@@ -31,7 +31,7 @@ oppia.factory('answerClassificationService', [
      *     answer group contains rule_specs, which is a list of rules.
      * @param {object} defaultOutcome - The default outcome of the interaction.
      * @param {function} interactionRulesService The service which contains the
-     *     rules of that interaction.
+     *     explicit rules of that interaction.
      *
      * @return {object} An object representing the answer group with the
      *     following properties:
@@ -83,8 +83,7 @@ oppia.factory('answerClassificationService', [
        * @param {boolean} isInEditorMode - Whether the function is being called
        *   in editor mode.
        * @param {?function} interactionRulesService - The service which contains
-       *   the rules of that interaction. If this is undefined, then the
-       *   function uses server-side classification.
+       *   the rules of that interaction.
        *
        * @return {promise} A promise for an object representing the answer group
        *     with the following properties:

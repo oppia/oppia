@@ -50,14 +50,12 @@ class InteractionAnswerUnitTests(test_utils.GenericTestBase):
     """Test the answer object and type properties of an interaction object."""
 
     def test_rules_property(self):
-        """Test that interaction.rules behaves as expected."""
+        """Test that answer normalization behaves as expected."""
         interaction = base.BaseInteraction()
         interaction.answer_type = None
         interaction.normalize_answer('15')
-        self.assertEqual(interaction.rules, [])
 
         interaction.answer_type = 'NonnegativeInt'
-        self.assertEqual(len(interaction.rules), 1)
         interaction.normalize_answer('15')
 
         with self.assertRaisesRegexp(Exception, 'not a valid object class'):
@@ -149,6 +147,32 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             },
             'default_value': 1,
         }])
+
+    def test_interaction_rules(self):
+        def _check_num_interaction_rules(interaction_id, expected_num):
+            interaction = interaction_registry.Registry.get_interaction_by_id(
+                interaction_id)
+            self.assertEqual(len(interaction.rules), expected_num)
+
+        _check_num_interaction_rules('MultipleChoiceInput', 1)
+        _check_num_interaction_rules('NumericInput', 7)
+        _check_num_interaction_rules('Continue', 0)
+        with self.assertRaises(KeyError):
+            _check_num_interaction_rules('FakeObjType', 0)
+
+    def test_interaction_rule_descriptions(self):
+        interaction = interaction_registry.Registry.get_interaction_by_id(
+            'NumericInput')
+        self.assertEqual(interaction.to_dict()['rule_descriptions'], {
+            'Equals': 'is equal to {{x|Real}}',
+            'IsLessThan': 'is less than {{x|Real}}',
+            'IsGreaterThan': 'is greater than {{x|Real}}',
+            'IsLessThanOrEqualTo': 'is less than or equal to {{x|Real}}',
+            'IsGreaterThanOrEqualTo': 'is greater than or equal to {{x|Real}}',
+            'IsInclusivelyBetween': (
+                'is between {{a|Real}} and {{b|Real}}, inclusive'),
+            'IsWithinTolerance': 'is within {{tol|Real}} of {{x|Real}}'
+        })
 
     def test_default_interactions_are_valid(self):
         """Test that the default interactions are valid."""
@@ -313,6 +337,28 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             else:
                 self.assertIsNone(interaction.default_outcome_heading)
 
+            # Check that the rules for this interaction have object editor
+            # templates.
+            for rule_name, rule_dict in interaction.rules.iteritems():
+                rule_description = rule_dict['description']
+                param_list = rule_domain.get_param_list(rule_description)
+
+                for (_, param_obj_type) in param_list:
+                    # TODO(sll): Get rid of these special cases.
+                    if param_obj_type.__name__ in [
+                            'NonnegativeInt', 'ListOfGraph',
+                            'ListOfCodeEvaluation', 'ListOfCoordTwoDim',
+                            'SetOfNormalizedString']:
+                        continue
+
+                    self.assertTrue(
+                        param_obj_type.has_editor_js_template(),
+                        msg='(%s)' % rule_description)
+                    at_least_one_rule_found = True
+
+                self.assertTrue(at_least_one_rule_found)
+
+
     def test_trainable_interactions_have_fuzzy_rules(self):
         all_interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
@@ -321,11 +367,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             interaction = interaction_registry.Registry.get_interaction_by_id(
                 interaction_id)
             if interaction.is_trainable:
-                obj_type = interaction.answer_type
-                all_rule_classes = rule_domain.get_rules_for_obj_type(obj_type)
                 self.assertIn(
-                    rule_domain.FUZZY_RULE_TYPE,
-                    [rule_class.__name__ for rule_class in all_rule_classes],
+                    rule_domain.FUZZY_RULE_TYPE, interaction.rules,
                     'Expected to find a fuzzy rule in trainable '
                     'interaction: %s' % interaction_id)
 
@@ -337,11 +380,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             interaction = interaction_registry.Registry.get_interaction_by_id(
                 interaction_id)
             if not interaction.is_trainable:
-                obj_type = interaction.answer_type
-                all_rule_classes = rule_domain.get_rules_for_obj_type(obj_type)
                 self.assertNotIn(
-                    rule_domain.FUZZY_RULE_TYPE,
-                    [rule_class.__name__ for rule_class in all_rule_classes],
+                    rule_domain.FUZZY_RULE_TYPE, interaction.rules,
                     'Did not expect to find a fuzzy rule in untrainable '
                     'interaction: %s' % interaction_id)
 
@@ -357,10 +397,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             interaction = interaction_registry.Registry.get_interaction_by_id(
                 interaction_id)
             if interaction.is_trainable:
-                obj_type = interaction.answer_type
-                all_rule_classes = rule_domain.get_rules_for_obj_type(obj_type)
                 self.assertNotEqual(
-                    len(all_rule_classes), 1,
+                    len(interaction.rules), 1,
                     'Expected trainable interaction to have more than just a '
                     'fuzzy rule: %s' % interaction_id)
 

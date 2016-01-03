@@ -27,7 +27,8 @@ module.exports = function(config) {
       'core/templates/dev/head/components/rating_display.html',
       'extensions/**/*.js',
       'extensions/interactions/**/*.html',
-      'extensions/skins/**/*.html'
+      'extensions/skins/**/*.html',
+      'extensions/interactions/rules.json'
     ],
     exclude: [
       'core/templates/dev/head/**/*-e2e.js',
@@ -69,7 +70,8 @@ module.exports = function(config) {
       // list above.
       'core/templates/dev/head/components/rating_display.html': ['ng-html2js'],
       'extensions/interactions/**/*.html': ['ng-html2js'],
-      'extensions/skins/**/*.html': ['ng-html2js']
+      'extensions/skins/**/*.html': ['ng-html2js'],
+      'extensions/interactions/rules.json': ['json_fixtures']
     },
     reporters: ['progress', 'coverage'],
     coverageReporter: {
@@ -95,9 +97,11 @@ module.exports = function(config) {
       }
     },
     plugins: [
+      'karma-jasmine-jquery',
       'karma-jasmine',
       'karma-chrome-launcher',
       'karma-ng-html2js-preprocessor',
+      'karma-json-fixtures-preprocessor',
       'karma-coverage'
     ],
     ngHtml2JsPreprocessor: {
@@ -105,6 +109,9 @@ module.exports = function(config) {
         return filepath;
       },
       moduleName: 'directiveTemplates'
+    },
+    jsonFixturesPreprocessor: {
+      variableName: '__fixtures__'
     }
   });
 };

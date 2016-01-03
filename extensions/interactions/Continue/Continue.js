@@ -60,3 +60,7 @@ oppia.directive('oppiaShortResponseContinue', [function() {
     }]
   };
 }]);
+
+oppia.factory('continueRulesService', [function() {
+  return {};
+}]);

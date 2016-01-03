@@ -59,6 +59,7 @@ install_node_module karma-jasmine 0.1.0
 install_node_module karma-coverage 0.5.2
 install_node_module karma-ng-html2js-preprocessor 0.1.0
 install_node_module karma-chrome-launcher 0.1.4
+install_node_module karma-json-fixtures-preprocessor 0.0.4
 
 echo ""
 echo "  View interactive frontend test coverage reports by navigating to"

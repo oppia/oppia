@@ -69,6 +69,21 @@ class EditorTest(BaseEditorControllerTest):
         rights_manager.release_ownership_of_exploration(
             feconf.SYSTEM_COMMITTER_ID, '0')
 
+    def _submit_answer_as_learner(
+            self, exploration_id, state_name, answer, answer_group_index,
+            rule_spec_index):
+        # The params and version are faked.
+        self.post_json(
+            '/explorehandler/answer_submitted_event/%s' % exploration_id, {
+                'answer': answer,
+                'params': {},
+                'version': '1',
+                'old_state_name': state_name,
+                'answer_group_index': answer_group_index,
+                'rule_spec_index': rule_spec_index,
+            }
+        )
+
     def test_editor_page(self):
         """Test access to editor pages for the sample exploration."""
 
@@ -175,34 +190,40 @@ class EditorTest(BaseEditorControllerTest):
         self.logout()
 
     def test_resolved_answers_handler(self):
-        # In the reader perspective, submit the first multiple-choice answer,
-        # then submit 'blah' once, 'blah2' twice and 'blah3' three times.
-        # TODO(sll): Use the ExplorationPlayer in reader_test for this.
+        # As a learner, submit the first multiple-choice answer, then submit
+        # 'blah' once, 'blah2' twice and 'blah3' three times.
+        exp_id = '0'
         exploration_dict = self.get_json(
-            '%s/0' % feconf.EXPLORATION_INIT_URL_PREFIX)
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
         self.assertEqual(
             exploration_dict['exploration']['title'], 'Welcome to Oppia!')
 
-        state_name = exploration_dict['exploration']['init_state_name']
-        result_dict = self.submit_answer('0', state_name, '0')
+        first_state_name = exploration_dict['exploration']['init_state_name']
+        self._submit_answer_as_learner(exp_id, first_state_name, 0, 0, 0)
 
-        state_name = result_dict['state_name']
-        self.submit_answer('0', state_name, 'blah')
+        second_state_name = 'What language'
+        num_answer_groups = len(exploration_dict['exploration']['states'][
+            second_state_name]['interaction']['answer_groups'])
+        self._submit_answer_as_learner(
+            exp_id, second_state_name, 'blah', num_answer_groups, 0)
         for _ in range(2):
-            self.submit_answer('0', state_name, 'blah2')
+            self._submit_answer_as_learner(
+                exp_id, second_state_name, 'blah2', num_answer_groups, 0)
         for _ in range(3):
-            self.submit_answer('0', state_name, 'blah3')
+            self._submit_answer_as_learner(
+                exp_id, second_state_name, 'blah3', num_answer_groups, 0)
 
         # Log in as an editor.
         self.login(self.EDITOR_EMAIL)
 
-        response = self.testapp.get('/create/0')
+        response = self.testapp.get('/create/%s' % exp_id)
         csrf_token = self.get_csrf_token_from_response(response)
-        url = str('/createhandler/resolved_answers/0/%s' % state_name)
+        url = str('/createhandler/resolved_answers/%s/%s' % (
+            exp_id, second_state_name))
 
         def _get_unresolved_answers():
             return stats_domain.StateRuleAnswerLog.get(
-                '0', state_name, exp_domain.DEFAULT_RULESPEC_STR
+                exp_id, second_state_name, exp_domain.DEFAULT_RULESPEC_STR
             ).answers
 
         self.assertEqual(

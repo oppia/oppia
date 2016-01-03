@@ -519,7 +519,7 @@ class AnswerGroup(object):
 
         self.outcome = outcome
 
-    def validate(self, obj_type, exp_param_specs_dict):
+    def validate(self, interaction_rules, exp_param_specs_dict):
         """Rule validation.
 
         Verifies that all rule classes are valid, and that the AnswerGroup only
@@ -534,25 +534,21 @@ class AnswerGroup(object):
                 'There must be at least one rule for each answer group.'
                 % self.rule_specs)
 
-        all_rule_classes = rule_domain.get_rules_for_obj_type(obj_type)
         seen_fuzzy_rule = False
         for rule_spec in self.rule_specs:
-            rule_class = None
-            try:
-                rule_class = next(
-                    r for r in all_rule_classes
-                    if r.__name__ == rule_spec.rule_type)
-            except StopIteration:
+            if rule_spec.rule_type not in interaction_rules:
                 raise utils.ValidationError(
                     'Unrecognized rule type: %s' % rule_spec.rule_type)
-            if rule_class.__name__ == rule_domain.FUZZY_RULE_TYPE:
+
+            if rule_spec.rule_type == rule_domain.FUZZY_RULE_TYPE:
                 if seen_fuzzy_rule:
                     raise utils.ValidationError(
                         'AnswerGroups can only have one fuzzy rule.')
                 seen_fuzzy_rule = True
 
             rule_spec.validate(
-                rule_domain.get_param_list(rule_class.description),
+                rule_domain.get_param_list(
+                    interaction_rules[rule_spec.rule_type]['description']),
                 exp_param_specs_dict)
 
         self.outcome.validate()
@@ -753,11 +749,8 @@ class InteractionInstance(object):
             raise utils.ValidationError(
                 'Terminal interactions must not have any answer groups.')
 
-        obj_type = (
-            interaction_registry.Registry.get_interaction_by_id(
-                self.id).answer_type)
         for answer_group in self.answer_groups:
-            answer_group.validate(obj_type, exp_param_specs_dict)
+            answer_group.validate(interaction.rules, exp_param_specs_dict)
         if self.default_outcome is not None:
             self.default_outcome.validate()
 
@@ -1133,10 +1126,10 @@ class State(object):
             for rule_dict in rule_specs_list:
                 rule_spec = RuleSpec.from_dict(rule_dict)
 
-                matched_rule = (
+                matched_rule_description = (
                     interaction_registry.Registry.get_interaction_by_id(
                         self.interaction.id
-                    ).get_rule_by_name(rule_spec.rule_type))
+                    ).get_rule_description(rule_spec.rule_type))
 
                 # Normalize and store the rule params.
                 rule_inputs = rule_spec.inputs
@@ -1145,8 +1138,17 @@ class State(object):
                         'Expected rule_inputs to be a dict, received %s'
                         % rule_inputs)
                 for param_name, value in rule_inputs.iteritems():
-                    param_type = rule_domain.get_obj_type_for_param_name(
-                        matched_rule, param_name)
+                    param_list = rule_domain.get_param_list(
+                        matched_rule_description)
+
+                    param_type = None
+                    for item in param_list:
+                        if item[0] == param_name:
+                            param_type = item[1]
+                    if not param_type:
+                        raise Exception(
+                            'Rule %s has no param called %s' %
+                            (rule_spec.rule_type, param_name))
 
                     if (isinstance(value, basestring) and
                             '{{' in value and '}}' in value):

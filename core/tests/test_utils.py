@@ -427,59 +427,6 @@ class TestBase(unittest.TestCase):
                 obj_type, new_param_dict)
         return new_param_dict
 
-    def submit_answer(
-            self, exploration_id, state_name, answer,
-            params=None, unused_exploration_version=None):
-        """Submits an answer as an exploration player and returns the
-        corresponding dict. This function has strong parallels to code in
-        PlayerServices.js which has the non-test code to perform the same
-        functionality. This is replicated here so backend tests may utilize the
-        functionality of PlayerServices.js without being able to access it.
-
-        TODO(bhenning): Replicate this in an end-to-end Protractor test to
-        protect against code skew here.
-        """
-        if params is None:
-            params = {}
-
-        exploration = exp_services.get_exploration_by_id(exploration_id)
-
-        # First, the answer must be classified.
-        classify_result = self.post_json(
-            '/explorehandler/classify/%s' % exploration_id, {
-                'old_state': exploration.states[state_name].to_dict(),
-                'params': params,
-                'answer': answer
-            }
-        )
-
-        # Next, ensure the submission is recorded.
-        self.post_json(
-            '/explorehandler/answer_submitted_event/%s' % exploration_id, {
-                'answer': answer,
-                'params': params,
-                'version': exploration.version,
-                'old_state_name': state_name,
-                'answer_group_index': classify_result['answer_group_index'],
-                'rule_spec_index': classify_result['rule_spec_index']
-            }
-        )
-
-        # Now the next state's data must be calculated.
-        outcome = classify_result['outcome']
-        new_state = exploration.states[outcome['dest']]
-        params['answer'] = answer
-        new_params = self.get_updated_param_dict(
-            params, new_state.param_changes, exploration.param_specs)
-
-        return {
-            'feedback_html': jinja_utils.parse_string(
-                utils.get_random_choice(outcome['feedback'])
-                if outcome['feedback'] else '', params),
-            'question_html': new_state.content[0].to_html(new_params),
-            'state_name': outcome['dest']
-        }
-
     @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):
         """Swap an object's attribute value within the context of a

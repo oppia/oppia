@@ -35,10 +35,10 @@ dicts, each representing a customization arg -- viz.:
 """
 
 import copy
+import json
 import os
 
 from core.domain import obj_services
-from core.domain import rule_domain
 from extensions import domain
 import feconf
 import jinja_utils
@@ -103,6 +103,9 @@ class BaseInteraction(object):
     # be None unless the interaction is linear and non-terminal.
     default_outcome_heading = None
 
+    # Temporary cache for the rule definitions.
+    _cached_rules = None
+
     @property
     def id(self):
         return self.__class__.__name__
@@ -116,10 +119,6 @@ class BaseInteraction(object):
     @property
     def dependency_ids(self):
         return copy.deepcopy(self._dependency_ids)
-
-    @property
-    def rules(self):
-        return rule_domain.get_rules_for_obj_type(self.answer_type)
 
     def normalize_answer(self, answer):
         """Normalizes a learner's input to this interaction."""
@@ -137,6 +136,25 @@ class BaseInteraction(object):
                 feconf.INTERACTIONS_DIR, self.id, 'stats_response.html'))
         except IOError:
             return '{{answer}}'
+
+    @property
+    def rules(self):
+        if self._cached_rules is not None:
+            return self._cached_rules
+
+        rules_index_dict = json.loads(
+            utils.get_file_contents(os.path.join(
+                os.getcwd(), 'extensions', 'interactions', 'rules.json')))
+        self._cached_rules = rules_index_dict[self.id]
+
+        return self._cached_rules
+
+    @property
+    def _rule_description_strings(self):
+        return {
+            rule_name: self.rules[rule_name]['description']
+            for rule_name in self.rules
+        }
 
     @property
     def html_body(self):
@@ -168,7 +186,7 @@ class BaseInteraction(object):
         """Gets a dict representing this interaction. Only default values are
         provided.
         """
-        result = {
+        return {
             'id': self.id,
             'name': self.name,
             'description': self.description,
@@ -187,23 +205,15 @@ class BaseInteraction(object):
             } for ca_spec in self.customization_arg_specs],
             'instructions': self.instructions,
             'default_outcome_heading': self.default_outcome_heading,
+            'rule_descriptions': self._rule_description_strings,
         }
 
-        # Add information about rule descriptions corresponding to the answer
-        # type for this interaction.
-        result['rule_descriptions'] = (
-            rule_domain.get_description_strings_for_obj_type(
-                self.answer_type))
-
-        return result
-
-    def get_rule_by_name(self, rule_name):
-        """Gets a rule given its name."""
-        try:
-            return next(
-                r for r in self.rules if r.__name__ == rule_name)
-        except StopIteration:
+    def get_rule_description(self, rule_name):
+        """Gets a rule description, given its name."""
+        if rule_name not in self.rules:
             raise Exception('Could not find rule with name %s' % rule_name)
+        else:
+            return self.rules[rule_name]['description']
 
     def get_stats_log_html(self, state_customization_args, answer):
         """Gets the HTML for recording a learner's response in the stats log.

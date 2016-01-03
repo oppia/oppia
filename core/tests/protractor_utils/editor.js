@@ -23,7 +23,7 @@ var forms = require('./forms.js');
 var general = require('./general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 var gadgets = require('../../../extensions/gadgets/protractor.js');
-var rules = require('../../../extensions/rules/protractor.js');
+var rulesJson = require('../../../extensions/interactions/rules.json');
 
 var _NEW_STATE_OPTION = 'A New Card Called...';
 var _CURRENT_STATE_OPTION = '(try again)';
@@ -371,6 +371,17 @@ var addParameterChange = function(paramName, paramValue) {
 };
 
 // RULES
+var _getRuleDescription = function(interactionId, ruleName) {
+  if (rulesJson.hasOwnProperty(interactionId)) {
+    if (rulesJson[interactionId].hasOwnProperty(ruleName)) {
+      return rulesJson[interactionId][ruleName].description;
+    } else {
+      throw Error('Unknown rule: ' + ruleName);
+    }
+  } else {
+    throw Error('Could not find rules for interaction: ' + interactionId);
+  }
+};
 
 // This function selects a rule for the current interaction and enters the
 // entries of the parameterValues array as its parameters; the parameterValues
@@ -383,11 +394,12 @@ var _selectRule = function(ruleElement, interactionId, ruleName) {
     parameterValues.push(arguments[i]);
   }
 
-  var ruleDescription = rules.getDescription(
-    interactions.getInteraction(interactionId).answerObjectType, ruleName);
+  var ruleDescription = _getRuleDescription(interactionId, ruleName);
 
-  var parameterStart = (ruleDescription.indexOf('{{') === -1) ?
-    undefined : ruleDescription.indexOf('{{');
+  var parameterStart = (
+    ruleDescription.indexOf('{{') === -1) ?
+    undefined :
+    ruleDescription.indexOf('{{');
   // From the ruleDescription string we can deduce both the description used
   // in the page (which will have the form "is equal to ...") and the types
   // of the parameter objects, which will later tell us which object editors
