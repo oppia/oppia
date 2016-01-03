@@ -39,6 +39,9 @@ CUSTOMIZATION OPTIONS
 2.  To lint all files in  the folder or to lint just a specific file
         python scripts/pre_commit_linter.py --path filepath
 
+3.  To lint a specific list of files (*.js/*.py only). Separate files by spaces
+        python scripts/pre_commit_linter.py --files file_1 file_2 ... file_n
+
 Note that the root folder MUST be named 'oppia'.
  """
 
@@ -49,9 +52,15 @@ import sys
 import time
 
 _PARSER = argparse.ArgumentParser()
-_PARSER.add_argument(
+_EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
+_EXCLUSIVE_GROUP.add_argument(
     '--path',
     help='path to the directory with files to be linted',
+    action='store')
+_EXCLUSIVE_GROUP.add_argument(
+    '--files',
+    nargs='+',
+    help='specific files to be linted. Space separated list',
     action='store')
 
 if not os.getcwd().endswith('oppia'):
@@ -76,6 +85,7 @@ _PATHS_TO_INSERT = [
         _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.19',
         'google_appengine'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'webtest-1.4.2'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'numpy-1.6.1'),
     os.path.join('third_party', 'gae-pipeline-1.9.17.0'),
     os.path.join('third_party', 'bleach-1.2.2'),
     os.path.join('third_party', 'gae-mapreduce-1.9.17.0'),
@@ -218,21 +228,39 @@ def _pre_commit_linter():
     and pass JSCS binary path
     """
     parsed_args = _PARSER.parse_args()
-    input_path = parsed_args.path
-    if input_path:
+    if parsed_args.path:
         input_path = os.path.join(os.getcwd(), parsed_args.path)
         if not os.path.exists(input_path):
             print 'Could not locate file or directory %s. Exiting.' % input_path
             print '----------------------------------------'
-            sys.exit(0)
-
-    parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+            sys.exit(1)
+        if os.path.isfile(input_path):
+            all_files = [input_path]
+        else:
+            all_files = _get_all_files_in_directory(input_path)
+    elif parsed_args.files:
+        valid_filepaths = []
+        invalid_filepaths = []
+        for f in parsed_args.files:
+            if os.path.isfile(f):
+                valid_filepaths.append(f)
+            else:
+                invalid_filepaths.append(f)
+        if invalid_filepaths:
+            print ('The following file(s) do not exist: %s\n'
+                   'Exiting.' % invalid_filepaths)
+            sys.exit(1)
+        all_files = valid_filepaths
+    else:
+        all_files = _get_changed_filenames()
 
     jscsrc_path = os.path.join(os.getcwd(), '.jscsrc')
     pylintrc_path = os.path.join(os.getcwd(), '.pylintrc')
 
     config_jscsrc = '--config=%s' % jscsrc_path
     config_pylint = '--rcfile=%s' % pylintrc_path
+
+    parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
     node_path = os.path.join(
         parent_dir, 'oppia_tools', 'node-4.2.1', 'bin', 'node')
@@ -243,14 +271,7 @@ def _pre_commit_linter():
         print ''
         print 'ERROR    Please run start.sh first to install node-jscs '
         print '         and its dependencies.'
-
-    if input_path:
-        if os.path.isfile(input_path):
-            all_files = [input_path]
-        else:
-            all_files = _get_all_files_in_directory(input_path)
-    else:
-        all_files = _get_changed_filenames()
+        sys.exit(1)
 
     js_files_to_lint = [
         filename for filename in all_files if filename.endswith('.js')]
