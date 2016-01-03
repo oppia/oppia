@@ -58,7 +58,7 @@ class CollectionEditorPage(CollectionEditorHandler):
                 rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id))
 
         self.values.update({
-            'can_edit': can_edit, 
+            'can_edit': can_edit,
             'title': collection.title
         })
 
