@@ -166,18 +166,4 @@ describe('Interaction validator', function() {
         'Expected customization arguments to have properties: first, second');
     });
   });
-
-  describe('oppiaInteractiveTextInputValidator', function() {
-    var validator;
-
-    beforeEach(function() {
-      validator = filter('oppiaInteractiveTextInputValidator');
-    });
-
-    it('should be able to perform basic validation', function() {
-      var warnings = validator(
-        currentState, {}, goodAnswerGroups, goodDefaultOutcome);
-      expect(warnings).toEqual([]);
-    });
-  });
 });
