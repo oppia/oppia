@@ -23,7 +23,7 @@ oppia.directive('collectionSkillsListDirective', [function() {
   return {
     restrict: 'E',
     scope: {
-      collectionSkills : "=collectionSkills"
+      getCollectionSkills: '&collectionSkills'
     },
     templateUrl: 'inline/collection_skills_list_directive'
   };
