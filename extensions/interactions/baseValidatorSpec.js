@@ -167,60 +167,6 @@ describe('Interaction validator', function() {
     });
   });
 
-  describe('oppiaInteractiveContinueValidator', function() {
-    var validator, customizationArguments;
-
-    beforeEach(function() {
-      validator = filter('oppiaInteractiveContinueValidator');
-      customizationArguments = {
-        buttonText: {
-          value: 'Some Button Text'
-        }
-      };
-    });
-
-    it('should expect a non-empty button text customization argument',
-        function() {
-      var warnings = validator(
-        currentState, customizationArguments, [], goodDefaultOutcome);
-      expect(warnings).toEqual([]);
-
-      customizationArguments.buttonText.value = '';
-      warnings = validator(
-        currentState, customizationArguments, [], goodDefaultOutcome);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.CRITICAL,
-        message: 'The button text should not be empty.'
-      }]);
-
-      expect(function() {
-        validator(currentState, {}, [], goodDefaultOutcome);
-      }).toThrow(
-        'Expected customization arguments to have property: buttonText');
-    });
-
-    it('should expect no answer groups', function() {
-      var warnings = validator(
-        currentState, customizationArguments, goodAnswerGroups,
-        goodDefaultOutcome);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.CRITICAL,
-        message: (
-          'Only the default outcome is necessary for a continue interaction.')
-      }]);
-    });
-
-    it('should expect a non-confusing and non-null default outcome',
-        function() {
-      var warnings = validator(currentState, customizationArguments, [], null);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.ERROR,
-        message: (
-          'Please specify what Oppia should do after the button is clicked.')
-      }]);
-    });
-  });
-
   describe('oppiaInteractiveImageClickInputValidator', function() {
     var validator, customizationArguments;
 
