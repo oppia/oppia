@@ -167,20 +167,6 @@ describe('Interaction validator', function() {
     });
   });
 
-  describe('oppiaInteractiveSetInputValidator', function() {
-    var validator;
-
-    beforeEach(function() {
-      validator = filter('oppiaInteractiveSetInputValidator');
-    });
-
-    it('should be able to perform basic validation', function() {
-      var warnings = validator(
-        currentState, {}, goodAnswerGroups, goodDefaultOutcome);
-      expect(warnings).toEqual([]);
-    });
-  });
-
   describe('oppiaInteractiveTextInputValidator', function() {
     var validator;
 
