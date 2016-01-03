@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-describe('oppiaInteractiveMusicNotesInputValidator', function() {
+describe('oppiaInteractiveNumericInputValidator', function() {
   var validator, WARNING_TYPES;
 
   var currentState;
@@ -24,7 +24,7 @@ describe('oppiaInteractiveMusicNotesInputValidator', function() {
 
   beforeEach(inject(function($rootScope, $controller, $injector) {
     var filter = $injector.get('$filter');
-    validator = filter('oppiaInteractiveMusicNotesInputValidator');
+    validator = filter('oppiaInteractiveNumericInputValidator');
 
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 
