@@ -193,7 +193,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             try:
                 self.assertTrue(os.path.isfile(os.path.join(
-                    interaction_dir, 'ValidatorSpec.js')))
+                    interaction_dir, 'validatorSpec.js')))
                 optional_dirs_and_files_count += 1
             except Exception:
                 pass
