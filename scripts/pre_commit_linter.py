@@ -39,8 +39,8 @@ CUSTOMIZATION OPTIONS
 2.  To lint all files in  the folder or to lint just a specific file
         python scripts/pre_commit_linter.py --path filepath
 
-3.  To lint a specific list of files (*.js/*.py only)
-        python scripts/pre_commit_linter.py --files file1, file2 ... filen
+3.  To lint a specific list of files (*.js/*.py only). Separate files by spaces
+        python scripts/pre_commit_linter.py --files file_1 file_2 ... file_n
 
 Note that the root folder MUST be named 'oppia'.
  """
@@ -60,7 +60,7 @@ _EXCLUSIVE_GROUP.add_argument(
 _EXCLUSIVE_GROUP.add_argument(
     '--files',
     nargs='+',
-    help='specific files to be linted',
+    help='specific files to be linted. Space separated list',
     action='store')
 
 if not os.getcwd().endswith('oppia'):
@@ -228,32 +228,39 @@ def _pre_commit_linter():
     and pass JSCS binary path
     """
     parsed_args = _PARSER.parse_args()
-    input_path = parsed_args.path
-    if input_path:
+    if parsed_args.path:
         input_path = os.path.join(os.getcwd(), parsed_args.path)
         if not os.path.exists(input_path):
             print 'Could not locate file or directory %s. Exiting.' % input_path
             print '----------------------------------------'
-            sys.exit(0)
-    if parsed_args.files:
-        file_list = []
-        invalids = []
+            sys.exit(1)
+        if os.path.isfile(input_path):
+            all_files = [input_path]
+        else:
+            all_files = _get_all_files_in_directory(input_path)
+    elif parsed_args.files:
+        valid_filepaths = []
+        invalid_filepaths = []
         for f in parsed_args.files:
             if os.path.isfile(f):
-                file_list.append(f)
+                valid_filepaths.append(f)
             else:
-                invalids.append(f)
-        if invalids:
-            print 'The following file(s) do not exist: %s\nExiting.' % invalids
+                invalid_filepaths.append(f)
+        if invalid_filepaths:
+            print ('The following file(s) do not exist: %s\n'
+                   'Exiting.' % invalid_filepaths)
             sys.exit(1)
-
-    parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+        all_files = valid_filepaths
+    else:
+        all_files = _get_changed_filenames()
 
     jscsrc_path = os.path.join(os.getcwd(), '.jscsrc')
     pylintrc_path = os.path.join(os.getcwd(), '.pylintrc')
 
     config_jscsrc = '--config=%s' % jscsrc_path
     config_pylint = '--rcfile=%s' % pylintrc_path
+
+    parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
     node_path = os.path.join(
         parent_dir, 'oppia_tools', 'node-4.2.1', 'bin', 'node')
@@ -264,16 +271,7 @@ def _pre_commit_linter():
         print ''
         print 'ERROR    Please run start.sh first to install node-jscs '
         print '         and its dependencies.'
-
-    if input_path:
-        if os.path.isfile(input_path):
-            all_files = [input_path]
-        else:
-            all_files = _get_all_files_in_directory(input_path)
-    elif file_list:
-        all_files = file_list
-    else:
-        all_files = _get_changed_filenames()
+        sys.exit(1)
 
     js_files_to_lint = [
         filename for filename in all_files if filename.endswith('.js')]
