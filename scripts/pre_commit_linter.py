@@ -47,6 +47,7 @@ Note that the root folder MUST be named 'oppia'.
 
 import argparse
 import os
+import json
 import subprocess
 import sys
 import time
@@ -57,6 +58,10 @@ _EXCLUSIVE_GROUP.add_argument(
     '--path',
     help='path to the directory with files to be linted',
     action='store')
+_PARSER.add_argument(
+    '--silent',
+    help='suppress status messages',
+    action='store_true')
 _EXCLUSIVE_GROUP.add_argument(
     '--files',
     nargs='+',
@@ -129,7 +134,8 @@ def _get_all_files_in_directory(dir_path):
     return files_in_directory
 
 
-def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint):
+def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint,
+                   is_silent):
     """Prints a list of lint errors in the given list of JavaScript files.
 
     Args:
@@ -156,8 +162,11 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint):
     jscs_cmd_args = [node_path, jscs_path, config_jscsrc]
 
     for ind, filename in enumerate(files_to_lint):
-        print 'Linting file %d/%d: %s ...' % (
-            ind + 1, num_js_files, filename)
+        if not is_silent:
+            print 'Linting file %d/%d: %s ...' % (
+                ind + 1, num_js_files, filename)
+        elif ind % 100 == 0:
+            print 'Already linted %d/%d files' % (ind, num_js_files)
 
         proc_args = jscs_cmd_args + [filename]
         proc = subprocess.Popen(
@@ -228,6 +237,7 @@ def _pre_commit_linter():
     and pass JSCS binary path
     """
     parsed_args = _PARSER.parse_args()
+    is_silent = parsed_args.silent
     if parsed_args.path:
         input_path = os.path.join(os.getcwd(), parsed_args.path)
         if not os.path.exists(input_path):
@@ -281,7 +291,7 @@ def _pre_commit_linter():
     summary_messages = []
     print '\nStarting jscs linter...'
     summary_messages.append(_lint_js_files(
-        node_path, jscs_path, config_jscsrc, js_files_to_lint))
+        node_path, jscs_path, config_jscsrc, js_files_to_lint, is_silent))
     print '\nStarting pylint...'
     summary_messages.append(_lint_py_files(
         config_pylint, py_files_to_lint))

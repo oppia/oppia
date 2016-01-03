@@ -20,13 +20,13 @@ matrix:
   - env: RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false REPORT_BACKEND_COVERAGE=true
   fast_finish: true
 
-notifications:
-  email:
-    recipients:
-    - sean@seanlip.org
-    - henning.benmax@gmail.com
-    on_success: change
-    on_failure: change
+# notifications:
+#   email:
+#     recipients:
+#     - sean@seanlip.org
+#     - henning.benmax@gmail.com
+#     on_success: change
+#     on_failure: change
 
 before_install:
 - pip install codecov
@@ -44,6 +44,8 @@ install:
   -o gae-download.zip
 - unzip -qq gae-download.zip -d $TOOLS_DIR/google_appengine_1.9.19/
 - rm gae-download.zip
+- bash scripts/install_third_party.sh
+- python scripts/pre_commit_linter.py --path=. --silent
 
 script:
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report; fi
