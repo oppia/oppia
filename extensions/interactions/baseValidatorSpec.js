@@ -167,25 +167,6 @@ describe('Interaction validator', function() {
     });
   });
 
-  describe('oppiaInteractiveLogicProofValidator', function() {
-    var validator;
-
-    beforeEach(function() {
-      validator = filter('oppiaInteractiveLogicProofValidator');
-    });
-
-    it('should be able to perform basic validation', function() {
-      var warnings = validator(
-        currentState, {}, goodAnswerGroups, goodDefaultOutcome);
-      expect(warnings).toEqual([]);
-    });
-
-    it('should not have warnings for a confusing default outcome', function() {
-      var warnings = validator(currentState, {}, [], badOutcome);
-      expect(warnings).toEqual([]);
-    });
-  });
-
   describe('oppiaInteractiveMusicNotesInputValidator', function() {
     var validator;
 
