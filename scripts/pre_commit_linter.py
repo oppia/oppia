@@ -39,6 +39,9 @@ CUSTOMIZATION OPTIONS
 2.  To lint all files in  the folder or to lint just a specific file
         python scripts/pre_commit_linter.py --path filepath
 
+3.  To lint a specific list of files (*.js/*.py only)
+        python scripts/pre_commit_linter.py --files file1, file2 ... filen
+
 Note that the root folder MUST be named 'oppia'.
  """
 
@@ -49,9 +52,15 @@ import sys
 import time
 
 _PARSER = argparse.ArgumentParser()
-_PARSER.add_argument(
+_EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
+_EXCLUSIVE_GROUP.add_argument(
     '--path',
     help='path to the directory with files to be linted',
+    action='store')
+_EXCLUSIVE_GROUP.add_argument(
+    '--files',
+    nargs='+',
+    help='specific files to be linted',
     action='store')
 
 if not os.getcwd().endswith('oppia'):
@@ -76,6 +85,7 @@ _PATHS_TO_INSERT = [
         _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.19',
         'google_appengine'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'webtest-1.4.2'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'numpy-1.6.1'),
     os.path.join('third_party', 'gae-pipeline-1.9.17.0'),
     os.path.join('third_party', 'bleach-1.2.2'),
     os.path.join('third_party', 'gae-mapreduce-1.9.17.0'),
@@ -225,6 +235,17 @@ def _pre_commit_linter():
             print 'Could not locate file or directory %s. Exiting.' % input_path
             print '----------------------------------------'
             sys.exit(0)
+    if parsed_args.files:
+        file_list = []
+        invalids = []
+        for f in parsed_args.files:
+            if os.path.isfile(f):
+                file_list.append(f)
+            else:
+                invalids.append(f)
+        if invalids:
+            print 'The following file(s) do not exist: %s\nExiting.' % invalids
+            sys.exit(1)
 
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
@@ -249,6 +270,8 @@ def _pre_commit_linter():
             all_files = [input_path]
         else:
             all_files = _get_all_files_in_directory(input_path)
+    elif file_list:
+        all_files = file_list
     else:
         all_files = _get_changed_filenames()
 
