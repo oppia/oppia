@@ -34,7 +34,6 @@ from core.domain import interaction_registry
 from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import rule_domain
-from core.domain import skins_services
 from core.domain import stats_services
 from core.domain import user_services
 from core.domain import value_generators_domain
@@ -207,14 +206,10 @@ class ExplorationPage(EditorHandler):
         gadget_templates = (
             gadget_registry.Registry.get_gadget_html(gadget_types))
 
-        skin_templates = skins_services.Registry.get_skin_templates(
-            skins_services.Registry.get_all_skin_ids())
-
         self.values.update({
             'GADGET_SPECS': gadget_registry.Registry.get_all_specs(),
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
-            'PANEL_SPECS': skins_services.Registry.get_all_specs()[
-                feconf.DEFAULT_SKIN_ID],
+            'PANEL_SPECS': feconf.PANELS_PROPERTIES,
             'additional_angular_modules': additional_angular_modules,
             'can_delete': rights_manager.Actor(
                 self.user_id).can_delete(
@@ -247,10 +242,6 @@ class ExplorationPage(EditorHandler):
             'moderator_request_forum_url': MODERATOR_REQUEST_FORUM_URL.value,
             'nav_mode': feconf.NAV_MODE_CREATE,
             'value_generators_js': jinja2.utils.Markup(value_generators_js),
-            'skin_js_urls': [
-                skins_services.Registry.get_skin_js_url(skin_id)
-                for skin_id in skins_services.Registry.get_all_skin_ids()],
-            'skin_templates': jinja2.utils.Markup(skin_templates),
             'title': exploration.title,
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'ALLOWED_GADGETS': feconf.ALLOWED_GADGETS,

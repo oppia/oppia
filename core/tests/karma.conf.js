@@ -26,8 +26,7 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*.js',
       'core/templates/dev/head/components/rating_display.html',
       'extensions/**/*.js',
-      'extensions/interactions/**/*.html',
-      'extensions/skins/**/*.html'
+      'extensions/interactions/**/*.html'
     ],
     exclude: [
       'core/templates/dev/head/**/*-e2e.js',
@@ -68,8 +67,7 @@ module.exports = function(config) {
       // Jinja expressions. They should also be specified within the 'files'
       // list above.
       'core/templates/dev/head/components/rating_display.html': ['ng-html2js'],
-      'extensions/interactions/**/*.html': ['ng-html2js'],
-      'extensions/skins/**/*.html': ['ng-html2js']
+      'extensions/interactions/**/*.html': ['ng-html2js']
     },
     reporters: ['progress', 'coverage'],
     coverageReporter: {
