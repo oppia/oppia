@@ -111,3 +111,13 @@ if [ ! -d "$TOOLS_DIR/pylint-1.5.2" ]; then
 
   pip install pylint==1.5.2 --target="$TOOLS_DIR/pylint-1.5.2"
 fi
+
+# Install webtest.
+echo Checking if webtest is installed in third_party
+if [ ! -d "$TOOLS_DIR/webtest-1.4.2" ]; then
+  echo Installing webtest framework
+  # Note that the github URL redirects, so we pass in -L to tell curl to follow the redirect.
+  curl --silent -L https://github.com/Pylons/webtest/archive/1.4.2.zip -o webtest-download.zip
+  unzip webtest-download.zip -d $TOOLS_DIR
+  rm webtest-download.zip
+fi
