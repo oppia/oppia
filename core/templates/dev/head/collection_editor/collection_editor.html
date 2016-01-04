@@ -32,52 +32,36 @@
       <p>title: <[collection.title]></p>
       <p>category: <[collection.category]></p>
       <p>objective: <[collection.objective]></p>
+      <p>version: <em><[collection.version]></em></p>
+      <a ng-href="/collection/<[collection.id]>" target="_blank">Go to Collection</a>
 
-      <!-- Examples for modifying the collection. This is placeholder and should not go into develop. -->
-      <hr>
+      <!-- List of acquired and pre-requisite skills !-->
+      <br>
+      <br>
+      <strong>Skills</strong>
+      <collection-skills-list-directive collection-skills="collectionSkills">
+      </collection-skills-list-directive>
 
-      <h3>Current collection</h3>
-      <strong>Details</strong>
-      <br>
-      Title: <em><[collection.title]></em>
-      <br>
-      Category: <em><[collection.category]></em>
-      <br>
-      Objective: <em><[collection.objective]></em>
-      <br>
-      Version: <em><[collection.version]></em>
-      <br>
-      <br>
 
+      <!-- List of explorations !-->
+      <br>
       <strong>Explorations</strong>
       <ul>
         <li ng-repeat="node in collection.nodes">
-          <div>
-            [<[node.exploration.id]>] <em><[node.exploration.title]></em>
-            <br>
-            <div ng-if="node.prerequisite_skills.length > 0">
-              Prerequisite skills:
-              <ul>
-                <li ng-repeat="skill in node.prerequisite_skills"><em><[skill]></em></li>
-              </ul>
-            </div>
-            <div ng-if="node.acquired_skills.length > 0">
-              Acquired skills:
-              <ul>
-                <li ng-repeat="skill in node.acquired_skills"><em><[skill]></em></li>
-              </ul>
-            </div>
-          </div>
+          <collection-node-directive
+            prerequisite-skills="node.prerequisite_skills" acquired-skills="node.acquired_skills"
+            exploration-id="node.exploration.id", exploration-title="node.exploration.title"
+            add-prereq-skill="addPrereqSkill(expId, skillName)"
+            add-acquired-skill="addAcquiredSkill(expId, skillName)"
+            delete-exploration="deleteExploration(expId)"></collection-node-directive>
         </li>
       </ul>
 
-      <h3>Examples to change the collection<span ng-if="changeList.length > 0"> <em>(<[changeList.length]> changes pending)</em></h3>
-
-      <a ng-href="/collection/<[collection.id]>" target="_blank">Go to Collection</a>
+      <!-- Edit options for major collection properties !-->
+      <br>
+      <strong>Edit Collection</strong>
       <br>
       <input ng-model="newExpId" type="text" placeholder="New exp ID" /><button ng-click="addExploration(newExpId)">Add Exploration</button>
-      <br>
-      <input ng-model="removeExpId" type="text" placeholder="Remove exp ID" /><button ng-click="deleteExploration(removeExpId)">Delete Exploration</button>
       <br>
       <input ng-model="newTitle" type="text" placeholder="New collection title"><button ng-click="setCollectionTitle(newTitle)">Set Collection Title</button>
       <br>
@@ -85,25 +69,16 @@
       <br>
       <input ng-model="newObjective" type="text" placeholder="New collection objective"><button ng-click="setCollectionObjective(newObjective)">Set Collection Objective</button>
       <br>
-      <input ng-model="prereqExpId" type="text" placeholder="Exp ID"><input ng-model="prereqSkillName" type="text" placeholder="Skill name"><button ng-click="addPrereqSkill(prereqExpId, prereqSkillName)">Add Prerequisite Skill for Exploration</button>
-      <br>
-      <input ng-model="acqExpId" type="text" placeholder="Exp ID"><input ng-model="acqSkillName" type="text" placeholder="Skill name"><button ng-click="addAcquiredSkill(acqExpId, acqSkillName)">Add Acquired Skill for Exploration</button>
-
-      <br>
       <br>
 
+      <h3><span ng-if="changeList.length > 0"> <em>(<[changeList.length]> changes pending)</em></h3>
+      <br>
       <input ng-model="commitMessage" type="text" placeholder="Commit Message"><button ng-click="saveCollection(commitMessage)">Save Collection</button>
-
-      <!-- End of placeholder/example markup. -->
-
-      <!-- List of acquired and pre-requisite skills !-->
-      <h1>Skills</h1>
-      <collection-skills-list-directive collection-skills="collectionSkills">
-      </collection-skills-list-directive>
     </div>
   </div>
 
   {% include 'collection_editor/collection_skills_list_directive.html' %}
+  {% include 'collection_editor/collection_node_directive.html' %}
 {% endblock content %}
 
 
@@ -111,10 +86,11 @@
   {{ super() }}
   <script>
     {{ include_js_file('collection_editor/CollectionEditor.js') }}
-    {{ include_js_file('domain/collection/CollectionBackendApiService.js') }}
-    {{ include_js_file('domain/collection/WritableCollectionBackendApiService.js') }}
-    {{ include_js_file('domain/collection/CollectionUpdateService.js') }}
+    {{ include_js_file('collection_editor/CollectionNodeDirective.js') }}
     {{ include_js_file('collection_editor/CollectionSkillsListDirective.js') }}
+    {{ include_js_file('domain/collection/CollectionBackendApiService.js') }}
+    {{ include_js_file('domain/collection/CollectionUpdateService.js') }}
+    {{ include_js_file('domain/collection/WritableCollectionBackendApiService.js') }}
     {{ include_js_file('domain/utilities/UrlInterpolationService.js') }}
   </script>
 {% endblock footer_js %}
