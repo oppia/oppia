@@ -16,13 +16,14 @@
 
 """Pre-commit script for Oppia.
 
-This script uses the JSCS node module to lint JavaScript code, and prints a
+This script lints Python and JavaScript code, and prints a
 list of lint errors to the terminal. If the directory path is passed,
-it will lint all JavaScript files in that directory; otherwise,
+it will lint all Python and JavaScript files in that directory; otherwise,
 it will only lint files that have been touched in this commit.
 
 This script ignores all filepaths contained within the excludeFiles
-argument in .jscsrc
+argument in .jscsrc. Note that, as a side-effect, these filepaths will also
+prevent Python files in those paths from being linted.
 
 IMPORTANT NOTES:
 
@@ -121,21 +122,21 @@ def _get_changed_filenames():
     return unstaged_files + staged_files
 
 
-def _does_glob_pattern_include_filename(filename, glob_patterns):
-    """Checks whether 'filename' is described by 'glob_pattern'.
+def _is_filename_in_glob_patterns(filename, glob_patterns):
+    """Checks whether 'filename' by any pattern in 'glob_patterns'.
 
     Args:
     - filename: str. Filename to check
-    - source: list. List of glob_patterns to check filename against
+    - glob_patterns: list. List of glob_patterns to check filename against
 
     Returns:
-        bool whether filename matches with source.
+        bool: whether filename matches any glob_patterns.
 
-    >>> _does_glob_pattern_include_filename('foo/bar', ['foo/', 'bar/*'])
+    >>> _is_filename_in_glob_patterns('foo/bar', ['foo/', 'bar/*'])
     False
-    >>> _does_glob_pattern_include_filename('foo/bar', ['foo/foo','foo/**'])
+    >>> _is_filename_in_glob_patterns('foo/bar', ['foo/foo', 'foo/**'])
     True
-    >>> _does_glob_pattern_include_filename('bar/bar', ['bar/bar', 'foo/bar'])
+    >>> _is_filename_in_glob_patterns('bar/bar', ['bar/bar', 'foo/bar'])
     True
     """
     for glob_pattern in glob_patterns:
@@ -178,8 +179,8 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
         for file_name in files:
             filename = os.path.relpath(os.path.join(_dir, file_name),
                                        os.getcwd())
-            if not _does_glob_pattern_include_filename(filename,
-                                                       excluded_glob_patterns):
+            if not _is_filename_in_glob_patterns(filename,
+                                                 excluded_glob_patterns):
                 files_in_directory.append(filename)
     return files_in_directory
 
@@ -209,12 +210,12 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint):
         return ''
 
     jscs_cmd_args = [node_path, jscs_path, config_jscsrc]
-    _next_see_file = 1
+    first_file_in_batch = 1
     for ind, filename in enumerate(files_to_lint):
         if (ind + 1) % 10 == 0:
             print 'Linted files %d-%d of %d ...' % (
-                _next_see_file, ind + 1, num_js_files)
-            _next_see_file = ind + 2
+                first_file_in_batch, ind + 1, num_js_files)
+            first_file_in_batch = ind + 2
 
         proc_args = jscs_cmd_args + [filename]
         proc = subprocess.Popen(
@@ -231,7 +232,7 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint):
             print linter_stdout
 
     print 'Linted files %d-%d of %d ...' % (
-        _next_see_file, num_js_files, num_js_files)
+        first_file_in_batch, num_js_files, num_js_files)
     print '----------------------------------------'
 
     if num_files_with_errors:
@@ -302,8 +303,8 @@ def _pre_commit_linter():
         else:
             excluded_glob_patterns = _get_glob_patterns_excluded_from_jscsrc(
                 jscsrc_path)
-            all_files = _get_all_files_in_directory(input_path,
-                                                    excluded_glob_patterns)
+            all_files = _get_all_files_in_directory(
+                input_path, excluded_glob_patterns)
     elif parsed_args.files:
         valid_filepaths = []
         invalid_filepaths = []
