@@ -45,10 +45,10 @@ set -- "${remaining_params[@]}"
 
 echo Checking whether GAE is installed in $GOOGLE_APP_ENGINE_HOME
 if [ ! -f "$GOOGLE_APP_ENGINE_HOME/appcfg.py" ]; then
-  echo Installing Google App Engine
+  echo "Installing Google App Engine (this may take a little while)..."
   mkdir -p $GOOGLE_APP_ENGINE_HOME
   curl --silent https://storage.googleapis.com/appengine-sdks/deprecated/1919/google_appengine_1.9.19.zip -o gae-download.zip
-  unzip gae-download.zip -d $TOOLS_DIR/google_appengine_1.9.19/
+  unzip -q gae-download.zip -d $TOOLS_DIR/google_appengine_1.9.19/
   rm gae-download.zip
 fi
 
