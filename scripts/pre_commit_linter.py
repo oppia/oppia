@@ -122,29 +122,6 @@ def _get_changed_filenames():
     return unstaged_files + staged_files
 
 
-def _is_filename_in_glob_patterns(filename, glob_patterns):
-    """Checks whether 'filename' by any pattern in 'glob_patterns'.
-
-    Args:
-    - filename: str. Filename to check
-    - glob_patterns: list. List of glob_patterns to check filename against
-
-    Returns:
-        bool: whether filename matches any glob_patterns.
-
-    >>> _is_filename_in_glob_patterns('foo/bar', ['foo/', 'bar/*'])
-    False
-    >>> _is_filename_in_glob_patterns('foo/bar', ['foo/foo', 'foo/**'])
-    True
-    >>> _is_filename_in_glob_patterns('bar/bar', ['bar/bar', 'foo/bar'])
-    True
-    """
-    for glob_pattern in glob_patterns:
-        if fnmatch.fnmatch(filename, glob_pattern):
-            return True
-    return False
-
-
 def _get_glob_patterns_excluded_from_jscsrc(config_jscsrc):
     """Collects excludeFiles from jscsrc file.
 
@@ -177,10 +154,10 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
     files_in_directory = []
     for _dir, _, files in os.walk(dir_path):
         for file_name in files:
-            filename = os.path.relpath(os.path.join(_dir, file_name),
-                                       os.getcwd())
-            if not _is_filename_in_glob_patterns(filename,
-                                                 excluded_glob_patterns):
+            filename = os.path.relpath(
+                os.path.join(_dir, file_name), os.getcwd())
+            if not any([fnmatch.fnmatch(filename, gp) for gp in
+                        excluded_glob_patterns]):
                 files_in_directory.append(filename)
     return files_in_directory
 
