@@ -18,16 +18,16 @@ matrix:
   allow_failures:
   # The backend tests, with coverage, take too long to run, so we make this
   # optional.
-  - env: RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false REPORT_BACKEND_COVERAGE=true
+  - env: RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false RUN_LINT=false REPORT_BACKEND_COVERAGE=true
   fast_finish: true
 
-# notifications:
-#   email:
-#     recipients:
-#     - sean@seanlip.org
-#     - henning.benmax@gmail.com
-#     on_success: change
-#     on_failure: change
+notifications:
+  email:
+    recipients:
+    - sean@seanlip.org
+    - henning.benmax@gmail.com
+    on_success: change
+    on_failure: change
 
 before_install:
 - pip install codecov
