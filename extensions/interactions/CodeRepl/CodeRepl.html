@@ -4,7 +4,18 @@
   }
   .code-repl-language {
     float: right;
+    font-size: 0.8em;
     margin-top: 8px;
+  }
+  .code-repl-terminal {
+    background-color: #222;
+    color: white;
+    font-weight: bold;
+  }
+  .code-repl-terminal-error {
+    background-color: #222;
+    color: red;
+    font-weight: bold;
   }
 </style>
 
@@ -20,6 +31,16 @@
         <em>Language: <[language]></em>
       </span>
     </form>
+  </div>
+
+  <hr>
+
+  <div ng-if="fullError">
+    <pre class="code-repl-terminal-error"><[fullError]></pre>
+  </div>
+  <div ng-if="!fullError">
+    <pre ng-if="output" class="code-repl-terminal"><[output]></pre>
+    <pre ng-if="!output" class="code-repl-terminal">[No terminal output]</pre>
   </div>
 </script>
 
@@ -44,7 +65,7 @@
 </script>
 
 <script type="text/ng-template" id="shortResponse/CodeRepl">
-  <span><pre><[answer.code | truncateAtFirstLine]></pre></span>
+  <span><pre><[answer.code]></pre></span>
 
   <span ng-if="answer.output">
     <h5>Output</h5>

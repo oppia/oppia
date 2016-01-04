@@ -100,16 +100,23 @@ oppia.directive('oppiaInteractiveCodeRepl', [
           });
         };
 
+        var fixLineNumbers = function(err) {
+          var preCodeNumLines = $scope.preCode.split('\n').length;
+          return err.replace(/on line ([0-9]+)/g, function(match, p1) {
+            return '(on line ' + String(Number(p1) - preCodeNumLines) + ')';
+          });
+        };
+
         $scope.sendResponse = function(evaluation, err) {
           $scope.evaluation = (evaluation || '');
-          $scope.err = (err || '');
+          $scope.fullError = err ? fixLineNumbers(err) : '';
           $scope.$parent.submitAnswer({
             // Replace tabs with 2 spaces.
             // TODO(sll): Change the default Python indentation to 4 spaces.
             code: $scope.code.replace(/\t/g, '  ') || '',
             output: $scope.output,
             evaluation: $scope.evaluation,
-            error: $scope.err
+            error: (err || '')
           }, codeReplRulesService);
         };
       }]
