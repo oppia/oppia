@@ -23,8 +23,6 @@ import math
 import jinja2
 from jinja2 import meta
 
-import feconf  # pylint: disable=relative-import
-
 
 _OPPIA_MODULE_DEFINITION_FILE = 'app.js'
 
