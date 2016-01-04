@@ -55,7 +55,7 @@ oppia.factory('learnerParamsService', [function() {
 }]);
 
 // A service that provides a number of utility functions for JS used by
-// individual player skins.
+// the player skin.
 // Note that this service is used both in the learner and the editor views.
 // The URL determines which of these it is. Some methods may need to be
 // implemented differently depending on whether the skin is being played

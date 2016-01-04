@@ -52,7 +52,7 @@
 {% endblock local_top_nav_options %}
 
 {% block content %}
-  {{ skin_tag }}
+  <conversation-skin></conversation-skin>
 
   <br><br><br>
 
@@ -98,6 +98,7 @@
   {% include 'components/gadget_panel_directive.html' %}
   {% include 'components/profile_link_image_directive.html' %}
 
+  {% include 'player/conversation_skin_directive.html' %}
   {% include 'player/information_card_modal.html' %}
 {% endblock %}
 
@@ -125,12 +126,11 @@
     {{ include_js_file('player/PlayerPositionService.js') }}
     {{ include_js_file('player/PlayerTranscriptService.js') }}
     {{ include_js_file('player/StatsReportingService.js') }}
+    {{ include_js_file('player/ConversationSkinDirective.js') }}
 
     {{ include_js_file('expressions/expressionInterpolationService.js') }}
-    {{ include_skins_js_file(skin_js_url) }}
   </script>
 
-  {{ skin_templates }}
   {{ interaction_templates }}
   {{ gadget_templates }}
 {% endblock footer_js %}

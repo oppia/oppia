@@ -37,7 +37,6 @@ from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import rule_domain
-from core.domain import skins_services
 from core.domain import summary_services
 import feconf
 import utils
@@ -365,13 +364,6 @@ class ExplorationPage(base.BaseHandler):
             # Note that this overwrites the value in base.py.
             'meta_description': utils.capitalize_string(exploration.objective),
             'nav_mode': feconf.NAV_MODE_EXPLORE,
-            'skin_templates': jinja2.utils.Markup(
-                skins_services.Registry.get_skin_templates(
-                    [feconf.DEFAULT_SKIN_ID])),
-            'skin_js_url': skins_services.Registry.get_skin_js_url(
-                feconf.DEFAULT_SKIN_ID),
-            'skin_tag': jinja2.utils.Markup(
-                skins_services.Registry.get_skin_tag(feconf.DEFAULT_SKIN_ID)),
         })
 
         if is_iframed:

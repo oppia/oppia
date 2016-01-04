@@ -78,12 +78,6 @@ handlers:
   secure: always
   http_headers:
     Cache-Control: 'no-cache'
-- url: /extensions/skins/(.*)/static/(.*)
-  static_files: extensions/skins/\1/static/\2
-  upload: extensions/skins/(.*)/static/(.*)
-  secure: always
-  http_headers:
-    Cache-Control: 'no-cache'
 - url: /mapreduce/pipeline/images
   static_dir: third_party/gae-mapreduce-1.9.17.0/mapreduce/lib/pipeline/ui/images
   secure: always

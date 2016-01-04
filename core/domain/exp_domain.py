@@ -32,7 +32,6 @@ from core.domain import gadget_registry
 from core.domain import interaction_registry
 from core.domain import param_domain
 from core.domain import rule_domain
-from core.domain import skins_services
 from core.domain import trigger_registry
 import feconf
 import jinja_utils
@@ -928,18 +927,19 @@ class SkinInstance(object):
         None, in which case defaults will be generated that provide empty
         gadget panels for each panel specified in the skin.
         """
+        # TODO(sll): Deprecate this property; it is not used.
         self.skin_id = skin_id
         # panel_contents_dict has panel strings as keys and
         # lists of GadgetInstance instances as values.
         self.panel_contents_dict = {}
 
         default_skin_customizations = (
-            SkinInstance._get_default_skin_customizations(skin_id))
+            SkinInstance._get_default_skin_customizations())
 
         # Ensure that skin_customizations is a dict.
         if skin_customizations is None:
             skin_customizations = (
-                SkinInstance._get_default_skin_customizations(skin_id))
+                SkinInstance._get_default_skin_customizations())
 
         # Populate panel_contents_dict with default skin customizations
         # if they are not specified in skin_customizations.
@@ -956,19 +956,80 @@ class SkinInstance(object):
                     ) for gdict in skin_customizations['panels_contents'][panel]
                 ]
 
-    @property
-    def skin(self):
-        """Skin spec for validation and derived properties."""
-        return skins_services.Registry.get_skin_by_id(self.skin_id)
-
     @staticmethod
-    def _get_default_skin_customizations(skin_id):
+    def _get_default_skin_customizations():
         """Generates default skin customizations when none are specified."""
-        skin = skins_services.Registry.get_skin_by_id(skin_id)
-        panels_contents = {
-            panel: [] for panel in skin.panels_properties
+        return {
+            'panels_contents': {
+                panel_name: []
+                for panel_name in feconf.PANELS_PROPERTIES
+            }
         }
-        return {'panels_contents': panels_contents}
+
+    def validate_gadget_panel(self, panel_name, gadget_list):
+        """
+        Validate proper fit given space requirements specified by
+        feconf.PANELS_PROPERTIES.
+
+        Args:
+        - panel_name: str. Unique name that identifies this panel in the skin.
+            This should correspond to an entry in feconf.PANELS_PROPERTIES.
+        - gadget_list: list of GadgetInstance instances.
+        """
+        # If the panel contains no gadgets, max() will raise an error,
+        # so we return early.
+        if not gadget_list:
+            return
+
+        panel_spec = feconf.PANELS_PROPERTIES[panel_name]
+
+        # This is a dict whose keys are state names, and whose corresponding
+        # values are lists of GadgetInstance instances representing the gadgets
+        # visible in that state. Note that the keys only include states for
+        # which at least one gadget is visible.
+        gadget_visibility_map = collections.defaultdict(list)
+        for gadget_instance in gadget_list:
+            for state_name in set(gadget_instance.visible_in_states):
+                gadget_visibility_map[state_name].append(gadget_instance)
+
+        # Validate limitations and fit considering visibility for each state.
+        for state_name, gadget_instances in gadget_visibility_map.iteritems():
+            if len(gadget_instances) > panel_spec['max_gadgets']:
+                raise utils.ValidationError(
+                    "'%s' panel expected at most %d gadget%s, but %d gadgets"
+                    " are visible in state '%s'." % (
+                        panel_name,
+                        panel_spec['max_gadgets'],
+                        's' if panel_spec['max_gadgets'] != 1 else '',
+                        len(gadget_instances),
+                        state_name))
+
+            # Calculate total width and height of gadgets given custom args and
+            # panel stackable axis.
+            total_width = 0
+            total_height = 0
+
+            if (panel_spec['stackable_axis'] ==
+                    feconf.GADGET_PANEL_AXIS_HORIZONTAL):
+                total_width += panel_spec['pixels_between_gadgets'] * (
+                    len(gadget_instances) - 1)
+                total_width += sum(
+                    gadget.width for gadget in gadget_instances)
+                total_height = max(
+                    gadget.height for gadget in gadget_instances)
+            else:
+                raise utils.ValidationError(
+                    "Unrecognized axis for '%s' panel. ")
+
+            # Validate fit for each dimension.
+            if panel_spec['height'] < total_height:
+                raise utils.ValidationError(
+                    "Height %d of panel \'%s\' exceeds limit of %d" % (
+                        total_height, panel_name, panel_spec['height']))
+            elif panel_spec['width'] < total_width:
+                raise utils.ValidationError(
+                    "Width %d of panel \'%s\' exceeds limit of %d" % (
+                        total_width, panel_name, panel_spec['width']))
 
     def validate(self):
         """Validates that gadgets fit the skin panel dimensions, and that the
@@ -977,18 +1038,16 @@ class SkinInstance(object):
         # A list to validate each gadget_instance.name is unique.
         gadget_instance_names = []
 
-        for panel, gadget_instances in (
+        for panel_name, gadget_instances in (
                 self.panel_contents_dict.iteritems()):
 
             # Validate existence of panels in the skin.
-            if panel not in self.skin.panels_properties:
+            if panel_name not in feconf.PANELS_PROPERTIES:
                 raise utils.ValidationError(
-                    '%s panel not found in skin %s' % (
-                        panel, self.skin_id)
-                )
+                    'The panel name \'%s\' is invalid.' % panel_name)
 
             # Validate gadgets fit each skin panel.
-            self.skin.validate_panel(panel, gadget_instances)
+            self.validate_gadget_panel(panel_name, gadget_instances)
 
             # Validate gadget internal attributes.
             for gadget_instance in gadget_instances:
