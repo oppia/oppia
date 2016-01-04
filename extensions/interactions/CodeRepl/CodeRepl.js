@@ -49,11 +49,17 @@ oppia.directive('oppiaInteractiveCodeRepl', [
           // Options for the ui-codemirror display.
           editor.setOption('lineNumbers', true);
           editor.setOption('indentWithTabs', true);
-
-          // Note that only 'coffeescript', 'javascript', 'python', and 'ruby'
-          // have CodeMirror-supported syntax highlighting. For other
-          // languages, syntax highlighting will not happen.
-          editor.setOption('mode', $scope.language);
+          editor.setOption('indentUnit', 4);
+          editor.setOption('mode', 'python');
+          editor.setOption('extraKeys', {
+            Tab: function(cm) {
+              var spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
+              cm.replaceSelection(spaces);
+              // Move the cursor to the end of the selection.
+              var endSelectionPos = cm.getDoc().getCursor('head');
+              cm.getDoc().setCursor(endSelectionPos);
+            }
+          });
 
           // NOTE: this is necessary to avoid the textarea being greyed-out.
           setTimeout(function() {
