@@ -64,6 +64,14 @@ oppia.directive('oppiaInteractiveCodeRepl', [
             $scope.code = editor.getValue();
           });
 
+          // Without this, the editor does not show up correctly on small
+          // screens when the user switches to the supplemental interaction.
+          $scope.$on('showInteraction', function() {
+            setTimeout(function() {
+              editor.refresh();
+            }, 200);
+          });
+
           $scope.hasLoaded = true;
         };
 
