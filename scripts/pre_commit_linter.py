@@ -21,6 +21,9 @@ list of lint errors to the terminal. If the directory path is passed,
 it will lint all JavaScript files in that directory; otherwise,
 it will only lint files that have been touched in this commit.
 
+This script ignores all filepaths contained within the excludeFiles
+argument in .jscsrc
+
 IMPORTANT NOTES:
 
 1.  Before running this script, you must install third-party dependencies by
@@ -46,6 +49,7 @@ Note that the root folder MUST be named 'oppia'.
  """
 
 import argparse
+import fnmatch
 import os
 import json
 import subprocess
@@ -117,36 +121,34 @@ def _get_changed_filenames():
     return unstaged_files + staged_files
 
 
-def _filename_match(filename, sources):
-    """Checks if filname matches with source
+def _does_glob_pattern_include_filename(filename, glob_patterns):
+    """Checks whether 'filename' is described by 'glob_pattern'.
 
     Args:
     - filename: str. Filename to check
-    - source: list. Source to check against the filename
+    - source: list. List of glob_patterns to check filename against
 
     Returns:
         bool whether filename matches with source.
 
-    >>> _filename_match('foo/bar', 'foo/')
+    >>> _does_glob_pattern_include_filename('foo/bar', ['foo/', 'bar/*'])
     False
-    >>> _filename_match('foo/bar', 'foo/**')
+    >>> _does_glob_pattern_include_filename('foo/bar', ['foo/foo','foo/**'])
     True
-    >>> _filename_match('bar/bar', 'bar/bar')
+    >>> _does_glob_pattern_include_filename('bar/bar', ['bar/bar', 'foo/bar'])
     True
     """
-    for source in sources:
-        if filename == source:
-            return True
-        elif source.endswith('**') and filename.startswith(source[:-2]):
+    for glob_pattern in glob_patterns:
+        if fnmatch.fnmatch(filename, glob_pattern):
             return True
     return False
 
 
-def _get_jscs_exclude_files(config_jscsrc):
+def _get_glob_patterns_excluded_from_jscsrc(config_jscsrc):
     """Collects excludeFiles from jscsrc file.
 
     Args:
-    - config_jscsr: str. Path to .jscsrc file.
+    - config_jscsrc: str. Path to .jscsrc file.
 
     Returns:
         a list of files in excludeFiles.
@@ -160,13 +162,13 @@ def _get_jscs_exclude_files(config_jscsrc):
     return json_data['excludeFiles']
 
 
-def _get_all_files_in_directory(dir_path, excluded_files):
+def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
     """Recursively collects all files in directory and
     subdirectories of specified path.
 
     Args:
     - dir_path: str. Path to the folder to be linted.
-    - excluded_files: set. Set of all files to be excluded.
+    - excluded_glob_patterns: set. Set of all files to be excluded.
 
     Returns:
         a list of files in directory and subdirectories without excluded files.
@@ -176,7 +178,8 @@ def _get_all_files_in_directory(dir_path, excluded_files):
         for file_name in files:
             filename = os.path.relpath(os.path.join(_dir, file_name),
                                        os.getcwd())
-            if not _filename_match(filename, excluded_files):
+            if not _does_glob_pattern_include_filename(filename,
+                                                       excluded_glob_patterns):
                 files_in_directory.append(filename)
     return files_in_directory
 
@@ -195,7 +198,6 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint):
     """
 
     print '----------------------------------------'
-    print 'Status outputs be providing an update every 10 files'
 
     start_time = time.time()
     num_files_with_errors = 0
@@ -207,11 +209,12 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint):
         return ''
 
     jscs_cmd_args = [node_path, jscs_path, config_jscsrc]
-
+    _next_see_file = 1
     for ind, filename in enumerate(files_to_lint):
         if (ind + 1) % 10 == 0:
-            print 'Linting file %d/%d: %s ...' % (
-                ind + 1, num_js_files, filename)
+            print 'Linted files %d-%d of %d ...' % (
+                _next_see_file, ind + 1, num_js_files)
+            _next_see_file = ind + 2
 
         proc_args = jscs_cmd_args + [filename]
         proc = subprocess.Popen(
@@ -227,7 +230,8 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint):
             num_files_with_errors += 1
             print linter_stdout
 
-    print 'Linting complete'
+    print 'Linted files %d-%d of %d ...' % (
+        _next_see_file, num_js_files, num_js_files)
     print '----------------------------------------'
 
     if num_files_with_errors:
@@ -296,8 +300,10 @@ def _pre_commit_linter():
         if os.path.isfile(input_path):
             all_files = [input_path]
         else:
-            excluded_files = _get_jscs_exclude_files(jscsrc_path)
-            all_files = _get_all_files_in_directory(input_path, excluded_files)
+            excluded_glob_patterns = _get_glob_patterns_excluded_from_jscsrc(
+                jscsrc_path)
+            all_files = _get_all_files_in_directory(input_path,
+                                                    excluded_glob_patterns)
     elif parsed_args.files:
         valid_filepaths = []
         invalid_filepaths = []
