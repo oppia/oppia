@@ -107,6 +107,9 @@ for path in _PATHS_TO_INSERT:
 
 from pylint import lint  # pylint: disable=wrong-import-position
 
+_MESSAGE_TYPE_SUCCESS = 'SUCCESS'
+_MESSAGE_TYPE_FAILED = 'FAILED'
+
 
 def _get_changed_filenames():
     """Returns a list of modified files (both staged and unstaged)
@@ -213,10 +216,11 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint):
     print '----------------------------------------'
 
     if num_files_with_errors:
-        return 'FAILED    %s JavaScript files' % num_files_with_errors
+        return '%s    %s JavaScript files' % (
+            _MESSAGE_TYPE_FAILED, num_files_with_errors)
     else:
-        return 'SUCCESS   %s JavaScript files linted (%.1f secs)' % (
-            num_js_files, time.time() - start_time)
+        return '%s   %s JavaScript files linted (%.1f secs)' % (
+            _MESSAGE_TYPE_SUCCESS, num_js_files, time.time() - start_time)
 
 
 def _lint_py_files(config_pylint, files_to_lint):
@@ -253,10 +257,10 @@ def _lint_py_files(config_pylint, files_to_lint):
     print '----------------------------------------'
 
     if are_there_errors:
-        return 'FAILED    Python linting failed'
+        return '%s    Python linting failed' % _MESSAGE_TYPE_FAILED
     else:
-        return 'SUCCESS   %s Python files linted (%.1f secs)' % (
-            num_py_files, time.time() - start_time)
+        return '%s   %s Python files linted (%.1f secs)' % (
+            _MESSAGE_TYPE_SUCCESS, num_py_files, time.time() - start_time)
 
 
 def _pre_commit_linter():
@@ -330,9 +334,9 @@ def _pre_commit_linter():
     print '\n'.join(summary_messages)
     print ''
 
-    if any([message.startswith('FAILED') for message in summary_messages]):
+    if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
+            summary_messages]):
         sys.exit(1)
-    return
 
 if __name__ == '__main__':
     _pre_commit_linter()
