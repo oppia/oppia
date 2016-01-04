@@ -157,7 +157,7 @@ oppia.controller('ExplorationEditor', [
         }
 
         stateEditorTutorialFirstTimeService.init(
-          data.show_state_editor_tutorial_on_load, $scope.explorationId);
+          data.show_state_editor_tutorial_on_load);
       });
     };
 

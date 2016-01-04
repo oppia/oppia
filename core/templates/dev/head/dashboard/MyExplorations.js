@@ -20,17 +20,17 @@
 
 oppia.controller('MyExplorations', [
   '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
-  'ratingVisibilityService',
+  'RatingComputationService',
   function(
       $scope, $http, $rootScope, oppiaDatetimeFormatter,
-      ratingVisibilityService) {
+      RatingComputationService) {
     $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
       return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
         millisSinceEpoch);
     };
 
-    $scope.areRatingsShown = function(ratingFrequencies) {
-      return ratingVisibilityService.areRatingsShown(ratingFrequencies);
+    $scope.getAverageRating = function(ratings) {
+      return RatingComputationService.computeAverageRating(ratings);
     };
 
     $rootScope.loadingMessage = 'Loading';
@@ -42,10 +42,11 @@ oppia.controller('MyExplorations', [
 ]);
 
 oppia.controller('CreateExplorationButton', [
-  '$scope', 'CATEGORY_LIST', 'createExplorationButtonService',
-  function($scope, CATEGORY_LIST, createExplorationButtonService) {
+  '$scope', 'CATEGORY_LIST', 'ExplorationCreationButtonService',
+  function($scope, CATEGORY_LIST, ExplorationCreationButtonService) {
     $scope.showCreateExplorationModal = function() {
-      createExplorationButtonService.showCreateExplorationModal(CATEGORY_LIST);
+      ExplorationCreationButtonService.showCreateExplorationModal(
+        CATEGORY_LIST);
     };
   }
 ]);

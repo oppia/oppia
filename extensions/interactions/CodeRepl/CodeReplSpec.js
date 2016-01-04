@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for the CodeRepl interaction.
  *
@@ -55,5 +54,5 @@ describe('CodeRepl interaction', function() {
       expect(elt.html()).toContain('code-repl-input-box');
       expect(elt.html()).toContain('runCode(code)');
     });
-   });
+  });
 });

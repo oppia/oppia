@@ -24,10 +24,9 @@ module.exports = function(config) {
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
       'core/templates/dev/head/**/*.js',
-      'core/templates/dev/head/components/ratings.html',
+      'core/templates/dev/head/components/rating_display.html',
       'extensions/**/*.js',
-      'extensions/interactions/**/*.html',
-      'extensions/skins/**/*.html'
+      'extensions/interactions/**/*.html'
     ],
     exclude: [
       'core/templates/dev/head/**/*-e2e.js',
@@ -67,13 +66,16 @@ module.exports = function(config) {
       // Note that these files should contain only directive templates, and no
       // Jinja expressions. They should also be specified within the 'files'
       // list above.
-      'core/templates/dev/head/components/ratings.html': ['ng-html2js'],
-      'extensions/interactions/**/*.html': ['ng-html2js'],
-      'extensions/skins/**/*.html': ['ng-html2js']
+      'core/templates/dev/head/components/rating_display.html': ['ng-html2js'],
+      'extensions/interactions/**/*.html': ['ng-html2js']
     },
     reporters: ['progress', 'coverage'],
     coverageReporter: {
-      reporters: [{type: 'html'}, {type: 'json'}],
+      reporters: [{
+        type: 'html'
+      }, {
+        type: 'json'
+      }],
       subdir: '.',
       dir: '../karma_coverage_reports/'
     },

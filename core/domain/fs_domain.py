@@ -16,17 +16,16 @@
 
 """Domain objects representing a file system and a file stream."""
 
-__author__ = 'Sean Lip'
-
 import logging
 import os
 
 from core.platform import models
+import feconf
+import utils
+
 (file_models,) = models.Registry.import_models([
     models.NAMES.file
 ])
-import feconf
-import utils
 
 CHANGE_LIST_SAVE = [{'cmd': 'save'}]
 
@@ -136,7 +135,7 @@ class ExplorationFileSystem(object):
         data.commit(user_id, CHANGE_LIST_SAVE)
         metadata.commit(user_id, CHANGE_LIST_SAVE)
 
-    def get(self, filepath, version=None, mode=None):
+    def get(self, filepath, version=None, mode=None):  # pylint: disable=unused-argument
         """Gets a file as an unencoded stream of raw bytes.
 
         If `version` is not supplied, the latest version is retrieved. If the
@@ -231,7 +230,7 @@ class DiskBackedFileSystem(object):
         """Checks if a file exists."""
         return os.path.isfile(os.path.join(self._root, filepath))
 
-    def get(self, filepath, version=None, mode='r'):
+    def get(self, filepath, version=None, mode='r'):  # pylint: disable=unused-argument
         """Returns a bytestring with the file content, but no metadata."""
         content = utils.get_file_contents(
             os.path.join(self._root, filepath), raw_bytes=True, mode=mode)

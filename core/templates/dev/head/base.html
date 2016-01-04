@@ -264,24 +264,29 @@
     {% include 'directives.html' %}
     {% include 'forms/form_builder_templates.html' %}
     {% include 'footer_js_libs.html' %}
-    {% include 'components/exploration_summary_tile.html' %}
-    {% include 'components/ratings.html' %}
+    {% include 'components/exploration_summary_tile_directive.html' %}
+    {% include 'components/rating_display.html' %}
 
     <script>
       {{ include_js_file('app.js') }}
+      {{ include_js_file('base.js') }}
       {{ include_js_file('directives.js') }}
       {{ include_js_file('filters.js') }}
+
       {{ include_js_file('forms/formBuilder.js') }}
+
       {{ include_js_file('services/activeInputData.js') }}
       {{ include_js_file('services/warningsData.js') }}
-      {{ include_js_file('components/autocomplete.js') }}
-      {{ include_js_file('components/visualizations.js') }}
-      {{ include_js_file('base.js') }}
-      {{ include_js_file('/expressions/evaluator.js') }}
-      {{ include_js_file('/expressions/parser.js') }}
-      {{ include_js_file('components/objectEditor.js') }}
-      {{ include_js_file('components/ratings.js')}}
-      {{ include_js_file('components/explorationSummaryTile.js') }}
+
+      {{ include_js_file('components/ExplorationSummaryTileDirective.js') }}
+      {{ include_js_file('components/ObjectEditorDirective.js') }}
+      {{ include_js_file('components/RatingComputationService.js')}}
+      {{ include_js_file('components/RatingDisplayDirective.js')}}
+      {{ include_js_file('components/Select2DropdownDirective.js') }}
+
+      {{ include_js_file('expressions/evaluator.js') }}
+      {{ include_js_file('expressions/parser.js') }}
+
       {{ OBJECT_EDITORS_JS }}
     </script>
 

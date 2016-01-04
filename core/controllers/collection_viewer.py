@@ -14,16 +14,15 @@
 
 """Controllers for the Oppia collection learner view."""
 
-__author__ = 'Ben Henning'
-
 from core.controllers import base
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.platform import models
-(user_models,) = models.Registry.import_models([models.NAMES.user])
 import utils
+
+(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
 def require_collection_playable(handler):

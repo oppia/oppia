@@ -14,8 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'Jeremy Emerson'
-
 import os
 import re
 import string
@@ -32,6 +30,10 @@ import utils
 # RTE component validity.
 IGNORED_FILE_SUFFIXES = ['.pyc', '.DS_Store']
 
+_COMPONENT_CONFIG_SCHEMA = [
+    ('name', basestring), ('category', basestring),
+    ('description', basestring), ('_customization_arg_specs', list)]
+
 
 class RteComponentUnitTests(test_utils.GenericTestBase):
     """Tests that all the default RTE comopnents are valid."""
@@ -40,9 +42,9 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
         """Check whether a name is in CamelCase."""
         return name and (name[0] in string.ascii_uppercase)
 
-    def _is_alphanumeric_string(self, string):
+    def _is_alphanumeric_string(self, input_string):
         """Check whether a string is alphanumeric."""
-        return bool(re.compile("^[a-zA-Z0-9_]+$").match(string))
+        return bool(re.compile("^[a-zA-Z0-9_]+$").match(input_string))
 
     def _validate_customization_arg_specs(self, customization_arg_specs):
         for ca_spec in customization_arg_specs:
@@ -69,10 +71,10 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                     ca_spec['default_value'],
                     obj_class.normalize(ca_spec['default_value']))
 
-    def _listdir_omit_ignored(self, dir):
-        """List all files and directories within 'dir', omitting the ones whose
-        name ends in one of the IGNORED_FILE_SUFFIXES."""
-        names = os.listdir(dir)
+    def _listdir_omit_ignored(self, directory):
+        """List all files and directories within 'directory', omitting the ones
+        whose name ends in one of the IGNORED_FILE_SUFFIXES."""
+        names = os.listdir(directory)
         for suffix in IGNORED_FILE_SUFFIXES:
             names = [name for name in names if not name.endswith(suffix)]
         return names
@@ -91,20 +93,16 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
 
     def test_image_data_urls_for_rte_components(self):
         """Test the data urls for the RTE component icons."""
-        component_list = rte_component_registry.Registry._rte_components
         for (cpt_name, cpt_spec) in feconf.ALLOWED_RTE_EXTENSIONS.iteritems():
             image_filepath = os.path.join(
                 os.getcwd(), cpt_spec['dir'], '%s.png' % cpt_name)
             self.assertEqual(
                 utils.convert_png_to_data_url(image_filepath),
-                component_list[cpt_name].icon_data_url)
+                rte_component_registry.Registry.get_rte_component(
+                    cpt_name).icon_data_url)
 
     def test_default_rte_components_are_valid(self):
         """Test that the default RTE components are valid."""
-
-        _COMPONENT_CONFIG_SCHEMA = [
-            ('name', basestring), ('category', basestring),
-            ('description', basestring), ('_customization_arg_specs', list)]
 
         for component_id in feconf.ALLOWED_RTE_EXTENSIONS:
             # Check that the component id is valid.
@@ -143,8 +141,8 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             self.assertNotIn('<script>', js_file_content)
             self.assertNotIn('</script>', js_file_content)
 
-            component = rte_component_registry.Registry._rte_components[
-                component_id]
+            component = rte_component_registry.Registry.get_rte_component(
+                component_id)
 
             # Check that the specified component id is the same as the class
             # name.
@@ -160,4 +158,4 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                     self.assertTrue(getattr(component, item))
 
             self._validate_customization_arg_specs(
-                component._customization_arg_specs)
+                component._customization_arg_specs)  # pylint: disable=protected-access

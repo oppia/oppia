@@ -16,11 +16,8 @@
 
 """Tests for collection domain objects and methods defined on them."""
 
-__author__ = 'Ben Henning'
-
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import exp_services
 from core.tests import test_utils
 import feconf
 import utils
@@ -32,8 +29,7 @@ import utils
 # If evaluating differences in YAML, conversion to dict form via
 # utils.dict_from_yaml can isolate differences quickly.
 
-SAMPLE_YAML_CONTENT = (
-"""category: A category
+SAMPLE_YAML_CONTENT = ("""category: A category
 nodes:
 - acquired_skills:
   - Skill0a
@@ -61,50 +57,43 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
 
+    def _assert_validation_error(self, expected_error_substring):
+        """Checks that the collection passes strict validation."""
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            self.collection.validate()
+
     def test_initial_validation(self):
         """Test validating a new, valid collection."""
         self.collection.validate()
 
     def test_title_validation(self):
         self.collection.title = 0
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Expected title to be a string'):
-            self.collection.validate()
+        self._assert_validation_error('Expected title to be a string')
 
     def test_category_validation(self):
         self.collection.category = 0
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Expected category to be a string'):
-            self.collection.validate()
+        self._assert_validation_error('Expected category to be a string')
 
     def test_objective_validation(self):
         self.collection.objective = ''
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'objective must be specified'):
-            self.collection.validate()
+        self._assert_validation_error('objective must be specified')
 
         self.collection.objective = 0
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Expected objective to be a string'):
-            self.collection.validate()
+        self._assert_validation_error('Expected objective to be a string')
 
     def test_schema_version_validation(self):
         self.collection.schema_version = 'some_schema_version'
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Expected schema version to be an int'):
-            self.collection.validate()
+        self._assert_validation_error('Expected schema version to be an int')
 
         self.collection.schema_version = 100
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Expected schema version to be %s' %
-                feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
-            self.collection.validate()
+        self._assert_validation_error(
+            'Expected schema version to be %s' %
+            feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
     def test_nodes_validation(self):
         self.collection.nodes = {}
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Expected nodes to be a list'):
-            self.collection.validate()
+        self._assert_validation_error('Expected nodes to be a list')
 
         self.collection.nodes = [
             collection_domain.CollectionNode.from_dict({
@@ -118,11 +107,10 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
                 'acquired_skills': ['skill0b']
             })
         ]
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'There are explorations referenced in the collection more '
-                'than once.'):
-            self.collection.validate()
+
+        self._assert_validation_error(
+            'There are explorations referenced in the collection more than '
+            'once.')
 
     def test_initial_explorations_validation(self):
         # Having no collection nodes is fine for non-strict validation.
@@ -130,10 +118,8 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.collection.validate(strict=False)
 
         # But it's not okay for strict validation.
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'Expected to have at least 1 exploration in the collection.'):
-            self.collection.validate()
+        self._assert_validation_error(
+            'Expected to have at least 1 exploration in the collection.')
 
         # If the collection has exactly one exploration and that exploration
         # has prerequisite skills, then the collection should fail validation.
@@ -142,21 +128,17 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
             'exp_id_1', 'user@example.com', end_state_name='End')
         collection_node1 = self.collection.get_node('exp_id_1')
         collection_node1.update_prerequisite_skills(['skill1a'])
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'Expected to have at least 1 '
-                'exploration with no prerequisite skills.'):
-            self.collection.validate()
+        self._assert_validation_error(
+            'Expected to have at least 1 exploration with no prerequisite '
+            'skills.')
 
     def test_collection_completability_validation(self):
         # Add another exploration, but make it impossible to reach exp_id_1.
         self.collection.add_node('exp_id_1')
         collection_node1 = self.collection.get_node('exp_id_1')
         collection_node1.update_prerequisite_skills(['skill0a'])
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'Some explorations are unreachable from the initial '
-                'explorations'):
-            self.collection.validate()
+        self._assert_validation_error(
+            'Some explorations are unreachable from the initial explorations')
 
         # Connecting the two explorations should lead to clean validation.
         collection_node0 = self.collection.get_node('exp_id_0')
@@ -167,52 +149,36 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         # Validate CollectionNode's exploration_id.
         collection_node0 = self.collection.get_node('exp_id_0')
         collection_node0.exploration_id = 2
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'Expected exploration ID to be a string'):
-            self.collection.validate()
+        self._assert_validation_error('Expected exploration ID to be a string')
 
     def test_collection_node_prerequisite_skills_validation(self):
         collection_node0 = self.collection.get_node('exp_id_0')
 
         collection_node0.prerequisite_skills = {}
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'Expected prerequisite_skills to be a list'):
-            self.collection.validate()
+        self._assert_validation_error(
+            'Expected prerequisite_skills to be a list')
 
         collection_node0.prerequisite_skills = ['skill0a', 'skill0a']
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'The prerequisite_skills list has duplicate entries'):
-            self.collection.validate()
+        self._assert_validation_error(
+            'The prerequisite_skills list has duplicate entries')
 
         collection_node0.prerequisite_skills = ['skill0a', 2]
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'Expected all prerequisite skills to be strings'):
-            self.collection.validate()
+        self._assert_validation_error(
+            'Expected all prerequisite skills to be strings')
 
     def test_collection_node_acquired_skills_validation(self):
         collection_node0 = self.collection.get_node('exp_id_0')
 
         collection_node0.acquired_skills = {}
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'Expected acquired_skills to be a list'):
-            self.collection.validate()
+        self._assert_validation_error('Expected acquired_skills to be a list')
 
         collection_node0.acquired_skills = ['skill0a', 'skill0a']
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'The acquired_skills list has duplicate entries'):
-            self.collection.validate()
+        self._assert_validation_error(
+            'The acquired_skills list has duplicate entries')
 
         collection_node0.acquired_skills = ['skill0a', 2]
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'Expected all acquired skills to be strings'):
-            self.collection.validate()
+        self._assert_validation_error(
+            'Expected all acquired skills to be strings')
 
     def test_collection_node_skills_validation(self):
         collection_node0 = self.collection.get_node('exp_id_0')
@@ -222,11 +188,9 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
             'skill0a', 'skill0b', 'skill0c']
         collection_node0.acquired_skills = [
             'skill0z', 'skill0b', 'skill0c', 'skill0d']
-        with self.assertRaisesRegexp(
-                utils.ValidationError, 'There are some skills which are both '
-                'required for exploration exp_id_0 and acquired after playing '
-                'it: [skill0b, skill0c]'):
-            self.collection.validate()
+        self._assert_validation_error(
+            'There are some skills which are both required for exploration '
+            'exp_id_0 and acquired after playing it: [skill0b, skill0c]')
 
     def test_is_demo_property(self):
         """Test the is_demo property."""
@@ -266,8 +230,9 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(collection.nodes), 1)
 
         with self.assertRaisesRegexp(
-                ValueError,
-                'Exploration is already part of this collection: test_exp'):
+            ValueError,
+            'Exploration is already part of this collection: test_exp'
+            ):
             collection.add_node('test_exp')
 
         collection.add_node('another_exp')
@@ -277,8 +242,9 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(collection.nodes), 1)
 
         with self.assertRaisesRegexp(
-                ValueError,
-                'Exploration is not part of this collection: another_exp'):
+            ValueError,
+            'Exploration is not part of this collection: another_exp'
+            ):
             collection.delete_node('another_exp')
 
         collection.delete_node('test_exp')
@@ -430,20 +396,20 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
 class YamlCreationUnitTests(test_utils.GenericTestBase):
     """Test creation of collections from YAML files."""
 
+    COLLECTION_ID = 'a_collection_id'
+    EXPLORATION_ID = 'an_exploration_id'
+
     def test_yaml_import_and_export(self):
         """Test the from_yaml() and to_yaml() methods."""
-        COLLECTION_ID = 'a_collection_id'
-        EXPLORATION_ID = 'an_exploration_id'
-
         self.save_new_valid_exploration(
-            EXPLORATION_ID, 'user@example.com', end_state_name='End')
+            self.EXPLORATION_ID, 'user@example.com', end_state_name='End')
 
         collection = collection_domain.Collection.create_default_collection(
-            COLLECTION_ID, 'A title', 'A category', 'An objective')
-        collection.add_node(EXPLORATION_ID)
+            self.COLLECTION_ID, 'A title', 'A category', 'An objective')
+        collection.add_node(self.EXPLORATION_ID)
         self.assertEqual(len(collection.nodes), 1)
 
-        collection_node = collection.get_node(EXPLORATION_ID)
+        collection_node = collection.get_node(self.EXPLORATION_ID)
         collection_node.update_acquired_skills(['Skill0a', 'Skill0b'])
 
         collection.validate()
@@ -459,14 +425,13 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
 
         # Should not be able to create a collection from no YAML content.
         with self.assertRaises(Exception):
-            collection_domain.Collection.from_yaml('collection3')
+            collection_domain.Collection.from_yaml('collection3', None)
 
 
 class SchemaMigrationUnitTests(test_utils.GenericTestBase):
     """Test migration methods for yaml content."""
 
-    YAML_CONTENT_V1 = (
-"""category: A category
+    YAML_CONTENT_V1 = ("""category: A category
 nodes:
 - acquired_skills:
   - Skill1

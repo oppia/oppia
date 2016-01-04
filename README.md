@@ -1,4 +1,4 @@
-# Oppia [![Build Status](https://api.travis-ci.org/oppia/oppia.svg?branch=develop)](https://travis-ci.org/oppia/oppia) [![Code Coverage](https://codecov.io/github/oppia/oppia/coverage.svg?branch=develop)](https://codecov.io/github/oppia/oppia/?branch=develop) [![Join the chat at https://gitter.im/oppia](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/oppia?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+# Oppia [![Build Status](https://api.travis-ci.org/oppia/oppia.svg?branch=develop)](https://travis-ci.org/oppia/oppia) [![Code Coverage](https://codecov.io/github/oppia/oppia/coverage.svg?branch=develop)](https://codecov.io/github/oppia/oppia/?branch=develop) [![Join the chat at https://gitter.im/oppia/oppia-chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/oppia/oppia-chat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Oppia is an online learning tool that enables anyone to easily create and share interactive activities (called 'explorations'). These activities simulate a one-on-one conversation with a tutor, making it possible for students to learn by doing and get feedback.
 
@@ -68,4 +68,4 @@ The Oppia code is released under the [Apache v2 license](https://github.com/oppi
   * [Announcements mailing list](http://groups.google.com/group/oppia-announce)
   * Social media: [G+](https://plus.google.com/109898456505810251700/about), [YouTube](https://www.youtube.com/channel/UC5c1G7BNDCfv1rczcBp9FPw), [FB](https://www.facebook.com/oppiaorg), [Twitter](https://twitter.com/oppiaorg)
 
-We also have a chat room on Gitter: [https://gitter.im/oppia](https://gitter.im/oppia)
+We also have a public chat room on Gitter: [https://gitter.im/oppia/oppia-chat](https://gitter.im/oppia/oppia-chat). Drop by and say hello!

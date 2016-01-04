@@ -26,10 +26,13 @@ oppia.directive('oppiaNoninteractiveVideo', [
       scope: {},
       templateUrl: 'richTextComponent/Video',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        var start = oppiaHtmlEscaper.escapedJsonToObj($attrs.startWithValue),
-            end = oppiaHtmlEscaper.escapedJsonToObj($attrs.endWithValue);
-        $scope.autoplaySuffix = (oppiaHtmlEscaper.escapedJsonToObj($attrs.autoplayWithValue) ? '&autoplay=1' : '&autoplay=0');
-        $scope.videoId = oppiaHtmlEscaper.escapedJsonToObj($attrs.videoIdWithValue);
+        var start = oppiaHtmlEscaper.escapedJsonToObj($attrs.startWithValue);
+        var end = oppiaHtmlEscaper.escapedJsonToObj($attrs.endWithValue);
+
+        $scope.autoplaySuffix = (oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.autoplayWithValue) ? '&autoplay=1' : '&autoplay=0');
+        $scope.videoId = oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.videoIdWithValue);
         $scope.timingParams = '&start=' + start + '&end=' + end;
         $scope.videoUrl = $sce.trustAsResourceUrl(
           'https://www.youtube.com/embed/' + $scope.videoId + '?rel=0' +

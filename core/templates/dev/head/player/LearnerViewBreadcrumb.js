@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the learner view breadcrumb section of the navbar.
+ * @fileoverview Controllers for the learner view breadcrumb section of the
+ * navbar.
  *
  * @author sean@seanlip.org (Sean Lip)
  */
@@ -35,7 +36,7 @@ oppia.controller('LearnerViewBreadcrumb', [
         }).success(function(data) {
           expInfo = data.summaries[0];
           openInformationCardModal();
-        }).error(function(data) {
+        }).error(function() {
           $log.error(
             'Information card failed to load for exploration ' + explorationId);
         });
@@ -54,11 +55,11 @@ oppia.controller('LearnerViewBreadcrumb', [
         },
         controller: [
           '$scope', '$window', '$modalInstance', 'oppiaHtmlEscaper',
-          'embedExplorationButtonService', 'oppiaDatetimeFormatter',
-          'ratingComputationService', 'expInfo',
+          'ExplorationEmbedButtonService', 'oppiaDatetimeFormatter',
+          'RatingComputationService', 'expInfo',
           function($scope, $window, $modalInstance, oppiaHtmlEscaper,
-                   embedExplorationButtonService, oppiaDatetimeFormatter,
-                   ratingComputationService, expInfo) {
+                   ExplorationEmbedButtonService, oppiaDatetimeFormatter,
+                   RatingComputationService, expInfo) {
             var getExplorationTagsSummary = function(arrayOfTags) {
               var tagsToShow = [];
               var tagsInTooltip = [];
@@ -86,11 +87,13 @@ oppia.controller('LearnerViewBreadcrumb', [
                 millisSinceEpoch);
             };
 
-            $scope.averageRating = ratingComputationService.computeAverageRating(
-              expInfo.ratings) || 'Unrated';
+            $scope.averageRating = (
+              RatingComputationService.computeAverageRating(expInfo.ratings) ||
+              'Unrated');
             $scope.contributorNames = expInfo.contributor_names;
-            $scope.escapedTwitterText = oppiaHtmlEscaper.unescapedStrToEscapedStr(
-              GLOBALS.SHARING_OPTIONS_TWITTER_TEXT);
+            $scope.escapedTwitterText = (
+              oppiaHtmlEscaper.unescapedStrToEscapedStr(
+                GLOBALS.SHARING_OPTIONS_TWITTER_TEXT));
             $scope.explorationTags = getExplorationTagsSummary(expInfo.tags);
             $scope.explorationTitle = expInfo.title;
             $scope.infoCardBackgroundCss = {
@@ -104,7 +107,7 @@ oppia.controller('LearnerViewBreadcrumb', [
             $scope.serverName = (
               $window.location.protocol + '//' + $window.location.host);
             $scope.showEmbedExplorationModal = (
-              embedExplorationButtonService.showModal);
+              ExplorationEmbedButtonService.showModal);
 
             $scope.cancel = function() {
               $modalInstance.dismiss();
