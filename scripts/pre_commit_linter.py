@@ -58,10 +58,6 @@ _EXCLUSIVE_GROUP.add_argument(
     '--path',
     help='path to the directory with files to be linted',
     action='store')
-_PARSER.add_argument(
-    '--silent',
-    help='suppress status messages',
-    action='store_true')
 _EXCLUSIVE_GROUP.add_argument(
     '--files',
     nargs='+',
@@ -115,27 +111,71 @@ def _get_changed_filenames():
     return unstaged_files + staged_files
 
 
-def _get_all_files_in_directory(dir_path):
+def _filename_match(filename, sources):
+    """Checks if filname matches with source
+
+    Args:
+    - filename: str. Filename to check
+    - source: list. Source to check against the filename
+
+    Returns:
+        bool whether filename matches with source.
+
+    >>> _filename_match('foo/bar', 'foo/')
+    False
+    >>> _filename_match('foo/bar', 'foo/**')
+    True
+    >>> _filename_match('bar/bar', 'bar/bar')
+    True
+    """
+    for source in sources:
+        if filename == source:
+            return True
+        elif source.endswith('**') and filename.startswith(source[:-2]):
+            return True
+    return False
+
+
+def _get_jscs_exclude_files(config_jscsrc):
+    """Collects excludeFiles from jscsrc file.
+
+    Args:
+    - config_jscsr: str. Path to .jscsrc file.
+
+    Returns:
+        a list of files in excludeFiles.
+    """
+    with open(config_jscsrc) as f:
+        f.readline()  # First three lines are comments
+        f.readline()
+        f.readline()
+        json_data = json.loads(f.read())
+
+    return json_data['excludeFiles']
+
+
+def _get_all_files_in_directory(dir_path, excluded_files):
     """Recursively collects all files in directory and
     subdirectories of specified path.
 
     Args:
     - dir_path: str. Path to the folder to be linted.
+    - excluded_files: set. Set of all files to be excluded.
 
     Returns:
-        a list of files in directory and subdirectories.
+        a list of files in directory and subdirectories without excluded files.
     """
     files_in_directory = []
     for _dir, _, files in os.walk(dir_path):
         for file_name in files:
-            files_in_directory.append(
-                os.path.relpath(os.path.join(_dir, file_name), os.getcwd()))
-
+            filename = os.path.relpath(os.path.join(_dir, file_name),
+                                       os.getcwd())
+            if not _filename_match(filename, excluded_files):
+                files_in_directory.append(filename)
     return files_in_directory
 
 
-def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint,
-                   is_silent):
+def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint):
     """Prints a list of lint errors in the given list of JavaScript files.
 
     Args:
@@ -149,6 +189,7 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint,
     """
 
     print '----------------------------------------'
+    print 'Status outputs be providing an update every 10 files'
 
     start_time = time.time()
     num_files_with_errors = 0
@@ -162,11 +203,9 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint,
     jscs_cmd_args = [node_path, jscs_path, config_jscsrc]
 
     for ind, filename in enumerate(files_to_lint):
-        if not is_silent:
+        if (ind + 1) % 10 == 0:
             print 'Linting file %d/%d: %s ...' % (
                 ind + 1, num_js_files, filename)
-        elif ind % 100 == 0:
-            print 'Already linted %d/%d files' % (ind, num_js_files)
 
         proc_args = jscs_cmd_args + [filename]
         proc = subprocess.Popen(
@@ -182,6 +221,7 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint,
             num_files_with_errors += 1
             print linter_stdout
 
+    print 'Linting complete'
     print '----------------------------------------'
 
     if num_files_with_errors:
@@ -236,8 +276,11 @@ def _pre_commit_linter():
     root directory, node-jscs dependencies are installed
     and pass JSCS binary path
     """
+
+    jscsrc_path = os.path.join(os.getcwd(), '.jscsrc')
+    pylintrc_path = os.path.join(os.getcwd(), '.pylintrc')
+
     parsed_args = _PARSER.parse_args()
-    is_silent = parsed_args.silent
     if parsed_args.path:
         input_path = os.path.join(os.getcwd(), parsed_args.path)
         if not os.path.exists(input_path):
@@ -247,7 +290,8 @@ def _pre_commit_linter():
         if os.path.isfile(input_path):
             all_files = [input_path]
         else:
-            all_files = _get_all_files_in_directory(input_path)
+            excluded_files = _get_jscs_exclude_files(jscsrc_path)
+            all_files = _get_all_files_in_directory(input_path, excluded_files)
     elif parsed_args.files:
         valid_filepaths = []
         invalid_filepaths = []
@@ -263,9 +307,6 @@ def _pre_commit_linter():
         all_files = valid_filepaths
     else:
         all_files = _get_changed_filenames()
-
-    jscsrc_path = os.path.join(os.getcwd(), '.jscsrc')
-    pylintrc_path = os.path.join(os.getcwd(), '.pylintrc')
 
     config_jscsrc = '--config=%s' % jscsrc_path
     config_pylint = '--rcfile=%s' % pylintrc_path
@@ -291,7 +332,7 @@ def _pre_commit_linter():
     summary_messages = []
     print '\nStarting jscs linter...'
     summary_messages.append(_lint_js_files(
-        node_path, jscs_path, config_jscsrc, js_files_to_lint, is_silent))
+        node_path, jscs_path, config_jscsrc, js_files_to_lint))
     print '\nStarting pylint...'
     summary_messages.append(_lint_py_files(
         config_pylint, py_files_to_lint))

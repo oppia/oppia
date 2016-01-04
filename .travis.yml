@@ -9,9 +9,10 @@ branches:
   - develop
 
 env:
-- RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false REPORT_BACKEND_COVERAGE=false
-- RUN_BACKEND_TESTS=false RUN_FRONTEND_TESTS=true REPORT_BACKEND_COVERAGE=false
-- RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false REPORT_BACKEND_COVERAGE=true
+- RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false RUN_LINT=false REPORT_BACKEND_COVERAGE=false
+- RUN_BACKEND_TESTS=false RUN_FRONTEND_TESTS=true RUN_LINT=false REPORT_BACKEND_COVERAGE=false
+- RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false RUN_LINT=false REPORT_BACKEND_COVERAGE=true
+- RUN_BACKEND_TESTS=false RUN_FRONTEND_TESTS=false RUN_LINT=true REPORT_BACKEND_COVERAGE=false
 
 matrix:
   allow_failures:
@@ -44,12 +45,11 @@ install:
   -o gae-download.zip
 - unzip -qq gae-download.zip -d $TOOLS_DIR/google_appengine_1.9.19/
 - rm gae-download.zip
-- bash scripts/install_third_party.sh
-- python scripts/pre_commit_linter.py --path=. --silent
 
 script:
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report; fi
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'false' ]; then bash scripts/run_backend_tests.sh; fi
+- if [ $RUN_LINT == 'true' ]; then bash scripts/install_third_party.sh; python scripts/pre_commit_linter.py --path=.; fi
 # Travis aborts test run if nothing is printed back to STDOUT for some time.
 # -x is used to avoid that.
 - if [ $RUN_FRONTEND_TESTS == 'true' ]; then bash -x scripts/run_frontend_tests.sh; fi
