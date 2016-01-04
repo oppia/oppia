@@ -15,7 +15,7 @@
 ##########################################################################
 
 # This file should not be invoked directly, but sourced from other sh scripts.
-# Bash execution environent set up for scripts that requries GAE.
+# Bash execution environment setup for scripts that require GAE.
 
 
 if [ "$SETUP_GAE_DONE" ]; then
@@ -30,5 +30,14 @@ export PYTHONPATH=.:$COVERAGE_HOME:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HO
 
 # Delete old *.pyc files
 find . -iname "*.pyc" -exec rm -f {} \;
+
+echo Checking whether GAE is installed in $GOOGLE_APP_ENGINE_HOME
+if [ ! -f "$GOOGLE_APP_ENGINE_HOME/appcfg.py" ]; then
+  echo Installing Google App Engine
+  mkdir -p $GOOGLE_APP_ENGINE_HOME
+  curl --silent https://storage.googleapis.com/appengine-sdks/deprecated/1919/google_appengine_1.9.19.zip -o gae-download.zip
+  unzip gae-download.zip -d $TOOLS_DIR/google_appengine_1.9.19/
+  rm gae-download.zip
+fi
 
 export SETUP_GAE_DONE=true
