@@ -16,10 +16,14 @@
 
 """Pre-commit script for Oppia.
 
-This script uses the JSCS node module to lint JavaScript code, and prints a
+This script lints Python and JavaScript code, and prints a
 list of lint errors to the terminal. If the directory path is passed,
-it will lint all JavaScript files in that directory; otherwise,
+it will lint all Python and JavaScript files in that directory; otherwise,
 it will only lint files that have been touched in this commit.
+
+This script ignores all filepaths contained within the excludeFiles
+argument in .jscsrc. Note that, as a side-effect, these filepaths will also
+prevent Python files in those paths from being linted.
 
 IMPORTANT NOTES:
 
@@ -46,7 +50,9 @@ Note that the root folder MUST be named 'oppia'.
  """
 
 import argparse
+import fnmatch
 import os
+import json
 import subprocess
 import sys
 import time
@@ -101,6 +107,9 @@ for path in _PATHS_TO_INSERT:
 
 from pylint import lint  # pylint: disable=wrong-import-position
 
+_MESSAGE_TYPE_SUCCESS = 'SUCCESS'
+_MESSAGE_TYPE_FAILED = 'FAILED'
+
 
 def _get_changed_filenames():
     """Returns a list of modified files (both staged and unstaged)
@@ -116,22 +125,43 @@ def _get_changed_filenames():
     return unstaged_files + staged_files
 
 
-def _get_all_files_in_directory(dir_path):
+def _get_glob_patterns_excluded_from_jscsrc(config_jscsrc):
+    """Collects excludeFiles from jscsrc file.
+
+    Args:
+    - config_jscsrc: str. Path to .jscsrc file.
+
+    Returns:
+        a list of files in excludeFiles.
+    """
+    with open(config_jscsrc) as f:
+        f.readline()  # First three lines are comments
+        f.readline()
+        f.readline()
+        json_data = json.loads(f.read())
+
+    return json_data['excludeFiles']
+
+
+def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
     """Recursively collects all files in directory and
     subdirectories of specified path.
 
     Args:
     - dir_path: str. Path to the folder to be linted.
+    - excluded_glob_patterns: set. Set of all files to be excluded.
 
     Returns:
-        a list of files in directory and subdirectories.
+        a list of files in directory and subdirectories without excluded files.
     """
     files_in_directory = []
     for _dir, _, files in os.walk(dir_path):
         for file_name in files:
-            files_in_directory.append(
-                os.path.relpath(os.path.join(_dir, file_name), os.getcwd()))
-
+            filename = os.path.relpath(
+                os.path.join(_dir, file_name), os.getcwd())
+            if not any([fnmatch.fnmatch(filename, gp) for gp in
+                        excluded_glob_patterns]):
+                files_in_directory.append(filename)
     return files_in_directory
 
 
@@ -160,10 +190,12 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint):
         return ''
 
     jscs_cmd_args = [node_path, jscs_path, config_jscsrc]
-
+    first_file_in_batch = 1
     for ind, filename in enumerate(files_to_lint):
-        print 'Linting file %d/%d: %s ...' % (
-            ind + 1, num_js_files, filename)
+        if (ind + 1) % 10 == 0:
+            print 'Linted files %d-%d of %d ...' % (
+                first_file_in_batch, ind + 1, num_js_files)
+            first_file_in_batch = ind + 2
 
         proc_args = jscs_cmd_args + [filename]
         proc = subprocess.Popen(
@@ -179,13 +211,16 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint):
             num_files_with_errors += 1
             print linter_stdout
 
+    print 'Linted files %d-%d of %d ...' % (
+        first_file_in_batch, num_js_files, num_js_files)
     print '----------------------------------------'
 
     if num_files_with_errors:
-        return 'FAILED    %s JavaScript files' % num_files_with_errors
+        return '%s    %s JavaScript files' % (
+            _MESSAGE_TYPE_FAILED, num_files_with_errors)
     else:
-        return 'SUCCESS   %s JavaScript files linted (%.1f secs)' % (
-            num_js_files, time.time() - start_time)
+        return '%s   %s JavaScript files linted (%.1f secs)' % (
+            _MESSAGE_TYPE_SUCCESS, num_js_files, time.time() - start_time)
 
 
 def _lint_py_files(config_pylint, files_to_lint):
@@ -222,10 +257,10 @@ def _lint_py_files(config_pylint, files_to_lint):
     print '----------------------------------------'
 
     if are_there_errors:
-        return 'FAILED    Python linting failed'
+        return '%s    Python linting failed' % _MESSAGE_TYPE_FAILED
     else:
-        return 'SUCCESS   %s Python files linted (%.1f secs)' % (
-            num_py_files, time.time() - start_time)
+        return '%s   %s Python files linted (%.1f secs)' % (
+            _MESSAGE_TYPE_SUCCESS, num_py_files, time.time() - start_time)
 
 
 def _pre_commit_linter():
@@ -233,6 +268,10 @@ def _pre_commit_linter():
     root directory, node-jscs dependencies are installed
     and pass JSCS binary path
     """
+
+    jscsrc_path = os.path.join(os.getcwd(), '.jscsrc')
+    pylintrc_path = os.path.join(os.getcwd(), '.pylintrc')
+
     parsed_args = _PARSER.parse_args()
     if parsed_args.path:
         input_path = os.path.join(os.getcwd(), parsed_args.path)
@@ -243,7 +282,10 @@ def _pre_commit_linter():
         if os.path.isfile(input_path):
             all_files = [input_path]
         else:
-            all_files = _get_all_files_in_directory(input_path)
+            excluded_glob_patterns = _get_glob_patterns_excluded_from_jscsrc(
+                jscsrc_path)
+            all_files = _get_all_files_in_directory(
+                input_path, excluded_glob_patterns)
     elif parsed_args.files:
         valid_filepaths = []
         invalid_filepaths = []
@@ -259,9 +301,6 @@ def _pre_commit_linter():
         all_files = valid_filepaths
     else:
         all_files = _get_changed_filenames()
-
-    jscsrc_path = os.path.join(os.getcwd(), '.jscsrc')
-    pylintrc_path = os.path.join(os.getcwd(), '.pylintrc')
 
     config_jscsrc = '--config=%s' % jscsrc_path
     config_pylint = '--rcfile=%s' % pylintrc_path
@@ -294,6 +333,10 @@ def _pre_commit_linter():
 
     print '\n'.join(summary_messages)
     print ''
+
+    if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
+            summary_messages]):
+        sys.exit(1)
 
 if __name__ == '__main__':
     _pre_commit_linter()
