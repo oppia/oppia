@@ -32,11 +32,22 @@ oppia.controller('CollectionEditor', ['$scope', 'CollectionBackendApiService',
 
   $scope.collection = null;
   $scope.collectionId = GLOBALS.collectionId;
+  $scope.collectionSkills = null;
+
+  // Get the id of the collection to be loaded
+  var pathnameArray = window.location.pathname.split('/');
+  for (var i = 0; i < pathnameArray.length; i++) {
+    if (pathnameArray[i] === 'create') {
+      $scope.collectionId = pathnameArray[i + 1];
+      break;
+    }
+  }
 
   // Load the collection to be edited.
   CollectionBackendApiService.loadCollection($scope.collectionId).then(
     function(collection) {
       $scope.collection = collection;
+      $scope.collectionSkills = collection.skills;
     }, function(error) {
       // TODO(mgowano): Handle not being able to load the collection.
       warningsData.addWarning(
