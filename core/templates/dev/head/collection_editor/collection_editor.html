@@ -71,7 +71,7 @@
         </li>
       </ul>
 
-      <h3>Examples to change the collection</h3>
+      <h3>Examples to change the collection<span ng-if="changeList.length > 0"> <em>(<[changeList.length]> changes pending)</em></h3>
 
       <a ng-href="/collection/<[collection.id]>" target="_blank">Go to Collection</a>
       <br>
@@ -88,6 +88,11 @@
       <input ng-model="prereqExpId" type="text" placeholder="Exp ID"><input ng-model="prereqSkillName" type="text" placeholder="Skill name"><button ng-click="addPrereqSkill(prereqExpId, prereqSkillName)">Add Prerequisite Skill for Exploration</button>
       <br>
       <input ng-model="acqExpId" type="text" placeholder="Exp ID"><input ng-model="acqSkillName" type="text" placeholder="Skill name"><button ng-click="addAcquiredSkill(acqExpId, acqSkillName)">Add Acquired Skill for Exploration</button>
+
+      <br>
+      <br>
+
+      <input ng-model="commitMessage" type="text" placeholder="Commit Message"><button ng-click="saveCollection(commitMessage)">Save Collection</button>
 
       <!-- End of placeholder/example markup. -->
     </div>

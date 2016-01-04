@@ -43,8 +43,21 @@ oppia.controller('CollectionEditor', ['$scope', 'CollectionBackendApiService',
         error || 'There was an error loading the collection.');
   });
 
+  var _getCollectionNodeForExplorationId = function(explorationId) {
+    for (var i = 0; i < $scope.collection.nodes.length; i++) {
+      var collectionNode = $scope.collection.nodes[i];
+      if (collectionNode.exploration_id == explorationId) {
+        return collectionNode;
+      }
+    }
+    return null;
+  };
+
   // EXAMPLES DEMONSTRATING HOW TO CHANGE THE COLLECTION. THE FOLLOWING CODE
   // SHOULD NOT GO INTO DEVELOP.
+
+  // Stores a pending list of changes.
+  $scope.changeList = [];
 
   var _arrayContainsCaseInsensitive = function(array, element) {
     var lowerElement = element.toLowerCase();
@@ -56,22 +69,11 @@ oppia.controller('CollectionEditor', ['$scope', 'CollectionBackendApiService',
     return false;
   };
 
-  var _updateCollection = function(commitMessage, changeList) {
-    WritableCollectionBackendApiService.updateCollection(
-      $scope.collection.id, $scope.collection.version, commitMessage,
-      changeList).then(function(collection) {
-        $scope.collection = collection;
-      }, function(error) {
-        warningsData.addWarning(
-          error || 'There was an error updating the collection.');
-      });
-  };
-
   $scope.addExploration = function(newExpId) {
     if (newExpId) {
       var change = CollectionUpdateService.buildAddCollectionNodeUpdate(
         newExpId);
-      _updateCollection('Add new exploration to collection.', [change]);
+      $scope.changeList.push(change);
     }
   };
 
@@ -79,7 +81,7 @@ oppia.controller('CollectionEditor', ['$scope', 'CollectionBackendApiService',
     if (removeExpId) {
       var change = CollectionUpdateService.buildDeleteCollectionNodeUpdate(
         removeExpId);
-      _updateCollection('Remove exploration from collection.', [change]);
+      $scope.changeList.push(change);
     }
   };
 
@@ -87,7 +89,7 @@ oppia.controller('CollectionEditor', ['$scope', 'CollectionBackendApiService',
     if (newCollectionTitle) {
       var change = CollectionUpdateService.buildCollectionTitleUpdate(
         newCollectionTitle);
-      _updateCollection('Change collection title.', [change]);
+      $scope.changeList.push(change);
     }
   };
 
@@ -95,7 +97,7 @@ oppia.controller('CollectionEditor', ['$scope', 'CollectionBackendApiService',
     if (newCollectionCategory) {
       var change = CollectionUpdateService.buildCollectionCategoryUpdate(
         newCollectionCategory);
-      _updateCollection('Change collection category.', [change]);
+      $scope.changeList.push(change);
     }
   };
 
@@ -103,34 +105,49 @@ oppia.controller('CollectionEditor', ['$scope', 'CollectionBackendApiService',
     if (newCollectionObjective) {
       var change = CollectionUpdateService.buildCollectionObjectiveUpdate(
         newCollectionObjective);
-      _updateCollection('Change collection objective.', [change]);
+      $scope.changeList.push(change);
     }
   };
 
   $scope.addPrereqSkill = function(expId, skillName) {
     if (expId && skillName) {
-      var collectionNode = $scope.collection.nodes[expId];
+      var collectionNode = _getCollectionNodeForExplorationId(expId);
       var prerequisiteSkills = angular.copy(collectionNode.prerequisite_skills);
       if (!_arrayContainsCaseInsensitive(prerequisiteSkills, skillName)) {
         prerequisiteSkills.push(skillName);
         var change = CollectionUpdateService.buildPrerequisiteSkillsUpdate(
           expId, prerequisiteSkills);
-        _updateCollection('Add prerequisite skill to exploration.', [change]);
+        $scope.changeList.push(change);
       }
     }
   };
 
   $scope.addAcquiredSkill = function(expId, skillName) {
     if (expId && skillName) {
-      var collectionNode = $scope.collection.nodes[expId];
+      var collectionNode = _getCollectionNodeForExplorationId(expId);
       var acquiredSkills = angular.copy(collectionNode.acquired_skills);
       if (!_arrayContainsCaseInsensitive(acquiredSkills, skillName)) {
         acquiredSkills.push(skillName);
         var change = CollectionUpdateService.buildAcquiredSkillsUpdate(
           expId, acquiredSkills);
-        _updateCollection('Add acquired skill to exploration.', [change]);
+        $scope.changeList.push(change);
       }
     }
+  };
+
+  // An explicit save is needed to push all changes to the backend at once
+  // because some likely working states of the collection will cause validation
+  // errors when trying to incrementally save them.
+  $scope.saveCollection = function(commitMessage) {
+    WritableCollectionBackendApiService.updateCollection(
+      $scope.collection.id, $scope.collection.version, commitMessage,
+      $scope.changeList).then(function(collection) {
+        $scope.collection = collection;
+        $scope.changeList = [];
+      }, function(error) {
+        warningsData.addWarning(
+          error || 'There was an error updating the collection.');
+      });
   };
 
   // END OF EXAMPLE CODE DEMONSTRATING HOW TO CHANGE THE COLLECTION.
