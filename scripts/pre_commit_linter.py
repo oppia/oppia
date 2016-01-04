@@ -330,5 +330,9 @@ def _pre_commit_linter():
     print '\n'.join(summary_messages)
     print ''
 
+    if any([message.startswith('FAILED') for message in summary_messages]):
+        sys.exit(1)
+    return
+
 if __name__ == '__main__':
     _pre_commit_linter()
