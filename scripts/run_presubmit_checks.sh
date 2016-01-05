@@ -41,7 +41,7 @@ then
 fi
 
 set -e
-# Run frontend unit tests.
+# Run Javascript and Python linters.
 echo 'Linting files since the last commit'
 python $(dirname $0)/pre_commit_linter.py || exit 1
 echo 'Linting passed.'
