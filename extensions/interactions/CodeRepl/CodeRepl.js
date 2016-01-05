@@ -49,11 +49,17 @@ oppia.directive('oppiaInteractiveCodeRepl', [
           // Options for the ui-codemirror display.
           editor.setOption('lineNumbers', true);
           editor.setOption('indentWithTabs', true);
-
-          // Note that only 'coffeescript', 'javascript', 'python', and 'ruby'
-          // have CodeMirror-supported syntax highlighting. For other
-          // languages, syntax highlighting will not happen.
-          editor.setOption('mode', $scope.language);
+          editor.setOption('indentUnit', 4);
+          editor.setOption('mode', 'python');
+          editor.setOption('extraKeys', {
+            Tab: function(cm) {
+              var spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
+              cm.replaceSelection(spaces);
+              // Move the cursor to the end of the selection.
+              var endSelectionPos = cm.getDoc().getCursor('head');
+              cm.getDoc().setCursor(endSelectionPos);
+            }
+          });
 
           // NOTE: this is necessary to avoid the textarea being greyed-out.
           setTimeout(function() {
@@ -62,6 +68,14 @@ oppia.directive('oppiaInteractiveCodeRepl', [
 
           editor.on('change', function() {
             $scope.code = editor.getValue();
+          });
+
+          // Without this, the editor does not show up correctly on small
+          // screens when the user switches to the supplemental interaction.
+          $scope.$on('showInteraction', function() {
+            setTimeout(function() {
+              editor.refresh();
+            }, 200);
           });
 
           $scope.hasLoaded = true;
@@ -100,16 +114,34 @@ oppia.directive('oppiaInteractiveCodeRepl', [
           });
         };
 
+        var fixLineNumbers = function(err) {
+          var preCodeNumLines = $scope.preCode.split('\n').length;
+          var userCodeNumLines = $scope.code.split('\n').length;
+          return err.replace(/on line ([0-9]+)/g, function(match, p1) {
+            var originalLineNumber = Number(p1);
+
+            return (
+              originalLineNumber <= preCodeNumLines ?
+              '(on line ' + String(originalLineNumber) +
+                ' of exploration creator\'s prepended code)' :
+              originalLineNumber <= preCodeNumLines + userCodeNumLines ?
+              '(on line ' + String(originalLineNumber - preCodeNumLines) + ')' :
+              '(on line ' + String(
+                  originalLineNumber - preCodeNumLines - userCodeNumLines) +
+                ' of exploration creator\'s appended code)');
+          });
+        };
+
         $scope.sendResponse = function(evaluation, err) {
           $scope.evaluation = (evaluation || '');
-          $scope.err = (err || '');
+          $scope.fullError = err ? fixLineNumbers(err) : '';
           $scope.$parent.submitAnswer({
             // Replace tabs with 2 spaces.
             // TODO(sll): Change the default Python indentation to 4 spaces.
             code: $scope.code.replace(/\t/g, '  ') || '',
             output: $scope.output,
             evaluation: $scope.evaluation,
-            error: $scope.err
+            error: (err || '')
           }, codeReplRulesService);
         };
       }]
