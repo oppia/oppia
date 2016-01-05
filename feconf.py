@@ -440,7 +440,6 @@ CATEGORIES_TO_COLORS = {
     'Environment': COLOR_GUNMETAL,
     'Geography': COLOR_SALMON,
     'Government': COLOR_SALMON,
-    'Hobbies': COLOR_TEAL,
     'Languages': COLOR_SUNNYSIDE,
     'Law': COLOR_SALMON,
     'Life Skills': COLOR_TEAL,
@@ -453,11 +452,11 @@ CATEGORIES_TO_COLORS = {
     'Psychology': COLOR_SALMON,
     'Puzzles': COLOR_TEAL,
     'Reading': COLOR_TEAL,
-    'Religion': COLOR_SALMON,
     'Sport': COLOR_SUNNYSIDE,
     'Statistics': COLOR_SHARKFIN,
     'Welcome': COLOR_TEAL,
 }
+
 
 # A sorted list of default categories.
 DEFAULT_CATEGORIES = sorted(CATEGORIES_TO_COLORS.keys())

@@ -20,20 +20,17 @@
         <!-- User must complete the registration process. -->
         <a class="btn oppia-navbar-add-exploration-button protractor-test-create-exploration oppia-transition-200"
            href="{{gallery_login_redirect_url}}">
-          <span class="oppia-navbar-add-exploration-button-plus">+</span>
-          <span>Create Exploration</span>
+          <span>Create</span>
         </a>
       {% else %}
         <a class="btn oppia-navbar-add-exploration-button protractor-test-create-exploration oppia-transition-200"
            ng-click="showCreateExplorationModal()">
-          <span class="oppia-navbar-add-exploration-button-plus">+</span>
-          <span>Create Exploration</span>
+          <span>Create</span>
         </a>
         {% if allow_yaml_file_upload %}
           <a class="btn oppia-navbar-add-exploration-button oppia-transition-200"
              ng-click="showUploadExplorationModal()">
-            <span class="oppia-navbar-add-exploration-button-plus">+</span>
-            <span>Upload Exploration</span>
+            <span>Upload</span>
           </a>
         {% endif %}
       {% endif %}
@@ -48,7 +45,7 @@
                              'glyphicon-refresh oppia-animate-spin': searchIsLoading}">
             </span>
           </div>
-          <input type="text" class="form-control oppia-splash-search-input oppia-splash-search-text-input" placeholder="What are you curious about?" ng-model="searchQuery" ng-keyup="onSearchQueryChange($event)">
+          <input type="text" class="form-control oppia-splash-search-input oppia-splash-search-text-input" placeholder="What would you like to learn?" ng-model="searchQuery" ng-keyup="onSearchQueryChange($event)">
         </div>
       </div>
     </form>
@@ -150,14 +147,37 @@
     <div style="position: relative; z-index: 3;">
       <div ng-if="inSplashMode" class="oppia-gallery-interstitial">
         <span>
-          Oppia is a personalized learning platform created by and for people like you.
+          Oppia.org is a community for learning.
           <div style="display: inline-block;">
-            <a href="/about">Find out more!</a>
+            <a href="/about">Find out more.</a>
           </div>
         </span>
       </div>
 
-      <div class="oppia-gallery-tiles-area">
+      <div class="oppia-gallery-tiles-area" ng-if="inSplashMode">
+        <div class="oppia-gallery-tiles-container">
+          <div ng-repeat="galleryGroup in galleryGroups">
+            <!-- TODO(sll): Add card at end of the row that, when clicked, does showFullGalleryGroup(galleryGroup)" -->
+            <h2 class="oppia-gallery-group-header">
+              <a ng-click="showFullGalleryGroup(galleryGroup)">
+                <[galleryGroup.header]>
+              </a>
+            </h2>
+            <exploration-summary-tile ng-repeat="tile in galleryGroup.activity_summary_dicts"
+                                      exploration-id="tile.id"
+                                      exploration-title="tile.title"
+                                      last-updated-msec="tile.last_updated_msec"
+                                      objective="tile.objective"
+                                      category="tile.category"
+                                      ratings="tile.ratings"
+                                      thumbnail-icon-url="tile.thumbnail_icon_url"
+                                      thumbnail-bg-color="tile.thumbnail_bg_color">
+            </exploration-summary-tile>
+          </div>
+        </div>
+      </div>
+
+      <div class="oppia-gallery-tiles-area" ng-if="!inSplashMode">
         <div class="oppia-gallery-tiles-container">
           <div ng-if="allExplorationsInOrder.length === 0" class="oppia-gallery-tiles-introduction">
             <em>

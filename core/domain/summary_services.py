@@ -23,6 +23,30 @@ from core.domain import user_services
 import utils
 
 
+_GALLERY_CATEGORY_GROUPINGS = [{
+    'header': 'Computation & Programming',
+    'search_categories': ['Computing', 'Programming'],
+}, {
+    'header': 'Mathematics & Statistics',
+    'search_categories': ['Mathematics', 'Statistics'],
+}, {
+    'header': 'Biology, Chemistry & Medicine',
+    'search_categories': ['Biology', 'Chemistry', 'Medicine'],
+}, {
+    'header': 'Physics, Astronomy & Engineering',
+    'search_categories': ['Physics', 'Astronomy', 'Engineering'],
+}, {
+    'header': 'Languages & Reading',
+    'search_categories': ['Languages', 'Reading'],
+}, {
+    'header': 'Environment & Geography',
+    'search_categories': ['Environment', 'Geography'],
+}, {
+    'header': 'Business, Economics, Government & Law',
+    'search_categories': ['Business', 'Economics', 'Government', 'Law'],
+}]
+
+
 def get_displayable_exp_summary_dicts_matching_ids(exploration_ids):
     """Given a list of exploration ids, filters the list for
     explorations that are currently non-private and not deleted,
@@ -61,3 +85,38 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids):
             })
 
     return displayable_exp_summaries
+
+
+def get_gallery_category_groupings(language_codes):
+    """Returns a list of groups in the gallery. Each group has a header and
+    a list of dicts representing activity summaries.
+    """
+    language_codes_suffix = ''
+    if language_codes:
+        language_codes_suffix = ' language_code=("%s")' % (
+            '" OR "'.join(language_codes))
+
+    def _generate_query(categories):
+        # This assumes that 'categories' is non-empty.
+        return 'category=("%s")%s' % (
+            '" OR "'.join(categories), language_codes_suffix)
+
+    results = []
+    for gallery_group in _GALLERY_CATEGORY_GROUPINGS:
+        # TODO(sll): Extend this to include collections.
+        exp_ids = exp_services.search_explorations(
+            _generate_query(gallery_group['search_categories']), 10)[0]
+
+        summary_dicts = get_displayable_exp_summary_dicts_matching_ids(
+            exp_ids)
+
+        if not summary_dicts:
+            continue
+
+        results.append({
+            'header': gallery_group['header'],
+            'categories': gallery_group['search_categories'],
+            'activity_summary_dicts': summary_dicts,
+        })
+
+    return results

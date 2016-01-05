@@ -96,6 +96,28 @@ class GalleryPage(base.BaseHandler):
         self.render_template('galleries/gallery.html')
 
 
+class DefaultGalleryCategoriesHandler(base.BaseHandler):
+    """Provides data for the default gallery page."""
+
+    def get(self):
+        """Handles GET requests."""
+        language_codes = self.request.get('language_codes', [])
+        activity_summary_dicts_by_category = (
+            summary_services.get_gallery_category_groupings(language_codes))
+
+        preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
+        if self.user_id:
+            user_settings = user_services.get_user_settings(self.user_id)
+            preferred_language_codes = user_settings.preferred_language_codes
+
+        self.values.update({
+            'activity_summary_dicts_by_category': (
+                activity_summary_dicts_by_category),
+            'preferred_language_codes': preferred_language_codes,
+        })
+        self.render_json(self.values)
+
+
 class GalleryHandler(base.BaseHandler):
     """Provides data for the exploration gallery page."""
 
@@ -120,14 +142,8 @@ class GalleryHandler(base.BaseHandler):
                 'You may be running up against the default query limits.'
                 % feconf.DEFAULT_QUERY_LIMIT)
 
-        preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
-        if self.user_id:
-            user_settings = user_services.get_user_settings(self.user_id)
-            preferred_language_codes = user_settings.preferred_language_codes
-
         self.values.update({
             'explorations_list': explorations_list,
-            'preferred_language_codes': preferred_language_codes,
             'search_cursor': search_cursor,
         })
         self.render_json(self.values)

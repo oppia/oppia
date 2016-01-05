@@ -18,6 +18,8 @@
  * @author sll@google.com (Sean Lip)
  */
 
+// TODO(sll): Get this to read from a common JSON file; it's replicated in
+// feconf.
 oppia.constant('CATEGORY_LIST', [
   'Architecture',
   'Art',
@@ -31,7 +33,6 @@ oppia.constant('CATEGORY_LIST', [
   'Environment',
   'Geography',
   'Government',
-  'Hobbies',
   'Languages',
   'Law',
   'Life Skills',
@@ -44,7 +45,6 @@ oppia.constant('CATEGORY_LIST', [
   'Psychology',
   'Puzzles',
   'Reading',
-  'Religion',
   'Sport',
   'Statistics',
   'Welcome'

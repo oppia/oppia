@@ -769,18 +769,16 @@ textarea {
   white-space: normal;
 }
 .btn.oppia-navbar-add-exploration-button {
-  background-color: rgba(5, 190, 178, 0.9);
-  color: rgba(255,255,255,0.9);
-  font-size: 16px;
+  background-color: rgba(0,0,0,0.2);
+  color: rgba(255,255,255,1.0);
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 14px;
   margin-right: 5px;
+  margin-top: 2px;
+  text-transform: uppercase;
 }
 .btn.oppia-navbar-add-exploration-button:hover {
-  background-color: rgba(5, 190, 178, 1);
-  color: rgba(255,255,255,1);
-}
-.oppia-navbar-add-exploration-button-plus {
-  font-weight: bold;
-  margin-right: 5px;
+  background-color: rgba(0,0,0,0.3);
 }
 
 @media (max-width: 1050px) {
@@ -840,6 +838,19 @@ textarea {
   background-color: #eee;
 }
 
+.oppia-gallery-group-header {
+  margin-bottom: 6px;
+  margin-left: 4px;
+  margin-top: 36px;
+}
+.oppia-gallery-group-header a {
+  color: black;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+}
+.oppia-gallery-group-header a:hover {
+  color: #0844aa;
+}
+
 .oppia-gallery-tiles-introduction {
   font-size: 1.6em;
   padding-top: 40px;
@@ -852,8 +863,8 @@ textarea {
   margin-right: auto;
   width: 844px;
   min-height: 500px;
-  padding-bottom: 25px;
-  padding-top: 56px;
+  padding-bottom: 24px;
+  padding-top: 24px;
 }
 
 /* Ensure that the gallery tiles remain centered. Note that these values would
@@ -1874,21 +1885,6 @@ ul.oppia-dashboard-tiles {
 }
 .oppia-gallery-modal .modal-dialog {
   margin-top: 50px;
-}
-
-.oppia-gallery-modal-video {
-  padding-bottom: 56.25%;
-  position: relative;
-  width: 100%;
-}
-.oppia-gallery-modal-video > iframe {
-  bottom: 0;
-  height: 100%;
-  left: 0;
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 100%;
 }
 
 .oppia-modal-close {

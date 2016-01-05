@@ -36,9 +36,60 @@ angular.module('template/carousel/carousel.html', []).run([
 
 oppia.constant('GALLERY_DATA_URL', '/galleryhandler/data');
 
+// Keeps track of the current category and language selections.
+oppia.factory('selectionDataService', [function() {
+  var currentlySelectedCategories = [];
+  var currentlySelectedLanguageCodes = [];
+
+  return {
+    getCurrentlySelectedCategories: function() {
+      return angular.copy(currentlySelectedCategories);
+    },
+    getCurrentlySelectedLanguageCodes: function() {
+      return angular.copy(currentlySelectedLanguageCodes);
+    },
+    clearCategories: function() {
+      currentlySelectedCategories = [];
+    },
+    clearLanguageCodes: function() {
+      currentlySelectedLanguageCodes = [];
+    },
+    addCategoriesToSelection: function(newCategories) {
+      newCategories.forEach(function(category) {
+        if (currentlySelectedCategories.indexOf(category) === -1) {
+          currentlySelectedCategories.push(category);
+        }
+      });
+    },
+    addLanguageCodesToSelection: function(newLanguageCodes) {
+      newLanguageCodes.forEach(function(languageCode) {
+        if (currentlySelectedLanguageCodes.indexOf(languageCode) === -1) {
+          currentlySelectedLanguageCodes.push(languageCode);
+        }
+      });
+    },
+    removeCategoriesFromSelection: function(removedCategories) {
+      removedCategories.forEach(function(category) {
+        var index = currentlySelectedCategories.indexOf(category);
+        if (index !== -1) {
+          currentlySelectedCategories.splice(index, 1);
+        }
+      });
+    },
+    removeLanguageCodesFromSelection: function(removedLanguageCodes) {
+      removedLanguageCodes.forEach(function(languageCode) {
+        var index = currentlySelectedLanguageCodes.indexOf(languageCode);
+        if (index !== -1) {
+          currentlySelectedLanguageCodes.splice(index, 1);
+        }
+      });
+    }
+  };
+}]);
+
 oppia.factory('searchService', [
-    '$http', '$rootScope', 'GALLERY_DATA_URL',
-    function($http, $rootScope, GALLERY_DATA_URL) {
+    '$http', '$rootScope', 'GALLERY_DATA_URL', 'selectionDataService',
+    function($http, $rootScope, GALLERY_DATA_URL, selectionDataService) {
   var _lastQuery = null;
   var _lastSelectedCategories = {};
   var _lastSelectedLanguageCodes = {};
@@ -46,33 +97,32 @@ oppia.factory('searchService', [
 
   // Appends a suffix to the query describing allowed category and language
   // codes to filter on.
-  var _getSuffixForQuery = function(selectedCategories, selectedLanguageCodes) {
+  var _getSuffixForQuery = function() {
     var querySuffix = '';
 
-    var _categories = '';
-    for (var key in selectedCategories) {
-      if (selectedCategories[key]) {
-        if (_categories) {
-          _categories += '" OR "';
-        }
-        _categories += key;
+    var categories = selectionDataService.getCurrentlySelectedCategories();
+    var categorySuffix = '';
+    categories.forEach(function(category) {
+      if (categorySuffix) {
+        categorySuffix += '" OR "';
       }
-    }
-    if (_categories) {
-      querySuffix += ' category=("' + _categories + '")';
+      categorySuffix += category;
+    });
+    if (categorySuffix) {
+      querySuffix += ' category=("' + categorySuffix + '")';
     }
 
-    var _languageCodes = '';
-    for (var key in selectedLanguageCodes) {
-      if (selectedLanguageCodes[key]) {
-        if (_languageCodes) {
-          _languageCodes += '" OR "';
-        }
-        _languageCodes += key;
+    var languageCodes = (
+      selectionDataService.getCurrentlySelectedLanguageCodes());
+    var languageCodeSuffix = '';
+    languageCodes.forEach(function(languageCode) {
+      if (languageCodeSuffix) {
+        languageCodeSuffix += '" OR "';
       }
-    }
-    if (_languageCodes) {
-      querySuffix += ' language_code=("' + _languageCodes + '")';
+      languageCodeSuffix += languageCode;
+    });
+    if (languageCodeSuffix) {
+      querySuffix += ' language_code=("' + languageCodeSuffix + '")';
     }
 
     return querySuffix;
@@ -86,18 +136,13 @@ oppia.factory('searchService', [
 
   return {
     // Note that an empty query results in all explorations being shown.
-    executeSearchQuery: function(
-        searchQuery, selectedCategories, selectedLanguageCodes,
-        successCallback) {
+    executeSearchQuery: function(searchQuery, successCallback) {
       var queryUrl = GALLERY_DATA_URL + '?q=' + encodeURI(
-        searchQuery +
-        _getSuffixForQuery(selectedCategories, selectedLanguageCodes));
+        searchQuery + _getSuffixForQuery());
 
       _isCurrentlyFetchingResults = true;
       $http.get(queryUrl).success(function(data) {
         _lastQuery = searchQuery;
-        _lastSelectedCategories = angular.copy(selectedCategories);
-        _lastSelectedLanguageCodes = angular.copy(selectedLanguageCodes);
         _searchCursor = data.search_cursor;
         $rootScope.$broadcast(
           'refreshGalleryData', data, hasPageFinishedLoading());
@@ -115,8 +160,7 @@ oppia.factory('searchService', [
       }
 
       var queryUrl = GALLERY_DATA_URL + '?q=' + encodeURI(
-        _lastQuery + _getSuffixForQuery(
-          _lastSelectedCategories, _lastSelectedLanguageCodes));
+        _lastQuery + _getSuffixForQuery());
 
       if (_searchCursor) {
         queryUrl += '&cursor=' + _searchCursor;
@@ -136,14 +180,29 @@ oppia.factory('searchService', [
 
 oppia.controller('Gallery', [
   '$scope', '$http', '$rootScope', '$modal', '$window', '$timeout',
-  'ExplorationCreationButtonService', 'oppiaDatetimeFormatter',
-  'oppiaDebouncer', 'urlService', 'GALLERY_DATA_URL', 'CATEGORY_LIST',
-  'searchService',
+  'ExplorationCreationButtonService', 'oppiaDebouncer', 'urlService',
+  'GALLERY_DATA_URL', 'CATEGORY_LIST', 'searchService', 'selectionDataService',
   function(
       $scope, $http, $rootScope, $modal, $window, $timeout,
-      ExplorationCreationButtonService, oppiaDatetimeFormatter,
-      oppiaDebouncer, urlService, GALLERY_DATA_URL, CATEGORY_LIST,
-      searchService) {
+      createExplorationButtonService, oppiaDebouncer, urlService,
+      GALLERY_DATA_URL, CATEGORY_LIST, searchService, selectionDataService) {
+    $rootScope.loadingMessage = 'Loading';
+
+    $http.get('/default_gallery_categories').success(function(data) {
+      $scope.galleryGroups = data.activity_summary_dicts_by_category;
+
+      $rootScope.$broadcast(
+        'preferredLanguageCodesLoaded', data.preferred_language_codes);
+
+      if (data.username) {
+        if (urlService.getUrlParams().mode === 'create') {
+          $scope.showCreateExplorationModal(CATEGORY_LIST);
+        }
+      }
+
+      $rootScope.loadingMessage = '';
+    });
+
     $window.addEventListener('scroll', function() {
       var oppiaBanner = $('.oppia-gallery-banner-container');
       var oppiaTagline = $('.oppia-gallery-banner-tagline');
@@ -162,30 +221,22 @@ oppia.controller('Gallery', [
     $scope.CAROUSEL_SLIDES = GLOBALS.CAROUSEL_SLIDES_CONFIG || [];
 
     // Preload images, otherwise they will only start showing up some time after
-    // the carousel slide comes into view. See:
-    //
-    //     http://stackoverflow.com/q/1373142
+    // the carousel slide appears. See: http://stackoverflow.com/q/1373142
     for (var i = 0; i < $scope.CAROUSEL_SLIDES.length; i++) {
       var pic = new Image();
       pic.src = '/images/splash/' + $scope.CAROUSEL_SLIDES[i].image_filename;
     }
 
-    $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
-      return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
-        millisSinceEpoch);
-    };
-
-    $rootScope.loadingMessage = 'Loading';
-
     $scope.showCreateExplorationModal = function() {
-      ExplorationCreationButtonService.showCreateExplorationModal(
-        CATEGORY_LIST);
+      createExplorationButtonService.showCreateExplorationModal(CATEGORY_LIST);
     };
-
-    $scope.currentUserIsModerator = false;
 
     $scope.inSplashMode = ($scope.CAROUSEL_SLIDES.length > 0);
-    $scope.$on('hasChangedSearchQuery', function() {
+    $scope.$on('isInSearchMode', function() {
+      removeSplashCarousel();
+    });
+
+    var removeSplashCarousel = function() {
       if ($scope.inSplashMode) {
         $('.oppia-gallery-container').fadeOut(function() {
           $scope.inSplashMode = false;
@@ -194,7 +245,7 @@ oppia.controller('Gallery', [
           }, 50);
         });
       }
-    });
+    };
 
     // SEARCH FUNCTIONALITY
 
@@ -229,29 +280,27 @@ oppia.controller('Gallery', [
       }
     );
 
-    // Retrieves gallery data from the server.
-    $http.get(GALLERY_DATA_URL).success(function(data) {
-      $scope.currentUserIsModerator = Boolean(data.is_moderator);
-
-      // Note that this will cause an initial search query to be sent.
-      $rootScope.$broadcast(
-        'preferredLanguageCodesLoaded', data.preferred_language_codes);
-
-      if (data.username) {
-        if (urlService.getUrlParams().mode === 'create') {
-          $scope.showCreateExplorationModal(CATEGORY_LIST);
-        }
-      }
-    });
+    $scope.showFullGalleryGroup = function(galleryGroup) {
+      selectionDataService.clearCategories();
+      selectionDataService.addCategoriesToSelection(galleryGroup.categories);
+      // TODO(sll): is this line correct?
+      selectionDataService.clearLanguageCodes();
+      searchService.executeSearchQuery('', function() {
+        removeSplashCarousel();
+      });
+      // TODO(sll): Clear the search query from the search bar, too.
+    };
   }
 ]);
 
 oppia.controller('SearchBar', [
   '$scope', '$rootScope', 'searchService', 'oppiaDebouncer',
   'ExplorationCreationButtonService', 'urlService', 'CATEGORY_LIST',
+  'selectionDataService',
   function(
       $scope, $rootScope, searchService, oppiaDebouncer,
-      ExplorationCreationButtonService, urlService, CATEGORY_LIST) {
+      createExplorationButtonService, urlService, CATEGORY_LIST,
+      selectionDataService) {
     $scope.searchIsLoading = false;
     $scope.ALL_CATEGORIES = CATEGORY_LIST.map(function(categoryName) {
       return {
@@ -265,7 +314,8 @@ oppia.controller('SearchBar', [
           id: languageItem.code,
           text: languageItem.name
         };
-      });
+      }
+    );
 
     $scope.searchQuery = '';
     $scope.selectionDetails = {
@@ -318,8 +368,22 @@ oppia.controller('SearchBar', [
       var selections = $scope.selectionDetails[itemsType].selections;
       if (!selections.hasOwnProperty(optionName)) {
         selections[optionName] = true;
+        if (itemsType === 'categories') {
+          selectionDataService.addCategoriesToSelection([optionName]);
+        } else if (itemsType === 'languageCodes') {
+          selectionDataService.addLanguageCodesToSelection([optionName]);
+        } else {
+          throw Error('Invalid item type: ' + itemsType);
+        }
       } else {
         selections[optionName] = !selections[optionName];
+        if (itemsType === 'categories') {
+          selectionDataService.removeCategoriesFromSelection([optionName]);
+        } else if (itemsType === 'languageCodes') {
+          selectionDataService.removeLanguageCodesFromSelection([optionName]);
+        } else {
+          throw Error('Invalid item type: ' + itemsType);
+        }
       }
 
       _updateSelectionDetails(itemsType);
@@ -328,16 +392,14 @@ oppia.controller('SearchBar', [
 
     var _searchBarFullyLoaded = false;
 
-    var _hasChangedSearchQuery = Boolean(urlService.getUrlParams().q);
+    var _isInSearchMode = Boolean(urlService.getUrlParams().q);
     var _onSearchQueryChangeExec = function() {
       $scope.searchIsLoading = true;
-      searchService.executeSearchQuery(
-          $scope.searchQuery, $scope.selectionDetails.categories.selections,
-          $scope.selectionDetails.languageCodes.selections, function() {
+      searchService.executeSearchQuery($scope.searchQuery, function() {
         $scope.searchIsLoading = false;
-        if (!_hasChangedSearchQuery && _searchBarFullyLoaded) {
-          _hasChangedSearchQuery = true;
-          $rootScope.$broadcast('hasChangedSearchQuery');
+        if (!_isInSearchMode && _searchBarFullyLoaded) {
+          _isInSearchMode = true;
+          $rootScope.$broadcast('isInSearchMode');
         }
       });
     };
@@ -368,10 +430,7 @@ oppia.controller('SearchBar', [
             selections[languageCode] = !selections[languageCode];
           }
         }
-
         _updateSelectionDetails('languageCodes');
-        _onSearchQueryChangeExec();
-
         _searchBarFullyLoaded = true;
       }
     );
