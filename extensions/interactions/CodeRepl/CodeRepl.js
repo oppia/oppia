@@ -116,8 +116,19 @@ oppia.directive('oppiaInteractiveCodeRepl', [
 
         var fixLineNumbers = function(err) {
           var preCodeNumLines = $scope.preCode.split('\n').length;
+          var userCodeNumLines = $scope.code.split('\n').length;
           return err.replace(/on line ([0-9]+)/g, function(match, p1) {
-            return '(on line ' + String(Number(p1) - preCodeNumLines) + ')';
+            var originalLineNumber = Number(p1);
+
+            return (
+              originalLineNumber <= preCodeNumLines ?
+              '(on line ' + String(originalLineNumber) +
+                ' of exploration creator\'s prepended code)' :
+              originalLineNumber <= preCodeNumLines + userCodeNumLines ?
+              '(on line ' + String(originalLineNumber - preCodeNumLines) + ')' :
+              '(on line ' + String(
+                  originalLineNumber - preCodeNumLines - userCodeNumLines) +
+                ' of exploration creator\'s appended code)');
           });
         };
 
