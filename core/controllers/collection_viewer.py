@@ -81,58 +81,11 @@ class CollectionDataHandler(base.BaseHandler):
     def get(self, collection_id):
         """Populates the data on the individual collection page."""
         try:
-            collection = collection_services.get_collection_by_id(
-                collection_id)
+            collection_dict = (
+                collection_services.get_learner_collection_dict_by_id(
+                    collection_id, self.user_id))
         except Exception as e:
             raise self.PageNotFoundException(e)
-        exp_ids = collection.exploration_ids
-        exp_summaries = (
-            exp_services.get_exploration_summaries_matching_ids(exp_ids))
-        exp_summaries_dict = {
-            exp_id: exp_summaries[ind] for (ind, exp_id) in enumerate(exp_ids)
-        }
-
-        # TODO(bhenning): Users should not be recommended explorations they
-        # have completed outside the context of a collection.
-        next_exploration_ids = None
-        completed_exploration_ids = None
-        if self.user_id:
-            completed_exploration_ids = (
-                collection_services.get_completed_exploration_ids(
-                    self.user_id, collection_id))
-            next_exploration_ids = collection.get_next_exploration_ids(
-                completed_exploration_ids)
-        else:
-            # If the user is not logged in or they have not completed any of
-            # the explorations yet within the context of this collection,
-            # recommend the initial explorations.
-            next_exploration_ids = collection.init_exploration_ids
-            completed_exploration_ids = []
-
-        collection_dict = collection.to_dict()
-        collection_dict['skills'] = collection.skills
-        collection_dict['next_exploration_ids'] = next_exploration_ids
-        collection_dict['completed_exploration_ids'] = (
-            completed_exploration_ids)
-
-        # Insert an 'exploration' dict into each collection node, where the
-        # dict includes meta information about the exploration (ID and title).
-        for collection_node in collection_dict['nodes']:
-            summary = exp_summaries_dict.get(collection_node['exploration_id'])
-            collection_node['exploration'] = {
-                'id': collection_node['exploration_id'],
-                'title': summary.title if summary else None,
-                'category': summary.category if summary else None,
-                'objective': summary.objective if summary else None,
-                'ratings': summary.ratings if summary else None,
-                'last_updated_msec': utils.get_time_in_millisecs(
-                    summary.exploration_model_last_updated
-                ) if summary else None,
-                'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
-                    summary.category),
-                'thumbnail_bg_color': utils.get_hex_color_for_category(
-                    summary.category),
-            }
 
         self.values.update({
             'can_edit': (
@@ -140,7 +93,7 @@ class CollectionDataHandler(base.BaseHandler):
                     rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id)),
             'collection': collection_dict,
             'info_card_image_url': utils.get_info_card_url_for_category(
-                collection.category),
+                collection_dict['category']),
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
         })

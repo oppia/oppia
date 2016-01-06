@@ -19,7 +19,7 @@
  */
 
 oppia.constant(
-  'COLLECTION_DATA_URL', '/collectionhandler/data/<collection_id>');
+  'COLLECTION_DATA_URL', '/collection_handler/data/<collection_id>');
 
 oppia.animation('.oppia-collection-animate-slide', function() {
   return {
@@ -33,8 +33,8 @@ oppia.animation('.oppia-collection-animate-slide', function() {
 });
 
 oppia.controller('CollectionPlayer', [
-  '$scope', 'CollectionDataService', 'warningsData',
-  function($scope, CollectionDataService, warningsData) {
+  '$scope', 'CollectionBackendApiService', 'warningsData',
+  function($scope, CollectionBackendApiService, warningsData) {
     $scope.collection = null;
     $scope.collectionId = GLOBALS.collectionId;
     $scope.showingAllExplorations = !GLOBALS.isLoggedIn;
@@ -121,7 +121,7 @@ oppia.controller('CollectionPlayer', [
     };
 
     // Load the collection the learner wants to view.
-    CollectionDataService.loadCollection($scope.collectionId).then(
+    CollectionBackendApiService.loadCollection($scope.collectionId).then(
       function(collection) {
         $scope.collection = collection;
       },

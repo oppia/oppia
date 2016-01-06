@@ -98,7 +98,7 @@ def _require_valid_version(version_from_payload, exploration_version):
 
 
 def require_editor(handler):
-    """Decorator that checks if the user can edit the given entity."""
+    """Decorator that checks if the user can edit the given exploration."""
     def test_editor(self, exploration_id, escaped_state_name=None, **kwargs):
         """Gets the user and exploration id if the user can edit it.
 

@@ -12,7 +12,8 @@
 {% block header_js %}
   {{ super() }}
   <script type="text/javascript">
-    GLOBALS.can_edit = JSON.parse('{{can_edit|js_string}}');
+    GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
+    GLOBALS.canEdit = JSON.parse('{{can_edit|js_string}}');
   </script>
 
   <style>
@@ -27,10 +28,73 @@
 
 {% block content %}
   <div ng-controller="CollectionEditor">
-    <div ng-if="isCollectionLoaded">
+    <div ng-if="collection">
       <p>title: <[collection.title]></p>
       <p>category: <[collection.category]></p>
       <p>objective: <[collection.objective]></p>
+
+      <!-- Examples for modifying the collection. This is placeholder and should not go into develop. -->
+      <hr>
+
+      <h3>Current collection</h3>
+      <strong>Details</strong>
+      <br>
+      Title: <em><[collection.title]></em>
+      <br>
+      Category: <em><[collection.category]></em>
+      <br>
+      Objective: <em><[collection.objective]></em>
+      <br>
+      Version: <em><[collection.version]></em>
+      <br>
+      <br>
+
+      <strong>Explorations</strong>
+      <ul>
+        <li ng-repeat="node in collection.nodes">
+          <div>
+            [<[node.exploration.id]>] <em><[node.exploration.title]></em>
+            <br>
+            <div ng-if="node.prerequisite_skills.length > 0">
+              Prerequisite skills:
+              <ul>
+                <li ng-repeat="skill in node.prerequisite_skills"><em><[skill]></em></li>
+              </ul>
+            </div>
+            <div ng-if="node.acquired_skills.length > 0">
+              Acquired skills:
+              <ul>
+                <li ng-repeat="skill in node.acquired_skills"><em><[skill]></em></li>
+              </ul>
+            </div>
+          </div>
+        </li>
+      </ul>
+
+      <h3>Examples to change the collection<span ng-if="changeList.length > 0"> <em>(<[changeList.length]> changes pending)</em></h3>
+
+      <a ng-href="/collection/<[collection.id]>" target="_blank">Go to Collection</a>
+      <br>
+      <input ng-model="newExpId" type="text" placeholder="New exp ID" /><button ng-click="addExploration(newExpId)">Add Exploration</button>
+      <br>
+      <input ng-model="removeExpId" type="text" placeholder="Remove exp ID" /><button ng-click="deleteExploration(removeExpId)">Delete Exploration</button>
+      <br>
+      <input ng-model="newTitle" type="text" placeholder="New collection title"><button ng-click="setCollectionTitle(newTitle)">Set Collection Title</button>
+      <br>
+      <input ng-model="newCategory" type="text" placeholder="New collection category"><button ng-click="setCollectionCategory(newCategory)">Set Collection Category</button>
+      <br>
+      <input ng-model="newObjective" type="text" placeholder="New collection objective"><button ng-click="setCollectionObjective(newObjective)">Set Collection Objective</button>
+      <br>
+      <input ng-model="prereqExpId" type="text" placeholder="Exp ID"><input ng-model="prereqSkillName" type="text" placeholder="Skill name"><button ng-click="addPrereqSkill(prereqExpId, prereqSkillName)">Add Prerequisite Skill for Exploration</button>
+      <br>
+      <input ng-model="acqExpId" type="text" placeholder="Exp ID"><input ng-model="acqSkillName" type="text" placeholder="Skill name"><button ng-click="addAcquiredSkill(acqExpId, acqSkillName)">Add Acquired Skill for Exploration</button>
+
+      <br>
+      <br>
+
+      <input ng-model="commitMessage" type="text" placeholder="Commit Message"><button ng-click="saveCollection(commitMessage)">Save Collection</button>
+
+      <!-- End of placeholder/example markup. -->
 
       <!-- List of acquired and pre-requisite skills !-->
       <h1>Skills</h1>
@@ -47,8 +111,10 @@
   {{ super() }}
   <script>
     {{ include_js_file('collection_editor/CollectionEditor.js') }}
+    {{ include_js_file('domain/collection/CollectionBackendApiService.js') }}
+    {{ include_js_file('domain/collection/WritableCollectionBackendApiService.js') }}
+    {{ include_js_file('domain/collection/CollectionUpdateService.js') }}
     {{ include_js_file('collection_editor/CollectionSkillsListDirective.js') }}
-    {{ include_js_file('domain/collection/CollectionDataService.js') }}
     {{ include_js_file('domain/utilities/UrlInterpolationService.js') }}
   </script>
 {% endblock footer_js %}
