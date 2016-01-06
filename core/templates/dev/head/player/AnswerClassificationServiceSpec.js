@@ -21,16 +21,15 @@
 describe('Answer classification service', function() {
   beforeEach(module('oppia'));
 
+  var HARD_RULE_CLASSIFICATION = 'hard_rule';
+  var DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome';
+
   var acs, $httpBackend, successHandler, failHandler, $rootScope, state;
-  var HARD_RULE_CLASSIFICATION, DEFAULT_OUTCOME_CLASSIFICATION;
   beforeEach(inject(function($injector) {
     acs = $injector.get('answerClassificationService');
     sof = $injector.get('StateObjectFactory');
     $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
-    HARD_RULE_CLASSIFICATION = $injector.get('HARD_RULE_CLASSIFICATION');
-    DEFAULT_OUTCOME_CLASSIFICATION = $injector.get(
-      'DEFAULT_OUTCOME_CLASSIFICATION');
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
 

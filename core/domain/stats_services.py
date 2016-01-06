@@ -32,10 +32,6 @@ import sys
 import utils
 
 
-IMPROVE_TYPE_DEFAULT = 'default'
-IMPROVE_TYPE_INCOMPLETE = 'incomplete'
-
-
 # TODO(bhenning): Test.
 def get_visualizations_info(exploration_id, state_name):
     """Returns a list of visualization info. Each item in the list is a dict
@@ -110,69 +106,17 @@ def get_top_state_rule_answers(
         return []
 
 
-# TODO(bhenning): This needs to be migrated to the frontend. It should also
-# have a answer summarizer calculation associated with it.
-def get_state_improvements(exploration_id, exploration_version):
-    """Returns a list of dicts, each representing a suggestion for improvement
-    to a particular state.
+def count_top_state_rule_answers(
+        exploration_id, state_name, classification_category,
+        top_answer_count_per_category):
+    """Returns the number of answers that have been submitted to the specified
+    state and exploration and have been classified as the specific
+    classification category.
     """
-    ranked_states = []
-
-    exploration = exp_services.get_exploration_by_id(exploration_id)
-    state_names = exploration.states.keys()
-
-    default_rule_answer_logs = stats_domain.StateRuleAnswerLog.get_multi(
-        exploration_id, [{
-            'state_name': state_name,
-            'rule_str': exp_domain.DEFAULT_RULESPEC_STR
-        } for state_name in state_names])
-
-    statistics = stats_jobs_continuous.StatisticsAggregator.get_statistics(
-        exploration_id, exploration_version)
-    state_hit_counts = statistics['state_hit_counts']
-
-    for ind, state_name in enumerate(state_names):
-        total_entry_count = 0
-        no_answer_submitted_count = 0
-        if state_name in state_hit_counts:
-            total_entry_count = (
-                state_hit_counts[state_name]['total_entry_count'])
-            no_answer_submitted_count = state_hit_counts[state_name].get(
-                'no_answer_count', 0)
-
-        if total_entry_count == 0:
-            continue
-
-        threshold = 0.2 * total_entry_count
-        default_rule_answer_log = default_rule_answer_logs[ind]
-        default_count = default_rule_answer_log.total_answer_count
-
-        eligible_flags = []
-        state = exploration.states[state_name]
-        if (default_count > threshold and
-                state.interaction.default_outcome is not None and
-                state.interaction.default_outcome.dest == state_name):
-            eligible_flags.append({
-                'rank': default_count,
-                'improve_type': IMPROVE_TYPE_DEFAULT})
-        if no_answer_submitted_count > threshold:
-            eligible_flags.append({
-                'rank': no_answer_submitted_count,
-                'improve_type': IMPROVE_TYPE_INCOMPLETE})
-
-        if eligible_flags:
-            eligible_flags = sorted(
-                eligible_flags, key=lambda flag: flag['rank'], reverse=True)
-            ranked_states.append({
-                'rank': eligible_flags[0]['rank'],
-                'state_name': state_name,
-                'type': eligible_flags[0]['improve_type'],
-            })
-
-    return sorted([
-        ranked_state for ranked_state in ranked_states
-        if ranked_state['rank'] != 0
-    ], key=lambda x: -x['rank'])
+    top_answers = get_top_state_rule_answers(
+        exploration_id, state_name, [classification_category],
+        top_answer_count_per_category)
+    return sum([answer['frequency'] for answer in top_answers])
 
 
 def get_versions_for_exploration_stats(exploration_id):
@@ -193,21 +137,29 @@ def get_exploration_stats(exploration_id, exploration_version):
     last_updated = exp_stats['last_updated']
     state_hit_counts = exp_stats['state_hit_counts']
 
+    # TODO(bhenning): 'num_default_answers' isn't the true count, since the
+    # number of top answers pulled from the data store needs to be fixed.
+    # Figure out whether this is adequate or if we need to have another job
+    # which simply counts all answers for a given category (doesn't seem like a
+    # very useful calculation).
     return {
-        'improvements': get_state_improvements(
-            exploration_id, exploration_version),
         'last_updated': last_updated,
         'num_completions': exp_stats['complete_exploration_count'],
         'num_starts': exp_stats['start_exploration_count'],
         'state_stats': {
             state_name: {
                 'name': state_name,
-                'firstEntryCount': (
+                'first_entry_count': (
                     state_hit_counts[state_name]['first_entry_count']
                     if state_name in state_hit_counts else 0),
-                'totalEntryCount': (
+                'total_entry_count': (
                     state_hit_counts[state_name]['total_entry_count']
                     if state_name in state_hit_counts else 0),
+                'no_submitted_answer_count': (
+                    state_hit_counts[state_name].get('no_answer_count', 0)),
+                'num_default_answers': count_top_state_rule_answers(
+                    exploration_id, state_name,
+                    exp_domain.DEFAULT_OUTCOME_CLASSIFICATION, 100),
             } for state_name in exploration.states
         },
     }

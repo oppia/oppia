@@ -84,16 +84,12 @@ CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property'
 CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION = (
     'migrate_states_schema_to_latest_version')
 
-# This represents the stringified version of a 'default rule.' This is to be
-# used as an identifier for the default rule when storing which rule an answer
-# was matched against.
-DEFAULT_RULESPEC_STR = 'Default'
-
 # These are categories to which answers may be classified. These values should
 # not be changed because they are persisted in the data store within answer
 # logs.
 HARD_RULE_CLASSIFICATION = 'hard_rule'
 SOFT_RULE_CLASSIFICATION = 'soft_rule'
+STATISTICAL_CLASSIFICATION = 'statistical_classifier'
 DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome'
 
 
@@ -367,15 +363,6 @@ class RuleSpec(object):
     def __init__(self, rule_type, inputs):
         self.rule_type = rule_type
         self.inputs = inputs
-
-    def stringify_classified_rule(self):
-        """Returns a string representation of a rule (for the stats log)."""
-        if self.rule_type == rule_domain.FUZZY_RULE_TYPE:
-            return self.rule_type
-        else:
-            param_list = [utils.to_ascii(val) for
-                         (key, val) in self.inputs.iteritems()]
-            return '%s(%s)' % (self.rule_type, ','.join(param_list))
 
     def validate(self, rule_params_list, exp_param_specs_dict):
         """Validates a RuleSpec value object. It ensures the inputs dict does

@@ -426,7 +426,6 @@ class TestBase(unittest.TestCase):
             self, exploration_id, state_name, answer,
             params=None, exploration_version=None,
             session_id='dummy_session_id',
-            rule_spec_string='Default',
             client_time_spent_in_secs=0.0):
         """Submits an answer as an exploration player and returns the
         corresponding dict. This function has strong parallels to code in

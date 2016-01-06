@@ -219,6 +219,8 @@ def classify_string_classifier_rule(
                 'answer_group_index': best_matched_answer_group_index,
                 'classification_certainty': best_matched_truth_value,
                 'rule_spec_index': best_matched_rule_spec_index,
+                'classification_categorization': (
+                    exp_domain.STATISTICAL_CLASSIFICATION),
             }
         else:
             return None
@@ -266,8 +268,6 @@ def classify(exp_id, state, answer, params):
         feconf.ENABLE_STRING_CLASSIFIER and response is None):
         response = classify_string_classifier_rule(
             state, params, input_type, normalized_answer, fs)
-
-    # TODO(bhenning): Add soft and classifier classifications.
 
     # The best matched group must match above a certain threshold. If no group
     # meets this requirement, then the default 'group' automatically matches
