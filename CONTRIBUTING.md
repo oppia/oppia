@@ -54,7 +54,7 @@ Here's how to make a one-off code change. (If you're working on a larger feature
     ```
       python scripts/pre_commit_linter.py
     ```
-  which checks the styling of your JavaScript code. If you use [Sublime Text], you might also want to install the SublimeLinter-jscs plugin by following [these instructions](https://github.com/SublimeLinter/SublimeLinter-jscs).
+  which checks the styling of your JavaScript and Python code. If you use [Sublime Text], you might also want to install the SublimeLinter-jscs plugin by following [these instructions](https://github.com/SublimeLinter/SublimeLinter-jscs).
   * Please ensure that the code you write is well-tested.
   * Before making a commit, start up a local instance of Oppia and do some manual testing in order to check that you haven't broken anything! Also, ensure that all automated tests still pass:
 
@@ -68,6 +68,10 @@ Here's how to make a one-off code change. (If you're working on a larger feature
       git commit -a -m "{{YOUR COMMIT MESSAGE HERE}}"
       git push origin {{YOUR BRANCH NAME}}
     ```
+
+    Before your code gets uploaded to GitHub, a script is automatically executed that checks the styling of all changed JavaScript and Python files and runs the front-end and the back-end tests.
+     **If any of the tests fail, the push will be interrupted**. If this happens, fix the issues that the tests tell you about and **repeat the instructions above** ('commit' and then 'push')
+    If you need some help with your code and therefore want to put non functioning code into your GitHub fork to show it to other developers, you  can force a push with `git push origin {{YOUR BRANCH NAME}} --no-verify`.
 
 4. **When your feature is ready to merge, create a pull request.**
   * Go to your fork on GitHub, select your branch from the dropdown menu, and click "pull request". Ensure that the 'base' repository is the main oppia repo and that the 'base' branch is 'develop'.

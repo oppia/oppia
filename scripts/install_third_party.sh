@@ -121,3 +121,7 @@ if [ ! -d "$TOOLS_DIR/webtest-1.4.2" ]; then
   unzip webtest-download.zip -d $TOOLS_DIR
   rm webtest-download.zip
 fi
+
+# install pre-push script
+echo Installing pre-push hook for git
+python2 $OPPIA_DIR/scripts/pre_push_hook.py --install
