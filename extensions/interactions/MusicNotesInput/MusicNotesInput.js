@@ -305,7 +305,6 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                         if (isCloneOffStaff(draggableOptions)) {
                           scope._removeNotesFromNoteSequenceWithId(
                             draggableOptions.data('noteId'));
-                          
                           scope._sortNoteSequence();
                           draggableOptions.remove();
                         }
