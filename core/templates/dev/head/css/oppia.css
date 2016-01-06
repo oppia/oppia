@@ -2513,6 +2513,10 @@ md-card.preview-conversation-skin-supplemental-card {
   color: blue;
 }
 
+.oppia-info-card-content .tooltip-inner {
+  max-width: none;
+}
+
 .oppia-info-card-tag-icon {
   padding-top: 6px;
   width: 28px;
@@ -2667,4 +2671,3 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-visible-gadgets-container {
   position: relative;
 }
-
