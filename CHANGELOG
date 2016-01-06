@@ -3,53 +3,83 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://github.com/oppia/oppia/commits/master
 
 
+v2.1.2 (6 Jan 2016)
+-------------------
+Gallery page:
+* Reduce latency for fetching the data for the number of views of an exploration.
+* Add a 'loading more...' message at the bottom of the gallery.
+* Abbreviate the date shown in the gallery tiles.
+* Reduce the size of the 'updated' tag on the gallery tiles.
+
+Learner page:
+* Move the help card lower so that it does not block the display of the interaction.
+
+Interactions:
+* MusicNotesInput:
+  - Fix #1168: make the music notes interaction work on mobile devices.
+  - Fix #1165: make the music notes interaction work in editor preview mode.
+* CodeRepl:
+  - Show the output and error messages in the supplemental interaction panel.
+  - Fix a bug where the codemirror editor did not show correctly on small screens.
+  - If an error occurs, give information about whether it happens in the learner's code, or in the creator's prepended/postpended code.
+  - Change the indent unit to 4.
+* GraphInput: Fix #1265: limit the number of vertices in the graph used for isomorphism checks.
+
+Infrastructure:
+* Fix #1209: add installation instructions (and supporting scripts) for Windows.
+* Add functionality for linting python files.
+* Add a lint check to Travis-CI.
+* Fully lint all the files in the codebase.
+* Split up the Karma tests for interactions.
+
+
 v2.1.1 (29 Dec 2015)
 --------------------
 Learner page:
-- Fix #1084: redo the display of recommendations at the end of an exploration.
-- When the learner submits feedback, automatically append the current state name to the feedback.
-- Fix #714: add an e2e test for exploration ratings.
-- Move the help card to the bottom right of the supplemental interaction.
-- Do not animate the initial display of an exploration, even if its first state includes a supplemental interaction.
+* Fix #1084: redo the display of recommendations at the end of an exploration.
+* When the learner submits feedback, automatically append the current state name to the feedback.
+* Fix #714: add an e2e test for exploration ratings.
+* Move the help card to the bottom right of the supplemental interaction.
+* Do not animate the initial display of an exploration, even if its first state includes a supplemental interaction.
 
 Gallery page:
-- In the gallery tiles, show the number of views an exploration has received.
-- Unify the backend methods that compute data for the summary tiles.
-- Show a badge that indicates if an exploration has recently been updated.
-- Fix a bug that caused a backend error to be raised when new-style YAML versions of explorations are uploaded.
-- Fix a bug that caused the exploration summary tile data in the gallery to not update correctly when the search query is changed.
-- Update the icon used to denote the Mathematics category.
+* In the gallery tiles, show the number of views an exploration has received.
+* Unify the backend methods that compute data for the summary tiles.
+* Show a badge that indicates if an exploration has recently been updated.
+* Fix a bug that caused a backend error to be raised when new-style YAML versions of explorations are uploaded.
+* Fix a bug that caused the exploration summary tile data in the gallery to not update correctly when the search query is changed.
+* Update the icon used to denote the Mathematics category.
 
 Profile page:
-- Fix #1248: correctly display multi-paragraph bios in the Profile page.
-- Change heading of statistics tab from 'Statistics' to 'Impact'.
+* Fix #1248: correctly display multi-paragraph bios in the Profile page.
+* Change heading of statistics tab from 'Statistics' to 'Impact'.
 
 Interactions:
-- GraphInput: add a heuristic pre-check for graph isomorphism before performing the full calculation.
-- LogicProof: add inline feedback, and improve the handling of tab characters and blank lines.
-- For the following interactions, migrate the rule evaluation logic to the frontend: CodeRepl, GraphInput, InteractiveMap, MultipleChoiceInput, PencilCodeEditor and TextInput.
+* GraphInput: add a heuristic pre-check for graph isomorphism before performing the full calculation.
+* LogicProof: add inline feedback, and improve the handling of tab characters and blank lines.
+* For the following interactions, migrate the rule evaluation logic to the frontend: CodeRepl, GraphInput, InteractiveMap, MultipleChoiceInput, PencilCodeEditor and TextInput.
 
 Rich-text components:
-- VideoMp4: fix a Chrome bug that caused HTML5 video requests to sometimes forever remain in the 'pending' state.
+* VideoMp4: fix a Chrome bug that caused HTML5 video requests to sometimes forever remain in the 'pending' state.
 
 Editor page:
-- Fix #1259: autofocus on the commit message textarea when the Publish Exploration modal is opened.
+* Fix #1259: autofocus on the commit message textarea when the Publish Exploration modal is opened.
 
 Other pages:
-- Remove the email feature from the moderator page.
+* Remove the email feature from the moderator page.
 
 Infrastructure:
-- Incorporate the string classifier into the backend classification logic.
-- Lint all the JavaScript files in the codebase.
-- Refactor PlayerServices.js, breaking it down into separate services with distinct responsibilities.
-- Create frontend domain objects for Explorations and States.
-- Add tests for the third-party manifest file.
-- Remove the backend test count.
-- Fix #1272: generate minified files before launching the Protractor tests.
-- When running the karma tests, do so for both minified and unminified JS files.
+* Incorporate the string classifier into the backend classification logic.
+* Lint all the JavaScript files in the codebase.
+* Refactor PlayerServices.js, breaking it down into separate services with distinct responsibilities.
+* Create frontend domain objects for Explorations and States.
+* Add tests for the third-party manifest file.
+* Remove the backend test count.
+* Fix #1272: generate minified files before launching the Protractor tests.
+* When running the karma tests, do so for both minified and unminified JS files.
 
 Other:
-- Add gitter badge to README.md.
+* Add gitter badge to README.md.
 
 
 v2.1.0 (7 Dec 2015)
@@ -103,31 +133,31 @@ Infrastructure
 v2.0.3 (21 Nov 2015)
 --------------------
 Learner page:
-- Add help cards for Oppia's responses for supplemental interactions.
-- Increase width of cards without supplements.
-- Animate changes in card widths.
-- Change the 'Previous responses' heading to 'Previous answers'.
+* Add help cards for Oppia's responses for supplemental interactions.
+* Increase width of cards without supplements.
+* Animate changes in card widths.
+* Change the 'Previous responses' heading to 'Previous answers'.
 
 Interactions:
-- Fix a bug where rule fields of type CodeString default to None instead of the empty string.
+* Fix a bug where rule fields of type CodeString default to None instead of the empty string.
 
 Editor page:
-- Partially fix a bug where the save and publish buttons drop off the navbar on small screens.
+* Partially fix a bug where the save and publish buttons drop off the navbar on small screens.
 
 Rich-text editor components:
-- Fix a bug where images overspill their boundaries in Firefox.
-- Fix a bug that caused images to display inline; they should display as centered block elements instead.
-- Remove whitespace around links.
+* Fix a bug where images overspill their boundaries in Firefox.
+* Fix a bug that caused images to display inline; they should display as centered block elements instead.
+* Remove whitespace around links.
 
 Other pages:
-- Make the site feedback form more prominent.
-- Add a frontend learner view for collections.
+* Make the site feedback form more prominent.
+* Add a frontend learner view for collections.
 
 Infrastructure:
-- Reduce the time taken for backend tests by splitting up the jobs files.
-- Rename test scripts to run_backend_tests.sh, run_frontend_tests.sh and run_e2e_tests.sh.
-- Create a run_tests.sh script to run all of the tests.
-- Run all tests on deployment, instead of just the backend ones.
+* Reduce the time taken for backend tests by splitting up the jobs files.
+* Rename test scripts to run_backend_tests.sh, run_frontend_tests.sh and run_e2e_tests.sh.
+* Create a run_tests.sh script to run all of the tests.
+* Run all tests on deployment, instead of just the backend ones.
 
 
 v2.0.2 (8 Nov 2015)
