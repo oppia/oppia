@@ -2513,6 +2513,11 @@ md-card.preview-conversation-skin-supplemental-card {
   color: blue;
 }
 
+/* This is necessary so that long usernames don't overflow the tooltip. */
+.oppia-info-card-content .tooltip-inner {
+  max-width: none;
+}
+
 .oppia-info-card-tag-icon {
   padding-top: 6px;
   width: 28px;
@@ -2667,4 +2672,3 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-visible-gadgets-container {
   position: relative;
 }
-
