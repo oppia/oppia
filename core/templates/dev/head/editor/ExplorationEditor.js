@@ -485,7 +485,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
     $scope.saveChanges = function() {
       // This flag is used to change text of save button to "Loading..." to
-      // add indication to user that something is happening.
+      // add indication for user that something is happening.
       $scope.modalIsOpening = true;
 
       routerService.savePendingChanges();
