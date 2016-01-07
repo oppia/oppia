@@ -40,6 +40,7 @@ import os
 
 from core.domain import obj_services
 from extensions import domain
+from extensions.objects.models import objects
 import feconf
 import jinja_utils
 import utils
@@ -214,6 +215,39 @@ class BaseInteraction(object):
             raise Exception('Could not find rule with name %s' % rule_name)
         else:
             return self.rules[rule_name]['description']
+
+    def get_rule_param_list(self, rule_name):
+        """Gets the parameter list for a given rule."""
+        description = self.get_rule_description(rule_name)
+
+        param_list = []
+        while description.find('{{') != -1:
+            opening_index = description.find('{{')
+            description = description[opening_index + 2:]
+
+            bar_index = description.find('|')
+            param_name = description[: bar_index]
+            description = description[bar_index + 1:]
+
+            closing_index = description.find('}}')
+            normalizer_string = description[: closing_index]
+            description = description[closing_index + 2:]
+
+            param_list.append(
+                (param_name, getattr(objects, normalizer_string))
+            )
+
+        return param_list
+
+    def get_rule_param_type(self, rule_name, rule_param_name):
+        """Gets the parameter type for a given rule parameter name."""
+        rule_param_list = self.get_rule_param_list(rule_name)
+
+        for item in rule_param_list:
+            if item[0] == rule_param_name:
+                return item[1]
+        raise Exception(
+            'Rule %s has no param called %s' % (rule_name, rule_param_name))
 
     def get_stats_log_html(self, state_customization_args, answer):
         """Gets the HTML for recording a learner's response in the stats log.

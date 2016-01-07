@@ -51,6 +51,11 @@ FRONTEND_TEMPLATES_DIR = os.path.join(
 DEPENDENCIES_TEMPLATES_DIR = os.path.join('extensions', 'dependencies')
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
 
+# Constants related to rules.
+CERTAIN_TRUE_VALUE = 1.0
+CERTAIN_FALSE_VALUE = 0.0
+FUZZY_RULE_TYPE = 'FuzzyMatches'
+
 # The maximum number of results to retrieve in a datastore query.
 DEFAULT_QUERY_LIMIT = 1000
 

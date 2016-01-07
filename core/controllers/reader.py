@@ -35,11 +35,9 @@ from core.domain import rating_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
-from core.domain import rule_domain
 from core.domain import skins_services
 from core.domain import summary_services
 import feconf
-import jinja_utils
 import utils
 
 
@@ -102,21 +100,9 @@ def require_playable(handler):
 
 def _evaluate_rule(rule_spec, rule_description, context_params, answer):
     """Evaluates a rule spec. Returns a float between 0.0 and 1.0."""
-    param_list = []
-    param_defns = rule_domain.get_param_list(rule_description)
-    for (param_name, obj_cls) in param_defns:
-        parsed_param = rule_spec.inputs[param_name]
-        if isinstance(parsed_param, basestring) and '{{' in parsed_param:
-            parsed_param = jinja_utils.parse_string(
-                parsed_param, context_params, autoescape=False)
-        normalized_param = obj_cls.normalize(parsed_param)
-        param_list.append(normalized_param)
-
-    # NOTE TO DEVELOPERS: These lines will not work -- they originally
-    # constructed the rule, and evaluated the answer using it. This must be
-    # fixed prior to merge into develop.
-    # constructed_rule = rule_info(*param_list)
-    # return constructed_rule.eval(answer)
+    # NOTE TO DEVELOPERS: This function does not work. It must be removed
+    # prior to merge into develop.
+    pass
 
 
 def classify_hard_rule(state, params, input_type, normalized_answer):
@@ -124,17 +110,17 @@ def classify_hard_rule(state, params, input_type, normalized_answer):
     best_matched_answer_group = None
     best_matched_answer_group_index = len(state.interaction.answer_groups)
     best_matched_rule_spec_index = None
-    best_matched_truth_value = rule_domain.CERTAIN_FALSE_VALUE
+    best_matched_truth_value = feconf.CERTAIN_FALSE_VALUE
 
     interaction = interaction_registry.Registry.get_interaction_by_id(
         state.interaction.id)
 
     for (answer_group_index, answer_group) in enumerate(
             state.interaction.answer_groups):
-        ored_truth_value = rule_domain.CERTAIN_FALSE_VALUE
+        ored_truth_value = feconf.CERTAIN_FALSE_VALUE
         for (rule_spec_index, rule_spec) in enumerate(
                 answer_group.rule_specs):
-            if rule_spec.rule_type != rule_domain.FUZZY_RULE_TYPE:
+            if rule_spec.rule_type != feconf.FUZZY_RULE_TYPE:
                 evaluated_truth_value = _evaluate_rule(
                     rule_spec,
                     interaction.get_rule_description(rule_spec.rule_type),
@@ -142,7 +128,7 @@ def classify_hard_rule(state, params, input_type, normalized_answer):
                 if evaluated_truth_value > ored_truth_value:
                     ored_truth_value = evaluated_truth_value
                     best_rule_spec_index = rule_spec_index
-        if ored_truth_value == rule_domain.CERTAIN_TRUE_VALUE:
+        if ored_truth_value == feconf.CERTAIN_TRUE_VALUE:
             best_matched_truth_value = ored_truth_value
             best_matched_answer_group = answer_group
             best_matched_answer_group_index = answer_group_index
@@ -165,7 +151,7 @@ def classify_soft_rule(state, params, input_type, normalized_answer):
     best_matched_answer_group = None
     best_matched_answer_group_index = len(state.interaction.answer_groups)
     best_matched_rule_spec_index = None
-    best_matched_truth_value = rule_domain.CERTAIN_FALSE_VALUE
+    best_matched_truth_value = feconf.CERTAIN_FALSE_VALUE
 
     interaction = interaction_registry.Registry.get_interaction_by_id(
         state.interaction.id)
@@ -182,7 +168,7 @@ def classify_soft_rule(state, params, input_type, normalized_answer):
                 fuzzy_rule_spec,
                 interaction.get_rule_description(fuzzy_rule_spec.rule_type),
                 params, normalized_answer)
-            if evaluated_truth_value == rule_domain.CERTAIN_TRUE_VALUE:
+            if evaluated_truth_value == feconf.CERTAIN_TRUE_VALUE:
                 best_matched_truth_value = evaluated_truth_value
                 best_matched_rule_spec_index = fuzzy_rule_spec_index
                 best_matched_answer_group = answer_group
@@ -204,7 +190,7 @@ def classify_string_classifier_rule(state, normalized_answer):
     best_matched_answer_group = None
     best_matched_answer_group_index = len(state.interaction.answer_groups)
     best_matched_rule_spec_index = None
-    best_matched_truth_value = rule_domain.CERTAIN_FALSE_VALUE
+    best_matched_truth_value = feconf.CERTAIN_FALSE_VALUE
 
     sc = classifier_services.StringClassifier()
     training_examples = [
@@ -229,9 +215,9 @@ def classify_string_classifier_rule(state, normalized_answer):
             predicted_answer_group_index = int(predicted_label)
             predicted_answer_group = state.interaction.answer_groups[
                 predicted_answer_group_index]
-            best_matched_truth_value = rule_domain.CERTAIN_TRUE_VALUE
+            best_matched_truth_value = feconf.CERTAIN_TRUE_VALUE
             for rule_spec in predicted_answer_group.rule_specs:
-                if rule_spec.rule_type == rule_domain.FUZZY_RULE_TYPE:
+                if rule_spec.rule_type == feconf.FUZZY_RULE_TYPE:
                     best_matched_rule_spec_index = fuzzy_rule_spec_index
                     break
             best_matched_answer_group = predicted_answer_group

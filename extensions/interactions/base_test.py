@@ -24,7 +24,6 @@ import struct
 from core.domain import dependency_registry
 from core.domain import interaction_registry
 from core.domain import obj_services
-from core.domain import rule_domain
 from core.tests import test_utils
 from extensions.interactions import base
 import feconf
@@ -160,7 +159,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         with self.assertRaises(KeyError):
             _check_num_interaction_rules('FakeObjType', 0)
 
-    def test_interaction_rule_descriptions(self):
+    def test_interaction_rule_descriptions_in_dict(self):
         interaction = interaction_registry.Registry.get_interaction_by_id(
             'NumericInput')
         self.assertEqual(interaction.to_dict()['rule_descriptions'], {
@@ -340,20 +339,18 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             # Check that the rules for this interaction have object editor
             # templates.
             for rule_name, rule_dict in interaction.rules.iteritems():
-                rule_description = rule_dict['description']
-                param_list = rule_domain.get_param_list(rule_description)
+                param_list = interaction.get_rule_param_list(rule_name)
 
                 for (_, param_obj_type) in param_list:
                     # TODO(sll): Get rid of these special cases.
                     if param_obj_type.__name__ in [
                             'NonnegativeInt', 'ListOfGraph',
-                            'ListOfCodeEvaluation', 'ListOfCoordTwoDim',
-                            'SetOfNormalizedString']:
+                            'ListOfCoordTwoDim', 'SetOfNormalizedString']:
                         continue
 
                     self.assertTrue(
                         param_obj_type.has_editor_js_template(),
-                        msg='(%s)' % rule_description)
+                        msg='(%s)' % rule_dict['description'])
                     at_least_one_rule_found = True
 
                 self.assertTrue(at_least_one_rule_found)
@@ -368,7 +365,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 interaction_id)
             if interaction.is_trainable:
                 self.assertIn(
-                    rule_domain.FUZZY_RULE_TYPE, interaction.rules,
+                    feconf.FUZZY_RULE_TYPE, interaction.rules,
                     'Expected to find a fuzzy rule in trainable '
                     'interaction: %s' % interaction_id)
 
@@ -381,7 +378,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 interaction_id)
             if not interaction.is_trainable:
                 self.assertNotIn(
-                    rule_domain.FUZZY_RULE_TYPE, interaction.rules,
+                    feconf.FUZZY_RULE_TYPE, interaction.rules,
                     'Did not expect to find a fuzzy rule in untrainable '
                     'interaction: %s' % interaction_id)
 

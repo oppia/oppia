@@ -33,7 +33,6 @@ from core.domain import gadget_registry
 from core.domain import interaction_registry
 from core.domain import rights_manager
 from core.domain import rte_component_registry
-from core.domain import rule_domain
 from core.domain import skins_services
 from core.domain import stats_services
 from core.domain import user_services
@@ -604,7 +603,7 @@ class UntrainedAnswersHandler(EditorHandler):
         # matched to a fuzzy rule individually.
         answers = stats_services.get_top_state_rule_answers(
             exploration_id, state_name, [
-                exp_domain.DEFAULT_RULESPEC_STR, rule_domain.FUZZY_RULE_TYPE],
+                exp_domain.DEFAULT_RULESPEC_STR, feconf.FUZZY_RULE_TYPE],
             self.NUMBER_OF_TOP_ANSWERS_PER_RULE)
 
         interaction = state.interaction
@@ -623,7 +622,7 @@ class UntrainedAnswersHandler(EditorHandler):
                 trained_answers = set()
                 for answer_group in interaction.answer_groups:
                     for rule_spec in answer_group.rule_specs:
-                        if rule_spec.rule_type == rule_domain.FUZZY_RULE_TYPE:
+                        if rule_spec.rule_type == feconf.FUZZY_RULE_TYPE:
                             trained_answers.update(
                                 interaction_instance.normalize_answer(trained)
                                 for trained

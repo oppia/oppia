@@ -31,7 +31,6 @@ from core.domain import html_cleaner
 from core.domain import gadget_registry
 from core.domain import interaction_registry
 from core.domain import param_domain
-from core.domain import rule_domain
 from core.domain import skins_services
 from core.domain import trigger_registry
 import feconf
@@ -355,7 +354,7 @@ class RuleSpec(object):
 
     def stringify_classified_rule(self):
         """Returns a string representation of a rule (for the stats log)."""
-        if self.rule_type == rule_domain.FUZZY_RULE_TYPE:
+        if self.rule_type == feconf.FUZZY_RULE_TYPE:
             return self.rule_type
         else:
             param_list = [
@@ -519,7 +518,7 @@ class AnswerGroup(object):
 
         self.outcome = outcome
 
-    def validate(self, interaction_rules, exp_param_specs_dict):
+    def validate(self, interaction, exp_param_specs_dict):
         """Rule validation.
 
         Verifies that all rule classes are valid, and that the AnswerGroup only
@@ -536,19 +535,18 @@ class AnswerGroup(object):
 
         seen_fuzzy_rule = False
         for rule_spec in self.rule_specs:
-            if rule_spec.rule_type not in interaction_rules:
+            if rule_spec.rule_type not in interaction.rules:
                 raise utils.ValidationError(
                     'Unrecognized rule type: %s' % rule_spec.rule_type)
 
-            if rule_spec.rule_type == rule_domain.FUZZY_RULE_TYPE:
+            if rule_spec.rule_type == feconf.FUZZY_RULE_TYPE:
                 if seen_fuzzy_rule:
                     raise utils.ValidationError(
                         'AnswerGroups can only have one fuzzy rule.')
                 seen_fuzzy_rule = True
 
             rule_spec.validate(
-                rule_domain.get_param_list(
-                    interaction_rules[rule_spec.rule_type]['description']),
+                interaction.get_rule_param_list(rule_spec.rule_type),
                 exp_param_specs_dict)
 
         self.outcome.validate()
@@ -558,7 +556,7 @@ class AnswerGroup(object):
         doesn't exist.
         """
         for (rule_spec_index, rule_spec) in enumerate(self.rule_specs):
-            if rule_spec.rule_type == rule_domain.FUZZY_RULE_TYPE:
+            if rule_spec.rule_type == feconf.FUZZY_RULE_TYPE:
                 return rule_spec_index
         return None
 
@@ -750,7 +748,7 @@ class InteractionInstance(object):
                 'Terminal interactions must not have any answer groups.')
 
         for answer_group in self.answer_groups:
-            answer_group.validate(interaction.rules, exp_param_specs_dict)
+            answer_group.validate(interaction, exp_param_specs_dict)
         if self.default_outcome is not None:
             self.default_outcome.validate()
 
@@ -1107,6 +1105,10 @@ class State(object):
                 'Expected interaction_answer_groups to be a list, received %s'
                 % answer_groups_list)
 
+        interaction = (
+            interaction_registry.Registry.get_interaction_by_id(
+                self.interaction.id))
+
         interaction_answer_groups = []
 
         # TODO(yanamal): Do additional calculations here to get the
@@ -1126,11 +1128,6 @@ class State(object):
             for rule_dict in rule_specs_list:
                 rule_spec = RuleSpec.from_dict(rule_dict)
 
-                matched_rule_description = (
-                    interaction_registry.Registry.get_interaction_by_id(
-                        self.interaction.id
-                    ).get_rule_description(rule_spec.rule_type))
-
                 # Normalize and store the rule params.
                 rule_inputs = rule_spec.inputs
                 if not isinstance(rule_inputs, dict):
@@ -1138,17 +1135,8 @@ class State(object):
                         'Expected rule_inputs to be a dict, received %s'
                         % rule_inputs)
                 for param_name, value in rule_inputs.iteritems():
-                    param_list = rule_domain.get_param_list(
-                        matched_rule_description)
-
-                    param_type = None
-                    for item in param_list:
-                        if item[0] == param_name:
-                            param_type = item[1]
-                    if not param_type:
-                        raise Exception(
-                            'Rule %s has no param called %s' %
-                            (rule_spec.rule_type, param_name))
+                    param_type = interaction.get_rule_param_type(
+                        rule_spec.rule_type, param_name)
 
                     if (isinstance(value, basestring) and
                             '{{' in value and '}}' in value):

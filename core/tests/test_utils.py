@@ -31,11 +31,9 @@ from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import rule_domain
 from core.domain import rights_manager
 from core.platform import models
 import feconf
-import jinja_utils
 import main
 import utils
 
@@ -120,11 +118,11 @@ class TestBase(unittest.TestCase):
         raise NotImplementedError
 
     def assertFuzzyTrue(self, value):  # pylint: disable=invalid-name
-        self.assertEqual(value, rule_domain.CERTAIN_TRUE_VALUE)
+        self.assertEqual(value, feconf.CERTAIN_TRUE_VALUE)
         self.assertTrue(isinstance(value, float))
 
     def assertFuzzyFalse(self, value):  # pylint: disable=invalid-name
-        self.assertEqual(value, rule_domain.CERTAIN_FALSE_VALUE)
+        self.assertEqual(value, feconf.CERTAIN_FALSE_VALUE)
         self.assertTrue(isinstance(value, float))
 
     def _assert_validation_error(self, item, error_substring):
