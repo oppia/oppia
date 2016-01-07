@@ -154,15 +154,20 @@
         <button id="tutorialSaveButton" class="btn btn-default protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
           <span ng-if="!isSaveInProgress">
             <span ng-if="isPrivate()">
-              <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
-             alt="Save Draft">&#xE161;</i>
-
               <span ng-if="!modalIsOpening">
+                <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+               alt="Save Draft">&#xE161;</i>
                 <span class="oppia-save-publish-button-label">Save Draft</span>
                 <span class="hidden-sm hidden-xs" ng-if="getChangeListLength()" style="opacity: 0.5">(<[getChangeListLength()]>)</span>
               </span>
 
               <span ng-if="modalIsOpening">
+                <i class="oppia-save-publish-loading oppia-save-publish-button-icon"
+               alt="Loading">
+                 <span class="oppia-loading-dot-one">.</span>
+                 <span class="oppia-loading-dot-two">.</span>
+                 <span class="oppia-loading-dot-three">.</span>
+                </i>
                 <span class="oppia-save-publish-button-label">
                   Loading
                   <span class="oppia-loading-dot-one">.</span>

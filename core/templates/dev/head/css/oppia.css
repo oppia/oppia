@@ -1077,7 +1077,8 @@ md-card.oppia-gallery-tile {
 }
 
 @media(min-width: 1100px) {
-  .material-icons.oppia-save-publish-button-icon {
+  .material-icons.oppia-save-publish-button-icon,
+  .oppia-save-publish-loading.oppia-save-publish-button-icon {
     display: none;
   }
 }
@@ -2667,4 +2668,3 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-visible-gadgets-container {
   position: relative;
 }
-
