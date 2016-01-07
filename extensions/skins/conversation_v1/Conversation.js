@@ -358,6 +358,8 @@ oppia.directive('conversationSkin', [function() {
           interactionIsDisabled: false,
           interactionInstructions: (
             oppiaPlayerService.getInteractionInstructions(stateName)),
+	  interactionNarrowInstructions: (
+	    oppiaPlayerService.getNarrowInteractionInstructions(stateName)),
           answerFeedbackPairs: []
         });
 

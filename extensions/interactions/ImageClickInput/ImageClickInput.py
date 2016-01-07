@@ -28,6 +28,7 @@ class ImageClickInput(base.BaseInteraction):
     _dependency_ids = []
     answer_type = 'ClickOnImage'
     instructions = 'Click on the image'
+    narrow_instructions = 'Click to view image'
     needs_summary = False
 
     _customization_arg_specs = [{

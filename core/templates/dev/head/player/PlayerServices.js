@@ -431,6 +431,14 @@ oppia.factory('oppiaPlayerService', [
         return INTERACTION_SPECS[interactionId].instructions;
       }
     },
+    getNarrowInteractionInstructions: function(stateName) {
+      var interactionId = _exploration.states[stateName].interaction.id;
+      if (!interactionId) {
+        return '';
+      } else {
+        return INTERACTION_SPECS[interactionId].narrow_instructions;
+      }
+    },
     isInteractionInline: function(stateName) {
       var interactionId = _exploration.states[stateName].interaction.id;
       // Note that we treat a null interaction as an inline one, so that the
