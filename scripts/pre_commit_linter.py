@@ -175,7 +175,7 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint, stdout,
     - jscs_path: str. Path to the JSCS binary.
     - config_jscsrc: str. Configuration args for the call to the JSCS binary.
     - files_to_lint: list of str. A list of filepaths to lint.
-    - stdout:  multiprocessing.Queue. A Queue to store JSCS outputs
+    - stdout:  multiprocessing.Queue. A queue to store JSCS outputs
     - result: multiprocessing.Queue. A queue to put results of test
 
     Returns:
@@ -188,7 +188,6 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint, stdout,
     if not files_to_lint:
         result.put('')
         print 'There are no JavaScript files to lint.'
-        print ''
         return
 
     jscs_cmd_args = [node_path, jscs_path, config_jscsrc]
@@ -237,7 +236,7 @@ def _lint_py_files(config_pylint, files_to_lint, result):
 
     try:
         # This prints output to the console.
-        lint.Run(files_to_lint + [config_pylint])
+        lint.Run(files_to_lint + [config_pylint, '-j', '0'])
     except SystemExit as e:
         if str(e) != '0':
             are_there_errors = True
@@ -309,15 +308,17 @@ def _pre_commit_linter():
     py_files_to_lint = [
         filename for filename in all_files if filename.endswith('.py')]
 
-    results = multiprocessing.Queue()
+    js_result = multiprocessing.Queue()
     linting_processes = []
     js_stdout = multiprocessing.Queue()
     linting_processes.append(multiprocessing.Process(
         target=_lint_js_files, args=(node_path, jscs_path, config_jscsrc,
-                                     js_files_to_lint, js_stdout, results)))
+                                     js_files_to_lint, js_stdout, js_result)))
 
+    py_result = multiprocessing.Queue()
     linting_processes.append(multiprocessing.Process(
-        target=_lint_py_files, args=(config_pylint, py_files_to_lint, results)))
+        target=_lint_py_files,
+        args=(config_pylint, py_files_to_lint, py_result)))
     print 'Starting Javascript and Python Linting'
     print '----------------------------------------'
     for process in linting_processes:
@@ -326,11 +327,16 @@ def _pre_commit_linter():
     for process in linting_processes:
         process.join()
 
-    summary_messages = [results.get() for _ in linting_processes]
-    js_messages = [js_stdout.get() for _ in range(js_stdout.qsize())]
+    js_messages = []
+    while not js_stdout.empty():
+        js_messages.append(js_stdout.get())
+
     print ''
     print '\n'.join(js_messages)
     print '----------------------------------------'
+    summary_messages = []
+    summary_messages.append(js_result.get())
+    summary_messages.append(py_result.get())
     print '\n'.join(summary_messages)
     print ''
 
