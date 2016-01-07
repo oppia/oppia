@@ -51,6 +51,7 @@ Note that the root folder MUST be named 'oppia'.
 
 import argparse
 import fnmatch
+import multiprocessing
 import os
 import json
 import subprocess
@@ -165,7 +166,7 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
     return files_in_directory
 
 
-def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint):
+def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint, output):
     """Prints a list of lint errors in the given list of JavaScript files.
 
     Args:
@@ -216,14 +217,15 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint):
     print '----------------------------------------'
 
     if num_files_with_errors:
-        return '%s    %s JavaScript files' % (
-            _MESSAGE_TYPE_FAILED, num_files_with_errors)
+        output.put('%s    %s JavaScript files' % (
+                   _MESSAGE_TYPE_FAILED, num_files_with_errors))
     else:
-        return '%s   %s JavaScript files linted (%.1f secs)' % (
-            _MESSAGE_TYPE_SUCCESS, num_js_files, time.time() - start_time)
+        output.put('%s   %s JavaScript files linted (%.1f secs)' % (
+                   _MESSAGE_TYPE_SUCCESS,
+                   num_js_files, time.time() - start_time))
 
 
-def _lint_py_files(config_pylint, files_to_lint):
+def _lint_py_files(config_pylint, files_to_lint, output):
     """Prints a list of lint errors in the given list of Python files.
 
     Args:
@@ -257,10 +259,11 @@ def _lint_py_files(config_pylint, files_to_lint):
     print '----------------------------------------'
 
     if are_there_errors:
-        return '%s    Python linting failed' % _MESSAGE_TYPE_FAILED
+        output.put('%s    Python linting failed' % _MESSAGE_TYPE_FAILED)
     else:
-        return '%s   %s Python files linted (%.1f secs)' % (
-            _MESSAGE_TYPE_SUCCESS, num_py_files, time.time() - start_time)
+        ouput.put('%s   %s Python files linted (%.1f secs)' % (
+                  _MESSAGE_TYPE_SUCCESS,
+                  num_py_files, time.time() - start_time))
 
 
 def _pre_commit_linter():
@@ -323,14 +326,31 @@ def _pre_commit_linter():
     py_files_to_lint = [
         filename for filename in all_files if filename.endswith('.py')]
 
-    summary_messages = []
-    print '\nStarting jscs linter...'
-    summary_messages.append(_lint_js_files(
-        node_path, jscs_path, config_jscsrc, js_files_to_lint))
-    print '\nStarting pylint...'
-    summary_messages.append(_lint_py_files(
-        config_pylint, py_files_to_lint))
+    # summary_messages = []
+    output = multiprocessing.Queue()
+    linting_processes = []
+    linting_processes.append(multiprocessing.Process(
+                             target=_lint_js_files,
+                             args=(node_path, jscs_path, config_jscsrc,
+                                   js_files_to_lint, output)))
+    linting_processes.append(multiprocessing.Process(
+                             target=_lint_py_files,
+                             args=(config_pylint, py_files_to_lint, output)))
+    for process in linting_processes:
+        process.start()
 
+    for process in linting_processes:
+        process.join()
+
+    summary_messages = [output.get() for p in linting_processes]
+    # print '\nStarting jscs linter...'
+    # summary_messages.append(_lint_js_files(
+    #     node_path, jscs_path, config_jscsrc, js_files_to_lint))
+    # print '\nStarting pylint...'
+    # summary_messages.append(_lint_py_files(
+    #     config_pylint, py_files_to_lint))
+    # py_result = pool.apply_async(_lint_py_files,
+    #                              (config_pylint, py_files_to_lint))
     print '\n'.join(summary_messages)
     print ''
 
