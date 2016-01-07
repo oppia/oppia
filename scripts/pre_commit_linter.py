@@ -236,7 +236,7 @@ def _lint_py_files(config_pylint, files_to_lint, result):
 
     try:
         # This prints output to the console.
-        lint.Run(files_to_lint + [config_pylint, '-j', '0'])
+        lint.Run(files_to_lint + [config_pylint])
     except SystemExit as e:
         if str(e) != '0':
             are_there_errors = True
