@@ -484,6 +484,10 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     var _modalIsOpen = false;
 
     $scope.saveChanges = function() {
+      // This flag is used to change text of save button to "Loading..." to
+      // add indication to user that something is happening.
+      $scope.modalIsOpening = true;
+
       routerService.savePendingChanges();
 
       $scope.changeListSummaryUrl = (
@@ -722,6 +726,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
         // Modal is Opened
         _modalIsOpen = true;
+        $scope.modalIsOpening = false;
 
         modalInstance.opened.then(function() {
           // The $timeout seems to be needed in order to give the modal time to
