@@ -1,7 +1,7 @@
 <script type="text/ng-template" id="inline/collection_node_directive">
   <div>
     [<[getExplorationId()]>] <em><[getExplorationTitle()]></em>
-    <button ng-click="deleteExploration({expId:getExplorationId()})">Delete</button>
+    <button ng-click="deleteExploration()">Delete</button>
   </div>
   <p> Prerequisite skills: </p>
   <div ng-if="(getPrerequisiteSkills()).length > 0">
@@ -10,7 +10,7 @@
     </ul>
   </div>
   <input ng-model="prereqSkillName" type="text" placeholder="Skill name">
-  <button ng-click="addPrereqSkill({expId:getExplorationId(), skillName:prereqSkillName})">Add Prerequisite Skill for Exploration</button>
+  <button ng-click="addPrereqSkill(prereqSkillName)">Add Prerequisite Skill for Exploration</button>
   <br>
 
   <p> Acquired skills: </p>
@@ -20,7 +20,7 @@
     </ul>
   </div>
   <input ng-model="acquiredSkillName" type="text" placeholder="Skill name">
-  <button ng-click="addAcquiredSkill({expId:getExplorationId(), skillName:acquiredSkillName})">Add Acquired Skill for Exploration</button>
+  <button ng-click="addAcquiredSkill(acquiredSkillName)">Add Acquired Skill for Exploration</button>
   <br>
   <br>
   <br>

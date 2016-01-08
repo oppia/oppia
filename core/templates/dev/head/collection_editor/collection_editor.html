@@ -50,9 +50,8 @@
         <li ng-repeat="node in collection.nodes">
           <collection-node-directive
             prerequisite-skills="node.prerequisite_skills" acquired-skills="node.acquired_skills"
-            exploration-id="node.exploration.id", exploration-title="node.exploration.title"
-            add-prereq-skill="addPrereqSkill(expId, skillName)"
-            add-acquired-skill="addAcquiredSkill(expId, skillName)"
+            exploration-id="node.exploration.id" exploration-title="node.exploration.title"
+            add-change="addChange(change)"
             delete-exploration="deleteExploration(expId)"></collection-node-directive>
         </li>
       </ul>

@@ -64,34 +64,17 @@ oppia.controller('CollectionEditor', ['$scope', 'CollectionBackendApiService',
     return null;
   };
 
-  // EXAMPLES DEMONSTRATING HOW TO CHANGE THE COLLECTION. THE FOLLOWING CODE
-  // SHOULD NOT GO INTO DEVELOP.
-
   // Stores a pending list of changes.
   $scope.changeList = [];
 
-  var _arrayContainsCaseInsensitive = function(array, element) {
-    var lowerElement = element.toLowerCase();
-    for (var i = 0; i < array.length; i++) {
-      if (array[i].toLowerCase() === lowerElement) {
-        return true;
-      }
-    }
-    return false;
+  $scope.addChange = function(change) {
+    $scope.changeList.push(change);
   };
 
   $scope.addExploration = function(newExpId) {
     if (newExpId) {
       var change = CollectionUpdateService.buildAddCollectionNodeUpdate(
         newExpId);
-      $scope.changeList.push(change);
-    }
-  };
-
-  $scope.deleteExploration = function(removeExpId) {
-    if (removeExpId) {
-      var change = CollectionUpdateService.buildDeleteCollectionNodeUpdate(
-        removeExpId);
       $scope.changeList.push(change);
     }
   };
@@ -120,32 +103,6 @@ oppia.controller('CollectionEditor', ['$scope', 'CollectionBackendApiService',
     }
   };
 
-  $scope.addPrereqSkill = function(expId, skillName) {
-    if (expId && skillName) {
-      var collectionNode = _getCollectionNodeForExplorationId(expId);
-      var prerequisiteSkills = angular.copy(collectionNode.prerequisite_skills);
-      if (!_arrayContainsCaseInsensitive(prerequisiteSkills, skillName)) {
-        prerequisiteSkills.push(skillName);
-        var change = CollectionUpdateService.buildPrerequisiteSkillsUpdate(
-          expId, prerequisiteSkills);
-        $scope.changeList.push(change);
-      }
-    }
-  };
-
-  $scope.addAcquiredSkill = function(expId, skillName) {
-    if (expId && skillName) {
-      var collectionNode = _getCollectionNodeForExplorationId(expId);
-      var acquiredSkills = angular.copy(collectionNode.acquired_skills);
-      if (!_arrayContainsCaseInsensitive(acquiredSkills, skillName)) {
-        acquiredSkills.push(skillName);
-        var change = CollectionUpdateService.buildAcquiredSkillsUpdate(
-          expId, acquiredSkills);
-        $scope.changeList.push(change);
-      }
-    }
-  };
-
   // An explicit save is needed to push all changes to the backend at once
   // because some likely working states of the collection will cause validation
   // errors when trying to incrementally save them.
@@ -160,6 +117,4 @@ oppia.controller('CollectionEditor', ['$scope', 'CollectionBackendApiService',
           error || 'There was an error updating the collection.');
       });
   };
-
-  // END OF EXAMPLE CODE DEMONSTRATING HOW TO CHANGE THE COLLECTION.
 }]);
