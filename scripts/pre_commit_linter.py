@@ -51,6 +51,7 @@ Note that the root folder MUST be named 'oppia'.
 
 import argparse
 import fnmatch
+import multiprocessing
 import os
 import json
 import subprocess
@@ -165,7 +166,8 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
     return files_in_directory
 
 
-def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint):
+def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint, stdout,
+                   result):
     """Prints a list of lint errors in the given list of JavaScript files.
 
     Args:
@@ -173,30 +175,23 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint):
     - jscs_path: str. Path to the JSCS binary.
     - config_jscsrc: str. Configuration args for the call to the JSCS binary.
     - files_to_lint: list of str. A list of filepaths to lint.
+    - stdout:  multiprocessing.Queue. A queue to store JSCS outputs
+    - result: multiprocessing.Queue. A queue to put results of test
 
     Returns:
-    - a string summarizing the results.
+        None
     """
-
-    print '----------------------------------------'
-
     start_time = time.time()
     num_files_with_errors = 0
 
     num_js_files = len(files_to_lint)
     if not files_to_lint:
+        result.put('')
         print 'There are no JavaScript files to lint.'
-        print '----------------------------------------'
-        return ''
+        return
 
     jscs_cmd_args = [node_path, jscs_path, config_jscsrc]
-    first_file_in_batch = 1
-    for ind, filename in enumerate(files_to_lint):
-        if (ind + 1) % 10 == 0:
-            print 'Linted files %d-%d of %d ...' % (
-                first_file_in_batch, ind + 1, num_js_files)
-            first_file_in_batch = ind + 2
-
+    for _, filename in enumerate(files_to_lint):
         proc_args = jscs_cmd_args + [filename]
         proc = subprocess.Popen(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -209,43 +204,35 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint):
 
         if linter_stdout:
             num_files_with_errors += 1
-            print linter_stdout
-
-    print 'Linted files %d-%d of %d ...' % (
-        first_file_in_batch, num_js_files, num_js_files)
-    print '----------------------------------------'
+            stdout.put(linter_stdout)
 
     if num_files_with_errors:
-        return '%s    %s JavaScript files' % (
-            _MESSAGE_TYPE_FAILED, num_files_with_errors)
+        result.put('%s    %s JavaScript files' % (
+            _MESSAGE_TYPE_FAILED, num_files_with_errors))
     else:
-        return '%s   %s JavaScript files linted (%.1f secs)' % (
-            _MESSAGE_TYPE_SUCCESS, num_js_files, time.time() - start_time)
+        result.put('%s   %s JavaScript files linted (%.1f secs)' % (
+            _MESSAGE_TYPE_SUCCESS, num_js_files, time.time() - start_time))
 
 
-def _lint_py_files(config_pylint, files_to_lint):
+def _lint_py_files(config_pylint, files_to_lint, result):
     """Prints a list of lint errors in the given list of Python files.
 
     Args:
     - config_pylint: str. Path to the .pylintrc file.
     - files_to_lint: list of str. A list of filepaths to lint.
+    - result: multiprocessing.Queue. A queue to put results of test
 
     Returns:
-    - a string summarizing the results.
+        None
     """
-
-    print '----------------------------------------'
-
     start_time = time.time()
     are_there_errors = False
 
     num_py_files = len(files_to_lint)
     if not files_to_lint:
+        result.put('')
         print 'There are no Python files to lint.'
-        print '----------------------------------------'
-        return ''
-
-    print 'Linting %d files\n' % num_py_files
+        return
 
     try:
         # This prints output to the console.
@@ -254,13 +241,11 @@ def _lint_py_files(config_pylint, files_to_lint):
         if str(e) != '0':
             are_there_errors = True
 
-    print '----------------------------------------'
-
     if are_there_errors:
-        return '%s    Python linting failed' % _MESSAGE_TYPE_FAILED
+        result.put('%s    Python linting failed' % _MESSAGE_TYPE_FAILED)
     else:
-        return '%s   %s Python files linted (%.1f secs)' % (
-            _MESSAGE_TYPE_SUCCESS, num_py_files, time.time() - start_time)
+        result.put('%s   %s Python files linted (%.1f secs)' % (
+            _MESSAGE_TYPE_SUCCESS, num_py_files, time.time() - start_time))
 
 
 def _pre_commit_linter():
@@ -323,14 +308,35 @@ def _pre_commit_linter():
     py_files_to_lint = [
         filename for filename in all_files if filename.endswith('.py')]
 
-    summary_messages = []
-    print '\nStarting jscs linter...'
-    summary_messages.append(_lint_js_files(
-        node_path, jscs_path, config_jscsrc, js_files_to_lint))
-    print '\nStarting pylint...'
-    summary_messages.append(_lint_py_files(
-        config_pylint, py_files_to_lint))
+    js_result = multiprocessing.Queue()
+    linting_processes = []
+    js_stdout = multiprocessing.Queue()
+    linting_processes.append(multiprocessing.Process(
+        target=_lint_js_files, args=(node_path, jscs_path, config_jscsrc,
+                                     js_files_to_lint, js_stdout, js_result)))
 
+    py_result = multiprocessing.Queue()
+    linting_processes.append(multiprocessing.Process(
+        target=_lint_py_files,
+        args=(config_pylint, py_files_to_lint, py_result)))
+    print 'Starting Javascript and Python Linting'
+    print '----------------------------------------'
+    for process in linting_processes:
+        process.start()
+
+    for process in linting_processes:
+        process.join()
+
+    js_messages = []
+    while not js_stdout.empty():
+        js_messages.append(js_stdout.get())
+
+    print ''
+    print '\n'.join(js_messages)
+    print '----------------------------------------'
+    summary_messages = []
+    summary_messages.append(js_result.get())
+    summary_messages.append(py_result.get())
     print '\n'.join(summary_messages)
     print ''
 
