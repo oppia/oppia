@@ -59,28 +59,6 @@ def _start_subprocess_for_result(cmd):
     return out, err
 
 
-def _git_diff_names_only(left, right, diff_filter=''):
-    '''Compare two branches/commits etc with git.
-    Parameter:
-        left: the lefthand comperator
-        right: the righthand comperator
-        diff_filter: arguments given to --diff-filter (ACMRTD...)
-    Returns:
-        List of file names
-    Raises:
-        ValueError if git command fails
-    '''
-    git_cmd = ['git', 'diff', '--name-only']
-    if diff_filter:
-        git_cmd.append('--diff-filter={}'.format(diff_filter))
-    git_cmd.extend([left, right])
-    out, err = _start_subprocess_for_result(git_cmd)
-    if not err:
-        return out.splitlines()
-    else:
-        raise ValueError(err)
-
-
 def _git_diff_name_status(left, right, diff_filter=''):
     '''Compare two branches/commits etc with git.
     Parameter:
