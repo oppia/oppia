@@ -1,5 +1,4 @@
-#!/usr/bin/env python2.7
-# coding: utf-8
+#!/usr/bin/env python2
 #
 # Copyright 2014 The Oppia Authors. All Rights Reserved.
 #
@@ -35,6 +34,7 @@ import shutil
 
 GitRef = collections.namedtuple('GitRef', ['local_ref', 'local_sha1',
                                            'remote_ref', 'remote_sha1'])
+FileDiff = collections.namedtuple('FileDiff', ['status', 'name'])
 
 # git hash of /dev/null, refers to an 'empty' commit
 GIT_NULL_COMMIT = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
@@ -81,6 +81,29 @@ def _git_diff_names_only(left, right, diff_filter=''):
         raise ValueError(err)
 
 
+def _git_diff_name_status(left, right, diff_filter=''):
+    '''Compare two branches/commits etc with git.
+    Parameter:
+        left: the lefthand comperator
+        right: the righthand comperator
+        diff_filter: arguments given to --diff-filter (ACMRTD...)
+    Returns:
+        List of FileDiffs (tuple with name/status)
+    Raises:
+        ValueError if git command fails
+    '''
+    git_cmd = ['git', 'diff', '--name-status']
+    if diff_filter:
+        git_cmd.append('--diff-filter={}'.format(diff_filter))
+    git_cmd.extend([left, right])
+    out, err = _start_subprocess_for_result(git_cmd)
+    if not err:
+        file_list = [FileDiff(*line.split()) for line in out.splitlines()]
+        return file_list
+    else:
+        raise ValueError(err)
+
+
 def _compare_to_remote(remote, local_branch, remote_branch=None):
     '''Compare local with remote branch with git diff.
     Parameter:
@@ -96,17 +119,30 @@ def _compare_to_remote(remote, local_branch, remote_branch=None):
     '''
     remote_branch = remote_branch if remote_branch else local_branch
     git_remote = '%s/%s' % (remote, remote_branch)
-    return _git_diff_names_only(git_remote, local_branch,
-                                diff_filter='ACMRT')
+    return _git_diff_name_status(git_remote, local_branch)
+
+
+def _extract_files_to_lint(file_diffs):
+    '''Grab only files out of a list of FileDiffs that have a ACMRT status'''
+    lint_files = [f.name for f in file_diffs
+                  if f.status.upper() in 'ACMRT']
+    return lint_files
 
 
 def _collect_files_being_pushed(ref_list, remote):
-    '''Get all files that are modified and are being pushed'''
+    '''Collect modified files and filter those that need linting.
+    Parameter:
+        ref_list: list of references to parse (provided by git in stdin)
+        remote: the remote being pushed to
+    Returns:
+        Tuple of lists of changed_files, files_to_lint
+    '''
     # get branch name from e.g. local_ref='refs/heads/lint_hook'
     branches = [ref.local_ref.split('/')[-1] for ref in ref_list]
     hashes = [ref.local_sha1 for ref in ref_list]
     remote_hashes = [ref.remote_sha1 for ref in ref_list]
-    changed_files = set()
+    modified_files = set()
+    files_to_lint = set()
     for branch, sha1, remote_sha1 in zip(branches, hashes, remote_hashes):
         # git reports the following for an empty / non existing branch
         # sha1: '0000000000000000000000000000000000000000'
@@ -115,27 +151,37 @@ def _collect_files_being_pushed(ref_list, remote):
             continue
         elif set(remote_sha1) != {'0'}:
             try:
-                files = _compare_to_remote(remote, branch)
+                file_diffs = _compare_to_remote(remote, branch)
             except ValueError as e:
                 print e.message
                 sys.exit(1)
+            else:
+                modified_files.update(file_diffs)
+                files_to_lint.update(_extract_files_to_lint(modified_files))
         else:
             # Get the difference to origin/develop instead
             try:
-                files = _compare_to_remote(remote, branch,
-                                           remote_branch='develop')
+                file_diffs = _compare_to_remote(remote, branch,
+                                                remote_branch='develop')
             except ValueError:
                 # give up, return all files in repo
                 try:
-                    files = _git_diff_names_only(GIT_NULL_COMMIT, sha1,
-                                                 diff_filter='ACMRT')
+                    files = _git_diff_name_status(GIT_NULL_COMMIT, sha1)
                 except ValueError as e:
                     print e.message
                     sys.exit(1)
+                else:
+                    modified_files.update(files)
+                    files_to_lint.update(_extract_files_to_lint(files))
+            else:
+                modified_files.update(file_diffs)
+                files_to_lint.update(_extract_files_to_lint(modified_files))
 
-        changed_files.update(files)
-
-    return list(changed_files)
+        print "\nModified files:"
+        pprint.pprint(modified_files)
+        print "\nFiles to lint:"
+        pprint.pprint(files_to_lint)
+        return ([f.name for f in modified_files], list(files_to_lint))
 
 
 def _get_refs():
@@ -189,11 +235,11 @@ def main():
         _install_hook()
         sys.exit(0)
     refs = _get_refs()
-    modified_files = _collect_files_being_pushed(refs, remote)
-    if modified_files:
-        print 'Files being pushed:'
-        pprint.pprint(modified_files)
-        lint_status = _start_linter(modified_files)
+    modified_files, files_to_lint = _collect_files_being_pushed(refs, remote)
+    if not modified_files and not files_to_lint:
+        sys.exit(0)
+    if files_to_lint:
+        lint_status = _start_linter(files_to_lint)
         if lint_status != 0:
             print 'Push failed, please correct the linting issues above'
             sys.exit(1)
