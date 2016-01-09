@@ -159,9 +159,9 @@ def _collect_files_being_pushed(ref_list, remote):
                 modified_files.update(file_diffs)
                 files_to_lint.update(_extract_files_to_lint(modified_files))
 
-        print "\nModified files:"
+        print '\nModified files:'
         pprint.pprint(modified_files)
-        print "\nFiles to lint:"
+        print '\nFiles to lint:'
         pprint.pprint(files_to_lint)
         if modified_files:
             modified_files = [f.name for f in modified_files]

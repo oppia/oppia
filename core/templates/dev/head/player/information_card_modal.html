@@ -15,7 +15,7 @@
         <li class="protractor-test-info-card-rating">
           <span class="fa fa-star fa-lg" tooltip="Average Rating" tooltip-placement="top"></span>
           <span ng-if="averageRating === 0">Unrated</span>
-          <span ng-if="averageRating !== 0"><[averageRating]></span>
+          <span ng-if="averageRating !== 0"><[averageRating | number:1]></span>
         </li>
 
         <li>

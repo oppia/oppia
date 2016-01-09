@@ -165,16 +165,18 @@ oppia.directive('conversationSkin', [function() {
     templateUrl: 'skins/Conversation',
     controller: [
       '$scope', '$timeout', '$rootScope', '$window', 'messengerService',
-      'oppiaPlayerService', 'urlService', 'focusService', 'ratingService',
-      'windowDimensionsService', 'playerTranscriptService',
-      'learnerParamsService', 'playerPositionService',
-      'explorationRecommendationsService',
+      'oppiaPlayerService', 'urlService', 'focusService',
+      'LearnerViewRatingService', 'windowDimensionsService',
+      'playerTranscriptService', 'LearnerParamsService',
+      'playerPositionService', 'explorationRecommendationsService',
+      'StatsReportingService',
       function(
           $scope, $timeout, $rootScope, $window, messengerService,
-          oppiaPlayerService, urlService, focusService, ratingService,
-          windowDimensionsService, playerTranscriptService,
-          learnerParamsService, playerPositionService,
-          explorationRecommendationsService) {
+          oppiaPlayerService, urlService, focusService,
+          LearnerViewRatingService, windowDimensionsService,
+          playerTranscriptService, LearnerParamsService,
+          playerPositionService, explorationRecommendationsService,
+          StatsReportingService) {
         $scope.CONTINUE_BUTTON_FOCUS_LABEL = 'continueButton';
         // The exploration domain object.
         $scope.exploration = null;
@@ -371,7 +373,7 @@ oppia.directive('conversationSkin', [function() {
             stateName, newParams, contentHtml, interactionHtml);
 
           if (newParams) {
-            learnerParamsService.init(newParams);
+            LearnerParamsService.init(newParams);
           }
 
           $scope.numProgressDots++;
@@ -609,17 +611,19 @@ oppia.directive('conversationSkin', [function() {
         };
 
         $scope.submitUserRating = function(ratingValue) {
-          ratingService.submitUserRating(ratingValue);
+          LearnerViewRatingService.submitUserRating(ratingValue);
         };
         $scope.$on('ratingUpdated', function() {
-          $scope.userRating = ratingService.getUserRating();
+          $scope.userRating = LearnerViewRatingService.getUserRating();
         });
 
         $window.addEventListener('beforeunload', function(e) {
           if (hasInteractedAtLeastOnce && !$scope.isInPreviewMode &&
               !$scope.exploration.isStateTerminal(
                 playerTranscriptService.getLastCard().stateName)) {
-            oppiaPlayerService.registerMaybeLeaveEvent();
+            StatsReportingService.recordMaybeLeaveEvent(
+              playerTranscriptService.getLastStateName(),
+              LearnerParamsService.getAllParams());
             var confirmationMessage = (
               'If you navigate away from this page, your progress on the ' +
               'exploration will be lost.');
@@ -667,7 +671,7 @@ oppia.directive('conversationSkin', [function() {
         };
 
         $scope.initializePage();
-        ratingService.init(function(userRating) {
+        LearnerViewRatingService.init(function(userRating) {
           $scope.userRating = userRating;
         });
 
@@ -675,171 +679,5 @@ oppia.directive('conversationSkin', [function() {
         $scope.collectionTitle = GLOBALS.collectionTitle;
       }
     ]
-  };
-}]);
-
-oppia.directive('answerFeedbackPair', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      data: '=',
-      oppiaAvatarImageUrl: '&',
-      profilePicture: '&'
-    },
-    templateUrl: 'components/answerFeedbackPair',
-    controller: [
-      '$scope', 'oppiaPlayerService', 'playerTranscriptService',
-      'oppiaExplorationHtmlFormatterService', 'INTERACTION_SPECS',
-      'playerPositionService',
-      function(
-          $scope, oppiaPlayerService, playerTranscriptService,
-          oppiaExplorationHtmlFormatterService, INTERACTION_SPECS,
-          playerPositionService) {
-        $scope.isCurrentCardAtEndOfTranscript = function() {
-          return playerTranscriptService.isLastCard(
-            playerPositionService.getActiveCardIndex());
-        };
-
-        $scope.getAnswerHtml = function() {
-          var interaction = oppiaPlayerService.getInteraction(
-            playerPositionService.getCurrentStateName());
-          if ($scope.data) {
-            return oppiaExplorationHtmlFormatterService.getAnswerHtml(
-              $scope.data.learnerAnswer, interaction.id,
-              interaction.customization_args);
-          }
-        };
-
-        // Returns a HTML string representing a short summary of the answer, or
-        // null if the answer does not have to be summarized.
-        $scope.getShortAnswerHtml = function() {
-          var interaction = oppiaPlayerService.getInteraction(
-            playerPositionService.getCurrentStateName());
-          var shortAnswerHtml = '';
-          if ($scope.data && interaction.id &&
-              INTERACTION_SPECS[interaction.id].needs_summary) {
-            shortAnswerHtml = (
-              oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
-                $scope.data.learnerAnswer, interaction.id,
-                interaction.customization_args));
-          }
-          return shortAnswerHtml;
-        };
-      }
-    ]
-  };
-}]);
-
-oppia.directive('progressDots', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      getNumDots: '&numDots'
-    },
-    templateUrl: 'components/progressDots',
-    controller: [
-      '$scope', 'playerPositionService',
-      function($scope, playerPositionService) {
-        $scope.MAX_DOTS = 18;
-        $scope.dots = [];
-        $scope.currentDotIndex = playerPositionService.getActiveCardIndex();
-        var initialDotCount = $scope.getNumDots();
-        for (var i = 0; i < initialDotCount; i++) {
-          $scope.dots.push({});
-        }
-
-        $scope.$watch(function() {
-          return $scope.getNumDots();
-        }, function(newValue) {
-          var oldValue = $scope.dots.length;
-
-          if (newValue === oldValue) {
-            return;
-          } else if (newValue === oldValue + 1) {
-            $scope.dots.push({});
-            playerPositionService.setActiveCardIndex($scope.dots.length - 1);
-            $scope.currentDotIndex = $scope.dots.length - 1;
-            $scope.rightmostVisibleDotIndex = $scope.dots.length - 1;
-            if ($scope.dots.length > $scope.MAX_DOTS) {
-              $scope.leftmostVisibleDotIndex = (
-                $scope.rightmostVisibleDotIndex - $scope.MAX_DOTS + 1);
-            } else {
-              $scope.leftmostVisibleDotIndex = 0;
-            }
-          } else {
-            throw Error(
-              'Unexpected change to number of dots from ' + oldValue + ' to ' +
-              newValue);
-          }
-        });
-
-        $scope.changeActiveDot = function(index) {
-          playerPositionService.setActiveCardIndex(index);
-          $scope.currentDotIndex = index;
-        };
-
-        $scope.decrementCurrentDotIndex = function() {
-          if ($scope.currentDotIndex > 0) {
-            if ($scope.currentDotIndex === $scope.leftmostVisibleDotIndex) {
-              $scope.leftmostVisibleDotIndex = (
-                $scope.leftmostVisibleDotIndex - 1);
-              $scope.rightmostVisibleDotIndex = (
-                $scope.rightmostVisibleDotIndex - 1);
-            }
-            $scope.changeActiveDot($scope.currentDotIndex - 1);
-          }
-        };
-
-        $scope.incrementCurrentDotIndex = function() {
-          if ($scope.currentDotIndex < $scope.dots.length - 1) {
-            if ($scope.currentDotIndex === $scope.rightmostVisibleDotIndex) {
-              $scope.rightmostVisibleDotIndex = (
-                $scope.rightmostVisibleDotIndex + 1);
-              $scope.leftmostVisibleDotIndex = (
-                $scope.leftmostVisibleDotIndex + 1);
-            }
-            $scope.changeActiveDot($scope.currentDotIndex + 1);
-          }
-        };
-      }
-    ]
-  };
-}]);
-
-oppia.directive('mobileFriendlyTooltip', ['$timeout', function($timeout) {
-  return {
-    restrict: 'A',
-    scope: true,
-    controller: ['$scope', 'deviceInfoService', function(
-      $scope, deviceInfoService) {
-      $scope.opened = false;
-      $scope.deviceHasTouchEvents = deviceInfoService.hasTouchEvents();
-    }],
-    link: function(scope, element) {
-      var TIME_TOOLTIP_CLOSE_DELAY_MOBILE = 1000;
-
-      if (scope.deviceHasTouchEvents) {
-        element.on('touchstart', function() {
-          scope.opened = true;
-          scope.$apply();
-        });
-        element.on('touchend', function() {
-          // Set time delay before tooltip close
-          $timeout(function() {
-            scope.opened = false;
-          }, TIME_TOOLTIP_CLOSE_DELAY_MOBILE);
-        });
-      } else {
-        element.on('mouseenter', function() {
-          scope.opened = true;
-          scope.$apply();
-        });
-
-        element.on('mouseleave', function() {
-          scope.opened = false;
-          scope.$apply();
-        });
-      };
-    }
   };
 }]);
