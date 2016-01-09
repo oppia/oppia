@@ -124,6 +124,8 @@ def _compare_to_remote(remote, local_branch, remote_branch=None):
 
 def _extract_files_to_lint(file_diffs):
     '''Grab only files out of a list of FileDiffs that have a ACMRT status'''
+    if not file_diffs:
+        return []
     lint_files = [f.name for f in file_diffs
                   if f.status.upper() in 'ACMRT']
     return lint_files
@@ -137,6 +139,8 @@ def _collect_files_being_pushed(ref_list, remote):
     Returns:
         Tuple of lists of changed_files, files_to_lint
     '''
+    if not ref_list:
+        return [], []
     # get branch name from e.g. local_ref='refs/heads/lint_hook'
     branches = [ref.local_ref.split('/')[-1] for ref in ref_list]
     hashes = [ref.local_sha1 for ref in ref_list]
@@ -181,7 +185,11 @@ def _collect_files_being_pushed(ref_list, remote):
         pprint.pprint(modified_files)
         print "\nFiles to lint:"
         pprint.pprint(files_to_lint)
-        return ([f.name for f in modified_files], list(files_to_lint))
+        if modified_files:
+            modified_files = [f.name for f in modified_files]
+        else:
+            modified_files = []
+        return modified_files, list(files_to_lint)
 
 
 def _get_refs():
