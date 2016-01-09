@@ -27,7 +27,7 @@ class InteractiveMap(base.BaseInteraction):
     _dependency_ids = ['google_maps']
     answer_type = 'CoordTwoDim'
     instructions = 'Click on the map'
-    narrow_instructions = 'Click to view map'
+    narrow_instructions = 'View map'
     needs_summary = True
 
     _customization_arg_specs = [{

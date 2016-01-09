@@ -128,8 +128,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             'id', 'name', 'description', 'display_mode',
             'customization_arg_specs', 'is_trainable',
             'is_string_classifier_trainable', 'is_terminal', 'is_linear',
-            'rule_descriptions', 'instructions', 'needs_summary',
-            'default_outcome_heading'])
+            'rule_descriptions', 'instructions', 'narrow_instructions',
+            'needs_summary', 'default_outcome_heading'])
         self.assertEqual(interaction_dict['id'], TEXT_INPUT_ID)
         self.assertEqual(interaction_dict['customization_arg_specs'], [{
             'name': 'placeholder',
@@ -295,11 +295,12 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             # inline ones do not.
             if interaction.display_mode == base.DISPLAY_MODE_INLINE:
                 self.assertIsNone(interaction.instructions)
+                self.assertIsNone(interaction.narrow_instructions)
             else:
                 self.assertTrue(
                     isinstance(interaction.instructions, basestring))
                 self.assertIsNotNone(interaction.instructions)
-
+                self.assertIsNotNone(interaction.narrow_instructions)
             # Check that terminal interactions are not linear.
             if interaction.is_terminal:
                 self.assertFalse(interaction.is_linear)

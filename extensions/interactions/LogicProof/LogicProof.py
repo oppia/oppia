@@ -27,7 +27,7 @@ class LogicProof(base.BaseInteraction):
     _dependency_ids = ['logic_proof', 'codemirror']
     answer_type = 'CheckedProof'
     instructions = 'Construct a proof'
-    narrow_instructions = 'Click to view logic'
+    narrow_instructions = 'Construct a proof'
     needs_summary = True
 
     _customization_arg_specs = [{

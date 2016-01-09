@@ -97,6 +97,9 @@ class BaseInteraction(object):
     # Instructions for using this interaction, to be shown to the learner. Only
     # relevant for supplemental interactions.
     instructions = None
+    # Instructions for using this interaction, to be shown to the learner. Only
+    # shows up when view port is narrow. Only relevent for supplemental
+    # interactions.
     narrow_instructions = None
     # Whether the answer is long, and would benefit from being summarized.
     needs_summary = False

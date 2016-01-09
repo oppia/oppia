@@ -28,7 +28,7 @@ class MusicNotesInput(base.BaseInteraction):
     _dependency_ids = ['midijs']
     answer_type = 'MusicPhrase'
     instructions = 'Drag notes to the staff to form a sequence'
-    narrow_instructions = 'Click to view staff'
+    narrow_instructions = 'Show music staff'
     needs_summary = True
 
     _customization_arg_specs = [{

@@ -27,7 +27,7 @@ class CodeRepl(base.BaseInteraction):
     _dependency_ids = ['skulpt', 'codemirror']
     answer_type = 'CodeEvaluation'
     instructions = 'Type code in the editor'
-    narrow_instructions = 'Click to view editor'
+    narrow_instructions = 'Go to code editor'
     needs_summary = True
 
     # Language options 'lua', 'scheme', 'coffeescript', 'javascript', and
