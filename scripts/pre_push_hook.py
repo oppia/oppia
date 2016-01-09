@@ -173,8 +173,9 @@ def _collect_files_being_pushed(ref_list, remote):
 def _get_refs():
     # Git provides refs in STDIN
     ref_list = [GitRef(*ref_str.split()) for ref_str in sys.stdin]
-    print 'ref_list:'
-    pprint.pprint(ref_list)
+    if ref_list:
+        print 'ref_list:'
+        pprint.pprint(ref_list)
     return ref_list
 
 
