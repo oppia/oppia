@@ -124,7 +124,7 @@
           </div>
 
           <div>
-            <span ng-show="editabilityService.isEditable()">
+            <span ng-show="editabilityService.isEditable() && !activeThread.suggestion">
               Change status (optional):
               <select ng-model="tmpMessage.status"
                       ng-options="choice.id as choice.text for choice in STATUS_CHOICES"

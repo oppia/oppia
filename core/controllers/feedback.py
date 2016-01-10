@@ -70,11 +70,15 @@ class ThreadHandler(base.BaseHandler):
 
     @base.require_user
     def post(self, exploration_id, thread_id):
+        suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
         text = self.payload.get('text')
         updated_status = self.payload.get('updated_status')
         if not text and not updated_status:
             raise self.InvalidInputException(
                 'Text for the message must be specified.')
+        if suggestion and updated_status:
+            raise self.InvalidInputException(
+                    'Suggestion thread status cannot be changed manually.')
 
         feedback_services.create_message(
             exploration_id,
