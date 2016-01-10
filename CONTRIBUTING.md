@@ -17,15 +17,31 @@ Thanks for your interest in contributing code to the Oppia project! This page ex
 
 If you already know what you'd like to work on, you can skip this section.
 
-If you have an idea for something to do, first check if it's already been filed on the [issue tracker](https://github.com/oppia/oppia/issues). If so, add a comment to the issue saying you'd like to work on it, and we'll help you get started! Otherwise, please file a new issue and assign yourself to it.
+If you have an idea for something to do, first check if it's already been filed on the [issue tracker](https://github.com/oppia/oppia/issues). If so, add a comment to the issue saying you'd like to work on it, and we'll help you get started! Otherwise, please file a new issue.
 
-Otherwise, you could try searching the issue tracker for something that looks interesting! The issues have been categorized according to the type of help needed:
+Otherwise, you could try searching the issue tracker for something that looks interesting! High priority projects are tracked by [milestones](https://github.com/oppia/oppia/milestones), so we recommend you start there. The issues have been categorized according to the type of help needed:
 
-  * [TODO: code](https://github.com/oppia/oppia/labels/TODO%3A%20code) means that the overall solution is known, and the only thing left to do is code it.
-  * [TODO: design doc](https://github.com/oppia/oppia/labels/TODO%3A%20design%20doc) means that the problem is known, but the solution needs fleshing out. In that case, the best thing to do is to prepare a short doc outlining the solution approach and implementation plan, then circulate it to the [dev team](https://groups.google.com/forum/#!forum/oppia-dev) for feedback before starting implementation.
-  * [TODO: investigation](https://github.com/oppia/oppia/labels/TODO%3A%20investigation) means that the problem is known, but no one has a clue why it's happening. This is generally a detective puzzle: any information you can add to the thread that helps us get closer to the root of the problem would be very helpful!
+  * [TODO: code](https://github.com/oppia/oppia/labels/TODO%3A%20code) means that the overall solution is known and is described in the issue, and the only thing left to do is code it. This issue is suitable for new developers.
+  * [TODO: design (UI/Interaction)](https://github.com/oppia/oppia/labels/TODO%3A%20design%20%28UI%2Finteraction%29) means UI design help is needed. This could mean designing how a feature looks like. This issue is suitable for new designers.
+  * [TODO: design (usability)](https://github.com/oppia/oppia/labels/TODO%3A%20design%20%28usability%29) means the design needs user testing. This issue is suitable for new usability testers.
 
-If this is your first contribution, we additionally suggest picking a [starter project](https://github.com/oppia/oppia/labels/starter%20project). These projects are local to a small part of the codebase, and they tend to be easier, so they give you a chance to get your feet wet without having to understand the entire codebase.
+The above issues are also [starter projects](https://github.com/oppia/oppia/labels/starter%20project). These projects are local to a small part of the codebase, and they tend to be easier, so they give you a chance to get your feet wet without having to understand the  entire codebase. If this is your first contribution, we suggest picking one of these issues to get you familiar with the contribution process.
+
+When you get more experienced, consider tackling a issue that is more open-ended:
+
+For tech issues:
+  * [TODO: tech (instructions)](https://github.com/oppia/oppia/labels/TODO%3A%20tech%20%28instructions%29) means that the overall solution is generally known, but newcomers to the codebase may need additional instructions to be able to implement them. Adding instructions, for example where to make changes in the codebase will help move these issues to the `TODO: code` stage.
+  * [TODO: tech (breakdown)](https://github.com/oppia/oppia/labels/TODO%3A%20tech%20%28breakdown%29) means that the approach is known, but needs to be broken down into single-person projects.
+  * [TODO: tech (design doc)](https://github.com/oppia/oppia/labels/TODO%3A%20tech%20%28design%20doc%29) means that the problem is known, but the solution needs fleshing out. In that case, the best thing to do is to prepare a short doc outlining the solution approach and implementation plan, then discuss it on the issue thread before starting implementation.
+
+For design issues:
+  * [TODO: design (breakdown)](https://github.com/oppia/oppia/labels/TODO%3A%20design%20%breakdown%29) means the UX design is completed, but the issue needs to be broken down into single-person projects.
+  * [TODO: design (UX)](https://github.com/oppia/oppia/labels/TODO%3A%20design%20%UX%29) means the way that the user interacts with this feature needs to be planned. The best way to approach this is to outline a user journey, and discuss it on the issue thread.
+
+Issue triage:
+  * [TODO: triage](https://github.com/oppia/oppia/labels/TODO%3A%20triage) means we aren't sure whether to work on this issue or not. It would be helpful to give comments on this issue in support or against implementing that feature, or mention if you encountered something similar.
+
+If you can't find a suitable project on the milestones list, you can also look at the main issue tracker for something to work on.
 
 Another great way to start contributing is by writing tests -- we have pretty good backend test coverage, but our frontend and integration coverage is spotty. Tests are really important because they help prevent developers from accidentally breaking existing code, allowing them to build cool things faster. If you're interested in helping out, let the development team know by posting to the [developers' mailing list](https://groups.google.com/forum/#!forum/oppia-dev), and we'll help you get started.
 
@@ -50,16 +66,13 @@ Here's how to make a one-off code change. (If you're working on a larger feature
 3. **Make a commit to your feature branch.** Each commit should be self-contained and have a descriptive commit message that helps other developers understand why the changes were made.
   * You can refer to relevant issues in the commit message by writing, e.g., "#105".
   * For consistency, please conform to the [Python](http://google-styleguide.googlecode.com/svn/trunk/pyguide.html) and [JavaScript](https://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml) style guides. In addition, code should be formatted consistently with other code around it. Where these two guidelines differ, prefer the latter.
-  * In general, code should be formatted consistently with other code around it; we use Google's Python and JavaScript style guides as a reference. Prior to each commit, please run
-    ```
-      python scripts/pre_commit_linter.py
-    ```
-  which checks the styling of your JavaScript code. If you use [Sublime Text], you might also want to install the SublimeLinter-jscs plugin by following [these instructions](https://github.com/SublimeLinter/SublimeLinter-jscs).
+  * In general, code should be formatted consistently with other code around it; we use Google's Python and JavaScript style guides as a reference.
+    * If you use [Sublime Text](http://www.sublimetext.com/), you might also want to install the SublimeLinter, [SublimeLinter-jscs](https://github.com/SublimeLinter/SublimeLinter-jscs) and [SublimeLinter-pylint](https://github.com/SublimeLinter/SublimeLinter-pylint) plugins. Follow the instructions on the plugin pages for installation.
   * Please ensure that the code you write is well-tested.
-  * Before making a commit, start up a local instance of Oppia and do some manual testing in order to check that you haven't broken anything! Also, ensure that all automated tests still pass:
+  * Before making a commit, start up a local instance of Oppia and do some manual testing in order to check that you haven't broken anything! After that, ensure that the added code has no lint errors and pass all automated tests by running the presubmit script:
 
     ```
-      bash scripts/run_tests.sh
+      bash scripts/run_presubmit_checks.sh
     ```
 
   * To actually make the commit and push it to your GitHub fork, run:
@@ -99,6 +112,25 @@ Here's how to make a one-off code change. (If you're working on a larger feature
 
 7. **Celebrate.** Congratulations, you have contributed to Oppia!
 
+## Communication channels
+
+### Mailing lists
+
+Announcements: [oppia-announce](https://groups.google.com/forum/#!forum/oppia-announce) is for announcements of new releases or blog posts.
+
+Development team mailing list: [oppia-dev](https://groups.google.com/forum/#!forum/oppia-dev) is the main mailing list for communication between developers, and for technical questions.
+
+General: [oppia](https://groups.google.com/forum/#%21forum/oppia) is the general discussion list.
+
+### GitHub teams
+
+GitHub teams allow contributors working on similar areas of the Oppia codebase to to find and contact each other easily. These teams will be accessible via the GitHub alias @oppia/{{team-name}}. Mentioning a team in a issue or comment will notify all members in the team. During the issue triage process, issues will be assigned to a team, and members of the team are encouraged to comment on or take up the issue. If a contributor who is not part of the team is working on an issue, they will also be able to ask the team for guidance.
+
+You can indicate which team(s) you want to join by filling in the form [here](http://goo.gl/forms/kXILyztnfS), or requesting to join/leaving teams on the [teams page](https://github.com/orgs/oppia/teams). You can join or leave a team at any time.
+
+### Gitter chat room
+
+We have a developer chat room [here](https://gitter.im/oppia/oppia-chat). Feel free to say hi, or ask any questions there.
 
 ## Instructions for multiple contributors working on a large feature
 
