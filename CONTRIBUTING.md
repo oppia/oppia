@@ -18,29 +18,21 @@ Thanks for your interest in contributing code to the Oppia project! This page ex
 
 If you have an idea for something to do, first check if it's already on the [issue tracker](https://github.com/oppia/oppia/issues). If so, add a comment to the issue saying you'd like to work on it, and we'll help you get started! Otherwise, please file a new issue, and say you'd like to work on it.
 
-Otherwise, you could try searching the issue tracker for something that looks interesting! High-priority projects are tracked by [milestones](https://github.com/oppia/oppia/milestones), so we recommend starting there, but you're welcome to take on any of the other issues as well. Every issue has been categorized according to the type of help needed:
+If you don't have an idea for something to do, try searching the issue tracker for something that looks interesting! High-priority issues are tracked by [milestones](https://github.com/oppia/oppia/milestones), so we recommend starting there, but feel free to take on any of the others as well. Each issue is categorized based on the type of help needed:
 
   * **[TODO: code](https://github.com/oppia/oppia/labels/TODO%3A%20code)** means that the issue is suitable for new developers: the overall solution is known and is described in the issue, and the only thing left to do is code it.
   * **[TODO: design (UI/Interaction)](https://github.com/oppia/oppia/labels/TODO%3A%20design%20%28UI%2Finteraction%29)** means that the issue is suitable for new UI designers, interaction designers, artists and writers. In general, it means that UI design help is needed, and the deliverable would usually be a mockup, drawing, prototype or text that conveys what the feature should look like. 
   * **[TODO: design (usability)](https://github.com/oppia/oppia/labels/TODO%3A%20design%20%28usability%29)** means that the  issue is suitable for new usability testers. In general, it means that we have one (or more) ideas or designs for a project, and usability testing/research is needed to find out which one to go with. 
 
-The above issues are also tagged as [starter projects](https://github.com/oppia/oppia/labels/starter%20project). They are usually local to a small part of the codebase, and they tend to be easier, so they give you a chance to get your feet wet without having to understand the entire codebase. If this is your first contribution, we suggest picking one of these issues.
+The above issues are also tagged as [starter projects](https://github.com/oppia/oppia/labels/starter%20project). They are usually local to a small part of the codebase, and they tend to be easier, so they give you a chance to get your feet wet without having to understand the entire codebase. If this is your first contribution, we suggest picking one of these issues. In addition, if you'd like some help with finding an issue to work on, please don't hesitate to reach out to us at the [developers' mailing list](https://groups.google.com/forum/#!forum/oppia-dev) or the [Gitter chat room](https://gitter.im/oppia/oppia-chat)!
 
-As you get more experienced, you might also consider tackling a more open-ended issue:
-
-For tech issues:
+For reference, here are descriptions of what the other 'TODO' tags mean:
   * **[TODO: tech (instructions)](https://github.com/oppia/oppia/labels/TODO%3A%20tech%20%28instructions%29)** means that the overall solution is generally known, but newcomers to the codebase may need additional instructions to be able to implement them. Adding instructions, such as where to make the necessary changes, will help move these issues to the `TODO: code` stage.
   * **[TODO: tech (breakdown)](https://github.com/oppia/oppia/labels/TODO%3A%20tech%20%28breakdown%29)** means that the approach is known, but needs to be broken down into single-person projects.
   * **[TODO: tech (design doc)](https://github.com/oppia/oppia/labels/TODO%3A%20tech%20%28design%20doc%29)** means that the problem is known, but the solution needs fleshing out. In that case, the best thing to do is to prepare a short doc outlining the solution approach and implementation plan, then discuss it on the issue thread before starting implementation.
-
-For design issues:
   * **[TODO: design (breakdown)](https://github.com/oppia/oppia/labels/TODO%3A%20design%20%breakdown%29)** means the UX design is completed, but the issue needs to be broken down into single-person projects.
   * **[TODO: design (UX)](https://github.com/oppia/oppia/labels/TODO%3A%20design%20%UX%29)** means the way that the user interacts with this feature needs to be planned. The best way to approach this is to outline the core user journeys (probably using slides), and discuss them on the issue thread, so that the feature can move forward.
-
-Issue triage:
   * **[TODO: triage](https://github.com/oppia/oppia/labels/TODO%3A%20triage)** means we aren't sure whether to work on this issue or not. It would be helpful to give comments on this issue in support of or against implementing that feature, or mention if you encountered something similar.
-
-If you'd like help finding something to work on, please don't hesitate to reach out to us at the [developers' mailing list](https://groups.google.com/forum/#!forum/oppia-dev) or the [Gitter chat room](https://gitter.im/oppia/oppia-chat)!
 
 ## Instructions for making a code change
 
