@@ -1494,10 +1494,10 @@ def accept_suggestion(editor_id, thread_id, exploration_id, commit_message):
         full_commit_message = ('Accepted suggestion by %s: %s' % ( 
             suggestion_author_username, commit_message))
         change_list = _create_change_list_from_suggestion(suggestion)
-        suggestion_author_userid = user_services.get_user_id_from_username(
+        suggestion_author_id = user_services.get_user_id_from_username(
             suggestion_author_username)
         update_exploration(
-             suggestion_author_userid, exploration_id, change_list, 
+             suggestion_author_id, exploration_id, change_list,
              full_commit_message)
         feedback_services.create_message(
             exploration_id, thread_id, editor_id, None, None,
