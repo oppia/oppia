@@ -118,55 +118,57 @@ oppia.controller('FeedbackTab', [
         backdrop: true,
         size: 'lg',
         resolve: {
-          suggestionInfo: function() {
-            return {
-              isSuggestionValid: $scope.isSuggestionValid(),
-              hasUnsavedChanges: $scope.hasUnsavedChanges()
-            };
+          isSuggestionValid: function() {
+            return $scope.isSuggestionValid();
           },
-          stateContent: function() {
-            var states = explorationData.data.states;
+          hasUnsavedChanges: function() {
+            return $scope.hasUnsavedChanges();
+          },
+          oldContent: function() {
             var stateName = $scope.activeThread.suggestion.state_name;
-            return {
-              oldContent: states[stateName].content[0].value,
-              newContent: $scope.activeThread.suggestion.state_content.value
-            };
+            return explorationData.data.states[stateName].content[0].value;
+          },
+          newContent: function() {
+            return $scope.activeThread.suggestion.state_content.value;
           }
         },
         controller: [
-          '$scope', '$modalInstance', 'suggestionInfo', 'stateContent',
-          function($scope, $modalInstance, suggestionInfo, stateContent) {
-          var ACTION_INVALID_MSG = 'This suggestion has already been ' +
-            'acted upon, or was made for an outdated version ' +
-            'of this exploration.';
-          var UNSAVED_CHANGES_MSG = 'You have unsaved changes to this ' +
-            'exploration. Please save your changes before acting on ' +
-            'a suggestion.';
-          $scope.canActOnSuggestion = suggestionInfo.isSuggestionValid &&
-            !suggestionInfo.hasUnsavedChanges;
-          $scope.errorMessage = suggestionInfo.isSuggestionValid ?
-            UNSAVED_CHANGES_MSG : ACTION_INVALID_MSG;
-          $scope.oldContent = stateContent.oldContent;
-          $scope.newContent = stateContent.newContent;
-          $scope.commitMessage = '';
+          '$scope', '$modalInstance', 'isSuggestionValid', 'hasUnsavedChanges',
+          'oldContent', 'newContent',
+          function(
+            $scope, $modalInstance, isSuggestionValid, hasUnsavedChanges,
+            oldContent, newContent) {
+            var ACTION_INVALID_MSG = 'This suggestion has already been ' +
+              'acted upon, or was made for an outdated version ' +
+              'of this exploration.';
+            var UNSAVED_CHANGES_MSG = 'You have unsaved changes to this ' +
+              'exploration. Please save your changes before acting on ' +
+              'a suggestion.';
+            $scope.canActOnSuggestion = isSuggestionValid && !hasUnsavedChanges;
+            $scope.errorMessage = isSuggestionValid ?
+              UNSAVED_CHANGES_MSG : ACTION_INVALID_MSG;
+            $scope.oldContent = oldContent;
+            $scope.newContent = newContent;
+            $scope.commitMessage = '';
 
-          $scope.acceptSuggestion = function() {
-            $modalInstance.close({
-              action: ACTION_ACCEPT_SUGGESTION,
-              commitMsg: $scope.commitMessage
-            });
-          };
+            $scope.acceptSuggestion = function() {
+              $modalInstance.close({
+                action: ACTION_ACCEPT_SUGGESTION,
+                commitMsg: $scope.commitMessage
+              });
+            };
 
-          $scope.rejectSuggestion = function() {
-            $modalInstance.close({
-              action: ACTION_REJECT_SUGGESTION
-            });
-          };
+            $scope.rejectSuggestion = function() {
+              $modalInstance.close({
+                action: ACTION_REJECT_SUGGESTION
+              });
+            };
 
-          $scope.cancelReview = function() {
-            $modalInstance.dismiss();
-          };
-        }]
+            $scope.cancelReview = function() {
+              $modalInstance.dismiss();
+            };
+          }
+        ]
       }).result.then(function(result) {
         threadDataService.resolveSuggestion(
           $scope.activeThread.thread_id, result.action, result.commitMsg,
