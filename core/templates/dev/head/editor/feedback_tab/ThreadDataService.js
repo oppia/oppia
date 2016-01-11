@@ -24,7 +24,8 @@ oppia.factory('threadDataService', [
   var _expId = explorationData.explorationId;
   var _THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + _expId;
   var _SUGGESTION_LIST_HANDLER_URL = '/suggestionlisthandler/' + _expId;
-  var _SUGGESTION_ACTION_HANDLER_URL = '/suggestionactionhandler/' + _expId + '/';
+  var _SUGGESTION_ACTION_HANDLER_URL = '/suggestionactionhandler/' +
+    _expId + '/';
   var _THREAD_HANDLER_PREFIX = '/threadhandler/' + _expId + '/';
 
   // All the threads for this exploration. This is a list whose entries are
@@ -38,17 +39,15 @@ oppia.factory('threadDataService', [
   var _fetchThreads = function(successCallback) {
     var fPromise = $http.get(_THREAD_LIST_HANDLER_URL);
     var sPromise = $http.get(_SUGGESTION_LIST_HANDLER_URL, {
-      params: {list_type: 'all', has_suggestion: true}
+      params: {
+        list_type: 'all',
+        has_suggestion: true
+      }
     });
 
     $q.all([fPromise, sPromise]).then(function(res) {
       _data.feedbackThreads = res[0].data.threads;
       _data.suggestionThreads = res[1].data.threads;
-      // Later requests will use only the thread_id, not full_thread_id
-      _data.feedbackThreads.concat(_data.suggestionThreads).map(function(val) {
-        val.thread_id = val.full_thread_id.substring(
-          val.full_thread_id.indexOf('.') + 1, val.full_thread_id.length);
-      });
       if (successCallback) {
         successCallback();
       }
@@ -88,7 +87,8 @@ oppia.factory('threadDataService', [
         }
       });
     },
-    addNewMessage: function(threadId, newMessage, newStatus, successCallback, errorCallback) {
+    addNewMessage: function(
+      threadId, newMessage, newStatus, successCallback, errorCallback) {
       var url = _THREAD_HANDLER_PREFIX + threadId;
       var combined = _data.feedbackThreads.concat(_data.suggestionThreads);
       var thread = null;
@@ -113,19 +113,20 @@ oppia.factory('threadDataService', [
         text: newMessage
       };
 
-      $http.post(url, payload).success(function(data) {
+      $http.post(url, payload).success(function() {
         _fetchMessages(threadId);
 
         if (successCallback) {
           successCallback();
         }
-      }).error(function(data) {
+      }).error(function() {
         if (errorCallback) {
           errorCallback();
         }
       });
     },
-    resolveSuggestion: function(threadId, action, commitMsg, onSuccess, onFailure) {
+    resolveSuggestion: function(
+      threadId, action, commitMsg, onSuccess, onFailure) {
       var payload = {
         action: action
       };

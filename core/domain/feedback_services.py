@@ -40,7 +40,7 @@ def _get_thread_dict_from_model_instance(thread):
         'status': thread.status,
         'subject': thread.subject,
         'summary': thread.summary,
-        'full_thread_id': thread.id}
+        'thread_id': thread.id.split('.')[1]}
 
 
 def _create_models_for_thread_and_first_message(
