@@ -43,7 +43,7 @@ describe('retrieving threads service', function() {
         status: 'open',
         subject: 'Feedback from a learner',
         summary: null,
-        full_thread_id: expId + '.' + 'abc1'
+        thread_id: 'abc1'
       },
       {
         last_updated: 1441870501231.642,
@@ -52,7 +52,7 @@ describe('retrieving threads service', function() {
         status: 'open',
         subject: 'Feedback from a learner',
         summary: null,
-        full_thread_id: expId + '.' + 'abc2'
+        thread_id: 'abc2'
       }
     ];
 
@@ -64,7 +64,7 @@ describe('retrieving threads service', function() {
         status: 'open',
         subject: 'Suggestion from a learner',
         summary: null,
-        full_thread_id: expId + '.' + 'abc3',
+        thread_id: 'abc3',
       },
       {
         last_updated: 1441870501233.642,
@@ -73,7 +73,7 @@ describe('retrieving threads service', function() {
         status: 'open',
         subject: 'Suggestion from a learner',
         summary: null,
-        full_thread_id: expId + '.' + 'abc4',
+        thread_id: 'abc4',
       }
     ];
 
@@ -88,14 +88,6 @@ describe('retrieving threads service', function() {
 
     threadDataService.fetchThreads();
     httpBackend.flush();
-
-    // ThreadDataService will modify the data it receives like so.
-    mockFeedbackThreads.concat(mockOpenSuggestionThreads).map(
-      function(element, index) {
-      var fullThreadId = element.full_thread_id;
-      element.thread_id = fullThreadId.substring(
-          fullThreadId.indexOf('.') + 1, fullThreadId.length);
-    });
 
     for (var i = 0; i < mockFeedbackThreads.length; i++) {
       expect(threadDataService.data.feedbackThreads).toContain(
