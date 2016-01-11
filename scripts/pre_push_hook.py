@@ -47,7 +47,6 @@ SCRIPTS_DIR = os.path.join(OPPIA_DIR, 'scripts')
 LINTER_SCRIPT = 'pre_commit_linter.py'
 LINTER_FILE_FLAG = '--files'
 PYTHON_CMD = 'python'
-BACKEND_TEST_SCRIPT = 'run_backend_tests.sh'
 FRONTEND_TEST_SCRIPT = 'run_frontend_tests.sh'
 
 
@@ -215,7 +214,7 @@ def main():
     parser.add_argument('remote', nargs='?', help='provided by git before push')
     parser.add_argument('url', nargs='?', help='provided by git before push')
     parser.add_argument('--install', action='store_true', default=False,
-                        help='Install pre_push_hook to the .git/hooks directory')
+                        help='Install pre_push_hook to the .git/hooks dir')
     args = parser.parse_args()
     remote = args.remote
     if args.install:
@@ -233,10 +232,6 @@ def main():
     frontend_status = _start_sh_script(FRONTEND_TEST_SCRIPT)
     if frontend_status != 0:
         print 'Push aborted due to failing frontend tests.'
-        sys.exit(1)
-    backend_status = _start_sh_script(BACKEND_TEST_SCRIPT)
-    if backend_status != 0:
-        print 'Push aborted due to failing backend tests.'
         sys.exit(1)
 
 
