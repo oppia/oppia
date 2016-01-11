@@ -1518,5 +1518,6 @@ def reject_suggestion(editor_id, thread_id, exploration_id):
             get_by_exp_and_thread_id(exploration_id, thread_id))
         feedback_services.create_message(
             exploration_id, thread_id, editor_id,
-            feedback_models.STATUS_CHOICES_FIXED, None, 'Suggestion rejected.') 
+            feedback_models.STATUS_CHOICES_IGNORED,
+            None, 'Suggestion rejected.')
         thread.put()
