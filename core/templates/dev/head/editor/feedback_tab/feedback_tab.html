@@ -185,18 +185,18 @@
         </div>
       </div>
     </section>
-    <div style="margin-top: 20px; margin-left: 10px;" ng-show="canActOnSuggestion">
+    <div style="margin-top: 20px; margin-left: 10px;" ng-show="canAccept">
       Commit Message (required if accepting):
       <input type="text" ng-model="commitMessage" style="width: 100%">
     </div>
   </div>
 
   <div class="modal-footer">
-    <div ng-show="!canActOnSuggestion" style="text-align: right; width: 100%; color: red; margin-bottom: 10px;">
+    <div ng-show="errorMessage" style="text-align: right; width: 100%; color: red; margin-bottom: 10px;">
       <[ errorMessage ]>
     </div>
     <button class="btn btn-default" ng-click="cancelReview()">Cancel</button>
-    <button class="btn btn-danger" ng-click="rejectSuggestion()" ng-disabled="!canActOnSuggestion">Reject</button>
-    <button class="btn btn-success" ng-click="acceptSuggestion()" ng-disabled="!canActOnSuggestion || commitMessage.length == 0">Accept</button>
+    <button class="btn btn-danger" ng-click="rejectSuggestion()" ng-disabled="!canReject">Reject</button>
+    <button class="btn btn-success" ng-click="acceptSuggestion()" ng-disabled="!canAccept || commitMessage.length == 0">Accept</button>
   </div>
 </script>

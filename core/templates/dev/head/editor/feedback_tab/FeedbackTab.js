@@ -94,21 +94,23 @@ oppia.controller('FeedbackTab', [
       });
     };
 
-    $scope.isSuggestionValid = function() {
-      var activeThread = $scope.activeThread;
-      var currentStatus = activeThread.status;
-      var suggestionExpVersion = activeThread.suggestion.exploration_version;
-      return ($scope.activeThread.status === 'open' &&
-              explorationData.data.version === suggestionExpVersion);
+    var _isSuggestionOpen = function() {
+      return $scope.activeThread.status === 'open';
     };
 
-    $scope.hasUnsavedChanges = function() {
+    var _isSuggestionCurrent = function() {
+      var activeThread = $scope.activeThread;
+      var suggestionExpVersion = activeThread.suggestion.exploration_version;
+      return explorationData.data.version === suggestionExpVersion;
+    };
+
+    var _hasUnsavedChanges = function() {
       return (changeListService.getChangeList().length > 0);
     };
 
     $scope.viewSuggestionBtnType = function() {
-      return ($scope.isSuggestionValid() && !$scope.hasUnsavedChanges() ?
-              'primary' : 'default');
+      return (_isSuggestionOpen() && _isSuggestionCurrent() &&
+              !_hasUnsavedChanges() ? 'primary' : 'default');
     };
 
     // TODO(Allan): Implement ability to edit suggestions before applying.
@@ -118,11 +120,14 @@ oppia.controller('FeedbackTab', [
         backdrop: true,
         size: 'lg',
         resolve: {
-          isSuggestionValid: function() {
-            return $scope.isSuggestionValid();
+          isSuggestionOpen: function() {
+            return _isSuggestionOpen();
+          },
+          isSuggestionCurrent: function() {
+            return _isSuggestionCurrent();
           },
           hasUnsavedChanges: function() {
-            return $scope.hasUnsavedChanges();
+            return _hasUnsavedChanges();
           },
           oldContent: function() {
             var stateName = $scope.activeThread.suggestion.state_name;
@@ -133,20 +138,33 @@ oppia.controller('FeedbackTab', [
           }
         },
         controller: [
-          '$scope', '$modalInstance', 'isSuggestionValid', 'hasUnsavedChanges',
-          'oldContent', 'newContent',
+          '$scope', '$modalInstance', 'isSuggestionOpen', 'isSuggestionCurrent',
+          'hasUnsavedChanges', 'oldContent', 'newContent',
           function(
-            $scope, $modalInstance, isSuggestionValid, hasUnsavedChanges,
-            oldContent, newContent) {
-            var ACTION_INVALID_MSG = 'This suggestion has already been ' +
-              'acted upon, or was made for an outdated version ' +
-              'of this exploration.';
-            var UNSAVED_CHANGES_MSG = 'You have unsaved changes to this ' +
-              'exploration. Please save your changes before acting on ' +
-              'a suggestion.';
-            $scope.canActOnSuggestion = isSuggestionValid && !hasUnsavedChanges;
-            $scope.errorMessage = !isSuggestionValid ? ACTION_INVALID_MSG :
-              hasUnsavedChanges ? UNSAVED_CHANGES_MSG : '';
+            $scope, $modalInstance, isSuggestionOpen, isSuggestionCurrent,
+            hasUnsavedChanges, oldContent, newContent) {
+            var SUGGESTION_NOT_OPEN_MSG = 'This suggestion has already been ' +
+              'accepted or rejected.';
+            var SUGGESTION_OUTDATED_MSG = 'This suggestion was made ' +
+              'for an outdated version of this exploration. It cannot be ' +
+              'accepted.';
+            var UNSAVED_CHANGES_MSG = 'You have unsaved changes to ' +
+              'this exploration. Please discard your unsaved changes if you ' +
+              'wish to accept.';
+            $scope.canReject = isSuggestionOpen;
+            $scope.canAccept = isSuggestionOpen && isSuggestionCurrent &&
+              !hasUnsavedChanges;
+
+            if (!isSuggestionOpen) {
+              $scope.errorMessage = SUGGESTION_NOT_OPEN_MSG;
+            } else if (!isSuggestionCurrent) {
+              $scope.errorMessage = SUGGESTION_OUTDATED_MSG;
+            } else if (hasUnsavedChanges) {
+              $scope.errorMessage = UNSAVED_CHANGES_MSG;
+            } else {
+              $scope.errorMessage = '';
+            }
+
             $scope.oldContent = oldContent;
             $scope.newContent = newContent;
             $scope.commitMessage = '';
