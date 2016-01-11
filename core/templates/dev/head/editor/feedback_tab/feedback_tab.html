@@ -115,7 +115,7 @@
           <div>
             <label for="tmpMessageText">
               Add new message
-              <span ng-if="editabilityService.isEditable()">(and/or change status)</span>
+              <span ng-if="editabilityService.isEditable() && !activeThread.suggestion">(and/or change status)</span>
             </label>
             <textarea class="form-control" ng-model="tmpMessage.text"
                       id="tmpMessageText" rows="6"

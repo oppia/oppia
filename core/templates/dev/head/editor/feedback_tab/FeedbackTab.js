@@ -145,8 +145,8 @@ oppia.controller('FeedbackTab', [
               'exploration. Please save your changes before acting on ' +
               'a suggestion.';
             $scope.canActOnSuggestion = isSuggestionValid && !hasUnsavedChanges;
-            $scope.errorMessage = isSuggestionValid ?
-              UNSAVED_CHANGES_MSG : ACTION_INVALID_MSG;
+            $scope.errorMessage = !isSuggestionValid ? ACTION_INVALID_MSG :
+              hasUnsavedChanges ? UNSAVED_CHANGES_MSG : '';
             $scope.oldContent = oldContent;
             $scope.newContent = newContent;
             $scope.commitMessage = '';
