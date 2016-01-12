@@ -88,8 +88,7 @@ oppia.controller('LearnerViewBreadcrumb', [
             };
 
             $scope.averageRating = (
-              RatingComputationService.computeAverageRating(expInfo.ratings) ||
-              'Unrated');
+              RatingComputationService.computeAverageRating(expInfo.ratings));
             $scope.contributorNames = expInfo.contributor_names;
             $scope.escapedTwitterText = (
               oppiaHtmlEscaper.unescapedStrToEscapedStr(
