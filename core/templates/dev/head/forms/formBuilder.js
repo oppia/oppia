@@ -637,10 +637,10 @@ oppia.factory('rteHelperService', [
 oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [
       '$delegate', '$modal', '$timeout', 'focusService', 'taRegisterTool',
-      'rteHelperService',
+      'rteHelperService', 'explorationContextService',
       function(
         taOptions, $modal, $timeout, focusService, taRegisterTool,
-        rteHelperService) {
+        rteHelperService, explorationContextService) {
 
     taOptions.disableSanitizer = true;
     taOptions.classes.textEditor = 'form-control oppia-rte-content';
@@ -656,6 +656,16 @@ oppia.config(['$provide', function($provide) {
     var _openCustomizationModal = function(
         customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
         onDismissCallback, refocusFn) {
+      var pageContext = explorationContextService.getPageContext();
+      var componentName = customizationArgSpecs[0].name;
+      // The image component only works from the editor side.
+      // Prevent suggestors from trying to edit or add images.
+      if (componentName === 'filepath' && pageContext !== 'editor') {
+        alert(
+          'Sorry! Only exploration editors can add or edit images.');
+        return;
+      }
+
       var modalDialog = $modal.open({
         templateUrl: 'modals/customizeRteComponent',
         backdrop: 'static',
