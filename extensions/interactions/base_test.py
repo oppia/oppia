@@ -300,7 +300,6 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertTrue(
                     isinstance(interaction.instructions, basestring))
                 self.assertIsNotNone(interaction.instructions)
-                self.assertIsNotNone(interaction.narrow_instructions)
             # Check that terminal interactions are not linear.
             if interaction.is_terminal:
                 self.assertFalse(interaction.is_linear)
