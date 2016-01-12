@@ -834,8 +834,16 @@ textarea {
   background-color: #eee;
 }
 
+.oppia-gallery-group {
+  width: 888px;
+}
+
 .oppia-gallery-tiles-area {
   background-color: #eee;
+}
+
+exploration-summary-tile {
+  position: relative;
 }
 
 .oppia-gallery-group-header {
@@ -857,15 +865,42 @@ textarea {
   padding-bottom: 40px;
 }
 
+.oppia-gallery-tiles {
+  position: relative;
+  left: 0px;
+  margin: 0;
+  padding: 0;
+  width: 9999px;
+}
+
+.oppia-gallery-tiles-carousel {
+  float: left;
+  position: relative;
+  height: 264px;
+  max-width: 848px;
+  width: 100vw;
+  overflow: hidden;
+}
+
 .oppia-gallery-tiles-container {
   height: 100%;
   margin-left: auto;
   margin-right: auto;
-  width: 844px;
+  width: 100vw;
+  max-width: 888px;
   min-height: 500px;
   padding-bottom: 24px;
   padding-top: 24px;
 }
+
+.oppia-gallery-tiles-left-scroll, .oppia-gallery-tiles-right-scroll {
+  float: left;
+  height: 264px;
+  width: 20px;
+  background-color: yellow;
+  cursor: pointer;
+}
+
 
 /* Ensure that the gallery tiles remain centered. Note that these values would
    need to be updated if the gallery tiles are changed. */
@@ -2663,4 +2698,3 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-visible-gadgets-container {
   position: relative;
 }
-

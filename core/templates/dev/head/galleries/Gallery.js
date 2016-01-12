@@ -203,6 +203,35 @@ oppia.controller('Gallery', [
       $rootScope.loadingMessage = '';
     });
 
+    $scope.scrollLeft = function(ind) {
+      var htmlItem = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
+      var left = parseInt($(htmlItem).css('left'));
+
+      // Checks if it is *not* at the left most point yet.
+      if (left < 0) {
+        $(htmlItem).animate({
+          left: '+=208'
+        }, 500);
+      }
+    };
+
+    $scope.scrollRight = function(ind, galleryGroup) {
+      var htmlItem = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
+      var left = parseInt($(htmlItem).css('left'));
+
+      var tileWidth = Math.ceil(galleryGroup.length * 208);
+      var galleryLength = $('.oppia-gallery-tiles-carousel').width();
+      var leftLowerLimit = galleryLength - tileWidth;
+
+      // Checks if the elements are not at the right most point yet.
+      if (left > leftLowerLimit) {
+        console.log(Math.abs(left));
+        $(htmlItem).animate({
+          left: '-=208'
+        }, 500);
+      }
+    };
+
     $window.addEventListener('scroll', function() {
       var oppiaBanner = $('.oppia-gallery-banner-container');
       var oppiaTagline = $('.oppia-gallery-banner-tagline');

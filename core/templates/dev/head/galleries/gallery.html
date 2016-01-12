@@ -156,23 +156,31 @@
 
       <div class="oppia-gallery-tiles-area" ng-if="inSplashMode">
         <div class="oppia-gallery-tiles-container">
-          <div ng-repeat="galleryGroup in galleryGroups">
+          <div class="oppia-gallery-group" ng-repeat="galleryGroup in galleryGroups track by $index">
             <!-- TODO(sll): Add card at end of the row that, when clicked, does showFullGalleryGroup(galleryGroup)" -->
-            <h2 class="oppia-gallery-group-header">
+            <div><h2 class="oppia-gallery-group-header">
               <a ng-click="showFullGalleryGroup(galleryGroup)">
                 <[galleryGroup.header]>
               </a>
-            </h2>
-            <exploration-summary-tile ng-repeat="tile in galleryGroup.activity_summary_dicts"
-                                      exploration-id="tile.id"
-                                      exploration-title="tile.title"
-                                      last-updated-msec="tile.last_updated_msec"
-                                      objective="tile.objective"
-                                      category="tile.category"
-                                      ratings="tile.ratings"
-                                      thumbnail-icon-url="tile.thumbnail_icon_url"
-                                      thumbnail-bg-color="tile.thumbnail_bg_color">
-            </exploration-summary-tile>
+            </h2></div>
+            <div class="oppia-tiles-container">
+              <div class="oppia-gallery-tiles-left-scroll" ng-click="scrollLeft($index);"><i class="material-icons">keyboard_arrow_left</i></div>
+              <div class="oppia-gallery-tiles-carousel" ng-swipe-left="scrollRight($index, galleryGroup.activity_summary_dicts)" ng-swipe-right="scrollLeft($index)">
+                <div class="oppia-gallery-tiles">
+                  <exploration-summary-tile ng-repeat="tile in galleryGroup.activity_summary_dicts"
+                                            exploration-id="tile.id"
+                                            exploration-title="tile.title"
+                                            last-updated-msec="tile.last_updated_msec"
+                                            objective="tile.objective"
+                                            category="tile.category"
+                                            ratings="tile.ratings"
+                                            thumbnail-icon-url="tile.thumbnail_icon_url"
+                                            thumbnail-bg-color="tile.thumbnail_bg_color">
+                  </exploration-summary-tile>
+                </div>
+              </div>
+              <div class="oppia-gallery-tiles-right-scroll" ng-click="scrollRight($index, galleryGroup.activity_summary_dicts)"><i class="material-icons">keyboard_arrow_right</i></div>
+            </div>
           </div>
         </div>
       </div>
