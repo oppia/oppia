@@ -210,26 +210,44 @@ oppia.controller('Gallery', [
       // Checks if it is *not* at the left most point yet.
       if (left < 0) {
         $(htmlItem).animate({
-          left: '+=208'
+          left: '+=211.953'
         }, 500);
       }
+    };
+
+    $scope.leftCheck = function(ind) {
+      var htmlItem = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
+
+      // Checks if it is *not* at the left most point yet.
+      return parseInt($(htmlItem).css('left')) >= 0;
     };
 
     $scope.scrollRight = function(ind, galleryGroup) {
       var htmlItem = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
       var left = parseInt($(htmlItem).css('left'));
 
-      var tileWidth = Math.ceil(galleryGroup.length * 208);
+      var tileWidth = Math.floor(galleryGroup.length * 211.953);
       var galleryLength = $('.oppia-gallery-tiles-carousel').width();
       var leftLowerLimit = galleryLength - tileWidth;
 
       // Checks if the elements are not at the right most point yet.
       if (left > leftLowerLimit) {
-        console.log(Math.abs(left));
         $(htmlItem).animate({
-          left: '-=208'
+          left: '-=211.953'
         }, 500);
       }
+    };
+
+    $scope.rightCheck = function(ind, galleryGroup) {
+      var htmlItem = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
+      var left = parseInt($(htmlItem).css('left'));
+
+      var tileWidth = Math.floor(galleryGroup.length * 211.953);
+      var galleryLength = $('.oppia-gallery-tiles-carousel').width();
+      var leftLowerLimit = galleryLength - tileWidth;
+
+      // Checks if the elements are not at the right most point yet.
+      return left <= leftLowerLimit;
     };
 
     $window.addEventListener('scroll', function() {
@@ -465,11 +483,12 @@ oppia.controller('SearchBar', [
     );
 
     $scope.showCreateExplorationModal = function() {
-      ExplorationCreationButtonService.showCreateExplorationModal(
+      console.log('Creating exploration');
+      createExplorationButtonService.showCreateExplorationModal(
         CATEGORY_LIST);
     };
     $scope.showUploadExplorationModal = function() {
-      ExplorationCreationButtonService.showUploadExplorationModal(
+      createExplorationButtonService.showUploadExplorationModal(
         CATEGORY_LIST);
     };
   }

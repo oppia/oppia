@@ -835,7 +835,8 @@ textarea {
 }
 
 .oppia-gallery-group {
-  width: 888px;
+  width: 100vw;
+  max-width: 928px;
 }
 
 .oppia-gallery-tiles-area {
@@ -878,7 +879,7 @@ exploration-summary-tile {
   position: relative;
   height: 264px;
   max-width: 848px;
-  width: 100vw;
+  width: 80vw;
   overflow: hidden;
 }
 
@@ -887,20 +888,39 @@ exploration-summary-tile {
   margin-left: auto;
   margin-right: auto;
   width: 100vw;
-  max-width: 888px;
+  max-width: 928px;
   min-height: 500px;
   padding-bottom: 24px;
   padding-top: 24px;
 }
 
-.oppia-gallery-tiles-left-scroll, .oppia-gallery-tiles-right-scroll {
-  float: left;
-  height: 264px;
-  width: 20px;
-  background-color: yellow;
-  cursor: pointer;
+/*Below is to ensure that there are no margins on small screen devices*/
+@media (max-width: 844px) {
+  .oppia-gallery-tiles-container {
+    margin-left: 0;
+    margin-right: 0;
+  }
 }
 
+.oppia-gallery-scroll-btn {
+  position: relative;
+  margin-top: 100px;
+  float: left;
+  height: 60px;
+  width: 10vw;
+  max-width: 40px;
+  padding: 0;
+  cursor: pointer;
+  background-color: white !important;
+}
+
+.oppia-gallery-tiles-scroll i {
+  position: relative;
+  top: 50%;
+  font-size: 36px;
+  padding: 0;
+  margin: 0;
+}
 
 /* Ensure that the gallery tiles remain centered. Note that these values would
    need to be updated if the gallery tiles are changed. */
