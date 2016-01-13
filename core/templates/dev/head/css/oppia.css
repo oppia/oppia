@@ -834,14 +834,24 @@ textarea {
   background-color: #eee;
 }
 
+.oppia-gallery-group {
+  width: 100vw;
+  max-width: 928px;
+}
+
 .oppia-gallery-tiles-area {
   background-color: #eee;
+}
+
+exploration-summary-tile {
+  position: relative;
 }
 
 .oppia-gallery-group-header {
   margin-bottom: 6px;
   margin-left: 4px;
   margin-top: 36px;
+  display: inline-block;
 }
 .oppia-gallery-group-header a {
   color: black;
@@ -857,14 +867,60 @@ textarea {
   padding-bottom: 40px;
 }
 
+.oppia-gallery-tiles {
+  position: relative;
+  left: 0px;
+  margin: 0;
+  padding: 0;
+  width: 9999px;
+}
+
+.oppia-gallery-tiles-carousel {
+  float: left;
+  position: relative;
+  height: 264px;
+  max-width: 848px;
+  width: 80vw;
+  overflow: hidden;
+}
+
 .oppia-gallery-tiles-container {
   height: 100%;
   margin-left: auto;
   margin-right: auto;
-  width: 844px;
+  width: 100vw;
+  max-width: 928px;
   min-height: 500px;
   padding-bottom: 24px;
   padding-top: 24px;
+}
+
+/*Below is to ensure that there are no margins on small screen devices*/
+@media (max-width: 844px) {
+  .oppia-gallery-tiles-container {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+.oppia-gallery-scroll-btn {
+  position: relative;
+  margin-top: 100px;
+  float: left;
+  height: 60px;
+  width: 10vw;
+  max-width: 40px;
+  padding: 0;
+  cursor: pointer;
+  background-color: white !important;
+}
+
+.oppia-gallery-tiles-scroll i {
+  position: relative;
+  top: 50%;
+  font-size: 36px;
+  padding: 0;
+  margin: 0;
 }
 
 /* Ensure that the gallery tiles remain centered. Note that these values would
@@ -2663,4 +2719,3 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-visible-gadgets-container {
   position: relative;
 }
-

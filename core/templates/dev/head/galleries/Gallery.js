@@ -203,6 +203,51 @@ oppia.controller('Gallery', [
       $rootScope.loadingMessage = '';
     });
 
+    $scope.leftCheck = function(ind) {
+      var tilesHtml = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
+
+      // Checks if it is at the left most point.
+      return parseInt($(tilesHtml).css('left')) >= 0;
+    };
+
+    $scope.scrollLeft = function(ind) {
+      if (!$scope.leftCheck(ind)) {
+        var tilesHtml = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
+        $(tilesHtml).animate({
+          left: '+=211.953'
+        }, 500);
+      }
+    };
+
+    $scope.rightLowerLimits = [];
+    $scope.carouselDisplayWidth = $('.oppia-gallery-tiles-carousel').width();
+    $scope.rightCheck = function(ind, galleryGroup) {
+      var leftLowerLimit = $scope.rightLowerLimits[ind];
+
+      var tilesHtml = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
+      var left = parseInt($(tilesHtml).css('left'));
+
+      var currCarouselWidth = $('.oppia-gallery-tiles-carousel').width();
+      if (!leftLowerLimit || $scope.carouselDisplayWidth != currCarouselWidth) {
+        var tileWidth = Math.floor(galleryGroup.length * 211.953);
+        var galleryLength = $('.oppia-gallery-tiles-carousel').width();
+        var leftLowerLimit = galleryLength - tileWidth;
+        $scope.rightLowerLimits[ind] = leftLowerLimit;
+      }
+      // Checks if the elements are at the right most point
+      return left <= leftLowerLimit;
+    };
+
+    $scope.scrollRight = function(ind, galleryGroup) {
+      if (!$scope.rightCheck(ind, galleryGroup)) {
+        var tilesHtml = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
+
+        $(tilesHtml).animate({
+          left: '-=211.953'
+        }, 500);
+      }
+    };
+
     $window.addEventListener('scroll', function() {
       var oppiaBanner = $('.oppia-gallery-banner-container');
       var oppiaTagline = $('.oppia-gallery-banner-tagline');
@@ -436,11 +481,11 @@ oppia.controller('SearchBar', [
     );
 
     $scope.showCreateExplorationModal = function() {
-      ExplorationCreationButtonService.showCreateExplorationModal(
+      createExplorationButtonService.showCreateExplorationModal(
         CATEGORY_LIST);
     };
     $scope.showUploadExplorationModal = function() {
-      ExplorationCreationButtonService.showUploadExplorationModal(
+      createExplorationButtonService.showUploadExplorationModal(
         CATEGORY_LIST);
     };
   }
