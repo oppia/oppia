@@ -44,9 +44,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
         }
 
         // Make sure $scope.placeholder ends with a newline.
-        if ($scope.postCode.trim().length === 0) {
-          $scope.preCode = '';
-        } else if (!$scope.placeholder.endsWith('\n')) {
+        if (!$scope.placeholder.endsWith('\n')) {
           $scope.placeholder += '\n';
         }
 
@@ -55,7 +53,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
         // Keep the code string given by the user and the stdout from the
         // evaluation until sending them back to the server.
         $scope.code = (
-          $scope.preCode + ($scope.placeholder || '') + $scope.postCode);
+          $scope.preCode + $scope.placeholder + $scope.postCode);
         $scope.output = '';
 
         $scope.initCodeEditor = function(editor) {
@@ -159,6 +157,10 @@ oppia.directive('oppiaInteractiveCodeRepl', [
                 angular.extend({}, markOptions, {
                   inclusiveRight: false
                 }));
+
+            for (var i = 0; i < preCodeNumLines; i++) {
+              editor.addLineClass(i, 'text', 'code-repl-noneditable-line');
+            }
           }
 
           if ($scope.postCode.length !== 0) {
@@ -172,15 +174,11 @@ oppia.directive('oppiaInteractiveCodeRepl', [
                   ch: 0
                 },
                 markOptions);
-          }
 
-          for (var i = 0; i < preCodeNumLines; i++) {
-            editor.addLineClass(i, 'text', 'code-repl-noneditable-line');
-          }
-
-          for (var i = 0; i < postCodeNumLines; i++) {
-            editor.addLineClass(preCodeNumLines + userCodeNumLines + i,
-                'text', 'code-repl-noneditable-line');
+            for (var i = 0; i < postCodeNumLines; i++) {
+              editor.addLineClass(preCodeNumLines + userCodeNumLines + i,
+                  'text', 'code-repl-noneditable-line');
+            }
           }
         };
 
