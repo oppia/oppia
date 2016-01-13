@@ -37,12 +37,16 @@ oppia.directive('oppiaInteractiveCodeRepl', [
           $attrs.postCodeWithValue);
 
         // Make sure $scope.preCode ends with a newline:
-        if (!$scope.preCode.endsWith('\n')) {
+        if ($scope.preCode.trim().length === 0) {
+          $scope.preCode = '';
+        } else if (!$scope.preCode.endsWith('\n')) {
           $scope.preCode += '\n';
         }
 
         // Make sure $scope.placeholder ends with a newline.
-        if (!$scope.placeholder.endsWith('\n')) {
+        if ($scope.postCode.trim().length === 0) {
+          $scope.preCode = '';
+        } else if (!$scope.placeholder.endsWith('\n')) {
           $scope.placeholder += '\n';
         }
 
@@ -142,29 +146,33 @@ oppia.directive('oppiaInteractiveCodeRepl', [
             inclusiveRight: true
           };
 
-          doc.markText(
-              {
-                line: 0,
-                ch: 0
-              },
-              {
-                line: preCodeNumLines,
-                ch: 0
-              },
-              angular.extend({}, markOptions, {
-                inclusiveRight: false
-              }));
+          if ($scope.preCode.length !== 0) {
+            doc.markText(
+                {
+                  line: 0,
+                  ch: 0
+                },
+                {
+                  line: preCodeNumLines,
+                  ch: 0
+                },
+                angular.extend({}, markOptions, {
+                  inclusiveRight: false
+                }));
+          }
 
-          doc.markText(
-              {
-                line: preCodeNumLines + userCodeNumLines,
-                ch: 0
-              },
-              {
-                line: fullCodeNumLines,
-                ch: 0
-              },
-              markOptions);
+          if ($scope.postCode.length !== 0) {
+            doc.markText(
+                {
+                  line: preCodeNumLines + userCodeNumLines,
+                  ch: 0
+                },
+                {
+                  line: fullCodeNumLines,
+                  ch: 0
+                },
+                markOptions);
+          }
 
           for (var i = 0; i < preCodeNumLines; i++) {
             editor.addLineClass(i, 'text', 'code-repl-noneditable-line');
