@@ -204,32 +204,35 @@ oppia.controller('Gallery', [
     });
 
     $scope.leftCheck = function(ind) {
-      var htmlItem = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
+      var tilesHtml = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
 
       // Checks if it is at the left most point.
-      return parseInt($(htmlItem).css('left')) >= 0;
+      return parseInt($(tilesHtml).css('left')) >= 0;
     };
 
     $scope.scrollLeft = function(ind) {
       if (!$scope.leftCheck(ind)) {
-        var htmlItem = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
-        $(htmlItem).animate({
+        var tilesHtml = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
+        $(tilesHtml).animate({
           left: '+=211.953'
         }, 500);
       }
     };
 
-    var rightLowerLimits = [];
+    $scope.rightLowerLimits = [];
+    $scope.carouselDisplayWidth = $('.oppia-gallery-tiles-carousel').width();
     $scope.rightCheck = function(ind, galleryGroup) {
-      var leftLowerLimit = rightLowerLimits[ind];
+      var leftLowerLimit = $scope.rightLowerLimits[ind];
 
-      var htmlItem = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
-      var left = parseInt($(htmlItem).css('left'));
-      if (!leftLowerLimit) {
+      var tilesHtml = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
+      var left = parseInt($(tilesHtml).css('left'));
+
+      var currCarouselWidth = $('.oppia-gallery-tiles-carousel').width();
+      if (!leftLowerLimit || $scope.carouselDisplayWidth != currCarouselWidth) {
         var tileWidth = Math.floor(galleryGroup.length * 211.953);
         var galleryLength = $('.oppia-gallery-tiles-carousel').width();
         var leftLowerLimit = galleryLength - tileWidth;
-        rightLowerLimits[ind] = leftLowerLimit;
+        $scope.rightLowerLimits[ind] = leftLowerLimit;
       }
       // Checks if the elements are at the right most point
       return left <= leftLowerLimit;
@@ -237,9 +240,9 @@ oppia.controller('Gallery', [
 
     $scope.scrollRight = function(ind, galleryGroup) {
       if (!$scope.rightCheck(ind, galleryGroup)) {
-        var htmlItem = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
+        var tilesHtml = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
 
-        $(htmlItem).animate({
+        $(tilesHtml).animate({
           left: '-=211.953'
         }, 500);
       }

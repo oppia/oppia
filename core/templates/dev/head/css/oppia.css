@@ -851,6 +851,7 @@ exploration-summary-tile {
   margin-bottom: 6px;
   margin-left: 4px;
   margin-top: 36px;
+  display: inline-block;
 }
 .oppia-gallery-group-header a {
   color: black;
