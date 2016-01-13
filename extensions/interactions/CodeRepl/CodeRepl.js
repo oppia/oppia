@@ -138,7 +138,6 @@ oppia.directive('oppiaInteractiveCodeRepl', [
           var markOptions = {
             atomic: true,
             readOnly: true,
-            className: 'code-repl-marker',
             inclusiveLeft: true,
             inclusiveRight: true
           };
@@ -166,6 +165,15 @@ oppia.directive('oppiaInteractiveCodeRepl', [
                 ch: 0
               },
               markOptions);
+
+          for (var i = 0; i < preCodeNumLines; i++) {
+            editor.addLineClass(i, 'text', 'code-repl-noneditable-line');
+          }
+
+          for (var i = 0; i < postCodeNumLines; i++) {
+            editor.addLineClass(preCodeNumLines + userCodeNumLines + i,
+                'text', 'code-repl-noneditable-line');
+          }
         };
 
         $scope.sendResponse = function(evaluation, err) {
