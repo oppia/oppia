@@ -330,7 +330,7 @@ oppia.controller('StateInteraction', [
           'updateAnswerChoices',
           currentCustomizationArgs.choices.value.map(function(val, ind) {
             return {
-              val: ind,
+              val: val,
               label: val
             };
           })

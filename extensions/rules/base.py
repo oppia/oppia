@@ -19,6 +19,8 @@
 from core.domain import rule_domain
 from extensions.objects.models import objects
 
+class HtmlRule(rule_domain.Rule):
+    subject_type = objects.Html
 
 class CodeEvaluationRule(rule_domain.Rule):
     subject_type = objects.CodeEvaluation

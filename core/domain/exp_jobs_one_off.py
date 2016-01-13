@@ -26,6 +26,7 @@ from core.domain import rights_manager
 from core.platform import models
 import feconf
 import utils
+import copy
 
 (base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration])
@@ -219,6 +220,41 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceJobManager):
     def reduce(key, values):
         yield (key, values)
 
+class MultipleChoiceMigrationJobManager(jobs.BaseMapReduceJobManager):
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+        old_exploration = exp_services.get_exploration_by_id(item.id)
+        change_list = []
+        for state_name, state in old_exploration.states.iteritems():
+            if state.interaction.id != 'MultipleChoiceInput':
+                continue
+            answers = state.interaction.customization_args['choices']['value']
+            old_answer_groups = state.interaction.answer_groups
+            new_answer_groups = copy.deepcopy(old_answer_groups)
+            for answer_group in new_answer_groups:
+                for rule_spec in answer_group.rule_specs:
+                    rule_spec.inputs['x'] = answers[int(rule_spec.inputs['x'])]
+            change_list.append({
+                u'property_name': u'answer_groups',
+                u'state_name': state_name,
+                u'cmd': u'edit_state_property',
+                u'old_value': [answer.to_dict() for answer in old_answer_groups],
+                u'new_value': [answer.to_dict() for answer in new_answer_groups]
+            })
+        exp_services.update_exploration(
+            feconf.MIGRATION_BOT_USERNAME, item.id, change_list,
+            'Migrate MultipleChoiceInput answer_type from int to html')
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
 
 class InteractionAuditOneOffJob(jobs.BaseMapReduceJobManager):
     """Job that produces a list of (exploration, state) pairs, grouped by the
