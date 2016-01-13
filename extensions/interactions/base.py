@@ -142,10 +142,6 @@ class BaseInteraction(object):
             + self._auxiliary_calculation_ids)
 
     @property
-    def handlers(self):
-        return [AnswerHandler(**ah) for ah in self._handlers]
-
-    @property
     def dependency_ids(self):
         return copy.deepcopy(self._dependency_ids)
 

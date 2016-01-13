@@ -29,13 +29,25 @@ from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 
+# These are special sentinel values attributed to answers migrated from the old
+# answer storage model. Those answers could not have session IDs or time spent
+# values inferred or reconstituted perfectly, so they are assigned these
+# values, instead. Logic and jobs which use these values are expected to skip
+# over the migrated answers to avoid tainted results. Furthermore, all migrated
+# answers are easy to retrieve by reducing session value on this session ID.
+# NOTE TO DEVELOPERS: All other state answer data model entities must not ever
+# store this session ID unless it was created by the AnswerMigrationJob. Also,
+# this string must never change.
+MIGRATED_STATE_ANSWER_SESSION_ID = 'migrated_state_answer_session_id'
+MIGRATED_STATE_ANSWER_TIME_SPENT_IN_SEC = 0.0
+
+
 class StateAnswers(object):
     """Domain object containing answers of states."""
 
     def __init__(self, exploration_id, exploration_version, state_name,
                  interaction_id, answers_list):
-        """
-        Initialize domain object for state answers.
+        """Initialize domain object for state answers.
 
         interaction_id contains the interaction type of the state, e.g.
         multiple choice.
