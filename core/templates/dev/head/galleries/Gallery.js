@@ -481,7 +481,6 @@ oppia.controller('SearchBar', [
     );
 
     $scope.showCreateExplorationModal = function() {
-      console.log('Creating exploration');
       createExplorationButtonService.showCreateExplorationModal(
         CATEGORY_LIST);
     };
