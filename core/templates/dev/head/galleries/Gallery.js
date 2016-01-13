@@ -203,51 +203,46 @@ oppia.controller('Gallery', [
       $rootScope.loadingMessage = '';
     });
 
-    $scope.scrollLeft = function(ind) {
+    $scope.leftCheck = function(ind) {
       var htmlItem = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
-      var left = parseInt($(htmlItem).css('left'));
 
-      // Checks if it is *not* at the left most point yet.
-      if (left < 0) {
+      // Checks if it is at the left most point.
+      return parseInt($(htmlItem).css('left')) >= 0;
+    };
+
+    $scope.scrollLeft = function(ind) {
+      if (!$scope.leftCheck(ind)) {
+        var htmlItem = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
         $(htmlItem).animate({
           left: '+=211.953'
         }, 500);
       }
     };
 
-    $scope.leftCheck = function(ind) {
-      var htmlItem = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
+    var rightLowerLimits = [];
+    $scope.rightCheck = function(ind, galleryGroup) {
+      var leftLowerLimit = rightLowerLimits[ind];
 
-      // Checks if it is *not* at the left most point yet.
-      return parseInt($(htmlItem).css('left')) >= 0;
+      var htmlItem = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
+      var left = parseInt($(htmlItem).css('left'));
+      if (!leftLowerLimit) {
+        var tileWidth = Math.floor(galleryGroup.length * 211.953);
+        var galleryLength = $('.oppia-gallery-tiles-carousel').width();
+        var leftLowerLimit = galleryLength - tileWidth;
+        rightLowerLimits[ind] = leftLowerLimit;
+      }
+      // Checks if the elements are at the right most point
+      return left <= leftLowerLimit;
     };
 
     $scope.scrollRight = function(ind, galleryGroup) {
-      var htmlItem = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
-      var left = parseInt($(htmlItem).css('left'));
+      if (!$scope.rightCheck(ind, galleryGroup)) {
+        var htmlItem = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
 
-      var tileWidth = Math.floor(galleryGroup.length * 211.953);
-      var galleryLength = $('.oppia-gallery-tiles-carousel').width();
-      var leftLowerLimit = galleryLength - tileWidth;
-
-      // Checks if the elements are not at the right most point yet.
-      if (left > leftLowerLimit) {
         $(htmlItem).animate({
           left: '-=211.953'
         }, 500);
       }
-    };
-
-    $scope.rightCheck = function(ind, galleryGroup) {
-      var htmlItem = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
-      var left = parseInt($(htmlItem).css('left'));
-
-      var tileWidth = Math.floor(galleryGroup.length * 211.953);
-      var galleryLength = $('.oppia-gallery-tiles-carousel').width();
-      var leftLowerLimit = galleryLength - tileWidth;
-
-      // Checks if the elements are not at the right most point yet.
-      return left <= leftLowerLimit;
     };
 
     $window.addEventListener('scroll', function() {
