@@ -3,7 +3,7 @@ blurb: ''
 category: Test
 init_state_name: Text Input
 language_code: en
-objective: Show all interactions
+objective: Dummy exploration for testing all interactions
 param_changes: []
 param_specs: {}
 schema_version: 10
@@ -853,4 +853,4 @@ states:
     param_changes: []
 states_schema_version: 7
 tags: []
-title: All interactions
+title: Test of all interactions
