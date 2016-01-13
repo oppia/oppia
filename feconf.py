@@ -326,6 +326,7 @@ DEMO_EXPLORATIONS = [
     ('solar_system', 'The Solar System', 'Physics'),
     ('about_oppia.yaml', 'About Oppia', 'Welcome'),
     ('fuzzy_exploration.yaml', 'Demonstrating fuzzy rules', 'Test'),
+    ('all_interactions', 'All interactions', 'Test'),
 ]
 
 DEMO_COLLECTIONS = {
