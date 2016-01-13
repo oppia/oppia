@@ -21,6 +21,10 @@ To install the hook manually simply execute this script from the oppia root dir
 with the `--install` flag.
 To bypass the validation upon `git push` use the following command:
 `git push REMOTE BRANCH --no-verify`
+
+This hook works only on Unix like systems as of now.
+On Vagrant under Windows it will still copy the hook to the .git/hooks dir
+but it will have no effect.
 '''
 
 import os
