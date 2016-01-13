@@ -164,15 +164,11 @@
               <span ng-if="modalIsOpening">
                 <i class="oppia-save-publish-loading oppia-save-publish-button-icon"
                alt="Loading">
-                 <span class="oppia-loading-dot-one">.</span>
-                 <span class="oppia-loading-dot-two">.</span>
-                 <span class="oppia-loading-dot-three">.</span>
+                  <loading-dots></loading-dots>
                 </i>
                 <span class="oppia-save-publish-button-label">
-                  Loading
-                  <span class="oppia-loading-dot-one">.</span>
-                  <span class="oppia-loading-dot-two">.</span>
-                  <span class="oppia-loading-dot-three">.</span>
+                  Saving
+                  <loading-dots></loading-dots>
                 </span>
               </span>
             </span>
@@ -398,6 +394,7 @@
   {% include 'components/fuzzy_rule_panel_directive.html' %}
   {% include 'components/gadget_directive.html' %}
   {% include 'components/gadget_panel_directive.html' %}
+  {% include 'components/loading_dots_directive.html' %}
   {% include 'components/outcome_editor_directive.html' %}
   {% include 'components/outcome_destination_editor_directive.html' %}
   {% include 'components/outcome_feedback_editor_directive.html' %}
@@ -427,6 +424,7 @@
     {{ include_js_file('components/FuzzyRulePanelDirective.js') }}
     {{ include_js_file('components/GadgetDirective.js') }}
     {{ include_js_file('components/GadgetPanelDirective.js') }}
+    {{ include_js_file('components/LoadingDotsDirective.js') }}
     {{ include_js_file('components/OutcomeEditorDirective.js') }}
     {{ include_js_file('components/OutcomeDestinationEditorDirective.js') }}
     {{ include_js_file('components/OutcomeFeedbackEditorDirective.js') }}

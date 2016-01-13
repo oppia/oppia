@@ -1,9 +1,7 @@
 <div ng-controller="ExplorationStatistics">
   <div ng-if="!hasTabLoaded" class="oppia-align-center">
     Loading
-    <span class="oppia-loading-dot-one">.</span>
-    <span class="oppia-loading-dot-two">.</span>
-    <span class="oppia-loading-dot-three">.</span>
+    <loading-dots></loading-dots> 
   </div>
   <div ng-if="hasTabLoaded">
     <md-card class="oppia-editor-card">
