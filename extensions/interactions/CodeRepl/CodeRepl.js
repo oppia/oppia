@@ -152,7 +152,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
                 line: preCodeNumLines,
                 ch: 0
               },
-              Object.assign({}, markOptions, {
+              angular.extend({}, markOptions, {
                 inclusiveRight: false
               }));
 
