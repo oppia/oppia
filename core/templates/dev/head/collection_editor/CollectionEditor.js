@@ -54,53 +54,11 @@ oppia.controller('CollectionEditor', ['$scope', 'CollectionBackendApiService',
         error || 'There was an error loading the collection.');
   });
 
-  var _getCollectionNodeForExplorationId = function(explorationId) {
-    for (var i = 0; i < $scope.collection.nodes.length; i++) {
-      var collectionNode = $scope.collection.nodes[i];
-      if (collectionNode.exploration_id == explorationId) {
-        return collectionNode;
-      }
-    }
-    return null;
-  };
-
   // Stores a pending list of changes.
   $scope.changeList = [];
 
   $scope.addChange = function(change) {
     $scope.changeList.push(change);
-  };
-
-  $scope.addExploration = function(newExpId) {
-    if (newExpId) {
-      var change = CollectionUpdateService.buildAddCollectionNodeUpdate(
-        newExpId);
-      $scope.changeList.push(change);
-    }
-  };
-
-  $scope.setCollectionTitle = function(newCollectionTitle) {
-    if (newCollectionTitle) {
-      var change = CollectionUpdateService.buildCollectionTitleUpdate(
-        newCollectionTitle);
-      $scope.changeList.push(change);
-    }
-  };
-
-  $scope.setCollectionCategory = function(newCollectionCategory) {
-    if (newCollectionCategory) {
-      var change = CollectionUpdateService.buildCollectionCategoryUpdate(
-        newCollectionCategory);
-      $scope.changeList.push(change);
-    }
-  };
-
-  $scope.setCollectionObjective = function(newCollectionObjective) {
-    if (newCollectionObjective) {
-      var change = CollectionUpdateService.buildCollectionObjectiveUpdate(
-        newCollectionObjective);
-      $scope.changeList.push(change);
-    }
   };
 
   // An explicit save is needed to push all changes to the backend at once

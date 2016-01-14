@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2016 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for editing a collection node. This includes:
- * editing pre-requisite skills, editing acquired skills and deleting a node.
+ * @fileoverview Directive displaying and editing a collection node. Edit
+ * options include: editing pre-requisite skills, editing acquired skills and
+ * deleting a node.
  *
  * @author mgowano@google.com (Abraham Mgowano)
  */

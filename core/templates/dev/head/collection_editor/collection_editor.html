@@ -29,10 +29,12 @@
 {% block content %}
   <div ng-controller="CollectionEditor">
     <div ng-if="collection">
-      <p>title: <[collection.title]></p>
-      <p>category: <[collection.category]></p>
-      <p>objective: <[collection.objective]></p>
-      <p>version: <em><[collection.version]></em></p>
+      <!-- Collection details !-->
+      <collection-details-directive
+        title="collection.title" category="collection.category"
+        objective="collection.objective" version="collection.version"
+        add-change="addChange(change)">
+      </collection-details-directive>
       <a ng-href="/collection/<[collection.id]>" target="_blank">Go to Collection</a>
 
       <!-- List of acquired and pre-requisite skills !-->
@@ -42,7 +44,6 @@
       <collection-skills-list-directive collection-skills="collectionSkills">
       </collection-skills-list-directive>
 
-
       <!-- List of explorations !-->
       <br>
       <strong>Explorations</strong>
@@ -51,33 +52,20 @@
           <collection-node-directive
             prerequisite-skills="node.prerequisite_skills" acquired-skills="node.acquired_skills"
             exploration-id="node.exploration.id" exploration-title="node.exploration.title"
-            add-change="addChange(change)"
-            delete-exploration="deleteExploration(expId)"></collection-node-directive>
+            add-change="addChange(change)"></collection-node-directive>
         </li>
       </ul>
 
-      <!-- Edit options for major collection properties !-->
-      <br>
-      <strong>Edit Collection</strong>
-      <br>
-      <input ng-model="newExpId" type="text" placeholder="New exp ID" /><button ng-click="addExploration(newExpId)">Add Exploration</button>
-      <br>
-      <input ng-model="newTitle" type="text" placeholder="New collection title"><button ng-click="setCollectionTitle(newTitle)">Set Collection Title</button>
-      <br>
-      <input ng-model="newCategory" type="text" placeholder="New collection category"><button ng-click="setCollectionCategory(newCategory)">Set Collection Category</button>
-      <br>
-      <input ng-model="newObjective" type="text" placeholder="New collection objective"><button ng-click="setCollectionObjective(newObjective)">Set Collection Objective</button>
-      <br>
-      <br>
-
+      <!-- Collection changes to be commited !-->
       <h3><span ng-if="changeList.length > 0"> <em>(<[changeList.length]> changes pending)</em></h3>
       <br>
       <input ng-model="commitMessage" type="text" placeholder="Commit Message"><button ng-click="saveCollection(commitMessage)">Save Collection</button>
     </div>
   </div>
 
-  {% include 'collection_editor/collection_skills_list_directive.html' %}
+  {% include 'collection_editor/collection_details_directive.html' %}
   {% include 'collection_editor/collection_node_directive.html' %}
+  {% include 'collection_editor/collection_skills_list_directive.html' %}
 {% endblock content %}
 
 
@@ -85,6 +73,7 @@
   {{ super() }}
   <script>
     {{ include_js_file('collection_editor/CollectionEditor.js') }}
+    {{ include_js_file('collection_editor/CollectionDetailsDirective.js') }}
     {{ include_js_file('collection_editor/CollectionNodeDirective.js') }}
     {{ include_js_file('collection_editor/CollectionSkillsListDirective.js') }}
     {{ include_js_file('domain/collection/CollectionBackendApiService.js') }}
