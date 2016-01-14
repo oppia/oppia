@@ -146,17 +146,17 @@ oppia.directive('oppiaInteractiveCodeRepl', [
 
           if ($scope.preCode.length !== 0) {
             doc.markText(
-                {
-                  line: 0,
-                  ch: 0
-                },
-                {
-                  line: preCodeNumLines,
-                  ch: 0
-                },
-                angular.extend({}, markOptions, {
-                  inclusiveRight: false
-                }));
+              {
+                line: 0,
+                ch: 0
+              },
+              {
+                line: preCodeNumLines,
+                ch: 0
+              },
+              angular.extend({}, markOptions, {
+                inclusiveRight: false
+              }));
 
             for (var i = 0; i < preCodeNumLines; i++) {
               editor.addLineClass(i, 'text', 'code-repl-noneditable-line');
@@ -165,26 +165,26 @@ oppia.directive('oppiaInteractiveCodeRepl', [
 
           if ($scope.postCode.length !== 0) {
             doc.markText(
-                {
-                  line: preCodeNumLines + userCodeNumLines,
-                  ch: 0
-                },
-                {
-                  line: fullCodeNumLines,
-                  ch: 0
-                },
-                markOptions);
+              {
+                line: preCodeNumLines + userCodeNumLines,
+                ch: 0
+              },
+              {
+                line: fullCodeNumLines,
+                ch: 0
+              },
+              markOptions);
 
             for (var i = 0; i < postCodeNumLines; i++) {
               editor.addLineClass(preCodeNumLines + userCodeNumLines + i,
-                  'text', 'code-repl-noneditable-line');
+               'text', 'code-repl-noneditable-line');
             }
           }
         };
 
         $scope.sendResponse = function(evaluation, err) {
           $scope.evaluation = (evaluation || '');
-          $scope.fullError = err ? err : '';
+          $scope.fullError = err || '';
           $scope.$parent.submitAnswer({
             // Replace tabs with 2 spaces.
             // TODO(sll): Change the default Python indentation to 4 spaces.
