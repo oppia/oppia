@@ -108,7 +108,7 @@ oppia.factory('threadDataService', [
       }
 
       var payload = {
-        updated_status: newStatus,
+        updated_status: updatedStatus,
         updated_subject: null,
         text: newMessage
       };
