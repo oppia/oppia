@@ -124,4 +124,4 @@ fi
 
 # install pre-push script
 echo Installing pre-push hook for git
-python2 $OPPIA_DIR/scripts/pre_push_hook.py --install
+$PYTHON_CMD $OPPIA_DIR/scripts/pre_push_hook.py --install
