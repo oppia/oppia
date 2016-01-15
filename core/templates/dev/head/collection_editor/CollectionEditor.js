@@ -54,11 +54,99 @@ oppia.controller('CollectionEditor', ['$scope', 'CollectionBackendApiService',
         error || 'There was an error loading the collection.');
   });
 
+  var _arrayContainsCaseInsensitive = function(array, element) {
+    var lowerElement = element.toLowerCase();
+    for (var i = 0; i < array.length; i++) {
+      if (array[i].toLowerCase() === lowerElement) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  var _getCollectionNodeForExplorationId = function(explorationId) {
+    for (var i = 0; i < $scope.collection.nodes.length; i++) {
+      var collectionNode = $scope.collection.nodes[i];
+      if (collectionNode.exploration_id == explorationId) {
+        return collectionNode;
+      }
+    }
+    return null;
+  };
+
   // Stores a pending list of changes.
   $scope.changeList = [];
 
   $scope.addChange = function(change) {
     $scope.changeList.push(change);
+  };
+
+  // TODO(mgowano): Handle a case where adding a pre-requisite skill
+  // will result into having all exploration requiring a pre-requisite
+  // skill. At the moment this is only handled when a change is committed
+  // to the backend.
+  $scope.addPrerequisiteSkill = function(skillName, expId) {
+    if (skillName && expId) {
+      var collectionNode = _getCollectionNodeForExplorationId(expId);
+      var prerequisiteSkills = collectionNode.prerequisite_skills;
+      if (!_arrayContainsCaseInsensitive(prerequisiteSkills, skillName)) {
+        prerequisiteSkills.push(skillName);
+        return true;
+      }
+    }
+    return false;
+  };
+
+  $scope.addAcquiredSkill = function(skillName, expId) {
+    if (expId && skillName) {
+      var collectionNode = _getCollectionNodeForExplorationId(expId);
+      var acquiredSkills = collectionNode.acquired_skills;
+      if (!_arrayContainsCaseInsensitive(acquiredSkills, skillName)) {
+        acquiredSkills.push(skillName);
+        return true;
+      }
+    }
+    return false;
+  };
+
+  // TODO(mgowano): Handle a case where deleting an exploration will
+  // result into unreachable exploration. At the moment this is only
+  // handled when a change is committed to the backend.
+  $scope.delExploration = function(expId) {
+    if (expId) {
+      for (var i = 0; i < $scope.collection.nodes.length; i++) {
+        var collectionNode = $scope.collection.nodes[i];
+        if (collectionNode.exploration_id == expId) {
+          $scope.collection.nodes.splice(i, 1);
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+
+  $scope.setCollectionTitle = function(newTitle) {
+    if (newTitle) {
+      $scope.collection.title = newTitle;
+      return true;
+    }
+    return false;
+  };
+
+  $scope.setCollectionObjective = function(newObjective) {
+    if (newObjective) {
+      $scope.collection.objective = newObjective;
+      return true;
+    }
+    return false;
+  };
+
+  $scope.setCollectionCategory = function(newCategory) {
+    if (newCategory) {
+      $scope.collection.category = newCategory;
+      return true;
+    }
+    return false;
   };
 
   // An explicit save is needed to push all changes to the backend at once

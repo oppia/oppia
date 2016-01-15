@@ -33,7 +33,9 @@
       <collection-details-directive
         title="collection.title" category="collection.category"
         objective="collection.objective" version="collection.version"
-        add-change="addChange(change)">
+        add-change="addChange(change)" set-collection-title="setCollectionTitle(newTitle)"
+        set-collection-objective="setCollectionObjective(newObjective)" set-collection-category="setCollectionCategory(newCategory)"
+        add-new-exploration="addNewExploration(expId)">
       </collection-details-directive>
       <a ng-href="/collection/<[collection.id]>" target="_blank">Go to Collection</a>
 
@@ -52,7 +54,8 @@
           <collection-node-directive
             prerequisite-skills="node.prerequisite_skills" acquired-skills="node.acquired_skills"
             exploration-id="node.exploration.id" exploration-title="node.exploration.title"
-            add-change="addChange(change)"></collection-node-directive>
+            add-change="addChange(change)" add-prerequisite-skill="addPrerequisiteSkill(skillName, expId)"
+            add-acquired-skill="addAcquiredSkill(skillName, expId)" del-exploration="delExploration(expId)"></collection-node-directive>
         </li>
       </ul>
 

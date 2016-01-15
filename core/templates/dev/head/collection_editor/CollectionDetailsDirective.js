@@ -28,37 +28,42 @@ oppia.directive('collectionDetailsDirective', [function() {
       getCategory: '&category',
       getObjective: '&objective',
       getVersion: '&version',
+      addNewExploration: '&',
+      setCollectionTitle: '&',
+      setCollectionCategory: '&',
+      setCollectionObjective: '&',
       addChange: '&'
     },
     templateUrl: 'inline/collection_details_directive',
     controller: ['$scope', 'CollectionUpdateService', function($scope,
       CollectionUpdateService) {
       $scope.addExploration = function(newExpId) {
-        if (newExpId) {
+        if ($scope.addNewExploration({expId: newExpId})) {
           var change = CollectionUpdateService.buildAddCollectionNodeUpdate(
             newExpId);
           $scope.addChange({change: change});
         }
       };
 
-      $scope.setCollectionTitle = function(newCollectionTitle) {
-        if (newCollectionTitle) {
+      $scope.updateCollectionTitle = function(newCollectionTitle) {
+        console.log(newCollectionTitle);
+        if ($scope.setCollectionTitle({newTitle: newCollectionTitle})) {
           var change = CollectionUpdateService.buildCollectionTitleUpdate(
             newCollectionTitle);
           $scope.addChange({change: change});
         }
       };
 
-      $scope.setCollectionCategory = function(newCollectionCategory) {
-        if (newCollectionCategory) {
+      $scope.updateCollectionCategory = function(newCollectionCategory) {
+        if ($scope.setCollectionCategory({newCategory: newCollectionCategory})) {
           var change = CollectionUpdateService.buildCollectionCategoryUpdate(
             newCollectionCategory);
           $scope.addChange({change: change});
         }
       };
 
-      $scope.setCollectionObjective = function(newCollectionObjective) {
-        if (newCollectionObjective) {
+      $scope.updateCollectionObjective = function(newCollectionObjective) {
+        if ($scope.setCollectionObjective({newObjective: newCollectionObjective})) {
           var change = CollectionUpdateService.buildCollectionObjectiveUpdate(
             newCollectionObjective);
           $scope.addChange({change: change});

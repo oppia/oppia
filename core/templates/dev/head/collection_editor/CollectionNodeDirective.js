@@ -28,47 +28,48 @@ oppia.directive('collectionNodeDirective', [function() {
       getAcquiredSkills: '&acquiredSkills',
       getExplorationId: '&explorationId',
       getExplorationTitle: '&explorationTitle',
+      addPrerequisiteSkill: '&',
+      addAcquiredSkill: '&',
+      delExploration: '&',
       addChange: '&'
     },
     templateUrl: 'inline/collection_node_directive',
     controller: ['$scope', 'CollectionUpdateService', function($scope,
       CollectionUpdateService) {
-      var _arrayContainsCaseInsensitive = function(array, element) {
-        var lowerElement = element.toLowerCase();
-        for (var i = 0; i < array.length; i++) {
-          if (array[i].toLowerCase() === lowerElement) {
-            return true;
-          }
-        }
-        return false;
-      };
 
-      $scope.addPrereqSkill = function(skillName) {
-        if (skillName) {
-          if (!_arrayContainsCaseInsensitive($scope.getPrerequisiteSkills(), skillName)) {
-            $scope.getPrerequisiteSkills().push(skillName);
-            var change = CollectionUpdateService.buildPrerequisiteSkillsUpdate(
-              $scope.getExplorationId(), $scope.getPrerequisiteSkills());
-            $scope.addChange({change: change});
-          }
+      // Uses addPrerequisiteSkill callback function to add a pre-requisite
+      // skill on the frontend and then uses CollectionUpdateService to update
+      // a changelist that will update the backend.
+      $scope.updatePrereqSkills = function(newSkill) {
+        if ($scope.addPrerequisiteSkill(
+          {skillName: newSkill, expId: $scope.getExplorationId()})) {
+          var change = CollectionUpdateService.buildPrerequisiteSkillsUpdate(
+            $scope.getExplorationId(), $scope.getPrerequisiteSkills());
+          $scope.addChange({change: change});
         }
       };
 
-      $scope.addAcquiredSkill = function(skillName) {
-        if (skillName) {
-          if (!_arrayContainsCaseInsensitive($scope.getAcquiredSkills(), skillName)) {
-            $scope.getAcquiredSkills().push(skillName);
-            var change = CollectionUpdateService.buildAcquiredSkillsUpdate(
-              $scope.getExplorationId(), $scope.getAcquiredSkills());
-            $scope.addChange({change: change});
-          }
+      // Uses addAcquiredSkill callback function to add an acquired skill
+      // on the frontend and then uses CollectionUpdateService to update a
+      // changelist that will update the backend.
+      $scope.updateAcquiredSkills = function(newSkill) {
+        if ($scope.addAcquiredSkill({skillName: newSkill,
+          expId: $scope.getExplorationId()})) {
+          var change = CollectionUpdateService.buildAcquiredSkillsUpdate(
+            $scope.getExplorationId(), $scope.getAcquiredSkills());
+          $scope.addChange({change: change});
         }
       };
 
+      // Uses delExploration callback function to delete an exploration
+      // on the frontend and then uses CollectionUpdateService to update a
+      // changelist that will update the backend.
       $scope.deleteExploration = function() {
-        var change = CollectionUpdateService.buildDeleteCollectionNodeUpdate(
-          $scope.getExplorationId());
-        $scope.addChange({change: change});
+        if ($scope.delExploration({expId: $scope.getExplorationId()})) {
+          var change = CollectionUpdateService.buildDeleteCollectionNodeUpdate(
+            $scope.getExplorationId());
+          $scope.addChange({change: change});
+        }
       };
     }]
   };
