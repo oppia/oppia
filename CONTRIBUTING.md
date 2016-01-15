@@ -2,7 +2,7 @@
 
 *These instructions are for developers and designers who would like to contribute code to Oppia. If you'd prefer to help out with other things, please see our [general contribution guidelines](https://github.com/oppia/oppia/wiki/Contributing-to-Oppia).*
 
-Thanks for your interest in contributing code to the Oppia project! This page explains how to get set up, how to find something to work on, and how to make a code change. If you run into any problems along the way, please file an issue on our [issue tracker](https://github.com/oppia/oppia/issues), or get help by posting to the [developers' mailing list](https://groups.google.com/forum/#!forum/oppia-dev). You might also want to look at the resources on the [developer wiki](https://github.com/oppia/oppia/wiki).
+Thanks for your interest in contributing code or design help to the Oppia project! This page explains how to get set up, how to find something to work on, and how to make a code change. If you run into any problems along the way, please file an issue on our [issue tracker](https://github.com/oppia/oppia/issues), or get help by posting to the [developers' mailing list](https://groups.google.com/forum/#!forum/oppia-dev). You might also want to look at the resources on the [developer wiki](https://github.com/oppia/oppia/wiki).
 
 ## Setting things up
 
@@ -30,8 +30,8 @@ For reference, here are descriptions of what the other 'TODO' tags mean:
   * **[TODO: tech (instructions)](https://github.com/oppia/oppia/labels/TODO%3A%20tech%20%28instructions%29)** means that the overall solution is generally known, but newcomers to the codebase may need additional instructions to be able to implement them. Adding instructions, such as where to make the necessary changes, will help move these issues to the `TODO: code` stage.
   * **[TODO: tech (breakdown)](https://github.com/oppia/oppia/labels/TODO%3A%20tech%20%28breakdown%29)** means that the approach is known, but needs to be broken down into single-person projects.
   * **[TODO: tech (design doc)](https://github.com/oppia/oppia/labels/TODO%3A%20tech%20%28design%20doc%29)** means that the problem is known, but the solution needs fleshing out. In that case, the best thing to do is to prepare a short doc outlining the solution approach and implementation plan, then discuss it on the issue thread before starting implementation.
-  * **[TODO: design (breakdown)](https://github.com/oppia/oppia/labels/TODO%3A%20design%20%breakdown%29)** means the UX design is completed, but the issue needs to be broken down into single-person projects.
-  * **[TODO: design (UX)](https://github.com/oppia/oppia/labels/TODO%3A%20design%20%UX%29)** means the way that the user interacts with this feature needs to be planned. The best way to approach this is to outline the core user journeys (probably using slides), and discuss them on the issue thread, so that the feature can move forward.
+  * **[TODO: design (breakdown)](https://github.com/oppia/oppia/labels/TODO%3A%20design%20%28breakdown%29)** means the UX design is completed, but the issue needs to be broken down into single-person projects.
+  * **[TODO: design (UX)](https://github.com/oppia/oppia/labels/TODO%3A%20design%20%28UX%29)** means the way that the user interacts with this feature needs to be planned. The best way to approach this is to outline the core user journeys (probably using slides), and discuss them on the issue thread, so that the feature can move forward.
   * **[TODO: triage](https://github.com/oppia/oppia/labels/TODO%3A%20triage)** means we aren't sure whether to work on this issue or not. It would be helpful to give comments on this issue in support of or against implementing that feature, or mention if you encountered something similar.
 
 ## Instructions for making a code change
