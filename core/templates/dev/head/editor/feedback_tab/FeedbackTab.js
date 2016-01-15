@@ -98,10 +98,9 @@ oppia.controller('FeedbackTab', [
       return $scope.activeThread.status === 'open';
     };
 
-    var _isSuggestionCurrent = function() {
-      var activeThread = $scope.activeThread;
-      var suggestionExpVersion = activeThread.suggestion.exploration_version;
-      return explorationData.data.version === suggestionExpVersion;
+    var _isSuggestionValid = function() {
+      return explorationStatesService.getStates()[
+        $scope.activeThread.suggestion.state_name] !== undefined;
     };
 
     var _hasUnsavedChanges = function() {
@@ -109,7 +108,7 @@ oppia.controller('FeedbackTab', [
     };
 
     $scope.viewSuggestionBtnType = function() {
-      return (_isSuggestionOpen() && _isSuggestionCurrent() &&
+      return (_isSuggestionOpen() && _isSuggestionValid() &&
               !_hasUnsavedChanges() ? 'primary' : 'default');
     };
 
@@ -120,13 +119,13 @@ oppia.controller('FeedbackTab', [
         backdrop: true,
         size: 'lg',
         resolve: {
-          isSuggestionOpen: function() {
+          suggestionIsOpen: function() {
             return _isSuggestionOpen();
           },
-          isSuggestionCurrent: function() {
-            return _isSuggestionCurrent();
+          isSuggestionValid: function() {
+            return _isSuggestionValid();
           },
-          hasUnsavedChanges: function() {
+          unsavedChangesExist: function() {
             return _hasUnsavedChanges();
           },
           oldContent: function() {
@@ -138,28 +137,27 @@ oppia.controller('FeedbackTab', [
           }
         },
         controller: [
-          '$scope', '$modalInstance', 'isSuggestionOpen', 'isSuggestionCurrent',
-          'hasUnsavedChanges', 'oldContent', 'newContent',
+          '$scope', '$modalInstance', 'suggestionIsOpen', 'isSuggestionValid',
+          'unsavedChangesExist', 'oldContent', 'newContent',
           function(
-            $scope, $modalInstance, isSuggestionOpen, isSuggestionCurrent,
-            hasUnsavedChanges, oldContent, newContent) {
+            $scope, $modalInstance, suggestionIsOpen, isSuggestionValid,
+            unsavedChangesExist, oldContent, newContent) {
             var SUGGESTION_NOT_OPEN_MSG = 'This suggestion has already been ' +
               'accepted or rejected.';
-            var SUGGESTION_OUTDATED_MSG = 'This suggestion was made ' +
-              'for an outdated version of this exploration. It cannot be ' +
-              'accepted.';
+            var SUGGESTION_INVALID_MSG = 'This suggestion was made ' +
+              'for a state that no longer exists. It cannot be  accepted.';
             var UNSAVED_CHANGES_MSG = 'You have unsaved changes to ' +
               'this exploration. Please discard your unsaved changes if you ' +
               'wish to accept.';
-            $scope.canReject = isSuggestionOpen;
-            $scope.canAccept = isSuggestionOpen && isSuggestionCurrent &&
-              !hasUnsavedChanges;
+            $scope.canReject = suggestionIsOpen;
+            $scope.canAccept = suggestionIsOpen && isSuggestionValid &&
+              !unsavedChangesExist;
 
-            if (!isSuggestionOpen) {
+            if (!suggestionIsOpen) {
               $scope.errorMessage = SUGGESTION_NOT_OPEN_MSG;
-            } else if (!isSuggestionCurrent) {
-              $scope.errorMessage = SUGGESTION_OUTDATED_MSG;
-            } else if (hasUnsavedChanges) {
+            } else if (!isSuggestionValid) {
+              $scope.errorMessage = SUGGESTION_INVALID_MSG;
+            } else if (unsavedChangesExist) {
               $scope.errorMessage = UNSAVED_CHANGES_MSG;
             } else {
               $scope.errorMessage = '';
