@@ -16,8 +16,6 @@
 
 """Tests for rule objects."""
 
-__author__ = 'Sean Lip'
-
 import inspect
 import os
 import pkgutil
@@ -67,7 +65,7 @@ class RuleDomainUnitTests(test_utils.GenericTestBase):
         self.assertTrue(fake_rule.x, 2)
         self.assertTrue(fake_rule.y, 'a')
         self.assertEqual(
-            fake_rule._PARAMS,
+            fake_rule.params,
             [('x', objects.Real), ('y', objects.UnicodeString)]
         )
 
@@ -89,7 +87,7 @@ class RuleDataUnitTests(test_utils.GenericTestBase):
             for name, clazz in inspect.getmembers(module, inspect.isclass):
                 param_list = rule_domain.get_param_list(clazz.description)
 
-                for (param_name, param_obj_type) in param_list:
+                for (_, param_obj_type) in param_list:
                     # TODO(sll): Get rid of these special cases.
                     if param_obj_type.__name__ in [
                             'NonnegativeInt', 'ListOfGraph',
@@ -111,14 +109,14 @@ class RuleFunctionUnitTests(test_utils.GenericTestBase):
 
     def test_get_description_strings_for_obj_type(self):
         rule_descriptions = rule_domain.get_description_strings_for_obj_type(
-            'UnicodeString')
+            'Real')
         self.assertEqual(rule_descriptions, {
-            'CaseSensitiveEquals': (
-                'is equal to {{x|UnicodeString}}, taking case into account'),
-            'Contains': 'contains {{x|UnicodeString}}',
-            'Equals': 'is equal to {{x|UnicodeString}}',
-            'MatchesBase64EncodedFile': (
-                'has same content as the file located at '
-                '{{filepath|UnicodeString}}'),
-            'StartsWith': 'starts with {{x|UnicodeString}}',
+            'Equals': 'is equal to {{x|Real}}',
+            'IsLessThan': 'is less than {{x|Real}}',
+            'IsGreaterThan': 'is greater than {{x|Real}}',
+            'IsLessThanOrEqualTo': 'is less than or equal to {{x|Real}}',
+            'IsGreaterThanOrEqualTo': 'is greater than or equal to {{x|Real}}',
+            'IsInclusivelyBetween': (
+                'is between {{a|Real}} and {{b|Real}}, inclusive'),
+            'IsWithinTolerance': 'is within {{tol|Real}} of {{x|Real}}'
         })

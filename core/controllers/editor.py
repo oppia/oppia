@@ -16,14 +16,15 @@
 
 """Controllers for the editor view."""
 
-__author__ = 'sll@google.com (Sean Lip)'
-
 import imghdr
 import logging
+
+import jinja2
 
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import dependency_registry
+from core.domain import email_manager
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -33,16 +34,14 @@ from core.domain import interaction_registry
 from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import rule_domain
-from core.domain import skins_services
 from core.domain import stats_services
 from core.domain import user_services
 from core.domain import value_generators_domain
 from core.platform import models
-current_user_services = models.Registry.import_current_user_services()
 import feconf
 import utils
 
-import jinja2
+current_user_services = models.Registry.import_current_user_services()
 
 # The frontend template for a new state. It is sent to the frontend when the
 # exploration editor page is first loaded, so that new states can be
@@ -207,14 +206,10 @@ class ExplorationPage(EditorHandler):
         gadget_templates = (
             gadget_registry.Registry.get_gadget_html(gadget_types))
 
-        skin_templates = skins_services.Registry.get_skin_templates(
-            skins_services.Registry.get_all_skin_ids())
-
         self.values.update({
             'GADGET_SPECS': gadget_registry.Registry.get_all_specs(),
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
-            'PANEL_SPECS': skins_services.Registry.get_all_specs()[
-                feconf.DEFAULT_SKIN_ID],
+            'PANEL_SPECS': feconf.PANELS_PROPERTIES,
             'additional_angular_modules': additional_angular_modules,
             'can_delete': rights_manager.Actor(
                 self.user_id).can_delete(
@@ -247,10 +242,6 @@ class ExplorationPage(EditorHandler):
             'moderator_request_forum_url': MODERATOR_REQUEST_FORUM_URL.value,
             'nav_mode': feconf.NAV_MODE_CREATE,
             'value_generators_js': jinja2.utils.Markup(value_generators_js),
-            'skin_js_urls': [
-                skins_services.Registry.get_skin_js_url(skin_id)
-                for skin_id in skins_services.Registry.get_all_skin_ids()],
-            'skin_templates': jinja2.utils.Markup(skin_templates),
             'title': exploration.title,
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'ALLOWED_GADGETS': feconf.ALLOWED_GADGETS,
@@ -300,8 +291,7 @@ class ExplorationHandler(EditorHandler):
             'rights': rights_manager.get_exploration_rights(
                 exploration_id).to_dict(),
             'show_state_editor_tutorial_on_load': (
-                self.user_id and not
-                self.user_has_started_state_editor_tutorial),
+                self.user_id and not self.has_seen_editor_tutorial),
             'skin_customizations': exploration.skin_instance.to_dict()[
                 'skin_customizations'],
             'states': states,
@@ -434,7 +424,7 @@ class ExplorationRightsHandler(EditorHandler):
                 except utils.ValidationError as e:
                     raise self.InvalidInputException(e)
 
-                rights_manager.publish_exploration(
+                exp_services.publish_exploration_and_update_user_profiles(
                     self.user_id, exploration_id)
                 exp_services.index_explorations_given_ids([exploration_id])
             else:
@@ -481,6 +471,68 @@ class ExplorationRightsHandler(EditorHandler):
         })
 
 
+class ExplorationModeratorRightsHandler(EditorHandler):
+    """Handles management of exploration rights by moderators."""
+
+    PAGE_NAME_FOR_CSRF = 'editor'
+
+    @base.require_moderator
+    def put(self, exploration_id):
+        """Updates the publication status of the given exploration, and sends
+        an email to all its owners.
+        """
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        action = self.payload.get('action')
+        email_body = self.payload.get('email_body')
+        version = self.payload.get('version')
+        _require_valid_version(version, exploration.version)
+
+        if action not in feconf.VALID_MODERATOR_ACTIONS:
+            raise self.InvalidInputException('Invalid moderator action.')
+
+        # If moderator emails can be sent, check that all the prerequisites are
+        # satisfied, otherwise do nothing.
+        if feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION:
+            if not email_body:
+                raise self.InvalidInputException(
+                    'Moderator actions should include an email to the '
+                    'recipient.')
+            email_manager.require_moderator_email_prereqs_are_satisfied()
+
+        # Perform the moderator action.
+        if action == 'unpublish_exploration':
+            rights_manager.unpublish_exploration(
+                self.user_id, exploration_id)
+            exp_services.delete_documents_from_search_index([
+                exploration_id])
+        elif action == 'publicize_exploration':
+            try:
+                exploration.validate(strict=True)
+            except utils.ValidationError as e:
+                raise self.InvalidInputException(e)
+
+            rights_manager.publicize_exploration(
+                self.user_id, exploration_id)
+        else:
+            raise self.InvalidInputException(
+                'No change was made to this exploration.')
+
+        exp_rights = rights_manager.get_exploration_rights(exploration_id)
+
+        # If moderator emails can be sent, send an email to the all owners of
+        # the exploration notifying them of the change.
+        if feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION:
+            for owner_id in exp_rights.owner_ids:
+                email_manager.send_moderator_action_email(
+                    self.user_id, owner_id,
+                    feconf.VALID_MODERATOR_ACTIONS[action]['email_intent'],
+                    exploration.title, email_body)
+
+        self.render_json({
+            'rights': exp_rights.to_dict(),
+        })
+
+
 class ResolvedAnswersHandler(EditorHandler):
     """Allows learners' answers for a state to be marked as resolved."""
 
@@ -507,6 +559,8 @@ class UntrainedAnswersHandler(EditorHandler):
     """Returns answers that learners have submitted, but that Oppia hasn't been
     explicitly trained to respond to be an exploration author.
     """
+    NUMBER_OF_TOP_ANSWERS_PER_RULE = 50
+
     def get(self, exploration_id, escaped_state_name):
         """Handles GET requests."""
         try:
@@ -536,15 +590,13 @@ class UntrainedAnswersHandler(EditorHandler):
         # normalization calls in this function will not work correctly on those
         # strings. Once this happens, this handler should also be tested.
 
-        NUMBER_OF_TOP_ANSWERS_PER_RULE = 50
-
         # The total number of possible answers is 100 because it requests the
         # top 50 answers matched to the default rule and the top 50 answers
         # matched to a fuzzy rule individually.
         answers = stats_services.get_top_state_rule_answers(
             exploration_id, state_name, [
                 exp_domain.DEFAULT_RULESPEC_STR, rule_domain.FUZZY_RULE_TYPE],
-            NUMBER_OF_TOP_ANSWERS_PER_RULE)
+            self.NUMBER_OF_TOP_ANSWERS_PER_RULE)
 
         interaction = state.interaction
         unhandled_answers = []
@@ -619,8 +671,8 @@ class ExplorationDownloadHandler(EditorHandler):
             self.response.write(
                 exp_services.export_to_zip_file(exploration_id, version))
         elif output_format == feconf.OUTPUT_FORMAT_JSON:
-                self.render_json(exp_services.export_states_to_yaml(
-                    exploration_id, version=version, width=width))
+            self.render_json(exp_services.export_states_to_yaml(
+                exploration_id, version=version, width=width))
         else:
             raise self.InvalidInputException(
                 'Unrecognized output format %s' % output_format)
@@ -869,6 +921,6 @@ class ChangeListSummaryHandler(EditorHandler):
 class StartedTutorialEventHandler(EditorHandler):
     """Records that this user has started the state editor tutorial."""
 
-    def post(self, exploration_id):
+    def post(self):
         """Handles GET requests."""
         user_services.record_user_started_state_editor_tutorial(self.user_id)

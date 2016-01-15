@@ -14,10 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'Jeremy Emerson'
-
+# pylint: disable=relative-import
 from core.tests import test_utils
 import utils
+# pylint: enable=relative-import
 
 
 class UtilsTests(test_utils.GenericTestBase):
@@ -25,12 +25,12 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_create_enum_method(self):
         """Test create_enum method."""
-        o = utils.create_enum('first', 'second', 'third')
-        self.assertEqual(o.first, 'first')
-        self.assertEqual(o.second, 'second')
-        self.assertEqual(o.third, 'third')
+        enum = utils.create_enum('first', 'second', 'third')
+        self.assertEqual(enum.first, 'first')
+        self.assertEqual(enum.second, 'second')
+        self.assertEqual(enum.third, 'third')
         with self.assertRaises(AttributeError):
-            o.fourth
+            enum.fourth  # pylint: disable=pointless-statement
 
     def test_get_comma_sep_string_from_list(self):
         """Test get_comma_sep_string_from_list method."""
@@ -124,7 +124,8 @@ class UtilsTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegexp(
-                Exception, 'URL query parameter name must be a string'):
+            Exception, 'URL query parameter name must be a string'
+            ):
             utils.set_url_query_parameter('http://test.com?a=b', None, 'value')
 
     def test_convert_to_hash(self):
@@ -161,29 +162,30 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(p, '/foo/bar/baz')
 
     def test_capitalize_string(self):
-        s = utils.capitalize_string(None)
-        self.assertEqual(s, None)
+        test_data = [
+            [None, None],
+            ['', ''],
+            ['a', 'A'],
+            ['A', 'A'],
+            ['1', '1'],
+            ['lowercase', 'Lowercase'],
+            ['UPPERCASE', 'UPPERCASE'],
+            ['Partially', 'Partially'],
+            ['miDdle', 'MiDdle'],
+            ['2be', '2be'],
+        ]
 
-        s = utils.capitalize_string('')
-        self.assertEqual(s, '')
+        for datum in test_data:
+            self.assertEqual(utils.capitalize_string(datum[0]), datum[1])
 
-        s = utils.capitalize_string('a')
-        self.assertEqual(s, 'A')
+    def test_get_thumbnail_icon_url_for_category(self):
+        self.assertEqual(
+            utils.get_thumbnail_icon_url_for_category('Architecture'),
+            '/images/gallery/thumbnails/Architecture.svg')
+        self.assertEqual(
+            utils.get_thumbnail_icon_url_for_category('Life Skills'),
+            '/images/gallery/thumbnails/LifeSkills.svg')
+        self.assertEqual(
+            utils.get_thumbnail_icon_url_for_category('Nonexistent'),
+            '/images/gallery/thumbnails/Lightbulb.svg')
 
-        s = utils.capitalize_string('A')
-        self.assertEqual(s, 'A')
-
-        s = utils.capitalize_string('1')
-        self.assertEqual(s, '1')
-
-        s = utils.capitalize_string('lowercase')
-        self.assertEqual(s, 'Lowercase')
-
-        s = utils.capitalize_string('UPPERCASE')
-        self.assertEqual(s, 'UPPERCASE')
-
-        s = utils.capitalize_string('Partially')
-        self.assertEqual(s, 'Partially')
-
-        s = utils.capitalize_string('2be')
-        self.assertEqual(s, '2be')

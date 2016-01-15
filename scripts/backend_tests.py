@@ -28,10 +28,6 @@ import subprocess
 import threading
 import time
 
-# DEVELOPERS: Please change this number accordingly when new tests are added
-# or removed.
-EXPECTED_TEST_COUNT = 616
-
 COVERAGE_PATH = os.path.join(
     os.getcwd(), '..', 'oppia_tools', 'coverage-4.0', 'coverage')
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
@@ -245,7 +241,7 @@ def main():
     task_execution_failed = False
     try:
         _execute_tasks(tasks)
-    except:
+    except Exception:
         task_execution_failed = True
 
     for task in tasks:
@@ -277,7 +273,7 @@ def main():
 
             tests_failed_regex_match = re.search(
                 r'Test suite failed: ([0-9]+) tests run, ([0-9]+) errors, '
-                    '([0-9]+) failures',
+                '([0-9]+) failures',
                 str(task.exception))
 
             try:
@@ -299,23 +295,23 @@ def main():
                 print '    This is most likely due to an import error.'
                 print '------------------------------------------------------'
         else:
-            tests_run_regex_match = re.search(
-                r'Ran ([0-9]+) tests? in ([0-9\.]+)s', task.output)
-            test_count = int(tests_run_regex_match.group(1))
-            test_time = float(tests_run_regex_match.group(2))
-            print ('SUCCESS   %s: %d tests (%.1f secs)' %
-                   (spec.test_target, test_count, test_time))
+            try:
+                tests_run_regex_match = re.search(
+                    r'Ran ([0-9]+) tests? in ([0-9\.]+)s', task.output)
+                test_count = int(tests_run_regex_match.group(1))
+                test_time = float(tests_run_regex_match.group(2))
+                print ('SUCCESS   %s: %d tests (%.1f secs)' %
+                       (spec.test_target, test_count, test_time))
+            except Exception:
+                print (
+                    'An unexpected error occurred. '
+                    'Task output:\n%s' % task.output)
 
         total_count += test_count
 
     print ''
     if total_count == 0:
         raise Exception('WARNING: No tests were run.')
-    elif (parsed_args.test_path is None and parsed_args.test_target is None
-            and total_count != EXPECTED_TEST_COUNT):
-        raise Exception(
-            'ERROR: Expected %s tests to be run, not %s.' %
-            (EXPECTED_TEST_COUNT, total_count))
     else:
         print 'Ran %s test%s in %s test class%s.' % (
             total_count, '' if total_count == 1 else 's',

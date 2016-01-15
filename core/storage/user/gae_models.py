@@ -16,13 +16,12 @@
 
 """Models for Oppia users."""
 
-__author__ = 'Stephanie Federwisch'
-
 from core.platform import models
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 import feconf
 
 from google.appengine.ext import ndb
+
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
 class UserSettingsModel(base_models.BaseModel):
@@ -40,18 +39,23 @@ class UserSettingsModel(base_models.BaseModel):
     # When the user last agreed to the terms of the site. May be None.
     last_agreed_to_terms = ndb.DateTimeProperty(default=None)
     # When the user last started the state editor tutorial. May be None.
-    last_started_state_editor_tutorial = ndb.DateTimeProperty(default=None)
+    last_started_state_editor_tutorial = ndb.DateTimeProperty(default=None)  # pylint: disable=invalid-name
     # User uploaded profile picture as a dataURI string. May be None.
     profile_picture_data_url = ndb.TextProperty(default=None, indexed=False)
     # User specified biography (to be shown on their profile page).
     user_bio = ndb.TextProperty(indexed=False)
-    # When the user first contributed to Oppia. May be None.
-    first_contribution_datetime = ndb.DateTimeProperty(default=None)
+    # Subject interests specified by the user.
+    subject_interests = ndb.StringProperty(repeated=True, indexed=True)
+    # The time, in milliseconds, when the user first contributed to Oppia.
+    # May be None.
+    first_contribution_msec = ndb.FloatProperty(default=None)
     # Language preferences specified by the user.
     # TODO(sll): Add another field for the language that the user wants the
     # site to display in. These language preferences are mainly for the purpose
     # of figuring out what to show by default in the gallery.
-    preferred_language_codes = ndb.StringProperty(repeated=True, indexed=True,
+    preferred_language_codes = ndb.StringProperty(
+        repeated=True,
+        indexed=True,
         choices=[lc['code'] for lc in feconf.ALL_LANGUAGE_CODES])
 
     @classmethod
@@ -65,6 +69,22 @@ class UserSettingsModel(base_models.BaseModel):
         """Returns a user model given a normalized username"""
         return cls.get_all().filter(
             cls.normalized_username == normalized_username).get()
+
+
+class UserContributionsModel(base_models.BaseModel):
+    """Tracks explorations created/edited for a particular user.
+
+    Instances of this class are keyed by the user id.
+    """
+    # IDs of explorations that this user has created
+    # Includes subsequently deleted and private explorations.
+    created_exploration_ids = ndb.StringProperty(
+        repeated=True, indexed=True, default=None)
+    # IDs of explorations that this user has made a positive
+    # (i.e. non-revert) commit to.
+    # Includes subsequently deleted and private explorations.
+    edited_exploration_ids = ndb.StringProperty(
+        repeated=True, indexed=True, default=None)
 
 
 class UserEmailPreferencesModel(base_models.BaseModel):
@@ -104,6 +124,24 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
     # The time, in milliseconds since the epoch, when the job that computed
     # this batch model was queued.
     job_queued_msec = ndb.FloatProperty(indexed=False)
+
+
+class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
+    """The impact score for a particular user, where impact is defined as:
+    Sum of (
+    ln(playthroughs) * (ratings_scaler) * (average(ratings) - 2.5))
+    *(multiplier),
+    where multiplier = 10, and ratings_scaler is .1 * (number of ratings)
+    if there are < 10 ratings for that exploration.
+
+    The impact score is 0 for an exploration with 0 playthroughs or with an
+    average rating of less than 2.5.
+
+    Impact scores are calculated over explorations for which a user
+    is listed as a contributor. Keys for this model are user_ids.
+    """
+    # The impact score.
+    impact_score = ndb.FloatProperty(indexed=True)
 
 
 class ExplorationUserDataModel(base_models.BaseModel):

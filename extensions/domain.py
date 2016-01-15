@@ -16,8 +16,6 @@
 
 """Domain objects used within multiple extensions."""
 
-__author__ = 'Michael Anuzis'
-
 
 class CustomizationArgSpec(object):
     """Value object for a customization arg specification."""

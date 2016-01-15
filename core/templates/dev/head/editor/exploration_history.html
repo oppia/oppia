@@ -16,25 +16,25 @@
 <div ng-controller="ExplorationHistory" class="container-fluid" style="word-wrap: break-word;">
   <md-card class="oppia-editor-card">
     <h3>List of Changes</h3>
-    <div ng-repeat="versionNumber in snapshotOrderArray" class="row">
+    <div ng-repeat="versionCheckbox in versionCheckboxArray " class="row">
       <div class="col-sm-2 col-md-2 col-lg-2">
-        <input type="checkbox" name="compareVer1" ng-model="versionArr" ng-click="submitVersion($event, versionNumber)" class='protractor-test-history-v1-selector'>
-        [<[versionNumber]>]
+        <input type="checkbox" name="compareVer" ng-model="versionCheckbox.selected" ng-init="init()" ng-click="changeSelectedVersions($event, versionCheckbox.vnum)" ng-disabled="isCheckboxDisabled(versionCheckbox.vnum)" ng-hide="comparisonsAreDisabled" class='protractor-test-history-checkbox-selector'>
+        [<[versionCheckbox.vnum]>]
       </div>
       <div class="col-sm-2 col-md-2 col-lg-2">
-        <strong><profile-link-text username="explorationVersionMetadata[versionNumber].committerId"></profile-link-text></strong>
+        <strong><profile-link-text username="explorationVersionMetadata[versionCheckbox.vnum].committerId"></profile-link-text></strong>
       </div>
       <div class="col-sm-4 col-md-4 col-lg-4">
-        <[explorationVersionMetadata[versionNumber].commitMessage]>
+        <[explorationVersionMetadata[versionCheckbox.vnum].commitMessage]>
       </div>
       <div class="col-sm-4 col-md-4 col-lg-4">
         <span>
-          <em><[explorationVersionMetadata[versionNumber].createdOnStr]></em>
-          <span ng-if="versionNumber !== currentVersion && editabilityService.isEditable()">
-            | <a href="#" class='protractor-test-revert-version' ng-click="showRevertExplorationModal(versionNumber)">Revert</a>
+          <em><[explorationVersionMetadata[versionCheckbox.vnum].createdOnStr]></em>
+          <span ng-if="versionCheckbox.vnum !== currentVersion && editabilityService.isEditable()">
+            | <a href="#" class='protractor-test-revert-version' ng-click="showRevertExplorationModal(versionCheckbox.vnum)">Revert</a>
           </span>
           <span>
-            | <a href="#" ng-click="downloadExplorationWithVersion(versionNumber)" title="Download exploration as a zip file.">Download</a>
+            | <a href="#" ng-click="downloadExplorationWithVersion(versionCheckbox.vnum)" title="Download exploration as a zip file.">Download</a>
           </span>
         </span>
       </div>
@@ -42,8 +42,8 @@
 
     <br>
 
-    <div ng-hide="!explorationVersionMetadata || hideCompareVersionsButton">
-      <button class="btn protractor-test-show-history-graph" ng-class="{'btn-success': areCompareVersionsSelected(), 'btn-default': !areCompareVersionsSelected()}" ng-click="showHistoryGraph()" ng-disabled="!areCompareVersionsSelected()">Compare selected revisions</button>
+    <div ng-hide="!explorationVersionMetadata || compareVersionsButtonIsHidden">
+      <button class="btn protractor-test-show-history-graph" ng-class="{'btn-success': areCompareVersionsSelected(), 'btn-default': !areCompareVersionsSelected()}" ng-click="compareSelectedVersions()" ng-disabled="!areCompareVersionsSelected()">Compare selected revisions</button>
       <div class="version-count-prompt">
         <[versionCountPrompt]>
       </div>

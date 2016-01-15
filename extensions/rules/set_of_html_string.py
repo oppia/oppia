@@ -16,30 +16,17 @@
 
 """Rules for SetOfHtmlString objects."""
 
-__author__ = 'Kevin Lee'
-
 from extensions.rules import base
 
 
 class Equals(base.SetOfHtmlStringRule):
     description = 'is equal to {{x|SetOfHtmlString}}'
-    is_generic = False
-
-    def _evaluate(self, subject):
-        return set(subject) == set(self.x)
 
 
 class ContainsAtLeastOneOf(base.SetOfHtmlStringRule):
     description = 'contains at least one of {{x|SetOfHtmlString}}'
-    is_generic = False
-
-    def _evaluate(self, subject):
-        return any([e in self.x for e in subject])
 
 
+# TODO(wxy): migrate the name of this rule to OmitsAtLeastOneOf
 class DoesNotContainAtLeastOneOf(base.SetOfHtmlStringRule):
-    description = 'does not contain at least one of {{x|SetOfHtmlString}}'
-    is_generic = False
-
-    def _evaluate(self, subject):
-        return any([e not in self.x for e in subject])
+    description = 'omits at least one of {{x|SetOfHtmlString}}'

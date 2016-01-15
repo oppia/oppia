@@ -67,15 +67,8 @@ set -e
 source $(dirname $0)/setup.sh || exit 1
 source $(dirname $0)/setup_gae.sh || exit 1
 
-# Install webtest.
-echo Checking if webtest is installed in third_party
-if [ ! -d "$TOOLS_DIR/webtest-1.4.2" ]; then
-  echo Installing webtest framework
-  # Note that the github URL redirects, so we pass in -L to tell curl to follow the redirect.
-  curl --silent -L https://github.com/Pylons/webtest/archive/1.4.2.zip -o webtest-download.zip
-  unzip webtest-download.zip -d $TOOLS_DIR
-  rm webtest-download.zip
-fi
+# Install third party dependencies
+bash scripts/install_third_party.sh
 
 for arg in "$@"; do
   if [ "$arg" == "--generate_coverage_report" ]; then

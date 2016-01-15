@@ -45,10 +45,10 @@ set -- "${remaining_params[@]}"
 
 echo Checking whether GAE is installed in $GOOGLE_APP_ENGINE_HOME
 if [ ! -f "$GOOGLE_APP_ENGINE_HOME/appcfg.py" ]; then
-  echo Installing Google App Engine
+  echo "Installing Google App Engine (this may take a little while)..."
   mkdir -p $GOOGLE_APP_ENGINE_HOME
   curl --silent https://storage.googleapis.com/appengine-sdks/deprecated/1919/google_appengine_1.9.19.zip -o gae-download.zip
-  unzip gae-download.zip -d $TOOLS_DIR/google_appengine_1.9.19/
+  unzip -q gae-download.zip -d $TOOLS_DIR/google_appengine_1.9.19/
   rm gae-download.zip
 fi
 
@@ -104,6 +104,7 @@ echo Starting GAE development server
 # settings in feconf.py. Be careful with this -- you do not want to spam people
 # accidentally!
 
-$PYTHON_CMD $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=8181 $CLEAR_DATASTORE_ARG .
+
+$NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js start_devserver --gae_devserver_path=$GOOGLE_APP_ENGINE_HOME/dev_appserver.py --clear_datastore=$CLEAR_DATASTORE_ARG
 
 echo Done!

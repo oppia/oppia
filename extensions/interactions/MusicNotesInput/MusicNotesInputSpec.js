@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for the MusicNotesInput interaction.
  *
@@ -68,14 +67,20 @@ describe('MusicNotesInput interaction', function() {
         baseNoteMidiNumber: 71,
         offset: 0,
         noteId: 'note_id_0',
-        noteStart: {'num': 1, 'den': 1}
+        noteStart: {
+          num: 1,
+          den: 1
+        }
       });
       expect(ctrlScope.noteSequence).toEqual([{
         note: {
           baseNoteMidiNumber: 71,
           offset: 0,
           noteId: 'note_id_0',
-          noteStart: {'num': 1, 'den': 1}
+          noteStart: {
+            num: 1,
+            den: 1
+          }
         }
       }]);
 
@@ -83,21 +88,30 @@ describe('MusicNotesInput interaction', function() {
         baseNoteMidiNumber: 72,
         offset: 0,
         noteId: 'note_id_1',
-        noteStart: {'num': 1, 'den': 1}
+        noteStart: {
+          num: 1,
+          den: 1
+        }
       });
       expect(ctrlScope.noteSequence).toEqual([{
         note: {
           baseNoteMidiNumber: 71,
           offset: 0,
           noteId: 'note_id_0',
-          noteStart: {'num': 1, 'den': 1}
+          noteStart: {
+            num: 1,
+            den: 1
+          }
         }
       }, {
         note: {
           baseNoteMidiNumber: 72,
           offset: 0,
           noteId: 'note_id_1',
-          noteStart: {'num': 1, 'den': 1}
+          noteStart: {
+            num: 1,
+            den: 1
+          }
         }
       }]);
     });
@@ -134,7 +148,10 @@ describe('MusicNotesInput interaction', function() {
         baseNoteMidiNumber: 81,
         offset: 0,
         noteId: 'note_id_1',
-        noteStart: {'num': 1, 'den': 1}
+        noteStart: {
+          num: 1,
+          den: 1
+        }
       });
       ctrlScope._removeNotesFromNoteSequenceWithId('note_id_0');
       expect(ctrlScope.noteSequence).toEqual([{
@@ -142,7 +159,10 @@ describe('MusicNotesInput interaction', function() {
           baseNoteMidiNumber: 81,
           offset: 0,
           noteId: 'note_id_1',
-          noteStart: {'num': 1, 'den': 1}
+          noteStart: {
+            num: 1,
+            den: 1
+          }
         }
       }]);
     });
@@ -155,7 +175,10 @@ describe('MusicNotesInput interaction', function() {
         baseNoteMidiNumber: 64,
         offset: 0,
         noteId: 'note_id_0',
-        noteStart: {'num': 1, 'den': 1}
+        noteStart: {
+          num: 1,
+          den: 1
+        }
       });
       ctrlScope._removeNotesFromNoteSequenceWithId('note_id_1');
       expect(ctrlScope.noteSequence).toEqual([{
@@ -163,7 +186,10 @@ describe('MusicNotesInput interaction', function() {
           baseNoteMidiNumber: 64,
           offset: 0,
           noteId: 'note_id_0',
-          noteStart: {'num': 1, 'den': 1}
+          noteStart: {
+            num: 1,
+            den: 1
+          }
         }
       }]);
     });
@@ -183,7 +209,6 @@ describe('MusicNotesInput interaction', function() {
   });
 });
 
-
 describe('Music phrase player service', function() {
   beforeEach(module('oppia'));
 
@@ -196,15 +221,15 @@ describe('Music phrase player service', function() {
       // to include MIDI in the future, we will remember to swap
       // it out with a dummy MIDI and back again after the test.
       if ($window.MIDI) {
-        throw 'Expected MIDI library not to show up in tests.'
+        throw 'Expected MIDI library not to show up in tests.';
       }
 
       $window.MIDI = {
         Player: {
           stop: function() {}
         },
-        chordOn: function(channel, notes, velocity, delay) {},
-        chordOff: function(channel, notes, delay) {}
+        chordOn: function() {},
+        chordOff: function() {}
       };
       spyOn($window.MIDI.Player, 'stop');
       spyOn($window.MIDI, 'chordOn');
@@ -215,12 +240,14 @@ describe('Music phrase player service', function() {
       $window.MIDI = undefined;
     }));
 
-    it('should stop any existing playthroughs when a new play is requested', function() {
+    it('should stop any existing playthroughs when a new play is requested',
+        function() {
       mpps.playMusicPhrase([]);
       expect(MIDI.Player.stop).toHaveBeenCalled();
     });
 
-    it('should play all the notes in a music phrase', inject(function($timeout) {
+    it('should play all the notes in a music phrase',
+        inject(function($timeout) {
       mpps.playMusicPhrase([{
         midiValue: 69,
         duration: 2,

@@ -14,8 +14,6 @@
 
 """Tests for the moderator page."""
 
-__author__ = 'Yana Malysheva'
-
 from core.tests import test_utils
 
 
@@ -31,14 +29,7 @@ class ModeratorTest(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         response = self.testapp.get('/moderator', expect_errors=True)
-        csrf_token = self.get_csrf_token_from_response(response)
         self.assertEqual(response.status_int, 401)
-        response = self.post_json(
-            '/moderatorhandler/user_services',
-            {'username': 'username'},
-            csrf_token=csrf_token,
-            expect_errors=True,
-            expected_status_int=401)
         self.logout()
 
         # Try accessing the moderator page after logging in as a moderator.

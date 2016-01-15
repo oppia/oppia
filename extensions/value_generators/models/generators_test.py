@@ -16,8 +16,6 @@
 
 """Tests for value generators."""
 
-__author__ = 'Sean Lip'
-
 from core.tests import test_utils
 from extensions.value_generators.models import generators
 

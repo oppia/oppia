@@ -14,8 +14,6 @@
 
 """Tests for various static pages (like the About page)."""
 
-__author__ = 'Sean Lip'
-
 from core.tests import test_utils
 
 

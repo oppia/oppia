@@ -16,8 +16,6 @@
 
 """Tests for subscription management."""
 
-__author__ = 'Sean Lip'
-
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -26,10 +24,17 @@ from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.platform import models
-(user_models,) = models.Registry.import_models([
-    models.NAMES.user
-])
 from core.tests import test_utils
+
+(user_models,) = models.Registry.import_models([models.NAMES.user])
+
+COLLECTION_ID = 'col_id'
+COLLECTION_ID_2 = 'col_id_2'
+EXP_ID = 'exp_id'
+EXP_ID_2 = 'exp_id_2'
+FEEDBACK_THREAD_ID = 'fthread_id'
+FEEDBACK_THREAD_ID_2 = 'fthread_id_2'
+USER_ID = 'user_id'
 
 
 class SubscriptionsTest(test_utils.GenericTestBase):
@@ -72,10 +77,8 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             if subscriptions_model else [])
 
     def test_subscribe_to_feedback_thread(self):
-        USER_ID = 'user_id'
         self.assertEqual(self._get_thread_ids_subscribed_to(USER_ID), [])
 
-        FEEDBACK_THREAD_ID = 'fthread_id'
         subscription_services.subscribe_to_thread(USER_ID, FEEDBACK_THREAD_ID)
         self.assertEqual(
             self._get_thread_ids_subscribed_to(USER_ID), [FEEDBACK_THREAD_ID])
@@ -85,18 +88,15 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_thread_ids_subscribed_to(USER_ID), [FEEDBACK_THREAD_ID])
 
-        FEEDBACK_THREAD_2_ID = 'fthread_id_2'
         subscription_services.subscribe_to_thread(
-            USER_ID, FEEDBACK_THREAD_2_ID)
+            USER_ID, FEEDBACK_THREAD_ID_2)
         self.assertEqual(
             self._get_thread_ids_subscribed_to(USER_ID),
-            [FEEDBACK_THREAD_ID, FEEDBACK_THREAD_2_ID])
+            [FEEDBACK_THREAD_ID, FEEDBACK_THREAD_ID_2])
 
     def test_subscribe_to_exploration(self):
-        USER_ID = 'user_id'
         self.assertEqual(self._get_exploration_ids_subscribed_to(USER_ID), [])
 
-        EXP_ID = 'exp_id'
         subscription_services.subscribe_to_exploration(USER_ID, EXP_ID)
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(USER_ID), [EXP_ID])
@@ -106,34 +106,27 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(USER_ID), [EXP_ID])
 
-        EXP_2_ID = 'exp_id_2'
-        subscription_services.subscribe_to_exploration(USER_ID, EXP_2_ID)
+        subscription_services.subscribe_to_exploration(USER_ID, EXP_ID_2)
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(USER_ID),
-            [EXP_ID, EXP_2_ID])
+            [EXP_ID, EXP_ID_2])
 
     def test_get_exploration_ids_subscribed_to(self):
-        USER_ID = 'user_id'
         self.assertEqual(
             subscription_services.get_exploration_ids_subscribed_to(
                 USER_ID), [])
 
-        EXP_ID = 'exp_id'
         subscription_services.subscribe_to_exploration(USER_ID, EXP_ID)
         self.assertEqual(
             subscription_services.get_exploration_ids_subscribed_to(USER_ID),
-                [EXP_ID])
+            [EXP_ID])
 
-        EXP_2_ID = 'exp_id_2'
-        subscription_services.subscribe_to_exploration(USER_ID, EXP_2_ID)
+        subscription_services.subscribe_to_exploration(USER_ID, EXP_ID_2)
         self.assertEqual(
             subscription_services.get_exploration_ids_subscribed_to(USER_ID),
-            [EXP_ID, EXP_2_ID])
+            [EXP_ID, EXP_ID_2])
 
     def test_thread_and_exploration_subscriptions_are_tracked_individually(self):
-        USER_ID = 'user_id'
-        FEEDBACK_THREAD_ID = 'fthread_id'
-        EXP_ID = 'exp_id'
         self.assertEqual(self._get_thread_ids_subscribed_to(USER_ID), [])
 
         subscription_services.subscribe_to_thread(USER_ID, FEEDBACK_THREAD_ID)
@@ -145,21 +138,21 @@ class SubscriptionsTest(test_utils.GenericTestBase):
 
     def test_posting_to_feedback_thread_results_in_subscription(self):
         # The viewer posts a message to the thread.
-        MESSAGE_TEXT = 'text'
+        message_text = 'text'
         feedback_services.create_thread(
-            'exp_id', 'state_name', self.viewer_id, 'subject', MESSAGE_TEXT)
+            'exp_id', 'state_name', self.viewer_id, 'subject', message_text)
 
         thread_ids_subscribed_to = self._get_thread_ids_subscribed_to(
             self.viewer_id)
         self.assertEqual(len(thread_ids_subscribed_to), 1)
         thread_id = thread_ids_subscribed_to[0]
         self.assertEqual(
-            feedback_services.get_messages(thread_id)[0]['text'], MESSAGE_TEXT)
+            feedback_services.get_messages(thread_id)[0]['text'], message_text)
 
         # The editor posts a follow-up message to the thread.
-        NEW_MESSAGE_TEXT = 'new text'
+        new_message_text = 'new text'
         feedback_services.create_message(
-            thread_id, self.editor_id, '', '', NEW_MESSAGE_TEXT)
+            thread_id, self.editor_id, '', '', new_message_text)
 
         # The viewer and editor are now both subscribed to the thread.
         self.assertEqual(
@@ -168,9 +161,6 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             self._get_thread_ids_subscribed_to(self.editor_id), [thread_id])
 
     def test_creating_exploration_results_in_subscription(self):
-        EXP_ID = 'exp_id'
-        USER_ID = 'user_id'
-
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(USER_ID), [])
         exp_services.save_new_exploration(
@@ -181,7 +171,6 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             self._get_exploration_ids_subscribed_to(USER_ID), [EXP_ID])
 
     def test_adding_new_exploration_owner_or_editor_role_results_in_subscription(self):
-        EXP_ID = 'exp_id'
         exploration = exp_domain.Exploration.create_default_exploration(
             EXP_ID, 'Title', 'Category')
         exp_services.save_new_exploration(self.owner_id, exploration)
@@ -201,7 +190,6 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             self._get_exploration_ids_subscribed_to(self.editor_id), [EXP_ID])
 
     def test_adding_new_exploration_viewer_role_does_not_result_in_subscription(self):
-        EXP_ID = 'exp_id'
         exploration = exp_domain.Exploration.create_default_exploration(
             EXP_ID, 'Title', 'Category')
         exp_services.save_new_exploration(self.owner_id, exploration)
@@ -214,7 +202,6 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             self._get_exploration_ids_subscribed_to(self.viewer_id), [])
 
     def test_deleting_exploration_does_not_delete_subscription(self):
-        EXP_ID = 'exp_id'
         exploration = exp_domain.Exploration.create_default_exploration(
             EXP_ID, 'Title', 'Category')
         exp_services.save_new_exploration(self.owner_id, exploration)
@@ -226,10 +213,8 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             self._get_exploration_ids_subscribed_to(self.owner_id), [EXP_ID])
 
     def test_subscribe_to_collection(self):
-        USER_ID = 'user_id'
         self.assertEqual(self._get_collection_ids_subscribed_to(USER_ID), [])
 
-        COLLECTION_ID = 'col_id'
         subscription_services.subscribe_to_collection(USER_ID, COLLECTION_ID)
         self.assertEqual(
             self._get_collection_ids_subscribed_to(USER_ID), [COLLECTION_ID])
@@ -239,34 +224,27 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_collection_ids_subscribed_to(USER_ID), [COLLECTION_ID])
 
-        COLLECTION_ID_2 = 'col_id_2'
         subscription_services.subscribe_to_collection(USER_ID, COLLECTION_ID_2)
         self.assertEqual(
             self._get_collection_ids_subscribed_to(USER_ID),
             [COLLECTION_ID, COLLECTION_ID_2])
 
     def test_get_collection_ids_subscribed_to(self):
-        USER_ID = 'user_id'
         self.assertEqual(
             subscription_services.get_collection_ids_subscribed_to(
                 USER_ID), [])
 
-        COLLECTION_ID = 'col_id'
         subscription_services.subscribe_to_collection(USER_ID, COLLECTION_ID)
         self.assertEqual(
             subscription_services.get_collection_ids_subscribed_to(USER_ID),
-                [COLLECTION_ID])
+            [COLLECTION_ID])
 
-        COLLECTION_ID_2 = 'col_id_2'
         subscription_services.subscribe_to_collection(USER_ID, COLLECTION_ID_2)
         self.assertEqual(
             subscription_services.get_collection_ids_subscribed_to(USER_ID),
             [COLLECTION_ID, COLLECTION_ID_2])
 
     def test_creating_collection_results_in_subscription(self):
-        COLLECTION_ID = 'col_id'
-        USER_ID = 'user_id'
-
         self.assertEqual(
             self._get_collection_ids_subscribed_to(USER_ID), [])
         self.save_new_default_collection(COLLECTION_ID, USER_ID)
@@ -274,7 +252,6 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             self._get_collection_ids_subscribed_to(USER_ID), [COLLECTION_ID])
 
     def test_adding_new_collection_owner_or_editor_role_results_in_subscription(self):
-        COLLECTION_ID = 'col_id'
         self.save_new_default_collection(COLLECTION_ID, self.owner_id)
 
         self.assertEqual(
@@ -296,7 +273,6 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             [COLLECTION_ID])
 
     def test_adding_new_collection_viewer_role_does_not_result_in_subscription(self):
-        COLLECTION_ID = 'col_id'
         self.save_new_default_collection(COLLECTION_ID, self.owner_id)
 
         self.assertEqual(
@@ -308,7 +284,6 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             self._get_collection_ids_subscribed_to(self.viewer_id), [])
 
     def test_deleting_collection_does_not_delete_subscription(self):
-        COLLECTION_ID = 'col_id'
         self.save_new_default_collection(COLLECTION_ID, self.owner_id)
         self.assertEqual(
             self._get_collection_ids_subscribed_to(self.owner_id),
@@ -321,8 +296,6 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             [COLLECTION_ID])
 
     def test_adding_exploration_to_collection_does_not_create_subscription(self):
-        COLLECTION_ID = 'col_id'
-        EXP_ID = 'exp_id'
         self.save_new_default_collection(COLLECTION_ID, self.owner_id)
 
         # The author is subscribed to the collection but to no explorations.

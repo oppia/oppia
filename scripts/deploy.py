@@ -59,9 +59,9 @@ _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
     '--app_name', help='name of the app to deploy to', type=str)
 
-parsed_args = _PARSER.parse_args()
-if parsed_args.app_name:
-    APP_NAME = parsed_args.app_name
+PARSED_ARGS = _PARSER.parse_args()
+if PARSED_ARGS.app_name:
+    APP_NAME = PARSED_ARGS.app_name
 else:
     raise Exception('No app name specified.')
 
@@ -77,8 +77,11 @@ APPCFG_PATH = os.path.join(
     'appcfg.py')
 
 LOG_FILE_PATH = os.path.join('..', 'deploy.log')
-
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
+DEPLOY_DATA_PATH = os.path.join(os.getcwd(), '..', 'deploy_data', APP_NAME)
+
+SPLASH_PAGE_FILES = ['favicon.ico']
+IMAGE_DIRS = ['avatar', 'splash', 'sidebar', 'logo']
 
 
 def preprocess_release():
@@ -99,10 +102,6 @@ def preprocess_release():
     d.write(content)
 
     # Substitute image files for the splash page.
-    SPLASH_PAGE_FILES = ['favicon.ico']
-    DEPLOY_DATA_PATH = os.path.join(
-        os.getcwd(), '..', 'deploy_data', APP_NAME)
-
     if not os.path.exists(DEPLOY_DATA_PATH):
         raise Exception(
             'Could not find deploy_data directory at %s' % DEPLOY_DATA_PATH)
@@ -120,7 +119,6 @@ def preprocess_release():
                 'updated in the meantime?' % dst)
         shutil.copyfile(src, dst)
 
-    IMAGE_DIRS = ['avatar', 'splash', 'sidebar', 'logo']
     for dir_name in IMAGE_DIRS:
         src_dir = os.path.join(DEPLOY_DATA_PATH, 'images', dir_name)
         dst_dir = os.path.join(os.getcwd(), 'static', 'images', dir_name)
@@ -137,66 +135,71 @@ def preprocess_release():
             shutil.copyfile(src, dst)
 
 
-# Check that the current directory is correct.
-common.require_cwd_to_be_oppia()
+def _execute_deployment():
+    # Check that the current directory is correct.
+    common.require_cwd_to_be_oppia()
 
-CURRENT_GIT_VERSION = subprocess.check_output(
-    ['git', 'rev-parse', 'HEAD']).strip()
+    current_git_revision = subprocess.check_output(
+        ['git', 'rev-parse', 'HEAD']).strip()
 
-print ''
-print 'Starting deployment process.'
+    print ''
+    print 'Starting deployment process.'
 
-if not os.path.exists(THIRD_PARTY_DIR):
-    raise Exception(
-        'Could not find third_party directory at %s. Please run start.sh '
-        'prior to running this script.' % THIRD_PARTY_DIR)
-
-# Create a folder in which to save the release candidate.
-print 'Ensuring that the release directory parent exists'
-common.ensure_directory_exists(os.path.dirname(RELEASE_DIR_PATH))
-
-# Copy files to the release directory. Omits the .git subfolder.
-print 'Copying files to the release directory'
-shutil.copytree(
-    os.getcwd(), RELEASE_DIR_PATH, ignore=shutil.ignore_patterns('.git'))
-
-# Change the current directory to the release candidate folder.
-with common.CD(RELEASE_DIR_PATH):
-    if not os.getcwd().endswith(RELEASE_DIR_NAME):
+    if not os.path.exists(THIRD_PARTY_DIR):
         raise Exception(
-            'Invalid directory accessed during deployment: %s' % os.getcwd())
+            'Could not find third_party directory at %s. Please run start.sh '
+            'prior to running this script.' % THIRD_PARTY_DIR)
 
-    print 'Changing directory to %s' % os.getcwd()
+    # Create a folder in which to save the release candidate.
+    print 'Ensuring that the release directory parent exists'
+    common.ensure_directory_exists(os.path.dirname(RELEASE_DIR_PATH))
 
-    print 'Preprocessing release...'
-    preprocess_release()
+    # Copy files to the release directory. Omits the .git subfolder.
+    print 'Copying files to the release directory'
+    shutil.copytree(
+        os.getcwd(), RELEASE_DIR_PATH, ignore=shutil.ignore_patterns('.git'))
 
-    # Do a build; ensure there are no errors.
-    print 'Building and minifying scripts...'
-    subprocess.check_output(['python', 'scripts/build.py'])
+    # Change the current directory to the release candidate folder.
+    with common.CD(RELEASE_DIR_PATH):
+        if not os.getcwd().endswith(RELEASE_DIR_NAME):
+            raise Exception(
+                'Invalid directory accessed during deployment: %s' % os.getcwd())
 
-    # Run the tests; ensure there are no errors.
-    print 'Running tests...'
-    tests_proc = subprocess.Popen([
-        'bash', os.path.join('scripts', 'run_tests.sh')],
-        stdout=subprocess.PIPE)
-    tests_stdout, tests_stderr = tests_proc.communicate()
-    print tests_stdout
-    print tests_stderr
+        print 'Changing directory to %s' % os.getcwd()
 
-    if tests_proc.returncode != 0:
-        raise Exception('Tests failed. Halting deployment.')
+        print 'Preprocessing release...'
+        preprocess_release()
 
-    # Deploy to GAE.
-    subprocess.check_output([APPCFG_PATH, 'update', '.', '--oauth2'])
+        # Do a build; ensure there are no errors.
+        print 'Building and minifying scripts...'
+        subprocess.check_output(['python', 'scripts/build.py'])
 
-    # Writing log entry.
-    common.ensure_directory_exists(os.path.dirname(LOG_FILE_PATH))
-    with open(LOG_FILE_PATH, 'a') as log_file:
-        log_file.write('Successfully deployed to %s at %s (version %s)\n' % (
-            APP_NAME, CURRENT_DATETIME.strftime('%Y-%m-%d %H:%M:%S'),
-            CURRENT_GIT_VERSION))
+        # Run the tests; ensure there are no errors.
+        print 'Running tests...'
+        tests_proc = subprocess.Popen([
+            'bash', os.path.join('scripts', 'run_tests.sh')
+        ], stdout=subprocess.PIPE)
+        tests_stdout, tests_stderr = tests_proc.communicate()
+        print tests_stdout
+        print tests_stderr
 
-    print 'Returning to oppia/ root directory.'
+        if tests_proc.returncode != 0:
+            raise Exception('Tests failed. Halting deployment.')
 
-print 'Done!'
+        # Deploy to GAE.
+        subprocess.check_output([APPCFG_PATH, 'update', '.', '--oauth2'])
+
+        # Writing log entry.
+        common.ensure_directory_exists(os.path.dirname(LOG_FILE_PATH))
+        with open(LOG_FILE_PATH, 'a') as log_file:
+            log_file.write('Successfully deployed to %s at %s (version %s)\n' % (
+                APP_NAME, CURRENT_DATETIME.strftime('%Y-%m-%d %H:%M:%S'),
+                current_git_revision))
+
+        print 'Returning to oppia/ root directory.'
+
+    print 'Done!'
+
+
+if __name__ == '__main__':
+    _execute_deployment()

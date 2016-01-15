@@ -16,8 +16,6 @@
 
 """Job registries."""
 
-__author__ = 'Sean Lip'
-
 from core.domain import exp_jobs_continuous
 from core.domain import exp_jobs_one_off
 from core.domain import feedback_jobs_continuous
@@ -31,11 +29,14 @@ from core.domain import user_jobs_one_off
 # on the admin dashboard.
 ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.DashboardSubscriptionsOneOffJob,
-    exp_jobs_one_off.ExplorationFirstPublishedOneOffJob,
     exp_jobs_one_off.IndexAllExplorationsJobManager,
     exp_jobs_one_off.ExpSummariesCreationOneOffJob,
     exp_jobs_one_off.ExplorationValidityJobManager,
     stats_jobs_one_off.StatisticsAudit,
+    user_jobs_one_off.UserContributionsOneOffJob,
+    exp_jobs_one_off.ExplorationFirstPublishedOneOffJob,
+    exp_jobs_one_off.ExpSummariesContributorsOneOffJob,
+    user_jobs_one_off.UserFirstContributionMsecOneOffJob,
     exp_jobs_one_off.ExplorationMigrationJobManager]
 
 # List of all ContinuousComputation managers to show controls for on the
@@ -46,6 +47,7 @@ ALL_CONTINUOUS_COMPUTATION_MANAGERS = [
     exp_jobs_continuous.SearchRanker,
     stats_jobs_continuous.StatisticsAggregator,
     user_jobs_continuous.DashboardRecentUpdatesAggregator,
+    user_jobs_continuous.UserImpactAggregator,
     feedback_jobs_continuous.FeedbackAnalyticsAggregator,
     recommendations_jobs_continuous.ExplorationRecommendationsAggregator]
 

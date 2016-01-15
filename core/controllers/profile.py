@@ -14,10 +14,9 @@
 
 """Controllers for the profile page."""
 
-__author__ = 'sfederwisch@google.com (Stephanie Federwisch)'
-
 from core.controllers import base
 from core.domain import email_manager
+from core.domain import summary_services
 from core.domain import user_services
 import feconf
 import utils
@@ -53,6 +52,7 @@ class ProfilePage(base.BaseHandler):
             raise self.PageNotFoundException
 
         user_settings = user_services.get_user_settings_from_username(username)
+
         if not user_settings:
             raise self.PageNotFoundException
 
@@ -77,12 +77,30 @@ class ProfileHandler(base.BaseHandler):
         if not user_settings:
             raise self.PageNotFoundException
 
+        created_exp_summary_dicts = []
+        edited_exp_summary_dicts = []
+
+        user_contributions = user_services.get_user_contributions(
+            user_settings.user_id)
+        if user_contributions:
+            created_exp_summary_dicts = (
+                summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                    user_contributions.created_exploration_ids))
+            edited_exp_summary_dicts = (
+                summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                    user_contributions.edited_exploration_ids))
+
         self.values.update({
             'user_bio': user_settings.user_bio,
-            'first_contribution_datetime': (
-                utils.get_time_in_millisecs(user_settings.first_contribution_datetime)
-                if user_settings.first_contribution_datetime else None),
+            'subject_interests': user_settings.subject_interests,
+            'first_contribution_msec': (
+                user_settings.first_contribution_msec
+                if user_settings.first_contribution_msec else None),
             'profile_picture_data_url': user_settings.profile_picture_data_url,
+            'user_impact_score':user_services.get_user_impact_score(
+                user_settings.user_id),
+            'created_exp_summary_dicts': created_exp_summary_dicts,
+            'edited_exp_summary_dicts': edited_exp_summary_dicts,
         })
         self.render_json(self.values)
 
@@ -97,11 +115,8 @@ class PreferencesPage(base.BaseHandler):
         """Handles GET requests."""
         self.values.update({
             'nav_mode': feconf.NAV_MODE_PROFILE,
-            'LANGUAGE_CODES_AND_NAMES': [{
-                'code': lc['code'],
-                'name': utils.get_short_language_description(
-                    lc['description']),
-            } for lc in feconf.ALL_LANGUAGE_CODES],
+            'LANGUAGE_CODES_AND_NAMES': (
+                utils.get_all_language_codes_and_names()),
         })
         self.render_template(
             'profile/preferences.html', redirect_url_on_logout='/')
@@ -120,6 +135,7 @@ class PreferencesHandler(base.BaseHandler):
             'preferred_language_codes': user_settings.preferred_language_codes,
             'profile_picture_data_url': user_settings.profile_picture_data_url,
             'user_bio': user_settings.user_bio,
+            'subject_interests': user_settings.subject_interests,
             'can_receive_email_updates': user_services.get_email_preferences(
                 self.user_id)['can_receive_email_updates'],
         })
@@ -133,6 +149,8 @@ class PreferencesHandler(base.BaseHandler):
 
         if update_type == 'user_bio':
             user_services.update_user_bio(self.user_id, data)
+        elif update_type == 'subject_interests':
+            user_services.update_subject_interests(self.user_id, data)
         elif update_type == 'preferred_language_codes':
             user_services.update_preferred_language_codes(self.user_id, data)
         elif update_type == 'profile_picture_data_url':
@@ -167,9 +185,11 @@ class ProfilePictureHandlerByUsername(base.BaseHandler):
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.PageNotFoundException
+
         user_settings = user_services.get_user_settings(user_id)
         self.values.update({
-            'profile_picture_data_url_for_username': user_settings.profile_picture_data_url
+            'profile_picture_data_url_for_username': (
+                user_settings.profile_picture_data_url)
         })
         self.render_json(self.values)
 

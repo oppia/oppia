@@ -65,13 +65,13 @@ class StatisticsAudit(jobs.BaseMapReduceJobManager):
         # If the code reaches this point, we are looking at values that
         # correspond to each version of a particular exploration.
 
-        # These variables correspond to the _VERSION_ALL version.
+        # These variables correspond to the VERSION_ALL version.
         all_starts = 0
         all_completions = 0
         all_state_hit = collections.defaultdict(int)
 
         # These variables correspond to the sum of counts for all other
-        # versions besides _VERSION_ALL.
+        # versions besides VERSION_ALL.
         sum_starts = 0
         sum_completions = 0
         sum_state_hit = collections.defaultdict(int)
@@ -94,7 +94,7 @@ class StatisticsAudit(jobs.BaseMapReduceJobManager):
                     key, value['version'], value['completions'],
                     value['starts']),)
 
-            if value['version'] == stats_jobs_continuous._VERSION_ALL:
+            if value['version'] == stats_jobs_continuous.VERSION_ALL:
                 all_starts = value['starts']
                 all_completions = value['completions']
                 for (state_name, counts) in value['state_hit'].iteritems():
@@ -106,10 +106,12 @@ class StatisticsAudit(jobs.BaseMapReduceJobManager):
                     sum_state_hit[state_name] += counts['first_entry_count']
 
         if sum_starts != all_starts:
-            yield ('Non-all != all for starts: exp_id:%s sum: %s all: %s'
+            yield (
+                'Non-all != all for starts: exp_id:%s sum: %s all: %s'
                 % (key, sum_starts, all_starts),)
         if sum_completions != all_completions:
-            yield ('Non-all != all for completions: exp_id:%s sum: %s all: %s'
+            yield (
+                'Non-all != all for completions: exp_id:%s sum: %s all: %s'
                 % (key, sum_completions, all_completions),)
 
         for state_name in all_state_hit:

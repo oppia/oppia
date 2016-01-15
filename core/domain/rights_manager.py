@@ -16,22 +16,19 @@
 
 """Domain objects and functions that manage rights for various user actions."""
 
-__author__ = 'Sean Lip'
-
-
 import logging
 
 from core.domain import config_domain
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
+import feconf
+import utils
+
 current_user_services = models.Registry.import_current_user_services()
 (collection_models, exp_models,) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.exploration
 ])
-import feconf
-import utils
-
 
 # IMPORTANT: Ensure that all changes to how these cmds are interpreted preserve
 # backward-compatibility with previous exploration snapshots in the datastore.
@@ -76,7 +73,7 @@ class ActivityRights(object):
         self.cloned_from = cloned_from
         self.status = status
         self.viewable_if_private = viewable_if_private
-        self.first_published_msec=first_published_msec
+        self.first_published_msec = first_published_msec
 
     def validate(self):
         """Validates an ActivityRights object.
@@ -189,12 +186,14 @@ def _save_activity_rights(
 # TODO(msl): get rid of inline imports by refactoring code
 def _update_exploration_summary(activity_rights):
     from core.domain import exp_services
-    exp_services.update_exploration_summary(activity_rights.id)
+    exp_services.update_exploration_summary(
+        activity_rights.id, None)
 
 
 def _update_collection_summary(activity_rights):
     from core.domain import collection_services
-    collection_services.update_collection_summary(activity_rights.id)
+    collection_services.update_collection_summary(
+        activity_rights.id, None)
 
 
 def _update_activity_summary(activity_type, activity_rights):
@@ -204,18 +203,23 @@ def _update_activity_summary(activity_type, activity_rights):
         _update_collection_summary(activity_rights)
 
 
-def update_activity_first_published_msec_if_necessary(
-    activity_type, activity_id, first_published_msec):
+def update_activity_first_published_msec(
+        activity_type, activity_id, first_published_msec):
+    """Updates the first_published_msec field for an activity. This is only
+    called during the one-off job ExplorationFirstPublishedOneOffJob. Callers
+    are responsible for ensuring that this value is not already set before
+    updating it.
+    """
     activity_rights = _get_activity_rights(activity_type, activity_id)
-    if activity_rights.first_published_msec is None:
-        activity_rights.first_published_msec = first_published_msec
-        commit_cmds = [{
-            'cmd': CMD_UPDATE_FIRST_PUBLISHED_MSEC,
-            'first_published': first_published_msec
-        }]
-        _save_activity_rights(
-            feconf.SYSTEM_COMMITTER_ID, activity_rights, activity_type,
-            'set first published time in msec', commit_cmds)
+    commit_cmds = [{
+        'cmd': CMD_UPDATE_FIRST_PUBLISHED_MSEC,
+        'old_first_published_msec': activity_rights.first_published_msec,
+        'new_first_published_msec': first_published_msec
+    }]
+    activity_rights.first_published_msec = first_published_msec
+    _save_activity_rights(
+        feconf.SYSTEM_COMMITTER_ID, activity_rights, activity_type,
+        'set first published time in msec', commit_cmds)
 
 
 def create_new_exploration_rights(exploration_id, committer_id):
@@ -231,7 +235,7 @@ def create_new_exploration_rights(exploration_id, committer_id):
         community_owned=exploration_rights.community_owned,
         status=exploration_rights.status,
         viewable_if_private=exploration_rights.viewable_if_private,
-        first_published_msec=exploration_rights.first_published_msec
+        first_published_msec=exploration_rights.first_published_msec,
     ).commit(committer_id, 'Created new exploration', commit_cmds)
 
     subscription_services.subscribe_to_exploration(
@@ -363,17 +367,14 @@ class Actor(object):
     def _can_delete(self, rights_object):
         is_deleting_own_private_object = (
             rights_object.status == ACTIVITY_STATUS_PRIVATE and
-            self._is_owner(rights_object)
-        )
+            self._is_owner(rights_object))
 
-        is_moderator_deleting_public_object = (
+        is_mod_deleting_public_object = (
             rights_object.status == ACTIVITY_STATUS_PUBLIC and
-            self.is_moderator()
-        )
+            self.is_moderator())
 
         return (
-            is_deleting_own_private_object or
-            is_moderator_deleting_public_object)
+            is_deleting_own_private_object or is_mod_deleting_public_object)
 
     def is_owner(self, activity_type, activity_id):
         activity_rights = _get_activity_rights(activity_type, activity_id)
@@ -450,6 +451,7 @@ class Actor(object):
             return False
         if activity_rights.community_owned:
             return False
+
         return self.is_moderator()
 
     def can_modify_roles(self, activity_type, activity_id):
@@ -516,7 +518,7 @@ def _assign_role(
     old_role = ROLE_NONE
 
     if new_role == ROLE_OWNER:
-        if Actor(assignee_id)._is_owner(activity_rights):
+        if Actor(assignee_id)._is_owner(activity_rights):  # pylint: disable=protected-access
             raise Exception('This user already owns this %s.' % activity_type)
 
         activity_rights.owner_ids.append(assignee_id)
@@ -529,7 +531,7 @@ def _assign_role(
             old_role = ROLE_EDITOR
 
     elif new_role == ROLE_EDITOR:
-        if Actor(assignee_id)._has_editing_rights(activity_rights):
+        if Actor(assignee_id)._has_editing_rights(activity_rights):  # pylint: disable=protected-access
             raise Exception(
                 'This user already can edit this %s.'  % activity_type)
 
@@ -544,7 +546,7 @@ def _assign_role(
             old_role = ROLE_VIEWER
 
     elif new_role == ROLE_VIEWER:
-        if Actor(assignee_id)._has_viewing_rights(activity_rights):
+        if Actor(assignee_id)._has_viewing_rights(activity_rights):  # pylint: disable=protected-access
             raise Exception(
                 'This user already can view this %s.' % activity_type)
 
@@ -628,6 +630,12 @@ def _change_activity_status(
         committer_id, activity_rights, activity_type, commit_message,
         commit_cmds)
     _update_activity_summary(activity_type, activity_rights)
+
+    if new_status != ACTIVITY_STATUS_PRIVATE:
+        # Change first_published_msec in activity rights if necessary.
+        if activity_rights.first_published_msec is None:
+            activity_rights.first_published_msec = (
+                utils.get_current_time_in_millisecs())
 
 
 def _publish_activity(committer_id, activity_id, activity_type):
@@ -752,7 +760,8 @@ def set_private_viewability_of_exploration(
 
 
 def publish_exploration(committer_id, exploration_id):
-    """Publish an exploration. Commits changes.
+    """This is called by the publish_exploration_and_update_user_profiles
+    function in exp_services.py. It publishes an exploration and commits changes.
 
     It is the responsibility of the caller to check that the exploration is
     valid prior to publication.
@@ -816,7 +825,9 @@ def release_ownership_of_collection(committer_id, collection_id):
 
 
 def publish_collection(committer_id, collection_id):
-    """Publish an collection. Commits changes.
+    """This is called by the publish_collection_and_update_user_profiles
+    function in collection_services.py. It publishes an collection and commits
+    changes.
 
     It is the responsibility of the caller to check that the collection is
     valid prior to publication.

@@ -14,10 +14,6 @@
 
 """Tests for the page that allows learners to play through a collection."""
 
-__author__ = 'Ben Henning'
-
-from core.controllers import collection_viewer
-from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import rights_manager
 from core.tests import test_utils
@@ -28,18 +24,19 @@ class CollectionViewerPermissionsTest(test_utils.GenericTestBase):
     """Test permissions for learners to view collections."""
 
     COLLECTION_ID = 'cid'
+    OTHER_EDITOR_EMAIL = 'another@example.com'
 
     def setUp(self):
         """Before each individual test, create a dummy collection."""
         super(CollectionViewerPermissionsTest, self).setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.EDITOR_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.NEW_USER_ID = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
-        self.save_new_valid_collection(self.COLLECTION_ID, self.EDITOR_ID)
+        self.save_new_valid_collection(self.COLLECTION_ID, self.editor_id)
 
     def test_unpublished_collections_are_invisible_to_logged_out_users(self):
         response = self.testapp.get(
@@ -56,13 +53,11 @@ class CollectionViewerPermissionsTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_unpublished_collections_are_invisible_to_other_editors(self):
-        OTHER_EDITOR_EMAIL = 'another@example.com'
-        self.signup(OTHER_EDITOR_EMAIL, 'othereditorusername')
+        self.signup(self.OTHER_EDITOR_EMAIL, 'othereditorusername')
 
-        other_collection = self.save_new_valid_collection(
-          'cid2', OTHER_EDITOR_EMAIL)
+        self.save_new_valid_collection('cid2', self.OTHER_EDITOR_EMAIL)
 
-        self.login(OTHER_EDITOR_EMAIL)
+        self.login(self.OTHER_EDITOR_EMAIL)
         response = self.testapp.get(
             '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID),
             expect_errors=True)
@@ -86,7 +81,7 @@ class CollectionViewerPermissionsTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_published_collections_are_visible_to_logged_out_users(self):
-        rights_manager.publish_collection(self.EDITOR_ID, self.COLLECTION_ID)
+        rights_manager.publish_collection(self.editor_id, self.COLLECTION_ID)
 
         response = self.testapp.get(
             '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID),
@@ -94,7 +89,7 @@ class CollectionViewerPermissionsTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
 
     def test_published_collections_are_visible_to_logged_in_users(self):
-        rights_manager.publish_collection(self.EDITOR_ID, self.COLLECTION_ID)
+        rights_manager.publish_collection(self.editor_id, self.COLLECTION_ID)
 
         self.login(self.NEW_USER_EMAIL)
         response = self.testapp.get(
@@ -110,7 +105,7 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
         super(CollectionViewerControllerEndToEndTests, self).setUp()
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.VIEWER_ID = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
     def test_welcome_collection(self):
         """Test a learner's progression through the default collection."""
@@ -142,7 +137,7 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
         # 'Complete' the first exploration. This should lead to 3 more being
         # suggested to the learner.
         collection_services.record_played_exploration_in_collection_context(
-            self.VIEWER_ID, '0', '0')
+            self.viewer_id, '0', '0')
         response_dict = self.get_json(
             '%s/0' % feconf.COLLECTION_DATA_URL_PREFIX)
         collection_dict = response_dict['collection']
@@ -153,7 +148,7 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
 
         # Completing the 'Solar System' exploration results in no branching.
         collection_services.record_played_exploration_in_collection_context(
-            self.VIEWER_ID, '0', '13')
+            self.viewer_id, '0', '13')
         response_dict = self.get_json(
             '%s/0' % feconf.COLLECTION_DATA_URL_PREFIX)
         collection_dict = response_dict['collection']
@@ -166,7 +161,7 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
         # Completing the 'About Oppia' exploration results in another
         # exploration being suggested.
         collection_services.record_played_exploration_in_collection_context(
-            self.VIEWER_ID, '0', '14')
+            self.viewer_id, '0', '14')
         response_dict = self.get_json(
             '%s/0' % feconf.COLLECTION_DATA_URL_PREFIX)
         collection_dict = response_dict['collection']
@@ -178,9 +173,9 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
 
         # Completing all explorations should lead to no other suggestions.
         collection_services.record_played_exploration_in_collection_context(
-            self.VIEWER_ID, '0', '15')
+            self.viewer_id, '0', '15')
         collection_services.record_played_exploration_in_collection_context(
-            self.VIEWER_ID, '0', '4')
+            self.viewer_id, '0', '4')
         response_dict = self.get_json(
             '%s/0' % feconf.COLLECTION_DATA_URL_PREFIX)
         collection_dict = response_dict['collection']

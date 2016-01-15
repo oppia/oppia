@@ -32,7 +32,23 @@ oppia.controller('Profile', [
     $http.get(profileDataUrl).success(function(data) {
       $rootScope.loadingMessage = '';
       $scope.userBio = data.user_bio;
-      $scope.firstContributionDatetime = data.first_contribution_datetime;
+      $scope.userDisplayedStatistics = [{
+        title: 'User Impact Score',
+        value: data.user_impact_score,
+        helpText: (
+          'A rough measure of the impact of explorations created by this ' +
+          'user. Better ratings and more playthroughs improve this score.')
+      }, {
+        title: 'Created Explorations',
+        value: data.created_exp_summary_dicts.length
+      }, {
+        title: 'Edited Explorations',
+        value: data.edited_exp_summary_dicts.length
+      }];
+      $scope.userCreatedExplorations = data.created_exp_summary_dicts;
+      $scope.userEditedExplorations = data.edited_exp_summary_dicts;
+      $scope.subjectInterests = data.subject_interests;
+      $scope.firstContributionMsec = data.first_contribution_msec;
       $scope.profilePictureDataUrl = (
         data.profile_picture_data_url || DEFAULT_PROFILE_PICTURE_URL);
       $rootScope.loadingMessage = '';

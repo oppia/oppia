@@ -14,19 +14,15 @@
 
 """Controllers for the Oppia collection learner view."""
 
-__author__ = 'Ben Henning'
-
 from core.controllers import base
-from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import config_domain
-from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.platform import models
-(user_models,) = models.Registry.import_models([models.NAMES.user])
-import feconf
 import utils
+
+(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
 def require_collection_playable(handler):
@@ -90,14 +86,11 @@ class CollectionDataHandler(base.BaseHandler):
             raise self.PageNotFoundException(e)
 
         exp_ids = collection.exploration_ids
-
         exp_summaries = (
             exp_services.get_exploration_summaries_matching_ids(exp_ids))
-
-        exp_titles_dict = {}
-        for (ind, exp_id) in enumerate(exp_ids):
-            exp_summary = exp_summaries[ind]
-            exp_titles_dict[exp_id] = exp_summary.title if exp_summary else ''
+        exp_summaries_dict = {
+            exp_id: exp_summaries[ind] for (ind, exp_id) in enumerate(exp_ids)
+        }
 
         # TODO(bhenning): Users should not be recommended explorations they
         # have completed outside the context of a collection.
@@ -124,9 +117,20 @@ class CollectionDataHandler(base.BaseHandler):
         # Insert an 'exploration' dict into each collection node, where the
         # dict includes meta information about the exploration (ID and title).
         for collection_node in collection_dict['nodes']:
+            summary = exp_summaries_dict.get(collection_node['exploration_id'])
             collection_node['exploration'] = {
                 'id': collection_node['exploration_id'],
-                'title': exp_titles_dict[collection_node['exploration_id']]
+                'title': summary.title if summary else None,
+                'category': summary.category if summary else None,
+                'objective': summary.objective if summary else None,
+                'ratings': summary.ratings if summary else None,
+                'last_updated_msec': utils.get_time_in_millisecs(
+                    summary.exploration_model_last_updated
+                ) if summary else None,
+                'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
+                    summary.category),
+                'thumbnail_bg_color': utils.get_hex_color_for_category(
+                    summary.category),
             }
 
         self.values.update({

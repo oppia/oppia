@@ -1,0 +1,708 @@
+<script type="text/ng-template" id="skins/Conversation">
+  <!--
+    Off-screen preview of the next card in order to pre-determine the target
+    height for the card content transition animation.
+  -->
+  <div class="conversation-skin-future-tutor-card" aria-hidden="true"
+       ng-class="{'conversation-skin-left-card': isCurrentSupplementalCardNonempty() && canWindowFitTwoCards(), 'conversation-skin-has-subsidiary-cards': isCurrentSupplementalCardNonempty() && !canWindowFitTwoCards()}">
+    <div class="conversation-skin-tutor-card-content">
+      <div class="conversation-skin-tutor-card-top-section">
+        <div class="conversation-skin-tutor-card-top-content"
+             angular-html-bind="upcomingContentHtml">
+        </div>
+      </div>
+
+      <div ng-if="upcomingInlineInteractionHtml">
+        <div class="conversation-skin-inline-interaction">
+          <div angular-html-bind="upcomingInlineInteractionHtml">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div role="main" style="margin: 0 auto; position: relative;" ng-if="hasFullyLoaded">
+    <progress-dots num-dots="numProgressDots"
+                   class="conversation-skin-progress-dots"
+                   ng-class="{'conversation-skin-progress-dots-iframed': isIframed, 'conversation-skin-progress-dots-not-iframed': !isIframed}">
+    </progress-dots>
+
+    <div class="conversation-skin-cards-container conversation-skin-animate-cards"
+         ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
+
+      <!--
+        If the interaction is not inline, two cases arise: (a) the screen is
+        narrow, in which case only one card shows on the screen at a time, and
+        a selection bar appears at the bottom of the screen to switch between
+        cards, (b) the screen is wide, in which case both cards appear
+        side-by-side.
+      -->
+      <div class="conversation-skin-main-tutor-card conversation-skin-tutor-card-active"
+          ng-class="{'conversation-skin-left-card': isCurrentSupplementalCardNonempty() && canWindowFitTwoCards(), 'conversation-skin-has-subsidiary-cards': isCurrentSupplementalCardNonempty() && !canWindowFitTwoCards(),
+            'animate-card-width': startCardChangeAnimation}"
+          ng-show="isPanelVisible(PANEL_TUTOR)">
+        <div class="conversation-skin-tutor-card-content conversation-skin-animate-card-contents"
+             ng-class="{'animate-card-change': startCardChangeAnimation}">
+          <div class="conversation-skin-tutor-card-top-section">
+            <img class="conversation-skin-oppia-avatar"
+                 ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt="">
+            <div class="conversation-skin-tutor-card-top-content protractor-test-conversation-content"
+                 angular-html-bind="activeCard.contentHtml"
+                 focus-on="<[getContentFocusLabel($index)]>">
+            </div>
+          </div>
+
+          <div ng-if="(activeCard.answerFeedbackPairs.length > 1 && exploration.isInteractionInline(activeCard.stateName)) || (activeCard.answerFeedbackPairs.length > 0 && !exploration.isInteractionInline(activeCard.stateName))">
+            <h4 class="conversation-skin-responses-dropdown-container"
+                ng-click="toggleShowPreviousResponses()">
+              <span class="conversation-skin-responses-dropdown-text">
+                Previous answers (<[activeCard.answerFeedbackPairs.length - (exploration.isInteractionInline(activeCard.stateName) ? 1 : 0)]>)
+                <span class="glyphicon glyphicon-play conversation-skin-responses-dropdown-icon"
+                      ng-class="{'conversation-skin-responses-dropdown-icon-rotated': arePreviousResponsesShown}">
+                </span>
+              </span>
+            </h4>
+          </div>
+
+          <div ng-if="arePreviousResponsesShown"
+               class="conversation-skin-tutor-card-middle-section conversation-skin-responses-animate-slide">
+            <div ng-repeat="responsePair in activeCard.answerFeedbackPairs track by $index">
+              <div ng-if="!$last || !exploration.isInteractionInline(activeCard.stateName)">
+                <answer-feedback-pair data="responsePair"
+                                      profile-picture="profilePicture"
+                                      oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL">
+                </answer-feedback-pair>
+              </div>
+            </div>
+          </div>
+
+          <!-- If the interaction is inline, always show the most recent response pair, if there is one. -->
+          <div class="conversation-skin-tutor-card-bottom-section" ng-if="exploration.isInteractionInline(activeCard.stateName) && activeCard.answerFeedbackPairs.length > 0">
+            <answer-feedback-pair data="activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1]"
+                                  profile-picture="profilePicture"
+                                  oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL">
+            </answer-feedback-pair>
+          </div>
+
+          <!--
+            Show the interaction (if it is inline), the interaction instructions
+            (if the interaction is supplemental), or a continuation button (if
+            Oppia has given feedback and the learner is being asked to move on
+            to the next card).
+
+            In addition, if the exploration is iframed, the terminal card will
+            have no learner input section, so we do not show it.
+          -->
+          <div ng-if="(!waitingForOppiaFeedback || !exploration.isInteractionInline(activeCard.stateName)) && ((activeCard.interactionHtml && !activeCard.destStateName) || (activeCard.destStateName && !helpCardHasContinueButton)) && (!isOnTerminalCard() || !isIframed || (activeCard.destStateName && !helpCardHasContinueButton)) && isCurrentCardAtEndOfTranscript()">
+            <div class="conversation-skin-inline-interaction">
+              <div ng-if="activeCard.destStateName && activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].oppiaFeedbackHtml && !helpCardHasContinueButton">
+                <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
+                           focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
+                           ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)">
+                  Continue
+                </md-button>
+              </div>
+              <div ng-if="activeCard.interactionHtml && !activeCard.destStateName">
+                <div ng-if="exploration.isInteractionInline(activeCard.stateName)">
+                  <div class="protractor-test-conversation-input"
+                       angular-html-bind="activeCard.interactionHtml">
+                  </div>
+                </div>
+                <div ng-if="!exploration.isInteractionInline(activeCard.stateName)"
+                     ng-click="setVisiblePanel(PANEL_SUPPLEMENTAL)"
+                     ng-class="{'conversation-skin-interaction-clickable-instructions': panels.length > 1}"
+                     style="opacity: 0.8;">
+
+                  <div ng-if="canWindowFitTwoCards()">
+                    <button style="background: inherit; border: none;">
+                      <[exploration.getInteractionInstructions(activeCard.stateName)]>
+                      <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
+                    </button>
+                  </div>
+
+                  <div ng-if="!canWindowFitTwoCards()">
+                    <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button">
+                      <[exploration.getNarrowInstructions(activeCard.stateName)]>
+                      <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
+                    </md-button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div ng-if="isCurrentSupplementalCardNonempty()"
+           class="conversation-skin-supplemental-card-container"
+           ng-class="{'conversation-skin-right-card-container': isCurrentSupplementalCardNonempty() && isPanelVisible(PANEL_TUTOR) && isPanelVisible(PANEL_SUPPLEMENTAL)}">
+        <div ng-show="isPanelVisible(PANEL_SUPPLEMENTAL)"
+             class="conversation-skin-supplemental-card">
+
+          <div class="conversation-skin-supplemental-interaction-container">
+            <div class="conversation-skin-help-card" ng-if="helpCardHtml">
+              <img class="conversation-skin-oppia-avatar"
+                   ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt="">
+              <button type="button" class="conversation-skin-close-help-card-button"
+                      ng-click="clearHelpCard()" ng-if="!helpCardHasContinueButton">
+                <i class="material-icons md-18">&#xE5CD;</i>
+              </button>
+              <div class="conversation-skin-help-card-content" angular-html-bind="helpCardHtml">
+              </div>
+              <br>
+              <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
+                 focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
+                 ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)"
+                 ng-if="helpCardHasContinueButton"
+                 style="margin-top: 12px;">
+                Continue to next card
+              </md-button>
+            </div>
+
+            <div ng-if="!exploration.isInteractionInline(activeCard.stateName)">
+              <div class="protractor-test-conversation-input"
+                   angular-html-bind="activeCard.interactionHtml">
+              </div>
+            </div>
+          </div>
+
+          <div ng-if="!canWindowFitTwoCards()">
+            <md-button class="oppia-learner-continue-button" ng-click="setVisiblePanel(PANEL_TUTOR)">
+              <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C4;</i>
+              Instructions
+            </md-button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <oppia-gadget-panel panel-contents="exploration.getGadgetPanelsContents().bottom"
+                      class="conversation-skin-bottom-gadget-panel"
+                      current-state-name="activeCard.stateName">
+  </oppia-gadget-panel>
+
+  <div ng-if="isOnTerminalCard() && isLoggedIn && !isInPreviewMode && !isIframed && isCurrentCardAtEndOfTranscript()"
+       class="conversation-skin-final-ratings">
+
+    <div style="color: #eee; margin-bottom: 20px;">
+      Learned something new? How would you rate this exploration?
+    </div>
+    <div popover-placement="bottom" popover-template="'popover/feedback'" popover-trigger="click">
+      <rating-display rating-value="userRating"
+                      is-editable="true"
+                      on-edit="submitUserRating"
+                      style="letter-spacing: 10px; color: #eee;">
+      </rating-display>
+    </div>
+  </div>
+
+  <div ng-if="isOnTerminalCard() && !isIframed && isCurrentCardAtEndOfTranscript() && recommendedExplorationSummaries.length > 0"
+       class="conversation-skin-final-recommendations">
+      <span style="color: #eee;">Suggested next:</span>
+
+      <div class="oppia-gallery-tiles-container" style="padding-top: 10px;">
+        <exploration-summary-tile ng-repeat="exp in (recommendedExplorationSummaries|limitTo:3) track by $index"
+                                  collection-id="collectionId"
+                                  exploration-id="exp.id"
+                                  exploration-title="exp.title"
+                                  last-updated-msec="exp.last_updated_msec"
+                                  objective="exp.objective"
+                                  category="exp.category"
+                                  ratings="exp.ratings"
+                                  thumbnail-icon-url="exp.thumbnail_icon_url"
+                                  thumbnail-bg-color="exp.thumbnail_bg_color"
+                                  num-views="exp.num_views"
+                                  ng-attr-open-in-new-window="<[isIframed ? 'true' : undefined]>">
+          </exploration-summary-tile>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="conversation-skin-card-switcher" ng-if="panels.length >= 2">
+    <div class="conversation-skin-card-switcher-thumbnails-container">
+      <span ng-repeat="panelName in panels">
+        <a ng-click="setVisiblePanel(panelName)">
+          <img class="conversation-skin-card-switcher-thumbnail img-circle"
+               alt="<[panelName]>"
+               ng-src="<[getThumbnailSrc(panelName)]>"
+               ng-class="{'conversation-skin-card-switcher-thumbnail-active': isPanelVisible(panelName)}">
+        </a>
+      </span>
+    </div>
+  </div>
+
+  <style>
+    /*
+      Note that this affects both the learner mode and the 'editor preview'
+      mode.
+    */
+    html, body {
+      background: url('/images/general/background.jpg') no-repeat center center fixed;
+      background-color: #eee;
+      color: rgba(0,0,0,0.87);
+      font-family: 'Roboto', Arial, sans-serif;
+      font-size: 1.0em;
+      background-size: cover;
+    }
+
+    /*
+      Additional CSS for the conversation_v1 skin.
+      All classes below should start with .conversation-skin
+     */
+
+    /* Overwrite the default color for the 'Loading...' message. */
+    .oppia-loading-fullpage {
+      color: #fff;
+    }
+
+    .conversation-skin-progress-dots {
+      left: 0;
+      margin: 0 auto;
+      position: fixed;
+      right: 0;
+      z-index: 100;
+    }
+    .conversation-skin-progress-dots-not-iframed {
+      top: 56px;
+    }
+    .conversation-skin-progress-dots-iframed {
+      top: 6px;
+    }
+
+    .conversation-skin-oppia-avatar,
+    .conversation-skin-user-avatar {
+      height: 36px;
+      position: absolute;
+      top: 0;
+      width: 36px;
+      z-index: 1;
+    }
+    .conversation-skin-oppia-avatar {
+      left: -20px;
+    }
+
+    .conversation-skin-inline-interaction .conversation-skin-user-avatar {
+      left: -20px;
+      top: 14px;
+    }
+    .conversation-skin-learner-answer-container .conversation-skin-user-avatar {
+      right: -20px;
+    }
+
+    .conversation-skin-tutor-card-middle-section .conversation-skin-user-avatar,
+    .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-avatar {
+      display: none;
+    }
+
+    .conversation-skin-responses-dropdown-icon {
+      font-size: 10px;
+      margin-bottom: -4px;
+      -webkit-transition: all 0.2s;
+      -moz-transition: all 0.2s;
+      -o-transition: all 0.2s;
+      transition: 0.2s;
+    }
+    .conversation-skin-responses-dropdown-icon-rotated {
+      -webkit-transform: rotate(90deg);
+      -moz-transform: rotate(90deg);
+      -o-transform: rotate(90deg);
+      transform: rotate(90deg);
+    }
+    .conversation-skin-responses-dropdown-container {
+      border-bottom: 1px solid #ccc;
+      cursor: pointer;
+      line-height: 0.1em;
+      margin: 8px 20px 20px 20px;
+      text-align: center;
+    }
+    .conversation-skin-responses-dropdown-text {
+      background-color: #fff;
+      color: #888;
+      font-size: 0.8em;
+      padding: 0 10px;
+    }
+
+    .conversation-skin-bottom-gadget-panel {
+      bottom: 4px;
+      left: 0;
+      margin: 0 auto;
+      max-height: 135px;
+      max-width: 400px;
+      min-width: 150px;
+      position: fixed;
+      right: 0;
+      width: 360px;
+    }
+
+    .conversation-skin-cards-container {
+      margin: 0 auto;
+      /* This is the width of the main card, plus the width of the supplemental
+         card, plus a 12px margin between them.
+      */
+      max-width: 1084px;
+    }
+
+    .conversation-skin-help-card {
+      background: #fff;
+      border-radius: 2px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.24), 0 1px 3px rgba(0,0,0,0.12);
+      min-height: 50px;
+      opacity: 1;
+      padding: 12px;
+      position: absolute;
+      right: 12px;
+      bottom: -50px;
+      text-align: left;
+      transition: all 350ms;
+      z-index: 500;
+    }
+    .conversation-skin-help-card.ng-enter,
+    .conversation-skin-help-card.ng-leave-active {
+      opacity: 0;
+      transform: translateX(200px);
+    }
+    .conversation-skin-help-card .conversation-skin-oppia-avatar {
+      top: 12px;
+    }
+    .conversation-skin-help-card-content {
+      width: 270px;
+    }
+    .conversation-skin-close-help-card-button {
+      background: none;
+      border: 0;
+      color: #000;
+      cursor: pointer;
+      height: 24px;
+      opacity: 0.5;
+      position: absolute;
+      right: 2px;
+      top: 2px;
+      width: 24px;
+      z-index: 200;
+    }
+
+    .conversation-skin-main-tutor-card,
+    .conversation-skin-future-tutor-card {
+      background: #fff;
+      border-radius: 2px;
+      left: 0;
+      margin: 44px auto 60px auto;
+      padding-top: 20px;
+      position: relative;
+      right: 0;
+      text-align: left;
+      width: 560px;
+      z-index: 1;
+    }
+
+    .conversation-skin-main-tutor-card.conversation-skin-left-card,
+    .conversation-skin-future-tutor-card.conversation-skin-left-card {
+      float: left;
+      margin-left: 0;
+      margin-right: 0;
+      width: 472px;
+    }
+
+    .conversation-skin-main-tutor-card.animate-card-width {
+      -webkit-transition: width 500ms;
+      transition: width 500ms;
+    }
+
+    .conversation-skin-future-tutor-card {
+      position: absolute;
+      left: -30000px;
+      top: -30000px;
+    }
+
+    .conversation-skin-tutor-card-top-section,
+    .conversation-skin-oppia-feedback-container,
+    .conversation-skin-learner-answer-container {
+      position: relative;
+    }
+    .conversation-skin-tutor-card-top-section,
+    .conversation-skin-oppia-feedback-container,
+    .conversation-skin-learner-answer-container {
+      padding: 0 20px;
+    }
+
+    .conversation-skin-tutor-card-top-content,
+    .conversation-skin-oppia-feedback-content,
+    .conversation-skin-learner-answer-content,
+    .conversation-skin-help-card-content {
+      border-radius: 2px;
+      display: inline-block;
+      max-width: 100%;
+      position: relative;
+      text-align: left;
+    }
+    .conversation-skin-tutor-card-top-content,
+    .conversation-skin-oppia-feedback-content,
+    .conversation-skin-learner-answer-content {
+      margin-bottom: 12px;
+    }
+    .conversation-skin-tutor-card-top-content,
+    .conversation-skin-help-card-content {
+      padding: 12px;
+    }
+    .conversation-skin-oppia-feedback-content,
+    .conversation-skin-learner-answer-content {
+      padding: 8px 12px;
+    }
+    .conversation-skin-tutor-card-top-content,
+    .conversation-skin-oppia-feedback-content,
+    .conversation-skin-help-card-content {
+      background-color: rgba(224,242,241,1);
+    }
+    .conversation-skin-learner-answer-content {
+      background-color: rgba(236,239,241,1);
+      border-bottom-right-radius: 0;
+    }
+    .conversation-skin-tutor-card-top-content,
+    .conversation-skin-oppia-feedback-content,
+    .conversation-skin-help-card-content {
+      border-top-left-radius: 0;
+    }
+    .conversation-skin-learner-answer-container {
+      text-align: right;
+    }
+    .conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-content {
+      background-color: rgba(236,239,241,0.4);
+    }
+    .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-feedback-content {
+      background-color: rgba(224,242,241,0.4);
+    }
+    .conversation-skin-tutor-card-top-content::before,
+    .conversation-skin-oppia-feedback-content::before,
+    .conversation-skin-help-card-content::before {
+      content: " ";
+      left: -8px;
+      border-left: 8px solid transparent;
+      border-top: 12px solid rgba(224,242,241,1);
+      position: absolute;
+      top: 0;
+    }
+    .conversation-skin-learner-answer-content::before {
+      content: " ";
+      right: -8px;
+      border-right: 8px solid transparent;
+      border-top: 12px solid rgba(236,239,241,1);
+      position: absolute;
+      top: 0;
+    }
+    .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-feedback-content::before,
+    .conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-content::before {
+      display: none;
+    }
+
+    .conversation-skin-interaction-clickable-instructions {
+      cursor: pointer;
+    }
+
+    .conversation-skin-tutor-card-feedback-toggle-container {
+      position: absolute;
+      right: 10px;
+      top: 11px;
+      width: 20px;
+    }
+    .conversation-skin-tutor-card-feedback-toggle {
+      background: none;
+      border: 0;
+      color: #000;
+      cursor: pointer;
+      height: 20px;
+      margin-left: -5px;
+      opacity: 0.4;
+    }
+    .conversation-skin-tutor-card-feedback-toggle:hover {
+      opacity: 0.8;
+    }
+
+    .conversation-skin-inline-interaction {
+      background-color: rgba(236,239,241,1);
+      border-bottom-left-radius: 2px;
+      border-bottom-right-radius: 2px;
+      margin-top: 8px;
+      padding: 16px 20px;
+      position: relative;
+    }
+
+    .conversation-skin-learner-answer,
+    .conversation-skin-oppia-feedback {
+      word-wrap: break-word;
+    }
+
+    .conversation-skin-feedback-dot-one,
+    .conversation-skin-feedback-dot-two,
+    .conversation-skin-feedback-dot-three {
+      background-color: #666;
+      display: inline-block;
+      height: 2px;
+      width: 2px;
+    }
+    .conversation-skin-feedback-dot-one {
+      animation: dot 1.0s infinite;
+      animation-delay: 0.0s;
+      -moz-animation: dot 1.0s infinite;
+      -moz-animation-delay: 0.0s;
+      -webkit-animation: dot 1.0s infinite;
+      -webkit-animation-delay: 0.0s;
+      opacity: 0;
+    }
+    .conversation-skin-feedback-dot-two {
+      animation: dot 1.0s infinite;
+      animation-delay: 0.2s;
+      -moz-animation: dot 1.0s infinite;
+      -moz-animation-delay: 0.2s;
+      -webkit-animation: dot 1.0s infinite;
+      -webkit-animation-delay: 0.2s;
+      opacity: 0;
+    }
+    .conversation-skin-feedback-dot-three {
+      animation: dot 1.0s infinite;
+      animation-delay: 0.4s;
+      -moz-animation: dot 1.0s infinite;
+      -moz-animation-delay: 0.4s;
+      -webkit-animation: dot 1.0s infinite;
+      -webkit-animation-delay: 0.4s;
+      opacity: 0;
+    }
+
+    .conversation-skin-supplemental-card-container {
+      display: inline-block;
+      margin: 0 auto;
+      position: absolute;
+      width: 100%;
+    }
+
+    .conversation-skin-right-card-container {
+      margin-left: 12px;
+      width: 600px;
+    }
+
+    div.conversation-skin-supplemental-card {
+      left: 0;
+      margin: 44px auto 60px auto;
+      position: relative;
+      right: 0;
+      width: 600px;
+    }
+
+    .conversation-skin-supplemental-interaction-container {
+      background-color: #fff;
+      border-radius: 2px;
+      box-shadow: none;
+      margin-bottom: 8px;
+      padding: 8px;
+    }
+
+    .conversation-skin-right-card-container div.conversation-skin-supplemental-card-fixed {
+      left: inherit;
+      margin-top: 8px;
+      position: fixed;
+      right: inherit;
+    }
+
+    .conversation-skin-final-ratings {
+      text-align: center;
+    }
+
+    .conversation-skin-final-recommendations {
+      margin-top: 50px;
+      text-align: center;
+    }
+
+    .conversation-skin-left-card .conversation-skin-oppia-avatar,
+    .conversation-skin-left-card .conversation-skin-user-avatar {
+      display: none;
+    }
+
+    .conversation-skin-card-switcher {
+      background: #009688;
+      bottom: 0;
+      height: 50px;
+      position: fixed;
+      width: 100%;
+      z-index: 2;
+    }
+    .conversation-skin-card-switcher-thumbnails-container {
+      height: 100%;
+      margin: auto;
+      text-align: center;
+      width: 100%;
+    }
+    .conversation-skin-card-switcher-thumbnail {
+      border: 1px solid black;
+      cursor: pointer;
+      height: 40px;
+      margin-top: 2px;
+      width: 40px;
+    }
+    .conversation-skin-card-switcher-thumbnail-active {
+      border: 3px solid #0d47a1;
+      cursor: default;
+      height: 46px;
+      margin-top: 2px;
+      width: 46px;
+    }
+
+    .conversation-skin-oppia-feedback.ng-enter {
+      opacity: 0;
+      -webkit-transition: all .5s;
+      transition: all .5s;
+    }
+    .conversation-skin-oppia-feedback.ng-enter.ng-enter-active {
+      opacity: 1;
+    }
+
+    .conversation-skin-main-tutor-card.ng-hide-add.ng-hide-add-active,
+    .conversation-skin-main-tutor-card.ng-hide-remove.ng-hide-remove-active,
+    .conversation-skin-supplemental-card.ng-hide-add.ng-hide-add-active,
+    .conversation-skin-supplemental-card.ng-hide-remove.ng-hide-remove-active {
+      -webkit-transition: all ease-out 0.4s;
+      transition: all ease-out 0.4s;
+    }
+
+    .conversation-skin-main-tutor-card.ng-hide {
+      opacity: 0;
+      transform: translateX(-1000px);
+    }
+
+    .conversation-skin-supplemental-card.ng-hide {
+      opacity: 0;
+      transform: translateX(1000px);
+    }
+
+    @media(max-width: 1119px) {
+      /*
+        This is needed so that the left/right animation works smoothly with a
+        supplemental interaction on small screens. However, it needs the extra
+        'has-subsidiary-cards' class in order to avoid the final ratings section
+        displaying at the top of the page.
+      */
+      .conversation-skin-main-tutor-card.conversation-skin-has-subsidiary-cards {
+        position: absolute;
+      }
+    }
+
+    @media(max-width: 600px) {
+      .conversation-skin-right-card-container,
+      div.conversation-skin-supplemental-card,
+      .conversation-skin-main-tutor-card {
+        width: 100%;
+      }
+
+      .conversation-skin-help-card {
+        right: 4px;
+        top: 4px;
+      }
+
+      .conversation-skin-user-avatar,
+      .conversation-skin-oppia-avatar {
+        display: none;
+      }
+    }
+  </style>
+</script>

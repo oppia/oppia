@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * Directive for the NumericInput interaction.
  *
@@ -20,14 +19,14 @@
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
-oppia.directive('oppiaInteractiveNumericInput', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: 'interaction/NumericInput',
-      controller: ['$scope', '$attrs', 'focusService',
-          function($scope, $attrs, focusService) {
+oppia.directive('oppiaInteractiveNumericInput', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    templateUrl: 'interaction/NumericInput',
+    controller: [
+      '$scope', '$attrs', 'focusService', 'numericInputRulesService',
+      function($scope, $attrs, focusService, numericInputRulesService) {
         $scope.answer = '';
         $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
@@ -37,14 +36,14 @@ oppia.directive('oppiaInteractiveNumericInput', [
         };
 
         $scope.submitAnswer = function(answer) {
-          if (answer !== undefined && answer !== null) {
-            $scope.$parent.$parent.submitAnswer(Number(answer));
+          if (answer !== undefined && answer !== null && answer !== '') {
+            $scope.$parent.submitAnswer(answer, numericInputRulesService);
           }
         };
-      }]
-    };
-  }
-]);
+      }
+    ]
+  };
+}]);
 
 oppia.directive('oppiaResponseNumericInput', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
@@ -79,3 +78,32 @@ oppia.directive('oppiaShortResponseNumericInput', [
     };
   }
 ]);
+
+oppia.factory('numericInputRulesService', [function() {
+  return {
+    Equals: function(answer, inputs) {
+      return answer === inputs.x;
+    },
+    IsLessThan: function(answer, inputs) {
+      return answer < inputs.x;
+    },
+    IsGreaterThan: function(answer, inputs) {
+      return answer > inputs.x;
+    },
+    IsLessThanOrEqualTo: function(answer, inputs) {
+      return answer <= inputs.x;
+    },
+    IsGreaterThanOrEqualTo: function(answer, inputs) {
+      return answer >= inputs.x;
+    },
+    IsInclusivelyBetween: function(answer, inputs) {
+      // TODO(wxy): have frontend validation at creation time to check that
+      // inputs.a <= inputs.b
+      return answer >= inputs.a && answer <= inputs.b;
+    },
+    IsWithinTolerance: function(answer, inputs) {
+      return answer >= inputs.x - inputs.tol &&
+        answer <= inputs.x + inputs.tol;
+    }
+  };
+}]);

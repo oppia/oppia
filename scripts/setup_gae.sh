@@ -15,13 +15,12 @@
 ##########################################################################
 
 # This file should not be invoked directly, but sourced from other sh scripts.
-# Bash execution environent set up for scripts that requries GAE.
+# Bash execution environment setup for scripts that require GAE.
 
 
 if [ "$SETUP_GAE_DONE" ]; then
   return 0
 fi
-export SETUP_GAE_DONE=true
 
 export GOOGLE_APP_ENGINE_HOME=$TOOLS_DIR/google_appengine_1.9.19/google_appengine
 export COVERAGE_HOME=$TOOLS_DIR/coverage-4.0
@@ -31,3 +30,5 @@ export PYTHONPATH=.:$COVERAGE_HOME:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HO
 
 # Delete old *.pyc files
 find . -iname "*.pyc" -exec rm -f {} \;
+
+export SETUP_GAE_DONE=true
