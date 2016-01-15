@@ -125,6 +125,11 @@ oppia.controller('CollectionEditor', ['$scope', 'CollectionBackendApiService',
     return false;
   };
 
+  //TODO(mgowano): Implement adding a new exploration
+  $scope.addNewExploration = function(expId) {
+    return false;
+  };
+
   $scope.setCollectionTitle = function(newTitle) {
     if (newTitle) {
       $scope.collection.title = newTitle;
