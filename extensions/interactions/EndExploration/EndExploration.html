@@ -2,24 +2,20 @@
 
 <script type="text/ng-template" id="interaction/EndExploration">
   <div ng-if="recommendedExplorationIds.length > 0 || (isInEditorPage && invalidExpIds.length > 0)">
-    <span ng-if="!collectionId">Other explorations you might enjoy:</span>
+    <span ng-if="!collectionId" translate="I18N_PLAYER_RECOMMEND_EXPLORATIONS"></span>
     <span ng-if="collectionId">Continue &#39;<[collectionTitle]>&#39;:</span>
-    <div style="color: red;" ng-repeat="expId in invalidExpIds">
-      <strong>Error:</strong> no published exploration found with ID '<[expId]>'
+    <div style="color: red;" ng-repeat="expId in invalidExpIds" ng-if="isInEditorPreviewMode">
+      <strong translate="I18N_PLAYER_RECOMMEND_EXPLORATIONS_ERROR"></strong> <span translate="I18N_PLAYER_RECOMMEND_EXPLORATIONS_WRONG_ID" translate-values="{expId: <[expId]>}"></span>
     </div>
     <oppia-end-exploration-recommended-explorations recommended-exploration-ids="recommendedExplorationIds" recommended-exploration-summaries="recommendedExplorationSummaries" collection-id="collectionId"></oppia-end-exploration-recommended-explorations>
   </div>
 
   <div ng-if="!isIframed && !isInEditorPreviewMode && recommendedExplorationIds.length === 0 && (!isInEditorPage || invalidExpIds.length === 0)">
     <a ng-href="/collection/<[collectionId]>" ng-if="collectionId">
-      <md-button class="md-button-success">
-        Return to <[collectionTitle]>
-      </md-button>
+      <md-button class="md-button-success" translate="I18N_PLAYER_RETURN_TO_COLLECTION" translate-values="{collectionTitle: <[collectionTitle]>}"></md-button>
     </a>
     <a href="/">
-      <md-button class="md-button-success" ng-if="!collectionId">
-        Return to gallery
-      </md-button>
+      <md-button class="md-button-success" ng-if="!collectionId" translate="I18N_PLAYER_RETURN_TO_GALLERY"></md-button>
     </a>
   </div>
 </script>

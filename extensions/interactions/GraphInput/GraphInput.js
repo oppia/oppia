@@ -71,7 +71,7 @@ oppia.directive('oppiaInteractiveGraphInput', [
           if (checkValidGraph(newGraph)) {
             $scope.graph = newGraph;
           } else {
-            $scope.errorMessage = 'Invalid graph!';
+            $scope.errorMessage = 'I18N_INTERACTIONS_GRAPH_ERROR_INVALID';
           }
         }
       }]
@@ -187,8 +187,10 @@ oppia.directive('graphViz', function() {
       canEditOptions: '=',
     },
     templateUrl: 'graphViz/graphVizSvg',
-    controller: ['$scope', '$element', '$attrs', '$document', 'focusService', 'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
-    function($scope, $element, $attrs, $document, focusService, graphDetailService, GRAPH_INPUT_LEFT_MARGIN) {
+    controller: ['$scope', '$element', '$attrs', '$document', 'focusService',
+                 'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
+    function($scope, $element, $attrs, $document, focusService,
+             graphDetailService, GRAPH_INPUT_LEFT_MARGIN) {
       var _MODES = {
         MOVE: 0,
         ADD_EDGE: 1,
@@ -267,28 +269,28 @@ oppia.directive('graphViz', function() {
         if ($scope.canMoveVertex) {
           $scope.buttons.push({
             text: '\uE068',
-            description: 'Move',
+            description: 'I18N_INTERACTIONS_GRAPH_MOVE',
             mode: _MODES.MOVE
           });
         }
         if ($scope.canAddEdge) {
           $scope.buttons.push({
             text: '\uE144',
-            description: 'Add Edge',
+            description: 'I18N_INTERACTIONS_GRAPH_ADD_EDGE',
             mode: _MODES.ADD_EDGE
           });
         }
         if ($scope.canAddVertex) {
           $scope.buttons.push({
             text: '\u002B',
-            description: 'Add Node',
+            description: 'I18N_INTERACTIONS_GRAPH_ADD_NODE',
             mode: _MODES.ADD_VERTEX
           });
         }
         if ($scope.canDeleteVertex || $scope.canDeleteEdge) {
           $scope.buttons.push({
             text: '\u2212',
-            description: 'Delete',
+            description: 'I18N_INTERACTIONS_GRAPH_DELETE',
             mode: _MODES.DELETE
           });
         }

@@ -26,7 +26,7 @@
       <span class="oppia-navbar-breadcrumb-separator"></span>
       <span class="protractor-test-exploration-header" itemprop="description">{{exploration_title}}</span>
     </li>
-    <li ng-click="showInformationCard()" tooltip="Info" tooltip-placement="bottom" style="cursor: pointer;">
+    <li ng-click="showInformationCard()" tooltip="<['I18N_PLAYER_INFO_TOOLTIP' | translate]>" tooltip-placement="bottom" style="cursor: pointer;">
       <i class="material-icons oppia-navbar-breadcrumb-icon" style="font-size: 20px; vertical-align: middle;">&#xE88E;</i>
     </li>
   </ul>
@@ -35,14 +35,14 @@
 {% block local_top_nav_options %}
   <div ng-controller="LearnerLocalNav">
     <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="LearnerLocalNav" style="margin-right: 0px;">
-      <li popover-placement="bottom" popover-template="'popover/feedback'" popover-trigger="click">
-        <a href="" tooltip="Feedback" tooltip-placement="bottom">
+      <li popover-placement="bottom" popover-template="popover/feedback" popover-trigger="click">
+        <a href="" tooltip="<['I18N_PLAYER_FEEDBACK_TOOLTIP' | translate]>" tooltip-placement="bottom">
           <span class="glyphicon glyphicon-comment"></span>
         </a>
       </li>
       {% if can_edit %}
         <li>
-          <a ng-href="/create/<[explorationId]>" tooltip="Edit" tooltip-placement="bottom" target="_blank">
+          <a ng-href="/create/<[explorationId]>" tooltip="<['I18N_PLAYER_EDIT_TOOLTIP' | translate]>" tooltip-placement="bottom" target="_blank">
             <span class="glyphicon glyphicon-pencil"></span>
           </a>
         </li>
@@ -78,23 +78,23 @@
         <p ng-if="explorationDescription">
           <[explorationDescription | truncateAndCapitalize: 95]>
         </p>
-        <p ng-if="!explorationDescription">No objective specified.</p>
+        <p ng-if="!explorationDescription" translate="I18N_PLAYER_NO_OBJECTIVE"></p>
         <ul layout="row" class="card-metrics" layout-align="space-between center">
           <li>
-            <span class="fa fa-star fa-lg" tooltip="Ratings" tooltip-placement="top"></span>
-            <span ng-if="explorationRatings === 0">Unrated</span>
+            <span class="fa fa-star fa-lg" tooltip="<['I18N_PLAYER_RATINGS_TOOLTIP' | translate]>" tooltip-placement="top"></span>
+            <span ng-if="explorationRatings === 0" translate="I18N_PLAYER_UNRATED"></span>
             <span ng-if="explorationRatings !== 0"><[explorationRatings]></span>
           </li>
           <li>
-            <span class="fa fa-eye fa-lg" tooltip="Views" tooltip-placement="top"></span>
+            <span class="fa fa-eye fa-lg" tooltip="<['I18N_PLAYER_VIEWS_TOOLTIP' | translate]>" tooltip-placement="top"></span>
             <[viewersCount | summarizeNonnegativeNumber]>
           </li>
           <li>
-            <span class="fa fa-clock-o fa-lg" tooltip="Last Updated" tooltip-placement="top"></span>
+            <span class="fa fa-clock-o fa-lg" tooltip="<['I18N_PLAYER_LAST_UPDATED_TOOLTIP' | translate]>" tooltip-placement="top"></span>
             <[getLocaleAbbreviatedDatetimeString(explorationLastUpdatedMsec)]>
           </li>
           <ul layout="row" layout-align="space-between center" class="oppia-info-card-exploration-contributors-profile">
-            <i class="material-icons" tooltip="Contributors" tooltip-placement="top" style="cursor: default; margin-right: 5px;">&#xE7EF;</i>
+            <i class="material-icons" tooltip="<['I18N_PLAYER_CONTRIBUTORS_TOOLTIP' | translate]>" tooltip-placement="top" style="cursor: default; margin-right: 5px;">&#xE7EF;</i>
             <li ng-repeat="ContributorUsername in explorationContributorUsernames| limitTo: 2"
               tooltip="<[ContributorUsername]>" tooltip-placement="top">
               <profile-link-image username="ContributorUsername">
@@ -108,7 +108,7 @@
               tooltip-placement="top">+<[explorationContributorUsernames.length - 2]>
             </li>
             <li ng-if="explorationContributorUsernames.length === 0"
-                tooltip="Community editable" tooltip-placement="top">
+                tooltip="<['I18N_PLAYER_COMMUNITY_EDITABLE_TOOLTIP' | translate]>" tooltip-placement="top">
               <span class="fa fa-globe fa-lg oppia-info-card-community-editable-icon"></span>
             </li>
           </ul>
@@ -117,22 +117,21 @@
           <div flex="55">
             <md-content layout="row">
               <div class="oppia-info-card-tag-icon">
-                <span class="fa fa-tags fa-lg" tooltip-append-to-body="true" tooltip="Tags"
+                <span class="fa fa-tags fa-lg" tooltip-append-to-body="true" tooltip="<['I18N_PLAYER_TAGS_TOOLTIP' | translate]>"
                   tooltip-placement="top">
                 </span>
               </div>
               <md-chips layout-align="center center">
                 <md-chip ng-if="explorationTags.tagsInTooltip.length > 0" class="oppia-info-card-tooltip-more"
                   tooltip-append-to-body="true" tooltip="<[explorationTags.tagsInTooltip.join(', ')]>"
-                  tooltip-placement="right">
-                  <[explorationTags.tagsInTooltip.length]>+ more tags
+                  tooltip-placement="right" translate="I18N_PLAYER_PLUS_TAGS" translate-values="{additionalTagNumber: <[explorationTags.tagsInTooltip.length]>}">
                 </md-chip>
                 <md-chip ng-if="explorationTags.tagsToBeShown.length > 0">
                   <[explorationTags.tagsToBeShown.join(", ")]>
                 </md-chip>
                 <md-chip ng-if="explorationTags.tagsToBeShown.length === 0 &&
                   explorationTags.tagsInTooltip.length === 0">
-                  <span><em>No tags specified.</em></span>
+                  <span><em translate="I18N_PLAYER_NO_TAGS"></em></span>
                 <md-chip>
               </md-chips>
             </md-content>
@@ -165,7 +164,7 @@
               {% endif %}
 
               <li>
-                <a href="" ng-click="showEmbedExplorationModal(explorationId)" tooltip="Embed" tooltip-placement="top">
+                <a href="" ng-click="showEmbedExplorationModal(explorationId)" tooltip="<['I18N_PLAYER_EMBED_TOOLTIP' | translate]>" tooltip-placement="top">
                   <i class="material-icons md-18" style="color: black;">&#xE157;</i>
                 </a>
               </li>
@@ -174,8 +173,8 @@
         </div>
       </div>
       <div ng-if="loadingInfoCardData" class="oppia-info-card-content">
-        <h3 ng-if="!failedLoadingData">Loading...</h3>
-        <h3 ng-if="failedLoadingData">Oops, something went wrong. Could not load data.</h3>
+        <h3 ng-if="!failedLoadingData" translate="I18N_PLAYER_LOADING"></h3>
+        <h3 ng-if="failedLoadingData" translate="I18N_PLAYER_LOAD_ERROR"></h3>
       </div>
       <button type="button" class="oppia-close-popover-button" ng-click="cancel()">
         <i class="material-icons md-18" style="color: white;">&#xE5CD;</i>
@@ -192,23 +191,21 @@
         <br>
 
         <div>
-          <textarea ng-model="feedbackText" rows="5" class="oppia-feedback-popover-textarea" placeholder="Leave feedback for the authors..." focus-on="<[feedbackPopoverId]>">
+          <textarea ng-model="feedbackText" rows="5" class="oppia-feedback-popover-textarea" ng-attr-placeholder="<['I18N_PLAYER_LEAVE_FEEDBACK' | translate]>" focus-on="<[feedbackPopoverId]>">
           </textarea>
         </div>
 
         <!-- The z-index ensures that the button is not overlapped by the checkbox div. -->
-        <md-button class="pull-right" ng-class="{'oppia-feedback-popover-submit-btn-enabled': feedbackText}" style="margin-top: 6px; z-index: 30;" ng-click="saveFeedback()" ng-disabled="!feedbackText">Submit</md-button>
+        <md-button class="pull-right" ng-class="{'oppia-feedback-popover-submit-btn-enabled': feedbackText}" style="margin-top: 6px; z-index: 30;" ng-click="saveFeedback()" ng-disabled="!feedbackText" translate="I18N_PLAYER_SUBMIT_BUTTON"></md-button>
         <div class="checkbox" style="font-size: 0.9em; margin: 12px 0 4px 0;" ng-show="isLoggedIn">
           <label>
             <input type="checkbox" ng-model="isSubmitterAnonymized">
-            Stay Anonymous
+            <span translate="I18N_PLAYER_STAY_ANONYMOUS"></span>
           </label>
         </div>
       </div>
 
-      <div ng-show="feedbackSubmitted">
-        Thank you for the feedback!
-      </div>
+      <div ng-show="feedbackSubmitted" translate="I18N_PLAYER_THANK_FEEDBACK"></div>
     </div>
   </script>
 

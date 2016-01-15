@@ -8,21 +8,21 @@
     <li {% if nav_mode == 'gallery' %}class="active"{% endif %}>
       <a href="/">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE88A;</i>
-        <span translate>I18N_SIDEBAR_HOME_LINK</span>
+        <span translate="I18N_SIDEBAR_HOME_LINK"></span>
       </a>
     </li>
 
     <li {% if nav_mode == 'about' %}class="active"{% endif %}>
       <a href="/about">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE887;</i>
-        <span translate>I18N_SIDEBAR_HOME_ABOUT</span>
+        <span translate="I18N_SIDEBAR_HOME_ABOUT"></span>
       </a>
     </li>
 
     <li {% if nav_mode == 'participate' %}class="active"{% endif %}>
       <a href="/participate">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE88E;</i>
-        <span translate>I18N_SIDEBAR_PARTICIPATION_PLAYBOOK</span>
+        <span translate="I18N_SIDEBAR_PARTICIPATION_PLAYBOOK"></span>
       </a>
     </li>
 
@@ -30,7 +30,7 @@
       <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
         <a href="/forum">
           <i class="material-icons oppia-sidebar-menu-icon">&#xE7EF;</i>
-          <span translate>I18N_SIDEBAR_FORUM</span>
+          <span translate="I18N_SIDEBAR_FORUM"></span>
         </a>
       </li>
     {% endif %}
@@ -67,7 +67,7 @@
   <div class="oppia-sidebar-footer">
     {% if SOCIAL_MEDIA_BUTTONS %}
       <div>
-        <span>I18N_SIDEBAR_FOLLOW_US</span>:
+        <span="I18N_SIDEBAR_FOLLOW_US"></span>:
       </div>
       {% for button in SOCIAL_MEDIA_BUTTONS %}
         <a href="{{button['link']}}" target="_blank">

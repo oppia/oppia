@@ -1,6 +1,8 @@
 <div class="oppia-footer" ng-controller="I18nFooter">
   <span ng-repeat="(langCode, langName) in SUPPORTED_LANGUAGES">
-    <a ng-click="changeLanguage(langCode)"><[langName]></a>
+    <a ng-click="changeLanguage(langCode)" name="protractor-test-i18n-language-<[langName]>">
+      <[langName]>
+    </a>
     <span ng-if="!$last">·</span>
   </span>
 </div>

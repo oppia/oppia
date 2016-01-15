@@ -54,7 +54,7 @@ handlers:
     Cache-Control: 'public, max-age=2592000'
     Vary: Accept-Encoding
 - url: /i18n
-  static_dir: i18n/
+  static_dir: i18n
   secure: always
   http_headers:
     Cache-Control: 'no-cache'

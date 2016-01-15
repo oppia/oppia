@@ -1,14 +1,10 @@
 {% extends "base.html" %}
 
-{% block subtitle %}
-  <['I18N_SIGNUP_PAGE_SUBTITLE' | translate]>
-{% endblock subtitle %}
-
 {% block navbar_breadcrumb %}
   <ul class="nav navbar-nav oppia-navbar-breadcrumb">
     <li>
       <span class="oppia-navbar-breadcrumb-separator"></span>
-      <span translate>I18N_SIGNUP_REGISTRATION</span>
+      <span translate="I18N_SIGNUP_REGISTRATION"></span>
     </li>
   </ul>
 {% endblock navbar_breadcrumb %}
@@ -34,21 +30,19 @@
 
   <div class="oppia-page-cards-container" ng-controller="Signup">
     <md-card class="oppia-page-card">
-      <h2 class="oppia-signup-page-title" translate>I18N_SIGNUP_COMPLETE_REGISTRATION</h2>
+      <h2 class="oppia-signup-page-title" translate="I18N_SIGNUP_COMPLETE_REGISTRATION"></h2>
 
       <form ng-submit="submitPrerequisitesForm(hasAgreedToLatestTerms, username, canReceiveEmailUpdates)">
         <div ng-show="!hasUsername" role="form" class="form-horizontal">
           <div class="form-group">
-            <label for="username" class="col-lg-3 col-md-3 col-sm-3" translate>I18N_SIGNUP_USERNAME</label>
+            <label for="username" class="col-lg-3 col-md-3 col-sm-3" translate="I18N_SIGNUP_USERNAME"></label>
 
             <div class="col-lg-9 col-md-9 col-sm-9">
               <input type="text" ng-model="username" id="username" class="form-control protractor-test-username-input" ng-blur="onUsernameInputFormBlur(username)" ng-change="updateWarningText(username)" ng-trim="false" focus-on="usernameInputField" style="width: 260px;" autofocus="true">
-              <span class="help-block" style="font-size: 0.8em;" translate>
-                I18N_SIGNUP_USERNAME_EXPLANATION
-              </span>
+              <span class="help-block" style="font-size: 0.8em;" translate="I18N_SIGNUP_USERNAME_EXPLANATION"></span>
               <div style="height: 18px; width: 550px;">
                 <span style="color: red; font-size: 0.8em;" aria-live="assertive" ng-show="blurredAtLeastOnce">
-                  <[warningText | translate]>
+                  <[warningI18nCode | translate]>
                 </span>
               </div>
             </div>
@@ -60,18 +54,17 @@
               <div class="radio">
                 <label>
                   <input type="radio" ng-model="canReceiveEmailUpdates" value="yes" name="canReceiveEmailUpdates" ng-change="onSelectEmailPreference()">
-                  Send me news and updates about the site
+                  <span translate="I18N_SIGNUP_SEND_ME_NEWS"></span>
                 </label>
                 <label>
                   <input type="radio" ng-model="canReceiveEmailUpdates" value="no" name="canReceiveEmailUpdates" ng-change="onSelectEmailPreference()">
-                  Do not send these emails
+                  <span translate="I18N_SIGNUP_DO_NOT_SEND_EMAILS"></span>
                 </label>
-                <span class="help-block" style="font-size: smaller">
-                  You can change this setting at any time from your Preferences page.
+                <span class="help-block" style="font-size: smaller" translate="I18N_SIGNUP_EMAIL_PREFERENCES_EXPLAIN">
                 </span>
               </div>
               <div style="height: 18px; width: 550px;">
-                <span style="color: red; font-size: 0.8em;" aria-live="assertive" ng-show="blurredAtLeastOnce">
+                <span style="color: red; font-size: 0.8em;" aria-live="assertive" ng-show="blurredAtLeastOnce" translate>
                   <[emailPreferencesWarningText]>
                 </span>
               </div>
@@ -82,7 +75,7 @@
 
         <div class="oppia-long-text" ng-if="hasEverRegistered">
           <p>
-            <em>Please note that we've recently updated our Terms of Use.</em>
+            <em translate="I18N_SIGNUP_UPDATE_WARNING"></em>
           </p>
         </div>
         <div class="oppia-long-text" ng-if="!hasEverRegistered">
@@ -92,15 +85,9 @@
         </div>
 
         <div>
-          <strong>Creative Commons License</strong>
+          <strong translate="I18N_SIGNUP_CC_TITLE"></strong>
           <br>
-          Please note that, by agreeing to our Terms of Use, you agree that
-          any content or contributions you make on our Site are and will
-          be licensed under CC-BY-SA v.4.0, with a waiver of the
-          attribution (BY) requirement. Please review our
-          <a href="/terms">Terms of Use</a> for more information about the
-          license grant. For more information about CC-BY-SA, click
-          <a ng-click="showLicenseExplanationModal()">here</a>.
+          <span translate="I18N_SIGNUP_LICENSE_NOTE" translate-compile></span>
         </div>
 
         <hr>
@@ -109,17 +96,14 @@
           <label>
             <input type="checkbox" ng-model="hasAgreedToLatestTerms"
                    class="protractor-test-agree-to-terms-checkbox">
-            <span>
-              By checking the box to the left of this text, you acknowledge, agree, and accept to be bound by the Oppia Terms of Use, found <a href="/terms" target="_blank">here</a>.
-              <!-- TODO(sll): Change this to I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION. -->
+            <span translate="I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION" translate-value-sitename="{{SITE_NAME}}">
             </span>
           </label>
         </div>
 
         <br>
 
-        <button type="submit" class="btn btn-success protractor-test-register-user" ng-disabled="warningText || !hasAgreedToLatestTerms || submissionInProcess" translate>
-          I18N_SIGNUP_BUTTON_SUBMIT
+        <button type="submit" class="btn btn-success protractor-test-register-user" ng-disabled="warningText || !hasAgreedToLatestTerms || submissionInProcess" translate="I18N_SIGNUP_BUTTON_SUBMIT">
         </button>
       </form>
     </md-card>
@@ -127,25 +111,21 @@
 
   <script type="text/ng-template" id="modals/licenseExplanation">
     <div class="modal-header">
-      <h3 translate>I18N_SIGNUP_WHY_LICENSE</h3>
+      <h3 translate="I18N_SIGNUP_WHY_LICENSE"></h3>
     </div>
 
     <div class="modal-body oppia-long-text">
-      <p style="line-height: 1.5;" translate translate-value-sitename="{{SITE_NAME}}">
-        I18N_SIGNUP_SITE_OBJECTIVE
+      <p style="line-height: 1.5;" translate="I18N_SIGNUP_SITE_OBJECTIVE" translate-value-sitename="{{SITE_NAME}}">
       </p>
 
-      <p style="line-height: 1.5;" translate translate-licenselink="<a href=&quot;https://creativecommons.org/licenses/by-sa/4.0/&quot; target=&quot;_blank&quot;>CC-BY-SA v4.0</a>">
-        I18N_SIGNUP_LICENSE_OBJECTIVE
+      <p style="line-height: 1.5;" translate="I18N_SIGNUP_LICENSE_OBJECTIVE" translate-licenselink="<a href=&quot;https://creativecommons.org/licenses/by-sa/4.0/&quot; target=&quot;_blank&quot;>CC-BY-SA v4.0</a>">
       </p>
 
-      <p style="line-height: 1.5;" translate>
-        I18N_SIGNUP_WAIVER_OBJECTIVE
-      </p>
+      <p style="line-height: 1.5;" translate="I18N_SIGNUP_WAIVER_OBJECTIVE"></p>
     </div>
 
     <div class="modal-footer">
-      <button class="btn btn-default" ng-click="close()" translate>I18N_SIGNUP_CLOSE_BUTTON</button>
+      <button class="btn btn-default" ng-click="close()" translate="I18N_SIGNUP_CLOSE_BUTTON"></button>
     </div>
   </script>
 {% endblock %}

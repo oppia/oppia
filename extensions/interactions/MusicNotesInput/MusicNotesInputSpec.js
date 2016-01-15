@@ -24,7 +24,6 @@ describe('MusicNotesInput interaction', function() {
     var $httpBackend, $templateCache;
     var elt, scope, ctrlScope;
 
-    beforeEach(module('oppia'));
     beforeEach(module('directiveTemplates'));
     beforeEach(module('oppia', GLOBALS.OVERWRITE_TRANSLATOR_PROVIDER));
 
@@ -55,7 +54,7 @@ describe('MusicNotesInput interaction', function() {
 
     it('loads the music staff template', function() {
       expect(elt.html()).toContain('oppia-music-input-valid-note-area');
-      expect(elt.html()).toContain('Play Target Sequence');
+      expect(elt.html()).toContain('I18N_INTERACTIONS_MUSIC_PLAY_SEQUENCE');
       expect(elt.html()).toContain('playCurrentSequence()');
     });
 
@@ -187,7 +186,6 @@ describe('MusicNotesInput interaction', function() {
 
 
 describe('Music phrase player service', function() {
-  beforeEach(module('oppia'));
 
   describe('music phrase player service', function() {
     var mpps = null;

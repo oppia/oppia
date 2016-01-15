@@ -484,4 +484,9 @@ ALL_LANGUAGE_CODES = [{
 DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
 
+LANGUAGES_SUPPORTED = [{
+    'name': 'English', 'code': 'en',
+}, {
+    'name': u'Español', 'code': 'es',
+}]
 SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]

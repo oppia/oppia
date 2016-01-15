@@ -151,6 +151,7 @@ fi
 # Parse additional command line arguments that may be passed to protractor.
 # Credit: http://stackoverflow.com/questions/192249
 SHARDING=true
+SPECS='.'
 SHARD_INSTANCES=3
 for i in "$@"; do
   # Match each space-separated argument passed to the shell file to a separate
@@ -172,6 +173,11 @@ for i in "$@"; do
     shift
     ;;
 
+    --specs=*)
+    SPECS="--specs=${i#*=}"
+    shift
+    ;;
+
     *)
     echo Error: Unknown command line option: $i
     ;;
@@ -184,7 +190,7 @@ done
 # in at all.
 # TODO(bhenning): Figure out if this is a bug with protractor.
 if [ "$SHARDING" = "false" ] || [ "$SHARD_INSTANCES" = "1" ]; then
-  $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js
+  $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js "$SPECS"
 else
   $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES
 fi

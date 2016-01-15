@@ -59,7 +59,8 @@
             <h4 class="conversation-skin-responses-dropdown-container"
                 ng-click="toggleShowPreviousResponses()">
               <span class="conversation-skin-responses-dropdown-text">
-                Previous answers (<[activeCard.answerFeedbackPairs.length - (activeCard.interactionIsInline ? 1 : 0)]>)
+
+                <span translate="I18N_PLAYER_PREVIOUS_RESPONSES" translate-values="{previousResponses: <[activeCard.answerFeedbackPairs.length - (activeCard.interactionIsInline ? 1 : 0)]>}"></span>
                 <span class="glyphicon glyphicon-play conversation-skin-responses-dropdown-icon"
                       ng-class="{'conversation-skin-responses-dropdown-icon-rotated': arePreviousResponsesShown}">
                 </span>
@@ -108,8 +109,8 @@
               <div ng-if="waitingForContinueButtonClick && !helpCardHasContinueButton">
                 <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
                            focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
-                           ng-click="showPendingCard(upcomingStateName, upcomingContentHtml)">
-                  Continue
+                           ng-click="showPendingCard(upcomingStateName, upcomingContentHtml)"
+                           translate="I18N_PLAYER_CONTINUE_BUTTON">
                 </md-button>
               </div>
               <div ng-if="activeCard.interactionHtml && !activeCard.interactionIsDisabled">
@@ -153,8 +154,7 @@
                focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
                ng-click="showPendingCard(upcomingStateName, upcomingContentHtml)"
                ng-if="helpCardHasContinueButton"
-               style="margin-top: 12px;">
-              Continue to next card
+               style="margin-top: 12px;" translate="I18N_PLAYER_CONTINUE_NEXT_CARD">
             </md-button>
           </div>
 
@@ -176,8 +176,7 @@
   <div ng-if="explorationCompleted && isLoggedIn && !isInPreviewMode && !isIframed && currentProgressDotIndex === transcript.length - 1"
        class="conversation-skin-final-ratings">
 
-    <div style="color: #eee; margin-bottom: 20px;">
-      Learned something new? How would you rate this exploration?
+    <div style="color: #eee; margin-bottom: 20px;" translate="I18N_PLAYER_RATE_EXPLORATION">
     </div>
     <div popover-placement="bottom" popover-template="'popover/feedback'" popover-trigger="click">
       <rating-from-value rating-value="userRating"
@@ -315,7 +314,7 @@
     <li class="oppia-progress-arrow" ng-show="dots.length > 1"
         ng-class="{'oppia-progress-arrow-active' : currentDotIndex > 0}"
         ng-click="decrementCurrentDotIndex()">
-      <span class="sr-only">Back</span>
+      <span class="sr-only" translate="I18N_PLAYER_BACK"></span>
       <span class="glyphicon glyphicon-arrow-left" aria-hidden="true">
       </span>
     </li>
@@ -324,7 +323,7 @@
         ng-show="$index >= leftmostVisibleDotIndex && $index <= rightmostVisibleDotIndex">
       <span class="oppia-progress-dot oppia-progress-dot-active"
         ng-if="$index === currentDotIndex" ng-show="dots.length > 1"
-        tooltip="Card #<[$index +1]>" tooltip-placement="bottom"
+        tooltip="<['I18N_PLAYER_CARD_NUMBER_TOOLTIP' | translate]><[$index + 1]>" tooltip-placement="bottom"
         tooltip-trigger="none" tooltip-is-open="opened" mobile-friendly-tooltip>
       </span>
       <span class="oppia-progress-dot oppia-progress-dot-inactive"
@@ -333,14 +332,14 @@
                    'oppia-progress-dot-gradient-right' :''"
         ng-if="$index !== currentDotIndex"
         ng-click="changeActiveDot($index)"
-        tooltip="Card #<[$index +1]>" tooltip-placement="bottom"
+        tooltip="<['I18N_PLAYER_CARD_NUMBER_TOOLTIP' | translate]><[$index + 1]>" tooltip-placement="bottom"
         tooltip-trigger="none" tooltip-is-open="opened" mobile-friendly-tooltip>
       </span>
     </li>
     <li class="oppia-progress-arrow" ng-show="dots.length > 1"
         ng-class="{'oppia-progress-arrow-active' : currentDotIndex != dots.length - 1}"
         ng-click="incrementCurrentDotIndex()">
-      <span class="sr-only">Forward</span>
+      <span class="sr-only" translate="I18N_PLAYER_FORWARD"></span>
       <span class=" glyphicon glyphicon-arrow-right" aria-hidden="true">
       </span>
     </li>

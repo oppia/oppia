@@ -26,7 +26,7 @@ var oppia = angular.module(
   'oppia', [
     'ngMaterial', 'ngAnimate', 'ngSanitize', 'ngResource', 'ui.bootstrap',
     'ui.sortable', 'infinite-scroll', 'ngJoyRide', 'ngImgCrop', 'ui.validate',
-    'textAngular', 'pascalprecht.translate'
+    'textAngular', 'pascalprecht.translate', 'ngCookies'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
                    : []));
@@ -63,8 +63,11 @@ oppia.config(['$interpolateProvider', '$httpProvider',
         },
         responseError: function(response) {
           $log.error(response.data);
-          warningsData.addWarning(
-            response.data.error || 'Error communicating with server.');
+          if (response.data && response.data.error) {
+            warningsData.addWarning(response.data.error);
+          } else {
+            warningsData.addWarning('Error communicating with server.');
+          }
           return $q.reject(response);
         }
       };

@@ -19,7 +19,6 @@
  */
 
 describe('Gallery controller', function() {
-  beforeEach(module('oppia'));
 
   describe('Gallery', function() {
     var scope, ctrl, rootScope, $httpBackend;

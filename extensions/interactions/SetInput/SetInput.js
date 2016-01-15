@@ -32,7 +32,8 @@ oppia.directive('oppiaInteractiveSetInput', [
             type: 'unicode'
           },
           ui_config: {
-            add_element_text: 'Add item'
+            // TODO(mili): Translate this in the html
+            add_element_text: $translate.instant('I18N_INTERACTIONS_SET_INPUT_ADD_ITEM')
           }
         };
 
@@ -52,7 +53,7 @@ oppia.directive('oppiaInteractiveSetInput', [
         $scope.submitAnswer = function(answer) {
           if (hasDuplicates(answer)) {
             $scope.errorMessage = (
-              'Oops, it looks like your set has duplicates!');
+              'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
           } else {
             $scope.errorMessage = '';
             $scope.$parent.$parent.submitAnswer(answer);
@@ -85,7 +86,8 @@ oppia.directive('oppiaShortResponseSetInput', [
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         var _answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
         $scope.displayedAnswer = (
-          _answer.length > 0 ? _answer.join(', ') : 'No answer given.');
+          _answer.length > 0 ? _answer.join(', ') :
+          'I18N_INTERACTIONS_SET_INPUT_NO_ANSWER');
       }]
     };
   }
