@@ -1191,7 +1191,7 @@ def save_new_exploration_from_yaml_and_assets(
 
 def delete_demo(exploration_id):
     """Deletes a single demo exploration."""
-    if not 0 <= int(exploration_id) < len(feconf.DEMO_EXPLORATIONS):
+    if not exp_domain.Exploration.is_demo_exploration_id(exploration_id):
         raise Exception('Invalid demo exploration id %s' % exploration_id)
 
     exploration = get_exploration_by_id(exploration_id, strict=False)
@@ -1211,19 +1211,14 @@ def load_demo(exploration_id):
     """
     delete_demo(exploration_id)
 
-    if not 0 <= int(exploration_id) < len(feconf.DEMO_EXPLORATIONS):
+    if not exp_domain.Exploration.is_demo_exploration_id(exploration_id):
         raise Exception('Invalid demo exploration id %s' % exploration_id)
 
-    exploration_info = feconf.DEMO_EXPLORATIONS[int(exploration_id)]
-
-    if len(exploration_info) == 3:
-        (exp_filename, title, category) = exploration_info
-    else:
-        raise Exception('Invalid demo exploration: %s' % exploration_info)
+    exp_filename = feconf.DEMO_EXPLORATIONS[exploration_id]
 
     yaml_content, assets_list = get_demo_exploration_components(exp_filename)
     save_new_exploration_from_yaml_and_assets(
-        feconf.SYSTEM_COMMITTER_ID, yaml_content, title, category,
+        feconf.SYSTEM_COMMITTER_ID, yaml_content, None, None,
         exploration_id, assets_list)
 
     publish_exploration_and_update_user_profiles(

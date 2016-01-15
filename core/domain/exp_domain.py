@@ -1757,9 +1757,8 @@ class Exploration(object):
 
     @classmethod
     def is_demo_exploration_id(cls, exploration_id):
-        """Whether the exploration id is that of a demo exploration."""
-        return exploration_id.isdigit() and (
-            0 <= int(exploration_id) < len(feconf.DEMO_EXPLORATIONS))
+        """Whether the given exploration id is a demo exploration."""
+        return exploration_id in feconf.DEMO_EXPLORATIONS
 
     @property
     def is_demo(self):
