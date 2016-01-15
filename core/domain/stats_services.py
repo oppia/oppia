@@ -18,6 +18,9 @@
 
 __author__ = 'Sean Lip'
 
+import logging
+import sys
+
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import interaction_registry
@@ -26,8 +29,6 @@ from core.domain import stats_jobs_continuous
 from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
-import logging
-import sys
 import utils
 
 
