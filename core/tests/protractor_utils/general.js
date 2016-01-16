@@ -128,8 +128,8 @@ var expect404Error = function() {
     toMatch('Error 404');
 };
 
-// Checks no untranslated values are shown inside the given selector.
-var ensurePageHasNoTranslationIds = function(selector) {
+// Checks no untranslated values are shown in the page.
+var ensurePageHasNoTranslationIds = function() {
   // The use of the InnerHTML is hacky, but is faster than checking each
   // individual component that contains text.
   element(by.css('.oppia-base-container')).getInnerHtml().then(

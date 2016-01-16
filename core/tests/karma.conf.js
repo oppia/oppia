@@ -27,7 +27,12 @@ module.exports = function(config) {
       'core/templates/dev/head/components/rating_display.html',
       'extensions/**/*.js',
       'extensions/interactions/**/*.html',
-      {pattern: 'i18n/**/*.json', watched: true, served: true, included: false}
+      {
+        pattern: 'i18n/**/*.json',
+        watched: true,
+        served: true,
+        included: false
+      }
     ],
     exclude: [
       'core/templates/dev/head/**/*-e2e.js',

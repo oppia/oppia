@@ -141,9 +141,9 @@ oppia.factory('searchService', [
 // TODO(sll): This should be in some kind of service, rather than at the top
 // level.
 var getI18nId = function(prefix, name) {
-  var i18n_id = ('I18N_GALLERY_' + prefix.toUpperCase() + '_' +
+  return (
+    'I18N_GALLERY_' + prefix.toUpperCase() + '_' +
     name.toUpperCase().replace(' ', '_'));
-  return i18n_id;
 };
 
 oppia.controller('Gallery', [
@@ -157,11 +157,11 @@ oppia.controller('Gallery', [
       oppiaDebouncer, urlService, GALLERY_DATA_URL, CATEGORY_LIST,
       searchService) {
     $translate('I18N_GALLERY_PAGE_TITLE', 'I18N_GALLERY_PAGE_SUBTITLE')
-      .then(function (translatedPageTitle) {
+      .then(function(translatedPageTitle) {
       $rootScope.pageTitle = translatedPageTitle;
     });
 
-    $rootScope.$on('$translateChangeSuccess', function (event, data) {
+    $rootScope.$on('$translateChangeSuccess', function() {
       $rootScope.pageTitle = (
         $translate.instant('I18N_GALLERY_PAGE_TITLE') +
         ' - ' + $translate.instant('I18N_GALLERY_PAGE_SUBTITLE'));
@@ -320,7 +320,7 @@ oppia.controller('SearchBar', [
     };
 
     // Non translatable parts of the html strings, like numbers or user names.
-    $scope.translationData = {}
+    $scope.translationData = {};
 
     // Update the description, numSelections and summary fields of the relevant
     // entry of $scope.selectionDetails.
@@ -342,7 +342,7 @@ oppia.controller('SearchBar', [
         totalCount === 0 ? 'I18N_GALLERY_ALL_' + itemsName.toUpperCase() :
         totalCount === 1 ? selectedItems[0] :
         'I18N_GALLERY_N_' + itemsName.toUpperCase());
-      $scope.translationData[itemsName + 'Count'] = totalCount
+      $scope.translationData[itemsName + 'Count'] = totalCount;
 
       // TODO(milit): When the language changes, the translations wont change
       // until the user changes the selection and this function is re-executed.

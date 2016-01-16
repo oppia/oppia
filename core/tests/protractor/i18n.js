@@ -24,7 +24,7 @@ var users = require('../protractor_utils/users.js');
 
 var _selectLanguage = function(language) {
   element(by.name('protractor-test-i18n-language-' + language)).click();
-}
+};
 
 describe('Translations\' language', function() {
   beforeEach(function() {
@@ -49,6 +49,6 @@ describe('Translations\' language', function() {
   });
 
   afterEach(function() {
-    general.ensurePageHasNoTranslationIds([]);
+    general.ensurePageHasNoTranslationIds();
   });
 });

@@ -22,6 +22,7 @@ var GLOBALS = {
   PANEL_SPECS: {}
 };
 
+// jscs:disable maximumLineLength
 /* This function overwrites the translationProvider for a dummy function
  * (customLoader). This is necessary to prevent the js test warnings about an
  * "unexpected GET request" when the translationProvider tries to load the
@@ -29,13 +30,14 @@ var GLOBALS = {
  * More info in the angular-translate documentation
  * http://angular-translate.github.io/docs/#/guide/22_unit-testing-with-angular-translate
  */
+// jscs:enable maximumLineLength
 GLOBALS.OVERWRITE_TRANSLATOR_PROVIDER = function($provide, $translateProvider) {
   $provide.factory('customLoader', function($q) {
-    return function () {
+    return function() {
       var deferred = $q.defer();
       deferred.resolve({});
       return deferred.promise;
     };
   });
   $translateProvider.useLoader('customLoader');
-}
+};

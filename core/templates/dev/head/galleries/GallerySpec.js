@@ -19,7 +19,6 @@
  */
 
 describe('Gallery controller', function() {
-
   describe('Gallery', function() {
     var scope, ctrl, rootScope, $httpBackend;
 

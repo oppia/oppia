@@ -211,7 +211,6 @@ describe('MusicNotesInput interaction', function() {
 });
 
 describe('Music phrase player service', function() {
-
   describe('music phrase player service', function() {
     var mpps = null;
     beforeEach(module('oppia', GLOBALS.OVERWRITE_TRANSLATOR_PROVIDER));

@@ -20,7 +20,6 @@
  */
 
 describe('MyExplorations controller', function() {
-
   describe('MyExplorations', function() {
     var scope, ctrl, $httpBackend;
     var explorationsList = [{

@@ -32,7 +32,8 @@ describe('Exploration context service', function() {
             pathname: '/explore/123'
           }
         });
-        // angular-cookies uses $document to store the preferred language.
+        // The angular-cookies module uses $document to store the preferred
+        // language.
         $provide.value('$document', [{}]);
       });
     });
