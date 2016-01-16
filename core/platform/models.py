@@ -16,8 +16,6 @@
 
 """Interface for storage model switching."""
 
-__author__ = 'Sean Lip'
-
 import feconf
 import utils
 

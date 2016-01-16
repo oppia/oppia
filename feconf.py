@@ -45,7 +45,6 @@ RTE_EXTENSIONS_DIR = os.path.join('extensions', 'rich_text_components')
 RULES_DIR = os.path.join('extensions', 'rules')
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
-SKINS_TEMPLATES_DIR = os.path.join('extensions', 'skins')
 TEMPLATES_DIR_PREFIX = 'dev' if DEV_MODE else 'prod'
 FRONTEND_TEMPLATES_DIR = os.path.join(
     'core', 'templates', TEMPLATES_DIR_PREFIX, 'head')
@@ -196,6 +195,18 @@ VALID_MODERATOR_ACTIONS = {
     },
 }
 
+# Panel properties and other constants for the default skin.
+GADGET_PANEL_AXIS_HORIZONTAL = 'horizontal'
+PANELS_PROPERTIES = {
+    'bottom': {
+        'width': 350,
+        'height': 100,
+        'stackable_axis': GADGET_PANEL_AXIS_HORIZONTAL,
+        'pixels_between_gadgets': 80,
+        'max_gadgets': 1
+    }
+}
+
 # When the site terms were last updated, in UTC.
 REGISTRATION_PAGE_LAST_UPDATED_UTC = datetime.datetime(2015, 10, 14, 2, 40, 0)
 
@@ -209,6 +220,7 @@ DEFAULT_LANGUAGE_CODE = 'en'
 SHOW_CUSTOM_PAGES = True
 
 # The id of the default skin.
+# TODO(sll): Deprecate this; it is no longer used.
 DEFAULT_SKIN_ID = 'conversation_v1'
 
 # User id and username for exploration migration bot. Commits made by this bot
@@ -287,35 +299,33 @@ ALLOWED_GADGETS = {
 # Gadgets subclasses must specify a valid panel option from this list.
 ALLOWED_GADGET_PANELS = ['bottom']
 
-# Demo explorations to load on startup. The id assigned to each exploration
-# is based on the index of the exploration in this list, so if you want to
-# add a new exploration and preserve the existing ids, add that exploration
-# to the end of the list.
-# Each item is represented as a tuple: (filepath, title, category). If the
-# filepath is a yaml file it should end with '.yaml', otherwise it should
-# be the path to the directory WITHOUT a trailing '/'.
-DEMO_EXPLORATIONS = [
-    ('welcome.yaml', 'Welcome to Oppia!', 'Welcome'),
-    ('multiples.yaml', 'Project Euler Problem 1', 'Coding'),
-    ('binary_search', 'The Lazy Magician', 'Mathematics'),
-    ('root_linear_coefficient_theorem.yaml', 'Root Linear Coefficient Theorem',
-     'Mathematics'),
-    ('three_balls', 'Three Balls', 'Mathematics'),
-    ('cities.yaml', 'World Cities', 'Geography'),
-    ('boot_verbs.yaml', 'Boot Verbs', 'Languages'),
-    ('hola.yaml', u'¡Hola!', 'Languages'),
-    # This exploration is included to show other applications of Oppia, but
-    # please note that Oppia lacks many of the features of a full interactive
-    # fiction engine!
-    ('adventure.yaml', 'Parameterized Adventure', 'Interactive Fiction'),
-    ('pitch_perfect.yaml', 'Pitch Perfect', 'Music'),
-    ('test_interactions', 'Test of expressions and interactions', 'Test'),
-    ('modeling_graphs', 'Graph Modeling', 'Mathematics'),
-    ('protractor_test_1.yaml', 'Protractor Test', 'Mathematics'),
-    ('solar_system', 'The Solar System', 'Physics'),
-    ('about_oppia.yaml', 'About Oppia', 'Welcome'),
-    ('fuzzy_exploration.yaml', 'Demonstrating fuzzy rules', 'Test'),
-]
+# Demo explorations to load through the admin panel. The id assigned to each
+# exploration is based on the key of the exploration in this dict, so ensure it
+# doesn't change once it's in the list. Only integer-based indices should be
+# used in this list, as it maintains backward compatibility with how demo
+# explorations used to be assigned IDs. The value of each entry in this dict is
+# either a YAML file or a directory (depending on whether it ends in .yaml).
+# These explorations can be found under data/explorations.
+DEMO_EXPLORATIONS = {
+    u'0': 'welcome.yaml',
+    u'1': 'multiples.yaml',
+    u'2': 'binary_search',
+    u'3': 'root_linear_coefficient_theorem.yaml',
+    u'4': 'three_balls',
+    # TODO(bhenning): Replace demo exploration '5' with a new exploration
+    # described in #1376.
+    u'6': 'boot_verbs.yaml',
+    u'7': 'hola.yaml',
+    u'8': 'adventure.yaml',
+    u'9': 'pitch_perfect.yaml',
+    u'10': 'test_interactions',
+    u'11': 'modeling_graphs',
+    u'12': 'protractor_test_1.yaml',
+    u'13': 'solar_system',
+    u'14': 'about_oppia.yaml',
+    u'15': 'fuzzy_exploration.yaml',
+    u'16': 'all_interactions',
+}
 
 DEMO_COLLECTIONS = {
     u'0': 'welcome_to_collections.yaml'

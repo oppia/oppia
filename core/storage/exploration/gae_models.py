@@ -16,8 +16,6 @@
 
 """Model for an Oppia exploration."""
 
-__author__ = 'Sean Lip'
-
 import datetime
 
 import core.storage.base_model.gae_models as base_models
@@ -281,7 +279,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
             raise ValueError(
                 'max_age must be a datetime.timedelta instance or None.')
 
-        query = cls.query(cls.post_commit_is_private == False)
+        query = cls.query(cls.post_commit_is_private == False)  # pylint: disable=singleton-comparison
         if max_age:
             query = query.filter(
                 cls.last_updated >= datetime.datetime.utcnow() - max_age)
@@ -361,7 +359,7 @@ class ExpSummaryModel(base_models.BaseModel):
         return ExpSummaryModel.query().filter(
             ExpSummaryModel.status != feconf.ACTIVITY_STATUS_PRIVATE
         ).filter(
-            ExpSummaryModel.deleted == False
+            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
@@ -376,7 +374,7 @@ class ExpSummaryModel(base_models.BaseModel):
                    ExpSummaryModel.editor_ids == user_id,
                    ExpSummaryModel.viewer_ids == user_id)
         ).filter(
-            ExpSummaryModel.deleted == False
+            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
@@ -388,5 +386,5 @@ class ExpSummaryModel(base_models.BaseModel):
             ndb.OR(ExpSummaryModel.owner_ids == user_id,
                    ExpSummaryModel.editor_ids == user_id)
         ).filter(
-            ExpSummaryModel.deleted == False
+            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)

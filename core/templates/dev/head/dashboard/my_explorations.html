@@ -108,14 +108,16 @@
                       <span style="font-weight: bold;">&middot;</span>
                       Last updated <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
                     </span>
+
                     <span ng-if="exploration.status === 'publicized'">
                       <span style="font-weight: bold;">&middot;</span>
                       <span style="color: #888">Featured</span>
                     </span>
-                    <span ng-if="areRatingsShown(exploration.ratings)">
+
+                    <span ng-if="getAverageRating(exploration.ratings)">
                       <span style="font-weight: bold;">&middot;</span>
-                      <span class="oppia-gallery-tile-ratings">
-                        <rating-from-frequencies rating-frequencies="exploration.ratings"></rating-from-frequencies>
+                      <span style="color: #888">
+                        Average rating <[getAverageRating(exploration.ratings) | number:1]>
                       </span>
                     </span>
                   </div>
@@ -135,13 +137,13 @@
     </div>
   </div>
 
-  {% include 'components/exploration_creation_button.html' %}
+  {% include 'components/exploration_creation_button_modal.html' %}
 {% endblock %}
 
 {% block footer_js %}
   {{ super() }}
   <script>
-    {{ include_js_file('components/explorationCreationButton.js') }}
+    {{ include_js_file('components/ExplorationCreationButtonService.js') }}
     {{ include_js_file('dashboard/MyExplorations.js') }}
   </script>
 {% endblock footer_js %}

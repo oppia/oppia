@@ -16,9 +16,6 @@
 
 """Tests for user dashboard computations."""
 
-__author__ = 'Sean Lip'
-
-from core import jobs_registry
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_services
@@ -60,11 +57,11 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(UserContributionsOneOffJobTests, self).setUp()
-        # User A has no created or edited explorations 
-        # User B has one created exploration 
-        # User C has one edited exploration 
-        # User D has created an exploration and then edited it. 
-        # (This is used to check that there are no duplicate 
+        # User A has no created or edited explorations
+        # User B has one created exploration
+        # User C has one edited exploration
+        # User D has created an exploration and then edited it.
+        # (This is used to check that there are no duplicate
         # entries in the contribution lists.)
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
@@ -103,7 +100,7 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(user_a_contributions_model.edited_exploration_ids, [])
 
     def test_created_exp(self):
-        """Tests the case where user has created (and therefore edited) 
+        """Tests the case where user has created (and therefore edited)
         an exploration."""
 
         self._run_one_off_job()
@@ -133,11 +130,11 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
         user_d_contributions_model = user_models.UserContributionsModel.get(
             self.user_d_id)
         self.assertEqual(
-            user_d_contributions_model.edited_exploration_ids, 
-            [self.EXP_ID_2]) 
+            user_d_contributions_model.edited_exploration_ids,
+            [self.EXP_ID_2])
         self.assertEqual(
             user_d_contributions_model.created_exploration_ids,
-            [self.EXP_ID_2]) 
+            [self.EXP_ID_2])
 
 
 class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
@@ -181,10 +178,10 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
 
         with self.swap(
-                subscription_services, 'subscribe_to_thread', self._null_fn
+            subscription_services, 'subscribe_to_thread', self._null_fn
             ), self.swap(
-                subscription_services, 'subscribe_to_exploration',
-                self._null_fn):
+                subscription_services, 'subscribe_to_exploration', self._null_fn
+            ):
             # User A creates and saves a new valid exploration.
             self.save_new_valid_exploration(
                 self.EXP_ID_1, self.user_a_id, end_state_name='End')
@@ -210,10 +207,10 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(user_c_subscriptions_model, None)
 
         with self.swap(
-                subscription_services, 'subscribe_to_thread', self._null_fn
+            subscription_services, 'subscribe_to_thread', self._null_fn
             ), self.swap(
-                subscription_services, 'subscribe_to_exploration',
-                self._null_fn):
+                subscription_services, 'subscribe_to_exploration', self._null_fn
+            ):
             # User B starts a feedback thread.
             feedback_services.create_thread(
                 self.EXP_ID_1, None, self.user_b_id, 'subject', 'text')
@@ -239,10 +236,10 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
 
     def test_exploration_subscription(self):
         with self.swap(
-                subscription_services, 'subscribe_to_thread', self._null_fn
+            subscription_services, 'subscribe_to_thread', self._null_fn
             ), self.swap(
-                subscription_services, 'subscribe_to_exploration',
-                self._null_fn):
+                subscription_services, 'subscribe_to_exploration', self._null_fn
+            ):
             # User A adds user B as an editor to the exploration.
             rights_manager.assign_role_for_exploration(
                 self.user_a_id, self.EXP_ID_1, self.user_b_id,
@@ -272,10 +269,10 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
 
     def test_two_explorations(self):
         with self.swap(
-                subscription_services, 'subscribe_to_thread', self._null_fn
+            subscription_services, 'subscribe_to_thread', self._null_fn
             ), self.swap(
-                subscription_services, 'subscribe_to_exploration',
-                self._null_fn):
+                subscription_services, 'subscribe_to_exploration', self._null_fn
+            ):
             # User A creates and saves another valid exploration.
             self.save_new_valid_exploration(self.EXP_ID_2, self.user_a_id)
 
@@ -291,10 +288,10 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
 
     def test_community_owned_exploration(self):
         with self.swap(
-                subscription_services, 'subscribe_to_thread', self._null_fn
+            subscription_services, 'subscribe_to_thread', self._null_fn
             ), self.swap(
-                subscription_services, 'subscribe_to_exploration',
-                self._null_fn):
+                subscription_services, 'subscribe_to_exploration', self._null_fn
+            ):
             # User A adds user B as an editor to the exploration.
             rights_manager.assign_role_for_exploration(
                 self.user_a_id, self.EXP_ID_1, self.user_b_id,
@@ -325,10 +322,10 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
 
     def test_deleted_exploration(self):
         with self.swap(
-                subscription_services, 'subscribe_to_thread', self._null_fn
+            subscription_services, 'subscribe_to_thread', self._null_fn
             ), self.swap(
-                subscription_services, 'subscribe_to_exploration',
-                self._null_fn):
+                subscription_services, 'subscribe_to_exploration', self._null_fn
+            ):
 
             # User A deletes the exploration.
             exp_services.delete_exploration(self.user_a_id, self.EXP_ID_1)
@@ -342,13 +339,12 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
 
     def test_collection_subscription(self):
         with self.swap(
-                subscription_services, 'subscribe_to_thread', self._null_fn
+            subscription_services, 'subscribe_to_thread', self._null_fn
             ), self.swap(
-                subscription_services, 'subscribe_to_exploration',
-                self._null_fn
+                subscription_services, 'subscribe_to_exploration', self._null_fn
             ), self.swap(
-                subscription_services, 'subscribe_to_collection',
-                self._null_fn):
+                subscription_services, 'subscribe_to_collection', self._null_fn
+            ):
             # User A creates and saves a new valid collection.
             self.save_new_valid_collection(
                 self.COLLECTION_ID_1, self.user_a_id,
@@ -388,13 +384,12 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
 
     def test_two_collections(self):
         with self.swap(
-                subscription_services, 'subscribe_to_thread', self._null_fn
+            subscription_services, 'subscribe_to_thread', self._null_fn
             ), self.swap(
-                subscription_services, 'subscribe_to_exploration',
-                self._null_fn
+                subscription_services, 'subscribe_to_exploration', self._null_fn
             ), self.swap(
-                subscription_services, 'subscribe_to_collection',
-                self._null_fn):
+                subscription_services, 'subscribe_to_collection', self._null_fn
+            ):
             # User A creates and saves a new valid collection.
             self.save_new_valid_collection(
                 self.COLLECTION_ID_1, self.user_a_id,
@@ -417,13 +412,12 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
 
     def test_deleted_collection(self):
         with self.swap(
-                subscription_services, 'subscribe_to_thread', self._null_fn
+            subscription_services, 'subscribe_to_thread', self._null_fn
             ), self.swap(
-                subscription_services, 'subscribe_to_exploration',
-                self._null_fn
+                subscription_services, 'subscribe_to_exploration', self._null_fn
             ), self.swap(
-                subscription_services, 'subscribe_to_collection',
-                self._null_fn):
+                subscription_services, 'subscribe_to_collection', self._null_fn
+            ):
             # User A creates and saves a new collection.
             self.save_new_default_collection(
                 self.COLLECTION_ID_1, self.user_a_id)
@@ -444,10 +438,10 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
 
     def test_adding_exploration_to_collection(self):
         with self.swap(
-                subscription_services, 'subscribe_to_thread', self._null_fn
+            subscription_services, 'subscribe_to_thread', self._null_fn
             ), self.swap(
-                subscription_services, 'subscribe_to_collection',
-                self._null_fn):
+                subscription_services, 'subscribe_to_collection', self._null_fn
+            ):
             # User B creates and saves a new collection.
             self.save_new_default_collection(
                 self.COLLECTION_ID_1, self.user_b_id)
@@ -494,13 +488,20 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
     def setUp(self):
         super(UserFirstContributionMsecOneOffJobTests, self).setUp()
 
-    def test_contribution_msec_updates_on_published_explorations(self):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.set_admins([self.ADMIN_EMAIL])
 
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+    def test_contribution_msec_updates_on_published_explorations(self):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.admin_id, end_state_name='End')
-        self.init_state_name = exploration.init_state_name
+        init_state_name = exploration.init_state_name
 
         # Test that no contribution time is set.
         job_id = (
@@ -516,12 +517,10 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
             self.admin_id, self.EXP_ID)
         rights_manager.release_ownership_of_exploration(
             self.admin_id, self.EXP_ID)
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [{
                 'cmd': 'edit_state_property',
-                'state_name': self.init_state_name,
+                'state_name': init_state_name,
                 'property_name': 'widget_id',
                 'new_value': 'MultipleChoiceInput'
             }], 'commit')
@@ -529,28 +528,20 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
             user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
         user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
-        self.assertIsNotNone(user_services.get_user_settings(self.admin_id)
-            .first_contribution_msec)
-        self.assertIsNotNone(user_services.get_user_settings(self.editor_id)
-            .first_contribution_msec)
+        self.assertIsNotNone(user_services.get_user_settings(
+            self.admin_id).first_contribution_msec)
+        self.assertIsNotNone(user_services.get_user_settings(
+            self.editor_id).first_contribution_msec)
 
     def test_contribution_msec_does_not_update_on_unpublished_explorations(self):
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_EMAIL])
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        exploration = self.save_new_valid_exploration(
+        self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
-        self.init_state_name = exploration.init_state_name
         exp_services.publish_exploration_and_update_user_profiles(
             self.owner_id, self.EXP_ID)
         # We now manually reset the user's first_contribution_msec to None.
         # This is to test that the one off job skips over the unpublished
         # exploration and does not reset the user's first_contribution_msec.
-        user_services._update_first_contribution_msec(
+        user_services._update_first_contribution_msec(  # pylint: disable=protected-access
             self.owner_id, None)
         rights_manager.unpublish_exploration(self.admin_id, self.EXP_ID)
 

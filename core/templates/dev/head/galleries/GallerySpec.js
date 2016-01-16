@@ -78,7 +78,7 @@ describe('Gallery controller', function() {
       ctrl = $controller('Gallery', {
         $scope: scope,
         warningsData: null,
-        createExplorationButtonService: {
+        ExplorationCreationButtonService: {
           showCreateExplorationModal: null,
           showUploadExplorationModal: null
         },

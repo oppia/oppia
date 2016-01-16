@@ -16,8 +16,6 @@
 
 """Tests for the base gadget specification."""
 
-__author__ = 'Michael Anuzis'
-
 import os
 import re
 import string
@@ -26,7 +24,6 @@ from core.domain import dependency_registry
 from core.domain import gadget_registry
 from core.domain import obj_services
 from core.tests import test_utils
-from extensions.gadgets import base
 import feconf
 import schema_utils
 import schema_utils_test
@@ -36,11 +33,17 @@ import utils
 # validity of gadget definitions.
 IGNORED_FILE_SUFFIXES = ['.pyc', '.DS_Store']
 
+TEST_GADGET_TYPE = 'TestGadget'
 TEST_GADGETS = {
-    'TestGadget': {
+    TEST_GADGET_TYPE: {
         'dir': os.path.join(feconf.GADGETS_DIR, 'TestGadget')
     }
 }
+
+_GADGET_CONFIG_SCHEMA = [
+    ('short_description', basestring), ('description', basestring),
+    ('height_px', int), ('width_px', int), ('panel', basestring),
+    ('_customization_arg_specs', list)]
 
 
 class GadgetUnitTests(test_utils.GenericTestBase):
@@ -50,9 +53,9 @@ class GadgetUnitTests(test_utils.GenericTestBase):
         """Check whether a name is in CamelCase."""
         return name and (name[0] in string.ascii_uppercase)
 
-    def _is_alphanumeric_string(self, string):
+    def _is_alphanumeric_string(self, input_string):
         """Check whether a string is alphanumeric."""
-        return bool(re.compile("^[a-zA-Z0-9_]+$").match(string))
+        return bool(re.compile("^[a-zA-Z0-9_]+$").match(input_string))
 
     def _validate_customization_arg_specs(self, customization_args):
         for ca_spec in customization_args:
@@ -84,18 +87,16 @@ class GadgetUnitTests(test_utils.GenericTestBase):
         for dependency_id in dependency_ids:
             dependency_registry.Registry.get_dependency_html(dependency_id)
 
-    def _listdir_omit_ignored(self, dir):
-        """List all files and directories within 'dir', omitting the ones whose
-        name ends in one of the IGNORED_FILE_SUFFIXES."""
-        names = os.listdir(dir)
+    def _listdir_omit_ignored(self, directory):
+        """List all files and directories within 'directory', omitting the ones
+        whose name ends in one of the IGNORED_FILE_SUFFIXES."""
+        names = os.listdir(directory)
         for suffix in IGNORED_FILE_SUFFIXES:
             names = [name for name in names if not name.endswith(suffix)]
         return names
 
     def test_gadget_properties(self):
         """Test the standard properties of gadgets."""
-
-        TEST_GADGET_TYPE = 'TestGadget'
 
         with self.swap(feconf, 'ALLOWED_GADGETS', TEST_GADGETS):
             gadget = gadget_registry.Registry.get_gadget_by_type(
@@ -107,8 +108,8 @@ class GadgetUnitTests(test_utils.GenericTestBase):
 
         gadget_dict = gadget.to_dict()
         self.assertItemsEqual(gadget_dict.keys(), [
-            'type', 'short_description', 'height_px', 'width_px', 'panel', 'description',
-            'customization_arg_specs',])
+            'type', 'short_description', 'height_px', 'width_px', 'panel',
+            'description', 'customization_arg_specs',])
         self.assertEqual(gadget_dict['type'], TEST_GADGET_TYPE)
         self.assertEqual(gadget_dict['customization_arg_specs'], [
             {
@@ -151,11 +152,6 @@ class GadgetUnitTests(test_utils.GenericTestBase):
 
     def test_default_gadgets_are_valid(self):
         """Test that the default gadgets are valid."""
-
-        _GADGET_CONFIG_SCHEMA = [
-            ('short_description', basestring), ('description', basestring),
-            ('height_px', int), ('width_px', int), ('panel', basestring),
-            ('_customization_arg_specs', list)]
 
         for gadget_type in feconf.ALLOWED_GADGETS:
             # Check that the gadget type is valid.
@@ -216,7 +212,7 @@ class GadgetUnitTests(test_utils.GenericTestBase):
                 'oppiaGadget%s' % gadget_type, js_file_content)
             self.assertIn(
                 '<script type="text/ng-template" id="gadget/%s"' %
-                    gadget_type,
+                gadget_type,
                 html_file_content)
             self.assertNotIn('<script>', js_file_content)
             self.assertNotIn('</script>', js_file_content)
@@ -247,6 +243,6 @@ class GadgetUnitTests(test_utils.GenericTestBase):
                     self.assertTrue(getattr(gadget, item))
 
             self._validate_customization_arg_specs(
-                gadget._customization_arg_specs)
+                gadget._customization_arg_specs)  # pylint: disable=protected-access
 
             self._validate_dependencies(gadget.dependency_ids)

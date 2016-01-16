@@ -14,8 +14,6 @@
 
 """Controllers for the feedback thread page."""
 
-__author__ = 'kashida@google.com (Koji Ashida)'
-
 from core.controllers import base
 from core.domain import feedback_services
 
@@ -56,13 +54,13 @@ class ThreadHandler(base.BaseHandler):
 
     PAGE_NAME_FOR_CSRF = 'editor'
 
-    def get(self, exploration_id, thread_id):
+    def get(self, exploration_id, thread_id):  # pylint: disable=unused-argument
         self.values.update({
             'messages': feedback_services.get_messages(thread_id)})
         self.render_json(self.values)
 
     @base.require_user
-    def post(self, exploration_id, thread_id):
+    def post(self, exploration_id, thread_id):  # pylint: disable=unused-argument
         text = self.payload.get('text')
         updated_status = self.payload.get('updated_status')
         if not text and not updated_status:

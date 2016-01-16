@@ -16,8 +16,6 @@
 
 """Model for an Oppia collection."""
 
-__author__ = 'Ben Henning'
-
 import datetime
 
 import core.storage.base_model.gae_models as base_models
@@ -249,7 +247,8 @@ class CollectionCommitLogEntryModel(base_models.BaseModel):
             raise ValueError(
                 'max_age must be a datetime.timedelta instance or None.')
 
-        query = cls.query(cls.post_commit_is_private == False)
+        query = cls.query(
+            cls.post_commit_is_private == False)  # pylint: disable=singleton-comparison
         if max_age:
             query = query.filter(
                 cls.last_updated >= datetime.datetime.utcnow() - max_age)
@@ -324,7 +323,7 @@ class CollectionSummaryModel(base_models.BaseModel):
         return CollectionSummaryModel.query().filter(
             CollectionSummaryModel.status != feconf.ACTIVITY_STATUS_PRIVATE
         ).filter(
-            CollectionSummaryModel.deleted == False
+            CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
@@ -339,7 +338,7 @@ class CollectionSummaryModel(base_models.BaseModel):
                    CollectionSummaryModel.editor_ids == user_id,
                    CollectionSummaryModel.viewer_ids == user_id)
         ).filter(
-            CollectionSummaryModel.deleted == False
+            CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
@@ -351,5 +350,5 @@ class CollectionSummaryModel(base_models.BaseModel):
             ndb.OR(CollectionSummaryModel.owner_ids == user_id,
                    CollectionSummaryModel.editor_ids == user_id)
         ).filter(
-            CollectionSummaryModel.deleted == False
+            CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)

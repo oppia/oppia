@@ -14,8 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'Jeremy Emerson'
-
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services

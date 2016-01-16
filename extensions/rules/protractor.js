@@ -54,8 +54,8 @@ var DESCRIPTIONS = {
       'into account',
     StartsWith: 'starts with {{x|NormalizedString}}',
     Contains: 'contains {{x|NormalizedString}}',
-    FuzzyEquals: 'is equal to {{x|NormalizedString}}, misspelled by at most one ' +
-      'character'
+    FuzzyEquals: 'is equal to {{x|NormalizedString}}, misspelled by at most ' +
+      'one character'
   },
   Real: {
     Equals: 'is equal to {{x|Real}}',

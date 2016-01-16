@@ -14,8 +14,6 @@
 
 """Tests for the exploration editor page."""
 
-__author__ = 'Sean Lip'
-
 import os
 import StringIO
 import zipfile
@@ -112,7 +110,7 @@ class EditorTest(BaseEditorControllerTest):
 
     def test_add_new_state_error_cases(self):
         """Test the error cases for adding a new state to an exploration."""
-        CURRENT_VERSION = 1
+        current_version = 1
 
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/create/0')
@@ -146,37 +144,37 @@ class EditorTest(BaseEditorControllerTest):
 
         # A request with an empty state name is invalid.
         response_dict = _put_and_expect_400_error(
-            _get_payload('', CURRENT_VERSION))
+            _get_payload('', current_version))
         self.assertIn('should be between 1 and 50', response_dict['error'])
 
         # A request with a really long state name is invalid.
         response_dict = _put_and_expect_400_error(
-            _get_payload('a' * 100, CURRENT_VERSION))
+            _get_payload('a' * 100, current_version))
         self.assertIn('should be between 1 and 50', response_dict['error'])
 
         # A request with a state name containing invalid characters is
         # invalid.
         response_dict = _put_and_expect_400_error(
-            _get_payload('[Bad State Name]', CURRENT_VERSION))
+            _get_payload('[Bad State Name]', current_version))
         self.assertIn('Invalid character [', response_dict['error'])
 
         # A name cannot have spaces at the front or back.
         response_dict = _put_and_expect_400_error(
-            _get_payload('  aa', CURRENT_VERSION))
+            _get_payload('  aa', current_version))
         self.assertIn('start or end with whitespace', response_dict['error'])
         response_dict = _put_and_expect_400_error(
-            _get_payload('aa\t', CURRENT_VERSION))
+            _get_payload('aa\t', current_version))
         self.assertIn('end with whitespace', response_dict['error'])
         response_dict = _put_and_expect_400_error(
-            _get_payload('\n', CURRENT_VERSION))
+            _get_payload('\n', current_version))
         self.assertIn('end with whitespace', response_dict['error'])
 
         # A name cannot have consecutive whitespace.
         response_dict = _put_and_expect_400_error(
-            _get_payload('The   B', CURRENT_VERSION))
+            _get_payload('The   B', current_version))
         self.assertIn('Adjacent whitespace', response_dict['error'])
         response_dict = _put_and_expect_400_error(
-            _get_payload('The\t\tB', CURRENT_VERSION))
+            _get_payload('The\t\tB', current_version))
         self.assertIn('Adjacent whitespace', response_dict['error'])
 
         self.logout()
@@ -208,8 +206,8 @@ class EditorTest(BaseEditorControllerTest):
                 exploration_dict['exploration']['states'][state_name][
                     'interaction']['id'], 'TextInput')
 
-            # Input happy since there is a hard rule checking for that.
-            result_dict = self.submit_answer('15', state_name, 'happy')
+            # Input happy since there is an explicit rule checking for that.
+            self.submit_answer('15', state_name, 'happy')
 
             # Input text not at all similar to happy (default outcome).
             self.submit_answer('15', state_name, 'sad')
@@ -250,16 +248,16 @@ class EditorTest(BaseEditorControllerTest):
             # If the confirmed unclassified answers is trained for one of the
             # values, it should no longer show up in unhandled answers.
             self.put_json('/createhandler/data/15', {
-                    'change_list': [{
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'state_name': state_name,
-                        'property_name': (
-                            exp_domain.STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS),
-                        'new_value': ['sad']
-                    }],
-                    'commit_message': 'Update confirmed unclassified answers',
-                    'version': exploration_dict['version'],
-                }, csrf_token)
+                'change_list': [{
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': state_name,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS),
+                    'new_value': ['sad']
+                }],
+                'commit_message': 'Update confirmed unclassified answers',
+                'version': exploration_dict['version'],
+            }, csrf_token)
             response_dict = self.get_json(url)
             self.assertEqual(
                 response_dict['unhandled_answers'],
@@ -278,22 +276,22 @@ class EditorTest(BaseEditorControllerTest):
             rule_spec['inputs']['training_data'].append('joyful')
 
             self.put_json('/createhandler/data/15', {
-                    'change_list': [{
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'state_name': state_name,
-                        'property_name': (
-                            exp_domain.STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS),
-                        'new_value': []
-                    }, {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'state_name': state_name,
-                        'property_name': (
-                            exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
-                        'new_value': state['interaction']['answer_groups']
-                    }],
-                    'commit_message': 'Update confirmed unclassified answers',
-                    'version': exploration_dict['version'],
-                }, csrf_token)
+                'change_list': [{
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': state_name,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS),
+                    'new_value': []
+                }, {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': state_name,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+                    'new_value': state['interaction']['answer_groups']
+                }],
+                'commit_message': 'Update confirmed unclassified answers',
+                'version': exploration_dict['version'],
+            }, csrf_token)
             response_dict = self.get_json(url)
             self.assertEqual(
                 response_dict['unhandled_answers'],
@@ -305,16 +303,16 @@ class EditorTest(BaseEditorControllerTest):
             # If both are classified, then nothing should be returned
             # unhandled.
             self.put_json('/createhandler/data/15', {
-                    'change_list': [{
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'state_name': state_name,
-                        'property_name': (
-                            exp_domain.STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS),
-                        'new_value': ['sad']
-                    }],
-                    'commit_message': 'Update confirmed unclassified answers',
-                    'version': exploration_dict['version'],
-                }, csrf_token)
+                'change_list': [{
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': state_name,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS),
+                    'new_value': ['sad']
+                }],
+                'commit_message': 'Update confirmed unclassified answers',
+                'version': exploration_dict['version'],
+            }, csrf_token)
             response_dict = self.get_json(url)
             self.assertEqual(response_dict['unhandled_answers'], [])
 
@@ -329,16 +327,16 @@ class EditorTest(BaseEditorControllerTest):
             rule_spec = answer_group['rule_specs'][0]
             del rule_spec['inputs']['training_data'][1]
             self.put_json('/createhandler/data/15', {
-                    'change_list': [{
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'state_name': state_name,
-                        'property_name': (
-                            exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
-                        'new_value': state['interaction']['answer_groups']
-                    }],
-                    'commit_message': 'Update confirmed unclassified answers',
-                    'version': exploration_dict['version'],
-                }, csrf_token)
+                'change_list': [{
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': state_name,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+                    'new_value': state['interaction']['answer_groups']
+                }],
+                'commit_message': 'Update confirmed unclassified answers',
+                'version': exploration_dict['version'],
+            }, csrf_token)
             response_dict = self.get_json(url)
             self.assertEqual(response_dict['unhandled_answers'], [])
 
@@ -349,7 +347,7 @@ class DownloadIntegrationTest(BaseEditorControllerTest):
     """Test handler for exploration and state download."""
 
     SAMPLE_JSON_CONTENT = {
-        "State A": ("""content:
+        'State A': ("""content:
 - type: text
   value: ''
 interaction:
@@ -368,7 +366,7 @@ interaction:
   id: TextInput
 param_changes: []
 """),
-        "State B": ("""content:
+        'State B': ("""content:
 - type: text
   value: ''
 interaction:
@@ -408,8 +406,7 @@ param_changes: []
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
 
-    SAMPLE_STATE_STRING = (
-"""content:
+    SAMPLE_STATE_STRING = ("""content:
 - type: text
   value: ''
 interaction:
@@ -431,17 +428,17 @@ param_changes: []
 
     def test_exploration_download_handler_for_default_exploration(self):
         self.login(self.EDITOR_EMAIL)
-        self.OWNER_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        owner_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         # Create a simple exploration
-        EXP_ID = 'eid'
+        exp_id = 'eid'
         self.save_new_valid_exploration(
-            EXP_ID, self.OWNER_ID,
+            exp_id, owner_id,
             title='The title for ZIP download handler test!',
             category='This is just a test category',
             objective='')
 
-        exploration = exp_services.get_exploration_by_id(EXP_ID)
+        exploration = exp_services.get_exploration_by_id(exp_id)
         init_state = exploration.states[exploration.init_state_name]
         init_interaction = init_state.interaction
         init_interaction.default_outcome.dest = exploration.init_state_name
@@ -451,13 +448,14 @@ param_changes: []
         exploration.states['State 3'].update_interaction_id('TextInput')
         exploration.rename_state('State 2', 'State B')
         exploration.delete_state('State 3')
-        exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
-        response = self.testapp.get('/create/%s' % EXP_ID)
+        exp_services._save_exploration(  # pylint: disable=protected-access
+            owner_id, exploration, '', [])
+        response = self.testapp.get('/create/%s' % exp_id)
 
         # Check download to zip file
         # Download to zip file using download handler
-        EXPLORATION_DOWNLOAD_URL = '/createhandler/download/%s' % EXP_ID
-        response = self.testapp.get(EXPLORATION_DOWNLOAD_URL)
+        download_url = '/createhandler/download/%s' % exp_id
+        response = self.testapp.get(download_url)
 
         # Check downloaded zip file
         self.assertEqual(response.headers['Content-Type'], 'text/plain')
@@ -471,31 +469,30 @@ param_changes: []
 
         # Load golden zip file
         with open(os.path.join(
-                feconf.TESTS_DATA_DIR,
-                'oppia-ThetitleforZIPdownloadhandlertest!-v2-gold.zip'),
-                'rb') as f:
+            feconf.TESTS_DATA_DIR,
+            'oppia-ThetitleforZIPdownloadhandlertest!-v2-gold.zip'),
+                  'rb') as f:
             golden_zipfile = f.read()
         zf_gold = zipfile.ZipFile(StringIO.StringIO(golden_zipfile))
 
         # Compare saved with golden file
         self.assertEqual(
             zf_saved.open(
-                'The title for ZIP download handler test!.yaml'
-                ).read(),
+                'The title for ZIP download handler test!.yaml').read(),
             zf_gold.open(
-                'The title for ZIP download handler test!.yaml'
-                ).read())
+                'The title for ZIP download handler test!.yaml').read())
 
         # Check download to JSON
         exploration.update_objective('Test JSON download')
-        exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
+        exp_services._save_exploration(  # pylint: disable=protected-access
+            owner_id, exploration, '', [])
 
         # Download to JSON string using download handler
         self.maxDiff = None
-        EXPLORATION_DOWNLOAD_URL = (
+        download_url = (
             '/createhandler/download/%s?output_format=%s&width=50' %
-            (EXP_ID, feconf.OUTPUT_FORMAT_JSON))
-        response = self.get_json(EXPLORATION_DOWNLOAD_URL)
+            (exp_id, feconf.OUTPUT_FORMAT_JSON))
+        response = self.get_json(download_url)
 
         # Check downloaded dict
         self.assertEqual(self.SAMPLE_JSON_CONTENT, response)
@@ -505,32 +502,33 @@ param_changes: []
     def test_state_download_handler_for_default_exploration(self):
 
         self.login(self.EDITOR_EMAIL)
-        self.OWNER_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        owner_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         # Create a simple exploration
-        EXP_ID = 'eid'
+        exp_id = 'eid'
         self.save_new_valid_exploration(
-            EXP_ID, self.OWNER_ID,
+            exp_id, owner_id,
             title='The title for states download handler test!',
             category='This is just a test category')
 
-        exploration = exp_services.get_exploration_by_id(EXP_ID)
+        exploration = exp_services.get_exploration_by_id(exp_id)
         exploration.add_states(['State A', 'State 2', 'State 3'])
         exploration.states['State A'].update_interaction_id('TextInput')
         exploration.states['State 2'].update_interaction_id('TextInput')
         exploration.states['State 3'].update_interaction_id('TextInput')
         exploration.rename_state('State 2', 'State B')
         exploration.delete_state('State 3')
-        exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
-        response = self.testapp.get('/create/%s' % EXP_ID)
+        exp_services._save_exploration(  # pylint: disable=protected-access
+            owner_id, exploration, '', [])
+        response = self.testapp.get('/create/%s' % exp_id)
 
         # Check download state as YAML string
         self.maxDiff = None
         state_name = 'State%20A'
-        EXPLORATION_DOWNLOAD_URL = (
+        download_url = (
             '/createhandler/download_state/%s?state=%s&width=50' %
-            (EXP_ID, state_name))
-        response = self.testapp.get(EXPLORATION_DOWNLOAD_URL)
+            (exp_id, state_name))
+        response = self.testapp.get(download_url)
         self.assertEqual(self.SAMPLE_STATE_STRING, response.body)
 
         self.logout()
@@ -540,66 +538,66 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
 
     def test_deletion_rights_for_unpublished_exploration(self):
         """Test rights management for deletion of unpublished explorations."""
-        UNPUBLISHED_EXP_ID = 'unpublished_eid'
+        unpublished_exp_id = 'unpublished_eid'
         exploration = exp_domain.Exploration.create_default_exploration(
-            UNPUBLISHED_EXP_ID, 'A title', 'A category')
+            unpublished_exp_id, 'A title', 'A category')
         exp_services.save_new_exploration(self.owner_id, exploration)
 
         rights_manager.assign_role_for_exploration(
-            self.owner_id, UNPUBLISHED_EXP_ID, self.editor_id,
+            self.owner_id, unpublished_exp_id, self.editor_id,
             rights_manager.ROLE_EDITOR)
 
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.delete(
-            '/createhandler/data/%s' % UNPUBLISHED_EXP_ID, expect_errors=True)
+            '/createhandler/data/%s' % unpublished_exp_id, expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
         self.login(self.VIEWER_EMAIL)
         response = self.testapp.delete(
-            '/createhandler/data/%s' % UNPUBLISHED_EXP_ID, expect_errors=True)
+            '/createhandler/data/%s' % unpublished_exp_id, expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
         self.login(self.OWNER_EMAIL)
         response = self.testapp.delete(
-            '/createhandler/data/%s' % UNPUBLISHED_EXP_ID)
+            '/createhandler/data/%s' % unpublished_exp_id)
         self.assertEqual(response.status_int, 200)
         self.logout()
 
     def test_deletion_rights_for_published_exploration(self):
         """Test rights management for deletion of published explorations."""
-        PUBLISHED_EXP_ID = 'published_eid'
+        published_exp_id = 'published_eid'
         exploration = exp_domain.Exploration.create_default_exploration(
-            PUBLISHED_EXP_ID, 'A title', 'A category')
+            published_exp_id, 'A title', 'A category')
         exp_services.save_new_exploration(self.owner_id, exploration)
 
         rights_manager.assign_role_for_exploration(
-            self.owner_id, PUBLISHED_EXP_ID, self.editor_id,
+            self.owner_id, published_exp_id, self.editor_id,
             rights_manager.ROLE_EDITOR)
-        rights_manager.publish_exploration(self.owner_id, PUBLISHED_EXP_ID)
+        rights_manager.publish_exploration(self.owner_id, published_exp_id)
 
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.delete(
-            '/createhandler/data/%s' % PUBLISHED_EXP_ID, expect_errors=True)
+            '/createhandler/data/%s' % published_exp_id, expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
         self.login(self.VIEWER_EMAIL)
         response = self.testapp.delete(
-            '/createhandler/data/%s' % PUBLISHED_EXP_ID, expect_errors=True)
+            '/createhandler/data/%s' % published_exp_id, expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
         self.login(self.OWNER_EMAIL)
         response = self.testapp.delete(
-            '/createhandler/data/%s' % PUBLISHED_EXP_ID, expect_errors=True)
+            '/createhandler/data/%s' % published_exp_id, expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
         self.login(self.ADMIN_EMAIL)
         response = self.testapp.delete(
-            '/createhandler/data/%s' % PUBLISHED_EXP_ID)
+            '/createhandler/data/%s' % published_exp_id)
         self.assertEqual(response.status_int, 200)
         self.logout()
 
@@ -607,11 +605,11 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
 class VersioningIntegrationTest(BaseEditorControllerTest):
     """Test retrieval of and reverting to old exploration versions."""
 
+    EXP_ID = '0'
+
     def setUp(self):
         """Create exploration with two versions"""
         super(VersioningIntegrationTest, self).setUp()
-
-        self.EXP_ID = '0'
 
         exp_services.load_demo(self.EXP_ID)
         rights_manager.release_ownership_of_exploration(
@@ -730,10 +728,10 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
     def test_user_banning(self):
         """Test that banned users are banned."""
 
-        EXP_ID = '0'
-        exp_services.load_demo(EXP_ID)
+        exp_id = '0'
+        exp_services.load_demo(exp_id)
         rights_manager.release_ownership_of_exploration(
-            feconf.SYSTEM_COMMITTER_ID, EXP_ID)
+            feconf.SYSTEM_COMMITTER_ID, exp_id)
 
         # Sign-up new editors Joe and Sandra.
         self.signup('joe@example.com', 'joe')
@@ -744,7 +742,7 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
 
         response = self.testapp.get(feconf.GALLERY_URL)
         self.assertEqual(response.status_int, 200)
-        response = self.testapp.get('/create/%s' % EXP_ID)
+        response = self.testapp.get('/create/%s' % exp_id)
         self.assertEqual(response.status_int, 200)
         self.assert_can_edit(response.body)
 
@@ -755,7 +753,7 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
         # Test that Joe is banned. (He can still access the gallery.)
         response = self.testapp.get(feconf.GALLERY_URL, expect_errors=True)
         self.assertEqual(response.status_int, 200)
-        response = self.testapp.get('/create/%s' % EXP_ID, expect_errors=True)
+        response = self.testapp.get('/create/%s' % exp_id, expect_errors=True)
         self.assertEqual(response.status_int, 200)
         self.assert_cannot_edit(response.body)
 
@@ -764,7 +762,7 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
 
         # Sandra logs in and is unaffected.
         self.login('sandra@example.com')
-        response = self.testapp.get('/create/%s' % EXP_ID)
+        response = self.testapp.get('/create/%s' % exp_id)
         self.assertEqual(response.status_int, 200)
         self.assert_can_edit(response.body)
         self.logout()
@@ -791,28 +789,25 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         self.signup(
             self.COLLABORATOR3_EMAIL, username=self.COLLABORATOR3_USERNAME)
 
-        self.collaborator_id = self.get_user_id_from_email(
-            self.COLLABORATOR_EMAIL)
-
         # Owner creates exploration
         self.login(self.OWNER_EMAIL)
-        EXP_ID = 'eid'
+        exp_id = 'eid'
         self.save_new_valid_exploration(
-            EXP_ID, self.owner_id, title='Title for rights handler test!',
+            exp_id, self.owner_id, title='Title for rights handler test!',
             category='My category')
 
-        exploration = exp_services.get_exploration_by_id(EXP_ID)
+        exploration = exp_services.get_exploration_by_id(exp_id)
         exploration.add_states(['State A', 'State 2', 'State 3'])
         exploration.states['State A'].update_interaction_id('TextInput')
         exploration.states['State 2'].update_interaction_id('TextInput')
         exploration.states['State 3'].update_interaction_id('TextInput')
 
         response = self.testapp.get(
-            '%s/%s' % (feconf.EDITOR_URL_PREFIX, EXP_ID))
+            '%s/%s' % (feconf.EDITOR_URL_PREFIX, exp_id))
         csrf_token = self.get_csrf_token_from_response(response)
 
         # Owner adds rights for other users
-        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, EXP_ID)
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
         self.put_json(
             rights_url, {
                 'version': exploration.version,
@@ -836,20 +831,20 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
 
         # Check that viewer can access editor page but cannot edit.
         self.login(self.VIEWER_EMAIL)
-        response = self.testapp.get('/create/%s' % EXP_ID, expect_errors=True)
+        response = self.testapp.get('/create/%s' % exp_id, expect_errors=True)
         self.assertEqual(response.status_int, 200)
         self.assert_cannot_edit(response.body)
         self.logout()
 
         # Check that collaborator can access editor page and can edit.
         self.login(self.COLLABORATOR_EMAIL)
-        response = self.testapp.get('/create/%s' % EXP_ID)
+        response = self.testapp.get('/create/%s' % exp_id)
         self.assertEqual(response.status_int, 200)
         self.assert_can_edit(response.body)
         csrf_token = self.get_csrf_token_from_response(response)
 
         # Check that collaborator can add a new state called 'State 4'
-        add_url = '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, EXP_ID)
+        add_url = '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
         response_dict = self.put_json(
             add_url,
             {
@@ -871,8 +866,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         self.assertIn('State 4', response_dict['states'])
 
         # Check that collaborator cannot add new members
-        exploration = exp_services.get_exploration_by_id(EXP_ID)
-        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, EXP_ID)
+        exploration = exp_services.get_exploration_by_id(exp_id)
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
         response_dict = self.put_json(
             rights_url, {
                 'version': exploration.version,
@@ -885,13 +880,13 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
 
         # Check that collaborator2 can access editor page and can edit.
         self.login(self.COLLABORATOR2_EMAIL)
-        response = self.testapp.get('/create/%s' % EXP_ID)
+        response = self.testapp.get('/create/%s' % exp_id)
         self.assertEqual(response.status_int, 200)
         self.assert_can_edit(response.body)
         csrf_token = self.get_csrf_token_from_response(response)
 
         # Check that collaborator2 can add a new state called 'State 5'
-        add_url = '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, EXP_ID)
+        add_url = '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
         response_dict = self.put_json(
             add_url,
             {
@@ -912,9 +907,9 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         )
         self.assertIn('State 5', response_dict['states'])
 
-        # Check that collaborator2 cannot add new members
-        exploration = exp_services.get_exploration_by_id(EXP_ID)
-        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, EXP_ID)
+        # Check that collaborator2 cannot add new members.
+        exploration = exp_services.get_exploration_by_id(exp_id)
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
         response_dict = self.put_json(
             rights_url, {
                 'version': exploration.version,
@@ -929,35 +924,35 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
 class ModeratorEmailsTest(test_utils.GenericTestBase):
     """Integration test for post-moderator action emails."""
 
+    EXP_ID = 'eid'
+
     def setUp(self):
         super(ModeratorEmailsTest, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.EDITOR_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.MODERATOR_ID = self.get_user_id_from_email(self.MODERATOR_EMAIL)
         self.set_moderators([self.MODERATOR_EMAIL])
 
         # The editor publishes an exploration.
-        self.EXP_ID = 'eid'
         self.save_new_valid_exploration(
-            self.EXP_ID, self.EDITOR_ID, title='My Exploration',
+            self.EXP_ID, self.editor_id, title='My Exploration',
             end_state_name='END')
-        rights_manager.publish_exploration(self.EDITOR_ID, self.EXP_ID)
+        rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
 
         # Set the default email config.
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.ADMIN_ID = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         config_services.set_property(
-            self.ADMIN_ID, 'publicize_exploration_email_html_body',
+            self.admin_id, 'publicize_exploration_email_html_body',
             'Default publicization email body')
         config_services.set_property(
-            self.ADMIN_ID, 'unpublish_exploration_email_html_body',
+            self.admin_id, 'unpublish_exploration_email_html_body',
             'Default unpublishing email body')
 
     def test_error_cases_for_email_sending(self):
         with self.swap(
-                feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
+            feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
             ), self.swap(
                 feconf, 'CAN_SEND_EMAILS_TO_USERS', False):
             # Log in as a moderator.
@@ -1002,28 +997,28 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
 
             # Try to publicize the exploration even if the relevant feconf
             # flags are not set. This should cause a system error.
-            VALID_PAYLOAD = {
+            valid_payload = {
                 'action': feconf.MODERATOR_ACTION_PUBLICIZE_EXPLORATION,
                 'email_body': 'Your exploration is featured!',
                 'version': 1,
             }
             self.put_json(
                 '/createhandler/moderatorrights/%s' % self.EXP_ID,
-                VALID_PAYLOAD, csrf_token, expect_errors=True,
+                valid_payload, csrf_token, expect_errors=True,
                 expected_status_int=500)
 
             with self.swap(feconf, 'CAN_SEND_EMAILS_TO_USERS', True):
                 # Now the email gets sent with no error.
                 self.put_json(
                     '/createhandler/moderatorrights/%s' % self.EXP_ID,
-                    VALID_PAYLOAD, csrf_token)
+                    valid_payload, csrf_token)
 
             # Log out.
             self.logout()
 
     def test_email_is_sent_correctly_when_publicizing(self):
         with self.swap(
-                feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
+            feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
             ), self.swap(
                 feconf, 'CAN_SEND_EMAILS_TO_USERS', True):
             # Log in as a moderator.
@@ -1034,17 +1029,17 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
             self.assertEqual(response.status_int, 200)
             csrf_token = self.get_csrf_token_from_response(response)
 
-            NEW_EMAIL_BODY = 'Your exploration is featured!'
+            new_email_body = 'Your exploration is featured!'
 
-            VALID_PAYLOAD = {
+            valid_payload = {
                 'action': feconf.MODERATOR_ACTION_PUBLICIZE_EXPLORATION,
-                'email_body': NEW_EMAIL_BODY,
+                'email_body': new_email_body,
                 'version': 1,
             }
 
             self.put_json(
                 '/createhandler/moderatorrights/%s' % self.EXP_ID,
-                VALID_PAYLOAD, csrf_token)
+                valid_payload, csrf_token)
 
             # Check that an email was sent with the correct content.
             messages = self.mail_stub.get_sent_messages(
@@ -1068,7 +1063,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
                 'You can change your email preferences via the Preferences '
                 'page.' % (
                     self.EDITOR_USERNAME,
-                    NEW_EMAIL_BODY,
+                    new_email_body,
                     self.MODERATOR_USERNAME)))
             self.assertEqual(messages[0].html.decode(), (
                 'Hi %s,<br><br>'
@@ -1078,14 +1073,14 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
                 'You can change your email preferences via the '
                 '<a href="https://www.example.com">Preferences</a> page.' % (
                     self.EDITOR_USERNAME,
-                    NEW_EMAIL_BODY,
+                    new_email_body,
                     self.MODERATOR_USERNAME)))
 
             self.logout()
 
     def test_email_is_sent_correctly_when_unpublishing(self):
         with self.swap(
-                feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
+            feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
             ), self.swap(
                 feconf, 'CAN_SEND_EMAILS_TO_USERS', True):
             # Log in as a moderator.
@@ -1096,17 +1091,17 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
             self.assertEqual(response.status_int, 200)
             csrf_token = self.get_csrf_token_from_response(response)
 
-            NEW_EMAIL_BODY = 'Your exploration is unpublished :('
+            new_email_body = 'Your exploration is unpublished :('
 
-            VALID_PAYLOAD = {
+            valid_payload = {
                 'action': feconf.MODERATOR_ACTION_UNPUBLISH_EXPLORATION,
-                'email_body': NEW_EMAIL_BODY,
+                'email_body': new_email_body,
                 'version': 1,
             }
 
             self.put_json(
                 '/createhandler/moderatorrights/%s' % self.EXP_ID,
-                VALID_PAYLOAD, csrf_token)
+                valid_payload, csrf_token)
 
             # Check that an email was sent with the correct content.
             messages = self.mail_stub.get_sent_messages(
@@ -1130,7 +1125,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
                 'You can change your email preferences via the Preferences '
                 'page.' % (
                     self.EDITOR_USERNAME,
-                    NEW_EMAIL_BODY,
+                    new_email_body,
                     self.MODERATOR_USERNAME)))
             self.assertEqual(messages[0].html.decode(), (
                 'Hi %s,<br><br>'
@@ -1140,14 +1135,14 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
                 'You can change your email preferences via the '
                 '<a href="https://www.example.com">Preferences</a> page.' % (
                     self.EDITOR_USERNAME,
-                    NEW_EMAIL_BODY,
+                    new_email_body,
                     self.MODERATOR_USERNAME)))
 
             self.logout()
 
     def test_email_functionality_cannot_be_used_by_non_moderators(self):
         with self.swap(
-                feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
+            feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
             ), self.swap(
                 feconf, 'CAN_SEND_EMAILS_TO_USERS', True):
             # Log in as a non-moderator.
@@ -1158,18 +1153,18 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
             self.assertEqual(response.status_int, 200)
             csrf_token = self.get_csrf_token_from_response(response)
 
-            NEW_EMAIL_BODY = 'Your exploration is unpublished :('
+            new_email_body = 'Your exploration is unpublished :('
 
-            VALID_PAYLOAD = {
+            valid_payload = {
                 'action': feconf.MODERATOR_ACTION_UNPUBLISH_EXPLORATION,
-                'email_body': NEW_EMAIL_BODY,
+                'email_body': new_email_body,
                 'version': 1,
             }
 
             # The user should receive an 'unauthorized user' error.
             self.put_json(
                 '/createhandler/moderatorrights/%s' % self.EXP_ID,
-                VALID_PAYLOAD, csrf_token, expect_errors=True,
+                valid_payload, csrf_token, expect_errors=True,
                 expected_status_int=401)
 
             self.logout()

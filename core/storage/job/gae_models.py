@@ -16,15 +16,14 @@
 
 """Models for long-running jobs."""
 
-__author__ = 'Sean Lip'
-
 import random
 
 from core.platform import models
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 import utils
 
 from google.appengine.ext import ndb
+
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
 # These are the possible status codes for a job.

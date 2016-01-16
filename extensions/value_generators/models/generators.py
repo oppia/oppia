@@ -28,9 +28,6 @@ class Copier(value_generators_domain.BaseValueGenerator):
 
     default_value = ''
 
-    def __init__(self, *args, **kwargs):
-        super(Copier, self).__init__()
-
     def generate_value(self, context_params, value, parse_with_jinja=False):
         """Returns a copy of the input value.
 
@@ -55,5 +52,5 @@ class RandomSelector(value_generators_domain.BaseValueGenerator):
 
     default_value = ''
 
-    def generate_value(self, context_params, list_of_values):
+    def generate_value(self, unused_context_params, list_of_values):
         return copy.deepcopy(utils.get_random_choice(list_of_values))

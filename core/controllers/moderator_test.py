@@ -14,8 +14,6 @@
 
 """Tests for the moderator page."""
 
-__author__ = 'Yana Malysheva'
-
 from core.tests import test_utils
 
 

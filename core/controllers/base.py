@@ -14,8 +14,6 @@
 
 """Base constants and handlers."""
 
-__author__ = 'Sean Lip'
-
 import base64
 import Cookie
 import datetime
@@ -29,6 +27,10 @@ import traceback
 import urllib
 import urlparse
 
+import jinja2
+import webapp2
+from google.appengine.api import users
+
 from core import counters
 from core.domain import config_domain
 from core.domain import config_services
@@ -37,18 +39,14 @@ from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import user_services
 from core.platform import models
-current_user_services = models.Registry.import_current_user_services()
-(user_models,) = models.Registry.import_models([models.NAMES.user])
 import feconf
 import jinja_utils
 import utils
 
-import jinja2
-import webapp2
+current_user_services = models.Registry.import_current_user_services()
+(user_models,) = models.Registry.import_models([models.NAMES.user])
 
-from google.appengine.api import users
-
-
+ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
 DEFAULT_CSRF_SECRET = 'oppia csrf secret'
 CSRF_SECRET = config_domain.ConfigProperty(
     'oppia_csrf_secret', {'type': 'unicode'},
@@ -192,8 +190,6 @@ def require_fully_signed_up(handler):
 
 
 def _clear_login_cookies(response_headers):
-    ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
-
     # AppEngine sets the ACSID cookie for http:// and the SACSID cookie
     # for https:// . We just unset both below.
     cookie = Cookie.SimpleCookie()
@@ -247,7 +243,7 @@ class BaseHandler(webapp2.RequestHandler):
     def jinja2_env(self):
         return jinja_utils.get_jinja_env(feconf.FRONTEND_TEMPLATES_DIR)
 
-    def __init__(self, request, response):
+    def __init__(self, request, response):  # pylint: disable=super-init-not-called
         # Set self.request, self.response and self.app.
         self.initialize(request, response)
 
@@ -256,11 +252,11 @@ class BaseHandler(webapp2.RequestHandler):
         # Initializes the return dict for the handlers.
         self.values = {}
 
-        self.user = current_user_services.get_current_user(self.request)
+        self.user = current_user_services.get_current_user()
         self.user_id = current_user_services.get_user_id(
             self.user) if self.user else None
         self.username = None
-        self.user_has_started_state_editor_tutorial = False
+        self.has_seen_editor_tutorial = False
         self.partially_logged_in = False
         self.values['profile_picture_data_url'] = None
 
@@ -281,12 +277,12 @@ class BaseHandler(webapp2.RequestHandler):
                 self.values['profile_picture_data_url'] = (
                     user_settings.profile_picture_data_url)
                 if user_settings.last_started_state_editor_tutorial:
-                    self.user_has_started_state_editor_tutorial = True
+                    self.has_seen_editor_tutorial = True
 
         self.is_moderator = rights_manager.Actor(self.user_id).is_moderator()
         self.is_admin = rights_manager.Actor(self.user_id).is_admin()
-        self.is_super_admin = user_services.is_super_admin(
-            self.user_id, self.request)
+        self.is_super_admin = (
+            current_user_services.is_current_user_super_admin())
 
         self.values['is_moderator'] = self.is_moderator
         self.values['is_admin'] = self.is_admin
@@ -343,19 +339,19 @@ class BaseHandler(webapp2.RequestHandler):
 
         super(BaseHandler, self).dispatch()
 
-    def get(self, *args, **kwargs):
+    def get(self, *args, **kwargs):  # pylint: disable=unused-argument
         """Base method to handle GET requests."""
         raise self.PageNotFoundException
 
-    def post(self, *args):
+    def post(self, *args):  # pylint: disable=unused-argument
         """Base method to handle POST requests."""
         raise self.PageNotFoundException
 
-    def put(self, *args):
+    def put(self, *args):  # pylint: disable=unused-argument
         """Base method to handle PUT requests."""
         raise self.PageNotFoundException
 
-    def delete(self, *args):
+    def delete(self, *args):  # pylint: disable=unused-argument
         """Base method to handle DELETE requests."""
         raise self.PageNotFoundException
 
@@ -481,7 +477,7 @@ class BaseHandler(webapp2.RequestHandler):
             self.render_template(
                 'error/error.html', iframe_restriction=None)
 
-    def handle_exception(self, exception, debug_mode):
+    def handle_exception(self, exception, unused_debug_mode):
         """Overwrites the default exception handler."""
         logging.info(''.join(traceback.format_exception(*sys.exc_info())))
         logging.error('Exception raised: %s', exception)

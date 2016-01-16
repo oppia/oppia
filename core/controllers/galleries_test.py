@@ -14,7 +14,7 @@
 
 """Tests for the gallery pages."""
 
-__author__ = 'Sean Lip'
+import os
 
 from core.controllers import galleries
 from core.domain import config_services
@@ -23,22 +23,20 @@ from core.domain import exp_services
 from core.domain import rights_manager
 from core.tests import test_utils
 import feconf
-import os
 import utils
 
 
 CAN_EDIT_STR = 'can_edit'
-
 
 class GalleryPageTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(GalleryPageTest, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.EDITOR_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.ADMIN_ID = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
     def test_gallery_page(self):
         """Test access to the gallery page."""
@@ -76,7 +74,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
 
         # Publicize the demo exploration.
         self.set_admins([self.ADMIN_EMAIL])
-        rights_manager.publicize_exploration(self.ADMIN_ID, '0')
+        rights_manager.publicize_exploration(self.admin_id, '0')
 
         # Run migration job to create exploration summaries.
         # This is not necessary, but serves as additional check that
@@ -90,7 +88,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
 
         # change title and category
         exp_services.update_exploration(
-            self.EDITOR_ID, '0', [{
+            self.editor_id, '0', [{
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'A new title!'
@@ -133,10 +131,10 @@ class GalleryPageTest(test_utils.GenericTestBase):
 
         # Create exploration A
         exploration = self.save_new_valid_exploration(
-            'A', self.ADMIN_ID, title='Title A', category='Category A',
+            'A', self.admin_id, title='Title A', category='Category A',
             objective='Objective A')
-        exp_services._save_exploration(
-            self.ADMIN_ID, exploration, 'Exploration A', [])
+        exp_services._save_exploration(  # pylint: disable=protected-access
+            self.admin_id, exploration, 'Exploration A', [])
 
         # Test that the private exploration isn't displayed.
         response_dict = self.get_json(feconf.GALLERY_DATA_URL)
@@ -144,15 +142,15 @@ class GalleryPageTest(test_utils.GenericTestBase):
 
         # Create exploration B
         exploration = self.save_new_valid_exploration(
-            'B', self.ADMIN_ID, title='Title B', category='Category B',
+            'B', self.admin_id, title='Title B', category='Category B',
             objective='Objective B')
-        exp_services._save_exploration(
-            self.ADMIN_ID, exploration, 'Exploration B', [])
-        rights_manager.publish_exploration(self.ADMIN_ID, 'B')
-        rights_manager.publicize_exploration(self.ADMIN_ID, 'B')
+        exp_services._save_exploration(  # pylint: disable=protected-access
+            self.admin_id, exploration, 'Exploration B', [])
+        rights_manager.publish_exploration(self.admin_id, 'B')
+        rights_manager.publicize_exploration(self.admin_id, 'B')
 
         # Publish exploration A
-        rights_manager.publish_exploration(self.ADMIN_ID, 'A')
+        rights_manager.publish_exploration(self.admin_id, 'A')
 
         exp_services.index_explorations_given_ids(['A', 'B'])
 
@@ -177,7 +175,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
         }, response_dict['explorations_list'][1])
 
         # Delete exploration A
-        exp_services.delete_exploration(self.ADMIN_ID, 'A')
+        exp_services.delete_exploration(self.admin_id, 'A')
 
         # Test gallery
         response_dict = self.get_json(feconf.GALLERY_DATA_URL)
@@ -198,14 +196,12 @@ class GalleryPageTest(test_utils.GenericTestBase):
         response = self.testapp.get(feconf.GALLERY_URL)
         self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(response)
-        EXP_A_DICT = {
+        exp_a_id = self.post_json(feconf.NEW_EXPLORATION_URL, {
             'title': self.UNICODE_TEST_STRING,
             'category': self.UNICODE_TEST_STRING,
             'objective': 'Learn how to generate exploration ids.',
-            'language_code': feconf.DEFAULT_LANGUAGE_CODE}
-        exp_a_id = self.post_json(
-            feconf.NEW_EXPLORATION_URL, EXP_A_DICT, csrf_token
-        )[galleries.EXPLORATION_ID_KEY]
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE
+        }, csrf_token)[galleries.EXPLORATION_ID_KEY]
         self.assertEqual(len(exp_a_id), 12)
 
         self.logout()

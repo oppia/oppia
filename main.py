@@ -14,11 +14,9 @@
 
 """URL routing definitions, and some basic error/warmup handlers."""
 
-__author__ = 'Sean Lip'
-
-import feconf
 import logging
 
+# pylint: disable=relative-import
 from core.controllers import admin
 from core.controllers import base
 from core.controllers import collection_viewer
@@ -33,12 +31,15 @@ from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
 from core.platform import models
-transaction_services = models.Registry.import_transaction_services()
+import feconf
+# pylint: enable=relative-import
 
 from mapreduce import main as mapreduce_main
 from mapreduce import parameters as mapreduce_parameters
 import webapp2
 from webapp2_extras.routes import RedirectRoute
+
+transaction_services = models.Registry.import_transaction_services()
 
 
 class FrontendErrorHandler(base.BaseHandler):
@@ -58,10 +59,6 @@ class WarmupHandler(base.BaseHandler):
     def get(self):
         """Handles GET warmup requests."""
         pass
-
-
-# Regex for base64 id encoding
-r = '[A-Za-z0-9=_-]+'
 
 
 def get_redirect_route(regex_route, handler, name, defaults=None):
@@ -92,7 +89,7 @@ def ui_access_wrapper(self, *args, **kwargs):
     self.real_dispatch(*args, **kwargs)
 
 
-mapreduce_handlers = []
+MAPREDUCE_HANDLERS = []
 
 for path, handler_class in mapreduce_main.create_handlers_map():
     if path.startswith('.*/pipeline'):
@@ -110,23 +107,23 @@ for path, handler_class in mapreduce_main.create_handlers_map():
 
     if '/ui/' in path or path.endswith('/ui'):
         if (hasattr(handler_class, 'dispatch') and
-            not hasattr(handler_class, 'real_dispatch')):
+                not hasattr(handler_class, 'real_dispatch')):
             handler_class.real_dispatch = handler_class.dispatch
             handler_class.dispatch = ui_access_wrapper
-        mapreduce_handlers.append((path, handler_class))
+        MAPREDUCE_HANDLERS.append((path, handler_class))
     else:
         if (hasattr(handler_class, 'dispatch') and
-            not hasattr(handler_class, 'real_dispatch')):
+                not hasattr(handler_class, 'real_dispatch')):
             handler_class.real_dispatch = handler_class.dispatch
             handler_class.dispatch = authorization_wrapper
-        mapreduce_handlers.append((path, handler_class))
+        MAPREDUCE_HANDLERS.append((path, handler_class))
 
 # Tell map/reduce internals that this is now the base path to use.
 mapreduce_parameters.config.BASE_PATH = '/mapreduce/worker'
 
 
 # Register the URLs with the classes responsible for handling them.
-urls = [
+URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/_ah/warmup', WarmupHandler, 'warmup_handler'),
 
     get_redirect_route(
@@ -214,7 +211,8 @@ urls = [
         r'/preferenceshandler/profile_picture', profile.ProfilePictureHandler,
         'profle_picture_handler'),
     get_redirect_route(
-        r'/preferenceshandler/profile_picture_by_username/<username>', profile.ProfilePictureHandlerByUsername,
+        r'/preferenceshandler/profile_picture_by_username/<username>',
+        profile.ProfilePictureHandlerByUsername,
         'profile_picture_handler_by_username'),
     get_redirect_route(
         r'%s' % feconf.SIGNUP_URL, profile.SignupPage, 'signup_page'),
@@ -313,7 +311,7 @@ urls = [
         r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',
         editor.StateRulesStatsHandler, 'state_rules_stats_handler'),
     get_redirect_route(
-        r'/createhandler/started_tutorial_event/<exploration_id>',
+        r'/createhandler/started_tutorial_event',
         editor.StartedTutorialEventHandler, 'started_tutorial_event_handler'),
 
     get_redirect_route(
@@ -355,7 +353,5 @@ urls = [
     get_redirect_route(r'/<:.*>', base.Error404Handler, 'error_404_handler'),
 ]
 
-urls = mapreduce_handlers + urls
-
-app = transaction_services.toplevel_wrapper(
-    webapp2.WSGIApplication(urls, debug=feconf.DEBUG))
+app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
+    webapp2.WSGIApplication(URLS, debug=feconf.DEBUG))

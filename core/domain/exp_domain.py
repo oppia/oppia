@@ -21,8 +21,6 @@ objects they represent are stored. All methods and properties in this file
 should therefore be independent of the specific storage models used.
 """
 
-__author__ = 'Sean Lip'
-
 import collections
 import copy
 import logging
@@ -34,10 +32,10 @@ from core.domain import gadget_registry
 from core.domain import interaction_registry
 from core.domain import param_domain
 from core.domain import rule_domain
-from core.domain import skins_services
 from core.domain import trigger_registry
 import feconf
 import jinja_utils
+import schema_utils
 import utils
 
 
@@ -135,7 +133,7 @@ def _validate_customization_args_and_values(
 
     # Remove extra keys.
     extra_args = []
-    for (arg_name, arg_value) in customization_args.iteritems():
+    for arg_name in customization_args.keys():
         if not isinstance(arg_name, basestring):
             raise utils.ValidationError(
                 'Invalid customization arg name: %s' % arg_name)
@@ -153,18 +151,11 @@ def _validate_customization_args_and_values(
             schema_utils.normalize_against_schema(
                 customization_args[ca_spec.name]['value'],
                 ca_spec.schema)
-        except Exception as e:
+        except Exception:
             # TODO(sll): Raise an actual exception here if parameters are not
             # involved. (If they are, can we get sample values for the state
             # context parameters?)
-            """
-            logging.error(
-                'Validation error for customization arg %s: value %s does not '
-                'match schema %s.' % (
-                    ca_spec.name,
-                    unicode(customization_args[ca_spec.name]['value']),
-                    ca_spec.schema))
-            """
+            pass
 
 
 class ExplorationChange(object):
@@ -325,7 +316,7 @@ class Content(object):
     def validate(self):
         # TODO(sll): Add HTML sanitization checking.
         # TODO(sll): Validate customization args for rich-text components.
-        if not self.type == 'text':
+        if self.type != 'text':
             raise utils.ValidationError('Invalid content type: %s' % self.type)
         if not isinstance(self.value, basestring):
             raise utils.ValidationError(
@@ -363,6 +354,15 @@ class RuleSpec(object):
     def __init__(self, rule_type, inputs):
         self.rule_type = rule_type
         self.inputs = inputs
+
+    def stringify_classified_rule(self):
+        """Returns a string representation of a rule (for the stats log)."""
+        if self.rule_type == rule_domain.FUZZY_RULE_TYPE:
+            return self.rule_type
+        else:
+            param_list = [
+                utils.to_ascii(val) for val in self.inputs.values()]
+            return '%s(%s)' % (self.rule_type, ','.join(param_list))
 
     def validate(self, rule_params_list, exp_param_specs_dict):
         """Validates a RuleSpec value object. It ensures the inputs dict does
@@ -930,18 +930,19 @@ class SkinInstance(object):
         None, in which case defaults will be generated that provide empty
         gadget panels for each panel specified in the skin.
         """
+        # TODO(sll): Deprecate this property; it is not used.
         self.skin_id = skin_id
         # panel_contents_dict has panel strings as keys and
         # lists of GadgetInstance instances as values.
         self.panel_contents_dict = {}
 
         default_skin_customizations = (
-            SkinInstance._get_default_skin_customizations(skin_id))
+            SkinInstance._get_default_skin_customizations())
 
         # Ensure that skin_customizations is a dict.
         if skin_customizations is None:
             skin_customizations = (
-                SkinInstance._get_default_skin_customizations(skin_id))
+                SkinInstance._get_default_skin_customizations())
 
         # Populate panel_contents_dict with default skin customizations
         # if they are not specified in skin_customizations.
@@ -949,25 +950,89 @@ class SkinInstance(object):
             if panel not in skin_customizations['panels_contents']:
                 self.panel_contents_dict[panel] = []
             else:
-                self.panel_contents_dict[panel] = [GadgetInstance(
-                    gdict['gadget_type'], gdict['gadget_name'],
-                    gdict['visible_in_states'], gdict['customization_args'])
-                for gdict in
-                skin_customizations['panels_contents'][panel]]
-
-    @property
-    def skin(self):
-        """Skin spec for validation and derived properties."""
-        return skins_services.Registry.get_skin_by_id(self.skin_id)
+                self.panel_contents_dict[panel] = [
+                    GadgetInstance(
+                        gdict['gadget_type'],
+                        gdict['gadget_name'],
+                        gdict['visible_in_states'],
+                        gdict['customization_args']
+                    ) for gdict in skin_customizations['panels_contents'][panel]
+                ]
 
     @staticmethod
-    def _get_default_skin_customizations(skin_id):
+    def _get_default_skin_customizations():
         """Generates default skin customizations when none are specified."""
-        skin = skins_services.Registry.get_skin_by_id(skin_id)
-        panels_contents = {
-            panel: [] for panel in skin.panels_properties
+        return {
+            'panels_contents': {
+                panel_name: []
+                for panel_name in feconf.PANELS_PROPERTIES
+            }
         }
-        return {'panels_contents': panels_contents}
+
+    def validate_gadget_panel(self, panel_name, gadget_list):
+        """
+        Validate proper fit given space requirements specified by
+        feconf.PANELS_PROPERTIES.
+
+        Args:
+        - panel_name: str. Unique name that identifies this panel in the skin.
+            This should correspond to an entry in feconf.PANELS_PROPERTIES.
+        - gadget_list: list of GadgetInstance instances.
+        """
+        # If the panel contains no gadgets, max() will raise an error,
+        # so we return early.
+        if not gadget_list:
+            return
+
+        panel_spec = feconf.PANELS_PROPERTIES[panel_name]
+
+        # This is a dict whose keys are state names, and whose corresponding
+        # values are lists of GadgetInstance instances representing the gadgets
+        # visible in that state. Note that the keys only include states for
+        # which at least one gadget is visible.
+        gadget_visibility_map = collections.defaultdict(list)
+        for gadget_instance in gadget_list:
+            for state_name in set(gadget_instance.visible_in_states):
+                gadget_visibility_map[state_name].append(gadget_instance)
+
+        # Validate limitations and fit considering visibility for each state.
+        for state_name, gadget_instances in gadget_visibility_map.iteritems():
+            if len(gadget_instances) > panel_spec['max_gadgets']:
+                raise utils.ValidationError(
+                    "'%s' panel expected at most %d gadget%s, but %d gadgets"
+                    " are visible in state '%s'." % (
+                        panel_name,
+                        panel_spec['max_gadgets'],
+                        's' if panel_spec['max_gadgets'] != 1 else '',
+                        len(gadget_instances),
+                        state_name))
+
+            # Calculate total width and height of gadgets given custom args and
+            # panel stackable axis.
+            total_width = 0
+            total_height = 0
+
+            if (panel_spec['stackable_axis'] ==
+                    feconf.GADGET_PANEL_AXIS_HORIZONTAL):
+                total_width += panel_spec['pixels_between_gadgets'] * (
+                    len(gadget_instances) - 1)
+                total_width += sum(
+                    gadget.width for gadget in gadget_instances)
+                total_height = max(
+                    gadget.height for gadget in gadget_instances)
+            else:
+                raise utils.ValidationError(
+                    "Unrecognized axis for '%s' panel. ")
+
+            # Validate fit for each dimension.
+            if panel_spec['height'] < total_height:
+                raise utils.ValidationError(
+                    "Height %d of panel \'%s\' exceeds limit of %d" % (
+                        total_height, panel_name, panel_spec['height']))
+            elif panel_spec['width'] < total_width:
+                raise utils.ValidationError(
+                    "Width %d of panel \'%s\' exceeds limit of %d" % (
+                        total_width, panel_name, panel_spec['width']))
 
     def validate(self):
         """Validates that gadgets fit the skin panel dimensions, and that the
@@ -976,18 +1041,16 @@ class SkinInstance(object):
         # A list to validate each gadget_instance.name is unique.
         gadget_instance_names = []
 
-        for panel, gadget_instances in (
+        for panel_name, gadget_instances in (
                 self.panel_contents_dict.iteritems()):
 
             # Validate existence of panels in the skin.
-            if not panel in self.skin.panels_properties:
+            if panel_name not in feconf.PANELS_PROPERTIES:
                 raise utils.ValidationError(
-                    '%s panel not found in skin %s' % (
-                        panel, self.skin_id)
-                )
+                    'The panel name \'%s\' is invalid.' % panel_name)
 
             # Validate gadgets fit each skin panel.
-            self.skin.validate_panel(panel, gadget_instances)
+            self.validate_gadget_panel(panel_name, gadget_instances)
 
             # Validate gadget internal attributes.
             for gadget_instance in gadget_instances:
@@ -1056,8 +1119,8 @@ class State(object):
         # Parameter changes associated with this state.
         self.param_changes = [param_domain.ParamChange(
             param_change.name, param_change.generator.id,
-            param_change.customization_args)
-            for param_change in param_changes]
+            param_change.customization_args
+        ) for param_change in param_changes]
         # The interaction instance associated with this state.
         self.interaction = InteractionInstance(
             interaction.id, interaction.customization_args,
@@ -1426,7 +1489,7 @@ class Exploration(object):
                     'Tags should not start or end with whitespace, received '
                     ' \'%s\'' % tag)
 
-            if re.search('\s\s+', tag):
+            if re.search(r'\s\s+', tag):
                 raise utils.ValidationError(
                     'Adjacent whitespace in tags should be collapsed, '
                     'received \'%s\'' % tag)
@@ -1697,9 +1760,8 @@ class Exploration(object):
 
     @classmethod
     def is_demo_exploration_id(cls, exploration_id):
-        """Whether the exploration id is that of a demo exploration."""
-        return exploration_id.isdigit() and (
-            0 <= int(exploration_id) < len(feconf.DEMO_EXPLORATIONS))
+        """Whether the given exploration id is a demo exploration."""
+        return exploration_id in feconf.DEMO_EXPLORATIONS
 
     @property
     def is_demo(self):
@@ -1828,7 +1890,7 @@ class Exploration(object):
         if old_gadget_name == new_gadget_name:
             return
 
-        GadgetInstance._validate_gadget_name(new_gadget_name)
+        GadgetInstance._validate_gadget_name(new_gadget_name)  # pylint: disable=protected-access
 
         gadget_instance = self.get_gadget_instance_by_name(old_gadget_name)
         gadget_instance.name = new_gadget_name
@@ -1950,7 +2012,7 @@ class Exploration(object):
         """
         # The name of the implicit END state before the migration. Needed here
         # to migrate old explorations which expect that implicit END state.
-        _OLD_END_DEST = 'END'
+        old_end_dest = 'END'
 
         # Adds an explicit state called 'END' with an EndExploration to replace
         # links other states have to an implicit 'END' state. Otherwise, if no
@@ -1964,20 +2026,20 @@ class Exploration(object):
         targets_end_state = False
         has_end_state = False
         for (state_name, sdict) in states_dict.iteritems():
-            if not has_end_state and state_name == _OLD_END_DEST:
+            if not has_end_state and state_name == old_end_dest:
                 has_end_state = True
 
             if not targets_end_state:
                 for handler in sdict['interaction']['handlers']:
                     for rule_spec in handler['rule_specs']:
-                        if rule_spec['dest'] == _OLD_END_DEST:
+                        if rule_spec['dest'] == old_end_dest:
                             targets_end_state = True
                             break
 
         # Ensure any explorations pointing to an END state has a valid END
         # state to end with (in case it expects an END state)
         if targets_end_state and not has_end_state:
-            states_dict[_OLD_END_DEST] = {
+            states_dict[old_end_dest] = {
                 'content': [{
                     'type': 'text',
                     'value': 'Congratulations, you have finished!'
@@ -1995,7 +2057,7 @@ class Exploration(object):
                             'definition': {
                                 'rule_type': 'default'
                             },
-                            'dest': _OLD_END_DEST,
+                            'dest': old_end_dest,
                             'feedback': [],
                             'param_changes': []
                         }]
@@ -2014,7 +2076,7 @@ class Exploration(object):
         Note that the states_dict being passed in is modified in-place.
         """
         # Ensure all states interactions have a triggers list.
-        for (state_name, sdict) in states_dict.iteritems():
+        for sdict in states_dict.values():
             interaction = sdict['interaction']
             if 'triggers' not in interaction:
                 interaction['triggers'] = []
@@ -2032,8 +2094,8 @@ class Exploration(object):
 
         Note that the states_dict being passed in is modified in-place.
         """
-        for (state_name, sdict) in states_dict.iteritems():
-            interaction = sdict['interaction']
+        for state_dict in states_dict.values():
+            interaction = state_dict['interaction']
             answer_groups = []
             default_outcome = None
             for handler in interaction['handlers']:
@@ -2096,8 +2158,8 @@ class Exploration(object):
 
             is_terminal = (
                 interaction_registry.Registry.get_interaction_by_id(
-                    interaction['id']).is_terminal
-                    if interaction['id'] is not None else False)
+                    interaction['id']
+                ).is_terminal if interaction['id'] is not None else False)
             if not is_terminal:
                 interaction['answer_groups'] = answer_groups
                 interaction['default_outcome'] = default_outcome
@@ -2117,8 +2179,8 @@ class Exploration(object):
         Note that the states_dict being passed in is modified in-place.
         """
         # Ensure all states interactions have a fallbacks list.
-        for (state_name, sdict) in states_dict.iteritems():
-            interaction = sdict['interaction']
+        for state_dict in states_dict.values():
+            interaction = state_dict['interaction']
             if 'triggers' in interaction:
                 del interaction['triggers']
             if 'fallbacks' not in interaction:
@@ -2132,8 +2194,8 @@ class Exploration(object):
         confirmed unclassified answers. Those are answers which are confirmed
         to be associated with the default outcome during classification.
         """
-        for (state_name, sdict) in states_dict.iteritems():
-            interaction = sdict['interaction']
+        for state_dict in states_dict.values():
+            interaction = state_dict['interaction']
             if 'confirmed_unclassified_answers' not in interaction:
                 interaction['confirmed_unclassified_answers'] = []
 
@@ -2144,8 +2206,8 @@ class Exploration(object):
         """Converts from version 6 to 7. Version 7 forces all CodeRepl
         interactions to use Python.
         """
-        for (state_name, sdict) in states_dict.iteritems():
-            interaction = sdict['interaction']
+        for state_dict in states_dict.values():
+            interaction = state_dict['interaction']
             if interaction['id'] == 'CodeRepl':
                 interaction['customization_args']['language']['value'] = (
                     'python')
@@ -2174,8 +2236,8 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXPLORATION_SCHEMA_VERSION = 10
-    LAST_UNTITLED_EXPLORATION_SCHEMA_VERSION = 9
+    CURRENT_EXP_SCHEMA_VERSION = 10
+    LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
     def _convert_v1_dict_to_v2_dict(cls, exploration_dict):
@@ -2229,15 +2291,13 @@ class Exploration(object):
         exploration_dict['tags'] = exploration_dict['skill_tags']
         del exploration_dict['skill_tags']
 
-        _OLD_DEFAULT_SKIN_CUSTOMIZATIONS = {
+        exploration_dict['skin_customizations'] = {
             'panels_contents': {
                 'bottom': [],
                 'left': [],
                 'right': []
             }
         }
-        exploration_dict['skin_customizations'] = (
-            _OLD_DEFAULT_SKIN_CUSTOMIZATIONS)
 
         return exploration_dict
 
@@ -2354,10 +2414,10 @@ class Exploration(object):
         if exploration_schema_version is None:
             raise Exception('Invalid YAML file: no schema version specified.')
         if not (1 <= exploration_schema_version
-                <= cls.CURRENT_EXPLORATION_SCHEMA_VERSION):
+                <= cls.CURRENT_EXP_SCHEMA_VERSION):
             raise Exception(
                 'Sorry, we can only process v1 to v%s YAML files at '
-                'present.' % cls.CURRENT_EXPLORATION_SCHEMA_VERSION)
+                'present.' % cls.CURRENT_EXP_SCHEMA_VERSION)
         if exploration_schema_version == 1:
             exploration_dict = cls._convert_v1_dict_to_v2_dict(
                 exploration_dict)
@@ -2415,7 +2475,7 @@ class Exploration(object):
         initial_schema_version = migration_result[1]
 
         if (initial_schema_version <=
-                cls.LAST_UNTITLED_EXPLORATION_SCHEMA_VERSION):
+                cls.LAST_UNTITLED_SCHEMA_VERSION):
             raise Exception(
                 'Expected a YAML version >= 10, received: %d' % (
                     initial_schema_version))
@@ -2434,7 +2494,7 @@ class Exploration(object):
         initial_schema_version = migration_result[1]
 
         if (initial_schema_version >
-                cls.LAST_UNTITLED_EXPLORATION_SCHEMA_VERSION):
+                cls.LAST_UNTITLED_SCHEMA_VERSION):
             raise Exception(
                 'Expected a YAML version <= 9, received: %d' % (
                     initial_schema_version))
@@ -2444,7 +2504,7 @@ class Exploration(object):
 
     def to_yaml(self):
         exp_dict = self.to_dict()
-        exp_dict['schema_version'] = self.CURRENT_EXPLORATION_SCHEMA_VERSION
+        exp_dict['schema_version'] = self.CURRENT_EXP_SCHEMA_VERSION
 
         # The ID is the only property which should not be stored within the
         # YAML representation.

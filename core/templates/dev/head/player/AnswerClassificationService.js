@@ -25,9 +25,9 @@ oppia.constant('SOFT_RULE_CLASSIFICATION', 'soft_rule')
 oppia.constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome')
 
 oppia.factory('answerClassificationService', [
-  '$http', '$q', 'learnerParamsService', 'HARD_RULE_CLASSIFICATION',
+  '$http', '$q', 'LearnerParamsService', 'HARD_RULE_CLASSIFICATION',
   'DEFAULT_OUTCOME_CLASSIFICATION',
-  function($http, $q, learnerParamsService, HARD_RULE_CLASSIFICATION,
+  function($http, $q, LearnerParamsService, HARD_RULE_CLASSIFICATION,
       DEFAULT_OUTCOME_CLASSIFICATION) {
     /**
      * Finds the first answer group with a rule that returns true. This should
@@ -121,7 +121,7 @@ oppia.factory('answerClassificationService', [
           // which params should be passed to the batch classifier.
           var classifyUrl = '/explorehandler/classify/' + explorationId;
           var params = (
-            isInEditorMode ? {} : learnerParamsService.getAllParams());
+            isInEditorMode ? {} : LearnerParamsService.getAllParams());
 
           $http.post(classifyUrl, {
             old_state: oldState.toBackendDict(),

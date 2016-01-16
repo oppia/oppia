@@ -14,9 +14,6 @@
 
 """Controllers for simple, mostly-static pages (like About, Forum, etc.)."""
 
-__author__ = 'sll@google.com (Sean Lip)'
-
-
 import urllib
 import urlparse
 

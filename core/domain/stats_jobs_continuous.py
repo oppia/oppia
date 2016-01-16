@@ -28,13 +28,14 @@ from core.domain import stats_domain
 from core.platform import models
 
 import feconf
+import utils
+
+from google.appengine.ext import ndb
+
 (base_models, stats_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.statistics, models.NAMES.exploration
 ])
 transaction_services = models.Registry.import_transaction_services()
-import utils
-
-from google.appengine.ext import ndb
 
 # Counts contributions from all versions.
 VERSION_ALL = 'all'
@@ -184,11 +185,12 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
         realtime_models = cls._get_realtime_datastore_class().get_multi(
             realtime_model_ids)
 
-        return [
-            (mr_models[i].num_starts if mr_models[i] is not None else 0) +
-            (realtime_models[i].num_starts
-                if realtime_models[i] is not None else 0)
-            for i in range(len(exploration_ids))]
+        return [(
+            mr_models[i].num_starts if mr_models[i] is not None else 0
+        ) + (
+            realtime_models[i].num_starts
+            if realtime_models[i] is not None else 0
+        ) for i in range(len(exploration_ids))]
 
 
 class StatisticsMRJobManager(
@@ -286,7 +288,7 @@ class StatisticsMRJobManager(
         new_models_end_sessions = set()
         # {session_id: (created-on timestamp of last known maybe leave event,
         # state_name)}
-        session_id_to_latest_leave_event = collections.defaultdict(
+        session_id_to_latest_leave_evt = collections.defaultdict(
             lambda: (0, ''))
         old_models_start_count = 0
         old_models_complete_count = 0
@@ -355,10 +357,10 @@ class StatisticsMRJobManager(
             elif event_type == feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION:
                 # Identify the last learner event for this session.
                 latest_timestamp_so_far, _ = (
-                    session_id_to_latest_leave_event[session_id])
+                    session_id_to_latest_leave_evt[session_id])
                 if latest_timestamp_so_far < created_on:
                     latest_timestamp_so_far = created_on
-                    session_id_to_latest_leave_event[session_id] = (
+                    session_id_to_latest_leave_evt[session_id] = (
                         created_on, state_name)
             # If this is a state hit, increment the total count and record that
             # we have seen this session id.
@@ -376,12 +378,12 @@ class StatisticsMRJobManager(
         # determined as the set of session ids with maybe-leave events at
         # intermediate states, minus the ones that have a maybe-leave event
         # at the END state.
-        leave_states = set(session_id_to_latest_leave_event.keys()).difference(
+        leave_states = set(session_id_to_latest_leave_evt.keys()).difference(
             new_models_end_sessions)
         for session_id in leave_states:
             # Grab the state name of the state they left on and count that as a
             # 'no answer' for that state.
-            (_, state_name) = session_id_to_latest_leave_event[session_id]
+            (_, state_name) = session_id_to_latest_leave_evt[session_id]
             state_hit_counts[state_name]['no_answer_count'] += 1
 
         num_starts = (

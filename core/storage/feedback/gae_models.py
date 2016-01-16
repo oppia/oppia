@@ -16,14 +16,13 @@
 
 """Models for Oppia feedback threads and messages."""
 
-__author__ = 'Koji Ashida'
-
 from core.platform import models
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 import feconf
 import utils
 
 from google.appengine.ext import ndb
+
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 STATUS_CHOICES_OPEN = 'open'
 STATUS_CHOICES_FIXED = 'fixed'
@@ -37,6 +36,10 @@ STATUS_CHOICES = [
     STATUS_CHOICES_COMPLIMENT,
     STATUS_CHOICES_NOT_ACTIONABLE,
 ]
+
+# Constants used for generating new ids.
+_MAX_RETRIES = 10
+_RAND_RANGE = 127 * 127
 
 
 class FeedbackThreadModel(base_models.BaseModel):
@@ -71,12 +74,10 @@ class FeedbackThreadModel(base_models.BaseModel):
 
         Exploration ID + the generated thread ID is globally unique.
         """
-        MAX_RETRIES = 10
-        RAND_RANGE = 127 * 127
-        for i in range(MAX_RETRIES):
+        for _ in range(_MAX_RETRIES):
             thread_id = (
                 utils.base64_from_int(utils.get_current_time_in_millisecs()) +
-                utils.base64_from_int(utils.get_random_int(RAND_RANGE)))
+                utils.base64_from_int(utils.get_random_int(_RAND_RANGE)))
             if not cls.get_by_exp_and_thread_id(exploration_id, thread_id):
                 return thread_id
         raise Exception(
@@ -216,10 +217,10 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
     num_total_threads = ndb.IntegerProperty(default=None, indexed=True)
 
     @classmethod
-    def create(cls, id, num_open_threads, num_total_threads):
+    def create(cls, model_id, num_open_threads, num_total_threads):
         """Creates a new FeedbackAnalyticsModel entry."""
         cls(
-            id=id,
+            id=model_id,
             num_open_threads=num_open_threads,
             num_total_threads=num_total_threads
         ).put()

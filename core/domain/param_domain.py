@@ -16,14 +16,12 @@
 
 """Classes relating to parameters."""
 
-__author__ = 'Sean Lip'
-
-import feconf
 import re
-import utils
 
 from core.domain import obj_services
 from core.domain import value_generators_domain
+import feconf
+import utils
 
 
 class ParamSpec(object):

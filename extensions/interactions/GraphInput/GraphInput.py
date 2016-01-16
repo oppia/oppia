@@ -14,8 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'Zhan Xiong Chin'
-
 from extensions.interactions import base
 
 
@@ -29,6 +27,7 @@ class GraphInput(base.BaseInteraction):
     _dependency_ids = []
     answer_type = 'Graph'
     instructions = 'Create a graph'
+    narrow_instructions = 'View graph'
     needs_summary = True
 
     _customization_arg_specs = [{

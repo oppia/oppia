@@ -16,8 +16,6 @@
 
 """Rules for CoordTwoDim objects."""
 
-__author__ = 'Sean Lip'
-
 from extensions.rules import base
 
 

@@ -16,8 +16,6 @@
 
 """Tests for rule objects."""
 
-__author__ = 'Sean Lip'
-
 import inspect
 import os
 import pkgutil
@@ -67,7 +65,7 @@ class RuleDomainUnitTests(test_utils.GenericTestBase):
         self.assertTrue(fake_rule.x, 2)
         self.assertTrue(fake_rule.y, 'a')
         self.assertEqual(
-            fake_rule._PARAMS,
+            fake_rule.params,
             [('x', objects.Real), ('y', objects.UnicodeString)]
         )
 
@@ -89,7 +87,7 @@ class RuleDataUnitTests(test_utils.GenericTestBase):
             for name, clazz in inspect.getmembers(module, inspect.isclass):
                 param_list = rule_domain.get_param_list(clazz.description)
 
-                for (param_name, param_obj_type) in param_list:
+                for (_, param_obj_type) in param_list:
                     # TODO(sll): Get rid of these special cases.
                     if param_obj_type.__name__ in [
                             'NonnegativeInt', 'ListOfGraph',
