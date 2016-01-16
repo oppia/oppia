@@ -11,10 +11,10 @@
  // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  // See the License for the specific language governing permissions and
  // limitations under the License.
- 
+
  describe('Expression type parser service', function() {
    beforeEach(module('oppia'));
- 
+
    var ees = null;
    var eps = null;
    beforeEach(inject(function($injector) {
@@ -22,7 +22,7 @@
      eps = $injector.get('expressionParserService');
      ests = $injector.get('expressionSyntaxTreeService');
    }));
- 
+
    var ENVS = [
      {
        numZero: 'Real',
@@ -33,7 +33,7 @@
        strNull: 'UnicodeString'
      }
    ];
- 
+
    it('should determine the correct types for the expressions', function() {
      [
        ['2', 'Real'],
@@ -70,7 +70,7 @@
        if (test.length > 2) {
          var errorString = test[2];
        }
- 
+
        // 'expected' should be either a JavaScript primitive value that would be
        // the result of evaluation 'expression', or an exception that is
        // expected to be thrown.
@@ -80,7 +80,7 @@
            eps.parse(expression) : expression;
        var parsedJson = JSON.stringify(parsed);
        var failed = false;
- 
+
        var recordFailure = function(result, exception) {
          console.error('input     : ' + expression);
          console.error('parsed    : ' + parsedJson);
@@ -94,7 +94,7 @@
          }
          failed = true;
        };
- 
+
        try {
          var evaled = ests.evaluateParseTree(parsed, ENVS, ees.evaluate);
          if (expected instanceof Error || evaled !== expected) {
@@ -112,11 +112,11 @@
          }
        }
        expect(failed).toBe(false);
- 
+
        if (typeof (expression) != 'string') {
          return;
        }
- 
+
        failed = false;
        try {
          evaled = ees.evaluateExpression(expression, ENVS);

@@ -11,7 +11,7 @@
  // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  // See the License for the specific language governing permissions and
  // limitations under the License.
- 
+
  oppia.factory('expressionTypeParserService', ['$log',
    'expressionSyntaxTreeService',
    function($log, expressionSyntaxTreeService) {
@@ -19,7 +19,7 @@
          return expressionSyntaxTreeService.evaluateExpression(expression, envs,
            evaluate);
        };
- 
+
        /**
         * @param {*} parsed Parse output from the parser. See parser.pegjs for
         *     the data structure.
@@ -35,22 +35,22 @@
            if (parsed.length == 0) {
              throw 'Parser generated an intermediate node with zero children';
            }
- 
+
            if (parsed[0] == '#') {
              return expressionSyntaxTreeService.lookupEnvs(parsed[1], envs);
            }
- 
+
            // Now the first element should be a function name.
            var getType = expressionSyntaxTreeService.lookupEnvs(
              parsed[0], envs).getType;
- 
+
            // Evaluate rest of the elements, i.e. the arguments.
            var args = parsed.slice(1).map(function(item) {
              return evaluate(item, envs);
            });
            return getType(args);
          }
- 
+
          // This should be a terminal node with the actual value.
          var coercedValue = (+parsed);
          if (!isNaN(coercedValue)) {
@@ -58,7 +58,7 @@
          }
          return 'UnicodeString';
        };
- 
+
        return {
          evaluate: evaluate,
          evaluateExpression: evaluateExpression

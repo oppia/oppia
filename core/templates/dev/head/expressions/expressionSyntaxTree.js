@@ -1,4 +1,4 @@
-+// Copyright 2014 The Oppia Authors. All Rights Reserved.
+ // Copyright 2014 The Oppia Authors. All Rights Reserved.
  //
  // Licensed under the Apache License, Version 2.0 (the "License");
  // you may not use this file except in compliance with the License.
@@ -11,14 +11,15 @@
  // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  // See the License for the specific language governing permissions and
  // limitations under the License.
- oppia.factory('expressionSyntaxTreeService', ['$log', 'expressionParserService',
+ oppia.factory('expressionSyntaxTreeService', [
+     '$log', 'expressionParserService',
      function($log, expressionParserService) {
        // Exceptions that can be thrown from the evaluation of expressions.
        var ExpressionError = function() {
        };
        ExpressionError.prototype = new Error();
        ExpressionError.prototype.constructor = ExpressionError;
- 
+
        var ExprUndefinedVarError = function(varname, envs) {
          this.varname = varname;
          this.envs = envs;
@@ -29,7 +30,7 @@
        ExprUndefinedVarError.prototype.toString = function() {
          return this.name + ': ' + this.varname + ' not found in ' + this.envs;
        };
- 
+
        var ExprWrongNumArgsError = function(args, expectedMin, expectedMax) {
          this.args = args;
          this.expectedMin = expectedMin;
@@ -42,7 +43,7 @@
          return this.name + ': {' + this.args + '} not in range [' +
            this.expectedMin + ',' + this.expectedMax + ']';
        };
- 
+
        var ExprWrongArgTypeError = function(arg, actualType, expectedType) {
          this.arg = arg;
          this.actualType = actualType;
@@ -59,11 +60,11 @@
          return this.name + ': ' + this.arg + ' has type ' + this.actualType +
            ' which does not match expected type ' + this.expectedType;
        };
- 
+
        var getParamsUsedInExpression = function(expression) {
          var _findParams = function(parseTree) {
            var paramsFound = [];
- 
+
            if (parseTree instanceof Array) {
              if (parseTree[0] === '#') {
                paramsFound.push(parseTree[1]);
@@ -73,21 +74,21 @@
                }
              }
            }
- 
+
            var uniqueParams = [];
            for (var i = 0; i < paramsFound.length; i++) {
              if (uniqueParams.indexOf(paramsFound[i]) === -1) {
                uniqueParams.push(paramsFound[i]);
              }
            }
- 
+
            return uniqueParams.sort();
          };
- 
+
          var parsed = expressionParserService.parse(expression);
          return _findParams(parsed);
        };
- 
+
        // Checks if the args array has the expectedNum number of elements and
        // throws an error if not. If optional expectedMax is specified, it
        // verifies the number of args is in [expectedNum, expectedMax] range
@@ -101,7 +102,7 @@
          }
          throw new ExprWrongNumArgsError(args, expectedNum, expectedMax);
        };
- 
+
        var _verifyArgTypesMatchExpectedType = function(argTypes, expectedType) {
          for (var i = 0; i < argTypes.length; i++) {
            if (argTypes[i] != expectedType) {
@@ -110,23 +111,23 @@
          }
          return true;
        };
- 
+
        var _verifyArgTypesMatch = function(argType1, argType2) {
          if (argType1 != argType2) {
            throw new ExprWrongArgTypeError(null, argType1, argType2);
          }
          return true;
        };
- 
+
        var evaluateExpression = function(expression, envs, evaluate) {
          return evaluateParseTree(expressionParserService.parse(expression),
            envs, evaluate);
        };
- 
+
        var evaluateParseTree = function(parsed, envs, evaluate) {
          return evaluate(parsed, envs.concat(system));
        };
- 
+
        /**
         * Looks up a variable of the given name in the env. Here the variable
         * can be system or user defined functions and parameters, as well as
@@ -150,10 +151,10 @@
          })) {
            return value;
          }
- 
+
          throw new ExprUndefinedVarError(name, envs);
        };
- 
+
        // Coerces the argument to a Number, and throws an error if the result
        // is NaN.
        var _coerceToNumber = function(originalValue) {
@@ -164,7 +165,7 @@
          throw new ExprWrongArgTypeError(
            originalValue, typeof originalValue, 'Number');
        };
- 
+
        // Coerces all values in the given argument array to Number, and throws
        // an error if the result is NaN.
        var _coerceAllArgsToNumber = function(args) {
@@ -173,7 +174,7 @@
          }
          return args;
        };
- 
+
        // NOTE TO DEVELOPERS: When adding a new reserved word to this object,
        //   please first ensure that existing explorations do not use this
        //   parameter name. Also, to prevent future explorations using it,
@@ -182,7 +183,7 @@
        // Arguments:
        // args: for getType(): list of types of the evalutated sub-expression
        //         for eval(): list of values of the evaluated sub-expression
- 
+
        var system = {
          '+': {
            getType: function(args) {
@@ -411,7 +412,7 @@
            }
          }
        };
- 
+
        return {
          ExpressionError: ExpressionError,
          ExprUndefinedVarError: ExprUndefinedVarError,
