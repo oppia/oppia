@@ -79,6 +79,7 @@ def _git_diff_name_status(left, right, diff_filter=''):
     git_cmd.extend([left, right])
     out, err = _start_subprocess_for_result(git_cmd)
     if not err:
+        # 1st char is status, 2nd char is a tab, rest is filename
         file_list = [FileDiff(line[0], line[2:]) for line in out.splitlines()]
         return file_list
     else:
