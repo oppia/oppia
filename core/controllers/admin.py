@@ -87,13 +87,7 @@ class AdminPage(base.BaseHandler):
                 'value': average_time
             })
 
-        demo_exploration_ids = [
-            ind for ind in enumerate(feconf.DEMO_EXPLORATIONS)]
-        demo_explorations = [
-            (unicode(ind), exp[0]) for ind, exp in
-            enumerate(feconf.DEMO_EXPLORATIONS)]
-
-        demo_collection_ids = feconf.DEMO_COLLECTIONS.keys()
+        demo_exploration_ids = feconf.DEMO_EXPLORATIONS.keys()
 
         recent_job_data = jobs.get_data_for_recent_jobs()
         unfinished_job_data = jobs.get_data_for_unfinished_jobs()
@@ -128,9 +122,8 @@ class AdminPage(base.BaseHandler):
 
         self.values.update({
             'continuous_computations_data': continuous_computations_data,
-            'demo_collections': feconf.DEMO_COLLECTIONS.iteritems(),
-            'demo_collection_ids': demo_collection_ids,
-            'demo_explorations': demo_explorations,
+            'demo_collections': sorted(feconf.DEMO_COLLECTIONS.iteritems()),
+            'demo_explorations': sorted(feconf.DEMO_EXPLORATIONS.iteritems()),
             'demo_exploration_ids': demo_exploration_ids,
             'human_readable_current_time': (
                 utils.get_human_readable_time_string(

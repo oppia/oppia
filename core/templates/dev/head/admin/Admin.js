@@ -188,11 +188,11 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     };
 
     for (var i = 0; i < GLOBALS.DEMO_EXPLORATION_IDS.length; ++i) {
-      var exploration = GLOBALS.DEMO_EXPLORATION_IDS[i];
+      var explorationId = GLOBALS.DEMO_EXPLORATION_IDS[i];
 
       $http.post($scope.adminHandlerUrl, {
         action: 'reload_exploration',
-        exploration_id: exploration[0]
+        exploration_id: explorationId
       }).success(function() {
         ++numSucceeded;
         ++numTried;

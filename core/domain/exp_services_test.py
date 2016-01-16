@@ -512,20 +512,14 @@ class LoadingAndDeletionOfExplorationDemosTest(ExplorationServicesUnitTests):
         self.assertEqual(
             exp_models.ExplorationModel.get_exploration_count(), 0)
 
+        demo_exploration_ids = feconf.DEMO_EXPLORATIONS.keys()
         self.assertGreaterEqual(
-            len(feconf.DEMO_EXPLORATIONS), 1,
+            len(demo_exploration_ids), 1,
             msg='There must be at least one demo exploration.')
 
-        # TODO(bhenning): Fix backend functionality needed to properly migrate
-        # these explorations. All demo explorations should be able to be
-        # loaded, validated, and deleted.
-        excluded_demo_explorations = ['World Cities']
-        for ind in range(len(feconf.DEMO_EXPLORATIONS)):
+        for exp_id in demo_exploration_ids:
             start_time = datetime.datetime.utcnow()
 
-            exp_id = str(ind)
-            if feconf.DEMO_EXPLORATIONS[ind][1] in excluded_demo_explorations:
-                continue
             exp_services.load_demo(exp_id)
             exploration = exp_services.get_exploration_by_id(exp_id)
             warnings = exploration.validate(strict=True)
@@ -540,10 +534,10 @@ class LoadingAndDeletionOfExplorationDemosTest(ExplorationServicesUnitTests):
 
         self.assertEqual(
             exp_models.ExplorationModel.get_exploration_count(),
-            len(feconf.DEMO_EXPLORATIONS) - len(excluded_demo_explorations))
+            len(demo_exploration_ids))
 
-        for ind in range(len(feconf.DEMO_EXPLORATIONS)):
-            exp_services.delete_demo(str(ind))
+        for exp_id in demo_exploration_ids:
+            exp_services.delete_demo(exp_id)
         self.assertEqual(
             exp_models.ExplorationModel.get_exploration_count(), 0)
 

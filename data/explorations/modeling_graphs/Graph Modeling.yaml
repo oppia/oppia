@@ -1,14 +1,15 @@
 author_notes: ''
 blurb: ''
-default_skin: conversation_v1
+category: Mathematics
 init_state_name: Introduction
 language_code: en
 objective: Learn how to model objects as graphs
 param_changes: []
 param_specs: {}
-schema_version: 7
+schema_version: 10
 skin_customizations:
-  panels_contents: {}
+  panels_contents:
+    bottom: []
 states:
   Bosses correct:
     content:
@@ -19,6 +20,7 @@ states:
         \ the place!\_</div>"
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         buttonText:
           value: Continue
@@ -26,8 +28,8 @@ states:
         dest: END
         feedback: []
         param_changes: []
+      fallbacks: []
       id: Continue
-      triggers: []
     param_changes: []
   Bosses question:
     content:
@@ -86,6 +88,7 @@ states:
                 x: 218.59375
                 y: 162.0
           rule_type: IsIsomorphicTo
+      confirmed_unclassified_answers: []
       customization_args:
         canAddEdge:
           value: true
@@ -131,8 +134,8 @@ states:
         feedback:
         - Not exactly... try again!
         param_changes: []
+      fallbacks: []
       id: GraphInput
-      triggers: []
     param_changes: []
   Cities correct:
     content:
@@ -148,6 +151,7 @@ states:
         has a direction.</div><div><br></div><div>Let's give this a try now!</div>
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         buttonText:
           value: Continue
@@ -155,8 +159,8 @@ states:
         dest: Bosses question
         feedback: []
         param_changes: []
+      fallbacks: []
       id: Continue
-      triggers: []
     param_changes: []
   Cities question:
     content:
@@ -213,6 +217,7 @@ states:
                 x: 99.59375
                 y: 177.0
           rule_type: IsIsomorphicTo
+      confirmed_unclassified_answers: []
       customization_args:
         canAddEdge:
           value: true
@@ -252,8 +257,8 @@ states:
         feedback:
         - Not quite, try again!
         param_changes: []
+      fallbacks: []
       id: GraphInput
-      triggers: []
     param_changes: []
   END:
     content:
@@ -261,12 +266,13 @@ states:
       value: Congratulations, you have finished!
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         recommendedExplorationIds:
           value: []
       default_outcome: null
+      fallbacks: []
       id: EndExploration
-      triggers: []
     param_changes: []
   Friends correct:
     content:
@@ -280,6 +286,7 @@ states:
         give this a try!</div>
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         buttonText:
           value: Continue
@@ -287,8 +294,8 @@ states:
         dest: Cities question
         feedback: []
         param_changes: []
+      fallbacks: []
       id: Continue
-      triggers: []
     param_changes: []
   Friends question:
     content:
@@ -374,6 +381,7 @@ states:
                 x: 80.09375
                 y: 138
           rule_type: IsIsomorphicTo
+      confirmed_unclassified_answers: []
       customization_args:
         canAddEdge:
           value: true
@@ -416,8 +424,8 @@ states:
         feedback:
         - Not quite... Let's try again!
         param_changes: []
+      fallbacks: []
       id: GraphInput
-      triggers: []
     param_changes: []
   Introduction:
     content:
@@ -433,6 +441,7 @@ states:
         Not convinced? Let''s take a look at some things that graphs can model...</div>'
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         buttonText:
           value: Continue
@@ -440,8 +449,9 @@ states:
         dest: Friends question
         feedback: []
         param_changes: []
+      fallbacks: []
       id: Continue
-      triggers: []
     param_changes: []
-states_schema_version: 4
+states_schema_version: 7
 tags: []
+title: Graph Modeling
