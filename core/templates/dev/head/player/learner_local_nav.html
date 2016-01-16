@@ -1,13 +1,13 @@
 <ul class="nav navbar-nav oppia-navbar-nav navbar-right"
     ng-controller="LearnerLocalNav" style="margin-right: 0px;">
   <li popover-placement="bottom" popover-template="'popover/feedback'" popover-trigger="click">
-    <a href="" tooltip="Feedback" tooltip-placement="bottom">
+    <a href="" tooltip="<['I18N_PLAYER_FEEDBACK_TOOLTIP' | translate]>" tooltip-placement="bottom">
       <span class="glyphicon glyphicon-comment"></span>
     </a>
   </li>
   {% if can_edit %}
     <li>
-      <a ng-href="/create/<[explorationId]>" tooltip="Edit" tooltip-placement="bottom" target="_blank">
+      <a ng-href="/create/<[explorationId]>" tooltip="<['I18N_PLAYER_EDIT_TOOLTIP' | translate]>" tooltip-placement="bottom" target="_blank">
         <span class="glyphicon glyphicon-pencil"></span>
       </a>
     </li>

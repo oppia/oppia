@@ -672,6 +672,7 @@ describe('Build, validate and display line', function() {
   };
 
   it('should accept and build examples correctly', function() {
+
     expect(
       buildThenDisplay(
         '    from a\u2228b and c<=>d have (a\u2228b) \u2227 (c<=>d)')

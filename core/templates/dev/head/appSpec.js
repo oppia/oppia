@@ -135,11 +135,11 @@ describe('Datetime Formatter', function() {
     });
 
     it('should show the date even for a datetime occurring today', function() {
-      // In any timezone, 10 minutes before xx:45:00 should still fall within
-      // the same date as xx:45:00 in getLocaleDateString(). The date should
-      // always be shown as '11/21/2014'
-      expect(df.getLocaleDateString(
-        NOW_MILLIS - 10 * 60 * 1000)).toBe('11/21/2014');
+      // In any timezone, 10 minutes before xx:45:00 should still fall within the
+      // same date as xx:45:00 in getLocaleDateString(). The date should always
+      // be shown as '11/21/2014' or '21/11/2014'.
+      expect(['11/21/2014', '21/11/2014']).toContain(df.getLocaleDateString(
+        NOW_MILLIS - 10 * 60 * 1000));
       expect(df.getLocaleDateString(
         NOW_MILLIS - 10 * 60 * 1000)).not.toBe('2014/11/21');
     });

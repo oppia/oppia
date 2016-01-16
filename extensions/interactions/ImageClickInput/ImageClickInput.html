@@ -1,7 +1,5 @@
 <script type="text/ng-template" id="interaction/ImageClickInput">
-  <div ng-if="!imageUrl">
-    [Select an image to display]
-  </div>
+  <div ng-if="!imageUrl" translate="I18N_INTERACTIONS_IMAGE_CLICK_SELECT"></div>
 
   <div style="position: relative;" ng-if="imageUrl">
     <img ng-src="<[imageUrl]>"

@@ -397,10 +397,10 @@ textarea {
   Styles for the global navigation sidebar menu.
 */
 .oppia-base-container {
-  height: 100%;
   margin-left: auto;
   margin-right: auto;
   min-height: 100%;
+  padding-bottom: 50px;
   position: relative;
 }
 
@@ -2309,6 +2309,18 @@ div#ng-curtain {
 .form-control.oppia-rte-content > .ta-bind {
   height: auto;
   min-height: 80px;
+}
+
+.oppia-footer, .oppia-base-container:after {
+  height: 60px;
+}
+
+.oppia-footer {
+  background-color: white;
+  font-size: 0.9em;
+  padding: 20px 25px;
+  position: relative;
+  z-index: 1;
 }
 
 /* Styles for the editor training interfaces. */

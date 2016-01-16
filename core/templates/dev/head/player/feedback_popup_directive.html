@@ -11,22 +11,26 @@
       <br>
 
       <div>
-        <textarea ng-model="feedbackText" rows="5" class="oppia-feedback-popover-textarea" placeholder="Leave feedback for the authors..." focus-on="<[feedbackPopoverId]>">
+        <textarea ng-model="feedbackText" rows="5" class="oppia-feedback-popover-textarea"
+                  placeholder="<['I18N_PLAYER_LEAVE_FEEDBACK' | translate]>" focus-on="<[feedbackPopoverId]>">
         </textarea>
       </div>
 
       <!-- The z-index ensures that the button is not overlapped by the checkbox div. -->
-      <md-button class="pull-right" ng-class="{'oppia-feedback-popover-submit-btn-enabled': feedbackText}" style="margin-top: 6px; z-index: 30;" ng-click="saveFeedback()" ng-disabled="!feedbackText">Submit</md-button>
+      <md-button class="pull-right"
+                 ng-class="{'oppia-feedback-popover-submit-btn-enabled': feedbackText}" style="margin-top: 6px; z-index: 30;"
+                 ng-click="saveFeedback()"
+                 ng-disabled="!feedbackText"
+                 translate="I18N_PLAYER_SUBMIT_BUTTON">
+      </md-button>
       <div class="checkbox" style="font-size: 0.9em; margin: 12px 0 4px 0;" ng-show="isLoggedIn">
         <label>
-          <input type="checkbox" ng-model="isSubmitterAnonymized">
-          Stay Anonymous
+          <input type="checkbox" ng-model="isSubmitterAnonymized" translate="I18N_PLAYER_STAY_ANONYMOUS">
         </label>
       </div>
     </div>
 
-    <div ng-show="feedbackSubmitted">
-      Thank you for the feedback!
+    <div ng-show="feedbackSubmitted" translate="I18N_PLAYER_THANK_FEEDBACK">
     </div>
   </div>
 </script>

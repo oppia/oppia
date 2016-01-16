@@ -63,11 +63,14 @@ oppia.directive('oppiaInteractiveLogicProof', [
         }
         $scope.targetString = logicProofShared.displayExpression(
           $scope.questionData.results[0], operators);
-        $scope.questionString = ($scope.assumptionsString === '') ?
-            'Prove ' + $scope.targetString + '.' :
-            'Assuming ' + (
-              $scope.assumptionsString + '; prove ' + $scope.targetString +
-              '.');
+        $scope.questionString = (
+          $scope.assumptionsString === '' ?
+          'I18N_INTERACTIONS_PROOFS_QUESTION_STR_NO_ASSUMPTION':
+          'I18N_INTERACTIONS_PROOFS_QUESTION_STR_ASSUMPTIONS');
+        $scope.questionStrData = {
+          target: $scope.targetString,
+          assumptions: $scope.assumptionsString
+        };
 
         $scope.questionInstance = logicProofStudent.buildInstance(
           $scope.questionData);
