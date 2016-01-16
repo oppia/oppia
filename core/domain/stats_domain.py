@@ -16,8 +16,6 @@
 
 """Domain object for statistics models."""
 
-__author__ = 'Sean Lip'
-
 import copy
 import operator
 import sys
@@ -46,10 +44,7 @@ class StateRuleAnswerLog(object):
     def total_answer_count(self):
         """Total count of answers for this rule that have not been resolved."""
         # TODO(sll): Cache this computed property.
-        total_count = 0
-        for answer, count in self.answers.iteritems():
-            total_count += count
-        return total_count
+        return sum(self.answers.values())
 
     @classmethod
     def get_multi(cls, exploration_id, rule_data):
@@ -75,19 +70,19 @@ class StateRuleAnswerLog(object):
             'rule_str': rule_str
         }])[0]
 
-    def get_top_answers(self, N):
-        """Returns the top N answers.
+    def get_top_answers(self, num_answers_to_return):
+        """Returns the top `num_answers_to_return` answers.
 
         Args:
-            N: the maximum number of answers to return.
+            num_answers_to_return: the maximum number of answers to return.
 
         Returns:
-            A list of (answer, count) tuples for the N answers with the highest
-            counts.
+            A list of (answer, count) tuples for the `num_answers_to_return`
+            answers with the highest counts.
         """
         return sorted(
             self.answers.iteritems(), key=operator.itemgetter(1),
-            reverse=True)[:N]
+            reverse=True)[:num_answers_to_return]
 
 
 class StateAnswers(object):

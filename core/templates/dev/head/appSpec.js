@@ -115,9 +115,9 @@ describe('Datetime Formatter', function() {
       // In any timezone, 10 minutes before xx:45:00 should still fall within
       // the same date as xx:45:00 in getLocaleAbbreviateDatetimeString().
       expect(df.getLocaleAbbreviatedDatetimeString(
-        NOW_MILLIS - 10 * 60 * 1000)).not.toBe('11/21/2014');
+        NOW_MILLIS - 10 * 60 * 1000)).not.toBe('11/21/14');
       expect(df.getLocaleAbbreviatedDatetimeString(
-        NOW_MILLIS - 10 * 60 * 1000)).not.toBe('2014/11/21');
+        NOW_MILLIS - 10 * 60 * 1000)).not.toBe('14/11/21');
     });
 
     it('should show only the date for a datetime occurring before today',
@@ -128,7 +128,7 @@ describe('Datetime Formatter', function() {
       // formatting is different. This should hold true in
       // getLocaleAbbreviateDatetimeString()
       expect([
-        '11/18/2014', '11/17/2014', '2014/11/18', '2014/11/17', '18/11/2014'
+        '11/18/14', '11/17/14', '14/11/18', '14/11/17', '18/11/14', 'Nov 18'
       ]).toContain(
         df.getLocaleAbbreviatedDatetimeString(
           NOW_MILLIS - 72 * 60 * 60 * 1000));

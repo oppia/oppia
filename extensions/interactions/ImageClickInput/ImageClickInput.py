@@ -14,8 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'Zhan Xiong Chin'
-
 from extensions.interactions import base
 
 
@@ -28,6 +26,7 @@ class ImageClickInput(base.BaseInteraction):
     _dependency_ids = []
     answer_type = 'ClickOnImage'
     instructions = 'Click on the image'
+    narrow_instructions = 'View image'
     needs_summary = False
 
     _customization_arg_specs = [{

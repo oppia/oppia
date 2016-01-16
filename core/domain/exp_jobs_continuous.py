@@ -16,8 +16,6 @@
 
 """Continuous computations for explorations."""
 
-__author__ = 'Frederik Creemers'
-
 from core import jobs
 from core.domain import exp_services
 from core.platform import models

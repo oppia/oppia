@@ -16,15 +16,13 @@
 
 """Models relating to the per-exploration file system."""
 
-__author__ = 'Sean Lip'
-
-import os
-
-import core.storage.base_model.gae_models as base_models
+from core.platform import models
 import feconf
 import utils
 
 from google.appengine.ext import ndb
+
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
 class FileMetadataSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
@@ -45,12 +43,13 @@ class FileMetadataModel(base_models.VersionedModel):
     # The size of the file.
     size = ndb.IntegerProperty(indexed=False)
 
+    @classmethod
     def get_new_id(cls, entity_name):
         raise NotImplementedError
 
     @classmethod
     def get_undeleted(cls):
-        return cls.get_all().filter(cls.deleted == False).fetch(
+        return cls.get_all().filter(cls.deleted == False).fetch(  # pylint: disable=singleton-comparison
             feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
@@ -107,6 +106,7 @@ class FileModel(base_models.VersionedModel):
         """Manually overwrite the superclass method."""
         return self.content
 
+    @classmethod
     def get_new_id(cls, entity_name):
         raise NotImplementedError
 

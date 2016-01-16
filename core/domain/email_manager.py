@@ -16,9 +16,6 @@
 
 """Config properties and functions for managing email notifications."""
 
-__author__ = 'Sean Lip'
-
-
 import datetime
 import logging
 
@@ -27,14 +24,16 @@ from core.domain import html_cleaner
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
+import feconf
+
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 email_services = models.Registry.import_email_services()
 transaction_services = models.Registry.import_transaction_services()
-import feconf
-
 
 # Stub for logging.error(), so that it can be swapped out in tests.
-log_new_error = logging.error
+def log_new_error(*args, **kwargs):
+    logging.error(*args, **kwargs)
+
 
 EMAIL_HTML_BODY_SCHEMA = {
     'type': 'unicode',
@@ -201,13 +200,13 @@ def get_draft_moderator_action_email(intent):
     that no email will be sent.
     """
     try:
-        require_moderator_email_prereqs_are_satisfied(intent)
+        require_moderator_email_prereqs_are_satisfied()
         return _get_email_config(intent).value
     except Exception:
         return ''
 
 
-def require_moderator_email_prereqs_are_satisfied(intent):
+def require_moderator_email_prereqs_are_satisfied():
     """Raises an exception if, for any reason, moderator emails cannot be sent.
     """
     if not feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION:
@@ -228,7 +227,7 @@ def send_moderator_action_email(
     The caller is responsible for ensuring that emails are allowed to be sent
     to users (i.e. feconf.CAN_SEND_EMAILS_TO_USERS is True).
     """
-    require_moderator_email_prereqs_are_satisfied(intent)
+    require_moderator_email_prereqs_are_satisfied()
     email_config = feconf.VALID_MODERATOR_ACTIONS[intent]
 
     recipient_user_settings = user_services.get_user_settings(recipient_id)

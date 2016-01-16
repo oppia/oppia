@@ -14,11 +14,11 @@
 
 """Controllers for the Oppia exploration learner view."""
 
-__author__ = 'Sean Lip'
-
 import json
 import logging
 import random
+
+import jinja2
 
 from core.controllers import base
 from core.domain import classifier_services
@@ -37,12 +37,9 @@ from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import rule_domain
-from core.domain import skins_services
 from core.domain import summary_services
 import feconf
 import utils
-
-import jinja2
 
 
 MAX_SYSTEM_RECOMMENDATIONS = 4
@@ -92,7 +89,7 @@ def require_playable(handler):
                 'error/disabled_exploration.html', iframe_restriction=None)
             return
 
-        """Checks if the user for the current session is logged in."""
+        # Checks if the user for the current session is logged in.
         if rights_manager.Actor(self.user_id).can_play(
                 rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             return handler(self, exploration_id, **kwargs)
@@ -170,8 +167,7 @@ def classify_soft_rule(state, params, input_type, normalized_answer, fs):
     return None
 
 
-def classify_string_classifier_rule(
-    state, params, input_type, normalized_answer, fs):
+def classify_string_classifier_rule(state, normalized_answer):
     """Run the classifier if no prediction has been made yet. Currently this
     is behind a development flag.
     """
@@ -181,19 +177,19 @@ def classify_string_classifier_rule(
     best_matched_truth_value = rule_domain.CERTAIN_FALSE_VALUE
 
     sc = classifier_services.StringClassifier()
-    training_examples = [[doc, []] for doc in
-        state.interaction.confirmed_unclassified_answers]
+    training_examples = [
+        [doc, []] for doc in state.interaction.confirmed_unclassified_answers]
     for (answer_group_index, answer_group) in enumerate(
-        state.interaction.answer_groups):
+            state.interaction.answer_groups):
         fuzzy_rule_spec_index = answer_group.get_fuzzy_rule_index()
         if fuzzy_rule_spec_index is not None:
             fuzzy_rule_spec = answer_group.rule_specs[fuzzy_rule_spec_index]
         else:
             fuzzy_rule_spec = None
         if fuzzy_rule_spec is not None:
-            training_examples.extend(
-                [[doc, [str(answer_group_index)]] for doc in
-                fuzzy_rule_spec.inputs['training_data']])
+            training_examples.extend([
+                [doc, [str(answer_group_index)]]
+                for doc in fuzzy_rule_spec.inputs['training_data']])
     if len(training_examples) > 0:
         sc.load_examples(training_examples)
         doc_ids = sc.add_examples_for_predicting([normalized_answer])
@@ -204,7 +200,7 @@ def classify_string_classifier_rule(
             predicted_answer_group = state.interaction.answer_groups[
                 predicted_answer_group_index]
             best_matched_truth_value = rule_domain.CERTAIN_TRUE_VALUE
-            for rule_spec in answer_group.rule_specs:
+            for rule_spec in predicted_answer_group.rule_specs:
                 if rule_spec.rule_type == rule_domain.FUZZY_RULE_TYPE:
                     best_matched_rule_spec_index = fuzzy_rule_spec_index
                     break
@@ -259,9 +255,8 @@ def classify(exp_id, state, answer, params):
         response = classify_soft_rule(
             state, params, input_type, normalized_answer, fs)
     if (interaction_instance.is_string_classifier_trainable and
-        feconf.ENABLE_STRING_CLASSIFIER and response is None):
-        response = classify_string_classifier_rule(
-            state, params, input_type, normalized_answer, fs)
+            feconf.ENABLE_STRING_CLASSIFIER and response is None):
+        response = classify_string_classifier_rule(state, normalized_answer)
 
     # The best matched group must match above a certain threshold. If no group
     # meets this requirement, then the default 'group' automatically matches
@@ -278,8 +273,9 @@ def classify(exp_id, state, answer, params):
             'rule_spec_index': 0
         }
 
-    raise Exception('Something has seriously gone wrong with the exploration. '
-        'Oppia does not know what to do with this answer. Please contact the '
+    raise Exception(
+        'Something has seriously gone wrong with the exploration. Oppia does '
+        'not know what to do with this answer. Please contact the '
         'exploration owner.')
 
 
@@ -368,13 +364,6 @@ class ExplorationPage(base.BaseHandler):
             # Note that this overwrites the value in base.py.
             'meta_description': utils.capitalize_string(exploration.objective),
             'nav_mode': feconf.NAV_MODE_EXPLORE,
-            'skin_templates': jinja2.utils.Markup(
-                skins_services.Registry.get_skin_templates(
-                    [feconf.DEFAULT_SKIN_ID])),
-            'skin_js_url': skins_services.Registry.get_skin_js_url(
-                feconf.DEFAULT_SKIN_ID),
-            'skin_tag': jinja2.utils.Markup(
-                skins_services.Registry.get_skin_tag(feconf.DEFAULT_SKIN_ID)),
         })
 
         if is_iframed:
@@ -473,7 +462,8 @@ class StateHitEventHandler(base.BaseHandler):
         new_state_name = self.payload.get('new_state_name')
         exploration_version = self.payload.get('exploration_version')
         session_id = self.payload.get('session_id')
-        client_time_spent_in_secs = self.payload.get(
+        # TODO(sll): why do we not record the value of this anywhere?
+        client_time_spent_in_secs = self.payload.get(  # pylint: disable=unused-variable
             'client_time_spent_in_secs')
         old_params = self.payload.get('old_params')
 

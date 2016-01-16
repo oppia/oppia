@@ -16,9 +16,6 @@
 
 """Tests for the GAE mail API wrapper."""
 
-__author__ = 'Sean Lip'
-
-
 from core.platform.email import gae_email_services
 from core.tests import test_utils
 import feconf

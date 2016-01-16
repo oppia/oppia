@@ -16,8 +16,6 @@
 
 """Jobs for recommendations."""
 
-__author__ = 'Xinyu Wu'
-
 import ast
 
 from core import jobs
@@ -27,6 +25,11 @@ from core.domain import rights_manager
 from core.platform import models
 (exp_models, recommendations_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.recommendations])
+
+MAX_RECOMMENDATIONS = 10
+# Note: There is a threshold so that bad recommendations will be
+# discarded even if an exploration has few similar explorations.
+SIMILARITY_SCORE_THRESHOLD = 3.0
 
 
 class ExplorationRecommendationsRealtimeModel(
@@ -79,10 +82,6 @@ class ExplorationRecommendationsMRJobManager(
         if item.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
             return
 
-        # Note: There is a threshold so that bad recommendations will be
-        # discarded even if an exploration has few similar explorations.
-        SIMILARITY_SCORE_THRESHOLD = 3.0
-
         exp_summary_id = item.id
         exp_summaries_dict = (
             exp_services.get_non_private_exploration_summaries())
@@ -114,8 +113,6 @@ class ExplorationRecommendationsMRJobManager(
 
     @staticmethod
     def reduce(key, stringified_values):
-        MAX_RECOMMENDATIONS = 10
-
         other_exploration_similarities = sorted(
             [ast.literal_eval(v) for v in stringified_values],
             reverse=True,

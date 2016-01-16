@@ -16,8 +16,6 @@
 
 """Services for exploration-related statistics."""
 
-__author__ = 'Sean Lip'
-
 import logging
 import sys
 
@@ -27,13 +25,16 @@ from core.domain import interaction_registry
 from core.domain import stats_domain
 from core.domain import stats_jobs_continuous
 from core.platform import models
-(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 import utils
 
+(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 IMPROVE_TYPE_DEFAULT = 'default'
 IMPROVE_TYPE_INCOMPLETE = 'incomplete'
+# TODO(bhenning): Everything is handler name submit; therefore, it is
+# pointless and should be removed.
+_OLD_SUBMIT_HANDLER_NAME = 'submit'
 
 
 def get_top_unresolved_answers_for_default_rule(exploration_id, state_name):
@@ -56,9 +57,6 @@ def get_state_rules_stats(exploration_id, state_name):
     exploration = exp_services.get_exploration_by_id(exploration_id)
     state = exploration.states[state_name]
 
-    # TODO(bhenning): Everything is handler name submit; therefore, it is
-    # pointless and should be removed.
-    _OLD_SUBMIT_HANDLER_NAME = 'submit'
     rule_keys = []
     for group in state.interaction.answer_groups:
         for rule in group.rule_specs:
@@ -231,7 +229,7 @@ def get_exploration_stats(exploration_id, exploration_version):
 
     return {
         'improvements': get_state_improvements(
-             exploration_id, exploration_version),
+            exploration_id, exploration_version),
         'last_updated': last_updated,
         'num_completions': exp_stats['complete_exploration_count'],
         'num_starts': exp_stats['start_exploration_count'],

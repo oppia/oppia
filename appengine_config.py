@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Configuration for App Engine."""
+# pylint: skip-file
 
-__author__ = 'sll@google.com (Sean Lip)'
+"""Configuration for App Engine."""
 
 import logging
 import os

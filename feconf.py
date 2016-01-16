@@ -45,7 +45,6 @@ RTE_EXTENSIONS_DIR = os.path.join('extensions', 'rich_text_components')
 RULES_DIR = os.path.join('extensions', 'rules')
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
-SKINS_TEMPLATES_DIR = os.path.join('extensions', 'skins')
 TEMPLATES_DIR_PREFIX = 'dev' if DEV_MODE else 'prod'
 FRONTEND_TEMPLATES_DIR = os.path.join(
     'core', 'templates', TEMPLATES_DIR_PREFIX, 'head')
@@ -196,6 +195,18 @@ VALID_MODERATOR_ACTIONS = {
     },
 }
 
+# Panel properties and other constants for the default skin.
+GADGET_PANEL_AXIS_HORIZONTAL = 'horizontal'
+PANELS_PROPERTIES = {
+    'bottom': {
+        'width': 350,
+        'height': 100,
+        'stackable_axis': GADGET_PANEL_AXIS_HORIZONTAL,
+        'pixels_between_gadgets': 80,
+        'max_gadgets': 1
+    }
+}
+
 # When the site terms were last updated, in UTC.
 REGISTRATION_PAGE_LAST_UPDATED_UTC = datetime.datetime(2015, 10, 14, 2, 40, 0)
 
@@ -209,6 +220,7 @@ DEFAULT_LANGUAGE_CODE = 'en'
 SHOW_CUSTOM_PAGES = True
 
 # The id of the default skin.
+# TODO(sll): Deprecate this; it is no longer used.
 DEFAULT_SKIN_ID = 'conversation_v1'
 
 # User id and username for exploration migration bot. Commits made by this bot
@@ -315,6 +327,7 @@ DEMO_EXPLORATIONS = [
     ('solar_system', 'The Solar System', 'Physics'),
     ('about_oppia.yaml', 'About Oppia', 'Welcome'),
     ('fuzzy_exploration.yaml', 'Demonstrating fuzzy rules', 'Test'),
+    ('all_interactions', 'Test of all interactions', 'Test'),
 ]
 
 DEMO_COLLECTIONS = {

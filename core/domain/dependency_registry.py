@@ -16,8 +16,6 @@
 
 """Registry for JavaScript library dependencies."""
 
-__author__ = 'Sean Lip'
-
 import itertools
 import os
 

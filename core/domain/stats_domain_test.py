@@ -14,15 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'Sean Lip'
-
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import event_services
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.tests import test_utils
-import feconf
 
 
 class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):

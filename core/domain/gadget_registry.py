@@ -16,8 +16,6 @@
 
 """Registry for gadgets."""
 
-__author__ = 'Michael Anuzis'
-
 import pkgutil
 
 import feconf
@@ -34,13 +32,13 @@ class Registry(object):
         cls._gadgets.clear()
 
         # Assemble all paths to the gadgets.
-        EXTENSION_PATHS = [
+        extension_paths = [
             gadget['dir'] for gadget in
             feconf.ALLOWED_GADGETS.values()]
 
         # Crawl the directories and add new gadget instances to the
         # registry.
-        for loader, name, _ in pkgutil.iter_modules(path=EXTENSION_PATHS):
+        for loader, name, _ in pkgutil.iter_modules(path=extension_paths):
             module = loader.find_module(name).load_module(name)
             clazz = getattr(module, name)
 

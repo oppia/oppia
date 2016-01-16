@@ -16,8 +16,6 @@
 
 """Registry for interactions."""
 
-__author__ = 'Sean Lip'
-
 import itertools
 import os
 import pkgutil
@@ -37,7 +35,8 @@ class Registry(object):
         """Get a list of all interaction ids."""
         return list(itertools.chain(*[
             interaction_category['interaction_ids']
-        for interaction_category in feconf.ALLOWED_INTERACTION_CATEGORIES]))
+            for interaction_category in feconf.ALLOWED_INTERACTION_CATEGORIES
+        ]))
 
     @classmethod
     def _refresh(cls):
@@ -46,13 +45,13 @@ class Registry(object):
         all_interaction_ids = cls.get_all_interaction_ids()
 
         # Assemble all paths to the interactions.
-        EXTENSION_PATHS = [
+        extension_paths = [
             os.path.join(feconf.INTERACTIONS_DIR, interaction_id)
             for interaction_id in all_interaction_ids]
 
         # Crawl the directories and add new interaction instances to the
         # registry.
-        for loader, name, _ in pkgutil.iter_modules(path=EXTENSION_PATHS):
+        for loader, name, _ in pkgutil.iter_modules(path=extension_paths):
             module = loader.find_module(name).load_module(name)
             clazz = getattr(module, name)
 

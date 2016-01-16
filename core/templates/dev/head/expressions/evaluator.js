@@ -356,6 +356,7 @@ oppia.factory('expressionEvaluatorService', [
       },
       // Note that removing quotation marks from this key causes issues with
       // minification (when running the deployment scripts).
+      // jscs:disable disallowQuotedKeysInObjects
       'if': function(args) {
         // TODO(kashida): Make this short-circuit.
         verifyNumArgs(args, 3);
@@ -381,6 +382,7 @@ oppia.factory('expressionEvaluatorService', [
         var numericArgs = _coerceAllArgsToNumber(args);
         return Math.abs(numericArgs[0]);
       }
+      // jscs:enable disallowQuotedKeysInObjects
     };
 
     return {

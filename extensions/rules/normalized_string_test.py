@@ -16,8 +16,6 @@
 
 """Tests for classification of NormalizedStrings."""
 
-__author__ = 'Sean Lip'
-
 from core.tests import test_utils
 from extensions.rules import normalized_string
 

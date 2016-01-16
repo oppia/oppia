@@ -106,10 +106,12 @@ class StatisticsAudit(jobs.BaseMapReduceJobManager):
                     sum_state_hit[state_name] += counts['first_entry_count']
 
         if sum_starts != all_starts:
-            yield ('Non-all != all for starts: exp_id:%s sum: %s all: %s'
+            yield (
+                'Non-all != all for starts: exp_id:%s sum: %s all: %s'
                 % (key, sum_starts, all_starts),)
         if sum_completions != all_completions:
-            yield ('Non-all != all for completions: exp_id:%s sum: %s all: %s'
+            yield (
+                'Non-all != all for completions: exp_id:%s sum: %s all: %s'
                 % (key, sum_completions, all_completions),)
 
         for state_name in all_state_hit:

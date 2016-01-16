@@ -26,6 +26,7 @@ class Continue(base.BaseInteraction):
     _dependency_ids = []
     is_linear = True
     instructions = None
+    narrow_instructions = None
     needs_summary = False
     default_outcome_heading = 'When the button is clicked'
 

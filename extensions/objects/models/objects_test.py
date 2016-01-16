@@ -16,8 +16,6 @@
 
 """Tests for typed object classes (mostly normalization)."""
 
-__author__ = 'Sean Lip'
-
 import inspect
 
 from core.tests import test_utils

@@ -14,17 +14,13 @@
 
 """Controllers for Oppia resources (templates, images)."""
 
-__author__ = 'sll@google.com (Sean Lip)'
-
 import logging
-import mimetypes
 import urllib
 
 from core.controllers import base
 from core.domain import fs_domain
 from core.domain import obj_services
 from core.domain import value_generators_domain
-import feconf
 
 
 class ObjectEditorTemplateHandler(base.BaseHandler):
