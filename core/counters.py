@@ -16,22 +16,20 @@
 
 """Services for performance counters."""
 
-__author__ = 'Sean Lip'
-
 
 class PerfCounter(object):
     """Generic in-process numeric counter; not aggregated across instances."""
     # TODO(sll): Add aggregation across instances.
 
     def __init__(self, name, description):
-        if name in Registry._counters:
+        if name in Registry.get_all_counter_names():
             raise Exception('Counter %s already exists.' % name)
 
         self._name = name
         self._description = description
         self._value = 0
 
-        Registry._counters[self.name] = self
+        Registry.register_counter(self.name, self)
 
     def inc(self, increment=1):
         """Increments the counter value by a given increment."""
@@ -55,8 +53,16 @@ class Registry(object):
     _counters = {}
 
     @classmethod
+    def get_all_counter_names(cls):
+        return cls._counters.keys()
+
+    @classmethod
     def get_all_counters(cls):
         return cls._counters.values()
+
+    @classmethod
+    def register_counter(cls, name, counter_class):
+        cls._counters[name] = counter_class
 
 
 MEMCACHE_HIT = PerfCounter(

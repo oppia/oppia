@@ -20,8 +20,8 @@
 
 /* Each interaction's protractor file must implement the following:
  * customizeInteraction: a function that receives an element containing the
- *   interaction editor followed by some number of arguments used to customize the
- *   interaction in question (e.g options for the MultipleChoiceInput).
+ *   interaction editor followed by some number of arguments used to customize
+ *   the interaction in question (e.g options for the MultipleChoiceInput).
  * expectInteractionDetailsToMatch: a function that receives arguments
  *   describing the way the interaction is expected to look, and is run in the
  *   player to verify the interaction actually looks this way.

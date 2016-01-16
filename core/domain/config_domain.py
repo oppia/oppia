@@ -16,15 +16,12 @@
 
 """Domain objects for configuration properties."""
 
-__author__ = 'Sean Lip'
-
-
 from core.domain import user_services
 from core.platform import models
-(config_models,) = models.Registry.import_models([models.NAMES.config])
-memcache_services = models.Registry.import_memcache_services()
 import schema_utils
 
+(config_models,) = models.Registry.import_models([models.NAMES.config])
+memcache_services = models.Registry.import_memcache_services()
 
 COMPUTED_PROPERTY_PREFIX = 'computed:'
 
@@ -58,7 +55,7 @@ class ConfigProperty(object):
         pass
 
     def __init__(self, name, schema, description, default_value):
-        if name in Registry._config_registry:
+        if Registry.get_config_property(name):
             raise Exception('Property with name %s already exists' % name)
 
         self._name = name
@@ -67,7 +64,7 @@ class ConfigProperty(object):
         self._default_value = schema_utils.normalize_against_schema(
             default_value, self._schema)
 
-        Registry._config_registry[self.name] = self
+        Registry.init_config_property(self.name, self)
 
     @property
     def name(self):
@@ -109,18 +106,18 @@ class ConfigProperty(object):
 class ComputedProperty(ConfigProperty):
     """A property whose default value is computed using a given function."""
 
-    def refresh_default_value(self):
-        memcache_services.delete_multi([self.name])
-        self._default_value = self.fn(*self.args)
-
-    def __init__(self, name, schema, description, fn, *args):
-        self.fn = fn
+    def __init__(self, name, schema, description, conversion_func, *args):
+        self.conversion_func = conversion_func
         self.args = args
 
-        default_value = self.fn(*self.args)
+        default_value = self.conversion_func(*self.args)
         super(ComputedProperty, self).__init__(
             '%s%s' % (COMPUTED_PROPERTY_PREFIX, name),
             schema, description, default_value)
+
+    def refresh_default_value(self):
+        memcache_services.delete_multi([self.name])
+        self._default_value = self.conversion_func(*self.args)
 
     @property
     def value(self):
@@ -135,6 +132,10 @@ class Registry(object):
     # The keys of _config_registry are the property names, and the values are
     # ConfigProperty instances.
     _config_registry = {}
+
+    @classmethod
+    def init_config_property(cls, name, instance):
+        cls._config_registry[name] = instance
 
     @classmethod
     def get_config_property(cls, name):

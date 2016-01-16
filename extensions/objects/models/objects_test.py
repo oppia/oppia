@@ -16,8 +16,6 @@
 
 """Tests for typed object classes (mostly normalization)."""
 
-__author__ = 'Sean Lip'
-
 import inspect
 
 from core.tests import test_utils
@@ -389,4 +387,4 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils_test.validate_schema(member.SCHEMA)
                     count += 1
 
-        self.assertEquals(count, 28)
+        self.assertEquals(count, 29)

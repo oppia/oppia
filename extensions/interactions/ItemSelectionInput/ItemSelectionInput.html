@@ -39,7 +39,7 @@
 <script type="text/ng-template" id="interaction/ItemSelectionInput">
   <div class="item-selection-input-form-container">
     <form ng-submit="submitAnswer()">
-      <div class="item-selection-input-container" ng-repeat="choice in choices">
+      <div class="item-selection-input-container" ng-repeat="choice in choices track by $index">
         <label class="item-selection-input-item">
           <div ng-if="displayCheckboxes">
             <md-checkbox class="item-selection-input-checkbox" ng-model="userSelections[choice]" ng-checked="userSelections[choice]"

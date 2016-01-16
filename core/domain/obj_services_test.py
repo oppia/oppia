@@ -14,8 +14,6 @@
 
 """Tests for services relating to typed objects."""
 
-__author__ = 'Sean Lip'
-
 from core.domain import obj_services
 from core.tests import test_utils
 from extensions.objects.models import objects
@@ -26,8 +24,9 @@ class ObjectRegistryUnitTests(test_utils.GenericTestBase):
 
     def test_get_object_class_by_type_method(self):
         """Tests the normal behavior of get_object_class_by_type()."""
-        IntClass = obj_services.Registry.get_object_class_by_type('Int')
-        assert IntClass.__name__ == 'Int'
+        self.assertEqual(
+            obj_services.Registry.get_object_class_by_type('Int').__name__,
+            'Int')
 
     def test_fake_class_is_not_gettable(self):
         """Tests that trying to retrieve a fake class raises an error."""

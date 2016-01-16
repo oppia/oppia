@@ -25,8 +25,8 @@ oppia.directive('oppiaInteractiveTextInput', [
       restrict: 'E',
       scope: {},
       templateUrl: 'interaction/TextInput',
-      controller: ['$scope', '$attrs', 'focusService',
-          function($scope, $attrs, focusService) {
+      controller: ['$scope', '$attrs', 'focusService', 'textInputRulesService',
+          function($scope, $attrs, focusService, textInputRulesService) {
         $scope.placeholder = oppiaHtmlEscaper.escapedJsonToObj(
           $attrs.placeholderWithValue);
         $scope.rows = oppiaHtmlEscaper.escapedJsonToObj($attrs.rowsWithValue);
@@ -49,7 +49,8 @@ oppia.directive('oppiaInteractiveTextInput', [
             return;
           }
 
-          $scope.$parent.$parent.submitAnswer(answer);
+          $scope.$parent.submitAnswer(
+            answer, textInputRulesService);
         };
       }]
     };
@@ -81,3 +82,60 @@ oppia.directive('oppiaShortResponseTextInput', [
     };
   }
 ]);
+
+oppia.factory('textInputRulesService', ['$filter', function($filter) {
+  return {
+    Equals: function(answer, inputs) {
+      var normalizedAnswer = $filter('normalizeWhitespace')(answer);
+      var normalizedInput = $filter('normalizeWhitespace')(inputs.x);
+      return normalizedAnswer.toLowerCase() == normalizedInput.toLowerCase();
+    },
+    FuzzyEquals: function(answer, inputs) {
+      var normalizedAnswer = $filter('normalizeWhitespace')(answer);
+      var answerString = normalizedAnswer.toLowerCase();
+
+      var normalizedInput = $filter('normalizeWhitespace')(inputs.x);
+      var inputString = normalizedInput.toLowerCase();
+
+      if (inputString == answerString) {
+        return true;
+      }
+      var editDistance = [];
+      for (var i = 0; i <= inputString.length; i++) {
+        editDistance.push([i]);
+      }
+      for (var j = 1; j <= answerString.length; j++) {
+        editDistance[0].push(j);
+      }
+      for (var i = 1; i <= inputString.length; i++) {
+        for (var j = 1; j <= answerString.length; j++) {
+          if (inputString.charAt(i - 1) == answerString.charAt(j - 1)) {
+            editDistance[i][j] = editDistance[i - 1][j - 1];
+          } else {
+            editDistance[i][j] = Math.min(editDistance[i - 1][j - 1],
+                                          editDistance[i][j - 1],
+                                          editDistance[i - 1][j]) + 1;
+          }
+        }
+      }
+      return editDistance[inputString.length][answerString.length] == 1;
+    },
+    CaseSensitiveEquals: function(answer, inputs) {
+      var normalizedAnswer = $filter('normalizeWhitespace')(answer);
+      var normalizedInput = $filter('normalizeWhitespace')(inputs.x);
+      return normalizedAnswer == normalizedInput;
+    },
+    StartsWith: function(answer, inputs) {
+      var normalizedAnswer = $filter('normalizeWhitespace')(answer);
+      var normalizedInput = $filter('normalizeWhitespace')(inputs.x);
+      return normalizedAnswer.toLowerCase().indexOf(
+        normalizedInput.toLowerCase()) == 0;
+    },
+    Contains: function(answer, inputs) {
+      var normalizedAnswer = $filter('normalizeWhitespace')(answer);
+      var normalizedInput = $filter('normalizeWhitespace')(inputs.x);
+      return normalizedAnswer.toLowerCase().indexOf(
+        normalizedInput.toLowerCase()) != -1;
+    }
+  };
+}]);

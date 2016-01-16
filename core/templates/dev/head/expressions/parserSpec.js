@@ -28,7 +28,7 @@ describe('Expression parser service', function() {
       [0.001, '1e-3'],
       [0.35, '.35'],
       ['abc', '"abc"'],
-      ["a'b'c", '"a\'b\'c"'],
+      ['a\'b\'c', '"a\'b\'c"'],
       [null, 'null'],
       [true, 'true'],
       [false, 'false'],
@@ -69,26 +69,24 @@ describe('Expression parser service', function() {
       [undefined, '0.3.4'],
       [undefined, 'abc()('],
       [undefined, '()'],
-      [undefined, '*100'],
-
+      [undefined, '*100']
     ].forEach(function(test) {
+      // 'expected' should be either a JavaScript primitive value that would be
+      //   the result of evaluating 'expression', or undefined (which means
+      //   that the parser is expected to fail).
+      // 'expression' is the expression string to be parsed.
       var expected = test[0];
       var expression = test[1];
-
-      // 'expected' should be either a JavaScript primitive value that would be the
-      // result of evaluating 'expression', or undefined (which means that the
-      // parser is expected to fail).
-      // 'expression' is the expression string to be parsed.
 
       var failed = false;
       try {
         var parsed = eps.parse(expression);
-        parsed_json = JSON.stringify(parsed);
-        var expected_json = JSON.stringify(expected);
-        if (expected === undefined || parsed_json != expected_json) {
+        parsedJson = JSON.stringify(parsed);
+        var expectedJson = JSON.stringify(expected);
+        if (expected === undefined || parsedJson != expectedJson) {
           console.error('input    : ' + expression);
-          console.error('parsed   : ' + parsed_json);
-          console.error('expected : ' + expected_json);
+          console.error('parsed   : ' + parsedJson);
+          console.error('expected : ' + expectedJson);
           failed = true;
         }
       } catch (e) {

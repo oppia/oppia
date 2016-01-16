@@ -17,6 +17,8 @@
 from core.domain import classifier_services
 from core.tests import test_utils
 
+# pylint: disable=protected-access
+
 
 class StringClassifierUnitTests(test_utils.GenericTestBase):
 
@@ -40,7 +42,7 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         self.string_classifier = classifier_services.StringClassifier()
         self.string_classifier.load_examples(self._EXAMPLES_TRAIN)
 
-    def _validate_instance(self, string_classifier):
+    def _validate_instance(self):
         self.assertIn('_alpha', dir(self.string_classifier))
         self.assertIn('_beta', dir(self.string_classifier))
         self.assertIn('_prediction_threshold', dir(self.string_classifier))
@@ -93,7 +95,7 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         self.assertEquals(self.string_classifier._num_labels, 3)
         self.assertEquals(self.string_classifier._num_docs, 2)
         self.assertEquals(self.string_classifier._num_words, 7)
-        self._validate_instance(self.string_classifier)
+        self._validate_instance()
 
     def test_add_train_examples(self):
         self.string_classifier.add_examples_for_training(
@@ -101,14 +103,14 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         self.assertEquals(self.string_classifier._num_labels, 3)
         self.assertEquals(self.string_classifier._num_docs, 3)
         self.assertEquals(self.string_classifier._num_words, 10)
-        self._validate_instance(self.string_classifier)
+        self._validate_instance()
 
     def test_add_test_examples(self):
         self.string_classifier.add_examples_for_predicting(self._EXAMPLES_TEST)
         self.assertEquals(self.string_classifier._num_labels, 3)
         self.assertEquals(self.string_classifier._num_docs, 5)
         self.assertEquals(self.string_classifier._num_words, 34)
-        self._validate_instance(self.string_classifier)
+        self._validate_instance()
 
     def test_empty_load(self):
         self.string_classifier.load_examples([])
@@ -116,14 +118,14 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         self.assertEquals(self.string_classifier._num_labels, 1)
         self.assertEquals(self.string_classifier._num_docs, 0)
         self.assertEquals(self.string_classifier._num_words, 0)
-        self._validate_instance(self.string_classifier)
+        self._validate_instance()
 
     def test_empty_add(self):
         self.string_classifier.add_examples_for_training([])
         self.assertEquals(self.string_classifier._num_labels, 3)
         self.assertEquals(self.string_classifier._num_docs, 2)
         self.assertEquals(self.string_classifier._num_words, 7)
-        self._validate_instance(self.string_classifier)
+        self._validate_instance()
 
     def test_model_to_and_from_dict(self):
         self.assertEquals(
@@ -185,18 +187,19 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
             self.string_classifier._num_docs,
             len(self._NEW_EXAMPLES_TRAIN))
         self.assertEquals(self.string_classifier._num_words, 4)
-        self._validate_instance(self.string_classifier)
+        self._validate_instance()
 
     def test_prediction_report(self):
         def _mock_get_label_probabilities(d):
             self.assertEquals(d, -1)
             return [0.5, 0.3, 0.2]
 
-        def _mock_get_label_id(label):
+        def _mock_get_label_id(unused_label):
             return 0
 
-        def _mock_get_label_name(l):
+        def _mock_get_label_name(unused_label):
             return 'fake_label'
+
         self.string_classifier._prediction_threshold = 0
         self.string_classifier._get_label_probabilities = (
             _mock_get_label_probabilities)
@@ -205,7 +208,18 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
             self.string_classifier._get_prediction_report_for_doc(-1))
         self.assertEquals(prediction_report['prediction_label_id'], 1)
 
-    def test_training(self):
+    def test_predict_label_for_doc(self):
+        """This test ensures that the predictor is predicting the labels that
+        are provided (in this case, 'food', 'pets', and the generic label
+        '_default'). This test does not cover prediction accuracy, so
+        _DEFAULT_MIN_DOCS_TO_PREDICT and _DEFAULT_MIN_LABELS_TO_PREDICT have
+        been set to zero. This allows the predictor to predict on smaller data
+        sets, which is useful for testing purposes. Setting the above constants
+        to zero is not recommended in a serving system.
+        """
+        self.string_classifier._DEFAULT_MIN_DOCS_TO_PREDICT = 0
+        self.string_classifier._DEFAULT_MIN_LABELS_TO_PREDICT = 0
+
         doc_ids = self.string_classifier.add_examples_for_predicting(
             self._EXAMPLES_TEST)
         predicted_label = self.string_classifier.predict_label_for_doc(
@@ -219,4 +233,4 @@ class StringClassifierUnitTests(test_utils.GenericTestBase):
         predicted_label = self.string_classifier.predict_label_for_doc(
             doc_ids[2])
         self.assertEquals(predicted_label, '_default')
-        self._validate_instance(self.string_classifier)
+        self._validate_instance()

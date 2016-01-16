@@ -16,8 +16,6 @@
 
 """Classes relating to rules."""
 
-__author__ = 'Sean Lip'
-
 import inspect
 import os
 import pkgutil
@@ -67,14 +65,14 @@ def get_rules_for_obj_type(obj_type):
 
 
 def get_description_strings_for_obj_type(obj_type):
-   """Returns a dict whose keys are rule names and whose values are the
-   corresponding description strings.
-   """
-   rules = get_rules_for_obj_type(obj_type)
-   return {
-       rule.__name__: rule.description
-       for rule in rules
-   }
+    """Returns a dict whose keys are rule names and whose values are the
+    corresponding description strings.
+    """
+    rules = get_rules_for_obj_type(obj_type)
+    return {
+        rule.__name__: rule.description
+        for rule in rules
+    }
 
 
 def get_param_list(description):
@@ -118,16 +116,16 @@ class Rule(object):
     # overridden by subclasses.
     description = ''
 
-    _PARAMS = None
+    _params = None
     _fs = None
 
     @property
     def params(self):
-        if self._PARAMS is None:
+        if self._params is None:
             # Derive the rule params from its description.
-            self._PARAMS = get_param_list(self.description)
+            self._params = get_param_list(self.description)
 
-        return self._PARAMS
+        return self._params
 
     def __init__(self, *args):
         if len(args) != len(self.params):
@@ -146,7 +144,8 @@ class Rule(object):
     def _evaluate(self, subject):
         """Returns a normalized value between 0 and 1 indicating the truth value
         of the evaluation, where 1.0 is certainly true and 0.0 is certainly
-        false. This is to be implemented in overridden classes.
+        false. This is to be implemented in overridden classes, or implemented
+        in the frontend.
         """
         raise NotImplementedError
 
@@ -192,7 +191,7 @@ def evaluate_rule(rule_spec, answer_type, context_params, answer, fs):
     param_defns = get_param_list(rule.description)
     for (param_name, obj_cls) in param_defns:
         parsed_param = rule_spec.inputs[param_name]
-        if (isinstance(parsed_param, basestring) and '{{' in parsed_param):
+        if isinstance(parsed_param, basestring) and '{{' in parsed_param:
             parsed_param = jinja_utils.parse_string(
                 parsed_param, context_params, autoescape=False)
         normalized_param = obj_cls.normalize(parsed_param)

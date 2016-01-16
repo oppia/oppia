@@ -23,10 +23,11 @@ class PencilCodeEditor(base.BaseInteraction):
     name = 'Pencil Code Editor'
     description = 'Allows learners to edit code in Pencil Code.'
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
-    is_trainable = True
+    is_trainable = False
     _dependency_ids = ['pencilcode']
     answer_type = 'CodeEvaluation'
     instructions = 'Edit the code. Click \'Play\' to check it!'
+    narrow_instructions = 'Show code editor'
     needs_summary = True
 
     _customization_arg_specs = [{

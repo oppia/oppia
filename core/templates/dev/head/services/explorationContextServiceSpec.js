@@ -97,11 +97,13 @@ describe('Exploration context service', function() {
       ecs = $injector.get('explorationContextService');
     }));
 
-    it('should throw an error when trying to retrieve the exploration id', function() {
+    it('should throw an error when trying to retrieve the exploration id',
+        function() {
       expect(ecs.getExplorationId).toThrow();
     });
 
-    it('should throw an error when trying to retrieve the page context', function() {
+    it('should throw an error when trying to retrieve the page context',
+        function() {
       expect(ecs.getPageContext).toThrow();
     });
   });

@@ -17,28 +17,29 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
-var errorWrapper2 = function(dubiousFunction, input1, input2, input3, input4, input5, input6) {
+var errorWrapper2 = function(
+    dubiousFunction, input1, input2, input3, input4, input5, input6) {
   return function() {
     try {
-      if(input2 === undefined) {
+      if (input2 === undefined) {
         dubiousFunction(input1);
-      } else if(input3 === undefined) {
+      } else if (input3 === undefined) {
         dubiousFunction(input1, input2);
-      } else if(input4 === undefined) {
+      } else if (input4 === undefined) {
         dubiousFunction(input1, input2, input3);
-      } else if(input5 === undefined) {
+      } else if (input5 === undefined) {
         dubiousFunction(input1, input2, input3, input4);
-      } else if(input6 === undefined) {
+      } else if (input6 === undefined) {
         dubiousFunction(input1, input2, input3, input4, input5);
       } else {
         dubiousFunction(input1, input2, input3, input4, input5, input6);
       }
-    } catch(err) {
+    } catch (err) {
       throw new Error(logicProofShared.renderError(
         err, logicProofTeacher.TEACHER_ERROR_MESSAGES,
         logicProofData.BASE_STUDENT_LANGUAGE));
     }
-  }
+  };
 };
 
 describe('Build line templates', function() {
@@ -52,18 +53,18 @@ describe('Build line templates', function() {
       ), logicProofData.BASE_STUDENT_LANGUAGE.operators,
       logicProofData.BASE_VOCABULARY
     );
-  }
+  };
 
   it('should build then display examples correctly', function() {
     expect(
       buildThenDisplay(
         'and_introduce', 'from p and q we have p\u2227q', 'p, q', 'p\u2227q',
         '', [])).toEqual({
-          name: "and_introduce",
-          reader_view: "from p and q we have p\u2227q",
-          antecedents: "p, q",
-          results: "p\u2227q",
-          variables: "",
+          name: 'and_introduce',
+          reader_view: 'from p and q we have p\u2227q',
+          antecedents: 'p, q',
+          results: 'p\u2227q',
+          variables: '',
           error: []
         });
 
@@ -103,7 +104,8 @@ describe('Build line templates', function() {
       errorWrapper2(
         buildThenDisplay, 'name', 'from q we have r', 'q', 'p', '', [])
     ).toThrow(
-      'It will not be possible to uniquely identify p from a line of this form.');
+      'It will not be possible to uniquely identify p from a line of this ' +
+      'form.');
 
     // FUTURE: render this test passable
     expect(
@@ -111,7 +113,8 @@ describe('Build line templates', function() {
         buildThenDisplay, 'exists_introduce',
         'from p[x->a] we have \u2203x.p', 'p[x->a]', '\u2203x.p', 'a', [])
     ).toThrow(
-      'It will not be possible to uniquely identify a from a line of this form.');
+      'It will not be possible to uniquely identify a from a line of this ' +
+      'form.');
   });
 
   it('should reject mis-typed expressions', function() {
@@ -129,7 +132,7 @@ describe('Build line template table', function() {
       logicProofTeacher2.buildLineTemplateTable(
         inputStrings, logicProofData.BASE_VOCABULARY),
       logicProofData.BASE_VOCABULARY);
-  }
+  };
 
   it('should build and display examples correctly', function() {
     expect(buildThenDisplay([{
@@ -147,19 +150,19 @@ describe('Build line template table', function() {
       variables: 'x',
       error: ['How unwise {{x|variable}}.']
     }])).toEqual([{
-      name: "a",
-      reader_view: "p hence q",
-      antecedents: "p",
-      results: "q",
-      variables: "",
-      error: [],
+      name: 'a',
+      reader_view: 'p hence q',
+      antecedents: 'p',
+      results: 'q',
+      variables: '',
+      error: []
     }, {
-      name: "b",
-      reader_view: "\u2203x.(p\u2227q) if contradiction we have from r",
-      antecedents: "r, p, q",
-      results: "",
-      variables: "x",
-      error: ["How unwise {{x|variable}}."]
+      name: 'b',
+      reader_view: '\u2203x.(p\u2227q) if contradiction we have from r',
+      antecedents: 'r, p, q',
+      results: '',
+      variables: 'x',
+      error: ['How unwise {{x|variable}}.']
     }]);
   });
 
@@ -181,7 +184,9 @@ describe('Build line template table', function() {
             variables: 'x',
             error: ['How unwise {{x|variable}}.']
           }]);
-      } catch(err) {return err}
+      } catch (err) {
+        return err;
+      }
     })()[1]).toEqual(
       'The name \'if\' is reserved for vocabulary and so cannot be used here.');
   });
@@ -195,65 +200,65 @@ describe('Build mistake entry', function() {
         logicProofData.BASE_CONTROL_LANGUAGE
       ), logicProofData.BASE_CONTROL_LANGUAGE.operators
     );
-  }
+  };
 
   it('should build entries correctly', function() {
     expect(
       logicProofTeacher2.buildMistakeEntry(
         'name', '~target()\u2208results(n)', ['{{num_lines()-1}}'],
         logicProofData.BASE_CONTROL_LANGUAGE)).toEqual({
-        name:'name',
-        occurs:{
-          top_operator_name:'not',
-          top_kind_name:'unary_connective',
-          arguments:[{
-            top_operator_name:'is_in',
-            top_kind_name:'binary_relation',
-            arguments:[{
-              top_operator_name:'target',
-              top_kind_name:'prefix_function',
-              arguments:[],
-              dummies:[],
-              type:'formula'
-            },{
-              top_operator_name:'results',
-              top_kind_name:'prefix_function',
-              arguments:[{
-                top_operator_name:'n',
-                top_kind_name:'variable',
-                arguments:[],
-                dummies:[],
-                type:'integer'
+        name: 'name',
+        occurs: {
+          top_operator_name: 'not',
+          top_kind_name: 'unary_connective',
+          arguments: [{
+            top_operator_name: 'is_in',
+            top_kind_name: 'binary_relation',
+            arguments: [{
+              top_operator_name: 'target',
+              top_kind_name: 'prefix_function',
+              arguments: [],
+              dummies: [],
+              type: 'formula'
+            }, {
+              top_operator_name: 'results',
+              top_kind_name: 'prefix_function',
+              arguments: [{
+                top_operator_name: 'n',
+                top_kind_name: 'variable',
+                arguments: [],
+                dummies: [],
+                type: 'integer'
               }],
-              dummies:[],
-              type:'set_of_formulas'
+              dummies: [],
+              type: 'set_of_formulas'
             }],
-            dummies:[],
-            type:'boolean'
+            dummies: [],
+            type: 'boolean'
           }],
-          dummies:[],
-          type:'boolean'
+          dummies: [],
+          type: 'boolean'
         },
-        message:[[{
-          format:'expression',
-          content:{
-            top_operator_name:'subtraction',
-            top_kind_name:'binary_function',
-            arguments:[{
-              top_operator_name:'num_lines',
-              top_kind_name:'prefix_function',
-              arguments:[],
-              dummies:[],
-              type:'integer'
-            },{
-              top_operator_name:1,
-              top_kind_name:'constant',
-              arguments:[],
-              dummies:[],
-              type:'integer'
+        message: [[{
+          format: 'expression',
+          content: {
+            top_operator_name: 'subtraction',
+            top_kind_name: 'binary_function',
+            arguments: [{
+              top_operator_name: 'num_lines',
+              top_kind_name: 'prefix_function',
+              arguments: [],
+              dummies: [],
+              type: 'integer'
+            }, {
+              top_operator_name: 1,
+              top_kind_name: 'constant',
+              arguments: [],
+              dummies: [],
+              type: 'integer'
             }],
-            dummies:[],
-            type:'integer'
+            dummies: [],
+            type: 'integer'
           }
         }]]
       });
@@ -267,12 +272,13 @@ describe('Build mistake entry', function() {
           'Don\'t indent the first line of your proof'
         ])
     ).toEqual({
-          name: 'name',
-          occurs: '(n=1)\u2227(indentation(n)>0)',
-          message: [
-            'The first line of a proof should not be indented',
-            'Don\'t indent the first line of your proof'
-          ]});
+      name: 'name',
+      occurs: '(n=1)\u2227(indentation(n)>0)',
+      message: [
+        'The first line of a proof should not be indented',
+        'Don\'t indent the first line of your proof'
+      ]
+    });
   });
 
   it('should reject mis-typed combinations of expressions', function() {
@@ -281,7 +287,8 @@ describe('Build mistake entry', function() {
         buildThenDisplay, 'name', 'template(n) = \'given\'',
         ['examine {{antecedents(n-1)+1}}'])
     ).toThrow(
-      'antecedents yields a set_of_formulas but you are trying to use it to give a integer.'
+      'antecedents yields a set_of_formulas but you are trying to use it to ' +
+      'give a integer.'
     );
   });
 });
@@ -303,31 +310,30 @@ describe('Build mistake section', function() {
           }], []
         ), logicProofData.BASE_CONTROL_LANGUAGE.operators)
     ).toEqual({
-        name: 'layout',
-        entries: [{
-          name: 'mistake_1',
-          occurs: 'entry(1,antecedents(n))\u2208assumptions()',
-          message: ['wrong']
-        }, {
-          name: 'mistake_2',
-          occurs: 'num_lines()>3',
-          message: ['Try to assess {{indentation(22)}}']
-        }]
+      name: 'layout',
+      entries: [{
+        name: 'mistake_1',
+        occurs: 'entry(1,antecedents(n))\u2208assumptions()',
+        message: ['wrong']
+      }, {
+        name: 'mistake_2',
+        occurs: 'num_lines()>3',
+        message: ['Try to assess {{indentation(22)}}']
+      }]
     });
   });
 
   it('should reject invalid entries', function() {
     expect((function() {
       try {
-        logicProofTeacher2.buildMistakeSection(
-          'variables',
-          [{
-            name: 'a mistake',
-            occurs: 'operator(n)=\'and\'',
-            message: ['Dear dear']
-          }], []
-        )
-      } catch(err) {return err;}
+        logicProofTeacher2.buildMistakeSection('variables', [{
+          name: 'a mistake',
+          occurs: 'operator(n)=\'and\'',
+          message: ['Dear dear']
+        }], []);
+      } catch (err) {
+        return err;
+      }
     })()[0]).toEqual('The operator operator could not be identified.');
   });
 });
@@ -339,7 +345,7 @@ describe('Build control function', function() {
         LHSstring, RHSstring, descriptionString,
         logicProofData.BASE_CONTROL_LANGUAGE),
       logicProofData.BASE_CONTROL_LANGUAGE.operators);
-  }
+  };
 
   it('should build examples correctly', function() {
     expect(
@@ -361,28 +367,28 @@ describe('Build control function', function() {
         dummies: [],
         output: 'integer'
       }],
-      definition:{
-        top_operator_name:'addition',
-        top_kind_name:'binary_function',
-        arguments:[{
-          top_operator_name:'x',
-          top_kind_name:'variable',
-          arguments:[],
-          dummies:[],
-          type:'integer'
-        },{
-          top_operator_name:2,
-          top_kind_name:'constant',
-          arguments:[],
-          dummies:[],
-          type:'integer'
+      definition: {
+        top_operator_name: 'addition',
+        top_kind_name: 'binary_function',
+        arguments: [{
+          top_operator_name: 'x',
+          top_kind_name: 'variable',
+          arguments: [],
+          dummies: [],
+          type: 'integer'
+        }, {
+          top_operator_name: 2,
+          top_kind_name: 'constant',
+          arguments: [],
+          dummies: [],
+          type: 'integer'
         }],
-        dummies:[],
-        type:'integer'
+        dummies: [],
+        type: 'integer'
       },
-      description:'a description'
+      description: 'a description'
     });
-  })
+  });
 
   it('should build then display examples correctly', function() {
     expect(buildThenDisplay('f(n)', 'n+2', 'a')).toEqual({
@@ -414,7 +420,8 @@ describe('Build control function', function() {
       errorWrapper2(
         buildThenDisplay, 'f(n)', 'template(n) + 3', '')
     ).toThrow(
-      'template yields a string but you are trying to use it to give a integer.');
+      'template yields a string but you are trying to use it to give a ' +
+      'integer.');
   });
 
   it('should forbid ambiguous typings', function() {
@@ -422,7 +429,8 @@ describe('Build control function', function() {
       errorWrapper2(
         buildThenDisplay, 'f(n)', 'n', '')
     ).toThrow(
-      'Unfortunately this cannot be accepted as it has multiple possible typings.');
+      'Unfortunately this cannot be accepted as it has multiple possible ' +
+      'typings.');
   });
 
   it('should not allow n as a function name', function() {
@@ -430,7 +438,8 @@ describe('Build control function', function() {
       errorWrapper2(
         buildThenDisplay, 'n(x,y)', 'x-y', '')
     ).toThrow(
-      'You cannot use n as a function name; it is reserved to refer to line numbers');
+      'You cannot use n as a function name; it is reserved to refer to line ' +
+      'numbers');
   });
 });
 
@@ -443,12 +452,12 @@ describe('Build control function table', function() {
             {
               LHS: 'is_scope_creator(n)',
               RHS: 'template(n)=\'given\' \u2228 template(n)=\'assumption\'',
-              description: 'a',
+              description: 'a'
             }, {
               LHS: 'is_in_scope(m,n)',
               RHS: '(~is_scope_creator(m)\u2227indentation(n)>=indentation(m)' +
-                '\u2227~\u2203k<=n.(k>=m\u2227indentation(k)<indentation(m)))\u2228' +
-                '(indentation(n)>indentation(m)\u2227~\u2203' +
+                '\u2227~\u2203k<=n.(k>=m\u2227indentation(k)<indentation(m)))' +
+                '\u2228(indentation(n)>indentation(m)\u2227~\u2203' +
                 'k<=n.(k>=m\u2227indentation(k)<=indentation(m)))',
               description: 'b'
             }
@@ -461,9 +470,9 @@ describe('Build control function table', function() {
     }, {
       LHS: 'is_in_scope(m,n)',
       RHS: '((~is_scope_creator(m))\u2227((indentation(n)>=indentation(m))' +
-        '\u2227(~\u2203k<=n.(k>=m)\u2227(indentation(k)<indentation(m)))))\u2228' +
-        '((indentation(n)>indentation(m))\u2227(~\u2203k<=n.(k>=m)\u2227' +
-        '(indentation(k)<=indentation(m))))',
+        '\u2227(~\u2203k<=n.(k>=m)\u2227(indentation(k)<indentation(m)))))' +
+        '\u2228((indentation(n)>indentation(m))\u2227(~\u2203k<=n.(k>=m)' +
+        '\u2227(indentation(k)<=indentation(m))))',
       description: 'b'
     }]);
   });
@@ -472,19 +481,24 @@ describe('Build control function table', function() {
     expect((function() {
       try {
         logicProofTeacher2.buildControlFunctionTable([{
-          LHS: 'f(n)', RHS: 'indentation(n) - 2', description: ''
+          LHS: 'f(n)',
+          RHS: 'indentation(n) - 2',
+          description: ''
         }, {
-          LHS: 'f(n)', RHS: 'indentation(n) - 2', description: ''
+          LHS: 'f(n)',
+          RHS: 'indentation(n) - 2',
+          description: ''
         }]);
-      } catch(err) {return err.message}
+      } catch (err) {
+        return err.message;
+      }
     })()).toEqual('The function f has already been defined.');
   });
 });
 
 describe('Parse messages describing student mistakes', function() {
   it('should parse then display control-language messages correctly',
-    function() {
-
+      function() {
     expect(logicProofTeacher2.displayControlMessage(
         logicProofTeacher2.parseMessage(
           'stuff {{p\u2227q}} thingies', 'control'),

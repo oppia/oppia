@@ -163,6 +163,12 @@
 
                             <ul class="dropdown-menu ng-cloak oppia-navbar-profile-dropdown" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)" ng-show="profileDropdownIsActive">
                               <li>
+                                <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/profile/{{username}}">
+                                  <strong>{{username}}</strong>
+                                </a>
+                              </li>
+                              <hr class="oppia-top-right-menu-item-separator">
+                              <li>
                                 <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/my_explorations">
                                   <span translate="I18N_TOPNAV_MY_EXPLORATIONS"></span>
                                 </a>
@@ -195,6 +201,7 @@
                                   </a>
                                 </li>
                               {% endif %}
+                              <hr class="oppia-top-right-menu-item-separator">
                               <li>
                                 <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="{{logout_url}}">
                                   <span translate="I18N_TOPNAV_LOGOUT"></span>
@@ -246,7 +253,7 @@
       {% include 'language_footer.html' %}
       {% if DEV_MODE %}
         <div class="oppia-dev-mode">
-          Development Mode
+          Dev Mode
         </div>
       {% endif %}
 
@@ -263,22 +270,31 @@
     {% include 'directives.html' %}
     {% include 'forms/form_builder_templates.html' %}
     {% include 'footer_js_libs.html' %}
+    {% include 'components/exploration_summary_tile_directive.html' %}
+    {% include 'components/rating_display.html' %}
 
     <script>
       {{ include_js_file('app.js') }}
+      {{ include_js_file('base.js') }}
       {{ include_js_file('directives.js') }}
       {{ include_js_file('filters.js') }}
+
       {{ include_js_file('forms/formBuilder.js') }}
+
       {{ include_js_file('services/activeInputData.js') }}
       {{ include_js_file('services/warningsData.js') }}
-      {{ include_js_file('services/messengerService.js') }}
-      {{ include_js_file('components/autocomplete.js') }}
-      {{ include_js_file('components/visualizations.js') }}
-      {{ include_js_file('base.js') }}
-      {{ include_js_file('/expressions/evaluator.js') }}
-      {{ include_js_file('/expressions/parser.js') }}
-      {{ include_js_file('components/objectEditor.js') }}
+
       {{ include_js_file('i18n.js') }}
+
+      {{ include_js_file('components/ExplorationSummaryTileDirective.js') }}
+      {{ include_js_file('components/ObjectEditorDirective.js') }}
+      {{ include_js_file('components/RatingComputationService.js')}}
+      {{ include_js_file('components/RatingDisplayDirective.js')}}
+      {{ include_js_file('components/Select2DropdownDirective.js') }}
+
+      {{ include_js_file('expressions/evaluator.js') }}
+      {{ include_js_file('expressions/parser.js') }}
+
       {{ OBJECT_EDITORS_JS }}
     </script>
 

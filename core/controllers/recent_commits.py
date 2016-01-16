@@ -14,9 +14,6 @@
 
 """Controllers for queries relating to recent commits."""
 
-__author__ = 'sll@google.com (Sean Lip)'
-
-
 from core.controllers import base
 from core.domain import exp_services
 

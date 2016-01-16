@@ -21,38 +21,23 @@
 {% endblock header_js %}
 
 {% block navbar_breadcrumb %}
-  <ul class="nav navbar-nav oppia-navbar-breadcrumb" ng-controller="InformationCard">
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb" ng-controller="LearnerViewBreadcrumb">
     <li>
       <span class="oppia-navbar-breadcrumb-separator"></span>
       <span class="protractor-test-exploration-header" itemprop="description">{{exploration_title}}</span>
     </li>
-    <li ng-click="showInformationCard()" tooltip="<['I18N_PLAYER_INFO_TOOLTIP' | translate]>" tooltip-placement="bottom" style="cursor: pointer;">
+    <li ng-click="showInformationCard()" tooltip="<['I18N_PLAYER_INFO_TOOLTIP' | translate]>" tooltip-placement="bottom" style="cursor: pointer;" class="protractor-test-exploration-info-icon">
       <i class="material-icons oppia-navbar-breadcrumb-icon" style="font-size: 20px; vertical-align: middle;">&#xE88E;</i>
     </li>
   </ul>
 {% endblock navbar_breadcrumb %}
 
 {% block local_top_nav_options %}
-  <div ng-controller="LearnerLocalNav">
-    <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="LearnerLocalNav" style="margin-right: 0px;">
-      <li popover-placement="bottom" popover-template="popover/feedback" popover-trigger="click">
-        <a href="" tooltip="<['I18N_PLAYER_FEEDBACK_TOOLTIP' | translate]>" tooltip-placement="bottom">
-          <span class="glyphicon glyphicon-comment"></span>
-        </a>
-      </li>
-      {% if can_edit %}
-        <li>
-          <a ng-href="/create/<[explorationId]>" tooltip="<['I18N_PLAYER_EDIT_TOOLTIP' | translate]>" tooltip-placement="bottom" target="_blank">
-            <span class="glyphicon glyphicon-pencil"></span>
-          </a>
-        </li>
-      {% endif %}
-    </ul>
-  </div>
+  {% include 'player/learner_local_nav.html' %}
 {% endblock local_top_nav_options %}
 
 {% block content %}
-  {{ skin_tag }}
+  <conversation-skin></conversation-skin>
 
   <br><br><br>
 
@@ -60,156 +45,15 @@
     {% include 'attribution_guide.html' %}
   {% endif %}
 
-  {% include 'components/exploration_embed_button.html' %}
-  {% include 'components/ratings.html' %}
-  {% include 'components/profile_link.html' %}
-
-  <script type="text/ng-template" id="popover/feedback">
-    <feedback-popup></feedback-popup>
-  </script>
-
-  <script type="text/ng-template" id="popover/informationCard">
-    <md-card class="md-padding">
-      <div ng-style="infoCardBackgroundImageCss" class="oppia-info-card-logo-thumbnail">
-        <h2 class="oppia-info-card-title"><[explorationCardTitle]></h2>
-      </div>
-
-      <div ng-if="!loadingInfoCardData" class="oppia-info-card-content">
-        <p ng-if="explorationDescription">
-          <[explorationDescription | truncateAndCapitalize: 95]>
-        </p>
-        <p ng-if="!explorationDescription" translate="I18N_PLAYER_NO_OBJECTIVE"></p>
-        <ul layout="row" class="card-metrics" layout-align="space-between center">
-          <li>
-            <span class="fa fa-star fa-lg" tooltip="<['I18N_PLAYER_RATINGS_TOOLTIP' | translate]>" tooltip-placement="top"></span>
-            <span ng-if="explorationRatings === 0" translate="I18N_PLAYER_UNRATED"></span>
-            <span ng-if="explorationRatings !== 0"><[explorationRatings]></span>
-          </li>
-          <li>
-            <span class="fa fa-eye fa-lg" tooltip="<['I18N_PLAYER_VIEWS_TOOLTIP' | translate]>" tooltip-placement="top"></span>
-            <[viewersCount | summarizeNonnegativeNumber]>
-          </li>
-          <li>
-            <span class="fa fa-clock-o fa-lg" tooltip="<['I18N_PLAYER_LAST_UPDATED_TOOLTIP' | translate]>" tooltip-placement="top"></span>
-            <[getLocaleAbbreviatedDatetimeString(explorationLastUpdatedMsec)]>
-          </li>
-          <ul layout="row" layout-align="space-between center" class="oppia-info-card-exploration-contributors-profile">
-            <i class="material-icons" tooltip="<['I18N_PLAYER_CONTRIBUTORS_TOOLTIP' | translate]>" tooltip-placement="top" style="cursor: default; margin-right: 5px;">&#xE7EF;</i>
-            <li ng-repeat="ContributorUsername in explorationContributorUsernames| limitTo: 2"
-              tooltip="<[ContributorUsername]>" tooltip-placement="top">
-              <profile-link-image username="ContributorUsername">
-              </profile-link-image>
-            </li>
-
-            <!--TODO(Makonda) get profile picture and profile url to make image click direct to contributor profile-->
-
-            <li ng-if="explorationContributorUsernames.length > 2" class="oppia-contributors-more-circle"
-              tooltip-append-to-body="true" tooltip="<[explorationContributorUsernames.slice(2).join(',')]>"
-              tooltip-placement="top">+<[explorationContributorUsernames.length - 2]>
-            </li>
-            <li ng-if="explorationContributorUsernames.length === 0"
-                tooltip="<['I18N_PLAYER_COMMUNITY_EDITABLE_TOOLTIP' | translate]>" tooltip-placement="top">
-              <span class="fa fa-globe fa-lg oppia-info-card-community-editable-icon"></span>
-            </li>
-          </ul>
-        </ul>
-        <div class="oppia-info-card-bottom-row" layout="row">
-          <div flex="55">
-            <md-content layout="row">
-              <div class="oppia-info-card-tag-icon">
-                <span class="fa fa-tags fa-lg" tooltip-append-to-body="true" tooltip="<['I18N_PLAYER_TAGS_TOOLTIP' | translate]>"
-                  tooltip-placement="top">
-                </span>
-              </div>
-              <md-chips layout-align="center center">
-                <md-chip ng-if="explorationTags.tagsInTooltip.length > 0" class="oppia-info-card-tooltip-more"
-                  tooltip-append-to-body="true" tooltip="<[explorationTags.tagsInTooltip.join(', ')]>"
-                  tooltip-placement="right" translate="I18N_PLAYER_PLUS_TAGS" translate-values="{additionalTagNumber: <[explorationTags.tagsInTooltip.length]>}">
-                </md-chip>
-                <md-chip ng-if="explorationTags.tagsToBeShown.length > 0">
-                  <[explorationTags.tagsToBeShown.join(", ")]>
-                </md-chip>
-                <md-chip ng-if="explorationTags.tagsToBeShown.length === 0 &&
-                  explorationTags.tagsInTooltip.length === 0">
-                  <span><em translate="I18N_PLAYER_NO_TAGS"></em></span>
-                <md-chip>
-              </md-chips>
-            </md-content>
-          </div>
-          <div flex="45">
-            <ul layout="row" layout-align="end center">
-
-            {% if SHARING_OPTIONS['gplus'] %}
-                <li>
-                  <a ng-href="https://plus.google.com/share?url=<[serverName]>/explore/<[explorationId]>" onclick="return !window.open(this.href, '', 'height=600, width=600, menubar=no, toolbar=no, resizable=yes, scrollbars=yes')" target="_window">
-                    <img src="/images/general/gplus.png" alt="Google+">
-                  </a>
-                </li>
-              {% endif %}
-
-              {% if SHARING_OPTIONS['facebook'] %}
-                <li>
-                  <a ng-href="https://www.facebook.com/sharer/sharer.php?sdk=joey&u=<[serverName]>/explore/<[explorationId]>&display=popup&ref=plugin&src=share_button" onclick="return !window.open(this.href, '', 'height=336, width=640')" target="_window">
-                    <img src='/images/general/fb.png' alt="Facebook">
-                  </a>
-                </li>
-              {% endif %}
-
-              {% if SHARING_OPTIONS['twitter'] %}
-                <li>
-                  <a ng-href="https://twitter.com/share?text=<[escapedTwitterText]>&url=<[serverName]>/explore/<[explorationId]>" onclick="return !window.open(this.href, '', 'height=460, width=640')" target="_window">
-                    <img src="/images/general/twitter.png" alt="Twitter">
-                  </a>
-                </li>
-              {% endif %}
-
-              <li>
-                <a href="" ng-click="showEmbedExplorationModal(explorationId)" tooltip="<['I18N_PLAYER_EMBED_TOOLTIP' | translate]>" tooltip-placement="top">
-                  <i class="material-icons md-18" style="color: black;">&#xE157;</i>
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      <div ng-if="loadingInfoCardData" class="oppia-info-card-content">
-        <h3 ng-if="!failedLoadingData" translate="I18N_PLAYER_LOADING"></h3>
-        <h3 ng-if="failedLoadingData" translate="I18N_PLAYER_LOAD_ERROR"></h3>
-      </div>
-      <button type="button" class="oppia-close-popover-button" ng-click="cancel()">
-        <i class="material-icons md-18" style="color: white;">&#xE5CD;</i>
-      </button>
-    </md-card>
-  </script>
-
-  <script type="text/ng-template" id="components/feedback">
-    <div style="min-width: 250px;">
-      <div ng-show="!feedbackSubmitted">
-        <button type="button" class="oppia-close-popover-button" ng-click="closePopover()">
-          <i class="material-icons md-18">&#xE5CD;</i>
-        </button>
-        <br>
-
-        <div>
-          <textarea ng-model="feedbackText" rows="5" class="oppia-feedback-popover-textarea" ng-attr-placeholder="<['I18N_PLAYER_LEAVE_FEEDBACK' | translate]>" focus-on="<[feedbackPopoverId]>">
-          </textarea>
-        </div>
-
-        <!-- The z-index ensures that the button is not overlapped by the checkbox div. -->
-        <md-button class="pull-right" ng-class="{'oppia-feedback-popover-submit-btn-enabled': feedbackText}" style="margin-top: 6px; z-index: 30;" ng-click="saveFeedback()" ng-disabled="!feedbackText" translate="I18N_PLAYER_SUBMIT_BUTTON"></md-button>
-        <div class="checkbox" style="font-size: 0.9em; margin: 12px 0 4px 0;" ng-show="isLoggedIn">
-          <label>
-            <input type="checkbox" ng-model="isSubmitterAnonymized">
-            <span translate="I18N_PLAYER_STAY_ANONYMOUS"></span>
-          </label>
-        </div>
-      </div>
-
-      <div ng-show="feedbackSubmitted" translate="I18N_PLAYER_THANK_FEEDBACK"></div>
-    </div>
-  </script>
-
-  {% include 'components/gadget_panel.html' %}
+  {% include 'components/exploration_embed_button_modal.html' %}
+  {% include 'components/gadget_directive.html' %}
+  {% include 'components/gadget_panel_directive.html' %}
+  {% include 'components/profile_link_image_directive.html' %}
+  {% include 'player/answer_feedback_pair_directive.html' %}
+  {% include 'player/conversation_skin_directive.html' %}
+  {% include 'player/feedback_popup_directive.html' %}
+  {% include 'player/information_card_modal.html' %}
+  {% include 'player/progress_dots_directive.html' %}
 {% endblock %}
 
 {% block footer_js %}
@@ -217,17 +61,36 @@
   <script>
     {{ include_js_file('services/explorationContextService.js') }}
     {{ include_js_file('services/explorationServices.js') }}
-    {{ include_js_file('components/gadgetPanel.js') }}
-    {{ include_js_file('components/explorationEmbedButton.js') }}
+    {{ include_js_file('services/messengerService.js') }}
+
+    {{ include_js_file('components/ExplorationEmbedButtonService.js') }}
+    {{ include_js_file('components/GadgetDirective.js') }}
+    {{ include_js_file('components/GadgetPanelDirective.js') }}
+    {{ include_js_file('components/ProfileLinkImageDirective.js') }}
+
+    {{ include_js_file('domain/exploration/ExplorationObjectFactory.js') }}
+    {{ include_js_file('domain/exploration/StateObjectFactory.js') }}
+    {{ include_js_file('domain/utilities/StopwatchObjectFactory.js') }}
+    {{ include_js_file('domain/utilities/UrlInterpolationService.js') }}
+
     {{ include_js_file('player/AnswerClassificationService.js') }}
+    {{ include_js_file('player/AnswerFeedbackPairDirective.js') }}
+    {{ include_js_file('player/ConversationSkinDirective.js') }}
+    {{ include_js_file('player/ExplorationRecommendationsService.js') }}
+    {{ include_js_file('player/FeedbackPopupDirective.js') }}
+    {{ include_js_file('player/LearnerLocalNav.js') }}
+    {{ include_js_file('player/LearnerParamsService.js') }}
+    {{ include_js_file('player/LearnerViewBreadcrumb.js') }}
+    {{ include_js_file('player/LearnerViewRatingService.js') }}
+    {{ include_js_file('player/PlayerPositionService.js') }}
     {{ include_js_file('player/PlayerServices.js') }}
-    {{ include_js_file('player/StateTransitionService.js') }}
-    {{ include_js_file('components/profileLink.js')}}
-    {{ include_js_file('components/ratings.js')}}
-    {{ include_skins_js_file(skin_js_url) }}
+    {{ include_js_file('player/PlayerTranscriptService.js') }}
+    {{ include_js_file('player/ProgressDotsDirective.js') }}
+    {{ include_js_file('player/StatsReportingService.js') }}
+
+    {{ include_js_file('expressions/expressionInterpolationService.js') }}
   </script>
 
-  {{ skin_templates }}
   {{ interaction_templates }}
   {{ gadget_templates }}
 {% endblock footer_js %}

@@ -64,7 +64,6 @@ var checkForConsoleErrors = function(errorsToIgnore) {
   });
 };
 
-
 var SERVER_URL_PREFIX = 'http://localhost:4445';
 var GALLERY_URL_SUFFIX = '/gallery';
 var EDITOR_URL_SLICE = '/create/';
@@ -75,7 +74,6 @@ var SCRIPTS_URL_SLICE = '/scripts/';
 var EXPLORATION_ID_LENGTH = 12;
 
 var FIRST_STATE_DEFAULT_NAME = 'First Card';
-
 
 var _getExplorationId = function(currentUrlPrefix) {
   return {
@@ -111,6 +109,7 @@ var openEditor = function(explorationId) {
 
 var openPlayer = function(explorationId) {
   browser.get(PLAYER_URL_SLICE + explorationId);
+  browser.waitForAngular();
 };
 
 // Takes the user from an exploration editor to its player.

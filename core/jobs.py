@@ -16,25 +16,18 @@
 
 """Common classes and methods for managing long running jobs."""
 
-__author__ = 'Sean Lip'
-
 import ast
 import copy
 import datetime
 import json
 import logging
 import traceback
-import utils
 
 from core.platform import models
-(base_models, job_models,) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.job])
-taskqueue_services = models.Registry.import_taskqueue_services()
-transaction_services = models.Registry.import_transaction_services()
+import utils
 
 from google.appengine.api import app_identity
 from google.appengine.ext import ndb
-
 from mapreduce import base_handler
 from mapreduce import context
 from mapreduce import input_readers
@@ -43,6 +36,11 @@ from mapreduce import model as mapreduce_model
 from mapreduce import output_writers
 from mapreduce import util as mapreduce_util
 from pipeline import pipeline
+
+(base_models, job_models,) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.job])
+taskqueue_services = models.Registry.import_taskqueue_services()
+transaction_services = models.Registry.import_transaction_services()
 
 MAPPER_PARAM_KEY_ENTITY_KINDS = 'entity_kinds'
 MAPPER_PARAM_KEY_QUEUED_TIME_MSECS = 'queued_time_msecs'
@@ -378,7 +376,7 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
     def run(self, job_id, job_class_str, kwargs):
         job_class = mapreduce_util.for_name(job_class_str)
         job_class.register_start(job_id, metadata={
-            job_class._OUTPUT_KEY_ROOT_PIPELINE_ID: self.root_pipeline_id
+            job_class._OUTPUT_KEY_ROOT_PIPELINE_ID: self.root_pipeline_id  # pylint: disable=protected-access
         })
 
         # TODO(sll): Need try/except/mark-as-canceled here?
@@ -822,6 +820,18 @@ class BaseContinuousComputationManager(object):
             cls._get_active_realtime_index(), entity_id)
 
     @classmethod
+    def get_multi_active_realtime_layer_ids(cls, entity_ids):
+        """Returns a list of IDs of elements in the currently active realtime
+        datastore layer corresponding to the given entity ids.
+        """
+        realtime_datastore_class = cls._get_realtime_datastore_class()
+        active_realtime_index = cls._get_active_realtime_index()
+        return [
+            realtime_datastore_class.get_realtime_id(
+                active_realtime_index, entity_id
+            ) for entity_id in entity_ids]
+
+    @classmethod
     def _switch_active_realtime_class(cls):
         def _switch_active_realtime_class_transactional():
             cc_model = job_models.ContinuousComputationModel.get(
@@ -922,7 +932,7 @@ class BaseContinuousComputationManager(object):
         cls._kickoff_batch_job()
 
     @classmethod
-    def stop_computation(cls, user_id, test_mode=False):
+    def stop_computation(cls, user_id, unused_test_mode=False):
         """Cancels the currently-running batch job.
 
         No further batch runs will be kicked off.
@@ -967,8 +977,8 @@ class BaseContinuousComputationManager(object):
         The *args and **kwargs match those passed to the _handle_event() method
         of the corresponding EventHandler subclass.
         """
-        REALTIME_LAYERS = [0, 1]
-        for layer in REALTIME_LAYERS:
+        realtime_layers = [0, 1]
+        for layer in realtime_layers:
             cls._handle_incoming_event(layer, event_type, *args, **kwargs)
 
     @classmethod

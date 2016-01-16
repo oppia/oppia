@@ -1,5 +1,5 @@
 application: oppiaserver
-version: 2-0-3
+version: 2-1-2
 runtime: python27
 api_version: 1
 threadsafe: false
@@ -80,12 +80,6 @@ handlers:
 - url: /extensions/rich_text_components/(.*)/static/(.*)
   static_files: extensions/rich_text_components/\1/static/\2
   upload: extensions/rich_text_components/(.*)/static/(.*)
-  secure: always
-  http_headers:
-    Cache-Control: 'no-cache'
-- url: /extensions/skins/(.*)/static/(.*)
-  static_files: extensions/skins/\1/static/\2
-  upload: extensions/skins/(.*)/static/(.*)
   secure: always
   http_headers:
     Cache-Control: 'no-cache'

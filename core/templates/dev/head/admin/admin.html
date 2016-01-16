@@ -239,7 +239,7 @@
 
     {% if DEV_MODE %}
       <div class="oppia-dev-mode">
-        Development Mode
+        Dev Mode
       </div>
     {% endif %}
 
@@ -251,9 +251,12 @@
       {{ include_js_file('admin/Admin.js') }}
       {{ include_js_file('directives.js') }}
       {{ include_js_file('services/warningsData.js') }}
-      {{ include_js_file('components/objectEditor.js') }}
-      {{ include_js_file('components/valueGeneratorEditor.js') }}
+
+      {{ include_js_file('components/ObjectEditorDirective.js') }}
+      {{ include_js_file('components/ValueGeneratorEditorDirective.js') }}
+
       {{ include_js_file('forms/formBuilder.js') }}
+
       {{ include_js_file('expressions/evaluator.js') }}
       {{ include_js_file('expressions/parser.js') }}
       {{ value_generators_js }}

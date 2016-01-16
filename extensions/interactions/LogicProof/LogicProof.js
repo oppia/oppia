@@ -14,13 +14,12 @@
 
 oppia.directive('oppiaInteractiveLogicProof', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
-
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'interaction/LogicProof',
-      controller: ['$scope', '$attrs', '$modal',
-          function($scope, $attrs, $modal) {
+      controller: ['$scope', '$attrs', '$modal', 'logicProofRulesService',
+          function($scope, $attrs, $modal, logicProofRulesService) {
         $scope.localQuestionData = oppiaHtmlEscaper.escapedJsonToObj(
           $attrs.questionWithValue);
 
@@ -47,32 +46,42 @@ oppia.directive('oppiaInteractiveLogicProof', [
           logicProofData.BASE_STUDENT_LANGUAGE,
           ['variable', 'constant', 'prefix_function']
         );
-        $scope.questionData.language.operators = $scope.typing[0].operators;
 
-        $scope.assumptionsString = logicProofShared.displayExpressionArray(
-          $scope.questionData.assumptions,
-          $scope.questionData.language.operators);
+        var operators = $scope.typing[0].operators;
+
+        if ($scope.questionData.assumptions.length <= 1) {
+          $scope.assumptionsString = logicProofShared.displayExpressionArray(
+            $scope.questionData.assumptions, operators);
+        } else {
+          $scope.assumptionsString = logicProofShared.displayExpressionArray(
+            $scope.questionData.assumptions.slice(
+              0, $scope.questionData.assumptions.length - 1
+            ), operators
+          ) + ' and ' + logicProofShared.displayExpression(
+            $scope.questionData.assumptions[
+              $scope.questionData.assumptions.length - 1], operators);
+        }
         $scope.targetString = logicProofShared.displayExpression(
-          $scope.questionData.results[0],
-          $scope.questionData.language.operators);
-
-        $scope.questionString = ($scope.assumptionsString === '') ?
-            'I18N_INTERACTIONS_PROOFS_QUESTION_STR_NO_ASSUMPTION':
-            'I18N_INTERACTIONS_PROOFS_QUESTION_STR_ASSUMPTIONS';
+          $scope.questionData.results[0], operators);
+        $scope.questionString = (
+          $scope.assumptionsString === '' ?
+          'I18N_INTERACTIONS_PROOFS_QUESTION_STR_NO_ASSUMPTION':
+          'I18N_INTERACTIONS_PROOFS_QUESTION_STR_ASSUMPTIONS');
         $scope.questionStrData = {
           target: $scope.targetString,
           assumptions: $scope.assumptionsString
-        }
-
+        };
 
         $scope.questionInstance = logicProofStudent.buildInstance(
           $scope.questionData);
-        $scope.haveErrorMessage = false;
+        // Denotes whether messages are in response to a submission, in which
+        // case they persist for longer.
+        $scope.messageIsSticky = false;
 
         // NOTE: for information on integrating angular and code-mirror see
         // http://github.com/angular-ui/ui-codemirror
         $scope.codeEditor = function(editor) {
-          editor.setValue($scope.localQuestionData.default_proof_string)
+          editor.setValue($scope.localQuestionData.default_proof_string);
           $scope.proofString = editor.getValue();
           var cursorPosition = editor.doc.getCursor();
 
@@ -100,10 +109,10 @@ oppia.directive('oppiaInteractiveLogicProof', [
 
           editor.on('cursorActivity', function() {
             if (editor.doc.getCursor().line !== cursorPosition.line) {
-              $scope.refreshMessages(editor);
+              $scope.checkForBasicErrors();
               cursorPosition = editor.doc.getCursor();
             }
-          })
+          });
 
           // NOTE: we use change rather than beforeChange here so that checking
           // for mistakes is done with respect to the updated text.
@@ -112,33 +121,55 @@ oppia.directive('oppiaInteractiveLogicProof', [
             // We update the message only if the user has added or removed a
             // line break, so that it remains while they work on a single line.
             if (change.text.length > 1 || change.removed.length > 1) {
-              $scope.refreshMessages(editor);
+              $scope.checkForBasicErrors();
             }
           });
+
+          $scope.editor = editor;
         };
 
-        $scope.refreshMessages = function(editor) {
-          if($scope.mistakeMark) {
-            $scope.mistakeMark.clear();
+        // This performs simple error checks that are done as the student types
+        // rather than waiting for the proof to be submitted.
+        $scope.checkForBasicErrors = function() {
+          if (!$scope.messageIsSticky) {
+            $scope.clearMessage();
           }
           try {
             logicProofStudent.validateProof(
               $scope.proofString, $scope.questionInstance);
-            $scope.proofError = '';
-          } catch(err) {
-            $scope.proofError = $scope.displayMessage(err.message, err.line);
-            $scope.mistakeMark = editor.doc.markText(
-              {line: err.line, ch: 0},
-              {line: err.line, ch: 100},
-              {className: 'logic-proof-erroneous-line'});
+          } catch (err) {
+            $scope.clearMessage();
+            $scope.showMessage(err.message, err.line);
+            $scope.messageIsSticky = false;
           }
           // NOTE: this line is necessary to force angular to refresh the
-          // displayed proofError.
+          // displayed errorMessage.
           $scope.$apply();
         };
 
-        $scope.displayMessage = function(message, lineNumber) {
-          return 'line ' + (lineNumber + 1) + ': ' + message;
+        $scope.clearMessage = function() {
+          if ($scope.errorMark) {
+            $scope.errorMark.clear();
+          }
+          $scope.errorMessage = '';
+        };
+
+        $scope.showMessage = function(message, lineNum) {
+          $scope.errorMessage = $scope.constructDisplayedMessage(
+            message, lineNum);
+          $scope.errorMark = $scope.editor.doc.markText({
+            line: lineNum,
+            ch: 0
+          }, {
+            line: lineNum,
+            ch: 100
+          }, {
+            className: 'logic-proof-erroneous-line'
+          });
+        };
+
+        $scope.constructDisplayedMessage = function(message, lineNum) {
+          return 'line ' + (lineNum + 1) + ': ' + message;
         };
 
         $scope.displayProof = function(proofString, errorLineNum) {
@@ -163,6 +194,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
         // only computed here because response.html needs them and does not have
         // its own javascript.
         $scope.submitProof = function() {
+          $scope.clearMessage();
           var submission = {
             assumptions_string: $scope.assumptionsString,
             target_string: $scope.targetString,
@@ -182,16 +214,19 @@ oppia.directive('oppiaInteractiveLogicProof', [
             submission.error_message = err.message;
             submission.error_line_number = err.line;
             submission.displayed_message =
-              $scope.displayMessage(err.message, err.line);
+              $scope.constructDisplayedMessage(err.message, err.line);
             submission.displayed_proof =
               $scope.displayProof($scope.proofString, err.line);
+
+            $scope.showMessage(err.message, err.line);
+            $scope.messageIsSticky = true;
           }
           if (submission.correct) {
             submission.displayed_message = '';
             submission.displayed_proof = $scope.displayProof(
               $scope.proofString);
           }
-          $scope.$parent.$parent.submitAnswer(submission);
+          $scope.$parent.submitAnswer(submission, logicProofRulesService);
         };
 
         $scope.showHelp = function() {
@@ -237,3 +272,17 @@ oppia.directive('oppiaShortResponseLogicProof', [
     };
   }
 ]);
+
+oppia.factory('logicProofRulesService', [function() {
+  return {
+    Correct: function(answer) {
+      return answer.correct;
+    },
+    NotCorrect: function(answer) {
+      return !answer.correct;
+    },
+    NotCorrectByCategory: function(answer, inputs) {
+      return !answer.correct && answer.error_category === inputs.c;
+    }
+  };
+}]);

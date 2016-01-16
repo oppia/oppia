@@ -29,7 +29,6 @@ var forms = require('../protractor_utils/forms.js');
 
 describe('Gallery view', function() {
   it('should display private, published and featured explorations', function() {
-
     var EXPLORATION_SILMARILS = 'silmarils';
     var EXPLORATION_VINGILOT = 'Vingilot';
     var CATEGORY_BUSINESS = 'Business';
@@ -56,7 +55,8 @@ describe('Gallery view', function() {
 
     users.login('varda@example.com');
     browser.get(general.GALLERY_URL_SUFFIX);
-    gallery.editExploration(EXPLORATION_VINGILOT);
+    gallery.playExploration(EXPLORATION_VINGILOT);
+    general.moveToEditor();
     // Moderators can edit explorations and mark them as featured.
     editor.setLanguage(LANGUAGE_FRANCAIS);
     editor.saveChanges('change language');

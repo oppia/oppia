@@ -16,8 +16,6 @@
 
 """Tests for filesystem-related domain objects."""
 
-__author__ = 'Sean Lip'
-
 from core.domain import fs_domain
 from core.tests import test_utils
 import feconf

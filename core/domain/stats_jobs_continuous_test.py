@@ -14,8 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'Stephanie Federwisch'
-
 """Tests for statistics continuous computations."""
 
 import datetime
@@ -26,10 +24,19 @@ from core.domain import event_services
 from core.domain import exp_services
 from core.domain import stats_jobs_continuous
 from core.platform import models
-(exp_models, stats_models) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.statistics])
 from core.tests import test_utils
 import feconf
+
+(exp_models, stats_models) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.statistics])
+
+EMPTY_STATE_HIT_COUNTS_DICT = {
+    feconf.DEFAULT_INIT_STATE_NAME: {
+        'total_entry_count': 0,
+        'no_answer_count': 0,
+        'first_entry_count': 0,
+    }
+}
 
 
 class ModifiedStatisticsAggregator(stats_jobs_continuous.StatisticsAggregator):
@@ -56,8 +63,12 @@ class ModifiedStatisticsMRJobManager(
 class StatsAggregatorUnitTests(test_utils.GenericTestBase):
     """Tests for statistics aggregations."""
 
-    ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS = [
-        ModifiedStatisticsAggregator]
+    ALL_CC_MANAGERS_FOR_TESTS = [ModifiedStatisticsAggregator]
+
+    def _get_swap_context(self):
+        return self.swap(
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.ALL_CC_MANAGERS_FOR_TESTS)
 
     def _record_start(self, exp_id, exp_version, state, session_id):
         event_services.StartExplorationEventHandler.record(
@@ -85,18 +96,16 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
         counter.put()
 
     def test_state_hit(self):
-        with self.swap(
-                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+        with self._get_swap_context():
             exp_id = 'eid'
             exploration = self.save_new_valid_exploration(exp_id, 'owner')
             time.sleep(1)
-            stats_jobs_continuous._STATE_COUNTER_CUTOFF_DATE = (
+            stats_jobs_continuous._STATE_COUNTER_CUTOFF_DATE = (  # pylint: disable=protected-access
                 datetime.datetime.utcnow())
             original_init_state = exploration.init_state_name
             new_init_state_name = 'New init state'
             exploration.rename_state(original_init_state, new_init_state_name)
-            exp_services._save_exploration('owner', exploration, '', [])
+            exp_services._save_exploration('owner', exploration, '', [])  # pylint: disable=protected-access
             exp_version = 2
             state2_name = 'sid2'
 
@@ -124,7 +133,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
 
             output_model = (
                 stats_jobs_continuous.StatisticsAggregator.get_statistics(
-                    exp_id, stats_jobs_continuous._VERSION_NONE))
+                    exp_id, stats_jobs_continuous.VERSION_NONE))
             state_hit_counts = output_model['state_hit_counts']
             self.assertEqual(
                 state_hit_counts[original_init_state]['first_entry_count'], 18)
@@ -135,7 +144,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             state_hit_counts = (
                 stats_jobs_continuous.StatisticsAggregator.get_statistics(
                     exp_id,
-                    stats_jobs_continuous._VERSION_ALL)['state_hit_counts'])
+                    stats_jobs_continuous.VERSION_ALL)['state_hit_counts'])
             self.assertEqual(
                 state_hit_counts[original_init_state]['first_entry_count'], 18)
             self.assertEqual(
@@ -144,9 +153,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
                 state_hit_counts[state2_name]['first_entry_count'], 10)
 
     def test_no_completion(self):
-        with self.swap(
-                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+        with self._get_swap_context():
             exp_id = 'eid'
             exp_version = 1
             exploration = self.save_new_valid_exploration(exp_id, 'owner')
@@ -167,9 +174,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self.assertEqual(output_model.num_completions, 0)
 
     def test_all_complete(self):
-        with self.swap(
-                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+        with self._get_swap_context():
             exp_id = 'eid'
             exp_version = 1
             exploration = self.save_new_valid_exploration(exp_id, 'owner')
@@ -197,9 +202,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self.assertEqual(output_model.num_completions, 2)
 
     def test_one_leave_and_one_complete(self):
-        with self.swap(
-                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+        with self._get_swap_context():
             exp_id = 'eid'
             exp_version = 1
             exploration = self.save_new_valid_exploration(exp_id, 'owner')
@@ -224,9 +227,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self.assertEqual(output_model.num_completions, 1)
 
     def test_one_leave_and_one_complete_same_session(self):
-        with self.swap(
-                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+        with self._get_swap_context():
             exp_id = 'eid'
             exp_version = 1
             exploration = self.save_new_valid_exploration(exp_id, 'owner')
@@ -265,9 +266,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             })
 
     def test_multiple_maybe_leaves_same_session(self):
-        with self.swap(
-                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+        with self._get_swap_context():
             exp_id = 'eid'
             exp_version = 1
             exploration = self.save_new_valid_exploration(exp_id, 'owner')
@@ -296,10 +295,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self.assertEqual(output_model.num_completions, 1)
 
     def test_multiple_explorations(self):
-        with self.swap(
-                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
-
+        with self._get_swap_context():
             exp_version = 1
             exp_id_1 = 'eid1'
             exploration = self.save_new_valid_exploration(exp_id_1, 'owner')
@@ -307,14 +303,6 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             exp_id_2 = 'eid2'
             exploration = self.save_new_valid_exploration(exp_id_2, 'owner')
             state_2_1 = exploration.init_state_name
-
-            EMPTY_STATE_HIT_COUNTS_DICT = {
-                feconf.DEFAULT_INIT_STATE_NAME: {
-                    'total_entry_count': 0,
-                    'no_answer_count': 0,
-                    'first_entry_count': 0,
-                }
-            }
 
             # Record 2 start events for exp_id_1 and 1 start event for
             # exp_id_2.
@@ -326,14 +314,14 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self.assertEqual(self.count_jobs_in_taskqueue(), 1)
             self.process_and_flush_pending_tasks()
             results = ModifiedStatisticsAggregator.get_statistics(
-                exp_id_1, 'all')
+                exp_id_1, stats_jobs_continuous.VERSION_ALL)
             self.assertDictContainsSubset({
                 'start_exploration_count': 2,
                 'complete_exploration_count': 0,
                 'state_hit_counts': EMPTY_STATE_HIT_COUNTS_DICT,
             }, results)
             results = ModifiedStatisticsAggregator.get_statistics(
-                exp_id_2, 'all')
+                exp_id_2, stats_jobs_continuous.VERSION_ALL)
             self.assertDictContainsSubset({
                 'start_exploration_count': 1,
                 'complete_exploration_count': 0,
@@ -346,16 +334,20 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self._record_start(exp_id_2, exp_version, state_2_1, 'session3')
             self.process_and_flush_pending_tasks()
             results = ModifiedStatisticsAggregator.get_statistics(
-                exp_id_1, 'all')
+                exp_id_1, stats_jobs_continuous.VERSION_ALL)
             self.assertDictContainsSubset({
                 'start_exploration_count': 3,
                 'complete_exploration_count': 0,
                 'state_hit_counts': EMPTY_STATE_HIT_COUNTS_DICT,
             }, results)
             results = ModifiedStatisticsAggregator.get_statistics(
-                exp_id_2, 'all')
+                exp_id_2, stats_jobs_continuous.VERSION_ALL)
             self.assertDictContainsSubset({
                 'start_exploration_count': 2,
                 'complete_exploration_count': 0,
                 'state_hit_counts': EMPTY_STATE_HIT_COUNTS_DICT,
             }, results)
+
+            views_for_all_exps = ModifiedStatisticsAggregator.get_views_multi([
+                exp_id_1, exp_id_2])
+            self.assertEqual(views_for_all_exps, [3, 2])

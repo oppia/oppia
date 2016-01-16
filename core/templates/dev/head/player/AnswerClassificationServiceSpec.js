@@ -18,53 +18,59 @@
  * @author wxyxinyu@gmail.com (Xinyu Wu)
  */
 
-describe('Answer classifiation service', function() {
+describe('Answer classification service', function() {
   beforeEach(module('oppia'));
 
-  var acs, $httpBackend, successHandler, failHandler, $rootScope;
+  var acs, $httpBackend, successHandler, failHandler, $rootScope, state;
   beforeEach(inject(function($injector) {
     acs = $injector.get('answerClassificationService');
+    sof = $injector.get('StateObjectFactory');
     $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
+
+    state = sof.create('stateName', {
+      content: [{
+        type: 'text',
+        value: 'content'
+      }],
+      interaction: {
+        answer_groups: [{
+          outcome: 'outcome 1',
+          rule_specs: [{
+            inputs: {
+              x: 10
+            },
+            rule_type: 'Equals'
+          }]
+        }, {
+          outcome: 'outcome 2',
+          rule_specs: [{
+            inputs: {
+              x: 5
+            },
+            rule_type: 'Equals'
+          }, {
+            inputs: {
+              x: 7
+            },
+            rule_type: 'NotEquals'
+          }]
+        }],
+        default_outcome: 'default'
+      },
+      param_changes: []
+    });
   }));
 
   var explorationId = 'exploration';
 
-  var state = {
-    interaction: {
-      answer_groups: [{
-        outcome: 'outcome 1',
-        rule_specs: [{
-          inputs: {
-            x: 10
-          },
-          rule_type: 'Equals'
-        }]
-      }, {
-        outcome: 'outcome 2',
-        rule_specs: [{
-          inputs: {
-            x: 5
-          },
-          rule_type: 'Equals'
-        }, {
-          inputs: {
-            x: 7
-          },
-          rule_type: 'NotEquals'
-        }]
-      }],
-      default_outcome: 'default'
-    }
-  };
-
   var rules = {
-    'Equals': function(answer, inputs) {
+    Equals: function(answer, inputs) {
       return inputs.x === answer;
     },
-    'NotEquals': function(answer, inputs) {
+    NotEquals: function(answer, inputs) {
       return inputs.x != answer;
     }
   };

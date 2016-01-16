@@ -14,8 +14,6 @@
 
 """Tests for classes and methods relating to user rights."""
 
-__author__ = 'Sean Lip'
-
 from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -26,6 +24,8 @@ import feconf
 
 class ExplorationRightsTests(test_utils.GenericTestBase):
     """Test that rights for actions on explorations work as expected."""
+
+    EXP_ID = 'exp_id'
 
     def setUp(self):
         super(ExplorationRightsTests, self).setUp()
@@ -45,19 +45,18 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         self.set_admins([self.ADMIN_EMAIL])
 
-        self.EXP_ID = 'exp_id'
-
     def test_get_exploration_rights_for_nonexistent_exploration(self):
-        NON_EXP_ID = 'this_exp_does_not_exist_id'
+        non_exp_id = 'this_exp_does_not_exist_id'
 
         with self.assertRaisesRegexp(
-                Exception,
-                'Entity for class ExplorationRightsModel with id '
-                'this_exp_does_not_exist_id not found'):
-            rights_manager.get_exploration_rights(NON_EXP_ID)
+            Exception,
+            'Entity for class ExplorationRightsModel with id '
+            'this_exp_does_not_exist_id not found'
+            ):
+            rights_manager.get_exploration_rights(non_exp_id)
 
         self.assertIsNone(
-            rights_manager.get_exploration_rights(NON_EXP_ID, strict=False))
+            rights_manager.get_exploration_rights(non_exp_id, strict=False))
 
     def test_demo_exploration(self):
         exp_services.load_demo('1')
@@ -432,6 +431,9 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 class CollectionRightsTests(test_utils.GenericTestBase):
     """Test that rights for actions on collections work as expected."""
 
+    COLLECTION_ID = 'collection_id'
+    EXP_ID_FOR_COLLECTION = 'exp_id_for_collection'
+
     def setUp(self):
         super(CollectionRightsTests, self).setUp()
         self.signup('a@example.com', 'A')
@@ -450,20 +452,18 @@ class CollectionRightsTests(test_utils.GenericTestBase):
 
         self.set_admins([self.ADMIN_EMAIL])
 
-        self.COLLECTION_ID = 'collection_id'
-        self.EXP_ID_FOR_COLLECTION = 'exp_id_for_collection'
-
     def test_get_collection_rights_for_nonexistent_collection(self):
-        NON_COL_ID = 'this_collection_does_not_exist_id'
+        non_col_id = 'this_collection_does_not_exist_id'
 
         with self.assertRaisesRegexp(
-                Exception,
-                'Entity for class CollectionRightsModel with id '
-                'this_collection_does_not_exist_id not found'):
-            rights_manager.get_collection_rights(NON_COL_ID)
+            Exception,
+            'Entity for class CollectionRightsModel with id '
+            'this_collection_does_not_exist_id not found'
+            ):
+            rights_manager.get_collection_rights(non_col_id)
 
         self.assertIsNone(
-            rights_manager.get_collection_rights(NON_COL_ID, strict=False))
+            rights_manager.get_collection_rights(non_col_id, strict=False))
 
     def test_demo_collection(self):
         collection_services.load_demo('0')

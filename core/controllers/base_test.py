@@ -16,23 +16,24 @@
 
 """Tests for generic controller behavior."""
 
-__author__ = 'Sean Lip'
-
-import copy
 import datetime
-import feconf
 import re
 import types
 
 from core.controllers import base
 from core.domain import exp_services
 from core.platform import models
-current_user_services = models.Registry.import_current_user_services()
 from core.tests import test_utils
+import feconf
 import main
 
 import webapp2
 import webtest
+
+current_user_services = models.Registry.import_current_user_services()
+
+FORTY_EIGHT_HOURS_IN_SECS = 48 * 60 * 60
+PADDING = 1
 
 
 class BaseHandlerTest(test_utils.GenericTestBase):
@@ -51,7 +52,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
     def test_that_no_get_results_in_500_error(self):
         """Test that no GET request results in a 500 error."""
 
-        for route in main.urls:
+        for route in main.URLS:
             # This was needed for the Django tests to pass (at the time we had
             # a Django branch of the codebase).
             if isinstance(route, tuple):
@@ -114,66 +115,55 @@ class CsrfTokenManagerTest(test_utils.GenericTestBase):
 
     def test_token_expiry(self):
         # This can be any value.
-        ORIG_TIME = 100.0
+        orig_time = 100.0
+        current_time = orig_time
 
-        FORTY_EIGHT_HOURS_IN_SECS = 48 * 60 * 60
-        PADDING = 1
-        current_time = ORIG_TIME
-
-        # Create a fake copy of the CsrfTokenManager class so that its
-        # _get_current_time() method can be swapped out without affecting the
-        # original class.
-        FakeCsrfTokenManager = copy.deepcopy(base.CsrfTokenManager)
-
-        def _get_current_time(cls):
+        def _get_current_time(unused_cls):
             return current_time
 
-        setattr(
-            FakeCsrfTokenManager,
-            _get_current_time.__name__,
-            types.MethodType(_get_current_time, FakeCsrfTokenManager)
-        )
+        with self.swap(
+            base.CsrfTokenManager, '_get_current_time',
+            types.MethodType(_get_current_time, base.CsrfTokenManager)):
+            # Create a token and check that it expires correctly.
+            token = base.CsrfTokenManager().create_csrf_token('uid', 'page')
+            self.assertTrue(
+                base.CsrfTokenManager.is_csrf_token_valid('uid', 'page', token))
 
-        # Create a token and check that it expires correctly.
-        token = FakeCsrfTokenManager.create_csrf_token('uid', 'page')
-        self.assertTrue(
-            FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page', token))
+            current_time = orig_time + 1
+            self.assertTrue(
+                base.CsrfTokenManager.is_csrf_token_valid('uid', 'page', token))
 
-        current_time = ORIG_TIME + 1
-        self.assertTrue(
-            FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page', token))
+            current_time = orig_time + FORTY_EIGHT_HOURS_IN_SECS - PADDING
+            self.assertTrue(
+                base.CsrfTokenManager.is_csrf_token_valid('uid', 'page', token))
 
-        current_time = ORIG_TIME + FORTY_EIGHT_HOURS_IN_SECS - PADDING
-        self.assertTrue(
-            FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page', token))
+            current_time = orig_time + FORTY_EIGHT_HOURS_IN_SECS + PADDING
+            self.assertFalse(
+                base.CsrfTokenManager.is_csrf_token_valid('uid', 'page', token))
 
-        current_time = ORIG_TIME + FORTY_EIGHT_HOURS_IN_SECS + PADDING
-        self.assertFalse(
-            FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page', token))
+            # Check that the expiry of one token does not cause the other to
+            # expire.
+            current_time = orig_time
+            token1 = base.CsrfTokenManager.create_csrf_token('uid', 'page1')
+            self.assertTrue(
+                base.CsrfTokenManager.is_csrf_token_valid('uid', 'page1', token1))
 
-        # Check that the expiry of one token does not cause the other to
-        # expire.
-        current_time = ORIG_TIME
-        token1 = FakeCsrfTokenManager.create_csrf_token('uid', 'page1')
-        self.assertTrue(
-            FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page1', token1))
+            current_time = orig_time + 100
+            token2 = base.CsrfTokenManager.create_csrf_token('uid', 'page2')
+            self.assertTrue(
+                base.CsrfTokenManager.is_csrf_token_valid('uid', 'page2', token2))
 
-        current_time = ORIG_TIME + 100
-        token2 = FakeCsrfTokenManager.create_csrf_token('uid', 'page2')
-        self.assertTrue(
-            FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page2', token2))
+            current_time = orig_time + FORTY_EIGHT_HOURS_IN_SECS + PADDING
+            self.assertFalse(
+                base.CsrfTokenManager.is_csrf_token_valid('uid', 'page1', token1))
+            self.assertTrue(
+                base.CsrfTokenManager.is_csrf_token_valid('uid', 'page2', token2))
 
-        current_time = ORIG_TIME + FORTY_EIGHT_HOURS_IN_SECS + PADDING
-        self.assertFalse(
-            FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page1', token1))
-        self.assertTrue(
-            FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page2', token2))
-
-        current_time = ORIG_TIME + 100 + FORTY_EIGHT_HOURS_IN_SECS + PADDING
-        self.assertFalse(
-            FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page1', token1))
-        self.assertFalse(
-            FakeCsrfTokenManager.is_csrf_token_valid('uid', 'page2', token2))
+            current_time = orig_time + 100 + FORTY_EIGHT_HOURS_IN_SECS + PADDING
+            self.assertFalse(
+                base.CsrfTokenManager.is_csrf_token_valid('uid', 'page1', token1))
+            self.assertFalse(
+                base.CsrfTokenManager.is_csrf_token_valid('uid', 'page2', token2))
 
 
 class EscapingTest(test_utils.GenericTestBase):

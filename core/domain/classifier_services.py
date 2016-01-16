@@ -106,7 +106,7 @@ class StringClassifier(object):
     unless you know what you're doing.
 
     It is possible for a word instance in a doc to not have an explicit label
-    assigned to it. This is characterized by assigning _DEFAULT_LABEL to the
+    assigned to it. This is characterized by assigning DEFAULT_LABEL to the
     word instance.
     """
 
@@ -118,7 +118,22 @@ class StringClassifier(object):
 
     _DEFAULT_PREDICTION_THRESHOLD = 0.5
 
-    _DEFAULT_LABEL = '_default'
+    """Classifiers built with less than _DEFAULT_MIN_DOCS_TO_PREDICT will
+    likely not be useful for predicting as there are not enough examples to
+    build a generalized model. The value 20 was chosen as a balance between a
+    reasonable number of data to learn from and a low entry barrier to using
+    the classifier.
+    """
+    _DEFAULT_MIN_DOCS_TO_PREDICT = 20
+    """Because prediction uses Prob(the doc should be assigned this label | the
+    doc is not assigned DEFAULT_LABEL), if there are only two labels (the
+    default label and one other) then the one other label will always be
+    predicted. Therefore, a minimum of 3 labels are needed to perform a valid
+    prediction.
+    """
+    _DEFAULT_MIN_LABELS_TO_PREDICT = 3
+
+    DEFAULT_LABEL = '_default'
 
     def __init__(self):
         """Initializes constants for the classifier.
@@ -131,6 +146,19 @@ class StringClassifier(object):
 
         self._alpha = self._DEFAULT_ALPHA
         self._beta = self._DEFAULT_BETA
+
+        # These should be initialized in load_examples() or from_dict().
+        self._b_dl = None
+        self._c_dl = None
+        self._c_l = None
+        self._c_lw = None
+        self._l_dp = None
+        self._w_dp = None
+        self._label_to_id = None
+        self._word_to_id = None
+        self._num_docs = None
+        self._num_labels = None
+        self._num_words = None
 
         self._training_iterations = self._DEFAULT_TRAINING_ITERATIONS
         self._prediction_iterations = self._DEFAULT_PREDICTION_ITERATIONS
@@ -178,7 +206,7 @@ class StringClassifier(object):
         label_vector = numpy.zeros(self._num_labels)
         for label in labels:
             label_vector[self._get_label_id(label)] = 1
-        label_vector[self._label_to_id[self._DEFAULT_LABEL]] = 1
+        label_vector[self._label_to_id[self.DEFAULT_LABEL]] = 1
         return label_vector
 
     def _update_counting_matrices(self, d, w, l, val):
@@ -247,11 +275,10 @@ class StringClassifier(object):
         """Returns a list of label probabilities for a given doc, indexed by
         label id.
         """
-        unnormalized_label_probabilities = (
+        unnormalized_label_probs = (
             self._c_dl[d] + (self._b_dl[d] * self._alpha))
         label_probabilities = (
-            unnormalized_label_probabilities /
-            unnormalized_label_probabilities.sum())
+            unnormalized_label_probs / unnormalized_label_probs.sum())
         return label_probabilities
 
     def _get_prediction_report_for_doc(self, d):
@@ -262,11 +289,11 @@ class StringClassifier(object):
         - 'prediction_label_name': prediction_label_id's label name
         - 'prediction_confidence': the prediction confidence. This is
         Prob(the doc should be assigned this label |
-        the doc is not assigned _DEFAULT_LABEL).
+        the doc is not assigned DEFAULT_LABEL).
         - 'all_predictions': a dict mapping each label to
         Prob(the doc should be assigned to this label).
 
-        Because _DEFAULT_LABEL is a special label that captures unspecial
+        Because DEFAULT_LABEL is a special label that captures unspecial
         tokens (how ironic), its probability is not a good predicting
         indicator. For the current normalization process, it has on
         average a higher probability than other labels. To combat this,
@@ -279,10 +306,10 @@ class StringClassifier(object):
         The prediction threshold is currently defined at the classifier level.
         A higher prediction threshold indicates that the predictor needs
         more confidence prior to making a prediction, otherwise it will
-        predict _DEFAULT_LABEL. This will make non-default predictions more
+        predict DEFAULT_LABEL. This will make non-default predictions more
         accurate, but result in fewer of them.
         """
-        default_label_id = self._get_label_id(self._DEFAULT_LABEL)
+        default_label_id = self._get_label_id(self.DEFAULT_LABEL)
         prediction_label_id = default_label_id
         prediction_confidence = 0
         label_probabilities = self._get_label_probabilities(d)
@@ -324,8 +351,8 @@ class StringClassifier(object):
         """Runs Gibbs sampling for "iterations" number of times on the provided
         docs.
         """
-        for i in xrange(iterations):
-            statez = self._run_gibbs_sampling(doc_ids)
+        for _ in xrange(iterations):
+            self._run_gibbs_sampling(doc_ids)
 
     def _add_examples(self, examples, iterations):
         """Adds examples to the internal state of the classifier, assigns
@@ -342,7 +369,9 @@ class StringClassifier(object):
         last_num_words = self._num_words
 
         # Increments _num_labels with any new labels
-        [map(self._get_label_id, labels) for labels in labels_list]
+        for labels in labels_list:
+            for label in labels:
+                self._get_label_id(label)
         self._num_docs += len(docs)
 
         self._b_dl = numpy.concatenate(
@@ -397,8 +426,8 @@ class StringClassifier(object):
         """
         all_labels = self._label_to_id.keys()
         return self._add_examples(
-            zip(prediction_examples, [copy.deepcopy(all_labels) for _ in
-                prediction_examples]),
+            zip(prediction_examples, [
+                copy.deepcopy(all_labels) for _ in prediction_examples]),
             self._prediction_iterations)
 
     def load_examples(self, examples):
@@ -409,7 +438,7 @@ class StringClassifier(object):
         docs, labels_list = self._parse_examples(examples)
 
         label_set = set(
-            [self._DEFAULT_LABEL] +
+            [self.DEFAULT_LABEL] +
             [label for labels in labels_list for label in labels])
 
         self._num_labels = len(label_set)
@@ -442,7 +471,11 @@ class StringClassifier(object):
             xrange(self._num_docs))
 
     def predict_label_for_doc(self, d):
-        """Returns the predicted label from a doc's prediction report."""
+        """Returns the predicted label from a doc's prediction report.
+        """
+        if (self._num_docs < self._DEFAULT_MIN_DOCS_TO_PREDICT or
+                self._num_labels < self._DEFAULT_MIN_LABELS_TO_PREDICT):
+            return self.DEFAULT_LABEL
         return self._get_prediction_report_for_doc(d)['prediction_label_name']
 
     def to_dict(self):

@@ -16,8 +16,6 @@
 
 """Rules for NormalizedStrings."""
 
-__author__ = 'Sean Lip'
-
 from core.domain import rule_domain
 from extensions.rules import base
 
@@ -64,14 +62,13 @@ class FuzzyEquals(base.NormalizedStringRule):
 
         oneago = None
         thisrow = range(1, len(self.x) + 1) + [0]
-        for i in range(len(subject)):
-            twoago, oneago, thisrow = (
-                oneago, thisrow, [0] * len(self.x) + [i + 1])
+        for ind, letter in enumerate(subject):
+            oneago, thisrow = (thisrow, [0] * len(self.x) + [ind + 1])
 
-            for j in range(len(self.x)):
+            for j in range(len(self.x)):  # pylint: disable=invalid-name
                 delcost = oneago[j] + 1
                 addcost = thisrow[j - 1] + 1
-                subcost = oneago[j - 1] + (subject[i] != self.x[j])
+                subcost = oneago[j - 1] + (letter != self.x[j])
                 thisrow[j] = min(delcost, addcost, subcost)
 
         return self._fuzzify_truth_value(thisrow[len(self.x) - 1] == 1)

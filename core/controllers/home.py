@@ -14,8 +14,6 @@
 
 """Controllers for the user dashboard and for notifications."""
 
-__author__ = 'sll@google.com (Sean Lip)'
-
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import exp_services
@@ -76,8 +74,8 @@ class NotificationsDashboardHandler(base.BaseHandler):
         author_id_to_username = {
             None: '',
         }
-        for ind in range(len(author_ids)):
-            author_id_to_username[author_ids[ind]] = author_usernames[ind]
+        for ind, author_id in enumerate(author_ids):
+            author_id_to_username[author_id] = author_usernames[ind]
         for notification in recent_notifications:
             notification['author_username'] = (
                 author_id_to_username[notification['author_id']])
