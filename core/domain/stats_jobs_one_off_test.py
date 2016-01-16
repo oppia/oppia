@@ -27,10 +27,14 @@ from core.platform import models
 from core.tests import test_utils
 
 
+# TODO(bhenning): Implement tests for multiple answers submitted to the same
+# rule. Implement tests for multiple identical rules being submitted. Test
+# submissions to answer groups and rules other than the default.
 class AnswerMigrationJobTests(test_utils.GenericTestBase):
     """Tests for the answer migration job."""
 
     DEMO_EXP_ID = '16'
+    DEFAULT_RULESPEC_STR = 'Default'
 
     # This is based on the old stats_models.process_submitted_answer().
     def _record_old_answer(
@@ -98,3 +102,96 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'interaction_id': 'CodeRepl',
             'params': []
         }])
+
+    def test_migrate_continue(self):
+        state_name = 'Continue'
+        self._record_old_answer(state_name, self.DEFAULT_RULESPEC_STR, '')
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        self._run_migration_job()
+
+        # The answer should have been properly migrated to the new storage
+        # model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(state_answers.answers_list, [{
+            'answer': None,
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'Continue',
+            'params': []
+        }])
+
+    def test_migrate_graph_input(self):
+        pass
+
+    def test_migrate_image_click_input(self):
+        state_name = 'Image Region'
+
+        state = self.exploration.states[state_name]
+        answer_group = state.interaction.answer_groups[0]
+        rule_spec = answer_group.rule_specs[0]
+
+        rule_spec_str = 'IsInRegion(ctor)'
+        html_answer = '(0.307, 0.871)'
+        self._record_old_answer(state_name, rule_spec_str, html_answer)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        self._run_migration_job()
+
+        # The answer should have been properly migrated to the new storage
+        # model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(state_answers.answers_list, [{
+            'answer': {
+                'clickPosition': [0.307, 0.871],
+                'clickedRegions': ['ctor']
+            },
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 4,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.HARD_RULE_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'ImageClickInput',
+            'params': []
+        }])
+
+    def test_migrate_interactive_map(self):
+        pass
+
+    def test_migrate_item_selection_input(self):
+        pass
+
+    def test_migrate_logic_proof(self):
+        pass
+
+    def test_migrate_math_expression_input(self):
+        pass
+
+    def test_migrate_multiple_choice_input(self):
+        pass
+
+    def test_migrate_music_notes_input(self):
+        pass
+
+    def test_migrate_numeric_input(self):
+        pass
+
+    def test_migrate_pencil_code_editor(self):
+        pass
+
+    def test_migrate_set_input(self):
+        pass
+
+    def test_migrate_text_input(self):
+        pass

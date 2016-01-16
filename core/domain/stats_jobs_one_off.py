@@ -16,8 +16,8 @@
 
 import ast
 import collections
+import re
 
-import utils
 from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -27,6 +27,9 @@ from core.domain import stats_domain
 from core.domain import stats_services
 from core.platform import models
 from extensions.objects.models import objects
+
+import utils
+
 (base_models, stats_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.statistics, models.NAMES.exploration
 ])
@@ -140,6 +143,28 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     """This job is responsible for migrating all answers stored within
     stats_models.StateRuleAnswerLogModel to stats_models.StateAnswersModel
     """
+    _ERROR_KEY = 'Answer Migration ERROR'
+
+    _DEFAULT_RULESPEC_STR = 'Default'
+
+    _RECONSTITUTION_FUNCTION_MAP = {
+        'CodeRepl': '_reconstitute_code_evaluation',
+        'Continue': '_reconstitute_continue',
+        'EndExploration': '_reconstitute_end_exploration',
+        'GraphInput': '_reconstitute_graph_input',
+        'ImageClickInput': '_reconstitute_image_click_input',
+        'InteractiveMap': '_reconstitute_interactive_map',
+        'ItemSelectionInput': '_reconstitute_item_selection_input',
+        'LogicProof': '_reconstitute_logic_proof',
+        'MathExpressionInput': '_reconstitute_math_expression_input',
+        'MultipleChoiceInput': '_reconstitute_multiple_choice_input',
+        'MusicNotesInput': '_reconstitute_music_notes_input',
+        'NumericInput': '_reconstitute_numeric_input',
+        'PencilCodeEditor': '_reconstitute_pencil_code_editor',
+        'SetInput': '_reconstitute_set_input',
+        'TextInput': '_reconstitute_text_input',
+    }
+
     @classmethod
     def _find_exploration_immediately_before_timestamp(cls, exp_id, when):
         # Find the latest exploration version before the given time.
@@ -198,15 +223,20 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             for rule_spec_index, rule_spec in enumerate(rule_specs):
                 if cls._stringify_classified_rule(rule_spec) == rule_str:
                     return (answer_group_index, rule_spec_index)
+
+        # If none match, check whether it matches against the default rule,
+        # which thereby translates to the default outcome.
+        if rule_str == cls._DEFAULT_RULESPEC_STR:
+            return (len(answer_groups), 0)
+
         return (None, None)
 
     @classmethod
     def _infer_classification_categorization(cls, rule_str):
         # At this point, no classification was possible. Thus, only soft, hard,
         # and default classifications are possible.
-        _DEFAULT_RULESPEC_STR = 'Default'
         _FUZZY_RULE_TYPE = 'FuzzyMatches'
-        if rule_str == _DEFAULT_RULESPEC_STR:
+        if rule_str == cls._DEFAULT_RULESPEC_STR:
             return exp_domain.DEFAULT_OUTCOME_CLASSIFICATION
         elif rule_str == _FUZZY_RULE_TYPE:
             return exp_domain.SOFT_RULE_CLASSIFICATION
@@ -217,6 +247,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     def _html_to_plaintext(cls, str_value):
         # TODO(bhenning): Convert HTML to plaintext (should just involve
         # stripping <p> tags).
+        if '<' in str_value or '>' in str_value:
+            return None
         return str_value
 
     @classmethod
@@ -224,6 +256,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         if rule_spec.rule_type == 'OutputEquals':
             code_output = cls._html_to_plaintext(rule_spec.inputs['x'])
             code = cls._html_to_plaintext(answer_str)
+            if not code:
+                return (None, 'Failed to recover code: %s' % answer_str)
             # TODO(bhenning): Reconstitute the evaluation and error. Also, find
             # the default values to use, if cannot reconstitute.
             code_evaluation_dict = {
@@ -232,19 +266,112 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 'evaluation': '',
                 'error': ''
             }
-            return objects.CodeEvaluation.normalize(code_evaluation_dict)
+            return (
+                objects.CodeEvaluation.normalize(code_evaluation_dict), None)
         return (
             None,
             'Cannot reconstitute a CodeEvaluation object without an '
-            'OutputEquals rule')
+            'OutputEquals rule.')
+
+    @classmethod
+    def _reconstitute_continue(cls, rule_spec, rule_str, answer_str):
+        if not rule_spec and not answer_str and (
+                rule_str == cls._DEFAULT_RULESPEC_STR):
+            # There is no answer for 'Continue' interactions.
+            return (None, None)
+        return (
+            None,
+            'Expected Continue submissions to only be default rules: %s'
+            % rule_str)
+
+    @classmethod
+    def _reconstitute_end_exploration(cls, rule_spec, rule_str, answer_str):
+        return (
+            None,
+            'There should be no answers submitted for the end exploration.')
+
+    @classmethod
+    def _reconstitute_graph_input(cls, rule_spec, rule_str, answer_str):
+        return (None, 'Unsupported answer type.')
+
+    @classmethod
+    def _reconstitute_image_click_input(cls, rule_spec, rule_str, answer_str):
+        if rule_spec.rule_type == 'IsInRegion':
+            # Extract the region clicked on from the rule string.
+            region_name = rule_str[len(rule_spec.rule_type) + 1:-1]
+
+            # Match the pattern: '(real, real)' to extract the coordinates.
+            pattern = re.compile(
+                r'\((?P<x>\d+\.?\d+), (?P<y>\d+\.?\d+)\)')
+            match = pattern.match(answer_str)
+            x = float(match.group('x'))
+            y = float(match.group('y'))
+            click_on_image_dict = {
+                'clickPosition': [x, y],
+                'clickedRegions': [region_name]
+            }
+            return (objects.ClickOnImage.normalize(click_on_image_dict), None)
+        return (
+            None,
+            'Cannot reconstitute ImageClickInput object without an IsInRegion '
+            'rule.')
+
+    @classmethod
+    def _reconstitute_interactive_map(cls, rule_spec, rule_str, answer_str):
+        return (None, 'Unsupported answer type.')
+
+    @classmethod
+    def _reconstitute_item_selection_input(
+            cls, rule_spec, rule_str, answer_str):
+        return (None, 'Unsupported answer type.')
+
+    @classmethod
+    def _reconstitute_logic_proof(cls, rule_spec, rule_str, answer_str):
+        return (None, 'Unsupported answer type.')
+
+    @classmethod
+    def _reconstitute_math_expression_input(
+            cls, rule_spec, rule_str, answer_str):
+        return (None, 'Unsupported answer type.')
+
+    @classmethod
+    def _reconstitute_multiple_choice_input(
+            cls, rule_spec, rule_str, answer_str):
+        return (None, 'Unsupported answer type.')
+
+    @classmethod
+    def _reconstitute_multiple_choice_input(
+            cls, rule_spec, rule_str, answer_str):
+        return (None, 'Unsupported answer type.')
+
+    @classmethod
+    def _reconstitute_music_notes_input(cls, rule_spec, rule_str, answer_str):
+        return (None, 'Unsupported answer type.')
+
+    @classmethod
+    def _reconstitute_numeric_input(cls, rule_spec, rule_str, answer_str):
+        return (None, 'Unsupported answer type.')
+
+    @classmethod
+    def _reconstitute_pencil_code_editor(cls, rule_spec, rule_str, answer_str):
+        return (None, 'Unsupported answer type.')
+
+    @classmethod
+    def _reconstitute_set_input(cls, rule_spec, rule_str, answer_str):
+        return (None, 'Unsupported answer type.')
+
+    @classmethod
+    def _reconstitute_text_input(cls, rule_spec, rule_str, answer_str):
+        return (None, 'Unsupported answer type.')
 
     @classmethod
     def _reconstitute_answer_object(
             cls, state, rule_spec, rule_str, answer_str):
         interaction_id = state.interaction.id
-        if interaction_id == 'CodeRepl':
-            return (cls._reconstitute_code_evaluation(
-                rule_spec, rule_str, answer_str), None)
+        if interaction_id in cls._RECONSTITUTION_FUNCTION_MAP:
+            reconstitute = getattr(
+                cls, cls._RECONSTITUTION_FUNCTION_MAP[interaction_id])
+            return reconstitute(rule_spec, rule_str, answer_str)
         return (
             None,
             'Cannot reconstitute unsupported interaction ID: %s' %
@@ -307,14 +434,13 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # return none when it's not a default result.
 
         answer_groups = state.interaction.answer_groups
-        answer_group = answer_groups[answer_group_index]
-        rule_spec = answer_group.rule_specs[rule_spec_index]
-
-        for answer_str, answer_frequency in item.answers.iteritems():
-            # Major point of failure is if answer returns None; the error
-            # variable will contain why the reconstitution failed.
-            (answer, error) = AnswerMigrationJob._reconstitute_answer_object(
-                state, rule_spec, rule_str, answer_str)
+        if answer_group_index != len(answer_groups):
+            answer_group = answer_groups[answer_group_index]
+            rule_spec = answer_group.rule_specs[rule_spec_index]
+        else:
+            # The answer is matched with the default outcome.
+            answer_group = None
+            rule_spec = None
 
         # These are values which cannot be reconstituted; use special sentinel
         # values for them, instead.
@@ -322,18 +448,30 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         time_spent_in_sec = (
             stats_domain.MIGRATED_STATE_ANSWER_TIME_SPENT_IN_SEC)
 
-        # Params were, unfortunately, never stored. They cannot be recovered.
+        # Params were, unfortunately, never stored. They cannot be trvially
+        # recovered.
         params = []
 
-        # TODO(bhenning): Does the answer need to be normalized?
+        # TODO(bhenning): Implement answer frequency.
+        for answer_str, answer_frequency in item.answers.iteritems():
+            # Major point of failure is if answer returns None; the error
+            # variable will contain why the reconstitution failed.
+            (answer, error) = AnswerMigrationJob._reconstitute_answer_object(
+                state, rule_spec, rule_str, answer_str)
 
-        # TODO(bhenning): Store the rule_str and answer_strs directly within
-        # the new answer dicts so further processing may happen later on.
-        stats_services.record_answer(
-            exp_id, exploration.version, state_name, answer_group_index,
-            rule_spec_index, classification_categorization, session_id,
-            time_spent_in_sec, params, answer)
+            if error:
+                yield (AnswerMigrationJob._ERROR_KEY, error)
+                continue
+
+            # TODO(bhenning): Does the answer need to be normalized?
+
+            # TODO(bhenning): Store the rule_str and answer_strs directly within
+            # the new answer dicts so further processing may happen later on.
+            stats_services.record_answer(
+                exp_id, exploration.version, state_name, answer_group_index,
+                rule_spec_index, classification_categorization, session_id,
+                time_spent_in_sec, params, answer)
 
     @staticmethod
     def reduce(key, stringified_values):
-        pass
+        yield (stringified_values)
