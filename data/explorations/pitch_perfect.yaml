@@ -1,14 +1,15 @@
 author_notes: ''
 blurb: ''
-default_skin: conversation_v1
+category: Music
 init_state_name: Pitch Trainer-1
 language_code: en
 objective: practice listening to and transcribing musical pitches
 param_changes: []
 param_specs: {}
-schema_version: 7
+schema_version: 10
 skin_customizations:
-  panels_contents: {}
+  panels_contents:
+    bottom: []
 states:
   Choice from Interval-1:
     content:
@@ -48,6 +49,7 @@ states:
         - inputs:
             x: 3
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
@@ -60,8 +62,8 @@ states:
         feedback:
         - Let's keep matching intervals for now.
         param_changes: []
+      fallbacks: []
       id: MultipleChoiceInput
-      triggers: []
     param_changes: []
   Choice from Interval-2:
     content:
@@ -106,6 +108,7 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
@@ -118,8 +121,8 @@ states:
         feedback:
         - Let's keep matching intervals for now.
         param_changes: []
+      fallbacks: []
       id: MultipleChoiceInput
-      triggers: []
     param_changes: []
   Choice from Interval-3:
     content:
@@ -163,6 +166,7 @@ states:
         - inputs:
             x: 3
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
@@ -175,8 +179,8 @@ states:
         feedback:
         - Let's move on to the Melody Trainer.
         param_changes: []
+      fallbacks: []
       id: MultipleChoiceInput
-      triggers: []
     param_changes: []
   Choice from Melody-1:
     content:
@@ -222,6 +226,7 @@ states:
         - inputs:
             x: 3
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
@@ -234,8 +239,8 @@ states:
         feedback:
         - Let's keep matching melodies.
         param_changes: []
+      fallbacks: []
       id: MultipleChoiceInput
-      triggers: []
     param_changes: []
   Choice from Melody-2:
     content:
@@ -283,6 +288,7 @@ states:
         - inputs:
             x: 3
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
@@ -295,8 +301,8 @@ states:
         feedback:
         - Let's review some intervals.
         param_changes: []
+      fallbacks: []
       id: MultipleChoiceInput
-      triggers: []
     param_changes: []
   Choice from Pitch-2:
     content:
@@ -341,6 +347,7 @@ states:
         - inputs:
             x: 3
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
@@ -353,8 +360,8 @@ states:
         feedback:
         - Let's keep matching pitches for now.
         param_changes: []
+      fallbacks: []
       id: MultipleChoiceInput
-      triggers: []
     param_changes: []
   Choice from Pitch-3:
     content:
@@ -398,6 +405,7 @@ states:
         - inputs:
             x: 3
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
@@ -410,8 +418,8 @@ states:
         feedback:
         - Let's move on to the Interval Trainer.
         param_changes: []
+      fallbacks: []
       id: MultipleChoiceInput
-      triggers: []
     param_changes: []
   Choice-1:
     content:
@@ -459,6 +467,7 @@ states:
         - inputs:
             x: 3
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
@@ -471,8 +480,8 @@ states:
         feedback:
         - Let's keep matching pitches for now.
         param_changes: []
+      fallbacks: []
       id: MultipleChoiceInput
-      triggers: []
     param_changes: []
   END:
     content:
@@ -480,12 +489,13 @@ states:
       value: Congratulations, you have finished!
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         recommendedExplorationIds:
           value: []
       default_outcome: null
+      fallbacks: []
       id: EndExploration
-      triggers: []
     param_changes: []
   Interval Trainer-1:
     content:
@@ -685,6 +695,7 @@ states:
               readableNoteName: B4
             y: 10
           rule_type: IsTranspositionOf
+      confirmed_unclassified_answers: []
       customization_args:
         initialSequence:
           value: []
@@ -707,8 +718,8 @@ states:
         - "Try again. Listen to the desired sequence and make your selection.\_"
         - It's okay, practice makes perfect. Try as many times as you like.
         param_changes: []
+      fallbacks: []
       id: MusicNotesInput
-      triggers: []
     param_changes: []
   Interval Trainer-2:
     content:
@@ -908,6 +919,7 @@ states:
               readableNoteName: D5
             y: 5
           rule_type: IsTranspositionOf
+      confirmed_unclassified_answers: []
       customization_args:
         initialSequence:
           value: []
@@ -929,8 +941,8 @@ states:
           \ selection. You can compare it with your note as many times as you like\
           \ using the play buttons.\_"
         param_changes: []
+      fallbacks: []
       id: MusicNotesInput
-      triggers: []
     param_changes: []
   Interval Trainer-3:
     content:
@@ -1074,6 +1086,7 @@ states:
               readableNoteName: A4
             y: 12
           rule_type: IsTranspositionOf
+      confirmed_unclassified_answers: []
       customization_args:
         initialSequence:
           value: []
@@ -1096,8 +1109,8 @@ states:
         - Try again. Listen to the desired sequence and make your selection.
         - It's okay, practice makes perfect. Try as many times as you like.
         param_changes: []
+      fallbacks: []
       id: MusicNotesInput
-      triggers: []
     param_changes: []
   Melody Trainer-1:
     content:
@@ -1225,6 +1238,7 @@ states:
               readableNoteName: C5
             y: 5
           rule_type: IsTranspositionOfExceptFor
+      confirmed_unclassified_answers: []
       customization_args:
         initialSequence:
           value: []
@@ -1251,8 +1265,8 @@ states:
           \ using the play buttons.\_"
         - It's okay, practice makes perfect. Try as many times as you like.
         param_changes: []
+      fallbacks: []
       id: MusicNotesInput
-      triggers: []
     param_changes: []
   Melody Trainer-2:
     content:
@@ -1448,6 +1462,7 @@ states:
               readableNoteName: C5
             y: 5
           rule_type: IsTranspositionOfExceptFor
+      confirmed_unclassified_answers: []
       customization_args:
         initialSequence:
           value: []
@@ -1482,8 +1497,8 @@ states:
           \ selection. You can compare it with your note as many times as you like\
           \ using the play buttons.\_"
         param_changes: []
+      fallbacks: []
       id: MusicNotesInput
-      triggers: []
     param_changes: []
   Pitch Trainer-1:
     content:
@@ -1694,6 +1709,7 @@ states:
               readableNoteName: D5
             y: -14
           rule_type: IsTranspositionOf
+      confirmed_unclassified_answers: []
       customization_args:
         initialSequence:
           value: []
@@ -1712,8 +1728,8 @@ states:
         - Try again. Listen to the desired note and make your selection.<br>
         - It's okay, practice makes perfect. Try as many times as you like.
         param_changes: []
+      fallbacks: []
       id: MusicNotesInput
-      triggers: []
     param_changes: []
   Pitch Trainer-2:
     content:
@@ -1918,6 +1934,7 @@ states:
               readableNoteName: F4
             y: 16
           rule_type: IsTranspositionOf
+      confirmed_unclassified_answers: []
       customization_args:
         initialSequence:
           value: []
@@ -1936,8 +1953,8 @@ states:
         - "Try again. Listen to the desired note and make your selection.\_"
         - It's okay, practice makes perfect. Try as many times as you like.
         param_changes: []
+      fallbacks: []
       id: MusicNotesInput
-      triggers: []
     param_changes: []
   Pitch Trainer-3:
     content:
@@ -2143,6 +2160,7 @@ states:
               readableNoteName: A5
             y: -21
           rule_type: IsTranspositionOf
+      confirmed_unclassified_answers: []
       customization_args:
         initialSequence:
           value: []
@@ -2161,8 +2179,9 @@ states:
           \ using the play buttons.\_"
         - Try again. Listen to the desired note and make your selection.
         param_changes: []
+      fallbacks: []
       id: MusicNotesInput
-      triggers: []
     param_changes: []
-states_schema_version: 4
+states_schema_version: 7
 tags: []
+title: Pitch Perfect

@@ -1,14 +1,15 @@
 author_notes: ''
 blurb: ''
-default_skin: conversation_v1
+category: Languages
 init_state_name: Sentence
 language_code: en
 objective: master the conjugation of Spanish boot verbs
 param_changes: []
 param_specs: {}
-schema_version: 7
+schema_version: 10
 skin_customizations:
-  panels_contents: {}
+  panels_contents:
+    bottom: []
 states:
   END:
     content:
@@ -16,12 +17,13 @@ states:
       value: Congratulations, you have finished!
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         recommendedExplorationIds:
           value: []
       default_outcome: null
+      fallbacks: []
       id: EndExploration
-      triggers: []
     param_changes: []
   Sentence:
     content:
@@ -51,6 +53,7 @@ states:
         - inputs:
             x: jugo
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: ''
@@ -60,8 +63,8 @@ states:
         dest: subject
         feedback: []
         param_changes: []
+      fallbacks: []
       id: TextInput
-      triggers: []
     param_changes: []
   So...:
     content:
@@ -78,6 +81,7 @@ states:
         - inputs:
             x: juego
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: ''
@@ -88,8 +92,8 @@ states:
         feedback:
         - Try that again. Put jueg- together with -o and you get...?
         param_changes: []
+      fallbacks: []
       id: TextInput
-      triggers: []
     param_changes: []
   boot verb:
     content:
@@ -124,6 +128,7 @@ states:
         - inputs:
             x: juego
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: ''
@@ -134,8 +139,8 @@ states:
         feedback:
         - Not quite. Just change the <b>u</b> to a <b>ue</b> and you get <b>jueg-.</b>
         param_changes: []
+      fallbacks: []
       id: TextInput
-      triggers: []
     param_changes: []
   subject:
     content:
@@ -152,6 +157,7 @@ states:
         - inputs:
             x: yo
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: ''
@@ -163,8 +169,8 @@ states:
         - Remember, the subject of the sentence is the noun in the sentence that is
           doing the action. It is usually near the beginning of the sentence.
         param_changes: []
+      fallbacks: []
       id: TextInput
-      triggers: []
     param_changes: []
   verb endings:
     content:
@@ -192,6 +198,7 @@ states:
         - inputs:
             x: o
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: ''
@@ -205,8 +212,9 @@ states:
           \ habl\xE1is, ustedes/ellos/ellas hablan. From this list, what do you think\
           \ the corresponding ending for 'yo' is?"
         param_changes: []
+      fallbacks: []
       id: TextInput
-      triggers: []
     param_changes: []
-states_schema_version: 4
+states_schema_version: 7
 tags: []
+title: Boot Verbs

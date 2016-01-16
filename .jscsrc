@@ -11,8 +11,6 @@
         "extensions/interactions/LogicProof/static/js/generatedParser.js",
         "integrations/**",
         "integrations_dev/**",
-        "scripts/expand_template.js",
-        "scripts/wikicities.js",
         "static/scripts/**",
         "third_party/**"
     ],
