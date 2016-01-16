@@ -476,10 +476,10 @@ oppia.factory('ratingService', [
 
 
 oppia.controller('LearnerLocalNav', [
-    '$scope', '$http', '$modal', 'oppiaHtmlEscaper',
+    '$scope', '$http', '$modal', 'oppiaHtmlEscaper', 'warningsData',
     'oppiaPlayerService', 'embedExplorationButtonService', 'ratingService',
     function (
-      $scope, $http, $modal, oppiaHtmlEscaper,
+      $scope, $http, $modal, oppiaHtmlEscaper, warningsData,
       oppiaPlayerService, embedExplorationButtonService, ratingService) {
   $scope.explorationId = oppiaPlayerService.getExplorationId();
   $scope.serverName = window.location.protocol + '//' + window.location.host;
@@ -503,8 +503,9 @@ oppia.controller('LearnerLocalNav', [
       controller: [
         '$scope', '$modalInstance', '$timeout', 'playerPositionService',
         'oppiaPlayerService',
-        function($scope, $modalInstance, $timeout, playerPositionService,
-                 oppiaPlayerService) {
+        function(
+          $scope, $modalInstance, $timeout, playerPositionService,
+          oppiaPlayerService) {
           var stateName = playerPositionService.getCurrentStateName();
           $scope.initContent = oppiaPlayerService.getStateContentHtml(stateName);
           $scope.suggestionContent = $scope.initContent;
@@ -537,17 +538,18 @@ oppia.controller('LearnerLocalNav', [
           type: 'text',
           value: result.data.suggestionContent
         }
-      }).success(function(res) {
-        $modal.open({
-          templateUrl: 'modals/learnerSuggestionSubmitted',
-          backdrop: true,
-          resolve: {},
-          controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-            $scope.close = function() {
-              $modalInstance.dismiss();
-            };
-          }]
-        });
+      }).error(function(res) {
+        warningsData.addWarning(res);
+      });
+      $modal.open({
+        templateUrl: 'modals/learnerSuggestionSubmitted',
+        backdrop: true,
+        resolve: {},
+        controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+          $scope.close = function() {
+            $modalInstance.dismiss();
+          };
+        }]
       });
     });
   };
