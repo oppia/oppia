@@ -1,6 +1,6 @@
 author_notes: ''
 blurb: ''
-default_skin: conversation_v1
+category: Mathematics
 init_state_name: Introduction
 language_code: en
 objective: discover the binary search algorithm
@@ -50,9 +50,10 @@ param_specs:
     obj_type: UnicodeString
   worstnum:
     obj_type: UnicodeString
-schema_version: 7
+schema_version: 10
 skin_customizations:
-  panels_contents: {}
+  panels_contents:
+    bottom: []
 states:
   3 case 3 tries:
     content:
@@ -155,6 +156,7 @@ states:
         - inputs:
             x: half
           rule_type: Contains
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: Type your answer here.
@@ -167,8 +169,8 @@ states:
         - '"What else do we know about the magician''s number after we make our guess?"'
         - '"What can we use to eliminate more than one number with our first guess?"'
         param_changes: []
+      fallbacks: []
       id: TextInput
-      triggers: []
     param_changes: []
   3 tries 7 numbers:
     content:
@@ -221,14 +223,15 @@ states:
         - inputs:
             x: 4.0
           rule_type: IsGreaterThan
+      confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: 3 tries 7 numbers
         feedback:
         - But that's not even between 1 and 7!
         param_changes: []
+      fallbacks: []
       id: NumericInput
-      triggers: []
     param_changes: []
   4 tries abstract:
     content:
@@ -260,6 +263,7 @@ states:
         - inputs:
             x: 15.0
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: 4 tries abstract
@@ -269,8 +273,8 @@ states:
           is 7 numbers. The right half is the same. And there''s one more at the top!
           So how many is that?'
         param_changes: []
+      fallbacks: []
       id: NumericInput
-      triggers: []
     param_changes: []
   Add one more:
     content:
@@ -310,6 +314,7 @@ states:
         - inputs:
             x: '"one more"'
           rule_type: Contains
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: Type your answer here.
@@ -321,8 +326,8 @@ states:
         - '"... That we can actually add one more number to the range! We can do numbers
           from 1 to 7 in three tries!"'
         param_changes: []
+      fallbacks: []
       id: TextInput
-      triggers: []
     param_changes: []
   After three case:
     content:
@@ -396,6 +401,7 @@ states:
         - inputs:
             x: seven
           rule_type: Contains
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: Type your answer here.
@@ -409,8 +415,8 @@ states:
           Then I try to find a way to change that situation to one where I really
           do know the answer!"<div><br></div>'
         param_changes: []
+      fallbacks: []
       id: TextInput
-      triggers: []
     param_changes: []
   Degenerate Case:
     content:
@@ -444,6 +450,7 @@ states:
         - inputs:
             x: 2.0
           rule_type: IsLessThan
+      confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Degenerate Case
@@ -451,8 +458,8 @@ states:
         - '"No, I don''t think I would ever need that many tries... All I''m trying
           to do is guess whether you''re thinking 1 or 2!"'
         param_changes: []
+      fallbacks: []
       id: NumericInput
-      triggers: []
     param_changes: []
   Discussion Start:
     content:
@@ -539,6 +546,7 @@ states:
         - inputs:
             x: try guess
           rule_type: Contains
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: Type your answer here.
@@ -549,8 +557,8 @@ states:
         feedback:
         - '"Hmm, I have a thought..."'
         param_changes: []
+      fallbacks: []
       id: TextInput
-      triggers: []
     param_changes:
     - customization_args:
         parse_with_jinja: true
@@ -613,14 +621,15 @@ states:
         - inputs:
             x: 4.0
           rule_type: IsGreaterThan
+      confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Doubling range concept
         feedback:
         - ERROR
         param_changes: []
+      fallbacks: []
       id: NumericInput
-      triggers: []
     param_changes: []
   END:
     content:
@@ -628,12 +637,13 @@ states:
       value: Congratulations, you have finished!
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         recommendedExplorationIds:
           value: []
       default_outcome: null
+      fallbacks: []
       id: EndExploration
-      triggers: []
     param_changes: []
   Explain two guesses:
     content:
@@ -678,6 +688,7 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
@@ -689,8 +700,8 @@ states:
         feedback:
         - '"There should be no default"'
         param_changes: []
+      fallbacks: []
       id: MultipleChoiceInput
-      triggers: []
     param_changes: []
   Introduction:
     content:
@@ -750,6 +761,7 @@ states:
         - inputs:
             x: magic
           rule_type: Contains
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: Type your answer here.
@@ -761,8 +773,8 @@ states:
         - '"I''ve got a theory or two, but we should watch him first to figure out
           what he does."'
         param_changes: []
+      fallbacks: []
       id: TextInput
-      triggers: []
     param_changes: []
   Magician Guesses:
     content:
@@ -794,6 +806,7 @@ states:
         - inputs:
             x: 2
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
@@ -804,8 +817,8 @@ states:
         dest: correct
         feedback: []
         param_changes: []
+      fallbacks: []
       id: MultipleChoiceInput
-      triggers: []
     param_changes:
     - customization_args:
         parse_with_jinja: true
@@ -836,6 +849,7 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
@@ -846,8 +860,8 @@ states:
         feedback:
         - ERROR
         param_changes: []
+      fallbacks: []
       id: MultipleChoiceInput
-      triggers: []
     param_changes: []
   Middle Explanation:
     content:
@@ -877,6 +891,7 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
@@ -888,8 +903,8 @@ states:
         feedback:
         - ERROR
         param_changes: []
+      fallbacks: []
       id: MultipleChoiceInput
-      triggers: []
     param_changes: []
   Middle try it out:
     content:
@@ -907,6 +922,7 @@ states:
         - inputs:
             x: 10
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
@@ -936,8 +952,8 @@ states:
           \ the worst case is if the real number is {{if (answer-5==abs(answer-5))\
           \ then \"less than\" else \"greater than\"}} {{answer+1}}!<br></div></div></div>"
         param_changes: []
+      fallbacks: []
       id: MultipleChoiceInput
-      triggers: []
     param_changes: []
   Pick Limit for Magician:
     content:
@@ -955,13 +971,14 @@ states:
         - inputs:
             x: 1000000.0
           rule_type: IsGreaterThan
+      confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Think of a number
         feedback: []
         param_changes: []
+      fallbacks: []
       id: NumericInput
-      triggers: []
     param_changes: []
   Picking in the middle:
     content:
@@ -1009,6 +1026,7 @@ states:
         - inputs:
             x: 2
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
@@ -1020,8 +1038,8 @@ states:
         feedback:
         - ERROR
         param_changes: []
+      fallbacks: []
       id: MultipleChoiceInput
-      triggers: []
     param_changes: []
   Player Guess Setup:
     content:
@@ -1057,13 +1075,14 @@ states:
         - inputs:
             x: '{{MagicianNumber}}'
           rule_type: IsLessThan
+      confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: PlayerGuessing
         feedback: []
         param_changes: []
+      fallbacks: []
       id: NumericInput
-      triggers: []
     param_changes:
     - customization_args:
         list_of_values:
@@ -1089,6 +1108,7 @@ states:
       value: '"Pretty good! That only took you {{tries}} tries!"'
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         buttonText:
           value: Continue
@@ -1096,8 +1116,8 @@ states:
         dest: correct
         feedback: []
         param_changes: []
+      fallbacks: []
       id: Continue
-      triggers: []
     param_changes: []
   PlayerGuessing:
     content:
@@ -1132,14 +1152,15 @@ states:
         - inputs:
             x: '{{MagicianNumber}}'
           rule_type: IsGreaterThan
+      confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: PlayerGuessing
         feedback:
         - '"This should never happen"'
         param_changes: []
+      fallbacks: []
       id: NumericInput
-      triggers: []
     param_changes:
     - customization_args:
         parse_with_jinja: true
@@ -1186,6 +1207,7 @@ states:
         - inputs:
             x: '-'
           rule_type: Contains
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: Type your answer here.
@@ -1198,8 +1220,8 @@ states:
 
           X-Y except X and Y will be numbers.'
         param_changes: []
+      fallbacks: []
       id: TextInput
-      triggers: []
     param_changes: []
   Reduce 3 guesses to 2:
     content:
@@ -1249,6 +1271,7 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
@@ -1260,8 +1283,8 @@ states:
         feedback:
         - ERROR
         param_changes: []
+      fallbacks: []
       id: MultipleChoiceInput
-      triggers: []
     param_changes: []
   Reduce2 - what was the guess:
     content:
@@ -1279,6 +1302,7 @@ states:
         - inputs:
             x: 4.0
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Reduce2 - what was the guess
@@ -1286,8 +1310,8 @@ states:
         - '"Hmm, but if the number was less than {{answer}}, wouldn''t it be between
           1 and {{answer-1}}?"'
         param_changes: []
+      fallbacks: []
       id: NumericInput
-      triggers: []
     param_changes: []
   Think of a number:
     content:
@@ -1295,6 +1319,7 @@ states:
       value: '"OK, think of a number between {{lowest}} and {{highest-1}}"!'
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         buttonText:
           value: I thought of a number!
@@ -1302,8 +1327,8 @@ states:
         dest: Magician Guesses
         feedback: []
         param_changes: []
+      fallbacks: []
       id: Continue
-      triggers: []
     param_changes:
     - customization_args:
         parse_with_jinja: true
@@ -1350,14 +1375,15 @@ states:
         - inputs:
             x: 3.0
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Three Case
         feedback:
         - '"But I made the range bigger! how can I possible need fewer guesses now?"'
         param_changes: []
+      fallbacks: []
       id: NumericInput
-      triggers: []
     param_changes: []
   Three tries explanation:
     content:
@@ -1413,6 +1439,7 @@ states:
         - inputs:
             x: 4
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
@@ -1428,8 +1455,8 @@ states:
         feedback:
         - ERROR
         param_changes: []
+      fallbacks: []
       id: MultipleChoiceInput
-      triggers: []
     param_changes: []
   Town Square:
     content:
@@ -1443,6 +1470,7 @@ states:
         \ the magician points to you<br>\"Think of a number between 1 and 85!\""
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         buttonText:
           value: OK, I've thought of a number!
@@ -1450,8 +1478,8 @@ states:
         dest: Magician Guesses
         feedback: []
         param_changes: []
+      fallbacks: []
       id: Continue
-      triggers: []
     param_changes:
     - customization_args:
         list_of_values:
@@ -1532,14 +1560,15 @@ states:
         - inputs:
             x: 7.0
           rule_type: IsGreaterThan
+      confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: What if it was bigger than 4
         feedback:
         - ERROR
         param_changes: []
+      fallbacks: []
       id: NumericInput
-      triggers: []
     param_changes: []
   Worst Case Finished:
     content:
@@ -1560,6 +1589,7 @@ states:
         \ of you walk off along a winding path, planning your next adventure...<br><br></div>"
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         buttonText:
           value: End of Chapter 1
@@ -1567,8 +1597,8 @@ states:
         dest: END
         feedback: []
         param_changes: []
+      fallbacks: []
       id: Continue
-      triggers: []
     param_changes:
     - customization_args:
         parse_with_jinja: true
@@ -1661,6 +1691,7 @@ states:
         - inputs:
             x: '{{lowerBound}}'
           rule_type: IsLessThan
+      confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Worst Case Guess
@@ -1673,8 +1704,8 @@ states:
 
           {{middle}}'
         param_changes: []
+      fallbacks: []
       id: NumericInput
-      triggers: []
     param_changes:
     - customization_args:
         parse_with_jinja: true
@@ -1720,6 +1751,7 @@ states:
         work<b> at least </b>as well in all the other cases, and maybe even better!"<br>'
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         buttonText:
           value: Got it! I'm ready!
@@ -1728,8 +1760,8 @@ states:
         feedback:
         - '"OK, try to guess a number between 1 and 30!"'
         param_changes: []
+      fallbacks: []
       id: Continue
-      triggers: []
     param_changes:
     - customization_args:
         value: '0'
@@ -1774,6 +1806,7 @@ states:
         - inputs:
             x: 2
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
@@ -1785,8 +1818,8 @@ states:
         feedback:
         - ERROR
         param_changes: []
+      fallbacks: []
       id: MultipleChoiceInput
-      triggers: []
     param_changes: []
   higher-reguess:
     content:
@@ -1819,6 +1852,7 @@ states:
         - inputs:
             x: 2
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
@@ -1829,8 +1863,8 @@ states:
         dest: correct
         feedback: []
         param_changes: []
+      fallbacks: []
       id: MultipleChoiceInput
-      triggers: []
     param_changes:
     - customization_args:
         parse_with_jinja: true
@@ -1883,6 +1917,7 @@ states:
         - inputs:
             x: 2
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
@@ -1893,8 +1928,8 @@ states:
         dest: correct
         feedback: []
         param_changes: []
+      fallbacks: []
       id: MultipleChoiceInput
-      triggers: []
     param_changes:
     - customization_args:
         parse_with_jinja: true
@@ -1944,14 +1979,15 @@ states:
         - inputs:
             x: '{{newHighest}}'
           rule_type: IsGreaterThan
+      confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: practice ranges
         feedback:
         - No, we can't really say that!
         param_changes: []
+      fallbacks: []
       id: NumericInput
-      triggers: []
     param_changes:
     - customization_args:
         list_of_values:
@@ -2021,6 +2057,7 @@ states:
         - inputs:
             x: '{{newLowest}}'
           rule_type: IsLessThan
+      confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: practice ranges lowest
@@ -2028,8 +2065,8 @@ states:
         - '"No, that''s not right... the number doesn''t have to be bigger than that
           based on the information we have."'
         param_changes: []
+      fallbacks: []
       id: NumericInput
-      triggers: []
     param_changes: []
   worst case bigger:
     content:
@@ -2117,6 +2154,7 @@ states:
         - inputs:
             x: '{{lowerBound}}'
           rule_type: IsLessThan
+      confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Worst Case Guess
@@ -2129,8 +2167,8 @@ states:
 
           {{middle}}'
         param_changes: []
+      fallbacks: []
       id: NumericInput
-      triggers: []
     param_changes:
     - customization_args:
         parse_with_jinja: true
@@ -2263,6 +2301,7 @@ states:
         - inputs:
             x: '{{lowerBound}}'
           rule_type: IsLessThan
+      confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Worst Case Guess
@@ -2275,8 +2314,8 @@ states:
 
           {{middle}}'
         param_changes: []
+      fallbacks: []
       id: NumericInput
-      triggers: []
     param_changes:
     - customization_args:
         parse_with_jinja: true
@@ -2323,5 +2362,6 @@ states:
         value: '{{highest-largestValidRange-1}}'
       generator_id: Copier
       name: lowerBound
-states_schema_version: 4
+states_schema_version: 7
 tags: []
+title: The Lazy Magician

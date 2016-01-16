@@ -1,14 +1,15 @@
 author_notes: ''
 blurb: ''
-default_skin: conversation_v1
+category: Test
 init_state_name: text
 language_code: en
 objective: To demonstrate fuzzy rules and trained responses in explorations.
 param_changes: []
 param_specs: {}
-schema_version: 9
+schema_version: 10
 skin_customizations:
-  panels_contents: {}
+  panels_contents:
+    bottom: []
 states:
   final:
     content:
@@ -286,5 +287,6 @@ states:
       fallbacks: []
       id: TextInput
     param_changes: []
-states_schema_version: 6
+states_schema_version: 7
 tags: []
+title: Demonstrating fuzzy rules
