@@ -532,6 +532,7 @@ oppia.factory('rteHelperService', [
       name: RTE_COMPONENT_SPECS[componentId].frontend_name,
       iconDataUrl: RTE_COMPONENT_SPECS[componentId].icon_data_url,
       isComplex: RTE_COMPONENT_SPECS[componentId].is_complex,
+      requiresFs: RTE_COMPONENT_SPECS[componentId].requires_fs,
       tooltip: RTE_COMPONENT_SPECS[componentId].tooltip
     });
   });
@@ -637,10 +638,10 @@ oppia.factory('rteHelperService', [
 oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [
       '$delegate', '$modal', '$timeout', 'focusService', 'taRegisterTool',
-      'rteHelperService', 'explorationContextService',
+      'rteHelperService',
       function(
         taOptions, $modal, $timeout, focusService, taRegisterTool,
-        rteHelperService, explorationContextService) {
+        rteHelperService) {
 
     taOptions.disableSanitizer = true;
     taOptions.classes.textEditor = 'form-control oppia-rte-content';
@@ -656,16 +657,6 @@ oppia.config(['$provide', function($provide) {
     var _openCustomizationModal = function(
         customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
         onDismissCallback, refocusFn) {
-      var pageContext = explorationContextService.getPageContext();
-      var componentName = customizationArgSpecs[0].name;
-      // The image component only works from the editor side.
-      // Prevent suggestors from trying to edit or add images.
-      if (componentName === 'filepath' && pageContext !== 'editor') {
-        alert(
-          'Sorry! Only exploration editors can add or edit images.');
-        return;
-      }
-
       var modalDialog = $modal.open({
         templateUrl: 'modals/customizeRteComponent',
         backdrop: 'static',
@@ -815,7 +806,10 @@ oppia.config(['$provide', function($provide) {
 
 oppia.directive('textAngularRte', [
     '$filter', 'oppiaHtmlEscaper', 'rteHelperService',
-    function($filter, oppiaHtmlEscaper, rteHelperService) {
+    'explorationContextService', 'PAGE_CONTEXT',
+    function(
+      $filter, oppiaHtmlEscaper, rteHelperService,
+      explorationContextService, PAGE_CONTEXT) {
   return {
     restrict: 'E',
     scope: {
@@ -834,9 +828,12 @@ oppia.directive('textAngularRte', [
         []
       ];
 
+      var contextIsEditor = explorationContextService.getPageContext() ===
+        PAGE_CONTEXT.EDITOR;
       rteHelperService.getRichTextComponents().forEach(function(componentDefn) {
         if (!($scope.uiConfig() && $scope.uiConfig().hide_complex_extensions &&
-            componentDefn.isComplex)) {
+          componentDefn.isComplex) &&
+          (!componentDefn.requiresFs || contextIsEditor)) {
           toolbarOptions[2].push(componentDefn.name);
         }
       });

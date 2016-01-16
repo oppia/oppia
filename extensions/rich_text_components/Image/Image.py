@@ -25,6 +25,7 @@ class Image(base.BaseRichTextComponent):
     description = 'An image.'
     frontend_name = 'image'
     tooltip = 'Insert image'
+    requires_fs = True
 
     _customization_arg_specs = [{
         'name': 'filepath',
