@@ -139,7 +139,7 @@ describe('Datetime Formatter', function() {
       // the same date as xx:45:00 in getLocaleDateString(). The date should
       // always be shown as '11/21/2014'
       expect(df.getLocaleDateString(
-        NOW_MILLIS - 10 * 60 * 1000)).toBe('11/21/2014');
+        NOW_MILLIS - 10 * 60 * 1000)).toBe('21/11/2014');
       expect(df.getLocaleDateString(
         NOW_MILLIS - 10 * 60 * 1000)).not.toBe('2014/11/21');
     });
