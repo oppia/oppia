@@ -73,6 +73,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
               cm.getDoc().setCursor(endSelectionPos);
             }
           });
+          editor.setOption('theme', 'preview');
 
           // NOTE: this is necessary to avoid the textarea being greyed-out.
           setTimeout(function() {
