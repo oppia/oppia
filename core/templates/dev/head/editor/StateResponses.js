@@ -503,6 +503,10 @@ oppia.controller('StateResponses', [
           'editorContextService',
           function(
               $scope, $modalInstance, responsesService, editorContextService) {
+            $scope.feedbackEditorIsOpen = false;
+            $scope.openFeedbackEditor = function() {
+              $scope.feedbackEditorIsOpen = true;
+            };
             $scope.tmpRule = {
               rule_type: null,
               inputs: {}
