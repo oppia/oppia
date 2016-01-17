@@ -16,6 +16,13 @@
             <span class="oppia-rule-sort-handle" ng-if="answerGroups.length > 1" ng-mousedown="changeActiveAnswerGroupIndex(-1)">
               <img ng-if="editabilityService.isEditable()" src="/images/general/drag_dots.png" width="10">
             </span>
+              
+            <div class="oppia-rule-header-warning-placement" ng-if="isSelfLoopWithNoFeedback(answerGroup.outcome)" ng-click="changeActiveAnswerGroupIndex($index)">   
+                <div class="oppia-rule-header-warning-style" >
+                      ⚠
+                </div>
+            </div>
+              
             <a ng-click="changeActiveAnswerGroupIndex($index)" class="oppia-rule-tab protractor-test-response-tab" ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex === $index}">
               <response-header index="$index"
                                summary="answerGroup | summarizeAnswerGroup : getCurrentInteractionId():getAnswerChoices():false"
