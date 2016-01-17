@@ -50,7 +50,7 @@
         </button>
         <button type="button"
                 class="btn btn-success protractor-test-save-outcome-feedback"
-                ng-disabled="editOutcomeForm.editFeedbackForm.$invalid"
+                ng-disabled="invalidStateAfterFeedbackSave() || editOutcomeForm.editFeedbackForm.$invalid"
                 ng-click="saveThisFeedback()">
           Save Feedback
         </button>
@@ -107,7 +107,7 @@
         </button>
         <button type="button"
                 class="btn btn-success protractor-test-save-outcome-dest"
-                ng-disabled="editOutcomeForm.editDestForm.$invalid"
+                ng-disabled="invalidStateAfterDestinationSave() || editOutcomeForm.editDestForm.$invalid"
                 ng-click="saveThisDestination()">
           Save Destination
         </button>
