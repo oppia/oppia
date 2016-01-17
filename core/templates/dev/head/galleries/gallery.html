@@ -165,10 +165,13 @@
                 </a>
               </h2>
             </div>
-            <md-button class="md-raised oppia-gallery-scroll-btn" ng-click="scrollLeft($index);" ng-disabled='leftCheck($index)'>
+            <md-button class="md-no-ink oppia-gallery-scroll-btn" ng-click="scroll($index, true)"
+                       ng-hide='rowIndices[$index] == 0'>
               <i class="material-icons">keyboard_arrow_left</i>
             </md-button>
-            <div class="oppia-gallery-tiles-carousel" ng-swipe-left="scrollRight($index, galleryGroup.activity_summary_dicts)" ng-swipe-right="scrollLeft($index)">
+            <div class="oppia-gallery-scroll-btn" ng-show="rowIndices[$index] == 0"></div>
+            <div class="oppia-gallery-tiles-carousel" ng-swipe-right="scroll($index, true)" ng-swipe-left="scroll($index, false)">
+              <div class="oppia-gallery-tiles-carousel-overlay-left"></div>
               <div class="oppia-gallery-tiles">
                 <exploration-summary-tile ng-repeat="tile in galleryGroup.activity_summary_dicts"
                                           exploration-id="tile.id"
@@ -181,10 +184,13 @@
                                           thumbnail-bg-color="tile.thumbnail_bg_color">
                 </exploration-summary-tile>
               </div>
+              <div class="oppia-gallery-tiles-carousel-overlay-right"></div>
             </div>
-            <md-button class="md-raised oppia-gallery-scroll-btn" ng-click="scrollRight($index, galleryGroup.activity_summary_dicts)" ng-disabled="rightCheck($index, galleryGroup.activity_summary_dicts)">
+            <md-button class="md-no-ink oppia-gallery-scroll-btn" ng-click="scroll($index, false)"
+                       ng-hide="(galleryGroup.activity_summary_dicts.length - tileDisplayCount) <= rowIndices[$index]">
               <i class="material-icons">keyboard_arrow_right</i>
             </md-button>
+            <div class="oppia-gallery-scroll-btn" ng-show="(galleryGroup.activity_summary_dicts.length - tileDisplayCount) <= rowIndices[$index]"></div>
           </div>
         </div>
       </div>

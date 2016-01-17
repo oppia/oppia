@@ -184,7 +184,7 @@ oppia.controller('Gallery', [
   'GALLERY_DATA_URL', 'CATEGORY_LIST', 'searchService', 'selectionDataService',
   function(
       $scope, $http, $rootScope, $modal, $window, $timeout,
-      createExplorationButtonService, oppiaDebouncer, urlService,
+      ExplorationCreationButtonService, oppiaDebouncer, urlService,
       GALLERY_DATA_URL, CATEGORY_LIST, searchService, selectionDataService) {
     $rootScope.loadingMessage = 'Loading';
 
@@ -203,50 +203,124 @@ oppia.controller('Gallery', [
       $rootScope.loadingMessage = '';
     });
 
-    $scope.leftCheck = function(ind) {
-      var tilesHtml = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
+    // Below is the width of each tile
+    var TILEDISPLAYWIDTH = 211.953;
+    // If the value below is changed, the corresponding CSS values must be
+    // changed in oppia.css.
+    var MAXTILEDISPLAY = 4;
+    var maxGalleryTileWidth = TILEDISPLAYWIDTH * MAXTILEDISPLAY;
+    $scope.tileDisplayCount = 0;
+    $scope.galleryTilesResizedWidth = 0;
 
-      // Checks if it is at the left most point.
-      return parseInt($(tilesHtml).css('left')) >= 0;
-    };
+    var calculateCarouselCssWidth = function() {
+      var windowWidth = $(window).width() * 0.85;
+      $scope.tileDisplayCount = Math.floor(windowWidth / TILEDISPLAYWIDTH);
+      $scope.galleryTilesResizedWidth = $scope.tileDisplayCount *
+        TILEDISPLAYWIDTH;
+      if ($scope.galleryTilesResizedWidth > maxGalleryTileWidth) {
+        $scope.galleryTilesResizedWidth = maxGalleryTileWidth;
+        $scope.tileDisplayCount = MAXTILEDISPLAY;
+      }
+      $('.oppia-gallery-tiles-carousel').css({
+        width: $scope.galleryTilesResizedWidth + 'px'
+      });
 
-    $scope.scrollLeft = function(ind) {
-      if (!$scope.leftCheck(ind)) {
-        var tilesHtml = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
-        $(tilesHtml).animate({
-          left: '+=211.953'
-        }, 500);
+      // The following determines whether to enable left scroll after resize
+      for (i = 0; i < $('.oppia-gallery-tiles-carousel').length; i++) {
+        var carouselJQuerySelect = '.oppia-gallery-tiles:eq(n)'.replace(
+          'n', i);
+        var carouselScroll = $(carouselJQuerySelect).scrollLeft();
+        var index = Math.ceil(carouselScroll / TILEDISPLAYWIDTH);
+        $scope.rowIndices[i] = index;
       }
     };
 
-    $scope.rightLowerLimits = [];
-    $scope.carouselDisplayWidth = $('.oppia-gallery-tiles-carousel').width();
-    $scope.rightCheck = function(ind, galleryGroup) {
-      var leftLowerLimit = $scope.rightLowerLimits[ind];
+    $scope.scroll = function(ind, isLeftScroll) {
+      var carouselJQuerySelect = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
+      var direction = isLeftScroll ? -1 : 1;
+      var currentScrollPosition = $(carouselJQuerySelect).scrollLeft();
 
-      var tilesHtml = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
-      var left = parseInt($(tilesHtml).css('left'));
-
-      var currCarouselWidth = $('.oppia-gallery-tiles-carousel').width();
-      if (!leftLowerLimit || $scope.carouselDisplayWidth != currCarouselWidth) {
-        var tileWidth = Math.floor(galleryGroup.length * 211.953);
-        var galleryLength = $('.oppia-gallery-tiles-carousel').width();
-        var leftLowerLimit = galleryLength - tileWidth;
-        $scope.rightLowerLimits[ind] = leftLowerLimit;
+      // Scrolling eligibility checks
+      if ($scope.galleryGroups[ind].activity_summary_dicts.length <=
+          $scope.tileDisplayCount) {
+        return;
+      } else if (isLeftScroll && $scope.rowIndices[ind] == 0) {
+        return;
+      } else if (!isLeftScroll && $scope.rowIndices[ind] >=
+                 $scope.galleryGroups[ind].activity_summary_dicts.length -
+                 $scope.tileDisplayCount) {
+        return;
       }
-      // Checks if the elements are at the right most point
-      return left <= leftLowerLimit;
+
+      if (currentScrollPosition < 0) {
+        currentScrollPosition = 0;
+      }
+
+      if (isLeftScroll) {
+        $scope.rowIndices[ind] -= $scope.tileDisplayCount;
+        if ($scope.rowIndices[ind] < 0) {
+          $scope.rowIndices[ind] = 0;
+        }
+      } else {
+        $scope.rowIndices[ind] += $scope.tileDisplayCount;
+        if ($scope.rowIndices[ind] >
+            $scope.galleryGroups[ind].activity_summary_dicts.length - 1) {
+          $scope.rowIndices[ind] =
+            $scope.galleryGroups[ind].activity_summary_dicts.length -
+            $scope.tileDisplayCount + 1;
+        }
+      }
+      var newScrollPosition = currentScrollPosition +
+        ($scope.galleryTilesResizedWidth * direction);
+
+      var lftOverlaySelect = '.oppia-gallery-tiles-carousel-overlay-left:eq(n)'.
+        replace('n', ind);
+      var rtOverlaySelect = '.oppia-gallery-tiles-carousel-overlay-right:eq(n)'.
+        replace('n', ind);
+
+      $(carouselJQuerySelect).animate({
+        scrollLeft: newScrollPosition
+      }, {
+        duration: 800,
+        queue: false
+      });
+
+      $(lftOverlaySelect).css({
+        display: 'inline'
+      }).fadeOut({
+        duration: 800,
+        queue: false
+      });
+      $(rtOverlaySelect).css({
+        display: 'inline'
+      }).fadeOut({
+        duration: 800,
+        queue: false
+      });
     };
 
-    $scope.scrollRight = function(ind, galleryGroup) {
-      if (!$scope.rightCheck(ind, galleryGroup)) {
-        var tilesHtml = '.oppia-gallery-tiles:eq(n)'.replace('n', ind);
+    // Keeps track of the left most indices of each group
+    $scope.rowIndices = {};
+    // Keeps track if site is loading for the first time.
+    var firstLoad = true;
 
-        $(tilesHtml).animate({
-          left: '-=211.953'
-        }, 500);
+    $scope.$watch('galleryGroups', function() {
+      // Pause is necessary to ensure all elements have loaded.
+      $timeout(calculateCarouselCssWidth, 500);
+
+      if (typeof $scope.galleryGroups != 'undefined' && firstLoad) {
+        // The following initializes the tracker to have all
+        // elements flush left.
+        cleanLoad = false;
+        for (i = 0; i < $scope.galleryGroups.length; i++) {
+          $scope.rowIndices[i] = 0;
+        }
       }
-    };
+    });
+
+    $(window).resize(function() {
+      calculateCarouselCssWidth();
+    });
 
     $window.addEventListener('scroll', function() {
       var oppiaBanner = $('.oppia-gallery-banner-container');
@@ -273,7 +347,8 @@ oppia.controller('Gallery', [
     }
 
     $scope.showCreateExplorationModal = function() {
-      createExplorationButtonService.showCreateExplorationModal(CATEGORY_LIST);
+      ExplorationCreationButtonService.showCreateExplorationModal(
+        CATEGORY_LIST);
     };
 
     $scope.inSplashMode = ($scope.CAROUSEL_SLIDES.length > 0);
@@ -344,7 +419,7 @@ oppia.controller('SearchBar', [
   'selectionDataService',
   function(
       $scope, $rootScope, searchService, oppiaDebouncer,
-      createExplorationButtonService, urlService, CATEGORY_LIST,
+      ExplorationCreationButtonService, urlService, CATEGORY_LIST,
       selectionDataService) {
     $scope.searchIsLoading = false;
     $scope.ALL_CATEGORIES = CATEGORY_LIST.map(function(categoryName) {
@@ -481,11 +556,11 @@ oppia.controller('SearchBar', [
     );
 
     $scope.showCreateExplorationModal = function() {
-      createExplorationButtonService.showCreateExplorationModal(
+      ExplorationCreationButtonService.showCreateExplorationModal(
         CATEGORY_LIST);
     };
     $scope.showUploadExplorationModal = function() {
-      createExplorationButtonService.showUploadExplorationModal(
+      ExplorationCreationButtonService.showUploadExplorationModal(
         CATEGORY_LIST);
     };
   }

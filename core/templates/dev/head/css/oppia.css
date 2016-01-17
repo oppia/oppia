@@ -836,7 +836,9 @@ textarea {
 
 .oppia-gallery-group {
   width: 100vw;
+  height: 332px;
   max-width: 928px;
+  display: block;
 }
 
 .oppia-gallery-tiles-area {
@@ -845,11 +847,12 @@ textarea {
 
 exploration-summary-tile {
   position: relative;
+  max-width: 208px;
 }
 
 .oppia-gallery-group-header {
   margin-bottom: 6px;
-  margin-left: 4px;
+  margin-left: 44px;
   margin-top: 36px;
   display: inline-block;
 }
@@ -869,10 +872,14 @@ exploration-summary-tile {
 
 .oppia-gallery-tiles {
   position: relative;
-  left: 0px;
+  /*The height is adjusted to hide the scrollbars*/
+  height: 290px;
+  left: 0;
+  top: 0;
   margin: 0;
   padding: 0;
-  width: 9999px;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .oppia-gallery-tiles-carousel {
@@ -880,7 +887,6 @@ exploration-summary-tile {
   position: relative;
   height: 264px;
   max-width: 848px;
-  width: 80vw;
   overflow: hidden;
 }
 
@@ -893,13 +899,54 @@ exploration-summary-tile {
   min-height: 500px;
   padding-bottom: 24px;
   padding-top: 24px;
+  display: block;
 }
+
+.oppia-gallery-tiles-carousel-overlay-left {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: #b5bdc8;
+  background: -moz-linear-gradient(left, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%);
+  background: -webkit-linear-gradient(left, rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%);
+  background: linear-gradient(to right, rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%);
+  z-index: 99;
+  margin-top: 12px;
+  width: 20px;
+  height: 240px;
+  display: none;
+}
+
+.oppia-gallery-tiles-carousel-overlay-right {
+  position: absolute;
+  right: 0;
+  top: 0;
+  background: #b5bdc8;
+  background: -moz-linear-gradient(left, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%);
+  background: -webkit-linear-gradient(left, rgba(0,0,0,0) 0%,rgba(0,0,0,0.65) 100%);
+  background: linear-gradient(to right, rgba(0,0,0,0) 0%,rgba(0,0,0,0.65) 100%);
+  z-index: 99;
+  margin-top: 12px;
+  width: 20px;
+  height: 240px;
+  display: none;
+}
+
 
 /*Below is to ensure that there are no margins on small screen devices*/
 @media (max-width: 844px) {
   .oppia-gallery-tiles-container {
-    margin-left: 0;
-    margin-right: 0;
+    margin-left: 5vw;
+    margin-right: 5vw;
+    max-width: 89vw;
+  }
+}
+
+@media (max-width: 632px) {
+  .oppia-gallery-tiles-container {
+    margin-left: 2vw;
+    margin-right: 2vw;
+    max-width: 96vw;
   }
 }
 
@@ -912,11 +959,9 @@ exploration-summary-tile {
   max-width: 40px;
   padding: 0;
   cursor: pointer;
-  background-color: white !important;
 }
 
-.oppia-gallery-tiles-scroll i {
-  position: relative;
+.oppia-gallery-scroll-btn i {
   top: 50%;
   font-size: 36px;
   padding: 0;
