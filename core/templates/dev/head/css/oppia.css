@@ -845,11 +845,6 @@ textarea {
   background-color: #eee;
 }
 
-exploration-summary-tile {
-  position: relative;
-  max-width: 208px;
-}
-
 .oppia-gallery-group-header {
   margin-bottom: 6px;
   margin-left: 44px;
@@ -862,6 +857,24 @@ exploration-summary-tile {
 }
 .oppia-gallery-group-header a:hover {
   color: #0844aa;
+}
+
+.oppia-gallery-scroll-btn {
+  position: relative;
+  margin-top: 100px;
+  float: left;
+  height: 60px;
+  width: 10vw;
+  max-width: 40px;
+  padding: 0;
+  cursor: pointer;
+}
+
+.oppia-gallery-scroll-btn i {
+  top: 50%;
+  padding: 0;
+  margin: 0;
+  font-size: 36px;
 }
 
 .oppia-gallery-tiles-introduction {
@@ -890,26 +903,17 @@ exploration-summary-tile {
   overflow: hidden;
 }
 
-.oppia-gallery-tiles-container {
-  height: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  width: 100vw;
-  max-width: 928px;
-  min-height: 500px;
-  padding-bottom: 24px;
-  padding-top: 24px;
-  display: block;
-}
-
 .oppia-gallery-tiles-carousel-overlay-left {
   position: absolute;
   left: 0;
   top: 0;
   background: #b5bdc8;
-  background: -moz-linear-gradient(left, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%);
-  background: -webkit-linear-gradient(left, rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%);
-  background: linear-gradient(to right, rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%);
+  background: -moz-linear-gradient(left, rgba(0,0,0,0.65) 0%,
+                                   rgba(0,0,0,0) 100%);
+  background: -webkit-linear-gradient(left, rgba(0,0,0,0.65) 0%,
+                                      rgba(0,0,0,0) 100%);
+  background: linear-gradient(to right, rgba(0,0,0,0.65) 0%,
+                              rgba(0,0,0,0) 100%);
   z-index: 99;
   margin-top: 12px;
   width: 20px;
@@ -922,9 +926,12 @@ exploration-summary-tile {
   right: 0;
   top: 0;
   background: #b5bdc8;
-  background: -moz-linear-gradient(left, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%);
-  background: -webkit-linear-gradient(left, rgba(0,0,0,0) 0%,rgba(0,0,0,0.65) 100%);
-  background: linear-gradient(to right, rgba(0,0,0,0) 0%,rgba(0,0,0,0.65) 100%);
+  background: -moz-linear-gradient(left, rgba(0,0,0,0) 0%,
+                                   rgba(0,0,0,0.65) 100%);
+  background: -webkit-linear-gradient(left, rgba(0,0,0,0) 0%,
+                                      rgba(0,0,0,0.65) 100%);
+  background: linear-gradient(to right, rgba(0,0,0,0) 0%,
+                              rgba(0,0,0,0.65) 100%);
   z-index: 99;
   margin-top: 12px;
   width: 20px;
@@ -932,13 +939,26 @@ exploration-summary-tile {
   display: none;
 }
 
+.oppia-gallery-tiles-container {
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100vw;
+  max-width: 928px;
+  min-height: 500px;
+  padding-bottom: 24px;
+  padding-top: 24px;
+  display: block;
+}
 
-/*Below is to ensure that there are no margins on small screen devices*/
+/* Ensure that the gallery tiles remain centered. Note that these values would
+   need to be updated if the gallery tiles are changed. */
 @media (max-width: 844px) {
   .oppia-gallery-tiles-container {
     margin-left: 5vw;
     margin-right: 5vw;
     max-width: 89vw;
+    width: 632px;
   }
 }
 
@@ -947,37 +967,6 @@ exploration-summary-tile {
     margin-left: 2vw;
     margin-right: 2vw;
     max-width: 96vw;
-  }
-}
-
-.oppia-gallery-scroll-btn {
-  position: relative;
-  margin-top: 100px;
-  float: left;
-  height: 60px;
-  width: 10vw;
-  max-width: 40px;
-  padding: 0;
-  cursor: pointer;
-}
-
-.oppia-gallery-scroll-btn i {
-  top: 50%;
-  font-size: 36px;
-  padding: 0;
-  margin: 0;
-}
-
-/* Ensure that the gallery tiles remain centered. Note that these values would
-   need to be updated if the gallery tiles are changed. */
-@media (max-width: 844px) {
-  .oppia-gallery-tiles-container {
-    width: 632px;
-  }
-}
-
-@media (max-width: 632px) {
-  .oppia-gallery-tiles-container {
     width: 420px;
   }
 }
