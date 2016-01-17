@@ -846,11 +846,12 @@ textarea {
 }
 
 .oppia-gallery-group-header {
+  display: inline-block;
   margin-bottom: 6px;
   margin-left: 44px;
   margin-top: 36px;
-  display: inline-block;
 }
+
 .oppia-gallery-group-header a {
   color: black;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
@@ -860,27 +861,27 @@ textarea {
 }
 
 .oppia-gallery-scroll-btn {
-  position: relative;
-  margin-top: 100px;
+  cursor: pointer;
   float: left;
   height: 60px;
+  margin-top: 100px;
+  padding: 0;
+  position: relative;
   width: 10vw;
   max-width: 40px;
-  padding: 0;
-  cursor: pointer;
 }
 
 .oppia-gallery-scroll-btn i {
-  top: 50%;
-  padding: 0;
-  margin: 0;
   font-size: 36px;
+  margin: 0;
+  padding: 0;
+  top: 50%;
 }
 
 .oppia-gallery-tiles-introduction {
   font-size: 1.6em;
-  padding-top: 40px;
   padding-bottom: 40px;
+  padding-top: 40px;
 }
 
 .oppia-gallery-tiles {
@@ -890,9 +891,9 @@ textarea {
   left: 0;
   top: 0;
   margin: 0;
+  overflow: hidden;
   padding: 0;
   white-space: nowrap;
-  overflow: hidden;
 }
 
 .oppia-gallery-tiles-carousel {
@@ -904,6 +905,7 @@ textarea {
 }
 
 .oppia-gallery-tiles-carousel-overlay-left {
+  display: none;
   position: absolute;
   left: 0;
   top: 0;
@@ -914,14 +916,14 @@ textarea {
                                       rgba(0,0,0,0) 100%);
   background: linear-gradient(to right, rgba(0,0,0,0.65) 0%,
                               rgba(0,0,0,0) 100%);
-  z-index: 99;
   margin-top: 12px;
   width: 20px;
   height: 240px;
-  display: none;
+  z-index: 99;
 }
 
 .oppia-gallery-tiles-carousel-overlay-right {
+  display: none;
   position: absolute;
   right: 0;
   top: 0;
@@ -932,14 +934,14 @@ textarea {
                                       rgba(0,0,0,0.65) 100%);
   background: linear-gradient(to right, rgba(0,0,0,0) 0%,
                               rgba(0,0,0,0.65) 100%);
-  z-index: 99;
   margin-top: 12px;
   width: 20px;
   height: 240px;
-  display: none;
+  z-index: 99;
 }
 
 .oppia-gallery-tiles-container {
+  display: block;
   height: 100%;
   margin-left: auto;
   margin-right: auto;
@@ -948,7 +950,6 @@ textarea {
   min-height: 500px;
   padding-bottom: 24px;
   padding-top: 24px;
-  display: block;
 }
 
 /* Ensure that the gallery tiles remain centered. Note that these values would
