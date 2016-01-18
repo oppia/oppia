@@ -35,7 +35,7 @@
         objective="collection.objective" version="collection.version"
         add-change="addChange(change)" set-collection-title="setCollectionTitle(newTitle)"
         set-collection-objective="setCollectionObjective(newObjective)" set-collection-category="setCollectionCategory(newCategory)"
-        add-new-exploration="addNewExploration(expId)">
+        add-collection-node="addCollectionNode(expId)">
       </collection-details-directive>
       <a ng-href="/collection/<[collection.id]>" target="_blank">Go to Collection</a>
 
@@ -55,7 +55,8 @@
             prerequisite-skills="node.prerequisite_skills" acquired-skills="node.acquired_skills"
             exploration-id="node.exploration.id" exploration-title="node.exploration.title"
             add-change="addChange(change)" add-prerequisite-skill="addPrerequisiteSkill(skillName, expId)"
-            add-acquired-skill="addAcquiredSkill(skillName, expId)" del-exploration="delExploration(expId)"></collection-node-directive>
+            add-acquired-skill="addAcquiredSkill(skillName, expId)" delete-collection-node="deleteCollectionNode(expId)"
+            delete-acquired-skill="deleteAcquiredSkill(skillIdx, expId)" delete-prerequisite-skill="deletePrerequisiteSkill(skillIdx, expId)"></collection-node-directive>
         </li>
       </ul>
 

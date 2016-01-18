@@ -82,8 +82,8 @@ oppia.controller('CollectionEditor', ['$scope', 'CollectionBackendApiService',
   };
 
   // TODO(mgowano): Handle a case where adding a pre-requisite skill
-  // will result into having all exploration requiring a pre-requisite
-  // skill. At the moment this is only handled when a change is committed
+  // will result into having all exploration requiring pre-requisite
+  // skills. At the moment this is only handled when a change is committed
   // to the backend.
   $scope.addPrerequisiteSkill = function(skillName, expId) {
     if (skillName && expId) {
@@ -93,6 +93,17 @@ oppia.controller('CollectionEditor', ['$scope', 'CollectionBackendApiService',
         prerequisiteSkills.push(skillName);
         return true;
       }
+    }
+    return false;
+  };
+
+  // TODO(mgowano): Handle cases where deleting a pre-requisite skill results
+  // to unreachable explorations.
+  $scope.deletePrerequisiteSkill = function(skillIdx, expId) {
+    if (skillIdx) {
+      var collectionNode = _getCollectionNodeForExplorationId(expId);
+      collectionNode.prerequisite_skills.splice(skillIdx, 1);
+      return true;
     }
     return false;
   };
@@ -109,10 +120,21 @@ oppia.controller('CollectionEditor', ['$scope', 'CollectionBackendApiService',
     return false;
   };
 
+  // TODO(mgowano): Handle cases where deleting an acquired skill results
+  // to unreachable explorations.
+  $scope.deleteAcquiredSkill = function(skillIdx, expId) {
+    if (expId) {
+      var collectionNode = _getCollectionNodeForExplorationId(expId);
+      collectionNode.acquired_skills.splice(skillIdx, 1);
+      return true;
+    }
+    return false;
+  };
+
   // TODO(mgowano): Handle a case where deleting an exploration will
   // result into unreachable exploration. At the moment this is only
   // handled when a change is committed to the backend.
-  $scope.delExploration = function(expId) {
+  $scope.deleteCollectionNode = function(expId) {
     if (expId) {
       for (var i = 0; i < $scope.collection.nodes.length; i++) {
         var collectionNode = $scope.collection.nodes[i];
@@ -125,8 +147,25 @@ oppia.controller('CollectionEditor', ['$scope', 'CollectionBackendApiService',
     return false;
   };
 
-  //TODO(mgowano): Implement adding a new exploration
-  $scope.addNewExploration = function(expId) {
+  //TODO(mgowano): Set all values for the 'exploration' key in newNode
+  $scope.addCollectionNode = function(expId) {
+    if (expId) {
+      if (!_getCollectionNodeForExplorationId(expId)) {
+        var newNode = {
+          exploration_id: expId,
+          acquired_skills: [],
+          prerequisite_skills: [],
+          exploration: {
+            id: expId
+          }
+        }
+        $scope.collection.nodes.push(newNode);
+        return true;
+      } else {
+        warningsData.addWarning(
+          'exploration with id ' + expId + ' is already added');
+      }
+    }
     return false;
   };
 

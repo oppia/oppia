@@ -15,6 +15,8 @@
 /**
  * @fileoverview Directive for creating a list of skills (acquired and
  * pre-requisite skills) associated with a collection.
+ * TODO (mgowano): Update the skills list as the pre-requisite and acquired list
+ * get updated.
  *
  * @author mgowano@google.com (Abraham Mgowano)
  */

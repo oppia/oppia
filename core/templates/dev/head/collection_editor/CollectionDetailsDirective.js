@@ -28,7 +28,7 @@ oppia.directive('collectionDetailsDirective', [function() {
       getCategory: '&category',
       getObjective: '&objective',
       getVersion: '&version',
-      addNewExploration: '&',
+      addCollectionNode: '&',
       setCollectionTitle: '&',
       setCollectionCategory: '&',
       setCollectionObjective: '&',
@@ -36,9 +36,9 @@ oppia.directive('collectionDetailsDirective', [function() {
     },
     templateUrl: 'inline/collection_details_directive',
     controller: ['$scope', 'CollectionUpdateService', function($scope,
-      CollectionUpdateService) {
+        CollectionUpdateService) {
       $scope.addExploration = function(newExpId) {
-        if ($scope.addNewExploration({expId: newExpId})) {
+        if ($scope.addCollectionNode({expId: newExpId})) {
           var change = CollectionUpdateService.buildAddCollectionNodeUpdate(
             newExpId);
           $scope.addChange({change: change});
@@ -46,7 +46,6 @@ oppia.directive('collectionDetailsDirective', [function() {
       };
 
       $scope.updateCollectionTitle = function(newCollectionTitle) {
-        console.log(newCollectionTitle);
         if ($scope.setCollectionTitle({newTitle: newCollectionTitle})) {
           var change = CollectionUpdateService.buildCollectionTitleUpdate(
             newCollectionTitle);

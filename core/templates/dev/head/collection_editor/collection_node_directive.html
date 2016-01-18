@@ -6,21 +6,27 @@
   <p> Prerequisite skills: </p>
   <div ng-if="(getPrerequisiteSkills()).length > 0">
     <ul>
-      <li ng-repeat="skill in getPrerequisiteSkills()"><em><[skill]></em></li>
+      <li ng-repeat="skill in getPrerequisiteSkills() track by $index">
+        <em><[skill]></em>
+        <button ng-click="removePrerequisiteSkill($index)">Delete</button>
+      </li>
     </ul>
   </div>
   <input ng-model="prereqSkillName" type="text" placeholder="Skill name">
-  <button ng-click="updatePrereqSkills(prereqSkillName)">Add Prerequisite Skill for Exploration</button>
+  <button ng-click="addNewPrerequisiteSkill(prereqSkillName)">Add Prerequisite Skill for Exploration</button>
   <br>
 
   <p> Acquired skills: </p>
   <div ng-if="(getAcquiredSkills()).length > 0">
     <ul>
-      <li ng-repeat="skill in getAcquiredSkills()"><em><[skill]></em></li>
+      <li ng-repeat="skill in getAcquiredSkills() track by $index"><em>
+        <[skill]></em>
+        <button ng-click="removeAcquiredSkill($index)">Delete</button>
+      </li>
     </ul>
   </div>
   <input ng-model="acquiredSkillName" type="text" placeholder="Skill name">
-  <button ng-click="updateAcquiredSkills(acquiredSkillName)">Add Acquired Skill for Exploration</button>
+  <button ng-click="addNewAcquiredSkill(acquiredSkillName)">Add Acquired Skill for Exploration</button>
   <br>
   <br>
   <br>
