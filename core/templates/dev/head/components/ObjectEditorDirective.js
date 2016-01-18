@@ -36,6 +36,8 @@ oppia.directive('objectEditor', ['$compile', '$log', function($compile, $log) {
       if (directiveName) {
         element.html(
           '<' + directiveName + '-editor></' + directiveName + '-editor>');
+        console.log(directiveName);
+        console.log(element);
         $compile(element.contents())(scope);
       } else {
         $log.error('Error in objectEditor: no editor type supplied.');
