@@ -1537,24 +1537,28 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-rule-header-warning-placement {
+  left: -0.5em; 
   position: absolute; 
-  z-index: 2; left: 
-  -0.5em; 
   top: 6px;
+  z-index: 2; 
 }
 
 .oppia-rule-header-warning-style {
+    
+  -ms-transform: rotate(-10deg); 
+  -webkit-transform: rotate(-10deg);
+  
+  background-color: yellow; 
+  border:1px solid black; 
+  color: firebrick;
   cursor: pointer;
   font-size: 20px; 
   font-weight: bold;
-  width:22px; 
   height:22px; 
   line-height: 22px; 
-  background-color: yellow; 
-  border:1px solid black; 
+  text-align: center;
   transform: rotate(-10deg); 
-  -ms-transform: rotate(-10deg); 
-  -webkit-transform: rotate(-10deg);
+  width:22px; 
 }    
 
 .oppia-param-change-sort-handle {
