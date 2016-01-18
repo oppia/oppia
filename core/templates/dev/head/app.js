@@ -194,9 +194,6 @@ oppia.factory('oppiaHtmlEscaper', ['$log', function($log) {
 // Service for converting dates in milliseconds since the Epoch to
 // human-readable dates.
 oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
-  var pad = function(n) {
-    return n < 10 ? '0' + n : n;
-  };
   return {
     // Returns just the time if the local datetime representation has the
     // same date as the current date. Otherwise, returns just the date if the
@@ -216,10 +213,7 @@ oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
     // Returns just the date.
     getLocaleDateString: function(millisSinceEpoch) {
       var date = new Date(millisSinceEpoch);
-      var day = pad(date.getDate());
-      var month = pad(date.getMonth() + 1);
-      var year = date.getFullYear();
-      return day + '/' + month + '/' + year;
+      return date.toLocaleDateString();
     },
     // Returns whether the date is at most one week before the current date.
     isRecent: function(millisSinceEpoch) {
