@@ -834,15 +834,24 @@ textarea {
   background-color: #eee;
 }
 
+.oppia-gallery-group {
+  display: block;
+  height: 332px;
+  max-width: 928px;
+  width: 100vw;
+}
+
 .oppia-gallery-tiles-area {
   background-color: #eee;
 }
 
 .oppia-gallery-group-header {
+  display: inline-block;
   margin-bottom: 6px;
-  margin-left: 4px;
+  margin-left: 44px;
   margin-top: 36px;
 }
+
 .oppia-gallery-group-header a {
   color: black;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
@@ -851,32 +860,109 @@ textarea {
   color: #0844aa;
 }
 
+.oppia-gallery-scroll-btn {
+  float: left;
+  height: 60px;
+  margin-top: 100px;
+  max-width: 40px;
+  padding: 0;
+  position: relative;
+  width: 10vw;
+}
+
+.oppia-gallery-scroll-btn i {
+  font-size: 36px;
+  margin: 0;
+  padding: 0;
+  top: 50%;
+}
+
 .oppia-gallery-tiles-introduction {
   font-size: 1.6em;
-  padding-top: 40px;
   padding-bottom: 40px;
+  padding-top: 40px;
+}
+
+.oppia-gallery-tiles {
+  /*The height is adjusted to hide the scrollbars*/
+  height: 290px;
+  left: 0;
+  margin: 0;
+  overflow: hidden;
+  padding: 0;
+  position: relative;
+  top: 0;
+  white-space: nowrap;
+}
+
+.oppia-gallery-tiles-carousel {
+  height: 264px;
+  float: left;
+  max-width: 848px;
+  overflow: hidden;
+  position: relative;
+}
+
+.oppia-gallery-tiles-carousel-overlay-left {
+  background: #b5bdc8;
+  background: -moz-linear-gradient(left, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%);
+  background: -webkit-linear-gradient(left, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%);
+  background: linear-gradient(to right, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%);
+  /*The display is set with Gallery.js*/
+  display: none;
+  height: 240px;
+  left: 0;
+  margin-top: 12px;
+  position: absolute;
+  top: 0;
+  width: 20px;
+  z-index: 99;
+}
+
+.oppia-gallery-tiles-carousel-overlay-right {
+  background: #b5bdc8;
+  background: -moz-linear-gradient(left, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%);
+  background: -webkit-linear-gradient(left, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%);
+  background: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%);
+  /*The display is set with Gallery.js*/
+  display: none;
+  height: 240px;
+  right: 0;
+  margin-top: 12px;
+  position: absolute;
+  top: 0;
+  width: 20px;
+  z-index: 99;
 }
 
 .oppia-gallery-tiles-container {
+  display: block;
   height: 100%;
   margin-left: auto;
   margin-right: auto;
-  width: 844px;
+  max-width: 928px;
   min-height: 500px;
   padding-bottom: 24px;
   padding-top: 24px;
+  width: 100vw;
 }
 
 /* Ensure that the gallery tiles remain centered. Note that these values would
    need to be updated if the gallery tiles are changed. */
 @media (max-width: 844px) {
   .oppia-gallery-tiles-container {
+    margin-left: 5vw;
+    margin-right: 5vw;
+    max-width: 89vw;
     width: 632px;
   }
 }
 
 @media (max-width: 632px) {
   .oppia-gallery-tiles-container {
+    margin-left: 2vw;
+    margin-right: 2vw;
+    max-width: 96vw;
     width: 420px;
   }
 }
@@ -2663,4 +2749,3 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-visible-gadgets-container {
   position: relative;
 }
-
