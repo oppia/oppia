@@ -191,7 +191,7 @@ oppia.factory('expressionSyntaxTreeService', [
           verifyNumArgs(args, 1, 2);
           _verifyArgTypesMatchExpectedType(args, PARAMETER_TYPES.REAL);
           return PARAMETER_TYPES.REAL;
-        },
+        }
       },
       '-': {
         eval: function(args) {
