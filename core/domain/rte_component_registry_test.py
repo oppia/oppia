@@ -17,6 +17,7 @@
 import os
 import re
 import string
+import struct
 
 from core.domain import obj_services
 from core.domain import rte_component_registry
@@ -24,7 +25,6 @@ from core.tests import test_utils
 import feconf
 import schema_utils
 import schema_utils_test
-import struct
 import utils
 
 # File names ending in any of these suffixes will be ignored when checking for
