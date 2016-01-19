@@ -93,7 +93,10 @@ else
   export NPM_CMD=$NODE_PATH/bin/npm
 fi
 
-export NPM_INSTALL="$NPM_CMD install"
+# The addition of --no-bin-link prevents an installation issue on Windows
+# involving the creation of symlinks by npm, as detailed here:
+#   http://blog.rudylee.com/2013/10/24/fix-npm-symlink-problem-in-vagrant/
+export NPM_INSTALL="$NPM_CMD install --no-bin-link"
 
 # Download and install node.js.
 echo Checking if node.js is installed in $TOOLS_DIR
