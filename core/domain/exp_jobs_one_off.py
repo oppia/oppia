@@ -96,16 +96,16 @@ class ExplorationContributorsSummary(jobs.BaseMapReduceJobManager):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationModel]
-    
+
     @staticmethod
     def map(item):
         if item.deleted:
             return
-        
+
         summary = exp_services.get_exploration_summary_by_id(item.id)
         summary.contributor_summary = exp_services.compute_exploration_contributors_summary(item.id)
         exp_services.save_exploration_summary(summary)
-    
+
     @staticmethod
     def reduce(key, values):
         pass

@@ -2202,7 +2202,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 'A category', 'An objective', 'en', [],
                 feconf.get_empty_ratings(),
                 rights_manager.ACTIVITY_STATUS_PUBLIC,
-                False, [self.albert_id], [], [], [self.albert_id],
+                False, [self.albert_id], [], [], [self.albert_id], {self.albert_id: 1},
                 self.EXPECTED_VERSION_2,
                 actual_summaries[self.EXP_ID_2].exploration_model_created_on,
                 actual_summaries[self.EXP_ID_2].exploration_model_last_updated
@@ -2233,7 +2233,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 feconf.get_empty_ratings(),
                 rights_manager.ACTIVITY_STATUS_PRIVATE,
                 False, [self.albert_id], [], [], [self.albert_id, self.bob_id],
-                self.EXPECTED_VERSION_1,
+                {self.albert_id: 1, self.bob_id: 1}, self.EXPECTED_VERSION_1,
                 actual_summaries[self.EXP_ID_1].exploration_model_created_on,
                 actual_summaries[self.EXP_ID_1].exploration_model_last_updated
             ),
@@ -2243,7 +2243,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 feconf.get_empty_ratings(),
                 rights_manager.ACTIVITY_STATUS_PUBLIC,
                 False, [self.albert_id], [], [], [self.albert_id],
-                self.EXPECTED_VERSION_2,
+                {self.albert_id: 1}, self.EXPECTED_VERSION_2,
                 actual_summaries[self.EXP_ID_2].exploration_model_created_on,
                 actual_summaries[self.EXP_ID_2].exploration_model_last_updated
             )

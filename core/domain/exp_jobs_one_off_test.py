@@ -183,6 +183,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                     exp_rights_model.editor_ids,
                     exp_rights_model.viewer_ids,
                     [admin_id],
+                    exp_services.compute_exploration_contributors_summary(exp_id),
                     exploration.version,
                     exploration_model_created_on,
                     exploration_model_last_updated)

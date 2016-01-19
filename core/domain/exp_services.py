@@ -1068,7 +1068,7 @@ def compute_exploration_contributors_summary(exploration_id):
             contributors_summary[commiter_id] += 1
         if current_version == 1:
             break
-        
+
         if is_revert:
             current_version = snapshot_metadata['commit_cmds'][0]['version_number']
         else:
