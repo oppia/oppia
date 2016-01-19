@@ -166,10 +166,10 @@
               </h2>
             </div>
             <md-button class="md-no-ink oppia-gallery-scroll-btn" ng-click="scroll($index, true)" style="cursor: pointer"
-                       ng-hide='rowIndices[$index] == 0'>
+                       ng-hide="leftmostCardIndices[$index] == 0">
               <i class="material-icons">keyboard_arrow_left</i>
             </md-button>
-            <div class="oppia-gallery-scroll-btn" ng-show="rowIndices[$index] == 0"></div>
+            <div class="oppia-gallery-scroll-btn" ng-show="leftmostCardIndices[$index] == 0"></div>
             <div class="oppia-gallery-tiles-carousel" ng-swipe-right="scroll($index, true)" ng-swipe-left="scroll($index, false)">
               <div class="oppia-gallery-tiles-carousel-overlay-left"></div>
               <div class="oppia-gallery-tiles">
@@ -187,10 +187,10 @@
               <div class="oppia-gallery-tiles-carousel-overlay-right"></div>
             </div>
             <md-button class="md-no-ink oppia-gallery-scroll-btn" ng-click="scroll($index, false)" style="cursor: pointer"
-                       ng-hide="(galleryGroup.activity_summary_dicts.length - tileDisplayCount) <= rowIndices[$index]">
+                       ng-hide="(galleryGroup.activity_summary_dicts.length - tileDisplayCount) <= leftmostCardIndices[$index]">
               <i class="material-icons">keyboard_arrow_right</i>
             </md-button>
-            <div class="oppia-gallery-scroll-btn" ng-show="(galleryGroup.activity_summary_dicts.length - tileDisplayCount) <= rowIndices[$index]"></div>
+            <div class="oppia-gallery-scroll-btn" ng-show="(galleryGroup.activity_summary_dicts.length - tileDisplayCount) <= leftmostCardIndices[$index]"></div>
           </div>
         </div>
       </div>

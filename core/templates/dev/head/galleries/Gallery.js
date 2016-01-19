@@ -188,8 +188,8 @@ oppia.controller('Gallery', [
       GALLERY_DATA_URL, CATEGORY_LIST, searchService, selectionDataService) {
     $rootScope.loadingMessage = 'Loading';
 
-    // Keeps track of the left most displayed indices of each group.
-    $scope.rowIndices = {};
+    // Keeps track of the index of the left-most visible card of each group.
+    $scope.leftmostCardIndices = [];
 
     $http.get('/default_gallery_categories').success(function(data) {
       $scope.galleryGroups = data.activity_summary_dicts_by_category;
@@ -209,11 +209,11 @@ oppia.controller('Gallery', [
       // Pause is necessary to ensure all elements have loaded.
       $timeout(initCarousels, 500);
 
-
       // The following initializes the tracker to have all
       // elements flush left.
+      $scope.leftmostCardIndices = [];
       for (i = 0; i < $scope.galleryGroups.length; i++) {
-        $scope.rowIndices[i] = 0;
+        $scope.leftmostCardIndices.push(0);
       }
     });
 
@@ -223,14 +223,13 @@ oppia.controller('Gallery', [
     // must be changed:
     // - .oppia-gallery-tiles-carousel: max-width
     // - .oppia-gallery-tiles-container: max-width
-    var MAX_TILE_DISPLAY = 4;
+    var MAX_NUM_TILES_PER_ROW = 4;
     $scope.tileDisplayCount = 0;
 
     var initCarousels = function() {
       var windowWidth = $(window).width() * 0.85;
-      $scope.tileDisplayCount = Math.floor(windowWidth / TILE_DISPLAY_WIDTH);
-      $scope.tileDisplayCount = Math.min($scope.tileDisplayCount,
-                                         MAX_TILE_DISPLAY);
+      $scope.tileDisplayCount = Math.min(
+        Math.floor(windowWidth / TILE_DISPLAY_WIDTH), MAX_NUM_TILES_PER_ROW);
 
       $('.oppia-gallery-tiles-carousel').css({
         width: ($scope.tileDisplayCount * TILE_DISPLAY_WIDTH) + 'px'
@@ -242,7 +241,7 @@ oppia.controller('Gallery', [
           'n', i);
         var carouselScrollPositionPx = $(carouselJQuerySelector).scrollLeft();
         var index = Math.ceil(carouselScrollPositionPx / TILE_DISPLAY_WIDTH);
-        $scope.rowIndices[i] = index;
+        $scope.leftmostCardIndices[i] = index;
       }
     };
 
@@ -267,17 +266,17 @@ oppia.controller('Gallery', [
       carouselScrollPositionPx = Math.max(0, carouselScrollPositionPx);
 
       if (isLeftScroll) {
-        $scope.rowIndices[ind] = Math.max(0,
-              $scope.rowIndices[ind] - $scope.tileDisplayCount);
+        $scope.leftmostCardIndices[ind] = Math.max(
+          0, $scope.leftmostCardIndices[ind] - $scope.tileDisplayCount);
       } else {
-        $scope.rowIndices[ind] = Math.min(
+        $scope.leftmostCardIndices[ind] = Math.min(
           $scope.galleryGroups[ind].activity_summary_dicts.length -
-          $scope.tileDisplayCount + 1,
-          $scope.rowIndices[ind] + $scope.tileDisplayCount);
+            $scope.tileDisplayCount + 1,
+          $scope.leftmostCardIndices[ind] + $scope.tileDisplayCount);
       }
+
       var newScrollPositionPx = carouselScrollPositionPx +
         ($scope.tileDisplayCount * TILE_DISPLAY_WIDTH * direction);
-
       $(carouselJQuerySelector).animate({
         scrollLeft: newScrollPositionPx
       }, {
@@ -301,6 +300,8 @@ oppia.controller('Gallery', [
 
     $(window).resize(function() {
       initCarousels();
+      // This is needed, otherwise $scope.tileDisplayCount takes a long time
+      // (several seconds) to update.
       $scope.$apply();
     });
 
