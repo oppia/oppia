@@ -104,6 +104,15 @@ oppia.directive('oppiaInteractiveCodeRepl', [
             // runtime of the script.
             $scope.output += out;
           },
+          read: function(name) {
+            // This function is called when a builtin module is imported
+            if (Sk.builtinFiles.files[name] === undefined) {
+              // If corresponding module is not present then,
+              // removal of this block also results in failure of import.
+              throw 'module ' + name + ' not found';
+            }
+            return Sk.builtinFiles.files[name];
+          },
           timeoutMsg: function() {
             $scope.sendResponse('', 'timeout');
           },
