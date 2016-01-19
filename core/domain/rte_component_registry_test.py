@@ -24,11 +24,14 @@ from core.tests import test_utils
 import feconf
 import schema_utils
 import schema_utils_test
+import struct
 import utils
 
 # File names ending in any of these suffixes will be ignored when checking for
 # RTE component validity.
 IGNORED_FILE_SUFFIXES = ['.pyc', '.DS_Store']
+RTE_THUMBNAIL_HEIGHT_PX = 16
+RTE_THUMBNAIL_WIDTH_PX = 16
 
 _COMPONENT_CONFIG_SCHEMA = [
     ('name', basestring), ('category', basestring),
@@ -91,15 +94,17 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 os.path.join(os.getcwd(), component_definition['dir']))
             self.assertIn('%s.py' % component_name, contents)
 
-    def test_image_data_urls_for_rte_components(self):
-        """Test the data urls for the RTE component icons."""
+    def test_image_thumbnails_for_rte_components(self):
+        """Test the thumbnails for the RTE component icons."""
         for (cpt_name, cpt_spec) in feconf.ALLOWED_RTE_EXTENSIONS.iteritems():
             image_filepath = os.path.join(
                 os.getcwd(), cpt_spec['dir'], '%s.png' % cpt_name)
-            self.assertEqual(
-                utils.convert_png_to_data_url(image_filepath),
-                rte_component_registry.Registry.get_rte_component(
-                    cpt_name).icon_data_url)
+
+            with open(image_filepath, 'rb') as f:
+                img_data = f.read()
+                width, height = struct.unpack('>LL', img_data[16:24])
+                self.assertEqual(int(width), RTE_THUMBNAIL_WIDTH_PX)
+                self.assertEqual(int(height), RTE_THUMBNAIL_HEIGHT_PX)
 
     def test_default_rte_components_are_valid(self):
         """Test that the default RTE components are valid."""
