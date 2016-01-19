@@ -2079,6 +2079,42 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
             self.EXP_ID_1)
         self.assertEqual([albert_id], exploration_summary.contributor_ids)
 
+    def test_compute_exploration_contributor_summary(self):
+        albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.signup(self.BOB_EMAIL, self.BOB_NAME)
+
+        # Have Albert create a new exploration. Version 1
+        self.save_new_valid_exploration(self.EXP_ID_1, albert_id)
+        # Have Bob update that exploration. Version 2
+        exp_services.update_exploration(
+            bob_id, self.EXP_ID_1, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'Exploration 1 title'
+            }], 'Changed title.')
+        # Have Bob update that exploration. Version 3
+        exp_services.update_exploration(
+            bob_id, self.EXP_ID_1, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'Exploration 1 title'
+            }], 'Changed title.')
+        # Have Albert update that exploration. Version 4
+        exp_services.update_exploration(
+            albert_id, self.EXP_ID_1, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'Exploration 1 title'
+            }], 'Changed title.')
+        # Have Albert revert to version 3. Version 5
+        exp_services.revert_exploration(albert_id, self.EXP_ID_1, 4, 3)
+
+        exploration_summary = exp_services.get_exploration_summary_by_id(
+            self.EXP_ID_1)
+        self.assertEqual({albert_id: 1, bob_id: 2}, exploration_summary.contributors_summary)
+
 
 class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
     """Test exploration summaries get_* functions."""

@@ -29,6 +29,7 @@ import os
 import pprint
 import StringIO
 import zipfile
+from collections import defaultdict
 
 from core.domain import exp_domain
 from core.domain import fs_domain
@@ -159,8 +160,8 @@ def get_exploration_summary_from_model(exp_summary_model):
         exp_summary_model.ratings, exp_summary_model.status,
         exp_summary_model.community_owned, exp_summary_model.owner_ids,
         exp_summary_model.editor_ids, exp_summary_model.viewer_ids,
-        exp_summary_model.contributor_ids, exp_summary_model.version,
-        exp_summary_model.exploration_model_created_on,
+        exp_summary_model.contributor_ids, exp_summary_model.contributors_summary,
+        exp_summary_model.version, exp_summary_model.exploration_model_created_on,
         exp_summary_model.exploration_model_last_updated
     )
 
@@ -1045,10 +1046,35 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
         exploration.tags, ratings, exp_rights.status,
         exp_rights.community_owned, exp_rights.owner_ids,
         exp_rights.editor_ids, exp_rights.viewer_ids, contributor_ids,
+        compute_exploration_contributors_summary(exploration.id),
         exploration.version, exploration_model_created_on,
         exploration_model_last_updated)
 
     return exp_summary
+
+
+def compute_exploration_contributors_summary(exploration_id):
+    """Returns a dict containing user_id as a key, and number of commits
+    made by user_id for the Exploration as a value
+    """
+    snapshots_metadata = get_exploration_snapshots_metadata(exploration_id)
+    current_version = len(snapshots_metadata)
+    contributors_summary = defaultdict(int)
+    while True:
+        snapshot_metadata = snapshots_metadata[current_version - 1]
+        commiter_id = snapshot_metadata['committer_id']
+        is_revert = (snapshot_metadata['commit_type'] == 'revert')
+        if not is_revert and commiter_id not in feconf.SYSTEM_USER_IDS:
+            contributors_summary[commiter_id] += 1
+        if current_version == 1:
+            break
+        
+        if is_revert:
+            current_version = snapshot_metadata['commit_cmds'][0]['version_number']
+        else:
+            current_version -= 1
+    return contributors_summary
+
 
 def save_exploration_summary(exp_summary):
     """Save an exploration summary domain object as an ExpSummaryModel entity
@@ -1068,6 +1094,7 @@ def save_exploration_summary(exp_summary):
         editor_ids=exp_summary.editor_ids,
         viewer_ids=exp_summary.viewer_ids,
         contributor_ids=exp_summary.contributor_ids,
+        contributors_summary=exp_summary.contributors_summary,
         version=exp_summary.version,
         exploration_model_last_updated=(
             exp_summary.exploration_model_last_updated),

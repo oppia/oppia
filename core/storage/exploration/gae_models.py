@@ -349,6 +349,8 @@ class ExpSummaryModel(base_models.BaseModel):
     # The user_ids of users who have contributed (humans who have made a
     # positive (not just a revert) change to the exploration's content)
     contributor_ids = ndb.StringProperty(indexed=True, repeated=True)
+    # A dict representing number of non-trivial commits of user_ids
+    contributors_summary = ndb.JsonProperty(default={}, indexed=False)
     # The version number of the exploration after this commit. Only populated
     # for commits to an exploration (as opposed to its rights, etc.)
     version = ndb.IntegerProperty()
