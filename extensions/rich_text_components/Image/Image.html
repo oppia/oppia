@@ -1,3 +1,12 @@
+<style>
+.oppia-editable-section:hover oppia-noninteractive-image img {
+    -webkit-filter: grayscale(50%); /* Chrome 19+, Safari 6+, Safari 6+ iOS */
+    filter: grayscale(50%);
+    -webkit-transition : all 200ms;
+    transition: all 200ms;
+}
+</style>
+
 <script type="text/ng-template" id="richTextComponent/Image">
   <img ng-src="<[imageUrl]>" alt="<[imageAltText]>"
        style="display: block; margin-left: auto; margin-right: auto;">
