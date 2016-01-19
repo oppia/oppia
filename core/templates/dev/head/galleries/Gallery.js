@@ -225,20 +225,15 @@ oppia.controller('Gallery', [
     // - .oppia-gallery-tiles-container: max-width
     var MAX_TILE_DISPLAY = 4;
     $scope.tileDisplayCount = 0;
-    $scope.galleryTilesResizedWidth = 0;
 
     var initCarousels = function() {
       var windowWidth = $(window).width() * 0.85;
       $scope.tileDisplayCount = Math.floor(windowWidth / TILE_DISPLAY_WIDTH);
-      $scope.galleryTilesResizedWidth = $scope.tileDisplayCount *
-        TILE_DISPLAY_WIDTH;
-      if ($scope.galleryTilesResizedWidth >
-          TILE_DISPLAY_WIDTH * MAX_TILE_DISPLAY) {
-        $scope.galleryTilesResizedWidth = TILE_DISPLAY_WIDTH * MAX_TILE_DISPLAY;
-        $scope.tileDisplayCount = MAX_TILE_DISPLAY;
-      }
+      $scope.tileDisplayCount = Math.min($scope.tileDisplayCount,
+                                         MAX_TILE_DISPLAY);
+
       $('.oppia-gallery-tiles-carousel').css({
-        width: $scope.galleryTilesResizedWidth + 'px'
+        width: ($scope.tileDisplayCount * TILE_DISPLAY_WIDTH) + 'px'
       });
 
       // The following determines whether to enable left scroll after resize.
@@ -281,7 +276,7 @@ oppia.controller('Gallery', [
           $scope.rowIndices[ind] + $scope.tileDisplayCount);
       }
       var newScrollPositionPx = carouselScrollPositionPx +
-        ($scope.galleryTilesResizedWidth * direction);
+        ($scope.tileDisplayCount * TILE_DISPLAY_WIDTH * direction);
 
       $(carouselJQuerySelector).animate({
         scrollLeft: newScrollPositionPx
