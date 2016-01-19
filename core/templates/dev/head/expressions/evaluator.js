@@ -59,12 +59,12 @@
 // constraints) as well as the output value and type should be documented.
 
 // Service for expression evaluation.
-oppia.factory('expressionEvaluatorService', ['$log', 'expressionParserService',
-  'expressionSyntaxTreeService', function($log, expressionParserService,
-   expressionSyntaxTreeService) {
+oppia.factory('expressionEvaluatorService', [
+  '$log', 'expressionParserService', 'expressionSyntaxTreeService',
+  function($log, expressionParserService, expressionSyntaxTreeService) {
     var evaluateExpression = function(expression, envs) {
-      return expressionSyntaxTreeService.evaluateExpression(expression, envs,
-         evaluate);
+      return expressionSyntaxTreeService.applyFunctionToParseTree(
+        expressionParserService.parse(expression), envs, evaluate);
     };
 
     /**
@@ -86,14 +86,14 @@ oppia.factory('expressionEvaluatorService', ['$log', 'expressionParserService',
         if (parsed[0] == '#') {
           return expressionSyntaxTreeService.lookupEnvs(parsed[1], envs);
         }
-        // Now the first element should be a function name.
-        var op = expressionSyntaxTreeService.lookupEnvs(parsed[0], envs).eval;
 
         // Evaluate rest of the elements, i.e. the arguments.
         var args = parsed.slice(1).map(function(item) {
           return evaluate(item, envs);
         });
-        return op(args);
+        // The first element should be a function name.
+        return expressionSyntaxTreeService.lookupEnvs(
+          parsed[0], envs).eval(args);
       }
 
       // This should be a terminal node with the actual value.
@@ -149,4 +149,5 @@ oppia.factory('expressionEvaluatorService', ['$log', 'expressionParserService',
       validate: validate,
       validateExpression: validateExpression
     };
-  }]);
+  }
+]);

@@ -148,7 +148,7 @@ describe('Expression evaluator service', function() {
       };
 
       try {
-        var evaled = ests.evaluateParseTree(parsed, ENVS, ees.evaluate);
+        var evaled = ests.applyFunctionToParseTree(parsed, ENVS, ees.evaluate);
         if (expected instanceof Error || evaled !== expected) {
           recordFailure(evaled, undefined);
         }
