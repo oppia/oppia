@@ -209,13 +209,11 @@ oppia.controller('Gallery', [
       // Pause is necessary to ensure all elements have loaded.
       $timeout(initCarousels, 500);
 
-      if (typeof $scope.galleryGroups != 'undefined') {
-        // The following initializes the tracker to have all
-        // elements flush left.
-        cleanLoad = false;
-        for (i = 0; i < $scope.galleryGroups.length; i++) {
-          $scope.rowIndices[i] = 0;
-        }
+
+      // The following initializes the tracker to have all
+      // elements flush left.
+      for (i = 0; i < $scope.galleryGroups.length; i++) {
+        $scope.rowIndices[i] = 0;
       }
     });
 
@@ -244,7 +242,7 @@ oppia.controller('Gallery', [
       });
 
       // The following determines whether to enable left scroll after resize.
-      for (i = 0; i < $('.oppia-gallery-tiles-carousel').length; i++) {
+      for (i = 0; i < $scope.galleryGroups.length; i++) {
         var carouselJQuerySelector = '.oppia-gallery-tiles:eq(n)'.replace(
           'n', i);
         var carouselScrollPositionPx = $(carouselJQuerySelector).scrollLeft();
@@ -256,23 +254,18 @@ oppia.controller('Gallery', [
     $scope.scroll = function(ind, isLeftScroll) {
       var carouselJQuerySelector = '.oppia-gallery-tiles:eq(n)'.replace(
         'n', ind);
-      var lftOverlaySelector =
+      var leftOverlaySelector =
         '.oppia-gallery-tiles-carousel-overlay-left:eq(n)'.replace('n', ind);
-      var rtOverlaySelector =
+      var rightOverlaySelector =
         '.oppia-gallery-tiles-carousel-overlay-right:eq(n)'.replace('n', ind);
 
       var direction = isLeftScroll ? -1 : 1;
       var carouselScrollPositionPx = $(carouselJQuerySelector).scrollLeft();
 
-      // Scrolling eligibility checks.
+      // Prevent scrolling if there more carousel pixed widths than
+      // there are tile widths.
       if ($scope.galleryGroups[ind].activity_summary_dicts.length <=
           $scope.tileDisplayCount) {
-        return;
-      } else if (isLeftScroll && $scope.rowIndices[ind] == 0) {
-        return;
-      } else if (!isLeftScroll && $scope.rowIndices[ind] >=
-                 $scope.galleryGroups[ind].activity_summary_dicts.length -
-                 $scope.tileDisplayCount) {
         return;
       }
 
@@ -297,13 +290,13 @@ oppia.controller('Gallery', [
         queue: false
       });
 
-      $(lftOverlaySelector).css({
+      $(leftOverlaySelector).css({
         display: 'inline'
       }).fadeOut({
         duration: 800,
         queue: false
       });
-      $(rtOverlaySelector).css({
+      $(rightOverlaySelector).css({
         display: 'inline'
       }).fadeOut({
         duration: 800,
@@ -313,6 +306,7 @@ oppia.controller('Gallery', [
 
     $(window).resize(function() {
       initCarousels();
+      $scope.$apply();
     });
 
     $window.addEventListener('scroll', function() {

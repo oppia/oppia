@@ -165,7 +165,7 @@
                 </a>
               </h2>
             </div>
-            <md-button class="md-no-ink oppia-gallery-scroll-btn" ng-click="scroll($index, true)"
+            <md-button class="md-no-ink oppia-gallery-scroll-btn" ng-click="scroll($index, true)" style="cursor: pointer"
                        ng-hide='rowIndices[$index] == 0'>
               <i class="material-icons">keyboard_arrow_left</i>
             </md-button>
@@ -186,7 +186,7 @@
               </div>
               <div class="oppia-gallery-tiles-carousel-overlay-right"></div>
             </div>
-            <md-button class="md-no-ink oppia-gallery-scroll-btn" ng-click="scroll($index, false)"
+            <md-button class="md-no-ink oppia-gallery-scroll-btn" ng-click="scroll($index, false)" style="cursor: pointer"
                        ng-hide="(galleryGroup.activity_summary_dicts.length - tileDisplayCount) <= rowIndices[$index]">
               <i class="material-icons">keyboard_arrow_right</i>
             </md-button>
