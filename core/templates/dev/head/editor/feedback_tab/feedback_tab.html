@@ -196,7 +196,7 @@
       <[ errorMessage ]>
     </div>
     <button class="btn btn-default" ng-click="cancelReview()">Cancel</button>
-    <button class="btn btn-danger" ng-click="rejectSuggestion()" ng-disabled="!canReject">Reject</button>
-    <button class="btn btn-success" ng-click="acceptSuggestion()" ng-disabled="!canAccept || commitMessage.length == 0">Accept</button>
+    <button class="btn btn-danger" ng-show="canChange" ng-click="rejectSuggestion()" ng-disabled="!canReject">Reject</button>
+    <button class="btn btn-success" ng-show="canChange" ng-click="acceptSuggestion()" ng-disabled="!canAccept || commitMessage.length == 0">Accept</button>
   </div>
 </script>
