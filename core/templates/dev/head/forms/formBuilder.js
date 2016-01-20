@@ -638,10 +638,10 @@ oppia.factory('rteHelperService', [
 oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [
       '$delegate', '$modal', '$timeout', 'focusService', 'taRegisterTool',
-      'rteHelperService',
+      'rteHelperService', 'warningsData',
       function(
         taOptions, $modal, $timeout, focusService, taRegisterTool,
-        rteHelperService) {
+        rteHelperService, warningsData) {
 
     taOptions.disableSanitizer = true;
     taOptions.classes.textEditor = 'form-control oppia-rte-content';
@@ -719,6 +719,10 @@ oppia.config(['$provide', function($provide) {
       taRegisterTool(componentDefn.name, {
         display: buttonDisplay.outerHTML,
         tooltiptext: componentDefn.tooltip,
+        disabled: function() {
+          // Check canUseFs, a property on the textAngular directive scope.
+          return !this.$parent.$parent.canUseFs && componentDefn.requiresFs;
+        },
         onElementSelect: {
           element: 'img',
           filter: function(elt) {
@@ -727,6 +731,16 @@ oppia.config(['$provide', function($provide) {
           action: function(event, $element, editorScope) {
             event.preventDefault();
             var textAngular = this;
+
+            if (!textAngular.$editor().$parent.canUseFs &&
+                componentDefn.requiresFs) {
+              var FS_UNAUTHORIZED_WARNING = 'Unfortunately, only exploration ' +
+                'authors can make changes involving files.';
+              warningsData.addWarning(FS_UNAUTHORIZED_WARNING);
+              // Without this, the view will not update to show the warning.
+              textAngular.$editor().$parent.$apply();
+              return;
+            }
 
             // Move the cursor to be immediately after the clicked widget.
             // This prevents users from overwriting the widget.
@@ -821,6 +835,10 @@ oppia.directive('textAngularRte', [
       '     ta-paste="stripFormatting($html)" ng-model="tempContent">' +
       '</div>'),
     controller: ['$scope', '$log', function($scope, $log) {
+      // Currently, operations affecting the filesystem are allowed only in
+      // the editor context.
+      $scope.canUseFs = (
+        explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
       $scope.isCustomizationModalOpen = false;
       var toolbarOptions = [
         ['bold', 'italics', 'underline'],
@@ -828,12 +846,9 @@ oppia.directive('textAngularRte', [
         []
       ];
 
-      var contextIsEditor = explorationContextService.getPageContext() ===
-        PAGE_CONTEXT.EDITOR;
       rteHelperService.getRichTextComponents().forEach(function(componentDefn) {
         if (!($scope.uiConfig() && $scope.uiConfig().hide_complex_extensions &&
-          componentDefn.isComplex) &&
-          (!componentDefn.requiresFs || contextIsEditor)) {
+          componentDefn.isComplex)) {
           toolbarOptions[2].push(componentDefn.name);
         }
       });
