@@ -21,7 +21,7 @@ stored in the database. In particular, the various query methods should
 delegate to the Exploration model class. This will enable the exploration
 storage model to be changed without affecting this module and others above it.
 """
-
+import collections
 import copy
 import datetime
 import logging
@@ -29,7 +29,6 @@ import os
 import pprint
 import StringIO
 import zipfile
-from collections import defaultdict
 
 from core.domain import exp_domain
 from core.domain import fs_domain
@@ -1054,18 +1053,19 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
 
 
 def compute_exploration_contributors_summary(exploration_id):
-    """Returns a dict containing user_id as a key, and number of commits
-    made by user_id for the Exploration as a value
+    """Returns a dict whose keys are user_ids and whose values are
+    the number of (non-revert) commits made to the given exploration
+    by that user_id. This does not count commits which have since been reverted.
     """
     snapshots_metadata = get_exploration_snapshots_metadata(exploration_id)
     current_version = len(snapshots_metadata)
-    contributors_summary = defaultdict(int)
+    contributors_summary = collections.defaultdict(int)
     while True:
         snapshot_metadata = snapshots_metadata[current_version - 1]
-        commiter_id = snapshot_metadata['committer_id']
+        committer_id = snapshot_metadata['committer_id']
         is_revert = (snapshot_metadata['commit_type'] == 'revert')
-        if not is_revert and commiter_id not in feconf.SYSTEM_USER_IDS:
-            contributors_summary[commiter_id] += 1
+        if not is_revert and committer_id not in feconf.SYSTEM_USER_IDS:
+            contributors_summary[committer_id] += 1
         if current_version == 1:
             break
 

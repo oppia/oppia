@@ -89,7 +89,7 @@ class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceJobManager):
         exp_summary_model.put()
 
 
-class ExplorationContributorsSummary(jobs.BaseMapReduceJobManager):
+class ExplorationContributorsSummaryOneOffJob(jobs.BaseMapReduceJobManager):
     """One-off job that computes the number of commits
     done by contributors for each Exploration
     """
@@ -103,7 +103,8 @@ class ExplorationContributorsSummary(jobs.BaseMapReduceJobManager):
             return
 
         summary = exp_services.get_exploration_summary_by_id(item.id)
-        summary.contributor_summary = exp_services.compute_exploration_contributors_summary(item.id)
+        summary.contributor_summary = (
+            exp_services.compute_exploration_contributors_summary(item.id))
         exp_services.save_exploration_summary(summary)
 
     @staticmethod
