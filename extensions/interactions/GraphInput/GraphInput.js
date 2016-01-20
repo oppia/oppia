@@ -654,9 +654,10 @@ oppia.factory('graphUtilsService', [function() {
         if (isVisited[nextVertex] == this.DFS_STATUS.STILL_VISITING) {
           return true;
         }
-        if (isVisited[nextVertex] == this.DFS_STATUS.UNVISITED) {
-          return this.findCycle(
-            nextVertex, currentVertex, adjacencyLists, isVisited, isDirected);
+        if (isVisited[nextVertex] == this.DFS_STATUS.UNVISITED &&
+            this.findCycle(
+            nextVertex, currentVertex, adjacencyLists, isVisited, isDirected)) {
+          return true;
         }
       }
       isVisited[currentVertex] = this.DFS_STATUS.VISITED;

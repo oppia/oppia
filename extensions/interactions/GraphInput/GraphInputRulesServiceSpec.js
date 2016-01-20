@@ -842,6 +842,43 @@ describe('Graph Input service', function() {
       })).toBe(true);
       expect(girs.HasGraphProperty({
         vertices: [{
+          label: 'a',
+          x: 0.0,
+          y: 0.0
+        }, {
+          label: 'b',
+          x: 0.0,
+          y: 0.0
+        }, {
+          label: 'c',
+          x: 0.0,
+          y: 0.0
+        }, {
+          label: 'd',
+          x: 0.0,
+          y: 0.0
+        }],
+        edges: [{
+          src: 0,
+          dst: 1,
+          weight: 2
+        }, {
+          src: 2,
+          dst: 1,
+          weight: 4
+        }, {
+          src: 3,
+          dst: 1,
+          weight: 123
+        }],
+        isDirected: false,
+        isWeighted: true,
+        isLabeled: true
+      }, {
+        p: 'acyclic'
+      })).toBe(true);
+      expect(girs.HasGraphProperty({
+        vertices: [{
           label: '',
           x: 0.0,
           y: 0.0
