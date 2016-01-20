@@ -1023,9 +1023,11 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
         old_exp_summary = get_exploration_summary_from_model(exp_summary_model)
         ratings = old_exp_summary.ratings or feconf.get_empty_ratings()
         contributor_ids = old_exp_summary.contributor_ids or []
+        contributors_summary = old_exp_summary.contributors_summary or {}
     else:
         ratings = feconf.get_empty_ratings()
         contributor_ids = []
+        contributors_summary = {}
 
     # Update the contributor id list if necessary (contributors
     # defined as humans who have made a positive (i.e. not just
@@ -1034,6 +1036,17 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
             contributor_id_to_add not in feconf.SYSTEM_USER_IDS):
         if contributor_id_to_add not in contributor_ids:
             contributor_ids.append(contributor_id_to_add)
+
+    if contributor_id_to_add not in feconf.SYSTEM_USER_IDS:
+        if contributor_id_to_add is None:
+            # Revert commit or other non obvious commit
+            contributors_summary = compute_exploration_contributors_summary(
+                exploration.id)
+        else:
+            if contributor_id_to_add in contributors_summary:
+                contributors_summary[contributor_id_to_add] += 1
+            else:
+                contributors_summary[contributor_id_to_add] = 1
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
         _get_last_updated_by_human_ms(exploration.id) / 1000.0)
@@ -1045,9 +1058,8 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
         exploration.tags, ratings, exp_rights.status,
         exp_rights.community_owned, exp_rights.owner_ids,
         exp_rights.editor_ids, exp_rights.viewer_ids, contributor_ids,
-        compute_exploration_contributors_summary(exploration.id),
-        exploration.version, exploration_model_created_on,
-        exploration_model_last_updated)
+        contributors_summary, exploration.version,
+        exploration_model_created_on, exploration_model_last_updated)
 
     return exp_summary
 
