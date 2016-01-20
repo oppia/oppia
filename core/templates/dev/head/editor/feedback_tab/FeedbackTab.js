@@ -122,7 +122,7 @@ oppia.controller('FeedbackTab', [
           suggestionIsOpen: function() {
             return _isSuggestionOpen();
           },
-          isSuggestionValid: function() {
+          suggestionIsValid: function() {
             return _isSuggestionValid();
           },
           unsavedChangesExist: function() {
@@ -140,11 +140,13 @@ oppia.controller('FeedbackTab', [
           }
         },
         controller: [
-          '$scope', '$modalInstance', 'suggestionIsOpen', 'isSuggestionValid',
+          '$scope', '$modalInstance', 'suggestionIsOpen', 'suggestionIsValid',
           'unsavedChangesExist', 'suggestionStatus', 'oldContent', 'newContent',
+          'editabilityService',
           function(
-            $scope, $modalInstance, suggestionIsOpen, isSuggestionValid,
-            unsavedChangesExist, suggestionStatus, oldContent, newContent) {
+            $scope, $modalInstance, suggestionIsOpen, suggestionIsValid,
+            unsavedChangesExist, suggestionStatus, oldContent, newContent,
+            editabilityService) {
             var SUGGESTION_ACCEPTED_MSG = 'This suggestion has already been ' +
               'accepted.';
             var SUGGESTION_REJECTED_MSG = 'This suggestion has already been ' +
@@ -154,15 +156,18 @@ oppia.controller('FeedbackTab', [
             var UNSAVED_CHANGES_MSG = 'You have unsaved changes to ' +
               'this exploration. Please save/discard your unsaved changes if ' +
               'you wish to accept.';
-            $scope.canChange = suggestionIsOpen;
-            $scope.canReject = suggestionIsOpen;
-            $scope.canAccept = suggestionIsOpen && isSuggestionValid &&
-              !unsavedChangesExist;
+            $scope.isOpen = suggestionIsOpen;
+            $scope.canEdit = editabilityService.isEditable();
+            $scope.canReject = $scope.canEdit && $scope.isOpen;
+            $scope.canAccept = $scope.canEdit && $scope.isOpen &&
+              suggestionIsValid && !unsavedChangesExist;
 
-            if (!suggestionIsOpen) {
+            if (!$scope.canEdit) {
+              $scope.errorMessage = '';
+            } else if (!$scope.isOpen) {
               $scope.errorMessage = suggestionStatus === 'fixed' ?
                 SUGGESTION_ACCEPTED_MSG : SUGGESTION_REJECTED_MSG;
-            } else if (!isSuggestionValid) {
+            } else if (!suggestionIsValid) {
               $scope.errorMessage = SUGGESTION_INVALID_MSG;
             } else if (unsavedChangesExist) {
               $scope.errorMessage = UNSAVED_CHANGES_MSG;
