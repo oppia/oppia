@@ -33,20 +33,31 @@ oppia.directive('graphPropertyEditor', [
     controller: function($scope) {
       $scope.alwaysEditable = true;
 
-      $scope.graphProperties = [
-        'regular', 'acyclic', 'strongly connected', 'weakly connected'];
+      $scope.graphProperties = [{
+        name: 'regular',
+        humanReadableName: 'regular'
+      }, {
+        name: 'acyclic',
+        humanReadableName: 'acyclic'
+      }, {
+        name: 'strongly_connected',
+        humanReadableName: 'strongly connected'
+      }, {
+        name: 'weakly_connected',
+        humanReadableName: 'weakly connected'
+      }];
       $scope.localValue = {
         property: $scope.graphProperties[0]
       };
 
       for (var i = 0; i < $scope.graphProperties.length; i++) {
-        if ($scope.graphProperties[i] === $scope.$parent.value) {
+        if ($scope.graphProperties[i].name === $scope.$parent.value) {
           $scope.localValue.property = $scope.graphProperties[i];
         }
       }
 
       $scope.$watch('localValue.property', function() {
-        $scope.$parent.value = $scope.localValue.property;
+        $scope.$parent.value = $scope.localValue.property.name;
       });
     }
   };
