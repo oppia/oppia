@@ -25,19 +25,30 @@ oppia.directive('oppiaNoninteractiveVideo', [
       restrict: 'E',
       scope: {},
       templateUrl: 'richTextComponent/Video',
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        var start = oppiaHtmlEscaper.escapedJsonToObj($attrs.startWithValue);
-        var end = oppiaHtmlEscaper.escapedJsonToObj($attrs.endWithValue);
+      controller: [
+        '$scope', '$attrs', 'explorationContextService', 'PAGE_CONTEXT',
+        'EDITOR_TAB_CONTEXT',
+        function(
+          $scope, $attrs, explorationContextService,
+          PAGE_CONTEXT, EDITOR_TAB_CONTEXT) {
+          var start = oppiaHtmlEscaper.escapedJsonToObj($attrs.startWithValue);
+          var end = oppiaHtmlEscaper.escapedJsonToObj($attrs.endWithValue);
 
-        $scope.autoplaySuffix = (oppiaHtmlEscaper.escapedJsonToObj(
-          $attrs.autoplayWithValue) ? '&autoplay=1' : '&autoplay=0');
-        $scope.videoId = oppiaHtmlEscaper.escapedJsonToObj(
-          $attrs.videoIdWithValue);
-        $scope.timingParams = '&start=' + start + '&end=' + end;
-        $scope.videoUrl = $sce.trustAsResourceUrl(
-          'https://www.youtube.com/embed/' + $scope.videoId + '?rel=0' +
-          $scope.timingParams + $scope.autoplaySuffix);
-      }]
+          $scope.autoplaySuffix = (oppiaHtmlEscaper.escapedJsonToObj(
+            $attrs.autoplayWithValue) ? '&autoplay=1' : '&autoplay=0');
+          $scope.videoId = oppiaHtmlEscaper.escapedJsonToObj(
+            $attrs.videoIdWithValue);
+          $scope.timingParams = '&start=' + start + '&end=' + end;
+          $scope.videoUrl = $sce.trustAsResourceUrl(
+            'https://www.youtube.com/embed/' + $scope.videoId + '?rel=0' +
+            $scope.timingParams + $scope.autoplaySuffix);
+          if (explorationContextService.getPageContext() ===
+              PAGE_CONTEXT.EDITOR &&
+              explorationContextService.getEditorTabContext() ===
+              EDITOR_TAB_CONTEXT.EDITOR) {
+            $scope.tabIndexVal = '-1';
+          }
+        }]
     };
   }
 ]);
