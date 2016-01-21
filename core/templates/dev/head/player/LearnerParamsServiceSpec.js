@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for services for the exploration player page.
+ * @fileoverview Unit tests for the learner parameters service.
  *
  * @author sll@google.com (Sean Lip)
  */
@@ -22,46 +22,46 @@ describe('Learner parameters service', function() {
   beforeEach(module('oppia'));
 
   describe('learner params service', function() {
-    var learnerParamsService = null;
+    var LearnerParamsService = null;
 
     beforeEach(inject(function($injector) {
-      learnerParamsService = $injector.get('learnerParamsService');
+      LearnerParamsService = $injector.get('LearnerParamsService');
     }));
 
     it('should correctly initialize parameters', function() {
-      expect(learnerParamsService.getAllParams()).toEqual({});
-      learnerParamsService.init({
+      expect(LearnerParamsService.getAllParams()).toEqual({});
+      LearnerParamsService.init({
         a: 'b'
       });
-      expect(learnerParamsService.getAllParams()).toEqual({
+      expect(LearnerParamsService.getAllParams()).toEqual({
         a: 'b'
       });
     });
 
     it('should correctly get and set parameters', function() {
-      learnerParamsService.init({
+      LearnerParamsService.init({
         a: 'b'
       });
-      expect(learnerParamsService.getValue('a')).toEqual('b');
-      learnerParamsService.setValue('a', 'c');
-      expect(learnerParamsService.getValue('a')).toEqual('c');
+      expect(LearnerParamsService.getValue('a')).toEqual('b');
+      LearnerParamsService.setValue('a', 'c');
+      expect(LearnerParamsService.getValue('a')).toEqual('c');
     });
 
     it('should not get an invalid parameter', function() {
-      learnerParamsService.init({
+      LearnerParamsService.init({
         a: 'b'
       });
       expect(function() {
-        learnerParamsService.getValue('b');
+        LearnerParamsService.getValue('b');
       }).toThrow(new Error('Invalid parameter name: b'));
     });
 
     it('should not set an invalid parameter', function() {
-      learnerParamsService.init({
+      LearnerParamsService.init({
         a: 'b'
       });
       expect(function() {
-        learnerParamsService.setValue('b', 'c');
+        LearnerParamsService.setValue('b', 'c');
       }).toThrow(new Error('Cannot set unknown parameter: b'));
     });
   });

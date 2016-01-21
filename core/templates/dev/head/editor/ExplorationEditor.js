@@ -209,7 +209,7 @@ oppia.controller('ExplorationEditor', [
         'learner that is divided into several \'cards\'.<br><br>' +
         'The first part of a card is the <b>content</b>. Here, you can set ' +
         'the scene and ask the learner a question.'),
-      placement: 'right'
+      placement: 'bottom'
     }, {
       type: 'function',
       fn: function(isGoingForward) {

@@ -20,6 +20,7 @@ describe('Expression evaluator service', function() {
   beforeEach(inject(function($injector) {
     ees = $injector.get('expressionEvaluatorService');
     eps = $injector.get('expressionParserService');
+    ests = $injector.get('expressionSyntaxTreeService');
   }));
 
   var ENVS = [
@@ -81,7 +82,7 @@ describe('Expression evaluator service', function() {
       };
 
       try {
-        var params = ees.getParamsUsedInExpression(expression);
+        var params = ests.getParamsUsedInExpression(expression);
         if (!angular.equals(params, expectedParams)) {
           recordFailure(params, undefined);
         }
@@ -114,10 +115,10 @@ describe('Expression evaluator service', function() {
       ['abs(-3)', 3],
       ['pow(num100_001, numZero)', 1],
       ['log(9, 3)', 2],
-      ['numZero + numOne', ees.ExprUndefinedVarError],
-      [['+', 10, 20, 30], ees.ExprWrongNumArgsError],
-      [['==', true], ees.ExprWrongNumArgsError],
-      [['+', 'abc', 1], ees.ExprWrongArgTypeError]
+      ['numZero + numOne', ests.ExprUndefinedVarError],
+      [['+', 10, 20, 30], ests.ExprWrongNumArgsError],
+      [['==', true], ests.ExprWrongNumArgsError],
+      [['+', 'abc', 1], ests.ExprWrongArgTypeError]
     ].forEach(function(test) {
       var expression = test[0];
       var expected = test[1];
@@ -147,7 +148,7 @@ describe('Expression evaluator service', function() {
       };
 
       try {
-        var evaled = ees.evaluateParseTree(parsed, ENVS);
+        var evaled = ests.applyFunctionToParseTree(parsed, ENVS, ees.evaluate);
         if (expected instanceof Error || evaled !== expected) {
           recordFailure(evaled, undefined);
         }

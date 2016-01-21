@@ -64,6 +64,11 @@ oppia.constant('DEFAULT_FUZZY_RULE', {
   }
 });
 
+oppia.constant('PARAMETER_TYPES', {
+  REAL: 'Real',
+  UNICODE_STRING: 'UnicodeString'
+});
+
 oppia.constant('INTERACTION_DISPLAY_MODE_INLINE', 'inline');
 
 oppia.constant('OBJECT_EDITOR_URL_PREFIX', '/object_editor_template/');

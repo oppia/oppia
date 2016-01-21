@@ -96,6 +96,8 @@ describe('rich-text components', function() {
       'chrome-extension://eojlgccfgnjlphjnlopmadngcgmmdgpk/' +
         'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED',
       'chrome-extension://fjhoaacokmgbjemoflkofnenfaiekifl/' +
+        'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED',
+      'chrome-extension://pkedcjkdefgpdelpbcmbmeomcjbeemfm/' +
         'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED'
     ]);
   });
