@@ -1660,3 +1660,45 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         self.assertEqual(
             collection_summary.contributor_ids,
             [albert_id, bob_id])
+
+    def _check_contributors_summary(self, collection_id, expected):
+        contributors_summary = collection_services.get_collection_summary_by_id(
+            collection_id).contributors_summary
+        self.assertEqual(expected, contributors_summary)
+
+    def test_contributor_summary(self):
+        albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.signup(self.BOB_EMAIL, self.BOB_NAME)
+
+        # Have Albert create a new collection. Version 1
+        self.save_new_valid_collection(self.COLLECTION_ID, albert_id)
+        self._check_contributors_summary(self.COLLECTION_ID, {albert_id: 1})
+        changelist_cmds = [{
+            'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+            'property_name': 'title',
+            'new_value': 'Collection Bob title'
+        }]
+         # Have Bob update that collection. Version 2
+        collection_services.update_collection(
+            bob_id, self.COLLECTION_ID, changelist_cmds, 'Changed title.')
+        self._check_contributors_summary(self.COLLECTION_ID,
+                                         {albert_id: 1, bob_id: 1})
+        # Have Bob update that collection. Version 3
+        collection_services.update_collection(
+            bob_id, self.COLLECTION_ID, changelist_cmds, 'Changed title.')
+        self._check_contributors_summary(self.COLLECTION_ID,
+                                         {albert_id: 1, bob_id: 2})
+
+        # Have Albert update that collection. Version 4
+        collection_services.update_collection(
+            albert_id, self.COLLECTION_ID, changelist_cmds, 'Changed title.')
+        self._check_contributors_summary(self.COLLECTION_ID,
+                                         {albert_id: 2, bob_id: 2})
+
+        # TODO(madiyar): uncomment after revert_collection implementation
+        # Have Albert revert to version 3. Version 5
+        # collection_services.revert_collection(albert_id, self.COLLECTION_ID, 4, 3)
+        # self._check_contributors_summary(self.COLLECTION_ID,
+        #                                 {albert_id: 1, bob_id: 2})

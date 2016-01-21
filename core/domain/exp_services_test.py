@@ -2084,7 +2084,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
             exp_id).contributors_summary
         self.assertEqual(expected, contributors_summary)
 
-    def test_compute_exploration_contributor_summary(self):
+    def test_contributors_summary(self):
         albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
