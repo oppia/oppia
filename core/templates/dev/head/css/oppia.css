@@ -1195,9 +1195,32 @@ pre.oppia-pre-wrapped-text {
   border-radius: 4px;
 }
 
+.oppia-editable-section:hover pre {
+	background-color: inherit;
+}
+
+.oppia-editable-section:hover oppia-noninteractive-link,
+.oppia-editable-section:hover oppia-noninteractive-video,
+.oppia-editable-section:hover oppia-noninteractive-tabs {
+	pointer-events: none;
+	cursor: pointer;
+}
+
+.oppia-editable-section:hover oppia-noninteractive-tabs li.active a {
+	background-color: inherit;
+	-webkit-transition : all 200ms;
+	transition: all 200ms;
+}
+
 .oppia-editable-section:hover .oppia-interaction-preview {
   background: rgba(5, 140, 166, 0.5);
   border-radius: 4px;
+}
+
+.oppia-editable-section:hover oppia-noninteractive-image img {
+    opacity: 0.7;
+    -webkit-transition : all 200ms;
+    transition: all 200ms;
 }
 
 .oppia-interaction-preview {
