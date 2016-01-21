@@ -82,6 +82,7 @@
               <g class="node protractor-test-node" ng-repeat="node in nodeList">
                 <rect rx="2" ry="2" ng-attr-height="<[node.height]>" ng-attr-width="<[node.width]>"
                       class="protractor-test-node-background <[node.nodeClass]>"
+                      id="<[node.nodeClass]>"
                       ng-attr-x="<[node.x0]>" ng-attr-y="<[node.y0]>"
                       ng-class="{'clickable': canNavigateToNode(node.id)}"
                       ng-attr-style="<[node.style]>"
