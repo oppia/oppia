@@ -105,6 +105,7 @@ describe('Datetime Formatter', function() {
         return new OldDate(NOW_MILLIS);
       });
     }));
+
     it('should correctly indicate recency', function() {
       // 1 second ago is recent.
       expect(df.isRecent(NOW_MILLIS - 1)).toBe(true);
