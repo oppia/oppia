@@ -8,6 +8,9 @@
 
 
 Vagrant.configure(2) do |config|
+    config.vm.provider "virtualbox" do |v|
+      v.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/v-root", "1"]
+    end
   config.vm.provision "shell", inline: 'echo "export VAGRANT=true" >> ~/.profile'
   config.vm.provision "shell", inline: 'apt-get install -y unzip python-pip build-essential gfortran libatlas-base-dev python-dev && pip install -U pip'
   config.vm.network "forwarded_port", guest: 8181, host: 8181
