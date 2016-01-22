@@ -508,6 +508,7 @@ oppia.controller('LearnerLocalNav', [
           oppiaPlayerService) {
           var stateName = playerPositionService.getCurrentStateName();
           $scope.initContent = oppiaPlayerService.getStateContentHtml(stateName);
+          $scope.description = '';
           $scope.suggestionContent = $scope.initContent;
           $scope.showEditor = false;
           // Rte initially displays content unrendered for a split second
@@ -525,6 +526,7 @@ oppia.controller('LearnerLocalNav', [
                 id: oppiaPlayerService.getExplorationId(),
                 version: oppiaPlayerService.getExplorationVersion(),
                 stateName: stateName,
+                description: $scope.description,
                 suggestionContent: $scope.suggestionContent
               }
             });
@@ -534,6 +536,7 @@ oppia.controller('LearnerLocalNav', [
       $http.post('/suggestionhandler/' + result.data.id, {
         exploration_version: result.data.version,
         state_name: result.data.stateName,
+        description: result.data.description,
         suggestion_content: {
           type: 'text',
           value: result.data.suggestionContent

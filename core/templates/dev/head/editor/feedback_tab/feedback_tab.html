@@ -47,7 +47,8 @@
             </span>
           </button>
         </span>
-        <span style="font-size: larger">Feedback Thread: <[activeThread.subject]></span>
+        <span style="font-size: larger" ng-show="!activeThread.suggestion">Feedback Thread: <[activeThread.subject]></span>
+        <span style="font-size: larger" ng-show="activeThread.suggestion">Suggestion Thread: <[activeThread.subject]></span>
       </div>
 
       <div style="float: right;" class="col-lg-2 col-md-2 col-sm-2">
@@ -186,7 +187,7 @@
       </div>
     </section>
     <div style="margin-top: 20px; margin-left: 10px;" ng-show="canAccept">
-      Commit Message (required if accepting):
+      Brief Description of Changes (required if accepting):
       <input type="text" ng-model="commitMessage" style="width: 100%">
     </div>
   </div>

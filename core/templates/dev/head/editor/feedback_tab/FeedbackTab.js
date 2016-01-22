@@ -131,6 +131,9 @@ oppia.controller('FeedbackTab', [
           suggestionStatus: function() {
             return $scope.activeThread.status;
           },
+          description: function() {
+            return $scope.activeThread.suggestion.description;
+          },
           oldContent: function() {
             var stateName = $scope.activeThread.suggestion.state_name;
             return explorationData.data.states[stateName].content[0].value;
@@ -141,12 +144,12 @@ oppia.controller('FeedbackTab', [
         },
         controller: [
           '$scope', '$modalInstance', 'suggestionIsOpen', 'suggestionIsValid',
-          'unsavedChangesExist', 'suggestionStatus', 'oldContent', 'newContent',
-          'editabilityService',
+          'unsavedChangesExist', 'suggestionStatus', 'description',
+          'oldContent', 'newContent', 'editabilityService',
           function(
             $scope, $modalInstance, suggestionIsOpen, suggestionIsValid,
-            unsavedChangesExist, suggestionStatus, oldContent, newContent,
-            editabilityService) {
+            unsavedChangesExist, suggestionStatus, description,
+            oldContent, newContent, editabilityService) {
             var SUGGESTION_ACCEPTED_MSG = 'This suggestion has already been ' +
               'accepted.';
             var SUGGESTION_REJECTED_MSG = 'This suggestion has already been ' +
@@ -177,7 +180,7 @@ oppia.controller('FeedbackTab', [
 
             $scope.oldContent = oldContent;
             $scope.newContent = newContent;
-            $scope.commitMessage = '';
+            $scope.commitMessage = description;
 
             $scope.acceptSuggestion = function() {
               $modalInstance.close({

@@ -76,12 +76,13 @@
     <div class="modal-body">
       <text-angular-rte ng-show="showEditor" html-content="suggestionContent"></text-angular-rte>
       <br>
-      <p>Press 'Submit' to send your changes to the exploration author for review.</p>
+      Briefly describe your changes (required):
+      <input type="text" ng-model="description" style="width: 100%">
     </div>
 
     <div class="modal-footer">
       <button class="btn btn-default" ng-click="cancelSuggestion()">Cancel</button>
-      <button class="btn btn-success" ng-click="submitSuggestion()" ng-disabled="initContent == suggestionContent">
+      <button class="btn btn-success" ng-click="submitSuggestion()" ng-disabled="(initContent == suggestionContent) || !description">
         Submit Suggestion
       </button>
     </div>

@@ -200,17 +200,17 @@ def get_thread_analytics(exploration_id):
 
 
 def create_suggestion(exploration_id, author_id, exploration_version,
-                      state_name, suggestion_content):
+                      state_name, description, suggestion_content):
     """Creates a new SuggestionModel object and the corresponding
     FeedbackThreadModel object."""
 
     thread_id = _create_models_for_thread_and_first_message(
         exploration_id, state_name, author_id, 
-        DEFAULT_SUGGESTION_THREAD_SUBJECT, 
+        description,
         DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE, True)
     feedback_models.SuggestionModel.create(
         exploration_id, thread_id, author_id, exploration_version, state_name,
-        suggestion_content)
+        description, suggestion_content)
 
 
 def _get_suggestion_dict_from_model_instance(suggestion):
@@ -222,6 +222,7 @@ def _get_suggestion_dict_from_model_instance(suggestion):
         'exploration_id': suggestion.exploration_id,
         'exploration_version': suggestion.exploration_version,
         'state_name': suggestion.state_name,
+        'description': suggestion.description,
         'state_content': suggestion.state_content}
 
 
