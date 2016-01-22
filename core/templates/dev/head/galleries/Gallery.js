@@ -188,6 +188,11 @@ oppia.controller('Gallery', [
       GALLERY_DATA_URL, CATEGORY_LIST, searchService, selectionDataService) {
     $rootScope.loadingMessage = 'Loading';
 
+    // Below is the width of each tile (width + margins), which can be found
+    // in core/templates/dev/head/components/
+    //         exploration_summary_tile_directive.html
+    var TILE_DISPLAY_WIDTH = 208;
+
     // Keeps track of the index of the left-most visible card of each group.
     $scope.leftmostCardIndices = [];
 
@@ -205,9 +210,14 @@ oppia.controller('Gallery', [
 
       $rootScope.loadingMessage = '';
 
+      // Pause is necessary to ensure all elements have loaded, same for
+      // initCarousels
+      $timeout(function() {
+        TILE_DISPLAY_WIDTH = $('exploration-summary-tile').width();
+      }, 20);
+
       // The following initializes the gallery carousel(s).
-      // Pause is necessary to ensure all elements have loaded.
-      $timeout(initCarousels, 500);
+      $timeout(initCarousels, 300);
 
       // The following initializes the tracker to have all
       // elements flush left.
@@ -217,8 +227,6 @@ oppia.controller('Gallery', [
       }
     });
 
-    // Below is the width of each tile.
-    var TILE_DISPLAY_WIDTH = 208;
     // If the value below is changed, the following CSS values in oppia.css
     // must be changed:
     // - .oppia-gallery-tiles-carousel: max-width
