@@ -135,8 +135,9 @@ oppia.controller('FeedbackTab', [
             return $scope.activeThread.suggestion.description;
           },
           oldContent: function() {
-            var stateName = $scope.activeThread.suggestion.state_name;
-            return explorationData.data.states[stateName].content[0].value;
+            var state = explorationData.data.states[
+              $scope.activeThread.suggestion.state_name];
+            return state !== undefined ? state.content[0].value : null;
           },
           newContent: function() {
             return $scope.activeThread.suggestion.state_content.value;
@@ -178,7 +179,9 @@ oppia.controller('FeedbackTab', [
               $scope.errorMessage = '';
             }
 
-            $scope.oldContent = oldContent;
+            $scope.oldContent = (
+              oldContent || '<span style="color:red">Oops! This state no ' +
+                'longer exists.</span>');
             $scope.newContent = newContent;
             $scope.commitMessage = description;
 
