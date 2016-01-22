@@ -215,6 +215,9 @@ oppia.controller('FeedbackTab', [
               state.content[0].value = suggestion.state_content.value;
               explorationData.data.version += 1;
               explorationStatesService.setState(stateName, state);
+              $rootScope.$broadcast('refreshVersionHistory', {
+                forceRefresh: true
+              });
               $rootScope.$broadcast('refreshStateEditor');
             }
           }, function() {

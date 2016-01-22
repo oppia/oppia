@@ -96,7 +96,6 @@ oppia.factory('threadDataService', [
       for (var i = 0; i < combined.length; i++) {
         if (combined[i].thread_id === threadId) {
           thread = combined[i];
-          thread.status = newStatus;
           break;
         }
       }
@@ -105,6 +104,7 @@ oppia.factory('threadDataService', [
       var updatedStatus = null;
       if (newStatus !== thread.status) {
         updatedStatus = newStatus;
+        thread.status = newStatus;
       }
 
       var payload = {

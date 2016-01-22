@@ -1491,14 +1491,12 @@ def accept_suggestion(editor_id, thread_id, exploration_id, commit_message):
         suggestion = feedback_services.get_suggestion(
             exploration_id, thread_id)
         suggestion_author_username = suggestion['author_name']
-        full_commit_message = ('%s: %s' % (
-            suggestion_author_username, commit_message))
         change_list = _create_change_list_from_suggestion(suggestion)
         suggestion_author_id = user_services.get_user_id_from_username(
             suggestion_author_username)
         update_exploration(
              suggestion_author_id, exploration_id, change_list,
-             full_commit_message)
+             commit_message)
         feedback_services.create_message(
             exploration_id, thread_id, editor_id,
             feedback_models.STATUS_CHOICES_FIXED, None,
