@@ -98,12 +98,8 @@ oppia.factory('explorationContextService', [
       // Following variable helps to know whether exploration editor is
       // in main editing mode or preview mode.
       isInExplorationEditorMode: function() {
-        if (this.getPageContext() === PAGE_CONTEXT.EDITOR &&
-            this.getEditorTabContext() === EDITOR_TAB_CONTEXT.EDITOR) {
-          return true;
-        } else {
-          return false;
-        }
+        return (this.getPageContext() === PAGE_CONTEXT.EDITOR &&
+            this.getEditorTabContext() === EDITOR_TAB_CONTEXT.EDITOR);
       }
     };
   }
