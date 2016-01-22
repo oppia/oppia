@@ -147,7 +147,7 @@ oppia.controller('CollectionEditor', ['$scope', 'CollectionBackendApiService',
     return false;
   };
 
-  //TODO(mgowano): Set all values for the 'exploration' key in newNode
+  // TODO(mgowano): Set all values for the 'exploration' key in newNode
   $scope.addCollectionNode = function(expId) {
     if (expId) {
       if (!_getCollectionNodeForExplorationId(expId)) {
@@ -163,7 +163,7 @@ oppia.controller('CollectionEditor', ['$scope', 'CollectionBackendApiService',
         return true;
       } else {
         warningsData.addWarning(
-          'exploration with id ' + expId + ' is already added');
+          'Exploration with id ' + expId + ' is already added');
       }
     }
     return false;

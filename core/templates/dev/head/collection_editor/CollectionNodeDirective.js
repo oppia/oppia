@@ -43,8 +43,8 @@ oppia.directive('collectionNodeDirective', [function() {
       // skill on the frontend and then uses CollectionUpdateService to update
       // a changelist that will update the backend.
       $scope.addNewPrerequisiteSkill = function(newSkill) {
-        if ($scope.addPrerequisiteSkill(
-          {skillName: newSkill, expId: $scope.getExplorationId()})) {
+        var skillToAdd = {skillName: newSkill, expId: $scope.getExplorationId()};
+        if ($scope.addPrerequisiteSkill(skillToAdd)) {
           var change = CollectionUpdateService.buildPrerequisiteSkillsUpdate(
             $scope.getExplorationId(), $scope.getPrerequisiteSkills());
           $scope.addChange({change: change});
@@ -55,8 +55,8 @@ oppia.directive('collectionNodeDirective', [function() {
       // skill on the frontend and then uses CollectionUpdateService to update a
       // changelist that will update the backend.
       $scope.removePrerequisiteSkill = function(index) {
-        if ($scope.deletePrerequisiteSkill({skillIdx: index,
-          expId: $scope.getExplorationId()})) {
+        var skillToRemove = {skillIdx: index, expId: $scope.getExplorationId()};
+        if ($scope.deletePrerequisiteSkill(skillToRemove)) {
           var change = CollectionUpdateService.buildPrerequisiteSkillsUpdate(
             $scope.getExplorationId(), $scope.getPrerequisiteSkills());
           $scope.addChange({change: change});
@@ -67,8 +67,8 @@ oppia.directive('collectionNodeDirective', [function() {
       // on the frontend and then uses CollectionUpdateService to update a
       // changelist that will update the backend.
       $scope.addNewAcquiredSkill = function(newSkill) {
-        if ($scope.addAcquiredSkill({skillName: newSkill,
-          expId: $scope.getExplorationId()})) {
+        var skillToAdd = {skillName: newSkill, expId: $scope.getExplorationId()};
+        if ($scope.addAcquiredSkill(skillToAdd)) {
           var change = CollectionUpdateService.buildAcquiredSkillsUpdate(
             $scope.getExplorationId(), $scope.getAcquiredSkills());
           $scope.addChange({change: change});
@@ -79,13 +79,13 @@ oppia.directive('collectionNodeDirective', [function() {
       // on the frontend and then uses CollectionUpdateService to update a
       // changelist that will update the backend.
       $scope.removeAcquiredSkill = function(index) {
-        if ($scope.deleteAcquiredSkill({skillIdx: index,
-          expId: $scope.getExplorationId()})) {
+        var skillToRemove = {skillIdx: index, expId: $scope.getExplorationId()};
+        if ($scope.deleteAcquiredSkill(skillToRemove)) {
           var change = CollectionUpdateService.buildAcquiredSkillsUpdate(
             $scope.getExplorationId(), $scope.getAcquiredSkills());
           $scope.addChange({change: change});
         }
-      }
+      };
 
       // Uses deleteExploration callback function to delete an exploration
       // on the frontend and then uses CollectionUpdateService to update a

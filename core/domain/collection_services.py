@@ -276,7 +276,6 @@ def get_learner_collection_dict_by_id(
         completed_exploration_ids)
     collection_dict['version'] = collection.version
 
-    logging.info("*************************************************")
 
     # Insert an 'exploration' dict into each collection node, where the
     # dict includes meta information about the exploration (ID and title).
@@ -292,14 +291,11 @@ def get_learner_collection_dict_by_id(
                 summary.exploration_model_last_updated
             ) if summary else None,
             'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
-                summary.category) if summary else
-                utils.get_thumbnail_icon_url_for_category(None),
+                summary.category),
             'thumbnail_bg_color': utils.get_hex_color_for_category(
-                summary.category) if summary else
-                utils.get_hex_color_for_category(None),
+                summary.category),
         }
 
-    logging.info("+++++++++++++++++++++++++++++++++++++++++++++++++++++")
     return collection_dict
 
 
