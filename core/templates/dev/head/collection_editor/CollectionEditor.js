@@ -54,22 +54,6 @@ oppia.controller('CollectionEditor', ['$scope', 'CollectionBackendApiService',
         error || 'There was an error loading the collection.');
   });
 
-  var _getCollectionNodeForExplorationId = function(explorationId) {
-    for (var i = 0; i < $scope.collection.nodes.length; i++) {
-      var collectionNode = $scope.collection.nodes[i];
-      if (collectionNode.exploration_id == explorationId) {
-        return collectionNode;
-      }
-    }
-    return null;
-  };
-
-  // EXAMPLES DEMONSTRATING HOW TO CHANGE THE COLLECTION. THE FOLLOWING CODE
-  // SHOULD NOT GO INTO DEVELOP.
-
-  // Stores a pending list of changes.
-  $scope.changeList = [];
-
   var _arrayContainsCaseInsensitive = function(array, element) {
     var lowerElement = element.toLowerCase();
     for (var i = 0; i < array.length; i++) {
@@ -80,70 +64,133 @@ oppia.controller('CollectionEditor', ['$scope', 'CollectionBackendApiService',
     return false;
   };
 
-  $scope.addExploration = function(newExpId) {
-    if (newExpId) {
-      var change = CollectionUpdateService.buildAddCollectionNodeUpdate(
-        newExpId);
-      $scope.changeList.push(change);
+  var _getCollectionNodeForExplorationId = function(explorationId) {
+    for (var i = 0; i < $scope.collection.nodes.length; i++) {
+      var collectionNode = $scope.collection.nodes[i];
+      if (collectionNode.exploration_id == explorationId) {
+        return collectionNode;
+      }
     }
+    return null;
   };
 
-  $scope.deleteExploration = function(removeExpId) {
-    if (removeExpId) {
-      var change = CollectionUpdateService.buildDeleteCollectionNodeUpdate(
-        removeExpId);
-      $scope.changeList.push(change);
-    }
+  // Stores a pending list of changes.
+  $scope.changeList = [];
+
+  $scope.addChange = function(change) {
+    $scope.changeList.push(change);
   };
 
-  $scope.setCollectionTitle = function(newCollectionTitle) {
-    if (newCollectionTitle) {
-      var change = CollectionUpdateService.buildCollectionTitleUpdate(
-        newCollectionTitle);
-      $scope.changeList.push(change);
-    }
-  };
-
-  $scope.setCollectionCategory = function(newCollectionCategory) {
-    if (newCollectionCategory) {
-      var change = CollectionUpdateService.buildCollectionCategoryUpdate(
-        newCollectionCategory);
-      $scope.changeList.push(change);
-    }
-  };
-
-  $scope.setCollectionObjective = function(newCollectionObjective) {
-    if (newCollectionObjective) {
-      var change = CollectionUpdateService.buildCollectionObjectiveUpdate(
-        newCollectionObjective);
-      $scope.changeList.push(change);
-    }
-  };
-
-  $scope.addPrereqSkill = function(expId, skillName) {
-    if (expId && skillName) {
+  // TODO(mgowano): Handle a case where adding a pre-requisite skill
+  // will result into having all exploration requiring pre-requisite
+  // skills. At the moment this is only handled when a change is committed
+  // to the backend.
+  $scope.addPrerequisiteSkill = function(skillName, expId) {
+    if (skillName && expId) {
       var collectionNode = _getCollectionNodeForExplorationId(expId);
-      var prerequisiteSkills = angular.copy(collectionNode.prerequisite_skills);
+      var prerequisiteSkills = collectionNode.prerequisite_skills;
       if (!_arrayContainsCaseInsensitive(prerequisiteSkills, skillName)) {
         prerequisiteSkills.push(skillName);
-        var change = CollectionUpdateService.buildPrerequisiteSkillsUpdate(
-          expId, prerequisiteSkills);
-        $scope.changeList.push(change);
+        return true;
       }
     }
+    return false;
   };
 
-  $scope.addAcquiredSkill = function(expId, skillName) {
+  // TODO(mgowano): Handle cases where deleting a pre-requisite skill results
+  // to unreachable explorations.
+  $scope.deletePrerequisiteSkill = function(skillIdx, expId) {
+    if (skillIdx) {
+      var collectionNode = _getCollectionNodeForExplorationId(expId);
+      collectionNode.prerequisite_skills.splice(skillIdx, 1);
+      return true;
+    }
+    return false;
+  };
+
+  $scope.addAcquiredSkill = function(skillName, expId) {
     if (expId && skillName) {
       var collectionNode = _getCollectionNodeForExplorationId(expId);
-      var acquiredSkills = angular.copy(collectionNode.acquired_skills);
+      var acquiredSkills = collectionNode.acquired_skills;
       if (!_arrayContainsCaseInsensitive(acquiredSkills, skillName)) {
         acquiredSkills.push(skillName);
-        var change = CollectionUpdateService.buildAcquiredSkillsUpdate(
-          expId, acquiredSkills);
-        $scope.changeList.push(change);
+        return true;
       }
     }
+    return false;
+  };
+
+  // TODO(mgowano): Handle cases where deleting an acquired skill results
+  // to unreachable explorations.
+  $scope.deleteAcquiredSkill = function(skillIdx, expId) {
+    if (expId) {
+      var collectionNode = _getCollectionNodeForExplorationId(expId);
+      collectionNode.acquired_skills.splice(skillIdx, 1);
+      return true;
+    }
+    return false;
+  };
+
+  // TODO(mgowano): Handle a case where deleting an exploration will
+  // result into unreachable exploration. At the moment this is only
+  // handled when a change is committed to the backend.
+  $scope.deleteCollectionNode = function(expId) {
+    if (expId) {
+      for (var i = 0; i < $scope.collection.nodes.length; i++) {
+        var collectionNode = $scope.collection.nodes[i];
+        if (collectionNode.exploration_id == expId) {
+          $scope.collection.nodes.splice(i, 1);
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+
+  // TODO(mgowano): Set all values for the 'exploration' key in newNode
+  $scope.addCollectionNode = function(expId) {
+    if (expId) {
+      if (!_getCollectionNodeForExplorationId(expId)) {
+        var newNode = {
+          exploration_id: expId,
+          acquired_skills: [],
+          prerequisite_skills: [],
+          exploration: {
+            id: expId
+          }
+        }
+        $scope.collection.nodes.push(newNode);
+        return true;
+      } else {
+        warningsData.addWarning(
+          'Exploration with id ' + expId + ' is already added');
+      }
+    }
+    return false;
+  };
+
+  $scope.setCollectionTitle = function(newTitle) {
+    if (newTitle) {
+      $scope.collection.title = newTitle;
+      return true;
+    }
+    return false;
+  };
+
+  $scope.setCollectionObjective = function(newObjective) {
+    if (newObjective) {
+      $scope.collection.objective = newObjective;
+      return true;
+    }
+    return false;
+  };
+
+  $scope.setCollectionCategory = function(newCategory) {
+    if (newCategory) {
+      $scope.collection.category = newCategory;
+      return true;
+    }
+    return false;
   };
 
   // An explicit save is needed to push all changes to the backend at once
@@ -160,6 +207,4 @@ oppia.controller('CollectionEditor', ['$scope', 'CollectionBackendApiService',
           error || 'There was an error updating the collection.');
       });
   };
-
-  // END OF EXAMPLE CODE DEMONSTRATING HOW TO CHANGE THE COLLECTION.
 }]);

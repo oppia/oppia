@@ -276,6 +276,7 @@ def get_learner_collection_dict_by_id(
         completed_exploration_ids)
     collection_dict['version'] = collection.version
 
+
     # Insert an 'exploration' dict into each collection node, where the
     # dict includes meta information about the exploration (ID and title).
     for collection_node in collection_dict['nodes']:
