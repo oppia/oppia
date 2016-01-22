@@ -1966,8 +1966,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
     def test_get_search_rank(self):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
 
-        # The search rank has a 'last updated' bonus of 80.
-        base_search_rank = 20 + 80
+        base_search_rank = 20
 
         self.assertEqual(
             exp_services._get_search_rank(self.EXP_ID), base_search_rank)
@@ -1990,8 +1989,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
     def test_search_ranks_cannot_be_negative(self):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
 
-        # The search rank has a 'last updated' bonus of 80.
-        base_search_rank = 20 + 80
+        base_search_rank = 20
 
         self.assertEqual(
             exp_services._get_search_rank(self.EXP_ID), base_search_rank)

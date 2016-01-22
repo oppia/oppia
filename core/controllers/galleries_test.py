@@ -54,7 +54,6 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'explorations_list': [],
             'search_cursor': None,
             'profile_picture_data_url': None,
-            'preferred_language_codes': [feconf.DEFAULT_LANGUAGE_CODE],
         }, response_dict)
 
         # Load a public demo exploration.
@@ -126,7 +125,6 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'username': self.ADMIN_USERNAME,
             'search_cursor': None,
             'profile_picture_data_url': None,
-            'preferred_language_codes': [feconf.DEFAULT_LANGUAGE_CODE],
         }, response_dict)
 
         # Create exploration A
@@ -212,14 +210,14 @@ class GalleryPageTest(test_utils.GenericTestBase):
 
         response = self.testapp.get(feconf.GALLERY_URL)
         self.assertEqual(response.status_int, 200)
-        response.mustcontain(no=['Upload Exploration'])
+        response.mustcontain(no=['ng-click="showUploadExplorationModal'])
 
         config_services.set_property(
             feconf.SYSTEM_COMMITTER_ID, 'allow_yaml_file_upload', True)
 
         response = self.testapp.get(feconf.GALLERY_URL)
         self.assertEqual(response.status_int, 200)
-        response.mustcontain('Upload Exploration')
+        response.mustcontain('ng-click="showUploadExplorationModal')
 
         self.logout()
 
