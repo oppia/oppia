@@ -191,7 +191,7 @@ oppia.controller('Gallery', [
     // Below is the width of each tile (width + margins), which can be found
     // in core/templates/dev/head/components/
     //         exploration_summary_tile_directive.html
-    var TILE_DISPLAY_WIDTH = 208;
+    var tileDisplayWidth = null;
 
     // Keeps track of the index of the left-most visible card of each group.
     $scope.leftmostCardIndices = [];
@@ -213,11 +213,11 @@ oppia.controller('Gallery', [
       // Pause is necessary to ensure all elements have loaded, same for
       // initCarousels
       $timeout(function() {
-        TILE_DISPLAY_WIDTH = $('exploration-summary-tile').width();
+        tileDisplayWidth = $('exploration-summary-tile').width();
       }, 20);
 
       // The following initializes the gallery carousel(s).
-      $timeout(initCarousels, 300);
+      $timeout(initCarousels, 390);
 
       // The following initializes the tracker to have all
       // elements flush left.
@@ -237,10 +237,10 @@ oppia.controller('Gallery', [
     var initCarousels = function() {
       var windowWidth = $(window).width() * 0.85;
       $scope.tileDisplayCount = Math.min(
-        Math.floor(windowWidth / TILE_DISPLAY_WIDTH), MAX_NUM_TILES_PER_ROW);
+        Math.floor(windowWidth / tileDisplayWidth), MAX_NUM_TILES_PER_ROW);
 
       $('.oppia-gallery-tiles-carousel').css({
-        width: ($scope.tileDisplayCount * TILE_DISPLAY_WIDTH) + 'px'
+        width: ($scope.tileDisplayCount * tileDisplayWidth) + 'px'
       });
 
       // The following determines whether to enable left scroll after resize.
@@ -248,7 +248,7 @@ oppia.controller('Gallery', [
         var carouselJQuerySelector = '.oppia-gallery-tiles:eq(n)'.replace(
           'n', i);
         var carouselScrollPositionPx = $(carouselJQuerySelector).scrollLeft();
-        var index = Math.ceil(carouselScrollPositionPx / TILE_DISPLAY_WIDTH);
+        var index = Math.ceil(carouselScrollPositionPx / tileDisplayWidth);
         $scope.leftmostCardIndices[i] = index;
       }
     };
@@ -284,7 +284,7 @@ oppia.controller('Gallery', [
       }
 
       var newScrollPositionPx = carouselScrollPositionPx +
-        ($scope.tileDisplayCount * TILE_DISPLAY_WIDTH * direction);
+        ($scope.tileDisplayCount * tileDisplayWidth * direction);
       $(carouselJQuerySelector).animate({
         scrollLeft: newScrollPositionPx
       }, {
