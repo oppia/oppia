@@ -104,6 +104,10 @@ body {
   width: 100%;
 }
 
+exploration-summary-tile {
+  display: inline-block;
+}
+
 .oppia-profile-container, .oppia-dashboard-container {
   max-width: 800px;
   margin-left: auto;

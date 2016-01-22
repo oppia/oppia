@@ -218,7 +218,7 @@ oppia.controller('Gallery', [
     });
 
     // Below is the width of each tile.
-    var TILE_DISPLAY_WIDTH = 211.953;
+    var TILE_DISPLAY_WIDTH = 208;
     // If the value below is changed, the following CSS values in oppia.css
     // must be changed:
     // - .oppia-gallery-tiles-carousel: max-width
