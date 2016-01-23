@@ -159,7 +159,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
 
         # The viewer and editor are now both subscribed to the thread.
         self.assertEqual(
-            self._get_thread_ids_subscribed_to(self.viewer_id), 
+            self._get_thread_ids_subscribed_to(self.viewer_id),
             [full_thread_id])
         self.assertEqual(
             self._get_thread_ids_subscribed_to(self.editor_id),

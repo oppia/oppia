@@ -220,8 +220,8 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             thread_id = feedback_services.get_thread_id_from_full_thread_id(
                 full_thread_id)
             feedback_services.create_message(
-                 self.EXP_ID_1, thread_id, self.user_c_id, None, None,
-                 'more text')
+                self.EXP_ID_1, thread_id, self.user_c_id, None, None,
+                'more text')
 
         self._run_one_off_job()
 

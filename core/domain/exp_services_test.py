@@ -2898,42 +2898,43 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
     COMMIT_MESSAGE = 'commit message'
     EMPTY_COMMIT_MESSAGE = ' '
 
-    def _generate_thread_id(self, exp_id):
+    def _generate_thread_id(self, unused_exp_id):
         return self.THREAD_ID1
 
-    def _return_true(self, thread_id, exploration_id):
+    def _return_true(self, unused_thread_id, unused_exploration_id):
         return True
-        
-    def _return_false(self, thread_id, exploration_id):
+
+    def _return_false(self, unused_thread_id, unused_exploration_id):
         return False
 
     def _check_commit_message(
-        self, user_id, exploration_id, change_list, commit_message):
+            self, unused_user_id, unused_exploration_id, unused_change_list,
+            commit_message):
         self.assertEqual(commit_message, 'Accepted suggestion by %s: %s' % (
             self.USERNAME, self.COMMIT_MESSAGE))
 
     def setUp(self):
         super(SuggestionActionUnitTests, self).setUp()
-        self.USER_ID = self.get_user_id_from_email(self.USER_EMAIL)
-        self.EDITOR_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        user_services.get_or_create_user(self.USER_ID, self.USER_EMAIL)
-        user_services.get_or_create_user(self.EDITOR_ID, self.EDITOR_EMAIL)
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        user_services.get_or_create_user(self.user_id, self.USER_EMAIL)
+        user_services.get_or_create_user(self.editor_id, self.EDITOR_EMAIL)
         self.signup(self.USER_EMAIL, self.USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        with self.swap(feedback_models.FeedbackThreadModel, 
+        with self.swap(feedback_models.FeedbackThreadModel,
                        'generate_new_thread_id', self._generate_thread_id):
             feedback_services.create_suggestion(
-                self.EXP_ID1, self.USER_ID, 3, 'state_name', {'old_content': {}})
+                self.EXP_ID1, self.user_id, 3, 'state_name', {'old_content': {}})
             feedback_services.create_suggestion(
-                self.EXP_ID2, self.USER_ID, 3, 'state_name', {'old_content': {}})           
+                self.EXP_ID2, self.user_id, 3, 'state_name', {'old_content': {}})
 
     def test_accept_suggestion_valid_suggestion(self):
-        with self.swap(exp_services, '_is_suggestion_valid', 
+        with self.swap(exp_services, '_is_suggestion_valid',
                        self._return_true):
             with self.swap(exp_services, 'update_exploration',
                            self._check_commit_message):
                 exp_services.accept_suggestion(
-                    self.EDITOR_ID, self.THREAD_ID1, self.EXP_ID1,
+                    self.editor_id, self.THREAD_ID1, self.EXP_ID1,
                     self.COMMIT_MESSAGE)
         thread = feedback_models.FeedbackThreadModel.get(
             feedback_models.FeedbackThreadModel.generate_full_thread_id(
@@ -2948,23 +2949,24 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
         with self.swap(exp_services, '_is_suggestion_valid',
                        self._return_false):
             with self.assertRaisesRegexp(
-                    Exception,
-                    'Invalid suggestion: The state for which it was made '
-                    'has been removed/renamed.'):
+                Exception,
+                'Invalid suggestion: The state for which it was made '
+                'has been removed/renamed.'
+                ):
                 exp_services.accept_suggestion(
-                     self.EDITOR_ID, self.THREAD_ID1, self.EXP_ID2,
-                     self.COMMIT_MESSAGE)
+                    self.editor_id, self.THREAD_ID1, self.EXP_ID2,
+                    self.COMMIT_MESSAGE)
         thread = feedback_models.FeedbackThreadModel.get(
             feedback_models.FeedbackThreadModel.generate_full_thread_id(
                 self.EXP_ID2, self.THREAD_ID1))
         self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_OPEN)
 
     def test_accept_suggestion_empty_commit_message(self):
-        with self.assertRaisesRegexp(Exception, 
+        with self.assertRaisesRegexp(Exception,
                                      'Commit message cannot be empty.'):
             exp_services.accept_suggestion(
-                     self.EDITOR_ID, self.THREAD_ID1, self.EXP_ID2, 
-                     self.EMPTY_COMMIT_MESSAGE)
+                self.editor_id, self.THREAD_ID1, self.EXP_ID2,
+                self.EMPTY_COMMIT_MESSAGE)
         thread = feedback_models.FeedbackThreadModel.get(
             feedback_models.FeedbackThreadModel.generate_full_thread_id(
                 self.EXP_ID2, self.THREAD_ID1))
@@ -2976,12 +2978,12 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
                        self._return_true):
             with self.assertRaisesRegexp(Exception, exception_message):
                 exp_services.accept_suggestion(
-                     self.EDITOR_ID, self.THREAD_ID1, self.EXP_ID2,
-                     self.COMMIT_MESSAGE)
+                    self.editor_id, self.THREAD_ID1, self.EXP_ID2,
+                    self.COMMIT_MESSAGE)
 
     def test_reject_suggestion(self):
         exp_services.reject_suggestion(
-            self.EDITOR_ID, self.THREAD_ID1, self.EXP_ID2)
+            self.editor_id, self.THREAD_ID1, self.EXP_ID2)
         thread = feedback_models.FeedbackThreadModel.get(
             feedback_models.FeedbackThreadModel.generate_full_thread_id(
                 self.EXP_ID2, self.THREAD_ID1))
@@ -2994,4 +2996,4 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
                        self._return_true):
             with self.assertRaisesRegexp(Exception, exception_message):
                 exp_services.reject_suggestion(
-                    self.EDITOR_ID, self.THREAD_ID1, self.EXP_ID2)
+                    self.editor_id, self.THREAD_ID1, self.EXP_ID2)

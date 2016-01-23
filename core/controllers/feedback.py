@@ -149,8 +149,8 @@ class SuggestionActionHandler(base.BaseHandler):
                 exploration_id,
                 self.payload.get('commit_message'))
         elif action == self._REJECT_ACTION:
-             exp_services.reject_suggestion(
-                 self.user_id, thread_id, exploration_id)
+            exp_services.reject_suggestion(
+                self.user_id, thread_id, exploration_id)
         else:
             raise self.InvalidInputException('Invalid action.')
 
@@ -193,6 +193,6 @@ class SuggestionListHandler(base.BaseHandler):
                 exploration_id, has_suggestion)
         else:
             raise self.InvalidInputException('Invalid list type.')
-         
+
         self.values.update({'threads': threads})
         self.render_json(self.values)

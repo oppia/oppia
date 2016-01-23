@@ -42,7 +42,7 @@ def _get_thread_dict_from_model_instance(thread):
 
 
 def _create_models_for_thread_and_first_message(
-        exploration_id, state_name, original_author_id, subject, text, 
+        exploration_id, state_name, original_author_id, subject, text,
         has_suggestion):
     """Creates a thread and the first message in it.
 
@@ -114,8 +114,9 @@ def create_message(
     from core.domain import event_services
     # Get the thread at the outset, in order to check that the thread_id passed
     # in is valid.
-    full_thread_id = (feedback_models.FeedbackThreadModel
-        .generate_full_thread_id(exploration_id, thread_id))
+    full_thread_id = (
+        feedback_models.FeedbackThreadModel.generate_full_thread_id(
+            exploration_id, thread_id))
     thread = feedback_models.FeedbackThreadModel.get(full_thread_id)
 
     message_id = feedback_models.FeedbackMessageModel.get_message_count(
@@ -203,8 +204,8 @@ def create_suggestion(exploration_id, author_id, exploration_version,
     FeedbackThreadModel object."""
 
     thread_id = _create_models_for_thread_and_first_message(
-        exploration_id, state_name, author_id, 
-        DEFAULT_SUGGESTION_THREAD_SUBJECT, 
+        exploration_id, state_name, author_id,
+        DEFAULT_SUGGESTION_THREAD_SUBJECT,
         DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE, True)
     feedback_models.SuggestionModel.create(
         exploration_id, thread_id, author_id, exploration_version, state_name,
@@ -231,8 +232,8 @@ def get_suggestion(exploration_id, thread_id):
 
 def get_open_threads(exploration_id, has_suggestion):
     """If has_suggestion is True, return a list of all open threads that have a
-    suggestion, otherwise return a list of all open threads that do not have a 
-    suggestion.""" 
+    suggestion, otherwise return a list of all open threads that do not have a
+    suggestion."""
 
     threads = feedback_models.FeedbackThreadModel.get_threads(exploration_id)
     open_threads = []
@@ -253,7 +254,7 @@ def get_closed_threads(exploration_id, has_suggestion):
     threads = feedback_models.FeedbackThreadModel.get_threads(exploration_id)
     closed_threads = []
     for thread in threads:
-        if (thread.has_suggestion == has_suggestion and 
+        if (thread.has_suggestion == has_suggestion and
                 thread.status != feedback_models.STATUS_CHOICES_OPEN):
             closed_threads.append(thread)
     return [
@@ -267,7 +268,7 @@ def get_all_threads(exploration_id, has_suggestion):
     threads = feedback_models.FeedbackThreadModel.get_threads(exploration_id)
     all_threads = []
     for thread in threads:
-        if thread.has_suggestion == has_suggestion: 
+        if thread.has_suggestion == has_suggestion:
             all_threads.append(thread)
     return [
         _get_thread_dict_from_model_instance(t)

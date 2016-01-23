@@ -128,7 +128,7 @@ class FeedbackThreadModel(base_models.BaseModel):
 
         return cls.get_all().filter(
             cls.exploration_id == exploration_id).filter(
-                cls.has_suggestion == True).fetch(feconf.DEFAULT_QUERY_LIMIT)
+                cls.has_suggestion == True).fetch(feconf.DEFAULT_QUERY_LIMIT)  # pylint: disable=singleton-comparison
 
 
 class FeedbackMessageModel(base_models.BaseModel):
@@ -248,9 +248,9 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
 
 class SuggestionModel(base_models.BaseModel):
     """Suggestions made by learners.
-    
-    The id of each instance is the id of the corresponding thread. 
-    """ 
+
+    The id of each instance is the id of the corresponding thread.
+    """
 
     # ID of the user who submitted the suggestion.
     author_id = ndb.StringProperty(required=True, indexed=True)
@@ -286,7 +286,7 @@ class SuggestionModel(base_models.BaseModel):
     @classmethod
     def get_by_exploration_and_thread_id(cls, exploration_id, thread_id):
         """Gets a suggestion by the corresponding exploration and thread id's.
-        
+
         Returns None if it doesn't match anything."""
 
         return cls.get_by_id(cls._get_instance_id(exploration_id, thread_id))

@@ -1413,23 +1413,24 @@ def search_explorations(query, limit, sort=None, cursor=None):
     return search_services.search(
         query, SEARCH_INDEX_EXPLORATIONS, cursor, limit, sort, ids_only=True)
 
-         
-def _is_suggestion_valid(thread_id, exploration_id): 
-    """Check if the suggestion is still valid. A suggestion is considered 
+
+def _is_suggestion_valid(thread_id, exploration_id):
+    """Check if the suggestion is still valid. A suggestion is considered
     invalid if the name of the state that the suggestion was made for has
-    changed since.""" 
- 
+    changed since."""
+
     states = get_exploration_by_id(exploration_id).states
-    suggestion = (feedback_models.SuggestionModel 
-        .get_by_exploration_and_thread_id(exploration_id, thread_id)) 
+    suggestion = (
+        feedback_models.SuggestionModel.get_by_exploration_and_thread_id(
+            exploration_id, thread_id))
     return suggestion.state_name in states
 
 
 def _is_suggestion_handled(thread_id, exploration_id):
     """Checks if the current suggestion has already been accepted/rejected."""
 
-    thread = (feedback_models.FeedbackThreadModel.
-        get_by_exp_and_thread_id(exploration_id, thread_id))
+    thread = feedback_models.FeedbackThreadModel.get_by_exp_and_thread_id(
+        exploration_id, thread_id)
     return (
         thread.status in [
             feedback_models.STATUS_CHOICES_FIXED,
@@ -1438,7 +1439,7 @@ def _is_suggestion_handled(thread_id, exploration_id):
 
 def _create_change_list_from_suggestion(suggestion):
     """Creates a change list from a suggestion object."""
-    
+
     return [{'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
              'state_name': suggestion['state_name'],
              'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -1455,24 +1456,21 @@ def accept_suggestion(editor_id, thread_id, exploration_id, commit_message):
         raise Exception('Suggestion has already been accepted/rejected.')
     elif not _is_suggestion_valid(thread_id, exploration_id):
         raise Exception('Invalid suggestion: The state for which it was made '
-                         'has been removed/renamed.')
+                        'has been removed/renamed.')
     else:
         suggestion = feedback_services.get_suggestion(
             exploration_id, thread_id)
         suggestion_author_username = suggestion['author_name']
-        full_commit_message = ('Accepted suggestion by %s: %s' % ( 
+        full_commit_message = ('Accepted suggestion by %s: %s' % (
             suggestion_author_username, commit_message))
         change_list = _create_change_list_from_suggestion(suggestion)
-        suggestion_author_userid = user_services.get_user_id_from_username(
-            suggestion_author_username)
         update_exploration(
-             suggestion_author_userid, exploration_id, change_list, 
-             full_commit_message)
+            editor_id, exploration_id, change_list, full_commit_message)
         feedback_services.create_message(
-            exploration_id, thread_id, suggestion_author_userid, None, None,
-            'Suggestion accepted.') 
-        thread = (feedback_models.FeedbackThreadModel.
-            get_by_exp_and_thread_id(exploration_id, thread_id))
+            exploration_id, thread_id, editor_id, None, None,
+            'Suggestion accepted.')
+        thread = feedback_models.FeedbackThreadModel.get_by_exp_and_thread_id(
+            exploration_id, thread_id)
         thread.status = feedback_models.STATUS_CHOICES_FIXED
         thread.put()
 
@@ -1483,10 +1481,10 @@ def reject_suggestion(editor_id, thread_id, exploration_id):
     if _is_suggestion_handled(thread_id, exploration_id):
         raise Exception('Suggestion has already been accepted/rejected.')
     else:
-        thread = (feedback_models.FeedbackThreadModel.
-            get_by_exp_and_thread_id(exploration_id, thread_id))
+        thread = feedback_models.FeedbackThreadModel.get_by_exp_and_thread_id(
+            exploration_id, thread_id)
         feedback_services.create_message(
-            exploration_id, thread_id, editor_id, None, None, 
-            'Suggestion rejected.') 
+            exploration_id, thread_id, editor_id, None, None,
+            'Suggestion rejected.')
         thread.status = feedback_models.STATUS_CHOICES_IGNORED
         thread.put()
