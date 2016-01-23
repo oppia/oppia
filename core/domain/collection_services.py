@@ -593,6 +593,7 @@ def get_collection_snapshots_metadata(collection_id):
     return collection_models.CollectionModel.get_snapshots_metadata(
         collection_id, version_nums)
 
+
 def publish_collection_and_update_user_profiles(committer_id, col_id):
     """Publishes the collection with publish_collection() function in
     rights_manager.py, as well as updates first_contribution_msec.
@@ -702,6 +703,7 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
 
     return collection_summary
 
+
 def compute_collection_contributors_summary(collection_id):
     """Returns a dict whose keys are user_ids and whose values are
     the number of (non-revert) commits made to the given collection
@@ -725,6 +727,7 @@ def compute_collection_contributors_summary(collection_id):
         else:
             current_version -= 1
     return contributors_summary
+
 
 def save_collection_summary(collection_summary):
     """Save a collection summary domain object as a CollectionSummaryModel
