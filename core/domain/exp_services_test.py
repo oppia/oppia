@@ -2079,6 +2079,54 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
             self.EXP_ID_1)
         self.assertEqual([albert_id], exploration_summary.contributor_ids)
 
+    def _check_contributors_summary(self, exp_id, expected):
+        contributors_summary = exp_services.get_exploration_summary_by_id(
+            exp_id).contributors_summary
+        self.assertEqual(expected, contributors_summary)
+
+    def test_contributors_summary(self):
+        albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.signup(self.BOB_EMAIL, self.BOB_NAME)
+
+        # Have Albert create a new exploration. Version 1
+        self.save_new_valid_exploration(self.EXP_ID_1, albert_id)
+        self._check_contributors_summary(self.EXP_ID_1, {albert_id: 1})
+
+         # Have Bob update that exploration. Version 2
+        exp_services.update_exploration(
+            bob_id, self.EXP_ID_1, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'Exploration 1 title'
+            }], 'Changed title.')
+        self._check_contributors_summary(self.EXP_ID_1,
+                                         {albert_id: 1, bob_id: 1})
+        # Have Bob update that exploration. Version 3
+        exp_services.update_exploration(
+            bob_id, self.EXP_ID_1, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'Exploration 1 title'
+            }], 'Changed title.')
+        self._check_contributors_summary(self.EXP_ID_1,
+                                         {albert_id: 1, bob_id: 2})
+
+        # Have Albert update that exploration. Version 4
+        exp_services.update_exploration(
+            albert_id, self.EXP_ID_1, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'Exploration 1 title'
+            }], 'Changed title.')
+        self._check_contributors_summary(self.EXP_ID_1,
+                                         {albert_id: 2, bob_id: 2})
+
+        # Have Albert revert to version 3. Version 5
+        exp_services.revert_exploration(albert_id, self.EXP_ID_1, 4, 3)
+        self._check_contributors_summary(self.EXP_ID_1,
+                                         {albert_id: 1, bob_id: 2})
 
 class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
     """Test exploration summaries get_* functions."""
@@ -2166,7 +2214,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 'A category', 'An objective', 'en', [],
                 feconf.get_empty_ratings(),
                 rights_manager.ACTIVITY_STATUS_PUBLIC,
-                False, [self.albert_id], [], [], [self.albert_id],
+                False, [self.albert_id], [], [], [self.albert_id], {self.albert_id: 1},
                 self.EXPECTED_VERSION_2,
                 actual_summaries[self.EXP_ID_2].exploration_model_created_on,
                 actual_summaries[self.EXP_ID_2].exploration_model_last_updated
@@ -2197,7 +2245,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 feconf.get_empty_ratings(),
                 rights_manager.ACTIVITY_STATUS_PRIVATE,
                 False, [self.albert_id], [], [], [self.albert_id, self.bob_id],
-                self.EXPECTED_VERSION_1,
+                {self.albert_id: 1, self.bob_id: 1}, self.EXPECTED_VERSION_1,
                 actual_summaries[self.EXP_ID_1].exploration_model_created_on,
                 actual_summaries[self.EXP_ID_1].exploration_model_last_updated
             ),
@@ -2207,7 +2255,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 feconf.get_empty_ratings(),
                 rights_manager.ACTIVITY_STATUS_PUBLIC,
                 False, [self.albert_id], [], [], [self.albert_id],
-                self.EXPECTED_VERSION_2,
+                {self.albert_id: 1}, self.EXPECTED_VERSION_2,
                 actual_summaries[self.EXP_ID_2].exploration_model_created_on,
                 actual_summaries[self.EXP_ID_2].exploration_model_last_updated
             )

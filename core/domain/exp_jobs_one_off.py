@@ -89,6 +89,29 @@ class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceJobManager):
         exp_summary_model.put()
 
 
+class ExplorationContributorsSummaryOneOffJob(jobs.BaseMapReduceJobManager):
+    """One-off job that computes the number of commits
+    done by contributors for each Exploration
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        summary = exp_services.get_exploration_summary_by_id(item.id)
+        summary.contributor_summary = (
+            exp_services.compute_exploration_contributors_summary(item.id))
+        exp_services.save_exploration_summary(summary)
+
+    @staticmethod
+    def reduce(key, values):
+        pass
+
+
 class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
     """One-off job that finds first published time in milliseconds for all
     explorations.

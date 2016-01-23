@@ -313,6 +313,10 @@ class CollectionSummaryModel(base_models.BaseModel):
     # The user_ids of users who have contributed (humans who have made a
     # positive (not just a revert) change to the collection's content)
     contributor_ids = ndb.StringProperty(indexed=True, repeated=True)
+    # A dict representing the contributors of non-trivial commits to this
+    # collection. Each key of this dict is a user_id, and the corresponding
+    # value is the number of non-trivial commits that the user has made.
+    contributors_summary = ndb.JsonProperty(default={}, indexed=False)
     # The version number of the collection after this commit. Only populated
     # for commits to an collection (as opposed to its rights, etc.)
     version = ndb.IntegerProperty()

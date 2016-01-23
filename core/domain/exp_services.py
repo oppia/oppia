@@ -21,7 +21,7 @@ stored in the database. In particular, the various query methods should
 delegate to the Exploration model class. This will enable the exploration
 storage model to be changed without affecting this module and others above it.
 """
-
+import collections
 import copy
 import datetime
 import logging
@@ -159,8 +159,8 @@ def get_exploration_summary_from_model(exp_summary_model):
         exp_summary_model.ratings, exp_summary_model.status,
         exp_summary_model.community_owned, exp_summary_model.owner_ids,
         exp_summary_model.editor_ids, exp_summary_model.viewer_ids,
-        exp_summary_model.contributor_ids, exp_summary_model.version,
-        exp_summary_model.exploration_model_created_on,
+        exp_summary_model.contributor_ids, exp_summary_model.contributors_summary,
+        exp_summary_model.version, exp_summary_model.exploration_model_created_on,
         exp_summary_model.exploration_model_last_updated
     )
 
@@ -1023,9 +1023,11 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
         old_exp_summary = get_exploration_summary_from_model(exp_summary_model)
         ratings = old_exp_summary.ratings or feconf.get_empty_ratings()
         contributor_ids = old_exp_summary.contributor_ids or []
+        contributors_summary = old_exp_summary.contributors_summary or {}
     else:
         ratings = feconf.get_empty_ratings()
         contributor_ids = []
+        contributors_summary = {}
 
     # Update the contributor id list if necessary (contributors
     # defined as humans who have made a positive (i.e. not just
@@ -1034,6 +1036,17 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
             contributor_id_to_add not in feconf.SYSTEM_USER_IDS):
         if contributor_id_to_add not in contributor_ids:
             contributor_ids.append(contributor_id_to_add)
+
+    if contributor_id_to_add not in feconf.SYSTEM_USER_IDS:
+        if contributor_id_to_add is None:
+            # Revert commit or other non-positive commit
+            contributors_summary = compute_exploration_contributors_summary(
+                exploration.id)
+        else:
+            if contributor_id_to_add in contributors_summary:
+                contributors_summary[contributor_id_to_add] += 1
+            else:
+                contributors_summary[contributor_id_to_add] = 1
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
         _get_last_updated_by_human_ms(exploration.id) / 1000.0)
@@ -1045,10 +1058,35 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
         exploration.tags, ratings, exp_rights.status,
         exp_rights.community_owned, exp_rights.owner_ids,
         exp_rights.editor_ids, exp_rights.viewer_ids, contributor_ids,
-        exploration.version, exploration_model_created_on,
-        exploration_model_last_updated)
+        contributors_summary, exploration.version,
+        exploration_model_created_on, exploration_model_last_updated)
 
     return exp_summary
+
+
+def compute_exploration_contributors_summary(exploration_id):
+    """Returns a dict whose keys are user_ids and whose values are
+    the number of (non-revert) commits made to the given exploration
+    by that user_id. This does not count commits which have since been reverted.
+    """
+    snapshots_metadata = get_exploration_snapshots_metadata(exploration_id)
+    current_version = len(snapshots_metadata)
+    contributors_summary = collections.defaultdict(int)
+    while True:
+        snapshot_metadata = snapshots_metadata[current_version - 1]
+        committer_id = snapshot_metadata['committer_id']
+        is_revert = (snapshot_metadata['commit_type'] == 'revert')
+        if not is_revert and committer_id not in feconf.SYSTEM_USER_IDS:
+            contributors_summary[committer_id] += 1
+        if current_version == 1:
+            break
+
+        if is_revert:
+            current_version = snapshot_metadata['commit_cmds'][0]['version_number']
+        else:
+            current_version -= 1
+    return contributors_summary
+
 
 def save_exploration_summary(exp_summary):
     """Save an exploration summary domain object as an ExpSummaryModel entity
@@ -1068,6 +1106,7 @@ def save_exploration_summary(exp_summary):
         editor_ids=exp_summary.editor_ids,
         viewer_ids=exp_summary.viewer_ids,
         contributor_ids=exp_summary.contributor_ids,
+        contributors_summary=exp_summary.contributors_summary,
         version=exp_summary.version,
         exploration_model_last_updated=(
             exp_summary.exploration_model_last_updated),
