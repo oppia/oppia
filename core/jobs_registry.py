@@ -16,8 +16,6 @@
 
 """Job registries."""
 
-__author__ = 'Sean Lip'
-
 from core.domain import exp_jobs_continuous
 from core.domain import exp_jobs_one_off
 from core.domain import feedback_jobs_continuous

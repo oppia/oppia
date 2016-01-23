@@ -27,14 +27,16 @@ oppia.directive('oppiaNoninteractiveImage', [
       scope: {},
       templateUrl: 'richTextComponent/Image',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.filepath = oppiaHtmlEscaper.escapedJsonToObj($attrs.filepathWithValue);
+        $scope.filepath = oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.filepathWithValue);
         $scope.imageUrl = $sce.trustAsResourceUrl(
-            '/imagehandler/' + explorationContextService.getExplorationId() + '/' +
-            encodeURIComponent($scope.filepath));
+          '/imagehandler/' + explorationContextService.getExplorationId() +
+          '/' + encodeURIComponent($scope.filepath));
 
         $scope.imageAltText = '';
         if ($attrs.altWithValue) {
-          $scope.imageAltText = oppiaHtmlEscaper.escapedJsonToObj($attrs.altWithValue);
+          $scope.imageAltText = oppiaHtmlEscaper.escapedJsonToObj(
+            $attrs.altWithValue);
         }
       }]
     };

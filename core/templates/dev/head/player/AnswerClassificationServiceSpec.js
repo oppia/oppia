@@ -67,10 +67,10 @@ describe('Answer classification service', function() {
   var explorationId = 'exploration';
 
   var rules = {
-    'Equals': function(answer, inputs) {
+    Equals: function(answer, inputs) {
       return inputs.x === answer;
     },
-    'NotEquals': function(answer, inputs) {
+    NotEquals: function(answer, inputs) {
       return inputs.x != answer;
     }
   };

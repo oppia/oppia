@@ -1,0 +1,13 @@
+<script type="text/ng-template" id="rules/outcomeFeedbackEditor">
+  <div class="oppia-rule-edit-feedback protractor-test-feedback-bubble">
+    <div class="oppia-rule-details-header">
+      <strong>Oppia tells the learner...</strong>
+    </div>
+    <span ng-if="feedback.length == 0">
+      <em>No feedback specified.</em>
+    </span>
+
+    <schema-based-editor schema="OUTCOME_FEEDBACK_SCHEMA" local-value="outcome.feedback[0]">
+    </schema-based-editor>
+  </div>
+</script>

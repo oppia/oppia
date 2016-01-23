@@ -376,20 +376,24 @@
     </defs>
   </svg>
 
-  <script type="text/ng-template" id="inline/rule_editor">
-    {% include 'components/rule_editor.html' %}
-  </script>
+  {% include 'components/answer_group_editor_directive.html' %}
+  {% include 'components/exploration_embed_button_modal.html' %}
+  {% include 'components/fallback_editor_directive.html' %}
+  {% include 'components/fuzzy_rule_panel_directive.html' %}
+  {% include 'components/gadget_directive.html' %}
+  {% include 'components/gadget_panel_directive.html' %}
+  {% include 'components/outcome_editor_directive.html' %}
+  {% include 'components/outcome_destination_editor_directive.html' %}
+  {% include 'components/outcome_feedback_editor_directive.html' %}
+  {% include 'components/param_changes_editor_directive.html' %}
+  {% include 'components/profile_link_text_directive.html' %}
+  {% include 'components/response_header_directive.html' %}
+  {% include 'components/rule_editor_directive.html' %}
+  {% include 'components/state_graph_viz_directive.html' %}
 
-  {% include 'components/answer_group_editor.html' %}
-  {% include 'components/exploration_embed_button.html' %}
-  {% include 'components/gadget_panel.html' %}
-  {% include 'components/response_header.html' %}
-  {% include 'components/outcome_editor.html' %}
-  {% include 'components/fallback_editor.html' %}
-  {% include 'components/param_changes_editor.html' %}
-  {% include 'components/profile_link.html' %}
-  {% include 'components/visualizations.html' %}
-
+  {% include 'player/answer_feedback_pair_directive.html' %}
+  {% include 'player/conversation_skin_directive.html' %}
+  {% include 'player/progress_dots_directive.html' %}
 {% endblock content %}
 
 {% block footer_js %}
@@ -401,16 +405,32 @@
     {{ include_js_file('editor/ExplorationEditorAdvancedFeaturesService.js') }}
     {{ include_js_file('editor/ExplorationGraph.js') }}
     {{ include_js_file('editor/ExplorationPreview.js') }}
-    {{ include_js_file('components/explorationEmbedButton.js') }}
-    {{ include_js_file('components/paramChangesEditor.js') }}
-    {{ include_js_file('components/valueGeneratorEditor.js') }}
-    {{ include_js_file('components/gadgetPanel.js') }}
-    {{ include_js_file('components/responseHeader.js') }}
-    {{ include_js_file('components/outcomeEditor.js') }}
-    {{ include_js_file('components/fallbackEditor.js') }}
+
+    {{ include_js_file('components/AnswerGroupEditorDirective.js') }}
+    {{ include_js_file('components/BarChartDirective.js') }}
+    {{ include_js_file('components/ExplorationEmbedButtonService.js') }}
+    {{ include_js_file('components/FallbackEditorDirective.js') }}
+    {{ include_js_file('components/FuzzyRulePanelDirective.js') }}
+    {{ include_js_file('components/GadgetDirective.js') }}
+    {{ include_js_file('components/GadgetPanelDirective.js') }}
+    {{ include_js_file('components/OutcomeEditorDirective.js') }}
+    {{ include_js_file('components/OutcomeDestinationEditorDirective.js') }}
+    {{ include_js_file('components/OutcomeFeedbackEditorDirective.js') }}
+    {{ include_js_file('components/ParamChangesEditorDirective.js') }}
+    {{ include_js_file('components/ProfileLinkTextDirective.js') }}
+    {{ include_js_file('components/ResponseHeaderDirective.js') }}
+    {{ include_js_file('components/RuleEditorDirective.js') }}
+    {{ include_js_file('components/RuleTypeSelectorDirective.js') }}
+    {{ include_js_file('components/StateGraphLayoutService.js') }}
+    {{ include_js_file('components/StateGraphVizDirective.js') }}
+    {{ include_js_file('components/ValueGeneratorEditorDirective.js') }}
+
     {{ value_generators_js }}
+
     {{ include_js_file('services/explorationContextService.js') }}
     {{ include_js_file('services/explorationServices.js') }}
+    {{ include_js_file('services/messengerService.js') }}
+
     {{ include_js_file('editor/RouterServices.js') }}
     {{ include_js_file('editor/ExplorationStatistics.js') }}
     {{ include_js_file('editor/ExplorationSettings.js') }}
@@ -432,27 +452,27 @@
     {{ include_js_file('editor/GadgetValidationService.js') }}
     {{ include_js_file('editor/GadgetEditor.js') }}
     {{ include_js_file('editor/StateInteraction.js') }}
+
     {{ include_js_file('domain/exploration/ExplorationObjectFactory.js') }}
     {{ include_js_file('domain/exploration/StateObjectFactory.js') }}
     {{ include_js_file('domain/utilities/StopwatchObjectFactory.js') }}
     {{ include_js_file('domain/utilities/UrlInterpolationService.js') }}
-    {{ include_js_file('player/AnswerClassificationService.js') }}
-    {{ include_js_file('player/StatsReportingService.js') }}
-    {{ include_js_file('services/messengerService.js') }}
-    {{ include_js_file('player/PlayerServices.js') }}
-    {{ include_js_file('player/PlayerPositionService.js') }}
-    {{ include_js_file('player/PlayerTranscriptService.js') }}
-    {{ include_js_file('expressions/expressionInterpolationService.js') }}
-    {{ include_js_file('components/ruleEditor.js') }}
-    {{ include_js_file('components/answerGroupEditor.js') }}
-    {{ include_js_file('components/profileLink.js') }}
 
-    {% for skin_js_url in skin_js_urls %}
-      {{ include_skins_js_file(skin_js_url) }}
-    {% endfor %}
+    {{ include_js_file('player/AnswerClassificationService.js') }}
+    {{ include_js_file('player/AnswerFeedbackPairDirective.js') }}
+    {{ include_js_file('player/ConversationSkinDirective.js') }}
+    {{ include_js_file('player/ExplorationRecommendationsService.js') }}
+    {{ include_js_file('player/LearnerParamsService.js') }}
+    {{ include_js_file('player/LearnerViewRatingService.js') }}
+    {{ include_js_file('player/PlayerPositionService.js') }}
+    {{ include_js_file('player/PlayerServices.js') }}
+    {{ include_js_file('player/PlayerTranscriptService.js') }}
+    {{ include_js_file('player/ProgressDotsDirective.js') }}
+    {{ include_js_file('player/StatsReportingService.js') }}
+
+    {{ include_js_file('expressions/expressionInterpolationService.js') }}
   </script>
 
-  {{ skin_templates }}
   {{ interaction_templates }}
   {{ interaction_validators_html }}
   {{ gadget_templates }}

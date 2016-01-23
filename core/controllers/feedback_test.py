@@ -16,8 +16,6 @@
 
 """Tests for the feedback controllers."""
 
-__author__ = 'Sean Lip'
-
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -53,12 +51,12 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
         response = self.testapp.get('/create/%s' % self.EXP_ID)
         self.csrf_token = self.get_csrf_token_from_response(response)
         self.post_json('%s/%s' % (
-            feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID),
-            {
-                'state_name': self._get_unicode_test_string('statename'),
-                'subject': self._get_unicode_test_string('subject'),
-                'text': self._get_unicode_test_string('text'),
-            }, self.csrf_token)
+            feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID
+        ), {
+            'state_name': self._get_unicode_test_string('statename'),
+            'subject': self._get_unicode_test_string('subject'),
+            'text': self._get_unicode_test_string('text'),
+        }, self.csrf_token)
         self.logout()
 
     def test_invalid_exploration_ids_return_empty_threadlist(self):
@@ -97,12 +95,12 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
 
     def test_non_logged_in_users_cannot_create_threads_and_messages(self):
         self.post_json('%s/%s' % (
-            feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID),
-            {
-                'state_name': 'Welcome!',
-                'subject': self.UNICODE_TEST_STRING,
-                'text': self.UNICODE_TEST_STRING,
-            }, self.csrf_token, expect_errors=True, expected_status_int=401)
+            feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID
+        ), {
+            'state_name': 'Welcome!',
+            'subject': self.UNICODE_TEST_STRING,
+            'text': self.UNICODE_TEST_STRING,
+        }, self.csrf_token, expect_errors=True, expected_status_int=401)
 
         thread_url = '%s/%s/%s' % (
             feconf.FEEDBACK_THREAD_URL_PREFIX, self.EXP_ID, 'dummy_thread_id')
@@ -119,13 +117,9 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(FeedbackThreadIntegrationTests, self).setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)       
- 
+
         # Load exploration 0.
         exp_services.delete_demo(self.EXP_ID)
         exp_services.load_demo(self.EXP_ID)
@@ -252,16 +246,16 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_no_username_shown_for_logged_out_learners(self):
-        NEW_EXP_ID = 'new_eid'
+        new_exp_id = 'new_eid'
         exploration = exp_domain.Exploration.create_default_exploration(
-            NEW_EXP_ID, 'A title', 'A category')
+            new_exp_id, 'A title', 'A category')
         exp_services.save_new_exploration(self.editor_id, exploration)
-        rights_manager.publish_exploration(self.editor_id, NEW_EXP_ID)
+        rights_manager.publish_exploration(self.editor_id, new_exp_id)
 
-        response = self.testapp.get('/create/%s' % NEW_EXP_ID)
+        response = self.testapp.get('/create/%s' % new_exp_id)
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json(
-            '/explorehandler/give_feedback/%s' % NEW_EXP_ID,
+            '/explorehandler/give_feedback/%s' % new_exp_id,
             {
                 'state_name': None,
                 'subject': 'Test thread',
@@ -270,12 +264,12 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             }, csrf_token)
 
         response_dict = self.get_json(
-            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, NEW_EXP_ID))
+            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, new_exp_id))
         threadlist = response_dict['threads']
         self.assertIsNone(threadlist[0]['original_author_username'])
 
         response_dict = self.get_json('%s/%s/%s' % (
-            feconf.FEEDBACK_THREAD_URL_PREFIX, NEW_EXP_ID,
+            feconf.FEEDBACK_THREAD_URL_PREFIX, new_exp_id,
             feedback_services.get_thread_id_from_full_thread_id(
                 threadlist[0]['full_thread_id'])))
         self.assertIsNone(response_dict['messages'][0]['author_username'])
@@ -301,21 +295,21 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             feconf.FEEDBACK_THREAD_URL_PREFIX, self.EXP_ID, 
             feedback_services.get_thread_id_from_full_thread_id(thread_id))
 
-        def _get_username(n):
-            return 'editor%s' % n
+        def _get_username(index):
+            return 'editor%s' % index
 
-        def _get_email(n):
-            return '%s@example.com' % n
+        def _get_email(index):
+            return '%s@example.com' % index
 
         # Generate 10 users.
-        NUM_USERS = 10
-        for num in range(NUM_USERS):
+        num_users = 10
+        for num in range(num_users):
             username = _get_username(num)
             email = _get_email(num)
             self.signup(email, username)
 
         # Each of these users posts a new message to the same thread.
-        for num in range(NUM_USERS):
+        for num in range(num_users):
             self.login(_get_email(num))
             response = self.testapp.get('/create/%s' % self.EXP_ID)
             csrf_token = self.get_csrf_token_from_response(response)
@@ -326,7 +320,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
         # Get the message list.
         response_dict = self.get_json(thread_url)
-        self.assertEqual(len(response_dict['messages']), NUM_USERS + 1)
+        self.assertEqual(len(response_dict['messages']), num_users + 1)
         # The resulting message list is not sorted. It needs to be sorted
         # by message id.
         response_dict['messages'] = sorted(
@@ -337,7 +331,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             self.EDITOR_USERNAME)
         self.assertEqual(response_dict['messages'][0]['message_id'], 0)
         self.assertEqual(response_dict['messages'][0]['text'], 'Message 0')
-        for num in range(NUM_USERS):
+        for num in range(num_users):
             self.assertEqual(
                 response_dict['messages'][num + 1]['author_username'],
                 _get_username(num))

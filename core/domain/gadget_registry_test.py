@@ -16,13 +16,10 @@
 
 """Tests for methods in gadget registry."""
 
-__author__ = 'Michael Anuzis'
-
 import os
 
 from core.domain import gadget_registry
 from core.tests import test_utils
-from extensions.gadgets import base
 import feconf
 
 

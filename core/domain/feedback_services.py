@@ -16,16 +16,14 @@
 
 """Commands for feedback thread and message operations."""
 
-__author__ = 'Koji Ashida'
-
 from core.domain import feedback_jobs_continuous
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
-(feedback_models, exp_models) = models.Registry.import_models(
-    [models.NAMES.feedback, models.NAMES.exploration])
 import feconf
 import utils
+
+(feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
 
 DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a learner'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''

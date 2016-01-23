@@ -27,41 +27,41 @@ describe('Player transcript service', function() {
   }));
 
   it('should reset the transcript correctly', function() {
-    pts.addNewCard(
-      'First state', {a: 'b'}, 'Content HTML',
-      '<oppia-text-input-html></oppia-text-input-html>');
-    pts.addNewCard(
-      'Second state', {a: 'b'}, 'Content HTML',
-      '<oppia-text-input-html></oppia-text-input-html>');
+    pts.addNewCard('First state', {
+      a: 'b'
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
+    pts.addNewCard('Second state', {
+      a: 'b'
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
 
     expect(pts.getNumCards()).toBe(2);
 
     pts.init();
     expect(pts.getNumCards()).toBe(0);
-    pts.addNewCard(
-      'Third state', {a: 'b'}, 'Content HTML',
-      '<oppia-text-input-html></oppia-text-input-html>');
+    pts.addNewCard('Third state', {
+      a: 'b'
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
     expect(pts.getCard(0).stateName).toBe('Third state');
   });
 
   it('should compute the state history correctly', function() {
-    pts.addNewCard(
-      'First state', {a: 'b'}, 'Content HTML',
-      '<oppia-text-input-html></oppia-text-input-html>');
-    pts.addNewCard(
-      'Second state', {a: 'b'}, 'Content HTML',
-      '<oppia-text-input-html></oppia-text-input-html>');
-    pts.addNewCard(
-      'First state', {a: 'b'}, 'Content HTML',
-      '<oppia-text-input-html></oppia-text-input-html>');
+    pts.addNewCard('First state', {
+      a: 'b'
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
+    pts.addNewCard('Second state', {
+      a: 'b'
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
+    pts.addNewCard('First state', {
+      a: 'b'
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
     expect(pts.getStateHistory()).toEqual([
       'First state', 'Second state', 'First state']);
   });
 
   it('should add a new card correctly', function() {
-    pts.addNewCard(
-      'First state', {a: 'b'}, 'Content HTML',
-      '<oppia-text-input-html></oppia-text-input-html>');
+    pts.addNewCard('First state', {
+      a: 'b'
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
 
     var firstCard = pts.getCard(0);
     expect(firstCard).toEqual({
@@ -77,14 +77,16 @@ describe('Player transcript service', function() {
   });
 
   it('should record answer/feedback pairs in the correct order', function() {
-    pts.addNewCard(
-      'First state', {a: 'b'}, 'Content HTML',
-      '<oppia-text-input-html></oppia-text-input-html>');
+    pts.addNewCard('First state', {
+      a: 'b'
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
     pts.addNewAnswer('first answer');
     expect(function() {
       pts.addNewAnswer('invalid answer');
     }).toThrow(
-      new Error('Trying to add an answer when the feedback has not been received yet.'));
+      new Error(
+        'Trying to add an answer before the feedback for the previous answer ' +
+        'has been received.'));
 
     pts.addNewFeedback('feedback');
     expect(function() {
@@ -105,25 +107,25 @@ describe('Player transcript service', function() {
   });
 
   it('should set a destination name correctly', function() {
-    pts.addNewCard(
-      'First state', {a: 'b'}, 'Content HTML',
-      '<oppia-text-input-html></oppia-text-input-html>');
+    pts.addNewCard('First state', {
+      a: 'b'
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
     expect(pts.getCard(0).destStateName).toBeNull();
     pts.setDestination('New destination');
     expect(pts.getCard(0).destStateName).toBe('New destination');
     expect(function() {
       pts.setDestination('Invalid new destination');
     }).toThrow(
-      new Error('Trying to set a destStateName when the destStateName is already set.'));
+      new Error('Trying to set a destStateName when it has already been set.'));
   });
 
   it('should retrieve the last card of the transcript correctly', function() {
-    pts.addNewCard(
-      'First state', {a: 'b'}, 'Content HTML',
-      '<oppia-text-input-html></oppia-text-input-html>');
-    pts.addNewCard(
-      'Second state', {a: 'b'}, 'Content HTML',
-      '<oppia-text-input-html></oppia-text-input-html>');
+    pts.addNewCard('First state', {
+      a: 'b'
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
+    pts.addNewCard('Second state', {
+      a: 'b'
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
     expect(pts.getNumCards()).toBe(2);
     expect(pts.getLastCard().stateName).toBe('Second state');
     expect(pts.isLastCard(0)).toBe(false);

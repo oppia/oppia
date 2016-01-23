@@ -25,79 +25,83 @@
 //   processHtml('abc{{a}}', [{'a': 'b'}]) gives 'abcb'.
 //   processHtml('abc{{a}}', [{}]) returns null.
 //   processHtml('abc', [{}]) returns 'abc'.
-//   processHtml('{[a}}', [{'a': '<button></button>'}]) returns '&lt;button&gt;&lt;/button&gt;'.
+//   processHtml('{[a}}', [{'a': '<button></button>'}])
+//     returns '&lt;button&gt;&lt;/button&gt;'.
 //   processUnicode('abc{{a}}', [{'a': 'b'}]) gives 'abcb'.
 //   processUnicode('abc{{a}}', [{}]) returns null.
-//   processUnicode('{[a}}', [{'a': '<button></button>'}]) returns '<button></button>'.
+//   processUnicode('{[a}}', [{'a': '<button></button>'}]) returns
+//     '<button></button>'.
 oppia.factory('expressionInterpolationService', [
-    '$filter', 'expressionParserService',
-    'expressionEvaluatorService', 'oppiaHtmlEscaper',
-    function($filter, expressionParserService, expressionEvaluatorService,
-             oppiaHtmlEscaper) {
-  return {
-    // This method should only be used if its result would immediately be
-    // displayed on the screen without passing through further computation.
-    // It differs from other methods in this service in that it
-    // auto-escapes the returned HTML, and returns an 'error' label if the
-    // evaluation fails.
-    processHtml: function(sourceHtml, envs) {
-      return sourceHtml.replace(/{{([^}]*)}}/g, function(match, p1) {
+  '$filter', 'expressionParserService', 'expressionEvaluatorService',
+  'expressionSyntaxTreeService', 'oppiaHtmlEscaper',
+  function(
+      $filter, expressionParserService, expressionEvaluatorService,
+      expressionSyntaxTreeService, oppiaHtmlEscaper) {
+    return {
+      // This method should only be used if its result would immediately be
+      // displayed on the screen without passing through further computation.
+      // It differs from other methods in this service in that it
+      // auto-escapes the returned HTML, and returns an 'error' label if the
+      // evaluation fails.
+      processHtml: function(sourceHtml, envs) {
+        return sourceHtml.replace(/{{([^}]*)}}/g, function(match, p1) {
+          try {
+            // TODO(sll): Remove the call to $filter once we have a
+            // custom UI for entering expressions. It is only needed because
+            // expressions are currently input inline via the RTE.
+            return oppiaHtmlEscaper.unescapedStrToEscapedStr(
+              expressionEvaluatorService.evaluateExpression(
+                $filter('convertHtmlToUnicode')(p1), envs));
+          } catch (e) {
+            var EXPRESSION_ERROR_TAG = (
+              '<oppia-expression-error-tag></oppia-expression-error-tag>');
+            if ((e instanceof expressionParserService.SyntaxError) ||
+                (e instanceof expressionSyntaxTreeService.ExpressionError)) {
+              return EXPRESSION_ERROR_TAG;
+            }
+            throw e;
+          }
+        });
+      },
+      // Returns null if the evaluation fails.
+      processUnicode: function(sourceUnicode, envs) {
         try {
-          // TODO(sll): Remove the call to $filter once we have a
-          // custom UI for entering expressions. It is only needed because
-          // expressions are currently input inline via the RTE.
-          return oppiaHtmlEscaper.unescapedStrToEscapedStr(
-            expressionEvaluatorService.evaluateExpression(
-              $filter('convertHtmlToUnicode')(p1), envs));
+          return sourceUnicode.replace(/{{([^}]*)}}/g, function(match, p1) {
+            // TODO(sll): Remove the call to $filter once we have a
+            // custom UI for entering expressions. It is only needed because
+            // expressions are currently input inline via the RTE.
+            return expressionEvaluatorService.evaluateExpression(
+              $filter('convertHtmlToUnicode')(p1), envs);
+          });
         } catch (e) {
-          var EXPRESSION_ERROR_TAG = (
-            '<oppia-expression-error-tag></oppia-expression-error-tag>');
           if ((e instanceof expressionParserService.SyntaxError) ||
-              (e instanceof expressionEvaluatorService.ExpressionError)) {
-            return EXPRESSION_ERROR_TAG;
+              (e instanceof expressionSyntaxTreeService.ExpressionError)) {
+            return null;
           }
           throw e;
         }
-      });
-    },
-    // Returns null if the evaluation fails.
-    processUnicode: function(sourceUnicode, envs) {
-      try {
-        return sourceUnicode.replace(/{{([^}]*)}}/g, function(match, p1) {
-          // TODO(sll): Remove the call to $filter once we have a
-          // custom UI for entering expressions. It is only needed because
-          // expressions are currently input inline via the RTE.
-          return expressionEvaluatorService.evaluateExpression(
-            $filter('convertHtmlToUnicode')(p1), envs);
-        });
-      } catch (e) {
-        if ((e instanceof expressionParserService.SyntaxError) ||
-            (e instanceof expressionEvaluatorService.ExpressionError)) {
-          return null;
-        }
-        throw e;
-      }
-    },
-    // This works for both unicode and HTML.
-    getParamsFromString: function(sourceString) {
-      var matches = sourceString.match(/{{([^}]*)}}/g) || [];
+      },
+      // This works for both unicode and HTML.
+      getParamsFromString: function(sourceString) {
+        var matches = sourceString.match(/{{([^}]*)}}/g) || [];
 
-      var allParams = [];
-      for (var i = 0; i < matches.length; i++) {
-        // Trim the '{{' and '}}'.
-        matches[i] = matches[i].substring(2, matches[i].length - 2);
+        var allParams = [];
+        for (var i = 0; i < matches.length; i++) {
+          // Trim the '{{' and '}}'.
+          matches[i] = matches[i].substring(2, matches[i].length - 2);
 
-        var params = expressionEvaluatorService.getParamsUsedInExpression(
-          $filter('convertHtmlToUnicode')(matches[i]));
+          var params = expressionSyntaxTreeService.getParamsUsedInExpression(
+            $filter('convertHtmlToUnicode')(matches[i]));
 
-        for (var j = 0; j < params.length; j++) {
-          if (allParams.indexOf(params[j]) === -1) {
-            allParams.push(params[j]);
+          for (var j = 0; j < params.length; j++) {
+            if (allParams.indexOf(params[j]) === -1) {
+              allParams.push(params[j]);
+            }
           }
         }
-      }
 
-      return allParams.sort();
-    }
-  };
-}]);
+        return allParams.sort();
+      }
+    };
+  }
+]);

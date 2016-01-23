@@ -19,29 +19,29 @@
  */
 
 oppia.factory('playerPositionService', [
-    'playerTranscriptService', function(playerTranscriptService) {
+  'playerTranscriptService', function(playerTranscriptService) {
+    var activeCardIndex = null;
+    var onChangeCallback = null;
 
-  var activeCardIndex = null;
-  var onChangeCallback = null;
+    return {
+      init: function(callback) {
+        activeCardIndex = null;
+        onChangeCallback = callback;
+      },
+      getCurrentStateName: function() {
+        return playerTranscriptService.getCard(activeCardIndex).stateName;
+      },
+      setActiveCardIndex: function(index) {
+        var oldIndex = activeCardIndex;
+        activeCardIndex = index;
 
-  return {
-    init: function(callback) {
-      activeCardIndex = null;
-      onChangeCallback = callback;
-    },
-    getCurrentStateName: function() {
-      return playerTranscriptService.getCard(activeCardIndex).stateName;
-    },
-    setActiveCardIndex: function(index) {
-      var oldIndex = activeCardIndex;
-      activeCardIndex = index;
-
-      if (oldIndex !== activeCardIndex) {
-        onChangeCallback();
+        if (oldIndex !== activeCardIndex) {
+          onChangeCallback();
+        }
+      },
+      getActiveCardIndex: function() {
+        return activeCardIndex;
       }
-    },
-    getActiveCardIndex: function() {
-      return activeCardIndex;
-    }
-  };
-}]);
+    };
+  }
+]);

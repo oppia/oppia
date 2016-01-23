@@ -803,6 +803,18 @@ textarea {
   }
 }
 
+.oppia-gallery-loading-results-message {
+  background-color: #888;
+  bottom: 0;
+  color: white;
+  height: 30px;
+  opacity: 0.9;
+  padding-top: 5px;
+  text-align: center;
+  width: 100%;
+  z-index: 50;
+}
+
 @media (max-width: 768px) {
   .oppia-navbar-add-exploration-button {
     display: none;
@@ -2407,6 +2419,14 @@ md-card.preview-conversation-skin-supplemental-card {
   position: absolute;
 }
 
+.oppia-info-card-bg-image {
+  left: 50%;
+  margin-right: -50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .oppia-info-card-logo-thumbnail {
   background-position: center;
   background-repeat: no-repeat;
@@ -2491,6 +2511,11 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-info-card-tooltip-more {
   color: blue;
+}
+
+/* This is necessary so that long usernames don't overflow the tooltip. */
+.oppia-info-card-content .tooltip-inner {
+  max-width: none;
 }
 
 .oppia-info-card-tag-icon {

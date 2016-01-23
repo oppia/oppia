@@ -1,6 +1,6 @@
 author_notes: ''
 blurb: ''
-default_skin: conversation_v1
+category: Mathematics
 init_state_name: Intro
 language_code: en
 objective: learn how to count permutations accurately and systematically
@@ -8,9 +8,10 @@ param_changes: []
 param_specs:
   guess:
     obj_type: UnicodeString
-schema_version: 7
+schema_version: 10
 skin_customizations:
-  panels_contents: {}
+  panels_contents:
+    bottom: []
 states:
   END:
     content:
@@ -18,12 +19,13 @@ states:
       value: <p>Congratulations, you have finished!</p>
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         recommendedExplorationIds:
           value: []
       default_outcome: null
+      fallbacks: []
       id: EndExploration
-      triggers: []
     param_changes: []
   Final challenge:
     content:
@@ -94,6 +96,7 @@ states:
         - inputs:
             x: 24.0
           rule_type: IsGreaterThan
+      confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Final challenge
@@ -105,8 +108,8 @@ states:
           been developing, so that you can get the answer with just one multiplication
           :-)
         param_changes: []
+      fallbacks: []
       id: NumericInput
-      triggers: []
     param_changes: []
   Found all the ways:
     content:
@@ -134,6 +137,7 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
@@ -143,8 +147,8 @@ states:
         dest: Introspection
         feedback: []
         param_changes: []
+      fallbacks: []
       id: MultipleChoiceInput
-      triggers: []
     param_changes: []
   General Theory:
     content:
@@ -222,6 +226,7 @@ states:
         - inputs:
             x: F1 * 2
           rule_type: Contains
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: Type your answer here.
@@ -235,8 +240,8 @@ states:
           ball, and F1 ways to pick the second one. This all works out because F1
           = 1, so F2 = 2 * 1 = 2.
         param_changes: []
+      fallbacks: []
       id: TextInput
-      triggers: []
     param_changes: []
   Guess a generalization:
     content:
@@ -262,6 +267,7 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
@@ -271,8 +277,8 @@ states:
         dest: Two balls
         feedback: []
         param_changes: []
+      fallbacks: []
       id: MultipleChoiceInput
-      triggers: []
     param_changes: []
   Intro:
     content:
@@ -301,13 +307,14 @@ states:
         - inputs:
             x: 0.0
           rule_type: IsLessThanOrEqualTo
+      confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Not 6
         feedback: []
         param_changes: []
+      fallbacks: []
       id: NumericInput
-      triggers: []
     param_changes: []
   Introspection:
     content:
@@ -335,6 +342,7 @@ states:
         - inputs:
             x: ''
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: Type your answer here.
@@ -344,8 +352,8 @@ states:
         dest: Guess a generalization
         feedback: []
         param_changes: []
+      fallbacks: []
       id: TextInput
-      triggers: []
     param_changes: []
   Not 6:
     content:
@@ -426,14 +434,15 @@ states:
             - YRB
             - YBR
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Not 6
         feedback:
         - No, try again.
         param_changes: []
+      fallbacks: []
       id: SetInput
-      triggers: []
     param_changes:
     - customization_args:
         parse_with_jinja: true
@@ -503,6 +512,7 @@ states:
         - inputs:
             x: 1.0
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Two balls
@@ -510,8 +520,8 @@ states:
         - I think you may have counted something too many times. Try to remember the
           systematic approach you came up with earlier, and use it here...
         param_changes: []
+      fallbacks: []
       id: NumericInput
-      triggers: []
     param_changes: []
   correct but why:
     content:
@@ -545,6 +555,7 @@ states:
         - inputs:
             x: factorial
           rule_type: Contains
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: Type your answer here.
@@ -562,8 +573,9 @@ states:
           on the Internet, you''ll also be able to find more information about this
           topic. See if you can figure out what the answer for 4 balls is!'
         param_changes: []
+      fallbacks: []
       id: TextInput
-      triggers: []
     param_changes: []
-states_schema_version: 4
+states_schema_version: 7
 tags: []
+title: Protractor Test

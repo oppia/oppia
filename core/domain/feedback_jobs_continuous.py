@@ -14,23 +14,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Jobs for open feedback threads."""
-
 from core import jobs
 from core.platform import models
-(base_models, feedback_models, exp_models,) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.feedback, models.NAMES.exploration
-])
-transaction_services = models.Registry.import_transaction_services()
 import feconf
 
 from google.appengine.ext import ndb
 
+(base_models, feedback_models, exp_models,) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.feedback, models.NAMES.exploration
+])
+transaction_services = models.Registry.import_transaction_services()
+
 
 class FeedbackAnalyticsRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
-        num_open_threads = ndb.IntegerProperty(default=0)
-        num_total_threads = ndb.IntegerProperty(default=0)
+    num_open_threads = ndb.IntegerProperty(default=0)
+    num_total_threads = ndb.IntegerProperty(default=0)
 
 
 class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
@@ -108,7 +107,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
             if (old_status != feedback_models.STATUS_CHOICES_OPEN
                     and updated_status == feedback_models.STATUS_CHOICES_OPEN):
                 transaction_services.run_in_transaction(
-                     _increment_open_threads_count)
+                    _increment_open_threads_count)
             # Status changed from open to closed.
             elif (old_status == feedback_models.STATUS_CHOICES_OPEN
                   and updated_status != feedback_models.STATUS_CHOICES_OPEN):

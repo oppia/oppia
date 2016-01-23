@@ -185,29 +185,29 @@
                                       ratings="exp.ratings"
                                       thumbnail-icon-url="exp.thumbnail_icon_url"
                                       thumbnail-bg-color="exp.thumbnail_bg_color"
-                                      class="protractor-test-gallery-tile">
+                                      num-views="exp.num_views"
+                                      class="protractor-test-gallery-tile"
+                                      style="display: inline-block;">
             </exploration-summary-tile>
           </div>
         </div>
       </div>
+      <div class="oppia-gallery-loading-results-message" ng-if="pageLoaderIsBusy">
+        Loading more results
+        <span class="oppia-loading-dot-one">.</span>
+        <span class="oppia-loading-dot-two">.</span>
+        <span class="oppia-loading-dot-three">.</span>
+      </div>
     </div>
   </div>
 
-  {% include 'components/exploration_creation_button.html' %}
-
-  <script type="text/ng-template" id="modals/splashVideo">
-    <div class="modal-body">
-      <div class="oppia-gallery-modal-video">
-        <iframe src="https://www.youtube.com/embed/{{SPLASH_PAGE_YOUTUBE_VIDEO_ID}}?rel=0&autoplay=1&controls=2&showinfo=0" frameborder="0" allowfullscreen></iframe>
-      </div>
-    </div>
-  </script>
+  {% include 'components/exploration_creation_button_modal.html' %}
 {% endblock %}
 
 {% block footer_js %}
   {{ super() }}
   <script>
-    {{ include_js_file('components/explorationCreationButton.js') }}
+    {{ include_js_file('components/ExplorationCreationButtonService.js') }}
     {{ include_js_file('galleries/Gallery.js') }}
   </script>
 {% endblock footer_js %}

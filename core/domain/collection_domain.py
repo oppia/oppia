@@ -21,8 +21,6 @@ objects they represent are stored. All methods and properties in this file
 should therefore be independent of the specific storage models used.
 """
 
-__author__ = 'Ben Henning'
-
 import copy
 
 import feconf
@@ -157,14 +155,14 @@ class CollectionNode(object):
     completed.
     """
 
-    """Constructs a new CollectionNode object.
-
-    Args:
-        exploration_id: A valid ID of an exploration referenced by this node.
-        prerequisite_skills: A list of skills (strings).
-        acquired_skills: A list of skills (strings).
-    """
     def __init__(self, exploration_id, prerequisite_skills, acquired_skills):
+        """Constructs a new CollectionNode object.
+
+        Args:
+        - exploration_id: A valid ID of an exploration referenced by this node.
+        - prerequisite_skills: A list of skills (strings).
+        - acquired_skills: A list of skills (strings).
+        """
         self.exploration_id = exploration_id
         self.prerequisite_skills = prerequisite_skills
         self.acquired_skills = acquired_skills
@@ -252,23 +250,24 @@ class CollectionNode(object):
 class Collection(object):
     """Domain object for an Oppia collection."""
 
-    """Constructs a new collection given all the information necessary to
-    represent a collection.
-
-    Note: The schema_version represents the version of any underlying
-    dictionary or list structures stored within the collection. In particular,
-    the schema for CollectionNodes is represented by this version. If the
-    schema for CollectionNode changes, then a migration function will need to
-    be added to this class to convert from the current schema version to the
-    new one. This function should be called in both from_yaml in this class and
-    collection_services._migrate_collection_to_latest_schema.
-    feconf.CURRENT_COLLECTION_SCHEMA_VERSION should be incremented and the new
-    value should be saved in the collection after the migration process,
-    ensuring it represents the latest schema version.
-    """
     def __init__(self, collection_id, title, category, objective,
                  schema_version, nodes, version, created_on=None,
                  last_updated=None):
+        """Constructs a new collection given all the information necessary to
+        represent a collection.
+
+        Note: The schema_version represents the version of any underlying
+        dictionary or list structures stored within the collection. In
+        particular, the schema for CollectionNodes is represented by this
+        version. If the schema for CollectionNode changes, then a migration
+        function will need to be added to this class to convert from the
+        current schema version to the new one. This function should be called
+        in both from_yaml in this class and
+        collection_services._migrate_collection_to_latest_schema.
+        feconf.CURRENT_COLLECTION_SCHEMA_VERSION should be incremented and the
+        new value should be saved in the collection after the migration
+        process, ensuring it represents the latest schema version.
+        """
         self.id = collection_id
         self.title = title
         self.category = category
@@ -411,9 +410,9 @@ class Collection(object):
         self.objective = objective
 
     def _find_node(self, exploration_id):
-        for i in range(len(self.nodes)):
-            if self.nodes[i].exploration_id == exploration_id:
-                return i
+        for ind, node in enumerate(self.nodes):
+            if node.exploration_id == exploration_id:
+                return ind
         return None
 
     def get_node(self, exploration_id):

@@ -24,13 +24,13 @@ from core.domain import feedback_services
 from core.domain import rating_services
 from core.domain import stats_jobs_continuous
 from core.platform import models
+import feconf
+import utils
+
 (exp_models, collection_models, feedback_models, user_models) = (
     models.Registry.import_models([
         models.NAMES.exploration, models.NAMES.collection,
         models.NAMES.feedback, models.NAMES.user]))
-import feconf
-import utils
-
 
 # TODO(bhenning): Implement a working real-time layer for the recent dashboard
 # updates aggregator job.

@@ -26,7 +26,8 @@ oppia.directive('oppiaNoninteractiveTabs', [
       scope: {},
       templateUrl: 'richTextComponent/Tabs',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.tabContents = oppiaHtmlEscaper.escapedJsonToObj($attrs.tabContentsWithValue);
+        $scope.tabContents = oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.tabContentsWithValue);
       }]
     };
   }

@@ -18,9 +18,12 @@
 
 import contextlib
 import copy
+import inspect
+import json
 import os
 import re
 import unittest
+
 import webtest
 
 from core.domain import collection_domain
@@ -31,16 +34,13 @@ from core.domain import exp_services
 from core.domain import rule_domain
 from core.domain import rights_manager
 from core.platform import models
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
-current_user_services = models.Registry.import_current_user_services()
 import feconf
 import jinja_utils
 import main
 import utils
 
-import inspect
-import json
-
+(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+current_user_services = models.Registry.import_current_user_services()
 
 CSRF_REGEX = (
     r'csrf_token: JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\)')
@@ -119,13 +119,18 @@ class TestBase(unittest.TestCase):
     def tearDown(self):
         raise NotImplementedError
 
-    def assertFuzzyTrue(self, value):
+    def assertFuzzyTrue(self, value):  # pylint: disable=invalid-name
         self.assertEqual(value, rule_domain.CERTAIN_TRUE_VALUE)
         self.assertTrue(isinstance(value, float))
 
-    def assertFuzzyFalse(self, value):
+    def assertFuzzyFalse(self, value):  # pylint: disable=invalid-name
         self.assertEqual(value, rule_domain.CERTAIN_FALSE_VALUE)
         self.assertTrue(isinstance(value, float))
+
+    def _assert_validation_error(self, item, error_substring):
+        """Checks that the given item passes default validation."""
+        with self.assertRaisesRegexp(utils.ValidationError, error_substring):
+            item.validate()
 
     def signup_superadmin_user(self):
         """Signs up a superadmin user. Should be called at the end of setUp().
@@ -147,7 +152,7 @@ class TestBase(unittest.TestCase):
         Developers: please don't use this method outside this class -- it makes
         the individual tests harder to follow.
         """
-        self.stashed_user_env = {
+        self.stashed_user_env = {  # pylint: disable=attribute-defined-outside-init
             'USER_EMAIL': os.environ['USER_EMAIL'],
             'USER_ID': os.environ['USER_ID'],
             'USER_IS_ADMIN': os.environ['USER_IS_ADMIN']
@@ -165,7 +170,7 @@ class TestBase(unittest.TestCase):
         for key in self.stashed_user_env:
             os.environ[key] = self.stashed_user_env[key]
 
-        self.stashed_user_env = None
+        self.stashed_user_env = None  # pylint: disable=attribute-defined-outside-init
 
     def login(self, email, is_super_admin=False):
         os.environ['USER_EMAIL'] = email
@@ -426,7 +431,7 @@ class TestBase(unittest.TestCase):
 
     def submit_answer(
             self, exploration_id, state_name, answer,
-            params=None, exploration_version=None):
+            params=None, unused_exploration_version=None):
         """Submits an answer as an exploration player and returns the
         corresponding dict. This function has strong parallels to code in
         PlayerServices.js which has the non-test code to perform the same
@@ -485,10 +490,18 @@ class TestBase(unittest.TestCase):
 
         Example usage:
 
-        import math
-        with self.swap(math, "sqrt", lambda x: 42):
-            print math.sqrt(16.0) # prints 42
-        print math.sqrt(16.0) # prints 4 as expected.
+            import math
+            with self.swap(math, 'sqrt', lambda x: 42):
+                print math.sqrt(16.0)  # prints 42
+            print math.sqrt(16.0)  # prints 4 as expected.
+
+        Note that this does not work directly for classmethods. In this case,
+        you will need to import the 'types' module, as follows:
+
+            import types
+            with self.swap(
+                SomePythonClass, 'some_classmethod',
+                types.MethodType(new_classmethod, SomePythonClass)):
 
         NOTE: self.swap and other context managers that are created using
         contextlib.contextmanager use generators that yield exactly once. This
@@ -579,8 +592,8 @@ class AppEngineTestBase(TestBase):
             [queue_name] if queue_name else self._get_all_queue_names())
 
         tasks = self.taskqueue_stub.get_filtered_tasks(queue_names=queue_names)
-        for q in queue_names:
-            self.taskqueue_stub.FlushQueue(q)
+        for queue in queue_names:
+            self.taskqueue_stub.FlushQueue(queue)
 
         while tasks:
             for task in tasks:
@@ -602,8 +615,8 @@ class AppEngineTestBase(TestBase):
 
             tasks = self.taskqueue_stub.get_filtered_tasks(
                 queue_names=queue_names)
-            for q in queue_names:
-                self.taskqueue_stub.FlushQueue(q)
+            for queue in queue_names:
+                self.taskqueue_stub.FlushQueue(queue)
 
 
 if feconf.PLATFORM == 'gae':
@@ -618,26 +631,26 @@ class FunctionWrapper(object):
     methods for more info.
     """
 
-    def __init__(self, f):
+    def __init__(self, func):
         """Creates a new FunctionWrapper instance.
 
         args:
-          - f: a callable, or data descriptor. If it's a descriptor, its
-            __get__ should return a bound method. For example, f can be a
+          - func: a callable, or data descriptor. If it's a descriptor, its
+            __get__ should return a bound method. For example, func can be a
             function, a method, a static or class method, but not a @property.
         """
-        self._f = f
+        self._func = func
         self._instance = None
 
     def __call__(self, *args, **kwargs):
         if self._instance is not None:
             args = [self._instance] + list(args)
 
-        args_dict = inspect.getcallargs(self._f, *args, **kwargs)
+        args_dict = inspect.getcallargs(self._func, *args, **kwargs)
 
         self.pre_call_hook(args_dict)
 
-        result = self._f(*args, **kwargs)
+        result = self._func(*args, **kwargs)
 
         self.post_call_hook(args_dict, result)
 
@@ -645,7 +658,7 @@ class FunctionWrapper(object):
 
     def __get__(self, instance, owner):
         # We have to implement __get__ because otherwise, we don't have a
-        # chance to bind to the instance self._f was bound to. See the
+        # chance to bind to the instance self._func was bound to. See the
         # following SO answer: https://stackoverflow.com/a/22555978/675311
         self._instance = instance
         return self
@@ -704,9 +717,9 @@ class FailingFunction(FunctionWrapper):
 
         if not (self._num_tries_before_success >= 0 or self._always_fail):
             raise ValueError(
-                             'num_tries_before_success should either be an'
-                             'integer greater than or equal to 0,'
-                             'or FailingFunction.INFINITY')
+                'num_tries_before_success should either be an'
+                'integer greater than or equal to 0,'
+                'or FailingFunction.INFINITY')
 
     def pre_call_hook(self, args):
         self._times_called += 1

@@ -16,9 +16,6 @@
 
 """Provides a seam for transaction services."""
 
-__author__ = 'Sean Lip'
-
-
 from google.appengine.ext import ndb
 
 
@@ -33,4 +30,5 @@ def run_in_transaction(fn, *args, **kwargs):
 
 # The NDB toplevel() function. For more details, see
 #   https://developers.google.com/appengine/docs/python/ndb/async#intro
-toplevel_wrapper = ndb.toplevel
+def toplevel_wrapper(*args, **kwargs):
+    return ndb.toplevel(*args, **kwargs)
