@@ -1084,9 +1084,11 @@ md-card.oppia-gallery-tile {
 }
 
 .oppia-save-publish-loading.oppia-save-publish-button-icon {
-  font-size: 32px;
-  line-height: 0;
+  font-size: 30px;
+  line-height: 14px;
+  letter-spacing: -4px;
   font-style: normal;
+  text-align: center;
 }
 
 @media(max-width: 1100px) {
