@@ -249,6 +249,9 @@ def _validate_answer(answer_dict):
     - Check time_spent_in_sec is non-negative
     """
 
+    # TODO(bhenning): Remove the truncation/omission of submitted rules and
+    # implement a linked-list data structure for answers.
+
     # TODO(msl): These validation methods need tests to ensure that
     # the right errors show up in the various cases.
 
@@ -260,7 +263,7 @@ def _validate_answer(answer_dict):
     # 200-1000 bytes in size. We will address this later if it
     # happens regularly. At the moment, a ValidationError is raised if
     # an answer exceeds the maximum size.
-    MAX_BYTES_PER_ANSWER = 500
+    MAX_BYTES_PER_ANSWER = 2500
 
     # Prefix of strings that are cropped because they are too long.
     CROPPED_PREFIX_STRING = 'CROPPED: '
