@@ -439,23 +439,30 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     };
 
     $scope.showPublishExplorationModal = function() {
+      $scope.publishModalIsOpening = true;
       warningsData.clear();
-      $modal.open({
+      var modalInstance = $modal.open({
         templateUrl: 'modals/publishExploration',
         backdrop: true,
         controller: [
-            '$scope', '$modalInstance', function($scope, $modalInstance) {
-          $scope.publish = $modalInstance.close;
+          '$scope', '$modalInstance', function($scope, $modalInstance) {
+            $scope.publish = $modalInstance.close;
 
-          $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
-            warningsData.clear();
-          };
-        }]
-      }).result.then(function() {
+            $scope.cancel = function() {
+              $modalInstance.dismiss('cancel');
+              warningsData.clear();
+            };
+          }]
+      });
+
+      modalInstance.result.then(function() {
         explorationRightsService.saveChangeToBackend({
           is_public: true
         });
+      });
+
+      modalInstance.opened.then(function() {
+        $scope.publishModalIsOpening = false;
       });
     };
 
@@ -486,7 +493,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     $scope.saveChanges = function() {
       // This flag is used to change text of save button to "Loading..." to
       // add indication for user that something is happening.
-      $scope.modalIsOpening = true;
+      $scope.saveModalIsOpening = true;
 
       routerService.savePendingChanges();
 
@@ -726,7 +733,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
         // Modal is Opened
         _modalIsOpen = true;
-        $scope.modalIsOpening = false;
+        $scope.saveModalIsOpening = false;
 
         modalInstance.opened.then(function() {
           // The $timeout seems to be needed in order to give the modal time to
