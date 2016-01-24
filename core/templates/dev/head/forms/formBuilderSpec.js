@@ -202,19 +202,17 @@ describe('RTE helper service', function() {
       '<div>abc<span>def</span></div><b>ghi</b>'
     ], [
       '<oppia-noninteractive-image></oppia-noninteractive-image>',
-      '<img src="' + _DATA_URI + '" class="oppia-noninteractive-image">'
+      '<oppia-noninteractive-image></oppia-noninteractive-image>'
     ], [
       '<oppia-noninteractive-image ' +
         'image_id-with-value="&amp;quot;T&amp;quot;">' +
       '</oppia-noninteractive-image>',
-      '<img src="' + _DATA_URI + '" ' +
-           'class="oppia-noninteractive-image" ' +
-           'image_id-with-value="&amp;quot;T&amp;quot;">'
+      '<oppia-noninteractive-image ' +
+        'image_id-with-value="&amp;quot;T&amp;quot;">' +
+      '</oppia-noninteractive-image>'
     ]];
 
     for (var i = 0; i < testData.length; i++) {
-      expect(rhs.convertHtmlToRte(testData[i][0]))
-        .toEqual(testData[i][1]);
       expect(rhs.convertRteToHtml(testData[i][1]))
         .toEqual(testData[i][0]);
     }
