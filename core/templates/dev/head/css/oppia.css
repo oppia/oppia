@@ -1189,34 +1189,12 @@ pre.oppia-pre-wrapped-text {
   position: relative;
 }
 
-/* this class below is used to graymask
- * outcome section when one hovers
- * over the editable section
+/* this classes below are used to graymask
+ * outcome section when one hovers and
+ * editable section when one hovers over them
  */
 
-.oppia-editable-section .oppia-rule-preview-section-mask {
-  background-color: #eee;
-  bottom: 0;
-  height: 100%;
-  opacity: 0;
-  position: absolute;
-  top: 0;
-  width: 100%;
-  z-index: 10;
-}
-
-.oppia-editable-section:hover .oppia-rule-preview-section-mask {
-  border-radius: 4px;
-  opacity: 0.4;
-  transition: all 200ms;
-  -webkit-transition: all 200ms;
-}
-
-/* this class below is used to graymask
- * editable section when one hovers
- * over the editable section
- */
-
+.oppia-editable-section .oppia-rule-preview-section-mask,
 .oppia-editable-section .oppia-editable-section-mask {
   background-color: #eee;
   bottom: 0;
@@ -1228,6 +1206,7 @@ pre.oppia-pre-wrapped-text {
   z-index: 10;
 }
 
+.oppia-editable-section:hover .oppia-rule-preview-section-mask,
 .oppia-editable-section:hover .oppia-editable-section-mask {
   border-radius: 4px;
   opacity: 0.4;
