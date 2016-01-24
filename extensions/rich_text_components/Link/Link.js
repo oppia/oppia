@@ -25,38 +25,46 @@ oppia.directive('oppiaNoninteractiveLink', [
       restrict: 'E',
       scope: {},
       templateUrl: 'richTextComponent/Link',
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        if (!$attrs.openLinkInSameWindowWithValue) {
-          // This is done for backward-compatibility.
-          $scope.target = '_blank';
-        } else {
-          $scope.target = (
-            oppiaHtmlEscaper.escapedJsonToObj(
-              $attrs.openLinkInSameWindowWithValue) ? '_top' : '_blank');
-        }
-
-        var untrustedUrl = oppiaHtmlEscaper.escapedJsonToObj(
-          $attrs.urlWithValue);
-        if (untrustedUrl.indexOf('http://') !== 0 &&
-            untrustedUrl.indexOf('https://') !== 0) {
-          return;
-        }
-        $scope.url = untrustedUrl;
-
-        $scope.showUrlInTooltip = false;
-        $scope.text = $scope.url;
-        if ($attrs.textWithValue) {
-          // This is done for backward-compatibility; some old explorations
-          // have content parts that don't include a 'text' attribute on
-          // their links.
-          $scope.text = oppiaHtmlEscaper.escapedJsonToObj($attrs.textWithValue);
-          // Note that this second 'if' condition is needed because a link may
-          // have an empty 'text' value.
-          if ($scope.text) {
-            $scope.showUrlInTooltip = true;
+      controller: ['$scope', '$attrs', 'explorationContextService',
+        function($scope, $attrs, explorationContextService) {
+          if (!$attrs.openLinkInSameWindowWithValue) {
+            // This is done for backward-compatibility.
+            $scope.target = '_blank';
+          } else {
+            $scope.target = (
+              oppiaHtmlEscaper.escapedJsonToObj(
+                $attrs.openLinkInSameWindowWithValue) ? '_top' : '_blank');
           }
-        }
-      }]
+
+          var untrustedUrl = oppiaHtmlEscaper.escapedJsonToObj(
+            $attrs.urlWithValue);
+          if (untrustedUrl.indexOf('http://') !== 0 &&
+              untrustedUrl.indexOf('https://') !== 0) {
+            return;
+          }
+          $scope.url = untrustedUrl;
+
+          $scope.showUrlInTooltip = false;
+          $scope.text = $scope.url;
+          if ($attrs.textWithValue) {
+            // This is done for backward-compatibility; some old explorations
+            // have content parts that don't include a 'text' attribute on
+            // their links.
+            $scope.text =
+              oppiaHtmlEscaper.escapedJsonToObj($attrs.textWithValue);
+            // Note that this second 'if' condition is needed because a link may
+            // have an empty 'text' value.
+            if ($scope.text) {
+              $scope.showUrlInTooltip = true;
+            }
+          }
+
+          // This following check disbales the link in Editor being caught
+          // by tabbing while in Exploration Editor mode.
+          if (explorationContextService.isInExplorationEditorMode()) {
+            $scope.tabIndexVal = -1;
+          }
+        }]
     };
   }
 ]);
