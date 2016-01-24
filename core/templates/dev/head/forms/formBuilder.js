@@ -278,7 +278,7 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', function($modal) {
       // current caret.
       $scope.openEditParameterModal = function(currentParamName, eltToReplace) {
         return $modal.open({
-          templateUrl: 'modatmls/editParamName',
+          templateUrl: 'modals/editParamName',
           backdrop: true,
           resolve: {
             allowedParameterNames: function() {
@@ -936,7 +936,7 @@ oppia.directive('textAngularRte', [
       '<div text-angular="" ta-toolbar="<[toolbarOptionsJson]>" ' +
       '     ta-paste="stripFormatting($html)" ng-model="tempContent">' +
       '</div>'),
-    controller: ['$scope', '$element', function($scope) {
+    controller: ['$scope', function($scope) {
       $scope.isCustomizationModalOpen = false;
       var toolbarOptions = [
         ['bold', 'italics', 'underline'],
