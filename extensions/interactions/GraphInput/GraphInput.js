@@ -588,21 +588,23 @@ oppia.factory('graphUtilsService', [function() {
       INVERTED: 'inverted',
       UNDIRECTED: 'undirected'
     },
+
     DFS_STATUS: {
       VISITED: 'visited',
       UNVISITED: 'unvisited',
       STILL_VISITING: 'still visiting'
     },
+
     /**
-     * @param {object} graph A graph object.
-     * @param {string} mode A string indicating the mode.
+     * @param {object} graph - A graph object.
+     * @param {string} adjacencyListMode - A string indicating the mode.
      * @return {array} An adjacency list. Depending on the mode, the list has
      *   all edges (directed),
      *   all edges inverted (inverted),
      *   or all edges in both directions, as though the graph were undirected
      *   (undirected)
      */
-    constructAdjacencyLists: function(graph, mode) {
+    constructAdjacencyLists: function(graph, adjacencyListMode) {
       var adjacencyLists = [];
       for (var i = 0; i < graph.vertices.length; i++) {
         adjacencyLists.push([]);
@@ -610,38 +612,40 @@ oppia.factory('graphUtilsService', [function() {
 
       // If a graph is undirected, all modes work the same way anyway
       if (!graph.isDirected) {
-        mode = this.GRAPH_ADJACENCY_MODE.UNDIRECTED;
+        adjacencyListMode = this.GRAPH_ADJACENCY_MODE.UNDIRECTED;
       }
       for (var i = 0; i < graph.edges.length; i++) {
         var edge = graph.edges[i];
-        if (mode == this.GRAPH_ADJACENCY_MODE.DIRECTED ||
-            mode == this.GRAPH_ADJACENCY_MODE.UNDIRECTED) {
+        if (adjacencyListMode === this.GRAPH_ADJACENCY_MODE.DIRECTED ||
+            adjacencyListMode === this.GRAPH_ADJACENCY_MODE.UNDIRECTED) {
           adjacencyLists[edge.src].push(edge.dst);
         }
-        if (mode == this.GRAPH_ADJACENCY_MODE.INVERTED ||
-            mode == this.GRAPH_ADJACENCY_MODE.UNDIRECTED) {
+        if (adjacencyListMode === this.GRAPH_ADJACENCY_MODE.INVERTED ||
+            adjacencyListMode === this.GRAPH_ADJACENCY_MODE.UNDIRECTED) {
           adjacencyLists[edge.dst].push(edge.src);
         }
       }
       return adjacencyLists;
     },
+
     /**
-     * @param {integer} startVertex The index of the starting vertex.
-     * @param {array} adjacencyLists An array of arrays.
-     * @param {array} isVisited An array with length equal to the number of
+     * @param {integer} startVertex - The index of the starting vertex.
+     * @param {array} adjacencyLists - An array of arrays.
+     * @param {array} isVisited - An array with length equal to the number of
      *     vertices. All the values should be false initially.
      * This function modifies the isVisited array and changes the values at
-     * the indices of the vertices reachable form the starting vertex to true.
+     * the indices of the vertices reachable from the starting vertex to true.
      */
-    markVisited: function(startVertex, adjacencyLists, isVisited) {
+    markAccessible: function(startVertex, adjacencyLists, isVisited) {
       isVisited[startVertex] = true;
       for (var i = 0; i < adjacencyLists[startVertex].length; i++) {
         var nextVertex = adjacencyLists[startVertex][i];
         if (!isVisited[nextVertex]) {
-          this.markVisited(nextVertex, adjacencyLists, isVisited);
+          this.markAccessible(nextVertex, adjacencyLists, isVisited);
         }
       };
     },
+
     findCycle: function(
         currentVertex, previousVertex, adjacencyLists, isVisited,
         isDirected) {
@@ -663,6 +667,7 @@ oppia.factory('graphUtilsService', [function() {
       isVisited[currentVertex] = this.DFS_STATUS.VISITED;
       return false;
     },
+
     constructAdjacencyMatrix: function(graph) {
       var adjMatrix = [];
       for (var i = 0; i < graph.vertices.length; i++) {
@@ -681,6 +686,7 @@ oppia.factory('graphUtilsService', [function() {
       });
       return adjMatrix;
     },
+
     nextPermutation: function(permutation) {
       // Generates (in place) the next lexicographical permutation.
       // permutation is a permutation of [0, 1, 2, ..., permutation.length - 1]
@@ -709,6 +715,7 @@ oppia.factory('graphUtilsService', [function() {
       permutation = permutation.concat(permutation.splice(pivot + 1).reverse());
       return permutation;
     },
+
     areAdjacencyMatricesEqualWithPermutation: function(
         adj1, adj2, permutation) {
       var numVertices = adj1.length;
@@ -727,7 +734,7 @@ oppia.factory('graphUtilsService', [function() {
 oppia.factory('graphInputRulesService', [
     'graphUtilsService', function(graphUtilsService) {
   /**
-   * @param {object} graph A graph object.
+   * @param {object} graph - A graph object.
    * @return {boolean} Whether the graph is strongly connected.
    */
   var isStronglyConnected = function(graph) {
@@ -745,7 +752,7 @@ oppia.factory('graphInputRulesService', [
     var isVisited = graph.vertices.map(function() {
       return false;
     });
-    graphUtilsService.markVisited(0, adjacencyLists, isVisited);
+    graphUtilsService.markAccessible(0, adjacencyLists, isVisited);
     var isAnyVertexUnreachable = isVisited.some(function(visited) {
       return visited === false;
     });
@@ -753,7 +760,7 @@ oppia.factory('graphInputRulesService', [
     var isVisitedInReverse = graph.vertices.map(function() {
       return false;
     });
-    graphUtilsService.markVisited(
+    graphUtilsService.markAccessible(
       0, invertedAdjacencyLists, isVisitedInReverse);
     var isAnyVertexUnreachableInReverse =
       isVisitedInReverse.some(function(visited) {
@@ -764,7 +771,7 @@ oppia.factory('graphInputRulesService', [
   };
 
   /**
-   * @param {object} graph A graph object.
+   * @param {object} graph - A graph object.
    * @return {boolean} Whether the graph is weakly connected.
    */
   var isWeaklyConnected = function(graph) {
@@ -779,14 +786,14 @@ oppia.factory('graphInputRulesService', [
     var isVisited = graph.vertices.map(function() {
       return false;
     });
-    graphUtilsService.markVisited(0, adjacencyLists, isVisited);
+    graphUtilsService.markAccessible(0, adjacencyLists, isVisited);
     return isVisited.every(function(visited) {
       return visited === true;
     });
   };
 
   /**
-   * @param {object} graph A graph object.
+   * @param {object} graph - A graph object.
    * @return {boolean} Whether the graph is acyclic.
    */
   var isAcyclic = function(graph) {
@@ -812,7 +819,7 @@ oppia.factory('graphInputRulesService', [
   };
 
   /**
-   * @param {object} graph A graph object.
+   * @param {object} graph - A graph object.
    * @return {boolean} Whether the graph is acyclic.
    */
   var isRegular = function(graph) {
