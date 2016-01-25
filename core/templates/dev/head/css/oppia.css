@@ -1077,10 +1077,20 @@ md-card.oppia-gallery-tile {
 }
 
 @media(min-width: 1100px) {
-  .material-icons.oppia-save-publish-button-icon {
+  .material-icons.oppia-save-publish-button-icon,
+  .oppia-save-publish-loading.oppia-save-publish-button-icon {
     display: none;
   }
 }
+
+.oppia-save-publish-loading.oppia-save-publish-button-icon {
+  font-size: 30px;
+  line-height: 14px;
+  letter-spacing: -4px;
+  font-style: normal;
+  text-align: center;
+}
+
 @media(max-width: 1100px) {
   .oppia-save-publish-button-label {
     display: none;
