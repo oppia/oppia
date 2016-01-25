@@ -498,7 +498,7 @@ oppia.controller('LearnerLocalNav', [
   $scope.showLearnerSuggestionModal = function() {
     $modal.open({
       templateUrl: 'modals/learnerViewSuggestion',
-      backdrop: true,
+      backdrop: 'static',
       resolve: {},
       controller: [
         '$scope', '$modalInstance', '$timeout', 'playerPositionService',
