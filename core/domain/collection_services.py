@@ -281,15 +281,20 @@ def get_learner_collection_dict_by_id(
     # dict includes meta information about the exploration (ID and title).
     for collection_node in collection_dict['nodes']:
         summary = exp_summaries_dict.get(collection_node['exploration_id'])
+        if not summary:
+            raise Exception(
+                'Unexpected error: access to a collection node that refernces'
+                'a non-existent exploration with exploration id: %s' % (
+                    collection_node['exploration_id']))
+
         collection_node['exploration'] = {
             'id': collection_node['exploration_id'],
-            'title': summary.title if summary else None,
-            'category': summary.category if summary else None,
-            'objective': summary.objective if summary else None,
-            'ratings': summary.ratings if summary else None,
+            'title': summary.title,
+            'category': summary.category,
+            'objective': summary.objective,
+            'ratings': summary.ratings,
             'last_updated_msec': utils.get_time_in_millisecs(
-                summary.exploration_model_last_updated
-            ) if summary else None,
+                summary.exploration_model_last_updated),
             'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
                 summary.category),
             'thumbnail_bg_color': utils.get_hex_color_for_category(
@@ -525,6 +530,14 @@ def _save_collection(committer_id, collection, commit_message, change_list):
         collection.validate(strict=True)
     else:
         collection.validate(strict=False)
+
+    for collection_node in collection.nodes:
+        if not exp_services.get_exploration_by_id(
+            collection_node.exploration_id, strict=False):
+            raise Exception(
+                'Unexpected error: Access to a collection node that references '
+                'a non-existent exploration with id: %s when trying to save a'
+                'collection' % (collection_node.exploration_id))
 
     collection_model = collection_models.CollectionModel.get(
         collection.id, strict=False)
