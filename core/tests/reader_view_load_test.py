@@ -24,7 +24,6 @@ Run this script from the Oppia root directory:
 
 """
 
-import argparse
 import cookielib
 import json
 import logging
@@ -33,6 +32,7 @@ import threading
 import time
 import urllib
 import urllib2
+import argparse
 
 
 XSSI_PREFIX = ')]}\'\n'

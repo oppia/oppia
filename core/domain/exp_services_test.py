@@ -2904,11 +2904,12 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
     def _return_true(self, unused_thread_id, unused_exploration_id):
         return True
 
-    def _return_false(self, thread_id, exploration_id):
+    def _return_false(self, unused_thread_id, unused_exploration_id):
         return False
 
     def _check_commit_message(
-        self, user_id, exploration_id, change_list, commit_message):
+            self, unused_user_id, unused_exploration_id, unused_change_list,
+            commit_message):
         self.assertEqual(commit_message, self.COMMIT_MESSAGE)
 
     def setUp(self):

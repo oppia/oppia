@@ -32,8 +32,8 @@ import sys
 import subprocess
 import collections
 import pprint
-import argparse
 import shutil
+import argparse
 
 
 GitRef = collections.namedtuple('GitRef', ['local_ref', 'local_sha1',

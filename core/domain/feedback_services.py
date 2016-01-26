@@ -204,7 +204,7 @@ def create_suggestion(exploration_id, author_id, exploration_version,
     FeedbackThreadModel object."""
 
     thread_id = _create_models_for_thread_and_first_message(
-        exploration_id, state_name, author_id, 
+        exploration_id, state_name, author_id,
         description,
         DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE, True)
     feedback_models.SuggestionModel.create(

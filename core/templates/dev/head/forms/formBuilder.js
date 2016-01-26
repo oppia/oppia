@@ -865,69 +865,73 @@ oppia.directive('textAngularRte', [
     function(
       $filter, oppiaHtmlEscaper, rteHelperService,
       explorationContextService, PAGE_CONTEXT) {
-  return {
-    restrict: 'E',
-    scope: {
-      htmlContent: '=',
-      uiConfig: '&'
-    },
-    template: (
-      '<div text-angular="" ta-toolbar="<[toolbarOptionsJson]>" ' +
-      '     ta-paste="stripFormatting($html)" ng-model="tempContent">' +
-      '</div>'),
-    controller: ['$scope', '$log', function($scope, $log) {
-      // Currently, operations affecting the filesystem are allowed only in
-      // the editor context.
-      $scope.canUseFs = (
-        explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
-      $scope.isCustomizationModalOpen = false;
-      var toolbarOptions = [
-        ['bold', 'italics', 'underline'],
-        ['ol', 'ul', 'pre'],
-        []
-      ];
+      return {
+        restrict: 'E',
+        scope: {
+          htmlContent: '=',
+          uiConfig: '&'
+        },
+        template: (
+          '<div text-angular="" ta-toolbar="<[toolbarOptionsJson]>" ' +
+          '     ta-paste="stripFormatting($html)" ng-model="tempContent">' +
+          '</div>'),
+        controller: ['$scope', function($scope) {
+          // Currently, operations affecting the filesystem are allowed only in
+          // the editor context.
+          $scope.canUseFs = (
+            explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
+          $scope.isCustomizationModalOpen = false;
+          var toolbarOptions = [
+            ['bold', 'italics', 'underline'],
+            ['ol', 'ul', 'pre'],
+            []
+          ];
 
-      rteHelperService.getRichTextComponents().forEach(function(componentDefn) {
-        if (!($scope.uiConfig() && $scope.uiConfig().hide_complex_extensions &&
-          componentDefn.isComplex)) {
-          toolbarOptions[2].push(componentDefn.name);
-        }
-      });
-      $scope.toolbarOptionsJson = JSON.stringify(toolbarOptions);
+          rteHelperService.getRichTextComponents().forEach(
+            function(componentDefn) {
+              if (!($scope.uiConfig() &&
+                    $scope.uiConfig().hide_complex_extensions &&
+                    componentDefn.isComplex)) {
+                toolbarOptions[2].push(componentDefn.name);
+              }
+            }
+          );
+          $scope.toolbarOptionsJson = JSON.stringify(toolbarOptions);
 
-      var _convertHtmlToRte = function(html) {
-        return rteHelperService.convertHtmlToRte(html);
+          var _convertHtmlToRte = function(html) {
+            return rteHelperService.convertHtmlToRte(html);
+          };
+
+          $scope.stripFormatting = function(html) {
+            return $filter('sanitizeHtmlForRte')(html);
+          };
+
+          $scope.init = function() {
+            $scope.tempContent = _convertHtmlToRte($scope.htmlContent);
+          };
+
+          $scope.init();
+
+          $scope.$watch('tempContent', function(newVal) {
+            // Sanitizing while a modal is open would delete the markers that
+            // save and restore the cursor's position in the RTE.
+            var displayedContent = $scope.isCustomizationModalOpen ? newVal :
+              $filter('sanitizeHtmlForRte')(newVal);
+            $scope.htmlContent = rteHelperService.convertRteToHtml(
+              displayedContent);
+          });
+
+          // It is possible for the content of the RTE to be changed externally,
+          // e.g. if there are several RTEs in a list, and one is deleted.
+          $scope.$watch('htmlContent', function(newVal, oldVal) {
+            if (newVal !== oldVal) {
+              $scope.tempContent = _convertHtmlToRte(newVal);
+            }
+          });
+        }]
       };
-
-      $scope.stripFormatting = function(html) {
-        return $filter('sanitizeHtmlForRte')(html);
-      };
-
-      $scope.init = function() {
-        $scope.tempContent = _convertHtmlToRte($scope.htmlContent);
-      };
-
-      $scope.init();
-
-      $scope.$watch('tempContent', function(newVal) {
-        // Sanitizing while a modal is open would delete the markers that
-        // save and restore the cursor's position in the RTE.
-        var displayedContent = $scope.isCustomizationModalOpen ? newVal :
-          $filter('sanitizeHtmlForRte')(newVal);
-        $scope.htmlContent = rteHelperService.convertRteToHtml(
-          displayedContent);
-      });
-
-      // It is possible for the content of the RTE to be changed externally,
-      // e.g. if there are several RTEs in a list, and one is deleted.
-      $scope.$watch('htmlContent', function(newVal, oldVal) {
-        if (newVal !== oldVal) {
-          $scope.tempContent = _convertHtmlToRte(newVal);
-        }
-      });
-    }]
-  };
-}]);
+    }
+]);
 
 // The names of these filters must correspond to the names of the backend
 // validators (with underscores converted to camelcase).

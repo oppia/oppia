@@ -47,7 +47,7 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
             exp_id, thread_id)[0].id
 
         full_thread_id = (feedback_models.FeedbackThreadModel
-                .generate_full_thread_id(exp_id, thread_id))
+                          .generate_full_thread_id(exp_id, thread_id))
         # The message id should be prefixed with the full thread id and a full
         # stop, followed by the message id.
         self.assertEqual(

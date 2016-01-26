@@ -47,11 +47,11 @@ IMPORTANT NOTES:
     named 'oppia'.
 """
 
-import argparse
 import datetime
 import os
 import shutil
 import subprocess
+import argparse
 
 import common
 

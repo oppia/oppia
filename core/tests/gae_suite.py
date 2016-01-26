@@ -22,10 +22,10 @@ it from the command line by running
 from the oppia/ root folder.
 """
 
-import argparse
 import os
 import sys
 import unittest
+import argparse
 
 import feconf
 

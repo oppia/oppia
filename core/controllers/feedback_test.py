@@ -16,14 +16,14 @@
 
 """Tests for the feedback controllers."""
 
+import feconf
+from core.tests import test_utils
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rights_manager
 from core.platform import models
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
-from core.tests import test_utils
-import feconf
 
 
 EXPECTED_THREAD_KEYS = [
@@ -471,8 +471,8 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
                           thread_id))
         self.assertEqual(feedback_services.get_thread_id_from_full_thread_id(
             response_dict['suggestion']['id']), thread_id)
- 
-        # Get a list of all threads without suggestions. 
+
+        # Get a list of all threads without suggestions.
         response_dict = self.get_json(
             '%s/%s?list_type=%s&has_suggestion=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'all',
@@ -528,17 +528,17 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
             self.testapp.get('/create/%s' % self.EXP_ID))
         response_dict = self.get_json(
             '%s/%s?list_type=%s&has_suggestion=%s' % (
-            feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'all', 'true'))
+                feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'all', 'true'))
         threads = response_dict['threads']
         accepted_suggestion_thread_id = (
-                feedback_models.FeedbackThreadModel.generate_full_thread_id(
-                    self.EXP_ID, threads[0]['thread_id']))
+            feedback_models.FeedbackThreadModel.generate_full_thread_id(
+                self.EXP_ID, threads[0]['thread_id']))
         rejected_suggestion_thread_id = (
-                feedback_models.FeedbackThreadModel.generate_full_thread_id(
-                    self.EXP_ID, threads[1]['thread_id']))
+            feedback_models.FeedbackThreadModel.generate_full_thread_id(
+                self.EXP_ID, threads[1]['thread_id']))
         unsuccessful_accept_thread_id = (
-                feedback_models.FeedbackThreadModel.generate_full_thread_id(
-                    self.EXP_ID, threads[2]['thread_id']))
+            feedback_models.FeedbackThreadModel.generate_full_thread_id(
+                self.EXP_ID, threads[2]['thread_id']))
 
         # Accept a suggestion.
         self._accept_suggestion(accepted_suggestion_thread_id, csrf_token)

@@ -20,13 +20,13 @@ execute:
     bash scripts/run_backend_tests.sh
 """
 
-import argparse
 import datetime
 import os
 import re
 import subprocess
 import threading
 import time
+import argparse
 
 COVERAGE_PATH = os.path.join(
     os.getcwd(), '..', 'oppia_tools', 'coverage-4.0', 'coverage')

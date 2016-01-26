@@ -1465,14 +1465,14 @@ def accept_suggestion(editor_id, thread_id, exploration_id, commit_message):
         suggestion_author_id = user_services.get_user_id_from_username(
             suggestion_author_username)
         update_exploration(
-             suggestion_author_id, exploration_id, change_list,
-             commit_message)
+            suggestion_author_id, exploration_id, change_list,
+            commit_message)
         feedback_services.create_message(
             exploration_id, thread_id, editor_id,
             feedback_models.STATUS_CHOICES_FIXED, None,
-            'Suggestion accepted.') 
+            'Suggestion accepted.')
         thread = (feedback_models.FeedbackThreadModel.
-            get_by_exp_and_thread_id(exploration_id, thread_id))
+                  get_by_exp_and_thread_id(exploration_id, thread_id))
         thread.put()
 
 

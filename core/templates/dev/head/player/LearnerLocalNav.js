@@ -34,7 +34,8 @@ oppia.controller('LearnerLocalNav', [
             $scope, $modalInstance, $timeout, playerPositionService,
             oppiaPlayerService) {
             var stateName = playerPositionService.getCurrentStateName();
-            $scope.initContent = oppiaPlayerService.getStateContentHtml(stateName);
+            $scope.initContent = oppiaPlayerService.getStateContentHtml(
+              stateName);
             $scope.description = '';
             $scope.suggestionContent = $scope.initContent;
             $scope.showEditor = false;
@@ -75,11 +76,14 @@ oppia.controller('LearnerLocalNav', [
           templateUrl: 'modals/learnerSuggestionSubmitted',
           backdrop: true,
           resolve: {},
-          controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-            $scope.close = function() {
-              $modalInstance.dismiss();
-            };
-          }]
+          controller: [
+            '$scope', '$modalInstance',
+            function($scope, $modalInstance) {
+              $scope.close = function() {
+                $modalInstance.dismiss();
+              };
+            }
+          ]
         });
       });
     };

@@ -76,7 +76,7 @@ class ThreadHandler(base.BaseHandler):
                 'Text for the message must be specified.')
         if suggestion and updated_status:
             raise self.InvalidInputException(
-                    'Suggestion thread status cannot be changed manually.')
+                'Suggestion thread status cannot be changed manually.')
 
         feedback_services.create_message(
             exploration_id,

@@ -402,7 +402,8 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             # Trigger close event.
             threadlist = feedback_services.get_all_threads(exp_id, False)
             thread_id = threadlist[0]['thread_id']
-            feedback_services.create_message(exp_id, thread_id, 'author',
+            feedback_services.create_message(
+                exp_id, thread_id, 'author',
                 feedback_models.STATUS_CHOICES_FIXED, None, 'some text')
             self._flush_tasks_and_check_analytics(exp_id, {
                 'num_open_threads': 0,
@@ -428,7 +429,8 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             # Trigger close event.
             threadlist = feedback_services.get_all_threads(exp_id, False)
             thread_id = threadlist[0]['thread_id']
-            feedback_services.create_message(exp_id, thread_id, 'author',
+            feedback_services.create_message(
+                exp_id, thread_id, 'author',
                 feedback_models.STATUS_CHOICES_FIXED, None, 'some text')
             self._flush_tasks_and_check_analytics(exp_id, {
                 'num_open_threads': 0,
@@ -438,7 +440,8 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             # Trigger reopen event.
             threadlist = feedback_services.get_all_threads(exp_id, False)
             thread_id = threadlist[0]['thread_id']
-            feedback_services.create_message(exp_id, thread_id, 'author',
+            feedback_services.create_message(
+                exp_id, thread_id, 'author',
                 feedback_models.STATUS_CHOICES_OPEN, None, 'some text')
             self._flush_tasks_and_check_analytics(exp_id, {
                 'num_open_threads': 1,
@@ -464,7 +467,8 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             # Trigger close event.
             threadlist = feedback_services.get_all_threads(exp_id, False)
             thread_id = threadlist[0]['thread_id']
-            feedback_services.create_message(exp_id, thread_id, 'author',
+            feedback_services.create_message(
+                exp_id, thread_id, 'author',
                 feedback_models.STATUS_CHOICES_FIXED, None, 'some text')
             self._flush_tasks_and_check_analytics(exp_id, {
                 'num_open_threads': 0,
@@ -474,7 +478,8 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             # Trigger thread status change event.
             threadlist = feedback_services.get_all_threads(exp_id, False)
             thread_id = threadlist[0]['thread_id']
-            feedback_services.create_message( exp_id, thread_id, 'author',
+            feedback_services.create_message(
+                exp_id, thread_id, 'author',
                 feedback_models.STATUS_CHOICES_IGNORED, None, 'some text')
             self._flush_tasks_and_check_analytics(exp_id, {
                 'num_open_threads': 0,
