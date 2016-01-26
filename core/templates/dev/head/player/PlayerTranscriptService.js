@@ -75,7 +75,7 @@ oppia.factory('playerTranscriptService', ['$log', function($log) {
       var lastCard = this.getLastCard();
       if (lastCard.destStateName) {
         throw Error(
-          'Trying to set a destStateName when the destStateName is already set.',
+          'Trying to set a destStateName when it has already been set.',
           transcript);
       }
 
@@ -83,9 +83,11 @@ oppia.factory('playerTranscriptService', ['$log', function($log) {
     },
     addNewAnswer: function(answer) {
       var pairs = transcript[transcript.length - 1].answerFeedbackPairs;
-      if (pairs.length > 0 && pairs[pairs.length - 1].oppiaFeedbackHtml === null) {
+      if (pairs.length > 0 &&
+          pairs[pairs.length - 1].oppiaFeedbackHtml === null) {
         throw Error(
-          'Trying to add an answer when the feedback has not been received yet.',
+          'Trying to add an answer before the feedback for the previous ' +
+          'answer has been received.',
           transcript);
       }
       transcript[transcript.length - 1].answerFeedbackPairs.push({

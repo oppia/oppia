@@ -104,7 +104,7 @@ trap cleanup EXIT
 # TODO(jacob): Find a webdriver or selenium argument that controls log level.
 ($NODE_MODULE_DIR/.bin/webdriver-manager start 2>/dev/null)&
 # Start a demo server.
-($PYTHON_CMD $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=4445 --clear_datastore=yes --dev_appserver_log_level=critical --log_level=critical .)&
+($PYTHON_CMD $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=4445 --clear_datastore=yes --dev_appserver_log_level=critical --log_level=critical --skip_sdk_update_check=true .)&
 
 # Wait for the servers to come up.
 while ! nc -vz localhost 4444; do sleep 1; done

@@ -34,15 +34,28 @@ describe('Graph Input service', function() {
 
     it('should construct an adjacency matrix from a graph', function() {
       expect(utils.constructAdjacencyMatrix({
-        vertices: [
-          {label: 'a', x: 1.0, y: 1.0},
-          {label: 'b', x: 2.0, y: 2.0},
-          {label: 'c', x: 3.0, y: 3.0}
-        ],
-        edges: [
-          {src: 0, dst: 1, weight: 1},
-          {src: 1, dst: 2, weight: 2}
-        ],
+        vertices: [{
+          label: 'a',
+          x: 1.0,
+          y: 1.0
+        }, {
+          label: 'b',
+          x: 2.0,
+          y: 2.0
+        }, {
+          label: 'c',
+          x: 3.0,
+          y: 3.0
+        }],
+        edges: [{
+          src: 0,
+          dst: 1,
+          weight: 1
+        }, {
+          src: 1,
+          dst: 2,
+          weight: 2
+        }],
         isDirected: false,
         isWeighted: true,
         isLabeled: true
@@ -52,15 +65,28 @@ describe('Graph Input service', function() {
         [null, 2, null]
       ]);
       expect(utils.constructAdjacencyMatrix({
-        vertices: [
-          {label: 'a', x: 1.0, y: 1.0},
-          {label: 'b', x: 2.0, y: 2.0},
-          {label: 'c', x: 3.0, y: 3.0}
-        ],
-        edges: [
-          {src: 0, dst: 1, weight: 1},
-          {src: 1, dst: 2, weight: 2}
-        ],
+        vertices: [{
+          label: 'a',
+          x: 1.0,
+          y: 1.0
+        }, {
+          label: 'b',
+          x: 2.0,
+          y: 2.0
+        }, {
+          label: 'c',
+          x: 3.0,
+          y: 3.0
+        }],
+        edges: [{
+          src: 0,
+          dst: 1,
+          weight: 1
+        }, {
+          src: 1,
+          dst: 2,
+          weight: 2
+        }],
         isDirected: false,
         isWeighted: false,
         isLabeled: true
@@ -197,9 +223,9 @@ describe('Graph Input service', function() {
       for (var i = 0; i < numVertices; i++) {
         for (var j = i + 1; j < numVertices; j++) {
           graph.edges.push({
-              src: i,
-              dst: j,
-              weight: 1
+            src: i,
+            dst: j,
+            weight: 1
           });
         }
       }
@@ -207,243 +233,451 @@ describe('Graph Input service', function() {
     };
 
     it('should match graphs which are the same', function() {
-      expect(girs.IsIsomorphicTo(emptyGraph(), {g: emptyGraph()})).toBe(true);
-      expect(girs.IsIsomorphicTo(cycleGraph(5), {g: cycleGraph(5)})).toBe(true);
+      expect(girs.IsIsomorphicTo(emptyGraph(), {
+        g: emptyGraph()
+      })).toBe(true);
+      expect(girs.IsIsomorphicTo(cycleGraph(5), {
+        g: cycleGraph(5)
+      })).toBe(true);
     });
 
     it('should match isomorphic graphs', function() {
-      expect(girs.IsIsomorphicTo(cycleGraph(5), {g: {
-        vertices: [
-          {label: '', x: 1.0, y: 1.0},
-          {label: '', x: 1.0, y: 1.0},
-          {label: '', x: 1.0, y: 1.0},
-          {label: '', x: 1.0, y: 1.0},
-          {label: '', x: 1.0, y: 1.0}
-        ],
-        edges: [
-          {src: 0, dst: 2, weight: 1},
-          {src: 2, dst: 4, weight: 1},
-          {src: 4, dst: 1, weight: 1},
-          {src: 1, dst: 3, weight: 1},
-          {src: 3, dst: 0, weight: 1}
-        ],
-        isDirected: false,
-        isWeighted: false,
-        isLabeled: false
-      }})).toBe(true);
+      expect(girs.IsIsomorphicTo(cycleGraph(5), {
+        g: {
+          vertices: [{
+            label: '',
+            x: 1.0,
+            y: 1.0
+          }, {
+            label: '',
+            x: 1.0,
+            y: 1.0
+          }, {
+            label: '',
+            x: 1.0,
+            y: 1.0
+          }, {
+            label: '',
+            x: 1.0,
+            y: 1.0
+          }, {
+            label: '',
+            x: 1.0,
+            y: 1.0
+          }],
+          edges: [{
+            src: 0,
+            dst: 2,
+            weight: 1
+          }, {
+            src: 2,
+            dst: 4,
+            weight: 1
+          }, {
+            src: 4,
+            dst: 1,
+            weight: 1
+          }, {
+            src: 1,
+            dst: 3,
+            weight: 1
+          }, {
+            src: 3,
+            dst: 0,
+            weight: 1
+          }],
+          isDirected: false,
+          isWeighted: false,
+          isLabeled: false
+        }
+      })).toBe(true);
     });
 
     it('should match isomorphic graphs with labels', function() {
       expect(girs.IsIsomorphicTo({
-        vertices: [
-          {label: 'a', x: 1.0, y: 1.0},
-          {label: 'b', x: 2.0, y: 2.0},
-          {label: 'c', x: 3.0, y: 3.0}
-        ],
-        edges: [
-          {src: 0, dst: 1, weight: 1},
-        ],
+        vertices: [{
+          label: 'a',
+          x: 1.0,
+          y: 1.0
+        }, {
+          label: 'b',
+          x: 2.0,
+          y: 2.0
+        }, {
+          label: 'c',
+          x: 3.0,
+          y: 3.0
+        }],
+        edges: [{
+          src: 0,
+          dst: 1,
+          weight: 1
+        }],
         isDirected: false,
         isWeighted: false,
         isLabeled: true
-      }, {g: {
-        vertices: [
-            {label: 'c', x: 1.0, y: 1.0},
-            {label: 'a', x: 2.0, y: 2.0},
-            {label: 'b', x: 3.0, y: 3.0}
-        ],
-        edges: [
-            {src: 2, dst: 1, weight: 1},
-        ],
-        isDirected: false,
-        isWeighted: false,
-        isLabeled: true
-      }})).toBe(true);
+      }, {
+        g: {
+          vertices: [{
+            label: 'c',
+            x: 1.0,
+            y: 1.0
+          }, {
+            label: 'a',
+            x: 2.0,
+            y: 2.0
+          }, {
+            label: 'b',
+            x: 3.0,
+            y: 3.0
+          }],
+          edges: [{
+            src: 2,
+            dst: 1,
+            weight: 1
+          }],
+          isDirected: false,
+          isWeighted: false,
+          isLabeled: true
+        }
+      })).toBe(true);
     });
 
     it('should match isomorphic graphs with labels and weights', function() {
       expect(girs.IsIsomorphicTo({
-        vertices: [
-          {label: 'a', x: 1.0, y: 1.0},
-          {label: 'b', x: 2.0, y: 2.0},
-          {label: 'c', x: 3.0, y: 3.0}
-        ],
-        edges: [
-          {src: 0, dst: 1, weight: 2},
-          {src: 1, dst: 2, weight: 1}
-        ],
+        vertices: [{
+          label: 'a',
+          x: 1.0,
+          y: 1.0
+        }, {
+          label: 'b',
+          x: 2.0,
+          y: 2.0
+        }, {
+          label: 'c',
+          x: 3.0,
+          y: 3.0
+        }],
+        edges: [{
+          src: 0,
+          dst: 1,
+          weight: 2
+        }, {
+          src: 1,
+          dst: 2,
+          weight: 1
+        }],
         isDirected: false,
         isWeighted: true,
         isLabeled: true
-      }, {g: {
-        vertices: [
-            {label: 'b', x: 1.0, y: 1.0},
-            {label: 'a', x: 2.0, y: 2.0},
-            {label: 'c', x: 3.0, y: 3.0}
-        ],
-        edges: [
-            {src: 2, dst: 0, weight: 1},
-            {src: 1, dst: 0, weight: 2}
-        ],
-        isDirected: false,
-        isWeighted: true,
-        isLabeled: true
-      }})).toBe(true);
+      }, {
+        g: {
+          vertices: [{
+            label: 'b',
+            x: 1.0,
+            y: 1.0
+          }, {
+            label: 'a',
+            x: 2.0,
+            y: 2.0
+          }, {
+            label: 'c',
+            x: 3.0,
+            y: 3.0
+          }],
+          edges: [{
+            src: 2,
+            dst: 0,
+            weight: 1
+          }, {
+            src: 1,
+            dst: 0,
+            weight: 2
+          }],
+          isDirected: false,
+          isWeighted: true,
+          isLabeled: true
+        }
+      })).toBe(true);
     });
 
     it('should match directed and undirected graphs', function() {
       expect(girs.IsIsomorphicTo({
-        vertices: [
-          {label: '', x: 1.0, y: 1.0},
-          {label: '', x: 2.0, y: 2.0}
-        ],
-        edges: [
-          {src: 0, dst: 1, weight: 1}
-        ],
+        vertices: [{
+          label: '',
+          x: 1.0,
+          y: 1.0
+        }, {
+          label: '',
+          x: 2.0,
+          y: 2.0
+        }],
+        edges: [{
+          src: 0,
+          dst: 1,
+          weight: 1
+        }],
         isDirected: false,
         isWeighted: false,
         isLabeled: false
-      }, {g: {
-        vertices: [
-            {label: '', x: 1.0, y: 1.0},
-            {label: '', x: 2.0, y: 2.0}
-        ],
-        edges: [
-            {src: 0, dst: 1, weight: 1},
-            {src: 1, dst: 0, weight: 1}
-        ],
-        isDirected: true,
-        isWeighted: false,
-        isLabeled: false
-      }})).toBe(true);
+      }, {
+        g: {
+          vertices: [{
+            label: '',
+            x: 1.0,
+            y: 1.0
+          }, {
+            label: '',
+            x: 2.0,
+            y: 2.0
+          }],
+          edges: [{
+            src: 0,
+            dst: 1,
+            weight: 1
+          }, {
+            src: 1,
+            dst: 0,
+            weight: 1
+          }],
+          isDirected: true,
+          isWeighted: false,
+          isLabeled: false
+        }
+      })).toBe(true);
     });
 
-
     it('should not match simple graphs with different edges', function() {
-      expect(girs.IsIsomorphicTo(cycleGraph(3), {g: nullGraph(3)})).toBe(false);
-      expect(girs.IsIsomorphicTo(nullGraph(3), {g: cycleGraph(3)})).toBe(false);
-      expect(girs.IsIsomorphicTo(
-        completeGraph(4), {g: cycleGraph(4)})).toBe(false);
-      expect(girs.IsIsomorphicTo(
-        cycleGraph(4), {g: completeGraph(4)})).toBe(false);
+      expect(girs.IsIsomorphicTo(cycleGraph(3), {
+        g: nullGraph(3)
+      })).toBe(false);
+      expect(girs.IsIsomorphicTo(nullGraph(3), {
+        g: cycleGraph(3)
+      })).toBe(false);
+      expect(girs.IsIsomorphicTo(completeGraph(4), {
+        g: cycleGraph(4)
+      })).toBe(false);
+      expect(girs.IsIsomorphicTo(cycleGraph(4), {
+        g: completeGraph(4)
+      })).toBe(false);
     });
 
     it('should not match graphs with different numbers of nodes', function() {
-      expect(girs.IsIsomorphicTo(nullGraph(3), {g: nullGraph(6)})).toBe(false);
+      expect(girs.IsIsomorphicTo(nullGraph(3), {
+        g: nullGraph(6)
+      })).toBe(false);
     });
 
     it('should not match graphs with different edges', function() {
       expect(girs.IsIsomorphicTo({
-        vertices: [
-          {label: 'a', x: 1.0, y: 1.0},
-          {label: 'b', x: 2.0, y: 2.0},
-          {label: 'c', x: 3.0, y: 3.0}
-        ],
-        edges: [
-          {src: 0, dst: 1, weight: 2},
-          {src: 1, dst: 2, weight: 2}
-        ],
+        vertices: [{
+          label: 'a',
+          x: 1.0,
+          y: 1.0
+        }, {
+          label: 'b',
+          x: 2.0,
+          y: 2.0
+        }, {
+          label: 'c',
+          x: 3.0,
+          y: 3.0
+        }],
+        edges: [{
+          src: 0,
+          dst: 1,
+          weight: 2
+        }, {
+          src: 1,
+          dst: 2,
+          weight: 2
+        }],
         isDirected: false,
         isWeighted: true,
         isLabeled: true
-      }, {g: {
-        vertices: [
-          {label: 'b', x: 1.0, y: 1.0},
-          {label: 'a', x: 2.0, y: 2.0},
-          {label: 'c', x: 3.0, y: 3.0}
-        ],
-        edges: [
-          {src: 0, dst: 1, weight: 1},
-          {src: 0, dst: 2, weight: 2}
-        ],
-        isDirected: false,
-        isWeighted: true,
-        isLabeled: true
-      }})).toBe(false);
+      }, {
+        g: {
+          vertices: [{
+            label: 'b',
+            x: 1.0,
+            y: 1.0
+          }, {
+            label: 'a',
+            x: 2.0,
+            y: 2.0
+          }, {
+            label: 'c',
+            x: 3.0,
+            y: 3.0
+          }],
+          edges: [{
+            src: 0,
+            dst: 1,
+            weight: 1
+          }, {
+            src: 0,
+            dst: 2,
+            weight: 2
+          }],
+          isDirected: false,
+          isWeighted: true,
+          isLabeled: true
+        }
+      })).toBe(false);
     });
 
     it('should not match graphs with different edge weights', function() {
       expect(girs.IsIsomorphicTo({
-        vertices: [
-          {label: '', x: 1.0, y: 1.0},
-          {label: '', x: 2.0, y: 2.0}
-        ],
-        edges: [
-          {src: 0, dst: 1, weight: 1}
-        ],
+        vertices: [{
+          label: '',
+          x: 1.0,
+          y: 1.0
+        }, {
+          label: '',
+          x: 2.0,
+          y: 2.0
+        }],
+        edges: [{
+          src: 0,
+          dst: 1,
+          weight: 1
+        }],
         isDirected: false,
         isWeighted: true,
         isLabeled: false
-      }, {g: {
-        vertices: [
-          {label: '', x: 1.0, y: 1.0},
-          {label: '', x: 2.0, y: 2.0}
-        ],
-        edges: [
-          {src: 0, dst: 1, weight: 2}
-        ],
-        isDirected: false,
-        isWeighted: true,
-        isLabeled: false
-      }})).toBe(false);
+      }, {
+        g: {
+          vertices: [{
+            label: '',
+            x: 1.0,
+            y: 1.0
+          }, {
+            label: '',
+            x: 2.0,
+            y: 2.0
+          }],
+          edges: [{
+            src: 0,
+            dst: 1,
+            weight: 2
+          }],
+          isDirected: false,
+          isWeighted: true,
+          isLabeled: false
+        }
+      })).toBe(false);
     });
 
     it('should not match graphs with different labels', function() {
       expect(girs.IsIsomorphicTo({
-        vertices: [
-          {label: 'a', x: 1.0, y: 1.0},
-          {label: 'b', x: 2.0, y: 2.0}
-        ],
-        edges: [
-          {src: 0, dst: 1, weight: 2}
-        ],
+        vertices: [{
+          label: 'a',
+          x: 1.0,
+          y: 1.0
+        }, {
+          label: 'b',
+          x: 2.0,
+          y: 2.0
+        }],
+        edges: [{
+          src: 0,
+          dst: 1,
+          weight: 2
+        }],
         isDirected: false,
         isWeighted: true,
         isLabeled: true
-      }, {g: {
-        vertices: [
-          {label: 'a', x: 1.0, y: 1.0},
-          {label: 'c', x: 2.0, y: 2.0}
-        ],
-        edges: [
-          {src: 0, dst: 1, weight: 2},
-        ],
-        isDirected: false,
-        isWeighted: true,
-        isLabeled: true
-      }})).toBe(false);
+      }, {
+        g: {
+          vertices: [{
+            label: 'a',
+            x: 1.0,
+            y: 1.0
+          }, {
+            label: 'c',
+            x: 2.0,
+            y: 2.0
+          }],
+          edges: [{
+            src: 0,
+            dst: 1,
+            weight: 2
+          }],
+          isDirected: false,
+          isWeighted: true,
+          isLabeled: true
+        }
+      })).toBe(false);
     });
   });
 
   describe('fuzzy rule', function() {
     var RULE_INPUT = {
       training_data: [{
-        vertices: [
-          {label: '', x: 1.0, y: 1.0},
-          {label: '', x: 2.0, y: 2.0},
-          {label: '', x: 3.0, y: 3.0}
-        ],
-        edges: [
-          {src: 0, dst: 1, weight: 1},
-          {src: 1, dst: 2, weight: 1},
-          {src: 2, dst: 0, weight: 1},
-        ],
+        vertices: [{
+          label: '',
+          x: 1.0,
+          y: 1.0
+        }, {
+          label: '',
+          x: 2.0,
+          y: 2.0
+        }, {
+          label: '',
+          x: 3.0,
+          y: 3.0
+        }],
+        edges: [{
+          src: 0,
+          dst: 1,
+          weight: 1
+        }, {
+          src: 1,
+          dst: 2,
+          weight: 1
+        }, {
+          src: 2,
+          dst: 0,
+          weight: 1
+        }],
         isDirected: false,
         isWeighted: false,
         isLabeled: false
       }, {
-        vertices: [
-          {label: '', x: 1.0, y: 1.0},
-          {label: '', x: 2.0, y: 2.0},
-          {label: '', x: 3.0, y: 3.0},
-          {label: '', x: 4.0, y: 4.0}
-        ],
-        edges: [
-          {src: 0, dst: 1, weight: 1},
-          {src: 1, dst: 2, weight: 1},
-          {src: 2, dst: 3, weight: 1},
-          {src: 3, dst: 0, weight: 1},
-        ],
+        vertices: [{
+          label: '',
+          x: 1.0,
+          y: 1.0
+        }, {
+          label: '',
+          x: 2.0,
+          y: 2.0
+        }, {
+          label: '',
+          x: 3.0,
+          y: 3.0
+        }, {
+          label: '',
+          x: 4.0,
+          y: 4.0
+        }],
+        edges: [{
+          src: 0,
+          dst: 1,
+          weight: 1
+        }, {
+          src: 1,
+          dst: 2,
+          weight: 1
+        }, {
+          src: 2,
+          dst: 3,
+          weight: 1
+        }, {
+          src: 3,
+          dst: 0,
+          weight: 1
+        }],
         isDirected: false,
         isWeighted: false,
         isLabeled: false
@@ -452,32 +686,64 @@ describe('Graph Input service', function() {
 
     it('should match isomorphic graphs', function() {
       expect(girs.FuzzyMatches({
-        vertices: [
-          {label: '', x: 4.0, y: 4.0},
-          {label: '', x: 5.0, y: 5.0},
-          {label: '', x: 6.0, y: 6.0}
-        ],
-        edges: [
-          {src: 2, dst: 0, weight: 1},
-          {src: 0, dst: 1, weight: 1},
-          {src: 2, dst: 1, weight: 1},
-        ],
+        vertices: [{
+          label: '',
+          x: 4.0,
+          y: 4.0
+        }, {
+          label: '',
+          x: 5.0,
+          y: 5.0
+        }, {
+          label: '',
+          x: 6.0,
+          y: 6.0
+        }],
+        edges: [{
+          src: 2,
+          dst: 0,
+          weight: 1
+        }, {
+          src: 0,
+          dst: 1,
+          weight: 1
+        }, {
+          src: 2,
+          dst: 1,
+          weight: 1
+        }],
         isDirected: false,
         isWeighted: false,
         isLabeled: false
       }, RULE_INPUT)).toBe(true);
 
       expect(girs.FuzzyMatches({
-        vertices: [
-          {label: '', x: 4.0, y: 4.0},
-          {label: '', x: 5.0, y: 5.0},
-          {label: '', x: 6.0, y: 6.0}
-        ],
-        edges: [
-          {src: 2, dst: 0, weight: 1},
-          {src: 0, dst: 1, weight: 1},
-          {src: 2, dst: 1, weight: 1},
-        ],
+        vertices: [{
+          label: '',
+          x: 4.0,
+          y: 4.0
+        }, {
+          label: '',
+          x: 5.0,
+          y: 5.0
+        }, {
+          label: '',
+          x: 6.0,
+          y: 6.0
+        }],
+        edges: [{
+          src: 2,
+          dst: 0,
+          weight: 1
+        }, {
+          src: 0,
+          dst: 1,
+          weight: 1
+        }, {
+          src: 2,
+          dst: 1,
+          weight: 1
+        }],
         isDirected: false,
         isWeighted: false,
         isLabeled: false
@@ -487,18 +753,40 @@ describe('Graph Input service', function() {
     it('should match graphs isomorphic to another graph in the training data',
         function() {
       expect(girs.FuzzyMatches({
-        vertices: [
-          {label: '', x: 4.0, y: 4.0},
-          {label: '', x: 5.0, y: 5.0},
-          {label: '', x: 6.0, y: 6.0},
-          {label: '', x: 7.0, y: 7.0}
-        ],
-        edges: [
-          {src: 3, dst: 0, weight: 1},
-          {src: 0, dst: 1, weight: 1},
-          {src: 2, dst: 1, weight: 1},
-          {src: 3, dst: 2, weight: 1}
-        ],
+        vertices: [{
+          label: '',
+          x: 4.0,
+          y: 4.0
+        }, {
+          label: '',
+          x: 5.0,
+          y: 5.0
+        }, {
+          label: '',
+          x: 6.0,
+          y: 6.0
+        }, {
+          label: '',
+          x: 7.0,
+          y: 7.0
+        }],
+        edges: [{
+          src: 3,
+          dst: 0,
+          weight: 1
+        }, {
+          src: 0,
+          dst: 1,
+          weight: 1
+        }, {
+          src: 2,
+          dst: 1,
+          weight: 1
+        }, {
+          src: 3,
+          dst: 2,
+          weight: 1
+        }],
         isDirected: false,
         isWeighted: false,
         isLabeled: false
@@ -507,13 +795,20 @@ describe('Graph Input service', function() {
 
     it('should fail on non-isomorphic graphs', function() {
       expect(girs.FuzzyMatches({
-        vertices: [
-          {label: '', x: 4.0, y: 4.0},
-          {label: '', x: 5.0, y: 5.0},
-        ],
-        edges: [
-          {src: 1, dst: 0, weight: 1},
-        ],
+        vertices: [{
+          label: '',
+          x: 4.0,
+          y: 4.0
+        }, {
+          label: '',
+          x: 5.0,
+          y: 5.0
+        }],
+        edges: [{
+          src: 1,
+          dst: 0,
+          weight: 1
+        }],
         isDirected: false,
         isWeighted: false,
         isLabeled: false

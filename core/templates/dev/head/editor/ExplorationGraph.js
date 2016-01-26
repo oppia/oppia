@@ -19,77 +19,78 @@
  */
 
 oppia.controller('ExplorationGraph', [
-    '$scope', '$modal', 'editorContextService', 'warningsData',
-    'explorationStatesService', 'editabilityService', 'validatorsService',
-    'routerService', 'graphDataService', 'focusService',
-    function($scope, $modal, editorContextService, warningsData,
-             explorationStatesService, editabilityService, validatorsService,
-             routerService, graphDataService, focusService) {
+  '$scope', '$modal', 'editorContextService', 'warningsData',
+  'explorationStatesService', 'editabilityService', 'routerService',
+  'graphDataService',
+  function(
+      $scope, $modal, editorContextService, warningsData,
+      explorationStatesService, editabilityService, routerService,
+      graphDataService) {
+    $scope.getGraphData = graphDataService.getGraphData;
+    $scope.isEditable = editabilityService.isEditable;
 
-  $scope.getGraphData = graphDataService.getGraphData;
-  $scope.isEditable = editabilityService.isEditable;
+    $scope.deleteState = function(deleteStateName) {
+      explorationStatesService.deleteState(deleteStateName);
+    };
 
-  $scope.deleteState = function(deleteStateName) {
-    explorationStatesService.deleteState(deleteStateName);
-  };
+    $scope.onClickStateInMinimap = function(stateName) {
+      routerService.navigateToMainTab(stateName);
+    };
 
-  $scope.onClickStateInMinimap = function(stateName) {
-    routerService.navigateToMainTab(stateName);
-  };
+    $scope.getActiveStateName = function() {
+      return editorContextService.getActiveStateName();
+    };
 
-  $scope.getActiveStateName = function() {
-    return editorContextService.getActiveStateName();
-  };
+    $scope.openStateGraphModal = function() {
+      warningsData.clear();
 
-  $scope.openStateGraphModal = function() {
-    warningsData.clear();
+      $modal.open({
+        templateUrl: 'modals/stateGraph',
+        backdrop: true,
+        resolve: {
+          isEditable: function() {
+            return $scope.isEditable;
+          }
+        },
+        windowClass: 'oppia-large-modal-window',
+        controller: [
+          '$scope', '$modalInstance', 'editorContextService',
+          'graphDataService', 'isEditable',
+          function($scope, $modalInstance, editorContextService,
+                   graphDataService, isEditable) {
+            $scope.currentStateName = editorContextService.getActiveStateName();
+            $scope.graphData = graphDataService.getGraphData();
+            $scope.isEditable = isEditable;
 
-    $modal.open({
-      templateUrl: 'modals/stateGraph',
-      backdrop: true,
-      resolve: {
-        isEditable: function() {
-          return $scope.isEditable;
+            $scope.deleteState = function(stateName) {
+              $modalInstance.close({
+                action: 'delete',
+                stateName: stateName
+              });
+            };
+
+            $scope.selectState = function(stateName) {
+              $modalInstance.close({
+                action: 'navigate',
+                stateName: stateName
+              });
+            };
+
+            $scope.cancel = function() {
+              $modalInstance.dismiss('cancel');
+              warningsData.clear();
+            };
+          }
+        ]
+      }).result.then(function(closeDict) {
+        if (closeDict.action === 'delete') {
+          explorationStatesService.deleteState(closeDict.stateName);
+        } else if (closeDict.action === 'navigate') {
+          $scope.onClickStateInMinimap(closeDict.stateName);
+        } else {
+          console.error('Invalid closeDict action: ' + closeDict.action);
         }
-      },
-      windowClass: 'oppia-large-modal-window',
-      controller: [
-        '$scope', '$modalInstance', 'editorContextService', 'graphDataService',
-        'explorationStatesService', 'isEditable',
-        function($scope, $modalInstance, editorContextService, graphDataService,
-                 explorationStatesService, isEditable) {
-          $scope.currentStateName = editorContextService.getActiveStateName();
-          $scope.graphData = graphDataService.getGraphData();
-          $scope.isEditable = isEditable;
-
-          $scope.deleteState = function(stateName) {
-            $modalInstance.close({
-              action: 'delete',
-              stateName: stateName
-            });
-          };
-
-          $scope.selectState = function(stateName) {
-            $modalInstance.close({
-              action: 'navigate',
-              stateName: stateName
-            });
-          };
-
-          $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
-            warningsData.clear();
-          };
-        }
-      ]
-    }).result.then(function(closeDict) {
-      if (closeDict.action === 'delete') {
-        explorationStatesService.deleteState(closeDict.stateName);
-      } else if (closeDict.action === 'navigate') {
-        $scope.onClickStateInMinimap(closeDict.stateName);
-      } else {
-        console.error('Invalid closeDict action: ' + closeDict.action);
-      }
-    });
-  };
-}]);
+      });
+    };
+  }
+]);

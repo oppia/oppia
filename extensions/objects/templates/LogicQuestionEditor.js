@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 // Every editor directive should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
@@ -21,7 +20,7 @@ oppia.directive('logicQuestionEditor', [
     '$compile', 'OBJECT_EDITOR_URL_PREFIX',
     function($compile, OBJECT_EDITOR_URL_PREFIX) {
   return {
-    link: function(scope, element, attrs) {
+    link: function(scope, element) {
       scope.getTemplateUrl = function() {
         return OBJECT_EDITOR_URL_PREFIX + 'LogicQuestion';
       };
@@ -30,7 +29,7 @@ oppia.directive('logicQuestionEditor', [
     restrict: 'E',
     scope: true,
     template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: function($scope, $element, $attrs) {
+    controller: function($scope) {
       $scope.alwaysEditable = true;
       $scope.localValue = {
         assumptionsString: logicProofShared.displayExpressionArray(
@@ -47,7 +46,8 @@ oppia.directive('logicQuestionEditor', [
       // response to any change to the watched value, and we only want to
       // respond to changes made by the user.
       $scope.changeAssumptions = function() {
-        $scope.convertThenBuild('logicQuestionAssumptions', 'assumptionsString');
+        $scope.convertThenBuild(
+          'logicQuestionAssumptions', 'assumptionsString');
       };
       $scope.changeTarget = function() {
         $scope.convertThenBuild('logicQuestionTarget', 'targetString');
@@ -81,7 +81,7 @@ oppia.directive('logicQuestionEditor', [
             assumptions: builtQuestion.assumptions,
             results: builtQuestion.results,
             default_proof_string: $scope.localValue.proofString
-          }
+          };
           $scope.localValue.errorMessage = '';
         } catch (err) {
           $scope.localValue.errorMessage = err.message;

@@ -14,8 +14,6 @@
 
 """Controllers for the feedback thread page."""
 
-__author__ = 'kashida@google.com (Koji Ashida)'
-
 from core.controllers import base
 from core.controllers import editor
 from core.domain import exp_services
@@ -59,7 +57,7 @@ class ThreadHandler(base.BaseHandler):
 
     PAGE_NAME_FOR_CSRF = 'editor'
 
-    def get(self, exploration_id, thread_id):
+    def get(self, exploration_id, thread_id):  # pylint: disable=unused-argument
         self.values.update({
             'messages': feedback_services.get_messages(
                 exploration_id, thread_id)})
@@ -69,7 +67,7 @@ class ThreadHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @base.require_user
-    def post(self, exploration_id, thread_id):
+    def post(self, exploration_id, thread_id):  # pylint: disable=unused-argument
         suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
         text = self.payload.get('text')
         updated_status = self.payload.get('updated_status')
@@ -156,8 +154,8 @@ class SuggestionActionHandler(base.BaseHandler):
                 exploration_id,
                 self.payload.get('commit_message'))
         elif action == self._REJECT_ACTION:
-             exp_services.reject_suggestion(
-                 self.user_id, thread_id, exploration_id)
+            exp_services.reject_suggestion(
+                self.user_id, thread_id, exploration_id)
         else:
             raise self.InvalidInputException('Invalid action.')
 
@@ -200,6 +198,6 @@ class SuggestionListHandler(base.BaseHandler):
                 exploration_id, has_suggestion)
         else:
             raise self.InvalidInputException('Invalid list type.')
-         
+
         self.values.update({'threads': threads})
         self.render_json(self.values)

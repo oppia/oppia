@@ -1,128 +1,16 @@
 author_notes: ''
 blurb: ''
-default_skin: conversation_v1
+category: Test
 init_state_name: text
 language_code: en
 objective: To demonstrate fuzzy rules and trained responses in explorations.
 param_changes: []
 param_specs: {}
-schema_version: 9
+schema_version: 10
 skin_customizations:
-  panels_contents: {}
+  panels_contents:
+    bottom: []
 states:
-  code:
-    content:
-    - type: text
-      value: <p>Implement a function in Python to compute the Fibonacci sequence up
-        to some iteration N.</p>
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: code
-          feedback:
-          - <p>Implementing the Fibonacci sequence recursively is quite straightforward.
-            However, can you try implementing it iteratively?</p>
-          param_changes: []
-        rule_specs:
-        - inputs:
-            training_data:
-            - code: "# Type your code here.\ndef fibonacci(N):\n  if N<=1:return 1\n\
-                \  return fibonacci(N-1)+fibonacci(N-2)\n"
-              error: ''
-              evaluation: ''
-              output: '1,1,2,3,5,8,13,21,34,55
-
-                '
-            - code: "# Type your code here.\ndef fibonacci(N):\n  if N<=1:return 1\n\
-                \  return fibonacci(N-2)+fibonacci(N-1)\n"
-              error: ''
-              evaluation: ''
-              output: '1,1,2,3,5,8,13,21,34,55
-
-                '
-          rule_type: FuzzyMatches
-      - outcome:
-          dest: graph
-          feedback:
-          - <p>Nice iterative solution! You can also implement it recursively! Let's
-            move on.</p>
-          param_changes: []
-        rule_specs:
-        - inputs:
-            training_data:
-            - code: "# Type your code here.\ndef fibonacci(N):\n  table=[1,1]\n  for\
-                \ i in range(2, N + 1):\n    table.append(table[i-2]+table[i-1])\n\
-                \  return table[N]\n"
-              error: ''
-              evaluation: ''
-              output: '1,1,2,3,5,8,13,21,34,55
-
-                '
-            - code: "# Type your code here.\ndef fibonacci(N):\n  table=[1,1]\n  for\
-                \ i in range(2, N + 1):\n    table.append(table[i-1]+table[i-2])\n\
-                \  return table[N]\n"
-              error: ''
-              evaluation: ''
-              output: '1,1,2,3,5,8,13,21,34,55
-
-                '
-          rule_type: FuzzyMatches
-      - outcome:
-          dest: graph
-          feedback:
-          - <p>I'm not quite sure how you solved it, but you have the correct output!</p>
-          param_changes: []
-        rule_specs:
-        - inputs:
-            x: 1,1,2,3,5,8,13,21,34,55
-          rule_type: OutputEquals
-      - outcome:
-          dest: code
-          feedback:
-          - <p>You should try and implement the function!</p>
-          param_changes: []
-        rule_specs:
-        - inputs:
-            training_data:
-            - code: "# Type your code here.\ndef fibonacci(N):\n    return 0\n"
-              error: ''
-              evaluation: ''
-              output: '0,0,0,0,0,0,0,0,0,0,0
-
-                '
-            - code: "# Type your code here.\ndef fibonacci(N):\n    return 0\n"
-              error: ''
-              evaluation: ''
-              output: '0,0,0,0,0,0,0,0,0,0,0
-
-                '
-            - code: "# Type your code here.\ndef fibonacci(N):\n  return 0\n"
-              error: ''
-              evaluation: ''
-              output: '0,0,0,0,0,0,0,0,0,0
-
-                '
-          rule_type: FuzzyMatches
-      confirmed_unclassified_answers: []
-      customization_args:
-        language:
-          value: python
-        placeholder:
-          value: "# Type your code here.\ndef fibonacci(N):\n  return 0\n"
-        postCode:
-          value: "print \"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\" % (\n  fibonacci(0), fibonacci(1),\
-            \ fibonacci(2),\n  fibonacci(3), fibonacci(4), fibonacci(5),\n  fibonacci(6),\
-            \ fibonacci(7), fibonacci(8),\n  fibonacci(9))"
-        preCode:
-          value: ''
-      default_outcome:
-        dest: code
-        feedback:
-        - <p>You may have an error in your code. Try again.</p>
-        param_changes: []
-      fallbacks: []
-      id: CodeRepl
-    param_changes: []
   final:
     content:
     - type: text
@@ -392,12 +280,13 @@ states:
         rows:
           value: 1
       default_outcome:
-        dest: code
+        dest: graph
         feedback:
         - <p>Is {{answer}} actually happy? I'm not so sure. Let's move on!</p>
         param_changes: []
       fallbacks: []
       id: TextInput
     param_changes: []
-states_schema_version: 6
+states_schema_version: 7
 tags: []
+title: Demonstrating fuzzy rules

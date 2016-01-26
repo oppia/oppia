@@ -56,7 +56,8 @@ oppia.controller('Moderator', [
       var explorationIdsToExplorationData = data.exp_ids_to_exp_data;
       for (var expId in explorationIdsToExplorationData) {
         if (!$scope.explorationData.hasOwnProperty(expId)) {
-          $scope.explorationData[expId] = explorationIdsToExplorationData[expId];
+          $scope.explorationData[expId] = (
+            explorationIdsToExplorationData[expId]);
         }
       }
 
@@ -71,7 +72,6 @@ oppia.controller('Moderator', [
   };
 
   $scope.loadMoreCommits();
-
 
   $scope.recentFeedbackMessagesCursor = null;
   $scope.reachedEndOfFeedbackMessages = false;

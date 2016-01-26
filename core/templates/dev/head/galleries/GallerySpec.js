@@ -31,8 +31,8 @@ describe('Gallery controller', function() {
     beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
       $httpBackend = _$httpBackend_;
       $httpBackend.expectGET('/galleryhandler/data').respond({
-        'allow_yaml_file_upload': false,
-        'explorations_list': [{
+        allow_yaml_file_upload: false,
+        explorations_list: [{
           id: '3',
           title: 'Geography 2',
           category: 'Geography',
@@ -60,7 +60,7 @@ describe('Gallery controller', function() {
           community_owned: false,
           status: 'public'
         }],
-        'preferred_language_codes': ['en']
+        preferred_language_codes: ['en']
       });
 
       GLOBALS.LANGUAGE_CODES_AND_NAMES = [{
@@ -78,7 +78,7 @@ describe('Gallery controller', function() {
       ctrl = $controller('Gallery', {
         $scope: scope,
         warningsData: null,
-        createExplorationButtonService: {
+        ExplorationCreationButtonService: {
           showCreateExplorationModal: null,
           showUploadExplorationModal: null
         },

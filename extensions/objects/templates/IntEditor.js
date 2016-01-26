@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 // Every editor directive should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
@@ -21,7 +20,7 @@ oppia.directive('intEditor', [
     '$compile', 'OBJECT_EDITOR_URL_PREFIX',
     function($compile, OBJECT_EDITOR_URL_PREFIX) {
   return {
-    link: function(scope, element, attrs) {
+    link: function(scope, element) {
       scope.getTemplateUrl = function() {
         return OBJECT_EDITOR_URL_PREFIX + 'Int';
       };
@@ -30,7 +29,7 @@ oppia.directive('intEditor', [
     restrict: 'E',
     scope: true,
     template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: function ($scope, $attrs) {
+    controller: function($scope) {
       $scope.SCHEMA = {
         type: 'int'
       };

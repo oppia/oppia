@@ -26,14 +26,15 @@
 oppia.factory('CollectionDataService', [
     '$http', '$q', 'COLLECTION_DATA_URL', 'UrlInterpolationService',
     function($http, $q, COLLECTION_DATA_URL, UrlInterpolationService) {
-
   // Maps previously loaded collections to their IDs.
   var _collectionCache = [];
 
   var _fetchCollection = function(
       collectionId, successCallback, errorCallback) {
     var collectionDataUrl = UrlInterpolationService.interpolateUrl(
-      COLLECTION_DATA_URL, {'collection_id': collectionId});
+      COLLECTION_DATA_URL, {
+        collection_id: collectionId
+      });
 
     $http.get(collectionDataUrl).success(function(data) {
       var collection = angular.copy(data.collection);
@@ -107,6 +108,6 @@ oppia.factory('CollectionDataService', [
      */
     clearCollectionCache: function() {
       _collectionCache = [];
-    },
+    }
   };
 }]);

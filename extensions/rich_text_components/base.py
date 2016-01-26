@@ -16,8 +16,6 @@
 
 """Base class for rich-text components."""
 
-__author__ = 'Sean Lip'
-
 import os
 
 from extensions import domain

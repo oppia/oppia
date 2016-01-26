@@ -17,30 +17,31 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
-var errorWrapper = function(dubiousFunction, input1, input2, input3, input4, input5, input6) {
+var errorWrapper = function(
+    dubiousFunction, input1, input2, input3, input4, input5, input6) {
   return function() {
     try {
-      if(input1 === undefined) {
+      if (input1 === undefined) {
         dubiousFunction();
-      } else if(input2 === undefined) {
+      } else if (input2 === undefined) {
         dubiousFunction(input1);
-      } else if(input3 === undefined) {
+      } else if (input3 === undefined) {
         dubiousFunction(input1, input2);
-      } else if(input4 === undefined) {
+      } else if (input4 === undefined) {
         dubiousFunction(input1, input2, input3);
-      } else if(input5 === undefined) {
+      } else if (input5 === undefined) {
         dubiousFunction(input1, input2, input3, input4);
-      } else if(input6 === undefined) {
+      } else if (input6 === undefined) {
         dubiousFunction(input1, input2, input3, input4, input5);
       } else {
         dubiousFunction(input1, input2, input3, input4, input5, input6);
       }
-    } catch(err) {
+    } catch (err) {
       throw new Error(logicProofShared.renderError(
         err, logicProofData.BASE_GENERAL_MESSAGES,
         logicProofData.BASE_STUDENT_LANGUAGE));
     }
-  }
+  };
 };
 
 var displayLine = function(line, operators) {
@@ -65,7 +66,7 @@ var displayLine = function(line, operators) {
       line.variables, operators),
     indentation: line.indentation,
     text: line.text
-  }
+  };
 };
 
 var displayProof = function(proof, operators) {
@@ -104,25 +105,25 @@ var expressionRandS = {
   dummies: []
 };
 var expressiona = {
-  top_kind_name:'variable',
-  top_operator_name:'a',
-  arguments:[],
-  dummies:[]
+  top_kind_name: 'variable',
+  top_operator_name: 'a',
+  arguments: [],
+  dummies: []
 };
 var expressionAllxp = {
-  top_kind_name:'quantifier',
-  top_operator_name:'for_all',
-  arguments:[{
-    top_kind_name:'variable',
-    top_operator_name:'p',
-    arguments:[],
-    dummies:[]
+  top_kind_name: 'quantifier',
+  top_operator_name: 'for_all',
+  arguments: [{
+    top_kind_name: 'variable',
+    top_operator_name: 'p',
+    arguments: [],
+    dummies: []
   }],
-  dummies:[{
-    top_kind_name:'variable',
-    top_operator_name:'x',
-    arguments:[],
-    dummies:[]
+  dummies: [{
+    top_kind_name: 'variable',
+    top_operator_name: 'x',
+    arguments: [],
+    dummies: []
   }]
 };
 var expressionT = {
@@ -140,85 +141,85 @@ var expressionU = {
 
 var sampleControlLanguage = logicProofData.BASE_CONTROL_LANGUAGE;
 var sampleControlModel = logicProofStudent.BASE_CONTROL_MODEL;
-sampleControlLanguage.operators['scoper'] = {
-  kind:'prefix_function',
-  typing:[{
-    arguments:[{
+sampleControlLanguage.operators.scoper = {
+  kind: 'prefix_function',
+  typing: [{
+    arguments: [{
       type: 'integer',
       arbitrarily_many: false
     }],
-    dummies:[],
-    output:'integer'
+    dummies: [],
+    output: 'integer'
   }]
 };
-sampleControlModel.evaluation_rules['scoper'] = {
-  format:'definition',
+sampleControlModel.evaluation_rules.scoper = {
+  format: 'definition',
   evaluateExpression: function(expression, inputs, model, parameters, cache) {
     return logicProofStudent.evaluate({
-      top_kind_name:'ranged_function',
-      top_operator_name:'max',
-      arguments:[{
-        top_kind_name:'binary_relation',
-        top_operator_name:'less_than',
-        arguments:[{
-          top_kind_name:'variable',
-          top_operator_name:'k',
-          arguments:[],
-          dummies:[],
+      top_kind_name: 'ranged_function',
+      top_operator_name: 'max',
+      arguments: [{
+        top_kind_name: 'binary_relation',
+        top_operator_name: 'less_than',
+        arguments: [{
+          top_kind_name: 'variable',
+          top_operator_name: 'k',
+          arguments: [],
+          dummies: [],
           type: 'integer'
-        },{
-          top_kind_name:'variable',
-          top_operator_name:'n',
-          arguments:[],
-          dummies:[],
+        }, {
+          top_kind_name: 'variable',
+          top_operator_name: 'n',
+          arguments: [],
+          dummies: [],
           type: 'integer'
         }],
-        dummies:[],
+        dummies: [],
         type: 'boolean'
-      },{
-        top_kind_name:'binary_relation',
-        top_operator_name:'less_than',
-        arguments:[{
-          top_kind_name:'prefix_function',
-          top_operator_name:'indentation',
-          arguments:[{
-            top_kind_name:'variable',
-            top_operator_name:'k',
-            arguments:[],
-            dummies:[],
+      }, {
+        top_kind_name: 'binary_relation',
+        top_operator_name: 'less_than',
+        arguments: [{
+          top_kind_name: 'prefix_function',
+          top_operator_name: 'indentation',
+          arguments: [{
+            top_kind_name: 'variable',
+            top_operator_name: 'k',
+            arguments: [],
+            dummies: [],
             type: 'integer'
           }],
-          dummies:[],
+          dummies: [],
           type: 'integer'
-        },{
-          top_kind_name:'prefix_function',
-          top_operator_name:'indentation',
-          arguments:[{
-            top_kind_name:'variable',
-            top_operator_name:'n',
-            arguments:[],
-            dummies:[],
+        }, {
+          top_kind_name: 'prefix_function',
+          top_operator_name: 'indentation',
+          arguments: [{
+            top_kind_name: 'variable',
+            top_operator_name: 'n',
+            arguments: [],
+            dummies: [],
             type: 'integer'
           }],
-          dummies:[],
+          dummies: [],
           type: 'integer'
         }],
-        dummies:[],
+        dummies: [],
         integer: 'boolean'
       }],
-      dummies:[{
-        top_kind_name:'variable',
-        top_operator_name:'k',
-        arguments:[],
-        dummies:[],
+      dummies: [{
+        top_kind_name: 'variable',
+        top_operator_name: 'k',
+        arguments: [],
+        dummies: [],
         type: 'integer'
       }]
     }, {
-      'n': logicProofStudent.evaluate(
+      n: logicProofStudent.evaluate(
         expression.arguments[0], inputs, model, parameters, cache)
     }, model, parameters, cache);
   },
-  description:'The most recent line (not including n) in whose scope line n is'
+  description: 'The most recent line (not including n) in whose scope line n is'
 };
 
 var sampleInteraction = {
@@ -232,178 +233,178 @@ var sampleInteraction = {
   language: logicProofData.BASE_STUDENT_LANGUAGE,
   general_messages: logicProofData.BASE_GENERAL_MESSAGES,
   line_templates: [{
-    name:'and_introduce',
-    reader_view:[{
-      format:'phrase',
-      content:'from'
-    },{
-      format:'expression',
+    name: 'and_introduce',
+    reader_view: [{
+      format: 'phrase',
+      content: 'from'
+    }, {
+      format: 'expression',
       content: {
         expression: expressionR,
-        substitutions:[],
-        type:'boolean'
+        substitutions: [],
+        type: 'boolean'
       }
-    },{
-      format:'phrase',
-      content:'and'
-    },{
-      format:'expression',
-      content:{
+    }, {
+      format: 'phrase',
+      content: 'and'
+    }, {
+      format: 'expression',
+      content: {
         expression: expressionS,
-        substitutions:[],
-        type:'boolean'
+        substitutions: [],
+        type: 'boolean'
       }
-    },{
-      format:'phrase',
-      content:'have'
-    },{
-      format:'expression',
-      content:{
+    }, {
+      format: 'phrase',
+      content: 'have'
+    }, {
+      format: 'expression',
+      content: {
         expression: expressionRandS,
-        substitutions:[],
-        type:'boolean'
+        substitutions: [],
+        type: 'boolean'
       }
     }],
-    antecedents:[{
+    antecedents: [{
       expression: expressionR,
-      substitutions:[],
-      type:'boolean'
-    },{
+      substitutions: [],
+      type: 'boolean'
+    }, {
       expression: expressionS,
-      substitutions:[],
-      type:'boolean'
+      substitutions: [],
+      type: 'boolean'
     }],
-    results:[{
+    results: [{
       expression: expressionRandS,
-      substitutions:[],
-      type:'boolean'
+      substitutions: [],
+      type: 'boolean'
     }],
-    variables:[],
-    error:[]
+    variables: [],
+    error: []
   }, {
-    name:'for_all_introduce',
-    reader_view:[{
-      format:'expression',
-      content:{
+    name: 'for_all_introduce',
+    reader_view: [{
+      format: 'expression',
+      content: {
         expression: expressiona,
-        substitutions:[],
-        type:'element',
+        substitutions: [],
+        type: 'element',
         kind: 'variable'
       }
-    },{
-      format:'phrase',
-      content:'arbitrary'
-    },{
-      format:'phrase',
-      content:'hence'
-    },{
-      format:'expression',
-      content:{
+    }, {
+      format: 'phrase',
+      content: 'arbitrary'
+    }, {
+      format: 'phrase',
+      content: 'hence'
+    }, {
+      format: 'expression',
+      content: {
         expression: expressionAllxp,
-        substitutions:[],
-        type:'boolean'
+        substitutions: [],
+        type: 'boolean'
       }
     }],
-    antecedents:[{
-      expression:{
-        top_kind_name:'variable',
-        top_operator_name:'p',
-        arguments:[],
-        dummies:[]
+    antecedents: [{
+      expression: {
+        top_kind_name: 'variable',
+        top_operator_name: 'p',
+        arguments: [],
+        dummies: []
       },
-      substitutions:[{
-        'x': expressiona
+      substitutions: [{
+        x: expressiona
       }],
-      type:'boolean'
+      type: 'boolean'
     }],
-    results:[{
+    results: [{
       expression: expressionAllxp,
-      substitutions:[],
-      type:'boolean'
+      substitutions: [],
+      type: 'boolean'
     }],
     variables: [expressiona],
-    error:[]
+    error: []
   }, {
-    name:'and_introduce_e4',
-    reader_view:[{
-      format:'phrase',
-      content:'from'
-    },{
-      format:'expression',
-      content:{
+    name: 'and_introduce_e4',
+    reader_view: [{
+      format: 'phrase',
+      content: 'from'
+    }, {
+      format: 'expression',
+      content: {
         expression: expressionT,
-        substitutions:[],
-        type:'boolean'
+        substitutions: [],
+        type: 'boolean'
       }
-    },{
-      format:'phrase',
-      content:'and'
-    },{
-      format:'expression',
-      content:{
+    }, {
+      format: 'phrase',
+      content: 'and'
+    }, {
+      format: 'expression',
+      content: {
         expression: expressionU,
-        substitutions:[],
-        type:'boolean'
+        substitutions: [],
+        type: 'boolean'
       }
-    },{
-      format:'phrase',
-      content:'have'
-    },{
-      format:'expression',
-      content:{
+    }, {
+      format: 'phrase',
+      content: 'have'
+    }, {
+      format: 'expression',
+      content: {
         expression: expressionRandS,
-        substitutions:[],
-        type:'boolean'
+        substitutions: [],
+        type: 'boolean'
       }
     }],
     antecedents: [],
     results: [],
     variables: [],
-    error:[[{
-      format:'string',
-      content:'The conclusion you are allowed to make here is \'From '
-    },{
-      format:'expression',
-      content:{
+    error: [[{
+      format: 'string',
+      content: 'The conclusion you are allowed to make here is \'From '
+    }, {
+      format: 'expression',
+      content: {
         expression: expressionT,
-        substitutions:[],
-        type:'boolean'
+        substitutions: [],
+        type: 'boolean'
       }
-    },{
-      format:'string',
-      content:' and '
-    },{
-      format:'expression',
-      content:{
+    }, {
+      format: 'string',
+      content: ' and '
+    }, {
+      format: 'expression',
+      content: {
         expression: expressionU,
-        substitutions:[],
-        type:'boolean'
+        substitutions: [],
+        type: 'boolean'
       }
-    },{
-      format:'string',
-      content:' we have '
-    },{
-      format:'expression',
-      content:{
-        expression:{
-          top_kind_name:'binary_connective',
-          top_operator_name:'and',
-          arguments:[expressionT, expressionU],
-          dummies:[]
+    }, {
+      format: 'string',
+      content: ' we have '
+    }, {
+      format: 'expression',
+      content: {
+        expression: {
+          top_kind_name: 'binary_connective',
+          top_operator_name: 'and',
+          arguments: [expressionT, expressionU],
+          dummies: []
         },
-        substitutions:[],
-        type:'boolean'
+        substitutions: [],
+        type: 'boolean'
       }
-    },{
-      format:'string',
-      content:'\'.'
+    }, {
+      format: 'string',
+      content: '\'.'
     }]]
   }],
   vocabulary: logicProofData.BASE_VOCABULARY,
   mistake_table: [{
     name: 'variables',
     entries: [{
-      name:'incorrect_variable_forall',
+      name: 'incorrect_variable_forall',
       occurs: logicProofShared.assignTypesToExpression(
         logicProofParser.parse(
           'template(n)=\'for_all_introduce\'\u2227entry(1,variables(n))' +
@@ -412,11 +413,11 @@ var sampleInteraction = {
         ['boolean'], sampleControlLanguage,
         ['constant', 'variable']
       )[0].typedExpression,
-      message:[[{
-        format:'string',
-        content:'We originally took '
-      },{
-        format:'expression',
+      message: [[{
+        format: 'string',
+        content: 'We originally took '
+      }, {
+        format: 'expression',
         content: logicProofShared.assignTypesToExpression(
           logicProofParser.parse(
             'entry(1,variables(scoper(n-1)))', 'expression'),
@@ -424,53 +425,54 @@ var sampleInteraction = {
             ['constant', 'variable']
           )[0].typedExpression
       }, {
-        format:'string',
-        content:' as our arbitrary variable so this, rather than '
-      },{
-        format:'expression',
-        content:{
-          top_operator_name:'variables',
-          top_kind_name:'prefix_function',
-          arguments:[{
-            top_operator_name:'n',
-            top_kind_name:'variable',
-            arguments:[],
-            dummies:[],
-            type:'integer'
+        format: 'string',
+        content: ' as our arbitrary variable so this, rather than '
+      }, {
+        format: 'expression',
+        content: {
+          top_operator_name: 'variables',
+          top_kind_name: 'prefix_function',
+          arguments: [{
+            top_operator_name: 'n',
+            top_kind_name: 'variable',
+            arguments: [],
+            dummies: [],
+            type: 'integer'
           }],
-          dummies:[],
-          type:'set_of_formulas'
+          dummies: [],
+          type: 'set_of_formulas'
         }
-      },{
-        format:'string',
-        content:', needs to be the one that we quantify out over.'
+      }, {
+        format: 'string',
+        content: ', needs to be the one that we quantify out over.'
       }]]
     }]
   }, {
     name: 'target',
     entries: [{
-      name:'last_line_indented_assumption',
+      name: 'last_line_indented_assumption',
       occurs: logicProofShared.assignTypesToExpression(
         logicProofParser.parse(
-          'n=num_lines()\u2227indentation(n)>0\u2227template(scoper(n))!=\'given\'',
+          'n=num_lines()\u2227indentation(n)>0\u2227template(scoper(n))!=' +
+            '\'given\'',
           'expression'),
         ['boolean'], sampleControlLanguage, ['constant', 'variable']
         )[0].typedExpression,
-      message:[[{
-        format:'string',
-        content:'The last line of a proof should not be indented; you need to' +
-          ' prove that the given formulas holds just from the original ' +
+      message: [[{
+        format: 'string',
+        content: 'The last line of a proof should not be indented; you need ' +
+          'to prove that the given formulas holds just from the original ' +
           'assumptions, not the additional assumption of '
-      },{
-        format:'expression',
+      }, {
+        format: 'expression',
         content: logicProofShared.assignTypesToExpression(
           logicProofParser.parse(
             'entry(1,results(scoper(n)))', 'expression'), ['formula'],
           sampleControlLanguage, ['constant', 'variable']
         )[0].typedExpression
       }, {
-        format:'string',
-        content:'.'
+        format: 'string',
+        content: '.'
       }]]
     }]
   }],
@@ -478,16 +480,16 @@ var sampleInteraction = {
   control_model: sampleControlModel
 };
 
-
 describe('Match expression to expression template', function() {
-  var matchThenDisplay = function(expressionString, templateString, oldMatchings) {
+  var matchThenDisplay = function(
+      expressionString, templateString, oldMatchings) {
     return displayExpressionDictionary(
         logicProofStudent.matchExpression(
           logicProofParser.parse(expressionString, 'expression'),
           logicProofParser.parse(templateString, 'expression'), oldMatchings),
         logicProofData.BASE_STUDENT_LANGUAGE.operators
       );
-  }
+  };
 
   it('should match then display examples correctly', function() {
     expect(matchThenDisplay('A(x)\u2227t', 'p\u2227q', {})).toEqual(
@@ -500,7 +502,8 @@ describe('Match expression to expression template', function() {
     expect(errorWrapper(matchThenDisplay, 'A(x)\u2227t', 'p\u2227q', {
       q: logicProofParser.parse('s', 'expression')
     })).toThrow(
-      'This line could not be identified as valid - please check the list of possible lines.');
+      'This line could not be identified as valid - please check the list ' +
+      'of possible lines.');
   });
 });
 
@@ -535,7 +538,10 @@ describe('Instantiate expression', function() {
             y: logicProofParser.parse('x', 'expression'),
             z: logicProofParser.parse('22', 'expression'),
             p: logicProofParser.parse('p=>p', 'expression')
-        }), logicProofData.BASE_STUDENT_LANGUAGE.operators)
+          }
+        ),
+        logicProofData.BASE_STUDENT_LANGUAGE.operators
+      )
     ).toEqual('\u2200x.((x=22)\u2228(p=>p))');
   });
 });
@@ -561,7 +567,7 @@ describe('Throw lines messages', function() {
         sampleInteraction.line_templates[2].error, 'name', {
           T: logicProofParser.parse('x=y', 'expression'),
           U: logicProofParser.parse('A2(x,y)', 'expression')
-        }, logicProofData.BASE_STUDENT_LANGUAGE.operators)
+        }, logicProofData.BASE_STUDENT_LANGUAGE.operators);
     })).toThrow('The conclusion you are allowed to make here is \'From x=y ' +
       'and A2(x,y) we have (x=y)\u2227A2(x,y)\'.');
   });
@@ -574,7 +580,7 @@ describe('Match line to template', function() {
         lineString, logicProofData.BASE_STUDENT_LANGUAGE.operators,
         logicProofData.BASE_VOCABULARY
       )[0], template.reader_view, logicProofData.BASE_VOCABULARY);
-  }
+  };
 
   it('should match examples correctly', function() {
     expect(
@@ -620,7 +626,7 @@ describe('Line to have known layout as student types', function() {
       logicProofData.BASE_STUDENT_LANGUAGE, logicProofData.BASE_VOCABULARY,
       logicProofData.BASE_GENERAL_MESSAGES
     );
-  }
+  };
 
   it('should accept known layouts', function() {
     expect(requireIdentifiable('from p and q we have p\u2227q')).toEqual(
@@ -630,7 +636,8 @@ describe('Line to have known layout as student types', function() {
   it('should reject unknown layouts', function() {
     expect(
       errorWrapper(requireIdentifiable, 'from p we have p\u2228q')).toThrow(
-      'This line could not be identified as valid - please check the list of possible lines.');
+      'This line could not be identified as valid - please check the list of ' +
+      'possible lines.');
   });
 });
 
@@ -643,15 +650,16 @@ describe('Require all lines to have known layouts as student types',
       ).toEqual(undefined);
     });
 
-  it('should reject unknown layouts', function() {
-    expect(function() {
-      logicProofStudent.validateProof(
-        'from A and B we have A\u2227\n', sampleInteraction);
-    }).toThrow('We could not identify \'A\u2227\'; please make sure you' +
-      ' are using vocabulary from the given list, and don\'t have two ' +
-      'consecutive expressions.');
-  });
-});
+    it('should reject unknown layouts', function() {
+      expect(function() {
+        logicProofStudent.validateProof(
+          'from A and B we have A\u2227\n', sampleInteraction);
+      }).toThrow('We could not identify \'A\u2227\'; please make sure you' +
+        ' are using vocabulary from the given list, and don\'t have two ' +
+        'consecutive expressions.');
+    });
+  }
+);
 
 describe('Build, validate and display line', function() {
   var buildThenDisplay = function(lineString) {
@@ -661,7 +669,7 @@ describe('Build, validate and display line', function() {
         logicProofData.BASE_STUDENT_LANGUAGE, logicProofData.BASE_VOCABULARY
       ), logicProofData.BASE_STUDENT_LANGUAGE.operators
     );
-  }
+  };
 
   it('should accept and build examples correctly', function() {
     expect(
@@ -669,7 +677,10 @@ describe('Build, validate and display line', function() {
         '    from a\u2228b and c<=>d have (a\u2228b) \u2227 (c<=>d)')
     ).toEqual({
       template_name: 'and_introduce',
-      matchings: {R: 'a\u2228b', S: 'c<=>d'},
+      matchings: {
+        R: 'a\u2228b',
+        S: 'c<=>d'
+      },
       antecedents: 'a\u2228b, c<=>d',
       results: '(a\u2228b)\u2227(c<=>d)',
       variables: '',
@@ -699,14 +710,15 @@ describe('Build, validate and display line', function() {
 
   it('should reject lines that do not match a template', function() {
     expect(errorWrapper(buildThenDisplay, 'Hence A=>x=3')).toThrow(
-      'This line could not be identified as valid - please check the list of possible lines.');
+      'This line could not be identified as valid - please check the list ' +
+      'of possible lines.');
   });
 
   it('should reject lines that match an incorrect template', function() {
-     expect(
+    expect(
       errorWrapper(buildThenDisplay, 'from a<b and b<c we have a<b \u2227 b<d')
     ).toThrow('The conclusion you are allowed to make here is \'From a<b and' +
-      ' b<c we have (a<b)\u2227(b<c)\'.')
+      ' b<c we have (a<b)\u2227(b<c)\'.');
   });
 
   it('should reject lines starting with an odd number of spaces', function() {
@@ -722,15 +734,20 @@ describe('Build, validate and display proof', function() {
     return displayProof(
       logicProofStudent.buildProof(proofString, sampleInteraction),
       logicProofData.BASE_STUDENT_LANGUAGE.operators);
-  }
+  };
 
   it('should accept and build examples correctly', function() {
     expect(
       buildThenDisplay(
-        'a was arbitrary thus \u2200y.R\n  from p and \u2200y.R have p\u2227\u2200y.R')
+        'a was arbitrary thus \u2200y.R\n  from p and \u2200y.R have ' +
+        'p\u2227\u2200y.R')
     ).toEqual([{
       template_name: 'for_all_introduce',
-      matchings: {a: 'a', p: 'R', 'x': 'y'},
+      matchings: {
+        a: 'a',
+        p: 'R',
+        x: 'y'
+      },
       antecedents: 'R',
       results: '\u2200y.R',
       variables: 'a',
@@ -738,7 +755,10 @@ describe('Build, validate and display proof', function() {
       text: 'a was arbitrary thus \u2200y.R'
     }, {
       template_name: 'and_introduce',
-      matchings: {R: 'p', S: '\u2200y.R'},
+      matchings: {
+        R: 'p',
+        S: '\u2200y.R'
+      },
       antecedents: 'p, \u2200y.R',
       results: 'p\u2227(\u2200y.R)',
       variables: '',
@@ -750,7 +770,7 @@ describe('Build, validate and display proof', function() {
   it('should reject proofs with invalid lines', function() {
     expect(function() {
       buildThenDisplay(
-        'from a and b we have a\u2227b\nfrom a and b we have b\u2227a')
+        'from a and b we have a\u2227b\nfrom a and b we have b\u2227a');
     }).toThrow('The conclusion you are allowed to make here is \'From' +
       ' a and b we have a\u2227b\'.');
   });
@@ -764,13 +784,13 @@ describe('Evaluate a logical expression', function() {
         logicProofData.BASE_CONTROL_LANGUAGE
       )[0].typedExpression, inputs, logicProofStudent.BASE_CONTROL_MODEL,
       parameters, {});
-  }
+  };
 
   it('should evaluate examples correctly', function() {
     expect(testEvaluate('2+2', 'integer', {}, {})).toEqual(4);
 
     expect(testEvaluate('y\u2208z', 'boolean', {
-      x: "a",
+      x: 'a',
       y: logicProofParser.parse('p\u2227q', 'expression'),
       z: [
            logicProofParser.parse('\u2203x.p', 'expression'),
@@ -809,18 +829,24 @@ describe('Evaluate a logical expression', function() {
 
     expect(testEvaluate('scoper(num_lines())', 'integer', {}, {
       proof: logicProofStudent.buildProof(
-        'from r and s we have r\u2227s\n  from r\u2227s and s we have (r\u2227s)\u2227s',
+        'from r and s we have r\u2227s\n  from r\u2227s and s we have ' +
+        '(r\u2227s)\u2227s',
         sampleInteraction)
     })).toEqual(1);
 
     expect(
       logicProofStudent.evaluate(
-        sampleInteraction.mistake_table[0].entries[0].occurs, {n: 3},
+        sampleInteraction.mistake_table[0].entries[0].occurs, {
+          n: 3
+        },
         sampleInteraction.control_model, {
           proof: logicProofStudent.buildProof(
             'a was arbitrary hence \u2200x.p\n  from p and q we have' +
             ' p\u2227q\n  a was arbitrary hence \u2200x.q', sampleInteraction)
-      }, {})).toEqual(false);
+        },
+        {}
+      )
+    ).toEqual(false);
   });
 });
 
@@ -829,15 +855,13 @@ describe('Render mistake messages', function() {
     return logicProofStudent.renderMistakeMessages(
       mistakeEntry, lineInProof, sampleInteraction.control_model, {
         proof: logicProofStudent.buildProof(proofString, sampleInteraction)
-      }, logicProofData.BASE_STUDENT_LANGUAGE.operators)
-  }
+      }, logicProofData.BASE_STUDENT_LANGUAGE.operators);
+  };
 
-  it('should render example messages with respect to given proofs',
-    function() {
-
+  it('should render example messages with respect to given proofs', function() {
     expect(
       render(
-        sampleInteraction.mistake_table[0].entries[0] ,2, [
+        sampleInteraction.mistake_table[0].entries[0], 2, [
         'a was arbitrary hence \u2200x.p',
         '  from p and q we have p\u2227q',
         '  b was arbitrary hence \u2200x.q'].join('\n'))[0]
@@ -864,8 +888,9 @@ describe('Render mistake messages', function() {
 describe('Check proof makes no mistakes from the mistake table', function() {
   var testCheck = function(proofString) {
     return logicProofStudent.checkProof(
-      logicProofStudent.buildProof(proofString, sampleInteraction), sampleInteraction);
-  }
+      logicProofStudent.buildProof(proofString, sampleInteraction),
+      sampleInteraction);
+  };
 
   it('should allow proofs that make no mistake', function() {
     expect(

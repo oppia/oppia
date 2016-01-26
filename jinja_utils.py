@@ -15,54 +15,47 @@
 """Jinja-related utilities."""
 
 import copy
+import json
 import logging
 import os
 import math
 
-import feconf
 import jinja2
 from jinja2 import meta
-import json
 
 
 _OPPIA_MODULE_DEFINITION_FILE = 'app.js'
 
+def _js_string_filter(value):
+    """Converts a value to a JSON string for use in JavaScript code."""
+    string = json.dumps(value)
 
-class JinjaConfig(object):
-    """Contains Jinja configuration properties."""
+    replacements = [('\\', '\\\\'), ('"', '\\"'), ("'", "\\'"),
+                    ('\n', '\\n'), ('\r', '\\r'), ('\b', '\\b'),
+                    ('<', '\\u003c'), ('>', '\\u003e'), ('&', '\\u0026')]
 
-    def _js_string_filter(value):
-        """Converts a value to a JSON string for use in JavaScript code."""
-        string = json.dumps(value)
+    for replacement in replacements:
+        string = string.replace(replacement[0], replacement[1])
+    return jinja2.utils.Markup(string)
 
-        replacements = [('\\', '\\\\'), ('"', '\\"'), ("'", "\\'"),
-                        ('\n', '\\n'), ('\r', '\\r'), ('\b', '\\b'),
-                        ('<', '\\u003c'), ('>', '\\u003e'), ('&', '\\u0026')]
 
-        for replacement in replacements:
-            string = string.replace(replacement[0], replacement[1])
-        return jinja2.utils.Markup(string)
+def _log2_floor_filter(value):
+    """Returns the logarithm base 2 of the given value, rounded down."""
+    return int(math.log(value, 2))
 
-    def _log2_floor_filter(value):
-        """Returns the logarithm base 2 of the given value, rounded down."""
-        return int(math.log(value, 2))
 
-    FILTERS = {
-        'is_list': lambda x: isinstance(x, list),
-        'is_dict': lambda x: isinstance(x, dict),
-        'js_string': _js_string_filter,
-        'log2_floor': _log2_floor_filter,
-    }
+JINJA_FILTERS = {
+    'is_list': lambda x: isinstance(x, list),
+    'is_dict': lambda x: isinstance(x, dict),
+    'js_string': _js_string_filter,
+    'log2_floor': _log2_floor_filter,
+}
 
 
 def get_jinja_env(dir_path):
     loader = jinja2.FileSystemLoader(os.path.join(
         os.path.dirname(__file__), dir_path))
     env = jinja2.Environment(autoescape=True, loader=loader)
-
-    skins_loader = jinja2.FileSystemLoader(os.path.join(
-        os.path.dirname(__file__), feconf.SKINS_TEMPLATES_DIR))
-    skins_env = jinja2.Environment(autoescape=True, loader=skins_loader)
 
     def include_js_file(filepath):
         """Include a raw JS file in the template without evaluating it."""
@@ -75,14 +68,8 @@ def get_jinja_env(dir_path):
             # (IIFE) to prevent pollution of the global scope.
             return jinja2.Markup('(function() {%s})();' % raw_file_contents)
 
-    def include_skins_js_file(name):
-        """Include a raw JS file from extensions/skins in the template."""
-        assert name.endswith('.js')
-        return jinja2.Markup(skins_loader.get_source(skins_env, name)[0])
-
     env.globals['include_js_file'] = include_js_file
-    env.globals['include_skins_js_file'] = include_skins_js_file
-    env.filters.update(JinjaConfig.FILTERS)
+    env.filters.update(JINJA_FILTERS)
     return env
 
 
@@ -99,7 +86,7 @@ def parse_string(string, params, autoescape=True):
     """
     env = jinja2.Environment(autoescape=autoescape)
 
-    env.filters.update(JinjaConfig.FILTERS)
+    env.filters.update(JINJA_FILTERS)
     try:
         parsed_string = env.parse(string)
     except Exception:

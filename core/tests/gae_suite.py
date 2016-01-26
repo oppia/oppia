@@ -22,18 +22,14 @@ it from the command line by running
 from the oppia/ root folder.
 """
 
-__author__ = 'Sean Lip'
-
 import argparse
 import os
 import sys
 import unittest
 
-CURR_DIR = os.path.abspath(os.getcwd())
-sys.path.insert(0, CURR_DIR)
-
 import feconf
 
+CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 
@@ -68,9 +64,9 @@ def create_test_suites(test_target=None):
         raise Exception('The delimiter in test_target should be a dot (.)')
 
     loader = unittest.TestLoader()
-    return ([
-        loader.loadTestsFromName(test_target)] if test_target
-        else [loader.discover(
+    return (
+        [loader.loadTestsFromName(test_target)]
+        if test_target else [loader.discover(
             CURR_DIR, pattern='*_test.py', top_level_dir=CURR_DIR)])
 
 

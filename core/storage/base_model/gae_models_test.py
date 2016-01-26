@@ -14,11 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'Sean Lip'
-
 from core.platform import models
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 from core.tests import test_utils
+
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
 class BaseModelUnitTests(test_utils.GenericTestBase):

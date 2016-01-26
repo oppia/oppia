@@ -16,14 +16,13 @@
 
 """Models for Oppia feedback threads and messages."""
 
-__author__ = 'Koji Ashida'
-
 from core.platform import models
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 import feconf
 import utils
 
 from google.appengine.ext import ndb
+
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 # Allowed feedback thread statuses.
 STATUS_CHOICES_OPEN = 'open'
@@ -38,6 +37,10 @@ STATUS_CHOICES = [
     STATUS_CHOICES_COMPLIMENT,
     STATUS_CHOICES_NOT_ACTIONABLE,
 ]
+
+# Constants used for generating new ids.
+_MAX_RETRIES = 10
+_RAND_RANGE = 127 * 127
 
 
 class FeedbackThreadModel(base_models.BaseModel):
@@ -74,12 +77,10 @@ class FeedbackThreadModel(base_models.BaseModel):
 
         Exploration ID + the generated thread ID is globally unique.
         """
-        MAX_RETRIES = 10
-        RAND_RANGE = 127 * 127
-        for i in range(MAX_RETRIES):
+        for _ in range(_MAX_RETRIES):
             thread_id = (
                 utils.base64_from_int(utils.get_current_time_in_millisecs()) +
-                utils.base64_from_int(utils.get_random_int(RAND_RANGE)))
+                utils.base64_from_int(utils.get_random_int(_RAND_RANGE)))
             if not cls.get_by_exp_and_thread_id(exploration_id, thread_id):
                 return thread_id
         raise Exception(
@@ -127,7 +128,7 @@ class FeedbackThreadModel(base_models.BaseModel):
 
         return cls.get_all().filter(
             cls.exploration_id == exploration_id).filter(
-                cls.has_suggestion == True).fetch(feconf.DEFAULT_QUERY_LIMIT)
+                cls.has_suggestion == True).fetch(feconf.DEFAULT_QUERY_LIMIT)  # pylint: disable=singleton-comparison
 
 
 class FeedbackMessageModel(base_models.BaseModel):
@@ -236,10 +237,10 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
     num_total_threads = ndb.IntegerProperty(default=None, indexed=True)
 
     @classmethod
-    def create(cls, id, num_open_threads, num_total_threads):
+    def create(cls, model_id, num_open_threads, num_total_threads):
         """Creates a new FeedbackAnalyticsModel entry."""
         cls(
-            id=id,
+            id=model_id,
             num_open_threads=num_open_threads,
             num_total_threads=num_total_threads
         ).put()
@@ -247,9 +248,9 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
 
 class SuggestionModel(base_models.BaseModel):
     """Suggestions made by learners.
-    
-    The id of each instance is the id of the corresponding thread. 
-    """ 
+
+    The id of each instance is the id of the corresponding thread.
+    """
 
     # ID of the user who submitted the suggestion.
     author_id = ndb.StringProperty(required=True, indexed=True)
@@ -289,7 +290,7 @@ class SuggestionModel(base_models.BaseModel):
     @classmethod
     def get_by_exploration_and_thread_id(cls, exploration_id, thread_id):
         """Gets a suggestion by the corresponding exploration and thread id's.
-        
+
         Returns None if it doesn't match anything."""
 
         return cls.get_by_id(cls._get_instance_id(exploration_id, thread_id))

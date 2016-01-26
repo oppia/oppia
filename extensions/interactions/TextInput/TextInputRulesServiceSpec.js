@@ -53,7 +53,6 @@ describe('Text Input rules service', function() {
     expect(tirs.FuzzyEquals('abc', RULE_INPUT)).toBe(false);
     expect(tirs.FuzzyEquals('dbc deg', RULE_INPUT)).toBe(false);
     expect(tirs.FuzzyEquals('ghi jkl', RULE_INPUT)).toBe(false);
-
   });
 
   it('should have a correct \'case sensitive equals\' rule', function() {

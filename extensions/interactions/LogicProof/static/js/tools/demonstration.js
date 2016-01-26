@@ -1,7 +1,20 @@
+// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 var logicDemo = angular.module('logicDemo', []);
 
 logicDemo.controller('TestCtrl', function($scope) {
-
   $scope.buildIndexer = function(n) {
     var output = [];
     for (var i = 0; i < n; i++) {
@@ -25,7 +38,9 @@ logicDemo.controller('TestCtrl', function($scope) {
     general_messages: logicProofData.BASE_GENERAL_MESSAGES
   };
 
-  $scope.proofString = 'from P\u2227Q we have P\nfrom P\u2227Q we have Q\nfrom Q and P we have Q\u2227P';
+  $scope.proofString = (
+    'from P\u2227Q we have P\nfrom P\u2227Q we have Q\nfrom Q and P we have ' +
+    'Q\u2227P');
 
   $scope.displayMessage = function(message, line) {
     $scope.proofError = '';
@@ -35,8 +50,11 @@ logicDemo.controller('TestCtrl', function($scope) {
     var pointer = 0;
     while (pointer < message.length) {
       var nextSpace = message.slice(pointer, pointer + 70).lastIndexOf(' ');
-      var breakPoint = (nextSpace <= 0 || pointer + 70 >= message.length) ? 70: nextSpace + 1;
-      $scope.proofError += (message.slice(pointer, pointer + breakPoint) + '\n');
+      var breakPoint = (
+        (nextSpace <= 0 || pointer + 70 >= message.length) ? 70 :
+        nextSpace + 1);
+      $scope.proofError += (
+        message.slice(pointer, pointer + breakPoint) + '\n');
       pointer += breakPoint;
     }
   };
@@ -84,12 +102,14 @@ logicDemo.controller('TestCtrl', function($scope) {
       target: questionInstance.results[0]
     };
     for (var i = 0; i < questionInstance.mistake_table.length; i++) {
-      for (var j = 0; j < questionInstance.mistake_table[i].entries.length; j++) {
+      for (var j = 0;
+           j < questionInstance.mistake_table[i].entries.length; j++) {
         var mistake = questionInstance.mistake_table[i].entries[j];
         if (mistake.name === $scope.mistakeName) {
           $scope.localCheck = logicProofStudent.evaluate(
-            mistake.occurs, {n: parseInt($scope.line)},
-            questionInstance.control_model, parameters, {});
+            mistake.occurs, {
+              n: parseInt($scope.line)
+            }, questionInstance.control_model, parameters, {});
         }
       }
     }
@@ -105,13 +125,19 @@ logicDemo.controller('TestCtrl', function($scope) {
     $scope.buildSuccess = false;
     $scope.questionError = '';
     try {
-      var attempt = logicProofTeacher.buildQuestion($scope.assumptionsString, $scope.targetString, $scope.questionData.vocabulary);
+      var attempt = logicProofTeacher.buildQuestion(
+        $scope.assumptionsString, $scope.targetString,
+        $scope.questionData.vocabulary);
       $scope.questionData.assumptions = attempt.assumptions;
       $scope.questionData.results = attempt.results;
       $scope.questionData.language.operators = attempt.operators;
       $scope.questionSuccess = true;
-      $scope.assumptionsDisplay = logicProofShared.displayExpressionArray($scope.questionData.assumptions, $scope.questionData.language.operators);
-      $scope.targetDisplay = logicProofShared.displayExpression($scope.questionData.results[0], $scope.questionData.language.operators);
+      $scope.assumptionsDisplay = logicProofShared.displayExpressionArray(
+        $scope.questionData.assumptions,
+        $scope.questionData.language.operators);
+      $scope.targetDisplay = logicProofShared.displayExpression(
+        $scope.questionData.results[0],
+        $scope.questionData.language.operators);
     }
     catch (err) {
       $scope.questionError = err.message;
@@ -123,16 +149,20 @@ logicDemo.controller('TestCtrl', function($scope) {
 
   // LINE TEMPLATES
   $scope.lineTemplateStrings = DEFAULT_LINE_TEMPLATE_STRINGS;
-  $scope.lineTemplateIndexer = $scope.buildIndexer($scope.lineTemplateStrings.length);
+  $scope.lineTemplateIndexer = $scope.buildIndexer(
+    $scope.lineTemplateStrings.length);
   $scope.submitLineTemplates = function() {
     $scope.checkError = '';
     $scope.checkSuccess = false;
     $scope.buildError = '';
     $scope.buildSuccess = false;
     try {
-      $scope.questionData.line_templates = logicProofTeacher2.buildLineTemplateTable($scope.lineTemplateStrings, $scope.questionData.vocabulary);
+      $scope.questionData.line_templates = (
+        logicProofTeacher2.buildLineTemplateTable(
+          $scope.lineTemplateStrings, $scope.questionData.vocabulary));
       $scope.lineTemplateSuccess = true;
-      $scope.LineTemplateErrors = $scope.buildErrors($scope.lineTemplateStrings.length);
+      $scope.LineTemplateErrors = $scope.buildErrors(
+        $scope.lineTemplateStrings.length);
     }
     catch (err) {
       $scope.LineTemplateErrors = err;
@@ -161,7 +191,8 @@ logicDemo.controller('TestCtrl', function($scope) {
   $scope.mistakeSuccess = [];
   $scope.mistakeErrors = [];
   for (var i = 0; i < $scope.mistakeStrings.length; i++) {
-    $scope.mistakeSectionIndexer.push($scope.buildIndexer($scope.mistakeStrings[i].entries.length));
+    $scope.mistakeSectionIndexer.push(
+      $scope.buildIndexer($scope.mistakeStrings[i].entries.length));
     $scope.mistakeSuccess.push(true);
     $scope.mistakeErrors.push([]);
   }
@@ -172,12 +203,14 @@ logicDemo.controller('TestCtrl', function($scope) {
     $scope.buildError = '';
     $scope.buildSuccess = false;
     try {
-      $scope.questionData.mistake_table[sectionNumber] = logicProofTeacher2.buildMistakeSection(
-        $scope.mistakeStrings[sectionNumber].name,
-        $scope.mistakeStrings[sectionNumber].entries,
-        $scope.questionData.control_functions);
+      $scope.questionData.mistake_table[sectionNumber] = (
+        logicProofTeacher2.buildMistakeSection(
+          $scope.mistakeStrings[sectionNumber].name,
+          $scope.mistakeStrings[sectionNumber].entries,
+          $scope.questionData.control_functions));
       $scope.mistakeSuccess[sectionNumber] = true;
-      $scope.mistakeErrors[sectionNumber] = $scope.buildErrors($scope.mistakeStrings[sectionNumber].entries.length);
+      $scope.mistakeErrors[sectionNumber] = $scope.buildErrors(
+        $scope.mistakeStrings[sectionNumber].entries.length);
     }
     catch (err) {
       $scope.mistakeSuccess[sectionNumber] = false;
@@ -187,15 +220,19 @@ logicDemo.controller('TestCtrl', function($scope) {
 
   // CONTROL FUNCTIONS
   $scope.controlFunctionStrings = DEFAULT_CONTROL_FUNCTION_STRINGS;
-  $scope.controlFunctionIndexer = $scope.buildIndexer($scope.controlFunctionStrings.length);
+  $scope.controlFunctionIndexer = $scope.buildIndexer(
+    $scope.controlFunctionStrings.length);
   $scope.submitControlFunctions = function() {
     $scope.checkError = '';
     $scope.checkSuccess = false;
     $scope.buildError = '';
     $scope.buildSuccess = false;
-    $scope.controlFunctionErrors = $scope.buildErrors($scope.controlFunctionStrings.length);
+    $scope.controlFunctionErrors = $scope.buildErrors(
+      $scope.controlFunctionStrings.length);
     try {
-      $scope.questionData.control_functions = logicProofTeacher2.buildControlFunctionTable($scope.controlFunctionStrings);
+      $scope.questionData.control_functions = (
+        logicProofTeacher2.buildControlFunctionTable(
+          $scope.controlFunctionStrings));
       $scope.controlFunctionSuccess = true;
     }
     catch (err) {

@@ -16,11 +16,7 @@
 
 """Provides a seam for taskqueue-related operations."""
 
-__author__ = 'Sean Lip'
-
-
 from google.appengine.ext import deferred
-
 
 # NOTE: The following constants should match the queue names in queue.yaml.
 # Default queue for processing tasks (including MapReduce ones).

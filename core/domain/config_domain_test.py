@@ -16,8 +16,6 @@
 
 """Tests for the config property registry."""
 
-__author__ = 'Sean Lip'
-
 from core.domain import config_domain
 from core.tests import test_utils
 import schema_utils_test
@@ -27,7 +25,7 @@ class ConfigPropertyRegistryTests(test_utils.GenericTestBase):
     """Tests for the config property registry."""
 
     def test_config_property_schemas_are_valid(self):
-        for property_name in config_domain.Registry._config_registry:
+        for property_name in config_domain.Registry._config_registry:  # pylint: disable=protected-access
             schema = config_domain.Registry.get_config_property(
                 property_name).schema
             schema_utils_test.validate_schema(schema)
