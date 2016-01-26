@@ -49,10 +49,6 @@ class BaseRichTextComponent(object):
     # Customization arg specifications for the component, including their
     # descriptions, schemas and default values. Overridden in subclasses.
     _customization_arg_specs = []
-    # The icon to show in the rich-text editor. This is a representation of the
-    # .png file in this rich-text component folder, generated with the
-    # utils.convert_png_to_data_url() function. Overridden in subclasses.
-    icon_data_url = ''
 
     @property
     def id(self):
@@ -91,7 +87,8 @@ class BaseRichTextComponent(object):
                 'schema': ca_spec.schema,
             } for ca_spec in self.customization_arg_specs],
             'frontend_name': self.frontend_name,
-            'icon_data_url': self.icon_data_url,
+            'icon_data_url': utils.convert_png_to_data_url(os.path.join(
+                feconf.RTE_EXTENSIONS_DIR, self.id, '%s.png' % self.id)),
             'is_complex': self.is_complex,
             'tooltip': self.tooltip,
         }
