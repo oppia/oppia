@@ -2967,14 +2967,13 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
 
     def _return_true(self, thread_id, exploration_id):
         return True
-        
+
     def _return_false(self, thread_id, exploration_id):
         return False
 
     def _check_commit_message(
         self, user_id, exploration_id, change_list, commit_message):
-        self.assertEqual(commit_message, 'Accepted suggestion by %s: %s' % (
-            self.USERNAME, self.COMMIT_MESSAGE))
+        self.assertEqual(commit_message, self.COMMIT_MESSAGE)
 
     def setUp(self):
         super(SuggestionActionUnitTests, self).setUp()
@@ -2984,15 +2983,17 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
         user_services.get_or_create_user(self.EDITOR_ID, self.EDITOR_EMAIL)
         self.signup(self.USER_EMAIL, self.USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        with self.swap(feedback_models.FeedbackThreadModel, 
+        with self.swap(feedback_models.FeedbackThreadModel,
                        'generate_new_thread_id', self._generate_thread_id):
             feedback_services.create_suggestion(
-                self.EXP_ID1, self.USER_ID, 3, 'state_name', {'old_content': {}})
+                self.EXP_ID1, self.USER_ID, 3, 'state_name', 'description',
+                {'old_content': {}})
             feedback_services.create_suggestion(
-                self.EXP_ID2, self.USER_ID, 3, 'state_name', {'old_content': {}})           
+                self.EXP_ID2, self.USER_ID, 3, 'state_name', 'description',
+                {'old_content': {}})
 
     def test_accept_suggestion_valid_suggestion(self):
-        with self.swap(exp_services, '_is_suggestion_valid', 
+        with self.swap(exp_services, '_is_suggestion_valid',
                        self._return_true):
             with self.swap(exp_services, 'update_exploration',
                            self._check_commit_message):
