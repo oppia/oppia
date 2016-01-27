@@ -100,7 +100,7 @@ oppia.controller('CollectionEditor', ['$scope', 'CollectionBackendApiService',
   // TODO(mgowano): Handle cases where deleting a pre-requisite skill results
   // to unreachable explorations.
   $scope.deletePrerequisiteSkill = function(skillIdx, expId) {
-    if (skillIdx) {
+    if (expId) {
       var collectionNode = _getCollectionNodeForExplorationId(expId);
       collectionNode.prerequisite_skills.splice(skillIdx, 1);
       return true;
@@ -109,7 +109,7 @@ oppia.controller('CollectionEditor', ['$scope', 'CollectionBackendApiService',
   };
 
   $scope.addAcquiredSkill = function(skillName, expId) {
-    if (expId && skillName) {
+    if (skillName && expId) {
       var collectionNode = _getCollectionNodeForExplorationId(expId);
       var acquiredSkills = collectionNode.acquired_skills;
       if (!_arrayContainsCaseInsensitive(acquiredSkills, skillName)) {
@@ -197,6 +197,10 @@ oppia.controller('CollectionEditor', ['$scope', 'CollectionBackendApiService',
   // because some likely working states of the collection will cause validation
   // errors when trying to incrementally save them.
   $scope.saveCollection = function(commitMessage) {
+    // Don't attempt to save the collection if there are no changes pending.
+    if ($scope.changeList.length == 0) {
+      return;
+    }
     WritableCollectionBackendApiService.updateCollection(
       $scope.collection.id, $scope.collection.version, commitMessage,
       $scope.changeList).then(function(collection) {
