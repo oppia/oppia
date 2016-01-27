@@ -739,6 +739,19 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         self.assertEqual(
             collection.exploration_ids, [self.EXPLORATION_ID, _NEW_EXP_ID])
 
+    def test_add_node_with_invalid_exploration(self):
+        _INVALID_EXP_ID = 'invalid_exploration_id'
+        collection = collection_services.get_collection_by_id(
+            self.COLLECTION_ID)
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected collection to only reference '
+                'valid explorations'):
+            collection_services.update_collection(
+                self.OWNER_ID, self.COLLECTION_ID, [{
+                    'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                    'exploration_id': _INVALID_EXP_ID
+                }], 'Added invalid exploration')
+
     def test_delete_node(self):
         # Verify the initial collection only has 1 exploration in it.
         collection = collection_services.get_collection_by_id(
