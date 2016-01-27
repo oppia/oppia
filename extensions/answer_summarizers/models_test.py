@@ -37,7 +37,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
 
     def _create_sample_answer(
             self, answer, time_spent_in_card, session_id,
-            classify_category=exp_domain.HARD_RULE_CLASSIFICATION):
+            classify_category=exp_domain.EXPLICIT_CLASSIFICATION):
         return {
             'answer': answer,
             'time_spent_in_sec': time_spent_in_card,
@@ -367,7 +367,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         # category.
         dummy_answers_list = [
             self._create_sample_answer('Hard A', 0., 'sid1',
-                exp_domain.HARD_RULE_CLASSIFICATION),
+                exp_domain.EXPLICIT_CLASSIFICATION),
         ]
         state_answers_dict['answers_list'] = dummy_answers_list
 
@@ -378,7 +378,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
             actual_state_answers_calc_output.calculation_output)
 
         self.assertEquals(actual_calc_output, {
-            'hard_rule': [{
+            'explicit': [{
                 'answer': 'Hard A',
                 'frequency': 1
             }]
@@ -387,18 +387,27 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         # Multiple categories of answers should be identified and properly
         # aggregated.
         dummy_answers_list = [
-            self._create_sample_answer('Hard A', 0., 'sid1',
-                exp_domain.HARD_RULE_CLASSIFICATION),
-            self._create_sample_answer('Hard B', 0., 'sid1',
-                exp_domain.HARD_RULE_CLASSIFICATION),
-            self._create_sample_answer('Hard A', 0., 'sid1',
-                exp_domain.HARD_RULE_CLASSIFICATION),
-            self._create_sample_answer('Soft A', 0., 'sid1',
-                exp_domain.SOFT_RULE_CLASSIFICATION),
-            self._create_sample_answer('Soft B', 0., 'sid1',
-                exp_domain.SOFT_RULE_CLASSIFICATION),
-            self._create_sample_answer('Soft B', 0., 'sid1',
-                exp_domain.SOFT_RULE_CLASSIFICATION),
+            self._create_sample_answer('Explicit A', 0., 'sid1',
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            self._create_sample_answer('Explicit B', 0., 'sid1',
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            self._create_sample_answer('Explicit A', 0., 'sid1',
+                exp_domain.EXPLICIT_CLASSIFICATION),
+
+            self._create_sample_answer('Tained data A', 0., 'sid1',
+                exp_domain.TRAINING_DATA_CLASSIFICATION),
+            self._create_sample_answer('Tained data B', 0., 'sid1',
+                exp_domain.TRAINING_DATA_CLASSIFICATION),
+            self._create_sample_answer('Tained data B', 0., 'sid1',
+                exp_domain.TRAINING_DATA_CLASSIFICATION),
+
+            self._create_sample_answer('Stats B', 0., 'sid1',
+                exp_domain.STATISTICAL_CLASSIFICATION),
+            self._create_sample_answer('Stats C', 0., 'sid1',
+                exp_domain.STATISTICAL_CLASSIFICATION),
+            self._create_sample_answer('Stats C', 0., 'sid1',
+                exp_domain.STATISTICAL_CLASSIFICATION),
+
             self._create_sample_answer('Default C', 0., 'sid1',
                 exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
             self._create_sample_answer('Default C', 0., 'sid1',
@@ -415,18 +424,25 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
             actual_state_answers_calc_output.calculation_output)
 
         self.assertEquals(actual_calc_output, {
-            'hard_rule': [{
-                'answer': 'Hard A',
+            'explicit': [{
+                'answer': 'Explicit A',
                 'frequency': 2
             }, {
-                'answer': 'Hard B',
+                'answer': 'Explicit B',
                 'frequency': 1
             }],
-            'soft_rule': [{
-                'answer': 'Soft B',
+            'training_data_match': [{
+                'answer': 'Tained data B',
                 'frequency': 2
             }, {
-                'answer': 'Soft A',
+                'answer': 'Tained data A',
+                'frequency': 1
+            }],
+            'statistical_classifier': [{
+                'answer': 'Stats C',
+                'frequency': 2
+            }, {
+                'answer': 'Stats B',
                 'frequency': 1
             }],
             'default_outcome': [{

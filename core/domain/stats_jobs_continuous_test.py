@@ -425,19 +425,19 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             # add some answers
             event_services.AnswerSubmissionEventHandler.record(
                 exp_id, exp_version, FIRST_STATE_NAME, 0, 0,
-                exp_domain.HARD_RULE_CLASSIFICATION, 'session1', time_spent,
+                exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
                 params, 'answer1')
             event_services.AnswerSubmissionEventHandler.record(
                 exp_id, exp_version, FIRST_STATE_NAME, 0, 0,
-                exp_domain.HARD_RULE_CLASSIFICATION, 'session2', time_spent,
+                exp_domain.EXPLICIT_CLASSIFICATION, 'session2', time_spent,
                 params, 'answer1')
             event_services.AnswerSubmissionEventHandler.record(
                 exp_id, exp_version, FIRST_STATE_NAME, 0, 0,
-                exp_domain.HARD_RULE_CLASSIFICATION, 'session1', time_spent,
+                exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
                 params, 'answer2')
             event_services.AnswerSubmissionEventHandler.record(
                 exp_id, exp_version, SECOND_STATE_NAME, 0, 0,
-                exp_domain.HARD_RULE_CLASSIFICATION, 'session2', time_spent,
+                exp_domain.EXPLICIT_CLASSIFICATION, 'session2', time_spent,
                 params, 'answer3')
 
             # Run job on exploration with answers
@@ -519,7 +519,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             # Add an answer.
             event_services.AnswerSubmissionEventHandler.record(
                 exp_id, exp_version, FIRST_STATE_NAME, 0, 0,
-                exp_domain.HARD_RULE_CLASSIFICATION, 'session1', time_spent,
+                exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
                 params, 'answer1')
 
             # Run the answers aggregation job.
@@ -576,7 +576,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             exp_version = exp.version
             event_services.AnswerSubmissionEventHandler.record(
                 exp_id, exp_version, FIRST_STATE_NAME, 0, 0,
-                exp_domain.HARD_RULE_CLASSIFICATION, 'session2', time_spent,
+                exp_domain.EXPLICIT_CLASSIFICATION, 'session2', time_spent,
                 params, 'answer1')
 
             # Run the aggregator again.
@@ -672,7 +672,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             # Add an answer.
             event_services.AnswerSubmissionEventHandler.record(
                 exp_id, exp_version, FIRST_STATE_NAME, 0, 0,
-                exp_domain.HARD_RULE_CLASSIFICATION, 'session1', time_spent,
+                exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
                 params, 'answer1')
 
             # Run the aggregator job.

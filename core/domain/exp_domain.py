@@ -85,9 +85,17 @@ CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION = (
 # These are categories to which answers may be classified. These values should
 # not be changed because they are persisted in the data store within answer
 # logs.
-HARD_RULE_CLASSIFICATION = 'hard_rule'
-SOFT_RULE_CLASSIFICATION = 'soft_rule'
+
+# Represents answers classified using rules defined as part of an interaction.
+EXPLICIT_CLASSIFICATION = 'explicit'
+# Represents answers which are contained within the training data of an answer
+# group.
+TRAINING_DATA_CLASSIFICATION = 'training_data_match'
+# Represents answers which were predicted using a statistical training model
+# from training data within an answer group.
 STATISTICAL_CLASSIFICATION = 'statistical_classifier'
+# Represents answers which led to the 'default outcome' of an interaction,
+# rather than belonging to a specific answer group.
 DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome'
 
 

@@ -240,8 +240,9 @@ class TopAnswersByCategorization(BaseCalculation):
             state_answers_dict['answers_list'])
 
         calculation_output = {
-            exp_domain.HARD_RULE_CLASSIFICATION: [],
-            exp_domain.SOFT_RULE_CLASSIFICATION: [],
+            exp_domain.EXPLICIT_CLASSIFICATION: [],
+            exp_domain.TRAINING_DATA_CLASSIFICATION: [],
+            exp_domain.STATISTICAL_CLASSIFICATION: [],
             exp_domain.DEFAULT_OUTCOME_CLASSIFICATION: [],
         }
         for item in top_answer_counts_as_list_of_pairs:
@@ -257,10 +258,12 @@ class TopAnswersByCategorization(BaseCalculation):
             })
 
         # Remove empty lists if no answers match within those categories.
-        if not calculation_output[exp_domain.HARD_RULE_CLASSIFICATION]:
-            del calculation_output[exp_domain.HARD_RULE_CLASSIFICATION]
-        if not calculation_output[exp_domain.SOFT_RULE_CLASSIFICATION]:
-            del calculation_output[exp_domain.SOFT_RULE_CLASSIFICATION]
+        if not calculation_output[exp_domain.EXPLICIT_CLASSIFICATION]:
+            del calculation_output[exp_domain.EXPLICIT_CLASSIFICATION]
+        if not calculation_output[exp_domain.TRAINING_DATA_CLASSIFICATION]:
+            del calculation_output[exp_domain.TRAINING_DATA_CLASSIFICATION]
+        if not calculation_output[exp_domain.STATISTICAL_CLASSIFICATION]:
+            del calculation_output[exp_domain.STATISTICAL_CLASSIFICATION]
         if not calculation_output[exp_domain.DEFAULT_OUTCOME_CLASSIFICATION]:
             del calculation_output[exp_domain.DEFAULT_OUTCOME_CLASSIFICATION]
 

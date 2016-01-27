@@ -21,7 +21,7 @@
 describe('Answer classification service', function() {
   beforeEach(module('oppia'));
 
-  var HARD_RULE_CLASSIFICATION = 'hard_rule';
+  var EXPLICIT_CLASSIFICATION = 'explicit';
   var DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome';
 
   var acs, $httpBackend, successHandler, failHandler, $rootScope, state;
@@ -84,13 +84,13 @@ describe('Answer classification service', function() {
       outcome: 'outcome',
       answer_group_index: 0,
       rule_spec_index: 0,
-      classification_categorization: HARD_RULE_CLASSIFICATION,
+      classification_categorization: EXPLICIT_CLASSIFICATION,
     };
     var expectedClassificationResult = {
       outcome: 'outcome',
       answerGroupIndex: 0,
       ruleSpecIndex: 0,
-      classificationCategorization: HARD_RULE_CLASSIFICATION,
+      classificationCategorization: EXPLICIT_CLASSIFICATION,
     };
     $httpBackend.expectPOST(
       '/explorehandler/classify/' + explorationId).respond(
@@ -115,7 +115,7 @@ describe('Answer classification service', function() {
       outcome: 'outcome 1',
       answerGroupIndex: 0,
       ruleSpecIndex: 0,
-      classificationCategorization: HARD_RULE_CLASSIFICATION,
+      classificationCategorization: EXPLICIT_CLASSIFICATION,
     });
     expect(failHandler).not.toHaveBeenCalled();
 
@@ -126,7 +126,7 @@ describe('Answer classification service', function() {
       outcome: 'outcome 2',
       answerGroupIndex: 1,
       ruleSpecIndex: 0,
-      classificationCategorization: HARD_RULE_CLASSIFICATION,
+      classificationCategorization: EXPLICIT_CLASSIFICATION,
     });
     expect(failHandler).not.toHaveBeenCalled();
 
@@ -137,7 +137,7 @@ describe('Answer classification service', function() {
       outcome: 'outcome 2',
       answerGroupIndex: 1,
       ruleSpecIndex: 1,
-      classificationCategorization: HARD_RULE_CLASSIFICATION,
+      classificationCategorization: EXPLICIT_CLASSIFICATION,
     });
     expect(failHandler).not.toHaveBeenCalled();
   });

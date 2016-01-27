@@ -128,7 +128,7 @@ def classify_hard_rule(state, params, input_type, normalized_answer, fs):
                 'classification_certainty': best_matched_truth_value,
                 'rule_spec_index': best_matched_rule_spec_index,
                 'classification_categorization': (
-                    exp_domain.HARD_RULE_CLASSIFICATION),
+                    exp_domain.EXPLICIT_CLASSIFICATION),
             }
 
     return None
@@ -165,7 +165,7 @@ def classify_soft_rule(state, params, input_type, normalized_answer, fs):
                     'classification_certainty': best_matched_truth_value,
                     'rule_spec_index': best_matched_rule_spec_index,
                     'classification_categorization': (
-                        exp_domain.SOFT_RULE_CLASSIFICATION),
+                        exp_domain.TRAINING_DATA_CLASSIFICATION),
                 }
 
     return None

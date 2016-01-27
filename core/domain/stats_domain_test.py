@@ -63,53 +63,53 @@ class StateAnswersTests(test_utils.GenericTestBase):
         # answer is a string
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, FIRST_STATE_NAME, 0, 0,
-            exp_domain.HARD_RULE_CLASSIFICATION, 'sid1', TIME_SPENT, PARAMS,
+            exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', TIME_SPENT, PARAMS,
             'answer1')
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, FIRST_STATE_NAME, 0, 1,
-            exp_domain.HARD_RULE_CLASSIFICATION, 'sid2', TIME_SPENT, PARAMS,
+            exp_domain.EXPLICIT_CLASSIFICATION, 'sid2', TIME_SPENT, PARAMS,
             'answer1')
         # answer is a dict
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, FIRST_STATE_NAME, 1, 0,
-            exp_domain.HARD_RULE_CLASSIFICATION, 'sid1', TIME_SPENT, PARAMS,
+            exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', TIME_SPENT, PARAMS,
             {'x': 1.0, 'y': 5.0})
         # answer is a list
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, SECOND_STATE_NAME, 2, 0,
-            exp_domain.HARD_RULE_CLASSIFICATION, 'sid3', TIME_SPENT, PARAMS,
+            exp_domain.EXPLICIT_CLASSIFICATION, 'sid3', TIME_SPENT, PARAMS,
             [2, 4, 8])
         # answer is a unicode string
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, SECOND_STATE_NAME, 1, 1,
-            exp_domain.HARD_RULE_CLASSIFICATION, 'sid4', TIME_SPENT, PARAMS,
+            exp_domain.EXPLICIT_CLASSIFICATION, 'sid4', TIME_SPENT, PARAMS,
             self.UNICODE_TEST_STRING)
 
         expected_answers_list1 = [{
             'answer': 'answer1', 'time_spent_in_sec': 5.0,
             'answer_group_index': 0, 'rule_spec_index': 0,
-            'classification_categorization': 'hard_rule', 'session_id': 'sid1',
+            'classification_categorization': 'explicit', 'session_id': 'sid1',
             'interaction_id': 'TextInput', 'params': {}
         }, {
             'answer': 'answer1', 'time_spent_in_sec': 5.0,
             'answer_group_index': 0, 'rule_spec_index': 1,
-            'classification_categorization': 'hard_rule', 'session_id': 'sid2',
+            'classification_categorization': 'explicit', 'session_id': 'sid2',
             'interaction_id': 'TextInput', 'params': {}
         }, {
             'answer': {'x': 1.0, 'y': 5.0}, 'time_spent_in_sec': 5.0,
             'answer_group_index': 1, 'rule_spec_index': 0,
-            'classification_categorization': 'hard_rule', 'session_id': 'sid1',
+            'classification_categorization': 'explicit', 'session_id': 'sid1',
             'interaction_id': 'TextInput', 'params': {}
         }]
         expected_answers_list2 = [{
             'answer': [2, 4, 8], 'time_spent_in_sec': 5.0,
             'answer_group_index': 2, 'rule_spec_index': 0,
-            'classification_categorization': 'hard_rule', 'session_id': 'sid3',
+            'classification_categorization': 'explicit', 'session_id': 'sid3',
             'interaction_id': 'TextInput', 'params': {}
         }, {
             'answer': self.UNICODE_TEST_STRING, 'time_spent_in_sec': 5.0,
             'answer_group_index': 1, 'rule_spec_index': 1,
-            'classification_categorization': 'hard_rule', 'session_id': 'sid4',
+            'classification_categorization': 'explicit', 'session_id': 'sid4',
             'interaction_id': 'TextInput', 'params': {}
         }]
 

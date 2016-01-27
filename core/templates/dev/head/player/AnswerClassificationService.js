@@ -20,14 +20,17 @@
 
  // TODO(bhenning): Find a better place for these constants.
 
-oppia.constant('HARD_RULE_CLASSIFICATION', 'hard_rule')
-oppia.constant('SOFT_RULE_CLASSIFICATION', 'soft_rule')
+// NOTE TO DEVELOPERS: These constants must be the same (in name and value) as
+// the corresponding classification constants defined in core.domain.exp_domain.
+oppia.constant('EXPLICIT_CLASSIFICATION', 'explicit')
+oppia.constant('TRAINING_DATA_CLASSIFICATION', 'training_data_match')
+oppia.constant('STATISTICAL_CLASSIFICATION', 'statistical_classifier')
 oppia.constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome')
 
 oppia.factory('answerClassificationService', [
-  '$http', '$q', 'LearnerParamsService', 'HARD_RULE_CLASSIFICATION',
+  '$http', '$q', 'LearnerParamsService', 'EXPLICIT_CLASSIFICATION',
   'DEFAULT_OUTCOME_CLASSIFICATION',
-  function($http, $q, LearnerParamsService, HARD_RULE_CLASSIFICATION,
+  function($http, $q, LearnerParamsService, EXPLICIT_CLASSIFICATION,
       DEFAULT_OUTCOME_CLASSIFICATION) {
     /**
      * Finds the first answer group with a rule that returns true. This should
@@ -63,7 +66,7 @@ oppia.factory('answerClassificationService', [
               outcome: answerGroups[i].outcome,
               answerGroupIndex: i,
               ruleSpecIndex: j,
-              classificationCategorization: HARD_RULE_CLASSIFICATION
+              classificationCategorization: EXPLICIT_CLASSIFICATION
             };
           }
         }
@@ -117,8 +120,6 @@ oppia.factory('answerClassificationService', [
           deferred.resolve(classifyAnswer(
             answer, answerGroups, defaultOutcome, interactionRulesService));
         } else {
-          // TODO(bhenning): Figure out a long-term solution for determining
-          // which params should be passed to the batch classifier.
           var classifyUrl = '/explorehandler/classify/' + explorationId;
           var params = (
             isInEditorMode ? {} : LearnerParamsService.getAllParams());

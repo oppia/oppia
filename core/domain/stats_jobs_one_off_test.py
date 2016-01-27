@@ -93,7 +93,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_group_index': 0,
             'rule_spec_index': 0,
             'classification_categorization': (
-                exp_domain.HARD_RULE_CLASSIFICATION),
+                exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'CodeRepl',
             'params': []
@@ -152,7 +152,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_group_index': 4,
             'rule_spec_index': 0,
             'classification_categorization': (
-                exp_domain.HARD_RULE_CLASSIFICATION),
+                exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'ImageClickInput',
             'params': []
@@ -181,7 +181,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_group_index': 2,
             'rule_spec_index': 0,
             'classification_categorization': (
-                exp_domain.HARD_RULE_CLASSIFICATION),
+                exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'InteractiveMap',
             'params': []
@@ -211,7 +211,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_group_index': 0,
             'rule_spec_index': 0,
             'classification_categorization': (
-                exp_domain.HARD_RULE_CLASSIFICATION),
+                exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'ItemSelectionInput',
             'params': []
@@ -247,7 +247,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_group_index': 1,
             'rule_spec_index': 0,
             'classification_categorization': (
-                exp_domain.HARD_RULE_CLASSIFICATION),
+                exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'MathExpressionInput',
             'params': []
@@ -275,7 +275,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_group_index': 0,
             'rule_spec_index': 0,
             'classification_categorization': (
-                exp_domain.HARD_RULE_CLASSIFICATION),
+                exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'MultipleChoiceInput',
             'params': []
@@ -306,7 +306,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_group_index': 0,
             'rule_spec_index': 0,
             'classification_categorization': (
-                exp_domain.HARD_RULE_CLASSIFICATION),
+                exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'NumericInput',
             'params': []
@@ -343,7 +343,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_group_index': 0,
             'rule_spec_index': 0,
             'classification_categorization': (
-                exp_domain.HARD_RULE_CLASSIFICATION),
+                exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'PencilCodeEditor',
             'params': []
@@ -372,7 +372,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_group_index': 0,
             'rule_spec_index': 0,
             'classification_categorization': (
-                exp_domain.HARD_RULE_CLASSIFICATION),
+                exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'SetInput',
             'params': []
@@ -400,7 +400,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_group_index': 0,
             'rule_spec_index': 0,
             'classification_categorization': (
-                exp_domain.HARD_RULE_CLASSIFICATION),
+                exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'TextInput',
             'params': []

@@ -249,9 +249,9 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         if rule_str == cls._DEFAULT_RULESPEC_STR:
             return exp_domain.DEFAULT_OUTCOME_CLASSIFICATION
         elif rule_str == _FUZZY_RULE_TYPE:
-            return exp_domain.SOFT_RULE_CLASSIFICATION
+            return exp_domain.TRAINING_DATA_CLASSIFICATION
         else:
-            return exp_domain.HARD_RULE_CLASSIFICATION
+            return exp_domain.EXPLICIT_CLASSIFICATION
 
     @classmethod
     def _get_plaintext(cls, str_value):
