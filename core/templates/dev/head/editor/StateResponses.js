@@ -306,6 +306,21 @@ oppia.controller('StateResponses', [
       trainingDataService.initializeTrainingData(
         explorationId, currentStateName);
     };
+    $scope.isSelfLoopWithNoFeedback = function(outcome) {
+      var isSelfLoop = function(outcome) {
+        return (
+          outcome &&
+          outcome.dest === editorContextService.getActiveStateName());
+      };
+      if (!outcome) {
+        return false;
+      }
+      var hasFeedback = outcome.feedback.some(function(feedbackItem) {
+        return Boolean(feedbackItem);
+      });
+
+      return isSelfLoop(outcome) && !hasFeedback;
+    };
 
     $scope.changeActiveAnswerGroupIndex = function(newIndex) {
       $rootScope.$broadcast('externalSave');
@@ -503,6 +518,10 @@ oppia.controller('StateResponses', [
           'editorContextService',
           function(
               $scope, $modalInstance, responsesService, editorContextService) {
+            $scope.feedbackEditorIsOpen = false;
+            $scope.openFeedbackEditor = function() {
+              $scope.feedbackEditorIsOpen = true;
+            };
             $scope.tmpRule = {
               rule_type: null,
               inputs: {}

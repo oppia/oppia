@@ -19,7 +19,6 @@
  */
 
 var logicProofConversion = (function() {
-
   // NOTE: the 'old' values must all be single characters
   var REPLACEMENT_PAIRS = [{
     old: '&',

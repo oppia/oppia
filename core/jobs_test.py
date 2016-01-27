@@ -16,8 +16,6 @@
 
 """Tests for long running jobs and continuous computations."""
 
-__author__ = 'Sean Lip'
-
 import ast
 
 from core import jobs
@@ -26,14 +24,15 @@ from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.platform import models
-(base_models, exp_models, stats_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.exploration, models.NAMES.statistics])
-taskqueue_services = models.Registry.import_taskqueue_services()
-transaction_services = models.Registry.import_transaction_services()
 from core.tests import test_utils
 import feconf
 
 from google.appengine.ext import ndb
+
+(base_models, exp_models, stats_models) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.exploration, models.NAMES.statistics])
+taskqueue_services = models.Registry.import_taskqueue_services()
+transaction_services = models.Registry.import_transaction_services()
 
 JOB_FAILED_MESSAGE = 'failed (as expected)'
 
@@ -138,15 +137,12 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
 
     def test_deferred_job_with_additional_params(self):
         """Test the enqueueing of a job with additional parameters."""
-        ADDITIONAL_PARAMS_1 = {'random': 3, 'correct': 60}
-        ADDITIONAL_PARAMS_2 = {'random': 20, 'correct': 25}
-
         job_id_1 = DummyJobManagerWithParams.create_new()
         DummyJobManagerWithParams.enqueue(
-            job_id_1, additional_job_params=ADDITIONAL_PARAMS_1)
+            job_id_1, additional_job_params={'random': 3, 'correct': 60})
         job_id_2 = DummyJobManagerWithParams.create_new()
         DummyJobManagerWithParams.enqueue(
-            job_id_2, additional_job_params=ADDITIONAL_PARAMS_2)
+            job_id_2, additional_job_params={'random': 20, 'correct': 25})
 
         self.assertEqual(self.count_jobs_in_taskqueue(), 2)
         self.process_and_flush_pending_tasks()
@@ -217,7 +213,8 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_instantiate_jobs_from_abstract_base_classes(self):
         with self.assertRaisesRegexp(
-                Exception, 'directly create a job using the abstract base'):
+            Exception, 'directly create a job using the abstract base'
+            ):
             jobs.BaseJobManager.create_new()
 
     def test_cannot_enqueue_same_job_twice(self):
@@ -469,7 +466,8 @@ class DatastoreJobIntegrationTests(test_utils.GenericTestBase):
 
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)
         with self.assertRaisesRegexp(
-                taskqueue_services.PermanentTaskFailure, 'Oops, I failed'):
+            taskqueue_services.PermanentTaskFailure, 'Oops, I failed'
+            ):
             self.process_and_flush_pending_tasks()
         # The work that the failing job did before it failed is still done.
         self.assertEqual(self._get_stored_total(), 6)
@@ -525,13 +523,13 @@ class MapReduceJobIntegrationTests(test_utils.GenericTestBase):
 class JobRegistryTests(test_utils.GenericTestBase):
     """Tests job registry."""
 
-    def test_each_one_off_class_is_subclass_of_BaseJobManager(self):
+    def test_each_one_off_class_is_subclass_of_base_job_manager(self):
         for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
             self.assertTrue(issubclass(klass, jobs.BaseJobManager))
 
     def test_each_one_off_class_is_not_abstract(self):
         for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
-            self.assertFalse(klass._is_abstract())
+            self.assertFalse(klass._is_abstract())  # pylint: disable=protected-access
 
     def test_validity_of_each_continuous_computation_class(self):
         for klass in jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS:
@@ -547,7 +545,7 @@ class JobRegistryTests(test_utils.GenericTestBase):
                         event_type),
                     event_services.BaseEventHandler))
 
-            rdc = klass._get_realtime_datastore_class()
+            rdc = klass._get_realtime_datastore_class()  # pylint: disable=protected-access
             self.assertTrue(issubclass(
                 rdc, jobs.BaseRealtimeDatastoreClassForContinuousComputations))
 
@@ -556,11 +554,11 @@ class JobRegistryTests(test_utils.GenericTestBase):
             # _get_continuous_computation_class() and
             # _entity_created_before_job_queued() for other base classes
             # that are added to this list.
-            ALLOWED_BASE_BATCH_JOB_CLASSES = [
+            allowed_base_batch_job_classes = [
                 jobs.BaseMapReduceJobManagerForContinuousComputations]
             self.assertTrue(any([
-                issubclass(klass._get_batch_job_manager_class(), superclass)
-                for superclass in ALLOWED_BASE_BATCH_JOB_CLASSES]))
+                issubclass(klass._get_batch_job_manager_class(), superclass)  # pylint: disable=protected-access
+                for superclass in allowed_base_batch_job_classes]))
 
 
 class JobQueriesTests(test_utils.GenericTestBase):
@@ -646,7 +644,7 @@ class StartExplorationMRJobManager(
     @staticmethod
     def map(item):
         current_class = StartExplorationMRJobManager
-        if current_class._entity_created_before_job_queued(item):
+        if current_class._entity_created_before_job_queued(item):  # pylint: disable=protected-access
             yield (item.exploration_id, {
                 'event_type': item.event_type,
             })
@@ -688,8 +686,9 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
 
     @classmethod
     def _handle_incoming_event(
-            cls, active_realtime_layer, event_type, exp_id, exp_version,
-            state_name, session_id, params, play_type):
+            cls, active_realtime_layer, event_type, exp_id, unused_exp_version,
+            unused_state_name, unused_session_id, unused_params,
+            unused_play_type):
 
         def _increment_counter():
             realtime_class = cls._get_realtime_datastore_class()
@@ -734,7 +733,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
 
     EXP_ID = 'exp_id'
 
-    ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS = [
+    ALL_CC_MANAGERS_FOR_TESTS = [
         StartExplorationEventCounter]
 
     def setUp(self):
@@ -749,8 +748,9 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
     def test_continuous_computation_workflow(self):
         """An integration test for continuous computations."""
         with self.swap(
-                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.ALL_CC_MANAGERS_FOR_TESTS
+            ):
             self.assertEqual(
                 StartExplorationEventCounter.get_count(self.EXP_ID), 0)
 
@@ -805,19 +805,20 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
 
     def test_events_coming_in_while_batch_job_is_running(self):
         with self.swap(
-                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.ALL_CC_MANAGERS_FOR_TESTS
+            ):
             # Currently no events have been recorded.
             self.assertEqual(
                 StartExplorationEventCounter.get_count(self.EXP_ID), 0)
 
             # Enqueue the batch computation. (It is running on 0 events.)
-            StartExplorationEventCounter._kickoff_batch_job()
+            StartExplorationEventCounter._kickoff_batch_job()  # pylint: disable=protected-access
             # Record an event while this job is in the queue. Simulate
             # this by directly calling on_incoming_event(), because using
             # StartExplorationEventHandler.record() would just put the event
             # in the task queue, which we don't want to flush yet.
-            event_services.StartExplorationEventHandler._handle_event(
+            event_services.StartExplorationEventHandler._handle_event(  # pylint: disable=protected-access
                 self.EXP_ID, 1, feconf.DEFAULT_INIT_STATE_NAME, 'session_id', {},
                 feconf.PLAY_TYPE_NORMAL)
             StartExplorationEventCounter.on_incoming_event(

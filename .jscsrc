@@ -4,10 +4,15 @@
 {
     "preset": "google",
     "excludeFiles": [
-        "third_party/**",
         "core/templates/dev/head/expressions/parser.js",
         "core/templates/prod/**",
-        "core/tests/protractor.conf.js"
+        "core/tests/protractor.conf.js",
+        "extensions/interactions/LogicProof/static/js/generatedDefaultData.js",
+        "extensions/interactions/LogicProof/static/js/generatedParser.js",
+        "integrations/**",
+        "integrations_dev/**",
+        "static/scripts/**",
+        "third_party/**"
     ],
     "fileExtensions": [".js"],
     "extract": ["*.html"],
@@ -70,8 +75,7 @@
         "checkReturnTypes": true,
         "checkRedundantReturns": true,
         "requireReturnTypes": true,
-        "checkRedundantAccess": true,
-        "requireDescriptionCompleteSentence": true
+        "checkRedundantAccess": true
     },
     "maximumLineLength": 80,
     "requireAnonymousFunctions": true,

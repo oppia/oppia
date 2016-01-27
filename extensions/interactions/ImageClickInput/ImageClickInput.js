@@ -49,9 +49,11 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           var image = $($element).find('.oppia-image-click-img');
           var labeledRegion = imageAndRegions.labeledRegions[index];
           var regionArea = labeledRegion.region.area;
+          var leftDelta = image.offset().left - image.parent().offset().left;
+          var topDelta = image.offset().top - image.parent().offset().top;
           return {
-            left: regionArea[0][0] * image.width(),
-            top: regionArea[0][1] * image.height(),
+            left: regionArea[0][0] * image.width() + leftDelta,
+            top: regionArea[0][1] * image.height() + topDelta,
             width: (regionArea[1][0] - regionArea[0][0]) * image.width(),
             height: (regionArea[1][1] - regionArea[0][1]) * image.height()
           };

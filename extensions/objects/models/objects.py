@@ -16,8 +16,6 @@
 
 """Classes for interpreting typed objects in Oppia."""
 
-__author__ = 'Sean Lip'
-
 import copy
 import os
 
@@ -433,22 +431,22 @@ class LogicQuestion(BaseObject):
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
 
-        def _validateExpression(expression):
+        def _validate_expression(expression):
             assert isinstance(expression, dict)
             assert isinstance(expression['top_kind_name'], basestring)
             assert isinstance(expression['top_operator_name'], basestring)
-            _validateExpressionArray(expression['arguments'])
-            _validateExpressionArray(expression['dummies'])
+            _validate_expression_array(expression['arguments'])
+            _validate_expression_array(expression['dummies'])
 
-        def _validateExpressionArray(array):
+        def _validate_expression_array(array):
             assert isinstance(array, list)
             for item in array:
-                _validateExpression(item)
+                _validate_expression(item)
 
         try:
             assert isinstance(raw, dict)
-            _validateExpressionArray(raw['assumptions'])
-            _validateExpressionArray(raw['results'])
+            _validate_expression_array(raw['assumptions'])
+            _validate_expression_array(raw['results'])
             assert isinstance(raw['default_proof_string'], basestring)
 
             return copy.deepcopy(raw)
@@ -533,25 +531,24 @@ class Graph(BaseObject):
 
     @classmethod
     def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
-        """
+        """Validates and normalizes a raw Python object.
+
         Checks that there are no self-loops or multiple edges.
         Checks that unlabeled graphs have all labels empty.
         Checks that unweighted graphs have all weights set to 1.
         TODO(czx): Think about support for multigraphs?
         """
-
         try:
             raw = schema_utils.normalize_against_schema(raw, cls.SCHEMA)
 
             if not raw['isLabeled']:
                 for vertex in raw['vertices']:
-                    assert (vertex['label'] == '')
+                    assert vertex['label'] == ''
 
             for edge in raw['edges']:
-                assert (edge['src'] != edge['dst'])
+                assert edge['src'] != edge['dst']
                 if not raw['isWeighted']:
-                    assert (edge['weight'] == 1.0)
+                    assert edge['weight'] == 1.0
 
             if raw['isDirected']:
                 edge_pairs = [
@@ -567,6 +564,21 @@ class Graph(BaseObject):
             raise TypeError('Cannot convert to graph %s' % raw)
 
         return raw
+
+
+class GraphProperty(BaseObject):
+    """A string from a list of possible graph properties"""
+
+    description = 'One of the possible properties possessed by a graph.'
+    edit_html_filename = 'graph_property_editor'
+    edit_js_filename = 'GraphPropertyEditor'
+
+    SCHEMA = {
+        'type': 'unicode',
+        'choices': [
+            'strongly_connected', 'weakly_connected', 'acyclic', 'regular'
+        ]
+    }
 
 
 class ListOfGraph(BaseObject):

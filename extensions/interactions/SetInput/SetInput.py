@@ -26,6 +26,7 @@ class SetInput(base.BaseInteraction):
     _dependency_ids = []
     answer_type = 'SetOfUnicodeString'
     instructions = None
+    narrow_instructions = None
     needs_summary = False
 
     # NB: There used to be a UnicodeString-typed parameter here called

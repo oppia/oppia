@@ -1510,18 +1510,18 @@ oppia.factory('stateEditorTutorialFirstTimeService', [
     // Whether this is the first time the tutorial has been seen by this user.
     var _currentlyInFirstVisit = true;
 
+    var STARTED_TUTORIAL_EVENT_URL = '/createhandler/started_tutorial_event';
+
     return {
       // After the first call to it in a client session, this does nothing.
-      init: function(firstTime, explorationId) {
+      init: function(firstTime) {
         if (!firstTime || !_currentlyInFirstVisit) {
           _currentlyInFirstVisit = false;
         }
 
         if (_currentlyInFirstVisit) {
           $rootScope.$broadcast('openEditorTutorial');
-          var startedTutorialEventUrl = (
-            '/createhandler/started_tutorial_event/' + explorationId);
-          $http.post(startedTutorialEventUrl).error(function() {
+          $http.post(STARTED_TUTORIAL_EVENT_URL).error(function() {
             console.error('Warning: could not record tutorial start event.');
           });
         }

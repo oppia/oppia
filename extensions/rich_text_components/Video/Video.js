@@ -25,19 +25,26 @@ oppia.directive('oppiaNoninteractiveVideo', [
       restrict: 'E',
       scope: {},
       templateUrl: 'richTextComponent/Video',
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        var start = oppiaHtmlEscaper.escapedJsonToObj($attrs.startWithValue);
-        var end = oppiaHtmlEscaper.escapedJsonToObj($attrs.endWithValue);
+      controller: ['$scope', '$attrs', 'explorationContextService',
+        function($scope, $attrs, explorationContextService) {
+          var start = oppiaHtmlEscaper.escapedJsonToObj($attrs.startWithValue);
+          var end = oppiaHtmlEscaper.escapedJsonToObj($attrs.endWithValue);
 
-        $scope.autoplaySuffix = (oppiaHtmlEscaper.escapedJsonToObj(
-          $attrs.autoplayWithValue) ? '&autoplay=1' : '&autoplay=0');
-        $scope.videoId = oppiaHtmlEscaper.escapedJsonToObj(
-          $attrs.videoIdWithValue);
-        $scope.timingParams = '&start=' + start + '&end=' + end;
-        $scope.videoUrl = $sce.trustAsResourceUrl(
-          'https://www.youtube.com/embed/' + $scope.videoId + '?rel=0' +
-          $scope.timingParams + $scope.autoplaySuffix);
-      }]
+          $scope.autoplaySuffix = (oppiaHtmlEscaper.escapedJsonToObj(
+            $attrs.autoplayWithValue) ? '&autoplay=1' : '&autoplay=0');
+          $scope.videoId = oppiaHtmlEscaper.escapedJsonToObj(
+            $attrs.videoIdWithValue);
+          $scope.timingParams = '&start=' + start + '&end=' + end;
+          $scope.videoUrl = $sce.trustAsResourceUrl(
+            'https://www.youtube.com/embed/' + $scope.videoId + '?rel=0' +
+            $scope.timingParams + $scope.autoplaySuffix);
+
+          // This following check disbales the video in Editor being caught
+          // by tabbing while in Exploration Editor mode.
+          if (explorationContextService.isInExplorationEditorMode()) {
+            $scope.tabIndexVal = -1;
+          }
+        }]
     };
   }
 ]);

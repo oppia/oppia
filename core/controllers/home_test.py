@@ -14,8 +14,6 @@
 
 """Tests for the user notification dashboard and 'my explorations' pages."""
 
-__author__ = 'Sean Lip'
-
 from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import user_jobs_continuous
@@ -181,15 +179,16 @@ class MyExplorationsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['explorations_list'][0]['num_total_threads'], 0)
 
-        def mock_get_thread_analytics(exploration_id):
+        def mock_get_thread_analytics(unused_exploration_id):
             return {
                 'num_open_threads': 2,
                 'num_total_threads': 3,
             }
 
         with self.swap(
-                feedback_services, 'get_thread_analytics',
-                mock_get_thread_analytics):
+            feedback_services, 'get_thread_analytics',
+            mock_get_thread_analytics):
+
             response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
             self.assertEqual(len(response['explorations_list']), 1)
             self.assertEqual(
@@ -236,9 +235,10 @@ class NotificationsDashboardHandlerTest(test_utils.GenericTestBase):
         and that anonymous authors are handled correctly.
         """
         with self.swap(
-                user_jobs_continuous.DashboardRecentUpdatesAggregator,
-                'get_recent_notifications',
-                self._get_recent_notifications_mock_by_viewer):
+            user_jobs_continuous.DashboardRecentUpdatesAggregator,
+            'get_recent_notifications',
+            self._get_recent_notifications_mock_by_viewer):
+
             self.login(self.VIEWER_EMAIL)
             response = self.get_json(self.DASHBOARD_DATA_URL)
             self.assertEqual(len(response['recent_notifications']), 1)
@@ -248,9 +248,10 @@ class NotificationsDashboardHandlerTest(test_utils.GenericTestBase):
             self.assertNotIn('author_id', response['recent_notifications'][0])
 
         with self.swap(
-                user_jobs_continuous.DashboardRecentUpdatesAggregator,
-                'get_recent_notifications',
-                self._get_recent_notifications_mock_by_anonymous_user):
+            user_jobs_continuous.DashboardRecentUpdatesAggregator,
+            'get_recent_notifications',
+            self._get_recent_notifications_mock_by_anonymous_user):
+
             self.login(self.VIEWER_EMAIL)
             response = self.get_json(self.DASHBOARD_DATA_URL)
             self.assertEqual(len(response['recent_notifications']), 1)

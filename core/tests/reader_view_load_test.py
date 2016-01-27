@@ -24,8 +24,6 @@ Run this script from the Oppia root directory:
 
 """
 
-__author__ = 'Sean Lip (sll@google.com)'
-
 import argparse
 import cookielib
 import json
@@ -87,9 +85,9 @@ class WebSession(object):
             common_headers = {}
         self.uid = uid
         self.common_headers = common_headers
-        self.cj = cookielib.CookieJar()
+        self.cookie_jar = cookielib.CookieJar()
         self.opener = urllib2.build_opener(
-            urllib2.HTTPCookieProcessor(self.cj))
+            urllib2.HTTPCookieProcessor(self.cookie_jar))
 
     @classmethod
     def increment_duration_bucket(cls, index):
@@ -121,7 +119,7 @@ class WebSession(object):
                 cls.RESPONSE_TIME_HISTOGRAM)
 
     def get_cookie_value(self, name):
-        for cookie in self.cj:
+        for cookie in self.cookie_jar:
             if cookie.name == name:
                 return cookie.value
         return None
@@ -148,15 +146,15 @@ class WebSession(object):
             while True:
                 try:
                     return self.opener.open(request)
-                except urllib2.HTTPError as he:
+                except urllib2.HTTPError as http_error:
                     if (try_count < WebSession.MAX_RETRIES and
-                            self.is_soft_error(he)):
+                            self.is_soft_error(http_error)):
                         try_count += 1
                         with WebSession.PROGRESS_LOCK:
                             WebSession.RETRY_COUNT += 1
                         time.sleep(WebSession.RETRY_SLEEP_SEC)
                         continue
-                    raise he
+                    raise http_error
         except Exception as e:
             logging.info(
                 'Error in session %s executing: %s', self.uid, hint)
@@ -234,10 +232,10 @@ class TaskThread(threading.Thread):
     def run(self):
         try:
             self.func()
-        except Exception as e:  # pylint: disable-msg=broad-except
+        except Exception as e:
             logging.error('Error in %s: %s', self.name, e)
-            self.exc_info = sys.exc_info()
-            raise self.exc_info[1], None, self.exc_info[2]
+            exc_info = sys.exc_info()
+            raise exc_info[1], None, exc_info[2]
 
 
 class ReaderViewLoadTest(object):

@@ -16,9 +16,11 @@
 
 """Rules for Graph objects."""
 
-__author__ = 'Zhan Xiong Chin'
-
 from extensions.rules import base
+
+
+class HasGraphProperty(base.GraphRule):
+    description = 'is {{p|GraphProperty}}'
 
 
 class IsIsomorphicTo(base.GraphRule):

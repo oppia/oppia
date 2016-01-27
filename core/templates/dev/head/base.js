@@ -64,9 +64,20 @@ oppia.constant('DEFAULT_FUZZY_RULE', {
   }
 });
 
+oppia.constant('PARAMETER_TYPES', {
+  REAL: 'Real',
+  UNICODE_STRING: 'UnicodeString'
+});
+
 oppia.constant('INTERACTION_DISPLAY_MODE_INLINE', 'inline');
 
 oppia.constant('OBJECT_EDITOR_URL_PREFIX', '/object_editor_template/');
+
+// The maximum number of nodes to show in a row of the state graph.
+oppia.constant('MAX_NODES_PER_ROW', 4);
+// The following variable must be at least 3. It represents the maximum length,
+// in characters, for the name of each node label in the state graph.
+oppia.constant('MAX_NODE_LABEL_LENGTH', 15);
 
 // Global utility methods.
 oppia.controller('Base', [

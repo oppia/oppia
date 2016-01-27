@@ -16,8 +16,6 @@
 
 """One-off jobs for explorations."""
 
-__author__ = 'Frederik Creemers'
-
 import ast
 import logging
 
@@ -26,10 +24,13 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.platform import models
-(base_models, exp_models,) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.exploration])
 import feconf
 import utils
+
+(base_models, exp_models,) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.exploration])
+
+_COMMIT_TYPE_REVERT = 'revert'
 
 
 class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
@@ -73,11 +74,10 @@ class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        _COMMIT_TYPE_REVERT = 'revert'
         if (item.commit_type != _COMMIT_TYPE_REVERT and
-                    item.committer_id not in feconf.SYSTEM_USER_IDS):
-                exp_id = item.get_unversioned_instance_id()
-                yield (exp_id, item.committer_id)
+                item.committer_id not in feconf.SYSTEM_USER_IDS):
+            exp_id = item.get_unversioned_instance_id()
+            yield (exp_id, item.committer_id)
 
     @staticmethod
     def reduce(exp_id, committer_id_list):
@@ -87,6 +87,29 @@ class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceJobManager):
 
         exp_summary_model.contributor_ids = list(set(committer_id_list))
         exp_summary_model.put()
+
+
+class ExplorationContributorsSummaryOneOffJob(jobs.BaseMapReduceJobManager):
+    """One-off job that computes the number of commits
+    done by contributors for each Exploration
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        summary = exp_services.get_exploration_summary_by_id(item.id)
+        summary.contributor_summary = (
+            exp_services.compute_exploration_contributors_summary(item.id))
+        exp_services.save_exploration_summary(summary)
+
+    @staticmethod
+    def reduce(key, values):
+        pass
 
 
 class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
@@ -132,6 +155,10 @@ class IndexAllExplorationsJobManager(jobs.BaseMapReduceJobManager):
     def map(item):
         if not item.deleted:
             exp_services.index_explorations_given_ids([item.id])
+
+    @staticmethod
+    def reduce(key, values):
+        pass
 
 
 class ExplorationValidityJobManager(jobs.BaseMapReduceJobManager):

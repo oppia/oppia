@@ -16,12 +16,12 @@
 
 """HTML sanitizing service."""
 
-__author__ = 'Sean Lip'
-
-import bleach
-from core.domain import rte_component_registry
 import logging
 import urlparse
+
+import bleach
+
+from core.domain import rte_component_registry
 
 
 def filter_a(name, value):

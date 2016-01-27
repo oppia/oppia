@@ -33,6 +33,7 @@ class EndExploration(base.BaseInteraction):
     is_terminal = True
     _dependency_ids = []
     instructions = None
+    narrow_instructions = None
     needs_summary = False
 
     _customization_arg_specs = [{

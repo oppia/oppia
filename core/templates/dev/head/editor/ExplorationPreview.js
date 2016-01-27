@@ -20,13 +20,13 @@
  */
 
 oppia.controller('ExplorationPreview', [
-  '$scope', '$timeout', 'learnerParamsService', 'explorationData',
+  '$scope', '$timeout', 'LearnerParamsService', 'explorationData',
   'explorationStatesService', 'explorationInitStateNameService',
   'explorationParamSpecsService', 'explorationTitleService',
   'explorationCategoryService', 'explorationParamChangesService',
   'explorationGadgetsService', 'oppiaPlayerService',
   function(
-      $scope, $timeout, learnerParamsService, explorationData,
+      $scope, $timeout, LearnerParamsService, explorationData,
       explorationStatesService, explorationInitStateNameService,
       explorationParamSpecsService, explorationTitleService,
       explorationCategoryService, explorationParamChangesService,
@@ -59,7 +59,7 @@ oppia.controller('ExplorationPreview', [
 
     $scope.allParams = {};
     $scope.$on('playerStateChange', function() {
-      $scope.allParams = learnerParamsService.getAllParams();
+      $scope.allParams = LearnerParamsService.getAllParams();
     });
   }
 ]);

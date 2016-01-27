@@ -93,7 +93,6 @@ describe('Datetime Formatter', function() {
   describe('datetimeformatter', function() {
     // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
     var NOW_MILLIS = 1416563100000;
-    var YESTERDAY_MILLIS = NOW_MILLIS - 24 * 60 * 60 * 1000;
     var df = null;
     var OldDate = Date;
 
@@ -102,59 +101,10 @@ describe('Datetime Formatter', function() {
 
       // Mock Date() to give a time of NOW_MILLIS in GMT. (Unfortunately, there
       // doesn't seem to be a good way to set the timezone locale directly.)
-      spyOn(window, 'Date').andCallFake(function(optionalMillisSinceEpoch) {
-        if (optionalMillisSinceEpoch) {
-          return new OldDate(optionalMillisSinceEpoch);
-        } else {
-          return new OldDate(NOW_MILLIS);
-        }
+      spyOn(window, 'Date').andCallFake(function() {
+        return new OldDate(NOW_MILLIS);
       });
     }));
-
-    it('should show only the time for a datetime occurring today', function() {
-      // In any timezone, 10 minutes before xx:45:00 should still fall within
-      // the same date as xx:45:00 in getLocaleAbbreviateDatetimeString().
-      expect(df.getLocaleAbbreviatedDatetimeString(
-        NOW_MILLIS - 10 * 60 * 1000)).not.toBe('11/21/2014');
-      expect(df.getLocaleAbbreviatedDatetimeString(
-        NOW_MILLIS - 10 * 60 * 1000)).not.toBe('2014/11/21');
-    });
-
-    it('should show only the date for a datetime occurring before today',
-        function() {
-      // 72 hours ago. This is 18 Nov 2014 09:45:00 GMT, which corresponds to
-      // 17 Nov 2014 in some parts of the world, and 18 Nov 2014 in others.
-      // Also have into account different locales where the order of time/date
-      // formatting is different. This should hold true in
-      // getLocaleAbbreviateDatetimeString()
-      expect([
-        '11/18/2014', '11/17/2014', '2014/11/18', '2014/11/17', '18/11/2014'
-      ]).toContain(
-        df.getLocaleAbbreviatedDatetimeString(
-          NOW_MILLIS - 72 * 60 * 60 * 1000));
-    });
-
-    it('should show the date even for a datetime occurring today', function() {
-      // In any timezone, 10 minutes before xx:45:00 should still fall within
-      // the same date as xx:45:00 in getLocaleDateString(). The date should
-      // always be shown as '11/21/2014'
-      expect(df.getLocaleDateString(
-        NOW_MILLIS - 10 * 60 * 1000)).toBe('11/21/2014');
-      expect(df.getLocaleDateString(
-        NOW_MILLIS - 10 * 60 * 1000)).not.toBe('2014/11/21');
-    });
-
-    it('should show only the date for a datetime occurring before today',
-        function() {
-      // 72 hours ago. This is 18 Nov 2014 09:45:00 GMT, which corresponds to
-      // 17 Nov 2014 in some parts of the world, and 18 Nov 2014 in others.
-      // Also have into account different locales where the order of time/date
-      // formatting is different. This should hold true in
-      // getLocaleDateString().
-      expect([
-        '11/18/2014', '11/17/2014', '2014/11/18', '2014/11/17', '18/11/2014'
-      ]).toContain(df.getLocaleDateString(NOW_MILLIS - 72 * 60 * 60 * 1000));
-    });
 
     it('should correctly indicate recency', function() {
       // 1 second ago is recent.

@@ -1,6 +1,6 @@
 author_notes: ''
 blurb: ''
-default_skin: conversation_v1
+category: Test
 init_state_name: Continue
 language_code: en
 objective: check all the interactions work
@@ -12,9 +12,10 @@ param_specs:
     obj_type: UnicodeString
   c:
     obj_type: UnicodeString
-schema_version: 7
+schema_version: 10
 skin_customizations:
-  panels_contents: {}
+  panels_contents:
+    bottom: []
 states:
   Code REPL:
     content:
@@ -30,6 +31,7 @@ states:
         - inputs:
             x: '12'
           rule_type: OutputEquals
+      confirmed_unclassified_answers: []
       customization_args:
         language:
           value: python
@@ -44,8 +46,8 @@ states:
         feedback:
         - Wrong.
         param_changes: []
+      fallbacks: []
       id: CodeRepl
-      triggers: []
     param_changes: []
   Continue:
     content:
@@ -65,6 +67,7 @@ states:
         \ be an unescaped 'greater-than' sign.</span></div></div></div>"
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         buttonText:
           value: Continue
@@ -72,8 +75,8 @@ states:
         dest: Multiple choice input
         feedback: []
         param_changes: []
+      fallbacks: []
       id: Continue
-      triggers: []
     param_changes:
     - customization_args:
         parse_with_jinja: false
@@ -101,12 +104,13 @@ states:
       value: Congratulations, you have finished!
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         recommendedExplorationIds:
           value: []
       default_outcome: null
+      fallbacks: []
       id: EndExploration
-      triggers: []
     param_changes: []
   Multiple choice input:
     content:
@@ -124,6 +128,7 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
@@ -135,8 +140,8 @@ states:
         feedback:
         - Wrong.
         param_changes: []
+      fallbacks: []
       id: MultipleChoiceInput
-      triggers: []
     param_changes:
     - customization_args:
         parse_with_jinja: true
@@ -165,6 +170,7 @@ states:
                 num: 1
               readableNoteName: E4
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         initialSequence:
           value: []
@@ -183,8 +189,8 @@ states:
         feedback:
         - Wrong.
         param_changes: []
+      fallbacks: []
       id: MusicNotesInput
-      triggers: []
     param_changes: []
   Network Graph:
     content:
@@ -220,6 +226,7 @@ states:
                 x: 155.0
                 y: 125.0
           rule_type: IsIsomorphicTo
+      confirmed_unclassified_answers: []
       customization_args:
         canAddEdge:
           value: true
@@ -259,8 +266,8 @@ states:
         feedback:
         - Incorrect
         param_changes: []
+      fallbacks: []
       id: GraphInput
-      triggers: []
     param_changes: []
   Numeric input:
     content:
@@ -276,14 +283,15 @@ states:
         - inputs:
             x: 6.0
           rule_type: IsGreaterThan
+      confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Numeric input
         feedback:
         - Wrong.
         param_changes: []
+      fallbacks: []
       id: NumericInput
-      triggers: []
     param_changes: []
   Set input:
     content:
@@ -301,14 +309,15 @@ states:
             - abc
             - xyz
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Set input
         feedback:
         - Wrong.
         param_changes: []
+      fallbacks: []
       id: SetInput
-      triggers: []
     param_changes: []
   Text Area Input:
     content:
@@ -325,6 +334,7 @@ states:
         - inputs:
             x: hello
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: Type your answer here.
@@ -335,8 +345,8 @@ states:
         feedback:
         - Wrong
         param_changes: []
+      fallbacks: []
       id: TextInput
-      triggers: []
     param_changes: []
   Text input:
     content:
@@ -352,6 +362,7 @@ states:
         - inputs:
             x: rrrrr
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: Type your answer here.
@@ -362,8 +373,8 @@ states:
         feedback:
         - Wrong.
         param_changes: []
+      fallbacks: []
       id: TextInput
-      triggers: []
     param_changes: []
   World map:
     content:
@@ -382,6 +393,7 @@ states:
             - 40.0
             - -105.0
           rule_type: Within
+      confirmed_unclassified_answers: []
       customization_args:
         latitude:
           value: 0
@@ -394,8 +406,9 @@ states:
         feedback:
         - Wrong.
         param_changes: []
+      fallbacks: []
       id: InteractiveMap
-      triggers: []
     param_changes: []
-states_schema_version: 4
+states_schema_version: 7
 tags: []
+title: Test of expressions and interactions

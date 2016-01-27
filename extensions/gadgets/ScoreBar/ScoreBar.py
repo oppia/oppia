@@ -14,9 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'Michael Anuzis'
-
-
 from extensions.gadgets import base
 
 
@@ -30,8 +27,7 @@ class ScoreBar(base.BaseGadget):
     panel = 'bottom'
     _dependency_ids = []
 
-    _customization_arg_specs = [
-    {
+    _customization_arg_specs = [{
         'name': 'maxValue',
         'description': 'Maximum value (the bar fills up to this value)',
         'schema': {

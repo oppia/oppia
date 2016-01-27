@@ -14,8 +14,6 @@
 
 """Tests for Oppia resource handling (e.g. templates, images)."""
 
-__author__ = 'Sean Lip'
-
 import os
 
 from core.domain import exp_services

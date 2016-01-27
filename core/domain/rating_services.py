@@ -14,10 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""System for assigning and displaying ratings of explorations.
-"""
-
-__author__ = 'Jacob Davis'
+"""System for assigning and displaying ratings of explorations."""
 
 import datetime
 
@@ -27,6 +24,8 @@ import feconf
 (exp_models, user_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.user])
 transaction_services = models.Registry.import_transaction_services()
+
+ALLOWED_RATINGS = [1, 2, 3, 4, 5]
 
 
 def assign_rating_to_exploration(user_id, exploration_id, new_rating):
@@ -42,7 +41,6 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
         raise ValueError(
             'Expected the rating to be an integer, received %s' % new_rating)
 
-    ALLOWED_RATINGS = [1, 2, 3, 4, 5]
     if new_rating not in ALLOWED_RATINGS:
         raise ValueError('Expected a rating 1-5, received %s.' % new_rating)
 

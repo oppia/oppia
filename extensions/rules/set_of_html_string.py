@@ -16,8 +16,6 @@
 
 """Rules for SetOfHtmlString objects."""
 
-__author__ = 'Kevin Lee'
-
 from extensions.rules import base
 
 
