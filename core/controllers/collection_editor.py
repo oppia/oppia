@@ -19,16 +19,12 @@
 __author__ = 'Abraham Mgowano'
 
 from core.controllers import base
-from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import rights_manager
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
-import feconf
 import utils
-
-import jinja2
 
 
 def _require_valid_version(version_from_payload, collection_version):
@@ -73,8 +69,7 @@ def require_editor(handler):
                 'You do not have the credentials to access this page.')
 
         try:
-            collection = collection_services.get_collection_by_id(
-                collection_id)
+            collection_services.get_collection_by_id(collection_id)
         except:
             raise self.PageNotFoundException
 

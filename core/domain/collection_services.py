@@ -507,10 +507,10 @@ def apply_change_list(collection_id, change_list):
                         collection_domain.COLLECTION_PROPERTY_TITLE):
                     collection.update_title(change.new_value)
                 elif (change.property_name ==
-                        collection_domain.COLLECTION_PROPERTY_CATEGORY):
+                      collection_domain.COLLECTION_PROPERTY_CATEGORY):
                     collection.update_category(change.new_value)
                 elif (change.property_name ==
-                        collection_domain.COLLECTION_PROPERTY_OBJECTIVE):
+                      collection_domain.COLLECTION_PROPERTY_OBJECTIVE):
                     collection.update_objective(change.new_value)
             elif (
                     change.cmd ==
@@ -549,8 +549,8 @@ def _save_collection(committer_id, collection, commit_message, change_list):
 
     for collection_node in collection.nodes:
         if not exp_services.get_exploration_by_id(
-            collection_node.exploration_id, strict=False):
-            raise utils.ValidationError (
+                collection_node.exploration_id, strict=False):
+            raise utils.ValidationError(
                 'Expected collection to only reference valid explorations, '
                 'but found an exploration with ID: %s' %
                 collection_node.exploration_id)

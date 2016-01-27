@@ -23,6 +23,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import utils
 
 (collection_models, user_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.user])
@@ -729,18 +730,16 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         self.assertEqual(
             collection.exploration_ids, [self.EXPLORATION_ID, new_exp_id])
 
-    def test_add_node_with_invalid_exploration(self):
-        _INVALID_EXP_ID = 'invalid_exploration_id'
-        collection = collection_services.get_collection_by_id(
-            self.COLLECTION_ID)
+    def test_add_node_with_non_existent_exploration(self):
+        non_existent_exp_id = 'non_existent_exploration_id'
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected collection to only reference '
-                'valid explorations'):
+                utils.ValidationError,
+                'Expected collection to only reference valid explorations'):
             collection_services.update_collection(
-                self.OWNER_ID, self.COLLECTION_ID, [{
+                self.owner_id, self.COLLECTION_ID, [{
                     'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                    'exploration_id': _INVALID_EXP_ID
-                }], 'Added invalid exploration')
+                    'exploration_id': non_existent_exp_id
+                }], 'Added non-existent exploration')
 
     def test_delete_node(self):
         # Verify the initial collection only has 1 exploration in it.
