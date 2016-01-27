@@ -282,10 +282,10 @@ def get_learner_collection_dict_by_id(
     for collection_node in collection_dict['nodes']:
         summary = exp_summaries_dict.get(collection_node['exploration_id'])
         if not summary:
-            raise Exception(
-                'Unexpected error: access to a collection node that refernces'
-                'a non-existent exploration with exploration id: %s' % (
-                    collection_node['exploration_id']))
+            raise utils.ValidationError(
+                'Expected collection to only reference valid explorations, but '
+                'found an exploration with ID: %s (was the exploration '
+                'deleted?)' % collection_node['exploration_id'])
 
         collection_node['exploration'] = {
             'id': collection_node['exploration_id'],
@@ -534,10 +534,10 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     for collection_node in collection.nodes:
         if not exp_services.get_exploration_by_id(
             collection_node.exploration_id, strict=False):
-            raise Exception(
-                'Unexpected error: Access to a collection node that references '
-                'a non-existent exploration with id: %s when trying to save a'
-                'collection' % (collection_node.exploration_id))
+            raise utils.ValidationError (
+                'Expected collection to only reference valid explorations, '
+                'but found an exploration with ID: %s' %
+                collection_node.exploration_id)
 
     collection_model = collection_models.CollectionModel.get(
         collection.id, strict=False)

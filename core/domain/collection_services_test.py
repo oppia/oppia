@@ -626,8 +626,6 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
         with self.assertRaisesRegexp(Exception, 'between 1 and 50 characters'):
             collection_services.save_new_collection(self.OWNER_ID, collection)
 
-        collection = self.save_new_valid_collection
-
     def test_save_and_retrieve_collection(self):
         collection = self.save_new_valid_collection(
             self.COLLECTION_ID, self.OWNER_ID)
@@ -745,7 +743,9 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         _INVALID_EXP_ID = 'invalid_exploration_id'
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected collection to only reference '
+                'valid explorations'):
             collection_services.update_collection(
                 self.OWNER_ID, self.COLLECTION_ID, [{
                     'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
