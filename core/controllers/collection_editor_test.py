@@ -14,8 +14,6 @@
 
 """Tests for the collection editor page."""
 
-__author__ = 'Abraham Mgowano'
-
 from core.domain import collection_services
 from core.domain import rights_manager
 from core.tests import test_utils

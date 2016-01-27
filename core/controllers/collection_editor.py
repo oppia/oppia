@@ -16,15 +16,14 @@
 
 """Controllers for the collections editor."""
 
-__author__ = 'Abraham Mgowano'
-
 from core.controllers import base
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import rights_manager
 from core.platform import models
-current_user_services = models.Registry.import_current_user_services()
 import utils
+
+current_user_services = models.Registry.import_current_user_services()
 
 
 def _require_valid_version(version_from_payload, collection_version):
