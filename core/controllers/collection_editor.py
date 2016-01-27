@@ -101,8 +101,8 @@ class CollectionEditorPage(CollectionEditorHandler):
             collection_id, strict=False)
 
         if (collection is None or
-            not rights_manager.Actor(self.user_id).can_view(
-                rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id)):
+                not rights_manager.Actor(self.user_id).can_view(
+                    rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id)):
             self.redirect('/')
             return
 

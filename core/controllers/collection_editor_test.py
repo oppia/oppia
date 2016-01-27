@@ -16,7 +16,6 @@
 
 __author__ = 'Abraham Mgowano'
 
-from core.controllers import collection_editor
 from core.domain import collection_services
 from core.domain import rights_manager
 from core.tests import test_utils
@@ -74,14 +73,14 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         # number.
         response = self.testapp.get(
             '%s/%s?v=1' % (feconf.COLLECTION_DATA_URL_PREFIX,
-                self.COLLECTION_ID))
+                           self.COLLECTION_ID))
         self.assertEqual(response.status_int, 200)
         self.assertIn('Introduction to Collections in Oppia', response.body)
 
         # Check that non-editors can access, but not edit, the editor page.
         response = self.testapp.get(
             '%s/%s' % (feconf.COLLECTION_EDITOR_URL_PREFIX,
-                self.COLLECTION_ID))
+                       self.COLLECTION_ID))
         self.assertEqual(response.status_int, 200)
         self.assertIn('Introduction to Collections in Oppia', response.body)
         self.assert_cannot_edit(response.body)
@@ -90,7 +89,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get(
             '%s/%s' % (feconf.COLLECTION_EDITOR_URL_PREFIX,
-                self.COLLECTION_ID))
+                       self.COLLECTION_ID))
         self.assertEqual(response.status_int, 200)
         self.assertIn('Introduction to Collections in Oppia', response.body)
         self.assert_can_edit(response.body)

@@ -733,8 +733,8 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
     def test_add_node_with_non_existent_exploration(self):
         non_existent_exp_id = 'non_existent_exploration_id'
         with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'Expected collection to only reference valid explorations'):
+            utils.ValidationError,
+            'Expected collection to only reference valid explorations'):
             collection_services.update_collection(
                 self.owner_id, self.COLLECTION_ID, [{
                     'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
