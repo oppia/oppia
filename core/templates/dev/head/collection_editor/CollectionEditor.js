@@ -29,186 +29,185 @@ oppia.controller('CollectionEditor', ['$scope', 'CollectionBackendApiService',
   'warningsData', function(
     $scope, CollectionBackendApiService, WritableCollectionBackendApiService,
     CollectionUpdateService, warningsData) {
+    $scope.collection = null;
+    $scope.collectionId = GLOBALS.collectionId;
+    $scope.collectionSkills = null;
 
-  $scope.collection = null;
-  $scope.collectionId = GLOBALS.collectionId;
-  $scope.collectionSkills = null;
-
-  // Get the id of the collection to be loaded
-  var pathnameArray = window.location.pathname.split('/');
-  for (var i = 0; i < pathnameArray.length; i++) {
-    if (pathnameArray[i] === 'create') {
-      $scope.collectionId = pathnameArray[i + 1];
-      break;
-    }
-  }
-
-  // Load the collection to be edited.
-  CollectionBackendApiService.loadCollection($scope.collectionId).then(
-    function(collection) {
-      $scope.collection = collection;
-      $scope.collectionSkills = collection.skills;
-    }, function(error) {
-      // TODO(mgowano): Handle not being able to load the collection.
-      warningsData.addWarning(
-        error || 'There was an error loading the collection.');
-  });
-
-  var _arrayContainsCaseInsensitive = function(array, element) {
-    var lowerElement = element.toLowerCase();
-    for (var i = 0; i < array.length; i++) {
-      if (array[i].toLowerCase() === lowerElement) {
-        return true;
+    // Get the id of the collection to be loaded
+    var pathnameArray = window.location.pathname.split('/');
+    for (var i = 0; i < pathnameArray.length; i++) {
+      if (pathnameArray[i] === 'create') {
+        $scope.collectionId = pathnameArray[i + 1];
+        break;
       }
     }
-    return false;
-  };
 
-  var _getCollectionNodeForExplorationId = function(explorationId) {
-    for (var i = 0; i < $scope.collection.nodes.length; i++) {
-      var collectionNode = $scope.collection.nodes[i];
-      if (collectionNode.exploration_id == explorationId) {
-        return collectionNode;
-      }
-    }
-    return null;
-  };
+    // Load the collection to be edited.
+    CollectionBackendApiService.loadCollection($scope.collectionId).then(
+      function(collection) {
+        $scope.collection = collection;
+        $scope.collectionSkills = collection.skills;
+      }, function(error) {
+        // TODO(mgowano): Handle not being able to load the collection.
+        warningsData.addWarning(
+          error || 'There was an error loading the collection.');
+      });
 
-  // Stores a pending list of changes.
-  $scope.changeList = [];
-
-  $scope.addChange = function(change) {
-    $scope.changeList.push(change);
-  };
-
-  // TODO(mgowano): Handle a case where adding a pre-requisite skill
-  // will result into having all exploration requiring pre-requisite
-  // skills. At the moment this is only handled when a change is committed
-  // to the backend.
-  $scope.addPrerequisiteSkill = function(skillName, expId) {
-    if (skillName && expId) {
-      var collectionNode = _getCollectionNodeForExplorationId(expId);
-      var prerequisiteSkills = collectionNode.prerequisite_skills;
-      if (!_arrayContainsCaseInsensitive(prerequisiteSkills, skillName)) {
-        prerequisiteSkills.push(skillName);
-        return true;
-      }
-    }
-    return false;
-  };
-
-  // TODO(mgowano): Handle cases where deleting a pre-requisite skill results
-  // to unreachable explorations.
-  $scope.deletePrerequisiteSkill = function(skillIdx, expId) {
-    if (expId) {
-      var collectionNode = _getCollectionNodeForExplorationId(expId);
-      collectionNode.prerequisite_skills.splice(skillIdx, 1);
-      return true;
-    }
-    return false;
-  };
-
-  $scope.addAcquiredSkill = function(skillName, expId) {
-    if (skillName && expId) {
-      var collectionNode = _getCollectionNodeForExplorationId(expId);
-      var acquiredSkills = collectionNode.acquired_skills;
-      if (!_arrayContainsCaseInsensitive(acquiredSkills, skillName)) {
-        acquiredSkills.push(skillName);
-        return true;
-      }
-    }
-    return false;
-  };
-
-  // TODO(mgowano): Handle cases where deleting an acquired skill results
-  // to unreachable explorations.
-  $scope.deleteAcquiredSkill = function(skillIdx, expId) {
-    if (expId) {
-      var collectionNode = _getCollectionNodeForExplorationId(expId);
-      collectionNode.acquired_skills.splice(skillIdx, 1);
-      return true;
-    }
-    return false;
-  };
-
-  // TODO(mgowano): Handle a case where deleting an exploration will
-  // result into unreachable exploration. At the moment this is only
-  // handled when a change is committed to the backend.
-  $scope.deleteCollectionNode = function(expId) {
-    if (expId) {
-      for (var i = 0; i < $scope.collection.nodes.length; i++) {
-        var collectionNode = $scope.collection.nodes[i];
-        if (collectionNode.exploration_id == expId) {
-          $scope.collection.nodes.splice(i, 1);
+    var _arrayContainsCaseInsensitive = function(array, element) {
+      var lowerElement = element.toLowerCase();
+      for (var i = 0; i < array.length; i++) {
+        if (array[i].toLowerCase() === lowerElement) {
           return true;
         }
       }
-    }
-    return false;
-  };
+      return false;
+    };
 
-  // TODO(mgowano): Set all values for the 'exploration' key in newNode
-  $scope.addCollectionNode = function(expId) {
-    if (expId) {
-      if (!_getCollectionNodeForExplorationId(expId)) {
-        var newNode = {
-          exploration_id: expId,
-          acquired_skills: [],
-          prerequisite_skills: [],
-          exploration: {
-            id: expId
+    var _getCollectionNodeForExplorationId = function(explorationId) {
+      for (var i = 0; i < $scope.collection.nodes.length; i++) {
+        var collectionNode = $scope.collection.nodes[i];
+        if (collectionNode.exploration_id == explorationId) {
+          return collectionNode;
+        }
+      }
+      return null;
+    };
+
+    // Stores a pending list of changes.
+    $scope.changeList = [];
+
+    $scope.addChange = function(change) {
+      $scope.changeList.push(change);
+    };
+
+    // TODO(mgowano): Handle a case where adding a pre-requisite skill
+    // will result into having all exploration requiring pre-requisite
+    // skills. At the moment this is only handled when a change is committed
+    // to the backend.
+    $scope.addPrerequisiteSkill = function(skillName, expId) {
+      if (skillName && expId) {
+        var collectionNode = _getCollectionNodeForExplorationId(expId);
+        var prerequisiteSkills = collectionNode.prerequisite_skills;
+        if (!_arrayContainsCaseInsensitive(prerequisiteSkills, skillName)) {
+          prerequisiteSkills.push(skillName);
+          return true;
+        }
+      }
+      return false;
+    };
+
+    // TODO(mgowano): Handle cases where deleting a pre-requisite skill results
+    // to unreachable explorations.
+    $scope.deletePrerequisiteSkill = function(skillIdx, expId) {
+      if (expId) {
+        var collectionNode = _getCollectionNodeForExplorationId(expId);
+        collectionNode.prerequisite_skills.splice(skillIdx, 1);
+        return true;
+      }
+      return false;
+    };
+
+    $scope.addAcquiredSkill = function(skillName, expId) {
+      if (skillName && expId) {
+        var collectionNode = _getCollectionNodeForExplorationId(expId);
+        var acquiredSkills = collectionNode.acquired_skills;
+        if (!_arrayContainsCaseInsensitive(acquiredSkills, skillName)) {
+          acquiredSkills.push(skillName);
+          return true;
+        }
+      }
+      return false;
+    };
+
+    // TODO(mgowano): Handle cases where deleting an acquired skill results
+    // to unreachable explorations.
+    $scope.deleteAcquiredSkill = function(skillIdx, expId) {
+      if (expId) {
+        var collectionNode = _getCollectionNodeForExplorationId(expId);
+        collectionNode.acquired_skills.splice(skillIdx, 1);
+        return true;
+      }
+      return false;
+    };
+
+    // TODO(mgowano): Handle a case where deleting an exploration will
+    // result into unreachable exploration. At the moment this is only
+    // handled when a change is committed to the backend.
+    $scope.deleteCollectionNode = function(expId) {
+      if (expId) {
+        for (var i = 0; i < $scope.collection.nodes.length; i++) {
+          var collectionNode = $scope.collection.nodes[i];
+          if (collectionNode.exploration_id == expId) {
+            $scope.collection.nodes.splice(i, 1);
+            return true;
           }
         }
-        $scope.collection.nodes.push(newNode);
-        return true;
-      } else {
-        warningsData.addWarning(
-          'Exploration with id ' + expId + ' is already added');
       }
-    }
-    return false;
-  };
+      return false;
+    };
 
-  $scope.setCollectionTitle = function(newTitle) {
-    if (newTitle) {
-      $scope.collection.title = newTitle;
-      return true;
-    }
-    return false;
-  };
+    // TODO(mgowano): Set all values for the 'exploration' key in newNode
+    $scope.addCollectionNode = function(expId) {
+      if (expId) {
+        if (!_getCollectionNodeForExplorationId(expId)) {
+          var newNode = {
+            exploration_id: expId,
+            acquired_skills: [],
+            prerequisite_skills: [],
+            exploration: {
+              id: expId
+            }
+          };
+          $scope.collection.nodes.push(newNode);
+          return true;
+        } else {
+          warningsData.addWarning(
+            'Exploration with id ' + expId + ' is already added');
+        }
+      }
+      return false;
+    };
 
-  $scope.setCollectionObjective = function(newObjective) {
-    if (newObjective) {
-      $scope.collection.objective = newObjective;
-      return true;
-    }
-    return false;
-  };
+    $scope.setCollectionTitle = function(newTitle) {
+      if (newTitle) {
+        $scope.collection.title = newTitle;
+        return true;
+      }
+      return false;
+    };
 
-  $scope.setCollectionCategory = function(newCategory) {
-    if (newCategory) {
-      $scope.collection.category = newCategory;
-      return true;
-    }
-    return false;
-  };
+    $scope.setCollectionObjective = function(newObjective) {
+      if (newObjective) {
+        $scope.collection.objective = newObjective;
+        return true;
+      }
+      return false;
+    };
 
-  // An explicit save is needed to push all changes to the backend at once
-  // because some likely working states of the collection will cause validation
-  // errors when trying to incrementally save them.
-  $scope.saveCollection = function(commitMessage) {
-    // Don't attempt to save the collection if there are no changes pending.
-    if ($scope.changeList.length == 0) {
-      return;
-    }
-    WritableCollectionBackendApiService.updateCollection(
-      $scope.collection.id, $scope.collection.version, commitMessage,
-      $scope.changeList).then(function(collection) {
-        $scope.collection = collection;
-        $scope.changeList = [];
-      }, function(error) {
-        warningsData.addWarning(
-          error || 'There was an error updating the collection.');
-      });
-  };
-}]);
+    $scope.setCollectionCategory = function(newCategory) {
+      if (newCategory) {
+        $scope.collection.category = newCategory;
+        return true;
+      }
+      return false;
+    };
+
+    // An explicit save is needed to push all changes to the backend at once
+    // because some likely working states of the collection will cause
+    // validation errors when trying to incrementally save them.
+    $scope.saveCollection = function(commitMessage) {
+      // Don't attempt to save the collection if there are no changes pending.
+      if ($scope.changeList.length == 0) {
+        return;
+      }
+      WritableCollectionBackendApiService.updateCollection(
+        $scope.collection.id, $scope.collection.version, commitMessage,
+        $scope.changeList).then(function(collection) {
+          $scope.collection = collection;
+          $scope.changeList = [];
+        }, function(error) {
+          warningsData.addWarning(
+            error || 'There was an error updating the collection.');
+        });
+    };
+  }]);

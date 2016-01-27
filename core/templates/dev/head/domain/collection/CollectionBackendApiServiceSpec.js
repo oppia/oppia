@@ -152,7 +152,10 @@ describe('Collection Backend API Service', function() {
     expect(cbas.isCached('0')).toBeFalsy();
 
     // Cache a collection.
-    cbas.cacheCollection('0', {id: '0', nodes: []});
+    cbas.cacheCollection('0', {
+      id: '0',
+      nodes: []
+    });
 
     // It should now be cached.
     expect(cbas.isCached('0')).toBeTruthy();
@@ -161,10 +164,14 @@ describe('Collection Backend API Service', function() {
     // the returned collection should match the expected collection object.
     cbas.loadCollection('0').then(successHandler, failHandler);
 
-    // http://brianmcd.com/2014/03/27/a-tip-for-angular-unit-tests-with-promises.html
+    // http://brianmcd.com/2014/03/27/
+    // a-tip-for-angular-unit-tests-with-promises.html
     $rootScope.$digest();
 
-    expect(successHandler).toHaveBeenCalledWith({id: '0', nodes: []});
+    expect(successHandler).toHaveBeenCalledWith({
+      id: '0',
+      nodes: []
+    });
     expect(failHandler).not.toHaveBeenCalled();
   });
 });

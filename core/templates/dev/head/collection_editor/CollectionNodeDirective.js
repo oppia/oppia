@@ -38,16 +38,20 @@ oppia.directive('collectionNodeDirective', [function() {
     templateUrl: 'inline/collection_node_directive',
     controller: ['$scope', 'CollectionUpdateService', function($scope,
       CollectionUpdateService) {
-
       // Uses addPrerequisiteSkill callback function to add a pre-requisite
       // skill on the frontend and then uses CollectionUpdateService to update
       // a changelist that will update the backend.
       $scope.addNewPrerequisiteSkill = function(newSkill) {
-        var skillToAdd = {skillName: newSkill, expId: $scope.getExplorationId()};
+        var skillToAdd = {
+          skillName: newSkill,
+          expId: $scope.getExplorationId()
+        };
         if ($scope.addPrerequisiteSkill(skillToAdd)) {
           var change = CollectionUpdateService.buildPrerequisiteSkillsUpdate(
             $scope.getExplorationId(), $scope.getPrerequisiteSkills());
-          $scope.addChange({change: change});
+          $scope.addChange({
+            change: change
+          });
         }
       };
 
@@ -55,23 +59,33 @@ oppia.directive('collectionNodeDirective', [function() {
       // skill on the frontend and then uses CollectionUpdateService to update a
       // changelist that will update the backend.
       $scope.removePrerequisiteSkill = function(index) {
-        var skillToRemove = {skillIdx: index, expId: $scope.getExplorationId()};
+        var skillToRemove = {
+          skillIdx: index,
+          expId: $scope.getExplorationId()
+        };
         if ($scope.deletePrerequisiteSkill(skillToRemove)) {
           var change = CollectionUpdateService.buildPrerequisiteSkillsUpdate(
             $scope.getExplorationId(), $scope.getPrerequisiteSkills());
-          $scope.addChange({change: change});
+          $scope.addChange({
+            change: change
+          });
         }
-      }
+      };
 
       // Uses addAcquiredSkill callback function to add an acquired skill
       // on the frontend and then uses CollectionUpdateService to update a
       // changelist that will update the backend.
       $scope.addNewAcquiredSkill = function(newSkill) {
-        var skillToAdd = {skillName: newSkill, expId: $scope.getExplorationId()};
+        var skillToAdd = {
+          skillName: newSkill,
+          expId: $scope.getExplorationId()
+        };
         if ($scope.addAcquiredSkill(skillToAdd)) {
           var change = CollectionUpdateService.buildAcquiredSkillsUpdate(
             $scope.getExplorationId(), $scope.getAcquiredSkills());
-          $scope.addChange({change: change});
+          $scope.addChange({
+            change: change
+          });
         }
       };
 
@@ -79,11 +93,16 @@ oppia.directive('collectionNodeDirective', [function() {
       // on the frontend and then uses CollectionUpdateService to update a
       // changelist that will update the backend.
       $scope.removeAcquiredSkill = function(index) {
-        var skillToRemove = {skillIdx: index, expId: $scope.getExplorationId()};
+        var skillToRemove = {
+          skillIdx: index,
+          expId: $scope.getExplorationId()
+        };
         if ($scope.deleteAcquiredSkill(skillToRemove)) {
           var change = CollectionUpdateService.buildAcquiredSkillsUpdate(
             $scope.getExplorationId(), $scope.getAcquiredSkills());
-          $scope.addChange({change: change});
+          $scope.addChange({
+            change: change
+          });
         }
       };
 
@@ -91,10 +110,15 @@ oppia.directive('collectionNodeDirective', [function() {
       // on the frontend and then uses CollectionUpdateService to update a
       // changelist that will update the backend.
       $scope.deleteExploration = function() {
-        if ($scope.deleteCollectionNode({expId: $scope.getExplorationId()})) {
+        var deletedExploration = {
+          expId: $scope.getExplorationId()
+        };
+        if ($scope.deleteCollectionNode(deletedExploration)) {
           var change = CollectionUpdateService.buildDeleteCollectionNodeUpdate(
             $scope.getExplorationId());
-          $scope.addChange({change: change});
+          $scope.addChange({
+            change: change
+          });
         }
       };
     }]

@@ -35,57 +35,59 @@ oppia.factory('WritableCollectionBackendApiService', [
     'CollectionBackendApiService',
     function($http, $q, WRITABLE_COLLECTION_DATA_URL, UrlInterpolationService,
       CollectionBackendApiService) {
-  var _updateCollection = function(
-      collectionId, collectionVersion, commitMessage, changeList,
-      successCallback, errorCallback) {
-    var writableCollectionDataUrl = UrlInterpolationService.interpolateUrl(
-      WRITABLE_COLLECTION_DATA_URL, {
-        collection_id: collectionId
-      });
+      var _updateCollection = function(
+          collectionId, collectionVersion, commitMessage, changeList,
+          successCallback, errorCallback) {
+        var writableCollectionDataUrl = UrlInterpolationService.interpolateUrl(
+          WRITABLE_COLLECTION_DATA_URL, {
+            collection_id: collectionId
+          });
 
-    var putData = {
-      version: collectionVersion,
-      commit_message: commitMessage,
-      change_list: changeList
-    };
-    $http.put(writableCollectionDataUrl, putData).success(function(data) {
-      // The returned data is an updated collection dict.
-      var collection = angular.copy(data);
+        var putData = {
+          version: collectionVersion,
+          commit_message: commitMessage,
+          change_list: changeList
+        };
+        $http.put(writableCollectionDataUrl, putData).success(function(data) {
+          // The returned data is an updated collection dict.
+          var collection = angular.copy(data);
 
-      // Update the CollectionBackendApiService's cache with the new collection.
-      CollectionBackendApiService.cacheCollection(collectionId, collection);
+          // Update the CollectionBackendApiService's cache with the new
+          // collection.
+          CollectionBackendApiService.cacheCollection(collectionId, collection);
 
-      if (successCallback) {
-        successCallback(collection);
-      }
-    }).error(function(error) {
-      if (errorCallback) {
-        errorCallback(error);
-      }
-    });
-  };
+          if (successCallback) {
+            successCallback(collection);
+          }
+        }).error(function(error) {
+          if (errorCallback) {
+            errorCallback(error);
+          }
+        });
+      };
 
-  return {
-    /**
-     * Updates a collection in the backend with the provided colleciton ID. The
-     * changes only apply to the collection of the given version and the request
-     * to update the collection will fail if the provided collection version is
-     * older than the current version stored in the backend. Both the changes
-     * and the message to associate with those changes are used to commit a
-     * change to the collection. The new collection is passed to the success
-     * callback, if one is provided to the returned promise object. Errors are
-     * passed to the error callback, if one is provided and given an error
-     * occurs. Finally, if the update is successful, the returned collection
-     * will be cached within the CollectionBackendApiService to ensure the cache
-     * is not out-of-date with any updates made by this backend API service.
-     */
-    updateCollection: function(
-        collectionId, collectionVersion, commitMessage, changeList) {
-      return $q(function(resolve, reject) {
-        _updateCollection(
-          collectionId, collectionVersion, commitMessage, changeList, resolve,
-          reject);
-      });
-    },
-  };
-}]);
+      return {
+        /**
+         * Updates a collection in the backend with the provided colleciton ID.
+         * The changes only apply to the collection of the given version and the
+         * request to update the collection will fail if the provided collection
+         * version is older than the current version stored in the backend. Both
+         * the changes and the message to associate with those changes are used
+         * to commit a change to the collection. The new collection is passed to
+         * the success callback, if one is provided to the returned promise
+         * object. Errors are passed to the error callback, if one is provided
+         * and given an error occurs. Finally, if the update is successful, the
+         * returned collection will be cached within the
+         * CollectionBackendApiService to ensure the cache is not out-of-date
+         * with any updates made by this backend API service.
+         */
+        updateCollection: function(
+            collectionId, collectionVersion, commitMessage, changeList) {
+          return $q(function(resolve, reject) {
+            _updateCollection(
+              collectionId, collectionVersion, commitMessage, changeList,
+              resolve, reject);
+          });
+        }
+      };
+    }]);

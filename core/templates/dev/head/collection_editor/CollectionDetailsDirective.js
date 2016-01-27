@@ -38,34 +38,54 @@ oppia.directive('collectionDetailsDirective', [function() {
     controller: ['$scope', 'CollectionUpdateService', function($scope,
         CollectionUpdateService) {
       $scope.addExploration = function(newExpId) {
-        if ($scope.addCollectionNode({expId: newExpId})) {
+        var newCollectionNode = {
+          expId: newExpId
+        };
+        if ($scope.addCollectionNode(newCollectionNode)) {
           var change = CollectionUpdateService.buildAddCollectionNodeUpdate(
             newExpId);
-          $scope.addChange({change: change});
+          $scope.addChange({
+            change: change
+          });
         }
       };
 
       $scope.updateCollectionTitle = function(newCollectionTitle) {
-        if ($scope.setCollectionTitle({newTitle: newCollectionTitle})) {
+        var collectionTitle = {
+          newTitle: newCollectionTitle
+        };
+        if ($scope.setCollectionTitle(collectionTitle)) {
           var change = CollectionUpdateService.buildCollectionTitleUpdate(
             newCollectionTitle);
-          $scope.addChange({change: change});
+          $scope.addChange({
+            change: change
+          });
         }
       };
 
       $scope.updateCollectionCategory = function(newCollectionCategory) {
-        if ($scope.setCollectionCategory({newCategory: newCollectionCategory})) {
+        var collectionCategory = {
+          newCategory: newCollectionCategory
+        };
+        if ($scope.setCollectionCategory(collectionCategory)) {
           var change = CollectionUpdateService.buildCollectionCategoryUpdate(
             newCollectionCategory);
-          $scope.addChange({change: change});
+          $scope.addChange({
+            change: change
+          });
         }
       };
 
       $scope.updateCollectionObjective = function(newCollectionObjective) {
-        if ($scope.setCollectionObjective({newObjective: newCollectionObjective})) {
+        var collectionObjective = {
+          newObjective: newCollectionObjective
+        };
+        if ($scope.setCollectionObjective(collectionObjective)) {
           var change = CollectionUpdateService.buildCollectionObjectiveUpdate(
             newCollectionObjective);
-          $scope.addChange({change: change});
+          $scope.addChange({
+            change: change
+          });
         }
       };
     }]
