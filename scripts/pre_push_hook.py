@@ -27,13 +27,16 @@ On Vagrant under Windows it will still copy the hook to the .git/hooks dir
 but it will have no effect.
 '''
 
+# Pylint has issues with the import order of argparse.
+# pylint: disable=wrong-import-order
 import os
 import sys
 import subprocess
 import collections
 import pprint
-import shutil
 import argparse
+import shutil
+# pylint: enable=wrong-import-order
 
 
 GitRef = collections.namedtuple('GitRef', ['local_ref', 'local_sha1',

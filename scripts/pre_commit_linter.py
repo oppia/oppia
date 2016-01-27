@@ -49,6 +49,9 @@ CUSTOMIZATION OPTIONS
 Note that the root folder MUST be named 'oppia'.
  """
 
+# Pylint has issues with the import order of argparse.
+# pylint: disable=wrong-import-order
+import argparse
 import fnmatch
 import multiprocessing
 import os
@@ -56,7 +59,7 @@ import json
 import subprocess
 import sys
 import time
-import argparse
+# pylint: enable=wrong-import-order
 
 _PARSER = argparse.ArgumentParser()
 _EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
