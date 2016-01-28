@@ -14,14 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'Ben Henning'
-
 """Tests for statistics one-off jobs."""
+
+import logging
 
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_services
 from core.domain import stats_jobs_one_off
+from core.domain import user_services
 from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 from core.tests import test_utils
@@ -40,7 +41,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
     def _record_old_answer(
             self, state_name, rule_spec_str, answer_html_str):
         answer_log = stats_models.StateRuleAnswerLogModel.get_or_create(
-            self.exploration.id, state_name, rule_spec_str)
+            self.DEMO_EXP_ID, state_name, rule_spec_str)
         if answer_html_str in answer_log.answers:
             answer_log.answers[answer_html_str] += 1
         else:
@@ -49,7 +50,6 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             answer_log.put()
         except Exception as e:
             logging.error(e)
-            pass
 
     def _run_migration_job(self):
         # Start migration job on sample answers.
@@ -57,14 +57,17 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         stats_jobs_one_off.AnswerMigrationJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-    def _get_state_answers(self, state_name):
+    def _get_state_answers(self, state_name, exploration_version=1):
         return stats_services.get_state_answers(
-            self.DEMO_EXP_ID, 1, state_name)
+            self.DEMO_EXP_ID, exploration_version, state_name)
 
     def setUp(self):
         super(AnswerMigrationJobTests, self).setUp()
         exp_services.load_demo(self.DEMO_EXP_ID)
         self.exploration = exp_services.get_exploration_by_id(self.DEMO_EXP_ID)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        user_services.get_or_create_user(self.owner_id, self.OWNER_EMAIL)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
     def test_migrate_code_repl(self):
         state_name = 'Code Editor'

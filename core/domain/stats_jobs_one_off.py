@@ -18,6 +18,7 @@ import ast
 import collections
 import itertools
 import re
+import threading
 
 from core import jobs
 from core.domain import exp_domain
@@ -184,7 +185,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # associated with.
 
         latest_exp_model = exp_models.ExplorationModel.get(exp_id)
-        if (latest_exp_model.version == 0 or
+        if (latest_exp_model.version == 1 or
                 latest_exp_model.last_updated < when):
             # Short-circuit: the answer was submitted later than the current
             # exp version. Otherwise, this is the only version and something is
@@ -195,12 +196,13 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
         # Look backwards in the history of the exploration, starting with the
         # latest version.
-        for v in reversed(range(latest_exp_model.version)):
-            exp_commit_model = ExplorationCommitLogEntryModel.get(
-                'exploration-%s-%s' % (exp_id, v))
+        for version in reversed(range(latest_exp_model.version)):
+            exp_commit_model = exp_models.ExplorationCommitLogEntryModel.get(
+                'exploration-%s-%s' % (exp_id, version))
             if exp_commit_model.created_on < when:
                 # Found the closest exploration to the given
-                exp_model = exp_models.ExplorationModel.get(exp_id, version=v)
+                exp_model = exp_models.ExplorationModel.get(
+                    exp_id, version=version)
                 return exp_services.get_exploration_from_model(exp_model)
 
         # This indicates a major issue, also. Just return the latest version.
@@ -220,7 +222,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             rule_spec_inputs = rule_spec.inputs.values()
             for permuted_input in itertools.permutations(rule_spec_inputs):
                 param_list = [utils.to_ascii(val) for val in permuted_input]
-                yield  '%s(%s)' % (rule_spec.rule_type, ','.join(param_list))
+                yield '%s(%s)' % (rule_spec.rule_type, ','.join(param_list))
 
     @classmethod
     def _infer_which_answer_group_and_rule_match_answer(cls, state, rule_str):
@@ -245,10 +247,10 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     def _infer_classification_categorization(cls, rule_str):
         # At this point, no classification was possible. Thus, only soft, hard,
         # and default classifications are possible.
-        _FUZZY_RULE_TYPE = 'FuzzyMatches'
+        fuzzy_rule_type = 'FuzzyMatches'
         if rule_str == cls._DEFAULT_RULESPEC_STR:
             return exp_domain.DEFAULT_OUTCOME_CLASSIFICATION
-        elif rule_str == _FUZZY_RULE_TYPE:
+        elif rule_str == fuzzy_rule_type:
             return exp_domain.TRAINING_DATA_CLASSIFICATION
         else:
             return exp_domain.EXPLICIT_CLASSIFICATION
@@ -497,6 +499,11 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             cls, state, rule_spec, rule_str, answer_str):
         interaction_id = state.interaction.id
         if interaction_id in cls._RECONSTITUTION_FUNCTION_MAP:
+            # Check for default outcome.
+            if (interaction_id != 'Continue'
+                    and not rule_spec
+                    and rule_str == cls._DEFAULT_RULESPEC_STR):
+                return (None, None)
             reconstitute = getattr(
                 cls, cls._RECONSTITUTION_FUNCTION_MAP[interaction_id])
             return reconstitute(
@@ -541,9 +548,19 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # conducted to find which version of the exploration is associated with
         # the given answer.
 
-        # TODO(bhenning): Error for handler_name != 'submit'
+        if handler_name != 'submit':
+            yield (
+                AnswerMigrationJob._ERROR_KEY,
+                'Encountered submitted answer without the standard \'submit\' '
+                'handler: %s' % item.id)
 
         # One major point of failure is the exploration not existing.
+        # Another major point of failure comes from the time matching. Since
+        # one entity in StateRuleAnswerLogModel represents many different
+        # answers, all answers are being matched to a single exploration even
+        # though each answer may have been submitted to a different exploration
+        # version. This may cause significant migration issues and will be
+        # tricky to work around.
         exploration = (
             AnswerMigrationJob._find_exploration_immediately_before_timestamp(
                 exp_id, item.created_on))
@@ -551,24 +568,6 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # Another point of failure is the state not matching due to an
         # incorrect exploration version selection.
         state = exploration.states[state_name]
-
-        # Need to use the rule_str to find which answer group and rule spec
-        # index was used to submit the answer (look at exp migration to see how
-        # rule specs translate to answer groups for older explorations). Params
-        # need to be extracted from the rule_str.
-
-        # Need to extract all answers from the model (and counts). Answers need
-        # to be converted to the new answer object format.
-
-        # TODO(bhenning): How to infer/determine the following needed values:
-        #  - time_spent_in_sec [can't; use None]
-        #  - session_id [can't; use None]
-        #  - params [can't; use empty list]
-        # Some of these may need to have sentinel values to indicate they were
-        # converted from times when this data was unavailable.
-        # Sean prefers using None for all values which were conceptually 'None'
-        # before; I want to at least reconstitute
-        # classification_categorization.
 
         classification_categorization = (
             AnswerMigrationJob._infer_classification_categorization(rule_str))
@@ -583,6 +582,12 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
         # Major point of failure: answer_group_index or rule_spec_index may
         # return none when it's not a default result.
+        if answer_group_index is None or rule_spec_index is None:
+            yield (
+                AnswerMigrationJob._ERROR_KEY,
+                'Failed to match rule string: \'%s\' for answer \'%s\'' % (
+                    rule_str, item.id))
+            return
 
         answer_groups = state.interaction.answer_groups
         if answer_group_index != len(answer_groups):
@@ -599,11 +604,17 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         time_spent_in_sec = (
             stats_domain.MIGRATED_STATE_ANSWER_TIME_SPENT_IN_SEC)
 
-        # Params were, unfortunately, never stored. They cannot be trvially
+        # Params were, unfortunately, never stored. They cannot be trivially
         # recovered.
         params = []
 
         # TODO(bhenning): Implement answer frequency.
+        # A note on frequency: the resolved answer will simply be duplicated in
+        # the new data store to replicate frequency. This is not 100% accurate
+        # since each answer may have been submitted at different times and,
+        # thus, for different versions of the exploration. This information is
+        # practically impossible to recover, so this strategy is considered
+        # adequate.
         for answer_str, answer_frequency in item.answers.iteritems():
             # Major point of failure is if answer returns None; the error
             # variable will contain why the reconstitution failed.
@@ -614,8 +625,6 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 yield (AnswerMigrationJob._ERROR_KEY, error)
                 continue
 
-            # TODO(bhenning): Does the answer need to be normalized?
-
             # TODO(bhenning): Store the rule_str and answer_strs directly within
             # the new answer dicts so further processing may happen later on.
             stats_services.record_answer(
@@ -625,4 +634,4 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
-        yield (stringified_values)
+        yield stringified_values
