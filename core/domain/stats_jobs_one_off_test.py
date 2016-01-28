@@ -99,7 +99,9 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'CodeRepl',
-            'params': []
+            'params': [],
+            'rule_spec_str': rule_spec_str,
+            'answer_str': code_answer
         }])
 
     def test_migrate_continue(self):
@@ -124,7 +126,9 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'Continue',
-            'params': []
+            'params': [],
+            'rule_spec_str': 'Default',
+            'answer_str': ''
         }])
 
     def test_migrate_graph_input(self):
@@ -158,7 +162,9 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'ImageClickInput',
-            'params': []
+            'params': [],
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
         }])
 
     def test_migrate_interactive_map(self):
@@ -187,7 +193,9 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'InteractiveMap',
-            'params': []
+            'params': [],
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
         }])
 
     def test_migrate_item_selection_input(self):
@@ -217,7 +225,9 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'ItemSelectionInput',
-            'params': []
+            'params': [],
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
         }])
 
     def test_migrate_logic_proof(self):
@@ -253,7 +263,9 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'MathExpressionInput',
-            'params': []
+            'params': [],
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
         }])
 
     def test_migrate_multiple_choice_input(self):
@@ -281,7 +293,9 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'MultipleChoiceInput',
-            'params': []
+            'params': [],
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
         }])
 
     def test_migrate_music_notes_input(self):
@@ -312,7 +326,9 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'NumericInput',
-            'params': []
+            'params': [],
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
         }])
 
     def test_migrate_pencil_code_editor(self):
@@ -349,7 +365,9 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'PencilCodeEditor',
-            'params': []
+            'params': [],
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
         }])
 
     def test_migrate_set_input(self):
@@ -378,7 +396,9 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'SetInput',
-            'params': []
+            'params': [],
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
         }])
 
     def test_migrate_text_input(self):
@@ -406,5 +426,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
                 exp_domain.EXPLICIT_CLASSIFICATION),
             'session_id': 'migrated_state_answer_session_id',
             'interaction_id': 'TextInput',
-            'params': []
+            'params': [],
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
         }])

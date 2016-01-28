@@ -166,9 +166,13 @@ def get_exploration_stats(exploration_id, exploration_version):
 
 
 # TODO(bhenning): Test this.
+# TODO(bhenning): Remove the rule_spec_str and answer_str parameters after all
+# answers have been migrated. NOTE TO DEVELOPERS: do not use these two
+# parameters.
 def record_answer(exploration_id, exploration_version, state_name,
         answer_group_index, rule_spec_index, classification_categorization,
-        session_id, time_spent_in_sec, params, normalized_answer):
+        session_id, time_spent_in_sec, params, normalized_answer,
+        rule_spec_str=None, answer_str=None):
     """Record an answer by storing it to the corresponding StateAnswers entity.
     """
     # Retrieve state_answers from storage
@@ -201,6 +205,10 @@ def record_answer(exploration_id, exploration_version, state_name,
         'interaction_id': interaction_id,
         'params': params
     }
+    if rule_spec_str is not None:
+        answer_dict['rule_spec_str'] = rule_spec_str
+    if answer_str is not None:
+        answer_dict['answer_str'] = answer_str
     _validate_answer(answer_dict)
 
     # Add answer to state_answers (or create a new one) and commit it.

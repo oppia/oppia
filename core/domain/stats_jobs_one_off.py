@@ -625,12 +625,11 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 yield (AnswerMigrationJob._ERROR_KEY, error)
                 continue
 
-            # TODO(bhenning): Store the rule_str and answer_strs directly within
-            # the new answer dicts so further processing may happen later on.
             stats_services.record_answer(
                 exp_id, exploration.version, state_name, answer_group_index,
                 rule_spec_index, classification_categorization, session_id,
-                time_spent_in_sec, params, answer)
+                time_spent_in_sec, params, answer, rule_spec_str=rule_str,
+                answer_str=answer_str)
 
     @staticmethod
     def reduce(key, stringified_values):
