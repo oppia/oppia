@@ -846,6 +846,19 @@ textarea {
   padding-bottom: 40px;
 }
 
+.oppia-gallery-no-match, .oppia-gallery-no-match p {
+  text-align: center;
+}
+
+.oppia-gallery-no-match .no-match-notice-image {
+  width: 100%;
+}
+
+.oppia-gallery-no-match-tip {
+  position: relative;
+  margin-top: 10%;
+}
+
 .oppia-gallery-tiles-container {
   height: 100%;
   margin-left: auto;
