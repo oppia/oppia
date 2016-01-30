@@ -24,7 +24,9 @@ describe('retrieving threads service', function() {
   beforeEach(function() {
     module('oppia');
     module(function($provide) {
-      $provide.value('explorationData', { explorationId: expId });
+      $provide.value('explorationData', {
+        explorationId: expId
+      });
     });
   });
 
@@ -64,7 +66,7 @@ describe('retrieving threads service', function() {
         status: 'open',
         subject: 'Suggestion from a learner',
         summary: null,
-        thread_id: 'abc3',
+        thread_id: 'abc3'
       },
       {
         last_updated: 1441870501233.642,
@@ -73,7 +75,7 @@ describe('retrieving threads service', function() {
         status: 'open',
         subject: 'Suggestion from a learner',
         summary: null,
-        thread_id: 'abc4',
+        thread_id: 'abc4'
       }
     ];
 
@@ -91,11 +93,11 @@ describe('retrieving threads service', function() {
 
     for (var i = 0; i < mockFeedbackThreads.length; i++) {
       expect(threadDataService.data.feedbackThreads).toContain(
-          mockFeedbackThreads[i]);
+        mockFeedbackThreads[i]);
     }
     for (var i = 0; i < mockOpenSuggestionThreads.length; i++) {
       expect(threadDataService.data.suggestionThreads).toContain(
-          mockOpenSuggestionThreads[i]);
+        mockOpenSuggestionThreads[i]);
     }
   });
 });

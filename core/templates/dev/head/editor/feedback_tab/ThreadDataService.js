@@ -56,11 +56,11 @@ oppia.factory('threadDataService', [
 
   var _fetchMessages = function(threadId) {
     $http.get(_THREAD_HANDLER_PREFIX + threadId).success(function(data) {
-      var combined = _data.feedbackThreads.concat(_data.suggestionThreads);
-      for (var i = 0; i < combined.length; i++) {
-        if (combined[i].thread_id === threadId) {
-          combined[i].messages = data.messages;
-          combined[i].suggestion = data.suggestion;
+      var allThreads = _data.feedbackThreads.concat(_data.suggestionThreads);
+      for (var i = 0; i < allThreads.length; i++) {
+        if (allThreads[i].thread_id === threadId) {
+          allThreads[i].messages = data.messages;
+          allThreads[i].suggestion = data.suggestion;
           break;
         }
       }
@@ -90,12 +90,12 @@ oppia.factory('threadDataService', [
     addNewMessage: function(
       threadId, newMessage, newStatus, successCallback, errorCallback) {
       var url = _THREAD_HANDLER_PREFIX + threadId;
-      var combined = _data.feedbackThreads.concat(_data.suggestionThreads);
+      var allThreads = _data.feedbackThreads.concat(_data.suggestionThreads);
       var thread = null;
 
-      for (var i = 0; i < combined.length; i++) {
-        if (combined[i].thread_id === threadId) {
-          thread = combined[i];
+      for (var i = 0; i < allThreads.length; i++) {
+        if (allThreads[i].thread_id === threadId) {
+          thread = allThreads[i];
           break;
         }
       }

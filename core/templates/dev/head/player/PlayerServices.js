@@ -196,7 +196,7 @@ oppia.factory('oppiaPlayerService', [
         return version;
       },
       getStateContentHtml: function(stateName) {
-        return exploration.getContentHtml(stateName);
+        return exploration.getUninterpolatedContentHtml(stateName);
       },
       getInteractionHtml: function(stateName, labelForFocusTarget) {
         return oppiaExplorationHtmlFormatterService.getInteractionHtml(

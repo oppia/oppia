@@ -99,15 +99,15 @@ oppia.controller('FeedbackTab', [
     };
 
     var _isSuggestionValid = function() {
-      return explorationStatesService.getStates()[
-        $scope.activeThread.suggestion.state_name] !== undefined;
+      return explorationStatesService.hasState(
+        $scope.activeThread.suggestion.state_name);
     };
 
     var _hasUnsavedChanges = function() {
       return (changeListService.getChangeList().length > 0);
     };
 
-    $scope.viewSuggestionBtnType = function() {
+    $scope.getSuggestionButtonType = function() {
       return (_isSuggestionOpen() && _isSuggestionValid() &&
               !_hasUnsavedChanges() ? 'primary' : 'default');
     };
@@ -134,9 +134,9 @@ oppia.controller('FeedbackTab', [
           description: function() {
             return $scope.activeThread.suggestion.description;
           },
-          oldContent: function() {
-            var state = explorationData.data.states[
-              $scope.activeThread.suggestion.state_name];
+          currentContent: function() {
+            var state = explorationStatesService.getState(
+              $scope.activeThread.suggestion.state_name);
             return state !== undefined ? state.content[0].value : null;
           },
           newContent: function() {
@@ -146,17 +146,17 @@ oppia.controller('FeedbackTab', [
         controller: [
           '$scope', '$modalInstance', 'suggestionIsOpen', 'suggestionIsValid',
           'unsavedChangesExist', 'suggestionStatus', 'description',
-          'oldContent', 'newContent', 'editabilityService',
+          'currentContent', 'newContent', 'editabilityService',
           function(
             $scope, $modalInstance, suggestionIsOpen, suggestionIsValid,
             unsavedChangesExist, suggestionStatus, description,
-            oldContent, newContent, editabilityService) {
+            currentContent, newContent, editabilityService) {
             var SUGGESTION_ACCEPTED_MSG = 'This suggestion has already been ' +
               'accepted.';
             var SUGGESTION_REJECTED_MSG = 'This suggestion has already been ' +
               'rejected.';
             var SUGGESTION_INVALID_MSG = 'This suggestion was made ' +
-              'for a state that no longer exists. It cannot be  accepted.';
+              'for a state that no longer exists. It cannot be accepted.';
             var UNSAVED_CHANGES_MSG = 'You have unsaved changes to ' +
               'this exploration. Please save/discard your unsaved changes if ' +
               'you wish to accept.';
@@ -179,16 +179,14 @@ oppia.controller('FeedbackTab', [
               $scope.errorMessage = '';
             }
 
-            $scope.oldContent = (
-              oldContent || '<span style="color:red">Oops! This state no ' +
-                'longer exists.</span>');
+            $scope.currentContent = currentContent;
             $scope.newContent = newContent;
             $scope.commitMessage = description;
 
             $scope.acceptSuggestion = function() {
               $modalInstance.close({
                 action: ACTION_ACCEPT_SUGGESTION,
-                commitMsg: $scope.commitMessage
+                commitMessage: $scope.commitMessage
               });
             };
 
@@ -205,7 +203,7 @@ oppia.controller('FeedbackTab', [
         ]
       }).result.then(function(result) {
         threadDataService.resolveSuggestion(
-          $scope.activeThread.thread_id, result.action, result.commitMsg,
+          $scope.activeThread.thread_id, result.action, result.commitMessage,
           function() {
             threadDataService.fetchThreads(function() {
               $scope.setActiveThread($scope.activeThread.thread_id);
@@ -251,11 +249,11 @@ oppia.controller('FeedbackTab', [
     $scope.setActiveThread = function(threadId) {
       threadDataService.fetchMessages(threadId);
 
-      var combined = [].concat(
+      var allThreads = [].concat(
         $scope.threadData.feedbackThreads, $scope.threadData.suggestionThreads);
-      for (var i = 0; i < combined.length; i++) {
-        if (combined[i].thread_id === threadId) {
-          $scope.activeThread = combined[i];
+      for (var i = 0; i < allThreads.length; i++) {
+        if (allThreads[i].thread_id === threadId) {
+          $scope.activeThread = allThreads[i];
           break;
         }
       }

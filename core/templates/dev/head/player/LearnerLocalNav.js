@@ -50,24 +50,22 @@ oppia.controller('LearnerLocalNav', [
 
             $scope.submitSuggestion = function() {
               $modalInstance.close({
-                data: {
-                  id: oppiaPlayerService.getExplorationId(),
-                  version: oppiaPlayerService.getExplorationVersion(),
-                  stateName: stateName,
-                  description: $scope.description,
-                  suggestionContent: $scope.suggestionContent
-                }
+                id: oppiaPlayerService.getExplorationId(),
+                version: oppiaPlayerService.getExplorationVersion(),
+                stateName: stateName,
+                description: $scope.description,
+                suggestionContent: $scope.suggestionContent
               });
             };
           }]
       }).result.then(function(result) {
-        $http.post('/suggestionhandler/' + result.data.id, {
-          exploration_version: result.data.version,
-          state_name: result.data.stateName,
-          description: result.data.description,
+        $http.post('/suggestionhandler/' + result.id, {
+          exploration_version: result.version,
+          state_name: result.stateName,
+          description: result.description,
           suggestion_content: {
             type: 'text',
-            value: result.data.suggestionContent
+            value: result.suggestionContent
           }
         }).error(function(res) {
           warningsData.addWarning(res);

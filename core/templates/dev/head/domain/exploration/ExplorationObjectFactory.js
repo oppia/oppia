@@ -117,7 +117,7 @@ oppia.factory('ExplorationObjectFactory', [
       return this.getState(this.initStateName);
     };
 
-    Exploration.prototype.getContentHtml = function(stateName) {
+    Exploration.prototype.getUninterpolatedContentHtml = function(stateName) {
       return this.getState(stateName).content[0].value;
     };
 

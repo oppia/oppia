@@ -676,10 +676,12 @@ oppia.factory('rteHelperService', [
 oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [
     '$delegate', '$modal', '$timeout', 'focusService', 'taRegisterTool',
-    'rteHelperService', 'warningsData',
+    'rteHelperService', 'warningsData', 'explorationContextService',
+    'PAGE_CONTEXT',
     function(
         taOptions, $modal, $timeout, focusService, taRegisterTool,
-        rteHelperService, warningsData) {
+        rteHelperService, warningsData, explorationContextService,
+        PAGE_CONTEXT) {
       taOptions.disableSanitizer = true;
       taOptions.classes.textEditor = 'form-control oppia-rte-content';
       taOptions.setup.textEditorSetup = function($element) {
@@ -753,13 +755,15 @@ oppia.config(['$provide', function($provide) {
 
       rteHelperService.getRichTextComponents().forEach(function(componentDefn) {
         var buttonDisplay = rteHelperService.createToolbarIcon(componentDefn);
+        var canUseFs = explorationContextService.getPageContext() ===
+          PAGE_CONTEXT.EDITOR;
 
         taRegisterTool(componentDefn.name, {
           display: buttonDisplay.outerHTML,
           tooltiptext: componentDefn.tooltip,
           disabled: function() {
-            // Check canUseFs, a property on the textAngular directive scope.
-            return !this.$parent.$parent.canUseFs && componentDefn.requiresFs;
+            // Disable components that affect fs for non-editors.
+            return !canUseFs && componentDefn.requiresFs;
           },
           onElementSelect: {
             element: 'img',
@@ -770,8 +774,7 @@ oppia.config(['$provide', function($provide) {
               event.preventDefault();
               var textAngular = this;
 
-              if (!textAngular.$editor().$parent.canUseFs &&
-                  componentDefn.requiresFs) {
+              if (!canUseFs && componentDefn.requiresFs) {
                 var FS_UNAUTHORIZED_WARNING = 'Unfortunately, only ' +
                   'exploration authors can make changes involving files.';
                 warningsData.addWarning(FS_UNAUTHORIZED_WARNING);
@@ -861,10 +864,8 @@ oppia.config(['$provide', function($provide) {
 
 oppia.directive('textAngularRte', [
     '$filter', 'oppiaHtmlEscaper', 'rteHelperService',
-    'explorationContextService', 'PAGE_CONTEXT',
     function(
-      $filter, oppiaHtmlEscaper, rteHelperService,
-      explorationContextService, PAGE_CONTEXT) {
+      $filter, oppiaHtmlEscaper, rteHelperService) {
       return {
         restrict: 'E',
         scope: {
@@ -878,8 +879,6 @@ oppia.directive('textAngularRte', [
         controller: ['$scope', function($scope) {
           // Currently, operations affecting the filesystem are allowed only in
           // the editor context.
-          $scope.canUseFs = (
-            explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
           $scope.isCustomizationModalOpen = false;
           var toolbarOptions = [
             ['bold', 'italics', 'underline'],
