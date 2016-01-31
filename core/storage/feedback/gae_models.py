@@ -118,17 +118,8 @@ class FeedbackThreadModel(base_models.BaseModel):
         Does not include the deleted entries.
         """
         return cls.get_all().filter(
-            cls.exploration_id == exploration_id).fetch(
-                feconf.DEFAULT_QUERY_LIMIT)
-
-    @classmethod
-    def get_threads_with_suggestions(cls, exploration_id):
-        """Returns an array of threads that have suggestions, for the given
-        exploration."""
-
-        return cls.get_all().filter(
-            cls.exploration_id == exploration_id).filter(
-                cls.has_suggestion == True).fetch(feconf.DEFAULT_QUERY_LIMIT)  # pylint: disable=singleton-comparison
+            cls.exploration_id == exploration_id).order(
+                cls.last_updated).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
 
 class FeedbackMessageModel(base_models.BaseModel):
@@ -260,11 +251,15 @@ class SuggestionModel(base_models.BaseModel):
     exploration_version = ndb.IntegerProperty(required=True, indexed=True)
     # Name of the corresponding state.
     state_name = ndb.StringProperty(required=True, indexed=True)
+    # Learner-provided description of suggestion changes.
+    description = ndb.TextProperty(required=True, indexed=False)
+    # The state's content after the suggested edits.
+    # Contains keys 'type' (always 'text') and 'value' (the actual content).
     state_content = ndb.JsonProperty(required=True, indexed=False)
 
     @classmethod
     def create(cls, exploration_id, thread_id, author_id, exploration_version,
-               state_name, state_content):
+               state_name, description, state_content):
         """Creates a new SuggestionModel entry.
 
         Throws an exception if a suggestion with the given thread id already
@@ -277,7 +272,9 @@ class SuggestionModel(base_models.BaseModel):
         cls(id=instance_id, author_id=author_id,
             exploration_id=exploration_id,
             exploration_version=exploration_version,
-            state_name=state_name, state_content=state_content).put()
+            state_name=state_name,
+            description=description,
+            state_content=state_content).put()
 
     @classmethod
     def _get_instance_id(cls, exploration_id, thread_id):

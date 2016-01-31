@@ -1461,18 +1461,15 @@ def accept_suggestion(editor_id, thread_id, exploration_id, commit_message):
         suggestion = feedback_services.get_suggestion(
             exploration_id, thread_id)
         suggestion_author_username = suggestion['author_name']
-        full_commit_message = ('Accepted suggestion by %s: %s' % (
-            suggestion_author_username, commit_message))
         change_list = _create_change_list_from_suggestion(suggestion)
         update_exploration(
-            editor_id, exploration_id, change_list, full_commit_message)
+            editor_id, exploration_id, change_list,
+            'Accepted suggestion by %s: %s' % (
+                suggestion_author_username, commit_message))
         feedback_services.create_message(
-            exploration_id, thread_id, editor_id, None, None,
+            exploration_id, thread_id, editor_id,
+            feedback_models.STATUS_CHOICES_FIXED, None,
             'Suggestion accepted.')
-        thread = feedback_models.FeedbackThreadModel.get_by_exp_and_thread_id(
-            exploration_id, thread_id)
-        thread.status = feedback_models.STATUS_CHOICES_FIXED
-        thread.put()
 
 
 def reject_suggestion(editor_id, thread_id, exploration_id):
@@ -1484,7 +1481,7 @@ def reject_suggestion(editor_id, thread_id, exploration_id):
         thread = feedback_models.FeedbackThreadModel.get_by_exp_and_thread_id(
             exploration_id, thread_id)
         feedback_services.create_message(
-            exploration_id, thread_id, editor_id, None, None,
-            'Suggestion rejected.')
-        thread.status = feedback_models.STATUS_CHOICES_IGNORED
+            exploration_id, thread_id, editor_id,
+            feedback_models.STATUS_CHOICES_IGNORED,
+            None, 'Suggestion rejected.')
         thread.put()

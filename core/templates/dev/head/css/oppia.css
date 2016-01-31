@@ -2683,9 +2683,17 @@ md-card.preview-conversation-skin-supplemental-card {
   width: 49%;
   height: 100%;
 }
+
 .oppia-suggestion-review-panel {
   width: 100%;
   height: 100%;
   border: 1px solid black;
   overflow: scroll;
+}
+
+.oppia-suggestion-review-error {
+  text-align: right;
+  width: 100%;
+  color: red;
+  margin-bottom: 10px;
 }

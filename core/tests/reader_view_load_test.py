@@ -24,6 +24,8 @@ Run this script from the Oppia root directory:
 
 """
 
+# Pylint has issues with import order of argparse.
+#pylint: disable=wrong-import-order
 import argparse
 import cookielib
 import json
@@ -33,6 +35,7 @@ import threading
 import time
 import urllib
 import urllib2
+#pylint: enable=wrong-import-order
 
 
 XSSI_PREFIX = ')]}\'\n'

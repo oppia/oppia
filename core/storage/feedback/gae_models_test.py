@@ -34,12 +34,15 @@ class SuggestionModelTest(test_utils.GenericTestBase):
         super(SuggestionModelTest, self).setUp()
         feedback_models.SuggestionModel.create('exp_id1', 'thread_id1',
                                                'author_id', 1, 'state_name',
+                                               'description',
                                                {'old_content': {}})
         feedback_models.SuggestionModel.create('exp_id1', 'thread_id2',
                                                'author_id', 1, 'state_name',
+                                               'description',
                                                {'old_content': {}})
         feedback_models.SuggestionModel.create('exp_id2', 'thread_id2',
                                                'author_id', 1, 'state_name',
+                                               'description',
                                                {'old_content': {}})
 
     def _get_suggestion_models_for_test(self, suggestions_list):
@@ -49,7 +52,7 @@ class SuggestionModelTest(test_utils.GenericTestBase):
         updated_suggestions_list = []
         for suggestion in suggestions_list:
             suggestion_dict = suggestion.to_dict()
-            for field in FIELDS_NOT_REQUIRED: 
+            for field in FIELDS_NOT_REQUIRED:
                 if field in suggestion_dict:
                     suggestion_dict.pop(field)
             updated_suggestions_list.append(suggestion_dict)
@@ -58,6 +61,7 @@ class SuggestionModelTest(test_utils.GenericTestBase):
     def test_create_new_object_runs_successfully(self):
         feedback_models.SuggestionModel.create('exp_id3', 'thread_id2',
                                                'author_id', 1, 'state_name',
+                                               'description',
                                                {'old_content': {}})
         suggestion = (feedback_models.SuggestionModel
             .get_by_exploration_and_thread_id('exp_id3', 'thread_id2'))
@@ -66,15 +70,17 @@ class SuggestionModelTest(test_utils.GenericTestBase):
         self.assertEqual(suggestion.author_id, 'author_id')
         self.assertEqual(suggestion.exploration_version, 1)
         self.assertEqual(suggestion.state_name, 'state_name')
+        self.assertEqual(suggestion.description, 'description')
         self.assertEqual(suggestion.state_content, {'old_content': {}})
 
     def test_create_suggestion_fails_if_thread_already_has_suggestion(self):
         with self.assertRaisesRegexp(Exception, 'There is already a feedback '
                                      'thread with the given thread id: '
                                      'exp_id1.thread_id1'):
-            feedback_models.SuggestionModel.create('exp_id1', 
-                                                   'thread_id1', 'author_id', 1, 
-                                                   'state_name', 
+            feedback_models.SuggestionModel.create('exp_id1',
+                                                   'thread_id1', 'author_id', 1,
+                                                   'state_name',
+                                                   'description',
                                                    {'old_content': {}})
 
     def test_get_by_exploration_and_thread_id_suggestion_present(self):
@@ -86,6 +92,7 @@ class SuggestionModelTest(test_utils.GenericTestBase):
             exploration_id='exp_id1',
             exploration_version=1,
             state_name='state_name',
+            description='description',
             state_content={'old_content': {}})]
 
         self.assertEqual(len(self._get_suggestion_models_for_test(actual_suggestion)), 1)

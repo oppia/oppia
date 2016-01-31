@@ -5,12 +5,12 @@
       property. It works as of Angular 1.4.7. See
       http://stackoverflow.com/a/18644490.
     -->
-    <div ng-if="(threadData.threadList | filter:{suggestion_id:''}).length > 0">
+    <div ng-if="threadData.suggestionThreads.length > 0">
       <h2>Suggestions from Learners</h2>
-      <thread-table threads="threadData.threadList | filter:{suggestion_id:''}"
+      <thread-table threads="threadData.suggestionThreads"
                     on-click-row="setActiveThread">
       </thread-table>
-      <hr>
+      <br>
     </div>
 
     <div class="pull-right">
@@ -25,11 +25,11 @@
 
     <div style="clear: both;"></div>
 
-    <div ng-if="threadData.threadList.length === 0">
+    <div ng-if="threadData.feedbackThreads.length === 0">
       <em>No feedback has been given for this exploration yet.</em>
     </div>
 
-    <thread-table threads="threadData.threadList | filter:{suggestion_id:'!'}"
+    <thread-table threads="threadData.feedbackThreads"
                   on-click-row="setActiveThread">
     </thread-table>
 
@@ -47,7 +47,8 @@
             </span>
           </button>
         </span>
-        <span style="font-size: larger">Feedback Thread: <[activeThread.subject]></span>
+        <span style="font-size: larger" ng-show="!activeThread.suggestion">Feedback Thread: <[activeThread.subject]></span>
+        <span style="font-size: larger" ng-show="activeThread.suggestion">Suggestion Thread: <[activeThread.subject]></span>
       </div>
 
       <div style="float: right;" class="col-lg-2 col-md-2 col-sm-2">
@@ -93,9 +94,11 @@
               <div class="row">
                 <div class="col-lg-12 col-md-12 col-sm-12">
                   <div style="white-space: pre-wrap;"><[m.text]></div>
-                  <button class="btn btn-primary" ng-if="activeThread.suggestion && $index==0" ng-click="showSuggestionModal()">
-                    View Suggestion
-                  </button>
+                  <div ng-if="activeThread.suggestion && $index == 0">
+                      <button class="btn btn-<[getSuggestionButtonType()]>" style="margin-top: 6px; margin-bottom: 6px" ng-click="showSuggestionModal()">
+                        View Suggestion
+                      </button>
+                  </div>
                 </div>
               </div>
             </td>
@@ -113,7 +116,7 @@
           <div>
             <label for="tmpMessageText">
               Add new message
-              <span ng-if="editabilityService.isEditable()">(and/or change status)</span>
+              <span ng-if="editabilityService.isEditable() && !activeThread.suggestion">(and/or change status)</span>
             </label>
             <textarea class="form-control" ng-model="tmpMessage.text"
                       id="tmpMessageText" rows="6"
@@ -122,7 +125,7 @@
           </div>
 
           <div>
-            <span ng-show="editabilityService.isEditable()">
+            <span ng-show="editabilityService.isEditable() && !activeThread.suggestion">
               Change status (optional):
               <select ng-model="tmpMessage.status"
                       ng-options="choice.id as choice.text for choice in STATUS_CHOICES"
@@ -173,21 +176,29 @@
       <div class="oppia-suggestion-review-panel-container" style="float: left;">
         <strong>Current:</strong>
         <div class="oppia-suggestion-review-panel">
-          <p style="padding: 5px;"><[ oldContent ]></p>
+          <div ng-if="currentContent" angular-html-bind="currentContent"></div>
+          <div ng-if="!currentContent" style="color: red;">Oops! This state no longer exists!</div>
         </div>
       </div>
       <div class="oppia-suggestion-review-panel-container" style="float: right;">
         <strong>Suggested:</strong>
         <div class="oppia-suggestion-review-panel">
-          <p style="padding: 5px;"><[ newContent ]></p>
+          <div angular-html-bind="newContent"></div>
         </div>
       </div>
     </section>
+    <div style="margin-top: 20px; margin-left: 10px;" ng-show="canAccept">
+      Brief Description of Changes (required if accepting):
+      <input type="text" ng-model="commitMessage" style="width: 100%">
+    </div>
   </div>
 
   <div class="modal-footer">
+    <div ng-show="errorMessage" class="oppia-suggestion-review-error">
+      <[ errorMessage ]>
+    </div>
     <button class="btn btn-default" ng-click="cancelReview()">Cancel</button>
-    <button class="btn btn-danger" ng-click="rejectSuggestion()" ng-disabled="!(activeThread.suggestion.status == 'new')">Reject</button>
-    <button class="btn btn-success" ng-click="acceptSuggestion()" ng-disabled="!(activeThread.suggestion.status == 'new')">Accept</button>
+    <button class="btn btn-danger" ng-show="canEdit && isOpen" ng-click="rejectSuggestion()" ng-disabled="!canReject">Reject</button>
+    <button class="btn btn-success" ng-show="canEdit && isOpen" ng-click="acceptSuggestion()" ng-disabled="!canAccept || commitMessage.length == 0">Accept</button>
   </div>
 </script>

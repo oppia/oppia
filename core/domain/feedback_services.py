@@ -38,7 +38,7 @@ def _get_thread_dict_from_model_instance(thread):
         'status': thread.status,
         'subject': thread.subject,
         'summary': thread.summary,
-        'full_thread_id': thread.id}
+        'thread_id': get_thread_id_from_full_thread_id(thread.id)}
 
 
 def _create_models_for_thread_and_first_message(
@@ -199,28 +199,28 @@ def get_thread_analytics(exploration_id):
 
 
 def create_suggestion(exploration_id, author_id, exploration_version,
-                      state_name, suggestion_content):
+                      state_name, description, suggestion_content):
     """Creates a new SuggestionModel object and the corresponding
     FeedbackThreadModel object."""
 
     thread_id = _create_models_for_thread_and_first_message(
         exploration_id, state_name, author_id,
-        DEFAULT_SUGGESTION_THREAD_SUBJECT,
+        description,
         DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE, True)
     feedback_models.SuggestionModel.create(
         exploration_id, thread_id, author_id, exploration_version, state_name,
-        suggestion_content)
+        description, suggestion_content)
 
 
 def _get_suggestion_dict_from_model_instance(suggestion):
     if suggestion is None:
         return suggestion
     return {
-        'id': suggestion.id,
         'author_name': user_services.get_username(suggestion.author_id),
         'exploration_id': suggestion.exploration_id,
         'exploration_version': suggestion.exploration_version,
         'state_name': suggestion.state_name,
+        'description': suggestion.description,
         'state_content': suggestion.state_content}
 
 

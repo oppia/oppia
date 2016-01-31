@@ -26,8 +26,8 @@ from core.domain import user_jobs_one_off
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-(user_models,) = models.Registry.import_models(
-    [models.NAMES.user])
+(user_models, feedback_models) = models.Registry.import_models(
+    [models.NAMES.user, models.NAMES.feedback])
 taskqueue_services = models.Registry.import_taskqueue_services()
 search_services = models.Registry.import_search_services()
 
@@ -215,10 +215,8 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             feedback_services.create_thread(
                 self.EXP_ID_1, None, self.user_b_id, 'subject', 'text')
             # User C adds to that thread.
-            full_thread_id = feedback_services.get_all_threads(
-                self.EXP_ID_1, False)[0]['full_thread_id']
-            thread_id = feedback_services.get_thread_id_from_full_thread_id(
-                full_thread_id)
+            thread_id = feedback_services.get_all_threads(
+                self.EXP_ID_1, False)[0]['thread_id']
             feedback_services.create_message(
                 self.EXP_ID_1, thread_id, self.user_c_id, None, None,
                 'more text')
@@ -233,6 +231,9 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
 
         self.assertEqual(user_b_subscriptions_model.activity_ids, [])
         self.assertEqual(user_c_subscriptions_model.activity_ids, [])
+        full_thread_id = (
+            feedback_models.FeedbackThreadModel.generate_full_thread_id(
+                self.EXP_ID_1, thread_id))
         self.assertEqual(
             user_b_subscriptions_model.feedback_thread_ids, [full_thread_id])
         self.assertEqual(

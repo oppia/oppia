@@ -2910,8 +2910,9 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
     def _check_commit_message(
             self, unused_user_id, unused_exploration_id, unused_change_list,
             commit_message):
-        self.assertEqual(commit_message, 'Accepted suggestion by %s: %s' % (
-            self.USERNAME, self.COMMIT_MESSAGE))
+        self.assertEqual(
+            commit_message, 'Accepted suggestion by %s: %s' % (
+                self.USERNAME, self.COMMIT_MESSAGE))
 
     def setUp(self):
         super(SuggestionActionUnitTests, self).setUp()
@@ -2924,9 +2925,11 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
         with self.swap(feedback_models.FeedbackThreadModel,
                        'generate_new_thread_id', self._generate_thread_id):
             feedback_services.create_suggestion(
-                self.EXP_ID1, self.user_id, 3, 'state_name', {'old_content': {}})
+                self.EXP_ID1, self.user_id, 3, 'state_name', 'description',
+                {'old_content': {}})
             feedback_services.create_suggestion(
-                self.EXP_ID2, self.user_id, 3, 'state_name', {'old_content': {}})
+                self.EXP_ID2, self.user_id, 3, 'state_name', 'description',
+                {'old_content': {}})
 
     def test_accept_suggestion_valid_suggestion(self):
         with self.swap(exp_services, '_is_suggestion_valid',

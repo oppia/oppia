@@ -68,11 +68,15 @@ class ThreadHandler(base.BaseHandler):
 
     @base.require_user
     def post(self, exploration_id, thread_id):  # pylint: disable=unused-argument
+        suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
         text = self.payload.get('text')
         updated_status = self.payload.get('updated_status')
         if not text and not updated_status:
             raise self.InvalidInputException(
                 'Text for the message must be specified.')
+        if suggestion and updated_status:
+            raise self.InvalidInputException(
+                'Suggestion thread status cannot be changed manually.')
 
         feedback_services.create_message(
             exploration_id,
@@ -119,7 +123,7 @@ class RecentFeedbackMessagesHandler(base.BaseHandler):
 class SuggestionHandler(base.BaseHandler):
     """"Handles operations relating to learner suggestions."""
 
-    PAGE_NAME_FOR_CSRF = 'editor'
+    PAGE_NAME_FOR_CSRF = 'player'
 
     @base.require_user
     def post(self, exploration_id):
@@ -128,6 +132,7 @@ class SuggestionHandler(base.BaseHandler):
             self.user_id,
             self.payload.get('exploration_version'),
             self.payload.get('state_name'),
+            self.payload.get('description'),
             self.payload.get('suggestion_content'))
         self.render_json(self.values)
 

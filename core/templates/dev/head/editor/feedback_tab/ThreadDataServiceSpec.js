@@ -24,7 +24,9 @@ describe('retrieving threads service', function() {
   beforeEach(function() {
     module('oppia');
     module(function($provide) {
-      $provide.value('explorationData', { explorationId: expId });
+      $provide.value('explorationData', {
+        explorationId: expId
+      });
     });
   });
 
@@ -38,44 +40,42 @@ describe('retrieving threads service', function() {
     var mockFeedbackThreads = [
       {
         last_updated: 1441870501230.642,
-        original_author_username: 'test_author',
+        original_author_username: 'test_learner',
         state_name: null,
         status: 'open',
-        subject: 'example feedback',
+        subject: 'Feedback from a learner',
         summary: null,
-        threadId: 'abc1'
+        thread_id: 'abc1'
       },
       {
         last_updated: 1441870501231.642,
-        original_author_username: 'test_author',
+        original_author_username: 'test_learner',
         state_name: null,
         status: 'open',
-        subject: 'example feedback',
+        subject: 'Feedback from a learner',
         summary: null,
-        threadId: 'abc2'
+        thread_id: 'abc2'
       }
     ];
 
     var mockOpenSuggestionThreads = [
       {
         last_updated: 1441870501232.642,
-        original_author_username: 'test_author',
+        original_author_username: 'test_learner',
         state_name: null,
         status: 'open',
-        subject: 'example suggestion',
+        subject: 'Suggestion from a learner',
         summary: null,
-        threadId: 'abc3',
-        suggestion_id: '1'
+        thread_id: 'abc3'
       },
       {
         last_updated: 1441870501233.642,
-        original_author_username: 'test_author',
+        original_author_username: 'test_learner',
         state_name: null,
         status: 'open',
-        subject: 'example suggestion',
+        subject: 'Suggestion from a learner',
         summary: null,
-        threadId: 'abc4',
-        suggestion_id: '2'
+        thread_id: 'abc4'
       }
     ];
 
@@ -83,7 +83,8 @@ describe('retrieving threads service', function() {
       threads: mockFeedbackThreads
     });
 
-    httpBackend.whenGET('/suggestionlisthandler/' + expId + '?type=open').respond({
+    httpBackend.whenGET('/suggestionlisthandler/' + expId +
+        '?has_suggestion=true&list_type=all').respond({
       threads: mockOpenSuggestionThreads
     });
 
@@ -91,10 +92,12 @@ describe('retrieving threads service', function() {
     httpBackend.flush();
 
     for (var i = 0; i < mockFeedbackThreads.length; i++) {
-      expect(threadDataService.data.threadList).toContain(mockFeedbackThreads[i]);
+      expect(threadDataService.data.feedbackThreads).toContain(
+        mockFeedbackThreads[i]);
     }
     for (var i = 0; i < mockOpenSuggestionThreads.length; i++) {
-      expect(threadDataService.data.threadList).toContain(mockOpenSuggestionThreads[i]);
+      expect(threadDataService.data.suggestionThreads).toContain(
+        mockOpenSuggestionThreads[i]);
     }
   });
 });

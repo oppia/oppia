@@ -24,25 +24,30 @@ oppia.factory('threadDataService', [
   var _expId = explorationData.explorationId;
   var _THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + _expId;
   var _SUGGESTION_LIST_HANDLER_URL = '/suggestionlisthandler/' + _expId;
-  var _SUGGESTION_ACTION_HANDLER_URL = '/suggestionactionhandler/' + _expId + '/';
+  var _SUGGESTION_ACTION_HANDLER_URL = '/suggestionactionhandler/' +
+    _expId + '/';
   var _THREAD_HANDLER_PREFIX = '/threadhandler/' + _expId + '/';
 
   // All the threads for this exploration. This is a list whose entries are
   // objects, each representing threads. The 'messages' key of this object
   // is updated lazily.
   var _data = {
-    threadList: []
+    feedbackThreads: [],
+    suggestionThreads: []
   };
 
   var _fetchThreads = function(successCallback) {
-    // UI test code: http://pastebin.com/DhL4fGnm
     var fPromise = $http.get(_THREAD_LIST_HANDLER_URL);
     var sPromise = $http.get(_SUGGESTION_LIST_HANDLER_URL, {
-      params: {type: 'open'}
+      params: {
+        list_type: 'all',
+        has_suggestion: true
+      }
     });
 
     $q.all([fPromise, sPromise]).then(function(res) {
-      _data.threadList = [].concat(res[0].data.threads, res[1].data.threads);
+      _data.feedbackThreads = res[0].data.threads;
+      _data.suggestionThreads = res[1].data.threads;
       if (successCallback) {
         successCallback();
       }
@@ -50,11 +55,12 @@ oppia.factory('threadDataService', [
   };
 
   var _fetchMessages = function(threadId) {
-    $http.get(
-        _THREAD_HANDLER_PREFIX + threadId).success(function(data) {
-      for (var i = 0; i < _data.threadList.length; i++) {
-        if (_data.threadList[i].thread_id === threadId) {
-          _data.threadList[i].messages = data.messages;
+    $http.get(_THREAD_HANDLER_PREFIX + threadId).success(function(data) {
+      var allThreads = _data.feedbackThreads.concat(_data.suggestionThreads);
+      for (var i = 0; i < allThreads.length; i++) {
+        if (allThreads[i].thread_id === threadId) {
+          allThreads[i].messages = data.messages;
+          allThreads[i].suggestion = data.suggestion;
           break;
         }
       }
@@ -81,14 +87,15 @@ oppia.factory('threadDataService', [
         }
       });
     },
-    addNewMessage: function(threadId, newMessage, newStatus, successCallback, errorCallback) {
+    addNewMessage: function(
+      threadId, newMessage, newStatus, successCallback, errorCallback) {
       var url = _THREAD_HANDLER_PREFIX + threadId;
+      var allThreads = _data.feedbackThreads.concat(_data.suggestionThreads);
       var thread = null;
 
-      for (var i = 0; i < _data.threadList.length; i++) {
-        if (_data.threadList[i].thread_id === threadId) {
-          thread = _data.threadList[i];
-          thread.status = newStatus;
+      for (var i = 0; i < allThreads.length; i++) {
+        if (allThreads[i].thread_id === threadId) {
+          thread = allThreads[i];
           break;
         }
       }
@@ -97,30 +104,37 @@ oppia.factory('threadDataService', [
       var updatedStatus = null;
       if (newStatus !== thread.status) {
         updatedStatus = newStatus;
+        thread.status = newStatus;
       }
 
       var payload = {
-        updated_status: newStatus,
+        updated_status: updatedStatus,
         updated_subject: null,
         text: newMessage
       };
 
-      $http.post(url, payload).success(function(data) {
+      $http.post(url, payload).success(function() {
         _fetchMessages(threadId);
 
         if (successCallback) {
           successCallback();
         }
-      }).error(function(data) {
+      }).error(function() {
         if (errorCallback) {
           errorCallback();
         }
       });
     },
-    resolveSuggestion: function(thread_id, action) {
-      $http.put(_SUGGESTION_ACTION_HANDLER_URL + thread_id, {
+    resolveSuggestion: function(
+      threadId, action, commitMsg, onSuccess, onFailure) {
+      var payload = {
         action: action
-      });
+      };
+      if (commitMsg) {
+        payload.commit_message = commitMsg;
+      }
+      $http.put(_SUGGESTION_ACTION_HANDLER_URL + threadId, payload).success(
+        onSuccess).error(onFailure);
     }
   };
 }]);
