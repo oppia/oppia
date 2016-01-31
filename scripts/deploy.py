@@ -47,11 +47,14 @@ IMPORTANT NOTES:
     named 'oppia'.
 """
 
+# Pylint has issues with the import order of argparse.
+# pylint: disable=wrong-import-order
 import argparse
 import datetime
 import os
 import shutil
 import subprocess
+# pylint: enable=wrong-import-order
 
 import common
 
