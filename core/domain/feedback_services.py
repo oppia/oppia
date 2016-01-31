@@ -204,12 +204,16 @@ def create_suggestion(exploration_id, author_id, exploration_version,
     FeedbackThreadModel object."""
 
     thread_id = _create_models_for_thread_and_first_message(
-        exploration_id, state_name, author_id,
-        description,
+        exploration_id, state_name, author_id, description,
         DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE, True)
     feedback_models.SuggestionModel.create(
         exploration_id, thread_id, author_id, exploration_version, state_name,
         description, suggestion_content)
+
+    full_thread_id = (
+        feedback_models.FeedbackThreadModel.generate_full_thread_id(
+            exploration_id, thread_id))
+    subscription_services.subscribe_to_thread(author_id, full_thread_id)
 
 
 def _get_suggestion_dict_from_model_instance(suggestion):
