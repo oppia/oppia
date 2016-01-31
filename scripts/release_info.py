@@ -177,7 +177,7 @@ def _check_storage_models(current_release):
 
 def main():
     """Collects necessary info and dumps it to disk."""
-    with ChangedBranch("release_script"):
+    with ChangedBranch('develop'):
         current_release = _get_current_version()
         logs = _gather_logs(current_release)
         issue_links = _extract_issues(logs)
