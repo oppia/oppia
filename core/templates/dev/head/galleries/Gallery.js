@@ -94,13 +94,13 @@ oppia.factory('searchService', [
         _getSuffixForQuery(selectedCategories, selectedLanguageCodes));
 
       _isCurrentlyFetchingResults = true;
-      $http.get(queryUrl).success(function(data) {
+      $http.get(queryUrl).then(function(response) {
         _lastQuery = searchQuery;
         _lastSelectedCategories = angular.copy(selectedCategories);
         _lastSelectedLanguageCodes = angular.copy(selectedLanguageCodes);
-        _searchCursor = data.search_cursor;
+        _searchCursor = response.data.search_cursor;
         $rootScope.$broadcast(
-          'refreshGalleryData', data, hasPageFinishedLoading());
+          'refreshGalleryData', response.data, hasPageFinishedLoading());
         _isCurrentlyFetchingResults = false;
       });
 
@@ -123,8 +123,8 @@ oppia.factory('searchService', [
       }
 
       _isCurrentlyFetchingResults = true;
-      $http.get(queryUrl).success(function(data) {
-        _searchCursor = data.search_cursor;
+      $http.get(queryUrl).then(function(response) {
+        _searchCursor = response.data.search_cursor;
         _isCurrentlyFetchingResults = false;
         if (successCallback) {
           successCallback(data, hasPageFinishedLoading());
@@ -230,14 +230,14 @@ oppia.controller('Gallery', [
     );
 
     // Retrieves gallery data from the server.
-    $http.get(GALLERY_DATA_URL).success(function(data) {
-      $scope.currentUserIsModerator = Boolean(data.is_moderator);
+    $http.get(GALLERY_DATA_URL).then(function(response) {
+      $scope.currentUserIsModerator = Boolean(response.data.is_moderator);
 
       // Note that this will cause an initial search query to be sent.
       $rootScope.$broadcast(
-        'preferredLanguageCodesLoaded', data.preferred_language_codes);
+        'preferredLanguageCodesLoaded', response.data.preferred_language_codes);
 
-      if (data.username) {
+      if (response.data.username) {
         if (urlService.getUrlParams().mode === 'create') {
           $scope.showCreateExplorationModal(CATEGORY_LIST);
         }

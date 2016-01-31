@@ -98,9 +98,10 @@ oppia.controller('Base', [
     if (GLOBALS.userIsLoggedIn) {
       // Show the number of unseen notifications in the navbar and page title,
       // unless the user is already on the dashboard page.
-      $http.get('/notificationshandler').success(function(data) {
+      $http.get('/notificationshandler').then(function(response) {
         if ($window.location.pathname !== '/') {
-          $scope.numUnseenNotifications = data.num_unseen_notifications;
+          $scope.numUnseenNotifications =
+            response.data.num_unseen_notifications;
           if ($scope.numUnseenNotifications > 0) {
             $window.document.title = (
               '(' + $scope.numUnseenNotifications + ') ' +

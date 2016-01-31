@@ -30,11 +30,11 @@ oppia.controller('Signup', [
     $scope.showEmailPreferencesForm = GLOBALS.CAN_SEND_EMAILS_TO_USERS;
     $scope.submissionInProcess = false;
 
-    $http.get(_SIGNUP_DATA_URL).success(function(data) {
+    $http.get(_SIGNUP_DATA_URL).then(function(response) {
       $rootScope.loadingMessage = '';
-      $scope.username = data.username;
-      $scope.hasEverRegistered = data.has_ever_registered;
-      $scope.hasAgreedToLatestTerms = data.has_agreed_to_latest_terms;
+      $scope.username = response.data.username;
+      $scope.hasEverRegistered = response.data.has_ever_registered;
+      $scope.hasAgreedToLatestTerms = response.data.has_agreed_to_latest_terms;
       $scope.hasUsername = Boolean($scope.username);
       focusService.setFocus('usernameInputField');
     });
@@ -74,8 +74,8 @@ oppia.controller('Signup', [
       if (!$scope.warningText) {
         $http.post('usernamehandler/data', {
           username: $scope.username
-        }).success(function(data) {
-          if (data.username_is_taken) {
+        }).then(function(response) {
+          if (response.data.username_is_taken) {
             $scope.warningText = 'Sorry, this username is already taken.';
           }
         });
@@ -148,7 +148,7 @@ oppia.controller('Signup', [
       }
 
       $scope.submissionInProcess = true;
-      $http.post(_SIGNUP_DATA_URL, requestParams).success(function() {
+      $http.post(_SIGNUP_DATA_URL, requestParams).then(function() {
         window.location = window.decodeURIComponent(
           urlService.getUrlParams().return_url);
       }).error(function() {

@@ -89,14 +89,14 @@ oppia.factory('explorationData', [
           change_list: changeList,
           commit_message: commitMessage,
           version: explorationData.data.version
-        }).success(function(data) {
+        }).then(function(response) {
           warningsData.clear();
           $log.info('Changes to this exploration were saved successfully.');
-          explorationData.data = data;
+          explorationData.data = response.data;
           if (successCallback) {
             successCallback();
           }
-        }).error(function() {
+        }).catch(function() {
           if (errorCallback) {
             errorCallback();
           }
@@ -439,8 +439,9 @@ oppia.factory('explorationRightsService', [
       requestParams.version = explorationData.data.version;
       var explorationRightsUrl = (
         '/createhandler/rights/' + explorationData.explorationId);
-      $http.put(explorationRightsUrl, requestParams).success(function(data) {
+      $http.put(explorationRightsUrl, requestParams).then(function(response) {
         warningsData.clear();
+        var data = response.data;
         that.init(
           data.rights.owner_names, data.rights.editor_names,
           data.rights.viewer_names, data.rights.status,
@@ -457,7 +458,8 @@ oppia.factory('explorationRightsService', [
         action: action,
         email_body: emailBody,
         version: explorationData.data.version
-      }).success(function(data) {
+      }).then(function(response) {
+        var data = response.data;
         warningsData.clear();
         that.init(
           data.rights.owner_names, data.rights.editor_names,
@@ -1521,7 +1523,7 @@ oppia.factory('stateEditorTutorialFirstTimeService', [
 
         if (_currentlyInFirstVisit) {
           $rootScope.$broadcast('openEditorTutorial');
-          $http.post(STARTED_TUTORIAL_EVENT_URL).error(function() {
+          $http.post(STARTED_TUTORIAL_EVENT_URL).catch(function() {
             console.error('Warning: could not record tutorial start event.');
           });
         }

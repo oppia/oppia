@@ -43,8 +43,8 @@ oppia.controller('ExplorationFeedback', [
     };
 
     $scope._getThreadList = function(successCallback) {
-      $http.get(THREAD_LIST_HANDLER_URL).success(function(data) {
-        $scope.threads = data.threads;
+      $http.get(THREAD_LIST_HANDLER_URL).then(function(response) {
+        $scope.threads = response.data.threads;
         if (successCallback) {
           successCallback();
         }
@@ -56,7 +56,7 @@ oppia.controller('ExplorationFeedback', [
         state_name: null,
         subject: newThreadSubject,
         text: newThreadText
-      }).success(function() {
+      }).then(function() {
         $scope._getThreadList();
         $scope.setCurrentThread(null);
       });
@@ -71,10 +71,10 @@ oppia.controller('ExplorationFeedback', [
         return;
       }
 
-      $http.get(THREAD_HANDLER_PREFIX + threadId).success(function(data) {
+      $http.get(THREAD_HANDLER_PREFIX + threadId).then(function(response) {
         $scope.currentThreadId = threadId;
         $scope.currentThreadData = $scope._getThreadById(threadId);
-        $scope.currentThreadMessages = data.messages;
+        $scope.currentThreadMessages = response.data.messages;
         $scope.updatedStatus = $scope.currentThreadData.status;
       });
     };
@@ -141,12 +141,12 @@ oppia.controller('ExplorationFeedback', [
           updatedStatus : null),
         updated_subject: null,
         text: newMessageText
-      }).success(function() {
+      }).then(function() {
         $scope.currentThreadData.status = updatedStatus;
         $scope.setCurrentThread(threadId);
         $scope.messageSendingInProgress = false;
         $scope.newMessageText = '';
-      }).error(function() {
+      }).catch(function() {
         $scope.messageSendingInProgress = false;
       });
     };

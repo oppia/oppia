@@ -116,11 +116,11 @@ oppia.factory('answerClassificationService', [
             old_state: oldState.toBackendDict(),
             params: params,
             answer: answer
-          }).success(function(result) {
+          }).then(function(response) {
             deferred.resolve({
-              outcome: result.outcome,
-              ruleSpecIndex: result.rule_spec_index,
-              answerGroupIndex: result.answer_group_index
+              outcome: response.data.outcome,
+              ruleSpecIndex: response.data.rule_spec_index,
+              answerGroupIndex: response.data.answer_group_index
             });
           });
         }

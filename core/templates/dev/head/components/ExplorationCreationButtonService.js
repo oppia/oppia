@@ -148,9 +148,9 @@ oppia.factory('ExplorationCreationButtonService', [
             language_code: result.languageCode,
             objective: $filter('normalizeWhitespace')(result.objective),
             title: result.title
-          }).success(function(data) {
-            window.location = '/create/' + data.explorationId;
-          }).error(function() {
+          }).then(function(response) {
+            window.location = '/create/' + response.data.explorationId;
+          }).catch(function() {
             $rootScope.loadingMessage = '';
           });
         });
