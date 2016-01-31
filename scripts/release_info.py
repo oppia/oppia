@@ -26,7 +26,7 @@ import sys
 
 GIT_CMD_GET_CURRENT_VERSION = 'git describe --abbrev=0'
 GIT_CMD_GET_LOGS_FORMAT_STRING = (
-    'git log -z --no-color --pretty=format:"%H{0}%aN{0}%aE{0}%B" {1}..{2}')
+    'git log -z --no-color --pretty=format:%H{0}%aN{0}%aE{0}%B {1}..{2}')
 GIT_CMD_DIFF_NAMES_ONLY_FORMAT_STRING = 'git diff --name-only %s %s'
 GIT_CMD_SHOW_FORMAT_STRING = 'git show %s:feconf.py'
 ISSUE_URL_FORMAT_STRING = 'https://github.com/oppia/oppia/issues/%s'
