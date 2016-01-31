@@ -173,12 +173,13 @@ oppia.factory('oppiaPlayerService', [
           var explorationDataUrl = (
             '/explorehandler/init/' + _explorationId +
             (version ? '?v=' + version : ''));
-          $http.get(explorationDataUrl).success(function(data) {
-            exploration = ExplorationObjectFactory.create(data.exploration);
-            version = data.version;
+          $http.get(explorationDataUrl).then(function(response) {
+            exploration = ExplorationObjectFactory.
+              create(response.data.exploration);
+            version = response.data.version;
 
             StatsReportingService.initSession(
-              _explorationId, data.version, data.session_id,
+              _explorationId, response.data.version, response.data.session_id,
               GLOBALS.collectionId);
 
             _loadInitialState(successCallback);
@@ -329,8 +330,8 @@ oppia.factory('oppiaPlayerService', [
         if (_isLoggedIn && !_editorPreviewMode) {
           $http.get(
             '/preferenceshandler/profile_picture'
-          ).success(function(data) {
-            var profilePictureDataUrl = data.profile_picture_data_url;
+          ).then(function(response) {
+            var profilePictureDataUrl = response.data.profile_picture_data_url;
             if (profilePictureDataUrl) {
               deferred.resolve(profilePictureDataUrl);
             } else {

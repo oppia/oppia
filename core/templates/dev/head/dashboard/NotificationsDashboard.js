@@ -32,11 +32,11 @@ oppia.controller('DashboardNotifications', [
   };
 
   $rootScope.loadingMessage = 'Loading';
-  $http.get('/notificationsdashboardhandler/data').success(function(data) {
-    $scope.recentNotifications = data.recent_notifications;
-    $scope.jobQueuedMsec = data.job_queued_msec;
-    $scope.lastSeenMsec = data.last_seen_msec || 0.0;
-    $scope.currentUsername = data.username;
+  $http.get('/notificationsdashboardhandler/data').then(function(response) {
+    $scope.recentNotifications = response.data.recent_notifications;
+    $scope.jobQueuedMsec = response.data.job_queued_msec;
+    $scope.lastSeenMsec = response.data.last_seen_msec || 0.0;
+    $scope.currentUsername = response.data.username;
     $rootScope.loadingMessage = '';
   });
 }]);

@@ -50,10 +50,10 @@ oppia.controller('Moderator', [
       recentCommitsUrl += ('?cursor=' + $scope.recentCommitsCursor);
     }
 
-    $http.get(recentCommitsUrl).success(function(data) {
+    $http.get(recentCommitsUrl).then(function(response) {
       // Update the explorationData object with information about newly-
       // discovered explorations.
-      var explorationIdsToExplorationData = data.exp_ids_to_exp_data;
+      var explorationIdsToExplorationData = response.data.exp_ids_to_exp_data;
       for (var expId in explorationIdsToExplorationData) {
         if (!$scope.explorationData.hasOwnProperty(expId)) {
           $scope.explorationData[expId] = (
@@ -61,11 +61,11 @@ oppia.controller('Moderator', [
         }
       }
 
-      for (var i = 0; i < data.results.length; i++) {
-        $scope.allCommits.push(data.results[i]);
+      for (var i = 0; i < response.data.results.length; i++) {
+        $scope.allCommits.push(response.data.results[i]);
       }
-      $scope.recentCommitsCursor = data.cursor;
-      if (!data.more) {
+      $scope.recentCommitsCursor = response.data.cursor;
+      if (!response.data.more) {
         $scope.reachedEndOfCommits = true;
       }
     });
@@ -87,12 +87,12 @@ oppia.controller('Moderator', [
         '?cursor=' + $scope.recentFeedbackMessagesCursor);
     }
 
-    $http.get(recentFeedbackMessagesUrl).success(function(data) {
-      for (var i = 0; i < data.results.length; i++) {
-        $scope.allFeedbackMessages.push(data.results[i]);
+    $http.get(recentFeedbackMessagesUrl).then(function(response) {
+      for (var i = 0; i < response.data.results.length; i++) {
+        $scope.allFeedbackMessages.push(response.data.results[i]);
       }
-      $scope.recentFeedbackMessagesCursor = data.cursor;
-      if (!data.more) {
+      $scope.recentFeedbackMessagesCursor = response.data.cursor;
+      if (!response.data.more) {
         $scope.reachedEndOfFeedbackMessages = true;
       }
     });
