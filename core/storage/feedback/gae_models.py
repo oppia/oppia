@@ -118,17 +118,8 @@ class FeedbackThreadModel(base_models.BaseModel):
         Does not include the deleted entries.
         """
         return cls.get_all().filter(
-            cls.exploration_id == exploration_id).fetch(
-                feconf.DEFAULT_QUERY_LIMIT)
-
-    @classmethod
-    def get_threads_with_suggestions(cls, exploration_id):
-        """Returns an array of threads that have suggestions, for the given
-        exploration."""
-
-        return cls.get_all().filter(
-            cls.exploration_id == exploration_id).filter(
-                cls.has_suggestion == True).fetch(feconf.DEFAULT_QUERY_LIMIT)  # pylint: disable=singleton-comparison
+            cls.exploration_id == exploration_id).order(
+                cls.last_updated).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
 
 class FeedbackMessageModel(base_models.BaseModel):
@@ -261,7 +252,7 @@ class SuggestionModel(base_models.BaseModel):
     # Name of the corresponding state.
     state_name = ndb.StringProperty(required=True, indexed=True)
     # Learner-provided description of suggestion changes.
-    description = ndb.StringProperty(required=True, indexed=True)
+    description = ndb.TextProperty(required=True, indexed=False)
     # The state's content after the suggested edits.
     # Contains keys 'type' (always 'text') and 'value' (the actual content).
     state_content = ndb.JsonProperty(required=True, indexed=False)

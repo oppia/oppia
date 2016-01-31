@@ -535,6 +535,10 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         rejected_suggestion_thread_id = threads[1]['thread_id']
         unsuccessful_accept_thread_id = threads[2]['thread_id']
 
+        self.assertEqual(threads[0]['subject'], 'Suggestion for state A.')
+        self.assertEqual(threads[1]['subject'], 'A new value.')
+        self.assertEqual(threads[2]['subject'], 'Empty suggestion')
+
         # Accept a suggestion.
         self._accept_suggestion(accepted_suggestion_thread_id, csrf_token)
         updated_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
