@@ -2910,7 +2910,9 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
     def _check_commit_message(
             self, unused_user_id, unused_exploration_id, unused_change_list,
             commit_message):
-        self.assertEqual(commit_message, self.COMMIT_MESSAGE)
+        self.assertEqual(
+            commit_message, 'Accepted suggestion by %s: %s' % (
+                self.USERNAME, self.COMMIT_MESSAGE))
 
     def setUp(self):
         super(SuggestionActionUnitTests, self).setUp()

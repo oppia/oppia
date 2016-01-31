@@ -20,7 +20,6 @@ import feconf
 from core.tests import test_utils
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import feedback_services
 from core.domain import rights_manager
 from core.platform import models
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
@@ -360,8 +359,6 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
 
         # Login and create exploration and suggestions.
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/explore/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
 
         # Create exploration.
         self.save_new_valid_exploration(
@@ -383,6 +380,9 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         rights_manager.assign_role_for_exploration(
             self.editor_id, self.EXP_ID, self.owner_id,
             rights_manager.ROLE_EDITOR)
+
+        response = self.testapp.get('/explore/%s' % self.EXP_ID)
+        csrf_token = self.get_csrf_token_from_response(response)
 
         # Create suggestions.
         self.post_json(
@@ -469,8 +469,11 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         response_dict = self.get_json(
             '%s/%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, self.EXP_ID,
                           thread_id))
-        self.assertEqual(feedback_services.get_thread_id_from_full_thread_id(
-            response_dict['suggestion']['id']), thread_id)
+
+        # Suggestion description should be the same as thread subject.
+        self.assertEqual(
+            response_dict['suggestion']['description'],
+            threads[0]['subject'])
 
         # Get a list of all threads without suggestions.
         response_dict = self.get_json(
@@ -507,8 +510,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
                 return self.put_json(
                     '%s/%s/%s' % (
                         feconf.SUGGESTION_ACTION_URL_PREFIX, self.EXP_ID,
-                        feedback_services.get_thread_id_from_full_thread_id(
-                            thread_id)),
+                        thread_id),
                     {'action': u'accept', 'commit_message': 'message'},
                     csrf_token, expect_errors=expect_errors,
                     expected_status_int=expected_status_int)
@@ -516,9 +518,8 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
     def _reject_suggestion(self, thread_id, csrf_token,
                            expect_errors=False, expected_status_int=200):
         return self.put_json(
-            '%s/%s/%s' % (feconf.SUGGESTION_ACTION_URL_PREFIX, self.EXP_ID,
-                          feedback_services.get_thread_id_from_full_thread_id(
-                              thread_id)),
+            '%s/%s/%s' % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX, self.EXP_ID, thread_id),
             {'action': u'reject'}, csrf_token, expect_errors=expect_errors,
             expected_status_int=expected_status_int)
 
@@ -530,15 +531,9 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
             '%s/%s?list_type=%s&has_suggestion=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX, self.EXP_ID, 'all', 'true'))
         threads = response_dict['threads']
-        accepted_suggestion_thread_id = (
-            feedback_models.FeedbackThreadModel.generate_full_thread_id(
-                self.EXP_ID, threads[0]['thread_id']))
-        rejected_suggestion_thread_id = (
-            feedback_models.FeedbackThreadModel.generate_full_thread_id(
-                self.EXP_ID, threads[1]['thread_id']))
-        unsuccessful_accept_thread_id = (
-            feedback_models.FeedbackThreadModel.generate_full_thread_id(
-                self.EXP_ID, threads[2]['thread_id']))
+        accepted_suggestion_thread_id = threads[0]['thread_id']
+        rejected_suggestion_thread_id = threads[1]['thread_id']
+        unsuccessful_accept_thread_id = threads[2]['thread_id']
 
         # Accept a suggestion.
         self._accept_suggestion(accepted_suggestion_thread_id, csrf_token)
@@ -563,8 +558,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
             response_dict = self.put_json(
                 '%s/%s/%s' % (
                     feconf.SUGGESTION_ACTION_URL_PREFIX, self.EXP_ID,
-                    feedback_services.get_thread_id_from_full_thread_id(
-                        rejected_suggestion_thread_id)),
+                    rejected_suggestion_thread_id),
                 {'action': u'invalid'}, csrf_token, expect_errors=True,
                 expected_status_int=400)
         self.assertIn('Invalid action.', response_dict['error'])

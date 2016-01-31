@@ -216,7 +216,6 @@ def _get_suggestion_dict_from_model_instance(suggestion):
     if suggestion is None:
         return suggestion
     return {
-        'id': suggestion.id,
         'author_name': user_services.get_username(suggestion.author_id),
         'exploration_id': suggestion.exploration_id,
         'exploration_version': suggestion.exploration_version,

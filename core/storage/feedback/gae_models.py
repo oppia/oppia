@@ -260,8 +260,10 @@ class SuggestionModel(base_models.BaseModel):
     exploration_version = ndb.IntegerProperty(required=True, indexed=True)
     # Name of the corresponding state.
     state_name = ndb.StringProperty(required=True, indexed=True)
-    # Learner provided description of suggestion changes.
+    # Learner-provided description of suggestion changes.
     description = ndb.StringProperty(required=True, indexed=True)
+    # The state's content after the suggested edits.
+    # Contains keys 'type' (always 'text') and 'value' (the actual content).
     state_content = ndb.JsonProperty(required=True, indexed=False)
 
     @classmethod

@@ -204,9 +204,9 @@ class RecentUpdatesMRJobManager(
         for exp_model in tracked_exp_models_for_feedback:
             threads = feedback_services.get_all_threads(exp_model.id, False)
             for thread in threads:
-                full_thread_id = (feedback_models.FeedbackThreadModel
-                                  .generate_full_thread_id(
-                                      exp_model.id, thread['thread_id']))
+                full_thread_id = (
+                    feedback_models.FeedbackThreadModel.generate_full_thread_id(
+                        exp_model.id, thread['thread_id']))
                 if full_thread_id not in feedback_thread_ids_list:
                     feedback_thread_ids_list.append(full_thread_id)
 
