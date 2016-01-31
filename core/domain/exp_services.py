@@ -966,7 +966,8 @@ def publish_exploration_and_update_user_profiles(committer_id, exp_id):
 
 
 def update_exploration(
-        committer_id, exploration_id, change_list, commit_message):
+        committer_id, exploration_id, change_list, commit_message,
+        is_suggestion=False):
     """Update an exploration. Commits changes.
 
     Args:
@@ -977,14 +978,28 @@ def update_exploration(
         changes are applied in sequence to produce the resulting exploration.
     - commit_message: str or None. A description of changes made to the state.
         For published explorations, this must be present; for unpublished
-        explorations, it should be equal to None.
+        explorations, it should be equal to None. For suggestions that are
+        being accepted, and only for such commits, it should start with
+        feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX.
+    - is_suggestion: bool. whether the update is due to a suggestion being
+        accepted.
     """
     is_public = rights_manager.is_exploration_public(exploration_id)
-
     if is_public and not commit_message:
         raise ValueError(
             'Exploration is public so expected a commit message but '
             'received none.')
+
+    if (is_suggestion and (
+            not commit_message or
+            not commit_message.startswith(
+                feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX))):
+        raise ValueError('Invalid commit message for suggestion.')
+    if (not is_suggestion and commit_message and commit_message.startswith(
+            feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)):
+        raise ValueError(
+            'Commit messages for non-suggestions may not start with \'%s\'' %
+            feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
 
     exploration = apply_change_list(exploration_id, change_list)
     _save_exploration(committer_id, exploration, commit_message, change_list)
@@ -1446,6 +1461,19 @@ def _create_change_list_from_suggestion(suggestion):
              'new_value': [suggestion['state_content']]}]
 
 
+def _get_commit_message_for_suggestion(
+        suggestion_author_username, commit_message):
+    """Returns a modified commit message for an accepted suggestion.
+
+    NOTE TO DEVELOPERS: This should not be changed, since in the future we may
+    want to determine and credit the original authors of suggestions, and in
+    order to do so we will look for commit messages that follow this format.
+    """
+    return '%s %s: %s' % (
+        feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX,
+        suggestion_author_username, commit_message)
+
+
 def accept_suggestion(editor_id, thread_id, exploration_id, commit_message):
     """If the suggestion is valid, accepts it by updating the exploration.
     Raises an exception if the suggestion is not valid."""
@@ -1464,8 +1492,9 @@ def accept_suggestion(editor_id, thread_id, exploration_id, commit_message):
         change_list = _create_change_list_from_suggestion(suggestion)
         update_exploration(
             editor_id, exploration_id, change_list,
-            'Accepted suggestion by %s: %s' % (
-                suggestion_author_username, commit_message))
+            _get_commit_message_for_suggestion(
+                suggestion_author_username, commit_message),
+            is_suggestion=True)
         feedback_services.create_message(
             exploration_id, thread_id, editor_id,
             feedback_models.STATUS_CHOICES_FIXED, None,

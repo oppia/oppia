@@ -2909,7 +2909,8 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
 
     def _check_commit_message(
             self, unused_user_id, unused_exploration_id, unused_change_list,
-            commit_message):
+            commit_message, is_suggestion):
+        self.assertTrue(is_suggestion)
         self.assertEqual(
             commit_message, 'Accepted suggestion by %s: %s' % (
                 self.USERNAME, self.COMMIT_MESSAGE))
