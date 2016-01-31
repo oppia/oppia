@@ -11,15 +11,13 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS-IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and 
+# See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'Shantanu Bhowmik'
-
 from core.platform import models
-(feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
-import test_utils
+from core.tests import test_utils
 
+(feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
 
 CREATED_ON_FIELD = 'created_on'
 LAST_UPDATED_FIELD = 'last_updated'
@@ -63,8 +61,9 @@ class SuggestionModelTest(test_utils.GenericTestBase):
                                                'author_id', 1, 'state_name',
                                                'description',
                                                {'old_content': {}})
-        suggestion = (feedback_models.SuggestionModel
-            .get_by_exploration_and_thread_id('exp_id3', 'thread_id2'))
+        suggestion = (
+            feedback_models.SuggestionModel.get_by_exploration_and_thread_id(
+                'exp_id3', 'thread_id2'))
 
         self.assertEqual(suggestion.exploration_id, 'exp_id3')
         self.assertEqual(suggestion.author_id, 'author_id')
@@ -84,8 +83,9 @@ class SuggestionModelTest(test_utils.GenericTestBase):
                                                    {'old_content': {}})
 
     def test_get_by_exploration_and_thread_id_suggestion_present(self):
-        actual_suggestion = [(feedback_models.SuggestionModel
-            .get_by_exploration_and_thread_id('exp_id1', 'thread_id1'))]
+        actual_suggestion = [(
+            feedback_models.SuggestionModel.get_by_exploration_and_thread_id(
+                'exp_id1', 'thread_id1'))]
         expected_suggestion = [feedback_models.SuggestionModel(
             id='exp_id1.thread_id1',
             author_id='author_id',
@@ -101,7 +101,8 @@ class SuggestionModelTest(test_utils.GenericTestBase):
             self._get_suggestion_models_for_test(actual_suggestion))
 
     def test_get_by_exploration_and_thread_id_no_suggestion(self):
-        actual_suggestion = (feedback_models.SuggestionModel
-            .get_by_exploration_and_thread_id('invalid_exp_id', 'thread_id1'))
+        actual_suggestion = (
+            feedback_models.SuggestionModel.get_by_exploration_and_thread_id(
+                'invalid_exp_id', 'thread_id1'))
 
         self.assertIsNone(actual_suggestion)

@@ -20,13 +20,22 @@
  */
 
 oppia.factory('threadStatusDisplayService', [function() {
-  var _STATUS_CHOICES = [
-    {id: 'open', text: 'Open'},
-    {id: 'fixed', text: 'Fixed'},
-    {id: 'ignored', text: 'Ignored'},
-    {id: 'compliment', text: 'Compliment'},
-    {id: 'not_actionable', text: 'Not Actionable'}
-  ];
+  var _STATUS_CHOICES = [{
+    id: 'open',
+    text: 'Open'
+  }, {
+    id: 'fixed',
+    text: 'Fixed'
+  }, {
+    id: 'ignored',
+    text: 'Ignored'
+  }, {
+    id: 'compliment',
+    text: 'Compliment'
+  }, {
+    id: 'not_actionable',
+    text: 'Not Actionable'
+  }];
 
   return {
     STATUS_CHOICES: angular.copy(_STATUS_CHOICES),
