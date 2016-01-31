@@ -24,6 +24,20 @@ import re
 import subprocess
 import sys
 
+GIT_CMD_GET_CURRENT_VERSION = 'git describe --abbrev=0'
+GIT_CMD_GET_LOGS_FORMAT_STRING = (
+    'git log -z --no-color --pretty=format:"%H{0}%aN{0}%aE{0}%B" {1}..{2}')
+GIT_CMD_DIFF_NAMES_ONLY_FORMAT_STRING = 'git diff --name-only %s %s'
+GIT_CMD_SHOW_FORMAT_STRING = 'git show %s:feconf.py'
+ISSUE_URL_FORMAT_STRING = 'https://github.com/oppia/oppia/issues/%s'
+ISSUE_REGEX = re.compile(r'#(\d+)')
+GROUP_SEP = '\x1D'
+VERSION_RE_FORMAT_STRING = r'%s\s*=\s*(\d+|\.)+'
+FECONF_VAR_NAMES = ['CURRENT_EXPLORATION_STATES_SCHEMA_VERSION',
+                    'CURRENT_COLLECTION_SCHEMA_VERSION']
+
+Log = collections.namedtuple('Log', ['sha1', 'author', 'email', 'message'])
+
 
 class ChangedBranch(object):
     def __init__(self, new_branch):
@@ -35,7 +49,7 @@ class ChangedBranch(object):
     def __enter__(self):
         if not self.is_same_branch:
             try:
-                subprocess.check_output(["git", "checkout", self.new_branch])
+                subprocess.check_output(['git', 'checkout', self.new_branch])
             except subprocess.CalledProcessError:
                 print ('\nCould not change to %s. This is most probably because'
                        ' you are in a dirty state' % self.new_branch)
@@ -43,22 +57,24 @@ class ChangedBranch(object):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if not self.is_same_branch:
-            subprocess.check_output(["git", "checkout", self.old_branch])
+            subprocess.check_output(['git', 'checkout', self.old_branch])
 
 
-Log = collections.namedtuple('Log', ['sha1', 'author', 'email', 'message'])
+def _run_cmd(cmd_str):
+    """Runs the command and returns the output.
+    Raises subprocess.CalledProcessError upon failure.
 
+    Args:
+        cmd_str (str): The command string to execute
 
-def _get_current_version():
-    """Get the newest tag in the current commits branch (the version number).
+    Returns:
+        (str): The output of the command.
 
-    Returns (str): Latest version tag
     """
-    git_describe_cmd = 'git describe --abbrev=0'.split()
-    return subprocess.check_output(git_describe_cmd).strip()
+    return subprocess.check_output(cmd_str.split(' ')).strip()
 
 
-def _gather_logs(start, stop="HEAD"):
+def _gather_logs(start, stop='HEAD'):
     """Gathers the logs between the start and endpoint.
 
     Args:
@@ -69,16 +85,12 @@ def _gather_logs(start, stop="HEAD"):
         list[Log]: List of Logs
 
     """
-    group_sep = '\x1D'
-    git_log_cmd = \
-        'git log -z --no-color --pretty=format:"%H{0}%aN{0}%aE{0}%B' \
-            .format(group_sep).split(' ')
-    git_log_cmd.append('%s..%s' % (start, stop))
-    out = subprocess.check_output(git_log_cmd).strip().split('\x00')
+    get_logs_cmd = GIT_CMD_GET_LOGS_FORMAT_STRING.format(GROUP_SEP, start, stop)
+    out = _run_cmd(get_logs_cmd).split('\x00')
     if len(out) == 1 and out[0] == '':
         return []
     else:
-        return [Log(*line.strip().split(group_sep)) for line in out]
+        return [Log(*line.strip().split(GROUP_SEP)) for line in out]
 
 
 def _extract_issues(logs):
@@ -91,10 +103,8 @@ def _extract_issues(logs):
         set[str]: Set of found issues as links to Github
 
     """
-    issue_regex = re.compile(r'#([0-9]{4})')
-    issues = issue_regex.findall(" ".join([log.message for log in logs]))
-    base_url = 'https://github.com/oppia/oppia/issues/%s'
-    links = {base_url % issue for issue in issues}
+    issues = ISSUE_REGEX.findall(' '.join([log.message for log in logs]))
+    links = {ISSUE_URL_FORMAT_STRING % issue for issue in issues}
     return links
 
 
@@ -109,17 +119,16 @@ def _check_versions(current_release):
         Dictionary consisting of name --> boolean that indicates whether or not
             it has changed.
     """
-    feconf_vars = ['CURRENT_EXPLORATION_STATES_SCHEMA_VERSION',
-                   'CURRENT_COLLECTION_SCHEMA_VERSION']
     feconf_changed_version = {}
-    git_show_cmd = ('git show %s:feconf.py' % current_release).split()
-    old_feconf = subprocess.check_output(git_show_cmd)
+    git_show_cmd = (GIT_CMD_SHOW_FORMAT_STRING % current_release)
+    old_feconf = _run_cmd(git_show_cmd)
     with open('feconf.py', 'r') as feconf:
         new_feconf = feconf.read()
-    for variable in feconf_vars:
-        version_re = r'%s\s*=\s*(\d+|\.)+'
-        old_version = re.findall(version_re % variable, old_feconf)[0]
-        new_version = re.findall(version_re % variable, new_feconf)[0]
+    for variable in FECONF_VAR_NAMES:
+        old_version = re.findall(VERSION_RE_FORMAT_STRING % variable,
+                                 old_feconf)[0]
+        new_version = re.findall(VERSION_RE_FORMAT_STRING % variable,
+                                 new_feconf)[0]
         feconf_changed_version[variable] = old_version != new_version
     return feconf_changed_version
 
@@ -135,25 +144,26 @@ def _git_diff_names_only(left, right='HEAD'):
         (list): List of files that are different between the two points.
 
     """
-    git_diff_cmd = ('git diff --name-only %s %s' % (left, right)).split()
-    return subprocess.check_output(git_diff_cmd).splitlines()
+    diff_cmd = (GIT_CMD_DIFF_NAMES_ONLY_FORMAT_STRING % (left, right))
+    return _run_cmd(diff_cmd).splitlines()
 
 
-def _check_setup_scripts(current_release, changed_only=False):
+def _check_setup_scripts(base_release_tag, changed_only=True):
     """Check if setup scripts have changed.
 
     Args:
-        current_release (str): The current release tag to diff against.
-        changed_only (bool): If set to True returns only changed scripts
+        base_release_tag (str): The current release tag to diff against.
+        changed_only (bool): If set to False will return all tested files
+            instead of just the changed ones.
 
     Returns:
         dict consisting of script --> boolean indicating whether or not it has
-            changed.
+            changed (filtered by default to those that are modified).
     """
     setup_scripts = ['scripts/%s' % item for item in
                      ['setup.sh', 'setup_gae.sh', 'install_third_party.sh',
                       'install_third_party.py']]
-    changed_files = _git_diff_names_only(current_release)
+    changed_files = _git_diff_names_only(base_release_tag)
     changes_dict = {script: script in changed_files for script in setup_scripts}
     if changed_only:
         return {name: status for name, status in changes_dict.items() if status}
@@ -178,14 +188,14 @@ def _check_storage_models(current_release):
 def main():
     """Collects necessary info and dumps it to disk."""
     with ChangedBranch('develop'):
-        current_release = _get_current_version()
+        current_release = _run_cmd(GIT_CMD_GET_CURRENT_VERSION)
         logs = _gather_logs(current_release)
         issue_links = _extract_issues(logs)
         version_changes = _check_versions(current_release)
-        setup_changes = _check_setup_scripts(current_release, changed_only=True)
+        setup_changes = _check_setup_scripts(current_release)
         storage_changes = _check_storage_models(current_release)
 
-    summary_file = os.path.join(os.getcwd(), os.pardir, "release_summary.md")
+    summary_file = os.path.join(os.getcwd(), os.pardir, 'release_summary.md')
     with open(summary_file, 'w') as out:
         out.write('## Collected release information\n')
         out.write('\n### Feconf version changes:\n')
@@ -210,12 +220,14 @@ def main():
         out.write('\n### Commit History:\n')
         for name, title in [(log.author, log.message.split('\n\n')[0])
                             for log in logs]:
-            out.write('%s: %s  \n' %(name, title))
+            out.write('%s: %s  \n' % (name, title))
 
         if issue_links:
             out.write('\n### Issues mentioned in commits:\n')
             for link in issue_links:
                 out.write('* [%s](%s)\n' % (link, link))
+
+    print 'Done. Summary file generated in ../release_summary.md'
 
 
 if __name__ == '__main__':
