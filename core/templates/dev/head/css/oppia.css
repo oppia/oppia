@@ -2348,6 +2348,20 @@ div#ng-curtain {
   width: 245px;
 }
 
+.oppia-rte-overlay {
+  display: inline-block;
+  opacity: 1;
+  top: 0;
+  left: 0;
+  z-index: 5000;
+}
+
+.oppia-noninteractive-collapsible.oppia-rte-overlay,
+.oppia-noninteractive-video.oppia-rte-overlay,
+.oppia-noninteractive-image.oppia-rte-overlay{
+  width: 100%;
+}
+
 .oppia-rte-toolbar-image {
   padding-bottom: 8px;
   padding-top: 8px;
