@@ -32,10 +32,77 @@
 {% block content %}
   <div class="oppia-profile-container" ng-controller="Profile">
     <md-card class="oppia-profile-user-card">
+      <div class="oppia-profile-user-picture-name-container">
+        <img ng-src="<[profilePictureDataUrl]>"
+        class="oppia-profile-picture-fullsize"></div>
+      <h2 class="oppia-profile-username">
+        <span popover-placement="right" ng-attr-popover="<[username.helpText]>" popover-append-to-body popover-trigger="mouseenter">
+          <strong><[username.value| truncate:16]></strong>
+        </span>
+      </h2>
+      <p class="oppia-profile-first-contributed">
+        Contributing since <[getLocaleDateString(firstContributionMsec)]>
+      </p>
+      <div class="oppia-profile-user-stat-container">
+        <div ng-repeat="stat in userDisplayedStatistics" class="oppia-profile-user-stat">
+          <div popover-placement="right" ng-attr-popover="<[stat.helpText]>" popover-append-to-body popover-trigger="mouseenter">
+            <span><strong><[stat.value || 0]></strong>
+            <span><[stat.title]></span>
+          </div>
+        </div>
+      </div>
+      <p class="oppia-profile-user-bio">
+        <span ng-if="userBio" style="white-space: pre-wrap;"><[userBio]></span>
+        <span ng-if="!userBio">
+          <em>This user has not supplied a bio yet.</em>
+        </span>
+      </p>
+      <p class="oppia-profile-subject-interest-container">
+        Interests:
+          <span ng-if="subjectInterests.length > 0"><br>
+            <span ng-repeat="interest in subjectInterests track by $index">
+              <span class="oppia-profile-subject-interest">
+                <[interest]>
+              </span>
+            </span>
+          </span>
+          <span ng-if="subjectInterests.length === 0" class="oppia-profile-no-interests-text">
+            <em>none specified</em>
+          </span>
+          </p>
     </md-card>
 
-    <md-card ng-cloak class="oppia-profile-content-card">
-      <md-content>
+    <md-card class="oppia-profile-content-card">
+      <strong>Portfolio</strong>
+      <md-content class="oppia-profile-tabs-content">
+        <div class="oppia-profile-portfolio-container">
+          <exploration-summary-tile ng-repeat="expl in userCreatedExplorations"
+              exploration-id="expl.id"
+              exploration-title="expl.title"
+              last-updated-msec="expl.last_updated_msec"
+              objective="expl.objective"
+              category="expl.category"
+              ratings="expl.ratings"
+              thumbnail-icon-url="expl.thumbnail_icon_url"
+              thumbnail-bg-color="expl.thumbnail_bg_color"
+              num-views="expl.num_views">
+          </exploration-summary-tile>
+          <exploration-summary-tile ng-repeat="expl in userEditedExplorations"
+            exploration-id="expl.id"
+            exploration-title="expl.title"
+            last-updated-msec="expl.last_updated_msec"
+            objective="expl.objective"
+            category="expl.category"
+            ratings="expl.ratings"
+            thumbnail-icon-url="expl.thumbnail_icon_url"
+            thumbnail-bg-color="expl.thumbnail_bg_color"
+            num-views="expl.num_views"
+            class="protractor-test-gallery-tile">
+          </exploration-summary-tile>
+        </div>
+        <div ng-if="userCreatedExplorations.length === 0" ng-if="userEditedExplorations.length ===0">
+          <em></br>This user hasn't created or edited any explorations yet.</em>
+        </div>
       </md-content>
     </md-card>
   </div>

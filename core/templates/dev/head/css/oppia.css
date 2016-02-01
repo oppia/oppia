@@ -125,14 +125,72 @@ body {
   background-color: #fff;
   border: 2px solid #a9a9a9;
   float: left;
-  height: 600px;
   margin-right: 28px;
+  padding: 24px;
   width: 220px;
 }
 
-.oppia-profile-subject-interest-container {
-  font-weight: bold;
+/*.oppia-profile-user-card-visible-small {
+    background-color: #fff;
+    border: 2px solid #a9a9a9;
+    float: none;
+    margin: 0 auto 12px auto;
+    padding: 24px;
+    width: 90%;
+}*/
+
+.oppia-profile-picture-fullsize {
+  /* This maintains the aspect ratio of the picture. */
+  border-radius: 4px;
+  display: block;
+  height: auto;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 180px;
+  width: 80%;
+}
+
+.oppia-profile-username {
+  display: block;
+  font-size: 120%;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.oppia-profile-first-contributed {
+  font-size: 0.6em;
+  line-height: 0%;
+  margin-top: 14px;
+  text-align: center;
+}
+
+.oppia-profile-user-stat-container {
+  display: block;
+  font-size: 12px;
+  margin-top: 20px;
+  max-width: 220px;
+  text-align: center;
+}
+
+.oppia-profile-user-stat {
+  display: inline-block;
+  width: 33%;
+}
+
+.oppia-profile-user-stat span {
+  display: block;
+}
+
+.oppia-profile-user-bio {
+  font-size: 0.7em;
+  line-height: 130%;
   margin-top: 16px;
+}
+
+.oppia-profile-subject-interest-container {
+  font-size: .7em;
+  font-weight: bold;
+  margin-top: 6px;
 }
 
 .oppia-profile-subject-interest {
@@ -140,7 +198,7 @@ body {
   border-radius: .25em;
   color: #fff;
   display: inline;
-  font-size: 0.75em;
+  font-size: 0.7em;
   line-height: 1;
   margin: 0 2px;
   padding: .3em .35em .3em .5em;
@@ -150,47 +208,29 @@ body {
 }
 
 .oppia-profile-no-interests-text {
-  color: #888;
+  font-size: .9em;
   font-weight: normal;
 }
 
-.oppia-profile-picture-fullsize {
-  /* This maintains the aspect ratio of the picture. */
-  border-radius: 4px;
-  height: auto;
-  margin-bottom: 12px;
-  max-width: 180px;
-  width: 100%;
-}
-
-.oppia-profile-username {
-  margin-top: 4px;
-}
-
-.oppia-profile-first-contributed {
-  color: #888;
-  font-size: 0.9em;
-  font-style: italic;
-  margin-top: 16px;
-}
 
 .oppia-profile-content-card {
   background-color: #fff;
   border: 2px solid #00f;
   float: left;
-  height: 800px;
+  height: 700px;
+  padding: 30px;
   width: calc(100% - 280px);
 }
 
-.oppia-stat-container-top {
-  display: inline-block;
-  width: 30%;
-}
-
-.oppia-stat-big-container {
+/*.oppia-stat-big-container {
   display: block;
   text-align: center;
   width: 100%;
+}*/
+
+/*.oppia-stat-container-top {
+  display: inline-block;
+  width: 30%;
 }
 
 .oppia-stat-container-top span {
@@ -199,28 +239,51 @@ body {
 
 .oppia-stat-container-top .oppia-big-number {
   font-size: 48px;
-}
+}*/
 
-.oppia-profile-explorations-container {
+.oppia-profile-portfolio-container {
   margin: 0 auto;
   width: 644px;
 }
 
+.oppia-exploration-summary-tile {
+  width: 60%;
+}
 
 @media (max-width: 640px) {
   .oppia-profile-container {
     width: 90%;
   }
   .oppia-profile-user-card {
-    width: 90%;
     float: none;
     margin: 0 auto 12px auto;
-    height: 275px;
+    padding: 50px;
+    width: 90%;
   }
   .oppia-profile-content-card {
     width: 90%;
     float: none;
     margin: 0 auto;
+  }
+  .oppia-profile-picture-fullsize {
+    float: left;
+    padding: 10px;
+    width: calc(80% - 50px);
+  }
+  .oppia-profile-username {
+    font-size: 150%;
+    margin-left: 30px;
+    margin-right: 0;
+  }
+  .oppia-profile-first-contributed {
+    float: left;
+    padding: 5px;
+  }
+}
+
+@media (max-width: 640px) {
+  .oppia-profile-user-card {
+    padding: 30px;
   }
 }
 
@@ -750,7 +813,7 @@ textarea {
   border-radius: 0;
   margin-top: 10px;
 }
-/* In Bootstrap,white-space for dropdown list is no-wrap.Use this instead to allign ticks and
+/* In Bootstrap,white-space for dropdown list is no-wrap.Use this instead to align ticks and
    dropdown options
 */
 .oppia-navbar-button-container > .dropdown-menu > li > a {

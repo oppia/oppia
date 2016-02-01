@@ -91,6 +91,7 @@ class ProfileHandler(base.BaseHandler):
                     user_contributions.edited_exploration_ids))
 
         self.values.update({
+            'username': user_settings.username,
             'user_bio': user_settings.user_bio,
             'subject_interests': user_settings.subject_interests,
             'first_contribution_msec': (
