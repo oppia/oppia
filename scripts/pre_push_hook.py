@@ -36,6 +36,7 @@ import collections
 import pprint
 import argparse
 import shutil
+
 # pylint: enable=wrong-import-order
 
 
@@ -45,7 +46,6 @@ FileDiff = collections.namedtuple('FileDiff', ['status', 'name'])
 
 # git hash of /dev/null, refers to an 'empty' commit
 GIT_NULL_COMMIT = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
-
 
 # caution, __file__ is here *OPPiA/.git/hooks* and not in *OPPIA/scripts*
 FILE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -126,19 +126,19 @@ def _collect_files_being_pushed(ref_list, remote):
     """
     if not ref_list:
         return [], []
+    # avoid testing of non branch pushes (tags for instance) or deletions
+    ref_heads_only = [ref for ref in ref_list
+                      if ref.local_ref.startswith('refs/heads/')]
     # get branch name from e.g. local_ref='refs/heads/lint_hook'
-    branches = [ref.local_ref.split('/')[-1] for ref in ref_list]
-    hashes = [ref.local_sha1 for ref in ref_list]
-    remote_hashes = [ref.remote_sha1 for ref in ref_list]
+    branches = [ref.local_ref.split('/')[-1] for ref in ref_heads_only]
+    hashes = [ref.local_sha1 for ref in ref_heads_only]
+    remote_hashes = [ref.remote_sha1 for ref in ref_heads_only]
     modified_files = set()
     files_to_lint = set()
     for branch, sha1, remote_sha1 in zip(branches, hashes, remote_hashes):
         # git reports the following for an empty / non existing branch
         # sha1: '0000000000000000000000000000000000000000'
-        if set(sha1) == {'0'}:
-            # We are deleting a branch, nothing to do
-            continue
-        elif set(remote_sha1) != {'0'}:
+        if set(remote_sha1) != {'0'}:
             try:
                 file_diffs = _compare_to_remote(remote, branch)
             except ValueError as e:
