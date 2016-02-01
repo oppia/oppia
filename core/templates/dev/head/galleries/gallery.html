@@ -160,17 +160,17 @@
       <div class="oppia-gallery-tiles-area">
         <div class="oppia-gallery-tiles-container">
           <div ng-if="allExplorationsInOrder.length === 0" class="oppia-gallery-tiles-introduction">
-            <em>
-              We don't have any explorations matching this query yet.
-            </em>
-            <br><br>
-            <div style="display: inline-block;">
-            <!-- NOTE: If you change the links here, please make the corresponding change for the 'Create New Exploration' button. -->
-              {% if not has_fully_registered %}
-                <a href="{{gallery_login_redirect_url}}">Would you like to create one?</a>
-              {% else %}
-                <a ng-click="showCreateExplorationModal()">Would you like to create one?</a>
-              {% endif %}
+            <div class="oppia-gallery-no-match">
+              <img src="/images/general/no_explorations_found.png" alt="No explorations found">
+              <p style="text-align: center;">
+                Oops, it looks like your search didn't match any explorations.<br><br>
+                <!-- NOTE: If you change the links here, please make the corresponding change for the 'Create New Exploration' button. -->
+                {% if not has_fully_registered %}
+                  Would you like to <a href="{{gallery_login_redirect_url}}">create one</a>?
+                {% else %}
+                  Would you like to <a ng-click="showCreateExplorationModal()">create one</a>?
+                {% endif %}
+              </p>
             </div>
           </div>
 
@@ -194,9 +194,7 @@
       </div>
       <div class="oppia-gallery-loading-results-message" ng-if="pageLoaderIsBusy">
         Loading more results
-        <span class="oppia-loading-dot-one">.</span>
-        <span class="oppia-loading-dot-two">.</span>
-        <span class="oppia-loading-dot-three">.</span>
+        <loading-dots></loading-dots>
       </div>
     </div>
   </div>

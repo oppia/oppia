@@ -103,7 +103,7 @@ class ExplorationContributorsSummaryOneOffJob(jobs.BaseMapReduceJobManager):
             return
 
         summary = exp_services.get_exploration_summary_by_id(item.id)
-        summary.contributor_summary = (
+        summary.contributors_summary = (
             exp_services.compute_exploration_contributors_summary(item.id))
         exp_services.save_exploration_summary(summary)
 

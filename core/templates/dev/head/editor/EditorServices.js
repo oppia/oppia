@@ -679,6 +679,9 @@ oppia.factory('explorationStatesService', [
       getStates: function() {
         return angular.copy(_states);
       },
+      hasState: function(stateName) {
+        return _states.hasOwnProperty(stateName);
+      },
       getState: function(stateName) {
         return angular.copy(_states[stateName]);
       },
