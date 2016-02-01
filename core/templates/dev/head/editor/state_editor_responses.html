@@ -17,7 +17,7 @@
               <img ng-if="editabilityService.isEditable()" src="/images/general/drag_dots.png" width="10">
             </span>
             <div class="oppia-rule-header-warning-placement" ng-if="isSelfLoopWithNoFeedback(answerGroup.outcome)" ng-click="changeActiveAnswerGroupIndex($index)"
-                 tooltip="Please give Oppia something useful to say or direct the learner to a different card." tooltip-placement="bottom">   
+                 tooltip="Please give Oppia something useful to say or direct the learner to a different card." tooltip-placement="bottom">
               <div class="oppia-rule-header-warning-style" >
                 ⚠
               </div>
@@ -54,7 +54,7 @@
         <ul class="nav nav-stacked nav-pills" role="tablist">
           <li ng-class="{'active': activeAnswerGroupIndex === answerGroups.length}" class="oppia-rule-block">
             <div class="oppia-rule-header-warning-placement" ng-if="isSelfLoopWithNoFeedback(defaultOutcome)" ng-click="changeActiveAnswerGroupIndex(answerGroups.length)"
-                 tooltip="Please give Oppia something useful to say or direct the learner to a different card." tooltip-placement="bottom">   
+                 tooltip="Please give Oppia something useful to say or direct the learner to a different card." tooltip-placement="bottom">
               <div class="oppia-rule-header-warning-style" >
                 ⚠
               </div>
@@ -188,7 +188,7 @@
            style="height: 100%; margin-right: 22px;">
         <div class="oppia-rule-details-header oppia-editable-section">
           <div class="oppia-rule-preview oppia-transition-200">
-            <div class="oppia-click-to-start-editing" ng-click="openFeedbackEditor()">
+            <div class="oppia-click-to-start-editing protractor-test-open-feedback-editor" ng-click="openFeedbackEditor()">
             </div>
             <strong>Oppia tells the learner...</strong>
             <div style="position: relative;">

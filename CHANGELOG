@@ -2,6 +2,54 @@ This file contains a summary of changes to the Oppia code base. For a full chang
 
     https://github.com/oppia/oppia/commits/master
 
+v2.1.3 (31 Jan 2016)
+--------------------
+Learner page:
+* Allow learners to make suggestions for changes to exploration content.
+* Fix #1279: Fix a bug where long usernames in the info card overflow the tooltip.
+* Fix #1332: Show only 1 decimal place for ratings.
+* Show 'Unrated' in the exploration information card when an exploration has no ratings.
+
+Gallery page:
+* Fix #918: Redesign the 'no search results found' message.
+
+Interactions:
+* ImageClickInput: fix misalignment of clickable regions.
+* MusicNotesInput: move the logic from the controller to the link function.
+* CodeRepl:
+  - Fix #1383: Allow imports in the learner’s code.
+  - Fix #1327: Show prepended and appended code.
+  - Gray out prepended and appended code sections.
+* Add rules for the Graph interaction to check if a graph is regular, acyclic, strongly connected or weakly connected.
+
+Editor page:
+* Fix #1090: Change the rule feedback editor to only require either feedback or a new destination, and add a warning sign to the answer group if neither is specified.
+* Fix #1255: Add a “Saving…” indicator after the 'Save Changes' button is clicked.
+* Remove the need to specify icon data URLs manually for RTE components.
+* Put a gray overlay over the state and interaction editors when they are hovered over.
+* Change popover placement for the intro tutorial.
+* Make history graph legend non-clickable.
+* Fix overlapping buttons in exploration settings.
+
+Infrastructure:
+* Add a push hook that runs the linter and frontend tests.
+* Add a script to simplify releases by summarizing authors, commit messages, and schema, setup script, and storage model changes.
+* Add a job to compute the number of commits done by each contributor in each exploration.
+* Skip the SDK update in the e2e tests script.
+* Add parallelization to the linter.
+* Split up the frontend player view into separate files.
+* Add ‘OpenJDK’ (for Skulpt) and ‘unzip’ to the prerequisite-installation script.
+* Remove frontend tests for displaying dates in users’ locales.
+* Add a frontend service for computing expression output types.
+
+Demo explorations:
+* Add a new demo exploration which contains every interaction Oppia currently supports (for testing purposes).
+* Remove the cities exploration.
+* Update the demo explorations list to be explicitly mapped by id.
+
+Other:
+* Update contribution instructions in CONTRIBUTING.md.
+
 
 v2.1.2 (6 Jan 2016)
 -------------------
