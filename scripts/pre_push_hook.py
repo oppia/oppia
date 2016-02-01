@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-'''Pre-push hook that executes the Python/JS linters on all files that
+"""Pre-push hook that executes the Python/JS linters on all files that
 deviate from develop.
 (By providing the list of files to `scripts/pre_commit_linter.py`)
 To install the hook manually simply execute this script from the oppia root dir
@@ -25,7 +25,7 @@ To bypass the validation upon `git push` use the following command:
 This hook works only on Unix like systems as of now.
 On Vagrant under Windows it will still copy the hook to the .git/hooks dir
 but it will have no effect.
-'''
+"""
 
 # Pylint has issues with the import order of argparse.
 # pylint: disable=wrong-import-order
@@ -58,7 +58,7 @@ FRONTEND_TEST_SCRIPT = 'run_frontend_tests.sh'
 
 
 def _start_subprocess_for_result(cmd):
-    '''Starts subprocess and returns (stdout, stderr)'''
+    """Starts subprocess and returns (stdout, stderr)"""
     task = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE)
     out, err = task.communicate()
@@ -66,7 +66,7 @@ def _start_subprocess_for_result(cmd):
 
 
 def _git_diff_name_status(left, right, diff_filter=''):
-    '''Compare two branches/commits etc with git.
+    """Compare two branches/commits etc with git.
     Parameter:
         left: the lefthand comperator
         right: the righthand comperator
@@ -75,7 +75,7 @@ def _git_diff_name_status(left, right, diff_filter=''):
         List of FileDiffs (tuple with name/status)
     Raises:
         ValueError if git command fails
-    '''
+    """
     git_cmd = ['git', 'diff', '--name-status']
     if diff_filter:
         git_cmd.append('--diff-filter={}'.format(diff_filter))
@@ -90,7 +90,7 @@ def _git_diff_name_status(left, right, diff_filter=''):
 
 
 def _compare_to_remote(remote, local_branch, remote_branch=None):
-    '''Compare local with remote branch with git diff.
+    """Compare local with remote branch with git diff.
     Parameter:
         remote: Git remote being pushed to
         local_branch: Git branch being pushed to
@@ -101,14 +101,14 @@ def _compare_to_remote(remote, local_branch, remote_branch=None):
         but not deleted
     Raises:
         ValueError if git command fails
-    '''
+    """
     remote_branch = remote_branch if remote_branch else local_branch
     git_remote = '%s/%s' % (remote, remote_branch)
     return _git_diff_name_status(git_remote, local_branch)
 
 
 def _extract_files_to_lint(file_diffs):
-    '''Grab only files out of a list of FileDiffs that have a ACMRT status'''
+    """Grab only files out of a list of FileDiffs that have a ACMRT status"""
     if not file_diffs:
         return []
     lint_files = [f.name for f in file_diffs
@@ -117,13 +117,13 @@ def _extract_files_to_lint(file_diffs):
 
 
 def _collect_files_being_pushed(ref_list, remote):
-    '''Collect modified files and filter those that need linting.
+    """Collect modified files and filter those that need linting.
     Parameter:
         ref_list: list of references to parse (provided by git in stdin)
         remote: the remote being pushed to
     Returns:
         Tuple of lists of changed_files, files_to_lint
-    '''
+    """
     if not ref_list:
         return [], []
     # get branch name from e.g. local_ref='refs/heads/lint_hook'
