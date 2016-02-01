@@ -7,7 +7,7 @@
 
         <div class="exploration-profile" ng-mouseenter="showBriefContributors=true"
                                          ng-mouseleave="showBriefContributors=false">
-          <profile-link-image username="contributors[0]" style="position:relative"
+          <profile-link-image username="contributors[0]"
            tooltip="<[contributors[0]]>" tooltip-placement="left">
           </profile-link-image>
           <p ng-if="!showBriefContributors && contributors.length > 1"
@@ -22,8 +22,8 @@
           </div>
 
           <div style="position:relative;" ng-if="showBriefContributors && contributors.length > 5">
-            <img style="position: absolute; left: 0px; top: 0px;" ng-if="!isUsernameLinkable(username())"
-                 ng-src="/images/avatar/oppia_all_black.png" alt="">
+            <img style="position: absolute; left: 0px; top: 0px;"
+             ng-src="/images/avatar/oppia_all_black.png" alt="">
             <small style="position: absolute; left: 5px; top: 3px; color:white;">
               +<[contributors.length-5]>
             </small>
