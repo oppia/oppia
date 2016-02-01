@@ -186,8 +186,10 @@
                                       thumbnail-icon-url="exp.thumbnail_icon_url"
                                       thumbnail-bg-color="exp.thumbnail_bg_color"
                                       num-views="exp.num_views"
+                                      contributors-summary="exp.contributors_summary"
                                       class="protractor-test-gallery-tile"
                                       style="display: inline-block;">
+
             </exploration-summary-tile>
           </div>
         </div>
@@ -200,12 +202,15 @@
   </div>
 
   {% include 'components/exploration_creation_button_modal.html' %}
+  {% include 'components/profile_link_image_directive.html' %}
+
 {% endblock %}
 
 {% block footer_js %}
   {{ super() }}
   <script>
     {{ include_js_file('components/ExplorationCreationButtonService.js') }}
+    {{ include_js_file('components/ProfileLinkImageDirective.js') }}
     {{ include_js_file('galleries/Gallery.js') }}
   </script>
 {% endblock footer_js %}

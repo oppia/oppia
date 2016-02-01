@@ -30,6 +30,7 @@ oppia.directive('explorationSummaryTile', [function() {
       getObjective: '&objective',
       getCategory: '&category',
       getRatings: '&ratings',
+      getContributorsSummary: '&contributorsSummary',
       getThumbnailIconUrl: '&thumbnailIconUrl',
       getThumbnailBgColor: '&thumbnailBgColor',
       // If this is not null, the new exploration opens in a new window when
@@ -40,6 +41,14 @@ oppia.directive('explorationSummaryTile', [function() {
     controller: [
       '$scope', 'oppiaDatetimeFormatter', 'RatingComputationService',
       function($scope, oppiaDatetimeFormatter, RatingComputationService) {
+        $scope.contributors = Object.keys($scope.getContributorsSummary()).sort(
+          function(a, b) {
+            var avalue = $scope.getContributorsSummary()[a];
+            var bvalue = $scope.getContributorsSummary()[b];
+            return bvalue - avalue;
+          }
+        );
+
         $scope.getAverageRating = function() {
           return RatingComputationService.computeAverageRating(
             $scope.getRatings());
@@ -61,6 +70,8 @@ oppia.directive('explorationSummaryTile', [function() {
           }
           return result;
         };
+
+        $scope.showBriefContributors = false;
       }
     ]
   };

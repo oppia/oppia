@@ -108,27 +108,20 @@ class ExplorationDisplayableSummaries(
         displayable_summaries = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
                 [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3]))
-
-        self.assertEqual(len(displayable_summaries), 1)
-        self.assertEqual(
-            displayable_summaries[0]['id'], self.EXP_ID_2)
-        self.assertEqual(
-            displayable_summaries[0]['status'],
-            rights_manager.ACTIVITY_STATUS_PUBLIC)
-        self.assertEqual(
-            displayable_summaries[0]['community_owned'], False)
-        self.assertEqual(
-            displayable_summaries[0]['language_code'],
-            feconf.DEFAULT_LANGUAGE_CODE)
-        self.assertEqual(
-            displayable_summaries[0]['category'], 'A category')
-        self.assertEqual(
-            displayable_summaries[0]['ratings'], feconf.get_empty_ratings())
-        self.assertEqual(
-            displayable_summaries[0]['title'], 'Exploration 2 Albert title')
-        self.assertEqual(
-            displayable_summaries[0]['contributor_names'], [self.ALBERT_NAME])
-        self.assertEqual(
-            displayable_summaries[0]['objective'], 'An objective')
-        self.assertEqual(displayable_summaries[0]['num_views'], 0)
-        self.assertIn('last_updated_msec', displayable_summaries[0])
+        expect_summary = {
+            'status': u'public',
+            'thumbnail_bg_color': '#05a69a',
+            'community_owned': False,
+            'tags': [],
+            'thumbnail_icon_url': '/images/gallery/thumbnails/Lightbulb.svg',
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'contributors_summary': {self.ALBERT_NAME: 2},
+            'id': self.EXP_ID_2,
+            'category': u'A category',
+            'ratings': feconf.get_empty_ratings(),
+            'title': u'Exploration 2 Albert title',
+            'num_views': 0,
+            'objective': u'An objective',
+            'contributor_names': [self.ALBERT_NAME]
+        }
+        self.assertDictContainsSubset(expect_summary, displayable_summaries[0])
