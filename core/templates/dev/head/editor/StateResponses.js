@@ -551,6 +551,14 @@ oppia.controller('StateResponses', [
             $scope.saveResponse = function(reopen) {
               $scope.$broadcast('saveOutcomeFeedbackDetails');
               $scope.$broadcast('saveOutcomeDestDetails');
+
+              // If the feedback editor is never opened, replace the feedback
+              // with an empty array.
+              if ($scope.tmpOutcome.feedback.length === 1 &&
+                  $scope.tmpOutcome.feedback[0] === '') {
+                $scope.tmpOutcome.feedback = [];
+              }
+
               // Close the modal and save it afterwards.
               $modalInstance.close({
                 tmpRule: angular.copy($scope.tmpRule),
