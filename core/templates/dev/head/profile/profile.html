@@ -40,13 +40,13 @@
           <strong><[username.value| truncate:16]></strong>
         </span>
       </h2>
-      <p class="oppia-profile-first-contributed">
+      <p class="oppia-profile-first-contributed" ng-if="firstContributionMsec">
         Contributing since <[getLocaleDateString(firstContributionMsec)]>
       </p>
       <div class="oppia-profile-user-stat-container">
         <div ng-repeat="stat in userDisplayedStatistics" class="oppia-profile-user-stat">
           <div popover-placement="right" ng-attr-popover="<[stat.helpText]>" popover-append-to-body popover-trigger="mouseenter">
-            <span><strong><[stat.value || 0]></strong>
+            <span style="font-size: 16px"><strong><[stat.value || 0]></strong></span>
             <span><[stat.title]></span>
           </div>
         </div>
@@ -74,36 +74,25 @@
 
     <md-card class="oppia-profile-content-card">
       <strong>Portfolio</strong>
-      <md-content class="oppia-profile-tabs-content">
-        <div class="oppia-profile-portfolio-container">
-          <exploration-summary-tile ng-repeat="expl in userCreatedExplorations"
-              exploration-id="expl.id"
-              exploration-title="expl.title"
-              last-updated-msec="expl.last_updated_msec"
-              objective="expl.objective"
-              category="expl.category"
-              ratings="expl.ratings"
-              thumbnail-icon-url="expl.thumbnail_icon_url"
-              thumbnail-bg-color="expl.thumbnail_bg_color"
-              num-views="expl.num_views">
-          </exploration-summary-tile>
-          <exploration-summary-tile ng-repeat="expl in userEditedExplorations"
-            exploration-id="expl.id"
-            exploration-title="expl.title"
-            last-updated-msec="expl.last_updated_msec"
-            objective="expl.objective"
-            category="expl.category"
-            ratings="expl.ratings"
-            thumbnail-icon-url="expl.thumbnail_icon_url"
-            thumbnail-bg-color="expl.thumbnail_bg_color"
-            num-views="expl.num_views"
-            class="protractor-test-gallery-tile">
-          </exploration-summary-tile>
-        </div>
-        <div ng-if="userCreatedExplorations.length === 0" ng-if="userEditedExplorations.length ===0">
+      <md-content class="oppia-profile-portfolio-container">
+        <exploration-summary-tile ng-repeat="expl in userEditedExplorations"
+          exploration-id="expl.id"
+          exploration-title="expl.title"
+          last-updated-msec="expl.last_updated_msec"
+          objective="expl.objective"
+          category="expl.category"
+          ratings="expl.ratings"
+          thumbnail-icon-url="expl.thumbnail_icon_url"
+          thumbnail-bg-color="expl.thumbnail_bg_color"
+          num-views="expl.num_views">
+        </exploration-summary-tile>
+        <div ng-if="userCreatedExplorations.length === 0" ng-if="userEditedExplorations.length === 0">
           <em></br>This user hasn't created or edited any explorations yet.</em>
         </div>
       </md-content>
+      <span class="oppia-profile-portfolio-pages" ng-if="userPortfolioExplorations > 4">
+        Showing #-# of <[userPortfolioExplorations]>
+      </span>
     </md-card>
   </div>
 {% endblock %}

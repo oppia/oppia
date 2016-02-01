@@ -52,6 +52,7 @@ oppia.controller('Profile', [
       }];
       $scope.userCreatedExplorations = data.created_exp_summary_dicts;
       $scope.userEditedExplorations = data.edited_exp_summary_dicts;
+      $scope.userPortfolioExplorations = data.edited_exp_summary_dicts.length;
       $scope.subjectInterests = data.subject_interests;
       $scope.firstContributionMsec = data.first_contribution_msec;
       $scope.profilePictureDataUrl = (

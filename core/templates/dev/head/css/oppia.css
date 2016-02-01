@@ -117,7 +117,7 @@ body {
   margin-right: auto;
   margin-top: 60px;
   margin-bottom: 30px;
-  max-width: 800px;
+  max-width: 980px;
   width: 90%;
 }
 
@@ -147,18 +147,18 @@ body {
   margin-left: auto;
   margin-right: auto;
   max-width: 180px;
-  width: 80%;
+  width: 90%;
 }
 
 .oppia-profile-username {
   display: block;
-  font-size: 120%;
+  font-size: 150%;
   margin-top: 20px;
   text-align: center;
 }
 
 .oppia-profile-first-contributed {
-  font-size: 0.6em;
+  font-size: 0.7em;
   line-height: 0%;
   margin-top: 14px;
   text-align: center;
@@ -188,7 +188,7 @@ body {
 }
 
 .oppia-profile-subject-interest-container {
-  font-size: .7em;
+  font-size: .8em;
   font-weight: bold;
   margin-top: 6px;
 }
@@ -198,7 +198,7 @@ body {
   border-radius: .25em;
   color: #fff;
   display: inline;
-  font-size: 0.7em;
+  font-size: 0.8em;
   line-height: 1;
   margin: 0 2px;
   padding: .3em .35em .3em .5em;
@@ -217,38 +217,27 @@ body {
   background-color: #fff;
   border: 2px solid #00f;
   float: left;
-  height: 700px;
+  margin-bottom: 80px;
+  min-height: 500px;
   padding: 30px;
   width: calc(100% - 280px);
 }
 
-/*.oppia-stat-big-container {
-  display: block;
-  text-align: center;
-  width: 100%;
-}*/
-
-/*.oppia-stat-container-top {
-  display: inline-block;
-  width: 30%;
-}
-
-.oppia-stat-container-top span {
-  display: block;
-}
-
-.oppia-stat-container-top .oppia-big-number {
-  font-size: 48px;
-}*/
-
 .oppia-profile-portfolio-container {
   margin: 0 auto;
-  width: 644px;
+  width: 100%;
 }
 
-.oppia-exploration-summary-tile {
-  width: 60%;
+.oppia-profile-portfolio-pages {
+  display: block;
+  font-size: .7em;
+  margin-top: 5px;
+  text-align: right;
 }
+
+/*.oppia-exploration-summary-tile {
+  width: 60%;
+}*/
 
 @media (max-width: 640px) {
   .oppia-profile-container {
