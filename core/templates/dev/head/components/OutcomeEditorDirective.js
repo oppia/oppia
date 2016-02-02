@@ -33,17 +33,25 @@ oppia.directive('outcomeEditor', [function() {
         $scope.editOutcomeForm = {};
         $scope.feedbackEditorIsOpen = false;
         $scope.destinationEditorIsOpen = false;
-        $scope.outcomeFeedbackMemento = null;
-        $scope.outcomeDestMemento = null;
+        $scope.savedOutcome = angular.copy($scope.outcome);
 
         var onExternalSave = function() {
-          if ($scope.feedbackEditorIsOpen &&
-              $scope.editOutcomeForm.editFeedbackForm.$valid) {
-            $scope.saveThisFeedback();
+          if ($scope.feedbackEditorIsOpen) {
+            if ($scope.editOutcomeForm.editFeedbackForm.$valid &&
+                !$scope.invalidStateAfterFeedbackSave()) {
+              $scope.saveThisFeedback();
+            } else {
+              $scope.cancelThisFeedbackEdit();
+            }
           }
-          if ($scope.destinationEditorIsOpen &&
-              $scope.editOutcomeForm.editDestForm.$valid) {
-            $scope.saveThisDestination();
+
+          if ($scope.destinationEditorIsOpen) {
+            if ($scope.editOutcomeForm.editDestForm.$valid &&
+                !$scope.invalidStateAfterDestinationSave()) {
+              $scope.saveThisDestination();
+            } else {
+              $scope.cancelThisDestinationEdit();
+            }
           }
         };
 
@@ -72,11 +80,18 @@ oppia.directive('outcomeEditor', [function() {
 
           return $scope.isSelfLoop(outcome) && !hasFeedback;
         };
-
+        $scope.invalidStateAfterFeedbackSave = function() {
+          var tmpOutcome = angular.copy($scope.savedOutcome);
+          tmpOutcome.feedback = angular.copy($scope.outcome.feedback);
+          return $scope.isSelfLoopWithNoFeedback(tmpOutcome);
+        };
+        $scope.invalidStateAfterDestinationSave = function() {
+          var tmpOutcome = angular.copy($scope.savedOutcome);
+          tmpOutcome.dest = angular.copy($scope.outcome.dest);
+          return $scope.isSelfLoopWithNoFeedback(tmpOutcome);
+        };
         $scope.openFeedbackEditor = function() {
           if ($scope.isEditable()) {
-            $scope.outcomeFeedbackMemento = angular.copy(
-              $scope.outcome.feedback);
             $scope.feedbackEditorIsOpen = true;
             if ($scope.outcome.feedback.length === 0) {
               $scope.outcome.feedback.push('');
@@ -86,7 +101,6 @@ oppia.directive('outcomeEditor', [function() {
 
         $scope.openDestinationEditor = function() {
           if ($scope.isEditable()) {
-            $scope.outcomeDestMemento = angular.copy($scope.outcome.dest);
             $scope.destinationEditorIsOpen = true;
           }
         };
@@ -94,26 +108,24 @@ oppia.directive('outcomeEditor', [function() {
         $scope.saveThisFeedback = function() {
           $scope.$broadcast('saveOutcomeFeedbackDetails');
           $scope.feedbackEditorIsOpen = false;
-          $scope.outcomeFeedbackMemento = null;
-          $scope.getOnSaveFeedbackFn()($scope.outcome);
+          $scope.savedOutcome.feedback = angular.copy($scope.outcome.feedback);
+          $scope.getOnSaveFeedbackFn()($scope.savedOutcome);
         };
 
         $scope.saveThisDestination = function() {
           $scope.$broadcast('saveOutcomeDestDetails');
           $scope.destinationEditorIsOpen = false;
-          $scope.outcomeDestMemento = null;
-          $scope.getOnSaveDestFn()($scope.outcome);
+          $scope.savedOutcome.dest = angular.copy($scope.outcome.dest);
+          $scope.getOnSaveDestFn()($scope.savedOutcome);
         };
 
         $scope.cancelThisFeedbackEdit = function() {
-          $scope.outcome.feedback = angular.copy($scope.outcomeFeedbackMemento);
-          $scope.outcomeFeedbackMemento = null;
+          $scope.outcome.feedback = angular.copy($scope.savedOutcome.feedback);
           $scope.feedbackEditorIsOpen = false;
         };
 
         $scope.cancelThisDestinationEdit = function() {
-          $scope.outcome.dest = angular.copy($scope.outcomeDestMemento);
-          $scope.outcomeDestMemento = null;
+          $scope.outcome.dest = angular.copy($scope.savedOutcome.dest);
           $scope.destinationEditorIsOpen = false;
         };
       }

@@ -153,15 +153,18 @@
       <div class="oppia-gallery-tiles-area">
         <div class="oppia-gallery-tiles-container">
           <div ng-if="allExplorationsInOrder.length === 0" class="oppia-gallery-tiles-introduction">
-            <em translate="I18N_GALLERY_NO_EXPLORATION_FOR_QUERY"></em>
-            <br><br>
-            <div style="display: inline-block;">
-            <!-- NOTE: If you change the links here, please make the corresponding change for the 'Create New Exploration' button. -->
-              {% if not has_fully_registered %}
-                <a href="{{gallery_login_redirect_url}}" translate="I18N_GALLERY_CREATE_EXPLORATION_QUESTION"></a>
-              {% else %}
-                <a ng-click="showCreateExplorationModal()" translate="I18N_GALLERY_CREATE_EXPLORATION_QUESTION"></a>
-              {% endif %}
+            <div class="oppia-gallery-no-match">
+              <img src="/images/general/no_explorations_found.png" alt="No explorations found">
+              <p style="text-align: center;">
+                <em translate="I18N_GALLERY_NO_EXPLORATION_FOR_QUERY"></em>
+                <br><br>
+                <!-- NOTE: If you change the links here, please make the corresponding change for the 'Create New Exploration' button. -->
+                {% if not has_fully_registered %}
+                  <a href="{{gallery_login_redirect_url}}" translate="I18N_GALLERY_CREATE_EXPLORATION_QUESTION"></a>
+                {% else %}
+                  <a ng-click="showCreateExplorationModal()" translate="I18N_GALLERY_CREATE_EXPLORATION_QUESTION"></a>
+                {% endif %}
+              </p>
             </div>
           </div>
 
@@ -177,16 +180,15 @@
                                       thumbnail-icon-url="exp.thumbnail_icon_url"
                                       thumbnail-bg-color="exp.thumbnail_bg_color"
                                       num-views="exp.num_views"
-                                      class="protractor-test-gallery-tile">
+                                      class="protractor-test-gallery-tile"
+                                      style="display: inline-block;">
             </exploration-summary-tile>
           </div>
         </div>
       </div>
       <div class="oppia-gallery-loading-results-message" ng-if="pageLoaderIsBusy">
         Loading more results
-        <span class="oppia-loading-dot-one">.</span>
-        <span class="oppia-loading-dot-two">.</span>
-        <span class="oppia-loading-dot-three">.</span>
+        <loading-dots></loading-dots>
       </div>
     </div>
   </div>

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash 
+#!/usr/bin/env bash
 
 # Copyright 2016 The Oppia Authors. All Rights Reserved.
 #
@@ -18,7 +18,7 @@
 
 # INSTRUCTIONS:
 #
-# This script sets up a development dependencies for running Oppia. 
+# This script sets up a development dependencies for running Oppia.
 # Run the script from the oppia root folder:
 #
 #   bash scripts/install_prerequisites.sh
@@ -26,9 +26,12 @@
 # Note that the root folder MUST be named 'oppia'.
 
 sudo apt-get update
-sudo apt-get install git
 sudo apt-get install curl
+sudo apt-get install git
+sudo apt-get install openjdk-7-jre
 sudo apt-get install python-setuptools
 sudo apt-get install python-dev
-sudo apt-get install python-pip 
+sudo apt-get install python-pip
+sudo apt-get install unzip
+
 sudo pip install --upgrade pip

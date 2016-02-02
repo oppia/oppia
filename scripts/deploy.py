@@ -29,8 +29,9 @@ IMPORTANT NOTES:
     folder should contain a folder called /images, which in turn should
     contain:
     - one file: favicon.ico
-    - four folders: /avatar, /logo, /splash and /sidebar, containing images
-        used for the avatar, logo, gallery carousel and sidebar, respectively.
+    - five folders: /avatar, /general, /logo, /splash and /sidebar, containing
+        images used for the avatar, general-purpose usage, logo, gallery
+        carousel and sidebar, respectively.
 
 2.  Before running this script, you must install third-party dependencies by
     running
@@ -47,11 +48,14 @@ IMPORTANT NOTES:
     named 'oppia'.
 """
 
+# Pylint has issues with the import order of argparse.
+# pylint: disable=wrong-import-order
 import argparse
 import datetime
 import os
 import shutil
 import subprocess
+# pylint: enable=wrong-import-order
 
 import common
 
@@ -81,7 +85,7 @@ THIRD_PARTY_DIR = os.path.join('.', 'third_party')
 DEPLOY_DATA_PATH = os.path.join(os.getcwd(), '..', 'deploy_data', APP_NAME)
 
 SPLASH_PAGE_FILES = ['favicon.ico']
-IMAGE_DIRS = ['avatar', 'splash', 'sidebar', 'logo']
+IMAGE_DIRS = ['avatar', 'general', 'splash', 'sidebar', 'logo']
 
 
 def preprocess_release():

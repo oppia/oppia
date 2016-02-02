@@ -93,6 +93,13 @@ oppia.factory('explorationContextService', [
             'ERROR: explorationContextService should not be used outside the ' +
             'context of an exploration.');
         }
+      },
+
+      // Following variable helps to know whether exploration editor is
+      // in main editing mode or preview mode.
+      isInExplorationEditorMode: function() {
+        return (this.getPageContext() === PAGE_CONTEXT.EDITOR &&
+            this.getEditorTabContext() === EDITOR_TAB_CONTEXT.EDITOR);
       }
     };
   }

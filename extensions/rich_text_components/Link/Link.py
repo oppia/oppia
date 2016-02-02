@@ -51,14 +51,3 @@ class Link(base.BaseRichTextComponent):
         },
         'default_value': False,
     }]
-
-    icon_data_url = (
-        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1%2BjfqA'
-        'AAABGdBTUEAAK/INwWK6QAAABl0RVh0%0AU29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXH'
-        'JZTwAAADpSURBVCjPY/jPgB8y0EmBHXdWaeu7ef9r%0AHuaY50jU3J33v/VdVqkdN1SBE'
-        'ZtP18T/L/7f/X/wf%2BO96kM3f9z9f%2BT/xP8%2BXUZsYAWGfsUfrr6L%0A2Ob9J/X/p'
-        'P%2BV/1P/e/%2BJ2LbiYfEHQz%2BICV1N3yen%2B3PZf977/9z/Q//X/rf/7M81Ob3pu1'
-        'EXWIFu%0AZvr7aSVBOx1/uf0PBEK3/46/gnZOK0l/r5sJVqCp6Xu99/2qt%2Bv%2BT/9f'
-        '%2BL8CSK77v%2Bpt73vf65qa%0AYAVqzPYGXvdTvmR/z/4ZHhfunP0p%2B3vKF6/79gZq'
-        'zPQLSYoUAABKPQ%2BkpVV/igAAAABJRU5ErkJg%0Agg%3D%3D%0A'
-    )

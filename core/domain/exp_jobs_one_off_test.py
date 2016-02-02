@@ -183,6 +183,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                     exp_rights_model.editor_ids,
                     exp_rights_model.viewer_ids,
                     [admin_id],
+                    {admin_id: 1},
                     exploration.version,
                     exploration_model_created_on,
                     exploration_model_last_updated)
@@ -225,7 +226,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                             'language_code', 'tags', 'ratings', 'status',
                             'community_owned', 'owner_ids',
                             'editor_ids', 'viewer_ids',
-                            'contributor_ids', 'version',
+                            'contributor_ids', 'contributors_summary', 'version',
                             'exploration_model_created_on']
             for exp_id in actual_job_output:
                 for prop in simple_props:

@@ -562,6 +562,7 @@ oppia.factory('rteHelperService', [
         name: RTE_COMPONENT_SPECS[componentId].frontend_name,
         iconDataUrl: RTE_COMPONENT_SPECS[componentId].icon_data_url,
         isComplex: RTE_COMPONENT_SPECS[componentId].is_complex,
+        requiresFs: RTE_COMPONENT_SPECS[componentId].requires_fs,
         tooltip: RTE_COMPONENT_SPECS[componentId].tooltip
       });
     });
@@ -675,10 +676,12 @@ oppia.factory('rteHelperService', [
 oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [
     '$delegate', '$modal', '$timeout', 'focusService', 'taRegisterTool',
-    'rteHelperService',
+    'rteHelperService', 'warningsData', 'explorationContextService',
+    'PAGE_CONTEXT',
     function(
         taOptions, $modal, $timeout, focusService, taRegisterTool,
-        rteHelperService) {
+        rteHelperService, warningsData, explorationContextService,
+        PAGE_CONTEXT) {
       taOptions.disableSanitizer = true;
       taOptions.classes.textEditor = 'form-control oppia-rte-content';
       taOptions.setup.textEditorSetup = function($element) {
@@ -698,8 +701,8 @@ oppia.config(['$provide', function($provide) {
           backdrop: 'static',
           resolve: {},
           controller: [
-              '$scope', '$modalInstance', '$timeout',
-              function($scope, $modalInstance, $timeout) {
+            '$scope', '$modalInstance', '$timeout',
+            function($scope, $modalInstance, $timeout) {
             $scope.customizationArgSpecs = customizationArgSpecs;
 
             // Without this code, the focus will remain in the background RTE
@@ -752,10 +755,16 @@ oppia.config(['$provide', function($provide) {
 
       rteHelperService.getRichTextComponents().forEach(function(componentDefn) {
         var buttonDisplay = rteHelperService.createToolbarIcon(componentDefn);
+        var canUseFs = explorationContextService.getPageContext() ===
+          PAGE_CONTEXT.EDITOR;
 
         taRegisterTool(componentDefn.name, {
           display: buttonDisplay.outerHTML,
           tooltiptext: componentDefn.tooltip,
+          disabled: function() {
+            // Disable components that affect fs for non-editors.
+            return !canUseFs && componentDefn.requiresFs;
+          },
           onElementSelect: {
             element: 'img',
             filter: function(elt) {
@@ -764,6 +773,15 @@ oppia.config(['$provide', function($provide) {
             action: function(event, $element) {
               event.preventDefault();
               var textAngular = this;
+
+              if (!canUseFs && componentDefn.requiresFs) {
+                var FS_UNAUTHORIZED_WARNING = 'Unfortunately, only ' +
+                  'exploration authors can make changes involving files.';
+                warningsData.addWarning(FS_UNAUTHORIZED_WARNING);
+                // Without this, the view will not update to show the warning.
+                textAngular.$editor().$parent.$apply();
+                return;
+              }
 
               // Move the cursor to be immediately after the clicked widget.
               // This prevents users from overwriting the widget.
@@ -795,7 +813,6 @@ oppia.config(['$provide', function($provide) {
                   textAngular.$editor().displayElements.text[0].focus();
                   rangy.restoreSelection(savedSelection);
                 });
-
               return false;
             }
           },
@@ -847,66 +864,73 @@ oppia.config(['$provide', function($provide) {
 
 oppia.directive('textAngularRte', [
     '$filter', 'oppiaHtmlEscaper', 'rteHelperService',
-    function($filter, oppiaHtmlEscaper, rteHelperService) {
-  return {
-    restrict: 'E',
-    scope: {
-      htmlContent: '=',
-      uiConfig: '&'
-    },
-    template: (
-      '<div text-angular="" ta-toolbar="<[toolbarOptionsJson]>" ' +
-      '     ta-paste="stripFormatting($html)" ng-model="tempContent">' +
-      '</div>'),
-    controller: ['$scope', function($scope) {
-      $scope.isCustomizationModalOpen = false;
-      var toolbarOptions = [
-        ['bold', 'italics', 'underline'],
-        ['ol', 'ul', 'pre'],
-        []
-      ];
+    function(
+      $filter, oppiaHtmlEscaper, rteHelperService) {
+      return {
+        restrict: 'E',
+        scope: {
+          htmlContent: '=',
+          uiConfig: '&'
+        },
+        template: (
+          '<div text-angular="" ta-toolbar="<[toolbarOptionsJson]>" ' +
+          '     ta-paste="stripFormatting($html)" ng-model="tempContent">' +
+          '</div>'),
+        controller: ['$scope', function($scope) {
+          // Currently, operations affecting the filesystem are allowed only in
+          // the editor context.
+          $scope.isCustomizationModalOpen = false;
+          var toolbarOptions = [
+            ['bold', 'italics', 'underline'],
+            ['ol', 'ul', 'pre'],
+            []
+          ];
 
-      rteHelperService.getRichTextComponents().forEach(function(componentDefn) {
-        if (!($scope.uiConfig() && $scope.uiConfig().hide_complex_extensions &&
-            componentDefn.isComplex)) {
-          toolbarOptions[2].push(componentDefn.name);
-        }
-      });
-      $scope.toolbarOptionsJson = JSON.stringify(toolbarOptions);
+          rteHelperService.getRichTextComponents().forEach(
+            function(componentDefn) {
+              if (!($scope.uiConfig() &&
+                    $scope.uiConfig().hide_complex_extensions &&
+                    componentDefn.isComplex)) {
+                toolbarOptions[2].push(componentDefn.name);
+              }
+            }
+          );
+          $scope.toolbarOptionsJson = JSON.stringify(toolbarOptions);
 
-      var _convertHtmlToRte = function(html) {
-        return rteHelperService.convertHtmlToRte(html);
+          var _convertHtmlToRte = function(html) {
+            return rteHelperService.convertHtmlToRte(html);
+          };
+
+          $scope.stripFormatting = function(html) {
+            return $filter('sanitizeHtmlForRte')(html);
+          };
+
+          $scope.init = function() {
+            $scope.tempContent = _convertHtmlToRte($scope.htmlContent);
+          };
+
+          $scope.init();
+
+          $scope.$watch('tempContent', function(newVal) {
+            // Sanitizing while a modal is open would delete the markers that
+            // save and restore the cursor's position in the RTE.
+            var displayedContent = $scope.isCustomizationModalOpen ? newVal :
+              $filter('sanitizeHtmlForRte')(newVal);
+            $scope.htmlContent = rteHelperService.convertRteToHtml(
+              displayedContent);
+          });
+
+          // It is possible for the content of the RTE to be changed externally,
+          // e.g. if there are several RTEs in a list, and one is deleted.
+          $scope.$watch('htmlContent', function(newVal, oldVal) {
+            if (newVal !== oldVal) {
+              $scope.tempContent = _convertHtmlToRte(newVal);
+            }
+          });
+        }]
       };
-
-      $scope.stripFormatting = function(html) {
-        return $filter('sanitizeHtmlForRte')(html);
-      };
-
-      $scope.init = function() {
-        $scope.tempContent = _convertHtmlToRte($scope.htmlContent);
-      };
-
-      $scope.init();
-
-      $scope.$watch('tempContent', function(newVal) {
-        // Sanitizing while a modal is open would delete the markers that
-        // save and restore the cursor's position in the RTE.
-        var displayedContent = $scope.isCustomizationModalOpen ? newVal :
-          $filter('sanitizeHtmlForRte')(newVal);
-        $scope.htmlContent = rteHelperService.convertRteToHtml(
-          displayedContent);
-      });
-
-      // It is possible for the content of the RTE to be changed externally,
-      // e.g. if there are several RTEs in a list, and one is deleted.
-      $scope.$watch('htmlContent', function(newVal, oldVal) {
-        if (newVal !== oldVal) {
-          $scope.tempContent = _convertHtmlToRte(newVal);
-        }
-      });
-    }]
-  };
-}]);
+    }
+]);
 
 // The names of these filters must correspond to the names of the backend
 // validators (with underscores converted to camelcase).
