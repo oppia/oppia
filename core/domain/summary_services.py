@@ -24,14 +24,13 @@ import utils
 
 
 def get_human_readable_contributors_summary(contributors_summary):
-    contributors_items = contributors_summary.items()
-    readable_user_ids = user_services.get_human_readable_user_ids(
-        [c[0] for c in contributors_items])
-
-    readable_contributors = {}
-    for i in xrange(len(contributors_items)):
-        readable_contributors[readable_user_ids[i]] = contributors_items[i][1]
-    return readable_contributors
+    contributor_ids = contributors_summary.keys()
+    contributor_usernames = user_services.get_human_readable_user_ids(
+        contributor_ids)
+    return {
+        contributor_usernames[ind]: contributors_summary[contributor_ids[ind]]
+        for ind in xrange(len(contributor_ids))
+    }
 
 
 def get_displayable_exp_summary_dicts_matching_ids(exploration_ids):
@@ -61,7 +60,7 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids):
                 'status': exploration_summary.status,
                 'ratings': exploration_summary.ratings,
                 'community_owned': exploration_summary.community_owned,
-                'contributors_summary':
+                'human_readable_contributors_summary':
                     get_human_readable_contributors_summary(
                         exploration_summary.contributors_summary),
                 'contributor_names': user_services.get_human_readable_user_ids(

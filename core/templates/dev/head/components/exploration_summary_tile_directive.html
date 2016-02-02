@@ -5,27 +5,27 @@
         <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
         <h2 class="exploration-title protractor-test-exp-summary-tile-title"><[getExplorationTitle()]></h2>
 
-        <div class="exploration-profile" ng-mouseenter="showBriefContributors=true"
-                                         ng-mouseleave="showBriefContributors=false">
+        <div class="exploration-profile" ng-if="contributors.length > 0"
+             ng-mouseenter="allContributorsAreVisible = true"
+             ng-mouseleave="allContributorsAreVisible = false">
           <profile-link-image username="contributors[0]"
            tooltip="<[contributors[0]]>" tooltip-placement="left">
           </profile-link-image>
-          <p ng-if="!showBriefContributors && contributors.length > 1"
-             style="position:relative; top: -10px; left: 15px; color: white; font-size:smaller; font-weight: bold;">
-            +<[contributors.length-1]>
+          <p ng-if="!allContributorsAreVisible && contributors.length > 1"
+             class="exploration-committers-number-1">
+            +<[contributors.length - 1]>
           </p>
-          <div ng-repeat="contributor in contributors | limitTo:4:1"
-               ng-if="showBriefContributors">
+          <div ng-if="allContributorsAreVisible"
+               ng-repeat="contributor in contributors | limitTo:4:1">
             <profile-link-image username="contributor"
              tooltip="<[contributor]>" tooltip-placement="left">
             </profile-link-image>
           </div>
 
-          <div style="position:relative;" ng-if="showBriefContributors && contributors.length > 5">
-            <img style="position: absolute; left: 0px; top: 0px;"
-             ng-src="/images/avatar/oppia_all_black.png" alt="">
-            <small style="position: absolute; left: 5px; top: 3px; color:white;">
-              +<[contributors.length-5]>
+          <div style="position:relative;" ng-if="allContributorsAreVisible && contributors.length > 5">
+            <img ng-src="/images/avatar/oppia_all_black.png" alt="">
+            <small class="exploration-commiters-number-5">
+              +<[contributors.length - 5]>
             </small>
           </div>
         </div>
@@ -120,12 +120,32 @@
   }
 
   .oppia-exploration-summary-tile .exploration-profile {
-    position:absolute;
-    width: 31px;
-    top: 5px;
-    padding-left: 0px;
-    padding-right: 5px;
     left: 170px;
+    padding-right: 5px;
+    position: absolute;
+    top: 5px;
+    width: 31px;
+  }
+
+  .exploration-profile profile-link-image {
+    margin-bottom: 3px;
+    display:block;
+  }
+
+  .oppia-exploration-summary-tile .exploration-committers-number-1 {
+    color: white;
+    font-size: x-small;
+    font-weight: bold;
+    left: 17px;
+    position: relative;
+    top: -6px;
+  }
+
+  .oppia-exploration-summary-tile .exploration-commiters-number-5 {
+    color: white;
+    left: 5px;
+    position: absolute;
+    top: 3px;
   }
 
   .oppia-exploration-summary-tile .exploration-category {

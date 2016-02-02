@@ -42,10 +42,12 @@ oppia.directive('explorationSummaryTile', [function() {
       '$scope', 'oppiaDatetimeFormatter', 'RatingComputationService',
       function($scope, oppiaDatetimeFormatter, RatingComputationService) {
         $scope.contributors = Object.keys($scope.getContributorsSummary()).sort(
-          function(a, b) {
-            var avalue = $scope.getContributorsSummary()[a];
-            var bvalue = $scope.getContributorsSummary()[b];
-            return bvalue - avalue;
+          function(contributorUsername1, contributorUsername2) {
+            var commitsOfContributor1 = $scope.getContributorsSummary()[
+                contributorUsername1];
+            var commitsOfContributor2 = $scope.getContributorsSummary()[
+                contributorUsername2];
+            return commitsOfContributor2 - commitsOfContributor1;
           }
         );
 
@@ -71,7 +73,7 @@ oppia.directive('explorationSummaryTile', [function() {
           return result;
         };
 
-        $scope.showBriefContributors = false;
+        $scope.allContributorsAreVisible = false;
       }
     ]
   };

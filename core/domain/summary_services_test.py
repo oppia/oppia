@@ -98,6 +98,13 @@ class ExplorationDisplayableSummaries(
         rights_manager.publish_exploration(self.albert_id, self.EXP_ID_3)
         exp_services.delete_exploration(self.albert_id, self.EXP_ID_3)
 
+    def test_get_human_readable_contributors_summary(self):
+        contributors_summary = {self.albert_id: 10, self.bob_id: 13}
+        self.assertEqual({
+            self.ALBERT_NAME: 10, self.BOB_NAME: 13
+        }, summary_services.get_human_readable_contributors_summary(
+            contributors_summary))
+
     def test_get_displayable_exp_summary_dicts_matching_ids(self):
         # A list of exp_id's are passed in:
         # EXP_ID_1 -- private exploration
@@ -108,14 +115,14 @@ class ExplorationDisplayableSummaries(
         displayable_summaries = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
                 [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3]))
-        expect_summary = {
+        expected_summary = {
             'status': u'public',
             'thumbnail_bg_color': '#05a69a',
             'community_owned': False,
             'tags': [],
             'thumbnail_icon_url': '/images/gallery/thumbnails/Lightbulb.svg',
             'language_code': feconf.DEFAULT_LANGUAGE_CODE,
-            'contributors_summary': {self.ALBERT_NAME: 2},
+            'human_readable_contributors_summary': {self.ALBERT_NAME: 2},
             'id': self.EXP_ID_2,
             'category': u'A category',
             'ratings': feconf.get_empty_ratings(),
@@ -124,4 +131,5 @@ class ExplorationDisplayableSummaries(
             'objective': u'An objective',
             'contributor_names': [self.ALBERT_NAME]
         }
-        self.assertDictContainsSubset(expect_summary, displayable_summaries[0])
+        self.assertIn('last_updated_msec', displayable_summaries[0])
+        self.assertDictContainsSubset(expected_summary, displayable_summaries[0])
