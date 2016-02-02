@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-'''Pre-push hook that executes the Python/JS linters on all files that
+"""Pre-push hook that executes the Python/JS linters on all files that
 deviate from develop.
 (By providing the list of files to `scripts/pre_commit_linter.py`)
 To install the hook manually simply execute this script from the oppia root dir
@@ -25,7 +25,7 @@ To bypass the validation upon `git push` use the following command:
 This hook works only on Unix like systems as of now.
 On Vagrant under Windows it will still copy the hook to the .git/hooks dir
 but it will have no effect.
-'''
+"""
 
 # Pylint has issues with the import order of argparse.
 # pylint: disable=wrong-import-order
@@ -36,6 +36,7 @@ import collections
 import pprint
 import argparse
 import shutil
+
 # pylint: enable=wrong-import-order
 
 
@@ -45,7 +46,6 @@ FileDiff = collections.namedtuple('FileDiff', ['status', 'name'])
 
 # git hash of /dev/null, refers to an 'empty' commit
 GIT_NULL_COMMIT = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
-
 
 # caution, __file__ is here *OPPiA/.git/hooks* and not in *OPPIA/scripts*
 FILE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -58,7 +58,7 @@ FRONTEND_TEST_SCRIPT = 'run_frontend_tests.sh'
 
 
 def _start_subprocess_for_result(cmd):
-    '''Starts subprocess and returns (stdout, stderr)'''
+    """Starts subprocess and returns (stdout, stderr)"""
     task = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE)
     out, err = task.communicate()
@@ -66,7 +66,7 @@ def _start_subprocess_for_result(cmd):
 
 
 def _git_diff_name_status(left, right, diff_filter=''):
-    '''Compare two branches/commits etc with git.
+    """Compare two branches/commits etc with git.
     Parameter:
         left: the lefthand comperator
         right: the righthand comperator
@@ -75,7 +75,7 @@ def _git_diff_name_status(left, right, diff_filter=''):
         List of FileDiffs (tuple with name/status)
     Raises:
         ValueError if git command fails
-    '''
+    """
     git_cmd = ['git', 'diff', '--name-status']
     if diff_filter:
         git_cmd.append('--diff-filter={}'.format(diff_filter))
@@ -90,7 +90,7 @@ def _git_diff_name_status(left, right, diff_filter=''):
 
 
 def _compare_to_remote(remote, local_branch, remote_branch=None):
-    '''Compare local with remote branch with git diff.
+    """Compare local with remote branch with git diff.
     Parameter:
         remote: Git remote being pushed to
         local_branch: Git branch being pushed to
@@ -101,14 +101,14 @@ def _compare_to_remote(remote, local_branch, remote_branch=None):
         but not deleted
     Raises:
         ValueError if git command fails
-    '''
+    """
     remote_branch = remote_branch if remote_branch else local_branch
     git_remote = '%s/%s' % (remote, remote_branch)
     return _git_diff_name_status(git_remote, local_branch)
 
 
 def _extract_files_to_lint(file_diffs):
-    '''Grab only files out of a list of FileDiffs that have a ACMRT status'''
+    """Grab only files out of a list of FileDiffs that have a ACMRT status"""
     if not file_diffs:
         return []
     lint_files = [f.name for f in file_diffs
@@ -117,28 +117,28 @@ def _extract_files_to_lint(file_diffs):
 
 
 def _collect_files_being_pushed(ref_list, remote):
-    '''Collect modified files and filter those that need linting.
+    """Collect modified files and filter those that need linting.
     Parameter:
         ref_list: list of references to parse (provided by git in stdin)
         remote: the remote being pushed to
     Returns:
         Tuple of lists of changed_files, files_to_lint
-    '''
+    """
     if not ref_list:
         return [], []
+    # avoid testing of non branch pushes (tags for instance) or deletions
+    ref_heads_only = [ref for ref in ref_list
+                      if ref.local_ref.startswith('refs/heads/')]
     # get branch name from e.g. local_ref='refs/heads/lint_hook'
-    branches = [ref.local_ref.split('/')[-1] for ref in ref_list]
-    hashes = [ref.local_sha1 for ref in ref_list]
-    remote_hashes = [ref.remote_sha1 for ref in ref_list]
+    branches = [ref.local_ref.split('/')[-1] for ref in ref_heads_only]
+    hashes = [ref.local_sha1 for ref in ref_heads_only]
+    remote_hashes = [ref.remote_sha1 for ref in ref_heads_only]
     modified_files = set()
     files_to_lint = set()
     for branch, sha1, remote_sha1 in zip(branches, hashes, remote_hashes):
         # git reports the following for an empty / non existing branch
         # sha1: '0000000000000000000000000000000000000000'
-        if set(sha1) == {'0'}:
-            # We are deleting a branch, nothing to do
-            continue
-        elif set(remote_sha1) != {'0'}:
+        if set(remote_sha1) != {'0'}:
             try:
                 file_diffs = _compare_to_remote(remote, branch)
             except ValueError as e:
