@@ -323,8 +323,8 @@ class UserImpactMRJobManager(
     @classmethod
     def _get_exp_impact_score(cls, exploration_id):
         # Get ratings and compute average rating score.
-        rating_frequencies = rating_services.get_overall_ratings_for_exploration(
-            exploration_id)
+        rating_frequencies = rating_services.\
+            get_overall_ratings_for_exploration(exploration_id)
         total_num_ratings = 0
         total_rating = 0.0
         for rating, num_ratings in rating_frequencies.iteritems():
@@ -349,9 +349,10 @@ class UserImpactMRJobManager(
             num_ratings_scaler = 1.0
 
         # Get number of completions/playthroughs.
-        num_completions = stats_jobs_continuous.StatisticsAggregator.get_statistics(
-            exploration_id,
-            stats_jobs_continuous.VERSION_ALL)['complete_exploration_count']
+        num_completions = stats_jobs_continuous.StatisticsAggregator.\
+            get_statistics(
+                exploration_id,
+                stats_jobs_continuous.VERSION_ALL)['complete_exploration_count']
         # Only take the log of a non-zero number.
         if num_completions <= 0:
             return 0

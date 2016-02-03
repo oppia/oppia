@@ -423,13 +423,12 @@ def apply_change_list(collection_id, change_list):
                     change.cmd ==
                     collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY):
                 collection_node = collection.get_node(change.exploration_id)
-                if (change.property_name ==
-                        collection_domain.COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS):
+                if change.property_name == collection_domain.\
+                    COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS:
                     collection_node.update_prerequisite_skills(
                         change.new_value)
-                elif (
-                        change.property_name ==
-                        collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS):
+                elif change.property_name == collection_domain.\
+                    COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS:
                     collection_node.update_acquired_skills(change.new_value)
             elif change.cmd == collection_domain.CMD_EDIT_COLLECTION_PROPERTY:
                 if change.property_name == 'title':
@@ -644,7 +643,8 @@ def update_collection(
 def create_collection_summary(collection_id, contributor_id_to_add):
     """Create summary of a collection and store in datastore."""
     collection = get_collection_by_id(collection_id)
-    collection_summary = compute_summary_of_collection(collection, contributor_id_to_add)
+    collection_summary = compute_summary_of_collection(
+        collection, contributor_id_to_add)
     save_collection_summary(collection_summary)
 
 
@@ -723,7 +723,8 @@ def compute_collection_contributors_summary(collection_id):
             break
 
         if is_revert:
-            current_version = snapshot_metadata['commit_cmds'][0]['version_number']
+            current_version = snapshot_metadata['commit_cmds'][0][
+                'version_number']
         else:
             current_version -= 1
     return contributors_summary
@@ -870,8 +871,9 @@ def get_next_page_of_all_non_private_commits(
             "max_age must be a datetime.timedelta instance. or None.")
 
     results, new_urlsafe_start_cursor, more = (
-        collection_models.CollectionCommitLogEntryModel.get_all_non_private_commits(
-            page_size, urlsafe_start_cursor, max_age=max_age))
+        collection_models.CollectionCommitLogEntryModel.\
+        get_all_non_private_commits(page_size,
+                                    urlsafe_start_cursor, max_age=max_age))
 
     return ([collection_domain.CollectionCommitLogEntry(
         entry.created_on, entry.last_updated, entry.user_id, entry.username,

@@ -185,7 +185,8 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
         # The splitlines() is needed because a carriage return is added in
         # the returned string
         self.assertEqual(
-            recommendations_services.get_topic_similarities_as_csv().splitlines(),
+            recommendations_services.get_topic_similarities_as_csv().\
+            splitlines(),
             self.TOPIC_SIMILARITIES_DEFAULT.splitlines())
 
         recommendations_services.update_topic_similarities(
@@ -194,7 +195,8 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
             '0.2,1.0,0.8\n'
             '0.1,0.8,1.0')
         self.assertEqual(
-            recommendations_services.get_topic_similarities_as_csv().splitlines(),
+            recommendations_services.get_topic_similarities_as_csv().\
+            splitlines(),
             self.TOPIC_SIMILARITIES_UPDATED.splitlines())
 
 

@@ -36,6 +36,8 @@ FEEDBACK_THREAD_ID = 'fthread_id'
 FEEDBACK_THREAD_ID_2 = 'fthread_id_2'
 USER_ID = 'user_id'
 
+# Remove this line, maybe by shortaning names of methods smaller
+# pylint: disable=C0301
 
 class SubscriptionsTest(test_utils.GenericTestBase):
     """Tests for subscription management."""
@@ -126,7 +128,8 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             subscription_services.get_exploration_ids_subscribed_to(USER_ID),
             [EXP_ID, EXP_ID_2])
 
-    def test_thread_and_exploration_subscriptions_are_tracked_individually(self):
+    def test_thread_and_exploration_subscriptions_are_tracked_individually(
+            self):
         self.assertEqual(self._get_thread_ids_subscribed_to(USER_ID), [])
 
         subscription_services.subscribe_to_thread(USER_ID, FEEDBACK_THREAD_ID)

@@ -514,7 +514,8 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
         self.assertIsNone(
-            user_services.get_user_settings(self.admin_id).first_contribution_msec)
+            user_services.get_user_settings(
+                self.admin_id).first_contribution_msec)
 
         # Test all owners and editors of exploration after publication have
         # updated times.
@@ -538,7 +539,8 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         self.assertIsNotNone(user_services.get_user_settings(
             self.editor_id).first_contribution_msec)
 
-    def test_contribution_msec_does_not_update_on_unpublished_explorations(self):
+    def test_contribution_msec_does_not_update_on_unpublished_explorations(
+            self):
         self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
         exp_services.publish_exploration_and_update_user_profiles(
@@ -552,7 +554,8 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
 
         # Test that first contribution time is not set for unpublished
         # explorations.
-        job_id = user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new()
+        job_id = user_jobs_one_off.\
+            UserFirstContributionMsecOneOffJob.create_new()
         user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
         self.assertIsNone(user_services.get_user_settings(

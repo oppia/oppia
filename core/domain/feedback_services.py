@@ -194,8 +194,8 @@ def get_thread_analytics(exploration_id):
     - 'num_total_threads': the total number of feedback threads for this
          exploration.
     """
-    return feedback_jobs_continuous.FeedbackAnalyticsAggregator.get_thread_analytics(
-        exploration_id)
+    return feedback_jobs_continuous.FeedbackAnalyticsAggregator.\
+        get_thread_analytics(exploration_id)
 
 
 def create_suggestion(exploration_id, author_id, exploration_version,
