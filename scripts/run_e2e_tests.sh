@@ -24,6 +24,7 @@
 # Optional arguments:
 #   --sharding=true/false Disables/Enables parallelization of protractor tests.
 #   --sharding-instances=# Sets the number of parallel browsers to open while sharding.
+#   --specs=path/to/specFile.js  Runs only the test in specFile.js
 # Sharding must be disabled (either by passing in false to --sharding or 1 to
 # --sharding-instances) if running any tests in isolation (iit or ddescribe).
 #

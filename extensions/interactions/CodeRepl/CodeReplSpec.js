@@ -24,7 +24,7 @@ describe('CodeRepl interaction', function() {
     var elt, scope, ctrlScope;
 
     beforeEach(module('directiveTemplates'));
-    beforeEach(module('oppia', GLOBALS.OVERWRITE_TRANSLATOR_PROVIDER));
+    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
     beforeEach(inject(function($compile, _$templateCache_, $rootScope) {
       $templateCache = _$templateCache_;

@@ -24,11 +24,6 @@ oppia.controller('Signup', [
   function(
       $scope, $http, $rootScope, $modal, $translate, warningsData,
       urlService, focusService) {
-    $translate('I18N_SIGNUP_PAGE_TITLE', 'I18N_SIGNUP_PAGE_SUBTITLE')
-     .then(function(translatedPageTitle) {
-      $rootScope.pageTitle = translatedPageTitle;
-    });
-
     $rootScope.$on('$translateChangeSuccess', function() {
       $rootScope.pageTitle = (
         $translate.instant('I18N_SIGNUP_PAGE_SUBTITLE') +
@@ -124,7 +119,7 @@ oppia.controller('Signup', [
     $scope.submitPrerequisitesForm = function(
         agreedToTerms, username, canReceiveEmailUpdates) {
       if (!agreedToTerms) {
-        warningsData.addWarning('I18N_SIGNUP_ERROR_MUST_AGREE_WITH_TERMS');
+        warningsData.addWarning('I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
         return;
       }
 

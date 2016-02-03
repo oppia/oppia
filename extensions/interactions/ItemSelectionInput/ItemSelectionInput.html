@@ -61,12 +61,12 @@
       <div ng-if="displayCheckboxes">
         <small class="pull-right">
           <span ng-if="notEnoughSelections">
-            <span ng-if="minAllowableSelectionCount > 1" translate="I18N_INTERACTIONS_ITEM_SELECTION_NOT_ENOUGH_PL" translate-values="{minChoiceNumber:<[minAllowableSelectionCount]>"></span>
+            <span ng-if="minAllowableSelectionCount > 1" translate="I18N_INTERACTIONS_ITEM_SELECTION_NOT_ENOUGH_PLURAL" translate-values="{minChoiceNumber:<[minAllowableSelectionCount]>"></span>
             <span ng-if="minAllowableSelectionCount == 1" translate="I18N_INTERACTIONS_ITEM_SELECTION_NOT_ENOUGH"></span>.
           </span>
 
           <span ng-if="preventAdditionalSelections">
-            <span translate="I18N_INTERACTIONS_ITEM_SELECTION_PREVENT_MORE_PL" ng-if="maxAllowableSelectionCount !== 1" translate-values="{maxAllowableSelectionCount:<[maxAllowableSelectionCount]>}">
+            <span translate="I18N_INTERACTIONS_ITEM_SELECTION_PREVENT_MORE_PLURAL" ng-if="maxAllowableSelectionCount !== 1" translate-values="{maxAllowableSelectionCount:<[maxAllowableSelectionCount]>}">
             <span translate="I18N_INTERACTIONS_ITEM_SELECTION_PREVENT_MORE" ng-if="maxAllowableSelectionCount == 1">
           </span>
         </small>

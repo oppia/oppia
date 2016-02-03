@@ -51,6 +51,10 @@
     <meta property="og:image" content="{{DOMAIN_URL}}/images/logo/288x288_logo_mint.png">
 
     <link rel="apple-touch-icon" href="/images/logo/favicon.png">
+    <!-- The title is binded to the rootScope and it will be replaced for its
+    translation when the page is loading. This is the only way to translate the
+    page title because the head of the file is outside the scope of any other
+    controller. -->
     <title itemprop="name" ng-bind="pageTitle">{% block subtitle %}{% endblock %} - {% block maintitle %}Oppia{% endblock %}</title>
 
     {% block header_css %}

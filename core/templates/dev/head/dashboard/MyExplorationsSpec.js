@@ -38,7 +38,7 @@ describe('MyExplorations controller', function() {
       title: 'Featured exploration'
     }];
 
-    beforeEach(module('oppia', GLOBALS.OVERWRITE_TRANSLATOR_PROVIDER));
+    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
     beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
       $httpBackend = _$httpBackend_;

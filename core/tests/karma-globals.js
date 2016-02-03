@@ -31,7 +31,7 @@ var GLOBALS = {
  * http://angular-translate.github.io/docs/#/guide/22_unit-testing-with-angular-translate
  */
 // jscs:enable maximumLineLength
-GLOBALS.OVERWRITE_TRANSLATOR_PROVIDER = function($provide, $translateProvider) {
+GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS = function($provide, $translateProvider) {
   $provide.factory('customLoader', function($q) {
     return function() {
       var deferred = $q.defer();
