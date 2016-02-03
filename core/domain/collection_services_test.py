@@ -653,7 +653,8 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             collection_services.get_collection_summary_by_id(
                 self.COLLECTION_ID))
 
-        self.assertEqual(retrieved_collection_summary.contributor_ids, [self.owner_id])
+        self.assertEqual(retrieved_collection_summary.contributor_ids,
+                         [self.owner_id])
         self.assertEqual(retrieved_collection_summary.title, 'A new title')
         self.assertEqual(
             retrieved_collection_summary.category, 'A new category')
@@ -1699,6 +1700,7 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
 
         # TODO(madiyar): uncomment after revert_collection implementation
         # Have Albert revert to version 3. Version 5
-        # collection_services.revert_collection(albert_id, self.COLLECTION_ID, 4, 3)
+        # collection_services.revert_collection(albert_id,
+        #       self.COLLECTION_ID, 4, 3)
         # self._check_contributors_summary(self.COLLECTION_ID,
         #                                 {albert_id: 1, bob_id: 2})

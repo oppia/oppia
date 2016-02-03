@@ -25,8 +25,9 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
     def test_wrapper_calls_subclass_methods(self):
         """Tests the basic functionality of FunctionWrapper."""
 
-        # Keeps track of which functions have been called, to test that pre_call_hook,
-        # the actual function, and post_call_hook are called in the right order.
+        # Keeps track of which functions have been called, to test that
+        # pre_call_hook, the actual function, and post_call_hook are
+        # called in the right order.
         order = []
         testcase = self
 
@@ -120,7 +121,8 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
 
 
 class CallCounterTests(test_utils.GenericTestBase):
-    def test_call_counter_counts_the_number_of_times_a_function_gets_called(self):
+    def test_call_counter_counts_the_number_of_times_a_function_gets_called(
+            self):
         f = lambda x: x ** 2
 
         wrapped_function = test_utils.CallCounter(f)
