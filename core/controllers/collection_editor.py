@@ -26,19 +26,6 @@ import utils
 current_user_services = models.Registry.import_current_user_services()
 
 
-def _require_valid_version(version_from_payload, collection_version):
-    """Check that the payload version matches the given collection version."""
-    if version_from_payload is None:
-        raise base.BaseHandler.InvalidInputException(
-            'Invalid POST request: a version must be specified.')
-
-    if version_from_payload != collection_version:
-        raise base.BaseHandler.InvalidInputException(
-            'Trying to update version %s of collection from version %s, '
-            'which is too old. Please reload the page and try again.'
-            % (collection_version, version_from_payload))
-
-
 def require_editor(handler):
     """Decorator that checks if the user can edit the given collection."""
     def test_collection_editor(self, collection_id, **kwargs):
@@ -93,6 +80,10 @@ class CollectionEditorHandler(base.BaseHandler):
 class CollectionEditorPage(CollectionEditorHandler):
     """The editor page for a single collection."""
 
+    # TODO(bhenning): Implement read-only version of the editor. Until that
+    # exists, ensure the user has proper permission to edit this collection
+    # before seeing the editor.
+    @require_editor
     def get(self, collection_id):
         """Handles GET requests."""
 
@@ -123,13 +114,26 @@ class CollectionEditorPage(CollectionEditorHandler):
 class WritableCollectionDataHandler(CollectionEditorHandler):
     """A data handler for collections which supports writing."""
 
+    def _require_valid_version(self, version_from_payload, collection_version):
+        """Check that the payload version matches the given collection version.
+        """
+        if version_from_payload is None:
+            raise base.BaseHandler.InvalidInputException(
+                'Invalid POST request: a version must be specified.')
+
+        if version_from_payload != collection_version:
+            raise base.BaseHandler.InvalidInputException(
+                'Trying to update version %s of collection from version %s, '
+                'which is too old. Please reload the page and try again.'
+                % (collection_version, version_from_payload))
+
     @require_editor
     def put(self, collection_id):
         """Updates properties of the given collection."""
 
         collection = collection_services.get_collection_by_id(collection_id)
         version = self.payload.get('version')
-        _require_valid_version(version, collection.version)
+        self._require_valid_version(version, collection.version)
 
         commit_message = self.payload.get('commit_message')
         change_list = self.payload.get('change_list')
@@ -141,12 +145,9 @@ class WritableCollectionDataHandler(CollectionEditorHandler):
             raise self.InvalidInputException(e)
 
         # Retrieve the updated collection.
-        try:
-            collection_dict = (
-                collection_services.get_learner_collection_dict_by_id(
-                    collection_id, self.user_id))
-        except:
-            raise self.PageNotFoundException
+        collection_dict = (
+            collection_services.get_learner_collection_dict_by_id(
+                collection_id, self.user_id, allow_invalid_explorations=True))
 
         # Send the updated collection back to the frontend.
         self.values.update(collection_dict)

@@ -75,13 +75,11 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         self.assertEqual(response.status_int, 200)
         self.assertIn('Introduction to Collections in Oppia', response.body)
 
-        # Check that non-editors can access, but not edit, the editor page.
+        # Check that non-editors cannot access the editor page.
         response = self.testapp.get(
             '%s/%s' % (feconf.COLLECTION_EDITOR_URL_PREFIX,
                        self.COLLECTION_ID))
-        self.assertEqual(response.status_int, 200)
-        self.assertIn('Introduction to Collections in Oppia', response.body)
-        self.assert_cannot_edit(response.body)
+        self.assertEqual(response.status_int, 302)
 
         # Check that it is now possible to access and edit the editor page.
         self.login(self.EDITOR_EMAIL)

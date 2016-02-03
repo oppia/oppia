@@ -31,15 +31,38 @@
 // after deciding and acting upon the decision (which would mean implementing
 // it if it's agreed upon).
 oppia.factory('WritableCollectionBackendApiService', [
-    '$http', '$q', 'WRITABLE_COLLECTION_DATA_URL', 'UrlInterpolationService',
+    '$http', '$q', 'COLLECTION_DATA_URL_TEMPLATE',
+    'WRITABLE_COLLECTION_DATA_URL_TEMPLATE', 'UrlInterpolationService',
     'CollectionBackendApiService',
-    function($http, $q, WRITABLE_COLLECTION_DATA_URL, UrlInterpolationService,
+    function($http, $q, COLLECTION_DATA_URL_TEMPLATE,
+      WRITABLE_COLLECTION_DATA_URL_TEMPLATE, UrlInterpolationService,
       CollectionBackendApiService) {
+
+      var _fetchWritableCollection = function(
+          collectionId, successCallback, errorCallback) {
+        var collectionDataUrl = UrlInterpolationService.interpolateUrl(
+          COLLECTION_DATA_URL_TEMPLATE, {
+            collection_id: collectionId
+          });
+        collectionDataUrl += '?allow_invalid_explorations=true';
+
+        $http.get(collectionDataUrl).success(function(data) {
+          var collection = angular.copy(data.collection);
+          if (successCallback) {
+            successCallback(collection);
+          }
+        }).error(function(error) {
+          if (errorCallback) {
+            errorCallback(error);
+          }
+        });
+      }
+
       var _updateCollection = function(
           collectionId, collectionVersion, commitMessage, changeList,
           successCallback, errorCallback) {
         var writableCollectionDataUrl = UrlInterpolationService.interpolateUrl(
-          WRITABLE_COLLECTION_DATA_URL, {
+          WRITABLE_COLLECTION_DATA_URL_TEMPLATE, {
             collection_id: collectionId
           });
 
@@ -67,19 +90,24 @@ oppia.factory('WritableCollectionBackendApiService', [
       };
 
       return {
+        fetchWritableCollection: function(collectionId) {
+          return $q(function(resolve, reject) {
+            _fetchWritableCollection(collectionId, resolve, reject);
+          });
+        },
+
         /**
-         * Updates a collection in the backend with the provided colleciton ID.
+         * Updates a collection in the backend with the provided collection ID.
          * The changes only apply to the collection of the given version and the
          * request to update the collection will fail if the provided collection
          * version is older than the current version stored in the backend. Both
          * the changes and the message to associate with those changes are used
          * to commit a change to the collection. The new collection is passed to
          * the success callback, if one is provided to the returned promise
-         * object. Errors are passed to the error callback, if one is provided
-         * and given an error occurs. Finally, if the update is successful, the
-         * returned collection will be cached within the
-         * CollectionBackendApiService to ensure the cache is not out-of-date
-         * with any updates made by this backend API service.
+         * object. Errors are passed to the error callback, if one is provided.
+         * Finally, if the update is successful, the returned collection will be
+         * cached within the CollectionBackendApiService to ensure the cache is
+         * not out-of-date with any updates made by this backend API service.
          */
         updateCollection: function(
             collectionId, collectionVersion, commitMessage, changeList) {

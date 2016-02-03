@@ -24,15 +24,15 @@
 // the collection instead. This file should not be included on the page in that
 // scenario.
 oppia.factory('CollectionBackendApiService', [
-    '$http', '$q', 'COLLECTION_DATA_URL', 'UrlInterpolationService',
-    function($http, $q, COLLECTION_DATA_URL, UrlInterpolationService) {
+    '$http', '$q', 'COLLECTION_DATA_URL_TEMPLATE', 'UrlInterpolationService',
+    function($http, $q, COLLECTION_DATA_URL_TEMPLATE, UrlInterpolationService) {
   // Maps previously loaded collections to their IDs.
   var _collectionCache = [];
 
   var _fetchCollection = function(
       collectionId, successCallback, errorCallback) {
     var collectionDataUrl = UrlInterpolationService.interpolateUrl(
-      COLLECTION_DATA_URL, {
+      COLLECTION_DATA_URL_TEMPLATE, {
         collection_id: collectionId
       });
 
@@ -109,7 +109,7 @@ oppia.factory('CollectionBackendApiService', [
      * collection ID with a new collection object.
      */
     cacheCollection: function(collectionId, collection) {
-      _collectionCache[collectionId] = collection;
+      _collectionCache[collectionId] = angular.copy(collection);
     },
 
     /**

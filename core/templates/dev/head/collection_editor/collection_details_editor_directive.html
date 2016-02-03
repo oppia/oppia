@@ -1,11 +1,11 @@
-<script type="text/ng-template" id="inline/collection_details_directive">
+<script type="text/ng-template" id="inline/collection_details_editor_directive">
   <p>title: <[getTitle()]> </p>
   <p>category: <[getCategory()]> </p>
   <p>objective: <[getObjective()]> </p>
   <p>version: <em><[getVersion()]></em></p>
 
   <br>
-  <input ng-model="newExpId" type="text" placeholder="New exp ID" /><button ng-click="addExploration(newExpId)">Add Exploration</button>
+  <input ng-model="newExplorationId" type="text" placeholder="New exploration ID"><button ng-click="addExploration(newExplorationId)">Add Exploration</button>
   <br>
   <input ng-model="newTitle" type="text" placeholder="New collection title"><button ng-click="updateCollectionTitle(newTitle)">Set Collection Title</button>
   <br>

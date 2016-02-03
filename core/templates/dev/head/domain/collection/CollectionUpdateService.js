@@ -48,22 +48,22 @@ oppia.factory('CollectionUpdateService', [
       COLLECTION_PROPERTY_OBJECTIVE,
       COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS,
       COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS) {
-      var _buildUpdate = function(command, params) {
-        var update = angular.copy(params);
-        update.cmd = command;
-        return update;
+      var _buildChangeDict = function(command, params) {
+        var changeDict = angular.copy(params);
+        changeDict.cmd = command;
+        return changeDict;
       };
 
-      var _buildPropertyUpdate = function(propertyName, newValue) {
-        return _buildUpdate(CMD_EDIT_COLLECTION_PROPERTY, {
+      var _buildPropertyChangeDict = function(propertyName, newValue) {
+        return _buildChangeDict(CMD_EDIT_COLLECTION_PROPERTY, {
           property_name: propertyName,
           new_value: newValue
         });
       };
 
-      var _buildNodePropertyUpdate = function(
+      var _buildNodePropertyChangeDict = function(
           propertyName, explorationId, newValue) {
-        return _buildUpdate(CMD_EDIT_COLLECTION_NODE_PROPERTY, {
+        return _buildChangeDict(CMD_EDIT_COLLECTION_NODE_PROPERTY, {
           property_name: propertyName,
           exploration_id: explorationId,
           new_value: newValue
@@ -74,63 +74,66 @@ oppia.factory('CollectionUpdateService', [
       // core.domain.collection_services.apply_change_list.
       return {
         /**
-         * Builds a change object to a collection representing adding a new
+         * Builds a change dict object to a collection representing adding a new
          * exploration to a collection which, in turn, creates a new collection
          * node to represent the referenced exploration.
          */
-        buildAddCollectionNodeUpdate: function(explorationId) {
-          return _buildUpdate(CMD_ADD_COLLECTION_NODE, {
+        buildAddCollectionNodeChangeDict: function(explorationId) {
+          return _buildChangeDict(CMD_ADD_COLLECTION_NODE, {
             exploration_id: explorationId
           });
         },
 
         /**
-         * Builds a change object to remove an exploration from a collection.
+         * Builds a change dict object to remove an exploration from a
+         * collection.
          */
-        buildDeleteCollectionNodeUpdate: function(explorationId) {
-          return _buildUpdate(CMD_DELETE_COLLECTION_NODE, {
+        buildDeleteCollectionNodeChangeDict: function(explorationId) {
+          return _buildChangeDict(CMD_DELETE_COLLECTION_NODE, {
             exploration_id: explorationId
           });
         },
 
         /**
-         * Builds a change object to change the title of a collection.
+         * Builds a change dict object to change the title of a collection.
          */
-        buildCollectionTitleUpdate: function(title) {
-          return _buildPropertyUpdate(COLLECTION_PROPERTY_TITLE, title);
+        buildCollectionTitleChangeDict: function(title) {
+          return _buildPropertyChangeDict(COLLECTION_PROPERTY_TITLE, title);
         },
 
         /**
-         * Builds a change object to change the title of a category.
+         * Builds a change dict object to change the title of a category.
          */
-        buildCollectionCategoryUpdate: function(category) {
-          return _buildPropertyUpdate(COLLECTION_PROPERTY_CATEGORY, category);
+        buildCollectionCategoryChangeDict: function(category) {
+          return _buildPropertyChangeDict(
+            COLLECTION_PROPERTY_CATEGORY, category);
         },
 
         /**
-         * Builds a change object to change the title of an objective.
+         * Builds a change dict object to change the title of an objective.
          */
-        buildCollectionObjectiveUpdate: function(objective) {
-          return _buildPropertyUpdate(COLLECTION_PROPERTY_OBJECTIVE, objective);
+        buildCollectionObjectiveChangeDict: function(objective) {
+          return _buildPropertyChangeDict(
+            COLLECTION_PROPERTY_OBJECTIVE, objective);
         },
 
         /**
-         * Builds a change object to change the prerequisite skills of an
+         * Builds a change dict object to change the prerequisite skills of an
          * exploration within a collection.
          */
-        buildPrerequisiteSkillsUpdate: function(
+        buildPrerequisiteSkillsChangeDict: function(
             explorationId, prerequisiteSkills) {
-          return _buildNodePropertyUpdate(
+          return _buildNodePropertyChangeDict(
             COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS, explorationId,
             prerequisiteSkills);
         },
 
         /**
-         * Builds a change object to change the acquired skills of an
+         * Builds a change dict object to change the acquired skills of an
          * exploration within a collection.
          */
-        buildAcquiredSkillsUpdate: function(explorationId, acquiredSkills) {
-          return _buildNodePropertyUpdate(
+        buildAcquiredSkillsChangeDict: function(explorationId, acquiredSkills) {
+          return _buildNodePropertyChangeDict(
             COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS, explorationId,
             acquiredSkills);
         }

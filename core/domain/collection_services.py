@@ -31,6 +31,7 @@ import os
 from core.domain import collection_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import summary_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -248,7 +249,8 @@ def is_collection_summary_editable(collection_summary, user_id=None):
 
 
 def get_learner_collection_dict_by_id(
-        collection_id, user_id, strict=True, version=None):
+        collection_id, user_id, strict=True, allow_invalid_explorations=False,
+        version=None):
     """Creates and returns a dictionary representation of a collection given by
     the provided collection ID. This dictionary contains extra information
     along with the dict returned by collection_domain.Collection.to_dict()
@@ -256,24 +258,29 @@ def get_learner_collection_dict_by_id(
     includes progress in the collection, information about explorations
     referenced within the collection, and a slightly nicer data structure for
     frontend work.
+
+    This raises a ValidationError if the collection retrieved using the given ID
+    references non-existent explorations.
     """
     collection = get_collection_by_id(
         collection_id, strict=strict, version=version)
 
     exp_ids = collection.exploration_ids
-    exp_summaries = (
-        exp_services.get_exploration_summaries_matching_ids(exp_ids))
-    exp_summaries_dict = {
-        exp_id: exp_summaries[ind] for (ind, exp_id) in enumerate(exp_ids)
+    exp_summary_dicts = (
+        summary_services.get_displayable_exp_summary_dicts_matching_ids(
+            exp_ids))
+    exp_summaries_dict_map = {
+        exp_summary_dict['id']: exp_summary_dict
+        for exp_summary_dict in exp_summary_dicts
     }
 
-    # TODO(bhenning): Users should not be recommended explorations they
+    # TODO(#1461): Users should not be recommended explorations they
     # have completed outside the context of a collection.
     next_exploration_ids = None
     completed_exploration_ids = None
     if user_id:
-        completed_exploration_ids = get_completed_exploration_ids(
-            user_id, collection_id)
+        completed_exploration_ids = _get_valid_completed_exploration_ids(
+            user_id, collection_id, collection)
         next_exploration_ids = collection.get_next_exploration_ids(
             completed_exploration_ids)
     else:
@@ -290,30 +297,31 @@ def get_learner_collection_dict_by_id(
         completed_exploration_ids)
     collection_dict['version'] = collection.version
 
+    collection_is_public = rights_manager.is_collection_public(collection_id)
 
     # Insert an 'exploration' dict into each collection node, where the
     # dict includes meta information about the exploration (ID and title).
     for collection_node in collection_dict['nodes']:
-        summary = exp_summaries_dict.get(collection_node['exploration_id'])
-        if not summary:
-            raise utils.ValidationError(
-                'Expected collection to only reference valid explorations, but '
-                'found an exploration with ID: %s (was the exploration '
-                'deleted?)' % collection_node['exploration_id'])
+        exploration_id = collection_node['exploration_id']
+        summary_dict = exp_summaries_dict_map.get(exploration_id)
+        if not allow_invalid_explorations:
+            if not summary_dict:
+                raise utils.ValidationError(
+                    'Expected collection to only reference valid '
+                    'explorations, but found an exploration with ID: %s (was '
+                    'the exploration deleted?)' % exploration_id)
+            if collection_is_public and rights_manager.is_exploration_private(
+                    exploration_id):
+                raise utils.ValidationError(
+                    'Cannot reference a private exploration within a public '
+                    'collection, exploration ID: %s' % exploration_id)
 
         collection_node['exploration'] = {
             'id': collection_node['exploration_id'],
-            'title': summary.title,
-            'category': summary.category,
-            'objective': summary.objective,
-            'ratings': summary.ratings,
-            'last_updated_msec': utils.get_time_in_millisecs(
-                summary.exploration_model_last_updated),
-            'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
-                summary.category),
-            'thumbnail_bg_color': utils.get_hex_color_for_category(
-                summary.category),
+            'exists': bool(summary_dict)
         }
+        if summary_dict:
+            collection_node['exploration'].update(summary_dict)
 
     return collection_dict
 
@@ -362,6 +370,19 @@ def get_completed_exploration_ids(user_id, collection_id):
     progress_model = user_models.CollectionProgressModel.get(
         user_id, collection_id)
     return progress_model.completed_explorations if progress_model else []
+
+
+def _get_valid_completed_exploration_ids(user_id, collection_id, collection):
+    """Returns a filtered version of the return value of
+    get_completed_exploration_ids, where explorations not also found within the
+    collection are removed from the returned list.
+    """
+    completed_exploration_ids = get_completed_exploration_ids(
+        user_id, collection_id)
+    return [
+        exp_id for exp_id in completed_exploration_ids
+        if collection.get_node(exp_id)
+    ]
 
 
 def get_next_exploration_ids_to_complete_by_user(user_id, collection_id):
@@ -547,13 +568,32 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     else:
         collection.validate(strict=False)
 
+    # Validate that all explorations referenced by the collection exist.
+    exp_ids = collection.exploration_ids
+    exp_summaries = (
+        exp_services.get_exploration_summaries_matching_ids(exp_ids))
+    exp_summaries_dict = {
+        exp_id: exp_summaries[ind] for (ind, exp_id) in enumerate(exp_ids)
+    }
     for collection_node in collection.nodes:
-        if not exp_services.get_exploration_by_id(
-                collection_node.exploration_id, strict=False):
+        if not exp_summaries_dict[collection_node.exploration_id]:
             raise utils.ValidationError(
                 'Expected collection to only reference valid explorations, '
-                'but found an exploration with ID: %s' %
+                'but found an exploration with ID: %s (was it deleted?)' %
                 collection_node.exploration_id)
+
+    # Ensure no explorations are being added that are 'below' the public status
+    # of this collection. If the collection is private, it can have both
+    # private and public explorations. If it's public, it can only have public
+    # explorations.
+    # TODO(bhenning): Ensure the latter is enforced above when trying to
+    # publish a collection.
+    if rights_manager.is_collection_public(collection.id):
+        for exploration_id in collection.exploration_ids:
+            if rights_manager.is_exploration_private(exploration_id):
+                raise utils.ValidationError(
+                    'Cannot reference a private exploration within a public '
+                    'collection, exploration ID: %s' % exploration_id)
 
     collection_model = collection_models.CollectionModel.get(
         collection.id, strict=False)

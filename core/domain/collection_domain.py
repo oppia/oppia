@@ -383,8 +383,9 @@ class Collection(object):
         """
         acquired_skills = set()
         for completed_exp_id in completed_exploration_ids:
-            acquired_skills.update(
-                self.get_node(completed_exp_id).acquired_skills)
+            collection_node = self.get_node(completed_exp_id)
+            if collection_node:
+                acquired_skills.update(collection_node.acquired_skills)
 
         next_exp_ids = []
         for node in self.nodes:

@@ -19,7 +19,7 @@
  */
 
 oppia.constant(
-  'COLLECTION_DATA_URL', '/collection_handler/data/<collection_id>');
+  'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');
 
 oppia.animation('.oppia-collection-animate-slide', function() {
   return {
@@ -127,8 +127,11 @@ oppia.controller('CollectionPlayer', [
       },
       function(error) {
         // TODO(bhenning): Handle not being able to load the collection.
+        // NOTE TO DEVELOPERS: Check the backend console for an indication as to
+        // why this error occurred; sometimes the errors are noisy, so they are
+        // not shown to the user.
         warningsData.addWarning(
-          error || 'There was an error loading the collection.');
+          'There was an error loading the collection.');
       }
     );
   }

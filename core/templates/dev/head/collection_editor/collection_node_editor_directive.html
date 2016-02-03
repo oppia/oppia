@@ -1,10 +1,12 @@
-<script type="text/ng-template" id="inline/collection_node_directive">
+<script type="text/ng-template" id="inline/collection_node_editor_directive">
   <div>
     [<[getExplorationId()]>] <em><[getExplorationTitle()]></em>
+    <span ng-if="!doesExplorationExist()"><strong>Warning: This exploration no longer exists.</strong></span>
+    <span ng-if="isExplorationNew()"><strong>Warning: Please save the collection before details will appear for this exploration.</strong></span>
     <button ng-click="deleteExploration()">Delete</button>
   </div>
   <p> Prerequisite skills: </p>
-  <div ng-if="(getPrerequisiteSkills()).length > 0">
+  <div ng-if="getPrerequisiteSkills().length > 0">
     <ul>
       <li ng-repeat="skill in getPrerequisiteSkills() track by $index">
         <em><[skill]></em>
@@ -17,10 +19,10 @@
   <br>
 
   <p> Acquired skills: </p>
-  <div ng-if="(getAcquiredSkills()).length > 0">
+  <div ng-if="getAcquiredSkills().length > 0">
     <ul>
-      <li ng-repeat="skill in getAcquiredSkills() track by $index"><em>
-        <[skill]></em>
+      <li ng-repeat="skill in getAcquiredSkills() track by $index">
+        <em><[skill]></em>
         <button ng-click="removeAcquiredSkill($index)">Delete</button>
       </li>
     </ul>
