@@ -304,7 +304,7 @@ def download_manifest_files(filepath):
                     dependency_tar_root_name, dependency_target_root_name)
 
 
-MATHJAX_REV = '2.4-latest'
+MATHJAX_REV = '2.6.0'
 MATHJAX_ROOT_NAME = 'MathJax-%s' % MATHJAX_REV
 MATHJAX_TARGET_ROOT_NAME = MATHJAX_ROOT_NAME
 MATHJAX_DIR_PREFIX = os.path.join(
