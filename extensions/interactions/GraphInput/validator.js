@@ -62,7 +62,9 @@ oppia.filter('oppiaInteractiveGraphInputValidator', [
       for (var j = 0; j < ruleSpecs.length; j++) {
         var ruleSpec = ruleSpecs[j];
         try {
-          if (ruleSpec.rule_type === 'IsIsomorphicTo' &&
+          if (ruleSpec.rule_type === 'HasGraphProperty') {
+            continue;
+          } else if (ruleSpec.rule_type === 'IsIsomorphicTo' &&
               ruleSpec.inputs.g.vertices.length > ISOMORPHISM_VERTICES_LIMIT) {
             warningsList.push({
               type: WARNING_TYPES.CRITICAL,

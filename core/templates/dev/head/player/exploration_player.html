@@ -33,6 +33,40 @@
 {% endblock navbar_breadcrumb %}
 
 {% block local_top_nav_options %}
+  <script type="text/ng-template" id="modals/learnerSuggestionSubmitted">
+    <div class="modal-header">
+      <h3>Thanks!</h3>
+    </div>
+
+    <div class="modal-body">
+      <p>
+        Your suggestion has been forwarded to the exploration author for review.
+      </p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-default" ng-click="close()">Close</button>
+    </div>
+  </script>
+  <script type="text/ng-template" id="modals/learnerViewSuggestion">
+    <div class="modal-header">
+      <h3>Suggest a Change</h3>
+    </div>
+
+    <div class="modal-body">
+      <text-angular-rte ng-show="showEditor" html-content="suggestionContent"></text-angular-rte>
+      <br>
+      Briefly describe your changes (required):
+      <input type="text" ng-model="description" style="width: 100%">
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-default" ng-click="cancelSuggestion()">Cancel</button>
+      <button class="btn btn-success" ng-click="submitSuggestion()" ng-disabled="(initContent == suggestionContent) || !description">
+        Submit Suggestion
+      </button>
+    </div>
+  </script>
   {% include 'player/learner_local_nav.html' %}
 {% endblock local_top_nav_options %}
 
@@ -59,7 +93,6 @@
 {% block footer_js %}
   {{ super() }}
   <script>
-    {{ include_js_file('services/explorationContextService.js') }}
     {{ include_js_file('services/explorationServices.js') }}
     {{ include_js_file('services/messengerService.js') }}
 

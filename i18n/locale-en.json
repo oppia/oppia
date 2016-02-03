@@ -86,7 +86,7 @@
   "I18N_GALLERY_N_LANGUAGES": "<[languagesCount]> Languages",
   "I18N_GALLERY_OPPIA_DESCRIPTION": "Oppia is a personalized learning platform created by and for people like you.",
   "I18N_GALLERY_OPPIA_FIND_OUT_MORE": "Find out more!",
-  "I18N_GALLERY_NO_EXPLORATION_FOR_QUERY": "We don't have any explorations matching this query yet.",
+  "I18N_GALLERY_NO_EXPLORATION_FOR_QUERY": "Oops, it looks like your search didn't match any explorations.",
   "I18N_GALLERY_CREATE_EXPLORATION_QUESTION": "Would you like to create one?",
   "I18N_GALLERY_COMMUNITY_EXPLORATIONS": "Dive into an exploration created by the community:",
   "I18N_GALLERY_EDIT_EXPLORATION": "Edit",

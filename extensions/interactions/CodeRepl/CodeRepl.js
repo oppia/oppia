@@ -73,6 +73,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
               cm.getDoc().setCursor(endSelectionPos);
             }
           });
+          editor.setOption('theme', 'preview default');
 
           // NOTE: this is necessary to avoid the textarea being greyed-out.
           setTimeout(function() {
@@ -102,6 +103,15 @@ oppia.directive('oppiaInteractiveCodeRepl', [
             // This output function is called continuously throughout the
             // runtime of the script.
             $scope.output += out;
+          },
+          read: function(name) {
+            // This function is called when a builtin module is imported
+            if (Sk.builtinFiles.files[name] === undefined) {
+              // If corresponding module is not present then,
+              // removal of this block also results in failure of import.
+              throw 'module ' + name + ' not found';
+            }
+            return Sk.builtinFiles.files[name];
           },
           timeoutMsg: function() {
             $scope.sendResponse('', 'timeout');
