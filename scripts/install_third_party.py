@@ -220,8 +220,9 @@ def test_manifest_syntax(dependency_type, dependency_dict):
                 print '------------------------------------------'
                 print 'There is syntax error in this dependency'
                 print dependency_dict
-                print 'Only one of these keys pair must be used: "%s".'\
-                      % str(optional_keys)
+                print (
+                    'Only one of these keys pair must be used: "%s".'
+                    % str(optional_keys))
                 print 'Exiting'
                 sys.exit(1)
 
@@ -317,9 +318,9 @@ MATHJAX_SUBDIRS_TO_REMOVE = [
 def _install_third_party_libs():
     download_manifest_files(MANIFEST_FILE_PATH)
 
-    # pylint: disable=fixme, line-too-long
     # MathJax is too big. Remove many unneeded files by following these
     # instructions:
+    # pylint: disable=line-too-long
     # https://github.com/mathjax/MathJax/wiki/Shrinking-MathJax-for-%22local%22-installation
     for subdir in MATHJAX_SUBDIRS_TO_REMOVE:
         full_dir = os.path.join(MATHJAX_DIR_PREFIX, subdir)

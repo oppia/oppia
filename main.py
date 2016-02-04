@@ -283,8 +283,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/imageupload/<exploration_id>',
         editor.ImageUploadHandler, 'image_upload_handler'),
     get_redirect_route(
-        r'/createhandler/resolved_answers/<exploration_id>/'
-        + r'<escaped_state_name>',
+        r'/createhandler/resolved_answers/<exploration_id>/' +
+        r'<escaped_state_name>',
         editor.ResolvedAnswersHandler, 'resolved_answers_handler'),
     get_redirect_route(
         r'/createhandler/training_data/<exploration_id>/<escaped_state_name>',
@@ -313,8 +313,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/statistics/<exploration_id>/<exploration_version>',
         editor.ExplorationStatisticsHandler, 'exploration_statistics_handler'),
     get_redirect_route(
-        r'/createhandler/state_rules_stats/<exploration_id>/'
-        + r'<escaped_state_name>',
+        r'/createhandler/state_rules_stats/<exploration_id>/' +
+        r'<escaped_state_name>',
         editor.StateRulesStatsHandler, 'state_rules_stats_handler'),
     get_redirect_route(
         r'/createhandler/started_tutorial_event',

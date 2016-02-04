@@ -257,8 +257,8 @@ class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.EXP_ID, owner_id, end_state_name='End')
         rights_manager.publish_exploration(owner_id, self.EXP_ID)
-        job_id = exp_jobs_one_off.\
-            ExplorationFirstPublishedOneOffJob.create_new()
+        job_class = exp_jobs_one_off.ExplorationFirstPublishedOneOffJob
+        job_id = job_class.create_new()
         exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
         exploration_rights = rights_manager.get_exploration_rights(self.EXP_ID)
@@ -273,8 +273,7 @@ class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
 
         rights_manager.unpublish_exploration(admin_id, self.EXP_ID)
         rights_manager.publish_exploration(owner_id, self.EXP_ID)
-        job_id = exp_jobs_one_off.\
-            ExplorationFirstPublishedOneOffJob.create_new()
+        job_id = job_class.create_new()
         exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 

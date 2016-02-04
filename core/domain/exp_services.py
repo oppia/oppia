@@ -470,8 +470,8 @@ def apply_change_list(exploration_id, change_list):
                         exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
                     state.update_interaction_default_outcome(change.new_value)
                 elif (
-                        change.property_name == exp_domain.\
-                            STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS):
+                        change.property_name ==
+                        exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
                     state.update_interaction_confirmed_unclassified_answers(
                         change.new_value)
                 elif (

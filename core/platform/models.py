@@ -41,8 +41,8 @@ class _Gae(_Platform):
                 from core.storage.base_model import gae_models as base_models
                 returned_models.append(base_models)
             elif name == NAMES.collection:
-                from core.storage.collection import gae_models\
-                as collection_models
+                # pylint: disable=line-too-long
+                from core.storage.collection import gae_models as collection_models
                 returned_models.append(collection_models)
             elif name == NAMES.config:
                 from core.storage.config import gae_models as config_models
@@ -63,13 +63,13 @@ class _Gae(_Platform):
                 from core.storage.job import gae_models as job_models
                 returned_models.append(job_models)
             elif name == NAMES.recommendations:
-                from core.storage.recommendations import gae_models\
-                as recommendations_models
+                # pylint: disable=line-too-long
+                from core.storage.recommendations import gae_models as recommendations_models
 
                 returned_models.append(recommendations_models)
             elif name == NAMES.statistics:
-                from core.storage.statistics import gae_models\
-                as statistics_models
+                # pylint: disable=line-too-long
+                from core.storage.statistics import gae_models as statistics_models
                 returned_models.append(statistics_models)
             elif name == NAMES.user:
                 from core.storage.user import gae_models as user_models
