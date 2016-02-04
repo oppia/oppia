@@ -63,7 +63,6 @@ class _Gae(_Platform):
                 returned_models.append(job_models)
             elif name == NAMES.recommendations:
                 from core.storage.recommendations import gae_models as recommendations_models # pylint: disable=line-too-long
-
                 returned_models.append(recommendations_models)
             elif name == NAMES.statistics:
                 from core.storage.statistics import gae_models as statistics_models # pylint: disable=line-too-long
