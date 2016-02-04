@@ -137,21 +137,17 @@ oppia.controller('CollectionEditor', ['$scope',
     };
 
     $scope.addCollectionNode = function(explorationId) {
-      if (!_getCollectionNodeByExplorationId(explorationId)) {
-        var newNode = {
-          exploration_id: explorationId,
-          acquired_skills: [],
-          prerequisite_skills: [],
-          exploration: {
-            id: explorationId,
-            exists: true,
-            newlyCreated: true
-          }
-        };
-        $scope.collection.nodes.push(newNode);
-        return true;
-      } else {
-      }
+      var newNode = {
+        exploration_id: explorationId,
+        acquired_skills: [],
+        prerequisite_skills: [],
+        exploration: {
+          id: explorationId,
+          exists: true,
+          newlyCreated: true
+        }
+      };
+      $scope.collection.nodes.push(newNode);
     };
 
     $scope.setCollectionTitle = function(newTitle) {

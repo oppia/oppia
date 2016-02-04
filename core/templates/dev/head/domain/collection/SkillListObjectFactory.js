@@ -21,9 +21,7 @@
 
 // TODO(bhenning): Add tests for this, especially before it's more critically
 // used.
-oppia.factory('SkillListObjectFactory', [
-  function(
-      INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE, StateObjectFactory) {
+oppia.factory('SkillListObjectFactory', [function() {
     var SkillList = function(initialSkills) {
       this.clearSkills();
       this.addSkills(initialSkills);

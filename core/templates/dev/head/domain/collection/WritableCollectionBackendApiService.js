@@ -37,7 +37,6 @@ oppia.factory('WritableCollectionBackendApiService', [
     function($http, $q, COLLECTION_DATA_URL_TEMPLATE,
       WRITABLE_COLLECTION_DATA_URL_TEMPLATE, UrlInterpolationService,
       CollectionBackendApiService) {
-
       var _fetchWritableCollection = function(
           collectionId, successCallback, errorCallback) {
         var collectionDataUrl = UrlInterpolationService.interpolateUrl(
@@ -56,7 +55,7 @@ oppia.factory('WritableCollectionBackendApiService', [
             errorCallback(error);
           }
         });
-      }
+      };
 
       var _updateCollection = function(
           collectionId, collectionVersion, commitMessage, changeList,

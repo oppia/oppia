@@ -125,7 +125,7 @@ oppia.controller('CollectionPlayer', [
       function(collection) {
         $scope.collection = collection;
       },
-      function(error) {
+      function() {
         // TODO(bhenning): Handle not being able to load the collection.
         // NOTE TO DEVELOPERS: Check the backend console for an indication as to
         // why this error occurred; sometimes the errors are noisy, so they are
