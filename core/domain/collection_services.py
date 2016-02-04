@@ -869,6 +869,7 @@ def get_next_page_of_all_non_private_commits(
     if max_age is not None and not isinstance(max_age, datetime.timedelta):
         raise ValueError(
             "max_age must be a datetime.timedelta instance. or None.")
+
     results, new_urlsafe_start_cursor, more = (
         collection_models.CollectionCommitLogEntryModel.get_all_non_private_commits( # pylint: disable=line-too-long
             page_size, urlsafe_start_cursor, max_age=max_age))
