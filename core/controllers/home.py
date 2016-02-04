@@ -56,10 +56,9 @@ class NotificationsDashboardHandler(base.BaseHandler):
         """Handles GET requests."""
         if self.user_id is None:
             raise self.PageNotFoundException
-
+        # pylint: disable=line-too-long
         job_queued_msec, recent_notifications = (
-            user_jobs_continuous.DashboardRecentUpdatesAggregator.\
-            get_recent_notifications(
+            user_jobs_continuous.DashboardRecentUpdatesAggregator.get_recent_notifications(
                 self.user_id))
 
         last_seen_msec = (

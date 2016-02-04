@@ -554,8 +554,8 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
 
         # Test that first contribution time is not set for unpublished
         # explorations.
-        job_id = user_jobs_one_off.\
-            UserFirstContributionMsecOneOffJob.create_new()
+        job_id = (
+            user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
         user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
         self.assertIsNone(user_services.get_user_settings(
