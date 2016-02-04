@@ -214,6 +214,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 'author_id': ANOTHER_USER_ID,
                 'subject': 'Update exploration',
             }], recent_notifications)
+
     def test_basic_computation_with_an_update_after_exploration_is_created(
             self):
         with self._get_test_context():

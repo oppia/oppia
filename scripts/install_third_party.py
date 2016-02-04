@@ -320,8 +320,7 @@ def _install_third_party_libs():
 
     # MathJax is too big. Remove many unneeded files by following these
     # instructions:
-    # pylint: disable=line-too-long
-    # https://github.com/mathjax/MathJax/wiki/Shrinking-MathJax-for-%22local%22-installation
+    # https://github.com/mathjax/MathJax/wiki/Shrinking-MathJax-for-%22local%22-installation pylint: disable=line-too-long
     for subdir in MATHJAX_SUBDIRS_TO_REMOVE:
         full_dir = os.path.join(MATHJAX_DIR_PREFIX, subdir)
         if os.path.isdir(full_dir):
