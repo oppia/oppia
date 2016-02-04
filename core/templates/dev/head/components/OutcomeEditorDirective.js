@@ -36,19 +36,22 @@ oppia.directive('outcomeEditor', [function() {
         $scope.savedOutcome = angular.copy($scope.outcome);
 
         var onExternalSave = function() {
-          if ($scope.feedbackEditorIsOpen &&
-              $scope.editOutcomeForm.editFeedbackForm.$valid &&
-              !$scope.invalidStateAfterFeedbackSave()) {
-            $scope.saveThisFeedback();
-          } else {
-            $scope.cancelThisFeedbackEdit();
+          if ($scope.feedbackEditorIsOpen) {
+            if ($scope.editOutcomeForm.editFeedbackForm.$valid &&
+                !$scope.invalidStateAfterFeedbackSave()) {
+              $scope.saveThisFeedback();
+            } else {
+              $scope.cancelThisFeedbackEdit();
+            }
           }
-          if ($scope.destinationEditorIsOpen &&
-              $scope.editOutcomeForm.editDestForm.$valid &&
-              !$scope.invalidStateAfterDestinationSave()) {
-            $scope.saveThisDestination();
-          } else {
-            $scope.cancelThisDestinationEdit();
+
+          if ($scope.destinationEditorIsOpen) {
+            if ($scope.editOutcomeForm.editDestForm.$valid &&
+                !$scope.invalidStateAfterDestinationSave()) {
+              $scope.saveThisDestination();
+            } else {
+              $scope.cancelThisDestinationEdit();
+            }
           }
         };
 

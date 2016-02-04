@@ -4,7 +4,7 @@
        ng-class="{'oppia-editable-section': editabilityService.isEditable()}">
     <span ng-if="editabilityService.isEditable()" class="glyphicon glyphicon-pencil oppia-editor-edit-icon" title="Edit Card Content">
     </span>
-    <div class="oppia-state-content-display protractor-test-state-edit-content oppia-transition-200" ng-class="{'oppia-prevent-selection': editabilityService.isEditable()}" title="Card Content">
+    <div class="oppia-state-content-display oppia-transition-200" ng-class="{'oppia-prevent-selection': editabilityService.isEditable()}" title="Card Content">
       <span ng-show="content[0].value == '' && isCurrentStateInitialState()" class="oppia-placeholder">
         This is the first card of your exploration. Use this space to introduce your topic and engage the learner, then ask them a question.
       </span>
@@ -13,8 +13,8 @@
       </span>
       <span angular-html-bind="content[0].value" class="protractor-test-state-content-display"></span>
     </div>
-    <!-- This is a dummy div created to mask the contents when hovored above user contents-->
-    <div class="oppia-editable-section-mask"></div>
+    <!-- This is a dummy div created to mask the contents when hovered above user contents-->
+    <div class="oppia-editable-section-mask protractor-test-state-edit-content"></div>
   </div>
 </div>
 
