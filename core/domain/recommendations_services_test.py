@@ -195,10 +195,10 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
             '1.0,0.2,0.1\n'
             '0.2,1.0,0.8\n'
             '0.1,0.8,1.0')
-        self.assertEqual(
-            recommendations_services.get_topic_similarities_as_csv().\
-            splitlines(),
-            self.TOPIC_SIMILARITIES_UPDATED.splitlines())
+        topic_similarities = (
+            recommendations_services.get_topic_similarities_as_csv())
+        self.assertEqual(topic_similarities.splitlines(),
+                         self.TOPIC_SIMILARITIES_UPDATED.splitlines())
 
 
 class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
