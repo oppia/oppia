@@ -192,6 +192,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.NEW_EXPLORATION_URL,
         galleries.NewExploration, 'new_exploration'),
     get_redirect_route(
+        r'%s' % feconf.NEW_COLLECTION_URL,
+        galleries.NewCollection, 'new_collection'),
+    get_redirect_route(
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
         galleries.UploadExploration, 'upload_exploration'),
     get_redirect_route(

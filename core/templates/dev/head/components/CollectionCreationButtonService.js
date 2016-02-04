@@ -13,19 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Modal and functionality for the create exploration button.
+ * @fileoverview Modal and functionality for the create collection button.
  *
- * @author sll@google.com (Sean Lip)
+ * @author henning.benmax@gmail.com (Ben Henning)
  */
 
-// Service for the create/upload exploration buttons and modals.
-oppia.factory('ExplorationCreationButtonService', [
+// TODO(bhenning): Refactor this to match the frontend design spec and reduce
+// duplicated code between CollectionCreationButtonService and
+// ExplorationCreationButtonService.
+
+oppia.factory('CollectionCreationButtonService', [
   '$filter', '$http', '$modal', '$timeout', '$rootScope',
   'validatorsService', 'warningsData', 'focusService',
   function(
       $filter, $http, $modal, $timeout, $rootScope,
       validatorsService, warningsData, focusService) {
-    var getModalInstance = function(categoryList, isUploadModal) {
+    var getModalInstance = function(categoryList) {
       var modalInstance = $modal.open({
         backdrop: true,
         templateUrl: 'modals/galleryCreateNew',
@@ -40,25 +43,20 @@ oppia.factory('ExplorationCreationButtonService', [
               });
             }
             return result;
-          },
-          isUploadModal: function() {
-            return isUploadModal;
           }
         },
         controller: [
-          '$scope', '$modalInstance', 'categoriesForDropdown', 'isUploadModal',
+          '$scope', '$modalInstance', 'categoriesForDropdown',
           function(
-              $scope, $modalInstance, categoriesForDropdown, isUploadModal) {
-            $scope.createNewTitle = (
-              isUploadModal ? 'Upload an Exploration' :
-              'Create New Exploration');
-            $scope.activityName = 'exploration';
+              $scope, $modalInstance, categoriesForDropdown) {
+            $scope.createNewTitle = 'Create New Collection';
+            $scope.activityName = 'collection';
             $scope.categoriesForDropdown = categoriesForDropdown;
             $scope.newActivityTitle = '';
             $scope.newActivityCategory = '';
             $scope.newActivityObjective = '';
             $scope.newActivityLanguageCode = GLOBALS.DEFAULT_LANGUAGE_CODE;
-            $scope.isUploadModal = isUploadModal;
+            $scope.isUploadModal = false;
             $scope.changedAtLeastOnce = false;
 
             $scope.getAllLanguageCodes = function() {
@@ -72,38 +70,26 @@ oppia.factory('ExplorationCreationButtonService', [
 
               if (!category) {
                 warningsData.addWarning(
-                  'Please specify a category for this exploration.');
+                  'Please specify a category for this collection.');
                 return;
               }
 
-              var returnObj = {
+              $modalInstance.close({
                 category: category,
-                title: title
-              };
-
-              if ($scope.isUploadModal) {
-                var file = document.getElementById('newFileInput').files[0];
-                if (!file || !file.size) {
-                  warningsData.addWarning('Empty file detected.');
-                  return;
-                }
-                returnObj.yamlFile = file;
-              } else {
-                returnObj.objective = objective;
-                returnObj.languageCode = languageCode;
-              }
-
-              $modalInstance.close(returnObj);
+                title: title,
+                objective: objective,
+                languageCode: languageCode
+              });
             };
 
-            // Checks the validity of exploration title.
+            // Checks the validity of the colleciton title.
             $scope.isTitleValid = function(title, changedAtLeastOnce) {
               if (changedAtLeastOnce) {
                 $scope.changedAtLeastOnce = true;
               }
 
               if (!title) {
-                $scope.warningText = 'Please enter an exploration title.';
+                $scope.warningText = 'Please enter a collection title.';
                 return false;
               }
 
@@ -137,7 +123,7 @@ oppia.factory('ExplorationCreationButtonService', [
     };
 
     return {
-      showCreateExplorationModal: function(categoryList) {
+      showCreateCollectionModal: function(categoryList) {
         warningsData.clear();
 
         getModalInstance(categoryList, false).result.then(function(result) {
@@ -146,61 +132,16 @@ oppia.factory('ExplorationCreationButtonService', [
             return;
           }
 
-          $rootScope.loadingMessage = 'Creating exploration';
-          $http.post('/contributehandler/create_new', {
+          $rootScope.loadingMessage = 'Creating collection';
+          $http.post('/collection_editor_handler/create_new', {
             category: category,
             language_code: result.languageCode,
             objective: $filter('normalizeWhitespace')(result.objective),
             title: result.title
           }).success(function(data) {
-            window.location = '/create/' + data.explorationId;
+            window.location = '/collection_editor/create/' + data.collectionId;
           }).error(function() {
             $rootScope.loadingMessage = '';
-          });
-        });
-      },
-      showUploadExplorationModal: function(categoryList) {
-        warningsData.clear();
-
-        getModalInstance(categoryList, true).result.then(function(result) {
-          var title = result.title;
-          var category = $filter('normalizeWhitespace')(result.category);
-          var yamlFile = result.yamlFile;
-
-          if (!validatorsService.isValidEntityName(category, true)) {
-            return;
-          }
-
-          $rootScope.loadingMessage = 'Creating exploration';
-
-          var form = new FormData();
-          form.append('yaml_file', yamlFile);
-          form.append('payload', JSON.stringify({
-            category: category,
-            title: title
-          }));
-          form.append('csrf_token', GLOBALS.csrf_token);
-
-          $.ajax({
-            contentType: false,
-            data: form,
-            dataFilter: function(data) {
-              // Remove the XSSI prefix.
-              return JSON.parse(data.substring(5));
-            },
-            dataType: 'text',
-            processData: false,
-            type: 'POST',
-            url: 'contributehandler/upload'
-          }).done(function(data) {
-            window.location = '/create/' + data.explorationId;
-          }).fail(function(data) {
-            var transformedData = data.responseText.substring(5);
-            var parsedResponse = JSON.parse(transformedData);
-            warningsData.addWarning(
-              parsedResponse.error || 'Error communicating with server.');
-            $rootScope.loadingMessage = '';
-            $scope.$apply();
           });
         });
       }

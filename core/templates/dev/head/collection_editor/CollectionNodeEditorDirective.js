@@ -66,18 +66,20 @@ oppia.directive('collectionNodeEditorDirective', [function() {
 
       // Adds a prerequisite skill to the frontend collection object and also
       // updates the changelist.
-      $scope.addNewPrerequisiteSkill = function(newSkill) {
-        if (!_validateNewSkill(newSkill, $scope.getPrerequisiteSkills())) {
+      $scope.addNewPrerequisiteSkill = function() {
+        if (!_validateNewSkill(
+            $scope.prerequisiteSkillName, $scope.getPrerequisiteSkills())) {
           return;
         }
         $scope.addPrerequisiteSkill({
-          skillName: newSkill,
+          skillName: $scope.prerequisiteSkillName,
           explorationId: $scope.getExplorationId()
         });
         $scope.addChange({
           change: CollectionUpdateService.buildPrerequisiteSkillsChangeDict(
             $scope.getExplorationId(), $scope.getPrerequisiteSkills())
         });
+        $scope.prerequisiteSkillName = '';
       };
 
       // Removes a prerequisite skill from the frontend collection object and
@@ -95,18 +97,20 @@ oppia.directive('collectionNodeEditorDirective', [function() {
 
       // Adds an acquired skill to the frontend collection object and also
       // updates the changelist.
-      $scope.addNewAcquiredSkill = function(newSkill) {
-        if (!_validateNewSkill(newSkill, $scope.getAcquiredSkills())) {
+      $scope.addNewAcquiredSkill = function() {
+        if (!_validateNewSkill(
+            $scope.acquiredSkillName, $scope.getAcquiredSkills())) {
           return;
         }
         $scope.addAcquiredSkill({
-          skillName: newSkill,
+          skillName: $scope.acquiredSkillName,
           explorationId: $scope.getExplorationId()
         });
         $scope.addChange({
           change: CollectionUpdateService.buildAcquiredSkillsChangeDict(
             $scope.getExplorationId(), $scope.getAcquiredSkills())
         });
+        $scope.acquiredSkillName = '';
       };
 
       // Removes an acquired skill from the frontend collection object and also

@@ -222,3 +222,9 @@ BANNED_USERNAMES = ConfigProperty(
     SET_OF_STRINGS_SCHEMA,
     'Banned usernames (editing permissions for these users have been removed)',
     [])
+
+WHITELISTED_COLLECTION_EDITOR_USERNAMES = ConfigProperty(
+    'collection_editor_whitelist',
+    SET_OF_STRINGS_SCHEMA,
+    'Names of users allowed to use the collection editor',
+    [])

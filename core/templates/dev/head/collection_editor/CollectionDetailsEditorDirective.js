@@ -41,66 +41,71 @@ oppia.directive('collectionDetailsEditorDirective', [function() {
     templateUrl: 'inline/collection_details_editor_directive',
     controller: ['$scope', 'CollectionUpdateService', 'warningsData',
         function($scope, CollectionUpdateService, warningsData) {
-      $scope.addExploration = function(newExplorationId) {
+      $scope.addExploration = function() {
         var addCollectionNodeArgs = {
-          explorationId: newExplorationId
+          explorationId: $scope.newExplorationId
         };
-        if (!newExplorationId) {
+        if (!$scope.newExplorationId) {
           warningsData.addWarning('Cannot add an empty exploration ID.');
           return;
         }
         if ($scope.hasCollectionNode(addCollectionNodeArgs)) {
           warningsData.addWarning(
-            'Exploration with id ' + newExplorationId + ' is already added');
+            'Exploration with id ' + $scope.newExplorationId +
+            ' is already added');
           return;
         }
         $scope.addCollectionNode(addCollectionNodeArgs);
         $scope.addChange({
           change: CollectionUpdateService.buildAddCollectionNodeChangeDict(
-            newExplorationId)
+            $scope.newExplorationId)
         });
+        $scope.newExplorationId = '';
       };
 
-      $scope.updateCollectionTitle = function(newCollectionTitle) {
-        if (!newCollectionTitle) {
+      $scope.updateCollectionTitle = function() {
+        if (!$scope.newCollectionTitle) {
           warningsData.addWarning('Cannot set empty collection title.');
           return;
         }
         $scope.setCollectionTitle({
-          newTitle: newCollectionTitle
+          newTitle: $scope.newCollectionTitle
         });
         $scope.addChange({
           change: CollectionUpdateService.buildCollectionTitleChangeDict(
-            newCollectionTitle)
+            $scope.newCollectionTitle)
         });
+        $scope.newCollectionTitle = '';
       };
 
-      $scope.updateCollectionCategory = function(newCollectionCategory) {
-        if (!newCollectionCategory) {
+      $scope.updateCollectionCategory = function() {
+        if (!$scope.newCollectionCategory) {
           warningsData.addWarning('Cannot set empty collection category.');
           return;
         }
         $scope.setCollectionCategory({
-          newCategory: newCollectionCategory
+          newCategory: $scope.newCollectionCategory
         });
         $scope.addChange({
           change: CollectionUpdateService.buildCollectionCategoryChangeDict(
-            newCollectionCategory)
+            $scope.newCollectionCategory)
         });
+        $scope.newCollectionCategory = '';
       };
 
-      $scope.updateCollectionObjective = function(newCollectionObjective) {
-        if (!newCollectionObjective) {
+      $scope.updateCollectionObjective = function() {
+        if (!$scope.newCollectionObjective) {
           warningsData.addWarning('Cannot set empty collection objective.');
           return;
         }
         $scope.setCollectionObjective({
-          newObjective: newCollectionObjective
+          newObjective: $scope.newCollectionObjective
         });
         $scope.addChange({
           change: CollectionUpdateService.buildCollectionObjectiveChangeDict(
-            newCollectionObjective)
+            $scope.newCollectionObjective)
         });
+        $scope.newCollectionObjective = '';
       };
     }]
   };
