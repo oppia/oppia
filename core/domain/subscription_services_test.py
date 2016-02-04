@@ -36,8 +36,6 @@ FEEDBACK_THREAD_ID = 'fthread_id'
 FEEDBACK_THREAD_ID_2 = 'fthread_id_2'
 USER_ID = 'user_id'
 
-# Remove this line, maybe by shortaning names of methods smaller
-# pylint: disable=line-too-long
 
 class SubscriptionsTest(test_utils.GenericTestBase):
     """Tests for subscription management."""
@@ -177,7 +175,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(USER_ID), [EXP_ID])
 
-    def test_adding_new_exploration_owner_or_editor_role_results_in_subscription(self):
+    def test_adding_new_exploration_owner_or_editor_role_results_in_subscription(self): # pylint: disable=line-too-long
         exploration = exp_domain.Exploration.create_default_exploration(
             EXP_ID, 'Title', 'Category')
         exp_services.save_new_exploration(self.owner_id, exploration)
@@ -196,7 +194,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.editor_id), [EXP_ID])
 
-    def test_adding_new_exploration_viewer_role_does_not_result_in_subscription(self):
+    def test_adding_new_exploration_viewer_role_does_not_result_in_subscription(self): # pylint: disable=line-too-long
         exploration = exp_domain.Exploration.create_default_exploration(
             EXP_ID, 'Title', 'Category')
         exp_services.save_new_exploration(self.owner_id, exploration)
@@ -258,7 +256,8 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_collection_ids_subscribed_to(USER_ID), [COLLECTION_ID])
 
-    def test_adding_new_collection_owner_or_editor_role_results_in_subscription(self):
+    def test_adding_new_collection_owner_or_editor_role_results_in_subscription(
+            self):
         self.save_new_default_collection(COLLECTION_ID, self.owner_id)
 
         self.assertEqual(
@@ -279,7 +278,8 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             self._get_collection_ids_subscribed_to(self.editor_id),
             [COLLECTION_ID])
 
-    def test_adding_new_collection_viewer_role_does_not_result_in_subscription(self):
+    def test_adding_new_collection_viewer_role_does_not_result_in_subscription(
+            self):
         self.save_new_default_collection(COLLECTION_ID, self.owner_id)
 
         self.assertEqual(
@@ -302,7 +302,8 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             self._get_collection_ids_subscribed_to(self.owner_id),
             [COLLECTION_ID])
 
-    def test_adding_exploration_to_collection_does_not_create_subscription(self):
+    def test_adding_exploration_to_collection_does_not_create_subscription(
+            self):
         self.save_new_default_collection(COLLECTION_ID, self.owner_id)
 
         # The author is subscribed to the collection but to no explorations.
