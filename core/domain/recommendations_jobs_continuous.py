@@ -93,7 +93,8 @@ class ExplorationRecommendationsMRJobManager(
             return
 
         reference_exp_summary = exp_summaries_dict[exp_summary_id]
-        for compared_exp_id, compared_exp_summary in exp_summaries_dict.iteritems():
+        exp_summaries_items = exp_summaries_dict.iteritems()
+        for compared_exp_id, compared_exp_summary in exp_summaries_items:
             if compared_exp_id != exp_summary_id:
                 similarity_score = (
                     recommendations_services.get_item_similarity(

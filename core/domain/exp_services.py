@@ -161,8 +161,9 @@ def get_exploration_summary_from_model(exp_summary_model):
         exp_summary_model.ratings, exp_summary_model.status,
         exp_summary_model.community_owned, exp_summary_model.owner_ids,
         exp_summary_model.editor_ids, exp_summary_model.viewer_ids,
-        exp_summary_model.contributor_ids, exp_summary_model.contributors_summary,
-        exp_summary_model.version, exp_summary_model.exploration_model_created_on,
+        exp_summary_model.contributor_ids,
+        exp_summary_model.contributors_summary, exp_summary_model.version,
+        exp_summary_model.exploration_model_created_on,
         exp_summary_model.exploration_model_last_updated
     )
 
@@ -470,7 +471,7 @@ def apply_change_list(exploration_id, change_list):
                     state.update_interaction_default_outcome(change.new_value)
                 elif (
                         change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS):
+                        exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
                     state.update_interaction_confirmed_unclassified_answers(
                         change.new_value)
                 elif (
@@ -1099,7 +1100,8 @@ def compute_exploration_contributors_summary(exploration_id):
             break
 
         if is_revert:
-            current_version = snapshot_metadata['commit_cmds'][0]['version_number']
+            current_version = snapshot_metadata['commit_cmds'][0][
+                'version_number']
         else:
             current_version -= 1
     return contributors_summary
