@@ -95,7 +95,8 @@ class SuggestionModelTest(test_utils.GenericTestBase):
             description='description',
             state_content={'old_content': {}})]
 
-        self.assertEqual(len(self._get_suggestion_models_for_test(actual_suggestion)), 1)
+        self.assertEqual(len(self._get_suggestion_models_for_test(
+            actual_suggestion)), 1)
         self.assertEqual(
             self._get_suggestion_models_for_test(expected_suggestion),
             self._get_suggestion_models_for_test(actual_suggestion))

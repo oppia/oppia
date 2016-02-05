@@ -643,7 +643,7 @@ class RecommendationsHandler(base.BaseHandler):
         auto_recommended_exp_ids = []
         if self.user_id and collection_id:
             next_exp_ids_in_collection = (
-                collection_services.get_next_exploration_ids_to_complete_by_user(
+                collection_services.get_next_exploration_ids_to_complete_by_user( # pylint: disable=line-too-long
                     self.user_id, collection_id))
             auto_recommended_exp_ids = list(
                 set(next_exp_ids_in_collection) -

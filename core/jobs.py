@@ -542,7 +542,8 @@ class BaseMapReduceJobManager(BaseJobManager):
 
     @staticmethod
     def _entity_created_before_job_queued(entity):
-        """Checks that the given entity was created before the MR job was queued.
+        """Checks that the given entity was created before the MR job was
+        queued.
 
         Mapper methods may want to use this as a precomputation check,
         especially if the datastore classes being iterated over are append-only
@@ -617,7 +618,8 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
 
     @staticmethod
     def _entity_created_before_job_queued(entity):
-        """Checks that the given entity was created before the MR job was queued.
+        """Checks that the given entity was created before the MR job was
+        queued.
 
         Mapper methods may want to use this as a precomputation check,
         especially if the datastore classes being iterated over are append-only

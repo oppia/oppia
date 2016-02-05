@@ -568,8 +568,8 @@ def _assign_role(
         'new_role': new_role
     }]
 
-    _save_activity_rights(
-        committer_id, activity_rights, activity_type, commit_message, commit_cmds)
+    _save_activity_rights(committer_id, activity_rights, activity_type,
+                          commit_message, commit_cmds)
     _update_activity_summary(activity_type, activity_rights)
 
 
@@ -761,7 +761,8 @@ def set_private_viewability_of_exploration(
 
 def publish_exploration(committer_id, exploration_id):
     """This is called by the publish_exploration_and_update_user_profiles
-    function in exp_services.py. It publishes an exploration and commits changes.
+    function in exp_services.py. It publishes an exploration and
+    commits changes.
 
     It is the responsibility of the caller to check that the exploration is
     valid prior to publication.

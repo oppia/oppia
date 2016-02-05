@@ -309,7 +309,8 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
             '/profilehandler/data/%s' % self.USERNAME)
         self.assertIsNone(response_dict['first_contribution_msec'])
 
-        # Update the first_contribution_msec to the current time in milliseconds.
+        # Update the first_contribution_msec to the current time in
+        # milliseconds.
         first_time_in_msecs = utils.get_current_time_in_millisecs()
         user_services.update_first_contribution_msec_if_not_set(
             user_id, first_time_in_msecs)
