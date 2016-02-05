@@ -5,9 +5,9 @@
         <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
         <h2 class="exploration-title protractor-test-exp-summary-tile-title"><[getExplorationTitle()]></h2>
 
-        <div class="exploration-profile" ng-if="contributors.length > 0"
-             ng-mouseenter="allContributorsAreVisible = true"
-             ng-mouseleave="allContributorsAreVisible = false">
+        <div class="exploration-summary-contributors" ng-if="contributors.length > 0"
+             ng-mouseenter="$parent.allContributorsAreVisible = true"
+             ng-mouseleave="$parent.allContributorsAreVisible = false">
           <profile-link-image username="contributors[0]"
            tooltip="<[contributors[0]]>" tooltip-placement="left">
           </profile-link-image>
@@ -30,6 +30,10 @@
             </p>
           </div>
         </div>
+      </div>
+
+      <div ng-class="{'top-section-mask': !allContributorsAreVisible,
+                      'exploration-summary-tile-mask': allContributorsAreVisible}">
       </div>
 
       <div>
@@ -105,13 +109,8 @@
 
   .oppia-exploration-summary-tile .top-section {
     height: 144px;
-    opacity: 1.0;
     position: relative;
     width: 100%;
-  }
-
-  .oppia-exploration-summary-tile:hover .top-section {
-    opacity: 0.8;
   }
 
   .oppia-exploration-summary-tile,
@@ -120,12 +119,35 @@
     transition: all 300ms;
   }
 
-  .oppia-exploration-summary-tile .exploration-profile {
+  .exploration-summary-contributors {
     left: 170px;
     padding-right: 5px;
     position: absolute;
     top: 5px;
     width: 31px;
+    z-index: 11;
+  }
+
+  .exploration-summary-tile-mask {
+    background-color: #eee;
+    height: 240px;
+    left: 0px;
+    opacity: 0.7;
+    position: absolute;
+    top: 0px;
+    width: 200px;
+    z-index: 10;
+  }
+
+  .oppia-exploration-summary-tile:hover .top-section-mask {
+    background-color: #eee;
+    height: 144px;
+    left: 0px;
+    opacity: 0.4;
+    position: absolute;
+    top: 0px;
+    width: 200px;
+    z-index: 10;
   }
 
   .oppia-exploration-summary-tile .exploration-black-profile {
@@ -136,7 +158,7 @@
     height: 26px;
   }
 
-  .exploration-profile profile-link-image {
+  .exploration-summary-contributors profile-link-image {
     margin-bottom: 3px;
     display:block;
   }
