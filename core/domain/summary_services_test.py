@@ -132,4 +132,5 @@ class ExplorationDisplayableSummaries(
             'contributor_names': [self.ALBERT_NAME]
         }
         self.assertIn('last_updated_msec', displayable_summaries[0])
-        self.assertDictContainsSubset(expected_summary, displayable_summaries[0])
+        self.assertDictContainsSubset(expected_summary,
+                                      displayable_summaries[0])
