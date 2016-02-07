@@ -40,7 +40,7 @@ oppia.directive('oppiaNoninteractiveLink', [
             $attrs.urlWithValue);
           if (untrustedUrl.indexOf('http://') !== 0 &&
               untrustedUrl.indexOf('https://') !== 0) {
-            return;
+            unstrustedUrl = 'https://' + untrustedUrl;
           }
           $scope.url = untrustedUrl;
 
