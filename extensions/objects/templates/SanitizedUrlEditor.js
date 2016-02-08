@@ -46,10 +46,6 @@ oppia.directive('sanitizedUrlEditor', [
 
       $scope.$watch('localValue.label', function(newValue) {
         $scope.$parent.value = encodeURI(newValue);
-        if (newValue.indexOf('http://') === 0 ||
-            newValue.indexOf('https://') === 0) {
-          $scope.$parent.value = encodeURI(newValue);
-        }
       });
 
       $scope.$on('externalSave', function() {
