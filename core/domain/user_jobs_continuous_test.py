@@ -215,7 +215,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 'subject': 'Update exploration',
             }], recent_notifications)
 
-    def test_basic_computation_with_an_update_after_exploration_is_created(self):
+    def test_basic_computation_with_an_update_after_exploration_is_created(
+            self):
         with self._get_test_context():
             self.save_new_valid_exploration(
                 EXP_ID, USER_ID, title=EXP_TITLE, category='Category')
@@ -394,7 +395,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 expected_thread_notification,
             ])
 
-    def test_subscribing_to_exploration_subscribes_to_its_feedback_threads(self):
+    def test_subscribing_to_exploration_subscribes_to_its_feedback_threads(
+            self):
         with self._get_test_context():
             self.signup(USER_A_EMAIL, USER_A_USERNAME)
             user_a_id = self.get_user_id_from_email(USER_A_EMAIL)
@@ -928,8 +930,8 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
             user_stats_model.impact_score, expected_user_impact_score)
 
     def test_no_ratings_independence(self):
-        """Test that when one exploration has no ratings, the other exploration's
-        impact score is not impacted.
+        """Test that when one exploration has no ratings, the other
+        exploration's impact score is not impacted.
         """
         # Sign up a user and have them create two explorations.
         user_a_id = self._sign_up_user(
