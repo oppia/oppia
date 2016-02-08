@@ -29,7 +29,7 @@ class Link(base.BaseRichTextComponent):
     _customization_arg_specs = [{
         'name': 'url',
         'description': (
-            'If no protocol specified, HTTPS will be used.'),
+            'The link URL. If no protocol is specified, HTTPS will be used.'),
         'schema': {
             'type': 'custom',
             'obj_type': 'SanitizedUrl',
