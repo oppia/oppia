@@ -16,7 +16,7 @@
 
 oppia.directive('sanitizedUrlEditor', [
     '$compile', 'OBJECT_EDITOR_URL_PREFIX', 'warningsData',
-    function($compile, OBJECT_EDITOR_URL_PREFIX, warningsData) {
+    function($compile, OBJECT_EDITOR_URL_PREFIX) {
   // Editable URL directive.
   return {
     link: function(scope, element) {
@@ -43,17 +43,13 @@ oppia.directive('sanitizedUrlEditor', [
       }, true);
 
       $scope.getWarningText = function() {
-        if ($scope.localValue.label.indexOf('http://') !== 0 &&
-            $scope.localValue.label.indexOf('https://') !== 0) {
-          return 'URLs should start with http:// or https://';
-        } else {
-          return '';
-        }
+        return '';
       };
 
       $scope.alwaysEditable = true;
 
       $scope.$watch('localValue.label', function(newValue) {
+        $scope.$parent.value = encodeURI(newValue);
         if (newValue.indexOf('http://') === 0 ||
             newValue.indexOf('https://') === 0) {
           $scope.$parent.value = encodeURI(newValue);
@@ -62,18 +58,11 @@ oppia.directive('sanitizedUrlEditor', [
 
       $scope.$on('externalSave', function() {
         var currentValue = String($scope.localValue.label);
-        if (currentValue.indexOf('http://') !== 0 &&
-            currentValue.indexOf('https://') !== 0) {
-          warningsData.addWarning(
-              'Please enter a URL that starts with http:// or https://. ' +
-              'Your changes to the URL were not saved.');
-        } else {
-          if ($scope.active) {
-            $scope.replaceValue(currentValue);
-            // The $scope.$apply() call is needed to propagate the replaced
-            // value.
-            $scope.$apply();
-          }
+        if ($scope.active) {
+          $scope.replaceValue(currentValue);
+          // The $scope.$apply() call is needed to propagate the replaced
+          // value.
+          $scope.$apply();
         }
       });
     }
