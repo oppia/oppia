@@ -42,10 +42,6 @@ oppia.directive('sanitizedUrlEditor', [
         };
       }, true);
 
-      $scope.getWarningText = function() {
-        return '';
-      };
-
       $scope.alwaysEditable = true;
 
       $scope.$watch('localValue.label', function(newValue) {
