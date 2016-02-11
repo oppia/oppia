@@ -49,8 +49,7 @@ oppia.directive('sanitizedUrlEditor', [
       });
 
       $scope.$on('externalSave', function() {
-        var currentValue = encodeURI($scope.localValue.label);
-        var currentValue = String(currentValue);
+        var currentValue = String($scope.localValue.label);
         if ($scope.active) {
           $scope.replaceValue(currentValue);
           // The $scope.$apply() call is needed to propagate the replaced
