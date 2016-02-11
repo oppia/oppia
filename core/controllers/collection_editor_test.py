@@ -15,6 +15,7 @@
 """Tests for the collection editor page."""
 
 from core.domain import collection_services
+from core.domain import config_domain
 from core.domain import rights_manager
 from core.tests import test_utils
 import feconf
@@ -66,27 +67,34 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
 
     def test_access_collection_editor_page(self):
         """Test access to editor pages for the sample collection."""
+        whitelisted_usernames = (
+            config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES)
+        with self.swap(
+            config_domain, 'WHITELISTED_COLLECTION_EDITOR_USERNAMES',
+            config_domain.ConfigProperty(
+                'test_whitelisted_usernames', whitelisted_usernames.schema,
+                whitelisted_usernames.description, [self.EDITOR_USERNAME])):
+            # Check that it is possible to access a page with specific version
+            # number.
+            response = self.testapp.get(
+                '%s/%s?v=1' % (feconf.COLLECTION_DATA_URL_PREFIX,
+                               self.COLLECTION_ID))
+            self.assertEqual(response.status_int, 200)
+            self.assertIn('Introduction to Collections in Oppia', response.body)
 
-        # Check that it is possible to access a page with specific version
-        # number.
-        response = self.testapp.get(
-            '%s/%s?v=1' % (feconf.COLLECTION_DATA_URL_PREFIX,
+            # Check that non-editors cannot access the editor page. This is due
+            # to them being whitelisted.
+            response = self.testapp.get(
+                '%s/%s' % (feconf.COLLECTION_EDITOR_URL_PREFIX,
                            self.COLLECTION_ID))
-        self.assertEqual(response.status_int, 200)
-        self.assertIn('Introduction to Collections in Oppia', response.body)
+            self.assertEqual(response.status_int, 302)
 
-        # Check that non-editors cannot access the editor page.
-        response = self.testapp.get(
-            '%s/%s' % (feconf.COLLECTION_EDITOR_URL_PREFIX,
-                       self.COLLECTION_ID))
-        self.assertEqual(response.status_int, 302)
-
-        # Check that it is now possible to access and edit the editor page.
-        self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get(
-            '%s/%s' % (feconf.COLLECTION_EDITOR_URL_PREFIX,
-                       self.COLLECTION_ID))
-        self.assertEqual(response.status_int, 200)
-        self.assertIn('Introduction to Collections in Oppia', response.body)
-        self.assert_can_edit(response.body)
-        self.logout()
+            # Check that it is now possible to access and edit the editor page.
+            self.login(self.EDITOR_EMAIL)
+            response = self.testapp.get(
+                '%s/%s' % (feconf.COLLECTION_EDITOR_URL_PREFIX,
+                           self.COLLECTION_ID))
+            self.assertEqual(response.status_int, 200)
+            self.assertIn('Introduction to Collections in Oppia', response.body)
+            self.assert_can_edit(response.body)
+            self.logout()

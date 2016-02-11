@@ -99,7 +99,6 @@ oppia.factory('CollectionNodeObjectFactory', [
         acquired_skills: [],
         prerequisite_skills: [],
         exploration: {
-          id: explorationId,
           exists: true,
           newlyCreated: true
         }

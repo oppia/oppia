@@ -333,6 +333,7 @@ DEMO_COLLECTIONS = {
 # TODO(sll): Add all other URLs here.
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_WRITABLE_DATA_URL_PREFIX = '/collection_editor_handler/data'
+COLLECTION_RIGHTS_PREFIX = '/collection_editor_handler/rights'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
 CONTRIBUTE_GALLERY_URL = '/contribute'

@@ -24,26 +24,21 @@ oppia.constant(
 oppia.constant(
   'WRITABLE_COLLECTION_DATA_URL_TEMPLATE',
   '/collection_editor_handler/data/<collection_id>');
+oppia.constant(
+  'COLLECTION_RIGHTS_URL_TEMPLATE',
+  '/collection_editor_handler/rights/<collection_id>');
 
 oppia.controller('CollectionEditor', ['$scope',
-  'WritableCollectionBackendApiService', 'CollectionObjectFactory',
-  'SkillListObjectFactory', 'CollectionUpdateService', 'UndoRedoService',
-  'warningsData', function(
-    $scope, WritableCollectionBackendApiService, CollectionObjectFactory,
+  'WritableCollectionBackendApiService', 'CollectionRightsBackendApiService',
+  'CollectionObjectFactory', 'SkillListObjectFactory',
+  'CollectionUpdateService', 'UndoRedoService', 'warningsData', function(
+    $scope, WritableCollectionBackendApiService,
+    CollectionRightsBackendApiService, CollectionObjectFactory,
     SkillListObjectFactory, CollectionUpdateService, UndoRedoService,
     warningsData) {
     $scope.collection = null;
     $scope.collectionId = GLOBALS.collectionId;
     $scope.collectionSkillList = SkillListObjectFactory.create([]);
-
-    // Get the id of the collection to be loaded
-    var pathnameArray = window.location.pathname.split('/');
-    for (var i = 0; i < pathnameArray.length; i++) {
-      if (pathnameArray[i] === 'create') {
-        $scope.collectionId = pathnameArray[i + 1];
-        break;
-      }
-    }
 
     // Load the collection to be edited.
     WritableCollectionBackendApiService.fetchWritableCollection(
@@ -85,6 +80,19 @@ oppia.controller('CollectionEditor', ['$scope',
         }, function(error) {
           warningsData.addWarning(
             error || 'There was an error updating the collection.');
+        });
+    };
+
+    $scope.publishCollection = function() {
+      // TODO(bhenning): Publishing should not be doable when the exploration
+      // may have errors/warnings. Publish should only show up if the collection
+      // is private. This also needs a confirmation of destructive action since
+      // it is not reversible.
+      CollectionRightsBackendApiService.setCollectionPublic(
+        $scope.collectionId, $scope.collection.getVersion(),
+        true /* isPublic */).then(function() {}, function(error) {
+          warningsData.addWarning(
+            'There was an error when publishing the collection.');
         });
     };
   }]);

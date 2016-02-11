@@ -353,6 +353,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<collection_id>' % feconf.COLLECTION_WRITABLE_DATA_URL_PREFIX,
         collection_editor.WritableCollectionDataHandler,
         'writable_collection_data_handler'),
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_RIGHTS_PREFIX,
+        collection_editor.CollectionRightsHandler, 'collection_rights_handler'),
 
     get_redirect_route(
         r'/notificationshandler', home.NotificationsHandler,

@@ -26,6 +26,19 @@ import utils
 current_user_services = models.Registry.import_current_user_services()
 
 
+def _require_valid_version(version_from_payload, collection_version):
+    """Check that the payload version matches the given collection version."""
+    if version_from_payload is None:
+        raise base.BaseHandler.InvalidInputException(
+            'Invalid POST request: a version must be specified.')
+
+    if version_from_payload != collection_version:
+        raise base.BaseHandler.InvalidInputException(
+            'Trying to update version %s of collection from version %s, '
+            'which is too old. Please reload the page and try again.'
+            % (collection_version, version_from_payload))
+
+
 def require_editor(handler):
     """Decorator that checks if the user can edit the given collection."""
     def test_collection_editor(self, collection_id, **kwargs):
@@ -50,7 +63,9 @@ def require_editor(handler):
                 self.request.uri))
             return
 
-        if self.username in config_domain.BANNED_USERNAMES.value:
+        if (self.username in config_domain.BANNED_USERNAMES.value
+                or self.username not in
+                config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value):
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to access this page.')
 
@@ -152,3 +167,40 @@ class WritableCollectionDataHandler(CollectionEditorHandler):
         # Send the updated collection back to the frontend.
         self.values.update(collection_dict)
         self.render_json(self.values)
+
+
+class CollectionRightsHandler(CollectionEditorHandler):
+    """Handles management of collection editing rights."""
+
+    @require_editor
+    def put(self, collection_id):
+        """Updates the editing rights for the given collection."""
+        collection = collection_services.get_collection_by_id(collection_id)
+        version = self.payload.get('version')
+        _require_valid_version(version, collection.version)
+
+        # TODO(bhenning): Implement other rights changes here.
+        is_public = self.payload.get('is_public')
+
+        if is_public is not None:
+            if is_public:
+                try:
+                    collection.validate(strict=True)
+                    collection_services.validate_collection_public_explorations(
+                        collection)
+                except utils.ValidationError as e:
+                    raise self.InvalidInputException(e)
+
+                collection_services.publish_collection_and_update_user_profiles(
+                    self.user_id, collection_id)
+                collection_services.index_collections_given_ids([
+                    collection_id])
+            else:
+                raise self.InvalidInputException(
+                    'Cannot unpublish a collection.')
+
+        self.render_json({
+            'rights': rights_manager.get_collection_rights(
+                collection_id).to_dict()
+        })
+

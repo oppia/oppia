@@ -126,8 +126,8 @@ oppia.factory('SkillListObjectFactory', [function() {
       return this._skillList.length;
     };
 
-    // Appends another skill list to this list, where duplicate skills are
-    // ignored.
+    // Appends another skill list domain object to this list object, where
+    // duplicate skills are ignored.
     SkillList.prototype.concatSkillList = function(otherSkillList) {
       for (var i = 0; i < otherSkillList.getSkillCount(); i++) {
         this.addSkill(otherSkillList.getSkillByIndex(i));

@@ -274,8 +274,8 @@ def get_learner_collection_dict_by_id(
         for exp_summary_dict in exp_summary_dicts
     }
 
-    # TODO(#1461): Users should not be recommended explorations they
-    # have completed outside the context of a collection.
+    # TODO(bhenning): Users should not be recommended explorations they have
+    # completed outside the context of a collection (see #1461).
     next_exploration_ids = None
     completed_exploration_ids = None
     if user_id:
@@ -317,7 +317,6 @@ def get_learner_collection_dict_by_id(
                     'collection, exploration ID: %s' % exploration_id)
 
         collection_node['exploration'] = {
-            'id': collection_node['exploration_id'],
             'exists': bool(summary_dict)
         }
         if summary_dict:
@@ -551,6 +550,14 @@ def apply_change_list(collection_id, change_list):
         raise
 
 
+def validate_collection_public_explorations(collection):
+    for exploration_id in collection.exploration_ids:
+        if rights_manager.is_exploration_private(exploration_id):
+            raise utils.ValidationError(
+                'Cannot reference a private exploration within a public '
+                'collection, exploration ID: %s' % exploration_id)
+
+
 def _save_collection(committer_id, collection, commit_message, change_list):
     """Validates an collection and commits it to persistent storage.
 
@@ -589,11 +596,7 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     # TODO(bhenning): Ensure the latter is enforced above when trying to
     # publish a collection.
     if rights_manager.is_collection_public(collection.id):
-        for exploration_id in collection.exploration_ids:
-            if rights_manager.is_exploration_private(exploration_id):
-                raise utils.ValidationError(
-                    'Cannot reference a private exploration within a public '
-                    'collection, exploration ID: %s' % exploration_id)
+        validate_collection_public_explorations(collection)
 
     collection_model = collection_models.CollectionModel.get(
         collection.id, strict=False)
