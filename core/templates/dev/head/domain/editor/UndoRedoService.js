@@ -25,7 +25,7 @@
  * not currently supported.
  */
 var UndoRedoService = function() {
-  var UndoRedoService = { };
+  var UndoRedoService = {};
 
   var _appliedChanges = [];
   var _undoneChanges = [];

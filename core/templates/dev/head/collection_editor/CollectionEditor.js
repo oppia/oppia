@@ -88,9 +88,10 @@ oppia.controller('CollectionEditor', ['$scope',
       // may have errors/warnings. Publish should only show up if the collection
       // is private. This also needs a confirmation of destructive action since
       // it is not reversible.
+      var isPublic = true;
       CollectionRightsBackendApiService.setCollectionPublic(
-        $scope.collectionId, $scope.collection.getVersion(),
-        true /* isPublic */).then(function() {}, function(error) {
+        $scope.collectionId, $scope.collection.getVersion(), isPublic).then(
+        function() {}, function() {
           warningsData.addWarning(
             'There was an error when publishing the collection.');
         });

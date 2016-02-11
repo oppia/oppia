@@ -84,7 +84,7 @@ oppia.factory('CollectionUpdateService', [
         return _getParameterFromChangeDict(changeDict, 'exploration_id');
       };
 
-      var setSkillsMutator = function(oldSkills, skillGetterCallback) {
+      var SetSkillsMutator = function(oldSkills, skillGetterCallback) {
         var _getCollectionNode = function(changeDict, collection) {
           var explorationId = _getExplorationIdFromChangeDict(changeDict);
           return collection.getCollectionNodeByExplorationId(explorationId);
@@ -100,13 +100,13 @@ oppia.factory('CollectionUpdateService', [
         };
       };
 
-      var setPrerequisiteSkillsMutator = function(oldSkills) {
-        return new setSkillsMutator(oldSkills, function(collectionNode) {
+      var SetPrerequisiteSkillsMutator = function(oldSkills) {
+        return new SetSkillsMutator(oldSkills, function(collectionNode) {
           return collectionNode.getPrerequisiteSkillList();
         });
       };
-      var setAcquiredSkillsMutator = function(oldSkills) {
-        return new setSkillsMutator(oldSkills, function(collectionNode) {
+      var SetAcquiredSkillsMutator = function(oldSkills) {
+        return new SetSkillsMutator(oldSkills, function(collectionNode) {
           return collectionNode.getAcquiredSkillList();
         });
       };
@@ -152,7 +152,7 @@ oppia.factory('CollectionUpdateService', [
               changeDict, 'exploration_id');
             collection.deleteCollectionNode(explorationId);
           }, function(changeDict, collection) {
-              // Undo.
+            // Undo.
             collection.addCollectionNode(oldCollectionNode);
           });
         },
@@ -217,7 +217,7 @@ oppia.factory('CollectionUpdateService', [
          */
         setPrerequisiteSkills: function(collection, collectionNode) {
           var oldSkills = collectionNode.getPrerequisiteSkillList().getSkills();
-          var mutator = new setPrerequisiteSkillsMutator(oldSkills);
+          var mutator = new SetPrerequisiteSkillsMutator(oldSkills);
           _applyNodePropertyChange(
             collection, COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS,
             collectionNode.getExplorationId(), oldSkills, mutator.apply,
@@ -230,7 +230,7 @@ oppia.factory('CollectionUpdateService', [
          */
         setAcquiredSkills: function(collection, collectionNode) {
           var oldSkills = collectionNode.getAcquiredSkillList().getSkills();
-          var mutator = new setAcquiredSkillsMutator(oldSkills);
+          var mutator = new SetAcquiredSkillsMutator(oldSkills);
           _applyNodePropertyChange(
             collection, COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS,
             collectionNode.getExplorationId(), oldSkills, mutator.apply,
