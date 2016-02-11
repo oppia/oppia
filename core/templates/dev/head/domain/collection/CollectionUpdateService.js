@@ -15,7 +15,8 @@
 /**
  * @fileoverview Service to build changes to a collection. These changes may
  * then be used by other services, such as a backend API service to update the
- * collection in the backend.
+ * collection in the backend. This service also registers all changes with the
+ * undo/redo service.
  *
  * @author henning.benmax@gmail.com (Ben Henning)
  */
@@ -36,37 +37,77 @@ oppia.constant(
 oppia.constant('COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS', 'acquired_skills');
 
 oppia.factory('CollectionUpdateService', [
+    'CollectionNodeObjectFactory', 'ChangeObjectFactory', 'UndoRedoService',
     'CMD_ADD_COLLECTION_NODE', 'CMD_DELETE_COLLECTION_NODE',
     'CMD_EDIT_COLLECTION_PROPERTY', 'CMD_EDIT_COLLECTION_NODE_PROPERTY',
     'COLLECTION_PROPERTY_TITLE', 'COLLECTION_PROPERTY_CATEGORY',
     'COLLECTION_PROPERTY_OBJECTIVE',
     'COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS',
     'COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS', function(
+      CollectionNodeObjectFactory, ChangeObjectFactory, UndoRedoService,
       CMD_ADD_COLLECTION_NODE, CMD_DELETE_COLLECTION_NODE,
       CMD_EDIT_COLLECTION_PROPERTY, CMD_EDIT_COLLECTION_NODE_PROPERTY,
       COLLECTION_PROPERTY_TITLE, COLLECTION_PROPERTY_CATEGORY,
       COLLECTION_PROPERTY_OBJECTIVE,
       COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS,
       COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS) {
-      var _buildChangeDict = function(command, params) {
+      var _applyChange = function(collection, command, params, apply, reverse) {
         var changeDict = angular.copy(params);
         changeDict.cmd = command;
-        return changeDict;
+        var changeObj = ChangeObjectFactory.create(changeDict, apply, reverse);
+        UndoRedoService.applyChange(changeObj, collection);
+      };
+      var _getParameterFromChangeDict = function(changeDict, paramName) {
+        return changeDict[paramName];
       };
 
-      var _buildPropertyChangeDict = function(propertyName, newValue) {
-        return _buildChangeDict(CMD_EDIT_COLLECTION_PROPERTY, {
+      var _applyPropertyChange = function(
+          collection, propertyName, newValue, apply, reverse) {
+        _applyChange(collection, CMD_EDIT_COLLECTION_PROPERTY, {
           property_name: propertyName,
           new_value: newValue
-        });
+        }, apply, reverse);
+      };
+      var _getNewPropertyValueFromChangeDict = function(changeDict) {
+        return _getParameterFromChangeDict(changeDict, 'new_value');
       };
 
-      var _buildNodePropertyChangeDict = function(
-          propertyName, explorationId, newValue) {
-        return _buildChangeDict(CMD_EDIT_COLLECTION_NODE_PROPERTY, {
+      var _applyNodePropertyChange = function(
+          collection, propertyName, explorationId, newValue, apply, reverse) {
+        _applyChange(collection, CMD_EDIT_COLLECTION_NODE_PROPERTY, {
           property_name: propertyName,
           exploration_id: explorationId,
           new_value: newValue
+        }, apply, reverse);
+      };
+      var _getExplorationIdFromChangeDict = function(changeDict) {
+        return _getParameterFromChangeDict(changeDict, 'exploration_id');
+      };
+
+      var setSkillsMutator = function(oldSkills, skillGetterCallback) {
+        var _getCollectionNode = function(changeDict, collection) {
+          var explorationId = _getExplorationIdFromChangeDict(changeDict);
+          return collection.getCollectionNodeByExplorationId(explorationId);
+        };
+        this.apply = function(changeDict, collection) {
+          var skills = _getNewPropertyValueFromChangeDict(changeDict);
+          var collectionNode = _getCollectionNode(changeDict, collection);
+          skillGetterCallback(collectionNode).setSkills(skills);
+        };
+        this.reverse = function(changeDict, collection) {
+          var collectionNode = _getCollectionNode(changeDict, collection);
+          skillGetterCallback(collectionNode).setSkills(oldSkills);
+        };
+      };
+
+      var setPrerequisiteSkillsMutator = function(oldSkills) {
+        return new setSkillsMutator(oldSkills, function(collectionNode) {
+          return collectionNode.getPrerequisiteSkillList();
+        });
+      };
+      var setAcquiredSkillsMutator = function(oldSkills) {
+        return new setSkillsMutator(oldSkills, function(collectionNode) {
+          return collectionNode.getAcquiredSkillList();
         });
       };
 
@@ -74,68 +115,126 @@ oppia.factory('CollectionUpdateService', [
       // core.domain.collection_services.apply_change_list.
       return {
         /**
-         * Builds a change dict object to a collection representing adding a new
-         * exploration to a collection which, in turn, creates a new collection
-         * node to represent the referenced exploration.
+         * Adds a new exploration to a collection and records the change in the
+         * undo/redo service.
          */
-        buildAddCollectionNodeChangeDict: function(explorationId) {
-          return _buildChangeDict(CMD_ADD_COLLECTION_NODE, {
+        addCollectionNode: function(collection, explorationId) {
+          _applyChange(collection, CMD_ADD_COLLECTION_NODE, {
             exploration_id: explorationId
+          }, function(changeDict, collection) {
+            // Apply.
+            var explorationId = _getParameterFromChangeDict(
+              changeDict, 'exploration_id');
+            collection.addCollectionNode(
+              CollectionNodeObjectFactory.createNewFromExplorationId(
+                explorationId));
+          }, function(changeDict, collection) {
+            // Undo.
+            var explorationId = _getParameterFromChangeDict(
+              changeDict, 'exploration_id');
+            collection.deleteCollectionNode(explorationId);
           });
         },
 
         /**
-         * Builds a change dict object to remove an exploration from a
-         * collection.
+         * Removes an exploration from a collection and records the change in
+         * the undo/redo service.
          */
-        buildDeleteCollectionNodeChangeDict: function(explorationId) {
-          return _buildChangeDict(CMD_DELETE_COLLECTION_NODE, {
+        deleteCollectionNode: function(collection, explorationId) {
+          // TODO(bhenning): Check if the collection node needs to be cloned.
+          var oldCollectionNode = collection.getCollectionNodeByExplorationId(
+            explorationId);
+          _applyChange(collection, CMD_DELETE_COLLECTION_NODE, {
             exploration_id: explorationId
+          }, function(changeDict, collection) {
+            // Apply.
+            var explorationId = _getParameterFromChangeDict(
+              changeDict, 'exploration_id');
+            collection.deleteCollectionNode(explorationId);
+          }, function(changeDict, collection) {
+              // Undo.
+            collection.addCollectionNode(oldCollectionNode);
           });
         },
 
         /**
-         * Builds a change dict object to change the title of a collection.
+         * Changes the title of a collection and records the change in the
+         * undo/redo service.
          */
-        buildCollectionTitleChangeDict: function(title) {
-          return _buildPropertyChangeDict(COLLECTION_PROPERTY_TITLE, title);
+        setCollectionTitle: function(collection, title) {
+          var oldTitle = angular.copy(title);
+          _applyPropertyChange(
+            collection, COLLECTION_PROPERTY_TITLE, title,
+            function(changeDict, collection) {
+              // Apply.
+              var title = _getNewPropertyValueFromChangeDict(changeDict);
+              collection.setTitle(title);
+            }, function(changeDict, collection) {
+              // Undo.
+              collection.setTitle(oldTitle);
+            });
         },
 
         /**
-         * Builds a change dict object to change the title of a category.
+         * Changes the title of a category and records the change in the
+         * undo/redo service.
          */
-        buildCollectionCategoryChangeDict: function(category) {
-          return _buildPropertyChangeDict(
-            COLLECTION_PROPERTY_CATEGORY, category);
+        setCollectionCategory: function(collection, category) {
+          var oldCategory = angular.copy(category);
+          _applyPropertyChange(
+            collection, COLLECTION_PROPERTY_CATEGORY, category,
+            function(changeDict, collection) {
+              // Apply.
+              var category = _getNewPropertyValueFromChangeDict(changeDict);
+              collection.setCategory(category);
+            }, function(changeDict, collection) {
+              // Undo.
+              collection.setCategory(oldCategory);
+            });
         },
 
         /**
-         * Builds a change dict object to change the title of an objective.
+         * Changes the title of an objective and records the change in the
+         * undo/redo service.
          */
-        buildCollectionObjectiveChangeDict: function(objective) {
-          return _buildPropertyChangeDict(
-            COLLECTION_PROPERTY_OBJECTIVE, objective);
+        setCollectionObjective: function(collection, objective) {
+          var oldObjective = angular.copy(objective);
+          _applyPropertyChange(
+            collection, COLLECTION_PROPERTY_OBJECTIVE, objective,
+            function(changeDict, collection) {
+              // Apply.
+              var objective = _getNewPropertyValueFromChangeDict(changeDict);
+              collection.setObjective(objective);
+            }, function(changeDict, collection) {
+              // Undo.
+              collection.setObjective(oldObjective);
+            });
         },
 
         /**
-         * Builds a change dict object to change the prerequisite skills of an
-         * exploration within a collection.
+         * Changes the prerequisite skills of an exploration within a collection
+         * and records the change in the undo/redo service.
          */
-        buildPrerequisiteSkillsChangeDict: function(
-            explorationId, prerequisiteSkills) {
-          return _buildNodePropertyChangeDict(
-            COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS, explorationId,
-            prerequisiteSkills);
+        setPrerequisiteSkills: function(collection, collectionNode) {
+          var oldSkills = collectionNode.getPrerequisiteSkillList().getSkills();
+          var mutator = new setPrerequisiteSkillsMutator(oldSkills);
+          _applyNodePropertyChange(
+            collection, COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS,
+            collectionNode.getExplorationId(), oldSkills, mutator.apply,
+            mutator.reverse);
         },
 
         /**
-         * Builds a change dict object to change the acquired skills of an
-         * exploration within a collection.
+         * Changes the acquired skills of an exploration within a collection and
+         * records the change in the undo/redo service.
          */
-        buildAcquiredSkillsChangeDict: function(explorationId, acquiredSkills) {
-          return _buildNodePropertyChangeDict(
-            COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS, explorationId,
-            acquiredSkills);
+        setAcquiredSkills: function(collection, collectionNode) {
+          var oldSkills = collectionNode.getAcquiredSkillList().getSkills();
+          var mutator = new setAcquiredSkillsMutator(oldSkills);
+          _applyNodePropertyChange(
+            collection, COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS,
+            collectionNode.getExplorationId(), oldSkills, mutator.apply,
+            mutator.reverse);
         }
       };
     }]);

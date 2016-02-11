@@ -33,21 +33,21 @@ oppia.animation('.oppia-collection-animate-slide', function() {
 });
 
 oppia.controller('CollectionPlayer', [
-  '$scope', 'CollectionBackendApiService', 'warningsData',
-  function($scope, CollectionBackendApiService, warningsData) {
+  '$scope', 'CollectionBackendApiService', 'CollectionObjectFactory',
+  'warningsData',
+  function($scope, CollectionBackendApiService, CollectionObjectFactory,
+    warningsData) {
     $scope.collection = null;
     $scope.collectionId = GLOBALS.collectionId;
     $scope.showingAllExplorations = !GLOBALS.isLoggedIn;
 
     $scope.getCollectionNodeForExplorationId = function(explorationId) {
-      for (var i = 0; i < $scope.collection.nodes.length; i++) {
-        var collectionNode = $scope.collection.nodes[i];
-        if (collectionNode.exploration_id == explorationId) {
-          return collectionNode;
-        }
+      var collectionNode = (
+        $scope.collection.getCollectionNodeByExplorationId(explorationId));
+      if (!collectionNode) {
+        warningsData.addWarning('There was an error loading the collection.');
       }
-      warningsData.addWarning('There was an error loading the collection.');
-      return null;
+      return collectionNode;
     };
 
     $scope.getCollectionNodesForExplorationIds = function(explorationIds) {
@@ -59,48 +59,34 @@ oppia.controller('CollectionPlayer', [
       return collectionNodes;
     };
 
-    $scope.hasStartedCollection = function() {
-      return $scope.collection.completed_exploration_ids.length != 0;
-    };
-
-    $scope.hasFinishedCollection = function() {
-      return $scope.collection.next_exploration_ids.length == 0;
-    };
-
-    $scope.getNextRecommendedCollectionNodeCount = function() {
-      return $scope.collection.next_exploration_ids.length;
-    };
-
     $scope.getNextRecommendedCollectionNodes = function() {
       return $scope.getCollectionNodesForExplorationIds(
-        $scope.collection.next_exploration_ids);
-    };
-
-    $scope.getCompletedExplorationNodeCount = function() {
-      return $scope.collection.completed_exploration_ids.length;
+        $scope.collection.getNextExplorationIds());
     };
 
     $scope.getCompletedExplorationNodes = function() {
       return $scope.getCollectionNodesForExplorationIds(
-        $scope.collection.completed_exploration_ids);
+        $scope.collection.getCompletedExplorationIds());
     };
 
     $scope.getNonRecommendedCollectionNodeCount = function() {
-      return $scope.collection.nodes.length - (
-        $scope.getNextRecommendedCollectionNodeCount() +
-        $scope.getCompletedExplorationNodeCount());
+      return $scope.collection.getCollectionNodeCount() - (
+        $scope.collection.getNextRecommendedCollectionNodeCount() +
+        $scope.collection.getCompletedExplorationNodeCount());
     };
 
     $scope.getNonRecommendedCollectionNodes = function() {
       var displayedExplorationIds = (
-        $scope.collection.next_exploration_ids.concat(
-          $scope.collection.completed_exploration_ids));
+        $scope.collection.getNextExplorationIds().concat(
+          $scope.collection.getCompletedExplorationIds()));
       var nonRecommendedCollectionNodes = [];
-      for (var i = 0; i < $scope.collection.nodes.length; i++) {
-        var collectionNode = $scope.collection.nodes[i];
+      var collectionNodes = $scope.collection.getCollectionNodes();
+      for (var i = 0; i < collectionNodes.length; i++) {
+        var collectionNode = collectionNodes[i];
+        var explorationId = collectionNode.getExplorationId();
         var searchIndex = -1;
         for (var j = 0; j < displayedExplorationIds.length; j++) {
-          if (displayedExplorationIds[j] === collectionNode.exploration_id) {
+          if (displayedExplorationIds[j] === explorationId) {
             searchIndex = j;
             break;
           }
@@ -112,10 +98,6 @@ oppia.controller('CollectionPlayer', [
       return nonRecommendedCollectionNodes;
     };
 
-    $scope.getAllCollectionNodes = function() {
-      return $scope.collection.nodes;
-    };
-
     $scope.toggleShowAllExplorations = function() {
       $scope.showingAllExplorations = !$scope.showingAllExplorations;
     };
@@ -123,7 +105,7 @@ oppia.controller('CollectionPlayer', [
     // Load the collection the learner wants to view.
     CollectionBackendApiService.loadCollection($scope.collectionId).then(
       function(collection) {
-        $scope.collection = collection;
+        $scope.collection = CollectionObjectFactory.create(collection);
       },
       function() {
         // TODO(bhenning): Handle not being able to load the collection.

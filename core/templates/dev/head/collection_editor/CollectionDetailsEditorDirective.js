@@ -24,42 +24,27 @@ oppia.directive('collectionDetailsEditorDirective', [function() {
   return {
     restrict: 'E',
     scope: {
-      getTitle: '&title',
-      getCategory: '&category',
-      getObjective: '&objective',
-      getVersion: '&version',
-      hasCollectionNode: '&',
-      addCollectionNode: '&',
-      setCollectionTitle: '&',
-      setCollectionCategory: '&',
-      setCollectionObjective: '&',
-      // TODO(bhenning): The functionality of adding changes should be provided
-      // through a change list service singleton that's injected, rather than
-      // being passed through $scope.
-      addChange: '&'
+      getCollection: '&collection'
     },
     templateUrl: 'inline/collection_details_editor_directive',
-    controller: ['$scope', 'CollectionUpdateService', 'warningsData',
-        function($scope, CollectionUpdateService, warningsData) {
+    controller: ['$scope', 'CollectionUpdateService',
+      'CollectionNodeObjectFactory', 'warningsData', function(
+      $scope, CollectionUpdateService, CollectionNodeObjectFactory,
+      warningsData) {
       $scope.addExploration = function() {
-        var addCollectionNodeArgs = {
-          explorationId: $scope.newExplorationId
-        };
         if (!$scope.newExplorationId) {
           warningsData.addWarning('Cannot add an empty exploration ID.');
           return;
         }
-        if ($scope.hasCollectionNode(addCollectionNodeArgs)) {
+        var collection = $scope.getCollection();
+        if (collection.containsCollectionNode($scope.newExplorationId)) {
           warningsData.addWarning(
             'Exploration with id ' + $scope.newExplorationId +
             ' is already added');
           return;
         }
-        $scope.addCollectionNode(addCollectionNodeArgs);
-        $scope.addChange({
-          change: CollectionUpdateService.buildAddCollectionNodeChangeDict(
-            $scope.newExplorationId)
-        });
+        CollectionUpdateService.addCollectionNode(
+          collection, $scope.newExplorationId);
         $scope.newExplorationId = '';
       };
 
@@ -68,13 +53,9 @@ oppia.directive('collectionDetailsEditorDirective', [function() {
           warningsData.addWarning('Cannot set empty collection title.');
           return;
         }
-        $scope.setCollectionTitle({
-          newTitle: $scope.newCollectionTitle
-        });
-        $scope.addChange({
-          change: CollectionUpdateService.buildCollectionTitleChangeDict(
-            $scope.newCollectionTitle)
-        });
+        var collection = $scope.getCollection();
+        CollectionUpdateService.setCollectionTitle(
+          collection, $scope.newCollectionTitle);
         $scope.newCollectionTitle = '';
       };
 
@@ -83,13 +64,9 @@ oppia.directive('collectionDetailsEditorDirective', [function() {
           warningsData.addWarning('Cannot set empty collection category.');
           return;
         }
-        $scope.setCollectionCategory({
-          newCategory: $scope.newCollectionCategory
-        });
-        $scope.addChange({
-          change: CollectionUpdateService.buildCollectionCategoryChangeDict(
-            $scope.newCollectionCategory)
-        });
+        var collection = $scope.getCollection();
+        CollectionUpdateService.setCollectionCategory(
+          collection, $scope.newCollectionCategory);
         $scope.newCollectionCategory = '';
       };
 
@@ -98,13 +75,9 @@ oppia.directive('collectionDetailsEditorDirective', [function() {
           warningsData.addWarning('Cannot set empty collection objective.');
           return;
         }
-        $scope.setCollectionObjective({
-          newObjective: $scope.newCollectionObjective
-        });
-        $scope.addChange({
-          change: CollectionUpdateService.buildCollectionObjectiveChangeDict(
-            $scope.newCollectionObjective)
-        });
+        var collection = $scope.getCollection();
+        CollectionUpdateService.setCollectionObjective(
+          collection, $scope.newCollectionObjective);
         $scope.newCollectionObjective = '';
       };
     }]

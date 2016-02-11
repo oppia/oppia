@@ -19,11 +19,10 @@
  * @author henning.benmax@gmail.com (Ben Henning)
  */
 
-// TODO(bhenning): Add tests for this, especially before it's more critically
-// used.
+// TODO(bhenning): Add tests for this.
 oppia.factory('SkillListObjectFactory', [function() {
     var SkillList = function(initialSkills) {
-      this.clearSkills();
+      this._skillList = [];
       this.addSkills(initialSkills);
     };
 
@@ -33,7 +32,7 @@ oppia.factory('SkillListObjectFactory', [function() {
     // names are case-insensitive.
     SkillList.prototype.containsSkill = function(skillName) {
       var lowercaseSkillName = skillName.toLowerCase();
-      return this.skillsList.some(function(arrayItem) {
+      return this._skillList.some(function(arrayItem) {
         return arrayItem.toLowerCase() == lowercaseSkillName;
       });
     };
@@ -45,7 +44,7 @@ oppia.factory('SkillListObjectFactory', [function() {
       if (this.containsSkill(skillName)) {
         return false;
       }
-      this.skillsList.push(skillName);
+      this._skillList.push(skillName);
       return true;
     };
 
@@ -69,15 +68,25 @@ oppia.factory('SkillListObjectFactory', [function() {
     // Returns the skill at the given index, or null if the index is out of
     // bounds.
     SkillList.prototype.getSkillByIndex = function(skillIndex) {
-      if (skillIndex < 0 || skillIndex >= this.skillsList.length) {
+      if (skillIndex < 0 || skillIndex >= this._skillList.length) {
         return null;
       }
-      return this.skillsList[skillIndex];
+      return this._skillList[skillIndex];
     };
 
-    // Returns all of the skill names in the list.
+    // Returns all of the skill names in the list. The changes to the returned
+    // list will not be reflected in this domain object.
     SkillList.prototype.getSkills = function() {
-      return this.skillsList;
+      return this._skillList.slice();
+    };
+
+    // Returns the same result as getSkills(), except changes to the returned
+    // list are reflected in this class. This should only be used for angular
+    // bindings. Please note this reference is never invalidated; the internal
+    // skill list domain object guarantees this reference will not change for
+    // the lifetime of the skill list object.
+    SkillList.prototype.getBindableSkills = function() {
+      return this._skillList;
     };
 
     // Returns the index for the given skill, based on a case-insensitive search
@@ -85,8 +94,8 @@ oppia.factory('SkillListObjectFactory', [function() {
     // list.
     SkillList.prototype.indexOfSkill = function(skillName) {
       var lowercaseSkillName = skillName.toLowerCase();
-      for (var i = 0; i < this.skillsList.length; i++) {
-        if (this.skillsList[i] == lowercaseSkillName) {
+      for (var i = 0; i < this._skillList.length; i++) {
+        if (this._skillList[i] == lowercaseSkillName) {
           return i;
         }
       }
@@ -97,10 +106,10 @@ oppia.factory('SkillListObjectFactory', [function() {
     // successfully removed, where the removal will fail if the index is out of
     // bounds of the list.
     SkillList.prototype.removeSkillByIndex = function(skillIndex) {
-      if (skillIndex < 0 || skillIndex >= this.skillsList.length) {
+      if (skillIndex < 0 || skillIndex >= this._skillList.length) {
         return false;
       }
-      this.skillsList.splice(skillIndex, 1);
+      this._skillList.splice(skillIndex, 1);
       return true;
     };
 
@@ -114,7 +123,7 @@ oppia.factory('SkillListObjectFactory', [function() {
 
     // Returns the number of skills contained in this list.
     SkillList.prototype.getSkillCount = function() {
-      return this.skillsList.length;
+      return this._skillList.length;
     };
 
     // Appends another skill list to this list, where duplicate skills are
@@ -125,14 +134,15 @@ oppia.factory('SkillListObjectFactory', [function() {
       }
     };
 
-    // Empties this list of all skill names.
+    // Empties this list of all skill names. This will not invalidate previous
+    // references to the underlying skills list returned by getBindableSkills().
     SkillList.prototype.clearSkills = function() {
-      this.skillsList = [];
+      this._skillList.length = 0;
     };
 
     // Sorts the skill list lexicographically.
     SkillList.prototype.sortSkills = function() {
-      this.skillsList.sort();
+      this._skillList.sort();
     };
 
     // Static class methods. Note that "this" is not available in static
