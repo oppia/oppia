@@ -45,7 +45,7 @@ oppia.directive('sanitizedUrlEditor', [
       $scope.alwaysEditable = true;
 
       $scope.$watch('localValue.label', function(newValue) {
-        $scope.$parent.value = encodeURI(newValue);
+        $scope.$parent.value = newValue;
       });
 
       $scope.$on('externalSave', function() {
