@@ -19,14 +19,14 @@
  */
 
 describe('Gallery controller', function() {
-  beforeEach(module('oppia'));
-
   describe('Gallery', function() {
     var scope, ctrl, rootScope, $httpBackend;
 
     beforeEach(function() {
       module('ui.bootstrap');
     });
+
+    beforeEach(module('oppia', GLOBALS.OVERWRITE_TRANSLATOR_PROVIDER));
 
     beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
       $httpBackend = _$httpBackend_;

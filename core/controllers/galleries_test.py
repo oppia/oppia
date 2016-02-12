@@ -42,7 +42,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
         """Test access to the gallery page."""
         response = self.testapp.get(feconf.GALLERY_URL)
         self.assertEqual(response.status_int, 200)
-        response.mustcontain('Gallery', 'Categories')
+        response.mustcontain('I18N_GALLERY_PAGE_TITLE', 'CATEGORIES')
 
     def test_gallery_handler_demo_exploration(self):
         """Test the gallery data handler on demo explorations."""
@@ -212,14 +212,14 @@ class GalleryPageTest(test_utils.GenericTestBase):
 
         response = self.testapp.get(feconf.GALLERY_URL)
         self.assertEqual(response.status_int, 200)
-        response.mustcontain(no=['Upload Exploration'])
+        response.mustcontain(no=['I18N_GALLERY_UPLOAD_EXPLORATION'])
 
         config_services.set_property(
             feconf.SYSTEM_COMMITTER_ID, 'allow_yaml_file_upload', True)
 
         response = self.testapp.get(feconf.GALLERY_URL)
         self.assertEqual(response.status_int, 200)
-        response.mustcontain('Upload Exploration')
+        response.mustcontain('I18N_GALLERY_UPLOAD_EXPLORATION')
 
         self.logout()
 

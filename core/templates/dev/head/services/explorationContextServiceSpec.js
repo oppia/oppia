@@ -32,8 +32,13 @@ describe('Exploration context service', function() {
             pathname: '/explore/123'
           }
         });
+        // The angular-cookies module uses $document to store the preferred
+        // language.
+        $provide.value('$document', [{}]);
       });
     });
+
+    beforeEach(module('oppia', GLOBALS.OVERWRITE_TRANSLATOR_PROVIDER));
 
     beforeEach(inject(function($injector) {
       ecs = $injector.get('explorationContextService');
@@ -58,6 +63,7 @@ describe('Exploration context service', function() {
             pathname: '/create/123'
           }
         });
+        $provide.value('$document', [{}]);
       });
     });
 
@@ -84,6 +90,7 @@ describe('Exploration context service', function() {
             pathname: '/about'
           }
         });
+        $provide.value('$document', [{}]);
       });
     });
 

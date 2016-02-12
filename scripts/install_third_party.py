@@ -129,6 +129,7 @@ def download_and_unzip_files(
             req.add_header('User-agent', 'python')
             # This is needed to get a seekable filestream that can be used
             # by zipfile.ZipFile.
+            print source_url
             file_stream = StringIO.StringIO(urllib2.urlopen(req).read())
             with zipfile.ZipFile(file_stream, 'r') as zfile:
                 zfile.extractall(target_parent_dir)
@@ -254,6 +255,10 @@ def validate_manifest(filepath):
     dependencies = manifest_data['dependencies']
     for _, dependency in dependencies.items():
         for _, dependency_contents in dependency.items():
+            if 'downloadFormat' not in dependency_contents:
+                raise Exception(
+                    'downloadFormat not specified in %s' %
+                    dependency_contents)
             download_format = dependency_contents['downloadFormat']
             test_manifest_syntax(download_format, dependency_contents)
 

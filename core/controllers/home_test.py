@@ -28,8 +28,9 @@ class HomePageTest(test_utils.GenericTestBase):
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 200)
         response.mustcontain(
-            'Your personal tutor',
-            'Oppia - Gallery', 'About', 'Login', no=['Logout'])
+            'I18N_GALLERY_SUBTITLE', 'I18N_GALLERY_PAGE_TITLE',
+            'I18N_GALLERY_PAGE_SUBTITLE', 'I18N_SIDEBAR_HOME_ABOUT',
+            'I18N_TOPNAV_SIGN_IN', no=['I18N_TOPNAV_LOGOUT'])
 
     def test_notifications_dashboard_redirects_for_logged_out_users(self):
         """Test the logged-out view of the notifications dashboard."""
@@ -52,11 +53,12 @@ class HomePageTest(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/notifications_dashboard')
         self.assertEqual(response.status_int, 200)
+        # The string I18N_TOPNAV_SIGN_IN cannot be part of the inner text of
+        # the tag, but can appear as an attribute value.
         response.mustcontain(
-            'Notifications', 'Logout',
+            'I18N_TOPNAV_NOTIFICATIONS', 'I18N_TOPNAV_LOGOUT',
             self.get_expected_logout_url('/'),
-            no=['Login', 'Your personal tutor',
-                self.get_expected_login_url('/')])
+            no=['>I18N_TOPNAV_SIGN_IN<', self.get_expected_login_url('/')])
         self.logout()
 
 

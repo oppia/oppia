@@ -26,7 +26,7 @@
       <span class="oppia-navbar-breadcrumb-separator"></span>
       <span class="protractor-test-exploration-header" itemprop="description">{{exploration_title}}</span>
     </li>
-    <li ng-click="showInformationCard()" tooltip="Info" tooltip-placement="bottom" style="cursor: pointer;" class="protractor-test-exploration-info-icon">
+    <li ng-click="showInformationCard()" tooltip="<['I18N_PLAYER_INFO_TOOLTIP' | translate]>" tooltip-placement="bottom" style="cursor: pointer;" class="protractor-test-exploration-info-icon">
       <i class="material-icons oppia-navbar-breadcrumb-icon" style="font-size: 20px; vertical-align: middle;">&#xE88E;</i>
     </li>
   </ul>
@@ -83,7 +83,6 @@
   {% include 'components/gadget_directive.html' %}
   {% include 'components/gadget_panel_directive.html' %}
   {% include 'components/profile_link_image_directive.html' %}
-
   {% include 'player/answer_feedback_pair_directive.html' %}
   {% include 'player/conversation_skin_directive.html' %}
   {% include 'player/feedback_popup_directive.html' %}
