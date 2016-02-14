@@ -131,7 +131,7 @@ oppia.factory('oppiaPlayerService', [
       PAGE_CONTEXT) {
   var _INTERACTION_DISPLAY_MODE_INLINE = 'inline';
   var _NULL_INTERACTION_HTML = (
-    '<span style="color: red;"><strong>Error</strong>: No interaction specified.</span>');
+    '<span style="color: red;"><strong>Error</strong>: No interaction specified for </span>');
 
   var _explorationId = explorationContextService.getExplorationId();
   var _editorPreviewMode = (explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
@@ -161,7 +161,7 @@ oppia.factory('oppiaPlayerService', [
   // a common standalone service.
   var _getInteractionHtml = function(interactionId, interactionCustomizationArgSpecs, labelForFocusTarget) {
     if (!interactionId) {
-      return _NULL_INTERACTION_HTML;
+      return _NULL_INTERACTION_HTML + '<span style="color: red;">' + _currentStateName + '</span>';
     }
 
     var el = $(
