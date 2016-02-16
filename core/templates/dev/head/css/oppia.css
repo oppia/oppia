@@ -1007,6 +1007,11 @@ md-card.oppia-gallery-tile {
   color: white;
 }
 
+.oppia-html-select .oppia-html-select-option oppia-noninteractive-image {
+  display: block;
+  margin-bottom: -22px;
+}
+
 .oppia-create-exploration-label {
   margin-top: 5px;
 }
