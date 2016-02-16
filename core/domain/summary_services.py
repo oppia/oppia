@@ -27,6 +27,8 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids):
     """Given a list of exploration ids, filters the list for
     explorations that are currently non-private and not deleted,
     and returns a list of dicts of the corresponding exploration summaries.
+    Please use this function when needing summary information to display on
+    exploration summary tiles in the frontend.
     """
     displayable_exp_summaries = []
     exploration_summaries = (

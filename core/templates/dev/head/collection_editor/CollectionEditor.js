@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2016 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,33 +18,82 @@
  * @author mgowano@google.com (Abraham Mgowano)
  */
 
+// TODO(bhenning): These constants should be provided by the backend.
 oppia.constant(
-  'COLLECTION_DATA_URL', '/collectionhandler/data/<collection_id>');
+  'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');
+oppia.constant(
+  'WRITABLE_COLLECTION_DATA_URL_TEMPLATE',
+  '/collection_editor_handler/data/<collection_id>');
+oppia.constant(
+  'COLLECTION_RIGHTS_URL_TEMPLATE',
+  '/collection_editor_handler/rights/<collection_id>');
 
-oppia.controller('CollectionEditor', ['$scope', 'CollectionDataService', 'warningsData',
-	function($scope, collectionDataService, warningsData){
+oppia.controller('CollectionEditor', ['$scope',
+  'WritableCollectionBackendApiService', 'CollectionRightsBackendApiService',
+  'CollectionObjectFactory', 'SkillListObjectFactory',
+  'CollectionUpdateService', 'UndoRedoService', 'warningsData', function(
+    $scope, WritableCollectionBackendApiService,
+    CollectionRightsBackendApiService, CollectionObjectFactory,
+    SkillListObjectFactory, CollectionUpdateService, UndoRedoService,
+    warningsData) {
+    $scope.collection = null;
+    $scope.collectionId = GLOBALS.collectionId;
+    $scope.collectionSkillList = SkillListObjectFactory.create([]);
 
-  $scope.collection = null;
-  $scope.collectionId = '';
-  $scope.isCollectionLoaded = false;
+    // Load the collection to be edited.
+    WritableCollectionBackendApiService.fetchWritableCollection(
+      $scope.collectionId).then(
+        function(collection) {
+          $scope.collection = CollectionObjectFactory.create(collection);
+          $scope.collectionSkillList.setSkills(collection.skills);
+        }, function(error) {
+          warningsData.addWarning(
+            error || 'There was an error loading the collection.');
+        });
 
-  // Get the id of the collection to be loaded
-  var pathnameArray = window.location.pathname.split('/');
-  for (var i = 0; i < pathnameArray.length; i++) {
-    if (pathnameArray[i] === 'create') {
-      $scope.collectionId = pathnameArray[i + 1];
-      break;
-    }
-  }
+    $scope.getChangeListCount = function() {
+      return UndoRedoService.getChangeCount();
+    };
 
-  // Load the collection to be edited.
-  collectionDataService.loadCollection($scope.collectionId).then(
-    function(collection) {
-      $scope.collection = collection;
-      $scope.isCollectionLoaded = true;
-    }, function(error, collectionId) {
-      // TODO(mgowano): Handle not being able to load the collection.
-      warningsData.addWarning(
-        error || 'There was an error loading the collection.');
-  });
-}]);
+    // To be used after mutating the prerequisite and/or acquired skill lists.
+    $scope.updateSkillList = function() {
+      $scope.collectionSkillList.clearSkills();
+      $scope.collectionSkillList.concatSkillList(
+        $scope.collection.getSkillList());
+      $scope.collectionSkillList.sortSkills();
+    };
+
+    // An explicit save is needed to push all changes to the backend at once
+    // because some likely working states of the collection will cause
+    // validation errors when trying to incrementally save them.
+    $scope.saveCollection = function(commitMessage) {
+      // Don't attempt to save the collection if there are no changes pending.
+      if (!UndoRedoService.hasChanges()) {
+        return;
+      }
+      WritableCollectionBackendApiService.updateCollection(
+        $scope.collection.getId(), $scope.collection.getVersion(),
+        commitMessage, UndoRedoService.getCommittableChangeList()).then(
+        function(collection) {
+          $scope.collection = CollectionObjectFactory.create(collection);
+          UndoRedoService.clearChanges();
+        }, function(error) {
+          warningsData.addWarning(
+            error || 'There was an error updating the collection.');
+        });
+    };
+
+    $scope.publishCollection = function() {
+      // TODO(bhenning): Publishing should not be doable when the exploration
+      // may have errors/warnings. Publish should only show up if the collection
+      // is private. This also needs a confirmation of destructive action since
+      // it is not reversible.
+      var isPublic = true;
+      CollectionRightsBackendApiService.setCollectionPublic(
+        $scope.collectionId, $scope.collection.getVersion(), isPublic).then(
+        function() {}, function() {
+          warningsData.addWarning(
+            'There was an error when publishing the collection.');
+        });
+    };
+  }]);

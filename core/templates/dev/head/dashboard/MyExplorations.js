@@ -50,3 +50,12 @@ oppia.controller('CreateExplorationButton', [
     };
   }
 ]);
+
+oppia.controller('CreateCollectionButton', [
+  '$scope', 'CATEGORY_LIST', 'CollectionCreationButtonService',
+  function($scope, CATEGORY_LIST, CollectionCreationButtonService) {
+    $scope.showCreateCollectionModal = function() {
+      CollectionCreationButtonService.showCreateCollectionModal(CATEGORY_LIST);
+    };
+  }
+]);
