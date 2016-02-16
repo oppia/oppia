@@ -29,9 +29,7 @@ var argv = yargs
         .usage('Usage: $0 build [--minify]')
         .option('minify', {
           describe: 'Whether to minify third-party dependencies'
-        })
-        .demand(['minify'])
-        .argv;
+        }).argv;
     })
   .command('start_devserver', 'start GAE development server',
     function(yargs) {
@@ -55,7 +53,7 @@ var gulp = require('gulp');
 var gulpStartGae = require('./scripts/gulp-start-gae-devserver');
 var gulpUtil = require('gulp-util');
 var manifest = require('./manifest.json');
-var minifyCss = require('gulp-minify-css');
+var cssnano = require('gulp-cssnano');
 var path = require('path');
 var sourcemaps = require('gulp-sourcemaps');
 var minify = require('gulp-minify');
@@ -75,7 +73,6 @@ if (argv.clear_datastore) {
 if (argv.enable_sendmail) {
   params.enable_sendmail = argv.enable_sendmail;
 }
-
 
 // Check if path to the file to be minified and/or concatenated does exist.
 // If not, raise a warning and terminate the program.
@@ -113,7 +110,6 @@ var generatedTargetDir = path.join(
 var generatedCssTargetDir = path.join(generatedTargetDir, 'css');
 var generatedJsTargetDir = path.join(generatedTargetDir, 'js');
 
-
 gulp.task('collectDependencyFilepaths', function() {
   for (var dependencyId in frontendDependencies) {
     var dependency = frontendDependencies[dependencyId];
@@ -149,7 +145,7 @@ gulp.task('collectDependencyFilepaths', function() {
 gulp.task('generateCss', function() {
   requireFilesExist(cssFilePaths);
   gulp.src(cssFilePaths)
-    .pipe(isMinificationNeeded ? minifyCss() : gulpUtil.noop())
+    .pipe(isMinificationNeeded ? cssnano() : gulpUtil.noop())
     .pipe(concat('third_party.css'))
     .pipe(gulp.dest(generatedCssTargetDir));
 });
@@ -161,14 +157,14 @@ gulp.task('generateJs', function() {
       .pipe(concat('third_party.js'))
       .pipe(isMinificationNeeded ? minify({
         ext: {
-          src:'.js',
-          min:'.min.js'
+          src: '.js',
+          min: '.min.js'
         }
       }) : gulpUtil.noop())
-    // This map a combined/minified file back to an unbuilt state,
-    // holds information about original files.
-    // When you query a certain line and column number in your generated JavaScript
-    // you can do a lookup in the source map which returns the original location.
+    // This maps a combined/minified file back to an unbuilt state by holding
+    // information about original files. When you query a certain line and
+    // column number in your generated JavaScript, you can do a lookup in the
+    // source map which returns the original location.
     // http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/
     .pipe(sourcemaps.write())
     .pipe(gulp.dest(generatedJsTargetDir));
@@ -183,8 +179,7 @@ gulp.task('copyFonts', function() {
 });
 
 // This is a task which copies background image used by css.
-// TODO(Barnabas) find a way of removing this task.
-// It is a bit of a hack,
+// TODO(Barnabas) find a way of removing this task. It is a bit of a hack,
 // because it depends on the relative location of the CSS background images
 // of a third-party library with respect to the CSS file that uses them.
 // The currently-affected libraries include select2.css.

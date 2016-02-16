@@ -14,8 +14,6 @@
 
 """Controllers for the user dashboard and for notifications."""
 
-__author__ = 'sll@google.com (Sean Lip)'
-
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import exp_services
@@ -60,7 +58,7 @@ class NotificationsDashboardHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         job_queued_msec, recent_notifications = (
-            user_jobs_continuous.DashboardRecentUpdatesAggregator.get_recent_notifications(
+            user_jobs_continuous.DashboardRecentUpdatesAggregator.get_recent_notifications(  # pylint: disable=line-too-long
                 self.user_id))
 
         last_seen_msec = (
@@ -76,8 +74,8 @@ class NotificationsDashboardHandler(base.BaseHandler):
         author_id_to_username = {
             None: '',
         }
-        for ind in range(len(author_ids)):
-            author_id_to_username[author_ids[ind]] = author_usernames[ind]
+        for ind, author_id in enumerate(author_ids):
+            author_id_to_username[author_id] = author_usernames[ind]
         for notification in recent_notifications:
             notification['author_username'] = (
                 author_id_to_username[notification['author_id']])
@@ -191,7 +189,7 @@ class NotificationsHandler(base.BaseHandler):
                 subscription_services.get_last_seen_notifications_msec(
                     self.user_id))
             _, recent_notifications = (
-                user_jobs_continuous.DashboardRecentUpdatesAggregator.get_recent_notifications(
+                user_jobs_continuous.DashboardRecentUpdatesAggregator.get_recent_notifications( # pylint: disable=line-too-long
                     self.user_id))
             for notification in recent_notifications:
                 if (notification['last_updated_ms'] > last_seen_msec and

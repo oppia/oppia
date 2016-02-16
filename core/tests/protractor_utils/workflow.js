@@ -55,7 +55,8 @@ var publishExploration = function() {
 };
 
 // Creates and publishes a minimal exploration
-var createAndPublishExploration = function(name, category, objective, language) {
+var createAndPublishExploration = function(
+    name, category, objective, language) {
   createExploration(name, category);
   editor.setContent(forms.toRichText('new exploration'));
   editor.setInteraction('TextInput');
@@ -85,7 +86,7 @@ var markExplorationAsFeatured = function() {
 
 // Role management (state editor settings tab)
 
-// roleName here is the user-visible form of the role name (e.g. 'Manager')
+// Here, 'roleName' is the user-visible form of the role name (e.g. 'Manager').
 var _addExplorationRole = function(roleName, username) {
   editor.runFromSettingsTab(function() {
     element(by.css('.protractor-test-edit-roles')).click();
@@ -108,14 +109,14 @@ var addExplorationPlaytester = function(username) {
   _addExplorationRole('Playtester', username);
 };
 
-// roleName here is the server-side form of the name (e.g. 'owner')
+// Here, roleName is the server-side form of the name (e.g. 'owner').
 var _getExplorationRoles = function(roleName) {
   var result = editor.runFromSettingsTab(function() {
     var itemName = roleName + 'Name';
     var listName = roleName + 'Names';
     return element.all(by.repeater(
-          itemName + ' in explorationRightsService.' + listName + ' track by $index'
-        )).map(function(elem) {
+      itemName + ' in explorationRightsService.' + listName + ' track by $index'
+    )).map(function(elem) {
       return elem.getText();
     });
   });

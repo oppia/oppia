@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * Directive for the InteractiveMap interaction.
  *
@@ -27,48 +26,53 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
       restrict: 'E',
       scope: {},
       templateUrl: 'interaction/InteractiveMap',
-      controller: ['$scope', '$attrs', '$timeout', function($scope, $attrs, $timeout) {
-        $scope.coords = [
-          oppiaHtmlEscaper.escapedJsonToObj($attrs.latitudeWithValue),
-          oppiaHtmlEscaper.escapedJsonToObj($attrs.longitudeWithValue)];
-        $scope.zoom = oppiaHtmlEscaper.escapedJsonToObj($attrs.zoomWithValue);
+      controller: [
+        '$scope', '$attrs', '$timeout', function($scope, $attrs, $timeout) {
+          $scope.coords = [
+            oppiaHtmlEscaper.escapedJsonToObj($attrs.latitudeWithValue),
+            oppiaHtmlEscaper.escapedJsonToObj($attrs.longitudeWithValue)];
+          $scope.zoom = oppiaHtmlEscaper.escapedJsonToObj($attrs.zoomWithValue);
 
-        $scope.$on('showInteraction', function() {
+          $scope.$on('showInteraction', function() {
+            refreshMap();
+          });
+
+          $scope.mapMarkers = [];
+
+          // This is required in order to avoid the following bug:
+          //   http://stackoverflow.com/questions/18769287
+          var refreshMap = function() {
+            $timeout(function() {
+              google.maps.event.trigger($scope.map, 'resize');
+              $scope.map.setCenter({
+                lat: coords[0],
+                lng: coords[1]
+              });
+            }, 100);
+          };
+
+          var coords = $scope.coords || [0, 0];
+          var zoomLevel = parseInt($scope.zoom, 10) || 0;
+          $scope.mapOptions = {
+            center: new google.maps.LatLng(coords[0], coords[1]),
+            zoom: zoomLevel,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+          };
+
+          $scope.registerClick = function($event, $params) {
+            var ll = $params[0].latLng;
+            $scope.mapMarkers.push(new google.maps.Marker({
+              map: $scope.map,
+              position: ll
+            }));
+
+            $scope.$parent.submitAnswer(
+              [ll.lat(), ll.lng()], interactiveMapRulesService);
+          };
+
           refreshMap();
-        });
-
-        $scope.mapMarkers = [];
-
-        // This is required in order to avoid the following bug:
-        //   http://stackoverflow.com/questions/18769287
-        var refreshMap = function() {
-          $timeout(function() {
-            google.maps.event.trigger($scope.map, 'resize');
-            $scope.map.setCenter({lat: coords[0], lng: coords[1]});
-          }, 100);
-        };
-
-        var coords = $scope.coords || [0, 0];
-        var zoom_level = parseInt($scope.zoom, 10) || 0;
-        $scope.mapOptions = {
-          center: new google.maps.LatLng(coords[0], coords[1]),
-          zoom: zoom_level,
-          mapTypeId: google.maps.MapTypeId.ROADMAP
-        };
-
-        $scope.registerClick = function($event, $params) {
-          var ll = $params[0].latLng;
-          $scope.mapMarkers.push(new google.maps.Marker({
-            map: $scope.map,
-            position: ll
-          }));
-
-          $scope.$parent.submitAnswer(
-            [ll.lat(), ll.lng()], interactiveMapRulesService);
-        };
-
-        refreshMap();
-      }]
+        }
+      ]
     };
   }
 ]);

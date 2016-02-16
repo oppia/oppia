@@ -185,6 +185,13 @@
         "rootDirPrefix": "jquery-ui-themes-",
         "targetDirPrefix": "jquery-ui-themes-"
       },
+      "jqueryUITouchPunch": {
+        "version": "0.3.1",
+        "downloadFormat": "zip",
+        "url": "https://github.com/Bantam/jquery-ui-touch-punch-improved/archive/0.3.1.zip",
+        "rootDirPrefix": "jquery-ui-touch-punch-improved-",
+        "targetDirPrefix": "jquery-ui-touch-punch-"
+      },
       "mathExpressions": {
         "version": "762ffd0effea1525b21a882624074322fa7aad26",
         "downloadFormat": "zip",
@@ -193,9 +200,9 @@
         "targetDir": "math-expressions-762ffd"
       },
       "mathJax": {
-        "version": "2.4-latest",
+        "version": "2.6.0",
         "downloadFormat": "zip",
-        "url": "https://github.com/mathjax/MathJax/archive/v2.4-latest.zip",
+        "url": "https://github.com/mathjax/MathJax/archive/2.6.0.zip",
         "rootDirPrefix": "MathJax-",
         "targetDirPrefix": "MathJax-"
       },

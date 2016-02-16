@@ -24,13 +24,13 @@ from core.domain import feedback_services
 from core.domain import rating_services
 from core.domain import stats_jobs_continuous
 from core.platform import models
+import feconf
+import utils
+
 (exp_models, collection_models, feedback_models, user_models) = (
     models.Registry.import_models([
         models.NAMES.exploration, models.NAMES.collection,
         models.NAMES.feedback, models.NAMES.user]))
-import feconf
-import utils
-
 
 # TODO(bhenning): Implement a working real-time layer for the recent dashboard
 # updates aggregator job.
@@ -202,10 +202,13 @@ class RecentUpdatesMRJobManager(
                 feconf.COMMIT_MESSAGE_EXPLORATION_DELETED))
 
         for exp_model in tracked_exp_models_for_feedback:
-            threads = feedback_services.get_threadlist(exp_model.id)
+            threads = feedback_services.get_all_threads(exp_model.id, False)
             for thread in threads:
-                if thread['thread_id'] not in feedback_thread_ids_list:
-                    feedback_thread_ids_list.append(thread['thread_id'])
+                full_thread_id = (
+                    feedback_models.FeedbackThreadModel.generate_full_thread_id(
+                        exp_model.id, thread['thread_id']))
+                if full_thread_id not in feedback_thread_ids_list:
+                    feedback_thread_ids_list.append(full_thread_id)
 
         # TODO(bhenning): Implement a solution to having feedback threads for
         # collections.
@@ -219,9 +222,13 @@ class RecentUpdatesMRJobManager(
             yield (reducer_key, recent_activity_commit_dict)
 
         for feedback_thread_id in feedback_thread_ids_list:
+            exp_id = feedback_services.get_exp_id_from_full_thread_id(
+                feedback_thread_id)
+            thread_id = feedback_services.get_thread_id_from_full_thread_id(
+                feedback_thread_id)
             last_message = (
                 feedback_models.FeedbackMessageModel.get_most_recent_message(
-                    feedback_thread_id))
+                    exp_id, thread_id))
 
             yield (reducer_key, {
                 'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
@@ -316,8 +323,9 @@ class UserImpactMRJobManager(
     @classmethod
     def _get_exp_impact_score(cls, exploration_id):
         # Get ratings and compute average rating score.
-        rating_frequencies = rating_services.get_overall_ratings_for_exploration(
-            exploration_id)
+        rating_frequencies = (
+            rating_services.get_overall_ratings_for_exploration(
+                exploration_id))
         total_num_ratings = 0
         total_rating = 0.0
         for rating, num_ratings in rating_frequencies.iteritems():
@@ -342,9 +350,10 @@ class UserImpactMRJobManager(
             num_ratings_scaler = 1.0
 
         # Get number of completions/playthroughs.
-        num_completions = stats_jobs_continuous.StatisticsAggregator.get_statistics(
-            exploration_id,
-            stats_jobs_continuous.VERSION_ALL)['complete_exploration_count']
+        num_completions = (
+            stats_jobs_continuous.StatisticsAggregator.get_statistics(
+                exploration_id, stats_jobs_continuous.VERSION_ALL)[
+                    'complete_exploration_count'])
         # Only take the log of a non-zero number.
         if num_completions <= 0:
             return 0

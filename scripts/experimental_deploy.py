@@ -35,11 +35,14 @@ Note:
     named 'oppia'.
 """
 
+# Pylint has issues with the import order of argparse.
+# pylint: disable=wrong-import-order
 import argparse
 import datetime
 import os
 import shutil
 import subprocess
+# pylint: enable=wrong-import-order
 
 import common
 
@@ -47,9 +50,9 @@ _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
     '--app_name', help='name of the app to deploy to', type=str)
 
-parsed_args = _PARSER.parse_args()
-if parsed_args.app_name:
-    APP_NAME = parsed_args.app_name
+PARSED_ARGS = _PARSER.parse_args()
+if PARSED_ARGS.app_name:
+    APP_NAME = PARSED_ARGS.app_name
     if APP_NAME in ['oppiaserver', 'oppiatestserver']:
         raise Exception(
             'This script should not be used for updating %s. Please use '

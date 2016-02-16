@@ -16,8 +16,6 @@
 
 """Tests for parameter domain objects."""
 
-__author__ = 'Sean Lip'
-
 from core.domain import param_domain
 from core.tests import test_utils
 import utils
@@ -30,13 +28,15 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
         """Test validation of param specs."""
         param_spec = param_domain.ParamSpec('FakeType')
         with self.assertRaisesRegexp(
-                TypeError, '\'FakeType\' is not a valid object class.'):
+            TypeError, '\'FakeType\' is not a valid object class.'
+            ):
             param_spec.validate()
 
         param_spec.obj_type = 'Real'
         with self.assertRaisesRegexp(
-                utils.ValidationError, 'Only \'UnicodeString\' is the '
-                'supported object type for parameters, not: Real'):
+            utils.ValidationError, 'Only \'UnicodeString\' is the '
+            'supported object type for parameters, not: Real'
+            ):
             param_spec.validate()
 
         # Restore a valid parameter spec.
@@ -47,17 +47,20 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
         """Test validation of parameter changes."""
         # Raise an error because the name is invalid.
         with self.assertRaisesRegexp(
-                utils.ValidationError, 'Only parameter names'):
+            utils.ValidationError, 'Only parameter names'
+            ):
             param_domain.ParamChange('¡hola', 'Copier', {}).validate()
 
         # Raise an error because no such generator type exists.
         with self.assertRaisesRegexp(
-                utils.ValidationError, 'Invalid generator id'):
+            utils.ValidationError, 'Invalid generator id'
+            ):
             param_domain.ParamChange('abc', 'InvalidGenerator', {}).validate()
 
         # Raise an error because customization_args is not a dict.
         with self.assertRaisesRegexp(
-                utils.ValidationError, 'Expected a dict'):
+            utils.ValidationError, 'Expected a dict'
+            ):
             param_domain.ParamChange('abc', 'Copier', ['a', 'b']).validate()
 
     def test_param_change_class(self):

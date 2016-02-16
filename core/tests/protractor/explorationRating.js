@@ -31,18 +31,19 @@ describe('Gallery view', function() {
   var LANGUAGE_ENGLISH = 'English';
   var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 1;
   var addRating = function(userEmail, userName, explorationName, ratingValue) {
-      users.createUser(userEmail, userName);
-      users.login(userEmail);
-      browser.get(general.GALLERY_URL_SUFFIX);
-      gallery.playExploration(EXPLORATION_RATINGTEST);
-      player.expectExplorationNameToBe(explorationName);
-      player.submitAnswer('Continue');
-      player.rateExploration(ratingValue);
+    users.createUser(userEmail, userName);
+    users.login(userEmail);
+    browser.get(general.GALLERY_URL_SUFFIX);
+    gallery.playExploration(EXPLORATION_RATINGTEST);
+    player.expectExplorationNameToBe(explorationName);
+    player.submitAnswer('Continue');
+    player.rateExploration(ratingValue);
 
-      users.logout();
-    };
-    
-  it('should display ratings on exploration when minimum ratings have been submitted', function() {
+    users.logout();
+  };
+
+  it('should display ratings on exploration when minimum ratings have been ' +
+     'submitted', function() {
     users.createUser('rating@example.com', 'Rating');
     // Create an test exploration
     users.login('rating@example.com');
@@ -59,7 +60,7 @@ describe('Gallery view', function() {
     }
 
     browser.get(general.GALLERY_URL_SUFFIX);
-    gallery.expectExplorationRatingToBeHidden(EXPLORATION_RATINGTEST);
+    gallery.expectExplorationRatingToEqual(EXPLORATION_RATINGTEST, 'N/A');
 
     var userEmail = 'Display@example.com';
     var username = 'Display';
@@ -69,8 +70,7 @@ describe('Gallery view', function() {
     gallery.expectExplorationRatingToEqual(EXPLORATION_RATINGTEST, '4.0');
 
     gallery.playExploration(EXPLORATION_RATINGTEST);
-    player.expectExplorationRatingOnInformationCardToEqual('4');
-
+    player.expectExplorationRatingOnInformationCardToEqual('4.0');
   });
   afterEach(function() {
     general.checkForConsoleErrors([]);

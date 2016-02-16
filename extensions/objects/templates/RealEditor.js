@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 oppia.directive('realEditor', [
     '$compile', 'OBJECT_EDITOR_URL_PREFIX',
     function($compile, OBJECT_EDITOR_URL_PREFIX) {
   return {
-    link: function(scope, element, attrs) {
+    link: function(scope, element) {
       scope.getTemplateUrl = function() {
         return OBJECT_EDITOR_URL_PREFIX + 'Real';
       };
@@ -31,8 +30,9 @@ oppia.directive('realEditor', [
         type: 'float'
       };
 
-      $scope.$watch('$parent.value', function(newValue, oldValue) {
-        if ($scope.$parent.value === '') {  // A new rule
+      $scope.$watch('$parent.value', function() {
+        if ($scope.$parent.value === '') {
+          // A new rule
           $scope.$parent.value = 0.0;
         }
       });

@@ -16,10 +16,10 @@
 
 """Controllers for the editor view."""
 
-__author__ = 'sll@google.com (Sean Lip)'
-
 import imghdr
 import logging
+
+import jinja2
 
 from core.controllers import base
 from core.domain import config_domain
@@ -34,16 +34,14 @@ from core.domain import interaction_registry
 from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import rule_domain
-from core.domain import skins_services
 from core.domain import stats_services
 from core.domain import user_services
 from core.domain import value_generators_domain
 from core.platform import models
-current_user_services = models.Registry.import_current_user_services()
 import feconf
 import utils
 
-import jinja2
+current_user_services = models.Registry.import_current_user_services()
 
 # The frontend template for a new state. It is sent to the frontend when the
 # exploration editor page is first loaded, so that new states can be
@@ -208,14 +206,10 @@ class ExplorationPage(EditorHandler):
         gadget_templates = (
             gadget_registry.Registry.get_gadget_html(gadget_types))
 
-        skin_templates = skins_services.Registry.get_skin_templates(
-            skins_services.Registry.get_all_skin_ids())
-
         self.values.update({
             'GADGET_SPECS': gadget_registry.Registry.get_all_specs(),
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
-            'PANEL_SPECS': skins_services.Registry.get_all_specs()[
-                feconf.DEFAULT_SKIN_ID],
+            'PANEL_SPECS': feconf.PANELS_PROPERTIES,
             'additional_angular_modules': additional_angular_modules,
             'can_delete': rights_manager.Actor(
                 self.user_id).can_delete(
@@ -248,10 +242,6 @@ class ExplorationPage(EditorHandler):
             'moderator_request_forum_url': MODERATOR_REQUEST_FORUM_URL.value,
             'nav_mode': feconf.NAV_MODE_CREATE,
             'value_generators_js': jinja2.utils.Markup(value_generators_js),
-            'skin_js_urls': [
-                skins_services.Registry.get_skin_js_url(skin_id)
-                for skin_id in skins_services.Registry.get_all_skin_ids()],
-            'skin_templates': jinja2.utils.Markup(skin_templates),
             'title': exploration.title,
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'ALLOWED_GADGETS': feconf.ALLOWED_GADGETS,
@@ -301,8 +291,7 @@ class ExplorationHandler(EditorHandler):
             'rights': rights_manager.get_exploration_rights(
                 exploration_id).to_dict(),
             'show_state_editor_tutorial_on_load': (
-                self.user_id and not
-                self.user_has_started_state_editor_tutorial),
+                self.user_id and not self.has_seen_editor_tutorial),
             'skin_customizations': exploration.skin_instance.to_dict()[
                 'skin_customizations'],
             'states': states,
@@ -413,7 +402,8 @@ class ExplorationRightsHandler(EditorHandler):
         if new_member_username:
             if not rights_manager.Actor(
                     self.user_id).can_modify_roles(
-                        rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
+                        rights_manager.ACTIVITY_TYPE_EXPLORATION,
+                        exploration_id):
                 raise self.UnauthorizedUserException(
                     'Only an owner of this exploration can add or change '
                     'roles.')
@@ -508,7 +498,7 @@ class ExplorationModeratorRightsHandler(EditorHandler):
                 raise self.InvalidInputException(
                     'Moderator actions should include an email to the '
                     'recipient.')
-            email_manager.require_moderator_email_prereqs_are_satisfied(action)
+            email_manager.require_moderator_email_prereqs_are_satisfied()
 
         # Perform the moderator action.
         if action == 'unpublish_exploration':
@@ -570,6 +560,8 @@ class UntrainedAnswersHandler(EditorHandler):
     """Returns answers that learners have submitted, but that Oppia hasn't been
     explicitly trained to respond to be an exploration author.
     """
+    NUMBER_OF_TOP_ANSWERS_PER_RULE = 50
+
     def get(self, exploration_id, escaped_state_name):
         """Handles GET requests."""
         try:
@@ -599,15 +591,13 @@ class UntrainedAnswersHandler(EditorHandler):
         # normalization calls in this function will not work correctly on those
         # strings. Once this happens, this handler should also be tested.
 
-        NUMBER_OF_TOP_ANSWERS_PER_RULE = 50
-
         # The total number of possible answers is 100 because it requests the
         # top 50 answers matched to the default rule and the top 50 answers
         # matched to a fuzzy rule individually.
         answers = stats_services.get_top_state_rule_answers(
             exploration_id, state_name, [
                 exp_domain.DEFAULT_RULESPEC_STR, rule_domain.FUZZY_RULE_TYPE],
-            NUMBER_OF_TOP_ANSWERS_PER_RULE)
+            self.NUMBER_OF_TOP_ANSWERS_PER_RULE)
 
         interaction = state.interaction
         unhandled_answers = []
@@ -682,8 +672,8 @@ class ExplorationDownloadHandler(EditorHandler):
             self.response.write(
                 exp_services.export_to_zip_file(exploration_id, version))
         elif output_format == feconf.OUTPUT_FORMAT_JSON:
-                self.render_json(exp_services.export_states_to_yaml(
-                    exploration_id, version=version, width=width))
+            self.render_json(exp_services.export_states_to_yaml(
+                exploration_id, version=version, width=width))
         else:
             raise self.InvalidInputException(
                 'Unrecognized output format %s' % output_format)
@@ -932,6 +922,6 @@ class ChangeListSummaryHandler(EditorHandler):
 class StartedTutorialEventHandler(EditorHandler):
     """Records that this user has started the state editor tutorial."""
 
-    def post(self, exploration_id):
+    def post(self):
         """Handles GET requests."""
         user_services.record_user_started_state_editor_tutorial(self.user_id)

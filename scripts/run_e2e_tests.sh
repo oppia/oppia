@@ -81,6 +81,9 @@ install_node_module jasmine-spec-reporter 2.2.2
 
 $NODE_MODULE_DIR/.bin/webdriver-manager update
 
+#build so as to have minified js and css
+$NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js build
+
 if ( nc -vz localhost 8181 ); then
   echo ""
   echo "  There is already a server running on localhost:8181."
@@ -101,7 +104,7 @@ trap cleanup EXIT
 # TODO(jacob): Find a webdriver or selenium argument that controls log level.
 ($NODE_MODULE_DIR/.bin/webdriver-manager start 2>/dev/null)&
 # Start a demo server.
-($PYTHON_CMD $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=4445 --clear_datastore=yes --dev_appserver_log_level=critical --log_level=critical .)&
+($PYTHON_CMD $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=4445 --clear_datastore=yes --dev_appserver_log_level=critical --log_level=critical --skip_sdk_update_check=true .)&
 
 # Wait for the servers to come up.
 while ! nc -vz localhost 4444; do sleep 1; done

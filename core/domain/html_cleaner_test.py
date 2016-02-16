@@ -16,8 +16,6 @@
 
 """Tests for the HTML sanitizer."""
 
-__author__ = 'Sean Lip'
-
 from core.domain import html_cleaner
 from core.tests import test_utils
 
@@ -30,7 +28,7 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
         self.longMessage = True
 
     def test_good_tags_allowed(self):
-        TEST_DATA = [(
+        test_data = [(
             '<a href="http://www.google.com">Hello</a>',
             '<a href="http://www.google.com">Hello</a>'
         ), (
@@ -47,13 +45,13 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
             'A big mix <div>Hello</div> Yes <span>No</span>'
         )]
 
-        for datum in TEST_DATA:
+        for datum in test_data:
             self.assertEqual(
                 html_cleaner.clean(datum[0]), datum[1],
                 '\n\nOriginal text: %s' % datum[0])
 
     def test_bad_tags_suppressed(self):
-        TEST_DATA = [(
+        test_data = [(
             '<incomplete-bad-tag>',
             ''
         ), (
@@ -76,13 +74,13 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
             ''
         )]
 
-        for datum in TEST_DATA:
+        for datum in test_data:
             self.assertEqual(
                 html_cleaner.clean(datum[0]), datum[1],
                 '\n\nOriginal text: %s' % datum[0])
 
     def test_oppia_custom_tags(self):
-        TEST_DATA = [(
+        test_data = [(
             '<oppia-noninteractive-image filepath-with-value="1"/>',
             '<oppia-noninteractive-image filepath-with-value="1">'
             '</oppia-noninteractive-image>'
@@ -96,7 +94,7 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
             ''
         )]
 
-        for datum in TEST_DATA:
+        for datum in test_data:
             self.assertEqual(
                 html_cleaner.clean(datum[0]), datum[1],
                 '\n\nOriginal text: %s' % datum[0])
@@ -106,7 +104,7 @@ class HtmlStripperUnitTests(test_utils.GenericTestBase):
     """Test the HTML stripper."""
 
     def test_strip_html_tags(self):
-        TEST_DATA = [(
+        test_data = [(
             '<a href="http://www.google.com">Hello</a>',
             'Hello',
         ), (
@@ -126,5 +124,5 @@ class HtmlStripperUnitTests(test_utils.GenericTestBase):
             'Text with\nnewlines',
         )]
 
-        for datum in TEST_DATA:
+        for datum in test_data:
             self.assertEqual(html_cleaner.strip_html_tags(datum[0]), datum[1])

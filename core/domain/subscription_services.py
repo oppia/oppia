@@ -16,16 +16,14 @@
 
 """Services for managing subscriptions."""
 
-__author__ = 'Sean Lip'
-
 import datetime
 
 from core.platform import models
+import utils
+
 (user_models,) = models.Registry.import_models([
     models.NAMES.user
 ])
-import utils
-
 
 def subscribe_to_thread(user_id, feedback_thread_id):
     """Subscribes a user to a feedback thread.

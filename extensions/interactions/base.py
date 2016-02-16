@@ -34,8 +34,6 @@ dicts, each representing a customization arg -- viz.:
     }]
 """
 
-__author__ = 'Sean Lip'
-
 import copy
 import os
 
@@ -44,7 +42,6 @@ from core.domain import rule_domain
 from extensions import domain
 import feconf
 import jinja_utils
-import schema_utils
 import utils
 
 # Indicates that the learner view of the interaction should be displayed in the
@@ -83,6 +80,9 @@ class BaseInteraction(object):
     is_linear = False
     # Whether this interaction supports training and fuzzy classification.
     is_trainable = False
+    # Whether this interaction supports the string classifier.
+    # TODO(chiangs): remove once classifier_services is generalized.
+    is_string_classifier_trainable = False
     # Additional JS library dependencies that should be loaded in pages
     # containing this interaction. These should correspond to names of files in
     # feconf.DEPENDENCIES_TEMPLATES_DIR. Overridden in subclasses.
@@ -97,6 +97,10 @@ class BaseInteraction(object):
     # Instructions for using this interaction, to be shown to the learner. Only
     # relevant for supplemental interactions.
     instructions = None
+    # Instructions for using this interaction, to be shown to the learner. Only
+    # shows up when view port is narrow. Only relevent for supplemental
+    # interactions.
+    narrow_instructions = None
     # Whether the answer is long, and would benefit from being summarized.
     needs_summary = False
     # The heading for the 'default outcome' section in the editor. This should
@@ -175,6 +179,8 @@ class BaseInteraction(object):
             'display_mode': self.display_mode,
             'is_terminal': self.is_terminal,
             'is_trainable': self.is_trainable,
+            'is_string_classifier_trainable':
+                self.is_string_classifier_trainable,
             'is_linear': self.is_linear,
             'needs_summary': self.needs_summary,
             'customization_arg_specs': [{
@@ -184,6 +190,7 @@ class BaseInteraction(object):
                 'schema': ca_spec.schema,
             } for ca_spec in self.customization_arg_specs],
             'instructions': self.instructions,
+            'narrow_instructions': self.narrow_instructions,
             'default_outcome_heading': self.default_outcome_heading,
         }
 

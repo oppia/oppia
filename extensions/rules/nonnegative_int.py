@@ -16,8 +16,6 @@
 
 """Rules for NonnegativeInts."""
 
-__author__ = 'Sean Lip'
-
 from extensions.rules import base
 
 

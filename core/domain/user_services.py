@@ -16,17 +16,16 @@
 
 """Services for user data."""
 
-__author__ = 'Stephanie Federwisch'
-
 import datetime
 import logging
 import re
 
 from core.platform import models
-current_user_services = models.Registry.import_current_user_services()
-(user_models,) = models.Registry.import_models([models.NAMES.user])
 import feconf
 import utils
+
+current_user_services = models.Registry.import_current_user_services()
+(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 MAX_USERNAME_LENGTH = 50
 
@@ -43,7 +42,7 @@ class UserSettings(object):
         self.email = email
         self.username = username
         self.last_agreed_to_terms = last_agreed_to_terms
-        self.last_started_state_editor_tutorial = (
+        self.last_started_state_editor_tutorial = (  # pylint: disable=invalid-name
             last_started_state_editor_tutorial)
         self.profile_picture_data_url = profile_picture_data_url
         self.user_bio = user_bio
@@ -194,7 +193,7 @@ def get_users_settings(user_ids):
                 profile_picture_data_url=model.profile_picture_data_url,
                 user_bio=model.user_bio,
                 subject_interests=model.subject_interests,
-                first_contribution_msec = model.first_contribution_msec,
+                first_contribution_msec=model.first_contribution_msec,
                 preferred_language_codes=model.preferred_language_codes
             ))
         else:
@@ -387,10 +386,6 @@ def get_user_id_from_email(email):
     return current_user_services.get_user_id_from_email(email)
 
 
-def is_super_admin(user_id, request):
-    return current_user_services.is_super_admin(user_id, request)
-
-
 def record_user_started_state_editor_tutorial(user_id):
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.last_started_state_editor_tutorial = (
@@ -445,8 +440,8 @@ class UserContributions(object):
 
         if not isinstance(self.created_exploration_ids, list):
             raise utils.ValidationError(
-                'Expected created_exploration_ids to be a list, received %s' 
-            % self.created_exploration_ids)    
+                'Expected created_exploration_ids to be a list, received %s'
+                % self.created_exploration_ids)
         for exploration_id in self.created_exploration_ids:
             if not isinstance(exploration_id, basestring):
                 raise utils.ValidationError(
@@ -456,8 +451,8 @@ class UserContributions(object):
 
         if not isinstance(self.edited_exploration_ids, list):
             raise utils.ValidationError(
-                'Expected edited_exploration_ids to be a list, received %s' 
-            % self.edited_exploration_ids)
+                'Expected edited_exploration_ids to be a list, received %s'
+                % self.edited_exploration_ids)
         for exploration_id in self.edited_exploration_ids:
             if not isinstance(exploration_id, basestring):
                 raise utils.ValidationError(
@@ -471,16 +466,18 @@ def get_user_contributions(user_id, strict=False):
 
     If the given user_id does not exist, returns None.
     """
-    model = user_models.UserContributionsModel.get(user_id, strict=False)
+    model = user_models.UserContributionsModel.get(user_id, strict=strict)
     if model is not None:
         result = UserContributions(
-            model.id, model.created_exploration_ids, model.edited_exploration_ids)
+            model.id, model.created_exploration_ids,
+            model.edited_exploration_ids)
     else:
         result = None
     return result
 
 
-def create_user_contributions(user_id, created_exploration_ids, edited_exploration_ids):
+def create_user_contributions(
+        user_id, created_exploration_ids, edited_exploration_ids):
     """Creates a new UserContributionsModel and returns the domain object."""
     user_contributions = get_user_contributions(user_id, strict=False)
     if user_contributions:
@@ -493,10 +490,11 @@ def create_user_contributions(user_id, created_exploration_ids, edited_explorati
     return user_contributions
 
 
-def update_user_contributions(user_id, created_exploration_ids, edited_exploration_ids):
-    """Updates an existing UserContributionsModel with new calculated 
+def update_user_contributions(user_id, created_exploration_ids,
+                              edited_exploration_ids):
+    """Updates an existing UserContributionsModel with new calculated
     contributions"""
-    
+
     user_contributions = get_user_contributions(user_id, strict=False)
     if not user_contributions:
         raise Exception(
@@ -546,13 +544,13 @@ def _save_user_contributions(user_contributions):
         created_exploration_ids=user_contributions.created_exploration_ids,
         edited_exploration_ids=user_contributions.edited_exploration_ids,
     ).put()
-    
-    
+
+
 def get_user_impact_score(user_id):
     """Returns user impact score associated with user_id"""
-    
+
     model = user_models.UserStatsModel.get(user_id, strict=False)
-    
+
     if model:
         return model.impact_score
     else:

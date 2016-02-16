@@ -22,8 +22,7 @@ delegate to the Collection model class. This will enable the collection
 storage model to be changed without affecting this module and others above it.
 """
 
-__author__ = 'Ben Henning'
-
+import collections
 import copy
 import datetime
 import logging
@@ -34,19 +33,33 @@ from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
+import feconf
+import utils
+
 (collection_models, user_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.user])
 memcache_services = models.Registry.import_memcache_services()
 search_services = models.Registry.import_search_services()
-import feconf
-import utils
-
 
 # This takes additional 'title' and 'category' parameters.
 CMD_CREATE_NEW = 'create_new'
 
 # Name for the collection search index.
 SEARCH_INDEX_COLLECTIONS = 'collections'
+
+# The maximum number of iterations allowed for populating the results of a
+# search query.
+MAX_ITERATIONS = 10
+
+# TODO(bhenning): Improve the ranking calculation. Some possible suggestions
+# for a better ranking include using an average of the search ranks of each
+# exploration referenced in the collection and/or demoting collections
+# for any validation errors from explorations referenced in the collection.
+_STATUS_PUBLICIZED_BONUS = 30
+# This is done to prevent the rank hitting 0 too easily. Note that
+# negative ranks are disallowed in the Search API.
+_DEFAULT_RANK = 20
+_MS_IN_ONE_DAY = 24 * 60 * 60 * 1000
 
 
 def _migrate_collection_to_latest_schema(versioned_collection):
@@ -130,6 +143,7 @@ def get_collection_summary_from_model(collection_summary_model):
         collection_summary_model.editor_ids,
         collection_summary_model.viewer_ids,
         collection_summary_model.contributor_ids,
+        collection_summary_model.contributors_summary,
         collection_summary_model.version,
         collection_summary_model.collection_model_created_on,
         collection_summary_model.collection_model_last_updated
@@ -191,8 +205,8 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
         uncached)
     db_results_dict = {}
     not_found = []
-    for i, cid in enumerate(uncached):
-        model = db_collection_models[i]
+    for index, cid in enumerate(uncached):
+        model = db_collection_models[index]
         if model:
             collection = get_collection_from_model(model)
             db_results_dict[cid] = collection
@@ -243,12 +257,12 @@ def get_collection_titles_and_categories(collection_ids):
     Any invalid collection_ids will not be included in the return dict. No
     error will be raised.
     """
-    collections = [
+    collection_list = [
         (get_collection_from_model(e) if e else None)
         for e in collection_models.CollectionModel.get_multi(collection_ids)]
 
     result = {}
-    for collection in collections:
+    for collection in collection_list:
         if collection is None:
             logging.error('Could not find collection corresponding to id')
         else:
@@ -347,11 +361,10 @@ def get_collection_summaries_matching_query(query_string, cursor=None):
     behaviour does not occur, an error will be logged.) The method also returns
     a search cursor.
     """
-    MAX_ITERATIONS = 10
     summary_models = []
     search_cursor = cursor
 
-    for i in range(MAX_ITERATIONS):
+    for _ in range(MAX_ITERATIONS):
         remaining_to_fetch = feconf.GALLERY_PAGE_SIZE - len(summary_models)
 
         collection_ids, search_cursor = search_collections(
@@ -406,15 +419,16 @@ def apply_change_list(collection_id, change_list):
                 collection.add_node(change.exploration_id)
             elif change.cmd == collection_domain.CMD_DELETE_COLLECTION_NODE:
                 collection.delete_node(change.exploration_id)
-            elif (change.cmd ==
+            elif (
+                    change.cmd ==
                     collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY):
                 collection_node = collection.get_node(change.exploration_id)
                 if (change.property_name ==
-                        collection_domain.COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS):
+                        collection_domain.COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS): # pylint: disable=line-too-long
                     collection_node.update_prerequisite_skills(
                         change.new_value)
                 elif (change.property_name ==
-                        collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS):
+                      collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS): # pylint: disable=line-too-long
                     collection_node.update_acquired_skills(change.new_value)
             elif change.cmd == collection_domain.CMD_EDIT_COLLECTION_PROPERTY:
                 if change.property_name == 'title':
@@ -423,7 +437,8 @@ def apply_change_list(collection_id, change_list):
                     collection.update_category(change.new_value)
                 elif change.property_name == 'objective':
                     collection.update_objective(change.new_value)
-            elif (change.cmd ==
+            elif (
+                    change.cmd ==
                     collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
                 # Loading the collection model from the datastore into an
                 # Collection domain object automatically converts it to use the
@@ -552,8 +567,9 @@ def delete_collection(committer_id, collection_id, force_deletion=False):
     # Delete the collection from search.
     delete_documents_from_search_index([collection_id])
 
-    # Delete the summary of the collection.
-    delete_collection_summary(collection_id, force_deletion=force_deletion)
+    # Delete the summary of the collection (regardless of whether
+    # force_deletion is True or not).
+    delete_collection_summary(collection_id)
 
 
 def get_collection_snapshots_metadata(collection_id):
@@ -575,6 +591,7 @@ def get_collection_snapshots_metadata(collection_id):
 
     return collection_models.CollectionModel.get_snapshots_metadata(
         collection_id, version_nums)
+
 
 def publish_collection_and_update_user_profiles(committer_id, col_id):
     """Publishes the collection with publish_collection() function in
@@ -626,7 +643,8 @@ def update_collection(
 def create_collection_summary(collection_id, contributor_id_to_add):
     """Create summary of a collection and store in datastore."""
     collection = get_collection_by_id(collection_id)
-    collection_summary = get_summary_of_collection(collection, contributor_id_to_add)
+    collection_summary = compute_summary_of_collection(
+        collection, contributor_id_to_add)
     save_collection_summary(collection_summary)
 
 
@@ -635,7 +653,7 @@ def update_collection_summary(collection_id, contributor_id_to_add):
     create_collection_summary(collection_id, contributor_id_to_add)
 
 
-def get_summary_of_collection(collection, contributor_id_to_add):
+def compute_summary_of_collection(collection, contributor_id_to_add):
     """Create a CollectionSummary domain object for a given Collection domain
     object and return it.
     """
@@ -649,12 +667,26 @@ def get_summary_of_collection(collection, contributor_id_to_add):
     # a revert) change to an collection's content).
     if collection_summary_model:
         contributor_ids = collection_summary_model.contributor_ids
+        contributors_summary = collection_summary_model.contributors_summary
     else:
         contributor_ids = []
+        contributors_summary = {}
+
     if (contributor_id_to_add is not None and
-                contributor_id_to_add not in feconf.SYSTEM_USER_IDS):
-            if contributor_id_to_add not in contributor_ids:
-                contributor_ids.append(contributor_id_to_add)
+            contributor_id_to_add not in feconf.SYSTEM_USER_IDS and
+            contributor_id_to_add not in contributor_ids):
+        contributor_ids.append(contributor_id_to_add)
+
+    if contributor_id_to_add not in feconf.SYSTEM_USER_IDS:
+        if contributor_id_to_add is None:
+            # Revert commit or other non-positive commit
+            contributors_summary = compute_collection_contributors_summary(
+                collection.id)
+        else:
+            if contributor_id_to_add in contributors_summary:
+                contributors_summary[contributor_id_to_add] += 1
+            else:
+                contributors_summary[contributor_id_to_add] = 1
 
     collection_model_last_updated = collection.last_updated
     collection_model_created_on = collection.created_on
@@ -664,12 +696,38 @@ def get_summary_of_collection(collection, contributor_id_to_add):
         collection.objective, collection_rights.status,
         collection_rights.community_owned, collection_rights.owner_ids,
         collection_rights.editor_ids, collection_rights.viewer_ids,
-        contributor_ids,
+        contributor_ids, contributors_summary,
         collection.version, collection_model_created_on,
         collection_model_last_updated
     )
 
     return collection_summary
+
+
+def compute_collection_contributors_summary(collection_id):
+    """Returns a dict whose keys are user_ids and whose values are
+    the number of (non-revert) commits made to the given collection
+    by that user_id. This does not count commits which have since been reverted.
+    """
+    snapshots_metadata = get_collection_snapshots_metadata(collection_id)
+    current_version = len(snapshots_metadata)
+    contributors_summary = collections.defaultdict(int)
+    while True:
+        snapshot_metadata = snapshots_metadata[current_version - 1]
+        committer_id = snapshot_metadata['committer_id']
+        is_revert = (snapshot_metadata['commit_type'] == 'revert')
+        if not is_revert and committer_id not in feconf.SYSTEM_USER_IDS:
+            contributors_summary[committer_id] += 1
+
+        if current_version == 1:
+            break
+
+        if is_revert:
+            current_version = snapshot_metadata['commit_cmds'][0][
+                'version_number']
+        else:
+            current_version -= 1
+    return contributors_summary
 
 
 def save_collection_summary(collection_summary):
@@ -687,6 +745,7 @@ def save_collection_summary(collection_summary):
         editor_ids=collection_summary.editor_ids,
         viewer_ids=collection_summary.viewer_ids,
         contributor_ids=collection_summary.contributor_ids,
+        contributors_summary=collection_summary.contributors_summary,
         version=collection_summary.version,
         collection_model_last_updated=(
             collection_summary.collection_model_last_updated),
@@ -697,8 +756,8 @@ def save_collection_summary(collection_summary):
     collection_summary_model.put()
 
 
-def delete_collection_summary(collection_id, force_deletion=False):
-    """Delete an collection summary model."""
+def delete_collection_summary(collection_id):
+    """Delete a collection summary model."""
 
     collection_models.CollectionSummaryModel.get(collection_id).delete()
 
@@ -812,7 +871,7 @@ def get_next_page_of_all_non_private_commits(
             "max_age must be a datetime.timedelta instance. or None.")
 
     results, new_urlsafe_start_cursor, more = (
-        collection_models.CollectionCommitLogEntryModel.get_all_non_private_commits(
+        collection_models.CollectionCommitLogEntryModel.get_all_non_private_commits( # pylint: disable=line-too-long
             page_size, urlsafe_start_cursor, max_age=max_age))
 
     return ([collection_domain.CollectionCommitLogEntry(
@@ -842,18 +901,7 @@ def _get_search_rank(collection_id):
     Featured collections get a ranking bump, and so do collections that
     have been more recently updated.
     """
-    # TODO(bhenning): Improve this calculation. Some possible suggestions for
-    # a better ranking include using an average of the search ranks of each
-    # exploration referenced in the collection and/or demoting collections
-    # for any validation errors from explorations referenced in the collection.
-    _STATUS_PUBLICIZED_BONUS = 30
-    # This is done to prevent the rank hitting 0 too easily. Note that
-    # negative ranks are disallowed in the Search API.
-    _DEFAULT_RANK = 20
-
-    collection = get_collection_by_id(collection_id)
     rights = rights_manager.get_collection_rights(collection_id)
-    summary = get_collection_summary_by_id(collection_id)
     rank = _DEFAULT_RANK + (
         _STATUS_PUBLICIZED_BONUS
         if rights.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED
@@ -868,10 +916,9 @@ def _get_search_rank(collection_id):
             last_human_update_ms = snapshot_metadata['created_on_ms']
             break
 
-    _TIME_NOW_MS = utils.get_current_time_in_millisecs()
-    _MS_IN_ONE_DAY = 24 * 60 * 60 * 1000
+    _time_now_ms = utils.get_current_time_in_millisecs()
     time_delta_days = int(
-        (_TIME_NOW_MS - last_human_update_ms) / _MS_IN_ONE_DAY)
+        (_time_now_ms - last_human_update_ms) / _MS_IN_ONE_DAY)
     if time_delta_days == 0:
         rank += 80
     elif time_delta_days == 1:
@@ -905,11 +952,11 @@ def clear_search_index():
 
 def index_collections_given_ids(collection_ids):
     # We pass 'strict=False' so as not to index deleted collections.
-    collection_models = get_multiple_collections_by_id(
-        collection_ids, strict=False)
+    collection_list = get_multiple_collections_by_id(
+        collection_ids, strict=False).values()
     search_services.add_documents_to_index([
         _collection_to_search_dict(collection)
-        for collection in collection_models.values()
+        for collection in collection_list
         if _should_index(collection)
     ], SEARCH_INDEX_COLLECTIONS)
 

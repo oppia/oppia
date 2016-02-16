@@ -1,0 +1,5 @@
+<script type="text/ng-template" id="components/ratingSummary">
+  <span style="<[getCursorStyle()]>" ng-mouseleave="leaveArea()">
+    <span ng-if="ratingValue || isEditable" ng-repeat="star in stars" class="fa <[star.cssClass]> protractor-test-rating-star" ng-click="clickStar(star.value)" ng-mouseenter="enterStar(star.value)"></span>
+  </span>
+</script>

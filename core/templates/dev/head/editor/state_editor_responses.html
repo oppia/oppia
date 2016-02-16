@@ -16,6 +16,12 @@
             <span class="oppia-rule-sort-handle" ng-if="answerGroups.length > 1" ng-mousedown="changeActiveAnswerGroupIndex(-1)">
               <img ng-if="editabilityService.isEditable()" src="/images/general/drag_dots.png" width="10">
             </span>
+            <div class="oppia-rule-header-warning-placement" ng-if="isSelfLoopWithNoFeedback(answerGroup.outcome)" ng-click="changeActiveAnswerGroupIndex($index)"
+                 tooltip="Please give Oppia something useful to say or direct the learner to a different card." tooltip-placement="bottom">
+              <div class="oppia-rule-header-warning-style" >
+                ⚠
+              </div>
+            </div>
             <a ng-click="changeActiveAnswerGroupIndex($index)" class="oppia-rule-tab protractor-test-response-tab" ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex === $index}">
               <response-header index="$index"
                                summary="answerGroup | summarizeAnswerGroup : getCurrentInteractionId():getAnswerChoices():false"
@@ -47,6 +53,12 @@
       <div>
         <ul class="nav nav-stacked nav-pills" role="tablist">
           <li ng-class="{'active': activeAnswerGroupIndex === answerGroups.length}" class="oppia-rule-block">
+            <div class="oppia-rule-header-warning-placement" ng-if="isSelfLoopWithNoFeedback(defaultOutcome)" ng-click="changeActiveAnswerGroupIndex(answerGroups.length)"
+                 tooltip="Please give Oppia something useful to say or direct the learner to a different card." tooltip-placement="bottom">
+              <div class="oppia-rule-header-warning-style" >
+                ⚠
+              </div>
+            </div>
             <a ng-click="changeActiveAnswerGroupIndex(answerGroups.length)" class="oppia-rule-tab oppia-default-rule-tab protractor-test-default-response-tab" ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex == answerGroups.length}">
               <response-header index="$index"
                                is-active="$index === activeAnswerGroupIndex"
@@ -171,9 +183,30 @@
 
       <br>
 
-      <outcome-feedback-editor outcome="tmpOutcome">
-      </outcome-feedback-editor>
+      <div ng-if="!feedbackEditorIsOpen"
+           title="Edit feedback"
+           style="height: 100%; margin-right: 22px;">
+        <div class="oppia-rule-details-header oppia-editable-section">
+          <div class="oppia-rule-preview oppia-transition-200">
+            <div class="oppia-click-to-start-editing protractor-test-open-feedback-editor" ng-click="openFeedbackEditor()">
+            </div>
+            <strong>Oppia tells the learner...</strong>
+            <div style="position: relative;">
+              <span class="glyphicon glyphicon-pencil oppia-editor-edit-icon pull-right"
+                    title="Edit Feedback">
+              </span>
+              <span style="color: #888">
+                <em>Nothing</em>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
 
+      <div ng-if="feedbackEditorIsOpen">
+        <outcome-feedback-editor outcome="tmpOutcome">
+        </outcome-feedback-editor>
+      </div>
       <br>
 
       <outcome-destination-editor outcome="tmpOutcome">

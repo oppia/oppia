@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 // TODO(sll): Remove this directive (as well as the whole of the value
 // generators framework).
 
-oppia.directive('copier', function($compile) {
+oppia.directive('copier', ['$compile', function($compile) {
   return {
-    link: function(scope, element, attrs) {
+    link: function(scope, element) {
       scope.getTemplateUrl = function() {
         return '/value_generator_handler/' + scope.$parent.generatorId;
       };
@@ -27,22 +26,22 @@ oppia.directive('copier', function($compile) {
     restrict: 'E',
     scope: true,
     template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: function($scope, $attrs) {
-      $scope.$watch('$parent.initArgs', function(newValue, oldValue) {
+    controller: function($scope) {
+      $scope.$watch('$parent.initArgs', function() {
         $scope.initArgs = $scope.$parent.initArgs;
       }, true);
 
-      $scope.$watch('$parent.objType', function(newValue, oldValue) {
+      $scope.$watch('$parent.objType', function() {
         $scope.objType = $scope.$parent.objType;
       }, true);
 
-      $scope.$watch('$parent.customizationArgs', function(newValue, oldValue) {
+      $scope.$watch('$parent.customizationArgs', function() {
         $scope.customizationArgs = $scope.$parent.customizationArgs;
       }, true);
 
-      $scope.$watch('customizationArgs', function(newValue, oldValue) {
+      $scope.$watch('customizationArgs', function() {
         $scope.$parent.customizationArgs = $scope.customizationArgs;
       }, true);
     }
   };
-});
+}]);

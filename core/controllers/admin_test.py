@@ -14,8 +14,6 @@
 
 """Tests for the admin page."""
 
-__author__ = 'Sean Lip'
-
 from core.controllers import editor
 from core.controllers import pages
 from core.domain import config_domain
@@ -23,10 +21,12 @@ from core.tests import test_utils
 import feconf
 
 
+BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 SITE_FORUM_URL = 'siteforum.url'
 
 
 class AdminIntegrationTest(test_utils.GenericTestBase):
+    """Server integration tests for operations on the admin page."""
 
     def setUp(self):
         """Complete the signup process for self.ADMIN_EMAIL."""
@@ -69,8 +69,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_change_configuration_property(self):
         """Test that configuration properties can be changed."""
 
-        TEST_STRING = self.UNICODE_TEST_STRING
-
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
@@ -84,7 +82,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         payload = {
             'action': 'save_config_properties',
             'new_config_property_values': {
-                editor.MODERATOR_REQUEST_FORUM_URL.name: TEST_STRING
+                editor.MODERATOR_REQUEST_FORUM_URL.name: (
+                    self.UNICODE_TEST_STRING),
             }
         }
         self.post_json('/adminhandler', payload, csrf_token)
@@ -92,7 +91,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response_dict = self.get_json('/adminhandler')
         response_config_properties = response_dict['config_properties']
         self.assertDictContainsSubset({
-            'value': TEST_STRING
+            'value': self.UNICODE_TEST_STRING,
         }, response_config_properties[editor.MODERATOR_REQUEST_FORUM_URL.name])
 
         self.logout()
@@ -122,8 +121,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
     def test_change_rights(self):
         """Test that the correct role indicators show up on app pages."""
-
-        BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup('superadmin@example.com', 'superadm1n')
@@ -167,5 +164,5 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         # navbar.
         self.login(BOTH_MODERATOR_AND_ADMIN_EMAIL)
         self.testapp.get(feconf.GALLERY_URL).mustcontain(
-             '/moderator', no=['/admin'])
+            '/moderator', no=['/admin'])
         self.logout()

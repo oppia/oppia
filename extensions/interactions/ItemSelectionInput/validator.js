@@ -18,80 +18,88 @@
  */
 
 oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
-    '$filter', 'WARNING_TYPES', 'baseInteractionValidationService',
-    function($filter, WARNING_TYPES, baseInteractionValidationService) {
-      // Returns a list of warnings.
-      return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
-    var warningsList = [];
+  '$filter', 'WARNING_TYPES', 'baseInteractionValidationService',
+  function($filter, WARNING_TYPES, baseInteractionValidationService) {
+    // Returns a list of warnings.
+    return function(
+        stateName, customizationArgs, answerGroups, defaultOutcome) {
+      var warningsList = [];
 
-    baseInteractionValidationService.requireCustomizationArguments(
-      customizationArgs, ['choices']);
+      baseInteractionValidationService.requireCustomizationArguments(
+        customizationArgs, ['choices']);
 
-    var areAnyChoicesEmpty = false;
-    var areAnyChoicesDuplicated = false;
-    var seenChoices = [];
-    var numChoices = customizationArgs.choices.value.length;
-    for (var i = 0; i < customizationArgs.choices.value.length; i++) {
-      var choice = customizationArgs.choices.value[i];
-      if (choice.trim().length === 0) {
-        areAnyChoicesEmpty = true;
+      var areAnyChoicesEmpty = false;
+      var areAnyChoicesDuplicated = false;
+      var seenChoices = [];
+      var numChoices = customizationArgs.choices.value.length;
+      for (var i = 0; i < customizationArgs.choices.value.length; i++) {
+        var choice = customizationArgs.choices.value[i];
+        if (choice.trim().length === 0) {
+          areAnyChoicesEmpty = true;
+        }
+        if (seenChoices.indexOf(choice) !== -1) {
+          areAnyChoicesDuplicated = true;
+        }
+        seenChoices.push(choice);
       }
-      if (seenChoices.indexOf(choice) !== -1) {
-        areAnyChoicesDuplicated = true;
+
+      if (areAnyChoicesEmpty) {
+        warningsList.push({
+          type: WARNING_TYPES.CRITICAL,
+          message: 'Please ensure the choices are nonempty.'
+        });
       }
-      seenChoices.push(choice);
-    }
 
-    if (areAnyChoicesEmpty) {
-      warningsList.push({
-        type: WARNING_TYPES.CRITICAL,
-        message: 'Please ensure the choices are nonempty.'
-      });
-    }
+      if (areAnyChoicesDuplicated) {
+        warningsList.push({
+          type: WARNING_TYPES.CRITICAL,
+          message: 'Please ensure the choices are unique.'
+        });
+      }
 
-    if (areAnyChoicesDuplicated) {
-      warningsList.push({
-        type: WARNING_TYPES.CRITICAL,
-        message: 'Please ensure the choices are unique.'
-      });
-    }
+      var minAllowedCount = customizationArgs.minAllowableSelectionCount.value;
+      var maxAllowedCount = customizationArgs.maxAllowableSelectionCount.value;
 
-    var minAllowedCount = customizationArgs.minAllowableSelectionCount.value;
-    var maxAllowedCount = customizationArgs.maxAllowableSelectionCount.value;
+      if (minAllowedCount > maxAllowedCount) {
+        warningsList.push({
+          type: WARNING_TYPES.CRITICAL,
+          message: (
+            'Please ensure that the max allowed count is not less than the ' +
+            'min count.')
+        });
+      }
 
-    if (minAllowedCount > maxAllowedCount) {
-      warningsList.push({
-        type: WARNING_TYPES.CRITICAL,
-        message: 'Please ensure that the max allowed count is not less than the min count.'
-      });
-    }
+      if (numChoices < minAllowedCount) {
+        warningsList.push({
+          type: WARNING_TYPES.CRITICAL,
+          message: (
+            'Please ensure that you have enough choices to reach the min ' +
+            'count.')
+        });
+      } else if (numChoices < maxAllowedCount) {
+        warningsList.push({
+          type: WARNING_TYPES.CRITICAL,
+          message: (
+            'Please ensure that you have enough choices to reach the max ' +
+            'count.')
+        });
+      }
 
-    if (numChoices < minAllowedCount) {
-      warningsList.push({
-        type: WARNING_TYPES.CRITICAL,
-        message: 'Please ensure that you have enough choices to reach the min count.'
-      });
-    } else if (numChoices < maxAllowedCount) {
-      warningsList.push({
-        type: WARNING_TYPES.CRITICAL,
-        message: 'Please ensure that you have enough choices to reach the max count.'
-      });
-    }
+      warningsList = warningsList.concat(
+        baseInteractionValidationService.getAnswerGroupWarnings(
+          answerGroups, stateName));
 
-    warningsList = warningsList.concat(
-      baseInteractionValidationService.getAnswerGroupWarnings(
-        answerGroups, stateName));
+      if (!defaultOutcome ||
+          $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
+        warningsList.push({
+          type: WARNING_TYPES.ERROR,
+          message: (
+            'Please clarify the default outcome so it is less confusing to ' +
+            'the user.')
+        });
+      }
 
-
-    if (!defaultOutcome || $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
-      warningsList.push({
-        type: WARNING_TYPES.ERROR,
-        message: (
-          'Please clarify the default outcome so it is less confusing to ' +
-          'the user.')
-      });
-    }
-
-    return warningsList;
-  };
-}]);
+      return warningsList;
+    };
+  }
+]);

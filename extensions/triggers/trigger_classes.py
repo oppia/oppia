@@ -21,8 +21,6 @@ framework for third-party developers. This is because reacting to triggers
 involves changes to core code.
 """
 
-__author__ = 'Sean Lip'
-
 from extensions import domain
 
 

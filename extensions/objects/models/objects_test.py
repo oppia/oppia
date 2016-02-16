@@ -16,8 +16,6 @@
 
 """Tests for typed object classes (mostly normalization)."""
 
-__author__ = 'Sean Lip'
-
 import inspect
 
 from core.tests import test_utils
@@ -370,6 +368,19 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.Graph, mappings, invalid_values)
 
+    def test_graph_property_validation(self):
+        """Tests objects of type GraphProperty"""
+
+        mappings = [
+            ('acyclic', 'acyclic'), ('regular', 'regular'),
+            ('strongly_connected', 'strongly_connected'),
+            ('weakly_connected', 'weakly_connected')]
+
+        invalid_values = [None, 2, 'string', 'item']
+
+        self.check_normalization(
+            objects.GraphProperty, mappings, invalid_values)
+
     def test_set_of_html_string(self):
         """Tests objects of the type StringList"""
 
@@ -389,4 +400,4 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils_test.validate_schema(member.SCHEMA)
                     count += 1
 
-        self.assertEquals(count, 29)
+        self.assertEquals(count, 30)

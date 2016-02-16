@@ -12,6 +12,9 @@
   .state-diff-modal .modal-body {
     height: 60vh;
   }
+  #legend-graph .node rect {
+    pointer-events: none;
+  }
 </style>
 <div ng-controller="ExplorationHistory" class="container-fluid" style="word-wrap: break-word;">
   <md-card class="oppia-editor-card">
@@ -56,16 +59,14 @@
 
     <div ng-hide="diffGraphData" class="oppia-align-center">
       Loading
-      <span class="oppia-loading-dot-one">.</span>
-      <span class="oppia-loading-dot-two">.</span>
-      <span class="oppia-loading-dot-three">.</span>
+      <loading-dots></loading-dots>
     </div>
     <div state-graph-viz class='protractor-test-history-graph' graph-data="diffGraphData" node-colors="diffGraphNodeColors" node-secondary-labels="diffGraphSecondaryLabels" init-state-id2="v1InitStateId" link-property-mapping="DIFF_GRAPH_LINK_PROPERTY_MAPPING" on-click-function="onClickStateInHistoryGraph">
     </div>
 
     <div style="position: absolute; right: -100px; top: 10px;" ng-show="diffGraphData">
       <h4>Exploration Graph Legend</h4>
-      <div state-graph-viz graph-data="legendGraph" node-colors="LEGEND_GRAPH_COLORS" node-secondary-labels="LEGEND_GRAPH_SECONDARY_LABELS" link-property-mapping="LEGEND_GRAPH_LINK_PROPERTY_MAPPING"></div>
+      <div ng-disabled="true" state-graph-viz graph-data="legendGraph" node-colors="LEGEND_GRAPH_COLORS" node-secondary-labels="LEGEND_GRAPH_SECONDARY_LABELS" link-property-mapping="LEGEND_GRAPH_LINK_PROPERTY_MAPPING" id="legend-graph"></div>
     </div>
   </md-card>
 </div>

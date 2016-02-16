@@ -18,16 +18,15 @@
 To use these jobs, first need to register them in jobs_registry (at
 the moment they are not displayed there to avoid accidental use)."""
 
-__author__ = 'Marcel Schmittfull'
-
 from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.platform import models
+import feconf
+
 (base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration])
-import feconf
 
 
 class ExpCopiesRealtimeModel(
@@ -58,7 +57,7 @@ class ExpCopiesAggregator(jobs.BaseContinuousComputationManager):
 
 
 class ExpCopiesMRJobManager(
-    jobs.BaseMapReduceJobManagerForContinuousComputations):
+        jobs.BaseMapReduceJobManagerForContinuousComputations):
     """A continuous-computation job creating 10 published copies of every
     existing exploration, with the eid being '[old_eid]copy[copy_number]',
     title 'Copy' and category 'Copies'.

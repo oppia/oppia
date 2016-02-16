@@ -19,134 +19,141 @@
  */
 
 oppia.controller('Signup', [
-    '$scope', '$http', '$rootScope', '$modal', 'warningsData', 'urlService', 'focusService',
-    function($scope, $http, $rootScope, $modal, warningsData, urlService, focusService) {
-  var _SIGNUP_DATA_URL = '/signuphandler/data';
-  $rootScope.loadingMessage = 'Loading';
-  $scope.warningText = '';
-  $scope.showEmailPreferencesForm = GLOBALS.CAN_SEND_EMAILS_TO_USERS;
-  $scope.submissionInProcess = false;
+  '$scope', '$http', '$rootScope', '$modal', 'warningsData', 'urlService',
+  'focusService',
+  function(
+      $scope, $http, $rootScope, $modal, warningsData, urlService,
+      focusService) {
+    var _SIGNUP_DATA_URL = '/signuphandler/data';
+    $rootScope.loadingMessage = 'Loading';
+    $scope.warningText = '';
+    $scope.showEmailPreferencesForm = GLOBALS.CAN_SEND_EMAILS_TO_USERS;
+    $scope.submissionInProcess = false;
 
-  $http.get(_SIGNUP_DATA_URL).success(function(data) {
-    $rootScope.loadingMessage = '';
-    $scope.username = data.username;
-    $scope.hasEverRegistered = data.has_ever_registered;
-    $scope.hasAgreedToLatestTerms = data.has_agreed_to_latest_terms;
-    $scope.hasUsername = Boolean($scope.username);
-    focusService.setFocus('usernameInputField');
-  });
-
-  $scope.blurredAtLeastOnce = false;
-  $scope.canReceiveEmailUpdates = null;
-
-  $scope.isFormValid = function() {
-    return (
-      $scope.hasAgreedToLatestTerms &&
-      ($scope.hasUsername || !$scope.getWarningText($scope.username))
-    );
-  };
-
-  $scope.showLicenseExplanationModal = function() {
-    $modal.open({
-      templateUrl: 'modals/licenseExplanation',
-      backdrop: true,
-      resolve: {},
-      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-        $scope.close = function() {
-          $modalInstance.dismiss('cancel');
-        };
-      }]
+    $http.get(_SIGNUP_DATA_URL).success(function(data) {
+      $rootScope.loadingMessage = '';
+      $scope.username = data.username;
+      $scope.hasEverRegistered = data.has_ever_registered;
+      $scope.hasAgreedToLatestTerms = data.has_agreed_to_latest_terms;
+      $scope.hasUsername = Boolean($scope.username);
+      focusService.setFocus('usernameInputField');
     });
-  };
 
-  $scope.onUsernameInputFormBlur = function(username) {
-    if ($scope.hasUsername) {
-      return;
-    }
-    warningsData.clear();
-    $scope.blurredAtLeastOnce = true;
-    $scope.updateWarningText(username);
-    if (!$scope.warningText) {
-      $http.post('usernamehandler/data', {
-        username: $scope.username
-      }).success(function(data) {
-        if (data.username_is_taken) {
-          $scope.warningText = 'Sorry, this username is already taken.'
-        }
-      });
-    }
-  };
+    $scope.blurredAtLeastOnce = false;
+    $scope.canReceiveEmailUpdates = null;
 
-  // Returns the warning text corresponding to the validation error for the
-  // given username, or an empty string if the username is valid.
-  $scope.updateWarningText = function(username) {
-    var alphanumeric = /^[A-Za-z0-9]+$/;
-    var admin = /admin/i;
-    var oppia = /oppia/i;
-
-    if (!username) {
-      $scope.warningText = 'Please choose a username.';
-    } else if (username.indexOf(' ') !== -1) {
-      $scope.warningText = 'Please ensure that your username has no spaces.';
-    } else if (username.length > 50) {
-      $scope.warningText = 'A username can have at most 50 characters.';
-    } else if (!alphanumeric.test(username)) {
-      $scope.warningText = 'Usernames can only have alphanumeric characters.';
-    } else if (admin.test(username)) {
-      $scope.warningText = 'User names with \'admin\' are reserved.';
-    } else if (oppia.test(username)) {
-      $scope.warningText = 'This user name is not available.';
-    } else {
-      $scope.warningText = '';
-    }
-  };
-
-  $scope.onSelectEmailPreference = function() {
-    $scope.emailPreferencesWarningText = '';
-  };
-
-  $scope.submitPrerequisitesForm = function(
-      agreedToTerms, username, canReceiveEmailUpdates) {
-    if (!agreedToTerms) {
-      warningsData.addWarning(
-        'In order to edit explorations on this site, you will need to ' +
-        'agree to the site terms.');
-      return;
-    }
-
-    if (!$scope.hasUsername && $scope.warningText) {
-      return;
-    }
-
-    var requestParams = {
-      agreed_to_terms: agreedToTerms,
-      can_receive_email_updates: null
+    $scope.isFormValid = function() {
+      return (
+        $scope.hasAgreedToLatestTerms &&
+        ($scope.hasUsername || !$scope.getWarningText($scope.username))
+      );
     };
-    if (!$scope.hasUsername) {
-      requestParams.username = username;
-    }
 
-    if (GLOBALS.CAN_SEND_EMAILS_TO_USERS && !$scope.hasUsername) {
-      if (canReceiveEmailUpdates === null) {
-        $scope.emailPreferencesWarningText = 'This field is required.';
+    $scope.showLicenseExplanationModal = function() {
+      $modal.open({
+        templateUrl: 'modals/licenseExplanation',
+        backdrop: true,
+        resolve: {},
+        controller: [
+          '$scope', '$modalInstance', function($scope, $modalInstance) {
+            $scope.close = function() {
+              $modalInstance.dismiss('cancel');
+            };
+          }
+        ]
+      });
+    };
+
+    $scope.onUsernameInputFormBlur = function(username) {
+      if ($scope.hasUsername) {
+        return;
+      }
+      warningsData.clear();
+      $scope.blurredAtLeastOnce = true;
+      $scope.updateWarningText(username);
+      if (!$scope.warningText) {
+        $http.post('usernamehandler/data', {
+          username: $scope.username
+        }).success(function(data) {
+          if (data.username_is_taken) {
+            $scope.warningText = 'Sorry, this username is already taken.';
+          }
+        });
+      }
+    };
+
+    // Returns the warning text corresponding to the validation error for the
+    // given username, or an empty string if the username is valid.
+    $scope.updateWarningText = function(username) {
+      var alphanumeric = /^[A-Za-z0-9]+$/;
+      var admin = /admin/i;
+      var oppia = /oppia/i;
+
+      if (!username) {
+        $scope.warningText = 'Please choose a username.';
+      } else if (username.indexOf(' ') !== -1) {
+        $scope.warningText = 'Please ensure that your username has no spaces.';
+      } else if (username.length > 50) {
+        $scope.warningText = 'A username can have at most 50 characters.';
+      } else if (!alphanumeric.test(username)) {
+        $scope.warningText = 'Usernames can only have alphanumeric characters.';
+      } else if (admin.test(username)) {
+        $scope.warningText = 'User names with \'admin\' are reserved.';
+      } else if (oppia.test(username)) {
+        $scope.warningText = 'This user name is not available.';
+      } else {
+        $scope.warningText = '';
+      }
+    };
+
+    $scope.onSelectEmailPreference = function() {
+      $scope.emailPreferencesWarningText = '';
+    };
+
+    $scope.submitPrerequisitesForm = function(
+        agreedToTerms, username, canReceiveEmailUpdates) {
+      if (!agreedToTerms) {
+        warningsData.addWarning(
+          'In order to edit explorations on this site, you will need to ' +
+          'agree to the site terms.');
         return;
       }
 
-      if (canReceiveEmailUpdates === 'yes') {
-        requestParams.can_receive_email_updates = true;
-      } else if (canReceiveEmailUpdates === 'no') {
-        requestParams.can_receive_email_updates = false;
-      } else {
-        throw Error(
-          'Invalid value for email preferences: ' + canReceiveEmailUpdates);
+      if (!$scope.hasUsername && $scope.warningText) {
+        return;
       }
-    }
 
-    $scope.submissionInProcess = true;
-    $http.post(_SIGNUP_DATA_URL, requestParams).success(function(data) {
-      window.location = window.decodeURIComponent(urlService.getUrlParams().return_url);
-    }).error(function(data) {
-      $scope.submissionInProcess = false;
-    });
-  };
-}]);
+      var requestParams = {
+        agreed_to_terms: agreedToTerms,
+        can_receive_email_updates: null
+      };
+      if (!$scope.hasUsername) {
+        requestParams.username = username;
+      }
+
+      if (GLOBALS.CAN_SEND_EMAILS_TO_USERS && !$scope.hasUsername) {
+        if (canReceiveEmailUpdates === null) {
+          $scope.emailPreferencesWarningText = 'This field is required.';
+          return;
+        }
+
+        if (canReceiveEmailUpdates === 'yes') {
+          requestParams.can_receive_email_updates = true;
+        } else if (canReceiveEmailUpdates === 'no') {
+          requestParams.can_receive_email_updates = false;
+        } else {
+          throw Error(
+            'Invalid value for email preferences: ' + canReceiveEmailUpdates);
+        }
+      }
+
+      $scope.submissionInProcess = true;
+      $http.post(_SIGNUP_DATA_URL, requestParams).success(function() {
+        window.location = window.decodeURIComponent(
+          urlService.getUrlParams().return_url);
+      }).error(function() {
+        $scope.submissionInProcess = false;
+      });
+    };
+  }
+]);

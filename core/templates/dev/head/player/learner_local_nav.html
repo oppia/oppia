@@ -1,0 +1,19 @@
+<ul class="nav navbar-nav oppia-navbar-nav navbar-right"
+    ng-controller="LearnerLocalNav" style="margin-right: 0px;">
+  <li popover-placement="bottom" popover-template="'popover/feedback'" popover-trigger="click">
+    <a href="" tooltip="Feedback" tooltip-placement="bottom">
+      <span class="glyphicon glyphicon-comment"></span>
+    </a>
+  </li>
+  <li>
+    {% if can_edit %}
+      <a ng-href="/create/<[explorationId]>" tooltip="Edit" tooltip-placement="bottom" target="_blank">
+        <span class="glyphicon glyphicon-pencil"></span>
+      </a>
+    {% elif username %}
+      <a ng-click="showLearnerSuggestionModal()" tooltip="Suggest Changes" tooltip-placement="bottom" target="_blank">
+        <span class="glyphicon glyphicon-pencil"></span>
+      </a>
+    {% endif %}
+  </li>
+</ul>

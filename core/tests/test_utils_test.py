@@ -9,14 +9,12 @@
 #      http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an 'AS-IS' BASIS, 
+# distributed under the License is distributed on an 'AS-IS' BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
 """Tests for test_utils, mainly for the FunctionWrapper. """
-
-__author__ = 'Frederik Creemers'
 
 from core.tests import test_utils
 
@@ -27,8 +25,9 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
     def test_wrapper_calls_subclass_methods(self):
         """Tests the basic functionality of FunctionWrapper."""
 
-        # Keeps track of which functions have been called, to test that pre_call_hook,
-        # the actual function, and post_call_hook are called in the right order.
+        # Keeps track of which functions have been called, to test that
+        # pre_call_hook, the actual function, and post_call_hook are
+        # called in the right order.
         order = []
         testcase = self
 
@@ -58,18 +57,18 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         """Tests that FunctionWrapper also works for methods"""
         data = {}
 
-        class A(object):
-            def __init__(self, a):
-                self.a = a
+        class Klass(object):
+            def __init__(self, num1):
+                self.num1 = num1
 
-            def my_method(self, b):
-                data['value'] = self.a + b
-                return (self.a + b) * 2
+            def my_method(self, num2):
+                data['value'] = self.num1 + num2
+                return (self.num1 + num2) * 2
 
-        wrapped = test_utils.FunctionWrapper(A.my_method)
+        wrapped = test_utils.FunctionWrapper(Klass.my_method)
 
-        with self.swap(A, 'my_method', wrapped):
-            val = A('foo').my_method('bar')
+        with self.swap(Klass, 'my_method', wrapped):
+            val = Klass('foo').my_method('bar')
             self.assertEqual(val, 'foobarfoobar')
             self.assertEqual(data.get('value'), 'foobar')
 
@@ -77,17 +76,17 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         """Tests that FunctionWrapper also works for class methods"""
         data = {}
 
-        class A(object):
-            a = "foo"
+        class Klass(object):
+            str_attr = 'foo'
 
             @classmethod
-            def class_method(cls, b):
-                data['value'] = cls.a + b
-                return (cls.a + b) * 2
+            def class_method(cls, num):
+                data['value'] = cls.str_attr + num
+                return (cls.str_attr + num) * 2
 
-        wrapped = test_utils.FunctionWrapper(A.class_method)
-        with self.swap(A, 'class_method', wrapped):
-            val = A.class_method('bar')
+        wrapped = test_utils.FunctionWrapper(Klass.class_method)
+        with self.swap(Klass, 'class_method', wrapped):
+            val = Klass.class_method('bar')
             self.assertEqual(val, 'foobarfoobar')
             self.assertEqual(data.get('value'), 'foobar')
 
@@ -95,24 +94,24 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         """Tests that FunctionWrapper also works for static methods"""
         data = {}
 
-        class A(object):
+        class Klass(object):
             @staticmethod
-            def static_method(ab):
-                data['value'] = ab
-                return ab * 2
+            def static_method(num):
+                data['value'] = num
+                return num * 2
 
-        wrapped = test_utils.FunctionWrapper(A.static_method)
-        with self.swap(A, 'static_method', wrapped):
-            val = A.static_method('foobar')
+        wrapped = test_utils.FunctionWrapper(Klass.static_method)
+        with self.swap(Klass, 'static_method', wrapped):
+            val = Klass.static_method('foobar')
             self.assertEqual(val, 'foobarfoobar')
             self.assertEqual(data.get('value'), 'foobar')
 
     def test_wrapper_calls_passed_lambdas(self):
         data = {}
 
-        def side_effect(ab):
-            data['value'] = ab
-            return ab
+        def side_effect(num):
+            data['value'] = num
+            return num
 
         l = lambda x: side_effect(x)*2
 
@@ -122,7 +121,8 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
 
 
 class CallCounterTests(test_utils.GenericTestBase):
-    def test_call_counter_counts_the_number_of_times_a_function_gets_called(self):
+    def test_call_counter_counts_the_number_of_times_a_function_gets_called(
+            self):
         f = lambda x: x ** 2
 
         wrapped_function = test_utils.CallCounter(f)
@@ -141,14 +141,14 @@ class FailingFunctionTests(test_utils.GenericTestBase):
 
         function = lambda x: x ** 2
 
-        ff = test_utils.FailingFunction(function, CustomError, 5)
+        failing_func = test_utils.FailingFunction(function, CustomError, 5)
 
         for i in xrange(5):
             with self.assertRaises(CustomError):
-                ff(i)
+                failing_func(i)
                 raise ValueError(str(i))
 
-        self.assertEqual(ff(5), 25)
+        self.assertEqual(failing_func(5), 25)
 
     def test_failing_function_never_succeeds_when_n_is_infinity(self):
         class CustomError(Exception):
@@ -156,8 +156,9 @@ class FailingFunctionTests(test_utils.GenericTestBase):
 
         function = lambda x: x ** 2
 
-        ff = test_utils.FailingFunction(function, CustomError, test_utils.FailingFunction.INFINITY)
+        failing_func = test_utils.FailingFunction(
+            function, CustomError, test_utils.FailingFunction.INFINITY)
 
         for i in xrange(20):
             with self.assertRaises(CustomError):
-                ff(i)
+                failing_func(i)

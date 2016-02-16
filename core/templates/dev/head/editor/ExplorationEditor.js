@@ -157,7 +157,7 @@ oppia.controller('ExplorationEditor', [
         }
 
         stateEditorTutorialFirstTimeService.init(
-          data.show_state_editor_tutorial_on_load, $scope.explorationId);
+          data.show_state_editor_tutorial_on_load);
       });
     };
 
@@ -209,7 +209,7 @@ oppia.controller('ExplorationEditor', [
         'learner that is divided into several \'cards\'.<br><br>' +
         'The first part of a card is the <b>content</b>. Here, you can set ' +
         'the scene and ask the learner a question.'),
-      placement: 'right'
+      placement: 'bottom'
     }, {
       type: 'function',
       fn: function(isGoingForward) {
@@ -439,23 +439,30 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     };
 
     $scope.showPublishExplorationModal = function() {
+      $scope.publishModalIsOpening = true;
       warningsData.clear();
-      $modal.open({
+      var modalInstance = $modal.open({
         templateUrl: 'modals/publishExploration',
         backdrop: true,
         controller: [
-            '$scope', '$modalInstance', function($scope, $modalInstance) {
-          $scope.publish = $modalInstance.close;
+          '$scope', '$modalInstance', function($scope, $modalInstance) {
+            $scope.publish = $modalInstance.close;
 
-          $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
-            warningsData.clear();
-          };
-        }]
-      }).result.then(function() {
+            $scope.cancel = function() {
+              $modalInstance.dismiss('cancel');
+              warningsData.clear();
+            };
+          }]
+      });
+
+      modalInstance.result.then(function() {
         explorationRightsService.saveChangeToBackend({
           is_public: true
         });
+      });
+
+      modalInstance.opened.then(function() {
+        $scope.publishModalIsOpening = false;
       });
     };
 
@@ -484,6 +491,10 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     var _modalIsOpen = false;
 
     $scope.saveChanges = function() {
+      // This flag is used to change text of save button to "Loading..." to
+      // add indication for user that something is happening.
+      $scope.saveModalIsOpening = true;
+
       routerService.savePendingChanges();
 
       $scope.changeListSummaryUrl = (
@@ -722,6 +733,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
         // Modal is Opened
         _modalIsOpen = true;
+        $scope.saveModalIsOpening = false;
 
         modalInstance.opened.then(function() {
           // The $timeout seems to be needed in order to give the modal time to
