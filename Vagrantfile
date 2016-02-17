@@ -6,14 +6,23 @@
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 
+$script = <<SCRIPT
+cd /home/vagrant/oppia
+apt-get update && apt-get install -y python-pip python-dev unzip
+bash ./scripts/setup.sh
+bash ./scripts/install_third_party.sh
+SCRIPT
 
 Vagrant.configure(2) do |config|
     config.vm.provider "virtualbox" do |v|
       v.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/v-root", "1"]
+      v.memory = 1024
     end
   config.vm.provision "shell", inline: 'echo "export VAGRANT=true" >> ~/.profile'
-  config.vm.provision "shell", inline: 'apt-get install -y unzip python-pip build-essential git gfortran libatlas-base-dev python-dev && pip install -U pip'
+  config.vm.network "forwarded_port", guest: 8000, host: 8000
+  config.vm.network "forwarded_port", guest: 42559, host: 42559
   config.vm.network "forwarded_port", guest: 8181, host: 8181
   config.vm.box = "ubuntu/trusty64"
   config.vm.synced_folder ".", "/home/vagrant/oppia"
+  config.vm.provision "shell", inline: $script
 end
