@@ -34,7 +34,7 @@ oppia.factory('explorationContextService', [
   function($window, PAGE_CONTEXT, EDITOR_TAB_CONTEXT) {
     var _pageContext = null;
     var _explorationId = null;
-
+    var isVideoPlayedList = {};
     return {
       // Returns a string representing the current tab of the editor (either
       // 'editor' or 'preview'), or null if the current tab is neither of these,
@@ -100,6 +100,21 @@ oppia.factory('explorationContextService', [
       isInExplorationEditorMode: function() {
         return (this.getPageContext() === PAGE_CONTEXT.EDITOR &&
             this.getEditorTabContext() === EDITOR_TAB_CONTEXT.EDITOR);
+      },
+
+      // Following functions help in remembering whether video is already
+      // autoplayed or not. Consider the case when same video is to be shown
+      // in exploration twice, then 2nd time video will not autoplay. To
+      // solve that problem, unique id to each element can be assigned and
+      // that id can be used to store whether video is autoplayed or not.
+      addToPlayedList: function(
+          videoId) {
+        isVideoPlayedList[videoId] = true;
+      },
+
+      getFromPlayedList: function(
+          videoId) {
+        return isVideoPlayedList.videoId;
       }
     };
   }
