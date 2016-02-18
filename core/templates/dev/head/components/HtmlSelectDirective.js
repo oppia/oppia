@@ -30,6 +30,12 @@ oppia.directive('htmlSelect', [function() {
       options: '=',
       selection: '='
     },
-    templateUrl: 'components/html_select'
+    templateUrl: 'components/htmlSelect',
+    controller: ['$scope', function($scope) {
+      $scope.select = function(id) {
+        $scope.selection = id;
+        };
+      }
+    ]
   };
 }]);
