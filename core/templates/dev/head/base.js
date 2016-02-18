@@ -64,6 +64,8 @@ oppia.constant('DEFAULT_FUZZY_RULE', {
   }
 });
 
+oppia.constant('EVENT_HTML_CHANGED', 'htmlChanged');
+
 oppia.constant('PARAMETER_TYPES', {
   REAL: 'Real',
   UNICODE_STRING: 'UnicodeString'

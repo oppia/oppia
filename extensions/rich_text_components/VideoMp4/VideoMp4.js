@@ -20,19 +20,26 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaNoninteractiveVideoMp4', [
-  '$sce', 'oppiaHtmlEscaper', function($sce, oppiaHtmlEscaper) {
+  '$sce', 'oppiaHtmlEscaper', 'EVENT_HTML_CHANGED',
+  function($sce, oppiaHtmlEscaper, EVENT_HTML_CHANGED) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'richTextComponent/VideoMp4',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        // Chrome has a bug where HTML5 videos sometimes stay pending for a
-        // long time. The randomParameter used here applies the fix in
-        // http://stackoverflow.com/a/18858057.
-        var randomParameter = new Date().getMilliseconds();
         $scope.videoUrl = $sce.trustAsResourceUrl(
-          oppiaHtmlEscaper.escapedJsonToObj($attrs.videoUrlWithValue) +
-          '?t=' + randomParameter);
+          oppiaHtmlEscaper.escapedJsonToObj($attrs.videoUrlWithValue));
+
+        // Clearing the video URL src after a card leaves the user's view
+        // helps browsers clear memory and release resources. Without this,
+        // a bug was observed where resources would freeze for learning
+        // experiences that rely heavily on video.
+        //
+        // See W3C spec 4.7.10.18
+        // Ref: https://www.w3.org/TR/html5/embedded-content-0.html
+        $scope.$on(EVENT_HTML_CHANGED, function() {
+          $scope.videoUrl = '';
+        });
       }]
     };
   }
