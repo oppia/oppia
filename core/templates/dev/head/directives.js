@@ -27,8 +27,8 @@ oppia.directive('angularHtmlBind', ['$compile', '$timeout',
     restrict: 'A',
     link: function(scope, elm, attrs) {
       scope.$watch(attrs.angularHtmlBind, function(newValue) {
-        // Inform child components that the value of the HTML string has changed, so
-        // that they can perform any necessary cleanup.
+        // Inform child components that the value of the HTML string has
+        // changed, so that they can perform any necessary cleanup.
         scope.$broadcast(EVENT_HTML_CHANGED);
         $timeout(function() {
           elm.html(newValue);
