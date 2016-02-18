@@ -36,7 +36,7 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         user_models.ExplorationUserDataModel(
             id=self.MODEL_ID_ONE, user_id=self.USER_ID,
             exploration_id=self.EXP_ID_ONE, rating=2,
-            rated_on=self.DATETIME_OBJECT, change_list = {'new_content': {}},
+            rated_on=self.DATETIME_OBJECT, change_list={'new_content': {}},
             change_list_last_updated=self.DATETIME_OBJECT,
             change_list_exp_version=3).put()
 
