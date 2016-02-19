@@ -27,7 +27,8 @@ oppia.directive('answerGroupEditor', [function() {
       getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
       getOnSaveAnswerGroupRulesFn: '&onSaveAnswerGroupRules',
       outcome: '=',
-      rules: '='
+      rules: '=',
+      suppressWarnings: '='
     },
     templateUrl: 'inline/answer_group_editor',
     controller: [

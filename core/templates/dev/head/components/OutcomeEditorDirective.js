@@ -25,11 +25,15 @@ oppia.directive('outcomeEditor', [function() {
       isEditable: '&isEditable',
       getOnSaveDestFn: '&onSaveDest',
       getOnSaveFeedbackFn: '&onSaveFeedback',
-      outcome: '=outcome'
+      outcome: '=outcome',
+      suppressWarnings: '&suppressWarnings'
     },
     templateUrl: 'components/outcomeEditor',
     controller: [
-      '$scope', 'editorContextService', function($scope, editorContextService) {
+      '$scope', 'editorContextService',
+      'stateInteractionIdService', 'responsesService',
+      function($scope, editorContextService,
+        stateInteractionIdService, responsesService) {
         $scope.editOutcomeForm = {};
         $scope.feedbackEditorIsOpen = false;
         $scope.destinationEditorIsOpen = false;
@@ -63,6 +67,21 @@ oppia.directive('outcomeEditor', [function() {
           onExternalSave();
         });
 
+        $scope.getCurrentInteractionId = function() {
+          return stateInteractionIdService.savedMemento;
+        };
+
+        $scope.suppressDefaultAnswerGroupWarnings = function() {
+          var interactionId = $scope.getCurrentInteractionId();
+          if (interactionId === 'MultipleChoiceInput' &&
+          responsesService.getAnswerGroups().length ===
+          responsesService.getAnswerChoices().length) {
+            return true;
+          } else {
+            return false;
+          }
+        };
+
         $scope.isSelfLoop = function(outcome) {
           return (
             outcome &&
@@ -73,12 +92,12 @@ oppia.directive('outcomeEditor', [function() {
           if (!outcome) {
             return false;
           }
-
           var hasFeedback = outcome.feedback.some(function(feedbackItem) {
             return Boolean(feedbackItem);
           });
-
-          return $scope.isSelfLoop(outcome) && !hasFeedback;
+          if (!$scope.suppressDefaultAnswerGroupWarnings()) {
+            return $scope.isSelfLoop(outcome) && !hasFeedback;
+          }
         };
         $scope.invalidStateAfterFeedbackSave = function() {
           var tmpOutcome = angular.copy($scope.savedOutcome);

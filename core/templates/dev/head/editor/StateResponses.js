@@ -306,6 +306,16 @@ oppia.controller('StateResponses', [
       trainingDataService.initializeTrainingData(
         explorationId, currentStateName);
     };
+    $scope.suppressDefaultAnswerGroupWarnings = function() {
+      var interactionId = $scope.getCurrentInteractionId();
+      if (interactionId === 'MultipleChoiceInput' &&
+      responsesService.getAnswerGroups().length ===
+      $scope.getAnswerChoices().length) {
+        return true;
+      } else {
+        return false;
+      }
+    };
     $scope.isSelfLoopWithNoFeedback = function(outcome) {
       var isSelfLoop = function(outcome) {
         return (
@@ -318,8 +328,9 @@ oppia.controller('StateResponses', [
       var hasFeedback = outcome.feedback.some(function(feedbackItem) {
         return Boolean(feedbackItem);
       });
-
-      return isSelfLoop(outcome) && !hasFeedback;
+      if (!$scope.suppressDefaultAnswerGroupWarnings()) {
+        return isSelfLoop(outcome) && !hasFeedback;
+      }
     };
 
     $scope.changeActiveAnswerGroupIndex = function(newIndex) {
@@ -418,7 +429,7 @@ oppia.controller('StateResponses', [
         backdrop: true,
         controller: [
           '$scope', '$modalInstance', 'oppiaExplorationHtmlFormatterService',
-          'stateInteractionIdService', 'stateCustomizationArgsService',
+          'getCurrentInteractionId()', 'stateCustomizationArgsService',
           'explorationContextService', 'editorContextService',
           'explorationStatesService', 'trainingDataService',
           'answerClassificationService', 'focusService', 'DEFAULT_RULE_NAME',
