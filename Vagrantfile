@@ -8,9 +8,8 @@
 
 $script = <<SCRIPT
 cd /home/vagrant/oppia
-apt-get update && apt-get install -y python-pip python-dev unzip
-bash ./scripts/setup.sh
-bash ./scripts/install_third_party.sh
+bash ./scripts/install_prerequisites.sh
+bash ./scripts/start.sh
 SCRIPT
 
 Vagrant.configure(2) do |config|
