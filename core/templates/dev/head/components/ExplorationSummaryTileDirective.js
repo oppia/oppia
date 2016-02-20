@@ -67,6 +67,8 @@ oppia.directive('explorationSummaryTile', [function() {
 
         $scope.MAX_CONTRIBUTORS_TO_DISPLAY = 5;
 
+        $scope.allContributorsAreVisible = false;
+
         $scope.getAverageRating = function() {
           return RatingComputationService.computeAverageRating(
             $scope.getRatings());
@@ -89,7 +91,6 @@ oppia.directive('explorationSummaryTile', [function() {
           return result;
         };
 
-        $scope.allContributorsAreVisible = false;
       }
     ]
   };
