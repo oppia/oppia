@@ -90,7 +90,6 @@ oppia.directive('explorationSummaryTile', [function() {
           }
           return result;
         };
-
       }
     ]
   };
