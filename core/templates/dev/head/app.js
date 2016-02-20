@@ -355,6 +355,62 @@ oppia.factory('windowDimensionsService', ['$window', function($window) {
   };
 }]);
 
+// Service for sending events to Google Analytics.
+//
+// Note that events are only sent if the CAN_SEND_ANALYTICS_EVENTS flag is
+// turned on. This flag must be turned on explicitly by the application
+// owner.
+oppia.factory('siteAnalyticsService', ['$window', function($window) {
+  var CAN_SEND_ANALYTICS_EVENTS = GLOBALS.CAN_SEND_ANALYTICS_EVENTS;
+
+  // For definitions of the various arguments, please see:
+  // developers.google.com/analytics/devguides/collection/analyticsjs/events
+  var _sendEventToGa = function(eventCategory, eventAction, eventLabel) {
+    if ($window.ga && CAN_SEND_ANALYTICS_EVENTS) {
+      $window.ga('send', 'event', eventCategory, eventAction, eventLabel);
+    }
+  };
+
+  // For definitions of the various arguments, please see:
+  // developers.google.com/analytics/devguides/collection/analyticsjs/
+  //   social-interactions
+  var _sendSocialEventToGa = function(network, action, targetUrl) {
+    if ($window.ga && CAN_SEND_ANALYTICS_EVENTS) {
+      $window.ga('send', 'social', network, action, targetUrl);
+    }
+  };
+
+  return {
+    // The srcElement refers to the element on the page that is clicked.
+    registerStartLoginEvent: function(srcElement) {
+      _sendEventToGa(
+        'LoginButton', 'click', $window.location.pathname + ' ' + srcElement);
+    },
+    registerOpenExplorationCreationModalEvent: function() {
+      _sendEventToGa(
+        'CreateExplorationModal', 'open', $window.location.pathname);
+    },
+    registerPublishExplorationEvent: function(explorationId) {
+      _sendEventToGa('PublishExploration', 'click', explorationId);
+    },
+    registerPublishExplorationChangesEvent: function(explorationId) {
+      _sendEventToGa('SaveChangesToPublicExp', 'click', explorationId);
+    },
+    registerSaveExplorationDraftEvent: function(explorationId) {
+      _sendEventToGa('SaveChangesToPrivateExp', 'click', explorationId);
+    },
+    registerShareExplorationEvent: function(network) {
+      _sendSocialEventToGa(network, 'share', $window.location.pathname);
+    },
+    registerOpenEmbedInfoEvent: function(explorationId) {
+      _sendEventToGa('EmbedInfoModal', 'open', explorationId);
+    },
+    registerFirstExplorationEditorEntryEvent: function(explorationId) {
+      _sendEventToGa('ExplorationEditorPage', 'firstEntry', explorationId);
+    }
+  };
+}]);
+
 // Service for debouncing function calls.
 oppia.factory('oppiaDebouncer', [function() {
   return {

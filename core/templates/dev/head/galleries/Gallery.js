@@ -146,12 +146,12 @@ oppia.controller('Gallery', [
   '$scope', '$http', '$rootScope', '$modal', '$window', '$timeout',
   'ExplorationCreationButtonService', 'oppiaDatetimeFormatter',
   'oppiaDebouncer', 'urlService', 'GALLERY_DATA_URL', 'CATEGORY_LIST',
-  'searchService',
+  'searchService', 'siteAnalyticsService',
   function(
       $scope, $http, $rootScope, $modal, $window, $timeout,
       ExplorationCreationButtonService, oppiaDatetimeFormatter,
       oppiaDebouncer, urlService, GALLERY_DATA_URL, CATEGORY_LIST,
-      searchService) {
+      searchService, siteAnalyticsService) {
     $window.addEventListener('scroll', function() {
       var oppiaBanner = $('.oppia-gallery-banner-container');
       var oppiaTagline = $('.oppia-gallery-banner-tagline');
@@ -251,15 +251,21 @@ oppia.controller('Gallery', [
         }
       }
     });
+
+    $scope.onRedirectToLogin = function() {
+      siteAnalyticsService.registerStartLoginEvent('noSearchResults');
+    };
   }
 ]);
 
 oppia.controller('SearchBar', [
   '$scope', '$rootScope', 'searchService', 'oppiaDebouncer',
   'ExplorationCreationButtonService', 'urlService', 'CATEGORY_LIST',
+  'siteAnalyticsService',
   function(
       $scope, $rootScope, searchService, oppiaDebouncer,
-      ExplorationCreationButtonService, urlService, CATEGORY_LIST) {
+      ExplorationCreationButtonService, urlService, CATEGORY_LIST,
+      siteAnalyticsService) {
     $scope.searchIsLoading = false;
     $scope.ALL_CATEGORIES = CATEGORY_LIST.map(function(categoryName) {
       return {
@@ -391,6 +397,10 @@ oppia.controller('SearchBar', [
     $scope.showUploadExplorationModal = function() {
       ExplorationCreationButtonService.showUploadExplorationModal(
         CATEGORY_LIST);
+    };
+
+    $scope.onRedirectToLogin = function() {
+      siteAnalyticsService.registerStartLoginEvent('createExplorationButton');
     };
   }
 ]);

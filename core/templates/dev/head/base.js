@@ -85,9 +85,11 @@ oppia.constant('MAX_NODE_LABEL_LENGTH', 15);
 oppia.controller('Base', [
   '$scope', '$http', '$rootScope', '$window', '$timeout', '$document', '$log',
   'warningsData', 'activeInputData', 'LABEL_FOR_CLEARING_FOCUS',
+  'siteAnalyticsService',
   function(
       $scope, $http, $rootScope, $window, $timeout, $document, $log,
-      warningsData, activeInputData, LABEL_FOR_CLEARING_FOCUS) {
+      warningsData, activeInputData, LABEL_FOR_CLEARING_FOCUS,
+      siteAnalyticsService) {
     $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
 
     $scope.warningsData = warningsData;
@@ -202,6 +204,10 @@ oppia.controller('Base', [
 
     $scope.onMouseoutDropdownMenu = function(evt) {
       angular.element(evt.currentTarget).parent().removeClass('open');
+    };
+
+    $scope.onLoginButtonClicked = function() {
+      siteAnalyticsService.registerLoginEvent('loginButton');
     };
 
     $scope.pageHasLoaded = false;

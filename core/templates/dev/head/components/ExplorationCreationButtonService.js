@@ -21,10 +21,10 @@
 // Service for the create/upload exploration buttons and modals.
 oppia.factory('ExplorationCreationButtonService', [
   '$filter', '$http', '$modal', '$timeout', '$rootScope',
-  'validatorsService', 'warningsData', 'focusService',
+  'validatorsService', 'warningsData', 'focusService', 'siteAnalyticsService',
   function(
       $filter, $http, $modal, $timeout, $rootScope,
-      validatorsService, warningsData, focusService) {
+      validatorsService, warningsData, focusService, siteAnalyticsService) {
     var getModalInstance = function(categoryList, isUploadModal) {
       var modalInstance = $modal.open({
         backdrop: true,
@@ -136,6 +136,8 @@ oppia.factory('ExplorationCreationButtonService', [
       showCreateExplorationModal: function(categoryList) {
         warningsData.clear();
 
+        siteAnalyticsService.registerOpenExplorationCreationModalEvent();
+
         getModalInstance(categoryList, false).result.then(function(result) {
           var category = $filter('normalizeWhitespace')(result.category);
           if (!validatorsService.isValidEntityName(category, true)) {
@@ -149,6 +151,8 @@ oppia.factory('ExplorationCreationButtonService', [
             objective: $filter('normalizeWhitespace')(result.objective),
             title: result.title
           }).success(function(data) {
+            siteAnalyticsService.registerFirstExplorationEditorEntryEvent(
+              data.explorationId);
             window.location = '/create/' + data.explorationId;
           }).error(function() {
             $rootScope.loadingMessage = '';
