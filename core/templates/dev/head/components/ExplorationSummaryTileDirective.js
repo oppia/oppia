@@ -18,6 +18,19 @@
  * @author Sean Lip
  */
 
+oppia.animation('.oppia-exploration-summary-tile-all-contributors-animate',
+  function() {
+    return {
+      enter: function(element) {
+        element.hide().slideDown();
+      },
+      leave: function(element) {
+        element.slideUp();
+      }
+    };
+  }
+);
+
 oppia.directive('explorationSummaryTile', [function() {
   return {
     restrict: 'E',
@@ -41,7 +54,8 @@ oppia.directive('explorationSummaryTile', [function() {
     controller: [
       '$scope', 'oppiaDatetimeFormatter', 'RatingComputationService',
       function($scope, oppiaDatetimeFormatter, RatingComputationService) {
-        $scope.contributors = Object.keys($scope.getContributorsSummary()).sort(
+        $scope.contributors = Object.keys(
+          $scope.getContributorsSummary() || {}).sort(
           function(contributorUsername1, contributorUsername2) {
             var commitsOfContributor1 = $scope.getContributorsSummary()[
                 contributorUsername1];
@@ -50,6 +64,8 @@ oppia.directive('explorationSummaryTile', [function() {
             return commitsOfContributor2 - commitsOfContributor1;
           }
         );
+
+        $scope.MAX_CONTRIBUTORS_TO_DISPLAY = 5;
 
         $scope.getAverageRating = function() {
           return RatingComputationService.computeAverageRating(

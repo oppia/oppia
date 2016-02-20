@@ -14,22 +14,23 @@
                               tooltip-append-to-body="true">
           </profile-link-image>
           <p ng-show="!allContributorsAreVisible && contributors.length > 1"
-             class="exploration-committers-number-1">
+             class="contributors-number">
             +<[contributors.length - 1]>
           </p>
 
-          <div ng-show="allContributorsAreVisible">
-            <profile-link-image ng-repeat="contributor in contributors | limitTo:4:1"
+          <div ng-if="allContributorsAreVisible" class="all-contributors
+                oppia-exploration-summary-tile-all-contributors-animate">
+            <profile-link-image ng-repeat="contributor in contributors | limitTo:MAX_CONTRIBUTORS_TO_DISPLAY-1:1"
                                 username="contributor"
                                 tooltip="<[contributor]>"
                                 tooltip-placement="left"
                                 tooltip-append-to-body="true">
             </profile-link-image>
 
-            <div style="position:relative;" ng-show="contributors.length > 5">
+            <div style="position:relative;" ng-show="contributors.length > MAX_CONTRIBUTORS_TO_DISPLAY">
               <div class="exploration-black-profile"></div>
-              <p class="exploration-commiters-number-5">
-                +<[contributors.length - 5]>
+              <p class="contributors-number">
+                +<[contributors.length - MAX_CONTRIBUTORS_TO_DISPLAY]>
               </p>
             </div>
           </div>
@@ -123,7 +124,7 @@
     transition: all 300ms;
   }
 
-  .exploration-summary-contributors {
+  .oppia-exploration-summary-tile .exploration-summary-contributors {
     left: 170px;
     padding-right: 5px;
     position: absolute;
@@ -132,7 +133,7 @@
     z-index: 11;
   }
 
-  .exploration-summary-tile-mask {
+  .oppia-exploration-summary-tile .exploration-summary-tile-mask {
     background-color: #eee;
     height: 240px;
     left: 0px;
@@ -162,12 +163,12 @@
     height: 26px;
   }
 
-  .exploration-summary-contributors profile-link-image {
+  .oppia-exploration-summary-tile .exploration-summary-contributors profile-link-image {
     margin-bottom: 3px;
     display:block;
   }
 
-  .oppia-exploration-summary-tile .exploration-committers-number-1 {
+  .oppia-exploration-summary-tile .contributors-number {
     color: white;
     font-family: Roboto;
     font-size: x-small;
@@ -177,10 +178,11 @@
     top: -6px;
   }
 
-  .oppia-exploration-summary-tile .exploration-commiters-number-5 {
+  .oppia-exploration-summary-tile .all-contributors .contributors-number {
     color: white;
     font-family: Roboto;
     font-size: 0.7em;
+    font-weight: normal;
     left: 8px;
     position: absolute;
     top: 8px;
