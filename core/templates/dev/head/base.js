@@ -84,6 +84,7 @@ oppia.controller('Base', [
     $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
 
     $scope.warningsData = warningsData;
+    $scope.activeInputName = '';
     $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
 
     // If this is nonempty, the whole page goes into 'Loading...' mode.
