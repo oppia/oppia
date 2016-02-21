@@ -45,7 +45,7 @@ oppia.controller('ExplorationSettings', [
       });
     }
 
-    $scope.activeInputName = '';
+    $scope.isRolesFormOpen = false;
 
     $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
 
@@ -171,7 +171,7 @@ oppia.controller('ExplorationSettings', [
     * Methods for rights management.
     ********************************************/
     $scope.openEditRolesForm = function() {
-      $scope.activeInputName = 'explorationMetadata.editRoles';
+      $scope.isRolesFormOpen = true;
       $scope.newMemberUsername = '';
       $scope.newMemberRole = $scope.ROLES[0];
     };
@@ -179,11 +179,11 @@ oppia.controller('ExplorationSettings', [
     $scope.closeEditRolesForm = function() {
       $scope.newMemberUsername = '';
       $scope.newMemberRole = $scope.ROLES[0];
-      $scope.activeInputClear();
+      $scope.closeRolesForm();
     };
 
     $scope.editRole = function(newMemberUsername, newMemberRole) {
-      $scope.activeInputClear();
+      $scope.closeRolesForm();
       explorationRightsService.saveChangeToBackend({
         new_member_username: newMemberUsername,
         new_member_role: newMemberRole
@@ -338,8 +338,8 @@ oppia.controller('ExplorationSettings', [
       return changeListService.isExplorationLockedForEditing();
     };
 
-    $scope.activeInputClear = function() {
-      $scope.activeInputName = '';
+    $scope.closeRolesForm = function() {
+      $scope.isRolesFormOpen = false;
     };
   }
 ]);
