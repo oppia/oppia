@@ -19,7 +19,7 @@
  */
 
 oppia.controller('ExplorationSettings', [
-  '$scope', '$http', '$window', '$modal', '$rootScope', 'activeInputData',
+  '$scope', '$http', '$window', '$modal', '$rootScope',
   'explorationData', 'explorationTitleService', 'explorationCategoryService',
   'explorationObjectiveService', 'explorationLanguageCodeService',
   'explorationTagsService', 'explorationRightsService',
@@ -28,7 +28,7 @@ oppia.controller('ExplorationSettings', [
   'explorationParamChangesService', 'explorationWarningsService',
   'CATEGORY_LIST', 'explorationAdvancedFeaturesService',
   function(
-      $scope, $http, $window, $modal, $rootScope, activeInputData,
+      $scope, $http, $window, $modal, $rootScope,
       explorationData, explorationTitleService, explorationCategoryService,
       explorationObjectiveService, explorationLanguageCodeService,
       explorationTagsService, explorationRightsService,
@@ -44,6 +44,8 @@ oppia.controller('ExplorationSettings', [
         text: CATEGORY_LIST[i]
       });
     }
+
+    $scope.activeInputName = '';
 
     $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
 
@@ -169,7 +171,7 @@ oppia.controller('ExplorationSettings', [
     * Methods for rights management.
     ********************************************/
     $scope.openEditRolesForm = function() {
-      activeInputData.name = 'explorationMetadata.editRoles';
+      $scope.activeInputName = 'explorationMetadata.editRoles';
       $scope.newMemberUsername = '';
       $scope.newMemberRole = $scope.ROLES[0];
     };
@@ -177,11 +179,11 @@ oppia.controller('ExplorationSettings', [
     $scope.closeEditRolesForm = function() {
       $scope.newMemberUsername = '';
       $scope.newMemberRole = $scope.ROLES[0];
-      activeInputData.clear();
+      $scope.activeInputClear();
     };
 
     $scope.editRole = function(newMemberUsername, newMemberRole) {
-      activeInputData.clear();
+      $scope.activeInputClear();
       explorationRightsService.saveChangeToBackend({
         new_member_username: newMemberUsername,
         new_member_role: newMemberRole
@@ -334,6 +336,10 @@ oppia.controller('ExplorationSettings', [
 
     $scope.isExplorationLockedForEditing = function() {
       return changeListService.isExplorationLockedForEditing();
+    };
+
+    $scope.activeInputClear = function() {
+      $scope.activeInputName = '';
     };
   }
 ]);

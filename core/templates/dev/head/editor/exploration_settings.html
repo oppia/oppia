@@ -238,13 +238,13 @@
 
 
           {% if can_modify_roles %}
-            <div ng-hide="activeInputData.name == 'explorationMetadata.editRoles'">
+            <div ng-hide="activeInputName == 'explorationMetadata.editRoles'">
               <button type="button" class="btn btn-default protractor-test-edit-roles" ng-click="openEditRolesForm()">
                 Edit Roles
               </button>
             </div>
 
-            <div ng-show="activeInputData.name == 'explorationMetadata.editRoles'">
+            <div ng-show="activeInputName == 'explorationMetadata.editRoles'">
               <strong>Add or Change Role</strong>
               <div class="form-group">
                 <form ng-submit="editRole(newMemberUsername, newMemberRole.value)">
@@ -264,7 +264,7 @@
 
                   <input type="submit" class="btn btn-default protractor-test-save-role" value="Save">
                   <button type="button" class="btn btn-default" ng-click="closeEditRolesForm()"
-                    ng-show="activeInputData.name == 'explorationMetadata.editRoles'">
+                    ng-show="activeInputName == 'explorationMetadata.editRoles'">
                     Cancel
                   </button>
                 </form>
