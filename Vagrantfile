@@ -19,7 +19,6 @@ Vagrant.configure(2) do |config|
     end
   config.vm.provision "shell", inline: 'echo "export VAGRANT=true" >> ~/.profile'
   config.vm.network "forwarded_port", guest: 8000, host: 8000
-  config.vm.network "forwarded_port", guest: 42559, host: 42559
   config.vm.network "forwarded_port", guest: 8181, host: 8181
   config.vm.box = "ubuntu/trusty64"
   config.vm.synced_folder ".", "/home/vagrant/oppia"
