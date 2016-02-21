@@ -120,7 +120,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
             self.login(self.ADMIN_EMAIL)
             admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-            self.set_admins([self.ADMIN_EMAIL])
+            self.set_admins([self.ADMIN_USERNAME])
 
             # Create and delete an exploration (to make sure job handles
             # deleted explorations correctly).
@@ -249,7 +249,7 @@ class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
         """
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_EMAIL])
+        self.set_admins([self.ADMIN_USERNAME])
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
