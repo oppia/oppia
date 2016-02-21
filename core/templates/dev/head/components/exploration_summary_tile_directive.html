@@ -12,11 +12,11 @@
                               tooltip-placement="left"
                               tooltip-append-to-body="true">
           </profile-link-image>
-          <span class="contributors-number-1" ng-show="contributors.length > 1">
+          <div class="contributors-num-minus-one" ng-show="contributors.length > 1">
             +<[contributors.length - 1]>
-          </span>
+          </div>
 
-          <span class="all-contributors" style="display: none">
+          <div class="all-contributors" style="display: none;">
             <profile-link-image ng-repeat="contributor in contributors | limitTo:MAX_CONTRIBUTORS_TO_DISPLAY-1:1"
                                 username="contributor"
                                 tooltip="<[contributor]>"
@@ -26,14 +26,14 @@
 
             <div style="position:relative;" ng-show="contributors.length > MAX_CONTRIBUTORS_TO_DISPLAY">
               <div class="exploration-black-profile"></div>
-              <span class="contributors-number" ng-show="contributors.length > MAX_CONTRIBUTORS_TO_DISPLAY">
+              <div class="num-remaining-contributors" ng-show="contributors.length > MAX_CONTRIBUTORS_TO_DISPLAY">
                 +<[contributors.length - MAX_CONTRIBUTORS_TO_DISPLAY]>
-              </span>
+              </div>
             </div>
-          </span>
+          </div>
         </div>
       </div>
-      <div id="mask" class="top-section-mask"></div>
+      <div class="top-section-mask mask"></div>
 
       <div>
         <div class="objective protractor-test-exp-summary-tile-objective">
@@ -119,11 +119,10 @@
   }
 
   .oppia-exploration-summary-tile .exploration-summary-contributors {
-    left: 170px;
-    padding-right: 5px;
+    left: 171px;
     position: absolute;
     top: 5px;
-    width: 31px;
+    width: 26px;
     z-index: 11;
   }
 
@@ -161,7 +160,7 @@
     display:block;
   }
 
-  .oppia-exploration-summary-tile .contributors-number-1 {
+  .oppia-exploration-summary-tile .contributors-num-minus-one {
     color: white;
     font-family: Roboto;
     font-size: x-small;
@@ -171,7 +170,7 @@
     top: 18px;
   }
 
-  .oppia-exploration-summary-tile .all-contributors .contributors-number {
+  .oppia-exploration-summary-tile .all-contributors .num-remaining-contributors {
     color: white;
     font-family: Roboto;
     font-size: 0.7em;
