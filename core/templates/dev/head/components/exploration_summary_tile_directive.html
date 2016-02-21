@@ -5,21 +5,18 @@
         <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
         <h2 class="exploration-title protractor-test-exp-summary-tile-title"><[getExplorationTitle()]></h2>
 
-        <div class="exploration-summary-contributors" ng-if="contributors.length > 0"
-             ng-mouseenter="$parent.allContributorsAreVisible = true"
-             ng-mouseleave="$parent.allContributorsAreVisible = false">
-          <profile-link-image username="contributors[0]"
+        <div class="exploration-summary-contributors" ng-show="contributors.length > 0">
+          <profile-link-image ng-if="contributors.length > 0"
+                              username="contributors[0]"
                               tooltip="<[contributors[0]]>"
                               tooltip-placement="left"
                               tooltip-append-to-body="true">
           </profile-link-image>
-          <p ng-show="!allContributorsAreVisible && contributors.length > 1"
-             class="contributors-number">
+          <span class="contributors-number-1" ng-show="contributors.length > 1">
             +<[contributors.length - 1]>
-          </p>
+          </span>
 
-          <div ng-if="allContributorsAreVisible" class="all-contributors
-                oppia-exploration-summary-tile-all-contributors-animate">
+          <span class="all-contributors" style="display: none">
             <profile-link-image ng-repeat="contributor in contributors | limitTo:MAX_CONTRIBUTORS_TO_DISPLAY-1:1"
                                 username="contributor"
                                 tooltip="<[contributor]>"
@@ -29,17 +26,14 @@
 
             <div style="position:relative;" ng-show="contributors.length > MAX_CONTRIBUTORS_TO_DISPLAY">
               <div class="exploration-black-profile"></div>
-              <p class="contributors-number">
+              <span class="contributors-number" ng-show="contributors.length > MAX_CONTRIBUTORS_TO_DISPLAY">
                 +<[contributors.length - MAX_CONTRIBUTORS_TO_DISPLAY]>
-              </p>
+              </span>
             </div>
-          </div>
+          </span>
         </div>
       </div>
-
-      <div ng-class="{'top-section-mask': !allContributorsAreVisible,
-                      'exploration-summary-tile-mask': allContributorsAreVisible}">
-      </div>
+      <div id="mask" class="top-section-mask"></div>
 
       <div>
         <div class="objective protractor-test-exp-summary-tile-objective">
@@ -159,8 +153,8 @@
     background-color: black;
     border-radius: 50%;
     display: block;
-    width: 26px;
-    height: 26px;
+    width: 24px;
+    height: 24px;
   }
 
   .oppia-exploration-summary-tile .exploration-summary-contributors profile-link-image {
@@ -168,14 +162,14 @@
     display:block;
   }
 
-  .oppia-exploration-summary-tile .contributors-number {
+  .oppia-exploration-summary-tile .contributors-number-1 {
     color: white;
     font-family: Roboto;
     font-size: x-small;
     font-weight: bold;
     left: 17px;
-    position: relative;
-    top: -6px;
+    position: absolute;
+    top: 18px;
   }
 
   .oppia-exploration-summary-tile .all-contributors .contributors-number {
@@ -183,9 +177,9 @@
     font-family: Roboto;
     font-size: 0.7em;
     font-weight: normal;
-    left: 8px;
+    left: 5px;
     position: absolute;
-    top: 8px;
+    top: 4px;
   }
 
   .oppia-exploration-summary-tile .exploration-category {

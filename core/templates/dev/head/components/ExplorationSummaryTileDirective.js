@@ -18,19 +18,6 @@
  * @author Sean Lip
  */
 
-oppia.animation('.oppia-exploration-summary-tile-all-contributors-animate',
-  function() {
-    return {
-      enter: function(element) {
-        element.hide().slideDown();
-      },
-      leave: function(element) {
-        element.slideUp();
-      }
-    };
-  }
-);
-
 oppia.directive('explorationSummaryTile', [function() {
   return {
     restrict: 'E',
@@ -51,6 +38,25 @@ oppia.directive('explorationSummaryTile', [function() {
       openInNewWindow: '@openInNewWindow'
     },
     templateUrl: 'summaryTile/exploration',
+    link: function(scope, element) {
+      element.find('.exploration-summary-contributors').on('mouseenter',
+        function() {
+          element.find('#mask').attr('class', 'exploration-summary-tile-mask');
+          element.find('.contributors-number-1').hide(0, function() {
+            element.find('.all-contributors').slideDown();
+          });
+        }
+      );
+
+      element.find('.exploration-summary-contributors').on('mouseleave',
+        function() {
+          element.find('#mask').attr('class', 'top-section-mask');
+          element.find('.all-contributors').slideUp(400, function() {
+            element.find('.contributors-number-1').show();
+          });
+        }
+      );
+    },
     controller: [
       '$scope', 'oppiaDatetimeFormatter', 'RatingComputationService',
       function($scope, oppiaDatetimeFormatter, RatingComputationService) {
@@ -66,8 +72,6 @@ oppia.directive('explorationSummaryTile', [function() {
         );
 
         $scope.MAX_CONTRIBUTORS_TO_DISPLAY = 5;
-
-        $scope.allContributorsAreVisible = false;
 
         $scope.getAverageRating = function() {
           return RatingComputationService.computeAverageRating(
