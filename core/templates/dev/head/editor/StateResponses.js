@@ -348,6 +348,26 @@ oppia.controller('StateResponses', [
       return interactionId && INTERACTION_SPECS[interactionId].is_linear;
     };
 
+    $scope.isLinearWithNoFeedback = function(outcome) {
+      // Returns false if current interaction is linear and has no feedback
+      if (!outcome) {
+        return false;
+      }
+      var hasFeedback = outcome.feedback.some(function(feedbackItem) {
+        return Boolean(feedbackItem);
+      });
+      return $scope.isCurrentInteractionLinear() && !hasFeedback;
+    };
+
+    $scope.getOutcomeTooltip = function(outcome) {
+      // Outcome tooltip depends on whether feedback is displayed
+      if ($scope.isLinearWithNoFeedback(outcome)) {
+        return "Please direct the learner to a different card.";
+      } else {
+        return "Please give Oppia something useful to say, or direct the learner to a different card.";
+      }
+    };
+
     $scope.$on('initializeAnswerGroups', function(evt, data) {
       responsesService.init(data);
       $scope.answerGroups = responsesService.getAnswerGroups();

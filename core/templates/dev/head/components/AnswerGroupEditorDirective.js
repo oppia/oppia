@@ -23,6 +23,7 @@ oppia.directive('answerGroupEditor', [function() {
     restrict: 'E',
     scope: {
       isEditable: '=',
+      displayFeedback: '=',
       getOnSaveAnswerGroupDestFn: '&onSaveAnswerGroupDest',
       getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
       getOnSaveAnswerGroupRulesFn: '&onSaveAnswerGroupRules',
