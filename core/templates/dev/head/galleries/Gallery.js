@@ -99,9 +99,16 @@ oppia.factory('searchService', [
         _lastSelectedCategories = angular.copy(selectedCategories);
         _lastSelectedLanguageCodes = angular.copy(selectedLanguageCodes);
         _searchCursor = data.search_cursor;
-        $rootScope.$broadcast(
-          'refreshGalleryData', data, hasPageFinishedLoading());
-        _isCurrentlyFetchingResults = false;
+
+        if ($('.oppia-splash-search-input').val() === searchQuery) {
+          $rootScope.$broadcast('refreshGalleryData', data,
+                                hasPageFinishedLoading());
+          _isCurrentlyFetchingResults = false;
+        } else {
+          console.log('Mismatch');
+          console.log('SearchQuery: ' + searchQuery);
+          console.log('Input: ' + $('.oppia-splash-search-input').val());
+        }
       });
 
       if (successCallback) {
@@ -126,6 +133,7 @@ oppia.factory('searchService', [
       $http.get(queryUrl).success(function(data) {
         _searchCursor = data.search_cursor;
         _isCurrentlyFetchingResults = false;
+
         if (successCallback) {
           successCallback(data, hasPageFinishedLoading());
         }
@@ -199,11 +207,13 @@ oppia.controller('Gallery', [
     // SEARCH FUNCTIONALITY
 
     $scope.allExplorationsInOrder = [];
+    $scope.allCollectionsInOrder = [];
 
     // Called when the page loads, and after every search query.
     var _refreshGalleryData = function(data, hasPageFinishedLoading) {
       $scope.searchIsLoading = false;
       $scope.allExplorationsInOrder = data.explorations_list;
+      $scope.allCollectionsInOrder = data.collections_list;
       $scope.finishedLoadingPage = hasPageFinishedLoading;
       $rootScope.loadingMessage = '';
     };
@@ -216,6 +226,8 @@ oppia.controller('Gallery', [
         searchService.loadMoreData(function(data, hasPageFinishedLoading) {
           $scope.allExplorationsInOrder = $scope.allExplorationsInOrder.concat(
             data.explorations_list);
+          $scope.allCollectionsInOrder = $scope.allCollectionsInOrder.concat(
+            data.collections_list);
           $scope.finishedLoadingPage = hasPageFinishedLoading;
           $scope.pageLoaderIsBusy = false;
         });

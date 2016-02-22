@@ -20,6 +20,8 @@ execute:
     bash scripts/run_backend_tests.sh
 """
 
+# Pylint has issues with the import order of argparse.
+# pylint: disable=wrong-import-order
 import argparse
 import datetime
 import os
@@ -27,6 +29,7 @@ import re
 import subprocess
 import threading
 import time
+# pylint: enable=wrong-import-order
 
 
 COVERAGE_PATH = os.path.join(

@@ -58,9 +58,9 @@ class CollectionPage(base.BaseHandler):
             'can_edit': (
                 bool(self.username) and
                 self.username in (
-                    config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value) and
-                self.username not in config_domain.BANNED_USERNAMES.value and
-                rights_manager.Actor(self.user_id).can_edit(
+                    config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value)
+                and self.username not in config_domain.BANNED_USERNAMES.value
+                and rights_manager.Actor(self.user_id).can_edit(
                     rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id)
             ),
             'is_logged_in': bool(self.user_id),

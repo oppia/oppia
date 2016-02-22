@@ -32,6 +32,8 @@ bad-functions=apply,input
 
 [FORMAT]
 
+max-line-length=80
+
 indent-string='    '
 
 [SIMILARITIES]

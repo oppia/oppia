@@ -490,6 +490,36 @@ def get_collection_summaries_matching_query(query_string, cursor=None):
     ], search_cursor)
 
 
+def get_displayable_collections_matching_query(query_string,
+                                               cursor=None):
+    """Returns a list with all collection summary objects that can be
+    displayed on the gallery page as collection summary tiles.
+    """
+    search_cursor = cursor
+    collection_summaries, search_cursor = (
+        get_collection_summaries_matching_query(
+            query_string, cursor=search_cursor))
+
+    collection_summaries_to_display = []
+    for collection_summary in collection_summaries:
+        if collection_summary and collection_summary.status != (
+                rights_manager.ACTIVITY_STATUS_PRIVATE):
+            collection_summaries_to_display.append({
+                'id': collection_summary.id,
+                'title': collection_summary.title,
+                'objective': collection_summary.objective,
+                'num_explorations': len(get_collection_by_id(
+                    collection_summary.id).nodes),
+                'last_updated_msec': utils.get_time_in_millisecs(
+                    collection_summary.collection_model_last_updated),
+                'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
+                    collection_summary.category),
+                'thumbnail_bg_color': utils.get_hex_color_for_category(
+                    collection_summary.category),
+            })
+    return collection_summaries_to_display
+
+
 # Repository SAVE and DELETE methods.
 def apply_change_list(collection_id, change_list):
     """Applies a changelist to a pristine collection and returns the result.
@@ -515,12 +545,11 @@ def apply_change_list(collection_id, change_list):
                     collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY):
                 collection_node = collection.get_node(change.exploration_id)
                 if (change.property_name ==
-                        collection_domain.COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS):
+                        collection_domain.COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS): # pylint: disable=line-too-long
                     collection_node.update_prerequisite_skills(
                         change.new_value)
-                elif (
-                        change.property_name ==
-                        collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS):
+                elif (change.property_name ==
+                      collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS): # pylint: disable=line-too-long
                     collection_node.update_acquired_skills(change.new_value)
             elif change.cmd == collection_domain.CMD_EDIT_COLLECTION_PROPERTY:
                 if (change.property_name ==
@@ -769,7 +798,8 @@ def update_collection(
 def create_collection_summary(collection_id, contributor_id_to_add):
     """Create summary of a collection and store in datastore."""
     collection = get_collection_by_id(collection_id)
-    collection_summary = compute_summary_of_collection(collection, contributor_id_to_add)
+    collection_summary = compute_summary_of_collection(
+        collection, contributor_id_to_add)
     save_collection_summary(collection_summary)
 
 
@@ -848,7 +878,8 @@ def compute_collection_contributors_summary(collection_id):
             break
 
         if is_revert:
-            current_version = snapshot_metadata['commit_cmds'][0]['version_number']
+            current_version = snapshot_metadata['commit_cmds'][0][
+                'version_number']
         else:
             current_version -= 1
     return contributors_summary
@@ -995,7 +1026,7 @@ def get_next_page_of_all_non_private_commits(
             "max_age must be a datetime.timedelta instance. or None.")
 
     results, new_urlsafe_start_cursor, more = (
-        collection_models.CollectionCommitLogEntryModel.get_all_non_private_commits(
+        collection_models.CollectionCommitLogEntryModel.get_all_non_private_commits( # pylint: disable=line-too-long
             page_size, urlsafe_start_cursor, max_age=max_age))
 
     return ([collection_domain.CollectionCommitLogEntry(

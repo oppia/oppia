@@ -69,8 +69,12 @@ Here's how to make a one-off code change. (If you're working on a larger feature
       git push origin {{YOUR BRANCH NAME}}
     ```
 
-    Before your code gets uploaded to GitHub, a script is automatically executed that checks the styling of all changed JavaScript and Python files and runs the front-end tests.
-     **If any of the tests fail, the push will be interrupted**. If this happens, fix the issues that the tests tell you about and **repeat the instructions above** ('commit' and then 'push')
+    
+
+    Before your code gets uploaded to GitHub, a script is automatically executed that checks the styling of all changed JavaScript and Python files and runs the front-end tests. Run the push command in command line, and not GitHub's Desktop client, as the script needs access to other tools like pip.
+    
+     **If any of the tests fail, the push will be interrupted**. If this happens, fix the issues that the tests tell you about and **repeat the instructions above** ('commit' and then 'push').
+     
     If you need some help with your code and therefore want to put non functioning code into your GitHub fork to show it to other developers, you  can force a push with `git push origin {{YOUR BRANCH NAME}} --no-verify`.
 
 4. **When your feature is ready to merge, create a pull request.**

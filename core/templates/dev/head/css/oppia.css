@@ -717,7 +717,7 @@ textarea {
 }
 
 .oppia-exploration-ctrl {
-  margin: 0 5px;
+  margin: 15px 0;
 }
 
 .oppia-loading-fullpage {
@@ -844,6 +844,11 @@ textarea {
   font-size: 1.6em;
   padding-top: 40px;
   padding-bottom: 40px;
+}
+
+.oppia-gallery-no-match, .oppia-gallery-no-match p {
+  font-size: 0.85em;
+  text-align: center;
 }
 
 .oppia-gallery-tiles-container {
@@ -1566,29 +1571,29 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-rule-header-warning-placement {
-  left: -0.5em; 
-  position: absolute; 
+  left: -0.5em;
+  position: absolute;
   top: 6px;
-  z-index: 2; 
+  z-index: 2;
 }
 
 .oppia-rule-header-warning-style {
-    
-  -ms-transform: rotate(-10deg); 
+
+  -ms-transform: rotate(-10deg);
   -webkit-transform: rotate(-10deg);
-  
-  background-color: yellow; 
-  border:1px solid black; 
+
+  background-color: yellow;
+  border:1px solid black;
   color: firebrick;
   cursor: pointer;
-  font-size: 20px; 
+  font-size: 20px;
   font-weight: bold;
-  height:22px; 
-  line-height: 22px; 
+  height:22px;
+  line-height: 22px;
   text-align: center;
-  transform: rotate(-10deg); 
-  width:22px; 
-}    
+  transform: rotate(-10deg);
+  width:22px;
+}
 
 .oppia-param-change-sort-handle {
   cursor: move;
@@ -2725,4 +2730,29 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-hidden-gadget,
 .oppia-visible-gadgets-container {
   position: relative;
+}
+
+.oppia-suggestion-review-container {
+  width: 100%;
+  height: 350px;
+  padding: 10px;
+}
+
+.oppia-suggestion-review-panel-container {
+  width: 49%;
+  height: 100%;
+}
+
+.oppia-suggestion-review-panel {
+  width: 100%;
+  height: 100%;
+  border: 1px solid black;
+  overflow: scroll;
+}
+
+.oppia-suggestion-review-error {
+  text-align: right;
+  width: 100%;
+  color: red;
+  margin-bottom: 10px;
 }
