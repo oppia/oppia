@@ -244,6 +244,23 @@ class ProfileLinkTests(test_utils.GenericTestBase):
 
 class ProfileDataHandlerTests(test_utils.GenericTestBase):
 
+    def test_preference_page_updates(self):
+        self.signup(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+        response = self.testapp.get('/preferences')
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.put_json(
+            '/preferenceshandler/data',
+            {'update_type': 'preferred_site_language_code', 'data': 'en'},
+            csrf_token=csrf_token)
+        self.put_json(
+            '/preferenceshandler/data',
+            {'update_type': 'preferred_language_codes', 'data': ['en']},
+            csrf_token=csrf_token)
+        response = self.get_json('/preferenceshandler/data')
+        self.assertEqual(response['preferred_language_codes'], ['en'])
+        self.assertEqual(response['preferred_site_language_code'], 'en')
+
     def test_profile_data_is_independent_of_currently_logged_in_user(self):
         self.signup(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)
