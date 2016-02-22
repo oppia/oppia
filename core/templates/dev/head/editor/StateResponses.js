@@ -362,9 +362,10 @@ oppia.controller('StateResponses', [
     $scope.getOutcomeTooltip = function(outcome) {
       // Outcome tooltip depends on whether feedback is displayed
       if ($scope.isLinearWithNoFeedback(outcome)) {
-        return "Please direct the learner to a different card.";
+        return 'Please direct the learner to a different card.';
       } else {
-        return "Please give Oppia something useful to say, or direct the learner to a different card.";
+        return 'Please give Oppia something useful to say,' +
+               ' or direct the learner to a different card.';
       }
     };
 
