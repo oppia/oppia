@@ -65,6 +65,7 @@
       var GLOBALS = {
         ADDITIONAL_ANGULAR_MODULES: [],
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
+        csrf_token_for_footer: JSON.parse('{{csrf_token_for_footer|js_string}}'),
         DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}'),
         NAV_MODE:
           {% if nav_mode %}
