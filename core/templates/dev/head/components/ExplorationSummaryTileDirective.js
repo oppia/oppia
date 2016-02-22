@@ -43,17 +43,19 @@ oppia.directive('explorationSummaryTile', [function() {
         function() {
           element.find('.mask').attr('class',
             'exploration-summary-tile-mask mask');
-          element.find('.contributors-num-minus-one').hide(1, function() {
-            element.find('.all-contributors').slideDown();
-          });
+          element.find('.contributors-num-minus-one').stop(true).hide(1,
+            function() {
+              element.find('.all-contributors').stop(true).slideDown();
+            }
+          );
         }
       );
 
       element.find('.exploration-summary-contributors').on('mouseleave',
         function() {
           element.find('.mask').attr('class', 'top-section-mask mask');
-          element.find('.all-contributors').slideUp(400, function() {
-            element.find('.contributors-num-minus-one').show(1);
+          element.find('.all-contributors').stop(true).slideUp(400, function() {
+            element.find('.contributors-num-minus-one').stop(true).show(1);
           });
         }
       );
