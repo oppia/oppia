@@ -13,38 +13,26 @@
 // limitations under the License.
 
 /**
- * @fileoverview Gallery tile component for exploration.
+ * @fileoverview Gallery tile component for collections.
  *
- * @author Sean Lip
+ * @author amgowano@stanford.edu (Abraham Mgowano)
  */
-
-oppia.directive('explorationSummaryTile', [function() {
+oppia.directive('collectionSummaryTile', [function() {
   return {
     restrict: 'E',
     scope: {
       getCollectionId: '&collectionId',
-      getExplorationId: '&explorationId',
-      getExplorationTitle: '&explorationTitle',
-      getLastUpdatedMsec: '&lastUpdatedMsec',
-      getNumViews: '&numViews',
+      getCollectionTitle: '&collectionTitle',
       getObjective: '&objective',
-      getCategory: '&category',
-      getRatings: '&ratings',
+      getNumExplorations: '&numExplorations',
+      getLastUpdatedMsec: '&lastUpdatedMsec',
       getThumbnailIconUrl: '&thumbnailIconUrl',
-      getThumbnailBgColor: '&thumbnailBgColor',
-      // If this is not null, the new exploration opens in a new window when
-      // the summary tile is clicked.
-      openInNewWindow: '@openInNewWindow'
+      getThumbnailBgColor: '&thumbnailBgColor'
     },
-    templateUrl: 'summaryTile/exploration',
+    templateUrl: 'summaryTile/collection',
     controller: [
-      '$scope', 'oppiaDatetimeFormatter', 'RatingComputationService',
-      function($scope, oppiaDatetimeFormatter, RatingComputationService) {
-        $scope.getAverageRating = function() {
-          return RatingComputationService.computeAverageRating(
-            $scope.getRatings());
-        };
-
+      '$scope', 'oppiaDatetimeFormatter',
+      function($scope, oppiaDatetimeFormatter) {
         $scope.getLastUpdatedDatetime = function() {
           return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
             $scope.getLastUpdatedMsec());
@@ -54,11 +42,8 @@ oppia.directive('explorationSummaryTile', [function() {
           return oppiaDatetimeFormatter.isRecent($scope.getLastUpdatedMsec());
         };
 
-        $scope.getExplorationLink = function() {
-          var result = '/explore/' + $scope.getExplorationId();
-          if ($scope.getCollectionId()) {
-            result += ('?collection_id=' + $scope.getCollectionId());
-          }
+        $scope.getCollectionLink = function() {
+          var result = '/collection/' + $scope.getCollectionId();
           return result;
         };
       }

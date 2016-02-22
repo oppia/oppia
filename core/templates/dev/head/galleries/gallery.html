@@ -176,6 +176,15 @@
 
           <div infinite-scroll="showMoreExplorations()" infinite-scroll-distance="1"
                infinite-scroll-disabled="finishedLoadingPage || pageLoaderIsBusy">
+            <collection-summary-tile ng-repeat="collection in allCollectionsInOrder track by $index"
+                                     collection-id="collection.id"
+                                     collection-title="collection.title"
+                                     last-updated-msec="collection.last_updated_msec"
+                                     num-explorations="collection.num_explorations"
+                                     objective="collection.objective"
+                                     thumbnail-icon-url="collection.thumbnail_icon_url"
+                                     thumbnail-bg-color="collection.thumbnail_bg_color">
+            </collection-summary-tile>
             <exploration-summary-tile ng-repeat="exp in allExplorationsInOrder track by $index"
                                       exploration-id="exp.id"
                                       exploration-title="exp.title"
