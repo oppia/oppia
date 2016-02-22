@@ -43,6 +43,10 @@ oppia.directive('explorationSummaryTile', [function() {
         function() {
           element.find('.mask').attr('class',
             'exploration-summary-tile-mask mask');
+          // As animation duration time may be 400ms, .stop(true) is used
+          // to prevent the effects queue falling behind the mouse movement.
+          // .hide(1) and .show(1) used to place the animation in the
+          // effects queue.
           element.find('.contributors-num-minus-one').stop(true).hide(1,
             function() {
               element.find('.all-contributors').stop(true).slideDown();
