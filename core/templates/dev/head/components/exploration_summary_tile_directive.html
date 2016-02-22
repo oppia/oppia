@@ -9,7 +9,7 @@
           <profile-link-image ng-if="contributors.length > 0"
                               username="contributors[0]"
                               tooltip="<[contributors[0]]>"
-                              tooltip-placement="left"
+                              tooltip-placement="right"
                               tooltip-append-to-body="true">
           </profile-link-image>
           <div class="contributors-num-minus-one" ng-show="contributors.length > 1">
@@ -20,7 +20,7 @@
             <profile-link-image ng-repeat="contributor in contributors | limitTo:MAX_CONTRIBUTORS_TO_DISPLAY-1:1"
                                 username="contributor"
                                 tooltip="<[contributor]>"
-                                tooltip-placement="left"
+                                tooltip-placement="right"
                                 tooltip-append-to-body="true">
             </profile-link-image>
 
@@ -119,10 +119,12 @@
   }
 
   .oppia-exploration-summary-tile .exploration-summary-contributors {
-    left: 171px;
+    padding-bottom: 4px;
+    padding-right: 5px;
+    left: 169px;
     position: absolute;
-    top: 5px;
-    width: 26px;
+    top: 3px;
+    width: 31px;
     z-index: 11;
   }
 

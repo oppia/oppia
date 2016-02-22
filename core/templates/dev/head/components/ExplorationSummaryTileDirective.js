@@ -43,7 +43,7 @@ oppia.directive('explorationSummaryTile', [function() {
         function() {
           element.find('.mask').attr('class',
             'exploration-summary-tile-mask mask');
-          element.find('.contributors-num-minus-one').hide(0, function() {
+          element.find('.contributors-num-minus-one').hide(1, function() {
             element.find('.all-contributors').slideDown();
           });
         }
@@ -53,7 +53,7 @@ oppia.directive('explorationSummaryTile', [function() {
         function() {
           element.find('.mask').attr('class', 'top-section-mask mask');
           element.find('.all-contributors').slideUp(400, function() {
-            element.find('.contributors-num-minus-one').show();
+            element.find('.contributors-num-minus-one').show(1);
           });
         }
       );
