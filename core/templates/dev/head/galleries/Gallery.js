@@ -147,12 +147,6 @@ oppia.controller('Gallery', [
       $translate, ExplorationCreationButtonService, oppiaDatetimeFormatter,
       oppiaDebouncer, urlService, GALLERY_DATA_URL, CATEGORY_LIST,
       searchService) {
-    $rootScope.$on('$translateChangeSuccess', function() {
-      $rootScope.pageTitle = (
-        $translate.instant('I18N_GALLERY_PAGE_TITLE') +
-        ' - ' + $translate.instant('I18N_GALLERY_PAGE_SUBTITLE'));
-    });
-
     $window.addEventListener('scroll', function() {
       var oppiaBanner = $('.oppia-gallery-banner-container');
       var oppiaTagline = $('.oppia-gallery-banner-tagline');
