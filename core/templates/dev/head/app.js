@@ -359,13 +359,14 @@ oppia.factory('windowDimensionsService', ['$window', function($window) {
 //
 // Note that events are only sent if the CAN_SEND_ANALYTICS_EVENTS flag is
 // turned on. This flag must be turned on explicitly by the application
-// owner.
+// owner in feconf.py.
 oppia.factory('siteAnalyticsService', ['$window', function($window) {
   var CAN_SEND_ANALYTICS_EVENTS = GLOBALS.CAN_SEND_ANALYTICS_EVENTS;
 
   // For definitions of the various arguments, please see:
   // developers.google.com/analytics/devguides/collection/analyticsjs/events
-  var _sendEventToGa = function(eventCategory, eventAction, eventLabel) {
+  var _sendEventToGoogleAnalytics = function(
+      eventCategory, eventAction, eventLabel) {
     if ($window.ga && CAN_SEND_ANALYTICS_EVENTS) {
       $window.ga('send', 'event', eventCategory, eventAction, eventLabel);
     }
@@ -374,7 +375,8 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
   // For definitions of the various arguments, please see:
   // developers.google.com/analytics/devguides/collection/analyticsjs/
   //   social-interactions
-  var _sendSocialEventToGa = function(network, action, targetUrl) {
+  var _sendSocialEventToGoogleAnalytics = function(
+      network, action, targetUrl) {
     if ($window.ga && CAN_SEND_ANALYTICS_EVENTS) {
       $window.ga('send', 'social', network, action, targetUrl);
     }
@@ -383,30 +385,35 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
   return {
     // The srcElement refers to the element on the page that is clicked.
     registerStartLoginEvent: function(srcElement) {
-      _sendEventToGa(
+      _sendEventToGoogleAnalytics(
         'LoginButton', 'click', $window.location.pathname + ' ' + srcElement);
     },
     registerOpenExplorationCreationModalEvent: function() {
-      _sendEventToGa(
+      _sendEventToGoogleAnalytics(
         'CreateExplorationModal', 'open', $window.location.pathname);
     },
     registerPublishExplorationEvent: function(explorationId) {
-      _sendEventToGa('PublishExploration', 'click', explorationId);
+      _sendEventToGoogleAnalytics(
+        'PublishExploration', 'click', explorationId);
     },
     registerPublishExplorationChangesEvent: function(explorationId) {
-      _sendEventToGa('SaveChangesToPublicExp', 'click', explorationId);
+      _sendEventToGoogleAnalytics(
+        'SaveChangesToPublicExp', 'click', explorationId);
     },
     registerSaveExplorationDraftEvent: function(explorationId) {
-      _sendEventToGa('SaveChangesToPrivateExp', 'click', explorationId);
+      _sendEventToGoogleAnalytics(
+        'SaveChangesToPrivateExp', 'click', explorationId);
     },
     registerShareExplorationEvent: function(network) {
-      _sendSocialEventToGa(network, 'share', $window.location.pathname);
+      _sendSocialEventToGoogleAnalytics(
+        network, 'share', $window.location.pathname);
     },
     registerOpenEmbedInfoEvent: function(explorationId) {
-      _sendEventToGa('EmbedInfoModal', 'open', explorationId);
+      _sendEventToGoogleAnalytics('EmbedInfoModal', 'open', explorationId);
     },
     registerFirstExplorationEditorEntryEvent: function(explorationId) {
-      _sendEventToGa('ExplorationEditorPage', 'firstEntry', explorationId);
+      _sendEventToGoogleAnalytics(
+        'ExplorationEditorPage', 'firstEntry', explorationId);
     }
   };
 }]);
