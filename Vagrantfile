@@ -13,11 +13,14 @@ bash ./scripts/start.sh
 SCRIPT
 
 Vagrant.configure(2) do |config|
-    config.vm.provider "virtualbox" do |v|
-      v.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/v-root", "1"]
-      v.memory = 1024
-    end
+  config.vm.provider "virtualbox" do |v|
+    v.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/v-root", "1"]
+    v.memory = 1024
+  end
+  # General-purpose env var to let scripts know we are in Vagrant.  
   config.vm.provision "shell", inline: 'echo "export VAGRANT=true" >> ~/.profile'
+  # Tell apt to default to "yes" when installing pacakges. Necessary for unattended installs.
+  config.vm.provision "shell", inline: 'echo \'APT::Get::Assume-Yes "true";\' > /etc/apt/apt.conf.d/90yes'
   config.vm.network "forwarded_port", guest: 8000, host: 8000
   config.vm.network "forwarded_port", guest: 8181, host: 8181
   config.vm.box = "ubuntu/trusty64"
