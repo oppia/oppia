@@ -382,10 +382,6 @@ def get_human_readable_user_ids(user_ids):
     return usernames
 
 
-def get_user_id_from_email(email):
-    return current_user_services.get_user_id_from_email(email)
-
-
 def record_user_started_state_editor_tutorial(user_id):
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.last_started_state_editor_tutorial = (
