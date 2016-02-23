@@ -99,9 +99,16 @@ oppia.factory('searchService', [
         _lastSelectedCategories = angular.copy(selectedCategories);
         _lastSelectedLanguageCodes = angular.copy(selectedLanguageCodes);
         _searchCursor = data.search_cursor;
-        $rootScope.$broadcast(
-          'refreshGalleryData', data, hasPageFinishedLoading());
-        _isCurrentlyFetchingResults = false;
+
+        if ($('.oppia-splash-search-input').val() === searchQuery) {
+          $rootScope.$broadcast('refreshGalleryData', data,
+                                hasPageFinishedLoading());
+          _isCurrentlyFetchingResults = false;
+        } else {
+          console.log('Mismatch');
+          console.log('SearchQuery: ' + searchQuery);
+          console.log('Input: ' + $('.oppia-splash-search-input').val());
+        }
       });
 
       if (successCallback) {
@@ -126,6 +133,7 @@ oppia.factory('searchService', [
       $http.get(queryUrl).success(function(data) {
         _searchCursor = data.search_cursor;
         _isCurrentlyFetchingResults = false;
+
         if (successCallback) {
           successCallback(data, hasPageFinishedLoading());
         }

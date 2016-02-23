@@ -194,7 +194,7 @@ def get_thread_analytics(exploration_id):
     - 'num_total_threads': the total number of feedback threads for this
          exploration.
     """
-    return feedback_jobs_continuous.FeedbackAnalyticsAggregator.get_thread_analytics(
+    return feedback_jobs_continuous.FeedbackAnalyticsAggregator.get_thread_analytics( # pylint: disable=line-too-long
         exploration_id)
 
 

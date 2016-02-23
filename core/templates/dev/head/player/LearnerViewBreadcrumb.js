@@ -90,6 +90,7 @@ oppia.controller('LearnerViewBreadcrumb', [
             $scope.averageRating = (
               RatingComputationService.computeAverageRating(expInfo.ratings));
             $scope.contributorNames = expInfo.contributor_names;
+            $scope.explorationId = expInfo.id;
             $scope.escapedTwitterText = (
               oppiaHtmlEscaper.unescapedStrToEscapedStr(
                 GLOBALS.SHARING_OPTIONS_TWITTER_TEXT));

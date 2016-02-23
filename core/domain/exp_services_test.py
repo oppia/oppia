@@ -463,7 +463,10 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_ID, [{
                 'cmd': 'edit_exploration_property',
                 'property_name': 'param_specs',
-                'new_value': {'theParameter': param_domain.ParamSpec('UnicodeString').to_dict()}
+                'new_value': {
+                    'theParameter':
+                        param_domain.ParamSpec('UnicodeString').to_dict()
+                }
             }],
             '')
 
@@ -483,7 +486,10 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_ID, [{
                 'cmd': 'edit_exploration_property',
                 'property_name': 'param_specs',
-                'new_value': {'theParameter': param_domain.ParamSpec('UnicodeString').to_dict()}
+                'new_value': {
+                    'theParameter':
+                        param_domain.ParamSpec('UnicodeString').to_dict()
+                }
             }], '')
 
         # Change title and category.
@@ -2215,7 +2221,8 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 'A category', 'An objective', 'en', [],
                 feconf.get_empty_ratings(),
                 rights_manager.ACTIVITY_STATUS_PUBLIC,
-                False, [self.albert_id], [], [], [self.albert_id], {self.albert_id: 1},
+                False, [self.albert_id], [], [], [self.albert_id],
+                {self.albert_id: 1},
                 self.EXPECTED_VERSION_2,
                 actual_summaries[self.EXP_ID_2].exploration_model_created_on,
                 actual_summaries[self.EXP_ID_2].exploration_model_last_updated

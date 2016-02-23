@@ -69,8 +69,12 @@ Here's how to make a one-off code change. (If you're working on a larger feature
       git push origin {{YOUR BRANCH NAME}}
     ```
 
-    Before your code gets uploaded to GitHub, a script is automatically executed that checks the styling of all changed JavaScript and Python files and runs the front-end tests.
-     **If any of the tests fail, the push will be interrupted**. If this happens, fix the issues that the tests tell you about and **repeat the instructions above** ('commit' and then 'push')
+    
+
+    Before your code gets uploaded to GitHub, a script is automatically executed that checks the styling of all changed JavaScript and Python files and runs the front-end tests. Run the push command in command line, and not GitHub's Desktop client, as the script needs access to other tools like pip.
+    
+     **If any of the tests fail, the push will be interrupted**. If this happens, fix the issues that the tests tell you about and **repeat the instructions above** ('commit' and then 'push').
+     
     If you need some help with your code and therefore want to put non functioning code into your GitHub fork to show it to other developers, you  can force a push with `git push origin {{YOUR BRANCH NAME}} --no-verify`.
 
 4. **When your feature is ready to merge, create a pull request.**
@@ -118,3 +122,7 @@ We also have a developer chat room [here](https://gitter.im/oppia/oppia-chat). F
 GitHub teams allow contributors working on similar areas of the Oppia codebase to to find and contact each other easily. These teams will be accessible via the GitHub alias @oppia/{{team-name}}. Mentioning a team in a issue or comment will notify all members in the team. During the issue triage process, issues will be assigned to a team, and members of the team are encouraged to comment on or take up the issue. If a contributor who is not part of the team is working on an issue, they will also be able to ask the team for guidance.
 
 You can indicate which team(s) you want to join by filling in the form [here](http://goo.gl/forms/kXILyztnfS), or requesting to join/leave teams on the [teams page](https://github.com/orgs/oppia/teams). You can join or leave a team at any time.
+
+### Design docs and planning
+
+Design documents and meeting minutes are in our [Google Drive folder](https://drive.google.com/open?id=0B8ADASwHtwE9UFlLSFdlMkt2Y2c). 
