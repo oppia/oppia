@@ -206,8 +206,12 @@ oppia.controller('Base', [
       angular.element(evt.currentTarget).parent().removeClass('open');
     };
 
-    $scope.onLoginButtonClicked = function() {
-      siteAnalyticsService.registerLoginEvent('loginButton');
+    $scope.onLoginButtonClicked = function(loginUrl) {
+      siteAnalyticsService.registerStartLoginEvent('loginButton');
+      $timeout(function() {
+        $window.location = loginUrl;
+      }, 150);
+      return false;
     };
 
     $scope.pageHasLoaded = false;

@@ -396,13 +396,13 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
       _sendEventToGoogleAnalytics(
         'PublishExploration', 'click', explorationId);
     },
-    registerPublishExplorationChangesEvent: function(explorationId) {
+    registerCommitChangesToPublicExplorationEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
-        'SaveChangesToPublicExp', 'click', explorationId);
+        'CommitToPublicExploration', 'click', explorationId);
     },
-    registerSaveExplorationDraftEvent: function(explorationId) {
+    registerCommitChangesToPrivateExplorationEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
-        'SaveChangesToPrivateExp', 'click', explorationId);
+        'CommitToPrivateExploration', 'click', explorationId);
     },
     registerShareExplorationEvent: function(network) {
       _sendSocialEventToGoogleAnalytics(

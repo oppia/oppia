@@ -205,13 +205,13 @@
                           </li>
                         {% else %}
                           <li class="dropdown oppia-clickable-dropdown pull-right">
-                            <a href="{{login_url}}" class="oppia-navbar-profile-dropdown-toggle" style="font-size: 1em; padding-top: 17px;" ng-click="onLoginButtonClicked()">
+                            <a href class="oppia-navbar-profile-dropdown-toggle" style="font-size: 1em; padding-top: 17px;" ng-click="onLoginButtonClicked('{{login_url}}')">
                               Sign in
                               <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu oppia-navbar-profile-dropdown" role="menu" style="padding: 0;" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
                               <li>
-                                <a href="{{login_url}}" style="padding: 0; width: 200px;">
+                                <a href style="padding: 0; width: 200px;" ng-click="onLoginButtonClicked('{{login_url}}')">
                                   <img src="/images/signin/Red-signin-Long-base-44dp.png">
                                 </a>
                               </li>

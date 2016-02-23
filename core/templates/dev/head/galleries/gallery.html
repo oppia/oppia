@@ -19,7 +19,7 @@
       {% if not has_fully_registered %}
         <!-- User must complete the registration process. -->
         <a class="btn oppia-navbar-add-exploration-button protractor-test-create-exploration oppia-transition-200"
-           href="{{gallery_login_redirect_url}}" ng-click="onRedirectToLogin()">
+           href ng-click="onRedirectToLogin('{{gallery_login_redirect_url}}')">
           <span class="oppia-navbar-add-exploration-button-plus">+</span>
           <span>Create Exploration</span>
         </a>
@@ -166,7 +166,7 @@
                 Oops, it looks like your search didn't match any explorations.<br><br>
                 <!-- NOTE: If you change the links here, please make the corresponding change for the 'Create New Exploration' button. -->
                 {% if not has_fully_registered %}
-                  Would you like to <a href="{{gallery_login_redirect_url}}" ng-click="onRedirectToLogin()">create one</a>?
+                  Would you like to <a href ng-click="onRedirectToLogin('{{gallery_login_redirect_url}}')">create one</a>?
                 {% else %}
                   Would you like to <a ng-click="showCreateExplorationModal()">create one</a>?
                 {% endif %}

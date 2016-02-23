@@ -763,10 +763,10 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
           });
 
           if ($scope.isPrivate()) {
-            siteAnalyticsService.registerSaveExplorationDraftEvent(
+            siteAnalyticsService.registerCommitChangesToPrivateExplorationEvent(
               explorationData.explorationId);
           } else {
-            siteAnalyticsService.registerPublishExplorationChangesEvent(
+            siteAnalyticsService.registerCommitChangesToPublicExplorationEvent(
               explorationData.explorationId);
           }
         }, function() {
