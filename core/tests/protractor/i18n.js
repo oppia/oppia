@@ -39,11 +39,10 @@ describe('Site language', function() {
     expect(browser.getTitle()).toEqual('Oppia - Galería');
   });
 
-  it('should not change between different pages.', function() {
+  it('should not change between different pages', function() {
     _selectLanguage('Español');
     // Go to a different page
     users.login('varda@example.com');
-    // First login needs to be redirected to SignUp page
     browser.get('/signup?return_url=http%3A%2F%2Flocalhost%3A4445%2F');
     // Spanish is still selected
     title = element(by.css('.protractor-test-signup-page-title'));
@@ -81,13 +80,14 @@ describe('Site language', function() {
     language = element(by.css('.protractor-test-system-language-selector'))
       .element(by.css('.select2-chosen'));
     expect(language.getText(), 'English');
+    expect(browser.getTitle()).toEqual('Registro - Oppia');
   });
 
   it('should be used in titles of pages without controllers', function() {
     browser.get('/about');
     expect(browser.getTitle()).toEqual('About - Oppia');
     _selectLanguage('Español');
-    expect(browser.getTitle()).toEqual('Acerca de - Oppia')
+    expect(browser.getTitle()).toEqual('Acerca de - Oppia');
   });
 
   afterEach(function() {

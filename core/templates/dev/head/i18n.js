@@ -44,40 +44,33 @@ oppia.constant('DEFAULT_TRANSLATIONS', {
   I18N_SIGNUP_LOADING: 'Loading'
 });
 
-oppia.constant('SITE_LANGUAGES', {
+oppia.constant('SUPPORTED_LANGUAGES', {
   en: 'English',
   es: 'Español'
 });
 
 oppia.controller('I18nFooter', [
-    '$http', '$rootScope', '$scope', '$translate', 'SITE_LANGUAGES',
-    function($http, $rootScope, $scope, $translate, SITE_LANGUAGES) {
-  var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
-  var _SAVE_SITE_LANGUAGE_URL = '/save_site_language';
-  $scope.SITE_LANGUAGES = SITE_LANGUAGES;
-  if (GLOBALS.userIsLoggedIn) {
-    $http.get(_PREFERENCES_DATA_URL).success(function(data) {
-      $translate.use(data.preferred_site_language_code);
-    });
-  }
-
-  $scope.changeLanguage = function(siteLanguageCode) {
-    $translate.use(siteLanguageCode);
-    if (GLOBALS.userIsLoggedIn) {
-      $http.put(_SAVE_SITE_LANGUAGE_URL, {
-        site_language_code: siteLanguageCode,
-        requestIsFromFooter: true
-      });
-    }
+    '$rootScope', '$scope', '$translate', 'SUPPORTED_LANGUAGES',
+    function($rootScope, $scope, $translate, SUPPORTED_LANGUAGES) {
+  $scope.SUPPORTED_LANGUAGES = SUPPORTED_LANGUAGES;
+  // Changes the language of the translations.
+  $scope.changeLanguage = function(langCode) {
+    $translate.use(langCode);
   };
+  // After loading default translations, change the language for the stored
+  // language if necessary.
+  $rootScope.$on('$translateLoadingSuccess', function() {
+    var currentLang = $translate.proposedLanguage() || $translate.use();
+    $translate.use(currentLang);
+  });
 }]);
 
 oppia.config([
-    '$translateProvider', 'DEFAULT_TRANSLATIONS', 'SITE_LANGUAGES',
-    function($translateProvider, DEFAULT_TRANSLATIONS, SITE_LANGUAGES) {
+    '$translateProvider', 'DEFAULT_TRANSLATIONS', 'SUPPORTED_LANGUAGES',
+    function($translateProvider, DEFAULT_TRANSLATIONS, SUPPORTED_LANGUAGES) {
   var availableLanguageKeys = [];
   var availableLanguageKeysMap = {};
-  for (var prop in SITE_LANGUAGES) {
+  for (var prop in SUPPORTED_LANGUAGES) {
     availableLanguageKeys.push(prop);
     availableLanguageKeysMap[prop + '*'] = prop;
   };
@@ -91,7 +84,7 @@ oppia.config([
       suffix: '.json'
     })
     // The use of default translation improves the loading time when English is
-    // selected as preferred system language.
+    // selected
     .translations('en', DEFAULT_TRANSLATIONS)
     .fallbackLanguage('en')
     .determinePreferredLanguage()

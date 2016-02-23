@@ -260,38 +260,3 @@ class NotificationsDashboardHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(
                 response['recent_notifications'][0]['author_username'], '')
             self.assertNotIn('author_id', response['recent_notifications'][0])
-
-
-class SaveSiteLanguageHandlerTests(test_utils.GenericTestBase):
-
-    def test_save_site_language_handler(self):
-        """Test the language is saved in the preferences when handler is called.
-        """
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        language_code = 'some_code'
-        self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get(feconf.GALLERY_URL)
-        self.assertEqual(response.status_int, 200)
-        csrf_token = self.get_csrf_token_from_response(response,
-                                                       for_footer=True)
-        self.put_json(feconf.SAVE_SITE_LANGUAGE, {
-            'site_language_code': language_code,
-        }, csrf_token)
-
-        preferences = self.get_json('/preferenceshandler/data')
-        self.assertIsNotNone(preferences)
-        self.assertEqual(preferences['preferred_site_language_code'],
-                         language_code)
-
-        self.logout()
-
-    def test_save_site_language_no_user(self):
-        """The SaveSiteLanguageHandler handler can be called without a user."""
-        response = self.testapp.get(feconf.GALLERY_URL)
-        self.assertEqual(response.status_int, 200)
-        csrf_token = self.get_csrf_token_from_response(response,
-                                                       for_footer=True)
-        self.put_json(feconf.SAVE_SITE_LANGUAGE, {
-            'site_language_code': 'some_code',
-            'requestIsFromFooter': True
-        }, csrf_token)

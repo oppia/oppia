@@ -199,17 +199,3 @@ class NotificationsHandler(base.BaseHandler):
         self.render_json({
             'num_unseen_notifications': num_unseen_notifications,
         })
-
-
-class SaveSiteLanguageHandler(base.BaseHandler):
-    """Changes the preferred system language in the user's preferences."""
-
-    PAGE_NAME_FOR_CSRF = 'footer'
-
-    def put(self):
-        """Handles PUT requests."""
-        if user_services.has_fully_registered(self.user_id):
-            site_language_code = self.payload.get('site_language_code')
-            user_services.update_preferred_site_language_code(
-                self.user_id, site_language_code)
-        self.render_json({})
