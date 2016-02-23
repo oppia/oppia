@@ -32,11 +32,11 @@ class EmailRightsTest(test_utils.GenericTestBase):
 
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
-        self.set_moderators([self.MODERATOR_EMAIL])
+        self.set_moderators([self.MODERATOR_USERNAME])
 
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_EMAIL])
+        self.set_admins([self.ADMIN_USERNAME])
 
     def test_sender_id_validation(self):
         sender_ids_to_test = [
@@ -93,7 +93,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
 
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_EMAIL])
+        self.set_admins([self.ADMIN_USERNAME])
 
         self.new_footer = (
             'Unsubscribe from emails at your '

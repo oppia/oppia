@@ -198,21 +198,6 @@
       No configuration properties are available.
     </div>
 
-    <h3>Computed configuration properties</h3>
-
-    <div ng-if="isNonemptyObject(computedProperties)">
-      <ul>
-        <li ng-repeat="(computedPropertyId, computedPropertyData) in computedProperties">
-          <em><[computedPropertyData.description]></em>
-          <button ng-click="refreshComputedProperty(computedPropertyId)">Reload</button>
-        </li>
-      </ul>
-    </div>
-
-    <div ng-if="!isNonemptyObject(computedProperties)">
-      No computed configuration properties are available.
-    </div>
-
     <h3>Performance Counters</h3>
 
     <ul>
