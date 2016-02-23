@@ -32,18 +32,22 @@
 {% block content %}
   <div class="oppia-profile-container" ng-controller="Profile">
     <md-card class="oppia-profile-user-card">
-      <div class="oppia-profile-user-picture-name-container">
-        <img ng-src="<[profilePictureDataUrl]>"
-        class="oppia-profile-picture-fullsize"></div>
-      <h2 class="oppia-profile-username">
+      <img ng-src="<[profilePictureDataUrl]>"
+      class="oppia-profile-picture-fullsize">
+      <h2 class="oppia-profile-username-large-screen">
         <span popover-placement="right" ng-attr-popover="<[username.helpText]>" popover-append-to-body popover-trigger="mouseenter">
           <strong><[username.value| truncate:16]></strong>
         </span>
       </h2>
+      <h2 class="oppia-profile-username-small-screen">
+        <span popover-placement="right" ng-attr-popover="<[username.helpText]>" popover-append-to-body popover-trigger="mouseenter">
+          <strong><[username.value| truncate:11]></strong>
+        </span>
+      </h2>
       <p class="oppia-profile-first-contributed" ng-if="firstContributionMsec">
-        Contributing since <[getLocaleDateString(firstContributionMsec)]>
+        Contributing since: <[getLocaleDateString(firstContributionMsec)]>
       </p>
-      <div class="oppia-profile-user-stat-container">
+      <div class="oppia-profile-user-stat-container-large-screen">
         <div ng-repeat="stat in userDisplayedStatistics" class="oppia-profile-user-stat">
           <div popover-placement="right" ng-attr-popover="<[stat.helpText]>" popover-append-to-body popover-trigger="mouseenter">
             <span style="font-size: 16px"><strong><[stat.value || 0]></strong></span>
@@ -59,17 +63,27 @@
       </p>
       <p class="oppia-profile-subject-interest-container">
         Interests:
-          <span ng-if="subjectInterests.length > 0"><br>
-            <span ng-repeat="interest in subjectInterests track by $index">
-              <span class="oppia-profile-subject-interest">
-                <[interest]>
-              </span>
+        <span ng-if="subjectInterests.length > 0"><br>
+          <span ng-repeat="interest in subjectInterests track by $index">
+            <span class="oppia-profile-subject-interest">
+              <[interest]>
             </span>
           </span>
-          <span ng-if="subjectInterests.length === 0" class="oppia-profile-no-interests-text">
-            <em>none specified</em>
-          </span>
-          </p>
+        </span>
+        <span ng-if="subjectInterests.length === 0" class="oppia-profile-no-interests-text">
+          <em>none specified</em>
+        </span>
+      </p>
+      <hr class="oppia-profile-stat-container-line-small-screen">
+      <div class="oppia-profile-user-stat-container-small-screen">
+        <div ng-repeat="stat in userDisplayedStatistics" class="oppia-profile-user-stat">
+          <div popover-placement="right" ng-attr-popover="<[stat.helpText]>" popover-append-to-body popover-trigger="mouseenter">
+            <span style="font-size: 16px"><strong><[stat.value || 0]></strong></span>
+            <span><[stat.title]></span>
+          </div>
+        </div>
+      </div>
+      <hr class="oppia-profile-stat-container-line-small-screen">
     </md-card>
 
     <md-card class="oppia-profile-content-card">
@@ -90,8 +104,8 @@
           <em></br>This user hasn't created or edited any explorations yet.</em>
         </div>
       </md-content>
-      <span class="oppia-profile-portfolio-pages" ng-if="userPortfolioExplorations > 4">
-        Showing #-# of <[userPortfolioExplorations]>
+      <span class="oppia-profile-portfolio-pages" ng-if="numUserPortfolioExplorations > 4">
+        Showing #-# of <[numUserPortfolioExplorations]>
       </span>
     </md-card>
   </div>
