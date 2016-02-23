@@ -151,7 +151,7 @@ oppia.factory('ExplorationCreationButtonService', [
             objective: $filter('normalizeWhitespace')(result.objective),
             title: result.title
           }).success(function(data) {
-            siteAnalyticsService.registerFirstExplorationEditorEntryEvent(
+            siteAnalyticsService.registerCreateNewExplorationEvent(
               data.explorationId);
             $timeout(function() {
               $window.location = '/create/' + data.explorationId;

@@ -411,9 +411,9 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
     registerOpenEmbedInfoEvent: function(explorationId) {
       _sendEventToGoogleAnalytics('EmbedInfoModal', 'open', explorationId);
     },
-    registerFirstExplorationEditorEntryEvent: function(explorationId) {
+    registerCreateNewExplorationEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
-        'ExplorationEditorPage', 'firstEntry', explorationId);
+        'NewExploration', 'create', explorationId);
     }
   };
 }]);
