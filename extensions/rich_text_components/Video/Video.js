@@ -26,46 +26,54 @@ oppia.directive('oppiaNoninteractiveVideo', [
       scope: {},
       templateUrl: 'richTextComponent/Video',
       controller: ['$scope', '$attrs', 'explorationContextService', '$element',
-        'PAGE_CONTEXT',
-        function($scope, $attrs, explorationContextService, $element) {
+        'autoplayedVideosService', 'PAGE_CONTEXT', '$timeout',
+        function($scope, $attrs, explorationContextService, $element,
+          autoplayedVideosService, PAGE_CONTEXT, $timeout) {
           var start = oppiaHtmlEscaper.escapedJsonToObj($attrs.startWithValue);
           var end = oppiaHtmlEscaper.escapedJsonToObj($attrs.endWithValue);
 
           $scope.videoId = oppiaHtmlEscaper.escapedJsonToObj(
             $attrs.videoIdWithValue);
           $scope.timingParams = '&start=' + start + '&end=' + end;
+          $scope.autoplaySuffix = '&autoplay=0';
 
-          // This code helps in checking whether video is for upcoming content.
-          // This is totally dependent of parent div of video container
-          // If in future that parent div changes then this code will be
-          // required to change accordingly.
-          var isVisible = true;
-          var videoVisibilty = angular.element($element).prop('offsetParent');
-          if (videoVisibilty) {
-            isVisible = (videoVisibilty.getAttribute('angular-html-bind') !==
-              'upcomingContentHtml' ? true : false);
-          }
+          $timeout(function() {
+            // Check whether creator wants to autoplay this video or not
+            var autoplayVal = oppiaHtmlEscaper.escapedJsonToObj(
+              $attrs.autoplayWithValue);
 
-          // If user in learner context then only autoplay videos.
-          if (explorationContextService.getPageContext() ===
-            PAGE_CONTEXT.LEARNER) {
-            // If video has been already played or if it is not visible for now
-            // then dont autoplay it.
-            if (explorationContextService.getFromPlayedList($scope.videoId) ||
-              !(isVisible)) {
-              $scope.autoplaySuffix = '&autoplay=0';
-            } else {
-              $scope.autoplaySuffix = '&autoplay=1';
+            // This code helps in visibility of video. It checks whether
+            // mid point of video frame is in the view or not.
+            var rect = angular.element($element)[0].getBoundingClientRect();
+            var clh = window.innerHeight;
+            var clw = window.innerWidth;
+            var isVisible = ((rect.left + rect.right) / 2 < clw &&
+              (rect.top + rect.bottom) / 2 < clh) &&
+              (rect.left > 0 && rect.right > 0);
+
+            // Autoplay if user is in lerner context and creator has specified
+            // to autoplay given video.
+            if (explorationContextService.getPageContext() ===
+              PAGE_CONTEXT.LEARNER && autoplayVal) {
+              // If it has been autoplayed then do not autoplay again.
+              if (
+                autoplayedVideosService.hasVideoBeenAutoplayed(
+                  $scope.videoId) || !(isVisible)) {
+                $scope.autoplaySuffix = '&autoplay=0';
+              } else {
+                $scope.autoplaySuffix = '&autoplay=1';
+                autoplayedVideosService.addAutoplayedVideo($scope.videoId);
+              }
             }
-          } else {
-            // If not in learner context then use default value,
-            $scope.autoplaySuffix = (oppiaHtmlEscaper.escapedJsonToObj(
-            $attrs.autoplayWithValue) ? '&autoplay=1' : '&autoplay=0');
-          }
 
-          $scope.videoUrl = $sce.trustAsResourceUrl(
-            'https://www.youtube.com/embed/' + $scope.videoId + '?rel=0' +
-            $scope.timingParams + $scope.autoplaySuffix);
+            $scope.videoUrl = $sce.trustAsResourceUrl(
+              'https://www.youtube.com/embed/' + $scope.videoId + '?rel=0' +
+              $scope.timingParams + $scope.autoplaySuffix);
+          }, 900);
+          // (^)Here timeout is set to 900ms. This is time it takes to bring the
+          // frame to correct point in browser and bring user to the main
+          // content. Slower timeout causes checks to be performed very before
+          // the oppia manages screen and brings the main content on display.
 
           // This following check disbales the video in Editor being caught
           // by tabbing while in Exploration Editor mode.
