@@ -308,14 +308,36 @@ oppia.controller('StateResponses', [
     };
     $scope.suppressDefaultAnswerGroupWarnings = function() {
       var interactionId = $scope.getCurrentInteractionId();
-      if (interactionId === 'MultipleChoiceInput' &&
-      responsesService.getAnswerGroups().length ===
-      $scope.getAnswerChoices().length) {
+      if (interactionId === 'MultipleChoiceInput') {
+        var choices = $scope.getAnswerChoices().length;
+        var suppressAnswer = responsesService.getAnswerGroups();
+        var defaultAnswers;
+        // For choice length, have indices 0 through choice length - 1
+        for (var x = 0; x < choices; x++) {
+          if (suppressAnswer['' + x + ''] === undefined) {
+            // Return false if no object exists for the index
+            /* Note that multiple choice only allows for
+            one rule per answerGroup*/
+            return false;
+          }
+          /*
+            ToDo:
+            check if logged answer index
+            (suppressAnswer['' + x + ''].rule_specs[0].inputs.x)
+            match all indices because an answergroup (ex. item selection)
+            may contain more than one rule
+
+            Item selection inputs.x returns an array of one or more strings
+            that match the choices text
+            else if (suppressAnswer['' + x + ''].rule_specs[0].inputs.x !== x){
+              return false;
+            }
+            */
+        }
         return true;
-      } else {
-        return false;
       }
     };
+
     $scope.isSelfLoopWithNoFeedback = function(outcome) {
       var isSelfLoop = function(outcome) {
         return (
@@ -328,9 +350,7 @@ oppia.controller('StateResponses', [
       var hasFeedback = outcome.feedback.some(function(feedbackItem) {
         return Boolean(feedbackItem);
       });
-      if (!$scope.suppressDefaultAnswerGroupWarnings()) {
-        return isSelfLoop(outcome) && !hasFeedback;
-      }
+      return isSelfLoop(outcome) && !hasFeedback;
     };
 
     $scope.changeActiveAnswerGroupIndex = function(newIndex) {
@@ -429,7 +449,7 @@ oppia.controller('StateResponses', [
         backdrop: true,
         controller: [
           '$scope', '$modalInstance', 'oppiaExplorationHtmlFormatterService',
-          'getCurrentInteractionId()', 'stateCustomizationArgsService',
+          'stateInteractionIdService', 'stateCustomizationArgsService',
           'explorationContextService', 'editorContextService',
           'explorationStatesService', 'trainingDataService',
           'answerClassificationService', 'focusService', 'DEFAULT_RULE_NAME',

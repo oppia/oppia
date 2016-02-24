@@ -31,9 +31,9 @@ oppia.directive('outcomeEditor', [function() {
     templateUrl: 'components/outcomeEditor',
     controller: [
       '$scope', 'editorContextService',
-      'stateInteractionIdService', 'responsesService',
+      'stateInteractionIdService',
       function($scope, editorContextService,
-        stateInteractionIdService, responsesService) {
+        stateInteractionIdService) {
         $scope.editOutcomeForm = {};
         $scope.feedbackEditorIsOpen = false;
         $scope.destinationEditorIsOpen = false;
@@ -67,25 +67,14 @@ oppia.directive('outcomeEditor', [function() {
           onExternalSave();
         });
 
-        $scope.getCurrentInteractionId = function() {
-          return stateInteractionIdService.savedMemento;
-        };
-
-        $scope.suppressDefaultAnswerGroupWarnings = function() {
-          var interactionId = $scope.getCurrentInteractionId();
-          if (interactionId === 'MultipleChoiceInput' &&
-          responsesService.getAnswerGroups().length ===
-          responsesService.getAnswerChoices().length) {
-            return true;
-          } else {
-            return false;
-          }
-        };
-
         $scope.isSelfLoop = function(outcome) {
           return (
             outcome &&
             outcome.dest === editorContextService.getActiveStateName());
+        };
+
+        $scope.getCurrentInteractionId = function() {
+          return stateInteractionIdService.savedMemento;
         };
 
         $scope.isSelfLoopWithNoFeedback = function(outcome) {
@@ -95,10 +84,9 @@ oppia.directive('outcomeEditor', [function() {
           var hasFeedback = outcome.feedback.some(function(feedbackItem) {
             return Boolean(feedbackItem);
           });
-          if (!$scope.suppressDefaultAnswerGroupWarnings()) {
-            return $scope.isSelfLoop(outcome) && !hasFeedback;
-          }
+          return $scope.isSelfLoop(outcome) && !hasFeedback;
         };
+
         $scope.invalidStateAfterFeedbackSave = function() {
           var tmpOutcome = angular.copy($scope.savedOutcome);
           tmpOutcome.feedback = angular.copy($scope.outcome.feedback);

@@ -27,8 +27,8 @@ oppia.directive('answerGroupEditor', [function() {
       getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
       getOnSaveAnswerGroupRulesFn: '&onSaveAnswerGroupRules',
       outcome: '=',
-      rules: '=',
-      suppressWarnings: '='
+      suppressWarnings: '&',
+      rules: '='
     },
     templateUrl: 'inline/answer_group_editor',
     controller: [
@@ -40,7 +40,6 @@ oppia.directive('answerGroupEditor', [function() {
           editorContextService, warningsData, INTERACTION_SPECS,
           FUZZY_RULE_TYPE) {
         $scope.rulesMemento = null;
-
         $scope.activeRuleIndex = responsesService.getActiveRuleIndex();
         $scope.editAnswerGroupForm = {};
 
