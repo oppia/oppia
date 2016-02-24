@@ -34,7 +34,6 @@ oppia.factory('explorationContextService', [
   function($window, PAGE_CONTEXT, EDITOR_TAB_CONTEXT) {
     var _pageContext = null;
     var _explorationId = null;
-    var isVideoPlayedList = {};
     return {
       // Returns a string representing the current tab of the editor (either
       // 'editor' or 'preview'), or null if the current tab is neither of these,
