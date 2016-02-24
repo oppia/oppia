@@ -103,7 +103,7 @@ oppia.controller('CollectionPlayer', [
           collectionBackendObject);
         $scope.collectionPlaythrough = (
           CollectionPlaythroughObjectFactory.create(
-            collectionBackendObject.playthrough_dict))
+            collectionBackendObject.playthrough_dict));
       },
       function() {
         // TODO(bhenning): Handle not being able to load the collection.
