@@ -510,6 +510,15 @@ var addResponse = function(interactionId, feedbackInstructions, destStateName,
   }
   _selectRule.apply(null, args);
 
+  // Open the feedback entry form if it is not already open.
+  var feedbackContainerElem = element(by.css(
+    '.protractor-test-open-feedback-editor'));
+  feedbackContainerElem.isPresent().then(function(isVisible) {
+    if (isVisible) {
+      element(by.css('.protractor-test-open-feedback-editor')).click();
+    }
+  });
+
   if (feedbackInstructions) {
     // Set feedback contents.
     _setOutcomeFeedback(ruleElement, feedbackInstructions);

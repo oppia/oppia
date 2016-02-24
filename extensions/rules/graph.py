@@ -19,6 +19,10 @@
 from extensions.rules import base
 
 
+class HasGraphProperty(base.GraphRule):
+    description = 'is {{p|GraphProperty}}'
+
+
 class IsIsomorphicTo(base.GraphRule):
     description = 'is isomorphic to {{g|Graph}}, including matching labels'
 

@@ -302,7 +302,7 @@ class EditorTest(BaseEditorControllerTest):
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': state_name,
                     'property_name': (
-                        exp_domain.STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS),
+                        exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS),
                     'new_value': ['sad']
                 }],
                 'commit_message': 'Update confirmed unclassified answers',
@@ -330,7 +330,7 @@ class EditorTest(BaseEditorControllerTest):
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': state_name,
                     'property_name': (
-                        exp_domain.STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS),
+                        exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS),
                     'new_value': []
                 }, {
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -357,7 +357,7 @@ class EditorTest(BaseEditorControllerTest):
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': state_name,
                     'property_name': (
-                        exp_domain.STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS),
+                        exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS),
                     'new_value': ['sad']
                 }],
                 'commit_message': 'Update confirmed unclassified answers',

@@ -53,7 +53,7 @@ var gulp = require('gulp');
 var gulpStartGae = require('./scripts/gulp-start-gae-devserver');
 var gulpUtil = require('gulp-util');
 var manifest = require('./manifest.json');
-var minifyCss = require('gulp-minify-css');
+var cssnano = require('gulp-cssnano');
 var path = require('path');
 var sourcemaps = require('gulp-sourcemaps');
 var minify = require('gulp-minify');
@@ -145,7 +145,7 @@ gulp.task('collectDependencyFilepaths', function() {
 gulp.task('generateCss', function() {
   requireFilesExist(cssFilePaths);
   gulp.src(cssFilePaths)
-    .pipe(isMinificationNeeded ? minifyCss() : gulpUtil.noop())
+    .pipe(isMinificationNeeded ? cssnano() : gulpUtil.noop())
     .pipe(concat('third_party.css'))
     .pipe(gulp.dest(generatedCssTargetDir));
 });

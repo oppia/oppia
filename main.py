@@ -287,7 +287,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/imageupload/<exploration_id>',
         editor.ImageUploadHandler, 'image_upload_handler'),
     get_redirect_route(
-        r'/createhandler/resolved_answers/<exploration_id>/<escaped_state_name>',
+        r'/createhandler/resolved_answers/<exploration_id>/' +
+        r'<escaped_state_name>',
         editor.ResolvedAnswersHandler, 'resolved_answers_handler'),
     get_redirect_route(
         r'/createhandler/training_data/<exploration_id>/<escaped_state_name>',
@@ -310,12 +311,14 @@ URLS = MAPREDUCE_HANDLERS + [
         editor.ExplorationSnapshotsHandler, 'exploration_snapshots_handler'),
     get_redirect_route(
         r'/createhandler/statisticsversion/<exploration_id>',
-        editor.ExplorationStatsVersionsHandler, 'exploration_stats_versions_handler'),
+        editor.ExplorationStatsVersionsHandler,
+        'exploration_stats_versions_handler'),
     get_redirect_route(
         r'/createhandler/statistics/<exploration_id>/<exploration_version>',
         editor.ExplorationStatisticsHandler, 'exploration_statistics_handler'),
     get_redirect_route(
-        r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',
+        r'/createhandler/state_rules_stats/<exploration_id>/' +
+        r'<escaped_state_name>',
         editor.StateRulesStatsHandler, 'state_rules_stats_handler'),
     get_redirect_route(
         r'/createhandler/started_tutorial_event',
@@ -338,6 +341,16 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<exploration_id>/<thread_id>' % feconf.FEEDBACK_THREAD_URL_PREFIX,
         feedback.ThreadHandler, 'feedback_thread_handler'),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.SUGGESTION_URL_PREFIX,
+        feedback.SuggestionHandler, 'suggestion_handler'),
+    get_redirect_route(
+        r'%s/<exploration_id>/<thread_id>' %
+        feconf.SUGGESTION_ACTION_URL_PREFIX,
+        feedback.SuggestionActionHandler, 'suggestion_action_handler'),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.SUGGESTION_LIST_URL_PREFIX,
+        feedback.SuggestionListHandler, 'suggestion_list_handler'),
 
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_URL_PREFIX,

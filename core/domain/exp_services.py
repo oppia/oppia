@@ -21,7 +21,7 @@ stored in the database. In particular, the various query methods should
 delegate to the Exploration model class. This will enable the exploration
 storage model to be changed without affecting this module and others above it.
 """
-
+import collections
 import copy
 import datetime
 import logging
@@ -31,6 +31,7 @@ import StringIO
 import zipfile
 
 from core.domain import exp_domain
+from core.domain import feedback_services
 from core.domain import fs_domain
 from core.domain import rights_manager
 from core.domain import user_services
@@ -41,7 +42,8 @@ import utils
 memcache_services = models.Registry.import_memcache_services()
 search_services = models.Registry.import_search_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models, feedback_models) = models.Registry.import_models(
+    [models.NAMES.exploration, models.NAMES.feedback])
 
 # This takes additional 'title' and 'category' parameters.
 CMD_CREATE_NEW = 'create_new'
@@ -159,7 +161,8 @@ def get_exploration_summary_from_model(exp_summary_model):
         exp_summary_model.ratings, exp_summary_model.status,
         exp_summary_model.community_owned, exp_summary_model.owner_ids,
         exp_summary_model.editor_ids, exp_summary_model.viewer_ids,
-        exp_summary_model.contributor_ids, exp_summary_model.version,
+        exp_summary_model.contributor_ids,
+        exp_summary_model.contributors_summary, exp_summary_model.version,
         exp_summary_model.exploration_model_created_on,
         exp_summary_model.exploration_model_last_updated
     )
@@ -468,7 +471,7 @@ def apply_change_list(exploration_id, change_list):
                     state.update_interaction_default_outcome(change.new_value)
                 elif (
                         change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS):
+                        exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
                     state.update_interaction_confirmed_unclassified_answers(
                         change.new_value)
                 elif (
@@ -964,7 +967,8 @@ def publish_exploration_and_update_user_profiles(committer_id, exp_id):
 
 
 def update_exploration(
-        committer_id, exploration_id, change_list, commit_message):
+        committer_id, exploration_id, change_list, commit_message,
+        is_suggestion=False):
     """Update an exploration. Commits changes.
 
     Args:
@@ -975,14 +979,28 @@ def update_exploration(
         changes are applied in sequence to produce the resulting exploration.
     - commit_message: str or None. A description of changes made to the state.
         For published explorations, this must be present; for unpublished
-        explorations, it should be equal to None.
+        explorations, it should be equal to None. For suggestions that are
+        being accepted, and only for such commits, it should start with
+        feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX.
+    - is_suggestion: bool. whether the update is due to a suggestion being
+        accepted.
     """
     is_public = rights_manager.is_exploration_public(exploration_id)
-
     if is_public and not commit_message:
         raise ValueError(
             'Exploration is public so expected a commit message but '
             'received none.')
+
+    if (is_suggestion and (
+            not commit_message or
+            not commit_message.startswith(
+                feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX))):
+        raise ValueError('Invalid commit message for suggestion.')
+    if (not is_suggestion and commit_message and commit_message.startswith(
+            feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)):
+        raise ValueError(
+            'Commit messages for non-suggestions may not start with \'%s\'' %
+            feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
 
     exploration = apply_change_list(exploration_id, change_list)
     _save_exploration(committer_id, exploration, commit_message, change_list)
@@ -1023,9 +1041,11 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
         old_exp_summary = get_exploration_summary_from_model(exp_summary_model)
         ratings = old_exp_summary.ratings or feconf.get_empty_ratings()
         contributor_ids = old_exp_summary.contributor_ids or []
+        contributors_summary = old_exp_summary.contributors_summary or {}
     else:
         ratings = feconf.get_empty_ratings()
         contributor_ids = []
+        contributors_summary = {}
 
     # Update the contributor id list if necessary (contributors
     # defined as humans who have made a positive (i.e. not just
@@ -1034,6 +1054,17 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
             contributor_id_to_add not in feconf.SYSTEM_USER_IDS):
         if contributor_id_to_add not in contributor_ids:
             contributor_ids.append(contributor_id_to_add)
+
+    if contributor_id_to_add not in feconf.SYSTEM_USER_IDS:
+        if contributor_id_to_add is None:
+            # Revert commit or other non-positive commit
+            contributors_summary = compute_exploration_contributors_summary(
+                exploration.id)
+        else:
+            if contributor_id_to_add in contributors_summary:
+                contributors_summary[contributor_id_to_add] += 1
+            else:
+                contributors_summary[contributor_id_to_add] = 1
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
         _get_last_updated_by_human_ms(exploration.id) / 1000.0)
@@ -1045,10 +1076,36 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
         exploration.tags, ratings, exp_rights.status,
         exp_rights.community_owned, exp_rights.owner_ids,
         exp_rights.editor_ids, exp_rights.viewer_ids, contributor_ids,
-        exploration.version, exploration_model_created_on,
-        exploration_model_last_updated)
+        contributors_summary, exploration.version,
+        exploration_model_created_on, exploration_model_last_updated)
 
     return exp_summary
+
+
+def compute_exploration_contributors_summary(exploration_id):
+    """Returns a dict whose keys are user_ids and whose values are
+    the number of (non-revert) commits made to the given exploration
+    by that user_id. This does not count commits which have since been reverted.
+    """
+    snapshots_metadata = get_exploration_snapshots_metadata(exploration_id)
+    current_version = len(snapshots_metadata)
+    contributors_summary = collections.defaultdict(int)
+    while True:
+        snapshot_metadata = snapshots_metadata[current_version - 1]
+        committer_id = snapshot_metadata['committer_id']
+        is_revert = (snapshot_metadata['commit_type'] == 'revert')
+        if not is_revert and committer_id not in feconf.SYSTEM_USER_IDS:
+            contributors_summary[committer_id] += 1
+        if current_version == 1:
+            break
+
+        if is_revert:
+            current_version = snapshot_metadata['commit_cmds'][0][
+                'version_number']
+        else:
+            current_version -= 1
+    return contributors_summary
+
 
 def save_exploration_summary(exp_summary):
     """Save an exploration summary domain object as an ExpSummaryModel entity
@@ -1068,6 +1125,7 @@ def save_exploration_summary(exp_summary):
         editor_ids=exp_summary.editor_ids,
         viewer_ids=exp_summary.viewer_ids,
         contributor_ids=exp_summary.contributor_ids,
+        contributors_summary=exp_summary.contributors_summary,
         version=exp_summary.version,
         exploration_model_last_updated=(
             exp_summary.exploration_model_last_updated),
@@ -1398,3 +1456,90 @@ def search_explorations(query, limit, sort=None, cursor=None):
     """
     return search_services.search(
         query, SEARCH_INDEX_EXPLORATIONS, cursor, limit, sort, ids_only=True)
+
+
+def _is_suggestion_valid(thread_id, exploration_id):
+    """Check if the suggestion is still valid. A suggestion is considered
+    invalid if the name of the state that the suggestion was made for has
+    changed since."""
+
+    states = get_exploration_by_id(exploration_id).states
+    suggestion = (
+        feedback_models.SuggestionModel.get_by_exploration_and_thread_id(
+            exploration_id, thread_id))
+    return suggestion.state_name in states
+
+
+def _is_suggestion_handled(thread_id, exploration_id):
+    """Checks if the current suggestion has already been accepted/rejected."""
+
+    thread = feedback_models.FeedbackThreadModel.get_by_exp_and_thread_id(
+        exploration_id, thread_id)
+    return (
+        thread.status in [
+            feedback_models.STATUS_CHOICES_FIXED,
+            feedback_models.STATUS_CHOICES_IGNORED])
+
+
+def _create_change_list_from_suggestion(suggestion):
+    """Creates a change list from a suggestion object."""
+
+    return [{'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+             'state_name': suggestion['state_name'],
+             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+             'new_value': [suggestion['state_content']]}]
+
+
+def _get_commit_message_for_suggestion(
+        suggestion_author_username, commit_message):
+    """Returns a modified commit message for an accepted suggestion.
+
+    NOTE TO DEVELOPERS: This should not be changed, since in the future we may
+    want to determine and credit the original authors of suggestions, and in
+    order to do so we will look for commit messages that follow this format.
+    """
+    return '%s %s: %s' % (
+        feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX,
+        suggestion_author_username, commit_message)
+
+
+def accept_suggestion(editor_id, thread_id, exploration_id, commit_message):
+    """If the suggestion is valid, accepts it by updating the exploration.
+    Raises an exception if the suggestion is not valid."""
+
+    if not commit_message or not commit_message.strip():
+        raise Exception('Commit message cannot be empty.')
+    if _is_suggestion_handled(thread_id, exploration_id):
+        raise Exception('Suggestion has already been accepted/rejected.')
+    elif not _is_suggestion_valid(thread_id, exploration_id):
+        raise Exception('Invalid suggestion: The state for which it was made '
+                        'has been removed/renamed.')
+    else:
+        suggestion = feedback_services.get_suggestion(
+            exploration_id, thread_id)
+        suggestion_author_username = suggestion['author_name']
+        change_list = _create_change_list_from_suggestion(suggestion)
+        update_exploration(
+            editor_id, exploration_id, change_list,
+            _get_commit_message_for_suggestion(
+                suggestion_author_username, commit_message),
+            is_suggestion=True)
+        feedback_services.create_message(
+            exploration_id, thread_id, editor_id,
+            feedback_models.STATUS_CHOICES_FIXED, None,
+            'Suggestion accepted.')
+
+
+def reject_suggestion(editor_id, thread_id, exploration_id):
+    """Set the state of a suggetion to REJECTED."""
+
+    if _is_suggestion_handled(thread_id, exploration_id):
+        raise Exception('Suggestion has already been accepted/rejected.')
+    else:
+        thread = feedback_models.FeedbackThreadModel.get_by_exp_and_thread_id(
+            exploration_id, thread_id)
+        feedback_services.create_message(
+            exploration_id, thread_id, editor_id,
+            feedback_models.STATUS_CHOICES_IGNORED,
+            None, 'Suggestion rejected.')
+        thread.put()

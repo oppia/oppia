@@ -146,24 +146,30 @@ class CsrfTokenManagerTest(test_utils.GenericTestBase):
             current_time = orig_time
             token1 = base.CsrfTokenManager.create_csrf_token('uid', 'page1')
             self.assertTrue(
-                base.CsrfTokenManager.is_csrf_token_valid('uid', 'page1', token1))
+                base.CsrfTokenManager.is_csrf_token_valid(
+                    'uid', 'page1', token1))
 
             current_time = orig_time + 100
             token2 = base.CsrfTokenManager.create_csrf_token('uid', 'page2')
             self.assertTrue(
-                base.CsrfTokenManager.is_csrf_token_valid('uid', 'page2', token2))
+                base.CsrfTokenManager.is_csrf_token_valid(
+                    'uid', 'page2', token2))
 
             current_time = orig_time + FORTY_EIGHT_HOURS_IN_SECS + PADDING
             self.assertFalse(
-                base.CsrfTokenManager.is_csrf_token_valid('uid', 'page1', token1))
+                base.CsrfTokenManager.is_csrf_token_valid(
+                    'uid', 'page1', token1))
             self.assertTrue(
-                base.CsrfTokenManager.is_csrf_token_valid('uid', 'page2', token2))
+                base.CsrfTokenManager.is_csrf_token_valid(
+                    'uid', 'page2', token2))
 
             current_time = orig_time + 100 + FORTY_EIGHT_HOURS_IN_SECS + PADDING
             self.assertFalse(
-                base.CsrfTokenManager.is_csrf_token_valid('uid', 'page1', token1))
+                base.CsrfTokenManager.is_csrf_token_valid(
+                    'uid', 'page1', token1))
             self.assertFalse(
-                base.CsrfTokenManager.is_csrf_token_valid('uid', 'page2', token2))
+                base.CsrfTokenManager.is_csrf_token_valid(
+                    'uid', 'page2', token2))
 
 
 class EscapingTest(test_utils.GenericTestBase):

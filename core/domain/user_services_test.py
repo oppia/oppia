@@ -271,7 +271,8 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         self.assertIsNotNone(user_services.get_user_settings(
             self.admin_id).first_contribution_msec)
 
-        # Test editor of published collection has updated first contribution time.
+        # Test editor of published collection has updated
+        # first contribution time.
         rights_manager.release_ownership_of_collection(
             self.admin_id, self.COL_ID)
 
@@ -285,7 +286,8 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         self.assertIsNotNone(user_services.get_user_settings(
             self.editor_id).first_contribution_msec)
 
-    def test_contribution_msec_does_not_update_until_collection_is_published(self):
+    def test_contribution_msec_does_not_update_until_collection_is_published(
+            self):
         self.save_new_valid_collection(
             self.COL_ID, self.admin_id, title=self.COLLECTION_TITLE,
             category=self.COLLECTION_CATEGORY,
@@ -330,7 +332,8 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         self.assertIsNotNone(user_services.get_user_settings(
             self.editor_id).first_contribution_msec)
 
-    def test_contribution_msec_does_not_change_if_no_contribution_to_collection(self):
+    def test_contribution_msec_does_not_change_if_no_contribution_to_collection(
+            self):
         self.save_new_valid_collection(
             self.COL_ID, self.admin_id, title=self.COLLECTION_TITLE,
             category=self.COLLECTION_CATEGORY,

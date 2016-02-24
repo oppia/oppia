@@ -26,8 +26,8 @@ from core.domain import user_jobs_one_off
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-(user_models,) = models.Registry.import_models(
-    [models.NAMES.user])
+(user_models, feedback_models) = models.Registry.import_models(
+    [models.NAMES.user, models.NAMES.feedback])
 taskqueue_services = models.Registry.import_taskqueue_services()
 search_services = models.Registry.import_search_services()
 
@@ -215,10 +215,11 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             feedback_services.create_thread(
                 self.EXP_ID_1, None, self.user_b_id, 'subject', 'text')
             # User C adds to that thread.
-            thread_id = feedback_services.get_threadlist(
-                self.EXP_ID_1)[0]['thread_id']
+            thread_id = feedback_services.get_all_threads(
+                self.EXP_ID_1, False)[0]['thread_id']
             feedback_services.create_message(
-                thread_id, self.user_c_id, None, None, 'more text')
+                self.EXP_ID_1, thread_id, self.user_c_id, None, None,
+                'more text')
 
         self._run_one_off_job()
 
@@ -227,12 +228,16 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             self.user_b_id)
         user_c_subscriptions_model = user_models.UserSubscriptionsModel.get(
             self.user_c_id)
+
         self.assertEqual(user_b_subscriptions_model.activity_ids, [])
         self.assertEqual(user_c_subscriptions_model.activity_ids, [])
+        full_thread_id = (
+            feedback_models.FeedbackThreadModel.generate_full_thread_id(
+                self.EXP_ID_1, thread_id))
         self.assertEqual(
-            user_b_subscriptions_model.feedback_thread_ids, [thread_id])
+            user_b_subscriptions_model.feedback_thread_ids, [full_thread_id])
         self.assertEqual(
-            user_c_subscriptions_model.feedback_thread_ids, [thread_id])
+            user_c_subscriptions_model.feedback_thread_ids, [full_thread_id])
 
     def test_exploration_subscription(self):
         with self.swap(
@@ -509,7 +514,8 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
         self.assertIsNone(
-            user_services.get_user_settings(self.admin_id).first_contribution_msec)
+            user_services.get_user_settings(
+                self.admin_id).first_contribution_msec)
 
         # Test all owners and editors of exploration after publication have
         # updated times.
@@ -533,7 +539,8 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         self.assertIsNotNone(user_services.get_user_settings(
             self.editor_id).first_contribution_msec)
 
-    def test_contribution_msec_does_not_update_on_unpublished_explorations(self):
+    def test_contribution_msec_does_not_update_on_unpublished_explorations(
+            self):
         self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
         exp_services.publish_exploration_and_update_user_profiles(
@@ -547,7 +554,8 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
 
         # Test that first contribution time is not set for unpublished
         # explorations.
-        job_id = user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new()
+        job_id = (
+            user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
         user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
         self.assertIsNone(user_services.get_user_settings(
