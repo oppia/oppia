@@ -7,11 +7,6 @@
        ng-class="{'conversation-skin-left-card': isCurrentSupplementalCardNonempty() && canWindowFitTwoCards(), 'conversation-skin-has-subsidiary-cards': isCurrentSupplementalCardNonempty() && !canWindowFitTwoCards()}">
     <div class="conversation-skin-tutor-card-content">
       <div class="conversation-skin-tutor-card-top-section">
-        <!--
-          This following div code is used to determine whether card is hidden or not
-          in extension/rich_text_components/Video/Video.js, any changes in this code
-          will be required to be done there too
-        -->
         <div class="conversation-skin-tutor-card-top-content"
              angular-html-bind="upcomingContentHtml">
         </div>
