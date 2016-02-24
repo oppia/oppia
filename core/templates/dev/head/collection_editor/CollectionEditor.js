@@ -39,13 +39,15 @@ oppia.controller('CollectionEditor', ['$scope',
     $scope.collection = null;
     $scope.collectionId = GLOBALS.collectionId;
     $scope.collectionSkillList = SkillListObjectFactory.create([]);
+    $scope.isPublic = GLOBALS.isPublic;
 
     // Load the collection to be edited.
     WritableCollectionBackendApiService.fetchWritableCollection(
       $scope.collectionId).then(
-        function(collection) {
-          $scope.collection = CollectionObjectFactory.create(collection);
-          $scope.collectionSkillList.setSkills(collection.skills);
+        function(collectionBackendObject) {
+          $scope.collection = CollectionObjectFactory.create(
+            collectionBackendObject);
+          $scope.collectionSkillList.setSkills(collectionBackendObject.skills);
         }, function(error) {
           warningsData.addWarning(
             error || 'There was an error loading the collection.');
@@ -58,7 +60,7 @@ oppia.controller('CollectionEditor', ['$scope',
     // To be used after mutating the prerequisite and/or acquired skill lists.
     $scope.updateSkillList = function() {
       $scope.collectionSkillList.clearSkills();
-      $scope.collectionSkillList.concatSkillList(
+      $scope.collectionSkillList.addSkillsFromSkillList(
         $scope.collection.getSkillList());
       $scope.collectionSkillList.sortSkills();
     };
@@ -74,8 +76,10 @@ oppia.controller('CollectionEditor', ['$scope',
       WritableCollectionBackendApiService.updateCollection(
         $scope.collection.getId(), $scope.collection.getVersion(),
         commitMessage, UndoRedoService.getCommittableChangeList()).then(
-        function(collection) {
-          $scope.collection = CollectionObjectFactory.create(collection);
+        function(collectionBackendObject) {
+          $scope.collection = CollectionObjectFactory.create(
+            collectionBackendObject);
+          $scope.collectionSkillList.setSkills(collectionBackendObject.skills);
           UndoRedoService.clearChanges();
         }, function(error) {
           warningsData.addWarning(
@@ -88,10 +92,13 @@ oppia.controller('CollectionEditor', ['$scope',
       // may have errors/warnings. Publish should only show up if the collection
       // is private. This also needs a confirmation of destructive action since
       // it is not reversible.
-      var isPublic = true;
       CollectionRightsBackendApiService.setCollectionPublic(
-        $scope.collectionId, $scope.collection.getVersion(), isPublic).then(
-        function() {}, function() {
+        $scope.collectionId, $scope.collection.getVersion()).then(
+        function() {
+          // TODO(bhenning): There should be a scope-level rights object used,
+          // instead. The rights object should be loaded with the collection.
+          $scope.isPublic = true;
+        }, function() {
           warningsData.addWarning(
             'There was an error when publishing the collection.');
         });

@@ -93,7 +93,7 @@ oppia.factory('CollectionNodeObjectFactory', [
 
     // TODO(bhenning): Ensure this matches the backend dict elements for
     // collection nodes.
-    CollectionNode.createNewFromExplorationId = function(explorationId) {
+    CollectionNode.createFromExplorationId = function(explorationId) {
       return CollectionNode.create({
         exploration_id: explorationId,
         acquired_skills: [],

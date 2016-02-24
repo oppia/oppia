@@ -38,8 +38,8 @@ var UndoRedoService = function() {
   };
 
   /**
-   * Push a change domain object to this service and apply it to the provided
-   * domain object.
+   * Pushes a change domain object onto the change stack and applies it to the
+   * provided domain object.
    */
   UndoRedoService.applyChange = function(changeObject, domainObject) {
     _appliedChanges.push(changeObject);
@@ -47,8 +47,8 @@ var UndoRedoService = function() {
   };
 
   /**
-   * Undo the last change to the provided domain object. This function returns
-   * false if there are no changes to undo, and true if otherwise.
+   * Undoes the last change to the provided domain object. This function returns
+   * false if there are no changes to undo, and true otherwise.
    */
   UndoRedoService.undoChange = function(domainObject) {
     if (_appliedChanges.length != 0) {
@@ -75,7 +75,7 @@ var UndoRedoService = function() {
   };
 
   /**
-   * Returns the current list of changes applied to the previous domain objects.
+   * Returns the current list of changes applied to the provided domain object.
    * This list will not contain undone actions. Changes to the returned list
    * will not be reflected in this service.
    */
@@ -97,7 +97,7 @@ var UndoRedoService = function() {
   };
 
   /**
-   * Returns the number of changes applied to preivous domain objects.
+   * Returns the number of changes that have been applied to the domain object.
    */
   UndoRedoService.getChangeCount = function() {
     return _appliedChanges.length;
@@ -111,11 +111,13 @@ var UndoRedoService = function() {
   };
 
   /**
-   * Clears all changes applied to previous domain objects. This function simply
-   * erases the history of the UndoRedoService; it does not actually undo any
-   * previously-applied changes.
+   * Clears the change history. This does not reverse any of the changes applied
+   * from applyChange() or redoChange().
    */
   UndoRedoService.clearChanges = function() {
+    // Clears the existing arrays in-place, since there may be Angular bindings
+    // to these arrays and they can't be reset to empty arrays.See for context:
+    // http://stackoverflow.com/a/1232046
     _appliedChanges.length = 0;
     _undoneChanges.length = 0;
   };

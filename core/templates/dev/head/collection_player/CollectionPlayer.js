@@ -34,10 +34,11 @@ oppia.animation('.oppia-collection-animate-slide', function() {
 
 oppia.controller('CollectionPlayer', [
   '$scope', 'CollectionBackendApiService', 'CollectionObjectFactory',
-  'warningsData',
+  'CollectionPlaythroughObjectFactory', 'warningsData',
   function($scope, CollectionBackendApiService, CollectionObjectFactory,
-    warningsData) {
+    CollectionPlaythroughObjectFactory, warningsData) {
     $scope.collection = null;
+    $scope.collectionPlaythrough = null;
     $scope.collectionId = GLOBALS.collectionId;
     $scope.showingAllExplorations = !GLOBALS.isLoggedIn;
 
@@ -61,37 +62,30 @@ oppia.controller('CollectionPlayer', [
 
     $scope.getNextRecommendedCollectionNodes = function() {
       return $scope.getCollectionNodesForExplorationIds(
-        $scope.collection.getNextExplorationIds());
+        $scope.collectionPlaythrough.getNextExplorationIds());
     };
 
     $scope.getCompletedExplorationNodes = function() {
       return $scope.getCollectionNodesForExplorationIds(
-        $scope.collection.getCompletedExplorationIds());
+        $scope.collectionPlaythrough.getCompletedExplorationIds());
     };
 
     $scope.getNonRecommendedCollectionNodeCount = function() {
       return $scope.collection.getCollectionNodeCount() - (
-        $scope.collection.getNextRecommendedCollectionNodeCount() +
-        $scope.collection.getCompletedExplorationNodeCount());
+        $scope.collectionPlaythrough.getNextRecommendedCollectionNodeCount() +
+        $scope.collectionPlaythrough.getCompletedExplorationNodeCount());
     };
 
     $scope.getNonRecommendedCollectionNodes = function() {
       var displayedExplorationIds = (
-        $scope.collection.getNextExplorationIds().concat(
-          $scope.collection.getCompletedExplorationIds()));
+        $scope.collectionPlaythrough.getNextExplorationIds().concat(
+          $scope.collectionPlaythrough.getCompletedExplorationIds()));
       var nonRecommendedCollectionNodes = [];
       var collectionNodes = $scope.collection.getCollectionNodes();
       for (var i = 0; i < collectionNodes.length; i++) {
         var collectionNode = collectionNodes[i];
         var explorationId = collectionNode.getExplorationId();
-        var searchIndex = -1;
-        for (var j = 0; j < displayedExplorationIds.length; j++) {
-          if (displayedExplorationIds[j] === explorationId) {
-            searchIndex = j;
-            break;
-          }
-        }
-        if (searchIndex == -1) {
+        if (displayedExplorationIds.indexOf(explorationId) == -1) {
           nonRecommendedCollectionNodes.push(collectionNode);
         }
       }
@@ -104,8 +98,12 @@ oppia.controller('CollectionPlayer', [
 
     // Load the collection the learner wants to view.
     CollectionBackendApiService.loadCollection($scope.collectionId).then(
-      function(collection) {
-        $scope.collection = CollectionObjectFactory.create(collection);
+      function(collectionBackendObject) {
+        $scope.collection = CollectionObjectFactory.create(
+          collectionBackendObject);
+        $scope.collectionPlaythrough = (
+          CollectionPlaythroughObjectFactory.create(
+            collectionBackendObject.playthrough_dict))
       },
       function() {
         // TODO(bhenning): Handle not being able to load the collection.

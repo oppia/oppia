@@ -83,14 +83,14 @@ oppia.factory('SkillListObjectFactory', [function() {
     // Returns the same result as getSkills(), except changes to the returned
     // list are reflected in this class. This should only be used for angular
     // bindings. Please note this reference is never invalidated; the internal
-    // skill list domain object guarantees this reference will not change for
-    // the lifetime of the skill list object.
+    // SkillList domain object guarantees this reference will not change for the
+    // lifetime of the SkillList object.
     SkillList.prototype.getBindableSkills = function() {
       return this._skillList;
     };
 
     // Returns the index for the given skill, based on a case-insensitive search
-    // of the skill list, or -1 if the skill name is not contained within the
+    // of the SkillList, or -1 if the skill name is not contained within the
     // list.
     SkillList.prototype.indexOfSkill = function(skillName) {
       var lowercaseSkillName = skillName.toLowerCase();
@@ -126,9 +126,9 @@ oppia.factory('SkillListObjectFactory', [function() {
       return this._skillList.length;
     };
 
-    // Appends another skill list domain object to this list object, where
+    // Adds the skills from another SkillList domain object to this one, where
     // duplicate skills are ignored.
-    SkillList.prototype.concatSkillList = function(otherSkillList) {
+    SkillList.prototype.addSkillsFromSkillList = function(otherSkillList) {
       for (var i = 0; i < otherSkillList.getSkillCount(); i++) {
         this.addSkill(otherSkillList.getSkillByIndex(i));
       }
@@ -137,10 +137,13 @@ oppia.factory('SkillListObjectFactory', [function() {
     // Empties this list of all skill names. This will not invalidate previous
     // references to the underlying skills list returned by getBindableSkills().
     SkillList.prototype.clearSkills = function() {
+      // Clears the existing array in-place, since there may be Angular bindings
+      // to this array and they can't be reset to empty arrays.See for context:
+      // http://stackoverflow.com/a/1232046
       this._skillList.length = 0;
     };
 
-    // Sorts the skill list lexicographically.
+    // Sorts the SkillList lexicographically.
     SkillList.prototype.sortSkills = function() {
       this._skillList.sort();
     };

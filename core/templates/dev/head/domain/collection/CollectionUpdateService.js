@@ -51,16 +51,22 @@ oppia.factory('CollectionUpdateService', [
       COLLECTION_PROPERTY_OBJECTIVE,
       COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS,
       COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS) {
+      // Creates a change using an apply function, reverse function, a change
+      // command and related parameters. The change is applied to a given
+      // collection.
       var _applyChange = function(collection, command, params, apply, reverse) {
         var changeDict = angular.copy(params);
         changeDict.cmd = command;
         var changeObj = ChangeObjectFactory.create(changeDict, apply, reverse);
         UndoRedoService.applyChange(changeObj, collection);
       };
+
       var _getParameterFromChangeDict = function(changeDict, paramName) {
         return changeDict[paramName];
       };
 
+      // Applies a collection property change, specifically. See _applyChange()
+      // for details on the other behavior of this function.
       var _applyPropertyChange = function(
           collection, propertyName, newValue, apply, reverse) {
         _applyChange(collection, CMD_EDIT_COLLECTION_PROPERTY, {
@@ -68,10 +74,13 @@ oppia.factory('CollectionUpdateService', [
           new_value: newValue
         }, apply, reverse);
       };
+
       var _getNewPropertyValueFromChangeDict = function(changeDict) {
         return _getParameterFromChangeDict(changeDict, 'new_value');
       };
 
+      // Applies a property change to a collection node. See _applyChanges() for
+      // details on the other behavior of this function.
       var _applyNodePropertyChange = function(
           collection, propertyName, explorationId, newValue, apply, reverse) {
         _applyChange(collection, CMD_EDIT_COLLECTION_NODE_PROPERTY, {
@@ -80,11 +89,17 @@ oppia.factory('CollectionUpdateService', [
           new_value: newValue
         }, apply, reverse);
       };
+
       var _getExplorationIdFromChangeDict = function(changeDict) {
         return _getParameterFromChangeDict(changeDict, 'exploration_id');
       };
 
-      var SetSkillsMutator = function(oldSkills, skillGetterCallback) {
+      // A mutator object which provides generic apply() and reverse() functions
+      // for changing the skills of a collection. The skillListGetterCallback()
+      // takes a CollectionNode domain object and needs to return a SkillList
+      // domain object whose skills can be updated. The oldSkills parameter must
+      // be a copy of the current skills stored in the SkillList domain object.
+      var SetSkillsMutator = function(oldSkills, skillListGetterCallback) {
         var _getCollectionNode = function(changeDict, collection) {
           var explorationId = _getExplorationIdFromChangeDict(changeDict);
           return collection.getCollectionNodeByExplorationId(explorationId);
@@ -92,19 +107,24 @@ oppia.factory('CollectionUpdateService', [
         this.apply = function(changeDict, collection) {
           var skills = _getNewPropertyValueFromChangeDict(changeDict);
           var collectionNode = _getCollectionNode(changeDict, collection);
-          skillGetterCallback(collectionNode).setSkills(skills);
+          skillListGetterCallback(collectionNode).setSkills(skills);
         };
         this.reverse = function(changeDict, collection) {
           var collectionNode = _getCollectionNode(changeDict, collection);
-          skillGetterCallback(collectionNode).setSkills(oldSkills);
+          skillListGetterCallback(collectionNode).setSkills(oldSkills);
         };
       };
 
+      // An instance of SetSkillsMutator with apply() and reverse() functions
+      // which affect the prerequisite skills of a collecton node.
       var SetPrerequisiteSkillsMutator = function(oldSkills) {
         return new SetSkillsMutator(oldSkills, function(collectionNode) {
           return collectionNode.getPrerequisiteSkillList();
         });
       };
+
+      // An instance of SetSkillsMutator with apply() and reverse() functions
+      // which affect the acquired skills of a collecton node.
       var SetAcquiredSkillsMutator = function(oldSkills) {
         return new SetSkillsMutator(oldSkills, function(collectionNode) {
           return collectionNode.getAcquiredSkillList();
@@ -123,15 +143,13 @@ oppia.factory('CollectionUpdateService', [
             exploration_id: explorationId
           }, function(changeDict, collection) {
             // Apply.
-            var explorationId = _getParameterFromChangeDict(
-              changeDict, 'exploration_id');
+            var explorationId = _getExplorationIdFromChangeDict(changeDict);
             collection.addCollectionNode(
-              CollectionNodeObjectFactory.createNewFromExplorationId(
+              CollectionNodeObjectFactory.createFromExplorationId(
                 explorationId));
           }, function(changeDict, collection) {
             // Undo.
-            var explorationId = _getParameterFromChangeDict(
-              changeDict, 'exploration_id');
+            var explorationId = _getExplorationIdFromChangeDict(changeDict);
             collection.deleteCollectionNode(explorationId);
           });
         },
@@ -141,15 +159,13 @@ oppia.factory('CollectionUpdateService', [
          * the undo/redo service.
          */
         deleteCollectionNode: function(collection, explorationId) {
-          // TODO(bhenning): Check if the collection node needs to be cloned.
-          var oldCollectionNode = collection.getCollectionNodeByExplorationId(
-            explorationId);
+          var oldCollectionNode = angular.copy(
+            collection.getCollectionNodeByExplorationId(explorationId));
           _applyChange(collection, CMD_DELETE_COLLECTION_NODE, {
             exploration_id: explorationId
           }, function(changeDict, collection) {
             // Apply.
-            var explorationId = _getParameterFromChangeDict(
-              changeDict, 'exploration_id');
+            var explorationId = _getExplorationIdFromChangeDict(changeDict);
             collection.deleteCollectionNode(explorationId);
           }, function(changeDict, collection) {
             // Undo.
@@ -216,7 +232,8 @@ oppia.factory('CollectionUpdateService', [
          * and records the change in the undo/redo service.
          */
         setPrerequisiteSkills: function(collection, collectionNode) {
-          var oldSkills = collectionNode.getPrerequisiteSkillList().getSkills();
+          var oldSkills = angular.copy(
+            collectionNode.getPrerequisiteSkillList().getSkills());
           var mutator = new SetPrerequisiteSkillsMutator(oldSkills);
           _applyNodePropertyChange(
             collection, COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS,
@@ -229,7 +246,8 @@ oppia.factory('CollectionUpdateService', [
          * records the change in the undo/redo service.
          */
         setAcquiredSkills: function(collection, collectionNode) {
-          var oldSkills = collectionNode.getAcquiredSkillList().getSkills();
+          var oldSkills = angular.copy(
+            collectionNode.getAcquiredSkillList().getSkills());
           var mutator = new SetAcquiredSkillsMutator(oldSkills);
           _applyNodePropertyChange(
             collection, COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS,

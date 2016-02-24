@@ -292,9 +292,10 @@ def get_learner_collection_dict_by_id(
 
     collection_dict = collection.to_dict()
     collection_dict['skills'] = collection.skills
-    collection_dict['next_exploration_ids'] = next_exploration_ids
-    collection_dict['completed_exploration_ids'] = (
-        completed_exploration_ids)
+    collection_dict['playthrough_dict'] = {
+        'next_exploration_ids': next_exploration_ids,
+        'completed_exploration_ids': completed_exploration_ids
+    }
     collection_dict['version'] = collection.version
 
     collection_is_public = rights_manager.is_collection_public(collection_id)
@@ -550,7 +551,7 @@ def apply_change_list(collection_id, change_list):
         raise
 
 
-def validate_collection_public_explorations(collection):
+def validate_exps_in_collection_are_public(collection):
     for exploration_id in collection.exploration_ids:
         if rights_manager.is_exploration_private(exploration_id):
             raise utils.ValidationError(
@@ -596,7 +597,7 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     # TODO(bhenning): Ensure the latter is enforced above when trying to
     # publish a collection.
     if rights_manager.is_collection_public(collection.id):
-        validate_collection_public_explorations(collection)
+        validate_exps_in_collection_are_public(collection)
 
     collection_model = collection_models.CollectionModel.get(
         collection.id, strict=False)

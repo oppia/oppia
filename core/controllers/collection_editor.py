@@ -118,6 +118,7 @@ class CollectionEditorPage(CollectionEditorHandler):
                 rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id))
 
         self.values.update({
+            'is_public': rights_manager.is_collection_public(collection_id),
             'can_edit': can_edit,
             'collection_id': collection.id,
             'title': collection.title
@@ -186,7 +187,7 @@ class CollectionRightsHandler(CollectionEditorHandler):
             if is_public:
                 try:
                     collection.validate(strict=True)
-                    collection_services.validate_collection_public_explorations(
+                    collection_services.validate_exps_in_collection_are_public(
                         collection)
                 except utils.ValidationError as e:
                     raise self.InvalidInputException(e)
@@ -195,7 +196,7 @@ class CollectionRightsHandler(CollectionEditorHandler):
                     self.user_id, collection_id)
                 collection_services.index_collections_given_ids([
                     collection_id])
-            else:
+            elif not self.is_admin:
                 raise self.InvalidInputException(
                     'Cannot unpublish a collection.')
 

@@ -22,7 +22,7 @@ oppia.factory('CollectionRightsBackendApiService', [
     '$http', '$q', 'COLLECTION_RIGHTS_URL_TEMPLATE', 'UrlInterpolationService',
     function($http, $q, COLLECTION_RIGHTS_URL_TEMPLATE,
       UrlInterpolationService) {
-      var _setCollectionPublic = function(
+      var _setCollectionStatus = function(
           collectionId, collectionVersion, isPublic, successCallback,
           errorCallback) {
         var collectionRightsUrl = UrlInterpolationService.interpolateUrl(
@@ -50,13 +50,13 @@ oppia.factory('CollectionRightsBackendApiService', [
 
       return {
         /**
-         * Updates a collection's rights given its ID and rights parameters.
+         * Updates a collection's rights to be have public learner access, given
+         * its ID and version.
          */
-        setCollectionPublic: function(
-            collectionId, collectionVersion, isPublic) {
+        setCollectionPublic: function(collectionId, collectionVersion) {
           return $q(function(resolve, reject) {
-            _setCollectionPublic(
-              collectionId, collectionVersion, isPublic, resolve, reject);
+            _setCollectionStatus(
+              collectionId, collectionVersion, true, resolve, reject);
           });
         }
       };

@@ -47,8 +47,8 @@ oppia.factory('ChangeObjectFactory', [function() {
     };
 
     // Reverse-applies this change to the related object (such as a frontend
-    // collection domain object). Calling this may have unintentional side
-    // effects if called without first calling applyChange().
+    // collection domain object). This method should only be used to reverse a
+    // change that was previously applied by calling the applyChange() method.
     ChangeObjectFactory.prototype.reverseChange = function(domainObject) {
       this.reverseChangeToObject(this.getBackendChangeObject(), domainObject);
     };

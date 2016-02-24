@@ -29,15 +29,16 @@ oppia.factory('CollectionObjectFactory', [
       this._objective = collectionBackendObject.objective;
       this._category = collectionBackendObject.category;
       this._version = collectionBackendObject.version;
-      this._nextExplorationIds = collectionBackendObject.next_exploration_ids;
-      this._completedExplorationIds = (
-        collectionBackendObject.completed_exploration_ids);
       this._nodes = [];
-      this._nodeIndexExplorationIdMap = {};
+
+      // This map acts a fast way of looking up a collection node for a given
+      // exploration ID.
+      this._explorationIdToNodeIndexMap = {};
       for (var i = 0; i < collectionBackendObject.nodes.length; i++) {
         this._nodes[i] = CollectionNodeObjectFactory.create(
           collectionBackendObject.nodes[i]);
-        this._nodeIndexExplorationIdMap[this._nodes[i].getExplorationId()] = i;
+        var explorationId = this._nodes[i].getExplorationId();
+        this._explorationIdToNodeIndexMap[explorationId] = i;
       }
     };
 
@@ -75,34 +76,6 @@ oppia.factory('CollectionObjectFactory', [
       return this._version;
     };
 
-    // Returns a list of upcoming exploration IDs. Changes to this list are not
-    // reflected in this collection.
-    Collection.prototype.getNextExplorationIds = function() {
-      return angular.copy(this._nextExplorationIds);
-    };
-
-    Collection.prototype.getNextRecommendedCollectionNodeCount = function() {
-      return this._nextExplorationIds.length;
-    };
-
-    Collection.hasFinishedCollection = function() {
-      return this._nextExplorationIds.length == 0;
-    };
-
-    // Returns a list of explorations completed that are related to this
-    // collection. Changes to this list are not reflected in this collection.
-    Collection.prototype.getCompletedExplorationIds = function() {
-      return angular.copy(this._completedExplorationIds);
-    };
-
-    Collection.prototype.getCompletedExplorationNodeCount = function() {
-      return this._completedExplorationIds.length;
-    };
-
-    Collection.prototype.hasStartedCollection = function() {
-      return this._completedExplorationIds.length != 0;
-    };
-
     // Adds a new frontend collection node domain object to this collection.
     // This will return true if the node was successfully added, or false if the
     // given collection node references an exploration ID already referenced by
@@ -110,8 +83,8 @@ oppia.factory('CollectionObjectFactory', [
     // be reflected in this collection.
     Collection.prototype.addCollectionNode = function(collectionNodeObject) {
       var explorationId = collectionNodeObject.getExplorationId();
-      if (!this._nodeIndexExplorationIdMap.hasOwnProperty(explorationId)) {
-        this._nodeIndexExplorationIdMap[explorationId] = this._nodes.length;
+      if (!this._explorationIdToNodeIndexMap.hasOwnProperty(explorationId)) {
+        this._explorationIdToNodeIndexMap[explorationId] = this._nodes.length;
         this._nodes.push(collectionNodeObject);
         return true;
       }
@@ -127,16 +100,16 @@ oppia.factory('CollectionObjectFactory', [
       // invalidated, leading to errors if its mutated in the future. This might
       // help prevent bugs where collection nodes are stored and changed after
       // being removed from a collection.
-      if (this._nodeIndexExplorationIdMap.hasOwnProperty(explorationId)) {
-        var nodeIndex = this._nodeIndexExplorationIdMap[explorationId];
-        delete this._nodeIndexExplorationIdMap[explorationId];
+      if (this._explorationIdToNodeIndexMap.hasOwnProperty(explorationId)) {
+        var nodeIndex = this._explorationIdToNodeIndexMap[explorationId];
+        delete this._explorationIdToNodeIndexMap[explorationId];
         this._nodes.splice(nodeIndex, 1);
 
         // Update all node exploration ID map references past the removed index
         // to ensure they are still pointing to correct indexes.
         for (var i = nodeIndex; i < this._nodes.length; i++) {
           var nodeExpId = this._nodes[i].getExplorationId();
-          this._nodeIndexExplorationIdMap[nodeExpId] = i;
+          this._explorationIdToNodeIndexMap[nodeExpId] = i;
         }
         return true;
       }
@@ -146,14 +119,14 @@ oppia.factory('CollectionObjectFactory', [
     // Returns whether any collection nodes in this collection reference the
     // provided exploration ID.
     Collection.prototype.containsCollectionNode = function(explorationId) {
-      return this._nodeIndexExplorationIdMap.hasOwnProperty(explorationId);
+      return this._explorationIdToNodeIndexMap.hasOwnProperty(explorationId);
     };
 
     // Returns a collection node given an exploration ID, or undefined if no
     // collection node within this collection references the provided
     // exploration ID.
     Collection.prototype.getCollectionNodeByExplorationId = function(expId) {
-      return this._nodes[this._nodeIndexExplorationIdMap[expId]];
+      return this._nodes[this._explorationIdToNodeIndexMap[expId]];
     };
 
     // Returns a list of collection node objects for this collection. Changes to
@@ -182,8 +155,9 @@ oppia.factory('CollectionObjectFactory', [
       var skillList = SkillListObjectFactory.create([]);
       for (var i = 0; i < this._nodes.length; i++) {
         var collectionNode = this._nodes[i];
-        skillList.concatSkillList(collectionNode.getPrerequisiteSkillList());
-        skillList.concatSkillList(collectionNode.getAcquiredSkillList());
+        skillList.addSkillsFromSkillList(
+          collectionNode.getPrerequisiteSkillList());
+        skillList.addSkillsFromSkillList(collectionNode.getAcquiredSkillList());
       }
       return skillList;
     };
