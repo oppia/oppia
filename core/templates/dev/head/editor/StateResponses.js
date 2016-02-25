@@ -310,29 +310,36 @@ oppia.controller('StateResponses', [
       var interactionId = $scope.getCurrentInteractionId();
       if (interactionId === 'MultipleChoiceInput') {
         var choices = $scope.getAnswerChoices().length;
-        var suppressAnswer = responsesService.getAnswerGroups();
-        var defaultAnswers;
-        // For choice length, have indices 0 through choice length - 1
-        for (var x = 0; x < choices; x++) {
-          if (suppressAnswer['' + x + ''] === undefined) {
-            // Return false if no object exists for the index
-            /* Note that multiple choice only allows for
-            one rule per answerGroup*/
+        var answerGroups = responsesService.getAnswerGroups();
+        // First push all choice indices into an array
+        var choiceArray = [];
+        for (var i = 0; i < choices; i++) {
+          choiceArray.push(i);
+        }
+        /* Then cycle through answerGroup rule_specs
+        and put all of them into an array */
+        var answerArray = [];
+        for (var j = 0; j < answerGroups.length; j++) {
+          /* Make sure to check if a an answerGroup rule_spec
+          has more than one rule */
+          if (answerGroups['' + j + ''].rule_specs.length > 1) {
+            for (var k = 0;
+              k < answerGroups['' + j + ''].rule_specs.length; k++) {
+              answerArray.push(
+                answerGroups['' + j + ''].rule_specs[k].inputs.x
+              );
+            }
+          } else {
+            answerArray.push(
+              answerGroups['' + j + ''].rule_specs[0].inputs.x
+            );
+          }
+        }
+        // Then compare arrays for missing values
+        for (var l = 0; l < choiceArray.length; l++) {
+          if (answerArray.indexOf(l) < 0) {
             return false;
           }
-          /*
-            ToDo:
-            check if logged answer index
-            (suppressAnswer['' + x + ''].rule_specs[0].inputs.x)
-            match all indices because an answergroup (ex. item selection)
-            may contain more than one rule
-
-            Item selection inputs.x returns an array of one or more strings
-            that match the choices text
-            else if (suppressAnswer['' + x + ''].rule_specs[0].inputs.x !== x){
-              return false;
-            }
-            */
         }
         return true;
       }

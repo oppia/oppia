@@ -21,7 +21,7 @@
               Please give Oppia something useful to say here.
             </span>
           </span>
-          <span ng-if="!isSelfLoopWithNoFeedback(outcome) && outcome.feedback.length === 0 || isSelfLoopWithNoFeedback(outcome) && suppressWarnings()"
+          <span ng-if="(!isSelfLoopWithNoFeedback(outcome) && outcome.feedback.length === 0) || (isSelfLoopWithNoFeedback(outcome) && suppressWarnings())"
                 style="color: #888">
             <em>Nothing</em>
           </span>
