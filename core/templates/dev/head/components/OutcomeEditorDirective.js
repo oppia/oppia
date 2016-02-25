@@ -23,6 +23,7 @@ oppia.directive('outcomeEditor', [function() {
     restrict: 'E',
     scope: {
       isEditable: '&isEditable',
+      displayFeedback: '=',
       getOnSaveDestFn: '&onSaveDest',
       getOnSaveFeedbackFn: '&onSaveFeedback',
       outcome: '=outcome'
