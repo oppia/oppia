@@ -30,7 +30,9 @@ describe('Undo/Redo Service', function() {
   }));
 
   var _createChangeBackendObject = function(value) {
-    return { property_name: value };
+    return {
+      roperty_name: value
+    };
   };
 
   var _createChangeDomainObject = function(backendObj, applyFunc, reverseFunc) {

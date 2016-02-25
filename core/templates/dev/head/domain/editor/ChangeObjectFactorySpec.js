@@ -31,7 +31,9 @@ describe('Factory for Change domain objects', function() {
     var applyFunc = jasmine.createSpy('applyChange');
     var reverseFunc = jasmine.createSpy('reverseChange');
 
-    var changeBackendObject = { property_name: 'value' };
+    var changeBackendObject = {
+      property_name: 'value'
+    };
     ChangeObjectFactory.create(changeBackendObject, applyFunc, reverseFunc);
 
     expect(applyFunc).not.toHaveBeenCalled();
@@ -42,11 +44,15 @@ describe('Factory for Change domain objects', function() {
     var applyFunc = jasmine.createSpy('applyChange');
     var reverseFunc = jasmine.createSpy('reverseChange');
 
-    var changeBackendObject = { property_name: 'value' };
+    var changeBackendObject = {
+      property_name: 'value'
+    };
     var changeDomainObject = ChangeObjectFactory.create(
       changeBackendObject, applyFunc, reverseFunc);
 
-    var fakeDomainObject = { domain_property_name: 'fake value' };
+    var fakeDomainObject = {
+      domain_property_name: 'fake value'
+    };
     changeDomainObject.applyChange(fakeDomainObject);
 
     expect(applyFunc).toHaveBeenCalledWith(
@@ -58,11 +64,15 @@ describe('Factory for Change domain objects', function() {
     var applyFunc = jasmine.createSpy('applyChange');
     var reverseFunc = jasmine.createSpy('reverseChange');
 
-    var changeBackendObject = { property_name: 'value' };
+    var changeBackendObject = {
+      property_name: 'value'
+    };
     var changeDomainObject = ChangeObjectFactory.create(
       changeBackendObject, applyFunc, reverseFunc);
 
-    var fakeDomainObject = { domain_property_name: 'fake value' };
+    var fakeDomainObject = {
+      domain_property_name: 'fake value'
+    };
     changeDomainObject.reverseChange(fakeDomainObject);
 
     expect(reverseFunc).toHaveBeenCalledWith(
@@ -72,7 +82,9 @@ describe('Factory for Change domain objects', function() {
 
   it('should not receive changes to the provided change backend object',
       function() {
-    var changeBackendObject = { property_name: 'value' };
+    var changeBackendObject = {
+      property_name: 'value'
+    };
     var changeDomainObject = ChangeObjectFactory.create(
       changeBackendObject, function() {}, function() {});
 
