@@ -90,7 +90,7 @@ class MyExplorationsHandlerTest(test_utils.GenericTestBase):
     def test_managers_can_see_explorations(self):
         self.save_new_default_exploration(
             self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
-        self.set_admins([self.OWNER_EMAIL])
+        self.set_admins([self.OWNER_USERNAME])
 
         self.login(self.OWNER_EMAIL)
         response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
@@ -120,7 +120,7 @@ class MyExplorationsHandlerTest(test_utils.GenericTestBase):
         rights_manager.assign_role_for_exploration(
             self.owner_id, self.EXP_ID, self.collaborator_id,
             rights_manager.ROLE_EDITOR)
-        self.set_admins([self.OWNER_EMAIL])
+        self.set_admins([self.OWNER_USERNAME])
 
         self.login(self.COLLABORATOR_EMAIL)
         response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
@@ -151,7 +151,7 @@ class MyExplorationsHandlerTest(test_utils.GenericTestBase):
         rights_manager.assign_role_for_exploration(
             self.owner_id, self.EXP_ID, self.viewer_id,
             rights_manager.ROLE_VIEWER)
-        self.set_admins([self.OWNER_EMAIL])
+        self.set_admins([self.OWNER_USERNAME])
 
         self.login(self.VIEWER_EMAIL)
         response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)

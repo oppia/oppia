@@ -22,6 +22,7 @@ import feconf
 
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
+BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
 SITE_FORUM_URL = 'siteforum.url'
 
 
@@ -124,7 +125,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup('superadmin@example.com', 'superadm1n')
-        self.signup(BOTH_MODERATOR_AND_ADMIN_EMAIL, 'moderatorandadm1n')
+        self.signup(
+            BOTH_MODERATOR_AND_ADMIN_EMAIL, BOTH_MODERATOR_AND_ADMIN_USERNAME)
 
         # Navigate to any page. The role is not set.
         self.testapp.get('/').mustcontain(no=['/moderator', '/admin'])
@@ -140,10 +142,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.post_json('/adminhandler', {
             'action': 'save_config_properties',
             'new_config_property_values': {
-                config_domain.ADMIN_EMAILS.name: [
-                    self.ADMIN_EMAIL, BOTH_MODERATOR_AND_ADMIN_EMAIL],
-                config_domain.MODERATOR_EMAILS.name: [
-                    self.MODERATOR_EMAIL, BOTH_MODERATOR_AND_ADMIN_EMAIL],
+                config_domain.ADMIN_USERNAMES.name: [
+                    self.ADMIN_USERNAME,
+                    BOTH_MODERATOR_AND_ADMIN_USERNAME],
+                config_domain.MODERATOR_USERNAMES.name: [
+                    self.MODERATOR_USERNAME,
+                    BOTH_MODERATOR_AND_ADMIN_USERNAME],
             }
         }, csrf_token)
         self.logout()
