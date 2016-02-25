@@ -53,7 +53,9 @@ describe('Undo/Redo Service', function() {
 
     expect(UndoRedoService.hasChanges()).toBeFalsy();
 
-    var fakeDomainObject = { domain_property_name: 'fake value' };
+    var fakeDomainObject = {
+      domain_property_name: 'fake value'
+    };
     var changeBackendObject = _createChangeBackendObject('value');
     var changeDomainObject = _createChangeDomainObject(
       changeBackendObject, applyFunc, function() {});
@@ -71,7 +73,9 @@ describe('Undo/Redo Service', function() {
     expect(UndoRedoService.hasChanges()).toBeFalsy();
 
     // Apply the initial change.
-    var fakeDomainObject = { domain_property_name: 'fake value' };
+    var fakeDomainObject = {
+      domain_property_name: 'fake value'
+    };
     var changeBackendObject = _createChangeBackendObject('value');
     var changeDomainObject = _createChangeDomainObject(
       changeBackendObject, applyFunc, reverseFunc);
@@ -94,7 +98,9 @@ describe('Undo/Redo Service', function() {
     expect(UndoRedoService.hasChanges()).toBeFalsy();
 
     // Apply the initial change.
-    var fakeDomainObject = { domain_property_name: 'fake value' };
+    var fakeDomainObject = {
+      domain_property_name: 'fake value'
+    };
     var changeBackendObject = _createChangeBackendObject('value');
     var changeDomainObject = _createChangeDomainObject(
       changeBackendObject, applyFunc, reverseFunc);
@@ -115,14 +121,18 @@ describe('Undo/Redo Service', function() {
   });
 
   it('should not undo anything if no changes are applied', function() {
-    var fakeDomainObject = { domain_property_name: 'fake value' };
+    var fakeDomainObject = {
+      domain_property_name: 'fake value'
+    };
 
     expect(UndoRedoService.hasChanges()).toBeFalsy();
     expect(UndoRedoService.undoChange(fakeDomainObject)).toBeFalsy();
   });
 
   it('should not redo anything if no changes are undone', function() {
-    var fakeDomainObject = { domain_property_name: 'fake value' };
+    var fakeDomainObject = {
+      domain_property_name: 'fake value'
+    };
 
     expect(UndoRedoService.hasChanges()).toBeFalsy();
     expect(UndoRedoService.redoChange(fakeDomainObject)).toBeFalsy();
@@ -136,7 +146,9 @@ describe('Undo/Redo Service', function() {
     var applyFunc = jasmine.createSpy('applyChange');
     var reverseFunc = jasmine.createSpy('reverseChange');
 
-    var fakeDomainObject = { domain_property_name: 'fake value' };
+    var fakeDomainObject = {
+      domain_property_name: 'fake value'
+    };
     var changeBackendObject = _createChangeBackendObject('value');
     var changeDomainObject = _createChangeDomainObject(
       changeBackendObject, applyFunc, reverseFunc);
@@ -158,7 +170,9 @@ describe('Undo/Redo Service', function() {
     var appliedChanges = [];
     var reversedChanges = [];
 
-    var fakeDomainObject = { domain_property_name: 'fake value' };
+    var fakeDomainObject = {
+      domain_property_name: 'fake value'
+    };
     var changeBackendObject1 = _createChangeBackendObject('value1');
     var changeDomainObject1 = _createChangeDomainObject(
       changeBackendObject1, function() {
@@ -207,7 +221,9 @@ describe('Undo/Redo Service', function() {
       function() {
     expect(UndoRedoService.getChangeCount()).toEqual(0);
 
-    var fakeDomainObject = { domain_property_name: 'fake value' };
+    var fakeDomainObject = {
+      domain_property_name: 'fake value'
+    };
     var changeDomainObject1 = _createNoOpChangeDomainObject('value1');
     var changeDomainObject2 = _createNoOpChangeDomainObject('value2');
     var changeDomainObject3 = _createNoOpChangeDomainObject('value3');
@@ -230,7 +246,9 @@ describe('Undo/Redo Service', function() {
   it('should build a change list from only applied changes', function() {
     expect(UndoRedoService.getChangeCount()).toEqual(0);
 
-    var fakeDomainObject = { domain_property_name: 'fake value' };
+    var fakeDomainObject = {
+      domain_property_name: 'fake value'
+    };
     var changeDomainObject1 = _createNoOpChangeDomainObject('value1');
     var changeDomainObject2 = _createNoOpChangeDomainObject('value2');
     var changeDomainObject3 = _createNoOpChangeDomainObject('value3');
@@ -248,7 +266,9 @@ describe('Undo/Redo Service', function() {
 
   it('should return a change list whose mutations do not change the service',
       function() {
-    var fakeDomainObject = { domain_property_name: 'fake value' };
+    var fakeDomainObject = {
+      domain_property_name: 'fake value'
+    };
     var changeDomainObject1 = _createNoOpChangeDomainObject('value1');
     var changeDomainObject2 = _createNoOpChangeDomainObject('value2');
 
@@ -268,7 +288,9 @@ describe('Undo/Redo Service', function() {
   });
 
   it('should build a committable change list with one change', function() {
-    var fakeDomainObject = { domain_property_name: 'fake value' };
+    var fakeDomainObject = {
+      domain_property_name: 'fake value'
+    };
     var changeBackendObject = _createChangeBackendObject('value');
     var changeDomainObject = _createChangeDomainObject(changeBackendObject);
 
@@ -280,10 +302,13 @@ describe('Undo/Redo Service', function() {
     ]);
   });
 
-  it('should build a committable change list in the order of applied changes', function() {
+  it('should build a committable change list in the order of applied changes',
+      function() {
     // Perform a series of complex operations to build the committable change
     // list. Apply 3 changes, undo two, redo one, and apply one.
-    var fakeDomainObject = { domain_property_name: 'fake value' };
+    var fakeDomainObject = {
+      domain_property_name: 'fake value'
+    };
     var changeBackendObject1 = _createChangeBackendObject('value1');
     var changeBackendObject2 = _createChangeBackendObject('value2');
     var changeBackendObject3 = _createChangeBackendObject('value3');
