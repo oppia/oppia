@@ -441,7 +441,10 @@ var _selectRule = function(ruleElement, interactionId, ruleName) {
     if (interactionId === 'MultipleChoiceInput') {
       // This is a special case as it uses a dropdown to set a NonnegativeInt
       parameterElement.element(
-        by.cssContainingText('option', parameterValues[i])
+        by.tagName('button')
+      ).click();
+      parameterElement.element(
+        by.cssContainingText('.oppia-html-select-option', parameterValues[i])
       ).click();
     } else {
       parameterEditor.setValue(parameterValues[i]);
