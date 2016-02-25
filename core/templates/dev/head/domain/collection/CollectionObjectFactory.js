@@ -147,6 +147,12 @@ oppia.factory('CollectionObjectFactory', [
       return this._nodes;
     };
 
+    // Returns a list of all exploration IDs referenced by this collection.
+    // Changes to the list itself will not be reflected in this collection.
+    Collection.prototype.getExplorationIds = function() {
+      return angular.copy(Object.keys(this._explorationIdToNodeIndexMap));
+    };
+
     // Builds a unique skill list containing all prerequisite and acquired
     // skills from all collections nodes within this domain object. Please note
     // this operation returns a new skill list everytime this function is

@@ -39,11 +39,13 @@ var UndoRedoService = function() {
 
   /**
    * Pushes a change domain object onto the change stack and applies it to the
-   * provided domain object.
+   * provided domain object. When a new change is applied, all undone changes
+   * are lost and cannot be redone.
    */
   UndoRedoService.applyChange = function(changeObject, domainObject) {
     _appliedChanges.push(changeObject);
     _applyChange(changeObject, domainObject);
+    _undoneChanges = [];
   };
 
   /**
@@ -80,6 +82,8 @@ var UndoRedoService = function() {
    * will not be reflected in this service.
    */
   UndoRedoService.getChangeList = function() {
+    // TODO(bhenning): Consider integrating something like Immutable.js to avoid
+    // the slice here and ensure the returned object is truly an immutable copy.
     return _appliedChanges.slice();
   };
 
@@ -91,7 +95,7 @@ var UndoRedoService = function() {
   UndoRedoService.getCommittableChangeList = function() {
     var committableChangeList = [];
     for (var i = 0; i < _appliedChanges.length; i++) {
-      committableChangeList[i] = _appliedChanges[i].getBackendChangeObject();
+      committableChangeList[i] = _appliedChanges[i].getChangeBackendObject();
     }
     return committableChangeList;
   };
@@ -115,11 +119,8 @@ var UndoRedoService = function() {
    * from applyChange() or redoChange().
    */
   UndoRedoService.clearChanges = function() {
-    // Clears the existing arrays in-place, since there may be Angular bindings
-    // to these arrays and they can't be reset to empty arrays.See for context:
-    // http://stackoverflow.com/a/1232046
-    _appliedChanges.length = 0;
-    _undoneChanges.length = 0;
+    _appliedChanges = [];
+    _undoneChanges = [];
   };
 
   return UndoRedoService;

@@ -23,34 +23,33 @@
 // TODO(bhenning): Consolidate the backend ExplorationChange and
 // CollectionChange domain objects.
 
-// TODO(bhenning): Add tests for this.
 oppia.factory('ChangeObjectFactory', [function() {
-    var ChangeObjectFactory = function(
-        backendChangeObject, applyChangeToObject, reverseChangeToObject) {
-      this.backendChangeObject = angular.copy(backendChangeObject);
-      this.applyChangeToObject = applyChangeToObject;
-      this.reverseChangeToObject = reverseChangeToObject;
+    var Change = function(
+        changeBackendObject, applyChangeToObject, reverseChangeToObject) {
+      this._changeBackendObject = angular.copy(changeBackendObject);
+      this._applyChangeToObject = applyChangeToObject;
+      this._reverseChangeToObject = reverseChangeToObject;
     };
 
     // Instance methods
 
     // Returns the JSON object which represents a backend python dict of this
     // change. Changes to this object are not reflected in this domain object.
-    ChangeObjectFactory.prototype.getBackendChangeObject = function() {
-      return this.backendChangeObject;
+    Change.prototype.getChangeBackendObject = function() {
+      return angular.copy(this._changeBackendObject);
     };
 
     // Applies this change to the related object (such as a frontend collection
     // domain object).
-    ChangeObjectFactory.prototype.applyChange = function(domainObject) {
-      this.applyChangeToObject(this.getBackendChangeObject(), domainObject);
+    Change.prototype.applyChange = function(domainObject) {
+      this._applyChangeToObject(this._changeBackendObject, domainObject);
     };
 
     // Reverse-applies this change to the related object (such as a frontend
     // collection domain object). This method should only be used to reverse a
     // change that was previously applied by calling the applyChange() method.
-    ChangeObjectFactory.prototype.reverseChange = function(domainObject) {
-      this.reverseChangeToObject(this.getBackendChangeObject(), domainObject);
+    Change.prototype.reverseChange = function(domainObject) {
+      this._reverseChangeToObject(this._changeBackendObject, domainObject);
     };
 
     // Static class methods. Note that "this" is not available in static
@@ -61,12 +60,12 @@ oppia.factory('ChangeObjectFactory', [function() {
     // parameter is a callback which behaves in the same way as the second
     // parameter and takes the same inputs, except it should reverse the change
     // for the provided domain object.
-    ChangeObjectFactory.create = function(
-        backendChangeObject, applyChangeToObject, reverseChangeToObject) {
-      return new ChangeObjectFactory(
-        backendChangeObject, applyChangeToObject, reverseChangeToObject);
+    Change.create = function(
+        changeBackendObject, applyChangeToObject, reverseChangeToObject) {
+      return new Change(
+        changeBackendObject, applyChangeToObject, reverseChangeToObject);
     };
 
-    return ChangeObjectFactory;
+    return Change;
   }
 ]);
