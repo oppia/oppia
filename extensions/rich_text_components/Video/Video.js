@@ -25,21 +25,55 @@ oppia.directive('oppiaNoninteractiveVideo', [
       restrict: 'E',
       scope: {},
       templateUrl: 'richTextComponent/Video',
-      controller: ['$scope', '$attrs', 'explorationContextService',
-        function($scope, $attrs, explorationContextService) {
+      controller: ['$scope', '$attrs', 'explorationContextService', '$element',
+        'autoplayedVideosService', 'PAGE_CONTEXT', '$timeout', '$window',
+        function($scope, $attrs, explorationContextService, $element,
+          autoplayedVideosService, PAGE_CONTEXT, $timeout, $window) {
           var start = oppiaHtmlEscaper.escapedJsonToObj($attrs.startWithValue);
           var end = oppiaHtmlEscaper.escapedJsonToObj($attrs.endWithValue);
 
-          $scope.autoplaySuffix = (oppiaHtmlEscaper.escapedJsonToObj(
-            $attrs.autoplayWithValue) ? '&autoplay=1' : '&autoplay=0');
           $scope.videoId = oppiaHtmlEscaper.escapedJsonToObj(
             $attrs.videoIdWithValue);
           $scope.timingParams = '&start=' + start + '&end=' + end;
-          $scope.videoUrl = $sce.trustAsResourceUrl(
-            'https://www.youtube.com/embed/' + $scope.videoId + '?rel=0' +
-            $scope.timingParams + $scope.autoplaySuffix);
+          $scope.autoplaySuffix = '&autoplay=0';
 
-          // This following check disbales the video in Editor being caught
+          $timeout(function() {
+            // Check whether creator wants to autoplay this video or not
+            var autoplayVal = oppiaHtmlEscaper.escapedJsonToObj(
+              $attrs.autoplayWithValue);
+
+            // This code helps in visibility of video. It checks whether
+            // mid point of video frame is in the view or not.
+            var rect = angular.element($element)[0].getBoundingClientRect();
+            var clientHeight = $window.innerHeight;
+            var clientWidth = $window.innerWidth;
+            var isVisible = ((rect.left + rect.right) / 2 < clientWidth &&
+              (rect.top + rect.bottom) / 2 < clientHeight) &&
+              (rect.left > 0 && rect.right > 0);
+
+            // Autoplay if user is in learner view and creator has specified
+            // to autoplay given video.
+            if (explorationContextService.getPageContext() ===
+              PAGE_CONTEXT.LEARNER && autoplayVal) {
+              // If it has been autoplayed then do not autoplay again.
+              if (
+                !autoplayedVideosService.hasVideoBeenAutoplayed(
+                  $scope.videoId) && isVisible) {
+                $scope.autoplaySuffix = '&autoplay=1';
+                autoplayedVideosService.addAutoplayedVideo($scope.videoId);
+              }
+            }
+
+            $scope.videoUrl = $sce.trustAsResourceUrl(
+              'https://www.youtube.com/embed/' + $scope.videoId + '?rel=0' +
+              $scope.timingParams + $scope.autoplaySuffix);
+          }, 900);
+          // (^)Here timeout is set to 900ms. This is time it takes to bring the
+          // frame to correct point in browser and bring user to the main
+          // content. Smaller delay causes checks to be performed even before
+          // the player displays the content of the new card.
+
+          // This following check disables the video in Editor being caught
           // by tabbing while in Exploration Editor mode.
           if (explorationContextService.isInExplorationEditorMode()) {
             $scope.tabIndexVal = -1;
