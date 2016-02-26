@@ -33,7 +33,7 @@ oppia.factory('autoplayedVideosService', [function() {
       },
 
       hasVideoBeenAutoplayed: function(videoId) {
-        return autoplayedVideosDict[videoId];
+        return Boolean(autoplayedVideosDict[videoId]);
       }
     };
   }

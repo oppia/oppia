@@ -45,22 +45,20 @@ oppia.directive('oppiaNoninteractiveVideo', [
             // This code helps in visibility of video. It checks whether
             // mid point of video frame is in the view or not.
             var rect = angular.element($element)[0].getBoundingClientRect();
-            var clh = window.innerHeight;
-            var clw = window.innerWidth;
-            var isVisible = ((rect.left + rect.right) / 2 < clw &&
-              (rect.top + rect.bottom) / 2 < clh) &&
+            var clientHeight = $window.innerHeight;
+            var clientWidth = $window.innerWidth;
+            var isVisible = ((rect.left + rect.right) / 2 < clientWidth &&
+              (rect.top + rect.bottom) / 2 < clientHeight) &&
               (rect.left > 0 && rect.right > 0);
 
-            // Autoplay if user is in lerner view and creator has specified
+            // Autoplay if user is in learner view and creator has specified
             // to autoplay given video.
             if (explorationContextService.getPageContext() ===
               PAGE_CONTEXT.LEARNER && autoplayVal) {
               // If it has been autoplayed then do not autoplay again.
               if (
-                autoplayedVideosService.hasVideoBeenAutoplayed(
-                  $scope.videoId) || !(isVisible)) {
-                $scope.autoplaySuffix = '&autoplay=0';
-              } else {
+                !autoplayedVideosService.hasVideoBeenAutoplayed(
+                  $scope.videoId) && isVisible) {
                 $scope.autoplaySuffix = '&autoplay=1';
                 autoplayedVideosService.addAutoplayedVideo($scope.videoId);
               }
@@ -72,10 +70,10 @@ oppia.directive('oppiaNoninteractiveVideo', [
           }, 900);
           // (^)Here timeout is set to 900ms. This is time it takes to bring the
           // frame to correct point in browser and bring user to the main
-          // content. Slower timeout causes checks to be performed very before
-          // the oppia manages screen and brings the main content on display.
+          // content. Smaller delay causes checks to be performed even before
+          // the player displays the content of the new card.
 
-          // This following check disbales the video in Editor being caught
+          // This following check disables the video in Editor being caught
           // by tabbing while in Exploration Editor mode.
           if (explorationContextService.isInExplorationEditorMode()) {
             $scope.tabIndexVal = -1;
