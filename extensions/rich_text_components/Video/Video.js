@@ -51,7 +51,7 @@ oppia.directive('oppiaNoninteractiveVideo', [
               (rect.top + rect.bottom) / 2 < clh) &&
               (rect.left > 0 && rect.right > 0);
 
-            // Autoplay if user is in lerner context and creator has specified
+            // Autoplay if user is in lerner view and creator has specified
             // to autoplay given video.
             if (explorationContextService.getPageContext() ===
               PAGE_CONTEXT.LEARNER && autoplayVal) {

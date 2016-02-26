@@ -20,7 +20,7 @@
 //
 // Caveat: if the same video is shown twice in the exploration, the second and
 // subsequent instances of that video will not autoplay. We believe this
-// occurrence is rare, and have not accounted it for it here. If it turns out
+// occurrence is rare, and have not accounted for it here. If it turns out
 // to be an issue, we may need to instead assign a unique id to each rich-text
 // component and use that id instead to determine whether to suppress
 // autoplaying.
