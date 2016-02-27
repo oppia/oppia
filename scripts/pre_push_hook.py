@@ -195,9 +195,6 @@ def _collect_files_being_pushed(ref_list, remote):
             print '\nFiles to lint in %s:' % branch
             pprint.pprint(files_to_lint)
             print '\n'
-            modified_files = [f.name for f in modified_files]
-        else:
-            modified_files = []
     return collected_files
 
 
