@@ -311,7 +311,7 @@ oppia.controller('StateResponses', [
       if (interactionId === 'MultipleChoiceInput') {
         var answerGroups = responsesService.getAnswerGroups();
         // Collect all answers which have been handled by at least one
-        // Answer group.
+        // answer group.
         var handledAnswersArray = [];
         for (var j = 0; j < answerGroups.length; j++) {
           for (var k = 0; k < answerGroups[j].rule_specs.length; k++) {
@@ -324,7 +324,7 @@ oppia.controller('StateResponses', [
           choiceIndices.push(i);
         }
         // We only suppress the default warning if each choice index has
-        // Been handled by at least one answer group.
+        // been handled by at least one answer group.
         return choiceIndices.every(function(choiceIndex) {
           return handledAnswersArray.indexOf(choiceIndex) != -1;
         });
