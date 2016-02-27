@@ -143,6 +143,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         });
 
         $scope.onSelectNewRuleType = function(newRuleType) {
+          var oldRuleInputs = $scope.rule.inputs;
           $scope.rule.rule_type = newRuleType;
           $scope.rule.inputs = {};
           var tmpRuleDescription = computeRuleDescriptionFragments();
@@ -179,6 +180,12 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             }
 
             tmpRuleDescription = tmpRuleDescription.replace(PATTERN, ' ');
+          }
+
+          for (var key in $scope.rule.inputs) {
+            if (key in oldRuleInputs) {
+              $scope.rule.inputs[key] = oldRuleInputs[key];
+            }
           }
         };
 
