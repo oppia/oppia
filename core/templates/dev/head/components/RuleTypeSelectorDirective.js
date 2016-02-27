@@ -22,7 +22,7 @@ oppia.directive('ruleTypeSelector', [function() {
   return {
     restrict: 'E',
     scope: {
-      localValue: '=',
+      localValue: '@',
       onSelectionChange: '&'
     },
     template: '<input type="hidden">',
@@ -62,12 +62,6 @@ oppia.directive('ruleTypeSelector', [function() {
           }
         });
 
-        // Select the first choice by default.
-        if (!$scope.localValue) {
-          $scope.localValue = choices[0].id;
-          $scope.onSelectionChange()($scope.localValue);
-        }
-
         var select2Node = $element[0].firstChild;
         $(select2Node).select2({
           allowClear: false,
@@ -80,15 +74,16 @@ oppia.directive('ruleTypeSelector', [function() {
           }
         });
 
+        // Select the first choice by default.
+        if (!$scope.localValue) {
+          $scope.localValue = choices[0].id;
+          $scope.onSelectionChange()($scope.localValue);
+        }
+
         // Initialize the dropdown.
         $(select2Node).select2('val', $scope.localValue);
 
-        // Update $scope.localValue when the selection changes.
         $(select2Node).on('change', function(e) {
-          $scope.localValue = e.val;
-          // This is needed to actually update the localValue in the containing
-          // scope.
-          $scope.$apply();
           $scope.onSelectionChange()(e.val);
           // This is needed to propagate the change and display input fields for
           // parameterizing the rule.
