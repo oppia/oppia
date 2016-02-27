@@ -312,36 +312,25 @@ oppia.controller('StateResponses', [
         var choices = $scope.getAnswerChoices().length;
         var answerGroups = responsesService.getAnswerGroups();
         // First push all choice indices into an array
-        var choiceArray = [];
+        var handledChoicesArray = [];
         for (var i = 0; i < choices; i++) {
-          choiceArray.push(i);
+          handledChoicesArray.push(i);
         }
         /* Then cycle through answerGroup rule_specs
         and put all of them into an array */
         var answerArray = [];
         for (var j = 0; j < answerGroups.length; j++) {
-          /* Make sure to check if a an answerGroup rule_spec
-          has more than one rule */
-          if (answerGroups['' + j + ''].rule_specs.length > 1) {
-            for (var k = 0;
-              k < answerGroups['' + j + ''].rule_specs.length; k++) {
-              answerArray.push(
-                answerGroups['' + j + ''].rule_specs[k].inputs.x
-              );
-            }
-          } else {
+          for (var k = 0;
+            k < answerGroups[j].rule_specs.length; k++) {
             answerArray.push(
-              answerGroups['' + j + ''].rule_specs[0].inputs.x
-            );
+                answerGroups[j].rule_specs[k].inputs.x
+              );
           }
         }
         // Then compare arrays for missing values
-        for (var l = 0; l < choiceArray.length; l++) {
-          if (answerArray.indexOf(l) < 0) {
-            return false;
-          }
-        }
-        return true;
+        return handledChoicesArray.every(function(choiceIndex) {
+          return answerArray.indexOf(choiceIndex) >= 0;
+        });
       }
     };
 
