@@ -34,9 +34,20 @@ oppia.directive('outcomeEditor', [function() {
         $scope.editOutcomeForm = {};
         $scope.feedbackEditorIsOpen = false;
         $scope.destinationEditorIsOpen = false;
+        // TODO(sll): Investigate whether this line can be removed, due to
+        // $scope.savedOutcome now being set in onExternalSave().
         $scope.savedOutcome = angular.copy($scope.outcome);
 
         var onExternalSave = function() {
+          // The reason for this guard is because, when the editor page for an
+          // exploration is first opened, the 'initializeAnswerGroups' event
+          // (which fires an 'externalSave' event) only fires after the
+          // $scope.savedOutcome is set above. Until then, $scope.savedOutcome
+          // is undefined.
+          if ($scope.savedOutcome === undefined) {
+            $scope.savedOutcome = angular.copy($scope.outcome);
+          }
+
           if ($scope.feedbackEditorIsOpen) {
             if ($scope.editOutcomeForm.editFeedbackForm.$valid &&
                 !$scope.invalidStateAfterFeedbackSave()) {
