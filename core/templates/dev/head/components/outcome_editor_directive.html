@@ -15,13 +15,13 @@
                 class="glyphicon glyphicon-pencil oppia-editor-edit-icon pull-right"
                 title="Edit Feedback">
           </span>
-          <span ng-if="isSelfLoopWithNoFeedback(outcome)">
+          <span ng-if="isSelfLoopWithNoFeedback(outcome) && !suppressWarnings()">
             <span class="oppia-confusing-outcome-warning-text">
               <span class="glyphicon glyphicon-warning-sign"></span>
               Please give Oppia something useful to say here.
             </span>
           </span>
-          <span ng-if="!isSelfLoopWithNoFeedback(outcome) && outcome.feedback.length === 0"
+          <span ng-if="(!isSelfLoopWithNoFeedback(outcome) && outcome.feedback.length === 0) || (isSelfLoopWithNoFeedback(outcome) && suppressWarnings())"
                 style="color: #888">
             <em>Nothing</em>
           </span>

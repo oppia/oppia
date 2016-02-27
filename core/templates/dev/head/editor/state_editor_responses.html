@@ -54,7 +54,7 @@
       <div>
         <ul class="nav nav-stacked nav-pills" role="tablist">
           <li ng-class="{'active': activeAnswerGroupIndex === answerGroups.length}" class="oppia-rule-block">
-            <div class="oppia-rule-header-warning-placement" ng-if="isSelfLoopWithNoFeedback(defaultOutcome)" ng-click="changeActiveAnswerGroupIndex(answerGroups.length)"
+            <div class="oppia-rule-header-warning-placement" ng-if="isSelfLoopWithNoFeedback(defaultOutcome) && !suppressDefaultAnswerGroupWarnings()" ng-click="changeActiveAnswerGroupIndex(answerGroups.length)"
                  tooltip="<[getOutcomeTooltip(defaultOutcome)]>" tooltip-placement="bottom">
               <div class="oppia-rule-header-warning-style" >
                 ⚠
@@ -77,6 +77,7 @@
                                        on-save-answer-group-feedback="saveDefaultOutcomeFeedback"
                                        on-save-answer-group-dest="saveDefaultOutcomeDest"
                                        is-editable="editabilityService.isEditable()"
+                                       suppress-warnings="suppressDefaultAnswerGroupWarnings()"
                                        display-feedback="!isLinearWithNoFeedback(defaultOutcome)"
                                        class="protractor-test-response-body">
                   </answer-group-editor>

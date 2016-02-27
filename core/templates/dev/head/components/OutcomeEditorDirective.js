@@ -26,11 +26,15 @@ oppia.directive('outcomeEditor', [function() {
       displayFeedback: '=',
       getOnSaveDestFn: '&onSaveDest',
       getOnSaveFeedbackFn: '&onSaveFeedback',
-      outcome: '=outcome'
+      outcome: '=outcome',
+      suppressWarnings: '&suppressWarnings'
     },
     templateUrl: 'components/outcomeEditor',
     controller: [
-      '$scope', 'editorContextService', function($scope, editorContextService) {
+      '$scope', 'editorContextService',
+      'stateInteractionIdService',
+      function($scope, editorContextService,
+        stateInteractionIdService) {
         $scope.editOutcomeForm = {};
         $scope.feedbackEditorIsOpen = false;
         $scope.destinationEditorIsOpen = false;
@@ -81,17 +85,20 @@ oppia.directive('outcomeEditor', [function() {
             outcome.dest === editorContextService.getActiveStateName());
         };
 
+        $scope.getCurrentInteractionId = function() {
+          return stateInteractionIdService.savedMemento;
+        };
+
         $scope.isSelfLoopWithNoFeedback = function(outcome) {
           if (!outcome) {
             return false;
           }
-
           var hasFeedback = outcome.feedback.some(function(feedbackItem) {
             return Boolean(feedbackItem);
           });
-
           return $scope.isSelfLoop(outcome) && !hasFeedback;
         };
+
         $scope.invalidStateAfterFeedbackSave = function() {
           var tmpOutcome = angular.copy($scope.savedOutcome);
           tmpOutcome.feedback = angular.copy($scope.outcome.feedback);
