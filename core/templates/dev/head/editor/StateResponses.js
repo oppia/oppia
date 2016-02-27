@@ -309,27 +309,24 @@ oppia.controller('StateResponses', [
     $scope.suppressDefaultAnswerGroupWarnings = function() {
       var interactionId = $scope.getCurrentInteractionId();
       if (interactionId === 'MultipleChoiceInput') {
-        var choices = $scope.getAnswerChoices().length;
         var answerGroups = responsesService.getAnswerGroups();
-        // First push all choice indices into an array
-        var handledChoicesArray = [];
-        for (var i = 0; i < choices; i++) {
-          handledChoicesArray.push(i);
-        }
-        /* Then cycle through answerGroup rule_specs
-        and put all of them into an array */
-        var answerArray = [];
+        // Collect all answers which have been handled by at least one
+        // Answer group.
+        var handledAnswersArray = [];
         for (var j = 0; j < answerGroups.length; j++) {
-          for (var k = 0;
-            k < answerGroups[j].rule_specs.length; k++) {
-            answerArray.push(
-                answerGroups[j].rule_specs[k].inputs.x
-              );
+          for (var k = 0; k < answerGroups[j].rule_specs.length; k++) {
+            handledAnswersArray.push(answerGroups[j].rule_specs[k].inputs.x);
           }
         }
-        // Then compare arrays for missing values
-        return handledChoicesArray.every(function(choiceIndex) {
-          return answerArray.indexOf(choiceIndex) >= 0;
+        var choiceIndices = [];
+        var numChoices = $scope.getAnswerChoices().length;
+        for (var i = 0; i < numChoices; i++) {
+          choiceIndices.push(i);
+        }
+        // We only suppress the default warning if each choice index has
+        // Been handled by at least one answer group.
+        return choiceIndices.every(function(choiceIndex) {
+          return handledAnswersArray.indexOf(choiceIndex) != -1;
         });
       }
     };
