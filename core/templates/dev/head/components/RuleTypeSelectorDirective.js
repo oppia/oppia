@@ -85,9 +85,6 @@ oppia.directive('ruleTypeSelector', [function() {
 
         $(select2Node).on('change', function(e) {
           $scope.onSelectionChange()(e.val);
-          // This is needed to propagate the change and display input fields for
-          // parameterizing the rule.
-          $scope.$apply();
         });
       }
     ]
