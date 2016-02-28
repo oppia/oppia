@@ -143,9 +143,13 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         });
 
         $scope.onSelectNewRuleType = function(newRuleType) {
-          var oldRuleInputs = $scope.rule.inputs;
+          var oldRuleInputs = $scope.rule.inputs || {};
+          var oldRuleInputTypes = $scope.rule.inputTypes || {};
+
           $scope.rule.rule_type = newRuleType;
           $scope.rule.inputs = {};
+          $scope.rule.inputTypes = {};
+
           var tmpRuleDescription = computeRuleDescriptionFragments();
           // This provides the list of choices for the multiple-choice and
           // image-click interactions.
@@ -162,6 +166,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             if (tmpRuleDescription.match(PATTERN)[2]) {
               varType = tmpRuleDescription.match(PATTERN)[2].substring(1);
             }
+            $scope.rule.inputTypes[varName] = varType;
 
             if (varType === 'SetOfHtmlString') {
               $scope.rule.inputs[varName] = [];
@@ -183,7 +188,8 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           }
 
           for (var key in $scope.rule.inputs) {
-            if (key in oldRuleInputs) {
+            if (key in oldRuleInputs &&
+              oldRuleInputTypes[key] === $scope.rule.inputTypes[key]) {
               $scope.rule.inputs[key] = oldRuleInputs[key];
             }
           }
