@@ -70,9 +70,9 @@ class ChangedBranch(object):
             try:
                 subprocess.check_output(['git', 'checkout', self.new_branch])
             except subprocess.CalledProcessError:
-                print ('\nCould not change to %s. This is most probably because'
-                       ' you are in a dirty state. Change to the branch that is'
-                       ' being linted manually or stash your changes.'
+                print ('\nCould not change branch to %s. This is most probably '
+                       'because you are in a dirty state. Change manually to '
+                       'the branch that is being linted or stash your changes.'
                        % self.new_branch)
                 sys.exit(1)
 
@@ -146,7 +146,8 @@ def _collect_files_being_pushed(ref_list, remote):
         ref_list: list of references to parse (provided by git in stdin)
         remote: the remote being pushed to
     Returns:
-        dict: Dict consisting of branch --> ists of changed_files, files_to_lint
+        dict: Dict mapping branch names to 2-tuples of the form (list of
+            changed files, list of files to lint)
     """
     if not ref_list:
         return {}
@@ -167,8 +168,6 @@ def _collect_files_being_pushed(ref_list, remote):
             except ValueError as e:
                 print e.message
                 sys.exit(1)
-            else:
-                files_to_lint = _extract_files_to_lint(modified_files)
         else:
             # Get the difference to origin/develop instead
             try:
@@ -182,10 +181,7 @@ def _collect_files_being_pushed(ref_list, remote):
                 except ValueError as e:
                     print e.message
                     sys.exit(1)
-                else:
-                    files_to_lint = _extract_files_to_lint(modified_files)
-            else:
-                files_to_lint = _extract_files_to_lint(modified_files)
+        files_to_lint = _extract_files_to_lint(modified_files)
         collected_files[branch] = (modified_files, files_to_lint)
 
     for branch, (modified_files, files_to_lint) in collected_files.items():
@@ -221,11 +217,11 @@ def _start_sh_script(scriptname):
     return task.returncode
 
 
-def _is_in_dirty_state():
-    """Returns true if the repos state is dirty (modified files are uncommited)
-    ignores untracked files."""
-    state = subprocess.check_output(GIT_IS_DIRTY_CMD.split(" "))
-    return len(state)
+def _has_uncommitted_files():
+    """Returns true if the repo contains modified files that are uncommitted.
+    Ignores untracked files."""
+    state = subprocess.check_output(GIT_IS_DIRTY_CMD.split(' '))
+    return bool(len(state))
 
 
 def _install_hook():
@@ -259,7 +255,7 @@ def main():
     refs = _get_refs()
     collected_files = _collect_files_being_pushed(refs, remote)
     # only interfere if we actually have something to lint (prevents annoyances)
-    if collected_files and _is_in_dirty_state():
+    if collected_files and _has_uncommitted_files():
         print ('Your repo is in a dirty state which prevents the linting from'
                ' working.\nStash your changes or commit them.\n')
         sys.exit(1)
