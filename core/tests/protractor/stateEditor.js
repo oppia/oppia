@@ -136,7 +136,7 @@ describe('State editor', function() {
     users.logout();
   });
 
-  it('should preserve input vale when rule type changes', function() {
+  it('should preserve input value when rule type changes', function() {
     users.createUser('user4@example.com', 'user4');
     users.login('user4@example.com');
     workflow.createExploration('sums', 'maths');
