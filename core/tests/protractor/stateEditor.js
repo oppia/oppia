@@ -20,11 +20,13 @@
  */
 
 var general = require('../protractor_utils/general.js');
+var interactions = require('../../../extensions/interactions/protractor.js');
 var forms = require('../protractor_utils/forms.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
 var player = require('../protractor_utils/player.js');
+var rules = require('../../../extensions/rules/protractor.js');
 
 describe('State editor', function() {
   it('should display plain text content', function() {
@@ -131,6 +133,49 @@ describe('State editor', function() {
     player.clickThroughToNextCard();
     player.expectExplorationToBeOver();
 
+    users.logout();
+  });
+
+  it('should preserve input vale when rule type changes', function() {
+    users.createUser('user4@example.com', 'user4');
+    users.login('user4@example.com');
+    workflow.createExploration('sums', 'maths');
+    editor.setContent(forms.toRichText('some content'));
+    editor.openInteraction('TextInput');
+
+    var elem = element(by.css('.protractor-test-interaction-editor'));
+    interactions.getInteraction('TextInput').customizeInteraction(
+      elem, 'My PlaceHolder', 2);
+    element(by.css('.protractor-test-save-interaction')).click();
+    // Wait for the customization modal to close.
+    general.waitForSystem();
+
+    var headerElem = element(by.css(
+      '.protractor-test-add-response-modal-header'));
+    expect(headerElem.isPresent()).toBe(true);
+
+    var ruleElement = element(by.css('.protractor-test-add-response-details'));
+    editor.selectRule(ruleElement, 'TextInput', 'Equals', false, 'Some Text');
+
+    ruleElement.all(
+      by.css('.protractor-test-answer-description-fragment'
+    )).get(1).element(by.tagName('input')).getAttribute('value').then(
+      function(text) {
+        expect(text).toEqual('Some Text');
+      }
+    );
+
+    editor.selectRule(ruleElement, 'TextInput', 'Contains', true);
+    ruleElement.all(
+      by.css('.protractor-test-answer-description-fragment'
+    )).get(1).element(by.tagName('input')).getAttribute('value').then(
+      function(text) {
+        expect(text).toEqual('Some Text');
+      }
+    );
+
+    element(by.css('.protractor-test-close-add-response-modal')).click();
+    editor.saveChanges();
     users.logout();
   });
 });
