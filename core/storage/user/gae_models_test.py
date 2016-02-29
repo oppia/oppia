@@ -28,17 +28,16 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
     USER_ID = 'user_id'
     EXP_ID_ONE = 'exp_id_one'
     EXP_ID_TWO = 'exp_id_two'
-    MODEL_ID_ONE = '%s.%s' % (USER_ID, EXP_ID_ONE)
-    MODEL_ID_TWO = '%s.%s' % (USER_ID, EXP_ID_TWO)
 
     def setUp(self):
         super(ExplorationUserDataModelTest, self).setUp()
         user_models.ExplorationUserDataModel(
-            id=self.MODEL_ID_ONE, user_id=self.USER_ID,
+            id='%s.%s' % (self.USER_ID, self.EXP_ID_ONE), user_id=self.USER_ID,
             exploration_id=self.EXP_ID_ONE, rating=2,
-            rated_on=self.DATETIME_OBJECT, change_list={'new_content': {}},
-            change_list_last_updated=self.DATETIME_OBJECT,
-            change_list_exp_version=3).put()
+            rated_on=self.DATETIME_OBJECT,
+            draft_change_list={'new_content': {}},
+            draft_change_list_last_updated=self.DATETIME_OBJECT,
+            draft_change_list_exp_version=3).put()
 
     def test_create_success(self):
         user_models.ExplorationUserDataModel.create(
@@ -46,7 +45,7 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         expected_object = user_models.ExplorationUserDataModel(
             user_id=self.USER_ID, exploration_id=self.EXP_ID_TWO)
         actual_object = user_models.ExplorationUserDataModel.get_by_id(
-            self.MODEL_ID_TWO)
+            '%s.%s' % (self.USER_ID, self.EXP_ID_TWO))
 
         self.assertEqual(expected_object.exploration_id, actual_object.exploration_id)
         self.assertEqual(expected_object.user_id, actual_object.user_id)
@@ -59,10 +58,11 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         self.assertEqual(retrieved_object.exploration_id, self.EXP_ID_ONE)
         self.assertEqual(retrieved_object.rating, 2)
         self.assertEqual(retrieved_object.rated_on, self.DATETIME_OBJECT)
-        self.assertEqual(retrieved_object.change_list, {'new_content': {}})
         self.assertEqual(
-            retrieved_object.change_list_last_updated, self.DATETIME_OBJECT)
-        self.assertEqual(retrieved_object.change_list_exp_version, 3)
+            retrieved_object.draft_change_list, {'new_content': {}})
+        self.assertEqual(retrieved_object.draft_change_list_last_updated,
+                         self.DATETIME_OBJECT)
+        self.assertEqual(retrieved_object.draft_change_list_exp_version, 3)
 
     def test_get_failure(self):
         retrieved_object = user_models.ExplorationUserDataModel.get(

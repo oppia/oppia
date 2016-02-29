@@ -125,13 +125,13 @@ class ExplorationUserDataModel(base_models.BaseModel):
     rated_on = ndb.DateTimeProperty(default=None, indexed=False)
 
     # List of uncomitted changes made by the user to the exploration.
-    change_list = ndb.JsonProperty(default=None)
+    draft_change_list = ndb.JsonProperty(default=None)
 
     # Timestamp of when the change list was last updated.
-    change_list_last_updated = ndb.DateTimeProperty(default=None)
+    draft_change_list_last_updated = ndb.DateTimeProperty(default=None)
 
     # The exploration version that this change list applied to.
-    change_list_exp_version = ndb.IntegerProperty(default=None)
+    draft_change_list_exp_version = ndb.IntegerProperty(default=None)
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
