@@ -18,7 +18,8 @@
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.factory('ExplorationEmbedButtonService', ['$modal', function($modal) {
+oppia.factory('ExplorationEmbedButtonService', [
+    '$modal', 'siteAnalyticsService', function($modal, siteAnalyticsService) {
   return {
     showModal: function(explorationId) {
       $modal.open({
@@ -51,6 +52,8 @@ oppia.factory('ExplorationEmbedButtonService', ['$modal', function($modal) {
           }
         ]
       });
+
+      siteAnalyticsService.registerOpenEmbedInfoEvent(explorationId);
     }
   };
 }]);

@@ -382,6 +382,7 @@ class BaseHandler(webapp2.RequestHandler):
                 BEFORE_END_HEAD_TAG_HOOK.value),
             'BEFORE_END_BODY_TAG_HOOK': jinja2.utils.Markup(
                 BEFORE_END_BODY_TAG_HOOK.value),
+            'CAN_SEND_ANALYTICS_EVENTS': feconf.CAN_SEND_ANALYTICS_EVENTS,
             'DEFAULT_LANGUAGE_CODE': feconf.ALL_LANGUAGE_CODES[0]['code'],
             'DEV_MODE': feconf.DEV_MODE,
             'DOMAIN_URL': '%s://%s' % (scheme, netloc),
