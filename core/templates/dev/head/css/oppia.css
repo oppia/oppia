@@ -996,7 +996,7 @@ md-card.oppia-gallery-tile {
   top: 0;
 }
 
-.oppia-html-select .oppia-html-select-selection {  
+.oppia-html-select .oppia-html-select-selection {
   padding-right: 20px;
   position: relative;
   text-decoration: none;
@@ -1328,7 +1328,7 @@ pre.oppia-pre-wrapped-text {
   margin-top: 60px;
   margin-left: auto;
   margin-right: auto;
-  max-width: 800px;
+  max-width: 844px;
   min-height: 500px;
   padding-bottom: 25px;
   position: relative;
@@ -2361,7 +2361,7 @@ div#ng-curtain {
 }
 
 .oppia-page-heading {
-  margin-bottom: 5px;
+  margin-bottom: 24px;
 }
 
 .oppia-page-heading-subtext {
