@@ -55,6 +55,30 @@ LINTER_SCRIPT = 'pre_commit_linter.py'
 LINTER_FILE_FLAG = '--files'
 PYTHON_CMD = 'python'
 FRONTEND_TEST_SCRIPT = 'run_frontend_tests.sh'
+GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
+
+
+class ChangedBranch(object):
+    def __init__(self, new_branch):
+        get_branch_cmd = 'git symbolic-ref -q --short HEAD'.split()
+        self.old_branch = subprocess.check_output(get_branch_cmd).strip()
+        self.new_branch = new_branch
+        self.is_same_branch = self.old_branch == self.new_branch
+
+    def __enter__(self):
+        if not self.is_same_branch:
+            try:
+                subprocess.check_output(['git', 'checkout', self.new_branch])
+            except subprocess.CalledProcessError:
+                print ('\nCould not change branch to %s. This is most probably '
+                       'because you are in a dirty state. Change manually to '
+                       'the branch that is being linted or stash your changes.'
+                       % self.new_branch)
+                sys.exit(1)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if not self.is_same_branch:
+            subprocess.check_output(['git', 'checkout', self.old_branch])
 
 
 def _start_subprocess_for_result(cmd):
@@ -122,10 +146,11 @@ def _collect_files_being_pushed(ref_list, remote):
         ref_list: list of references to parse (provided by git in stdin)
         remote: the remote being pushed to
     Returns:
-        Tuple of lists of changed_files, files_to_lint
+        dict: Dict mapping branch names to 2-tuples of the form (list of
+            changed files, list of files to lint)
     """
     if not ref_list:
-        return [], []
+        return {}
     # avoid testing of non branch pushes (tags for instance) or deletions
     ref_heads_only = [ref for ref in ref_list
                       if ref.local_ref.startswith('refs/heads/')]
@@ -133,48 +158,42 @@ def _collect_files_being_pushed(ref_list, remote):
     branches = [ref.local_ref.split('/')[-1] for ref in ref_heads_only]
     hashes = [ref.local_sha1 for ref in ref_heads_only]
     remote_hashes = [ref.remote_sha1 for ref in ref_heads_only]
-    modified_files = set()
-    files_to_lint = set()
+    collected_files = {}
+    # git allows that multiple branches get pushed simultaneously with the "all"
+    # flag. Therefore we need to loop over the ref_list provided.
     for branch, sha1, remote_sha1 in zip(branches, hashes, remote_hashes):
         # git reports the following for an empty / non existing branch
         # sha1: '0000000000000000000000000000000000000000'
         if set(remote_sha1) != {'0'}:
             try:
-                file_diffs = _compare_to_remote(remote, branch)
+                modified_files = _compare_to_remote(remote, branch)
             except ValueError as e:
                 print e.message
                 sys.exit(1)
-            else:
-                modified_files.update(file_diffs)
-                files_to_lint.update(_extract_files_to_lint(modified_files))
         else:
             # Get the difference to origin/develop instead
             try:
-                file_diffs = _compare_to_remote(remote, branch,
-                                                remote_branch='develop')
+                modified_files = _compare_to_remote(remote, branch,
+                                                    remote_branch='develop')
             except ValueError:
                 # give up, return all files in repo
                 try:
-                    files = _git_diff_name_status(GIT_NULL_COMMIT, sha1)
+                    modified_files = _git_diff_name_status(GIT_NULL_COMMIT,
+                                                           sha1)
                 except ValueError as e:
                     print e.message
                     sys.exit(1)
-                else:
-                    modified_files.update(files)
-                    files_to_lint.update(_extract_files_to_lint(files))
-            else:
-                modified_files.update(file_diffs)
-                files_to_lint.update(_extract_files_to_lint(modified_files))
+        files_to_lint = _extract_files_to_lint(modified_files)
+        collected_files[branch] = (modified_files, files_to_lint)
 
-    if modified_files:
-        print '\nModified files:'
-        pprint.pprint(modified_files)
-        print '\nFiles to lint:'
-        pprint.pprint(files_to_lint)
-        modified_files = [f.name for f in modified_files]
-    else:
-        modified_files = []
-    return modified_files, list(files_to_lint)
+    for branch, (modified_files, files_to_lint) in collected_files.iteritems():
+        if modified_files:
+            print '\nModified files in %s:' % branch
+            pprint.pprint(modified_files)
+            print '\nFiles to lint in %s:' % branch
+            pprint.pprint(files_to_lint)
+            print '\n'
+    return collected_files
 
 
 def _get_refs():
@@ -198,6 +217,13 @@ def _start_sh_script(scriptname):
     task = subprocess.Popen(cmd)
     task.communicate()
     return task.returncode
+
+
+def _has_uncommitted_files():
+    """Returns true if the repo contains modified files that are uncommitted.
+    Ignores untracked files."""
+    uncommitted_files = subprocess.check_output(GIT_IS_DIRTY_CMD.split(' '))
+    return bool(len(uncommitted_files))
 
 
 def _install_hook():
@@ -229,18 +255,26 @@ def main():
         _install_hook()
         sys.exit(0)
     refs = _get_refs()
-    modified_files, files_to_lint = _collect_files_being_pushed(refs, remote)
-    if not modified_files and not files_to_lint:
-        sys.exit(0)
-    if files_to_lint:
-        lint_status = _start_linter(files_to_lint)
-        if lint_status != 0:
-            print 'Push failed, please correct the linting issues above'
-            sys.exit(1)
-    frontend_status = _start_sh_script(FRONTEND_TEST_SCRIPT)
-    if frontend_status != 0:
-        print 'Push aborted due to failing frontend tests.'
+    collected_files = _collect_files_being_pushed(refs, remote)
+    # only interfere if we actually have something to lint (prevents annoyances)
+    if collected_files and _has_uncommitted_files():
+        print ('Your repo is in a dirty state which prevents the linting from'
+               ' working.\nStash your changes or commit them.\n')
         sys.exit(1)
+    for branch, (modified_files, files_to_lint) in collected_files.iteritems():
+        with ChangedBranch(branch):
+            if not modified_files and not files_to_lint:
+                continue
+            if files_to_lint:
+                lint_status = _start_linter(files_to_lint)
+                if lint_status != 0:
+                    print 'Push failed, please correct the linting issues above'
+                    sys.exit(1)
+            frontend_status = _start_sh_script(FRONTEND_TEST_SCRIPT)
+            if frontend_status != 0:
+                print 'Push aborted due to failing frontend tests.'
+                sys.exit(1)
+    sys.exit(0)
 
 
 if __name__ == '__main__':
