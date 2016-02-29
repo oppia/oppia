@@ -192,6 +192,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.NEW_EXPLORATION_URL,
         galleries.NewExploration, 'new_exploration'),
     get_redirect_route(
+        r'%s' % feconf.NEW_COLLECTION_URL,
+        galleries.NewCollection, 'new_collection'),
+    get_redirect_route(
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
         galleries.UploadExploration, 'upload_exploration'),
     get_redirect_route(
@@ -322,10 +325,6 @@ URLS = MAPREDUCE_HANDLERS + [
         editor.StartedTutorialEventHandler, 'started_tutorial_event_handler'),
 
     get_redirect_route(
-        r'/collection_editor/create/<collection_id>',
-        collection_editor.CollectionEditorPage, 'collection_editor_page'),
-
-    get_redirect_route(
         r'%s' % feconf.RECENT_COMMITS_DATA_URL,
         recent_commits.RecentCommitsHandler, 'recent_commits_handler'),
     get_redirect_route(
@@ -359,6 +358,17 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_DATA_URL_PREFIX,
         collection_viewer.CollectionDataHandler, 'collection_data_handler'),
+
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_EDITOR_URL_PREFIX,
+        collection_editor.CollectionEditorPage, 'collection_editor_page'),
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_WRITABLE_DATA_URL_PREFIX,
+        collection_editor.WritableCollectionDataHandler,
+        'writable_collection_data_handler'),
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_RIGHTS_PREFIX,
+        collection_editor.CollectionRightsHandler, 'collection_rights_handler'),
 
     get_redirect_route(
         r'/notificationshandler', home.NotificationsHandler,

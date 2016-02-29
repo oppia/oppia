@@ -336,7 +336,9 @@ DEMO_COLLECTIONS = {
 }
 
 # TODO(sll): Add all other URLs here.
-COLLECTION_DATA_URL_PREFIX = '/collectionhandler/data'
+COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
+COLLECTION_WRITABLE_DATA_URL_PREFIX = '/collection_editor_handler/data'
+COLLECTION_RIGHTS_PREFIX = '/collection_editor_handler/rights'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
 CONTRIBUTE_GALLERY_URL = '/contribute'
@@ -353,6 +355,7 @@ GALLERY_CREATE_MODE_URL = '%s?mode=create' % GALLERY_URL
 GALLERY_DATA_URL = '/galleryhandler/data'
 LEARN_GALLERY_URL = '/learn'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
+NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 PLAYTEST_QUEUE_URL = '/playtest'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
