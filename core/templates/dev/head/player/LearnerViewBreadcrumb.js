@@ -56,10 +56,10 @@ oppia.controller('LearnerViewBreadcrumb', [
         controller: [
           '$scope', '$window', '$modalInstance', 'oppiaHtmlEscaper',
           'ExplorationEmbedButtonService', 'oppiaDatetimeFormatter',
-          'RatingComputationService', 'expInfo',
+          'RatingComputationService', 'expInfo', 'siteAnalyticsService',
           function($scope, $window, $modalInstance, oppiaHtmlEscaper,
                    ExplorationEmbedButtonService, oppiaDatetimeFormatter,
-                   RatingComputationService, expInfo) {
+                   RatingComputationService, expInfo, siteAnalyticsService) {
             var getExplorationTagsSummary = function(arrayOfTags) {
               var tagsToShow = [];
               var tagsInTooltip = [];
@@ -90,6 +90,7 @@ oppia.controller('LearnerViewBreadcrumb', [
             $scope.averageRating = (
               RatingComputationService.computeAverageRating(expInfo.ratings));
             $scope.contributorNames = expInfo.contributor_names;
+            $scope.explorationId = expInfo.id;
             $scope.escapedTwitterText = (
               oppiaHtmlEscaper.unescapedStrToEscapedStr(
                 GLOBALS.SHARING_OPTIONS_TWITTER_TEXT));
@@ -110,6 +111,10 @@ oppia.controller('LearnerViewBreadcrumb', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss();
+            };
+
+            $scope.registerShareExplorationEvent = function(network) {
+              siteAnalyticsService.registerShareExplorationEvent(network);
             };
           }
         ]

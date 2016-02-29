@@ -20,11 +20,11 @@
 
 // Service for the create/upload exploration buttons and modals.
 oppia.factory('ExplorationCreationButtonService', [
-  '$filter', '$http', '$modal', '$timeout', '$rootScope',
-  'validatorsService', 'warningsData', 'focusService',
+  '$filter', '$http', '$modal', '$timeout', '$rootScope', '$window',
+  'validatorsService', 'warningsData', 'focusService', 'siteAnalyticsService',
   function(
-      $filter, $http, $modal, $timeout, $rootScope,
-      validatorsService, warningsData, focusService) {
+      $filter, $http, $modal, $timeout, $rootScope, $window,
+      validatorsService, warningsData, focusService, siteAnalyticsService) {
     var getModalInstance = function(categoryList, isUploadModal) {
       var modalInstance = $modal.open({
         backdrop: true,
@@ -136,6 +136,8 @@ oppia.factory('ExplorationCreationButtonService', [
       showCreateExplorationModal: function(categoryList) {
         warningsData.clear();
 
+        siteAnalyticsService.registerOpenExplorationCreationModalEvent();
+
         getModalInstance(categoryList, false).result.then(function(result) {
           var category = $filter('normalizeWhitespace')(result.category);
           if (!validatorsService.isValidEntityName(category, true)) {
@@ -149,7 +151,12 @@ oppia.factory('ExplorationCreationButtonService', [
             objective: $filter('normalizeWhitespace')(result.objective),
             title: result.title
           }).success(function(data) {
-            window.location = '/create/' + data.explorationId;
+            siteAnalyticsService.registerCreateNewExplorationEvent(
+              data.explorationId);
+            $timeout(function() {
+              $window.location = '/create/' + data.explorationId;
+            }, 150);
+            return false;
           }).error(function() {
             $rootScope.loadingMessage = '';
           });

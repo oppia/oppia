@@ -22,6 +22,7 @@ oppia.directive('outcomeDestinationEditor', [function() {
   return {
     restrict: 'E',
     scope: {
+      outcomeHasFeedback: '=',
       outcome: '='
     },
     templateUrl: 'rules/outcomeDestinationEditor',

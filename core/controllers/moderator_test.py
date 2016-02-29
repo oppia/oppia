@@ -34,7 +34,7 @@ class ModeratorTest(test_utils.GenericTestBase):
 
         # Try accessing the moderator page after logging in as a moderator.
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.set_moderators([self.MODERATOR_EMAIL])
+        self.set_moderators([self.MODERATOR_USERNAME])
         self.login(self.MODERATOR_EMAIL)
         response = self.testapp.get('/moderator')
         self.assertEqual(response.status_int, 200)
@@ -42,7 +42,7 @@ class ModeratorTest(test_utils.GenericTestBase):
 
         # Try accessing the moderator page after logging in as an admin.
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_EMAIL])
+        self.set_admins([self.ADMIN_USERNAME])
         self.login(self.ADMIN_EMAIL)
         response = self.testapp.get('/moderator')
         self.assertEqual(response.status_int, 200)

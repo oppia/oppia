@@ -1,7 +1,8 @@
 <script type="text/ng-template" id="rules/outcomeDestinationEditor">
   <div class="form-inline protractor-test-dest-bubble" style="margin-bottom: 10px;">
     <div class="oppia-rule-details-header">
-      <strong>And afterwards, directs the learner to...</strong>
+      <strong ng-if="outcomeHasFeedback">And afterwards, directs the learner to...</strong>
+      <strong ng-if="!outcomeHasFeedback">Oppia directs the learner to...</strong>
     </div>
     <div class="form-group" style="font-size: 1.1em;">
       <span>
