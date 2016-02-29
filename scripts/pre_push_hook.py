@@ -159,6 +159,8 @@ def _collect_files_being_pushed(ref_list, remote):
     hashes = [ref.local_sha1 for ref in ref_heads_only]
     remote_hashes = [ref.remote_sha1 for ref in ref_heads_only]
     collected_files = {}
+    # git allows that multiple branches get pushed simultaneously with the "all"
+    # flag. Therefore we need to loop over the ref_list provided.
     for branch, sha1, remote_sha1 in zip(branches, hashes, remote_hashes):
         # git reports the following for an empty / non existing branch
         # sha1: '0000000000000000000000000000000000000000'
@@ -184,7 +186,7 @@ def _collect_files_being_pushed(ref_list, remote):
         files_to_lint = _extract_files_to_lint(modified_files)
         collected_files[branch] = (modified_files, files_to_lint)
 
-    for branch, (modified_files, files_to_lint) in collected_files.items():
+    for branch, (modified_files, files_to_lint) in collected_files.iteritems():
         if modified_files:
             print '\nModified files in %s:' % branch
             pprint.pprint(modified_files)
@@ -220,8 +222,8 @@ def _start_sh_script(scriptname):
 def _has_uncommitted_files():
     """Returns true if the repo contains modified files that are uncommitted.
     Ignores untracked files."""
-    state = subprocess.check_output(GIT_IS_DIRTY_CMD.split(' '))
-    return bool(len(state))
+    uncommitted_files = subprocess.check_output(GIT_IS_DIRTY_CMD.split(' '))
+    return bool(len(uncommitted_files))
 
 
 def _install_hook():
@@ -259,7 +261,7 @@ def main():
         print ('Your repo is in a dirty state which prevents the linting from'
                ' working.\nStash your changes or commit them.\n')
         sys.exit(1)
-    for branch, (modified_files, files_to_lint) in collected_files.items():
+    for branch, (modified_files, files_to_lint) in collected_files.iteritems():
         with ChangedBranch(branch):
             if not modified_files and not files_to_lint:
                 continue
