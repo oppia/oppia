@@ -23,6 +23,7 @@ import zipfile
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
+from core.domain import feedback_services
 from core.domain import fs_domain
 from core.domain import param_domain
 from core.domain import rating_services
@@ -33,8 +34,8 @@ from core.tests import test_utils
 import feconf
 import utils
 
-(exp_models,) = models.Registry.import_models([
-    models.NAMES.exploration
+(exp_models, feedback_models) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.feedback
 ])
 search_services = models.Registry.import_search_services()
 transaction_services = models.Registry.import_transaction_services()
@@ -74,8 +75,9 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
 
-        self.set_admins([self.ADMIN_EMAIL])
+        self.set_admins([self.ADMIN_USERNAME])
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
 
@@ -462,7 +464,10 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_ID, [{
                 'cmd': 'edit_exploration_property',
                 'property_name': 'param_specs',
-                'new_value': {'theParameter': param_domain.ParamSpec('UnicodeString').to_dict()}
+                'new_value': {
+                    'theParameter':
+                        param_domain.ParamSpec('UnicodeString').to_dict()
+                }
             }],
             '')
 
@@ -482,7 +487,10 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_ID, [{
                 'cmd': 'edit_exploration_property',
                 'property_name': 'param_specs',
-                'new_value': {'theParameter': param_domain.ParamSpec('UnicodeString').to_dict()}
+                'new_value': {
+                    'theParameter':
+                        param_domain.ParamSpec('UnicodeString').to_dict()
+                }
             }], '')
 
         # Change title and category.
@@ -2214,7 +2222,8 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 'A category', 'An objective', 'en', [],
                 feconf.get_empty_ratings(),
                 rights_manager.ACTIVITY_STATUS_PUBLIC,
-                False, [self.albert_id], [], [], [self.albert_id], {self.albert_id: 1},
+                False, [self.albert_id], [], [], [self.albert_id],
+                {self.albert_id: 1},
                 self.EXPECTED_VERSION_2,
                 actual_summaries[self.EXP_ID_2].exploration_model_created_on,
                 actual_summaries[self.EXP_ID_2].exploration_model_last_updated
@@ -2930,3 +2939,121 @@ title: Old Title
         # The converted exploration should be up-to-date and properly
         # converted.
         self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
+
+
+class SuggestionActionUnitTests(test_utils.GenericTestBase):
+    """Test learner suggestion action functions in exp_services."""
+
+    THREAD_ID1 = '1111'
+    EXP_ID1 = 'exp_id1'
+    EXP_ID2 = 'exp_id2'
+    USER_EMAIL = 'user@123.com'
+    EDITOR_EMAIL = 'editor@123.com'
+    USERNAME = 'user123'
+    EDITOR_USERNAME = 'editor123'
+    COMMIT_MESSAGE = 'commit message'
+    EMPTY_COMMIT_MESSAGE = ' '
+
+    def _generate_thread_id(self, unused_exp_id):
+        return self.THREAD_ID1
+
+    def _return_true(self, unused_thread_id, unused_exploration_id):
+        return True
+
+    def _return_false(self, unused_thread_id, unused_exploration_id):
+        return False
+
+    def _check_commit_message(
+            self, unused_user_id, unused_exploration_id, unused_change_list,
+            commit_message, is_suggestion):
+        self.assertTrue(is_suggestion)
+        self.assertEqual(
+            commit_message, 'Accepted suggestion by %s: %s' % (
+                self.USERNAME, self.COMMIT_MESSAGE))
+
+    def setUp(self):
+        super(SuggestionActionUnitTests, self).setUp()
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        user_services.get_or_create_user(self.user_id, self.USER_EMAIL)
+        user_services.get_or_create_user(self.editor_id, self.EDITOR_EMAIL)
+        self.signup(self.USER_EMAIL, self.USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        with self.swap(feedback_models.FeedbackThreadModel,
+                       'generate_new_thread_id', self._generate_thread_id):
+            feedback_services.create_suggestion(
+                self.EXP_ID1, self.user_id, 3, 'state_name', 'description',
+                {'old_content': {}})
+            feedback_services.create_suggestion(
+                self.EXP_ID2, self.user_id, 3, 'state_name', 'description',
+                {'old_content': {}})
+
+    def test_accept_suggestion_valid_suggestion(self):
+        with self.swap(exp_services, '_is_suggestion_valid',
+                       self._return_true):
+            with self.swap(exp_services, 'update_exploration',
+                           self._check_commit_message):
+                exp_services.accept_suggestion(
+                    self.editor_id, self.THREAD_ID1, self.EXP_ID1,
+                    self.COMMIT_MESSAGE)
+        thread = feedback_models.FeedbackThreadModel.get(
+            feedback_models.FeedbackThreadModel.generate_full_thread_id(
+                self.EXP_ID1, self.THREAD_ID1))
+        thread_messages = feedback_services.get_messages(
+            self.EXP_ID1, self.THREAD_ID1)
+        last_message = thread_messages[len(thread_messages) - 1]
+        self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_FIXED)
+        self.assertEqual(last_message['text'], 'Suggestion accepted.')
+
+    def test_accept_suggestion_invalid_suggestion(self):
+        with self.swap(exp_services, '_is_suggestion_valid',
+                       self._return_false):
+            with self.assertRaisesRegexp(
+                Exception,
+                'Invalid suggestion: The state for which it was made '
+                'has been removed/renamed.'
+                ):
+                exp_services.accept_suggestion(
+                    self.editor_id, self.THREAD_ID1, self.EXP_ID2,
+                    self.COMMIT_MESSAGE)
+        thread = feedback_models.FeedbackThreadModel.get(
+            feedback_models.FeedbackThreadModel.generate_full_thread_id(
+                self.EXP_ID2, self.THREAD_ID1))
+        self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_OPEN)
+
+    def test_accept_suggestion_empty_commit_message(self):
+        with self.assertRaisesRegexp(Exception,
+                                     'Commit message cannot be empty.'):
+            exp_services.accept_suggestion(
+                self.editor_id, self.THREAD_ID1, self.EXP_ID2,
+                self.EMPTY_COMMIT_MESSAGE)
+        thread = feedback_models.FeedbackThreadModel.get(
+            feedback_models.FeedbackThreadModel.generate_full_thread_id(
+                self.EXP_ID2, self.THREAD_ID1))
+        self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_OPEN)
+
+    def test_accept_suggestion_actioned_suggestion(self):
+        exception_message = 'Suggestion has already been accepted/rejected'
+        with self.swap(exp_services, '_is_suggestion_handled',
+                       self._return_true):
+            with self.assertRaisesRegexp(Exception, exception_message):
+                exp_services.accept_suggestion(
+                    self.editor_id, self.THREAD_ID1, self.EXP_ID2,
+                    self.COMMIT_MESSAGE)
+
+    def test_reject_suggestion(self):
+        exp_services.reject_suggestion(
+            self.editor_id, self.THREAD_ID1, self.EXP_ID2)
+        thread = feedback_models.FeedbackThreadModel.get(
+            feedback_models.FeedbackThreadModel.generate_full_thread_id(
+                self.EXP_ID2, self.THREAD_ID1))
+        self.assertEqual(thread.status,
+                         feedback_models.STATUS_CHOICES_IGNORED)
+
+    def test_reject_actioned_suggestion(self):
+        exception_message = 'Suggestion has already been accepted/rejected'
+        with self.swap(exp_services, '_is_suggestion_handled',
+                       self._return_true):
+            with self.assertRaisesRegexp(Exception, exception_message):
+                exp_services.reject_suggestion(
+                    self.editor_id, self.THREAD_ID1, self.EXP_ID2)

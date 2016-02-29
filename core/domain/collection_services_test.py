@@ -62,8 +62,9 @@ class CollectionServicesUnitTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
 
-        self.set_admins([self.ADMIN_EMAIL])
+        self.set_admins([self.ADMIN_USERNAME])
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
 
@@ -654,7 +655,8 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             collection_services.get_collection_summary_by_id(
                 self.COLLECTION_ID))
 
-        self.assertEqual(retrieved_collection_summary.contributor_ids, [self.owner_id])
+        self.assertEqual(retrieved_collection_summary.contributor_ids,
+                         [self.owner_id])
         self.assertEqual(retrieved_collection_summary.title, 'A new title')
         self.assertEqual(
             retrieved_collection_summary.category, 'A new category')
@@ -1759,6 +1761,7 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
 
         # TODO(madiyar): uncomment after revert_collection implementation
         # Have Albert revert to version 3. Version 5
-        # collection_services.revert_collection(albert_id, self.COLLECTION_ID, 4, 3)
+        # collection_services.revert_collection(albert_id,
+        #       self.COLLECTION_ID, 4, 3)
         # self._check_contributors_summary(self.COLLECTION_ID,
         #                                 {albert_id: 1, bob_id: 2})

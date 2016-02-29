@@ -157,6 +157,8 @@ CAN_SEND_EMAILS_TO_USERS = False
 DEFAULT_EMAIL_UPDATES_PREFERENCE = False
 # Whether to require an email to be sent, following a moderator action.
 REQUIRE_EMAIL_ON_MODERATOR_ACTION = False
+# Whether to allow custom event reporting to Google Analytics.
+CAN_SEND_ANALYTICS_EVENTS = False
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
@@ -221,6 +223,9 @@ SHOW_CUSTOM_PAGES = True
 # The id of the default skin.
 # TODO(sll): Deprecate this; it is no longer used.
 DEFAULT_SKIN_ID = 'conversation_v1'
+
+# The prefix for an 'accepted suggestion' commit message.
+COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
 
 # User id and username for exploration migration bot. Commits made by this bot
 # are not reflected in the exploration summary models (for the gallery and
@@ -356,6 +361,9 @@ RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 SIGNUP_URL = '/signup'
 SIGNUP_DATA_URL = '/signuphandler/data'
+SUGGESTION_URL_PREFIX = '/suggestionhandler'
+SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
+SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 

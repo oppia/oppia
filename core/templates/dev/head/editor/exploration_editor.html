@@ -392,7 +392,8 @@
       </div>
 
       <div ng-show="getTabStatuses().active === 'feedback'">
-        {% include 'editor/exploration_feedback.html' %}
+        {% include 'editor/feedback_tab/feedback_tab.html' %}
+        {% include 'editor/feedback_tab/thread_table_directive.html' %}
       </div>
     </div>
   </div>
@@ -425,6 +426,7 @@
   {% include 'components/fuzzy_rule_panel_directive.html' %}
   {% include 'components/gadget_directive.html' %}
   {% include 'components/gadget_panel_directive.html' %}
+  {% include 'components/html_select_directive.html' %}
   {% include 'components/loading_dots_directive.html' %}
   {% include 'components/outcome_editor_directive.html' %}
   {% include 'components/outcome_destination_editor_directive.html' %}
@@ -457,6 +459,7 @@
     {{ include_js_file('components/FuzzyRulePanelDirective.js') }}
     {{ include_js_file('components/GadgetDirective.js') }}
     {{ include_js_file('components/GadgetPanelDirective.js') }}
+    {{ include_js_file('components/HtmlSelectDirective.js') }}
     {{ include_js_file('components/LoadingDotsDirective.js') }}
     {{ include_js_file('components/OutcomeEditorDirective.js') }}
     {{ include_js_file('components/OutcomeDestinationEditorDirective.js') }}
@@ -471,8 +474,6 @@
     {{ include_js_file('components/ValueGeneratorEditorDirective.js') }}
 
     {{ value_generators_js }}
-
-    {{ include_js_file('services/explorationContextService.js') }}
     {{ include_js_file('services/explorationServices.js') }}
     {{ include_js_file('services/messengerService.js') }}
 
@@ -481,7 +482,12 @@
     {{ include_js_file('editor/ExplorationSettings.js') }}
     {{ include_js_file('editor/ExplorationHistory.js') }}
     {{ include_js_file('editor/HistoryServices.js') }}
-    {{ include_js_file('editor/ExplorationFeedback.js') }}
+
+    {{ include_js_file('editor/feedback_tab/FeedbackTab.js') }}
+    {{ include_js_file('editor/feedback_tab/ThreadDataService.js') }}
+    {{ include_js_file('editor/feedback_tab/ThreadStatusDisplayService.js') }}
+    {{ include_js_file('editor/feedback_tab/ThreadTableDirective.js') }}
+
     {{ include_js_file('editor/SidebarStateName.js') }}
     {{ include_js_file('editor/StateParameterChanges.js') }}
     {{ include_js_file('editor/StateEditor.js') }}

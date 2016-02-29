@@ -71,11 +71,6 @@ BEFORE_END_BODY_TAG_HOOK = config_domain.ConfigProperty(
     },
     'Code to insert just before the closing </body> tag in all pages.', '')
 
-OBJECT_EDITORS_JS = config_domain.ComputedProperty(
-    'object_editors_js', {'type': 'unicode'},
-    'JavaScript code for the object editors',
-    obj_services.get_all_object_editor_js_templates)
-
 SIDEBAR_MENU_ADDITIONAL_LINKS = config_domain.ConfigProperty(
     'sidebar_menu_additional_links', {
         'type': 'list',
@@ -387,6 +382,7 @@ class BaseHandler(webapp2.RequestHandler):
                 BEFORE_END_HEAD_TAG_HOOK.value),
             'BEFORE_END_BODY_TAG_HOOK': jinja2.utils.Markup(
                 BEFORE_END_BODY_TAG_HOOK.value),
+            'CAN_SEND_ANALYTICS_EVENTS': feconf.CAN_SEND_ANALYTICS_EVENTS,
             'DEFAULT_LANGUAGE_CODE': feconf.ALL_LANGUAGE_CODES[0]['code'],
             'DEV_MODE': feconf.DEV_MODE,
             'DOMAIN_URL': '%s://%s' % (scheme, netloc),
@@ -400,7 +396,8 @@ class BaseHandler(webapp2.RequestHandler):
             'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
             # TODO(sll): Consider including the obj_editor html directly as
             # part of the base HTML template?
-            'OBJECT_EDITORS_JS': jinja2.utils.Markup(OBJECT_EDITORS_JS.value),
+            'OBJECT_EDITORS_JS': jinja2.utils.Markup(
+                obj_services.get_all_object_editor_js_templates()),
             'RTE_COMPONENT_SPECS': (
                 rte_component_registry.Registry.get_all_specs()),
             'SHOW_CUSTOM_PAGES': feconf.SHOW_CUSTOM_PAGES,

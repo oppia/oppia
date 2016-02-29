@@ -24,6 +24,7 @@ from google.appengine.ext import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
+# Allowed feedback thread statuses.
 STATUS_CHOICES_OPEN = 'open'
 STATUS_CHOICES_FIXED = 'fixed'
 STATUS_CHOICES_IGNORED = 'ignored'
@@ -67,6 +68,8 @@ class FeedbackThreadModel(base_models.BaseModel):
     subject = ndb.StringProperty(indexed=False)
     # Summary text of the thread.
     summary = ndb.TextProperty(indexed=False)
+    # Specifies whether this thread has a related learner suggestion.
+    has_suggestion = ndb.BooleanProperty(indexed=True, default=False)
 
     @classmethod
     def generate_new_thread_id(cls, exploration_id):
@@ -84,7 +87,7 @@ class FeedbackThreadModel(base_models.BaseModel):
             'New thread id generator is producing too many collisions.')
 
     @classmethod
-    def _generate_id(cls, exploration_id, thread_id):
+    def generate_full_thread_id(cls, exploration_id, thread_id):
         return '.'.join([exploration_id, thread_id])
 
     @classmethod
@@ -94,7 +97,7 @@ class FeedbackThreadModel(base_models.BaseModel):
         Throws an exception if a thread with the given exploration ID and
         thread ID combination exists already.
         """
-        instance_id = cls._generate_id(exploration_id, thread_id)
+        instance_id = cls.generate_full_thread_id(exploration_id, thread_id)
         if cls.get_by_id(instance_id):
             raise Exception('Feedback thread ID conflict on create.')
         return cls(id=instance_id)
@@ -105,7 +108,8 @@ class FeedbackThreadModel(base_models.BaseModel):
 
         Returns None if the thread is not found or is already deleted.
         """
-        return cls.get_by_id(cls._generate_id(exploration_id, thread_id))
+        return cls.get_by_id(cls.generate_full_thread_id(
+            exploration_id, thread_id))
 
     @classmethod
     def get_threads(cls, exploration_id):
@@ -114,8 +118,8 @@ class FeedbackThreadModel(base_models.BaseModel):
         Does not include the deleted entries.
         """
         return cls.get_all().filter(
-            cls.exploration_id == exploration_id).fetch(
-                feconf.DEFAULT_QUERY_LIMIT)
+            cls.exploration_id == exploration_id).order(
+                cls.last_updated).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
 
 class FeedbackMessageModel(base_models.BaseModel):
@@ -143,8 +147,8 @@ class FeedbackMessageModel(base_models.BaseModel):
     text = ndb.StringProperty(indexed=False)
 
     @classmethod
-    def _generate_id(cls, thread_id, message_id):
-        return '.'.join([thread_id, str(message_id)])
+    def _generate_id(cls, exploration_id, thread_id, message_id):
+        return '.'.join([exploration_id, thread_id, str(message_id)])
 
     @property
     def exploration_id(self):
@@ -154,19 +158,20 @@ class FeedbackMessageModel(base_models.BaseModel):
         return FeedbackThreadModel.get_by_id(self.thread_id).subject
 
     @classmethod
-    def create(cls, thread_id, message_id):
+    def create(cls, exploration_id, thread_id, message_id):
         """Creates a new FeedbackMessageModel entry.
 
         Throws an exception if a message with the given thread ID and message
         ID combination exists already.
         """
-        instance_id = cls._generate_id(thread_id, message_id)
+        instance_id = cls._generate_id(
+            exploration_id, thread_id, message_id)
         if cls.get_by_id(instance_id):
             raise Exception('Feedback message ID conflict on create.')
         return cls(id=instance_id)
 
     @classmethod
-    def get(cls, thread_id, message_id, strict=True):
+    def get(cls, exploration_id, thread_id, message_id, strict=True):
         """Gets the FeedbackMessageModel entry for the given ID.
 
         If the message id is valid and it is not marked as deleted, returns the
@@ -174,31 +179,37 @@ class FeedbackMessageModel(base_models.BaseModel):
         - if strict is True, raises EntityNotFoundError
         - if strict is False, returns None.
         """
-        instance_id = cls._generate_id(thread_id, message_id)
+        instance_id = cls._generate_id(exploration_id, thread_id, message_id)
         return super(FeedbackMessageModel, cls).get(instance_id, strict=strict)
 
     @classmethod
-    def get_messages(cls, thread_id):
+    def get_messages(cls, exploration_id, thread_id):
         """Returns an array of messages in the thread.
 
         Does not include the deleted entries.
         """
+        full_thread_id = FeedbackThreadModel.generate_full_thread_id(
+            exploration_id, thread_id)
         return cls.get_all().filter(
-            cls.thread_id == thread_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
+            cls.thread_id == full_thread_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def get_most_recent_message(cls, thread_id):
+    def get_most_recent_message(cls, exploration_id, thread_id):
+        full_thread_id = FeedbackThreadModel.generate_full_thread_id(
+            exploration_id, thread_id)
         return cls.get_all().filter(
-            cls.thread_id == thread_id).order(-cls.last_updated).get()
+            cls.thread_id == full_thread_id).order(-cls.last_updated).get()
 
     @classmethod
-    def get_message_count(cls, thread_id):
+    def get_message_count(cls, exploration_id, thread_id):
         """Returns the number of messages in the thread.
 
         Includes the deleted entries.
         """
+        full_thread_id = FeedbackThreadModel.generate_full_thread_id(
+            exploration_id, thread_id)
         return cls.get_all(include_deleted_entities=True).filter(
-            cls.thread_id == thread_id).count()
+            cls.thread_id == full_thread_id).count()
 
     @classmethod
     def get_all_messages(cls, page_size, urlsafe_start_cursor):
@@ -224,3 +235,55 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
             num_open_threads=num_open_threads,
             num_total_threads=num_total_threads
         ).put()
+
+
+class SuggestionModel(base_models.BaseModel):
+    """Suggestions made by learners.
+
+    The id of each instance is the id of the corresponding thread.
+    """
+
+    # ID of the user who submitted the suggestion.
+    author_id = ndb.StringProperty(required=True, indexed=True)
+    # ID of the corresponding exploration.
+    exploration_id = ndb.StringProperty(required=True, indexed=True)
+    # The exploration version for which the suggestion was made.
+    exploration_version = ndb.IntegerProperty(required=True, indexed=True)
+    # Name of the corresponding state.
+    state_name = ndb.StringProperty(required=True, indexed=True)
+    # Learner-provided description of suggestion changes.
+    description = ndb.TextProperty(required=True, indexed=False)
+    # The state's content after the suggested edits.
+    # Contains keys 'type' (always 'text') and 'value' (the actual content).
+    state_content = ndb.JsonProperty(required=True, indexed=False)
+
+    @classmethod
+    def create(cls, exploration_id, thread_id, author_id, exploration_version,
+               state_name, description, state_content):
+        """Creates a new SuggestionModel entry.
+
+        Throws an exception if a suggestion with the given thread id already
+        exists.
+        """
+        instance_id = cls._get_instance_id(exploration_id, thread_id)
+        if cls.get_by_id(instance_id):
+            raise Exception('There is already a feedback thread with the given '
+                            'thread id: %s' % instance_id)
+        cls(id=instance_id, author_id=author_id,
+            exploration_id=exploration_id,
+            exploration_version=exploration_version,
+            state_name=state_name,
+            description=description,
+            state_content=state_content).put()
+
+    @classmethod
+    def _get_instance_id(cls, exploration_id, thread_id):
+        return '.'.join([exploration_id, thread_id])
+
+    @classmethod
+    def get_by_exploration_and_thread_id(cls, exploration_id, thread_id):
+        """Gets a suggestion by the corresponding exploration and thread id's.
+
+        Returns None if it doesn't match anything."""
+
+        return cls.get_by_id(cls._get_instance_id(exploration_id, thread_id))

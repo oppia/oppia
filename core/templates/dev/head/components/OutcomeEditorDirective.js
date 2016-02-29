@@ -23,32 +23,51 @@ oppia.directive('outcomeEditor', [function() {
     restrict: 'E',
     scope: {
       isEditable: '&isEditable',
+      displayFeedback: '=',
       getOnSaveDestFn: '&onSaveDest',
       getOnSaveFeedbackFn: '&onSaveFeedback',
-      outcome: '=outcome'
+      outcome: '=outcome',
+      suppressWarnings: '&suppressWarnings'
     },
     templateUrl: 'components/outcomeEditor',
     controller: [
-      '$scope', 'editorContextService', function($scope, editorContextService) {
+      '$scope', 'editorContextService',
+      'stateInteractionIdService',
+      function($scope, editorContextService,
+        stateInteractionIdService) {
         $scope.editOutcomeForm = {};
         $scope.feedbackEditorIsOpen = false;
         $scope.destinationEditorIsOpen = false;
+        // TODO(sll): Investigate whether this line can be removed, due to
+        // $scope.savedOutcome now being set in onExternalSave().
         $scope.savedOutcome = angular.copy($scope.outcome);
 
         var onExternalSave = function() {
-          if ($scope.feedbackEditorIsOpen &&
-              $scope.editOutcomeForm.editFeedbackForm.$valid &&
-              !$scope.invalidStateAfterFeedbackSave()) {
-            $scope.saveThisFeedback();
-          } else {
-            $scope.cancelThisFeedbackEdit();
+          // The reason for this guard is because, when the editor page for an
+          // exploration is first opened, the 'initializeAnswerGroups' event
+          // (which fires an 'externalSave' event) only fires after the
+          // $scope.savedOutcome is set above. Until then, $scope.savedOutcome
+          // is undefined.
+          if ($scope.savedOutcome === undefined) {
+            $scope.savedOutcome = angular.copy($scope.outcome);
           }
-          if ($scope.destinationEditorIsOpen &&
-              $scope.editOutcomeForm.editDestForm.$valid &&
-              !$scope.invalidStateAfterDestinationSave()) {
-            $scope.saveThisDestination();
-          } else {
-            $scope.cancelThisDestinationEdit();
+
+          if ($scope.feedbackEditorIsOpen) {
+            if ($scope.editOutcomeForm.editFeedbackForm.$valid &&
+                !$scope.invalidStateAfterFeedbackSave()) {
+              $scope.saveThisFeedback();
+            } else {
+              $scope.cancelThisFeedbackEdit();
+            }
+          }
+
+          if ($scope.destinationEditorIsOpen) {
+            if ($scope.editOutcomeForm.editDestForm.$valid &&
+                !$scope.invalidStateAfterDestinationSave()) {
+              $scope.saveThisDestination();
+            } else {
+              $scope.cancelThisDestinationEdit();
+            }
           }
         };
 
@@ -66,17 +85,20 @@ oppia.directive('outcomeEditor', [function() {
             outcome.dest === editorContextService.getActiveStateName());
         };
 
+        $scope.getCurrentInteractionId = function() {
+          return stateInteractionIdService.savedMemento;
+        };
+
         $scope.isSelfLoopWithNoFeedback = function(outcome) {
           if (!outcome) {
             return false;
           }
-
           var hasFeedback = outcome.feedback.some(function(feedbackItem) {
             return Boolean(feedbackItem);
           });
-
           return $scope.isSelfLoop(outcome) && !hasFeedback;
         };
+
         $scope.invalidStateAfterFeedbackSave = function() {
           var tmpOutcome = angular.copy($scope.savedOutcome);
           tmpOutcome.feedback = angular.copy($scope.outcome.feedback);

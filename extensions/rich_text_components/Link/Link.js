@@ -36,11 +36,11 @@ oppia.directive('oppiaNoninteractiveLink', [
                 $attrs.openLinkInSameWindowWithValue) ? '_top' : '_blank');
           }
 
-          var untrustedUrl = oppiaHtmlEscaper.escapedJsonToObj(
-            $attrs.urlWithValue);
+          var untrustedUrl = encodeURI(oppiaHtmlEscaper.escapedJsonToObj(
+            $attrs.urlWithValue));
           if (untrustedUrl.indexOf('http://') !== 0 &&
               untrustedUrl.indexOf('https://') !== 0) {
-            return;
+            untrustedUrl = 'https://' + untrustedUrl;
           }
           $scope.url = untrustedUrl;
 

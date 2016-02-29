@@ -382,10 +382,6 @@ def get_human_readable_user_ids(user_ids):
     return usernames
 
 
-def get_user_id_from_email(email):
-    return current_user_services.get_user_id_from_email(email)
-
-
 def record_user_started_state_editor_tutorial(user_id):
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.last_started_state_editor_tutorial = (
@@ -469,7 +465,8 @@ def get_user_contributions(user_id, strict=False):
     model = user_models.UserContributionsModel.get(user_id, strict=strict)
     if model is not None:
         result = UserContributions(
-            model.id, model.created_exploration_ids, model.edited_exploration_ids)
+            model.id, model.created_exploration_ids,
+            model.edited_exploration_ids)
     else:
         result = None
     return result
@@ -489,7 +486,8 @@ def create_user_contributions(
     return user_contributions
 
 
-def update_user_contributions(user_id, created_exploration_ids, edited_exploration_ids):
+def update_user_contributions(user_id, created_exploration_ids,
+                              edited_exploration_ids):
     """Updates an existing UserContributionsModel with new calculated
     contributions"""
 

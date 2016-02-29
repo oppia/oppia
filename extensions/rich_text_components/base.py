@@ -46,6 +46,9 @@ class BaseRichTextComponent(object):
     # Whether the component is large enough to discourage its use when the
     # rich-text editor is intended to be lightweight.
     is_complex = False
+    # Whether the component requires the filesystem in some way that
+    # prevents it from being used by unauthorized users.
+    requires_fs = False
     # Customization arg specifications for the component, including their
     # descriptions, schemas and default values. Overridden in subclasses.
     _customization_arg_specs = []
@@ -90,5 +93,6 @@ class BaseRichTextComponent(object):
             'icon_data_url': utils.convert_png_to_data_url(os.path.join(
                 feconf.RTE_EXTENSIONS_DIR, self.id, '%s.png' % self.id)),
             'is_complex': self.is_complex,
+            'requires_fs': self.requires_fs,
             'tooltip': self.tooltip,
         }

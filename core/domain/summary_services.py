@@ -23,6 +23,16 @@ from core.domain import user_services
 import utils
 
 
+def get_human_readable_contributors_summary(contributors_summary):
+    contributor_ids = contributors_summary.keys()
+    contributor_usernames = user_services.get_human_readable_user_ids(
+        contributor_ids)
+    return {
+        contributor_usernames[ind]: contributors_summary[contributor_ids[ind]]
+        for ind in xrange(len(contributor_ids))
+    }
+
+
 def get_displayable_exp_summary_dicts_matching_ids(exploration_ids):
     """Given a list of exploration ids, filters the list for
     explorations that are currently non-private and not deleted,
@@ -52,6 +62,9 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids):
                 'status': exploration_summary.status,
                 'ratings': exploration_summary.ratings,
                 'community_owned': exploration_summary.community_owned,
+                'human_readable_contributors_summary':
+                    get_human_readable_contributors_summary(
+                        exploration_summary.contributors_summary),
                 'contributor_names': user_services.get_human_readable_user_ids(
                     exploration_summary.contributor_ids),
                 'tags': exploration_summary.tags,
