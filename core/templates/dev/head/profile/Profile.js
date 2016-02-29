@@ -50,11 +50,23 @@ oppia.controller('Profile', [
         title: 'Edited',
         value: data.edited_exp_summary_dicts.length
       }];
-      $scope.userCreatedExplorations = data.created_exp_summary_dicts;
-      $scope.userEditedExplorations = data.edited_exp_summary_dicts;
+
+      $scope.userEditedExplorations = data.edited_exp_summary_dicts.sort(
+          function(exploration1, exploration2 ) {
+        if (exploration1.ratings > exploration2.ratings) {
+          return 1;
+        } else if (exploration1.ratings === exploration2.ratings) {
+          if (exploration1.playthroughs > exploration2.playthroughs) {
+            return 1;
+          } else {
+            return -1;
+          }
+        } else {
+          return -1;
+        }
+      });
       $scope.numUserPortfolioExplorations = (
         data.edited_exp_summary_dicts.length);
-      console.log($scope.userEditedExplorations);
       $scope.subjectInterests = data.subject_interests;
       $scope.firstContributionMsec = data.first_contribution_msec;
       $scope.profilePictureDataUrl = (
