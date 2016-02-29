@@ -1,11 +1,11 @@
 <script type="text/ng-template" id="summaryTile/exploration">
-  <md-card class="oppia-exploration-summary-tile">
+  <md-card class="oppia-gallery-summary-tile">
     <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
       <div class="top-section" style="background-color: <[getThumbnailBgColor()]>;">
         <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
-        <h2 class="exploration-title protractor-test-exp-summary-tile-title"><[getExplorationTitle()]></h2>
+        <h2 class="title protractor-test-exp-summary-tile-title"><[getExplorationTitle()]></h2>
 
-        <div class="exploration-summary-contributors" ng-show="contributors.length > 0">
+        <div class="summary-contributors" ng-show="contributors.length > 0">
           <profile-link-image ng-if="contributors.length > 0"
                               username="contributors[0]"
                               tooltip="<[contributors[0]]>"
@@ -25,7 +25,7 @@
             </profile-link-image>
 
             <div style="position:relative;" ng-show="contributors.length > MAX_CONTRIBUTORS_TO_DISPLAY">
-              <div class="exploration-black-profile"></div>
+              <div class="black-profile"></div>
               <div class="num-remaining-contributors" ng-show="contributors.length > MAX_CONTRIBUTORS_TO_DISPLAY">
                 +<[contributors.length - MAX_CONTRIBUTORS_TO_DISPLAY]>
               </div>
@@ -73,181 +73,3 @@
     </a>
   </md-card>
 </script>
-
-<style>
-  .oppia-exploration-summary-tile {
-    background-color: #fff;
-    cursor: pointer;
-    display: inline-block;
-    height: 240px;
-    margin: 12px 4px;
-    padding: 0;
-    position: relative;
-    text-align: left;
-    vertical-align: top;
-    width: 200px;
-  }
-
-  .oppia-exploration-summary-tile a,
-  .oppia-exploration-summary-tile a:hover,
-  .oppia-exploration-summary-tile a:active,
-  .oppia-exploration-summary-tile a:visited {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .oppia-exploration-summary-tile:hover {
-    /*
-      This is based on the levels defined on the following page:
-        https://medium.com/@Florian/freebie-google-material-design-shadow-helper-2a0501295a2d#.22sskepri
-      Level 2 seemed too subtle, but level 3 seemed too strong. This line
-      therefore tries to average both of them.
-    */
-    box-shadow: 0 6px 13px rgba(0,0,0,0.17), 0 4px 6px rgba(0,0,0,0.23);
-  }
-
-  .oppia-exploration-summary-tile .top-section {
-    height: 144px;
-    position: relative;
-    width: 100%;
-  }
-
-  .oppia-exploration-summary-tile,
-  .oppia-exploration-summary-tile .top-section {
-    -webkit-transition: all 300ms;
-    transition: all 300ms;
-  }
-
-  .oppia-exploration-summary-tile .exploration-summary-contributors {
-    padding-bottom: 4px;
-    padding-right: 5px;
-    left: 169px;
-    position: absolute;
-    top: 3px;
-    width: 31px;
-    z-index: 11;
-  }
-
-  .oppia-exploration-summary-tile .exploration-summary-tile-mask {
-    background-color: #eee;
-    height: 240px;
-    left: 0px;
-    opacity: 0.7;
-    position: absolute;
-    top: 0px;
-    width: 200px;
-    z-index: 10;
-  }
-
-  .oppia-exploration-summary-tile:hover .top-section-mask {
-    background-color: #eee;
-    height: 144px;
-    left: 0px;
-    opacity: 0.4;
-    position: absolute;
-    top: 0px;
-    width: 200px;
-    z-index: 10;
-  }
-
-  .oppia-exploration-summary-tile .exploration-black-profile {
-    background-color: black;
-    border-radius: 50%;
-    width: 26px;
-    height: 26px;
-  }
-
-  .oppia-exploration-summary-tile .exploration-summary-contributors profile-link-image {
-    margin-bottom: 3px;
-    display:block;
-  }
-
-  .oppia-exploration-summary-tile .contributors-num-minus-one {
-    color: white;
-    font-family: Roboto;
-    font-size: x-small;
-    font-weight: bold;
-    left: 17px;
-    position: absolute;
-    top: 18px;
-  }
-
-  .oppia-exploration-summary-tile .all-contributors .num-remaining-contributors {
-    color: white;
-    font-family: Roboto;
-    font-size: 0.7em;
-    font-weight: normal;
-    left: 7px;
-    position: absolute;
-    top: 5px;
-  }
-
-  .oppia-exploration-summary-tile .exploration-category {
-    color: #fff;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
-    font-size: 0.65em;
-    margin-left: 12px;
-    margin-top: 8px;
-    position: absolute;
-    text-transform: uppercase;
-  }
-
-  .oppia-exploration-summary-tile .thumbnail-image {
-    display: block;
-    margin: 0 auto;
-    height: 40px;
-    top: 36px;
-    position: relative;
-    width: 40px;
-  }
-
-  .oppia-exploration-summary-tile .exploration-title {
-    bottom: 0;
-    color: white;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
-    font-size: 1em;
-    line-height: 1.2em;
-    margin: 12px;
-    padding: 0;
-    position: absolute;
-  }
-
-  .oppia-exploration-summary-tile .objective {
-    height: 60px;
-    font-family: Roboto;
-    font-size: 0.85em;
-    font-style: italic;
-    padding: 12px;
-  }
-
-  .oppia-exploration-summary-tile .rating-disabled {
-    opacity: 0.5;
-  }
-
-  .oppia-exploration-summary-tile .metrics {
-    height: 30px;
-    margin: 0 12px;
-    padding: 0;
-  }
-
-  .oppia-exploration-summary-tile .metrics li {
-    font-size: 0.75em;
-    list-style-type: none;
-    text-align: center;
-  }
-
-  .oppia-exploration-summary-tile .metrics li .fa {
-    font-size: 1.1em;
-    margin-right: 2px;
-    vertical-align: initial;
-  }
-
-  .oppia-exploration-summary-tile .recently-updated {
-    background-color: rgb(19,105,193);
-    border-radius: 10px;
-    color: white;
-    font-size: 0.8em;
-    font-weight: bold;
-    padding: 5px 8px 4px 8px;
-  }
-</style>

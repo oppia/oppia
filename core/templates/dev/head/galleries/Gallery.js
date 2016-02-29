@@ -207,11 +207,13 @@ oppia.controller('Gallery', [
     // SEARCH FUNCTIONALITY
 
     $scope.allExplorationsInOrder = [];
+    $scope.allCollectionsInOrder = [];
 
     // Called when the page loads, and after every search query.
     var _refreshGalleryData = function(data, hasPageFinishedLoading) {
       $scope.searchIsLoading = false;
       $scope.allExplorationsInOrder = data.explorations_list;
+      $scope.allCollectionsInOrder = data.collections_list;
       $scope.finishedLoadingPage = hasPageFinishedLoading;
       $rootScope.loadingMessage = '';
     };
@@ -224,6 +226,8 @@ oppia.controller('Gallery', [
         searchService.loadMoreData(function(data, hasPageFinishedLoading) {
           $scope.allExplorationsInOrder = $scope.allExplorationsInOrder.concat(
             data.explorations_list);
+          $scope.allCollectionsInOrder = $scope.allCollectionsInOrder.concat(
+            data.collections_list);
           $scope.finishedLoadingPage = hasPageFinishedLoading;
           $scope.pageLoaderIsBusy = false;
         });
