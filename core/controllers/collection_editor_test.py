@@ -38,7 +38,7 @@ class BaseCollectionEditorControllerTest(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-        self.set_admins([self.ADMIN_EMAIL])
+        self.set_admins([self.ADMIN_USERNAME])
 
     def assert_can_edit(self, response_body):
         """Returns True if the response body indicates that the collection is
