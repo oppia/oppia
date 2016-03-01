@@ -64,6 +64,8 @@ oppia.constant('DEFAULT_FUZZY_RULE', {
   }
 });
 
+oppia.constant('EVENT_HTML_CHANGED', 'htmlChanged');
+
 oppia.constant('PARAMETER_TYPES', {
   REAL: 'Real',
   UNICODE_STRING: 'UnicodeString'
@@ -82,14 +84,13 @@ oppia.constant('MAX_NODE_LABEL_LENGTH', 15);
 // Global utility methods.
 oppia.controller('Base', [
   '$scope', '$http', '$rootScope', '$window', '$timeout', '$document', '$log',
-  'warningsData', 'activeInputData', 'LABEL_FOR_CLEARING_FOCUS',
+  'warningsData', 'LABEL_FOR_CLEARING_FOCUS', 'siteAnalyticsService',
   function(
       $scope, $http, $rootScope, $window, $timeout, $document, $log,
-      warningsData, activeInputData, LABEL_FOR_CLEARING_FOCUS) {
+      warningsData, LABEL_FOR_CLEARING_FOCUS, siteAnalyticsService) {
     $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
 
     $scope.warningsData = warningsData;
-    $scope.activeInputData = activeInputData;
     $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
 
     // If this is nonempty, the whole page goes into 'Loading...' mode.
@@ -200,6 +201,14 @@ oppia.controller('Base', [
 
     $scope.onMouseoutDropdownMenu = function(evt) {
       angular.element(evt.currentTarget).parent().removeClass('open');
+    };
+
+    $scope.onLoginButtonClicked = function(loginUrl) {
+      siteAnalyticsService.registerStartLoginEvent('loginButton');
+      $timeout(function() {
+        $window.location = loginUrl;
+      }, 150);
+      return false;
     };
 
     $scope.pageHasLoaded = false;

@@ -15,7 +15,7 @@
 // This directive is based on the unicodeStringEditor one.
 
 oppia.directive('sanitizedUrlEditor', [
-    '$compile', 'OBJECT_EDITOR_URL_PREFIX', 'warningsData',
+    '$compile', 'OBJECT_EDITOR_URL_PREFIX',
     function($compile, OBJECT_EDITOR_URL_PREFIX) {
   // Editable URL directive.
   return {

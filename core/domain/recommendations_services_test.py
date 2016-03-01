@@ -252,7 +252,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
         user_services.get_or_create_user(
             self.admin_id, self.ADMIN_EMAIL)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_EMAIL])
+        self.set_admins([self.ADMIN_USERNAME])
 
 
 class ExplorationRecommendationsUnitTests(RecommendationsServicesUnitTests):

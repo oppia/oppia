@@ -30,23 +30,11 @@ def set_property(committer_id, name, value):
     if config_property is None:
         raise Exception('No config property with name %s found.')
 
-    value = config_property.normalize(value)
+    if not config_property.is_directly_settable:
+        raise Exception(
+            'Cannot modify value of config property %s directly' % name)
 
-    # Set value in datastore.
-    datastore_item = config_models.ConfigPropertyModel.get(
-        config_property.name, strict=False)
-    if datastore_item is None:
-        datastore_item = config_models.ConfigPropertyModel(
-            id=config_property.name)
-    datastore_item.value = value
-    datastore_item.commit(committer_id, [{
-        'cmd': CMD_CHANGE_PROPERTY_VALUE,
-        'new_value': value
-    }])
-
-    # Set value in memcache.
-    memcache_services.set_multi({
-        datastore_item.id: datastore_item.value})
+    config_property.set_value(committer_id, value)
 
 
 def revert_property(committer_id, name):

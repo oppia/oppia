@@ -265,8 +265,8 @@ class TestBase(unittest.TestCase):
 
         self.logout()
 
-    def set_admins(self, admin_emails):
-        """Set the ADMIN_EMAILS property."""
+    def set_admins(self, admin_usernames):
+        """Set the ADMIN_USERNAMES property."""
         self._stash_current_user_env()
 
         self.login('tmpsuperadmin@example.com', is_super_admin=True)
@@ -275,15 +275,15 @@ class TestBase(unittest.TestCase):
         self.post_json('/adminhandler', {
             'action': 'save_config_properties',
             'new_config_property_values': {
-                config_domain.ADMIN_EMAILS.name: admin_emails,
+                config_domain.ADMIN_USERNAMES.name: admin_usernames,
             }
         }, csrf_token)
         self.logout()
 
         self._restore_stashed_user_env()
 
-    def set_moderators(self, moderator_emails):
-        """Set the MODERATOR_EMAILS property."""
+    def set_moderators(self, moderator_usernames):
+        """Set the MODERATOR_USERNAMES property."""
         self._stash_current_user_env()
 
         self.login('tmpsuperadmin@example.com', is_super_admin=True)
@@ -292,7 +292,7 @@ class TestBase(unittest.TestCase):
         self.post_json('/adminhandler', {
             'action': 'save_config_properties',
             'new_config_property_values': {
-                config_domain.MODERATOR_EMAILS.name: moderator_emails,
+                config_domain.MODERATOR_USERNAMES.name: moderator_usernames,
             }
         }, csrf_token)
         self.logout()

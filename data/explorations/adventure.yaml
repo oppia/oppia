@@ -4,7 +4,12 @@ category: Interactive Fiction
 init_state_name: Welcome
 language_code: en
 objective: N/A
-param_changes: []
+param_changes:
+- customization_args:
+    parse_with_jinja: true
+    value: '0'
+  generator_id: Copier
+  name: numcoins
 param_specs:
   Name:
     obj_type: UnicodeString

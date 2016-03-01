@@ -188,12 +188,14 @@ oppia.factory('searchService', [
 
 oppia.controller('Gallery', [
   '$scope', '$http', '$rootScope', '$modal', '$window', '$timeout',
-  'ExplorationCreationButtonService', 'oppiaDebouncer', 'urlService',
-  'GALLERY_DATA_URL', 'CATEGORY_LIST', 'searchService', 'selectionDataService',
+  'ExplorationCreationButtonService', 'oppiaDatetimeFormatter',
+  'oppiaDebouncer', 'urlService', 'GALLERY_DATA_URL', 'CATEGORY_LIST',
+  'searchService', 'siteAnalyticsService',
   function(
       $scope, $http, $rootScope, $modal, $window, $timeout,
-      ExplorationCreationButtonService, oppiaDebouncer, urlService,
-      GALLERY_DATA_URL, CATEGORY_LIST, searchService, selectionDataService) {
+      ExplorationCreationButtonService, oppiaDatetimeFormatter,
+      oppiaDebouncer, urlService, GALLERY_DATA_URL, CATEGORY_LIST,
+      searchService, siteAnalyticsService) {
     $rootScope.loadingMessage = 'Loading';
 
     // Below is the width of each tile (width + margins), which can be found
@@ -399,27 +401,39 @@ oppia.controller('Gallery', [
       }
     );
 
-    $scope.showFullGalleryGroup = function(galleryGroup) {
-      selectionDataService.clearCategories();
-      selectionDataService.addCategoriesToSelection(galleryGroup.categories);
-      // TODO(sll): is this line correct?
-      selectionDataService.clearLanguageCodes();
-      searchService.executeSearchQuery('', function() {
-        removeSplashCarousel();
-      });
-      // TODO(sll): Clear the search query from the search bar, too.
+    // Retrieves gallery data from the server.
+    $http.get(GALLERY_DATA_URL).success(function(data) {
+      $scope.currentUserIsModerator = Boolean(data.is_moderator);
+
+      // Note that this will cause an initial search query to be sent.
+      $rootScope.$broadcast(
+        'preferredLanguageCodesLoaded', data.preferred_language_codes);
+
+      if (data.username) {
+        if (urlService.getUrlParams().mode === 'create') {
+          $scope.showCreateExplorationModal(CATEGORY_LIST);
+        }
+      }
+    });
+
+    $scope.onRedirectToLogin = function(destinationUrl) {
+      siteAnalyticsService.registerStartLoginEvent('noSearchResults');
+      $timeout(function() {
+        $window.location = destinationUrl;
+      }, 150);
+      return false;
     };
   }
 ]);
 
 oppia.controller('SearchBar', [
-  '$scope', '$rootScope', 'searchService', 'oppiaDebouncer',
-  'ExplorationCreationButtonService', 'urlService', 'CATEGORY_LIST',
-  'selectionDataService',
+  '$scope', '$rootScope', '$timeout', '$window', 'searchService',
+  'oppiaDebouncer', 'ExplorationCreationButtonService', 'urlService',
+  'CATEGORY_LIST', 'siteAnalyticsService',
   function(
-      $scope, $rootScope, searchService, oppiaDebouncer,
-      ExplorationCreationButtonService, urlService, CATEGORY_LIST,
-      selectionDataService) {
+      $scope, $rootScope, $timeout, $window, searchService,
+      oppiaDebouncer, ExplorationCreationButtonService, urlService,
+      CATEGORY_LIST, siteAnalyticsService) {
     $scope.searchIsLoading = false;
     $scope.ALL_CATEGORIES = CATEGORY_LIST.map(function(categoryName) {
       return {
@@ -539,7 +553,7 @@ oppia.controller('SearchBar', [
 
     $scope.$on(
       'preferredLanguageCodesLoaded',
-      function(evt, preferredLanguageCodesList) {
+      function(preferredLanguageCodesList) {
         for (var i = 0; i < preferredLanguageCodesList.length; i++) {
           var selections = $scope.selectionDetails.languageCodes.selections;
           var languageCode = preferredLanguageCodesList[i];
@@ -561,6 +575,14 @@ oppia.controller('SearchBar', [
     $scope.showUploadExplorationModal = function() {
       ExplorationCreationButtonService.showUploadExplorationModal(
         CATEGORY_LIST);
+    };
+
+    $scope.onRedirectToLogin = function(destinationUrl) {
+      siteAnalyticsService.registerStartLoginEvent('createExplorationButton');
+      $timeout(function() {
+        $window.location = destinationUrl;
+      }, 150);
+      return false;
     };
   }
 ]);

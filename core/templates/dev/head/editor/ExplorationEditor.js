@@ -365,12 +365,12 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
   '$scope', '$http', '$rootScope', '$window', '$timeout', '$modal',
   'warningsData', 'changeListService', 'focusService', 'routerService',
   'explorationData', 'explorationRightsService', 'editabilityService',
-  'explorationWarningsService',
+  'explorationWarningsService', 'siteAnalyticsService',
   function(
       $scope, $http, $rootScope, $window, $timeout, $modal,
       warningsData, changeListService, focusService, routerService,
       explorationData, explorationRightsService, editabilityService,
-      explorationWarningsService) {
+      explorationWarningsService, siteAnalyticsService) {
     // Whether or not a save action is currently in progress.
     $scope.isSaveInProgress = false;
     // Whether or not a discard action is currently in progress.
@@ -459,6 +459,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         explorationRightsService.saveChangeToBackend({
           is_public: true
         });
+        siteAnalyticsService.registerPublishExplorationEvent(
+          explorationData.explorationId);
       });
 
       modalInstance.opened.then(function() {
@@ -759,6 +761,14 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
           }, function() {
             $scope.isSaveInProgress = false;
           });
+
+          if ($scope.isPrivate()) {
+            siteAnalyticsService.registerCommitChangesToPrivateExplorationEvent(
+              explorationData.explorationId);
+          } else {
+            siteAnalyticsService.registerCommitChangesToPublicExplorationEvent(
+              explorationData.explorationId);
+          }
         }, function() {
           _modalIsOpen = false;
         });

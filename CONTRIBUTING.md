@@ -122,3 +122,7 @@ We also have a developer chat room [here](https://gitter.im/oppia/oppia-chat). F
 GitHub teams allow contributors working on similar areas of the Oppia codebase to to find and contact each other easily. These teams will be accessible via the GitHub alias @oppia/{{team-name}}. Mentioning a team in a issue or comment will notify all members in the team. During the issue triage process, issues will be assigned to a team, and members of the team are encouraged to comment on or take up the issue. If a contributor who is not part of the team is working on an issue, they will also be able to ask the team for guidance.
 
 You can indicate which team(s) you want to join by filling in the form [here](http://goo.gl/forms/kXILyztnfS), or requesting to join/leave teams on the [teams page](https://github.com/orgs/oppia/teams). You can join or leave a team at any time.
+
+### Design docs and planning
+
+Design documents and meeting minutes are in our [Google Drive folder](https://drive.google.com/open?id=0B8ADASwHtwE9UFlLSFdlMkt2Y2c). 
