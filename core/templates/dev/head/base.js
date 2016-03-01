@@ -83,10 +83,11 @@ oppia.constant('MAX_NODE_LABEL_LENGTH', 15);
 
 // Global utility methods.
 oppia.controller('Base', [
-  '$scope', '$http', '$rootScope', '$window', '$timeout', '$document', '$log',
+  '$scope', '$http', '$rootScope', '$location', '$window', '$timeout',
+  '$document', '$log',
   'warningsData', 'LABEL_FOR_CLEARING_FOCUS', 'siteAnalyticsService',
   function(
-      $scope, $http, $rootScope, $window, $timeout, $document, $log,
+      $scope, $http, $rootScope, $location, $window, $timeout, $document, $log,
       warningsData, LABEL_FOR_CLEARING_FOCUS, siteAnalyticsService) {
     $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
 
@@ -95,6 +96,17 @@ oppia.controller('Base', [
 
     // If this is nonempty, the whole page goes into 'Loading...' mode.
     $rootScope.loadingMessage = '';
+
+    // Watch for location change event,
+    // redirect user to dashboard page if logged in and visiting '/'.
+    $scope.$on('$locationChangeStart', function(event) {
+      if (GLOBALS.userIsLoggedIn) {
+        if ($window.location.pathname === '/') {
+          event.preventDefault();
+          $window.location.replace('/my_explorations');
+        }
+      }
+    });
 
     if (GLOBALS.userIsLoggedIn) {
       // Show the number of unseen notifications in the navbar and page title,
