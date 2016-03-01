@@ -26,10 +26,15 @@ class HomePageTest(test_utils.GenericTestBase):
     def test_logged_out_homepage(self):
         """Test the logged-out version of the home page."""
         response = self.testapp.get('/')
-        self.assertEqual(response.status_int, 200)
-        response.mustcontain(
-            'Your personal tutor',
-            'Oppia - Gallery', 'About', 'Sign in', no=['Logout'])
+        if response.status_int != 302:
+            self.assertEqual(response.status_int, 200)
+            response.mustcontain(
+                'Your personal tutor',
+                'Oppia - Gallery', 'About', 'Sign in', no=['Logout'])
+        else:
+            # Check whether a redirect has been made
+            self.assertEqual(response.status_int, 302)
+
 
     def test_notifications_dashboard_redirects_for_logged_out_users(self):
         """Test the logged-out view of the notifications dashboard."""
