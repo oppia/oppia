@@ -1332,6 +1332,7 @@ pre.oppia-pre-wrapped-text {
   min-height: 500px;
   padding-bottom: 25px;
   position: relative;
+  padding-left: 1em;
 }
 .oppia-collection-player-tiles-container .oppia-page-heading {
   color: #fff;
@@ -1348,6 +1349,13 @@ pre.oppia-pre-wrapped-text {
   margin-top: 12px;
   margin-bottom: 6px;
 }
+
+@media only screen and (max-width: 500px) {
+    .oppia-collection-player-small-text {
+      text-align: center;
+      display: block;
+    }
+  }
 
 /* Styles for the statistics page. */
 
