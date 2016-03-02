@@ -284,14 +284,15 @@ class TestBase(unittest.TestCase):
 
         self._restore_stashed_user_env()
 
-    def set_admins(self, admin_emails):
-        """Set the ADMIN_EMAILS property."""
-        self.set_config_property(config_domain.ADMIN_EMAILS, admin_emails)
-
-    def set_moderators(self, moderator_emails):
-        """Set the MODERATOR_EMAILS property."""
+    def set_admins(self, admin_usernames):
+        """Set the ADMIN_USERNAMES property."""
         self.set_config_property(
-            config_domain.MODERATOR_EMAILS, moderator_emails)
+            config_domain.ADMIN_USERNAMES, admin_usernames)
+
+    def set_moderators(self, moderator_usernames):
+        """Set the MODERATOR_USERNAMES property."""
+        self.set_config_property(
+            config_domain.MODERATOR_USERNAMES, moderator_usernames)
 
     def get_current_logged_in_user_id(self):
         return os.environ['USER_ID']
