@@ -190,12 +190,12 @@ oppia.controller('Gallery', [
   '$scope', '$http', '$rootScope', '$modal', '$window', '$timeout',
   'ExplorationCreationButtonService', 'oppiaDatetimeFormatter',
   'oppiaDebouncer', 'urlService', 'GALLERY_DATA_URL', 'CATEGORY_LIST',
-  'searchService', 'siteAnalyticsService',
+  'searchService', 'siteAnalyticsService', 'selectionDataService',
   function(
       $scope, $http, $rootScope, $modal, $window, $timeout,
       ExplorationCreationButtonService, oppiaDatetimeFormatter,
       oppiaDebouncer, urlService, GALLERY_DATA_URL, CATEGORY_LIST,
-      searchService, siteAnalyticsService) {
+      searchService, siteAnalyticsService, selectionDataService) {
     $rootScope.loadingMessage = 'Loading';
 
     // Below is the width of each tile (width + margins), which can be found
@@ -401,6 +401,17 @@ oppia.controller('Gallery', [
       }
     );
 
+    $scope.showFullGalleryGroup = function(galleryGroup) {
+      selectionDataService.clearCategories();
+      selectionDataService.addCategoriesToSelection(galleryGroup.categories);
+      // TODO(sll): is this line correct?
+      selectionDataService.clearLanguageCodes();
+      searchService.executeSearchQuery('', function() {
+        removeSplashCarousel();
+      });
+      // TODO(sll): Clear the search query from the search bar, too.
+    };
+
     // Retrieves gallery data from the server.
     $http.get(GALLERY_DATA_URL).success(function(data) {
       $scope.currentUserIsModerator = Boolean(data.is_moderator);
@@ -429,11 +440,11 @@ oppia.controller('Gallery', [
 oppia.controller('SearchBar', [
   '$scope', '$rootScope', '$timeout', '$window', 'searchService',
   'oppiaDebouncer', 'ExplorationCreationButtonService', 'urlService',
-  'CATEGORY_LIST', 'siteAnalyticsService',
+  'CATEGORY_LIST', 'siteAnalyticsService', 'selectionDataService',
   function(
       $scope, $rootScope, $timeout, $window, searchService,
       oppiaDebouncer, ExplorationCreationButtonService, urlService,
-      CATEGORY_LIST, siteAnalyticsService) {
+      CATEGORY_LIST, siteAnalyticsService, selectionDataService) {
     $scope.searchIsLoading = false;
     $scope.ALL_CATEGORIES = CATEGORY_LIST.map(function(categoryName) {
       return {
