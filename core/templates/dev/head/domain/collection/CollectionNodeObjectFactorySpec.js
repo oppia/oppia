@@ -90,7 +90,7 @@ describe('Collection node object factory', function() {
     var summaryObject = collectionNode.getExplorationSummaryObject();
     expect(summaryObject).toEqual(explorationSummaryBackendObject);
 
-    delete summaryObject['category'];
+    delete summaryObject.category;
     expect(summaryObject).not.toEqual(
       collectionNode.getExplorationSummaryObject());
   });
