@@ -19,7 +19,7 @@
  * @author henning.benmax@gmail.com (Ben Henning)
  */
 
-// TODO(bhenning): Add tests for this.
+// TODO(bhenning): Implement validation functions and related tests.
 oppia.factory('SkillListObjectFactory', [function() {
     var SkillList = function(initialSkills) {
       this._skillList = [];
@@ -129,6 +129,9 @@ oppia.factory('SkillListObjectFactory', [function() {
     // Adds the skills from another SkillList domain object to this one, where
     // duplicate skills are ignored.
     SkillList.prototype.addSkillsFromSkillList = function(otherSkillList) {
+      if (this === otherSkillList) {
+        return;
+      }
       for (var i = 0; i < otherSkillList.getSkillCount(); i++) {
         this.addSkill(otherSkillList.getSkillByIndex(i));
       }

@@ -19,7 +19,7 @@
  * @author henning.benmax@gmail.com (Ben Henning)
  */
 
-// TODO(bhenning): Add tests for this.
+// TODO(bhenning): Implement validation functions and related tests.
 oppia.factory('CollectionObjectFactory', [
     'CollectionNodeObjectFactory', 'SkillListObjectFactory',
     function(CollectionNodeObjectFactory, SkillListObjectFactory) {
@@ -133,7 +133,7 @@ oppia.factory('CollectionObjectFactory', [
     // nodes returned by this function will be reflected in the collection.
     // Changes to the list itself will not be reflected in this collection.
     Collection.prototype.getCollectionNodes = function() {
-      return this._nodes.slice();
+      return angular.copy(this._nodes);
     };
 
     Collection.prototype.getCollectionNodeCount = function() {
@@ -142,7 +142,10 @@ oppia.factory('CollectionObjectFactory', [
 
     // Returns the reference to the internal nodes array; this function is only
     // meant to be used for Angular bindings and should never be used in code.
-    // Please use getCollectionNodes() and related functions, instead.
+    // Please use getCollectionNodes() and related functions, instead. Please
+    // also be aware this exposes internal state of the collection domain
+    // object, so changes to the array itself may internally break the domain
+    // object.
     Collection.prototype.getBindableCollectionNodes = function() {
       return this._nodes;
     };

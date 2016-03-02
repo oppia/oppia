@@ -19,7 +19,7 @@
  * @author henning.benmax@gmail.com (Ben Henning)
  */
 
-// TODO(bhenning): Add tests for this.
+// TODO(bhenning): Implement validation functions and related tests.
 oppia.factory('CollectionNodeObjectFactory', [
       'SkillListObjectFactory', function(SkillListObjectFactory) {
     var CollectionNode = function(collectionNodeBackendObject) {
