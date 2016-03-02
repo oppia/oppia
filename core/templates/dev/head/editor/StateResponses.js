@@ -306,6 +306,31 @@ oppia.controller('StateResponses', [
       trainingDataService.initializeTrainingData(
         explorationId, currentStateName);
     };
+    $scope.suppressDefaultAnswerGroupWarnings = function() {
+      var interactionId = $scope.getCurrentInteractionId();
+      if (interactionId === 'MultipleChoiceInput') {
+        var answerGroups = responsesService.getAnswerGroups();
+        // Collect all answers which have been handled by at least one
+        // answer group.
+        var handledAnswersArray = [];
+        for (var j = 0; j < answerGroups.length; j++) {
+          for (var k = 0; k < answerGroups[j].rule_specs.length; k++) {
+            handledAnswersArray.push(answerGroups[j].rule_specs[k].inputs.x);
+          }
+        }
+        var choiceIndices = [];
+        var numChoices = $scope.getAnswerChoices().length;
+        for (var i = 0; i < numChoices; i++) {
+          choiceIndices.push(i);
+        }
+        // We only suppress the default warning if each choice index has
+        // been handled by at least one answer group.
+        return choiceIndices.every(function(choiceIndex) {
+          return handledAnswersArray.indexOf(choiceIndex) != -1;
+        });
+      }
+    };
+
     $scope.isSelfLoopWithNoFeedback = function(outcome) {
       var isSelfLoop = function(outcome) {
         return (
@@ -318,7 +343,6 @@ oppia.controller('StateResponses', [
       var hasFeedback = outcome.feedback.some(function(feedbackItem) {
         return Boolean(feedbackItem);
       });
-
       return isSelfLoop(outcome) && !hasFeedback;
     };
 
@@ -346,6 +370,27 @@ oppia.controller('StateResponses', [
     $scope.isCurrentInteractionLinear = function() {
       var interactionId = $scope.getCurrentInteractionId();
       return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+    };
+
+    $scope.isLinearWithNoFeedback = function(outcome) {
+      // Returns false if current interaction is linear and has no feedback
+      if (!outcome) {
+        return false;
+      }
+      var hasFeedback = outcome.feedback.some(function(feedbackItem) {
+        return Boolean(feedbackItem);
+      });
+      return $scope.isCurrentInteractionLinear() && !hasFeedback;
+    };
+
+    $scope.getOutcomeTooltip = function(outcome) {
+      // Outcome tooltip depends on whether feedback is displayed
+      if ($scope.isLinearWithNoFeedback(outcome)) {
+        return 'Please direct the learner to a different card.';
+      } else {
+        return 'Please give Oppia something useful to say,' +
+               ' or direct the learner to a different card.';
+      }
     };
 
     $scope.$on('initializeAnswerGroups', function(evt, data) {

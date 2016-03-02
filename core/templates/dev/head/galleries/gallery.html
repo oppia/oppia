@@ -19,8 +19,9 @@
       {% if not has_fully_registered %}
         <!-- User must complete the registration process. -->
         <a class="btn oppia-navbar-add-exploration-button protractor-test-create-exploration oppia-transition-200"
-           href="{{gallery_login_redirect_url}}">
-          <span>Create</span>
+           href ng-click="onRedirectToLogin('{{gallery_login_redirect_url}}')">
+          <span class="oppia-navbar-add-exploration-button-plus">+</span>
+          <span>Create Exploration</span>
         </a>
       {% else %}
         <a class="btn oppia-navbar-add-exploration-button protractor-test-create-exploration oppia-transition-200"
@@ -204,7 +205,7 @@
                 Oops, it looks like your search didn't match any explorations.<br><br>
                 <!-- NOTE: If you change the links here, please make the corresponding change for the 'Create New Exploration' button. -->
                 {% if not has_fully_registered %}
-                  Would you like to <a href="{{gallery_login_redirect_url}}">create one</a>?
+                  Would you like to <a href ng-click="onRedirectToLogin('{{gallery_login_redirect_url}}')">create one</a>?
                 {% else %}
                   Would you like to <a ng-click="showCreateExplorationModal()">create one</a>?
                 {% endif %}
@@ -224,7 +225,9 @@
                                       thumbnail-icon-url="exp.thumbnail_icon_url"
                                       thumbnail-bg-color="exp.thumbnail_bg_color"
                                       num-views="exp.num_views"
-                                      class="protractor-test-gallery-tile">
+                                      contributors-summary="exp.human_readable_contributors_summary"
+                                      class="protractor-test-gallery-tile"
+                                      style="display: inline-block;">
             </exploration-summary-tile>
           </div>
         </div>
@@ -237,12 +240,14 @@
   </div>
 
   {% include 'components/exploration_creation_button_modal.html' %}
+  {% include 'components/profile_link_image_directive.html' %}
 {% endblock %}
 
 {% block footer_js %}
   {{ super() }}
   <script>
     {{ include_js_file('components/ExplorationCreationButtonService.js') }}
+    {{ include_js_file('components/ProfileLinkImageDirective.js') }}
     {{ include_js_file('galleries/Gallery.js') }}
   </script>
 {% endblock footer_js %}

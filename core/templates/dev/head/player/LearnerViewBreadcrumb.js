@@ -56,10 +56,10 @@ oppia.controller('LearnerViewBreadcrumb', [
         controller: [
           '$scope', '$window', '$modalInstance', 'oppiaHtmlEscaper',
           'ExplorationEmbedButtonService', 'oppiaDatetimeFormatter',
-          'RatingComputationService', 'expInfo',
+          'RatingComputationService', 'expInfo', 'siteAnalyticsService',
           function($scope, $window, $modalInstance, oppiaHtmlEscaper,
                    ExplorationEmbedButtonService, oppiaDatetimeFormatter,
-                   RatingComputationService, expInfo) {
+                   RatingComputationService, expInfo, siteAnalyticsService) {
             var getExplorationTagsSummary = function(arrayOfTags) {
               var tagsToShow = [];
               var tagsInTooltip = [];
@@ -111,6 +111,10 @@ oppia.controller('LearnerViewBreadcrumb', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss();
+            };
+
+            $scope.registerShareExplorationEvent = function(network) {
+              siteAnalyticsService.registerShareExplorationEvent(network);
             };
           }
         ]

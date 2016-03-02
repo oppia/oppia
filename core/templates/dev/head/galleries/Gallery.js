@@ -188,12 +188,14 @@ oppia.factory('searchService', [
 
 oppia.controller('Gallery', [
   '$scope', '$http', '$rootScope', '$modal', '$window', '$timeout',
-  'ExplorationCreationButtonService', 'oppiaDebouncer', 'urlService',
-  'GALLERY_DATA_URL', 'CATEGORY_LIST', 'searchService', 'selectionDataService',
+  'ExplorationCreationButtonService', 'oppiaDatetimeFormatter',
+  'oppiaDebouncer', 'urlService', 'GALLERY_DATA_URL', 'CATEGORY_LIST',
+  'searchService', 'siteAnalyticsService', 'selectionDataService',
   function(
       $scope, $http, $rootScope, $modal, $window, $timeout,
-      ExplorationCreationButtonService, oppiaDebouncer, urlService,
-      GALLERY_DATA_URL, CATEGORY_LIST, searchService, selectionDataService) {
+      ExplorationCreationButtonService, oppiaDatetimeFormatter,
+      oppiaDebouncer, urlService, GALLERY_DATA_URL, CATEGORY_LIST,
+      searchService, siteAnalyticsService, selectionDataService) {
     $rootScope.loadingMessage = 'Loading';
 
     // Below is the width of each tile (width + margins), which can be found
@@ -409,17 +411,25 @@ oppia.controller('Gallery', [
       });
       // TODO(sll): Clear the search query from the search bar, too.
     };
+
+    $scope.onRedirectToLogin = function(destinationUrl) {
+      siteAnalyticsService.registerStartLoginEvent('noSearchResults');
+      $timeout(function() {
+        $window.location = destinationUrl;
+      }, 150);
+      return false;
+    };
   }
 ]);
 
 oppia.controller('SearchBar', [
-  '$scope', '$rootScope', 'searchService', 'oppiaDebouncer',
-  'ExplorationCreationButtonService', 'urlService', 'CATEGORY_LIST',
-  'selectionDataService',
+  '$scope', '$rootScope', '$timeout', '$window', 'searchService',
+  'oppiaDebouncer', 'ExplorationCreationButtonService', 'urlService',
+  'CATEGORY_LIST', 'siteAnalyticsService', 'selectionDataService',
   function(
-      $scope, $rootScope, searchService, oppiaDebouncer,
-      ExplorationCreationButtonService, urlService, CATEGORY_LIST,
-      selectionDataService) {
+      $scope, $rootScope, $timeout, $window, searchService,
+      oppiaDebouncer, ExplorationCreationButtonService, urlService,
+      CATEGORY_LIST, siteAnalyticsService, selectionDataService) {
     $scope.searchIsLoading = false;
     $scope.ALL_CATEGORIES = CATEGORY_LIST.map(function(categoryName) {
       return {
@@ -539,7 +549,7 @@ oppia.controller('SearchBar', [
 
     $scope.$on(
       'preferredLanguageCodesLoaded',
-      function(evt, preferredLanguageCodesList) {
+      function(preferredLanguageCodesList) {
         for (var i = 0; i < preferredLanguageCodesList.length; i++) {
           var selections = $scope.selectionDetails.languageCodes.selections;
           var languageCode = preferredLanguageCodesList[i];
@@ -561,6 +571,14 @@ oppia.controller('SearchBar', [
     $scope.showUploadExplorationModal = function() {
       ExplorationCreationButtonService.showUploadExplorationModal(
         CATEGORY_LIST);
+    };
+
+    $scope.onRedirectToLogin = function(destinationUrl) {
+      siteAnalyticsService.registerStartLoginEvent('createExplorationButton');
+      $timeout(function() {
+        $window.location = destinationUrl;
+      }, 150);
+      return false;
     };
   }
 ]);

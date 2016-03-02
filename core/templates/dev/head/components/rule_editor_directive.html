@@ -2,7 +2,7 @@
   <div style="position: relative;">
     <form class="form-inline protractor-test-rule-details" role="form" name="ruleEditForm.form">
       <div ng-if="rule.rule_type != 'FuzzyMatches'">
-        <rule-type-selector class="protractor-test-answer-description" local-value="rule.rule_type" on-selection-change="onSelectNewRuleType">
+        <rule-type-selector class="protractor-test-answer-description" local-value="<[rule.rule_type]>" on-selection-change="onSelectNewRuleType">
         </rule-type-selector>
 
         <span ng-repeat="item in ruleDescriptionFragments track by $index" class="form-group protractor-test-answer-description-fragment" style="margin-right: 5px; width: 100%;">
@@ -11,8 +11,8 @@
               "<[ruleDescriptionChoices[0].val|convertToPlainText|truncate]>"
             </span>
             <span ng-if="ruleDescriptionChoices.length !== 1">
-              <select class="form-control" ng-model="rule.inputs[item.varName]" ng-options="choice.id as (choice.val|convertToPlainText|truncate) for choice in ruleDescriptionChoices" style="max-width: 250px;">
-              </select>
+              <html-select style="width: 250px;" options="ruleDescriptionChoices" selection="rule.inputs[item.varName]">
+              </html-select>
             </span>
           </span>
 

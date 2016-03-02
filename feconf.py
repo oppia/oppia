@@ -157,6 +157,8 @@ CAN_SEND_EMAILS_TO_USERS = False
 DEFAULT_EMAIL_UPDATES_PREFERENCE = False
 # Whether to require an email to be sent, following a moderator action.
 REQUIRE_EMAIL_ON_MODERATOR_ACTION = False
+# Whether to allow custom event reporting to Google Analytics.
+CAN_SEND_ANALYTICS_EVENTS = False
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'

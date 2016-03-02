@@ -4,7 +4,36 @@
       <div class="top-section" style="background-color: <[getThumbnailBgColor()]>;">
         <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
         <h2 class="exploration-title protractor-test-exp-summary-tile-title"><[getExplorationTitle()]></h2>
+
+        <div class="exploration-summary-contributors" ng-show="contributors.length > 0">
+          <profile-link-image ng-if="contributors.length > 0"
+                              username="contributors[0]"
+                              tooltip="<[contributors[0] | truncate:14]>"
+                              tooltip-placement="right"
+                              tooltip-append-to-body="true">
+          </profile-link-image>
+          <div class="contributors-num-minus-one" ng-show="contributors.length > 1">
+            +<[contributors.length - 1]>
+          </div>
+
+          <div class="all-contributors" style="display: none;">
+            <profile-link-image ng-repeat="contributor in contributors | limitTo:MAX_CONTRIBUTORS_TO_DISPLAY-1:1"
+                                username="contributor"
+                                tooltip="<[contributor | truncate:14]>"
+                                tooltip-placement="right"
+                                tooltip-append-to-body="true">
+            </profile-link-image>
+
+            <div style="position:relative;" ng-show="contributors.length > MAX_CONTRIBUTORS_TO_DISPLAY">
+              <div class="exploration-black-profile"></div>
+              <div class="num-remaining-contributors" ng-show="contributors.length > MAX_CONTRIBUTORS_TO_DISPLAY">
+                +<[contributors.length - MAX_CONTRIBUTORS_TO_DISPLAY]>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+      <div class="top-section-mask mask"></div>
 
       <div>
         <div class="objective protractor-test-exp-summary-tile-objective">
@@ -80,19 +109,78 @@
 
   .oppia-exploration-summary-tile .top-section {
     height: 144px;
-    opacity: 1.0;
     position: relative;
     width: 100%;
-  }
-
-  .oppia-exploration-summary-tile:hover .top-section {
-    opacity: 0.8;
   }
 
   .oppia-exploration-summary-tile,
   .oppia-exploration-summary-tile .top-section {
     -webkit-transition: all 300ms;
     transition: all 300ms;
+  }
+
+  .oppia-exploration-summary-tile .exploration-summary-contributors {
+    padding-bottom: 4px;
+    padding-right: 5px;
+    left: 169px;
+    position: absolute;
+    top: 3px;
+    width: 31px;
+    z-index: 11;
+  }
+
+  .oppia-exploration-summary-tile .exploration-summary-tile-mask {
+    background-color: #eee;
+    height: 240px;
+    left: 0px;
+    opacity: 0.7;
+    position: absolute;
+    top: 0px;
+    width: 200px;
+    z-index: 10;
+  }
+
+  .oppia-exploration-summary-tile:hover .top-section-mask {
+    background-color: #eee;
+    height: 144px;
+    left: 0px;
+    opacity: 0.4;
+    position: absolute;
+    top: 0px;
+    width: 200px;
+    z-index: 10;
+  }
+
+  .oppia-exploration-summary-tile .exploration-black-profile {
+    background-color: black;
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+  }
+
+  .oppia-exploration-summary-tile .exploration-summary-contributors profile-link-image {
+    margin-bottom: 3px;
+    display:block;
+  }
+
+  .oppia-exploration-summary-tile .contributors-num-minus-one {
+    color: white;
+    font-family: Roboto;
+    font-size: x-small;
+    font-weight: bold;
+    left: 17px;
+    position: absolute;
+    top: 18px;
+  }
+
+  .oppia-exploration-summary-tile .all-contributors .num-remaining-contributors {
+    color: white;
+    font-family: Roboto;
+    font-size: 0.7em;
+    font-weight: normal;
+    left: 7px;
+    position: absolute;
+    top: 5px;
   }
 
   .oppia-exploration-summary-tile .exploration-category {

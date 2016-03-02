@@ -30,6 +30,7 @@ oppia.directive('explorationSummaryTile', [function() {
       getObjective: '&objective',
       getCategory: '&category',
       getRatings: '&ratings',
+      getContributorsSummary: '&contributorsSummary',
       getThumbnailIconUrl: '&thumbnailIconUrl',
       getThumbnailBgColor: '&thumbnailBgColor',
       // If this is not null, the new exploration opens in a new window when
@@ -37,9 +38,48 @@ oppia.directive('explorationSummaryTile', [function() {
       openInNewWindow: '@openInNewWindow'
     },
     templateUrl: 'summaryTile/exploration',
+    link: function(scope, element) {
+      element.find('.exploration-summary-contributors').on('mouseenter',
+        function() {
+          element.find('.mask').attr('class',
+            'exploration-summary-tile-mask mask');
+          // As animation duration time may be 400ms, .stop(true) is used
+          // to prevent the effects queue falling behind the mouse movement.
+          // .hide(1) and .show(1) used to place the animation in the
+          // effects queue.
+          element.find('.contributors-num-minus-one').stop(true).hide(1,
+            function() {
+              element.find('.all-contributors').stop(true).slideDown();
+            }
+          );
+        }
+      );
+
+      element.find('.exploration-summary-contributors').on('mouseleave',
+        function() {
+          element.find('.mask').attr('class', 'top-section-mask mask');
+          element.find('.all-contributors').stop(true).slideUp(400, function() {
+            element.find('.contributors-num-minus-one').stop(true).show(1);
+          });
+        }
+      );
+    },
     controller: [
       '$scope', 'oppiaDatetimeFormatter', 'RatingComputationService',
       function($scope, oppiaDatetimeFormatter, RatingComputationService) {
+        $scope.contributors = Object.keys(
+          $scope.getContributorsSummary() || {}).sort(
+          function(contributorUsername1, contributorUsername2) {
+            var commitsOfContributor1 = $scope.getContributorsSummary()[
+                contributorUsername1];
+            var commitsOfContributor2 = $scope.getContributorsSummary()[
+                contributorUsername2];
+            return commitsOfContributor2 - commitsOfContributor1;
+          }
+        );
+
+        $scope.MAX_CONTRIBUTORS_TO_DISPLAY = 5;
+
         $scope.getAverageRating = function() {
           return RatingComputationService.computeAverageRating(
             $scope.getRatings());

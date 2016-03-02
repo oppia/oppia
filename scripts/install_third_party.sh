@@ -26,7 +26,7 @@ install_node_module gulp 3.9.0
 install_node_module through2 2.0.0
 install_node_module yargs 3.29.0
 install_node_module gulp-concat 2.6.0
-install_node_module gulp-cssnano 2.1.0
+install_node_module gulp-clean-css 2.0.2
 install_node_module gulp-util 3.0.7
 install_node_module jscs 2.3.0
 install_node_module gulp-sourcemaps 1.6.0

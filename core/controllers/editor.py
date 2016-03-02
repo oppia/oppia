@@ -59,6 +59,14 @@ NEW_STATE_TEMPLATE = {
     'unresolved_answers': {},
 }
 
+MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE = (
+    'https://moderator/request/forum/url')
+MODERATOR_REQUEST_FORUM_URL = config_domain.ConfigProperty(
+    'moderator_request_forum_url', {'type': 'unicode'},
+    'A link to the forum for nominating explorations to be featured '
+    'in the gallery',
+    default_value=MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE)
+
 
 def get_value_generators_js():
     """Return a string that concatenates the JS for all value generators."""
@@ -68,18 +76,6 @@ def get_value_generators_js():
     for _, generator_cls in all_value_generators.iteritems():
         value_generators_js += generator_cls.get_js_template()
     return value_generators_js
-
-VALUE_GENERATORS_JS = config_domain.ComputedProperty(
-    'value_generators_js', {'type': 'unicode'},
-    'JavaScript code for the value generators', get_value_generators_js)
-
-MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE = (
-    'https://moderator/request/forum/url')
-MODERATOR_REQUEST_FORUM_URL = config_domain.ConfigProperty(
-    'moderator_request_forum_url', {'type': 'unicode'},
-    'A link to the forum for nominating explorations to be featured '
-    'in the gallery',
-    default_value=MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE)
 
 
 def _require_valid_version(version_from_payload, exploration_version):
@@ -182,8 +178,6 @@ class ExplorationPage(EditorHandler):
             rights_manager.Actor(self.user_id).can_edit(
                 rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id))
 
-        value_generators_js = VALUE_GENERATORS_JS.value
-
         interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
 
@@ -241,7 +235,8 @@ class ExplorationPage(EditorHandler):
                 interaction_validators_html),
             'moderator_request_forum_url': MODERATOR_REQUEST_FORUM_URL.value,
             'nav_mode': feconf.NAV_MODE_CREATE,
-            'value_generators_js': jinja2.utils.Markup(value_generators_js),
+            'value_generators_js': jinja2.utils.Markup(
+                get_value_generators_js()),
             'title': exploration.title,
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'ALLOWED_GADGETS': feconf.ALLOWED_GADGETS,

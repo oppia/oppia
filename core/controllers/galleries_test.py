@@ -72,7 +72,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
         }, response_dict['explorations_list'][0])
 
         # Publicize the demo exploration.
-        self.set_admins([self.ADMIN_EMAIL])
+        self.set_admins([self.ADMIN_USERNAME])
         rights_manager.publicize_exploration(self.admin_id, '0')
 
         # Run migration job to create exploration summaries.
@@ -112,7 +112,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
 
     def test_gallery_handler_for_created_explorations(self):
         """Test the gallery data handler for manually created explirations."""
-        self.set_admins([self.ADMIN_EMAIL])
+        self.set_admins([self.ADMIN_USERNAME])
 
         self.login(self.ADMIN_EMAIL)
         response_dict = self.get_json(feconf.GALLERY_DATA_URL)
