@@ -2369,9 +2369,9 @@ div#ng-curtain {
   opacity: 0.7;
 }
 
-@media(max-width: 800px) {
+@media(max-width: 500px) {
   .oppia-page-heading, .oppia-page-heading-subtext {
-    margin-left: 30px;
+    text-align: center;
   }
 }
 
