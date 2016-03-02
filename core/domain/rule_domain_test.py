@@ -78,8 +78,6 @@ class RuleDataUnitTests(test_utils.GenericTestBase):
 
         at_least_one_rule_found = False
 
-        clses = []
-
         for loader, name, _ in pkgutil.iter_modules(path=[rule_dir]):
             if name.endswith('_test') or name == 'base':
                 continue
@@ -99,9 +97,47 @@ class RuleDataUnitTests(test_utils.GenericTestBase):
                         param_obj_type.has_editor_js_template(),
                         msg='(%s)' % clazz.description)
                     at_least_one_rule_found = True
-                clses.append(clazz)
 
         self.assertTrue(at_least_one_rule_found)
+
+    def test_that_all_rule_input_fields_have_default_values(self):
+        rule_dir = os.path.join(os.getcwd(), feconf.RULES_DIR)
+
+        at_least_one_rule_found = False
+
+        for loader, name, _ in pkgutil.iter_modules(path=[rule_dir]):
+            if name.endswith('_test') or name == 'base':
+                continue
+            module = loader.find_module(name).load_module(name)
+            for name, clazz in inspect.getmembers(module, inspect.isclass):
+                param_list = rule_domain.get_param_list(clazz.description)
+
+                for (_, param_obj_type) in param_list:
+                    self.assertIsNotNone(
+                        param_obj_type.default_value, msg=(
+                            'No default value specified for object class %s.' %
+                            param_obj_type.__name__))
+                    at_least_one_rule_found = True
+
+        self.assertTrue(at_least_one_rule_found)
+
+    def test_get_default_object_values_function(self):
+        rule_dir = os.path.join(os.getcwd(), feconf.RULES_DIR)
+
+        expected_result = {}
+        for loader, name, _ in pkgutil.iter_modules(path=[rule_dir]):
+            if name.endswith('_test') or name == 'base':
+                continue
+            module = loader.find_module(name).load_module(name)
+            for name, clazz in inspect.getmembers(module, inspect.isclass):
+                param_list = rule_domain.get_param_list(clazz.description)
+
+                for (_, param_obj_type) in param_list:
+                    expected_result[param_obj_type.__name__] = (
+                        param_obj_type.default_value)
+
+        self.assertEqual(
+            expected_result, rule_domain.get_default_object_values())
 
 
 class RuleFunctionUnitTests(test_utils.GenericTestBase):
