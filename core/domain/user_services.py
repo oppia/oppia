@@ -19,6 +19,8 @@
 import datetime
 import logging
 import re
+import hashlib
+import urllib
 
 from core.platform import models
 import feconf
@@ -28,6 +30,7 @@ current_user_services = models.Registry.import_current_user_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 MAX_USERNAME_LENGTH = 50
+PROFILE_PICTURE_SIZE = 40
 
 
 class UserSettings(object):
@@ -44,7 +47,10 @@ class UserSettings(object):
         self.last_agreed_to_terms = last_agreed_to_terms
         self.last_started_state_editor_tutorial = (  # pylint: disable=invalid-name
             last_started_state_editor_tutorial)
-        self.profile_picture_data_url = profile_picture_data_url
+        
+        self.profile_picture_data_url = (
+             profile_picture_data_url if profile_picture_data_url else "http://www.gravatar.com/avatar/" + hashlib.md5(email.lower()).hexdigest() + "?"
+             +urllib.urlencode({'d':'retro', 's':str(PROFILE_PICTURE_SIZE)}))
         self.user_bio = user_bio
         self.subject_interests = (
             subject_interests if subject_interests else [])
