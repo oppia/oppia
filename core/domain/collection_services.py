@@ -491,6 +491,36 @@ def get_collection_summaries_matching_query(query_string, cursor=None):
     ], search_cursor)
 
 
+def get_displayable_collections_matching_query(query_string,
+                                               cursor=None):
+    """Returns a list with all collection summary objects that can be
+    displayed on the gallery page as collection summary tiles.
+    """
+    search_cursor = cursor
+    collection_summaries, search_cursor = (
+        get_collection_summaries_matching_query(
+            query_string, cursor=search_cursor))
+
+    collection_summaries_to_display = []
+    for collection_summary in collection_summaries:
+        if collection_summary and collection_summary.status != (
+                rights_manager.ACTIVITY_STATUS_PRIVATE):
+            collection_summaries_to_display.append({
+                'id': collection_summary.id,
+                'title': collection_summary.title,
+                'objective': collection_summary.objective,
+                'num_explorations': len(get_collection_by_id(
+                    collection_summary.id).nodes),
+                'last_updated_msec': utils.get_time_in_millisecs(
+                    collection_summary.collection_model_last_updated),
+                'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
+                    collection_summary.category),
+                'thumbnail_bg_color': utils.get_hex_color_for_category(
+                    collection_summary.category),
+            })
+    return collection_summaries_to_display
+
+
 # Repository SAVE and DELETE methods.
 def apply_change_list(collection_id, change_list):
     """Applies a changelist to a pristine collection and returns the result.
