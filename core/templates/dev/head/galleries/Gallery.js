@@ -412,21 +412,6 @@ oppia.controller('Gallery', [
       // TODO(sll): Clear the search query from the search bar, too.
     };
 
-    // Retrieves gallery data from the server.
-    $http.get(GALLERY_DATA_URL).success(function(data) {
-      $scope.currentUserIsModerator = Boolean(data.is_moderator);
-
-      // Note that this will cause an initial search query to be sent.
-      $rootScope.$broadcast(
-        'preferredLanguageCodesLoaded', data.preferred_language_codes);
-
-      if (data.username) {
-        if (urlService.getUrlParams().mode === 'create') {
-          $scope.showCreateExplorationModal(CATEGORY_LIST);
-        }
-      }
-    });
-
     $scope.onRedirectToLogin = function(destinationUrl) {
       siteAnalyticsService.registerStartLoginEvent('noSearchResults');
       $timeout(function() {
