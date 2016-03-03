@@ -143,21 +143,7 @@ var expectContentTextToEqual = function(text) {
 // passed on to the relevant interaction editor.
 var setInteraction = function(interactionId) {
   openInteraction(interactionId);
-  var elem = element(by.css('.protractor-test-interaction-editor'));
-  var customizationArgs = [elem];
-
-  if (arguments.length > 1) {
-    for (var i = 1; i < arguments.length; i++) {
-      customizationArgs.push(arguments[i]);
-    }
-    interactions.getInteraction(interactionId).customizeInteraction.apply(
-      null, customizationArgs);
-  }
-
-  element(by.css('.protractor-test-save-interaction')).click();
-  // Wait for the customization modal to close.
-  general.waitForSystem();
-
+  customizeInteraction.apply(null, arguments);
   // If the "Add Response" modal opens, close it.
   var headerElem = element(by.css(
     '.protractor-test-add-response-modal-header'));
@@ -204,6 +190,26 @@ var openInteraction = function(interactionId) {
     '.protractor-test-interaction-tab-' +
     INTERACTION_ID_TO_TAB_NAME[interactionId])).click();
   element(by.css('.protractor-test-interaction-tile-' + interactionId)).click();
+};
+
+var closeInteraction = function() {
+  element(by.css('.protractor-test-close-add-response-modal')).click();
+  general.waitForSystem();
+};
+
+var customizeInteraction = function(interactionId) {
+  if (arguments.length > 1) {
+    var elem = element(by.css('.protractor-test-interaction-editor'));
+    var customizationArgs = [elem];
+    for (var i = 1; i < arguments.length; i++) {
+      customizationArgs.push(arguments[i]);
+    }
+    interactions.getInteraction(interactionId).customizeInteraction.apply(
+      null, customizationArgs);
+  }
+  element(by.css('.protractor-test-save-interaction')).click();
+  // Wait for the customization modal to close.
+  general.waitForSystem();
 };
 
 // Likewise this can receive additional arguments.
@@ -380,7 +386,7 @@ var addParameterChange = function(paramName, paramValue) {
 // should be specified after the ruleName as additional arguments. For example
 // with interaction 'NumericInput' and rule 'Equals' then there is a single
 // parameter which the given answer is required to equal.
-var selectRule = function(ruleElement, interactionId, ruleName,
+var _selectRule = function(ruleElement, interactionId, ruleName,
   skipParameters) {
   var parameterValues = [];
   for (var i = 4; i < arguments.length; i++) {
@@ -460,6 +466,28 @@ var selectRule = function(ruleElement, interactionId, ruleName,
   }
 };
 
+var selectRuleInAddResponse = function() {
+  var ruleElement = element(by.css('.protractor-test-add-response-details'));
+  var args = [ruleElement];
+  for (var i = 0; i < arguments.length; i++) {
+    args.push(arguments[i]);
+  }
+  _selectRule.apply(null, args);
+};
+
+var expectRuleParametersToBe = function() {
+  for (var i = 0; i < arguments.length; i++) {
+    var expected = arguments[i];
+    var parameterElement = element.all(
+      by.css('.protractor-test-answer-description-fragment'
+    )).get(i * 2 + 1).element(by.tagName('input')).getAttribute('value').then(
+      function(text) {
+        expect(text).toEqual(expected);
+      }
+    );
+  }
+};
+
 var _setOutcomeFeedback = function(feedbackEditorElem, richTextInstructions) {
   var feedbackEditor = forms.RichTextEditor(
     feedbackEditorElem.element(by.css('.protractor-test-feedback-bubble')));
@@ -515,11 +543,11 @@ var addResponse = function(interactionId, feedbackInstructions, destStateName,
 
   // Set the rule description.
   var ruleElement = element(by.css('.protractor-test-add-response-details'));
-  var args = [ruleElement, interactionId, ruleName, false];
+  var args = [ruleElement, interactionId, ruleName];
   for (var i = 5; i < arguments.length; i++) {
     args.push(arguments[i]);
   }
-  selectRule.apply(null, args);
+  _selectRule.apply(null, args);
 
   // Open the feedback entry form if it is not already open.
   var feedbackContainerElem = element(by.css(
@@ -646,11 +674,11 @@ var ResponseEditor = function(responseNum) {
 
       // Set the rule description.
       var ruleElement = element(by.css('.protractor-test-rule-details'));
-      var args = [ruleElement, interactionId, ruleName, false];
+      var args = [ruleElement, interactionId, ruleName];
       for (var i = 2; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
-      selectRule.apply(null, args);
+      _selectRule.apply(null, args);
 
       // Save the new rule.
       element(by.css('.protractor-test-save-answer')).click();
@@ -1233,10 +1261,13 @@ exports.expectContentToMatch = expectContentToMatch;
 
 exports.setInteraction = setInteraction;
 exports.openInteraction = openInteraction;
+exports.closeInteraction = closeInteraction;
+exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionToMatch = expectInteractionToMatch;
 exports.expectCannotDeleteInteraction = expectCannotDeleteInteraction;
 
-exports.selectRule = selectRule;
+exports.selectRuleInAddResponse = selectRuleInAddResponse;
+exports.expectRuleParametersToBe = expectRuleParametersToBe;
 
 exports.addGadget = addGadget;
 exports.renameGadget = renameGadget;

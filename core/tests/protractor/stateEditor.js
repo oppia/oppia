@@ -141,40 +141,15 @@ describe('State editor', function() {
     users.login('user4@example.com');
     workflow.createExploration('sums', 'maths');
     editor.setContent(forms.toRichText('some content'));
+
     editor.openInteraction('TextInput');
+    editor.customizeInteraction('TextInput', 'My PlaceHolder', 2);
+    editor.selectRuleInAddResponse('TextInput', 'Equals', false, 'Some Text');
+    editor.expectRuleParametersToBe('Some Text');
+    editor.selectRuleInAddResponse('TextInput', 'Contains', true);
+    editor.expectRuleParametersToBe('Some Text');
+    editor.closeInteraction();
 
-    var elem = element(by.css('.protractor-test-interaction-editor'));
-    interactions.getInteraction('TextInput').customizeInteraction(
-      elem, 'My PlaceHolder', 2);
-    element(by.css('.protractor-test-save-interaction')).click();
-    // Wait for the customization modal to close.
-    general.waitForSystem();
-
-    var headerElem = element(by.css(
-      '.protractor-test-add-response-modal-header'));
-    expect(headerElem.isPresent()).toBe(true);
-
-    var ruleElement = element(by.css('.protractor-test-add-response-details'));
-    editor.selectRule(ruleElement, 'TextInput', 'Equals', false, 'Some Text');
-
-    ruleElement.all(
-      by.css('.protractor-test-answer-description-fragment'
-    )).get(1).element(by.tagName('input')).getAttribute('value').then(
-      function(text) {
-        expect(text).toEqual('Some Text');
-      }
-    );
-
-    editor.selectRule(ruleElement, 'TextInput', 'Contains', true);
-    ruleElement.all(
-      by.css('.protractor-test-answer-description-fragment'
-    )).get(1).element(by.tagName('input')).getAttribute('value').then(
-      function(text) {
-        expect(text).toEqual('Some Text');
-      }
-    );
-
-    element(by.css('.protractor-test-close-add-response-modal')).click();
     editor.saveChanges();
     users.logout();
   });
