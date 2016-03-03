@@ -127,3 +127,85 @@ class StatisticsAudit(jobs.BaseMapReduceJobManager):
                     'all: %s sum:%s' % (
                         key, state_name, all_state_hit[state_name],
                         sum_state_hit[state_name]),)
+
+
+class AnswersAudit(jobs.BaseMapReduceJobManager):
+
+    _STATE_COUNTER_ERROR_KEY = 'State Counter ERROR'
+    _HANDLER_NAME_COUNTER_KEY = 'HandlerCounter'
+    _HANDLER_FUZZY_RULE_COUNTER_KEY = 'FuzzyRuleCounter'
+    _HANDLER_DEFAULT_RULE_COUNTER_KEY = 'DefaultRuleCounter'
+    _HANDLER_STANDARD_RULE_COUNTER_KEY = 'StandardRuleCounter'
+    _HANDLER_ERROR_RULE_COUNTER_KEY = 'ErrorRuleCounter'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.StateRuleAnswerLogModel]
+
+    @staticmethod
+    def map(item):
+        item_id = item.id
+        period_idx = item_id.index('.')
+        # exp_id = item_id[:period_idx]
+
+        item_id = item_id[period_idx+1:]
+        period_idx = item_id.index('.')
+        # state_name = item_id[:period_idx]
+
+        item_id = item_id[period_idx+1:]
+        period_idx = item_id.index('.')
+        handler_name = item_id[:period_idx]
+        yield (handler_name, {
+            'reduce_type': AnswersAudit._HANDLER_NAME_COUNTER_KEY
+        })
+
+        item_id = item_id[period_idx+1:]
+        rule_str = item_id
+
+        if rule_str == 'FuzzyMatches':
+            yield (rule_str, {
+                'reduce_type': AnswersAudit._HANDLER_FUZZY_RULE_COUNTER_KEY
+            })
+        elif rule_str == 'Default':
+            yield (rule_str, {
+                'reduce_type': AnswersAudit._HANDLER_DEFAULT_RULE_COUNTER_KEY
+            })
+        elif '(' in rule_str and rule_str[-1] == ')':
+            index = rule_str.index('(')
+            rule_type = rule_str[0:index]
+            rule_args = rule_str[index+1:-1]
+            yield (rule_type, {
+                'reduce_type': AnswersAudit._HANDLER_STANDARD_RULE_COUNTER_KEY,
+                'rule_str': rule_str,
+                'rule_args': rule_args
+            })
+        else:
+            yield (rule_str, {
+                'reduce_type': AnswersAudit._HANDLER_ERROR_RULE_COUNTER_KEY
+            })
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        reduce_type = None
+        reduce_count = len(stringified_values)
+        for value_str in stringified_values:
+            value_dict = ast.literal_eval(value_str)
+            if reduce_type and reduce_type != value_dict['reduce_type']:
+                yield 'Internal error 1'
+            elif not reduce_type:
+                reduce_type = value_dict['reduce_type']
+
+        if reduce_type == AnswersAudit._HANDLER_NAME_COUNTER_KEY:
+            yield 'Found handler "%s" %d time(s)' % (key, reduce_count)
+        elif reduce_type == AnswersAudit._HANDLER_FUZZY_RULE_COUNTER_KEY:
+            yield 'Found fuzzy rules %d time(s)' % reduce_count
+        elif reduce_type == AnswersAudit._HANDLER_DEFAULT_RULE_COUNTER_KEY:
+            yield 'Found default rules %d time(s)' % reduce_count
+        elif reduce_type == AnswersAudit._HANDLER_STANDARD_RULE_COUNTER_KEY:
+            yield 'Found rule type "%s" %d time(s)' % (key, reduce_count)
+        elif reduce_type == AnswersAudit._HANDLER_ERROR_RULE_COUNTER_KEY:
+            yield (
+                'Encountered invalid rule string %d time(s) (is it too long?): '
+                '"%s"' % (reduce_count, key))
+        else:
+            yield 'Internal error 2'
