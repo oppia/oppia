@@ -13,7 +13,7 @@
                               tooltip-append-to-body="true">
           </profile-link-image>
           <div class="contributors-num-minus-one" ng-show="contributors.length > 1">
-            +<[contributors.length - 1]>
+            <[numMinusOneText]>
           </div>
 
           <div class="all-contributors" style="display: none;">
@@ -170,6 +170,7 @@
     left: 17px;
     position: absolute;
     top: 18px;
+    padding-left: 4px;
   }
 
   .oppia-exploration-summary-tile .all-contributors .num-remaining-contributors {
