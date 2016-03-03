@@ -1351,11 +1351,11 @@ pre.oppia-pre-wrapped-text {
 }
 
 @media only screen and (max-width: 500px) {
-    .oppia-collection-player-small-text {
-      text-align: center;
-      display: block;
-    }
+  .oppia-collection-player-small-text {
+    text-align: center;
+    display: block;
   }
+}
 
 /* Styles for the statistics page. */
 
