@@ -129,11 +129,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             BOTH_MODERATOR_AND_ADMIN_EMAIL, BOTH_MODERATOR_AND_ADMIN_USERNAME)
 
         # There should be a redirect on navigating to /
-        self.assertEqual(self.testapp.get('/').status_int, 302)
+        self.testapp.get('/gallery').mustcontain(no=['/moderator', '/admin'])
 
         # Log in as a superadmin. There should again be a redirect on /
         self.login('superadmin@example.com', is_super_admin=True)
-        self.assertEqual(self.testapp.get('/').status_int, 302)
+        self.testapp.get('/gallery').mustcontain('/admin', no=['/moderator'])
 
         # Add a moderator, an admin, and a person with both roles, then log
         # out.
@@ -154,14 +154,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         # Log in as a moderator.
         self.login(self.MODERATOR_EMAIL)
-        self.assertEqual(self.testapp.get('/').status_int, 302)
         self.testapp.get(feconf.GALLERY_URL).mustcontain(
             '/moderator', no=['/admin'])
         self.logout()
 
         # Log in as an admin.
         self.login(self.ADMIN_EMAIL)
-        self.assertEqual(self.testapp.get('/').status_int, 302)
         self.testapp.get(feconf.GALLERY_URL).mustcontain(
             '/moderator', no=['/admin'])
         self.logout()
