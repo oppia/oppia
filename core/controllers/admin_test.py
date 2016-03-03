@@ -128,10 +128,10 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.signup(
             BOTH_MODERATOR_AND_ADMIN_EMAIL, BOTH_MODERATOR_AND_ADMIN_USERNAME)
 
-        # There should be a redirect on navigating to /
+        # Navigate to any page. The role is not set.
         self.testapp.get('/gallery').mustcontain(no=['/moderator', '/admin'])
 
-        # Log in as a superadmin. There should again be a redirect on /
+        # Log in as a superadmin. This gives access to /admin.
         self.login('superadmin@example.com', is_super_admin=True)
         self.testapp.get('/gallery').mustcontain('/admin', no=['/moderator'])
 
