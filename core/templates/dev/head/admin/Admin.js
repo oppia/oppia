@@ -30,7 +30,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     var adminJobOutputUrl = ADMIN_JOB_OUTPUT_URL_PREFIX + '?job_id=' + jobId;
     $http.get(adminJobOutputUrl).success(function(data) {
       $scope.showJobOutput = true;
-      $scope.jobOutput = data.output;
+      $scope.jobOutput = data.output ? data.output : [];
     });
   };
 
