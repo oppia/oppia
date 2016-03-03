@@ -1,8 +1,35 @@
 <script type="text/ng-template" id="richTextComponent/Video">
   <center>
-    <div style="position: relative; padding-bottom: 60.9%;">
-      <iframe width="460" height="280" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
-              ng-src="<[videoUrl]>" frameborder="0" allowfullscreen tabindex="<[tabIndexVal]>"></iframe>
+    <div class="oppia-noninteractive-video-iframe-container">
+    <!--  -->
+      <iframe class="oppia-noninteractive-video-iframe" ng-src="<[videoUrl]>"
+              frameborder="0" allowfullscreen tabindex="<[tabIndexVal]>"></iframe>
     </div>
   </center>
 </script>
+
+<style>
+	/* Allows the video to be the full width of the container
+	 * when put inside a collapsible accordion.
+	 */
+    .conversation-skin-tutor-card-top-content {
+      width: 100%;
+    }
+
+    /* The value of 60.9% is derived from the ratio of the height to the width
+     * (280/480). See http://alistapart.com/article/creating-intrinsic-ratios-for-video
+     * for more details.
+     */
+    .oppia-noninteractive-video-iframe-container {
+		position: relative;
+		padding-bottom: 60.9%;
+    }
+
+    .oppia-noninteractive-video-iframe {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%
+    }
+</style>
