@@ -1332,7 +1332,6 @@ pre.oppia-pre-wrapped-text {
   min-height: 500px;
   padding-bottom: 25px;
   position: relative;
-  padding-left: 1em;
 }
 .oppia-collection-player-tiles-container .oppia-page-heading {
   color: #fff;
@@ -1350,10 +1349,9 @@ pre.oppia-pre-wrapped-text {
   margin-bottom: 6px;
 }
 
-@media only screen and (max-width: 500px) {
+@media only screen and (max-width: 870px) {
   .oppia-collection-player-small-text {
-    text-align: center;
-    display: block;
+    padding: 2em;
   }
 }
 
@@ -2369,9 +2367,9 @@ div#ng-curtain {
   opacity: 0.7;
 }
 
-@media(max-width: 500px) {
+@media(max-width: 870px) {
   .oppia-page-heading, .oppia-page-heading-subtext {
-    text-align: center;
+    padding-left: 1.2em;
   }
 }
 
