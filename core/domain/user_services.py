@@ -16,11 +16,15 @@
 
 """Services for user data."""
 
+import base64
 import datetime
+import hashlib
 import logging
 import re
+import urllib
 
 from core.platform import models
+from google.appengine.api import urlfetch
 import feconf
 import utils
 
@@ -28,7 +32,6 @@ current_user_services = models.Registry.import_current_user_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 MAX_USERNAME_LENGTH = 50
-
 
 class UserSettings(object):
     """Value object representing a user's settings."""
@@ -111,7 +114,6 @@ class UserSettings(object):
             # Admin usernames are reserved for admins. Note that 'admin'
             # itself is already in use for the demo exploration.
             raise utils.ValidationError('This username is not available.')
-
 
 def is_username_taken(username):
     """Checks if the given username is taken."""
@@ -282,11 +284,10 @@ def get_usernames(user_ids):
     return [us.username if us else None for us in users_settings]
 
 
-# NB: If we ever allow usernames to change, update the
+# NB: If we ever allow usernames to change, update
 # config_domain.BANNED_USERNAMES property.
 def set_username(user_id, new_username):
     user_settings = get_user_settings(user_id, strict=True)
-
     UserSettings.require_valid_username(new_username)
     if is_username_taken(new_username):
         raise utils.ValidationError(
@@ -295,6 +296,10 @@ def set_username(user_id, new_username):
     user_settings.username = new_username
     _save_user_settings(user_settings)
 
+def set_signup_profile_picture_url(user_id):
+    user_email = get_email_from_user_id(user_id)
+    user_gravatar = fetch_gravatar(user_email)
+    update_profile_picture_data_url(user_id, user_gravatar)
 
 def record_agreement_to_terms(user_id):
     """Records that the user has agreed to the license terms."""
@@ -551,3 +556,16 @@ def get_user_impact_score(user_id):
         return model.impact_score
     else:
         return 0
+
+def fetch_gravatar(email):
+    """Returns the gravatar corresponding to given email"""
+
+    base_url = "http://www.gravatar.com/avatar/"
+    gravatar_url = base_url + hashlib.md5(email).hexdigest() + "?"
+    size = str('feconf.GRAVATAR_SIZE_PX')
+    gravatar_url += urllib.urlencode({'d':'retro', 's':size})
+    result = urlfetch.fetch(gravatar_url, headers={'Content-Type': 'image/png'})
+    if result.status_code == 200:
+        encoded_body = base64.b64encode(result.content)
+        return "data:{};base64,{}".format('image/png', encoded_body)
+
