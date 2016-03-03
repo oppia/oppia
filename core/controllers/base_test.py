@@ -87,6 +87,18 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         response = self.testapp.put('/gallery/extra', {}, expect_errors=True)
         self.assertEqual(response.status_int, 404)
 
+    def test_redirect_in_both_logged_in_and_logged_out_states(self):
+        "Test for a redirect in both logged in and logged out states on '/'."
+
+        # Logged out state
+        response = self.testapp.get('/')
+        self.assertEqual(response.status_int, 302)
+
+        # Login and assert that there is a redirect
+        self.login('user@example.com')
+        response = self.testapp.get('/')
+        self.assertEqual(response.status_int, 302)
+
 
 class CsrfTokenManagerTest(test_utils.GenericTestBase):
 
