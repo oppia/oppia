@@ -32,10 +32,7 @@ current_user_services = models.Registry.import_current_user_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 MAX_USERNAME_LENGTH = 50
-PROFILE_PICTURE_SIZE = 80
-
-
-
+PROFILE_PICTURE_SIZE = 60
 
 
 class UserSettings(object):
