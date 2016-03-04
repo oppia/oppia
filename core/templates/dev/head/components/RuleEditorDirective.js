@@ -162,7 +162,8 @@ oppia.directive('ruleEditor', ['$log', function($log) {
               varType = tmpRuleDescription.match(PATTERN)[2].substring(1);
             }
 
-            if (varType === 'SetOfHtmlString') {
+            if (varType === 'SetOfHtmlString' ||
+                varType === 'SetOfUnicodeString') {
               $scope.rule.inputs[varName] = [];
             } else if (answerChoices) {
               $scope.rule.inputs[varName] = angular.copy(answerChoices[0].val);
