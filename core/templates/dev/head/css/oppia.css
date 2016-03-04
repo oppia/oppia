@@ -1351,7 +1351,7 @@ pre.oppia-pre-wrapped-text {
 
 @media only screen and (max-width: 870px) {
   .oppia-collection-player-small-text {
-    padding: 2em;
+    margin-left: 2em;
   }
 }
 
@@ -2369,7 +2369,7 @@ div#ng-curtain {
 
 @media(max-width: 870px) {
   .oppia-page-heading, .oppia-page-heading-subtext {
-    padding-left: 1.2em;
+    margin-left: 1.2em;
   }
 }
 
