@@ -979,7 +979,7 @@ md-card.oppia-gallery-tile {
 
 .oppia-html-select {
   position: relative;
-  width: inherit;
+  width: 80%;
 }
 
 .oppia-html-select .oppia-html-select-selection-element {
@@ -1005,6 +1005,8 @@ md-card.oppia-gallery-tile {
 
 .oppia-html-select .oppia-html-select-option {
   padding-top: 10px;
+  overflow: hidden;
+  margin-right: 10px;
 }
 
 .oppia-html-select .oppia-html-select-option:hover {
