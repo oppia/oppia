@@ -30,6 +30,7 @@ from core.controllers import profile
 from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
+from core.domain import user_services
 from core.platform import models
 import feconf
 # pylint: enable=relative-import
@@ -59,6 +60,15 @@ class WarmupHandler(base.BaseHandler):
     def get(self):
         """Handles GET warmup requests."""
         pass
+
+
+class HomePageRedirectHandler(base.BaseHandler):
+    "Check whether user is logged in or logged out and perform redirects on '/'"
+    def get(self):
+        if self.user_id and user_services.has_fully_registered(self.user_id):
+            self.redirect(feconf.MY_EXPLORATIONS_URL)
+        else:
+            self.redirect(feconf.GALLERY_URL)
 
 
 def get_redirect_route(regex_route, handler, name, defaults=None):
@@ -171,7 +181,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler, 'value_generator_handler'),
 
-    get_redirect_route(r'/', galleries.GalleryPage, 'gallery_page'),
+    get_redirect_route(r'/', HomePageRedirectHandler, 'home_page'),
+
     get_redirect_route(
         r'%s' % feconf.GALLERY_URL, galleries.GalleryPage, 'gallery_page'),
     get_redirect_route(
