@@ -979,7 +979,7 @@ md-card.oppia-gallery-tile {
 
 .oppia-html-select {
   position: relative;
-  width: inherit;
+  width: 80%;
 }
 
 .oppia-html-select .oppia-html-select-selection-element {
@@ -996,7 +996,7 @@ md-card.oppia-gallery-tile {
   top: 0;
 }
 
-.oppia-html-select .oppia-html-select-selection {  
+.oppia-html-select .oppia-html-select-selection {
   padding-right: 20px;
   position: relative;
   text-decoration: none;
@@ -1005,6 +1005,8 @@ md-card.oppia-gallery-tile {
 
 .oppia-html-select .oppia-html-select-option {
   padding-top: 10px;
+  overflow: hidden;
+  margin-right: 10px;
 }
 
 .oppia-html-select .oppia-html-select-option:hover {
