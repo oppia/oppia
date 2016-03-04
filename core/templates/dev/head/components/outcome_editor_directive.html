@@ -12,6 +12,7 @@
         <strong>Oppia tells the learner...</strong>
         <div style="position: relative;">
           <span ng-if="isEditable()"
+                ng-click="openFeedbackEditor()"
                 class="glyphicon glyphicon-pencil oppia-editor-edit-icon pull-right"
                 title="Edit Feedback">
           </span>
@@ -85,6 +86,7 @@
             (try again)
           </span>
           <span ng-if="isEditable()"
+                ng-click="openDestinationEditor()"
                 class="glyphicon glyphicon-pencil oppia-editor-edit-icon pull-right"
                 title="Edit Destination">
           </span>
