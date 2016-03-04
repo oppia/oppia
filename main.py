@@ -61,13 +61,14 @@ class WarmupHandler(base.BaseHandler):
         """Handles GET warmup requests."""
         pass
 
-class RedirectBasedOnLoginStatus(base.BaseHandler):
+
+class HomePageRedirectHandler(base.BaseHandler):
     "Check whether user is logged in or logged out and perform redirects on '/'"
     def get(self):
         if self.user_id and user_services.has_fully_registered(self.user_id):
-            self.redirect('/my_explorations')
+            self.redirect(feconf.MY_EXPLORATIONS_URL)
         else:
-            self.redirect('/gallery')
+            self.redirect(feconf.GALLERY_URL)
 
 
 def get_redirect_route(regex_route, handler, name, defaults=None):
@@ -180,7 +181,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler, 'value_generator_handler'),
 
-    get_redirect_route(r'/', RedirectBasedOnLoginStatus, 'home_page'),
+    get_redirect_route(r'/', HomePageRedirectHandler, 'home_page'),
 
     get_redirect_route(
         r'%s' % feconf.GALLERY_URL, galleries.GalleryPage, 'gallery_page'),
