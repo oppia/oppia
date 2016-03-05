@@ -83,7 +83,9 @@ oppia.controller('Profile', [
         for (var count = $scope.explorationIndexStart;
             count <= $scope.explorationIndexEnd; count++) {
           var nextExploration = $scope.userEditedExplorations[count];
-          if (nextExploration == null) break;
+          if (nextExploration == null) {
+            break;
+          }
           $scope.explorationsOnPage.push($scope.userEditedExplorations[count]);
         }
         return $scope.explorationsOnPage;
@@ -95,11 +97,10 @@ oppia.controller('Profile', [
         var startingNumber = $scope.currentPage * $scope.pageSize + 1;
         $scope.startingExplorationNumber = startingNumber.toString();
         if ($scope.userEditedExplorations.length > (
-            $scope.currentPage+1) * $scope.pageSize) {
+            $scope.currentPage + 1) * $scope.pageSize) {
           var endingNumber = $scope.currentPage * $scope.pageSize + 6;
           $scope.endingExplorationNumber = endingNumber;
-        }
-        else {
+        } else {
           var endingNumber = $scope.userEditedExplorations.length;
           $scope.endingExplorationNumber = endingNumber;
         }
