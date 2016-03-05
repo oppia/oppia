@@ -246,7 +246,8 @@ body {
   bottom: 0;
   display: block;
   font-size: .7em;
-  padding: 10px;
+  margin-right: 40px;
+  margin-bottom: 20px;
   position: absolute;
   right: 0;
   text-align: right;
