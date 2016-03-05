@@ -18,9 +18,10 @@
  * @author sean@seanlip.org (Sean Lip)
  */
 
+var app=angular.module('Oppia', []);
 oppia.controller('Profile', [
-  '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
-  function($scope, $http, $rootScope, oppiaDatetimeFormatter) {
+  '$scope', '$filter', '$http', '$rootScope', 'oppiaDatetimeFormatter',
+  function($scope, $filter, $http, $rootScope, oppiaDatetimeFormatter) {
     var profileDataUrl = '/profilehandler/data/' + GLOBALS.PROFILE_USERNAME;
     var DEFAULT_PROFILE_PICTURE_URL = '/images/general/no_profile_picture.png';
 
@@ -65,6 +66,43 @@ oppia.controller('Profile', [
           return -1;
         }
       });
+
+      $scope.currentPage = 0;
+      $scope.previousPage = function() {
+        $scope.currentPage--;
+      }
+      $scope.nextPage = function() {
+        $scope.currentPage++;
+      }
+      $scope.pageSize = 6;
+
+      $scope.userDisplayedExplorations = function() {
+        $scope.explorationsOnPage = [];
+        $scope.explorationIndexStart = $scope.currentPage * $scope.pageSize;
+        $scope.explorationIndexEnd = $scope.explorationIndexStart + $scope.pageSize - 1;
+        for (var count = $scope.explorationIndexStart; count<=$scope.explorationIndexEnd; count++) {
+          var nextExploration = $scope.userEditedExplorations[count];
+          if (nextExploration == null) break;
+          $scope.explorationsOnPage.push($scope.userEditedExplorations[count]);
+        }
+        return $scope.explorationsOnPage;
+      }
+
+      $scope.startingExplorationNumber = '1';
+      $scope.endingExplorationNumber = '6';
+      $scope.newExplorationNumbers = function() {
+        var startingNumber = $scope.currentPage*$scope.pageSize+1;
+        $scope.startingExplorationNumber = startingNumber.toString();
+        if ($scope.userEditedExplorations.length > ($scope.currentPage+1)*$scope.pageSize) {
+          var endingNumber = $scope.currentPage*$scope.pageSize + 6;
+          $scope.endingExplorationNumber = endingNumber;
+        }
+        else {
+          var endingNumber = $scope.userEditedExplorations.length;
+          $scope.endingExplorationNumber = endingNumber;
+        }
+      }
+
       $scope.numUserPortfolioExplorations = (
         data.edited_exp_summary_dicts.length);
       $scope.subjectInterests = data.subject_interests;

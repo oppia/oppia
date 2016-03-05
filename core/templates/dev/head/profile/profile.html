@@ -89,7 +89,7 @@
     <md-card class="oppia-profile-content-card">
       <strong>Portfolio</strong>
       <md-content class="oppia-profile-portfolio-container">
-        <exploration-summary-tile ng-repeat="expl in userEditedExplorations"
+        <exploration-summary-tile ng-repeat="expl in userDisplayedExplorations()"
           exploration-id="expl.id"
           exploration-title="expl.title"
           last-updated-msec="expl.last_updated_msec"
@@ -100,12 +100,20 @@
           thumbnail-bg-color="expl.thumbnail_bg_color"
           num-views="expl.num_views">
         </exploration-summary-tile>
+
         <div ng-if="userEditedExplorations.length === 0">
           <em></br>This user hasn't created or edited any explorations yet.</em>
         </div>
       </md-content>
-      <span class="oppia-profile-portfolio-pages" ng-if="numUserPortfolioExplorations > 4">
-        Showing #-# of <[numUserPortfolioExplorations]>
+
+      <span class="oppia-profile-portfolio-pages" ng-if="numUserPortfolioExplorations > 6">
+        <button ng-disabled="currentPage == 0" ng-click="previousPage(); newExplorationNumbers()">
+        Previous
+        </button>
+        Showing <[startingExplorationNumber]> - <[endingExplorationNumber]> of <[numUserPortfolioExplorations]>
+        <button ng-disabled="currentPage >= userEditedExplorations.length/pageSize - 1" ng-click="nextPage(); newExplorationNumbers()">
+          Next
+        </button>
       </span>
     </md-card>
   </div>

@@ -230,20 +230,25 @@ body {
   background-color: #fff;
   float: left;
   margin-bottom: 80px;
-  min-height: 500px;
+  min-height: 630px;
   padding: 30px;
+  position: relative;
   width: calc(100% - 280px);
 }
 
 .oppia-profile-portfolio-container {
   margin: 0 auto;
+  margin-bottom: 10px;
   width: 100%;
 }
 
 .oppia-profile-portfolio-pages {
+  bottom: 0;
   display: block;
   font-size: .7em;
-  margin-top: 5px;
+  padding: 10px;
+  position: absolute;
+  right: 0;
   text-align: right;
 }
 
