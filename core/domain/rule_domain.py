@@ -41,6 +41,43 @@ def get_obj_type_for_param_name(rule_class, param_name):
         'Rule %s has no param called %s' % (rule_class.__name__, param_name))
 
 
+def get_default_object_values():
+    """Returns a dict mapping object types to their default values, taking into
+    account only object types which represent rule input parameters.
+
+    Note: we return an explicit dict here in order to avoid unnecessary
+    computation, since this dict never changes between a release and is served
+    each time the editor page loads. We have backend tests that compare the
+    value returned here to an explicitly-computed value -- see
+
+          rule_domain_test.test_get_default_object_values().
+    """
+    return {
+        'CodeString': '',
+        'CoordTwoDim': [0.0, 0.0],
+        'Graph': {
+            'edges': [],
+            'isDirected': False,
+            'isLabeled': False,
+            'isWeighted': False,
+            'vertices': []
+        },
+        'GraphProperty': 'strongly_connected',
+        'Int': 0,
+        'ListOfCoordTwoDim': [],
+        'ListOfGraph': [],
+        'LogicErrorCategory': 'mistake',
+        'MusicPhrase': [],
+        'NonnegativeInt': 0,
+        'NormalizedString': u'',
+        'Real': 0.0,
+        'SetOfHtmlString': [],
+        'SetOfNormalizedString': [],
+        'SetOfUnicodeString': [],
+        'UnicodeString': u''
+    }
+
+
 def get_rules_for_obj_type(obj_type):
     """Gets all rules for a given object type.
 

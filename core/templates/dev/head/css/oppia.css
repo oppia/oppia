@@ -1036,7 +1036,7 @@ md-card.oppia-gallery-tile {
 
 .oppia-html-select {
   position: relative;
-  width: inherit;
+  width: 80%;
 }
 
 .oppia-html-select .oppia-html-select-selection-element {
@@ -1053,7 +1053,7 @@ md-card.oppia-gallery-tile {
   top: 0;
 }
 
-.oppia-html-select .oppia-html-select-selection {  
+.oppia-html-select .oppia-html-select-selection {
   padding-right: 20px;
   position: relative;
   text-decoration: none;
@@ -1062,6 +1062,8 @@ md-card.oppia-gallery-tile {
 
 .oppia-html-select .oppia-html-select-option {
   padding-top: 10px;
+  overflow: hidden;
+  margin-right: 10px;
 }
 
 .oppia-html-select .oppia-html-select-option:hover {
@@ -1382,13 +1384,14 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-collection-player-tiles-container {
   height: 100%;
-  margin-top: 60px;
   margin-left: auto;
   margin-right: auto;
-  max-width: 800px;
+  margin-top: 60px;
+  max-width: 844px;
   min-height: 500px;
   padding-bottom: 25px;
   position: relative;
+  padding-left: 1em;
 }
 .oppia-collection-player-tiles-container .oppia-page-heading {
   color: #fff;
@@ -1405,6 +1408,13 @@ pre.oppia-pre-wrapped-text {
   margin-top: 12px;
   margin-bottom: 6px;
 }
+
+@media only screen and (max-width: 500px) {
+    .oppia-collection-player-small-text {
+      text-align: center;
+      display: block;
+    }
+  }
 
 /* Styles for the statistics page. */
 
@@ -2410,7 +2420,7 @@ div#ng-curtain {
 }
 
 .oppia-page-heading {
-  margin-bottom: 5px;
+  margin-bottom: 24px;
 }
 
 .oppia-page-heading-subtext {
@@ -2418,9 +2428,9 @@ div#ng-curtain {
   opacity: 0.7;
 }
 
-@media(max-width: 800px) {
+@media(max-width: 500px) {
   .oppia-page-heading, .oppia-page-heading-subtext {
-    margin-left: 30px;
+    text-align: center;
   }
 }
 

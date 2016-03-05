@@ -19,11 +19,11 @@
  */
 
 oppia.controller('MyExplorations', [
-  '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
-  'RatingComputationService',
+  '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter', 'CATEGORY_LIST',
+  'RatingComputationService', 'urlService', 'ExplorationCreationButtonService',
   function(
-      $scope, $http, $rootScope, oppiaDatetimeFormatter,
-      RatingComputationService) {
+      $scope, $http, $rootScope, oppiaDatetimeFormatter, CATEGORY_LIST,
+      RatingComputationService, urlService, ExplorationCreationButtonService) {
     $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
       return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
         millisSinceEpoch);
@@ -33,10 +33,21 @@ oppia.controller('MyExplorations', [
       return RatingComputationService.computeAverageRating(ratings);
     };
 
+    $scope.showCreateExplorationModal = function() {
+      ExplorationCreationButtonService.showCreateExplorationModal(
+        CATEGORY_LIST);
+    };
+
     $rootScope.loadingMessage = 'Loading';
     $http.get('/myexplorationshandler/data').success(function(data) {
       $scope.explorationsList = data.explorations_list;
       $rootScope.loadingMessage = '';
+
+      if (data.username) {
+        if (urlService.getUrlParams().mode === 'create') {
+          $scope.showCreateExplorationModal(CATEGORY_LIST);
+        }
+      }
     });
   }
 ]);
