@@ -236,9 +236,8 @@ class ProfileLinkTests(test_utils.GenericTestBase):
         response_dict = self.get_json(
             '%s%s' % (self.PROFILE_PIC_URL, self.USERNAME)
         )
-        self.assertEqual(
-            response_dict['profile_picture_data_url_for_username'],
-            None)
+        self.assertIsNotNone(
+            response_dict['profile_picture_data_url_for_username'])
 
 
 class ProfileDataHandlerTests(test_utils.GenericTestBase):

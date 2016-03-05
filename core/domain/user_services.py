@@ -562,7 +562,7 @@ def fetch_gravatar(email):
 
     base_url = "http://www.gravatar.com/avatar/"
     gravatar_url = base_url + hashlib.md5(email).hexdigest() + "?"
-    size = str('feconf.GRAVATAR_SIZE_PX')
+    size = str(feconf.GRAVATAR_SIZE_PX)
     gravatar_url += urllib.urlencode({'d':'retro', 's':size})
     result = urlfetch.fetch(gravatar_url, headers={'Content-Type': 'image/png'})
     if result.status_code == 200:
