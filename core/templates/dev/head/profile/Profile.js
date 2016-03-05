@@ -18,7 +18,6 @@
  * @author sean@seanlip.org (Sean Lip)
  */
 
-var app=angular.module('Oppia', []);
 oppia.controller('Profile', [
   '$scope', '$filter', '$http', '$rootScope', 'oppiaDatetimeFormatter',
   function($scope, $filter, $http, $rootScope, oppiaDatetimeFormatter) {
@@ -70,38 +69,41 @@ oppia.controller('Profile', [
       $scope.currentPage = 0;
       $scope.previousPage = function() {
         $scope.currentPage--;
-      }
+      };
       $scope.nextPage = function() {
         $scope.currentPage++;
-      }
+      };
       $scope.pageSize = 6;
 
       $scope.userDisplayedExplorations = function() {
         $scope.explorationsOnPage = [];
         $scope.explorationIndexStart = $scope.currentPage * $scope.pageSize;
-        $scope.explorationIndexEnd = $scope.explorationIndexStart + $scope.pageSize - 1;
-        for (var count = $scope.explorationIndexStart; count<=$scope.explorationIndexEnd; count++) {
+        $scope.explorationIndexEnd = (
+          $scope.explorationIndexStart + $scope.pageSize - 1);
+        for (var count = $scope.explorationIndexStart;
+            count <= $scope.explorationIndexEnd; count++) {
           var nextExploration = $scope.userEditedExplorations[count];
           if (nextExploration == null) break;
           $scope.explorationsOnPage.push($scope.userEditedExplorations[count]);
         }
         return $scope.explorationsOnPage;
-      }
+      };
 
       $scope.startingExplorationNumber = '1';
       $scope.endingExplorationNumber = '6';
       $scope.newExplorationNumbers = function() {
-        var startingNumber = $scope.currentPage*$scope.pageSize+1;
+        var startingNumber = $scope.currentPage * $scope.pageSize + 1;
         $scope.startingExplorationNumber = startingNumber.toString();
-        if ($scope.userEditedExplorations.length > ($scope.currentPage+1)*$scope.pageSize) {
-          var endingNumber = $scope.currentPage*$scope.pageSize + 6;
+        if ($scope.userEditedExplorations.length > (
+            $scope.currentPage+1) * $scope.pageSize) {
+          var endingNumber = $scope.currentPage * $scope.pageSize + 6;
           $scope.endingExplorationNumber = endingNumber;
         }
         else {
           var endingNumber = $scope.userEditedExplorations.length;
           $scope.endingExplorationNumber = endingNumber;
         }
-      }
+      };
 
       $scope.numUserPortfolioExplorations = (
         data.edited_exp_summary_dicts.length);
