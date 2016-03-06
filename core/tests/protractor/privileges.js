@@ -49,7 +49,8 @@ describe('Permissions for private explorations', function() {
       users.login('eve@example.com');
       general.openEditor(explorationId);
       // Eve is redirected to the homepage.
-      expect(browser.getCurrentUrl()).toEqual(general.SERVER_URL_PREFIX + '/');
+      expect(browser.getCurrentUrl()).toEqual(
+        general.SERVER_URL_PREFIX + '/my_explorations');
       users.logout();
     });
   });
