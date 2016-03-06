@@ -16,6 +16,7 @@
 
 """Common utilities for test classes."""
 
+import base64
 import contextlib
 import copy
 import inspect
@@ -34,6 +35,7 @@ from core.domain import exp_services
 from core.domain import rule_domain
 from core.domain import rights_manager
 from core.platform import models
+from google.appengine.api import urlfetch
 import feconf
 import jinja_utils
 import main
@@ -304,6 +306,14 @@ class TestBase(unittest.TestCase):
 
     def get_user_id_from_email(self, email):
         return current_user_services.get_user_id_from_email(email)
+
+    def get_gravatar_from_url(self, url):
+        response = urlfetch.fetch(url, headers={'Content-Type': 'image/png'})
+        self.assertEqual(response.status_code, 200)
+        if response.status_code == 200:
+            encoded_body = base64.b64encode(response.content)
+            return 'data:{};base64,{}'.format('image/png', encoded_body)
+
 
     def save_new_default_exploration(
             self, exploration_id, owner_id, title='A title'):

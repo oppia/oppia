@@ -112,7 +112,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
         }, response_dict['explorations_list'][0])
 
     def test_gallery_handler_for_created_explorations(self):
-        """Test the gallery data handler for manually created explirations."""
+        """Test the gallery data handler for manually created explorations."""
         self.set_admins([self.ADMIN_USERNAME])
 
         self.login(self.ADMIN_EMAIL)
@@ -125,7 +125,13 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'user_email': self.ADMIN_EMAIL,
             'username': self.ADMIN_USERNAME,
             'search_cursor': None,
-            'profile_picture_data_url': None,
+            'profile_picture_data_url':(
+                'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAy'
+                'CAIAAACRXR/mAAAAqElEQVRYhe2YsQ2AMBADAWUfWpagygxMxQxULE'
+                'gfoUenT4QLXwsiJ8sfIPO61UmP5W+Bd6xFENUqZ92Dy8d1D1o4Xlc0'
+                'LWsRRLXmzC4/blxE07IWQVSLVT7ueAyaANG0rEWwFsFaBGsR2l0+s4'
+                '9naN4BomlZiyCqVdDdmc9zNEyiaVmLIKrFKt/g31cNrEVIVX7cEaZo'
+                'WtYiiGp9VL5jqZtH+Vy+H9YiPKBTHRjD6dKiAAAAAElFTkSuQmCC'),
             'preferred_language_codes': [feconf.DEFAULT_LANGUAGE_CODE],
         }, response_dict)
 
