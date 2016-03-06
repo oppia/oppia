@@ -249,7 +249,7 @@ class ProfileLinkTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.get_gravatar_from_url(self.GRAVATAR_URL),
             response_dict['profile_picture_data_url_for_username'])
-            
+
 
 class ProfileDataHandlerTests(test_utils.GenericTestBase):
 
