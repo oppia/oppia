@@ -139,6 +139,7 @@ var expectContentTextToEqual = function(text) {
 
 // INTERACTIONS
 
+// Used as the standard way to specify interaction for most purposes.
 // Additional arguments may be sent to this function, and they will be
 // passed on to the relevant interaction editor.
 var setInteraction = function(interactionId) {
@@ -149,12 +150,13 @@ var setInteraction = function(interactionId) {
     '.protractor-test-add-response-modal-header'));
   headerElem.isPresent().then(function(isVisible) {
     if (isVisible) {
-      element(by.css('.protractor-test-close-add-response-modal')).click();
-      general.waitForSystem();
+      closeAddResponseModal();
     }
   });
 };
 
+// This function is not usually necessary, please consider using
+// setInteracton instead.
 var openInteraction = function(interactionId) {
   element(by.css('.protractor-test-delete-interaction')).isPresent().then(
     function(isVisible) {
@@ -192,11 +194,15 @@ var openInteraction = function(interactionId) {
   element(by.css('.protractor-test-interaction-tile-' + interactionId)).click();
 };
 
-var closeInteraction = function() {
+// This function is not usually necessary, please consider using
+// setInteracton instead.
+var closeAddResponseModal = function() {
   element(by.css('.protractor-test-close-add-response-modal')).click();
   general.waitForSystem();
 };
 
+// This function is not usually necessary, please consider using
+// setInteracton instead.
 var customizeInteraction = function(interactionId) {
   if (arguments.length > 1) {
     var elem = element(by.css('.protractor-test-interaction-editor'));
@@ -381,29 +387,85 @@ var addParameterChange = function(paramName, paramValue) {
 
 // RULES
 
-// This function selects a rule for the current interaction and enters the
-// entries of the parameterValues array as its parameters; the parameterValues
-// should be specified after the ruleName as additional arguments. For example
-// with interaction 'NumericInput' and rule 'Equals' then there is a single
-// parameter which the given answer is required to equal.
-var _selectRule = function(ruleElement, interactionId, ruleName,
-  skipParameters) {
-  var parameterValues = [];
-  for (var i = 4; i < arguments.length; i++) {
-    parameterValues.push(arguments[i]);
-  }
+var selectRuleInAddResponseModal = function(interactionId, ruleName) {
+  var ruleElement = element(by.css('.protractor-test-add-response-details'));
+  _selectRule(ruleElement, interactionId, ruleName);
+};
 
+var selectRuleParametersInAddResponseModal = function() {
+  var ruleElement = element(by.css('.protractor-test-add-response-details'));
+  var args = [ruleElement];
+  for (var i = 0; i < arguments.length; i++) {
+    args.push(arguments[i]);
+  }
+  _selectRuleParameters.apply(null, args);
+};
+
+// From the corresponding ruleDescription string deduces and returns the types
+// of the parameter objects
+var _getRuleParameterTypes = function(interactionId, ruleName) {
   var ruleDescription = rules.getDescription(
     interactions.getInteraction(interactionId).answerObjectType, ruleName);
 
   var parameterStart = (ruleDescription.indexOf('{{') === -1) ?
     undefined : ruleDescription.indexOf('{{');
-  // From the ruleDescription string we can deduce both the description used
-  // in the page (which will have the form "is equal to ...") and the types
-  // of the parameter objects, which will later tell us which object editors
-  // to use to enter the parameterValues.
-  var ruleDescriptionInDropdown = ruleDescription.substring(0, parameterStart);
   var parameterTypes = [];
+  while (parameterStart !== undefined) {
+    var parameterEnd = ruleDescription.indexOf('}}', parameterStart) + 2;
+    parameterTypes.push(
+      ruleDescription.substring(
+        ruleDescription.indexOf('|', parameterStart) + 1, parameterEnd - 2));
+
+    var nextParameterStart =
+      (ruleDescription.indexOf('{{', parameterEnd) === -1) ?
+      undefined : ruleDescription.indexOf('{{', parameterEnd);
+    parameterStart = nextParameterStart;
+  }
+  return parameterTypes;
+};
+
+// This function enters the entries of the parameterValues array as its
+// parameters; the parameterValues should be specified after the ruleName
+// as additional arguments. For example with interaction 'NumericInput'
+// and rule 'Equals' then there is a single parameter
+// which the given answer is required to equal.
+var _selectRuleParameters = function(ruleElement, interactionId, ruleName) {
+  var parameterValues = [];
+  for (var i = 3; i < arguments.length; i++) {
+    parameterValues.push(arguments[i]);
+  }
+  var parameterTypes = _getRuleParameterTypes(interactionId, ruleName);
+  expect(parameterValues.length).toEqual(parameterTypes.length);
+
+  for (var i = 0; i < parameterValues.length; i++) {
+    var parameterElement = ruleElement.all(
+      by.css('.protractor-test-answer-description-fragment'
+    )).get(i * 2 + 1);
+    var parameterEditor = forms.getEditor(parameterTypes[i])(parameterElement);
+
+    if (interactionId === 'MultipleChoiceInput') {
+      // This is a special case as it uses a dropdown to set a NonnegativeInt
+      parameterElement.element(
+        by.tagName('button')
+      ).click();
+      parameterElement.element(
+        by.cssContainingText('.oppia-html-select-option', parameterValues[i])
+      ).click();
+    } else {
+      parameterEditor.setValue(parameterValues[i]);
+    }
+  }
+};
+
+var _selectRule = function(ruleElement, interactionId, ruleName) {
+  var ruleDescription = rules.getDescription(
+    interactions.getInteraction(interactionId).answerObjectType, ruleName);
+
+  var parameterStart = (ruleDescription.indexOf('{{') === -1) ?
+    undefined : ruleDescription.indexOf('{{');
+  // From the ruleDescription string we can deduce the description used
+  // in the page (which will have the form "is equal to ...")
+  var ruleDescriptionInDropdown = ruleDescription.substring(0, parameterStart);
   while (parameterStart !== undefined) {
     var parameterEnd = ruleDescription.indexOf('}}', parameterStart) + 2;
     var nextParameterStart =
@@ -411,14 +473,9 @@ var _selectRule = function(ruleElement, interactionId, ruleName,
       undefined : ruleDescription.indexOf('{{', parameterEnd);
     ruleDescriptionInDropdown = ruleDescriptionInDropdown + '...' +
       ruleDescription.substring(parameterEnd, nextParameterStart);
-    parameterTypes.push(
-      ruleDescription.substring(
-        ruleDescription.indexOf('|', parameterStart) + 1, parameterEnd - 2));
     parameterStart = nextParameterStart;
   }
-  if (!skipParameters) {
-    expect(parameterValues.length).toEqual(parameterTypes.length);
-  }
+
   ruleElement.element(by.css('.protractor-test-answer-description')).click();
 
   element.all(by.id('select2-drop')).map(function(selectorElement) {
@@ -440,51 +497,27 @@ var _selectRule = function(ruleElement, interactionId, ruleName,
       optionElements[0].click();
     });
   });
+};
 
-  if (skipParameters) {
-    return;
+// Before using this function ensure that expectValueToBe
+// (as declared in TODO below) is implemented in your parameter type editor.
+var expectRuleParametersToBe = function(interactionId, ruleName) {
+  var parameterValues = [];
+  for (var i = 2; i < arguments.length; i++) {
+    parameterValues.push(arguments[i]);
   }
+
+  parameterTypes = _getRuleParameterTypes(interactionId, ruleName);
+  expect(parameterValues.length).toEqual(parameterTypes.length);
 
   // Now we enter the parameters
   for (var i = 0; i < parameterValues.length; i++) {
-    var parameterElement = ruleElement.all(
+    var parameterElement = element.all(
       by.css('.protractor-test-answer-description-fragment'
     )).get(i * 2 + 1);
     var parameterEditor = forms.getEditor(parameterTypes[i])(parameterElement);
-
-    if (interactionId === 'MultipleChoiceInput') {
-      // This is a special case as it uses a dropdown to set a NonnegativeInt
-      parameterElement.element(
-        by.tagName('button')
-      ).click();
-      parameterElement.element(
-        by.cssContainingText('.oppia-html-select-option', parameterValues[i])
-      ).click();
-    } else {
-      parameterEditor.setValue(parameterValues[i]);
-    }
-  }
-};
-
-var selectRuleInAddResponse = function() {
-  var ruleElement = element(by.css('.protractor-test-add-response-details'));
-  var args = [ruleElement];
-  for (var i = 0; i < arguments.length; i++) {
-    args.push(arguments[i]);
-  }
-  _selectRule.apply(null, args);
-};
-
-var expectRuleParametersToBe = function() {
-  for (var i = 0; i < arguments.length; i++) {
-    var expected = arguments[i];
-    var parameterElement = element.all(
-      by.css('.protractor-test-answer-description-fragment'
-    )).get(i * 2 + 1).element(by.tagName('input')).getAttribute('value').then(
-      function(text) {
-        expect(text).toEqual(expected);
-      }
-    );
+    // TODO: implement expectValueToBe in all parameterEditors.
+    parameterEditor.expectValueToBe(parameterValues[i]);
   }
 };
 
@@ -547,7 +580,8 @@ var addResponse = function(interactionId, feedbackInstructions, destStateName,
   for (var i = 5; i < arguments.length; i++) {
     args.push(arguments[i]);
   }
-  _selectRule.apply(null, args);
+  _selectRule(ruleElement, interactionId, ruleName);
+  _selectRuleParameters.apply(null, args);
 
   // Open the feedback entry form if it is not already open.
   var feedbackContainerElem = element(by.css(
@@ -678,7 +712,8 @@ var ResponseEditor = function(responseNum) {
       for (var i = 2; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
-      _selectRule.apply(null, args);
+      _selectRule(ruleElement, interactionId, ruleName);
+      _selectRuleParameters.apply(null, args);
 
       // Save the new rule.
       element(by.css('.protractor-test-save-answer')).click();
@@ -1261,12 +1296,14 @@ exports.expectContentToMatch = expectContentToMatch;
 
 exports.setInteraction = setInteraction;
 exports.openInteraction = openInteraction;
-exports.closeInteraction = closeInteraction;
+exports.closeAddResponseModal = closeAddResponseModal;
 exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionToMatch = expectInteractionToMatch;
 exports.expectCannotDeleteInteraction = expectCannotDeleteInteraction;
 
-exports.selectRuleInAddResponse = selectRuleInAddResponse;
+exports.selectRuleInAddResponseModal = selectRuleInAddResponseModal;
+exports.selectRuleParametersInAddResponseModal = (
+  selectRuleParametersInAddResponseModal);
 exports.expectRuleParametersToBe = expectRuleParametersToBe;
 
 exports.addGadget = addGadget;

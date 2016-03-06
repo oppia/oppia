@@ -145,8 +145,8 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         });
 
         $scope.onSelectNewRuleType = function(newRuleType) {
-          var oldRuleInputs = $scope.rule.inputs || {};
-          var oldRuleInputTypes = $scope.rule.inputTypes || {};
+          var oldRuleInputs = angular.copy($scope.rule.inputs) || {};
+          var oldRuleInputTypes = angular.copy($scope.rule.inputTypes) || {};
 
           $scope.rule.rule_type = newRuleType;
           $scope.rule.inputs = {};
@@ -187,7 +187,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           }
 
           for (var key in $scope.rule.inputs) {
-            if (key in oldRuleInputs &&
+            if (oldRuleInputs.hasOwnProperty(key) &&
               oldRuleInputTypes[key] === $scope.rule.inputTypes[key]) {
               $scope.rule.inputs[key] = oldRuleInputs[key];
             }
