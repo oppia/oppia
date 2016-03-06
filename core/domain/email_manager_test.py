@@ -426,3 +426,41 @@ class SignupEmailTests(test_utils.GenericTestBase):
                 sent_email_model.subject, 'Welcome!')
             self.assertEqual(
                 sent_email_model.html_body, self.expected_html_email_content)
+
+
+class GenerateHashTests(test_utils.GenericTestBase):
+    """Test that generating hash functionality works as expected."""
+
+    def test_same_input_always_gives_same_hash(self):
+        # pylint: disable=protected-access
+        email_hash1 = email_manager._generate_hash('recipient_id',
+                                                   'email_subject',
+                                                   'email_html_body1')
+
+        email_hash2 = email_manager._generate_hash('recipient_id',
+                                                   'email_subject',
+                                                   'email_html_body1')
+        self.assertEqual(email_hash1, email_hash2)
+        # pylint: enable=protected-access
+
+    def test_different_input_give_different_hash(self):
+        # pylint: disable=protected-access
+        email_hash1 = email_manager._generate_hash('recipient_id',
+                                                   'email_subject',
+                                                   'email_html_body1')
+
+        email_hash2 = email_manager._generate_hash('recipient_id',
+                                                   'email_subject',
+                                                   'email_html_body2')
+        self.assertNotEqual(email_hash1, email_hash2)
+
+        email_hash2 = email_manager._generate_hash('recipient_id2',
+                                                   'email_subject',
+                                                   'email_html_body')
+        self.assertNotEqual(email_hash1, email_hash2)
+
+        email_hash2 = email_manager._generate_hash('recipient_id',
+                                                   'email_subject2',
+                                                   'email_html_body')
+        self.assertNotEqual(email_hash1, email_hash2)
+        # pylint: enable=protected-access

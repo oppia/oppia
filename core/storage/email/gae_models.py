@@ -16,6 +16,8 @@
 
 """Models for the content of sent emails."""
 
+import datetime
+
 from core.platform import models
 import feconf
 import utils
@@ -59,6 +61,8 @@ class SentEmailModel(base_models.BaseModel):
     html_body = ndb.TextProperty(required=True)
     # The datetime the email was sent, in UTC.
     sent_datetime = ndb.DateTimeProperty(required=True, indexed=True)
+    # The hash of the recipient id, email subject and message body.
+    email_hash = ndb.StringProperty(indexed=True)
 
     @classmethod
     def _generate_id(cls, intent):
@@ -84,16 +88,42 @@ class SentEmailModel(base_models.BaseModel):
     @classmethod
     def create(
             cls, recipient_id, recipient_email, sender_id, sender_email,
-            intent, subject, html_body, sent_datetime):
+            intent, subject, html_body, sent_datetime, email_hash):
         """Creates a new SentEmailModel entry."""
         instance_id = cls._generate_id(intent)
         email_model_instance = cls(
             id=instance_id, recipient_id=recipient_id,
             recipient_email=recipient_email, sender_id=sender_id,
             sender_email=sender_email, intent=intent, subject=subject,
-            html_body=html_body, sent_datetime=sent_datetime)
+            html_body=html_body, sent_datetime=sent_datetime,
+            email_hash=email_hash)
         # We only allow the model instance to be saved once, when it is
         # first created. To do this, we bypass the instance's put() method,
         # which raises an error, and use the put() method of its superclass
         # instead.
         super(SentEmailModel, email_model_instance).put()
+
+    @classmethod
+    def get_by_hash(cls, email_hash, after=None):
+        """Returns all messages with a given email_hash.
+
+        This also takes an optional after argument, which is a
+        datetime instance. If this is given, only SentEmailModel
+        instances sent after the given datetime should be returned.
+        """
+
+        if after is not None:
+            if not isinstance(after, datetime.datetime):
+                raise Exception(
+                    'Expected datetime, received %s of type %s' %
+                    (after, type(after)))
+
+        query = cls.query()
+        query = query.filter(cls.email_hash == email_hash)
+
+        if after is not None:
+            query = query.filter(cls.sent_datetime > after)
+
+        messages = query.fetch()
+
+        return messages

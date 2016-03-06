@@ -30,9 +30,86 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
         email_models.SentEmailModel.create(
             'recipient_id', 'recipient@email.com', 'sender_id',
             'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
-            'Email Subject', 'Email Body', datetime.datetime.utcnow())
+            'Email Subject', 'Email Body', datetime.datetime.utcnow(),
+            'Email Hash')
 
         model = email_models.SentEmailModel.get_all().fetch()[0]
         model.recipient_id = 'new_recipient_id'
         with self.assertRaises(Exception):
             model.put()
+
+    def test_model_saved_with_certain_hash_can_be_retrieved_same_hash(self):
+        email_models.SentEmailModel.create(
+            'recipient_id', 'recipient@email.com', 'sender_id',
+            'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
+            'Email Subject', 'Email Body', datetime.datetime.utcnow(),
+            'Email Hash')
+
+        query = email_models.SentEmailModel.query()
+        query = query.filter(
+            email_models.SentEmailModel.email_hash == 'Email Hash')
+
+        model = query.fetch(2)
+
+        self.assertEqual(len(model), 1)
+
+        query = email_models.SentEmailModel.query()
+        query = query.filter(
+            email_models.SentEmailModel.email_hash == 'Wrong Email Hash')
+
+        model = query.fetch(2)
+
+        self.assertEqual(len(model), 0)
+
+    def test_model_saved_certain_hash_retrieved_same_hash_using_getbyhash(self):
+        email_models.SentEmailModel.create(
+            'recipient_id', 'recipient@email.com', 'sender_id',
+            'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
+            'Email Subject', 'Email Body', datetime.datetime.utcnow(),
+            'Email Hash')
+
+        model = email_models.SentEmailModel.get_by_hash('Email Hash')
+
+        self.assertEqual(len(model), 1)
+
+        model = email_models.SentEmailModel.get_by_hash('Wrong Email Hash')
+
+        self.assertEqual(len(model), 0)
+
+    def test_get_by_hash_return_multiple_models_same_hash(self):
+        email_models.SentEmailModel.create(
+            'recipient_id', 'recipient@email.com', 'sender_id',
+            'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
+            'Email Subject', 'Email Body', datetime.datetime.utcnow(),
+            'Same Hash')
+
+        email_models.SentEmailModel.create(
+            'recipient_id', 'recipient@email.com', 'sender_id',
+            'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
+            'Email Subject', 'Email Body', datetime.datetime.utcnow(),
+            'Same Hash')
+
+        model = email_models.SentEmailModel.get_by_hash('Same Hash')
+
+        self.assertEqual(len(model), 2)
+
+    def test_get_by_hash_correct_usage_after_argument(self):
+        time_now = datetime.datetime.utcnow()
+
+        email_models.SentEmailModel.create(
+            'recipient_id', 'recipient@email.com', 'sender_id',
+            'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
+            'Email Subject', 'Email Body', datetime.datetime.utcnow(),
+            'Email Hash')
+
+        model = email_models.SentEmailModel.get_by_hash('Email Hash', time_now)
+        self.assertEqual(len(model), 1)
+
+        time_now = datetime.datetime.utcnow()
+
+        model = email_models.SentEmailModel.get_by_hash('Email Hash', time_now)
+        self.assertEqual(len(model), 0)
+
+        with self.assertRaises(Exception):
+            model = email_models.SentEmailModel.get_by_hash(
+                'Email Hash', 'Random String')
