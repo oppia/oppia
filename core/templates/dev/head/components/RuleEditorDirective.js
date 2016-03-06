@@ -42,6 +42,8 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           explorationStatesService, routerService, validatorsService,
           responsesService, stateInteractionIdService, INTERACTION_SPECS,
           FUZZY_RULE_TYPE) {
+        var DEFAULT_OBJECT_VALUES = GLOBALS.DEFAULT_OBJECT_VALUES;
+
         $scope.currentInteractionId = stateInteractionIdService.savedMemento;
         $scope.editRuleForm = {};
 
@@ -162,20 +164,17 @@ oppia.directive('ruleEditor', ['$log', function($log) {
               varType = tmpRuleDescription.match(PATTERN)[2].substring(1);
             }
 
-            if (varType === 'SetOfHtmlString') {
+            // TODO(sll): Find a more robust way of doing this. For example,
+            // we could associate a particular varName with answerChoices
+            // depending on the interaction. This varName would take its
+            // default value from answerChoices, but other variables would
+            // take their default values from the DEFAULT_OBJECT_VALUES dict.
+            if (angular.equals(DEFAULT_OBJECT_VALUES[varType], [])) {
               $scope.rule.inputs[varName] = [];
             } else if (answerChoices) {
               $scope.rule.inputs[varName] = angular.copy(answerChoices[0].val);
-            } else if (varType == 'Graph') {
-              $scope.rule.inputs[varName] = {
-                edges: [],
-                isDirected: false,
-                isLabeled: false,
-                isWeighted: false,
-                vertices: []
-              };
             } else {
-              $scope.rule.inputs[varName] = '';
+              $scope.rule.inputs[varName] = DEFAULT_OBJECT_VALUES[varType];
             }
 
             tmpRuleDescription = tmpRuleDescription.replace(PATTERN, ' ');
