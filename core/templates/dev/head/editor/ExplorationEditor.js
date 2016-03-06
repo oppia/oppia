@@ -537,6 +537,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         if (!changesExist) {
           warningsData.addWarning('Your changes cancel each other out, ' +
             'so nothing has been saved.');
+          $scope.saveModalIsOpening = false;
+          changeListService.discardAllChanges();
           return;
         }
 
