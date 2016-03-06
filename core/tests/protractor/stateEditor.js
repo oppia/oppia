@@ -137,9 +137,9 @@ describe('State editor', function() {
   });
 
   it('should preserve input value when rule type changes in' +
-  'add response modal', function() {
-    users.createUser('user4@example.com', 'user4');
-    users.login('user4@example.com');
+  ' add response modal', function() {
+    users.createUser('stateEditorUser1@example.com', 'stateEditorUser1');
+    users.login('stateEditorUser1@example.com');
     workflow.createExploration('sums', 'maths');
     editor.setContent(forms.toRichText('some content'));
 
