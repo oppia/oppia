@@ -137,7 +137,7 @@ describe('State editor', function() {
   });
 
   it('should preserve input value when rule type changes in' +
-  ' add response modal', function() {
+      ' add response modal', function() {
     users.createUser('stateEditorUser1@example.com', 'stateEditorUser1');
     users.login('stateEditorUser1@example.com');
     workflow.createExploration('sums', 'maths');
@@ -146,7 +146,7 @@ describe('State editor', function() {
     editor.openInteraction('TextInput');
     editor.customizeInteraction('TextInput', 'My PlaceHolder', 2);
     editor.selectRuleInAddResponseModal('TextInput', 'Equals');
-    editor.selectRuleParametersInAddResponseModal('TextInput',
+    editor.setRuleParametersInAddResponseModal('TextInput',
       'Equals', 'Some Text');
     editor.expectRuleParametersToBe('TextInput', 'Equals', 'Some Text');
     editor.selectRuleInAddResponseModal('TextInput', 'Contains');

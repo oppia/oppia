@@ -139,9 +139,9 @@ var expectContentTextToEqual = function(text) {
 
 // INTERACTIONS
 
-// Used as the standard way to specify interaction for most purposes.
-// Additional arguments may be sent to this function, and they will be
-// passed on to the relevant interaction editor.
+// This function should be used as the standard way to specify interactions for
+// most purposes. Additional arguments may be sent to this function,
+// and they will be passed on to the relevant interaction editor.
 var setInteraction = function(interactionId) {
   openInteraction(interactionId);
   customizeInteraction.apply(null, arguments);
@@ -155,8 +155,8 @@ var setInteraction = function(interactionId) {
   });
 };
 
-// This function is not usually necessary, please consider using
-// setInteracton instead.
+// This function should not usually be invoked directly; please consider
+// using setInteraction instead.
 var openInteraction = function(interactionId) {
   element(by.css('.protractor-test-delete-interaction')).isPresent().then(
     function(isVisible) {
@@ -194,15 +194,15 @@ var openInteraction = function(interactionId) {
   element(by.css('.protractor-test-interaction-tile-' + interactionId)).click();
 };
 
-// This function is not usually necessary, please consider using
-// setInteracton instead.
+// This function should not usually be invoked directly; please consider
+// using setInteraction instead.
 var closeAddResponseModal = function() {
   element(by.css('.protractor-test-close-add-response-modal')).click();
   general.waitForSystem();
 };
 
-// This function is not usually necessary, please consider using
-// setInteracton instead.
+// This function should not usually be invoked directly; please consider
+// using setInteraction instead.
 var customizeInteraction = function(interactionId) {
   if (arguments.length > 1) {
     var elem = element(by.css('.protractor-test-interaction-editor'));
@@ -392,17 +392,17 @@ var selectRuleInAddResponseModal = function(interactionId, ruleName) {
   _selectRule(ruleElement, interactionId, ruleName);
 };
 
-var selectRuleParametersInAddResponseModal = function() {
+var setRuleParametersInAddResponseModal = function() {
   var ruleElement = element(by.css('.protractor-test-add-response-details'));
   var args = [ruleElement];
   for (var i = 0; i < arguments.length; i++) {
     args.push(arguments[i]);
   }
-  _selectRuleParameters.apply(null, args);
+  _setRuleParameters.apply(null, args);
 };
 
-// From the corresponding ruleDescription string deduces and returns the types
-// of the parameter objects
+// Parses the relevant ruleDescription string, and returns an Array containing
+// the types of the rule input parameters.
 var _getRuleParameterTypes = function(interactionId, ruleName) {
   var ruleDescription = rules.getDescription(
     interactions.getInteraction(interactionId).answerObjectType, ruleName);
@@ -424,12 +424,12 @@ var _getRuleParameterTypes = function(interactionId, ruleName) {
   return parameterTypes;
 };
 
-// This function enters the entries of the parameterValues array as its
-// parameters; the parameterValues should be specified after the ruleName
-// as additional arguments. For example with interaction 'NumericInput'
-// and rule 'Equals' then there is a single parameter
-// which the given answer is required to equal.
-var _selectRuleParameters = function(ruleElement, interactionId, ruleName) {
+// This function sets the parameter values for the given rule.
+// Note: The parameter values should be specified as additional arguments
+// after the ruleName. For example, the call
+//   _selectRuleParameters(ruleElement, 'NumericInput', 'Equals', 24)
+// will result in a rule that checks whether the learner's answer equals 24.
+var _setRuleParameters = function(ruleElement, interactionId, ruleName) {
   var parameterValues = [];
   for (var i = 3; i < arguments.length; i++) {
     parameterValues.push(arguments[i]);
@@ -457,6 +457,8 @@ var _selectRuleParameters = function(ruleElement, interactionId, ruleName) {
   }
 };
 
+// This function selects a rule from the dropdown,
+// but does not set any of its input parameters.
 var _selectRule = function(ruleElement, interactionId, ruleName) {
   var ruleDescription = rules.getDescription(
     interactions.getInteraction(interactionId).answerObjectType, ruleName);
@@ -499,8 +501,12 @@ var _selectRule = function(ruleElement, interactionId, ruleName) {
   });
 };
 
-// Before using this function ensure that expectValueToBe
-// (as declared in TODO below) is implemented in your parameter type editor.
+// Checks that the current rule parameter values match the given ones.
+// Note: the expected rule parameter values should be specified as
+// additional arguments after the ruleName.
+//
+// Before using this function, ensure that expectValueToBe (see the TODO below)
+// is implemented in the corresponding parameter type editor.
 var expectRuleParametersToBe = function(interactionId, ruleName) {
   var parameterValues = [];
   for (var i = 2; i < arguments.length; i++) {
@@ -516,7 +522,7 @@ var expectRuleParametersToBe = function(interactionId, ruleName) {
       by.css('.protractor-test-answer-description-fragment'
     )).get(i * 2 + 1);
     var parameterEditor = forms.getEditor(parameterTypes[i])(parameterElement);
-    // TODO: implement expectValueToBe in all parameterEditors.
+    // TODO(maitbayev): implement expectValueToBe in all parameterEditors.
     parameterEditor.expectValueToBe(parameterValues[i]);
   }
 };
@@ -581,7 +587,7 @@ var addResponse = function(interactionId, feedbackInstructions, destStateName,
     args.push(arguments[i]);
   }
   _selectRule(ruleElement, interactionId, ruleName);
-  _selectRuleParameters.apply(null, args);
+  _setRuleParameters.apply(null, args);
 
   // Open the feedback entry form if it is not already open.
   var feedbackContainerElem = element(by.css(
@@ -713,7 +719,7 @@ var ResponseEditor = function(responseNum) {
         args.push(arguments[i]);
       }
       _selectRule(ruleElement, interactionId, ruleName);
-      _selectRuleParameters.apply(null, args);
+      _setRuleParameters.apply(null, args);
 
       // Save the new rule.
       element(by.css('.protractor-test-save-answer')).click();
@@ -1302,8 +1308,8 @@ exports.expectInteractionToMatch = expectInteractionToMatch;
 exports.expectCannotDeleteInteraction = expectCannotDeleteInteraction;
 
 exports.selectRuleInAddResponseModal = selectRuleInAddResponseModal;
-exports.selectRuleParametersInAddResponseModal = (
-  selectRuleParametersInAddResponseModal);
+exports.setRuleParametersInAddResponseModal = (
+  setRuleParametersInAddResponseModal);
 exports.expectRuleParametersToBe = expectRuleParametersToBe;
 
 exports.addGadget = addGadget;

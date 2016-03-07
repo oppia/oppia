@@ -56,7 +56,7 @@ exports.config = {
   // When run without a command line parameter, all suites will run. If run
   // with --suite=smoke, only the patterns matched by that suite will run.
   suites: {
-    full: 'protractor/*.js'
+    full: 'protractor/stateEditor.js'
   },
 
   // ----- Capabilities to be passed to the webdriver instance ----
