@@ -45,15 +45,15 @@ set -- "${remaining_params[@]}"
 
 echo Checking whether GAE is installed in $GOOGLE_APP_ENGINE_HOME
 if [ ! -f "$GOOGLE_APP_ENGINE_HOME/appcfg.py" ]; then
-  echo "Installing Google App Engine (this may take a little while)..."
+  echo "Downloading Google App Engine (this may take a little while)..."
   mkdir -p $GOOGLE_APP_ENGINE_HOME
-  echo "Downloading..."
   curl --silent https://storage.googleapis.com/appengine-sdks/deprecated/1919/google_appengine_1.9.19.zip -o gae-download.zip
-  if [ 0 -eq $? ];
-  then
-	  echo "Downloaded. Unzipping..."
+  # $? contains the (exit) status code of previous command, which if successful is always 0. else non-zero 
+  if [ 0 -eq $? ]; then
+        echo "Downloaded complete. Installing Google App Engine..."
   else
-	  echo "Error in downloading Google App Engine"
+        echo "Error downloading Google App Engine. Exiting."
+        exit 1
   fi
   unzip -q gae-download.zip -d $TOOLS_DIR/google_appengine_1.9.19/
   rm gae-download.zip
