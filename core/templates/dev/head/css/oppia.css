@@ -996,7 +996,7 @@ md-card.oppia-gallery-tile {
   top: 0;
 }
 
-.oppia-html-select .oppia-html-select-selection {  
+.oppia-html-select .oppia-html-select-selection {
   padding-right: 20px;
   position: relative;
   text-decoration: none;
@@ -1330,10 +1330,10 @@ pre.oppia-pre-wrapped-text {
   margin-top: 60px;
   margin-left: auto;
   margin-right: auto;
-  padding-left: 50px;
   max-width: 800px;
   min-height: 500px;
   padding-bottom: 25px;
+  padding-left: 50px;
   position: relative;
 }
 .oppia-collection-player-tiles-container .oppia-page-heading {
@@ -1351,13 +1351,6 @@ pre.oppia-pre-wrapped-text {
   margin-top: 12px;
   margin-bottom: 6px;
 }
-
-@media only screen and (max-width: 500px) {
-    .oppia-collection-player-small-text {
-      text-align: center;
-      display: block;
-    }
-  }
 
 /* Styles for the statistics page. */
 
@@ -2369,12 +2362,6 @@ div#ng-curtain {
 .oppia-page-heading-subtext {
   font-size: smaller;
   opacity: 0.7;
-}
-
-@media(max-width: 500px) {
-  .oppia-page-heading, .oppia-page-heading-subtext {
-    text-align: center;
-  }
 }
 
 .oppia-rating-star-active {
