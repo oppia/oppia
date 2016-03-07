@@ -8,7 +8,7 @@
         <div class="exploration-summary-contributors" ng-show="contributors.length > 0">
           <profile-link-image ng-if="contributors.length > 0"
                               username="contributors[0]"
-                              tooltip="<[contributors[0]]>"
+                              tooltip="<[contributors[0] | truncate:14]>"
                               tooltip-placement="right"
                               tooltip-append-to-body="true">
           </profile-link-image>
@@ -19,7 +19,7 @@
           <div class="all-contributors" style="display: none;">
             <profile-link-image ng-repeat="contributor in contributors | limitTo:MAX_CONTRIBUTORS_TO_DISPLAY-1:1"
                                 username="contributor"
-                                tooltip="<[contributor]>"
+                                tooltip="<[contributor | truncate:14]>"
                                 tooltip-placement="right"
                                 tooltip-append-to-body="true">
             </profile-link-image>
@@ -37,7 +37,7 @@
 
       <div>
         <div class="objective protractor-test-exp-summary-tile-objective">
-          <[getObjective() | truncateAndCapitalize: 45]>
+          <[getObjective() | truncateAndCapitalize: 60]>
           <span ng-if="!getObjective()">No objective specified.</span>
         </div>
         <ul layout="row" class="metrics" layout-align="space-between center">
