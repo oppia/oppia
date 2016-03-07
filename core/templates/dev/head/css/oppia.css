@@ -110,6 +110,15 @@ body {
   margin-right: auto;
   margin-top: 60px;
   margin-bottom: 30px;
+  padding-left: 30px;
+  padding-right: 30px;
+}
+
+@media (max-width: 500px) {
+  .oppia-dashboard-container {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
 }
 
 .oppia-profile-top-card {
@@ -1702,6 +1711,7 @@ oppia-parameter {
 
 .oppia-dashboard-row {
   cursor: pointer;
+  margin-bottom: 10px;
 }
 .oppia-dashboard-row:hover {
   background: #eee;
@@ -2324,6 +2334,35 @@ div#ng-curtain {
 
 .oppia-notifications-dashboard-card {
   padding: 15px 40px;
+}
+
+.oppia-notification-type {
+  float: left;
+}
+
+.oppia-notification-activity-title {
+  float: left;
+  margin-left: 5px;
+}
+
+.oppia-notification-last-updated {
+  float: right;
+}
+
+.clearfix:after {
+  content: ".";
+  clear: both;
+  display: block;
+  height: 0;
+  visibility: hidden;
+}
+
+.oppia-notification-author-username {
+  float: right;
+}
+
+.oppia-notification-subject {
+  float: left;
 }
 
 .oppia-about-anchor {
