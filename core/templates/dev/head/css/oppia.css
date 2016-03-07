@@ -2222,6 +2222,27 @@ div#ng-curtain {
 .oppia-exploration-warnings-count {
   margin-left: -3px;
 }
+
+.oppia-exploration-open-threads-indicator {
+  position: absolute;
+  right: 5px;
+  width: 16px;
+  bottom: 10px;
+  height: 13px;
+  text-align: center;
+  border-radius: 10%;
+}
+.oppia-exploration-open-threads-color {
+  background-color: #4078C0;
+  border: 1px solid rgb(243, 243, 243);
+}
+.oppia-exploration-open-threads-count {
+  font-size: 9px;
+  position: relative;
+  bottom: 8px;
+  color: white;
+}
+
 .dropdown-menu.oppia-exploration-warnings-box {
   background: #fcf8e3;
 }
