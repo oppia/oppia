@@ -491,303 +491,359 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
         }
 
     def test_send_email_does_not_resend_if_same_hash_exists(self):
-        with self.swap(feconf, 'CAN_SEND_EMAILS_TO_USERS', True):
-            with self.swap(feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 1000):
-                all_models = email_models.SentEmailModel.get_all().fetch()
-                self.assertEqual(len(all_models), 0)
+        can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
 
-                # pylint: disable=protected-access
-                email_hash = email_manager._generate_hash(self.new_user_id,
-                                                          'Email Subject',
-                                                          'Email Body')
-                email_models.SentEmailModel.create(
-                    self.new_user_id, self.NEW_USER_EMAIL,
-                    feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
-                    feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
-                    datetime.datetime.utcnow(), email_hash)
+        duplicate_email_ctx = self.swap(
+            feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 1000)
 
-                # Check that the content of this email was recorded in
-                # SentEmailModel.
-                all_models = email_models.SentEmailModel.get_all().fetch()
-                self.assertEqual(len(all_models), 1)
+        logged_errors = []
 
-                email_manager._send_email(self.new_user_id,
-                                          feconf.SYSTEM_COMMITTER_ID,
-                                          feconf.EMAIL_INTENT_SIGNUP,
-                                          'Email Subject', 'Email Body')
-                # pylint: enable=protected-access
+        def _log_error_for_tests(error_message):
+            logged_errors.append(error_message)
 
-                # Check that a new email was not sent.
-                messages = self.mail_stub.get_sent_messages(
-                    to=self.NEW_USER_EMAIL)
-                self.assertEqual(0, len(messages))
+        log_new_error_counter = test_utils.CallCounter(_log_error_for_tests)
+        log_new_error_ctx = self.swap(
+            email_manager, 'log_new_error', log_new_error_counter)
 
-                # Check that the content of this email was not recorded in
-                # SentEmailModel.
-                all_models = email_models.SentEmailModel.get_all().fetch()
-                self.assertEqual(len(all_models), 1)
+        with can_send_emails_ctx, duplicate_email_ctx, log_new_error_ctx:
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            self.assertEqual(len(all_models), 0)
+
+            # pylint: disable=protected-access
+            email_hash = email_manager._generate_hash(self.new_user_id,
+                                                      'Email Subject',
+                                                      'Email Body')
+            email_models.SentEmailModel.create(
+                self.new_user_id, self.NEW_USER_EMAIL,
+                feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
+                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
+                datetime.datetime.utcnow(), email_hash)
+
+            # Check that the content of this email was recorded in
+            # SentEmailModel.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            self.assertEqual(len(all_models), 1)
+
+            email_manager._send_email(self.new_user_id,
+                                      feconf.SYSTEM_COMMITTER_ID,
+                                      feconf.EMAIL_INTENT_SIGNUP,
+                                      'Email Subject', 'Email Body')
+            # pylint: enable=protected-access
+
+            # Two errors should be recorded in the logs.
+            self.assertEqual(log_new_error_counter.times_called, 2)
+            self.assertRegexpMatches(logged_errors[0], 'Duplicate email')
+
+            # Check that a new email was not sent.
+            messages = self.mail_stub.get_sent_messages(
+                to=self.NEW_USER_EMAIL)
+            self.assertEqual(0, len(messages))
+
+            # Check that the content of this email was not recorded in
+            # SentEmailModel.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            self.assertEqual(len(all_models), 1)
 
     def test_send_email_does_not_resend_within_duplicate_interval(self):
-        with self.swap(feconf, 'CAN_SEND_EMAILS_TO_USERS', True):
-            with self.swap(feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2):
-                config_services.set_property(
-                    self.admin_id, email_manager.EMAIL_SENDER_NAME.name,
-                    'Email Sender')
+        can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
 
-                all_models = email_models.SentEmailModel.get_all().fetch()
-                self.assertEqual(len(all_models), 0)
+        duplicate_email_ctx = self.swap(
+            feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2)
 
-                # pylint: disable=protected-access
-                email_manager._send_email(self.new_user_id,
-                                          feconf.SYSTEM_COMMITTER_ID,
-                                          feconf.EMAIL_INTENT_SIGNUP,
-                                          'Email Subject', 'Email Body')
+        logged_errors = []
 
-                # Check that a new email was sent.
-                messages = self.mail_stub.get_sent_messages(
-                    to=self.NEW_USER_EMAIL)
-                self.assertEqual(1, len(messages))
+        def _log_error_for_tests(error_message):
+            logged_errors.append(error_message)
 
-                # Check that the content of this email was recorded in
-                # SentEmailModel.
-                all_models = email_models.SentEmailModel.get_all().fetch()
-                self.assertEqual(len(all_models), 1)
+        log_new_error_counter = test_utils.CallCounter(_log_error_for_tests)
+        log_new_error_ctx = self.swap(
+            email_manager, 'log_new_error', log_new_error_counter)
 
-                email_manager._send_email(self.new_user_id,
-                                          feconf.SYSTEM_COMMITTER_ID,
-                                          feconf.EMAIL_INTENT_SIGNUP,
-                                          'Email Subject', 'Email Body')
-                # pylint: enable=protected-access
+        with can_send_emails_ctx, duplicate_email_ctx, log_new_error_ctx:
+            config_services.set_property(
+                self.admin_id, email_manager.EMAIL_SENDER_NAME.name,
+                'Email Sender')
 
-                # Check that a new email was not sent.
-                messages = self.mail_stub.get_sent_messages(
-                    to=self.NEW_USER_EMAIL)
-                self.assertEqual(1, len(messages))
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            self.assertEqual(len(all_models), 0)
 
-                # Check that the content of this email was not recorded in
-                # SentEmailModel.
-                all_models = email_models.SentEmailModel.get_all().fetch()
-                self.assertEqual(len(all_models), 1)
+            # pylint: disable=protected-access
+            email_manager._send_email(self.new_user_id,
+                                      feconf.SYSTEM_COMMITTER_ID,
+                                      feconf.EMAIL_INTENT_SIGNUP,
+                                      'Email Subject', 'Email Body')
+
+            # Check that a new email was sent.
+            messages = self.mail_stub.get_sent_messages(
+                to=self.NEW_USER_EMAIL)
+            self.assertEqual(1, len(messages))
+
+            # Check that the content of this email was recorded in
+            # SentEmailModel.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            self.assertEqual(len(all_models), 1)
+
+            email_manager._send_email(self.new_user_id,
+                                      feconf.SYSTEM_COMMITTER_ID,
+                                      feconf.EMAIL_INTENT_SIGNUP,
+                                      'Email Subject', 'Email Body')
+            # pylint: enable=protected-access
+
+            # Two errors should be recorded in the logs.
+            self.assertEqual(log_new_error_counter.times_called, 2)
+            self.assertRegexpMatches(logged_errors[0], 'Duplicate email')
+
+            # Check that a new email was not sent.
+            messages = self.mail_stub.get_sent_messages(
+                to=self.NEW_USER_EMAIL)
+            self.assertEqual(1, len(messages))
+
+            # Check that the content of this email was not recorded in
+            # SentEmailModel.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            self.assertEqual(len(all_models), 1)
 
     def test_send_email_sends_within_duplicate_interval_diff_recipient(self):
         '''Hash for both messages is same but recipients are different'''
-        with self.swap(feconf, 'CAN_SEND_EMAILS_TO_USERS', True):
-            with self.swap(feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2):
-                all_models = email_models.SentEmailModel.get_all().fetch()
-                self.assertEqual(len(all_models), 0)
+        can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
 
-                # pylint: disable=protected-access
-                email_hash = email_manager._generate_hash(self.new_user_id,
-                                                          'Email Subject',
-                                                          'Email Body')
-                email_models.SentEmailModel.create(
-                    'recipient_id', self.NEW_USER_EMAIL,
-                    feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
-                    feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
-                    datetime.datetime.utcnow(), email_hash)
+        duplicate_email_ctx = self.swap(
+            feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2)
 
-                # Check that the content of this email was recorded in
-                # SentEmailModel.
-                all_models = email_models.SentEmailModel.get_all().fetch()
-                self.assertEqual(len(all_models), 1)
+        with can_send_emails_ctx, duplicate_email_ctx:
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            self.assertEqual(len(all_models), 0)
 
-                email_manager._send_email(self.new_user_id,
-                                          feconf.SYSTEM_COMMITTER_ID,
-                                          feconf.EMAIL_INTENT_SIGNUP,
-                                          'Email Subject', 'Email Body')
-                # pylint: enable=protected-access
+            # pylint: disable=protected-access
+            email_hash = email_manager._generate_hash(self.new_user_id,
+                                                      'Email Subject',
+                                                      'Email Body')
+            email_models.SentEmailModel.create(
+                'recipient_id', self.NEW_USER_EMAIL,
+                feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
+                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
+                datetime.datetime.utcnow(), email_hash)
 
-                # Check that a new email was sent.
-                messages = self.mail_stub.get_sent_messages(
-                    to=self.NEW_USER_EMAIL)
-                self.assertEqual(1, len(messages))
+            # Check that the content of this email was recorded in
+            # SentEmailModel.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            self.assertEqual(len(all_models), 1)
 
-                # Check that the content of this email was not recorded in
-                # SentEmailModel.
-                all_models = email_models.SentEmailModel.get_all().fetch()
-                self.assertEqual(len(all_models), 2)
+            email_manager._send_email(self.new_user_id,
+                                      feconf.SYSTEM_COMMITTER_ID,
+                                      feconf.EMAIL_INTENT_SIGNUP,
+                                      'Email Subject', 'Email Body')
+            # pylint: enable=protected-access
 
-                # Check that the contents of the model are correct.
-                sent_email_model1 = all_models[0]
-                sent_email_model2 = all_models[1]
+            # Check that a new email was sent.
+            messages = self.mail_stub.get_sent_messages(
+                to=self.NEW_USER_EMAIL)
+            self.assertEqual(1, len(messages))
 
-                self.assertEqual(
-                    sent_email_model1.email_hash,
-                    sent_email_model2.email_hash)
-                self.assertNotEqual(
-                    sent_email_model1.recipient_id,
-                    sent_email_model2.recipient_id)
-                self.assertEqual(
-                    sent_email_model1.subject, sent_email_model2.subject)
-                self.assertEqual(
-                    sent_email_model1.html_body, sent_email_model2.html_body)
+            # Check that the content of this email was not recorded in
+            # SentEmailModel.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            self.assertEqual(len(all_models), 2)
+
+            # Check that the contents of the model are correct.
+            sent_email_model1 = all_models[0]
+            sent_email_model2 = all_models[1]
+
+            self.assertEqual(
+                sent_email_model1.email_hash,
+                sent_email_model2.email_hash)
+            self.assertNotEqual(
+                sent_email_model1.recipient_id,
+                sent_email_model2.recipient_id)
+            self.assertEqual(
+                sent_email_model1.subject, sent_email_model2.subject)
+            self.assertEqual(
+                sent_email_model1.html_body, sent_email_model2.html_body)
 
     def test_send_email_sends_within_duplicate_interval_diff_subject(self):
         '''Hash for both messages is same but subjects are different'''
-        with self.swap(feconf, 'CAN_SEND_EMAILS_TO_USERS', True):
-            with self.swap(feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2):
-                all_models = email_models.SentEmailModel.get_all().fetch()
-                self.assertEqual(len(all_models), 0)
+        can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
 
-                # pylint: disable=protected-access
-                email_hash = email_manager._generate_hash(self.new_user_id,
-                                                          'Email Subject',
-                                                          'Email Body')
-                email_models.SentEmailModel.create(
-                    self.new_user_id, self.NEW_USER_EMAIL,
-                    feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
-                    feconf.EMAIL_INTENT_SIGNUP, 'Email Subject1', 'Email Body',
-                    datetime.datetime.utcnow(), email_hash)
+        duplicate_email_ctx = self.swap(
+            feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2)
 
-                # Check that the content of this email was recorded in
-                # SentEmailModel.
-                all_models = email_models.SentEmailModel.get_all().fetch()
-                self.assertEqual(len(all_models), 1)
+        with can_send_emails_ctx, duplicate_email_ctx:
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            self.assertEqual(len(all_models), 0)
 
-                email_manager._send_email(self.new_user_id,
-                                          feconf.SYSTEM_COMMITTER_ID,
-                                          feconf.EMAIL_INTENT_SIGNUP,
-                                          'Email Subject', 'Email Body')
-                # pylint: enable=protected-access
+            # pylint: disable=protected-access
+            email_hash = email_manager._generate_hash(self.new_user_id,
+                                                      'Email Subject',
+                                                      'Email Body')
+            email_models.SentEmailModel.create(
+                self.new_user_id, self.NEW_USER_EMAIL,
+                feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
+                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject1', 'Email Body',
+                datetime.datetime.utcnow(), email_hash)
 
-                # Check that a new email was sent.
-                messages = self.mail_stub.get_sent_messages(
-                    to=self.NEW_USER_EMAIL)
-                self.assertEqual(1, len(messages))
+            # Check that the content of this email was recorded in
+            # SentEmailModel.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            self.assertEqual(len(all_models), 1)
 
-                # Check that the content of this email was not recorded in
-                # SentEmailModel.
-                all_models = email_models.SentEmailModel.get_all().fetch()
-                self.assertEqual(len(all_models), 2)
+            email_manager._send_email(self.new_user_id,
+                                      feconf.SYSTEM_COMMITTER_ID,
+                                      feconf.EMAIL_INTENT_SIGNUP,
+                                      'Email Subject', 'Email Body')
+            # pylint: enable=protected-access
 
-                # Check that the contents of the model are correct.
-                sent_email_model1 = all_models[0]
-                sent_email_model2 = all_models[1]
+            # Check that a new email was sent.
+            messages = self.mail_stub.get_sent_messages(
+                to=self.NEW_USER_EMAIL)
+            self.assertEqual(1, len(messages))
 
-                self.assertEqual(
-                    sent_email_model1.email_hash,
-                    sent_email_model2.email_hash)
-                self.assertEqual(
-                    sent_email_model1.recipient_id,
-                    sent_email_model2.recipient_id)
-                self.assertNotEqual(
-                    sent_email_model1.subject, sent_email_model2.subject)
-                self.assertEqual(
-                    sent_email_model1.html_body, sent_email_model2.html_body)
+            # Check that the content of this email was not recorded in
+            # SentEmailModel.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            self.assertEqual(len(all_models), 2)
+
+            # Check that the contents of the model are correct.
+            sent_email_model1 = all_models[0]
+            sent_email_model2 = all_models[1]
+
+            self.assertEqual(
+                sent_email_model1.email_hash,
+                sent_email_model2.email_hash)
+            self.assertEqual(
+                sent_email_model1.recipient_id,
+                sent_email_model2.recipient_id)
+            self.assertNotEqual(
+                sent_email_model1.subject, sent_email_model2.subject)
+            self.assertEqual(
+                sent_email_model1.html_body, sent_email_model2.html_body)
 
     def test_send_email_sends_within_duplicate_interval_diff_body(self):
         '''Hash for both messages is same but body is different'''
-        with self.swap(feconf, 'CAN_SEND_EMAILS_TO_USERS', True):
-            with self.swap(feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2):
-                all_models = email_models.SentEmailModel.get_all().fetch()
-                self.assertEqual(len(all_models), 0)
+        can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
 
-                # pylint: disable=protected-access
-                email_hash = email_manager._generate_hash(self.new_user_id,
-                                                          'Email Subject',
-                                                          'Email Body')
-                email_models.SentEmailModel.create(
-                    self.new_user_id, self.NEW_USER_EMAIL,
-                    feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
-                    feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body1',
-                    datetime.datetime.utcnow(), email_hash)
+        duplicate_email_ctx = self.swap(
+            feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2)
 
-                # Check that the content of this email was recorded in
-                # SentEmailModel.
-                all_models = email_models.SentEmailModel.get_all().fetch()
-                self.assertEqual(len(all_models), 1)
+        with can_send_emails_ctx, duplicate_email_ctx:
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            self.assertEqual(len(all_models), 0)
 
-                email_manager._send_email(self.new_user_id,
-                                          feconf.SYSTEM_COMMITTER_ID,
-                                          feconf.EMAIL_INTENT_SIGNUP,
-                                          'Email Subject', 'Email Body')
-                # pylint: enable=protected-access
+            # pylint: disable=protected-access
+            email_hash = email_manager._generate_hash(self.new_user_id,
+                                                      'Email Subject',
+                                                      'Email Body')
+            email_models.SentEmailModel.create(
+                self.new_user_id, self.NEW_USER_EMAIL,
+                feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
+                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body1',
+                datetime.datetime.utcnow(), email_hash)
 
-                # Check that a new email was sent.
-                messages = self.mail_stub.get_sent_messages(
-                    to=self.NEW_USER_EMAIL)
-                self.assertEqual(1, len(messages))
+            # Check that the content of this email was recorded in
+            # SentEmailModel.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            self.assertEqual(len(all_models), 1)
 
-                # Check that the content of this email was not recorded in
-                # SentEmailModel.
-                all_models = email_models.SentEmailModel.get_all().fetch()
-                self.assertEqual(len(all_models), 2)
+            email_manager._send_email(self.new_user_id,
+                                      feconf.SYSTEM_COMMITTER_ID,
+                                      feconf.EMAIL_INTENT_SIGNUP,
+                                      'Email Subject', 'Email Body')
+            # pylint: enable=protected-access
 
-                # Check that the contents of the model are correct.
-                sent_email_model1 = all_models[0]
-                sent_email_model2 = all_models[1]
+            # Check that a new email was sent.
+            messages = self.mail_stub.get_sent_messages(
+                to=self.NEW_USER_EMAIL)
+            self.assertEqual(1, len(messages))
 
-                self.assertEqual(
-                    sent_email_model1.email_hash,
-                    sent_email_model2.email_hash)
-                self.assertEqual(
-                    sent_email_model1.recipient_id,
-                    sent_email_model2.recipient_id)
-                self.assertEqual(
-                    sent_email_model1.subject, sent_email_model2.subject)
-                self.assertNotEqual(
-                    sent_email_model1.html_body, sent_email_model2.html_body)
+            # Check that the content of this email was not recorded in
+            # SentEmailModel.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            self.assertEqual(len(all_models), 2)
+
+            # Check that the contents of the model are correct.
+            sent_email_model1 = all_models[0]
+            sent_email_model2 = all_models[1]
+
+            self.assertEqual(
+                sent_email_model1.email_hash,
+                sent_email_model2.email_hash)
+            self.assertEqual(
+                sent_email_model1.recipient_id,
+                sent_email_model2.recipient_id)
+            self.assertEqual(
+                sent_email_model1.subject, sent_email_model2.subject)
+            self.assertNotEqual(
+                sent_email_model1.html_body, sent_email_model2.html_body)
 
     def test_send_email_sends_outside_duplicate_interval_same_hash(self):
-        with self.swap(feconf, 'CAN_SEND_EMAILS_TO_USERS', True):
-            with self.swap(feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2):
-                all_models = email_models.SentEmailModel.get_all().fetch()
-                self.assertEqual(len(all_models), 0)
+        can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
 
-                # pylint: disable=protected-access
-                email_hash = email_manager._generate_hash(self.new_user_id,
-                                                          'Email Subject',
-                                                          'Email Body')
-                email_sent_time = (datetime.datetime.utcnow() -
-                                   datetime.timedelta(minutes=4))
+        duplicate_email_ctx = self.swap(
+            feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2)
 
-                email_models.SentEmailModel.create(
-                    self.new_user_id, self.NEW_USER_EMAIL,
-                    feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
-                    feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
-                    email_sent_time, email_hash)
+        with can_send_emails_ctx, duplicate_email_ctx:
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            self.assertEqual(len(all_models), 0)
 
-                # Check that the content of this email was recorded in
-                # SentEmailModel.
-                all_models = email_models.SentEmailModel.get_all().fetch()
-                self.assertEqual(len(all_models), 1)
+            # pylint: disable=protected-access
+            email_hash = email_manager._generate_hash(self.new_user_id,
+                                                      'Email Subject',
+                                                      'Email Body')
+            email_sent_time = (datetime.datetime.utcnow() -
+                               datetime.timedelta(minutes=4))
 
-                email_sent_time = (datetime.datetime.utcnow() -
-                                   datetime.timedelta(minutes=2))
+            email_models.SentEmailModel.create(
+                self.new_user_id, self.NEW_USER_EMAIL,
+                feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
+                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
+                email_sent_time, email_hash)
 
-                email_models.SentEmailModel.create(
-                    self.new_user_id, self.NEW_USER_EMAIL,
-                    feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
-                    feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
-                    email_sent_time, email_hash)
+            # Check that the content of this email was recorded in
+            # SentEmailModel.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            self.assertEqual(len(all_models), 1)
 
-                # Check that the content of this email was recorded in
-                # SentEmailModel.
-                all_models = email_models.SentEmailModel.get_all().fetch()
-                self.assertEqual(len(all_models), 2)
+            email_sent_time = (datetime.datetime.utcnow() -
+                               datetime.timedelta(minutes=2))
 
-                email_manager._send_email(self.new_user_id,
-                                          feconf.SYSTEM_COMMITTER_ID,
-                                          feconf.EMAIL_INTENT_SIGNUP,
-                                          'Email Subject', 'Email Body')
-                # pylint: enable=protected-access
+            email_models.SentEmailModel.create(
+                self.new_user_id, self.NEW_USER_EMAIL,
+                feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
+                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
+                email_sent_time, email_hash)
 
-                # Check that a new email was sent.
-                messages = self.mail_stub.get_sent_messages(
-                    to=self.NEW_USER_EMAIL)
-                self.assertEqual(1, len(messages))
+            # Check that the content of this email was recorded in
+            # SentEmailModel.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            self.assertEqual(len(all_models), 2)
 
-                # Check that the content of this email was not recorded in
-                # SentEmailModel.
-                all_models = email_models.SentEmailModel.get_all().fetch()
-                self.assertEqual(len(all_models), 3)
+            email_manager._send_email(self.new_user_id,
+                                      feconf.SYSTEM_COMMITTER_ID,
+                                      feconf.EMAIL_INTENT_SIGNUP,
+                                      'Email Subject', 'Email Body')
+            # pylint: enable=protected-access
 
-                # Check that the contents of the model are correct.
-                sent_email_model1 = all_models[0]
-                sent_email_model2 = all_models[1]
-                sent_email_model3 = all_models[2]
+            # Check that a new email was sent.
+            messages = self.mail_stub.get_sent_messages(
+                to=self.NEW_USER_EMAIL)
+            self.assertEqual(1, len(messages))
 
-                self.assertEqual(
-                    sent_email_model1.email_hash, sent_email_model2.email_hash)
-                self.assertEqual(
-                    sent_email_model1.email_hash, sent_email_model3.email_hash)
+            # Check that the content of this email was not recorded in
+            # SentEmailModel.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            self.assertEqual(len(all_models), 3)
+
+            # Check that the contents of the model are correct.
+            sent_email_model1 = all_models[0]
+            sent_email_model2 = all_models[1]
+            sent_email_model3 = all_models[2]
+
+            self.assertEqual(
+                sent_email_model1.email_hash, sent_email_model2.email_hash)
+            self.assertEqual(
+                sent_email_model1.email_hash, sent_email_model3.email_hash)

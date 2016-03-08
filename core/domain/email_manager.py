@@ -293,12 +293,12 @@ def _check_duplicate_message(
                 message.subject == email_subject and
                 message.html_body == email_html_body):
             log_new_error(
-                'Duplicate email:\n',
-                'Current Message:\n%s %s %s\n\n' %
-                (recipient_id, email_subject, email_html_body),
-                'Old Message:\n%s %s %s\n\n' %
-                (message.recipient_id, message.subject, message.html_body),
-                'Email Hash: %s' % (email_hash))
+                'Duplicate email:\n'
+                'Current Message:\n%s%s\n%s\n\n Old Message:\n%s%s\n%s\n'
+                'Email Hash: %s\n' %
+                (recipient_id, email_subject, email_html_body,
+                 message.recipient_id, message.subject, message.html_body,
+                 email_hash))
             return True
 
     return False
