@@ -470,7 +470,7 @@ CATEGORIES_TO_COLORS = {
 DEFAULT_CATEGORIES = sorted(CATEGORIES_TO_COLORS.keys())
 
 #Size of the gravatar in px assigned to the user after signup
-GRAVATAR_SIZE_PX = 50
+GRAVATAR_SIZE_PX = 150
 
 # List of supported language codes. Each description has a
 # parenthetical part that may be stripped out to give a shorter

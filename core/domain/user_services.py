@@ -296,7 +296,7 @@ def set_username(user_id, new_username):
     user_settings.username = new_username
     _save_user_settings(user_settings)
 
-def set_signup_profile_picture_url(user_id):
+def generate_signup_profile_picture(user_id):
     user_email = get_email_from_user_id(user_id)
     user_gravatar = fetch_gravatar(user_email)
     update_profile_picture_data_url(user_id, user_gravatar)
@@ -558,14 +558,18 @@ def get_user_impact_score(user_id):
         return 0
 
 def fetch_gravatar(email):
-    """Returns the gravatar corresponding to given email"""
-
-    base_url = 'http://www.gravatar.com/avatar/'
+    """Returns the gravatar corresponding to the user's email, or an default image if gravtar is not receieved"""
+    DEFAULT_IDENTICON_DATA_URL = '/images/avatar/user_blue_72px.png'
+    base_url = 'http://www.grvatar.com/avatar/'
     gravatar_url = base_url + hashlib.md5(email).hexdigest() + '?'
     size = str(feconf.GRAVATAR_SIZE_PX)
-    gravatar_url += urllib.urlencode({'d':'retro', 's':size})
-    result = urlfetch.fetch(gravatar_url, headers={'Content-Type': 'image/png'})
+    gravatar_url += urllib.urlencode({'d':'identicon', 's':size})
+    result = urlfetch.fetch(
+         gravatar_url,
+         headers={'Content-Type': 'image/png'},
+         follow_redirects:False)
     if result.status_code == 200:
         encoded_body = base64.b64encode(result.content)
         return 'data:{};base64,{}'.format('image/png', encoded_body)
-
+    else:
+        return DEFAULT_IDENTICON_DATA_URL

@@ -239,16 +239,7 @@ class ProfileLinkTests(test_utils.GenericTestBase):
             '%s%s' % (self.PROFILE_PIC_URL, self.USERNAME)
         )
         self.assertIsNotNone(
-            response_dict['profile_picture_data_url_for_username'])
-
-    def test_get_signup_gravatar(self):
-        self.signup(self.EMAIL, self.USERNAME)
-        response_dict = self.get_json(
-            '%s%s' % (self.PROFILE_PIC_URL, self.USERNAME)
-        )
-        self.assertEqual(
-            self.get_gravatar_from_url(self.GRAVATAR_URL),
-            response_dict['profile_picture_data_url_for_username'])
+            response_dict['profile_picture_data_url_for_username']
 
 
 class ProfileDataHandlerTests(test_utils.GenericTestBase):

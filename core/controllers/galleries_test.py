@@ -117,7 +117,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
 
         self.login(self.ADMIN_EMAIL)
         response_dict = self.get_json(feconf.GALLERY_DATA_URL)
-        self.assertEqual({
+        self.assertDictContainsSubset({
             'is_admin': True,
             'is_moderator': True,
             'is_super_admin': False,
@@ -125,13 +125,6 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'user_email': self.ADMIN_EMAIL,
             'username': self.ADMIN_USERNAME,
             'search_cursor': None,
-            'profile_picture_data_url':(
-                'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAy'
-                'CAIAAACRXR/mAAAAqElEQVRYhe2YsQ2AMBADAWUfWpagygxMxQxULE'
-                'gfoUenT4QLXwsiJ8sfIPO61UmP5W+Bd6xFENUqZ92Dy8d1D1o4Xlc0'
-                'LWsRRLXmzC4/blxE07IWQVSLVT7ueAyaANG0rEWwFsFaBGsR2l0+s4'
-                '9naN4BomlZiyCqVdDdmc9zNEyiaVmLIKrFKt/g31cNrEVIVX7cEaZo'
-                'WtYiiGp9VL5jqZtH+Vy+H9YiPKBTHRjD6dKiAAAAAElFTkSuQmCC'),
             'preferred_language_codes': [feconf.DEFAULT_LANGUAGE_CODE],
         }, response_dict)
 
