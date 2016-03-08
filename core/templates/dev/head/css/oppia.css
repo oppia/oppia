@@ -2336,6 +2336,18 @@ div#ng-curtain {
   padding: 15px 40px;
 }
 
+.oppia-notifications-even-notification {
+  background-color: #dae5f4;
+  padding: 10px;
+  word-break: break-all;
+}
+
+.oppia-notifications-odd-notification {
+  background-color: #b8d1f3;
+  padding: 10px;
+  word-break: break-all;
+}
+
 .oppia-notification-type {
   float: left;
 }
@@ -2358,7 +2370,8 @@ div#ng-curtain {
 }
 
 .oppia-notification-author-username {
-  float: right;
+  float: left;
+  margin-left: 5px;
 }
 
 .oppia-notification-subject {

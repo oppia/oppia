@@ -32,7 +32,7 @@
       </div>
 
       <div ng-if="recentNotifications.length > 0">
-        <div ng-repeat="notification in recentNotifications"
+        <div ng-class-even="'oppia-notifications-even-notification'" ng-class-odd="'oppia-notifications-odd-notification'" ng-repeat="notification in recentNotifications"
             ng-class="{'oppia-dashboard-row-recent': lastSeenMsec && lastSeenMsec < notification.last_updated_ms && notification.author_username !== currentUsername, 'oppia-dashboard-row': !lastSeenMsec || lastSeenMsec >= notification.last_updated_ms || notification.author_username === currentUsername}"
             ng-click="navigateToItem(notification.activity_id, notification.type)">
           <div>
@@ -49,10 +49,12 @@
                   class="glyphicon glyphicon-comment"
                   title="Feedback thread"></span>
           </div>
-          <div class="oppia-notification-activity-title"><[notification.activity_title]></div>
+          <strong>
+            <div class="oppia-notification-author-username"><[notification.author_username]> left a comment on </div>
+            <div class="oppia-notification-activity-title"><[notification.activity_title]></div>
+          </strong>
           <div class="oppia-notification-last-updated"><[getLocaleAbbreviatedDatetimeString(notification.last_updated_ms)]></div>
           <div class="clearfix"></div>
-          <div class="oppia-notification-author-username"><[notification.author_username]></div>
           <div class="oppia-notification-subject"><[notification.subject]></div>
           <div class="clearfix"></div>
         </div>
