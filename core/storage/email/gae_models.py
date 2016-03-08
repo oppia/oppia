@@ -104,25 +104,26 @@ class SentEmailModel(base_models.BaseModel):
         super(SentEmailModel, email_model_instance).put()
 
     @classmethod
-    def get_by_hash(cls, email_hash, after=None):
+    def get_by_hash(cls, email_hash, sent_datetime_lower_bound=None):
         """Returns all messages with a given email_hash.
 
-        This also takes an optional after argument, which is a
-        datetime instance. If this is given, only SentEmailModel
-        instances sent after the given datetime should be returned.
+        This also takes an optional sent_datetime_lower_bound argument,
+        which is a datetime instance. If this is given, only
+        SentEmailModel instances sent sent_datetime_lower_bound the
+        given datetime should be returned.
         """
 
-        if after is not None:
-            if not isinstance(after, datetime.datetime):
+        if sent_datetime_lower_bound is not None:
+            if not isinstance(sent_datetime_lower_bound, datetime.datetime):
                 raise Exception(
                     'Expected datetime, received %s of type %s' %
-                    (after, type(after)))
+                    (sent_datetime_lower_bound,
+                     type(sent_datetime_lower_bound)))
 
-        query = cls.query()
-        query = query.filter(cls.email_hash == email_hash)
+        query = cls.query().filter(cls.email_hash == email_hash)
 
-        if after is not None:
-            query = query.filter(cls.sent_datetime > after)
+        if sent_datetime_lower_bound is not None:
+            query = query.filter(cls.sent_datetime > sent_datetime_lower_bound)
 
         messages = query.fetch()
 

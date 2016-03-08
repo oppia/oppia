@@ -164,7 +164,7 @@ def _send_email(
                                 cleaned_plaintext_body):
         log_new_error(
             'Duplicate email:\n'
-            'Details:\n%s %s %s %s\n\n' %
+            'Details:\n%s %s %s\n%s\n\n' %
             (recipient_email, recipient_id, email_subject,
              cleaned_plaintext_body))
         return
@@ -272,21 +272,19 @@ def _generate_hash(
         recipient_id + email_subject + email_html_body,
         100)
 
-    print 'hash_value: ', hash_value
-
     return hash_value
 
 def _check_duplicate_message(
         recipient_id, email_subject, email_html_body):
     """Check for a given recipient_id, email_subject
         and cleaned email_html_body, whether a similar message has been sent
-        in the last DUPLICATE_EMAIL_INTERVAL.
+        in the last DUPLICATE_EMAIL_INTERVAL_MINS.
     """
 
     email_hash = _generate_hash(recipient_id, email_subject, email_html_body)
 
-    after = datetime.datetime.now() - datetime.timedelta(
-        minutes=feconf.DUPLICATE_EMAIL_INTERVAL)
+    after = datetime.datetime.utcnow() - datetime.timedelta(
+        minutes=feconf.DUPLICATE_EMAIL_INTERVAL_MINS)
 
     messages = email_models.SentEmailModel.get_by_hash(email_hash, after)
 

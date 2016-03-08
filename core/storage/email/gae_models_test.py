@@ -49,17 +49,17 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
         query = query.filter(
             email_models.SentEmailModel.email_hash == 'Email Hash')
 
-        model = query.fetch(2)
+        results = query.fetch(2)
 
-        self.assertEqual(len(model), 1)
+        self.assertEqual(len(results), 1)
 
         query = email_models.SentEmailModel.query()
         query = query.filter(
             email_models.SentEmailModel.email_hash == 'Wrong Email Hash')
 
-        model = query.fetch(2)
+        results = query.fetch(2)
 
-        self.assertEqual(len(model), 0)
+        self.assertEqual(len(results), 0)
 
     def test_model_saved_certain_hash_retrieved_same_hash_using_getbyhash(self):
         email_models.SentEmailModel.create(
@@ -68,13 +68,13 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             'Email Subject', 'Email Body', datetime.datetime.utcnow(),
             'Email Hash')
 
-        model = email_models.SentEmailModel.get_by_hash('Email Hash')
+        results = email_models.SentEmailModel.get_by_hash('Email Hash')
 
-        self.assertEqual(len(model), 1)
+        self.assertEqual(len(results), 1)
 
-        model = email_models.SentEmailModel.get_by_hash('Wrong Email Hash')
+        results = email_models.SentEmailModel.get_by_hash('Wrong Email Hash')
 
-        self.assertEqual(len(model), 0)
+        self.assertEqual(len(results), 0)
 
     def test_get_by_hash_return_multiple_models_same_hash(self):
         email_models.SentEmailModel.create(
@@ -89,9 +89,9 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             'Email Subject', 'Email Body', datetime.datetime.utcnow(),
             'Same Hash')
 
-        model = email_models.SentEmailModel.get_by_hash('Same Hash')
+        results = email_models.SentEmailModel.get_by_hash('Same Hash')
 
-        self.assertEqual(len(model), 2)
+        self.assertEqual(len(results), 2)
 
     def test_get_by_hash_correct_usage_after_argument(self):
         time_now = datetime.datetime.utcnow()
@@ -102,14 +102,22 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             'Email Subject', 'Email Body', datetime.datetime.utcnow(),
             'Email Hash')
 
-        model = email_models.SentEmailModel.get_by_hash('Email Hash', time_now)
-        self.assertEqual(len(model), 1)
+        results = email_models.SentEmailModel.get_by_hash('Email Hash',
+                                                          time_now)
+        self.assertEqual(len(results), 1)
 
-        time_now = datetime.datetime.utcnow()
+        time_now1 = datetime.datetime.utcnow()
 
-        model = email_models.SentEmailModel.get_by_hash('Email Hash', time_now)
-        self.assertEqual(len(model), 0)
+        results = email_models.SentEmailModel.get_by_hash('Email Hash',
+                                                          time_now1)
+        self.assertEqual(len(results), 0)
 
+        after = datetime.datetime.utcnow() - datetime.timedelta(minutes=2)
+
+        results = email_models.SentEmailModel.get_by_hash('Email Hash', after)
+        self.assertEqual(len(results), 1)
+
+        # Check if it accepts only DateTime objects.
         with self.assertRaises(Exception):
-            model = email_models.SentEmailModel.get_by_hash(
+            results = email_models.SentEmailModel.get_by_hash(
                 'Email Hash', 'Random String')
