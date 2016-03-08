@@ -26,6 +26,11 @@ oppia.controller('DashboardNotifications', [
       notificationType === 'feedback_thread' ? '#/feedback' : '');
   };
 
+  $scope.navigateToProfile = function($event, username) {
+    $event.stopPropagation();
+    window.location.href = '/profile/' + username;
+  };
+
   $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
     return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
       millisSinceEpoch);

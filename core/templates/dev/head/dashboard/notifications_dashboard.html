@@ -50,7 +50,7 @@
                   title="Feedback thread"></span>
           </div>
           <strong>
-            <div class="oppia-notification-author-username"><[notification.author_username]> left a comment on </div>
+            <div class="oppia-notification-author-username"><a ng-click="navigateToProfile($event, notification.author_username)"><[notification.author_username]></a> left a comment on </div>
             <div class="oppia-notification-activity-title"><[notification.activity_title]></div>
           </strong>
           <div class="oppia-notification-last-updated"><[getLocaleAbbreviatedDatetimeString(notification.last_updated_ms)]></div>
