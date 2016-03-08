@@ -1015,8 +1015,8 @@ md-card.oppia-gallery-tile {
 }
 
 .oppia-html-select .oppia-html-select-option oppia-noninteractive-image {
-  display: block;
-  margin-bottom: -22px;
+  display: inline-block;
+  margin-bottom: 0;
 }
 
 .oppia-create-exploration-label {
