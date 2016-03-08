@@ -10,6 +10,12 @@
       </div>
     </div>
 
+    <div class="oppia-info-blocks">
+      <div ng-repeat="infoMessage in alertsService.infoMessages track by $index">
+        <info-message message-content="infoMessage" message-index="$index"></info-message>
+      </div>
+    </div>
+
     <div ng-show="loadingMessage" class="oppia-loading-fullpage">
       <div class="oppia-align-center">
         <[loadingMessage]>

@@ -19,12 +19,12 @@
  */
 
 oppia.controller('FeedbackTab', [
-  '$scope', '$http', '$modal', '$timeout', '$rootScope', 'warningsData',
+  '$scope', '$http', '$modal', '$timeout', '$rootScope', 'alertsService', 'warningsData',
   'oppiaDatetimeFormatter', 'threadStatusDisplayService',
   'threadDataService', 'explorationStatesService', 'explorationData',
   'changeListService',
   function(
-    $scope, $http, $modal, $timeout, $rootScope, warningsData,
+    $scope, $http, $modal, $timeout, $rootScope, alertsService, warningsData,
     oppiaDatetimeFormatter, threadStatusDisplayService,
     threadDataService, explorationStatesService, explorationData,
     changeListService) {
@@ -90,6 +90,7 @@ oppia.controller('FeedbackTab', [
         threadDataService.createNewThread(
           result.newThreadSubject, result.newThreadText, function() {
             $scope.clearActiveThread();
+            alertsService.addInfoMessage("Thread Created!");
           });
       });
     };

@@ -26,7 +26,7 @@ var oppia = angular.module(
   'oppia', [
     'ngMaterial', 'ngAnimate', 'ngSanitize', 'ngResource', 'ui.bootstrap',
     'ui.sortable', 'infinite-scroll', 'ngJoyRide', 'ngImgCrop', 'ui.validate',
-    'textAngular'
+    'textAngular', 'toastr'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
                    : []));
@@ -105,6 +105,28 @@ oppia.config(['$provide', function($provide) {
 
     return $delegate;
   }]);
+}]);
+
+oppia.config(['toastrConfig', function(toastrConfig) {
+  angular.extend(toastrConfig, {
+    allowHtml: false,
+    //closeButton: true,
+    //closeHtml: '<button>&times;</button>',
+    //extendedTimeOut: 1000,
+    iconClasses: {
+      error: 'toast-error',
+      info: 'toast-info',
+      success: 'toast-success',
+      warning: 'toast-warning'
+    },
+    positionClass: 'toast-bottom-right',
+    messageClass: 'toast-message',
+    progressBar: false,
+    tapToDismiss: true,
+    timeOut: 1500,
+    titleClass: 'toast-title',
+    //toastClass: 'oppia-toast'
+  });
 }]);
 
 // Returns true if the user is on a mobile device.

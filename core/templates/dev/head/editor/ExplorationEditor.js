@@ -363,12 +363,12 @@ oppia.controller('EditorNavbarBreadcrumb', [
 
 oppia.controller('ExplorationSaveAndPublishButtons', [
   '$scope', '$http', '$rootScope', '$window', '$timeout', '$modal',
-  'warningsData', 'changeListService', 'focusService', 'routerService',
+  'alertsService', 'warningsData', 'changeListService', 'focusService', 'routerService',
   'explorationData', 'explorationRightsService', 'editabilityService',
   'explorationWarningsService', 'siteAnalyticsService',
   function(
       $scope, $http, $rootScope, $window, $timeout, $modal,
-      warningsData, changeListService, focusService, routerService,
+      alertsService, warningsData, changeListService, focusService, routerService,
       explorationData, explorationRightsService, editabilityService,
       explorationWarningsService, siteAnalyticsService) {
     // Whether or not a save action is currently in progress.
@@ -461,6 +461,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         });
         siteAnalyticsService.registerPublishExplorationEvent(
           explorationData.explorationId);
+        alertsService.addInfoMessage("Exploration Published!");
       });
 
       modalInstance.opened.then(function() {
