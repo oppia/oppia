@@ -50,8 +50,14 @@
                   title="Feedback thread"></span>
           </div>
           <strong>
-            <div class="oppia-notification-author-username"><a ng-click="navigateToProfile($event, notification.author_username)"><[notification.author_username]></a> left a comment on </div>
-            <div class="oppia-notification-activity-title"><[notification.activity_title]></div>
+            <div ng-if="notification.type === 'feedback_thread'">
+              <div class="oppia-notification-author-username"><a ng-click="navigateToProfile($event, notification.author_username)"><[notification.author_username]></a><span ng-if="!notification.author_username">Anonymous</span> left a comment on </div>
+              <div class="oppia-notification-activity-title"><[notification.activity_title]></div>
+            </div>
+            <div ng-if="notification.type === 'exploration_commit'">
+              <div class="oppia-notification-author-username"><a ng-click="navigateToProfile($event, notification.author_username)"><[notification.author_username]></a><span ng-if="!notification.author_username">Anonymous</span> committed on </div>
+              <div class="oppia-notification-activity-title"><[notification.activity_title]></div>
+            </div>
           </strong>
           <div class="oppia-notification-last-updated"><[getLocaleAbbreviatedDatetimeString(notification.last_updated_ms)]></div>
           <div class="clearfix"></div>
