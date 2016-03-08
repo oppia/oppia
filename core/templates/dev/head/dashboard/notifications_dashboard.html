@@ -26,12 +26,12 @@
       Last updated: <[getLocaleAbbreviatedDatetimeString(jobQueuedMsec)]>
     </div>
 
-    <md-card class="oppia-page-card oppia-notifications-dashboard-card">
-      <div ng-if="recentNotifications.length === 0">
+    <div>
+      <md-card ng-if="recentNotifications.length === 0" class="oppia-page-card oppia-notifications-dashboard-card">
         <em>No recent notifications.</em>
-      </div>
+      </md-card>
 
-      <div ng-if="recentNotifications.length > 0">
+      <md-card ng-if="recentNotifications.length > 0" >
         <div ng-class-even="'oppia-notifications-even-notification'" ng-class-odd="'oppia-notifications-odd-notification'" ng-repeat="notification in recentNotifications"
             ng-class="{'oppia-dashboard-row-recent': lastSeenMsec && lastSeenMsec < notification.last_updated_ms && notification.author_username !== currentUsername, 'oppia-dashboard-row': !lastSeenMsec || lastSeenMsec >= notification.last_updated_ms || notification.author_username === currentUsername}"
             ng-click="navigateToItem(notification.activity_id, notification.type)">
@@ -58,8 +58,8 @@
           <div class="oppia-notification-subject"><[notification.subject]></div>
           <div class="clearfix"></div>
         </div>
-      </div>
-    </md-card>
+      </md-card>
+    </div>
   </div>
 {% endblock %}
 
