@@ -1711,7 +1711,6 @@ oppia-parameter {
 
 .oppia-dashboard-row {
   cursor: pointer;
-  margin-bottom: 10px;
 }
 .oppia-dashboard-row:hover {
   background: #eee;
@@ -2376,6 +2375,22 @@ div#ng-curtain {
 
 .oppia-notification-subject {
   float: left;
+}
+
+@media all and (max-width: 500px) {
+  .oppia-notification-type,
+  .oppia-notification-activity-title,
+  .oppia-notification-last-updated,
+  .oppia-notification-author-username,
+  .oppia-notification-subject {
+    clear: both;
+    float: left;
+  }
+
+  .oppia-notification-activity-title,
+  .oppia-notification-author-username {
+    margin-left: -1px;
+  }
 }
 
 .oppia-about-anchor {
