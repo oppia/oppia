@@ -20,11 +20,13 @@
  */
 
 var general = require('../protractor_utils/general.js');
+var interactions = require('../../../extensions/interactions/protractor.js');
 var forms = require('../protractor_utils/forms.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
 var player = require('../protractor_utils/player.js');
+var rules = require('../../../extensions/rules/protractor.js');
 
 describe('State editor', function() {
   it('should display plain text content', function() {
@@ -131,6 +133,27 @@ describe('State editor', function() {
     player.clickThroughToNextCard();
     player.expectExplorationToBeOver();
 
+    users.logout();
+  });
+
+  it('should preserve input value when rule type changes in' +
+      ' add response modal', function() {
+    users.createUser('stateEditorUser1@example.com', 'stateEditorUser1');
+    users.login('stateEditorUser1@example.com');
+    workflow.createExploration('sums', 'maths');
+    editor.setContent(forms.toRichText('some content'));
+
+    editor.openInteraction('TextInput');
+    editor.customizeInteraction('TextInput', 'My PlaceHolder', 2);
+    editor.selectRuleInAddResponseModal('TextInput', 'Equals');
+    editor.setRuleParametersInAddResponseModal('TextInput',
+      'Equals', 'Some Text');
+    editor.expectRuleParametersToBe('TextInput', 'Equals', 'Some Text');
+    editor.selectRuleInAddResponseModal('TextInput', 'Contains');
+    editor.expectRuleParametersToBe('TextInput', 'Equals', 'Some Text');
+    editor.closeAddResponseModal();
+
+    editor.saveChanges();
     users.logout();
   });
 });
