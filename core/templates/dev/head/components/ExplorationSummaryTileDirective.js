@@ -36,7 +36,8 @@ oppia.directive('explorationSummaryTile', [function() {
       isCommunityOwned: '&isCommunityOwned',
       // If this is not null, the new exploration opens in a new window when
       // the summary tile is clicked.
-      openInNewWindow: '@openInNewWindow'
+      openInNewWindow: '@openInNewWindow',
+      isCommunityOwned: '=?isCommunityOwned'
     },
     templateUrl: 'summaryTile/exploration',
     link: function(scope, element) {
@@ -78,6 +79,13 @@ oppia.directive('explorationSummaryTile', [function() {
             return commitsOfContributor2 - commitsOfContributor1;
           }
         );
+
+        if ($scope.isCommunityOwned) {
+          $scope.contributors.unshift('Community Owned');
+          $scope.numMinusOneText = $scope.contributors.length - 1;
+        } else {
+          $scope.numMinusOneText = '+' + $scope.contributors.length - 1;
+        }
 
         $scope.MAX_CONTRIBUTORS_TO_DISPLAY = 5;
 
