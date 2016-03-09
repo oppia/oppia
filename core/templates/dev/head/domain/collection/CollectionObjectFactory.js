@@ -133,7 +133,7 @@ oppia.factory('CollectionObjectFactory', [
     // nodes returned by this function will be reflected in the collection.
     // Changes to the list itself will not be reflected in this collection.
     Collection.prototype.getCollectionNodes = function() {
-      return angular.copy(this._nodes);
+      return this._nodes.slice();
     };
 
     Collection.prototype.getCollectionNodeCount = function() {

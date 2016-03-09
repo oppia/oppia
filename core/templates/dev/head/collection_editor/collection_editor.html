@@ -44,7 +44,7 @@
       <br>
       <strong>Explorations</strong>
       <ul>
-        <li ng-repeat="node in collection.getCollectionNodes()">
+        <li ng-repeat="node in collection.getBindableCollectionNodes()">
           <collection-node-editor-directive collection="collection" collection-node="node" update-skill-list="updateSkillList()">
           </collection-node-editor-directive>
         </li>

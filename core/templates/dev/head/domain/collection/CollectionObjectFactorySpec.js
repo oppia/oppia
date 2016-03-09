@@ -177,12 +177,13 @@ describe('Collection object factory', function() {
     expect(_sampleCollection.getCollectionNodes()).not.toEqual(collectionNodes);
     expect(_sampleCollection.getCollectionNodeCount()).toEqual(2);
 
-    // Ensure contained collection nodes cannot be mutated and reflected in the
+    // Ensure contained collection nodes can be mutated and reflected in the
     // collection object.
-    collectionNodes = _sampleCollection.getCollectionNodes();
-    collectionNodes[0].getPrerequisiteSkillList().addSkill('example');
-    expect(_sampleCollection.getCollectionNodes()).not.toEqual(collectionNodes);
-    expect(_getCollectionNode('exp_id0')).not.toEqual(collectionNodes[0]);
+    collectionNodes = _sampleCollection.getBindableCollectionNodes();
+    collectionNodes[1].getPrerequisiteSkillList().addSkill('example');
+    expect(_sampleCollection.getBindableCollectionNodes()).toEqual(
+      collectionNodes);
+    expect(_getCollectionNode('exp_id1')).toEqual(collectionNodes[1]);
   });
 
   it('should accept changes to the bindable list of collection nodes',
@@ -191,9 +192,14 @@ describe('Collection object factory', function() {
     _addCollectionNode('exp_id1');
     expect(_sampleCollection.getCollectionNodeCount()).toEqual(2);
 
+    // The array itself can be mutated.
+    var collectionNodes = _sampleCollection.getBindableCollectionNodes();
+    collectionNodes.splice(0, 1);
+    expect(_sampleCollection.getCollectionNodeCount()).toEqual(1);
+
     // Collection nodes can be mutated and reflected in the collection object.
     collectionNodes = _sampleCollection.getBindableCollectionNodes();
-    collectionNodes[1].getPrerequisiteSkillList().addSkill('example');
+    collectionNodes[0].getPrerequisiteSkillList().addSkill('example');
     expect(_sampleCollection.getBindableCollectionNodes()).toEqual(
       collectionNodes);
     expect(_getCollectionNode('exp_id1')).toEqual(collectionNodes[1]);
