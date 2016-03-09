@@ -116,10 +116,15 @@
       </a>
     </li>
 
-    <li ng-class="{'active': getTabStatuses().active === 'feedback'}">
-      <a href="#" tooltip="Feedback" tooltip-placement="bottom" ng-click="selectFeedbackTab()">
+    <li ng-class="{'active': getTabStatuses().active === 'feedback'}" ng-click="selectFeedbackTab()">
+      <a href="#" tooltip="Feedback" tooltip-placement="bottom">
         <span class="glyphicon glyphicon-comment"></span>
       </a>
+      <div ng-show="getOpenThreadsCount()" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
+        <span class="oppia-exploration-open-threads-count">
+          <[getOpenThreadsCount()]>
+        </span>
+      </div>
     </li>
 
     {% if username %}
