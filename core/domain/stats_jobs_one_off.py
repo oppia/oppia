@@ -168,7 +168,7 @@ class AnswersAudit(jobs.BaseMapReduceJobManager):
         period_idx += (
             AnswersAudit._get_consecutive_dot_count(item_id, period_idx) - 1)
         handler_name = item_id[:period_idx]
-        yield (handler_name, {
+        yield (handler_name + '    ' + item.id, {
             'reduce_type': AnswersAudit._HANDLER_NAME_COUNTER_KEY
         })
 
