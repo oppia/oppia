@@ -132,7 +132,8 @@ class StatisticsAudit(jobs.BaseMapReduceJobManager):
 class AnswersAudit(jobs.BaseMapReduceJobManager):
 
     _STATE_COUNTER_ERROR_KEY = 'State Counter ERROR'
-    _HANDLER_NAME_COUNTER_KEY = 'HandlerCounter'
+    _UNKNOWN_HANDLER_NAME_COUNTER_KEY = 'UnknownHandlerCounter'
+    _SUBMIT_HANDLER_NAME_COUNTER_KEY = 'SubmitHandlerCounter'
     _HANDLER_FUZZY_RULE_COUNTER_KEY = 'FuzzyRuleCounter'
     _HANDLER_DEFAULT_RULE_COUNTER_KEY = 'DefaultRuleCounter'
     _HANDLER_STANDARD_RULE_COUNTER_KEY = 'StandardRuleCounter'
@@ -152,24 +153,21 @@ class AnswersAudit(jobs.BaseMapReduceJobManager):
     @staticmethod
     def map(item):
         item_id = item.id
-        period_idx = item_id.index('.')
-        period_idx += (
-            AnswersAudit._get_consecutive_dot_count(item_id, period_idx) - 1)
-        # exp_id = item_id[:period_idx]
+        if 'submit' not in item_id:
+            yield (AnswersAudit._UNKNOWN_HANDLER_NAME_COUNTER_KEY, {
+                'reduce_type': AnswersAudit._UNKNOWN_HANDLER_NAME_COUNTER_KEY,
+                'rule_spec_str': item.id
+            })
+            return
 
-        item_id = item_id[period_idx+1:]
-        period_idx = item_id.index('.')
-        period_idx += (
-            AnswersAudit._get_consecutive_dot_count(item_id, period_idx) - 1)
-        # state_name = item_id[:period_idx]
-
-        item_id = item_id[period_idx+1:]
+        period_idx = item_id.index('submit')
+        item_id = item_id[period_idx:]
         period_idx = item_id.index('.')
         period_idx += (
             AnswersAudit._get_consecutive_dot_count(item_id, period_idx) - 1)
         handler_name = item_id[:period_idx]
         yield (handler_name, {
-            'reduce_type': AnswersAudit._HANDLER_NAME_COUNTER_KEY,
+            'reduce_type': AnswersAudit._SUBMIT_HANDLER_NAME_COUNTER_KEY,
             'rule_spec_str': item.id
         })
 
@@ -209,14 +207,16 @@ class AnswersAudit(jobs.BaseMapReduceJobManager):
             elif not reduce_type:
                 reduce_type = value_dict['reduce_type']
 
-        if reduce_type == AnswersAudit._HANDLER_NAME_COUNTER_KEY:
+        if reduce_type == AnswersAudit._UNKNOWN_HANDLER_NAME_COUNTER_KEY:
             rule_spec_strs = [
                 ast.literal_eval(value_str)['rule_spec_str']
                 for value_str in stringified_values
             ]
             yield (
-                'Found handler "%s" %d time(s), ALL RULE SPEC STRINGS: \n%s' % (
-                    key, reduce_count, rule_spec_strs[:10]))
+                'Encountered unknown handler %d time(s), FOUND RULE SPEC '
+                'STRINGS: \n%s' % (reduce_count, rule_spec_strs[:10]))
+        elif reduce_type == AnswersAudit._SUBMIT_HANDLER_NAME_COUNTER_KEY:
+            yield 'Found handler "%s" %d time(s)' % (key, reduce_count)
         elif reduce_type == AnswersAudit._HANDLER_FUZZY_RULE_COUNTER_KEY:
             yield 'Found fuzzy rules %d time(s)' % reduce_count
         elif reduce_type == AnswersAudit._HANDLER_DEFAULT_RULE_COUNTER_KEY:
