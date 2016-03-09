@@ -33,6 +33,7 @@ oppia.directive('explorationSummaryTile', [function() {
       getContributorsSummary: '&contributorsSummary',
       getThumbnailIconUrl: '&thumbnailIconUrl',
       getThumbnailBgColor: '&thumbnailBgColor',
+      isCommunityOwned: '&isCommunityOwned',
       // If this is not null, the new exploration opens in a new window when
       // the summary tile is clicked.
       openInNewWindow: '@openInNewWindow'
