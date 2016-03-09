@@ -25,7 +25,7 @@ oppia.directive('searchBar', [function() {
     controller: [
       '$scope', '$rootScope', '$timeout', '$window', 'searchService',
       'oppiaDebouncer', 'ExplorationCreationButtonService', 'urlService',
-      'CATEGORY_LIST', 'siteAnalyticsService',  
+      'CATEGORY_LIST', 'siteAnalyticsService',
       function(
           $scope, $rootScope, $timeout, $window, searchService,
           oppiaDebouncer, ExplorationCreationButtonService, urlService,
@@ -64,16 +64,17 @@ oppia.directive('searchBar', [function() {
             summary: ''
           }
         };
-        
-        // Update the description, numSelections and summary fields of the relevant
-        // entry of $scope.selectionDetails.
+
+        // Update the description, numSelections and summary fields of the
+        // relevant entry of $scope.selectionDetails.
         var _updateSelectionDetails = function(itemsType) {
           var itemsName = $scope.selectionDetails[itemsType].itemsName;
           var masterList = $scope.selectionDetails[itemsType].masterList;
 
           var selectedItems = [];
           for (var i = 0; i < masterList.length; i++) {
-            if ($scope.selectionDetails[itemsType].selections[masterList[i].id]) {
+            if ($scope.selectionDetails[itemsType]
+                      .selections[masterList[i].id]) {
               selectedItems.push(masterList[i].text);
             }
           }
@@ -83,7 +84,8 @@ oppia.directive('searchBar', [function() {
 
           $scope.selectionDetails[itemsType].summary = (
             totalCount === 0 ? (
-              'All ' + itemsName.charAt(0).toUpperCase() + itemsName.substr(1)) :
+              'All ' + itemsName.charAt(0).toUpperCase() +
+                       itemsName.substr(1)) :
             totalCount === 1 ? selectedItems[0] :
             totalCount + ' ' + itemsName);
 
@@ -164,12 +166,13 @@ oppia.directive('searchBar', [function() {
         };
 
         $scope.onRedirectToLogin = function(destinationUrl) {
-          siteAnalyticsService.registerStartLoginEvent('createExplorationButton');
+          siteAnalyticsService.registerStartLoginEvent(
+            'createExplorationButton');
           $timeout(function() {
             $window.location = destinationUrl;
           }, 150);
           return false;
-        }; 
+        };
       }
     ]
   };
