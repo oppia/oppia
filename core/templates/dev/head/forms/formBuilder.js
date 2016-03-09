@@ -936,7 +936,7 @@ oppia.directive('textAngularRte', [
       '<div text-angular="" ta-toolbar="<[toolbarOptionsJson]>" ' +
       '     ta-paste="stripFormatting($html)" ng-model="tempContent">' +
       '</div>'),
-    controller: ['$scope', function($scope) {
+    controller: ['$scope', '$timeout', function($scope, $timeout) {
       $scope.isCustomizationModalOpen = false;
       var toolbarOptions = [
         ['bold', 'italics', 'underline'],
@@ -972,6 +972,14 @@ oppia.directive('textAngularRte', [
             rteHelperService.stripRteElementContent(newVal));
         $scope.htmlContent = rteHelperService.convertRteToHtml(
           displayedContent);
+      });
+
+      $scope.$on('removed-element', function(event, args) {
+	$timeout(function() {
+          _convertHtmlToRte($scope.htmlContent, function(html) {
+              $scope.tempContent = html;
+          });
+	}, 0.05);
       });
 
       /*
@@ -1704,6 +1712,7 @@ oppia.directive('schemaBasedListEditor', [
 
           $scope.deleteElement = function(index) {
             $scope.localValue.splice(index, 1);
+	    $scope.$broadcast('removed-element');
           };
         } else {
           if ($scope.len <= 0) {
