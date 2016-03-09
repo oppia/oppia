@@ -149,9 +149,6 @@ def _send_email(
         sender_email = '%s <%s>' % (
             EMAIL_SENDER_NAME.value, feconf.SYSTEM_EMAIL_ADDRESS)
 
-        email_hash = _generate_hash(recipient_id, email_subject,
-                                    cleaned_html_body)
-
         email_services.send_mail(
             sender_email, recipient_email, email_subject,
             cleaned_plaintext_body, cleaned_html_body, bcc_admin)
@@ -160,13 +157,14 @@ def _send_email(
             email_subject, cleaned_html_body, datetime.datetime.utcnow(),
             email_hash)
 
+    email_hash = _generate_hash(recipient_id, email_subject, cleaned_html_body)
+
     if _check_duplicate_message(recipient_id, email_subject,
                                 cleaned_plaintext_body):
         log_new_error(
             'Duplicate email:\n'
             'Details:\n%s %s %s\n%s\n\n' %
-            (recipient_email, recipient_id, email_subject,
-             cleaned_plaintext_body))
+            (email_hash, recipient_id, email_subject, cleaned_plaintext_body))
         return
 
     return transaction_services.run_in_transaction(_send_email_in_transaction)
@@ -277,28 +275,22 @@ def _generate_hash(
 def _check_duplicate_message(
         recipient_id, email_subject, email_html_body):
     """Check for a given recipient_id, email_subject
-        and cleaned email_html_body, whether a similar message has been sent
-        in the last DUPLICATE_EMAIL_INTERVAL_MINS.
+    and cleaned email_html_body, whether a similar message has been sent
+    in the last DUPLICATE_EMAIL_INTERVAL_MINS.
     """
 
     email_hash = _generate_hash(recipient_id, email_subject, email_html_body)
 
-    after = datetime.datetime.utcnow() - datetime.timedelta(
+    sent_datetime_lower_bound = datetime.datetime.utcnow() - datetime.timedelta(
         minutes=feconf.DUPLICATE_EMAIL_INTERVAL_MINS)
 
-    messages = email_models.SentEmailModel.get_by_hash(email_hash, after)
+    messages = email_models.SentEmailModel.get_by_hash(
+        email_hash, sent_datetime_lower_bound=sent_datetime_lower_bound)
 
     for message in messages:
         if (message.recipient_id == recipient_id and
                 message.subject == email_subject and
                 message.html_body == email_html_body):
-            log_new_error(
-                'Duplicate email:\n'
-                'Current Message:\n%s%s\n%s\n\n Old Message:\n%s%s\n%s\n'
-                'Email Hash: %s\n' %
-                (recipient_id, email_subject, email_html_body,
-                 message.recipient_id, message.subject, message.html_body,
-                 email_hash))
             return True
 
     return False

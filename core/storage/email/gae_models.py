@@ -109,8 +109,8 @@ class SentEmailModel(base_models.BaseModel):
 
         This also takes an optional sent_datetime_lower_bound argument,
         which is a datetime instance. If this is given, only
-        SentEmailModel instances sent sent_datetime_lower_bound the
-        given datetime should be returned.
+        SentEmailModel instances sent after sent_datetime_lower_bound
+        should be returned.
         """
 
         if sent_datetime_lower_bound is not None:

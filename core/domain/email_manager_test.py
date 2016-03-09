@@ -433,39 +433,38 @@ class SignupEmailTests(test_utils.GenericTestBase):
 class GenerateHashTests(test_utils.GenericTestBase):
     """Test that generating hash functionality works as expected."""
 
-    def test_same_input_always_gives_same_hash(self):
+    def test_same_inputs_always_gives_same_hashes(self):
         # pylint: disable=protected-access
-        email_hash1 = email_manager._generate_hash('recipient_id',
-                                                   'email_subject',
-                                                   'email_html_body1')
+        email_hash1 = email_manager._generate_hash(
+            'recipient_id', 'email_subject', 'email_html_body')
 
-        email_hash2 = email_manager._generate_hash('recipient_id',
-                                                   'email_subject',
-                                                   'email_html_body1')
+        email_hash2 = email_manager._generate_hash(
+            'recipient_id', 'email_subject', 'email_html_body')
         self.assertEqual(email_hash1, email_hash2)
         # pylint: enable=protected-access
 
-    def test_different_input_give_different_hash(self):
+    def test_different_inputs_give_different_hashes(self):
         # pylint: disable=protected-access
-        email_hash1 = email_manager._generate_hash('recipient_id',
-                                                   'email_subject',
-                                                   'email_html_body1')
+        email_hash1 = email_manager._generate_hash(
+            'recipient_id', 'email_subject', 'email_html_body')
 
-        email_hash2 = email_manager._generate_hash('recipient_id',
-                                                   'email_subject',
-                                                   'email_html_body2')
+        email_hash2 = email_manager._generate_hash(
+            'recipient_id', 'email_subject', 'email_html_body2')
         self.assertNotEqual(email_hash1, email_hash2)
 
-        email_hash2 = email_manager._generate_hash('recipient_id2',
-                                                   'email_subject',
-                                                   'email_html_body')
+        email_hash2 = email_manager._generate_hash(
+            'recipient_id2', 'email_subject', 'email_html_body')
         self.assertNotEqual(email_hash1, email_hash2)
 
-        email_hash2 = email_manager._generate_hash('recipient_id',
-                                                   'email_subject2',
-                                                   'email_html_body')
+        email_hash2 = email_manager._generate_hash(
+            'recipient_id', 'email_subject2', 'email_html_body')
+        self.assertNotEqual(email_hash1, email_hash2)
+
+        email_hash2 = email_manager._generate_hash(
+            'recipient_id2', 'email_subject2', 'email_html_body2')
         self.assertNotEqual(email_hash1, email_hash2)
         # pylint: enable=protected-access
+
 
 class DuplicateEmailTests(test_utils.GenericTestBase):
     """Test that duplicate emails are not sent"""
@@ -511,9 +510,8 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             self.assertEqual(len(all_models), 0)
 
             # pylint: disable=protected-access
-            email_hash = email_manager._generate_hash(self.new_user_id,
-                                                      'Email Subject',
-                                                      'Email Body')
+            email_hash = email_manager._generate_hash(
+                self.new_user_id, 'Email Subject', 'Email Body')
             email_models.SentEmailModel.create(
                 self.new_user_id, self.NEW_USER_EMAIL,
                 feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
@@ -525,19 +523,17 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 1)
 
-            email_manager._send_email(self.new_user_id,
-                                      feconf.SYSTEM_COMMITTER_ID,
-                                      feconf.EMAIL_INTENT_SIGNUP,
-                                      'Email Subject', 'Email Body')
+            email_manager._send_email(
+                self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
+                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body')
             # pylint: enable=protected-access
 
-            # Two errors should be recorded in the logs.
-            self.assertEqual(log_new_error_counter.times_called, 2)
+            # An error should be recorded in the logs.
+            self.assertEqual(log_new_error_counter.times_called, 1)
             self.assertRegexpMatches(logged_errors[0], 'Duplicate email')
 
             # Check that a new email was not sent.
-            messages = self.mail_stub.get_sent_messages(
-                to=self.NEW_USER_EMAIL)
+            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
             self.assertEqual(0, len(messages))
 
             # Check that the content of this email was not recorded in
@@ -570,14 +566,12 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             self.assertEqual(len(all_models), 0)
 
             # pylint: disable=protected-access
-            email_manager._send_email(self.new_user_id,
-                                      feconf.SYSTEM_COMMITTER_ID,
-                                      feconf.EMAIL_INTENT_SIGNUP,
-                                      'Email Subject', 'Email Body')
+            email_manager._send_email(
+                self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
+                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body')
 
             # Check that a new email was sent.
-            messages = self.mail_stub.get_sent_messages(
-                to=self.NEW_USER_EMAIL)
+            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
             self.assertEqual(1, len(messages))
 
             # Check that the content of this email was recorded in
@@ -585,19 +579,20 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 1)
 
-            email_manager._send_email(self.new_user_id,
-                                      feconf.SYSTEM_COMMITTER_ID,
-                                      feconf.EMAIL_INTENT_SIGNUP,
-                                      'Email Subject', 'Email Body')
+            # No error should be recorded in the logs.
+            self.assertEqual(log_new_error_counter.times_called, 0)
+
+            email_manager._send_email(
+                self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
+                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body')
             # pylint: enable=protected-access
 
-            # Two errors should be recorded in the logs.
-            self.assertEqual(log_new_error_counter.times_called, 2)
+            # An error should be recorded in the logs.
+            self.assertEqual(log_new_error_counter.times_called, 1)
             self.assertRegexpMatches(logged_errors[0], 'Duplicate email')
 
             # Check that a new email was not sent.
-            messages = self.mail_stub.get_sent_messages(
-                to=self.NEW_USER_EMAIL)
+            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
             self.assertEqual(1, len(messages))
 
             # Check that the content of this email was not recorded in
@@ -605,8 +600,8 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 1)
 
-    def test_send_email_sends_within_duplicate_interval_diff_recipient(self):
-        '''Hash for both messages is same but recipients are different'''
+    def test_sending_email_with_different_recipient_but_same_hash(self):
+        """Hash for both messages is same but recipients are different"""
         can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
 
@@ -618,9 +613,8 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             self.assertEqual(len(all_models), 0)
 
             # pylint: disable=protected-access
-            email_hash = email_manager._generate_hash(self.new_user_id,
-                                                      'Email Subject',
-                                                      'Email Body')
+            email_hash = email_manager._generate_hash(
+                self.new_user_id, 'Email Subject', 'Email Body')
             email_models.SentEmailModel.create(
                 'recipient_id', self.NEW_USER_EMAIL,
                 feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
@@ -632,18 +626,16 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 1)
 
-            email_manager._send_email(self.new_user_id,
-                                      feconf.SYSTEM_COMMITTER_ID,
-                                      feconf.EMAIL_INTENT_SIGNUP,
-                                      'Email Subject', 'Email Body')
+            email_manager._send_email(
+                self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
+                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body')
             # pylint: enable=protected-access
 
             # Check that a new email was sent.
-            messages = self.mail_stub.get_sent_messages(
-                to=self.NEW_USER_EMAIL)
+            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
             self.assertEqual(1, len(messages))
 
-            # Check that the content of this email was not recorded in
+            # Check that the content of this email was recorded in
             # SentEmailModel.
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 2)
@@ -653,18 +645,16 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             sent_email_model2 = all_models[1]
 
             self.assertEqual(
-                sent_email_model1.email_hash,
-                sent_email_model2.email_hash)
+                sent_email_model1.email_hash, sent_email_model2.email_hash)
             self.assertNotEqual(
-                sent_email_model1.recipient_id,
-                sent_email_model2.recipient_id)
+                sent_email_model1.recipient_id, sent_email_model2.recipient_id)
             self.assertEqual(
                 sent_email_model1.subject, sent_email_model2.subject)
             self.assertEqual(
                 sent_email_model1.html_body, sent_email_model2.html_body)
 
-    def test_send_email_sends_within_duplicate_interval_diff_subject(self):
-        '''Hash for both messages is same but subjects are different'''
+    def test_sending_email_with_different_subject_but_same_hash(self):
+        """Hash for both messages is same but subjects are different"""
         can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
 
@@ -676,9 +666,8 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             self.assertEqual(len(all_models), 0)
 
             # pylint: disable=protected-access
-            email_hash = email_manager._generate_hash(self.new_user_id,
-                                                      'Email Subject',
-                                                      'Email Body')
+            email_hash = email_manager._generate_hash(
+                self.new_user_id, 'Email Subject', 'Email Body')
             email_models.SentEmailModel.create(
                 self.new_user_id, self.NEW_USER_EMAIL,
                 feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
@@ -690,18 +679,16 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 1)
 
-            email_manager._send_email(self.new_user_id,
-                                      feconf.SYSTEM_COMMITTER_ID,
-                                      feconf.EMAIL_INTENT_SIGNUP,
-                                      'Email Subject', 'Email Body')
+            email_manager._send_email(
+                self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
+                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body')
             # pylint: enable=protected-access
 
             # Check that a new email was sent.
-            messages = self.mail_stub.get_sent_messages(
-                to=self.NEW_USER_EMAIL)
+            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
             self.assertEqual(1, len(messages))
 
-            # Check that the content of this email was not recorded in
+            # Check that the content of this email was recorded in
             # SentEmailModel.
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 2)
@@ -711,18 +698,16 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             sent_email_model2 = all_models[1]
 
             self.assertEqual(
-                sent_email_model1.email_hash,
-                sent_email_model2.email_hash)
+                sent_email_model1.email_hash, sent_email_model2.email_hash)
             self.assertEqual(
-                sent_email_model1.recipient_id,
-                sent_email_model2.recipient_id)
+                sent_email_model1.recipient_id, sent_email_model2.recipient_id)
             self.assertNotEqual(
                 sent_email_model1.subject, sent_email_model2.subject)
             self.assertEqual(
                 sent_email_model1.html_body, sent_email_model2.html_body)
 
-    def test_send_email_sends_within_duplicate_interval_diff_body(self):
-        '''Hash for both messages is same but body is different'''
+    def test_sending_email_with_different_body_but_same_hash(self):
+        """Hash for both messages is same but body is different"""
         can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
 
@@ -734,9 +719,8 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             self.assertEqual(len(all_models), 0)
 
             # pylint: disable=protected-access
-            email_hash = email_manager._generate_hash(self.new_user_id,
-                                                      'Email Subject',
-                                                      'Email Body')
+            email_hash = email_manager._generate_hash(
+                self.new_user_id, 'Email Subject', 'Email Body')
             email_models.SentEmailModel.create(
                 self.new_user_id, self.NEW_USER_EMAIL,
                 feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
@@ -748,18 +732,16 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 1)
 
-            email_manager._send_email(self.new_user_id,
-                                      feconf.SYSTEM_COMMITTER_ID,
-                                      feconf.EMAIL_INTENT_SIGNUP,
-                                      'Email Subject', 'Email Body')
+            email_manager._send_email(
+                self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
+                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body')
             # pylint: enable=protected-access
 
             # Check that a new email was sent.
-            messages = self.mail_stub.get_sent_messages(
-                to=self.NEW_USER_EMAIL)
+            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
             self.assertEqual(1, len(messages))
 
-            # Check that the content of this email was not recorded in
+            # Check that the content of this email was recorded in
             # SentEmailModel.
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 2)
@@ -769,17 +751,15 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             sent_email_model2 = all_models[1]
 
             self.assertEqual(
-                sent_email_model1.email_hash,
-                sent_email_model2.email_hash)
+                sent_email_model1.email_hash, sent_email_model2.email_hash)
             self.assertEqual(
-                sent_email_model1.recipient_id,
-                sent_email_model2.recipient_id)
+                sent_email_model1.recipient_id, sent_email_model2.recipient_id)
             self.assertEqual(
                 sent_email_model1.subject, sent_email_model2.subject)
             self.assertNotEqual(
                 sent_email_model1.html_body, sent_email_model2.html_body)
 
-    def test_send_email_sends_outside_duplicate_interval_same_hash(self):
+    def test_duplicate_emails_are_sent_after_some_time_has_elapsed(self):
         can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
 
@@ -791,9 +771,8 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             self.assertEqual(len(all_models), 0)
 
             # pylint: disable=protected-access
-            email_hash = email_manager._generate_hash(self.new_user_id,
-                                                      'Email Subject',
-                                                      'Email Body')
+            email_hash = email_manager._generate_hash(
+                self.new_user_id, 'Email Subject', 'Email Body')
             email_sent_time = (datetime.datetime.utcnow() -
                                datetime.timedelta(minutes=4))
 
@@ -822,18 +801,16 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 2)
 
-            email_manager._send_email(self.new_user_id,
-                                      feconf.SYSTEM_COMMITTER_ID,
-                                      feconf.EMAIL_INTENT_SIGNUP,
-                                      'Email Subject', 'Email Body')
+            email_manager._send_email(
+                self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
+                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body')
             # pylint: enable=protected-access
 
             # Check that a new email was sent.
-            messages = self.mail_stub.get_sent_messages(
-                to=self.NEW_USER_EMAIL)
+            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
             self.assertEqual(1, len(messages))
 
-            # Check that the content of this email was not recorded in
+            # Check that the content of this email was recorded in
             # SentEmailModel.
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 3)
