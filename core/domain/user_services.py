@@ -297,6 +297,10 @@ def set_username(user_id, new_username):
     _save_user_settings(user_settings)
 
 def generate_signup_profile_picture(user_id):
+    """ Generates a profile picture data URL for a new user. This uses
+
+    their gravatar, if it exists, otherwise returns default image.
+    """
     user_email = get_email_from_user_id(user_id)
     user_gravatar = fetch_gravatar(user_email)
     update_profile_picture_data_url(user_id, user_gravatar)
@@ -559,17 +563,22 @@ def get_user_impact_score(user_id):
 
 def fetch_gravatar(email):
     """Returns the gravatar corresponding to the user's email, or an default image if gravtar is not receieved"""
-    DEFAULT_IDENTICON_DATA_URL = '/images/avatar/user_blue_72px.png'
-    base_url = 'http://www.grvatar.com/avatar/'
+    DEFAULT_IDENTICON_DATA_URL = feconf.DEFAULT_IDENTICON_DATA_URL
+    base_url = 'http://www.gravatar.com/avatar/'
     gravatar_url = base_url + hashlib.md5(email).hexdigest() + '?'
-    size = str(feconf.GRAVATAR_SIZE_PX)
-    gravatar_url += urllib.urlencode({'d':'identicon', 's':size})
-    result = urlfetch.fetch(
-         gravatar_url,
-         headers={'Content-Type': 'image/png'},
-         follow_redirects:False)
-    if result.status_code == 200:
-        encoded_body = base64.b64encode(result.content)
-        return 'data:{};base64,{}'.format('image/png', encoded_body)
-    else:
+    params = {'d':'identicon', 's':feconf.GRAVATAR_SIZE_PX}
+    gravatar_url += "&".join("%s=%s" % (k,v) for k,v in params.items())
+    try:
+        result = urlfetch.fetch(
+             gravatar_url,
+             headers={'Content-Type': 'image/png'},
+             follow_redirects=False)
+        if result.status_code == 200:
+            encoded_body = base64.b64encode(result.content)
+            return 'data:{};base64,{}'.format('image/png', encoded_body)
+        else:
+            logging.error('Unable to fetch gravatar')
+            return DEFAULT_IDENTICON_DATA_URL
+    except urlfetch.InvalidURLError:
+        logging.error("Invalid url for fetching gravatar")
         return DEFAULT_IDENTICON_DATA_URL

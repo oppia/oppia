@@ -224,8 +224,7 @@ class ProfileLinkTests(test_utils.GenericTestBase):
     USERNAME = 'abc123'
     EMAIL = 'abc123@gmail.com'
     PROFILE_PIC_URL = '/preferenceshandler/profile_picture_by_username/'
-    EMAIL_HASH = 'a751156c43e6349d8eae1f392950df34'
-    GRAVATAR_URL = 'http://www.gravatar.com/avatar/'+ EMAIL_HASH+'?d=retro&s=50'
+    DEFAULT_IDENTICON_DATA_URL = feconf.DEFAULT_IDENTICON_DATA_URL
 
     def test_get_profile_picture_invalid_username(self):
         response = self.testapp.get(
@@ -239,7 +238,19 @@ class ProfileLinkTests(test_utils.GenericTestBase):
             '%s%s' % (self.PROFILE_PIC_URL, self.USERNAME)
         )
         self.assertIsNotNone(
-            response_dict['profile_picture_data_url_for_username']
+            response_dict['profile_picture_data_url_for_username'])
+
+    def test_fetch_gravatar(self):
+        fetch_gravatar_counter =(
+         test_utils.CallCounter(user_services.fetch_gravatar))
+        with self.swap(user_services,'fetch_gravatar',fetch_gravatar_counter):
+            self.signup(self.EMAIL, self.USERNAME)
+            self.assertEqual(fetch_gravatar_counter.times_called,1)
+        response_dict = self.get_json(
+           '%s%s' % (self.PROFILE_PIC_URL, self.USERNAME))
+        self.assertNotEqual(
+            response_dict['profile_picture_data_url_for_username'],
+            feconf.DEFAULT_IDENTICON_DATA_URL)
 
 
 class ProfileDataHandlerTests(test_utils.GenericTestBase):
