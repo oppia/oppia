@@ -21,7 +21,6 @@ import datetime
 import hashlib
 import logging
 import re
-import urllib
 
 from core.platform import models
 from google.appengine.api import urlfetch
@@ -32,6 +31,7 @@ current_user_services = models.Registry.import_current_user_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 MAX_USERNAME_LENGTH = 50
+
 
 class UserSettings(object):
     """Value object representing a user's settings."""
@@ -562,23 +562,26 @@ def get_user_impact_score(user_id):
         return 0
 
 def fetch_gravatar(email):
-    """Returns the gravatar corresponding to the user's email, or an default image if gravtar is not receieved"""
-    DEFAULT_IDENTICON_DATA_URL = feconf.DEFAULT_IDENTICON_DATA_URL
+    """Returns the gravatar corresponding to the user's email,
+
+    or an default image if gravtar is not receieved
+    """
+    default_identicon_data_url = feconf.DEFAULT_IDENTICON_DATA_URL
     base_url = 'http://www.gravatar.com/avatar/'
     gravatar_url = base_url + hashlib.md5(email).hexdigest() + '?'
     params = {'d':'identicon', 's':feconf.GRAVATAR_SIZE_PX}
-    gravatar_url += "&".join("%s=%s" % (k,v) for k,v in params.items())
+    gravatar_url += "&".join("%s=%s" % (k, v) for k, v in params.items())
     try:
         result = urlfetch.fetch(
-             gravatar_url,
-             headers={'Content-Type': 'image/png'},
-             follow_redirects=False)
+            gravatar_url,
+            headers={'Content-Type': 'image/png'},
+            follow_redirects=False)
         if result.status_code == 200:
             encoded_body = base64.b64encode(result.content)
             return 'data:{};base64,{}'.format('image/png', encoded_body)
         else:
             logging.error('Unable to fetch gravatar')
-            return DEFAULT_IDENTICON_DATA_URL
+            return default_identicon_data_url
     except urlfetch.InvalidURLError:
         logging.error("Invalid url for fetching gravatar")
-        return DEFAULT_IDENTICON_DATA_URL
+        return default_identicon_data_url

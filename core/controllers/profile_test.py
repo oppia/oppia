@@ -241,13 +241,15 @@ class ProfileLinkTests(test_utils.GenericTestBase):
             response_dict['profile_picture_data_url_for_username'])
 
     def test_fetch_gravatar(self):
-        fetch_gravatar_counter =(
-         test_utils.CallCounter(user_services.fetch_gravatar))
-        with self.swap(user_services,'fetch_gravatar',fetch_gravatar_counter):
+        fetch_gravatar_counter = test_utils.CallCounter(
+            user_services.fetch_gravatar)
+        fetch_gravatar_swap = self.swap(
+            user_services, 'fetch_gravatar', fetch_gravatar_counter)
+        with fetch_gravatar_swap:
             self.signup(self.EMAIL, self.USERNAME)
-            self.assertEqual(fetch_gravatar_counter.times_called,1)
+            self.assertEqual(fetch_gravatar_counter.times_called, 1)
         response_dict = self.get_json(
-           '%s%s' % (self.PROFILE_PIC_URL, self.USERNAME))
+            '%s%s' % (self.PROFILE_PIC_URL, self.USERNAME))
         self.assertNotEqual(
             response_dict['profile_picture_data_url_for_username'],
             feconf.DEFAULT_IDENTICON_DATA_URL)
