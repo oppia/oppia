@@ -37,28 +37,60 @@ set -e
 source $(dirname $0)/setup.sh || exit 1
 source $(dirname $0)/setup_gae.sh || exit 1
 
-# Install third party dependencies
-# TODO(sll): Make this work with fewer third-party dependencies.
-bash scripts/install_third_party.sh
+# Parse additional command line arguments.
+# Credit: http://stackoverflow.com/questions/192249
+SKIP_INSTALL=false
+RUN_MINIFIED_TESTS=false
+for i in "$@"; do
+  # Match each space-separated argument passed to the shell file to a separate
+  # case label, based on a pattern. E.g. Match to --skip-install=*, where the
+  # asterisk refers to any characters following the equals sign, other than
+  # whitespace.
+  case $i in
+    --skip-install=*)
+    # Extract the value right of the equal sign by substringing the $i variable
+    # at the equal sign.
+    # http://tldp.org/LDP/abs/html/string-manipulation.html
+    SKIP_INSTALL="${i#*=}"
+    # Shifts the argument parameters over by one. E.g. $2 becomes $1, etc.
+    shift
+    ;;
 
-# Ensure that generated JS and CSS files are in place before running the tests.
-echo ""
-echo "  Running build task with concatenation only "
-echo ""
+    --run-minified-tests=*)
+    RUN_MINIFIED_TESTS="${i#*=}"
+    shift
+    ;;
 
-$NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js build
+    *)
+    echo Error: Unknown command line option: $i
+    ;;
+  esac
+done
 
-echo ""
-echo "  Running build task with concatenation and minification"
-echo ""
+if [ "$SKIP_INSTALL" = "false" ]; then
+  # Install third party dependencies
+  # TODO(sll): Make this work with fewer third-party dependencies.
+  bash scripts/install_third_party.sh
 
-$NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js build --minify=True
+  # Ensure that generated JS and CSS files are in place before running the tests.
+  echo ""
+  echo "  Running build task with concatenation only "
+  echo ""
 
-install_node_module karma 0.12.16
-install_node_module karma-jasmine 0.1.0
-install_node_module karma-coverage 0.5.2
-install_node_module karma-ng-html2js-preprocessor 0.1.0
-install_node_module karma-chrome-launcher 0.1.4
+  $NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js build
+
+  echo ""
+  echo "  Running build task with concatenation and minification"
+  echo ""
+
+  $NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js build --minify=True
+
+  install_node_module karma 0.12.16
+  install_node_module karma-jasmine 0.1.0
+  install_node_module karma-coverage 0.5.2
+  install_node_module karma-ng-html2js-preprocessor 0.1.0
+  install_node_module karma-chrome-launcher 0.1.4
+fi
 
 echo ""
 echo "  View interactive frontend test coverage reports by navigating to"
@@ -74,10 +106,12 @@ echo ""
 
 $NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.js
 
-echo ""
-echo "  Running test in production environment"
-echo ""
+if [ "$RUN_MINIFIED_TESTS" = "true" ]; then
+  echo ""
+  echo "  Running test in production environment"
+  echo ""
 
-$NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.js --minify=True
+  $NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.js --minify=True
+fi
 
 echo Done!
