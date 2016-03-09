@@ -2335,16 +2335,13 @@ div#ng-curtain {
   padding: 15px 40px;
 }
 
-.oppia-notifications-even-notification {
-  background-color: #dae5f4;
-  padding: 10px;
-  word-break: break-all;
+.md-card.oppia-outer-notification-card {
+  position: relative;
 }
 
-.oppia-notifications-odd-notification {
-  background-color: #b8d1f3;
-  padding: 10px;
-  word-break: break-all;
+.oppia-exploration-commit-notification {
+  background: lightgreen;
+  padding: 5px;
 }
 
 .oppia-notification-type {
@@ -2379,17 +2376,16 @@ div#ng-curtain {
 
 @media all and (max-width: 500px) {
   .oppia-notification-type,
-  .oppia-notification-activity-title,
-  .oppia-notification-last-updated,
-  .oppia-notification-author-username,
-  .oppia-notification-subject {
-    clear: both;
+  .oppia-notification-activity-title {
     float: left;
   }
 
-  .oppia-notification-activity-title,
+  .oppia-notification-type {
+    margin-right: 5px;
+  }
+
   .oppia-notification-author-username {
-    margin-left: -1px;
+    float: none;
   }
 }
 
