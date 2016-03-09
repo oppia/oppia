@@ -95,7 +95,7 @@ var UndoRedoService = function() {
   UndoRedoService.getCommittableChangeList = function() {
     var committableChangeList = [];
     for (var i = 0; i < _appliedChanges.length; i++) {
-      committableChangeList[i] = _appliedChanges[i].getChangeBackendObject();
+      committableChangeList[i] = _appliedChanges[i].getBackendChangeObject();
     }
     return committableChangeList;
   };

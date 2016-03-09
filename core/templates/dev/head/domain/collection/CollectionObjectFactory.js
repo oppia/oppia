@@ -31,7 +31,7 @@ oppia.factory('CollectionObjectFactory', [
       this._version = collectionBackendObject.version;
       this._nodes = [];
 
-      // This map acts a fast way of looking up a collection node for a given
+      // This map acts as a fast way of looking up a collection node for a given
       // exploration ID.
       this._explorationIdToNodeIndexMap = {};
       for (var i = 0; i < collectionBackendObject.nodes.length; i++) {

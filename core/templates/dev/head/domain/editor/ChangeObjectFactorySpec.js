@@ -31,10 +31,10 @@ describe('Factory for Change domain objects', function() {
     var applyFunc = jasmine.createSpy('applyChange');
     var reverseFunc = jasmine.createSpy('reverseChange');
 
-    var changeBackendObject = {
+    var backendChangeObject = {
       property_name: 'value'
     };
-    ChangeObjectFactory.create(changeBackendObject, applyFunc, reverseFunc);
+    ChangeObjectFactory.create(backendChangeObject, applyFunc, reverseFunc);
 
     expect(applyFunc).not.toHaveBeenCalled();
     expect(reverseFunc).not.toHaveBeenCalled();
@@ -44,11 +44,11 @@ describe('Factory for Change domain objects', function() {
     var applyFunc = jasmine.createSpy('applyChange');
     var reverseFunc = jasmine.createSpy('reverseChange');
 
-    var changeBackendObject = {
+    var backendChangeObject = {
       property_name: 'value'
     };
     var changeDomainObject = ChangeObjectFactory.create(
-      changeBackendObject, applyFunc, reverseFunc);
+      backendChangeObject, applyFunc, reverseFunc);
 
     var fakeDomainObject = {
       domain_property_name: 'fake value'
@@ -56,7 +56,7 @@ describe('Factory for Change domain objects', function() {
     changeDomainObject.applyChange(fakeDomainObject);
 
     expect(applyFunc).toHaveBeenCalledWith(
-      changeBackendObject, fakeDomainObject);
+      backendChangeObject, fakeDomainObject);
     expect(reverseFunc).not.toHaveBeenCalled();
   });
 
@@ -64,11 +64,11 @@ describe('Factory for Change domain objects', function() {
     var applyFunc = jasmine.createSpy('applyChange');
     var reverseFunc = jasmine.createSpy('reverseChange');
 
-    var changeBackendObject = {
+    var backendChangeObject = {
       property_name: 'value'
     };
     var changeDomainObject = ChangeObjectFactory.create(
-      changeBackendObject, applyFunc, reverseFunc);
+      backendChangeObject, applyFunc, reverseFunc);
 
     var fakeDomainObject = {
       domain_property_name: 'fake value'
@@ -76,22 +76,22 @@ describe('Factory for Change domain objects', function() {
     changeDomainObject.reverseChange(fakeDomainObject);
 
     expect(reverseFunc).toHaveBeenCalledWith(
-      changeBackendObject, fakeDomainObject);
+      backendChangeObject, fakeDomainObject);
     expect(applyFunc).not.toHaveBeenCalled();
   });
 
   it('should not receive changes to the provided change backend object',
       function() {
-    var changeBackendObject = {
+    var backendChangeObject = {
       property_name: 'value'
     };
     var changeDomainObject = ChangeObjectFactory.create(
-      changeBackendObject, function() {}, function() {});
+      backendChangeObject, function() {}, function() {});
 
-    var returnedBackendObject = changeDomainObject.getChangeBackendObject();
+    var returnedBackendObject = changeDomainObject.getBackendChangeObject();
     returnedBackendObject.property_name = 'new value';
 
-    expect(changeDomainObject.getChangeBackendObject()).toEqual({
+    expect(changeDomainObject.getBackendChangeObject()).toEqual({
       property_name: 'value'
     });
   });

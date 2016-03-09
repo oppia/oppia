@@ -80,7 +80,7 @@ describe('Skill list object factory', function() {
     ]);
   });
 
-  it('should override existing skills with setSkills()', function() {
+  it('should overwrite existing skills with setSkills()', function() {
     var skillList = SkillListObjectFactory.create(['first', 'second']);
     expect(skillList.getSkillCount()).toEqual(2);
 

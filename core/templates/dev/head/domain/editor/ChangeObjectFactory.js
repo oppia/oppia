@@ -25,8 +25,8 @@
 
 oppia.factory('ChangeObjectFactory', [function() {
     var Change = function(
-        changeBackendObject, applyChangeToObject, reverseChangeToObject) {
-      this._changeBackendObject = angular.copy(changeBackendObject);
+        backendChangeObject, applyChangeToObject, reverseChangeToObject) {
+      this._backendChangeObject = angular.copy(backendChangeObject);
       this._applyChangeToObject = applyChangeToObject;
       this._reverseChangeToObject = reverseChangeToObject;
     };
@@ -35,21 +35,21 @@ oppia.factory('ChangeObjectFactory', [function() {
 
     // Returns the JSON object which represents a backend python dict of this
     // change. Changes to this object are not reflected in this domain object.
-    Change.prototype.getChangeBackendObject = function() {
-      return angular.copy(this._changeBackendObject);
+    Change.prototype.getBackendChangeObject = function() {
+      return angular.copy(this._backendChangeObject);
     };
 
     // Applies this change to the related object (such as a frontend collection
     // domain object).
     Change.prototype.applyChange = function(domainObject) {
-      this._applyChangeToObject(this._changeBackendObject, domainObject);
+      this._applyChangeToObject(this._backendChangeObject, domainObject);
     };
 
     // Reverse-applies this change to the related object (such as a frontend
     // collection domain object). This method should only be used to reverse a
     // change that was previously applied by calling the applyChange() method.
     Change.prototype.reverseChange = function(domainObject) {
-      this._reverseChangeToObject(this._changeBackendObject, domainObject);
+      this._reverseChangeToObject(this._backendChangeObject, domainObject);
     };
 
     // Static class methods. Note that "this" is not available in static
@@ -61,9 +61,9 @@ oppia.factory('ChangeObjectFactory', [function() {
     // parameter and takes the same inputs, except it should reverse the change
     // for the provided domain object.
     Change.create = function(
-        changeBackendObject, applyChangeToObject, reverseChangeToObject) {
+        backendChangeObject, applyChangeToObject, reverseChangeToObject) {
       return new Change(
-        changeBackendObject, applyChangeToObject, reverseChangeToObject);
+        backendChangeObject, applyChangeToObject, reverseChangeToObject);
     };
 
     return Change;
