@@ -16,7 +16,6 @@
 
 """Common utilities for test classes."""
 
-import base64
 import contextlib
 import copy
 import inspect
@@ -35,7 +34,6 @@ from core.domain import exp_services
 from core.domain import rule_domain
 from core.domain import rights_manager
 from core.platform import models
-from google.appengine.api import urlfetch
 import feconf
 import jinja_utils
 import main
