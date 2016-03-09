@@ -139,6 +139,13 @@ class AnswersAudit(jobs.BaseMapReduceJobManager):
     _HANDLER_ERROR_RULE_COUNTER_KEY = 'ErrorRuleCounter'
 
     @classmethod
+    def _get_consecutive_dot_count(cls, string, idx):
+        for i in range(idx, len(string)):
+            if string[i] != '.':
+                return i - idx
+        return 0
+
+    @classmethod
     def entity_classes_to_map_over(cls):
         return [stats_models.StateRuleAnswerLogModel]
 
@@ -146,14 +153,20 @@ class AnswersAudit(jobs.BaseMapReduceJobManager):
     def map(item):
         item_id = item.id
         period_idx = item_id.index('.')
+        period_idx += (
+            AnswersAudit._get_consecutive_dot_count(item_id, period_idx) - 1)
         # exp_id = item_id[:period_idx]
 
         item_id = item_id[period_idx+1:]
         period_idx = item_id.index('.')
+        period_idx += (
+            AnswersAudit._get_consecutive_dot_count(item_id, period_idx) - 1)
         # state_name = item_id[:period_idx]
 
         item_id = item_id[period_idx+1:]
         period_idx = item_id.index('.')
+        period_idx += (
+            AnswersAudit._get_consecutive_dot_count(item_id, period_idx) - 1)
         handler_name = item_id[:period_idx]
         yield (handler_name, {
             'reduce_type': AnswersAudit._HANDLER_NAME_COUNTER_KEY
