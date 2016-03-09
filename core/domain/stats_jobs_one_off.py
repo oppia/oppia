@@ -210,13 +210,13 @@ class AnswersAudit(jobs.BaseMapReduceJobManager):
                 reduce_type = value_dict['reduce_type']
 
         if reduce_type == AnswersAudit._HANDLER_NAME_COUNTER_KEY:
-            rule_spec_strs = []
-            for value_str in stringified_values:
-                value_dict = ast.literal_eval(value_str)
-                rule_spec_strs.append(value_dict['rule_spec_str'])
+            rule_spec_strs = [
+                ast.literal_eval(value_str)['rule_spec_str']
+                for value_str in stringified_values
+            ]
             yield (
                 'Found handler "%s" %d time(s), ALL RULE SPEC STRINGS: \n%s' % (
-                    key, reduce_count, rule_spec_strs))
+                    key, reduce_count, rule_spec_strs[:10]))
         elif reduce_type == AnswersAudit._HANDLER_FUZZY_RULE_COUNTER_KEY:
             yield 'Found fuzzy rules %d time(s)' % reduce_count
         elif reduce_type == AnswersAudit._HANDLER_DEFAULT_RULE_COUNTER_KEY:
