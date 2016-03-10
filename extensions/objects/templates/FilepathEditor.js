@@ -109,7 +109,8 @@ oppia.directive('filepathEditor', [
             return;
           }
           if (!file.type.match('image.*')) {
-            alertsService.addWarning('This file is not recognized as an image.');
+            alertsService.addWarning(
+              'This file is not recognized as an image.');
             return;
           }
 
