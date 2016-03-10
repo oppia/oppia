@@ -49,11 +49,15 @@ oppia.factory('ExplorationCreationButtonService', [
           '$scope', '$modalInstance', 'categoriesForDropdown', 'isUploadModal',
           function(
               $scope, $modalInstance, categoriesForDropdown, isUploadModal) {
+            $scope.createNewTitle = (
+              isUploadModal ? 'Upload an Exploration' :
+              'Create New Exploration');
+            $scope.activityName = 'exploration';
             $scope.categoriesForDropdown = categoriesForDropdown;
-            $scope.newExplorationTitle = '';
-            $scope.newExplorationCategory = '';
-            $scope.newExplorationObjective = '';
-            $scope.newExplorationLanguageCode = GLOBALS.DEFAULT_LANGUAGE_CODE;
+            $scope.newActivityTitle = '';
+            $scope.newActivityCategory = '';
+            $scope.newActivityObjective = '';
+            $scope.newActivityLanguageCode = GLOBALS.DEFAULT_LANGUAGE_CODE;
             $scope.isUploadModal = isUploadModal;
             $scope.changedAtLeastOnce = false;
 
@@ -125,7 +129,7 @@ oppia.factory('ExplorationCreationButtonService', [
         // The $timeout seems to be needed in order to give the modal time to
         // render.
         $timeout(function() {
-          focusService.setFocus('newExplorationModalOpened');
+          focusService.setFocus('newActivityModalOpened');
         }, 300);
       });
 

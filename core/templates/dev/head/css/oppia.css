@@ -1015,8 +1015,8 @@ md-card.oppia-gallery-tile {
 }
 
 .oppia-html-select .oppia-html-select-option oppia-noninteractive-image {
-  display: block;
-  margin-bottom: -22px;
+  display: inline-block;
+  margin-bottom: 0;
 }
 
 .oppia-create-exploration-label {
@@ -1392,14 +1392,14 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-collection-player-tiles-container {
   height: 100%;
+  margin-top: 60px;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 60px;
-  max-width: 844px;
+  max-width: 800px;
   min-height: 500px;
   padding-bottom: 25px;
+  padding-left: 50px;
   position: relative;
-  padding-left: 1em;
 }
 .oppia-collection-player-tiles-container .oppia-page-heading {
   color: #fff;
@@ -1416,13 +1416,6 @@ pre.oppia-pre-wrapped-text {
   margin-top: 12px;
   margin-bottom: 6px;
 }
-
-@media only screen and (max-width: 500px) {
-    .oppia-collection-player-small-text {
-      text-align: center;
-      display: block;
-    }
-  }
 
 /* Styles for the statistics page. */
 
@@ -2294,6 +2287,27 @@ div#ng-curtain {
 .oppia-exploration-warnings-count {
   margin-left: -3px;
 }
+
+.oppia-exploration-open-threads-indicator {
+  position: absolute;
+  right: 5px;
+  width: 16px;
+  bottom: 10px;
+  height: 13px;
+  text-align: center;
+  border-radius: 10%;
+}
+.oppia-exploration-open-threads-color {
+  background-color: #4078C0;
+  border: 1px solid rgb(243, 243, 243);
+}
+.oppia-exploration-open-threads-count {
+  font-size: 9px;
+  position: relative;
+  bottom: 8px;
+  color: white;
+}
+
 .dropdown-menu.oppia-exploration-warnings-box {
   background: #fcf8e3;
 }
@@ -2428,18 +2442,12 @@ div#ng-curtain {
 }
 
 .oppia-page-heading {
-  margin-bottom: 24px;
+  margin-bottom: 5px;
 }
 
 .oppia-page-heading-subtext {
   font-size: smaller;
   opacity: 0.7;
-}
-
-@media(max-width: 500px) {
-  .oppia-page-heading, .oppia-page-heading-subtext {
-    text-align: center;
-  }
 }
 
 .oppia-rating-star-active {

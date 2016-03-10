@@ -145,8 +145,13 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         });
 
         $scope.onSelectNewRuleType = function(newRuleType) {
+          var oldRuleInputs = angular.copy($scope.rule.inputs) || {};
+          var oldRuleInputTypes = angular.copy($scope.rule.inputTypes) || {};
+
           $scope.rule.rule_type = newRuleType;
           $scope.rule.inputs = {};
+          $scope.rule.inputTypes = {};
+
           var tmpRuleDescription = computeRuleDescriptionFragments();
           // This provides the list of choices for the multiple-choice and
           // image-click interactions.
@@ -163,6 +168,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             if (tmpRuleDescription.match(PATTERN)[2]) {
               varType = tmpRuleDescription.match(PATTERN)[2].substring(1);
             }
+            $scope.rule.inputTypes[varName] = varType;
 
             // TODO(sll): Find a more robust way of doing this. For example,
             // we could associate a particular varName with answerChoices
@@ -178,6 +184,13 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             }
 
             tmpRuleDescription = tmpRuleDescription.replace(PATTERN, ' ');
+          }
+
+          for (var key in $scope.rule.inputs) {
+            if (oldRuleInputs.hasOwnProperty(key) &&
+              oldRuleInputTypes[key] === $scope.rule.inputTypes[key]) {
+              $scope.rule.inputs[key] = oldRuleInputs[key];
+            }
           }
         };
 

@@ -292,9 +292,10 @@ oppia.controller('ExplorationEditor', [
 oppia.controller('EditorNavigation', [
   '$scope', '$rootScope', '$timeout', 'routerService',
   'explorationRightsService', 'explorationWarningsService',
+  'threadDataService',
   function(
     $scope, $rootScope, $timeout, routerService,
-    explorationRightsService, explorationWarningsService) {
+    explorationRightsService, explorationWarningsService, threadDataService) {
     $scope.postTutorialHelpPopoverIsShown = false;
 
     $scope.$on('openPostTutorialHelpPopover', function() {
@@ -325,6 +326,7 @@ oppia.controller('EditorNavigation', [
     $scope.selectStatsTab = routerService.navigateToStatsTab;
     $scope.selectHistoryTab = routerService.navigateToHistoryTab;
     $scope.selectFeedbackTab = routerService.navigateToFeedbackTab;
+    $scope.getOpenThreadsCount = threadDataService.getOpenThreadsCount;
   }
 ]);
 
@@ -539,6 +541,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         if (!changesExist) {
           alertsService.addWarning('Your changes cancel each other out, ' +
             'so nothing has been saved.');
+          $scope.saveModalIsOpening = false;
+          changeListService.discardAllChanges();
           return;
         }
 

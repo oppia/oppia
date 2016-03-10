@@ -265,8 +265,10 @@ class TestBase(unittest.TestCase):
 
         self.logout()
 
-    def set_admins(self, admin_usernames):
-        """Set the ADMIN_USERNAMES property."""
+    def set_config_property(self, config_obj, new_config_value):
+        """Sets a given configuration object's value to the new value specified
+        using a POST request.
+        """
         self._stash_current_user_env()
 
         self.login('tmpsuperadmin@example.com', is_super_admin=True)
@@ -275,29 +277,22 @@ class TestBase(unittest.TestCase):
         self.post_json('/adminhandler', {
             'action': 'save_config_properties',
             'new_config_property_values': {
-                config_domain.ADMIN_USERNAMES.name: admin_usernames,
+                config_obj.name: new_config_value,
             }
         }, csrf_token)
         self.logout()
 
         self._restore_stashed_user_env()
+
+    def set_admins(self, admin_usernames):
+        """Set the ADMIN_USERNAMES property."""
+        self.set_config_property(
+            config_domain.ADMIN_USERNAMES, admin_usernames)
 
     def set_moderators(self, moderator_usernames):
         """Set the MODERATOR_USERNAMES property."""
-        self._stash_current_user_env()
-
-        self.login('tmpsuperadmin@example.com', is_super_admin=True)
-        response = self.testapp.get('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json('/adminhandler', {
-            'action': 'save_config_properties',
-            'new_config_property_values': {
-                config_domain.MODERATOR_USERNAMES.name: moderator_usernames,
-            }
-        }, csrf_token)
-        self.logout()
-
-        self._restore_stashed_user_env()
+        self.set_config_property(
+            config_domain.MODERATOR_USERNAMES, moderator_usernames)
 
     def get_current_logged_in_user_id(self):
         return os.environ['USER_ID']
