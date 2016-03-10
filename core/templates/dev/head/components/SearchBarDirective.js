@@ -25,11 +25,11 @@ oppia.directive('searchBar', [function() {
     controller: [
       '$scope', '$rootScope', '$timeout', '$window', 'searchService',
       'oppiaDebouncer', 'ExplorationCreationButtonService', 'urlService',
-      'CATEGORY_LIST', 'siteAnalyticsService',
+      'CATEGORY_LIST',
       function(
           $scope, $rootScope, $timeout, $window, searchService,
           oppiaDebouncer, ExplorationCreationButtonService, urlService,
-          CATEGORY_LIST, siteAnalyticsService) {
+          CATEGORY_LIST) {
         $scope.searchIsLoading = false;
         $scope.ALL_CATEGORIES = CATEGORY_LIST.map(function(categoryName) {
           return {
