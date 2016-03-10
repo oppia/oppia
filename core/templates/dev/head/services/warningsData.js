@@ -83,7 +83,7 @@ oppia.factory('alertsService', ['$log', function($log) {
   var infoMessagesSoFar = 0;
 
   /**
-   * Adds a warning message to the butterbar.
+   * Adds a warning message.
    * @param {string} warning - The warning message to display.
    */
   alertsService.addWarning = function(warning) {
@@ -92,12 +92,48 @@ oppia.factory('alertsService', ['$log', function($log) {
     if (warningsSoFar > MAX_TOTAL_WARNINGS) {
       return;
     }
-
-    alertsService.warnings = [warning];
+    alertsService.warnings.push(warning);
   };
 
+  /**
+   * Adds a warning in the same way as addWarning(), except it also throws an
+   * exception to cause a hard failure in the frontend.
+   * @param {string} warning - The warning message to display.
+   */
+  alertsService.fatalWarning = function(warning) {
+    alertsService.addWarning(warning);
+    throw new Error(warning);
+  };
+
+  /**
+   * Deletes the warning from the warnings list.
+   * @param {string} warning - The warning message to be deleted.
+   */
+  alertsService.deleteWarning = function(warning) {
+    //console.log("Deleting message!");
+    //warningsData.warnings.splice(index, 1);
+    var warnings = alertsService.warnings;
+    var newWarnings = [];
+    for(var i = 0; i < warnings.length; i++) {
+      if (warnings[i] != warning) {
+        newWarnings.push(warnings[i]);
+      }
+    }
+    alertsService.warnings = newWarnings;
+  };
+
+  /**
+   * Clears all warnings.
+   */
+  alertsService.clearWarnings = function() {
+    alertsService.warnings = [];
+  };
+
+  /**
+   * Adds an info message(FYI-type messages)
+   * @param {string} message - The info message to display.
+   */
   alertsService.addInfoMessage = function(message) {
-    $log.error(message);
     infoMessagesSoFar++;
     if (infoMessagesSoFar > MAX_TOTAL_INFO_MESSAGES) {
       return;
@@ -105,40 +141,52 @@ oppia.factory('alertsService', ['$log', function($log) {
     alertsService.infoMessages.push(message);
   };
  
-  alertsService.deleteInfoMessage = function(message, index) {
-    console.log("Deleting info message!");
-    var info = alertsService.infoMessages;
-    var new_info = [];
-    for(var i = 0; i < info.length; i++) {
-      if (info[i] != message) {
-        new_info.push(info[i]);
+  /**
+   * Deletes the message from the info messages list
+   * @param {string} message - Message to be deleted.
+   */
+  alertsService.deleteInfoMessage = function(message) {
+    var infoMessages = alertsService.infoMessages;
+    var newInfoMessages = [];
+    for(var i = 0; i < infoMessages.length; i++) {
+      if (infoMessages[i] != message) {
+        newInfoMessages.push(infoMessages[i]);
       }
     }
-    alertsService.infoMessages = new_info;
-    //alertsService.infoMessages.splice(index, 1);
+    alertsService.infoMessages = newInfoMessages;
+  };
+
+  /**
+   * Clears all info messages.
+   */
+  alertsService.clearInfoMessages = function() {
+    alertsService.infoMessages = [];
   };
 
   return alertsService;
 
 }]);
 
-oppia.directive('infoMessage', ['$timeout', function($timeout){
+oppia.directive('infoMessage', ['$timeout', function($timeout) {
   return {
     restrict: 'E',
     scope: {
-      message: '=messageContent',
-      messageIndex: '=',
+      getMessage: '&messageContent',
+      getMessageIndex: '&messageIndex',
     },
     template: '<div class="oppia-info-message"></div>',
-    controller: ['$scope', 'alertsService', 'toastr', function($scope, alertsService, toastr) {
-      $scope.alertsService = alertsService;
-      $scope.toastr = toastr;
-    }],
+    controller: [
+      '$scope', 'alertsService', 'toastr', 
+      function($scope, alertsService, toastr) {
+        $scope.alertsService = alertsService;
+        $scope.toastr = toastr;
+      }
+    ],
     link: function(scope, element, attrs) {
-      scope.toastr.success(scope.message, {
+      var message = scope.getMessage();
+      scope.toastr.success(message, {
         onHidden: function() {
-          scope.alertsService.deleteInfoMessage(
-            scope.message, scope.messageIndex);
+          scope.alertsService.deleteInfoMessage(message);
         }
       });
     }
