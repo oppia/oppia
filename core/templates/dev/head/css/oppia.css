@@ -1711,6 +1711,8 @@ oppia-parameter {
 
 .oppia-dashboard-row {
   cursor: pointer;
+  background-color: #fff;
+  margin-bottom: -5px;
 }
 .oppia-dashboard-row:hover {
   background: #eee;
@@ -2319,6 +2321,7 @@ div#ng-curtain {
   position: relative;
   width: 660px;
 }
+
 .oppia-page-card {
   background: rgb(255,255,255);
   margin-left: auto;
@@ -2331,16 +2334,16 @@ div#ng-curtain {
   margin-bottom: 10px;
 }
 
+.oppia-notifications-tray {
+  margin-left: -8px;
+}
+
 .oppia-notifications-dashboard-card {
   padding: 15px 40px;
 }
 
-.md-card.oppia-outer-notification-card {
-  position: relative;
-}
-
-.oppia-exploration-commit-notification {
-  background: lightgreen;
+.oppia-exploration-commit-notification,
+.oppia-feedback-notification {
   padding: 5px;
 }
 
@@ -2349,7 +2352,6 @@ div#ng-curtain {
 }
 
 .oppia-notification-activity-title {
-  float: left;
   margin-left: 5px;
 }
 
@@ -2375,8 +2377,7 @@ div#ng-curtain {
 }
 
 @media all and (max-width: 500px) {
-  .oppia-notification-type,
-  .oppia-notification-activity-title {
+  .oppia-notification-type {
     float: left;
   }
 
