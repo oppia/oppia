@@ -28,17 +28,17 @@ oppia.directive('collectionDetailsEditorDirective', [function() {
     },
     templateUrl: 'inline/collection_details_editor_directive',
     controller: ['$scope', 'CollectionUpdateService',
-      'CollectionNodeObjectFactory', 'warningsData', function(
+      'CollectionNodeObjectFactory', 'alertsService', function(
       $scope, CollectionUpdateService, CollectionNodeObjectFactory,
-      warningsData) {
+      alertsService) {
       $scope.addExploration = function() {
         if (!$scope.newExplorationId) {
-          warningsData.addWarning('Cannot add an empty exploration ID.');
+          alertsService.addWarning('Cannot add an empty exploration ID.');
           return;
         }
         var collection = $scope.getCollection();
         if (collection.containsCollectionNode($scope.newExplorationId)) {
-          warningsData.addWarning(
+          alertsService.addWarning(
             'Exploration with id ' + $scope.newExplorationId +
             ' is already added');
           return;
@@ -50,7 +50,7 @@ oppia.directive('collectionDetailsEditorDirective', [function() {
 
       $scope.updateCollectionTitle = function() {
         if (!$scope.newCollectionTitle) {
-          warningsData.addWarning('Cannot set empty collection title.');
+          alertsService.addWarning('Cannot set empty collection title.');
           return;
         }
         var collection = $scope.getCollection();
@@ -61,7 +61,7 @@ oppia.directive('collectionDetailsEditorDirective', [function() {
 
       $scope.updateCollectionCategory = function() {
         if (!$scope.newCollectionCategory) {
-          warningsData.addWarning('Cannot set empty collection category.');
+          alertsService.addWarning('Cannot set empty collection category.');
           return;
         }
         var collection = $scope.getCollection();
@@ -72,7 +72,7 @@ oppia.directive('collectionDetailsEditorDirective', [function() {
 
       $scope.updateCollectionObjective = function() {
         if (!$scope.newCollectionObjective) {
-          warningsData.addWarning('Cannot set empty collection objective.');
+          alertsService.addWarning('Cannot set empty collection objective.');
           return;
         }
         var collection = $scope.getCollection();

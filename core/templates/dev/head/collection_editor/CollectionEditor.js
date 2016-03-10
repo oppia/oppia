@@ -31,11 +31,11 @@ oppia.constant(
 oppia.controller('CollectionEditor', ['$scope',
   'WritableCollectionBackendApiService', 'CollectionRightsBackendApiService',
   'CollectionObjectFactory', 'SkillListObjectFactory',
-  'CollectionUpdateService', 'UndoRedoService', 'warningsData', function(
+  'CollectionUpdateService', 'UndoRedoService', 'alertsService', function(
     $scope, WritableCollectionBackendApiService,
     CollectionRightsBackendApiService, CollectionObjectFactory,
     SkillListObjectFactory, CollectionUpdateService, UndoRedoService,
-    warningsData) {
+    alertsService) {
     $scope.collection = null;
     $scope.collectionId = GLOBALS.collectionId;
     $scope.collectionSkillList = SkillListObjectFactory.create([]);
@@ -49,7 +49,7 @@ oppia.controller('CollectionEditor', ['$scope',
             collectionBackendObject);
           $scope.collectionSkillList.setSkills(collectionBackendObject.skills);
         }, function(error) {
-          warningsData.addWarning(
+          alertsService.addWarning(
             error || 'There was an error loading the collection.');
         });
 
@@ -82,7 +82,7 @@ oppia.controller('CollectionEditor', ['$scope',
           $scope.collectionSkillList.setSkills(collectionBackendObject.skills);
           UndoRedoService.clearChanges();
         }, function(error) {
-          warningsData.addWarning(
+          alertsService.addWarning(
             error || 'There was an error updating the collection.');
         });
     };
@@ -99,7 +99,7 @@ oppia.controller('CollectionEditor', ['$scope',
           // instead. The rights object should be loaded with the collection.
           $scope.isPublic = true;
         }, function() {
-          warningsData.addWarning(
+          alertsService.addWarning(
             'There was an error when publishing the collection.');
         });
     };
