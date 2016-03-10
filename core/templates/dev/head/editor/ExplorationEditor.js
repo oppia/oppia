@@ -397,11 +397,12 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     $scope.discardChanges = function() {
       var confirmDiscard = confirm('Do you want to discard your changes?');
       if (confirmDiscard) {
-        warningsData.clear();
+        alertsService.clearWarnings();
         $rootScope.$broadcast('externalSave');
 
         $scope.isDiscardInProgress = true;
         changeListService.discardAllChanges();
+        alertsService.addInfoMessage('Changes discarded.');
         $rootScope.$broadcast('initExplorationPage', function() {
           $scope.lastSaveOrDiscardAction = 'discard';
           $scope.isDiscardInProgress = false;
@@ -440,7 +441,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
     $scope.showPublishExplorationModal = function() {
       $scope.publishModalIsOpening = true;
-      warningsData.clear();
+      alertsService.clearWarnings();
       var modalInstance = $modal.open({
         templateUrl: 'modals/publishExploration',
         backdrop: true,
@@ -450,7 +451,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              warningsData.clear();
+              alertsService.clearWarnings();
             };
           }]
       });
@@ -508,7 +509,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         version: explorationData.data.version
       }).success(function(data) {
         if (data.error) {
-          warningsData.addWarning(data.error);
+          alertsService.addWarning(data.error);
           return;
         }
 
@@ -536,7 +537,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
           deletedGadgets.length > 0);
 
         if (!changesExist) {
-          warningsData.addWarning('Your changes cancel each other out, ' +
+          alertsService.addWarning('Your changes cancel each other out, ' +
             'so nothing has been saved.');
           return;
         }
@@ -544,11 +545,11 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         if (!explorationRightsService.isPrivate() && warningMessage) {
           // If the exploration is not private, warnings should be fixed before
           // it can be saved.
-          warningsData.addWarning(warningMessage);
+          alertsService.addWarning(warningMessage);
           return;
         }
 
-        warningsData.clear();
+        alertsService.clearWarnings();
 
         // If the modal is open, do not open another one.
         if (_modalIsOpen) {
@@ -728,7 +729,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               };
               $scope.cancel = function() {
                 $modalInstance.dismiss('cancel');
-                warningsData.clear();
+                alertsService.clearWarnings();
               };
             }
           ]
@@ -757,6 +758,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
             $rootScope.$broadcast('refreshVersionHistory', {
               forceRefresh: true
             });
+            alertsService.addInfoMessage('Changes saved.');
             $scope.lastSaveOrDiscardAction = 'save';
             $scope.isSaveInProgress = false;
           }, function() {

@@ -20,10 +20,10 @@
  */
 
 oppia.controller('ExplorationStatistics', [
-  '$scope', '$http', '$modal', 'warningsData', 'explorationStatesService',
+  '$scope', '$http', '$modal', 'alertsService', 'explorationStatesService',
   'explorationData', 'computeGraphService', 'oppiaDatetimeFormatter',
   function(
-      $scope, $http, $modal, warningsData, explorationStatesService,
+      $scope, $http, $modal, alertsService, explorationStatesService,
       explorationData, computeGraphService, oppiaDatetimeFormatter) {
     $scope.COMPLETION_RATE_CHART_OPTIONS = {
       chartAreaWidth: 300,
@@ -117,7 +117,7 @@ oppia.controller('ExplorationStatistics', [
     };
 
     $scope.showStateStatsModal = function(stateName, improvementType) {
-      warningsData.clear();
+      alertsService.clearWarnings();
 
       $http.get(
         '/createhandler/state_rules_stats/' + $scope.explorationId + '/' +
@@ -180,7 +180,7 @@ oppia.controller('ExplorationStatistics', [
 
               $scope.cancel = function() {
                 $modalInstance.dismiss('cancel');
-                warningsData.clear();
+                alertsService.clearWarnings();
               };
             }
           ]

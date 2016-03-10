@@ -676,11 +676,11 @@ oppia.factory('rteHelperService', [
 oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [
     '$delegate', '$modal', '$timeout', 'focusService', 'taRegisterTool',
-    'rteHelperService', 'warningsData', 'explorationContextService',
+    'rteHelperService', 'alertsService', 'explorationContextService',
     'PAGE_CONTEXT',
     function(
         taOptions, $modal, $timeout, focusService, taRegisterTool,
-        rteHelperService, warningsData, explorationContextService,
+        rteHelperService, alertsService, explorationContextService,
         PAGE_CONTEXT) {
       taOptions.disableSanitizer = true;
       taOptions.classes.textEditor = 'form-control oppia-rte-content';
@@ -777,7 +777,7 @@ oppia.config(['$provide', function($provide) {
               if (!canUseFs && componentDefn.requiresFs) {
                 var FS_UNAUTHORIZED_WARNING = 'Unfortunately, only ' +
                   'exploration authors can make changes involving files.';
-                warningsData.addWarning(FS_UNAUTHORIZED_WARNING);
+                alertsService.addWarning(FS_UNAUTHORIZED_WARNING);
                 // Without this, the view will not update to show the warning.
                 textAngular.$editor().$parent.$apply();
                 return;

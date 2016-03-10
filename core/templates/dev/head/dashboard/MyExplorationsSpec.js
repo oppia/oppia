@@ -52,7 +52,7 @@ describe('MyExplorations controller', function() {
           showCreateExplorationModal: null,
           showUploadExplorationModal: null
         },
-        warningsData: null
+        alertsService: null
       });
     }));
 

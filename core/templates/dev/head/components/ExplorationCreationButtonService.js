@@ -21,10 +21,10 @@
 // Service for the create/upload exploration buttons and modals.
 oppia.factory('ExplorationCreationButtonService', [
   '$filter', '$http', '$modal', '$timeout', '$rootScope', '$window',
-  'validatorsService', 'warningsData', 'focusService', 'siteAnalyticsService',
+  'validatorsService', 'alertsService', 'focusService', 'siteAnalyticsService',
   function(
       $filter, $http, $modal, $timeout, $rootScope, $window,
-      validatorsService, warningsData, focusService, siteAnalyticsService) {
+      validatorsService, alertsService, focusService, siteAnalyticsService) {
     var getModalInstance = function(categoryList, isUploadModal) {
       var modalInstance = $modal.open({
         backdrop: true,
@@ -67,7 +67,7 @@ oppia.factory('ExplorationCreationButtonService', [
               }
 
               if (!category) {
-                warningsData.addWarning(
+                alertsService.addWarning(
                   'Please specify a category for this exploration.');
                 return;
               }
@@ -80,7 +80,7 @@ oppia.factory('ExplorationCreationButtonService', [
               if ($scope.isUploadModal) {
                 var file = document.getElementById('newFileInput').files[0];
                 if (!file || !file.size) {
-                  warningsData.addWarning('Empty file detected.');
+                  alertsService.addWarning('Empty file detected.');
                   return;
                 }
                 returnObj.yamlFile = file;
@@ -115,7 +115,7 @@ oppia.factory('ExplorationCreationButtonService', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              warningsData.clear();
+              alertsService.clearWarnings();
             };
           }
         ]
@@ -134,7 +134,7 @@ oppia.factory('ExplorationCreationButtonService', [
 
     return {
       showCreateExplorationModal: function(categoryList) {
-        warningsData.clear();
+        alertsService.clearWarnings();
 
         siteAnalyticsService.registerOpenExplorationCreationModalEvent();
 
@@ -163,7 +163,7 @@ oppia.factory('ExplorationCreationButtonService', [
         });
       },
       showUploadExplorationModal: function(categoryList) {
-        warningsData.clear();
+        alertsService.clearWarnings();
 
         getModalInstance(categoryList, true).result.then(function(result) {
           var title = result.title;
@@ -200,7 +200,7 @@ oppia.factory('ExplorationCreationButtonService', [
           }).fail(function(data) {
             var transformedData = data.responseText.substring(5);
             var parsedResponse = JSON.parse(transformedData);
-            warningsData.addWarning(
+            alertsService.addWarning(
               parsedResponse.error || 'Error communicating with server.');
             $rootScope.loadingMessage = '';
             $scope.$apply();
