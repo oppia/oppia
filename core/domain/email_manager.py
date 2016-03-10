@@ -263,7 +263,7 @@ def send_moderator_action_email(
 def _generate_hash(
         recipient_id, email_subject, email_html_body):
     """Generate hash for a given recipient_id, email_subject
-        and cleaned email_html_body.
+    and cleaned email_html_body.
     """
 
     hash_value = utils.convert_to_hash(

@@ -81,10 +81,6 @@ class SentEmailModel(base_models.BaseModel):
             'The id generator for SentEmailModel is producing too many '
             'collisions.')
 
-    def put(self):
-        """Once written, instances of this class should be read-only."""
-        raise NotImplementedError
-
     @classmethod
     def create(
             cls, recipient_id, recipient_email, sender_id, sender_email,
