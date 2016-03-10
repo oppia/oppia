@@ -13,68 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for handling warnings.
+ * @fileoverview Factory for handling warnings and info messages.
  *
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.factory('warningsData', ['$log', function($log) {
-  var warningsData = {
-    warnings: [],
-    infoMessages: [],
-  };
-  // This is to prevent infinite loops.
-  var MAX_TOTAL_WARNINGS = 100;
-  var MAX_TOTAL_INFO_MESSAGES = 100;
-  var warningsSoFar = 0;
-  var infoMessagesSoFar = 0;
-
-  /**
-   * Adds a warning message to the butterbar.
-   * @param {string} warning - The warning message to display.
-   */
-  warningsData.addWarning = function(warning) {
-    $log.error(warning);
-    warningsSoFar++;
-    if (warningsSoFar > MAX_TOTAL_WARNINGS) {
-      return;
-    }
-
-    warningsData.warnings = [warning];
-  };
-
-  /**
-   * Adds a warning in the same way as addWarning(), except it also throws an
-   * exception to cause a hard failure in the frontend.
-   */
-  warningsData.fatalWarning = function(warning) {
-    warningsData.addWarning(warning);
-    throw new Error(warning);
-  };
-
-  /**
-   * Deletes the warning at a given index.
-   * @param {int} index - The index of the warning to delete.
-   */
-  warningsData.deleteWarning = function(index) {
-    console.log("Deleting message!");
-    warningsData.warnings.splice(index, 1);
-  };
-
-  /**
-   * Clears all warnings.
-   */
-  warningsData.clear = function() {
-    warningsData.warnings = [];
-  };
-
-  return warningsData;
-}]);
-
 oppia.factory('alertsService', ['$log', function($log) {
   var alertsService = {
     warnings: [],
-    infoMessages: [],
+    infoMessages: []
   };
   // This is to prevent infinite loops.
   var MAX_TOTAL_WARNINGS = 100;
@@ -110,11 +57,9 @@ oppia.factory('alertsService', ['$log', function($log) {
    * @param {string} warning - The warning message to be deleted.
    */
   alertsService.deleteWarning = function(warning) {
-    //console.log("Deleting message!");
-    //warningsData.warnings.splice(index, 1);
     var warnings = alertsService.warnings;
     var newWarnings = [];
-    for(var i = 0; i < warnings.length; i++) {
+    for (var i = 0; i < warnings.length; i++) {
       if (warnings[i] != warning) {
         newWarnings.push(warnings[i]);
       }
@@ -140,7 +85,7 @@ oppia.factory('alertsService', ['$log', function($log) {
     }
     alertsService.infoMessages.push(message);
   };
- 
+
   /**
    * Deletes the message from the info messages list
    * @param {string} message - Message to be deleted.
@@ -148,7 +93,7 @@ oppia.factory('alertsService', ['$log', function($log) {
   alertsService.deleteInfoMessage = function(message) {
     var infoMessages = alertsService.infoMessages;
     var newInfoMessages = [];
-    for(var i = 0; i < infoMessages.length; i++) {
+    for (var i = 0; i < infoMessages.length; i++) {
       if (infoMessages[i] != message) {
         newInfoMessages.push(infoMessages[i]);
       }
@@ -164,25 +109,24 @@ oppia.factory('alertsService', ['$log', function($log) {
   };
 
   return alertsService;
-
 }]);
 
-oppia.directive('infoMessage', ['$timeout', function($timeout) {
+oppia.directive('infoMessage', [function() {
   return {
     restrict: 'E',
     scope: {
       getMessage: '&messageContent',
-      getMessageIndex: '&messageIndex',
+      getMessageIndex: '&messageIndex'
     },
     template: '<div class="oppia-info-message"></div>',
     controller: [
-      '$scope', 'alertsService', 'toastr', 
+      '$scope', 'alertsService', 'toastr',
       function($scope, alertsService, toastr) {
         $scope.alertsService = alertsService;
         $scope.toastr = toastr;
       }
     ],
-    link: function(scope, element, attrs) {
+    link: function(scope) {
       var message = scope.getMessage();
       scope.toastr.success(message, {
         onHidden: function() {
@@ -190,5 +134,5 @@ oppia.directive('infoMessage', ['$timeout', function($timeout) {
         }
       });
     }
-  }
+  };
 }]);

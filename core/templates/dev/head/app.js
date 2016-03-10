@@ -110,9 +110,6 @@ oppia.config(['$provide', function($provide) {
 oppia.config(['toastrConfig', function(toastrConfig) {
   angular.extend(toastrConfig, {
     allowHtml: false,
-    //closeButton: true,
-    //closeHtml: '<button>&times;</button>',
-    //extendedTimeOut: 1000,
     iconClasses: {
       error: 'toast-error',
       info: 'toast-info',
@@ -124,8 +121,7 @@ oppia.config(['toastrConfig', function(toastrConfig) {
     progressBar: false,
     tapToDismiss: true,
     timeOut: 1500,
-    titleClass: 'toast-title',
-    //toastClass: 'oppia-toast'
+    titleClass: 'toast-title'
   });
 }]);
 
