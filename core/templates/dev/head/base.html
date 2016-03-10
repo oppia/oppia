@@ -112,9 +112,6 @@
               <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation">
                 <div class="navbar-container">
                   <div class="navbar-header protractor-test-navbar-header pull-left">
-                    <a ng-click="openSidebar()" class="navbar-brand oppia-navbar-menu oppia-transition-200">
-                      <img src="/images/general/menu.png">
-                    </a>
                     <a class="oppia-navbar-brand-name oppia-transition-200" href="/gallery" focus-on="<[LABEL_FOR_CLEARING_FOCUS]>">
                       <img src="/images/logo/288x128_logo_white.png" class="oppia-logo">
                     </a>
@@ -123,7 +120,6 @@
                       <img src="/images/logo/288x128_logo_mint.png" itemprop="image">
                     </a>
                   </div>
-
                   {% if nav_mode != 'signup' %}
                     <div class="navbar-header pull-right">
                       <ul class="nav oppia-navbar-nav oppia-navbar-profile">
@@ -220,9 +216,58 @@
                             </ul>
                           </li>
                         {% endif %}
-                      </ul>
+                    {% if nav_mode != 'create' and nav_mode != 'explore' %}
+                    <div class="pull-right oppia-navbar-button-container">
+                      <!-- NOTE: If you change the links here, please make the corresponding change in the 'no results' message. -->
+                      {% if not username %}
+                        <!-- User must complete the registration process. -->
+                        <a class="btn oppia-navbar-add-exploration-button protractor-test-create-exploration oppia-transition-200"
+                           href ng-click="onRedirectToLogin('{{login_url}}')">
+                          <span class="oppia-navbar-add-exploration-button-plus">+</span>
+                          <span>Create Exploration</span>
+                        </a>
+                      {% else %}
+                        <a class="btn oppia-navbar-add-exploration-button protractor-test-create-exploration oppia-transition-200"
+                           ng-click="showCreateExplorationModal()">
+                          <span class="oppia-navbar-add-exploration-button-plus">+</span>
+                          <span>Create Exploration</span>
+                        </a>
+                        {% if allow_yaml_file_upload %}
+                          <a class="btn oppia-navbar-add-exploration-button oppia-transition-200"
+                             ng-click="showUploadExplorationModal()">
+                            <span class="oppia-navbar-add-exploration-button-plus">+</span>
+                            <span>Upload Exploration</span>
+                          </a>
+                        {% endif %}
+                      {% endif %}
                     </div>
+                    <li class="dropdown oppia-clickable-dropdown pull-right" >
+                      <a class="oppia-navbar-profile-dropdown-toggle" style="font-size: 1em; padding-top: 17px;" href="/forum">
+                    Forum
+                    </a>
+                    </li>
+                    <li class="dropdown oppia-clickable-dropdown pull-right">
+                      <a class="oppia-navbar-profile-dropdown-toggle" style="font-size: 1em; padding-top: 17px;" href="/about">
+                      About</a>
+                      <ul class="dropdown-menu oppia-navbar-profile-dropdown __web-inspector-hide-shortcut__" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
+                <li><a href="/about#our-mission">Mission</a></li>
+                <li><a href="/about#meet-oppia">Meet Oppia</a></li>
+                <li><a href="/about#contact">Contact Us</a></li>
+                <li><a href="/about#license">License</a></li>
+                <li><a href="/about#foundation">Foundation</a></li>
+                <li><a href="/about#credits">Credits</a></li>
+                      </ul>
+                    </li>
+                  <li class="dropdown oppia-clickable-dropdown pull-right">
+                    <a class="oppia-navbar-profile-dropdown-toggle" style="font-size: 1em; padding-top: 17px;" href="/gallery">
+                    Explore
+                    </a>
+                  </li>
                   {% endif %}
+                </div>
+                {% endif %}
+
+                </ul>
 
                   <div class="collapse navbar-collapse ng-cloak">
                     {% block navbar_breadcrumb %}
@@ -241,8 +286,8 @@
               {{ warnings_and_loader() }}
             </div>
 
-            {% include 'side_nav.html' %}
-
+        <!--   {% include 'side_nav.html' %}
+-->
           </div>
         </div>
       </div>
@@ -268,7 +313,7 @@
     {% include 'footer_js_libs.html' %}
     {% include 'components/exploration_summary_tile_directive.html' %}
     {% include 'components/rating_display.html' %}
-
+    {% include 'components/exploration_creation_button_modal.html' %}
     <script>
       {{ include_js_file('app.js') }}
       {{ include_js_file('base.js') }}
@@ -291,7 +336,7 @@
       {{ include_js_file('expressions/expressionSyntaxTree.js') }}
       {{ include_js_file('expressions/evaluator.js') }}
       {{ include_js_file('expressions/parser.js') }}
-
+        {{ include_js_file('components/ExplorationCreationButtonService.js') }}
       {{ OBJECT_EDITORS_JS }}
     </script>
 

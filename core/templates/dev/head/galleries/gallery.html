@@ -14,30 +14,6 @@
 
 {% block local_top_nav_options %}
   <div ng-controller="SearchBar">
-    <div class="pull-right oppia-navbar-button-container">
-      <!-- NOTE: If you change the links here, please make the corresponding change in the 'no results' message. -->
-      {% if not has_fully_registered %}
-        <!-- User must complete the registration process. -->
-        <a class="btn oppia-navbar-add-exploration-button protractor-test-create-exploration oppia-transition-200"
-           href ng-click="onRedirectToLogin('{{gallery_login_redirect_url}}')">
-          <span class="oppia-navbar-add-exploration-button-plus">+</span>
-          <span>Create Exploration</span>
-        </a>
-      {% else %}
-        <a class="btn oppia-navbar-add-exploration-button protractor-test-create-exploration oppia-transition-200"
-           ng-click="showCreateExplorationModal()">
-          <span class="oppia-navbar-add-exploration-button-plus">+</span>
-          <span>Create Exploration</span>
-        </a>
-        {% if allow_yaml_file_upload %}
-          <a class="btn oppia-navbar-add-exploration-button oppia-transition-200"
-             ng-click="showUploadExplorationModal()">
-            <span class="oppia-navbar-add-exploration-button-plus">+</span>
-            <span>Upload Exploration</span>
-          </a>
-        {% endif %}
-      {% endif %}
-    </div>
 
     <form class="navbar-form navbar-left oppia-splash-search-form" role="search">
       <div class="form-group">
@@ -200,8 +176,7 @@
     </div>
   </div>
 
-  {% include 'components/exploration_creation_button_modal.html' %}
-  {% include 'components/profile_link_image_directive.html' %}
+{% include 'components/profile_link_image_directive.html' %}
 {% endblock %}
 
 {% block footer_js %}

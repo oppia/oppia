@@ -265,11 +265,10 @@ oppia.controller('Gallery', [
 oppia.controller('SearchBar', [
   '$scope', '$rootScope', '$timeout', '$window', 'searchService',
   'oppiaDebouncer', 'ExplorationCreationButtonService', 'urlService',
-  'CATEGORY_LIST', 'siteAnalyticsService',
-  function(
+  'CATEGORY_LIST', function(
       $scope, $rootScope, $timeout, $window, searchService,
       oppiaDebouncer, ExplorationCreationButtonService, urlService,
-      CATEGORY_LIST, siteAnalyticsService) {
+      CATEGORY_LIST) {
     $scope.searchIsLoading = false;
     $scope.ALL_CATEGORIES = CATEGORY_LIST.map(function(categoryName) {
       return {
@@ -393,22 +392,5 @@ oppia.controller('SearchBar', [
         _searchBarFullyLoaded = true;
       }
     );
-
-    $scope.showCreateExplorationModal = function() {
-      ExplorationCreationButtonService.showCreateExplorationModal(
-        CATEGORY_LIST);
-    };
-    $scope.showUploadExplorationModal = function() {
-      ExplorationCreationButtonService.showUploadExplorationModal(
-        CATEGORY_LIST);
-    };
-
-    $scope.onRedirectToLogin = function(destinationUrl) {
-      siteAnalyticsService.registerStartLoginEvent('createExplorationButton');
-      $timeout(function() {
-        $window.location = destinationUrl;
-      }, 150);
-      return false;
-    };
   }
 ]);

@@ -85,9 +85,11 @@ oppia.constant('MAX_NODE_LABEL_LENGTH', 15);
 oppia.controller('Base', [
   '$scope', '$http', '$rootScope', '$window', '$timeout', '$document', '$log',
   'warningsData', 'LABEL_FOR_CLEARING_FOCUS', 'siteAnalyticsService',
+  'ExplorationCreationButtonService', 'urlService', 'CATEGORY_LIST',
   function(
       $scope, $http, $rootScope, $window, $timeout, $document, $log,
-      warningsData, LABEL_FOR_CLEARING_FOCUS, siteAnalyticsService) {
+      warningsData, LABEL_FOR_CLEARING_FOCUS, siteAnalyticsService,
+      ExplorationCreationButtonService, urlService, CATEGORY_LIST) {
     $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
 
     $scope.warningsData = warningsData;
@@ -207,6 +209,23 @@ oppia.controller('Base', [
       siteAnalyticsService.registerStartLoginEvent('loginButton');
       $timeout(function() {
         $window.location = loginUrl;
+      }, 150);
+      return false;
+    };
+    // The following methods are defined for the createExplorationButton
+    $scope.showCreateExplorationModal = function() {
+      ExplorationCreationButtonService.showCreateExplorationModal(
+        CATEGORY_LIST);
+    };
+    $scope.showUploadExplorationModal = function() {
+      ExplorationCreationButtonService.showUploadExplorationModal(
+        CATEGORY_LIST);
+    };
+
+    $scope.onRedirectToLogin = function(destinationUrl) {
+      siteAnalyticsService.registerStartLoginEvent('createExplorationButton');
+      $timeout(function() {
+        $window.location = destinationUrl;
       }, 150);
       return false;
     };
