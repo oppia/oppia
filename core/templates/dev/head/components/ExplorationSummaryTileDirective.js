@@ -35,11 +35,12 @@ oppia.directive('explorationSummaryTile', [function() {
       getThumbnailBgColor: '&thumbnailBgColor',
       // If this is not null, the new exploration opens in a new window when
       // the summary tile is clicked.
-      openInNewWindow: '@openInNewWindow'
+      openInNewWindow: '@openInNewWindow',
+      isCommunityOwned: '&isCommunityOwned'
     },
     templateUrl: 'summaryTile/exploration',
     link: function(scope, element) {
-      element.find('.exploration-summary-contributors').on('mouseenter',
+      element.find('.exploration-summary-avatars').on('mouseenter',
         function() {
           element.find('.mask').attr('class',
             'exploration-summary-tile-mask mask');
@@ -47,26 +48,29 @@ oppia.directive('explorationSummaryTile', [function() {
           // to prevent the effects queue falling behind the mouse movement.
           // .hide(1) and .show(1) used to place the animation in the
           // effects queue.
-          element.find('.contributors-num-minus-one').stop(true).hide(1,
+          element.find('.avatars-num-minus-one').stop(true).hide(1,
             function() {
-              element.find('.all-contributors').stop(true).slideDown();
+              element.find('.all-avatars').stop(true).slideDown();
             }
           );
         }
       );
 
-      element.find('.exploration-summary-contributors').on('mouseleave',
+      element.find('.exploration-summary-avatars').on('mouseleave',
         function() {
           element.find('.mask').attr('class', 'top-section-mask mask');
-          element.find('.all-contributors').stop(true).slideUp(400, function() {
-            element.find('.contributors-num-minus-one').stop(true).show(1);
+          element.find('.all-avatars').stop(true).slideUp(400, function() {
+            element.find('.avatars-num-minus-one').stop(true).show(1);
           });
         }
       );
     },
     controller: [
-      '$scope', 'oppiaDatetimeFormatter', 'RatingComputationService',
-      function($scope, oppiaDatetimeFormatter, RatingComputationService) {
+      '$scope', '$http',
+      'oppiaDatetimeFormatter', 'RatingComputationService',
+      function(
+        $scope, $http,
+        oppiaDatetimeFormatter, RatingComputationService) {
         $scope.contributors = Object.keys(
           $scope.getContributorsSummary() || {}).sort(
           function(contributorUsername1, contributorUsername2) {
@@ -78,7 +82,48 @@ oppia.directive('explorationSummaryTile', [function() {
           }
         );
 
-        $scope.MAX_CONTRIBUTORS_TO_DISPLAY = 5;
+        $scope.avatarsList = [];
+        $scope.contributors.forEach(function(contributorName) {
+          var DEFAULT_PROFILE_IMAGE_PATH = '/images/avatar/user_blue_72px.png';
+
+          var avatarData = {
+            image: DEFAULT_PROFILE_IMAGE_PATH,
+            tooltipText: contributorName
+          };
+
+          var profileImageUrl = (
+            '/preferenceshandler/profile_picture_by_username/' +
+              contributorName);
+          // Returns a promise for the user profile picture, or
+          // the default image if user is not logged in or
+          // has not uploaded a profile picture, or
+          // the player is in preview mode.
+          $http.get(profileImageUrl).success(function(data) {
+            avatarData.image = (
+              data.profile_picture_data_url_for_username ||
+                DEFAULT_PROFILE_IMAGE_PATH);
+          });
+
+          if (GLOBALS.SYSTEM_USERNAMES.indexOf(contributorName) == -1) {
+            avatarData.link = '/profile/' + contributorName;
+          }
+
+          $scope.avatarsList.push(avatarData);
+        });
+
+        if ($scope.isCommunityOwned()) {
+          var COMMUNITY_OWNED_IMAGE_PATH = '/images/avatar/fa_globe_72px.png';
+          var COMMUNITY_OWNED_TOOLTIP_TEXT = 'Community Owned';
+
+          var communityOwnedAvatar = {
+            image: COMMUNITY_OWNED_IMAGE_PATH,
+            tooltipText: COMMUNITY_OWNED_TOOLTIP_TEXT
+          };
+
+          $scope.avatarsList.unshift(communityOwnedAvatar);
+        }
+
+        $scope.MAX_AVATARS_TO_DISPLAY = 5;
 
         $scope.getAverageRating = function() {
           return RatingComputationService.computeAverageRating(
