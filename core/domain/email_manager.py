@@ -145,6 +145,16 @@ def _send_email(
         '<br>', '\n').replace('</p><p>', '</p>\n<p>')
     cleaned_plaintext_body = html_cleaner.strip_html_tags(raw_plaintext_body)
 
+    email_hash = _generate_hash(recipient_id, email_subject, cleaned_html_body)
+
+    if _check_duplicate_message(recipient_id, email_subject,
+                                cleaned_plaintext_body):
+        log_new_error(
+            'Duplicate email:\n'
+            'Details:\n%s %s %s\n%s\n\n' %
+            (email_hash, recipient_id, email_subject, cleaned_plaintext_body))
+        return
+
     def _send_email_in_transaction():
         sender_email = '%s <%s>' % (
             EMAIL_SENDER_NAME.value, feconf.SYSTEM_EMAIL_ADDRESS)
@@ -156,16 +166,6 @@ def _send_email(
             recipient_id, recipient_email, sender_id, sender_email, intent,
             email_subject, cleaned_html_body, datetime.datetime.utcnow(),
             email_hash)
-
-    email_hash = _generate_hash(recipient_id, email_subject, cleaned_html_body)
-
-    if _check_duplicate_message(recipient_id, email_subject,
-                                cleaned_plaintext_body):
-        log_new_error(
-            'Duplicate email:\n'
-            'Details:\n%s %s %s\n%s\n\n' %
-            (email_hash, recipient_id, email_subject, cleaned_plaintext_body))
-        return
 
     return transaction_services.run_in_transaction(_send_email_in_transaction)
 

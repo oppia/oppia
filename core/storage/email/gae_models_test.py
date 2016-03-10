@@ -26,18 +26,6 @@ import feconf
 class SentEmailModelUnitTests(test_utils.GenericTestBase):
     """Test the SentEmailModel class."""
 
-    def test_sent_email_model_instances_are_read_only(self):
-        email_models.SentEmailModel.create(
-            'recipient_id', 'recipient@email.com', 'sender_id',
-            'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
-            'Email Subject', 'Email Body', datetime.datetime.utcnow(),
-            'Email Hash')
-
-        model = email_models.SentEmailModel.get_all().fetch()[0]
-        model.recipient_id = 'new_recipient_id'
-        with self.assertRaises(Exception):
-            model.put()
-
     def test_saved_model_can_be_retrieved_with_same_hash(self):
         email_models.SentEmailModel.create(
             'recipient_id', 'recipient@email.com', 'sender_id',

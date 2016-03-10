@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for Email-related jobs."""
+
 import datetime
 
 from core.domain import email_jobs_one_off
@@ -46,33 +47,33 @@ class SentEmailUpdateHashOneOffJobTests(test_utils.GenericTestBase):
             'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
             'Email Subject', 'Email Body', datetime.datetime.utcnow(), None)
 
-        # Check that the content of this email was recorded in
-        # SentEmailModel.
-        all_models = email_models.SentEmailModel.get_all().fetch()
-        self.assertEqual(len(all_models), 1)
-
         email_models.SentEmailModel.create(
             'recipient_id2', 'recipient@email.com', 'sender_id',
             'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
-            'Email Subject', 'Email Body', datetime.datetime.utcnow(), None)
-
-        # Check that the content of this email was recorded in
-        # SentEmailModel.
-        all_models = email_models.SentEmailModel.get_all().fetch()
-        self.assertEqual(len(all_models), 2)
+            'Email Subject', 'Email Body', datetime.datetime.utcnow(), '')
 
         email_models.SentEmailModel.create(
-            'recipient_id2', 'recipient@email.com', 'sender_id',
+            'recipient_id3', 'recipient@email.com', 'sender_id',
             'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
             'Email Subject', 'Email Body', datetime.datetime.utcnow(),
             'Email Hash.')
 
-        # Check that the content of this email was recorded in
-        # SentEmailModel.
+        # Check that all the emails were recorded in SentEmailModel.
         all_models = email_models.SentEmailModel.get_all().fetch()
         self.assertEqual(len(all_models), 3)
 
+        for model in all_models:
+            if model.recipient_id == 'recipient_id1':
+                self.assertIsNone(model.email_hash)
+            elif model.recipient_id == 'recipient_id2':
+                self.assertEqual(len(model.email_hash), 0)
+
         self._run_one_off_job()
+
+        # Check that all the emails that were recorded in SentEmailModel
+        # still present.
+        all_models = email_models.SentEmailModel.get_all().fetch()
+        self.assertEqual(len(all_models), 3)
 
         all_models = email_models.SentEmailModel.get_all().fetch()
 

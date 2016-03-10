@@ -29,20 +29,15 @@ class SentEmailUpdateHashOneOffJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(email_model):
-        if not email_model.email_hash or len(email_model.email_hash) == 0:
-            yield (email_model.id, None)
+        if not email_model.email_hash:
+            # pylint: disable=protected-access
+            email_hash = email_manager._generate_hash(
+                email_model.recipient_id, email_model.subject,
+                email_model.html_body)
+            # pylint: enable=protected-access
+            email_model.email_hash = email_hash
+            email_model.put()
 
     @staticmethod
-    def reduce(email_model_id, value=None):# pylint: disable=unused-argument
-        email_model = email_models.SentEmailModel.get_by_id(email_model_id)
-        if email_model is None:
-            return
-
-        # pylint: disable=protected-access
-        email_hash = email_manager._generate_hash(
-            email_model.recipient_id, email_model.subject,
-            email_model.html_body)
-        # pylint: enable=protected-access
-
-        email_model.email_hash = email_hash
-        email_model.put()
+    def reduce(email_model_id, value):
+        pass

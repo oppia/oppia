@@ -93,11 +93,8 @@ class SentEmailModel(base_models.BaseModel):
             sender_email=sender_email, intent=intent, subject=subject,
             html_body=html_body, sent_datetime=sent_datetime,
             email_hash=email_hash)
-        # We only allow the model instance to be saved once, when it is
-        # first created. To do this, we bypass the instance's put() method,
-        # which raises an error, and use the put() method of its superclass
-        # instead.
-        super(SentEmailModel, email_model_instance).put()
+
+        email_model_instance.put()
 
     @classmethod
     def get_by_hash(cls, email_hash, sent_datetime_lower_bound=None):
