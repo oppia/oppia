@@ -155,24 +155,6 @@ oppia.directive('searchBar', [function() {
             _searchBarFullyLoaded = true;
           }
         );
-
-        $scope.showCreateExplorationModal = function() {
-          ExplorationCreationButtonService.showCreateExplorationModal(
-            CATEGORY_LIST);
-        };
-        $scope.showUploadExplorationModal = function() {
-          ExplorationCreationButtonService.showUploadExplorationModal(
-            CATEGORY_LIST);
-        };
-
-        $scope.onRedirectToLogin = function(destinationUrl) {
-          siteAnalyticsService.registerStartLoginEvent(
-            'createExplorationButton');
-          $timeout(function() {
-            $window.location = destinationUrl;
-          }, 150);
-          return false;
-        };
       }
     ]
   };
