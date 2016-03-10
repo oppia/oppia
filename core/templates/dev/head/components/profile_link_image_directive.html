@@ -1,17 +1,7 @@
 <script type="text/ng-template" id="components/profileLinkImage">
-  <a ng-if="username() !== 'Community Owned' && isUsernameLinkable(username())" ng-href="/profile/<[username()]>">
+  <a ng-if="isUsernameLinkable(username())" ng-href="/profile/<[username()]>">
     <img ng-src="<[profilePicture]>" alt="" class="img-circle">
   </a>
 
-  <img ng-if="username() !== 'Community Owned' && !isUsernameLinkable(username())" ng-src="<[profilePicture]>" alt="">
-
-  <span ng-if="username() === 'Community Owned'" class="fa fa-globe oppia-is-community-owned-profile"></span>
+  <img ng-if="!isUsernameLinkable(username())" ng-src="<[profilePicture]>" alt="">
 </script>
-
-<style>
-  .oppia-is-community-owned-profile {
-    font-size: 28px;
-    color: white;
-    padding-left: 1px;
-  }
-</style>
