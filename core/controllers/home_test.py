@@ -26,8 +26,9 @@ class HomePageTest(test_utils.GenericTestBase):
     def test_logged_out_homepage(self):
         """Test the logged-out version of the home page."""
         response = self.testapp.get('/')
-        self.assertEqual(response.status_int, 200)
-        response.mustcontain(
+        self.assertEqual(response.status_int, 302)
+        self.assertIn('gallery', response.headers['location'])
+        response.follow().mustcontain(
             'Your personal tutor',
             'Oppia - Gallery', 'About', 'Sign in', no=['Logout'])
 

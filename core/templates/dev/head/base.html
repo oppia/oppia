@@ -112,6 +112,9 @@
               <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation">
                 <div class="navbar-container">
                   <div class="navbar-header protractor-test-navbar-header pull-left">
+                    <a ng-click="openSidebar()" class="navbar-brand oppia-navbar-menu oppia-transition-200">
+                      <img src="/images/general/menu.png">
+                    </a>
                     <a class="oppia-navbar-brand-name oppia-transition-200" href="/gallery" focus-on="<[LABEL_FOR_CLEARING_FOCUS]>">
                       <img src="/images/logo/288x128_logo_white.png" class="oppia-logo">
                     </a>
@@ -120,6 +123,7 @@
                       <img src="/images/logo/288x128_logo_mint.png" itemprop="image">
                     </a>
                   </div>
+
                   {% if nav_mode != 'signup' %}
                     <div class="navbar-header pull-right">
                       <ul class="nav oppia-navbar-nav oppia-navbar-profile">
@@ -285,6 +289,9 @@
 
               {{ warnings_and_loader() }}
             </div>
+
+            {% include 'side_nav.html' %}
+
           </div>
         </div>
       </div>
@@ -310,7 +317,8 @@
     {% include 'footer_js_libs.html' %}
     {% include 'components/exploration_summary_tile_directive.html' %}
     {% include 'components/rating_display.html' %}
-    {% include 'components/exploration_creation_button_modal.html' %}
+    {% include 'components/create_exploration_button_directive.html' %}
+
     <script>
       {{ include_js_file('app.js') }}
       {{ include_js_file('base.js') }}
@@ -329,11 +337,12 @@
       {{ include_js_file('components/RatingComputationService.js')}}
       {{ include_js_file('components/RatingDisplayDirective.js')}}
       {{ include_js_file('components/Select2DropdownDirective.js') }}
+      {{ include_js_file('components/CreateExplorationButtonDirective.js') }}
 
       {{ include_js_file('expressions/expressionSyntaxTree.js') }}
       {{ include_js_file('expressions/evaluator.js') }}
       {{ include_js_file('expressions/parser.js') }}
-        {{ include_js_file('components/ExplorationCreationButtonService.js') }}
+
       {{ OBJECT_EDITORS_JS }}
     </script>
 
