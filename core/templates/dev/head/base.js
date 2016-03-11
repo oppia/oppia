@@ -85,13 +85,13 @@ oppia.constant('MAX_NODE_LABEL_LENGTH', 15);
 oppia.controller('Base', [
   '$scope', '$http', '$rootScope', '$window', '$timeout', '$document', '$log',
   'warningsData', 'LABEL_FOR_CLEARING_FOCUS', 'siteAnalyticsService',
-  'ExplorationCreationButtonService', 'urlService', 'CATEGORY_LIST',
+  'urlService', 'CATEGORY_LIST', 'windowDimensionsService',
   function(
       $scope, $http, $rootScope, $window, $timeout, $document, $log,
       warningsData, LABEL_FOR_CLEARING_FOCUS, siteAnalyticsService,
-      ExplorationCreationButtonService, urlService, CATEGORY_LIST) {
+      urlService, CATEGORY_LIST, windowDimensionsService ) {
     $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
-
+    $scope.test=false;
     $scope.warningsData = warningsData;
     $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
 
@@ -229,6 +229,8 @@ oppia.controller('Base', [
       }, 150);
       return false;
     };
+    //checks the width of the window
+    $scope.windowWidth  = windowDimensionsService.getWidth();
 
     $scope.pageHasLoaded = false;
     $scope.pendingSidebarClick = false;
