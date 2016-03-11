@@ -297,7 +297,7 @@ class UserImpactMRJobManager(
     # Value per user: average rating - 2
     # Reach: sum over all cards of count of answers given ^ (2/3)
     # Fractional contribution: percent of commits by this user
-    # The final number will be rounded.
+    # The final number will be rounded to the nearest integer.
     @classmethod
     def _get_continuous_computation_class(cls):
         return UserImpactAggregator
@@ -311,21 +311,22 @@ class UserImpactMRJobManager(
         if item.deleted:
             return
 
-        exponent = 2/float(3)
+        exponent = 2.0/3
 
         # Get average rating and value per user
         total_rating = 0
         for ratings_value in item.ratings:
             total_rating += item.ratings[ratings_value] * int(ratings_value)
-        if sum(item.ratings.itervalues()):
-            average_rating = total_rating / sum(item.ratings.itervalues())
-            value_per_user = average_rating - 2
-        else:
-            value_per_user = 0
+        if not sum(item.ratings.itervalues()):
+            return
+        average_rating = total_rating / sum(item.ratings.itervalues())
+        value_per_user = average_rating - 2
+        if value_per_user <= 0:
+            return
 
         statistics = (
-            stats_jobs_continuous.StatisticsAggregator.get_statistics(item.id,
-                                                                      'all'))
+            stats_jobs_continuous.StatisticsAggregator.get_statistics(
+                item.id, stats_jobs_continuous.VERSION_ALL))
         answer_count = 0
         # Find number of users per state (card), and subtract no answer
         # This will not count people who have been back to a state twice
@@ -341,22 +342,23 @@ class UserImpactMRJobManager(
         # Turn answer count into reach
         reach = answer_count**exponent
 
-        if value_per_user > 0:
-            exploration_summary = exp_services.get_exploration_summary_by_id(
-                item.id)
-            contributors = exploration_summary.contributors_summary
-            total_commits = sum(contributors.itervalues())
-            for contrib_id in contributors:
-                # Find fractional contribution for each contributor
-                contribution = contributors[contrib_id] / float(total_commits)
-                # Find score for this specific exploration
-                exploration_impact_score = value_per_user * reach * contribution
-                yield (contrib_id, exploration_impact_score)
+        exploration_summary = exp_services.get_exploration_summary_by_id(
+            item.id)
+        contributors = exploration_summary.contributors_summary
+        total_commits = sum(contributors.itervalues())
+        if total_commits == 0:
+            return
+        for contrib_id in contributors:
+            # Find fractional contribution for each contributor
+            contribution = contributors[contrib_id] / float(total_commits)
+            # Find score for this specific exploration
+            exploration_impact_score = value_per_user * reach * contribution
+            yield (contrib_id, exploration_impact_score)
 
     @staticmethod
     def reduce(key, stringified_values):
         values = [ast.literal_eval(v) for v in stringified_values]
-        exponent = 2/float(3)
+        exponent = 2.0/3
         # Find the final score and round to a whole number
         user_impact_score = int(round(sum(values) ** exponent))
         user_models.UserStatsModel(id=key, impact_score=user_impact_score).put()
