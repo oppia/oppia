@@ -21,11 +21,18 @@
 oppia.factory('alertsService', ['$log', function($log) {
   var alertsService = {
     /**
-     * List of warning messages.
+     * Each element in each of the arrays here is an object with two keys:
+     *   - type:  a string specifying the type of message or warning.
+     *            Possible types - "warning", "info" or "success".
+     *   - content: a string containing the warning or message.
+     */
+
+    /**
+     * Array of "warning" messages.
      */
     warnings: [],
     /**
-     * List of "success" or "info" messages.
+     * Array of "success" or "info" messages.
      */
     messages: []
   };
@@ -33,8 +40,6 @@ oppia.factory('alertsService', ['$log', function($log) {
   // This is to prevent infinite loops.
   var MAX_TOTAL_WARNINGS = 10;
   var MAX_TOTAL_MESSAGES = 10;
-  var warningsSoFar = 0;
-  var messagesSoFar = 0;
 
   /**
    * Adds a warning message.
@@ -42,8 +47,7 @@ oppia.factory('alertsService', ['$log', function($log) {
    */
   alertsService.addWarning = function(warning) {
     $log.error(warning);
-    warningsSoFar++;
-    if (warningsSoFar > MAX_TOTAL_WARNINGS) {
+    if (alertsService.warnings.length >= MAX_TOTAL_WARNINGS) {
       return;
     }
     alertsService.warnings.push({
@@ -69,14 +73,11 @@ oppia.factory('alertsService', ['$log', function($log) {
   alertsService.deleteWarning = function(warningObject) {
     var warnings = alertsService.warnings;
     var newWarnings = [];
-    var warningsCount = 0;
     for (var i = 0; i < warnings.length; i++) {
       if (warnings[i].content != warningObject.content) {
-        warningsCount++;
         newWarnings.push(warnings[i]);
       }
     }
-    warningsSoFar = warningsCount;
     alertsService.warnings = newWarnings;
   };
 
@@ -85,7 +86,6 @@ oppia.factory('alertsService', ['$log', function($log) {
    */
   alertsService.clearWarnings = function() {
     alertsService.warnings = [];
-    warningsSoFar = 0;
   };
 
   /**
@@ -94,8 +94,7 @@ oppia.factory('alertsService', ['$log', function($log) {
    * @param {string} message - Message content
    */
   alertsService.addMessage = function(type, message) {
-    messagesSoFar++;
-    if (messagesSoFar > MAX_TOTAL_MESSAGES) {
+    if (alertsService.messages.length >= MAX_TOTAL_MESSAGES) {
       return;
     }
     alertsService.messages.push({
@@ -111,15 +110,12 @@ oppia.factory('alertsService', ['$log', function($log) {
   alertsService.deleteMessage = function(messageObject) {
     var messages = alertsService.messages;
     var newMessages = [];
-    var messagesCount = 0;
     for (var i = 0; i < messages.length; i++) {
       if (messages[i].type != messageObject.type ||
           messages[i].content != messageObject.content) {
-        messagesCount++;
         newMessages.push(messages[i]);
       }
     }
-    messagesSoFar = messagesCount;
     alertsService.messages = newMessages;
   };
 
@@ -144,7 +140,6 @@ oppia.factory('alertsService', ['$log', function($log) {
    */
   alertsService.clearMessages = function() {
     alertsService.messages = [];
-    messagesSoFar = 0;
   };
 
   return alertsService;

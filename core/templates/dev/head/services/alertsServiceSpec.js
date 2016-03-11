@@ -15,7 +15,7 @@
 /**
  * @fileoverview Unit tests for the Alerts Service.
  *
- * @author sll@google.com (Sean Lip)
+ * @author hitesh96db@gmail.com (Hitesh Sharma)
  */
 
 describe('Alerts Service', function() {
@@ -26,14 +26,14 @@ describe('Alerts Service', function() {
     alertsService = $injector.get('alertsService');
   }));
 
-  describe('tests warnings', function() {
+  describe('Warnings', function() {
     it('should add a warning', function() {
       expect(alertsService.warnings.length).toBe(0);
       alertsService.addWarning('Warning 1');
       expect(alertsService.warnings.length).toBe(1);
     });
 
-    it('should delete a warning', function() {
+    it('should delete a warning (no duplicates)', function() {
       var warning = 'Warning 1';
       // Warning message to be deleted
       alertsService.addWarning(warning);
@@ -56,6 +56,36 @@ describe('Alerts Service', function() {
         }
       }
       expect(found).toBe(false);
+      expect(alertsService.warnings[0].content).toBe('Warning 2');
+      expect(alertsService.warnings[1].content).toBe('Warning 3');
+    });
+
+    it('should delete a warning (with duplicates)', function() {
+      var warning = 'Warning 1';
+      // Warning message to be deleted
+      alertsService.addWarning(warning);
+      // Add a few other warning message
+      alertsService.addWarning('Warning 2');
+      alertsService.addWarning(warning);
+      alertsService.addWarning('Warning 3');
+
+      expect(alertsService.warnings.length).toBe(4);
+      alertsService.deleteWarning({
+        type: 'warning',
+        content: warning
+      });
+      expect(alertsService.warnings.length).toBe(2);
+
+      // Search for the deleted warning message
+      var found = false;
+      for (var i = 0; i < alertsService.warnings.length; i++) {
+        if (alertsService.warnings[i].content == warning) {
+          found = true;
+        }
+      }
+      expect(found).toBe(false);
+      expect(alertsService.warnings[0].content).toBe('Warning 2');
+      expect(alertsService.warnings[1].content).toBe('Warning 3');
     });
 
     it('should not add more than 10 warnings', function() {
@@ -75,7 +105,7 @@ describe('Alerts Service', function() {
     });
   });
 
-  describe('tests messages', function() {
+  describe('Messages', function() {
     it('should add an info message', function() {
       var message = 'Info 1';
       expect(alertsService.messages.length).toBe(0);
@@ -95,7 +125,7 @@ describe('Alerts Service', function() {
       expect(alertsService.messages[0].content).toBe(message);
     });
 
-    it('should delete a message', function() {
+    it('should delete a message (no duplicates)', function() {
       var message = 'Info 1';
       // Info Message to be deleted
       alertsService.addInfoMessage(message);
@@ -119,6 +149,37 @@ describe('Alerts Service', function() {
         }
       }
       expect(found).toBe(false);
+      expect(alertsService.messages[0].content).toBe('Info 2');
+      expect(alertsService.messages[1].content).toBe('Success 1');
+    });
+
+    it('should delete a message (with duplicates)', function() {
+      var message = 'Info 1';
+      // Info Message to be deleted
+      alertsService.addInfoMessage(message);
+      // Add a few other messages
+      alertsService.addInfoMessage('Info 2');
+      alertsService.addSuccessMessage('Success 1');
+      alertsService.addInfoMessage(message);
+
+      expect(alertsService.messages.length).toBe(4);
+      alertsService.deleteMessage({
+        type: 'info',
+        content: message
+      });
+      expect(alertsService.messages.length).toBe(2);
+
+      // Search for the message
+      var found = false;
+      for (var i = 0; i < alertsService.messages.length; i++) {
+        if (alertsService.messages[i].content == message &&
+            alertsService.messages[i].type == 'info') {
+          found = true;
+        }
+      }
+      expect(found).toBe(false);
+      expect(alertsService.messages[0].content).toBe('Info 2');
+      expect(alertsService.messages[1].content).toBe('Success 1');
     });
 
     it('should not add more than 10 messages', function() {
