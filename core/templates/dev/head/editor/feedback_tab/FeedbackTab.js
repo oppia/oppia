@@ -19,12 +19,12 @@
  */
 
 oppia.controller('FeedbackTab', [
-  '$scope', '$http', '$modal', '$timeout', '$rootScope', 'warningsData',
+  '$scope', '$http', '$modal', '$timeout', '$rootScope', 'alertsService',
   'oppiaDatetimeFormatter', 'threadStatusDisplayService',
   'threadDataService', 'explorationStatesService', 'explorationData',
   'changeListService',
   function(
-    $scope, $http, $modal, $timeout, $rootScope, warningsData,
+    $scope, $http, $modal, $timeout, $rootScope, alertsService,
     oppiaDatetimeFormatter, threadStatusDisplayService,
     threadDataService, explorationStatesService, explorationData,
     changeListService) {
@@ -68,11 +68,11 @@ oppia.controller('FeedbackTab', [
 
           $scope.create = function(newThreadSubject, newThreadText) {
             if (!newThreadSubject) {
-              warningsData.addWarning('Please specify a thread subject.');
+              alertsService.addWarning('Please specify a thread subject.');
               return;
             }
             if (!newThreadText) {
-              warningsData.addWarning('Please specify a message.');
+              alertsService.addWarning('Please specify a message.');
               return;
             }
 
@@ -90,6 +90,7 @@ oppia.controller('FeedbackTab', [
         threadDataService.createNewThread(
           result.newThreadSubject, result.newThreadText, function() {
             $scope.clearActiveThread();
+            alertsService.addSuccessMessage('Feedback thread created.');
           });
       });
     };
@@ -229,11 +230,11 @@ oppia.controller('FeedbackTab', [
 
     $scope.addNewMessage = function(threadId, tmpText, tmpStatus) {
       if (threadId === null) {
-        warningsData.addWarning('Cannot add message to thread with ID: null.');
+        alertsService.addWarning('Cannot add message to thread with ID: null.');
         return;
       }
       if (!tmpStatus) {
-        warningsData.addWarning('Invalid message status: ' + tmpStatus);
+        alertsService.addWarning('Invalid message status: ' + tmpStatus);
         return;
       }
 

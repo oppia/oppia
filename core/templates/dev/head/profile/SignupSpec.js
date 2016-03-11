@@ -20,7 +20,7 @@
 
 describe('Signup controller', function() {
   describe('SignupCtrl', function() {
-    var scope, ctrl, $httpBackend, rootScope, mockWarningsData, urlParams;
+    var scope, ctrl, $httpBackend, rootScope, mockAlertsService, urlParams;
 
     beforeEach(function() {
       module('oppia');
@@ -34,10 +34,10 @@ describe('Signup controller', function() {
       });
       rootScope = $rootScope;
 
-      mockWarningsData = {
+      mockAlertsService = {
         addWarning: function() {}
       };
-      spyOn(mockWarningsData, 'addWarning');
+      spyOn(mockAlertsService, 'addWarning');
 
       scope = {
         getUrlParams: function() {
@@ -51,13 +51,13 @@ describe('Signup controller', function() {
         $scope: scope,
         $http: $http,
         $rootScope: rootScope,
-        warningsData: mockWarningsData
+        alertsService: mockAlertsService
       });
     }));
 
     it('should show warning if user has not agreed to terms', function() {
       scope.submitPrerequisitesForm(false, null);
-      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
+      expect(mockAlertsService.addWarning).toHaveBeenCalledWith(
         'In order to edit explorations on this site, you will need to agree ' +
         'to the site terms.');
     });
@@ -76,7 +76,7 @@ describe('Signup controller', function() {
 
     it('should show warning if terms are not agreed to', function() {
       scope.submitPrerequisitesForm(false, '');
-      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
+      expect(mockAlertsService.addWarning).toHaveBeenCalledWith(
         'In order to edit explorations on this site, you will need to ' +
         'agree to the site terms.');
     });

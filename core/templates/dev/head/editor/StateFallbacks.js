@@ -20,11 +20,11 @@
 
 oppia.controller('StateFallbacks', [
   '$scope', '$rootScope', '$modal', '$filter', 'editorContextService',
-  'warningsData', 'INTERACTION_SPECS', 'stateFallbacksService',
+  'alertsService', 'INTERACTION_SPECS', 'stateFallbacksService',
   'explorationStatesService', 'stateInteractionIdService',
   function(
       $scope, $rootScope, $modal, $filter, editorContextService,
-      warningsData, INTERACTION_SPECS, stateFallbacksService,
+      alertsService, INTERACTION_SPECS, stateFallbacksService,
       explorationStatesService, stateInteractionIdService) {
     $scope.editorContextService = editorContextService;
     $scope.stateFallbacksService = stateFallbacksService;
@@ -66,7 +66,7 @@ oppia.controller('StateFallbacks', [
     };
 
     $scope.openAddFallbackModal = function() {
-      warningsData.clear();
+      alertsService.clearWarnings();
       $rootScope.$broadcast('externalSave');
 
       $modal.open({
@@ -123,7 +123,7 @@ oppia.controller('StateFallbacks', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              warningsData.clear();
+              alertsService.clearWarnings();
             };
           }
         ]
@@ -159,7 +159,7 @@ oppia.controller('StateFallbacks', [
       // state of the answer group.
       evt.stopPropagation();
 
-      warningsData.clear();
+      alertsService.clearWarnings();
       $modal.open({
         templateUrl: 'modals/deleteFallback',
         backdrop: true,
@@ -171,7 +171,7 @@ oppia.controller('StateFallbacks', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              warningsData.clear();
+              alertsService.clearWarnings();
             };
           }
         ]

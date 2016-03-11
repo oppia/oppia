@@ -1047,11 +1047,70 @@ md-card.oppia-gallery-tile {
   width: 80%;
 }
 
-.oppia-alert-blocks {
-  left: 20%;
+.oppia-toast-container {
   position: fixed;
-  width: 60%;
-  z-index: 3000;
+  z-index: 999999;
+}
+.oppia-toast-container * {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.oppia-toast {
+  position: relative;
+  overflow: hidden;
+  padding: 15px 15px 15px 50px;
+  top: 60px;
+  width: 500px;
+  -moz-border-radius: 3px 3px 3px 3px;
+  -webkit-border-radius: 3px 3px 3px 3px;
+  border-radius: 3px 3px 3px 3px;
+  background-position: 15px center;
+  background-repeat: no-repeat;
+  -moz-box-shadow: 0 0 12px #999999;
+  -webkit-box-shadow: 0 0 12px #999999;
+  box-shadow: 0 0 12px #999999;
+  color: #FFFFFF;
+  opacity: 0.8;
+  margin: auto;
+  margin-top: 5px;
+}
+.oppia-toast-container > :hover {
+  -moz-box-shadow: 0 0 12px #000000;
+  -webkit-box-shadow: 0 0 12px #000000;
+  box-shadow: 0 0 12px #000000;
+  opacity: 1;
+  cursor: pointer;
+}
+.toast-warning {
+  background-image: url("/images/general/warning.png");
+}
+
+@media all and (max-width: 240px) {
+  .oppia-toast {
+    padding: 8px 8px 8px 50px;
+    width: 11em;
+  }
+  .oppia-toast-container .toast-close-button {
+    right: -0.2em;
+    top: -0.2em;
+  }
+}
+@media all and (min-width: 241px) and (max-width: 480px) {
+  .oppia-toast {
+    padding: 8px 8px 8px 50px;
+    width: 18em;
+  }
+  .oppia-toast-container .toast-close-button {
+    right: -0.2em;
+    top: -0.2em;
+  }
+}
+@media all and (min-width: 481px) and (max-width: 768px) {
+  .oppia-toast {
+    padding: 15px 15px 15px 50px;
+    width: 25em;
+  }
 }
 
 .oppia-form input.ng-invalid.ng-dirty {

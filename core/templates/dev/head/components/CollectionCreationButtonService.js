@@ -24,10 +24,10 @@
 
 oppia.factory('CollectionCreationButtonService', [
   '$filter', '$http', '$modal', '$timeout', '$rootScope',
-  'validatorsService', 'warningsData', 'focusService',
+  'validatorsService', 'alertsService', 'focusService',
   function(
       $filter, $http, $modal, $timeout, $rootScope,
-      validatorsService, warningsData, focusService) {
+      validatorsService, alertsService, focusService) {
     var getModalInstance = function(categoryList) {
       var modalInstance = $modal.open({
         backdrop: true,
@@ -69,7 +69,7 @@ oppia.factory('CollectionCreationButtonService', [
               }
 
               if (!category) {
-                warningsData.addWarning(
+                alertsService.addWarning(
                   'Please specify a category for this collection.');
                 return;
               }
@@ -105,7 +105,7 @@ oppia.factory('CollectionCreationButtonService', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              warningsData.clear();
+              alertsService.clearWarnings();
             };
           }
         ]
@@ -124,7 +124,7 @@ oppia.factory('CollectionCreationButtonService', [
 
     return {
       showCreateCollectionModal: function(categoryList) {
-        warningsData.clear();
+        alertsService.clearWarnings();
 
         getModalInstance(categoryList, false).result.then(function(result) {
           var category = $filter('normalizeWhitespace')(result.category);

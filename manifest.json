@@ -84,6 +84,17 @@
         "targetDirPrefix": "angularjs-",
         "files": ["angular-mocks.js", "angular-scenario.js"]
       },
+      "angularToastr": {
+        "version": "1.7.0",
+        "downloadFormat": "zip",
+        "url": "https://github.com/Foxandxss/angular-toastr/archive/1.7.0.zip",
+        "rootDirPrefix": "angular-toastr-",
+        "targetDirPrefix": "angular-toastr-",
+        "bundle": {
+          "css": ["dist/angular-toastr.min.css"],
+          "js": ["dist/angular-toastr.tpls.min.js"]
+        }
+      },
       "bootstrap": {
         "version": "3.3.4",
         "downloadFormat": "zip",

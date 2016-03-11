@@ -68,7 +68,7 @@ oppia.factory('answerClassificationService', [
           ruleSpecIndex: 0
         };
       } else {
-        warningsData.addWarning('No default outcome found.');
+        alertsService.addWarning('No default outcome found.');
       }
     };
 
