@@ -1,10 +1,10 @@
 {% macro warnings_and_loader() -%}
   <div ng-cloak>
     <div class="oppia-toast-container toast-top-center">
-      <div ng-repeat="warning in (alertsService.warnings | limitTo:5) track by $index" class="toast toast-warning">
+      <div ng-repeat="warning in (alertsService.warnings | limitTo:5) track by $index" class="toast toast-warning oppia-toast-div">
         <button type="button" class="toast-close-button" ng-click="alertsService.deleteWarning(warning)" role="button">&times;</button>
         <div class="toast-message">
-          <[warning]>
+          <[warning.content]>
         </div>
       </div>
     </div>
@@ -287,6 +287,7 @@
       {{ include_js_file('services/autoplayedVideosService.js') }}
 
 
+      {{ include_js_file('components/AlertMessageDirective.js') }}
       {{ include_js_file('components/ObjectEditorDirective.js') }}
       {{ include_js_file('components/ExplorationSummaryTileDirective.js') }}
       {{ include_js_file('components/RatingComputationService.js')}}
