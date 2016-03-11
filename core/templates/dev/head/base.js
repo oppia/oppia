@@ -89,9 +89,8 @@ oppia.controller('Base', [
   function(
       $scope, $http, $rootScope, $window, $timeout, $document, $log,
       warningsData, LABEL_FOR_CLEARING_FOCUS, siteAnalyticsService,
-      urlService, CATEGORY_LIST, windowDimensionsService ) {
+      urlService, CATEGORY_LIST, windowDimensionsService) {
     $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
-    $scope.test=false;
     $scope.warningsData = warningsData;
     $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
 
@@ -229,8 +228,8 @@ oppia.controller('Base', [
       }, 150);
       return false;
     };
-    //checks the width of the window
-    $scope.windowWidth  = windowDimensionsService.getWidth();
+    // Checks the width of the window
+    $scope.windowWidth = windowDimensionsService.getWidth();
 
     $scope.pageHasLoaded = false;
     $scope.pendingSidebarClick = false;
