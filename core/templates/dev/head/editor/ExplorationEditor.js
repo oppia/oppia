@@ -404,7 +404,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
         $scope.isDiscardInProgress = true;
         changeListService.discardAllChanges();
-        alertsService.addInfoMessage('Changes discarded.');
+        alertsService.addSuccessMessage('Changes discarded.');
         $rootScope.$broadcast('initExplorationPage', function() {
           $scope.lastSaveOrDiscardAction = 'discard';
           $scope.isDiscardInProgress = false;
@@ -464,7 +464,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         });
         siteAnalyticsService.registerPublishExplorationEvent(
           explorationData.explorationId);
-        alertsService.addInfoMessage('Exploration Published!');
+        alertsService.addSuccessMessage('Exploration Published!');
       });
 
       modalInstance.opened.then(function() {
@@ -762,7 +762,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
             $rootScope.$broadcast('refreshVersionHistory', {
               forceRefresh: true
             });
-            alertsService.addInfoMessage('Changes saved.');
+            alertsService.addSuccessMessage('Changes saved.');
             $scope.lastSaveOrDiscardAction = 'save';
             $scope.isSaveInProgress = false;
           }, function() {
