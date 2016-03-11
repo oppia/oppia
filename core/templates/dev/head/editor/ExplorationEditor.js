@@ -464,7 +464,6 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         });
         siteAnalyticsService.registerPublishExplorationEvent(
           explorationData.explorationId);
-        alertsService.addSuccessMessage('Exploration Published!');
       });
 
       modalInstance.opened.then(function() {

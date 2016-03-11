@@ -1056,10 +1056,9 @@ md-card.oppia-gallery-tile {
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
-.oppia-toast-container > div {
+.oppia-toast-div {
   position: relative;
   overflow: hidden;
-  margin: 0 0 6px;
   padding: 15px 15px 15px 50px;
   top: 60px;
   width: 500px;
@@ -1073,6 +1072,8 @@ md-card.oppia-gallery-tile {
   box-shadow: 0 0 12px #999999;
   color: #FFFFFF;
   opacity: 0.8;
+  margin: auto;
+  margin-top: 5px;
 }
 .oppia-toast-container > :hover {
   -moz-box-shadow: 0 0 12px #000000;
@@ -1081,19 +1082,12 @@ md-card.oppia-gallery-tile {
   opacity: 1;
   cursor: pointer;
 }
-
-.oppia-toast-container > .toast-warning {
-  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGYSURBVEhL5ZSvTsNQFMbXZGICMYGYmJhAQIJAICYQPAACiSDB8AiICQQJT4CqQEwgJvYASAQCiZiYmJhAIBATCARJy+9rTsldd8sKu1M0+dLb057v6/lbq/2rK0mS/TRNj9cWNAKPYIJII7gIxCcQ51cvqID+GIEX8ASG4B1bK5gIZFeQfoJdEXOfgX4QAQg7kH2A65yQ87lyxb27sggkAzAuFhbbg1K2kgCkB1bVwyIR9m2L7PRPIhDUIXgGtyKw575yz3lTNs6X4JXnjV+LKM/m3MydnTbtOKIjtz6VhCBq4vSm3ncdrD2lk0VgUXSVKjVDJXJzijW1RQdsU7F77He8u68koNZTz8Oz5yGa6J3H3lZ0xYgXBK2QymlWWA+RWnYhskLBv2vmE+hBMCtbA7KX5drWyRT/2JsqZ2IvfB9Y4bWDNMFbJRFmC9E74SoS0CqulwjkC0+5bpcV1CZ8NMej4pjy0U+doDQsGyo1hzVJttIjhQ7GnBtRFN1UarUlH8F3xict+HY07rEzoUGPlWcjRFRr4/gChZgc3ZL2d8oAAAAASUVORK5CYII=") !important;
-}
-.oppia-toast-container.toast-top-center > div,
-.oppia-toast-container.toast-bottom-center > div {
-  width: 500px;
-  margin: auto;
-  margin-top: 5px;
+.toast-warning {
+  background-image: url("/images/general/warning.png");
 }
 
 @media all and (max-width: 240px) {
-  .oppia-toast-container > div {
+  .oppia-toast-div {
     padding: 8px 8px 8px 50px;
     width: 11em;
   }
@@ -1103,7 +1097,7 @@ md-card.oppia-gallery-tile {
   }
 }
 @media all and (min-width: 241px) and (max-width: 480px) {
-  .oppia-toast-container > div {
+  .oppia-toast-div {
     padding: 8px 8px 8px 50px;
     width: 18em;
   }
@@ -1113,7 +1107,7 @@ md-card.oppia-gallery-tile {
   }
 }
 @media all and (min-width: 481px) and (max-width: 768px) {
-  .oppia-toast-container > div {
+  .oppia-toast-div {
     padding: 15px 15px 15px 50px;
     width: 25em;
   }

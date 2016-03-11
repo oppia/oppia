@@ -90,7 +90,7 @@ oppia.controller('FeedbackTab', [
         threadDataService.createNewThread(
           result.newThreadSubject, result.newThreadText, function() {
             $scope.clearActiveThread();
-            alertsService.addSuccessMessage('Thread Created!');
+            alertsService.addSuccessMessage('Feedback thread created.');
           });
       });
     };

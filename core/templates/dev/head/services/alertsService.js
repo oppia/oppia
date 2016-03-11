@@ -20,12 +20,19 @@
 
 oppia.factory('alertsService', ['$log', function($log) {
   var alertsService = {
+    /**
+     * List of warning messages.
+     */
     warnings: [],
+    /**
+     * List of "success" or "info" messages.
+     */
     messages: []
   };
+
   // This is to prevent infinite loops.
-  var MAX_TOTAL_WARNINGS = 100;
-  var MAX_TOTAL_MESSAGES = 100;
+  var MAX_TOTAL_WARNINGS = 10;
+  var MAX_TOTAL_MESSAGES = 10;
   var warningsSoFar = 0;
   var messagesSoFar = 0;
 
@@ -39,7 +46,10 @@ oppia.factory('alertsService', ['$log', function($log) {
     if (warningsSoFar > MAX_TOTAL_WARNINGS) {
       return;
     }
-    alertsService.warnings.push(warning);
+    alertsService.warnings.push({
+      type: 'warning',
+      content: warning
+    });
   };
 
   /**
@@ -54,13 +64,13 @@ oppia.factory('alertsService', ['$log', function($log) {
 
   /**
    * Deletes the warning from the warnings list.
-   * @param {string} warning - The warning message to be deleted.
+   * @param {Object} warningObject - The warning message to be deleted.
    */
-  alertsService.deleteWarning = function(warning) {
+  alertsService.deleteWarning = function(warningObject) {
     var warnings = alertsService.warnings;
     var newWarnings = [];
     for (var i = 0; i < warnings.length; i++) {
-      if (warnings[i] != warning) {
+      if (warnings[i].content != warningObject.content) {
         newWarnings.push(warnings[i]);
       }
     }
@@ -75,7 +85,7 @@ oppia.factory('alertsService', ['$log', function($log) {
   };
 
   /**
-   * Adds a message, could be info messages or success messages.
+   * Adds a message, can be info messages or success messages.
    * @param {string} type - Type of message
    * @param {string} message - Message content
    */
@@ -92,13 +102,14 @@ oppia.factory('alertsService', ['$log', function($log) {
 
   /**
    * Deletes the message from the messages list.
-   * @param {Object} message - Message to be deleted.
+   * @param {Object} messageObject - Message to be deleted.
    */
-  alertsService.deleteMessage = function(message) {
+  alertsService.deleteMessage = function(messageObject) {
     var messages = alertsService.messages;
     var newMessages = [];
     for (var i = 0; i < messages.length; i++) {
-      if (messages[i] != message) {
+      if (messages[i].type != messageObject.type ||
+          messages[i].content != messageObject.content) {
         newMessages.push(messages[i]);
       }
     }
@@ -129,38 +140,4 @@ oppia.factory('alertsService', ['$log', function($log) {
   };
 
   return alertsService;
-}]);
-
-oppia.directive('alertMessage', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      getMessage: '&messageObject',
-      getMessageIndex: '&messageIndex'
-    },
-    template: '<div class="oppia-alert-message"></div>',
-    controller: [
-      '$scope', 'alertsService', 'toastr',
-      function($scope, alertsService, toastr) {
-        $scope.alertsService = alertsService;
-        $scope.toastr = toastr;
-      }
-    ],
-    link: function(scope) {
-      var message = scope.getMessage();
-      if (message.type == 'info') {
-        scope.toastr.info(message.content, {
-          onHidden: function() {
-            scope.alertsService.deleteMessage(message);
-          }
-        });
-      } else if (message.type == 'success') {
-        scope.toastr.success(message.content, {
-          onHidden: function() {
-            scope.alertsService.deleteMessage(message);
-          }
-        });
-      }
-    }
-  };
 }]);
