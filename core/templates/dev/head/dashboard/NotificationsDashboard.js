@@ -32,8 +32,9 @@ oppia.controller('DashboardNotifications', [
   };
 
   $scope.changeExplorationCommitNotificationColor = function() {
-    $('.oppia-exploration-commit-notification').parent().css('background-color', 'lightblue');
-  }
+    $('.oppia-exploration-commit-notification').parent()
+    .css('background-color', 'lightblue');
+  };
 
   $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
     return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
