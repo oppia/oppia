@@ -47,7 +47,8 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         actual_object = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.USER_ID, self.EXP_ID_TWO))
 
-        self.assertEqual(expected_object.exploration_id, actual_object.exploration_id)
+        self.assertEqual(
+            expected_object.exploration_id, actual_object.exploration_id)
         self.assertEqual(expected_object.user_id, actual_object.user_id)
 
     def test_get_success(self):

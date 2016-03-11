@@ -43,8 +43,8 @@ import feconf
 memcache_services = models.Registry.import_memcache_services()
 search_services = models.Registry.import_search_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
-(exp_models, feedback_models) = models.Registry.import_models(
-    [models.NAMES.exploration, models.NAMES.feedback])
+(exp_models, feedback_models, user_models) = models.Registry.import_models(
+    [models.NAMES.exploration, models.NAMES.feedback, models.name.user])
 import utils
 
 # This takes additional 'title' and 'category' parameters.
@@ -1387,3 +1387,14 @@ def reject_suggestion(thread_id, exploration_id):
         get_by_exp_and_thread_id(exploration_id, thread_id))
     thread.status = feedback_models.STATUS_CHOICES_IGNORED
     thread.put()
+
+
+def is_draft_version_valid(exp_id, user_id):
+    """Checks if the draft version is the same as the latest version of the
+    exploration."""
+
+    draft_version = user_models.ExplorationUserDataModel.get(
+        user_id, exp_id).draft_change_list_exp_version
+    exp_version = get_exploration_summary_by_id(exp_id).version
+    return draft_version == exp_version
+    
