@@ -1056,7 +1056,7 @@ md-card.oppia-gallery-tile {
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
-.oppia-toast-div {
+.oppia-toast {
   position: relative;
   overflow: hidden;
   padding: 15px 15px 15px 50px;
@@ -1087,7 +1087,7 @@ md-card.oppia-gallery-tile {
 }
 
 @media all and (max-width: 240px) {
-  .oppia-toast-div {
+  .oppia-toast {
     padding: 8px 8px 8px 50px;
     width: 11em;
   }
@@ -1097,7 +1097,7 @@ md-card.oppia-gallery-tile {
   }
 }
 @media all and (min-width: 241px) and (max-width: 480px) {
-  .oppia-toast-div {
+  .oppia-toast {
     padding: 8px 8px 8px 50px;
     width: 18em;
   }
@@ -1107,7 +1107,7 @@ md-card.oppia-gallery-tile {
   }
 }
 @media all and (min-width: 481px) and (max-width: 768px) {
-  .oppia-toast-div {
+  .oppia-toast {
     padding: 15px 15px 15px 50px;
     width: 25em;
   }

@@ -1,7 +1,7 @@
 {% macro warnings_and_loader() -%}
   <div ng-cloak>
     <div class="oppia-toast-container toast-top-center">
-      <div ng-repeat="warning in (alertsService.warnings | limitTo:5) track by $index" class="toast toast-warning oppia-toast-div">
+      <div ng-repeat="warning in (alertsService.warnings | limitTo:5) track by $index" class="toast toast-warning oppia-toast">
         <button type="button" class="toast-close-button" ng-click="alertsService.deleteWarning(warning)" role="button">&times;</button>
         <div class="toast-message">
           <[warning.content]>
