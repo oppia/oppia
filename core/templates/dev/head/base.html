@@ -268,6 +268,7 @@
     {% include 'footer_js_libs.html' %}
     {% include 'components/exploration_summary_tile_directive.html' %}
     {% include 'components/rating_display.html' %}
+    {% include 'components/create_exploration_button_directive.html' %}
 
     <script>
       {{ include_js_file('app.js') }}
@@ -287,6 +288,7 @@
       {{ include_js_file('components/RatingComputationService.js')}}
       {{ include_js_file('components/RatingDisplayDirective.js')}}
       {{ include_js_file('components/Select2DropdownDirective.js') }}
+      {{ include_js_file('components/CreateExplorationButtonDirective.js') }}
 
       {{ include_js_file('expressions/expressionSyntaxTree.js') }}
       {{ include_js_file('expressions/evaluator.js') }}

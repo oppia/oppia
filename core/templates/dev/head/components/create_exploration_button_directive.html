@@ -4,7 +4,7 @@
     {% if not has_fully_registered %}
       <!-- User must complete the registration process. -->
       <a class="btn oppia-navbar-add-exploration-button protractor-test-create-exploration oppia-transition-200"
-         href ng-click="onRedirectToLogin('{{gallery_login_redirect_url}}')">
+         href ng-click="onRedirectToLogin('/my_explorations?mode=create')">
         <span class="oppia-navbar-add-exploration-button-plus">+</span>
         <span>Create Exploration</span>
       </a>
