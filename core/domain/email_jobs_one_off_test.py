@@ -52,12 +52,12 @@ class EmailHashRegenerationOneOffJobTests(test_utils.GenericTestBase):
                 return ''
             return 'Email Hash'
 
-        generate_hash_ctx = self.swap(
+        generate_constant_hash_ctx = self.swap(
             email_models.SentEmailModel, '_generate_hash',
             types.MethodType(_generate_hash_for_tests,
                              email_models.SentEmailModel))
 
-        with generate_hash_ctx:
+        with generate_constant_hash_ctx:
             email_models.SentEmailModel.create(
                 'recipient_id1', 'recipient@email.com', 'sender_id',
                 'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,

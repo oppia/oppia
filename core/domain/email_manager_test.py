@@ -16,6 +16,7 @@
 
 import datetime
 import types
+from contextlib import nested
 
 from core.domain import config_services
 from core.domain import email_manager
@@ -459,7 +460,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
                 cls, recipient_id, email_subject, email_body):
             return 'Email Hash'
 
-        self.generate_hash_ctx = self.swap(
+        self.generate_constant_hash_ctx = self.swap(
             email_models.SentEmailModel, '_generate_hash',
             types.MethodType(_generate_hash_for_tests,
                              email_models.SentEmailModel))
@@ -581,7 +582,8 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
         duplicate_email_ctx = self.swap(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2)
 
-        with can_send_emails_ctx, duplicate_email_ctx, self.generate_hash_ctx:
+        with nested(can_send_emails_ctx, duplicate_email_ctx,
+                    self.generate_constant_hash_ctx):
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 0)
 
@@ -632,7 +634,8 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
         duplicate_email_ctx = self.swap(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2)
 
-        with can_send_emails_ctx, duplicate_email_ctx, self.generate_hash_ctx:
+        with nested(can_send_emails_ctx, duplicate_email_ctx,
+                    self.generate_constant_hash_ctx):
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 0)
 
@@ -683,7 +686,8 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
         duplicate_email_ctx = self.swap(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2)
 
-        with can_send_emails_ctx, duplicate_email_ctx, self.generate_hash_ctx:
+        with nested(can_send_emails_ctx, duplicate_email_ctx,
+                    self.generate_constant_hash_ctx):
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 0)
 

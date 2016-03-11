@@ -35,13 +35,13 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                 cls, recipient_id, email_subject, email_body):
             return 'Email Hash'
 
-        self.generate_hash_ctx = self.swap(
+        self.generate_constant_hash_ctx = self.swap(
             email_models.SentEmailModel, '_generate_hash',
             types.MethodType(_generate_hash_for_tests,
                              email_models.SentEmailModel))
 
     def test_saved_model_can_be_retrieved_with_same_hash(self):
-        with self.generate_hash_ctx:
+        with self.generate_constant_hash_ctx:
             email_models.SentEmailModel.create(
                 'recipient_id', 'recipient@email.com', 'sender_id',
                 'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
@@ -64,7 +64,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             self.assertEqual(len(results), 0)
 
     def test_get_by_hash_works_correctly(self):
-        with self.generate_hash_ctx:
+        with self.generate_constant_hash_ctx:
             email_models.SentEmailModel.create(
                 'recipient_id', 'recipient@email.com', 'sender_id',
                 'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
@@ -79,7 +79,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             self.assertEqual(len(results), 0)
 
     def test_get_by_hash_returns_multiple_models_with_same_hash(self):
-        with self.generate_hash_ctx:
+        with self.generate_constant_hash_ctx:
             email_models.SentEmailModel.create(
                 'recipient_id', 'recipient@email.com', 'sender_id',
                 'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
@@ -95,7 +95,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             self.assertEqual(len(results), 2)
 
     def test_get_by_hash_behavior_with_sent_datetime_lower_bound(self):
-        with self.generate_hash_ctx:
+        with self.generate_constant_hash_ctx:
             time_now = datetime.datetime.utcnow()
 
             email_models.SentEmailModel.create(
@@ -113,10 +113,11 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                 'Email Hash', sent_datetime_lower_bound=time_now1)
             self.assertEqual(len(results), 0)
 
-            after = datetime.datetime.utcnow() - datetime.timedelta(minutes=2)
+            time_before = (datetime.datetime.utcnow() -
+                           datetime.timedelta(minutes=10))
 
             results = email_models.SentEmailModel.get_by_hash(
-                'Email Hash', sent_datetime_lower_bound=after)
+                'Email Hash', sent_datetime_lower_bound=time_before)
             self.assertEqual(len(results), 1)
 
             # Check that it accepts only DateTime objects.

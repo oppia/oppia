@@ -21,7 +21,13 @@ from core.platform import models
 
 
 class EmailHashRegenerationOneOffJob(jobs.BaseMapReduceJobManager):
-    """One-off job for updating hash for all Sent Email Models."""
+    """One-off job for re-generating hash for all Sent Email Models.
+    For every instance we call the put() method. The put() method
+    results in a hash value (new hash value in case the hash
+    function changes or no hash was present before.) getting generated
+    and updated for each instance.
+    """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         return [email_models.SentEmailModel]
