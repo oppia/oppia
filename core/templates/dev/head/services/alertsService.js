@@ -69,11 +69,14 @@ oppia.factory('alertsService', ['$log', function($log) {
   alertsService.deleteWarning = function(warningObject) {
     var warnings = alertsService.warnings;
     var newWarnings = [];
+    var warningsCount = 0;
     for (var i = 0; i < warnings.length; i++) {
       if (warnings[i].content != warningObject.content) {
+        warningsCount++;
         newWarnings.push(warnings[i]);
       }
     }
+    warningsSoFar = warningsCount;
     alertsService.warnings = newWarnings;
   };
 
@@ -82,6 +85,7 @@ oppia.factory('alertsService', ['$log', function($log) {
    */
   alertsService.clearWarnings = function() {
     alertsService.warnings = [];
+    warningsSoFar = 0;
   };
 
   /**
@@ -107,12 +111,15 @@ oppia.factory('alertsService', ['$log', function($log) {
   alertsService.deleteMessage = function(messageObject) {
     var messages = alertsService.messages;
     var newMessages = [];
+    var messagesCount = 0;
     for (var i = 0; i < messages.length; i++) {
       if (messages[i].type != messageObject.type ||
           messages[i].content != messageObject.content) {
+        messagesCount++;
         newMessages.push(messages[i]);
       }
     }
+    messagesSoFar = messagesCount;
     alertsService.messages = newMessages;
   };
 
@@ -137,6 +144,7 @@ oppia.factory('alertsService', ['$log', function($log) {
    */
   alertsService.clearMessages = function() {
     alertsService.messages = [];
+    messagesSoFar = 0;
   };
 
   return alertsService;
