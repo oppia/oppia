@@ -704,6 +704,22 @@ textarea {
   }
 }
 
+.navbar-nav.oppia-navbar-nav > li > a.oppia-navbar-editor-navigation-toggle{
+font-size: 30px;
+padding: 10px 15px;
+
+}
+
+.oppia-editor-navigation-dropdown > .active > a,.oppia-editor-navigation-dropdown > .active > a:focus,.oppia-editor-navigation-dropdown > .active > a:hover{
+  background-color: #009688 !important;
+  color:#fff !important;
+}
+
+
+.dropdown-menu > li > a > .glyphicon{
+  padding-right: 10px;
+}
+
 .oppia-main-content {
   margin: 10px;
   padding: 10px;
