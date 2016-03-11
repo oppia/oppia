@@ -42,14 +42,11 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
     def test_create_success(self):
         user_models.ExplorationUserDataModel.create(
             self.USER_ID, self.EXP_ID_TWO).put()
-        expected_object = user_models.ExplorationUserDataModel(
-            user_id=self.USER_ID, exploration_id=self.EXP_ID_TWO)
-        actual_object = user_models.ExplorationUserDataModel.get_by_id(
+        retrieved_object = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.USER_ID, self.EXP_ID_TWO))
 
-        self.assertEqual(
-            expected_object.exploration_id, actual_object.exploration_id)
-        self.assertEqual(expected_object.user_id, actual_object.user_id)
+        self.assertEqual(retrieved_object.user_id, self.USER_ID)
+        self.assertEqual(retrieved_object.exploration_id, self.EXP_ID_TWO)
 
     def test_get_success(self):
         retrieved_object = user_models.ExplorationUserDataModel.get(
@@ -67,6 +64,6 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
 
     def test_get_failure(self):
         retrieved_object = user_models.ExplorationUserDataModel.get(
-            self.USER_ID, self.EXP_ID_TWO)
+            self.USER_ID, 'unknown_exp_id')
 
         self.assertEqual(retrieved_object, None)

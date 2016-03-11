@@ -124,7 +124,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
     # When the most recent rating was awarded, or None if not rated.
     rated_on = ndb.DateTimeProperty(default=None, indexed=False)
 
-    # List of uncomitted changes made by the user to the exploration.
+    # List of uncommitted changes made by the user to the exploration.
     draft_change_list = ndb.JsonProperty(default=None)
 
     # Timestamp of when the change list was last updated.
