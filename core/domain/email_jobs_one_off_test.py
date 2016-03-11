@@ -17,6 +17,7 @@
 """Tests for Email-related jobs."""
 
 import datetime
+import types
 
 from core.domain import email_jobs_one_off
 from core.platform import models
@@ -28,13 +29,13 @@ import feconf
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
-class SentEmailUpdateHashOneOffJobTests(test_utils.GenericTestBase):
+class EmailHashRegenerationOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off update hash job."""
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
-        job_id = email_jobs_one_off.SentEmailUpdateHashOneOffJob.create_new()
-        email_jobs_one_off.SentEmailUpdateHashOneOffJob.enqueue(job_id)
+        job_id = email_jobs_one_off.EmailHashRegenerationOneOffJob.create_new()
+        email_jobs_one_off.EmailHashRegenerationOneOffJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
@@ -42,21 +43,35 @@ class SentEmailUpdateHashOneOffJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
     def test_hashes_get_generated(self):
-        email_models.SentEmailModel.create(
-            'recipient_id1', 'recipient@email.com', 'sender_id',
-            'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
-            'Email Subject', 'Email Body', datetime.datetime.utcnow(), None)
+        # pylint: disable=unused-argument
+        def _generate_hash_for_tests(
+                cls, recipient_id, email_subject, email_body):
+            if recipient_id == 'recipient_id1':
+                return None
+            elif recipient_id == 'recipient_id2':
+                return ''
+            return 'Email Hash'
 
-        email_models.SentEmailModel.create(
-            'recipient_id2', 'recipient@email.com', 'sender_id',
-            'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
-            'Email Subject', 'Email Body', datetime.datetime.utcnow(), '')
+        generate_hash_ctx = self.swap(
+            email_models.SentEmailModel, '_generate_hash',
+            types.MethodType(_generate_hash_for_tests,
+                             email_models.SentEmailModel))
 
-        email_models.SentEmailModel.create(
-            'recipient_id3', 'recipient@email.com', 'sender_id',
-            'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
-            'Email Subject', 'Email Body', datetime.datetime.utcnow(),
-            'Email Hash.')
+        with generate_hash_ctx:
+            email_models.SentEmailModel.create(
+                'recipient_id1', 'recipient@email.com', 'sender_id',
+                'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
+                'Email Subject', 'Email Body', datetime.datetime.utcnow())
+
+            email_models.SentEmailModel.create(
+                'recipient_id2', 'recipient@email.com', 'sender_id',
+                'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
+                'Email Subject', 'Email Body', datetime.datetime.utcnow())
+
+            email_models.SentEmailModel.create(
+                'recipient_id3', 'recipient@email.com', 'sender_id',
+                'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
+                'Email Subject', 'Email Body', datetime.datetime.utcnow())
 
         # Check that all the emails were recorded in SentEmailModel.
         all_models = email_models.SentEmailModel.get_all().fetch()

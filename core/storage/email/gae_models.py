@@ -84,17 +84,22 @@ class SentEmailModel(base_models.BaseModel):
     @classmethod
     def create(
             cls, recipient_id, recipient_email, sender_id, sender_email,
-            intent, subject, html_body, sent_datetime, email_hash):
+            intent, subject, html_body, sent_datetime):
         """Creates a new SentEmailModel entry."""
         instance_id = cls._generate_id(intent)
         email_model_instance = cls(
             id=instance_id, recipient_id=recipient_id,
             recipient_email=recipient_email, sender_id=sender_id,
             sender_email=sender_email, intent=intent, subject=subject,
-            html_body=html_body, sent_datetime=sent_datetime,
-            email_hash=email_hash)
+            html_body=html_body, sent_datetime=sent_datetime)
 
         email_model_instance.put()
+
+    def put(self):
+        email_hash = self._generate_hash(
+            self.recipient_id, self.subject, self.html_body)
+        self.email_hash = email_hash
+        super(SentEmailModel, self).put()
 
     @classmethod
     def get_by_hash(cls, email_hash, sent_datetime_lower_bound=None):
@@ -121,3 +126,41 @@ class SentEmailModel(base_models.BaseModel):
         messages = query.fetch()
 
         return messages
+
+    @classmethod
+    def _generate_hash(cls, recipient_id, email_subject, email_body):
+        """Generate hash for a given recipient_id, email_subject and cleaned
+        email_body.
+        """
+        hash_value = utils.convert_to_hash(
+            recipient_id + email_subject + email_body,
+            100)
+
+        return hash_value
+
+    @classmethod
+    def check_duplicate_message(cls, recipient_id, email_subject, email_body):
+        """Check for a given recipient_id, email_subject and cleaned
+        email_body, whether a similar message has been sent in the last
+        DUPLICATE_EMAIL_INTERVAL_MINS.
+        """
+
+        email_hash = cls._generate_hash(
+            recipient_id, email_subject, email_body)
+
+        datetime_now = datetime.datetime.utcnow()
+        time_interval = datetime.timedelta(
+            minutes=feconf.DUPLICATE_EMAIL_INTERVAL_MINS)
+
+        sent_datetime_lower_bound = datetime_now - time_interval
+
+        messages = cls.get_by_hash(
+            email_hash, sent_datetime_lower_bound=sent_datetime_lower_bound)
+
+        for message in messages:
+            if (message.recipient_id == recipient_id and
+                    message.subject == email_subject and
+                    message.html_body == email_body):
+                return True
+
+        return False

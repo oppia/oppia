@@ -15,6 +15,7 @@
 """Tests for methods relating to sending emails."""
 
 import datetime
+import types
 
 from core.domain import config_services
 from core.domain import email_manager
@@ -430,42 +431,6 @@ class SignupEmailTests(test_utils.GenericTestBase):
                 sent_email_model.html_body, self.expected_html_email_content)
 
 
-class GenerateHashTests(test_utils.GenericTestBase):
-    """Test that generating hash functionality works as expected."""
-
-    def test_same_inputs_always_gives_same_hashes(self):
-        # pylint: disable=protected-access
-        email_hash1 = email_manager._generate_hash(
-            'recipient_id', 'email_subject', 'email_html_body')
-
-        email_hash2 = email_manager._generate_hash(
-            'recipient_id', 'email_subject', 'email_html_body')
-        self.assertEqual(email_hash1, email_hash2)
-        # pylint: enable=protected-access
-
-    def test_different_inputs_give_different_hashes(self):
-        # pylint: disable=protected-access
-        email_hash1 = email_manager._generate_hash(
-            'recipient_id', 'email_subject', 'email_html_body')
-
-        email_hash2 = email_manager._generate_hash(
-            'recipient_id', 'email_subject', 'email_html_body2')
-        self.assertNotEqual(email_hash1, email_hash2)
-
-        email_hash2 = email_manager._generate_hash(
-            'recipient_id2', 'email_subject', 'email_html_body')
-        self.assertNotEqual(email_hash1, email_hash2)
-
-        email_hash2 = email_manager._generate_hash(
-            'recipient_id', 'email_subject2', 'email_html_body')
-        self.assertNotEqual(email_hash1, email_hash2)
-
-        email_hash2 = email_manager._generate_hash(
-            'recipient_id2', 'email_subject2', 'email_html_body2')
-        self.assertNotEqual(email_hash1, email_hash2)
-        # pylint: enable=protected-access
-
-
 class DuplicateEmailTests(test_utils.GenericTestBase):
     """Test that duplicate emails are not sent"""
 
@@ -489,6 +454,16 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
                 'With a <b>bold</b> bit and an <i>italic</i> bit.<br>')
         }
 
+        # pylint: disable=unused-argument
+        def _generate_hash_for_tests(
+                cls, recipient_id, email_subject, email_body):
+            return 'Email Hash'
+
+        self.generate_hash_ctx = self.swap(
+            email_models.SentEmailModel, '_generate_hash',
+            types.MethodType(_generate_hash_for_tests,
+                             email_models.SentEmailModel))
+
     def test_send_email_does_not_resend_if_same_hash_exists(self):
         can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
@@ -509,20 +484,18 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 0)
 
-            # pylint: disable=protected-access
-            email_hash = email_manager._generate_hash(
-                self.new_user_id, 'Email Subject', 'Email Body')
             email_models.SentEmailModel.create(
                 self.new_user_id, self.NEW_USER_EMAIL,
                 feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
                 feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
-                datetime.datetime.utcnow(), email_hash)
+                datetime.datetime.utcnow())
 
             # Check that the content of this email was recorded in
             # SentEmailModel.
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 1)
 
+            # pylint: disable=protected-access
             email_manager._send_email(
                 self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body')
@@ -608,24 +581,22 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
         duplicate_email_ctx = self.swap(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2)
 
-        with can_send_emails_ctx, duplicate_email_ctx:
+        with can_send_emails_ctx, duplicate_email_ctx, self.generate_hash_ctx:
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 0)
 
-            # pylint: disable=protected-access
-            email_hash = email_manager._generate_hash(
-                self.new_user_id, 'Email Subject', 'Email Body')
             email_models.SentEmailModel.create(
                 'recipient_id', self.NEW_USER_EMAIL,
                 feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
                 feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
-                datetime.datetime.utcnow(), email_hash)
+                datetime.datetime.utcnow())
 
             # Check that the content of this email was recorded in
             # SentEmailModel.
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 1)
 
+            # pylint: disable=protected-access
             email_manager._send_email(
                 self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body')
@@ -661,24 +632,22 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
         duplicate_email_ctx = self.swap(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2)
 
-        with can_send_emails_ctx, duplicate_email_ctx:
+        with can_send_emails_ctx, duplicate_email_ctx, self.generate_hash_ctx:
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 0)
 
-            # pylint: disable=protected-access
-            email_hash = email_manager._generate_hash(
-                self.new_user_id, 'Email Subject', 'Email Body')
             email_models.SentEmailModel.create(
                 self.new_user_id, self.NEW_USER_EMAIL,
                 feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
                 feconf.EMAIL_INTENT_SIGNUP, 'Email Subject1', 'Email Body',
-                datetime.datetime.utcnow(), email_hash)
+                datetime.datetime.utcnow())
 
             # Check that the content of this email was recorded in
             # SentEmailModel.
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 1)
 
+            # pylint: disable=protected-access
             email_manager._send_email(
                 self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body')
@@ -714,24 +683,22 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
         duplicate_email_ctx = self.swap(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2)
 
-        with can_send_emails_ctx, duplicate_email_ctx:
+        with can_send_emails_ctx, duplicate_email_ctx, self.generate_hash_ctx:
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 0)
 
-            # pylint: disable=protected-access
-            email_hash = email_manager._generate_hash(
-                self.new_user_id, 'Email Subject', 'Email Body')
             email_models.SentEmailModel.create(
                 self.new_user_id, self.NEW_USER_EMAIL,
                 feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
                 feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body1',
-                datetime.datetime.utcnow(), email_hash)
+                datetime.datetime.utcnow())
 
             # Check that the content of this email was recorded in
             # SentEmailModel.
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 1)
 
+            # pylint: disable=protected-access
             email_manager._send_email(
                 self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body')
@@ -770,9 +737,6 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 0)
 
-            # pylint: disable=protected-access
-            email_hash = email_manager._generate_hash(
-                self.new_user_id, 'Email Subject', 'Email Body')
             email_sent_time = (datetime.datetime.utcnow() -
                                datetime.timedelta(minutes=4))
 
@@ -780,7 +744,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
                 self.new_user_id, self.NEW_USER_EMAIL,
                 feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
                 feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
-                email_sent_time, email_hash)
+                email_sent_time)
 
             # Check that the content of this email was recorded in
             # SentEmailModel.
@@ -794,13 +758,14 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
                 self.new_user_id, self.NEW_USER_EMAIL,
                 feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
                 feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
-                email_sent_time, email_hash)
+                email_sent_time)
 
             # Check that the content of this email was recorded in
             # SentEmailModel.
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 2)
 
+            # pylint: disable=protected-access
             email_manager._send_email(
                 self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body')

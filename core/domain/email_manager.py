@@ -25,7 +25,6 @@ from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
 import feconf
-import utils
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 email_services = models.Registry.import_email_services()
@@ -145,14 +144,12 @@ def _send_email(
         '<br>', '\n').replace('</p><p>', '</p>\n<p>')
     cleaned_plaintext_body = html_cleaner.strip_html_tags(raw_plaintext_body)
 
-    email_hash = _generate_hash(recipient_id, email_subject, cleaned_html_body)
-
-    if _check_duplicate_message(recipient_id, email_subject,
-                                cleaned_plaintext_body):
+    if email_models.SentEmailModel.check_duplicate_message(
+            recipient_id, email_subject, cleaned_plaintext_body):
         log_new_error(
             'Duplicate email:\n'
-            'Details:\n%s %s %s\n%s\n\n' %
-            (email_hash, recipient_id, email_subject, cleaned_plaintext_body))
+            'Details:\n%s %s\n%s\n\n' %
+            (recipient_id, email_subject, cleaned_plaintext_body))
         return
 
     def _send_email_in_transaction():
@@ -164,8 +161,7 @@ def _send_email(
             cleaned_plaintext_body, cleaned_html_body, bcc_admin)
         email_models.SentEmailModel.create(
             recipient_id, recipient_email, sender_id, sender_email, intent,
-            email_subject, cleaned_html_body, datetime.datetime.utcnow(),
-            email_hash)
+            email_subject, cleaned_html_body, datetime.datetime.utcnow())
 
     return transaction_services.run_in_transaction(_send_email_in_transaction)
 
@@ -259,38 +255,3 @@ def send_moderator_action_email(
     _send_email(
         recipient_id, sender_id, intent, email_subject, full_email_content,
         bcc_admin=True)
-
-def _generate_hash(
-        recipient_id, email_subject, email_html_body):
-    """Generate hash for a given recipient_id, email_subject
-    and cleaned email_html_body.
-    """
-
-    hash_value = utils.convert_to_hash(
-        recipient_id + email_subject + email_html_body,
-        100)
-
-    return hash_value
-
-def _check_duplicate_message(
-        recipient_id, email_subject, email_html_body):
-    """Check for a given recipient_id, email_subject
-    and cleaned email_html_body, whether a similar message has been sent
-    in the last DUPLICATE_EMAIL_INTERVAL_MINS.
-    """
-
-    email_hash = _generate_hash(recipient_id, email_subject, email_html_body)
-
-    sent_datetime_lower_bound = datetime.datetime.utcnow() - datetime.timedelta(
-        minutes=feconf.DUPLICATE_EMAIL_INTERVAL_MINS)
-
-    messages = email_models.SentEmailModel.get_by_hash(
-        email_hash, sent_datetime_lower_bound=sent_datetime_lower_bound)
-
-    for message in messages:
-        if (message.recipient_id == recipient_id and
-                message.subject == email_subject and
-                message.html_body == email_html_body):
-            return True
-
-    return False
