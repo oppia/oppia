@@ -20,7 +20,6 @@ from collections import defaultdict
 
 from core import jobs_registry
 from core.domain import collection_services
-from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
@@ -589,6 +588,7 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
     USER_A_USERNAME = 'a'
     USER_B_USERNAME = 'b'
     MIN_NUM_COMPLETIONS = 2
+    EXPONENT = 2.0/3
 
     def setUp(self):
         super(UserImpactAggregatorTest, self).setUp()
@@ -597,23 +597,31 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
     def _mock_get_statistics(self, exp_id, unused_version):
         current_completions = {
             self.EXP_ID_1: {
-                'complete_exploration_count':
-                self.num_completions[self.EXP_ID_1],
+                'complete_exploration_count': (
+                    self.num_completions[self.EXP_ID_1]),
                 'state_hit_counts': {
-                    'state1': {'first_entry_count': 3,
-                               'no_answer_count': 1},
-                    'state2': {'first_entry_count': 7,
-                               'no_answer_count': 1},
+                    'state1': {
+                        'first_entry_count': 3,
+                        'no_answer_count': 1
+                    },
+                    'state2': {
+                        'first_entry_count': 7,
+                        'no_answer_count': 1
+                    },
                 }
             },
             self.EXP_ID_2: {
-                'complete_exploration_count':
-                self.num_completions[self.EXP_ID_2],
+                'complete_exploration_count': (
+                    self.num_completions[self.EXP_ID_2]),
                 'state_hit_counts': {
-                    'state1': {'first_entry_count': 3,
-                               'no_answer_count': 1},
-                    'state2': {'first_entry_count': 7,
-                               'no_answer_count': 1},
+                    'state1': {
+                        'first_entry_count': 3,
+                        'no_answer_count': 1
+                    },
+                    'state2': {
+                        'first_entry_count': 7,
+                        'no_answer_count': 1
+                    },
                 }
             },
             self.EXP_ID_3: {
@@ -666,23 +674,6 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
             rating_services.assign_rating_to_exploration(
                 user_id, exp_id, rating)
 
-    def _complete_exploration(self, exploration, num_completions):
-        """Log a completion of exploration with id exp_id num_completions
-        times."""
-        exp_version = 1
-        state = exploration.init_state_name
-        session_ids = ['session%d' % i for i in range(num_completions)]
-        for session_id in session_ids:
-            event_services.StartExplorationEventHandler.record(
-                exploration.id, exp_version, state, session_id, {},
-                feconf.PLAY_TYPE_NORMAL)
-            event_services.CompleteExplorationEventHandler.record(
-                exploration.id, exp_version, state, session_id, 27, {},
-                feconf.PLAY_TYPE_NORMAL)
-        # Set the number of completions, so mock can function
-        # correctly.
-        self.num_completions[exploration.id] += num_completions
-
     def test_user_with_no_explorations_has_no_impact(self):
         """Test that a user who is not a contributor on any exploration
         is not assigned an impact score by the UserImpactMRJobManager.
@@ -703,11 +694,11 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
         avg_rating = 4
         self._rate_exploration(exploration.id, 5, avg_rating)
 
-        rating = avg_rating - 2
-        exp = 2/float(3)
-        answer_count = 8 # see state counts above
-        reach = answer_count**exp
-        expected_user_impact_score = round((rating * reach) ** exp)
+        # See state counts in _mock_get_statistics(), above.
+        expected_answer_count = 8
+        reach = expected_answer_count ** self.EXPONENT
+        expected_user_impact_score = round(
+            ((avg_rating - 2) * reach) ** self.EXPONENT)
 
         # Verify that the impact score matches the expected.
         self._run_computation()
@@ -727,12 +718,12 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
         self._rate_exploration(exploration.id, 5, avg_rating)
         exp_services.update_exploration(user_b_id, self.EXP_ID_1, [], '')
 
-        rating = avg_rating - 2
-        exp = 2/float(3)
-        answer_count = 8 # see state counts above
-        reach = answer_count**exp
+        # See state counts in _mock_get_statistics(), above.
+        expected_answer_count = 8
+        reach = expected_answer_count ** self.EXPONENT
         contrib = 0.5
-        expected_user_impact_score = round((rating * reach * contrib) ** exp)
+        expected_user_impact_score = round(
+            ((avg_rating - 2) * reach * contrib) ** self.EXPONENT)
 
         # Verify that the impact score matches the expected.
         self._run_computation()
@@ -753,12 +744,12 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
         self._rate_exploration(exploration_1.id, 2, avg_rating)
         self._rate_exploration(exploration_2.id, 2, avg_rating)
 
-        rating = avg_rating - 2
-        exp = 2/float(3)
-        answer_count = 8 # see state counts above
-        reach = answer_count**exp
-        impact_per_exp = (rating * reach) # * 1 for contribution
-        expected_user_impact_score = round((impact_per_exp * 2) ** exp)
+        # See state counts in _mock_get_statistics(), above.
+        expected_answer_count = 8
+        reach = expected_answer_count ** self.EXPONENT
+        impact_per_exp = ((avg_rating - 2) * reach) # * 1 for contribution
+        expected_user_impact_score = round(
+            (impact_per_exp * 2) ** self.EXPONENT)
 
         # Verify that the impact score matches the expected.
         self._run_computation()
@@ -773,16 +764,34 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
         user_a_id = self._sign_up_user(
             self.USER_A_EMAIL, self.USER_A_USERNAME)
         self._create_exploration(self.EXP_ID_1, user_a_id)
-        self._rate_exploration(self.EXP_ID_1, 2, 1)
 
+        # Give two ratings of 1.
+        self._rate_exploration(self.EXP_ID_1, 2, 1)
         self._run_computation()
-        user_stats_model = user_models.UserStatsModel.get(user_a_id,
-                                                          strict=False)
-        self.assertEqual(user_stats_model, None)
+        user_stats_model = user_models.UserStatsModel.get(
+            user_a_id, strict=False)
+        self.assertIsNone(user_stats_model)
+        ModifiedUserImpactAggregator.stop_computation(user_a_id)
+
+        # Give two ratings of 2.
+        self._rate_exploration(self.EXP_ID_1, 2, 2)
+        self._run_computation()
+        user_stats_model = user_models.UserStatsModel.get(
+            user_a_id, strict=False)
+        self.assertIsNone(user_stats_model)
+        ModifiedUserImpactAggregator.stop_computation(user_a_id)
+
+        # Give two ratings of 3. The impact score should now be nonzero.
+        self._rate_exploration(self.EXP_ID_1, 2, 3)
+        self._run_computation()
+        user_stats_model = user_models.UserStatsModel.get(
+            user_a_id, strict=False)
+        self.assertIsNotNone(user_stats_model)
+        self.assertGreater(user_stats_model.impact_score, 0)
 
     def test_impact_for_exp_with_no_answers(self):
-        """Test that when an exploration has no answers and thus has
-         no reach.
+        """Test that when an exploration has no answers, it is considered to
+        have no reach.
         """
         # Sign up a user and have them create an exploration.
         user_a_id = self._sign_up_user(
@@ -801,6 +810,6 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
         user_a_id = self._sign_up_user(
             self.USER_A_EMAIL, self.USER_A_USERNAME)
         self._create_exploration(self.EXP_ID_1, user_a_id)
-        user_stats_model = user_models.UserStatsModel.get(user_a_id,
-                                                          strict=False)
+        user_stats_model = user_models.UserStatsModel.get(
+            user_a_id, strict=False)
         self.assertEqual(user_stats_model, None)
