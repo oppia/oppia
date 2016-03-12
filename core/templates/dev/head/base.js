@@ -101,7 +101,7 @@ oppia.controller('Base', [
     $window.onresize = function() {
       $scope.windowWidth = windowDimensionsService.getWidth();
       $scope.$apply();
-            };
+    };
 
     if (GLOBALS.userIsLoggedIn) {
       // Show the number of unseen notifications in the navbar and page title,
