@@ -704,17 +704,40 @@ textarea {
   }
 }
 
-.navbar-nav.oppia-navbar-nav > li > a.oppia-navbar-editor-navigation-toggle{
-font-size: 30px;
-padding: 10px 15px;
-
+.oppia-editor-navigation{
+  list-style: none;
+  line-height: 56px;
 }
 
-.oppia-editor-navigation-dropdown > .active > a,.oppia-editor-navigation-dropdown > .active > a:focus,.oppia-editor-navigation-dropdown > .active > a:hover{
-  background-color: #009688 !important;
-  color:#fff !important;
+.oppia-editor-navigation > li {
+  display: inline-block;
+  padding:0 20px;
 }
 
+.navbar-nav.oppia-navbar-nav > li > a.oppia-navbar-editor-navigation-toggle { 
+  font-size: 20px;
+}
+
+.oppia-editor-navigation > li > a {
+  color: #fff;
+}
+
+.oppia-editor-navigation > li:hover {
+  background-color: #06B9AC;
+}
+
+.oppia-editor-navigation > li.active,
+.oppia-editor-navigation > li.active:focus,
+.oppia-editor-navigation > li.active:hover {
+  background-color: #06B9AC;
+}
+
+.nav .dropdown:hover > .oppia-editor-navigation-dropdown.dropdown-menu > li.active > a,
+.nav .dropdown:hover > .oppia-editor-navigation-dropdown.dropdown-menu > li.active > a:focus,
+.nav .dropdown:hover > .oppia-editor-navigation-dropdown.dropdown-menu > li.active > a:hover {
+  color:#fff;
+  background-color: #009688;
+}
 
 .dropdown-menu > li > a > .glyphicon{
   padding-right: 10px;
