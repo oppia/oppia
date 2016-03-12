@@ -863,9 +863,9 @@ oppia.config(['$provide', function($provide) {
 }]);
 
 oppia.directive('textAngularRte', [
-    '$filter', 'oppiaHtmlEscaper', 'rteHelperService',
+    '$filter', 'oppiaHtmlEscaper', 'rteHelperService', '$timeout',
     function(
-      $filter, oppiaHtmlEscaper, rteHelperService) {
+      $filter, oppiaHtmlEscaper, rteHelperService, $timeout) {
       return {
         restrict: 'E',
         scope: {
@@ -922,10 +922,10 @@ oppia.directive('textAngularRte', [
 
           // It is possible for the content of the RTE to be changed externally,
           // e.g. if there are several RTEs in a list, and one is deleted.
-          $scope.$watch('htmlContent', function(newVal, oldVal) {
-            if (newVal !== oldVal) {
-              $scope.tempContent = _convertHtmlToRte(newVal);
-            }
+          $scope.$on('externalHtmlContentChange', function() {
+            $timeout(function() {
+              $scope.tempContent = _convertHtmlToRte($scope.htmlContent);
+            });
           });
         }]
       };
@@ -1646,6 +1646,8 @@ oppia.directive('schemaBasedListEditor', [
             'submittedSchemaBasedUnicodeForm', $scope._onChildFormSubmit);
 
           $scope.deleteElement = function(index) {
+            // Need to let the RTE know that HtmlContent has been changed.
+            $scope.$broadcast('externalHtmlContentChange');
             $scope.localValue.splice(index, 1);
           };
         } else {
