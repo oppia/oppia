@@ -97,6 +97,10 @@ oppia.controller('Base', [
 
     // If this is nonempty, the whole page goes into 'Loading...' mode.
     $rootScope.loadingMessage = '';
+    // Method to call windowSize on resizing the window
+    $window.onresize = function() {
+              windowSize();
+            };
 
     if (GLOBALS.userIsLoggedIn) {
       // Show the number of unseen notifications in the navbar and page title,
@@ -212,8 +216,13 @@ oppia.controller('Base', [
       }, 150);
       return false;
     };
+
     // Checks the width of the window
     $scope.windowWidth = windowDimensionsService.getWidth();
+    function windowSize() {
+      $scope.windowWidth = windowDimensionsService.getWidth();
+      $scope.$apply();
+    }
 
     $scope.pageHasLoaded = false;
     $scope.pendingSidebarClick = false;

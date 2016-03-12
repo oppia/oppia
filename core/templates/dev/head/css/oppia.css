@@ -660,7 +660,7 @@ textarea {
    clicked -- so, in such cases (e.g. for the 'Sign in' link at the top right),
    we use this instead.
 */
-.oppia-clickable-dropdown:hover ul.dropdown-menu {
+.oppia-clickable-dropdown:hover ul.dropdown-menu .oppia-clickable-navbar-element:hover{
   display: block;
 }
 
@@ -773,6 +773,7 @@ textarea {
   color: rgba(255,255,255,0.9);
   font-size: 16px;
   margin-right: 5px;
+  margin-left: 5px;
 }
 .btn.oppia-navbar-add-exploration-button:hover {
   background-color: rgba(5, 190, 178, 1);
@@ -2129,16 +2130,28 @@ div#ng-curtain {
   margin-left: -10px;
 }
 
-.oppia-logo {
+.oppia-logo-wide,
+.oppia-logo-small {
   display: inline-block;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 21px;
   font-weight: 300;
   height: 40px;
-  margin-left: 6px;
   margin-top: 8px;
 }
-.oppia-navbar-profile-dropdown-toggle {
+.oppia-logo-wide {
+  margin-left: 25px;
+}
+.oppia-logo-small {
+  margin-left: 6px;
+}
+
+.nav > li > a.oppia-navbar-tabs {
+  font-size: 1em;
+  padding-top: 17px;
+}
+.oppia-navbar-profile-dropdown-toggle,
+.oppia-navbar-tabs {
   height: 56px;
   color: #fff;
 }
