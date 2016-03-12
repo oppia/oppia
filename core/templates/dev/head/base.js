@@ -84,14 +84,15 @@ oppia.constant('MAX_NODE_LABEL_LENGTH', 15);
 // Global utility methods.
 oppia.controller('Base', [
   '$scope', '$http', '$rootScope', '$window', '$timeout', '$document', '$log',
-  'warningsData', 'LABEL_FOR_CLEARING_FOCUS', 'siteAnalyticsService',
-  'urlService', 'CATEGORY_LIST', 'windowDimensionsService',
+  'alertsService', 'LABEL_FOR_CLEARING_FOCUS', 'siteAnalyticsService',
+  'windowDimensionsService',
   function(
       $scope, $http, $rootScope, $window, $timeout, $document, $log,
-      warningsData, LABEL_FOR_CLEARING_FOCUS, siteAnalyticsService,
-      urlService, CATEGORY_LIST, windowDimensionsService) {
+      alertsService, LABEL_FOR_CLEARING_FOCUS, siteAnalyticsService,
+      windowDimensionsService) {
     $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
-    $scope.warningsData = warningsData;
+
+    $scope.alertsService = alertsService;
     $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
 
     // If this is nonempty, the whole page goes into 'Loading...' mode.

@@ -1,12 +1,17 @@
 {% macro warnings_and_loader() -%}
   <div ng-cloak>
-    <div class="oppia-alert-blocks">
-      <div ng-repeat="warning in (warningsData.warnings | limitTo:5) track by $index">
-        <p class="alert alert-warning">
-          <button type="button" class="close" ng-click="warningsData.deleteWarning($index)">&times;</button>
-          <strong>Warning!</strong>
-          <[warning]>
-        </p>
+    <div class="oppia-toast-container toast-top-center">
+      <div ng-repeat="warning in (alertsService.warnings | limitTo:5) track by $index" class="toast toast-warning oppia-toast">
+        <button type="button" class="toast-close-button" ng-click="alertsService.deleteWarning(warning)" role="button">&times;</button>
+        <div class="toast-message">
+          <[warning.content]>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div ng-repeat="message in alertsService.messages track by $index">
+        <alert-message message-object="message" message-index="$index"></alert-message>
       </div>
     </div>
 
@@ -304,10 +309,12 @@
 
       {{ include_js_file('forms/formBuilder.js') }}
 
-      {{ include_js_file('services/warningsData.js') }}
+      {{ include_js_file('services/alertsService.js') }}
       {{ include_js_file('services/explorationContextService.js') }}
       {{ include_js_file('services/autoplayedVideosService.js') }}
 
+
+      {{ include_js_file('components/AlertMessageDirective.js') }}
       {{ include_js_file('components/ObjectEditorDirective.js') }}
       {{ include_js_file('components/ExplorationSummaryTileDirective.js') }}
       {{ include_js_file('components/RatingComputationService.js')}}

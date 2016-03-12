@@ -159,6 +159,8 @@ DEFAULT_EMAIL_UPDATES_PREFERENCE = False
 REQUIRE_EMAIL_ON_MODERATOR_ACTION = False
 # Whether to allow custom event reporting to Google Analytics.
 CAN_SEND_ANALYTICS_EVENTS = False
+# Timespan in minutes before allowing duplicate emails
+DUPLICATE_EMAIL_INTERVAL_MINS = 2
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'

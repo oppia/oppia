@@ -29,15 +29,15 @@ oppia.directive('collectionNodeEditorDirective', [function() {
       updateSkillList: '&'
     },
     templateUrl: 'inline/collection_node_editor_directive',
-    controller: ['$scope', 'CollectionUpdateService', 'warningsData',
-      function($scope, CollectionUpdateService, warningsData) {
+    controller: ['$scope', 'CollectionUpdateService', 'alertsService',
+      function($scope, CollectionUpdateService, alertsService) {
       var _addSkill = function(skillList, newSkillName) {
         // Ensure the user entered a skill name.
         if (!newSkillName) {
-          warningsData.addWarning('Cannot add empty skill to collection.');
+          alertsService.addWarning('Cannot add empty skill to collection.');
           return false;
         } else if (!skillList.addSkill(newSkillName)) {
-          warningsData.addWarning('Skill is already added: ' + newSkillName);
+          alertsService.addWarning('Skill is already added: ' + newSkillName);
           return false;
         }
         return true;
@@ -114,7 +114,7 @@ oppia.directive('collectionNodeEditorDirective', [function() {
         var collectionNode = $scope.getCollectionNode();
         var explorationId = collectionNode.getExplorationId();
         if (!collection.containsCollectionNode(explorationId)) {
-          warningsData.fatalWarning(
+          alertsService.fatalWarning(
             'Internal collection editor error. Could not delete exploration ' +
             'by ID: ' + explorationId);
         }

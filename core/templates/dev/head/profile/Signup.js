@@ -19,10 +19,10 @@
  */
 
 oppia.controller('Signup', [
-  '$scope', '$http', '$rootScope', '$modal', 'warningsData', 'urlService',
+  '$scope', '$http', '$rootScope', '$modal', 'alertsService', 'urlService',
   'focusService',
   function(
-      $scope, $http, $rootScope, $modal, warningsData, urlService,
+      $scope, $http, $rootScope, $modal, alertsService, urlService,
       focusService) {
     var _SIGNUP_DATA_URL = '/signuphandler/data';
     $rootScope.loadingMessage = 'Loading';
@@ -68,7 +68,7 @@ oppia.controller('Signup', [
       if ($scope.hasUsername) {
         return;
       }
-      warningsData.clear();
+      alertsService.clearWarnings();
       $scope.blurredAtLeastOnce = true;
       $scope.updateWarningText(username);
       if (!$scope.warningText) {
@@ -113,7 +113,7 @@ oppia.controller('Signup', [
     $scope.submitPrerequisitesForm = function(
         agreedToTerms, username, canReceiveEmailUpdates) {
       if (!agreedToTerms) {
-        warningsData.addWarning(
+        alertsService.addWarning(
           'In order to edit explorations on this site, you will need to ' +
           'agree to the site terms.');
         return;

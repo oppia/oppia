@@ -34,9 +34,9 @@ oppia.animation('.oppia-collection-animate-slide', function() {
 
 oppia.controller('CollectionPlayer', [
   '$scope', 'CollectionBackendApiService', 'CollectionObjectFactory',
-  'CollectionPlaythroughObjectFactory', 'warningsData',
+  'CollectionPlaythroughObjectFactory', 'alertsService',
   function($scope, CollectionBackendApiService, CollectionObjectFactory,
-    CollectionPlaythroughObjectFactory, warningsData) {
+    CollectionPlaythroughObjectFactory, alertsService) {
     $scope.collection = null;
     $scope.collectionPlaythrough = null;
     $scope.collectionId = GLOBALS.collectionId;
@@ -46,7 +46,7 @@ oppia.controller('CollectionPlayer', [
       var collectionNode = (
         $scope.collection.getCollectionNodeByExplorationId(explorationId));
       if (!collectionNode) {
-        warningsData.addWarning('There was an error loading the collection.');
+        alertsService.addWarning('There was an error loading the collection.');
       }
       return collectionNode;
     };
@@ -110,7 +110,7 @@ oppia.controller('CollectionPlayer', [
         // NOTE TO DEVELOPERS: Check the backend console for an indication as to
         // why this error occurred; sometimes the errors are noisy, so they are
         // not shown to the user.
-        warningsData.addWarning(
+        alertsService.addWarning(
           'There was an error loading the collection.');
       }
     );

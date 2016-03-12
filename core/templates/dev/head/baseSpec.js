@@ -28,7 +28,7 @@ describe('Base controller', function() {
       scope = $rootScope.$new();
       ctrl = $controller('Base', {
         $scope: scope,
-        warningsData: null,
+        alertsService: null,
         messengerService: null
       });
     }));
