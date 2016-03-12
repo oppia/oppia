@@ -2873,3 +2873,491 @@ md-card.preview-conversation-skin-supplemental-card {
   color: red;
   margin-bottom: 10px;
 }
+
+.conversation-skin-progress-dots {
+  left: 0;
+  margin: 0 auto;
+  position: fixed;
+  right: 0;
+  z-index: 1;
+}
+
+.conversation-skin-progress-dots-not-iframed {
+  top: 56px;
+}
+
+.conversation-skin-progress-dots-iframed {
+  top: 6px;
+}
+
+.conversation-skin-oppia-avatar,
+.conversation-skin-user-avatar {
+  height: 36px;
+  position: absolute;
+  top: 0;
+  width: 36px;
+  z-index: 1;
+}
+
+.conversation-skin-oppia-avatar {
+  left: -20px;
+}
+
+.conversation-skin-tutor-card-top-section .conversation-skin-oppia-avatar {
+  height: 48px;
+  left: -28px;
+  width: 48px;
+}
+
+.conversation-skin-inline-interaction .conversation-skin-user-avatar {
+  left: -20px;
+  top: 14px;
+}
+
+.conversation-skin-learner-answer-container .conversation-skin-user-avatar {
+  right: -20px;
+}
+
+.conversation-skin-tutor-card-middle-section .conversation-skin-user-avatar,
+.conversation-skin-tutor-card-middle-section .conversation-skin-oppia-avatar {
+  display: none;
+}
+
+.conversation-skin-responses-dropdown-icon {
+  font-size: 10px;
+  margin-bottom: -4px;
+  -webkit-transition: all 0.2s;
+  -moz-transition: all 0.2s;
+  -o-transition: all 0.2s;
+  transition: 0.2s;
+}
+
+.conversation-skin-responses-dropdown-icon-rotated {
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  transform: rotate(90deg);
+}
+
+.conversation-skin-responses-dropdown-container {
+  border-bottom: 1px solid #ccc;
+  cursor: pointer;
+  line-height: 0.1em;
+  margin: 8px 20px 20px 20px;
+  text-align: center;
+}
+
+.conversation-skin-responses-dropdown-text {
+  background-color: #fff;
+  color: #888;
+  font-size: 0.8em;
+  padding: 0 10px;
+}
+
+.conversation-skin-bottom-gadget-panel {
+  bottom: 4px;
+  left: 0;
+  margin: 0 auto;
+  max-height: 135px;
+  max-width: 400px;
+  min-width: 150px;
+  position: fixed;
+  right: 0;
+  width: 360px;
+}
+
+.conversation-skin-cards-container {
+  margin: 0 auto;
+  /* This is the width of the main card, plus the width of the supplemental
+     card, plus a 12px margin between them.
+  */
+  max-width: 1084px;
+}
+
+.conversation-skin-help-card {
+  background: #fff;
+  border-radius: 2px;
+  /* We move the help card lower so that it does not block
+    the terminal output in the CodeRepl interaction.
+  */
+  bottom: -50px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.24), 0 1px 3px rgba(0,0,0,0.12);
+  min-height: 50px;
+  opacity: 1;
+  padding: 12px;
+  position: absolute;
+  right: 12px;
+  text-align: left;
+  transition: all 350ms;
+  z-index: 500;
+}
+
+.conversation-skin-help-card.ng-enter,
+.conversation-skin-help-card.ng-leave-active {
+  opacity: 0;
+  transform: translateX(200px);
+}
+
+.conversation-skin-help-card .conversation-skin-oppia-avatar {
+  top: 12px;
+}
+
+.conversation-skin-help-card-content {
+  width: 270px;
+}
+
+.conversation-skin-close-help-card-button {
+  background: none;
+  border: 0;
+  color: #000;
+  cursor: pointer;
+  height: 24px;
+  opacity: 0.5;
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  width: 24px;
+  z-index: 200;
+}
+
+.conversation-skin-main-tutor-card,
+.conversation-skin-future-tutor-card {
+  background: #fff;
+  border-radius: 2px;
+  left: 0;
+  margin: 44px auto 60px auto;
+  padding-top: 20px;
+  position: relative;
+  right: 0;
+  text-align: left;
+  width: 560px;
+  z-index: 1;
+}
+
+.conversation-skin-main-tutor-card.conversation-skin-left-card,
+.conversation-skin-future-tutor-card.conversation-skin-left-card {
+  float: left;
+  margin-left: 0;
+  margin-right: 0;
+  width: 472px;
+}
+
+.conversation-skin-main-tutor-card.animate-card-width {
+  -webkit-transition: width 500ms;
+  transition: width 500ms;
+}
+
+.conversation-skin-future-tutor-card {
+  position: absolute;
+  left: -30000px;
+  top: -30000px;
+}
+
+.conversation-skin-tutor-card-top-section,
+.conversation-skin-oppia-feedback-container,
+.conversation-skin-learner-answer-container {
+  position: relative;
+}
+
+.conversation-skin-tutor-card-top-section,
+.conversation-skin-oppia-feedback-container,
+.conversation-skin-learner-answer-container {
+  padding: 0 20px;
+}
+
+.conversation-skin-tutor-card-top-content,
+.conversation-skin-oppia-feedback-content,
+.conversation-skin-learner-answer-content,
+.conversation-skin-help-card-content {
+  border-radius: 2px;
+  display: inline-block;
+  max-width: 100%;
+  position: relative;
+  text-align: left;
+}
+
+.conversation-skin-tutor-card-top-content,
+.conversation-skin-oppia-feedback-content,
+.conversation-skin-learner-answer-content {
+  margin-bottom: 12px;
+}
+
+.conversation-skin-tutor-card-top-content {
+  width: 100%;
+}
+
+.conversation-skin-tutor-card-top-content,
+.conversation-skin-help-card-content {
+  padding: 12px;
+}
+
+.conversation-skin-oppia-feedback-content,
+.conversation-skin-learner-answer-content {
+  padding: 8px 12px;
+}
+
+.conversation-skin-tutor-card-top-content,
+.conversation-skin-oppia-feedback-content,
+.conversation-skin-help-card-content {
+  background-color: rgba(224,242,241,1);
+}
+
+.conversation-skin-learner-answer-content {
+  background-color: rgba(236,239,241,1);
+  border-bottom-right-radius: 0;
+}
+
+.conversation-skin-tutor-card-top-content,
+.conversation-skin-oppia-feedback-content,
+.conversation-skin-help-card-content {
+  border-top-left-radius: 0;
+}
+
+.conversation-skin-learner-answer-container {
+  text-align: right;
+}
+
+.conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-content {
+  background-color: rgba(236,239,241,0.4);
+}
+
+.conversation-skin-tutor-card-middle-section .conversation-skin-oppia-feedback-content {
+  background-color: rgba(224,242,241,0.4);
+}
+
+.conversation-skin-tutor-card-top-content::before,
+.conversation-skin-oppia-feedback-content::before,
+.conversation-skin-help-card-content::before {
+  content: " ";
+  left: -8px;
+  border-left: 8px solid transparent;
+  border-top: 12px solid rgba(224,242,241,1);
+  position: absolute;
+  top: 0;
+}
+
+.conversation-skin-learner-answer-content::before {
+  content: " ";
+  right: -8px;
+  border-right: 8px solid transparent;
+  border-top: 12px solid rgba(236,239,241,1);
+  position: absolute;
+  top: 0;
+}
+
+.conversation-skin-tutor-card-middle-section .conversation-skin-oppia-feedback-content::before,
+.conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-content::before {
+  display: none;
+}
+
+.conversation-skin-interaction-clickable-instructions {
+  cursor: pointer;
+}
+
+.conversation-skin-tutor-card-feedback-toggle-container {
+  position: absolute;
+  right: 10px;
+  top: 11px;
+  width: 20px;
+}
+
+.conversation-skin-tutor-card-feedback-toggle {
+  background: none;
+  border: 0;
+  color: #000;
+  cursor: pointer;
+  height: 20px;
+  margin-left: -5px;
+  opacity: 0.4;
+}
+
+.conversation-skin-tutor-card-feedback-toggle:hover {
+  opacity: 0.8;
+}
+
+.conversation-skin-inline-interaction {
+  background-color: rgba(236,239,241,1);
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+  margin-top: 8px;
+  padding: 16px 20px;
+  position: relative;
+}
+
+.conversation-skin-learner-answer,
+.conversation-skin-oppia-feedback {
+  word-wrap: break-word;
+}
+
+.conversation-skin-feedback-dot-one,
+.conversation-skin-feedback-dot-two,
+.conversation-skin-feedback-dot-three {
+  background-color: #666;
+  display: inline-block;
+  height: 2px;
+  width: 2px;
+}
+
+.conversation-skin-feedback-dot-one {
+  animation: dot 1.0s infinite;
+  animation-delay: 0.0s;
+  -moz-animation: dot 1.0s infinite;
+  -moz-animation-delay: 0.0s;
+  -webkit-animation: dot 1.0s infinite;
+  -webkit-animation-delay: 0.0s;
+  opacity: 0;
+}
+
+.conversation-skin-feedback-dot-two {
+  animation: dot 1.0s infinite;
+  animation-delay: 0.2s;
+  -moz-animation: dot 1.0s infinite;
+  -moz-animation-delay: 0.2s;
+  -webkit-animation: dot 1.0s infinite;
+  -webkit-animation-delay: 0.2s;
+  opacity: 0;
+}
+
+.conversation-skin-feedback-dot-three {
+  animation: dot 1.0s infinite;
+  animation-delay: 0.4s;
+  -moz-animation: dot 1.0s infinite;
+  -moz-animation-delay: 0.4s;
+  -webkit-animation: dot 1.0s infinite;
+  -webkit-animation-delay: 0.4s;
+  opacity: 0;
+}
+
+.conversation-skin-supplemental-card-container {
+  display: inline-block;
+  margin: 0 auto;
+  position: absolute;
+  width: 100%;
+}
+
+.conversation-skin-right-card-container {
+  margin-left: 6px;
+  width: 600px;
+}
+
+div.conversation-skin-supplemental-card {
+  left: 0;
+  margin: 44px auto 60px auto;
+  position: relative;
+  right: 0;
+  width: 600px;
+}
+
+.conversation-skin-supplemental-interaction-container {
+  background-color: #fff;
+  border-radius: 2px;
+  box-shadow: none;
+  margin-bottom: 8px;
+  padding: 8px;
+}
+
+.conversation-skin-right-card-container div.conversation-skin-supplemental-card-fixed {
+  left: inherit;
+  margin-top: 8px;
+  position: fixed;
+  right: inherit;
+}
+
+.conversation-skin-final-ratings {
+  text-align: center;
+}
+
+.conversation-skin-final-recommendations {
+  margin-top: 50px;
+  text-align: center;
+}
+
+.conversation-skin-left-card .conversation-skin-oppia-avatar,
+.conversation-skin-left-card .conversation-skin-user-avatar {
+  display: none;
+}
+
+.conversation-skin-card-switcher {
+  background: #009688;
+  bottom: 0;
+  height: 50px;
+  position: fixed;
+  width: 100%;
+  z-index: 2;
+}
+
+.conversation-skin-card-switcher-thumbnails-container {
+  height: 100%;
+  margin: auto;
+  text-align: center;
+  width: 100%;
+}
+
+.conversation-skin-card-switcher-thumbnail {
+  border: 1px solid black;
+  cursor: pointer;
+  height: 40px;
+  margin-top: 2px;
+  width: 40px;
+}
+
+.conversation-skin-card-switcher-thumbnail-active {
+  border: 3px solid #0d47a1;
+  cursor: default;
+  height: 46px;
+  margin-top: 2px;
+  width: 46px;
+}
+
+.conversation-skin-oppia-feedback.ng-enter {
+  opacity: 0;
+  -webkit-transition: all .5s;
+  transition: all .5s;
+}
+
+.conversation-skin-oppia-feedback.ng-enter.ng-enter-active {
+  opacity: 1;
+}
+
+.conversation-skin-main-tutor-card.ng-hide-add.ng-hide-add-active,
+.conversation-skin-main-tutor-card.ng-hide-remove.ng-hide-remove-active,
+.conversation-skin-supplemental-card.ng-hide-add.ng-hide-add-active,
+.conversation-skin-supplemental-card.ng-hide-remove.ng-hide-remove-active {
+  -webkit-transition: all ease-out 0.4s;
+  transition: all ease-out 0.4s;
+}
+
+.conversation-skin-main-tutor-card.ng-hide {
+  opacity: 0;
+  transform: translateX(-1000px);
+}
+
+.conversation-skin-supplemental-card.ng-hide {
+  opacity: 0;
+  transform: translateX(1000px);
+}
+
+@media(max-width: 1119px) {
+  /*
+    This is needed so that the left/right animation works smoothly with a
+    supplemental interaction on small screens. However, it needs the extra
+    'has-subsidiary-cards' class in order to avoid the final ratings section
+    displaying at the top of the page.
+  */
+  .conversation-skin-main-tutor-card.conversation-skin-has-subsidiary-cards {
+    position: absolute;
+  }
+}
+
+@media(max-width: 600px) {
+  .conversation-skin-right-card-container,
+  div.conversation-skin-supplemental-card,
+  .conversation-skin-main-tutor-card {
+    width: 100%;
+  }
+
+  .conversation-skin-user-avatar,
+  .conversation-skin-oppia-avatar {
+    display: none;
+  }
+}
