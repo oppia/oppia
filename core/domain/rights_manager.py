@@ -16,21 +16,19 @@
 
 """Domain objects and functions that manage rights for various user actions."""
 
-__author__ = 'Sean Lip'
-
 import logging
 
 from core.domain import config_domain
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
+import feconf
+import utils
+
 current_user_services = models.Registry.import_current_user_services()
 (collection_models, exp_models,) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.exploration
 ])
-import feconf
-import utils
-
 
 # IMPORTANT: Ensure that all changes to how these cmds are interpreted preserve
 # backward-compatibility with previous exploration snapshots in the datastore.
@@ -75,7 +73,7 @@ class ActivityRights(object):
         self.cloned_from = cloned_from
         self.status = status
         self.viewable_if_private = viewable_if_private
-        self.first_published_msec=first_published_msec
+        self.first_published_msec = first_published_msec
 
     def validate(self):
         """Validates an ActivityRights object.
@@ -369,17 +367,14 @@ class Actor(object):
     def _can_delete(self, rights_object):
         is_deleting_own_private_object = (
             rights_object.status == ACTIVITY_STATUS_PRIVATE and
-            self._is_owner(rights_object)
-        )
+            self._is_owner(rights_object))
 
-        is_moderator_deleting_public_object = (
+        is_mod_deleting_public_object = (
             rights_object.status == ACTIVITY_STATUS_PUBLIC and
-            self.is_moderator()
-        )
+            self.is_moderator())
 
         return (
-            is_deleting_own_private_object or
-            is_moderator_deleting_public_object)
+            is_deleting_own_private_object or is_mod_deleting_public_object)
 
     def is_owner(self, activity_type, activity_id):
         activity_rights = _get_activity_rights(activity_type, activity_id)
@@ -523,7 +518,7 @@ def _assign_role(
     old_role = ROLE_NONE
 
     if new_role == ROLE_OWNER:
-        if Actor(assignee_id)._is_owner(activity_rights):
+        if Actor(assignee_id)._is_owner(activity_rights):  # pylint: disable=protected-access
             raise Exception('This user already owns this %s.' % activity_type)
 
         activity_rights.owner_ids.append(assignee_id)
@@ -536,7 +531,7 @@ def _assign_role(
             old_role = ROLE_EDITOR
 
     elif new_role == ROLE_EDITOR:
-        if Actor(assignee_id)._has_editing_rights(activity_rights):
+        if Actor(assignee_id)._has_editing_rights(activity_rights):  # pylint: disable=protected-access
             raise Exception(
                 'This user already can edit this %s.'  % activity_type)
 
@@ -551,7 +546,7 @@ def _assign_role(
             old_role = ROLE_VIEWER
 
     elif new_role == ROLE_VIEWER:
-        if Actor(assignee_id)._has_viewing_rights(activity_rights):
+        if Actor(assignee_id)._has_viewing_rights(activity_rights):  # pylint: disable=protected-access
             raise Exception(
                 'This user already can view this %s.' % activity_type)
 
@@ -573,8 +568,8 @@ def _assign_role(
         'new_role': new_role
     }]
 
-    _save_activity_rights(
-        committer_id, activity_rights, activity_type, commit_message, commit_cmds)
+    _save_activity_rights(committer_id, activity_rights, activity_type,
+                          commit_message, commit_cmds)
     _update_activity_summary(activity_type, activity_rights)
 
 
@@ -766,7 +761,8 @@ def set_private_viewability_of_exploration(
 
 def publish_exploration(committer_id, exploration_id):
     """This is called by the publish_exploration_and_update_user_profiles
-    function in exp_services.py. It publishes an exploration and commits changes.
+    function in exp_services.py. It publishes an exploration and
+    commits changes.
 
     It is the responsibility of the caller to check that the exploration is
     valid prior to publication.

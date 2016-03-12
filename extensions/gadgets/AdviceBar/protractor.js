@@ -23,12 +23,12 @@
 
 var objects = require('../../objects/protractor.js');
 
-var customizeGadget = function(elem, title) {
-	// TODO(anuzis): Implement.
+var customizeGadget = function() {
+  // TODO(anuzis): Implement.
 };
 
-var expectGadgetDetailsToMatch = function(elem, title) {
-	// TODO(anuzis): Implement.
+var expectGadgetDetailsToMatch = function() {
+  // TODO(anuzis): Implement.
 };
 
 exports.customizeGadget = customizeGadget;

@@ -18,30 +18,29 @@
  */
 
 var logicProofTeacher = (function() {
-  //////////////////////////////  QUESTION   /////////////////////////////////////////////////
+  // QUESTION
 
- /**
-  * A question is composed of the formulas the student may assume and the
-  * formula she must prove; it will be different for each state in which the
-  * interaction is used.
-  * @param assumptionsString: typed by the teacher to describe the assumptions
-  *        the student is allowed to make.
-  * @param targetString: typed by the teacher to describe what the student is
-  *        supposed to prove.
-  * @param language: A Language object in which expressions are written.
-  * @param vocabulary: A vocabulary object, the words from which the teacher is
-  *        not allowed to use as function names.
-  * @result {
-  *           operators: the operators occurring in the question including both
-  *             ordinary ones (like ∧) and specific ones (like f).
-  *           assumptions: an array of Expressions, which will form the
-  *             'assumptions' key in the interaction.
-  *           results: an array of length one built from the targetString which
-  *             will form the 'results' key in the interaction.
-  *         }
-  * @raises If the given strings cannot be parsed, or are mal-typed or use
-  *         words that are reserved for the vocabulary.
-  */
+  /**
+   * A question is composed of the formulas the student may assume and the
+   * formula she must prove; it will be different for each state in which the
+   * interaction is used.
+   * @param {string} assumptionsString - typed by the teacher to describe the
+   *        assumptions the student is allowed to make.
+   * @param {string} targetString - typed by the teacher to describe what the
+   *        student is supposed to prove.
+   * @param {object} vocabulary - A vocabulary object, the words from which the
+   *        teacher is not allowed to use as function names.
+   * @returns {
+   *           operators: the operators occurring in the question including both
+   *             ordinary ones (like ∧) and specific ones (like f).
+   *           assumptions: an array of Expressions, which will form the
+   *             'assumptions' key in the interaction.
+   *           results: an array of length one built from the targetString which
+   *             will form the 'results' key in the interaction.
+   *         }
+   * @throws If the given strings cannot be parsed, or are mal-typed or use
+   *         words that are reserved for the vocabulary.
+   */
   var buildQuestion = function(assumptionsString, targetString, vocabulary) {
     if (assumptionsString.replace(/ /g, '') === '') {
       var assumptions = [];
@@ -49,9 +48,10 @@ var logicProofTeacher = (function() {
       try {
         var assumptions = logicProofParser.parse(
           assumptionsString.replace(/ /g, ''), 'listOfExpressions');
-      } catch(err) {
-        var error = new logicProofShared.UserError(
-          'unparseable', {field: 'assumptions'});
+      } catch (err) {
+        var error = new logicProofShared.UserError('unparseable', {
+          field: 'assumptions'
+        });
         throw {
           message: logicProofShared.renderError(
             error, TEACHER_ERROR_MESSAGES, logicProofData.BASE_STUDENT_LANGUAGE)
@@ -61,9 +61,10 @@ var logicProofTeacher = (function() {
     try {
       var target = logicProofParser.parse(
         targetString.replace(/ /g, ''), 'expression');
-    } catch(err) {
-      var error = new logicProofShared.UserError(
-        'unparseable', {field: 'target'});
+    } catch (err) {
+      var error = new logicProofShared.UserError('unparseable', {
+        field: 'target'
+      });
       throw {
         message: logicProofShared.renderError(
           error, TEACHER_ERROR_MESSAGES, logicProofData.BASE_STUDENT_LANGUAGE)
@@ -89,7 +90,8 @@ var logicProofTeacher = (function() {
         throw new logicProofShared.UserError('ambiguous_typing', {});
       }
       requireNoVocabularyWordsUsed(
-        expressions, logicProofData.BASE_STUDENT_LANGUAGE.operators, vocabulary);
+        expressions, logicProofData.BASE_STUDENT_LANGUAGE.operators, vocabulary
+      );
     } catch (err) {
       throw {
         message: logicProofShared.renderError(
@@ -97,20 +99,20 @@ var logicProofTeacher = (function() {
       };
     }
     return {
-    	operators: typing[0].operators,
-    	assumptions: assumptions,
-    	results: [target]
+      operators: typing[0].operators,
+      assumptions: assumptions,
+      results: [target]
     };
   };
 
   // Throws an error if the given expression array uses an operator that is not
   // in knownOperators and whose name has length greater than one and occurs as
   // a word in the vocabulary.
-  var requireNoVocabularyWordsUsed = function(expressionArray, knownOperators, vocabulary) {
-
+  var requireNoVocabularyWordsUsed = function(
+      expressionArray, knownOperators, vocabulary) {
     var _isMember = function(entry, array) {
       return (array.indexOf(entry) !== -1);
-    }
+    };
 
     var vocabularyWords = [];
     for (var key in vocabulary) {
@@ -130,16 +132,17 @@ var logicProofTeacher = (function() {
       if (_isMember(operatorNamesToCheck[i], vocabularyWords) &&
           operatorNamesToCheck[i].length > 1 &&
           !knownOperators.hasOwnProperty(operatorNamesToCheck[i])) {
-        throw new logicProofShared.UserError(
-          'forbidden_word', {word: operatorNamesToCheck[i]});
+        throw new logicProofShared.UserError('forbidden_word', {
+          word: operatorNamesToCheck[i]
+        });
       }
     }
   };
 
-  /////////////////////////////  DATA  ////////////////////////////////////////
+  // DATA
 
-    TEACHER_ERROR_MESSAGES = {
-    'unparseable': {
+  var TEACHER_ERROR_MESSAGES = {
+    unparseable: {
       templates: [[{
         isFixed: true,
         content: 'The '
@@ -151,17 +154,21 @@ var logicProofTeacher = (function() {
         content: ' could not be parsed.'
       }]],
       parameters: {
-        'field': {format: 'string'}
+        field: {
+          format: 'string'
+        }
       }
     },
-    'ambiguous_typing': {
+    ambiguous_typing: {
       templates: [[{
         isFixed: true,
-        content: 'Unfortunately this cannot be accepted as it has multiple possible typings.'
+        content: (
+          'Unfortunately this cannot be accepted as it has multiple possible ' +
+          'typings.')
       }]],
       parameters: {}
     },
-    'hidden_operator': {
+    hidden_operator: {
       templates: [[{
         isFixed: true,
         content: 'It will not be possible to uniquely identify '
@@ -173,10 +180,12 @@ var logicProofTeacher = (function() {
         content: ' from a line of this form.'
       }]],
       parameters: {
-        'operator': {format: 'string'}
+        operator: {
+          format: 'string'
+        }
       }
     },
-    'duplicate_function_name': {
+    duplicate_function_name: {
       templates: [[{
         isFixed: true,
         content: 'The function '
@@ -188,16 +197,20 @@ var logicProofTeacher = (function() {
         content: ' has already been defined.'
       }]],
       parameters: {
-        'function': {format: 'string'}
+        function: {
+          format: 'string'
+        }
       }
     },
-    'function_name_is_n': {
+    function_name_is_n: {
       templates: [[{
         isFixed: true,
-        content: 'You cannot use n as a function name; it is reserved to refer to line numbers'
+        content: (
+          'You cannot use n as a function name; it is reserved to refer to ' +
+          'line numbers')
       }]]
     },
-    'argument_is_function_name': {
+    argument_is_function_name: {
       templates: [[{
         isFixed: true,
         content: '\''
@@ -206,22 +219,27 @@ var logicProofTeacher = (function() {
         content: 'argument'
       }, {
         isFixed: true,
-        content: '\' is the name of a function and so cannot be used as an argument.'
+        content: (
+          '\' is the name of a function and so cannot be used as an argument.')
       }]],
       parameters: {
-        'argument': {format: 'string'}
+        argument: {
+          format: 'string'
+        }
       }
     },
-    'duplicate_argument': {
+    duplicate_argument: {
       templates: [[{
         isFixed: true,
         content: 'The variables used as arguments must all be distinct'
       }]],
       parameters: {
-        'argument': {format: 'string'}
+        argument: {
+          format: 'string'
+        }
       }
     },
-    'unused_argument': {
+    unused_argument: {
       templates: [[{
         isFixed: true,
         content: 'The argument \''
@@ -233,10 +251,12 @@ var logicProofTeacher = (function() {
         content: '\' does not occur in the definition.'
       }]],
       parameters: {
-        'argument': {format: 'string'}
+        argument: {
+          format: 'string'
+        }
       }
     },
-    'unknown_typing_error': {
+    unknown_typing_error: {
       templates: [[{
         isFixed: true,
         content: 'A typing error has occurred with '
@@ -248,7 +268,9 @@ var logicProofTeacher = (function() {
         content: '.'
       }]],
       parameters: {
-        'expression': {format: 'expression'}
+        expression: {
+          format: 'expression'
+        }
       }
     },
     'unmatched_{{': {
@@ -258,7 +280,7 @@ var logicProofTeacher = (function() {
       }]],
       parameters: {}
     },
-    'unparseable_fragment': {
+    unparseable_fragment: {
       templates: [[{
         isFixed: true,
         content: 'It was not possible to parse '
@@ -270,10 +292,12 @@ var logicProofTeacher = (function() {
         content: '.'
       }]],
       parameters: {
-        'fragment': {format: 'string'}
+        fragment: {
+          format: 'string'
+        }
       }
     },
-    'ambiguous_parsing': {
+    ambiguous_parsing: {
       templates: [[{
         isFixed: true,
         content: 'The '
@@ -282,15 +306,18 @@ var logicProofTeacher = (function() {
         content: 'field'
       }, {
         isFixed: true,
-        content: ' can be understood in more than one way. Try using fewer\
- single-character words and variables so that it is easier to distinguish\
- between the two.'
+        content: (
+          ' can be understood in more than one way. Try using fewer ' +
+          'single-character words and variables so that it is easier to ' +
+          'distinguish between the two.')
       }]],
       parameters: {
-        'field': {format: 'string'}
+        field: {
+          format: 'string'
+        }
       }
     },
-    'illegal_symbol': {
+    illegal_symbol: {
       templates: [[{
         isFixed: true,
         content: 'The symbol '
@@ -302,17 +329,19 @@ var logicProofTeacher = (function() {
         content: ' was not recognised.'
       }]],
       parameters: {
-        'symbol': {format: 'string'}
+        symbol: {
+          format: 'string'
+        }
       }
     },
-    'blank_line': {
+    blank_line: {
       templates: [[{
         isFixed: true,
         content: 'This line is blank.'
       }]],
       parameters: {}
     },
-    'unidentified_word': {
+    unidentified_word: {
       templates: [[{
         isFixed: true,
         content: 'We could not identify \''
@@ -321,14 +350,17 @@ var logicProofTeacher = (function() {
         content: 'word'
       }, {
         isFixed: true,
-        content: '\'; please make sure you are using vocabulary from the given\
- list, and don\'t have two consecutive expressions.'
+        content: (
+          '\'; please make sure you are using vocabulary from the given ' +
+          'list, and don\'t have two consecutive expressions.')
       }]],
       parameters: {
-        'word': {format: 'string'}
+        word: {
+          format: 'string'
+        }
       }
     },
-    'unidentified_words': {
+    unidentified_words: {
       templates: [[{
         isFixed: true,
         content: 'We could not identify either of \''
@@ -343,15 +375,20 @@ var logicProofTeacher = (function() {
         content: 'word2'
       }, {
         isFixed: true,
-        content: '\' as words; please make sure you are using vocabulary from\
- the given list, and don\'t have two consecutive expressions.'
+        content: (
+          '\' as words; please make sure you are using vocabulary from ' +
+          'the given list, and don\'t have two consecutive expressions.')
       }]],
       parameters: {
-        'word1': {format: 'string'},
-        'word2': {format: 'string'}
+        word1: {
+          format: 'string'
+        },
+        word2: {
+          format: 'string'
+        }
       }
     },
-    'consecutive_expressions': {
+    consecutive_expressions: {
       templates: [[{
         isFixed: true,
         content: 'This line has two expressions in a row ('
@@ -369,11 +406,15 @@ var logicProofTeacher = (function() {
         content: ') which is not allowed.'
       }]],
       parameters: {
-        'word1': {format: 'string'},
-        'word2': {format: 'string'}
+        word1: {
+          format: 'string'
+        },
+        word2: {
+          format: 'string'
+        }
       }
     },
-    'unidentified_phrase_starting_at': {
+    unidentified_phrase_starting_at: {
       templates: [[{
         isFixed: true,
         content: 'The phrase starting \''
@@ -382,14 +423,17 @@ var logicProofTeacher = (function() {
         content: 'word'
       }, {
         isFixed: true,
-        content: '\' could not be identified; please make sure you are only\
- using phrases from the given list of vocabulary.'
+        content: (
+          '\' could not be identified; please make sure you are only ' +
+          'using phrases from the given list of vocabulary.')
       }]],
       parameters: {
-        'word': {format: 'string'}
+        word: {
+          format: 'string'
+        }
       }
     },
-    'forbidden_word': {
+    forbidden_word: {
       templates: [[{
         isFixed: true,
         content: 'The name \''
@@ -401,10 +445,12 @@ var logicProofTeacher = (function() {
         content: '\' is reserved for vocabulary and so cannot be used here.'
       }]],
       parameters: {
-        'word': {format: 'string'}
+        word: {
+          format: 'string'
+        }
       }
     },
-    'not_enough_inputs': {
+    not_enough_inputs: {
       templates: [[{
         isFixed: false,
         content: 'operator'
@@ -425,12 +471,18 @@ var logicProofTeacher = (function() {
         content: '.'
       }]],
       parameters: {
-        'num_needed': {format: 'string'},
-        'input_category': {format: 'string'},
-        'operator': {format: 'string'}
+        num_needed: {
+          format: 'string'
+        },
+        input_category: {
+          format: 'string'
+        },
+        operator: {
+          format: 'string'
+        }
       }
     },
-    'wrong_num_inputs': {
+    wrong_num_inputs: {
       templates: [[{
         isFixed: false,
         content: 'operator'
@@ -451,18 +503,24 @@ var logicProofTeacher = (function() {
         content: '.'
       }]],
       parameters: {
-        'num_needed': {format: 'string'},
-        'input_category': {format: 'string'},
-        'operator': {format: 'string'}
+        num_needed: {
+          format: 'string'
+        },
+        input_category: {
+          format: 'string'
+        },
+        operator: {
+          format: 'string'
+        }
       }
     },
-    'wrong_kind': {
+    wrong_kind: {
       templates: [[{
         isFixed: false,
         content: 'operator'
       }, {
         isFixed: true,
-        content: ' is supposed to be a ',
+        content: ' is supposed to be a '
       }, {
         isFixed: false,
         content: 'expected_kind'
@@ -471,18 +529,24 @@ var logicProofTeacher = (function() {
         content: '.'
       }]],
       parameters: {
-        'operator': {format: 'string'},
-        'expected_kind': {format: 'string'},
-        'actual_kind': {format: 'string'}
+        operator: {
+          format: 'string'
+        },
+        expected_kind: {
+          format: 'string'
+        },
+        actual_kind: {
+          format: 'string'
+        }
       }
     },
-    'wrong_type': {
+    wrong_type: {
       templates: [[{
         isFixed: false,
         content: 'operator'
       }, {
         isFixed: true,
-        content: ' yields a ',
+        content: ' yields a '
       }, {
         isFixed: false,
         content: 'actual_type'
@@ -497,12 +561,18 @@ var logicProofTeacher = (function() {
         content: '.'
       }]],
       parameters: {
-        'operator': {format: 'string'},
-        'expected_type': {format: 'string'},
-        'actual_type': {format: 'string'}
+        operator: {
+          format: 'string'
+        },
+        expected_type: {
+          format: 'string'
+        },
+        actual_type: {
+          format: 'string'
+        }
       }
     },
-    'duplicate_dummy_name': {
+    duplicate_dummy_name: {
       templates: [[{
         isFixed: true,
         content: 'The name \''
@@ -520,11 +590,15 @@ var logicProofTeacher = (function() {
         content: '.'
       }]],
       parameters: {
-        'dummy': {format: 'expression'},
-        'expression': {format: 'expression'}
+        dummy: {
+          format: 'expression'
+        },
+        expression: {
+          format: 'expression'
+        }
       }
     },
-    'dummy_not_variable': {
+    dummy_not_variable: {
       templates: [[{
         isFixed: true,
         content: 'You can only quantify over variables, not  '
@@ -536,11 +610,15 @@ var logicProofTeacher = (function() {
         content: '.'
       }]],
       parameters: {
-        'dummy': {format: 'expression'},
-        'expression': {format: 'expression'}
+        dummy: {
+          format: 'expression'
+        },
+        expression: {
+          format: 'expression'
+        }
       }
     },
-    'unknown_operator': {
+    unknown_operator: {
       templates: [[{
         isFixed: true,
         content: 'The operator '
@@ -552,25 +630,29 @@ var logicProofTeacher = (function() {
         content: ' could not be identified.'
       }]],
       parameters: {
-        'operator': {format: 'string'}
+        operator: {
+          format: 'string'
+        }
       }
     },
-    'too_many_parsings': {
+    too_many_parsings: {
       templates: [[{
         isFixed: true,
-        content: 'This can be parsed in too many different ways - try using\
- fewer words, especially single-character words.'
+        content: (
+          'This can be parsed in too many different ways - try using ' +
+          'fewer words, especially single-character words.')
       }]],
       parameters: {}
     },
-    'too_many_typings': {
+    too_many_typings: {
       templates: [[{
         isFixed: true,
-        content: 'This has too many possible typings - try using fewer variables.'
+        content: (
+          'This has too many possible typings - try using fewer variables.')
       }]],
       parameters: {}
     }
-  }
+  };
 
   return {
     buildQuestion: buildQuestion,

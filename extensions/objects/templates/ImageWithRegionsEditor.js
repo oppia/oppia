@@ -18,12 +18,12 @@
 
 // TODO(czx): Uniquify the labels of image regions
 oppia.directive('imageWithRegionsEditor', [
-  '$sce', '$compile', 'warningsData', '$document', 'explorationContextService',
+  '$sce', '$compile', 'alertsService', '$document', 'explorationContextService',
   'OBJECT_EDITOR_URL_PREFIX',
-  function($sce, $compile, warningsData, $document, explorationContextService,
+  function($sce, $compile, alertsService, $document, explorationContextService,
            OBJECT_EDITOR_URL_PREFIX) {
     return {
-      link: function(scope, element, attrs) {
+      link: function(scope, element) {
         scope.getTemplateUrl = function() {
           return OBJECT_EDITOR_URL_PREFIX + 'ImageWithRegions';
         };
@@ -32,12 +32,13 @@ oppia.directive('imageWithRegionsEditor', [
       restrict: 'E',
       scope: true,
       template: '<div ng-include="getTemplateUrl()"></div>',
-      controller: function($scope, $element, $attrs) {
+      controller: function($scope, $element) {
         $scope.alwaysEditable = true;
 
         $scope.REGION_LABEL_OFFSET_X = 6;
         $scope.REGION_LABEL_OFFSET_Y = 18;
-        $scope.REGION_LABEL_STYLE = 'fill: white; font-size: large; pointer-events: none;';
+        $scope.REGION_LABEL_STYLE = (
+          'fill: white; font-size: large; pointer-events: none;');
         $scope.SELECTED_REGION_STYLE = 'fill: orange; opacity: 0.5;';
         $scope.UNSELECTED_REGION_STYLE = 'fill: blue; opacity: 0.5;';
         $scope.getRegionStyle = function(index) {
@@ -93,10 +94,13 @@ oppia.directive('imageWithRegionsEditor', [
         // Calculates the dimensions of the image, assuming that the width
         // of the image is scaled down to fit the svg element if necessary
         var _calculateImageDimensions = function() {
-          var svgElement = $($element).find('.oppia-image-with-regions-editor-svg');
-          var displayedImageWidth = Math.min(svgElement.width(), $scope.originalImageWidth);
+          var svgElement = $($element).find(
+            '.oppia-image-with-regions-editor-svg');
+          var displayedImageWidth = Math.min(
+            svgElement.width(), $scope.originalImageWidth);
           var scalingRatio = displayedImageWidth / $scope.originalImageWidth;
-          // Note that scalingRatio may be NaN if $scope.originalImageWidth is zero.
+          // Note that scalingRatio may be NaN if $scope.originalImageWidth is
+          // zero.
           var displayedImageHeight = (
             $scope.originalImageWidth === 0 ? 0.0 :
             $scope.originalImageHeight * scalingRatio);
@@ -115,8 +119,8 @@ oppia.directive('imageWithRegionsEditor', [
 
         $scope.getPreviewUrl = function(imageUrl) {
           return $sce.trustAsResourceUrl(
-            '/imagehandler/' + explorationContextService.getExplorationId() + '/' +
-            encodeURIComponent(imageUrl)
+            '/imagehandler/' + explorationContextService.getExplorationId() +
+            '/' + encodeURIComponent(imageUrl)
           );
         };
 
@@ -136,7 +140,7 @@ oppia.directive('imageWithRegionsEditor', [
           }
         });
 
-        function hasDuplicates(originalArray) {
+        var hasDuplicates = function(originalArray) {
           var array = originalArray.slice(0).sort();
           for (var i = 1; i < array.length; i++) {
             if (array[i - 1] === array[i]) {
@@ -144,7 +148,7 @@ oppia.directive('imageWithRegionsEditor', [
             }
           }
           return false;
-        }
+        };
 
         $scope.regionLabelGetterSetter = function(index) {
           return function(label) {
@@ -163,12 +167,12 @@ oppia.directive('imageWithRegionsEditor', [
           };
         };
 
-        function convertCoordsToFraction(coords, dimensions) {
+        var convertCoordsToFraction = function(coords, dimensions) {
           return [coords[0] / dimensions[0], coords[1] / dimensions[1]];
-        }
+        };
         // Convert to and from region area (which is stored as a fraction of
         // image width and height) and actual width and height
-        function regionAreaFromCornerAndDimensions(x, y, width, height) {
+        var regionAreaFromCornerAndDimensions = function(x, y, width, height) {
           return [
             convertCoordsToFraction(
               [x, y],
@@ -179,18 +183,19 @@ oppia.directive('imageWithRegionsEditor', [
               [$scope.getImageWidth(), $scope.getImageHeight()]
             )
           ];
-        }
-        function cornerAndDimensionsFromRegionArea(area) {
+        };
+        var cornerAndDimensionsFromRegionArea = function(area) {
           return {
             x: area[0][0] * $scope.getImageWidth(),
             y: area[0][1] * $scope.getImageHeight(),
             width: (area[1][0] - area[0][0]) * $scope.getImageWidth(),
             height: (area[1][1] - area[0][1]) * $scope.getImageHeight()
           };
-        }
+        };
 
         $scope.onSvgMouseMove = function(evt) {
-          var svgElement = $($element).find('.oppia-image-with-regions-editor-svg');
+          var svgElement = $($element).find(
+            '.oppia-image-with-regions-editor-svg');
           $scope.mouseX = evt.pageX - svgElement.offset().left;
           $scope.mouseY = evt.pageY - svgElement.offset().top;
           if ($scope.userIsCurrentlyDrawing) {
@@ -211,6 +216,7 @@ oppia.directive('imageWithRegionsEditor', [
             );
           }
         };
+
         $scope.onSvgMouseDown = function(evt) {
           evt.preventDefault();
           $scope.originalMouseX = $scope.mouseX;
@@ -219,8 +225,9 @@ oppia.directive('imageWithRegionsEditor', [
             $scope.rectWidth = $scope.rectHeight = 0;
             $scope.userIsCurrentlyDrawing = true;
           }
-        }
-        $scope.onSvgMouseUp = function(evt) {
+        };
+
+        $scope.onSvgMouseUp = function() {
           if ($scope.hoveredRegion === null) {
             $scope.selectedRegion = null;
           }
@@ -257,7 +264,8 @@ oppia.directive('imageWithRegionsEditor', [
               };
               $scope.$parent.value.labeledRegions.push(newRegion);
               labelList.push(newLabel);
-              $scope.selectedRegion = $scope.$parent.value.labeledRegions.length - 1;
+              $scope.selectedRegion = (
+                $scope.$parent.value.labeledRegions.length - 1);
             }
           }
         };
@@ -271,21 +279,19 @@ oppia.directive('imageWithRegionsEditor', [
             $scope.hoveredRegion = null;
           }
         };
-        $scope.onMousedownRegion = function(index) {
-          function selectRegion(index) {
-            $scope.selectedRegion = index;
-            $scope.originalRectArea = cornerAndDimensionsFromRegionArea(
-              $scope.$parent.value.labeledRegions[index].region.area
-            );
-          }
+        $scope.onMousedownRegion = function() {
           $scope.userIsCurrentlyDragging = true;
-          selectRegion($scope.hoveredRegion);
+          $scope.selectedRegion = $scope.hoveredRegion;
+          $scope.originalRectArea = cornerAndDimensionsFromRegionArea(
+            $scope.$parent.value.labeledRegions[
+              $scope.hoveredRegion].region.area
+          );
         };
-        $scope.onDocumentMouseUp = function(evt) {
+        $scope.onDocumentMouseUp = function() {
           if ($scope.regionDrawMode && !$scope.userIsCurrentlyDrawing) {
             $scope.regionDrawMode = false;
           }
-        }
+        };
         $document.on('mouseup', $scope.onDocumentMouseUp);
 
         $scope.setDrawMode = function() {
@@ -317,5 +323,3 @@ oppia.directive('imageWithRegionsEditor', [
     };
   }
 ]);
-
-

@@ -18,10 +18,13 @@
  */
 
 oppia.filter('oppiaInteractiveMusicNotesInputValidator', [
-    'baseInteractionValidationService', function(baseInteractionValidationService) {
-  // Returns a list of warnings.
-  return function(stateName, customizationArgs, answerGroups, defaultOutcome) {
-    return baseInteractionValidationService.getAllOutcomeWarnings(
-      answerGroups, defaultOutcome, stateName);
-  };
-}]);
+  'baseInteractionValidationService',
+  function(baseInteractionValidationService) {
+    // Returns a list of warnings.
+    return function(
+        stateName, customizationArgs, answerGroups, defaultOutcome) {
+      return baseInteractionValidationService.getAllOutcomeWarnings(
+        answerGroups, defaultOutcome, stateName);
+    };
+  }
+]);

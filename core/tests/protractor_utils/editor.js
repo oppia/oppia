@@ -25,9 +25,8 @@ var interactions = require('../../../extensions/interactions/protractor.js');
 var gadgets = require('../../../extensions/gadgets/protractor.js');
 var rules = require('../../../extensions/rules/protractor.js');
 
-// constants
 var _NEW_STATE_OPTION = 'A New Card Called...';
-var _CURRENT_STATE_OPTION = '(try again)'
+var _CURRENT_STATE_OPTION = '(try again)';
 
 var exitTutorialIfNecessary = function() {
   // If the editor tutorial shows up, exit it.
@@ -82,7 +81,7 @@ var navigateToSettingsTab = function() {
 // UTILITIES
 
 var setStateName = function(name) {
-  var nameElement = element(by.css('.protractor-test-state-name-container'))
+  var nameElement = element(by.css('.protractor-test-state-name-container'));
   nameElement.click();
   nameElement.element(by.css('.protractor-test-state-name-input')).clear();
   nameElement.element(by.css('.protractor-test-state-name-input')).
@@ -140,66 +139,83 @@ var expectContentTextToEqual = function(text) {
 
 // INTERACTIONS
 
-// Additional arguments may be sent to this function, and they will be
-// passed on to the relevant interaction editor.
+// This function should be used as the standard way to specify interactions for
+// most purposes. Additional arguments may be sent to this function,
+// and they will be passed on to the relevant interaction editor.
 var setInteraction = function(interactionId) {
-  element(by.css('.protractor-test-delete-interaction')).isPresent().then(function(isVisible) {
-    // If there is already an interaction present, delete it.
+  openInteraction(interactionId);
+  customizeInteraction.apply(null, arguments);
+  // If the "Add Response" modal opens, close it.
+  var headerElem = element(by.css(
+    '.protractor-test-add-response-modal-header'));
+  headerElem.isPresent().then(function(isVisible) {
     if (isVisible) {
-      element(by.css('.protractor-test-delete-interaction')).click();
-      // Click through the "are you sure?" warning.
-      element(by.css('.protractor-test-confirm-delete-interaction')).click();
+      closeAddResponseModal();
     }
   });
+};
+
+// This function should not usually be invoked directly; please consider
+// using setInteraction instead.
+var openInteraction = function(interactionId) {
+  element(by.css('.protractor-test-delete-interaction')).isPresent().then(
+    function(isVisible) {
+      // If there is already an interaction present, delete it.
+      if (isVisible) {
+        element(by.css('.protractor-test-delete-interaction')).click();
+        // Click through the "are you sure?" warning.
+        element(by.css('.protractor-test-confirm-delete-interaction')).click();
+      }
+    });
 
   general.waitForSystem();
 
   element(by.css('.protractor-test-open-add-interaction-modal')).click();
 
   var INTERACTION_ID_TO_TAB_NAME = {
-    'Continue': 'General',
-    'EndExploration': 'General',
-    'ImageClickInput': 'General',
-    'MultipleChoiceInput': 'General',
-    'TextInput': 'General',
-    'GraphInput': 'Math',
-    'LogicProof': 'Math',
-    'NumericInput': 'Math',
-    'SetInput': 'Math',
-    'CodeRepl': 'Programming',
-    'MusicNotesInput': 'Music',
-    'InteractiveMap': 'Geography'
-  }
+    Continue: 'General',
+    EndExploration: 'General',
+    ImageClickInput: 'General',
+    MultipleChoiceInput: 'General',
+    TextInput: 'General',
+    GraphInput: 'Math',
+    LogicProof: 'Math',
+    NumericInput: 'Math',
+    SetInput: 'Math',
+    CodeRepl: 'Programming',
+    MusicNotesInput: 'Music',
+    InteractiveMap: 'Geography'
+  };
 
   general.waitForSystem();
   element(by.css(
     '.protractor-test-interaction-tab-' +
     INTERACTION_ID_TO_TAB_NAME[interactionId])).click();
   element(by.css('.protractor-test-interaction-tile-' + interactionId)).click();
+};
 
-  var elem = element(by.css('.protractor-test-interaction-editor'));
-  var customizationArgs = [elem];
+// This function should not usually be invoked directly; please consider
+// using setInteraction instead.
+var closeAddResponseModal = function() {
+  element(by.css('.protractor-test-close-add-response-modal')).click();
+  general.waitForSystem();
+};
 
+// This function should not usually be invoked directly; please consider
+// using setInteraction instead.
+var customizeInteraction = function(interactionId) {
   if (arguments.length > 1) {
+    var elem = element(by.css('.protractor-test-interaction-editor'));
+    var customizationArgs = [elem];
     for (var i = 1; i < arguments.length; i++) {
       customizationArgs.push(arguments[i]);
     }
     interactions.getInteraction(interactionId).customizeInteraction.apply(
       null, customizationArgs);
   }
-
   element(by.css('.protractor-test-save-interaction')).click();
   // Wait for the customization modal to close.
   general.waitForSystem();
-
-  // If the "Add Response" modal opens, close it.
-  var headerElem = element(by.css('.protractor-test-add-response-modal-header'));
-  headerElem.isPresent().then(function(isVisible) {
-    if (isVisible) {
-      element(by.css('.protractor-test-close-add-response-modal')).click();
-      general.waitForSystem();
-    }
-  });
 };
 
 // Likewise this can receive additional arguments.
@@ -226,7 +242,6 @@ var expectCannotDeleteInteraction = function() {
 // Additional arguments may be sent to this function, and they will be
 // passed on to the relevant gadget editor.
 var addGadget = function(gadgetType, gadgetName) {
-
   // Bring up the gadget insertion modal.
   element(
     by.css('.protractor-test-add-gadget-button'))
@@ -260,7 +275,6 @@ var addGadget = function(gadgetType, gadgetName) {
 
   // Wait for the customization modal to close.
   general.waitForSystem(2000);
-
 };
 
 // Callers should ensure that a gadget with currentName exists.
@@ -282,7 +296,8 @@ var renameGadget = function(currentName, newName) {
 var deleteGadget = function(gadgetName) {
   element(by.css('.protractor-test-delete-' + gadgetName + '-gadget-icon'))
     .click();
-  general.waitForSystem(2000); // wait for modal popup.
+  // Wait for the modal popup to appear.
+  general.waitForSystem(2000);
   element(by.css('.protractor-test-delete-gadget-button')).click();
 };
 
@@ -307,8 +322,8 @@ var enableGadgetVisibilityForState = function(stateName) {
         if (!selected) {
           items[0].click();
         }
-      })
-    })
+      });
+    });
 };
 
 // Disables visibility for a given state.
@@ -322,8 +337,8 @@ var disableGadgetVisibilityForState = function(stateName) {
         if (selected) {
           items[0].click();
         }
-      })
-    })
+      });
+    });
 };
 
 // Verifies a gadget's short description and name show up as expected
@@ -340,7 +355,7 @@ var expectGadgetListNameToMatch = function(
     .getText()).toBe(expectedListName);
 };
 
-var expectGadgetWithNameDoesNotExist = function(gadgetType, gadgetName) {
+var expectGadgetWithTypeDoesNotExist = function(gadgetType) {
   expect(element.all(by.css('.protractor-test-' + gadgetType + '-list-item'))
     .count()).toBe(0);
 };
@@ -368,33 +383,91 @@ var addParameterChange = function(paramName, paramValue) {
   element(by.css('.protractor-test-save-param-changes-button')).click();
 
   general.waitForSystem(500);
-}
-
+};
 
 // RULES
 
-// This function selects a rule for the current interaction and enters the
-// entries of the parameterValues array as its parameters; the parameterValues
-// should be specified after the ruleName as additional arguments. For example
-// with interaction 'NumericInput' and rule 'Equals' then there is a single
-// parameter which the given answer is required to equal.
-var _selectRule = function(ruleElement, interactionId, ruleName) {
-  var parameterValues = [];
-  for (var i = 3; i < arguments.length; i++) {
-    parameterValues.push(arguments[i]);
-  }
+var selectRuleInAddResponseModal = function(interactionId, ruleName) {
+  var ruleElement = element(by.css('.protractor-test-add-response-details'));
+  _selectRule(ruleElement, interactionId, ruleName);
+};
 
+var setRuleParametersInAddResponseModal = function() {
+  var ruleElement = element(by.css('.protractor-test-add-response-details'));
+  var args = [ruleElement];
+  for (var i = 0; i < arguments.length; i++) {
+    args.push(arguments[i]);
+  }
+  _setRuleParameters.apply(null, args);
+};
+
+// Parses the relevant ruleDescription string, and returns an Array containing
+// the types of the rule input parameters.
+var _getRuleParameterTypes = function(interactionId, ruleName) {
   var ruleDescription = rules.getDescription(
     interactions.getInteraction(interactionId).answerObjectType, ruleName);
 
   var parameterStart = (ruleDescription.indexOf('{{') === -1) ?
     undefined : ruleDescription.indexOf('{{');
-  // From the ruleDescription string we can deduce both the description used
-  // in the page (which will have the form "is equal to ...") and the types
-  // of the parameter objects, which will later tell us which object editors
-  // to use to enter the parameterValues.
-  var ruleDescriptionInDropdown = ruleDescription.substring(0, parameterStart);
   var parameterTypes = [];
+  while (parameterStart !== undefined) {
+    var parameterEnd = ruleDescription.indexOf('}}', parameterStart) + 2;
+    parameterTypes.push(
+      ruleDescription.substring(
+        ruleDescription.indexOf('|', parameterStart) + 1, parameterEnd - 2));
+
+    var nextParameterStart =
+      (ruleDescription.indexOf('{{', parameterEnd) === -1) ?
+      undefined : ruleDescription.indexOf('{{', parameterEnd);
+    parameterStart = nextParameterStart;
+  }
+  return parameterTypes;
+};
+
+// This function sets the parameter values for the given rule.
+// Note: The parameter values should be specified as additional arguments
+// after the ruleName. For example, the call
+//   _selectRuleParameters(ruleElement, 'NumericInput', 'Equals', 24)
+// will result in a rule that checks whether the learner's answer equals 24.
+var _setRuleParameters = function(ruleElement, interactionId, ruleName) {
+  var parameterValues = [];
+  for (var i = 3; i < arguments.length; i++) {
+    parameterValues.push(arguments[i]);
+  }
+  var parameterTypes = _getRuleParameterTypes(interactionId, ruleName);
+  expect(parameterValues.length).toEqual(parameterTypes.length);
+
+  for (var i = 0; i < parameterValues.length; i++) {
+    var parameterElement = ruleElement.all(
+      by.css('.protractor-test-answer-description-fragment'
+    )).get(i * 2 + 1);
+    var parameterEditor = forms.getEditor(parameterTypes[i])(parameterElement);
+
+    if (interactionId === 'MultipleChoiceInput') {
+      // This is a special case as it uses a dropdown to set a NonnegativeInt
+      parameterElement.element(
+        by.tagName('button')
+      ).click();
+      parameterElement.element(
+        by.cssContainingText('.oppia-html-select-option', parameterValues[i])
+      ).click();
+    } else {
+      parameterEditor.setValue(parameterValues[i]);
+    }
+  }
+};
+
+// This function selects a rule from the dropdown,
+// but does not set any of its input parameters.
+var _selectRule = function(ruleElement, interactionId, ruleName) {
+  var ruleDescription = rules.getDescription(
+    interactions.getInteraction(interactionId).answerObjectType, ruleName);
+
+  var parameterStart = (ruleDescription.indexOf('{{') === -1) ?
+    undefined : ruleDescription.indexOf('{{');
+  // From the ruleDescription string we can deduce the description used
+  // in the page (which will have the form "is equal to ...")
+  var ruleDescriptionInDropdown = ruleDescription.substring(0, parameterStart);
   while (parameterStart !== undefined) {
     var parameterEnd = ruleDescription.indexOf('}}', parameterStart) + 2;
     var nextParameterStart =
@@ -402,13 +475,8 @@ var _selectRule = function(ruleElement, interactionId, ruleName) {
       undefined : ruleDescription.indexOf('{{', parameterEnd);
     ruleDescriptionInDropdown = ruleDescriptionInDropdown + '...' +
       ruleDescription.substring(parameterEnd, nextParameterStart);
-    parameterTypes.push(
-      ruleDescription.substring(
-        ruleDescription.indexOf('|', parameterStart) + 1, parameterEnd - 2));
     parameterStart = nextParameterStart;
   }
-
-  expect(parameterValues.length).toEqual(parameterTypes.length);
 
   ruleElement.element(by.css('.protractor-test-answer-description')).click();
 
@@ -431,22 +499,31 @@ var _selectRule = function(ruleElement, interactionId, ruleName) {
       optionElements[0].click();
     });
   });
+};
+
+// Checks that the current rule parameter values match the given ones.
+// Note: the expected rule parameter values should be specified as
+// additional arguments after the ruleName.
+//
+// Before using this function, ensure that expectValueToBe (see the TODO below)
+// is implemented in the corresponding parameter type editor.
+var expectRuleParametersToBe = function(interactionId, ruleName) {
+  var parameterValues = [];
+  for (var i = 2; i < arguments.length; i++) {
+    parameterValues.push(arguments[i]);
+  }
+
+  parameterTypes = _getRuleParameterTypes(interactionId, ruleName);
+  expect(parameterValues.length).toEqual(parameterTypes.length);
 
   // Now we enter the parameters
   for (var i = 0; i < parameterValues.length; i++) {
-    var parameterElement = ruleElement.all(
+    var parameterElement = element.all(
       by.css('.protractor-test-answer-description-fragment'
     )).get(i * 2 + 1);
     var parameterEditor = forms.getEditor(parameterTypes[i])(parameterElement);
-
-    if (interactionId === 'MultipleChoiceInput') {
-      // This is a special case as it uses a dropdown to set a NonnegativeInt
-      parameterElement.element(
-        by.cssContainingText('option', parameterValues[i])
-      ).click();
-    } else {
-      parameterEditor.setValue(parameterValues[i]);
-    }
+    // TODO(maitbayev): implement expectValueToBe in all parameterEditors.
+    parameterEditor.expectValueToBe(parameterValues[i]);
   }
 };
 
@@ -458,7 +535,7 @@ var _setOutcomeFeedback = function(feedbackEditorElem, richTextInstructions) {
 };
 
 var _setOutcomeDest = function(destEditorElem, destName, createDest) {
-  expect(destName === null && createDest).toBe(false)
+  expect(destName === null && createDest).toBe(false);
   var destinationElement =
     destEditorElem.element(by.css('.protractor-test-dest-bubble'));
 
@@ -493,9 +570,9 @@ var _setOutcomeDest = function(destEditorElem, destName, createDest) {
 // feedback'), and only represents a single feedback element.
 var addResponse = function(interactionId, feedbackInstructions, destStateName,
     createState, ruleName) {
-
   // Open the "Add Response" modal if it is not already open.
-  var headerElem = element(by.css('.protractor-test-add-response-modal-header'));
+  var headerElem = element(by.css(
+    '.protractor-test-add-response-modal-header'));
   headerElem.isPresent().then(function(isVisible) {
     if (!isVisible) {
       element(by.css('.protractor-test-open-add-response-modal')).click();
@@ -505,11 +582,21 @@ var addResponse = function(interactionId, feedbackInstructions, destStateName,
 
   // Set the rule description.
   var ruleElement = element(by.css('.protractor-test-add-response-details'));
-  var args = [ruleElement, interactionId];
-  for (var i = 4; i < arguments.length; i++) {
+  var args = [ruleElement, interactionId, ruleName];
+  for (var i = 5; i < arguments.length; i++) {
     args.push(arguments[i]);
   }
-  _selectRule.apply(null, args);
+  _selectRule(ruleElement, interactionId, ruleName);
+  _setRuleParameters.apply(null, args);
+
+  // Open the feedback entry form if it is not already open.
+  var feedbackContainerElem = element(by.css(
+    '.protractor-test-open-feedback-editor'));
+  feedbackContainerElem.isPresent().then(function(isVisible) {
+    if (isVisible) {
+      element(by.css('.protractor-test-open-feedback-editor')).click();
+    }
+  });
 
   if (feedbackInstructions) {
     // Set feedback contents.
@@ -546,7 +633,6 @@ var setDefaultOutcome = function(feedbackInstructions,
   // Wait for feedback and/or destination editors to finish saving.
   general.waitForSystem();
 };
-
 
 // Rules are zero-indexed; 'default' denotes the default outcome.
 var ResponseEditor = function(responseNum) {
@@ -628,11 +714,12 @@ var ResponseEditor = function(responseNum) {
 
       // Set the rule description.
       var ruleElement = element(by.css('.protractor-test-rule-details'));
-      var args = [ruleElement, interactionId];
-      for (var i = 1; i < arguments.length; i++) {
+      var args = [ruleElement, interactionId, ruleName];
+      for (var i = 2; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
-      _selectRule.apply(null, args);
+      _selectRule(ruleElement, interactionId, ruleName);
+      _setRuleParameters.apply(null, args);
 
       // Save the new rule.
       element(by.css('.protractor-test-save-answer')).click();
@@ -665,7 +752,7 @@ var ResponseEditor = function(responseNum) {
       expect(headerElem.element(by.css(
         '.protractor-test-delete-response')).isPresent()).toBeFalsy();
     }
-  }
+  };
 };
 
 var expectCannotAddResponse = function() {
@@ -741,7 +828,7 @@ var FallbackEditor = function(fallbackNum) {
       expect(headerElem.element(by.css(
         '.protractor-test-delete-response')).isPresent()).toBeFalsy();
     }
-  }
+  };
 };
 
 var expectCannotAddFallback = function() {
@@ -762,9 +849,9 @@ var expectCannotAddFallback = function() {
 // feedback'), and only represents a single feedback element.
 var addFallback = function(
     numSubmits, feedbackInstructions, destStateName, createState) {
-
   // Open the "Add Feedback" modal if it is not already open.
-  var headerElem = element(by.css('.protractor-test-add-fallback-modal-header'));
+  var headerElem = element(by.css(
+    '.protractor-test-add-fallback-modal-header'));
   headerElem.isPresent().then(function(isVisible) {
     if (!isVisible) {
       element(by.css('.protractor-test-open-add-fallback-modal')).click();
@@ -812,7 +899,7 @@ var moveToState = function(targetName) {
         general.waitForSystem();
       }
     }
-    if (! matched) {
+    if (!matched) {
       throw Error('State ' + targetName + ' not found by editor.moveToState');
     }
   });
@@ -835,7 +922,7 @@ var deleteState = function(stateName) {
         matched = true;
       }
     }
-    if (! matched) {
+    if (!matched) {
       throw Error('State ' + stateName + ' not found by editor.deleteState');
     }
   });
@@ -986,8 +1073,10 @@ var _selectComparedVersions = function(v1, v2) {
     }
     // Check to ensure no negative indices are queried
     if (v1 > versionNumber) {
-      throw Error('In editor._selectComparedVersions(' + v1 + ', ' + v2 + '),' +
-      'expected v1 to be less than or equal to total number of saved revisions');
+      throw Error(
+        'In editor._selectComparedVersions(' + v1 + ', ' + v2 + '),' +
+        'expected v1 to be less than or equal to total number of saved ' +
+        'revisions');
     }
     if (v2 > versionNumber) {
       throw Error('In editor._selectComparedVersions(' + v1 + ', ' + v2 + '),' +
@@ -1014,8 +1103,8 @@ var _selectComparedVersions = function(v1, v2) {
 };
 
 var expectGraphComparisonOf = function(v1, v2) {
-  // This function compares the states in the history graph with a list of objects
-  // with the following key-value pairs:
+  // This function compares the states in the history graph with a list of
+  // objects with the following key-value pairs:
   //   - 'label': label of the node (Note: if the node has a secondary label,
   //              the secondary label should appear after a space. It may be
   //              truncated.)
@@ -1024,9 +1113,9 @@ var expectGraphComparisonOf = function(v1, v2) {
     element(by.css('.protractor-test-history-graph'))
         .all(by.css('.protractor-test-node')).map(function(stateNode) {
       return {
-        'label': stateNode.element(
+        label: stateNode.element(
           by.css('.protractor-test-node-label')).getText(),
-        'color': stateNode.element(
+        color: stateNode.element(
           by.css('.protractor-test-node-background')).getCssValue('fill')
       };
     }).then(function(states) {
@@ -1041,7 +1130,8 @@ var expectGraphComparisonOf = function(v1, v2) {
 
   // Checks that the history graph contains totalLinks links altogether,
   // addedLinks green links and deletedLinks red links.
-  var _expectNumberOfLinksToBe = function(totalLinks, addedLinks, deletedLinks) {
+  var _expectNumberOfLinksToBe = function(
+      totalLinks, addedLinks, deletedLinks) {
     var COLOR_ADDED = 'rgb(31, 125, 31)';
     var COLOR_DELETED = 'rgb(178, 34, 34)';
     var totalCount = 0;
@@ -1072,19 +1162,22 @@ var expectGraphComparisonOf = function(v1, v2) {
       }
 
       if (totalCount != totalLinks) {
-        throw Error('In editor.expectGraphComparisonOf(' + v1 + ', ' + v2 + '), ' +
+        throw Error(
+          'In editor.expectGraphComparisonOf(' + v1 + ', ' + v2 + '), ' +
           'expected to find ' + totalLinks + ' links in total, ' +
           'but found ' + totalCount);
       }
       if (addedCount != addedLinks) {
-        throw Error('In editor.expectGraphComparisonOf(' + v1 + ', ' + v2 + '), ' +
+        throw Error(
+          'In editor.expectGraphComparisonOf(' + v1 + ', ' + v2 + '), ' +
           'expected to find ' + addedLinks + ' added links, ' + 'but found ' +
           addedCount);
       }
       if (deletedCount != deletedLinks) {
-        throw Error('In editor.expectGraphComparisonOf(' + v1 + ', ' + v2 + '), ' +
-          'expected to find ' + deletedLinks + ' deleted links, ' + 'but found ' +
-          deletedCount);
+        throw Error(
+          'In editor.expectGraphComparisonOf(' + v1 + ', ' + v2 + '), ' +
+          'expected to find ' + deletedLinks + ' deleted links, ' +
+          'but found ' + deletedCount);
       }
     });
   };
@@ -1129,8 +1222,9 @@ var expectTextComparisonOf = function(v1, v2, stateName) {
           return result;
         }
       }
-      if (! matched) {
-        throw Error('State ' + stateName + ' not found by editor.openStateHistoryModal');
+      if (!matched) {
+        throw Error(
+          'State ' + stateName + ' not found by editor.openStateHistoryModal');
       }
     });
   };
@@ -1147,10 +1241,12 @@ var expectTextComparisonOf = function(v1, v2, stateName) {
       _runFromHistoryTab(function() {
         _selectComparedVersions(v1, v2);
         _openStateHistoryModal(function() {
-          forms.CodeMirrorChecker(element.all(by.css('.CodeMirror-code')).first())
-            .expectTextWithHighlightingToBe(v1StateContents);
-          forms.CodeMirrorChecker(element.all(by.css('.CodeMirror-code')).last())
-            .expectTextWithHighlightingToBe(v2StateContents);
+          forms.CodeMirrorChecker(
+            element.all(by.css('.CodeMirror-code')).first()
+          ).expectTextWithHighlightingToBe(v1StateContents);
+          forms.CodeMirrorChecker(
+            element.all(by.css('.CodeMirror-code')).last()
+          ).expectTextWithHighlightingToBe(v2StateContents);
         });
       });
     },
@@ -1161,10 +1257,12 @@ var expectTextComparisonOf = function(v1, v2, stateName) {
       _runFromHistoryTab(function() {
         _selectComparedVersions(v1, v2);
         _openStateHistoryModal(function() {
-          forms.CodeMirrorChecker(element.all(by.css('.CodeMirror-code')).first())
-            .expectTextToBe(v1StateContents);
-          forms.CodeMirrorChecker(element.all(by.css('.CodeMirror-code')).last())
-            .expectTextToBe(v2StateContents);
+          forms.CodeMirrorChecker(
+            element.all(by.css('.CodeMirror-code')).first()
+          ).expectTextToBe(v1StateContents);
+          forms.CodeMirrorChecker(
+            element.all(by.css('.CodeMirror-code')).last()
+          ).expectTextToBe(v2StateContents);
         });
       });
     }
@@ -1176,8 +1274,9 @@ var expectTextComparisonOf = function(v1, v2, stateName) {
 var revertToVersion = function(version) {
   _runFromHistoryTab(function() {
     var versionPosition = null;
-    var elem = element.all(by.css('.protractor-test-history-checkbox-selector')).count()
-        .then(function(versionNumber) {
+    var elem = element.all(by.css(
+      '.protractor-test-history-checkbox-selector'
+    )).count().then(function(versionNumber) {
       // Note: there is no 'revert' link next to the current version
       versionPosition = versionNumber - version - 1;
       element.all(by.css('.protractor-test-revert-version'))
@@ -1189,7 +1288,7 @@ var revertToVersion = function(version) {
 
 exports.exitTutorialIfNecessary = exitTutorialIfNecessary;
 exports.progressInTutorial = progressInTutorial;
-exports.finishTutorial  = finishTutorial;
+exports.finishTutorial = finishTutorial;
 
 exports.navigateToMainTab = navigateToMainTab;
 exports.navigateToPreviewTab = navigateToPreviewTab;
@@ -1202,15 +1301,23 @@ exports.setContent = setContent;
 exports.expectContentToMatch = expectContentToMatch;
 
 exports.setInteraction = setInteraction;
+exports.openInteraction = openInteraction;
+exports.closeAddResponseModal = closeAddResponseModal;
+exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionToMatch = expectInteractionToMatch;
 exports.expectCannotDeleteInteraction = expectCannotDeleteInteraction;
+
+exports.selectRuleInAddResponseModal = selectRuleInAddResponseModal;
+exports.setRuleParametersInAddResponseModal = (
+  setRuleParametersInAddResponseModal);
+exports.expectRuleParametersToBe = expectRuleParametersToBe;
 
 exports.addGadget = addGadget;
 exports.renameGadget = renameGadget;
 exports.deleteGadget = deleteGadget;
 
 exports.expectGadgetListNameToMatch = expectGadgetListNameToMatch;
-exports.expectGadgetWithNameDoesNotExist = expectGadgetWithNameDoesNotExist;
+exports.expectGadgetWithTypeDoesNotExist = expectGadgetWithTypeDoesNotExist;
 
 exports.openGadgetEditorModal = openGadgetEditorModal;
 exports.saveAndCloseGadgetEditorModal = saveAndCloseGadgetEditorModal;

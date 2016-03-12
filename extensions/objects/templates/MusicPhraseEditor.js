@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 // This directive is always editable.
 
 oppia.directive('musicPhraseEditor', [
-    '$compile', 'OBJECT_EDITOR_URL_PREFIX', 'warningsData',
-    function($compile, OBJECT_EDITOR_URL_PREFIX, warningsData) {
+    '$compile', 'OBJECT_EDITOR_URL_PREFIX', 'alertsService',
+    function($compile, OBJECT_EDITOR_URL_PREFIX, alertsService) {
   return {
-    link: function(scope, element, attrs) {
+    link: function(scope, element) {
       scope.getTemplateUrl = function() {
         return OBJECT_EDITOR_URL_PREFIX + 'MusicPhrase';
       };
@@ -28,7 +27,7 @@ oppia.directive('musicPhraseEditor', [
     restrict: 'E',
     scope: true,
     template: '<div ng-include="getTemplateUrl()"></div>',
-    controller: ['$scope', '$rootScope', function($scope, $rootScope) {
+    controller: ['$scope', function($scope) {
       // The maximum number of notes allowed in a music phrase.
       var _MAX_NOTES_IN_PHRASE = 8;
 
@@ -52,7 +51,7 @@ oppia.directive('musicPhraseEditor', [
 
       // Reset the component each time the value changes (e.g. if this is part
       // of an editable list).
-      $scope.$watch('$parent.value', function(newValue, oldValue) {
+      $scope.$watch('$parent.value', function(newValue) {
         // TODO(sll): Check that $scope.$parent.value is a list.
         $scope.localValue = [];
         if (newValue) {
@@ -65,14 +64,16 @@ oppia.directive('musicPhraseEditor', [
       $scope.$watch('localValue', function(newValue, oldValue) {
         if (newValue && oldValue) {
           if (newValue.length > _MAX_NOTES_IN_PHRASE) {
-            warningsData.addWarning('There are too many notes on the staff.');
-          }
-          else {
+            alertsService.addWarning('There are too many notes on the staff.');
+          } else {
             var parentValues = [];
             for (var i = 0; i < newValue.length; i++) {
               parentValues.push({
                 readableNoteName: newValue[i],
-                noteDuration: {'num': 1, 'den': 1}
+                noteDuration: {
+                  num: 1,
+                  den: 1
+                }
               });
             }
             $scope.$parent.value = parentValues;

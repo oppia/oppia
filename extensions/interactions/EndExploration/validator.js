@@ -42,13 +42,6 @@ oppia.filter('oppiaInteractiveEndExplorationValidator', ['WARNING_TYPES',
       });
     }
 
-    if (customizationArgs.recommendedExplorationIds.value.length > 8) {
-      warningsList.push({
-        type: WARNING_TYPES.CRITICAL,
-        message: 'At most 8 explorations can be recommended.'
-      });
-    }
-
     return warningsList;
   };
 }]);

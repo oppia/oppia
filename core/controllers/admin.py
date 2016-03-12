@@ -14,9 +14,9 @@
 
 """Controllers for the admin view."""
 
-__author__ = 'sll@google.com (Sean Lip)'
-
 import logging
+
+import jinja2
 
 from core import counters
 from core import jobs
@@ -30,13 +30,11 @@ from core.domain import exp_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
-from core.domain import user_services
 from core.platform import models
-current_user_services = models.Registry.import_current_user_services()
 import feconf
 import utils
 
-import jinja2
+current_user_services = models.Registry.import_current_user_services()
 
 
 def require_super_admin(handler):
@@ -47,7 +45,7 @@ def require_super_admin(handler):
             self.redirect(
                 current_user_services.create_login_url(self.request.uri))
             return
-        if not user_services.is_super_admin(self.user_id, self.request):
+        if not current_user_services.is_current_user_super_admin():
             raise self.UnauthorizedUserException(
                 '%s is not a super admin of this application', self.user_id)
         return handler(self, **kwargs)
@@ -89,13 +87,7 @@ class AdminPage(base.BaseHandler):
                 'value': average_time
             })
 
-        demo_exploration_ids = [
-            ind for ind in enumerate(feconf.DEMO_EXPLORATIONS)]
-        demo_explorations = [
-            (unicode(ind), exp[0]) for ind, exp in
-            enumerate(feconf.DEMO_EXPLORATIONS)]
-
-        demo_collection_ids = feconf.DEMO_COLLECTIONS.keys()
+        demo_exploration_ids = feconf.DEMO_EXPLORATIONS.keys()
 
         recent_job_data = jobs.get_data_for_recent_jobs()
         unfinished_job_data = jobs.get_data_for_unfinished_jobs()
@@ -130,9 +122,8 @@ class AdminPage(base.BaseHandler):
 
         self.values.update({
             'continuous_computations_data': continuous_computations_data,
-            'demo_collections': feconf.DEMO_COLLECTIONS.iteritems(),
-            'demo_collection_ids': demo_collection_ids,
-            'demo_explorations': demo_explorations,
+            'demo_collections': sorted(feconf.DEMO_COLLECTIONS.iteritems()),
+            'demo_explorations': sorted(feconf.DEMO_EXPLORATIONS.iteritems()),
             'demo_exploration_ids': demo_exploration_ids,
             'human_readable_current_time': (
                 utils.get_human_readable_time_string(
@@ -143,7 +134,7 @@ class AdminPage(base.BaseHandler):
                 rte_component_registry.Registry.get_html_for_all_components()),
             'unfinished_job_data': unfinished_job_data,
             'value_generators_js': jinja2.utils.Markup(
-                editor.VALUE_GENERATORS_JS.value),
+                editor.get_value_generators_js()),
         })
 
         self.render_template('admin/admin.html')
@@ -161,8 +152,6 @@ class AdminHandler(base.BaseHandler):
         self.render_json({
             'config_properties': (
                 config_domain.Registry.get_config_property_schemas()),
-            'computed_properties': (
-                config_domain.Registry.get_computed_property_names()),
         })
 
     @require_super_admin
@@ -200,11 +189,6 @@ class AdminHandler(base.BaseHandler):
                              (self.user_id, config_property_id))
                 config_services.revert_property(
                     self.user_id, config_property_id)
-            elif self.payload.get('action') == 'refresh_computed_property':
-                computed_property_name = self.payload.get(
-                    'computed_property_name')
-                config_domain.Registry.get_config_property(
-                    computed_property_name).refresh_default_value()
             elif self.payload.get('action') == 'start_new_job':
                 for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
                     if klass.__name__ == self.payload.get('job_type'):

@@ -16,8 +16,6 @@
 
 """Rules for CheckedProof objects."""
 
-__author__ = 'Jacob Davis'
-
 from extensions.rules import base
 
 

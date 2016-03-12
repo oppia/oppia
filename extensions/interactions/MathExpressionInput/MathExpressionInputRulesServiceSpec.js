@@ -30,31 +30,50 @@ describe('Math expression input rules service', function() {
     expect(meirs.IsMathematicallyEquivalentTo({
       ascii: 'x',
       latex: ''
-    }, {x: 'x'})).toBe(true);
+    }, {
+      x: 'x'
+    })).toBe(true);
+
     expect(meirs.IsMathematicallyEquivalentTo({
       ascii: 'x + x - x',
       latex: ''
-    }, {x: 'x'})).toBe(true);
+    }, {
+      x: 'x'
+    })).toBe(true);
+
     expect(meirs.IsMathematicallyEquivalentTo({
       ascii: 'x',
       latex: ''
-    }, {x: 'x + x - x'})).toBe(true);
+    }, {
+      x: 'x + x - x'
+    })).toBe(true);
+
     expect(meirs.IsMathematicallyEquivalentTo({
       ascii: 'x^2/x',
       latex: ''
-    }, {x: 'x'})).toBe(true);
+    }, {
+      x: 'x'
+    })).toBe(true);
 
     expect(meirs.IsMathematicallyEquivalentTo({
       ascii: 'y',
       latex: ''
-    }, {x: 'x'})).toBe(false);
+    }, {
+      x: 'x'
+    })).toBe(false);
+
     expect(meirs.IsMathematicallyEquivalentTo({
       ascii: 'x^2',
       latex: ''
-    }, {x: 'x'})).toBe(false);
+    }, {
+      x: 'x'
+    })).toBe(false);
+
     expect(meirs.IsMathematicallyEquivalentTo({
       ascii: 'x + 0.1',
       latex: ''
-    }, {x: 'x'})).toBe(false);
+    }, {
+      x: 'x'
+    })).toBe(false);
   });
 });

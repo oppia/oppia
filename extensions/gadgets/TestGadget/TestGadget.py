@@ -14,9 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'Michael Anuzis'
-
-
 from extensions.gadgets import base
 import utils
 

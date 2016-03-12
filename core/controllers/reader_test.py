@@ -14,16 +14,12 @@
 
 """Tests for the page that allows learners to play through an exploration."""
 
-__author__ = 'Sean Lip'
-
 import os
 
 from core.controllers import reader
 from core.domain import classifier_services
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import fs_domain
-from core.domain import interaction_registry
 from core.domain import rights_manager
 from core.domain import param_domain
 from core.tests import test_utils
@@ -41,10 +37,10 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         super(ReaderPermissionsTest, self).setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.EDITOR_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         self.save_new_valid_exploration(
-            self.EXP_ID, self.EDITOR_ID, title=self.UNICODE_TEST_STRING,
+            self.EXP_ID, self.editor_id, title=self.UNICODE_TEST_STRING,
             category=self.UNICODE_TEST_STRING)
 
     def test_unpublished_explorations_are_invisible_to_logged_out_users(self):
@@ -63,15 +59,15 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_unpublished_explorations_are_invisible_to_other_editors(self):
-        OTHER_EDITOR_EMAIL = 'another@example.com'
-        self.signup(OTHER_EDITOR_EMAIL, 'othereditorusername')
+        other_editor_email = 'another@example.com'
+        self.signup(other_editor_email, 'othereditorusername')
 
         other_exploration = exp_domain.Exploration.create_default_exploration(
             'eid2', 'A title', 'A category')
         exp_services.save_new_exploration(
-            OTHER_EDITOR_EMAIL, other_exploration)
+            other_editor_email, other_exploration)
 
-        self.login(OTHER_EDITOR_EMAIL)
+        self.login(other_editor_email)
         response = self.testapp.get(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
             expect_errors=True)
@@ -87,7 +83,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
 
     def test_unpublished_explorations_are_visible_to_admins(self):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_EMAIL])
+        self.set_admins([self.ADMIN_USERNAME])
         self.login(self.ADMIN_EMAIL)
         response = self.testapp.get(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
@@ -95,7 +91,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_published_explorations_are_visible_to_logged_out_users(self):
-        rights_manager.publish_exploration(self.EDITOR_ID, self.EXP_ID)
+        rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
 
         response = self.testapp.get(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
@@ -103,7 +99,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
 
     def test_published_explorations_are_visible_to_logged_in_users(self):
-        rights_manager.publish_exploration(self.EDITOR_ID, self.EXP_ID)
+        rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
@@ -125,8 +121,8 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
         `expected_response` will be interpreted as a regex string.
         """
         reader_dict = self.submit_answer(
-            self.EXP_ID, self.last_state_name, answer)
-        self.last_state_name = reader_dict['state_name']
+            self.exp_id, self.last_state_name, answer)
+        self.last_state_name = reader_dict['state_name']  # pylint: disable=attribute-defined-outside-init
         self.assertRegexpMatches(
             reader_dict['feedback_html'], expected_feedback)
         self.assertRegexpMatches(
@@ -141,12 +137,12 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
         exp_services.delete_demo(exploration_id)
         exp_services.load_demo(exploration_id)
 
-        self.EXP_ID = exploration_id
+        self.exp_id = exploration_id  # pylint: disable=attribute-defined-outside-init
 
         reader_dict = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID))
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.exp_id))
 
-        self.last_state_name = reader_dict['exploration']['init_state_name']
+        self.last_state_name = reader_dict['exploration']['init_state_name']  # pylint: disable=attribute-defined-outside-init
         init_state_data = (
             reader_dict['exploration']['states'][self.last_state_name])
         init_content = init_state_data['content'][0]['value']
@@ -169,8 +165,8 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
         """Test the binary search (lazy magician) exploration."""
         self.init_player(
             '2', 'The Lazy Magician', 'How does he do it?')
-        self.submit_and_compare('Dont know', 'we should watch him first',
-            'town square')
+        self.submit_and_compare(
+            'Dont know', 'we should watch him first', 'town square')
         self.submit_and_compare(0, '', 'Is it')
         self.submit_and_compare(2, '', 'Do you want to play again?')
         # TODO(sll): Redo all of the following as a JS test, since the
@@ -233,33 +229,33 @@ class ReaderClassifyTests(test_utils.GenericTestBase):
             'Testing String Classifier', 'Test',
             exploration_id, assets_list)
 
-        self.EXP_ID = exploration_id
-        self.EXP_STATE = (
+        self.exp_id = exploration_id
+        self.exp_state = (
             exp_services.get_exploration_by_id(exploration_id).states['Home'])
 
     def _get_classiying_rule_type(self, answer):
         string_classifier_predict = (
             classifier_services.StringClassifier.predict_label_for_doc)
-        string_classifier_predict_counter = test_utils.CallCounter(
+        predict_counter = test_utils.CallCounter(
             string_classifier_predict)
 
         with self.swap(
-                classifier_services.StringClassifier,
-            'predict_label_for_doc', string_classifier_predict_counter):
+            classifier_services.StringClassifier,
+            'predict_label_for_doc', predict_counter):
+
             response = reader.classify(
-                self.EXP_ID, self.EXP_STATE, answer, {'answer': answer})
+                self.exp_id, self.exp_state, answer, {'answer': answer})
 
         answer_group_index = response['answer_group_index']
         rule_spec_index = response['rule_spec_index']
-        answer_groups = self.EXP_STATE.interaction.answer_groups
+        answer_groups = self.exp_state.interaction.answer_groups
         if answer_group_index == len(answer_groups):
             return 'default'
 
         answer_group = answer_groups[answer_group_index]
         if answer_group.get_fuzzy_rule_index() == rule_spec_index:
             return (
-                'soft'
-                if string_classifier_predict_counter.times_called == 0
+                'soft' if predict_counter.times_called == 0
                 else 'classifier')
         return 'hard'
 
@@ -340,19 +336,19 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
         # Load demo exploration
-        EXP_ID = '0'
+        exp_id = '0'
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
 
         # Viewer opens exploration
         self.login(self.VIEWER_EMAIL)
         exploration_dict = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, EXP_ID))
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
         state_name_1 = exploration_dict['exploration']['init_state_name']
 
         # Viewer gives 1st feedback
         self.post_json(
-            '/explorehandler/give_feedback/%s' % EXP_ID,
+            '/explorehandler/give_feedback/%s' % exp_id,
             {
                 'state_name': state_name_1,
                 'feedback': 'This is a feedback message.',
@@ -360,12 +356,12 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         )
 
         # Viewer submits answer '0'
-        result_dict = self.submit_answer(EXP_ID, state_name_1, '0')
+        result_dict = self.submit_answer(exp_id, state_name_1, '0')
         state_name_2 = result_dict['state_name']
 
         # Viewer gives 2nd feedback
         self.post_json(
-            '/explorehandler/give_feedback/%s' % EXP_ID,
+            '/explorehandler/give_feedback/%s' % exp_id,
             {
                 'state_name': state_name_2,
                 'feedback': 'This is a 2nd feedback message.',
@@ -434,11 +430,11 @@ class ExplorationParametersUnitTests(test_utils.GenericTestBase):
 class RatingsIntegrationTests(test_utils.GenericTestBase):
     """Integration tests of ratings recording and display."""
 
+    EXP_ID = '0'
+
     def setUp(self):
         super(RatingsIntegrationTests, self).setUp()
-        self.EXP_ID = '0'
-        exp_services.delete_demo('0')
-        exp_services.load_demo('0')
+        exp_services.load_demo(self.EXP_ID)
 
     def test_assign_and_read_ratings(self):
         """Test the PUT and GET methods for ratings."""

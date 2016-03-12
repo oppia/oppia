@@ -19,11 +19,11 @@
  * @author henning.benmax@gmail.com (Ben Henning)
  */
 
-oppia.factory('UrlInterpolationService', ['warningsData',
-    function(warningsData) {
+oppia.factory('UrlInterpolationService', ['alertsService',
+    function(alertsService) {
   // http://stackoverflow.com/questions/203739
   var _isString = function(value) {
-    return (typeof(value) === 'string') || (value instanceof String);
+    return (typeof value === 'string') || (value instanceof String);
   };
 
   return {
@@ -44,7 +44,7 @@ oppia.factory('UrlInterpolationService', ['warningsData',
      */
     interpolateUrl: function(urlTemplate, interpolationValues) {
       if (!urlTemplate) {
-        warningsData.fatalWarning(
+        alertsService.fatalWarning(
           'Invalid or empty URL template passed in: \'' +
           new String(urlTemplate) + '\'');
         return null;
@@ -54,7 +54,7 @@ oppia.factory('UrlInterpolationService', ['warningsData',
       if (!(interpolationValues instanceof Object) || (
           Object.prototype.toString.call(
             interpolationValues) === '[object Array]')) {
-        warningsData.fatalWarning(
+        alertsService.fatalWarning(
           'Expected an object of interpolation values to be passed into ' +
           'interpolateUrl.');
         return null;
@@ -67,12 +67,13 @@ oppia.factory('UrlInterpolationService', ['warningsData',
       var EMPTY_VARIABLE_REGEX = /<>/;
       var INVALID_VARIABLE_REGEX = /(<{2,})(\w*)(>{2,})/;
 
-      // Parameter values can only contain alphanumerical characters.
-      var VALID_PARAMETER_VALUE_REGEX = /^(\w| )+$/;
+      // Parameter values can only contain alphanumerical characters, spaces,
+      // hyphens or underscores.
+      var VALID_PARAMETER_VALUE_REGEX = /^(\w| |_|-)+$/;
 
       if (urlTemplate.match(INVALID_VARIABLE_REGEX) ||
           urlTemplate.match(EMPTY_VARIABLE_REGEX)) {
-        warningsData.fatalWarning(
+        alertsService.fatalWarning(
           'Invalid URL template received: \'' + urlTemplate + '\'');
         return null;
       }
@@ -81,16 +82,17 @@ oppia.factory('UrlInterpolationService', ['warningsData',
       for (var varName in interpolationValues) {
         var value = interpolationValues[varName];
         if (!_isString(value)) {
-          warningsData.fatalWarning(
+          alertsService.fatalWarning(
             'Parameters passed into interpolateUrl must be strings.');
           return null;
         }
 
         // Ensure the value is valid.
         if (!value.match(VALID_PARAMETER_VALUE_REGEX)) {
-          warningsData.fatalWarning(
+          alertsService.fatalWarning(
             'Parameter values passed into interpolateUrl must only contain ' +
-            'alphanumerical characters or spaces: \'' + value + '\'');
+            'alphanumerical characters, hyphens, underscores or spaces: \'' +
+            value + '\'');
           return null;
         }
 
@@ -104,7 +106,7 @@ oppia.factory('UrlInterpolationService', ['warningsData',
       while (match) {
         var varName = match[1];
         if (!escapedInterpolationValues.hasOwnProperty(varName)) {
-          warningsData.fatalWarning('Expected variable \'' + varName +
+          alertsService.fatalWarning('Expected variable \'' + varName +
             '\' when interpolating URL.');
           return null;
         }

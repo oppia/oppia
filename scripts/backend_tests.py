@@ -20,6 +20,8 @@ execute:
     bash scripts/run_backend_tests.sh
 """
 
+# Pylint has issues with the import order of argparse.
+# pylint: disable=wrong-import-order
 import argparse
 import datetime
 import os
@@ -27,6 +29,8 @@ import re
 import subprocess
 import threading
 import time
+# pylint: enable=wrong-import-order
+
 
 COVERAGE_PATH = os.path.join(
     os.getcwd(), '..', 'oppia_tools', 'coverage-4.0', 'coverage')
@@ -241,7 +245,7 @@ def main():
     task_execution_failed = False
     try:
         _execute_tasks(tasks)
-    except:
+    except Exception:
         task_execution_failed = True
 
     for task in tasks:
@@ -273,7 +277,7 @@ def main():
 
             tests_failed_regex_match = re.search(
                 r'Test suite failed: ([0-9]+) tests run, ([0-9]+) errors, '
-                    '([0-9]+) failures',
+                '([0-9]+) failures',
                 str(task.exception))
 
             try:
@@ -295,12 +299,17 @@ def main():
                 print '    This is most likely due to an import error.'
                 print '------------------------------------------------------'
         else:
-            tests_run_regex_match = re.search(
-                r'Ran ([0-9]+) tests? in ([0-9\.]+)s', task.output)
-            test_count = int(tests_run_regex_match.group(1))
-            test_time = float(tests_run_regex_match.group(2))
-            print ('SUCCESS   %s: %d tests (%.1f secs)' %
-                   (spec.test_target, test_count, test_time))
+            try:
+                tests_run_regex_match = re.search(
+                    r'Ran ([0-9]+) tests? in ([0-9\.]+)s', task.output)
+                test_count = int(tests_run_regex_match.group(1))
+                test_time = float(tests_run_regex_match.group(2))
+                print ('SUCCESS   %s: %d tests (%.1f secs)' %
+                       (spec.test_target, test_count, test_time))
+            except Exception:
+                print (
+                    'An unexpected error occurred. '
+                    'Task output:\n%s' % task.output)
 
         total_count += test_count
 

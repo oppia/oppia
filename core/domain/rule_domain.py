@@ -16,8 +16,6 @@
 
 """Classes relating to rules."""
 
-__author__ = 'Sean Lip'
-
 import inspect
 import os
 import pkgutil
@@ -41,6 +39,43 @@ def get_obj_type_for_param_name(rule_class, param_name):
             return item[1]
     raise Exception(
         'Rule %s has no param called %s' % (rule_class.__name__, param_name))
+
+
+def get_default_object_values():
+    """Returns a dict mapping object types to their default values, taking into
+    account only object types which represent rule input parameters.
+
+    Note: we return an explicit dict here in order to avoid unnecessary
+    computation, since this dict never changes between a release and is served
+    each time the editor page loads. We have backend tests that compare the
+    value returned here to an explicitly-computed value -- see
+
+          rule_domain_test.test_get_default_object_values().
+    """
+    return {
+        'CodeString': '',
+        'CoordTwoDim': [0.0, 0.0],
+        'Graph': {
+            'edges': [],
+            'isDirected': False,
+            'isLabeled': False,
+            'isWeighted': False,
+            'vertices': []
+        },
+        'GraphProperty': 'strongly_connected',
+        'Int': 0,
+        'ListOfCoordTwoDim': [],
+        'ListOfGraph': [],
+        'LogicErrorCategory': 'mistake',
+        'MusicPhrase': [],
+        'NonnegativeInt': 0,
+        'NormalizedString': u'',
+        'Real': 0.0,
+        'SetOfHtmlString': [],
+        'SetOfNormalizedString': [],
+        'SetOfUnicodeString': [],
+        'UnicodeString': u''
+    }
 
 
 def get_rules_for_obj_type(obj_type):
@@ -67,14 +102,14 @@ def get_rules_for_obj_type(obj_type):
 
 
 def get_description_strings_for_obj_type(obj_type):
-   """Returns a dict whose keys are rule names and whose values are the
-   corresponding description strings.
-   """
-   rules = get_rules_for_obj_type(obj_type)
-   return {
-       rule.__name__: rule.description
-       for rule in rules
-   }
+    """Returns a dict whose keys are rule names and whose values are the
+    corresponding description strings.
+    """
+    rules = get_rules_for_obj_type(obj_type)
+    return {
+        rule.__name__: rule.description
+        for rule in rules
+    }
 
 
 def get_param_list(description):
@@ -118,16 +153,16 @@ class Rule(object):
     # overridden by subclasses.
     description = ''
 
-    _PARAMS = None
+    _params = None
     _fs = None
 
     @property
     def params(self):
-        if self._PARAMS is None:
+        if self._params is None:
             # Derive the rule params from its description.
-            self._PARAMS = get_param_list(self.description)
+            self._params = get_param_list(self.description)
 
-        return self._PARAMS
+        return self._params
 
     def __init__(self, *args):
         if len(args) != len(self.params):
@@ -193,7 +228,7 @@ def evaluate_rule(rule_spec, answer_type, context_params, answer, fs):
     param_defns = get_param_list(rule.description)
     for (param_name, obj_cls) in param_defns:
         parsed_param = rule_spec.inputs[param_name]
-        if (isinstance(parsed_param, basestring) and '{{' in parsed_param):
+        if isinstance(parsed_param, basestring) and '{{' in parsed_param:
             parsed_param = jinja_utils.parse_string(
                 parsed_param, context_params, autoescape=False)
         normalized_param = obj_cls.normalize(parsed_param)

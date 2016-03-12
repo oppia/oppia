@@ -46,7 +46,7 @@ describe('Stopwatch object factory', function() {
       expect(stopwatch.getTimeInSecs()).toEqual(0.5);
     });
 
-    it('should not reset the stopwatch when the current time is retrieved', function() {
+    it('should not reset stopwatch when current time is retrieved', function() {
       var stopwatch = StopwatchObjectFactory.create();
       changeCurrentTime(stopwatch, 0);
       stopwatch.reset();
@@ -67,7 +67,7 @@ describe('Stopwatch object factory', function() {
       expect(stopwatch.getTimeInSecs()).toEqual(0.3);
     });
 
-    it('should raise an error if getTimeInSecs() is called prior to reset()', function() {
+    it('should error if getTimeInSecs() is called before reset()', function() {
       var stopwatch = StopwatchObjectFactory.create();
       changeCurrentTime(stopwatch, 29);
       expect(stopwatch.getTimeInSecs()).toBeNull();

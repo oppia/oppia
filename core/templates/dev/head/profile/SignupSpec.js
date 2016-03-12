@@ -19,9 +19,8 @@
  */
 
 describe('Signup controller', function() {
-
   describe('SignupCtrl', function() {
-    var scope, ctrl, $httpBackend, rootScope, mockWarningsData, urlParams;
+    var scope, ctrl, $httpBackend, rootScope, mockAlertsService, urlParams;
 
     beforeEach(function() {
       module('oppia');
@@ -35,14 +34,16 @@ describe('Signup controller', function() {
       });
       rootScope = $rootScope;
 
-      mockWarningsData = {
-        addWarning: function(warning) {}
+      mockAlertsService = {
+        addWarning: function() {}
       };
-      spyOn(mockWarningsData, 'addWarning');
+      spyOn(mockAlertsService, 'addWarning');
 
       scope = {
         getUrlParams: function() {
-          return {return_url: 'return_url'};
+          return {
+            return_url: 'return_url'
+          };
         }
       };
 
@@ -50,13 +51,13 @@ describe('Signup controller', function() {
         $scope: scope,
         $http: $http,
         $rootScope: rootScope,
-        warningsData: mockWarningsData
+        alertsService: mockAlertsService
       });
     }));
 
     it('should show warning if user has not agreed to terms', function() {
       scope.submitPrerequisitesForm(false, null);
-      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
+      expect(mockAlertsService.addWarning).toHaveBeenCalledWith(
         'In order to edit explorations on this site, you will need to agree ' +
         'to the site terms.');
     });
@@ -75,12 +76,12 @@ describe('Signup controller', function() {
 
     it('should show warning if terms are not agreed to', function() {
       scope.submitPrerequisitesForm(false, '');
-      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
+      expect(mockAlertsService.addWarning).toHaveBeenCalledWith(
         'In order to edit explorations on this site, you will need to ' +
         'agree to the site terms.');
     });
 
-    it('should show warning if no username provided', function($http) {
+    it('should show warning if no username provided', function() {
       scope.updateWarningText('');
       expect(scope.warningText).toEqual('Please choose a username.');
 
@@ -88,20 +89,21 @@ describe('Signup controller', function() {
       expect(scope.warningText).toEqual('Please choose a username.');
     });
 
-    it('should show warning if username is too long', function($http) {
+    it('should show warning if username is too long', function() {
       scope.updateWarningText(
         'abcdefghijklmnopqrstuvwxyzyxwvutsrqponmlkjihgfedcba');
       expect(scope.warningText).toEqual(
         'A username can have at most 50 characters.');
     });
 
-    it('should show warning if username has non-alphanumeric characters', function($http) {
+    it('should show warning if username has non-alphanumeric characters',
+        function() {
       scope.updateWarningText('a-a');
       expect(scope.warningText).toEqual(
         'Usernames can only have alphanumeric characters.');
     });
 
-    it('should show warning if username has \'admin\' in it', function($http) {
+    it('should show warning if username has \'admin\' in it', function() {
       scope.updateWarningText('administrator');
       expect(scope.warningText).toEqual(
         'User names with \'admin\' are reserved.');

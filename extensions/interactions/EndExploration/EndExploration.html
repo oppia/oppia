@@ -1,42 +1,18 @@
-<link rel="stylesheet" type="text/css" href="/extensions/interactions/EndExploration/static/css/EndExploration.css">
-
 <script type="text/ng-template" id="interaction/EndExploration">
-  <div ng-if="recommendedExplorationIds.length > 0 || (isInEditorPage && invalidExpIds.length > 0)">
-    <span ng-if="!collectionId">Other explorations you might enjoy:</span>
-    <span ng-if="collectionId">Continue &#39;<[collectionTitle]>&#39;:</span>
-    <div style="color: red;" ng-repeat="expId in invalidExpIds">
-      <strong>Error:</strong> no published exploration found with ID '<[expId]>'
-    </div>
-
-    <div layout="row" layout-wrap>
-      <div ng-repeat="expId in recommendedExplorationIds track by $index">
-        <exploration-summary-tile ng-if="recommendedExplorationSummaries[$index]"
-                                  collection-id="collectionId"
-                                  exploration-id="expId"
-                                  exploration-title="recommendedExplorationSummaries[$index].title"
-                                  last-updated-msec="recommendedExplorationSummaries[$index].last_updated"
-                                  objective="recommendedExplorationSummaries[$index].objective"
-                                  category=" recommendedExplorationSummaries[$index].category"
-                                  ratings="recommendedExplorationSummaries[$index].ratings"
-                                  thumbnail-icon-url="recommendedExplorationSummaries[$index].thumbnail_icon_url"
-                                  thumbnail-bg-color="recommendedExplorationSummaries[$index].thumbnail_bg_color"
-                                  ng-attr-open-in-new-window="<[isIframed ? 'true' : undefined]>">
-        </exploration-summary-tile>
-      </div>
-    </div>
-  </div>
-
-  <div ng-if="!isIframed && !isInEditorPreviewMode && recommendedExplorationIds.length === 0 && (!isInEditorPage || invalidExpIds.length === 0)">
+  <div ng-if="!isIframed && !isInEditorPreviewMode">
     <a ng-href="/collection/<[collectionId]>" ng-if="collectionId">
-      <md-button class="md-button-success">
-        Return to <[collectionTitle]>
+      <md-button class="oppia-learner-continue-button">
+        Return to "<[collectionTitle]>"
       </md-button>
     </a>
-    <a href="/">
-      <md-button class="md-button-success" ng-if="!collectionId">
+    <a href="/gallery">
+      <md-button class="oppia-learner-continue-button" ng-if="!collectionId">
         Return to gallery
       </md-button>
     </a>
+  </div>
+  <div ng-if="isInEditorPage" style="color: red; font-size: 0.8em; margin-top: 20px;">
+    <span><[errorMessage]></span>
   </div>
 </script>
 

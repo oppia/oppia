@@ -15,7 +15,6 @@
 """Installation script for Oppia third-party libraries."""
 
 import contextlib
-import itertools
 import json
 import os
 import shutil
@@ -118,10 +117,10 @@ def download_and_unzip_files(
         urllib.urlretrieve(source_url, TMP_UNZIP_PATH)
 
         try:
-            with zipfile.ZipFile(TMP_UNZIP_PATH, 'r') as z:
-                z.extractall(target_parent_dir)
+            with zipfile.ZipFile(TMP_UNZIP_PATH, 'r') as zfile:
+                zfile.extractall(target_parent_dir)
             os.remove(TMP_UNZIP_PATH)
-        except:
+        except Exception:
             if os.path.exists(TMP_UNZIP_PATH):
                 os.remove(TMP_UNZIP_PATH)
 
@@ -131,8 +130,8 @@ def download_and_unzip_files(
             # This is needed to get a seekable filestream that can be used
             # by zipfile.ZipFile.
             file_stream = StringIO.StringIO(urllib2.urlopen(req).read())
-            with zipfile.ZipFile(file_stream, 'r') as z:
-                z.extractall(target_parent_dir)
+            with zipfile.ZipFile(file_stream, 'r') as zfile:
+                zfile.extractall(target_parent_dir)
 
         # Rename the target directory.
         os.rename(
@@ -163,8 +162,8 @@ def download_and_untar_files(
         common.ensure_directory_exists(target_parent_dir)
 
         urllib.urlretrieve(source_url, TMP_UNZIP_PATH)
-        with contextlib.closing(tarfile.open(TMP_UNZIP_PATH, 'r:gz')) as t:
-            t.extractall(target_parent_dir)
+        with contextlib.closing(tarfile.open(TMP_UNZIP_PATH, 'r:gz')) as tfile:
+            tfile.extractall(target_parent_dir)
         os.remove(TMP_UNZIP_PATH)
 
         # Rename the target directory.
@@ -203,7 +202,7 @@ def test_manifest_syntax(dependency_type, dependency_dict):
         dependency_type]['mandatory_keys']
     # Optional keys requires exactly one member of the pair
     # to be available as a key in the dependency_dict
-    optional_key_pairs= DOWNLOAD_FORMATS_TO_MANIFEST_KEYS[
+    optional_key_pairs = DOWNLOAD_FORMATS_TO_MANIFEST_KEYS[
         dependency_type]['optional_key_pairs']
     for key in mandatory_keys:
         if key not in keys:
@@ -215,13 +214,15 @@ def test_manifest_syntax(dependency_type, dependency_dict):
             sys.exit(1)
     if optional_key_pairs:
         for optional_keys in optional_key_pairs:
-            optional_keys_in_dict =[
+            optional_keys_in_dict = [
                 key for key in optional_keys if key in keys]
-            if not len(optional_keys_in_dict) == 1:
+            if len(optional_keys_in_dict) != 1:
                 print '------------------------------------------'
                 print 'There is syntax error in this dependency'
                 print dependency_dict
-                print 'Only one of these keys pair must be used: "%s".' % str(optional_keys)
+                print (
+                    'Only one of these keys pair must be used: "%s".'
+                    % str(optional_keys))
                 print 'Exiting'
                 sys.exit(1)
 
@@ -232,16 +233,16 @@ def test_manifest_syntax(dependency_type, dependency_dict):
     is_zip_file_format = dependency_type == _DOWNLOAD_FORMAT_ZIP
     is_tar_file_format = dependency_type == _DOWNLOAD_FORMAT_TAR
     if (dependency_url.endswith('.zip') and not is_zip_file_format or
-        is_zip_file_format and not dependency_url.endswith('.zip') or
-        dependency_url.endswith('.tar.gz') and not is_tar_file_format or
-        is_tar_file_format and not dependency_url.endswith('.tar.gz')):
-            print '------------------------------------------'
-            print 'There is syntax error in this dependency'
-            print dependency_dict
-            print 'This url  %s is invalid for %s file format.' % (
-                dependency_url, dependency_type)
-            print 'Exiting.'
-            sys.exit(1)
+            is_zip_file_format and not dependency_url.endswith('.zip') or
+            dependency_url.endswith('.tar.gz') and not is_tar_file_format or
+            is_tar_file_format and not dependency_url.endswith('.tar.gz')):
+        print '------------------------------------------'
+        print 'There is syntax error in this dependency'
+        print dependency_dict
+        print 'This url  %s is invalid for %s file format.' % (
+            dependency_url, dependency_type)
+        print 'Exiting.'
+        sys.exit(1)
 
 
 def validate_manifest(filepath):
@@ -252,7 +253,7 @@ def validate_manifest(filepath):
     manifest_data = return_json(filepath)
     dependencies = manifest_data['dependencies']
     for _, dependency in dependencies.items():
-        for dependency_id, dependency_contents in dependency.items():
+        for _, dependency_contents in dependency.items():
             download_format = dependency_contents['downloadFormat']
             test_manifest_syntax(download_format, dependency_contents)
 
@@ -266,7 +267,7 @@ def download_manifest_files(filepath):
     manifest_data = return_json(filepath)
     dependencies = manifest_data['dependencies']
     for data, dependency in dependencies.items():
-        for dependency_id, dependency_contents in dependency.items():
+        for _, dependency_contents in dependency.items():
             dependency_rev = dependency_contents['version']
             dependency_url = dependency_contents['url']
             download_format = dependency_contents['downloadFormat']
@@ -305,24 +306,26 @@ def download_manifest_files(filepath):
                     dependency_tar_root_name, dependency_target_root_name)
 
 
-download_manifest_files(MANIFEST_FILE_PATH)
-
-MATHJAX_REV = '2.4-latest'
+MATHJAX_REV = '2.6.0'
 MATHJAX_ROOT_NAME = 'MathJax-%s' % MATHJAX_REV
-MATHJAX_ZIP_URL = (
-    'https://github.com/mathjax/MathJax/archive/v%s.zip' % MATHJAX_REV)
-MATHJAX_ZIP_ROOT_NAME = MATHJAX_ROOT_NAME
 MATHJAX_TARGET_ROOT_NAME = MATHJAX_ROOT_NAME
-
-# MathJax is too big. Remove many unneeded files by following these
-# instructions:
-#   https://github.com/mathjax/MathJax/wiki/Shrinking-MathJax-for-%22local%22-installation
 MATHJAX_DIR_PREFIX = os.path.join(
     THIRD_PARTY_STATIC_DIR, MATHJAX_TARGET_ROOT_NAME)
 MATHJAX_SUBDIRS_TO_REMOVE = [
     'unpacked', os.path.join('fonts', 'HTML-CSS', 'TeX', 'png')]
-for subdir in MATHJAX_SUBDIRS_TO_REMOVE:
-    full_dir = os.path.join(MATHJAX_DIR_PREFIX, subdir)
-    if os.path.isdir(full_dir):
-        print 'Removing unnecessary MathJax directory \'%s\'' % subdir
-        shutil.rmtree(full_dir)
+
+
+def _install_third_party_libs():
+    download_manifest_files(MANIFEST_FILE_PATH)
+
+    # MathJax is too big. Remove many unneeded files by following these
+    # instructions:
+    # https://github.com/mathjax/MathJax/wiki/Shrinking-MathJax-for-%22local%22-installation pylint: disable=line-too-long
+    for subdir in MATHJAX_SUBDIRS_TO_REMOVE:
+        full_dir = os.path.join(MATHJAX_DIR_PREFIX, subdir)
+        if os.path.isdir(full_dir):
+            print 'Removing unnecessary MathJax directory \'%s\'' % subdir
+            shutil.rmtree(full_dir)
+
+if __name__ == '__main__':
+    _install_third_party_libs()

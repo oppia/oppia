@@ -1,14 +1,15 @@
 author_notes: ''
 blurb: ''
-default_skin: conversation_v1
+category: Coding
 init_state_name: Intro
 language_code: en
 objective: solve Problem 1 on the Project Euler site
 param_changes: []
 param_specs: {}
-schema_version: 7
+schema_version: 10
 skin_customizations:
-  panels_contents: {}
+  panels_contents:
+    bottom: []
 states:
   After First Question:
     content:
@@ -18,6 +19,7 @@ states:
         get 23. Well done!
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         buttonText:
           value: Continue
@@ -25,8 +27,8 @@ states:
         dest: Second Question
         feedback: []
         param_changes: []
+      fallbacks: []
       id: Continue
-      triggers: []
     param_changes: []
   END:
     content:
@@ -34,12 +36,13 @@ states:
       value: Congratulations, you have finished!
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         recommendedExplorationIds:
           value: []
       default_outcome: null
+      fallbacks: []
       id: EndExploration
-      triggers: []
     param_changes: []
   First Question:
     content:
@@ -80,14 +83,15 @@ states:
         - inputs:
             x: 8.0
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Numbers for first question
         feedback:
         - OK. To check our work, let's have a quick look at what we're adding up!
         param_changes: []
+      fallbacks: []
       id: NumericInput
-      triggers: []
     param_changes: []
   Intro:
     content:
@@ -109,6 +113,7 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
@@ -118,8 +123,8 @@ states:
         dest: First Question
         feedback: []
         param_changes: []
+      fallbacks: []
       id: MultipleChoiceInput
-      triggers: []
     param_changes: []
   Numbers for first question:
     content:
@@ -206,6 +211,7 @@ states:
             - '7'
             - '8'
           rule_type: HasElementsIn
+      confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Numbers for first question
@@ -215,8 +221,8 @@ states:
         - Remember, the question asked only for numbers less than 10. (Also, the 'multiples'
           here should be positive integers.)
         param_changes: []
+      fallbacks: []
       id: SetInput
-      triggers: []
     param_changes: []
   Second Question:
     content:
@@ -236,6 +242,7 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
+      confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
@@ -245,8 +252,8 @@ states:
         dest: Second Question Coding
         feedback: []
         param_changes: []
+      fallbacks: []
       id: MultipleChoiceInput
-      triggers: []
     param_changes: []
   Second Question Coding:
     content:
@@ -262,7 +269,9 @@ states:
       answer_groups:
       - outcome:
           dest: Second Question Coding
-          feedback: []
+          feedback:
+          - <p>Oops, it looks like the code has an error! Have a look at the error
+            message in the terminal; that might help you fix it.</p>
           param_changes: []
         rule_specs:
         - inputs: {}
@@ -346,6 +355,7 @@ states:
         - inputs:
             x: ''
           rule_type: OutputEquals
+      confirmed_unclassified_answers: []
       customization_args:
         language:
           value: python
@@ -384,8 +394,8 @@ states:
           replacing the number 1000 in your program with 10, and seeing if that gives
           you 23, as before?
         param_changes: []
+      fallbacks: []
       id: CodeRepl
-      triggers: []
     param_changes: []
   Second Question Sample Answer:
     content:
@@ -400,6 +410,7 @@ states:
         \ add anything to the sum, we still get the correct result.)</div>"
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         buttonText:
           value: Continue
@@ -407,8 +418,8 @@ states:
         dest: END
         feedback: []
         param_changes: []
+      fallbacks: []
       id: Continue
-      triggers: []
     param_changes: []
   Second Question Straight Answer:
     content:
@@ -453,6 +464,7 @@ states:
         - inputs:
             x: 23.0
           rule_type: IsLessThan
+      confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Second Question Coding
@@ -461,8 +473,8 @@ states:
           numbers together, so sometimes it might be easier to let the computer do
           it instead.<br>
         param_changes: []
+      fallbacks: []
       id: NumericInput
-      triggers: []
     param_changes: []
   Second Question Why:
     content:
@@ -471,6 +483,7 @@ states:
         answer?</div>
     interaction:
       answer_groups: []
+      confirmed_unclassified_answers: []
       customization_args:
         placeholder:
           value: Type your answer here.
@@ -480,8 +493,9 @@ states:
         dest: END
         feedback: []
         param_changes: []
+      fallbacks: []
       id: TextInput
-      triggers: []
     param_changes: []
-states_schema_version: 4
+states_schema_version: 7
 tags: []
+title: Project Euler Problem 1

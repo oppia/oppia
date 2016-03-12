@@ -75,6 +75,12 @@ indexes:
   - name: last_updated
     direction: desc
 
+- kind: FeedbackThreadModel
+  properties:
+  - name: deleted
+  - name: exploration_id
+  - name: last_updated
+
 - kind: JobModel
   properties:
   - name: status_code

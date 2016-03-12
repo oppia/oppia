@@ -14,8 +14,6 @@
 
 """Tests for the user notification dashboard and 'my explorations' pages."""
 
-__author__ = 'Sean Lip'
-
 from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import user_jobs_continuous
@@ -28,10 +26,11 @@ class HomePageTest(test_utils.GenericTestBase):
     def test_logged_out_homepage(self):
         """Test the logged-out version of the home page."""
         response = self.testapp.get('/')
-        self.assertEqual(response.status_int, 200)
-        response.mustcontain(
+        self.assertEqual(response.status_int, 302)
+        self.assertIn('gallery', response.headers['location'])
+        response.follow().mustcontain(
             'Your personal tutor',
-            'Oppia - Gallery', 'About', 'Login', no=['Logout'])
+            'Oppia - Gallery', 'About', 'Sign in', no=['Logout'])
 
     def test_notifications_dashboard_redirects_for_logged_out_users(self):
         """Test the logged-out view of the notifications dashboard."""
@@ -57,7 +56,7 @@ class HomePageTest(test_utils.GenericTestBase):
         response.mustcontain(
             'Notifications', 'Logout',
             self.get_expected_logout_url('/'),
-            no=['Login', 'Your personal tutor',
+            no=['Sign in', 'Your personal tutor',
                 self.get_expected_login_url('/')])
         self.logout()
 
@@ -92,7 +91,7 @@ class MyExplorationsHandlerTest(test_utils.GenericTestBase):
     def test_managers_can_see_explorations(self):
         self.save_new_default_exploration(
             self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
-        self.set_admins([self.OWNER_EMAIL])
+        self.set_admins([self.OWNER_USERNAME])
 
         self.login(self.OWNER_EMAIL)
         response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
@@ -122,7 +121,7 @@ class MyExplorationsHandlerTest(test_utils.GenericTestBase):
         rights_manager.assign_role_for_exploration(
             self.owner_id, self.EXP_ID, self.collaborator_id,
             rights_manager.ROLE_EDITOR)
-        self.set_admins([self.OWNER_EMAIL])
+        self.set_admins([self.OWNER_USERNAME])
 
         self.login(self.COLLABORATOR_EMAIL)
         response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
@@ -153,7 +152,7 @@ class MyExplorationsHandlerTest(test_utils.GenericTestBase):
         rights_manager.assign_role_for_exploration(
             self.owner_id, self.EXP_ID, self.viewer_id,
             rights_manager.ROLE_VIEWER)
-        self.set_admins([self.OWNER_EMAIL])
+        self.set_admins([self.OWNER_USERNAME])
 
         self.login(self.VIEWER_EMAIL)
         response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
@@ -181,15 +180,16 @@ class MyExplorationsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['explorations_list'][0]['num_total_threads'], 0)
 
-        def mock_get_thread_analytics(exploration_id):
+        def mock_get_thread_analytics(unused_exploration_id):
             return {
                 'num_open_threads': 2,
                 'num_total_threads': 3,
             }
 
         with self.swap(
-                feedback_services, 'get_thread_analytics',
-                mock_get_thread_analytics):
+            feedback_services, 'get_thread_analytics',
+            mock_get_thread_analytics):
+
             response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
             self.assertEqual(len(response['explorations_list']), 1)
             self.assertEqual(
@@ -236,9 +236,10 @@ class NotificationsDashboardHandlerTest(test_utils.GenericTestBase):
         and that anonymous authors are handled correctly.
         """
         with self.swap(
-                user_jobs_continuous.DashboardRecentUpdatesAggregator,
-                'get_recent_notifications',
-                self._get_recent_notifications_mock_by_viewer):
+            user_jobs_continuous.DashboardRecentUpdatesAggregator,
+            'get_recent_notifications',
+            self._get_recent_notifications_mock_by_viewer):
+
             self.login(self.VIEWER_EMAIL)
             response = self.get_json(self.DASHBOARD_DATA_URL)
             self.assertEqual(len(response['recent_notifications']), 1)
@@ -248,9 +249,10 @@ class NotificationsDashboardHandlerTest(test_utils.GenericTestBase):
             self.assertNotIn('author_id', response['recent_notifications'][0])
 
         with self.swap(
-                user_jobs_continuous.DashboardRecentUpdatesAggregator,
-                'get_recent_notifications',
-                self._get_recent_notifications_mock_by_anonymous_user):
+            user_jobs_continuous.DashboardRecentUpdatesAggregator,
+            'get_recent_notifications',
+            self._get_recent_notifications_mock_by_anonymous_user):
+
             self.login(self.VIEWER_EMAIL)
             response = self.get_json(self.DASHBOARD_DATA_URL)
             self.assertEqual(len(response['recent_notifications']), 1)

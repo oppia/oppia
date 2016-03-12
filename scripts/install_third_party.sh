@@ -26,7 +26,7 @@ install_node_module gulp 3.9.0
 install_node_module through2 2.0.0
 install_node_module yargs 3.29.0
 install_node_module gulp-concat 2.6.0
-install_node_module gulp-minify-css 1.2.1
+install_node_module gulp-clean-css 2.0.2
 install_node_module gulp-util 3.0.7
 install_node_module jscs 2.3.0
 install_node_module gulp-sourcemaps 1.6.0
@@ -76,28 +76,52 @@ if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt-0.10.0" ]; then
   cp -r $TOOLS_DIR/skulpt-0.10.0/skulpt/dist/* $THIRD_PARTY_DIR/static/skulpt-0.10.0
 fi
 
-# Note that numpy needs to be built after downloading. If you are having
+# Checking if pip is installed. If you are having
 # trouble, please ensure that you have pip installed (see "Installing Oppia"
 # on the Oppia developers' wiki page).
+echo Checking if pip is installed on the local machine
+if ! type pip > /dev/null 2>&1 ; then
+    echo ""
+    echo "  Pip is required to install Oppia dependencies, but pip wasn't found"
+    echo "  on your local machine."
+    echo ""
+    echo "  Please see \"Installing Oppia\" on the Oppia developers' wiki page:"
+
+    if [ "${OS}" == "Darwin" ] ; then
+      echo "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-OS%29"
+    else
+      echo "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux%29"
+    fi
+
+    # If pip is not installed, quit.
+    exit 1
+fi
+
+# Note that numpy needs to be built after downloading.
 echo Checking if numpy is installed in $TOOLS_DIR/pip_packages
 if [ ! -d "$TOOLS_DIR/numpy-1.6.1" ]; then
   echo Installing numpy
 
-  if ! type pip > /dev/null 2>&1 ; then
-      echo ""
-      echo "  Numpy is required for Oppia to operate properly, but pip wasn't found"
-      echo "  on your local machine."
-      echo ""
-      echo "  Please see \"Installing Oppia\" on the Oppia developers' wiki page:"
-
-      if [ "${OS}" == "Darwin" ] ; then
-        echo "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-OS%29"
-      else
-        echo "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux%29"
-      fi
-
-      exit 1
-  fi
-
   pip install numpy==1.6.1 --target="$TOOLS_DIR/numpy-1.6.1"
 fi
+
+echo Checking if pylint is installed in $TOOLS_DIR/pip_packages
+if [ ! -d "$TOOLS_DIR/pylint-1.5.2" ]; then
+  echo Installing Pylint
+
+  pip install pylint==1.5.2 --target="$TOOLS_DIR/pylint-1.5.2"
+fi
+
+# Install webtest.
+echo Checking if webtest is installed in third_party
+if [ ! -d "$TOOLS_DIR/webtest-1.4.2" ]; then
+  echo Installing webtest framework
+  # Note that the github URL redirects, so we pass in -L to tell curl to follow the redirect.
+  curl --silent -L https://github.com/Pylons/webtest/archive/1.4.2.zip -o webtest-download.zip
+  unzip webtest-download.zip -d $TOOLS_DIR
+  rm webtest-download.zip
+fi
+
+# install pre-push script
+echo Installing pre-push hook for git
+$PYTHON_CMD $OPPIA_DIR/scripts/pre_push_hook.py --install

@@ -16,13 +16,12 @@
 
 """Models for Oppia users."""
 
-__author__ = 'Stephanie Federwisch'
-
 from core.platform import models
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 import feconf
 
 from google.appengine.ext import ndb
+
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
 class UserSettingsModel(base_models.BaseModel):
@@ -40,7 +39,7 @@ class UserSettingsModel(base_models.BaseModel):
     # When the user last agreed to the terms of the site. May be None.
     last_agreed_to_terms = ndb.DateTimeProperty(default=None)
     # When the user last started the state editor tutorial. May be None.
-    last_started_state_editor_tutorial = ndb.DateTimeProperty(default=None)
+    last_started_state_editor_tutorial = ndb.DateTimeProperty(default=None)  # pylint: disable=invalid-name
     # User uploaded profile picture as a dataURI string. May be None.
     profile_picture_data_url = ndb.TextProperty(default=None, indexed=False)
     # User specified biography (to be shown on their profile page).
@@ -54,7 +53,9 @@ class UserSettingsModel(base_models.BaseModel):
     # TODO(sll): Add another field for the language that the user wants the
     # site to display in. These language preferences are mainly for the purpose
     # of figuring out what to show by default in the gallery.
-    preferred_language_codes = ndb.StringProperty(repeated=True, indexed=True,
+    preferred_language_codes = ndb.StringProperty(
+        repeated=True,
+        indexed=True,
         choices=[lc['code'] for lc in feconf.ALL_LANGUAGE_CODES])
 
     @classmethod
@@ -75,12 +76,12 @@ class UserContributionsModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
-    # IDs of explorations that this user has created 
+    # IDs of explorations that this user has created
     # Includes subsequently deleted and private explorations.
     created_exploration_ids = ndb.StringProperty(
         repeated=True, indexed=True, default=None)
-    # IDs of explorations that this user has made a positive 
-    # (i.e. non-revert) commit to. 
+    # IDs of explorations that this user has made a positive
+    # (i.e. non-revert) commit to.
     # Includes subsequently deleted and private explorations.
     edited_exploration_ids = ndb.StringProperty(
         repeated=True, indexed=True, default=None)
@@ -152,6 +153,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     # The user id.
     user_id = ndb.StringProperty(required=True, indexed=True)
+
     # The exploration id.
     exploration_id = ndb.StringProperty(required=True, indexed=True)
 
@@ -161,6 +163,15 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     # When the most recent rating was awarded, or None if not rated.
     rated_on = ndb.DateTimeProperty(default=None, indexed=False)
+
+    # List of uncommitted changes made by the user to the exploration.
+    draft_change_list = ndb.JsonProperty(default=None)
+
+    # Timestamp of when the change list was last updated.
+    draft_change_list_last_updated = ndb.DateTimeProperty(default=None)
+
+    # The exploration version that this change list applied to.
+    draft_change_list_exp_version = ndb.IntegerProperty(default=None)
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):

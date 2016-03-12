@@ -1,0 +1,856 @@
+author_notes: ''
+blurb: ''
+category: Test
+init_state_name: Text Input
+language_code: en
+objective: Dummy exploration for testing all interactions
+param_changes: []
+param_specs: {}
+schema_version: 10
+skin_customizations:
+  panels_contents:
+    bottom: []
+states:
+  Code Editor:
+    content:
+    - type: text
+      value: <p>Code Editor. Write a program which prints hello to me.</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Pencil Code Editor
+          feedback:
+          - <p>Hello! Let's move onto another interaction.</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: Hello Oppia
+          rule_type: OutputEquals
+      confirmed_unclassified_answers: []
+      customization_args:
+        language:
+          value: python
+        placeholder:
+          value: '# Type your code here.'
+        postCode:
+          value: ''
+        preCode:
+          value: ''
+      default_outcome:
+        dest: Code Editor
+        feedback:
+        - <p>I'm looking for a particular 'Hello Oppia' message. Don't you want to
+          say hello?</p>
+        param_changes: []
+      fallbacks: []
+      id: CodeRepl
+    param_changes: []
+  Continue:
+    content:
+    - type: text
+      value: <p>Continue. Please press the continue button.</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value: Continue
+      default_outcome:
+        dest: Graph Theory
+        feedback:
+        - <p>Moving onward!</p>
+        param_changes: []
+      fallbacks: []
+      id: Continue
+    param_changes: []
+  End Exploration:
+    content:
+    - type: text
+      value: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      fallbacks: []
+      id: EndExploration
+    param_changes: []
+  Graph Theory:
+    content:
+    - type: text
+      value: <p>Graph Theory. Please create a pentagon.</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Logic Proof
+          feedback:
+          - <p>Penta-penta-pentagon!</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            g:
+              edges:
+              - dst: 0
+                src: 4
+                weight: 1
+              - dst: 0
+                src: 1
+                weight: 1
+              - dst: 2
+                src: 1
+                weight: 1
+              - dst: 3
+                src: 2
+                weight: 1
+              - dst: 4
+                src: 3
+                weight: 1
+              isDirected: false
+              isLabeled: false
+              isWeighted: false
+              vertices:
+              - label: ''
+                x: 244.0
+                y: 41.5625
+              - label: ''
+                x: 383.0
+                y: 67.5625
+              - label: ''
+                x: 351.0
+                y: 193.5625
+              - label: ''
+                x: 176.0
+                y: 219.5625
+              - label: ''
+                x: 155.0
+                y: 112.5625
+          rule_type: IsIsomorphicTo
+      - outcome:
+          dest: Graph Theory
+          feedback:
+          - <p>That's a triangle. Your shape needs more sides.</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            g:
+              edges:
+              - dst: 0
+                src: 2
+                weight: 1
+              - dst: 1
+                src: 0
+                weight: 1
+              - dst: 2
+                src: 1
+                weight: 1
+              isDirected: false
+              isLabeled: false
+              isWeighted: false
+              vertices:
+              - label: ''
+                x: 278.0
+                y: 42.5625
+              - label: ''
+                x: 376.0
+                y: 121.5625
+              - label: ''
+                x: 132.0
+                y: 204.5625
+          rule_type: IsIsomorphicTo
+      - outcome:
+          dest: Graph Theory
+          feedback:
+          - <p>Your shape is missing one side!</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            g:
+              edges:
+              - dst: 0
+                src: 4
+                weight: 1
+              - dst: 1
+                src: 0
+                weight: 1
+              - dst: 2
+                src: 1
+                weight: 1
+              - dst: 3
+                src: 2
+                weight: 1
+              isDirected: false
+              isLabeled: false
+              isWeighted: false
+              vertices:
+              - label: ''
+                x: 251.0
+                y: 49.5625
+              - label: ''
+                x: 413.0
+                y: 105.5625
+              - label: ''
+                x: 356.0
+                y: 201.5625
+              - label: ''
+                x: 205.0
+                y: 193.5625
+              - label: ''
+                x: 187.0
+                y: 111.5625
+          rule_type: IsIsomorphicTo
+      confirmed_unclassified_answers: []
+      customization_args:
+        canAddEdge:
+          value: true
+        canAddVertex:
+          value: true
+        canDeleteEdge:
+          value: true
+        canDeleteVertex:
+          value: true
+        canEditEdgeWeight:
+          value: false
+        canEditVertexLabel:
+          value: false
+        canMoveVertex:
+          value: true
+        graph:
+          value:
+            edges:
+            - dst: 1
+              src: 0
+              weight: 1
+            - dst: 2
+              src: 1
+              weight: 1
+            isDirected: false
+            isLabeled: false
+            isWeighted: false
+            vertices:
+            - label: ''
+              x: 129
+              y: 41
+            - label: ''
+              x: 200
+              y: 50
+            - label: ''
+              x: 246
+              y: 168
+      default_outcome:
+        dest: Graph Theory
+        feedback:
+        - <p>That's not quite a pentagon. Please try again!</p>
+        param_changes: []
+      fallbacks: []
+      id: GraphInput
+    param_changes: []
+  Image Region:
+    content:
+    - type: text
+      value: <p>Image Region. Please click on the constructor in the Python code shown.</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Image Region
+          feedback:
+          - <p>That's the class definition. Try again.</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: classdef
+          rule_type: IsInRegion
+      - outcome:
+          dest: Image Region
+          feedback:
+          - <p>That's the class's docstring. Try again.</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: docstring
+          rule_type: IsInRegion
+      - outcome:
+          dest: Image Region
+          feedback:
+          - <p>That's a function, which is close to what you're looking for. Try again!</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: instancefunc
+          rule_type: IsInRegion
+      - outcome:
+          dest: Image Region
+          feedback:
+          - <p>That's a classmethod. It does execute code, but it doesn't construct
+            anything. Try again!</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: classfunc
+          rule_type: IsInRegion
+      - outcome:
+          dest: Continue
+          feedback:
+          - <p>You found it! This is the code responsible for constructing a new class
+            object.</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: ctor
+          rule_type: IsInRegion
+      confirmed_unclassified_answers: []
+      customization_args:
+        highlightRegionsOnHover:
+          value: true
+        imageAndRegions:
+          value:
+            imagePath: code_sample.png
+            labeledRegions:
+            - label: classdef
+              region:
+                area:
+                - - 0.004291845493562232
+                  - 0.004692192192192192
+                - - 0.40987124463519314
+                  - 0.05874624624624625
+                regionType: Rectangle
+            - label: docstring
+              region:
+                area:
+                - - 0.07296137339055794
+                  - 0.06475225225225226
+                - - 0.9892703862660944
+                  - 0.1218093093093093
+                regionType: Rectangle
+            - label: instancefunc
+              region:
+                area:
+                - - 0.07296137339055794
+                  - 0.15183933933933935
+                - - 0.6995708154506438
+                  - 0.44012762762762764
+                regionType: Rectangle
+            - label: classfunc
+              region:
+                area:
+                - - 0.06866952789699571
+                  - 0.46114864864864863
+                - - 0.6931330472103004
+                  - 0.776463963963964
+                regionType: Rectangle
+            - label: ctor
+              region:
+                area:
+                - - 0.06437768240343347
+                  - 0.821509009009009
+                - - 0.740343347639485
+                  - 0.9926801801801802
+                regionType: Rectangle
+      default_outcome:
+        dest: Image Region
+        feedback:
+        - "<p>Constructors <i>initialize</i>\_an object, or <i>init</i>\_it.Constructors\
+          \ are also functions themselves.</p>"
+        param_changes: []
+      fallbacks: []
+      id: ImageClickInput
+    param_changes: []
+  Item Selection:
+    content:
+    - type: text
+      value: <p>Item selection. Please select the good options.</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Image Region
+          feedback:
+          - <p>That's right!</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x:
+            - <p>Good option A.</p>
+            - <p>Good option C.</p>
+          rule_type: Equals
+      - outcome:
+          dest: Item Selection
+          feedback:
+          - <p>That's not a good option!</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x:
+            - <p>Bad option B.</p>
+          rule_type: ContainsAtLeastOneOf
+      - outcome:
+          dest: Item Selection
+          feedback:
+          - <p>That's not all of the good options!</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: []
+          rule_type: DoesNotContainAtLeastOneOf
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - <p>Good option A.</p>
+          - <p>Bad option B.</p>
+          - <p>Good option C.</p>
+        maxAllowableSelectionCount:
+          value: 2
+        minAllowableSelectionCount:
+          value: 2
+      default_outcome:
+        dest: Item Selection
+        feedback:
+        - <p>The two good options actually have the word 'good' in them.</p>
+        param_changes: []
+      fallbacks: []
+      id: ItemSelectionInput
+    param_changes: []
+  Logic Proof:
+    content:
+    - type: text
+      value: <p>Logic Proof. From p we have what?</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Number Input
+          feedback:
+          - <p>You proved p!</p>
+          param_changes: []
+        rule_specs:
+        - inputs: {}
+          rule_type: Correct
+      confirmed_unclassified_answers: []
+      customization_args:
+        question:
+          value:
+            assumptions:
+            - arguments: []
+              dummies: []
+              top_kind_name: variable
+              top_operator_name: p
+            default_proof_string: ''
+            results:
+            - arguments: []
+              dummies: []
+              top_kind_name: variable
+              top_operator_name: p
+      default_outcome:
+        dest: Logic Proof
+        feedback:
+        - <p>Given p, we have p. Try again.</p>
+        param_changes: []
+      fallbacks: []
+      id: LogicProof
+    param_changes: []
+  Math Expression Input:
+    content:
+    - type: text
+      value: <p>Math Expression Input. Provide a general equation of a 2D line in
+        a 2D space. Let y be an independent variable which depends on the dependent
+        variable x.</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Code Editor
+          feedback:
+          - <p>That is the normal form of a line. Good job!</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: ax+by+c=0
+          rule_type: IsMathematicallyEquivalentTo
+      - outcome:
+          dest: Code Editor
+          feedback:
+          - <p>That's slope-intercept form. A popular form!</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: y=mx+b
+          rule_type: IsMathematicallyEquivalentTo
+      - outcome:
+          dest: Code Editor
+          feedback:
+          - <p>That's point-slope form! Great!</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: y-y0=m(x-x0)
+          rule_type: IsMathematicallyEquivalentTo
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: Math Expression Input
+        feedback:
+        - <p>There are three specific equations I'm looking for. Be aware that these
+          can each be derived from each other.</p>
+        param_changes: []
+      fallbacks:
+      - outcome:
+          dest: Math Expression Input
+          feedback:
+          - <p>If you start with two points, p0=(x0, y0) and p1=(x1, y1), you can
+            find the slope between them as such:</p><p><br></p><p><oppia-noninteractive-math
+            raw_latex-with-value="&amp;quot;m=\\frac{y0-y1}{x0-x1}&amp;quot;"></oppia-noninteractive-math><br></p><p><br></p><p>This,
+            combined with one of the points, can create a linear relationship between
+            x and y.</p>
+          param_changes: []
+        trigger:
+          customization_args:
+            num_submits:
+              value: 3
+          trigger_type: NthResubmission
+      - outcome:
+          dest: Math Expression Input
+          feedback:
+          - <p>It's possible to use the slope and first point of the line to form
+            a relationship:</p><p><br></p><p><oppia-noninteractive-math raw_latex-with-value="&amp;quot;y-y0=m(x-x0)&amp;quot;"></oppia-noninteractive-math><br></p>
+          param_changes: []
+        trigger:
+          customization_args:
+            num_submits:
+              value: 4
+          trigger_type: NthResubmission
+      - outcome:
+          dest: Math Expression Input
+          feedback:
+          - "<p>Which yields a final, common line equation:</p><p><br></p><p><oppia-noninteractive-math\
+            \ raw_latex-with-value=\"&amp;quot;y=mx+b&amp;quot;\"></oppia-noninteractive-math><br></p><p><br></p><p>Where\_\
+            <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;b=y0-m*x0&amp;quot;\"\
+            ></oppia-noninteractive-math></p>"
+          param_changes: []
+        trigger:
+          customization_args:
+            num_submits:
+              value: 5
+          trigger_type: NthResubmission
+      id: MathExpressionInput
+    param_changes: []
+  Multiple Choice:
+    content:
+    - type: text
+      value: <p>Multiple Choice. Select "Second choice" below.</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Item Selection
+          feedback:
+          - <p>Nice choice!</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 1
+          rule_type: Equals
+      - outcome:
+          dest: Multiple Choice
+          feedback:
+          - <p>Hmm, not quite. Perhaps the right option is below this one.</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+      - outcome:
+          dest: Multiple Choice
+          feedback:
+          - <p>Hmm, not quite. Perhaps the answer is above this one.</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 2
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - <p>First choice</p>
+          - <p>Second choice</p>
+          - <p>Third choice</p>
+      default_outcome:
+        dest: Multiple Choice
+        feedback: []
+        param_changes: []
+      fallbacks: []
+      id: MultipleChoiceInput
+    param_changes: []
+  Music Notes Input:
+    content:
+    - type: text
+      value: <p>Music Notes Input. One C note is given. Can you find the next C in
+        the scale?</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: World Map
+          feedback:
+          - <p>You found the next C! Excellent.</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: C5
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        initialSequence:
+          value:
+          - noteDuration:
+              den: 1
+              num: 1
+            readableNoteName: C4
+        sequenceToGuess:
+          value: []
+      default_outcome:
+        dest: Music Notes Input
+        feedback:
+        - <p>That's not the next C. Try again?</p>
+        param_changes: []
+      fallbacks:
+      - outcome:
+          dest: Music Notes Input
+          feedback:
+          - '<p>Hint: The acronym ''FACE'' is very helpful for remembering notes on
+            the C major scale.</p>'
+          param_changes: []
+        trigger:
+          customization_args:
+            num_submits:
+              value: 3
+          trigger_type: NthResubmission
+      id: MusicNotesInput
+    param_changes: []
+  Number Input:
+    content:
+    - type: text
+      value: <p>Number Input. Enter a two or higher digit number.</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Set Input
+          feedback:
+          - <p>That number has more than one digit. Right!</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 9.0
+          rule_type: IsGreaterThan
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: Number Input
+        feedback:
+        - <p>That's only one digit! Try again.</p>
+        param_changes: []
+      fallbacks: []
+      id: NumericInput
+    param_changes: []
+  Pencil Code Editor:
+    content:
+    - type: text
+      value: <p>Pencil Code Editor. Similar to before, but instead write a goodbye
+        message to me.</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Music Notes Input
+          feedback:
+          - <p>Goodbye! Well, not quite. We still have a little more to explore.</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: Bye Oppia
+          rule_type: OutputEquals
+      - outcome:
+          dest: Music Notes Input
+          feedback:
+          - <p>Goodbye! Well, not quite. We still have a little more to explore.<br></p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: Goodbye Oppia
+          rule_type: CodeEquals
+      confirmed_unclassified_answers: []
+      customization_args:
+        initial_code:
+          value: '# Write a goodbye to me, below.'
+      default_outcome:
+        dest: Pencil Code Editor
+        feedback:
+        - <p>Where are your manners? You should say goodbye to me. We've explored
+          so much, together!</p>
+        param_changes: []
+      fallbacks: []
+      id: PencilCodeEditor
+    param_changes: []
+  Set Input:
+    content:
+    - type: text
+      value: <p>Set Input. Try entering a word which has nearly no rhymes. I am specifically
+        looking for any of three popular ones.</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Math Expression Input
+          feedback:
+          - <p>Nice! Orange, purple, and silver are all words that are exceptionally
+            hard to use in rhyming devices.</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x:
+            - orange
+            - purple
+            - silver
+          rule_type: HasElementsIn
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: Set Input
+        feedback:
+        - <p>Not quite.</p>
+        param_changes: []
+      fallbacks:
+      - outcome:
+          dest: Set Input
+          feedback:
+          - '<p>Hint #1: One of them is a precious metal and another is a color.<br></p>'
+          param_changes: []
+        trigger:
+          customization_args:
+            num_submits:
+              value: 1
+          trigger_type: NthResubmission
+      - outcome:
+          dest: Set Input
+          feedback:
+          - <p>A third one is both a color and a fruit. This fruit is of particular
+            importance to the state of Florida.<br></p>
+          param_changes: []
+        trigger:
+          customization_args:
+            num_submits:
+              value: 2
+          trigger_type: NthResubmission
+      - outcome:
+          dest: Set Input
+          feedback:
+          - <p>Try orange. :) There are still two others, however!<br></p>
+          param_changes: []
+        trigger:
+          customization_args:
+            num_submits:
+              value: 3
+          trigger_type: NthResubmission
+      id: SetInput
+    param_changes: []
+  Text Input:
+    content:
+    - type: text
+      value: <p>Text input. Please add a word containing "ate".</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Multiple Choice
+          feedback:
+          - <p>Omnomnom.</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: ate
+          rule_type: Contains
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: Text Input
+        feedback:
+        - <p>The answer needs to contain "ate".</p>
+        param_changes: []
+      fallbacks: []
+      id: TextInput
+    param_changes: []
+  World Map:
+    content:
+    - type: text
+      value: <p>World Map. Can you find the capitals of Canada, Mexico, or the United
+        States?</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: End Exploration
+          feedback:
+          - <p>That's Washington, D.C., the capital of the United States.</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            d: 100.0
+            p:
+            - 38.89103282648846
+            - -76.90361022949219
+          rule_type: Within
+      - outcome:
+          dest: End Exploration
+          feedback:
+          - <p>Ottawa, the capital of Canada!</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            d: 100.0
+            p:
+            - 45.42929873257377
+            - -75.62919616699219
+          rule_type: Within
+      - outcome:
+          dest: End Exploration
+          feedback:
+          - <p>Mexico City, Mexico. The capital of Mexico.</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            d: 100.0
+            p:
+            - 19.228176737766262
+            - -99.13993835449219
+          rule_type: Within
+      confirmed_unclassified_answers: []
+      customization_args:
+        latitude:
+          value: 39.16
+        longitude:
+          value: -103
+        zoom:
+          value: 3
+      default_outcome:
+        dest: World Map
+        feedback:
+        - <p>Not quite. Try again!</p>
+        param_changes: []
+      fallbacks:
+      - outcome:
+          dest: World Map
+          feedback:
+          - '<p>Hint: Try looking in the middle of Mexico. Capitals also have special
+            markings on a map.</p>'
+          param_changes: []
+        trigger:
+          customization_args:
+            num_submits:
+              value: 3
+          trigger_type: NthResubmission
+      id: InteractiveMap
+    param_changes: []
+states_schema_version: 7
+tags: []
+title: Test of all interactions

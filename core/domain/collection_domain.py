@@ -21,8 +21,6 @@ objects they represent are stored. All methods and properties in this file
 should therefore be independent of the specific storage models used.
 """
 
-__author__ = 'Ben Henning'
-
 import copy
 
 import feconf
@@ -31,6 +29,9 @@ import utils
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
+COLLECTION_PROPERTY_TITLE = 'title'
+COLLECTION_PROPERTY_CATEGORY = 'category'
+COLLECTION_PROPERTY_OBJECTIVE = 'objective'
 COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS = 'prerequisite_skills'
 COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS = 'acquired_skills'
 
@@ -40,10 +41,10 @@ CMD_ADD_COLLECTION_NODE = 'add_collection_node'
 CMD_DELETE_COLLECTION_NODE = 'delete_collection_node'
 # This takes additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
-CMD_EDIT_COLLECTION_NODE_PROPERTY = 'edit_collection_node_property'
+CMD_EDIT_COLLECTION_PROPERTY = 'edit_collection_property'
 # This takes additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
-CMD_EDIT_COLLECTION_PROPERTY = 'edit_collection_property'
+CMD_EDIT_COLLECTION_NODE_PROPERTY = 'edit_collection_node_property'
 # This takes additional 'from_version' and 'to_version' parameters for logging.
 CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION = 'migrate_schema_to_latest_version'
 
@@ -61,7 +62,9 @@ class CollectionChange(object):
         COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS,
         COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS)
 
-    COLLECTION_PROPERTIES = ('title', 'category', 'objective')
+    COLLECTION_PROPERTIES = (
+        COLLECTION_PROPERTY_TITLE, COLLECTION_PROPERTY_CATEGORY,
+        COLLECTION_PROPERTY_OBJECTIVE)
 
     def __init__(self, change_dict):
         """Initializes an CollectionChange object from a dict.
@@ -157,14 +160,14 @@ class CollectionNode(object):
     completed.
     """
 
-    """Constructs a new CollectionNode object.
-
-    Args:
-        exploration_id: A valid ID of an exploration referenced by this node.
-        prerequisite_skills: A list of skills (strings).
-        acquired_skills: A list of skills (strings).
-    """
     def __init__(self, exploration_id, prerequisite_skills, acquired_skills):
+        """Constructs a new CollectionNode object.
+
+        Args:
+        - exploration_id: A valid ID of an exploration referenced by this node.
+        - prerequisite_skills: A list of skills (strings).
+        - acquired_skills: A list of skills (strings).
+        """
         self.exploration_id = exploration_id
         self.prerequisite_skills = prerequisite_skills
         self.acquired_skills = acquired_skills
@@ -252,23 +255,24 @@ class CollectionNode(object):
 class Collection(object):
     """Domain object for an Oppia collection."""
 
-    """Constructs a new collection given all the information necessary to
-    represent a collection.
-
-    Note: The schema_version represents the version of any underlying
-    dictionary or list structures stored within the collection. In particular,
-    the schema for CollectionNodes is represented by this version. If the
-    schema for CollectionNode changes, then a migration function will need to
-    be added to this class to convert from the current schema version to the
-    new one. This function should be called in both from_yaml in this class and
-    collection_services._migrate_collection_to_latest_schema.
-    feconf.CURRENT_COLLECTION_SCHEMA_VERSION should be incremented and the new
-    value should be saved in the collection after the migration process,
-    ensuring it represents the latest schema version.
-    """
     def __init__(self, collection_id, title, category, objective,
                  schema_version, nodes, version, created_on=None,
                  last_updated=None):
+        """Constructs a new collection given all the information necessary to
+        represent a collection.
+
+        Note: The schema_version represents the version of any underlying
+        dictionary or list structures stored within the collection. In
+        particular, the schema for CollectionNodes is represented by this
+        version. If the schema for CollectionNode changes, then a migration
+        function will need to be added to this class to convert from the
+        current schema version to the new one. This function should be called
+        in both from_yaml in this class and
+        collection_services._migrate_collection_to_latest_schema.
+        feconf.CURRENT_COLLECTION_SCHEMA_VERSION should be incremented and the
+        new value should be saved in the collection after the migration
+        process, ensuring it represents the latest schema version.
+        """
         self.id = collection_id
         self.title = title
         self.category = category
@@ -379,8 +383,9 @@ class Collection(object):
         """
         acquired_skills = set()
         for completed_exp_id in completed_exploration_ids:
-            acquired_skills.update(
-                self.get_node(completed_exp_id).acquired_skills)
+            collection_node = self.get_node(completed_exp_id)
+            if collection_node:
+                acquired_skills.update(collection_node.acquired_skills)
 
         next_exp_ids = []
         for node in self.nodes:
@@ -411,9 +416,9 @@ class Collection(object):
         self.objective = objective
 
     def _find_node(self, exploration_id):
-        for i in range(len(self.nodes)):
-            if self.nodes[i].exploration_id == exploration_id:
-                return i
+        for ind, node in enumerate(self.nodes):
+            if node.exploration_id == exploration_id:
+                return ind
         return None
 
     def get_node(self, exploration_id):
@@ -526,7 +531,7 @@ class CollectionSummary(object):
 
     def __init__(self, collection_id, title, category, objective,
                  status, community_owned, owner_ids, editor_ids,
-                 viewer_ids, contributor_ids, version,
+                 viewer_ids, contributor_ids, contributors_summary, version,
                  collection_model_created_on, collection_model_last_updated):
         self.id = collection_id
         self.title = title
@@ -538,6 +543,7 @@ class CollectionSummary(object):
         self.editor_ids = editor_ids
         self.viewer_ids = viewer_ids
         self.contributor_ids = contributor_ids
+        self.contributors_summary = contributors_summary
         self.version = version
         self.collection_model_created_on = collection_model_created_on
         self.collection_model_last_updated = collection_model_last_updated
@@ -554,6 +560,7 @@ class CollectionSummary(object):
             'editor_ids': self.editor_ids,
             'viewer_ids': self.viewer_ids,
             'contributor_ids': self.contributor_ids,
+            'contributors_summary': self.contributors_summary,
             'version': self.version,
             'collection_model_created_on': self.collection_model_created_on,
             'collection_model_last_updated': self.collection_model_last_updated

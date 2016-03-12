@@ -14,13 +14,12 @@
 
 """URL routing definitions, and some basic error/warmup handlers."""
 
-__author__ = 'Sean Lip'
-
-import feconf
 import logging
 
+# pylint: disable=relative-import
 from core.controllers import admin
 from core.controllers import base
+from core.controllers import collection_editor
 from core.controllers import collection_viewer
 from core.controllers import editor
 from core.controllers import feedback
@@ -32,13 +31,17 @@ from core.controllers import profile
 from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
+from core.domain import user_services
 from core.platform import models
-transaction_services = models.Registry.import_transaction_services()
+import feconf
+# pylint: enable=relative-import
 
 from mapreduce import main as mapreduce_main
 from mapreduce import parameters as mapreduce_parameters
 import webapp2
 from webapp2_extras.routes import RedirectRoute
+
+transaction_services = models.Registry.import_transaction_services()
 
 
 class FrontendErrorHandler(base.BaseHandler):
@@ -60,8 +63,13 @@ class WarmupHandler(base.BaseHandler):
         pass
 
 
-# Regex for base64 id encoding
-r = '[A-Za-z0-9=_-]+'
+class HomePageRedirectHandler(base.BaseHandler):
+    "Check whether user is logged in or logged out and perform redirects on '/'"
+    def get(self):
+        if self.user_id and user_services.has_fully_registered(self.user_id):
+            self.redirect(feconf.MY_EXPLORATIONS_URL)
+        else:
+            self.redirect(feconf.GALLERY_URL)
 
 
 def get_redirect_route(regex_route, handler, name, defaults=None):
@@ -92,7 +100,7 @@ def ui_access_wrapper(self, *args, **kwargs):
     self.real_dispatch(*args, **kwargs)
 
 
-mapreduce_handlers = []
+MAPREDUCE_HANDLERS = []
 
 for path, handler_class in mapreduce_main.create_handlers_map():
     if path.startswith('.*/pipeline'):
@@ -110,23 +118,23 @@ for path, handler_class in mapreduce_main.create_handlers_map():
 
     if '/ui/' in path or path.endswith('/ui'):
         if (hasattr(handler_class, 'dispatch') and
-            not hasattr(handler_class, 'real_dispatch')):
+                not hasattr(handler_class, 'real_dispatch')):
             handler_class.real_dispatch = handler_class.dispatch
             handler_class.dispatch = ui_access_wrapper
-        mapreduce_handlers.append((path, handler_class))
+        MAPREDUCE_HANDLERS.append((path, handler_class))
     else:
         if (hasattr(handler_class, 'dispatch') and
-            not hasattr(handler_class, 'real_dispatch')):
+                not hasattr(handler_class, 'real_dispatch')):
             handler_class.real_dispatch = handler_class.dispatch
             handler_class.dispatch = authorization_wrapper
-        mapreduce_handlers.append((path, handler_class))
+        MAPREDUCE_HANDLERS.append((path, handler_class))
 
 # Tell map/reduce internals that this is now the base path to use.
 mapreduce_parameters.config.BASE_PATH = '/mapreduce/worker'
 
 
 # Register the URLs with the classes responsible for handling them.
-urls = [
+URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/_ah/warmup', WarmupHandler, 'warmup_handler'),
 
     get_redirect_route(
@@ -174,7 +182,8 @@ urls = [
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler, 'value_generator_handler'),
 
-    get_redirect_route(r'/', galleries.GalleryPage, 'gallery_page'),
+    get_redirect_route(r'/', HomePageRedirectHandler, 'home_page'),
+
     get_redirect_route(
         r'%s' % feconf.GALLERY_URL, galleries.GalleryPage, 'gallery_page'),
     get_redirect_route(
@@ -193,6 +202,9 @@ urls = [
     get_redirect_route(
         r'%s' % feconf.NEW_EXPLORATION_URL,
         galleries.NewExploration, 'new_exploration'),
+    get_redirect_route(
+        r'%s' % feconf.NEW_COLLECTION_URL,
+        galleries.NewCollection, 'new_collection'),
     get_redirect_route(
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
         galleries.UploadExploration, 'upload_exploration'),
@@ -214,7 +226,8 @@ urls = [
         r'/preferenceshandler/profile_picture', profile.ProfilePictureHandler,
         'profle_picture_handler'),
     get_redirect_route(
-        r'/preferenceshandler/profile_picture_by_username/<username>', profile.ProfilePictureHandlerByUsername,
+        r'/preferenceshandler/profile_picture_by_username/<username>',
+        profile.ProfilePictureHandlerByUsername,
         'profile_picture_handler_by_username'),
     get_redirect_route(
         r'%s' % feconf.SIGNUP_URL, profile.SignupPage, 'signup_page'),
@@ -285,7 +298,8 @@ urls = [
         r'/createhandler/imageupload/<exploration_id>',
         editor.ImageUploadHandler, 'image_upload_handler'),
     get_redirect_route(
-        r'/createhandler/resolved_answers/<exploration_id>/<escaped_state_name>',
+        r'/createhandler/resolved_answers/<exploration_id>/' +
+        r'<escaped_state_name>',
         editor.ResolvedAnswersHandler, 'resolved_answers_handler'),
     get_redirect_route(
         r'/createhandler/training_data/<exploration_id>/<escaped_state_name>',
@@ -308,15 +322,17 @@ urls = [
         editor.ExplorationSnapshotsHandler, 'exploration_snapshots_handler'),
     get_redirect_route(
         r'/createhandler/statisticsversion/<exploration_id>',
-        editor.ExplorationStatsVersionsHandler, 'exploration_stats_versions_handler'),
+        editor.ExplorationStatsVersionsHandler,
+        'exploration_stats_versions_handler'),
     get_redirect_route(
         r'/createhandler/statistics/<exploration_id>/<exploration_version>',
         editor.ExplorationStatisticsHandler, 'exploration_statistics_handler'),
     get_redirect_route(
-        r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',
+        r'/createhandler/state_rules_stats/<exploration_id>/' +
+        r'<escaped_state_name>',
         editor.StateRulesStatsHandler, 'state_rules_stats_handler'),
     get_redirect_route(
-        r'/createhandler/started_tutorial_event/<exploration_id>',
+        r'/createhandler/started_tutorial_event',
         editor.StartedTutorialEventHandler, 'started_tutorial_event_handler'),
 
     get_redirect_route(
@@ -336,6 +352,19 @@ urls = [
     get_redirect_route(
         r'%s/<exploration_id>/<thread_id>' % feconf.FEEDBACK_THREAD_URL_PREFIX,
         feedback.ThreadHandler, 'feedback_thread_handler'),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.FEEDBACK_STATS_URL_PREFIX,
+        feedback.FeedbackStatsHandler, 'feedback_stats_handler'),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.SUGGESTION_URL_PREFIX,
+        feedback.SuggestionHandler, 'suggestion_handler'),
+    get_redirect_route(
+        r'%s/<exploration_id>/<thread_id>' %
+        feconf.SUGGESTION_ACTION_URL_PREFIX,
+        feedback.SuggestionActionHandler, 'suggestion_action_handler'),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.SUGGESTION_LIST_URL_PREFIX,
+        feedback.SuggestionListHandler, 'suggestion_list_handler'),
 
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_URL_PREFIX,
@@ -343,6 +372,17 @@ urls = [
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_DATA_URL_PREFIX,
         collection_viewer.CollectionDataHandler, 'collection_data_handler'),
+
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_EDITOR_URL_PREFIX,
+        collection_editor.CollectionEditorPage, 'collection_editor_page'),
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_WRITABLE_DATA_URL_PREFIX,
+        collection_editor.WritableCollectionDataHandler,
+        'writable_collection_data_handler'),
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_RIGHTS_PREFIX,
+        collection_editor.CollectionRightsHandler, 'collection_rights_handler'),
 
     get_redirect_route(
         r'/notificationshandler', home.NotificationsHandler,
@@ -358,7 +398,5 @@ urls = [
     get_redirect_route(r'/<:.*>', base.Error404Handler, 'error_404_handler'),
 ]
 
-urls = mapreduce_handlers + urls
-
-app = transaction_services.toplevel_wrapper(
-    webapp2.WSGIApplication(urls, debug=feconf.DEBUG))
+app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
+    webapp2.WSGIApplication(URLS, debug=feconf.DEBUG))

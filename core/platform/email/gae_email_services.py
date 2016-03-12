@@ -16,9 +16,6 @@
 
 """Provides email services."""
 
-__author__ = 'Sean Lip'
-
-
 from core import counters
 import feconf
 

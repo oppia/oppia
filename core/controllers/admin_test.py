@@ -14,8 +14,6 @@
 
 """Tests for the admin page."""
 
-__author__ = 'Sean Lip'
-
 from core.controllers import editor
 from core.controllers import pages
 from core.domain import config_domain
@@ -23,10 +21,13 @@ from core.tests import test_utils
 import feconf
 
 
+BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
+BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
 SITE_FORUM_URL = 'siteforum.url'
 
 
 class AdminIntegrationTest(test_utils.GenericTestBase):
+    """Server integration tests for operations on the admin page."""
 
     def setUp(self):
         """Complete the signup process for self.ADMIN_EMAIL."""
@@ -69,8 +70,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_change_configuration_property(self):
         """Test that configuration properties can be changed."""
 
-        TEST_STRING = self.UNICODE_TEST_STRING
-
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
@@ -84,7 +83,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         payload = {
             'action': 'save_config_properties',
             'new_config_property_values': {
-                editor.MODERATOR_REQUEST_FORUM_URL.name: TEST_STRING
+                editor.MODERATOR_REQUEST_FORUM_URL.name: (
+                    self.UNICODE_TEST_STRING),
             }
         }
         self.post_json('/adminhandler', payload, csrf_token)
@@ -92,7 +92,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response_dict = self.get_json('/adminhandler')
         response_config_properties = response_dict['config_properties']
         self.assertDictContainsSubset({
-            'value': TEST_STRING
+            'value': self.UNICODE_TEST_STRING,
         }, response_config_properties[editor.MODERATOR_REQUEST_FORUM_URL.name])
 
         self.logout()
@@ -123,18 +123,17 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_change_rights(self):
         """Test that the correct role indicators show up on app pages."""
 
-        BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
-
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup('superadmin@example.com', 'superadm1n')
-        self.signup(BOTH_MODERATOR_AND_ADMIN_EMAIL, 'moderatorandadm1n')
+        self.signup(
+            BOTH_MODERATOR_AND_ADMIN_EMAIL, BOTH_MODERATOR_AND_ADMIN_USERNAME)
 
         # Navigate to any page. The role is not set.
-        self.testapp.get('/').mustcontain(no=['/moderator', '/admin'])
+        self.testapp.get('/gallery').mustcontain(no=['/moderator', '/admin'])
 
         # Log in as a superadmin. This gives access to /admin.
         self.login('superadmin@example.com', is_super_admin=True)
-        self.testapp.get('/').mustcontain('/admin', no=['/moderator'])
+        self.testapp.get('/gallery').mustcontain('/admin', no=['/moderator'])
 
         # Add a moderator, an admin, and a person with both roles, then log
         # out.
@@ -143,10 +142,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.post_json('/adminhandler', {
             'action': 'save_config_properties',
             'new_config_property_values': {
-                config_domain.ADMIN_EMAILS.name: [
-                    self.ADMIN_EMAIL, BOTH_MODERATOR_AND_ADMIN_EMAIL],
-                config_domain.MODERATOR_EMAILS.name: [
-                    self.MODERATOR_EMAIL, BOTH_MODERATOR_AND_ADMIN_EMAIL],
+                config_domain.ADMIN_USERNAMES.name: [
+                    self.ADMIN_USERNAME,
+                    BOTH_MODERATOR_AND_ADMIN_USERNAME],
+                config_domain.MODERATOR_USERNAMES.name: [
+                    self.MODERATOR_USERNAME,
+                    BOTH_MODERATOR_AND_ADMIN_USERNAME],
             }
         }, csrf_token)
         self.logout()
@@ -163,9 +164,10 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             '/moderator', no=['/admin'])
         self.logout()
 
-        # Log in as a both-moderator-and-admin. Only '(Admin)' is shown in the
-        # navbar.
+        # Log in as a both-moderator-and-admin.
+        # Only '(Admin)' is shown in the navbar.
         self.login(BOTH_MODERATOR_AND_ADMIN_EMAIL)
+        self.assertEqual(self.testapp.get('/').status_int, 302)
         self.testapp.get(feconf.GALLERY_URL).mustcontain(
-             '/moderator', no=['/admin'])
+            '/moderator', no=['/admin'])
         self.logout()

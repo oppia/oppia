@@ -14,22 +14,24 @@
 
 """Controllers for the gallery pages."""
 
-__author__ = 'sll@google.com (Sean Lip)'
-
 import json
 import logging
 
 from core.controllers import base
+from core.domain import collection_domain
+from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import summary_services
 from core.domain import user_services
 from core.platform import models
+import feconf
+import utils
+
 (base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration])
 current_user_services = models.Registry.import_current_user_services()
-import feconf
-import utils
 
 SPLASH_PAGE_YOUTUBE_VIDEO_ID = config_domain.ConfigProperty(
     'splash_page_youtube_video_id', {'type': 'unicode'},
@@ -37,6 +39,7 @@ SPLASH_PAGE_YOUTUBE_VIDEO_ID = config_domain.ConfigProperty(
     default_value='')
 
 EXPLORATION_ID_KEY = 'explorationId'
+COLLECTION_ID_KEY = 'collectionId'
 
 ALLOW_YAML_FILE_UPLOAD = config_domain.ConfigProperty(
     'allow_yaml_file_upload', {'type': 'bool'},
@@ -82,19 +85,13 @@ class GalleryPage(base.BaseHandler):
         self.values.update({
             'nav_mode': feconf.NAV_MODE_GALLERY,
             'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
-            'gallery_login_redirect_url': (
-                current_user_services.create_login_url(
-                    feconf.GALLERY_CREATE_MODE_URL)),
             'has_fully_registered': bool(
                 self.user_id and
                 user_services.has_fully_registered(self.user_id)),
             'SPLASH_PAGE_YOUTUBE_VIDEO_ID': SPLASH_PAGE_YOUTUBE_VIDEO_ID.value,
             'CAROUSEL_SLIDES_CONFIG': CAROUSEL_SLIDES_CONFIG.value,
-            'LANGUAGE_CODES_AND_NAMES': [{
-                'code': lc['code'],
-                'name': utils.get_short_language_description(
-                    lc['description']),
-            } for lc in feconf.ALL_LANGUAGE_CODES],
+            'LANGUAGE_CODES_AND_NAMES': (
+                utils.get_all_language_codes_and_names()),
         })
         self.render_template('galleries/gallery.html')
 
@@ -109,27 +106,13 @@ class GalleryHandler(base.BaseHandler):
 
         query_string = self.request.get('q')
         search_cursor = self.request.get('cursor', None)
-        exp_summaries_list, search_cursor = (
-            exp_services.get_exploration_summaries_matching_query(
+        exp_ids, search_cursor = (
+            exp_services.get_exploration_ids_matching_query(
                 query_string, cursor=search_cursor))
 
-        explorations_list = [{
-            'id': exp_summary.id,
-            'title': exp_summary.title,
-            'category': exp_summary.category,
-            'objective': exp_summary.objective,
-            'language_code': exp_summary.language_code,
-            'last_updated_msec': utils.get_time_in_millisecs(
-                exp_summary.exploration_model_last_updated),
-            'status': exp_summary.status,
-            'ratings': exp_summary.ratings,
-            'community_owned': exp_summary.community_owned,
-            # TODO(sll): Replace these with per-category thumbnails.
-            'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
-                exp_summary.category),
-            'thumbnail_bg_color': utils.get_hex_color_for_category(
-                exp_summary.category),
-        } for exp_summary in exp_summaries_list]
+        explorations_list = (
+            summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                exp_ids))
 
         if len(explorations_list) == feconf.DEFAULT_QUERY_LIMIT:
             logging.error(
@@ -179,6 +162,32 @@ class NewExploration(base.BaseHandler):
         self.render_json({EXPLORATION_ID_KEY: new_exploration_id})
 
 
+class NewCollection(base.BaseHandler):
+    """Creates a new collection."""
+
+    PAGE_NAME_FOR_CSRF = 'gallery'
+
+    @base.require_fully_signed_up
+    def post(self):
+        """Handles POST requests."""
+        title = self.payload.get('title')
+        category = self.payload.get('category')
+        objective = self.payload.get('objective')
+        # TODO(bhenning): Implement support for language codes in collections.
+
+        if not title:
+            raise self.InvalidInputException('No title supplied.')
+        if not category:
+            raise self.InvalidInputException('No category chosen.')
+
+        new_collection_id = collection_services.get_new_collection_id()
+        collection = collection_domain.Collection.create_default_collection(
+            new_collection_id, title, category, objective=objective)
+        collection_services.save_new_collection(self.user_id, collection)
+
+        self.render_json({COLLECTION_ID_KEY: new_collection_id})
+
+
 class UploadExploration(base.BaseHandler):
     """Uploads a new exploration."""
 
@@ -207,23 +216,6 @@ class UploadExploration(base.BaseHandler):
                 'This server does not allow file uploads.')
 
 
-class RecentCommitsHandler(base.BaseHandler):
-    """Returns a list of recent commits."""
-
-    def get(self):
-        """Handles GET requests."""
-        urlsafe_start_cursor = self.request.get('cursor')
-        all_commits, new_urlsafe_start_cursor, more = (
-            exp_services.get_next_page_of_all_non_private_commits(
-                urlsafe_start_cursor=urlsafe_start_cursor))
-        all_commit_dicts = [commit.to_dict() for commit in all_commits]
-        self.render_json({
-            'results': all_commit_dicts,
-            'cursor': new_urlsafe_start_cursor,
-            'more': more,
-        })
-
-
 class GalleryRedirectPage(base.BaseHandler):
     """An old exploration gallery page."""
 
@@ -246,29 +238,9 @@ class ExplorationSummariesHandler(base.BaseHandler):
                 isinstance(exp_id, basestring) for exp_id in exp_ids])):
             raise self.PageNotFoundException
 
-        exp_summaries = exp_services.get_exploration_summaries_matching_ids(
-            exp_ids)
-
         self.values.update({
-            'summaries': [(None if exp_summary is None else {
-                'id': exp_summary.id,
-                'title': exp_summary.title,
-                'category': exp_summary.category,
-                'objective': exp_summary.objective,
-                'language_code': exp_summary.language_code,
-                'last_updated': utils.get_time_in_millisecs(
-                    exp_summary.exploration_model_last_updated),
-                'status': exp_summary.status,
-                'ratings': exp_summary.ratings,
-                'community_owned': exp_summary.community_owned,
-                'contributor_names': user_services.get_human_readable_user_ids(
-                    exp_summary.contributor_ids),
-                'tags': exp_summary.tags,
-                'thumbnail_icon_url': (
-                    utils.get_thumbnail_icon_url_for_category(
-                        exp_summary.category)),
-                'thumbnail_bg_color': utils.get_hex_color_for_category(
-                    exp_summary.category),
-            }) for exp_summary in exp_summaries]
+            'summaries': (
+                summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                    exp_ids))
         })
         self.render_json(self.values)

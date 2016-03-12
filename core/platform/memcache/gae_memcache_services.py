@@ -16,9 +16,6 @@
 
 """Provides memcache services."""
 
-__author__ = 'Sean Lip'
-
-
 from core import counters
 from google.appengine.api import memcache
 

@@ -60,7 +60,7 @@ var expectCurrentCategorySelectionToBe = function(expectedCategories) {
 // Returns a promise of all explorations with the given name.
 var _getExplorationElements = function(name) {
   return element.all(by.css('.protractor-test-gallery-tile')).filter(
-      function(tile, index) {
+      function(tile) {
     return tile.element(by.css('.protractor-test-exp-summary-tile-title')).
         getText().then(function(tileTitle) {
       return (tileTitle === name);
@@ -91,24 +91,18 @@ var playExploration = function(name) {
 
 var getExplorationObjective = function(name) {
   return _getExplorationElements(name).then(function(elems) {
-    return elems[0].element(by.css('.protractor-test-exp-summary-tile-objective')).
-      getText();
+    return elems[0].element(by.css(
+      '.protractor-test-exp-summary-tile-objective'
+    )).getText();
   });
 };
 
 var expectExplorationRatingToEqual = function(name, ratingValue) {
   _getExplorationElements(name).then(function(elems) {
-    elems[0].element(by.css('.protractor-test-exp-summary-tile-rating')).
-      getText().then(function(value) {
-        expect(value).toBe(ratingValue);
-    });
-  });
-};
-
-var expectExplorationRatingToBeHidden = function(name) {
-  _getExplorationElements(name).then(function(elems) {
-    elems[0].all(by.css('.protractor-test-exp-summary-tile-rating')).then(function(items) {
-      expect(items.length).toBe(0);
+    elems[0].element(by.css(
+      '.protractor-test-exp-summary-tile-rating'
+    )).getText().then(function(value) {
+      expect(value).toBe(ratingValue);
     });
   });
 };
@@ -126,4 +120,3 @@ exports.playExploration = playExploration;
 exports.getExplorationObjective = getExplorationObjective;
 
 exports.expectExplorationRatingToEqual = expectExplorationRatingToEqual;
-exports.expectExplorationRatingToBeHidden = expectExplorationRatingToBeHidden;

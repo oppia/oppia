@@ -19,33 +19,54 @@
  */
 
 oppia.controller('MyExplorations', [
-  '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
-  'ratingVisibilityService',
+  '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter', 'CATEGORY_LIST',
+  'RatingComputationService', 'urlService', 'ExplorationCreationButtonService',
   function(
-      $scope, $http, $rootScope, oppiaDatetimeFormatter,
-      ratingVisibilityService) {
+      $scope, $http, $rootScope, oppiaDatetimeFormatter, CATEGORY_LIST,
+      RatingComputationService, urlService, ExplorationCreationButtonService) {
     $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
       return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
         millisSinceEpoch);
     };
 
-    $scope.areRatingsShown = function(ratingFrequencies) {
-      return ratingVisibilityService.areRatingsShown(ratingFrequencies);
+    $scope.getAverageRating = function(ratings) {
+      return RatingComputationService.computeAverageRating(ratings);
+    };
+
+    $scope.showCreateExplorationModal = function() {
+      ExplorationCreationButtonService.showCreateExplorationModal(
+        CATEGORY_LIST);
     };
 
     $rootScope.loadingMessage = 'Loading';
     $http.get('/myexplorationshandler/data').success(function(data) {
       $scope.explorationsList = data.explorations_list;
       $rootScope.loadingMessage = '';
+
+      if (data.username) {
+        if (urlService.getUrlParams().mode === 'create') {
+          $scope.showCreateExplorationModal(CATEGORY_LIST);
+        }
+      }
     });
   }
 ]);
 
 oppia.controller('CreateExplorationButton', [
-  '$scope', 'CATEGORY_LIST', 'createExplorationButtonService',
-  function($scope, CATEGORY_LIST, createExplorationButtonService) {
+  '$scope', 'CATEGORY_LIST', 'ExplorationCreationButtonService',
+  function($scope, CATEGORY_LIST, ExplorationCreationButtonService) {
     $scope.showCreateExplorationModal = function() {
-      createExplorationButtonService.showCreateExplorationModal(CATEGORY_LIST);
+      ExplorationCreationButtonService.showCreateExplorationModal(
+        CATEGORY_LIST);
+    };
+  }
+]);
+
+oppia.controller('CreateCollectionButton', [
+  '$scope', 'CATEGORY_LIST', 'CollectionCreationButtonService',
+  function($scope, CATEGORY_LIST, CollectionCreationButtonService) {
+    $scope.showCreateCollectionModal = function() {
+      CollectionCreationButtonService.showCreateCollectionModal(CATEGORY_LIST);
     };
   }
 ]);

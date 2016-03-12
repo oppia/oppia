@@ -48,11 +48,11 @@ describe('MyExplorations controller', function() {
       scope = $rootScope.$new();
       ctrl = $controller('MyExplorations', {
         $scope: scope,
-        createExplorationButtonService: {
+        ExplorationCreationButtonService: {
           showCreateExplorationModal: null,
           showUploadExplorationModal: null
         },
-        warningsData: null
+        alertsService: null
       });
     }));
 

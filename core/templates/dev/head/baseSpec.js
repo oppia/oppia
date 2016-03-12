@@ -19,7 +19,6 @@
  */
 
 describe('Base controller', function() {
-
   beforeEach(module('oppia'));
 
   describe('BaseCtrl', function() {
@@ -29,14 +28,15 @@ describe('Base controller', function() {
       scope = $rootScope.$new();
       ctrl = $controller('Base', {
         $scope: scope,
-        warningsData: null,
-        activeInputData: null,
+        alertsService: null,
         messengerService: null
       });
     }));
 
     it('should check if an object is empty', function() {
-      var a = {'a': 'b'};
+      var a = {
+        a: 'b'
+      };
       var isEmpty = scope.isEmpty(a);
       expect(isEmpty).toEqual(false);
       var b = {};

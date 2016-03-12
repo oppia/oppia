@@ -16,8 +16,6 @@
 
 """Tests for typed object classes (mostly normalization)."""
 
-__author__ = 'Sean Lip'
-
 import inspect
 
 from core.tests import test_utils
@@ -370,6 +368,19 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.Graph, mappings, invalid_values)
 
+    def test_graph_property_validation(self):
+        """Tests objects of type GraphProperty"""
+
+        mappings = [
+            ('acyclic', 'acyclic'), ('regular', 'regular'),
+            ('strongly_connected', 'strongly_connected'),
+            ('weakly_connected', 'weakly_connected')]
+
+        invalid_values = [None, 2, 'string', 'item']
+
+        self.check_normalization(
+            objects.GraphProperty, mappings, invalid_values)
+
     def test_set_of_html_string(self):
         """Tests objects of the type StringList"""
 
@@ -389,4 +400,30 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils_test.validate_schema(member.SCHEMA)
                     count += 1
 
-        self.assertEquals(count, 29)
+        self.assertEquals(count, 30)
+
+
+class ObjectDefinitionTests(test_utils.GenericTestBase):
+
+    def test_default_values_for_objects_are_valid(self):
+        for _, member in inspect.getmembers(objects):
+            if inspect.isclass(member) and member.default_value is not None:
+                self.assertEqual(
+                    member.normalize(member.default_value),
+                    member.default_value)
+
+                # Comparing types here is necessary because 0 == False in
+                # Python. We handle the string case separately since Python
+                # treats str and unicode as different types.
+                type_error_message = (
+                    'Mismatched default value types for object class %s' %
+                    member.__name__)
+                if isinstance(member.default_value, basestring):
+                    self.assertIsInstance(
+                        member.normalize(member.default_value), basestring,
+                        msg=type_error_message)
+                else:
+                    self.assertIsInstance(
+                        member.normalize(member.default_value),
+                        type(member.default_value),
+                        msg=type_error_message)

@@ -19,16 +19,13 @@
  * @author sean@seanlip.org (Sean Lip)
  */
 
-oppia.factory('StateObjectFactory', [
-    'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE',
-    function(INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE) {
-
-  function State(name, content, interaction, paramChanges) {
+oppia.factory('StateObjectFactory', [function() {
+  var State = function(name, content, interaction, paramChanges) {
     this.name = name;
     this.content = content;
     this.interaction = interaction;
     this.paramChanges = paramChanges;
-  }
+  };
 
   // Instance methods.
   State.prototype.toBackendDict = function() {

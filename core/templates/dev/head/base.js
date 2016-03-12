@@ -58,138 +58,164 @@ oppia.constant('DEFAULT_RULE_NAME', 'Default');
 oppia.constant('FUZZY_RULE_TYPE', 'FuzzyMatches');
 
 oppia.constant('DEFAULT_FUZZY_RULE', {
-  'rule_type': 'FuzzyMatches',
-  'inputs': {
-    'training_data': []
+  rule_type: 'FuzzyMatches',
+  inputs: {
+    training_data: []
   }
-})
+});
+
+oppia.constant('EVENT_HTML_CHANGED', 'htmlChanged');
+
+oppia.constant('PARAMETER_TYPES', {
+  REAL: 'Real',
+  UNICODE_STRING: 'UnicodeString'
+});
 
 oppia.constant('INTERACTION_DISPLAY_MODE_INLINE', 'inline');
 
 oppia.constant('OBJECT_EDITOR_URL_PREFIX', '/object_editor_template/');
 
+// The maximum number of nodes to show in a row of the state graph.
+oppia.constant('MAX_NODES_PER_ROW', 4);
+// The following variable must be at least 3. It represents the maximum length,
+// in characters, for the name of each node label in the state graph.
+oppia.constant('MAX_NODE_LABEL_LENGTH', 15);
+
 // Global utility methods.
 oppia.controller('Base', [
-    '$scope', '$http', '$rootScope', '$window', '$timeout', '$document', '$log',
-    'warningsData', 'activeInputData', 'LABEL_FOR_CLEARING_FOCUS',
-    function($scope, $http, $rootScope, $window, $timeout, $document, $log,
-             warningsData, activeInputData, LABEL_FOR_CLEARING_FOCUS) {
-  $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
+  '$scope', '$http', '$rootScope', '$window', '$timeout', '$document', '$log',
+  'alertsService', 'LABEL_FOR_CLEARING_FOCUS', 'siteAnalyticsService',
+  function(
+      $scope, $http, $rootScope, $window, $timeout, $document, $log,
+      alertsService, LABEL_FOR_CLEARING_FOCUS, siteAnalyticsService) {
+    $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
 
-  $scope.warningsData = warningsData;
-  $scope.activeInputData = activeInputData;
-  $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
+    $scope.alertsService = alertsService;
+    $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
 
-  // If this is nonempty, the whole page goes into 'Loading...' mode.
-  $rootScope.loadingMessage = '';
+    // If this is nonempty, the whole page goes into 'Loading...' mode.
+    $rootScope.loadingMessage = '';
 
-  if (GLOBALS.userIsLoggedIn) {
-    // Show the number of unseen notifications in the navbar and page title,
-    // unless the user is already on the dashboard page.
-    $http.get('/notificationshandler').success(function(data) {
-      if ($window.location.pathname !== '/') {
-        $scope.numUnseenNotifications = data.num_unseen_notifications;
-        if ($scope.numUnseenNotifications > 0) {
-          $window.document.title = (
-            '(' + $scope.numUnseenNotifications + ') ' + $window.document.title);
+    if (GLOBALS.userIsLoggedIn) {
+      // Show the number of unseen notifications in the navbar and page title,
+      // unless the user is already on the dashboard page.
+      $http.get('/notificationshandler').success(function(data) {
+        if ($window.location.pathname !== '/') {
+          $scope.numUnseenNotifications = data.num_unseen_notifications;
+          if ($scope.numUnseenNotifications > 0) {
+            $window.document.title = (
+              '(' + $scope.numUnseenNotifications + ') ' +
+              $window.document.title);
+          }
+        }
+      });
+    }
+
+    /**
+     * Checks if an object is empty.
+     */
+    $scope.isEmpty = function(obj) {
+      for (var property in obj) {
+        if (obj.hasOwnProperty(property)) {
+          return false;
         }
       }
-    });
-  }
+      return true;
+    };
 
-  /**
-   * Checks if an object is empty.
-   */
-  $scope.isEmpty = function(obj) {
-    for (var property in obj) {
-      if (obj.hasOwnProperty(property)) {
-        return false;
+    /**
+     * Adds content to an iframe.
+     * @param {Element} iframe - The iframe element to add content to.
+     * @param {string} content - The code for the iframe.
+     */
+    $scope.addContentToIframe = function(iframe, content) {
+      if (typeof iframe == 'string') {
+        iframe = document.getElementById(iframe);
       }
-    }
-    return true;
-  };
+      if (!iframe) {
+        $log.error('Could not add content to iframe: no iframe found.');
+        return;
+      }
+      if (iframe.contentDocument) {
+        doc = iframe.contentDocument;
+      } else {
+        doc = (
+          iframe.contentWindow ? iframe.contentWindow.document :
+          iframe.document);
+      }
+      doc.open();
+      doc.writeln(content);
+      doc.close();
+    };
 
-  /**
-   * Adds content to an iframe.
-   * @param {Element} iframe The iframe element to add content to.
-   * @param {string} content The code for the iframe.
-   */
-  $scope.addContentToIframe = function(iframe, content) {
-    if (typeof(iframe) == 'string') {
-      iframe = document.getElementById(iframe);
-    }
-    if (!iframe) {
-      $log.error('Could not add content to iframe: no iframe found.');
-      return;
-    }
-    if (iframe.contentDocument) {
-      doc = iframe.contentDocument;
-    } else {
-      doc = iframe.contentWindow ? iframe.contentWindow.document : iframe.document;
-    }
-    doc.open();
-    doc.writeln(content);
-    doc.close();
-  };
+    /**
+     * Adds content to an iframe where iframe is specified by its ID.
+     * @param {string} iframeId - The id of the iframe to add content to.
+     * @param {string} content - The code for the iframe.
+     */
+    $scope.addContentToIframeWithId = function(iframeId, content) {
+      $scope.addContentToIframe(document.getElementById(iframeId), content);
+    };
 
-  /**
-   * Adds content to an iframe where iframe is specified by its ID.
-   * @param {string} iframeId The id of the iframe to add content to.
-   * @param {string} content The code for the iframe.
-   */
-  $scope.addContentToIframeWithId = function(iframeId, content) {
-    $scope.addContentToIframe(document.getElementById(iframeId), content);
-  };
+    // This method is here because the trigger for the tutorial is in the site
+    // navbar. It broadcasts an event to tell the exploration editor to open the
+    // editor tutorial.
+    $scope.openEditorTutorial = function() {
+      $scope.$broadcast('openEditorTutorial');
+    };
 
-  // This method is here because the trigger for the tutorial is in the site
-  // navbar. It broadcasts an event to tell the exploration editor to open the
-  // editor tutorial.
-  $scope.openEditorTutorial = function() {
-    $scope.$broadcast('openEditorTutorial');
-  };
+    // The following methods and listeners relate to the global navigation
+    // sidebar.
+    $scope.openSidebar = function() {
+      if (!$scope.sidebarIsShown) {
+        $scope.sidebarIsShown = true;
+        $scope.pendingSidebarClick = true;
+      }
+    };
 
-  // The following methods and listeners relate to the global navigation sidebar.
-  $scope.openSidebar = function() {
-    if (!$scope.sidebarIsShown) {
-      $scope.sidebarIsShown = true;
-      $scope.pendingSidebarClick = true;
-    }
-  };
+    // TODO(sll): use 'touchstart' for mobile.
+    $document.on('click', function() {
+      if (!$scope.pendingSidebarClick) {
+        $scope.sidebarIsShown = false;
+      } else {
+        $scope.pendingSidebarClick = false;
+      }
+      $scope.$apply();
+    });
 
-  // TODO(sll): use 'touchstart' for mobile.
-  $document.on('click', function(evt) {
-    if (!$scope.pendingSidebarClick) {
-      $scope.sidebarIsShown = false;
-    } else {
-      $scope.pendingSidebarClick = false;
-    }
-    $scope.$apply();
-  });
-
-  $scope.profileDropdownIsActive = false;
-
-  $scope.onMouseoverProfilePictureOrDropdown = function(evt) {
-    angular.element(evt.currentTarget).parent().addClass('open');
-    $scope.profileDropdownIsActive = true;
-  };
-
-  $scope.onMouseoutProfilePictureOrDropdown = function(evt) {
-    angular.element(evt.currentTarget).parent().removeClass('open');
     $scope.profileDropdownIsActive = false;
-  };
 
-  $scope.onMouseoverDropdownMenu = function(evt) {
-    angular.element(evt.currentTarget).parent().addClass('open');
-  };
+    $scope.onMouseoverProfilePictureOrDropdown = function(evt) {
+      angular.element(evt.currentTarget).parent().addClass('open');
+      $scope.profileDropdownIsActive = true;
+    };
 
-  $scope.onMouseoutDropdownMenu = function(evt) {
-    angular.element(evt.currentTarget).parent().removeClass('open');
-  };
+    $scope.onMouseoutProfilePictureOrDropdown = function(evt) {
+      angular.element(evt.currentTarget).parent().removeClass('open');
+      $scope.profileDropdownIsActive = false;
+    };
 
-  $scope.pageHasLoaded = false;
-  $scope.pendingSidebarClick = false;
-  $scope.sidebarIsShown = false;
-  $timeout(function() {
-    $scope.pageHasLoaded = true;
-  }, 500);
-}]);
+    $scope.onMouseoverDropdownMenu = function(evt) {
+      angular.element(evt.currentTarget).parent().addClass('open');
+    };
+
+    $scope.onMouseoutDropdownMenu = function(evt) {
+      angular.element(evt.currentTarget).parent().removeClass('open');
+    };
+
+    $scope.onLoginButtonClicked = function(loginUrl) {
+      siteAnalyticsService.registerStartLoginEvent('loginButton');
+      $timeout(function() {
+        $window.location = loginUrl;
+      }, 150);
+      return false;
+    };
+
+    $scope.pageHasLoaded = false;
+    $scope.pendingSidebarClick = false;
+    $scope.sidebarIsShown = false;
+    $timeout(function() {
+      $scope.pageHasLoaded = true;
+    }, 500);
+  }
+]);

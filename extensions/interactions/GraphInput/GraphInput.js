@@ -33,11 +33,15 @@ oppia.directive('oppiaInteractiveGraphInput', [
           function($scope, $element, $attrs) {
         $scope.errorMessage = '';
         $scope.graph = {
-          'vertices': [], 'edges': [], 'isDirected': false, 'isWeighted': false,
-          'isLabeled': false };
+          vertices: [],
+          edges: [],
+          isDirected: false,
+          isWeighted: false,
+          isLabeled: false
+        };
 
         $scope.submitGraph = function() {
-          // angular.copy needed to strip $$hashkey from the graph
+          // Here, angular.copy is needed to strip $$hashkey from the graph.
           $scope.$parent.submitAnswer(
             angular.copy($scope.graph), graphInputRulesService);
         };
@@ -45,11 +49,11 @@ oppia.directive('oppiaInteractiveGraphInput', [
           updateGraphFromJSON($attrs.graphWithValue);
         };
 
-        $scope.init = function() {
+        var init = function() {
           updateGraphFromJSON($attrs.graphWithValue);
-          function stringToBool(str) {
+          var stringToBool = function(str) {
             return (str === 'true');
-          }
+          };
           $scope.canAddVertex = stringToBool($attrs.canAddVertexWithValue);
           $scope.canDeleteVertex = stringToBool(
             $attrs.canDeleteVertexWithValue);
@@ -61,21 +65,22 @@ oppia.directive('oppiaInteractiveGraphInput', [
           $scope.canEditEdgeWeight = stringToBool(
             $attrs.canEditEdgeWeightWithValue);
         };
-        $scope.init();
 
         // TODO(czxcjx): Write this function
-        function checkValidGraph(graph) {
-          return true;
-        }
+        var checkValidGraph = function(graph) {
+          return Boolean(graph);
+        };
 
-        function updateGraphFromJSON(jsonGraph) {
+        var updateGraphFromJSON = function(jsonGraph) {
           var newGraph = oppiaHtmlEscaper.escapedJsonToObj(jsonGraph);
           if (checkValidGraph(newGraph)) {
             $scope.graph = newGraph;
           } else {
             $scope.errorMessage = 'Invalid graph!';
           }
-        }
+        };
+
+        init();
       }]
     };
   }
@@ -146,10 +151,10 @@ oppia.directive('oppiaResponseGraphInput', [
           return graphDetailService.getDirectedEdgeArrowPoints(
             $scope.graph, index);
         };
+
         $scope.getEdgeCentre = function(index) {
           return graphDetailService.getEdgeCentre($scope.graph, index);
         };
-
       }]
     };
   }
@@ -188,7 +193,7 @@ oppia.directive('graphViz', function() {
       canAddEdge: '=',
       canDeleteEdge: '=',
       canEditEdgeWeight: '=',
-      canEditOptions: '=',
+      canEditOptions: '='
     },
     templateUrl: 'graphViz/graphVizSvg',
     controller: ['$scope', '$element', '$attrs', '$document', 'focusService',
@@ -225,7 +230,7 @@ oppia.directive('graphViz', function() {
           vertexDragStartY: 0,
           // Original position of mouse when dragging started
           mouseDragStartX: 0,
-          mouseDragStartY: 0,
+          mouseDragStartY: 0
         };
 
         $scope.VERTEX_RADIUS = graphDetailService.VERTEX_RADIUS;
@@ -236,21 +241,25 @@ oppia.directive('graphViz', function() {
         $scope.mousemoveGraphSVG = function(event) {
           $scope.state.mouseX = event.pageX - vizContainer.offset().left;
           $scope.state.mouseY = event.pageY - vizContainer.offset().top;
-          // vertexDragStartX/Y and mouseDragStartX/Y are to make mouse-dragging
-          // by label more natural, by moving the vertex according to the
-          // difference from the original position. Otherwise, mouse-dragging by
-          // label will make the vertex awkwardly jump to the mouse.
+          // We use vertexDragStartX/Y and mouseDragStartX/Y to make
+          // mouse-dragging by label more natural, by moving the vertex
+          // according to the difference from the original position. Otherwise,
+          // mouse-dragging by label will make the vertex awkwardly jump to the
+          // mouse.
           if ($scope.state.currentlyDraggedVertex !== null &&
               ($scope.state.mouseX > GRAPH_INPUT_LEFT_MARGIN)) {
             $scope.graph.vertices[$scope.state.currentlyDraggedVertex].x =
-              $scope.state.vertexDragStartX + ($scope.state.mouseX - $scope.state.mouseDragStartX);
+              $scope.state.vertexDragStartX + (
+                $scope.state.mouseX - $scope.state.mouseDragStartX);
             $scope.graph.vertices[$scope.state.currentlyDraggedVertex].y =
-              $scope.state.vertexDragStartY + ($scope.state.mouseY - $scope.state.mouseDragStartY);
+              $scope.state.vertexDragStartY + (
+                $scope.state.mouseY - $scope.state.mouseDragStartY);
           }
         };
 
-        $scope.onClickGraphSVG = function(event) {
-          if ($scope.state.currentMode === _MODES.ADD_VERTEX && $scope.canAddVertex) {
+        $scope.onClickGraphSVG = function() {
+          if ($scope.state.currentMode === _MODES.ADD_VERTEX &&
+              $scope.canAddVertex) {
             $scope.graph.vertices.push({
               x: $scope.state.mouseX,
               y: $scope.state.mouseY,
@@ -269,9 +278,8 @@ oppia.directive('graphViz', function() {
           initButtons();
           $scope.state.currentMode = $scope.buttons[0].mode;
         };
-        $scope.init();
 
-        function initButtons() {
+        var initButtons = function() {
           $scope.buttons = [];
           if ($scope.canMoveVertex) {
             $scope.buttons.push({
@@ -301,7 +309,7 @@ oppia.directive('graphViz', function() {
               mode: _MODES.DELETE
             });
           }
-        }
+        };
 
         $scope.graphOptions = [{
           text: 'Labeled',
@@ -403,13 +411,15 @@ oppia.directive('graphViz', function() {
         $document.on('mouseup', $scope.onMouseupDocument);
 
         // Actions
-        function beginAddEdge(startIndex) {
+        var beginAddEdge = function(startIndex) {
           $scope.state.addEdgeVertex = startIndex;
-        }
-        function endAddEdge() {
+        };
+
+        var endAddEdge = function() {
           $scope.state.addEdgeVertex = null;
-        }
-        function tryAddEdge(startIndex, endIndex) {
+        };
+
+        var tryAddEdge = function(startIndex, endIndex) {
           if (
               startIndex === null ||
               endIndex === null ||
@@ -438,35 +448,40 @@ oppia.directive('graphViz', function() {
             weight: 1
           });
           return;
-        }
-        function beginDragVertex(index) {
+        };
+
+        var beginDragVertex = function(index) {
           $scope.state.currentlyDraggedVertex = index;
           $scope.state.vertexDragStartX = $scope.graph.vertices[index].x;
           $scope.state.vertexDragStartY = $scope.graph.vertices[index].y;
           $scope.state.mouseDragStartX = $scope.state.mouseX;
           $scope.state.mouseDragStartY = $scope.state.mouseY;
-        }
-        function endDragVertex() {
+        };
+
+        var endDragVertex = function() {
           $scope.state.currentlyDraggedVertex = null;
           $scope.state.vertexDragStartX = 0;
           $scope.state.vertexDragStartY = 0;
           $scope.state.mouseDragStartX = 0;
           $scope.state.mouseDragStartY = 0;
-        }
-        function beginEditVertexLabel(index) {
+        };
+
+        var beginEditVertexLabel = function(index) {
           $scope.state.selectedVertex = index;
           focusService.setFocus('vertexLabelEditBegun');
-        }
+        };
 
-        function beginEditEdgeWeight(index) {
+        var beginEditEdgeWeight = function(index) {
           $scope.state.selectedEdge = index;
           focusService.setFocus('edgeWeightEditBegun');
-        }
-        function deleteEdge(index) {
+        };
+
+        var deleteEdge = function(index) {
           $scope.graph.edges.splice(index, 1);
           $scope.state.hoveredEdge = null;
-        }
-        function _deleteRepeatedUndirectedEdges() {
+        };
+
+        var _deleteRepeatedUndirectedEdges = function() {
           for (var i = 0; i < $scope.graph.edges.length; i++) {
             var edge1 = $scope.graph.edges[i];
             for (var j = i + 1; j < $scope.graph.edges.length; j++) {
@@ -478,8 +493,9 @@ oppia.directive('graphViz', function() {
               }
             }
           }
-        }
-        function deleteVertex(index) {
+        };
+
+        var deleteVertex = function(index) {
           // Using jQuery's map instead of normal array.map because
           // it removes elements for which the callback returns null
           $scope.graph.edges = $.map($scope.graph.edges, function(edge) {
@@ -496,7 +512,8 @@ oppia.directive('graphViz', function() {
           });
           $scope.graph.vertices.splice(index, 1);
           $scope.state.hoveredVertex = null;
-        }
+        };
+
         $scope.selectedVertexLabelGetterSetter = function(label) {
           if ($scope.state.selectedVertex === null) {
             return '';
@@ -506,6 +523,7 @@ oppia.directive('graphViz', function() {
           }
           return $scope.graph.vertices[$scope.state.selectedVertex].label;
         };
+
         $scope.selectedEdgeWeight = function(weight) {
           if ($scope.state.selectedEdge === null) {
             return '';
@@ -515,7 +533,6 @@ oppia.directive('graphViz', function() {
           }
           return $scope.graph.edges[$scope.state.selectedEdge].weight;
         };
-
 
         // Styling functions
         var DELETE_COLOR = 'red';
@@ -557,12 +574,100 @@ oppia.directive('graphViz', function() {
         $scope.getEdgeCentre = function(index) {
           return graphDetailService.getEdgeCentre($scope.graph, index);
         };
-      }]
+
+        $scope.init();
+      }
+    ]
   };
 });
 
 oppia.factory('graphUtilsService', [function() {
   return {
+    GRAPH_ADJACENCY_MODE: {
+      DIRECTED: 'directed',
+      INVERTED: 'inverted',
+      UNDIRECTED: 'undirected'
+    },
+
+    DFS_STATUS: {
+      VISITED: 'visited',
+      UNVISITED: 'unvisited',
+      STILL_VISITING: 'still visiting'
+    },
+
+    /**
+     * @param {object} graph - A graph object.
+     * @param {string} adjacencyListMode - A string indicating the mode.
+     * @return {array} An adjacency list. Depending on the mode, the list has
+     *   all edges (directed),
+     *   all edges inverted (inverted),
+     *   or all edges in both directions, as though the graph were undirected
+     *   (undirected)
+     */
+    constructAdjacencyLists: function(graph, adjacencyListMode) {
+      var adjacencyLists = [];
+      for (var i = 0; i < graph.vertices.length; i++) {
+        adjacencyLists.push([]);
+      }
+
+      // If a graph is undirected, all modes work the same way anyway
+      if (!graph.isDirected) {
+        adjacencyListMode = this.GRAPH_ADJACENCY_MODE.UNDIRECTED;
+      }
+      for (var i = 0; i < graph.edges.length; i++) {
+        var edge = graph.edges[i];
+        if (adjacencyListMode === this.GRAPH_ADJACENCY_MODE.DIRECTED ||
+            adjacencyListMode === this.GRAPH_ADJACENCY_MODE.UNDIRECTED) {
+          adjacencyLists[edge.src].push(edge.dst);
+        }
+        if (adjacencyListMode === this.GRAPH_ADJACENCY_MODE.INVERTED ||
+            adjacencyListMode === this.GRAPH_ADJACENCY_MODE.UNDIRECTED) {
+          adjacencyLists[edge.dst].push(edge.src);
+        }
+      }
+      return adjacencyLists;
+    },
+
+    /**
+     * @param {integer} startVertex - The index of the starting vertex.
+     * @param {array} adjacencyLists - An array of arrays.
+     * @param {array} isVisited - An array with length equal to the number of
+     *     vertices. All the values should be false initially.
+     * This function modifies the isVisited array and changes the values at
+     * the indices of the vertices reachable from the starting vertex to true.
+     */
+    markAccessible: function(startVertex, adjacencyLists, isVisited) {
+      isVisited[startVertex] = true;
+      for (var i = 0; i < adjacencyLists[startVertex].length; i++) {
+        var nextVertex = adjacencyLists[startVertex][i];
+        if (!isVisited[nextVertex]) {
+          this.markAccessible(nextVertex, adjacencyLists, isVisited);
+        }
+      };
+    },
+
+    findCycle: function(
+        currentVertex, previousVertex, adjacencyLists, isVisited,
+        isDirected) {
+      isVisited[currentVertex] = this.DFS_STATUS.STILL_VISITING;
+      for (var i = 0; i < adjacencyLists[currentVertex].length; i++) {
+        var nextVertex = adjacencyLists[currentVertex][i];
+        if (nextVertex == previousVertex && !isDirected) {
+          continue;
+        }
+        if (isVisited[nextVertex] == this.DFS_STATUS.STILL_VISITING) {
+          return true;
+        }
+        if (isVisited[nextVertex] == this.DFS_STATUS.UNVISITED &&
+            this.findCycle(
+            nextVertex, currentVertex, adjacencyLists, isVisited, isDirected)) {
+          return true;
+        }
+      }
+      isVisited[currentVertex] = this.DFS_STATUS.VISITED;
+      return false;
+    },
+
     constructAdjacencyMatrix: function(graph) {
       var adjMatrix = [];
       for (var i = 0; i < graph.vertices.length; i++) {
@@ -581,6 +686,7 @@ oppia.factory('graphUtilsService', [function() {
       });
       return adjMatrix;
     },
+
     nextPermutation: function(permutation) {
       // Generates (in place) the next lexicographical permutation.
       // permutation is a permutation of [0, 1, 2, ..., permutation.length - 1]
@@ -602,14 +708,16 @@ oppia.factory('graphUtilsService', [function() {
         return null;
       }
 
-      // swap the pivot and successor and reverse the suffix
+      // Swap the pivot and successor and reverse the suffix
       var tmp = permutation[pivot];
       permutation[pivot] = permutation[successor];
       permutation[successor] = tmp;
       permutation = permutation.concat(permutation.splice(pivot + 1).reverse());
       return permutation;
     },
-    areAdjacencyMatricesEqualWithPermutation: function(adj1, adj2, permutation) {
+
+    areAdjacencyMatricesEqualWithPermutation: function(
+        adj1, adj2, permutation) {
       var numVertices = adj1.length;
       for (var i = 0; i < numVertices; i++) {
         for (var j = 0; j < numVertices; j++) {
@@ -625,7 +733,125 @@ oppia.factory('graphUtilsService', [function() {
 
 oppia.factory('graphInputRulesService', [
     'graphUtilsService', function(graphUtilsService) {
-  var IsIsomorphic = function(graph1, graph2) {
+  /**
+   * @param {object} graph - A graph object.
+   * @return {boolean} Whether the graph is strongly connected.
+   */
+  var isStronglyConnected = function(graph) {
+    // Uses depth first search on each vertex to try and visit every other
+    // vertex in both the normal and inverted adjacency lists.
+    if (graph.vertices.length === 0) {
+      return true;
+    }
+
+    var adjacencyLists = graphUtilsService.constructAdjacencyLists(
+      graph, graphUtilsService.GRAPH_ADJACENCY_MODE.DIRECTED);
+    var invertedAdjacencyLists = graphUtilsService.constructAdjacencyLists(
+      graph, graphUtilsService.GRAPH_ADJACENCY_MODE.INVERTED);
+
+    var isVisited = graph.vertices.map(function() {
+      return false;
+    });
+    graphUtilsService.markAccessible(0, adjacencyLists, isVisited);
+    var isAnyVertexUnreachable = isVisited.some(function(visited) {
+      return visited === false;
+    });
+
+    var isVisitedInReverse = graph.vertices.map(function() {
+      return false;
+    });
+    graphUtilsService.markAccessible(
+      0, invertedAdjacencyLists, isVisitedInReverse);
+    var isAnyVertexUnreachableInReverse =
+      isVisitedInReverse.some(function(visited) {
+        return visited === false;
+      });
+
+    return !isAnyVertexUnreachable && !isAnyVertexUnreachableInReverse;
+  };
+
+  /**
+   * @param {object} graph - A graph object.
+   * @return {boolean} Whether the graph is weakly connected.
+   */
+  var isWeaklyConnected = function(graph) {
+    // Generates adjacency lists assuming graph is undirected, then uses depth
+    // first search on node 0 to try to reach every other vertex
+    if (graph.vertices.length == 0) {
+      return true;
+    }
+
+    var adjacencyLists = graphUtilsService.constructAdjacencyLists(
+      graph, graphUtilsService.GRAPH_ADJACENCY_MODE.UNDIRECTED);
+    var isVisited = graph.vertices.map(function() {
+      return false;
+    });
+    graphUtilsService.markAccessible(0, adjacencyLists, isVisited);
+    return isVisited.every(function(visited) {
+      return visited === true;
+    });
+  };
+
+  /**
+   * @param {object} graph - A graph object.
+   * @return {boolean} Whether the graph is acyclic.
+   */
+  var isAcyclic = function(graph) {
+    // Uses depth first search to ensure that we never have an edge to an
+    // ancestor in the search tree.
+
+    var isVisited = graph.vertices.map(function() {
+      return graphUtilsService.DFS_STATUS.UNVISITED;
+    });
+    var adjacencyLists = graphUtilsService.constructAdjacencyLists(
+      graph, graphUtilsService.GRAPH_ADJACENCY_MODE.DIRECTED);
+    for (var startVertex = 0;
+         startVertex < graph.vertices.length;
+         startVertex++) {
+      if (isVisited[startVertex] == graphUtilsService.DFS_STATUS.UNVISITED) {
+        if (graphUtilsService.findCycle(
+            startVertex, -1, adjacencyLists, isVisited, graph.isDirected)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  };
+
+  /**
+   * @param {object} graph - A graph object.
+   * @return {boolean} Whether the graph is acyclic.
+   */
+  var isRegular = function(graph) {
+    // Checks that every vertex has outdegree and indegree equal to the first
+    if (graph.vertices.length === 0) {
+      return true;
+    }
+
+    var adjacencyLists = graphUtilsService.constructAdjacencyLists(
+      graph, graphUtilsService.GRAPH_ADJACENCY_MODE.DIRECTED);
+    var outdegreeCounts = adjacencyLists.map(function(list) {
+      return list.length;
+    });
+    var indegreeCounts = adjacencyLists.map(function() {
+      return 0;
+    });
+    adjacencyLists.forEach(function(list) {
+      list.forEach(function(destination) {
+        indegreeCounts[destination]++;
+      });
+    });
+
+    var areIndegreeCountsEqual = indegreeCounts.every(function(indegree) {
+      return indegree == indegreeCounts[0];
+    });
+    var areOutdegreeCountsEqual = outdegreeCounts.every(function(outdegree) {
+      return outdegree == outdegreeCounts[0];
+    });
+    return areIndegreeCountsEqual && areOutdegreeCountsEqual;
+  };
+
+  var isIsomorphic = function(graph1, graph2) {
     if (graph1.vertices.length != graph2.vertices.length) {
       return false;
     }
@@ -638,13 +864,13 @@ oppia.factory('graphInputRulesService', [
     var degrees1 = adj1.map(function(value) {
       return value.reduce(function(prev, cur) {
         return prev + cur;
-      })
+      });
     }).sort();
 
     var degrees2 = adj2.map(function(value) {
       return value.reduce(function(prev, cur) {
         return prev + cur;
-      })
+      });
     }).sort();
 
     if (!angular.equals(degrees1, degrees2)) {
@@ -673,12 +899,25 @@ oppia.factory('graphInputRulesService', [
   };
 
   return {
+    HasGraphProperty: function(answer, inputs) {
+      if (inputs.p == 'strongly_connected') {
+        return isStronglyConnected(answer);
+      } else if (inputs.p == 'weakly_connected') {
+        return isWeaklyConnected(answer);
+      } else if (inputs.p == 'acyclic') {
+        return isAcyclic(answer);
+      } else if (inputs.p == 'regular') {
+        return isRegular(answer);
+      } else {
+        return false;
+      }
+    },
     IsIsomorphicTo: function(answer, inputs) {
-      return IsIsomorphic(answer, inputs.g);
+      return isIsomorphic(answer, inputs.g);
     },
     FuzzyMatches: function(answer, inputs) {
       return inputs.training_data.some(function(trainingGraph) {
-        return IsIsomorphic(answer, trainingGraph);
+        return isIsomorphic(answer, trainingGraph);
       });
     }
   };

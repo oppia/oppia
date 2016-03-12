@@ -16,8 +16,6 @@
 
 """Model for an Oppia exploration."""
 
-__author__ = 'Sean Lip'
-
 import datetime
 
 import core.storage.base_model.gae_models as base_models
@@ -281,7 +279,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
             raise ValueError(
                 'max_age must be a datetime.timedelta instance or None.')
 
-        query = cls.query(cls.post_commit_is_private == False)
+        query = cls.query(cls.post_commit_is_private == False)  # pylint: disable=singleton-comparison
         if max_age:
             query = query.filter(
                 cls.last_updated >= datetime.datetime.utcnow() - max_age)
@@ -351,6 +349,10 @@ class ExpSummaryModel(base_models.BaseModel):
     # The user_ids of users who have contributed (humans who have made a
     # positive (not just a revert) change to the exploration's content)
     contributor_ids = ndb.StringProperty(indexed=True, repeated=True)
+    # A dict representing the contributors of non-trivial commits to this
+    # exploration. Each key of this dict is a user_id, and the corresponding
+    # value is the number of non-trivial commits that the user has made.
+    contributors_summary = ndb.JsonProperty(default={}, indexed=False)
     # The version number of the exploration after this commit. Only populated
     # for commits to an exploration (as opposed to its rights, etc.)
     version = ndb.IntegerProperty()
@@ -361,7 +363,7 @@ class ExpSummaryModel(base_models.BaseModel):
         return ExpSummaryModel.query().filter(
             ExpSummaryModel.status != feconf.ACTIVITY_STATUS_PRIVATE
         ).filter(
-            ExpSummaryModel.deleted == False
+            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
@@ -376,7 +378,7 @@ class ExpSummaryModel(base_models.BaseModel):
                    ExpSummaryModel.editor_ids == user_id,
                    ExpSummaryModel.viewer_ids == user_id)
         ).filter(
-            ExpSummaryModel.deleted == False
+            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
@@ -388,5 +390,5 @@ class ExpSummaryModel(base_models.BaseModel):
             ndb.OR(ExpSummaryModel.owner_ids == user_id,
                    ExpSummaryModel.editor_ids == user_id)
         ).filter(
-            ExpSummaryModel.deleted == False
+            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)

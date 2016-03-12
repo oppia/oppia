@@ -14,7 +14,6 @@
 
 oppia.directive('oppiaInteractiveLogicProof', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
-
     return {
       restrict: 'E',
       scope: {},
@@ -65,7 +64,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
         $scope.targetString = logicProofShared.displayExpression(
           $scope.questionData.results[0], operators);
         $scope.questionString = ($scope.assumptionsString === '') ?
-            'Prove ' + $scope.targetString + '.':
+            'Prove ' + $scope.targetString + '.' :
             'Assuming ' + (
               $scope.assumptionsString + '; prove ' + $scope.targetString +
               '.');
@@ -79,7 +78,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
         // NOTE: for information on integrating angular and code-mirror see
         // http://github.com/angular-ui/ui-codemirror
         $scope.codeEditor = function(editor) {
-          editor.setValue($scope.localQuestionData.default_proof_string)
+          editor.setValue($scope.localQuestionData.default_proof_string);
           $scope.proofString = editor.getValue();
           var cursorPosition = editor.doc.getCursor();
 
@@ -110,7 +109,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
               $scope.checkForBasicErrors();
               cursorPosition = editor.doc.getCursor();
             }
-          })
+          });
 
           // NOTE: we use change rather than beforeChange here so that checking
           // for mistakes is done with respect to the updated text.
@@ -135,7 +134,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
           try {
             logicProofStudent.validateProof(
               $scope.proofString, $scope.questionInstance);
-          } catch(err) {
+          } catch (err) {
             $scope.clearMessage();
             $scope.showMessage(err.message, err.line);
             $scope.messageIsSticky = false;
@@ -150,15 +149,20 @@ oppia.directive('oppiaInteractiveLogicProof', [
             $scope.errorMark.clear();
           }
           $scope.errorMessage = '';
-        }
+        };
 
         $scope.showMessage = function(message, lineNum) {
           $scope.errorMessage = $scope.constructDisplayedMessage(
             message, lineNum);
-          $scope.errorMark = $scope.editor.doc.markText(
-            {line: lineNum, ch: 0},
-            {line: lineNum, ch: 100},
-            {className: 'logic-proof-erroneous-line'});
+          $scope.errorMark = $scope.editor.doc.markText({
+            line: lineNum,
+            ch: 0
+          }, {
+            line: lineNum,
+            ch: 100
+          }, {
+            className: 'logic-proof-erroneous-line'
+          });
         };
 
         $scope.constructDisplayedMessage = function(message, lineNum) {
@@ -268,10 +272,10 @@ oppia.directive('oppiaShortResponseLogicProof', [
 
 oppia.factory('logicProofRulesService', [function() {
   return {
-    Correct: function(answer, inputs) {
+    Correct: function(answer) {
       return answer.correct;
     },
-    NotCorrect: function(answer, inputs) {
+    NotCorrect: function(answer) {
       return !answer.correct;
     },
     NotCorrectByCategory: function(answer, inputs) {

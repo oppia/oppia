@@ -19,8 +19,8 @@
  */
 
 oppia.controller('Preferences', [
-    '$scope', '$http', '$rootScope', '$modal', '$timeout', 'warningsData',
-    function($scope, $http, $rootScope, $modal, $timeout, warningsData) {
+    '$scope', '$http', '$rootScope', '$modal', '$timeout', 'alertsService',
+    function($scope, $http, $rootScope, $modal, $timeout, alertsService) {
   var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
   $rootScope.loadingMessage = 'Loading';
   $scope.profilePictureDataUrl = '';
@@ -51,10 +51,10 @@ oppia.controller('Preferences', [
               'Subject interests should use only lowercase letters.');
           }
         } else {
-            console.error(
-              'Error: received bad value for a subject interest. Expected a ' +
-                'string, got ', subjectInterests[i]);
-            throw Error('Error: received bad value for a subject interest.');
+          console.error(
+            'Error: received bad value for a subject interest. Expected a ' +
+            'string, got ', subjectInterests[i]);
+          throw Error('Error: received bad value for a subject interest.');
         }
       }
     } else {
@@ -66,7 +66,7 @@ oppia.controller('Preferences', [
   };
 
   $scope.onSubjectInterestsSelectionChange = function(subjectInterests) {
-    warningsData.clear();
+    alertsService.clearWarnings();
     $scope.subjectInterestsChangedAtLeastOnce = true;
     $scope.subjectInterestsWarningText = null;
     $scope.updateSubjectInterestsWarning(subjectInterests);
@@ -87,53 +87,55 @@ oppia.controller('Preferences', [
     $modal.open({
       templateUrl: 'modals/editProfilePicture',
       backdrop: true,
-      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-        $scope.uploadedImage = null;
-        $scope.croppedImageDataUrl = '';
-        $scope.invalidImageWarningIsShown = false;
-
-        $scope.onFileChanged = function(file, filename) {
-          $('.oppia-profile-image-uploader').fadeOut(function() {
-            $scope.invalidImageWarningIsShown = false;
-
-            var reader = new FileReader();
-            reader.onload = function(e) {
-              $scope.$apply(function() {
-                $scope.uploadedImage = e.target.result;
-              });
-            };
-            reader.readAsDataURL(file);
-
-            $timeout(function() {
-              $('.oppia-profile-image-uploader').fadeIn();
-            }, 100);
-          });
-        };
-
-        $scope.reset = function() {
+      controller: [
+        '$scope', '$modalInstance', function($scope, $modalInstance) {
           $scope.uploadedImage = null;
           $scope.croppedImageDataUrl = '';
-        };
+          $scope.invalidImageWarningIsShown = false;
 
-        $scope.onInvalidImageLoaded = function() {
-          $scope.uploadedImage = null;
-          $scope.croppedImageDataUrl = '';
-          $scope.invalidImageWarningIsShown = true;
-        };
+          $scope.onFileChanged = function(file) {
+            $('.oppia-profile-image-uploader').fadeOut(function() {
+              $scope.invalidImageWarningIsShown = false;
 
-        $scope.confirm = function() {
-          $modalInstance.close($scope.croppedImageDataUrl);
-        };
+              var reader = new FileReader();
+              reader.onload = function(e) {
+                $scope.$apply(function() {
+                  $scope.uploadedImage = e.target.result;
+                });
+              };
+              reader.readAsDataURL(file);
 
-        $scope.cancel = function() {
-          $modalInstance.dismiss('cancel');
-        };
-      }]
+              $timeout(function() {
+                $('.oppia-profile-image-uploader').fadeIn();
+              }, 100);
+            });
+          };
+
+          $scope.reset = function() {
+            $scope.uploadedImage = null;
+            $scope.croppedImageDataUrl = '';
+          };
+
+          $scope.onInvalidImageLoaded = function() {
+            $scope.uploadedImage = null;
+            $scope.croppedImageDataUrl = '';
+            $scope.invalidImageWarningIsShown = true;
+          };
+
+          $scope.confirm = function() {
+            $modalInstance.close($scope.croppedImageDataUrl);
+          };
+
+          $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+          };
+        }
+      ]
     }).result.then(function(newProfilePictureDataUrl) {
       $http.put(_PREFERENCES_DATA_URL, {
         update_type: 'profile_picture_data_url',
         data: newProfilePictureDataUrl
-      }).success(function(response) {
+      }).success(function() {
         // The reload is needed in order to update the profile picture in the
         // top-right corner.
         location.reload();
@@ -141,12 +143,14 @@ oppia.controller('Preferences', [
     });
   };
 
-  $scope.LANGUAGE_CHOICES = GLOBALS.LANGUAGE_CODES_AND_NAMES.map(function(languageItem) {
-    return {
-      id: languageItem.code,
-      text: languageItem.name
-    };
-  });
+  $scope.LANGUAGE_CHOICES = GLOBALS.LANGUAGE_CODES_AND_NAMES.map(
+    function(languageItem) {
+      return {
+        id: languageItem.code,
+        text: languageItem.name
+      };
+    }
+  );
 
   $scope.hasPageLoaded = false;
   $http.get(_PREFERENCES_DATA_URL).success(function(data) {

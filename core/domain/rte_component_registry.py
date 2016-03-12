@@ -16,8 +16,6 @@
 
 """Registry for custom rich-text components."""
 
-__author__ = 'Sean Lip'
-
 import pkgutil
 
 import feconf
@@ -35,13 +33,13 @@ class Registry(object):
         cls._rte_components.clear()
 
         # Assemble all paths to the RTE components.
-        EXTENSION_PATHS = [
+        extension_paths = [
             component['dir'] for component in
             feconf.ALLOWED_RTE_EXTENSIONS.values()]
 
         # Crawl the directories and add new RTE component instances to the
         # registry.
-        for loader, name, _ in pkgutil.iter_modules(path=EXTENSION_PATHS):
+        for loader, name, _ in pkgutil.iter_modules(path=extension_paths):
             module = loader.find_module(name).load_module(name)
             clazz = getattr(module, name)
 
@@ -56,6 +54,13 @@ class Registry(object):
         if len(cls._rte_components) == 0:
             cls._refresh()
         return cls._rte_components.values()
+
+    @classmethod
+    def get_rte_component(cls, component_name):
+        """Get an instance of the given RTE component."""
+        if len(cls._rte_components) == 0:
+            cls._refresh()
+        return cls._rte_components[component_name]
 
     @classmethod
     def get_tag_list_with_attrs(cls):

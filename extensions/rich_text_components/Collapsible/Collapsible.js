@@ -20,14 +20,17 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaNoninteractiveCollapsible', [
-  '$rootScope', '$sce', 'oppiaHtmlEscaper', function($rootScope, $sce, oppiaHtmlEscaper) {
+  '$rootScope', '$sce', 'oppiaHtmlEscaper',
+  function($rootScope, $sce, oppiaHtmlEscaper) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'richTextComponent/Collapsible',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.heading = oppiaHtmlEscaper.escapedJsonToObj($attrs.headingWithValue);
-        $scope.content = oppiaHtmlEscaper.escapedJsonToObj($attrs.contentWithValue);
+        $scope.heading = oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.headingWithValue);
+        $scope.content = oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.contentWithValue);
       }]
     };
   }
