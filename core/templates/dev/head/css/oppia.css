@@ -1720,6 +1720,7 @@ oppia-parameter {
 .oppia-dashboard-row-recent {
   background: #fff4ca;
   cursor: pointer;
+  margin-bottom: -5px;
 }
 .oppia-dashboard-row-recent:hover {
   background: #ffe279;
@@ -2342,17 +2343,9 @@ div#ng-curtain {
   padding: 15px 40px;
 }
 
-.oppia-exploration-commit-notification,
-.oppia-feedback-notification {
-  padding: 5px;
-}
-
 .oppia-notification-type {
   float: left;
-}
-
-.oppia-notification-activity-title {
-  margin-left: 5px;
+  margin-right: 5px;
 }
 
 .oppia-notification-last-updated {
@@ -2367,11 +2360,7 @@ div#ng-curtain {
   visibility: hidden;
 }
 
-.oppia-notification-author-username {
-  float: left;
-  margin-left: 5px;
-}
-
+.oppia-notification-author-username,
 .oppia-notification-subject {
   float: left;
 }
@@ -2379,10 +2368,6 @@ div#ng-curtain {
 @media all and (max-width: 500px) {
   .oppia-notification-type {
     float: left;
-  }
-
-  .oppia-notification-type {
-    margin-right: 5px;
   }
 
   .oppia-notification-author-username {
