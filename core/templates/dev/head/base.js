@@ -99,7 +99,8 @@ oppia.controller('Base', [
     $rootScope.loadingMessage = '';
     // Method to call windowSize on resizing the window
     $window.onresize = function() {
-              windowSize();
+      $scope.windowWidth = windowDimensionsService.getWidth();
+      $scope.$apply();
             };
 
     if (GLOBALS.userIsLoggedIn) {
@@ -219,10 +220,6 @@ oppia.controller('Base', [
 
     // Checks the width of the window
     $scope.windowWidth = windowDimensionsService.getWidth();
-    function windowSize() {
-      $scope.windowWidth = windowDimensionsService.getWidth();
-      $scope.$apply();
-    }
 
     $scope.pageHasLoaded = false;
     $scope.pendingSidebarClick = false;
