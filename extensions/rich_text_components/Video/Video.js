@@ -32,8 +32,14 @@ oppia.directive('oppiaNoninteractiveVideo', [
           var start = oppiaHtmlEscaper.escapedJsonToObj($attrs.startWithValue);
           var end = oppiaHtmlEscaper.escapedJsonToObj($attrs.endWithValue);
 
-          $scope.videoId = oppiaHtmlEscaper.escapedJsonToObj(
+          var idUrl = oppiaHtmlEscaper.escapedJsonToObj(
             $attrs.videoIdWithValue);
+          if (idUrl.match('^(http|https)://(www.)?youtube|youtu\.be')) {
+            $scope.videoId = idUrl.split(/v\/|v=|youtu\.be\//)[1].split(/[?&]/)
+              [0];
+          } else if (idUrl.length == 11) {
+            $scope.videoId = idUrl;
+          }
           $scope.timingParams = '&start=' + start + '&end=' + end;
           $scope.autoplaySuffix = '&autoplay=0';
 
