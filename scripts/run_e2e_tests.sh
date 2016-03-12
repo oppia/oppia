@@ -22,6 +22,7 @@
 #   bash scripts/run_e2e_tests.sh
 #
 # Optional arguments:
+#   --skip-install=true/false Possibly skips installing dependencies. The default value is false.
 #   --sharding=true/false Disables/Enables parallelization of protractor tests.
 #   --sharding-instances=# Sets the number of parallel browsers to open while sharding.
 # Sharding must be disabled (either by passing in false to --sharding or 1 to
@@ -69,20 +70,9 @@ set -e
 source $(dirname $0)/setup.sh || exit 1
 source $(dirname $0)/setup_gae.sh || exit 1
 
-# Install third party dependencies
-bash scripts/install_third_party.sh
-
-install_node_module karma 0.12.16
-install_node_module karma-jasmine 0.1.0
-install_node_module karma-ng-html2js-preprocessor 0.1.0
-install_node_module protractor 2.5.0
-install_node_module protractor-screenshot-reporter 0.0.5
-install_node_module jasmine-spec-reporter 2.2.2
-
-$NODE_MODULE_DIR/.bin/webdriver-manager update
-
-#build so as to have minified js and css
-$NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js build
+export DEFAULT_SKIP_INSTALLING_THIRD_PARTY_LIBS=false
+export DEFAULT_RUN_MINIFIED_TESTS=false
+maybeInstallDependencies "$@"
 
 if ( nc -vz localhost 8181 ); then
   echo ""
