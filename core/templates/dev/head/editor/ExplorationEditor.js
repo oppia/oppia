@@ -175,9 +175,7 @@ oppia.controller('ExplorationEditor', [
     var screenWidth = windowDimensionsService.getWidth();
     if (screenWidth <= 1280) {
       _ID_TUTORIAL_PREVIEW_TAB = '#tutorialPreviewSmall';
-
     }
-
 
     $scope.EDITOR_TUTORIAL_OPTIONS = [{
       type: 'title',
@@ -342,10 +340,10 @@ oppia.controller('EditorNavigation', [
     }
 
     $scope.hideDropdown = function() {
-      if ($scope.isSmallerWindow && !$scope.optionDropdownIsActive){
+      if ($scope.isSmallerWindow && !$scope.optionDropdownIsActive) {
         return true;
       }
-    }
+    };
 
     $scope.onMouseoverOptionOrDropdown = function(evt) {
       angular.element(evt.currentTarget).parent().addClass('open');
