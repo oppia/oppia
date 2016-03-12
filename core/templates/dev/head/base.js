@@ -213,7 +213,7 @@ oppia.controller('Base', [
       return false;
     };
     // Checks the width of the window
-    $scope.windowWidth  = windowDimensionsService.getWidth();
+    $scope.windowWidth = windowDimensionsService.getWidth();
 
     $scope.pageHasLoaded = false;
     $scope.pendingSidebarClick = false;
