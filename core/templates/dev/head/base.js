@@ -211,25 +211,8 @@ oppia.controller('Base', [
       }, 150);
       return false;
     };
-    // The following methods are defined for the createExplorationButton
-    $scope.showCreateExplorationModal = function() {
-      ExplorationCreationButtonService.showCreateExplorationModal(
-        CATEGORY_LIST);
-    };
-    $scope.showUploadExplorationModal = function() {
-      ExplorationCreationButtonService.showUploadExplorationModal(
-        CATEGORY_LIST);
-    };
-
-    $scope.onRedirectToLogin = function(destinationUrl) {
-      siteAnalyticsService.registerStartLoginEvent('createExplorationButton');
-      $timeout(function() {
-        $window.location = destinationUrl;
-      }, 150);
-      return false;
-    };
     // Checks the width of the window
-    $scope.windowWidth = windowDimensionsService.getWidth();
+    $scope.windowWidth  = windowDimensionsService.getWidth();
 
     $scope.pageHasLoaded = false;
     $scope.pendingSidebarClick = false;
