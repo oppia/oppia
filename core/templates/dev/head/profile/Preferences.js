@@ -20,10 +20,9 @@
 
 oppia.controller('Preferences', [
   '$scope', '$http', '$rootScope', '$modal', '$timeout', '$translate',
-  'warningsData', 'SITE_LANGUAGES',
+  'warningsData',
   function(
-      $scope, $http, $rootScope, $modal, $timeout, $translate, warningsData,
-      SITE_LANGUAGES) {
+      $scope, $http, $rootScope, $modal, $timeout, $translate, warningsData) {
     var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
     $rootScope.loadingMessage = 'Loading';
     $scope.profilePictureDataUrl = '';
@@ -163,10 +162,10 @@ oppia.controller('Preferences', [
     );
 
     $scope.SITE_LANGUAGE_CHOICES = [];
-    for (var languageKey in SITE_LANGUAGES) {
+    for (var languageKey in GLOBALS.SITE_LANGUAGES_SUPPORTED) {
       $scope.SITE_LANGUAGE_CHOICES.push({
         id: languageKey,
-        text: SITE_LANGUAGES[languageKey]
+        text: GLOBALS.SITE_LANGUAGES_SUPPORTED[languageKey]
       });
     };
 

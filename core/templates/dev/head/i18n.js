@@ -44,16 +44,11 @@ oppia.constant('DEFAULT_TRANSLATIONS', {
   I18N_SIGNUP_LOADING: 'Loading'
 });
 
-oppia.constant('SUPPORTED_LANGUAGES', {
-  en: 'English',
-  es: 'Español'
-});
-
 oppia.controller('I18nFooter', [
-    '$rootScope', '$scope', '$translate', 'SUPPORTED_LANGUAGES',
-    function($rootScope, $scope, $translate, SUPPORTED_LANGUAGES) {
-  $scope.SUPPORTED_LANGUAGES = SUPPORTED_LANGUAGES;
+    '$rootScope', '$scope', '$translate',
+    function($rootScope, $scope, $translate) {
   // Changes the language of the translations.
+  $scope.site_languages_supported = GLOBALS.SITE_LANGUAGES_SUPPORTED;
   $scope.changeLanguage = function(langCode) {
     $translate.use(langCode);
   };
@@ -66,14 +61,14 @@ oppia.controller('I18nFooter', [
 }]);
 
 oppia.config([
-    '$translateProvider', 'DEFAULT_TRANSLATIONS', 'SUPPORTED_LANGUAGES',
-    function($translateProvider, DEFAULT_TRANSLATIONS, SUPPORTED_LANGUAGES) {
+    '$translateProvider', 'DEFAULT_TRANSLATIONS',
+    function($translateProvider, DEFAULT_TRANSLATIONS) {
   var availableLanguageKeys = [];
   var availableLanguageKeysMap = {};
-  for (var prop in SUPPORTED_LANGUAGES) {
+  for (var prop in GLOBALS.SITE_LANGUAGES_SUPPORTED) {
     availableLanguageKeys.push(prop);
     availableLanguageKeysMap[prop + '*'] = prop;
-  };
+  }
   availableLanguageKeysMap['*'] = 'en';
 
   $translateProvider
@@ -96,7 +91,7 @@ oppia.config([
     .forceAsyncReload(true);
 }]);
 
-// Service to dinamically construct translation ids for i18n.
+// Service to dynamically construct translation ids for i18n.
 oppia.factory('i18nIdService', function() {
   return {
     // Construct a translation id for gallery from name and a prefix.

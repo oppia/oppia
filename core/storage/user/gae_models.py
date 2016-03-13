@@ -60,7 +60,9 @@ class UserSettingsModel(base_models.BaseModel):
     # System language preference (for I18N).
     # TODO(milit): This field should have fixed choices. For now, validation
     # is done in the frontend.
-    preferred_site_language_code = ndb.StringProperty(default=None)
+    preferred_site_language_code = ndb.StringProperty(
+        default=None,
+        choices=feconf.SITE_LANGUAGES_SUPPORTED.keys())
 
     @classmethod
     def is_normalized_username_taken(cls, normalized_username):

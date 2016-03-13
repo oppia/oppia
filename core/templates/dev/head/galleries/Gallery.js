@@ -257,8 +257,10 @@ oppia.controller('SearchBar', [
       ExplorationCreationButtonService, urlService, CATEGORY_LIST,
       i18nIdService) {
     $rootScope.$on('$translateChangeSuccess', function() {
-      // This strings must be translated with a filter, generating FoUC for
-      // languages other than English.
+      // If you translate these strings in the html, then you must use a filter
+      // because only the first 14 characters are displayed. That would generate
+      // FOUC for languages other than English. As an exception, we translate
+      // them here and update the translation every time the language is changed
       $scope.searchBarPlaceholder = $translate.instant(
         'I18N_GALLERY_SEARCH_PLACEHOLDER');
       $scope.categoryButtonText = $translate.instant(

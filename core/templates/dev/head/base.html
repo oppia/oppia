@@ -51,10 +51,12 @@
     <meta property="og:image" content="{{DOMAIN_URL}}/images/logo/288x288_logo_mint.png">
 
     <link rel="apple-touch-icon" href="/images/logo/favicon.png">
-    <!-- The title is binded to the rootScope and it will be replaced for its
-    translation when the page is loading. This is the only way to translate the
-    page title because the head of the file is outside the scope of any other
-    controller. -->
+    <!-- The title is bounded to the rootScope. The content of the block
+    maintitle can be a string or a translation id. If it is a translation it
+    will be replaced by its translation when the page is loading. If it is a
+    string it would be displayed as is. This is the only way to translate
+    the page title because the head of the file is outside the scope of
+    any other controller. -->
     <title itemprop="name" translate="{% block maintitle %}Oppia{% endblock maintitle %}"></title>
 
     {% block header_css %}
@@ -87,7 +89,8 @@
         /* A list of functions to be called when an exploration is completed. */
         POST_COMPLETION_HOOKS: [],
         SYSTEM_USERNAMES: JSON.parse('{{SYSTEM_USERNAMES|js_string}}'),
-        userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}')
+        userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}'),
+        SITE_LANGUAGES_SUPPORTED: JSON.parse('{{SITE_LANGUAGES_SUPPORTED|js_string}}')
       };
 
       {% if additional_angular_modules %}

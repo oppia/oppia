@@ -249,17 +249,21 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/preferences')
         csrf_token = self.get_csrf_token_from_response(response)
+        original_preferences = self.get_json('/preferenceshandler/data')
+        self.assertEqual(
+            ['en'], original_preferences['preferred_language_codes'])
+        self.assertIsNone(original_preferences['preferred_site_language_code'])
         self.put_json(
             '/preferenceshandler/data',
             {'update_type': 'preferred_site_language_code', 'data': 'en'},
             csrf_token=csrf_token)
         self.put_json(
             '/preferenceshandler/data',
-            {'update_type': 'preferred_language_codes', 'data': ['en']},
+            {'update_type': 'preferred_language_codes', 'data': ['de']},
             csrf_token=csrf_token)
-        response = self.get_json('/preferenceshandler/data')
-        self.assertEqual(response['preferred_language_codes'], ['en'])
-        self.assertEqual(response['preferred_site_language_code'], 'en')
+        new_preferences = self.get_json('/preferenceshandler/data')
+        self.assertEqual(new_preferences['preferred_language_codes'], ['de'])
+        self.assertEqual(new_preferences['preferred_site_language_code'], 'en')
 
     def test_profile_data_is_independent_of_currently_logged_in_user(self):
         self.signup(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
