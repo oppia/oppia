@@ -290,12 +290,12 @@ oppia.factory('responsesService', [
 
 oppia.controller('StateResponses', [
   '$scope', '$rootScope', '$modal', '$filter', 'stateInteractionIdService',
-  'editorContextService', 'warningsData', 'responsesService', 'routerService',
+  'editorContextService', 'alertsService', 'responsesService', 'routerService',
   'explorationContextService', 'trainingDataService',
   'PLACEHOLDER_OUTCOME_DEST', 'INTERACTION_SPECS',
   function(
       $scope, $rootScope, $modal, $filter, stateInteractionIdService,
-      editorContextService, warningsData, responsesService, routerService,
+      editorContextService, alertsService, responsesService, routerService,
       explorationContextService, trainingDataService,
       PLACEHOLDER_OUTCOME_DEST, INTERACTION_SPECS) {
     $scope.editorContextService = editorContextService;
@@ -455,7 +455,7 @@ oppia.controller('StateResponses', [
     });
 
     $scope.openTeachOppiaModal = function() {
-      warningsData.clear();
+      alertsService.clearWarnings();
       $rootScope.$broadcast('externalSave');
 
       $modal.open({
@@ -552,7 +552,7 @@ oppia.controller('StateResponses', [
     };
 
     $scope.openAddAnswerGroupModal = function() {
-      warningsData.clear();
+      alertsService.clearWarnings();
       $rootScope.$broadcast('externalSave');
 
       $modal.open({
@@ -614,7 +614,7 @@ oppia.controller('StateResponses', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              warningsData.clear();
+              alertsService.clearWarnings();
             };
           }
         ]
@@ -660,7 +660,7 @@ oppia.controller('StateResponses', [
       // state of the answer group.
       evt.stopPropagation();
 
-      warningsData.clear();
+      alertsService.clearWarnings();
       $modal.open({
         templateUrl: 'modals/deleteAnswerGroup',
         backdrop: true,
@@ -672,7 +672,7 @@ oppia.controller('StateResponses', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              warningsData.clear();
+              alertsService.clearWarnings();
             };
           }
         ]
