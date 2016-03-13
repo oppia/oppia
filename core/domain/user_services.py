@@ -128,6 +128,15 @@ def get_email_from_user_id(user_id):
     return user_settings.email
 
 
+def get_profile_picture_data_url_from_user_id(user_id):
+    """Gets the profile picture data url from a given user_id.
+
+    Raises an Exception if the user is not found.
+    """
+    user_settings = get_user_settings(user_id)
+    return user_settings.profile_picture_data_url
+
+
 def get_email_from_username(username):
     """Gets the email for a given username.
 
