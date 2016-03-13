@@ -308,19 +308,19 @@
     {% include 'components/exploration_summary_tile_directive.html' %}
     {% include 'components/rating_display.html' %}
     {% include 'components/create_exploration_button_directive.html' %}
+    {% include 'components/activity-tiles-infinity-grid.html' %}
 
     <script>
       {{ include_js_file('app.js') }}
       {{ include_js_file('base.js') }}
       {{ include_js_file('directives.js') }}
       {{ include_js_file('filters.js') }}
-
       {{ include_js_file('forms/formBuilder.js') }}
 
       {{ include_js_file('services/alertsService.js') }}
       {{ include_js_file('services/explorationContextService.js') }}
       {{ include_js_file('services/autoplayedVideosService.js') }}
-
+      {{ include_js_file('services/searchService.js') }}
 
       {{ include_js_file('components/AlertMessageDirective.js') }}
       {{ include_js_file('components/ObjectEditorDirective.js') }}
@@ -329,7 +329,7 @@
       {{ include_js_file('components/RatingDisplayDirective.js')}}
       {{ include_js_file('components/Select2DropdownDirective.js') }}
       {{ include_js_file('components/CreateExplorationButtonDirective.js') }}
-
+      {{ include_js_file('components/activityTilesInfinityGrid.js') }}
       {{ include_js_file('expressions/expressionSyntaxTree.js') }}
       {{ include_js_file('expressions/evaluator.js') }}
       {{ include_js_file('expressions/parser.js') }}
