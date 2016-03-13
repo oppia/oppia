@@ -92,6 +92,7 @@
                                       thumbnail-bg-color="exp.thumbnail_bg_color"
                                       num-views="exp.num_views"
                                       contributors-summary="exp.human_readable_contributors_summary"
+                                      is-community-owned="exp.community_owned"
                                       class="protractor-test-gallery-tile"
                                       style="display: inline-block;">
             </exploration-summary-tile>
@@ -107,6 +108,7 @@
 
   {% include 'components/exploration_creation_button_modal.html' %}
   {% include 'components/profile_link_image_directive.html' %}
+  {% include 'components/circular_image_directive.html' %}
   {% include 'components/search_bar_directive.html' %}
 {% endblock %}
 
@@ -115,6 +117,7 @@
   <script>
     {{ include_js_file('components/ExplorationCreationButtonService.js') }}
     {{ include_js_file('components/ProfileLinkImageDirective.js') }}
+    {{ include_js_file('components/CircularImageDirective.js') }}
     {{ include_js_file('components/SearchBarDirective.js') }}
     {{ include_js_file('galleries/Gallery.js') }}
   </script>
