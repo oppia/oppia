@@ -71,9 +71,9 @@ oppia.directive('explorationSummaryTile', [function() {
           $scope.getContributorsSummary() || {}).sort(
           function(contributorUsername1, contributorUsername2) {
             var commitsOfContributor1 = $scope.getContributorsSummary()[
-                contributorUsername1];
+                contributorUsername1].num_commits;
             var commitsOfContributor2 = $scope.getContributorsSummary()[
-                contributorUsername2];
+                contributorUsername2].num_commits;
             return commitsOfContributor2 - commitsOfContributor1;
           }
         );
