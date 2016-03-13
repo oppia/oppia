@@ -1062,9 +1062,9 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
                 exploration.id)
         else:
             if contributor_id_to_add in contributors_summary:
-                contributors_summary[contributor_id_to_add]['num_commits'] += 1
+                contributors_summary[contributor_id_to_add] += 1
             else:
-                contributors_summary[contributor_id_to_add]['num_commits'] = 1
+                contributors_summary[contributor_id_to_add] = 1
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
         _get_last_updated_by_human_ms(exploration.id) / 1000.0)
@@ -1089,17 +1089,13 @@ def compute_exploration_contributors_summary(exploration_id):
     """
     snapshots_metadata = get_exploration_snapshots_metadata(exploration_id)
     current_version = len(snapshots_metadata)
-    contributors_summary = collections.defaultdict(
-        lambda: collections.defaultdict(int)
-    )
+    contributors_summary = collections.defaultdict(int)
     while True:
         snapshot_metadata = snapshots_metadata[current_version - 1]
         committer_id = snapshot_metadata['committer_id']
         is_revert = (snapshot_metadata['commit_type'] == 'revert')
-        contributors_summary[committer_id]['profile_picture_data_url'] = \
-            user_services.get_profile_picture_from_user_id(committer_id)
         if not is_revert and committer_id not in feconf.SYSTEM_USER_IDS:
-            contributors_summary[committer_id]['num_commits'] += 1
+            contributors_summary[committer_id] += 1
         if current_version == 1:
             break
 
