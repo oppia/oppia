@@ -101,7 +101,14 @@ class ExplorationDisplayableSummaries(
     def test_get_human_readable_contributors_summary(self):
         contributors_summary = {self.albert_id: 10, self.bob_id: 13}
         self.assertEqual({
-            self.ALBERT_NAME: 10, self.BOB_NAME: 13
+            self.ALBERT_NAME: {
+                'num_commits': 10,
+                'profile_picture_data_url': None
+            },
+            self.BOB_NAME: {
+                'num_commits': 13,
+                'profile_picture_data_url': None
+            }
         }, summary_services.get_human_readable_contributors_summary(
             contributors_summary))
 
@@ -122,7 +129,12 @@ class ExplorationDisplayableSummaries(
             'tags': [],
             'thumbnail_icon_url': '/images/gallery/thumbnails/Lightbulb.svg',
             'language_code': feconf.DEFAULT_LANGUAGE_CODE,
-            'human_readable_contributors_summary': {self.ALBERT_NAME: 2},
+            'human_readable_contributors_summary': {
+                self.ALBERT_NAME: {
+                    'num_commits': 2,
+                    'profile_picture_data_url': None
+                }
+            },
             'id': self.EXP_ID_2,
             'category': u'A category',
             'ratings': feconf.get_empty_ratings(),
