@@ -121,7 +121,7 @@
                       <img src="/images/general/menu.png">
                     </a>
                     <a class="oppia-navbar-brand-name oppia-transition-200" href="/gallery" focus-on="<[LABEL_FOR_CLEARING_FOCUS]>">
-                      <img src="/images/logo/288x128_logo_white.png" class="oppia-logo" ng-class="isWindowNarrow() ? 'oppia-logo-wide' : 'oppia-logo-small'">
+                      <img src="/images/logo/288x128_logo_white.png" class="oppia-logo" ng-class="isWindowNarrow() ? 'oppia-logo-small' : 'oppia-logo-wide'">
                     </a>
                     <!-- This is needed for the correct image to appear when an exploration is shared using G+. -->
                     <a style="display: none;">
@@ -226,15 +226,15 @@
                           </li>
                         {% endif %}
                         {% if nav_mode != 'create' and nav_mode != 'explore' %}
-                          <create-exploration-button ng-if="isWindowNarrow()"></create-exploration-button>
+                          <create-exploration-button ng-if="!isWindowNarrow()"></create-exploration-button>
                           {% if SHOW_CUSTOM_PAGES %}
-                            <li ng-if="isWindowNarrow()" class="oppia-clickable-navbar-element pull-right">
+                            <li ng-if="!isWindowNarrow()" class="oppia-clickable-navbar-element pull-right">
                               <a class="oppia-navbar-tab" href="/forum">
                                 Forum
                               </a>
                             </li>
                           {% endif %}
-                          <li ng-if="isWindowNarrow()" class="dropdown oppia-clickable-dropdown pull-right">
+                          <li ng-if="!isWindowNarrow()" class="dropdown oppia-clickable-dropdown pull-right">
                             <a class="oppia-navbar-tab">
                               About
                               <span class="caret"></span>
@@ -251,7 +251,7 @@
                               {% endif %}
                             </ul>
                           </li>
-                          <li ng-if="isWindowNarrow()" class="oppia-clickable-navbar-element pull-right">
+                          <li ng-if="!isWindowNarrow()" class="oppia-clickable-navbar-element pull-right">
                             <a class="oppia-navbar-tab" href="/gallery">
                               Explore
                             </a>
