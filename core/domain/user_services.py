@@ -128,15 +128,6 @@ def get_email_from_user_id(user_id):
     return user_settings.email
 
 
-def get_profile_picture_data_url_from_user_id(user_id):
-    """Gets the profile picture data url from a given user_id.
-
-    Raises an Exception if the user is not found.
-    """
-    user_settings = get_user_settings(user_id)
-    return user_settings.profile_picture_data_url
-
-
 def get_email_from_username(username):
     """Gets the email for a given username.
 
@@ -207,6 +198,23 @@ def get_users_settings(user_ids):
             ))
         else:
             result.append(None)
+    return result
+
+
+def get_profile_pictures_by_user_ids(user_ids):
+    """Gets the profile_picture_data_url from the domain objects
+    representing the settings for the given user_ids.
+
+    If the given user_id does not exist, the corresponding entry in the
+    returned list is None.
+    """
+    user_settings_models = user_models.UserSettingsModel.get_multi(user_ids)
+    result = {}
+    for model in user_settings_models:
+        if model:
+            result[model.id] = model.profile_picture_data_url
+        else:
+            result[model.id] = None
     return result
 
 
