@@ -194,7 +194,7 @@ oppia.controller('Base', [
       angular.element(evt.currentTarget).parent().removeClass('open');
       $scope.profileDropdownIsActive = false;
     };
-    
+
     $scope.onMouseoverDropdownMenu = function(evt) {
       angular.element(evt.currentTarget).parent().addClass('open');
     };

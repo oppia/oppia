@@ -711,7 +711,7 @@ textarea {
 
 .oppia-editor-navigation > li {
   display: inline-block;
-  padding:0 20px;
+  padding: 0 20px;
 }
 
 .navbar-nav.oppia-navbar-nav > li > a.oppia-navbar-editor-navigation-toggle { 
@@ -735,7 +735,7 @@ textarea {
 .nav .dropdown:hover > .oppia-editor-navigation-dropdown.dropdown-menu > li.active > a,
 .nav .dropdown:hover > .oppia-editor-navigation-dropdown.dropdown-menu > li.active > a:focus,
 .nav .dropdown:hover > .oppia-editor-navigation-dropdown.dropdown-menu > li.active > a:hover {
-  color:#fff;
+  color: #fff;
   background-color: #009688;
 }
 
