@@ -7,19 +7,19 @@
 
         <div class="exploration-summary-avatars" ng-show="avatarsList.length > 0">
           <circular-image ng-if="avatarsList.length > 0"
-                          picture="avatarsList[0].image"
+                          src="avatarsList[0].image"
                           link="avatarsList[0].link"
                           tooltip="<[avatarsList[0].tooltipText | truncate:14]>"
                           tooltip-placement="right"
                           tooltip-append-to-body="true">
           </circular-image>
-            <div class="avatars-num-minus-one" ng-show="avatarsList.length > 1">
-              <span ng-if="!isCommunityOwned()">+</span><[avatarsList.length - 1]>
-            </div>
+          <div class="avatars-num-minus-one" ng-show="avatarsList.length > 1">
+            <span ng-if="!isCommunityOwned()">+</span><[avatarsList.length - 1]>
+          </div>
 
           <div class="all-avatars" style="display: none;">
             <circular-image ng-repeat="avatar in avatarsList | limitTo:MAX_AVATARS_TO_DISPLAY-1:1"
-                            picture="avatar.image"
+                            src="avatar.image"
                             link="avatar.link"
                             tooltip="<[avatar.tooltipText | truncate:14]>"
                             tooltip-placement="right"

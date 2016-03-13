@@ -22,7 +22,7 @@ oppia.directive('circularImage', [function() {
   return {
     restrict: 'E',
     scope: {
-      picture: '&',
+      src: '&',
       link: '&?'
     },
     templateUrl: 'components/circularImage',
