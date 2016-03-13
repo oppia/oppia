@@ -221,6 +221,14 @@ oppia.controller('Base', [
     // Checks the width of the window
     $scope.windowWidth = windowDimensionsService.getWidth();
 
+    //  Method to check if the window size is narrow
+    $scope.isWindowNarrow = function() {
+      if($scope.windowWidth >= 768)
+        return true;
+      else
+        return false;
+    };
+
     $scope.pageHasLoaded = false;
     $scope.pendingSidebarClick = false;
     $scope.sidebarIsShown = false;
