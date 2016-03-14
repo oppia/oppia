@@ -117,7 +117,7 @@
               <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation">
                 <div class="navbar-container">
                   <div class="navbar-header protractor-test-navbar-header pull-left">
-                    <a ng-if="windowWidth < 768" ng-click="openSidebar()" class="navbar-brand oppia-navbar-menu oppia-transition-200">
+                    <a ng-if="isWindowNarrow()" ng-click="openSidebar()" class="navbar-brand oppia-navbar-menu oppia-transition-200">
                       <img src="/images/general/menu.png">
                     </a>
                     <a class="oppia-navbar-brand-name oppia-transition-200" href="/gallery" focus-on="<[LABEL_FOR_CLEARING_FOCUS]>">
@@ -134,7 +134,7 @@
                       <ul class="nav oppia-navbar-nav oppia-navbar-profile">
                         {% if username %}
                           <li class="dropdown pull-right">
-                            <a class="dropdown-toggle oppia-navbar-profile-dropdown-toggle" data-toggle="dropdown" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
+                            <a class="dropdown-toggle oppia-navbar-dropdown-toggle" data-toggle="dropdown" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
                               <div class="oppia-navbar-profile-picture-container" ng-cloak>
                                 {% if profile_picture_data_url %}
                                   <img src="{{profile_picture_data_url}}" class="oppia-navbar-profile-picture img-circle">
@@ -166,7 +166,7 @@
                                 {% endif %}
                               </div>
                             </a>
-                            <ul class="dropdown-menu ng-cloak oppia-navbar-profile-dropdown" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)" ng-show="profileDropdownIsActive">
+                            <ul class="dropdown-menu ng-cloak oppia-navbar-dropdown" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)" ng-show="profileDropdownIsActive">
                               <li>
                                 <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/profile/{{username}}">
                                   <strong>{{username}}</strong>
@@ -212,11 +212,11 @@
                           </li>
                         {% else %}
                           <li class="dropdown oppia-clickable-dropdown pull-right">
-                            <a href class="oppia-navbar-profile-dropdown-toggle" style="font-size: 1em; padding-top: 17px;" ng-click="onLoginButtonClicked('{{login_url}}')">
+                            <a href class="oppia-navbar-dropdown-toggle" style="font-size: 1em; padding-top: 17px;" ng-click="onLoginButtonClicked('{{login_url}}')">
                               Sign in
                               <span class="caret"></span>
                             </a>
-                            <ul class="dropdown-menu oppia-navbar-profile-dropdown" role="menu" style="padding: 0;" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
+                            <ul class="dropdown-menu oppia-navbar-dropdown" role="menu" style="padding: 0;" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
                               <li>
                                 <a href style="padding: 0; width: 200px;" ng-click="onLoginButtonClicked('{{login_url}}')">
                                   <img src="/images/signin/Red-signin-Long-base-44dp.png">
