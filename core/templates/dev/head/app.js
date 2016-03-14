@@ -378,7 +378,7 @@ oppia.factory('windowDimensionsService', ['$window', function($window) {
         document.body.clientWidth);
     },
     registerOnResizeHook: function(hookFn) {
-        onResizeHooks.push(hookFn);
+      onResizeHooks.push(hookFn);
     }
   };
 }]);
