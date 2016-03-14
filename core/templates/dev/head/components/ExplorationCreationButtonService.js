@@ -140,31 +140,37 @@ oppia.factory('ExplorationCreationButtonService', [
       showCreateExplorationModal: function(categoryList) {
         alertsService.clearWarnings();
 
-        siteAnalyticsService.registerOpenExplorationCreationModalEvent();
+        var currentPage = window.location.pathname;
 
-        getModalInstance(categoryList, false).result.then(function(result) {
-          var category = $filter('normalizeWhitespace')(result.category);
-          if (!validatorsService.isValidEntityName(category, true)) {
-            return;
-          }
+        if (currentPage.indexOf('/my_explorations') === -1) {
+          window.location.replace('/my_explorations?mode=create');
+        } else {
+          siteAnalyticsService.registerOpenExplorationCreationModalEvent();
 
-          $rootScope.loadingMessage = 'Creating exploration';
-          $http.post('/contributehandler/create_new', {
-            category: category,
-            language_code: result.languageCode,
-            objective: $filter('normalizeWhitespace')(result.objective),
-            title: result.title
-          }).success(function(data) {
-            siteAnalyticsService.registerCreateNewExplorationEvent(
-              data.explorationId);
-            $timeout(function() {
-              $window.location = '/create/' + data.explorationId;
-            }, 150);
-            return false;
-          }).error(function() {
-            $rootScope.loadingMessage = '';
+          getModalInstance(categoryList, false).result.then(function(result) {
+            var category = $filter('normalizeWhitespace')(result.category);
+            if (!validatorsService.isValidEntityName(category, true)) {
+              return;
+            }
+
+            $rootScope.loadingMessage = 'Creating exploration';
+            $http.post('/contributehandler/create_new', {
+              category: category,
+              language_code: result.languageCode,
+              objective: $filter('normalizeWhitespace')(result.objective),
+              title: result.title
+            }).success(function(data) {
+              siteAnalyticsService.registerCreateNewExplorationEvent(
+                data.explorationId);
+              $timeout(function() {
+                $window.location = '/create/' + data.explorationId;
+              }, 150);
+              return false;
+            }).error(function() {
+              $rootScope.loadingMessage = '';
+            });
           });
-        });
+        }
       },
       showUploadExplorationModal: function(categoryList) {
         alertsService.clearWarnings();
