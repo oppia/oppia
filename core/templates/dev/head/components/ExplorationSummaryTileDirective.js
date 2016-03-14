@@ -71,12 +71,13 @@ oppia.directive('explorationSummaryTile', [function() {
       function(
         $scope, $http,
         oppiaDatetimeFormatter, RatingComputationService) {
+        var contributorsSummary = $scope.getContributorsSummary();
         $scope.contributors = Object.keys(
-          $scope.getContributorsSummary() || {}).sort(
+          contributorsSummary || {}).sort(
           function(contributorUsername1, contributorUsername2) {
-            var commitsOfContributor1 = $scope.getContributorsSummary()[
+            var commitsOfContributor1 = contributorsSummary[
                 contributorUsername1].num_commits;
-            var commitsOfContributor2 = $scope.getContributorsSummary()[
+            var commitsOfContributor2 = contributorsSummary[
                 contributorUsername2].num_commits;
             return commitsOfContributor2 - commitsOfContributor1;
           }
@@ -87,22 +88,11 @@ oppia.directive('explorationSummaryTile', [function() {
           var DEFAULT_PROFILE_IMAGE_PATH = '/images/avatar/user_blue_72px.png';
 
           var avatarData = {
-            image: DEFAULT_PROFILE_IMAGE_PATH,
+            image: contributorsSummary[
+              contributorName].profile_picture_data_url ||
+              DEFAULT_PROFILE_IMAGE_PATH,
             tooltipText: contributorName
           };
-
-          var profileImageUrl = (
-            '/preferenceshandler/profile_picture_by_username/' +
-              contributorName);
-          // Returns a promise for the user profile picture, or
-          // the default image if user is not logged in or
-          // has not uploaded a profile picture, or
-          // the player is in preview mode.
-          $http.get(profileImageUrl).success(function(data) {
-            avatarData.image = (
-              data.profile_picture_data_url_for_username ||
-                DEFAULT_PROFILE_IMAGE_PATH);
-          });
 
           if (GLOBALS.SYSTEM_USERNAMES.indexOf(contributorName) == -1) {
             avatarData.link = '/profile/' + contributorName;
