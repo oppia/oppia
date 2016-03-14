@@ -34,7 +34,7 @@ oppia.directive('profileLinkImage', [function() {
 
       $scope.profileImageUrl = (
         '/preferenceshandler/profile_picture_by_username/' +
-          $scope.username());
+        $scope.username());
       $scope.profilePicture = DEFAULT_PROFILE_IMAGE_PATH;
 
       // Returns a promise for the user profile picture, or the default image

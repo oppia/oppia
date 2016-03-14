@@ -90,7 +90,15 @@ oppia.controller('LearnerViewBreadcrumb', [
             $scope.averageRating = (
               RatingComputationService.computeAverageRating(expInfo.ratings));
             $scope.contributorNames = Object.keys(
-              expInfo.human_readable_contributors_summary);
+              expInfo.human_readable_contributors_summary).sort(
+                function(contributorUsername1, contributorUsername2) {
+                  var commitsOfContributor1 = contributorsSummary[
+                    contributorUsername1].num_commits;
+                  var commitsOfContributor2 = contributorsSummary[
+                    contributorUsername2].num_commits;
+                  return commitsOfContributor2 - commitsOfContributor1;
+                }
+              );
             $scope.explorationId = expInfo.id;
             $scope.escapedTwitterText = (
               oppiaHtmlEscaper.unescapedStrToEscapedStr(

@@ -71,9 +71,9 @@ oppia.directive('explorationSummaryTile', [function() {
       function(
         $scope, $http,
         oppiaDatetimeFormatter, RatingComputationService) {
-        var contributorsSummary = $scope.getContributorsSummary();
+        var contributorsSummary = $scope.getContributorsSummary() || {};
         $scope.contributors = Object.keys(
-          contributorsSummary || {}).sort(
+          contributorsSummary).sort(
           function(contributorUsername1, contributorUsername2) {
             var commitsOfContributor1 = contributorsSummary[
                 contributorUsername1].num_commits;
