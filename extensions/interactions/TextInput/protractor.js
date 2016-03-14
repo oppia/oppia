@@ -27,12 +27,55 @@ var customizeInteraction = function(elem, placeholderText, heightOfBox) {
   ).setValue(heightOfBox);
 };
 
-var expectInteractionDetailsToMatch = function(elem) {
-  // TODO (Jacob) add checks for the placeholder text and the height of the
-  // textbox.
+var expectInteractionDetailsToMatch = function(elem, placeholderText,
+  heightOfBox) {
+  var textInputElem = elem.element(by.tagName('oppia-interactive-text-input'));
   expect(
-    elem.element(by.tagName('oppia-interactive-text-input')).isPresent()
+    textInputElem.isPresent()
   ).toBe(true);
+
+  var isCheckForPlaceHolder = (typeof placeholderText !== 'undefined');
+  var isCheckForBoxHeight = (typeof heightOfBox !== 'undefined');
+
+  if (isCheckForPlaceHolder || isCheckForBoxHeight) {
+    var textAreaElem = textInputElem.element(by.tagName('textarea'));
+    var inputElem = textInputElem.element(by.tagName('input'));
+
+    if (isCheckForPlaceHolder) {
+      textAreaElem.isPresent().then(function(present) {
+        if (present) {
+          textAreaElem.getAttribute('placeholder').then(function(placeholder) {
+            expect(placeholder).toEqual(placeholderText);
+          });
+        } else {
+          inputElem.isPresent().then(function(present) {
+            if (present) {
+              inputElem.getAttribute('placeholder').then(function(placeholder) {
+                expect(placeholder).toEqual(placeholderText);
+              });
+            }
+          });
+        }
+      });
+    }
+
+    if (isCheckForBoxHeight) {
+      textAreaElem.isPresent().then(function(present) {
+        if (present) {
+          textAreaElem.getAttribute('rows').then(function(rows) {
+            var height = parseInt(rows);
+            expect(height).toEqual(heightOfBox);
+          });
+        } else {
+          inputElem.isPresent().then(function(present) {
+            if (present) {
+              expect(heightOfBox).toEqual(1);
+            }
+          });
+        }
+      });
+    }
+  }
 };
 
 var submitAnswer = function(elem, answer) {
