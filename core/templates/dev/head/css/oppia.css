@@ -2343,36 +2343,21 @@ div#ng-curtain {
   padding: 15px 40px;
 }
 
-.oppia-notification-type {
-  float: left;
-  margin-right: 5px;
+.oppia-notification-content {
+  display: inline-block;
 }
 
 .oppia-notification-last-updated {
   float: right;
 }
 
-.clearfix:after {
-  content: ".";
-  clear: both;
-  display: block;
-  height: 0;
-  visibility: hidden;
-}
-
-.oppia-notification-author-username,
-.oppia-notification-subject {
-  float: left;
-}
-
 @media all and (max-width: 500px) {
-  .oppia-notification-type {
-    float: left;
+
+  .oppia-notification-content,
+  .oppia-notification-last-updated {
+    display: inline;
   }
 
-  .oppia-notification-author-username {
-    float: none;
-  }
 }
 
 .oppia-about-anchor {
