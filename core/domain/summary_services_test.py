@@ -36,7 +36,7 @@ class ExplorationDisplayableSummaries(
     USER_C_EMAIL = 'c@example.com'
     USER_D_EMAIL = 'd@example.com'
 
-    USER_C_PROFILE_PICTURE = 'c_profile_picture.png'
+    USER_C_PROFILE_PICTURE = 'c_profile_picture'
 
     EXP_ID_1 = 'eid1'
     EXP_ID_2 = 'eid2'
@@ -62,7 +62,7 @@ class ExplorationDisplayableSummaries(
         - (9) Albert publishes EXP_ID_3
         - (10) Albert deletes EXP_ID_3
 
-        - (1) User_3(has a profile_picture) creates EXP_ID_4.
+        - (1) User_3 (has a profile_picture) creates EXP_ID_4.
         - (2) User_4 edits the title of EXP_ID_4.
         - (3) User_4 edits the title of EXP_ID_4.
         """
