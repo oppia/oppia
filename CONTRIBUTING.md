@@ -109,7 +109,7 @@ Here's how to make a one-off code change. (If you're working on a larger feature
 
 ### Notes
 
-Since linting has been added, author tags are omitted in all files. Author tags also tend to be inaccurate or become stale when the author is no longer a regular contributor. 
+We do not use author tags in files, since they tend to be inaccurate or become stale when the author is no longer a regular contributor. However, you can still find the author of a particular change in a file by running the command:
 
 You can find the author of a particular change in a file as follows: 
 
@@ -123,7 +123,7 @@ To confine the search of an author between particular lines in a file, you can u
 ```
 git blame -L 40,60 file-name
 ```
-The following output will only show lines 40 to 60 of the particular file.
+The output will then show lines 40 to 60 of the particular file.
 
 For more `git blame` options, you can visit the [git blame documentation](https://git-scm.com/docs/git-blame).
 
