@@ -21,10 +21,12 @@
 // Service for the create/upload exploration buttons and modals.
 oppia.factory('ExplorationCreationButtonService', [
   '$filter', '$http', '$modal', '$timeout', '$rootScope', '$window',
-  'validatorsService', 'alertsService', 'focusService', 'siteAnalyticsService',
+  'validatorsService', 'alertsService', 'focusService',
+  'siteAnalyticsService', 'urlService',
   function(
       $filter, $http, $modal, $timeout, $rootScope, $window,
-      validatorsService, alertsService, focusService, siteAnalyticsService) {
+      validatorsService, alertsService, focusService,
+      siteAnalyticsService, urlService) {
     var getModalInstance = function(categoryList, isUploadModal) {
       var modalInstance = $modal.open({
         backdrop: true,
@@ -140,31 +142,37 @@ oppia.factory('ExplorationCreationButtonService', [
       showCreateExplorationModal: function(categoryList) {
         alertsService.clearWarnings();
 
-        siteAnalyticsService.registerOpenExplorationCreationModalEvent();
+        var currentPathname = urlService.getPathname();
 
-        getModalInstance(categoryList, false).result.then(function(result) {
-          var category = $filter('normalizeWhitespace')(result.category);
-          if (!validatorsService.isValidEntityName(category, true)) {
-            return;
-          }
+        if (currentPathname !== '/my_explorations') {
+          window.location.replace('/my_explorations?mode=create');
+        } else {
+          siteAnalyticsService.registerOpenExplorationCreationModalEvent();
 
-          $rootScope.loadingMessage = 'Creating exploration';
-          $http.post('/contributehandler/create_new', {
-            category: category,
-            language_code: result.languageCode,
-            objective: $filter('normalizeWhitespace')(result.objective),
-            title: result.title
-          }).success(function(data) {
-            siteAnalyticsService.registerCreateNewExplorationEvent(
-              data.explorationId);
-            $timeout(function() {
-              $window.location = '/create/' + data.explorationId;
-            }, 150);
-            return false;
-          }).error(function() {
-            $rootScope.loadingMessage = '';
+          getModalInstance(categoryList, false).result.then(function(result) {
+            var category = $filter('normalizeWhitespace')(result.category);
+            if (!validatorsService.isValidEntityName(category, true)) {
+              return;
+            }
+
+            $rootScope.loadingMessage = 'Creating exploration';
+            $http.post('/contributehandler/create_new', {
+              category: category,
+              language_code: result.languageCode,
+              objective: $filter('normalizeWhitespace')(result.objective),
+              title: result.title
+            }).success(function(data) {
+              siteAnalyticsService.registerCreateNewExplorationEvent(
+                data.explorationId);
+              $timeout(function() {
+                $window.location = '/create/' + data.explorationId;
+              }, 150);
+              return false;
+            }).error(function() {
+              $rootScope.loadingMessage = '';
+            });
           });
-        });
+        }
       },
       showUploadExplorationModal: function(categoryList) {
         alertsService.clearWarnings();
