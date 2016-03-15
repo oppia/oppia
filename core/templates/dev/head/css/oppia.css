@@ -2162,7 +2162,9 @@ div#ng-curtain {
 .oppia-navbar-profile > li > a:focus,
 .oppia-navbar-profile .open > a,
 .oppia-navbar-profile .open > a:hover,
-.oppia-navbar-profile .open > a:focus {
+.oppia-navbar-profile .open > a:focus,
+.oppia-navbar-tabs > li > a:hover,
+.oppia-navbar-tabs > li > a:focus {
   background-color: #fff;
   color: #009688;
 }
