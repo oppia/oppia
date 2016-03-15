@@ -189,8 +189,7 @@ class ExplorationDisplayableSummaries(
             'ratings': feconf.get_empty_ratings(),
             'title': u'Exploration 2 Albert title',
             'num_views': 0,
-            'objective': u'An objective',
-            'contributor_names': [self.ALBERT_NAME]
+            'objective': u'An objective'
         }
         self.assertIn('last_updated_msec', displayable_summaries[0])
         self.assertDictContainsSubset(expected_summary,
