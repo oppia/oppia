@@ -1720,8 +1720,6 @@ oppia-parameter {
 }
 .oppia-dashboard-row-recent {
   background: #fff4ca;
-  cursor: pointer;
-  margin-bottom: -5px;
 }
 .oppia-dashboard-row-recent:hover {
   background: #ffe279;
