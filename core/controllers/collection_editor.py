@@ -21,6 +21,7 @@ from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import rights_manager
 from core.platform import models
+import feconf
 import utils
 
 current_user_services = models.Registry.import_current_user_services()
@@ -121,7 +122,21 @@ class CollectionEditorPage(CollectionEditorHandler):
             'is_public': rights_manager.is_collection_public(collection_id),
             'can_edit': can_edit,
             'collection_id': collection.id,
-            'title': collection.title
+            'title': collection.title,
+            'SHOW_COLLECTION_NAVIGATION_TAB_MAIN': (
+                feconf.SHOW_COLLECTION_NAVIGATION_TAB_MAIN),
+            'SHOW_COLLECTION_NAVIGATION_TAB_PREVIEW': (
+                feconf.SHOW_COLLECTION_NAVIGATION_TAB_PREVIEW),
+            'SHOW_COLLECTION_NAVIGATION_TAB_SETTINGS': (
+                feconf.SHOW_COLLECTION_NAVIGATION_TAB_SETTINGS),
+            'SHOW_COLLECTION_NAVIGATION_TAB_HISTORY': (
+                feconf.SHOW_COLLECTION_NAVIGATION_TAB_HISTORY),
+            'SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK': (
+                feconf.SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK),
+            'SHOW_COLLECTION_NAVIGATION_TAB_STATS': (
+                feconf.SHOW_COLLECTION_NAVIGATION_TAB_STATS),
+            'SHOW_COLLECTION_NAVIGATION_TAB_HELP': (
+                feconf.SHOW_COLLECTION_NAVIGATION_TAB_HELP)
         })
 
         self.render_template('collection_editor/collection_editor.html')
