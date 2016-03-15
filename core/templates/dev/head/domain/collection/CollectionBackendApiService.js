@@ -15,8 +15,6 @@
 /**
  * @fileoverview Service to retrieve information about collections from the
  * backend.
- *
- * @author henning.benmax@gmail.com (Ben Henning)
  */
 
 // TODO(bhenning): For preview mode, this service should be replaced by a

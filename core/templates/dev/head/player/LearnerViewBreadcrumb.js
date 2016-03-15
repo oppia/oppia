@@ -15,8 +15,6 @@
 /**
  * @fileoverview Controllers for the learner view breadcrumb section of the
  * navbar.
- *
- * @author sean@seanlip.org (Sean Lip)
  */
 
 oppia.controller('LearnerViewBreadcrumb', [
@@ -89,7 +87,17 @@ oppia.controller('LearnerViewBreadcrumb', [
 
             $scope.averageRating = (
               RatingComputationService.computeAverageRating(expInfo.ratings));
-            $scope.contributorNames = expInfo.contributor_names;
+            var contributorsSummary = (
+              expInfo.human_readable_contributors_summary || {});
+            $scope.contributorNames = Object.keys(contributorsSummary).sort(
+              function(contributorUsername1, contributorUsername2) {
+                var commitsOfContributor1 = contributorsSummary[
+                  contributorUsername1].num_commits;
+                var commitsOfContributor2 = contributorsSummary[
+                  contributorUsername2].num_commits;
+                return commitsOfContributor2 - commitsOfContributor1;
+              }
+            );
             $scope.explorationId = expInfo.id;
             $scope.escapedTwitterText = (
               oppiaHtmlEscaper.unescapedStrToEscapedStr(

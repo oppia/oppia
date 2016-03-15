@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview End-to-end tests of the fallbacks functionality.
- *
- * @author Sean Lip (sean@seanlip.org)
  */
 
 var general = require('../protractor_utils/general.js');

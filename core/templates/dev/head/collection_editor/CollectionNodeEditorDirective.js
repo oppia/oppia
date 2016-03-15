@@ -16,8 +16,6 @@
  * @fileoverview Directive for displaying and editing a collection node. This
  * directive allows creators to add and remove prerequisite and acquired skills,
  * and also delete the collection node represented by this directive.
- *
- * @author mgowano@google.com (Abraham Mgowano)
  */
 
 oppia.directive('collectionNodeEditorDirective', [function() {

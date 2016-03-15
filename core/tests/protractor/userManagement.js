@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview End-to-end tests for user management.
- *
- * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var general = require('../protractor_utils/general.js');

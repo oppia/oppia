@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Unit tests for generic services.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 describe('Validators service', function() {

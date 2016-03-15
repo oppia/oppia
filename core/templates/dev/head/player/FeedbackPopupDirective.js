@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Directive for the feedback popup.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 // This directive is unusual in that it should only be invoked indirectly, as

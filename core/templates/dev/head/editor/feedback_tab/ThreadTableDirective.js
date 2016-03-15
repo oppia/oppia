@@ -15,8 +15,6 @@
 /**
  * @fileoverview Directive for displaying the list of threads in the feedback
  * tab of the exploration editor.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.directive('threadTable', [function() {

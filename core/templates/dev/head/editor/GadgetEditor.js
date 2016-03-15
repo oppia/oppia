@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Controller for a state's gadgets editor.
- *
- * @author vjoisar@google.com (Vishal Joisar)
  */
 
 // Controls adding, deleting and updating gadgets.

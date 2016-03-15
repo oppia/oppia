@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Oppia's base controller.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.constant('CATEGORY_LIST', [
@@ -97,11 +95,6 @@ oppia.controller('Base', [
 
     // If this is nonempty, the whole page goes into 'Loading...' mode.
     $rootScope.loadingMessage = '';
-    // Method to call windowSize on resizing the window
-    $window.onresize = function() {
-      $scope.windowWidth = windowDimensionsService.getWidth();
-      $scope.$apply();
-    };
 
     if (GLOBALS.userIsLoggedIn) {
       // Show the number of unseen notifications in the navbar and page title,
@@ -218,8 +211,14 @@ oppia.controller('Base', [
       return false;
     };
 
-    // Checks the width of the window
-    $scope.windowWidth = windowDimensionsService.getWidth();
+    $scope.isWindowNarrow = windowDimensionsService.getWidth() <= 1171;
+
+    //  Method to check if the window size is narrow
+    $scope.recomputeWindowWidth = function() {
+      $scope.isWindowNarrow = windowDimensionsService.getWidth() <= 1171;
+      $scope.$apply();
+    };
+    windowDimensionsService.registerOnResizeHook($scope.recomputeWindowWidth);
 
     $scope.pageHasLoaded = false;
     $scope.pendingSidebarClick = false;

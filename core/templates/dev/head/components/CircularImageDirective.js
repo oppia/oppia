@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2015 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,19 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives for creating text links to a user's profile page.
+ * @fileoverview Displays circled images with linking (when available).
  */
 
-oppia.directive('profileLinkText', [function() {
+oppia.directive('circularImage', [function() {
   return {
     restrict: 'E',
     scope: {
-      username: '&'
+      src: '&',
+      link: '&?'
     },
-    templateUrl: 'components/profileLinkText',
+    templateUrl: 'components/circularImage',
     controller: ['$scope', function($scope) {
-      $scope.isUsernameLinkable = function(username) {
-        return GLOBALS.SYSTEM_USERNAMES.indexOf(username) == -1;
+      $scope.isLinkAvailable = function() {
+        return $scope.link() ? true : false;
       };
     }]
   };

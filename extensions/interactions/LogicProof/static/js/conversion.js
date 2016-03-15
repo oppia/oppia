@@ -15,7 +15,6 @@
 /**
  * @fileoverview Functions to convert symbols available on the keyboard to
  *   desired logic symbols as a user types.
- * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var logicProofConversion = (function() {

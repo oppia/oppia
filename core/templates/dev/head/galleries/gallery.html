@@ -90,14 +90,15 @@
   {% include 'components/exploration_creation_button_modal.html' %}
   {% include 'components/profile_link_image_directive.html' %}
   {% include 'components/search_bar_directive.html' %}
+  {% include 'components/circular_image_directive.html' %}
 {% endblock %}
 
 {% block footer_js %}
   {{ super() }}
   <script>
-    {{ include_js_file('components/ExplorationCreationButtonService.js') }}
     {{ include_js_file('components/ProfileLinkImageDirective.js') }}
     {{ include_js_file('components/SearchBarDirective.js') }}
+    {{ include_js_file('components/CircularImageDirective.js') }}
     {{ include_js_file('galleries/Gallery.js') }}
   </script>
 {% endblock footer_js %}

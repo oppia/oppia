@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Unit tests for CollectionBackendApiService.
- *
- * @author henning.benmax@gmail.com (Ben Henning)
  */
 
 describe('Collection backend API service', function() {

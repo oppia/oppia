@@ -16,7 +16,6 @@
  * @fileoverview These functions are used to build defaultData.js. In future
     they should be made available to exploration editors to change the data
     used in an instance of the LogicProof interaction.
- * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var logicProofTeacher2 = (function() {

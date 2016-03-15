@@ -2146,11 +2146,14 @@ div#ng-curtain {
   margin-left: 6px;
 }
 
+.oppia-navbar-tabs {
+  min-width: 525px;
+}
 .nav > li > a.oppia-navbar-tab {
   font-size: 1em;
   padding-top: 17px;
 }
-.oppia-navbar-profile-dropdown-toggle,
+.oppia-navbar-dropdown-toggle,
 .oppia-navbar-tab {
   height: 56px;
   color: #fff;
@@ -2159,23 +2162,21 @@ div#ng-curtain {
 .oppia-navbar-profile > li > a:focus,
 .oppia-navbar-profile .open > a,
 .oppia-navbar-profile .open > a:hover,
-.oppia-navbar-profile .open > a:focus {
+.oppia-navbar-profile .open > a:focus,
+.oppia-navbar-tabs > li > a:hover,
+.oppia-navbar-tabs > li > a:focus {
   background-color: #fff;
   color: #009688;
 }
-.oppia-navbar-profile-dropdown,
 .oppia-navbar-dropdown {
   border: 0;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
   margin-top: 0;
 }
-.oppia-navbar-profile-dropdown > li > a,
 .oppia-navbar-dropdown > li > a {
   color: #009688;
 }
-.oppia-navbar-profile-dropdown > li > a:hover,
-.oppia-navbar-profile-dropdown > li > a:focus,
 .oppia-navbar-dropdown > li > a:hover,
 .oppia-navbar-dropdown > li > a:focus {
   background-color: #eee;

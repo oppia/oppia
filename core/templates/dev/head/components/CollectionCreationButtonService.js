@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Modal and functionality for the create collection button.
- *
- * @author henning.benmax@gmail.com (Ben Henning)
  */
 
 // TODO(bhenning): Refactor this to match the frontend design spec and reduce

@@ -117,11 +117,11 @@
               <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation">
                 <div class="navbar-container">
                   <div class="navbar-header protractor-test-navbar-header pull-left">
-                    <a ng-if="windowWidth < 768" ng-click="openSidebar()" class="navbar-brand oppia-navbar-menu oppia-transition-200">
+                    <a ng-if="isWindowNarrow" ng-click="openSidebar()" class="navbar-brand oppia-navbar-menu oppia-transition-200">
                       <img src="/images/general/menu.png">
                     </a>
                     <a class="oppia-navbar-brand-name oppia-transition-200" href="/gallery" focus-on="<[LABEL_FOR_CLEARING_FOCUS]>">
-                      <img src="/images/logo/288x128_logo_white.png" class="oppia-logo" ng-class="windowWidth > 768 ? 'oppia-logo-wide' : 'oppia-logo-small'">
+                      <img src="/images/logo/288x128_logo_white.png" class="oppia-logo" ng-class="isWindowNarrow ? 'oppia-logo-small' : 'oppia-logo-wide'">
                     </a>
                     <!-- This is needed for the correct image to appear when an exploration is shared using G+. -->
                     <a style="display: none;">
@@ -134,7 +134,7 @@
                       <ul class="nav oppia-navbar-nav oppia-navbar-profile">
                         {% if username %}
                           <li class="dropdown pull-right">
-                            <a class="dropdown-toggle oppia-navbar-profile-dropdown-toggle" data-toggle="dropdown" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
+                            <a class="dropdown-toggle oppia-navbar-dropdown-toggle" data-toggle="dropdown" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
                               <div class="oppia-navbar-profile-picture-container" ng-cloak>
                                 {% if profile_picture_data_url %}
                                   <img src="{{profile_picture_data_url}}" class="oppia-navbar-profile-picture img-circle">
@@ -166,7 +166,7 @@
                                 {% endif %}
                               </div>
                             </a>
-                            <ul class="dropdown-menu ng-cloak oppia-navbar-profile-dropdown" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)" ng-show="profileDropdownIsActive">
+                            <ul class="dropdown-menu ng-cloak oppia-navbar-dropdown" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)" ng-show="profileDropdownIsActive">
                               <li>
                                 <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/profile/{{username}}">
                                   <strong>{{username}}</strong>
@@ -212,11 +212,11 @@
                           </li>
                         {% else %}
                           <li class="dropdown oppia-clickable-dropdown pull-right">
-                            <a href class="oppia-navbar-profile-dropdown-toggle" style="font-size: 1em; padding-top: 17px;" ng-click="onLoginButtonClicked('{{login_url}}')">
+                            <a href class="oppia-navbar-dropdown-toggle" style="font-size: 1em; padding-top: 17px;" ng-click="onLoginButtonClicked('{{login_url}}')">
                               Sign in
                               <span class="caret"></span>
                             </a>
-                            <ul class="dropdown-menu oppia-navbar-profile-dropdown" role="menu" style="padding: 0;" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
+                            <ul class="dropdown-menu oppia-navbar-dropdown" role="menu" style="padding: 0;" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
                               <li>
                                 <a href style="padding: 0; width: 200px;" ng-click="onLoginButtonClicked('{{login_url}}')">
                                   <img src="/images/signin/Red-signin-Long-base-44dp.png">
@@ -226,36 +226,38 @@
                           </li>
                         {% endif %}
                         {% if nav_mode != 'create' and nav_mode != 'explore' %}
-                          <create-exploration-button ng-if="windowWidth > 768"></create-exploration-button>
-                          {% if SHOW_CUSTOM_PAGES %}
-                            <li ng-if="windowWidth > 768" class="oppia-clickable-navbar-element pull-right">
-                              <a class="oppia-navbar-tab" href="/forum">
-                                Forum
+                          <ul ng-if="!isWindowNarrow" class="nav oppia-navbar-tabs">
+                            <create-exploration-button></create-exploration-button>
+                            {% if SHOW_CUSTOM_PAGES %}
+                              <li class="oppia-clickable-navbar-element pull-right">
+                                <a class="oppia-navbar-tab" href="/forum">
+                                  Forum
+                                </a>
+                              </li>
+                            {% endif %}
+                            <li class="dropdown oppia-clickable-dropdown pull-right">
+                              <a class="oppia-navbar-tab">
+                                About
+                                <span class="caret"></span>
+                              </a>
+                              <ul class="dropdown-menu oppia-navbar-dropdown" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
+                                <li><a href="/about">About Oppia</a></li>
+                                <li><a href="/participate">Participation Playbook</a></li>
+                                {% for additional_link in SIDEBAR_MENU_ADDITIONAL_LINKS %}
+                                  <li><a href="{{additional_link['link']}}">{{additional_link['name']}}</a></li>
+                                {% endfor %}
+                                {% if SHOW_CUSTOM_PAGES %}
+                                  <li><a href="/terms">Terms of Service</a></li>
+                                  <li><a href="/privacy">Privacy Policy</a></li>
+                                {% endif %}
+                              </ul>
+                            </li>
+                            <li class="oppia-clickable-navbar-element pull-right">
+                              <a class="oppia-navbar-tab" href="/gallery">
+                                Explore
                               </a>
                             </li>
-                          {% endif %}
-                          <li ng-if="windowWidth > 768" class="dropdown oppia-clickable-dropdown pull-right">
-                            <a class="oppia-navbar-tab">
-                              About
-                              <span class="caret"></span>
-                            </a>
-                            <ul class="dropdown-menu oppia-navbar-dropdown" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
-                              <li><a href="/about">About Oppia</a></li>
-                              <li><a href="/participate">Participation Playbook</a></li>
-                              {% for additional_link in SIDEBAR_MENU_ADDITIONAL_LINKS %}
-                                <li><a href="{{additional_link['link']}}">{{additional_link['name']}}</a></li>
-                              {% endfor %}
-                              {% if SHOW_CUSTOM_PAGES %}
-                                <li><a href="/terms">Terms of Service</a></li>
-                                <li><a href="/privacy">Privacy Policy</a></li>
-                              {% endif %}
-                            </ul>
-                          </li>
-                          <li ng-if="windowWidth > 768" class="oppia-clickable-navbar-element pull-right">
-                            <a class="oppia-navbar-tab" href="/gallery">
-                              Explore
-                            </a>
-                          </li>
+                          </ul>
                         {% endif %}
                       </ul>
                     </div>
@@ -269,7 +271,6 @@
                     {% endblock %}
                   </div>
                 </div>
-            </div>
               </nav>
 
               <div class="oppia-top-of-page-padding">
@@ -313,6 +314,7 @@
       {{ include_js_file('base.js') }}
       {{ include_js_file('directives.js') }}
       {{ include_js_file('filters.js') }}
+
       {{ include_js_file('forms/formBuilder.js') }}
 
       {{ include_js_file('services/alertsService.js') }}
@@ -327,6 +329,7 @@
       {{ include_js_file('components/RatingDisplayDirective.js')}}
       {{ include_js_file('components/Select2DropdownDirective.js') }}
       {{ include_js_file('components/CreateExplorationButtonDirective.js') }}
+      {{ include_js_file('components/ExplorationCreationButtonService.js') }}
       {{ include_js_file('components/activityTilesInfinityGrid.js') }}
 
       {{ include_js_file('expressions/expressionSyntaxTree.js') }}

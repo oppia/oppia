@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Unit tests for CollectionRightsBackendApiService.
- *
- * @author henning.benmax@gmail.com (Ben Henning)
  */
 
 describe('Collection rights backend API service', function() {

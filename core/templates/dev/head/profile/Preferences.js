@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Data and controllers for the Oppia 'edit preferences' page.
- *
- * @author sfederwisch@google.com (Stephanie Federwisch)
  */
 
 oppia.controller('Preferences', [

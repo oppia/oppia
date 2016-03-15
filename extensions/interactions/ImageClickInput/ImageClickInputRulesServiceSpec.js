@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Unit tests for Image Click Input rules.
- *
- * @author wxyxinyu@gmail.com (Xinyu Wu)
  */
 
 describe('Image Click Input rules service', function() {

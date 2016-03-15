@@ -15,8 +15,6 @@
 /**
  * @fileoverview Controllers, services and filters for responses corresponding
  * to a state's interaction and answer groups.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 // A state-specific cache for interaction handlers. It stores handlers

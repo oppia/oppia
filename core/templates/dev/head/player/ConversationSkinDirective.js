@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Controller for the conversation skin.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 // Note: This file should be assumed to be in an IIFE, and the constants below

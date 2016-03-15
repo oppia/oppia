@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Service for handling all gadget validation.
- *
- * @author vjoisar@google.com (Vishal Joisar)
  */
 oppia.factory('gadgetValidationService', [
   '$filter', 'alertsService', 'validatorsService', 'editorContextService',
