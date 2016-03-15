@@ -3,7 +3,7 @@ oppia.directive('activityTilesInfinityGrid', [function() {
     restrict: 'E',
     templateUrl: 'components/activityTilesInfinityGrid',
     controller: [
-      '$scope', '$rootScope', '$modal', '$window',
+      '$scope', '$rootScope', '$modal', '$window', 'searchService',
       function($scope, $rootScope, $modal, $window, searchService) {
         $scope.showMoreExplorations = function() {
           if (!$rootScope.loadingMessage) {
