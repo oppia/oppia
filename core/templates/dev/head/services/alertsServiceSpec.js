@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Unit tests for the Alerts Service.
- *
- * @author hitesh96db@gmail.com (Hitesh Sharma)
  */
 
 describe('Alerts Service', function() {

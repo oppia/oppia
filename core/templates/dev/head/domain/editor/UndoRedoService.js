@@ -15,8 +15,6 @@
 /**
  * @fileoverview Service which maintains a stack of changes to a domain object.
  * Changes may be undone, redone, or replaced.
- *
- * @author henning.benmax@gmail.com (Ben Henning)
  */
 
 /**

@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview End-to-end tests of the history tab.
- *
- * @author Xinyu Wu (wxyxinyu@gmail.com)
  */
 
 var general = require('../protractor_utils/general.js');

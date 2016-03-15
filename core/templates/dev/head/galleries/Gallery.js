@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Data and controllers for the Oppia contributors' gallery page.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 // Overwrite the default ui-bootstrap carousel template to remove the

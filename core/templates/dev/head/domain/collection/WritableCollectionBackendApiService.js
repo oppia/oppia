@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Service to send changes to a collection to the backend.
- *
- * @author henning.benmax@gmail.com (Ben Henning)
  */
 
 // TODO(bhenning): I think that this might be better merged with the

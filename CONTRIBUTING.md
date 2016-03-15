@@ -107,6 +107,26 @@ Here's how to make a one-off code change. (If you're working on a larger feature
 
 7. **Celebrate.** Congratulations, you have contributed to Oppia!
 
+### Notes
+
+Since linting has been added, author tags are omitted in all files. Author tags also tend to be inaccurate or become stale when the author is no longer a regular contributor. 
+
+You can find the author of a particular change in a file as follows: 
+
+```
+git blame file-name
+```
+The output will show the latest commit SHA, author, date, and time of commit for each line.
+
+To confine the search of an author between particular lines in a file, you can use:
+
+```
+git blame -L 40,60 file-name
+```
+The following output will only show lines 40 to 60 of the particular file.
+
+For more `git blame` options, you can visit the [git blame documentation](https://git-scm.com/docs/git-blame).
+
 ## Communication channels
 
 ### Mailing lists

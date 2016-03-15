@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Directive for the answer group editor.
- *
- * @author bhenning@google.com (Ben Henning)
  */
 
 oppia.directive('answerGroupEditor', [function() {

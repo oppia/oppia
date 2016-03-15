@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Directive for the rule type selector.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.directive('ruleTypeSelector', [function() {

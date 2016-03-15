@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Unit tests for the editor prerequisites page.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 describe('Signup controller', function() {

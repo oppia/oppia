@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview End-to-end tests of the gadget editor.
- *
- * @author Michael Anuzis (anuzis@google.com)
  */
 
 var general = require('../protractor_utils/general.js');

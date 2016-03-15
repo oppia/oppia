@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Primary controller for the collection editor page.
- *
- * @author mgowano@google.com (Abraham Mgowano)
  */
 
 // TODO(bhenning): These constants should be provided by the backend.

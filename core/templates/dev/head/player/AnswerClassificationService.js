@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Classification service for answer groups.
- *
- * @author wxyxinyu@gmail.com (Xinyu Wu)
  */
 
 oppia.factory('answerClassificationService', [

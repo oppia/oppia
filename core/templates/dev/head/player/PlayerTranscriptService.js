@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Service for the learner view transcript.
- *
- * @author sean@seanlip.org (Sean Lip)
  */
 
 // A service that maintains the transcript of the playthrough (i.e., what cards

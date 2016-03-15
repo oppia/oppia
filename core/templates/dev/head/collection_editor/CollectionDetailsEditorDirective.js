@@ -16,8 +16,6 @@
  * @fileoverview Directive for displaying and editing a collection details.
  * Edit options include: changing the title, objective, and category, and also
  * adding a new exploration.
- *
- * @author mgowano@google.com (Abraham Mgowano)
  */
 
 oppia.directive('collectionDetailsEditorDirective', [function() {

@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview End-to-end tests of the exploration rating feature.
- *
- * @author Shouvik Roy (shouvik@techie.com)
  */
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');

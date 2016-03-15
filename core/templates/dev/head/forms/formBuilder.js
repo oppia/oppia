@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Directives for schema-based form builders.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 // NOTE TO DEVELOPERS: This forms framework accepts an external event

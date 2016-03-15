@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Data and controllers for the Oppia profile page.
- *
- * @author sfederwisch@google.com (Stephanie Federwisch)
  */
 
 oppia.controller('Signup', [

@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Service for the rating functionality in the learner view.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.factory('LearnerViewRatingService', [
