@@ -142,7 +142,8 @@ oppia.factory('ExplorationCreationButtonService', [
 
         var currentPage = window.location.pathname;
 
-        if (currentPage.indexOf('/my_explorations') === -1) {
+        if (currentPage !== '/my_explorations' &&
+          currentPage !== '/my_explorations?mode=create') {
           window.location.replace('/my_explorations?mode=create');
         } else {
           siteAnalyticsService.registerOpenExplorationCreationModalEvent();
