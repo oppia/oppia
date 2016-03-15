@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Directive for the rule editor.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 // This directive controls an editor for selecting the type and input parameters

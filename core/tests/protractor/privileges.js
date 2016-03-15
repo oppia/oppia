@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview End-to-end tests of user editing and viewing rights.
- *
- * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var forms = require('../protractor_utils/forms.js');

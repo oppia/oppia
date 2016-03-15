@@ -15,8 +15,6 @@
 /**
  * @fileoverview Directives that are not associated with reusable components.
  * NB: Reusable component directives should go in the components/ folder.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 // HTML bind directive that trusts the value it is given and also evaluates

@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Tests that ratings are being displayed correctly.
- *
- * @author Jacob Davis
  */
 
 describe('Rating display directive', function() {

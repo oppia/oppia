@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview End-to-end tests of embedding explorations in other websites.
- *
- * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var forms = require('../protractor_utils/forms.js');

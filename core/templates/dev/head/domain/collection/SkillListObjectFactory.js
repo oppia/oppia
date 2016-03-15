@@ -15,8 +15,6 @@
 /**
  * @fileoverview Factory for creating and mutating frontend instances of skill
  * lists used in frontend collection domain objects.
- *
- * @author henning.benmax@gmail.com (Ben Henning)
  */
 
 // TODO(bhenning): Implement validation functions and related tests.

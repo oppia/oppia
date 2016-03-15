@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Displays circled images with linking (when available).
- *
- * @author 526avijit@gmail.com (Avijit Gupta)
  */
 
 oppia.directive('circularImage', [function() {

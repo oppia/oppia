@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Unit tests for the base controller.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 describe('Base controller', function() {

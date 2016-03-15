@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Oppia's base controller.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.constant('CATEGORY_LIST', [

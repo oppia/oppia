@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Service for interpolating expressions.
- *
- * @author kashida@google.com (Koji Ashida)
  */
 
 // Interpolates an HTML or a unicode string containing expressions.

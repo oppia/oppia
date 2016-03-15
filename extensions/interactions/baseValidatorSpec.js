@@ -22,8 +22,6 @@
  * perform basic validation." These simple tests are to ensure the policy of the
  * validator is to defer validation to the baseValidator, since it has its own
  * tests to ensure it is working properly.
- *
- * @author bhenning@google.com (Ben Henning)
  */
 
 describe('Interaction validator', function() {

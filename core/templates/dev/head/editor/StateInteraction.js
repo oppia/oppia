@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Controllers for a state's interaction editor.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 // A state-specific cache for interaction details. It stores customization args

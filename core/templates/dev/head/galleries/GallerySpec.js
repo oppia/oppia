@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Unit tests for the controller of the gallery page.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 describe('Gallery controller', function() {

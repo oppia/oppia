@@ -15,8 +15,6 @@
 /**
  * @fileoverview Directive for creating a list of collection nodes which link to
  * playing the exploration in each node.
- *
- * @author henning.benmax@google.com (Ben Henning)
  */
 
 oppia.directive('collectionNodeList', [function() {

@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Controller for the exploration editor feedback tab.
- *
- * @author kashida@google.com (Koji Ashida)
  */
 
 oppia.controller('FeedbackTab', [

@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Controllers for the page showing the user's explorations.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.controller('MyExplorations', [

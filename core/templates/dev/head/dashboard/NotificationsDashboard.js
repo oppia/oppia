@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Data and controllers for the user's notifications dashboard.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.controller('DashboardNotifications', [

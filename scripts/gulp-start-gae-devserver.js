@@ -19,8 +19,6 @@
  * google app_engine and export its path.
  *
  * @fileoverview module that start gae server in gulp.
- *
- * @author barnabasmakonda@gmail.com (Barnabas Makonda)
  */
 
 'use strict';
