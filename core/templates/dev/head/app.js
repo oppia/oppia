@@ -365,11 +365,21 @@ oppia.factory('urlService', ['$window', function($window) {
 
 // Service for computing the window dimensions.
 oppia.factory('windowDimensionsService', ['$window', function($window) {
+  var onResizeHooks = [];
+
+  $window.onresize = function() {
+    onResizeHooks.forEach(function(hookFn) {
+      hookFn();
+    });
+  };
   return {
     getWidth: function() {
       return (
         $window.innerWidth || document.documentElement.clientWidth ||
         document.body.clientWidth);
+    },
+    registerOnResizeHook: function(hookFn) {
+      onResizeHooks.push(hookFn);
     }
   };
 }]);

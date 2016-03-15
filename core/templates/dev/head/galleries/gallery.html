@@ -14,7 +14,6 @@
 
 {% block local_top_nav_options %}
   <search-bar></search-bar>
-  <create-exploration-button></create-exploration-button>
 {% endblock %}
 
 {% block header_js %}
@@ -115,7 +114,6 @@
 {% block footer_js %}
   {{ super() }}
   <script>
-    {{ include_js_file('components/ExplorationCreationButtonService.js') }}
     {{ include_js_file('components/ProfileLinkImageDirective.js') }}
     {{ include_js_file('components/SearchBarDirective.js') }}
     {{ include_js_file('components/CircularImageDirective.js') }}
