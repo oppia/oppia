@@ -21,10 +21,12 @@
 // Service for the create/upload exploration buttons and modals.
 oppia.factory('ExplorationCreationButtonService', [
   '$filter', '$http', '$modal', '$timeout', '$rootScope', '$window',
-  'validatorsService', 'alertsService', 'focusService', 'siteAnalyticsService',
+  'validatorsService', 'alertsService', 'focusService',
+  'siteAnalyticsService', 'urlService',
   function(
       $filter, $http, $modal, $timeout, $rootScope, $window,
-      validatorsService, alertsService, focusService, siteAnalyticsService) {
+      validatorsService, alertsService, focusService,
+      siteAnalyticsService, urlService) {
     var getModalInstance = function(categoryList, isUploadModal) {
       var modalInstance = $modal.open({
         backdrop: true,
@@ -140,10 +142,9 @@ oppia.factory('ExplorationCreationButtonService', [
       showCreateExplorationModal: function(categoryList) {
         alertsService.clearWarnings();
 
-        var currentPage = window.location.pathname;
+        var currentPathname = urlService.getPathname();
 
-        if (currentPage !== '/my_explorations' &&
-          currentPage !== '/my_explorations?mode=create') {
+        if (currentPathname !== '/my_explorations') {
           window.location.replace('/my_explorations?mode=create');
         } else {
           siteAnalyticsService.registerOpenExplorationCreationModalEvent();

@@ -358,6 +358,9 @@ oppia.factory('urlService', ['$window', function($window) {
     },
     isIframed: function() {
       return !!(this.getUrlParams().iframed);
+    },
+    getPathname: function() {
+      return window.location.pathname;
     }
   };
 }]);
