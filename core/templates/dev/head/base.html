@@ -226,36 +226,38 @@
                           </li>
                         {% endif %}
                         {% if nav_mode != 'create' and nav_mode != 'explore' %}
-                          <create-exploration-button ng-if="!isWindowNarrow"></create-exploration-button>
-                          {% if SHOW_CUSTOM_PAGES %}
-                            <li ng-if="!isWindowNarrow" class="oppia-clickable-navbar-element pull-right">
-                              <a class="oppia-navbar-tab" href="/forum">
-                                Forum
+                          <ul ng-if="!isWindowNarrow" class="nav oppia-navbar-tabs">
+                            <create-exploration-button></create-exploration-button>
+                            {% if SHOW_CUSTOM_PAGES %}
+                              <li class="oppia-clickable-navbar-element pull-right">
+                                <a class="oppia-navbar-tab" href="/forum">
+                                  Forum
+                                </a>
+                              </li>
+                            {% endif %}
+                            <li class="dropdown oppia-clickable-dropdown pull-right">
+                              <a class="oppia-navbar-tab">
+                                About
+                                <span class="caret"></span>
+                              </a>
+                              <ul class="dropdown-menu oppia-navbar-dropdown" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
+                                <li><a href="/about">About Oppia</a></li>
+                                <li><a href="/participate">Participation Playbook</a></li>
+                                {% for additional_link in SIDEBAR_MENU_ADDITIONAL_LINKS %}
+                                  <li><a href="{{additional_link['link']}}">{{additional_link['name']}}</a></li>
+                                {% endfor %}
+                                {% if SHOW_CUSTOM_PAGES %}
+                                  <li><a href="/terms">Terms of Service</a></li>
+                                  <li><a href="/privacy">Privacy Policy</a></li>
+                                {% endif %}
+                              </ul>
+                            </li>
+                            <li class="oppia-clickable-navbar-element pull-right">
+                              <a class="oppia-navbar-tab" href="/gallery">
+                                Explore
                               </a>
                             </li>
-                          {% endif %}
-                          <li ng-if="!isWindowNarrow" class="dropdown oppia-clickable-dropdown pull-right">
-                            <a class="oppia-navbar-tab">
-                              About
-                              <span class="caret"></span>
-                            </a>
-                            <ul class="dropdown-menu oppia-navbar-dropdown" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
-                              <li><a href="/about">About Oppia</a></li>
-                              <li><a href="/participate">Participation Playbook</a></li>
-                              {% for additional_link in SIDEBAR_MENU_ADDITIONAL_LINKS %}
-                                <li><a href="{{additional_link['link']}}">{{additional_link['name']}}</a></li>
-                              {% endfor %}
-                              {% if SHOW_CUSTOM_PAGES %}
-                                <li><a href="/terms">Terms of Service</a></li>
-                                <li><a href="/privacy">Privacy Policy</a></li>
-                              {% endif %}
-                            </ul>
-                          </li>
-                          <li ng-if="!isWindowNarrow" class="oppia-clickable-navbar-element pull-right">
-                            <a class="oppia-navbar-tab" href="/gallery">
-                              Explore
-                            </a>
-                          </li>
+                          </ul>
                         {% endif %}
                       </ul>
                     </div>
@@ -326,6 +328,7 @@
       {{ include_js_file('components/RatingDisplayDirective.js')}}
       {{ include_js_file('components/Select2DropdownDirective.js') }}
       {{ include_js_file('components/CreateExplorationButtonDirective.js') }}
+      {{ include_js_file('components/ExplorationCreationButtonService.js') }}
 
       {{ include_js_file('expressions/expressionSyntaxTree.js') }}
       {{ include_js_file('expressions/evaluator.js') }}

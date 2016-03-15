@@ -2146,6 +2146,9 @@ div#ng-curtain {
   margin-left: 6px;
 }
 
+.oppia-navbar-tabs {
+  min-width: 525px;
+}
 .nav > li > a.oppia-navbar-tab {
   font-size: 1em;
   padding-top: 17px;
