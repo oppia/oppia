@@ -110,6 +110,15 @@ body {
   margin-right: auto;
   margin-top: 60px;
   margin-bottom: 30px;
+  padding-left: 30px;
+  padding-right: 30px;
+}
+
+@media (max-width: 500px) {
+  .oppia-dashboard-container {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
 }
 
 .oppia-profile-top-card {
@@ -1763,13 +1772,15 @@ oppia-parameter {
 
 .oppia-dashboard-row {
   cursor: pointer;
+  background-color: #fff;
+  margin-bottom: -5px;
+  overflow: auto;
 }
 .oppia-dashboard-row:hover {
   background: #eee;
 }
 .oppia-dashboard-row-recent {
   background: #fff4ca;
-  cursor: pointer;
 }
 .oppia-dashboard-row-recent:hover {
   background: #ffe279;
@@ -2408,6 +2419,7 @@ div#ng-curtain {
   position: relative;
   width: 660px;
 }
+
 .oppia-page-card {
   background: rgb(255,255,255);
   margin-left: auto;
@@ -2420,8 +2432,29 @@ div#ng-curtain {
   margin-bottom: 10px;
 }
 
+.oppia-notifications-tray {
+  margin-left: -8px;
+}
+
 .oppia-notifications-dashboard-card {
   padding: 15px 40px;
+}
+
+.oppia-notification-content {
+  display: inline-block;
+}
+
+.oppia-notification-last-updated {
+  float: right;
+}
+
+@media (max-width: 500px) {
+
+  .oppia-notification-content,
+  .oppia-notification-last-updated {
+    display: inline;
+  }
+
 }
 
 .oppia-about-anchor {
