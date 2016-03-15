@@ -29,6 +29,9 @@ import utils
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
+COLLECTION_PROPERTY_TITLE = 'title'
+COLLECTION_PROPERTY_CATEGORY = 'category'
+COLLECTION_PROPERTY_OBJECTIVE = 'objective'
 COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS = 'prerequisite_skills'
 COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS = 'acquired_skills'
 
@@ -38,10 +41,10 @@ CMD_ADD_COLLECTION_NODE = 'add_collection_node'
 CMD_DELETE_COLLECTION_NODE = 'delete_collection_node'
 # This takes additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
-CMD_EDIT_COLLECTION_NODE_PROPERTY = 'edit_collection_node_property'
+CMD_EDIT_COLLECTION_PROPERTY = 'edit_collection_property'
 # This takes additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
-CMD_EDIT_COLLECTION_PROPERTY = 'edit_collection_property'
+CMD_EDIT_COLLECTION_NODE_PROPERTY = 'edit_collection_node_property'
 # This takes additional 'from_version' and 'to_version' parameters for logging.
 CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION = 'migrate_schema_to_latest_version'
 
@@ -59,7 +62,9 @@ class CollectionChange(object):
         COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS,
         COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS)
 
-    COLLECTION_PROPERTIES = ('title', 'category', 'objective')
+    COLLECTION_PROPERTIES = (
+        COLLECTION_PROPERTY_TITLE, COLLECTION_PROPERTY_CATEGORY,
+        COLLECTION_PROPERTY_OBJECTIVE)
 
     def __init__(self, change_dict):
         """Initializes an CollectionChange object from a dict.
@@ -378,8 +383,9 @@ class Collection(object):
         """
         acquired_skills = set()
         for completed_exp_id in completed_exploration_ids:
-            acquired_skills.update(
-                self.get_node(completed_exp_id).acquired_skills)
+            collection_node = self.get_node(completed_exp_id)
+            if collection_node:
+                acquired_skills.update(collection_node.acquired_skills)
 
         next_exp_ids = []
         for node in self.nodes:
@@ -525,7 +531,7 @@ class CollectionSummary(object):
 
     def __init__(self, collection_id, title, category, objective,
                  status, community_owned, owner_ids, editor_ids,
-                 viewer_ids, contributor_ids, version,
+                 viewer_ids, contributor_ids, contributors_summary, version,
                  collection_model_created_on, collection_model_last_updated):
         self.id = collection_id
         self.title = title
@@ -537,6 +543,7 @@ class CollectionSummary(object):
         self.editor_ids = editor_ids
         self.viewer_ids = viewer_ids
         self.contributor_ids = contributor_ids
+        self.contributors_summary = contributors_summary
         self.version = version
         self.collection_model_created_on = collection_model_created_on
         self.collection_model_last_updated = collection_model_last_updated
@@ -553,6 +560,7 @@ class CollectionSummary(object):
             'editor_ids': self.editor_ids,
             'viewer_ids': self.viewer_ids,
             'contributor_ids': self.contributor_ids,
+            'contributors_summary': self.contributors_summary,
             'version': self.version,
             'collection_model_created_on': self.collection_model_created_on,
             'collection_model_last_updated': self.collection_model_last_updated

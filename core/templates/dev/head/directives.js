@@ -21,13 +21,19 @@
 
 // HTML bind directive that trusts the value it is given and also evaluates
 // custom directive tags in the provided value.
-oppia.directive('angularHtmlBind', ['$compile', function($compile) {
+oppia.directive('angularHtmlBind', ['$compile', '$timeout',
+  'EVENT_HTML_CHANGED', function($compile, $timeout, EVENT_HTML_CHANGED) {
   return {
     restrict: 'A',
     link: function(scope, elm, attrs) {
       scope.$watch(attrs.angularHtmlBind, function(newValue) {
-        elm.html(newValue);
-        $compile(elm.contents())(scope);
+        // Inform child components that the value of the HTML string has
+        // changed, so that they can perform any necessary cleanup.
+        scope.$broadcast(EVENT_HTML_CHANGED);
+        $timeout(function() {
+          elm.html(newValue);
+          $compile(elm.contents())(scope);
+        }, 10);
       });
     }
   };
@@ -172,6 +178,44 @@ oppia.directive('imageUploader', [function() {
           evt.currentTarget.files[0],
           evt.target.value.split(/(\\|\/)/g).pop());
       });
+    }
+  };
+}]);
+
+oppia.directive('mobileFriendlyTooltip', ['$timeout', function($timeout) {
+  return {
+    restrict: 'A',
+    scope: true,
+    controller: ['$scope', 'deviceInfoService', function(
+        $scope, deviceInfoService) {
+      $scope.opened = false;
+      $scope.deviceHasTouchEvents = deviceInfoService.hasTouchEvents();
+    }],
+    link: function(scope, element) {
+      var TIME_TOOLTIP_CLOSE_DELAY_MOBILE = 1000;
+
+      if (scope.deviceHasTouchEvents) {
+        element.on('touchstart', function() {
+          scope.opened = true;
+          scope.$apply();
+        });
+        element.on('touchend', function() {
+          // Set time delay before tooltip close
+          $timeout(function() {
+            scope.opened = false;
+          }, TIME_TOOLTIP_CLOSE_DELAY_MOBILE);
+        });
+      } else {
+        element.on('mouseenter', function() {
+          scope.opened = true;
+          scope.$apply();
+        });
+
+        element.on('mouseleave', function() {
+          scope.opened = false;
+          scope.$apply();
+        });
+      };
     }
   };
 }]);

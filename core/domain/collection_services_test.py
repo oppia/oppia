@@ -23,6 +23,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import utils
 
 (collection_models, user_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.user])
@@ -61,8 +62,9 @@ class CollectionServicesUnitTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
 
-        self.set_admins([self.ADMIN_EMAIL])
+        self.set_admins([self.ADMIN_USERNAME])
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
 
@@ -653,7 +655,8 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             collection_services.get_collection_summary_by_id(
                 self.COLLECTION_ID))
 
-        self.assertEqual(retrieved_collection_summary.contributor_ids, [self.owner_id])
+        self.assertEqual(retrieved_collection_summary.contributor_ids,
+                         [self.owner_id])
         self.assertEqual(retrieved_collection_summary.title, 'A new title')
         self.assertEqual(
             retrieved_collection_summary.category, 'A new category')
@@ -728,6 +731,62 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
             self.COLLECTION_ID)
         self.assertEqual(
             collection.exploration_ids, [self.EXPLORATION_ID, new_exp_id])
+
+    def test_add_node_with_non_existent_exploration(self):
+        non_existent_exp_id = 'non_existent_exploration_id'
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected collection to only reference valid explorations'):
+            collection_services.update_collection(
+                self.owner_id, self.COLLECTION_ID, [{
+                    'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                    'exploration_id': non_existent_exp_id
+                }], 'Added non-existent exploration')
+
+    def test_add_node_with_private_exploration_in_public_collection(self):
+        """Ensures public collections cannot reference private explorations."""
+
+        private_exp_id = 'private_exp_id0'
+        self.save_new_valid_exploration(private_exp_id, self.owner_id)
+        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+
+        self.assertTrue(
+            rights_manager.is_collection_public(self.COLLECTION_ID))
+        self.assertTrue(rights_manager.is_exploration_private(private_exp_id))
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Cannot reference a private exploration within a public '
+            'collection'):
+            collection_services.update_collection(
+                self.owner_id, self.COLLECTION_ID, [{
+                    'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                    'exploration_id': private_exp_id
+                }], 'Added private exploration')
+
+    def test_add_node_with_public_exploration_in_private_collection(self):
+        """Ensures private collections can reference public and private
+        explorations.
+        """
+        public_exp_id = 'public_exp_id0'
+        private_exp_id = 'private_exp_id0'
+        self.save_new_valid_exploration(public_exp_id, self.owner_id)
+        self.save_new_valid_exploration(private_exp_id, self.owner_id)
+        rights_manager.publish_exploration(self.owner_id, public_exp_id)
+
+        self.assertTrue(
+            rights_manager.is_collection_private(self.COLLECTION_ID))
+        self.assertTrue(rights_manager.is_exploration_public(public_exp_id))
+        self.assertTrue(rights_manager.is_exploration_private(private_exp_id))
+
+        # No exception should be raised for either insertion.
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                'exploration_id': public_exp_id
+            }, {
+                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                'exploration_id': private_exp_id
+            }], 'Added public and private explorations')
 
     def test_delete_node(self):
         # Verify the initial collection only has 1 exploration in it.
@@ -897,6 +956,7 @@ class CommitMessageHandlingTests(CollectionServicesUnitTests):
     def test_record_commit_message(self):
         """Check published collections record commit messages."""
         rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
 
         collection_services.update_collection(
             self.owner_id, self.COLLECTION_ID, _get_node_change_list(
@@ -956,8 +1016,9 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
         self.signup(self.SECOND_EMAIL, self.SECOND_USERNAME)
         second_committer_id = self.get_user_id_from_email(self.SECOND_EMAIL)
 
+        exp_id = 'exp_id0'
         v1_collection = self.save_new_valid_collection(
-            self.COLLECTION_ID, self.owner_id)
+            self.COLLECTION_ID, self.owner_id, exploration_id=exp_id)
 
         snapshots_metadata = (
             collection_services.get_collection_snapshots_metadata(
@@ -977,9 +1038,10 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
         }, snapshots_metadata[0])
         self.assertIn('created_on_ms', snapshots_metadata[0])
 
-        # Publish the collection. This does not affect the collection version
-        # history.
+        # Publish the collection and any explorations contained within it. This
+        # does not affect the collection version history.
         rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+        rights_manager.publish_exploration(self.owner_id, exp_id)
 
         snapshots_metadata = (
             collection_services.get_collection_snapshots_metadata(
@@ -1660,3 +1722,46 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         self.assertEqual(
             collection_summary.contributor_ids,
             [albert_id, bob_id])
+
+    def _check_contributors_summary(self, collection_id, expected):
+        contributors_summary = collection_services.get_collection_summary_by_id(
+            collection_id).contributors_summary
+        self.assertEqual(expected, contributors_summary)
+
+    def test_contributor_summary(self):
+        albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.signup(self.BOB_EMAIL, self.BOB_NAME)
+
+        # Have Albert create a new collection. Version 1
+        self.save_new_valid_collection(self.COLLECTION_ID, albert_id)
+        self._check_contributors_summary(self.COLLECTION_ID, {albert_id: 1})
+        changelist_cmds = [{
+            'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+            'property_name': 'title',
+            'new_value': 'Collection Bob title'
+        }]
+         # Have Bob update that collection. Version 2
+        collection_services.update_collection(
+            bob_id, self.COLLECTION_ID, changelist_cmds, 'Changed title.')
+        self._check_contributors_summary(self.COLLECTION_ID,
+                                         {albert_id: 1, bob_id: 1})
+        # Have Bob update that collection. Version 3
+        collection_services.update_collection(
+            bob_id, self.COLLECTION_ID, changelist_cmds, 'Changed title.')
+        self._check_contributors_summary(self.COLLECTION_ID,
+                                         {albert_id: 1, bob_id: 2})
+
+        # Have Albert update that collection. Version 4
+        collection_services.update_collection(
+            albert_id, self.COLLECTION_ID, changelist_cmds, 'Changed title.')
+        self._check_contributors_summary(self.COLLECTION_ID,
+                                         {albert_id: 2, bob_id: 2})
+
+        # TODO(madiyar): uncomment after revert_collection implementation
+        # Have Albert revert to version 3. Version 5
+        # collection_services.revert_collection(albert_id,
+        #       self.COLLECTION_ID, 4, 3)
+        # self._check_contributors_summary(self.COLLECTION_ID,
+        #                                 {albert_id: 1, bob_id: 2})

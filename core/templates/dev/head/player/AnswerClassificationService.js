@@ -19,8 +19,8 @@
  */
 
 oppia.factory('answerClassificationService', [
-  '$http', '$q', 'learnerParamsService',
-  function($http, $q, learnerParamsService) {
+  '$http', '$q', 'LearnerParamsService',
+  function($http, $q, LearnerParamsService) {
     /**
      * Finds the first answer group with a rule that returns true. This should
      * be synced with the backend classify() function in
@@ -68,7 +68,7 @@ oppia.factory('answerClassificationService', [
           ruleSpecIndex: 0
         };
       } else {
-        warningsData.addWarning('No default outcome found.');
+        alertsService.addWarning('No default outcome found.');
       }
     };
 
@@ -109,7 +109,7 @@ oppia.factory('answerClassificationService', [
           // what params should be passed to the batch classifier.
           var classifyUrl = '/explorehandler/classify/' + explorationId;
           var params = (
-            isInEditorMode ? {} : learnerParamsService.getAllParams());
+            isInEditorMode ? {} : LearnerParamsService.getAllParams());
 
           $http.post(classifyUrl, {
             old_state: oldState.toBackendDict(),

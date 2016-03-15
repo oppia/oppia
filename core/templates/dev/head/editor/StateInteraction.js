@@ -46,13 +46,13 @@ oppia.factory('interactionDetailsCache', [function() {
 }]);
 
 oppia.controller('StateInteraction', [
-  '$scope', '$http', '$rootScope', '$modal', '$filter', 'warningsData',
+  '$scope', '$http', '$rootScope', '$modal', '$filter', 'alertsService',
   'editorContextService', 'changeListService', 'oppiaHtmlEscaper',
   'INTERACTION_SPECS', 'stateInteractionIdService',
   'stateCustomizationArgsService', 'editabilityService',
   'explorationStatesService', 'graphDataService',
   'interactionDetailsCache', 'oppiaExplorationHtmlFormatterService',
-  function($scope, $http, $rootScope, $modal, $filter, warningsData,
+  function($scope, $http, $rootScope, $modal, $filter, alertsService,
       editorContextService, changeListService, oppiaHtmlEscaper,
       INTERACTION_SPECS, stateInteractionIdService,
       stateCustomizationArgsService, editabilityService,
@@ -183,7 +183,7 @@ oppia.controller('StateInteraction', [
 
     $scope.openInteractionCustomizerModal = function() {
       if (editabilityService.isEditable()) {
-        warningsData.clear();
+        alertsService.clearWarnings();
 
         $modal.open({
           templateUrl: 'modals/customizeInteraction',
@@ -287,7 +287,7 @@ oppia.controller('StateInteraction', [
     };
 
     $scope.deleteInteraction = function() {
-      warningsData.clear();
+      alertsService.clearWarnings();
       $modal.open({
         templateUrl: 'modals/deleteInteraction',
         backdrop: true,
@@ -299,7 +299,7 @@ oppia.controller('StateInteraction', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              warningsData.clear();
+              alertsService.clearWarnings();
             };
           }
         ]

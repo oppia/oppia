@@ -26,7 +26,7 @@ install_node_module gulp 3.9.0
 install_node_module through2 2.0.0
 install_node_module yargs 3.29.0
 install_node_module gulp-concat 2.6.0
-install_node_module gulp-minify-css 1.2.1
+install_node_module gulp-clean-css 2.0.2
 install_node_module gulp-util 3.0.7
 install_node_module jscs 2.3.0
 install_node_module gulp-sourcemaps 1.6.0
@@ -111,3 +111,17 @@ if [ ! -d "$TOOLS_DIR/pylint-1.5.2" ]; then
 
   pip install pylint==1.5.2 --target="$TOOLS_DIR/pylint-1.5.2"
 fi
+
+# Install webtest.
+echo Checking if webtest is installed in third_party
+if [ ! -d "$TOOLS_DIR/webtest-1.4.2" ]; then
+  echo Installing webtest framework
+  # Note that the github URL redirects, so we pass in -L to tell curl to follow the redirect.
+  curl --silent -L https://github.com/Pylons/webtest/archive/1.4.2.zip -o webtest-download.zip
+  unzip webtest-download.zip -d $TOOLS_DIR
+  rm webtest-download.zip
+fi
+
+# install pre-push script
+echo Installing pre-push hook for git
+$PYTHON_CMD $OPPIA_DIR/scripts/pre_push_hook.py --install

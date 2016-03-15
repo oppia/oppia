@@ -45,7 +45,6 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
   $scope.reloadConfigProperties = function() {
     $http.get($scope.adminHandlerUrl).success(function(data) {
       $scope.configProperties = data.config_properties;
-      $scope.computedProperties = data.computed_properties;
     });
   };
 
@@ -80,17 +79,6 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     }).error(function(errorResponse) {
       $scope.message = 'Server error: ' + errorResponse.error;
       $scope.migrationInProcess = false;
-    });
-  };
-
-  $scope.refreshComputedProperty = function(computedPropertyId) {
-    $http.post($scope.adminHandlerUrl, {
-      action: 'refresh_computed_property',
-      computed_property_name: computedPropertyId
-    }).success(function() {
-      $scope.message = 'Computed property reloaded successfully.';
-    }).error(function(errorResponse) {
-      $scope.message = 'Server error: ' + errorResponse.error;
     });
   };
 
@@ -188,11 +176,11 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     };
 
     for (var i = 0; i < GLOBALS.DEMO_EXPLORATION_IDS.length; ++i) {
-      var exploration = GLOBALS.DEMO_EXPLORATION_IDS[i];
+      var explorationId = GLOBALS.DEMO_EXPLORATION_IDS[i];
 
       $http.post($scope.adminHandlerUrl, {
         action: 'reload_exploration',
-        exploration_id: exploration[0]
+        exploration_id: explorationId
       }).success(function() {
         ++numSucceeded;
         ++numTried;

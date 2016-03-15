@@ -70,7 +70,7 @@ describe('Gallery view', function() {
     gallery.expectExplorationRatingToEqual(EXPLORATION_RATINGTEST, '4.0');
 
     gallery.playExploration(EXPLORATION_RATINGTEST);
-    player.expectExplorationRatingOnInformationCardToEqual('4');
+    player.expectExplorationRatingOnInformationCardToEqual('4.0');
   });
   afterEach(function() {
     general.checkForConsoleErrors([]);

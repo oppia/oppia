@@ -767,7 +767,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
             self._assert_validation_error(
                 exploration,
-                'non_existent_panel panel not found in skin conversation_v1')
+                'The panel name \'non_existent_panel\' is invalid.')
 
     def test_gadget_name_validation(self):
         """Test that gadget naming conditions validate properly."""
@@ -1845,8 +1845,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'param_specs': {},
             'skin_customizations': (
-                exp_domain.SkinInstance._get_default_skin_customizations(  # pylint: disable=protected-access
-                    feconf.DEFAULT_SKIN_ID)
+                exp_domain.SkinInstance._get_default_skin_customizations()  # pylint: disable=protected-access
             ),
         })
 
@@ -2115,8 +2114,7 @@ class GadgetInstanceUnitTests(test_utils.GenericTestBase):
 
             self._assert_validation_error(
                 exploration,
-                'Size exceeded: bottom panel width of 4600 exceeds limit of '
-                '350')
+                'Width 4600 of panel \'bottom\' exceeds limit of 350')
 
         # Assert internal validation against CustomizationArgSpecs.
         test_gadget_instance.customization_args[

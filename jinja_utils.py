@@ -23,8 +23,6 @@ import math
 import jinja2
 from jinja2 import meta
 
-import feconf  # pylint: disable=relative-import
-
 
 _OPPIA_MODULE_DEFINITION_FILE = 'app.js'
 
@@ -59,10 +57,6 @@ def get_jinja_env(dir_path):
         os.path.dirname(__file__), dir_path))
     env = jinja2.Environment(autoescape=True, loader=loader)
 
-    skins_loader = jinja2.FileSystemLoader(os.path.join(
-        os.path.dirname(__file__), feconf.SKINS_TEMPLATES_DIR))
-    skins_env = jinja2.Environment(autoescape=True, loader=skins_loader)
-
     def include_js_file(filepath):
         """Include a raw JS file in the template without evaluating it."""
         assert filepath.endswith('.js')
@@ -74,13 +68,7 @@ def get_jinja_env(dir_path):
             # (IIFE) to prevent pollution of the global scope.
             return jinja2.Markup('(function() {%s})();' % raw_file_contents)
 
-    def include_skins_js_file(name):
-        """Include a raw JS file from extensions/skins in the template."""
-        assert name.endswith('.js')
-        return jinja2.Markup(skins_loader.get_source(skins_env, name)[0])
-
     env.globals['include_js_file'] = include_js_file
-    env.globals['include_skins_js_file'] = include_skins_js_file
     env.filters.update(JINJA_FILTERS)
     return env
 

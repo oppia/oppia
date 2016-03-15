@@ -27,6 +27,7 @@ class PencilCodeEditor(base.BaseInteraction):
     _dependency_ids = ['pencilcode']
     answer_type = 'CodeEvaluation'
     instructions = 'Edit the code. Click \'Play\' to check it!'
+    narrow_instructions = 'Show code editor'
     needs_summary = True
 
     _customization_arg_specs = [{

@@ -76,6 +76,14 @@ oppia.factory('ExplorationObjectFactory', [
       return interactionId ? INTERACTION_SPECS[interactionId].instructions : '';
     };
 
+    Exploration.prototype.getNarrowInstructions = function(stateName) {
+      var interactionId = this.getInteractionId(stateName);
+      return (
+        interactionId ?
+        INTERACTION_SPECS[interactionId].narrow_instructions :
+        '');
+    };
+
     Exploration.prototype.getInteractionThumbnailSrc = function(stateName) {
       // TODO(sll): unify this with the 'choose interaction' modal in
       // state_editor_interaction.html.
@@ -107,6 +115,10 @@ oppia.factory('ExplorationObjectFactory', [
 
     Exploration.prototype.getInitialState = function() {
       return this.getState(this.initStateName);
+    };
+
+    Exploration.prototype.getUninterpolatedContentHtml = function(stateName) {
+      return this.getState(stateName).content[0].value;
     };
 
     // Static class methods. Note that "this" is not available in

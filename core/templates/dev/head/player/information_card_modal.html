@@ -14,8 +14,8 @@
       <ul layout="row" class="card-metrics" layout-align="space-between center">
         <li class="protractor-test-info-card-rating">
           <span class="fa fa-star fa-lg" tooltip="Average Rating" tooltip-placement="top"></span>
-          <span ng-if="averageRating === 0">Unrated</span>
-          <span ng-if="averageRating !== 0"><[averageRating]></span>
+          <span ng-if="!averageRating">Unrated</span>
+          <span ng-if="averageRating"><[averageRating | number:1]></span>
         </li>
 
         <li>
@@ -76,7 +76,7 @@
           <ul layout="row" layout-align="end center">
             {% if SHARING_OPTIONS['gplus'] %}
               <li>
-                <a ng-href="https://plus.google.com/share?url=<[serverName]>/explore/<[explorationId]>" onclick="return !window.open(this.href, '', 'height=600, width=600, menubar=no, toolbar=no, resizable=yes, scrollbars=yes')" target="_window">
+                <a ng-href="https://plus.google.com/share?url=<[serverName]>/explore/<[explorationId]>" onclick="return !window.open(this.href, '', 'height=600, width=600, menubar=no, toolbar=no, resizable=yes, scrollbars=yes')" ng-click="registerShareExplorationEvent('gplus')" target="_window">
                   <img src="/images/general/gplus.png" alt="Google+">
                 </a>
               </li>
@@ -84,7 +84,7 @@
 
             {% if SHARING_OPTIONS['facebook'] %}
               <li>
-                <a ng-href="https://www.facebook.com/sharer/sharer.php?sdk=joey&u=<[serverName]>/explore/<[explorationId]>&display=popup&ref=plugin&src=share_button" onclick="return !window.open(this.href, '', 'height=336, width=640')" target="_window">
+                <a ng-href="https://www.facebook.com/sharer/sharer.php?sdk=joey&u=<[serverName]>/explore/<[explorationId]>&display=popup&ref=plugin&src=share_button" onclick="return !window.open(this.href, '', 'height=336, width=640')" ng-click="registerShareExplorationEvent('facebook')" target="_window">
                   <img src='/images/general/fb.png' alt="Facebook">
                 </a>
               </li>
@@ -93,7 +93,7 @@
             {% if SHARING_OPTIONS['twitter'] %}
               <li>
                 <a ng-href="https://twitter.com/share?text=<[escapedTwitterText]>&url=<[serverName]>/explore/<[explorationId]>" onclick="return !window.open(this.href, '', 'height=460, width=640')" target="_window">
-                  <img src="/images/general/twitter.png" alt="Twitter">
+                  <img src="/images/general/twitter.png" ng-click="registerShareExplorationEvent('twitter')" alt="Twitter">
                 </a>
               </li>
             {% endif %}

@@ -22,17 +22,12 @@ import datetime
 import json
 import logging
 import traceback
-import utils
 
 from core.platform import models
-(base_models, job_models,) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.job])
-taskqueue_services = models.Registry.import_taskqueue_services()
-transaction_services = models.Registry.import_transaction_services()
+import utils
 
 from google.appengine.api import app_identity
 from google.appengine.ext import ndb
-
 from mapreduce import base_handler
 from mapreduce import context
 from mapreduce import input_readers
@@ -41,6 +36,11 @@ from mapreduce import model as mapreduce_model
 from mapreduce import output_writers
 from mapreduce import util as mapreduce_util
 from pipeline import pipeline
+
+(base_models, job_models,) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.job])
+taskqueue_services = models.Registry.import_taskqueue_services()
+transaction_services = models.Registry.import_transaction_services()
 
 MAPPER_PARAM_KEY_ENTITY_KINDS = 'entity_kinds'
 MAPPER_PARAM_KEY_QUEUED_TIME_MSECS = 'queued_time_msecs'
@@ -376,7 +376,7 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
     def run(self, job_id, job_class_str, kwargs):
         job_class = mapreduce_util.for_name(job_class_str)
         job_class.register_start(job_id, metadata={
-            job_class._OUTPUT_KEY_ROOT_PIPELINE_ID: self.root_pipeline_id
+            job_class._OUTPUT_KEY_ROOT_PIPELINE_ID: self.root_pipeline_id  # pylint: disable=protected-access
         })
 
         # TODO(sll): Need try/except/mark-as-canceled here?
@@ -542,7 +542,8 @@ class BaseMapReduceJobManager(BaseJobManager):
 
     @staticmethod
     def _entity_created_before_job_queued(entity):
-        """Checks that the given entity was created before the MR job was queued.
+        """Checks that the given entity was created before the MR job was
+        queued.
 
         Mapper methods may want to use this as a precomputation check,
         especially if the datastore classes being iterated over are append-only
@@ -617,7 +618,8 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
 
     @staticmethod
     def _entity_created_before_job_queued(entity):
-        """Checks that the given entity was created before the MR job was queued.
+        """Checks that the given entity was created before the MR job was
+        queued.
 
         Mapper methods may want to use this as a precomputation check,
         especially if the datastore classes being iterated over are append-only
@@ -932,7 +934,7 @@ class BaseContinuousComputationManager(object):
         cls._kickoff_batch_job()
 
     @classmethod
-    def stop_computation(cls, user_id, test_mode=False):
+    def stop_computation(cls, user_id, unused_test_mode=False):
         """Cancels the currently-running batch job.
 
         No further batch runs will be kicked off.
@@ -977,8 +979,8 @@ class BaseContinuousComputationManager(object):
         The *args and **kwargs match those passed to the _handle_event() method
         of the corresponding EventHandler subclass.
         """
-        REALTIME_LAYERS = [0, 1]
-        for layer in REALTIME_LAYERS:
+        realtime_layers = [0, 1]
+        for layer in realtime_layers:
             cls._handle_incoming_event(layer, event_type, *args, **kwargs)
 
     @classmethod

@@ -15,7 +15,7 @@
 ##########################################################################
 
 # This file should not be invoked directly, but sourced from other sh scripts.
-# Bash execution environent set up for scripts that requries GAE.
+# Bash execution environment setup for scripts that require GAE.
 
 
 if [ "$SETUP_GAE_DONE" ]; then
