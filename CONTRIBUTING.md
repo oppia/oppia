@@ -111,8 +111,6 @@ Here's how to make a one-off code change. (If you're working on a larger feature
 
 We do not use author tags in files, since they tend to be inaccurate or become stale when the author is no longer a regular contributor. However, you can still find the author of a particular change in a file by running the command:
 
-You can find the author of a particular change in a file as follows: 
-
 ```
 git blame file-name
 ```
