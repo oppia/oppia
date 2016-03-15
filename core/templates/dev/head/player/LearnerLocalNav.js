@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Controller for the local navigation in the learner view.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.controller('LearnerLocalNav', [

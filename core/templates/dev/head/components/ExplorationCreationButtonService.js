@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Modal and functionality for the create exploration button.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 // Service for the create/upload exploration buttons and modals.

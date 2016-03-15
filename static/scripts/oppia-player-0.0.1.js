@@ -15,8 +15,6 @@
 /**
  * Insert this script at the bottom of your web page. It will take all the
  * <oppia> tags and render them as iframes of Oppia explorations.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 

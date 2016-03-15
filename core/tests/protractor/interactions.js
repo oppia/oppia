@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview End-to-end tests for interactions.
- *
- * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var forms = require('../protractor_utils/forms.js');

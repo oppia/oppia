@@ -16,8 +16,6 @@
  * @fileoverview Factory for creating and mutating instances of frontend change
  * domain objects. This frontend object represents both CollectionChange and
  * ExplorationChange backend domain objects.
- *
- * @author henning.benmax@gmail.com (Ben Henning)
  */
 
 // TODO(bhenning): Consolidate the backend ExplorationChange and

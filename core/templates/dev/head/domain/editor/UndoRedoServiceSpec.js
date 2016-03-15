@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Tests for UndoRedoService.
- *
- * @author henning.benmax@gmail.com (Ben Henning)
  */
 
 describe('Undo/Redo Service', function() {

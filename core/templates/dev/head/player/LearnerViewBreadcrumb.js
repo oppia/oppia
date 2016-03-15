@@ -15,8 +15,6 @@
 /**
  * @fileoverview Controllers for the learner view breadcrumb section of the
  * navbar.
- *
- * @author sean@seanlip.org (Sean Lip)
  */
 
 oppia.controller('LearnerViewBreadcrumb', [

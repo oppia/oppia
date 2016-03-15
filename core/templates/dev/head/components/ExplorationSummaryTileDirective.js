@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Gallery tile component.
- *
- * @author Sean Lip
  */
 
 oppia.directive('explorationSummaryTile', [function() {

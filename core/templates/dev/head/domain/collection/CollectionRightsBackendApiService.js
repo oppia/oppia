@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Service to change the rights of collections in the backend.
- *
- * @author henning.benmax@gmail.com (Ben Henning)
  */
 
 oppia.factory('CollectionRightsBackendApiService', [

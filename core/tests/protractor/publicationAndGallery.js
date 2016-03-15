@@ -15,8 +15,6 @@
 /**
  * @fileoverview End-to-end tests of the publication and featuring process, and
  * the resultant display of explorations in the gallery.
- *
- * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var general = require('../protractor_utils/general.js');

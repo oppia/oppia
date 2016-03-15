@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Initialization and basic configuration for the Oppia module.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 // TODO(sll): Remove the check for window.GLOBALS. This check is currently

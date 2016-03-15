@@ -15,8 +15,6 @@
 /**
  * @fileoverview Controllers for the exploration editor page and the editor
  *               help tab in the navbar.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);

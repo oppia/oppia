@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Directive for the Search Bar.
- *
- * @author sean@seanlip.org (Sean Lip)
  */
 
 oppia.directive('searchBar', [function() {

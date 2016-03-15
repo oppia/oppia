@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Directive for the Create Exploration Button.
- *
- * @author sean@seanlip.org (Sean Lip)
  */
 
 oppia.directive('createExplorationButton', [function() {

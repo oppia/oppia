@@ -15,8 +15,6 @@
 /**
  * @fileoverview Directive for creating a list of skills (acquired and
  * pre-requisite skills) associated with a collection.
- *
- * @author mgowano@google.com (Abraham Mgowano)
  */
 
 oppia.directive('collectionSkillListDirective', [function() {

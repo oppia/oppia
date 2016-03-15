@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Controllers for the graphical state editor.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.controller('StateEditor', [

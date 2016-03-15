@@ -15,8 +15,6 @@
 /**
  * @fileoverview Unit tests for the services and controllers of the exploration
  *   editor page.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 describe('Exploration context service', function() {

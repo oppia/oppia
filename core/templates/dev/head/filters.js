@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Filters for Oppia.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.constant('RULE_SUMMARY_WRAP_CHARACTER_COUNT', 30);

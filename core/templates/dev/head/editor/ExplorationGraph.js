@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Controllers for the exploration graph.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.controller('ExplorationGraph', [
