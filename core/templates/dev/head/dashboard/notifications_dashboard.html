@@ -35,7 +35,7 @@
         <md-card ng-repeat="notification in recentNotifications"
           ng-class="{'oppia-dashboard-row-recent': lastSeenMsec && lastSeenMsec < notification.last_updated_ms && notification.author_username !== currentUsername, 'oppia-dashboard-row': !lastSeenMsec || lastSeenMsec >= notification.last_updated_ms || notification.author_username === currentUsername, '.oppia-exploration-commit-notification': lastSeenMsec && lastSeenMsec < notification.last_updated_ms}" ng-click="navigateToItem(notification.activity_id, notification.type)">
           <div class="oppia-notification-content">
-            <span class="oppia-notification-type" >
+            <span class="oppia-notification-type">
               <span ng-if="notification.type === 'feedback_thread'"
                     class="glyphicon glyphicon-comment"
                     title="Feedback thread"></span>

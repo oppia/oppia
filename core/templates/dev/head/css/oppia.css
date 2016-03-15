@@ -1713,6 +1713,7 @@ oppia-parameter {
   cursor: pointer;
   background-color: #fff;
   margin-bottom: -5px;
+  overflow: auto;
 }
 .oppia-dashboard-row:hover {
   background: #eee;
@@ -2351,7 +2352,7 @@ div#ng-curtain {
   float: right;
 }
 
-@media all and (max-width: 500px) {
+@media (max-width: 500px) {
 
   .oppia-notification-content,
   .oppia-notification-last-updated {
