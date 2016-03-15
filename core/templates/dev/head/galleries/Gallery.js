@@ -94,8 +94,6 @@ oppia.controller('Gallery', [
       }
     });
 
-    // SEARCH FUNCTIONALITY
-
     $scope.allExplorationsInOrder = [];
 
     // Called when the page loads, and after every search query.
