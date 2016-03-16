@@ -105,50 +105,6 @@ oppia.controller('CollectionEditor', ['$scope',
     };
   }]);
 
-oppia.controller('CollectionEditorNavbarBreadcrumb', ['$scope',
-  'WritableCollectionBackendApiService', 'CollectionRightsBackendApiService',
-  'CollectionObjectFactory', 'SkillListObjectFactory',
-  'CollectionUpdateService', 'UndoRedoService', 'warningsData',
-  'routerService', function(
-    $scope, WritableCollectionBackendApiService,
-    CollectionRightsBackendApiService, CollectionObjectFactory,
-    SkillListObjectFactory, CollectionUpdateService, UndoRedoService,
-    warningsData, routerService) {
-    $scope.collection = null;
-    $scope.collectionId = GLOBALS.collectionId;
-    $scope.collectionSkillList = SkillListObjectFactory.create([]);
-    $scope.isPublic = GLOBALS.isPublic;
-
-    var _TAB_NAMES_TO_HUMAN_READABLE_NAMES = {
-      main: 'Edit',
-      preview: 'Preview',
-      settings: 'Settings',
-      stats: 'Statistics',
-      history: 'History',
-      feedback: 'Feedback'
-    };
-
-    WritableCollectionBackendApiService.fetchWritableCollection(
-      $scope.collectionId).then(
-        function(collectionBackendObject) {
-          $scope.collection = CollectionObjectFactory.create(
-            collectionBackendObject);
-          $scope.collectionSkillList.setSkills(collectionBackendObject.skills);
-        }, function(error) {
-          warningsData.addWarning(
-            error || 'There was an error loading the collection.');
-        });
-
-    $scope.getCurrentTabName = function() {
-      if (!routerService.getTabStatuses()) {
-        return '';
-      } else {
-        return _TAB_NAMES_TO_HUMAN_READABLE_NAMES[
-          routerService.getTabStatuses().active];
-      }
-    };
-  }]);
-
 oppia.controller('CollectionEditorNavigation', [
   '$scope', '$rootScope', '$timeout', 'routerService',
   function($scope, $rootScope, $timeout, routerService) {
