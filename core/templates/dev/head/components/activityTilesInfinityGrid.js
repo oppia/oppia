@@ -22,8 +22,8 @@ oppia.directive('activityTilesInfinityGrid', [function() {
     restrict: 'E',
     templateUrl: 'components/activityTilesInfinityGrid',
     controller: [
-      '$scope', '$rootScope', '$modal', '$window', 'searchService',
-      function($scope, $rootScope, $modal, $window, searchService) {
+      '$scope', '$rootScope', 'searchService',
+      function($scope, $rootScope, searchService) {
         $scope.showMoreExplorations = function() {
           if (!$rootScope.loadingMessage) {
             $scope.pageLoaderIsBusy = true;
