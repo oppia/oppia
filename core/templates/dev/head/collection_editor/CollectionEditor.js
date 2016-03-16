@@ -104,17 +104,3 @@ oppia.controller('CollectionEditor', ['$scope',
         });
     };
   }]);
-
-oppia.controller('CollectionEditorNavigation', [
-  '$scope', '$rootScope', '$timeout', 'routerService',
-  function($scope, $rootScope, $timeout, routerService) {
-    $scope.tutorialHelpPopoverIsShown = false;
-    $scope.getTabStatuses = routerService.getTabStatuses;
-    $scope.selectMainTab = routerService.navigateToMainTab;
-    $scope.selectPreviewTab = routerService.navigateToPreviewTab;
-    $scope.selectSettingsTab = routerService.navigateToSettingsTab;
-    $scope.selectStatsTab = routerService.navigateToStatsTab;
-    $scope.selectHistoryTab = routerService.navigateToHistoryTab;
-    $scope.selectFeedbackTab = routerService.navigateToFeedbackTab;
-  }
-]);

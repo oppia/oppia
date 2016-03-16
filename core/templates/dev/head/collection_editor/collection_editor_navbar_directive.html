@@ -1,0 +1,112 @@
+<script type="text/ng-template" id="inline/collection_editor_navbar_directive">
+  <ul
+    class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak"
+    style="margin-left: 20px;">
+    <!-- Editor -->
+    {% if SHOW_COLLECTION_NAVIGATION_TAB_MAIN %}
+    <li
+      ng-class="{'active': getTabStatuses().active === 'main',
+      'dropdown': countWarnings()}">
+      <a
+        href="#"
+        tooltip="Editor"
+        tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>"
+        ng-click="selectMainTab()" class="protractor-test-main-tab">
+        <span class="glyphicon glyphicon-pencil"></span>
+      </a>
+    </li>
+    {% endif %}
+
+    <!-- Preview -->
+    {% if SHOW_COLLECTION_NAVIGATION_TAB_PREVIEW and username %}
+      <li
+        id="tutorialPreviewTab"
+        ng-class="{'active': getTabStatuses().active === 'preview'}">
+        <a
+          href="#"
+          tooltip="Preview"
+          tooltip-placement="bottom"
+          ng-click="selectPreviewTab()"
+          class="protractor-test-preview-tab">
+          <span class="glyphicon glyphicon-play"></span>
+        </a>
+      </li>
+    {% endif %}
+
+    <!-- Settings -->
+    {% if SHOW_COLLECTION_NAVIGATION_TAB_SETTINGS %}
+    <li
+    ng-class="{'active': getTabStatuses().active === 'settings'}">
+      <a
+        href="#"
+        tooltip="Settings"
+        tooltip-placement="bottom"
+        ng-click="selectSettingsTab()"
+        class="protractor-test-settings-tab">
+        <span class="glyphicon glyphicon-cog"></span>
+      </a>
+    </li>
+    {% endif %}
+
+    <!-- History -->
+    {% if SHOW_COLLECTION_NAVIGATION_TAB_HISTORY %}
+    <li
+    ng-class="{'active': getTabStatuses().active === 'history'}">
+      <a
+        href="#"
+        tooltip="History"
+        tooltip-placement="bottom"
+        ng-click="selectHistoryTab()"
+        disabled="explorationRightsService.isCloned()"
+        class="protractor-test-history-tab">
+        <span class="glyphicon glyphicon-time"></span>
+      </a>
+    </li>
+    {% endif %}
+
+    <!-- Feedback -->
+    {% if SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK %}
+    <li
+    ng-class="{'active': getTabStatuses().active === 'feedback'}">
+      <a
+        href="#"
+        tooltip="Feedback"
+        tooltip-placement="bottom"
+        ng-click="selectFeedbackTab()">
+        <span class="glyphicon glyphicon-comment"></span>
+      </a>
+    </li>
+    {% endif %}
+
+    <!-- Stats -->
+    {% if SHOW_COLLECTION_NAVIGATION_TAB_STATS and username %}
+      <li
+      ng-class="{'active': getTabStatuses().active === 'stats'}">
+        <a
+          href="#"
+          tooltip="Statistics"
+          tooltip-placement="bottom"
+          ng-click="selectStatsTab()">
+          <span class="glyphicon glyphicon-stats"></span>
+        </a>
+      </li>
+    {% endif %}
+
+    <!-- Help -->
+    {% if SHOW_COLLECTION_NAVIGATION_TAB_HELP and username %}
+      <li
+        class="dropdown"
+        popover-is-open="tutorialHelpPopoverIsShown"
+        popover-placement="bottom"
+        popover-trigger="none"
+        popover="To get help in the future, click here!">
+        <a
+          href="#"
+          tooltip="Help"
+          tooltip-placement="bottom">
+          <span class="glyphicon glyphicon-question-sign"></span>
+        </a>
+      </li>
+    {% endif %}
+  </ul>
+</script>
