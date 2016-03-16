@@ -22,7 +22,7 @@
 #   bash scripts/run_frontend_tests.sh
 #
 # Optional arguments:
-#   --skip-install=true/false Possibly skips installing dependencies. The
+#   --skip-install=true/false If true, skips installing dependencies. The
 #         default value is false.
 #   --run-minified-tests=true/false Whether to run frontend karma tests on both
 #         minified and non-minified code. The default value is false.

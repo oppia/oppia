@@ -44,7 +44,7 @@ function maybeInstallDependencies {
       ;;
 
       *)
-      echo Error: Unknown command line option: $i
+      echo "Error: Unknown command line option: $i"
       ;;
     esac
   done

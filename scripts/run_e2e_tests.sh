@@ -22,9 +22,11 @@
 #   bash scripts/run_e2e_tests.sh
 #
 # Optional arguments:
-#   --skip-install=true/false Possibly skips installing dependencies. The default value is false.
+#   --skip-install=true/false If true, skips installing dependencies. The
+#         default value is false.
 #   --sharding=true/false Disables/Enables parallelization of protractor tests.
-#   --sharding-instances=# Sets the number of parallel browsers to open while sharding.
+#   --sharding-instances=# Sets the number of parallel browsers to open while
+#         sharding.
 # Sharding must be disabled (either by passing in false to --sharding or 1 to
 # --sharding-instances) if running any tests in isolation (iit or ddescribe).
 #
@@ -130,7 +132,7 @@ for i in "$@"; do
     ;;
 
     *)
-    echo Error: Unknown command line option: $i
+    echo "Error: Unknown command line option: $i"
     ;;
   esac
 done
