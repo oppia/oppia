@@ -16,8 +16,6 @@
  * @fileoverview search service for activityTilesInfinityGrid
  */
 
-// Service for searching
-
 oppia.constant('GALLERY_DATA_URL', '/galleryhandler/data');
 
 oppia.factory('searchService', [

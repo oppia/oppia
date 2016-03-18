@@ -16,7 +16,6 @@
  * @fileoverview Directive for load more activity tiles
  */
 
-//
 oppia.directive('activityTilesInfinityGrid', [function() {
   return {
     restrict: 'E',
