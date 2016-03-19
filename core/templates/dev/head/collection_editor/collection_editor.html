@@ -55,6 +55,7 @@
       <br>
       <input ng-model="commitMessage" type="text" placeholder="Commit Message"><button ng-click="saveCollection(commitMessage)">Save Collection</button>
       <button ng-click="publishCollection()" ng-if="!isPublic">Publish Collection</button>
+      <button ng-click="unpublishCollection()" ng-if"isPublic">Unpublish Collection</button>
     </div>
   </div>
 
