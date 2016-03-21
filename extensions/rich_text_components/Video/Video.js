@@ -34,6 +34,8 @@ oppia.directive('oppiaNoninteractiveVideo', [
 
           $scope.videoId = oppiaHtmlEscaper.escapedJsonToObj(
             $attrs.videoIdWithValue);
+          $scope.videoId = $scope.videoId.match(
+            /([A-z]|[0-9]){11}/g);
           $scope.timingParams = '&start=' + start + '&end=' + end;
           $scope.autoplaySuffix = '&autoplay=0';
 
