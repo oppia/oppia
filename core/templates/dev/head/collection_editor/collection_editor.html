@@ -37,34 +37,28 @@
 
 {% block content %}
   <div ng-controller="CollectionEditor">
-    <div ng-if="collection">
-      <!-- Collection details -->
-      <collection-details-editor-directive collection="collection">
-      </collection-details-editor-directive>
-      <a ng-href="/collection/<[collection.getId()]>" target="_blank">Go to Collection</a>
+    <div ng-if="getTabStatuses().active === 'main'">
+      {% include 'collection_editor/collection_main.html' %}
+    </div>
 
-      <!-- List of acquired and pre-requisite skills -->
-      <br>
-      <br>
-      <strong>Skills</strong>
-      <collection-skill-list-directive collection-skill-list="collectionSkillList">
-      </collection-skill-list-directive>
+    <div ng-if="getTabStatuses().active === 'preview'">
+      {% include 'collection_editor/collection_preview.html' %}
+    </div>
 
-      <!-- List of explorations -->
-      <br>
-      <strong>Explorations</strong>
-      <ul>
-        <li ng-repeat="node in collection.getBindableCollectionNodes()">
-          <collection-node-editor-directive collection="collection" collection-node="node" update-skill-list="updateSkillList()">
-          </collection-node-editor-directive>
-        </li>
-      </ul>
+    <div ng-show="getTabStatuses().active === 'settings'">
+      {% include 'collection_editor/collection_settings.html' %}
+    </div>
 
-      <!-- Collection changes to be commited -->
-      <h3><span ng-if="getChangeListCount() > 0"> <em>(<[getChangeListCount()]> changes pending)</em></h3>
-      <br>
-      <input ng-model="commitMessage" type="text" placeholder="Commit Message"><button ng-click="saveCollection(commitMessage)">Save Collection</button>
-      <button ng-click="publishCollection()" ng-if="!isPublic">Publish Collection</button>
+    <div ng-show="getTabStatuses().active === 'history'">
+      {% include 'collection_editor/collection_history.html' %}
+    </div>
+
+    <div ng-show="getTabStatuses().active === 'feedback'">
+      {% include 'collection_editor/collection_feedback.html' %}
+    </div>
+
+    <div ng-show="getTabStatuses().active === 'stats'">
+      {% include 'collection_editor/collection_statistics.html' %}
     </div>
   </div>
 
@@ -84,6 +78,14 @@
     {{ include_js_file('collection_editor/CollectionSkillListDirective.js') }}
     {{ include_js_file('collection_editor/CollectionEditorNavbarBreadcrumbDirective.js') }}
     {{ include_js_file('collection_editor/CollectionEditorNavbarDirective.js') }}
+
+    {{ include_js_file('collection_editor/CollectionMain.js') }}
+    {{ include_js_file('collection_editor/CollectionPreview.js') }}
+    {{ include_js_file('collection_editor/CollectionSettings.js') }}
+    {{ include_js_file('collection_editor/CollectionHistory.js') }}
+    {{ include_js_file('collection_editor/CollectionFeedback.js') }}
+    {{ include_js_file('collection_editor/CollectionStatistics.js') }}
+
     {{ include_js_file('domain/collection/CollectionBackendApiService.js') }}
     {{ include_js_file('domain/collection/CollectionNodeObjectFactory.js') }}
     {{ include_js_file('domain/collection/CollectionObjectFactory.js') }}
@@ -94,10 +96,12 @@
     {{ include_js_file('domain/editor/ChangeObjectFactory.js') }}
     {{ include_js_file('domain/editor/UndoRedoService.js') }}
     {{ include_js_file('domain/utilities/UrlInterpolationService.js') }}
+
     {{ include_js_file('editor/ExplorationEditor.js') }}
     {{ include_js_file('editor/EditorServices.js') }}
     {{ include_js_file('editor/GadgetValidationService.js') }}
     {{ include_js_file('editor/RouterServices.js') }}
+
     {{ include_js_file('expressions/expressionInterpolationService.js') }}
   </script>
 {% endblock footer_js %}
