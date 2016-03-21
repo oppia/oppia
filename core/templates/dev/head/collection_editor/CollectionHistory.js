@@ -19,6 +19,4 @@
  * @author oskar.cieslik@gmail.com (Oskar Cieslik)
  */
 
-oppia.controller('CollectionHistory', [
-  '$scope', function($scope) {}
-]);
+oppia.controller('CollectionHistory', ['$scope']);
