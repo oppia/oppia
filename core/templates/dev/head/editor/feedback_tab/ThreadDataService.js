@@ -15,13 +15,11 @@
 /**
  * @fileoverview Service for getting thread data from the backend for the
  * feedback tab of the exploration editor.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.factory('threadDataService', [
-    '$http', '$q', 'explorationData', 'warningsData',
-    function($http, $q, explorationData, warningsData) {
+    '$http', '$q', 'explorationData', 'alertsService',
+    function($http, $q, explorationData, alertsService) {
   var _expId = explorationData.explorationId;
   var _FEEDBACK_STATS_HANDLER_URL = '/feedbackstatshandler/' + _expId;
   var _THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + _expId;
@@ -102,7 +100,7 @@ oppia.factory('threadDataService', [
         }
       }).error(function() {
         _openThreadsCount -= 1;
-        warningsData.addWarning('Error creating new thread.');
+        alertsService.addWarning('Error creating new thread.');
       });
     },
     addNewMessage: function(

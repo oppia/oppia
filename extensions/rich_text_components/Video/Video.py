@@ -66,3 +66,4 @@ class Video(base.BaseRichTextComponent):
         },
         'default_value': False,
     }]
+

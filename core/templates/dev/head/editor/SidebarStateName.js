@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Controllers for the 'state name' section of the editor sidebar.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.controller('SidebarStateName', [

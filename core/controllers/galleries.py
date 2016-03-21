@@ -18,6 +18,8 @@ import json
 import logging
 
 from core.controllers import base
+from core.domain import collection_domain
+from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -37,6 +39,7 @@ SPLASH_PAGE_YOUTUBE_VIDEO_ID = config_domain.ConfigProperty(
     default_value='')
 
 EXPLORATION_ID_KEY = 'explorationId'
+COLLECTION_ID_KEY = 'collectionId'
 
 ALLOW_YAML_FILE_UPLOAD = config_domain.ConfigProperty(
     'allow_yaml_file_upload', {'type': 'bool'},
@@ -82,9 +85,6 @@ class GalleryPage(base.BaseHandler):
         self.values.update({
             'nav_mode': feconf.NAV_MODE_GALLERY,
             'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
-            'gallery_login_redirect_url': (
-                current_user_services.create_login_url(
-                    feconf.MY_EXPLORATIONS_CREATE_MODE_URL)),
             'has_fully_registered': bool(
                 self.user_id and
                 user_services.has_fully_registered(self.user_id)),
@@ -176,6 +176,32 @@ class NewExploration(base.BaseHandler):
         exp_services.save_new_exploration(self.user_id, exploration)
 
         self.render_json({EXPLORATION_ID_KEY: new_exploration_id})
+
+
+class NewCollection(base.BaseHandler):
+    """Creates a new collection."""
+
+    PAGE_NAME_FOR_CSRF = 'gallery'
+
+    @base.require_fully_signed_up
+    def post(self):
+        """Handles POST requests."""
+        title = self.payload.get('title')
+        category = self.payload.get('category')
+        objective = self.payload.get('objective')
+        # TODO(bhenning): Implement support for language codes in collections.
+
+        if not title:
+            raise self.InvalidInputException('No title supplied.')
+        if not category:
+            raise self.InvalidInputException('No category chosen.')
+
+        new_collection_id = collection_services.get_new_collection_id()
+        collection = collection_domain.Collection.create_default_collection(
+            new_collection_id, title, category, objective=objective)
+        collection_services.save_new_collection(self.user_id, collection)
+
+        self.render_json({COLLECTION_ID_KEY: new_collection_id})
 
 
 class UploadExploration(base.BaseHandler):

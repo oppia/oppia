@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Controllers for the exploration history tab.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.controller('ExplorationHistory', [

@@ -19,6 +19,7 @@ import logging
 # pylint: disable=relative-import
 from core.controllers import admin
 from core.controllers import base
+from core.controllers import collection_editor
 from core.controllers import collection_viewer
 from core.controllers import editor
 from core.controllers import feedback
@@ -206,6 +207,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.NEW_EXPLORATION_URL,
         galleries.NewExploration, 'new_exploration'),
     get_redirect_route(
+        r'%s' % feconf.NEW_COLLECTION_URL,
+        galleries.NewCollection, 'new_collection'),
+    get_redirect_route(
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
         galleries.UploadExploration, 'upload_exploration'),
     get_redirect_route(
@@ -372,6 +376,17 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_DATA_URL_PREFIX,
         collection_viewer.CollectionDataHandler, 'collection_data_handler'),
+
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_EDITOR_URL_PREFIX,
+        collection_editor.CollectionEditorPage, 'collection_editor_page'),
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_WRITABLE_DATA_URL_PREFIX,
+        collection_editor.WritableCollectionDataHandler,
+        'writable_collection_data_handler'),
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_RIGHTS_PREFIX,
+        collection_editor.CollectionRightsHandler, 'collection_rights_handler'),
 
     get_redirect_route(
         r'/notificationshandler', home.NotificationsHandler,

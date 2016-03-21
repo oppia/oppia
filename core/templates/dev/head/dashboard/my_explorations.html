@@ -20,16 +20,19 @@
 {% endblock navbar_breadcrumb %}
 
 {% block local_top_nav_options %}
-  <ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak" ng-controller="CreateExplorationButton">
-    <li>
-      <div class="oppia-navbar-button-container" style="margin-right: 25px;">
-        <a class="btn oppia-navbar-add-exploration-button protractor-test-create-exploration oppia-transition-200"
-           ng-click="showCreateExplorationModal()" style="margin-right: 0;">
-          <span>Create</span>
-        </a>
-      </div>
-    </li>
-  </ul>
+  {% if can_create_collections %}
+    <ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak" ng-controller="CreateCollectionButton">
+      <li>
+        <div class="oppia-navbar-button-container" style="margin-right: 25px;">
+          <a class="btn oppia-navbar-add-exploration-button protractor-test-create-exploration oppia-transition-200"
+             ng-click="showCreateCollectionModal()" style="margin-right: 0;">
+            <span class="oppia-navbar-add-exploration-button-plus">+</span>
+            <span>Create Collection</span>
+          </a>
+        </div>
+      </li>
+    </ul>
+  {% endif %}
 {% endblock local_top_nav_options %}
 
 {% block content %}
@@ -142,7 +145,7 @@
 {% block footer_js %}
   {{ super() }}
   <script>
-    {{ include_js_file('components/ExplorationCreationButtonService.js') }}
+    {{ include_js_file('components/CollectionCreationButtonService.js') }}
     {{ include_js_file('dashboard/MyExplorations.js') }}
   </script>
 {% endblock footer_js %}

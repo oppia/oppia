@@ -15,8 +15,6 @@
 /**
  * @fileoverview Controllers for the exploration editor page and the editor
  *               help tab in the navbar.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
@@ -365,12 +363,12 @@ oppia.controller('EditorNavbarBreadcrumb', [
 
 oppia.controller('ExplorationSaveAndPublishButtons', [
   '$scope', '$http', '$rootScope', '$window', '$timeout', '$modal',
-  'warningsData', 'changeListService', 'focusService', 'routerService',
+  'alertsService', 'changeListService', 'focusService', 'routerService',
   'explorationData', 'explorationRightsService', 'editabilityService',
   'explorationWarningsService', 'siteAnalyticsService',
   function(
       $scope, $http, $rootScope, $window, $timeout, $modal,
-      warningsData, changeListService, focusService, routerService,
+      alertsService, changeListService, focusService, routerService,
       explorationData, explorationRightsService, editabilityService,
       explorationWarningsService, siteAnalyticsService) {
     // Whether or not a save action is currently in progress.
@@ -399,11 +397,12 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     $scope.discardChanges = function() {
       var confirmDiscard = confirm('Do you want to discard your changes?');
       if (confirmDiscard) {
-        warningsData.clear();
+        alertsService.clearWarnings();
         $rootScope.$broadcast('externalSave');
 
         $scope.isDiscardInProgress = true;
         changeListService.discardAllChanges();
+        alertsService.addSuccessMessage('Changes discarded.');
         $rootScope.$broadcast('initExplorationPage', function() {
           $scope.lastSaveOrDiscardAction = 'discard';
           $scope.isDiscardInProgress = false;
@@ -442,7 +441,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
     $scope.showPublishExplorationModal = function() {
       $scope.publishModalIsOpening = true;
-      warningsData.clear();
+      alertsService.clearWarnings();
       var modalInstance = $modal.open({
         templateUrl: 'modals/publishExploration',
         backdrop: true,
@@ -452,7 +451,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              warningsData.clear();
+              alertsService.clearWarnings();
             };
           }]
       });
@@ -509,7 +508,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         version: explorationData.data.version
       }).success(function(data) {
         if (data.error) {
-          warningsData.addWarning(data.error);
+          alertsService.addWarning(data.error);
           return;
         }
 
@@ -537,7 +536,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
           deletedGadgets.length > 0);
 
         if (!changesExist) {
-          warningsData.addWarning('Your changes cancel each other out, ' +
+          alertsService.addWarning('Your changes cancel each other out, ' +
             'so nothing has been saved.');
           $scope.saveModalIsOpening = false;
           changeListService.discardAllChanges();
@@ -547,11 +546,11 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         if (!explorationRightsService.isPrivate() && warningMessage) {
           // If the exploration is not private, warnings should be fixed before
           // it can be saved.
-          warningsData.addWarning(warningMessage);
+          alertsService.addWarning(warningMessage);
           return;
         }
 
-        warningsData.clear();
+        alertsService.clearWarnings();
 
         // If the modal is open, do not open another one.
         if (_modalIsOpen) {
@@ -731,7 +730,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               };
               $scope.cancel = function() {
                 $modalInstance.dismiss('cancel');
-                warningsData.clear();
+                alertsService.clearWarnings();
               };
             }
           ]
@@ -760,6 +759,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
             $rootScope.$broadcast('refreshVersionHistory', {
               forceRefresh: true
             });
+            alertsService.addSuccessMessage('Changes saved.');
             $scope.lastSaveOrDiscardAction = 'save';
             $scope.isSaveInProgress = false;
           }, function() {

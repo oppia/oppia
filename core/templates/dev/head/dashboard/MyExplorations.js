@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Controllers for the page showing the user's explorations.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.controller('MyExplorations', [
@@ -58,6 +56,15 @@ oppia.controller('CreateExplorationButton', [
     $scope.showCreateExplorationModal = function() {
       ExplorationCreationButtonService.showCreateExplorationModal(
         CATEGORY_LIST);
+    };
+  }
+]);
+
+oppia.controller('CreateCollectionButton', [
+  '$scope', 'CATEGORY_LIST', 'CollectionCreationButtonService',
+  function($scope, CATEGORY_LIST, CollectionCreationButtonService) {
+    $scope.showCreateCollectionModal = function() {
+      CollectionCreationButtonService.showCreateCollectionModal(CATEGORY_LIST);
     };
   }
 ]);

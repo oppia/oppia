@@ -15,24 +15,22 @@
 /**
  * @fileoverview Service to retrieve information about collections from the
  * backend.
- *
- * @author henning.benmax@gmail.com (Ben Henning)
  */
 
 // TODO(bhenning): For preview mode, this service should be replaced by a
 // separate CollectionDataService implementation which returns a local copy of
 // the collection instead. This file should not be included on the page in that
 // scenario.
-oppia.factory('CollectionDataService', [
-    '$http', '$q', 'COLLECTION_DATA_URL', 'UrlInterpolationService',
-    function($http, $q, COLLECTION_DATA_URL, UrlInterpolationService) {
+oppia.factory('CollectionBackendApiService', [
+    '$http', '$q', 'COLLECTION_DATA_URL_TEMPLATE', 'UrlInterpolationService',
+    function($http, $q, COLLECTION_DATA_URL_TEMPLATE, UrlInterpolationService) {
   // Maps previously loaded collections to their IDs.
   var _collectionCache = [];
 
   var _fetchCollection = function(
       collectionId, successCallback, errorCallback) {
     var collectionDataUrl = UrlInterpolationService.interpolateUrl(
-      COLLECTION_DATA_URL, {
+      COLLECTION_DATA_URL_TEMPLATE, {
         collection_id: collectionId
       });
 
@@ -88,7 +86,9 @@ oppia.factory('CollectionDataService', [
           _fetchCollection(collectionId, function(collection) {
             // Save the fetched collection to avoid future fetches.
             _collectionCache[collectionId] = collection;
-            resolve(angular.copy(collection));
+            if (resolve) {
+              resolve(angular.copy(collection));
+            }
           }, reject);
         }
       });
@@ -100,6 +100,14 @@ oppia.factory('CollectionDataService', [
      */
     isCached: function(collectionId) {
       return _isCached(collectionId);
+    },
+
+    /**
+     * Replaces the current collection in the cache given by the specified
+     * collection ID with a new collection object.
+     */
+    cacheCollection: function(collectionId, collection) {
+      _collectionCache[collectionId] = angular.copy(collection);
     },
 
     /**

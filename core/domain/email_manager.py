@@ -144,9 +144,18 @@ def _send_email(
         '<br>', '\n').replace('</p><p>', '</p>\n<p>')
     cleaned_plaintext_body = html_cleaner.strip_html_tags(raw_plaintext_body)
 
+    if email_models.SentEmailModel.check_duplicate_message(
+            recipient_id, email_subject, cleaned_plaintext_body):
+        log_new_error(
+            'Duplicate email:\n'
+            'Details:\n%s %s\n%s\n\n' %
+            (recipient_id, email_subject, cleaned_plaintext_body))
+        return
+
     def _send_email_in_transaction():
         sender_email = '%s <%s>' % (
             EMAIL_SENDER_NAME.value, feconf.SYSTEM_EMAIL_ADDRESS)
+
         email_services.send_mail(
             sender_email, recipient_email, email_subject,
             cleaned_plaintext_body, cleaned_html_body, bcc_admin)

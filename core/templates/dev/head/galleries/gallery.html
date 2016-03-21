@@ -13,101 +13,7 @@
 {% endblock navbar_breadcrumb %}
 
 {% block local_top_nav_options %}
-  <div ng-controller="SearchBar">
-    <div class="pull-right oppia-navbar-button-container">
-      <!-- NOTE: If you change the links here, please make the corresponding change in the 'no results' message. -->
-      {% if not has_fully_registered %}
-        <!-- User must complete the registration process. -->
-        <a class="btn oppia-navbar-add-exploration-button protractor-test-create-exploration oppia-transition-200"
-           href ng-click="onRedirectToLogin('{{gallery_login_redirect_url}}')">
-          <span class="oppia-navbar-add-exploration-button-plus">+</span>
-          <span>Create Exploration</span>
-        </a>
-      {% else %}
-        <a class="btn oppia-navbar-add-exploration-button protractor-test-create-exploration oppia-transition-200"
-           ng-click="showCreateExplorationModal()">
-          <span>Create</span>
-        </a>
-        {% if allow_yaml_file_upload %}
-          <a class="btn oppia-navbar-add-exploration-button oppia-transition-200"
-             ng-click="showUploadExplorationModal()">
-            <span>Upload</span>
-          </a>
-        {% endif %}
-      {% endif %}
-    </div>
-
-    <form class="navbar-form navbar-left oppia-splash-search-form" role="search">
-      <div class="form-group">
-        <div class="input-group" style="max-width: 300px; width: 300px;">
-          <div class="input-group-addon oppia-splash-search-icon">
-            <span class="glyphicon"
-                  ng-class="{'glyphicon-search': !searchIsLoading,
-                             'glyphicon-refresh oppia-animate-spin': searchIsLoading}">
-            </span>
-          </div>
-          <input type="text" class="form-control oppia-splash-search-input oppia-splash-search-text-input" placeholder="What would you like to learn?" ng-model="searchQuery" ng-keyup="onSearchQueryChange($event)">
-        </div>
-      </div>
-    </form>
-
-    <div dropdown class="dropdown navbar-left oppia-navbar-button-container oppia-gallery-category-selector protractor-test-gallery-category-selector">
-      <button dropdown-toggle type="button" class="btn dropdown-toggle oppia-splash-search-input ng-cloak"
-              title="<[selectionDetails.categories.description]>" style="max-width: 130px;">
-        <[selectionDetails.categories.summary | truncate:14 ]>
-        <span class="caret"></span>
-      </button>
-      <!-- The $event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
-      <ul class="dropdown-menu" role="menu" style="max-height: 400px; overflow: auto;" ng-click="$event.stopPropagation()">
-        <li ng-repeat="item in selectionDetails.categories.masterList track by $index"
-            class="protractor-test-selected"
-            ng-if="selectionDetails.categories.selections[item.id]">
-          <a href ng-click="toggleSelection('categories', item.id)">
-            <[item.text]>
-            <span ng-if="selectionDetails.categories.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
-          </a>
-        </li>
-        <hr ng-if="selectionDetails.categories.numSelections > 0" style="margin: 2px;">
-        <li ng-repeat="item in selectionDetails.categories.masterList track by $index"
-            class="protractor-test-deselected"
-            ng-if="!selectionDetails.categories.selections[item.id]">
-          <a href ng-click="toggleSelection('categories', item.id)">
-            <[item.text]>
-            <span ng-if="selectionDetails.categories.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
-          </a>
-        </li>
-      </ul>
-    </div>
-
-    <div dropdown class="dropdown navbar-left oppia-navbar-button-container oppia-gallery-language-selector protractor-test-gallery-language-selector">
-      <button dropdown-toggle type="button" class="btn dropdown-toggle oppia-splash-search-input ng-cloak"
-              style="border-bottom-right-radius: 4px; border-top-right-radius: 4px; max-width: 130px;"
-              title="<[selectionDetails.languageCodes.description]>">
-        <[selectionDetails.languageCodes.summary | truncate:14 ]>
-        <span class="caret"></span>
-      </button>
-      <!-- The $event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
-      <ul class="dropdown-menu" role="menu" style="max-height: 400px; overflow: auto;" ng-click="$event.stopPropagation()">
-        <li ng-repeat="item in selectionDetails.languageCodes.masterList track by $index"
-            class="protractor-test-selected"
-            ng-if="selectionDetails.languageCodes.selections[item.id]">
-          <a href ng-click="toggleSelection('languageCodes', item.id)">
-            <[item.text]>
-            <span ng-if="selectionDetails.languageCodes.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
-          </a>
-        </li>
-        <hr ng-if="selectionDetails.languageCodes.numSelections > 0" style="margin: 2px;">
-        <li ng-repeat="item in selectionDetails.languageCodes.masterList track by $index"
-            class="protractor-test-deselected"
-            ng-if="!selectionDetails.languageCodes.selections[item.id]">
-          <a href ng-click="toggleSelection('languageCodes', item.id)">
-            <[item.text]>
-            <span ng-if="selectionDetails.languageCodes.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
-          </a>
-        </li>
-      </ul>
-    </div>
-  </div>
+  <search-bar></search-bar>
 {% endblock %}
 
 {% block header_js %}
@@ -205,31 +111,14 @@
                 Oops, it looks like your search didn't match any explorations.<br><br>
                 <!-- NOTE: If you change the links here, please make the corresponding change for the 'Create New Exploration' button. -->
                 {% if not has_fully_registered %}
-                  Would you like to <a href ng-click="onRedirectToLogin('{{gallery_login_redirect_url}}')">create one</a>?
+                  Would you like to <a href ng-click="onRedirectToLogin('/my_explorations?mode=create')">create one</a>?
                 {% else %}
                   Would you like to <a ng-click="showCreateExplorationModal()">create one</a>?
                 {% endif %}
               </p>
             </div>
           </div>
-
-          <div infinite-scroll="showMoreExplorations()" infinite-scroll-distance="1"
-               infinite-scroll-disabled="finishedLoadingPage || pageLoaderIsBusy">
-            <exploration-summary-tile ng-repeat="exp in allExplorationsInOrder track by $index"
-                                      exploration-id="exp.id"
-                                      exploration-title="exp.title"
-                                      last-updated-msec="exp.last_updated_msec"
-                                      objective="exp.objective"
-                                      category="exp.category"
-                                      ratings="exp.ratings"
-                                      thumbnail-icon-url="exp.thumbnail_icon_url"
-                                      thumbnail-bg-color="exp.thumbnail_bg_color"
-                                      num-views="exp.num_views"
-                                      contributors-summary="exp.human_readable_contributors_summary"
-                                      class="protractor-test-gallery-tile"
-                                      style="display: inline-block;">
-            </exploration-summary-tile>
-          </div>
+          <activity-tiles-infinity-grid></activity-tiles-infinity-grid>
         </div>
       </div>
       <div class="oppia-gallery-loading-results-message" ng-if="pageLoaderIsBusy">
@@ -241,13 +130,16 @@
 
   {% include 'components/exploration_creation_button_modal.html' %}
   {% include 'components/profile_link_image_directive.html' %}
+  {% include 'components/search_bar_directive.html' %}
+  {% include 'components/circular_image_directive.html' %}
 {% endblock %}
 
 {% block footer_js %}
   {{ super() }}
   <script>
-    {{ include_js_file('components/ExplorationCreationButtonService.js') }}
     {{ include_js_file('components/ProfileLinkImageDirective.js') }}
+    {{ include_js_file('components/SearchBarDirective.js') }}
+    {{ include_js_file('components/CircularImageDirective.js') }}
     {{ include_js_file('galleries/Gallery.js') }}
   </script>
 {% endblock footer_js %}

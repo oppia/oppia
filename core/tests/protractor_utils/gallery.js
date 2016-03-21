@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Utilities for the gallery in end-to-end tests with protractor.
- *
- * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var editor = require('./editor.js');

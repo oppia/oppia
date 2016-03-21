@@ -15,8 +15,6 @@
 /**
  * @fileoverview Utilities for interacting with forms when carrrying
  * out end-to-end testing with protractor.
- *
- * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var interactions = require('../../../extensions/interactions/protractor.js');
