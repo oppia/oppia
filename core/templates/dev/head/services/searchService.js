@@ -71,6 +71,7 @@ oppia.factory('searchService', [
     executeSearchQuery: function(
         searchQuery, selectedCategories, selectedLanguageCodes,
         successCallback) {
+      console.log(searchQuery);
       var queryUrl = GALLERY_DATA_URL + '?q=' + encodeURI(
         searchQuery +
         _getSuffixForQuery(selectedCategories, selectedLanguageCodes));

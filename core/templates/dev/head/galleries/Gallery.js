@@ -89,12 +89,12 @@ oppia.controller('Gallery', [
   '$scope', '$http', '$rootScope', '$modal', '$window', '$timeout',
   'ExplorationCreationButtonService', 'oppiaDatetimeFormatter',
   'oppiaDebouncer', 'urlService', 'GALLERY_DATA_URL', 'CATEGORY_LIST',
-  'searchService', 'siteAnalyticsService', 'selectionDataService',
+  'searchService', 'siteAnalyticsService',
   function(
       $scope, $http, $rootScope, $modal, $window, $timeout,
       ExplorationCreationButtonService, oppiaDatetimeFormatter,
       oppiaDebouncer, urlService, GALLERY_DATA_URL, CATEGORY_LIST,
-      searchService, siteAnalyticsService, selectionDataService) {
+      searchService, siteAnalyticsService) {
     $rootScope.loadingMessage = 'Loading';
 
     // Below is the width of each tile (width + margins), which can be found
@@ -263,7 +263,7 @@ oppia.controller('Gallery', [
       }
     };
 
-    $scope.$on('isInSearchMode', function() {
+    $scope.$on('hasChangedSearchQuery', function() {
       removeSplashCarousel();
     });
 
@@ -287,12 +287,11 @@ oppia.controller('Gallery', [
     );
 
     $scope.showFullGalleryGroup = function(galleryGroup) {
-      selectionDataService.clearCategories();
-      selectionDataService.addCategoriesToSelection(galleryGroup.categories);
-      // TODO(sll): is this line correct?
-      selectionDataService.clearLanguageCodes();
-      console.log(galleryGroup);
-      searchService.executeSearchQuery('', galleryGroup.categories, '', function() {
+      var selectedCategories = {};
+      for (i = 0; i < galleryGroup.categories.length; i++) {
+        selectedCategories[galleryGroup.categories[i]] = true;
+      }
+      searchService.executeSearchQuery('', selectedCategories, '', function() {
         removeSplashCarousel();
       });
       // TODO(sll): Clear the search query from the search bar, too.
