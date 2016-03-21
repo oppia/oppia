@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview End-to-end tests of user editing and viewing rights.
- *
- * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var forms = require('../protractor_utils/forms.js');
@@ -49,7 +47,8 @@ describe('Permissions for private explorations', function() {
       users.login('eve@example.com');
       general.openEditor(explorationId);
       // Eve is redirected to the homepage.
-      expect(browser.getCurrentUrl()).toEqual(general.SERVER_URL_PREFIX + '/');
+      expect(browser.getCurrentUrl()).toEqual(
+        general.SERVER_URL_PREFIX + '/my_explorations');
       users.logout();
     });
   });

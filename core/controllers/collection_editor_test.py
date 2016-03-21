@@ -14,28 +14,17 @@
 
 """Tests for the collection editor page."""
 
-__author__ = 'Abraham Mgowano'
-
-
-import os
-import StringIO
-import zipfile
-
-from core.controllers import collection_editor
-from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import config_services
+from core.domain import config_domain
 from core.domain import rights_manager
-from core.domain import rule_domain
 from core.tests import test_utils
 import feconf
-import logging
 
 
 class BaseCollectionEditorControllerTest(test_utils.GenericTestBase):
 
-    CAN_EDIT_STR = 'GLOBALS.can_edit = JSON.parse(\'true\');'
-    CANNOT_EDIT_STR = 'GLOBALS.can_edit = JSON.parse(\'false\');'
+    CAN_EDIT_STR = 'GLOBALS.canEdit = JSON.parse(\'true\');'
+    CANNOT_EDIT_STR = 'GLOBALS.canEdit = JSON.parse(\'false\');'
 
     def setUp(self):
         """Completes the sign-up process for self.EDITOR_EMAIL."""
@@ -49,7 +38,7 @@ class BaseCollectionEditorControllerTest(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-        self.set_admins([self.ADMIN_EMAIL])
+        self.set_admins([self.ADMIN_USERNAME])
 
     def assert_can_edit(self, response_body):
         """Returns True if the response body indicates that the collection is
@@ -67,10 +56,10 @@ class BaseCollectionEditorControllerTest(test_utils.GenericTestBase):
 
 
 class CollectionEditorTest(BaseCollectionEditorControllerTest):
+    COLLECTION_ID = '0'
+
     def setUp(self):
         super(CollectionEditorTest, self).setUp()
-
-        self.COLLECTION_ID = '0'
 
         collection_services.load_demo(self.COLLECTION_ID)
         rights_manager.release_ownership_of_collection(
@@ -78,24 +67,31 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
 
     def test_access_collection_editor_page(self):
         """Test access to editor pages for the sample collection."""
+        whitelisted_usernames = [self.EDITOR_USERNAME]
+        self.set_config_property(
+            config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES,
+            whitelisted_usernames)
 
-        # Check that it is possible to access a page with specific version number
+        # Check that it is possible to access a page with specific version
+        # number.
         response = self.testapp.get(
-            '%s/%s?v=1' % (feconf.COLLECTION_DATA_URL_PREFIX, self.COLLECTION_ID))
+            '%s/%s?v=1' % (feconf.COLLECTION_DATA_URL_PREFIX,
+                           self.COLLECTION_ID))
         self.assertEqual(response.status_int, 200)
         self.assertIn('Introduction to Collections in Oppia', response.body)
-     
-        # Check that non-editors can access, but not edit, the editor page.
-        response = self.testapp.get(
-            '%s/%s' % (feconf.COLLECTION_EDITOR_URL_PREFIX, self.COLLECTION_ID))
-        self.assertEqual(response.status_int, 200)
-        self.assertIn('Introduction to Collections in Oppia', response.body)
-        self.assert_cannot_edit(response.body)
 
-        # Check that it is now possible to access and edit the editor page.
+        # Check that non-editors cannot access the editor page. This is due
+        # to them not being whitelisted.
+        response = self.testapp.get(
+            '%s/%s' % (feconf.COLLECTION_EDITOR_URL_PREFIX,
+                       self.COLLECTION_ID))
+        self.assertEqual(response.status_int, 302)
+
+        # Check that whitelisted users can access and edit in the editor page.
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get(
-            '%s/%s' % (feconf.COLLECTION_EDITOR_URL_PREFIX, self.COLLECTION_ID))
+            '%s/%s' % (feconf.COLLECTION_EDITOR_URL_PREFIX,
+                       self.COLLECTION_ID))
         self.assertEqual(response.status_int, 200)
         self.assertIn('Introduction to Collections in Oppia', response.body)
         self.assert_can_edit(response.body)

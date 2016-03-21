@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Unit tests for math expression rules.
- *
- * @author sean@seanlip.org (Sean Lip)
  */
 
 describe('Math expression input rules service', function() {

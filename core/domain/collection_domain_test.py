@@ -392,6 +392,20 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
             collection.get_next_exploration_ids(
                 ['exp_id_0', 'exp_id_1', 'exp_id_2', 'exp_id_3']), [])
 
+    def test_next_explorations_with_invalid_exploration_ids(self):
+        collection = collection_domain.Collection.create_default_collection(
+            'collection_id', 'A title', 'A category', 'An objective')
+        collection.add_node('exp_id_1')
+
+        # There should be one suggested exploration to complete by default.
+        self.assertEqual(collection.get_next_exploration_ids([]), ['exp_id_1'])
+
+        # If an invalid exploration ID is passed to get_next_exploration_ids(),
+        # it should be ignored. This tests the situation where an exploration
+        # is deleted from a collection after being completed by a user.
+        self.assertEqual(
+            collection.get_next_exploration_ids(['fake_exp_id']), ['exp_id_1'])
+
 
 class YamlCreationUnitTests(test_utils.GenericTestBase):
     """Test creation of collections from YAML files."""

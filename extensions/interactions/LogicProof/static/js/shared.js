@@ -15,7 +15,6 @@
 /**
  * @fileoverview Components used by both the editor and reader of the
  *  LogicProof interaction.
- * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var logicProofShared = (function() {

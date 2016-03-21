@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Directive for displaying summary rating information.
- *
- * @author Jacob Davis
  */
 
 oppia.directive('ratingDisplay', [function() {

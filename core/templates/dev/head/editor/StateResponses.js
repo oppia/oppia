@@ -15,8 +15,6 @@
 /**
  * @fileoverview Controllers, services and filters for responses corresponding
  * to a state's interaction and answer groups.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 // A state-specific cache for interaction handlers. It stores handlers
@@ -290,12 +288,12 @@ oppia.factory('responsesService', [
 
 oppia.controller('StateResponses', [
   '$scope', '$rootScope', '$modal', '$filter', 'stateInteractionIdService',
-  'editorContextService', 'warningsData', 'responsesService', 'routerService',
+  'editorContextService', 'alertsService', 'responsesService', 'routerService',
   'explorationContextService', 'trainingDataService',
   'PLACEHOLDER_OUTCOME_DEST', 'INTERACTION_SPECS',
   function(
       $scope, $rootScope, $modal, $filter, stateInteractionIdService,
-      editorContextService, warningsData, responsesService, routerService,
+      editorContextService, alertsService, responsesService, routerService,
       explorationContextService, trainingDataService,
       PLACEHOLDER_OUTCOME_DEST, INTERACTION_SPECS) {
     $scope.editorContextService = editorContextService;
@@ -455,7 +453,7 @@ oppia.controller('StateResponses', [
     });
 
     $scope.openTeachOppiaModal = function() {
-      warningsData.clear();
+      alertsService.clearWarnings();
       $rootScope.$broadcast('externalSave');
 
       $modal.open({
@@ -552,7 +550,7 @@ oppia.controller('StateResponses', [
     };
 
     $scope.openAddAnswerGroupModal = function() {
-      warningsData.clear();
+      alertsService.clearWarnings();
       $rootScope.$broadcast('externalSave');
 
       $modal.open({
@@ -614,7 +612,7 @@ oppia.controller('StateResponses', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              warningsData.clear();
+              alertsService.clearWarnings();
             };
           }
         ]
@@ -660,7 +658,7 @@ oppia.controller('StateResponses', [
       // state of the answer group.
       evt.stopPropagation();
 
-      warningsData.clear();
+      alertsService.clearWarnings();
       $modal.open({
         templateUrl: 'modals/deleteAnswerGroup',
         backdrop: true,
@@ -672,7 +670,7 @@ oppia.controller('StateResponses', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              warningsData.clear();
+              alertsService.clearWarnings();
             };
           }
         ]
