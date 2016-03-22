@@ -576,7 +576,7 @@ def fetch_gravatar(email):
     """
     base_url = 'http://www.gravatar.com/avatar/'
     gravatar_url = base_url + hashlib.md5(email).hexdigest() + '?'
-    params = 'd=identicon&s=%s' % feconf.GRAVATAR_SIZE_PX
+    params = 'd=identicon&s=%s' % GRAVATAR_SIZE_PX
     gravatar_url += params
     try:
         result = urlfetch.fetch(
