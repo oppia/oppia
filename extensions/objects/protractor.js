@@ -71,6 +71,13 @@ var IntEditor = function(elem) {
     setValue: function(value) {
       elem.element(by.tagName('input')).clear();
       elem.element(by.tagName('input')).sendKeys(value);
+    },
+    expectValueToBe: function(expectedValue) {
+      elem.element(by.tagName('input')).getAttribute('value').then(
+        function(value) {
+          expect(value).toEqual(expectedValue);
+        }
+      );
     }
   };
 };
@@ -89,6 +96,13 @@ var NonnegativeIntEditor = function(elem) {
     setValue: function(value) {
       elem.element(by.tagName('input')).clear();
       elem.element(by.tagName('input')).sendKeys(value);
+    },
+    expectValueToBe: function(expectedValue) {
+      elem.element(by.tagName('input')).getAttribute('value').then(
+        function(value) {
+          expect(value).toEqual(expectedValue);
+        }
+      );
     }
   };
 };
@@ -98,6 +112,13 @@ var NormalizedStringEditor = function(elem) {
     setValue: function(value) {
       elem.element(by.tagName('input')).clear();
       elem.element(by.tagName('input')).sendKeys(value);
+    },
+    expectValueToBe: function(expectedValue) {
+      elem.element(by.tagName('input')).getAttribute('value').then(
+        function(value) {
+          expect(value).toEqual(expectedValue);
+        }
+      );
     }
   };
 };
@@ -115,6 +136,13 @@ var SanitizedUrlEditor = function(elem) {
     setValue: function(text) {
       elem.element(by.tagName('input')).clear();
       elem.element(by.tagName('input')).sendKeys(text);
+    },
+    expectValueToBe: function(expectedValue) {
+      elem.element(by.tagName('input')).getAttribute('value').then(
+        function(value) {
+          expect(value).toEqual(expectedValue);
+        }
+      );
     }
   };
 };
@@ -124,6 +152,13 @@ var UnicodeStringEditor = function(elem) {
     setValue: function(text) {
       elem.element(by.tagName('input')).clear();
       elem.element(by.tagName('input')).sendKeys(text);
+    },
+    expectValueToBe: function(expectedValue) {
+      elem.element(by.tagName('input')).getAttribute('value').then(
+        function(value) {
+          expect(value).toEqual(expectedValue);
+        }
+      );
     }
   };
 };

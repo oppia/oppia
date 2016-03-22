@@ -263,6 +263,7 @@ oppia.controller('FeedbackTab', [
 
     // Initial load of the thread list on page load.
     $scope.clearActiveThread();
+    threadDataService.fetchFeedbackStats();
     threadDataService.fetchThreads(function() {
       $timeout(function() {
         $rootScope.loadingMessage = '';
