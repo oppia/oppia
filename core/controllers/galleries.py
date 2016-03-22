@@ -113,6 +113,10 @@ class GalleryHandler(base.BaseHandler):
         explorations_list = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
                 exp_ids))
+        # TODO(mgowano): Remove '' in query to allow for collection searches
+        collections_list = (
+            collection_services.get_displayable_collections_matching_query(
+                '', cursor=search_cursor))
 
         if len(explorations_list) == feconf.DEFAULT_QUERY_LIMIT:
             logging.error(
@@ -127,6 +131,7 @@ class GalleryHandler(base.BaseHandler):
 
         self.values.update({
             'explorations_list': explorations_list,
+            'collections_list': collections_list,
             'preferred_language_codes': preferred_language_codes,
             'search_cursor': search_cursor,
         })

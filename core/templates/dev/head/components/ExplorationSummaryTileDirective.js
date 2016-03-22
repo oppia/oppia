@@ -13,7 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Gallery tile component.
+ * @fileoverview Gallery tile component for exploration.
+ *
+ * @author Sean Lip
  */
 
 oppia.directive('explorationSummaryTile', [function() {

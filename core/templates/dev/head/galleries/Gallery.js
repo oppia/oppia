@@ -95,16 +95,32 @@ oppia.controller('Gallery', [
     });
 
     $scope.allExplorationsInOrder = [];
+    $scope.allCollectionsInOrder = [];
 
     // Called when the page loads, and after every search query.
     var _refreshGalleryData = function(data, hasPageFinishedLoading) {
       $scope.searchIsLoading = false;
       $scope.allExplorationsInOrder = data.explorations_list;
+      $scope.allCollectionsInOrder = data.collections_list;
       $scope.finishedLoadingPage = hasPageFinishedLoading;
       $rootScope.loadingMessage = '';
     };
 
     $scope.pageLoaderIsBusy = false;
+    $scope.showMoreExplorations = function() {
+      if (!$rootScope.loadingMessage) {
+        $scope.pageLoaderIsBusy = true;
+
+        searchService.loadMoreData(function(data, hasPageFinishedLoading) {
+          $scope.allExplorationsInOrder = $scope.allExplorationsInOrder.concat(
+            data.explorations_list);
+          $scope.allCollectionsInOrder = $scope.allCollectionsInOrder.concat(
+            data.collections_list);
+          $scope.finishedLoadingPage = hasPageFinishedLoading;
+          $scope.pageLoaderIsBusy = false;
+        });
+      }
+    };
 
     $scope.$on(
       'refreshGalleryData',
