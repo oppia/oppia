@@ -59,7 +59,7 @@ oppia.controller('Profile', [
           if (exploration1.playthroughs > exploration2.playthroughs) {
             return 1;
           } else if (exploration1.playthroughs > exploration2.playthroughs) {
-              return 0;
+            return 0;
           } else {
             return -1;
           }
@@ -87,15 +87,16 @@ oppia.controller('Profile', [
 
       $scope.goToPreviousPage = function() {
         if ($scope.currentPageNumber === 0) {
-          console.log("Error: cannot decrement page");
+          console.log('Error: cannot decrement page');
         } else {
           $scope.currentPageNumber--;
           $scope.updateDisplayedExplorationNumbers();
         }
       };
       $scope.goToNextPage = function() {
-        if ($scope.currentPageNumber * $scope.pageSize >= data.edited_exp_summary_dicts.length) {
-          console.log("Error: Cannot increment page")
+        if ($scope.currentPageNumber * $scope.pageSize >= (
+            data.edited_exp_summary_dicts.length)) {
+          console.log("Error: Cannot increment page");
         } else {
           $scope.currentPageNumber++;
           $scope.updateDisplayedExplorationNumbers();
@@ -104,7 +105,8 @@ oppia.controller('Profile', [
 
       $scope.getExplorationsToDisplay = function() {
         $scope.explorationsOnPage = [];
-        $scope.explorationIndexStart = $scope.currentPageNumber * $scope.pageSize;
+        $scope.explorationIndexStart = (
+          $scope.currentPageNumber * $scope.pageSize);
         $scope.explorationIndexEnd = (
           $scope.explorationIndexStart + $scope.pageSize - 1);
         for (var ind = $scope.explorationIndexStart;
