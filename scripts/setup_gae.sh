@@ -31,4 +31,14 @@ export PYTHONPATH=.:$COVERAGE_HOME:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HO
 # Delete old *.pyc files
 find . -iname "*.pyc" -exec rm -f {} \;
 
+echo Exported paths for Google App Engine, checking if it needs to be installed.
+if [ ! -d "$GOOGLE_APP_ENGINE_HOME" ]; then
+	mkdir -p $GOOGLE_APP_ENGINE_HOME
+	curl --silent https://storage.googleapis.com/appengine-sdks/deprecated/1919/google_appengine_1.9.19.zip -o gae-download.zip
+	unzip -qq gae-download.zip -d $TOOLS_DIR/google_appengine_1.9.19/
+	rm gae-download.zip
+else
+	echo Google App Engine folder detected.
+fi
+
 export SETUP_GAE_DONE=true
