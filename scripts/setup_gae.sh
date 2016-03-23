@@ -43,7 +43,8 @@ if [ ! -d "$GOOGLE_APP_ENGINE_HOME" ]; then
     echo "Download complete. Installing Google App Engine..."
   else
     echo "Error downloading Google App Engine. Exiting."
-    exit 1	
+    exit 1
+  fi
   unzip -q gae-download.zip -d $TOOLS_DIR/google_appengine_1.9.19/
   rm gae-download.zip
 fi
