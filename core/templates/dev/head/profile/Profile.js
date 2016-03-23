@@ -96,7 +96,7 @@ oppia.controller('Profile', [
       $scope.goToNextPage = function() {
         if ($scope.currentPageNumber * $scope.pageSize >= (
             data.edited_exp_summary_dicts.length)) {
-          console.log("Error: Cannot increment page");
+          console.log('Error: Cannot increment page');
         } else {
           $scope.currentPageNumber++;
           $scope.updateDisplayedExplorationNumbers();
