@@ -64,3 +64,6 @@ cache:
     - core/templates/prod/
 
 before_cache:
+  # Deleting python bytecode before files are cached,
+  # to prevent recaching.
+  - find third_party -name ["*.pyc"] -print -delete
