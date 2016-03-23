@@ -62,3 +62,5 @@ cache:
     - ../oppia_tools/
     - third_party/
     - core/templates/prod/
+
+before_cache:
