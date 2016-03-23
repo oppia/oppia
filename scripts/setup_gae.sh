@@ -31,6 +31,7 @@ export PYTHONPATH=.:$COVERAGE_HOME:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HO
 # Delete old *.pyc files
 find . -iname "*.pyc" -exec rm -f {} \;
 
+# Moved from install .travis.yml.
 echo Exported paths for Google App Engine, checking if it needs to be installed.
 if [ ! -d "$GOOGLE_APP_ENGINE_HOME" ]; then
 	mkdir -p $GOOGLE_APP_ENGINE_HOME
@@ -38,7 +39,7 @@ if [ ! -d "$GOOGLE_APP_ENGINE_HOME" ]; then
 	unzip -qq gae-download.zip -d $TOOLS_DIR/google_appengine_1.9.19/
 	rm gae-download.zip
 else
-	echo Google App Engine folder detected.
+	echo Google App Engine folder detected, no download commencing.
 fi
 
 export SETUP_GAE_DONE=true
