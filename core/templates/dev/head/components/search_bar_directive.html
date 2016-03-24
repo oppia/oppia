@@ -8,6 +8,7 @@
                 ng-class="{'glyphicon-search': !searchIsLoading,
                            'glyphicon-refresh oppia-animate-spin': searchIsLoading}">
           </span>
+          <i class="material-icons">&#xE8B6;</i>
         </div>
         <input type="text" class="form-control oppia-splash-search-input oppia-splash-search-text-input" placeholder="What are you curious about?" ng-model="searchQuery" ng-keyup="onSearchQueryChange($event)">
       </div>
@@ -27,7 +28,7 @@
           ng-if="selectionDetails.categories.selections[item.id]">
         <a href ng-click="toggleSelection('categories', item.id)">
           <[item.text]>
-          <span ng-if="selectionDetails.categories.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
+          <i ng-if="selectionDetails.categories.selections[item.id]" class="material-icons pull-right">&#xE876;</i>
         </a>
       </li>
       <hr ng-if="selectionDetails.categories.numSelections > 0" style="margin: 2px;">
@@ -36,7 +37,7 @@
           ng-if="!selectionDetails.categories.selections[item.id]">
         <a href ng-click="toggleSelection('categories', item.id)">
           <[item.text]>
-          <span ng-if="selectionDetails.categories.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
+          <i ng-if="selectionDetails.categories.selections[item.id]" class="material-icons pull-right">&#xE876;</i>
         </a>
       </li>
     </ul>
@@ -56,7 +57,7 @@
           ng-if="selectionDetails.languageCodes.selections[item.id]">
         <a href ng-click="toggleSelection('languageCodes', item.id)">
           <[item.text]>
-          <span ng-if="selectionDetails.languageCodes.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
+          <i ng-if="selectionDetails.languageCodes.selections[item.id]" class="material-icons pull-right">&#xE876;</i>
         </a>
       </li>
       <hr ng-if="selectionDetails.languageCodes.numSelections > 0" style="margin: 2px;">
@@ -65,7 +66,7 @@
           ng-if="!selectionDetails.languageCodes.selections[item.id]">
         <a href ng-click="toggleSelection('languageCodes', item.id)">
           <[item.text]>
-          <span ng-if="selectionDetails.languageCodes.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
+          <i ng-if="selectionDetails.languageCodes.selections[item.id]" class="material-icons pull-right">&#xE876;</i>
         </a>
       </li>
     </ul>
