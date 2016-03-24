@@ -408,7 +408,7 @@ class BaseHandler(webapp2.RequestHandler):
                 SIDEBAR_MENU_ADDITIONAL_LINKS.value),
             'SITE_FEEDBACK_FORM_URL': SITE_FEEDBACK_FORM_URL.value,
             'SITE_NAME': SITE_NAME.value,
-            'SITE_LANGUAGES_SUPPORTED': feconf.SITE_LANGUAGES_SUPPORTED,
+            'SUPPORTED_SITE_LANGUAGES': feconf.SUPPORTED_SITE_LANGUAGES,
             'SOCIAL_MEDIA_BUTTONS': SOCIAL_MEDIA_BUTTONS.value,
             'SYSTEM_USERNAMES': feconf.SYSTEM_USERNAMES,
             'user_is_logged_in': user_services.has_fully_registered(

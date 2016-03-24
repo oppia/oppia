@@ -1,6 +1,6 @@
 <div class="oppia-footer" ng-controller="I18nFooter">
   <span translate="I18N_LANGUAGE_FOOTER_VIEW_IN"></span>
-  <span ng-repeat="(langCode, langName) in site_languages_supported">
+  <span ng-repeat="(langCode, langName) in supportedSiteLanguages">
     <a ng-click="changeLanguage(langCode)" name="protractor-test-i18n-language-<[langName]>">
       <[langName]>
     </a>

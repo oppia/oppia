@@ -48,7 +48,7 @@ oppia.controller('I18nFooter', [
     '$rootScope', '$scope', '$translate',
     function($rootScope, $scope, $translate) {
   // Changes the language of the translations.
-  $scope.site_languages_supported = GLOBALS.SITE_LANGUAGES_SUPPORTED;
+  $scope.supportedSiteLanguages = GLOBALS.SUPPORTED_SITE_LANGUAGES;
   $scope.changeLanguage = function(langCode) {
     $translate.use(langCode);
   };
@@ -65,7 +65,7 @@ oppia.config([
     function($translateProvider, DEFAULT_TRANSLATIONS) {
   var availableLanguageKeys = [];
   var availableLanguageKeysMap = {};
-  for (var prop in GLOBALS.SITE_LANGUAGES_SUPPORTED) {
+  for (var prop in GLOBALS.SUPPORTED_SITE_LANGUAGES) {
     availableLanguageKeys.push(prop);
     availableLanguageKeysMap[prop + '*'] = prop;
   }

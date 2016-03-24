@@ -162,10 +162,10 @@ oppia.controller('Preferences', [
     );
 
     $scope.SITE_LANGUAGE_CHOICES = [];
-    for (var languageKey in GLOBALS.SITE_LANGUAGES_SUPPORTED) {
+    for (var languageKey in GLOBALS.SUPPORTED_SITE_LANGUAGES) {
       $scope.SITE_LANGUAGE_CHOICES.push({
         id: languageKey,
-        text: GLOBALS.SITE_LANGUAGES_SUPPORTED[languageKey]
+        text: GLOBALS.SUPPORTED_SITE_LANGUAGES[languageKey]
       });
     };
 
