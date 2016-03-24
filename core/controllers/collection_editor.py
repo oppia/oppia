@@ -196,6 +196,11 @@ class CollectionRightsHandler(CollectionEditorHandler):
                     self.user_id, collection_id)
                 collection_services.index_collections_given_ids([
                     collection_id])
+            elif not is_public:
+                collection_services.unpublish_collection_and_update_user_profiles(
+                    self.user_id, collection_id)
+                collection_services.index_collections_given_ids([
+                    collection_id])
             elif not self.is_admin:
                 raise self.InvalidInputException(
                     'Cannot unpublish a collection.')

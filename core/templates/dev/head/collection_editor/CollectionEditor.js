@@ -101,4 +101,16 @@ oppia.controller('CollectionEditor', ['$scope',
             'There was an error when publishing the collection.');
         });
     };
+
+    // Unpublish the collection. Will only show up if the collection is public.
+    $scope.unpublishCollection = function() {
+      CollectionRightsBackendApiService.setCollectionPrivate(
+        $scope.collectionId, $scope.collection.getVersion()).then(
+        function() {
+          $scope.isPublic = false;
+        }, function() {
+          alertsService.addWarning(
+            'There was an error when unpublishing the collection.');
+        });
+    };
   }]);
