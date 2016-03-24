@@ -1,59 +1,72 @@
-<!DOCTYPE html>
-<html>
-  <style>
-    .footer{
+<style>
+  .footer {
     position: relative; 
     background-color: #094142;
     width: 100%;
     text-align: left;
-    padding: 55px 50px 50px 200px;
-    }
+    padding: 55px 50px 50px 300px;
+  }
 
-    .footer .footer-column{
+  .footer .footer-column {
     display: inline-block;
     vertical-align: top;
     width: 20%;
     line-height: 20px;
     font-size: 13px;
-    }
-
-    .footer .footer-column a{
-    color: white;
-    text-decoration: none; 
-    }
-
-    .footer .footer-column span{
+  }
+  
+  .footer .footer-column h4 {
+    text-transform: uppercase; 
     display: block;
     color: white;
     font-size: 14px;
-    }
-  </style>
+    margin-bottom: 0; 
+  }
 
-  <footer class="footer">
-    <div class="footer-column">
-      <span>ABOUT OPPIA</span>
-      <a href="/about">About</a><br>
-      <a href="/about#foundation">The Oppia Foundation</a><br>
-      <a href="/about#contact">Get Involved</a><br>
-      <a href="/about#credits">Credits</a><br>
-    </div>
+  .footer .footer-column a {
+    color: white;
+    text-decoration: none; 
+    text-transform: capitalize; 
+  }
+  .footer .footer-column ul, li { 
+    list-style-type: none;
+    list-style-position: inside;
+    padding-left: 0; 
+  }
+</style>
 
-    <div class="footer-column">
-      <span>TEACH</span>
-      <a href="/about#teach">Teach on Oppia</a><br>
-      <a href="/participate">Participation Playbook</a><br>
-    </div>
+<footer class="footer">
+  <div class="footer-column">
+    <h4>ABOUT OPPIA</h4>
+    <ul>
+      <li><a href="/about">About</a></li>
+      <li><a href="/about#foundation">The Oppia Foundation</a></li>
+      <li><a href="/about#contact">Get Involved</a></li>
+      <li><a href="/about#credits">Credits</a></li>
+    </ul>
+  </div>
 
-    <div class="footer-column">
-      <span>LEARN</span>
-      <a href="/gallery">Featured Topics</a><br>
-      <a href="/gallery">Browse</a><br>
-    </div>
+  <div class="footer-column">
+    <h4>TEACH</h4>
+    <ul>
+      <li><a href="/about#teach">Teach on Oppia</a></li>
+      <li><a href="/participate">Participation Playbook</a></li>
+    </ul>
+  </div>
 
-    <div class="footer-column">
-      <span>CONTACT US</span>
-      <a href="/forum">Forum</a><br>
-      <a href="/about#contact">Contact Us</a><br>
-    </div>
-  </footer>
-</html>
+  <div class="footer-column">
+    <h4>LEARN</h4>
+    <ul>
+      <li><a href="/gallery">Browse</a></li>
+    </ul>
+  </div>
+
+  <div class="footer-column">
+    <h4>CONTACT US</h4>
+    <ul>
+      <li><a href="/forum">Forum</a></li>
+      <li><a href="/about#contact">Contact Us</a></li>
+    </ul>
+  </div>
+</footer>
+
