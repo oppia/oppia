@@ -223,7 +223,6 @@ body {
   font-weight: normal;
 }
 
-
 .oppia-profile-content-card {
   background-color: #fff;
   float: left;
@@ -236,16 +235,24 @@ body {
 
 .oppia-profile-portfolio-container {
   margin: 0 auto;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   width: 100%;
+}
+
+.oppia-profile-explorations-container-large-screen {
+  display: block;
+}
+
+.oppia-profile-explorations-container-small-screen {
+  display: none;
 }
 
 .oppia-profile-portfolio-pages {
   bottom: 0;
   display: block;
   font-size: .7em;
-  margin-right: 40px;
   margin-bottom: 20px;
+  margin-right: 40px;
   position: absolute;
   right: 0;
   text-align: right;
@@ -294,6 +301,12 @@ body {
   }
   .oppia-profile-user-bio {
     display: inline-block;
+  }
+  .oppia-profile-explorations-container-large-screen {
+    display: none;
+  }
+  .oppia-profile-explorations-container-small-screen {
+    display: block;
   }
 }
 
