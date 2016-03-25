@@ -3,7 +3,6 @@
     class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak"
     style="margin-left: 20px;">
     <!-- Editor -->
-    {% if SHOW_COLLECTION_NAVIGATION_TAB_MAIN %}
     <li
       ng-class="{'active': getTabStatuses().active === 'main',
       'dropdown': countWarnings()}">
@@ -15,7 +14,6 @@
         <span class="glyphicon glyphicon-pencil"></span>
       </a>
     </li>
-    {% endif %}
 
     <!-- Preview -->
     {% if SHOW_COLLECTION_NAVIGATION_TAB_PREVIEW and username %}
