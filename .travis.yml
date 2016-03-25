@@ -65,6 +65,7 @@ cache:
     - core/templates/prod/
 
 before_cache:
-  # Deleting python bytecode before files are cached,
-  # to prevent Travis from making a new cache every time.
+  # Delete python bytecode to prevent cache rebuild.
   - find third_party -name "*.pyc" -print -delete
+  # Delete the pip debug log to prevent cache rebuild.
+  - rm -f $HOME/.cache/pip/log/debug.log
