@@ -142,9 +142,46 @@ describe('Embedding', function() {
     });
 
     users.logout();
+    general.checkForConsoleErrors([]);
   });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
+  it('should have the site language or English as default', function() {
+    users.createUser('embedder2@example.com', 'Embedder2');
+    users.login('embedder2@example.com', true);
+    admin.reloadExploration('protractor_test_1.yaml');
+
+    var driver = browser.driver;
+    driver.get(
+      general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE +
+      'embedding_tests_dev_0.0.1.html');
+
+    // Select the new version. It does not have site-language attribute.
+    browser.switchTo().frame(
+      driver.findElement(
+        by.xpath("//div[@class='protractor-test-standard']/iframe")));
+    general.waitForSystem();
+    browser.waitForAngular();
+    // Expect language to be English
+    expect(driver.findElement(by.css('.protractor-test-float-form-input'))
+        .getAttribute('placeholder')).toBe('Type a number');
+    browser.switchTo().defaultContent();
+
+    // Select the old version.
+    driver.findElement(
+      by.xpath(
+        "//div[@class='protractor-test-deferred']/oppia/div/button")).click();
+    browser.switchTo().frame(
+      driver.findElement(
+        by.xpath("//div[@class='protractor-test-deferred']/iframe")));
+    general.waitForSystem();
+    browser.waitForAngular();
+    // Expect language to be Spanish
+    expect(driver.findElement(by.css('.protractor-test-float-form-input'))
+        .getAttribute('placeholder')).toBe('Ingresa un número');
+    browser.switchTo().defaultContent();
+
+    users.logout();
+    var browserError = /404 (Not Found)*/;
+    general.checkForConsoleErrors([browserError]);
   });
 });

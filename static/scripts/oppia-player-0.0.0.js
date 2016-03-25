@@ -136,6 +136,8 @@
    *       server.
    *   - locale: The preferred locale. Defaults to 'en' (which is the only one
    *       that is currently implemented).
+   *   - site-language: The preferred site language to display with the
+   *       exploration. Defaults to 'en'.
    *   - height: The non-changing height of the iframe (can be specified as
    *       standard CSS). If not set, defaults to an initial height of 700px
    *       and is allowed to change when the iframe content changes.
@@ -208,6 +210,9 @@
     }
 
     var iframe = document.createElement('iframe');
+    iframe.isEmbedded = true;
+    iframe.preferredSiteLanguage = oppiaNode.getAttribute(
+      'site-language') || 'en';
 
     var currLoc = window.location.protocol + '//' + window.location.host;
     var locale = oppiaNode.getAttribute('locale') || 'en';

@@ -52,6 +52,7 @@ oppia.controller('I18nFooter', [
   $scope.changeLanguage = function(langCode) {
     $translate.use(langCode);
   };
+
   // After loading default translations, change the language for the stored
   // language if necessary.
   $rootScope.$on('$translateLoadingSuccess', function() {
@@ -59,6 +60,26 @@ oppia.controller('I18nFooter', [
     $translate.use(currentLang);
   });
 }]);
+
+// Service to store user preferred language when he/she is not logged in.
+// It is equal to angular-translate-storage-cookie, but ignores cookies
+// when the variable GLOBALS.IS_EMBEDDED is true
+oppia.factory('customCookieStorage', function($cookieStore) {
+  'use strict';
+  return {
+    put: function(name, value) {
+      $cookieStore.put(name, value);
+    },
+    get: function(name) {
+      // If the variable is not set assume true
+      if (GLOBALS.IS_EMBEDDED || GLOBALS.IS_EMBEDDED === undefined) {
+        return null;
+      } else {
+        return $cookieStore.get(name);
+      }
+    }
+  };
+});
 
 oppia.config([
     '$translateProvider', 'DEFAULT_TRANSLATIONS',
@@ -83,13 +104,24 @@ oppia.config([
     .translations('en', DEFAULT_TRANSLATIONS)
     .fallbackLanguage('en')
     .determinePreferredLanguage()
-    .useCookieStorage()
+    .useStorage('customCookieStorage')
     // The strategy 'sanitize' does not support utf-8 encoding.
     // https://github.com/angular-translate/angular-translate/issues/1131
     // The strategy 'escape' will brake strings with raw html, like hyperlinks
     .useSanitizeValueStrategy('sanitizeParameters')
     .forceAsyncReload(true);
-}]);
+}]).run(function($translate, $window) {
+  // Set the site language in case the exploration is embedded in an iframe.
+  // In this case, the controller is not going to be called.
+  // The GLOBALS.IS_EMBEDDED attribute is used by the storage factory to
+  // ignore cookies.
+  if ($window.self !== $window.top && $window.frameElement.isEmbedded) {
+    GLOBALS.IS_EMBEDDED = true;
+    $translate.use($window.frameElement.preferredSiteLanguage);
+  } else {
+    GLOBALS.IS_EMBEDDED = false;
+  }
+});
 
 // Service to dynamically construct translation ids for i18n.
 oppia.factory('i18nIdService', function() {
