@@ -58,6 +58,7 @@ after_success:
 cache:
   # Cache codecov and its dependencies.
   pip: true
+  # Cache Oppia's dependencies.
   directories:
     - ../node_modules/
     - ../oppia_tools/
