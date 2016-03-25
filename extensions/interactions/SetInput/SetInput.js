@@ -25,8 +25,8 @@ oppia.directive('oppiaInteractiveSetInput', [function() {
     restrict: 'E',
     scope: {},
     templateUrl: 'interaction/SetInput',
-    controller: ['$scope', '$attrs', 'setInputRulesService', function(
-        $scope, $attrs, setInputRulesService) {
+    controller: ['$scope', '$attrs', '$translate', 'setInputRulesService',
+        function($scope, $attrs, $translate, setInputRulesService) {
       $scope.schema = {
         type: 'list',
         items: {

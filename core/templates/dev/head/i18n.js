@@ -22,7 +22,7 @@
 // here to be loaded synchronously with the script to prevent a FOUC or
 // Flash of Untranslated Content.
 // See http://angular-translate.github.io/docs/#/guide/12_asynchronous-loading
-var defaultTranslations = {
+oppia.constant('DEFAULT_TRANSLATIONS', {
   I18N_GALLERY_PAGE_TITLE: 'Gallery',
   I18N_GALLERY_PAGE_SUBTITLE: 'Oppia',
   I18N_GALLERY_LOADING: 'Loading',
@@ -42,18 +42,13 @@ var defaultTranslations = {
   I18N_TOPNAV_SIGN_IN: 'Sign in',
   I18N_SIGNUP_REGISTRATION: 'Registration',
   I18N_SIGNUP_LOADING: 'Loading'
-};
-
-oppia.constant('SUPPORTED_LANGUAGES', {
-  en: 'English',
-  es: 'Español'
 });
 
 oppia.controller('I18nFooter', [
-    '$rootScope', '$scope', '$translate', 'SUPPORTED_LANGUAGES',
-    function($rootScope, $scope, $translate, SUPPORTED_LANGUAGES) {
-  $scope.SUPPORTED_LANGUAGES = SUPPORTED_LANGUAGES;
+    '$rootScope', '$scope', '$translate',
+    function($rootScope, $scope, $translate) {
   // Changes the language of the translations.
+  $scope.supportedSiteLanguages = GLOBALS.SUPPORTED_SITE_LANGUAGES;
   $scope.changeLanguage = function(langCode) {
     $translate.use(langCode);
   };
@@ -66,31 +61,45 @@ oppia.controller('I18nFooter', [
 }]);
 
 oppia.config([
-    '$translateProvider', 'SUPPORTED_LANGUAGES',
-    function($translateProvider, SUPPORTED_LANGUAGES) {
+    '$translateProvider', 'DEFAULT_TRANSLATIONS',
+    function($translateProvider, DEFAULT_TRANSLATIONS) {
   var availableLanguageKeys = [];
   var availableLanguageKeysMap = {};
-  for (var prop in SUPPORTED_LANGUAGES) {
+  for (var prop in GLOBALS.SUPPORTED_SITE_LANGUAGES) {
     availableLanguageKeys.push(prop);
     availableLanguageKeysMap[prop + '*'] = prop;
-  };
+  }
   availableLanguageKeysMap['*'] = 'en';
-  $translateProvider.registerAvailableLanguageKeys(
-    availableLanguageKeys, availableLanguageKeysMap);
 
-  $translateProvider.translations('en', defaultTranslations);
-  $translateProvider.fallbackLanguage('en');
-
-  $translateProvider.determinePreferredLanguage();
-  $translateProvider.useCookieStorage();
-
-  $translateProvider.useStaticFilesLoader({
-    prefix: '/i18n/locale-',
-    suffix: '.json'
-  });
-  $translateProvider.preferredLanguage('en');
-  // Using the strategy 'sanitize' does not support utf-8 encoding.
-  // https://github.com/angular-translate/angular-translate/issues/1131
-  $translateProvider.useSanitizeValueStrategy('sanitizeParameters');
-  $translateProvider.forceAsyncReload(true);
+  $translateProvider
+    .registerAvailableLanguageKeys(
+      availableLanguageKeys, availableLanguageKeysMap)
+    .useStaticFilesLoader({
+      prefix: '/i18n/locale-',
+      suffix: '.json'
+    })
+    // The use of default translation improves the loading time when English is
+    // selected
+    .translations('en', DEFAULT_TRANSLATIONS)
+    .fallbackLanguage('en')
+    .determinePreferredLanguage()
+    .useCookieStorage()
+    // The strategy 'sanitize' does not support utf-8 encoding.
+    // https://github.com/angular-translate/angular-translate/issues/1131
+    // The strategy 'escape' will brake strings with raw html, like hyperlinks
+    .useSanitizeValueStrategy('sanitizeParameters')
+    .forceAsyncReload(true);
 }]);
+
+// Service to dynamically construct translation ids for i18n.
+oppia.factory('i18nIdService', function() {
+  return {
+    // Construct a translation id for gallery from name and a prefix.
+    // Ex: 'categories', 'art' -> 'I18N_GALLERY_CATEGORIES_ART'
+    getGalleryId: function(prefix, name) {
+      return (
+        'I18N_GALLERY_' + prefix.toUpperCase() + '_' +
+        name.toUpperCase().replace(' ', '_'));
+    }
+  };
+});

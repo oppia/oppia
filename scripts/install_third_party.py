@@ -129,7 +129,6 @@ def download_and_unzip_files(
             req.add_header('User-agent', 'python')
             # This is needed to get a seekable filestream that can be used
             # by zipfile.ZipFile.
-            print source_url
             file_stream = StringIO.StringIO(urllib2.urlopen(req).read())
             with zipfile.ZipFile(file_stream, 'r') as zfile:
                 zfile.extractall(target_parent_dir)

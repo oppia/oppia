@@ -38,7 +38,7 @@ describe('Exploration context service', function() {
       });
     });
 
-    beforeEach(module('oppia', GLOBALS.OVERWRITE_TRANSLATOR_PROVIDER));
+    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
     beforeEach(inject(function($injector) {
       ecs = $injector.get('explorationContextService');

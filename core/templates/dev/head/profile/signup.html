@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% block maintitle %}I18N_SIGNUP_PAGE_TITLE{% endblock maintitle %}
+
 {% block navbar_breadcrumb %}
   <ul class="nav navbar-nav oppia-navbar-breadcrumb">
     <li>
@@ -49,7 +51,7 @@
           </div>
 
           <div ng-show="showEmailPreferencesForm" class="form-group">
-            <label for="canReceiveEmailUpdates" class="col-lg-3 col-md-3 col-sm-3">Email Preferences</label>
+            <label for="canReceiveEmailUpdates" class="col-lg-3 col-md-3 col-sm-3" translate="I18N_SIGNUP_EMAIL_PREFERENCES"></label>
             <div class="col-lg-9 col-md-9 col-sm-9">
               <div class="radio">
                 <label>
@@ -64,8 +66,7 @@
                 </span>
               </div>
               <div style="height: 18px; width: 550px;">
-                <span style="color: red; font-size: 0.8em;" aria-live="assertive" ng-show="blurredAtLeastOnce" translate>
-                  <[emailPreferencesWarningText]>
+                <span style="color: red; font-size: 0.8em;" aria-live="assertive" ng-show="blurredAtLeastOnce" translate="<[emailPreferencesWarningText]>">
                 </span>
               </div>
             </div>

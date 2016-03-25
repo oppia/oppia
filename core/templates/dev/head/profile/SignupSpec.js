@@ -22,7 +22,7 @@ describe('Signup controller', function() {
   describe('SignupCtrl', function() {
     var scope, ctrl, $httpBackend, rootScope, mockWarningsData, urlParams;
 
-    beforeEach(module('oppia', GLOBALS.OVERWRITE_TRANSLATOR_PROVIDER));
+    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
     beforeEach(inject(function(_$httpBackend_, $http, $rootScope, $controller) {
       $httpBackend = _$httpBackend_;
@@ -56,7 +56,7 @@ describe('Signup controller', function() {
     it('should show warning if user has not agreed to terms', function() {
       scope.submitPrerequisitesForm(false, null);
       expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
-        'I18N_SIGNUP_ERROR_MUST_AGREE_WITH_TERMS');
+        'I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
     });
 
     it('should get data correctly from the server', function() {
@@ -74,7 +74,7 @@ describe('Signup controller', function() {
     it('should show warning if terms are not agreed to', function() {
       scope.submitPrerequisitesForm(false, '');
       expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
-        'I18N_SIGNUP_ERROR_MUST_AGREE_WITH_TERMS');
+        'I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
     });
 
     it('should show warning if no username provided', function() {

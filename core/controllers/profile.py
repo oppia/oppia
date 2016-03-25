@@ -133,11 +133,13 @@ class PreferencesHandler(base.BaseHandler):
         user_settings = user_services.get_user_settings(self.user_id)
         self.values.update({
             'preferred_language_codes': user_settings.preferred_language_codes,
+            'preferred_site_language_code':
+                user_settings.preferred_site_language_code,
             'profile_picture_data_url': user_settings.profile_picture_data_url,
             'user_bio': user_settings.user_bio,
             'subject_interests': user_settings.subject_interests,
             'can_receive_email_updates': user_services.get_email_preferences(
-                self.user_id)['can_receive_email_updates'],
+                self.user_id)['can_receive_email_updates']
         })
         self.render_json(self.values)
 
@@ -153,6 +155,9 @@ class PreferencesHandler(base.BaseHandler):
             user_services.update_subject_interests(self.user_id, data)
         elif update_type == 'preferred_language_codes':
             user_services.update_preferred_language_codes(self.user_id, data)
+        elif update_type == 'preferred_site_language_code':
+            user_services.update_preferred_site_language_code(self.user_id,
+                                                              data)
         elif update_type == 'profile_picture_data_url':
             user_services.update_profile_picture_data_url(self.user_id, data)
         elif update_type == 'can_receive_email_updates':

@@ -102,6 +102,7 @@ oppia.factory('searchService', [
 
         $rootScope.$broadcast(
           'refreshGalleryData', data, hasPageFinishedLoading());
+        // Translate the new explorations loaded
         $translate.refresh();
         _isCurrentlyFetchingResults = false;
       });
@@ -136,16 +137,6 @@ oppia.factory('searchService', [
   };
 }]);
 
-// Construct a translation id from a name and a prefix.
-// Ex: 'categories', 'art' -> 'I18N_GALLERY_CATEGORIES_ART'
-// TODO(sll): This should be in some kind of service, rather than at the top
-// level.
-var getI18nId = function(prefix, name) {
-  return (
-    'I18N_GALLERY_' + prefix.toUpperCase() + '_' +
-    name.toUpperCase().replace(' ', '_'));
-};
-
 oppia.controller('Gallery', [
   '$scope', '$http', '$rootScope', '$modal', '$window', '$timeout',
   '$translate', 'ExplorationCreationButtonService', 'oppiaDatetimeFormatter',
@@ -156,17 +147,6 @@ oppia.controller('Gallery', [
       $translate, ExplorationCreationButtonService, oppiaDatetimeFormatter,
       oppiaDebouncer, urlService, GALLERY_DATA_URL, CATEGORY_LIST,
       searchService) {
-    $translate('I18N_GALLERY_PAGE_TITLE', 'I18N_GALLERY_PAGE_SUBTITLE')
-      .then(function(translatedPageTitle) {
-      $rootScope.pageTitle = translatedPageTitle;
-    });
-
-    $rootScope.$on('$translateChangeSuccess', function() {
-      $rootScope.pageTitle = (
-        $translate.instant('I18N_GALLERY_PAGE_TITLE') +
-        ' - ' + $translate.instant('I18N_GALLERY_PAGE_SUBTITLE'));
-    });
-
     $window.addEventListener('scroll', function() {
       var oppiaBanner = $('.oppia-gallery-banner-container');
       var oppiaTagline = $('.oppia-gallery-banner-tagline');
@@ -219,14 +199,6 @@ oppia.controller('Gallery', [
       }
     });
 
-    // Transforms the category name of each exploration into a translation id
-    var addTranslationIds = function(allExplorationsInOrder) {
-      for (var i = 0; i < allExplorationsInOrder.length; i++) {
-        allExplorationsInOrder[i].i18nCategory = getI18nId('categories',
-          allExplorationsInOrder[i].category);
-      }
-    };
-
     // SEARCH FUNCTIONALITY
     $scope.allExplorationsInOrder = [];
 
@@ -234,7 +206,6 @@ oppia.controller('Gallery', [
     var _refreshGalleryData = function(data, hasPageFinishedLoading) {
       $scope.searchIsLoading = false;
       $scope.allExplorationsInOrder = data.explorations_list;
-      addTranslationIds($scope.allExplorationsInOrder);
       $scope.finishedLoadingPage = hasPageFinishedLoading;
       $rootScope.loadingMessage = '';
     };
@@ -247,7 +218,6 @@ oppia.controller('Gallery', [
         searchService.loadMoreData(function(data, hasPageFinishedLoading) {
           $scope.allExplorationsInOrder = $scope.allExplorationsInOrder.concat(
             data.explorations_list);
-          addTranslationIds($scope.allExplorationsInOrder);
           $scope.finishedLoadingPage = hasPageFinishedLoading;
           $scope.pageLoaderIsBusy = false;
         });
@@ -281,21 +251,36 @@ oppia.controller('Gallery', [
 oppia.controller('SearchBar', [
   '$scope', '$rootScope', '$translate', 'searchService', 'oppiaDebouncer',
   'ExplorationCreationButtonService', 'urlService', 'CATEGORY_LIST',
+  'i18nIdService',
   function(
       $scope, $rootScope, $translate, searchService, oppiaDebouncer,
-      ExplorationCreationButtonService, urlService, CATEGORY_LIST) {
+      ExplorationCreationButtonService, urlService, CATEGORY_LIST,
+      i18nIdService) {
+    $rootScope.$on('$translateChangeSuccess', function() {
+      // If you translate these strings in the html, then you must use a filter
+      // because only the first 14 characters are displayed. That would generate
+      // FOUC for languages other than English. As an exception, we translate
+      // them here and update the translation every time the language is changed
+      $scope.searchBarPlaceholder = $translate.instant(
+        'I18N_GALLERY_SEARCH_PLACEHOLDER');
+      $scope.categoryButtonText = $translate.instant(
+        $scope.selectionDetails.categories.summary, $scope.translationData);
+      $scope.languageButtonText = $translate.instant(
+        $scope.selectionDetails.languageCodes.summary, $scope.translationData);
+    });
+
     $scope.searchIsLoading = false;
     $scope.ALL_CATEGORIES = CATEGORY_LIST.map(function(categoryName) {
       return {
         id: categoryName,
-        text: getI18nId('categories', categoryName)
+        text: i18nIdService.getGalleryId('categories', categoryName)
       };
     });
     $scope.ALL_LANGUAGE_CODES = GLOBALS.LANGUAGE_CODES_AND_NAMES.map(
       function(languageItem) {
         return {
           id: languageItem.code,
-          text: getI18nId('languages', languageItem.code)
+          text: i18nIdService.getGalleryId('languages', languageItem.code)
         };
       });
 
