@@ -15,8 +15,6 @@
 /**
  * @fileoverview Controllers and services for the collection feedback in the
  * collection editor page.
- *
- * @author oskar.cieslik@gmail.com (Oskar Cieslik)
  */
 
 oppia.controller('CollectionFeedback', ['$scope']);
