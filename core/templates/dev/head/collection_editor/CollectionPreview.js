@@ -17,4 +17,4 @@
  * collection editor page.
  */
 
-oppia.controller('CollectionPreview', []);
+oppia.controller('CollectionPreview', [function() {}]);
