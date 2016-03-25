@@ -123,8 +123,6 @@ class CollectionEditorPage(CollectionEditorHandler):
             'can_edit': can_edit,
             'collection_id': collection.id,
             'title': collection.title,
-            'SHOW_COLLECTION_NAVIGATION_TAB_MAIN': (
-                feconf.SHOW_COLLECTION_NAVIGATION_TAB_MAIN),
             'SHOW_COLLECTION_NAVIGATION_TAB_PREVIEW': (
                 feconf.SHOW_COLLECTION_NAVIGATION_TAB_PREVIEW),
             'SHOW_COLLECTION_NAVIGATION_TAB_SETTINGS': (
