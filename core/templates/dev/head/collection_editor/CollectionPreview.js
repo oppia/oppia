@@ -17,4 +17,4 @@
  * collection editor page.
  */
 
-oppia.controller('CollectionPreview', ['$scope']);
+oppia.controller('CollectionPreview', []);
