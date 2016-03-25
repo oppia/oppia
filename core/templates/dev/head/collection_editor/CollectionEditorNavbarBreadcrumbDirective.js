@@ -21,18 +21,12 @@
 oppia.directive('collectionEditorNavbarBreadcrumbDirective', [function() {
   return {
     restrict: 'E',
+    scope: {
+      getCollection: '&collection'
+    },
     templateUrl: 'inline/collection_editor_navbar_breadcrumb_directive',
-    controller: ['$scope', 'WritableCollectionBackendApiService',
-      'CollectionRightsBackendApiService', 'CollectionObjectFactory',
-      'CollectionUpdateService', 'UndoRedoService', 'warningsData',
-      'routerService', 'CollectionBackendApiService', function(
-      $scope, WritableCollectionBackendApiService,
-      CollectionRightsBackendApiService, CollectionObjectFactory,
-      CollectionUpdateService, UndoRedoService, warningsData, routerService,
-      CollectionBackendApiService) {
-      $scope.collection = null;
-      $scope.collectionId = GLOBALS.collectionId;
-
+    controller: ['$scope', 'CollectionUpdateService', 'routerService',
+    function($scope, warningsData, routerService) {
       var _TAB_NAMES_TO_HUMAN_READABLE_NAMES = {
         main: 'Edit',
         preview: 'Preview',
@@ -42,24 +36,9 @@ oppia.directive('collectionEditorNavbarBreadcrumbDirective', [function() {
         feedback: 'Feedback'
       };
 
-      CollectionBackendApiService.loadCollection($scope.collectionId).then(
-        function(collectionBackendObject) {
-          $scope.collection = CollectionObjectFactory.create(
-            collectionBackendObject);
-        },
-        function(error) {
-          warningsData.addWarning(
-            error || 'There was an error loading the collection.');
-        }
-      );
-
       $scope.getCurrentTabName = function() {
         return _TAB_NAMES_TO_HUMAN_READABLE_NAMES[
           routerService.getTabStatuses().active];
-      };
-
-      $scope.getCollection = function() {
-        return $scope.collection;
       };
     }]
   };
