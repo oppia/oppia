@@ -4,13 +4,12 @@
     style="margin-left: 20px;">
     <!-- Editor -->
     <li
-      ng-class="{'active': getTabStatuses().active === 'main',
-      'dropdown': countWarnings()}">
+      ng-class="{'active': getTabStatuses().active === 'main'">
       <a
         href="#"
         tooltip="Editor"
-        tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>"
-        ng-click="selectMainTab()" class="protractor-test-main-tab">
+        ng-click="selectMainTab()"
+        class="protractor-test-main-tab">
         <span class="glyphicon glyphicon-pencil"></span>
       </a>
     </li>
@@ -55,7 +54,6 @@
         tooltip="History"
         tooltip-placement="bottom"
         ng-click="selectHistoryTab()"
-        disabled="explorationRightsService.isCloned()"
         class="protractor-test-history-tab">
         <span class="glyphicon glyphicon-time"></span>
       </a>
