@@ -26,8 +26,10 @@
 {% endblock header_js %}
 
 {% block navbar_breadcrumb %}
-  <collection-editor-navbar-breadcrumb-directive>
-  </collection-editor-navbar-breadcrumb-directive>
+  <div ng-controller="CollectionEditor">
+    <collection-editor-navbar-breadcrumb-directive collection="collection">
+    </collection-editor-navbar-breadcrumb-directive>
+  </div>
 {% endblock navbar_breadcrumb %}
 
 {% block local_top_nav_options %}
