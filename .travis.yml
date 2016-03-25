@@ -22,14 +22,14 @@ matrix:
   - env: RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false RUN_LINT=false REPORT_BACKEND_COVERAGE=true
   fast_finish: true
 
-notifications:
-  email:
-    recipients:
-    - sean@seanlip.org
-    - henning.benmax@gmail.com
-    - wxy.xinyu@gmail.com
-    on_success: change
-    on_failure: change
+#notifications:
+#  email:
+#    recipients:
+#    - sean@seanlip.org
+#    - henning.benmax@gmail.com
+#    - wxy.xinyu@gmail.com
+#    on_success: change
+#    on_failure: change
 
 before_install:
 - pip install codecov
@@ -56,8 +56,9 @@ after_success:
 - if [ $RUN_FRONTEND_TESTS == 'true' ]; then codecov --file ../karma_coverage_reports/coverage-final.json; fi
 
 cache:
+  # Cache codecov its dependencies.
+  pip: true
   directories:
-    # Runs once before being cached by Travis
     - ../node_modules/
     - ../oppia_tools/
     - third_party/
@@ -65,5 +66,5 @@ cache:
 
 before_cache:
   # Deleting python bytecode before files are cached,
-  # to prevent recaching.
+  # to prevent Travis from making a new cache every time.
   - find third_party -name ["*.pyc"] -print -delete
