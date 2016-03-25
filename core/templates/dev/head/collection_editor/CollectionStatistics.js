@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers and services for the collection statistics in the
+ * @fileoverview Controller for the collection statistics in the
  * collection editor page.
  */
 

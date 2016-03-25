@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers and services for the collection feedback in the
+ * @fileoverview Controller for the collection feedback in the
  * collection editor page.
  */
 
