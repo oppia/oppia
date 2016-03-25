@@ -2924,3 +2924,6 @@ md-card.preview-conversation-skin-supplemental-card {
   color: red;
   margin-bottom: 10px;
 }
+/* Icon fonts size definition */
+.material-icons.md-100 { font-size: 100px; }
+.material-icons.md-40 { font-size: 40px; }
