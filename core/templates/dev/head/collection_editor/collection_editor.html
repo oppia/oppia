@@ -64,29 +64,34 @@
     </div>
   </div>
 
-  {% include 'collection_editor/collection_details_editor_directive.html' %}
-  {% include 'collection_editor/collection_editor_navbar_breadcrumb_directive.html' %}
-  {% include 'collection_editor/collection_editor_navbar_directive.html' %}
-  {% include 'collection_editor/collection_node_editor_directive.html' %}
-  {% include 'collection_editor/collection_skill_list_directive.html' %}
+  {% include 'collection_editor/editor_tab/collection_details_editor_directive.html' %}
+  {% include 'collection_editor/navbar/collection_editor_navbar_breadcrumb_directive.html' %}
+  {% include 'collection_editor/navbar/collection_editor_navbar_directive.html' %}
+  {% include 'collection_editor/editor_tab/collection_node_editor_directive.html' %}
+  {% include 'collection_editor/editor_tab/collection_skill_list_directive.html' %}
 {% endblock content %}
 
 {% block footer_js %}
   {{ super() }}
   <script>
-    {{ include_js_file('collection_editor/CollectionDetailsEditorDirective.js') }}
-    {{ include_js_file('collection_editor/CollectionEditor.js') }}
-    {{ include_js_file('collection_editor/CollectionEditorNavbarBreadcrumbDirective.js') }}
-    {{ include_js_file('collection_editor/CollectionEditorNavbarDirective.js') }}
-    {{ include_js_file('collection_editor/CollectionNodeEditorDirective.js') }}
-    {{ include_js_file('collection_editor/CollectionSkillListDirective.js') }}
+    {{ include_js_file(
+      'collection_editor/editor_tab/CollectionDetailsEditorDirective.js') }}
+    {{ include_js_file('collection_editor/editor_tab/CollectionEditor.js') }}
+    {{ include_js_file(
+      'collection_editor/editor_tab/CollectionNodeEditorDirective.js') }}
+    {{ include_js_file(
+      'collection_editor/editor_tab/CollectionSkillListDirective.js') }}
+    {{ include_js_file(
+      'collection_editor/navbar/CollectionEditorNavbarBreadcrumbDirective.js') }}
+    {{ include_js_file(
+      'collection_editor/navbar/CollectionEditorNavbarDirective.js') }}
 
-    {{ include_js_file('collection_editor/CollectionFeedback.js') }}
-    {{ include_js_file('collection_editor/CollectionHistory.js') }}
-    {{ include_js_file('collection_editor/CollectionMain.js') }}
-    {{ include_js_file('collection_editor/CollectionPreview.js') }}
-    {{ include_js_file('collection_editor/CollectionSettings.js') }}
-    {{ include_js_file('collection_editor/CollectionStatistics.js') }}
+    {{ include_js_file('collection_editor/feedback_tab/CollectionFeedback.js') }}
+    {{ include_js_file('collection_editor/history_tab/CollectionHistory.js') }}
+    {{ include_js_file('collection_editor/editor_tab/CollectionMain.js') }}
+    {{ include_js_file('collection_editor/preview_tab/CollectionPreview.js') }}
+    {{ include_js_file('collection_editor/settings_tab/CollectionSettings.js') }}
+    {{ include_js_file('collection_editor/statistics_tab/CollectionStatistics.js') }}
 
     {{ include_js_file('domain/collection/CollectionBackendApiService.js') }}
     {{ include_js_file('domain/collection/CollectionNodeObjectFactory.js') }}
