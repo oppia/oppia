@@ -40,27 +40,27 @@
 {% block content %}
   <div ng-controller="CollectionEditor">
     <div ng-if="getTabStatuses().active === 'main'">
-      {% include 'collection_editor/collection_main.html' %}
+      {% include 'collection_editor/editor_tab/collection_main.html' %}
     </div>
 
     <div ng-if="getTabStatuses().active === 'preview'">
-      {% include 'collection_editor/collection_preview.html' %}
+      {% include 'collection_editor/preview_tab/collection_preview.html' %}
     </div>
 
     <div ng-show="getTabStatuses().active === 'settings'">
-      {% include 'collection_editor/collection_settings.html' %}
+      {% include 'collection_editor/settings_tab/collection_settings.html' %}
     </div>
 
     <div ng-show="getTabStatuses().active === 'history'">
-      {% include 'collection_editor/collection_history.html' %}
+      {% include 'collection_editor/history_tab/collection_history.html' %}
     </div>
 
     <div ng-show="getTabStatuses().active === 'feedback'">
-      {% include 'collection_editor/collection_feedback.html' %}
+      {% include 'collection_editor/feedback_tab/collection_feedback.html' %}
     </div>
 
     <div ng-show="getTabStatuses().active === 'stats'">
-      {% include 'collection_editor/collection_statistics.html' %}
+      {% include 'collection_editor/statistics_tab/collection_statistics.html' %}
     </div>
   </div>
 
@@ -76,7 +76,7 @@
   <script>
     {{ include_js_file(
       'collection_editor/editor_tab/CollectionDetailsEditorDirective.js') }}
-    {{ include_js_file('collection_editor/editor_tab/CollectionEditor.js') }}
+    {{ include_js_file('collection_editor/CollectionEditor.js') }}
     {{ include_js_file(
       'collection_editor/editor_tab/CollectionNodeEditorDirective.js') }}
     {{ include_js_file(
