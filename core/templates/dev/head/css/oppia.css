@@ -494,6 +494,7 @@ textarea {
 }
 .oppia-sidebar-menu a {
   color: #333;
+  font-style: normal; /* Fix for italicized links on the sidebar #1631 */
   display: block;
   padding: 1em 0 1em 18px;
   text-decoration: none;
