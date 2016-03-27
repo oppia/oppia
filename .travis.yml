@@ -56,8 +56,7 @@ after_success:
 - if [ $RUN_FRONTEND_TESTS == 'true' ]; then codecov --file ../karma_coverage_reports/coverage-final.json; fi
 
 cache:
-  # Cache codecov and Oppia's dependencies.
-  pip: true
+  # Cache Oppia's dependencies.
   directories:
     - ../node_modules/
     - ../oppia_tools/
@@ -67,4 +66,3 @@ cache:
 before_cache:
   # Delete python bytecode and pip debug log to prevent cache rebuild.
   - find third_party -name "*.pyc" -print -delete
-  - rm $HOME/.cache/pip/log/debug.log
