@@ -45,3 +45,4 @@ class Collapsible(base.BaseRichTextComponent):
         },
         'default_value': 'You have opened the collapsible block.'
     }]
+

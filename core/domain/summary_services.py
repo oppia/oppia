@@ -71,8 +71,6 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids):
                 'human_readable_contributors_summary':
                     get_human_readable_contributors_summary(
                         exploration_summary.contributors_summary),
-                'contributor_names': user_services.get_human_readable_user_ids(
-                    exploration_summary.contributor_ids),
                 'tags': exploration_summary.tags,
                 'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
                     exploration_summary.category),

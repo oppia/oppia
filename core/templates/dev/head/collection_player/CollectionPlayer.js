@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Controller for the learner's view of a collection.
- *
- * @author henning.benmax@gmail.com (Ben Henning)
  */
 
 oppia.constant(

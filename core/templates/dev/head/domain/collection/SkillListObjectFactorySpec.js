@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Tests for SkillListObjectFactory.
- *
- * @author henning.benmax@gmail.com (Ben Henning)
  */
 
 describe('Skill list object factory', function() {

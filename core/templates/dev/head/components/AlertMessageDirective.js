@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Directive for Alert Messages
- *
- * @author hitesh96db@gmail.com (Hitesh Sharma)
  */
 
 oppia.directive('alertMessage', [function() {

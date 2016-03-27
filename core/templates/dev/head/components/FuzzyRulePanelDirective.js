@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Directive for the fuzzy rule panel.
- *
- * @author henning.benmax@gmail.com (Ben Henning)
  */
 
 oppia.directive('fuzzyRulePanel', [function() {

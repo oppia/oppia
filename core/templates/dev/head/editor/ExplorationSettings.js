@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Controllers for the exploration settings tab.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.controller('ExplorationSettings', [

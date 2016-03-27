@@ -15,8 +15,6 @@
 /**
  * @fileoverview Controllers for the exploration statistics tab in the
  * exploration editor.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.controller('ExplorationStatistics', [

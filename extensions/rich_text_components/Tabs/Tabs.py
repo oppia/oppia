@@ -71,3 +71,4 @@ class Tabs(base.BaseRichTextComponent):
             'content': 'This is a first hint.'
         }],
     }]
+

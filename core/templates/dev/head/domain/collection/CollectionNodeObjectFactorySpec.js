@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Tests for CollectionNodeObjectFactory.
- *
- * @author henning.benmax@gmail.com (Ben Henning)
  */
 
 describe('Collection node object factory', function() {

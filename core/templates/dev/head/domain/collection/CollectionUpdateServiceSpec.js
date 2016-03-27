@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Tests for ChangeObjectFactory.
- *
- * @author henning.benmax@gmail.com (Ben Henning)
  */
 
 describe('Collection update service', function() {

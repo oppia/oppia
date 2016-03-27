@@ -15,8 +15,6 @@
 /**
  * @fileoverview Service for returning information about an exploration's
  * context.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.constant('PAGE_CONTEXT', {

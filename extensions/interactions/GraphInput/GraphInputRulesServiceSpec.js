@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Unit tests for Graph Input rules.
- *
- * @author wxyxinyu@gmail.com (Xinyu Wu)
  */
 
 describe('Graph Input service', function() {

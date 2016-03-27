@@ -15,8 +15,6 @@
 /**
  * @fileoverview Service to construct URLs by inserting variables within them as
  * necessary to have a fully-qualified URL.
- *
- * @author henning.benmax@gmail.com (Ben Henning)
  */
 
 oppia.factory('UrlInterpolationService', ['alertsService',

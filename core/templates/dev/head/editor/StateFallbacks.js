@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Controllers, services and filters for fallbacks.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.controller('StateFallbacks', [

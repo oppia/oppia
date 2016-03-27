@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Factory for handling warnings and info messages.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.factory('alertsService', ['$log', function($log) {

@@ -15,8 +15,6 @@
 /**
  * @fileoverview Service for getting thread data from the backend for the
  * feedback tab of the exploration editor.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.factory('threadDataService', [

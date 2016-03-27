@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Utility service for the learner's view of an exploration.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.constant('GADGET_SPECS', GLOBALS.GADGET_SPECS);

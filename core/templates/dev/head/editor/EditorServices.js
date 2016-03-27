@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Standalone services for the exploration editor page.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 // Service for handling all interactions with the exploration editor backend.
