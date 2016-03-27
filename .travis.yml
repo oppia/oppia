@@ -64,5 +64,5 @@ cache:
     - core/templates/prod/
 
 before_cache:
-  # Delete python bytecode and pip debug log to prevent cache rebuild.
+  # Delete python bytecode to prevent cache rebuild.
   - find third_party -name "*.pyc" -print -delete
