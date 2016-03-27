@@ -190,7 +190,7 @@ if [ ! -d "$NODE_PATH" ]; then
 fi
 
 # Adjust path to support the default Chrome locations for Unix, Windows and Mac OS.
-if [ $VAGRANT = 'true' ]; then
+if [ $VAGRANT = 'true' ] || [ $TRAVIS = 'true' ] ; then
   export CHROME_BIN="chromium-browser"
   # Used in frontend and e2e tests. Only gets set if using Vagrant VM.
   export XVFB_PREFIX="/usr/bin/xvfb-run"
