@@ -190,12 +190,16 @@ if [ ! -d "$NODE_PATH" ]; then
 fi
 
 # Adjust path to support the default Chrome locations for Unix, Windows and Mac OS.
-if [ $VAGRANT = 'true' ] || [ $TRAVIS = 'true' ] ; then
+if [ $VAGRANT = 'true' ]; then
   export CHROME_BIN="chromium-browser"
-  # Used in frontend and e2e tests. Only gets set if using Vagrant VM.
-  export XVFB_PREFIX="/usr/bin/xvfb-run"
-  # Enforce proper ownership on Oppia and oppia_tools or else NPM installs will fail.
-  sudo chown -R vagrant.vagrant /home/vagrant/oppia*
+elif [ $TRAVIS = 'true' ]; then
+    # Required for headless testing in Vagrant
+    sudo apt-get install xvfb chromium-browser
+    export CHROME_BIN="chromium-browser"
+    # Used in frontend and e2e tests. Only gets set if using Vagrant VM.
+    export XVFB_PREFIX="/usr/bin/xvfb-run"
+    # Enforce proper ownership on Oppia and oppia_tools or else NPM installs will fail.
+    sudo chown -R vagrant.vagrant /home/vagrant/oppia*
 elif [ -f "/usr/bin/google-chrome" ]; then
   # Unix.
   export CHROME_BIN="/usr/bin/google-chrome"
