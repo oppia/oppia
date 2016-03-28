@@ -3054,5 +3054,5 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             self.current_exp_id = None
             exp_services.get_exp_with_draft_applied(
                 self.EXP_ID3, self.USER_ID)
-        # Assert that _get_exp_domain_object was called.
+        # Assert that _get_exp_domain_object was not called.
         self.assertEqual(self.current_exp_id, None)
