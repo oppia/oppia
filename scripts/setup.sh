@@ -190,9 +190,9 @@ if [ ! -d "$NODE_PATH" ]; then
 fi
 
 # Adjust path to support the default Chrome locations for Unix, Windows and Mac OS.
-if [ $TRAVIS = 'true' ]; then
+if [ $TRAVIS = true ]; then
   export CHROME_BIN="chromium-browser"
-elif [ $VAGRANT = 'true' ]; then
+elif [ $VAGRANT = true ]; then
     # Required for headless testing in Vagrant
     sudo apt-get install xvfb chromium-browser
     export CHROME_BIN="chromium-browser"
