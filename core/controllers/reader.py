@@ -45,7 +45,7 @@ import utils
 MAX_SYSTEM_RECOMMENDATIONS = 4
 
 SHARING_OPTIONS = config_domain.ConfigProperty(
-    'sharing_options', {
+    'sharing_options_reader', {
         'type': 'dict',
         'properties': [{
             'name': 'gplus',
@@ -64,22 +64,22 @@ SHARING_OPTIONS = config_domain.ConfigProperty(
             }
         }]
     },
-    'Sharing options to display in the learner view',
+    'Sharing options to display in the editor view',
     default_value={
         'gplus': False,
         'facebook': False,
         'twitter': False,
     })
 
+
 SHARING_OPTIONS_TWITTER_TEXT = config_domain.ConfigProperty(
-    'sharing_options_twitter_text', {
+    'sharing_options_twitter_text_reader', {
         'type': 'unicode',
     },
-    'Default text for the Twitter share message',
+    'Default text for the Twitter share message for the reader',
     default_value=(
         'Check out this interactive lesson from Oppia - a free, open-source '
         'learning platform!'))
-
 
 def require_playable(handler):
     """Decorator that checks if the user can play the given exploration."""

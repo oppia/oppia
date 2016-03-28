@@ -67,6 +67,41 @@ MODERATOR_REQUEST_FORUM_URL = config_domain.ConfigProperty(
     'in the gallery',
     default_value=MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE)
 
+SHARING_OPTIONS = config_domain.ConfigProperty(
+    'sharing_options_editor', {
+        'type': 'dict',
+        'properties': [{
+            'name': 'gplus',
+            'schema': {
+                'type': 'bool',
+            }
+        }, {
+            'name': 'facebook',
+            'schema': {
+                'type': 'bool',
+            }
+        }, {
+            'name': 'twitter',
+            'schema': {
+                'type': 'bool',
+            }
+        }]
+    },
+    'Sharing options to display in the editor view',
+    default_value={
+        'gplus': False,
+        'facebook': False,
+        'twitter': False,
+    })
+
+SHARING_OPTIONS_TWITTER_TEXT = config_domain.ConfigProperty(
+    'sharing_options_twitter_text_editor', {
+        'type': 'unicode',
+    },
+    'Default text for the Twitter share message for the editor',
+    default_value=(
+        'Check out this interactive lesson from Oppia - a free, open-source '
+        'learning platform!'))
 
 def get_value_generators_js():
     """Return a string that concatenates the JS for all value generators."""
@@ -205,6 +240,8 @@ class ExplorationPage(EditorHandler):
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'PANEL_SPECS': feconf.PANELS_PROPERTIES,
             'DEFAULT_OBJECT_VALUES': rule_domain.get_default_object_values(),
+            'SHARING_OPTIONS': SHARING_OPTIONS.value,
+            'SHARING_OPTIONS_TWITTER_TEXT': SHARING_OPTIONS_TWITTER_TEXT.value,
             'additional_angular_modules': additional_angular_modules,
             'can_delete': rights_manager.Actor(
                 self.user_id).can_delete(
