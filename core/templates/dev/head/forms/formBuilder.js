@@ -711,7 +711,6 @@ oppia.factory('rteHelperService', [
         $timeout(function() {
           callback(elt.html());
         });
-        return;
       },
       // Replace <img> tags with <oppia-noninteractive> tags.
       convertRteToHtml: function(rte) {
@@ -780,6 +779,59 @@ oppia.config(['$provide', function($provide) {
         $timeout(function() {
           var id = 'textAngularEditor' + $element.get(0).id.replace(/\D/g, '');
           var textAngularEditor = textAngularManager.retrieveEditor(id);
+
+          $element.keydown(function(e){
+            //http://stackoverflow.com/questions/2177958/how-to-delete-an-html-element-inside-a-div-with-attribute-contenteditable
+            if(typeof InstallTrigger !== 'undefined' && e.keyCode === 8){
+              // fix backspace bug in FF
+              // https://bugzilla.mozilla.org/show_bug.cgi?id=685445
+              var selection = window.getSelection();
+              if (!selection.isCollapsed || !selection.rangeCount) {
+                  return;
+              }
+
+              var curRange = selection.getRangeAt(selection.rangeCount - 1);
+              if (curRange.commonAncestorContainer.nodeType == 3 && curRange.startOffset > 0) {
+                  // we are in child selection. The characters of the text node is being deleted
+                  if(curRange.startOffset == 1 &&
+                     curRange.commonAncestorContainer.nodeValue.length == 1 &&
+                     curRange.commonAncestorContainer.childNodes.length == 0){
+                    console.log(curRange.commonAncestorContainer.parentNode);
+                    console.log(curRange.commonAncestorContainer.contentEditable);
+                    /*curRange.commonAncestorContainer.parentNode.removeChild(
+                      curRange.commonAncestorContainer);*/
+                  }
+                  return;
+              }
+
+              var range = document.createRange();
+              console.log(selection.anchorNode);
+              if (selection.anchorNode != this) {
+                  // selection is in character mode. expand it to the whole editable field
+                  range.selectNodeContents(this);
+                  range.setEndBefore(selection.anchorNode);
+              } else if (selection.anchorOffset > 0) {
+                  range.setEnd(this, selection.anchorOffset);
+              } else {
+                  // reached the beginning of editable field
+                  return;
+              }
+
+              console.log("range offset: " + (range.endOffset - 1));
+              console.log(selection.rangeCount);
+              range.setStart(this, range.endOffset - 1);
+
+
+              var previousNode = range.cloneContents().lastChild;
+              console.log(previousNode);
+              if (previousNode && previousNode.contentEditable == 'false') {
+                  // this is some rich content, e.g. smile. We should help the user to delete it
+                  console.log("deleting content");
+                  range.deleteContents();
+                  e.preventDefault();
+              }
+            }
+          })
           if (textAngularEditor) {
             var textAngularEditorScope = textAngularEditor.scope;
             _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {

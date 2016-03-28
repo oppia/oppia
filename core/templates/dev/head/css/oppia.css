@@ -2350,6 +2350,16 @@ div#ng-curtain {
   min-height: 80px;
 }
 
+/* Hacky fix to force display of the cursor when the editor is empty */
+.form-control.oppia-rte-content > div:last-child {
+  display: inline-block;
+  width: 100%;
+}
+
+.form-control.oppia-rte-content > div:last-child p{
+  min-width: 2px;
+}
+
 /* Styles for the editor training interfaces. */
 
 .preview-conversation-skin-card-row-container {

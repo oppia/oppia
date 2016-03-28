@@ -172,7 +172,8 @@ describe('Normalizer tests', function() {
 describe('RTE helper service', function() {
   var _DATA_URI = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///';
   var rhs;
-
+  var $rootScope;
+  var $timeout;
   beforeEach(module('oppia'));
 
   beforeEach(function() {
@@ -186,11 +187,13 @@ describe('RTE helper service', function() {
     });
   });
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject(function($injector, _$rootScope_, _$timeout_) {
     rhs = $injector.get('rteHelperService');
+    $rootScope = _$rootScope_;
+    $timeout = _$timeout_;
   }));
 
-  it('should convert correctly between HTML and RTE', function() {
+  it('should convert correctly between HTML and RTE', function(done) {
     var testData = [[
       '<div></div>', '<div></div>'
     ], [
@@ -201,21 +204,43 @@ describe('RTE helper service', function() {
       '<div>abc<span>def</span></div><b>ghi</b>',
       '<div>abc<span>def</span></div><b>ghi</b>'
     ], [
-      '<oppia-noninteractive-image></oppia-noninteractive-image>',
-      '<oppia-noninteractive-image></oppia-noninteractive-image>'
+      '<oppia-noninteractive-image oppia-rte-overlay="" ng-scope="" ' +
+        'contenteditable="false">' +
+      '</oppia-noninteractive-image>',
+      '<span class="oppia-noninteractive-image oppia-rte-overlay ng-scope" ' +
+        'contenteditable="false">' +
+        '<span contenteditable="false" style="display: none;"></span>' +
+        '<oppia-noninteractive-image contenteditable="false" ' +
+          'style="pointer-events: none;">' +
+        '</oppia-noninteractive-image>' +
+      '</span>'
     ], [
-      '<oppia-noninteractive-image ' +
+      '<oppia-noninteractive-image oppia-rte-overlay="" ng-scope="" ' +
+        'contenteditable="false" ' +
         'image_id-with-value="&amp;quot;T&amp;quot;">' +
       '</oppia-noninteractive-image>',
-      '<oppia-noninteractive-image ' +
-        'image_id-with-value="&amp;quot;T&amp;quot;">' +
-      '</oppia-noninteractive-image>'
+      '<span class="oppia-noninteractive-image oppia-rte-overlay ng-scope" ' +
+        'contenteditable="false" image_id-with-value="&amp;quot;T&amp;quot;">' +
+        '<span contenteditable="false" style="display: none;"></span>' +
+        '<oppia-noninteractive-image contenteditable="false" ' +
+          'image_id-with-value="&amp;quot;T&amp;quot;" ' +
+          'style="pointer-events: none;">' +
+        '</oppia-noninteractive-image>' +
+      '</span>'
     ]];
 
     for (var i = 0; i < testData.length; i++) {
       expect(rhs.convertRteToHtml(testData[i][1]))
         .toEqual(testData[i][0]);
+      (function(htmlContent, rteContent) {
+        rhs.convertHtmlToRte(htmlContent, function(content) {
+          //Fix for a bug where a special empty string character is inserted
+          content = content.replace(String.fromCharCode(8203), "");
+          expect(content).toEqual(rteContent);
+        });
+      })(testData[i][0], testData[i][1]);
     }
+    $timeout.flush();
   });
 
   it('should correctly sanitize HTML for the RTE', inject(function($filter) {
