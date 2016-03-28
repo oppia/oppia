@@ -43,8 +43,8 @@ import feconf
 memcache_services = models.Registry.import_memcache_services()
 search_services = models.Registry.import_search_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
-(exp_models, feedback_models) = models.Registry.import_models(
-    [models.NAMES.exploration, models.NAMES.feedback])
+(exp_models, feedback_models, user_models) = models.Registry.import_models(
+    [models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user])
 import utils
 
 # This takes additional 'title' and 'category' parameters.
@@ -952,6 +952,13 @@ def update_exploration(
     exploration = apply_change_list(exploration_id, change_list)
     _save_exploration(committer_id, exploration, commit_message, change_list)
 
+    user_exp = user_models.ExplorationUserDataModel.get(
+        committer_id, exploration_id)
+    user_exp.draft_change_list = None
+    user_exp.draft_change_list_last_updated = None
+    user_exp.draft_change_list_exp_version = None
+    user_exp.put()
+    
     # Update summary of changed exploration.
     update_exploration_summary(exploration.id)
 
@@ -1360,6 +1367,7 @@ def _is_suggestion_valid(thread_id, exploration_id):
         suggestion.state_name in states and
         suggestion.state_content == states[suggestion.state_name])
 
+
 def accept_suggestion(editor_id, change_list, thread_id, exploration_id, 
                       commit_message):
     """If the suggestion is valid, accepts it by updating the exploration.
@@ -1387,3 +1395,45 @@ def reject_suggestion(thread_id, exploration_id):
         get_by_exp_and_thread_id(exploration_id, thread_id))
     thread.status = feedback_models.STATUS_CHOICES_IGNORED
     thread.put()
+
+
+def is_draft_version_valid(exp_id, user_id):
+    """Checks if the draft version is the same as the latest version of the
+    exploration."""
+
+    draft_version = user_models.ExplorationUserDataModel.get(
+        user_id, exp_id).draft_change_list_exp_version
+    exp_version = get_exploration_summary_by_id(exp_id).version
+    return draft_version == exp_version
+
+
+def create_or_update_draft(
+        exp_id, user_id, change_list, exp_version, timestamp):
+    """Creates a draft with the given change list, or updates the changes list
+    of the draft if it already exists. A draft is updated only if the change
+    list timestamp of the new change list is greater than the change list
+    timestamp of the draft.
+    The method assumes that a ExplorationUserDataModel object exists for the
+    given user and exploration."""
+
+    user_exp = user_models.ExplorationUserDataModel.get(user_id, exp_id) 
+    if (user_exp.draft_change_list and
+            user_exp.draft_change_list_last_updated > timestamp):
+        return
+    updated_exploration = apply_change_list(exp_id, change_list)
+    updated_exploration.validate(strict=False)
+    user_exp.draft_change_list = change_list
+    user_exp.draft_change_list_last_updated = timestamp
+    user_exp.draft_change_list_exp_version = exp_version
+    user_exp.put()
+
+
+def get_exp_with_draft_applied(exp_id, user_id):
+    """If a draft exists for the given user and exploration,
+    apply it to the exploration."""
+
+    user_exp = user_models.ExplorationUserDataModel.get(user_id, exp_id)
+    exploration = get_exploration_by_id(exp_id) 
+    if user_exp.draft_change_list: 
+        return apply_change_list(exp_id, user_exp.draft_change_list)
+    return exploration
