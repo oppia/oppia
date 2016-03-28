@@ -64,7 +64,7 @@ SHARING_OPTIONS = config_domain.ConfigProperty(
             }
         }]
     },
-    'Sharing options to display in the editor view',
+    'Sharing options to display in the learner view',
     default_value={
         'gplus': False,
         'facebook': False,
