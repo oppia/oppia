@@ -118,7 +118,7 @@
                 <div class="navbar-container">
                   <div class="navbar-header protractor-test-navbar-header pull-left">
                     <a ng-if="isWindowNarrow" ng-click="openSidebar()" class="navbar-brand oppia-navbar-menu oppia-transition-200">
-                      <img src="/images/general/menu.png">
+                      <i class="material-icons oppia-navbar-menu-icon">&#xE5D2;</i>
                     </a>
                     <a class="oppia-navbar-brand-name oppia-transition-200" href="/gallery" focus-on="<[LABEL_FOR_CLEARING_FOCUS]>">
                       <img src="/images/logo/288x128_logo_white.png" class="oppia-logo" ng-class="isWindowNarrow ? 'oppia-logo-small' : 'oppia-logo-wide'">
@@ -138,11 +138,12 @@
                               <div class="oppia-navbar-profile-picture-container" ng-cloak>
                                 {% if profile_picture_data_url %}
                                   <img src="{{profile_picture_data_url}}" class="oppia-navbar-profile-picture img-circle">
+                                  <span class="caret" style="margin-top: 10px;"></span>
                                 {% else %}
-                                  <img ng-if="profileDropdownIsActive" src="/images/avatar/user_mint_48px.png" class="oppia-navbar-profile-picture">
-                                  <img ng-if="!profileDropdownIsActive" src="/images/avatar/user_white_48px.png" class="oppia-navbar-profile-picture">
+                                  <i class="material-icons md-40" style="margin-top: -1px;">&#xE853;</i>
+                                  <span class="caret" style="margin-top: -26px;"></span>
                                 {% endif %}
-                                <span class="caret" style="margin-top: 10px;"></span>
+                                
 
                                 <div class="oppia-navbar-dashboard-indicator ng-cloak" ng-if="numUnseenNotifications > 0">
                                   <span class="oppia-navbar-dashboard-indicator-text">
