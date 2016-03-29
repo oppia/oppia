@@ -77,11 +77,6 @@ button.md-button.md-default-theme.oppia-learner-continue-button:hover {
 .material-icons.md-dark {
   color: rgba(0, 0, 0, 0.54);
 }
-.material-icons.menu {
-color:#fff;
-margin-top:-5px
-}
-
 /* Bootstrap overrides and additions. */
 html {
   /*
@@ -2140,6 +2135,10 @@ div#ng-curtain {
   opacity: 0.9;
   outline-color: transparent;
   padding-top: 20px;
+}
+.oppia-navbar-menu-icon {
+  color: #fff;
+  margin-top: -5px;
 }
 .oppia-navbar-menu:hover {
   opacity: 1;
