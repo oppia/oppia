@@ -30,6 +30,11 @@ notifications:
     - wxy.xinyu@gmail.com
     on_success: change
     on_failure: change
+  irc:
+    channels:
+      - "chat.freenode.net#oppia"
+    on_success: never
+    on_failure: always
 
 before_install:
 - pip install codecov
