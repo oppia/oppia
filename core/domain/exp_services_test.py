@@ -965,6 +965,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, _get_change_list(
                 self.init_state_name, 'param_changes', self.param_changes), '')
+
         user_exp = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.owner_id, self.EXP_ID))
         self.assertEqual(user_exp.draft_change_list, None)
@@ -1682,6 +1683,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
 
     def setUp(self):
         """Populate the database of explorations to be queried against.
+
         The sequence of events is:
         - (1) Albert creates EXP_ID_1.
         - (2) Bob edits the title of EXP_ID_1.
@@ -2297,6 +2299,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
 
 class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
     """Test change list summaries generate as expected for edge cases.
+
     CHANGE_LIST_ONE: Adds a simple state with a Continue interaction.
     CHANGE_LIST_TWO: Edits the first state's content and renames it.
     CHANGE_LIST_THREE: Adds a gadget.
@@ -2790,6 +2793,7 @@ title: Old Title
         reverting to a version prior to the migration still maintains a valid
         exploration. It tests both the exploration domain object and the
         exploration model stored in the datastore for validity.
+
         Note: It is important to distinguish between when the test is testing
         the exploration domain versus its model. It is operating at the domain
         layer when using exp_services.get_exploration_by_id. Otherwise, it
