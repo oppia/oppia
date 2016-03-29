@@ -68,6 +68,12 @@ button.md-button.md-default-theme.oppia-learner-continue-button:hover {
 .material-icons.md-18 {
   font-size: 18px;
 }
+.material-icons.md-100 { 
+  font-size: 100px; 
+}
+.material-icons.md-40 {
+  font-size: 40px; 
+}
 .material-icons.md-dark {
   color: rgba(0, 0, 0, 0.54);
 }
@@ -2130,6 +2136,10 @@ div#ng-curtain {
   opacity: 0.9;
   outline-color: transparent;
   padding-top: 20px;
+}
+.oppia-navbar-menu-icon {
+  color: #fff;
+  margin-top: -5px;
 }
 .oppia-navbar-menu:hover {
   opacity: 1;
