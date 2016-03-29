@@ -34,8 +34,8 @@ from core.tests import test_utils
 import feconf
 import utils
 
-(exp_models, feedback_models) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.feedback
+(exp_models, feedback_models, user_models) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
 ])
 search_services = models.Registry.import_search_services()
 transaction_services = models.Registry.import_transaction_services()
@@ -67,6 +67,7 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.datetime = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
 
         user_services.get_or_create_user(self.owner_id, self.OWNER_EMAIL)
         user_services.get_or_create_user(self.editor_id, self.EDITOR_EMAIL)
@@ -921,6 +922,13 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'feedback': ['Incorrect', '<b>Wrong answer</b>'],
             'param_changes': []
         }
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.owner_id, self.EXP_ID), user_id=self.owner_id,
+            exploration_id=self.EXP_ID, rating=2,
+            rated_on=self.datetime,
+            draft_change_list={'new_content': {}},
+            draft_change_list_last_updated=self.datetime,
+            draft_change_list_exp_version=3).put()
 
     def test_update_state_name(self):
         """Test updating of state name."""
@@ -957,7 +965,11 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, _get_change_list(
                 self.init_state_name, 'param_changes', self.param_changes), '')
-
+        user_exp = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.owner_id, self.EXP_ID))
+        self.assertEqual(user_exp.draft_change_list, None)
+        self.assertEqual(user_exp.draft_change_list_last_updated, None)
+        self.assertEqual(user_exp.draft_change_list_exp_version, None)
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         param_changes = exploration.init_state.param_changes[0]
         self.assertEqual(param_changes._name, 'myParam')
@@ -1670,7 +1682,6 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
 
     def setUp(self):
         """Populate the database of explorations to be queried against.
-
         The sequence of events is:
         - (1) Albert creates EXP_ID_1.
         - (2) Bob edits the title of EXP_ID_1.
@@ -2153,7 +2164,6 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
 
     def setUp(self):
         """Populate the database of explorations and their summaries.
-
         The sequence of events is:
         - (1) Albert creates EXP_ID_1.
         - (2) Bob edits the title of EXP_ID_1.
@@ -2287,7 +2297,6 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
 
 class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
     """Test change list summaries generate as expected for edge cases.
-
     CHANGE_LIST_ONE: Adds a simple state with a Continue interaction.
     CHANGE_LIST_TWO: Edits the first state's content and renames it.
     CHANGE_LIST_THREE: Adds a gadget.
@@ -2781,7 +2790,6 @@ title: Old Title
         reverting to a version prior to the migration still maintains a valid
         exploration. It tests both the exploration domain object and the
         exploration model stored in the datastore for validity.
-
         Note: It is important to distinguish between when the test is testing
         the exploration domain versus its model. It is operating at the domain
         layer when using exp_services.get_exploration_by_id. Otherwise, it
@@ -3057,3 +3065,132 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
             with self.assertRaisesRegexp(Exception, exception_message):
                 exp_services.reject_suggestion(
                     self.editor_id, self.THREAD_ID1, self.EXP_ID2)
+
+
+class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
+    """Test editor auto saving functions in exp_services."""
+
+    THREAD_ID1 = '1111'
+    EXP_ID1 = 'exp_id1'
+    EXP_ID2 = 'exp_id2'
+    EXP_ID3 = 'exp_id3'
+    USERNAME = 'user123'
+    USER_ID = 'user_id'
+    COMMIT_MESSAGE = 'commit message'
+    DATETIME = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
+    OLDER_DATETIME = datetime.datetime.strptime('2016-01-16', '%Y-%m-%d')
+    NEWER_DATETIME = datetime.datetime.strptime('2016-03-16', '%Y-%m-%d')
+    DRAFT_CHANGELIST = {'new_content': {}}
+    NEW_CHANGELIST = [{
+        'cmd': 'edit_exploration_property',
+        'property_name': 'title',
+        'new_value': 'New title'}]  
+
+    def setUp(self):
+        super(EditorAutoSavingUnitTests, self).setUp()
+        # Explorations with draft set.
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.USER_ID, self.EXP_ID1), user_id=self.USER_ID,
+            exploration_id=self.EXP_ID1, 
+            draft_change_list=self.DRAFT_CHANGELIST,
+            draft_change_list_last_updated=self.DATETIME,
+            draft_change_list_exp_version=3).put()
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.USER_ID, self.EXP_ID2), user_id=self.USER_ID,
+            exploration_id=self.EXP_ID2,
+            draft_change_list=self.DRAFT_CHANGELIST,
+            draft_change_list_last_updated=self.DATETIME,
+            draft_change_list_exp_version=4).put()
+        # Exploration with no draft.
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.USER_ID, self.EXP_ID3), user_id=self.USER_ID,
+            exploration_id=self.EXP_ID3).put()
+
+    def _get_exploration_summary(self, exp_id):
+        return exp_models.ExpSummaryModel(version=3) 
+
+    def _empty_method(self, strict):
+        pass
+
+    def _get_exp_domain_object(self, exp_id, change_list):
+        self.current_exp_id = exp_id
+        return exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID1, 'A title', 'A category')
+
+    def test_draft_version_valid_true(self):
+        with self.swap(exp_services, 'get_exploration_summary_by_id',
+                       self._get_exploration_summary):
+            self.assertEqual(exp_services.is_draft_version_valid(
+                self.EXP_ID1, self.USER_ID), True)
+
+    def test_draft_version_valid_false(self):
+        with self.swap(exp_services, 'get_exploration_summary_by_id',
+                       self._get_exploration_summary):
+            self.assertEqual(exp_services.is_draft_version_valid(
+                self.EXP_ID2, self.USER_ID), False)
+
+    def test_create_or_update_draft_older_draft_exists(self):
+        with self.swap(exp_services, 'apply_change_list',
+                       self._get_exp_domain_object):
+            with self.swap(exp_domain.Exploration, 'validate',
+                           self._empty_method):
+                exp_services.create_or_update_draft(
+                    self.EXP_ID1, self.USER_ID, self.NEW_CHANGELIST, 5,
+                    self.NEWER_DATETIME)
+                user_exp = user_models.ExplorationUserDataModel.get(
+                    self.USER_ID, self.EXP_ID1)       
+        self.assertEqual(user_exp.exploration_id, self.EXP_ID1)
+        self.assertEqual(
+            user_exp.draft_change_list, self.NEW_CHANGELIST)
+        self.assertEqual(user_exp.draft_change_list_last_updated,
+                         self.NEWER_DATETIME)
+        self.assertEqual(user_exp.draft_change_list_exp_version, 5)
+
+    def test_create_or_update_draft_newer_draft_exists(self):
+        exp_services.create_or_update_draft(
+            self.EXP_ID1, self.USER_ID, self.NEW_CHANGELIST, 5,
+            self.OLDER_DATETIME)
+        user_exp = user_models.ExplorationUserDataModel.get(
+            self.USER_ID, self.EXP_ID1)
+        self.assertEqual(user_exp.exploration_id, self.EXP_ID1)
+        self.assertEqual(user_exp.draft_change_list, self.DRAFT_CHANGELIST)
+        self.assertEqual(
+            user_exp.draft_change_list_last_updated, self.DATETIME)
+        self.assertEqual(user_exp.draft_change_list_exp_version, 3)
+
+    def test_create_or_update_draft_draft_does_not_exist(self):
+        with self.swap(exp_services, 'apply_change_list',
+                       self._get_exp_domain_object):
+            with self.swap(exp_domain.Exploration, 'validate',
+                           self._empty_method):
+                exp_services.create_or_update_draft(
+                    self.EXP_ID3, self.USER_ID, self.NEW_CHANGELIST, 5,
+                    self.NEWER_DATETIME)
+                user_exp = user_models.ExplorationUserDataModel.get(
+                    self.USER_ID, self.EXP_ID3)        
+        self.assertEqual(user_exp.exploration_id, self.EXP_ID3)
+        self.assertEqual(
+            user_exp.draft_change_list, self.NEW_CHANGELIST)
+        self.assertEqual(user_exp.draft_change_list_last_updated,
+                         self.NEWER_DATETIME)
+        self.assertEqual(user_exp.draft_change_list_exp_version, 5)
+
+    def test_get_exp_with_draft_applied_draft_exists(self):
+        with self.swap(exp_services, 'apply_change_list',
+                       self._get_exp_domain_object):
+            with self.swap(exp_services, 'get_exploration_by_id',
+                           self._get_exploration_summary):
+                self.current_exp_id = None
+                exp_services.get_exp_with_draft_applied(
+                    self.EXP_ID1, self.USER_ID)
+        # Assert that _get_exp_domain_object was called.
+        self.assertEqual(self.current_exp_id, self.EXP_ID1)
+
+    def test_get_exp_with_draft_applied_draft_does_not_exist(self):
+        with self.swap(exp_services, 'get_exploration_by_id',
+                       self._get_exploration_summary):
+            self.current_exp_id = None
+            exp_services.get_exp_with_draft_applied(
+                self.EXP_ID3, self.USER_ID)
+        # Assert that _get_exp_domain_object was not called.
+        self.assertEqual(self.current_exp_id, None)

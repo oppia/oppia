@@ -15,7 +15,6 @@
 # limitations under the License.
 
 """Commands that can be used to operate on explorations.
-
 All functions here should be agnostic of how ExplorationModel objects are
 stored in the database. In particular, the various query methods should
 delegate to the Exploration model class. This will enable the exploration
@@ -42,8 +41,9 @@ import utils
 memcache_services = models.Registry.import_memcache_services()
 search_services = models.Registry.import_search_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
-(exp_models, feedback_models) = models.Registry.import_models(
-    [models.NAMES.exploration, models.NAMES.feedback])
+(exp_models, feedback_models, user_models) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
+])
 
 # This takes additional 'title' and 'category' parameters.
 CMD_CREATE_NEW = 'create_new'
@@ -77,7 +77,6 @@ def _migrate_states_schema(versioned_exploration_states):
     (feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION), a new conversion
     function must be added and some code appended to this function to account
     for that new version.
-
     Args:
         versioned_exploration_states: A dict with two keys:
           - states_schema_version: the states schema version for the
@@ -116,12 +115,10 @@ def _get_exploration_memcache_key(exploration_id, version=None):
 def get_exploration_from_model(exploration_model, run_conversion=True):
     """Returns an Exploration domain object given an exploration model loaded
     from the datastore.
-
     If run_conversion is True, then the exploration's states schema version
     will be checked against the current states schema version. If they do not
     match, the exploration will be automatically updated to the latest states
     schema version.
-
     IMPORTANT NOTE TO DEVELOPERS: In general, run_conversion should never be
     False. This option is only used for testing that the states schema version
     migration works correctly, and it should never be changed otherwise.
@@ -267,10 +264,8 @@ def is_exp_summary_editable(exp_summary, user_id=None):
 # Query methods.
 def get_exploration_titles_and_categories(exp_ids):
     """Returns exploration titles and categories for the given ids.
-
     The result is a dict with exploration ids as keys. The corresponding values
     are dicts with the keys 'title' and 'category'.
-
     Any invalid exp_ids will not be included in the return dict. No error will
     be raised.
     """
@@ -317,7 +312,6 @@ def get_exploration_summaries_matching_ids(exp_ids):
 def get_exploration_ids_matching_query(query_string, cursor=None):
     """Returns a list with all exploration ids matching the given search query
     string, as well as a search cursor for future fetches.
-
     This method returns exactly feconf.GALLERY_PAGE_SIZE results if there are
     at least that many, otherwise it returns all remaining results. (If this
     behaviour does not occur, an error will be logged.) The method also returns
@@ -420,10 +414,8 @@ def export_states_to_yaml(exploration_id, version=None, width=80):
 # Repository SAVE and DELETE methods.
 def apply_change_list(exploration_id, change_list):
     """Applies a changelist to a pristine exploration and returns the result.
-
     Each entry in change_list is a dict that represents an ExplorationChange
     object.
-
     Returns:
       the resulting exploration domain object.
     """
@@ -600,7 +592,6 @@ class EntityChangeListSummarizer(object):
     def process_changes(self, original_entity_names, changes):
         """Processes the changes, making results available in each of the
         initialized data structures of the EntityChangeListSummarizer.
-
         Args:
         - original_entity_names: a list of strings representing the names of
           the individual entities before any of the changes in the change list
@@ -702,10 +693,8 @@ class EntityChangeListSummarizer(object):
 
 def get_summary_of_change_list(base_exploration, change_list):
     """Applies a changelist to a pristine exploration and returns a summary.
-
     Each entry in change_list is a dict that represents an ExplorationChange
     object.
-
     Returns:
       a dict with nine keys:
         - exploration_property_changes: a dict, where each key is a
@@ -777,7 +766,6 @@ def get_summary_of_change_list(base_exploration, change_list):
 
 def _save_exploration(committer_id, exploration, commit_message, change_list):
     """Validates an exploration and commits it to persistent storage.
-
     If successful, increments the version number of the incoming exploration
     domain object by 1.
     """
@@ -833,7 +821,6 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 def _create_exploration(
         committer_id, exploration, commit_message, commit_cmds):
     """Ensures that rights for a new exploration are saved first.
-
     This is because _save_exploration() depends on the rights object being
     present to tell it whether to do strict validation or not.
     """
@@ -879,10 +866,8 @@ def save_new_exploration(committer_id, exploration):
 
 def delete_exploration(committer_id, exploration_id, force_deletion=False):
     """Deletes the exploration with the given exploration_id.
-
     IMPORTANT: Callers of this function should ensure that committer_id has
     permissions to delete this exploration, prior to calling this function.
-
     If force_deletion is True the exploration and its history are fully deleted
     and are unrecoverable. Otherwise, the exploration and all its history are
     marked as deleted, but the corresponding models are still retained in the
@@ -916,10 +901,8 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
 # Operations on exploration snapshots.
 def get_exploration_snapshots_metadata(exploration_id):
     """Returns the snapshots for this exploration, as dicts.
-
     Args:
         exploration_id: str. The id of the exploration in question.
-
     Returns:
         list of dicts, each representing a recent snapshot. Each dict has the
         following keys: committer_id, commit_message, commit_cmds, commit_type,
@@ -954,7 +937,6 @@ def _get_last_updated_by_human_ms(exp_id):
 def publish_exploration_and_update_user_profiles(committer_id, exp_id):
     """Publishes the exploration with publish_exploration() function in
     rights_manager.py, as well as updates first_contribution_msec.
-
     It is the responsibility of the caller to check that the exploration is
     valid prior to publication.
     """
@@ -970,7 +952,6 @@ def update_exploration(
         committer_id, exploration_id, change_list, commit_message,
         is_suggestion=False):
     """Update an exploration. Commits changes.
-
     Args:
     - committer_id: str. The id of the user who is performing the update
         action.
@@ -1004,6 +985,12 @@ def update_exploration(
 
     exploration = apply_change_list(exploration_id, change_list)
     _save_exploration(committer_id, exploration, commit_message, change_list)
+    user_exp = user_models.ExplorationUserDataModel.get(
+        committer_id, exploration_id)
+    user_exp.draft_change_list = None
+    user_exp.draft_change_list_last_updated = None
+    user_exp.draft_change_list_exp_version = None
+    user_exp.put()
     # Update summary of changed exploration.
     update_exploration_summary(exploration.id, committer_id)
     user_services.add_edited_exploration_id(committer_id, exploration.id)
@@ -1183,11 +1170,9 @@ def revert_exploration(
 # Creation and deletion methods.
 def get_demo_exploration_components(demo_path):
     """Gets the content of `demo_path` in the sample explorations folder.
-
     Args:
       demo_path: the file or folder path for the content of an exploration
         in SAMPLE_EXPLORATIONS_DIR. E.g.: 'adventure.yaml' or 'tar/'.
-
     Returns:
       a 2-tuple, the first element of which is a yaml string, and the second
       element of which is a list of (filepath, content) 2-tuples. The filepath
@@ -1263,7 +1248,6 @@ def delete_demo(exploration_id):
 
 def load_demo(exploration_id):
     """Loads a demo exploration.
-
     The resulting exploration will have two commits in its history (one for its
     initial creation and one for its subsequent modification.)
     """
@@ -1290,10 +1274,8 @@ def load_demo(exploration_id):
 def get_next_page_of_all_commits(
         page_size=feconf.COMMIT_LIST_PAGE_SIZE, urlsafe_start_cursor=None):
     """Returns a page of commits to all explorations in reverse time order.
-
     The return value is a triple (results, cursor, more) as described in
     fetch_page() at:
-
         https://developers.google.com/appengine/docs/python/ndb/queryclass
     """
     results, new_urlsafe_start_cursor, more = (
@@ -1313,10 +1295,8 @@ def get_next_page_of_all_non_private_commits(
         max_age=None):
     """Returns a page of non-private commits in reverse time order. If max_age
     is given, it should be a datetime.timedelta instance.
-
     The return value is a triple (results, cursor, more) as described in
     fetch_page() at:
-
         https://developers.google.com/appengine/docs/python/ndb/queryclass
     """
     if max_age is not None and not isinstance(max_age, datetime.timedelta):
@@ -1350,7 +1330,6 @@ def _should_index(exp):
 
 def _get_search_rank(exp_id):
     """Returns an integer determining the document's rank in search.
-
     Featured explorations get a ranking bump, and so do explorations that
     have been more recently updated. Good ratings will increase the ranking
     and bad ones will lower it.
@@ -1446,7 +1425,6 @@ def delete_documents_from_search_index(exploration_ids):
 
 def search_explorations(query, limit, sort=None, cursor=None):
     """Searches through the available explorations.
-
     args:
       - query_string: the query string to search for.
       - sort: a string indicating how to sort results. This should be a string
@@ -1459,7 +1437,6 @@ def search_explorations(query, limit, sort=None, cursor=None):
       - cursor: A cursor, used to get the next page of results.
           If there are more documents that match the query than 'limit', this
           function will return a cursor to get the next page.
-
     returns: a tuple:
       - a list of exploration ids that match the query.
       - a cursor if there are more matching explorations to fetch, None
@@ -1505,7 +1482,6 @@ def _create_change_list_from_suggestion(suggestion):
 def _get_commit_message_for_suggestion(
         suggestion_author_username, commit_message):
     """Returns a modified commit message for an accepted suggestion.
-
     NOTE TO DEVELOPERS: This should not be changed, since in the future we may
     want to determine and credit the original authors of suggestions, and in
     order to do so we will look for commit messages that follow this format.
@@ -1555,3 +1531,45 @@ def reject_suggestion(editor_id, thread_id, exploration_id):
             feedback_models.STATUS_CHOICES_IGNORED,
             None, 'Suggestion rejected.')
         thread.put()
+
+
+def is_draft_version_valid(exp_id, user_id):
+    """Checks if the draft version is the same as the latest version of the
+    exploration."""
+
+    draft_version = user_models.ExplorationUserDataModel.get(
+        user_id, exp_id).draft_change_list_exp_version
+    exp_version = get_exploration_summary_by_id(exp_id).version
+    return draft_version == exp_version
+
+
+def create_or_update_draft(
+        exp_id, user_id, change_list, exp_version, timestamp):
+    """Creates a draft with the given change list, or updates the changes list
+    of the draft if it already exists. A draft is updated only if the change
+    list timestamp of the new change list is greater than the change list
+    timestamp of the draft.
+    The method assumes that a ExplorationUserDataModel object exists for the
+    given user and exploration."""
+
+    user_exp = user_models.ExplorationUserDataModel.get(user_id, exp_id) 
+    if (user_exp.draft_change_list and
+            user_exp.draft_change_list_last_updated > timestamp):
+        return
+    updated_exploration = apply_change_list(exp_id, change_list)
+    updated_exploration.validate(strict=False)
+    user_exp.draft_change_list = change_list
+    user_exp.draft_change_list_last_updated = timestamp
+    user_exp.draft_change_list_exp_version = exp_version
+    user_exp.put()
+
+
+def get_exp_with_draft_applied(exp_id, user_id):
+    """If a draft exists for the given user and exploration,
+    apply it to the exploration."""
+
+    user_exp = user_models.ExplorationUserDataModel.get(user_id, exp_id)
+    exploration = get_exploration_by_id(exp_id) 
+    if user_exp.draft_change_list: 
+        return apply_change_list(exp_id, user_exp.draft_change_list)
+    return exploration
