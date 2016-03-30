@@ -38,7 +38,7 @@ describe('Collection validation service', function() {
     };
     _sampleCollection = CollectionObjectFactory.create(
       sampleCollectionBackendObject);
-    _addCollectionNode('exp_id0', true, false)
+    _addCollectionNode('exp_id0', true, false);
   }));
 
   var _addCollectionNode = function(explorationId, exists, isPublic) {
