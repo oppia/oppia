@@ -22,50 +22,50 @@ oppia.factory('ExplorationSummaryBackendApiService', [
     'UrlInterpolationService',
     function($http, $q, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE,
       UrlInterpolationService) {
-  var _fetchExpSummaries = function(
-      explorationIds, includePrivateExplorations, successCallback,
-      errorCallback) {
-    var explorationSummaryDataUrl = UrlInterpolationService.interpolateUrl(
-      EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
-        stringified_exp_ids: JSON.stringify(explorationIds),
-        include_private_explorations: JSON.stringify(includePrivateExplorations)
-      });
+      var _fetchExpSummaries = function(explorationIds,
+        includePrivateExplorations, successCallback, errorCallback) {
+        var explorationSummaryDataUrl = UrlInterpolationService.interpolateUrl(
+          EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
+            stringified_exp_ids: JSON.stringify(explorationIds),
+            include_private_explorations: JSON.stringify(
+              includePrivateExplorations)
+          });
 
-    $http.get(explorationSummaryDataUrl).success(function(data) {
-      var summaries = angular.copy(data.summaries);
-      if (successCallback) {
-        successCallback(summaries);
-      }
-    }).error(function(error) {
-      if (errorCallback) {
-        errorCallback(error);
-      }
-    });
-  };
+        $http.get(explorationSummaryDataUrl).success(function(data) {
+          var summaries = angular.copy(data.summaries);
+          if (successCallback) {
+            successCallback(summaries);
+          }
+        }).error(function(error) {
+          if (errorCallback) {
+            errorCallback(error);
+          }
+        });
+      };
 
-  return {
-    /**
-     * Fetches a list of public exploration summaries from the backend for each
-     * exploration ID provided. The provided list of exploration summaries are
-     * in the same order as input exploration IDs list, though some may be
-     * missing (if the exploration doesn't exist or is private).
-     */
-    loadPublicExplorationSummaries: function(explorationIds) {
-      return $q(function(resolve, reject) {
-        _fetchExpSummaries(explorationIds, false, resolve, reject);
-      });
-    },
+      return {
+        /**
+         * Fetches a list of public exploration summaries from the backend for
+         * each exploration ID provided. The provided list of exploration
+         * summaries are in the same order as input exploration IDs list, though
+         * some may be missing (if the exploration doesn't exist or is private).
+         */
+        loadPublicExplorationSummaries: function(explorationIds) {
+          return $q(function(resolve, reject) {
+            _fetchExpSummaries(explorationIds, false, resolve, reject);
+          });
+        },
 
-    /**
-     * Behaves in the same way as loadPublicExplorationSummaries(), except it
-     * also fetches private explorations for which the user has access. If the
-     * user is currently logged out, this function behaves the same as
-     * loadPublicExplorationSummaries().
-     */
-    loadPublicAndPrivateExplorationSummaries: function(explorationIds) {
-      return $q(function(resolve, reject) {
-        _fetchExpSummaries(explorationIds, true, resolve, reject);
-      });
-    },
-  };
-}]);
+        /**
+         * Behaves in the same way as loadPublicExplorationSummaries(), except
+         * it also fetches private explorations for which the user has access.
+         * If the user is currently logged out, this function behaves the same
+         * as loadPublicExplorationSummaries().
+         */
+        loadPublicAndPrivateExplorationSummaries: function(explorationIds) {
+          return $q(function(resolve, reject) {
+            _fetchExpSummaries(explorationIds, true, resolve, reject);
+          });
+        }
+      };
+    }]);
