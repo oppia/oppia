@@ -1007,10 +1007,11 @@ def update_exploration(
     _save_exploration(committer_id, exploration, commit_message, change_list)
     user_exp = user_models.ExplorationUserDataModel.get(
         committer_id, exploration_id)
-    user_exp.draft_change_list = None
-    user_exp.draft_change_list_last_updated = None
-    user_exp.draft_change_list_exp_version = None
-    user_exp.put()
+    if user_exp:
+        user_exp.draft_change_list = None
+        user_exp.draft_change_list_last_updated = None
+        user_exp.draft_change_list_exp_version = None
+        user_exp.put()
     # Update summary of changed exploration.
     update_exploration_summary(exploration.id, committer_id)
     user_services.add_edited_exploration_id(committer_id, exploration.id)
@@ -1583,7 +1584,7 @@ def create_or_update_draft(
     The method assumes that a ExplorationUserDataModel object exists for the
     given user and exploration."""
 
-    user_exp = user_models.ExplorationUserDataModel.get(user_id, exp_id) 
+    user_exp = user_models.ExplorationUserDataModel.get(user_id, exp_id)
     if (user_exp.draft_change_list and
             user_exp.draft_change_list_last_updated > timestamp):
         return
@@ -1600,7 +1601,7 @@ def get_exp_with_draft_applied(exp_id, user_id):
     apply it to the exploration."""
 
     user_exp = user_models.ExplorationUserDataModel.get(user_id, exp_id)
-    exploration = get_exploration_by_id(exp_id) 
-    if user_exp.draft_change_list: 
+    exploration = get_exploration_by_id(exp_id)
+    if user_exp.draft_change_list:
         return apply_change_list(exp_id, user_exp.draft_change_list)
     return exploration
