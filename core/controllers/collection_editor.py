@@ -197,7 +197,7 @@ class CollectionRightsHandler(CollectionEditorHandler):
                 collection_services.index_collections_given_ids([
                     collection_id])
             elif not is_public:
-                collection_services.unpublish_collection_and_update_user_profiles(
+                collection_services.unpublish_collection_update_user_profiles(
                     self.user_id, collection_id)
                 collection_services.index_collections_given_ids([
                     collection_id])

@@ -743,7 +743,7 @@ def publish_collection_and_update_user_profiles(committer_id, col_id):
             contributor, contribution_time_msec)
 
 
-def unpublish_collection_and_update_user_profiles(committer_id, col_id):
+def unpublish_collection_update_user_profiles(committer_id, col_id):
     """Unpublishes the collection with unpublish_collection() function in
     rights_manager.py, as well as updates first_contribution_msec.
 
