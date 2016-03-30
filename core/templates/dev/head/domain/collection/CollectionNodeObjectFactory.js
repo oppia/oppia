@@ -17,20 +17,30 @@
  * collection node domain objects.
  */
 
-// TODO(bhenning): Implement validation functions and related tests.
+// TODO(bhenning): This should be provided by the backend.
+oppia.constant('ACTIVITY_STATUS_PRIVATE', 'private');
+
 oppia.factory('CollectionNodeObjectFactory', [
-      'SkillListObjectFactory', function(SkillListObjectFactory) {
+      'SkillListObjectFactory', 'ACTIVITY_STATUS_PRIVATE',
+      function(SkillListObjectFactory, ACTIVITY_STATUS_PRIVATE) {
+    var _initializeExplorationDetails = function(
+        node, explorationSummaryBackendObject) {
+      node._explorationTitle = explorationSummaryBackendObject.title;
+      node._explorationExists = explorationSummaryBackendObject.exists;
+      node._explorationIsPrivate = (
+        explorationSummaryBackendObject.status == ACTIVITY_STATUS_PRIVATE);
+      node._explorationSummaryObject = angular.copy(
+        explorationSummaryBackendObject);
+    };
+
     var CollectionNode = function(collectionNodeBackendObject) {
       this._explorationId = collectionNodeBackendObject.exploration_id;
-      this._explorationTitle = collectionNodeBackendObject.exploration.title;
-      this._explorationExists = collectionNodeBackendObject.exploration.exists;
-      this._newlyCreated = collectionNodeBackendObject.exploration.newlyCreated;
       this._prerequisiteSkillList = SkillListObjectFactory.create(
         collectionNodeBackendObject.prerequisite_skills);
       this._acquiredSkillList = SkillListObjectFactory.create(
         collectionNodeBackendObject.acquired_skills);
-      this._explorationSummaryObject = angular.copy(
-        collectionNodeBackendObject.exploration);
+      _initializeExplorationDetails(
+        this, collectionNodeBackendObject.exploration);
     };
 
     // Instance methods
@@ -47,16 +57,16 @@ oppia.factory('CollectionNodeObjectFactory', [
       return this._explorationTitle;
     };
 
-    // Returns whether this exploration is known to exist in the backend. This
-    // property is immutable.
+    // Returns whether the exploration referenced by this node is known to exist
+    // in the backend. This property is immutable.
     CollectionNode.prototype.doesExplorationExist = function() {
       return this._explorationExists;
     };
 
-    // Returns whether this collection node was created in the frontend. This
-    // property is immutable.
-    CollectionNode.prototype.isNewlyCreated = function() {
-      return this._newlyCreated;
+    // Returns whether the exploration referenced by this node is private and
+    // not published. This property is immutable.
+    CollectionNode.prototype.isExplorationPrivate = function() {
+      return this._explorationIsPrivate;
     };
 
     // Returns a SkillsList object of the prerequisite skills of this collection
@@ -77,9 +87,17 @@ oppia.factory('CollectionNodeObjectFactory', [
     // frontend exploration summary tile displaying. Changes to the returned
     // object are not reflected in this domain object.
     CollectionNode.prototype.getExplorationSummaryObject = function() {
-      // TODO(bhenning): This should be represented by a frontend summary tile
-      // domain object that is also shared with the exploration editor/viewer.
+      // TODO(bhenning): This should be represented by a frontend summary domain
+      // object that is also shared with the exploration editor/viewer.
       return angular.copy(this._explorationSummaryObject);
+    };
+
+    // Sets the raw exploration summary object stored within this node.
+    CollectionNode.prototype.setExplorationSummaryObject = function(
+        explorationSummaryBackendObject) {
+      // TODO(bhenning): This function should be removed once the exploration
+      // summary object is represented by a frontend summary domain object.
+      _initializeExplorationDetails(this, explorationSummaryBackendObject);
     };
 
     // Static class methods. Note that "this" is not available in static
@@ -97,8 +115,7 @@ oppia.factory('CollectionNodeObjectFactory', [
         acquired_skills: [],
         prerequisite_skills: [],
         exploration: {
-          exists: true,
-          newlyCreated: true
+          exists: true
         }
       });
     };

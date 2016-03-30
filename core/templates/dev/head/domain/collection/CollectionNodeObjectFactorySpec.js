@@ -103,8 +103,7 @@ describe('Collection node object factory', function() {
     expect(prerequisiteSkillList.getSkillCount()).toEqual(0);
     expect(acquiredSkillList.getSkillCount()).toEqual(0);
     expect(collectionNode.getExplorationSummaryObject()).toEqual({
-      exists: true,
-      newlyCreated: true
+      exists: true
     });
   });
 });

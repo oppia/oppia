@@ -254,6 +254,26 @@ oppia.factory('CollectionUpdateService', [
           _applyNodePropertyChange(
             collection, COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS,
             explorationId, skills, oldSkills, mutator.apply, mutator.reverse);
+        },
+
+        /**
+         * Returns whether the given change object constructed by this service
+         * is adding a new collection node to a collection.
+         */
+        isAddingCollectionNode: function(changeObject) {
+          var backendChangeObject = changeObject.getBackendChangeObject();
+          return backendChangeObject.cmd == CMD_ADD_COLLECTION_NODE;
+        },
+
+        /**
+         * Returns the exploration ID referenced by the specified change object,
+         * or undefined if the given changeObject does not reference an
+         * exploration ID. The change object is expected to be one constructed
+         * by this service.
+         */
+        getExplorationIdFromChangeObject: function(changeObject) {
+          return _getExplorationIdFromChangeDict(
+            changeObject.getBackendChangeObject());
         }
       };
     }]);

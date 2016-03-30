@@ -139,21 +139,24 @@ describe('URL Interpolation Service', function() {
       name: '<value>'
     })).toThrow(new Error(
       'Parameter values passed into interpolateUrl must only contain ' +
-      'alphanumerical characters, hyphens, underscores or spaces: ' +
+      'alphanumerical characters, hyphens, underscores, spaces, quotes, or ' +
+      'square brackets: ' +
       "'<value>'"));
 
     expect(uis.interpolateUrl.bind(null, '/test_url/<name>', {
       name: '<<value>>'
     })).toThrow(new Error(
       'Parameter values passed into interpolateUrl must only contain ' +
-      'alphanumerical characters, hyphens, underscores or spaces: ' +
+      'alphanumerical characters, hyphens, underscores, spaces, quotes, or ' +
+      'square brackets: ' +
       "'<<value>>'"));
 
     expect(uis.interpolateUrl.bind(null, '/test_url/<name>', {
       name: '<>'
     })).toThrow(new Error(
       'Parameter values passed into interpolateUrl must only contain ' +
-      'alphanumerical characters, hyphens, underscores or spaces: ' +
+      'alphanumerical characters, hyphens, underscores, spaces, quotes, or ' +
+      'square brackets: ' +
       '\'<>\''));
 
     // Values cannot contain non-alphanumerical characters or spaces, including
@@ -165,7 +168,8 @@ describe('URL Interpolation Service', function() {
       });
     }).toThrow(new Error(
       'Parameter values passed into interpolateUrl must only contain ' +
-      'alphanumerical characters, hyphens, underscores or spaces: ' +
+      'alphanumerical characters, hyphens, underscores, spaces, quotes, or ' +
+      'square brackets: ' +
       '\'https://www.oppia.org/\''));
 
     expect(function() {
@@ -174,7 +178,8 @@ describe('URL Interpolation Service', function() {
       });
     }).toThrow(new Error(
       'Parameter values passed into interpolateUrl must only contain ' +
-      'alphanumerical characters, hyphens, underscores or spaces: ' +
+      'alphanumerical characters, hyphens, underscores, spaces, quotes, or ' +
+      'square brackets: ' +
       '\'value\nmultiple lines\''));
   });
 

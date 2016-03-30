@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Tests for SkillListObjectFactory.
+ *
+ * @author henning.benmax@gmail.com (Ben Henning)
  */
 
 describe('Skill list object factory', function() {
@@ -29,7 +31,7 @@ describe('Skill list object factory', function() {
 
   it('should be creatable from an empty skills array', function() {
     var skillList = SkillListObjectFactory.create([]);
-    expect(skillList.getSkillCount()).toEqual(0);
+    expect(skillList.isEmpty()).toBeTruthy();
     expect(skillList.getSkills()).toEqual([]);
   });
 
@@ -58,7 +60,7 @@ describe('Skill list object factory', function() {
   });
 
   it('should be able to add a list of skills, ignoring duplicates', function() {
-    expect(_skillList.getSkillCount()).toEqual(0);
+    expect(_skillList.isEmpty()).toBeTruthy();
 
     var skills1 = ['skill0', 'skill1'];
     expect(_skillList.addSkills(skills1)).toBeTruthy();
@@ -87,12 +89,41 @@ describe('Skill list object factory', function() {
     expect(skillList.getSkills()).toEqual(['skill2', 'skill0', 'skill1']);
   });
 
+  it('should be able to detect being a superset of another skill list',
+      function() {
+    var skillList1 = SkillListObjectFactory.create(['skill0', 'skill1']);
+    var skillList2 = SkillListObjectFactory.create(['skill0']);
+
+    expect(skillList1.isSupersetOfSkillList(skillList2)).toBeTruthy();
+    expect(skillList2.isSupersetOfSkillList(skillList1)).toBeFalsy();
+
+    // The empty list is a subset of all lists.
+    var skillList3 = SkillListObjectFactory.create([]);
+    expect(skillList1.isSupersetOfSkillList(skillList3)).toBeTruthy();
+    expect(skillList2.isSupersetOfSkillList(skillList3)).toBeTruthy();
+    expect(skillList3.isSupersetOfSkillList(skillList1)).toBeFalsy();
+    expect(skillList3.isSupersetOfSkillList(skillList2)).toBeFalsy();
+
+    // A list is the superset of itself, including the empty list.
+    expect(skillList1.isSupersetOfSkillList(skillList1)).toBeTruthy();
+    expect(skillList2.isSupersetOfSkillList(skillList2)).toBeTruthy();
+    expect(skillList3.isSupersetOfSkillList(skillList3)).toBeTruthy();
+
+    // A list can be made the superset of another.
+    var skillList4 = SkillListObjectFactory.create([]);
+    skillList4.addSkillsFromSkillList(skillList1);
+    skillList4.removeSkillByIndex(0);
+    expect(skillList1.isSupersetOfSkillList(skillList4)).toBeTruthy();
+    expect(skillList4.isSupersetOfSkillList(skillList1)).toBeFalsy();
+  });
+
   it('should be able to clear skills', function() {
     var skillList = SkillListObjectFactory.create(['first', 'second']);
     expect(skillList.getSkillCount()).toEqual(2);
+    expect(skillList.isEmpty()).toBeFalsy();
 
     skillList.clearSkills();
-    expect(skillList.getSkillCount()).toEqual(0);
+    expect(skillList.isEmpty()).toBeTruthy();
   });
 
   it('should be able to retrieve a skill by its index', function() {

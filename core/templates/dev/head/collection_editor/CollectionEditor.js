@@ -25,31 +25,83 @@ oppia.constant(
 oppia.constant(
   'COLLECTION_RIGHTS_URL_TEMPLATE',
   '/collection_editor_handler/rights/<collection_id>');
+oppia.constant(
+  'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
+  '/explorationsummarieshandler/data?' +
+  'stringified_exp_ids=<stringified_exp_ids>&' +
+  'include_private_explorations=<include_private_explorations>');
 
 oppia.controller('CollectionEditor', ['$scope',
   'WritableCollectionBackendApiService', 'CollectionRightsBackendApiService',
-  'CollectionObjectFactory', 'SkillListObjectFactory',
+  'ExplorationSummaryBackendApiService', 'CollectionObjectFactory',
+  'SkillListObjectFactory', 'CollectionValidationService',
   'CollectionUpdateService', 'UndoRedoService', 'alertsService', function(
     $scope, WritableCollectionBackendApiService,
-    CollectionRightsBackendApiService, CollectionObjectFactory,
-    SkillListObjectFactory, CollectionUpdateService, UndoRedoService,
+    CollectionRightsBackendApiService, ExplorationSummaryBackendApiService,
+    CollectionObjectFactory, SkillListObjectFactory,
+    CollectionValidationService, CollectionUpdateService, UndoRedoService,
     alertsService) {
     $scope.collection = null;
     $scope.collectionId = GLOBALS.collectionId;
     $scope.collectionSkillList = SkillListObjectFactory.create([]);
     $scope.isPublic = GLOBALS.isPublic;
+    $scope.validationIssues = [];
+
+    var _validateCollection = function() {
+      if ($scope.isPublic) {
+        $scope.validationIssues = (
+          CollectionValidationService.findValidationIssuesForPublicCollection(
+            $scope.collection));
+      } else {
+        $scope.validationIssues = (
+          CollectionValidationService.findValidationIssuesForPrivateCollection(
+            $scope.collection));
+      }
+    };
+
+    var _updateCollection = function(newBackendCollectionObject) {
+      $scope.collection = CollectionObjectFactory.create(
+        newBackendCollectionObject);
+      $scope.collectionSkillList.setSkills(newBackendCollectionObject.skills);
+      _validateCollection();
+    };
 
     // Load the collection to be edited.
     WritableCollectionBackendApiService.fetchWritableCollection(
       $scope.collectionId).then(
-        function(collectionBackendObject) {
-          $scope.collection = CollectionObjectFactory.create(
-            collectionBackendObject);
-          $scope.collectionSkillList.setSkills(collectionBackendObject.skills);
-        }, function(error) {
+        _updateCollection, function(error) {
           alertsService.addWarning(
-            error || 'There was an error loading the collection.');
+            error || 'There was an error when loading the collection.');
         });
+
+    UndoRedoService.setOnChangedCallback(function(changeObject, wasApplied) {
+      if (changeObject && wasApplied &&
+          CollectionUpdateService.isAddingCollectionNode(changeObject)) {
+        var explorationId = (
+          CollectionUpdateService.getExplorationIdFromChangeObject(
+            changeObject));
+        var collectionNode = (
+          $scope.collection.getCollectionNodeByExplorationId(explorationId));
+        ExplorationSummaryBackendApiService
+          .loadPublicAndPrivateExplorationSummaries(
+          [explorationId]).then(function(summaries) {
+            var summaryBackendObject = {};
+            if (summaries.length != 0 && summaries[0].id == explorationId) {
+              summaryBackendObject = summaries[0];
+              summaryBackendObject.exists = true;
+            } else {
+              summaryBackendObject.exists = false;
+            }
+            collectionNode.setExplorationSummaryObject(summaryBackendObject);
+            _validateCollection();
+          }, function() {
+            alertsService.addWarning(
+              'There was an error while adding an exploration to the ' +
+              'collection.');
+          });
+      }
+      _validateCollection();
+    });
 
     $scope.getChangeListCount = function() {
       return UndoRedoService.getChangeCount();
@@ -75,21 +127,17 @@ oppia.controller('CollectionEditor', ['$scope',
         $scope.collection.getId(), $scope.collection.getVersion(),
         commitMessage, UndoRedoService.getCommittableChangeList()).then(
         function(collectionBackendObject) {
-          $scope.collection = CollectionObjectFactory.create(
-            collectionBackendObject);
-          $scope.collectionSkillList.setSkills(collectionBackendObject.skills);
+          _updateCollection(collectionBackendObject);
           UndoRedoService.clearChanges();
         }, function(error) {
           alertsService.addWarning(
-            error || 'There was an error updating the collection.');
+            error || 'There was an error when updating the collection.');
         });
     };
 
     $scope.publishCollection = function() {
-      // TODO(bhenning): Publishing should not be doable when the exploration
-      // may have errors/warnings. Publish should only show up if the collection
-      // is private. This also needs a confirmation of destructive action since
-      // it is not reversible.
+      // TODO(bhenning): This also needs a confirmation of destructive action
+      // since it is not reversible.
       CollectionRightsBackendApiService.setCollectionPublic(
         $scope.collectionId, $scope.collection.getVersion()).then(
         function() {

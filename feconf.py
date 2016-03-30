@@ -355,6 +355,7 @@ FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 FEEDBACK_STATS_URL_PREFIX = '/feedbackstatshandler'
 GALLERY_URL = '/gallery'
 GALLERY_DATA_URL = '/galleryhandler/data'
+EXPLORATION_SUMMARIES_DATA_URL = '/explorationsummarieshandler/data'
 LEARN_GALLERY_URL = '/learn'
 MY_EXPLORATIONS_URL = '/my_explorations'
 MY_EXPLORATIONS_CREATE_MODE_URL = '%s?mode=create' % MY_EXPLORATIONS_URL

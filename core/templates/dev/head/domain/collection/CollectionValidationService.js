@@ -1,0 +1,171 @@
+// Copyright 2016 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Service to build changes to a collection. These changes may
+ * then be used by other services, such as a backend API service to update the
+ * collection in the backend. This service also registers all changes with the
+ * undo/redo service.
+ */
+
+oppia.factory('CollectionValidationService', [
+  'SkillListObjectFactory', function(SkillListObjectFactory) {
+    var _getStartingExplorationIds = function(collection) {
+      var startingCollectionNodes = collection.getStartingCollectionNodes();
+      return startingCollectionNodes.map(function(collectionNode) {
+        return collectionNode.getExplorationId();
+      });
+    };
+
+    var _getOverlappingPrerequisiteAcquiredSkills = function(collectionNode) {
+      var prerequisiteSkillList = collectionNode.getPrerequisiteSkillList();
+      var acquiredSkillList = collectionNode.getAcquiredSkillList();
+      var overlappingSkillList = SkillListObjectFactory.create([]);
+      prerequisiteSkillList.getSkills().forEach(function(skill) {
+        if (acquiredSkillList.containsSkill(skill)) {
+          overlappingSkillList.addSkill(skill);
+        }
+      });
+      acquiredSkillList.getSkills().forEach(function(skill) {
+        if (prerequisiteSkillList.containsSkill(skill)) {
+          overlappingSkillList.addSkill(skill);
+        }
+      });
+      return overlappingSkillList.getSkills();
+    };
+
+    var _getNextExplorationIds = function(collection, completedExpIds) {
+      var acquiredSkillList = completedExpIds.reduce(
+        function(skillList, explorationId) {
+          var collectionNode = collection.getCollectionNodeByExplorationId(
+            explorationId);
+          skillList.addSkillsFromSkillList(
+            collectionNode.getAcquiredSkillList());
+          return skillList;
+        }, SkillListObjectFactory.create([]));
+
+      // Pick all collection nodes whose prerequisite skills are satisified by
+      // the currently acquired skills and which has not yet been completed.
+      return collection.getExplorationIds().filter(function(explorationId) {
+        var collectionNode = collection.getCollectionNodeByExplorationId(
+          explorationId);
+        return completedExpIds.indexOf(explorationId) == -1 &&
+          acquiredSkillList.isSupersetOfSkillList(
+            collectionNode.getPrerequisiteSkillList());
+      });
+    };
+
+    var _getUnreachableExplorationIds = function(collection) {
+      var completedExpIds = _getStartingExplorationIds(collection);
+      var nextExpIds = _getNextExplorationIds(collection, completedExpIds);
+      while (nextExpIds.length > 0) {
+        completedExpIds = completedExpIds.concat(nextExpIds);
+        nextExpIds = _getNextExplorationIds(collection, completedExpIds);
+      }
+
+      return collection.getExplorationIds().filter(function(explorationId) {
+        return completedExpIds.indexOf(explorationId) == -1;
+      });
+    };
+
+    var _getNonexistentExplorationIds = function(collection) {
+      return collection.getCollectionNodes().filter(function(collectionNode) {
+        return !collectionNode.doesExplorationExist();
+      }).map(function(collectionNode) {
+        return collectionNode.getExplorationId();
+      });
+    };
+
+    var _getPrivateExplorationIds = function(collection) {
+      return collection.getCollectionNodes().filter(function(collectionNode) {
+        return collectionNode.isExplorationPrivate();
+      }).map(function(collectionNode) {
+        return collectionNode.getExplorationId();
+      });
+    };
+
+    var _validateCollection = function(collection, isPublic) {
+      // NOTE(bhenning): These validation issues should be similar to those
+      // detected in core.domain.collection_domain.Collection.validate().
+      var issues = [];
+
+      var collectionHasNodes = collection.getCollectionNodeCount() > 0;
+      if (!collectionHasNodes) {
+        issues.push(
+          'Expected to have at least 1 exploration in the collection');
+      }
+
+      var startingExpIds = _getStartingExplorationIds(collection);
+      if (collectionHasNodes && startingExpIds.length == 0) {
+        issues.push(
+          'Expected to have at least 1 exploration initially available to ' +
+          'the learner');
+      }
+
+      collection.getCollectionNodes().forEach(function(collectionNode) {
+        var overlappingSkills = _getOverlappingPrerequisiteAcquiredSkills(
+          collectionNode);
+        if (overlappingSkills.length > 0) {
+          issues.push('Exploration ' + collectionNode.getExplorationId() +
+            ' has skills which are both required for playing it and acquired ' +
+            'after playing it: ' + overlappingSkills.join(', '));
+        }
+      });
+
+      var unreachableExpIds = _getUnreachableExplorationIds(collection);
+      if (unreachableExpIds.length != 0) {
+        issues.push(
+          'Some exploration(s) are unreachable from the initial ' +
+          'exploration(s): ' + unreachableExpIds.join(', '));
+      }
+
+      var nonexistentExpIds = _getNonexistentExplorationIds(collection);
+      if (nonexistentExpIds.length != 0) {
+        issues.push(
+          'The following exploration(s) either do not exist, or you do not ' +
+          'have edit access to add them to this collection: ' +
+          nonexistentExpIds.join(', '));
+      }
+
+      var privateExpIds = _getPrivateExplorationIds(collection);
+      if (isPublic && privateExpIds.length != 0) {
+        issues.push(
+          'Private explorations cannot be added to a public collection: ' +
+          privateExpIds.join(', '));
+      }
+
+      return issues;
+    };
+
+    return {
+      /**
+       * Returns a list of error strings found when validating the provided
+       * collection. The validation methods used in this function are written to
+       * match the validations performed in the backend. This function is
+       * expensive, so it should be called sparingly.
+       */
+      findValidationIssuesForPrivateCollection: function(collection) {
+        return _validateCollection(collection, false);
+      },
+
+      /**
+       * Behaves in the same way as findValidationIssuesForPrivateCollection(),
+       * except additional validation checks are performed which are specific to
+       * public collections.
+       */
+      findValidationIssuesForPublicCollection: function(collection) {
+        return _validateCollection(collection, true);
+      }
+    };
+  }]);
