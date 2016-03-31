@@ -107,20 +107,6 @@ oppia.controller('Gallery', [
     };
 
     $scope.pageLoaderIsBusy = false;
-    $scope.showMoreExplorations = function() {
-      if (!$rootScope.loadingMessage) {
-        $scope.pageLoaderIsBusy = true;
-
-        searchService.loadMoreData(function(data, hasPageFinishedLoading) {
-          $scope.allExplorationsInOrder = $scope.allExplorationsInOrder.concat(
-            data.explorations_list);
-          $scope.allCollectionsInOrder = $scope.allCollectionsInOrder.concat(
-            data.collections_list);
-          $scope.finishedLoadingPage = hasPageFinishedLoading;
-          $scope.pageLoaderIsBusy = false;
-        });
-      }
-    };
 
     $scope.$on(
       'refreshGalleryData',

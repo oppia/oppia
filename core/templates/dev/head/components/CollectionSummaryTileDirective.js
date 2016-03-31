@@ -14,9 +14,11 @@
 
 /**
  * @fileoverview Gallery tile component for collections.
- *
- * @author amgowano@stanford.edu (Abraham Mgowano)
  */
+
+oppia.constant(
+  'COLLECTION_VIEWER_URL', '/collection/<collection_id>');
+
 oppia.directive('collectionSummaryTile', [function() {
   return {
     restrict: 'E',
@@ -31,8 +33,9 @@ oppia.directive('collectionSummaryTile', [function() {
     },
     templateUrl: 'summaryTile/collection',
     controller: [
-      '$scope', 'oppiaDatetimeFormatter',
-      function($scope, oppiaDatetimeFormatter) {
+      '$scope', 'oppiaDatetimeFormatter', 'UrlInterpolationService',
+      'COLLECTION_VIEWER_URL', function($scope, oppiaDatetimeFormatter,
+      UrlInterpolationService, COLLECTION_VIEWER_URL) {
         $scope.getLastUpdatedDatetime = function() {
           return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
             $scope.getLastUpdatedMsec());
@@ -43,8 +46,8 @@ oppia.directive('collectionSummaryTile', [function() {
         };
 
         $scope.getCollectionLink = function() {
-          var result = '/collection/' + $scope.getCollectionId();
-          return result;
+          return UrlInterpolationService.interpolateUrl(COLLECTION_VIEWER_URL,
+            {collection_id: $scope.getCollectionId()});
         };
       }
     ]
