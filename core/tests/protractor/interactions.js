@@ -26,9 +26,9 @@ var interactions = require('../../../extensions/interactions/protractor.js');
 
 describe('Interactions', function() {
   it('should pass their own test suites', function() {
-    users.createUser('interactions@example.com', 'interactions');
-    users.login('interactions@example.com');
-    workflow.createExploration('interactions', 'interactions');
+    users.createUser('user@interactions.com', 'userInteractions');
+    users.login('user@interactions.com');
+    workflow.createExploration('interactions', 'userInteractions');
     editor.setStateName('first');
     editor.setContent(forms.toRichText('some content'));
 
