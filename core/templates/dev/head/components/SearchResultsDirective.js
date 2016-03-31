@@ -23,11 +23,8 @@ oppia.directive('searchResults', [function() {
     restrict: 'E',
     templateUrl: 'components/searchResults',
     controller: [
-      '$http', '$scope', '$rootScope', '$timeout', '$window', 'searchService',
-      'GALLERY_DATA_URL', 'urlService',
-      function(
-          $http, $scope, $rootScope, $timeout, $window, searchService,
-          GALLERY_DATA_URL, urlService) {
+      '$http', '$scope', '$rootScope',
+      function($http, $scope, $rootScope) {
         $scope.allExplorationsInOrder = GLOBALS.explorations_list;
 
         // // Called when the page loads, and after every search query.

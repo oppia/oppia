@@ -96,7 +96,7 @@ class GalleryPage(base.BaseHandler):
         self.render_template('galleries/gallery.html')
 
 class GallerySearchPage(base.BaseHandler):
-    """The exploration gallery page."""
+    """The exploration gallery search page."""
 
     PAGE_NAME_FOR_CSRF = 'gallery'
 
@@ -106,7 +106,9 @@ class GallerySearchPage(base.BaseHandler):
         gallery_handler.get_data()
         explorations_list = gallery_handler.values['explorations_list']
         query_response = self.request.get('q').split()
-        query_string_list = [x for x in query_response if not x.startswith('language') or x.startswith('category')]
+        query_string_list = [x for x in query_response
+                             if not x.startswith('language') or
+                             x.startswith('category')]
         query_string = ' '.join(query_string_list)
 
         self.values.update({
