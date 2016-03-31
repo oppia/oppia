@@ -21,11 +21,11 @@ oppia.directive('searchBar', [function() {
     restrict: 'E',
     templateUrl: 'components/searchBar',
     controller: [
-      '$scope', '$rootScope', '$timeout', '$window', 'searchService',
-      'oppiaDebouncer', 'ExplorationCreationButtonService', 'urlService',
-      'CATEGORY_LIST',
+      '$location', '$scope', '$rootScope', '$timeout', '$window',
+      'searchService', 'oppiaDebouncer', 'ExplorationCreationButtonService',
+      'urlService', 'CATEGORY_LIST',
       function(
-          $scope, $rootScope, $timeout, $window, searchService,
+          $location, $scope, $rootScope, $timeout, $window, searchService,
           oppiaDebouncer, ExplorationCreationButtonService, urlService,
           CATEGORY_LIST) {
         $scope.searchIsLoading = false;
@@ -43,7 +43,10 @@ oppia.directive('searchBar', [function() {
             };
           });
 
-        $scope.searchQuery = '';
+        $scope.searchQuery = GLOBALS.query_string;
+        if ($scope.searchQuery == undefined) {
+          $scope.searchQuery = '';
+        }
         $scope.selectionDetails = {
           categories: {
             description: '',
@@ -105,11 +108,12 @@ oppia.directive('searchBar', [function() {
         };
 
         var _searchBarFullyLoaded = false;
+        var url;
 
         var _hasChangedSearchQuery = Boolean(urlService.getUrlParams().q);
-        var _onSearchQueryChangeExec = function() {
+        var _onSearchQueryChangeExec = function(changeUrl) {
           $scope.searchIsLoading = true;
-          searchService.executeSearchQuery(
+          url = searchService.executeSearchQuery(
               $scope.searchQuery, $scope.selectionDetails.categories.selections,
               $scope.selectionDetails.languageCodes.selections, function() {
             $scope.searchIsLoading = false;
@@ -118,6 +122,9 @@ oppia.directive('searchBar', [function() {
               $rootScope.$broadcast('hasChangedSearchQuery');
             }
           });
+          if ($window.location.search != url && changeUrl) {
+            $window.location.href = '/search' + url;
+          }
         };
 
         // Initialize the selection descriptions and summaries.
@@ -127,10 +134,12 @@ oppia.directive('searchBar', [function() {
 
         $scope.onSearchQueryChange = function(evt) {
           // Query immediately when the enter or space key is pressed.
-          if (evt.keyCode == 13 || evt.keyCode == 32) {
-            _onSearchQueryChangeExec();
+          if (evt.keyCode == 13) {
+            _onSearchQueryChangeExec(true);
+          } else if (evt.keyCode == 32) {
+            _onSearchQueryChangeExec(false);
           } else {
-            oppiaDebouncer.debounce(_onSearchQueryChangeExec, 400)();
+            oppiaDebouncer.debounce(_onSearchQueryChangeExec(false), 400)();
           }
         };
 

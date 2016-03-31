@@ -95,6 +95,35 @@ class GalleryPage(base.BaseHandler):
         })
         self.render_template('galleries/gallery.html')
 
+class GallerySearchPage(base.BaseHandler):
+    """The exploration gallery page."""
+
+    PAGE_NAME_FOR_CSRF = 'gallery'
+
+    def get(self):
+        """Handles GET requests."""
+        gallery_handler = GalleryHandler(self.request, self.response)
+        gallery_handler.get_data()
+        explorations_list = gallery_handler.values['explorations_list']
+        query_response = self.request.get('q').split()
+        query_string_list = [x for x in query_response if not x.startswith('language') or x.startswith('category')]
+        query_string = ' '.join(query_string_list)
+
+        self.values.update({
+            'nav_mode': feconf.NAV_MODE_GALLERY,
+            'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
+            'has_fully_registered': bool(
+                self.user_id and
+                user_services.has_fully_registered(self.user_id)),
+            'SPLASH_PAGE_YOUTUBE_VIDEO_ID': SPLASH_PAGE_YOUTUBE_VIDEO_ID.value,
+            'CAROUSEL_SLIDES_CONFIG': CAROUSEL_SLIDES_CONFIG.value,
+            'LANGUAGE_CODES_AND_NAMES': (
+                utils.get_all_language_codes_and_names()),
+            'explorations_list': explorations_list,
+            'query_string': query_string
+        })
+        self.render_template('galleries/gallery.html')
+
 
 class DefaultGalleryCategoriesHandler(base.BaseHandler):
     """Provides data for the default gallery page."""
@@ -121,8 +150,8 @@ class DefaultGalleryCategoriesHandler(base.BaseHandler):
 class GalleryHandler(base.BaseHandler):
     """Provides data for the exploration gallery page."""
 
-    def get(self):
-        """Handles GET requests."""
+    def get_data(self):
+        """Handles get exploration data"""
         # TODO(sll): Figure out what to do about explorations in categories
         # other than those explicitly listed.
 
@@ -146,6 +175,11 @@ class GalleryHandler(base.BaseHandler):
             'explorations_list': explorations_list,
             'search_cursor': search_cursor,
         })
+
+    def get(self):
+        """Handles GET requests."""
+        self.get_data()
+
         self.render_json(self.values)
 
 

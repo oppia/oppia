@@ -251,7 +251,8 @@ oppia.controller('Gallery', [
         CATEGORY_LIST);
     };
 
-    $scope.inSplashMode = ($scope.CAROUSEL_SLIDES.length > 0);
+    // The following checks if gallery is in search mode
+    $scope.inSplashMode = !Boolean(urlService.getUrlParams().q);
     var removeSplashCarousel = function() {
       if ($scope.inSplashMode) {
         $('.oppia-gallery-container').fadeOut(function() {
@@ -263,28 +264,9 @@ oppia.controller('Gallery', [
       }
     };
 
-    $scope.$on('hasChangedSearchQuery', function() {
-      removeSplashCarousel();
-    });
-
-    $scope.allExplorationsInOrder = [];
-
-    // Called when the page loads, and after every search query.
-    var _refreshGalleryData = function(data, hasPageFinishedLoading) {
-      $scope.searchIsLoading = false;
-      $scope.allExplorationsInOrder = data.explorations_list;
-      $scope.finishedLoadingPage = hasPageFinishedLoading;
-      $rootScope.loadingMessage = '';
-    };
-
-    $scope.pageLoaderIsBusy = false;
-
-    $scope.$on(
-      'refreshGalleryData',
-      function(evt, data, hasPageFinishedLoading) {
-        _refreshGalleryData(data, hasPageFinishedLoading);
-      }
-    );
+    // $scope.$on('hasChangedSearchQuery', function() {
+    //   removeSplashCarousel();
+    // });
 
     $scope.showFullGalleryGroup = function(galleryGroup) {
       var selectedCategories = {};
