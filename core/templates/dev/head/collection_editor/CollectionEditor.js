@@ -102,7 +102,8 @@ oppia.controller('CollectionEditor', ['$scope',
         });
     };
 
-    // Unpublish the collection. Will only show up if the collection is public.
+    // Unpublish the collection. Will only show up if the collection is public
+    // and the user have access to the collection.
     $scope.unpublishCollection = function() {
       CollectionRightsBackendApiService.setCollectionPrivate(
         $scope.collectionId, $scope.collection.getVersion()).then(

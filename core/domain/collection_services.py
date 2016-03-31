@@ -558,14 +558,6 @@ def validate_exps_in_collection_are_public(collection):
                 'collection, exploration ID: %s' % exploration_id)
 
 
-def validate_exps_in_collection_are_private(collection):
-    for exploration_id in collection.exploration_ids:
-        if rights_manager.is_exploration_public(exploration_id):
-            raise utils.ValidationError(
-                'Cannot reference a public exploration within a private '
-                'collection, exploration ID: %s' % exploration_id)
-
-
 def _save_collection(committer_id, collection, commit_message, change_list):
     """Validates an collection and commits it to persistent storage.
 
@@ -735,22 +727,6 @@ def publish_collection_and_update_user_profiles(committer_id, col_id):
     valid prior to publication.
     """
     rights_manager.publish_collection(committer_id, col_id)
-    contribution_time_msec = utils.get_current_time_in_millisecs()
-    collection_summary = get_collection_summary_by_id(col_id)
-    contributor_ids = collection_summary.contributor_ids
-    for contributor in contributor_ids:
-        user_services.update_first_contribution_msec_if_not_set(
-            contributor, contribution_time_msec)
-
-
-def unpublish_collection_update_user_profiles(committer_id, col_id):
-    """Unpublishes the collection with unpublish_collection() function in
-    rights_manager.py, as well as updates first_contribution_msec.
-
-    It is the responsibility of the caller to check that the collection is
-    valid prior to unpublication.
-    """
-    rights_manager.unpublish_collection(committer_id, col_id)
     contribution_time_msec = utils.get_current_time_in_millisecs()
     collection_summary = get_collection_summary_by_id(col_id)
     contributor_ids = collection_summary.contributor_ids
