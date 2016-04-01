@@ -130,7 +130,7 @@
                   </div>
 
                   {% if nav_mode != 'signup' %}
-                    <div class="navbar-header pull-right">
+                    <div ng-cloak class="navbar-header pull-right">
                       <ul class="nav oppia-navbar-nav oppia-navbar-profile">
                         {% if username %}
                           <li class="dropdown pull-right">
@@ -212,10 +212,14 @@
                           </li>
                         {% else %}
                           <li class="dropdown oppia-clickable-dropdown pull-right">
-                            <a href class="oppia-navbar-dropdown-toggle" style="font-size: 1em; padding-top: 17px;" ng-click="onLoginButtonClicked('{{login_url}}')">
-                              Sign in
-                              <span class="caret"></span>
-                            </a>
+                            <div class="oppia-navbar-button-container" style="margin-right: 10px;">
+                              <a class="btn oppia-navbar-button"
+                                 href
+                                 ng-click="onLoginButtonClicked('{{login_url}}')">
+                                <span>Sign in</span>
+                                <span class="caret"></span>
+                              </a>
+                            </div>
                             <ul class="dropdown-menu oppia-navbar-dropdown" role="menu" style="padding: 0;" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
                               <li>
                                 <a href style="padding: 0; width: 200px;" ng-click="onLoginButtonClicked('{{login_url}}')">
@@ -226,6 +230,9 @@
                           </li>
                         {% endif %}
                         {% if nav_mode != 'create' and nav_mode != 'explore' %}
+                          <ul ng-if="isWindowNarrow" class="nav oppia-navbar-tabs-narrow">
+                            <create-exploration-button></create-exploration-button>
+                          </ul>
                           <ul ng-if="!isWindowNarrow" class="nav oppia-navbar-tabs">
                             <create-exploration-button></create-exploration-button>
                             {% if SHOW_CUSTOM_PAGES %}
