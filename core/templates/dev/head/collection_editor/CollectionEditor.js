@@ -38,6 +38,7 @@ oppia.controller('CollectionEditor', ['$scope',
     $scope.collectionId = GLOBALS.collectionId;
     $scope.collectionSkillList = SkillListObjectFactory.create([]);
     $scope.isPublic = GLOBALS.isPublic;
+    $scope.canUnpublish = GLOBALS.canUnpublish;
 
     // Load the collection to be edited.
     WritableCollectionBackendApiService.fetchWritableCollection(
