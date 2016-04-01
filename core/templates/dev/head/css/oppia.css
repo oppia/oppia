@@ -2196,6 +2196,7 @@ div#ng-curtain {
   border: 0;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
+  margin-right: 15px;
   margin-top: 0;
 }
 .oppia-navbar-dropdown > li > a {
