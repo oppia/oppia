@@ -229,12 +229,12 @@ def get_random_choice(alist):
 
 
 def convert_png_binary_to_data_url(content):
-    """Converts the png binary string to a data URL."""
+    """Converts a png image string(content) to a data URL."""
     if imghdr.what(None, content) == 'png':
         return 'data:image/png;base64,%s' % urllib.quote(
             content.encode('base64'))
     else:
-        raise Exception('Binary specified is not a png image')
+        raise Exception('Given string is not a png image.')
 
 
 def convert_png_to_data_url(filepath):

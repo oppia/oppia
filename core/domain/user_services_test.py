@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import os
+import logging
 
 from core.domain import collection_services
 from core.domain import exp_services
@@ -22,7 +23,6 @@ from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
-import logging
 import utils
 from google.appengine.api import urlfetch
 
@@ -155,7 +155,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         with self.swap(urlfetch, 'fetch', urlfetch_counter), \
             self.swap(logging, 'error', logging_error_mock):
             self.set_urlfetch_return_values(status_code=404)
-            profile_picture = user_services.fetch_gravatar(user_email)
+            user_services.fetch_gravatar(user_email)
             self.assertEqual(urlfetch_counter.times_called, 1)
             self.assertEqual(logging_error_mock.times_called, 1)
         self.disable_urlfetch_mock()
@@ -182,7 +182,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             identicon_data_url, user_services.DEFAULT_IDENTICON_DATA_URL)
 
-        
+
 class UpdateContributionMsecTests(test_utils.GenericTestBase):
     """Test whether contribution date changes with publication of
     exploration/collection and update of already published

@@ -13,15 +13,12 @@
 # limitations under the License.
 
 """Tests for the profile page."""
-import os
-
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
 import utils
-import logging
 
 class SignupTest(test_utils.GenericTestBase):
 

@@ -68,21 +68,25 @@ class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
     def __init__(self, service_name='urlfetch'):
         super(URLFetchServiceMock, self).__init__(service_name)
         self.return_values = {}
+        self.response = None
+        self.request = None
 
     def set_return_values(self, **kwargs):
         self.return_values = kwargs
 
-    def _Dynamic_Fetch(self, request, response):
+    def _Dynamic_Fetch(self, request, response): # pylint: disable=invalid-name
         return_values = self.return_values
         response.set_content(return_values.get('content', ''))
         response.set_statuscode(return_values.get('status_code', 200))
-        for header_key, header_value in return_values.get('headers', {}).items():
+        for header_key, header_value in return_values.get(
+                'headers', {}).items():
             new_header = response.add_header()
             new_header.set_key(header_key)
             new_header.set_value(header_value)
         response.set_finalurl(return_values.get('final_url', request.url()))
-        response.set_contentwastruncated(return_values.get('content_was_truncated', False))
- 
+        response.set_contentwastruncated(
+            return_values.get('content_was_truncated', False))
+
         self.request = request
         self.response = response
 
@@ -571,6 +575,8 @@ class AppEngineTestBase(TestBase):
         self.testbed.init_blobstore_stub()
         self.testbed.init_search_stub()
 
+        self._urlfetch_mock = None
+
         # The root path tells the testbed where to find the queue.yaml file.
         self.testbed.init_taskqueue_stub(root_path=os.getcwd())
         self.taskqueue_stub = self.testbed.get_stub(
@@ -593,17 +599,23 @@ class AppEngineTestBase(TestBase):
         return [q['name'] for q in self.taskqueue_stub.GetQueues()]
 
     def enable_urlfetch_mock(self):
+        #pylint: disable=protected-access
         if 'urlfetch' in apiproxy_stub_map.apiproxy._APIProxyStubMap__stub_map:
-            del apiproxy_stub_map.apiproxy._APIProxyStubMap__stub_map['urlfetch']
+            del apiproxy_stub_map.apiproxy\
+                    ._APIProxyStubMap__stub_map['urlfetch']
         urlfetch_mock = URLFetchServiceMock()
         apiproxy_stub_map.apiproxy.RegisterStub('urlfetch', urlfetch_mock)
         self._urlfetch_mock = urlfetch_mock
- 
+        #pylint: enable=protected-access
+
     def disable_urlfetch_mock(self):
+        #pylint: disable=protected-access
         if 'urlfetch' in apiproxy_stub_map.apiproxy._APIProxyStubMap__stub_map:
-            del apiproxy_stub_map.apiproxy._APIProxyStubMap__stub_map['urlfetch']
+            del apiproxy_stub_map.apiproxy\
+                    ._APIProxyStubMap__stub_map['urlfetch']
         self._urlfetch_mock = None
         self.testbed.init_urlfetch_stub()
+        #pylint: enable=protected-access
 
     def set_urlfetch_return_values(self, **kwargs):
         self._urlfetch_mock.set_return_values(**kwargs)
