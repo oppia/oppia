@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Controllers for the exploration settings tab.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.controller('ExplorationSettings', [
@@ -24,7 +22,7 @@ oppia.controller('ExplorationSettings', [
   'explorationObjectiveService', 'explorationLanguageCodeService',
   'explorationTagsService', 'explorationRightsService',
   'explorationInitStateNameService', 'explorationParamSpecsService',
-  'changeListService', 'warningsData', 'explorationStatesService',
+  'changeListService', 'alertsService', 'explorationStatesService',
   'explorationParamChangesService', 'explorationWarningsService',
   'CATEGORY_LIST', 'explorationAdvancedFeaturesService',
   function(
@@ -33,7 +31,7 @@ oppia.controller('ExplorationSettings', [
       explorationObjectiveService, explorationLanguageCodeService,
       explorationTagsService, explorationRightsService,
       explorationInitStateNameService, explorationParamSpecsService,
-      changeListService, warningsData, explorationStatesService,
+      changeListService, alertsService, explorationStatesService,
       explorationParamChangesService, explorationWarningsService,
       CATEGORY_LIST, explorationAdvancedFeaturesService) {
     $scope.CATEGORY_LIST_FOR_SELECT2 = [];
@@ -135,7 +133,7 @@ oppia.controller('ExplorationSettings', [
       var newInitStateName = explorationInitStateNameService.displayed;
 
       if (!explorationStatesService.getState(newInitStateName)) {
-        warningsData.addWarning(
+        alertsService.addWarning(
           'Invalid initial state name: ' + newInitStateName);
         explorationInitStateNameService.restoreFromMemento();
         return;
@@ -200,7 +198,7 @@ oppia.controller('ExplorationSettings', [
     * Methods relating to control buttons.
     ********************************************/
     $scope.showTransferExplorationOwnershipModal = function() {
-      warningsData.clear();
+      alertsService.clearWarnings();
       $modal.open({
         templateUrl: 'modals/transferExplorationOwnership',
         backdrop: true,
@@ -210,7 +208,7 @@ oppia.controller('ExplorationSettings', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              warningsData.clear();
+              alertsService.clearWarnings();
             };
           }
         ]
@@ -222,7 +220,7 @@ oppia.controller('ExplorationSettings', [
     };
 
     $scope.showNominateExplorationModal = function() {
-      warningsData.clear();
+      alertsService.clearWarnings();
       $modal.open({
         templateUrl: 'modals/nominateExploration',
         backdrop: true,
@@ -230,7 +228,7 @@ oppia.controller('ExplorationSettings', [
           '$scope', '$modalInstance', function($scope, $modalInstance) {
             $scope.close = function() {
               $modalInstance.dismiss('cancel');
-              warningsData.clear();
+              alertsService.clearWarnings();
             };
           }
         ]
@@ -238,7 +236,7 @@ oppia.controller('ExplorationSettings', [
     };
 
     $scope.deleteExploration = function(role) {
-      warningsData.clear();
+      alertsService.clearWarnings();
 
       $modal.open({
         templateUrl: 'modals/deleteExploration',
@@ -249,7 +247,7 @@ oppia.controller('ExplorationSettings', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              warningsData.clear();
+              alertsService.clearWarnings();
             };
           }
         ]
@@ -265,7 +263,7 @@ oppia.controller('ExplorationSettings', [
     };
 
     var openModalForModeratorAction = function(action) {
-      warningsData.clear();
+      alertsService.clearWarnings();
 
       var moderatorEmailDraftUrl = '/moderatorhandler/email_draft/' + action;
 
@@ -306,7 +304,7 @@ oppia.controller('ExplorationSettings', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              warningsData.clear();
+              alertsService.clearWarnings();
             };
           }]
         }).result.then(function(result) {

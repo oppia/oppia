@@ -15,8 +15,6 @@
 /**
  * @fileoverview Factory for creating and mutating instances of frontend
  * collection playthrough domain objects.
- *
- * @author henning.benmax@gmail.com (Ben Henning)
  */
 
 oppia.factory('CollectionPlaythroughObjectFactory', [function() {

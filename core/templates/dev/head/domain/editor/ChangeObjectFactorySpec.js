@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Tests for ChangeObjectFactory.
- *
- * @author henning.benmax@gmail.com (Ben Henning)
  */
 
 describe('Factory for Change domain objects', function() {

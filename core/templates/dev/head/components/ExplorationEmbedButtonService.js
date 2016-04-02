@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Service for the 'embed exploration' modal.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.factory('ExplorationEmbedButtonService', [

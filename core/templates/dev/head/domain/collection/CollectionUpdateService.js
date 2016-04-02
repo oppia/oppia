@@ -17,8 +17,6 @@
  * then be used by other services, such as a backend API service to update the
  * collection in the backend. This service also registers all changes with the
  * undo/redo service.
- *
- * @author henning.benmax@gmail.com (Ben Henning)
  */
 
 // These should match the constants defined in core.domain.collection_domain.

@@ -85,9 +85,6 @@ class GalleryPage(base.BaseHandler):
         self.values.update({
             'nav_mode': feconf.NAV_MODE_GALLERY,
             'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
-            'gallery_login_redirect_url': (
-                current_user_services.create_login_url(
-                    feconf.GALLERY_CREATE_MODE_URL)),
             'has_fully_registered': bool(
                 self.user_id and
                 user_services.has_fully_registered(self.user_id)),

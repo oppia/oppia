@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Service for keeping track of the learner's position.
- *
- * @author sean@seanlip.org (Sean Lip)
  */
 
 oppia.factory('playerPositionService', [

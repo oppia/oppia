@@ -14,13 +14,11 @@
 
 /**
  * @fileoverview Data and controllers for the Oppia 'edit preferences' page.
- *
- * @author sfederwisch@google.com (Stephanie Federwisch)
  */
 
 oppia.controller('Preferences', [
-    '$scope', '$http', '$rootScope', '$modal', '$timeout', 'warningsData',
-    function($scope, $http, $rootScope, $modal, $timeout, warningsData) {
+    '$scope', '$http', '$rootScope', '$modal', '$timeout', 'alertsService',
+    function($scope, $http, $rootScope, $modal, $timeout, alertsService) {
   var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
   $rootScope.loadingMessage = 'Loading';
   $scope.profilePictureDataUrl = '';
@@ -66,7 +64,7 @@ oppia.controller('Preferences', [
   };
 
   $scope.onSubjectInterestsSelectionChange = function(subjectInterests) {
-    warningsData.clear();
+    alertsService.clearWarnings();
     $scope.subjectInterestsChangedAtLeastOnce = true;
     $scope.subjectInterestsWarningText = null;
     $scope.updateSubjectInterestsWarning(subjectInterests);

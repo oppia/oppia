@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview End-to-end tests of the full exploration editor.
- *
- * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var general = require('../protractor_utils/general.js');
@@ -27,8 +25,8 @@ var player = require('../protractor_utils/player.js');
 
 describe('Full exploration editor', function() {
   it('should navigate multiple states correctly, with parameters', function() {
-    users.createUser('user4@example.com', 'user4');
-    users.login('user4@example.com');
+    users.createUser('user4@editorAndPlayer.com', 'user4EditorAndPlayer');
+    users.login('user4@editorAndPlayer.com');
 
     workflow.createExploration('sums', 'maths');
     editor.setStateName('card 1');
@@ -72,8 +70,8 @@ describe('Full exploration editor', function() {
   it('should handle discarding changes, navigation, deleting states, ' +
       'changing the first state, displaying content, deleting responses and ' +
       'switching to preview mode', function() {
-    users.createUser('user5@example.com', 'user5');
-    users.login('user5@example.com');
+    users.createUser('user5@editorAndPlayer.com', 'user5EditorAndPlayer');
+    users.login('user5@editorAndPlayer.com');
 
     workflow.createExploration('sums', 'maths');
     general.getExplorationIdFromEditor().then(function(explorationId) {
@@ -168,10 +166,9 @@ describe('Full exploration editor', function() {
 
   it('should handle multiple rules in an answer group and also disallow ' +
       'editing of a read-only exploration', function() {
-    users.createUser('user6@example.com', 'user6');
-    users.createUser('user7@example.com', 'user7');
-    users.login('user6@example.com');
-
+    users.createUser('user6@editorAndPlayer.com', 'user6EditorAndPlayer');
+    users.createUser('user7@editorAndPlayer.com', 'user7EditorAndPlayer');
+    users.login('user6@editorAndPlayer.com');
     workflow.createExploration('sums', 'maths');
 
     general.getExplorationIdFromEditor().then(function(explorationId) {
@@ -205,7 +202,7 @@ describe('Full exploration editor', function() {
       // Login as another user and verify that the exploration editor does not
       // allow the second user to modify the exploration.
       users.logout();
-      users.login('user7@example.com');
+      users.login('user7@editorAndPlayer.com');
       general.openEditor(explorationId);
       editor.exitTutorialIfNecessary();
 

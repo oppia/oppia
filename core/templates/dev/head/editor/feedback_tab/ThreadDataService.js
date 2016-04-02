@@ -15,18 +15,19 @@
 /**
  * @fileoverview Service for getting thread data from the backend for the
  * feedback tab of the exploration editor.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.factory('threadDataService', [
-    '$http', '$q', 'explorationData', function($http, $q, explorationData) {
+    '$http', '$q', 'explorationData', 'alertsService',
+    function($http, $q, explorationData, alertsService) {
   var _expId = explorationData.explorationId;
+  var _FEEDBACK_STATS_HANDLER_URL = '/feedbackstatshandler/' + _expId;
   var _THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + _expId;
   var _SUGGESTION_LIST_HANDLER_URL = '/suggestionlisthandler/' + _expId;
   var _SUGGESTION_ACTION_HANDLER_URL = '/suggestionactionhandler/' +
     _expId + '/';
   var _THREAD_HANDLER_PREFIX = '/threadhandler/' + _expId + '/';
+  var _THREAD_STATUS_OPEN = 'open';
 
   // All the threads for this exploration. This is a list whose entries are
   // objects, each representing threads. The 'messages' key of this object
@@ -35,6 +36,9 @@ oppia.factory('threadDataService', [
     feedbackThreads: [],
     suggestionThreads: []
   };
+
+  // Number of open threads that need action
+  var _openThreadsCount = 0;
 
   var _fetchThreads = function(successCallback) {
     var fPromise = $http.get(_THREAD_LIST_HANDLER_URL);
@@ -75,7 +79,16 @@ oppia.factory('threadDataService', [
     fetchMessages: function(threadId) {
       _fetchMessages(threadId);
     },
+    fetchFeedbackStats: function() {
+      $http.get(_FEEDBACK_STATS_HANDLER_URL).success(function(data) {
+        _openThreadsCount = data.num_open_threads;
+      });
+    },
+    getOpenThreadsCount: function() {
+      return _openThreadsCount;
+    },
     createNewThread: function(newSubject, newText, successCallback) {
+      _openThreadsCount += 1;
       $http.post(_THREAD_LIST_HANDLER_URL, {
         state_name: null,
         subject: newSubject,
@@ -85,6 +98,9 @@ oppia.factory('threadDataService', [
         if (successCallback) {
           successCallback();
         }
+      }).error(function() {
+        _openThreadsCount -= 1;
+        alertsService.addWarning('Error creating new thread.');
       });
     },
     addNewMessage: function(
@@ -101,10 +117,18 @@ oppia.factory('threadDataService', [
       }
 
       // This is only set if the status has changed.
+      // Assume a successful POST, in case of an error
+      // the changes are reverted in the error callback.
       var updatedStatus = null;
-      if (newStatus !== thread.status) {
+      var oldStatus = thread.status;
+      if (newStatus !== oldStatus) {
         updatedStatus = newStatus;
-        thread.status = newStatus;
+        if (oldStatus == _THREAD_STATUS_OPEN) {
+          _openThreadsCount -= 1;
+        } else if (newStatus == _THREAD_STATUS_OPEN) {
+          _openThreadsCount += 1;
+        }
+        thread.status = updatedStatus;
       }
 
       var payload = {
@@ -120,6 +144,15 @@ oppia.factory('threadDataService', [
           successCallback();
         }
       }).error(function() {
+        // Revert changes
+        if (newStatus !== oldStatus) {
+          if (oldStatus == _THREAD_STATUS_OPEN) {
+            _openThreadsCount += 1;
+          } else if (newStatus == _THREAD_STATUS_OPEN) {
+            _openThreadsCount -= 1;
+          }
+          thread.status = oldStatus;
+        }
         if (errorCallback) {
           errorCallback();
         }
@@ -133,8 +166,14 @@ oppia.factory('threadDataService', [
       if (commitMsg) {
         payload.commit_message = commitMsg;
       }
+      _openThreadsCount -= 1;
       $http.put(_SUGGESTION_ACTION_HANDLER_URL + threadId, payload).success(
-        onSuccess).error(onFailure);
+        onSuccess).error(function() {
+        _openThreadsCount += 1;
+        if (onFailure) {
+          onFailure();
+        }
+      });
     }
   };
 }]);

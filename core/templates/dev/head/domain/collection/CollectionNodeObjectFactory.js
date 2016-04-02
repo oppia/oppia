@@ -15,8 +15,6 @@
 /**
  * @fileoverview Factory for creating and mutating instances of frontend
  * collection node domain objects.
- *
- * @author henning.benmax@gmail.com (Ben Henning)
  */
 
 // TODO(bhenning): Implement validation functions and related tests.
