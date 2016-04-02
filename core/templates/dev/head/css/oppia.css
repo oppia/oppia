@@ -830,8 +830,8 @@ textarea {
   z-index: 50;
 }
 
-@media (max-width: 380px) {
-  .oppia-navbar-hide-on-very-small-width {
+@media (max-width: 768px) {
+  .oppia-navbar-hide-on-small-width {
     display: none;
   }
 }
