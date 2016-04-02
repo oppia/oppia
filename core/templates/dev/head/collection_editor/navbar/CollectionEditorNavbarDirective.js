@@ -14,17 +14,14 @@
 
 /**
  * @fileoverview Primary controller for the collection editor navbar.
- *
- * @author oskar.cieslik@gmail.com (Oskar Cieslik)
  */
 
 oppia.directive('collectionEditorNavbarDirective', [function() {
   return {
     restrict: 'E',
     templateUrl: 'inline/collection_editor_navbar_directive',
-    controller: ['$scope', '$rootScope', '$timeout', 'routerService',
-    function($scope, $rootScope, $timeout, routerService) {
-      $scope.tutorialHelpPopoverIsShown = false;
+    controller: ['$scope', 'routerService',
+    function($scope, routerService) {
       $scope.getTabStatuses = routerService.getTabStatuses;
       $scope.selectMainTab = routerService.navigateToMainTab;
       $scope.selectPreviewTab = routerService.navigateToPreviewTab;
