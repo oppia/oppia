@@ -39,6 +39,9 @@ import jinja_utils
 import main
 import utils
 
+from google.appengine.api import apiproxy_stub
+from google.appengine.api import apiproxy_stub_map
+
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 current_user_services = models.Registry.import_current_user_services()
 
@@ -58,6 +61,30 @@ def empty_environ():
     os.environ['USER_IS_ADMIN'] = '0'
     os.environ['DEFAULT_VERSION_HOSTNAME'] = '%s:%s' % (
         os.environ['HTTP_HOST'], os.environ['SERVER_PORT'])
+
+class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
+    """Mock for google.appengine.api.urlfetch"""
+
+    def __init__(self, service_name='urlfetch'):
+        super(URLFetchServiceMock, self).__init__(service_name)
+        self.return_values = {}
+
+    def set_return_values(self, **kwargs):
+        self.return_values = kwargs
+
+    def _Dynamic_Fetch(self, request, response):
+        return_values = self.return_values
+        response.set_content(return_values.get('content', ''))
+        response.set_statuscode(return_values.get('status_code', 200))
+        for header_key, header_value in return_values.get('headers', {}).items():
+            new_header = response.add_header()
+            new_header.set_key(header_key)
+            new_header.set_value(header_value)
+        response.set_finalurl(return_values.get('final_url', request.url()))
+        response.set_contentwastruncated(return_values.get('content_was_truncated', False))
+ 
+        self.request = request
+        self.response = response
 
 
 class TestBase(unittest.TestCase):
@@ -251,6 +278,7 @@ class TestBase(unittest.TestCase):
         """Complete the signup process for the user with the given username."""
         self.login(email)
 
+        self.enable_urlfetch_mock()
         response = self.testapp.get(feconf.SIGNUP_URL)
         self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -262,7 +290,7 @@ class TestBase(unittest.TestCase):
             })
         })
         self.assertEqual(response.status_int, 200)
-
+        self.disable_urlfetch_mock()
         self.logout()
 
     def set_config_property(self, config_obj, new_config_value):
@@ -563,6 +591,22 @@ class AppEngineTestBase(TestBase):
 
     def _get_all_queue_names(self):
         return [q['name'] for q in self.taskqueue_stub.GetQueues()]
+
+    def enable_urlfetch_mock(self):
+        if 'urlfetch' in apiproxy_stub_map.apiproxy._APIProxyStubMap__stub_map:
+            del apiproxy_stub_map.apiproxy._APIProxyStubMap__stub_map['urlfetch']
+        urlfetch_mock = URLFetchServiceMock()
+        apiproxy_stub_map.apiproxy.RegisterStub('urlfetch', urlfetch_mock)
+        self._urlfetch_mock = urlfetch_mock
+ 
+    def disable_urlfetch_mock(self):
+        if 'urlfetch' in apiproxy_stub_map.apiproxy._APIProxyStubMap__stub_map:
+            del apiproxy_stub_map.apiproxy._APIProxyStubMap__stub_map['urlfetch']
+        self._urlfetch_mock = None
+        self.testbed.init_urlfetch_stub()
+
+    def set_urlfetch_return_values(self, **kwargs):
+        self._urlfetch_mock.set_return_values(**kwargs)
 
     def count_jobs_in_taskqueue(self, queue_name=None):
         """Counts the jobs in the given queue. If queue_name is None,
