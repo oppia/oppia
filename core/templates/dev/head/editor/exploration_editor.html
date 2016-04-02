@@ -65,80 +65,94 @@
 
 {% block local_top_nav_options %}
   <ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak" ng-controller="EditorNavigation" style="margin-left: 20px;">
-    <li ng-class="{'active': getTabStatuses().active === 'main', 'dropdown': countWarnings()}">
-      <a href="#" tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()" class="protractor-test-main-tab">
-        <span class="glyphicon glyphicon-pencil"></span>
+    <li id="tutorialPreviewSmall" class="pull-right" ng-class="{'dropdown': isSmallerWindow}">
+      <a class="dropdown-toggle oppia-navbar-editor-navigation-toggle" data-toggle="dropdown" ng-mouseover="onMouseoverOptionOrDropdown($event)" ng-mouseleave="onMouseoutOptionOrDropdown($event)" ng-show="isSmallerWindow">
+       <span class="glyphicon glyphicon-option-vertical"></span>
       </a>
-      <div ng-show="countWarnings()" class="oppia-exploration-warnings-indicator" ng-click="selectMainTab()" ng-class="{'oppia-exploration-warnings-critical-color': hasCriticalWarnings(), 'oppia-exploration-warnings-error-color': !hasCriticalWarnings()}">
-        <span class="oppia-exploration-warnings-count">
-          <[countWarnings()]>
-        </span>
-      </div>
-      <ul class="dropdown-menu oppia-exploration-warnings-box">
-        <span class="oppia-exploration-warnings-header">Warnings</span>
-        <li class="oppia-exploration-warnings-text" ng-repeat="warning in getWarnings() track by $index">
-          <hr class="oppia-exploration-warnings-separator">
-          <span ng-if="warning.type === 'critical'">
-            <strong><[warning.message]></strong>
-          </span>
-          <span ng-if="warning.type !== 'critical'">
-            <[warning.message]>
-          </span>
+      <ul class="ng-cloak" role="menu" ng-mouseover="onMouseoverOptionOrDropdown($event)" ng-mouseleave="onMouseoutOptionOrDropdown($event)" ng-class="{'dropdown-menu oppia-editor-navigation-dropdown': isSmallerWindow, 'oppia-editor-navigation': !isSmallerWindow}" ng-hide="hideDropdown()">
+        <li ng-class="{'active': getTabStatuses().active === 'main', 'dropdown': countWarnings()}" ng-click="selectMainTab(); onMouseoutOptionOrDropdown($event)">
+          <a href="#" class="protractor-test-main-tab">
+            <span class="glyphicon glyphicon-pencil"></span>
+            <span ng-show="isSmallerWindow">Editor</span>
+          </a>
+          <div ng-show="countWarnings()" class="oppia-exploration-warnings-indicator" ng-click="selectMainTab()" ng-class="{'oppia-exploration-warnings-critical-color': hasCriticalWarnings(), 'oppia-exploration-warnings-error-color': !hasCriticalWarnings()}">
+            <span class="oppia-exploration-warnings-count">
+              <[countWarnings()]>
+            </span>
+          </div>
+          <ul class="dropdown-menu oppia-exploration-warnings-box">
+            <span class="oppia-exploration-warnings-header">Warnings</span>
+            <li class="oppia-exploration-warnings-text" ng-repeat="warning in getWarnings() track by $index">
+              <hr class="oppia-exploration-warnings-separator">
+              <span ng-if="warning.type === 'critical'">
+                <strong><[warning.message]></strong>
+              </span>
+              <span ng-if="warning.type !== 'critical'">
+                <[warning.message]>
+              </span>
+            </li>
+          </ul>
         </li>
+
+        {% if username %}
+          <li id="tutorialPreviewTab" ng-class="{'active': getTabStatuses().active === 'preview'}" ng-click="selectPreviewTab(); onMouseoutOptionOrDropdown($event)">
+            <a href="#" class="protractor-test-preview-tab">
+              <span class="glyphicon glyphicon-play"></span>
+              <span ng-show="isSmallerWindow">Preview</span>
+            </a>
+          </li>
+        {% endif %}
+
+        <li ng-class="{'active': getTabStatuses().active === 'settings'}" ng-click="selectSettingsTab(); onMouseoutOptionOrDropdown($event)">
+          <a href="#" class="protractor-test-settings-tab">
+            <span class="glyphicon glyphicon-cog"></span>
+            <span ng-show="isSmallerWindow">Settings</span>
+          </a>
+        </li>
+
+        {% if username %}
+          <li ng-class="{'active': getTabStatuses().active === 'stats'}" ng-click="selectStatsTab(); onMouseoutOptionOrDropdown($event)">
+            <a href="#">
+              <span class="glyphicon glyphicon-stats"></span>
+              <span ng-show="isSmallerWindow">Statistics</span>
+            </a>
+          </li>
+        {% endif %}
+
+        <li ng-class="{'active': getTabStatuses().active === 'history'}" ng-click="selectHistoryTab(); onMouseoutOptionOrDropdown($event)" >
+          <a href="#" disabled="explorationRightsService.isCloned()" class="protractor-test-history-tab">
+            <span class="glyphicon glyphicon-time"></span>
+            <span ng-show="isSmallerWindow">History</span>
+          </a>
+        </li>
+
+        <li ng-class="{'active': getTabStatuses().active === 'feedback'}" ng-click="selectFeedbackTab();onMouseoutOptionOrDropdown($event)">
+          <a href="#">
+            <span class="glyphicon glyphicon-comment"></span>
+            <span ng-show="isSmallerWindow">Feedback</span>
+          </a>
+          <div ng-show="getOpenThreadsCount()" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
+            <span class="oppia-exploration-open-threads-count">
+              <[getOpenThreadsCount()]>
+            </span>
+          </div>
+        </li>
+
+        {% if username %}
+          <li class="dropdown" popover-is-open="postTutorialHelpPopoverIsShown"
+          popover-placement="bottom" popover-trigger="none"
+          popover="To get help in the future, click here!" 
+          ng-click="openEditorTutorial(); onMouseoutOptionOrDropdown($event)" >
+            <a href="#">
+              <span class="glyphicon glyphicon-question-sign"></span>
+              <span ng-show="isSmallerWindow">Help</span>
+            </a>
+          </li>
+        {% endif %}
       </ul>
     </li>
-
-    {% if username %}
-      <li id="tutorialPreviewTab" ng-class="{'active': getTabStatuses().active === 'preview'}">
-        <a href="#" tooltip="Preview" tooltip-placement="bottom" ng-click="selectPreviewTab()" class="protractor-test-preview-tab">
-          <span class="glyphicon glyphicon-play"></span>
-        </a>
-      </li>
-    {% endif %}
-
-    <li ng-class="{'active': getTabStatuses().active === 'settings'}">
-      <a href="#" tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()" class="protractor-test-settings-tab">
-        <span class="glyphicon glyphicon-cog"></span>
-      </a>
-    </li>
-
-    {% if username %}
-      <li ng-class="{'active': getTabStatuses().active === 'stats'}">
-        <a href="#" tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()">
-          <span class="glyphicon glyphicon-stats"></span>
-        </a>
-      </li>
-    {% endif %}
-
-    <li ng-class="{'active': getTabStatuses().active === 'history'}">
-      <a href="#" tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()" disabled="explorationRightsService.isCloned()" class="protractor-test-history-tab">
-        <span class="glyphicon glyphicon-time"></span>
-      </a>
-    </li>
-
-    <li ng-class="{'active': getTabStatuses().active === 'feedback'}" ng-click="selectFeedbackTab()">
-      <a href="#" tooltip="Feedback" tooltip-placement="bottom">
-        <span class="glyphicon glyphicon-comment"></span>
-      </a>
-      <div ng-show="getOpenThreadsCount()" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
-        <span class="oppia-exploration-open-threads-count">
-          <[getOpenThreadsCount()]>
-        </span>
-      </div>
-    </li>
-
-    {% if username %}
-      <li class="dropdown" popover-is-open="postTutorialHelpPopoverIsShown"
-          popover-placement="bottom" popover-trigger="none"
-          popover="To get help in the future, click here!">
-        <a href="#" tooltip="Help" tooltip-placement="bottom"
-           ng-click="openEditorTutorial()">
-          <span class="glyphicon glyphicon-question-sign"></span>
-        </a>
-      </li>
-    {% endif %}
   </ul>
-
+  
   <ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak" ng-controller="ExplorationSaveAndPublishButtons">
     <li ng-if="isPrivate()">
       <div class="btn-group" style="margin-right: 10px; margin-top: 8px;"

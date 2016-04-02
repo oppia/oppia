@@ -31,7 +31,7 @@ oppia.controller('ExplorationEditor', [
   'routerService', 'graphDataService', 'stateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
   'explorationWarningsService', '$templateCache', 'explorationContextService',
-  'explorationAdvancedFeaturesService',
+  'explorationAdvancedFeaturesService', 'windowDimensionsService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
       explorationData, editorContextService, explorationTitleService,
@@ -42,7 +42,7 @@ oppia.controller('ExplorationEditor', [
       routerService, graphDataService, stateEditorTutorialFirstTimeService,
       explorationParamSpecsService, explorationParamChangesService,
       explorationWarningsService, $templateCache, explorationContextService,
-      explorationAdvancedFeaturesService) {
+      explorationAdvancedFeaturesService, windowDimensionsService) {
     $scope.editabilityService = editabilityService;
     $scope.editorContextService = editorContextService;
 
@@ -170,6 +170,11 @@ oppia.controller('ExplorationEditor', [
     var _ID_TUTORIAL_PREVIEW_TAB = '#tutorialPreviewTab';
     var _ID_TUTORIAL_SAVE_BUTTON = '#tutorialSaveButton';
 
+    var screenWidth = windowDimensionsService.getWidth();
+    if (screenWidth <= 1280) {
+      _ID_TUTORIAL_PREVIEW_TAB = '#tutorialPreviewSmall';
+    }
+
     $scope.EDITOR_TUTORIAL_OPTIONS = [{
       type: 'title',
       heading: 'Tutorial',
@@ -290,10 +295,11 @@ oppia.controller('ExplorationEditor', [
 oppia.controller('EditorNavigation', [
   '$scope', '$rootScope', '$timeout', 'routerService',
   'explorationRightsService', 'explorationWarningsService',
-  'threadDataService',
+  'threadDataService', 'windowDimensionsService',
   function(
     $scope, $rootScope, $timeout, routerService,
-    explorationRightsService, explorationWarningsService, threadDataService) {
+    explorationRightsService, explorationWarningsService, threadDataService,
+    windowDimensionsService) {
     $scope.postTutorialHelpPopoverIsShown = false;
 
     $scope.$on('openPostTutorialHelpPopover', function() {
@@ -325,6 +331,27 @@ oppia.controller('EditorNavigation', [
     $scope.selectHistoryTab = routerService.navigateToHistoryTab;
     $scope.selectFeedbackTab = routerService.navigateToFeedbackTab;
     $scope.getOpenThreadsCount = threadDataService.getOpenThreadsCount;
+
+    var screenWidth = windowDimensionsService.getWidth();
+    if (screenWidth <= 1280) {
+      $scope.isSmallerWindow = true;
+    }
+
+    $scope.hideDropdown = function() {
+      if ($scope.isSmallerWindow && !$scope.optionDropdownIsActive) {
+        return true;
+      }
+    };
+
+    $scope.onMouseoverOptionOrDropdown = function(evt) {
+      angular.element(evt.currentTarget).parent().addClass('open');
+      $scope.optionDropdownIsActive = true;
+    };
+
+    $scope.onMouseoutOptionOrDropdown = function(evt) {
+      angular.element(evt.currentTarget).parent().removeClass('open');
+      $scope.optionDropdownIsActive = false;
+    };
   }
 ]);
 
