@@ -264,6 +264,8 @@ class SignupHandler(base.BaseHandler):
             except utils.ValidationError as e:
                 raise self.InvalidInputException(e)
 
+        user_services.generate_signup_profile_picture(self.user_id)
+
         if can_receive_email_updates is not None:
             user_services.update_email_preferences(
                 self.user_id, can_receive_email_updates)

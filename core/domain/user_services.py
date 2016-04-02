@@ -16,11 +16,14 @@
 
 """Services for user data."""
 
+import base64
 import datetime
+import hashlib
 import logging
 import re
 
 from core.platform import models
+from google.appengine.api import urlfetch
 import feconf
 import utils
 
@@ -28,6 +31,12 @@ current_user_services = models.Registry.import_current_user_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 MAX_USERNAME_LENGTH = 50
+
+#Default Identicon for new users
+DEFAULT_IDENTICON_DATA_URL = '/images/avatar/user_blue_72px.png'
+
+#Size of the gravatar in px assigned to the user after signup
+GRAVATAR_SIZE_PX = 150
 
 
 class UserSettings(object):
@@ -111,7 +120,6 @@ class UserSettings(object):
             # Admin usernames are reserved for admins. Note that 'admin'
             # itself is already in use for the demo exploration.
             raise utils.ValidationError('This username is not available.')
-
 
 def is_username_taken(username):
     """Checks if the given username is taken."""
@@ -299,11 +307,10 @@ def get_usernames(user_ids):
     return [us.username if us else None for us in users_settings]
 
 
-# NB: If we ever allow usernames to change, update the
+# NB: If we ever allow usernames to change, update
 # config_domain.BANNED_USERNAMES property.
 def set_username(user_id, new_username):
     user_settings = get_user_settings(user_id, strict=True)
-
     UserSettings.require_valid_username(new_username)
     if is_username_taken(new_username):
         raise utils.ValidationError(
@@ -311,6 +318,16 @@ def set_username(user_id, new_username):
             'a different one.' % new_username)
     user_settings.username = new_username
     _save_user_settings(user_settings)
+
+
+def generate_signup_profile_picture(user_id):
+    """ Generates a profile picture data URL for a new user. This uses
+
+    their gravatar, if it exists, otherwise returns default image.
+    """
+    user_email = get_email_from_user_id(user_id)
+    user_gravatar = fetch_gravatar(user_email)
+    update_profile_picture_data_url(user_id, user_gravatar)
 
 
 def record_agreement_to_terms(user_id):
@@ -568,3 +585,27 @@ def get_user_impact_score(user_id):
         return model.impact_score
     else:
         return 0
+
+
+def fetch_gravatar(email):
+    """Returns the gravatar corresponding to the user's email,
+    or a default image if gravtar is not receieved.
+    """
+    base_url = 'http://www.gravatar.com/avatar/'
+    gravatar_url = base_url + hashlib.md5(email).hexdigest() + '?'
+    params = 'd=identicon&s=%s' % GRAVATAR_SIZE_PX
+    gravatar_url += params
+    try:
+        result = urlfetch.fetch(
+            gravatar_url,
+            headers={'Content-Type': 'image/png'},
+            follow_redirects=False)
+        if result.status_code == 200:
+            encoded_body = base64.b64encode(result.content)
+            return 'data:{};base64,{}'.format('image/png', encoded_body)
+        else:
+            logging.error('Unable to fetch gravatar')
+            return DEFAULT_IDENTICON_DATA_URL
+    except urlfetch.InvalidURLError:
+        logging.error('Invalid gravatar fetching url :' + gravatar_url)
+        return DEFAULT_IDENTICON_DATA_URL

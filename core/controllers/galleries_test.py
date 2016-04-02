@@ -112,12 +112,12 @@ class GalleryPageTest(test_utils.GenericTestBase):
         }, response_dict['explorations_list'][0])
 
     def test_gallery_handler_for_created_explorations(self):
-        """Test the gallery data handler for manually created explirations."""
+        """Test the gallery data handler for manually created explorations."""
         self.set_admins([self.ADMIN_USERNAME])
 
         self.login(self.ADMIN_EMAIL)
         response_dict = self.get_json(feconf.GALLERY_DATA_URL)
-        self.assertEqual({
+        self.assertDictContainsSubset({
             'is_admin': True,
             'is_moderator': True,
             'is_super_admin': False,
@@ -125,7 +125,6 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'user_email': self.ADMIN_EMAIL,
             'username': self.ADMIN_USERNAME,
             'search_cursor': None,
-            'profile_picture_data_url': None,
             'preferred_language_codes': [feconf.DEFAULT_LANGUAGE_CODE],
         }, response_dict)
 
