@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the collection main page in the
- * collection editor page.
+ * @fileoverview Controller for the main tab of the collection editor.
  */
 
 oppia.controller('CollectionMain', [function() {}]);
