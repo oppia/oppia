@@ -74,21 +74,16 @@
 {% block footer_js %}
   {{ super() }}
   <script>
-    {{ include_js_file(
-      'collection_editor/editor_tab/CollectionDetailsEditorDirective.js') }}
     {{ include_js_file('collection_editor/CollectionEditor.js') }}
-    {{ include_js_file(
-      'collection_editor/editor_tab/CollectionNodeEditorDirective.js') }}
-    {{ include_js_file(
-      'collection_editor/editor_tab/CollectionSkillListDirective.js') }}
-    {{ include_js_file(
-      'collection_editor/navbar/CollectionEditorNavbarBreadcrumbDirective.js') }}
-    {{ include_js_file(
-      'collection_editor/navbar/CollectionEditorNavbarDirective.js') }}
+    {{ include_js_file('collection_editor/editor_tab/CollectionNodeEditorDirective.js') }}
+    {{ include_js_file('collection_editor/editor_tab/CollectionSkillListDirective.js') }}
+    {{ include_js_file('collection_editor/navbar/CollectionEditorNavbarBreadcrumbDirective.js') }}
+    {{ include_js_file('collection_editor/navbar/CollectionEditorNavbarDirective.js') }}
 
+    {{ include_js_file('collection_editor/editor_tab/CollectionDetailsEditorDirective.js') }}
+    {{ include_js_file('collection_editor/editor_tab/CollectionMain.js') }}
     {{ include_js_file('collection_editor/feedback_tab/CollectionFeedback.js') }}
     {{ include_js_file('collection_editor/history_tab/CollectionHistory.js') }}
-    {{ include_js_file('collection_editor/editor_tab/CollectionMain.js') }}
     {{ include_js_file('collection_editor/preview_tab/CollectionPreview.js') }}
     {{ include_js_file('collection_editor/settings_tab/CollectionSettings.js') }}
     {{ include_js_file('collection_editor/statistics_tab/CollectionStatistics.js') }}
