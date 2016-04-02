@@ -1,27 +1,22 @@
 <script type="text/ng-template" id="components/createExplorationButton">
-
   <div class="pull-right oppia-navbar-button-container">
-    {% if not has_fully_registered %}
+    {% if not user_is_logged_in %}
       <!-- User must complete the registration process. -->
-      <a class="btn oppia-navbar-add-exploration-button protractor-test-create-exploration oppia-transition-200"
-         href ng-click="onRedirectToLogin('/my_explorations?mode=create')">
-        <span class="oppia-navbar-add-exploration-button-plus">+</span>
-        <span>Create Exploration</span>
-      </a>
+      <button class="btn oppia-navbar-button oppia-navbar-hide-on-small-width protractor-test-create-exploration oppia-transition-200"
+         ng-click="onRedirectToLogin('/my_explorations?mode=create')">
+        <span>Create</span>
+      </button>
     {% else %}
-      <a class="btn oppia-navbar-add-exploration-button protractor-test-create-exploration oppia-transition-200"
+      <button class="btn oppia-navbar-button oppia-navbar-hide-on-small-width protractor-test-create-exploration oppia-transition-200"
          ng-click="showCreateExplorationModal()">
-        <span class="oppia-navbar-add-exploration-button-plus">+</span>
-        <span>Create Exploration</span>
-      </a>
+        <span>Create</span>
+      </button>
       {% if allow_yaml_file_upload %}
-        <a class="btn oppia-navbar-add-exploration-button oppia-transition-200"
+        <button class="btn oppia-navbar-button oppia-navbar-hide-on-small-width oppia-transition-200"
            ng-click="showUploadExplorationModal()">
-          <span class="oppia-navbar-add-exploration-button-plus">+</span>
-          <span>Upload Exploration</span>
-        </a>
+          <span>Upload</span>
+        </button>
       {% endif %}
     {% endif %}
   </div>
-
 </script>
