@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Primary controller for the collection editor navbar breadcrumb.
- *
- * @author oskar.cieslik@gmail.com (Oskar Cieslik)
  */
 
 oppia.directive('collectionEditorNavbarBreadcrumbDirective', [function() {
@@ -25,8 +23,8 @@ oppia.directive('collectionEditorNavbarBreadcrumbDirective', [function() {
       getCollection: '&collection'
     },
     templateUrl: 'inline/collection_editor_navbar_breadcrumb_directive',
-    controller: ['$scope', 'CollectionUpdateService', 'routerService',
-    function($scope, warningsData, routerService) {
+    controller: ['$scope', 'routerService',
+    function($scope, routerService) {
       var _TAB_NAMES_TO_HUMAN_READABLE_NAMES = {
         main: 'Edit',
         preview: 'Preview',
