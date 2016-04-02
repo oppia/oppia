@@ -105,21 +105,23 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
             collection_id, 'A title', 'A Category', 'An Objective')
         collection_services.save_new_collection(self.owner_id, collection)
 
-        # Check that collection are published correctly
+        # Check that collection is published correctly.
         rights_manager.assign_role_for_collection(
             self.owner_id, collection_id, self.editor_id,
             rights_manager.ROLE_EDITOR)
         rights_manager.publish_collection(self.owner_id, collection_id)
 
-        # Check that collection cannot be unpublished by non admin
+        # Check that collection cannot be unpublished by non admin.
         with self.assertRaisesRegexp(
             Exception, 'This collection cannot be unpublished.'
             ):
             rights_manager.unpublish_collection(self.owner_id, collection_id)
         collection_rights = rights_manager.get_collection_rights(collection_id)
-        self.assertEqual(collection_rights.status, 'public')
+        self.assertEqual(collection_rights.status,
+                         rights_manager.ACTIVITY_STATUS_PUBLIC)
 
-        # Check that collection can be unpublished by admin
+        # Check that collection can be unpublished by admin.
         rights_manager.unpublish_collection(self.admin_id, collection_id)
         collection_rights = rights_manager.get_collection_rights(collection_id)
-        self.assertEqual(collection_rights.status, 'private')
+        self.assertEqual(collection_rights.status,
+                         rights_manager.ACTIVITY_STATUS_PRIVATE)
