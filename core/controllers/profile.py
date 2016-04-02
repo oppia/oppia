@@ -131,6 +131,7 @@ class PreferencesHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
+        user_services.generate_profile_picture(self.user_id)
         self.values.update({
             'preferred_language_codes': user_settings.preferred_language_codes,
             'profile_picture_data_url': user_settings.profile_picture_data_url,
@@ -272,6 +273,8 @@ class SignupHandler(base.BaseHandler):
         # time.
         if feconf.CAN_SEND_EMAILS_TO_USERS and not has_ever_registered:
             email_manager.send_post_signup_email(self.user_id)
+
+        user_services.generate_profile_picture(self.user_id)
 
         self.render_json({})
 
