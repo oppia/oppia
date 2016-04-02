@@ -2,7 +2,8 @@
   <span style="font-size: 14px;">
     <strong>Gadgets</strong>
   </span>
-  <i class="material-icons" tooltip="These can be reused throughout an exploration." tooltip-placement="bottom" style="font-size: 12px; padding-left: 18px;">&#xE88E;</i>
+  <i class="material-icons md-18" tooltip="These can be reused throughout an exploration." tooltip-placement="bottom" 
+     style="font-size: padding-left: 18px;">&#xE88E;</i>
 
   <md-card style="background-color: white; margin: 20px 0px; padding: 10px 10px;" class="md-default-theme">
     <div ng-repeat="(panel, panelContents) in panels"
@@ -20,10 +21,10 @@
               </span>
             </button>
             <i title="Edit Gadget (<[gadgetName]>)" ng-click="editGadget(gadgetName)"
-              class="material-icons oppia-gadget-edit-icon protractor-test-edit-<[gadgetName]>-gadget">&#xE254;
+               class="material-icons oppia-gadget-edit-icon protractor-test-edit-<[gadgetName]>-gadget">&#xE254;
             </i>
             <i title="Delete Gadget (<[gadgetName]>)" ng-click="deleteGadget(gadgetName)"
-              class="material-icons oppia-gadget-delete-icon protractor-test-delete-<[gadgetName]>-gadget-icon">&#xE92B;
+               class="material-icons oppia-gadget-delete-icon protractor-test-delete-<[gadgetName]>-gadget-icon">&#xE14C;
             </i>
           </div>
         </div>
@@ -56,7 +57,7 @@
                 ng-click="renameGadget(newNameForRenamedGadget)">&#xE876;
         </button>
         <button class="btn btn-xs material-icons protractor-test-cancel-gadget-name-editor"
-                ng-click="cancelGadgetNameEditor()">&#xE92B;
+                ng-click="cancelGadgetNameEditor()">&#xE14C;
         </button>
       </span>
     </div>
