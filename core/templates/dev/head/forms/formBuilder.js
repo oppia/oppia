@@ -681,6 +681,7 @@ oppia.config(['$provide', function($provide) {
         rteHelperService, alertsService, explorationContextService,
         PAGE_CONTEXT) {
       taOptions.disableSanitizer = true;
+      taOptions.forceTextAngularSanitize = false;
       taOptions.classes.textEditor = 'form-control oppia-rte-content';
       taOptions.setup.textEditorSetup = function($element) {
         $timeout(function() {

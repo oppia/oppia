@@ -4,8 +4,10 @@
     <div class="form-group">
       <div class="input-group" style="max-width: 300px; width: 300px;">
         <div class="input-group-addon oppia-splash-search-icon">
-          <i class="material-icons md-18" ng-if="!searchIsLoading">&#xE8B6;</i>
-          <i class="material-icons md-18 oppia-animate-spin" ng-if="searchIsLoading">&#xE863;</i>
+          <i class="material-icons md-18" ng-if="!isSearchInProgress()">&#xE8B6;</i>
+          <span ng-if="isSearchInProgress()">
+            <i class="material-icons md-18 oppia-animate-spin">&#xE863;</i>
+          </span>
         </div>
         <input type="text" class="form-control oppia-splash-search-input oppia-splash-search-text-input" placeholder="What are you curious about?" ng-model="searchQuery" ng-keyup="onSearchQueryChange($event)">
       </div>
