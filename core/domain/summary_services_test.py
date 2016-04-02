@@ -139,11 +139,11 @@ class ExplorationDisplayableSummaries(
         self.assertEqual({
             self.ALBERT_NAME: {
                 'num_commits': 10,
-                'profile_picture_data_url': None
+                'profile_picture_data_url': user_services.DEFAULT_IDENTICON_DATA_URL
             },
             self.BOB_NAME: {
                 'num_commits': 13,
-                'profile_picture_data_url': None
+                'profile_picture_data_url': user_services.DEFAULT_IDENTICON_DATA_URL
             }
         }, summary_services.get_human_readable_contributors_summary(
             contributors_summary))
@@ -156,7 +156,7 @@ class ExplorationDisplayableSummaries(
             },
             self.USER_D_NAME: {
                 'num_commits': 2,
-                'profile_picture_data_url': None
+                'profile_picture_data_url': user_services.DEFAULT_IDENTICON_DATA_URL
             }
         }, summary_services.get_human_readable_contributors_summary(
             contributors_summary))
@@ -181,7 +181,7 @@ class ExplorationDisplayableSummaries(
             'human_readable_contributors_summary': {
                 self.ALBERT_NAME: {
                     'num_commits': 2,
-                    'profile_picture_data_url': None
+                    'profile_picture_data_url': user_services.DEFAULT_IDENTICON_DATA_URL
                 }
             },
             'id': self.EXP_ID_2,

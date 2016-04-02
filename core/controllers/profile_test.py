@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the profile page."""
+import os
 
 from core.domain import exp_services
 from core.domain import rights_manager
@@ -20,7 +21,7 @@ from core.domain import user_services
 from core.tests import test_utils
 import feconf
 import utils
-
+import logging
 
 class SignupTest(test_utils.GenericTestBase):
 
@@ -236,10 +237,10 @@ class ProfileLinkTests(test_utils.GenericTestBase):
         response_dict = self.get_json(
             '%s%s' % (self.PROFILE_PIC_URL, self.USERNAME)
         )
-        # Although the user has a valid username, they have not yet supplied
-        # a profile picture.
-        self.assertIsNone(
-            response_dict['profile_picture_data_url_for_username'])
+        # Every user must have a profile picture
+        self.assertEqual(
+            response_dict['profile_picture_data_url_for_username'],
+            user_services.DEFAULT_IDENTICON_DATA_URL)
 
 
 class ProfileDataHandlerTests(test_utils.GenericTestBase):
