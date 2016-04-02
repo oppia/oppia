@@ -28,7 +28,7 @@ oppia.directive('searchBar', [function() {
           $scope, $rootScope, $timeout, $window, searchService,
           oppiaDebouncer, ExplorationCreationButtonService, urlService,
           CATEGORY_LIST) {
-        $scope.searchIsLoading = false;
+        $scope.isSearchInProgress = searchService.isSearchInProgress;
         $scope.ALL_CATEGORIES = CATEGORY_LIST.map(function(categoryName) {
           return {
             id: categoryName,
@@ -108,11 +108,9 @@ oppia.directive('searchBar', [function() {
 
         var _hasChangedSearchQuery = Boolean(urlService.getUrlParams().q);
         var _onSearchQueryChangeExec = function() {
-          $scope.searchIsLoading = true;
           searchService.executeSearchQuery(
               $scope.searchQuery, $scope.selectionDetails.categories.selections,
               $scope.selectionDetails.languageCodes.selections, function() {
-            $scope.searchIsLoading = false;
             if (!_hasChangedSearchQuery && _searchBarFullyLoaded) {
               _hasChangedSearchQuery = true;
               $rootScope.$broadcast('hasChangedSearchQuery');

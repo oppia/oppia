@@ -4,9 +4,9 @@
     <div class="form-group">
       <div class="input-group" style="max-width: 300px; width: 300px;">
         <div class="input-group-addon oppia-splash-search-icon">
-          <span class="glyphicon"
-                ng-class="{'glyphicon-search': !searchIsLoading,
-                           'glyphicon-refresh oppia-animate-spin': searchIsLoading}">
+          <span class="glyphicon glyphicon-search" ng-if="!isSearchInProgress()"></span>
+          <span ng-if="isSearchInProgress()">
+            <span class="glyphicon glyphicon-refresh oppia-animate-spin"></span>
           </span>
         </div>
         <input type="text" class="form-control oppia-splash-search-input oppia-splash-search-text-input" placeholder="What are you curious about?" ng-model="searchQuery" ng-keyup="onSearchQueryChange($event)">
