@@ -1,24 +1,22 @@
 <script type="text/ng-template" id="components/createExplorationButton">
-
   <div class="pull-right oppia-navbar-button-container">
     {% if not has_fully_registered %}
       <!-- User must complete the registration process. -->
-      <a class="btn oppia-navbar-button protractor-test-create-exploration oppia-transition-200"
+      <a class="btn oppia-navbar-button oppia-navbar-hide-on-small-width protractor-test-create-exploration oppia-transition-200"
          href ng-click="onRedirectToLogin('/my_explorations?mode=create')">
         <span>Create</span>
       </a>
     {% else %}
-      <a class="btn oppia-navbar-button protractor-test-create-exploration oppia-transition-200"
+      <a class="btn oppia-navbar-button oppia-navbar-hide-on-small-width protractor-test-create-exploration oppia-transition-200"
          ng-click="showCreateExplorationModal()">
         <span>Create</span>
       </a>
       {% if allow_yaml_file_upload %}
-        <a class="btn oppia-navbar-button oppia-transition-200"
+        <a class="btn oppia-navbar-button oppia-navbar-hide-on-small-width oppia-transition-200"
            ng-click="showUploadExplorationModal()">
           <span>Upload</span>
         </a>
       {% endif %}
     {% endif %}
   </div>
-
 </script>
