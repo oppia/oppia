@@ -24,177 +24,82 @@
 {% endblock navbar_breadcrumb %}
 
 {% block content %}
-  <div class="oppia-page-cards-container">
-    <md-card class="oppia-page-card oppia-long-text">
+<div class="about-header">
+    <h1>Be Part of a Community of Learners</h1>
+  </div>
 
-      {% if ABOUT_PAGE_YOUTUBE_VIDEO_ID %}
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/{{ABOUT_PAGE_YOUTUBE_VIDEO_ID}}?rel=0" frameborder="0" allowfullscreen>
-        </iframe>
-      {% endif %}
+  <div class="about-card about-content">
+    <div class="about-nav">
+      <ul class="about-tab-links">
+        <li class="about-active-tab">
+          <a href="about-tab-1">About Oppia</a>
+        </li>
+        <li>
+          <a href="about-tab-2">The Oppia Foundation</a>
+        </li>
+        <li>
+          <a href="about-tab-3">Credits</a>
+        </li>
+      </ul>
+    </div> <!-- /about-nav -->
 
-      <a class="oppia-about-anchor" name="our-mission"></a>
-      <h3>Our Mission</h3>
+  <div class="about-tab-container">
+    <div class="about-tab-1 about-tab-content about-visible-content">
+      <div class="about-card-content-wide about-card-content-narrow">
+        <h2>
+          Our Mission<br>
+          To help anyone learn anything they want in an effective and
+          enjoyable way.
+        </h2>
+        <p>
+          Oppia means "learn" in Finnish, and this site is all about learning and
+          sharing knowledge! Oppia is a free, open-source learning platform that
+          offers interactive learning modules that recreate the power of 1-on-1 tutoring.
+          Our unique technology allows anyone to create these learning modules, or,
+          as we call them, explorations, to share their knowledge in the most effective and
+          efficient way. Since these explorations adapt to the needs and the current knowledge
+          of learners, Oppia provides an enriched learning experience. Oppia's explorations cover
+          a variey of subjects, like mathematics, biology, and programming, and are offered
+          in various languages made by unique individuals like you.
+        </p>
+        <a class="about-page-buttons">See how Oppia works</a>
+      </div><!-- /MISSION about-card-content-wide about-card-content-narrow -->
+    </div><!-- /tab -->
 
+  <div class="about-tab-2 about-tab-content">
+    <div class="about-card-content-wide about-card-content-narrow">
+      <h2>The Oppia Foundation</h2>
       <p>
-        To help anyone learn anything they want in an effective and enjoyable way.
-      </p>
-
-      <a class="oppia-about-anchor" name="meet-oppia"></a>
-      <h3 style="margin-top: 40px;">Meet Oppia</h3>
-
-      <p>
-        Oppia is a free, open-source learning platform. Full of interactive activities
-        called 'explorations', Oppia helps curious minds learn and teach.
-      </p>
-
-      <strong>Learn</strong>
-      <p>
-        Oppia recreates the experience of one-on-one tutoring. It adapts to your
-        needs and lets you learn in the best way possible &mdash; by doing.
-      </p>
-
-      <strong>Teach</strong>
-      <p>
-        Oppia enables you to share your knowledge with people worldwide. Anyone can create
-        and contribute to an exploration. Find out more in our <a href="/participate">participation playbook</a>.
-      </p>
-
-      <a class="oppia-about-anchor" name="contact"></a>
-      <h3 style="margin-top: 40px;">Contacting Us</h3>
-
-      <p>
-        <strong>For site questions:</strong> Post to our <a href="{{SITE_FORUM_URL}}">forum</a>.
-      </p>
-      <p>
-        <strong>To get involved:</strong> Reach out via our
-        <a href="https://groups.google.com/forum/#!forum/oppia-dev">oppia-dev</a>
-        Google Group, or by contacting {{CONTACT_EMAIL_ADDRESS}}. We'd be delighted
-        to work with you!
-      </p>
-      <p>
-        <strong>For bugs and feature requests:</strong> Create an issue on our
-        <a href="https://github.com/oppia/oppia/issues/new?title=Describe%20your%20feature%20request%20or%20bug%20report%20succinctly&body=If%20you%27d%20like%20to%20propose%20a%20feature,%20describe%20what%20you%27d%20like%20to%20see.%20Mock%20ups%20would%20be%20great!%0A%0AIf%20you%27re%20reporting%20a%20bug,%20please%20be%20sure%20to%20include%20the%20expected%20behaviour,%20the%20observed%20behaviour,%20and%20steps%20to%20reproduce%20the%20problem.%20Console%20copy-pastes%20and%20any%20background%20on%20the%20environment%20would%20also%20be%20helpful.%0A%0AThanks!">Oppia bug tracker</a>.
-        or get in touch via the
-        <a href="https://groups.google.com/forum/#!forum/oppia-dev">developers' forum</a>.
+        The Oppia website and source code are supported by the Oppia Foundation,
+        a non-profit public benefit corporation of the State of California.
       </p>
       <p>
-        <strong>For sensitive issues</strong> (for example, reporting a security bug):
-        Write to {{CONTACT_EMAIL_ADDRESS}}.
+        The directos of the Foundation are Amit Deutsch, Jacob Davis, and Sean Lip.
+        The Foundation's
+        <a href="https://drive.google.com/folderview?id=0B9KSjiibL_WDfjlpUUpqampZSTBOTmRqM2IyaGN3R3NlVWstZlhKcjlZQ3VMTHJBQWNGTFU&usp=sharing"
+        class="inline-links">bylaws and minutes</a>
+        are available to read. If you wish to contact the Foundation, please email:
+        <a href="mailto:{{CONTACT_EMAIL_ADDRESS}}" class="inline-links">admin@oppia.org</a>
       </p>
-
-      <a class="oppia-about-anchor" name="license"></a>
       <h3>License</h3>
-
       <p>
         All content in Oppia's explorations is licensed under
-        <a href="https://creativecommons.org/licenses/by-sa/4.0/legalcode">CC-BY-SA 4.0</a>
-        with a waiver of the attribution requirement (specifically, Sections 3(a)(1) and 3(a)(2)).
-        If you reuse content from this site, we encourage you to include a link to the
-        relevant exploration page, but do not require it.
+        <a href="https://creativecommons.org/licenses/by-sa/4.0/legalcode" class="inline-links">CC-BY-SA 4.0</a>
+        with a waiver of the attribution requirement (specifically, Sections 3(a)(1) and
+        3(a)(2)). If you reuse content from this site, we encourage you to include a link
+        to the relevant exploration page, but do not require it.
       </p>
       <p>
         The software powering Oppia is open source, and its
-        <a href="https://github.com/oppia/oppia/">code</a> is released under an
-        <a href="https://www.apache.org/licenses/">Apache 2.0</a> license.
+        <a href="https://github.com/oppia/oppia/" class="inline-links">code</a> is released under an
+        <a href="https://www.apache.org/licenses/" class="inline-links">Apache 2.0</a> license.
       </p>
+    </div><!-- /FOUNDATION about-card-content-wide about-card-content-narrow -->
+  </div><!-- /tab -->
 
-      <a class="oppia-about-anchor" name="foundation"></a>
-      <h3>The Oppia Foundation</h3>
-      <p>
-        The Oppia website and source code are supported by the Oppia
-        Foundation, a non-profit public benefit corporation of the State of
-        California.
-      </p>
-      <p>
-        The directors of the Foundation are Amit Deutsch, Jacob Davis and Sean
-        Lip. The Foundation's
-        <a href="https://drive.google.com/folderview?id=0B9KSjiibL_WDfjlpUUpqampZSTBOTmRqM2IyaGN3R3NlVWstZlhKcjlZQ3VMTHJBQWNGTFU&usp=sharing">
-          bylaws and minutes
-        </a>
-        are available to read. If you wish to contact the Foundation, please
-        email {{CONTACT_EMAIL_ADDRESS}}.
-      </p>
-
-      <a class="oppia-about-anchor" name="credits"></a>
-      <h3>Credits</h3>
-      <p>
-        Many people have contributed to the open-source codebase powering Oppia.
-        Thanks to:
-      </p>
-
-      <ul style="font-size: 0.8em;">
-        <li>Abraham Mgowano</li>
-        <li>Alex Gower</li>
-        <li>Allan Zhou</li>
-        <li>Amit Deutsch</li>
-        <li>Andrew Low</li>
-        <li>Andrey Mironyuk</li>
-        <li>Angela Park</li>
-        <li>Arun Kumar</li>
-        <li>Barnabas Makonda</li>
-        <li>Ben Henning</li>
-        <li>Ben Targan</li>
-        <li>Brenton Briggs</li>
-        <li>Charisse De Torres</li>
-        <li>Chase Albert</li>
-        <li>Chin Zhan Xiong</li>
-        <li>Debanshu Bhaumik</li>
-        <li>Edward Allison</li>
-        <li>Elizabeth Kemp</li>
-        <li>Estelle Lee</li>
-        <li>Frederik Creemers</li>
-        <li>Jacob Davis</li>
-        <li>Jakub Osika</li>
-        <li>Jasper Deng</li>
-        <li>Jaysinh Shukla</li>
-        <li>Jeremy Emerson</li>
-        <li>Jérôme (zolk232)</li>
-        <li>Jerry Chen</li>
-        <li>Joshua Lusk</li>
-        <li>Karen Rustad</li>
-        <li>Kerry Wang</li>
-        <li>Kevin Lee</li>
-        <li>Koji Ashida</li>
-        <li>Kristin Anthony</li>
-        <li>Kumari Shalini</li>
-        <li>Madiyar Aitbayev</li>
-        <li>Manas Tungare</li>
-        <li>Marcel Schmittfull</li>
-        <li>Michael Anuzis</li>
-        <li>Michael Mossey</li>
-        <li>Michael Wagner</li>
-        <li>Milagro Teruel</li>
-        <li>Mungo Dewar</li>
-        <li>Oskar Cieslik</li>
-        <li>Owen Parry</li>
-        <li>Phil Wagner</li>
-        <li>Philip Hayes</li>
-        <li>Prasanna Patil</li>
-        <li>Raine Hoover</li>
-        <li>Reinaldo Aguiar</li>
-        <li>Reto Brunner</li>
-        <li>Richard Cho</li>
-        <li>Samara Trilling</li>
-        <li>Santos Hernandez</li>
-        <li>Scott Junner</li>
-        <li>Sean Lip</li>
-        <li>Shafqat Dulal</li>
-        <li>Shantanu Bhowmik</li>
-        <li>Shouvik Roy</li>
-        <li>Stephanie Federwisch</li>
-        <li>Stephen Chiang</li>
-        <li>Tarashish Mishra</li>
-        <li>Travis Shafer</li>
-        <li>Tuguldur Baigalmaa</li>
-        <li>Viraj Prabhu</li>
-        <li>Vishal Joisar</li>
-        <li>Wilson Hong</li>
-        <li>Xinyu Wu</li>
-        <li>Yana Malysheva</li>
-        <li>Yuan Gu</li>
-        <li>Zoe Madden-Wood</li>
-      </ul>
-
+  <div class="about-tab-3 about-tab-content">
+    <div class="about-card-content-wide">
+      <h2>Oppia Contributors</h2>
       <p>
         The Oppia development team is also grateful for the feedback, ideas,
         help and suggestions by Alex Kauffmann, Allison Barros, Amy Latten,
@@ -204,31 +109,313 @@
         Piotr Mitros, Rachel Chen, Rahim Nathwani, Robyn Choo, Tricia Ngoon,
         Vikrant Nanda and Vinamrata Singal.
       </p>
-    </md-card>
+      <div class="three-cols-container">
+        <div class="three-cols-layout">
+          <div class="letter-groups">
+            <span>A</span>
+              <ul>
+                <li>Abraham Mgowano</li>
+              <li>Alex Gower</li>
+              <li>Allan Zhou</li>
+              <li>Amit Deutsch</li>
+              <li>Andrew Low</li>
+              <li>Andrey Mironyuk</li>
+              <li>Angela Park</li>
+              <li>Arun Kumar</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>B</span>
+              <ul>
+                <li>Barnabas Makonda</li>
+                <li>Ben Henning</li>
+                <li>Ben Targan</li>
+                <li>Brenton Briggs</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>C</span>
+              <ul>
+                <li>Charisse De Torres</li>
+                <li>Chase Albert</li>
+                <li>Chin Zhan Xiong</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>D</span>
+              <ul>
+                <li>Debanshu Bhaumik</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>E</span>
+              <ul>
+                <li>Edward Allison</li>
+                <li>Elizabeth Kemp</li>
+                <li>Estelle Lee</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>F</span>
+              <ul>
+                <li>Frederik Creemers</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>G</span>
+              <ul>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>H</span>
+              <ul>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>I</span>
+              <ul>
+              </ul>
+          </div>
+        </div><!-- /LEFT three-cols-layout -->
+
+        <div class="three-cols-layout">
+          <div class="letter-groups">
+            <span>J</span>
+              <ul>
+                <li>Jacob Davis</li>
+                <li>Jakub Osika</li>
+                <li>Jasper Deng</li>
+                <li>Jaysinh Shukla</li>
+                <li>Jeremy Emerson</li>
+                <li>Jérôme (zolk232)</li>
+                <li>Jerry Chen</li>
+                <li>Joshua Lusk</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>K</span>
+              <ul>
+                <li>Karen Rustad</li>
+                <li>Kerry Wang</li>
+                <li>Kevin Lee</li>
+                <li>Koji Ashida</li>
+                <li>Kristin Anthony</li>
+                <li>Kumari Shalini</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>L</span>
+              <ul>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>M</span>
+              <ul>
+                <li>Madiyar Aitbayev</li>
+                <li>Manas Tungare</li>
+                <li>Marcel Schmittfull</li>
+                <li>Michael Anuzis</li>
+                <li>Michael Mossey</li>
+                <li>Michael Wagner</li>
+                <li>Milagro Teruel</li>
+                <li>Mungo Dewar</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>N</span>
+              <ul>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>O</span>
+              <ul>
+                <li>Oskar Cieslik</li>
+                <li>Owen Parry</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>P</span>
+              <ul>
+                <li>Phil Wagner</li>
+                <li>Philip Hayes</li>
+                <li>Prasanna Patil</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>Q</span>
+              <ul>
+              </ul>
+          </div>
+        </div><!-- /mid three-cols-layout -->
+
+        <div class="three-cols-layout">
+          <div class="letter-groups">
+            <span>R</span>
+              <ul>
+                <li>Raine Hoover</li>
+                <li>Reinaldo Aguiar</li>
+                <li>Reto Brunner</li>
+                <li>Richard Cho</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>S</span>
+              <ul>
+                <li>Samara Trilling</li>
+                <li>Santos Hernandez</li>
+                <li>Scott Junner</li>
+                <li>Sean Lip</li>
+                <li>Shafqat Dulal</li>
+                <li>Shantanu Bhowmik</li>
+                <li>Shouvik Roy</li>
+                <li>Stephanie Federwisch</li>
+                <li>Stephen Chiang</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>T</span>
+              <ul>
+                <li>Tarashish Mishra</li>
+                <li>Travis Shafer</li>
+                <li>Tuguldur Baigalmaa</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>U</span>
+              <ul>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>V</span>
+              <ul>
+                <li>Viraj Prabhu</li>
+                <li>Vishal Joisar</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>W</span>
+              <ul>
+                <li>Wilson Hong</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>X</span>
+              <ul>
+                <li>Xinyu Wu</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>Y</span>
+              <ul>
+                <li>Yana Malysheva</li>
+                <li>Yuan Gu</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>Z</span>
+              <ul>
+                <li>Zoe Madden-Wood</li>
+              </ul>
+          </div>
+        </div><!-- /RIGHT three-cols-layout -->
+      </div><!-- /three-cols-container -->
+    </div><!-- /CONTRIBUTORS about-card-content-wide -->
+  </div><!-- /tab -->
+  </div><!-- /tab-container -->
+</div><!-- /about-content -->
+
+<div class="about-extra-container about-tab-container">
+  <div class="about-tab-1 about-tab-content about-visible-content">
+    <div class="about-extra-content clearfix">
+      <div class="about-otter-container">
+        <img src="images/about-page-otter.png" class="about-page-otter" alt="Otter">
+      </div>
+      <div class="otter-speech-card">
+        <blockquote class="otter-speech-bubble">
+          <h3 >What do you want to do today?</h3>
+        </blockquote><!-- /about-card-content-wide -->
+      </div><!-- /otter-speech-card -->
+    </div><!-- /about-content -->
+
+    <div class="about-extra-info about-otter-buttons">
+      <div class="about-content about-extra-content">
+        <div class="about-card-content-wide about-card-content-narrow otter-button-container">
+          <a href="#" class="about-page-buttons otter-buttons">I want to learn</a>
+          <a href="#" class="about-page-buttons otter-buttons">I want to teach</a>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="nav oppia-about-right-menu hidden-sm hidden-xs">
-    <strong>About Oppia</strong>
-    <p><a href="#our-mission">Our Mission</a></p>
-    <p><a href="#meet-oppia">Meet Oppia</a></p>
-    <p><a href="#contact">Contacting Us</a></p>
-    <p><a href="#license">License</a></p>
-    <p><a href="#foundation">Foundation</a></p>
-    <p><a href="#credits">Credits</a></p>
-  </div>
+  <div class="about-tab-2 about-tab-content">
+    <div class="about-extra-info about-get-involved">
+      <div class="about-content about-extra-content">
+        <div class="about-card-content-wide about-card-content-narrow">
+          <h3>Get involved!</h3>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            Aenean vel tristique turpis, in facilisis diam. Donec ornare rutrum finibus.
+            Sed pulvinar justo et mollis aliquam. Curabitur et sapien porttitor,
+            scelerisque ante et, tempus velit. Ut metus urna, bibendum porta molestie in, cursus in augue.
+          </p>
+          <p>
+            For site questions:<br>
+            Post to our <a href="{{SITE_FORUM_URL}}" class="inline-links">forum</a>
+          </p>
+          <p>
+            For bugs and feature requests:<br>
+            Create an issue on our Oppia <a href="https://github.com/oppia/oppia/issues/new?title=Describe%20your%20feature%20request%20or%20bug%20report%20succinctly&body=If%20you%27d%20like%20to%20propose%20a%20feature,%20describe%20what%20you%27d%20like%20to%20see.%20Mock%20ups%20would%20be%20great!%0A%0AIf%20you%27re%20reporting%20a%20bug,%20please%20be%20sure%20to%20include%20the%20expected%20behaviour,%20the%20observed%20behaviour,%20and%20steps%20to%20reproduce%20the%20problem.%20Console%20copy-pastes%20and%20any%20background%20on%20the%20environment%20would%20also%20be%20helpful.%0A%0AThanks!" class="inline-links">bug tracker</a><br>
+            or get in touch via the <a href="https://groups.google.com/forum/#!forum/oppia-dev" class="inline-links">developer's forum</a>
+          </p>
+          <p>
+            For security issues:<br>
+            Write to <a href="{{CONTACT_EMAIL_ADDRESS}}" class="inline-links">admin@oppia.org</a>
+          </p>
+        </div><!-- /about-card-content-wide -->
+      </div><!-- /about-content -->
+    </div><!-- /about-get-involved -->
+  </div><!-- /tab -->
+</div><!-- /about-extra-container -->
 
+
+  <!-- JS -->
+   <script src="scripts/jquery-2.1.1.js"></script>
   <script>
-    // This scrolls the page to the anchor clicked on in the quick links menu.
-    $('a[href*=#]:not([href=#])').click(function() {
-      if (location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '')) {
-        var target = $('[name=' + this.hash.slice(1) +']');
-        if (target.length) {
-          $('html,body').animate({
-            scrollTop: target.offset().top
-          }, 1000);
-          return false;
-        }
-      }
+    $(document).ready(function() {
+      $(".about-tab-links li").on("click", function(event) {
+        event.preventDefault();
+        var tabIndex = $(this).index();
+        // change tab color
+        $(this).addClass("about-active-tab").siblings().removeClass("about-active-tab");
+        // show/hide tab contents
+        var currentAttrVal = $(this).children("a").attr("href");
+        $("." + currentAttrVal).addClass("about-visible-content").siblings().removeClass("about-visible-content");
+      });
     });
+
+
   </script>
 {% endblock %}

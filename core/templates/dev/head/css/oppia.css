@@ -2934,3 +2934,308 @@ md-card.preview-conversation-skin-supplemental-card {
   color: red;
   margin-bottom: 10px;
 }
+
+/*
+  about / creators / learners pages
+*/
+
+.clearfix {
+  display: table;
+  content: "";
+  clear: both;
+}
+
+.about-header {
+  background-color: #79ddd3;
+  color: #fff;
+  text-align: center;
+  padding: 10%;
+}
+
+.about-card {
+  background-color: #fff;
+  border-radius: 5px;
+}
+
+.about-content {
+  width: 60%;
+  margin: 0 auto 3% auto;
+}
+
+.about-extra-container {
+  width: 100%;
+}
+
+.about-extra-content {
+  width: 60%;
+  margin: 0 auto;
+}
+
+.about-otter-container {
+  position: relative;
+}
+
+.otter-speech-card {
+  width: 50%;
+  float: right;
+}
+
+.otter-speech-bubble {
+  position: relative;
+  padding: 50px 15px;
+  margin: 1em 0 3em;
+  text-align: center;
+  background: #fff;
+  border-radius: 5px;
+}
+
+.otter-speech-bubble:before {
+  content: "";
+  position: absolute;
+  z-index: 10;
+  bottom: -1.7em;
+  left: 1em;
+  width: 50px;
+  height: 30px;
+  background: #fff;
+  display: block;
+  border-bottom-right-radius: 80px 50px;
+}
+
+.otter-speech-bubble:after {
+  content: "";
+  position: absolute;
+  z-index: 10;
+  bottom: -1.7em;
+  left: 1em;
+  width: 20px;
+  height: 30px;
+  background: #eee;
+  border-bottom-right-radius: 40px 50px;
+  display: block;
+}
+
+.about-extra-container h1,
+.about-extra-container h2,
+.about-extra-container h3,
+.about-extra-container h4,
+.about-extra-container h5,
+.about-extra-container h6 {
+  text-align: center;
+}
+
+.about-card-content-wide {
+  width: 90%;
+  padding: 8% 0;
+  margin: 0 auto;
+}
+
+.about-card-content-narrow {
+  width: 70%;
+}
+
+.three-cols-container {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0 0 8% 0;
+}
+
+.three-cols-feature {
+  text-align: center;
+}
+
+.three-cols-layout {
+  width: calc((100% - 20px) / 3);
+  padding: 10px;
+  margin-right: 10px;
+}
+
+.three-cols-layout:last-of-type {
+  margin-right: 0;
+}
+
+.letter-groups {
+  margin: 0 0 10% 0;
+}
+
+.about-extra-info {
+  width: 100%;
+  color: #fff;
+}
+
+.about-otter-buttons {
+  background-color: #009788;
+}
+
+.about-get-involved {
+  background-color: #009788;
+}
+
+.new-explorations {
+  background-color: #43db92;
+}
+
+.start-creating {
+  background-color: #0d8885;
+}
+
+.about-active-tab a {
+  color: #ff900d;
+}
+
+.about-tab-content {
+  display: none;
+}
+
+.about-visible-content {
+  position: relative;
+  opacity: 1;
+  display: block;
+  transition: opacity .35s ease;
+}
+
+strong {
+  color: #009788;
+}
+
+.inline-links {
+  color: #ff900d;
+  text-decoration: none;
+}
+
+.about-content h2 {
+  text-align: center;
+  color: #ff900d;
+}
+
+.otter-content h3 {
+  text-align: center;
+}
+
+.about-content p {
+  line-height: 1.5em;
+  margin: 5% 0;
+}
+
+.about-tab-links {
+  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.about-tab-links li {
+  display: inline-block;
+  cursor: pointer;
+  width: calc(100% / 3);
+  box-shadow: 3px -1px 4px #e7e7e7;
+}
+
+.about-page-otter {
+  width: 25%;
+  float: left;
+  top: 28px;
+  position: relative;
+}
+
+.nav-creators ul li{
+  width: calc(100% / 2);
+}
+
+.about-tab-links {
+  padding: 0;
+}
+
+.about-tab-links li a {
+  display: block;
+  padding: 10px;
+  text-decoration: none;
+}
+
+.about-page-buttons {
+  background-color: #ff900d;
+  text-decoration: none;
+  text-align: center;
+  display: block;
+  margin: 0 auto;
+  width: 40%;
+  cursor: pointer;
+  padding: 15px;
+  box-shadow: 0 3px 0 #e58314;
+  border: transparent;
+  color: #fff;
+}
+
+.otter-button-container {
+  text-align: center;
+}
+
+.otter-buttons {
+  display: inline-block;
+  margin-right: 20px;
+}
+
+.otter-buttons:last-of-type {
+  margin-right: 0;
+}
+
+.letter-groups span {
+  color: #ff900d;
+  font-size: 1.8em;
+}
+
+.letter-groups ul {
+  padding: 0;
+}
+
+.letter-groups ul li {
+  list-style-type: none;
+  line-height: 1.5em;
+}
+
+/*
+  about/learners/creators media queries
+*/
+
+@media only screen and (min-width: 1400px) {
+  body {
+    font-size: 1.7em;
+  }
+  .about-content, .about-extra-content {
+    width: 960px;
+  }
+}
+
+@media only screen and (max-width: 800px) {
+  .about-content, .about-extra-content {
+    width: 90%;
+  }
+  .about-tab-links li a {
+    padding: 20px;
+  }
+}
+
+@media only screen and (max-width: 500px) {
+  .about-tab-links li {
+    width: 100%;
+  }
+  .about-card-content-narrow {
+    width: 80%;
+  }
+  .three-cols-layout {
+    width: 100%;
+    text-align: center;
+  }
+
+  .about-page-buttons {
+    width: 100%;
+    margin: 20px 0 0 0;
+  }
+
+  .about-page-buttons:first-child {
+    margin: 0;
+  }
+}
+
+/*
+  END about/learners/creators
+*/
