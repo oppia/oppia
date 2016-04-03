@@ -20,7 +20,7 @@ Vagrant.configure(2) do |config|
     v.memory = 1024
   end
   # General-purpose env var to let scripts know we are in Vagrant.
-  config.vm.provision "shell", inline: 'echo "export VAGRANT=true" >> ~/.profile'
+  config.vm.provision "shell", inline: 'echo "export VAGRANT=true" >> /etc/profile'
   # Tell apt to default to "yes" when installing packages. Necessary for unattended installs.
   config.vm.provision "shell", inline: 'echo \'APT::Get::Assume-Yes "true";\' > /etc/apt/apt.conf.d/90yes'
   config.vm.network "forwarded_port", guest: 8000, host: 8000
