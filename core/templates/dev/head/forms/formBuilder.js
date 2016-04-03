@@ -564,7 +564,7 @@ oppia.factory('rteHelperService', [
         previewUrlTemplate:
           RTE_COMPONENT_SPECS[componentId].preview_url_template,
         isComplex: RTE_COMPONENT_SPECS[componentId].is_complex,
-        isBlock: RTE_COMPONENT_SPECS[componentId].is_block,
+        isBlockElement: RTE_COMPONENT_SPECS[componentId].is_block_element,
         requiresFs: RTE_COMPONENT_SPECS[componentId].requires_fs,
         tooltip: RTE_COMPONENT_SPECS[componentId].tooltip
       });
@@ -616,8 +616,8 @@ oppia.factory('rteHelperService', [
           el.attr('src', componentDefn.iconDataUrl);
         }
         el.addClass('oppia-noninteractive-' + componentDefn.name);
-        if (componentDefn.isBlock) {
-          el.addClass('block-component');
+        if (componentDefn.isBlockElement) {
+          el.addClass('block-element');
         }
         for (var attrName in customizationArgsDict) {
           el.attr(

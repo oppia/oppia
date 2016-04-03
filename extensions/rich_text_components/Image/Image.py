@@ -27,7 +27,7 @@ class Image(base.BaseRichTextComponent):
     tooltip = 'Insert image'
     requires_fs = True
     preview_url_template = '/imagehandler/<[explorationId]>/<[filepath]>'
-    is_block = True
+    is_block_element = True
 
     _customization_arg_specs = [{
         'name': 'filepath',

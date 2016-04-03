@@ -2551,9 +2551,9 @@ div#ng-curtain {
   min-height: 80px;
 }
 
-.form-control.oppia-rte-content img.block-component {
+.form-control.oppia-rte-content img.block-element {
   display: block;
-  margin:auto;
+  margin: auto;
 }
 
 /* Styles for the editor training interfaces. */
