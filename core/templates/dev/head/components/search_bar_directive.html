@@ -30,6 +30,9 @@
           <span ng-if="selectionDetails.categories.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
         </a>
       </li>
+      <li ng-if="selectionDetails.categories.numSelections > 1">
+        <a href ng-click="deselectAll('categories')"><i>Deselect All</i></a>
+      </li>
       <hr ng-if="selectionDetails.categories.numSelections > 0" style="margin: 2px;">
       <li ng-repeat="item in selectionDetails.categories.masterList track by $index"
           class="protractor-test-deselected"
@@ -58,6 +61,9 @@
           <[item.text]>
           <span ng-if="selectionDetails.languageCodes.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
         </a>
+      </li>
+      <li ng-if="selectionDetails.languageCodes.numSelections > 1">
+        <a href ng-click="deselectAll('languageCodes')"><i>Deselect All</i></a>
       </li>
       <hr ng-if="selectionDetails.languageCodes.numSelections > 0" style="margin: 2px;">
       <li ng-repeat="item in selectionDetails.languageCodes.masterList track by $index"
