@@ -68,11 +68,11 @@ button.md-button.md-default-theme.oppia-learner-continue-button:hover {
 .material-icons.md-18 {
   font-size: 18px;
 }
-.material-icons.md-100 { 
-  font-size: 100px; 
+.material-icons.md-100 {
+  font-size: 100px;
 }
 .material-icons.md-40 {
-  font-size: 40px; 
+  font-size: 40px;
 }
 .material-icons.md-dark {
   color: rgba(0, 0, 0, 0.54);
@@ -2645,6 +2645,36 @@ md-card.preview-conversation-skin-supplemental-card {
   border-radius:0;
   margin: 0;
   padding: 0;
+}
+/* Editor Tutorial Welcome Modal */
+.oppia-welcome-modal .modal-dialog {
+  position: fixed;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+}
+
+.oppia-welcome-modal .modal-content {
+  border-radius: 0;
+  height: 100%;
+}
+
+.oppia-welcome-modal .modal-body,
+.oppia-welcome-modal .oppia-long-text p {
+  text-align: center;
+}
+
+.oppia-welcome-modal .modal-body {
+  width: 70%;
+  top: 20%;
+  margin: 0 auto;
+}
+
+.divider {
+    width: 4em;
+    height: auto;
+    display: inline-block;
 }
 
 .oppia-info-card-title {

@@ -1522,7 +1522,7 @@ oppia.factory('stateEditorTutorialFirstTimeService', [
         }
 
         if (_currentlyInFirstVisit) {
-          $rootScope.$broadcast('openEditorTutorial');
+          $rootScope.$broadcast('openEditorTutorialFirstTime');
           $http.post(STARTED_TUTORIAL_EVENT_URL).error(function() {
             console.error('Warning: could not record tutorial start event.');
           });

@@ -263,6 +263,21 @@
       </div>
     </script>
 
+    <script type="text/ng-template" id="modals/welcomeExploration">
+      <div class="modal-body oppia-long-text">
+        <h1>Welcome!</h1>
+        <p>
+          Looks like you're new to creating explorations.
+        </p>
+        <p>
+          Would you like an introduction to creating in Oppia?
+        </p>
+        <a ng-click="cancel()">No, take me to the editor.</a>
+        <div class="divider"></div>
+        <button class="btn btn-success" ng-click="beginTutorial()">Yes, please!</button>
+      </div>
+    </script>
+
     <script type="text/ng-template" id="modals/saveExploration">
       <div class="modal-header">
         <h3>
