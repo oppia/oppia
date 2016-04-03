@@ -21,7 +21,8 @@ oppia.directive('sharingLinks', [function() {
     restrict: 'E',
     scope: {
       layoutType: '@',
-      layoutAlignType: '@'
+      layoutAlignType: '@',
+      getTwitterText: '&twitterText'
     },
     templateUrl: 'components/sharingLinks',
     controller: [
@@ -43,8 +44,7 @@ oppia.directive('sharingLinks', [function() {
           $window.location.protocol + '//' + $window.location.host);
 
         $scope.escapedTwitterText = (
-          oppiaHtmlEscaper.unescapedStrToEscapedStr(
-            GLOBALS.SHARING_OPTIONS_TWITTER_TEXT));
+          oppiaHtmlEscaper.unescapedStrToEscapedStr($scope.getTwitterText()));
       }
     ]
   };

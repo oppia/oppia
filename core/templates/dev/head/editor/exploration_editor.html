@@ -25,7 +25,7 @@
     GLOBALS.PANEL_SPECS = JSON.parse('{{PANEL_SPECS|js_string}}');
     GLOBALS.TAG_REGEX = JSON.parse('{{TAG_REGEX|js_string}}');
     GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = JSON.parse('{{SHOW_TRAINABLE_UNRESOLVED_ANSWERS|js_string}}');
-    GLOBALS.SHARING_OPTIONS_TWITTER_TEXT = JSON.parse('{{SHARING_OPTIONS_TWITTER_TEXT|js_string}}');
+    GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = JSON.parse('{{DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR|js_string}}');
   </script>
 
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
@@ -237,14 +237,17 @@
   <div ng-controller="ExplorationEditor" ng-cloak>
     <script type="text/ng-template" id="modals/shareExplorationAfterPublish">
       <div class="modal-header">
-        <h3>Share Exploration</h3>
+        <h3>Exploration Published</h3>
       </div>
 
       <div class="modal-body oppia-long-text">
         <p>
-          Congratulations, you have published your exploration successfully!
+          Congratulations! Your exploration was successfully published.
         </p>
-        <sharing-links flex="100" layout-type="row" layout-align-type="center center"></sharing-links>
+        <p>
+          <strong>Share your exploration via:</strong>
+        </p>
+        <sharing-links flex="100" layout-type="row" layout-align-type="center center" twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR"></sharing-links>
       </div>
     </script>
 

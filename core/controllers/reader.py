@@ -44,11 +44,11 @@ import utils
 
 MAX_SYSTEM_RECOMMENDATIONS = 4
 
-SHARING_OPTIONS_TWITTER_TEXT = config_domain.ConfigProperty(
-    'sharing_options_twitter_text_reader', {
+DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = config_domain.ConfigProperty(
+    'default_twitter_share_message_player', {
         'type': 'unicode',
     },
-    'Default text for the Twitter share message for the reader',
+    'Default text for the Twitter share message for the learner view',
     default_value=(
         'Check out this interactive lesson from Oppia - a free, open-source '
         'learning platform!'))
@@ -311,7 +311,8 @@ class ExplorationPage(base.BaseHandler):
             'GADGET_SPECS': gadget_registry.Registry.get_all_specs(),
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'SHARING_OPTIONS': base.SHARING_OPTIONS.value,
-            'SHARING_OPTIONS_TWITTER_TEXT': SHARING_OPTIONS_TWITTER_TEXT.value,
+            'DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER': (
+                DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER.value),
             'additional_angular_modules': additional_angular_modules,
             'can_edit': (
                 bool(self.username) and

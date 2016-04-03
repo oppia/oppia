@@ -442,7 +442,11 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     $scope.showCongratulatorySharingModal = function() {
       $modal.open({
         templateUrl: 'modals/shareExplorationAfterPublish',
-        backdrop: true
+        backdrop: true,
+        controller: ['$scope', function($scope) {
+          $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
+            GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
+        }]
       });
     };
 

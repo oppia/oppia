@@ -83,6 +83,8 @@ oppia.controller('LearnerViewBreadcrumb', [
                 millisSinceEpoch);
             };
 
+            $scope.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = (
+              GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER);
             $scope.averageRating = (
               RatingComputationService.computeAverageRating(expInfo.ratings));
             var contributorsSummary = (
