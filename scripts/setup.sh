@@ -190,12 +190,12 @@ if [ ! -d "$NODE_PATH" ]; then
 fi
 
 # Adjust path to support the default Chrome locations for Unix, Windows and Mac OS.
-if [ $TRAVIS = true ]; then
-  export CHROME_BIN="chromium-browser"
-elif [ $VAGRANT = true ]; then
-    # Required for headless testing in Vagrant
+if [ "$TRAVIS" = true ]; then
+  export CHROME_BIN="/usr/bin/chromium-browser"
+elif [ "$VAGRANT" = true ]; then
+    # XVFB is required for headless testing in Vagrant
     sudo apt-get install xvfb chromium-browser
-    export CHROME_BIN="chromium-browser"
+    export CHROME_BIN="/usr/bin/chromium-browser"
     # Used in frontend and e2e tests. Only gets set if using Vagrant VM.
     export XVFB_PREFIX="/usr/bin/xvfb-run"
     # Enforce proper ownership on Oppia and oppia_tools or else NPM installs will fail.
