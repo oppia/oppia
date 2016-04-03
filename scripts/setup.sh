@@ -199,7 +199,7 @@ elif [ "$VAGRANT" = true ]; then
     # Used in frontend and e2e tests. Only gets set if using Vagrant VM.
     export XVFB_PREFIX="/usr/bin/xvfb-run"
     # Enforce proper ownership on Oppia and oppia_tools or else NPM installs will fail.
-    sudo chown -R vagrant.vagrant /home/vagrant/oppia*
+    sudo chown -R vagrant.vagrant /home/vagrant/oppia /home/vagrant/oppia_tools
 elif [ -f "/usr/bin/google-chrome" ]; then
   # Unix.
   export CHROME_BIN="/usr/bin/google-chrome"
