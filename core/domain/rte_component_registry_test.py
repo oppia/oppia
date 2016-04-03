@@ -128,6 +128,8 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             html_file = os.path.join(component_dir, '%s.html' % component_id)
             js_file = os.path.join(component_dir, '%s.js' % component_id)
             png_file = os.path.join(component_dir, '%s.png' % component_id)
+            preview_file = os.path.join(
+                component_dir, '%sPreview.png' % component_id)
             protractor_file = os.path.join(component_dir, 'protractor.js')
 
             self.assertTrue(os.path.isfile(py_file))
@@ -135,6 +137,8 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isfile(js_file))
             self.assertTrue(os.path.isfile(png_file))
             self.assertTrue(os.path.isfile(protractor_file))
+            if len(dir_contents) == 6:
+                self.assertTrue(os.path.isfile(preview_file))
 
             js_file_content = utils.get_file_contents(js_file)
             html_file_content = utils.get_file_contents(html_file)

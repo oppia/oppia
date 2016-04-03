@@ -34,8 +34,10 @@ class Video(base.BaseRichTextComponent):
     description = 'A YouTube video.'
     frontend_name = 'video'
     tooltip = 'Insert video'
-    preview_url_to_interpolate = 'https://img.youtube.com/vi/' + \
+    is_block = True
+    preview_url_template = 'https://img.youtube.com/vi/' + \
         '<[video_id]>/hqdefault.jpg'
+
     _customization_arg_specs = [{
         'name': 'video_id',
         'description': (

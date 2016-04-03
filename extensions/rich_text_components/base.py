@@ -49,6 +49,12 @@ class BaseRichTextComponent(object):
     # Whether the component requires the filesystem in some way that
     # prevents it from being used by unauthorized users.
     requires_fs = False
+    # Whether the component should be displayed as a block component
+    is_block = False
+    # URL template of the component, such that when interpolated with the
+    # customization arugment dictionary, points to an image which will be
+    # rendered in the RTE preview
+    preview_url_template = ''
     # Customization arg specifications for the component, including their
     # descriptions, schemas and default values. Overridden in subclasses.
     _customization_arg_specs = []
@@ -81,7 +87,7 @@ class BaseRichTextComponent(object):
         """Gets a dict representing this component. Only the default values for
         customization args are provided.
         """
-        d = {
+        component_dict = {
             'backend_name': self.name,
             'customization_arg_specs': [{
                 'name': ca_spec.name,
@@ -95,11 +101,13 @@ class BaseRichTextComponent(object):
             'is_complex': self.is_complex,
             'requires_fs': self.requires_fs,
             'tooltip': self.tooltip,
+            'is_block': self.is_block,
         }
         preview_path = os.path.join(
             feconf.RTE_EXTENSIONS_DIR, self.id, '%sPreview.png' % self.id)
         if os.path.exists(preview_path):
-            d['preview_data_url'] = utils.convert_png_to_data_url(preview_path)
-        if hasattr(self, 'preview_url_to_interpolate'):
-            d['preview_url_to_interpolate'] = self.preview_url_to_interpolate
-        return d
+            component_dict['preview_url_template'] = \
+                utils.convert_png_to_data_url(preview_path)
+        elif hasattr(self, 'preview_url_template'):
+            component_dict['preview_url_template'] = self.preview_url_template
+        return component_dict

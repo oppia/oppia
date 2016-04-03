@@ -26,7 +26,8 @@ class Image(base.BaseRichTextComponent):
     frontend_name = 'image'
     tooltip = 'Insert image'
     requires_fs = True
-    preview_url_to_interpolate = '/imagehandler/<[explorationId]>/<[filepath]>'
+    preview_url_template = '/imagehandler/<[explorationId]>/<[filepath]>'
+    is_block = True
 
     _customization_arg_specs = [{
         'name': 'filepath',

@@ -561,10 +561,10 @@ oppia.factory('rteHelperService', [
           RTE_COMPONENT_SPECS[componentId].customization_arg_specs),
         name: RTE_COMPONENT_SPECS[componentId].frontend_name,
         iconDataUrl: RTE_COMPONENT_SPECS[componentId].icon_data_url,
-        previewDataUrl: RTE_COMPONENT_SPECS[componentId].preview_data_url,
-        previewUrlToInterpolate:
-          RTE_COMPONENT_SPECS[componentId].preview_url_to_interpolate,
+        previewUrlTemplate:
+          RTE_COMPONENT_SPECS[componentId].preview_url_template,
         isComplex: RTE_COMPONENT_SPECS[componentId].is_complex,
+        isBlock: RTE_COMPONENT_SPECS[componentId].is_block,
         requiresFs: RTE_COMPONENT_SPECS[componentId].requires_fs,
         tooltip: RTE_COMPONENT_SPECS[componentId].tooltip
       });
@@ -603,12 +603,10 @@ oppia.factory('rteHelperService', [
       // Returns a DOM node.
       createRteElement: function(componentDefn, customizationArgsDict) {
         var el = $('<img/>');
-        if (componentDefn.previewDataUrl) {
-          el.attr('src', componentDefn.previewDataUrl);
-        } else if (componentDefn.previewUrlToInterpolate) {
+        if (componentDefn.previewUrlTemplate) {
           el.attr('src',
             $interpolate(
-              componentDefn.previewUrlToInterpolate)(
+              componentDefn.previewUrlTemplate)(
                 angular.extend(customizationArgsDict,
                   {
                     explorationId: explorationContextService.getExplorationId()
@@ -618,7 +616,9 @@ oppia.factory('rteHelperService', [
           el.attr('src', componentDefn.iconDataUrl);
         }
         el.addClass('oppia-noninteractive-' + componentDefn.name);
-
+        if (componentDefn.isBlock) {
+          el.addClass('block-component');
+        }
         for (var attrName in customizationArgsDict) {
           el.attr(
             $filter('camelCaseToHyphens')(attrName) + '-with-value',
