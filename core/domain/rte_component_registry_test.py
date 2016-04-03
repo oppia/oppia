@@ -119,9 +119,10 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isdir(component_dir))
 
             # In this directory there should be a config .py file, an
-            # html file, a JS file, a .png file and a protractor.js file.
+            # html file, a JS file, an icon .png file and a protractor.js file,
+            # and an optional preview .png file.
             dir_contents = self._listdir_omit_ignored(component_dir)
-            self.assertLessEqual(len(dir_contents), 5)
+            self.assertLessEqual(len(dir_contents), 6)
 
             py_file = os.path.join(component_dir, '%s.py' % component_id)
             html_file = os.path.join(component_dir, '%s.html' % component_id)

@@ -81,7 +81,7 @@ class BaseRichTextComponent(object):
         """Gets a dict representing this component. Only the default values for
         customization args are provided.
         """
-        return {
+        d = {
             'backend_name': self.name,
             'customization_arg_specs': [{
                 'name': ca_spec.name,
@@ -96,3 +96,10 @@ class BaseRichTextComponent(object):
             'requires_fs': self.requires_fs,
             'tooltip': self.tooltip,
         }
+        preview_path = os.path.join(
+            feconf.RTE_EXTENSIONS_DIR, self.id, '%sPreview.png' % self.id)
+        if os.path.exists(preview_path):
+            d['preview_data_url'] = utils.convert_png_to_data_url(preview_path)
+        if hasattr(self, 'preview_url_to_interpolate'):
+            d['preview_url_to_interpolate'] = self.preview_url_to_interpolate
+        return d

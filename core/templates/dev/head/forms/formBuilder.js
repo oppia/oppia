@@ -548,8 +548,10 @@ oppia.filter('sanitizeHtmlForRte', ['$sanitize', function($sanitize) {
 }]);
 
 oppia.factory('rteHelperService', [
-  '$filter', '$log', 'RTE_COMPONENT_SPECS', 'oppiaHtmlEscaper',
-  function($filter, $log, RTE_COMPONENT_SPECS, oppiaHtmlEscaper) {
+  '$filter', '$log', '$interpolate', 'explorationContextService',
+  'RTE_COMPONENT_SPECS', 'oppiaHtmlEscaper',
+  function($filter, $log, $interpolate, explorationContextService,
+    RTE_COMPONENT_SPECS, oppiaHtmlEscaper) {
     var _RICH_TEXT_COMPONENTS = [];
 
     Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
@@ -559,6 +561,9 @@ oppia.factory('rteHelperService', [
           RTE_COMPONENT_SPECS[componentId].customization_arg_specs),
         name: RTE_COMPONENT_SPECS[componentId].frontend_name,
         iconDataUrl: RTE_COMPONENT_SPECS[componentId].icon_data_url,
+        previewDataUrl: RTE_COMPONENT_SPECS[componentId].preview_data_url,
+        previewUrlToInterpolate:
+          RTE_COMPONENT_SPECS[componentId].preview_url_to_interpolate,
         isComplex: RTE_COMPONENT_SPECS[componentId].is_complex,
         requiresFs: RTE_COMPONENT_SPECS[componentId].requires_fs,
         tooltip: RTE_COMPONENT_SPECS[componentId].tooltip
@@ -598,7 +603,20 @@ oppia.factory('rteHelperService', [
       // Returns a DOM node.
       createRteElement: function(componentDefn, customizationArgsDict) {
         var el = $('<img/>');
-        el.attr('src', componentDefn.iconDataUrl);
+        if (componentDefn.previewDataUrl) {
+          el.attr('src', componentDefn.previewDataUrl);
+        } else if (componentDefn.previewUrlToInterpolate) {
+          el.attr('src',
+            $interpolate(
+              componentDefn.previewUrlToInterpolate)(
+                angular.extend(customizationArgsDict,
+                  {
+                    explorationId: explorationContextService.getExplorationId()
+                  }
+                )));
+        } else {
+          el.attr('src', componentDefn.iconDataUrl);
+        }
         el.addClass('oppia-noninteractive-' + componentDefn.name);
 
         for (var attrName in customizationArgsDict) {
