@@ -104,7 +104,7 @@ oppia.directive('searchBar', [function() {
           _onSearchQueryChangeExec();
         };
 
-        $scope.unselectAll = function(itemsType) {
+        $scope.deselectAll = function(itemsType) {
           $scope.selectionDetails[itemsType].selections = {};
           _updateSelectionDetails(itemsType);
         };
