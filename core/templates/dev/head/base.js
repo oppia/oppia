@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Oppia's base controller.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.constant('CATEGORY_LIST', [
@@ -84,13 +82,15 @@ oppia.constant('MAX_NODE_LABEL_LENGTH', 15);
 // Global utility methods.
 oppia.controller('Base', [
   '$scope', '$http', '$rootScope', '$window', '$timeout', '$document', '$log',
-  'warningsData', 'LABEL_FOR_CLEARING_FOCUS', 'siteAnalyticsService',
+  'alertsService', 'LABEL_FOR_CLEARING_FOCUS', 'siteAnalyticsService',
+  'windowDimensionsService',
   function(
       $scope, $http, $rootScope, $window, $timeout, $document, $log,
-      warningsData, LABEL_FOR_CLEARING_FOCUS, siteAnalyticsService) {
+      alertsService, LABEL_FOR_CLEARING_FOCUS, siteAnalyticsService,
+      windowDimensionsService) {
     $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
 
-    $scope.warningsData = warningsData;
+    $scope.alertsService = alertsService;
     $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
 
     // If this is nonempty, the whole page goes into 'Loading...' mode.
@@ -210,6 +210,20 @@ oppia.controller('Base', [
       }, 150);
       return false;
     };
+
+    $scope.windowIsNarrow = windowDimensionsService.getWidth() <= 1171;
+
+    //  Method to check if the window size is narrow
+    $scope.recomputeWindowWidth = function() {
+      $scope.windowIsNarrow = windowDimensionsService.getWidth() <= 1171;
+      $scope.$apply();
+
+      // If the window is now wide, and the sidebar is still open, close it.
+      if (!$scope.windowIsNarrow) {
+        $scope.sidebarIsShown = false;
+      }
+    };
+    windowDimensionsService.registerOnResizeHook($scope.recomputeWindowWidth);
 
     $scope.pageHasLoaded = false;
     $scope.pendingSidebarClick = false;

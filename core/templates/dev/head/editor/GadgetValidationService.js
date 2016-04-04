@@ -14,14 +14,12 @@
 
 /**
  * @fileoverview Service for handling all gadget validation.
- *
- * @author vjoisar@google.com (Vishal Joisar)
  */
 oppia.factory('gadgetValidationService', [
-  '$filter', 'warningsData', 'validatorsService', 'editorContextService',
+  '$filter', 'alertsService', 'validatorsService', 'editorContextService',
   'GADGET_SPECS',
   function(
-      $filter, warningsData, validatorsService, editorContextService,
+      $filter, alertsService, validatorsService, editorContextService,
       GADGET_SPECS) {
     var AXIS_HORIZONTAL = 'horizontal';
     var AXIS_VERTICAL = 'vertical';
@@ -50,7 +48,7 @@ oppia.factory('gadgetValidationService', [
         if (VALID_AXIS_OPTIONS.indexOf(stackableAxis) == -1) {
           var warningText = 'Unrecognized axis: ' + stackableAxis + ' for ' +
             panel + ' panel.';
-          warningsData.addWarning(warningText);
+          alertsService.addWarning(warningText);
           return false;
         }
         for (var stateName in visibilityMap) {
@@ -61,7 +59,7 @@ oppia.factory('gadgetValidationService', [
               currentPanelSpec.max_gadgets + ', but ' +
               gadgetInstances.length + ' are visible in state ' + stateName +
               '.');
-            warningsData.addWarning(warningText);
+            alertsService.addWarning(warningText);
             return false;
           }
 
@@ -103,13 +101,13 @@ oppia.factory('gadgetValidationService', [
               'Size exceeded: ' + panel + ' panel width of ' +
               totalWidth + ' exceeds limit of ' + currentPanelSpec.width +
               '.');
-            warningsData.addWarning(warningText);
+            alertsService.addWarning(warningText);
             return false;
           } else if (currentPanelSpec.height < totalHeight) {
             var warningText = 'Size exceeded: ' + panel +
               ' panel height of ' + totalHeight + ' exceeds limit of ' +
               currentPanelSpec.height + '.';
-            warningsData.addWarning(warningText);
+            alertsService.addWarning(warningText);
             return false;
           }
         }
@@ -123,14 +121,14 @@ oppia.factory('gadgetValidationService', [
        */
       isValidGadgetName: function(input) {
         if (!validatorsService.isValidEntityName(input)) {
-          warningsData.addWarning(
+          alertsService.addWarning(
             'Gadget name is invalid. Please use a non-empty name consisting ' +
             'of alphanumeric characters, underscores, spaces and/or hyphens.');
           return false;
         }
 
         if (input.length > _MAX_GADGET_NAME_LENGTH) {
-          warningsData.addWarning(
+          alertsService.addWarning(
             'Gadget name should be at most 50 characters long.');
           return false;
         }
@@ -149,7 +147,7 @@ oppia.factory('gadgetValidationService', [
           gadgetType, customizationArgs, visibleInStates) {
         // It should be visible in at least one state.
         if (!visibleInStates.length) {
-          warningsData.addWarning('This gadget is not visible in any states.');
+          alertsService.addWarning('This gadget is not visible in any states.');
           return false;
         }
         return true;
@@ -187,7 +185,7 @@ oppia.factory('gadgetValidationService', [
               currentPanelSpec.max_gadgets + ' gadget' +
               (currentPanelSpec.max_gadgets > 1 ? 's' : '') +
               ' visible at a time.');
-            warningsData.addWarning(warningText);
+            alertsService.addWarning(warningText);
             return false;
           }
 

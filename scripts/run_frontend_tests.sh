@@ -20,6 +20,13 @@
 #
 # Run this script from the oppia root folder:
 #   bash scripts/run_frontend_tests.sh
+#
+# Optional arguments:
+#   --skip-install=true/false If true, skips installing dependencies. The
+#         default value is false.
+#   --run-minified-tests=true/false Whether to run frontend karma tests on both
+#         minified and non-minified code. The default value is false.
+#
 # The root folder MUST be named 'oppia'.
 # It runs unit tests for frontend JavaScript code (using Karma).
 
@@ -37,28 +44,9 @@ set -e
 source $(dirname $0)/setup.sh || exit 1
 source $(dirname $0)/setup_gae.sh || exit 1
 
-# Install third party dependencies
-# TODO(sll): Make this work with fewer third-party dependencies.
-bash scripts/install_third_party.sh
-
-# Ensure that generated JS and CSS files are in place before running the tests.
-echo ""
-echo "  Running build task with concatenation only "
-echo ""
-
-$NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js build
-
-echo ""
-echo "  Running build task with concatenation and minification"
-echo ""
-
-$NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js build --minify=True
-
-install_node_module karma 0.12.16
-install_node_module karma-jasmine 0.1.0
-install_node_module karma-coverage 0.5.2
-install_node_module karma-ng-html2js-preprocessor 0.1.0
-install_node_module karma-chrome-launcher 0.1.4
+export DEFAULT_SKIP_INSTALLING_THIRD_PARTY_LIBS=false
+export DEFAULT_RUN_MINIFIED_TESTS=false
+maybeInstallDependencies "$@"
 
 echo ""
 echo "  View interactive frontend test coverage reports by navigating to"
@@ -72,12 +60,14 @@ echo ""
 echo "  Running test in development environment"
 echo ""
 
-$NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.js
+$XVFB_PREFIX $NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.js
 
-echo ""
-echo "  Running test in production environment"
-echo ""
+if [ "$RUN_MINIFIED_TESTS" = "true" ]; then
+  echo ""
+  echo "  Running test in production environment"
+  echo ""
 
-$NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.js --minify=True
+  $XVFB_PREFIX $NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.js --minify=True
+fi
 
 echo Done!

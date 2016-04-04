@@ -67,6 +67,14 @@ MODERATOR_REQUEST_FORUM_URL = config_domain.ConfigProperty(
     'in the gallery',
     default_value=MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE)
 
+DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = config_domain.ConfigProperty(
+    'default_twitter_share_message_editor', {
+        'type': 'unicode',
+    },
+    'Default text for the Twitter share message for the editor',
+    default_value=(
+        'Check out this interactive lesson I created on Oppia - a free '
+        'platform for teaching and learning!'))
 
 def get_value_generators_js():
     """Return a string that concatenates the JS for all value generators."""
@@ -92,7 +100,7 @@ def _require_valid_version(version_from_payload, exploration_version):
 
 
 def require_editor(handler):
-    """Decorator that checks if the user can edit the given entity."""
+    """Decorator that checks if the user can edit the given exploration."""
     def test_editor(self, exploration_id, escaped_state_name=None, **kwargs):
         """Gets the user and exploration id if the user can edit it.
 
@@ -204,6 +212,10 @@ class ExplorationPage(EditorHandler):
             'GADGET_SPECS': gadget_registry.Registry.get_all_specs(),
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'PANEL_SPECS': feconf.PANELS_PROPERTIES,
+            'DEFAULT_OBJECT_VALUES': rule_domain.get_default_object_values(),
+            'SHARING_OPTIONS': base.SHARING_OPTIONS.value,
+            'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR': (
+                DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR.value),
             'additional_angular_modules': additional_angular_modules,
             'can_delete': rights_manager.Actor(
                 self.user_id).can_delete(

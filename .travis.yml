@@ -30,6 +30,18 @@ notifications:
     - wxy.xinyu@gmail.com
     on_success: change
     on_failure: change
+  irc:
+    channels:
+      - "chat.freenode.net#oppia"
+    on_success: never
+    on_failure: always
+  webhooks:
+    urls:
+      # This URL can be obtained by going to the Gitter chat room
+      # and clicking Settings > Integrations.
+      - https://webhooks.gitter.im/e/f8f782497ec1ffcea2e7
+    on_success: always
+    on_failure: always
 
 before_install:
 - pip install codecov
@@ -54,7 +66,7 @@ script:
 - if [ $RUN_LINT == 'true' ]; then bash scripts/install_third_party.sh; python scripts/pre_commit_linter.py --path=.; fi
 # Travis aborts test run if nothing is printed back to STDOUT for some time.
 # -x is used to avoid that.
-- if [ $RUN_FRONTEND_TESTS == 'true' ]; then bash -x scripts/run_frontend_tests.sh; fi
+- if [ $RUN_FRONTEND_TESTS == 'true' ]; then bash -x scripts/run_frontend_tests.sh --run-minified-tests=true; fi
 
 after_success:
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then codecov; fi

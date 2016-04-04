@@ -15,8 +15,6 @@
 /**
  * @fileoverview Utility services for explorations which may be shared by both
  * the learner and editor views.
- *
- * @author bhenning@google.com (Ben Henning)
  */
 
 // A service that provides a number of utility functions useful to both the

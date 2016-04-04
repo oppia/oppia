@@ -15,8 +15,6 @@
 /**
  * @fileoverview Controllers for the learner view breadcrumb section of the
  * navbar.
- *
- * @author sean@seanlip.org (Sean Lip)
  */
 
 oppia.controller('LearnerViewBreadcrumb', [
@@ -54,12 +52,10 @@ oppia.controller('LearnerViewBreadcrumb', [
           }
         },
         controller: [
-          '$scope', '$window', '$modalInstance', 'oppiaHtmlEscaper',
-          'ExplorationEmbedButtonService', 'oppiaDatetimeFormatter',
-          'RatingComputationService', 'expInfo', 'siteAnalyticsService',
-          function($scope, $window, $modalInstance, oppiaHtmlEscaper,
-                   ExplorationEmbedButtonService, oppiaDatetimeFormatter,
-                   RatingComputationService, expInfo, siteAnalyticsService) {
+          '$scope', '$window', '$modalInstance', 'oppiaDatetimeFormatter',
+          'RatingComputationService', 'expInfo',
+          function($scope, $window, $modalInstance, oppiaDatetimeFormatter,
+                   RatingComputationService, expInfo) {
             var getExplorationTagsSummary = function(arrayOfTags) {
               var tagsToShow = [];
               var tagsInTooltip = [];
@@ -87,13 +83,22 @@ oppia.controller('LearnerViewBreadcrumb', [
                 millisSinceEpoch);
             };
 
+            $scope.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = (
+              GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER);
             $scope.averageRating = (
               RatingComputationService.computeAverageRating(expInfo.ratings));
-            $scope.contributorNames = expInfo.contributor_names;
+            var contributorsSummary = (
+              expInfo.human_readable_contributors_summary || {});
+            $scope.contributorNames = Object.keys(contributorsSummary).sort(
+              function(contributorUsername1, contributorUsername2) {
+                var commitsOfContributor1 = contributorsSummary[
+                  contributorUsername1].num_commits;
+                var commitsOfContributor2 = contributorsSummary[
+                  contributorUsername2].num_commits;
+                return commitsOfContributor2 - commitsOfContributor1;
+              }
+            );
             $scope.explorationId = expInfo.id;
-            $scope.escapedTwitterText = (
-              oppiaHtmlEscaper.unescapedStrToEscapedStr(
-                GLOBALS.SHARING_OPTIONS_TWITTER_TEXT));
             $scope.explorationTags = getExplorationTagsSummary(expInfo.tags);
             $scope.explorationTitle = expInfo.title;
             $scope.infoCardBackgroundCss = {
@@ -104,17 +109,9 @@ oppia.controller('LearnerViewBreadcrumb', [
               expInfo.last_updated_msec);
             $scope.numViews = expInfo.num_views;
             $scope.objective = expInfo.objective;
-            $scope.serverName = (
-              $window.location.protocol + '//' + $window.location.host);
-            $scope.showEmbedExplorationModal = (
-              ExplorationEmbedButtonService.showModal);
 
             $scope.cancel = function() {
               $modalInstance.dismiss();
-            };
-
-            $scope.registerShareExplorationEvent = function(network) {
-              siteAnalyticsService.registerShareExplorationEvent(network);
             };
           }
         ]

@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Data and controllers for the user's notifications dashboard.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.controller('DashboardNotifications', [
@@ -24,6 +22,11 @@ oppia.controller('DashboardNotifications', [
   $scope.navigateToItem = function(activityId, notificationType) {
     window.location.href = '/create/' + activityId + (
       notificationType === 'feedback_thread' ? '#/feedback' : '');
+  };
+
+  $scope.navigateToProfile = function($event, username) {
+    $event.stopPropagation();
+    window.location.href = '/profile/' + username;
   };
 
   $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
