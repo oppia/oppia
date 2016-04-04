@@ -25,6 +25,7 @@
     GLOBALS.PANEL_SPECS = JSON.parse('{{PANEL_SPECS|js_string}}');
     GLOBALS.TAG_REGEX = JSON.parse('{{TAG_REGEX|js_string}}');
     GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = JSON.parse('{{SHOW_TRAINABLE_UNRESOLVED_ANSWERS|js_string}}');
+    GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = JSON.parse('{{DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR|js_string}}');
   </script>
 
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
@@ -234,6 +235,22 @@
 
 {% block content %}
   <div ng-controller="ExplorationEditor" ng-cloak>
+    <script type="text/ng-template" id="modals/shareExplorationAfterPublish">
+      <div class="modal-header">
+        <h3>Exploration Published</h3>
+      </div>
+
+      <div class="modal-body oppia-long-text">
+        <p>
+          Congratulations! Your exploration was successfully published.
+        </p>
+        <p>
+          <strong>Share your exploration via:</strong>
+        </p>
+        <sharing-links flex="100" layout-type="row" layout-align-type="center center" twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR"></sharing-links>
+      </div>
+    </script>
+
     <script type="text/ng-template" id="modals/publishExploration">
       <div class="modal-header">
         <h3>Publish Exploration</h3>
@@ -441,6 +458,7 @@
   {% include 'components/profile_link_text_directive.html' %}
   {% include 'components/response_header_directive.html' %}
   {% include 'components/rule_editor_directive.html' %}
+  {% include 'components/sharing_links_directive.html' %}
   {% include 'components/state_graph_viz_directive.html' %}
 
   {% include 'player/answer_feedback_pair_directive.html' %}
@@ -475,6 +493,7 @@
     {{ include_js_file('components/ResponseHeaderDirective.js') }}
     {{ include_js_file('components/RuleEditorDirective.js') }}
     {{ include_js_file('components/RuleTypeSelectorDirective.js') }}
+    {{ include_js_file('components/SharingLinksDirective.js') }}
     {{ include_js_file('components/StateGraphLayoutService.js') }}
     {{ include_js_file('components/StateGraphVizDirective.js') }}
     {{ include_js_file('components/ValueGeneratorEditorDirective.js') }}

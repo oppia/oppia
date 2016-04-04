@@ -56,6 +56,17 @@ oppia.factory('CollectionRightsBackendApiService', [
             _setCollectionStatus(
               collectionId, collectionVersion, true, resolve, reject);
           });
+        },
+
+        /**
+         * Updates a collection's rights to be have private learner access,
+         * given its ID and version.
+         */
+        setCollectionPrivate: function(collectionId, collectionVersion) {
+          return $q(function(resolve, reject) {
+            _setCollectionStatus(
+              collectionId, collectionVersion, false, resolve, reject);
+          });
         }
       };
     }]);
