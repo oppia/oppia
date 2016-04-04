@@ -439,6 +439,17 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       return explorationRightsService.isPublic();
     };
 
+    $scope.showCongratulatorySharingModal = function() {
+      $modal.open({
+        templateUrl: 'modals/shareExplorationAfterPublish',
+        backdrop: true,
+        controller: ['$scope', function($scope) {
+          $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
+            GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
+        }]
+      });
+    };
+
     $scope.showPublishExplorationModal = function() {
       $scope.publishModalIsOpening = true;
       alertsService.clearWarnings();
@@ -462,6 +473,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         });
         siteAnalyticsService.registerPublishExplorationEvent(
           explorationData.explorationId);
+        $scope.showCongratulatorySharingModal();
       });
 
       modalInstance.opened.then(function() {
