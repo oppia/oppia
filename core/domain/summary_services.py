@@ -124,10 +124,21 @@ def get_gallery_category_groupings(language_codes):
         if not summary_dicts:
             continue
 
+        for ind, exploration_summary in enumerate(summary_dicts):
+            if exploration_summary['status']=='publicized':
+                featured.append(exploration_summary)
+
         results.append({
             'header': gallery_group['header'],
             'categories': gallery_group['search_categories'],
             'activity_summary_dicts': summary_dicts,
         })
+
+    if featured:
+        results.insert(0, {
+            'header': 'Featured',
+            'categories': 'Featured',
+            'activity_summary_dicts': featured,
+        })     
 
     return results
