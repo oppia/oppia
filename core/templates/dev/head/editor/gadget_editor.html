@@ -21,10 +21,10 @@
               </span>
             </button>
             <i title="Edit Gadget (<[gadgetName]>)" ng-click="editGadget(gadgetName)"
-               class="material-icons oppia-gadget-edit-icon protractor-test-edit-<[gadgetName]>-gadget">&#xE254;
+               class="material-icons oppia-gadget-edit-icon md-18 protractor-test-edit-<[gadgetName]>-gadget">&#xE254;
             </i>
             <i title="Delete Gadget (<[gadgetName]>)" ng-click="deleteGadget(gadgetName)"
-               class="material-icons oppia-gadget-delete-icon protractor-test-delete-<[gadgetName]>-gadget-icon">&#xE14C;
+               class="material-icons oppia-gadget-delete-icon md-18 protractor-test-delete-<[gadgetName]>-gadget-icon">&#xE14C;
             </i>
           </div>
         </div>
@@ -48,7 +48,8 @@
         <[gadgetDict.gadget_type]>
         <span class="protractor-test-open-gadget-name-editor" ng-show="!SHOW_GADGET_NAME_EDITOR" ng-click="openGadgetNameEditor()">
           (<[gadgetDict.gadget_name]>)
-          <i class="material-icons" title="Edit Gadget Name">&#xE254;</i>
+          <i class="material-icons md-18" title="Edit Gadget Name" 
+             style="padding-bottom: 2px; vertical-align: middle;">&#xE254;</i>
         </span>
       </strong>
       <span ng-show="SHOW_GADGET_NAME_EDITOR" class="oppia-rename-gadget-form">
