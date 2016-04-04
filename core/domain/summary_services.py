@@ -113,6 +113,7 @@ def get_gallery_category_groupings(language_codes):
             '" OR "'.join(categories), language_codes_suffix)
 
     results = []
+    featured = []
     for gallery_group in _GALLERY_CATEGORY_GROUPINGS:
         # TODO(sll): Extend this to include collections.
         exp_ids = exp_services.search_explorations(
@@ -125,7 +126,7 @@ def get_gallery_category_groupings(language_codes):
             continue
 
         for ind, exploration_summary in enumerate(summary_dicts):
-            if exploration_summary['status']=='publicized':
+            if exploration_summary['status'] == 'publicized':
                 featured.append(exploration_summary)
 
         results.append({
