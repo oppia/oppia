@@ -4,9 +4,9 @@
     <div class="form-group">
       <div class="input-group" style="max-width: 300px; width: 300px;">
         <div class="input-group-addon oppia-splash-search-icon">
-          <span class="glyphicon"
-                ng-class="{'glyphicon-search': !searchIsLoading,
-                           'glyphicon-refresh oppia-animate-spin': searchIsLoading}">
+          <span class="glyphicon glyphicon-search" ng-if="!isSearchInProgress()"></span>
+          <span ng-if="isSearchInProgress()">
+            <span class="glyphicon glyphicon-refresh oppia-animate-spin"></span>
           </span>
         </div>
         <input type="text" class="form-control oppia-splash-search-input oppia-splash-search-text-input" placeholder="What are you curious about?" ng-model="searchQuery" ng-keyup="onSearchQueryChange($event)">
@@ -29,6 +29,9 @@
           <[item.text]>
           <span ng-if="selectionDetails.categories.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
         </a>
+      </li>
+      <li ng-if="selectionDetails.categories.numSelections > 1">
+        <a href ng-click="deselectAll('categories')"><i>Deselect All</i></a>
       </li>
       <hr ng-if="selectionDetails.categories.numSelections > 0" style="margin: 2px;">
       <li ng-repeat="item in selectionDetails.categories.masterList track by $index"
@@ -58,6 +61,9 @@
           <[item.text]>
           <span ng-if="selectionDetails.languageCodes.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
         </a>
+      </li>
+      <li ng-if="selectionDetails.languageCodes.numSelections > 1">
+        <a href ng-click="deselectAll('languageCodes')"><i>Deselect All</i></a>
       </li>
       <hr ng-if="selectionDetails.languageCodes.numSelections > 0" style="margin: 2px;">
       <li ng-repeat="item in selectionDetails.languageCodes.masterList track by $index"
