@@ -89,7 +89,6 @@
     <md-card class="oppia-profile-content-card">
       <strong>Portfolio</strong>
       <md-content class="oppia-profile-portfolio-container">
-        <div class="oppia-profile-explorations-container-large-screen">
           <exploration-summary-tile ng-repeat="expl in getExplorationsToDisplay()"
             exploration-id="expl.id"
             exploration-title="expl.title"
@@ -99,22 +98,9 @@
             ratings="expl.ratings"
             thumbnail-icon-url="expl.thumbnail_icon_url"
             thumbnail-bg-color="expl.thumbnail_bg_color"
-            num-views="expl.num_views">
+            num-views="expl.num_views"
+            mobile-cutoff-px="610">
           </exploration-summary-tile>
-        </div>
-        <div class="oppia-profile-explorations-container-small-screen">
-          <exploration-summary-tile-mobile ng-repeat="expl in getExplorationsToDisplay()"
-            exploration-id="expl.id"
-            exploration-title="expl.title"
-            last-updated-msec="expl.last_updated_msec"
-            objective="expl.objective"
-            category="expl.category"
-            ratings="expl.ratings"
-            thumbnail-icon-url="expl.thumbnail_icon_url"
-            thumbnail-bg-color="expl.thumbnail_bg_color"
-            num-views="expl.num_views">
-          </exploration-summary-tile-mobile>
-        </div>
 
         <div ng-if="userEditedExplorations.length === 0">
           <em></br>This user hasn't created or edited any explorations yet.</em>
@@ -126,7 +112,7 @@
           Previous
         </button>
         Showing <[startingExplorationNumber]> - <[endingExplorationNumber]> of <[numUserPortfolioExplorations]>
-        <button ng-disabled="(currentPageNumber + 1) * pageSize >= userEditedExplorations.length" ng-click="goToNextPage();">
+        <button ng-disabled="(currentPageNumber + 1) * PAGE_SIZE >= userEditedExplorations.length" ng-click="goToNextPage();">
           Next
         </button>
       </span>

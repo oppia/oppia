@@ -34,7 +34,8 @@ oppia.directive('explorationSummaryTile', [function() {
       // If this is not null, the new exploration opens in a new window when
       // the summary tile is clicked.
       openInNewWindow: '@openInNewWindow',
-      isCommunityOwned: '&isCommunityOwned'
+      isCommunityOwned: '&isCommunityOwned',
+      mobileCutoffPx: '@mobileCutoffPx'
     },
     templateUrl: 'summaryTile/exploration',
     link: function(scope, element) {
@@ -66,9 +67,11 @@ oppia.directive('explorationSummaryTile', [function() {
     controller: [
       '$scope', '$http',
       'oppiaDatetimeFormatter', 'RatingComputationService',
+      'windowDimensionsService',
       function(
         $scope, $http,
-        oppiaDatetimeFormatter, RatingComputationService) {
+        oppiaDatetimeFormatter, RatingComputationService,
+        windowDimensionsService) {
         var contributorsSummary = $scope.getContributorsSummary() || {};
         $scope.contributors = Object.keys(
           contributorsSummary).sort(
@@ -134,6 +137,15 @@ oppia.directive('explorationSummaryTile', [function() {
           }
           return result;
         };
+
+        $scope.isWindowLarge = (
+          windowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
+        $scope.recomputeWindowWidth = function() {
+          $scope.isWindowLarge = (
+            windowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
+          $scope.$apply();
+        };
+        windowDimensionsService.registerOnResizeHook($scope.recomputeWindowWidth);
       }
     ]
   };

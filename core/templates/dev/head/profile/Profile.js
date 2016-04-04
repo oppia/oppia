@@ -19,8 +19,8 @@
  */
 
 oppia.controller('Profile', [
-  '$scope', '$filter', '$http', '$rootScope', 'oppiaDatetimeFormatter',
-  function($scope, $filter, $http, $rootScope, oppiaDatetimeFormatter) {
+  '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
+  function($scope, $http, $rootScope, oppiaDatetimeFormatter) {
     var profileDataUrl = '/profilehandler/data/' + GLOBALS.PROFILE_USERNAME;
     var DEFAULT_PROFILE_PICTURE_URL = '/images/general/no_profile_picture.png';
 
@@ -69,21 +69,9 @@ oppia.controller('Profile', [
       });
 
       $scope.currentPageNumber = 0;
-      $scope.pageSize = 6;
+      $scope.PAGE_SIZE = 6;
       $scope.startingExplorationNumber = 1;
       $scope.endingExplorationNumber = 6;
-      $scope.updateDisplayedExplorationNumbers = function() {
-        var startingNumber = $scope.currentPageNumber * $scope.pageSize + 1;
-        $scope.startingExplorationNumber = startingNumber;
-        if ($scope.userEditedExplorations.length > (
-            $scope.currentPageNumber + 1) * $scope.pageSize) {
-          var endingNumber = $scope.currentPageNumber * $scope.pageSize + 6;
-          $scope.endingExplorationNumber = endingNumber;
-        } else {
-          var endingNumber = $scope.userEditedExplorations.length;
-          $scope.endingExplorationNumber = endingNumber;
-        }
-      };
 
       $scope.goToPreviousPage = function() {
         if ($scope.currentPageNumber === 0) {
@@ -94,7 +82,7 @@ oppia.controller('Profile', [
         }
       };
       $scope.goToNextPage = function() {
-        if ($scope.currentPageNumber * $scope.pageSize >= (
+        if ($scope.currentPageNumber * $scope.PAGE_SIZE >= (
             data.edited_exp_summary_dicts.length)) {
           console.log('Error: Cannot increment page');
         } else {
@@ -105,10 +93,13 @@ oppia.controller('Profile', [
 
       $scope.getExplorationsToDisplay = function() {
         $scope.explorationsOnPage = [];
+        if ($scope.userEditedExplorations.length === 0) {
+          return $scope.explorationsOnPage;
+        }
         $scope.explorationIndexStart = (
-          $scope.currentPageNumber * $scope.pageSize);
+          $scope.currentPageNumber * $scope.PAGE_SIZE);
         $scope.explorationIndexEnd = (
-          $scope.explorationIndexStart + $scope.pageSize - 1);
+          $scope.explorationIndexStart + $scope.PAGE_SIZE - 1);
         for (var ind = $scope.explorationIndexStart;
             ind <= $scope.explorationIndexEnd; ind++) {
           $scope.explorationsOnPage.push($scope.userEditedExplorations[ind]);
