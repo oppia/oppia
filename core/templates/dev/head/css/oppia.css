@@ -2959,7 +2959,8 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .about-content {
   width: 60%;
-  margin: 0 auto 3% auto;
+  padding: 0;
+  /* margin: 0 auto 3% auto; */
 }
 
 .about-extra-container {
@@ -3079,10 +3080,6 @@ md-card.preview-conversation-skin-supplemental-card {
   background-color: #0d8885;
 }
 
-.about-active-tab a {
-  color: #ff900d;
-}
-
 .about-tab-content {
   display: none;
 }
@@ -3099,22 +3096,15 @@ strong {
 }
 
 .inline-links {
-  color: #ff900d;
   text-decoration: none;
 }
 
 .about-content h2 {
   text-align: center;
-  color: #ff900d;
 }
 
 .otter-content h3 {
   text-align: center;
-}
-
-.about-content p {
-  line-height: 1.5em;
-  margin: 5% 0;
 }
 
 .about-tab-links {
@@ -3127,7 +3117,10 @@ strong {
   display: inline-block;
   cursor: pointer;
   width: calc(100% / 3);
-  box-shadow: 3px -1px 4px #e7e7e7;
+  background-color: #009688;
+  border: 1px solid rgba(0,0,0,0.1);
+  padding: 10px;
+  margin-bottom: 0;
 }
 
 .about-page-otter {
@@ -3146,23 +3139,24 @@ strong {
 }
 
 .about-tab-links li a {
-  display: block;
-  padding: 10px;
+  color: #fff;
   text-decoration: none;
 }
 
 .about-page-buttons {
-  background-color: #ff900d;
+  background-color: rgba(5,190,178,0.9);
   text-decoration: none;
-  text-align: center;
-  display: block;
-  margin: 0 auto;
+  font-size: 16px;
+  margin: 0 15px;
   width: 40%;
   cursor: pointer;
   padding: 15px;
-  box-shadow: 0 3px 0 #e58314;
-  border: transparent;
-  color: #fff;
+  color: rgba(255,255,255,0.9);
+}
+
+.about-page-buttons:hover {
+  background-color: rgba(5,190,187,1);
+  color: rgba(255,255,255,1);
 }
 
 .otter-button-container {
@@ -3179,7 +3173,6 @@ strong {
 }
 
 .letter-groups span {
-  color: #ff900d;
   font-size: 1.8em;
 }
 
@@ -3189,7 +3182,6 @@ strong {
 
 .letter-groups ul li {
   list-style-type: none;
-  line-height: 1.5em;
 }
 
 /*
