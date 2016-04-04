@@ -125,7 +125,7 @@ def get_gallery_category_groupings(language_codes):
         if not summary_dicts:
             continue
 
-        for ind, exploration_summary in enumerate(summary_dicts):
+        for exploration_summary in summary_dicts:
             if exploration_summary['status'] == 'publicized':
                 featured.append(exploration_summary)
 
