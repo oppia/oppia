@@ -145,7 +145,8 @@ oppia.directive('explorationSummaryTile', [function() {
             windowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
           $scope.$apply();
         };
-        windowDimensionsService.registerOnResizeHook($scope.recomputeWindowWidth);
+        windowDimensionsService.registerOnResizeHook(
+          $scope.recomputeWindowWidth);
       }
     ]
   };
