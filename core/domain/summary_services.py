@@ -140,6 +140,6 @@ def get_gallery_category_groupings(language_codes):
             'header': 'Featured',
             'categories': 'Featured',
             'activity_summary_dicts': featured,
-        })     
+        })
 
     return results
