@@ -31,7 +31,6 @@ export PYTHONPATH=.:$COVERAGE_HOME:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HO
 # Delete old *.pyc files
 find . -iname "*.pyc" -exec rm -f {} \;
 
-# Moved from install .travis.yml.
 echo Checking whether Google App Engine is installed in $GOOGLE_APP_ENGINE_HOME
 if [ ! -d "$GOOGLE_APP_ENGINE_HOME" ]; then
   echo "Downloading Google App Engine (this may take a little while)..."

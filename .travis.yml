@@ -73,7 +73,6 @@ cache:
     - ../node_modules/
     - ../oppia_tools/
     - third_party/
-    - core/templates/prod/
 
 before_cache:
   # Delete python bytecode to prevent cache rebuild.
