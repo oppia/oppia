@@ -102,7 +102,7 @@ class DefaultGalleryCategoriesHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         language_codes = self.request.get('language_codes', [])
-        activity_summary_dicts_by_category = (
+        summary_dicts_by_category = (
             summary_services.get_gallery_category_groupings(language_codes))
 
         preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
@@ -112,7 +112,7 @@ class DefaultGalleryCategoriesHandler(base.BaseHandler):
 
         self.values.update({
             'activity_summary_dicts_by_category': (
-                activity_summary_dicts_by_category),
+                summary_dicts_by_category),
             'preferred_language_codes': preferred_language_codes,
         })
         self.render_json(self.values)
