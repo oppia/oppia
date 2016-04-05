@@ -14,6 +14,7 @@
     GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
     GLOBALS.isPublic = JSON.parse('{{is_public|js_string}}');
     GLOBALS.canEdit = JSON.parse('{{can_edit|js_string}}');
+    GLOBALS.canUnpublish = JSON.parse('{{can_unpublish|js_string}}');
   </script>
 
   <style>
@@ -99,6 +100,7 @@
       <br>
       <input ng-model="commitMessage" type="text" placeholder="Commit Message"><button ng-click="saveCollection(commitMessage)">Save Collection</button>
       <button ng-click="publishCollection()" ng-if="!isPublic">Publish Collection</button>
+      <button ng-click="unpublishCollection()" ng-if="isPublic && canUnpublish">Unpublish Collection</button>
     </div>
   </div>
 

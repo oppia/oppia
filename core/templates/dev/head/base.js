@@ -211,12 +211,17 @@ oppia.controller('Base', [
       return false;
     };
 
-    $scope.isWindowNarrow = windowDimensionsService.getWidth() <= 1171;
+    $scope.windowIsNarrow = windowDimensionsService.getWidth() <= 1171;
 
     //  Method to check if the window size is narrow
     $scope.recomputeWindowWidth = function() {
-      $scope.isWindowNarrow = windowDimensionsService.getWidth() <= 1171;
+      $scope.windowIsNarrow = windowDimensionsService.getWidth() <= 1171;
       $scope.$apply();
+
+      // If the window is now wide, and the sidebar is still open, close it.
+      if (!$scope.windowIsNarrow) {
+        $scope.sidebarIsShown = false;
+      }
     };
     windowDimensionsService.registerOnResizeHook($scope.recomputeWindowWidth);
 
