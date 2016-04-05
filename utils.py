@@ -234,7 +234,7 @@ def convert_png_binary_to_data_url(content):
         return 'data:image/png;base64,%s' % urllib.quote(
             content.encode('base64'))
     else:
-        raise Exception('Given string is not a png image.')
+        raise Exception('The given string does not represent a PNG image.')
 
 
 def convert_png_to_data_url(filepath):

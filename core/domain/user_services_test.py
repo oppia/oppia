@@ -14,8 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import logging
+from contextlib import nested
+import os
 
 from core.domain import collection_services
 from core.domain import exp_services
@@ -24,6 +25,7 @@ from core.domain import user_services
 from core.tests import test_utils
 import feconf
 import utils
+
 from google.appengine.api import urlfetch
 
 class UserServicesUnitTests(test_utils.GenericTestBase):
@@ -137,42 +139,41 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_fetch_gravatar_success(self):
         user_email = 'user@example.com'
-        self.enable_urlfetch_mock()
         gravatar_filepath = os.path.join(
             'static', 'images', 'avatar', 'gravatar_example.png')
-        gravatar = open(gravatar_filepath).read()
-        self.set_urlfetch_return_values(content=gravatar)
-        profile_picture = user_services.fetch_gravatar(user_email)
-        gravatar_data_url = utils.convert_png_to_data_url(gravatar_filepath)
-        self.assertEqual(profile_picture, gravatar_data_url)
-        self.disable_urlfetch_mock()
+        with open(gravatar_filepath, 'r') as f:
+            gravatar = f.read()
+        with self.urlfetch_mock(content=gravatar):
+            profile_picture = user_services.fetch_gravatar(user_email)
+            gravatar_data_url = utils.convert_png_to_data_url(gravatar_filepath)
+            self.assertEqual(profile_picture, gravatar_data_url)
 
     def test_fetch_gravatar_failure_404(self):
         user_email = 'user@example.com'
-        self.enable_urlfetch_mock()
         logging_error_mock = test_utils.CallCounter(lambda x: x)
         urlfetch_counter = test_utils.CallCounter(urlfetch.fetch)
-        with self.swap(urlfetch, 'fetch', urlfetch_counter), \
-            self.swap(logging, 'error', logging_error_mock):
-            self.set_urlfetch_return_values(status_code=404)
-            user_services.fetch_gravatar(user_email)
+        with nested(
+            self.urlfetch_mock(status_code=404),
+            self.swap(logging, 'error', logging_error_mock),
+            self.swap(urlfetch, 'fetch', urlfetch_counter)):
+            profile_picture = user_services.fetch_gravatar(user_email)
             self.assertEqual(urlfetch_counter.times_called, 1)
             self.assertEqual(logging_error_mock.times_called, 1)
-        self.disable_urlfetch_mock()
+            self.assertEqual(
+                profile_picture, user_services.DEFAULT_IDENTICON_DATA_URL)
 
     def test_fetch_gravatar_failure_exception(self):
         user_email = 'user@example.com'
-        self.enable_urlfetch_mock()
         logging_error_mock = test_utils.CallCounter(lambda x: x)
         urlfetch_fail_mock = test_utils.FailingFunction(
             urlfetch.fetch, urlfetch.InvalidURLError, 'infinity')
-        with self.swap(logging, 'error', logging_error_mock), \
-            self.swap(urlfetch, 'fetch', urlfetch_fail_mock):
+        with nested(
+            self.swap(logging, 'error', logging_error_mock),
+            self.swap(urlfetch, 'fetch', urlfetch_fail_mock)):
             profile_picture = user_services.fetch_gravatar(user_email)
             self.assertEqual(logging_error_mock.times_called, 1)
             self.assertEqual(
                 profile_picture, user_services.DEFAULT_IDENTICON_DATA_URL)
-        self.disable_urlfetch_mock()
 
     def test_default_identicon_data_url(self):
         identicon_filepath = os.path.join(

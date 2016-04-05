@@ -83,9 +83,6 @@ class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
             new_header = response.add_header()
             new_header.set_key(header_key)
             new_header.set_value(header_value)
-        response.set_finalurl(return_values.get('final_url', request.url()))
-        response.set_contentwastruncated(
-            return_values.get('content_was_truncated', False))
 
         self.request = request
         self.response = response
@@ -281,20 +278,21 @@ class TestBase(unittest.TestCase):
     def signup(self, email, username):
         """Complete the signup process for the user with the given username."""
         self.login(email)
-
-        self.enable_urlfetch_mock()
-        response = self.testapp.get(feconf.SIGNUP_URL)
-        self.assertEqual(response.status_int, 200)
-        csrf_token = self.get_csrf_token_from_response(response)
-        response = self.testapp.post(feconf.SIGNUP_DATA_URL, {
-            'csrf_token': csrf_token,
-            'payload': json.dumps({
-                'username': username,
-                'agreed_to_terms': True
+        # Signup uses a custom urlfetch mock (URLFetchServiceMock), instead
+        # of the stub provided by testbed. This custom mock is disabled
+        # immediately once the signup is complete.
+        with self.urlfetch_mock():
+            response = self.testapp.get(feconf.SIGNUP_URL)
+            self.assertEqual(response.status_int, 200)
+            csrf_token = self.get_csrf_token_from_response(response)
+            response = self.testapp.post(feconf.SIGNUP_DATA_URL, {
+                'csrf_token': csrf_token,
+                'payload': json.dumps({
+                    'username': username,
+                    'agreed_to_terms': True
+                })
             })
-        })
-        self.assertEqual(response.status_int, 200)
-        self.disable_urlfetch_mock()
+            self.assertEqual(response.status_int, 200)
         self.logout()
 
     def set_config_property(self, config_obj, new_config_value):
@@ -575,8 +573,6 @@ class AppEngineTestBase(TestBase):
         self.testbed.init_blobstore_stub()
         self.testbed.init_search_stub()
 
-        self._urlfetch_mock = None
-
         # The root path tells the testbed where to find the queue.yaml file.
         self.testbed.init_taskqueue_stub(root_path=os.getcwd())
         self.taskqueue_stub = self.testbed.get_stub(
@@ -598,27 +594,36 @@ class AppEngineTestBase(TestBase):
     def _get_all_queue_names(self):
         return [q['name'] for q in self.taskqueue_stub.GetQueues()]
 
-    def enable_urlfetch_mock(self):
-        #pylint: disable=protected-access
-        if 'urlfetch' in apiproxy_stub_map.apiproxy._APIProxyStubMap__stub_map:
-            del apiproxy_stub_map.apiproxy\
-                    ._APIProxyStubMap__stub_map['urlfetch']
+    @contextlib.contextmanager
+    def urlfetch_mock(
+            self, content='', status_code=200, headers=None):
+        """Enables the custom urlfetch mock (URLFetchServiceMock) within the
+        context of a 'with' statement.
+
+        This mock is currently used for signup to prevent external HTTP
+        requests to fetch the Gravatar profile picture for new users.
+
+        args:
+          - content: Response content or body.
+          - status_code: Response status code.
+          - headers: Response headers.
+        """
+        if not headers:
+            response_headers = {}
+        else:
+            response_headers = headers
+        self.testbed.init_urlfetch_stub(enable=False)
         urlfetch_mock = URLFetchServiceMock()
         apiproxy_stub_map.apiproxy.RegisterStub('urlfetch', urlfetch_mock)
-        self._urlfetch_mock = urlfetch_mock
-        #pylint: enable=protected-access
-
-    def disable_urlfetch_mock(self):
-        #pylint: disable=protected-access
-        if 'urlfetch' in apiproxy_stub_map.apiproxy._APIProxyStubMap__stub_map:
-            del apiproxy_stub_map.apiproxy\
-                    ._APIProxyStubMap__stub_map['urlfetch']
-        self._urlfetch_mock = None
-        self.testbed.init_urlfetch_stub()
-        #pylint: enable=protected-access
-
-    def set_urlfetch_return_values(self, **kwargs):
-        self._urlfetch_mock.set_return_values(**kwargs)
+        urlfetch_mock.set_return_values(
+            content=content, status_code=status_code, headers=response_headers)
+        try:
+            yield
+        finally:
+            # Disables the custom mock
+            self.testbed.init_urlfetch_stub(enable=False)
+            # Enables the testbed urlfetch mock
+            self.testbed.init_urlfetch_stub()
 
     def count_jobs_in_taskqueue(self, queue_name=None):
         """Counts the jobs in the given queue. If queue_name is None,
