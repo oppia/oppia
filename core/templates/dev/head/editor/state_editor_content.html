@@ -2,7 +2,9 @@
   <div ng-if="contentMemento === null" class="protractor-test-edit-content"
        ng-click="openStateContentEditor()"
        ng-class="{'oppia-editable-section': editabilityService.isEditable()}">
-    <span ng-if="editabilityService.isEditable()" class="glyphicon glyphicon-pencil oppia-editor-edit-icon" title="Edit Card Content">
+    <i ng-if="editabilityService.isEditable()" class="material-icons oppia-editor-edit-icon" 
+       title="Edit Card Content">&#xE254;
+    </i>
     </span>
     <div class="oppia-state-content-display oppia-transition-200" ng-class="{'oppia-prevent-selection': editabilityService.isEditable()}" title="Card Content">
       <span ng-show="content[0].value == '' && isCurrentStateInitialState()" class="oppia-placeholder">

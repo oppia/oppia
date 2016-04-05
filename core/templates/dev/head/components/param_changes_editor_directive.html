@@ -45,7 +45,7 @@
 
     <div ng-if="warningText" class="oppia-serious-warning-text"
          style="margin-top: 20px; margin-bottom: 20px;">
-      <span class="glyphicon glyphicon-warning-sign"></span>
+      <i class="material-icons">&#xE002;</i>
       <[warningText]>
     </div>
 
@@ -59,10 +59,9 @@
 
   <div ng-if="!isParamChangesEditorOpen" ng-click="openParamChangesEditor()"
        ng-class="{'oppia-editable-section': editabilityService.isEditable()}">
-    <span ng-if="editabilityService.isEditable()"
-          class="glyphicon glyphicon-pencil oppia-editor-edit-icon"
-          title="Edit Card Parameter Changes">
-    </span>
+    <i ng-if="editabilityService.isEditable()" class="material-icons oppia-editor-edit-icon"
+       title="Edit Card Parameter Changes">&#xE254;
+    </i>
     <div class="oppia-param-changes-display oppia-transition-200"
          ng-class="{'oppia-prevent-selection': editabilityService.isEditable()}"
          title="Card Parameter Changes" style="opacity: 0.7;">

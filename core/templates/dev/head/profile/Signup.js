@@ -18,10 +18,10 @@
 
 oppia.controller('Signup', [
   '$scope', '$http', '$rootScope', '$modal', 'alertsService', 'urlService',
-  'focusService',
+  'focusService', 'siteAnalyticsService',
   function(
       $scope, $http, $rootScope, $modal, alertsService, urlService,
-      focusService) {
+      focusService, siteAnalyticsService) {
     var _SIGNUP_DATA_URL = '/signuphandler/data';
     $rootScope.loadingMessage = 'Loading';
     $scope.warningText = '';
@@ -144,6 +144,8 @@ oppia.controller('Signup', [
             'Invalid value for email preferences: ' + canReceiveEmailUpdates);
         }
       }
+
+      siteAnalyticsService.registerNewSignupEvent();
 
       $scope.submissionInProcess = true;
       $http.post(_SIGNUP_DATA_URL, requestParams).success(function() {
