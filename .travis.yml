@@ -54,11 +54,6 @@ install:
 - pushd $TRAVIS_BUILD_DIR
 - source scripts/setup.sh || exit 1
 - source scripts/setup_gae.sh || exit 1
-- mkdir -p $GOOGLE_APP_ENGINE_HOME
-- curl --silent https://storage.googleapis.com/appengine-sdks/deprecated/1919/google_appengine_1.9.19.zip
-  -o gae-download.zip
-- unzip -qq gae-download.zip -d $TOOLS_DIR/google_appengine_1.9.19/
-- rm gae-download.zip
 
 script:
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report; fi
@@ -71,3 +66,15 @@ script:
 after_success:
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then codecov; fi
 - if [ $RUN_FRONTEND_TESTS == 'true' ]; then codecov --file ../karma_coverage_reports/coverage-final.json; fi
+
+cache:
+  # Cache Oppia's dependencies.
+  directories:
+    - ../node_modules/
+    - ../oppia_tools/
+    - third_party/
+    - core/templates/prod/
+
+before_cache:
+  # Delete python bytecode to prevent cache rebuild.
+  - find third_party -name "*.pyc" -print -delete
