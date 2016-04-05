@@ -224,7 +224,7 @@ oppia.controller('ExplorationEditor', [
         'Text/Number input' +
         '</li>' +
         '<li>' +
-        'Write a code snippet' +
+        'Code snippets' +
         '</li>' +
         '</ul>' +
         'and more.')
@@ -294,9 +294,9 @@ oppia.controller('ExplorationEditor', [
       placement: 'bottom'
     }, {
       type: 'title',
-      heading: 'Exploration Complete',
+      heading: 'Tutorial Complete',
       text: (
-        '<h1>Now for the fun part...</h1>' +
+        '<h2>Now for the fun part...</h2>' +
         'That\'s the end of the tour! ' +
         'To finish up, here are some things we suggest: ' +
         '<ul>' +
@@ -342,8 +342,6 @@ oppia.controller('ExplorationEditor', [
     };
 
     $scope.showWelcomeExplorationModal = function() {
-      $scope.welcomeModalIsOpening = true;
-      var startTutorial = $scope.startTutorial;
       var modalInstance = $modal.open({
         templateUrl: 'modals/welcomeExploration',
         backdrop: true,
@@ -354,20 +352,15 @@ oppia.controller('ExplorationEditor', [
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
             };
-          }],
+          }
+        ],
         windowClass: 'oppia-welcome-modal'
       });
 
       modalInstance.result.then(function() {
-      // Called after $modal.close()
-      startTutorial();
-    }, function() {
-      // Called after $modalInstance.dismiss
-      stateEditorTutorialFirstTimeService.markTutorialFinished();
-    });
-
-      modalInstance.opened.then(function() {
-        $scope.welcomeModalIsOpening = false;
+        $scope.startTutorial();
+      }, function() {
+        stateEditorTutorialFirstTimeService.markTutorialFinished();
       });
     };
 
@@ -375,8 +368,8 @@ oppia.controller('ExplorationEditor', [
       $rootScope.$broadcast('openEditorTutorialFirstTime');
     };
 
-    $scope.$on('openEditorTutorialFirstTime',
-    $scope.showWelcomeExplorationModal);
+    $scope.$on(
+      'enterEditorForTheFirstTime', $scope.showWelcomeExplorationModal);
     $scope.$on('openEditorTutorial', $scope.startTutorial);
   }
 ]);
@@ -392,8 +385,6 @@ oppia.controller('EditorNavigation', [
 
     $scope.$on('openPostTutorialHelpPopover', function() {
       $scope.postTutorialHelpPopoverIsShown = true;
-      // Without this, the popover does not trigger.
-      $scope.$apply();
       $timeout(function() {
         $scope.postTutorialHelpPopoverIsShown = false;
       }, 5000);
