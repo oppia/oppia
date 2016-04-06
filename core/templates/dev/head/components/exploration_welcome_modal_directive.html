@@ -1,0 +1,61 @@
+<script type="text/ng-template" id="modals/welcomeExploration">
+  <div class="modal-body oppia-long-text">
+    <h1>Welcome!</h1>
+    <p>
+      Looks like you're new to creating explorations.
+    </p>
+    <p>
+      Would you like an introduction to creating in Oppia?
+    </p>
+    <a class="oppia-welcome-dismiss" ng-click="cancel()">No, take me to the editor.</a>
+    <button class="btn btn-success oppia-welcome-start" ng-click="beginTutorial()">Yes, please!</button>
+  </div>
+</script>
+<style>
+  /* Editor Tutorial Welcome Modal */
+
+  .oppia-welcome-modal .modal-body,
+  .oppia-welcome-modal .oppia-long-text p {
+    text-align: center;
+  }
+
+  .oppia-welcome-modal .modal-body {
+    width: 70%;
+    height: 100%;
+    top: 20%;
+    margin: 0 auto;
+    }
+
+  .oppia-welcome-modal .modal-content {
+    border-radius: 0;
+    height: 100%;
+  }
+
+  .oppia-welcome-modal .modal-dialog {
+    width: 70%;
+    height: 70%;
+    padding: 0;
+    max-height: calc(100% - 100px);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) !important;
+  }
+
+
+  .oppia-welcome-dismiss {
+    margin-right: 3em;
+    text-align: center;
+  }
+
+  @media (max-width: 750px) {
+    .oppia-welcome-modal .modal-body {
+      top: 10%;
+    }
+    .oppia-welcome-dismiss {
+      display: block;
+      margin-right: 0;
+      margin-bottom: 1em;
+    }
+  }
+</style>
