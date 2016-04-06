@@ -55,7 +55,8 @@ describe('Collection update service', function() {
   it('should add/remove a new collection node to/from a collection',
       function() {
     expect(_sampleCollection.getExplorationIds()).toEqual(['exp_id0']);
-    CollectionUpdateService.addCollectionNode(_sampleCollection, 'exp_id1');
+    CollectionUpdateService.addCollectionNode(
+      _sampleCollection, 'exp_id1', undefined);
     expect(_sampleCollection.getExplorationIds()).toEqual([
       'exp_id0', 'exp_id1'
     ]);
@@ -66,7 +67,8 @@ describe('Collection update service', function() {
 
   it('should create a proper backend change dict for adding collection nodes',
       function() {
-    CollectionUpdateService.addCollectionNode(_sampleCollection, 'exp_id1');
+    CollectionUpdateService.addCollectionNode(
+      _sampleCollection, 'exp_id1', undefined);
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'add_collection_node',
       exploration_id: 'exp_id1'

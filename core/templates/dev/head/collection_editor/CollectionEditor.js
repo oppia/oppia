@@ -26,35 +26,32 @@ oppia.constant(
   'COLLECTION_RIGHTS_URL_TEMPLATE',
   '/collection_editor_handler/rights/<collection_id>');
 oppia.constant(
-  'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
-  '/explorationsummarieshandler/data?' +
-  'stringified_exp_ids=<stringified_exp_ids>&' +
-  'include_private_explorations=<include_private_explorations>');
+  'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', '/explorationsummarieshandler/data');
 
 oppia.controller('CollectionEditor', ['$scope',
   'WritableCollectionBackendApiService', 'CollectionRightsBackendApiService',
-  'ExplorationSummaryBackendApiService', 'CollectionObjectFactory',
-  'SkillListObjectFactory', 'CollectionValidationService',
-  'CollectionUpdateService', 'UndoRedoService', 'alertsService', function(
-    $scope, WritableCollectionBackendApiService,
-    CollectionRightsBackendApiService, ExplorationSummaryBackendApiService,
+  'CollectionObjectFactory', 'SkillListObjectFactory',
+  'CollectionValidationService', 'CollectionUpdateService', 'UndoRedoService',
+  'alertsService', function(
+    $scope,
+    WritableCollectionBackendApiService, CollectionRightsBackendApiService,
     CollectionObjectFactory, SkillListObjectFactory,
     CollectionValidationService, CollectionUpdateService, UndoRedoService,
     alertsService) {
     $scope.collection = null;
     $scope.collectionId = GLOBALS.collectionId;
     $scope.collectionSkillList = SkillListObjectFactory.create([]);
-    $scope.isPublic = GLOBALS.isPublic;
+    $scope.isPrivate = GLOBALS.isPrivate;
     $scope.validationIssues = [];
 
     var _validateCollection = function() {
-      if ($scope.isPublic) {
+      if ($scope.isPrivate) {
         $scope.validationIssues = (
-          CollectionValidationService.findValidationIssuesForPublicCollection(
+          CollectionValidationService.findValidationIssuesForPrivateCollection(
             $scope.collection));
       } else {
         $scope.validationIssues = (
-          CollectionValidationService.findValidationIssuesForPrivateCollection(
+          CollectionValidationService.findValidationIssuesForPublicCollection(
             $scope.collection));
       }
     };
@@ -74,34 +71,7 @@ oppia.controller('CollectionEditor', ['$scope',
             error || 'There was an error when loading the collection.');
         });
 
-    UndoRedoService.setOnChangedCallback(function(changeObject, wasApplied) {
-      if (changeObject && wasApplied &&
-          CollectionUpdateService.isAddingCollectionNode(changeObject)) {
-        var explorationId = (
-          CollectionUpdateService.getExplorationIdFromChangeObject(
-            changeObject));
-        var collectionNode = (
-          $scope.collection.getCollectionNodeByExplorationId(explorationId));
-        ExplorationSummaryBackendApiService
-          .loadPublicAndPrivateExplorationSummaries(
-          [explorationId]).then(function(summaries) {
-            var summaryBackendObject = {};
-            if (summaries.length != 0 && summaries[0].id == explorationId) {
-              summaryBackendObject = summaries[0];
-              summaryBackendObject.exists = true;
-            } else {
-              summaryBackendObject.exists = false;
-            }
-            collectionNode.setExplorationSummaryObject(summaryBackendObject);
-            _validateCollection();
-          }, function() {
-            alertsService.addWarning(
-              'There was an error while adding an exploration to the ' +
-              'collection.');
-          });
-      }
-      _validateCollection();
-    });
+    UndoRedoService.setOnChangedCallback(_validateCollection);
 
     $scope.getChangeListCount = function() {
       return UndoRedoService.getChangeCount();
@@ -143,7 +113,7 @@ oppia.controller('CollectionEditor', ['$scope',
         function() {
           // TODO(bhenning): There should be a scope-level rights object used,
           // instead. The rights object should be loaded with the collection.
-          $scope.isPublic = true;
+          $scope.isPrivate = false;
         }, function() {
           alertsService.addWarning(
             'There was an error when publishing the collection.');

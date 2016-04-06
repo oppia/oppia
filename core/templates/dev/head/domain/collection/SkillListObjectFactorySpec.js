@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Tests for SkillListObjectFactory.
- *
- * @author henning.benmax@gmail.com (Ben Henning)
  */
 
 describe('Skill list object factory', function() {
@@ -112,6 +110,8 @@ describe('Skill list object factory', function() {
     // A list can be made the superset of another.
     var skillList4 = SkillListObjectFactory.create([]);
     skillList4.addSkillsFromSkillList(skillList1);
+    expect(skillList1.isSupersetOfSkillList(skillList4)).toBeTruthy();
+    expect(skillList4.isSupersetOfSkillList(skillList1)).toBeTruthy();
     skillList4.removeSkillByIndex(0);
     expect(skillList1.isSupersetOfSkillList(skillList4)).toBeTruthy();
     expect(skillList4.isSupersetOfSkillList(skillList1)).toBeFalsy();

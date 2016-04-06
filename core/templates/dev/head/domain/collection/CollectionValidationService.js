@@ -13,10 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to build changes to a collection. These changes may
- * then be used by other services, such as a backend API service to update the
- * collection in the backend. This service also registers all changes with the
- * undo/redo service.
+ * @fileoverview Service to validate the consistency of a collection. These
+ * checks are performable in the frontend to avoid sending a potentially invalid
+ * collection to the backend, which performs similar validation checks to these
+ * in collection_domain.Collection and subsequent domain objects.
  */
 
 oppia.factory('CollectionValidationService', [
@@ -37,11 +37,6 @@ oppia.factory('CollectionValidationService', [
           overlappingSkillList.addSkill(skill);
         }
       });
-      acquiredSkillList.getSkills().forEach(function(skill) {
-        if (prerequisiteSkillList.containsSkill(skill)) {
-          overlappingSkillList.addSkill(skill);
-        }
-      });
       return overlappingSkillList.getSkills();
     };
 
@@ -56,7 +51,7 @@ oppia.factory('CollectionValidationService', [
         }, SkillListObjectFactory.create([]));
 
       // Pick all collection nodes whose prerequisite skills are satisified by
-      // the currently acquired skills and which has not yet been completed.
+      // the currently acquired skills and which have not yet been completed.
       return collection.getExplorationIds().filter(function(explorationId) {
         var collectionNode = collection.getCollectionNodeByExplorationId(
           explorationId);
@@ -96,21 +91,21 @@ oppia.factory('CollectionValidationService', [
     };
 
     var _validateCollection = function(collection, isPublic) {
-      // NOTE(bhenning): These validation issues should be similar to those
-      // detected in core.domain.collection_domain.Collection.validate().
+      // NOTE TO DEVELOPERS: Please ensure that this validation logic is the
+      // same as that in core.domain.collection_domain.Collection.validate().
       var issues = [];
 
       var collectionHasNodes = collection.getCollectionNodeCount() > 0;
       if (!collectionHasNodes) {
         issues.push(
-          'Expected to have at least 1 exploration in the collection');
+          'There should be at least 1 exploration in the collection');
       }
 
       var startingExpIds = _getStartingExplorationIds(collection);
       if (collectionHasNodes && startingExpIds.length == 0) {
         issues.push(
-          'Expected to have at least 1 exploration initially available to ' +
-          'the learner');
+          'There should be at least 1 exploration initially available to the ' +
+          'learner');
       }
 
       collection.getCollectionNodes().forEach(function(collectionNode) {
@@ -126,7 +121,7 @@ oppia.factory('CollectionValidationService', [
       var unreachableExpIds = _getUnreachableExplorationIds(collection);
       if (unreachableExpIds.length != 0) {
         issues.push(
-          'Some exploration(s) are unreachable from the initial ' +
+          'The following exploration(s) are unreachable from the initial ' +
           'exploration(s): ' + unreachableExpIds.join(', '));
       }
 
@@ -138,11 +133,13 @@ oppia.factory('CollectionValidationService', [
           nonexistentExpIds.join(', '));
       }
 
-      var privateExpIds = _getPrivateExplorationIds(collection);
-      if (isPublic && privateExpIds.length != 0) {
-        issues.push(
-          'Private explorations cannot be added to a public collection: ' +
-          privateExpIds.join(', '));
+      if (isPublic) {
+        var privateExpIds = _getPrivateExplorationIds(collection);
+        if (privateExpIds.length != 0) {
+          issues.push(
+            'Private explorations cannot be added to a public collection: ' +
+            privateExpIds.join(', '));
+        }
       }
 
       return issues;
@@ -162,7 +159,8 @@ oppia.factory('CollectionValidationService', [
       /**
        * Behaves in the same way as findValidationIssuesForPrivateCollection(),
        * except additional validation checks are performed which are specific to
-       * public collections.
+       * public collections. This function is expensive, so it should be called
+       * sparingly.
        */
       findValidationIssuesForPublicCollection: function(collection) {
         return _validateCollection(collection, true);

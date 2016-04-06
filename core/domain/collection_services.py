@@ -310,8 +310,8 @@ def get_learner_collection_dict_by_id(
                 raise utils.ValidationError(
                     'Expected collection to only reference valid '
                     'explorations, but found an exploration with ID: %s (was '
-                    'the exploration deleted or do you not have edit access '
-                    'to it?)'
+                    'the exploration deleted or is it a private exploration '
+                    'that you do not have edit access to?)'
                     % exploration_id)
             if collection_is_public and rights_manager.is_exploration_private(
                     exploration_id):
@@ -319,11 +319,8 @@ def get_learner_collection_dict_by_id(
                     'Cannot reference a private exploration within a public '
                     'collection, exploration ID: %s' % exploration_id)
 
-        collection_node['exploration'] = {
-            'exists': bool(summary_dict)
-        }
         if summary_dict:
-            collection_node['exploration'].update(summary_dict)
+            collection_node['exploration_summary'] = summary_dict
 
     return collection_dict
 

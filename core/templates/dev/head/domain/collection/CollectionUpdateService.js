@@ -139,15 +139,20 @@ oppia.factory('CollectionUpdateService', [
          * Adds a new exploration to a collection and records the change in the
          * undo/redo service.
          */
-        addCollectionNode: function(collection, explorationId) {
+        addCollectionNode: function(collection, explorationId,
+            explorationSummaryBackendObject) {
+          var oldSummaryBackendObject = angular.copy(
+            explorationSummaryBackendObject);
           _applyChange(collection, CMD_ADD_COLLECTION_NODE, {
             exploration_id: explorationId
           }, function(changeDict, collection) {
             // Apply.
             var explorationId = _getExplorationIdFromChangeDict(changeDict);
-            collection.addCollectionNode(
+            var collectionNode = (
               CollectionNodeObjectFactory.createFromExplorationId(
                 explorationId));
+            collectionNode.setExplorationSummaryObject(oldSummaryBackendObject);
+            collection.addCollectionNode(collectionNode);
           }, function(changeDict, collection) {
             // Undo.
             var explorationId = _getExplorationIdFromChangeDict(changeDict);

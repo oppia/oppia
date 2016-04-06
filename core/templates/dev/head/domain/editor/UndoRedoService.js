@@ -29,9 +29,9 @@ var UndoRedoService = function() {
   var _undoneChanges = [];
   var _mutationCallback = null;
 
-  var _dispatchMutation = function(changeObject, wasApplied) {
+  var _dispatchMutation = function(changeObject, isForwardChange) {
     if (_mutationCallback) {
-      _mutationCallback(changeObject, wasApplied);
+      _mutationCallback(changeObject, isForwardChange);
     }
   };
   var _applyChange = function(changeObject, domainObject) {
@@ -46,8 +46,8 @@ var UndoRedoService = function() {
   /**
    * Pushes a change domain object onto the change stack and applies it to the
    * provided domain object. When a new change is applied, all undone changes
-   * are lost and cannot be redone. This will invoke the callback provided to
-   * setOnChangedCallback(), if one is available.
+   * are lost and cannot be redone. This will invoke the latest callback
+   * provided to setOnChangedCallback(), if one is available.
    */
   UndoRedoService.applyChange = function(changeObject, domainObject) {
     _appliedChanges.push(changeObject);
@@ -58,7 +58,8 @@ var UndoRedoService = function() {
   /**
    * Undoes the last change to the provided domain object. This function returns
    * false if there are no changes to undo, and true otherwise. This will invoke
-   * the callback provided to setOnChangedCallback(), if one is available.
+   * the latest callback provided to setOnChangedCallback(), if one is
+   * available.
    */
   UndoRedoService.undoChange = function(domainObject) {
     if (_appliedChanges.length != 0) {
@@ -73,7 +74,8 @@ var UndoRedoService = function() {
   /**
    * Reverses an undo for the given domain object. This function returns false
    * if there are no changes to redo, and true if otherwise. This will invoke
-   * the callback provided to setOnChangedCallback(), if one is available.
+   * the latest callback provided to setOnChangedCallback(), if one is
+   * available.
    */
   UndoRedoService.redoChange = function(domainObject) {
     if (_undoneChanges.length != 0) {
@@ -125,8 +127,8 @@ var UndoRedoService = function() {
 
   /**
    * Clears the change history. This does not reverse any of the changes applied
-   * from applyChange() or redoChange(). This will invoke the callback provided
-   * to setOnChangedCallback(), if one is available.
+   * from applyChange() or redoChange(). This will invoke the latest callback
+   * provided to setOnChangedCallback(), if one is available.
    */
   UndoRedoService.clearChanges = function() {
     _appliedChanges = [];
