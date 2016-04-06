@@ -1,0 +1,46 @@
+<script type="text/ng-template" id="components/sharingLinks">
+  <ul class="oppia-sharing-links" layout="<[layoutType]>" layout-align="<[layoutAlignType]>">
+    {% if SHARING_OPTIONS['gplus'] %}
+      <li>
+        <a ng-href="https://plus.google.com/share?url=<[serverName]>/explore/<[explorationId]>" onclick="return !window.open(this.href, '', 'height=600, width=600, menubar=no, toolbar=no, resizable=yes, scrollbars=yes')" ng-click="registerShareExplorationEvent('gplus')" target="_window">
+          <img class="share-option-img" src="/images/general/gplus.png" alt="Google+">
+        </a>
+      </li>
+    {% endif %}
+
+    {% if SHARING_OPTIONS['facebook'] %}
+      <li>
+        <a ng-href="https://www.facebook.com/sharer/sharer.php?sdk=joey&u=<[serverName]>/explore/<[explorationId]>&display=popup&ref=plugin&src=share_button" onclick="return !window.open(this.href, '', 'height=336, width=640')" ng-click="registerShareExplorationEvent('facebook')" target="_window">
+          <img class="share-option-img" src='/images/general/fb.png' alt="Facebook">
+        </a>
+      </li>
+    {% endif %}
+
+    {% if SHARING_OPTIONS['twitter'] %}
+      <li>
+        <a ng-href="https://twitter.com/share?text=<[escapedTwitterText]>&url=<[serverName]>/explore/<[explorationId]>" onclick="return !window.open(this.href, '', 'height=460, width=640')" target="_window">
+          <img class="share-option-img" src="/images/general/twitter.png" ng-click="registerShareExplorationEvent('twitter')" alt="Twitter">
+        </a>
+      </li>
+    {% endif %}
+
+    <li>
+      <a href="" ng-click="showEmbedExplorationModal(explorationId)" tooltip="Embed" tooltip-placement="top">
+        <i class="material-icons md-18" style="color: black;">&#xE157;</i>
+      </a>
+    </li>
+  </ul>
+</script>
+
+<style>
+  ul.oppia-sharing-links {
+    list-style: none;
+  }
+
+  .oppia-sharing-links .share-option-img {
+    border-radius: 2px;
+    height: 40px;
+    margin: 3px;
+    width: 40px;
+  }
+</style>

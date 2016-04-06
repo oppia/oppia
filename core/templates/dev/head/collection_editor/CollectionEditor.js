@@ -42,6 +42,7 @@ oppia.controller('CollectionEditor', ['$scope',
     $scope.collectionId = GLOBALS.collectionId;
     $scope.collectionSkillList = SkillListObjectFactory.create([]);
     $scope.isPrivate = GLOBALS.isPrivate;
+    $scope.canUnpublish = GLOBALS.canUnpublish;
     $scope.validationIssues = [];
 
     var _validateCollection = function() {
@@ -117,6 +118,19 @@ oppia.controller('CollectionEditor', ['$scope',
         }, function() {
           alertsService.addWarning(
             'There was an error when publishing the collection.');
+        });
+    };
+
+    // Unpublish the collection. Will only show up if the collection is public
+    // and the user have access to the collection.
+    $scope.unpublishCollection = function() {
+      CollectionRightsBackendApiService.setCollectionPrivate(
+        $scope.collectionId, $scope.collection.getVersion()).then(
+        function() {
+          $scope.isPrivate = true;
+        }, function() {
+          alertsService.addWarning(
+            'There was an error when unpublishing the collection.');
         });
     };
   }]);

@@ -335,9 +335,9 @@ class UserImpactMRJobManager(
         # who gave an answer" since it is "number of users who always gave
         # an answer".
         for state_name in statistics['state_hit_counts']:
-            state = statistics['state_hit_counts'][state_name]
-            first_entry_count = state['first_entry_count']
-            no_answer_count = state['no_answer_count']
+            state_stats = statistics['state_hit_counts'][state_name]
+            first_entry_count = state_stats.get('first_entry_count', 0)
+            no_answer_count = state_stats.get('no_answer_count', 0)
             answer_count += first_entry_count - no_answer_count
         # Turn answer count into reach
         reach = answer_count**exponent

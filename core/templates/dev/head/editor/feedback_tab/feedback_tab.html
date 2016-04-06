@@ -40,18 +40,17 @@
 
   <div ng-if="activeThread">
     <div class="row">
-      <div class="col-lg-6 col-md-6 col-sm-6">
+      <div class="col-lg-7 col-md-7 col-sm-7">
         <span class="oppia-back-arrow">
           <button type="button" class="btn btn-default btn-xs" ng-click="clearActiveThread()">
-            <span class="glyphicon glyphicon-chevron-left" title="Return to list of feedback threads">
-            </span>
+            <i class="material-icons oppia-vcenter" title="Return to list of feedback threads">&#xE5CB;</i>
           </button>
         </span>
         <span style="font-size: larger" ng-show="!activeThread.suggestion">Feedback Thread: <[activeThread.subject]></span>
         <span style="font-size: larger" ng-show="activeThread.suggestion">Suggestion Thread: <[activeThread.subject]></span>
       </div>
 
-      <div style="float: right;" class="col-lg-2 col-md-2 col-sm-2">
+      <div style="float: right;" class="col-lg-5 col-md-5 col-sm-5">
         <div class="pull-right">
           <span ng-if="activeThread.state_name" class="label label-info">
             state: <[activeThread.state_name]>

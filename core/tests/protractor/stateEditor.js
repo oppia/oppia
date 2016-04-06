@@ -27,9 +27,24 @@ var player = require('../protractor_utils/player.js');
 var rules = require('../../../extensions/rules/protractor.js');
 
 describe('State editor', function() {
+  it('should walk through the tutorial when user repeatedly clicks Next',
+      function() {
+    var NUM_TUTORIAL_STAGES = 5;
+    users.createUser(
+      'userTutorial@stateEditor.com', 'userTutorialStateEditor');
+    users.login('userTutorial@stateEditor.com');
+
+    workflow.createExplorationAndStartTutorial('sums', 'maths');
+    for (var i = 0; i < NUM_TUTORIAL_STAGES - 1; i++) {
+      editor.progressInTutorial();
+    }
+    editor.finishTutorial();
+    users.logout();
+  });
+
   it('should display plain text content', function() {
-    users.createUser('user1@example.com', 'user1');
-    users.login('user1@example.com');
+    users.createUser('user1@stateEditor.com', 'user1StateEditor');
+    users.login('user1@stateEditor.com');
 
     workflow.createExploration('sums', 'maths');
     editor.setContent(forms.toRichText('plain text'));
@@ -51,23 +66,9 @@ describe('State editor', function() {
     users.logout();
   });
 
-  it('should walk through the tutorial when user repeatedly clicks Next',
-      function() {
-    var NUM_TUTORIAL_STAGES = 5;
-    users.createUser('user@example.com', 'user');
-    users.login('user@example.com');
-
-    workflow.createExplorationAndStartTutorial('sums', 'maths');
-    for (var i = 0; i < NUM_TUTORIAL_STAGES - 1; i++) {
-      editor.progressInTutorial();
-    }
-    editor.finishTutorial();
-    users.logout();
-  });
-
   it('should create content and multiple choice interactions', function() {
-    users.createUser('user2@example.com', 'user2');
-    users.login('user2@example.com');
+    users.createUser('user2@stateEditor.com', 'user2StateEditor');
+    users.login('user2@stateEditor.com');
 
     workflow.createExploration('sums', 'maths');
     editor.setContent(function(richTextEditor) {
@@ -102,8 +103,8 @@ describe('State editor', function() {
   });
 
   it('should obey numeric interaction rules and display feedback', function() {
-    users.createUser('user3@example.com', 'user3');
-    users.login('user3@example.com');
+    users.createUser('user3@stateEditor.com', 'user3StateEditor');
+    users.login('user3@stateEditor.com');
 
     workflow.createExploration('sums', 'maths');
     editor.setContent(forms.toRichText('some content'));

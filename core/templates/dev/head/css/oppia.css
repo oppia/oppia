@@ -68,6 +68,12 @@ button.md-button.md-default-theme.oppia-learner-continue-button:hover {
 .material-icons.md-18 {
   font-size: 18px;
 }
+.material-icons.md-100 {
+  font-size: 100px;
+}
+.material-icons.md-40 {
+  font-size: 40px;
+}
 .material-icons.md-dark {
   color: rgba(0, 0, 0, 0.54);
 }
@@ -582,7 +588,7 @@ textarea {
   font-size: 16px;
   font-weight: 400;
   height: 56px;
-  padding-top: 17px;
+  padding-top: 16px;
 }
 
 .oppia-navbar-breadcrumb {
@@ -778,20 +784,18 @@ textarea {
 .oppia-navbar-button-container > .dropdown-menu > li > a {
   white-space: normal;
 }
-.btn.oppia-navbar-add-exploration-button {
-  background-color: rgba(5, 190, 178, 0.9);
-  color: rgba(255,255,255,0.9);
-  font-size: 16px;
+.btn.oppia-navbar-button {
+  background-color: rgba(0,0,0,0.2);
+  color: rgba(255,255,255,1.0);
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 14px;
   margin-right: 5px;
   margin-left: 5px;
+  text-transform: uppercase;
 }
-.btn.oppia-navbar-add-exploration-button:hover {
+.btn.oppia-navbar-button:hover {
   background-color: rgba(5, 190, 178, 1);
   color: rgba(255,255,255,1);
-}
-.oppia-navbar-add-exploration-button-plus {
-  font-weight: bold;
-  margin-right: 5px;
 }
 
 @media (max-width: 1050px) {
@@ -827,7 +831,7 @@ textarea {
 }
 
 @media (max-width: 768px) {
-  .oppia-navbar-add-exploration-button {
+  .oppia-navbar-hide-on-small-width {
     display: none;
   }
 }
@@ -1818,7 +1822,7 @@ oppia-parameter {
   height: 85px;
   margin-left: 10px;
   padding-left: 20px;
-  padding-right: 30px;
+  padding-right: 20px;
 }
 
 md-card.oppia-dashboard-tile {
@@ -2131,6 +2135,10 @@ div#ng-curtain {
   outline-color: transparent;
   padding-top: 20px;
 }
+.oppia-navbar-menu-icon {
+  color: #fff;
+  margin-top: -5px;
+}
 .oppia-navbar-menu:hover {
   opacity: 1;
 }
@@ -2157,12 +2165,17 @@ div#ng-curtain {
   margin-left: 6px;
 }
 
+.oppia-navbar-tabs-narrow {
+  min-width: 210px;
+}
 .oppia-navbar-tabs {
-  min-width: 525px;
+  min-width: 500px;
 }
 .nav > li > a.oppia-navbar-tab {
-  font-size: 1em;
-  padding-top: 17px;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 14px;
+  padding: 17px 12px 10px 12px;
+  text-transform: uppercase;
 }
 .oppia-navbar-dropdown-toggle,
 .oppia-navbar-tab {
@@ -2513,7 +2526,7 @@ div#ng-curtain {
   margin-top: 4px;
   padding: 4px;
   resize: none;
-  width: 245px;
+  width: 200px;
 }
 
 .oppia-rte-toolbar-image {
@@ -2725,14 +2738,8 @@ md-card.preview-conversation-skin-supplemental-card {
   padding: 0;
 }
 
-.oppia-info-card-bottom-row ul li {
-  list-style-type: none;
-}
-
 .oppia-info-card-bottom-row ul li a img {
-  border-radius: 2px;
   height: 20px;
-  margin: 3px;
   width: 20px;
 }
 

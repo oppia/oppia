@@ -103,6 +103,33 @@ SITE_FEEDBACK_FORM_URL = config_domain.ConfigProperty(
     'site_feedback_form_url', {'type': 'unicode'},
     'Site feedback form URL (leave blank if there is no such form)', '')
 
+SHARING_OPTIONS = config_domain.ConfigProperty(
+    'sharing_options', {
+        'type': 'dict',
+        'properties': [{
+            'name': 'gplus',
+            'schema': {
+                'type': 'bool',
+            }
+        }, {
+            'name': 'facebook',
+            'schema': {
+                'type': 'bool',
+            }
+        }, {
+            'name': 'twitter',
+            'schema': {
+                'type': 'bool',
+            }
+        }]
+    },
+    'Sharing options to display in the editor view',
+    default_value={
+        'gplus': False,
+        'facebook': False,
+        'twitter': False,
+    })
+
 SOCIAL_MEDIA_BUTTONS = config_domain.ConfigProperty(
     'social_media_buttons', {
         'type': 'list',
