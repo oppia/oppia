@@ -18,7 +18,6 @@ import ast
 import collections
 import itertools
 import re
-import threading
 
 from core import jobs
 from core.domain import exp_domain
@@ -269,16 +268,31 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     @classmethod
     def _reconstitute_code_evaluation(
             cls, interaction, rule_spec, rule_str, answer_str):
+        rule_types_without_output = ['CodeContains', 'CodeDoesNotContain']
+        # TODO(bhenning): Reconstitute the evaluation and error. Also, find the
+        # default values to use, if cannot reconstitute.
         if rule_spec.rule_type == 'OutputEquals':
             code_output = cls._get_plaintext(rule_spec.inputs['x'])
             code = cls._get_plaintext(answer_str)
             if not code:
                 return (None, 'Failed to recover code: %s' % answer_str)
-            # TODO(bhenning): Reconstitute the evaluation and error. Also, find
-            # the default values to use, if cannot reconstitute.
             code_evaluation_dict = {
                 'code': code,
                 'output': code_output,
+                'evaluation': '',
+                'error': ''
+            }
+            return (
+                objects.CodeEvaluation.normalize(code_evaluation_dict), None)
+        elif rule_spec.rule_type in rule_types_without_output:
+            code = cls._get_plaintext(answer_str)
+            if not code:
+                return (None, 'Failed to recover code: %s' % answer_str)
+            # TODO(bhenning): Add sentinel value for output here, since it
+            # cannot be recovered.
+            code_evaluation_dict = {
+                'code': code,
+                'output': '',
                 'evaluation': '',
                 'error': ''
             }
@@ -362,7 +376,10 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     @classmethod
     def _reconstitute_item_selection_input(
             cls, interaction, rule_spec, rule_str, answer_str):
-        if rule_spec.rule_type == 'Equals':
+        supported_rule_types = [
+            'Equals', 'ContainsAtLeastOneOf', 'DoesNotContainAtLeastOneOf'
+        ]
+        if rule_spec.rule_type in supported_rule_types:
             option_list = eval(answer_str)
             if not isinstance(option_list, list):
                 return (
@@ -532,10 +549,10 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         exp_id = item_id[:period_idx]
 
         item_id = item_id[period_idx+1:]
-        period_idx = item_id.index('.')
-        state_name = item_id[:period_idx]
+        handler_period_idx = item_id.index('submit') - 1
+        state_name = item_id[:handler_period_idx]
 
-        item_id = item_id[period_idx+1:]
+        item_id = item_id[handler_period_idx+1:]
         period_idx = item_id.index('.')
         handler_name = item_id[:period_idx]
 
@@ -547,8 +564,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # not associated with a particular version, a search needs to be
         # conducted to find which version of the exploration is associated with
         # the given answer.
-
-        if handler_name != 'submit':
+        if 'submit' not in item.id or handler_name != 'submit':
             yield (
                 AnswerMigrationJob._ERROR_KEY,
                 'Encountered submitted answer without the standard \'submit\' '
@@ -608,7 +624,6 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # recovered.
         params = []
 
-        # TODO(bhenning): Implement answer frequency.
         # A note on frequency: the resolved answer will simply be duplicated in
         # the new data store to replicate frequency. This is not 100% accurate
         # since each answer may have been submitted at different times and,
@@ -625,11 +640,12 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 yield (AnswerMigrationJob._ERROR_KEY, error)
                 continue
 
-            stats_services.record_answer(
-                exp_id, exploration.version, state_name, answer_group_index,
-                rule_spec_index, classification_categorization, session_id,
-                time_spent_in_sec, params, answer, rule_spec_str=rule_str,
-                answer_str=answer_str)
+            for _ in xrange(answer_frequency):
+                stats_services.record_answer(
+                    exp_id, exploration.version, state_name, answer_group_index,
+                    rule_spec_index, classification_categorization, session_id,
+                    time_spent_in_sec, params, answer, rule_spec_str=rule_str,
+                    answer_str=answer_str)
 
     @staticmethod
     def reduce(key, stringified_values):
