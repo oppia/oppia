@@ -28,16 +28,15 @@ oppia.constant(
 oppia.constant(
   'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', '/explorationsummarieshandler/data');
 
-oppia.controller('CollectionEditor', ['$scope',
-  'WritableCollectionBackendApiService', 'CollectionRightsBackendApiService',
-  'CollectionObjectFactory', 'SkillListObjectFactory',
-  'CollectionValidationService', 'CollectionUpdateService', 'UndoRedoService',
-  'alertsService', function(
-    $scope,
-    WritableCollectionBackendApiService, CollectionRightsBackendApiService,
-    CollectionObjectFactory, SkillListObjectFactory,
-    CollectionValidationService, CollectionUpdateService, UndoRedoService,
-    alertsService) {
+oppia.controller('CollectionEditor', [
+  '$scope', 'WritableCollectionBackendApiService',
+  'CollectionRightsBackendApiService', 'CollectionObjectFactory',
+  'SkillListObjectFactory', 'CollectionValidationService',
+  'CollectionUpdateService', 'UndoRedoService', 'alertsService', function(
+    $scope, WritableCollectionBackendApiService,
+    CollectionRightsBackendApiService, CollectionObjectFactory,
+    SkillListObjectFactory, CollectionValidationService,
+    CollectionUpdateService, UndoRedoService, alertsService) {
     $scope.collection = null;
     $scope.collectionId = GLOBALS.collectionId;
     $scope.collectionSkillList = SkillListObjectFactory.create([]);

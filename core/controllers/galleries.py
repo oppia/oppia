@@ -249,11 +249,15 @@ class ExplorationSummariesHandler(base.BaseHandler):
                 isinstance(exp_id, basestring) for exp_id in exp_ids])):
             raise self.PageNotFoundException
 
-        summaries = (
-            summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                exp_ids,
-                match_private_explorations=include_private_exps,
-                editor_user_id=editor_user_id))
+        if include_private_exps:
+            summaries = (
+                summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                    exp_ids,
+                    editor_user_id=editor_user_id))
+        else:
+            summaries = (
+                summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                    exp_ids))
         self.values.update({
             'summaries': summaries
         })

@@ -40,7 +40,7 @@ def get_human_readable_contributors_summary(contributors_summary):
 
 
 def get_displayable_exp_summary_dicts_matching_ids(
-        exploration_ids, match_private_explorations=False, editor_user_id=None):
+        exploration_ids, editor_user_id=None):
     """Given a list of exploration ids, optionally filters the list for
     explorations that are currently non-private and not deleted, and returns a
     list of dicts of the corresponding exploration summaries. This function can
@@ -61,12 +61,11 @@ def get_displayable_exp_summary_dicts_matching_ids(
             continue
         if exploration_summary.status == (
                 rights_manager.ACTIVITY_STATUS_PRIVATE):
-            if not match_private_explorations:
+            if not editor_user_id:
                 continue
-            elif editor_user_id and not (
-                    rights_manager.Actor(editor_user_id).can_edit(
-                        rights_manager.ACTIVITY_TYPE_EXPLORATION,
-                        exploration_summary.id)):
+            if not rights_manager.Actor(editor_user_id).can_edit(
+                    rights_manager.ACTIVITY_TYPE_EXPLORATION,
+                    exploration_summary.id):
                 continue
 
         displayable_exp_summaries.append({
