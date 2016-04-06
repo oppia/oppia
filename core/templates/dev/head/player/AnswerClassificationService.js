@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Classification service for answer groups.
- *
- * @author wxyxinyu@gmail.com (Xinyu Wu)
  */
 
  // TODO(bhenning): Find a better place for these constants.
@@ -82,7 +80,7 @@ oppia.factory('answerClassificationService', [
           classificationCategorization: DEFAULT_OUTCOME_CLASSIFICATION
         };
       } else {
-        warningsData.addWarning('No default outcome found.');
+        alertsService.addWarning('No default outcome found.');
       }
     };
 

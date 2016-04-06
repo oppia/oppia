@@ -34,7 +34,7 @@ class ItemSelectionInput(base.BaseInteraction):
             'type': 'int',
             'validators': [{
                 'id': 'is_at_least',
-                'min_value': 1,
+                'min_value': 0,
             }],
         },
         'default_value': 1,

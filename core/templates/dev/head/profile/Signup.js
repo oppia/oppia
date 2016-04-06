@@ -14,16 +14,14 @@
 
 /**
  * @fileoverview Data and controllers for the Oppia profile page.
- *
- * @author sfederwisch@google.com (Stephanie Federwisch)
  */
 
 oppia.controller('Signup', [
-  '$scope', '$http', '$rootScope', '$modal', 'warningsData', 'urlService',
-  'focusService',
+  '$scope', '$http', '$rootScope', '$modal', 'alertsService', 'urlService',
+  'focusService', 'siteAnalyticsService',
   function(
-      $scope, $http, $rootScope, $modal, warningsData, urlService,
-      focusService) {
+      $scope, $http, $rootScope, $modal, alertsService, urlService,
+      focusService, siteAnalyticsService) {
     var _SIGNUP_DATA_URL = '/signuphandler/data';
     $rootScope.loadingMessage = 'Loading';
     $scope.warningText = '';
@@ -68,7 +66,7 @@ oppia.controller('Signup', [
       if ($scope.hasUsername) {
         return;
       }
-      warningsData.clear();
+      alertsService.clearWarnings();
       $scope.blurredAtLeastOnce = true;
       $scope.updateWarningText(username);
       if (!$scope.warningText) {
@@ -113,7 +111,7 @@ oppia.controller('Signup', [
     $scope.submitPrerequisitesForm = function(
         agreedToTerms, username, canReceiveEmailUpdates) {
       if (!agreedToTerms) {
-        warningsData.addWarning(
+        alertsService.addWarning(
           'In order to edit explorations on this site, you will need to ' +
           'agree to the site terms.');
         return;
@@ -146,6 +144,8 @@ oppia.controller('Signup', [
             'Invalid value for email preferences: ' + canReceiveEmailUpdates);
         }
       }
+
+      siteAnalyticsService.registerNewSignupEvent();
 
       $scope.submissionInProcess = true;
       $http.post(_SIGNUP_DATA_URL, requestParams).success(function() {

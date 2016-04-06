@@ -43,7 +43,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.user_id_e = self.get_user_id_from_email('e@example.com')
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
-        self.set_admins([self.ADMIN_EMAIL])
+        self.set_admins([self.ADMIN_USERNAME])
 
     def test_get_exploration_rights_for_nonexistent_exploration(self):
         non_exp_id = 'this_exp_does_not_exist_id'
@@ -450,7 +450,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.user_id_e = self.get_user_id_from_email('e@example.com')
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
-        self.set_admins([self.ADMIN_EMAIL])
+        self.set_admins([self.ADMIN_USERNAME])
 
     def test_get_collection_rights_for_nonexistent_collection(self):
         non_col_id = 'this_collection_does_not_exist_id'

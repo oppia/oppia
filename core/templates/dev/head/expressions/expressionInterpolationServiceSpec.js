@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Unit tests for ExpressionInterpolationService.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 describe('Expression interpolation service', function() {

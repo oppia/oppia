@@ -22,6 +22,7 @@ delegate to the Collection model class. This will enable the collection
 storage model to be changed without affecting this module and others above it.
 """
 
+import collections
 import copy
 import datetime
 import logging
@@ -30,6 +31,7 @@ import os
 from core.domain import collection_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import summary_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -142,6 +144,7 @@ def get_collection_summary_from_model(collection_summary_model):
         collection_summary_model.editor_ids,
         collection_summary_model.viewer_ids,
         collection_summary_model.contributor_ids,
+        collection_summary_model.contributors_summary,
         collection_summary_model.version,
         collection_summary_model.collection_model_created_on,
         collection_summary_model.collection_model_last_updated
@@ -245,6 +248,84 @@ def is_collection_summary_editable(collection_summary, user_id=None):
         or collection_summary.community_owned)
 
 
+def get_learner_collection_dict_by_id(
+        collection_id, user_id, strict=True, allow_invalid_explorations=False,
+        version=None):
+    """Creates and returns a dictionary representation of a collection given by
+    the provided collection ID. This dictionary contains extra information
+    along with the dict returned by collection_domain.Collection.to_dict()
+    which includes useful data for the collection learner view. The information
+    includes progress in the collection, information about explorations
+    referenced within the collection, and a slightly nicer data structure for
+    frontend work.
+
+    This raises a ValidationError if the collection retrieved using the given ID
+    references non-existent explorations.
+    """
+    collection = get_collection_by_id(
+        collection_id, strict=strict, version=version)
+
+    exp_ids = collection.exploration_ids
+    exp_summary_dicts = (
+        summary_services.get_displayable_exp_summary_dicts_matching_ids(
+            exp_ids))
+    exp_summaries_dict_map = {
+        exp_summary_dict['id']: exp_summary_dict
+        for exp_summary_dict in exp_summary_dicts
+    }
+
+    # TODO(bhenning): Users should not be recommended explorations they have
+    # completed outside the context of a collection (see #1461).
+    next_exploration_ids = None
+    completed_exploration_ids = None
+    if user_id:
+        completed_exploration_ids = _get_valid_completed_exploration_ids(
+            user_id, collection_id, collection)
+        next_exploration_ids = collection.get_next_exploration_ids(
+            completed_exploration_ids)
+    else:
+        # If the user is not logged in or they have not completed any of
+        # the explorations yet within the context of this collection,
+        # recommend the initial explorations.
+        next_exploration_ids = collection.init_exploration_ids
+        completed_exploration_ids = []
+
+    collection_dict = collection.to_dict()
+    collection_dict['skills'] = collection.skills
+    collection_dict['playthrough_dict'] = {
+        'next_exploration_ids': next_exploration_ids,
+        'completed_exploration_ids': completed_exploration_ids
+    }
+    collection_dict['version'] = collection.version
+
+    collection_is_public = rights_manager.is_collection_public(collection_id)
+
+    # Insert an 'exploration' dict into each collection node, where the
+    # dict includes meta information about the exploration (ID and title).
+    for collection_node in collection_dict['nodes']:
+        exploration_id = collection_node['exploration_id']
+        summary_dict = exp_summaries_dict_map.get(exploration_id)
+        if not allow_invalid_explorations:
+            if not summary_dict:
+                raise utils.ValidationError(
+                    'Expected collection to only reference valid '
+                    'explorations, but found an exploration with ID: %s (was '
+                    'the exploration deleted?)' % exploration_id)
+            if collection_is_public and rights_manager.is_exploration_private(
+                    exploration_id):
+                raise utils.ValidationError(
+                    'Cannot reference a private exploration within a public '
+                    'collection, exploration ID: %s' % exploration_id)
+
+        collection_node['exploration'] = {
+            'exists': bool(summary_dict)
+        }
+        if summary_dict:
+            collection_node['exploration'].update(summary_dict)
+
+    return collection_dict
+
+
 # Query methods.
 def get_collection_titles_and_categories(collection_ids):
     """Returns collection titles and categories for the given ids.
@@ -255,12 +336,12 @@ def get_collection_titles_and_categories(collection_ids):
     Any invalid collection_ids will not be included in the return dict. No
     error will be raised.
     """
-    collections = [
+    collection_list = [
         (get_collection_from_model(e) if e else None)
         for e in collection_models.CollectionModel.get_multi(collection_ids)]
 
     result = {}
-    for collection in collections:
+    for collection in collection_list:
         if collection is None:
             logging.error('Could not find collection corresponding to id')
         else:
@@ -289,6 +370,19 @@ def get_completed_exploration_ids(user_id, collection_id):
     progress_model = user_models.CollectionProgressModel.get(
         user_id, collection_id)
     return progress_model.completed_explorations if progress_model else []
+
+
+def _get_valid_completed_exploration_ids(user_id, collection_id, collection):
+    """Returns a filtered version of the return value of
+    get_completed_exploration_ids, where explorations not also found within the
+    collection are removed from the returned list.
+    """
+    completed_exploration_ids = get_completed_exploration_ids(
+        user_id, collection_id)
+    return [
+        exp_id for exp_id in completed_exploration_ids
+        if collection.get_node(exp_id)
+    ]
 
 
 def get_next_exploration_ids_to_complete_by_user(user_id, collection_id):
@@ -422,19 +516,21 @@ def apply_change_list(collection_id, change_list):
                     collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY):
                 collection_node = collection.get_node(change.exploration_id)
                 if (change.property_name ==
-                        collection_domain.COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS):
+                        collection_domain.COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS): # pylint: disable=line-too-long
                     collection_node.update_prerequisite_skills(
                         change.new_value)
-                elif (
-                        change.property_name ==
-                        collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS):
+                elif (change.property_name ==
+                      collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS): # pylint: disable=line-too-long
                     collection_node.update_acquired_skills(change.new_value)
             elif change.cmd == collection_domain.CMD_EDIT_COLLECTION_PROPERTY:
-                if change.property_name == 'title':
+                if (change.property_name ==
+                        collection_domain.COLLECTION_PROPERTY_TITLE):
                     collection.update_title(change.new_value)
-                elif change.property_name == 'category':
+                elif (change.property_name ==
+                      collection_domain.COLLECTION_PROPERTY_CATEGORY):
                     collection.update_category(change.new_value)
-                elif change.property_name == 'objective':
+                elif (change.property_name ==
+                      collection_domain.COLLECTION_PROPERTY_OBJECTIVE):
                     collection.update_objective(change.new_value)
             elif (
                     change.cmd ==
@@ -454,6 +550,14 @@ def apply_change_list(collection_id, change_list):
         raise
 
 
+def validate_exps_in_collection_are_public(collection):
+    for exploration_id in collection.exploration_ids:
+        if rights_manager.is_exploration_private(exploration_id):
+            raise utils.ValidationError(
+                'Cannot reference a private exploration within a public '
+                'collection, exploration ID: %s' % exploration_id)
+
+
 def _save_collection(committer_id, collection, commit_message, change_list):
     """Validates an collection and commits it to persistent storage.
 
@@ -470,6 +574,29 @@ def _save_collection(committer_id, collection, commit_message, change_list):
         collection.validate(strict=True)
     else:
         collection.validate(strict=False)
+
+    # Validate that all explorations referenced by the collection exist.
+    exp_ids = collection.exploration_ids
+    exp_summaries = (
+        exp_services.get_exploration_summaries_matching_ids(exp_ids))
+    exp_summaries_dict = {
+        exp_id: exp_summaries[ind] for (ind, exp_id) in enumerate(exp_ids)
+    }
+    for collection_node in collection.nodes:
+        if not exp_summaries_dict[collection_node.exploration_id]:
+            raise utils.ValidationError(
+                'Expected collection to only reference valid explorations, '
+                'but found an exploration with ID: %s (was it deleted?)' %
+                collection_node.exploration_id)
+
+    # Ensure no explorations are being added that are 'below' the public status
+    # of this collection. If the collection is private, it can have both
+    # private and public explorations. If it's public, it can only have public
+    # explorations.
+    # TODO(bhenning): Ensure the latter is enforced above when trying to
+    # publish a collection.
+    if rights_manager.is_collection_public(collection.id):
+        validate_exps_in_collection_are_public(collection)
 
     collection_model = collection_models.CollectionModel.get(
         collection.id, strict=False)
@@ -591,6 +718,7 @@ def get_collection_snapshots_metadata(collection_id):
     return collection_models.CollectionModel.get_snapshots_metadata(
         collection_id, version_nums)
 
+
 def publish_collection_and_update_user_profiles(committer_id, col_id):
     """Publishes the collection with publish_collection() function in
     rights_manager.py, as well as updates first_contribution_msec.
@@ -641,7 +769,8 @@ def update_collection(
 def create_collection_summary(collection_id, contributor_id_to_add):
     """Create summary of a collection and store in datastore."""
     collection = get_collection_by_id(collection_id)
-    collection_summary = get_summary_of_collection(collection, contributor_id_to_add)
+    collection_summary = compute_summary_of_collection(
+        collection, contributor_id_to_add)
     save_collection_summary(collection_summary)
 
 
@@ -650,7 +779,7 @@ def update_collection_summary(collection_id, contributor_id_to_add):
     create_collection_summary(collection_id, contributor_id_to_add)
 
 
-def get_summary_of_collection(collection, contributor_id_to_add):
+def compute_summary_of_collection(collection, contributor_id_to_add):
     """Create a CollectionSummary domain object for a given Collection domain
     object and return it.
     """
@@ -664,13 +793,26 @@ def get_summary_of_collection(collection, contributor_id_to_add):
     # a revert) change to an collection's content).
     if collection_summary_model:
         contributor_ids = collection_summary_model.contributor_ids
+        contributors_summary = collection_summary_model.contributors_summary
     else:
         contributor_ids = []
+        contributors_summary = {}
 
     if (contributor_id_to_add is not None and
             contributor_id_to_add not in feconf.SYSTEM_USER_IDS and
             contributor_id_to_add not in contributor_ids):
         contributor_ids.append(contributor_id_to_add)
+
+    if contributor_id_to_add not in feconf.SYSTEM_USER_IDS:
+        if contributor_id_to_add is None:
+            # Revert commit or other non-positive commit
+            contributors_summary = compute_collection_contributors_summary(
+                collection.id)
+        else:
+            if contributor_id_to_add in contributors_summary:
+                contributors_summary[contributor_id_to_add] += 1
+            else:
+                contributors_summary[contributor_id_to_add] = 1
 
     collection_model_last_updated = collection.last_updated
     collection_model_created_on = collection.created_on
@@ -680,12 +822,38 @@ def get_summary_of_collection(collection, contributor_id_to_add):
         collection.objective, collection_rights.status,
         collection_rights.community_owned, collection_rights.owner_ids,
         collection_rights.editor_ids, collection_rights.viewer_ids,
-        contributor_ids,
+        contributor_ids, contributors_summary,
         collection.version, collection_model_created_on,
         collection_model_last_updated
     )
 
     return collection_summary
+
+
+def compute_collection_contributors_summary(collection_id):
+    """Returns a dict whose keys are user_ids and whose values are
+    the number of (non-revert) commits made to the given collection
+    by that user_id. This does not count commits which have since been reverted.
+    """
+    snapshots_metadata = get_collection_snapshots_metadata(collection_id)
+    current_version = len(snapshots_metadata)
+    contributors_summary = collections.defaultdict(int)
+    while True:
+        snapshot_metadata = snapshots_metadata[current_version - 1]
+        committer_id = snapshot_metadata['committer_id']
+        is_revert = (snapshot_metadata['commit_type'] == 'revert')
+        if not is_revert and committer_id not in feconf.SYSTEM_USER_IDS:
+            contributors_summary[committer_id] += 1
+
+        if current_version == 1:
+            break
+
+        if is_revert:
+            current_version = snapshot_metadata['commit_cmds'][0][
+                'version_number']
+        else:
+            current_version -= 1
+    return contributors_summary
 
 
 def save_collection_summary(collection_summary):
@@ -703,6 +871,7 @@ def save_collection_summary(collection_summary):
         editor_ids=collection_summary.editor_ids,
         viewer_ids=collection_summary.viewer_ids,
         contributor_ids=collection_summary.contributor_ids,
+        contributors_summary=collection_summary.contributors_summary,
         version=collection_summary.version,
         collection_model_last_updated=(
             collection_summary.collection_model_last_updated),
@@ -828,7 +997,7 @@ def get_next_page_of_all_non_private_commits(
             "max_age must be a datetime.timedelta instance. or None.")
 
     results, new_urlsafe_start_cursor, more = (
-        collection_models.CollectionCommitLogEntryModel.get_all_non_private_commits(
+        collection_models.CollectionCommitLogEntryModel.get_all_non_private_commits( # pylint: disable=line-too-long
             page_size, urlsafe_start_cursor, max_age=max_age))
 
     return ([collection_domain.CollectionCommitLogEntry(
@@ -909,11 +1078,11 @@ def clear_search_index():
 
 def index_collections_given_ids(collection_ids):
     # We pass 'strict=False' so as not to index deleted collections.
-    collections = get_multiple_collections_by_id(
+    collection_list = get_multiple_collections_by_id(
         collection_ids, strict=False).values()
     search_services.add_documents_to_index([
         _collection_to_search_dict(collection)
-        for collection in collections
+        for collection in collection_list
         if _should_index(collection)
     ], SEARCH_INDEX_COLLECTIONS)
 

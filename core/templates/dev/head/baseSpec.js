@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Unit tests for the base controller.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 describe('Base controller', function() {
@@ -28,8 +26,7 @@ describe('Base controller', function() {
       scope = $rootScope.$new();
       ctrl = $controller('Base', {
         $scope: scope,
-        warningsData: null,
-        activeInputData: null,
+        alertsService: null,
         messengerService: null
       });
     }));

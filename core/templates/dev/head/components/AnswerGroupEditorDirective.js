@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Directive for the answer group editor.
- *
- * @author bhenning@google.com (Ben Henning)
  */
 
 oppia.directive('answerGroupEditor', [function() {
@@ -23,23 +21,24 @@ oppia.directive('answerGroupEditor', [function() {
     restrict: 'E',
     scope: {
       isEditable: '=',
+      displayFeedback: '=',
       getOnSaveAnswerGroupDestFn: '&onSaveAnswerGroupDest',
       getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
       getOnSaveAnswerGroupRulesFn: '&onSaveAnswerGroupRules',
       outcome: '=',
+      suppressWarnings: '&',
       rules: '='
     },
     templateUrl: 'inline/answer_group_editor',
     controller: [
       '$scope', 'stateInteractionIdService', 'responsesService',
-      'editorContextService', 'warningsData', 'INTERACTION_SPECS',
+      'editorContextService', 'alertsService', 'INTERACTION_SPECS',
       'FUZZY_RULE_TYPE',
       function(
           $scope, stateInteractionIdService, responsesService,
-          editorContextService, warningsData, INTERACTION_SPECS,
+          editorContextService, alertsService, INTERACTION_SPECS,
           FUZZY_RULE_TYPE) {
         $scope.rulesMemento = null;
-
         $scope.activeRuleIndex = responsesService.getActiveRuleIndex();
         $scope.editAnswerGroupForm = {};
 
@@ -203,7 +202,7 @@ oppia.directive('answerGroupEditor', [function() {
           $scope.saveRules();
 
           if ($scope.rules.length == 0) {
-            warningsData.addWarning(
+            alertsService.addWarning(
               'All answer groups must have at least one rule.');
           }
         };

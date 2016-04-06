@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Directive for the feedback popup.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 // This directive is unusual in that it should only be invoked indirectly, as
@@ -36,10 +34,10 @@ oppia.directive('feedbackPopup', [
       templateUrl: 'components/feedback',
       controller: [
         '$scope', '$element', '$http', '$timeout', 'focusService',
-        'warningsData', 'playerPositionService',
+        'alertsService', 'playerPositionService',
         function(
             $scope, $element, $http, $timeout, focusService,
-            warningsData, playerPositionService) {
+            alertsService, playerPositionService) {
           $scope.feedbackText = '';
           $scope.isSubmitterAnonymized = false;
           $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();

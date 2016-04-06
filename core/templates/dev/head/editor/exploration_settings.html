@@ -238,13 +238,13 @@
 
 
           {% if can_modify_roles %}
-            <div ng-hide="activeInputData.name == 'explorationMetadata.editRoles'">
+            <div ng-hide="isRolesFormOpen">
               <button type="button" class="btn btn-default protractor-test-edit-roles" ng-click="openEditRolesForm()">
                 Edit Roles
               </button>
             </div>
 
-            <div ng-show="activeInputData.name == 'explorationMetadata.editRoles'">
+            <div ng-show="isRolesFormOpen">
               <strong>Add or Change Role</strong>
               <div class="form-group">
                 <form ng-submit="editRole(newMemberUsername, newMemberRole.value)">
@@ -264,7 +264,7 @@
 
                   <input type="submit" class="btn btn-default protractor-test-save-role" value="Save">
                   <button type="button" class="btn btn-default" ng-click="closeEditRolesForm()"
-                    ng-show="activeInputData.name == 'explorationMetadata.editRoles'">
+                    ng-show="isRolesFormOpen">
                     Cancel
                   </button>
                 </form>
@@ -340,7 +340,7 @@
         <h3>Controls</h3>
 
         {% if can_release_ownership %}
-          <p ng-hide="explorationRightsService.isCommunityOwned()">
+          <p class="oppia-exploration-ctrl" ng-hide="explorationRightsService.isCommunityOwned()">
             <button type="button" class="btn btn-default" ng-click="showTransferExplorationOwnershipModal()" ng-disabled="isExplorationLockedForEditing()">
               Transfer ownership to the community
             </button>
@@ -352,7 +352,7 @@
         {% endif %}
 
         {% if can_delete %}
-          <p>
+          <p class="oppia-exploration-ctrl">
             <button type="button" ng-if="explorationRightsService.isPrivate()"
                     class="btn btn-danger" ng-click="deleteExploration('')"
                     title="Delete this exploration">
@@ -361,18 +361,18 @@
           </p>
         {% endif %}
 
-        <span class="oppia-exploration-ctrl" ng-if="editabilityService.isEditable() && explorationRightsService.isPublic()">
+        <p class="oppia-exploration-ctrl" ng-if="editabilityService.isEditable() && explorationRightsService.isPublic()">
           <button type="button" class="btn btn-default" ng-click="showNominateExplorationModal()" ng-disabled="isExplorationLockedForEditing()" ng-class="{'btn-success': !isExplorationLockedForEditing()}" tooltip="Click this button to nominate this exploration for featured status in the gallery." tooltip-placement="bottom">
             Nominate for Featured Status
           </button>
-        </span>
+        </p>
       </div>
 
       <div class="col-lg-6 col-md-6 col-sm-6" ng-if="currentUserIsAdmin || currentUserIsModerator">
         <h3>Admin Controls</h3>
 
         {% if can_publicize %}
-          <p ng-show="explorationRightsService.isPublic()">
+          <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-show="explorationRightsService.isPublic()">
             <button type="button" class="btn btn-default protractor-test-mark-exploration-featured" ng-click="publicizeExplorationAsModerator()" ng-disabled="isExplorationLockedForEditing()">
               Mark "featured"
               <span ng-if="currentUserIsAdmin">(as admin)</span>
@@ -382,7 +382,7 @@
         {% endif %}
 
         {% if can_unpublicize %}
-          <p ng-show="explorationRightsService.isPublicized()">
+          <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-show="explorationRightsService.isPublicized()">
             <button type="button" class="btn btn-default" ng-click="unpublicizeExplorationAsModerator()" ng-disabled="isExplorationLockedForEditing()">
               Remove "featured" status
               <span ng-if="currentUserIsAdmin">(as admin)</span>
@@ -392,7 +392,7 @@
         {% endif %}
 
         {% if can_unpublish %}
-          <p ng-show="explorationRightsService.isPublic()">
+          <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-show="explorationRightsService.isPublic()">
             <button type="button" class="btn btn-default" ng-click="unpublishExplorationAsModerator()" ng-disabled="isExplorationLockedForEditing()">
               Unpublish
               <span ng-if="currentUserIsAdmin">(as admin)</span>
@@ -401,7 +401,7 @@
           </p>
         {% endif %}
 
-        <p ng-if="explorationRightsService.isPublic() && (currentUserIsAdmin || currentUserIsModerator)">
+        <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-if="explorationRightsService.isPublic() && (currentUserIsAdmin || currentUserIsModerator)">
           <button type="button" class="btn btn-danger"
                   ng-click="currentUserIsAdmin ? deleteExploration('admin') : deleteExploration('moderator')">
             Delete Exploration
@@ -431,7 +431,8 @@
 
     <h3>
       Initial parameter changes
-      <span class="glyphicon glyphicon-info-sign" tooltip="These changes are applied before the learner begins the exploration." tooltip-placement="right" style="font-size: 12px; padding-left: 18px;"></span>
+      <i class="material-icons md-18" tooltip="These changes are applied before the learner begins the exploration."
+         tooltip-placement="right" style="padding-left: 4px; vertical-align: text-top;">&#xE88E;</i>
     </h3>
 
     <div class="row">

@@ -15,8 +15,6 @@
 /**
  * @fileoverview Unit tests for the controller of the page showing the
  * user's explorations.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 describe('MyExplorations controller', function() {
@@ -52,7 +50,7 @@ describe('MyExplorations controller', function() {
           showCreateExplorationModal: null,
           showUploadExplorationModal: null
         },
-        warningsData: null
+        alertsService: null
       });
     }));
 

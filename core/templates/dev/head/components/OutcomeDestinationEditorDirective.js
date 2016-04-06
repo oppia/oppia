@@ -14,14 +14,13 @@
 
 /**
  * @fileoverview Directives for the outcome destination editor.
- *
- * @author sean@seanlip.org (Sean Lip)
  */
 
 oppia.directive('outcomeDestinationEditor', [function() {
   return {
     restrict: 'E',
     scope: {
+      outcomeHasFeedback: '=',
       outcome: '='
     },
     templateUrl: 'rules/outcomeDestinationEditor',

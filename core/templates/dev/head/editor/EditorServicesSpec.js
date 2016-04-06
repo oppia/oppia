@@ -15,8 +15,6 @@
 /**
  * @fileoverview Unit tests for the services and controllers of the exploration
  *   editor page.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 describe('Editor context service', function() {
@@ -56,7 +54,7 @@ describe('Change list service', function() {
         addWarning: function() {}
       };
       module(function($provide) {
-        $provide.value('warningsData', mockWarningsData);
+        $provide.value('alertsService', mockWarningsData);
       });
       spyOn(mockWarningsData, 'addWarning');
     });
@@ -607,7 +605,7 @@ describe('Exploration gadgets service', function() {
         addWarning: function() {}
       };
       module(function($provide) {
-        $provide.value('warningsData', mockWarningsData);
+        $provide.value('alertsService', mockWarningsData);
         $provide.constant('GADGET_SPECS', GADGET_SPECS);
       });
       spyOn(mockWarningsData, 'addWarning');

@@ -34,13 +34,3 @@ class VideoMp4(base.BaseRichTextComponent):
         },
         'default_value': '',
     }]
-
-    icon_data_url = (
-        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAA'
-        'AA3NCSVQICAjb4U/gAAABFklEQVQo%0Akd2SoaqDYACFj86gIoggItgVq%2BEPBotgW5j'
-        'FNqtPYVtQn2HFBxiDBZ/ABxgrugcYhmFYENThf8Nd%0AtKxd7qnnfOEcDkMpxTdiv0r/K'
-        'aBpGtM0AXCn02kYhmmagiA4n8%2B%2B79u2XVUVgPv9vt/vFUVZlqUo%0ACsMwALBZlhF'
-        'Crtfr4XDwfT9NUwDH41EURV3X8zwHUJblbreTZRkAq%2Bu6aZqe5xFCbNvmef71elFK%0'
-        'AXdeNoqhpmsfjUdc1IWSe577vuU8V9lOGYZhlWQDM8zyOoyRJXddZllWW5fP5vFwunKZp'
-        'AARBeL/f%0AAFRV/YXzPL/dbkmSOI7jOA6Atm3jOAZdUxiG0zStWuuzbrfbzWazajH/4E'
-        's/m4aWzlzjUhwAAAAA%0ASUVORK5CYII%3D%0A')

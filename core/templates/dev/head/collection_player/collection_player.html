@@ -36,28 +36,40 @@
   </ul>
 {% endblock navbar_breadcrumb %}
 
+{% block local_top_nav_options %}
+  <ul class="nav navbar-nav oppia-navbar-nav navbar-right" style="margin-right: 0px;">
+    {% if can_edit %}
+      <li>
+        <a ng-href="/collection_editor/create/{{collection_id}}" tooltip="Edit" tooltip-placement="bottom" target="_blank">
+          <i class="material-icons">&#xE254;</i>
+        </a>
+      </li>
+    {% endif %}
+  </ul>
+{% endblock local_top_nav_options %}
+
 {% block content %}
   <div ng-controller="CollectionPlayer">
     <div ng-if="collection" class="oppia-collection-player-tiles-container">
-      <h2 ng-if="!hasFinishedCollection()" class="oppia-page-heading">
-        <span ng-if="!hasStartedCollection()">Begin <[collection.title]>:</span>
-        <span ng-if="hasStartedCollection()">Continue <[collection.title]>:</span>
+      <h2 ng-if="!collectionPlaythrough.hasFinishedCollection()" class="oppia-page-heading">
+        <span ng-if="!collectionPlaythrough.hasStartedCollection()">Begin <[collection.getTitle()]>:</span>
+        <span ng-if="collectionPlaythrough.hasStartedCollection()">Continue <[collection.getTitle()]>:</span>
       </h2>
-      <h2 ng-if="hasFinishedCollection()" class="oppia-page-heading">
+      <h2 ng-if="collectionPlaythrough.hasFinishedCollection()" class="oppia-page-heading">
         <span>You have finished the collection! Feel free to replay any explorations below.</span>
       </h2>
 
       {% if is_logged_in %}
-        <div ng-if="getNextRecommendedCollectionNodeCount() > 0" class="oppia-collection-player-tile-section">
+        <div ng-if="collectionPlaythrough.getNextRecommendedCollectionNodeCount() > 0" class="oppia-collection-player-tile-section">
           <div class="oppia-collection-player-small-text">
-            Next exploration<span ng-if="getNextRecommendedCollectionNodeCount() > 1">s</span> to play
+            Next exploration<span ng-if="collectionPlaythrough.getNextRecommendedCollectionNodeCount() > 1">s</span> to play
           </div>
           <collection-node-list collection-id="collectionId" collection-nodes="getNextRecommendedCollectionNodes()"></collection-node-list>
         </div>
 
-        <div ng-if="getCompletedExplorationNodeCount() > 0" class="oppia-collection-player-tile-section">
+        <div ng-if="collectionPlaythrough.getCompletedExplorationNodeCount() > 0" class="oppia-collection-player-tile-section">
           <div class="oppia-collection-player-small-text">
-            Completed exploration<span ng-if="getCompletedExplorationNodeCount() > 1">s</span>
+            Completed exploration<span ng-if="collectionPlaythrough.getCompletedExplorationNodeCount() > 1">s</span>
           </div>
           <collection-node-list collection-id="collectionId" collection-nodes="getCompletedExplorationNodes()"></collection-node-list>
         </div>
@@ -75,7 +87,7 @@
         </a>
       {% else %}
         <div class="oppia-collection-player-small-text">You must login to save your progress.</div>
-        <collection-node-list collection-id="collectionId" collection-nodes="getAllCollectionNodes()"></collection-node-list>
+        <collection-node-list collection-id="collectionId" collection-nodes="collection.getCollectionNodes()"></collection-node-list>
       {% endif %}
     </div>
   </div>
@@ -89,7 +101,11 @@
   <script>
     {{ include_js_file('collection_player/CollectionPlayer.js') }}
     {{ include_js_file('collection_player/CollectionNodeListDirective.js') }}
-    {{ include_js_file('domain/collection/CollectionDataService.js') }}
+    {{ include_js_file('domain/collection/CollectionBackendApiService.js') }}
+    {{ include_js_file('domain/collection/CollectionNodeObjectFactory.js') }}
+    {{ include_js_file('domain/collection/CollectionObjectFactory.js') }}
+    {{ include_js_file('domain/collection/CollectionPlaythroughObjectFactory.js') }}
+    {{ include_js_file('domain/collection/SkillListObjectFactory.js') }}
     {{ include_js_file('domain/utilities/UrlInterpolationService.js') }}
   </script>
 {% endblock footer_js %}

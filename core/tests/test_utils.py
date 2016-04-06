@@ -207,7 +207,9 @@ class TestBase(unittest.TestCase):
         return json.loads(json_response.body[len(feconf.XSSI_PREFIX):])
 
     def get_json(self, url):
-        """Get a JSON response, transformed to a Python object."""
+        """Get a JSON response, transformed to a Python object. This method
+        does not support calling testapp.get() with errors expected in response
+        because testapp.get() in that case does not return a JSON object."""
         json_response = self.testapp.get(url)
         self.assertEqual(json_response.status_int, 200)
         return self._parse_json_response(json_response, expect_errors=False)
@@ -263,8 +265,10 @@ class TestBase(unittest.TestCase):
 
         self.logout()
 
-    def set_admins(self, admin_emails):
-        """Set the ADMIN_EMAILS property."""
+    def set_config_property(self, config_obj, new_config_value):
+        """Sets a given configuration object's value to the new value specified
+        using a POST request.
+        """
         self._stash_current_user_env()
 
         self.login('tmpsuperadmin@example.com', is_super_admin=True)
@@ -273,29 +277,22 @@ class TestBase(unittest.TestCase):
         self.post_json('/adminhandler', {
             'action': 'save_config_properties',
             'new_config_property_values': {
-                config_domain.ADMIN_EMAILS.name: admin_emails,
+                config_obj.name: new_config_value,
             }
         }, csrf_token)
         self.logout()
 
         self._restore_stashed_user_env()
 
-    def set_moderators(self, moderator_emails):
-        """Set the MODERATOR_EMAILS property."""
-        self._stash_current_user_env()
+    def set_admins(self, admin_usernames):
+        """Set the ADMIN_USERNAMES property."""
+        self.set_config_property(
+            config_domain.ADMIN_USERNAMES, admin_usernames)
 
-        self.login('tmpsuperadmin@example.com', is_super_admin=True)
-        response = self.testapp.get('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json('/adminhandler', {
-            'action': 'save_config_properties',
-            'new_config_property_values': {
-                config_domain.MODERATOR_EMAILS.name: moderator_emails,
-            }
-        }, csrf_token)
-        self.logout()
-
-        self._restore_stashed_user_env()
+    def set_moderators(self, moderator_usernames):
+        """Set the MODERATOR_USERNAMES property."""
+        self.set_config_property(
+            config_domain.MODERATOR_USERNAMES, moderator_usernames)
 
     def get_current_logged_in_user_id(self):
         return os.environ['USER_ID']

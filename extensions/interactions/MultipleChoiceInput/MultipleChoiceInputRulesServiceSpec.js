@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Unit tests for multiple choice input rules.
- *
- * @author wxyxinyu@gmail.com (Xinyu Wu)
  */
 
 describe('Multiple choice input rules service', function() {

@@ -80,6 +80,12 @@ indexes:
   - name: realtime_layer
   - name: created_on
 
+- kind: FeedbackThreadModel
+  properties:
+  - name: deleted
+  - name: exploration_id
+  - name: last_updated
+
 - kind: JobModel
   properties:
   - name: status_code

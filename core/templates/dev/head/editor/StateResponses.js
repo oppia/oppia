@@ -15,8 +15,6 @@
 /**
  * @fileoverview Controllers, services and filters for responses corresponding
  * to a state's interaction and answer groups.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 // A state-specific cache for interaction handlers. It stores handlers
@@ -290,12 +288,12 @@ oppia.factory('responsesService', [
 
 oppia.controller('StateResponses', [
   '$scope', '$rootScope', '$modal', '$filter', 'stateInteractionIdService',
-  'editorContextService', 'warningsData', 'responsesService', 'routerService',
+  'editorContextService', 'alertsService', 'responsesService', 'routerService',
   'explorationContextService', 'trainingDataService',
   'PLACEHOLDER_OUTCOME_DEST', 'INTERACTION_SPECS',
   function(
       $scope, $rootScope, $modal, $filter, stateInteractionIdService,
-      editorContextService, warningsData, responsesService, routerService,
+      editorContextService, alertsService, responsesService, routerService,
       explorationContextService, trainingDataService,
       PLACEHOLDER_OUTCOME_DEST, INTERACTION_SPECS) {
     $scope.editorContextService = editorContextService;
@@ -305,6 +303,45 @@ oppia.controller('StateResponses', [
       var currentStateName = editorContextService.getActiveStateName();
       trainingDataService.initializeTrainingData(
         explorationId, currentStateName);
+    };
+    $scope.suppressDefaultAnswerGroupWarnings = function() {
+      var interactionId = $scope.getCurrentInteractionId();
+      if (interactionId === 'MultipleChoiceInput') {
+        var answerGroups = responsesService.getAnswerGroups();
+        // Collect all answers which have been handled by at least one
+        // answer group.
+        var handledAnswersArray = [];
+        for (var j = 0; j < answerGroups.length; j++) {
+          for (var k = 0; k < answerGroups[j].rule_specs.length; k++) {
+            handledAnswersArray.push(answerGroups[j].rule_specs[k].inputs.x);
+          }
+        }
+        var choiceIndices = [];
+        var numChoices = $scope.getAnswerChoices().length;
+        for (var i = 0; i < numChoices; i++) {
+          choiceIndices.push(i);
+        }
+        // We only suppress the default warning if each choice index has
+        // been handled by at least one answer group.
+        return choiceIndices.every(function(choiceIndex) {
+          return handledAnswersArray.indexOf(choiceIndex) != -1;
+        });
+      }
+    };
+
+    $scope.isSelfLoopWithNoFeedback = function(outcome) {
+      var isSelfLoop = function(outcome) {
+        return (
+          outcome &&
+          outcome.dest === editorContextService.getActiveStateName());
+      };
+      if (!outcome) {
+        return false;
+      }
+      var hasFeedback = outcome.feedback.some(function(feedbackItem) {
+        return Boolean(feedbackItem);
+      });
+      return isSelfLoop(outcome) && !hasFeedback;
     };
 
     $scope.changeActiveAnswerGroupIndex = function(newIndex) {
@@ -331,6 +368,27 @@ oppia.controller('StateResponses', [
     $scope.isCurrentInteractionLinear = function() {
       var interactionId = $scope.getCurrentInteractionId();
       return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+    };
+
+    $scope.isLinearWithNoFeedback = function(outcome) {
+      // Returns false if current interaction is linear and has no feedback
+      if (!outcome) {
+        return false;
+      }
+      var hasFeedback = outcome.feedback.some(function(feedbackItem) {
+        return Boolean(feedbackItem);
+      });
+      return $scope.isCurrentInteractionLinear() && !hasFeedback;
+    };
+
+    $scope.getOutcomeTooltip = function(outcome) {
+      // Outcome tooltip depends on whether feedback is displayed
+      if ($scope.isLinearWithNoFeedback(outcome)) {
+        return 'Please direct the learner to a different card.';
+      } else {
+        return 'Please give Oppia something useful to say,' +
+               ' or direct the learner to a different card.';
+      }
     };
 
     $scope.$on('initializeAnswerGroups', function(evt, data) {
@@ -395,7 +453,7 @@ oppia.controller('StateResponses', [
     });
 
     $scope.openTeachOppiaModal = function() {
-      warningsData.clear();
+      alertsService.clearWarnings();
       $rootScope.$broadcast('externalSave');
 
       $modal.open({
@@ -492,7 +550,7 @@ oppia.controller('StateResponses', [
     };
 
     $scope.openAddAnswerGroupModal = function() {
-      warningsData.clear();
+      alertsService.clearWarnings();
       $rootScope.$broadcast('externalSave');
 
       $modal.open({
@@ -503,6 +561,10 @@ oppia.controller('StateResponses', [
           'editorContextService',
           function(
               $scope, $modalInstance, responsesService, editorContextService) {
+            $scope.feedbackEditorIsOpen = false;
+            $scope.openFeedbackEditor = function() {
+              $scope.feedbackEditorIsOpen = true;
+            };
             $scope.tmpRule = {
               rule_type: null,
               inputs: {}
@@ -532,6 +594,14 @@ oppia.controller('StateResponses', [
             $scope.saveResponse = function(reopen) {
               $scope.$broadcast('saveOutcomeFeedbackDetails');
               $scope.$broadcast('saveOutcomeDestDetails');
+
+              // If the feedback editor is never opened, replace the feedback
+              // with an empty array.
+              if ($scope.tmpOutcome.feedback.length === 1 &&
+                  $scope.tmpOutcome.feedback[0] === '') {
+                $scope.tmpOutcome.feedback = [];
+              }
+
               // Close the modal and save it afterwards.
               $modalInstance.close({
                 tmpRule: angular.copy($scope.tmpRule),
@@ -542,7 +612,7 @@ oppia.controller('StateResponses', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              warningsData.clear();
+              alertsService.clearWarnings();
             };
           }
         ]
@@ -588,7 +658,7 @@ oppia.controller('StateResponses', [
       // state of the answer group.
       evt.stopPropagation();
 
-      warningsData.clear();
+      alertsService.clearWarnings();
       $modal.open({
         templateUrl: 'modals/deleteAnswerGroup',
         backdrop: true,
@@ -600,7 +670,7 @@ oppia.controller('StateResponses', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              warningsData.clear();
+              alertsService.clearWarnings();
             };
           }
         ]

@@ -50,7 +50,7 @@ STATE_PROPERTY_INTERACTION_ID = 'widget_id'
 STATE_PROPERTY_INTERACTION_CUST_ARGS = 'widget_customization_args'
 STATE_PROPERTY_INTERACTION_ANSWER_GROUPS = 'answer_groups'
 STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME = 'default_outcome'
-STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS = (
+STATE_PROPERTY_UNCLASSIFIED_ANSWERS = (
     'confirmed_unclassified_answers')
 STATE_PROPERTY_INTERACTION_FALLBACKS = 'fallbacks'
 # These two properties are kept for legacy purposes and are not used anymore.
@@ -185,7 +185,7 @@ class ExplorationChange(object):
         STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
         STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
         STATE_PROPERTY_INTERACTION_FALLBACKS,
-        STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS)
+        STATE_PROPERTY_UNCLASSIFIED_ANSWERS)
 
     GADGET_PROPERTIES = (
         GADGET_PROPERTY_VISIBILITY,
@@ -2582,7 +2582,7 @@ class ExplorationSummary(object):
     def __init__(self, exploration_id, title, category, objective,
                  language_code, tags, ratings, status,
                  community_owned, owner_ids, editor_ids,
-                 viewer_ids, contributor_ids, version,
+                 viewer_ids, contributor_ids, contributors_summary, version,
                  exploration_model_created_on,
                  exploration_model_last_updated):
         """'ratings' is a dict whose keys are '1', '2', '3', '4', '5' and whose
@@ -2610,6 +2610,7 @@ class ExplorationSummary(object):
         self.editor_ids = editor_ids
         self.viewer_ids = viewer_ids
         self.contributor_ids = contributor_ids
+        self.contributors_summary = contributors_summary
         self.version = version
         self.exploration_model_created_on = exploration_model_created_on
         self.exploration_model_last_updated = exploration_model_last_updated

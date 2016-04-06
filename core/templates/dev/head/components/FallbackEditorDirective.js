@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Directive for the fallback editor.
- *
- * @author sean@seanlip.org (Sean Lip)
  */
 
 oppia.directive('fallbackEditor', [function() {

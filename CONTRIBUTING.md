@@ -12,7 +12,8 @@ Thanks for your interest in contributing code or design help to the Oppia projec
     * Go to the [Oppia repo](https://github.com/oppia/oppia), and click 'Watch' at the top right. Ensure that you're not 'ignoring' the repo, so that you'll be notified when someone replies to a conversation you're part of.
   3. Please sign the CLA so that we can accept your contributions. If you're contributing as an individual, use the [individual CLA](https://goo.gl/forms/AttNH80OV0). If your company owns the copyright to your contributions, a company representative should sign the [corporate CLA](https://goo.gl/forms/xDq9gK3Zcv).
   4. Fill in [this form](http://goo.gl/forms/kXILyztnfS) to indicate which parts of the codebase you're interested in. (You can always change this later.)
-  5. (Optional) You may also want to set up [automatic auth](https://help.github.com/articles/set-up-git/#next-steps-authenticating-with-github-from-git) so you don't have to type in a username and password each time you commit a change.
+  5. Join the [oppia-dev@](https://groups.google.com/forum/#!forum/oppia-dev) mailing list, and say hi on the [gitter](https://gitter.im/oppia/oppia-chat) chat channel!
+  6. (Optional) You may also want to set up [automatic auth](https://help.github.com/articles/set-up-git/#next-steps-authenticating-with-github-from-git) so you don't have to type in a username and password each time you commit a change.
 
 ## Finding something to do
 
@@ -29,7 +30,7 @@ These issues, also tagged as 'starter projects', are usually local to a small pa
 For reference, here are descriptions of what the other 'TODO' tags mean:
   * **[TODO: tech (instructions)](https://github.com/oppia/oppia/labels/TODO%3A%20tech%20%28instructions%29)** means that the overall solution is generally known, but newcomers to the codebase may need additional instructions to be able to implement them. Adding instructions, such as where to make the necessary changes, will help move these issues to the `TODO: code` stage.
   * **[TODO: tech (breakdown)](https://github.com/oppia/oppia/labels/TODO%3A%20tech%20%28breakdown%29)** means that the approach is known, but needs to be broken down into single-person projects.
-  * **[TODO: tech (design doc)](https://github.com/oppia/oppia/labels/TODO%3A%20tech%20%28design%20doc%29)** means that the problem is known, but the solution needs fleshing out. In that case, the best thing to do is to prepare a short doc outlining the solution approach and implementation plan, then discuss it on the issue thread before starting implementation.
+  * **[TODO: tech (design doc)](https://github.com/oppia/oppia/labels/TODO%3A%20tech%20%28design%20doc%29)** means that the problem is known, but the solution needs fleshing out. In that case, the best thing to do is to prepare a short doc outlining the solution approach and implementation plan, add a link to it on the issue thread, then discuss it before starting implementation.
   * **[TODO: design (breakdown)](https://github.com/oppia/oppia/labels/TODO%3A%20design%20%28breakdown%29)** means the UX design is completed, but the issue needs to be broken down into single-person projects.
   * **[TODO: design (UX)](https://github.com/oppia/oppia/labels/TODO%3A%20design%20%28UX%29)** means the way that the user interacts with this feature needs to be planned. The best way to approach this is to outline the core user journeys (probably using slides), and discuss them on the issue thread, so that the feature can move forward.
   * **[TODO: triage](https://github.com/oppia/oppia/labels/TODO%3A%20triage)** means we aren't sure whether to work on this issue or not. It would be helpful to give comments on this issue in support of or against implementing that feature, or mention if you encountered something similar.
@@ -69,8 +70,12 @@ Here's how to make a one-off code change. (If you're working on a larger feature
       git push origin {{YOUR BRANCH NAME}}
     ```
 
-    Before your code gets uploaded to GitHub, a script is automatically executed that checks the styling of all changed JavaScript and Python files and runs the front-end tests.
-     **If any of the tests fail, the push will be interrupted**. If this happens, fix the issues that the tests tell you about and **repeat the instructions above** ('commit' and then 'push')
+    
+
+    Before your code gets uploaded to GitHub, a script is automatically executed that checks the styling of all changed JavaScript and Python files and runs the front-end tests. Run the push command in command line, and not GitHub's Desktop client, as the script needs access to other tools like pip.
+    
+     **If any of the tests fail, the push will be interrupted**. If this happens, fix the issues that the tests tell you about and **repeat the instructions above** ('commit' and then 'push').
+     
     If you need some help with your code and therefore want to put non functioning code into your GitHub fork to show it to other developers, you  can force a push with `git push origin {{YOUR BRANCH NAME}} --no-verify`.
 
 4. **When your feature is ready to merge, create a pull request.**
@@ -103,6 +108,24 @@ Here's how to make a one-off code change. (If you're working on a larger feature
 
 7. **Celebrate.** Congratulations, you have contributed to Oppia!
 
+### Notes
+
+We do not use author tags in files, since they tend to be inaccurate or become stale when the author is no longer a regular contributor. However, you can still find the author of a particular change in a file by running the command:
+
+```
+git blame file-name
+```
+The output will show the latest commit SHA, author, date, and time of commit for each line.
+
+To confine the search of an author between particular lines in a file, you can use:
+
+```
+git blame -L 40,60 file-name
+```
+The output will then show lines 40 to 60 of the particular file.
+
+For more `git blame` options, you can visit the [git blame documentation](https://git-scm.com/docs/git-blame).
+
 ## Communication channels
 
 ### Mailing lists
@@ -118,3 +141,7 @@ We also have a developer chat room [here](https://gitter.im/oppia/oppia-chat). F
 GitHub teams allow contributors working on similar areas of the Oppia codebase to to find and contact each other easily. These teams will be accessible via the GitHub alias @oppia/{{team-name}}. Mentioning a team in a issue or comment will notify all members in the team. During the issue triage process, issues will be assigned to a team, and members of the team are encouraged to comment on or take up the issue. If a contributor who is not part of the team is working on an issue, they will also be able to ask the team for guidance.
 
 You can indicate which team(s) you want to join by filling in the form [here](http://goo.gl/forms/kXILyztnfS), or requesting to join/leave teams on the [teams page](https://github.com/orgs/oppia/teams). You can join or leave a team at any time.
+
+### Design docs and planning
+
+Design documents and meeting minutes are in our [Google Drive folder](https://drive.google.com/open?id=0B8ADASwHtwE9UFlLSFdlMkt2Y2c). 

@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Service for interpolating expressions.
- *
- * @author kashida@google.com (Koji Ashida)
  */
 
 // Interpolates an HTML or a unicode string containing expressions.
@@ -33,10 +31,10 @@
 //     '<button></button>'.
 oppia.factory('expressionInterpolationService', [
   '$filter', 'expressionParserService', 'expressionEvaluatorService',
-  'oppiaHtmlEscaper',
+  'expressionSyntaxTreeService', 'oppiaHtmlEscaper',
   function(
       $filter, expressionParserService, expressionEvaluatorService,
-      oppiaHtmlEscaper) {
+      expressionSyntaxTreeService, oppiaHtmlEscaper) {
     return {
       // This method should only be used if its result would immediately be
       // displayed on the screen without passing through further computation.
@@ -56,7 +54,7 @@ oppia.factory('expressionInterpolationService', [
             var EXPRESSION_ERROR_TAG = (
               '<oppia-expression-error-tag></oppia-expression-error-tag>');
             if ((e instanceof expressionParserService.SyntaxError) ||
-                (e instanceof expressionEvaluatorService.ExpressionError)) {
+                (e instanceof expressionSyntaxTreeService.ExpressionError)) {
               return EXPRESSION_ERROR_TAG;
             }
             throw e;
@@ -75,7 +73,7 @@ oppia.factory('expressionInterpolationService', [
           });
         } catch (e) {
           if ((e instanceof expressionParserService.SyntaxError) ||
-              (e instanceof expressionEvaluatorService.ExpressionError)) {
+              (e instanceof expressionSyntaxTreeService.ExpressionError)) {
             return null;
           }
           throw e;
@@ -90,7 +88,7 @@ oppia.factory('expressionInterpolationService', [
           // Trim the '{{' and '}}'.
           matches[i] = matches[i].substring(2, matches[i].length - 2);
 
-          var params = expressionEvaluatorService.getParamsUsedInExpression(
+          var params = expressionSyntaxTreeService.getParamsUsedInExpression(
             $filter('convertHtmlToUnicode')(matches[i]));
 
           for (var j = 0; j < params.length; j++) {

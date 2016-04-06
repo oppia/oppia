@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Data and controllers for the Oppia admin page.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
@@ -45,7 +43,6 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
   $scope.reloadConfigProperties = function() {
     $http.get($scope.adminHandlerUrl).success(function(data) {
       $scope.configProperties = data.config_properties;
-      $scope.computedProperties = data.computed_properties;
     });
   };
 
@@ -80,17 +77,6 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     }).error(function(errorResponse) {
       $scope.message = 'Server error: ' + errorResponse.error;
       $scope.migrationInProcess = false;
-    });
-  };
-
-  $scope.refreshComputedProperty = function(computedPropertyId) {
-    $http.post($scope.adminHandlerUrl, {
-      action: 'refresh_computed_property',
-      computed_property_name: computedPropertyId
-    }).success(function() {
-      $scope.message = 'Computed property reloaded successfully.';
-    }).error(function(errorResponse) {
-      $scope.message = 'Server error: ' + errorResponse.error;
     });
   };
 

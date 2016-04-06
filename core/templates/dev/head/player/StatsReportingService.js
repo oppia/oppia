@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Services for stats reporting.
- *
- * @author sean@seanlip.org (Sean Lip)
  */
 
 oppia.constant('STATS_REPORTING_URLS', {

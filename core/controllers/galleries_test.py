@@ -73,7 +73,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
         }, response_dict['explorations_list'][0])
 
         # Publicize the demo exploration.
-        self.set_admins([self.ADMIN_EMAIL])
+        self.set_admins([self.ADMIN_USERNAME])
         rights_manager.publicize_exploration(self.admin_id, '0')
 
         # Run migration job to create exploration summaries.
@@ -113,7 +113,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
 
     def test_gallery_handler_for_created_explorations(self):
         """Test the gallery data handler for manually created explirations."""
-        self.set_admins([self.ADMIN_EMAIL])
+        self.set_admins([self.ADMIN_USERNAME])
 
         self.login(self.ADMIN_EMAIL)
         response_dict = self.get_json(feconf.GALLERY_DATA_URL)
@@ -212,14 +212,14 @@ class GalleryPageTest(test_utils.GenericTestBase):
 
         response = self.testapp.get(feconf.GALLERY_URL)
         self.assertEqual(response.status_int, 200)
-        response.mustcontain(no=['Upload Exploration'])
+        response.mustcontain(no=['ng-click="showUploadExplorationModal()"'])
 
         config_services.set_property(
             feconf.SYSTEM_COMMITTER_ID, 'allow_yaml_file_upload', True)
 
         response = self.testapp.get(feconf.GALLERY_URL)
         self.assertEqual(response.status_int, 200)
-        response.mustcontain('Upload Exploration')
+        response.mustcontain('ng-click="showUploadExplorationModal()"')
 
         self.logout()
 
