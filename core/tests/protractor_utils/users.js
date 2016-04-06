@@ -15,8 +15,6 @@
 /**
  * @fileoverview Utilities for user creation, login and privileging when
  * carrying out end-to-end testing with protractor.
- *
- * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var forms = require('./forms.js');
@@ -68,8 +66,8 @@ var createModerator = function(email, username) {
   login(email, true);
   _completeSignup(username);
   admin.editConfigProperty(
-      'Email addresses of moderators', 'List', function(listEditor) {
-    listEditor.addItem('Unicode').setValue(email);
+      'Usernames of moderators', 'List', function(listEditor) {
+    listEditor.addItem('Unicode').setValue(username);
   });
   logout();
 };
@@ -78,8 +76,8 @@ var createAdmin = function(email, username) {
   login(email, true);
   _completeSignup(username);
   admin.editConfigProperty(
-      'Email addresses of admins', 'List', function(listEditor) {
-    listEditor.addItem('Unicode').setValue(email);
+      'Usernames of admins', 'List', function(listEditor) {
+    listEditor.addItem('Unicode').setValue(username);
   });
   logout();
 };

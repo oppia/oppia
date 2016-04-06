@@ -583,6 +583,91 @@ oppia.directive('graphViz', function() {
 
 oppia.factory('graphUtilsService', [function() {
   return {
+    GRAPH_ADJACENCY_MODE: {
+      DIRECTED: 'directed',
+      INVERTED: 'inverted',
+      UNDIRECTED: 'undirected'
+    },
+
+    DFS_STATUS: {
+      VISITED: 'visited',
+      UNVISITED: 'unvisited',
+      STILL_VISITING: 'still visiting'
+    },
+
+    /**
+     * @param {object} graph - A graph object.
+     * @param {string} adjacencyListMode - A string indicating the mode.
+     * @return {array} An adjacency list. Depending on the mode, the list has
+     *   all edges (directed),
+     *   all edges inverted (inverted),
+     *   or all edges in both directions, as though the graph were undirected
+     *   (undirected)
+     */
+    constructAdjacencyLists: function(graph, adjacencyListMode) {
+      var adjacencyLists = [];
+      for (var i = 0; i < graph.vertices.length; i++) {
+        adjacencyLists.push([]);
+      }
+
+      // If a graph is undirected, all modes work the same way anyway
+      if (!graph.isDirected) {
+        adjacencyListMode = this.GRAPH_ADJACENCY_MODE.UNDIRECTED;
+      }
+      for (var i = 0; i < graph.edges.length; i++) {
+        var edge = graph.edges[i];
+        if (adjacencyListMode === this.GRAPH_ADJACENCY_MODE.DIRECTED ||
+            adjacencyListMode === this.GRAPH_ADJACENCY_MODE.UNDIRECTED) {
+          adjacencyLists[edge.src].push(edge.dst);
+        }
+        if (adjacencyListMode === this.GRAPH_ADJACENCY_MODE.INVERTED ||
+            adjacencyListMode === this.GRAPH_ADJACENCY_MODE.UNDIRECTED) {
+          adjacencyLists[edge.dst].push(edge.src);
+        }
+      }
+      return adjacencyLists;
+    },
+
+    /**
+     * @param {integer} startVertex - The index of the starting vertex.
+     * @param {array} adjacencyLists - An array of arrays.
+     * @param {array} isVisited - An array with length equal to the number of
+     *     vertices. All the values should be false initially.
+     * This function modifies the isVisited array and changes the values at
+     * the indices of the vertices reachable from the starting vertex to true.
+     */
+    markAccessible: function(startVertex, adjacencyLists, isVisited) {
+      isVisited[startVertex] = true;
+      for (var i = 0; i < adjacencyLists[startVertex].length; i++) {
+        var nextVertex = adjacencyLists[startVertex][i];
+        if (!isVisited[nextVertex]) {
+          this.markAccessible(nextVertex, adjacencyLists, isVisited);
+        }
+      };
+    },
+
+    findCycle: function(
+        currentVertex, previousVertex, adjacencyLists, isVisited,
+        isDirected) {
+      isVisited[currentVertex] = this.DFS_STATUS.STILL_VISITING;
+      for (var i = 0; i < adjacencyLists[currentVertex].length; i++) {
+        var nextVertex = adjacencyLists[currentVertex][i];
+        if (nextVertex == previousVertex && !isDirected) {
+          continue;
+        }
+        if (isVisited[nextVertex] == this.DFS_STATUS.STILL_VISITING) {
+          return true;
+        }
+        if (isVisited[nextVertex] == this.DFS_STATUS.UNVISITED &&
+            this.findCycle(
+            nextVertex, currentVertex, adjacencyLists, isVisited, isDirected)) {
+          return true;
+        }
+      }
+      isVisited[currentVertex] = this.DFS_STATUS.VISITED;
+      return false;
+    },
+
     constructAdjacencyMatrix: function(graph) {
       var adjMatrix = [];
       for (var i = 0; i < graph.vertices.length; i++) {
@@ -601,6 +686,7 @@ oppia.factory('graphUtilsService', [function() {
       });
       return adjMatrix;
     },
+
     nextPermutation: function(permutation) {
       // Generates (in place) the next lexicographical permutation.
       // permutation is a permutation of [0, 1, 2, ..., permutation.length - 1]
@@ -629,6 +715,7 @@ oppia.factory('graphUtilsService', [function() {
       permutation = permutation.concat(permutation.splice(pivot + 1).reverse());
       return permutation;
     },
+
     areAdjacencyMatricesEqualWithPermutation: function(
         adj1, adj2, permutation) {
       var numVertices = adj1.length;
@@ -646,7 +733,125 @@ oppia.factory('graphUtilsService', [function() {
 
 oppia.factory('graphInputRulesService', [
     'graphUtilsService', function(graphUtilsService) {
-  var IsIsomorphic = function(graph1, graph2) {
+  /**
+   * @param {object} graph - A graph object.
+   * @return {boolean} Whether the graph is strongly connected.
+   */
+  var isStronglyConnected = function(graph) {
+    // Uses depth first search on each vertex to try and visit every other
+    // vertex in both the normal and inverted adjacency lists.
+    if (graph.vertices.length === 0) {
+      return true;
+    }
+
+    var adjacencyLists = graphUtilsService.constructAdjacencyLists(
+      graph, graphUtilsService.GRAPH_ADJACENCY_MODE.DIRECTED);
+    var invertedAdjacencyLists = graphUtilsService.constructAdjacencyLists(
+      graph, graphUtilsService.GRAPH_ADJACENCY_MODE.INVERTED);
+
+    var isVisited = graph.vertices.map(function() {
+      return false;
+    });
+    graphUtilsService.markAccessible(0, adjacencyLists, isVisited);
+    var isAnyVertexUnreachable = isVisited.some(function(visited) {
+      return visited === false;
+    });
+
+    var isVisitedInReverse = graph.vertices.map(function() {
+      return false;
+    });
+    graphUtilsService.markAccessible(
+      0, invertedAdjacencyLists, isVisitedInReverse);
+    var isAnyVertexUnreachableInReverse =
+      isVisitedInReverse.some(function(visited) {
+        return visited === false;
+      });
+
+    return !isAnyVertexUnreachable && !isAnyVertexUnreachableInReverse;
+  };
+
+  /**
+   * @param {object} graph - A graph object.
+   * @return {boolean} Whether the graph is weakly connected.
+   */
+  var isWeaklyConnected = function(graph) {
+    // Generates adjacency lists assuming graph is undirected, then uses depth
+    // first search on node 0 to try to reach every other vertex
+    if (graph.vertices.length == 0) {
+      return true;
+    }
+
+    var adjacencyLists = graphUtilsService.constructAdjacencyLists(
+      graph, graphUtilsService.GRAPH_ADJACENCY_MODE.UNDIRECTED);
+    var isVisited = graph.vertices.map(function() {
+      return false;
+    });
+    graphUtilsService.markAccessible(0, adjacencyLists, isVisited);
+    return isVisited.every(function(visited) {
+      return visited === true;
+    });
+  };
+
+  /**
+   * @param {object} graph - A graph object.
+   * @return {boolean} Whether the graph is acyclic.
+   */
+  var isAcyclic = function(graph) {
+    // Uses depth first search to ensure that we never have an edge to an
+    // ancestor in the search tree.
+
+    var isVisited = graph.vertices.map(function() {
+      return graphUtilsService.DFS_STATUS.UNVISITED;
+    });
+    var adjacencyLists = graphUtilsService.constructAdjacencyLists(
+      graph, graphUtilsService.GRAPH_ADJACENCY_MODE.DIRECTED);
+    for (var startVertex = 0;
+         startVertex < graph.vertices.length;
+         startVertex++) {
+      if (isVisited[startVertex] == graphUtilsService.DFS_STATUS.UNVISITED) {
+        if (graphUtilsService.findCycle(
+            startVertex, -1, adjacencyLists, isVisited, graph.isDirected)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  };
+
+  /**
+   * @param {object} graph - A graph object.
+   * @return {boolean} Whether the graph is acyclic.
+   */
+  var isRegular = function(graph) {
+    // Checks that every vertex has outdegree and indegree equal to the first
+    if (graph.vertices.length === 0) {
+      return true;
+    }
+
+    var adjacencyLists = graphUtilsService.constructAdjacencyLists(
+      graph, graphUtilsService.GRAPH_ADJACENCY_MODE.DIRECTED);
+    var outdegreeCounts = adjacencyLists.map(function(list) {
+      return list.length;
+    });
+    var indegreeCounts = adjacencyLists.map(function() {
+      return 0;
+    });
+    adjacencyLists.forEach(function(list) {
+      list.forEach(function(destination) {
+        indegreeCounts[destination]++;
+      });
+    });
+
+    var areIndegreeCountsEqual = indegreeCounts.every(function(indegree) {
+      return indegree == indegreeCounts[0];
+    });
+    var areOutdegreeCountsEqual = outdegreeCounts.every(function(outdegree) {
+      return outdegree == outdegreeCounts[0];
+    });
+    return areIndegreeCountsEqual && areOutdegreeCountsEqual;
+  };
+
+  var isIsomorphic = function(graph1, graph2) {
     if (graph1.vertices.length != graph2.vertices.length) {
       return false;
     }
@@ -694,12 +899,25 @@ oppia.factory('graphInputRulesService', [
   };
 
   return {
+    HasGraphProperty: function(answer, inputs) {
+      if (inputs.p == 'strongly_connected') {
+        return isStronglyConnected(answer);
+      } else if (inputs.p == 'weakly_connected') {
+        return isWeaklyConnected(answer);
+      } else if (inputs.p == 'acyclic') {
+        return isAcyclic(answer);
+      } else if (inputs.p == 'regular') {
+        return isRegular(answer);
+      } else {
+        return false;
+      }
+    },
     IsIsomorphicTo: function(answer, inputs) {
-      return IsIsomorphic(answer, inputs.g);
+      return isIsomorphic(answer, inputs.g);
     },
     FuzzyMatches: function(answer, inputs) {
       return inputs.training_data.some(function(trainingGraph) {
-        return IsIsomorphic(answer, trainingGraph);
+        return isIsomorphic(answer, trainingGraph);
       });
     }
   };

@@ -1,13 +1,15 @@
 <script type="text/ng-template" id="inline/collection_node_list_directive">
-  <exploration-summary-tile ng-repeat="collection_node in getCollectionNodes()"
+  <exploration-summary-tile ng-repeat="collectionNode in getCollectionNodes()"
                             collection-id="getCollectionId()"
-                            exploration-id="collection_node.exploration.id"
-                            exploration-title="collection_node.exploration.title"
-                            last-updated-msec="collection_node.exploration.last_updated_msec"
-                            objective="collection_node.exploration.objective"
-                            category="collection_node.exploration.category"
-                            ratings="collection_node.exploration.ratings"
-                            thumbnail-icon-url="collection_node.exploration.thumbnail_icon_url"
-                            thumbnail-bg-color="collection_node.exploration.thumbnail_bg_color">
+                            exploration-id="collectionNode.getExplorationId()"
+                            exploration-title="collectionNode.getExplorationSummaryObject().title"
+                            last-updated-msec="collectionNode.getExplorationSummaryObject().last_updated_msec"
+                            objective="collectionNode.getExplorationSummaryObject().objective"
+                            category="collectionNode.getExplorationSummaryObject().category"
+                            ratings="collectionNode.getExplorationSummaryObject().ratings"
+                            num-views="collectionNode.getExplorationSummaryObject().num_views"
+                            thumbnail-icon-url="collectionNode.getExplorationSummaryObject().thumbnail_icon_url"
+                            thumbnail-bg-color="collectionNode.getExplorationSummaryObject().thumbnail_bg_color"
+                            is-community-owned="collectionNode.getExplorationSummaryObject().community_owned">
   </exploration-summary-tile>
 </script>

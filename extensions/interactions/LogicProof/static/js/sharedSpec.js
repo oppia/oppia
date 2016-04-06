@@ -15,7 +15,6 @@
 /**
  * @fileoverview Unit tests for the shared components of the LogicProof
  * interaction.
- * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var errorWrapper = function(dubiousFunction, input, parameter) {

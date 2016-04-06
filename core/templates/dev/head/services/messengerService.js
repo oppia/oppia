@@ -17,8 +17,6 @@
  * communication with a parent iframe should pass through here. (This
  * communication should be outbound only; reverse communication should NOT
  * be attempted due to cross-domain security issues.)
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.factory('messengerService', ['$log', '$window', function($log, $window) {

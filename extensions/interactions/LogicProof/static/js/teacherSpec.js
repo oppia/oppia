@@ -15,7 +15,6 @@
 /**
  * @fileoverview Unit tests for the editor components of the LogicProof
  * interaction.
- * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 describe('Build questions', function() {

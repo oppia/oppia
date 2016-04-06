@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Unit tests for the player transcript service.
- *
- * @author sean@seanlip.org (Sean Lip)
  */
 
 describe('Player transcript service', function() {

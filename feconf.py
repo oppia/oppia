@@ -158,6 +158,10 @@ CAN_SEND_EMAILS_TO_USERS = False
 DEFAULT_EMAIL_UPDATES_PREFERENCE = False
 # Whether to require an email to be sent, following a moderator action.
 REQUIRE_EMAIL_ON_MODERATOR_ACTION = False
+# Whether to allow custom event reporting to Google Analytics.
+CAN_SEND_ANALYTICS_EVENTS = False
+# Timespan in minutes before allowing duplicate emails
+DUPLICATE_EMAIL_INTERVAL_MINS = 2
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
@@ -222,6 +226,9 @@ SHOW_CUSTOM_PAGES = True
 # The id of the default skin.
 # TODO(sll): Deprecate this; it is no longer used.
 DEFAULT_SKIN_ID = 'conversation_v1'
+
+# The prefix for an 'accepted suggestion' commit message.
+COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
 
 # User id and username for exploration migration bot. Commits made by this bot
 # are not reflected in the exploration summary models (for the gallery and
@@ -332,7 +339,10 @@ DEMO_COLLECTIONS = {
 }
 
 # TODO(sll): Add all other URLs here.
-COLLECTION_DATA_URL_PREFIX = '/collectionhandler/data'
+COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
+COLLECTION_WRITABLE_DATA_URL_PREFIX = '/collection_editor_handler/data'
+COLLECTION_RIGHTS_PREFIX = '/collection_editor_handler/rights'
+COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
 CONTRIBUTE_GALLERY_URL = '/contribute'
 EDITOR_URL_PREFIX = '/create'
@@ -343,16 +353,22 @@ EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
 FEEDBACK_LAST_UPDATED_URL_PREFIX = '/feedback_last_updated'
 FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
+FEEDBACK_STATS_URL_PREFIX = '/feedbackstatshandler'
 GALLERY_URL = '/gallery'
-GALLERY_CREATE_MODE_URL = '%s?mode=create' % GALLERY_URL
 GALLERY_DATA_URL = '/galleryhandler/data'
 LEARN_GALLERY_URL = '/learn'
+MY_EXPLORATIONS_URL = '/my_explorations'
+MY_EXPLORATIONS_CREATE_MODE_URL = '%s?mode=create' % MY_EXPLORATIONS_URL
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
+NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 PLAYTEST_QUEUE_URL = '/playtest'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 SIGNUP_URL = '/signup'
 SIGNUP_DATA_URL = '/signuphandler/data'
+SUGGESTION_URL_PREFIX = '/suggestionhandler'
+SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
+SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 

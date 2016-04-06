@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Services for the exploration history tab.
- *
- * @author wxyxinyu@gmail.com (Xinyu Wu)
  */
 
 // Service for handling all interactions with the version history tree.

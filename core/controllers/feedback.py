@@ -15,6 +15,8 @@
 """Controllers for the feedback thread page."""
 
 from core.controllers import base
+from core.controllers import editor
+from core.domain import exp_services
 from core.domain import feedback_services
 
 
@@ -25,7 +27,8 @@ class ThreadListHandler(base.BaseHandler):
 
     def get(self, exploration_id):
         self.values.update({
-            'threads': feedback_services.get_threadlist(exploration_id)})
+            'threads': feedback_services.get_all_threads(
+                exploration_id, False)})
         self.render_json(self.values)
 
     @base.require_user
@@ -56,18 +59,27 @@ class ThreadHandler(base.BaseHandler):
 
     def get(self, exploration_id, thread_id):  # pylint: disable=unused-argument
         self.values.update({
-            'messages': feedback_services.get_messages(thread_id)})
+            'messages': feedback_services.get_messages(
+                exploration_id, thread_id)})
+        self.values.update({
+            'suggestion': feedback_services.get_suggestion(
+                exploration_id, thread_id)})
         self.render_json(self.values)
 
     @base.require_user
     def post(self, exploration_id, thread_id):  # pylint: disable=unused-argument
+        suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
         text = self.payload.get('text')
         updated_status = self.payload.get('updated_status')
         if not text and not updated_status:
             raise self.InvalidInputException(
                 'Text for the message must be specified.')
+        if suggestion and updated_status:
+            raise self.InvalidInputException(
+                'Suggestion thread status cannot be changed manually.')
 
         feedback_services.create_message(
+            exploration_id,
             thread_id,
             self.user_id,
             updated_status,
@@ -106,3 +118,104 @@ class RecentFeedbackMessagesHandler(base.BaseHandler):
             'cursor': new_urlsafe_start_cursor,
             'more': more,
         })
+
+
+class FeedbackStatsHandler(base.BaseHandler):
+    """Returns Feedback stats for an exploration.
+        - Number of open threads
+        - Number of total threads
+    """
+
+    def get(self, exploration_id):
+        feedback_thread_analytics = feedback_services.get_thread_analytics(
+            exploration_id)
+        self.values.update({
+            'num_open_threads': (
+                feedback_thread_analytics['num_open_threads']),
+            'num_total_threads': (
+                feedback_thread_analytics['num_total_threads']),
+        })
+        self.render_json(self.values)
+
+
+class SuggestionHandler(base.BaseHandler):
+    """"Handles operations relating to learner suggestions."""
+
+    PAGE_NAME_FOR_CSRF = 'player'
+
+    @base.require_user
+    def post(self, exploration_id):
+        feedback_services.create_suggestion(
+            exploration_id,
+            self.user_id,
+            self.payload.get('exploration_version'),
+            self.payload.get('state_name'),
+            self.payload.get('description'),
+            self.payload.get('suggestion_content'))
+        self.render_json(self.values)
+
+
+class SuggestionActionHandler(base.BaseHandler):
+    """"Handles actions performed on threads with suggestions."""
+
+    PAGE_NAME_FOR_CSRF = 'editor'
+    _ACCEPT_ACTION = 'accept'
+    _REJECT_ACTION = 'reject'
+
+    @editor.require_editor
+    def put(self, exploration_id, thread_id):
+        action = self.payload.get('action')
+        if action == self._ACCEPT_ACTION:
+            exp_services.accept_suggestion(
+                self.user_id,
+                thread_id,
+                exploration_id,
+                self.payload.get('commit_message'))
+        elif action == self._REJECT_ACTION:
+            exp_services.reject_suggestion(
+                self.user_id, thread_id, exploration_id)
+        else:
+            raise self.InvalidInputException('Invalid action.')
+
+        self.render_json(self.values)
+
+
+class SuggestionListHandler(base.BaseHandler):
+    """Handles operations relating to list of threads with suggestions."""
+
+    PAGE_NAME_FOR_CSRF = 'editor'
+    _LIST_TYPE_OPEN = 'open'
+    _LIST_TYPE_CLOSED = 'closed'
+    _LIST_TYPE_ALL = 'all'
+
+    def _string_to_bool(self, has_suggestion):
+        if has_suggestion == 'true':
+            return True
+        elif has_suggestion == 'false':
+            return False
+        else:
+            return None
+
+    @base.require_user
+    def get(self, exploration_id):
+        threads = None
+        list_type = self.request.get('list_type')
+        has_suggestion = self._string_to_bool(
+            self.request.get('has_suggestion'))
+        if has_suggestion is None:
+            raise self.InvalidInputException(
+                'Invalid value for has_suggestion.')
+        if list_type == self._LIST_TYPE_OPEN:
+            threads = feedback_services.get_open_threads(
+                exploration_id, has_suggestion)
+        elif list_type == self._LIST_TYPE_CLOSED:
+            threads = feedback_services.get_closed_threads(
+                exploration_id, has_suggestion)
+        elif list_type == self._LIST_TYPE_ALL:
+            threads = feedback_services.get_all_threads(
+                exploration_id, has_suggestion)
+        else:
+            raise self.InvalidInputException('Invalid list type.')
+
+        self.values.update({'threads': threads})
+        self.render_json(self.values)

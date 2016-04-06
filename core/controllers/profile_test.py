@@ -236,9 +236,10 @@ class ProfileLinkTests(test_utils.GenericTestBase):
         response_dict = self.get_json(
             '%s%s' % (self.PROFILE_PIC_URL, self.USERNAME)
         )
-        self.assertEqual(
-            response_dict['profile_picture_data_url_for_username'],
-            None)
+        # Although the user has a valid username, they have not yet supplied
+        # a profile picture.
+        self.assertIsNone(
+            response_dict['profile_picture_data_url_for_username'])
 
 
 class ProfileDataHandlerTests(test_utils.GenericTestBase):
@@ -309,7 +310,8 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
             '/profilehandler/data/%s' % self.USERNAME)
         self.assertIsNone(response_dict['first_contribution_msec'])
 
-        # Update the first_contribution_msec to the current time in milliseconds.
+        # Update the first_contribution_msec to the current time in
+        # milliseconds.
         first_time_in_msecs = utils.get_current_time_in_millisecs()
         user_services.update_first_contribution_msec_if_not_set(
             user_id, first_time_in_msecs)

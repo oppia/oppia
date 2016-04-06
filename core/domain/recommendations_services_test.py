@@ -184,18 +184,21 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
     def test_get_topic_similarities_as_csv(self):
         # The splitlines() is needed because a carriage return is added in
         # the returned string
-        self.assertEqual(
-            recommendations_services.get_topic_similarities_as_csv().splitlines(),
-            self.TOPIC_SIMILARITIES_DEFAULT.splitlines())
+        topic_similarities = (
+            recommendations_services.get_topic_similarities_as_csv())
+
+        self.assertEqual(topic_similarities.splitlines(),
+                         self.TOPIC_SIMILARITIES_DEFAULT.splitlines())
 
         recommendations_services.update_topic_similarities(
             'Art,Biology,Chemistry\n'
             '1.0,0.2,0.1\n'
             '0.2,1.0,0.8\n'
             '0.1,0.8,1.0')
-        self.assertEqual(
-            recommendations_services.get_topic_similarities_as_csv().splitlines(),
-            self.TOPIC_SIMILARITIES_UPDATED.splitlines())
+        topic_similarities = (
+            recommendations_services.get_topic_similarities_as_csv())
+        self.assertEqual(topic_similarities.splitlines(),
+                         self.TOPIC_SIMILARITIES_UPDATED.splitlines())
 
 
 class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
@@ -253,7 +256,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
         user_services.get_or_create_user(
             self.admin_id, self.ADMIN_EMAIL)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_EMAIL])
+        self.set_admins([self.ADMIN_USERNAME])
 
 
 class ExplorationRecommendationsUnitTests(RecommendationsServicesUnitTests):

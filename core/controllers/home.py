@@ -58,7 +58,7 @@ class NotificationsDashboardHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         job_queued_msec, recent_notifications = (
-            user_jobs_continuous.DashboardRecentUpdatesAggregator.get_recent_notifications(
+            user_jobs_continuous.DashboardRecentUpdatesAggregator.get_recent_notifications(  # pylint: disable=line-too-long
                 self.user_id))
 
         last_seen_msec = (
@@ -109,6 +109,9 @@ class MyExplorationsPage(base.BaseHandler):
         elif user_services.has_fully_registered(self.user_id):
             self.values.update({
                 'nav_mode': feconf.NAV_MODE_HOME,
+                'can_create_collections': (
+                    self.username in
+                    config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value)
             })
             self.render_template(
                 'dashboard/my_explorations.html', redirect_url_on_logout='/')
@@ -189,7 +192,7 @@ class NotificationsHandler(base.BaseHandler):
                 subscription_services.get_last_seen_notifications_msec(
                     self.user_id))
             _, recent_notifications = (
-                user_jobs_continuous.DashboardRecentUpdatesAggregator.get_recent_notifications(
+                user_jobs_continuous.DashboardRecentUpdatesAggregator.get_recent_notifications( # pylint: disable=line-too-long
                     self.user_id))
             for notification in recent_notifications:
                 if (notification['last_updated_ms'] > last_seen_msec and

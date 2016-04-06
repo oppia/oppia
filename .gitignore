@@ -14,3 +14,4 @@ venv/
 .DS_Store
 .idea
 static/images/splash/*
+.vagrant/*

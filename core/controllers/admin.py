@@ -134,7 +134,7 @@ class AdminPage(base.BaseHandler):
                 rte_component_registry.Registry.get_html_for_all_components()),
             'unfinished_job_data': unfinished_job_data,
             'value_generators_js': jinja2.utils.Markup(
-                editor.VALUE_GENERATORS_JS.value),
+                editor.get_value_generators_js()),
         })
 
         self.render_template('admin/admin.html')
@@ -152,8 +152,6 @@ class AdminHandler(base.BaseHandler):
         self.render_json({
             'config_properties': (
                 config_domain.Registry.get_config_property_schemas()),
-            'computed_properties': (
-                config_domain.Registry.get_computed_property_names()),
         })
 
     @require_super_admin
@@ -191,11 +189,6 @@ class AdminHandler(base.BaseHandler):
                              (self.user_id, config_property_id))
                 config_services.revert_property(
                     self.user_id, config_property_id)
-            elif self.payload.get('action') == 'refresh_computed_property':
-                computed_property_name = self.payload.get(
-                    'computed_property_name')
-                config_domain.Registry.get_config_property(
-                    computed_property_name).refresh_default_value()
             elif self.payload.get('action') == 'start_new_job':
                 for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
                     if klass.__name__ == self.payload.get('job_type'):

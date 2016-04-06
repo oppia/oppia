@@ -15,13 +15,12 @@
 /**
  * @fileoverview Service for returning information about an exploration's
  * context.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.constant('PAGE_CONTEXT', {
   EDITOR: 'editor',
-  LEARNER: 'learner'
+  LEARNER: 'learner',
+  OTHER: 'other'
 });
 
 oppia.constant('EDITOR_TAB_CONTEXT', {
@@ -51,7 +50,8 @@ oppia.factory('explorationContextService', [
       },
       // Returns a string representing the context of the current page.
       // This is either PAGE_CONTEXT.EDITOR or PAGE_CONTEXT.LEARNER.
-      // If the current page is not one of these, an error is raised.
+      // If the current page is not one in either EDITOR or LEARNER then
+      // return PAGE_CONTEXT.OTHER
       getPageContext: function() {
         if (_pageContext) {
           return _pageContext;
@@ -67,9 +67,7 @@ oppia.factory('explorationContextService', [
             }
           }
 
-          throw Error(
-            'ERROR: explorationContextService should not be used outside the ' +
-            'context of an exploration.');
+          return PAGE_CONTEXT.OTHER;
         }
       },
       // Returns a string representing the explorationId (obtained from the
@@ -93,6 +91,13 @@ oppia.factory('explorationContextService', [
             'ERROR: explorationContextService should not be used outside the ' +
             'context of an exploration.');
         }
+      },
+
+      // Following variable helps to know whether exploration editor is
+      // in main editing mode or preview mode.
+      isInExplorationEditorMode: function() {
+        return (this.getPageContext() === PAGE_CONTEXT.EDITOR &&
+            this.getEditorTabContext() === EDITOR_TAB_CONTEXT.EDITOR);
       }
     };
   }

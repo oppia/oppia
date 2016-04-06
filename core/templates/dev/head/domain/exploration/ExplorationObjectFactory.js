@@ -15,8 +15,6 @@
 /**
  * @fileoverview Factory for creating new frontend instances of Exploration
  * domain objects.
- *
- * @author sean@seanlip.org (Sean Lip)
  */
 
 oppia.factory('ExplorationObjectFactory', [
@@ -115,6 +113,10 @@ oppia.factory('ExplorationObjectFactory', [
 
     Exploration.prototype.getInitialState = function() {
       return this.getState(this.initStateName);
+    };
+
+    Exploration.prototype.getUninterpolatedContentHtml = function(stateName) {
+      return this.getState(stateName).content[0].value;
     };
 
     // Static class methods. Note that "this" is not available in
