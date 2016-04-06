@@ -321,6 +321,8 @@ def get_learner_collection_dict_by_id(
 
         if summary_dict:
             collection_node['exploration_summary'] = summary_dict
+        else:
+            collection_node['exploration_summary'] = None
 
     return collection_dict
 

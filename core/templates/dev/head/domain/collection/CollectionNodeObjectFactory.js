@@ -45,19 +45,19 @@ oppia.factory('CollectionNodeObjectFactory', [
 
     // Returns the title of the exploration represented by this collection node.
     // This property is immutable. The value returned by this function is
-    // undefined if doesExplorationExist() returns false.
+    // null if doesExplorationExist() returns false.
     CollectionNode.prototype.getExplorationTitle = function() {
       if (this._explorationSummaryObject) {
         return this._explorationSummaryObject.title;
       } else {
-        return undefined;
+        return null;
       }
     };
 
     // Returns whether the exploration referenced by this node is known to exist
     // in the backend. This property is immutable.
     CollectionNode.prototype.doesExplorationExist = function() {
-      return this._explorationSummaryObject !== undefined;
+      return this._explorationSummaryObject !== null;
     };
 
     // Returns whether the exploration referenced by this node is private and
@@ -88,7 +88,7 @@ oppia.factory('CollectionNodeObjectFactory', [
     // Returns a raw exploration summary object, as supplied by the backend for
     // frontend exploration summary tile displaying. Changes to the returned
     // object are not reflected in this domain object. The value returned by
-    // this function is undefined if doesExplorationExist() returns false.
+    // this function is null if doesExplorationExist() returns false.
     CollectionNode.prototype.getExplorationSummaryObject = function() {
       // TODO(bhenning): This should be represented by a frontend summary domain
       // object that is also shared with the gallery and profile pages.
@@ -115,7 +115,8 @@ oppia.factory('CollectionNodeObjectFactory', [
       return CollectionNode.create({
         exploration_id: explorationId,
         acquired_skills: [],
-        prerequisite_skills: []
+        prerequisite_skills: [],
+        exploration_summary: null
       });
     };
 

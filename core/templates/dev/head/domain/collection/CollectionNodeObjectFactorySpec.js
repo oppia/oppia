@@ -104,6 +104,6 @@ describe('Collection node object factory', function() {
     expect(collectionNode.getExplorationId()).toEqual('exp_id0');
     expect(prerequisiteSkillList.getSkillCount()).toEqual(0);
     expect(acquiredSkillList.getSkillCount()).toEqual(0);
-    expect(collectionNode.doesExplorationExist()).toBeFalsy();
+    expect(collectionNode.doesExplorationExist()).toBe(false);
   });
 });

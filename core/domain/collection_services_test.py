@@ -913,6 +913,7 @@ class CollectionLearnerDictTests(CollectionServicesUnitTests):
     """Test get_learner_collection_dict_by_id."""
 
     EXP_ID = 'exploration_id'
+    EXP_ID_1 = 'exp_id1'
 
     def setUp(self):
         super(CollectionLearnerDictTests, self).setUp()
@@ -978,6 +979,30 @@ class CollectionLearnerDictTests(CollectionServicesUnitTests):
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
         collection_services.get_learner_collection_dict_by_id(
             self.COLLECTION_ID, self.owner_id)
+
+    def test_get_learner_dict_with_allowed_private_exps(self):
+        self.save_new_valid_collection(
+            self.COLLECTION_ID, self.owner_id, exploration_id=self.EXP_ID)
+        self.save_new_valid_exploration(self.EXP_ID_1, self.editor_id)
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                'exploration_id': self.EXP_ID_1
+            }], 'Added another creator\'s private exploration')
+
+        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+
+        collection_dict = collection_services.get_learner_collection_dict_by_id(
+            self.COLLECTION_ID, self.owner_id, allow_invalid_explorations=True)
+
+        # The author's private exploration will be contained in the public
+        # collection since invalid explorations are being allowed, but the
+        # private exploration of another author will not.
+        collection_node_dicts = collection_dict['nodes']
+        self.assertEqual(
+            collection_node_dicts[0]['exploration_summary']['id'],
+            self.EXP_ID)
+        self.assertIsNone(collection_node_dicts[1]['exploration_summary'])
 
 
 def _get_node_change_list(exploration_id, property_name, new_value):

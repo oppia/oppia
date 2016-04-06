@@ -22,6 +22,10 @@ describe('Collection update service', function() {
   var UndoRedoService = null;
   var SkillListObjectFactory = null;
   var _sampleCollection = null;
+  var _sampleExplorationSummaryBackendObject = {
+    title: 'Title',
+    status: 'public'
+  };
 
   beforeEach(module('oppia'));
 
@@ -56,7 +60,7 @@ describe('Collection update service', function() {
       function() {
     expect(_sampleCollection.getExplorationIds()).toEqual(['exp_id0']);
     CollectionUpdateService.addCollectionNode(
-      _sampleCollection, 'exp_id1', undefined);
+      _sampleCollection, 'exp_id1', _sampleExplorationSummaryBackendObject);
     expect(_sampleCollection.getExplorationIds()).toEqual([
       'exp_id0', 'exp_id1'
     ]);
@@ -68,7 +72,7 @@ describe('Collection update service', function() {
   it('should create a proper backend change dict for adding collection nodes',
       function() {
     CollectionUpdateService.addCollectionNode(
-      _sampleCollection, 'exp_id1', undefined);
+      _sampleCollection, 'exp_id1', _sampleExplorationSummaryBackendObject);
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'add_collection_node',
       exploration_id: 'exp_id1'
