@@ -37,11 +37,11 @@ oppia.controller('MyExplorations', [
     };
 
     $rootScope.loadingMessage = 'Loading';
-    $http.get('/myexplorationshandler/data').success(function(data) {
-      $scope.explorationsList = data.explorations_list;
+    $http.get('/myexplorationshandler/data').then(function(response) {
+      $scope.explorationsList = response.data.explorations_list;
       $rootScope.loadingMessage = '';
 
-      if (data.username) {
+      if (response.data.username) {
         if (urlService.getUrlParams().mode === 'create') {
           $scope.showCreateExplorationModal(CATEGORY_LIST);
         }

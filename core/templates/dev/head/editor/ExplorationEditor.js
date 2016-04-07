@@ -518,7 +518,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       $http.post($scope.changeListSummaryUrl, {
         change_list: changeListService.getChangeList(),
         version: explorationData.data.version
-      }).success(function(data) {
+      }).then(function(response) {
+        var data = response.data;
         if (data.error) {
           alertsService.addWarning(data.error);
           return;
