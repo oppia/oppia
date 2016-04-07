@@ -106,6 +106,7 @@ class DefaultGalleryCategoriesHandler(base.BaseHandler):
             summary_services.get_gallery_category_groupings(language_codes))
 
         preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
+        featured_activity_summary_dicts = (summary_services.get_featured_explorations())
         if self.user_id:
             user_settings = user_services.get_user_settings(self.user_id)
             preferred_language_codes = user_settings.preferred_language_codes
@@ -113,6 +114,8 @@ class DefaultGalleryCategoriesHandler(base.BaseHandler):
         self.values.update({
             'activity_summary_dicts_by_category': (
                 summary_dicts_by_category),
+            'featured_activity_summary_dicts': (
+                featured_activity_summary_dicts),
             'preferred_language_codes': preferred_language_codes,
         })
         self.render_json(self.values)

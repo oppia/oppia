@@ -113,7 +113,6 @@ def get_gallery_category_groupings(language_codes):
             '" OR "'.join(categories), language_codes_suffix)
 
     results = []
-    featured = []
     for gallery_group in _GALLERY_CATEGORY_GROUPINGS:
         # TODO(sll): Extend this to include collections.
         exp_ids = exp_services.search_explorations(
@@ -125,21 +124,25 @@ def get_gallery_category_groupings(language_codes):
         if not summary_dicts:
             continue
 
-        for exploration_summary in summary_dicts:
-            if exploration_summary['status'] == 'publicized':
-                featured.append(exploration_summary)
-
         results.append({
             'header': gallery_group['header'],
             'categories': gallery_group['search_categories'],
             'activity_summary_dicts': summary_dicts,
         })
 
-    if featured:
-        results.insert(0, {
-            'header': 'Featured',
-            'categories': 'Featured',
-            'activity_summary_dicts': featured,
-        })
-
     return results
+
+
+def get_featured_explorations():
+    """Returns a list of featured explorations."""
+    exp_ids = []
+    exp_ids = exp_services.get_all_exploration_summaries()
+    exp_summaries = get_displayable_exp_summary_dicts_matching_ids(
+            exp_ids)
+    featured_exp_summaries = []
+    for exp_summary in exp_summaries:
+        print exp_summary['status'] == rights_manager.ACTIVITY_STATUS_PUBLICIZED
+        if exp_summary['status'] == rights_manager.ACTIVITY_STATUS_PUBLICIZED:
+            featured_exp_summaries.append(exp_summary)
+
+    return featured_exp_summaries
