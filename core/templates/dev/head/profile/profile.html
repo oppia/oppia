@@ -132,11 +132,14 @@
     </md-card>
   </div>
 {% endblock %}
+      
+{% block footer%}
+  {% include 'footer.html' %}
+{% endblock %}      
 
 {% block footer_js %}
   {{ super() }}
   <script>
     {{ include_js_file('profile/Profile.js') }}
   </script>
-  {% include 'footer.html' %}
 {% endblock footer_js %}
