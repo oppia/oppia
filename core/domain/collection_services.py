@@ -268,7 +268,7 @@ def get_learner_collection_dict_by_id(
     exp_ids = collection.exploration_ids
     exp_summary_dicts = (
         summary_services.get_displayable_exp_summary_dicts_matching_ids(
-            exp_ids))
+            exp_ids, editor_user_id=user_id))
     exp_summaries_dict_map = {
         exp_summary_dict['id']: exp_summary_dict
         for exp_summary_dict in exp_summary_dicts
@@ -310,18 +310,19 @@ def get_learner_collection_dict_by_id(
                 raise utils.ValidationError(
                     'Expected collection to only reference valid '
                     'explorations, but found an exploration with ID: %s (was '
-                    'the exploration deleted?)' % exploration_id)
+                    'the exploration deleted or is it a private exploration '
+                    'that you do not have edit access to?)'
+                    % exploration_id)
             if collection_is_public and rights_manager.is_exploration_private(
                     exploration_id):
                 raise utils.ValidationError(
                     'Cannot reference a private exploration within a public '
                     'collection, exploration ID: %s' % exploration_id)
 
-        collection_node['exploration'] = {
-            'exists': bool(summary_dict)
-        }
         if summary_dict:
-            collection_node['exploration'].update(summary_dict)
+            collection_node['exploration_summary'] = summary_dict
+        else:
+            collection_node['exploration_summary'] = None
 
     return collection_dict
 

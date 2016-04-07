@@ -18,6 +18,7 @@ import datetime
 
 from core.domain import collection_domain
 from core.domain import collection_services
+from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
@@ -906,6 +907,102 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
             self.COLLECTION_ID)
         collection_node = collection.get_node(self.EXPLORATION_ID)
         self.assertEqual(collection_node.acquired_skills, ['third', 'fourth'])
+
+
+class CollectionLearnerDictTests(CollectionServicesUnitTests):
+    """Test get_learner_collection_dict_by_id."""
+
+    EXP_ID = 'exploration_id'
+    EXP_ID_1 = 'exp_id1'
+
+    def setUp(self):
+        super(CollectionLearnerDictTests, self).setUp()
+
+    def test_get_learner_dict_with_deleted_exp_fails_validation(self):
+        self.save_new_valid_collection(
+            self.COLLECTION_ID, self.owner_id, exploration_id=self.EXP_ID)
+        collection_services.get_learner_collection_dict_by_id(
+            self.COLLECTION_ID, self.owner_id)
+
+        exp_services.delete_exploration(self.owner_id, self.EXP_ID)
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected collection to only reference valid explorations, but '
+            'found an exploration with ID: exploration_id'):
+            collection_services.get_learner_collection_dict_by_id(
+                self.COLLECTION_ID, self.owner_id)
+
+    def test_get_learner_dict_when_referencing_inaccessible_explorations(self):
+        self.save_new_default_collection(self.COLLECTION_ID, self.owner_id)
+        self.save_new_valid_exploration(self.EXP_ID, self.editor_id)
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                'exploration_id': self.EXP_ID
+            }], 'Added another creator\'s private exploration')
+
+        # A collection cannot access someone else's private exploration.
+        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected collection to only reference valid explorations, but '
+            'found an exploration with ID: exploration_id'):
+            collection_services.get_learner_collection_dict_by_id(
+                self.COLLECTION_ID, self.owner_id)
+
+        # After the exploration is published, the dict can now be created.
+        rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
+        collection_services.get_learner_collection_dict_by_id(
+            self.COLLECTION_ID, self.owner_id)
+
+    def test_get_learner_dict_with_private_exp_fails_validation(self):
+        self.save_new_valid_collection(
+            self.COLLECTION_ID, self.owner_id, exploration_id=self.EXP_ID)
+
+        # Since both the collection and exploration are private, the learner
+        # dict can be created.
+        collection_services.get_learner_collection_dict_by_id(
+            self.COLLECTION_ID, self.owner_id)
+
+        # A public collection referencing a private exploration is bad, however.
+        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Cannot reference a private exploration within a public '
+            'collection, exploration ID: exploration_id'):
+            collection_services.get_learner_collection_dict_by_id(
+                self.COLLECTION_ID, self.owner_id)
+
+        # After the exploration is published, the learner dict can be crated
+        # again.
+        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
+        collection_services.get_learner_collection_dict_by_id(
+            self.COLLECTION_ID, self.owner_id)
+
+    def test_get_learner_dict_with_allowed_private_exps(self):
+        self.save_new_valid_collection(
+            self.COLLECTION_ID, self.owner_id, exploration_id=self.EXP_ID)
+        self.save_new_valid_exploration(self.EXP_ID_1, self.editor_id)
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                'exploration_id': self.EXP_ID_1
+            }], 'Added another creator\'s private exploration')
+
+        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+
+        collection_dict = collection_services.get_learner_collection_dict_by_id(
+            self.COLLECTION_ID, self.owner_id, allow_invalid_explorations=True)
+
+        # The author's private exploration will be contained in the public
+        # collection since invalid explorations are being allowed, but the
+        # private exploration of another author will not.
+        collection_node_dicts = collection_dict['nodes']
+        self.assertEqual(
+            collection_node_dicts[0]['exploration_summary']['id'],
+            self.EXP_ID)
+        self.assertIsNone(collection_node_dicts[1]['exploration_summary'])
 
 
 def _get_node_change_list(exploration_id, property_name, new_value):
