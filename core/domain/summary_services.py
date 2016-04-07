@@ -138,11 +138,11 @@ def get_featured_explorations():
     exp_ids = []
     exp_ids = exp_services.get_all_exploration_summaries()
     exp_summaries = get_displayable_exp_summary_dicts_matching_ids(
-            exp_ids)
+        exp_ids)
     featured_exp_summaries = []
     for exp_summary in exp_summaries:
-        print exp_summary['status'] == rights_manager.ACTIVITY_STATUS_PUBLICIZED
         if exp_summary['status'] == rights_manager.ACTIVITY_STATUS_PUBLICIZED:
             featured_exp_summaries.append(exp_summary)
 
     return featured_exp_summaries
+    
