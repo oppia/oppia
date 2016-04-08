@@ -118,7 +118,7 @@ class CollectionEditorPage(CollectionEditorHandler):
                 rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id))
 
         self.values.update({
-            'is_public': rights_manager.is_collection_public(collection_id),
+            'is_private': rights_manager.is_collection_private(collection_id),
             'can_edit': can_edit,
             'collection_id': collection.id,
             'title': collection.title,
