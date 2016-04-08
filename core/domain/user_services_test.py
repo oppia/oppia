@@ -132,6 +132,40 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             user_services.get_user_id_from_username('fakeUsername'))
 
+    def test_set_and_get_user_email_preferences(self):
+        user_id = 'someUser'
+        username = 'username'
+        user_email = 'user@example.com'
+
+        user_services.get_or_create_user(user_id, user_email)
+        user_services.set_username(user_id, username)
+
+        # When UserEmailPreferencesModel is yet to be created value of
+        # membership email preference should be True by default
+        email_preferences = user_services.get_email_preferences(user_id)
+        self.assertEquals(
+            email_preferences['can_receive_membership_email'],
+            feconf.DEFAULT_MEMBERSHIP_EMAIL_PREFERENCE)
+
+        user_services.update_email_preferences(
+            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE)
+
+        # When nothing is specified for membership email notifications
+        # it should be True by default
+        email_preferences = user_services.get_email_preferences(user_id)
+        self.assertEquals(
+            email_preferences['can_receive_membership_email'],
+            feconf.DEFAULT_MEMBERSHIP_EMAIL_PREFERENCE)
+
+        # Change preference for receiving membership emails to False
+        user_services.update_email_preferences(
+            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE, False)
+
+        email_preferences = user_services.get_email_preferences(user_id)
+        self.assertEquals(
+            email_preferences['can_receive_membership_email'],
+            False)
+
 
 class UpdateContributionMsecTests(test_utils.GenericTestBase):
     """Test whether contribution date changes with publication of

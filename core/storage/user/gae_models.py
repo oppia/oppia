@@ -96,6 +96,11 @@ class UserEmailPreferencesModel(base_models.BaseModel):
     # None if the user has never set a preference.
     site_updates = ndb.BooleanProperty(indexed=True)
 
+    # The user's preference for receiving email when user is added as a member
+    # in exploration. This is set to True when user has never set a preference.
+    membership_notifications = ndb.BooleanProperty(
+        indexed=False, default=feconf.DEFAULT_MEMBERSHIP_EMAIL_PREFERENCE)
+
 
 class UserSubscriptionsModel(base_models.BaseModel):
     """A list of things that a user subscribes to.
