@@ -50,7 +50,7 @@ oppia.factory('WritableCollectionBackendApiService', [
           }
         }, function(error) {
           if (errorCallback) {
-            errorCallback(error);
+            errorCallback(error.data);
           }
         });
       };
@@ -81,7 +81,7 @@ oppia.factory('WritableCollectionBackendApiService', [
           }
         }, function(error) {
           if (errorCallback) {
-            errorCallback(error);
+            errorCallback(error.data);
           }
         });
       };

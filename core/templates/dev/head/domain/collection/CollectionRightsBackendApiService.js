@@ -41,7 +41,7 @@ oppia.factory('CollectionRightsBackendApiService', [
           }
         }, function(error) {
           if (errorCallback) {
-            errorCallback(error);
+            errorCallback(error.data);
           }
         });
       };

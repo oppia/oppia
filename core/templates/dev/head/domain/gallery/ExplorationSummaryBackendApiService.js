@@ -37,7 +37,7 @@ oppia.factory('ExplorationSummaryBackendApiService', [
           }
         }, function(error) {
           if (errorCallback) {
-            errorCallback(error);
+            errorCallback(error.data);
           }
         });
       };
