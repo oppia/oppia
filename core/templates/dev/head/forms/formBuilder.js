@@ -861,6 +861,33 @@ oppia.config(['$provide', function($provide) {
   ]);
 }]);
 
+oppia.directive('ckEditorRte', [
+  function() {
+    return {
+      restrict: 'E',
+      scope: {
+        htmlContent: '=',
+        uiConfig: '&'
+      },
+      template: '<textarea></textarea>',
+      link: function (scope, el, attr) {
+        var ck = CKEDITOR.replace(el[0].children[0]);
+        ck.on('instanceReady', function () {
+          ck.setData(scope.htmlContent);
+        });
+
+        function updateHtmlContent() {
+          var data = ck.getData();
+          scope.htmlContent = data;
+          scope.$apply();
+        }
+
+        ck.on('change', updateHtmlContent);
+      }
+    };
+  }
+]);
+
 oppia.directive('textAngularRte', [
     '$filter', 'oppiaHtmlEscaper', 'rteHelperService', '$timeout',
     function(
