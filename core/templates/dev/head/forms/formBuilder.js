@@ -871,7 +871,11 @@ oppia.directive('ckEditorRte', [
       },
       template: '<textarea></textarea>',
       link: function (scope, el, attr) {
-        var ck = CKEDITOR.replace(el[0].children[0]);
+        // Replace the textarea with the CKEditor.
+        var ck = CKEDITOR.replace(el[0].children[0], {
+          removePlugins: 'about,link'
+        });
+
         ck.on('instanceReady', function () {
           ck.setData(scope.htmlContent);
         });
