@@ -7,12 +7,22 @@
     <p>
       Would you like an introduction to creating in Oppia?
     </p>
-    <a class="oppia-welcome-dismiss" ng-click="cancel()">No, take me to the editor.</a>
+    <a href class="oppia-welcome-dismiss" ng-click="cancel()">No, take me to the editor.</a>
     <button class="btn btn-success oppia-welcome-start" ng-click="beginTutorial()">Yes, please!</button>
   </div>
 </script>
 <style>
   /* Editor Tutorial Welcome Modal */
+
+  /* Add inter-paragraph spacing to ng-joyride. */
+  .ng-joyride .popover-content p {
+    margin-top: 10px;
+  }
+
+  .oppia-welcome-dismiss {
+    margin-right: 3em;
+    text-align: center;
+  }
 
   .oppia-welcome-modal .modal-body,
   .oppia-welcome-modal .oppia-long-text p {
@@ -20,11 +30,11 @@
   }
 
   .oppia-welcome-modal .modal-body {
-    width: 70%;
     height: 100%;
-    top: 20%;
     margin: 0 auto;
-    }
+    top: 20%;
+    width: 70%;
+  }
 
   .oppia-welcome-modal .modal-content {
     border-radius: 0;
@@ -32,26 +42,27 @@
   }
 
   .oppia-welcome-modal .modal-dialog {
-    width: 70%;
     height: 70%;
-    padding: 0;
+    width: 70%;
+  }
+
+  .oppia-welcome-modal .in .modal-dialog {
+    left: 50%;
     max-height: calc(100% - 100px);
+    padding: 0;
     position: fixed;
     top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) !important;
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
   }
 
-
-  .oppia-welcome-dismiss {
-    margin-right: 3em;
-    text-align: center;
-  }
-
-  @media (max-width: 750px) {
-    .oppia-welcome-modal .modal-body {
-      top: 10%;
+  @media (max-width: 770px) {
+    .oppia-welcome-modal .modal-dialog {
+      margin: 10% auto;
     }
+
     .oppia-welcome-dismiss {
       display: block;
       margin-right: 0;
