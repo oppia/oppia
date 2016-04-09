@@ -154,7 +154,7 @@ oppia.controller('ExplorationEditor', [
           successCallback();
         }
 
-        $scope.firstTime = stateEditorTutorialFirstTimeService.init(
+        stateEditorTutorialFirstTimeService.init(
           data.show_state_editor_tutorial_on_load);
       });
     };
@@ -190,11 +190,11 @@ oppia.controller('ExplorationEditor', [
       selector: _ID_TUTORIAL_STATE_CONTENT,
       heading: 'Content',
       text: (
-        '<p>An Oppia exploration is divided into several \'cards\'' +
+        '<p>An Oppia exploration is divided into several \'cards.\' ' +
         'The first part of a card is the <b>content</b>.</p>' +
         '<p>Use the content section to set the scene. ' +
         'Tell the learner a story, give them some information, ' +
-        'and then, ask a relevant question.</p>'),
+        'and then ask a relevant question.</p>'),
       placement: 'bottom'
     }, {
       type: 'function',
@@ -364,13 +364,9 @@ oppia.controller('ExplorationEditor', [
       });
     };
 
-    $scope.openEditorTutorialFirstTime = function() {
-      $rootScope.$broadcast('openEditorTutorialFirstTime');
-    };
-
     $scope.$on(
       'enterEditorForTheFirstTime', $scope.showWelcomeExplorationModal);
-    $scope.$on('openEditorTutorial', $scope.startTutorial);
+    $scope.$on('openEditorTutorial', $scope.showWelcomeExplorationModal);
   }
 ]);
 
