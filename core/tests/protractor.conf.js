@@ -1,7 +1,12 @@
 var ScreenShotReporter = require('protractor-screenshot-reporter');
 
+var IS_ANGULAR =  false;
+var PORT = 9001;
+var BASE_URL = 'http://localhost';
+console.log('[INFOS] Testing on ' + BASE_URL + ':' + PORT);
+
 // A reference configuration file.
-exports.config = {
+var config = {
   // ----- How to setup Selenium -----
   //
   // There are three ways to specify how to use Selenium. Specify one of the
@@ -20,7 +25,7 @@ exports.config = {
   // to the location of this config. If no other method of starting selenium
   // is found, this will default to
   // node_modules/protractor/selenium/selenium-server...
-  seleniumServerJar: null,
+  seleniumServerJar: null, 
   // The port to start the selenium server on, or null if the server should
   // find its own unused port.
   seleniumPort: null,
@@ -32,24 +37,7 @@ exports.config = {
   // If true, only chromedriver will be started, not a standalone selenium.
   // Tests for browsers other than chrome will not run.
   chromeOnly: false,
-  // Additional command line options to pass to selenium. For example,
-  // if you need to change the browser timeout, use
-  // seleniumArgs: ['-browserTimeout=60'],
-  seleniumArgs: [],
-
-  // If sauceUser and sauceKey are specified, seleniumServerJar will be ignored.
-  // The tests will be run remotely using SauceLabs.
-  sauceUser: null,
-  sauceKey: null,
-
-  // The address of a running selenium server. If specified, Protractor will
-  // connect to an already running instance of selenium. This usually looks like
-  // seleniumAddress: 'http://localhost:4444/wd/hub'
-  seleniumAddress: 'http://localhost:4444/wd/hub',
-
-  // The timeout for each script run on the browser. This should be longer
-  // than the maximum time your application needs to stabilize between tasks.
-  allScriptsTimeout: 120000,
+  
 
   // ----- What tests to run -----
   //
@@ -58,6 +46,10 @@ exports.config = {
   suites: {
     full: 'protractor/*.js'
   },
+  // The timeout for each script run on the browser. This should be longer
+  // than the maximum time your application needs to stabilize between tasks.
+  allScriptsTimeout: 120000,
+  getPageTimeout: 30000,
 
   // ----- Capabilities to be passed to the webdriver instance ----
   //
@@ -65,10 +57,7 @@ exports.config = {
   // https://code.google.com/p/selenium/wiki/DesiredCapabilities
   // and
   // https://code.google.com/p/selenium/source/browse/javascript/webdriver/capabilities.js
-  capabilities: {
-    browserName: 'chrome'
-  },
-
+  
   // If you would like to run more than one instance of webdriver on the same
   // tests, use multiCapabilities, which takes an array of capabilities.
   // If this is specified, capabilities will be ignored.
@@ -78,7 +67,7 @@ exports.config = {
   //
   // A base URL for your application under test. Calls to protractor.get()
   // with relative paths will be prepended with this.
-  baseUrl: 'http://localhost:4445',
+  baseUrl: 'http://localhost:9001',
 
   // Selector for the element housing the angular app - this defaults to
   // body, but is necessary if ng-app is on a descendant of <body>
@@ -89,10 +78,6 @@ exports.config = {
   // You can specify a file containing code to run by setting onPrepare to
   // the filename string.
   onPrepare: function() {
-    // At this point, global 'protractor' object will be set up, and jasmine
-    // will be available. For example, you can add a Jasmine reporter with:
-    //     jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter(
-    //         'outputdir/', true, true));
 
     // This is currently pulled out into a flag because it sometimes obscures
     // the actual protractor error logs and does not close the browser after
@@ -187,3 +172,39 @@ exports.config = {
   // (0 if the tests passed or 1 if not).
   onCleanUp: function() {}
 };
+
+if (process.env.TRAVIS) {
+  config.sauceUser = process.env.SAUCE_USERNAME;
+  config.sauceKey = process.env.SAUCE_ACCESS_KEY;
+  config.capabilities = {
+    'name': 'oppia',
+    'browserName': 'chrome',
+    'seleniumVersion': '2.49.0',
+    'chromedriverVersion': '2.20',
+    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER,
+    'build': process.env.TRAVIS_BUILD_NUMBER,
+    'platform': 'OS X 10.10',
+    'screen-resolution': '1920x1200'
+  };
+} else {
+  // Additional command line options to pass to selenium. For example,
+  // if you need to change the browser timeout, use
+  // seleniumArgs: ['-browserTimeout=60'],
+  config.seleniumArgs = [];
+
+  // If sauceUser and sauceKey are specified, seleniumServerJar will be ignored.
+  // The tests will be run remotely using SauceLabs.
+  config.sauceUser = null;
+  config.sauceKey = null;
+  config.capabilities = {
+    browserName: 'chrome'
+  };
+
+
+  // The address of a running selenium server. If specified, Protractor will
+  // connect to an already running instance of selenium. This usually looks like
+  // seleniumAddress: 'http://localhost:4444/wd/hub'
+  config.seleniumAddress = 'http://localhost:4444/wd/hub';
+}
+
+exports.config = config;
