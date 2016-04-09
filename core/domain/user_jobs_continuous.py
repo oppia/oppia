@@ -200,7 +200,8 @@ class RecentUpdatesMRJobManager(
                 feconf.COMMIT_MESSAGE_EXPLORATION_DELETED))
 
         for exp_model in tracked_exp_models_for_feedback:
-            threads = feedback_services.get_all_threads(exp_model.id, False)
+            threads = feedback_services.get_displayable_threads(exp_model.id,
+                                                                False)
             for thread in threads:
                 full_thread_id = (
                     feedback_models.FeedbackThreadModel.generate_full_thread_id(

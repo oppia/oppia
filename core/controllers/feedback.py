@@ -27,7 +27,7 @@ class ThreadListHandler(base.BaseHandler):
 
     def get(self, exploration_id):
         self.values.update({
-            'threads': feedback_services.get_all_threads(
+            'threads': feedback_services.get_displayable_threads(
                 exploration_id, False)})
         self.render_json(self.values)
 
@@ -206,13 +206,13 @@ class SuggestionListHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid value for has_suggestion.')
         if list_type == self._LIST_TYPE_OPEN:
-            threads = feedback_services.get_open_threads(
+            threads = feedback_services.get_displayable_open_threads(
                 exploration_id, has_suggestion)
         elif list_type == self._LIST_TYPE_CLOSED:
-            threads = feedback_services.get_closed_threads(
+            threads = feedback_services.get_displayable_closed_threads(
                 exploration_id, has_suggestion)
         elif list_type == self._LIST_TYPE_ALL:
-            threads = feedback_services.get_all_threads(
+            threads = feedback_services.get_displayable_threads(
                 exploration_id, has_suggestion)
         else:
             raise self.InvalidInputException('Invalid list type.')

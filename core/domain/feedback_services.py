@@ -16,6 +16,7 @@
 
 """Commands for feedback thread and message operations."""
 
+from core.domain import feedback_domain
 from core.domain import feedback_jobs_continuous
 from core.domain import subscription_services
 from core.domain import user_services
@@ -29,7 +30,7 @@ DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a learner'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
 
 
-def _get_thread_dict_from_model_instance(thread):
+def _get_thread_dict(thread):
     return {
         'last_updated': utils.get_time_in_millisecs(thread.last_updated),
         'original_author_username': user_services.get_username(
@@ -79,6 +80,7 @@ def create_thread(
 def get_exp_id_from_full_thread_id(full_thread_id):
     return full_thread_id.split('.')[0]
 
+
 def get_thread_id_from_full_thread_id(full_thread_id):
     return full_thread_id.split('.')[1]
 
@@ -102,6 +104,7 @@ def get_messages(exploration_id, thread_id):
         _get_message_dict(m)
         for m in feedback_models.FeedbackMessageModel.get_messages(
             exploration_id, thread_id)]
+
 
 def create_message(
         exploration_id, thread_id, author_id, updated_status, updated_subject,
@@ -179,7 +182,7 @@ def get_last_updated_time(exploration_id):
 
     If this exploration has no threads, returns None.
     """
-    threadlist = get_all_threads(exploration_id, False)
+    threadlist = get_displayable_threads(exploration_id, False)
     return max(
         [thread['last_updated'] for thread in threadlist]
     ) if threadlist else None
@@ -234,7 +237,24 @@ def get_suggestion(exploration_id, thread_id):
             exploration_id, thread_id))
 
 
-def get_open_threads(exploration_id, has_suggestion):
+def _get_thread_from_model(thread_model):
+    return feedback_domain.FeedbackThread(
+        thread_model.id, thread_model.exploration_id, thread_model.state_name,
+        thread_model.original_author_id, thread_model.status,
+        thread_model.subject, thread_model.summary, thread_model.has_suggestion,
+        thread_model.created_on, thread_model.last_updated)
+
+
+def get_threads(exploration_id):
+    thread_models = feedback_models.FeedbackThreadModel.get_threads(
+        exploration_id)
+    threads = []
+    for model in thread_models:
+        threads.append(_get_thread_from_model(model))
+    return threads
+
+
+def get_displayable_open_threads(exploration_id, has_suggestion):
     """If has_suggestion is True, return a list of all open threads that have a
     suggestion, otherwise return a list of all open threads that do not have a
     suggestion."""
@@ -246,34 +266,34 @@ def get_open_threads(exploration_id, has_suggestion):
                 thread.status == feedback_models.STATUS_CHOICES_OPEN):
             open_threads.append(thread)
     return [
-        _get_thread_dict_from_model_instance(t)
+        _get_thread_dict(t)
         for t in open_threads]
 
 
-def get_closed_threads(exploration_id, has_suggestion):
+def get_displayable_closed_threads(exploration_id, has_suggestion):
     """If has_suggestion is True, return a list of all closed threads that have
     a suggestion, otherwise return a list of all closed threads that do not have
     a suggestion."""
 
-    threads = feedback_models.FeedbackThreadModel.get_threads(exploration_id)
+    threads = get_threads(exploration_id)
     closed_threads = []
     for thread in threads:
         if (thread.has_suggestion == has_suggestion and
                 thread.status != feedback_models.STATUS_CHOICES_OPEN):
             closed_threads.append(thread)
     return [
-        _get_thread_dict_from_model_instance(t)
+        _get_thread_dict(t)
         for t in closed_threads]
 
 
-def get_all_threads(exploration_id, has_suggestion):
+def get_displayable_threads(exploration_id, has_suggestion):
     """Return a list of all threads with suggestions."""
 
-    threads = feedback_models.FeedbackThreadModel.get_threads(exploration_id)
+    threads = get_threads(exploration_id)
     all_threads = []
     for thread in threads:
         if thread.has_suggestion == has_suggestion:
             all_threads.append(thread)
     return [
-        _get_thread_dict_from_model_instance(t)
+        _get_thread_dict(t)
         for t in all_threads]
