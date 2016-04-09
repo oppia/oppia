@@ -177,17 +177,6 @@ def get_next_page_of_all_feedback_messages(
     return (result_dicts, new_urlsafe_start_cursor, more)
 
 
-def get_last_updated_time(exploration_id):
-    """Returns the most recent time a thread for this exploration was updated.
-
-    If this exploration has no threads, returns None.
-    """
-    threadlist = get_displayable_threads(exploration_id, False)
-    return max(
-        [thread['last_updated'] for thread in threadlist]
-    ) if threadlist else None
-
-
 def get_thread_analytics(exploration_id):
     """Returns a dict with feedback thread analytics for the given exploration.
 
@@ -287,7 +276,8 @@ def get_displayable_closed_threads(exploration_id, has_suggestion):
 
 
 def get_displayable_threads(exploration_id, has_suggestion):
-    """Return a list of all threads with suggestions."""
+    """Returns a list of all threads with suggestions if has_suggestion is True;
+    otherwise, returns a list of all threads with no suggestions."""
 
     threads = get_threads(exploration_id)
     all_threads = []

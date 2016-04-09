@@ -88,16 +88,6 @@ class ThreadHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class FeedbackLastUpdatedHandler(base.BaseHandler):
-    """Returns the last time a thread for this exploration was updated."""
-
-    def get(self, exploration_id):
-        self.values.update({
-            'last_updated': feedback_services.get_last_updated_time(
-                exploration_id)})
-        self.render_json(self.values)
-
-
 class RecentFeedbackMessagesHandler(base.BaseHandler):
     """Returns a list of recently-posted feedback messages.
 
