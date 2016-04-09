@@ -163,7 +163,7 @@ oppia.factory('trainingModalService', ['$rootScope', '$modal', 'alertsService',
               var state = explorationStatesService.getState(currentStateName);
 
               answerClassificationService.getMatchingClassificationResult(
-                explorationId, state, unhandledAnswer, true).success(
+                explorationId, state, unhandledAnswer, true).then(
                     function(classificationResult) {
                   var feedback = 'Nothing';
                   var dest = classificationResult.outcome.dest;

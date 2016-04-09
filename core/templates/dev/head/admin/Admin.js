@@ -60,7 +60,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
       $scope.message = 'Config property reverted successfully.';
       $scope.reloadConfigProperties();
     }, function(errorResponse) {
-      $scope.message = 'Server error: ' + errorResponse.error;
+      $scope.message = 'Server error: ' + errorResponse.data.error;
     });
   };
 
@@ -75,7 +75,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
       $scope.migrationInProcess = false;
       window.reload();
     }, function(errorResponse) {
-      $scope.message = 'Server error: ' + errorResponse.error;
+      $scope.message = 'Server error: ' + errorResponse.data.error;
       $scope.migrationInProcess = false;
     });
   };
@@ -103,7 +103,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     }).then(function() {
       $scope.message = 'Data saved successfully.';
     }, function(errorResponse) {
-      $scope.message = 'Server error: ' + errorResponse.error;
+      $scope.message = 'Server error: ' + errorResponse.data.error;
     });
   };
 
@@ -123,7 +123,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     }).then(function() {
       $scope.message = 'Index successfully cleared.';
     }, function(errorResponse) {
-      $scope.message = 'Server error: ' + errorResponse.error;
+      $scope.message = 'Server error: ' + errorResponse.data.error;
     });
   };
 
@@ -144,7 +144,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     }).then(function() {
       $scope.message = 'Data reloaded successfully.';
     }, function(errorResponse) {
-      $scope.message = 'Server error: ' + errorResponse.error;
+      $scope.message = 'Server error: ' + errorResponse.data.error;
     });
   };
 
@@ -208,7 +208,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     }).then(function() {
       $scope.message = 'Data reloaded successfully.';
     }, function(errorResponse) {
-      $scope.message = 'Server error: ' + errorResponse.error;
+      $scope.message = 'Server error: ' + errorResponse.data.error;
     });
   };
 
@@ -222,7 +222,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
       $scope.message = 'Job started successfully.';
       window.location.reload();
     }, function(errorResponse) {
-      $scope.message = 'Server error: ' + errorResponse.error;
+      $scope.message = 'Server error: ' + errorResponse.data.error;
     });
   };
 
@@ -237,7 +237,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
       $scope.message = 'Abort signal sent to job.';
       window.location.reload();
     }, function(errorResponse) {
-      $scope.message = 'Server error: ' + errorResponse.error;
+      $scope.message = 'Server error: ' + errorResponse.data.error;
     });
   };
 
@@ -251,7 +251,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
       $scope.message = 'Computation started successfully.';
       window.location.reload();
     }, function(errorResponse) {
-      $scope.message = 'Server error: ' + errorResponse.error;
+      $scope.message = 'Server error: ' + errorResponse.data.error;
     });
   };
 
@@ -265,7 +265,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
       $scope.message = 'Abort signal sent to computation.';
       window.location.reload();
     }, function(errorResponse) {
-      $scope.message = 'Server error: ' + errorResponse.error;
+      $scope.message = 'Server error: ' + errorResponse.data.error;
     });
   };
 
@@ -280,7 +280,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
       }).then(function() {
         $scope.message = 'Topic similarities uploaded successfully.';
       }, function(errorResponse) {
-        $scope.message = 'Server error: ' + errorResponse.error;
+        $scope.message = 'Server error: ' + errorResponse.data.error;
       });
     };
     reader.readAsText(file);
