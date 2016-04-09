@@ -259,7 +259,7 @@ def get_displayable_open_threads(exploration_id, has_suggestion):
     suggestion, otherwise return a list of all open threads that do not have a
     suggestion."""
 
-    threads = feedback_models.FeedbackThreadModel.get_threads(exploration_id)
+    threads = get_threads(exploration_id)
     open_threads = []
     for thread in threads:
         if (thread.has_suggestion == has_suggestion and
