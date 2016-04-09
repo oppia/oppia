@@ -1,5 +1,5 @@
 <script type="text/ng-template" id="modals/welcomeExploration">
-  <div class="modal-body oppia-long-text">
+  <div class="modal-body oppia-long-text protractor-test-welcome-modal">
     <h1>Welcome!</h1>
     <p>
       Looks like you're new to creating explorations.
@@ -7,18 +7,12 @@
     <p>
       Would you like an introduction to creating in Oppia?
     </p>
-    <a href class="oppia-welcome-dismiss" ng-click="cancel()">No, take me to the editor.</a>
-    <button class="btn btn-success oppia-welcome-start" ng-click="beginTutorial()">Yes, please!</button>
+    <a href class="oppia-welcome-dismiss protractor-test-dismiss-welcome-modal" ng-click="cancel()">No, take me to the editor.</a>
+    <button class="btn btn-success oppia-welcome-start protractor-test-start-tutorial" ng-click="beginTutorial()">Yes, please!</button>
   </div>
 </script>
+
 <style>
-  /* Editor Tutorial Welcome Modal */
-
-  /* Add inter-paragraph spacing to ng-joyride. */
-  .ng-joyride .popover-content p {
-    margin-top: 10px;
-  }
-
   .oppia-welcome-dismiss {
     margin-right: 3em;
     text-align: center;

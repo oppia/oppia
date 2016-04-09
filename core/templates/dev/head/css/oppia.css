@@ -593,12 +593,12 @@ textarea {
 
 .oppia-footer-container a {
   color: #FFFFFF;
-  text-transform: capitalize; 
+  text-transform: capitalize;
 }
 
 .oppia-footer-container h4 {
   font-weight: bold;
-  text-transform: uppercase; 
+  text-transform: uppercase;
 }
 
 .oppia-footer-container ul {
@@ -606,7 +606,7 @@ textarea {
 }
 
 .oppia-footer-container li {
-  list-style-position: inside; 
+  list-style-position: inside;
   list-style-type: none;
 }
 
@@ -2160,6 +2160,11 @@ div.ng-joyride-title {
 }
 div#ng-curtain {
   z-index: 997;
+}
+
+/* Add inter-paragraph spacing to the ng-joyride tutorial contents. */
+.ng-joyride .popover-content p {
+  margin-top: 10px;
 }
 
 .oppia-navbar {

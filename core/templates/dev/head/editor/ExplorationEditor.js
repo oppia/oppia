@@ -217,15 +217,15 @@ oppia.controller('ExplorationEditor', [
         'to your question.</p> ' +
         '<p>Oppia has several built-in interactions, including:</p>' +
         '<ul>' +
-        '<li>' +
-        'Multiple Choice' +
-        '</li>' +
-        '<li>' +
-        'Text/Number input' +
-        '</li>' +
-        '<li>' +
-        'Code snippets' +
-        '</li>' +
+        '  <li>' +
+        '    Multiple Choice' +
+        '  </li>' +
+        '  <li>' +
+        '    Text/Number input' +
+        '  </li>' +
+        '  <li>' +
+        '    Code snippets' +
+        '  </li>' +
         '</ul>' +
         'and more.')
     }, {
@@ -300,18 +300,18 @@ oppia.controller('ExplorationEditor', [
         'That\'s the end of the tour! ' +
         'To finish up, here are some things we suggest: ' +
         '<ul>' +
-        '<li>' +
-        'Create your first card!' +
-        '</li>' +
-        '<li>' +
-        'Preview your exploration.' +
-        '</li>' +
-        '<li>' +
-        'Check out more resources in the ' +
-        '<a href="https://oppia.github.io/#/" target="_blank">' +
-        'Help Center.' +
-        '</a>' +
-        '</li>' +
+        '  <li>' +
+        '    Create your first card!' +
+        '  </li>' +
+        '  <li>' +
+        '    Preview your exploration.' +
+        '  </li>' +
+        '  <li>' +
+        '    Check out more resources in the ' +
+        '    <a href="https://oppia.github.io/#/" target="_blank">' +
+        '      Help Center.' +
+        '    </a>' +
+        '  </li>' +
         '</ul>')
     }];
 
