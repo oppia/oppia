@@ -60,19 +60,24 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids):
     explorations that are currently non-private and not deleted,
     and returns a list of dicts of the corresponding exploration summaries.
     """
-    displayable_exp_summaries = []
     exploration_summaries = (
         exp_services.get_exploration_summaries_matching_ids(exploration_ids))
     displayable_exp_summaries = get_displayable_exp_summary_dicts(
-        exploration_summaries, exploration_ids)
+        exploration_summaries)
 
-    return displayable_exp_summaries
+    return get_displayable_exp_summary_dicts(exploration_summaries)
 
-def get_displayable_exp_summary_dicts(exploration_summaries, exploration_ids):
-    """Given a list of exploration summary models and explorations
-    ids, returns a list of dicts of the corresponding exploration summaries
-    in displayable form"""
+
+def get_displayable_exp_summary_dicts(exploration_summaries):
+    """Given a list of exploration summary domain objects, return a
+    list of the corresponding human-readable exploration summary dicts."""
     displayable_exp_summaries = []
+    exploration_ids = []
+    
+    for exploration_summary in exploration_summaries:
+        if exploration_summary is not None:
+            exploration_ids.append(exploration_summary.id)
+    
     view_counts = (
         stats_jobs_continuous.StatisticsAggregator.get_views_multi(
             exploration_ids))
@@ -106,6 +111,7 @@ def get_displayable_exp_summary_dicts(exploration_summaries, exploration_ids):
             })
 
     return displayable_exp_summaries
+
 
 def get_gallery_category_groupings(language_codes):
     """Returns a list of groups in the gallery. Each group has a header and
@@ -141,22 +147,13 @@ def get_gallery_category_groupings(language_codes):
 
     return results
 
+
 def get_featured_explorations():
     """Returns a list of featured explorations."""
-    exp_summary_dict = []
-    exp_summary_dict = exp_services.get_non_private_exploration_summaries()
-    featured_exp_summary_dict = []
-    featured_exp_ids = []
-
-    for key in exp_summary_dict:
-        if exp_summary_dict[key].status == \
-        rights_manager.ACTIVITY_STATUS_PUBLICIZED:
-            featured_exp_summary_dict.append(exp_summary_dict[key])
-            featured_exp_ids.append(exp_summary_dict[key].id)
+    featured_exp_summary_dict = exp_services.get_featured_explorations()
 
     if featured_exp_summary_dict:
         featured_exp_summary_dict = get_displayable_exp_summary_dicts(
-            featured_exp_summary_dict, featured_exp_ids)
+            featured_exp_summary_dict.values())
 
     return featured_exp_summary_dict
-    
