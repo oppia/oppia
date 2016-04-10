@@ -1,9 +1,5 @@
 var ScreenShotReporter = require('protractor-screenshot-reporter');
 
-var IS_ANGULAR =  false;
-var PORT = 9001;
-var BASE_URL = 'http://localhost';
-console.log('[INFOS] Testing on ' + BASE_URL + ':' + PORT);
 
 // A reference configuration file.
 var config = {
@@ -49,7 +45,6 @@ var config = {
   // The timeout for each script run on the browser. This should be longer
   // than the maximum time your application needs to stabilize between tasks.
   allScriptsTimeout: 120000,
-  getPageTimeout: 30000,
 
   // ----- Capabilities to be passed to the webdriver instance ----
   //
@@ -174,6 +169,10 @@ var config = {
 };
 
 if (process.env.TRAVIS) {
+  // SAUCE_USERNAME(SauceLabs username) and SAUSE_ACCESS_KEY(SauceLabs Access Key)
+  // will be fetched as Travis env variable 
+  // https://support.saucelabs.com/customer/portal/articles/2029412-running-protractor-tests-on-sauce-labs
+  // https://support.saucelabs.com/customer/portal/articles/2005335-angular-js-protractor-example
   config.sauceUser = process.env.SAUCE_USERNAME;
   config.sauceKey = process.env.SAUCE_ACCESS_KEY;
   config.capabilities = {
@@ -199,7 +198,6 @@ if (process.env.TRAVIS) {
   config.capabilities = {
     browserName: 'chrome'
   };
-
 
   // The address of a running selenium server. If specified, Protractor will
   // connect to an already running instance of selenium. This usually looks like

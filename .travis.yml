@@ -14,17 +14,21 @@ branches:
   only:
   - master
   - develop
+  # This branch is added for testing. should be removed before merged to develop
+  - new-travis-tests
 
 env:
   matrix:
-  - RUN_E2E_TESTS=true
-  - RUN_BACKEND_TESTS=false RUN_FRONTEND_TESTS=false RUN_LINT=true REPORT_BACKEND_COVERAGE=false
-  - RUN_BACKEND_TESTS=false RUN_FRONTEND_TESTS=true RUN_LINT=false REPORT_BACKEND_COVERAGE=false
-  - RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false RUN_LINT=false REPORT_BACKEND_COVERAGE=false
-  - RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false RUN_LINT=false REPORT_BACKEND_COVERAGE=true
+    - RUN_E2E_TESTS=true
+    - RUN_BACKEND_TESTS=false RUN_FRONTEND_TESTS=false RUN_LINT=true REPORT_BACKEND_COVERAGE=false
+    - RUN_BACKEND_TESTS=false RUN_FRONTEND_TESTS=true RUN_LINT=false REPORT_BACKEND_COVERAGE=false
+    - RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false RUN_LINT=false REPORT_BACKEND_COVERAGE=false
+    - RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false RUN_LINT=false REPORT_BACKEND_COVERAGE=true
+  # Connect to SauceLabs by adding encripted username and Sauce Key
+  # They will be available globaly in travis env to be used by core/tests/protractor.conf.js
   global:
-  - secure: CdqriDTcKaS6LMGsL+zqLGyhKv4xWzycKgBFlhVEBwgG70kOH7I+HKj29UzA6Ym1Mb2hofKVSlRkhepzuG8CgH9Rd07lUeWnERphIdaZwGYNMulVZhZM0/6Quo2hNDDDHzyhOWlM2XkmzUsaBp8M0J/tIa5A9HkSpHZ4Fj3tEAsPzqj1wewxS7iQHlOhCXZb8WzpG/WEiJH8tonPbJCZBr+ZW8C3F8DdnTrl4Boino0PBLr01rgu5sURYbPKpi1Qa3iW9DMKAA9qEbz89ofnSvt9tXz7FdNqAbJ0B0KYpmS1rU82+Lz58dMXmHFnRxAZiIBeG+Fhzl97b0fG+d/S2+KiRostXcWVbVHa/h4wyfoBtVZD0XFgSUxCKJ10T+eFJhLrBstoCfIzJ10sxHLr/hrmPpJ/Ac+v2F2/ib3pFIvHrJOmbve831HzMVTlAVVqX2C+kkr+WH1QhdUw1AMm6aYTOsE4ZxBGV6IqWOkPOn7kA/CWnqaea2xVJ7O7drkXbO5cQCVpP3X+RxF1w2tUfseJftGx8A9Ca0JRjWpNvFX2AVyuK6gEgB7fWfCmfVmLdaVtSPXNMerTWaD/jLKPwcla92+sUh9iCVEiVfrYxx63U+27YJ8hwfHfkIXuuf6iGzh5vmp04KA93KSmQmMRddN4MhuuV7t/avVXRxKxuwQ=
-  - secure: S+epWEt5+Kliht0gH7EepXOwydt4YhPs10q+ZbF2V81zbDA54goVdwedU5c03vjiheXAl781+M8zfd+U8Ew531vwEkJ9HMnpS5dyUEexRtlyw7K//MHkbUyxWe7f1Jkq7baKD9j9eBN2gzeVTT8m6787aoIaTvSgVB0uifbW+rUq0k4+ENgSziERNBMVVnJkfvZM2zIjpeMFqpn5Ui2ARkYNnZwSAQN8K/KiKQx/v62/bLz5C59s1S9LjFfUzfXzOX73tdE4dw28jgc1toF2PLkXj8gtJM03hpHWvPTwDu/NGStUBpnj7e4Tp4ladfnuSGly1BTQtUfbK6gEdC/Y/OruLx94Ww/3BdBC2Peyh5DF0BDCViTYzQ0RDkIXtf4QL6AfHuqTBO2d088TkozAO7HasqFR+iSyeSyC2zXHJlyt0jZP14h/6gVO/lcO4XSS/eKWEMf6BgL8Weu8Rt8fZFPQYZ1idXkRF5ZMipO1akU0zOLHuDgXfauzaF/cv9cqyV5dXH5EBMwj+XGjtpTU+/6RyU0IBKK+1hqggXStvILrFyY/cnTo0cnReO2KM6SI+JpRjrOf5KfWnuKxesXVRfZ/MS4mXINrUCTbxl5UMP6vxPIa830pHbPSH9xnrE22fZytrvAlQltSxIDIZlpMFgKlsJQGomm/aQK3TdHMcZU=
+    - secure: CdqriDTcKaS6LMGsL+zqLGyhKv4xWzycKgBFlhVEBwgG70kOH7I+HKj29UzA6Ym1Mb2hofKVSlRkhepzuG8CgH9Rd07lUeWnERphIdaZwGYNMulVZhZM0/6Quo2hNDDDHzyhOWlM2XkmzUsaBp8M0J/tIa5A9HkSpHZ4Fj3tEAsPzqj1wewxS7iQHlOhCXZb8WzpG/WEiJH8tonPbJCZBr+ZW8C3F8DdnTrl4Boino0PBLr01rgu5sURYbPKpi1Qa3iW9DMKAA9qEbz89ofnSvt9tXz7FdNqAbJ0B0KYpmS1rU82+Lz58dMXmHFnRxAZiIBeG+Fhzl97b0fG+d/S2+KiRostXcWVbVHa/h4wyfoBtVZD0XFgSUxCKJ10T+eFJhLrBstoCfIzJ10sxHLr/hrmPpJ/Ac+v2F2/ib3pFIvHrJOmbve831HzMVTlAVVqX2C+kkr+WH1QhdUw1AMm6aYTOsE4ZxBGV6IqWOkPOn7kA/CWnqaea2xVJ7O7drkXbO5cQCVpP3X+RxF1w2tUfseJftGx8A9Ca0JRjWpNvFX2AVyuK6gEgB7fWfCmfVmLdaVtSPXNMerTWaD/jLKPwcla92+sUh9iCVEiVfrYxx63U+27YJ8hwfHfkIXuuf6iGzh5vmp04KA93KSmQmMRddN4MhuuV7t/avVXRxKxuwQ=
+    - secure: S+epWEt5+Kliht0gH7EepXOwydt4YhPs10q+ZbF2V81zbDA54goVdwedU5c03vjiheXAl781+M8zfd+U8Ew531vwEkJ9HMnpS5dyUEexRtlyw7K//MHkbUyxWe7f1Jkq7baKD9j9eBN2gzeVTT8m6787aoIaTvSgVB0uifbW+rUq0k4+ENgSziERNBMVVnJkfvZM2zIjpeMFqpn5Ui2ARkYNnZwSAQN8K/KiKQx/v62/bLz5C59s1S9LjFfUzfXzOX73tdE4dw28jgc1toF2PLkXj8gtJM03hpHWvPTwDu/NGStUBpnj7e4Tp4ladfnuSGly1BTQtUfbK6gEdC/Y/OruLx94Ww/3BdBC2Peyh5DF0BDCViTYzQ0RDkIXtf4QL6AfHuqTBO2d088TkozAO7HasqFR+iSyeSyC2zXHJlyt0jZP14h/6gVO/lcO4XSS/eKWEMf6BgL8Weu8Rt8fZFPQYZ1idXkRF5ZMipO1akU0zOLHuDgXfauzaF/cv9cqyV5dXH5EBMwj+XGjtpTU+/6RyU0IBKK+1hqggXStvILrFyY/cnTo0cnReO2KM6SI+JpRjrOf5KfWnuKxesXVRfZ/MS4mXINrUCTbxl5UMP6vxPIa830pHbPSH9xnrE22fZytrvAlQltSxIDIZlpMFgKlsJQGomm/aQK3TdHMcZU=
 
 matrix:
   allow_failures:
@@ -68,22 +72,16 @@ install:
 
 script:
 - if [ $RUN_E2E_TESTS == 'true' ]; then bash scripts/run_e2e_tests.sh; fi
-- if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then
-  bash scripts/run_backend_tests.sh --generate_coverage_report; fi
-- if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'false' ];
-  then bash scripts/run_backend_tests.sh; fi
-- if [ $RUN_LINT == 'true' ]; then bash scripts/install_third_party.sh; python scripts/pre_commit_linter.py
-  --path=.; fi
+- if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report; fi
+- if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'false' ]; then bash scripts/run_backend_tests.sh; fi
+- if [ $RUN_LINT == 'true' ]; then bash scripts/install_third_party.sh; python scripts/pre_commit_linter.py --path=.; fi
 # Travis aborts test run if nothing is printed back to STDOUT for some time.
 # -x is used to avoid that.
-- if [ $RUN_FRONTEND_TESTS == 'true' ]; then bash -x scripts/run_frontend_tests.sh
-  --run-minified-tests=true; fi
+- if [ $RUN_FRONTEND_TESTS == 'true' ]; then bash -x scripts/run_frontend_tests.sh --run-minified-tests=true; fi
 
 after_success:
-- if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then
-  codecov; fi
-- if [ $RUN_FRONTEND_TESTS == 'true' ]; then codecov --file ../karma_coverage_reports/coverage-final.json;
-  fi
+- if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then codecov; fi
+- if [ $RUN_FRONTEND_TESTS == 'true' ]; then codecov --file ../karma_coverage_reports/coverage-final.json; fi
 
 cache:
   # Cache Oppia's dependencies.
