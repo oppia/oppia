@@ -98,8 +98,8 @@ class UserEmailPreferencesModel(base_models.BaseModel):
 
     # The user's preference for receiving email when user is added as a member
     # in exploration. This is set to True when user has never set a preference.
-    membership_notifications = ndb.BooleanProperty(
-        indexed=False, default=feconf.DEFAULT_MEMBERSHIP_EMAIL_PREFERENCE)
+    editor_role_notifications = ndb.BooleanProperty(
+        indexed=False, default=feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
 
 
 class UserSubscriptionsModel(base_models.BaseModel):

@@ -172,14 +172,16 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                 user_services.get_email_preferences(editor_id),
                 {
                     'can_receive_email_updates': True,
-                    'can_receive_membership_email': True
+                    'can_receive_editor_role_email': (
+                        feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
                 })
         with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', False):
             self.assertEqual(
                 user_services.get_email_preferences(editor_id),
                 {
                     'can_receive_email_updates': False,
-                    'can_receive_membership_email': True
+                    'can_receive_editor_role_email': (
+                        feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
                 })
 
     def test_user_allowing_emails_on_signup(self):
@@ -199,14 +201,16 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                 user_services.get_email_preferences(editor_id),
                 {
                     'can_receive_email_updates': True,
-                    'can_receive_membership_email': True
+                    'can_receive_editor_role_email': (
+                        feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
                 })
         with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', False):
             self.assertEqual(
                 user_services.get_email_preferences(editor_id),
                 {
                     'can_receive_email_updates': True,
-                    'can_receive_membership_email': True
+                    'can_receive_editor_role_email': (
+                        feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
                 })
 
     def test_user_disallowing_emails_on_signup(self):
@@ -226,14 +230,16 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                 user_services.get_email_preferences(editor_id),
                 {
                     'can_receive_email_updates': False,
-                    'can_receive_membership_email': True
+                    'can_receive_editor_role_email': (
+                        feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
                 })
         with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', False):
             self.assertEqual(
                 user_services.get_email_preferences(editor_id),
                 {
                     'can_receive_email_updates': False,
-                    'can_receive_membership_email': True
+                    'can_receive_editor_role_email': (
+                        feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
                 })
 
 

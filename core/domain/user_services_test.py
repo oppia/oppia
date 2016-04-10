@@ -140,30 +140,31 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_services.get_or_create_user(user_id, user_email)
         user_services.set_username(user_id, username)
 
-        # When UserEmailPreferencesModel is yet to be created value of
-        # membership email preference should be True by default
+        # When UserEmailPreferencesModel is yet to be created,
+        # the value returned by get_email_preferences() should be True.
         email_preferences = user_services.get_email_preferences(user_id)
         self.assertEquals(
-            email_preferences['can_receive_membership_email'],
-            feconf.DEFAULT_MEMBERSHIP_EMAIL_PREFERENCE)
+            email_preferences['can_receive_editor_role_email'],
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
 
+        # When UserEmailPreferencesModel is created for user,
+        # value returned stored in UserEmailPreferencesModel should be Default.
         user_services.update_email_preferences(
-            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE)
+            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
 
-        # When nothing is specified for membership email notifications
-        # it should be True by default
         email_preferences = user_services.get_email_preferences(user_id)
         self.assertEquals(
-            email_preferences['can_receive_membership_email'],
-            feconf.DEFAULT_MEMBERSHIP_EMAIL_PREFERENCE)
+            email_preferences['can_receive_editor_role_email'],
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
 
-        # Change preference for receiving membership emails to False
+        # The user sets their membership email preference to False.
         user_services.update_email_preferences(
             user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE, False)
 
         email_preferences = user_services.get_email_preferences(user_id)
         self.assertEquals(
-            email_preferences['can_receive_membership_email'],
+            email_preferences['can_receive_editor_role_email'],
             False)
 
 

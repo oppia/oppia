@@ -407,9 +407,7 @@ def record_user_started_state_editor_tutorial(user_id):
 
 
 def update_email_preferences(
-        user_id, can_receive_email_updates,
-        can_receive_membership_email=(
-            feconf.DEFAULT_MEMBERSHIP_EMAIL_PREFERENCE)):
+        user_id, can_receive_email_updates, can_receive_editor_role_email):
     """Updates whether the user has chosen to receive email updates.
 
     If no UserEmailPreferencesModel exists for this user, a new one will
@@ -422,8 +420,8 @@ def update_email_preferences(
             id=user_id)
 
     email_preferences_model.site_updates = can_receive_email_updates
-    email_preferences_model.membership_notifications = (
-        can_receive_membership_email)
+    email_preferences_model.editor_role_notifications = (
+        can_receive_editor_role_email)
     email_preferences_model.put()
 
 
@@ -438,10 +436,10 @@ def get_email_preferences(user_id):
             feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
             if email_preferences_model is None
             else email_preferences_model.site_updates),
-        'can_receive_membership_email': (
-            feconf.DEFAULT_MEMBERSHIP_EMAIL_PREFERENCE
+        'can_receive_editor_role_email': (
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE
             if email_preferences_model is None
-            else email_preferences_model.membership_notifications)
+            else email_preferences_model.editor_role_notifications)
     }
 
 
