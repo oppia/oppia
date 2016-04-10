@@ -118,10 +118,13 @@ class CollectionEditorPage(CollectionEditorHandler):
                 rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id))
 
         self.values.update({
-            'is_public': rights_manager.is_collection_public(collection_id),
+            'is_private': rights_manager.is_collection_private(collection_id),
             'can_edit': can_edit,
             'collection_id': collection.id,
-            'title': collection.title
+            'title': collection.title,
+            'can_unpublish': rights_manager.Actor(
+                self.user_id).can_unpublish(
+                    rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id)
         })
 
         self.render_template('collection_editor/collection_editor.html')
@@ -196,7 +199,12 @@ class CollectionRightsHandler(CollectionEditorHandler):
                     self.user_id, collection_id)
                 collection_services.index_collections_given_ids([
                     collection_id])
-            elif not self.is_admin:
+            elif rights_manager.Actor(self.user_id).can_unpublish(
+                    rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id):
+                rights_manager.unpublish_collection(self.user_id, collection_id)
+                collection_services.delete_documents_from_search_index([
+                    collection_id])
+            else:
                 raise self.InvalidInputException(
                     'Cannot unpublish a collection.')
 

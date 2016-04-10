@@ -4,9 +4,9 @@
     <div class="form-group">
       <div class="input-group" style="max-width: 300px; width: 300px;">
         <div class="input-group-addon oppia-splash-search-icon">
-          <span class="glyphicon"
-                ng-class="{'glyphicon-search': !searchIsLoading,
-                           'glyphicon-refresh oppia-animate-spin': searchIsLoading}">
+          <i class="material-icons md-18" ng-if="!isSearchInProgress()">&#xE8B6;</i>
+          <span ng-if="isSearchInProgress()">
+            <i class="material-icons md-18 oppia-animate-spin">&#xE863;</i>
           </span>
         </div>
         <input type="text" class="form-control oppia-splash-search-input oppia-splash-search-text-input" placeholder="What are you curious about?" ng-model="searchQuery" ng-keyup="onSearchQueryChange($event)">
@@ -23,20 +23,21 @@
     <!-- The $event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
     <ul class="dropdown-menu" role="menu" style="max-height: 400px; overflow: auto;" ng-click="$event.stopPropagation()">
       <li ng-repeat="item in selectionDetails.categories.masterList track by $index"
-          class="protractor-test-selected"
           ng-if="selectionDetails.categories.selections[item.id]">
         <a href ng-click="toggleSelection('categories', item.id)">
-          <[item.text]>
-          <span ng-if="selectionDetails.categories.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
+          <span class="protractor-test-selected"><[item.text]></span>
+          <i ng-if="selectionDetails.categories.selections[item.id]" class="material-icons md-18 pull-right">&#xE876;</i>
         </a>
+      </li>
+      <li ng-if="selectionDetails.categories.numSelections > 1">
+        <a href ng-click="deselectAll('categories')"><i>Deselect All</i></a>
       </li>
       <hr ng-if="selectionDetails.categories.numSelections > 0" style="margin: 2px;">
       <li ng-repeat="item in selectionDetails.categories.masterList track by $index"
-          class="protractor-test-deselected"
           ng-if="!selectionDetails.categories.selections[item.id]">
         <a href ng-click="toggleSelection('categories', item.id)">
-          <[item.text]>
-          <span ng-if="selectionDetails.categories.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
+          <span class="protractor-test-deselected"><[item.text]></span>
+          <i ng-if="selectionDetails.categories.selections[item.id]" class="material-icons md-18 pull-right">&#xE876;</i>
         </a>
       </li>
     </ul>
@@ -52,20 +53,21 @@
     <!-- The $event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
     <ul class="dropdown-menu" role="menu" style="max-height: 400px; overflow: auto;" ng-click="$event.stopPropagation()">
       <li ng-repeat="item in selectionDetails.languageCodes.masterList track by $index"
-          class="protractor-test-selected"
           ng-if="selectionDetails.languageCodes.selections[item.id]">
         <a href ng-click="toggleSelection('languageCodes', item.id)">
-          <[item.text]>
-          <span ng-if="selectionDetails.languageCodes.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
+          <span class="protractor-test-selected"><[item.text]></span>
+          <i ng-if="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 pull-right">&#xE876;</i>
         </a>
+      </li>
+      <li ng-if="selectionDetails.languageCodes.numSelections > 1">
+        <a href ng-click="deselectAll('languageCodes')"><i>Deselect All</i></a>
       </li>
       <hr ng-if="selectionDetails.languageCodes.numSelections > 0" style="margin: 2px;">
       <li ng-repeat="item in selectionDetails.languageCodes.masterList track by $index"
-          class="protractor-test-deselected"
           ng-if="!selectionDetails.languageCodes.selections[item.id]">
         <a href ng-click="toggleSelection('languageCodes', item.id)">
-          <[item.text]>
-          <span ng-if="selectionDetails.languageCodes.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
+          <span class="protractor-test-deselected"><[item.text]></span>
+          <i ng-if="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 pull-right">&#xE876;</i>
         </a>
       </li>
     </ul>

@@ -3,7 +3,9 @@
     <span ng-if="editabilityService.isEditable()">
       <span ng-if="!stateNameEditorIsShown" ng-click="openStateNameEditor()" class="oppia-editable-section">
         <strong style="font-size: 1.2em;"><[stateName]></strong>
-        <span ng-if="editabilityService.isEditable()" class="glyphicon glyphicon-pencil oppia-editor-edit-icon" title="Edit State Name"></span>
+        <i ng-if="editabilityService.isEditable()" class="material-icons oppia-editor-edit-icon"
+           title="Edit State Name">&#xE254;
+        </i>
       </span>
 
       <span ng-if="stateNameEditorIsShown">

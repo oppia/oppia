@@ -256,7 +256,7 @@ oppia.controller('ExplorationSettings', [
         if (role) {
           deleteUrl += ('?role=' + role);
         }
-        $http['delete'](deleteUrl).success(function() {
+        $http['delete'](deleteUrl).then(function() {
           $window.location = MY_EXPLORATIONS_PAGE_URL;
         });
       });
