@@ -130,6 +130,14 @@
               </div>
             </div>
           </div>
+
+          <div ng-if="!activeCard.interactionHtml && !isOnTerminalCard()">
+            <div class="conversation-skin-inline-interaction">
+              <span style="color: red;">
+                <strong>Error</strong>: No interaction specified for '<[activeCard.stateName]>'.
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
