@@ -153,7 +153,7 @@ def get_featured_explorations():
         rights_manager.ACTIVITY_STATUS_PUBLICIZED:
             featured_exp_summary_dict.append(exp_summary_dict[key])
             featured_exp_ids.append(exp_summary_dict[key].id)
-  
+
     if featured_exp_summary_dict:
         featured_exp_summary_dict = get_displayable_exp_summary_dicts(
             featured_exp_summary_dict, featured_exp_ids)
