@@ -219,7 +219,7 @@
 </script>
 
 <script type="text/ng-template" id="schemaBasedEditor/html">
-  <ck-editor-rte ng-if="!isDisabled()" html-content="$parent.localValue"
+  <ck-editor-rte ng-if="!isDisabled()" ng-model="$parent.localValue"
                     ui-config="uiConfig()">
   </ck-editor-rte>
   <span ng-if="isDisabled()"
