@@ -3071,7 +3071,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
     DATETIME = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
     OLDER_DATETIME = datetime.datetime.strptime('2016-01-16', '%Y-%m-%d')
     NEWER_DATETIME = datetime.datetime.strptime('2016-03-16', '%Y-%m-%d')
-    DRAFT_CHANGELIST = []
+    draft_change_list = []
     NEW_CHANGELIST = [{
         'cmd': 'edit_exploration_property',
         'property_name': 'title',
@@ -3095,19 +3095,19 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             'name': 'myParam',
             'generator_id': 'RandomSelector'
         }]
-        self.DRAFT_CHANGELIST = _get_change_list(
+        self.draft_change_list = _get_change_list(
             self.init_state_name, 'param_changes', self.param_changes)
         # Explorations with draft set.
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.USER_ID, self.EXP_ID1), user_id=self.USER_ID,
             exploration_id=self.EXP_ID1,
-            draft_change_list=self.DRAFT_CHANGELIST,
+            draft_change_list=self.draft_change_list,
             draft_change_list_last_updated=self.DATETIME,
             draft_change_list_exp_version=2).put()
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.USER_ID, self.EXP_ID2), user_id=self.USER_ID,
             exploration_id=self.EXP_ID2,
-            draft_change_list=self.DRAFT_CHANGELIST,
+            draft_change_list=self.draft_change_list,
             draft_change_list_last_updated=self.DATETIME,
             draft_change_list_exp_version=4).put()
         # Exploration with no draft.
@@ -3118,14 +3118,13 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
     def _empty_method(self, strict):
         pass
 
-    def _get_exp_domain_object(self, exp_id, unused_change_list):
+    def _get_exp_domain_object(self, unused_exp_id, unused_change_list):
         return exp_domain.Exploration.create_default_exploration(
             self.EXP_ID1, 'A title', 'A category')
 
     def test_draft_cleared_after_change_list_applied(self):
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID1)
         exp_services.update_exploration(
-            self.USER_ID, self.EXP_ID1, self.DRAFT_CHANGELIST, '')
+            self.USER_ID, self.EXP_ID1, self.draft_change_list, '')
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.USER_ID, self.EXP_ID1))
         self.assertIsNone(exp_user_data.draft_change_list)
@@ -3162,7 +3161,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         user_exp = user_models.ExplorationUserDataModel.get(
             self.USER_ID, self.EXP_ID1)
         self.assertEqual(user_exp.exploration_id, self.EXP_ID1)
-        self.assertEqual(user_exp.draft_change_list, self.DRAFT_CHANGELIST)
+        self.assertEqual(user_exp.draft_change_list, self.draft_change_list)
         self.assertEqual(
             user_exp.draft_change_list_last_updated, self.DATETIME)
         self.assertEqual(user_exp.draft_change_list_exp_version, 2)
