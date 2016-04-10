@@ -875,7 +875,7 @@ oppia.directive('ckEditorRte', [
       },
       template: '<textarea></textarea>',
       require: '?ngModel',
-      link: function (scope, el, attr, ngModel) {
+      link: function(scope, el, attr, ngModel) {
         // Replace the textarea with the CKEditor.
         var ck = CKEDITOR.replace(el[0].children[0], {
           extraPlugins: 'oppialink',
@@ -904,14 +904,14 @@ oppia.directive('ckEditorRte', [
           ck.setData(ngModel.$viewValue);
         });
 
-        ngModel.$render = function(value) {
+        ngModel.$render = function() {
           ck.setData(ngModel.$viewValue);
         };
 
-        function updateHtmlContent() {
+        var updateHtmlContent = function() {
           ngModel.$setViewValue(ck.getData());
           scope.$apply();
-        }
+        };
 
         ck.on('change', updateHtmlContent);
       }

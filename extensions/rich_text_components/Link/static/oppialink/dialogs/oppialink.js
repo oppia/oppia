@@ -1,4 +1,4 @@
-CKEDITOR.dialog.add('oppialink', function(editor) {
+CKEDITOR.dialog.add('oppialink', function() {
   return {
     title: 'Edit Link',
     minWidth: 200,

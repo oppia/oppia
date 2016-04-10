@@ -6,7 +6,10 @@ CKEDITOR.plugins.add('oppialink', {
     editor.widgets.add('oppialink', {
       button: 'Add a link',
       inline: true,
-      template: '<oppia-noninteractive-link open_link_in_same_window-with-value="" text-with-value="" url-with-value=""></oppia-noninteractive-link>',
+      template: '<oppia-noninteractive-link ' +
+                'open_link_in_same_window-with-value="" ' +
+                'text-with-value="" url-with-value="">' +
+                '</oppia-noninteractive-link>',
       dialog: 'oppialink',
       upcast: function(element) {
         return element.name === 'oppia-noninteractive-link';
@@ -28,18 +31,22 @@ CKEDITOR.plugins.add('oppialink', {
         this.element.setHtml(`<a>${display}</a>`);
       },
       init: function() {
-        var openInSame = this.element.getAttribute('open_link_in_same_window-with-value');
+        var openInSame = this.element.getAttribute(
+          'open_link_in_same_window-with-value');
         var textWithValue = this.element.getAttribute('text-with-value');
         var urlWithValue = this.element.getAttribute('url-with-value');
         openInSame = openInSame.replace(/&quot;/g, '');
         textWithValue = textWithValue.replace(/&quot;/g, '');
         urlWithValue = urlWithValue.replace(/&quot;/g, '');
-        if (openInSame)
+        if (openInSame) {
           this.setData('openLinkInSameWindow', openInSame);
-        if (textWithValue)
+        }
+        if (textWithValue) {
           this.setData('text', textWithValue);
-        if (urlWithValue)
+        }
+        if (urlWithValue) {
           this.setData('url', urlWithValue);
+        }
       }
     });
   }
