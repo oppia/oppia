@@ -69,14 +69,14 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids):
     return displayable_exp_summaries
 
 def get_displayable_exp_summary_dicts(exploration_summaries, exploration_ids):
-    """Given a list of exploration summary models and explorations 
+    """Given a list of exploration summary models and explorations
     ids, returns a list of dicts of the corresponding exploration summaries
     in displayable form"""
     displayable_exp_summaries = []
     view_counts = (
         stats_jobs_continuous.StatisticsAggregator.get_views_multi(
             exploration_ids))
-    
+
     for ind, exploration_summary in enumerate(exploration_summaries):
         if exploration_summary and exploration_summary.status != (
                 rights_manager.ACTIVITY_STATUS_PRIVATE):
@@ -147,15 +147,16 @@ def get_featured_explorations():
     exp_summary_dict = exp_services.get_non_private_exploration_summaries()
     featured_exp_summary_dict = []
     featured_exp_ids = []
-    
+
     for key in exp_summary_dict:
-        if exp_summary_dict[key].status == rights_manager.ACTIVITY_STATUS_PUBLICIZED:
+        if exp_summary_dict[key].status == 
+        rights_manager.ACTIVITY_STATUS_PUBLICIZED:
             featured_exp_summary_dict.append(exp_summary_dict[key])
             featured_exp_ids.append(exp_summary_dict[key].id)
-    
+  
     if featured_exp_summary_dict:
         featured_exp_summary_dict = get_displayable_exp_summary_dicts(
             featured_exp_summary_dict, featured_exp_ids)
-    
+
     return featured_exp_summary_dict
     
