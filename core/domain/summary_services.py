@@ -149,7 +149,7 @@ def get_featured_explorations():
     featured_exp_ids = []
 
     for key in exp_summary_dict:
-        if exp_summary_dict[key].status == 
+        if exp_summary_dict[key].status == \
         rights_manager.ACTIVITY_STATUS_PUBLICIZED:
             featured_exp_summary_dict.append(exp_summary_dict[key])
             featured_exp_ids.append(exp_summary_dict[key].id)
