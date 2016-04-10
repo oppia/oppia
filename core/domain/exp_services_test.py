@@ -67,7 +67,6 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        self.datetime = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
 
         user_services.get_or_create_user(self.owner_id, self.OWNER_EMAIL)
         user_services.get_or_create_user(self.editor_id, self.EDITOR_EMAIL)
@@ -2154,6 +2153,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
 
     def setUp(self):
         """Populate the database of explorations and their summaries.
+
         The sequence of events is:
         - (1) Albert creates EXP_ID_1.
         - (2) Bob edits the title of EXP_ID_1.
