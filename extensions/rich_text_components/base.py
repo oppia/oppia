@@ -51,10 +51,6 @@ class BaseRichTextComponent(object):
     requires_fs = False
     # Whether the component should be displayed as a block element
     is_block_element = False
-    # URL template of the component, such that when interpolated with the
-    # customization arugment dictionary, points to an image which will be
-    # rendered in the RTE preview. explorationId may be used as well.
-    preview_url_template = ''
     # Customization arg specifications for the component, including their
     # descriptions, schemas and default values. Overridden in subclasses.
     _customization_arg_specs = []
@@ -68,6 +64,17 @@ class BaseRichTextComponent(object):
         return [
             domain.CustomizationArgSpec(**cas)
             for cas in self._customization_arg_specs]
+
+    @property
+    def preview_url_template(self):
+        """Returns a URL template which can be interpolated to a URL for the
+        image that represents the component in the RTE. The interpolation
+        dictionary used is the component's customization_args dict, extended
+        with an additional 'explorationId' key whose value corresponds to the
+        id of the containing exploration.
+        """
+        return utils.convert_png_to_data_url(os.path.join(
+            feconf.RTE_EXTENSIONS_DIR, self.id, '%sPreview.png' % self.id))
 
     @property
     def html_body(self):
@@ -87,7 +94,7 @@ class BaseRichTextComponent(object):
         """Gets a dict representing this component. Only the default values for
         customization args are provided.
         """
-        component_dict = {
+        return {
             'backend_name': self.name,
             'customization_arg_specs': [{
                 'name': ca_spec.name,
@@ -102,12 +109,5 @@ class BaseRichTextComponent(object):
             'requires_fs': self.requires_fs,
             'tooltip': self.tooltip,
             'is_block_element': self.is_block_element,
+            'preview_url_template': self.preview_url_template
         }
-        preview_path = os.path.join(
-            feconf.RTE_EXTENSIONS_DIR, self.id, '%sPreview.png' % self.id)
-        if os.path.exists(preview_path):
-            component_dict['preview_url_template'] = (
-                utils.convert_png_to_data_url(preview_path))
-        elif hasattr(self, 'preview_url_template'):
-            component_dict['preview_url_template'] = self.preview_url_template
-        return component_dict

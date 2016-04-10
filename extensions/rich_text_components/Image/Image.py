@@ -26,7 +26,6 @@ class Image(base.BaseRichTextComponent):
     frontend_name = 'image'
     tooltip = 'Insert image'
     requires_fs = True
-    preview_url_template = '/imagehandler/<[explorationId]>/<[filepath]>'
     is_block_element = True
 
     _customization_arg_specs = [{
@@ -47,3 +46,7 @@ class Image(base.BaseRichTextComponent):
         },
         'default_value': '',
     }]
+
+    @property
+    def preview_url_template(self):
+        return '/imagehandler/<[explorationId]>/<[filepath]>'

@@ -604,14 +604,19 @@ oppia.factory('rteHelperService', [
       createRteElement: function(componentDefn, customizationArgsDict) {
         var el = $('<img/>');
         if (componentDefn.previewUrlTemplate) {
-          el.attr('src',
-            $interpolate(
-              componentDefn.previewUrlTemplate)(
-                angular.extend(customizationArgsDict,
-                  {
-                    explorationId: explorationContextService.getExplorationId()
-                  }
-                )));
+          var interpolatedUrl = $interpolate(
+            componentDefn.previewUrlTemplate, false, null, true)(
+              angular.extend(customizationArgsDict,
+                {
+                  explorationId: explorationContextService.getExplorationId()
+                }
+              ));
+          if (typeof interpolatedUrl == 'undefined') {
+            $log.error(
+              'Error interpolating url : ' + componentDefn.previewUrlTemplate);
+          } else {
+            el.attr('src', interpolatedUrl);
+          }
         } else {
           el.attr('src', componentDefn.iconDataUrl);
         }
