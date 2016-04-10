@@ -155,7 +155,8 @@ CAN_SEND_EMAILS_TO_ADMIN = False
 CAN_SEND_EMAILS_TO_USERS = False
 # Whether to send email updates to a user who has not specified a preference.
 DEFAULT_EMAIL_UPDATES_PREFERENCE = False
-# Whther to send membership email when user who has not specified a preference.
+# Whether to send an invitation email when the user is granted
+# new role permissions in an exploration.
 DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE = True
 # Whether to require an email to be sent, following a moderator action.
 REQUIRE_EMAIL_ON_MODERATOR_ACTION = False

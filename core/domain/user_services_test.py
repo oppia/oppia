@@ -147,8 +147,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             email_preferences['can_receive_editor_role_email'],
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
 
-        # When UserEmailPreferencesModel is created for user,
-        # value returned stored in UserEmailPreferencesModel should be Default.
+        # The user retrieves their email preferences. This initializes,
+        # a UserEmailPreferencesModel instance with the default values
         user_services.update_email_preferences(
             user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
