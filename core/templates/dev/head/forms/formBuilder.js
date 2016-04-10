@@ -861,6 +861,11 @@ oppia.config(['$provide', function($provide) {
   ]);
 }]);
 
+// Add the widgets for Oppia's rich text components.
+CKEDITOR.plugins.addExternal(
+  'oppialink',
+  '/extensions/rich_text_components/link/static/oppialink/', 'plugin.js');
+
 oppia.directive('ckEditorRte', [
   function() {
     return {
@@ -873,6 +878,7 @@ oppia.directive('ckEditorRte', [
       link: function (scope, el, attr, ngModel) {
         // Replace the textarea with the CKEditor.
         var ck = CKEDITOR.replace(el[0].children[0], {
+          extraPlugins: 'oppialink',
           allowedContent: true,
           toolbar: [
             {
@@ -882,6 +888,10 @@ oppia.directive('ckEditorRte', [
             {
               name: 'paragraph',
               items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent']
+            },
+            {
+              name: 'rtecomponents',
+              items: ['Oppialink']
             },
             {
               name: 'document',
