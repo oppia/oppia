@@ -861,6 +861,11 @@ oppia.config(['$provide', function($provide) {
   ]);
 }]);
 
+// Required for custom widgets.
+CKEDITOR.plugins.addExternal(
+  'widget', '/third_party/static/widget/', 'plugin.js');
+CKEDITOR.plugins.addExternal(
+  'lineutils', '/third_party/static/lineutils/', 'plugin.js');
 // Add the widgets for Oppia's rich text components.
 CKEDITOR.plugins.addExternal(
   'oppialink',
@@ -878,7 +883,7 @@ oppia.directive('ckEditorRte', [
       link: function(scope, el, attr, ngModel) {
         // Replace the textarea with the CKEditor.
         var ck = CKEDITOR.replace(el[0].children[0], {
-          extraPlugins: 'oppialink',
+          extraPlugins: 'widget,lineutils,oppialink',
           allowedContent: true,
           toolbar: [
             {
