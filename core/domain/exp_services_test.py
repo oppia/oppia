@@ -3151,7 +3151,8 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         exp_user_data = user_models.ExplorationUserDataModel.get(
             self.USER_ID, self.EXP_ID1)
         self.assertEqual(exp_user_data.exploration_id, self.EXP_ID1)
-        self.assertEqual(exp_user_data.draft_change_list, self.draft_change_list)
+        self.assertEqual(
+            exp_user_data.draft_change_list, self.draft_change_list)
         self.assertEqual(
             exp_user_data.draft_change_list_last_updated, self.DATETIME)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 2)
@@ -3173,7 +3174,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         exploration = exp_services.get_exploration_by_id(self.EXP_ID1)
         self.assertEqual(exploration.init_state.param_changes, [])
         updated_exp = exp_services.get_exp_with_draft_applied(
-                self.EXP_ID1, self.USER_ID)
+            self.EXP_ID1, self.USER_ID)
         param_changes = updated_exp.init_state.param_changes[0]
         self.assertEqual(param_changes._name, 'myParam')
         self.assertEqual(param_changes._generator_id, 'RandomSelector')
@@ -3185,5 +3186,5 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         exploration = exp_services.get_exploration_by_id(self.EXP_ID3)
         self.assertEqual(exploration.init_state.param_changes, [])
         updated_exp = exp_services.get_exp_with_draft_applied(
-                self.EXP_ID3, self.USER_ID)
+            self.EXP_ID3, self.USER_ID)
         self.assertEqual(updated_exp.init_state.param_changes, [])
