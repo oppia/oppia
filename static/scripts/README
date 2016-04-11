@@ -5,10 +5,12 @@ This folder contains embedding scripts for Oppia explorations, and tests for
 them. Currently, the tests need to be done manually. They should be run as
 follows:
 
-- Load the 'Welcome' demo exploration (with id '0') on a local development
-  server.
-- Change the content of the initial state to anything you like. This changes
-  the exploration to version 2.
+- Load the 'Welcome' demo exploration (with id '0') for version 0.0.0 and
+  the 'protractor_test_1' exploration (with id '12') for version 0.0.1
+  on a local development server.
+- Change the content of the initial state to anything you like. Change also the
+  language to one of the supported site languages. This changes the exploration
+  to version 2.
 - In a browser window, open each of the HTML files in this folder, and ensure
   that they do the correct thing. Use URLs of the following form:
 

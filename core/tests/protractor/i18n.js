@@ -37,6 +37,7 @@ describe('Site language', function() {
   it('should change after selecting a different language', function() {
     _selectLanguage('Español');
     expect(browser.getTitle()).toEqual('Oppia - Galería');
+    general.ensurePageHasNoTranslationIds();
   });
 
   it('should not change between different pages', function() {
@@ -47,40 +48,44 @@ describe('Site language', function() {
     // Spanish is still selected
     title = element(by.css('.protractor-test-signup-page-title'));
     expect(title.getText()).toEqual('Completa tu registro');
+    general.ensurePageHasNoTranslationIds();
   });
 
   it('should use language selected in the Preferences page.', function() {
     users.createUser('varda@example.com', 'Varda');
     users.login('varda@example.com');
     browser.get('/preferences');
-    element(by.css('.protractor-test-system-language-selector'))
-      .click();
-    element.all(by.css('.select2-drop-active li div')).each(function(element) {
-      element.getText().then(function(text) {
+    element(by.css('.protractor-test-system-language-selector')).click();
+    element.all(by.css('.select2-drop-active li div')).each(function(node) {
+      node.getText().then(function(text) {
         if (text == 'Español') {
-          element.click();
+          node.click();
+          // The language has already changed
+          expect(element(by.css('.protractor-test-preferences-title'))
+                 .getText()).toEqual('Preferencias');
         }
       });
     });
-    // The language has already changed
-    expect(element(by.css('.protractor-test-preferences-title')).getText())
-      .toEqual('Preferencias');
-    _selectLanguage('English');
-    expect(element(by.css('.protractor-test-preferences-title')).getText())
-      .toEqual('Preferences');
+    general.ensurePageHasNoTranslationIds();
     users.logout();
+  });
 
-    // Login again and see the last selected language
-    users.login('varda@example.com');
+  it('should save the language selected in the footer into the preferences.',
+      function() {
+    users.createUser('feanor@example.com', 'Feanor');
+    users.login('feanor@example.com');
     browser.get('/gallery');
-    expect(browser.getTitle()).toEqual('Oppia - Gallery');
+    _selectLanguage('Español');
+    expect(browser.getTitle()).toEqual('Oppia - Galería');
 
     // The preference page shows the last selected language
     browser.get('/preferences');
     language = element(by.css('.protractor-test-system-language-selector'))
       .element(by.css('.select2-chosen'));
-    expect(language.getText(), 'English');
-    expect(browser.getTitle()).toEqual('Registro - Oppia');
+    expect(language.getText(), 'Español');
+    expect(browser.getTitle()).toEqual('Preferencias - Oppia');
+    general.ensurePageHasNoTranslationIds();
+    users.logout();
   });
 
   it('should be used in titles of pages without controllers', function() {
@@ -88,9 +93,6 @@ describe('Site language', function() {
     expect(browser.getTitle()).toEqual('About - Oppia');
     _selectLanguage('Español');
     expect(browser.getTitle()).toEqual('Acerca de - Oppia');
-  });
-
-  afterEach(function() {
     general.ensurePageHasNoTranslationIds();
   });
 });
