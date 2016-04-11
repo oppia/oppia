@@ -489,7 +489,7 @@ oppia.controller('ExplorationHistory', [
         $http.post($scope.revertExplorationUrl, {
           current_version: explorationData.data.version,
           revert_to_version: version
-        }).success(function() {
+        }).then(function() {
           location.reload();
         });
       });

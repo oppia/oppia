@@ -26,8 +26,10 @@ oppia.directive('collectionDetailsEditorDirective', [function() {
     },
     templateUrl: 'inline/collection_details_editor_directive',
     controller: ['$scope', 'CollectionUpdateService',
-      'CollectionNodeObjectFactory', 'alertsService', function(
-      $scope, CollectionUpdateService, CollectionNodeObjectFactory,
+    'CollectionNodeObjectFactory', 'ExplorationSummaryBackendApiService',
+    'alertsService', function(
+      $scope, CollectionUpdateService,
+      CollectionNodeObjectFactory, ExplorationSummaryBackendApiService,
       alertsService) {
       $scope.addExploration = function() {
         if (!$scope.newExplorationId) {
@@ -41,8 +43,28 @@ oppia.directive('collectionDetailsEditorDirective', [function() {
             ' is already added');
           return;
         }
-        CollectionUpdateService.addCollectionNode(
-          collection, $scope.newExplorationId);
+
+        var newExplorationId = angular.copy($scope.newExplorationId);
+        ExplorationSummaryBackendApiService
+          .loadPublicAndPrivateExplorationSummaries(
+            [newExplorationId]).then(function(summaries) {
+            var summaryBackendObject = null;
+            if (summaries.length != 0 && summaries[0].id == newExplorationId) {
+              summaryBackendObject = summaries[0];
+            }
+            if (summaryBackendObject) {
+              CollectionUpdateService.addCollectionNode(
+                collection, newExplorationId, summaryBackendObject);
+            } else {
+              alertsService.addWarning(
+                'That exploration does not exist or you do not have edit ' +
+                'access to it.');
+            }
+          }, function() {
+            alertsService.addWarning(
+              'There was an error while adding an exploration to the ' +
+              'collection.');
+          });
         $scope.newExplorationId = '';
       };
 

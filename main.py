@@ -209,7 +209,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
         galleries.UploadExploration, 'upload_exploration'),
     get_redirect_route(
-        r'/explorationsummarieshandler/data',
+        feconf.EXPLORATION_SUMMARIES_DATA_URL,
         galleries.ExplorationSummariesHandler, 'exploration_summaries_handler'),
 
     get_redirect_route(

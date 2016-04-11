@@ -23,10 +23,9 @@
     <!-- The $event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
     <ul class="dropdown-menu" role="menu" style="max-height: 400px; overflow: auto;" ng-click="$event.stopPropagation()">
       <li ng-repeat="item in selectionDetails.categories.masterList track by $index"
-          class="protractor-test-selected"
           ng-if="selectionDetails.categories.selections[item.id]">
         <a href ng-click="toggleSelection('categories', item.id)">
-          <[item.text]>
+          <span class="protractor-test-selected"><[item.text]></span>
           <i ng-if="selectionDetails.categories.selections[item.id]" class="material-icons md-18 pull-right">&#xE876;</i>
         </a>
       </li>
@@ -35,10 +34,9 @@
       </li>
       <hr ng-if="selectionDetails.categories.numSelections > 0" style="margin: 2px;">
       <li ng-repeat="item in selectionDetails.categories.masterList track by $index"
-          class="protractor-test-deselected"
           ng-if="!selectionDetails.categories.selections[item.id]">
         <a href ng-click="toggleSelection('categories', item.id)">
-          <[item.text]>
+          <span class="protractor-test-deselected"><[item.text]></span>
           <i ng-if="selectionDetails.categories.selections[item.id]" class="material-icons md-18 pull-right">&#xE876;</i>
         </a>
       </li>
@@ -55,10 +53,9 @@
     <!-- The $event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
     <ul class="dropdown-menu" role="menu" style="max-height: 400px; overflow: auto;" ng-click="$event.stopPropagation()">
       <li ng-repeat="item in selectionDetails.languageCodes.masterList track by $index"
-          class="protractor-test-selected"
           ng-if="selectionDetails.languageCodes.selections[item.id]">
         <a href ng-click="toggleSelection('languageCodes', item.id)">
-          <[item.text]>
+          <span class="protractor-test-selected"><[item.text]></span>
           <i ng-if="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 pull-right">&#xE876;</i>
         </a>
       </li>
@@ -67,10 +64,9 @@
       </li>
       <hr ng-if="selectionDetails.languageCodes.numSelections > 0" style="margin: 2px;">
       <li ng-repeat="item in selectionDetails.languageCodes.masterList track by $index"
-          class="protractor-test-deselected"
           ng-if="!selectionDetails.languageCodes.selections[item.id]">
         <a href ng-click="toggleSelection('languageCodes', item.id)">
-          <[item.text]>
+          <span class="protractor-test-deselected"><[item.text]></span>
           <i ng-if="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 pull-right">&#xE876;</i>
         </a>
       </li>

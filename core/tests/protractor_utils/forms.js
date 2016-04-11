@@ -260,7 +260,7 @@ var MultiSelectEditor = function(elem) {
     // Open the dropdown menu.
     elem.element(by.css('.dropdown-toggle')).click();
 
-    elem.element(by.css('.dropdown-menu')).all(by.tagName('li')).filter(
+    elem.element(by.css('.dropdown-menu')).all(by.tagName('span')).filter(
       function(choiceElem) {
         return choiceElem.getText().then(function(choiceText) {
           return texts.indexOf(choiceText) !== -1;

@@ -156,7 +156,8 @@ class PreferencesHandler(base.BaseHandler):
         elif update_type == 'profile_picture_data_url':
             user_services.update_profile_picture_data_url(self.user_id, data)
         elif update_type == 'can_receive_email_updates':
-            user_services.update_email_preferences(self.user_id, data)
+            user_services.update_email_preferences(
+                self.user_id, data, feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
         else:
             raise self.InvalidInputException(
                 'Invalid update type: %s' % update_type)
@@ -266,7 +267,8 @@ class SignupHandler(base.BaseHandler):
 
         if can_receive_email_updates is not None:
             user_services.update_email_preferences(
-                self.user_id, can_receive_email_updates)
+                self.user_id, can_receive_email_updates,
+                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
 
         # Note that an email is only sent when the user registers for the first
         # time.

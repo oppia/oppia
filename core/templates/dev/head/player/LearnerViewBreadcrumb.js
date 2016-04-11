@@ -31,10 +31,10 @@ oppia.controller('LearnerViewBreadcrumb', [
           params: {
             stringified_exp_ids: JSON.stringify([explorationId])
           }
-        }).success(function(data) {
-          expInfo = data.summaries[0];
+        }).then(function(response) {
+          expInfo = response.data.summaries[0];
           openInformationCardModal();
-        }).error(function() {
+        }, function() {
           $log.error(
             'Information card failed to load for exploration ' + explorationId);
         });

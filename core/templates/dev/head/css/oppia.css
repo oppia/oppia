@@ -569,6 +569,58 @@ textarea {
 }
 
 /*
+  Styles for footer
+*/
+.oppia-footer {
+  background-color: #094142;
+  bottom: 0;
+  color: #FFFFFF;
+  font-size: 13px;
+  line-height: 20px;
+  position: absolute;
+  width: 100%;
+}
+
+.oppia-footer-container {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  padding-left: 80px;
+  padding-right: 80px;
+}
+
+.oppia-footer-container a {
+  color: #FFFFFF;
+  text-transform: capitalize;
+}
+
+.oppia-footer-container h4 {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.oppia-footer-container ul {
+  padding-left: 0;
+}
+
+.oppia-footer-container li {
+  list-style-position: inside;
+  list-style-type: none;
+}
+
+.oppia-footer-padding {
+  height: 200px;
+}
+
+@media (max-width: 768px) {
+  .oppia-footer-padding {
+    height: 500px;
+  }
+}
+
+/*
   This is needed for proper display of tabs. See
 
   https://github.com/angular-ui/bootstrap/commit/8620aedba99b05822311
@@ -2108,6 +2160,11 @@ div.ng-joyride-title {
 }
 div#ng-curtain {
   z-index: 997;
+}
+
+/* Add inter-paragraph spacing to the ng-joyride tutorial contents. */
+.ng-joyride .popover-content p {
+  margin-top: 10px;
 }
 
 .oppia-navbar {
