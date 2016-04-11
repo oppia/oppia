@@ -25,8 +25,8 @@ env:
   # Connect to SauceLabs by adding encripted username and Sauce Key
   # They will be available globaly in travis env to be used by core/tests/protractor.conf.js
   global:
-    - secure: nS36E/OxArRmb/w2wf50b+S4adygrbaQYTNj5OcydqW9GrTN4zuk1Pd5/cBTH+PW4Yc
-    - secure: uxPefeKWJGLQIzZG+uUqpa1yR2k5r/8vDQfwweuBBd/6AzdmEYTncQACcLovFqilIyP
+    - SAUCE_USERNAME=oppiadevtool
+    - SAUCE_ACCESS_KEY=a3bc238c-ac51-4df7-b98a-7910dca9725e
 matrix:
   allow_failures:
   # The backend tests, with coverage, take too long to run, so we make this
