@@ -2,7 +2,8 @@
   <span style="font-size: 14px;">
     <strong>Gadgets</strong>
   </span>
-  <span class="glyphicon glyphicon-info-sign" tooltip="These can be reused throughout an exploration." tooltip-placement="bottom" style="font-size: 12px; padding-left: 18px;"></span>
+  <i class="material-icons md-18" tooltip="These can be reused throughout an exploration." tooltip-placement="bottom" 
+     style="padding-left: 4px; vertical-align: text-top;">&#xE88E;</i>
 
   <md-card style="background-color: white; margin: 20px 0px; padding: 10px 10px;" class="md-default-theme">
     <div ng-repeat="(panel, panelContents) in panels"
@@ -19,11 +20,12 @@
                 (<[gadgetName]>)
               </span>
             </button>
-            <span title="Edit Gadget (<[gadgetName]>)" ng-click="editGadget(gadgetName)"
-              class="glyphicon glyphicon-pencil oppia-gadget-edit-icon protractor-test-edit-<[gadgetName]>-gadget">
-            </span>
-            <span title="Delete Gadget (<[gadgetName]>)" ng-click="deleteGadget(gadgetName)" class="glyphicon glyphicon-remove oppia-gadget-delete-icon protractor-test-delete-<[gadgetName]>-gadget-icon">
-            </span>
+            <i title="Edit Gadget (<[gadgetName]>)" ng-click="editGadget(gadgetName)"
+               class="material-icons oppia-gadget-edit-icon md-18 protractor-test-edit-<[gadgetName]>-gadget">&#xE254;
+            </i>
+            <i title="Delete Gadget (<[gadgetName]>)" ng-click="deleteGadget(gadgetName)"
+               class="material-icons oppia-gadget-delete-icon md-18 protractor-test-delete-<[gadgetName]>-gadget-icon">&#xE14C;
+            </i>
           </div>
         </div>
       </div>
@@ -46,16 +48,17 @@
         <[gadgetDict.gadget_type]>
         <span class="protractor-test-open-gadget-name-editor" ng-show="!SHOW_GADGET_NAME_EDITOR" ng-click="openGadgetNameEditor()">
           (<[gadgetDict.gadget_name]>)
-          <span class="glyphicon glyphicon-pencil" title="Edit Gadget Name"></span>
+          <i class="material-icons md-18" title="Edit Gadget Name" 
+             style="padding-bottom: 2px; vertical-align: middle;">&#xE254;</i>
         </span>
       </strong>
       <span ng-show="SHOW_GADGET_NAME_EDITOR" class="oppia-rename-gadget-form">
         <input type="text" ng-model="newNameForRenamedGadget" class="protractor-test-gadget-rename-text-input">
-        <button class="btn btn-xs glyphicon glyphicon-ok protractor-test-gadget-rename-confirmation-button"
-                ng-click="renameGadget(newNameForRenamedGadget)">
+        <button class="btn btn-xs material-icons protractor-test-gadget-rename-confirmation-button"
+                ng-click="renameGadget(newNameForRenamedGadget)">&#xE876;
         </button>
-        <button class="btn btn-xs glyphicon glyphicon-remove protractor-test-cancel-gadget-name-editor"
-                ng-click="cancelGadgetNameEditor()">
+        <button class="btn btn-xs material-icons protractor-test-cancel-gadget-name-editor"
+                ng-click="cancelGadgetNameEditor()">&#xE14C;
         </button>
       </span>
     </div>

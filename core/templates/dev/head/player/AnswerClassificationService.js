@@ -114,7 +114,8 @@ oppia.factory('answerClassificationService', [
             old_state: oldState.toBackendDict(),
             params: params,
             answer: answer
-          }).success(function(result) {
+          }).then(function(response) {
+            var result = response.data;
             deferred.resolve({
               outcome: result.outcome,
               ruleSpecIndex: result.rule_spec_index,

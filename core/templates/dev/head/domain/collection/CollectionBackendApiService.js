@@ -34,14 +34,14 @@ oppia.factory('CollectionBackendApiService', [
         collection_id: collectionId
       });
 
-    $http.get(collectionDataUrl).success(function(data) {
-      var collection = angular.copy(data.collection);
+    $http.get(collectionDataUrl).then(function(response) {
+      var collection = angular.copy(response.data.collection);
       if (successCallback) {
         successCallback(collection);
       }
-    }).error(function(error) {
+    }, function(errorResponse) {
       if (errorCallback) {
-        errorCallback(error);
+        errorCallback(errorResponse.data);
       }
     });
   };
