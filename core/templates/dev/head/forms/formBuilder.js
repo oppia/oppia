@@ -673,7 +673,7 @@ oppia.factory('rteHelperService', [
             'img.oppia-noninteractive-' + componentDefn.name
           ).replaceWith(function() {
             // Look for a class name starting with oppia-noninteractive-*.
-            var tagNameMatch = /(^|\s)(oppia-noninteractive-\w+)/.exec(
+            var tagNameMatch = /(^|\s)(oppia-noninteractive-[a-z0-9\-]+)/.exec(
               this.className);
             if (!tagNameMatch) {
               $log.error('RTE Error: invalid class name ' + this.className);
