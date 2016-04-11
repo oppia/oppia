@@ -3078,6 +3078,10 @@ md-card.preview-conversation-skin-supplemental-card {
   text-align: center;
 }
 
+.about-extra-content p {
+  margin: 1.5em 0;
+}
+
 .about-card-content-wide {
   width: 90%;
   padding: 8% 0;
