@@ -861,16 +861,6 @@ oppia.config(['$provide', function($provide) {
   ]);
 }]);
 
-// Required for custom widgets.
-CKEDITOR.plugins.addExternal(
-  'widget', '/third_party/static/widget/', 'plugin.js');
-CKEDITOR.plugins.addExternal(
-  'lineutils', '/third_party/static/lineutils/', 'plugin.js');
-// Add the widgets for Oppia's rich text components.
-CKEDITOR.plugins.addExternal(
-  'oppialink',
-  '/extensions/rich_text_components/link/static/oppialink/', 'plugin.js');
-
 oppia.directive('ckEditorRte', [
   function() {
     return {

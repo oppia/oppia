@@ -18,6 +18,7 @@ module.exports = function(config) {
       'third_party/static/angularjs-1.4.7/angular.js',
       'third_party/static/angularjs-1.4.7/angular-mocks.js',
       'third_party/static/math-expressions-762ffd/build/math-expressions.js',
+      'third_party/static/ckeditor/ckeditor.js',
       generatedJs,
       'core/templates/dev/head/*.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of

@@ -24,3 +24,16 @@ bundled js at the header will block rendering.-->
 </script>
 <script src="/third_party/static/MathJax-2.6.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 <script src="/third_party/static/ckeditor/ckeditor.js"></script>
+
+<script>
+  // Required for custom widgets.
+  CKEDITOR.plugins.addExternal(
+  'widget', '/third_party/static/widget/', 'plugin.js');
+  CKEDITOR.plugins.addExternal(
+  'lineutils', '/third_party/static/lineutils/', 'plugin.js');
+
+  // Add the widgets for Oppia's rich text components.
+  CKEDITOR.plugins.addExternal(
+  'oppialink',
+  '/extensions/rich_text_components/link/static/oppialink/', 'plugin.js');
+</script>
