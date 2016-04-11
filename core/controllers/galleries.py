@@ -113,13 +113,14 @@ class GalleryHandler(base.BaseHandler):
             collection_services.get_collection_ids_matching_query(
                 '', cursor=search_cursor))
         activity_list = (
-            collection_services.get_displayable_collection_summary_dicts_matching_ids(
+            collection_services.get_displayable_col_summary_dicts_matching_ids(
                 collection_ids))
 
         exp_ids, search_cursor = (
             exp_services.get_exploration_ids_matching_query(
                 query_string, cursor=search_cursor))
-        activity_list += (summary_services.get_displayable_exp_summary_dicts_matching_ids(
+        activity_list += (
+            summary_services.get_displayable_exp_summary_dicts_matching_ids(
                 exp_ids))
 
         if len(activity_list) == feconf.DEFAULT_QUERY_LIMIT:
