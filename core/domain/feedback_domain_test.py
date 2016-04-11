@@ -77,7 +77,6 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
         user_services.get_or_create_user(self.owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
-
     def test_to_dict(self):
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
         expected_message = {
@@ -121,7 +120,6 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         user_services.get_or_create_user(self.owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-
 
     def test_to_dict(self):
         expected_suggestion = {
