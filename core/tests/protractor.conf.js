@@ -180,8 +180,8 @@ if (process.env.TRAVIS) {
     'browserName': 'chrome',
     'seleniumVersion': '2.49.0',
     'chromedriverVersion': '2.20',
-    //'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER,
-    //'build': process.env.TRAVIS_BUILD_NUMBER,
+    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER,
+    'build': process.env.TRAVIS_BUILD_NUMBER,
     'platform': 'OS X 10.10',
     'screen-resolution': '1920x1200'
   };
