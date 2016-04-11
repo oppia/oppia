@@ -68,7 +68,7 @@ install:
 - source scripts/setup_gae.sh || exit 1
 
 before_script:
-  - curl https://raw.githubusercontent.com/angular/protractor/master/scripts/sauce_connect_setup.sh | bash
+  - curl https://gist.github.com/everzet/5698159/raw/sauce_connect_setup.sh | bash
 script:
 - if [ $RUN_E2E_TESTS == 'true' ]; then bash scripts/run_e2e_tests.sh; fi
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report; fi
