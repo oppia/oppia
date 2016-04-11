@@ -39,7 +39,7 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
 
         messages = feedback_services.get_messages(exp_id, thread_id)
         self.assertEqual(len(messages), 1)
-        message_id = messages[0]['message_id']
+        message_id = messages[0].message_id
         self.assertTrue(isinstance(message_id, int))
 
         # Retrieve the message instance from the storage layer.

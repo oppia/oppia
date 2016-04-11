@@ -59,8 +59,8 @@ class ThreadHandler(base.BaseHandler):
 
     def get(self, exploration_id, thread_id):  # pylint: disable=unused-argument
         self.values.update({
-            'messages': feedback_services.get_messages(
-                exploration_id, thread_id)})
+            'messages': [m.to_dict() for m in feedback_services.get_messages(
+                exploration_id, thread_id)]})
         self.values.update({
             'suggestion': feedback_services.get_suggestion(
                 exploration_id, thread_id)})
@@ -104,7 +104,7 @@ class RecentFeedbackMessagesHandler(base.BaseHandler):
                 urlsafe_start_cursor=urlsafe_start_cursor))
 
         self.render_json({
-            'results': all_feedback_messages,
+            'results': [m.to_dict() for m in all_feedback_messages],
             'cursor': new_urlsafe_start_cursor,
             'more': more,
         })

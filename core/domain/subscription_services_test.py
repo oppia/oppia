@@ -151,7 +151,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         thread_id = feedback_thread_class.get_thread_id_from_full_thread_id(
             full_thread_id)
         self.assertEqual(
-            feedback_services.get_messages('exp_id', thread_id)[0]['text'],
+            feedback_services.get_messages('exp_id', thread_id)[0].text,
             message_text)
 
         # The editor posts a follow-up message to the thread.

@@ -22,7 +22,6 @@ from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 import feconf
-import utils
 
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
 
@@ -63,27 +62,6 @@ def create_thread(
 
     _create_models_for_thread_and_first_message(
         exploration_id, state_name, original_author_id, subject, text, False)
-
-
-def _get_message_dict(message_instance):
-    return {
-        'author_username': (
-            user_services.get_username(message_instance.author_id)
-            if message_instance.author_id else None),
-        'created_on': utils.get_time_in_millisecs(message_instance.created_on),
-        'exploration_id': message_instance.exploration_id,
-        'message_id': message_instance.message_id,
-        'text': message_instance.text,
-        'updated_status': message_instance.updated_status,
-        'updated_subject': message_instance.updated_subject,
-    }
-
-
-def get_messages(exploration_id, thread_id):
-    return [
-        _get_message_dict(m)
-        for m in feedback_models.FeedbackMessageModel.get_messages(
-            exploration_id, thread_id)]
 
 
 def create_message(
@@ -140,6 +118,21 @@ def create_message(
     return True
 
 
+def _get_message_from_model(message_model):
+    return feedback_domain.FeedbackMessage(
+        message_model.id, message_model.thread_id, message_model.message_id,
+        message_model.author_id, message_model.updated_status,
+        message_model.updated_subject, message_model.text,
+        message_model.created_on, message_model.last_updated)
+
+
+def get_messages(exploration_id, thread_id):
+    return [
+        _get_message_from_model(m)
+        for m in feedback_models.FeedbackMessageModel.get_messages(
+            exploration_id, thread_id)]
+
+
 def get_next_page_of_all_feedback_messages(
         page_size=feconf.FEEDBACK_TAB_PAGE_SIZE, urlsafe_start_cursor=None):
     """Returns a page of feedback messages in reverse time order.
@@ -153,8 +146,8 @@ def get_next_page_of_all_feedback_messages(
         feedback_models.FeedbackMessageModel.get_all_messages(
             page_size, urlsafe_start_cursor))
 
-    result_dicts = [_get_message_dict(m) for m in results]
-    return (result_dicts, new_urlsafe_start_cursor, more)
+    result_messages = [_get_message_from_model(m) for m in results]
+    return (result_messages, new_urlsafe_start_cursor, more)
 
 
 def get_thread_analytics(exploration_id):

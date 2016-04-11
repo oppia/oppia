@@ -57,3 +57,36 @@ class FeedbackThread(object):
     def get_thread_id_from_full_thread_id(full_thread_id):
         return full_thread_id.split('.')[1]
 
+
+class FeedbackMessage(object):
+    """Domain object for a feedback message."""
+    def __init__(self, full_message_id, full_thread_id, message_id, author_id,
+                 updated_status, updated_subject, text,
+                 created_on, last_updated):
+        self.id = full_message_id
+        self.full_thread_id = full_thread_id
+        self.message_id = message_id
+        self.author_id = author_id
+        self.updated_status = updated_status
+        self.updated_subject = updated_subject
+        self.text = text
+        self.created_on = created_on
+        self.last_updated = last_updated
+
+    @property
+    def exploration_id(self):
+        return self.id.split('.')[0]
+
+    def to_dict(self):
+        return {
+            'author_username': (
+                user_services.get_username(self.author_id)
+                if self.author_id else None),
+            'created_on': utils.get_time_in_millisecs(self.created_on),
+            'exploration_id': self.exploration_id,
+            'message_id': self.message_id,
+            'text': self.text,
+            'updated_status': self.updated_status,
+            'updated_subject': self.updated_subject,
+        }
+

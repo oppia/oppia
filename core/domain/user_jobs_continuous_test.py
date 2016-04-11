@@ -31,6 +31,7 @@ from core.domain import user_jobs_continuous
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import utils
 
 (exp_models, stats_models, user_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.statistics, models.NAMES.user])
@@ -324,7 +325,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 'activity_id': EXP_1_ID,
                 'activity_title': EXP_1_TITLE,
                 'author_id': editor_id,
-                'last_updated_ms': message['created_on'],
+                'last_updated_ms': utils.get_time_in_millisecs(
+                    message.created_on),
                 'subject': FEEDBACK_THREAD_SUBJECT,
                 'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
             }, (
@@ -373,7 +375,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 'activity_id': EXP_ID,
                 'activity_title': EXP_TITLE,
                 'author_id': user_b_id,
-                'last_updated_ms': message['created_on'],
+                'last_updated_ms': utils.get_time_in_millisecs(
+                    message.created_on),
                 'subject': FEEDBACK_THREAD_SUBJECT,
                 'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
             }
@@ -436,7 +439,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 'activity_id': EXP_ID,
                 'activity_title': EXP_TITLE,
                 'author_id': user_b_id,
-                'last_updated_ms': message['created_on'],
+                'last_updated_ms': utils.get_time_in_millisecs(
+                    message.created_on),
                 'subject': FEEDBACK_THREAD_SUBJECT,
                 'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
             }
