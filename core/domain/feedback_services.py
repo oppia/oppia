@@ -30,18 +30,6 @@ DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a learner'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
 
 
-def _get_thread_dict(thread):
-    return {
-        'last_updated': utils.get_time_in_millisecs(thread.last_updated),
-        'original_author_username': user_services.get_username(
-            thread.original_author_id) if thread.original_author_id else None,
-        'state_name': thread.state_name,
-        'status': thread.status,
-        'subject': thread.subject,
-        'summary': thread.summary,
-        'thread_id': get_thread_id_from_full_thread_id(thread.id)}
-
-
 def _create_models_for_thread_and_first_message(
         exploration_id, state_name, original_author_id, subject, text,
         has_suggestion):
@@ -75,14 +63,6 @@ def create_thread(
 
     _create_models_for_thread_and_first_message(
         exploration_id, state_name, original_author_id, subject, text, False)
-
-
-def get_exp_id_from_full_thread_id(full_thread_id):
-    return full_thread_id.split('.')[0]
-
-
-def get_thread_id_from_full_thread_id(full_thread_id):
-    return full_thread_id.split('.')[1]
 
 
 def _get_message_dict(message_instance):
@@ -243,7 +223,7 @@ def get_threads(exploration_id):
     return threads
 
 
-def get_displayable_open_threads(exploration_id, has_suggestion):
+def get_open_threads(exploration_id, has_suggestion):
     """If has_suggestion is True, return a list of all open threads that have a
     suggestion, otherwise return a list of all open threads that do not have a
     suggestion."""
@@ -254,12 +234,9 @@ def get_displayable_open_threads(exploration_id, has_suggestion):
         if (thread.has_suggestion == has_suggestion and
                 thread.status == feedback_models.STATUS_CHOICES_OPEN):
             open_threads.append(thread)
-    return [
-        _get_thread_dict(t)
-        for t in open_threads]
+    return open_threads
 
-
-def get_displayable_closed_threads(exploration_id, has_suggestion):
+def get_closed_threads(exploration_id, has_suggestion):
     """If has_suggestion is True, return a list of all closed threads that have
     a suggestion, otherwise return a list of all closed threads that do not have
     a suggestion."""
@@ -270,12 +247,10 @@ def get_displayable_closed_threads(exploration_id, has_suggestion):
         if (thread.has_suggestion == has_suggestion and
                 thread.status != feedback_models.STATUS_CHOICES_OPEN):
             closed_threads.append(thread)
-    return [
-        _get_thread_dict(t)
-        for t in closed_threads]
+    return closed_threads
 
 
-def get_displayable_threads(exploration_id, has_suggestion):
+def get_all_threads(exploration_id, has_suggestion):
     """Returns a list of all threads with suggestions if has_suggestion is True;
     otherwise, returns a list of all threads with no suggestions."""
 
@@ -284,6 +259,4 @@ def get_displayable_threads(exploration_id, has_suggestion):
     for thread in threads:
         if thread.has_suggestion == has_suggestion:
             all_threads.append(thread)
-    return [
-        _get_thread_dict(t)
-        for t in all_threads]
+    return all_threads

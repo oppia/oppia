@@ -20,6 +20,7 @@ from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import subscription_services
@@ -146,7 +147,8 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             self.viewer_id)
         self.assertEqual(len(thread_ids_subscribed_to), 1)
         full_thread_id = thread_ids_subscribed_to[0]
-        thread_id = feedback_services.get_thread_id_from_full_thread_id(
+        feedback_thread_class = feedback_domain.FeedbackThread
+        thread_id = feedback_thread_class.get_thread_id_from_full_thread_id(
             full_thread_id)
         self.assertEqual(
             feedback_services.get_messages('exp_id', thread_id)[0]['text'],

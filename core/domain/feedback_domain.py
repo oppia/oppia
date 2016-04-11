@@ -13,13 +13,16 @@
 # limitations under the License.
 
 """Domain objects for feedback models"""
+from core.domain import user_services
+import utils
+
 
 class FeedbackThread(object):
     """Domain object for a feedback thread."""
-    def __init__(self, thread_id, exploration_id, state_name,
+    def __init__(self, full_thread_id, exploration_id, state_name,
                  original_author_id, status, subject, summary, has_suggestion,
                  created_on, last_updated):
-        self.id = thread_id
+        self.id = full_thread_id
         self.exploration_id = exploration_id
         self.state_name = state_name
         self.original_author_id = original_author_id
@@ -30,3 +33,27 @@ class FeedbackThread(object):
 
         self.created_on = created_on
         self.last_updated = last_updated
+
+    def get_thread_id(self):
+        return FeedbackThread.get_thread_id_from_full_thread_id(self.id)
+
+    def to_dict(self):
+        return {
+            'last_updated': utils.get_time_in_millisecs(self.last_updated),
+            'original_author_username': user_services.get_username(
+                self.original_author_id) if self.original_author_id else None,
+            'state_name': self.state_name,
+            'status': self.status,
+            'subject': self.subject,
+            'summary': self.summary,
+            'thread_id': self.get_thread_id()
+        }
+
+    @staticmethod
+    def get_exp_id_from_full_thread_id(full_thread_id):
+        return full_thread_id.split('.')[0]
+
+    @staticmethod
+    def get_thread_id_from_full_thread_id(full_thread_id):
+        return full_thread_id.split('.')[1]
+
