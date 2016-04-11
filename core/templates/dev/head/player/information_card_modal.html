@@ -48,7 +48,7 @@
       </ul>
 
       <div class="oppia-info-card-bottom-row" layout="row">
-        <div flex="55">
+        <div flex="40">
           <md-content layout="row">
             <div class="oppia-info-card-tag-icon">
               <span class="fa fa-tags fa-lg" tooltip-append-to-body="true" tooltip="Tags"
@@ -72,38 +72,10 @@
           </md-content>
         </div>
 
-        <div flex="45">
-          <ul layout="row" layout-align="end center">
-            {% if SHARING_OPTIONS['gplus'] %}
-              <li>
-                <a ng-href="https://plus.google.com/share?url=<[serverName]>/explore/<[explorationId]>" onclick="return !window.open(this.href, '', 'height=600, width=600, menubar=no, toolbar=no, resizable=yes, scrollbars=yes')" ng-click="registerShareExplorationEvent('gplus')" target="_window">
-                  <img src="/images/general/gplus.png" alt="Google+">
-                </a>
-              </li>
-            {% endif %}
-
-            {% if SHARING_OPTIONS['facebook'] %}
-              <li>
-                <a ng-href="https://www.facebook.com/sharer/sharer.php?sdk=joey&u=<[serverName]>/explore/<[explorationId]>&display=popup&ref=plugin&src=share_button" onclick="return !window.open(this.href, '', 'height=336, width=640')" ng-click="registerShareExplorationEvent('facebook')" target="_window">
-                  <img src='/images/general/fb.png' alt="Facebook">
-                </a>
-              </li>
-            {% endif %}
-
-            {% if SHARING_OPTIONS['twitter'] %}
-              <li>
-                <a ng-href="https://twitter.com/share?text=<[escapedTwitterText]>&url=<[serverName]>/explore/<[explorationId]>" onclick="return !window.open(this.href, '', 'height=460, width=640')" target="_window">
-                  <img src="/images/general/twitter.png" ng-click="registerShareExplorationEvent('twitter')" alt="Twitter">
-                </a>
-              </li>
-            {% endif %}
-
-            <li>
-              <a href="" ng-click="showEmbedExplorationModal(explorationId)" tooltip="Embed" tooltip-placement="top">
-                <i class="material-icons md-18" style="color: black;">&#xE157;</i>
-              </a>
-            </li>
-          </ul>
+        <div flex="60">
+          <sharing-links flex="45" layout-type="row" layout-align-type="end center"
+                         twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER">
+          </sharing-links>
         </div>
       </div>
     </div>

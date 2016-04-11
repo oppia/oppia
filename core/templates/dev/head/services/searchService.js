@@ -65,6 +65,7 @@ oppia.factory('searchService', [
   };
 
   var _isCurrentlyFetchingResults = false;
+  var numSearchesInProgress = 0;
 
   return {
     // Note that an empty query results in all activities being shown.
@@ -76,11 +77,14 @@ oppia.factory('searchService', [
         _getSuffixForQuery(selectedCategories, selectedLanguageCodes));
 
       _isCurrentlyFetchingResults = true;
-      $http.get(queryUrl).success(function(data) {
+      numSearchesInProgress++;
+      $http.get(queryUrl).then(function(response) {
+        var data = response.data;
         _lastQuery = searchQuery;
         _lastSelectedCategories = angular.copy(selectedCategories);
         _lastSelectedLanguageCodes = angular.copy(selectedLanguageCodes);
         _searchCursor = data.search_cursor;
+        numSearchesInProgress--;
 
         if ($('.oppia-splash-search-input').val() === searchQuery) {
           $rootScope.$broadcast('refreshGalleryData', data,
@@ -91,11 +95,16 @@ oppia.factory('searchService', [
           console.log('SearchQuery: ' + searchQuery);
           console.log('Input: ' + $('.oppia-splash-search-input').val());
         }
+      }, function() {
+        numSearchesInProgress--;
       });
 
       if (successCallback) {
         successCallback();
       }
+    },
+    isSearchInProgress: function() {
+      return numSearchesInProgress > 0;
     },
     loadMoreData: function(successCallback) {
       // If a new query is still being sent, do not fetch more results.
@@ -112,12 +121,12 @@ oppia.factory('searchService', [
       }
 
       _isCurrentlyFetchingResults = true;
-      $http.get(queryUrl).success(function(data) {
-        _searchCursor = data.search_cursor;
+      $http.get(queryUrl).then(function(response) {
+        _searchCursor = response.data.search_cursor;
         _isCurrentlyFetchingResults = false;
 
         if (successCallback) {
-          successCallback(data, hasPageFinishedLoading());
+          successCallback(response.data, hasPageFinishedLoading());
         }
       });
     }

@@ -27,7 +27,8 @@ oppia.controller('Profile', [
     };
 
     $rootScope.loadingMessage = 'Loading';
-    $http.get(profileDataUrl).success(function(data) {
+    $http.get(profileDataUrl).then(function(response) {
+      var data = response.data;
       $rootScope.loadingMessage = '';
       $scope.userBio = data.user_bio;
       $scope.userDisplayedStatistics = [{

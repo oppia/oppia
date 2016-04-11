@@ -1,5 +1,4 @@
 <script type="text/ng-template" id="components/activityTilesInfinityGrid">
-
   <div infinite-scroll="showMoreActivities()" infinite-scroll-distance="1"
        infinite-scroll-disabled="finishedLoadingPage || pageLoaderIsBusy">
     <div ng-repeat="activity in allActivitiesInOrder track by $index" style="display: inline-block;">
@@ -24,9 +23,9 @@
                                 thumbnail-bg-color="activity.thumbnail_bg_color"
                                 num-views="activity.num_views"
                                 contributors-summary="activity.human_readable_contributors_summary"
+                                is-community-owned="activity.community_owned"
                                 class="protractor-test-gallery-tile">
       </exploration-summary-tile>
     </div>
   </div>
-
 </script>

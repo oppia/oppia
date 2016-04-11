@@ -133,7 +133,7 @@ oppia.controller('Preferences', [
       $http.put(_PREFERENCES_DATA_URL, {
         update_type: 'profile_picture_data_url',
         data: newProfilePictureDataUrl
-      }).success(function() {
+      }).then(function() {
         // The reload is needed in order to update the profile picture in the
         // top-right corner.
         location.reload();
@@ -151,7 +151,8 @@ oppia.controller('Preferences', [
   );
 
   $scope.hasPageLoaded = false;
-  $http.get(_PREFERENCES_DATA_URL).success(function(data) {
+  $http.get(_PREFERENCES_DATA_URL).then(function(response) {
+    var data = response.data;
     $rootScope.loadingMessage = '';
     $scope.userBio = data.user_bio;
     $scope.subjectInterests = data.subject_interests;
