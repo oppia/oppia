@@ -97,6 +97,20 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(expected_message, message.to_dict())
 
 
+class FeedbackAnalyticsDomainUnitTests(test_utils.GenericTestBase):
+    EXP_ID = 'exp0'
+
+    def setUp(self):
+        super(FeedbackAnalyticsDomainUnitTests, self).setUp()
+
+    def to_dict(self):
+        analytics = feedback_domain.FeedbackAnalytics(self.EXP_ID, 1, 2)
+        self.assertDictEqual({
+            'num_open_threads': 1,
+            'num_total_threads': 2
+        }, analytics.to_dict())
+
+
 class SuggestionDomainUnitTests(test_utils.GenericTestBase):
     EXP_ID = 'exp0'
     THREAD_ID = 'thread0'

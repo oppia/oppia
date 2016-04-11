@@ -91,6 +91,20 @@ class FeedbackMessage(object):
         }
 
 
+class FeedbackAnalytics(object):
+    """Domain object for a feedback analytics"""
+    def __init__(self, exploration_id, num_open_threads, num_total_threads):
+        self.id = exploration_id
+        self.num_open_threads = num_open_threads
+        self.num_total_threads = num_total_threads
+
+    def to_dict(self):
+        return {
+            'num_open_threads': self.num_open_threads,
+            'num_total_threads': self.num_total_threads
+        }
+
+
 class Suggestion(object):
     """Domain object for a suggestion."""
     def __init__(self, full_thread_id, author_id, exploration_id,

@@ -67,7 +67,8 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         self.assertEqual(
-            ModifiedFeedbackAnalyticsAggregator.get_thread_analytics(exp_id),
+            ModifiedFeedbackAnalyticsAggregator.get_thread_analytics(
+                exp_id).to_dict(),
             expected_thread_analytics)
 
     def test_no_threads(self):
@@ -147,14 +148,14 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
             self.assertEqual(
                 ModifiedFeedbackAnalyticsAggregator.get_thread_analytics(
-                    exp_id_1),
+                    exp_id_1).to_dict(),
                 {
                     'num_open_threads': 2,
                     'num_total_threads': 2,
                 })
             self.assertEqual(
                 ModifiedFeedbackAnalyticsAggregator.get_thread_analytics(
-                    exp_id_2),
+                    exp_id_2).to_dict(),
                 {
                     'num_open_threads': 2,
                     'num_total_threads': 2,
@@ -309,8 +310,8 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             self, exp_id, expected_thread_analytics):
         self.process_and_flush_pending_tasks()
         self.assertEqual(
-            ModifiedFeedbackAnalyticsAggregator.get_thread_analytics(exp_id),
-            expected_thread_analytics)
+            ModifiedFeedbackAnalyticsAggregator.get_thread_analytics(
+                exp_id).to_dict(), expected_thread_analytics)
 
     def test_no_threads(self):
         with self._get_swap_context():
