@@ -165,8 +165,7 @@
       var width = this.oppiaNode.getAttribute('width');
       var fixedHeight = 'false';
       var fixedWidth = 'false';
-      var explorationVersion = this.oppiaNode.getAttribute(
-        'exploration-version') || '';
+      var explorationVersion = this.oppiaNode.getAttribute('exploration-version') || '';
 
       if (!height || height == 'auto') {
         // The default height is 700px.
@@ -206,10 +205,6 @@
       for (var key in iframeAttrs) {
         this.iframe.setAttribute(key, iframeAttrs[key]);
       }
-      // Default site language is English.
-      this.iframe.preferredSiteLanguage = this.oppiaNode.getAttribute(
-        'site-language') || 'en';
-      this.iframe.isEmbedded = true;
 
       this.oppiaNode.parentNode.replaceChild(this.iframe, this.oppiaNode);
 

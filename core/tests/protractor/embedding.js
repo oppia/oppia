@@ -145,25 +145,30 @@ describe('Embedding', function() {
     general.checkForConsoleErrors([]);
   });
 
-  it('should have the site language or English as default', function() {
+  it('should use the exploration language as site language.', function() {
     users.createUser('embedder2@example.com', 'Embedder2');
     users.login('embedder2@example.com', true);
     admin.reloadExploration('protractor_test_1.yaml');
+
+    // Change language to Spanish
+    general.openEditor('12');
+    editor.setLanguage('español');
+    editor.saveChanges('changing the language');
 
     var driver = browser.driver;
     driver.get(
       general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE +
       'embedding_tests_dev_0.0.1.html');
 
-    // Select the new version. It does not have site-language attribute.
+    // Select the new version.
     browser.switchTo().frame(
       driver.findElement(
         by.xpath("//div[@class='protractor-test-standard']/iframe")));
     general.waitForSystem();
     browser.waitForAngular();
-    // Expect language to be English
+    // Expect language to be Spanish
     expect(driver.findElement(by.css('.protractor-test-float-form-input'))
-        .getAttribute('placeholder')).toBe('Type a number');
+        .getAttribute('placeholder')).toBe('Ingresa un número');
     browser.switchTo().defaultContent();
 
     // Select the old version.
@@ -175,9 +180,9 @@ describe('Embedding', function() {
         by.xpath("//div[@class='protractor-test-deferred']/iframe")));
     general.waitForSystem();
     browser.waitForAngular();
-    // Expect language to be Spanish
+    // Expect language to be English
     expect(driver.findElement(by.css('.protractor-test-float-form-input'))
-        .getAttribute('placeholder')).toBe('Ingresa un número');
+        .getAttribute('placeholder')).toBe('Type a number');
     browser.switchTo().defaultContent();
 
     users.logout();

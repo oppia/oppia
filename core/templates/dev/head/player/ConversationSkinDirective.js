@@ -164,14 +164,14 @@ oppia.directive('conversationSkin', [function() {
     scope: {},
     templateUrl: 'skins/Conversation',
     controller: [
-      '$scope', '$timeout', '$rootScope', '$window', 'messengerService',
-      'oppiaPlayerService', 'urlService', 'focusService',
+      '$scope', '$timeout', '$rootScope', '$window', '$translate',
+       'messengerService', 'oppiaPlayerService', 'urlService', 'focusService',
       'LearnerViewRatingService', 'windowDimensionsService',
       'playerTranscriptService', 'LearnerParamsService',
       'playerPositionService', 'explorationRecommendationsService',
       'StatsReportingService',
       function(
-          $scope, $timeout, $rootScope, $window, messengerService,
+          $scope, $timeout, $rootScope, $window, $translate, messengerService,
           oppiaPlayerService, urlService, focusService,
           LearnerViewRatingService, windowDimensionsService,
           playerTranscriptService, LearnerParamsService,
@@ -440,6 +440,13 @@ oppia.directive('conversationSkin', [function() {
                 exploration.initStateName, _nextFocusLabel));
             $rootScope.loadingMessage = '';
             $scope.hasFullyLoaded = true;
+
+            // If the exploration is embedded, use as site language the
+            // exploration language.
+            var siteLanguage = oppiaPlayerService.getExplorationLanguageCode();
+            if ($window.GLOBALS.SUPPORTED_SITE_LANGUAGES && $scope.isIframed) {
+              $translate.use(oppiaPlayerService.getExplorationLanguageCode());
+            }
 
             $scope.adjustPageHeight(false, null);
             $window.scrollTo(0, 0);
