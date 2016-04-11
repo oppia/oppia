@@ -20,12 +20,16 @@ CKEDITOR.plugins.add('oppialink', {
       data: function() {
         this.element.setAttribute(
           'open_link_in_same_window-with-value',
-          String(this.data.openLinkInSameWindow)
+          (this.data.openLinkInSameWindow ? 'true' : '')
         );
-        this.element.setAttribute(
-          'text-with-value', `&quot;${this.data.text}&quot;`);
-        this.element.setAttribute(
-          'url-with-value', `&quot;${this.data.url}&quot;`);
+        if (this.data.text) {
+          this.element.setAttribute(
+            'text-with-value', `&quot;${this.data.text}&quot;`);
+        }
+        if (this.data.url) {
+          this.element.setAttribute(
+            'url-with-value', `&quot;${this.data.url}&quot;`);
+        }
 
         var display = this.data.text || this.data.url;
         this.element.setHtml(`<a>${display}</a>`);
@@ -35,12 +39,10 @@ CKEDITOR.plugins.add('oppialink', {
           'open_link_in_same_window-with-value');
         var textWithValue = this.element.getAttribute('text-with-value');
         var urlWithValue = this.element.getAttribute('url-with-value');
-        openInSame = openInSame.replace(/&quot;/g, '');
+        openInSame = openInSame.replace(/&quot;/g, '').length > 0;
         textWithValue = textWithValue.replace(/&quot;/g, '');
         urlWithValue = urlWithValue.replace(/&quot;/g, '');
-        if (openInSame) {
-          this.setData('openLinkInSameWindow', openInSame);
-        }
+        this.setData('openLinkInSameWindow', openInSame);
         if (textWithValue) {
           this.setData('text', textWithValue);
         }
