@@ -672,7 +672,13 @@ oppia.factory('rteHelperService', [
           elt.find(
             'img.oppia-noninteractive-' + componentDefn.name
           ).replaceWith(function() {
-            var jQueryElt = $('<' + this.className.split(' ')[0] + '/>');
+            // Look for a class name starting with oppia-noninteractive-*.
+            var tagNameMatch = /(^|\s)(oppia-noninteractive-\w+)/.exec(
+              this.className);
+            if (!tagNameMatch) {
+              $log.error('RTE Error: invalid class name ' + this.className);
+            }
+            var jQueryElt = $('<' + tagNameMatch[2] + '/>');
             for (var i = 0; i < this.attributes.length; i++) {
               var attr = this.attributes[i];
               if (attr.name !== 'class' && attr.name !== 'src') {
