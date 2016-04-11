@@ -24,234 +24,381 @@
 {% endblock navbar_breadcrumb %}
 
 {% block content %}
+  <div class="about-header">
+    <h1>Be Part of a Community of Learners</h1>
+  </div>
+
   <div class="oppia-page-card about-content">
-    <div class="about-nav oppia-profile-tabs md-tab nav-creators">
+    <div class="about-nav oppia-profile-tabs md-tab">
       <ul class="about-tab-links">
         <li class="oppia-profile-tabs about-active-tab">
-          <a href="about-tab-1">
-            Teach on Oppia
-          </a>
+          <a href="about-tab-1">About Oppia</a>
         </li>
-        <li class="oppia-profile-tabs about-active-tab">
-          <a href="about-tab-2">
-            Participation Playbook
-          </a>
+        <li class="oppia-profile-tabs">
+          <a href="about-tab-2">The Oppia Foundation</a>
+        </li>
+        <li class="oppia-profile-tabs">
+          <a href="about-tab-3">Credits</a>
         </li>
       </ul>
-    </div><!-- /about-nav -->
+    </div> <!-- /about-nav -->
 
   <div class="about-tab-container">
     <div class="about-tab-1 about-tab-content about-visible-content">
       <div class="about-card-content-wide about-card-content-narrow">
         <h2>
-          Teach on Oppia
+          Our Mission<br>
+          To help anyone learn anything they want in an effective and
+          enjoyable way.
         </h2>
         <p>
-          Oppia is an open commons -- the perfect place to disseminate your knowledge, 
-          improve your ability to teach, and meet like-minded educators and curators
-          of knowledge. Anyone can create and contribute to an exploration,
-          and immediately reach Oppia's hundreds of thousands of users from around the world.
-          And, since Oppia's learning method is meant to simulate one-on-one tutoring sessions,
-          the platform offers an unparalleled way to teach effectively and efficiently,
-          and to represent information in a way that is best suited for learning.
-          Through Oppia, you can create better and more effective content,
-          reach more people with your content.
+          Oppia means "learn" in Finnish, and this site is all about learning and
+          sharing knowledge! Oppia is a free, open-source learning platform that
+          offers interactive learning modules that recreate the power of 1-on-1 tutoring.
+          Our unique technology allows anyone to create these learning modules, or,
+          as we call them, explorations, to share their knowledge in the most effective and
+          efficient way. Since these explorations adapt to the needs and the current knowledge
+          of learners, Oppia provides an enriched learning experience. Oppia's explorations cover
+          a variey of subjects, like mathematics, biology, and programming, and are offered
+          in various languages made by unique individuals like you.
         </p>
-      </div><!-- /teach on oppia -->
-      <div class="about-card-content-wide create-three-cols-container">
-        <div class="create-three-cols-layout create-three-cols-feature">
-          <img src="img/general/creator-create-exp.png"/>
-          <h3>Create an Exploration</h3>
-          <p>
-            Create an Exploration about a topic
-            that you are passionate about.
-          </p>
-        </div>
-        <div class="create-three-cols-layout create-three-cols-feature">
-          <img src="img/general/creator-pub-share.png"/>
-          <h3>Publish &amp; Share</h3>
-          <p>
-            Publish and share your work with your community.
-          </p>
-        </div>
-        <div class="create-three-cols-layout create-three-cols-feature">
-          <img src="img/general/creator-feedback.png" />
-          <h3>Earn feedback</h3>
-          <p>
-            Improve your Exploration based on feedback.
-          </p>
-        </div>
-      </div><!-- /create-three-cols-container -->
-    </div><!-- /teach on oppia -->
+      </div><!-- /MISSION about-card-content-wide about-card-content-narrow -->
+    </div><!-- /tab -->
 
-    <div class="about-tab-2 about-tab-content">
-      <div class="about-card-content-wide about-card-content-narrow">
-        <h2>Community Guidelines</h2>
-        <ol>
-          <li>
-            <p>
-              <strong>Once published, explorations can be played and commented on by anyone in the Oppia community.</strong>
-              With everyone's input, we can continuously improve explorations and make learning as perfect as possible.
-            </p>
-          </li>
-          <li>
-            <p>
-              <strong>Use good judgement when publishing explorations.</strong>
-              Explorations should have significant educational value and
-              cannot contain advertising, spam, vandalism and/or abuse.
-            </p>
-          </li>
-          <li>
-            <p>
-              <strong>Be a good citizen.</strong>
-              Creating multiple accounts, using explorations to trick users,
-              circumventing features meant to encourage improvement of explorations or
-              other such antisocial behavior will not be tolerated and may result in account suspension.
-            </p>
-          </li>
-        </ol>
-        <p>
-          If you're unsure about an exploration topic or
-          need clarification on guidelines, you can ask us on our <a href="{{SITE_FORUM_URL}}" class="inline-links">forum</a>.
-        </p>
+  <div class="about-tab-2 about-tab-content">
+    <div class="about-card-content-wide about-card-content-narrow">
+      <h2>The Oppia Foundation</h2>
+      <p>
+        The Oppia website and source code are supported by the Oppia Foundation,
+        a non-profit public benefit corporation of the State of California.
+      </p>
+      <p>
+        The directos of the Foundation are Amit Deutsch, Jacob Davis, and Sean Lip.
+        The Foundation's
+        <a href="https://drive.google.com/folderview?id=0B9KSjiibL_WDfjlpUUpqampZSTBOTmRqM2IyaGN3R3NlVWstZlhKcjlZQ3VMTHJBQWNGTFU&usp=sharing"
+        class="inline-links">bylaws and minutes</a>
+        are available to read. If you wish to contact the Foundation, please email:
+        <a href="mailto:{{CONTACT_EMAIL_ADDRESS}}" class="inline-links">admin@oppia.org</a>
+      </p>
+      <h3>License</h3>
+      <p>
+        All content in Oppia's explorations is licensed under
+        <a href="https://creativecommons.org/licenses/by-sa/4.0/legalcode" class="inline-links">CC-BY-SA 4.0</a>
+        with a waiver of the attribution requirement (specifically, Sections 3(a)(1) and
+        3(a)(2)). If you reuse content from this site, we encourage you to include a link
+        to the relevant exploration page, but do not require it.
+      </p>
+      <p>
+        The software powering Oppia is open source, and its
+        <a href="https://github.com/oppia/oppia/" class="inline-links">code</a> is released under an
+        <a href="https://www.apache.org/licenses/" class="inline-links">Apache 2.0</a> license.
+      </p>
+    </div><!-- /FOUNDATION about-card-content-wide about-card-content-narrow -->
+  </div><!-- /tab -->
 
-        <h2>Publication Criteria</h2>
-        <p>
-          These publication criteria ensure explorations can be meaningfully tested,
-          continually developed, and refined in a way that makes them fit to be featured.
-          They're meant to be objective and precise so you can easily determine whether an exploration is fit for publication.
-        </p>
-        <p>An exploration should:</p>
-        <p>
-          <strong>Teach something meaningful</strong>
-          - Present information that's new to the target audience.
-          Don't just test knowledge the target audience is already assumed to have.
-        </p>
-        <p>
-          <strong>Teach more than a single factoid</strong>
-          - Explorations should be either "deep" or "broad".
-          "Deep" means an involved, tricky concept that has nuances and depth.
-          "Broad" means a collection of related, interesting facts the learner can understand and
-          better remember after completing the exploration.
-        </p>
-        <p>
-          <strong>Give informative feedback</strong>
-          - Don't just tell learners if they're correct or incorrect — explain reasoning.
-          Tell learners why something is right or wrong, and how to correct it if necessary.
-          Make your exploration more than just a quiz!
-        </p>
-        <p>
-          <strong>Avoid duplicating existing explorations</strong>
-          - The beauty of Oppia is that everyone works together to make explorations maximally effective.
-          If you'd like to teach an existing topic, first try submitting feedback for the current exploration or improving it.
-          Only if you use a significantly different teaching style should you create a completely new exploration.
-        </p>
-
-        <h2>"Featured criteria"</h2>
-        <p>
-          Featured explorations are educational, are interesting to learners, and
-          use our interactive, discovery-based learning style.
-          For help on crafting useful feedback and creating explorations that fit these "Featured" criteria,
-          check out our <a href="http://oppia.github.io/#/DesignTips" class="inline-links">Design Tips</a> page!
-        </p>
-        <p>A featured exploration is:</p>
-        <p>
-          <strong>More than memorization</strong>
-          - The exploration does more than simply provide facts to memorize.
-          It helps the user genuinely understand interesting concepts.
-        </p>
-        <p>
-          <strong>Learning, not assessment</strong>
-          - The exploration doesn't just quiz the learner.
-          It presents and builds upon new concepts.
-        </p>
-        <p>
-          <strong>Interactive</strong>
-          - Users learn by doing. They have a chance to reason about concepts, try out new knowledge, and
-          receive useful feedback on responses.
-        </p>
-        <p>
-          <strong>Formative feedback</strong>
-          - The exploration's feedback gives learners new, useful insights.
-          It finds a good middle ground between telling the learner they're wrong (or right), and
-          giving the entire answer away. Also, the feedback should cover a wide range of potential replies.
-        </p>
-        <p>
-          <strong>Complete and polished</strong>
-            - Not only is the exploration free of typos, factual errors and bugs, it's well-written and easy to read.
-            Additionally, it delivers all the content promised in the learning objective and in the exploration itself.
-        </p>
-
-        <h2>Publication policy</h2>
-        <p>
-          The following policies help Oppia moderators enforce the criteria for publishing and featuring explorations.
-        </p>
-
-        <h4>Publishing an Exploration</h4>
-        <p>
-          Any owner of a private exploration can publish it at any time.
-          However, if the exploration does not fit the publication criteria, the site moderators may unpublish or delete it.
-          (The norm is to unpublish; deletion is only likely in egregious cases, such as outright spam.)
-        </p>
-
-        <h4>Editing rights</h4>
-        <p>
-          Explorations are meant to be polished and developed until they're "featured exploration" material.
-          An exploration that hasn't been edited for a long time may be considered "orphaned".
-          In this case, ownership may be handed to the community at large (at moderator discretion),
-          so that Oppia community members can continue to improve it.
-        </p>
-        <p>
-          Note that when you embed a particular version of your exploration in your site,
-          it won't change unless the original exploration is unpublished or deleted.
-          This means that even if you or other community members make changes to the exploration,
-          the version embedded on your website will remain the same.
-        </p>
-
-        <h4>Releasing an exploration</h4>
-        <p>
-          We hope to make the exploration-release process community-driven soon,
-          but here's how it works now: When an owner of an exploration
-          — or anyone involved in the process — thinks the exploration is ready to be featured,
-          they can post to the
-          <a href="{{MODERATOR_REQUEST_FORUM_URL}}" class="inline-links">Moderator Requests forum</a>.
-          A moderator will play through the exploration, look at its structure, and
-          decide whether it fits the
-          <a href="#publication-criteria" class="inline-links">"Featured" criteria</a>.
-          If it does, the exploration will be marked as featured.
-          If it doesn't, the moderator will work with the creator(s) to improve the exploration.
-        </p>
-      </div><!-- about-card-content-wide about-card-content-narrow -->  
-    </div><!-- /tab 2 -->
-  </div><!-- /tab-container -->
-  </div><!-- /about-card about-content -->
-  
-<!-- EXTRA CONTENT -->
-  <div class="about-extra-container about-tab-container">
-    <div class="about-tab-1 about-tab-content about-visible-content">
-      <div class="about-extra-info new-explorations">
-        <div class="about-extra-content">
-          <div class="about-card-content-wide">
-            <h3>Latest Explorations</h3>
-            <!-- INSERT LATEST EXPLORATION -->
-            <a href="/gallery" class="btn about-page-buttons about-centered-button">Browse all explorations</a>
+  <div class="about-tab-3 about-tab-content">
+    <div class="about-card-content-wide">
+      <h2>Oppia Contributors</h2>
+      <p>
+        The Oppia development team is also grateful for the feedback, ideas,
+        help and suggestions by Alex Kauffmann, Allison Barros, Amy Latten,
+        Brett Barros, Crystal Kwok, Divya Siddarth, John Cox, John Orr,
+        Katie Berlent, Mark Halpin, Michael Wawszczak, Mike Gainer,
+        Neil Fraser, Noah Falstein, Nupur Jain, Peter Norvig, Philip Guo,
+        Piotr Mitros, Rachel Chen, Rahim Nathwani, Robyn Choo, Tricia Ngoon,
+        Vikrant Nanda and Vinamrata Singal.
+      </p>
+      <div class="create-three-cols-container">
+        <div class="create-three-cols-layout">
+          <div class="letter-groups">
+            <span>A</span>
+              <ul>
+                <li>Abraham Mgowano</li>
+              <li>Alex Gower</li>
+              <li>Allan Zhou</li>
+              <li>Amit Deutsch</li>
+              <li>Andrew Low</li>
+              <li>Andrey Mironyuk</li>
+              <li>Angela Park</li>
+              <li>Arun Kumar</li>
+              </ul>
           </div>
-        </div><!-- /about-content -->
-      </div><!-- /about-extra-info -->
 
-      <div class="about-extra-info start-creating">
-        <div class="about-extra-content">
-          <div class="about-card-content-wide">
-              <h3>Start creating!</h3>
-              <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-              </p>
-              <a href="#" class="btn about-page-buttons about-centered-button">Start an exploration!</a>
-          </div><!-- /content-wide -->
-        </div><!-- about-extra-content -->
-      </div><!-- /about-extra-info start-creating -->
-    </div><!-- /tab-1 -->
-  </div><!-- /about-extra-container -->
+          <div class="letter-groups">
+            <span>B</span>
+              <ul>
+                <li>Barnabas Makonda</li>
+                <li>Ben Henning</li>
+                <li>Ben Targan</li>
+                <li>Brenton Briggs</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>C</span>
+              <ul>
+                <li>Charisse De Torres</li>
+                <li>Chase Albert</li>
+                <li>Chin Zhan Xiong</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>D</span>
+              <ul>
+                <li>Debanshu Bhaumik</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>E</span>
+              <ul>
+                <li>Edward Allison</li>
+                <li>Elizabeth Kemp</li>
+                <li>Estelle Lee</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>F</span>
+              <ul>
+                <li>Frederik Creemers</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>G</span>
+              <ul>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>H</span>
+              <ul>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>I</span>
+              <ul>
+              </ul>
+          </div>
+        </div><!-- /LEFT three-cols-layout -->
+
+        <div class="create-three-cols-layout">
+          <div class="letter-groups">
+            <span>J</span>
+              <ul>
+                <li>Jacob Davis</li>
+                <li>Jakub Osika</li>
+                <li>Jasper Deng</li>
+                <li>Jaysinh Shukla</li>
+                <li>Jeremy Emerson</li>
+                <li>Jérôme (zolk232)</li>
+                <li>Jerry Chen</li>
+                <li>Joshua Lusk</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>K</span>
+              <ul>
+                <li>Karen Rustad</li>
+                <li>Kerry Wang</li>
+                <li>Kevin Lee</li>
+                <li>Koji Ashida</li>
+                <li>Kristin Anthony</li>
+                <li>Kumari Shalini</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>L</span>
+              <ul>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>M</span>
+              <ul>
+                <li>Madiyar Aitbayev</li>
+                <li>Manas Tungare</li>
+                <li>Marcel Schmittfull</li>
+                <li>Michael Anuzis</li>
+                <li>Michael Mossey</li>
+                <li>Michael Wagner</li>
+                <li>Milagro Teruel</li>
+                <li>Mungo Dewar</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>N</span>
+              <ul>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>O</span>
+              <ul>
+                <li>Oskar Cieslik</li>
+                <li>Owen Parry</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>P</span>
+              <ul>
+                <li>Phil Wagner</li>
+                <li>Philip Hayes</li>
+                <li>Prasanna Patil</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>Q</span>
+              <ul>
+              </ul>
+          </div>
+        </div><!-- /mid three-cols-layout -->
+
+        <div class="create-three-cols-layout">
+          <div class="letter-groups">
+            <span>R</span>
+              <ul>
+                <li>Raine Hoover</li>
+                <li>Reinaldo Aguiar</li>
+                <li>Reto Brunner</li>
+                <li>Richard Cho</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>S</span>
+              <ul>
+                <li>Samara Trilling</li>
+                <li>Santos Hernandez</li>
+                <li>Scott Junner</li>
+                <li>Sean Lip</li>
+                <li>Shafqat Dulal</li>
+                <li>Shantanu Bhowmik</li>
+                <li>Shouvik Roy</li>
+                <li>Stephanie Federwisch</li>
+                <li>Stephen Chiang</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>T</span>
+              <ul>
+                <li>Tarashish Mishra</li>
+                <li>Travis Shafer</li>
+                <li>Tuguldur Baigalmaa</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>U</span>
+              <ul>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>V</span>
+              <ul>
+                <li>Viraj Prabhu</li>
+                <li>Vishal Joisar</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>W</span>
+              <ul>
+                <li>Wilson Hong</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>X</span>
+              <ul>
+                <li>Xinyu Wu</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>Y</span>
+              <ul>
+                <li>Yana Malysheva</li>
+                <li>Yuan Gu</li>
+              </ul>
+          </div>
+
+          <div class="letter-groups">
+            <span>Z</span>
+              <ul>
+                <li>Zoe Madden-Wood</li>
+              </ul>
+          </div>
+        </div><!-- /RIGHT three-cols-layout -->
+      </div><!-- /three-cols-container -->
+    </div><!-- /CONTRIBUTORS about-card-content-wide -->
+  </div><!-- /tab -->
+  </div><!-- /tab-container -->
+</div><!-- /about-content -->
+
+<div class="about-extra-container about-tab-container">
+  <div class="about-tab-1 about-tab-content about-visible-content">
+    <div class="about-extra-content clearfix">
+      <div class="about-otter-container">
+        <img src="images/general/about-page-otter.png" class="about-page-otter" alt="Otter">
+      </div>
+      <div class="otter-speech-card">
+        <blockquote class="otter-speech-bubble">
+          <h3 >What do you want to do today?</h3>
+        </blockquote><!-- /about-card-content-wide -->
+      </div><!-- /otter-speech-card -->
+    </div><!-- /about-content -->
+
+    <div class="about-extra-info about-otter-buttons">
+      <div class="about-content about-extra-content">
+        <div class="about-card-content-wide about-card-content-narrow otter-button-container">
+          <a href="/gallery" class="btn about-page-buttons">I want to learn</a>
+          <a href="/teach" class="btn about-page-buttons">I want to teach</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="about-tab-2 about-tab-content">
+    <div class="about-extra-info about-get-involved">
+      <div class="about-content about-extra-content">
+        <div class="about-card-content-wide about-card-content-narrow">
+          <h3>Get involved!</h3>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            Aenean vel tristique turpis, in facilisis diam. Donec ornare rutrum finibus.
+            Sed pulvinar justo et mollis aliquam. Curabitur et sapien porttitor,
+            scelerisque ante et, tempus velit. Ut metus urna, bibendum porta molestie in, cursus in augue.
+          </p>
+          <p>
+            For site questions:<br>
+            Post to our <a href="{{SITE_FORUM_URL}}" class="inline-links">forum</a>
+          </p>
+          <p>
+            For bugs and feature requests:<br>
+            Create an issue on our Oppia <a href="https://github.com/oppia/oppia/issues/new?title=Describe%20your%20feature%20request%20or%20bug%20report%20succinctly&body=If%20you%27d%20like%20to%20propose%20a%20feature,%20describe%20what%20you%27d%20like%20to%20see.%20Mock%20ups%20would%20be%20great!%0A%0AIf%20you%27re%20reporting%20a%20bug,%20please%20be%20sure%20to%20include%20the%20expected%20behaviour,%20the%20observed%20behaviour,%20and%20steps%20to%20reproduce%20the%20problem.%20Console%20copy-pastes%20and%20any%20background%20on%20the%20environment%20would%20also%20be%20helpful.%0A%0AThanks!" class="inline-links">bug tracker</a><br>
+            or get in touch via the <a href="https://groups.google.com/forum/#!forum/oppia-dev" class="inline-links">developer's forum</a>
+          </p>
+          <p>
+            For security issues:<br>
+            Write to <a href="{{CONTACT_EMAIL_ADDRESS}}" class="inline-links">admin@oppia.org</a>
+          </p>
+        </div><!-- /about-card-content-wide -->
+      </div><!-- /about-content -->
+    </div><!-- /about-get-involved -->
+  </div><!-- /tab -->
+</div><!-- /about-extra-container -->
+
 
   <!-- JS -->
    <script src="scripts/jquery-2.1.1.js"></script>
@@ -267,6 +414,8 @@
         $("." + currentAttrVal).addClass("about-visible-content").siblings().removeClass("about-visible-content");
       });
     });
+
+
   </script>
 {% endblock %}
 
