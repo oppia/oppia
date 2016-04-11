@@ -49,7 +49,7 @@ class BaseRichTextComponent(object):
     # Whether the component requires the filesystem in some way that
     # prevents it from being used by unauthorized users.
     requires_fs = False
-    # Whether the component should be displayed as a block element
+    # Whether the component should be displayed as a block element.
     is_block_element = False
     # Customization arg specifications for the component, including their
     # descriptions, schemas and default values. Overridden in subclasses.

@@ -603,22 +603,21 @@ oppia.factory('rteHelperService', [
       // Returns a DOM node.
       createRteElement: function(componentDefn, customizationArgsDict) {
         var el = $('<img/>');
-        if (componentDefn.previewUrlTemplate) {
-          var interpolatedUrl = $interpolate(
-            componentDefn.previewUrlTemplate, false, null, true)(
-              angular.extend(customizationArgsDict,
-                {
-                  explorationId: explorationContextService.getExplorationId()
-                }
-              ));
-          if (typeof interpolatedUrl == 'undefined') {
-            $log.error(
-              'Error interpolating url : ' + componentDefn.previewUrlTemplate);
-          } else {
-            el.attr('src', interpolatedUrl);
-          }
+        if (explorationContextService.isInExplorationContext()) {
+          customizationArgsDict = angular.extend(customizationArgsDict,
+            {
+              explorationId: explorationContextService.getExplorationId()
+            }
+          );
+        }
+        var interpolatedUrl = $interpolate(
+          componentDefn.previewUrlTemplate, false, null, true)(
+            customizationArgsDict);
+        if (!interpolatedUrl) {
+          $log.error(
+            'Error interpolating url : ' + componentDefn.previewUrlTemplate);
         } else {
-          el.attr('src', componentDefn.iconDataUrl);
+          el.attr('src', interpolatedUrl);
         }
         el.addClass('oppia-noninteractive-' + componentDefn.name);
         if (componentDefn.isBlockElement) {
@@ -673,7 +672,7 @@ oppia.factory('rteHelperService', [
           elt.find(
             'img.oppia-noninteractive-' + componentDefn.name
           ).replaceWith(function() {
-            var jQueryElt = $('<' + this.className + '/>');
+            var jQueryElt = $('<' + this.className.split(' ')[0] + '/>');
             for (var i = 0; i < this.attributes.length; i++) {
               var attr = this.attributes[i];
               if (attr.name !== 'class' && attr.name !== 'src') {
