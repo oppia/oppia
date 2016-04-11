@@ -148,6 +148,27 @@ describe('Code REPL rules service', function() {
     });
   });
 
+  describe('\'output contains\' rule', function() {
+      var RULE_INPUT = {
+        x: '1'
+      };
+
+      it('should check if output contains some content', function() {
+      expect(crrs.OutputContains({
+        output: '1 2 3 4'
+      }, RULE_INPUT)).toBe(true);
+      expect(crrs.OutputContains({
+        output: '\n1\n2\n3\n4\n'
+      }, RULE_INPUT)).toBe(true);
+      expect(crrs.OutputContains({
+        output: ''
+      }, RULE_INPUT)).toBe(false);
+      expect(crrs.OutputContains({
+        output: 'bad output'
+      }, RULE_INPUT)).toBe(false);
+    });
+    });
+
   describe('\'output equals\' rule', function() {
     var RULE_INPUT = {
       x: '1'
