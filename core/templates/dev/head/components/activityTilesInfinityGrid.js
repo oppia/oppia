@@ -28,9 +28,9 @@ oppia.directive('activityTilesInfinityGrid', [function() {
             $scope.pageLoaderIsBusy = true;
             searchService.loadMoreData(function(data,
               hasPageFinishedLoading) {
-              $scope.allExplorationsInOrder =
-              $scope.allExplorationsInOrder.concat(
-                data.explorations_list);
+              $scope.allActivitiesInOrder =
+              $scope.allActivitiesInOrder.concat(
+                data.activities_list);
               $scope.finishedLoadingPage = hasPageFinishedLoading;
               $scope.pageLoaderIsBusy = false;
             });

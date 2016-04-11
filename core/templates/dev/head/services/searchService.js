@@ -67,7 +67,7 @@ oppia.factory('searchService', [
   var _isCurrentlyFetchingResults = false;
 
   return {
-    // Note that an empty query results in all explorations being shown.
+    // Note that an empty query results in all activities being shown.
     executeSearchQuery: function(
         searchQuery, selectedCategories, selectedLanguageCodes,
         successCallback) {

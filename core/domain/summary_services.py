@@ -58,6 +58,7 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids):
                 rights_manager.ACTIVITY_STATUS_PRIVATE):
             displayable_exp_summaries.append({
                 'id': exploration_summary.id,
+                'activity_type': rights_manager.ACTIVITY_TYPE_EXPLORATION,
                 'title': exploration_summary.title,
                 'category': exploration_summary.category,
                 'objective': exploration_summary.objective,

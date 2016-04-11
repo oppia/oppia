@@ -46,10 +46,12 @@ oppia.directive('collectionSummaryTile', [function() {
         };
 
         $scope.getCollectionLink = function() {
-          return UrlInterpolationService.interpolateUrl(COLLECTION_VIEWER_URL,
+          return UrlInterpolationService.interpolateUrl(
+            COLLECTION_VIEWER_URL,
             {
               collection_id: $scope.getCollectionId()
-            });
+            }
+          );
         };
       }
     ]

@@ -94,14 +94,12 @@ oppia.controller('Gallery', [
       }
     });
 
-    $scope.allExplorationsInOrder = [];
-    $scope.allCollectionsInOrder = [];
+    $scope.allActivitiesInOrder = [];
 
     // Called when the page loads, and after every search query.
     var _refreshGalleryData = function(data, hasPageFinishedLoading) {
       $scope.searchIsLoading = false;
-      $scope.allExplorationsInOrder = data.explorations_list;
-      $scope.allCollectionsInOrder = data.collections_list;
+      $scope.allActivitiesInOrder = data.activity_list;
       $scope.finishedLoadingPage = hasPageFinishedLoading;
       $rootScope.loadingMessage = '';
     };
@@ -118,7 +116,6 @@ oppia.controller('Gallery', [
     // Retrieves gallery data from the server.
     $http.get(GALLERY_DATA_URL).success(function(data) {
       $scope.currentUserIsModerator = Boolean(data.is_moderator);
-
       // Note that this will cause an initial search query to be sent.
       $rootScope.$broadcast(
         'preferredLanguageCodesLoaded', data.preferred_language_codes);

@@ -106,21 +106,25 @@ class GalleryHandler(base.BaseHandler):
 
         query_string = self.request.get('q')
         search_cursor = self.request.get('cursor', None)
+        activity_list = []
+
+        # TODO(mgowano): Remove '' in query to allow for collection searches
+        collection_ids, search_cursor = (
+            collection_services.get_collection_ids_matching_query(
+                '', cursor=search_cursor))
+        activity_list = (
+            collection_services.get_displayable_collection_summary_dicts_matching_ids(
+                collection_ids))
+
         exp_ids, search_cursor = (
             exp_services.get_exploration_ids_matching_query(
                 query_string, cursor=search_cursor))
-
-        explorations_list = (
-            summary_services.get_displayable_exp_summary_dicts_matching_ids(
+        activity_list += (summary_services.get_displayable_exp_summary_dicts_matching_ids(
                 exp_ids))
-        # TODO(mgowano): Remove '' in query to allow for collection searches
-        collections_list = (
-            collection_services.get_displayable_collections_matching_query(
-                '', cursor=search_cursor))
 
-        if len(explorations_list) == feconf.DEFAULT_QUERY_LIMIT:
+        if len(activity_list) == feconf.DEFAULT_QUERY_LIMIT:
             logging.error(
-                '%s explorations were fetched to load the gallery page. '
+                '%s activities were fetched to load the gallery page. '
                 'You may be running up against the default query limits.'
                 % feconf.DEFAULT_QUERY_LIMIT)
 
@@ -130,8 +134,7 @@ class GalleryHandler(base.BaseHandler):
             preferred_language_codes = user_settings.preferred_language_codes
 
         self.values.update({
-            'explorations_list': explorations_list,
-            'collections_list': collections_list,
+            'activity_list': activity_list,
             'preferred_language_codes': preferred_language_codes,
             'search_cursor': search_cursor,
         })

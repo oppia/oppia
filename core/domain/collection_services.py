@@ -444,34 +444,33 @@ def get_collection_summaries_matching_ids(collection_ids):
 # TODO(bhenning): Update this function to support also matching the query to
 # explorations contained within this collection. Introduce tests to verify this
 # behavior.
-def get_collection_summaries_matching_query(query_string, cursor=None):
-    """Returns a list with all collection summary domain objects matching the
-    given search query string, as well as a search cursor for future fetches.
+def get_collection_ids_matching_query(query_string, cursor=None):
+    """Returns a list with all collection ids matching the given search query
+    string, as well as a search cursor for future fetches.
 
     This method returns exactly feconf.GALLERY_PAGE_SIZE results if there are
     at least that many, otherwise it returns all remaining results. (If this
     behaviour does not occur, an error will be logged.) The method also returns
     a search cursor.
     """
-    summary_models = []
+    returned_collection_ids = []
     search_cursor = cursor
 
     for _ in range(MAX_ITERATIONS):
-        remaining_to_fetch = feconf.GALLERY_PAGE_SIZE - len(summary_models)
-
+        remaining_to_fetch = feconf.GALLERY_PAGE_SIZE - len(
+            returned_collection_ids)
         collection_ids, search_cursor = search_collections(
             query_string, remaining_to_fetch, cursor=search_cursor)
-
         invalid_collection_ids = []
         for ind, model in enumerate(
                 collection_models.CollectionSummaryModel.get_multi(
                     collection_ids)):
             if model is not None:
-                summary_models.append(model)
+                returned_collection_ids.append(collection_ids[ind])
             else:
                 invalid_collection_ids.append(collection_ids[ind])
 
-        if len(summary_models) == feconf.GALLERY_PAGE_SIZE or (
+        if len(returned_collection_ids) == feconf.GALLERY_PAGE_SIZE or (
                 search_cursor is None):
             break
         else:
@@ -479,46 +478,39 @@ def get_collection_summaries_matching_query(query_string, cursor=None):
                 'Search index contains stale collection ids: %s' %
                 ', '.join(invalid_collection_ids))
 
-    if (len(summary_models) < feconf.GALLERY_PAGE_SIZE
+    if (len(returned_collection_ids) < feconf.GALLERY_PAGE_SIZE
             and search_cursor is not None):
         logging.error(
             'Could not fulfill search request for query string %s; at least '
             '%s retries were needed.' % (query_string, MAX_ITERATIONS))
 
-    return ([
-        get_collection_summary_from_model(summary_model)
-        for summary_model in summary_models
-    ], search_cursor)
+    return (returned_collection_ids, search_cursor)
 
 
-def get_displayable_collections_matching_query(query_string,
-                                               cursor=None):
-    """Returns a list with all collection summary objects that can be
-    displayed on the gallery page as collection summary tiles.
-    """
-    search_cursor = cursor
-    collection_summaries, search_cursor = (
-        get_collection_summaries_matching_query(
-            query_string, cursor=search_cursor))
-
-    collection_summaries_to_display = []
-    for collection_summary in collection_summaries:
-        if collection_summary and collection_summary.status != (
-                rights_manager.ACTIVITY_STATUS_PRIVATE):
-            collection_summaries_to_display.append({
-                'id': collection_summary.id,
-                'title': collection_summary.title,
-                'objective': collection_summary.objective,
-                'num_explorations': len(get_collection_by_id(
-                    collection_summary.id).nodes),
-                'last_updated_msec': utils.get_time_in_millisecs(
-                    collection_summary.collection_model_last_updated),
-                'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
-                    collection_summary.category),
-                'thumbnail_bg_color': utils.get_hex_color_for_category(
-                    collection_summary.category),
-            })
-    return collection_summaries_to_display
+def get_displayable_collection_summary_dicts_matching_ids(collection_ids):
+   """Returns a list with all collection summary objects that can be
+   displayed on the gallery page as collection summary tiles.
+   """
+   collection_summaries_to_display = []
+   collection_summaries = get_collection_summaries_matching_ids(collection_ids)
+   for collection_summary in collection_summaries:
+       if collection_summary and collection_summary.status != (
+               rights_manager.ACTIVITY_STATUS_PRIVATE):
+           collection_summaries_to_display.append({
+               'id': collection_summary.id,
+               'title': collection_summary.title,
+               'activity_type': rights_manager.ACTIVITY_TYPE_COLLECTION,
+               'objective': collection_summary.objective,
+               'num_explorations': len(get_collection_by_id(
+                   collection_summary.id).nodes),
+               'last_updated_msec': utils.get_time_in_millisecs(
+                   collection_summary.collection_model_last_updated),
+               'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
+                   collection_summary.category),
+               'thumbnail_bg_color': utils.get_hex_color_for_category(
+                   collection_summary.category),
+           })
+   return collection_summaries_to_display
 
 
 # Repository SAVE and DELETE methods.
