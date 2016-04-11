@@ -1540,8 +1540,8 @@ def accept_suggestion(editor_id, thread_id, exploration_id, commit_message):
     else:
         suggestion = feedback_services.get_suggestion(
             exploration_id, thread_id)
-        suggestion_author_username = suggestion['author_name']
-        change_list = _create_change_list_from_suggestion(suggestion)
+        suggestion_author_username = suggestion.to_dict()['author_name']
+        change_list = _create_change_list_from_suggestion(suggestion.to_dict())
         update_exploration(
             editor_id, exploration_id, change_list,
             _get_commit_message_for_suggestion(

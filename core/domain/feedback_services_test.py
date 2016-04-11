@@ -163,13 +163,16 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
         thread = feedback_models.FeedbackThreadModel.get(
             feedback_models.FeedbackThreadModel.generate_full_thread_id(
                 self.EXP_ID3, self.THREAD_ID1))
+        expected_suggestion = {
+            'exploration_id': self.EXP_ID3,
+            'author_name': 'user123',
+            'exploration_version': 3,
+            'state_name': 'state_name',
+            'description': 'description',
+            'state_content': {'old_content': {}}
+        }
         self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_OPEN)
-        self.assertEqual(suggestion['exploration_id'], self.EXP_ID3)
-        self.assertEqual(suggestion['author_name'], 'user123')
-        self.assertEqual(suggestion['exploration_version'], 3)
-        self.assertEqual(suggestion['state_name'], 'state_name')
-        self.assertEqual(suggestion['description'], 'description')
-        self.assertEqual(suggestion['state_content'], {'old_content': {}})
+        self.assertDictEqual(expected_suggestion, suggestion.to_dict())
 
     def test_get_open_threads_with_suggestions(self):
         with self.swap(feedback_models.FeedbackThreadModel, 'get_threads',

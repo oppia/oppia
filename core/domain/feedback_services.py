@@ -19,7 +19,6 @@
 from core.domain import feedback_domain
 from core.domain import feedback_jobs_continuous
 from core.domain import subscription_services
-from core.domain import user_services
 from core.platform import models
 import feconf
 
@@ -181,22 +180,18 @@ def create_suggestion(exploration_id, author_id, exploration_version,
     subscription_services.subscribe_to_thread(author_id, full_thread_id)
 
 
-def _get_suggestion_dict_from_model_instance(suggestion):
-    if suggestion is None:
-        return suggestion
-    return {
-        'author_name': user_services.get_username(suggestion.author_id),
-        'exploration_id': suggestion.exploration_id,
-        'exploration_version': suggestion.exploration_version,
-        'state_name': suggestion.state_name,
-        'description': suggestion.description,
-        'state_content': suggestion.state_content}
+def _get_suggestion_from_model(suggestion_model):
+    return feedback_domain.Suggestion(
+        suggestion_model.id, suggestion_model.author_id,
+        suggestion_model.exploration_id, suggestion_model.exploration_version,
+        suggestion_model.state_name, suggestion_model.description,
+        suggestion_model.state_content)
 
 
 def get_suggestion(exploration_id, thread_id):
-    return _get_suggestion_dict_from_model_instance(
-        feedback_models.SuggestionModel.get_by_exploration_and_thread_id(
-            exploration_id, thread_id))
+    model = feedback_models.SuggestionModel.get_by_exploration_and_thread_id(
+        exploration_id, thread_id)
+    return _get_suggestion_from_model(model) if model else None
 
 
 def _get_thread_from_model(thread_model):

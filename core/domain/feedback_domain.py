@@ -90,3 +90,26 @@ class FeedbackMessage(object):
             'updated_subject': self.updated_subject,
         }
 
+
+class Suggestion(object):
+    """Domain object for a suggestion."""
+    def __init__(self, full_thread_id, author_id, exploration_id,
+                 exploration_version, state_name, description, state_content):
+        self.id = full_thread_id
+        self.author_id = author_id
+        self.exploration_id = exploration_id
+        self.exploration_version = exploration_version
+        self.state_name = state_name
+        self.description = description
+        self.state_content = state_content
+
+    def to_dict(self):
+        return {
+            'author_name': user_services.get_username(self.author_id),
+            'exploration_id': self.exploration_id,
+            'exploration_version': self.exploration_version,
+            'state_name': self.state_name,
+            'description': self.description,
+            'state_content': self.state_content
+        }
+

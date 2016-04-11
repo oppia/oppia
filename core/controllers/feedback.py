@@ -61,9 +61,10 @@ class ThreadHandler(base.BaseHandler):
         self.values.update({
             'messages': [m.to_dict() for m in feedback_services.get_messages(
                 exploration_id, thread_id)]})
+        suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
         self.values.update({
-            'suggestion': feedback_services.get_suggestion(
-                exploration_id, thread_id)})
+            'suggestion': suggestion.to_dict() if suggestion else None
+        })
         self.render_json(self.values)
 
     @base.require_user
