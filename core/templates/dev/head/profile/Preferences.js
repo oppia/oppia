@@ -73,8 +73,13 @@ oppia.controller('Preferences', [
     }
   };
 
-  $scope.saveCanReceiveEmailUpdates = function(canReceiveEmailUpdates) {
-    _saveDataItem('can_receive_email_updates', canReceiveEmailUpdates);
+  $scope.saveEmailPreferences = function(
+    canReceiveEmailUpdates, canReceiveEditorRoleEmail) {
+    var data = {
+      can_receive_email_updates: canReceiveEmailUpdates,
+      can_receive_editor_role_email: canReceiveEditorRoleEmail
+    };
+    _saveDataItem('update_email_preferences', data);
   };
 
   $scope.savePreferredLanguageCodes = function(preferredLanguageCodes) {
@@ -159,6 +164,7 @@ oppia.controller('Preferences', [
     $scope.preferredLanguageCodes = data.preferred_language_codes;
     $scope.profilePictureDataUrl = data.profile_picture_data_url;
     $scope.canReceiveEmailUpdates = data.can_receive_email_updates;
+    $scope.canReceiveEditorRoleEmail = data.can_receive_editor_role_email;
     $scope.hasPageLoaded = true;
   });
 }]);
