@@ -3013,7 +3013,6 @@ md-card.preview-conversation-skin-supplemental-card {
 .about-content {
   width: 60%;
   padding: 0;
-  /* margin: 0 auto 3% auto; */
 }
 
 .about-extra-container {
@@ -3162,6 +3161,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .about-tab-links {
   text-align: center;
+  padding: 0;
   display: flex;
   flex-wrap: wrap;
 }
@@ -3188,10 +3188,6 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .nav-creators ul li{
   width: calc(100% / 2);
-}
-
-.about-tab-links {
-  padding: 0;
 }
 
 .about-page-buttons {
