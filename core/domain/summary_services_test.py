@@ -199,8 +199,9 @@ class ExplorationDisplayableSummaries(
 
 class FeaturedExplorationDisplayableSummaries(
         test_utils.GenericTestBase):
-    """Test functions for getting displayable
-     featured exploration summary dicts."""
+    """Test functions for getting displayable featured exploration
+    summary dicts.
+    """
 
     ALBERT_NAME = 'albert'
     ALBERT_EMAIL = 'albert@example.com'
@@ -213,11 +214,12 @@ class FeaturedExplorationDisplayableSummaries(
 
         The sequence of events is:
         - (1) Albert creates EXP_ID_1.
-        - (2) Albert publishes EXP_ID_1.
-        - (3) Albert creates EXP_ID_2.
+        - (2) Albert creates EXP_ID_2.
+        - (3) Albert publishes EXP_ID_1.
         - (4) Albert publishes EXP_ID_2.
         - (5) Admin user is set up.
         """
+
         super(FeaturedExplorationDisplayableSummaries, self).setUp()
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
@@ -234,12 +236,34 @@ class FeaturedExplorationDisplayableSummaries(
         self.set_admins([self.ADMIN_USERNAME])
 
     def test_for_featured_explorations(self):
-        # There are list of explorations
-        # EXP_ID_1 -- public exploration
-        # EXP_ID_2 -- publicized exploration
-        # Should only return [EXP_ID_2]
+        """Note that EXP_ID_1 is public, and EXP_ID_2 is publicized. 
+        The call to get_featured_explorations() should only return 
+        [EXP_ID_2].
+        """
 
         rights_manager.publicize_exploration(self.admin_id, self.EXP_ID_2)
 
-        featured_exploration = summary_services.get_featured_explorations()
-        self.assertEqual(featured_exploration[0]['id'], self.EXP_ID_2)
+        featured_exploration_summaries = (
+            summary_services.get_featured_exploration_summary_dicts())
+        expected_summary = {
+            'status': u'publicized',
+            'thumbnail_bg_color': '#05a69a',
+            'community_owned': False,
+            'tags': [],
+            'thumbnail_icon_url': '/images/gallery/thumbnails/Lightbulb.svg',
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'human_readable_contributors_summary': {
+                self.ALBERT_NAME: {
+                    'num_commits': 1,
+                    'profile_picture_data_url': None
+                }
+            },
+            'id': self.EXP_ID_2,
+            'category': u'A category',
+            'ratings': feconf.get_empty_ratings(),
+            'title': u'A title',
+            'num_views': 0,
+            'objective': u'An objective'
+        }
+        self.assertDictContainsSubset(expected_summary,
+                                      featured_exploration_summaries[0])

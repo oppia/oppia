@@ -107,7 +107,7 @@ class DefaultGalleryCategoriesHandler(base.BaseHandler):
 
         preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
         featured_activity_summary_dicts = (
-            summary_services.get_featured_explorations())
+            summary_services.get_featured_exploration_summary_dicts())
         if self.user_id:
             user_settings = user_services.get_user_settings(self.user_id)
             preferred_language_codes = user_settings.preferred_language_codes

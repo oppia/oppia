@@ -75,8 +75,11 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids):
 
 
 def get_displayable_exp_summary_dicts(exploration_summaries):
-    """Given a list of exploration summary domain objects, return a
-    list of the corresponding human-readable exploration summary dicts."""
+    """Given a list of exploration summary domain objects, returns
+     a list of the human-readable exploration summary dicts that 
+     correspond to explorations that are currently non-private 
+     and not deleted.
+    """
     displayable_exp_summaries = []
     exploration_ids = []
 
@@ -152,13 +155,11 @@ def get_gallery_category_groupings(language_codes):
     return results
 
 
-def get_featured_explorations():
+def get_featured_exploration_summary_dicts():
     """Returns a list of featured explorations."""
-    featured_exp_summary_dict = (
+    featured_exp_summaries = (
         exp_services.get_featured_exploration_summaries())
+    featured_exp_summary_dicts = get_displayable_exp_summary_dicts(
+            featured_exp_summaries.values())
 
-    if featured_exp_summary_dict:
-        featured_exp_summary_dict = get_displayable_exp_summary_dicts(
-            featured_exp_summary_dict.values())
-
-    return featured_exp_summary_dict
+    return featured_exp_summary_dicts
