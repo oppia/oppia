@@ -236,8 +236,8 @@ class FeaturedExplorationDisplayableSummaries(
         self.set_admins([self.ADMIN_USERNAME])
 
     def test_for_featured_explorations(self):
-        """Note that EXP_ID_1 is public, and EXP_ID_2 is publicized. 
-        The call to get_featured_explorations() should only return 
+        """Note that EXP_ID_1 is public, and EXP_ID_2 is publicized.
+        The call to get_featured_explorations() should only return
         [EXP_ID_2].
         """
 
