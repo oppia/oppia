@@ -58,11 +58,10 @@ class ThreadHandler(base.BaseHandler):
     PAGE_NAME_FOR_CSRF = 'editor'
 
     def get(self, exploration_id, thread_id):  # pylint: disable=unused-argument
-        self.values.update({
-            'messages': [m.to_dict() for m in feedback_services.get_messages(
-                exploration_id, thread_id)]})
         suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
         self.values.update({
+            'messages': [m.to_dict() for m in feedback_services.get_messages(
+                exploration_id, thread_id)],
             'suggestion': suggestion.to_dict() if suggestion else None
         })
         self.render_json(self.values)

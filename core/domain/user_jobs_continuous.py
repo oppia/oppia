@@ -218,11 +218,12 @@ class RecentUpdatesMRJobManager(
             yield (reducer_key, recent_activity_commit_dict)
 
         for feedback_thread_id in feedback_thread_ids_list:
-            feedback_thread_cl = feedback_domain.FeedbackThread
-            exp_id = feedback_thread_cl.get_exp_id_from_full_thread_id(
-                feedback_thread_id)
-            thread_id = feedback_thread_cl.get_thread_id_from_full_thread_id(
-                feedback_thread_id)
+            exp_id = (
+                feedback_domain.FeedbackThread.get_exp_id_from_full_thread_id(
+                    feedback_thread_id))
+            thread_id = (
+                feedback_domain.FeedbackThread.get_thread_id_from_full_thread_id( # pylint: disable=line-too-long
+                    feedback_thread_id))
             last_message = (
                 feedback_models.FeedbackMessageModel.get_most_recent_message(
                     exp_id, thread_id))

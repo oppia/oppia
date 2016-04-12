@@ -80,7 +80,6 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
     THREAD_ID5 = '5555'
     EXP_ID1 = 'exp_id1'
     EXP_ID2 = 'exp_id2'
-    EXP_ID3 = 'exp_id3'
     USER_EMAIL = 'abc@xyz.com'
     USERNAME = 'user123'
     CURRENT_TIME_IN_MSEC = 12345678
@@ -156,15 +155,15 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
         with self.swap(feedback_models.FeedbackThreadModel,
                        'generate_new_thread_id', self._generate_thread_id):
             feedback_services.create_suggestion(
-                self.EXP_ID3, self.user_id, 3, 'state_name',
+                self.EXP_ID2, self.user_id, 3, 'state_name',
                 'description', {'old_content': {}})
         suggestion = feedback_services.get_suggestion(
-            self.EXP_ID3, self.THREAD_ID1)
+            self.EXP_ID2, self.THREAD_ID1)
         thread = feedback_models.FeedbackThreadModel.get(
             feedback_models.FeedbackThreadModel.generate_full_thread_id(
-                self.EXP_ID3, self.THREAD_ID1))
-        expected_suggestion = {
-            'exploration_id': self.EXP_ID3,
+                self.EXP_ID2, self.THREAD_ID1))
+        expected_suggestion_dict = {
+            'exploration_id': self.EXP_ID2,
             'author_name': 'user123',
             'exploration_version': 3,
             'state_name': 'state_name',
@@ -172,7 +171,7 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
             'state_content': {'old_content': {}}
         }
         self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_OPEN)
-        self.assertDictEqual(expected_suggestion, suggestion.to_dict())
+        self.assertDictEqual(expected_suggestion_dict, suggestion.to_dict())
 
     def test_get_open_threads_with_suggestions(self):
         with self.swap(feedback_models.FeedbackThreadModel, 'get_threads',
@@ -254,7 +253,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
     def test_get_all_threads(self):
         # Create an anonymous feedback thread
-        expected_thread = {
+        expected_thread_dict = {
             'status': u'open',
             'state_name': u'a_state_name',
             'summary': None,
@@ -262,15 +261,16 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             'subject': u'a subject'
         }
         feedback_services.create_thread(
-            self.EXP_ID, expected_thread['state_name'], None,
-            expected_thread['subject'], 'not used here')
+            self.EXP_ID, expected_thread_dict['state_name'], None,
+            expected_thread_dict['subject'], 'not used here')
 
         threads = feedback_services.get_all_threads(self.EXP_ID, False)
         self.assertEqual(1, len(threads))
-        self.assertDictContainsSubset(expected_thread, threads[0].to_dict())
+        self.assertDictContainsSubset(expected_thread_dict,
+                                      threads[0].to_dict())
 
         # Viewer creates feedback thread
-        expected_thread = {
+        expected_thread_dict = {
             'status': u'open',
             'state_name': u'a_state_name_second',
             'summary': None,
@@ -278,9 +278,10 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             'subject': u'a subject second'
         }
         feedback_services.create_thread(
-            self.EXP_ID, expected_thread['state_name'], self.viewer_id,
-            expected_thread['subject'], 'not used here')
+            self.EXP_ID, expected_thread_dict['state_name'], self.viewer_id,
+            expected_thread_dict['subject'], 'not used here')
 
         threads = feedback_services.get_all_threads(self.EXP_ID, False)
         self.assertEqual(2, len(threads))
-        self.assertDictContainsSubset(expected_thread, threads[1].to_dict())
+        self.assertDictContainsSubset(expected_thread_dict,
+                                      threads[1].to_dict())

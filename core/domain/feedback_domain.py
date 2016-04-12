@@ -1,4 +1,4 @@
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2016 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,12 +13,14 @@
 # limitations under the License.
 
 """Domain objects for feedback models"""
+
 from core.domain import user_services
 import utils
 
 
 class FeedbackThread(object):
     """Domain object for a feedback thread."""
+
     def __init__(self, full_thread_id, exploration_id, state_name,
                  original_author_id, status, subject, summary, has_suggestion,
                  created_on, last_updated):
@@ -60,6 +62,7 @@ class FeedbackThread(object):
 
 class FeedbackMessage(object):
     """Domain object for a feedback message."""
+
     def __init__(self, full_message_id, full_thread_id, message_id, author_id,
                  updated_status, updated_subject, text,
                  created_on, last_updated):
@@ -92,7 +95,10 @@ class FeedbackMessage(object):
 
 
 class FeedbackAnalytics(object):
-    """Domain object for a feedback analytics"""
+    """Domain object representing feedback analytics
+    for a specific exploration.
+    """
+
     def __init__(self, exploration_id, num_open_threads, num_total_threads):
         self.id = exploration_id
         self.num_open_threads = num_open_threads
@@ -107,6 +113,7 @@ class FeedbackAnalytics(object):
 
 class Suggestion(object):
     """Domain object for a suggestion."""
+
     def __init__(self, full_thread_id, author_id, exploration_id,
                  exploration_version, state_name, description, state_content):
         self.id = full_thread_id
@@ -117,9 +124,12 @@ class Suggestion(object):
         self.description = description
         self.state_content = state_content
 
+    def get_author_name(self):
+        return user_services.get_username(self.author_id)
+
     def to_dict(self):
         return {
-            'author_name': user_services.get_username(self.author_id),
+            'author_name': self.get_author_name(),
             'exploration_id': self.exploration_id,
             'exploration_version': self.exploration_version,
             'state_name': self.state_name,

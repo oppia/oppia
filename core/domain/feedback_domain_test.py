@@ -1,6 +1,4 @@
-# coding: utf-8
-#
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2016 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,6 +21,7 @@ from core.domain import user_services
 from core.tests import test_utils
 import utils
 
+
 class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
     EXP_ID = 'exp0'
     THREAD_ID = 'thread0'
@@ -37,7 +36,7 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
 
     def test_to_dict(self):
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
-        expected_thread = {
+        expected_thread_dict = {
             'thread_id': self.THREAD_ID,
             'status': u'open',
             'state_name': u'a_state_name',
@@ -46,22 +45,25 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
             'subject': u'a subject',
             'last_updated': utils.get_time_in_millisecs(fake_date)
         }
-        thread = feedback_domain.FeedbackThread(
-            self.FULL_THREAD_ID, self.EXP_ID, expected_thread['state_name'],
-            self.viewer_id, expected_thread['status'],
-            expected_thread['subject'], expected_thread['summary'],
-            False, fake_date, fake_date)
-        self.assertDictEqual(expected_thread, thread.to_dict())
+        observed_thread_dict = feedback_domain.FeedbackThread(
+            self.FULL_THREAD_ID, self.EXP_ID,
+            expected_thread_dict['state_name'], self.viewer_id,
+            expected_thread_dict['status'], expected_thread_dict['subject'],
+            expected_thread_dict['summary'], False, fake_date, fake_date)
+        self.assertDictEqual(expected_thread_dict,
+                             observed_thread_dict.to_dict())
 
     def test_get_exp_id_from_full_thread_id(self):
-        feedback_thread_cl = feedback_domain.FeedbackThread
-        self.assertEqual(feedback_thread_cl.get_exp_id_from_full_thread_id(
-            self.FULL_THREAD_ID), self.EXP_ID)
+        observed_exp_id = (
+            feedback_domain.FeedbackThread.get_exp_id_from_full_thread_id(
+                self.FULL_THREAD_ID))
+        self.assertEqual(self.EXP_ID, observed_exp_id)
 
     def test_get_thread_id_from_full_thread_id(self):
-        feedback_thread_cl = feedback_domain.FeedbackThread
-        self.assertEqual(feedback_thread_cl.get_thread_id_from_full_thread_id(
-            self.FULL_THREAD_ID), self.THREAD_ID)
+        observed_thread_id = (
+            feedback_domain.FeedbackThread.get_thread_id_from_full_thread_id(
+                self.FULL_THREAD_ID))
+        self.assertEqual(self.THREAD_ID, observed_thread_id)
 
 
 class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
@@ -79,7 +81,7 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
 
     def test_to_dict(self):
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
-        expected_message = {
+        expected_message_dict = {
             'author_username': self.OWNER_USERNAME,
             'created_on': utils.get_time_in_millisecs(fake_date),
             'exploration_id': self.EXP_ID,
@@ -88,12 +90,13 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
             'updated_status': 'open',
             'updated_subject': 'an updated subject'
         }
-        message = feedback_domain.FeedbackMessage(
+        observed_message_dict = feedback_domain.FeedbackMessage(
             self.FULL_MESSAGE_ID, self.FULL_THREAD_ID, self.MESSAGE_ID,
-            self.owner_id, expected_message['updated_status'],
-            expected_message['updated_subject'], expected_message['text'],
-            fake_date, fake_date)
-        self.assertDictEqual(expected_message, message.to_dict())
+            self.owner_id, expected_message_dict['updated_status'],
+            expected_message_dict['updated_subject'],
+            expected_message_dict['text'], fake_date, fake_date)
+        self.assertDictEqual(expected_message_dict,
+                             observed_message_dict.to_dict())
 
 
 class FeedbackAnalyticsDomainUnitTests(test_utils.GenericTestBase):
@@ -102,12 +105,13 @@ class FeedbackAnalyticsDomainUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(FeedbackAnalyticsDomainUnitTests, self).setUp()
 
-    def to_dict(self):
-        analytics = feedback_domain.FeedbackAnalytics(self.EXP_ID, 1, 2)
-        self.assertDictEqual({
+    def test_to_dict(self):
+        expected_thread_analytics_dict = feedback_domain.FeedbackAnalytics(
+            self.EXP_ID, 1, 2)
+        self.assertDictEqual(expected_thread_analytics_dict.to_dict(), {
             'num_open_threads': 1,
             'num_total_threads': 2
-        }, analytics.to_dict())
+        })
 
 
 class SuggestionDomainUnitTests(test_utils.GenericTestBase):
@@ -122,7 +126,7 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
     def test_to_dict(self):
-        expected_suggestion = {
+        expected_suggestion_dict = {
             'author_name': self.OWNER_USERNAME,
             'exploration_id': self.EXP_ID,
             'exploration_version': 1,
@@ -130,10 +134,12 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
             'description': 'a description',
             'state_content': 'a state content'
         }
-        suggestion = feedback_domain.Suggestion(
+        observed_suggestion_dict = feedback_domain.Suggestion(
             self.THREAD_ID, self.owner_id, self.EXP_ID,
-            expected_suggestion['exploration_version'],
-            expected_suggestion['state_name'],
-            expected_suggestion['description'],
-            expected_suggestion['state_content'])
-        self.assertDictEqual(expected_suggestion, suggestion.to_dict())
+            expected_suggestion_dict['exploration_version'],
+            expected_suggestion_dict['state_name'],
+            expected_suggestion_dict['description'],
+            expected_suggestion_dict['state_content'])
+        self.assertDictEqual(expected_suggestion_dict,
+                             observed_suggestion_dict.to_dict())
+

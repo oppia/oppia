@@ -147,9 +147,9 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             self.viewer_id)
         self.assertEqual(len(thread_ids_subscribed_to), 1)
         full_thread_id = thread_ids_subscribed_to[0]
-        feedback_thread_class = feedback_domain.FeedbackThread
-        thread_id = feedback_thread_class.get_thread_id_from_full_thread_id(
-            full_thread_id)
+        thread_id = (
+            feedback_domain.FeedbackThread.get_thread_id_from_full_thread_id(
+                full_thread_id))
         self.assertEqual(
             feedback_services.get_messages('exp_id', thread_id)[0].text,
             message_text)
