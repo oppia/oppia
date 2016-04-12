@@ -2608,6 +2608,11 @@ div#ng-curtain {
   min-height: 80px;
 }
 
+.form-control.oppia-rte-content img.block-element {
+  display: block;
+  margin: auto;
+}
+
 /* Styles for the editor training interfaces. */
 
 .preview-conversation-skin-card-row-container {
