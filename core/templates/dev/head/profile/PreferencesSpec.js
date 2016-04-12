@@ -14,15 +14,14 @@
 
 describe('Preferences Controller', function() {
   describe('PreferencesCtrl', function() {
-    var scope, $httpbackend, ctrl, rootScope, $Http;
+    var scope, ctrl, $Http;
 
     beforeEach(function() {
       module('oppia');
     });
 
     beforeEach(inject(function(_$httpBackend_, $http, $rootScope, $controller) {
-      $httpbackend = _$httpBackend_;
-      $httpbackend.expectGET('/signuphandler/data').respond({
+      _$httpBackend_.expectGET('/signuphandler/data').respond({
         username: 'myUsername',
         has_agreed_to_latest_terms: true
       });
