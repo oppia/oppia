@@ -62,7 +62,7 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids):
     """
     exploration_summaries = (
         exp_services.get_exploration_summaries_matching_ids(exploration_ids))
-    
+
     return get_displayable_exp_summary_dicts(exploration_summaries)
 
 
@@ -71,7 +71,7 @@ def get_displayable_exp_summary_dicts(exploration_summaries):
     list of the corresponding human-readable exploration summary dicts."""
     displayable_exp_summaries = []
     exploration_ids = []
- 
+
     for exploration_summary in exploration_summaries:
         if exploration_summary is not None:
             exploration_ids.append(exploration_summary.id)

@@ -156,7 +156,7 @@ class FeaturedExplorationDisplayableSummaries(
         - (2) Albert publishes EXP_ID_1.
         - (3) Albert creates EXP_ID_2.
         - (4) Albert publishes EXP_ID_2.
-        - (5) Admin user is set up.  
+        - (5) Admin user is set up.
         """
         super(FeaturedExplorationDisplayableSummaries, self).setUp()
 
