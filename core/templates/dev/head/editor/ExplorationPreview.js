@@ -18,13 +18,15 @@
  */
 
 oppia.controller('ExplorationPreview', [
-  '$scope', '$timeout', 'LearnerParamsService', 'explorationData',
+  '$scope', '$timeout', 'LearnerParamsService',
+  'explorationData', 'editorContextService',
   'explorationStatesService', 'explorationInitStateNameService',
   'explorationParamSpecsService', 'explorationTitleService',
   'explorationCategoryService', 'explorationParamChangesService',
   'explorationGadgetsService', 'oppiaPlayerService',
   function(
-      $scope, $timeout, LearnerParamsService, explorationData,
+      $scope, $timeout, LearnerParamsService,
+      explorationData, editorContextService,
       explorationStatesService, explorationInitStateNameService,
       explorationParamSpecsService, explorationTitleService,
       explorationCategoryService, explorationParamChangesService,
@@ -59,5 +61,31 @@ oppia.controller('ExplorationPreview', [
     $scope.$on('playerStateChange', function() {
       $scope.allParams = LearnerParamsService.getAllParams();
     });
+
+    explorationData.getData().then($scope._refreshPreviewTab = function() {
+      var newStateName = explorationInitStateNameService;
+
+      if (angular.equals({}, explorationParamSpecsService.savedMemento)) {
+        newStateName.init(editorContextService.getActiveStateName());
+      }
+      // TODO(oparry): This conditional is a temporary fix meant to prevent
+      // starting a preview from the middle of an exploration if the exploration
+      // makes use of parameters. Once manual entry of parameter values is
+      // supported, remove the if (but not newStateName.init...)
+
+      oppiaPlayerService.populateExploration({
+        category: explorationCategoryService.savedMemento,
+        init_state_name: newStateName.savedMemento,
+        param_changes: explorationParamChangesService.savedMemento,
+        param_specs: explorationParamSpecsService.savedMemento,
+        states: explorationStatesService.getStates(),
+        title: explorationTitleService.savedMemento,
+        skin_customizations: {
+          panels_contents: explorationGadgetsService.getPanelsContents()
+        }
+      });
+    });
+
+    $scope.$on('refreshPreviewTab', $scope._refreshPreviewTab);
   }
 ]);

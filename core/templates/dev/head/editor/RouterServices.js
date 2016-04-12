@@ -52,8 +52,24 @@ oppia.factory('routerService', [
 
       $rootScope.$broadcast('externalSave');
 
-      if (newPath === '/preview') {
+      if (newPath.indexOf('/preview/') !== -1) {
         _tabs.active = PREVIEW_TAB;
+        var putativeStateName = newPath.substring('/preview/'.length);
+
+        var waitForStatesToLoad = $interval(function() {
+          var allStates = explorationStatesService.getStates();
+          if (allStates) {
+            $interval.cancel(waitForStatesToLoad);
+
+            if (allStates.hasOwnProperty(putativeStateName)) {
+              editorContextService.setActiveStateName(putativeStateName);
+              $rootScope.$broadcast('refreshPreviewTab');
+            } else {
+              $location.path(
+                '/preview/' + explorationInitStateNameService.savedMemento);
+            }
+          }
+        }, 500);
       } else if (newPath === '/settings') {
         _tabs.active = SETTINGS_TAB;
         $rootScope.$broadcast('refreshSettingsTab');
@@ -110,12 +126,27 @@ oppia.factory('routerService', [
       }
     };
 
-    var _getCurrentStateFromLocationPath = function() {
-      if ($location.path().indexOf('/gui/') !== -1) {
-        return $location.path().substring('/gui/'.length);
+    var _getCurrentStateFromLocationPath = function(pathType) {
+      if (pathType != 'preview' && pathType != 'gui') {
+        return null;
+      }
+      if ($location.path().indexOf('/' + pathType + '/') !== -1) {
+        return $location.path().substring('/' + pathType + '/'.length);
       } else {
         return null;
       }
+    };
+
+    var _actuallyNavigate = function(newStateName, pathType) {
+      if (pathType != 'preview' && pathType != 'gui') {
+        return;
+      }
+      if (newStateName) {
+        editorContextService.setActiveStateName(newStateName);
+      }
+      $location.path('/' + pathType + '/' +
+                     editorContextService.getActiveStateName());
+      $window.scrollTo(0, 0);
     };
 
     var routerService = {
@@ -132,39 +163,44 @@ oppia.factory('routerService', [
           currentPath === '/settings' || currentPath === '/history' ||
           currentPath === '/feedback');
       },
-      getCurrentStateFromLocationPath: function() {
-        return _getCurrentStateFromLocationPath();
+      getCurrentStateFromLocationPath: function(pathType) {
+        return _getCurrentStateFromLocationPath(pathType);
       },
       navigateToMainTab: function(stateName) {
         _savePendingChanges();
 
-        if (_getCurrentStateFromLocationPath() === stateName) {
+        if (_getCurrentStateFromLocationPath('gui') === stateName) {
           return;
         }
 
-        var _actuallyNavigate = function(newStateName) {
-          if (newStateName) {
-            editorContextService.setActiveStateName(newStateName);
-          }
-          $location.path('/gui/' + editorContextService.getActiveStateName());
-          $window.scrollTo(0, 0);
-        };
-
         if (_tabs.active === MAIN_TAB) {
           $('.oppia-editor-cards-container').fadeOut(function() {
-            _actuallyNavigate(stateName);
+            _actuallyNavigate(stateName, 'gui');
             $rootScope.$apply();
             $timeout(function() {
               $('.oppia-editor-cards-container').fadeIn();
             }, 150);
           });
         } else {
-          _actuallyNavigate(stateName);
+          _actuallyNavigate(stateName, 'gui');
         }
       },
-      navigateToPreviewTab: function() {
-        _savePendingChanges();
-        $location.path('/preview');
+      navigateToPreviewTab: function(stateName) {
+        if (_getCurrentStateFromLocationPath('preview') === stateName) {
+          return;
+        }
+
+        if (_tabs.active === PREVIEW_TAB) {
+          $('.conversation-skin-cards-container').fadeOut(function() {
+            _actuallyNavigate(stateName, 'preview');
+            $rootScope.$apply();
+            $timeout(function() {
+              $('.conversation-skin-cards-container').fadeIn();
+            }, 150);
+          });
+        } else {
+          _actuallyNavigate(stateName, 'preview');
+        }
       },
       navigateToStatsTab: function() {
         _savePendingChanges();

@@ -30,13 +30,13 @@ oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 // and audit it to ensure it behaves differently for learner mode and editor
 // mode. Add tests to ensure this.
 oppia.factory('oppiaPlayerService', [
-  '$http', '$rootScope', '$q', 'LearnerParamsService',
+  '$http', '$location', '$rootScope', '$q', 'LearnerParamsService',
   'alertsService', 'answerClassificationService', 'explorationContextService',
   'PAGE_CONTEXT', 'oppiaExplorationHtmlFormatterService',
   'playerTranscriptService', 'ExplorationObjectFactory',
   'expressionInterpolationService', 'StatsReportingService',
   function(
-      $http, $rootScope, $q, LearnerParamsService,
+      $http, $location, $rootScope, $q, LearnerParamsService,
       alertsService, answerClassificationService, explorationContextService,
       PAGE_CONTEXT, oppiaExplorationHtmlFormatterService,
       playerTranscriptService, ExplorationObjectFactory,
@@ -316,6 +316,7 @@ oppia.factory('oppiaPlayerService', [
             }
           }
 
+          $location.path('/preview/' + newStateName);
           $rootScope.$broadcast('playerStateChange');
           successCallback(
             newStateName, refreshInteraction, feedbackHtml, questionHtml,

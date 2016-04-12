@@ -134,7 +134,7 @@ oppia.controller('ExplorationEditor', [
 
         if (!routerService.isLocationSetToNonStateEditorTab() &&
             !data.states.hasOwnProperty(
-              routerService.getCurrentStateFromLocationPath())) {
+              routerService.getCurrentStateFromLocationPath('gui'))) {
           routerService.navigateToMainTab();
         }
 
