@@ -150,7 +150,7 @@ def get_gallery_category_groupings(language_codes):
 
 def get_featured_explorations():
     """Returns a list of featured explorations."""
-    featured_exp_summary_dict = exp_services.get_featured_explorations()
+    featured_exp_summary_dict = exp_services.get_featured_exploration_summaries()
 
     if featured_exp_summary_dict:
         featured_exp_summary_dict = get_displayable_exp_summary_dicts(
