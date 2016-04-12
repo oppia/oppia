@@ -107,7 +107,7 @@ oppia.controller('Gallery', [
 
     $http.get('/default_gallery_categories').success(function(data) {
       $scope.galleryGroups = data.activity_summary_dicts_by_category;
-      console.log(data)
+
       $rootScope.$broadcast(
         'preferredLanguageCodesLoaded', data.preferred_language_codes);
 
