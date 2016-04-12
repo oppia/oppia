@@ -32,6 +32,17 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     });
   };
 
+  $scope.profileDropdownIsActive = false;
+  $scope.onMouseoverProfilePictureOrDropdown = function(evt) {
+    angular.element(evt.currentTarget).parent().addClass('open');
+    $scope.profileDropdownIsActive = true;
+  };
+
+  $scope.onMouseoutProfilePictureOrDropdown = function(evt) {
+    angular.element(evt.currentTarget).parent().removeClass('open');
+    $scope.profileDropdownIsActive = false;
+  };
+
   $scope.isNonemptyObject = function(object) {
     var hasAtLeastOneElement = false;
     for (var property in object) {
