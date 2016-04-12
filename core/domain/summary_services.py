@@ -62,9 +62,7 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids):
     """
     exploration_summaries = (
         exp_services.get_exploration_summaries_matching_ids(exploration_ids))
-    displayable_exp_summaries = get_displayable_exp_summary_dicts(
-        exploration_summaries)
-
+    
     return get_displayable_exp_summary_dicts(exploration_summaries)
 
 
@@ -73,11 +71,11 @@ def get_displayable_exp_summary_dicts(exploration_summaries):
     list of the corresponding human-readable exploration summary dicts."""
     displayable_exp_summaries = []
     exploration_ids = []
-    
+ 
     for exploration_summary in exploration_summaries:
         if exploration_summary is not None:
             exploration_ids.append(exploration_summary.id)
-    
+
     view_counts = (
         stats_jobs_continuous.StatisticsAggregator.get_views_multi(
             exploration_ids))
@@ -150,7 +148,8 @@ def get_gallery_category_groupings(language_codes):
 
 def get_featured_explorations():
     """Returns a list of featured explorations."""
-    featured_exp_summary_dict = exp_services.get_featured_exploration_summaries()
+    featured_exp_summary_dict = (
+        exp_services.get_featured_exploration_summaries())
 
     if featured_exp_summary_dict:
         featured_exp_summary_dict = get_displayable_exp_summary_dicts(

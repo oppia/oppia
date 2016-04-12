@@ -139,14 +139,15 @@ class ExplorationDisplayableSummaries(
 
 class FeaturedExplorationDisplayableSummaries(
         test_utils.GenericTestBase):
-    """Test functions for getting displayable featured exploration summary dicts."""
+    """Test functions for getting displayable
+     featured exploration summary dicts."""
 
     ALBERT_NAME = 'albert'
     ALBERT_EMAIL = 'albert@example.com'
 
     EXP_ID_1 = 'eid1'
     EXP_ID_2 = 'eid2'
-    
+
     def setUp(self):
         """Populate the database of explorations and their summaries.
 
@@ -158,27 +159,27 @@ class FeaturedExplorationDisplayableSummaries(
         - (5) Admin user is set up.  
         """
         super(FeaturedExplorationDisplayableSummaries, self).setUp()
-        
+
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        
+
         self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
         self.save_new_valid_exploration(self.EXP_ID_2, self.albert_id)
 
         rights_manager.publish_exploration(self.albert_id, self.EXP_ID_1)
         rights_manager.publish_exploration(self.albert_id, self.EXP_ID_2)
-        
+
         self.set_admins([self.ADMIN_USERNAME])
- 
+
     def test_for_featured_explorations(self):
         # There are list of explorations
         # EXP_ID_1 -- public exploration
         # EXP_ID_2 -- publicized exploration
         # Should only return [EXP_ID_2]
-        
+
         rights_manager.publicize_exploration(self.admin_id, self.EXP_ID_2)
-        
+
         featured_exploration = summary_services.get_featured_explorations()
         self.assertEqual(featured_exploration[0]['id'], self.EXP_ID_2)
