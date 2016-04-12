@@ -60,7 +60,8 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
             self.ALL_CC_MANAGERS_FOR_TESTS)
 
-    def _run_job_and_check_results(self, exp_id, expected_thread_analytics):
+    def _run_job_and_check_results(self, exp_id,
+                                   expected_thread_analytics_dict):
         self.process_and_flush_pending_tasks()
         ModifiedFeedbackAnalyticsAggregator.start_computation()
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)
@@ -69,7 +70,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             ModifiedFeedbackAnalyticsAggregator.get_thread_analytics(
                 exp_id).to_dict(),
-            expected_thread_analytics)
+            expected_thread_analytics_dict)
 
     def test_no_threads(self):
         with self._get_swap_context():
@@ -307,11 +308,11 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             self.ALL_CC_MANAGERS_FOR_TESTS)
 
     def _flush_tasks_and_check_analytics(
-            self, exp_id, expected_thread_analytics):
+            self, exp_id, expected_thread_analytics_dict):
         self.process_and_flush_pending_tasks()
         self.assertEqual(
             ModifiedFeedbackAnalyticsAggregator.get_thread_analytics(
-                exp_id).to_dict(), expected_thread_analytics)
+                exp_id).to_dict(), expected_thread_analytics_dict)
 
     def test_no_threads(self):
         with self._get_swap_context():

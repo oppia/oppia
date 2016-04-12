@@ -205,10 +205,7 @@ def _get_thread_from_model(thread_model):
 def get_threads(exploration_id):
     thread_models = feedback_models.FeedbackThreadModel.get_threads(
         exploration_id)
-    threads = []
-    for model in thread_models:
-        threads.append(_get_thread_from_model(model))
-    return threads
+    return [_get_thread_from_model(model) for model in thread_models]
 
 
 def get_open_threads(exploration_id, has_suggestion):

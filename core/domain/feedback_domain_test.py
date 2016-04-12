@@ -45,13 +45,13 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
             'subject': u'a subject',
             'last_updated': utils.get_time_in_millisecs(fake_date)
         }
-        observed_thread_dict = feedback_domain.FeedbackThread(
+        observed_thread = feedback_domain.FeedbackThread(
             self.FULL_THREAD_ID, self.EXP_ID,
             expected_thread_dict['state_name'], self.viewer_id,
             expected_thread_dict['status'], expected_thread_dict['subject'],
             expected_thread_dict['summary'], False, fake_date, fake_date)
         self.assertDictEqual(expected_thread_dict,
-                             observed_thread_dict.to_dict())
+                             observed_thread.to_dict())
 
     def test_get_exp_id_from_full_thread_id(self):
         observed_exp_id = (
@@ -90,13 +90,13 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
             'updated_status': 'open',
             'updated_subject': 'an updated subject'
         }
-        observed_message_dict = feedback_domain.FeedbackMessage(
+        observed_message = feedback_domain.FeedbackMessage(
             self.FULL_MESSAGE_ID, self.FULL_THREAD_ID, self.MESSAGE_ID,
             self.owner_id, expected_message_dict['updated_status'],
             expected_message_dict['updated_subject'],
             expected_message_dict['text'], fake_date, fake_date)
         self.assertDictEqual(expected_message_dict,
-                             observed_message_dict.to_dict())
+                             observed_message.to_dict())
 
 
 class FeedbackAnalyticsDomainUnitTests(test_utils.GenericTestBase):
@@ -106,9 +106,9 @@ class FeedbackAnalyticsDomainUnitTests(test_utils.GenericTestBase):
         super(FeedbackAnalyticsDomainUnitTests, self).setUp()
 
     def test_to_dict(self):
-        expected_thread_analytics_dict = feedback_domain.FeedbackAnalytics(
+        expected_thread_analytics = feedback_domain.FeedbackAnalytics(
             self.EXP_ID, 1, 2)
-        self.assertDictEqual(expected_thread_analytics_dict.to_dict(), {
+        self.assertDictEqual(expected_thread_analytics.to_dict(), {
             'num_open_threads': 1,
             'num_total_threads': 2
         })
@@ -134,12 +134,12 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
             'description': 'a description',
             'state_content': 'a state content'
         }
-        observed_suggestion_dict = feedback_domain.Suggestion(
+        observed_suggestion = feedback_domain.Suggestion(
             self.THREAD_ID, self.owner_id, self.EXP_ID,
             expected_suggestion_dict['exploration_version'],
             expected_suggestion_dict['state_name'],
             expected_suggestion_dict['description'],
             expected_suggestion_dict['state_content'])
         self.assertDictEqual(expected_suggestion_dict,
-                             observed_suggestion_dict.to_dict())
+                             observed_suggestion.to_dict())
 
