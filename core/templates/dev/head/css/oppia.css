@@ -3148,10 +3148,6 @@ md-card.preview-conversation-skin-supplemental-card {
   transition: opacity .35s ease;
 }
 
-strong {
-  color: #009788;
-}
-
 .inline-links {
   text-decoration: none;
 }
