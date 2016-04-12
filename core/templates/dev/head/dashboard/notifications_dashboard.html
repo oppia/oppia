@@ -26,46 +26,47 @@
       Last updated: <[getLocaleAbbreviatedDatetimeString(jobQueuedMsec)]>
     </div>
 
-    <md-card class="oppia-page-card oppia-notifications-dashboard-card">
-      <div ng-if="recentNotifications.length === 0">
+    <div class="oppia-notifications-tray">
+      <md-card ng-if="recentNotifications.length === 0" class="oppia-page-card oppia-notifications-dashboard-card">
         <em>No recent notifications.</em>
-      </div>
+      </md-card>
 
       <div ng-if="recentNotifications.length > 0">
-        <table class="table">
-          <tr>
-            <th></th>
-            <th></th>
-            <th>Exploration</th>
-            <th>Last updated</th>
-            <th>by</th>
-            <th>Subject</th>
-          </tr>
-          <tr ng-repeat="notification in recentNotifications"
-              ng-class="{'oppia-dashboard-row-recent': lastSeenMsec && lastSeenMsec < notification.last_updated_ms && notification.author_username !== currentUsername, 'oppia-dashboard-row': !lastSeenMsec || lastSeenMsec >= notification.last_updated_ms || notification.author_username === currentUsername}"
-              ng-click="navigateToItem(notification.activity_id, notification.type)">
-            <td>
-              <span class="label label-primary"
-                    ng-if="lastSeenMsec && lastSeenMsec < notification.last_updated_ms && notification.author_username !== currentUsername">
-                New
-              </span>
-            </td>
-            <td>
-              <span ng-if="notification.type === 'exploration_commit'"
-                    class="glyphicon glyphicon-flag"
-                    title="Exploration commit"></span>
+        <md-card ng-repeat="notification in recentNotifications" class="oppia-dashboard-row"
+          ng-class="{'oppia-dashboard-row-recent': lastSeenMsec && lastSeenMsec < notification.last_updated_ms && notification.author_username !== currentUsername}" ng-click="navigateToItem(notification.activity_id, notification.type)">
+          <div class="oppia-notification-content">
+            <span class="oppia-notification-type">
               <span ng-if="notification.type === 'feedback_thread'"
                     class="glyphicon glyphicon-comment"
                     title="Feedback thread"></span>
-            </td>
-            <td><[notification.activity_title]></td>
-            <td><[getLocaleAbbreviatedDatetimeString(notification.last_updated_ms)]></td>
-            <td><[notification.author_username]></td>
-            <td><[notification.subject]></td>
-          </tr>
-        </table>
+              <span ng-if="notification.type === 'exploration_commit'"
+                    class="glyphicon glyphicon-pencil"
+                    title="Exploration commit"></span>
+            </span>
+            <span class="oppia-notification-author-username">
+              <strong>
+                <a ng-if="notification.author_username" ng-click="navigateToProfile($event, notification.author_username)"><[notification.author_username]></a>
+                <span ng-if="!notification.author_username">
+                  Anonymous
+                </span>
+              </strong>
+              <span ng-if="notification.type === 'exploration_commit'">
+                made a new commit to
+              </span>
+              <span ng-if="notification.type === 'feedback_thread'">
+                left a comment on
+              </span>
+              <span class="oppia-notification-activity-title">
+                <[notification.activity_title]>
+              </span>
+            </span>
+          </div>
+          <div class="oppia-notification-last-updated">
+            <[getLocaleAbbreviatedDatetimeString(notification.last_updated_ms)]>
+          </div>
+        </md-card>
       </div>
-    </md-card>
+    </div>
   </div>
 {% endblock %}
 

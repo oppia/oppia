@@ -45,6 +45,7 @@ class ConfigProperty(object):
     - editor_page_announcement
     - editor_prerequisites_agreement
     - full_site_url
+    - sharing_options_twitter_text
     - splash_page_exploration_id
     - splash_page_exploration_version
     """
@@ -216,4 +217,10 @@ BANNED_USERNAMES = ConfigProperty(
     'banned_usernames',
     SET_OF_STRINGS_SCHEMA,
     'Banned usernames (editing permissions for these users have been removed)',
+    [])
+
+WHITELISTED_COLLECTION_EDITOR_USERNAMES = ConfigProperty(
+    'collection_editor_whitelist',
+    SET_OF_STRINGS_SCHEMA,
+    'Names of users allowed to use the collection editor',
     [])

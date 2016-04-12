@@ -49,8 +49,14 @@ def get_human_readable_contributors_summary(contributors_summary):
     contributor_ids = contributors_summary.keys()
     contributor_usernames = user_services.get_human_readable_user_ids(
         contributor_ids)
+    contributor_profile_pictures = (
+        user_services.get_profile_pictures_by_user_ids(contributor_ids))
     return {
-        contributor_usernames[ind]: contributors_summary[contributor_ids[ind]]
+        contributor_usernames[ind]: {
+            'num_commits': contributors_summary[contributor_ids[ind]],
+            'profile_picture_data_url': contributor_profile_pictures[
+                contributor_ids[ind]]
+        }
         for ind in xrange(len(contributor_ids))
     }
 
@@ -59,6 +65,8 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids):
     """Given a list of exploration ids, filters the list for
     explorations that are currently non-private and not deleted,
     and returns a list of dicts of the corresponding exploration summaries.
+    Please use this function when needing summary information to display on
+    exploration summary tiles in the frontend.
     """
     exploration_summaries = (
         exp_services.get_exploration_summaries_matching_ids(exploration_ids))
@@ -98,8 +106,6 @@ def get_displayable_exp_summary_dicts(exploration_summaries):
                 'human_readable_contributors_summary':
                     get_human_readable_contributors_summary(
                         exploration_summary.contributors_summary),
-                'contributor_names': user_services.get_human_readable_user_ids(
-                    exploration_summary.contributor_ids),
                 'tags': exploration_summary.tags,
                 'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
                     exploration_summary.category),

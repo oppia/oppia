@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Unit tests for Text Input rules.
- *
- * @author kahkhang@gmail.com (Andrew Low)
  */
 
 describe('Text Input rules service', function() {

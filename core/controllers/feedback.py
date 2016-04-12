@@ -120,6 +120,24 @@ class RecentFeedbackMessagesHandler(base.BaseHandler):
         })
 
 
+class FeedbackStatsHandler(base.BaseHandler):
+    """Returns Feedback stats for an exploration.
+        - Number of open threads
+        - Number of total threads
+    """
+
+    def get(self, exploration_id):
+        feedback_thread_analytics = feedback_services.get_thread_analytics(
+            exploration_id)
+        self.values.update({
+            'num_open_threads': (
+                feedback_thread_analytics['num_open_threads']),
+            'num_total_threads': (
+                feedback_thread_analytics['num_total_threads']),
+        })
+        self.render_json(self.values)
+
+
 class SuggestionHandler(base.BaseHandler):
     """"Handles operations relating to learner suggestions."""
 

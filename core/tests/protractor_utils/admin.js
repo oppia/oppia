@@ -15,8 +15,6 @@
 /**
  * @fileoverview Utilities for interacting with the admin page, for use in
  * Protractor tests.
- *
- * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var general = require('./general.js');

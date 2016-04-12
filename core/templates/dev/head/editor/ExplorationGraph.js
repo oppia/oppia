@@ -14,16 +14,14 @@
 
 /**
  * @fileoverview Controllers for the exploration graph.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.controller('ExplorationGraph', [
-  '$scope', '$modal', 'editorContextService', 'warningsData',
+  '$scope', '$modal', 'editorContextService', 'alertsService',
   'explorationStatesService', 'editabilityService', 'routerService',
   'graphDataService',
   function(
-      $scope, $modal, editorContextService, warningsData,
+      $scope, $modal, editorContextService, alertsService,
       explorationStatesService, editabilityService, routerService,
       graphDataService) {
     $scope.getGraphData = graphDataService.getGraphData;
@@ -42,7 +40,7 @@ oppia.controller('ExplorationGraph', [
     };
 
     $scope.openStateGraphModal = function() {
-      warningsData.clear();
+      alertsService.clearWarnings();
 
       $modal.open({
         templateUrl: 'modals/stateGraph',
@@ -78,7 +76,7 @@ oppia.controller('ExplorationGraph', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              warningsData.clear();
+              alertsService.clearWarnings();
             };
           }
         ]

@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Unit tests for the controller of 'State Interactions'.
- *
- * @author bhenning@google.com (Ben Henning)
  */
 
 describe('State Interaction controller', function() {

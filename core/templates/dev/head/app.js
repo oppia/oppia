@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Initialization and basic configuration for the Oppia module.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 // TODO(sll): Remove the check for window.GLOBALS. This check is currently
@@ -26,7 +24,7 @@ var oppia = angular.module(
   'oppia', [
     'ngMaterial', 'ngAnimate', 'ngSanitize', 'ngTouch', 'ngResource',
     'ui.bootstrap', 'ui.sortable', 'infinite-scroll', 'ngJoyRide', 'ngImgCrop',
-    'ui.validate', 'textAngular'
+    'ui.validate', 'textAngular', 'toastr'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
                    : []));
@@ -49,7 +47,7 @@ oppia.config(['$interpolateProvider', '$httpProvider',
   };
 
   $httpProvider.interceptors.push([
-    '$q', '$log', 'warningsData', function($q, $log, warningsData) {
+    '$q', '$log', 'alertsService', function($q, $log, alertsService) {
       return {
         request: function(config) {
           // If this request carries data (in the form of a JS object),
@@ -76,7 +74,7 @@ oppia.config(['$interpolateProvider', '$httpProvider',
             if (rejection.data && rejection.data.error) {
               warningMessage = rejection.data.error;
             }
-            warningsData.addWarning(warningMessage);
+            alertsService.addWarning(warningMessage);
           }
           return $q.reject(rejection);
         }
@@ -105,6 +103,24 @@ oppia.config(['$provide', function($provide) {
 
     return $delegate;
   }]);
+}]);
+
+oppia.config(['toastrConfig', function(toastrConfig) {
+  angular.extend(toastrConfig, {
+    allowHtml: false,
+    iconClasses: {
+      error: 'toast-error',
+      info: 'toast-info',
+      success: 'toast-success',
+      warning: 'toast-warning'
+    },
+    positionClass: 'toast-bottom-right',
+    messageClass: 'toast-message',
+    progressBar: false,
+    tapToDismiss: true,
+    timeOut: 1500,
+    titleClass: 'toast-title'
+  });
 }]);
 
 // Returns true if the user is on a mobile device.
@@ -226,7 +242,7 @@ oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
 // Service for validating things and (optionally) displaying warning messages
 // if the validation fails.
 oppia.factory('validatorsService', [
-    '$filter', 'warningsData', function($filter, warningsData) {
+    '$filter', 'alertsService', function($filter, alertsService) {
   return {
     /**
      * Checks whether an entity name is valid, and displays a warning message
@@ -240,7 +256,7 @@ oppia.factory('validatorsService', [
       input = $filter('normalizeWhitespace')(input);
       if (!input) {
         if (showWarnings) {
-          warningsData.addWarning('Please enter a non-empty name.');
+          alertsService.addWarning('Please enter a non-empty name.');
         }
         return false;
       }
@@ -248,7 +264,7 @@ oppia.factory('validatorsService', [
       for (var i = 0; i < GLOBALS.INVALID_NAME_CHARS.length; i++) {
         if (input.indexOf(GLOBALS.INVALID_NAME_CHARS[i]) !== -1) {
           if (showWarnings) {
-            warningsData.addWarning(
+            alertsService.addWarning(
              'Invalid input. Please use a non-empty description consisting ' +
              'of alphanumeric characters, spaces and/or hyphens.'
             );
@@ -267,7 +283,7 @@ oppia.factory('validatorsService', [
 
       if (input.length > 50) {
         if (showWarnings) {
-          warningsData.addWarning(
+          alertsService.addWarning(
             'Card names should be at most 50 characters long.');
         }
         return false;
@@ -280,7 +296,7 @@ oppia.factory('validatorsService', [
         if (showWarnings) {
           // TODO(sll): Allow this warning to be more specific in terms of what
           // needs to be entered.
-          warningsData.addWarning('Please enter a non-empty value.');
+          alertsService.addWarning('Please enter a non-empty value.');
         }
         return false;
       }
@@ -340,17 +356,30 @@ oppia.factory('urlService', ['$window', function($window) {
     },
     isIframed: function() {
       return !!(this.getUrlParams().iframed);
+    },
+    getPathname: function() {
+      return window.location.pathname;
     }
   };
 }]);
 
 // Service for computing the window dimensions.
 oppia.factory('windowDimensionsService', ['$window', function($window) {
+  var onResizeHooks = [];
+
+  $window.onresize = function() {
+    onResizeHooks.forEach(function(hookFn) {
+      hookFn();
+    });
+  };
   return {
     getWidth: function() {
       return (
         $window.innerWidth || document.documentElement.clientWidth ||
         document.body.clientWidth);
+    },
+    registerOnResizeHook: function(hookFn) {
+      onResizeHooks.push(hookFn);
     }
   };
 }]);
@@ -388,21 +417,24 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
       _sendEventToGoogleAnalytics(
         'LoginButton', 'click', $window.location.pathname + ' ' + srcElement);
     },
+    registerNewSignupEvent: function() {
+      _sendEventToGoogleAnalytics('SignupButton', 'click', '');
+    },
     registerOpenExplorationCreationModalEvent: function() {
       _sendEventToGoogleAnalytics(
         'CreateExplorationModal', 'open', $window.location.pathname);
     },
-    registerPublishExplorationEvent: function(explorationId) {
+    registerCreateNewExplorationEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
-        'PublishExploration', 'click', explorationId);
-    },
-    registerCommitChangesToPublicExplorationEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'CommitToPublicExploration', 'click', explorationId);
+        'NewExploration', 'create', explorationId);
     },
     registerCommitChangesToPrivateExplorationEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
         'CommitToPrivateExploration', 'click', explorationId);
+    },
+    registerPublishExplorationEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'PublishExploration', 'click', explorationId);
     },
     registerShareExplorationEvent: function(network) {
       _sendSocialEventToGoogleAnalytics(
@@ -411,9 +443,9 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
     registerOpenEmbedInfoEvent: function(explorationId) {
       _sendEventToGoogleAnalytics('EmbedInfoModal', 'open', explorationId);
     },
-    registerCreateNewExplorationEvent: function(explorationId) {
+    registerCommitChangesToPublicExplorationEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
-        'NewExploration', 'create', explorationId);
+        'CommitToPublicExploration', 'click', explorationId);
     }
   };
 }]);
