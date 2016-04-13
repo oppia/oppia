@@ -38,7 +38,7 @@
           </a>
         </li>
       </ul>
-    </div><!-- /about-nav -->
+    </div>
 
   <div class="about-tab-container">
     <div class="about-tab-1 about-tab-content about-visible-content">
@@ -57,7 +57,7 @@
           Through Oppia, you can create better and more effective content,
           reach more people with your content.
         </p>
-      </div><!-- /teach on oppia -->
+      </div>
       <div class="about-card-content-wide create-three-cols-container">
         <div class="create-three-cols-layout create-three-cols-feature">
           <img src="images/general/creator-create-exp.png"/>
@@ -81,8 +81,8 @@
             Improve your Exploration based on feedback.
           </p>
         </div>
-      </div><!-- /create-three-cols-container -->
-    </div><!-- /teach on oppia -->
+      </div>
+    </div>
 
     <div class="about-tab-2 about-tab-content">
       <div class="about-card-content-wide about-card-content-narrow">
@@ -221,12 +221,12 @@
           If it does, the exploration will be marked as featured.
           If it doesn't, the moderator will work with the creator(s) to improve the exploration.
         </p>
-      </div><!-- about-card-content-wide about-card-content-narrow -->  
-    </div><!-- /tab 2 -->
-  </div><!-- /tab-container -->
-  </div><!-- /about-card about-content -->
+      </div> 
+    </div>
+  </div>
+  </div>
   
-<!-- EXTRA CONTENT -->
+
   <div class="about-extra-container about-tab-container">
     <div class="about-tab-1 about-tab-content about-visible-content">
       <div class="about-extra-info new-explorations">
@@ -236,8 +236,8 @@
             <!-- INSERT LATEST EXPLORATION -->
             <a href="/gallery" class="btn about-page-buttons about-centered-button">Browse all explorations</a>
           </div>
-        </div><!-- /about-content -->
-      </div><!-- /about-extra-info -->
+        </div>
+      </div>
 
       <div class="about-extra-info start-creating">
         <div class="about-extra-content">
@@ -247,22 +247,20 @@
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
               </p>
               <a href="#" class="btn about-page-buttons about-centered-button">Start an exploration!</a>
-          </div><!-- /content-wide -->
-        </div><!-- about-extra-content -->
-      </div><!-- /about-extra-info start-creating -->
-    </div><!-- /tab-1 -->
-  </div><!-- /about-extra-container -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <!-- JS -->
+
    <script src="scripts/jquery-2.1.1.js"></script>
   <script>
     $(document).ready(function() {
       $(".about-tab-links li").on("click", function(event) {
         event.preventDefault();
         var tabIndex = $(this).index();
-        // change tab color
         $(this).addClass("about-active-tab").siblings().removeClass("about-active-tab");
-        // show/hide tab contents
         var currentAttrVal = $(this).children("a").attr("href");
         $("." + currentAttrVal).addClass("about-visible-content").siblings().removeClass("about-visible-content");
       });

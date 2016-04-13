@@ -41,7 +41,7 @@
           <a href="about-tab-3">Credits</a>
         </li>
       </ul>
-    </div> <!-- /about-nav -->
+    </div>
 
   <div class="about-tab-container">
     <div class="about-tab-1 about-tab-content about-visible-content">
@@ -62,8 +62,8 @@
           a variey of subjects, like mathematics, biology, and programming, and are offered
           in various languages made by unique individuals like you.
         </p>
-      </div><!-- /MISSION about-card-content-wide about-card-content-narrow -->
-    </div><!-- /tab -->
+      </div>
+    </div>
 
   <div class="about-tab-2 about-tab-content">
     <div class="about-card-content-wide about-card-content-narrow">
@@ -93,8 +93,8 @@
         <a href="https://github.com/oppia/oppia/" class="inline-links">code</a> is released under an
         <a href="https://www.apache.org/licenses/" class="inline-links">Apache 2.0</a> license.
       </p>
-    </div><!-- /FOUNDATION about-card-content-wide about-card-content-narrow -->
-  </div><!-- /tab -->
+    </div>
+  </div>
 
   <div class="about-tab-3 about-tab-content">
     <div class="about-card-content-wide">
@@ -183,7 +183,7 @@
               <ul>
               </ul>
           </div>
-        </div><!-- /LEFT three-cols-layout -->
+        </div>
 
         <div class="create-three-cols-layout">
           <div class="letter-groups">
@@ -260,7 +260,7 @@
               <ul>
               </ul>
           </div>
-        </div><!-- /mid three-cols-layout -->
+        </div>
 
         <div class="create-three-cols-layout">
           <div class="letter-groups">
@@ -339,12 +339,12 @@
                 <li>Zoe Madden-Wood</li>
               </ul>
           </div>
-        </div><!-- /RIGHT three-cols-layout -->
-      </div><!-- /three-cols-container -->
-    </div><!-- /CONTRIBUTORS about-card-content-wide -->
-  </div><!-- /tab -->
-  </div><!-- /tab-container -->
-</div><!-- /about-content -->
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
 
 <div class="about-extra-container about-tab-container">
   <div class="about-tab-1 about-tab-content about-visible-content">
@@ -355,9 +355,9 @@
       <div class="otter-speech-card">
         <blockquote class="otter-speech-bubble">
           <h3 >What do you want to do today?</h3>
-        </blockquote><!-- /about-card-content-wide -->
-      </div><!-- /otter-speech-card -->
-    </div><!-- /about-content -->
+        </blockquote>
+      </div>
+    </div>
 
     <div class="about-extra-info about-otter-buttons">
       <div class="about-content about-extra-content">
@@ -393,23 +393,20 @@
             For security issues:<br>
             Write to <a href="{{CONTACT_EMAIL_ADDRESS}}" class="inline-links">admin@oppia.org</a>
           </p>
-        </div><!-- /about-card-content-wide -->
-      </div><!-- /about-content -->
-    </div><!-- /about-get-involved -->
-  </div><!-- /tab -->
-</div><!-- /about-extra-container -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 
-  <!-- JS -->
    <script src="scripts/jquery-2.1.1.js"></script>
   <script>
     $(document).ready(function() {
       $(".about-tab-links li").on("click", function(event) {
         event.preventDefault();
         var tabIndex = $(this).index();
-        // change tab color
         $(this).addClass("about-active-tab").siblings().removeClass("about-active-tab");
-        // show/hide tab contents
         var currentAttrVal = $(this).children("a").attr("href");
         $("." + currentAttrVal).addClass("about-visible-content").siblings().removeClass("about-visible-content");
       });
