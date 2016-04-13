@@ -55,6 +55,7 @@ class AboutPage(base.BaseHandler):
         })
         self.render_template('pages/about.html')
 
+
 class TeachPage(base.BaseHandler):
     """Page with information about how to teach on Oppia."""
 
@@ -66,6 +67,7 @@ class TeachPage(base.BaseHandler):
                 editor.MODERATOR_REQUEST_FORUM_URL.value),
         })
         self.render_template('pages/teach.html')
+
 
 class ParticipatePage(base.BaseHandler):
     """Page with information about participating in Oppia."""
