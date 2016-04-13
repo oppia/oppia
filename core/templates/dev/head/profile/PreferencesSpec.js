@@ -14,23 +14,18 @@
 
 describe('Preferences Controller', function() {
   describe('PreferencesCtrl', function() {
-    var scope, ctrl, $httpBackend, default_editor_role_email, op;
+    var scope, ctrl, $httpBackend, mockAlertsService;
 
     beforeEach(function() {
       module('oppia');
     });
 
-    beforeEach(inject(function(_$httpBackend_, $http, $rootScope, $controller, oppiaHtmlEscaper) {
+    beforeEach(inject(function(_$httpBackend_, $http, $rootScope, $controller) {
       $httpBackend = _$httpBackend_;
-      default_editor_role_email = true;
       $httpBackend.expectGET('/preferenceshandler/data').respond({
-          can_receive_email_updates: false,
-          can_receive_editor_role_email: default_editor_role_email
+        can_receive_email_updates: false,
+        can_receive_editor_role_email: true
       });
-      op = oppiaHtmlEscaper;
-      //$httpBackendPut.expectPUT('/preferenceshandler/data', function(data) {
-        //default_editor_role_email = data.data.can_receive_editor_role_email;
-      //}).respond({});
 
       mockAlertsService = {};
 
@@ -47,7 +42,7 @@ describe('Preferences Controller', function() {
     it('should show that editor role notifications checkbox is true by default',
       function() {
         $httpBackend.flush();
-        expect(scope.canReceiveEditorRoleEmail).toBe(default_editor_role_email);
+        expect(scope.canReceiveEditorRoleEmail).toBe(true);
       });
   });
 });
