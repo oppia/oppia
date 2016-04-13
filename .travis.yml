@@ -35,26 +35,26 @@ matrix:
   - env: RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false RUN_LINT=false REPORT_BACKEND_COVERAGE=true
   fast_finish: true
 
-# notifications:
-#   email:
-#     recipients:
-#     - sean@seanlip.org
-#     - henning.benmax@gmail.com
-#     - wxy.xinyu@gmail.com
-#     on_success: change
-#     on_failure: change
-#   irc:
-#     channels:
-#     - chat.freenode.net#oppia
-#     on_success: never
-#     on_failure: always
-#   webhooks:
-#     urls:
-#     # This URL can be obtained by going to the Gitter chat room
-#     # and clicking Settings > Integrations.
-#     - https://webhooks.gitter.im/e/f8f782497ec1ffcea2e7
-#     on_success: always
-#     on_failure: always
+notifications:
+  email:
+    recipients:
+    - sean@seanlip.org
+    - henning.benmax@gmail.com
+    - wxy.xinyu@gmail.com
+    on_success: change
+    on_failure: change
+  irc:
+    channels:
+    - chat.freenode.net#oppia
+    on_success: never
+    on_failure: always
+  webhooks:
+    urls:
+    # This URL can be obtained by going to the Gitter chat room
+    # and clicking Settings > Integrations.
+    - https://webhooks.gitter.im/e/f8f782497ec1ffcea2e7
+    on_success: always
+    on_failure: always
 
 before_install:
 - pip install codecov

@@ -100,10 +100,6 @@ var config = {
       displayStacktrace: 'all',
       displaySpecDuration: true
     }));
-
-    // Set a wide enough window size for the navbar in the gallery to display
-    // fully.
-    browser.driver.manage().window().setSize(1200, 1000);
   },
 
   // The params object will be passed directly to the protractor instance,
@@ -183,8 +179,14 @@ if (process.env.TRAVIS) {
     'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER,
     'build': process.env.TRAVIS_BUILD_NUMBER,
     'platform': 'OS X 10.10',
-    'screen-resolution': '1920x1200'
+    'screen-resolution': '2048x1536'
   };
+  config.onPrepare = function() {
+    // Set a wide enough window size for the navbar in the gallery to display
+    // fully.
+    browser.driver.manage().window().setSize(1920, 1440);
+  };
+  
 } else {
   // Additional command line options to pass to selenium. For example,
   // if you need to change the browser timeout, use
@@ -197,6 +199,11 @@ if (process.env.TRAVIS) {
   config.sauceKey = null;
   config.capabilities = {
     browserName: 'chrome'
+  };
+  config.onPrepare = function() {
+    // Set a wide enough window size for the navbar in the gallery to display
+    // fully.
+    browser.driver.manage().window().setSize(1200, 1000);
   };
 
   // The address of a running selenium server. If specified, Protractor will
