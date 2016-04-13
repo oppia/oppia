@@ -79,7 +79,7 @@ oppia.controller('Preferences', [
       can_receive_email_updates: canReceiveEmailUpdates,
       can_receive_editor_role_email: canReceiveEditorRoleEmail
     };
-    _saveDataItem('update_email_preferences', data);
+    _saveDataItem('email_preferences', data);
   };
 
   $scope.savePreferredLanguageCodes = function(preferredLanguageCodes) {

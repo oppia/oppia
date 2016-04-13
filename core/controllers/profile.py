@@ -159,7 +159,7 @@ class PreferencesHandler(base.BaseHandler):
             user_services.update_preferred_language_codes(self.user_id, data)
         elif update_type == 'profile_picture_data_url':
             user_services.update_profile_picture_data_url(self.user_id, data)
-        elif update_type == 'update_email_preferences':
+        elif update_type == 'email_preferences':
             user_services.update_email_preferences(
                 self.user_id, data['can_receive_email_updates'],
                 data['can_receive_editor_role_email'])
