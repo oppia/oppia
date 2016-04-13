@@ -75,6 +75,27 @@ CAROUSEL_SLIDES_CONFIG = config_domain.ConfigProperty(
     }])
 
 
+def get_explorations_list(query_string, search_cursor):
+    """Handles getting exploration list"""
+    # TODO(sll): Figure out what to do about explorations in categories
+    # other than those explicitly listed.
+    exp_ids, search_cursor = (
+        exp_services.get_exploration_ids_matching_query(
+            query_string, cursor=search_cursor))
+
+    explorations_list = (
+        summary_services.get_displayable_exp_summary_dicts_matching_ids(
+            exp_ids))
+
+    if len(explorations_list) == feconf.DEFAULT_QUERY_LIMIT:
+        logging.error(
+            '%s explorations were fetched to load the gallery page. '
+            'You may be running up against the default query limits.'
+            % feconf.DEFAULT_QUERY_LIMIT)
+    return explorations_list
+
+
+
 class GalleryPage(base.BaseHandler):
     """The exploration gallery page."""
 
@@ -102,14 +123,6 @@ class GallerySearchPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        gallery_handler = GalleryHandler(self.request, self.response)
-        gallery_handler.get_data()
-        explorations_list = gallery_handler.values['explorations_list']
-        query_response = self.request.get('q').split()
-        query_string_list = [x for x in query_response
-                             if not x.startswith('language') or
-                             x.startswith('category')]
-        query_string = ' '.join(query_string_list)
 
         self.values.update({
             'nav_mode': feconf.NAV_MODE_GALLERY,
@@ -121,8 +134,6 @@ class GallerySearchPage(base.BaseHandler):
             'CAROUSEL_SLIDES_CONFIG': CAROUSEL_SLIDES_CONFIG.value,
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
-            'explorations_list': explorations_list,
-            'query_string': query_string
         })
         self.render_template('galleries/gallery.html')
 
@@ -152,35 +163,17 @@ class DefaultGalleryCategoriesHandler(base.BaseHandler):
 class GalleryHandler(base.BaseHandler):
     """Provides data for the exploration gallery page."""
 
-    def get_data(self):
-        """Handles get exploration data"""
-        # TODO(sll): Figure out what to do about explorations in categories
-        # other than those explicitly listed.
-
+    def get(self):
+        """Handles GET requests."""
         query_string = self.request.get('q')
         search_cursor = self.request.get('cursor', None)
-        exp_ids, search_cursor = (
-            exp_services.get_exploration_ids_matching_query(
-                query_string, cursor=search_cursor))
 
-        explorations_list = (
-            summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                exp_ids))
-
-        if len(explorations_list) == feconf.DEFAULT_QUERY_LIMIT:
-            logging.error(
-                '%s explorations were fetched to load the gallery page. '
-                'You may be running up against the default query limits.'
-                % feconf.DEFAULT_QUERY_LIMIT)
+        explorations_list = get_explorations_list(query_string, search_cursor)
 
         self.values.update({
             'explorations_list': explorations_list,
             'search_cursor': search_cursor,
         })
-
-    def get(self):
-        """Handles GET requests."""
-        self.get_data()
 
         self.render_json(self.values)
 

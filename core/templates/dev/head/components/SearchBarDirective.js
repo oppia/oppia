@@ -21,11 +21,11 @@ oppia.directive('searchBar', [function() {
     restrict: 'E',
     templateUrl: 'components/searchBar',
     controller: [
-      '$location', '$scope', '$rootScope', '$timeout', '$window',
+      '$scope', '$rootScope', '$timeout', '$window', '$location',
       'searchService', 'oppiaDebouncer', 'ExplorationCreationButtonService',
       'urlService', 'CATEGORY_LIST',
       function(
-          $location, $scope, $rootScope, $timeout, $window, searchService,
+          $scope, $rootScope, $timeout, $window, $location, searchService,
           oppiaDebouncer, ExplorationCreationButtonService, urlService,
           CATEGORY_LIST) {
         $scope.isSearchInProgress = searchService.isSearchInProgress;
@@ -43,10 +43,7 @@ oppia.directive('searchBar', [function() {
             };
           });
 
-        $scope.searchQuery = GLOBALS.query_string;
-        if ($scope.searchQuery == undefined) {
-          $scope.searchQuery = '';
-        }
+        $scope.searchQuery = '';
         $scope.selectionDetails = {
           categories: {
             description: '',
@@ -161,11 +158,48 @@ oppia.directive('searchBar', [function() {
             }
 
             _updateSelectionDetails('languageCodes');
+
+            if (Boolean(urlService.getUrlParams().q)) {
+              _parseURL();
+            }
             _onSearchQueryChangeExec();
 
             _searchBarFullyLoaded = true;
           }
         );
+
+        var _parseURL = function() {
+          var urlSearch = $window.location.search;
+          var query = urlSearch.replace('?q=', '');
+
+          // Grab language code(s) from URL, these are 2 lowercase letters.
+          var _languageCodeSelections = query.match(/%22\w\w%22/g);
+          var languageCodePattern = /language_code=\([a-zOR\%0-9]+\)/;
+          query = query.replace(languageCodePattern, '');
+
+          for (i = 0; i < _languageCodeSelections.length; i++) {
+            var language = _languageCodeSelections[i].match(/[a-z]{2}/);
+            $scope.selectionDetails.languageCodes.selections[language] = true;
+          }
+          $scope.selectionDetails.languageCodes.numSelections = i;
+          console.log($scope.selectionDetails.languageCodes.selections);
+
+          // Grab category code(s) from URL
+          var categoryPattern = /category=\([A-Za-z0-9\%]+\)/;
+          var _categories = query.match(categoryPattern);
+          if (_categories == undefined) {
+            var _categories = [];
+          } else {
+            query = query.replace(categoryPattern, '');
+            _categories = _categories[0].match(/%22[A-Za-z]+%22/g);
+          }
+          for (i = 0; i < _categories.length; i++) {
+            var category = _categories[i].match(/[A-Za-z]+/);
+            $scope.selectionDetails.categories.selections[category] = true;
+          }
+          $scope.selectionDetails.categories.numSelections = i;
+          $scope.searchQuery = query.replace(/%20/g, ' ').trim();
+        };
       }
     ]
   };

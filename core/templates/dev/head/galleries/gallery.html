@@ -23,10 +23,6 @@
       '{{LANGUAGE_CODES_AND_NAMES|js_string}}');
     GLOBALS.CAROUSEL_SLIDES_CONFIG = JSON.parse(
       '{{CAROUSEL_SLIDES_CONFIG|js_string}}');
-    {% if explorations_list %}
-      GLOBALS.explorations_list = JSON.parse('{{explorations_list|js_string}}');
-      GLOBALS.query_string = JSON.parse('{{query_string|js_string}}');
-    {% endif %}
   </script>
 
   <style>

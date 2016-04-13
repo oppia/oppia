@@ -264,10 +264,6 @@ oppia.controller('Gallery', [
       }
     };
 
-    // $scope.$on('hasChangedSearchQuery', function() {
-    //   removeSplashCarousel();
-    // });
-
     $scope.showFullGalleryGroup = function(galleryGroup) {
       var selectedCategories = {};
       for (i = 0; i < galleryGroup.categories.length; i++) {
