@@ -68,12 +68,26 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids):
     Please use this function when needing summary information to display on
     exploration summary tiles in the frontend.
     """
-    displayable_exp_summaries = []
     exploration_summaries = (
         exp_services.get_exploration_summaries_matching_ids(exploration_ids))
+
+    return get_displayable_exp_summary_dicts(exploration_summaries)
+
+
+def get_displayable_exp_summary_dicts(exploration_summaries):
+    """Given a list of exploration summary domain objects, returns
+     a list of the human-readable exploration summary dicts that
+     correspond to explorations that are currently non-private
+     and not deleted.
+    """
+    exploration_ids = [(
+        exploration_summary.id if exploration_summary is not None
+        else None) for exploration_summary in exploration_summaries]
+
     view_counts = (
         stats_jobs_continuous.StatisticsAggregator.get_views_multi(
             exploration_ids))
+    displayable_exp_summaries = []
 
     for ind, exploration_summary in enumerate(exploration_summaries):
         if exploration_summary and exploration_summary.status != (
@@ -137,3 +151,13 @@ def get_gallery_category_groupings(language_codes):
         })
 
     return results
+
+
+def get_featured_exploration_summary_dicts():
+    """Returns a list of featured explorations."""
+    featured_exp_summaries = (
+        exp_services.get_featured_exploration_summaries())
+    featured_exp_summary_dicts = get_displayable_exp_summary_dicts(
+        featured_exp_summaries.values())
+
+    return featured_exp_summary_dicts
