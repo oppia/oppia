@@ -165,9 +165,9 @@ class MyExplorationsHandler(base.BaseHandler):
                     _get_intro_card_color(exp_summary.category)),
                 'ratings': exp_summary.ratings,
                 'num_open_threads': (
-                    feedback_thread_analytics['num_open_threads']),
+                    feedback_thread_analytics.num_open_threads),
                 'num_total_threads': (
-                    feedback_thread_analytics['num_total_threads']),
+                    feedback_thread_analytics.num_total_threads),
             })
 
         explorations_list = sorted(

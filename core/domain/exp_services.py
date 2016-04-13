@@ -1508,9 +1508,9 @@ def _create_change_list_from_suggestion(suggestion):
     """Creates a change list from a suggestion object."""
 
     return [{'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-             'state_name': suggestion['state_name'],
+             'state_name': suggestion.state_name,
              'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-             'new_value': [suggestion['state_content']]}]
+             'new_value': [suggestion.state_content]}]
 
 
 def _get_commit_message_for_suggestion(
@@ -1540,7 +1540,7 @@ def accept_suggestion(editor_id, thread_id, exploration_id, commit_message):
     else:
         suggestion = feedback_services.get_suggestion(
             exploration_id, thread_id)
-        suggestion_author_username = suggestion['author_name']
+        suggestion_author_username = suggestion.get_author_name()
         change_list = _create_change_list_from_suggestion(suggestion)
         update_exploration(
             editor_id, exploration_id, change_list,
