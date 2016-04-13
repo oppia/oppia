@@ -688,6 +688,7 @@ textarea {
 
 .navbar-default .dropdown-menu {
   background: #fff;
+  margin-top: 0px;
 }
 
 .navbar-default .navbar-nav > li > a, {
