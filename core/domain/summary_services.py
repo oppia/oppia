@@ -83,11 +83,9 @@ def get_displayable_exp_summary_dicts(exploration_summaries):
     displayable_exp_summaries = []
     exploration_ids = []
 
-    for exploration_summary in exploration_summaries:
-        if exploration_summary is not None:
-            exploration_ids.append(exploration_summary.id)
-        else:
-            exploration_ids.append(None)
+    exploration_ids = [(
+        exploration_summary.id if exploration_summary is not None (
+        else None)) for exploration_summary in exploration_summaries]
 
     view_counts = (
         stats_jobs_continuous.StatisticsAggregator.get_views_multi(
