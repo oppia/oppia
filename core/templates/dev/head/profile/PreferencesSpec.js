@@ -14,19 +14,23 @@
 
 describe('Preferences Controller', function() {
   describe('PreferencesCtrl', function() {
-    var scope, ctrl, $Http;
+    var scope, ctrl, $httpBackend, default_editor_role_email, op;
 
     beforeEach(function() {
       module('oppia');
     });
 
-    beforeEach(inject(function(_$httpBackend_, $http, $rootScope, $controller) {
-      _$httpBackend_.expectGET('/signuphandler/data').respond({
-        username: 'myUsername',
-        has_agreed_to_latest_terms: true
+    beforeEach(inject(function(_$httpBackend_, $http, $rootScope, $controller, oppiaHtmlEscaper) {
+      $httpBackend = _$httpBackend_;
+      default_editor_role_email = true;
+      $httpBackend.expectGET('/preferenceshandler/data').respond({
+          can_receive_email_updates: false,
+          can_receive_editor_role_email: default_editor_role_email
       });
-
-      $Http = $http;
+      op = oppiaHtmlEscaper;
+      //$httpBackendPut.expectPUT('/preferenceshandler/data', function(data) {
+        //default_editor_role_email = data.data.can_receive_editor_role_email;
+      //}).respond({});
 
       mockAlertsService = {};
 
@@ -42,17 +46,8 @@ describe('Preferences Controller', function() {
 
     it('should show that editor role notifications checkbox is true by default',
       function() {
-        $Http.get(scope._PREFERENCES_DATA_URL).then(function(response) {
-          expect(response.data.can_receive_editor_role_email).toBe(true);
-        });
-      });
-
-    it('should set editor role checkbox to false and get correct updated value',
-      function() {
-        scope.saveEmailPreferences(true, false);
-        $Http.get(scope._PREFERENCES_DATA_URL).then(function(response) {
-          expect(response.data.can_receive_editor_role_email).toBe(false);
-        });
+        $httpBackend.flush();
+        expect(scope.canReceiveEditorRoleEmail).toBe(default_editor_role_email);
       });
   });
 });
