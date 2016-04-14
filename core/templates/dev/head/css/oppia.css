@@ -2994,3 +2994,34 @@ md-card.preview-conversation-skin-supplemental-card {
   color: red;
   margin-bottom: 10px;
 }
+
+/*For overriding third party css*/
+
+.select2-container,
+.oppia-html-select {
+  width: 60%;
+}
+
+.select2-container .select2-choice {
+  height: 36px;
+  padding: 4px 0 0 8px;
+  width: 100%;
+}
+
+.select2-container .select2-choice,
+.select2-results .select2-result-label,
+.oppia-html-select .oppia-html-select-selection-element,
+.oppia-html-select .oppia-html-select-option {
+  font-size: 14px;
+  text-align: left;
+}
+
+.oppia-html-select .oppia-html-select-selection {
+  width: 100%;
+}
+
+.dropdown-menu {
+  margin-top: 0;
+  width: 100%;
+}
+

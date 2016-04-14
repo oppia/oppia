@@ -66,7 +66,6 @@ oppia.directive('ruleTypeSelector', [function() {
           data: choices,
           // Suppress the search box.
           minimumResultsForSearch: -1,
-          width: '350px',
           formatSelection: function(object) {
             return $filter('truncateAtFirstEllipsis')(object.text);
           }
