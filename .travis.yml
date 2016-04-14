@@ -14,7 +14,6 @@ branches:
   only:
   - master
   - develop
-  - travis-e2e-saucelabs
 
 env:
   matrix:
