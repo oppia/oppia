@@ -33,6 +33,7 @@ matrix:
   # The backend tests, with coverage, take too long to run, so we make this
   # optional.
   - env: RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false RUN_LINT=false REPORT_BACKEND_COVERAGE=true
+  - env: RUN_E2E_TESTS=true
   fast_finish: true
 
 notifications:
@@ -69,7 +70,6 @@ install:
 - source scripts/setup_gae.sh || exit 1
 
 script:
-- if [ $RUN_E2E_TESTS == 'true' ]; then bash scripts/run_e2e_tests.sh; fi
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report; fi
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'false' ]; then bash scripts/run_backend_tests.sh; fi
 - if [ $RUN_LINT == 'true' ]; then bash scripts/install_third_party.sh; python scripts/pre_commit_linter.py --path=.; fi
@@ -78,6 +78,7 @@ script:
 - if [ $RUN_FRONTEND_TESTS == 'true' ]; then bash -x scripts/run_frontend_tests.sh --run-minified-tests=true; fi
 
 after_success:
+- if [ $RUN_E2E_TESTS == 'true' ]; then bash scripts/run_e2e_tests.sh; fi
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then codecov; fi
 - if [ $RUN_FRONTEND_TESTS == 'true' ]; then codecov --file ../karma_coverage_reports/coverage-final.json; fi
 
