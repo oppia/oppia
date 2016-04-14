@@ -21,7 +21,7 @@ var config = {
   // to the location of this config. If no other method of starting selenium
   // is found, this will default to
   // node_modules/protractor/selenium/selenium-server...
-  seleniumServerJar: null, 
+  seleniumServerJar: null,
   // The port to start the selenium server on, or null if the server should
   // find its own unused port.
   seleniumPort: null,
