@@ -5,7 +5,6 @@ python:
 
 addons:
   firefox: latest
-  sauce_connect: true
   apt:
     sources:
     - google-chrome
