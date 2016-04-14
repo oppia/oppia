@@ -93,6 +93,9 @@ var config = {
         },
         takeScreenShotsOnlyForFailedSpecs: true
       }));
+      // Set a wide enough window size for the navbar in the gallery to display
+      // fully.
+      browser.driver.manage().window().setSize(1200, 1000);
     }
 
     var SpecReporter = require('jasmine-spec-reporter');
@@ -165,7 +168,7 @@ var config = {
 };
 
 if (process.env.TRAVIS) {
-  // SAUCE_USERNAME(SauceLabs username) and SAUSE_ACCESS_KEY(SauceLabs Access Key)
+  // SAUCE_USERNAME (SauceLabs username) and SAUCE_ACCESS_KEY (SauceLabs Access Key)
   // will be fetched as Travis env variable 
   // https://support.saucelabs.com/customer/portal/articles/2029412-running-protractor-tests-on-sauce-labs
   // https://support.saucelabs.com/customer/portal/articles/2005335-angular-js-protractor-example
@@ -181,12 +184,6 @@ if (process.env.TRAVIS) {
     'platform': 'OS X 10.10',
     'screen-resolution': '2048x1536'
   };
-  config.onPrepare = function() {
-    // Set a wide enough window size for the navbar in the gallery to display
-    // fully.
-    browser.driver.manage().window().setSize(1920, 1440);
-  };
-  
 } else {
   // Additional command line options to pass to selenium. For example,
   // if you need to change the browser timeout, use
@@ -199,11 +196,6 @@ if (process.env.TRAVIS) {
   config.sauceKey = null;
   config.capabilities = {
     browserName: 'chrome'
-  };
-  config.onPrepare = function() {
-    // Set a wide enough window size for the navbar in the gallery to display
-    // fully.
-    browser.driver.manage().window().setSize(1200, 1000);
   };
 
   // The address of a running selenium server. If specified, Protractor will
