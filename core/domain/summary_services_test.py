@@ -171,7 +171,7 @@ class ExplorationDisplayableSummaries(
 
         displayable_summaries = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3]))
+                [self.EXP_ID_3, self.EXP_ID_2, self.EXP_ID_1]))
         expected_summary = {
             'status': u'public',
             'thumbnail_bg_color': '#05a69a',
@@ -195,6 +195,36 @@ class ExplorationDisplayableSummaries(
         self.assertIn('last_updated_msec', displayable_summaries[0])
         self.assertDictContainsSubset(expected_summary,
                                       displayable_summaries[0])
+
+    def test_get_displayable_exp_summary_dicts(self):
+        exp_summary_input = exp_services.get_exploration_summaries_matching_ids(
+            [self.EXP_ID_2])
+        exp_summary_input.insert(0, None)
+        exploration_summary = (
+            summary_services.get_displayable_exp_summary_dicts(
+                exp_summary_input))   
+        expected_summary = {
+            'status': u'public',
+            'thumbnail_bg_color': '#05a69a',
+            'community_owned': False,
+            'tags': [],
+            'thumbnail_icon_url': '/images/gallery/thumbnails/Lightbulb.svg',
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'human_readable_contributors_summary': {
+                self.ALBERT_NAME: {
+                    'num_commits': 2,
+                    'profile_picture_data_url': None
+                }
+            },
+            'id': self.EXP_ID_2,
+            'category': u'A category',
+            'ratings': feconf.get_empty_ratings(),
+            'title': u'Exploration 2 Albert title',
+            'num_views': 0,
+            'objective': u'An objective'
+        }
+        self.assertDictContainsSubset(expected_summary,
+                                      exploration_summary[0])
 
 
 class FeaturedExplorationDisplayableSummaries(
