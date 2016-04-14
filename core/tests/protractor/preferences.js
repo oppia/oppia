@@ -22,8 +22,8 @@ var workflow = require('../protractor_utils/workflow.js');
 
 describe('Preferences', function() {
   it('should change editor role email checkbox value', function() {
-    users.createUser('alice@pereferences.com', 'alicePreferences');
-    users.login('alice@pereferences.com');
+    users.createUser('alice@preferences.com', 'alicePreferences');
+    users.login('alice@preferences.com');
     browser.get('/preferences');
     var checkbox = element(by.model('canReceiveEditorRoleEmail'));
     expect(checkbox.getAttribute('aria-checked')).toBe('true');
