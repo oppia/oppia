@@ -1,8 +1,7 @@
 var ScreenShotReporter = require('protractor-screenshot-reporter');
 
-
 // A reference configuration file.
-var config = {
+exports.config = {
   // ----- How to setup Selenium -----
   //
   // There are three ways to specify how to use Selenium. Specify one of the
@@ -33,7 +32,24 @@ var config = {
   // If true, only chromedriver will be started, not a standalone selenium.
   // Tests for browsers other than chrome will not run.
   chromeOnly: false,
-  
+  // Additional command line options to pass to selenium. For example,
+  // if you need to change the browser timeout, use
+  // seleniumArgs: ['-browserTimeout=60'],
+  seleniumArgs: [],
+
+  // If sauceUser and sauceKey are specified, seleniumServerJar will be ignored.
+  // The tests will be run remotely using SauceLabs.
+  sauceUser: null,
+  sauceKey: null,
+
+  // The address of a running selenium server. If specified, Protractor will
+  // connect to an already running instance of selenium. This usually looks like
+  // seleniumAddress: 'http://localhost:4444/wd/hub'
+  seleniumAddress: 'http://localhost:4444/wd/hub',
+
+  // The timeout for each script run on the browser. This should be longer
+  // than the maximum time your application needs to stabilize between tasks.
+  allScriptsTimeout: 120000,
 
   // ----- What tests to run -----
   //
@@ -42,9 +58,6 @@ var config = {
   suites: {
     full: 'protractor/*.js'
   },
-  // The timeout for each script run on the browser. This should be longer
-  // than the maximum time your application needs to stabilize between tasks.
-  allScriptsTimeout: 120000,
 
   // ----- Capabilities to be passed to the webdriver instance ----
   //
@@ -52,7 +65,10 @@ var config = {
   // https://code.google.com/p/selenium/wiki/DesiredCapabilities
   // and
   // https://code.google.com/p/selenium/source/browse/javascript/webdriver/capabilities.js
-  
+  capabilities: {
+    browserName: 'chrome'
+  },
+
   // If you would like to run more than one instance of webdriver on the same
   // tests, use multiCapabilities, which takes an array of capabilities.
   // If this is specified, capabilities will be ignored.
@@ -73,6 +89,10 @@ var config = {
   // You can specify a file containing code to run by setting onPrepare to
   // the filename string.
   onPrepare: function() {
+    // At this point, global 'protractor' object will be set up, and jasmine
+    // will be available. For example, you can add a Jasmine reporter with:
+    //     jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter(
+    //         'outputdir/', true, true));
 
     // This is currently pulled out into a flag because it sometimes obscures
     // the actual protractor error logs and does not close the browser after
@@ -93,9 +113,6 @@ var config = {
         },
         takeScreenShotsOnlyForFailedSpecs: true
       }));
-      // Set a wide enough window size for the navbar in the gallery to display
-      // fully.
-      browser.driver.manage().window().setSize(1200, 1000);
     }
 
     var SpecReporter = require('jasmine-spec-reporter');
@@ -103,6 +120,10 @@ var config = {
       displayStacktrace: 'all',
       displaySpecDuration: true
     }));
+
+    // Set a wide enough window size for the navbar in the gallery to display
+    // fully.
+    browser.driver.manage().window().setSize(1200, 1000);
   },
 
   // The params object will be passed directly to the protractor instance,
@@ -166,42 +187,3 @@ var config = {
   // (0 if the tests passed or 1 if not).
   onCleanUp: function() {}
 };
-
-if (process.env.TRAVIS) {
-  // SAUCE_USERNAME (SauceLabs username) and SAUCE_ACCESS_KEY (SauceLabs Access Key)
-  // will be fetched as Travis env variable 
-  // https://support.saucelabs.com/customer/portal/articles/2029412-running-protractor-tests-on-sauce-labs
-  // https://support.saucelabs.com/customer/portal/articles/2005335-angular-js-protractor-example
-  config.sauceUser = process.env.SAUCE_USERNAME;
-  config.sauceKey = process.env.SAUCE_ACCESS_KEY;
-  config.capabilities = {
-    'name': 'oppia',
-    'browserName': 'chrome',
-    'seleniumVersion': '2.49.0',
-    'chromedriverVersion': '2.20',
-    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER,
-    'build': process.env.TRAVIS_BUILD_NUMBER,
-    'platform': 'OS X 10.10',
-    'screen-resolution': '2048x1536'
-  };
-} else {
-  // Additional command line options to pass to selenium. For example,
-  // if you need to change the browser timeout, use
-  // seleniumArgs: ['-browserTimeout=60'],
-  config.seleniumArgs = [];
-
-  // If sauceUser and sauceKey are specified, seleniumServerJar will be ignored.
-  // The tests will be run remotely using SauceLabs.
-  config.sauceUser = null;
-  config.sauceKey = null;
-  config.capabilities = {
-    browserName: 'chrome'
-  };
-
-  // The address of a running selenium server. If specified, Protractor will
-  // connect to an already running instance of selenium. This usually looks like
-  // seleniumAddress: 'http://localhost:4444/wd/hub'
-  config.seleniumAddress = 'http://localhost:4444/wd/hub';
-}
-
-exports.config = config;
