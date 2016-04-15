@@ -1,4 +1,5 @@
 sudo: required
+# In order to install Chrome stable we need trusty distribution.
 dist: trusty
 language: python
 
@@ -6,8 +7,6 @@ python:
 - 2.7
 
 addons:
-  # From some tests it seems you can only have one firefox addon.
-  # Adding two results in the last one defined being the one installed.
   firefox: latest
   apt:
     sources:
@@ -28,9 +27,6 @@ env:
     - RUN_BACKEND_TESTS=false RUN_FRONTEND_TESTS=true RUN_LINT=false REPORT_BACKEND_COVERAGE=false
     - RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false RUN_LINT=false REPORT_BACKEND_COVERAGE=false
     - RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false RUN_LINT=false REPORT_BACKEND_COVERAGE=true
-  # Connect to SauceLabs by adding encrypted username and Sauce Key
-  # They will be available globally in travis env to be used by core/tests/protractor.conf.js
-  #global:   
 matrix:
   allow_failures:
   # The backend tests, with coverage, take too long to run, so we make this
