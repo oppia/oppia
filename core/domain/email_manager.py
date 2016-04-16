@@ -77,6 +77,46 @@ SIGNUP_EMAIL_CONTENT = config_domain.ConfigProperty(
         'subject': _PLACEHOLDER_SUBJECT,
         'html_body': _PLACEHOLDER_HTML_BODY,
     })
+
+_EDITOR_ROLE_EMAIL_SUBJECT = (
+    '%s added you to one of their explorations on Oppia.org')
+
+_EDITOR_ROLE_EMAIL_BODY = (
+    '%s added you to his exploration, \"%s\", as a %s.<br>'
+    '<br>This means you can:<br>'
+    '<ul>%s</ul><br>'
+    '<br>You can find exploration here: '
+    '<a href="http://www.oppia.org/%s">%s</a><br>'
+    '<br>Thank You for contributing to oppia<br>'
+    '<br>Best Wishes<br>'
+    'The Oppia Team<br>'
+    )
+
+EXPLORATION_ROLE_MANAGER = 'Manager'
+EXPLORATION_ROLE_MANAGER_RIGHTS = (
+    '<li>Change exploration permissions</li>'
+    '<li>Edit the exploration</li>'
+    '<li>View and playtest exploration</li>'
+    )
+
+EXPLORATION_ROLE_COLLABORATOR = 'Collaborator'
+EXPLORATION_ROLE_COLLABORATOR_RIGHTS = (
+    '<li>Edit the exploration</li>'
+    '<li>View and playtest exploration</li>'
+    )
+
+EXPLORATION_ROLE_PLAYTESTER = 'Playtester'
+EXPLORATION_ROLE_PLAYTESTER_RIGHTS = '<li>View and playtest exploration</li>'
+
+EDITOR_ROLE_EMAIL_CONTENT = config_domain.ConfigProperty(
+    'editor_role_email_content', EMAIL_CONTENT_SCHEMA,
+    'Content of email sent after a new user is assigned a role in '
+    'exploration by creator of exploration.',
+    {
+        'subject': _EDITOR_ROLE_EMAIL_SUBJECT,
+        'html_body': _EDITOR_ROLE_EMAIL_BODY,
+    })
+
 PUBLICIZE_EXPLORATION_EMAIL_HTML_BODY = config_domain.ConfigProperty(
     'publicize_exploration_email_html_body', EMAIL_HTML_BODY_SCHEMA,
     'Default content for the email sent after an exploration is publicized by '
@@ -98,6 +138,8 @@ SENDER_VALIDATORS = {
     feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: (
         lambda x: rights_manager.Actor(x).is_moderator()),
     feconf.EMAIL_INTENT_DAILY_BATCH: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_MARKETING: (
         lambda x: rights_manager.Actor(x).is_admin()),
@@ -255,3 +297,52 @@ def send_moderator_action_email(
     _send_email(
         recipient_id, sender_id, intent, email_subject, full_email_content,
         bcc_admin=True)
+
+def send_exploration_membership_email(
+        sender_id, recipient_id, recipient_role, exploration_id,
+        exploration_title):
+    """Sends a email when a new user is given activity rights (Manager, Editor,
+    Viewer) to an exploration by creator of exploration.
+
+    Email will only be sent if recipient wants to receive these emails (i.e.
+    'can_receive_editor_role_email' is set True in recipent's preferences).
+    """
+    recipient_user_setting = user_services.get_user_settings(recipient_id)
+    sender_user_settings = user_services.get_user_settings(sender_id)
+    recipient_preferences = user_services.get_email_preferences(recipient_id)
+    if recipient_preferences['can_receive_editor_role_email'] is False:
+        log_new_error(
+            '%s will not receive email notification of being assigned to an '
+            'exploration' % recipient_user_setting.username)
+        return
+
+    if recipient_role == rights_manager.ROLE_OWNER:
+        role = EXPLORATION_ROLE_MANAGER
+        rights = EXPLORATION_ROLE_MANAGER_RIGHTS
+
+    elif recipient_role == rights_manager.ROLE_EDITOR:
+        role = EXPLORATION_ROLE_COLLABORATOR
+        rights = EXPLORATION_ROLE_COLLABORATOR_RIGHTS
+
+    elif recipient_role == rights_manager.ROLE_VIEWER:
+        role = EXPLORATION_ROLE_PLAYTESTER
+        rights = EXPLORATION_ROLE_PLAYTESTER_RIGHTS
+
+    else:
+        raise Exception(
+            'Invalid role: %s' % recipient_role)
+
+    raw_email_subject = EDITOR_ROLE_EMAIL_CONTENT.value['subject']
+    raw_email_body = 'Hi %s,<br><br>%s<br><br>%s' % (
+        recipient_user_setting.username,
+        EDITOR_ROLE_EMAIL_CONTENT.value['html_body'],
+        EMAIL_FOOTER.value)
+
+    email_subject = raw_email_subject % (sender_user_settings.username)
+    email_body = raw_email_body % (
+        sender_user_settings.username, exploration_title, role, rights,
+        exploration_id, exploration_title)
+
+    _send_email(
+        recipient_id, feconf.SYSTEM_COMMITTER_ID,
+        feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION, email_subject, email_body)

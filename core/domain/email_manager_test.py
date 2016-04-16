@@ -19,6 +19,7 @@ import types
 
 from core.domain import config_services
 from core.domain import email_manager
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -86,6 +87,131 @@ class EmailRightsTest(test_utils.GenericTestBase):
             email_manager._require_sender_id_is_valid(
                 'invalid_intent', self.admin_id)
         # pylint: enable=protected-access
+
+
+class ExplortionMemebershipEmailTests(test_utils.GenericTestBase):
+    """ Tests that sending explortion membership email works as expected. """
+
+    def setUp(self):
+        super(ExplortionMemebershipEmailTests, self).setUp()
+
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+
+        self.exploration = self.save_new_default_exploration(
+            'A', self.editor_id, 'Title')
+
+    def test_exploration_membership_email_is_sent(self):
+        can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
+
+        with can_send_emails_ctx:
+            self.login(self.EDITOR_EMAIL)
+
+            response = self.testapp.get('%s/%s' % (
+                feconf.EDITOR_URL_PREFIX, self.exploration.id))
+            csrf_token = self.get_csrf_token_from_response(response)
+            self.put_json('%s/%s' % (
+                feconf.EXPLORATION_RIGHTS_PREFIX, self.exploration.id), {
+                    'version': self.exploration.version,
+                    'new_member_username': self.NEW_USER_USERNAME,
+                    'new_member_role': 'editor',
+                }, csrf_token=csrf_token)
+
+            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            self.assertEqual(len(messages), 1)
+
+    def test_email_is_not_sent_if_user_do_not_wish_to(self):
+        user_services.update_email_preferences(self.new_user_id, True, False)
+
+        can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
+        logged_errors = []
+
+        def _log_error_for_tests(error_message):
+            logged_errors.append(error_message)
+
+        log_new_error_counter = test_utils.CallCounter(_log_error_for_tests)
+        log_new_error_ctx = self.swap(
+            email_manager, 'log_new_error', log_new_error_counter)
+
+        with can_send_emails_ctx, log_new_error_ctx:
+            email_manager.send_exploration_membership_email(
+                self.editor_id, self.new_user_id, 'owner',
+                self.exploration.id, self.exploration.title)
+
+            self.assertEqual(log_new_error_counter.times_called, 1)
+
+    def test_email_correct_membership_email_are_sent(self):
+        can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
+
+        email_subject = '%s added you to one of their explorations on Oppia.org'
+        with can_send_emails_ctx:
+            email_manager.send_exploration_membership_email(
+                self.editor_id, self.new_user_id, 'viewer',
+                self.exploration.id, self.exploration.title)
+
+            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            self.assertEqual(len(messages), 1)
+
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            self.assertEqual(len(all_models), 1)
+
+            sent_email_model = all_models[0]
+
+            # Check that email details are correct.
+            self.assertEqual(
+                sent_email_model.recipient_id,
+                self.new_user_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.NEW_USER_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.SYSTEM_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION)
+            self.assertEqual(
+                sent_email_model.subject,
+                email_subject % self.EDITOR_USERNAME)
+
+    def test_correct_rights_are_written_in_email_body(self):
+        can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
+
+        with can_send_emails_ctx:
+            # Check that correct rights are written for Manager
+            email_manager.send_exploration_membership_email(
+                self.editor_id, self.new_user_id, 'owner',
+                self.exploration.id, self.exploration.title)
+
+            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            self.assertEqual(len(messages), 1)
+
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            self.assertEqual(len(all_models), 1)
+
+            sent_email_model_manager = all_models[0]
+            self.assertRegexpMatches(
+                sent_email_model_manager.html_body,
+                email_manager.EXPLORATION_ROLE_MANAGER)
+            self.assertRegexpMatches(
+                sent_email_model_manager.html_body,
+                email_manager.EXPLORATION_ROLE_MANAGER_RIGHTS)
+
+            # Check that exeption is raised when role is Undefined
+            with self.assertRaisesRegexp(Exception, 'Invalid role'):
+                email_manager.send_exploration_membership_email(
+                    self.editor_id, self.new_user_id, 'Undefined',
+                    self.exploration.id, self.exploration.title)
+
+
 
 
 class SignupEmailTests(test_utils.GenericTestBase):
