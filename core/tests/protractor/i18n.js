@@ -56,16 +56,17 @@ describe('Site language', function() {
     users.login('varda@example.com');
     browser.get('/preferences');
     element(by.css('.protractor-test-system-language-selector')).click();
-    element.all(by.css('.select2-drop-active li div')).each(function(node) {
-      node.getText().then(function(text) {
-        if (text == 'Español') {
-          node.click();
-          // The language has already changed
-          expect(element(by.css('.protractor-test-preferences-title'))
-                 .getText()).toEqual('Preferencias');
-        }
+    element.all(by.css('.select2-drop-active li div')).each(
+      function(optionElem) {
+        optionElem.getText().then(function(text) {
+          if (text == 'Español') {
+            optionElem.click();
+            // The language has already changed
+            expect(element(by.css('.protractor-test-preferences-title'))
+              .getText()).toEqual('Preferencias');
+          }
+        });
       });
-    });
     general.ensurePageHasNoTranslationIds();
     users.logout();
   });

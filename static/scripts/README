@@ -2,8 +2,7 @@ TESTING INSTRUCTIONS
 --------------------
 
 This folder contains embedding scripts for Oppia explorations, and tests for
-them. Currently, the tests need to be done manually. They should be run as
-follows:
+them. To load the examples manually you need to:
 
 - Load the 'Welcome' demo exploration (with id '0') for version 0.0.0 and
   the 'protractor_test_1' exploration (with id '12') for version 0.0.1
@@ -24,7 +23,3 @@ The features supported in each version of the embedding script are as follows:
 - v0.0.1: simple embedding; embedding a particular version of an exploration;
     embedding with event hooks; embedding with delayed loading and a 'load'
     button.
-
-
-TODO(sll): Write automated end-to-end tests that load the HTML pages and check
-that the relevant embedding assertions are satisfied.
