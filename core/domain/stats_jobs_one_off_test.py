@@ -69,6 +69,23 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         user_services.get_or_create_user(self.owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
+    def test_fuzzy_matches_does_not_migrate(self):
+        state_name = 'Text Input'
+
+        rule_spec_str = 'FuzzyMatches'
+        html_answer = 'weight'
+        self._record_old_answer(state_name, rule_spec_str, html_answer)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        self._run_migration_job()
+
+        # The answer should not be properly migrated.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
     def test_migrate_code_repl(self):
         state_name = 'Code Editor'
 
@@ -130,9 +147,6 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': 'Default',
             'answer_str': ''
         }])
-
-    def test_migrate_graph_input(self):
-        pass
 
     def test_migrate_image_click_input(self):
         state_name = 'Image Region'
@@ -231,7 +245,39 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         }])
 
     def test_migrate_logic_proof(self):
-        pass
+        state_name = 'Logic Proof'
+
+        rule_spec_str = 'Correct()'
+        html_answer = u'From p we have p'
+        self._record_old_answer(state_name, rule_spec_str, html_answer)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        self._run_migration_job()
+
+        # The answer should have been properly migrated to the new storage
+        # model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(state_answers.answers_list, [{
+            'answer': {
+                'assumptions_string': 'p',
+                'target_string': 'p',
+                'proof_string': 'From p we have p',
+                'correct': True
+            },
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'LogicProof',
+            'params': [],
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
 
     def test_migrate_math_expression_input(self):
         state_name = 'Math Expression Input'
@@ -299,7 +345,42 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         }])
 
     def test_migrate_music_notes_input(self):
-        pass
+        state_name = 'Music Notes Input'
+
+        rule_spec_str = (
+            'Equals([{u\'noteDuration\': {u\'num\': 1, u\'den\': 1}, '
+            'u\'readableNoteName\': u\'C5\'}])')
+        html_answer = u'[C5]\n'
+        self._record_old_answer(state_name, rule_spec_str, html_answer)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        self._run_migration_job()
+
+        # The answer should have been properly migrated to the new storage
+        # model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(state_answers.answers_list, [{
+            'answer': [{
+                'readableNoteName': 'C5',
+                'noteDuration': {
+                    'num': 1.0,
+                    'den': 1.0
+                }
+            }],
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'MusicNotesInput',
+            'params': [],
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
 
     def test_migrate_numeric_input(self):
         state_name = 'Number Input'

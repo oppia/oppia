@@ -37,6 +37,7 @@ import utils
 transaction_services = models.Registry.import_transaction_services()
 
 
+# pylint: disable=W0123
 class StatisticsAudit(jobs.BaseMapReduceJobManager):
 
     _STATE_COUNTER_ERROR_KEY = 'State Counter ERROR'
@@ -149,22 +150,81 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     _DEFAULT_RULESPEC_STR = 'Default'
 
     _RECONSTITUTION_FUNCTION_MAP = {
-        'CodeRepl': '_reconstitute_code_evaluation',
-        'Continue': '_reconstitute_continue',
-        'EndExploration': '_reconstitute_end_exploration',
-        'GraphInput': '_reconstitute_graph_input',
-        'ImageClickInput': '_reconstitute_image_click_input',
-        'InteractiveMap': '_reconstitute_interactive_map',
-        'ItemSelectionInput': '_reconstitute_item_selection_input',
-        'LogicProof': '_reconstitute_logic_proof',
-        'MathExpressionInput': '_reconstitute_math_expression_input',
-        'MultipleChoiceInput': '_reconstitute_multiple_choice_input',
-        'MusicNotesInput': '_reconstitute_music_notes_input',
-        'NumericInput': '_reconstitute_numeric_input',
-        'PencilCodeEditor': '_reconstitute_pencil_code_editor',
-        'SetInput': '_reconstitute_set_input',
-        'TextInput': '_reconstitute_text_input',
+        'CodeRepl': '_cb_reconstitute_code_evaluation',
+        'Continue': '_cb_reconstitute_continue',
+        'EndExploration': '_cb_reconstitute_end_exploration',
+        'GraphInput': '_cb_reconstitute_graph_input',
+        'ImageClickInput': '_cb_reconstitute_image_click_input',
+        'InteractiveMap': '_cb_reconstitute_interactive_map',
+        'ItemSelectionInput': '_cb_reconstitute_item_selection_input',
+        'LogicProof': '_cb_reconstitute_logic_proof',
+        'MathExpressionInput': '_cb_reconstitute_math_expression_input',
+        'MultipleChoiceInput': '_cb_reconstitute_multiple_choice_input',
+        'MusicNotesInput': '_cb_reconstitute_music_notes_input',
+        'NumericInput': '_cb_reconstitute_numeric_input',
+        'PencilCodeEditor': '_cb_reconstitute_pencil_code_editor',
+        'SetInput': '_cb_reconstitute_set_input',
+        'TextInput': '_cb_reconstitute_text_input',
     }
+
+    _EXPECTED_NOTE_TYPES = [
+        'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F5', 'G5',
+        'A5'
+    ]
+
+    # Following are all rules in Oppia during the time of answer migration. (44)
+    # Each being migrated by this job is prefixed with a '+' and, conversely, a
+    # prefix of '-' indicates it is not being migrated by this job. 6 rules are
+    # not being recovered. Also, rules which cannot be 100% recovered are noted.
+    # + checked_proof.Correct
+    # - checked_proof.NotCorrect
+    # - checked_proof.NotCorrectByCategory
+    # + click_on_image.IsInRegion
+    # - code_evaluation.CodeEquals
+    # + code_evaluation.CodeContains (cannot be 100% recovered)
+    # + code_evaluation.CodeDoesNotContain (cannot be 100% recovered)
+    # + code_evaluation.OutputEquals (cannot be 100% recovered)
+    # + code_evaluation.ResultsInError (cannot be 100% recovered)
+    # - code_evaluation.ErrorContains
+    # + coord_two_dim.Within
+    # + coord_two_dim.NotWithin
+    # - graph.HasGraphProperty
+    # - graph.IsIsomorphicTo
+    # + math_expression.IsMathematicallyEquivalentTo
+    # + music_phrase.Equals
+    # + music_phrase.IsLongerThan
+    # + music_phrase.HasLengthInclusivelyBetween
+    # + music_phrase.IsEqualToExceptFor
+    # + music_phrase.IsTranspositionOf
+    # + music_phrase.IsTranspositionOfExceptFor
+    # + nonnegative_int.Equals
+    # + normalized_string.Equals
+    # + normalized_string.CaseSensitiveEquals
+    # + normalized_string.StartsWith
+    # + normalized_string.Contains
+    # + normalized_string.FuzzyEquals
+    # + real.Equals
+    # + real.IsLessThan
+    # + real.IsGreaterThan
+    # + real.IsLessThanOrEqualTo
+    # + real.IsGreaterThanOrEqualTo
+    # + real.IsInclusivelyBetween
+    # + real.IsWithinTolerance
+    # + set_of_html_string.Equals
+    # + set_of_html_string.ContainsAtLeastOneOf
+    # + set_of_html_string.DoesNotContainAtLeastOneOf
+    # + set_of_unicode_string.Equals
+    # + set_of_unicode_string.IsSubsetOf
+    # + set_of_unicode_string.IsSupersetOf
+    # + set_of_unicode_string.HasElementsIn
+    # + set_of_unicode_string.HasElementsNotIn
+    # + set_of_unicode_string.OmitsElementsIn
+    # + set_of_unicode_string.IsDisjointFrom
+
+    # NOTE TO DEVELOPERS: This was never a modifiable value, so it will always
+    # take the minimum value. It wasn't stored in answers, but it does not need
+    # to be reconstituted.
+    _NOTE_DURATION_FRACTION_PART = 1
 
     @classmethod
     def _find_exploration_immediately_before_timestamp(cls, exp_id, when):
@@ -266,11 +326,23 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     # supported by an interaction.
 
     @classmethod
-    def _reconstitute_code_evaluation(
+    def _cb_reconstitute_code_evaluation(
             cls, interaction, rule_spec, rule_str, answer_str):
-        rule_types_without_output = ['CodeContains', 'CodeDoesNotContain']
-        # TODO(bhenning): Reconstitute the evaluation and error. Also, find the
-        # default values to use, if cannot reconstitute.
+        # The Jinja representation for CodeEvaluation answer strings is:
+        #   {{answer.code}}
+
+        rule_types_without_output = [
+            'CodeContains', 'CodeDoesNotContain', 'ResultsInError'
+        ]
+        # NOTE: Not all of CodeEvaluation can be reconstituted. Evaluation,
+        # error, and output (with one rule_type exception) cannot be recovered
+        # without actually running the code. For this reason, OutputEquals,
+        # CodeContains, CodeDoesNotContain, and ResultsInError can only be
+        # partially recovered. The missing values will be empty strings as
+        # special sentinel values. Empty strings must be checked in conjunction
+        # with the session_id to determine whether the empty string is the
+        # special sentinel value.
+
         if rule_spec.rule_type == 'OutputEquals':
             code_output = cls._get_plaintext(rule_spec.inputs['x'])
             code = cls._get_plaintext(answer_str)
@@ -288,8 +360,6 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             code = cls._get_plaintext(answer_str)
             if not code:
                 return (None, 'Failed to recover code: %s' % answer_str)
-            # TODO(bhenning): Add sentinel value for output here, since it
-            # cannot be recovered.
             code_evaluation_dict = {
                 'code': code,
                 'output': '',
@@ -300,12 +370,13 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 objects.CodeEvaluation.normalize(code_evaluation_dict), None)
         return (
             None,
-            'Cannot reconstitute a CodeEvaluation object without an '
-            'OutputEquals rule.')
+            'Cannot reconstitute a CodeEvaluation object without OutputEquals, '
+            'CodeContains, CodeDoesNotContain, or ResultsInError rules.')
 
     @classmethod
-    def _reconstitute_continue(
+    def _cb_reconstitute_continue(
             cls, interaction, rule_spec, rule_str, answer_str):
+        # The Jinja representation for CodeEvaluation answer strings is blank.
         if not rule_spec and not answer_str and (
                 rule_str == cls._DEFAULT_RULESPEC_STR):
             # There is no answer for 'Continue' interactions.
@@ -316,20 +387,40 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             % rule_str)
 
     @classmethod
-    def _reconstitute_end_exploration(
+    def _cb_reconstitute_end_exploration(
             cls, interaction, rule_spec, rule_str, answer_str):
         return (
             None,
             'There should be no answers submitted for the end exploration.')
 
     @classmethod
-    def _reconstitute_graph_input(
+    def _cb_reconstitute_graph_input(
             cls, interaction, rule_spec, rule_str, answer_str):
+        # pylint: disable=C0301
+        # The Jinja representation for Graph answer strings is:
+        #   ({% for vertex in answer.vertices -%}
+        #     {% if answer.isLabeled -%}{{vertex.label}}{% else -%}{{loop.index}}{% endif -%}
+        #     {% if not loop.last -%},{% endif -%}
+        #   {% endfor -%})
+        #   [{% for edge in answer.edges -%}
+        #     ({{edge.src}},{{edge.dst}}){% if not loop.last -%},{% endif -%}
+        #   {% endfor -%}]
+
+        # This answer type is not being reconsituted. 'HasGraphProperty' has
+        # never had an answer submitted for it. 'IsIsomorphicTo' has had 5
+        # answers submitted for it, 4 of which are too long to actually
+        # reconsititute because the rule_spec_str was cut off in the key name.
+        # That leaves 1 lonely graph answer to reconstitute; we're dropping it
+        # in favor of avoiding the time needed to build and test the
+        # reconstitution of the graph object.
         return (None, 'Unsupported answer type.')
 
     @classmethod
-    def _reconstitute_image_click_input(cls,
-            interaction, rule_spec, rule_str, answer_str):
+    def _cb_reconstitute_image_click_input(cls, interaction, rule_spec,
+                                           rule_str, answer_str):
+        # pylint: disable=C0301
+        # The Jinja representation for ClickOnImage answer strings is:
+        #   ({{'%0.3f' | format(answer.clickPosition[0]|float)}}, {{'%0.3f'|format(answer.clickPosition[1]|float)}})
         if rule_spec.rule_type == 'IsInRegion':
             # Extract the region clicked on from the rule string.
             region_name = rule_str[len(rule_spec.rule_type) + 1:-1]
@@ -342,10 +433,10 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 return (
                     None,
                     'Bad answer string in ImageClickInput IsInRegion rule.')
-            x = float(match.group('x'))
-            y = float(match.group('y'))
             click_on_image_dict = {
-                'clickPosition': [x, y],
+                'clickPosition': [
+                    float(match.group('x')), float(match.group('y'))
+                ],
                 'clickedRegions': [region_name]
             }
             return (objects.ClickOnImage.normalize(click_on_image_dict), None)
@@ -355,27 +446,36 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             'rule.')
 
     @classmethod
-    def _reconstitute_interactive_map(
+    def _cb_reconstitute_interactive_map(
             cls, interaction, rule_spec, rule_str, answer_str):
-        if rule_spec.rule_type == 'Within':
-            # Match the pattern: '(real, real)' to extract the coordinates.
-            pattern = re.compile(
-                r'\((?P<x>-?\d+\.?\d*), (?P<y>-?\d+\.?\d*)\)')
-            match = pattern.match(answer_str)
-            if not match:
-                return (
-                    None, 'Bad answer string in InteractiveMap Within rule.')
-            x = float(match.group('x'))
-            y = float(match.group('y'))
-            coord_two_dim_list = [x, y]
-            return (objects.CoordTwoDim.normalize(coord_two_dim_list), None)
-        return (
-            None,
-            'Cannot reconstitute InteractiveMap object without a Within rule.')
+        # pylint: disable=C0301
+        # The Jinja representation for CoordTwoDim answer strings is:
+        #   ({{'%0.6f' | format(answer[0]|float)}}, {{'%0.6f'|format(answer[1]|float)}})
+        supported_rule_types = ['Within', 'NotWithin']
+        if rule_spec.rule_type not in supported_rule_types:
+            return (
+                None,
+                'Unsupported rule type encountered while attempting to '
+                'reconstitute CoordTwoDim object: %s' % rule_spec.rule_type)
+
+        # Match the pattern: '(real, real)' to extract the coordinates.
+        pattern = re.compile(
+            r'\((?P<x>-?\d+\.?\d*), (?P<y>-?\d+\.?\d*)\)')
+        match = pattern.match(answer_str)
+        if not match:
+            return (
+                None, 'Bad answer string in InteractiveMap %s rule.' % (
+                    rule_spec.rule_type))
+        coord_two_dim_list = [
+            float(match.group('x')), float(match.group('y'))
+        ]
+        return (objects.CoordTwoDim.normalize(coord_two_dim_list), None)
 
     @classmethod
-    def _reconstitute_item_selection_input(
+    def _cb_reconstitute_item_selection_input(
             cls, interaction, rule_spec, rule_str, answer_str):
+        # The Jinja representation for SetOfHtmlString answer strings is:
+        #   {{ answer }}
         supported_rule_types = [
             'Equals', 'ContainsAtLeastOneOf', 'DoesNotContainAtLeastOneOf'
         ]
@@ -392,19 +492,64 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             'rule.')
 
     @classmethod
-    def _reconstitute_logic_proof(
+    def _cb_reconstitute_logic_proof(
             cls, interaction, rule_spec, rule_str, answer_str):
         if rule_spec.rule_type == 'Correct':
-            # TODO(bhenning): The answer_str is just the 'proof_string' of the
-            # CheckedProof object. It needs to back through the proof engine in
-            # order to reconstitute the lost data during submission.
-            return (None, 'Unsupported answer type.')
+            # The Jinja representation of the answer is:
+            #   {{answer.proof_string}}
+
+            # Because the rule implies the proof was correct, half of the
+            # CheckedProof structure does not need to be saved. The remaining
+            # structure consists of three strings: assumptions_string,
+            # target_string, and proof_string. The latter is already available
+            # as the answer_str.
+            if not answer_str:
+                return (
+                    None,
+                    'Failed to recover CheckedProof answer: %s' % answer_str)
+
+            # assumptions_string and target_string come from the assumptions and
+            # results customized to this particular LogicProof instance.
+            question_details = (
+                interaction.customization_args['question']['value'])
+            assumptions = question_details['assumptions']
+            results = question_details['results']
+
+            expressions = []
+            top_types = []
+            for assumption in assumptions:
+                expressions.append(assumption)
+                top_types.append('boolean')
+            expressions.append(results[0])
+            top_types.append('boolean')
+            operators = AnswerMigrationJob._BASE_STUDENT_LANGUAGE['operators']
+
+            if len(assumptions) <= 1:
+                assumptions_string = (
+                    AnswerMigrationJob._display_expression_array(
+                        assumptions, operators))
+            else:
+                assumptions_string = '%s and %s' % (
+                    AnswerMigrationJob._display_expression_array(
+                        assumptions[0:-1], operators),
+                    AnswerMigrationJob._display_expression_helper(
+                        assumptions[-1], operators, 0))
+
+            target_string = AnswerMigrationJob._display_expression_helper(
+                results[0], operators, 0)
+
+            return (objects.CheckedProof.normalize({
+                'assumptions_string': assumptions_string,
+                'target_string': target_string,
+                'proof_string': answer_str,
+                'correct': True
+            }), None)
         return (
             None,
-            'Cannot reconstitute LogicProof object without a Within rule.')
+            'Cannot reconstitute CheckedProof object without a Correct rule.')
 
     @classmethod
-    def _reconstitute_math_expression_input(
+    def _cb_reconstitute_math_expression_input(
             cls, interaction, rule_spec, rule_str, answer_str):
         if rule_spec.rule_type == 'IsMathematicallyEquivalentTo':
             math_expression_dict = eval(answer_str)
@@ -421,8 +566,10 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             'IsMathematicallyEquivalentTo rule.')
 
     @classmethod
-    def _reconstitute_multiple_choice_input(
+    def _cb_reconstitute_multiple_choice_input(
             cls, interaction, rule_spec, rule_str, answer_str):
+        # The Jinja representation for NonnegativeInt answer strings is:
+        #   {{ choices[answer|int] }}
         if rule_spec.rule_type == 'Equals':
             # Extract the clicked index from the rule string.
             clicked_index = int(rule_str[len(rule_spec.rule_type) + 1:-1])
@@ -441,12 +588,52 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             'rule.')
 
     @classmethod
-    def _reconstitute_music_notes_input(
+    def _cb_reconstitute_music_notes_input(
             cls, interaction, rule_spec, rule_str, answer_str):
-        return (None, 'Unsupported answer type.')
+        # The format of serialized answers is based on the following Jinja:
+        #   {% if (answer | length) == 0 -%}
+        #     No answer given.
+        #   {% else -%}
+        #     [{% for note in answer -%}
+        #       {% for prop in note -%}
+        #         {% if prop == 'readableNoteName' %}{{note[prop]}}{% endif -%}
+        #       {% endfor -%}
+        #       {% if not loop.last -%},{% endif -%}
+        #     {% endfor -%}]
+        #   {% endif -%}
+        supported_rule_types = [
+            'Equals', 'IsLongerThan', 'HasLengthInclusivelyBetween',
+            'IsEqualToExceptFor', 'IsTranspositionOf',
+            'IsTranspositionOfExceptFor'
+        ]
+        if rule_spec.rule_type not in supported_rule_types:
+            return (
+                None,
+                'Unsupported rule type encountered while attempting to '
+                'reconstitute MusicPhrase object: %s' % rule_spec.rule_type)
+        answer_str = answer_str.rstrip()
+        if answer_str == 'No answer given.':
+            return (objects.MusicPhrase.normalize([]), None)
+        if answer_str[0] != '[' or answer_str[-1] != ']' or ' ' in answer_str:
+            return (None, 'Invalid music note answer string: %s' % answer_str)
+        note_list_str = answer_str[1:-1]
+        note_list = note_list_str.split(',')
+        for note_str in note_list:
+            if note_str not in AnswerMigrationJob._EXPECTED_NOTE_TYPES:
+                return (
+                    None,
+                    'Invalid music note answer string (bad note: %s): %s' % (
+                        note_str, answer_str))
+        return (objects.MusicPhrase.normalize([{
+            'readableNoteName': note_str,
+            'noteDuration': {
+                'num': AnswerMigrationJob._NOTE_DURATION_FRACTION_PART,
+                'den': AnswerMigrationJob._NOTE_DURATION_FRACTION_PART
+            }
+        } for note_str in note_list]), None)
 
     @classmethod
-    def _reconstitute_numeric_input(
+    def _cb_reconstitute_numeric_input(
             cls, interaction, rule_spec, rule_str, answer_str):
         supported_rule_types = [
             'Equals', 'IsLessThan', 'IsGreaterThan', 'IsLessThanOrEqualTo',
@@ -462,7 +649,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         return (objects.Real.normalize(input_value), None)
 
     @classmethod
-    def _reconstitute_pencil_code_editor(
+    def _cb_reconstitute_pencil_code_editor(
             cls, interaction, rule_spec, rule_str, answer_str):
         if rule_spec.rule_type == 'OutputEquals':
             # Luckily, Pencil Code answers stored the actual dict rather than
@@ -478,7 +665,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             'OutputEquals rule.')
 
     @classmethod
-    def _reconstitute_set_input(
+    def _cb_reconstitute_set_input(
             cls, interaction, rule_spec, rule_str, answer_str):
         supported_rule_types = [
             'Equals', 'IsSubsetOf', 'IsSupersetOf', 'HasElementsIn',
@@ -497,7 +684,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             objects.SetOfUnicodeString.normalize(unicode_string_list), None)
 
     @classmethod
-    def _reconstitute_text_input(
+    def _cb_reconstitute_text_input(
             cls, interaction, rule_spec, rule_str, answer_str):
         supported_rule_types = [
             'Equals', 'CaseSensitiveEquals', 'StartsWith', 'Contains',
@@ -588,6 +775,13 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         classification_categorization = (
             AnswerMigrationJob._infer_classification_categorization(rule_str))
 
+        # Fuzzy rules are not supported by the migration job. No fuzzy rules
+        # should have been submitted in production, so all existing rules are
+        # being ignored.
+        if classification_categorization == (
+                exp_domain.TRAINING_DATA_CLASSIFICATION):
+            return
+
         # Unfortunately, the answer_group_index and rule_spec_index may be
         # wrong for soft rules, since previously there was no way of
         # differentiating between which soft rule was selected. This problem is
@@ -649,4 +843,367 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
+        # pylint: disable=unused-argument
         yield stringified_values
+
+    # Following are helpers and constants related to reconstituting the
+    # CheckedProof object.
+
+    @classmethod
+    def _display_expression_helper(
+            cls, expression, operators, desirability_of_brackets):
+        """From extensions/interactions/LogicProof/static/js/shared.js"""
+
+        desirability_of_brackets_below = (
+            2 if (
+                expression['top_kind_name'] == 'binary_connective' or
+                expression['top_kind_name'] == 'binary_relation' or
+                expression['top_kind_name'] == 'binary_function')
+            else 1 if (
+                expression['top_kind_name'] == 'unary_connective' or
+                expression['top_kind_name'] == 'quantifier')
+            else 0)
+        processed_arguments = []
+        processed_dummies = []
+        for argument in expression['arguments']:
+            processed_arguments.append(
+                AnswerMigrationJob._display_expression_helper(
+                    argument, operators, desirability_of_brackets_below))
+        for dummy in expression['dummies']:
+            processed_dummies.append(
+                AnswerMigrationJob._display_expression_helper(
+                    dummy, operators, desirability_of_brackets_below))
+        symbol = (
+            expression['top_operator_name']
+            if expression['top_operator_name'] not in operators
+            else expression['top_operator_name']
+            if 'symbols' not in operators[expression['top_operator_name']]
+            else operators[expression['top_operator_name']]['symbols'][0])
+
+        formatted_result = None
+        if (expression['top_kind_name'] == 'binary_connective' or
+                expression['top_kind_name'] == 'binary_relation' or
+                expression['top_kind_name'] == 'binary_function'):
+            formatted_result = (
+                '(%s)' % processed_arguments.join(symbol)
+                if desirability_of_brackets > 0
+                else processed_arguments.join(symbol))
+        elif expression['top_kind_name'] == 'unary_connective':
+            output = '%s%s' % (symbol, processed_arguments[0])
+            formatted_result = (
+                '(%s)' % output if desirability_of_brackets == 2 else output)
+        elif expression['top_kind_name'] == 'quantifier':
+            output = '%s%s.%s' % (
+                symbol, processed_dummies[0], processed_arguments[0])
+            formatted_result = (
+                '(%s)' % output if desirability_of_brackets == 2 else output)
+        elif expression['top_kind_name'] == 'bounded_quantifier':
+            output = '%s%s.%s' % (
+                symbol, processed_arguments[0], processed_arguments[1])
+            formatted_result = (
+                '(%s)' % output if desirability_of_brackets == 2 else output)
+        elif (expression['top_kind_name'] == 'prefix_relation'
+              or expression['top_kind_name'] == 'prefix_function'):
+            formatted_result = (
+                '%s(%s)' % (symbol, processed_arguments.join(',')))
+        elif expression['top_kind_name'] == 'ranged_function':
+            formatted_result = '%s{%s | %s}' % (
+                symbol, processed_arguments[0], processed_arguments[1])
+        elif (expression['top_kind_name'] == 'atom'
+              or expression['top_kind_name'] == 'constant'
+              or expression['top_kind_name'] == 'variable'):
+            formatted_result = symbol
+        else:
+            raise Exception('Unknown kind %s sent to displayExpression()' % (
+                expression['top_kind_name']))
+        return formatted_result
+
+    @classmethod
+    def _display_expression_array(cls, expression_array, operators):
+        """From extensions/interactions/LogicProof/static/js/shared.js"""
+
+        return ', '.join([
+            cls._display_expression_helper(expression, operators, 0)
+            for expression in expression_array])
+
+    # These are from extensions/interactions/LogicProof/static/js/data.js
+    _SINGLE_BOOLEAN = {
+        'type': 'boolean',
+        'arbitrarily_many': False
+    }
+    _SINGLE_ELEMENT = {
+        'type': 'element',
+        'arbitrarily_many': False
+    }
+    _BASE_STUDENT_LANGUAGE = {
+        'types': {
+            'boolean': {
+                'quantifiable': False
+            },
+            'element': {
+                'quantifiable': True
+            }
+        },
+        'kinds': {
+            'binary_connective': {
+                'display': [{
+                    'format': 'argument_index',
+                    'content': 0
+                }, {
+                    'format': 'name'
+                }, {
+                    'format': 'argument_index',
+                    'content': 1
+                }]
+            },
+            'unary_connective': {
+                'matchable': False,
+                'display': [{
+                    'format': 'name'
+                }, {
+                    'format': 'argument_index',
+                    'content': 0
+                }]
+            },
+            'quantifier': {
+                'matchable': False,
+                'display': [{
+                    'format': 'name'
+                }, {
+                    'format': 'dummy_index',
+                    'content': 0
+                }, {
+                    'format': 'string',
+                    'content': '.'
+                }, {
+                    'format': 'argument_index',
+                    'content': 0
+                }]
+            },
+            'binary_function': {
+                'matchable': False,
+                'display': [{
+                    'format': 'argument_index',
+                    'content': 0
+                }, {
+                    'format': 'name'
+                }, {
+                    'format': 'argument_index',
+                    'content': 1
+                }],
+                'typing': [{
+                    'arguments': [_SINGLE_ELEMENT, _SINGLE_ELEMENT],
+                    'dummies': [],
+                    'output': 'element'
+                }]
+            },
+            'prefix_function': {
+                'matchable': False,
+                'typing': [{
+                    'arguments': [{
+                        'type': 'element',
+                        'arbitrarily_many': True
+                    }],
+                    'dummies': [],
+                    'output': 'element'
+                }, {
+                    'arguments': [{
+                        'type': 'element',
+                        'arbitrarily_many': True
+                    }],
+                    'dummies': [],
+                    'output': 'boolean'
+                }]
+            },
+            'constant': {
+                'matchable': False,
+                'display': [{
+                    'format': 'name'
+                }],
+                'typing': [{
+                    'arguments': [],
+                    'dummies': [],
+                    'output': 'element'
+                }]
+            },
+            'variable': {
+                'matchable': True,
+                'display': [{
+                    'format': 'name'
+                }],
+                'typing': [{
+                    'arguments': [],
+                    'dummies': [],
+                    'output': 'element'
+                }, {
+                    'arguments': [],
+                    'dummies': [],
+                    'output': 'boolean'
+                }]
+            }
+        },
+        'operators': {
+            'and': {
+                'kind': 'binary_connective',
+                'typing': [{
+                    'arguments': [_SINGLE_BOOLEAN, _SINGLE_BOOLEAN],
+                    'dummies': [],
+                    'output': 'boolean'
+                }],
+                'symbols': [u'\u2227']
+            },
+            'or': {
+                'kind': 'binary_connective',
+                'typing': [{
+                    'arguments': [_SINGLE_BOOLEAN, _SINGLE_BOOLEAN],
+                    'dummies': [],
+                    'output': 'boolean'
+                }],
+                'symbols': [u'\u2228']
+            },
+            'implies': {
+                'kind': 'binary_connective',
+                'typing': [{
+                    'arguments': [_SINGLE_BOOLEAN, _SINGLE_BOOLEAN],
+                    'dummies': [],
+                    'output': 'boolean'
+                }],
+                'symbols': ['=>']
+            },
+            'iff': {
+                'kind': 'binary_connective',
+                'typing': [{
+                    'arguments': [_SINGLE_BOOLEAN, _SINGLE_BOOLEAN],
+                    'dummies': [],
+                    'output': 'boolean'
+                }],
+                'symbols': ['<=>']
+            },
+            'not': {
+                'kind': 'unary_connective',
+                'typing': [{
+                    'arguments': [_SINGLE_BOOLEAN],
+                    'dummies': [],
+                    'output': 'boolean'
+                }],
+                'symbols': ['~']
+            },
+            'for_all': {
+                'kind': 'quantifier',
+                'typing': [{
+                    'arguments': [_SINGLE_BOOLEAN],
+                    'dummies': [_SINGLE_ELEMENT],
+                    'output': 'boolean'
+                }],
+                'symbols': [u'\u2200', '.']
+            },
+            'exists': {
+                'kind': 'quantifier',
+                'typing': [{
+                    'arguments': [_SINGLE_BOOLEAN],
+                    'dummies': [_SINGLE_ELEMENT],
+                    'output': 'boolean'
+                }],
+                'symbols': [u'\u2203', '.']
+            },
+            'equals': {
+                'kind': 'binary_relation',
+                'typing': [{
+                    'arguments': [_SINGLE_ELEMENT, _SINGLE_ELEMENT],
+                    'dummies': [],
+                    'output': 'boolean'
+                }],
+                'symbols': ['=']
+            },
+            'not_equals': {
+                'kind': 'binary_relation',
+                'typing': [{
+                    'arguments': [_SINGLE_ELEMENT, _SINGLE_ELEMENT],
+                    'dummies': [],
+                    'output': 'boolean'
+                }],
+                'symbols': ['!=']
+            },
+            'less_than': {
+                'kind': 'binary_relation',
+                'typing': [{
+                    'arguments': [_SINGLE_ELEMENT, _SINGLE_ELEMENT],
+                    'dummies': [],
+                    'output': 'boolean'
+                }],
+                'symbols': ['<']
+            },
+            'greater_than': {
+                'kind': 'binary_relation',
+                'typing': [{
+                    'arguments': [_SINGLE_ELEMENT, _SINGLE_ELEMENT],
+                    'dummies': [],
+                    'output': 'boolean'
+                }],
+                'symbols': ['>']
+            },
+            'less_than_or_equals': {
+                'kind': 'binary_relation',
+                'typing': [{
+                    'arguments': [_SINGLE_ELEMENT, _SINGLE_ELEMENT],
+                    'dummies': [],
+                    'output': 'boolean'
+                }],
+                'symbols': ['<=']
+            },
+            'greater_than_or_equals': {
+                'kind': 'binary_relation',
+                'typing': [{
+                    'arguments': [_SINGLE_ELEMENT, _SINGLE_ELEMENT],
+                    'dummies': [],
+                    'output': 'boolean'
+                }],
+                'symbols': ['>=']
+            },
+            'addition': {
+                'kind': 'binary_function',
+                'typing': [{
+                    'arguments': [_SINGLE_ELEMENT, _SINGLE_ELEMENT],
+                    'dummies': [],
+                    'output': 'element'
+                }],
+                'symbols': ['+']
+            },
+            'subtraction': {
+                'kind': 'binary_function',
+                'typing': [{
+                    'arguments': [_SINGLE_ELEMENT, _SINGLE_ELEMENT],
+                    'dummies': [],
+                    'output': 'element'
+                }],
+                'symbols': ['-']
+            },
+            'multiplication': {
+                'kind': 'binary_function',
+                'typing': [{
+                    'arguments': [_SINGLE_ELEMENT, _SINGLE_ELEMENT],
+                    'dummies': [],
+                    'output': 'element'
+                }],
+                'symbols': ['*']
+            },
+            'division': {
+                'kind': 'binary_function',
+                'typing': [{
+                    'arguments': [_SINGLE_ELEMENT, _SINGLE_ELEMENT],
+                    'dummies': [],
+                    'output': 'element'
+                }],
+                'symbols': ['/']
+            },
+            'exponentiation': {
+                'kind': 'binary_function',
+                'typing': [{
+                    'arguments': [_SINGLE_ELEMENT, _SINGLE_ELEMENT],
+                    'dummies': [],
+                    'output': 'element'
+                }],
+                'symbols': ['^']
+            }
+        }
+    }
