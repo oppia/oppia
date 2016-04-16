@@ -52,6 +52,7 @@ oppia.controller('I18nFooter', [
   $scope.changeLanguage = function(langCode) {
     $translate.use(langCode);
   };
+
   // After loading default translations, change the language for the stored
   // language if necessary.
   $rootScope.$on('$translateLoadingSuccess', function() {
