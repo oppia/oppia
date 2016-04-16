@@ -307,6 +307,11 @@ def send_exploration_membership_email(
     Email will only be sent if recipient wants to receive these emails (i.e.
     'can_receive_editor_role_email' is set True in recipent's preferences).
     """
+    # Return from here if sending email is turned off.
+    if not feconf.CAN_SEND_EMAILS_TO_USERS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
     recipient_user_setting = user_services.get_user_settings(recipient_id)
     sender_user_settings = user_services.get_user_settings(sender_id)
     recipient_preferences = user_services.get_email_preferences(recipient_id)
