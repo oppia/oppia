@@ -573,11 +573,9 @@ textarea {
 */
 .oppia-footer {
   background-color: #094142;
-  bottom: 0;
   color: #FFFFFF;
   font-size: 13px;
   line-height: 20px;
-  position: absolute;
   width: 100%;
 }
 
@@ -585,10 +583,7 @@ textarea {
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 30px;
-  margin-bottom: 30px;
-  padding-left: 80px;
-  padding-right: 80px;
+  padding: 30px 80px;
 }
 
 .oppia-footer-container a {
