@@ -102,7 +102,7 @@ oppia.factory('searchService', [
       if (successCallback) {
         successCallback();
       }
-      return '\?q=' + encodeURI(searchQuery +
+      return encodeURI(searchQuery +
         _getSuffixForQuery(selectedCategories, selectedLanguageCodes));
     },
     isSearchInProgress: function() {

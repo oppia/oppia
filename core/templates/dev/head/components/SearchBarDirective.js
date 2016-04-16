@@ -22,12 +22,12 @@ oppia.directive('searchBar', [function() {
     templateUrl: 'components/searchBar',
     controller: [
       '$scope', '$rootScope', '$timeout', '$window', '$location',
-      'searchService', 'oppiaDebouncer', 'ExplorationCreationButtonService',
-      'urlService', 'CATEGORY_LIST',
+      'searchService', 'oppiaDebouncer', 'oppiaHtmlEscaper',
+      'ExplorationCreationButtonService', 'urlService', 'CATEGORY_LIST',
       function(
           $scope, $rootScope, $timeout, $window, $location, searchService,
-          oppiaDebouncer, ExplorationCreationButtonService, urlService,
-          CATEGORY_LIST) {
+          oppiaDebouncer, oppiaHtmlEscaper, ExplorationCreationButtonService,
+          urlService, CATEGORY_LIST) {
         $scope.isSearchInProgress = searchService.isSearchInProgress;
         $scope.ALL_CATEGORIES = CATEGORY_LIST.map(function(categoryName) {
           return {
@@ -113,7 +113,7 @@ oppia.directive('searchBar', [function() {
         var url;
 
         var _hasChangedSearchQuery = Boolean(urlService.getUrlParams().q);
-        var _onSearchQueryChangeExec = function(changeUrl) {
+        var _onSearchQueryChangeExec = function(reloadPage) {
           $scope.searchIsLoading = true;
           url = searchService.executeSearchQuery(
               $scope.searchQuery, $scope.selectionDetails.categories.selections,
@@ -123,8 +123,14 @@ oppia.directive('searchBar', [function() {
               $rootScope.$broadcast('hasChangedSearchQuery');
             }
           });
-          if ($window.location.search != url && changeUrl) {
-            $window.location.href = '/search' + url;
+          if ($window.location.search != url && reloadPage) {
+            $window.location.href = '/search\?q=' + url;
+          } else {
+            if ($window.location.pathname == '/search') {
+              $location.search({
+                q: decodeURIComponent(url)
+              });
+            }
           }
         };
 
@@ -169,36 +175,37 @@ oppia.directive('searchBar', [function() {
         );
 
         var _parseURL = function() {
-          var urlSearch = $window.location.search;
+          var urlSearch = decodeURI($window.location.search);
           var query = urlSearch.replace('?q=', '');
 
           // Grab language code(s) from URL, these are 2 lowercase letters.
-          var _languageCodeSelections = query.match(/%22\w\w%22/g);
-          var languageCodePattern = /language_code=\([a-zOR\%0-9]+\)/;
-          query = query.replace(languageCodePattern, '');
+          var _languageCodeSelections = query.match(/"\w\w"/g);
+          var _languageCodePattern = /language_code\%3D\([a-zOR\%\" ]+\)/;
+          query = query.replace(_languageCodePattern, '');
 
           for (i = 0; i < _languageCodeSelections.length; i++) {
             var language = _languageCodeSelections[i].match(/[a-z]{2}/);
             $scope.selectionDetails.languageCodes.selections[language] = true;
           }
-          $scope.selectionDetails.languageCodes.numSelections = i;
-          console.log($scope.selectionDetails.languageCodes.selections);
+          _updateSelectionDetails('languageCodes');
 
-          // Grab category code(s) from URL
-          var categoryPattern = /category=\([A-Za-z0-9\%]+\)/;
-          var _categories = query.match(categoryPattern);
+          // Grab category code(s) from URL.
+          var _categoryPattern = /category\%3D\([A-Za-z0-9\" ]+\)/;
+          var _categories = query.match(_categoryPattern);
           if (_categories == undefined) {
             var _categories = [];
           } else {
-            query = query.replace(categoryPattern, '');
-            _categories = _categories[0].match(/%22[A-Za-z]+%22/g);
+            query = query.replace(_categoryPattern, '');
+            _categories = _categories[0].match(/"[A-Za-z]+"/g);
           }
           for (i = 0; i < _categories.length; i++) {
             var category = _categories[i].match(/[A-Za-z]+/);
             $scope.selectionDetails.categories.selections[category] = true;
           }
-          $scope.selectionDetails.categories.numSelections = i;
-          $scope.searchQuery = query.replace(/%20/g, ' ').trim();
+          _updateSelectionDetails('categories');
+
+          // Remove leading and ending spaces from query.
+          $scope.searchQuery = query.trim();
         };
       }
     ]

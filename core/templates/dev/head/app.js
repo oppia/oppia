@@ -34,10 +34,14 @@ var oppia = angular.module(
 // Set default headers for POST and PUT requests.
 // Add an interceptor to convert requests to strings and to log and show
 // warnings for error responses.
-oppia.config(['$interpolateProvider', '$httpProvider',
-    function($interpolateProvider, $httpProvider) {
+oppia.config(['$interpolateProvider', '$httpProvider', '$locationProvider',
+    function($interpolateProvider, $httpProvider, $locationProvider) {
   $interpolateProvider.startSymbol('<[');
   $interpolateProvider.endSymbol(']>');
+
+  $locationProvider.html5Mode({
+    enabled: true
+  });
 
   $httpProvider.defaults.headers.post = {
     'Content-Type': 'application/x-www-form-urlencoded'
