@@ -1218,6 +1218,11 @@ md-card.oppia-gallery-tile {
   border-radius: 20px;
   width: 100%;
 }
+
+.error-wide-container {
+  margin-bottom: 30px;
+}
+
 .oppia-wide-panel-content, .oppia-forum {
   font-size: large;
   margin: 5px auto;
