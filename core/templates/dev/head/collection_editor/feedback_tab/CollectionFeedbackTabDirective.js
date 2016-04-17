@@ -13,7 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the history tab of the collection editor.
+ * @fileoverview Controller for the feedback tab of the collection editor.
  */
 
-oppia.controller('CollectionHistory', [function() {}]);
+oppia.directive('collectionFeedbackTabDirective', [function() {
+  return {
+    restrict: 'E',
+    templateUrl: 'inline/collection_feedback_tab_directive',
+    controller: [function() {}]
+  };
+}]);

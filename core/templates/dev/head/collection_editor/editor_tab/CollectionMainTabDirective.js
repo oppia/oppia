@@ -13,7 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the preview tab of the collection editor.
+ * @fileoverview Controller for the main tab of the collection editor.
  */
 
-oppia.controller('CollectionPreview', [function() {}]);
+oppia.directive('collectionMainTabDirective', [function() {
+  return {
+    restrict: 'E',
+    scope: { getCollection: '&collection' },
+    templateUrl: 'inline/collection_main_tab_directive',
+    controller: [function() {}]
+  };
+}]);
