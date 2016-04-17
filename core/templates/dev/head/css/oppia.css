@@ -3179,6 +3179,14 @@ md-card.preview-conversation-skin-supplemental-card {
   border-right: none;
 }
 
+.about-tab-links .about-active-tab {
+  border-bottom: 2px solid #009688;
+}
+
+.about-active-tab a {
+  text-decoration: none;
+}
+
 .about-page-otter {
   width: 25%;
   float: left;
