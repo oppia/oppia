@@ -65,8 +65,8 @@
   </div>
 
   {% include 'collection_editor/editor_tab/collection_details_editor_directive.html' %}
-  {% include 'collection_editor/navbar/collection_editor_navbar_breadcrumb_directive.html' %}
-  {% include 'collection_editor/navbar/collection_editor_navbar_directive.html' %}
+  {% include 'collection_editor/collection_editor_navbar_breadcrumb_directive.html' %}
+  {% include 'collection_editor/collection_editor_navbar_directive.html' %}
   {% include 'collection_editor/editor_tab/collection_node_editor_directive.html' %}
   {% include 'collection_editor/editor_tab/collection_skill_list_directive.html' %}
 {% endblock content %}
@@ -77,8 +77,8 @@
     {{ include_js_file('collection_editor/CollectionEditor.js') }}
     {{ include_js_file('collection_editor/editor_tab/CollectionNodeEditorDirective.js') }}
     {{ include_js_file('collection_editor/editor_tab/CollectionSkillListDirective.js') }}
-    {{ include_js_file('collection_editor/navbar/CollectionEditorNavbarBreadcrumbDirective.js') }}
-    {{ include_js_file('collection_editor/navbar/CollectionEditorNavbarDirective.js') }}
+    {{ include_js_file('collection_editor/CollectionEditorNavbarBreadcrumbDirective.js') }}
+    {{ include_js_file('collection_editor/CollectionEditorNavbarDirective.js') }}
 
     {{ include_js_file('collection_editor/editor_tab/CollectionDetailsEditorDirective.js') }}
     {{ include_js_file('collection_editor/editor_tab/CollectionMain.js') }}
