@@ -14,6 +14,8 @@
 
 /**
 * @fileoverview Data and controllers for the Oppia moderator page.
+*
+* @author yanamal@google.com (Yana Malysheva)
 */
 
 oppia.controller('Moderator', [

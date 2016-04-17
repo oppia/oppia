@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview End-to-end tests for user management.
+ *
+ * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var general = require('../protractor_utils/general.js');
@@ -22,19 +24,16 @@ var workflow = require('../protractor_utils/workflow.js');
 
 describe('Account creation', function() {
   it('should create users', function() {
-    users.createUser(
-      'ordinaryuser@userManagement.com', 'ordinaryUserManagement');
+    users.createUser('ordinaryuser@example.com', 'ordinaryuser');
   });
 
   it('should create moderators', function() {
-    users.createModerator(
-      'mod@userManagement.com', 'moderatorUserManagement');
+    users.createModerator('mod@example.com', 'moderator');
   });
 
   // Usernames containing "admin" are not permitted.
   it('should create admins', function() {
-    users.createAdmin(
-      'admin@userManagement.com', 'adm1nUserManagement');
+    users.createAdmin('admin@example.com', 'adm1n');
   });
 
   afterEach(function() {

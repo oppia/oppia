@@ -109,9 +109,6 @@ class MyExplorationsPage(base.BaseHandler):
         elif user_services.has_fully_registered(self.user_id):
             self.values.update({
                 'nav_mode': feconf.NAV_MODE_HOME,
-                'can_create_collections': (
-                    self.username in
-                    config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value)
             })
             self.render_template(
                 'dashboard/my_explorations.html', redirect_url_on_logout='/')

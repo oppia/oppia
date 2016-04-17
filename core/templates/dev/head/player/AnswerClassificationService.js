@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Classification service for answer groups.
+ *
+ * @author wxyxinyu@gmail.com (Xinyu Wu)
  */
 
 oppia.factory('answerClassificationService', [
@@ -66,7 +68,7 @@ oppia.factory('answerClassificationService', [
           ruleSpecIndex: 0
         };
       } else {
-        alertsService.addWarning('No default outcome found.');
+        warningsData.addWarning('No default outcome found.');
       }
     };
 

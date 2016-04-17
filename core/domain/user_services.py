@@ -201,23 +201,6 @@ def get_users_settings(user_ids):
     return result
 
 
-def get_profile_pictures_by_user_ids(user_ids):
-    """Gets the profile_picture_data_url from the domain objects
-    representing the settings for the given user_ids.
-
-    If the given user_id does not exist, the corresponding entry in the
-    returned list is None.
-    """
-    user_settings_models = user_models.UserSettingsModel.get_multi(user_ids)
-    result = {}
-    for model in user_settings_models:
-        if model:
-            result[model.id] = model.profile_picture_data_url
-        else:
-            result[model.id] = None
-    return result
-
-
 def get_user_settings(user_id, strict=False):
     """Return the user settings for a single user."""
     user_settings = get_users_settings([user_id])[0]

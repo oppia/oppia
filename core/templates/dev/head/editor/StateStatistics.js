@@ -15,6 +15,8 @@
 /**
  * @fileoverview Controllers for the unresolved answers section of the
  *   state editor.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 oppia.controller('StateStatistics', [

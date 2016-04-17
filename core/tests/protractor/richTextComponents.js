@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview End-to-end tests for rich-text components.
+ *
+ * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var general = require('../protractor_utils/general.js');
@@ -25,8 +27,8 @@ var player = require('../protractor_utils/player.js');
 
 describe('rich-text components', function() {
   it('should display correctly', function() {
-    users.createUser('user@richTextComponents.com', 'userRichTextComponents');
-    users.login('user@richTextComponents.com');
+    users.createUser('user11@example.com', 'user11');
+    users.login('user11@example.com');
 
     workflow.createExploration('RTE components', 'maths');
 

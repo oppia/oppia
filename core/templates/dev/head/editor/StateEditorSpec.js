@@ -15,6 +15,8 @@
 /**
  * @fileoverview Unit tests for the controller of the 'State Editor'. This also
  * includes unit tests for the training data service.
+ *
+ * @author wagnerdmike@gmail.com (Michael Wagner)
  */
 
 describe('State Editor controller', function() {

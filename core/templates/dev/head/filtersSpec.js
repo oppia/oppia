@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Unit tests for custom filters.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 describe('Testing filters', function() {

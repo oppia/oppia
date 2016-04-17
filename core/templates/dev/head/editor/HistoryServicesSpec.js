@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Unit tests for the services of the history page.
+ *
+ * @author wxyxinyu@gmail.com (Xinyu Wu)
  */
 
 describe('Versions tree service', function() {

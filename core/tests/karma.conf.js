@@ -49,7 +49,6 @@ module.exports = function(config) {
       'core/templates/dev/head/components/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/css/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/dashboard/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/domain/editor/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/domain/collection/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/domain/utilities/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/editor/!(*Spec).js': ['coverage'],

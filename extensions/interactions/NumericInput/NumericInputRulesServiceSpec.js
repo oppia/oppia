@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Unit tests for Numeric Input rules.
+ *
+ * @author wxyxinyu@gmail.com (Xinyu Wu)
  */
 
 describe('Numeric Input service', function() {

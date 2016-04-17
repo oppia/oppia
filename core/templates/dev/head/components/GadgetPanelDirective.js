@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Directive for gadget panels.
+ *
+ * @author anuzis@google.com (Michael Anuzis)
  */
 
 oppia.directive('oppiaGadgetPanel', function() {

@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Directive for displaying animated loading dots.
+ *
+ * @author oskar.cieslik@gmail.com (Oskar Cieslik)
  */
 
 oppia.directive('loadingDots', function() {

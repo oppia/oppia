@@ -14,15 +14,17 @@
 
 /**
  * @fileoverview Controller for the exploration editor feedback tab.
+ *
+ * @author kashida@google.com (Koji Ashida)
  */
 
 oppia.controller('FeedbackTab', [
-  '$scope', '$http', '$modal', '$timeout', '$rootScope', 'alertsService',
+  '$scope', '$http', '$modal', '$timeout', '$rootScope', 'warningsData',
   'oppiaDatetimeFormatter', 'threadStatusDisplayService',
   'threadDataService', 'explorationStatesService', 'explorationData',
   'changeListService',
   function(
-    $scope, $http, $modal, $timeout, $rootScope, alertsService,
+    $scope, $http, $modal, $timeout, $rootScope, warningsData,
     oppiaDatetimeFormatter, threadStatusDisplayService,
     threadDataService, explorationStatesService, explorationData,
     changeListService) {
@@ -66,11 +68,11 @@ oppia.controller('FeedbackTab', [
 
           $scope.create = function(newThreadSubject, newThreadText) {
             if (!newThreadSubject) {
-              alertsService.addWarning('Please specify a thread subject.');
+              warningsData.addWarning('Please specify a thread subject.');
               return;
             }
             if (!newThreadText) {
-              alertsService.addWarning('Please specify a message.');
+              warningsData.addWarning('Please specify a message.');
               return;
             }
 
@@ -88,7 +90,6 @@ oppia.controller('FeedbackTab', [
         threadDataService.createNewThread(
           result.newThreadSubject, result.newThreadText, function() {
             $scope.clearActiveThread();
-            alertsService.addSuccessMessage('Feedback thread created.');
           });
       });
     };
@@ -228,11 +229,11 @@ oppia.controller('FeedbackTab', [
 
     $scope.addNewMessage = function(threadId, tmpText, tmpStatus) {
       if (threadId === null) {
-        alertsService.addWarning('Cannot add message to thread with ID: null.');
+        warningsData.addWarning('Cannot add message to thread with ID: null.');
         return;
       }
       if (!tmpStatus) {
-        alertsService.addWarning('Invalid message status: ' + tmpStatus);
+        warningsData.addWarning('Invalid message status: ' + tmpStatus);
         return;
       }
 
@@ -262,7 +263,6 @@ oppia.controller('FeedbackTab', [
 
     // Initial load of the thread list on page load.
     $scope.clearActiveThread();
-    threadDataService.fetchFeedbackStats();
     threadDataService.fetchThreads(function() {
       $timeout(function() {
         $rootScope.loadingMessage = '';

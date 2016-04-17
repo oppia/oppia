@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Controllers for a state's interaction editor.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 // A state-specific cache for interaction details. It stores customization args
@@ -44,13 +46,13 @@ oppia.factory('interactionDetailsCache', [function() {
 }]);
 
 oppia.controller('StateInteraction', [
-  '$scope', '$http', '$rootScope', '$modal', '$filter', 'alertsService',
+  '$scope', '$http', '$rootScope', '$modal', '$filter', 'warningsData',
   'editorContextService', 'changeListService', 'oppiaHtmlEscaper',
   'INTERACTION_SPECS', 'stateInteractionIdService',
   'stateCustomizationArgsService', 'editabilityService',
   'explorationStatesService', 'graphDataService',
   'interactionDetailsCache', 'oppiaExplorationHtmlFormatterService',
-  function($scope, $http, $rootScope, $modal, $filter, alertsService,
+  function($scope, $http, $rootScope, $modal, $filter, warningsData,
       editorContextService, changeListService, oppiaHtmlEscaper,
       INTERACTION_SPECS, stateInteractionIdService,
       stateCustomizationArgsService, editabilityService,
@@ -181,7 +183,7 @@ oppia.controller('StateInteraction', [
 
     $scope.openInteractionCustomizerModal = function() {
       if (editabilityService.isEditable()) {
-        alertsService.clearWarnings();
+        warningsData.clear();
 
         $modal.open({
           templateUrl: 'modals/customizeInteraction',
@@ -285,7 +287,7 @@ oppia.controller('StateInteraction', [
     };
 
     $scope.deleteInteraction = function() {
-      alertsService.clearWarnings();
+      warningsData.clear();
       $modal.open({
         templateUrl: 'modals/deleteInteraction',
         backdrop: true,
@@ -297,7 +299,7 @@ oppia.controller('StateInteraction', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
+              warningsData.clear();
             };
           }
         ]

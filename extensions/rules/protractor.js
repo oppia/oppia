@@ -15,6 +15,8 @@
 /**
  * @fileoverview Utilities for interacting with rules during protractor
  * tests.
+ *
+ * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var DESCRIPTIONS = {

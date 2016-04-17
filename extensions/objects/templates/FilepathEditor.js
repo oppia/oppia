@@ -15,10 +15,10 @@
 // This directive can only be used in the context of an exploration.
 
 oppia.directive('filepathEditor', [
-  '$compile', '$http', '$sce', 'alertsService', 'explorationContextService',
+  '$compile', '$http', '$sce', 'warningsData', 'explorationContextService',
   'OBJECT_EDITOR_URL_PREFIX',
   function(
-      $compile, $http, $sce, alertsService, explorationContextService,
+      $compile, $http, $sce, warningsData, explorationContextService,
       OBJECT_EDITOR_URL_PREFIX) {
     return {
       link: function(scope, element) {
@@ -48,7 +48,7 @@ oppia.directive('filepathEditor', [
 
         $scope.$watch('localValue.label', function(newValue) {
           if (newValue) {
-            alertsService.clearWarnings();
+            warningsData.clear();
             $scope.localValue = {
               label: newValue
             };
@@ -102,20 +102,19 @@ oppia.directive('filepathEditor', [
         };
 
         $scope.saveUploadedFile = function(file, filename) {
-          alertsService.clearWarnings();
+          warningsData.clear();
 
           if (!file || !file.size) {
-            alertsService.addWarning('Empty file detected.');
+            warningsData.addWarning('Empty file detected.');
             return;
           }
           if (!file.type.match('image.*')) {
-            alertsService.addWarning(
-              'This file is not recognized as an image.');
+            warningsData.addWarning('This file is not recognized as an image.');
             return;
           }
 
           if (!filename) {
-            alertsService.addWarning('Filename must not be empty.');
+            warningsData.addWarning('Filename must not be empty.');
             return;
           }
 
@@ -149,7 +148,7 @@ oppia.directive('filepathEditor', [
             // Remove the XSSI prefix.
             var transformedData = data.responseText.substring(5);
             var parsedResponse = JSON.parse(transformedData);
-            alertsService.addWarning(
+            warningsData.addWarning(
               parsedResponse.error || 'Error communicating with server.');
             $scope.$apply();
           });

@@ -15,6 +15,8 @@
 /**
  * @fileoverview Utilities for user creation, login and privileging when
  * carrying out end-to-end testing with protractor.
+ *
+ * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var forms = require('./forms.js');

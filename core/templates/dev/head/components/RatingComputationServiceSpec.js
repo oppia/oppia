@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Tests that average ratings are being computed correctly.
+ *
+ * @author Jacob Davis
  */
 
 describe('Rating computation service', function() {

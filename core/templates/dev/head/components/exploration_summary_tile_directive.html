@@ -5,31 +5,29 @@
         <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
         <h2 class="exploration-title protractor-test-exp-summary-tile-title"><[getExplorationTitle()]></h2>
 
-        <div class="exploration-summary-avatars" ng-show="avatarsList.length > 0">
-          <circular-image ng-if="avatarsList.length > 0"
-                          src="avatarsList[0].image"
-                          link="avatarsList[0].link"
-                          tooltip="<[avatarsList[0].tooltipText | truncate:14]>"
-                          tooltip-placement="right"
-                          tooltip-append-to-body="true">
-          </circular-image>
-          <div class="avatars-num-minus-one" ng-show="avatarsList.length > 1">
-            <span ng-if="!isCommunityOwned()">+</span><[avatarsList.length - 1]>
+        <div class="exploration-summary-contributors" ng-show="contributors.length > 0">
+          <profile-link-image ng-if="contributors.length > 0"
+                              username="contributors[0]"
+                              tooltip="<[contributors[0]]>"
+                              tooltip-placement="right"
+                              tooltip-append-to-body="true">
+          </profile-link-image>
+          <div class="contributors-num-minus-one" ng-show="contributors.length > 1">
+            +<[contributors.length - 1]>
           </div>
 
-          <div class="all-avatars" style="display: none;">
-            <circular-image ng-repeat="avatar in avatarsList | limitTo:MAX_AVATARS_TO_DISPLAY-1:1"
-                            src="avatar.image"
-                            link="avatar.link"
-                            tooltip="<[avatar.tooltipText | truncate:14]>"
-                            tooltip-placement="right"
-                            tooltip-append-to-body="true">
-            </circular-image>
+          <div class="all-contributors" style="display: none;">
+            <profile-link-image ng-repeat="contributor in contributors | limitTo:MAX_CONTRIBUTORS_TO_DISPLAY-1:1"
+                                username="contributor"
+                                tooltip="<[contributor]>"
+                                tooltip-placement="right"
+                                tooltip-append-to-body="true">
+            </profile-link-image>
 
-            <div style="position:relative;" ng-show="avatarsList.length > MAX_AVATARS_TO_DISPLAY">
+            <div style="position:relative;" ng-show="contributors.length > MAX_CONTRIBUTORS_TO_DISPLAY">
               <div class="exploration-black-profile"></div>
-              <div class="num-remaining-avatars" ng-show="avatarsList.length > MAX_AVATARS_TO_DISPLAY">
-                +<[avatarsList.length - MAX_AVATARS_TO_DISPLAY]>
+              <div class="num-remaining-contributors" ng-show="contributors.length > MAX_CONTRIBUTORS_TO_DISPLAY">
+                +<[contributors.length - MAX_CONTRIBUTORS_TO_DISPLAY]>
               </div>
             </div>
           </div>
@@ -39,7 +37,7 @@
 
       <div>
         <div class="objective protractor-test-exp-summary-tile-objective">
-          <[getObjective() | truncateAndCapitalize: 60]>
+          <[getObjective() | truncateAndCapitalize: 45]>
           <span ng-if="!getObjective()">No objective specified.</span>
         </div>
         <ul layout="row" class="metrics" layout-align="space-between center">
@@ -90,14 +88,6 @@
     width: 200px;
   }
 
-  @media only screen and (max-width: 500px) {
-    .oppia-exploration-summary-tile {
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-    }
-  }
-
   .oppia-exploration-summary-tile a,
   .oppia-exploration-summary-tile a:hover,
   .oppia-exploration-summary-tile a:active,
@@ -128,7 +118,7 @@
     transition: all 300ms;
   }
 
-  .oppia-exploration-summary-tile .exploration-summary-avatars {
+  .oppia-exploration-summary-tile .exploration-summary-contributors {
     padding-bottom: 4px;
     padding-right: 5px;
     left: 169px;
@@ -167,23 +157,22 @@
     height: 26px;
   }
 
-  .oppia-exploration-summary-tile .exploration-summary-avatars profile-link-image {
+  .oppia-exploration-summary-tile .exploration-summary-contributors profile-link-image {
     margin-bottom: 3px;
     display:block;
   }
 
-  .oppia-exploration-summary-tile .avatars-num-minus-one {
+  .oppia-exploration-summary-tile .contributors-num-minus-one {
     color: white;
     font-family: Roboto;
     font-size: x-small;
     font-weight: bold;
-    left: 18px;
+    left: 17px;
     position: absolute;
     top: 18px;
-    padding-left: 4px;
   }
 
-  .oppia-exploration-summary-tile .all-avatars .num-remaining-avatars {
+  .oppia-exploration-summary-tile .all-contributors .num-remaining-contributors {
     color: white;
     font-family: Roboto;
     font-size: 0.7em;

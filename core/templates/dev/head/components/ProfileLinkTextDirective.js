@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Directives for creating text links to a user's profile page.
+ *
+ * @author raine@stanford.edu (Raine Hoover)
  */
 
 oppia.directive('profileLinkText', [function() {

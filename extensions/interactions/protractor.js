@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Clearing-house for protractor test utilities for interactions.
+ *
+ * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 /* Each interaction's protractor file must implement the following:

@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Directive for the select supporting html
+ *
+ * @author osika.jakub@gmail.com (Jakub Osika)
  */
 
 // This directive allows user to put html into select's options.

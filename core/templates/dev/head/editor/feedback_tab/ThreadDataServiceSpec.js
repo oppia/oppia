@@ -15,6 +15,8 @@
 /**
  * @fileoverview Unit tests for threadDataService, which retrieves thread
  * data for the feedback tab of the exploration editor.
+ *
+ * @author allan.zhou@berkeley.edu (Allan Zhou)
  */
 
 describe('retrieving threads service', function() {

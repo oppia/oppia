@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Service that handles routing for the exploration editor page.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 oppia.factory('routerService', [

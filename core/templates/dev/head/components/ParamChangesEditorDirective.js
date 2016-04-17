@@ -27,10 +27,10 @@ oppia.directive('paramChangesEditor', [function() {
     templateUrl: 'editor/paramChanges',
     controller: [
       '$scope', '$rootScope', 'editabilityService',
-      'explorationParamSpecsService', 'alertsService',
+      'explorationParamSpecsService', 'warningsData',
       function(
           $scope, $rootScope, editabilityService,
-          explorationParamSpecsService, alertsService) {
+          explorationParamSpecsService, warningsData) {
         $scope.editabilityService = editabilityService;
         $scope.isParamChangesEditorOpen = false;
         $scope.warningText = '';
@@ -183,7 +183,7 @@ oppia.directive('paramChangesEditor', [function() {
         $scope.saveParamChanges = function() {
           // Validate displayed value.
           if (!$scope.areDisplayedParamChangesValid()) {
-            alertsService.addWarning('Invalid parameter changes.');
+            warningsData.addWarning('Invalid parameter changes.');
             return;
           }
 
@@ -208,7 +208,7 @@ oppia.directive('paramChangesEditor', [function() {
         $scope.deleteParamChange = function(index) {
           if (index < 0 ||
               index >= $scope.paramChangesService.displayed.length) {
-            alertsService.addWarning(
+            warningsData.addWarning(
               'Cannot delete parameter change at position ' + index +
               ': index out of range');
           }

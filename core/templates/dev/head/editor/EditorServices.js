@@ -14,12 +14,14 @@
 
 /**
  * @fileoverview Standalone services for the exploration editor page.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 // Service for handling all interactions with the exploration editor backend.
 oppia.factory('explorationData', [
-  '$http', '$log', 'alertsService', '$q',
-  function($http, $log, alertsService, $q) {
+  '$http', '$log', 'warningsData', '$q',
+  function($http, $log, warningsData, $q) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
     var pathnameArray = window.location.pathname.split('/');
@@ -65,7 +67,7 @@ oppia.factory('explorationData', [
         }
       },
       resolveAnswers: function(stateName, resolvedAnswersList) {
-        alertsService.clearWarnings();
+        warningsData.clear();
         $http.put(
             resolvedAnswersUrlPrefix + '/' + encodeURIComponent(stateName), {
           resolved_answers: resolvedAnswersList
@@ -88,7 +90,7 @@ oppia.factory('explorationData', [
           commit_message: commitMessage,
           version: explorationData.data.version
         }).success(function(data) {
-          alertsService.clearWarnings();
+          warningsData.clear();
           $log.info('Changes to this exploration were saved successfully.');
           explorationData.data = data;
           if (successCallback) {
@@ -156,7 +158,7 @@ oppia.factory('editabilityService', [function() {
 // A service that maintains a provisional list of changes to be committed to
 // the server.
 oppia.factory('changeListService', [
-    '$rootScope', 'alertsService', function($rootScope, alertsService) {
+    '$rootScope', 'warningsData', function($rootScope, warningsData) {
   // TODO(sll): Implement undo, redo functionality. Show a message on each step
   // saying what the step is doing.
   // TODO(sll): Allow the user to view the list of changes made so far, as well
@@ -285,8 +287,7 @@ oppia.factory('changeListService', [
      */
     editExplorationProperty: function(backendName, newValue, oldValue) {
       if (!ALLOWED_EXPLORATION_BACKEND_NAMES.hasOwnProperty(backendName)) {
-        alertsService.addWarning(
-          'Invalid exploration property: ' + backendName);
+        warningsData.addWarning('Invalid exploration property: ' + backendName);
         return;
       }
       addChange({
@@ -309,7 +310,7 @@ oppia.factory('changeListService', [
      */
     editGadgetProperty: function(gadgetName, backendName, newValue, oldValue) {
       if (!ALLOWED_GADGET_BACKEND_NAMES.hasOwnProperty(backendName)) {
-        alertsService.addWarning('Invalid gadget property: ' + backendName);
+        warningsData.addWarning('Invalid gadget property: ' + backendName);
         return;
       }
       addChange({
@@ -332,7 +333,7 @@ oppia.factory('changeListService', [
      */
     editStateProperty: function(stateName, backendName, newValue, oldValue) {
       if (!ALLOWED_STATE_BACKEND_NAMES.hasOwnProperty(backendName)) {
-        alertsService.addWarning('Invalid state property: ' + backendName);
+        warningsData.addWarning('Invalid state property: ' + backendName);
         return;
       }
       addChange({
@@ -384,7 +385,7 @@ oppia.factory('changeListService', [
     },
     undoLastChange: function() {
       if (explorationChangeList.length === 0) {
-        alertsService.addWarning('There are no changes to undo.');
+        warningsData.addWarning('There are no changes to undo.');
         return;
       }
       var lastChange = explorationChangeList.pop();
@@ -395,8 +396,8 @@ oppia.factory('changeListService', [
 
 // A data service that stores data about the rights for this exploration.
 oppia.factory('explorationRightsService', [
-    '$http', 'explorationData', 'alertsService',
-    function($http, explorationData, alertsService) {
+    '$http', 'explorationData', 'warningsData',
+    function($http, explorationData, warningsData) {
   return {
     init: function(
         ownerNames, editorNames, viewerNames, status, clonedFrom,
@@ -439,7 +440,7 @@ oppia.factory('explorationRightsService', [
       var explorationRightsUrl = (
         '/createhandler/rights/' + explorationData.explorationId);
       $http.put(explorationRightsUrl, requestParams).success(function(data) {
-        alertsService.clearWarnings();
+        warningsData.clear();
         that.init(
           data.rights.owner_names, data.rights.editor_names,
           data.rights.viewer_names, data.rights.status,
@@ -457,7 +458,7 @@ oppia.factory('explorationRightsService', [
         email_body: emailBody,
         version: explorationData.data.version
       }).success(function(data) {
-        alertsService.clearWarnings();
+        warningsData.clear();
         that.init(
           data.rights.owner_names, data.rights.editor_names,
           data.rights.viewer_names, data.rights.status,
@@ -469,8 +470,8 @@ oppia.factory('explorationRightsService', [
 }]);
 
 oppia.factory('explorationPropertyService', [
-    '$rootScope', '$log', 'changeListService', 'alertsService',
-    function($rootScope, $log, changeListService, alertsService) {
+    '$rootScope', '$log', 'changeListService', 'warningsData',
+    function($rootScope, $log, changeListService, warningsData) {
   // Public base API for data services corresponding to exploration properties
   // (title, category, etc.)
   return {
@@ -526,7 +527,7 @@ oppia.factory('explorationPropertyService', [
         return;
       }
 
-      alertsService.clearWarnings();
+      warningsData.clear();
       changeListService.editExplorationProperty(
         this.propertyName, this.displayed, this.savedMemento);
       this.savedMemento = angular.copy(this.displayed);
@@ -662,12 +663,12 @@ oppia.factory('explorationParamChangesService', [
 // mementos.
 oppia.factory('explorationStatesService', [
   '$log', '$modal', '$filter', '$location', '$rootScope',
-  'explorationInitStateNameService', 'alertsService', 'changeListService',
+  'explorationInitStateNameService', 'warningsData', 'changeListService',
   'editorContextService', 'validatorsService', 'newStateTemplateService',
   'explorationGadgetsService',
   function(
       $log, $modal, $filter, $location, $rootScope,
-      explorationInitStateNameService, alertsService, changeListService,
+      explorationInitStateNameService, warningsData, changeListService,
       editorContextService, validatorsService, newStateTemplateService,
       explorationGadgetsService) {
     var _states = null;
@@ -691,7 +692,7 @@ oppia.factory('explorationStatesService', [
       isNewStateNameValid: function(newStateName, showWarnings) {
         if (_states.hasOwnProperty(newStateName)) {
           if (showWarnings) {
-            alertsService.addWarning('A state with this name already exists.');
+            warningsData.addWarning('A state with this name already exists.');
           }
           return false;
         }
@@ -704,10 +705,10 @@ oppia.factory('explorationStatesService', [
           return;
         }
         if (_states.hasOwnProperty(newStateName)) {
-          alertsService.addWarning('A state with this name already exists.');
+          warningsData.addWarning('A state with this name already exists.');
           return;
         }
-        alertsService.clearWarnings();
+        warningsData.clear();
 
         _states[newStateName] = newStateTemplateService.getNewStateTemplate(
           newStateName);
@@ -718,14 +719,14 @@ oppia.factory('explorationStatesService', [
         }
       },
       deleteState: function(deleteStateName) {
-        alertsService.clearWarnings();
+        warningsData.clear();
 
         var initStateName = explorationInitStateNameService.displayed;
         if (deleteStateName === initStateName) {
           return;
         }
         if (!_states[deleteStateName]) {
-          alertsService.addWarning(
+          warningsData.addWarning(
             'No state with name ' + deleteStateName + ' exists.');
           return;
         }
@@ -775,7 +776,7 @@ oppia.factory('explorationStatesService', [
 
               $scope.cancel = function() {
                 $modalInstance.dismiss('cancel');
-                alertsService.clearWarnings();
+                warningsData.clear();
               };
             }
           ]
@@ -824,10 +825,10 @@ oppia.factory('explorationStatesService', [
           return;
         }
         if (!!_states[newStateName]) {
-          alertsService.addWarning('A state with this name already exists.');
+          warningsData.addWarning('A state with this name already exists.');
           return;
         }
-        alertsService.clearWarnings();
+        warningsData.clear();
 
         _states[newStateName] = angular.copy(_states[oldStateName]);
         delete _states[oldStateName];
@@ -878,8 +879,8 @@ oppia.factory('explorationStatesService', [
 ]);
 
 oppia.factory('statePropertyService', [
-  '$log', 'changeListService', 'alertsService',
-  function($log, changeListService, alertsService) {
+  '$log', 'changeListService', 'warningsData',
+  function($log, changeListService, warningsData) {
     // Public base API for data services corresponding to state properties
     // (interaction id, content, etc.) Note that this does not update
     // explorationStatesService; it is maintained only locally.
@@ -949,7 +950,7 @@ oppia.factory('statePropertyService', [
           return;
         }
 
-        alertsService.clearWarnings();
+        warningsData.clear();
         changeListService.editStateProperty(
           this.stateName, this.propertyName, this.displayed, this.savedMemento);
 
@@ -1006,10 +1007,10 @@ oppia.factory('stateFallbacksService', [
 // Data service for keeping track of gadget data and location across panels.
 oppia.factory('explorationGadgetsService', [
   '$log', '$modal', '$filter', '$location', '$rootScope',
-  'changeListService', 'editorContextService', 'alertsService',
+  'changeListService', 'editorContextService', 'warningsData',
   'gadgetValidationService', 'GADGET_SPECS',
   function($log, $modal, $filter, $location, $rootScope,
-           changeListService, editorContextService, alertsService,
+           changeListService, editorContextService, warningsData,
            gadgetValidationService, GADGET_SPECS) {
     // _gadgets is a JS object with gadget_instance.name strings as keys
     // and each gadget_instance's data as values.
@@ -1076,7 +1077,7 @@ oppia.factory('explorationGadgetsService', [
 
     var _isNewGadgetNameValid = function(newGadgetName) {
       if (_gadgets.hasOwnProperty(newGadgetName)) {
-        alertsService.addWarning('A gadget with this name already exists.');
+        warningsData.addWarning('A gadget with this name already exists.');
         return false;
       }
       return (
@@ -1110,7 +1111,7 @@ oppia.factory('explorationGadgetsService', [
       init: function(skinCustomizationsData) {
         // Data structure initialization.
         if (!skinCustomizationsData.hasOwnProperty('panels_contents')) {
-          alertsService.addWarning(
+          warningsData.addWarning(
             'Gadget Initialization failed. Panel contents were not provided');
           return;
         }
@@ -1121,7 +1122,7 @@ oppia.factory('explorationGadgetsService', [
           isValid = gadgetValidationService.validatePanel(
             panel, visibilityMap);
           // The validatePanel(...) method should have added the warning to
-          // alertsService.
+          // warningsData.
           if (!isValid) {
             return;
           }
@@ -1234,7 +1235,7 @@ oppia.factory('explorationGadgetsService', [
       updateGadget: function(
           gadgetName, newCustomizationArgs, newVisibleInStates) {
         if (!_gadgets.hasOwnProperty(gadgetName)) {
-          alertsService.addWarning(
+          warningsData.addWarning(
             'Attempted to update a non-existent gadget: ' + gadgetName);
           return;
         }
@@ -1279,13 +1280,13 @@ oppia.factory('explorationGadgetsService', [
         // Defense-in-depth: This warning should never happen with panel names
         // hard coded and validated on the backend.
         if (!_panels.hasOwnProperty(gadgetData.panel)) {
-          alertsService.addWarning(
+          warningsData.addWarning(
             'Attempted add to a non-existent panel: ' + gadgetData.panel);
           return;
         }
 
         if (_gadgets.hasOwnProperty(gadgetData.gadget_name)) {
-          alertsService.addWarning('A gadget with this name already exists.');
+          warningsData.addWarning('A gadget with this name already exists.');
           return;
         }
 
@@ -1302,11 +1303,11 @@ oppia.factory('explorationGadgetsService', [
        *   dialog, pass false, true otherwise.
        */
       deleteGadget: function(deleteGadgetName, showConfirmationDialog) {
-        alertsService.clearWarnings();
+        warningsData.clear();
 
         if (showConfirmationDialog === null ||
             showConfirmationDialog === undefined) {
-          alertsService.addWarning(
+          warningsData.addWarning(
             'Missing param: No info was passed to show or hide the dialog.');
           return;
         }
@@ -1314,7 +1315,7 @@ oppia.factory('explorationGadgetsService', [
         if (!_gadgets.hasOwnProperty(deleteGadgetName)) {
           // This warning can't be triggered in current UI.
           // Keeping as defense-in-depth for future UI changes.
-          alertsService.addWarning(
+          warningsData.addWarning(
             'No gadget with name ' + deleteGadgetName + ' exists.'
           );
           return;
@@ -1357,7 +1358,7 @@ oppia.factory('explorationGadgetsService', [
 
               $scope.cancel = function() {
                 $modalInstance.dismiss('cancel');
-                alertsService.clearWarnings();
+                warningsData.clear();
               };
             }
           ]
@@ -1371,10 +1372,10 @@ oppia.factory('explorationGadgetsService', [
           return;
         }
         if (_gadgets.hasOwnProperty(newGadgetName)) {
-          alertsService.addWarning('A gadget with this name already exists.');
+          warningsData.addWarning('A gadget with this name already exists.');
           return;
         }
-        alertsService.clearWarnings();
+        warningsData.clear();
 
         // Update _gadgets
         gadgetData = angular.copy(_gadgets[oldGadgetName]);

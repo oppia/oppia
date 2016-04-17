@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Controllers for the graphical state editor.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 oppia.controller('StateEditor', [
@@ -124,11 +126,11 @@ oppia.controller('StateEditor', [
 
 // A service which handles opening and closing the training modal used for both
 // unresolved answers and answers within the training data of a fuzzy rule.
-oppia.factory('trainingModalService', ['$rootScope', '$modal', 'alertsService',
-    function($rootScope, $modal, alertsService) {
+oppia.factory('trainingModalService', ['$rootScope', '$modal', 'warningsData',
+    function($rootScope, $modal, warningsData) {
   return {
     openTrainUnresolvedAnswerModal: function(unhandledAnswer, externalSave) {
-      alertsService.clearWarnings();
+      warningsData.clear();
       if (externalSave) {
         $rootScope.$broadcast('externalSave');
       }

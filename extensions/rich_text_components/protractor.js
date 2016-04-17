@@ -15,6 +15,8 @@
 /**
  * @fileoverview Clearing-house for rich-text-component utilities for
  * protractor tests.
+ *
+ * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var RICH_TEXT_COMPONENTS = {

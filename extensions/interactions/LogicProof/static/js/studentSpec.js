@@ -14,6 +14,7 @@
 
 /**
  * @fileoverview Unit tests for LogicProof interaction student components.
+ * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var errorWrapper = function(

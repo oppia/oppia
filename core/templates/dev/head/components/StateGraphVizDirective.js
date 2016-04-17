@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Directive for the state graph visualization.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 oppia.directive('stateGraphViz', [function() {

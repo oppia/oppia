@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview End-to-end tests of user editing and viewing rights.
+ *
+ * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var forms = require('../protractor_utils/forms.js');
@@ -24,33 +26,30 @@ var workflow = require('../protractor_utils/workflow.js');
 
 describe('Permissions for private explorations', function() {
   it('should be correct for collaborators', function() {
-    users.createUser('alice@privileges.com', 'alicePrivileges');
-    users.createUser('bob@privileges.com', 'bobPrivileges');
-    users.createUser('eve@privileges.com', 'evePrivileges');
+    users.createUser('alice@example.com', 'Alice');
+    users.createUser('bob@example.com', 'Bob');
+    users.createUser('eve@example.com', 'Eve');
 
-    users.login('alice@privileges.com');
+    users.login('alice@example.com');
     workflow.createExploration('message', 'secrets');
-    workflow.addExplorationCollaborator('bobPrivileges');
-    expect(workflow.getExplorationManagers())
-    .toEqual(['alicePrivileges']);
-    expect(workflow.getExplorationCollaborators())
-    .toEqual(['bobPrivileges']);
+    workflow.addExplorationCollaborator('Bob');
+    expect(workflow.getExplorationManagers()).toEqual(['Alice']);
+    expect(workflow.getExplorationCollaborators()).toEqual(['Bob']);
     expect(workflow.getExplorationPlaytesters()).toEqual([]);
     general.getExplorationIdFromEditor().then(function(explorationId) {
       users.logout();
 
-      users.login('bob@privileges.com');
+      users.login('bob@example.com');
       general.openEditor(explorationId);
       editor.setContent(forms.toRichText('I love you'));
       editor.setInteraction('TextInput');
       editor.saveChanges();
       users.logout();
 
-      users.login('eve@privileges.com');
+      users.login('eve@example.com');
       general.openEditor(explorationId);
       // Eve is redirected to the homepage.
-      expect(browser.getCurrentUrl()).toEqual(
-        general.SERVER_URL_PREFIX + '/my_explorations');
+      expect(browser.getCurrentUrl()).toEqual(general.SERVER_URL_PREFIX + '/');
       users.logout();
     });
   });

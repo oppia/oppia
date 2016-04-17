@@ -14,11 +14,13 @@
 
 /**
  * @fileoverview Unit tests for the editor prerequisites page.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 describe('Signup controller', function() {
   describe('SignupCtrl', function() {
-    var scope, ctrl, $httpBackend, rootScope, mockAlertsService, urlParams;
+    var scope, ctrl, $httpBackend, rootScope, mockWarningsData, urlParams;
 
     beforeEach(function() {
       module('oppia');
@@ -32,10 +34,10 @@ describe('Signup controller', function() {
       });
       rootScope = $rootScope;
 
-      mockAlertsService = {
+      mockWarningsData = {
         addWarning: function() {}
       };
-      spyOn(mockAlertsService, 'addWarning');
+      spyOn(mockWarningsData, 'addWarning');
 
       scope = {
         getUrlParams: function() {
@@ -49,13 +51,13 @@ describe('Signup controller', function() {
         $scope: scope,
         $http: $http,
         $rootScope: rootScope,
-        alertsService: mockAlertsService
+        warningsData: mockWarningsData
       });
     }));
 
     it('should show warning if user has not agreed to terms', function() {
       scope.submitPrerequisitesForm(false, null);
-      expect(mockAlertsService.addWarning).toHaveBeenCalledWith(
+      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
         'In order to edit explorations on this site, you will need to agree ' +
         'to the site terms.');
     });
@@ -74,7 +76,7 @@ describe('Signup controller', function() {
 
     it('should show warning if terms are not agreed to', function() {
       scope.submitPrerequisitesForm(false, '');
-      expect(mockAlertsService.addWarning).toHaveBeenCalledWith(
+      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
         'In order to edit explorations on this site, you will need to ' +
         'agree to the site terms.');
     });

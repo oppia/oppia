@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Unit tests for the controller of the 'State Editor'.
+ *
+ * @author wagnerdmike@gmail.com (Michael Wagner)
  */
 
 describe('Sidebar state name controller', function() {

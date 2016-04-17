@@ -37,15 +37,10 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
           var pce = new PencilCodeEmbed($element[0].children[0]);
           pce.beginLoad($scope.initialCode);
           pce.on('load', function() {
-            // Hides the error console at the bottom right, and prevents it
-            // from showing up even if the code has an error. Also, hides the
-            // turtle, and redefines say() to also write the text on the
+            // Hide the turtle, and redefine say() to also write the text on the
             // screen.
             pce.setupScript([{
               code: [
-                'debug.hide();',
-                'window.removeEventListener("error", debug)',
-                '',
                 'ht();',
                 '',
                 'oldsay = window.say',

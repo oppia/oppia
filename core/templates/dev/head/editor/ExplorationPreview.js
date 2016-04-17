@@ -15,6 +15,8 @@
 /**
  * @fileoverview Controllers and services for the exploration preview in the
  * editor page.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 oppia.controller('ExplorationPreview', [

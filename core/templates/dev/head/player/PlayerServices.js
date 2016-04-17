@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Utility service for the learner's view of an exploration.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 oppia.constant('GADGET_SPECS', GLOBALS.GADGET_SPECS);
@@ -31,13 +33,13 @@ oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 // mode. Add tests to ensure this.
 oppia.factory('oppiaPlayerService', [
   '$http', '$rootScope', '$q', 'LearnerParamsService',
-  'alertsService', 'answerClassificationService', 'explorationContextService',
+  'warningsData', 'answerClassificationService', 'explorationContextService',
   'PAGE_CONTEXT', 'oppiaExplorationHtmlFormatterService',
   'playerTranscriptService', 'ExplorationObjectFactory',
   'expressionInterpolationService', 'StatsReportingService',
   function(
       $http, $rootScope, $q, LearnerParamsService,
-      alertsService, answerClassificationService, explorationContextService,
+      warningsData, answerClassificationService, explorationContextService,
       PAGE_CONTEXT, oppiaExplorationHtmlFormatterService,
       playerTranscriptService, ExplorationObjectFactory,
       expressionInterpolationService, StatsReportingService) {
@@ -112,13 +114,13 @@ oppia.factory('oppiaPlayerService', [
         exploration.paramChanges.concat(initialState.paramChanges),
         [baseParams]);
       if (startingParams === null) {
-        alertsService.addWarning('Expression parsing error.');
+        warningsData.addWarning('Expression parsing error.');
         return;
       }
 
       var questionHtml = makeQuestion(initialState, [startingParams]);
       if (questionHtml === null) {
-        alertsService.addWarning('Expression parsing error.');
+        warningsData.addWarning('Expression parsing error.');
         return;
       }
 
@@ -163,7 +165,7 @@ oppia.factory('oppiaPlayerService', [
           if (exploration) {
             _loadInitialState(successCallback);
           } else {
-            alertsService.addWarning(
+            warningsData.addWarning(
               'Could not initialize exploration, because it was not yet ' +
               'populated.');
           }
@@ -272,7 +274,7 @@ oppia.factory('oppiaPlayerService', [
           var feedbackHtml = makeFeedback(outcome.feedback, [oldParams]);
           if (feedbackHtml === null) {
             answerIsBeingProcessed = false;
-            alertsService.addWarning('Expression parsing error.');
+            warningsData.addWarning('Expression parsing error.');
             return;
           }
 
@@ -281,7 +283,7 @@ oppia.factory('oppiaPlayerService', [
               oldParams, newState.paramChanges, [oldParams]) : oldParams);
           if (newParams === null) {
             answerIsBeingProcessed = false;
-            alertsService.addWarning('Expression parsing error.');
+            warningsData.addWarning('Expression parsing error.');
             return;
           }
 
@@ -290,7 +292,7 @@ oppia.factory('oppiaPlayerService', [
           }]);
           if (questionHtml === null) {
             answerIsBeingProcessed = false;
-            alertsService.addWarning('Expression parsing error.');
+            warningsData.addWarning('Expression parsing error.');
             return;
           }
 

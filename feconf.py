@@ -159,8 +159,6 @@ DEFAULT_EMAIL_UPDATES_PREFERENCE = False
 REQUIRE_EMAIL_ON_MODERATOR_ACTION = False
 # Whether to allow custom event reporting to Google Analytics.
 CAN_SEND_ANALYTICS_EVENTS = False
-# Timespan in minutes before allowing duplicate emails
-DUPLICATE_EMAIL_INTERVAL_MINS = 2
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
@@ -338,10 +336,7 @@ DEMO_COLLECTIONS = {
 }
 
 # TODO(sll): Add all other URLs here.
-COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
-COLLECTION_WRITABLE_DATA_URL_PREFIX = '/collection_editor_handler/data'
-COLLECTION_RIGHTS_PREFIX = '/collection_editor_handler/rights'
-COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
+COLLECTION_DATA_URL_PREFIX = '/collectionhandler/data'
 COLLECTION_URL_PREFIX = '/collection'
 CONTRIBUTE_GALLERY_URL = '/contribute'
 EDITOR_URL_PREFIX = '/create'
@@ -352,14 +347,11 @@ EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
 FEEDBACK_LAST_UPDATED_URL_PREFIX = '/feedback_last_updated'
 FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
-FEEDBACK_STATS_URL_PREFIX = '/feedbackstatshandler'
 GALLERY_URL = '/gallery'
+GALLERY_CREATE_MODE_URL = '%s?mode=create' % GALLERY_URL
 GALLERY_DATA_URL = '/galleryhandler/data'
 LEARN_GALLERY_URL = '/learn'
-MY_EXPLORATIONS_URL = '/my_explorations'
-MY_EXPLORATIONS_CREATE_MODE_URL = '%s?mode=create' % MY_EXPLORATIONS_URL
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
-NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 PLAYTEST_QUEUE_URL = '/playtest'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
@@ -407,11 +399,6 @@ COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 ENABLE_STRING_CLASSIFIER = False
-SHOW_COLLECTION_NAVIGATION_TAB_PREVIEW = False
-SHOW_COLLECTION_NAVIGATION_TAB_SETTINGS = False
-SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
-SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK = False
-SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
 
 # Output formats of downloaded explorations.
 OUTPUT_FORMAT_JSON = 'json'

@@ -15,6 +15,8 @@
 /**
  * @fileoverview Utilities for using the HTML5 Video component during
  * end-to-end testing with Protractor.js
+ *
+ * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var objects = require('../../objects/protractor.js');

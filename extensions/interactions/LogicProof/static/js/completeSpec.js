@@ -14,6 +14,7 @@
 
 /**
  * @fileoverview Complete tests for LogicProof interaction JS.
+ * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var errorWrapper = function(

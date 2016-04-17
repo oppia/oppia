@@ -15,6 +15,8 @@
 /**
  * @fileoverview Utilities for using the Tabs component during
  * end-to-end testing with Protractor.js
+ *
+ * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var forms = require('../../../core/tests/protractor_utils/forms.js');

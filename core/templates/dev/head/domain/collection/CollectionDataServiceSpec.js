@@ -13,22 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for CollectionBackendApiService.
+ * @fileoverview Unit tests for CollectionDataService.
+ *
+ * @author henning.benmax@gmail.com (Ben Henning)
  */
 
-describe('Collection backend API service', function() {
-  var CollectionBackendApiService = null;
+describe('Collection Data Service', function() {
+  var cds = null;
   var sampleDataResults = null;
-  var $rootScope = null;
   var $scope = null;
   var $httpBackend = null;
 
   beforeEach(module('oppia'));
 
   beforeEach(inject(function($injector) {
-    CollectionBackendApiService = $injector.get('CollectionBackendApiService');
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
+    cds = $injector.get('CollectionDataService');
+    $scope = $injector.get('$rootScope').$new();
     $httpBackend = $injector.get('$httpBackend');
 
     // Sample collection object returnable from the backend
@@ -60,10 +60,9 @@ describe('Collection backend API service', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.expect('GET', '/collection_handler/data/0').respond(
+    $httpBackend.expect('GET', '/collectionhandler/data/0').respond(
       sampleDataResults);
-    CollectionBackendApiService.fetchCollection('0').then(
-      successHandler, failHandler);
+    cds.fetchCollection('0').then(successHandler, failHandler);
     $httpBackend.flush();
 
     expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
@@ -76,18 +75,16 @@ describe('Collection backend API service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     // Loading a collection the first time should fetch it from the backend.
-    $httpBackend.expect('GET', '/collection_handler/data/0').respond(
+    $httpBackend.expect('GET', '/collectionhandler/data/0').respond(
       sampleDataResults);
-    CollectionBackendApiService.loadCollection('0').then(
-      successHandler, failHandler);
+    cds.loadCollection('0').then(successHandler, failHandler);
     $httpBackend.flush();
 
     expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
     expect(failHandler).not.toHaveBeenCalled();
 
     // Loading a collection the second time should not fetch it.
-    CollectionBackendApiService.loadCollection('0').then(
-      successHandler, failHandler);
+    cds.loadCollection('0').then(successHandler, failHandler);
 
     expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
     expect(failHandler).not.toHaveBeenCalled();
@@ -99,10 +96,9 @@ describe('Collection backend API service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     // Loading a collection the first time should fetch it from the backend.
-    $httpBackend.expect('GET', '/collection_handler/data/0').respond(
+    $httpBackend.expect('GET', '/collectionhandler/data/0').respond(
       500, 'Error loading collection 0.');
-    CollectionBackendApiService.loadCollection('0').then(
-      successHandler, failHandler);
+    cds.loadCollection('0').then(successHandler, failHandler);
     $httpBackend.flush();
 
     expect(successHandler).not.toHaveBeenCalled();
@@ -114,70 +110,35 @@ describe('Collection backend API service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     // The collection should not currently be cached.
-    expect(CollectionBackendApiService.isCached('0')).toBeFalsy();
+    expect(cds.isCached('0')).toBeFalsy();
 
     // Loading a collection the first time should fetch it from the backend.
-    $httpBackend.expect('GET', '/collection_handler/data/0').respond(
+    $httpBackend.expect('GET', '/collectionhandler/data/0').respond(
       sampleDataResults);
-    CollectionBackendApiService.loadCollection('0').then(
-      successHandler, failHandler);
+    cds.loadCollection('0').then(successHandler, failHandler);
     $httpBackend.flush();
 
     expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
     expect(failHandler).not.toHaveBeenCalled();
 
     // The collection should now be cached.
-    expect(CollectionBackendApiService.isCached('0')).toBeTruthy();
+    expect(cds.isCached('0')).toBeTruthy();
 
     // The collection should be loadable from the cache.
-    CollectionBackendApiService.loadCollection('0').then(
-      successHandler, failHandler);
+    cds.loadCollection('0').then(successHandler, failHandler);
     expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
     expect(failHandler).not.toHaveBeenCalled();
 
     // Resetting the cache will cause another fetch from the backend.
-    CollectionBackendApiService.clearCollectionCache();
-    expect(CollectionBackendApiService.isCached('0')).toBeFalsy();
+    cds.clearCollectionCache();
+    expect(cds.isCached('0')).toBeFalsy();
 
-    $httpBackend.expect('GET', '/collection_handler/data/0').respond(
+    $httpBackend.expect('GET', '/collectionhandler/data/0').respond(
       sampleDataResults);
-    CollectionBackendApiService.loadCollection('0').then(
-      successHandler, failHandler);
+    cds.loadCollection('0').then(successHandler, failHandler);
     $httpBackend.flush();
 
     expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
-    expect(failHandler).not.toHaveBeenCalled();
-  });
-
-  it('should report a cached collection after caching it', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-
-    // The collection should not currently be cached.
-    expect(CollectionBackendApiService.isCached('0')).toBeFalsy();
-
-    // Cache a collection.
-    CollectionBackendApiService.cacheCollection('0', {
-      id: '0',
-      nodes: []
-    });
-
-    // It should now be cached.
-    expect(CollectionBackendApiService.isCached('0')).toBeTruthy();
-
-    // A new collection should not have been fetched from the backend. Also,
-    // the returned collection should match the expected collection object.
-    CollectionBackendApiService.loadCollection('0').then(
-      successHandler, failHandler);
-
-    // http://brianmcd.com/2014/03/27/
-    // a-tip-for-angular-unit-tests-with-promises.html
-    $rootScope.$digest();
-
-    expect(successHandler).toHaveBeenCalledWith({
-      id: '0',
-      nodes: []
-    });
     expect(failHandler).not.toHaveBeenCalled();
   });
 });

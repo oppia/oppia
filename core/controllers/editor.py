@@ -92,7 +92,7 @@ def _require_valid_version(version_from_payload, exploration_version):
 
 
 def require_editor(handler):
-    """Decorator that checks if the user can edit the given exploration."""
+    """Decorator that checks if the user can edit the given entity."""
     def test_editor(self, exploration_id, escaped_state_name=None, **kwargs):
         """Gets the user and exploration id if the user can edit it.
 
@@ -204,7 +204,6 @@ class ExplorationPage(EditorHandler):
             'GADGET_SPECS': gadget_registry.Registry.get_all_specs(),
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'PANEL_SPECS': feconf.PANELS_PROPERTIES,
-            'DEFAULT_OBJECT_VALUES': rule_domain.get_default_object_values(),
             'additional_angular_modules': additional_angular_modules,
             'can_delete': rights_manager.Actor(
                 self.user_id).can_delete(

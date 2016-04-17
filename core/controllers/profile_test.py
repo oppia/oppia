@@ -236,10 +236,9 @@ class ProfileLinkTests(test_utils.GenericTestBase):
         response_dict = self.get_json(
             '%s%s' % (self.PROFILE_PIC_URL, self.USERNAME)
         )
-        # Although the user has a valid username, they have not yet supplied
-        # a profile picture.
-        self.assertIsNone(
-            response_dict['profile_picture_data_url_for_username'])
+        self.assertEqual(
+            response_dict['profile_picture_data_url_for_username'],
+            None)
 
 
 class ProfileDataHandlerTests(test_utils.GenericTestBase):

@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Directive for bar chart visualization.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 oppia.directive('barChart', [function() {

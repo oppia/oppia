@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Tests for the form builders.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 describe('HTML to text', function() {

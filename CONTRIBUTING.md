@@ -12,8 +12,7 @@ Thanks for your interest in contributing code or design help to the Oppia projec
     * Go to the [Oppia repo](https://github.com/oppia/oppia), and click 'Watch' at the top right. Ensure that you're not 'ignoring' the repo, so that you'll be notified when someone replies to a conversation you're part of.
   3. Please sign the CLA so that we can accept your contributions. If you're contributing as an individual, use the [individual CLA](https://goo.gl/forms/AttNH80OV0). If your company owns the copyright to your contributions, a company representative should sign the [corporate CLA](https://goo.gl/forms/xDq9gK3Zcv).
   4. Fill in [this form](http://goo.gl/forms/kXILyztnfS) to indicate which parts of the codebase you're interested in. (You can always change this later.)
-  5. Join the [oppia-dev@](https://groups.google.com/forum/#!forum/oppia-dev) mailing list, and say hi on the [gitter](https://gitter.im/oppia/oppia-chat) chat channel!
-  6. (Optional) You may also want to set up [automatic auth](https://help.github.com/articles/set-up-git/#next-steps-authenticating-with-github-from-git) so you don't have to type in a username and password each time you commit a change.
+  5. (Optional) You may also want to set up [automatic auth](https://help.github.com/articles/set-up-git/#next-steps-authenticating-with-github-from-git) so you don't have to type in a username and password each time you commit a change.
 
 ## Finding something to do
 
@@ -107,24 +106,6 @@ Here's how to make a one-off code change. (If you're working on a larger feature
   ```
 
 7. **Celebrate.** Congratulations, you have contributed to Oppia!
-
-### Notes
-
-We do not use author tags in files, since they tend to be inaccurate or become stale when the author is no longer a regular contributor. However, you can still find the author of a particular change in a file by running the command:
-
-```
-git blame file-name
-```
-The output will show the latest commit SHA, author, date, and time of commit for each line.
-
-To confine the search of an author between particular lines in a file, you can use:
-
-```
-git blame -L 40,60 file-name
-```
-The output will then show lines 40 to 60 of the particular file.
-
-For more `git blame` options, you can visit the [git blame documentation](https://git-scm.com/docs/git-blame).
 
 ## Communication channels
 

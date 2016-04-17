@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Unit tests for Set Input rules.
+ *
+ * @author wxyxinyu@gmail.com (Xinyu Wu)
  */
 
 describe('Set Input rules service', function() {

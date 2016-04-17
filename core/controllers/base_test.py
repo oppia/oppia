@@ -38,10 +38,6 @@ PADDING = 1
 
 class BaseHandlerTest(test_utils.GenericTestBase):
 
-    def setUp(self):
-        super(BaseHandlerTest, self).setUp()
-        self.signup('user@example.com', 'user')
-
     def test_dev_indicator_appears_in_dev_and_not_in_production(self):
         """Test dev indicator appears in dev and not in production."""
 
@@ -90,21 +86,6 @@ class BaseHandlerTest(test_utils.GenericTestBase):
 
         response = self.testapp.put('/gallery/extra', {}, expect_errors=True)
         self.assertEqual(response.status_int, 404)
-
-    def test_redirect_in_both_logged_in_and_logged_out_states(self):
-        "Test for a redirect in both logged in and logged out states on '/'."
-
-        # Logged out state
-        response = self.testapp.get('/')
-        self.assertEqual(response.status_int, 302)
-        self.assertIn('gallery', response.headers['location'])
-
-        # Login and assert that there is a redirect
-        self.login('user@example.com')
-        response = self.testapp.get('/')
-        self.assertEqual(response.status_int, 302)
-        self.assertIn('my_explorations', response.headers['location'])
-        self.logout()
 
 
 class CsrfTokenManagerTest(test_utils.GenericTestBase):
