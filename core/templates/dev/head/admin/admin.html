@@ -12,9 +12,9 @@
       }
     </script>
     <style>
-    html, body {
-      background-color: #eee;
-    }
+      html, body {
+        background-color: #eee;
+      }
     </style>
   </head>
 
@@ -22,8 +22,8 @@
     <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation">
       <div class="navbar-container">
         <div class="navbar-header protractor-test-navbar-header pull-left">
-          <a class="oppia-navbar-brand-name oppia-transition-200" href="/gallery" focus-on="<[LABEL_FOR_CLEARING_FOCUS]>">
-            <img src="/images/logo/288x128_logo_white.png" class="oppia-logo" ng-class="windowIsNarrow ? 'oppia-logo-small' : 'oppia-logo-wide'">
+          <a class="oppia-navbar-brand-name oppia-transition-200" href="/gallery">
+            <img src="/images/logo/288x128_logo_white.png" class="oppia-logo" ng-class="'oppia-logo-wide'">
           </a>
           <ul class="nav navbar-nav oppia-navbar-breadcrumb">
             <li>
@@ -116,24 +116,23 @@
               </li>
             {% endif %}
               <ul class="nav oppia-navbar-tabs">
-                <create-exploration-button></create-exploration-button>
                   <li class="oppia-clickable-navbar-element pull-right">
-                    <a class="oppia-navbar-tab" href="#misc">
+                    <a class="oppia-navbar-tab" href="#misc" ng-click='showMiscTab()'>
                       Misc
                     </a>
                   </li>
                   <li class="oppia-clickable-navbar-element pull-right">
-                    <a class="oppia-navbar-tab" href="#config">
+                    <a class="oppia-navbar-tab" href="#config" ng-click='showConfigTab()'>
                       Config
                     </a>
                   </li>
                   <li class="oppia-clickable-navbar-element pull-right">
-                    <a class="oppia-navbar-tab" href="#jobs">
+                    <a class="oppia-navbar-tab" href="#jobs" ng-click='showJobsTab()'>
                       Jobs
                     </a>
                   </li>
                 <li class="dropdown oppia-clickable-dropdown pull-right">
-                  <a class="oppia-navbar-tab" href="#activities">
+                  <a class="oppia-navbar-tab" href="#activities" ng-click='showActivitiesTab()'>
                     Activities
                   </a>
                 </li>
@@ -141,24 +140,14 @@
           </ul>
         </div>
         {% endif %}
-
-        <div class="collapse navbar-collapse ng-cloak">
-          {% block navbar_breadcrumb %}
-          {% endblock navbar_breadcrumb %}
-
-          {% block local_top_nav_options %}
-          {% endblock %}
-        </div>
       </div>
     </nav>
-    <br><br>
     <div ng-if="message" style="background-color: lightyellow; position: fixed; width: 30%; z-index: 3000; border: 1px solid brown; right: 30px; top:58px">
       <[message]>
     </div>
-
+    <br>
     <div class="row" style="margin-left:15px; margin-right:15px;">
-    <a name="activities"></a>
-    <div class="col-lg-6 col-md-6 col-sm-6">
+    <div class="col-lg-6 col-md-6 col-sm-6" ng-show='activities' style="margin-top:16px;">
       <md-card class="oppia-page-card oppia-long-text">
         <div class="container" style="margin-left: 0;">
           <h3>Reload a single exploration</h3>
@@ -180,7 +169,7 @@
         </div>
       </md-card>
     </div>
-    <div class="col-lg-6 col-md-6 col-sm-6">
+    <div class="col-lg-6 col-md-6 col-sm-6" ng-show='activities' style="margin-top:16px;">
       <md-card class="oppia-page-card oppia-long-text">
         <div class="container" style="margin-left: 0;">
           <h3>Reload a single collection</h3>
@@ -198,10 +187,9 @@
           {% endfor %}
         </div>
       </md-card>
-    </div>
+    </div><br><br>
     <div class="col-lg-12 col-md-12 col-sm-12" style="margin-top:-30px;margin-bottom:-30px">
-    <a name="jobs"></a>
-      <md-card class="oppia-page-card oppia-long-text">
+      <md-card class="oppia-page-card oppia-long-text" ng-show='jobs'>
         <h4>Continuous computations</h4>
           <table class="table">
             <tr>
@@ -239,7 +227,7 @@
       </md-card>
     </div>
     <div class="col-lg-6 col-md-6 col-sm-6">
-      <md-card class="oppia-page-card oppia-long-text">
+      <md-card class="oppia-page-card oppia-long-text" ng-show='jobs'>
         <h3>Jobs</h3>
           <h4>Current time: {{human_readable_current_time}}</h4>
           <h4>One-off jobs</h4>
@@ -261,7 +249,7 @@
       </md-card>
     </div>
     <div class="col-lg-6 col-md-6 col-sm-6">
-      <md-card class="oppia-page-card oppia-long-text">
+      <md-card class="oppia-page-card oppia-long-text" ng-show='jobs'>
         <h4>Unfinished jobs</h4>
         <em>Note: This table may be stale; refresh to see the latest state.</em>
         <table class="table">
@@ -291,7 +279,7 @@
       </md-card>
     </div>
     <div class="col-lg-12 col-md-12 col-sm-12" style="margin-top:-30px">
-      <md-card class="oppia-page-card oppia-long-text">
+      <md-card class="oppia-page-card oppia-long-text" ng-show='jobs'>
         <h4>Recent jobs</h4>
         <em>Note: This table may be stale; refresh to see the latest state.</em>
         <table class="table">
@@ -323,8 +311,7 @@
           </p>
         </div>
       </md-card>
-      <a name="config"></a>
-      <md-card class="oppia-page-card oppia-long-text">
+      <md-card class="oppia-page-card oppia-long-text" ng-show='config'>
         <h3>Configuration properties</h3>
         <div class="container" ng-if="isNonemptyObject(configProperties)" style="margin-left: 0;">
           <div ng-repeat="(configPropertyId, configPropertyData) in configProperties">
@@ -350,8 +337,7 @@
           No configuration properties are available.
         </div>
       </md-card>
-      <a name="misc"></a>
-      <md-card class="oppia-page-card oppia-long-text" style="margin-bottom:-5px">
+      <md-card class="oppia-page-card oppia-long-text" style="margin-bottom:-5px" ng-show='misc'>
         <h3>Performance Counters</h3>
         <ul>
           {% for counter in counters %}
@@ -363,14 +349,14 @@
       </md-card>
     </div>
     <div class="col-lg-6 col-md-6 col-sm-6">
-      <md-card class="oppia-page-card oppia-long-text">
+      <md-card class="oppia-page-card oppia-long-text" ng-show='misc'>
       <h3>Search Index</h3>
 
       <button ng-click="clearSearchIndex()">Clear Search Index</button>
       </md-card>
     </div>
     <div class="col-lg-6 col-md-6 col-sm-6">
-      <md-card class="oppia-page-card oppia-long-text">
+      <md-card class="oppia-page-card oppia-long-text" ng-show='misc'>
         <h3>Topic Similarities</h3>
         <div>
           Upload a csv file:<br>
