@@ -15,6 +15,7 @@
 # limitations under the License.
 
 from core import jobs
+from core.domain import feedback_domain
 from core.platform import models
 import feconf
 
@@ -141,10 +142,8 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
             num_total_threads += (
                 feedback_thread_analytics_model.num_total_threads)
 
-        return {
-            'num_open_threads': num_open_threads,
-            'num_total_threads': num_total_threads
-        }
+        return feedback_domain.FeedbackAnalytics(
+            exploration_id, num_open_threads, num_total_threads)
 
 
 class FeedbackAnalyticsMRJobManager(

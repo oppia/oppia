@@ -147,8 +147,14 @@
             <div class="col-lg-10 col-md-10 col-sm-10">
               <div class="checkbox">
                 <label>
-                  <input type="checkbox" ng-model="canReceiveEmailUpdates" ng-change="saveCanReceiveEmailUpdates(canReceiveEmailUpdates)">
+                  <input type="checkbox" ng-model="canReceiveEmailUpdates" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail)">
                   Receive news and updates about the site
+                </label>
+              </div>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" ng-model="canReceiveEditorRoleEmail" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail)">
+                  Receive emails when someone gives you edit rights to an exploration
                 </label>
               </div>
             </div>
