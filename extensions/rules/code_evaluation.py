@@ -30,6 +30,8 @@ class CodeContains(base.CodeEvaluationRule):
 class CodeDoesNotContain(base.CodeEvaluationRule):
     description = 'has code that does not contain {{x|CodeString}}'
 
+class OutputContains(base.CodeEvaluationRule):
+    description = 'has output that contains {{x|CodeString}}'
 
 class OutputEquals(base.CodeEvaluationRule):
     description = 'has output equal to {{x|CodeString}}'
