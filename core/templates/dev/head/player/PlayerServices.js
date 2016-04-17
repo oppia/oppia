@@ -198,8 +198,13 @@ oppia.factory('oppiaPlayerService', [
         return exploration.getUninterpolatedContentHtml(stateName);
       },
       getInteractionHtml: function(stateName, labelForFocusTarget) {
+        var interactionId = exploration.getInteractionId(stateName);
+        if (!interactionId) {
+          return null;
+        }
+
         return oppiaExplorationHtmlFormatterService.getInteractionHtml(
-          exploration.getInteractionId(stateName),
+          interactionId,
           exploration.getInteractionCustomizationArgs(stateName),
           labelForFocusTarget);
       },

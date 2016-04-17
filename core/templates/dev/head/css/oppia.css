@@ -688,6 +688,7 @@ textarea {
 
 .navbar-default .dropdown-menu {
   background: #fff;
+  margin-top: 0px;
 }
 
 .navbar-default .navbar-nav > li > a, {
@@ -2606,6 +2607,11 @@ div#ng-curtain {
 .form-control.oppia-rte-content > .ta-bind {
   height: auto;
   min-height: 80px;
+}
+
+.form-control.oppia-rte-content img.block-element {
+  display: block;
+  margin: auto;
 }
 
 /* Styles for the editor training interfaces. */

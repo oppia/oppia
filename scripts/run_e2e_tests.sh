@@ -40,12 +40,12 @@ function cleanup {
   kill `ps aux | grep [Pp]rotractor/selenium | awk '{print $2}'`
 
   # Send a kill signal to the dev server.
-  kill `ps aux | grep "[Dd]ev_appserver.py --host=0.0.0.0 --port=4445" | awk '{print $2}'`
+  kill `ps aux | grep "[Dd]ev_appserver.py --host=0.0.0.0 --port=9001" | awk '{print $2}'`
 
   # Wait for the servers to go down; suppress "connection refused" error output
   # from nc since that is exactly what we are expecting to happen.
   while ( nc -vz localhost 4444 >/dev/null 2>&1 ); do sleep 1; done
-  while ( nc -vz localhost 4445 >/dev/null 2>&1 ); do sleep 1; done
+  while ( nc -vz localhost 9001 >/dev/null 2>&1 ); do sleep 1; done
 
   if [ -d "../protractor-screenshots" ]; then
     echo ""
@@ -96,11 +96,11 @@ trap cleanup EXIT
 # TODO(jacob): Find a webdriver or selenium argument that controls log level.
 ($NODE_MODULE_DIR/.bin/webdriver-manager start 2>/dev/null)&
 # Start a demo server.
-($PYTHON_CMD $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=4445 --clear_datastore=yes --dev_appserver_log_level=critical --log_level=critical --skip_sdk_update_check=true .)&
+($PYTHON_CMD $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=9001 --clear_datastore=yes --dev_appserver_log_level=critical --log_level=critical --skip_sdk_update_check=true .)&
 
 # Wait for the servers to come up.
 while ! nc -vz localhost 4444; do sleep 1; done
-while ! nc -vz localhost 4445; do sleep 1; done
+while ! nc -vz localhost 9001; do sleep 1; done
 
 # Delete outdated screenshots
 if [ -d "../protractor-screenshots" ]; then

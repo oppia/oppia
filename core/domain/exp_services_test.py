@@ -50,7 +50,7 @@ TEST_GADGETS = {
 }
 
 def _count_at_least_editable_exploration_summaries(user_id):
-    return len(exp_services._get_exploration_summary_dicts_from_models(  # pylint: disable=protected-access
+    return len(exp_services._get_exploration_summaries_from_models(  # pylint: disable=protected-access
         exp_models.ExpSummaryModel.get_at_least_editable(
             user_id=user_id)))
 
@@ -3003,7 +3003,7 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
             self.EXP_ID1, self.THREAD_ID1)
         last_message = thread_messages[len(thread_messages) - 1]
         self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_FIXED)
-        self.assertEqual(last_message['text'], 'Suggestion accepted.')
+        self.assertEqual(last_message.text, 'Suggestion accepted.')
 
     def test_accept_suggestion_invalid_suggestion(self):
         with self.swap(exp_services, '_is_suggestion_valid',
