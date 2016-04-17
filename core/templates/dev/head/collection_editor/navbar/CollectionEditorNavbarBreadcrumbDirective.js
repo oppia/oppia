@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Primary controller for the collection editor navbar breadcrumb.
+ * @fileoverview Controller for the navbar breadcrumb of the collection editor.
  */
 
 oppia.directive('collectionEditorNavbarBreadcrumbDirective', [function() {

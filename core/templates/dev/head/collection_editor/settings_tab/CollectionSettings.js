@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the collection settings in the
- * collection editor page.
+ * @fileoverview Controller for the settings tab of the collection editor.
  */
 
 oppia.controller('CollectionSettings', [function() {}]);

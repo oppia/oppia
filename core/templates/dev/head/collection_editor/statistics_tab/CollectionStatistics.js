@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the collection statistics in the
- * collection editor page.
+ * @fileoverview Controller for the statistics tab of the collection editor.
  */
 
 oppia.controller('CollectionStatistics', [function() {}]);

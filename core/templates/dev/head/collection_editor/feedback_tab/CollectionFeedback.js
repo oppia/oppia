@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the collection feedback in the
- * collection editor page.
+ * @fileoverview Controller for the feedback tab of the collection editor.
  */
 
 oppia.controller('CollectionFeedback', [function() {}]);

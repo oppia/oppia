@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the collection history in the
- * collection editor page.
+ * @fileoverview Controller for the history tab of the collection editor.
  */
 
 oppia.controller('CollectionHistory', [function() {}]);

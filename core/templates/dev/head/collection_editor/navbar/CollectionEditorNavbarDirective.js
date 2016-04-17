@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Primary controller for the collection editor navbar.
+ * @fileoverview Controller for the navbar of the collection editor.
  */
 
 oppia.directive('collectionEditorNavbarDirective', [function() {
