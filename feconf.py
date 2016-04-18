@@ -153,6 +153,10 @@ CAN_SEND_EMAILS_TO_ADMIN = False
 # SYSTEM_EMAIL_ADDRESS. If SYSTEM_EMAIL_ADDRESS is not that of an app owner,
 # email messages from this user cannot be sent.
 CAN_SEND_EMAILS_TO_USERS = False
+# If you want to turn on this facility please check email templates in
+# send_role_notification_email() function in email_manager.py and modify them
+# accordingly.
+CAN_SEND_EDITOR_ROLE_EMAILS = True
 # Whether to send email updates to a user who has not specified a preference.
 DEFAULT_EMAIL_UPDATES_PREFERENCE = False
 # Whether to send an invitation email when the user is granted

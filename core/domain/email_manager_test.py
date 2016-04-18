@@ -20,6 +20,7 @@ import types
 from core.domain import config_services
 from core.domain import email_manager
 from core.domain import user_services
+from core.domain import rights_manager
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -89,11 +90,11 @@ class EmailRightsTest(test_utils.GenericTestBase):
         # pylint: enable=protected-access
 
 
-class ExplortionMemebershipEmailTests(test_utils.GenericTestBase):
-    """ Tests that sending explortion membership email works as expected. """
+class ExplorationMemebershipEmailTests(test_utils.GenericTestBase):
+    """Tests that sending exploration membership email works as expected."""
 
     def setUp(self):
-        super(ExplortionMemebershipEmailTests, self).setUp()
+        super(ExplorationMemebershipEmailTests, self).setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -104,11 +105,61 @@ class ExplortionMemebershipEmailTests(test_utils.GenericTestBase):
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, 'Title')
 
-    def test_exploration_membership_email_is_sent(self):
-        can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
+        self.email_subject_tempate = (
+            '%s invited you to collaborate on Oppia.org')
 
-        with can_send_emails_ctx:
+        self.email_body_template = (
+            '%s has granted you %s to their learning exploration, '
+            '<a href="http://www.oppia.org/%s">%s</a>'
+            ', on Oppia.org.<br>'
+            'This allows you:<br>'
+            '<ul>%s</ul><br>'
+            'You can find exploration'
+            '<a href="http://www.oppia.org/%s">here</a>. Thanks!<br>'
+            '<br>Best Wishes,<br>'
+            'The Oppia Team<br>'
+        )
+
+        self.email_content_template = 'Hi %s,<br><br>%s<br><br>%s' % (
+            self.NEW_USER_USERNAME,
+            self.email_body_template,
+            email_manager.EMAIL_FOOTER.value)
+
+        self.manager_rights = (
+            email_manager.EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE[(
+                email_manager.EXPLORATION_ROLE_MANAGER)]
+        )
+        self.editor_rights = (
+            email_manager.EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE[(
+                email_manager.EXPLORATION_ROLE_EDITOR)]
+        )
+        self.playtester_rights = (
+            email_manager.EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE[(
+                email_manager.EXPLORATION_ROLE_PLAYTESTER)]
+        )
+
+        # pylint: disable=invalid-name
+        self.expected_manager_role_email_body = self.email_content_template % (
+            self.EDITOR_USERNAME, email_manager.EXPLORATION_ROLE_MANAGER,
+            self.exploration.id, self.exploration.title, self.manager_rights,
+            self.exploration.id)
+        self.expected_editor_role_email_body = self.email_content_template % (
+            self.EDITOR_USERNAME, email_manager.EXPLORATION_ROLE_EDITOR,
+            self.exploration.id, self.exploration.title, self.editor_rights,
+            self.exploration.id)
+        self.expected_playtester_role_email_body = (
+            self.email_content_template % (
+                self.EDITOR_USERNAME, email_manager.EXPLORATION_ROLE_PLAYTESTER,
+                self.exploration.id, self.exploration.title,
+                self.playtester_rights, self.exploration.id))
+
+        self.can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
+        self.can_send_editor_role_email_ctx = self.swap(
+            feconf, 'CAN_SEND_EDITOR_ROLE_EMAILS', True)
+
+    def test_role_email_is_sent_when_editor_assigns_role(self):
+        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             self.login(self.EDITOR_EMAIL)
 
             response = self.testapp.get('%s/%s' % (
@@ -118,41 +169,27 @@ class ExplortionMemebershipEmailTests(test_utils.GenericTestBase):
                 feconf.EXPLORATION_RIGHTS_PREFIX, self.exploration.id), {
                     'version': self.exploration.version,
                     'new_member_username': self.NEW_USER_USERNAME,
-                    'new_member_role': 'editor',
+                    'new_member_role': rights_manager.ROLE_EDITOR,
                 }, csrf_token=csrf_token)
 
             messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
 
-    def test_email_is_not_sent_if_user_do_not_wish_to(self):
+    def test_email_is_not_sent_if_recipient_has_declined_such_emails(self):
         user_services.update_email_preferences(self.new_user_id, True, False)
 
-        can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
-        logged_errors = []
-
-        def _log_error_for_tests(error_message):
-            logged_errors.append(error_message)
-
-        log_new_error_counter = test_utils.CallCounter(_log_error_for_tests)
-        log_new_error_ctx = self.swap(
-            email_manager, 'log_new_error', log_new_error_counter)
-
-        with can_send_emails_ctx, log_new_error_ctx:
-            email_manager.send_exploration_membership_email(
-                self.editor_id, self.new_user_id, 'owner',
+        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
+            email_manager.send_role_notification_email(
+                self.editor_id, self.new_user_id, rights_manager.ROLE_OWNER,
                 self.exploration.id, self.exploration.title)
 
-            self.assertEqual(log_new_error_counter.times_called, 1)
+            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            self.assertEqual(len(messages), 0)
 
-    def test_email_correct_membership_email_are_sent(self):
-        can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
-
-        email_subject = '%s added you to one of their explorations on Oppia.org'
-        with can_send_emails_ctx:
-            email_manager.send_exploration_membership_email(
-                self.editor_id, self.new_user_id, 'viewer',
+    def test_role_emails_sent_are_correct(self):
+        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
+            email_manager.send_role_notification_email(
+                self.editor_id, self.new_user_id, rights_manager.ROLE_VIEWER,
                 self.exploration.id, self.exploration.title)
 
             messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
@@ -179,16 +216,13 @@ class ExplortionMemebershipEmailTests(test_utils.GenericTestBase):
                 feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION)
             self.assertEqual(
                 sent_email_model.subject,
-                email_subject % self.EDITOR_USERNAME)
+                self.email_subject_tempate % self.EDITOR_USERNAME)
 
-    def test_correct_rights_are_written_in_email_body(self):
-        can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
-
-        with can_send_emails_ctx:
-            # Check that correct rights are written for Manager
-            email_manager.send_exploration_membership_email(
-                self.editor_id, self.new_user_id, 'owner',
+    def test_correct_rights_are_written_in_manager_role_email_body(self):
+        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
+            # Check that correct email content is sent for Manager.
+            email_manager.send_role_notification_email(
+                self.editor_id, self.new_user_id, rights_manager.ROLE_OWNER,
                 self.exploration.id, self.exploration.title)
 
             messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
@@ -198,20 +232,54 @@ class ExplortionMemebershipEmailTests(test_utils.GenericTestBase):
             self.assertEqual(len(all_models), 1)
 
             sent_email_model_manager = all_models[0]
-            self.assertRegexpMatches(
+            self.assertEqual(
                 sent_email_model_manager.html_body,
-                email_manager.EXPLORATION_ROLE_MANAGER)
-            self.assertRegexpMatches(
-                sent_email_model_manager.html_body,
-                email_manager.EXPLORATION_ROLE_MANAGER_RIGHTS)
+                self.expected_manager_role_email_body)
 
-            # Check that exeption is raised when role is Undefined
+    def test_correct_rights_are_written_in_editor_role_email_body(self):
+        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
+            # Check that correct email content is sent for Editor.
+            email_manager.send_role_notification_email(
+                self.editor_id, self.new_user_id, rights_manager.ROLE_EDITOR,
+                self.exploration.id, self.exploration.title)
+
+            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            self.assertEqual(len(messages), 1)
+
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            self.assertEqual(len(all_models), 1)
+
+            sent_email_model_manager = all_models[0]
+            self.assertEqual(
+                sent_email_model_manager.html_body,
+                self.expected_editor_role_email_body)
+
+    def test_correct_rights_are_written_in_playtester_role_email_body(self):
+        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
+            # Check that correct email content is sent for Playtester.
+            email_manager.send_role_notification_email(
+                self.editor_id, self.new_user_id, rights_manager.ROLE_VIEWER,
+                self.exploration.id, self.exploration.title)
+
+            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            self.assertEqual(len(messages), 1)
+
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            self.assertEqual(len(all_models), 1)
+
+            sent_email_model_manager = all_models[0]
+            self.assertEqual(
+                sent_email_model_manager.html_body,
+                self.expected_playtester_role_email_body)
+
+    def test_correct_undefined_role_raises_an_exceptions(self):
+        with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
+            # Check that an exception is raised when an invalid
+            # role is supplied.
             with self.assertRaisesRegexp(Exception, 'Invalid role'):
-                email_manager.send_exploration_membership_email(
-                    self.editor_id, self.new_user_id, 'Undefined',
+                email_manager.send_role_notification_email(
+                    self.editor_id, self.new_user_id, rights_manager.ROLE_NONE,
                     self.exploration.id, self.exploration.title)
-
-
 
 
 class SignupEmailTests(test_utils.GenericTestBase):

@@ -423,7 +423,7 @@ class ExplorationRightsHandler(EditorHandler):
 
             rights_manager.assign_role_for_exploration(
                 self.user_id, exploration_id, new_member_id, new_member_role)
-            email_manager.send_exploration_membership_email(
+            email_manager.send_role_notification_email(
                 self.user_id, new_member_id, new_member_role, exploration_id,
                 exploration.title)
 
