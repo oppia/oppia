@@ -3165,6 +3165,11 @@ md-card.preview-conversation-skin-supplemental-card {
   margin: 1.5em 0;
 }
 
+.about-content ol,
+.about-content ul {
+  padding: 0;
+}
+
 .about-content h2 {
   text-align: center;
 }
@@ -3248,10 +3253,6 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .letter-groups span {
   font-size: 1.8em;
-}
-
-.letter-groups ul {
-  padding: 0;
 }
 
 .letter-groups ul li {
