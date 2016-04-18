@@ -102,11 +102,14 @@ oppia.factory('searchService', [
       if (successCallback) {
         successCallback();
       }
-      return encodeURI(searchQuery +
-        _getSuffixForQuery(selectedCategories, selectedLanguageCodes));
     },
     isSearchInProgress: function() {
       return numSearchesInProgress > 0;
+    },
+    searchQueryUrl: function(searchQuery, selectedCategories,
+      selectedLanguageCodes) {
+      return encodeURI(searchQuery +
+          _getSuffixForQuery(selectedCategories, selectedLanguageCodes));
     },
     loadMoreData: function(successCallback) {
       // If a new query is still being sent, do not fetch more results.

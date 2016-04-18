@@ -75,8 +75,10 @@ CAROUSEL_SLIDES_CONFIG = config_domain.ConfigProperty(
     }])
 
 
-def get_explorations_list(query_string, search_cursor):
-    """Handles getting exploration list"""
+def get_matching_exploration_dicts(query_string, search_cursor):
+    """Given a query string and a search cursor, returns a list of exploration
+       dicts that satisfy the search query.
+    """
     # TODO(sll): Figure out what to do about explorations in categories
     # other than those explicitly listed.
     exp_ids, search_cursor = (
@@ -93,7 +95,6 @@ def get_explorations_list(query_string, search_cursor):
             'You may be running up against the default query limits.'
             % feconf.DEFAULT_QUERY_LIMIT)
     return explorations_list
-
 
 
 class GalleryPage(base.BaseHandler):
@@ -134,6 +135,7 @@ class GallerySearchPage(base.BaseHandler):
             'CAROUSEL_SLIDES_CONFIG': CAROUSEL_SLIDES_CONFIG.value,
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
+            'inSearchPage': True,
         })
         self.render_template('galleries/gallery.html')
 
@@ -168,7 +170,8 @@ class GalleryHandler(base.BaseHandler):
         query_string = self.request.get('q')
         search_cursor = self.request.get('cursor', None)
 
-        explorations_list = get_explorations_list(query_string, search_cursor)
+        explorations_list = get_matching_exploration_dicts(
+            query_string, search_cursor)
 
         self.values.update({
             'explorations_list': explorations_list,

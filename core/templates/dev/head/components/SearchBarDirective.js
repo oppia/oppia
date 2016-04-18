@@ -110,12 +110,11 @@ oppia.directive('searchBar', [function() {
         };
 
         var _searchBarFullyLoaded = false;
-        var url;
 
         var _hasChangedSearchQuery = Boolean(urlService.getUrlParams().q);
-        var _onSearchQueryChangeExec = function(reloadPage) {
+        var _onSearchQueryChangeExec = function() {
           $scope.searchIsLoading = true;
-          url = searchService.executeSearchQuery(
+          searchService.executeSearchQuery(
               $scope.searchQuery, $scope.selectionDetails.categories.selections,
               $scope.selectionDetails.languageCodes.selections, function() {
             if (!_hasChangedSearchQuery && _searchBarFullyLoaded) {
@@ -123,12 +122,18 @@ oppia.directive('searchBar', [function() {
               $rootScope.$broadcast('hasChangedSearchQuery');
             }
           });
-          if ($window.location.search != url && reloadPage) {
-            $window.location.href = '/search\?q=' + url;
+
+          var searchUrl = searchService.searchQueryUrl(
+            $scope.searchQuery, $scope.selectionDetails.categories.selections,
+            $scope.selectionDetails.languageCodes.selections
+          );
+          if ($window.location.pathname != '/search' &&
+              $scope.searchQuery != '') {
+            $window.location.href = '/search?q=' + searchUrl;
           } else {
             if ($window.location.pathname == '/search') {
               $location.search({
-                q: decodeURIComponent(url)
+                q: decodeURIComponent(searchUrl)
               });
             }
           }
@@ -141,12 +146,10 @@ oppia.directive('searchBar', [function() {
 
         $scope.onSearchQueryChange = function(evt) {
           // Query immediately when the enter or space key is pressed.
-          if (evt.keyCode == 13) {
-            _onSearchQueryChangeExec(true);
-          } else if (evt.keyCode == 32) {
-            _onSearchQueryChangeExec(false);
+          if (evt.keyCode == 13 || evt.keyCode == 32) {
+            _onSearchQueryChangeExec();
           } else {
-            oppiaDebouncer.debounce(_onSearchQueryChangeExec(false), 400)();
+            oppiaDebouncer.debounce(_onSearchQueryChangeExec(), 400)();
           }
         };
 
@@ -166,7 +169,7 @@ oppia.directive('searchBar', [function() {
             _updateSelectionDetails('languageCodes');
 
             if (Boolean(urlService.getUrlParams().q)) {
-              _parseURL();
+              updateSearchFieldsBasedOnUrlQuery();
             }
             _onSearchQueryChangeExec();
 
@@ -174,35 +177,54 @@ oppia.directive('searchBar', [function() {
           }
         );
 
-        var _parseURL = function() {
-          var urlSearch = decodeURI($window.location.search);
-          var query = urlSearch.replace('?q=', '');
+        var updateLanguageCodeFields = function(url) {
+          // Grabs Grab language code(s) from URL and returns url without
+          // language fields. This function assumes that language codes are
+          // at the end of the url.
 
-          // Grab language code(s) from URL, these are 2 lowercase letters.
-          var _languageCodeSelections = query.match(/"\w\w"/g);
-          var _languageCodePattern = /language_code\%3D\([a-zOR\%\" ]+\)/;
-          query = query.replace(_languageCodePattern, '');
+          var _languageCodePattern = / language_code=\([a-zOR\%\" ]+\)$/;
+          var _languageCodes = url.match(_languageCodePattern)[0];
+          var _languageCodeSelections = [];
+          if (_languageCodes != undefined) {
+            url = url.replace(_languageCodePattern, '');
+
+            // Grab language code(s) from extracted language section,
+            // these are 2 lowercase letters.
+            _languageCodeSelections = _languageCodes.match(/"([a-z]{2})"/g);
+          }
 
           for (i = 0; i < _languageCodeSelections.length; i++) {
-            var language = _languageCodeSelections[i].match(/[a-z]{2}/);
+            var language = _languageCodeSelections[i].match(/[a-z]{2}/g);
             $scope.selectionDetails.languageCodes.selections[language] = true;
           }
           _updateSelectionDetails('languageCodes');
+          return url;
+        };
 
-          // Grab category code(s) from URL.
-          var _categoryPattern = /category\%3D\([A-Za-z0-9\" ]+\)/;
-          var _categories = query.match(_categoryPattern);
-          if (_categories == undefined) {
-            var _categories = [];
-          } else {
-            query = query.replace(_categoryPattern, '');
-            _categories = _categories[0].match(/"[A-Za-z]+"/g);
+        var updateCategoryFields = function(url) {
+          // Grab category code(s) from URL and returns the url without
+          // the category field.
+          var _categoryPattern = /category=\([A-Za-z0-9\" ]+\)\s*/;
+          var _categoriesCodes = url.match(_categoryPattern);
+
+          var _categories = [];
+          if (_categoriesCodes != undefined) {
+            url = url.replace(_categoryPattern, '');
+            _categories = _categoriesCodes[0].match(/"[A-Za-z]+"/g);
           }
+
           for (i = 0; i < _categories.length; i++) {
             var category = _categories[i].match(/[A-Za-z]+/);
             $scope.selectionDetails.categories.selections[category] = true;
           }
           _updateSelectionDetails('categories');
+          return url;
+        };
+
+        var updateSearchFieldsBasedOnUrlQuery = function() {
+          var query = decodeURIComponent(urlService.getUrlParams().q);
+          query = updateLanguageCodeFields(query);
+          query = updateCategoryFields(query);
 
           // Remove leading and ending spaces from query.
           $scope.searchQuery = query.trim();
