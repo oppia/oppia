@@ -414,6 +414,186 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
             feconf.MIGRATION_BOT_USERNAME, exploration_summary.contributor_ids)
 
 
+class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
+    ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
+        exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob]
+
+    EXP_ID = 'exp_id'
+
+    USERNAME_A = 'usernamea'
+    USERNAME_B = 'usernameb'
+    EMAIL_A = 'emaila@example.com'
+    EMAIL_B = 'emailb@example.com'
+
+    def setUp(self):
+        super(ExplorationContributorsSummaryOneOffJobTest, self).setUp()
+
+    def test_contributors_for_valid_nonrevert_contribution(self):
+        """Test that if only non-revert commits are made by
+        contributor then the contributions summary shows same
+        exact number of commits for that contributor's ID
+        """
+
+        self.signup(self.EMAIL_B, self.USERNAME_B)
+        user_a_id = self.get_user_id_from_email(self.EMAIL_B)
+
+        # Let USER A make three commits.
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, user_a_id, title='Exploration Title')
+
+        exp_services.update_exploration(
+            user_a_id, self.EXP_ID, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'New Exploration Title'
+            }], 'Changed title.')
+
+        exp_services.update_exploration(
+            user_a_id, self.EXP_ID, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'New Objective'
+            }], 'Changed Objective.')
+
+        # Run the job to compute contributors summary
+        job_id = exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob\
+            .create_new()
+        exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        exploration_summary = exp_services.get_exploration_summary_by_id(
+            exploration.id)
+
+        self.assertEqual(
+            3, exploration_summary.contributors_summary[user_a_id])
+
+    def test_contributors_with_only_reverts_not_included(self):
+        """Test that if only reverts are made by contributor then the
+        contributions summary shouldn’t contain that contributor’s ID
+        """
+
+        # Sign up two users.
+        self.signup(self.EMAIL_A, self.USERNAME_A)
+        user_a_id = self.get_user_id_from_email(self.EMAIL_A)
+        self.signup(self.EMAIL_B, self.USERNAME_B)
+        user_b_id = self.get_user_id_from_email(self.EMAIL_B)
+
+        # Let USER A make three commits.
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, user_a_id, title='Exploration Title 1')
+
+        exp_services.update_exploration(
+            user_a_id, self.EXP_ID, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'New Exploration Title'
+            }], 'Changed title.')
+        exp_services.update_exploration(
+            user_a_id, self.EXP_ID, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'New Objective'
+            }], 'Changed Objective.')
+
+        # Let the second user revert version 3 to version 2
+        exp_services.revert_exploration(user_b_id, self.EXP_ID, 3, 2)
+
+        # Run the job to compute the contributors summary.
+        job_id = exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob\
+            .create_new()
+        exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        # Check that the contributors_summary contains only user_a_id &
+        # not user_b_id
+        exploration_summary = exp_services.get_exploration_summary_by_id(
+            exploration.id)
+        self.assertNotIn(user_b_id, exploration_summary.contributors_summary)
+        self.assertIn(user_a_id, exploration_summary.contributors_summary)
+
+    def test_reverts_not_counted(self):
+        """Test that if both non-revert commits and revert are
+        made by contributor then the contributions summary shows
+        only non-revert commits for that contributor. However,
+        the commits made after the version to which we have reverted
+        shouldn't be counted either.
+        """
+
+        # Sign up two users.
+        self.signup(self.EMAIL_A, self.USERNAME_A)
+        user_a_id = self.get_user_id_from_email(self.EMAIL_A)
+
+        # Let USER A make 2 non-revert commits and 1 revert
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, user_a_id, title='Exploration Title')
+        exp_services.update_exploration(
+            user_a_id, self.EXP_ID, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'New Exploration Title'
+            }], 'Changed title.')
+        exp_services.update_exploration(
+            user_a_id, self.EXP_ID, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'New Objective'
+            }], 'Changed Objective.')
+
+        # Let USER A revert version 2 to version 1
+        exp_services.revert_exploration(user_a_id, self.EXP_ID, 3, 2)
+
+        # Run the job to compute the contributor summary.
+        job_id = exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob\
+            .create_new()
+        exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        # Check that USER A's number of contributions is equal to 2
+        exploration_summary = exp_services.get_exploration_summary_by_id(
+            exploration.id)
+        self.assertEqual(2, exploration_summary.contributors_summary[user_a_id])
+
+    def test_nonhuman_committers_not_counted(self):
+        """Test that only human committers are counted as contributors.
+        """
+        # Create a commit with the system user id.
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, feconf.SYSTEM_COMMITTER_ID, title='Original Title')
+        # Run the job to compute the contributor ids.
+        job_id = exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob\
+            .create_new()
+        exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+        # Check that the system id was not added to the exploration's
+        # contributor's summary
+
+        exploration_summary = exp_services.get_exploration_summary_by_id(
+            exploration.id)
+        self.assertNotIn(
+            feconf.SYSTEM_COMMITTER_ID,
+            exploration_summary.contributors_summary)
+
+        # Create a commit with the migration bot user id.
+        exp_services.update_exploration(
+            feconf.MIGRATION_BOT_USERNAME, self.EXP_ID, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'New Exploration Title'
+            }], 'Changed title.')
+
+        # Run the job to compute the contributor summary.
+        job_id = exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob\
+            .create_new()
+        exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+        # Check that the migration bot id was not added to the exploration's
+        # contributor summary.
+        exploration_summary = exp_services.get_exploration_summary_by_id(
+            exploration.id)
+        self.assertNotIn(
+            feconf.MIGRATION_BOT_USERNAME,
+            exploration_summary.contributors_summary)
+
 class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
 
     EXP_ID = 'exp_id'
