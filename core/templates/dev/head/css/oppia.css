@@ -3161,6 +3161,10 @@ md-card.preview-conversation-skin-supplemental-card {
   text-decoration: none;
 }
 
+.about-content p {
+  margin: 1.5em 0;
+}
+
 .about-content h2 {
   text-align: center;
 }
@@ -3282,7 +3286,7 @@ md-card.preview-conversation-skin-supplemental-card {
     border-right: none;
     border-bottom: 1px solid rgba(0,0,0,0.1);
   }
-  .about-card-content-narrow {
+  .about-card-content-wide, .about-card-content-narrow {
     width: 80%;
   }
   .create-three-cols-layout {
