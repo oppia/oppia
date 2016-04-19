@@ -20,7 +20,7 @@
 
   <body ng-controller="Admin" ng-cloak>
     <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation">
-      <div class="navbar-container">
+      <div class="navbar-container" style="background-color: #00376d">
         <div class="navbar-header protractor-test-navbar-header pull-left">
           <a class="oppia-navbar-brand-name oppia-transition-200" href="/gallery">
             <img src="/images/logo/288x128_logo_white.png" class="oppia-logo" ng-class="'oppia-logo-wide'">
@@ -35,7 +35,7 @@
 
         {% if nav_mode != 'signup' %}
         <div ng-cloak class="navbar-header pull-right">
-          <ul class="nav oppia-navbar-nav oppia-navbar-profile">
+          <ul class="nav oppia-navbar-nav oppia-navbar-profile-admin">
             {% if username %}
               <li class="dropdown pull-right">
                 <a class="dropdown-toggle oppia-navbar-dropdown-toggle" data-toggle="dropdown" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
@@ -72,18 +72,18 @@
                 </a>
                 <ul class="dropdown-menu ng-cloak oppia-navbar-dropdown" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)" ng-show="profileDropdownIsActive">
                   <li>
-                    <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/profile/{{username}}">
+                    <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/profile/{{username}}" style="color: #00376d">
                       <strong>{{username}}</strong>
                     </a>
                   </li>
                   <hr class="oppia-top-right-menu-item-separator">
                   <li>
-                    <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/my_explorations">
+                    <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/my_explorations" style="color: #00376d">
                       My Explorations
                     </a>
                   </li>
                   <li>
-                    <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/notifications_dashboard">
+                    <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/notifications_dashboard" style="color: #00376d">
                       Notifications
                       <span ng-if="numUnseenNotifications > 0">
                         (<[numUnseenNotifications]>)
@@ -91,49 +91,49 @@
                     </a>
                   </li>
                   <li>
-                    <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/preferences">Preferences</a>
+                    <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/preferences" style="color: #00376d">Preferences</a>
                   </li>
 
                   {% if is_moderator %}
                     <li>
-                      <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/moderator" target="_blank">
+                      <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/moderator" target="_blank" style="color: #00376d">
                         Moderator Page
                       </a>
                     </li>
                   {% endif %}
                   {% if is_super_admin %}
                     <li>
-                      <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/admin" target="_blank">
+                      <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/admin" target="_blank" style="color: #00376d">
                         Admin Page
                       </a>
                     </li>
                   {% endif %}
                   <hr class="oppia-top-right-menu-item-separator">
                   <li>
-                    <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="{{logout_url}}">Logout</a>
+                    <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="{{logout_url}}" style="color: #00376d">Logout</a>
                   </li>
                 </ul>
               </li>
             {% endif %}
-              <ul class="nav oppia-navbar-tabs">
+              <ul class="nav oppia-navbar-tabs oppia-navbar-tabs-admin">
                   <li class="oppia-clickable-navbar-element pull-right">
-                    <a class="oppia-navbar-tab" href="#misc" ng-click='showMiscTab()'>
-                      Misc
+                    <a class="oppia-navbar-tab" href="#misc" tooltip="Miscellaneous" tooltip-placement="bottom" ng-click='showMiscTab()'>
+                      <i class="material-icons">&#xE8D2;</i>
                     </a>
                   </li>
                   <li class="oppia-clickable-navbar-element pull-right">
-                    <a class="oppia-navbar-tab" href="#config" ng-click='showConfigTab()'>
-                      Config
+                    <a class="oppia-navbar-tab" href="#config" tooltip="Config" tooltip-placement="bottom" ng-click='showConfigTab()'>
+                      <i class="material-icons">&#xE8B8;</i>
                     </a>
                   </li>
                   <li class="oppia-clickable-navbar-element pull-right">
-                    <a class="oppia-navbar-tab" href="#jobs" ng-click='showJobsTab()'>
-                      Jobs
+                    <a class="oppia-navbar-tab" href="#jobs" tooltip="Jobs" tooltip-placement="bottom" ng-click='showJobsTab()'>
+                      <i class="material-icons">&#xE869;</i>
                     </a>
                   </li>
                 <li class="dropdown oppia-clickable-dropdown pull-right">
-                  <a class="oppia-navbar-tab" href="#activities" ng-click='showActivitiesTab()'>
-                    Activities
+                  <a class="oppia-navbar-tab" href="#activities" tooltip="Activities" tooltip-placement="bottom" ng-click='showActivitiesTab()'>
+                    <i class="material-icons">&#xE922;</i>
                   </a>
                 </li>
               </ul>
@@ -142,13 +142,13 @@
         {% endif %}
       </div>
     </nav>
-    <div ng-if="message" style="background-color: lightyellow; position: fixed; width: 30%; z-index: 3000; border: 1px solid brown; right: 30px; top:58px">
+    <div align="center" ng-if="message" style="background-color: #ffffff; position: fixed; max-width: 30%; z-index: 3000; border: 1px solid #00376d; right: 30px; bottom: 30px">
       <[message]>
     </div>
     <br>
-    <div class="row" style="margin-left:15px; margin-right:15px;">
-    <div class="col-lg-6 col-md-6 col-sm-6" ng-show='activities' style="margin-top:16px;">
-      <md-card class="oppia-page-card oppia-long-text">
+    <div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12" ng-show='activities' style="margin-top: 16px;">
+      <md-card class="oppia-page-card oppia-long-text" style="max-width:700px">
         <div class="container" style="margin-left: 0;">
           <h3>Reload a single exploration</h3>
           {% for exploration in demo_explorations %}
@@ -157,7 +157,7 @@
               {{exploration[1]}}
             </span>
             <span class="col-lg-2 col-md-2 col-sm-2">
-              <button type="button" class="btn btn-default protractor-test-reload-exploration-button" ng-click="reloadExploration({{exploration[0]}})">
+              <button type="button" class="btn btn-default protractor-test-reload-exploration-button pull-right" ng-click="reloadExploration({{exploration[0]}})">
               Reload
               </button>
             </span>
@@ -168,9 +168,7 @@
           </button>
         </div>
       </md-card>
-    </div>
-    <div class="col-lg-6 col-md-6 col-sm-6" ng-show='activities' style="margin-top:16px;">
-      <md-card class="oppia-page-card oppia-long-text">
+      <md-card class="oppia-page-card oppia-long-text" style="max-width: 700px">
         <div class="container" style="margin-left: 0;">
           <h3>Reload a single collection</h3>
           {% for collection in demo_collections %}
@@ -179,7 +177,7 @@
               {{collection[1]}}
             </span>
             <span class="col-lg-2 col-md-2 col-sm-2">
-              <button type="button" class="btn btn-default protractor-test-reload-collection-button" ng-click="reloadCollection({{collection[0]}})">
+              <button type="button" class="btn btn-default protractor-test-reload-collection-button pull-right" ng-click="reloadCollection({{collection[0]}})">
               Reload
               </button>
             </span>
@@ -188,8 +186,8 @@
         </div>
       </md-card>
     </div><br><br>
-    <div class="col-lg-12 col-md-12 col-sm-12" style="margin-top:-30px;margin-bottom:-30px">
-      <md-card class="oppia-page-card oppia-long-text" ng-show='jobs'>
+    <div class="col-lg-12 col-md-12 col-sm-12" style="margin-top: -30px; margin-bottom: -30px">
+      <md-card class="oppia-page-card oppia-long-text" ng-show='jobs' style="max-width: 900px">
         <h4>Continuous computations</h4>
           <table class="table">
             <tr>
@@ -225,9 +223,7 @@
             {% endfor %}
           </table>
       </md-card>
-    </div>
-    <div class="col-lg-6 col-md-6 col-sm-6">
-      <md-card class="oppia-page-card oppia-long-text" ng-show='jobs'>
+      <md-card class="oppia-page-card oppia-long-text" ng-show='jobs' style="max-width: 900px">
         <h3>Jobs</h3>
           <h4>Current time: {{human_readable_current_time}}</h4>
           <h4>One-off jobs</h4>
@@ -247,9 +243,7 @@
             {% endfor %}
           </ul>
       </md-card>
-    </div>
-    <div class="col-lg-6 col-md-6 col-sm-6">
-      <md-card class="oppia-page-card oppia-long-text" ng-show='jobs'>
+      <md-card class="oppia-page-card oppia-long-text" ng-show='jobs' style="max-width: 900px">
         <h4>Unfinished jobs</h4>
         <em>Note: This table may be stale; refresh to see the latest state.</em>
         <table class="table">
@@ -262,7 +256,7 @@
           </tr>
           {% for job in unfinished_job_data %}
           <tr>
-            <td style="max-width:40px; overflow:hidden; text-overflow: ellipsis;  ">{{job.id}}</td>
+            <td>{{job.id}}</td>
             <td>{{job.status_code}}</td>
             <td>{{job.human_readable_time_started}}</td>
             <td>{{job.human_readable_time_finished}}</td>
@@ -277,9 +271,7 @@
           {% endfor %}
         </table>
       </md-card>
-    </div>
-    <div class="col-lg-12 col-md-12 col-sm-12" style="margin-top:-30px">
-      <md-card class="oppia-page-card oppia-long-text" ng-show='jobs'>
+      <md-card class="oppia-page-card oppia-long-text" ng-show='jobs' style="max-width: 900px">
         <h4>Recent jobs</h4>
         <em>Note: This table may be stale; refresh to see the latest state.</em>
         <table class="table">
@@ -311,7 +303,7 @@
           </p>
         </div>
       </md-card>
-      <md-card class="oppia-page-card oppia-long-text" ng-show='config'>
+      <md-card class="oppia-page-card oppia-long-text" ng-show='config' style="max-width: 1050px">
         <h3>Configuration properties</h3>
         <div class="container" ng-if="isNonemptyObject(configProperties)" style="margin-left: 0;">
           <div ng-repeat="(configPropertyId, configPropertyData) in configProperties">
@@ -337,7 +329,7 @@
           No configuration properties are available.
         </div>
       </md-card>
-      <md-card class="oppia-page-card oppia-long-text" style="margin-bottom:-5px" ng-show='misc'>
+      <md-card class="oppia-page-card oppia-long-text" style="max-width: 700px;" ng-show='misc'>
         <h3>Performance Counters</h3>
         <ul>
           {% for counter in counters %}
@@ -347,16 +339,12 @@
           {% endfor %}
         </ul>
       </md-card>
-    </div>
-    <div class="col-lg-6 col-md-6 col-sm-6">
-      <md-card class="oppia-page-card oppia-long-text" ng-show='misc'>
-      <h3>Search Index</h3>
+      <md-card class="oppia-page-card oppia-long-text" ng-show='misc' style="max-width: 700px">
+        <h3>Search Index</h3>
 
-      <button ng-click="clearSearchIndex()">Clear Search Index</button>
+        <button ng-click="clearSearchIndex()">Clear Search Index</button>
       </md-card>
-    </div>
-    <div class="col-lg-6 col-md-6 col-sm-6">
-      <md-card class="oppia-page-card oppia-long-text" ng-show='misc'>
+      <md-card class="oppia-page-card oppia-long-text" ng-show='misc' style="max-width: 700px">
         <h3>Topic Similarities</h3>
         <div>
           Upload a csv file:<br>
