@@ -202,7 +202,7 @@ class ExplorationDisplayableSummaries(
         exp_summary_input.insert(0, None)
         exploration_summary = (
             summary_services.get_displayable_exp_summary_dicts(
-                exp_summary_input))   
+                exp_summary_input))
         expected_summary = {
             'status': u'public',
             'thumbnail_bg_color': '#05a69a',
@@ -250,12 +250,12 @@ class ExplorationCategories(
             'exploration_id': '2'
         }, csrf_token)
         self.logout()
-        
+
     def test_get_gallery_category_groupings(self):
-        """Exploration with id property of 2 is an exploration with 
-        category property of Mathematics. The call to 
+        """Exploration with id property of 2 is an exploration with
+        category property of Mathematics. The call to
         get_gallery_catergory_groupings() should return the exploration
-        in Mathematics & Statistics category. 
+        in Mathematics & Statistics category.
         """
         gallery_category_groupings = (
             summary_services.get_gallery_category_groupings([]))
@@ -280,12 +280,12 @@ class ExplorationCategories(
             'header': 'Mathematics & Statistics',
         }
 
-        self.assertDictContainsSubset(expected_gallery_group,
-            gallery_category_groupings[0])
+        self.assertDictContainsSubset(expected_gallery_group, (
+            gallery_category_groupings[0]))
         actual_exploration = (
             gallery_category_groupings[0]["activity_summary_dicts"][0])
-        self.assertDictContainsSubset(expected_exploration_summary,
-            actual_exploration)
+        self.assertDictContainsSubset(expected_exploration_summary, (
+            actual_exploration))
 
 
 class FeaturedExplorationDisplayableSummaries(
