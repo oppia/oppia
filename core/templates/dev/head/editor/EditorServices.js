@@ -46,8 +46,8 @@ oppia.factory('explorationData', [
     var explorationData = {
       explorationId: explorationId,
       // Returns a promise that supplies the data for the current exploration.
-      getData: function() {
-        if (explorationData.data) {
+      getData: function(ignoreCache=false) {
+        if (explorationData.data && !ignoreCache) {
           $log.info('Found exploration data in cache.');
 
           var deferred = $q.defer();

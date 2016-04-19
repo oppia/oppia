@@ -315,8 +315,9 @@ oppia.factory('oppiaPlayerService', [
                 newStateName, LearnerParamsService.getAllParams());
             }
           }
-
-          $location.path('/preview/' + newStateName);
+          if (_editorPreviewMode) {
+            $location.path('/preview/' + newStateName);
+          }
           $rootScope.$broadcast('playerStateChange');
           successCallback(
             newStateName, refreshInteraction, feedbackHtml, questionHtml,

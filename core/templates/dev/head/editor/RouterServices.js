@@ -52,24 +52,9 @@ oppia.factory('routerService', [
 
       $rootScope.$broadcast('externalSave');
 
-      if (newPath.indexOf('/preview/') !== -1) {
+      if (newPath.indexOf('/preview/') === 0) {
         _tabs.active = PREVIEW_TAB;
-        var putativeStateName = newPath.substring('/preview/'.length);
-
-        var waitForStatesToLoad = $interval(function() {
-          var allStates = explorationStatesService.getStates();
-          if (allStates) {
-            $interval.cancel(waitForStatesToLoad);
-
-            if (allStates.hasOwnProperty(putativeStateName)) {
-              editorContextService.setActiveStateName(putativeStateName);
-              $rootScope.$broadcast('refreshPreviewTab');
-            } else {
-              $location.path(
-                '/preview/' + explorationInitStateNameService.savedMemento);
-            }
-          }
-        }, 500);
+        _doNavigation(newPath, 'preview');
       } else if (newPath === '/settings') {
         _tabs.active = SETTINGS_TAB;
         $rootScope.$broadcast('refreshSettingsTab');
@@ -86,26 +71,7 @@ oppia.factory('routerService', [
         _tabs.active = FEEDBACK_TAB;
       } else if (newPath.indexOf('/gui/') !== -1) {
         _tabs.active = MAIN_TAB;
-        var putativeStateName = newPath.substring('/gui/'.length);
-
-        var waitForStatesToLoad = $interval(function() {
-          var allStates = explorationStatesService.getStates();
-          if (allStates) {
-            $interval.cancel(waitForStatesToLoad);
-
-            if (allStates.hasOwnProperty(putativeStateName)) {
-              editorContextService.setActiveStateName(putativeStateName);
-              $rootScope.$broadcast('refreshStateEditor');
-              // TODO(sll): Fire an event to center the graph, in the case
-              // where another tab is loaded first and then the user switches
-              // to the editor tab. We used to redraw the graph completely but
-              // this is taking lots of time and is probably not worth it.
-            } else {
-              $location.path(
-                '/gui/' + explorationInitStateNameService.savedMemento);
-            }
-          }
-        }, 300);
+        _doNavigation(newPath, 'gui');
       } else {
         if (explorationInitStateNameService.savedMemento) {
           $location.path(
@@ -113,6 +79,30 @@ oppia.factory('routerService', [
         }
       }
     });
+
+    var _doNavigation = function(path, pathType) {
+      var pathBase = '/' + pathType + '/';
+      var putativeStateName = path.substring(pathBase.length);
+      var waitForStatesToLoad = $interval(function() {
+        var allStates = explorationStatesService.getStates();
+        if (allStates) {
+          $interval.cancel(waitForStatesToLoad);
+          if (allStates.hasOwnProperty(putativeStateName)) {
+            editorContextService.setActiveStateName(putativeStateName);
+            if (pathType === 'gui') {
+              $rootScope.$broadcast('refreshStateEditor');
+            }
+            // TODO(sll): Fire an event to center the graph, in the case
+            // where another tab is loaded first and then the user switches
+            // to the editor tab. We used to redraw the graph completely but
+            // this is taking lots of time and is probably not worth it.
+          } else {
+            $location.path(pathBase +
+                           explorationInitStateNameService.savedMemento);
+          }
+        }
+      }, 300);
+    };
 
     var _savePendingChanges = function() {
       try {
@@ -126,12 +116,9 @@ oppia.factory('routerService', [
       }
     };
 
-    var _getCurrentStateFromLocationPath = function(pathType) {
-      if (pathType != 'preview' && pathType != 'gui') {
-        return null;
-      }
-      if ($location.path().indexOf('/' + pathType + '/') !== -1) {
-        return $location.path().substring('/' + pathType + '/'.length);
+    var _getCurrentStateFromLocationPath = function() {
+      if ($location.path().indexOf('/gui/') !== -1) {
+        return $location.path().substring('/gui/'.length);
       } else {
         return null;
       }
@@ -163,13 +150,12 @@ oppia.factory('routerService', [
           currentPath === '/settings' || currentPath === '/history' ||
           currentPath === '/feedback');
       },
-      getCurrentStateFromLocationPath: function(pathType) {
-        return _getCurrentStateFromLocationPath(pathType);
+      getCurrentStateFromLocationPath: function() {
+        return _getCurrentStateFromLocationPath();
       },
       navigateToMainTab: function(stateName) {
         _savePendingChanges();
-
-        if (_getCurrentStateFromLocationPath('gui') === stateName) {
+        if (_getCurrentStateFromLocationPath() === stateName) {
           return;
         }
 
@@ -186,10 +172,6 @@ oppia.factory('routerService', [
         }
       },
       navigateToPreviewTab: function(stateName) {
-        if (_getCurrentStateFromLocationPath('preview') === stateName) {
-          return;
-        }
-
         if (_tabs.active === PREVIEW_TAB) {
           $('.conversation-skin-cards-container').fadeOut(function() {
             _actuallyNavigate(stateName, 'preview');
