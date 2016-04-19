@@ -32,9 +32,9 @@ describe('Permissions for private explorations', function() {
 
     users.login('alice@example.com');
     workflow.createExploration('message', 'secrets');
-    workflow.addExplorationCollaborator('Bob');
-    expect(workflow.getExplorationManagers()).toEqual(['Alice']);
-    expect(workflow.getExplorationCollaborators()).toEqual(['Bob']);
+    workflow.addExplorationCollaborator('bobPrivileges');
+    expect(workflow.getExplorationManagers()).toEqual(['alicePrivileges']);
+    expect(workflow.getExplorationCollaborators()).toEqual(['bobPrivileges']);
     expect(workflow.getExplorationPlaytesters()).toEqual([]);
     general.getExplorationIdFromEditor().then(function(explorationId) {
       users.logout();

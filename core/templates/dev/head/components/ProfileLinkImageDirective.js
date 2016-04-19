@@ -36,12 +36,12 @@ oppia.directive('profileLinkImage', [function() {
         '/preferenceshandler/profile_picture_by_username/' + $scope.username());
       $scope.profilePicture = DEFAULT_PROFILE_IMAGE_PATH;
 
-      // Returns a promise for the user profile picture, or the default image if
-      // user is not logged in or has not uploaded a profile picture, or the
-      // player is in preview mode.
-      $http.get($scope.profileImageUrl).success(function(data) {
+      // Returns a promise for the user profile picture, or the default image
+      // if user is not logged in or has not uploaded a profile picture, or
+      // the player is in preview mode.
+      $http.get($scope.profileImageUrl).then(function(response) {
         $scope.profilePicture = (
-          data.profile_picture_data_url_for_username ||
+          response.data.profile_picture_data_url_for_username ||
           DEFAULT_PROFILE_IMAGE_PATH);
       });
     }]

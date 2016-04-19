@@ -20,6 +20,7 @@ import math
 
 from core import jobs
 from core.domain import exp_services
+from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.domain import rating_services
 from core.domain import stats_jobs_continuous
@@ -204,11 +205,8 @@ class RecentUpdatesMRJobManager(
         for exp_model in tracked_exp_models_for_feedback:
             threads = feedback_services.get_all_threads(exp_model.id, False)
             for thread in threads:
-                full_thread_id = (
-                    feedback_models.FeedbackThreadModel.generate_full_thread_id(
-                        exp_model.id, thread['thread_id']))
-                if full_thread_id not in feedback_thread_ids_list:
-                    feedback_thread_ids_list.append(full_thread_id)
+                if thread.id not in feedback_thread_ids_list:
+                    feedback_thread_ids_list.append(thread.id)
 
         # TODO(bhenning): Implement a solution to having feedback threads for
         # collections.
@@ -222,10 +220,12 @@ class RecentUpdatesMRJobManager(
             yield (reducer_key, recent_activity_commit_dict)
 
         for feedback_thread_id in feedback_thread_ids_list:
-            exp_id = feedback_services.get_exp_id_from_full_thread_id(
-                feedback_thread_id)
-            thread_id = feedback_services.get_thread_id_from_full_thread_id(
-                feedback_thread_id)
+            exp_id = (
+                feedback_domain.FeedbackThread.get_exp_id_from_full_thread_id(
+                    feedback_thread_id))
+            thread_id = (
+                feedback_domain.FeedbackThread.get_thread_id_from_full_thread_id( # pylint: disable=line-too-long
+                    feedback_thread_id))
             last_message = (
                 feedback_models.FeedbackMessageModel.get_most_recent_message(
                     exp_id, thread_id))
@@ -376,14 +376,47 @@ class UserImpactMRJobManager(
         exploration_impact_score = (
             UserImpactMRJobManager._get_exp_impact_score(item.id))
 
-        if exploration_impact_score > 0:
-            # Get exploration summary and contributor ids,
-            # yield for each contributor.
-            exploration_summary = exp_services.get_exploration_summary_by_id(
-                item.id)
-            contributor_ids = exploration_summary.contributor_ids
-            for contributor_id in contributor_ids:
-                yield (contributor_id, exploration_impact_score)
+        # Get average rating and value per user
+        total_rating = 0
+        for ratings_value in item.ratings:
+            total_rating += item.ratings[ratings_value] * int(ratings_value)
+        if not sum(item.ratings.itervalues()):
+            return
+        average_rating = total_rating / sum(item.ratings.itervalues())
+        value_per_user = average_rating - 2
+        if value_per_user <= 0:
+            return
+
+        statistics = (
+            stats_jobs_continuous.StatisticsAggregator.get_statistics(
+                item.id, stats_jobs_continuous.VERSION_ALL))
+        answer_count = 0
+        # Find number of users per state (card), and subtract no answer
+        # This will not count people who have been back to a state twice
+        # but did not give an answer the second time, but is probably the
+        # closest we can get with current statistics to "number of users
+        # who gave an answer" since it is "number of users who always gave
+        # an answer".
+        for state_name in statistics['state_hit_counts']:
+            state_stats = statistics['state_hit_counts'][state_name]
+            first_entry_count = state_stats.get('first_entry_count', 0)
+            no_answer_count = state_stats.get('no_answer_count', 0)
+            answer_count += first_entry_count - no_answer_count
+        # Turn answer count into reach
+        reach = answer_count**exponent
+
+        exploration_summary = exp_services.get_exploration_summary_by_id(
+            item.id)
+        contributors = exploration_summary.contributors_summary
+        total_commits = sum(contributors.itervalues())
+        if total_commits == 0:
+            return
+        for contrib_id in contributors:
+            # Find fractional contribution for each contributor
+            contribution = contributors[contrib_id] / float(total_commits)
+            # Find score for this specific exploration
+            exploration_impact_score = value_per_user * reach * contribution
+            yield (contrib_id, exploration_impact_score)
 
     @staticmethod
     def reduce(key, stringified_values):

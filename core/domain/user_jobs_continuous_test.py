@@ -33,6 +33,7 @@ from core.domain import user_jobs_continuous
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import utils
 
 (exp_models, user_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.user])
@@ -297,7 +298,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 EXP_1_ID, None, editor_id, FEEDBACK_THREAD_SUBJECT,
                 'text')
             thread_id = feedback_services.get_all_threads(
-                EXP_1_ID, False)[0]['thread_id']
+                EXP_1_ID, False)[0].get_thread_id()
             message = feedback_services.get_messages(EXP_1_ID, thread_id)[0]
 
             # User creates another exploration.
@@ -326,7 +327,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 'activity_id': EXP_1_ID,
                 'activity_title': EXP_1_TITLE,
                 'author_id': editor_id,
-                'last_updated_ms': message['created_on'],
+                'last_updated_ms': utils.get_time_in_millisecs(
+                    message.created_on),
                 'subject': FEEDBACK_THREAD_SUBJECT,
                 'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
             }, (
@@ -353,7 +355,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             feedback_services.create_thread(
                 EXP_ID, None, user_b_id, FEEDBACK_THREAD_SUBJECT, 'text')
             thread_id = feedback_services.get_all_threads(
-                EXP_ID, False)[0]['thread_id']
+                EXP_ID, False)[0].get_thread_id()
 
             message = feedback_services.get_messages(
                 EXP_ID, thread_id)[0]
@@ -375,7 +377,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 'activity_id': EXP_ID,
                 'activity_title': EXP_TITLE,
                 'author_id': user_b_id,
-                'last_updated_ms': message['created_on'],
+                'last_updated_ms': utils.get_time_in_millisecs(
+                    message.created_on),
                 'subject': FEEDBACK_THREAD_SUBJECT,
                 'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
             }
@@ -413,7 +416,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             feedback_services.create_thread(
                 EXP_ID, None, user_b_id, FEEDBACK_THREAD_SUBJECT, 'text')
             thread_id = feedback_services.get_all_threads(
-                EXP_ID, False)[0]['thread_id']
+                EXP_ID, False)[0].get_thread_id()
             message = feedback_services.get_messages(
                 EXP_ID, thread_id)[0]
 
@@ -438,7 +441,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 'activity_id': EXP_ID,
                 'activity_title': EXP_TITLE,
                 'author_id': user_b_id,
-                'last_updated_ms': message['created_on'],
+                'last_updated_ms': utils.get_time_in_millisecs(
+                    message.created_on),
                 'subject': FEEDBACK_THREAD_SUBJECT,
                 'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
             }

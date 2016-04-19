@@ -33,6 +33,8 @@ class ExplorationDisplayableSummaries(
     EXP_ID_1 = 'eid1'
     EXP_ID_2 = 'eid2'
     EXP_ID_3 = 'eid3'
+    EXP_ID_4 = 'eid4'
+    EXP_ID_5 = 'eid5'
 
     EXPECTED_VERSION_1 = 4
     EXPECTED_VERSION_2 = 2
@@ -98,6 +100,30 @@ class ExplorationDisplayableSummaries(
         rights_manager.publish_exploration(self.albert_id, self.EXP_ID_3)
         exp_services.delete_exploration(self.albert_id, self.EXP_ID_3)
 
+        self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
+        self.user_d_id = self.get_user_id_from_email(self.USER_D_EMAIL)
+        self.signup(self.USER_C_EMAIL, self.USER_C_NAME)
+        self.signup(self.USER_D_EMAIL, self.USER_D_NAME)
+        user_services.update_profile_picture_data_url(
+            self.user_c_id, self.USER_C_PROFILE_PICTURE)
+
+        self.save_new_valid_exploration(self.EXP_ID_4, self.user_c_id)
+        exp_services.update_exploration(
+            self.user_d_id, self.EXP_ID_4, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'Exploration updated title'
+            }], 'Changed title once.')
+
+        exp_services.update_exploration(
+            self.user_d_id, self.EXP_ID_4, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'Exploration updated title again'
+            }], 'Changed title twice.')
+
+        self.save_new_valid_exploration(self.EXP_ID_5, self.bob_id)
+
     def test_get_human_readable_contributors_summary(self):
         contributors_summary = {self.albert_id: 10, self.bob_id: 13}
         self.assertEqual({
@@ -107,14 +133,15 @@ class ExplorationDisplayableSummaries(
 
     def test_get_displayable_exp_summary_dicts_matching_ids(self):
         # A list of exp_id's are passed in:
-        # EXP_ID_1 -- private exploration
-        # EXP_ID_2 -- pubished exploration
+        # EXP_ID_1 -- private exploration owned by Albert
+        # EXP_ID_2 -- pubished exploration owned by Albert
         # EXP_ID_3 -- deleted exploration
+        # EXP_ID_5 -- private exploration owned by Bob
         # Should only return [EXP_ID_2]
 
         displayable_summaries = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3]))
+                [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5]))
         expected_summary = {
             'status': u'public',
             'thumbnail_bg_color': '#05a69a',
@@ -134,3 +161,36 @@ class ExplorationDisplayableSummaries(
         self.assertIn('last_updated_msec', displayable_summaries[0])
         self.assertDictContainsSubset(expected_summary,
                                       displayable_summaries[0])
+
+    def test_get_public_and_filtered_private_summary_dicts_for_creator(self):
+        # If a new exploration is created by another user (Bob) and not public,
+        # then Albert cannot see it when querying for explorations.
+        displayable_summaries = (
+            summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5],
+                editor_user_id=self.albert_id))
+
+        self.assertEqual(len(displayable_summaries), 2)
+        self.assertEqual(displayable_summaries[0]['id'], self.EXP_ID_1)
+        self.assertEqual(displayable_summaries[1]['id'], self.EXP_ID_2)
+
+        # However, if Albert is granted editor access to Bob's exploration, then
+        # Albert has access to the corresponding summary.
+        rights_manager.assign_role_for_exploration(
+            self.bob_id, self.EXP_ID_5, self.albert_id,
+            rights_manager.ROLE_EDITOR)
+
+        displayable_summaries = (
+            summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5],
+                editor_user_id=self.albert_id))
+
+        self.assertEqual(len(displayable_summaries), 3)
+        self.assertEqual(displayable_summaries[0]['status'], 'private')
+        self.assertEqual(displayable_summaries[0]['id'], self.EXP_ID_1)
+
+        self.assertEqual(displayable_summaries[1]['status'], 'public')
+        self.assertEqual(displayable_summaries[1]['id'], self.EXP_ID_2)
+
+        self.assertEqual(displayable_summaries[2]['status'], 'private')
+        self.assertEqual(displayable_summaries[2]['id'], self.EXP_ID_5)

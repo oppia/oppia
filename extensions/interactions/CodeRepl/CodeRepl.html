@@ -21,13 +21,18 @@
     background-color: #eee;
   }
   .cm-s-preview .CodeMirror-code pre {
-    background-color: #fff;
+    /* Without this, underscore characters are not visible. */
+    height: 1.04em;
     width: 100%;
   }
   .cm-s-preview .CodeMirror-code .code-repl-noneditable-line {
     background-color: #eee;
     opacity: 0.8;
   }
+  .CodeMirror-lines {
+    background-color: white;
+  }
+  
 </style>
 
 <script type="text/ng-template" id="interaction/CodeRepl">

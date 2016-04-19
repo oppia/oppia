@@ -388,21 +388,24 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
       _sendEventToGoogleAnalytics(
         'LoginButton', 'click', $window.location.pathname + ' ' + srcElement);
     },
+    registerNewSignupEvent: function() {
+      _sendEventToGoogleAnalytics('SignupButton', 'click', '');
+    },
     registerOpenExplorationCreationModalEvent: function() {
       _sendEventToGoogleAnalytics(
         'CreateExplorationModal', 'open', $window.location.pathname);
     },
-    registerPublishExplorationEvent: function(explorationId) {
+    registerCreateNewExplorationEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
-        'PublishExploration', 'click', explorationId);
-    },
-    registerCommitChangesToPublicExplorationEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'CommitToPublicExploration', 'click', explorationId);
+        'NewExploration', 'create', explorationId);
     },
     registerCommitChangesToPrivateExplorationEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
         'CommitToPrivateExploration', 'click', explorationId);
+    },
+    registerPublishExplorationEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'PublishExploration', 'click', explorationId);
     },
     registerShareExplorationEvent: function(network) {
       _sendSocialEventToGoogleAnalytics(
@@ -411,9 +414,9 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
     registerOpenEmbedInfoEvent: function(explorationId) {
       _sendEventToGoogleAnalytics('EmbedInfoModal', 'open', explorationId);
     },
-    registerCreateNewExplorationEvent: function(explorationId) {
+    registerCommitChangesToPublicExplorationEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
-        'NewExploration', 'create', explorationId);
+        'CommitToPublicExploration', 'click', explorationId);
     }
   };
 }]);

@@ -81,7 +81,7 @@
         ng-class="{'oppia-progress-arrow-active' : currentDotIndex > 0}"
         ng-click="decrementCurrentDotIndex()">
       <span class="sr-only">Back</span>
-      <span class="glyphicon glyphicon-arrow-left" aria-hidden="true">
+      <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C4;</i>
       </span>
     </li>
     <li ng-repeat="dot in dots track by $index"
@@ -106,7 +106,7 @@
         ng-class="{'oppia-progress-arrow-active' : currentDotIndex != dots.length - 1}"
         ng-click="incrementCurrentDotIndex()">
       <span class="sr-only">Forward</span>
-      <span class=" glyphicon glyphicon-arrow-right" aria-hidden="true">
+      <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C8;</i>
       </span>
     </li>
   </ul>

@@ -89,14 +89,14 @@ oppia.factory('explorationData', [
           change_list: changeList,
           commit_message: commitMessage,
           version: explorationData.data.version
-        }).success(function(data) {
-          warningsData.clear();
+        }).then(function(response) {
+          alertsService.clearWarnings();
           $log.info('Changes to this exploration were saved successfully.');
-          explorationData.data = data;
+          explorationData.data = response.data;
           if (successCallback) {
             successCallback();
           }
-        }).error(function() {
+        }, function() {
           if (errorCallback) {
             errorCallback();
           }
@@ -439,8 +439,9 @@ oppia.factory('explorationRightsService', [
       requestParams.version = explorationData.data.version;
       var explorationRightsUrl = (
         '/createhandler/rights/' + explorationData.explorationId);
-      $http.put(explorationRightsUrl, requestParams).success(function(data) {
-        warningsData.clear();
+      $http.put(explorationRightsUrl, requestParams).then(function(response) {
+        var data = response.data;
+        alertsService.clearWarnings();
         that.init(
           data.rights.owner_names, data.rights.editor_names,
           data.rights.viewer_names, data.rights.status,
@@ -457,8 +458,9 @@ oppia.factory('explorationRightsService', [
         action: action,
         email_body: emailBody,
         version: explorationData.data.version
-      }).success(function(data) {
-        warningsData.clear();
+      }).then(function(response) {
+        var data = response.data;
+        alertsService.clearWarnings();
         that.init(
           data.rights.owner_names, data.rights.editor_names,
           data.rights.viewer_names, data.rights.status,
@@ -1523,7 +1525,7 @@ oppia.factory('stateEditorTutorialFirstTimeService', [
         }
 
         if (_currentlyInFirstVisit) {
-          $rootScope.$broadcast('openEditorTutorial');
+          $rootScope.$broadcast('enterEditorForTheFirstTime');
           $http.post(STARTED_TUTORIAL_EVENT_URL).error(function() {
             console.error('Warning: could not record tutorial start event.');
           });

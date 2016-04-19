@@ -144,21 +144,22 @@ oppia.factory('ExplorationCreationButtonService', [
             return;
           }
 
-          $rootScope.loadingMessage = 'Creating exploration';
-          $http.post('/contributehandler/create_new', {
-            category: category,
-            language_code: result.languageCode,
-            objective: $filter('normalizeWhitespace')(result.objective),
-            title: result.title
-          }).success(function(data) {
-            siteAnalyticsService.registerCreateNewExplorationEvent(
-              data.explorationId);
-            $timeout(function() {
-              $window.location = '/create/' + data.explorationId;
-            }, 150);
-            return false;
-          }).error(function() {
-            $rootScope.loadingMessage = '';
+            $rootScope.loadingMessage = 'Creating exploration';
+            $http.post('/contributehandler/create_new', {
+              category: category,
+              language_code: result.languageCode,
+              objective: $filter('normalizeWhitespace')(result.objective),
+              title: result.title
+            }).then(function(response) {
+              siteAnalyticsService.registerCreateNewExplorationEvent(
+                response.data.explorationId);
+              $timeout(function() {
+                $window.location = '/create/' + response.data.explorationId;
+              }, 150);
+              return false;
+            }, function() {
+              $rootScope.loadingMessage = '';
+            });
           });
         });
       },

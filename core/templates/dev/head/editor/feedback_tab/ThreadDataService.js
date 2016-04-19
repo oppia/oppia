@@ -55,12 +55,12 @@ oppia.factory('threadDataService', [
   };
 
   var _fetchMessages = function(threadId) {
-    $http.get(_THREAD_HANDLER_PREFIX + threadId).success(function(data) {
+    $http.get(_THREAD_HANDLER_PREFIX + threadId).then(function(response) {
       var allThreads = _data.feedbackThreads.concat(_data.suggestionThreads);
       for (var i = 0; i < allThreads.length; i++) {
         if (allThreads[i].thread_id === threadId) {
-          allThreads[i].messages = data.messages;
-          allThreads[i].suggestion = data.suggestion;
+          allThreads[i].messages = response.data.messages;
+          allThreads[i].suggestion = response.data.suggestion;
           break;
         }
       }
@@ -75,16 +75,27 @@ oppia.factory('threadDataService', [
     fetchMessages: function(threadId) {
       _fetchMessages(threadId);
     },
+    fetchFeedbackStats: function() {
+      $http.get(_FEEDBACK_STATS_HANDLER_URL).then(function(response) {
+        _openThreadsCount = response.data.num_open_threads;
+      });
+    },
+    getOpenThreadsCount: function() {
+      return _openThreadsCount;
+    },
     createNewThread: function(newSubject, newText, successCallback) {
       $http.post(_THREAD_LIST_HANDLER_URL, {
         state_name: null,
         subject: newSubject,
         text: newText
-      }).success(function() {
+      }).then(function() {
         _fetchThreads();
         if (successCallback) {
           successCallback();
         }
+      }, function() {
+        _openThreadsCount -= 1;
+        alertsService.addWarning('Error creating new thread.');
       });
     },
     addNewMessage: function(
@@ -113,13 +124,22 @@ oppia.factory('threadDataService', [
         text: newMessage
       };
 
-      $http.post(url, payload).success(function() {
+      $http.post(url, payload).then(function() {
         _fetchMessages(threadId);
 
         if (successCallback) {
           successCallback();
         }
-      }).error(function() {
+      }, function() {
+        // Revert changes
+        if (newStatus !== oldStatus) {
+          if (oldStatus == _THREAD_STATUS_OPEN) {
+            _openThreadsCount += 1;
+          } else if (newStatus == _THREAD_STATUS_OPEN) {
+            _openThreadsCount -= 1;
+          }
+          thread.status = oldStatus;
+        }
         if (errorCallback) {
           errorCallback();
         }
@@ -133,8 +153,14 @@ oppia.factory('threadDataService', [
       if (commitMsg) {
         payload.commit_message = commitMsg;
       }
-      $http.put(_SUGGESTION_ACTION_HANDLER_URL + threadId, payload).success(
-        onSuccess).error(onFailure);
+      _openThreadsCount -= 1;
+      $http.put(_SUGGESTION_ACTION_HANDLER_URL + threadId, payload).then(
+        onSuccess, function() {
+        _openThreadsCount += 1;
+        if (onFailure) {
+          onFailure();
+        }
+      });
     }
   };
 }]);

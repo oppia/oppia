@@ -26,6 +26,9 @@ from extensions.objects.models import objects
 import feconf
 
 
+EXPECTED_TOTAL_NUMBER_OF_RULES = 48
+
+
 class FakeRule(rule_domain.Rule):
     subject_type = objects.Real
     description = 'is between {{x|Real}} and {{y|UnicodeString}}'

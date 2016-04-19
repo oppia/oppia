@@ -45,6 +45,7 @@ class ConfigProperty(object):
     - editor_page_announcement
     - editor_prerequisites_agreement
     - full_site_url
+    - sharing_options_twitter_text
     - splash_page_exploration_id
     - splash_page_exploration_version
     """

@@ -33,10 +33,15 @@ def get_human_readable_contributors_summary(contributors_summary):
     }
 
 
-def get_displayable_exp_summary_dicts_matching_ids(exploration_ids):
-    """Given a list of exploration ids, filters the list for
-    explorations that are currently non-private and not deleted,
-    and returns a list of dicts of the corresponding exploration summaries.
+def get_displayable_exp_summary_dicts_matching_ids(
+        exploration_ids, editor_user_id=None):
+    """Given a list of exploration ids, optionally filters the list for
+    explorations that are currently non-private and not deleted, and returns a
+    list of dicts of the corresponding exploration summaries. This function can
+    also filter based on a user ID who has edit access to the corresponding
+    exploration, where the editor ID is for private explorations. Please use
+    this function when needing summary information to display on exploration
+    summary tiles in the frontend.
     """
     displayable_exp_summaries = []
     exploration_summaries = (
@@ -46,31 +51,38 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids):
             exploration_ids))
 
     for ind, exploration_summary in enumerate(exploration_summaries):
-        if exploration_summary and exploration_summary.status != (
+        if not exploration_summary:
+            continue
+        if exploration_summary.status == (
                 rights_manager.ACTIVITY_STATUS_PRIVATE):
-            displayable_exp_summaries.append({
-                'id': exploration_summary.id,
-                'title': exploration_summary.title,
-                'category': exploration_summary.category,
-                'objective': exploration_summary.objective,
-                'language_code': exploration_summary.language_code,
-                'last_updated_msec': utils.get_time_in_millisecs(
-                    exploration_summary.exploration_model_last_updated
-                ),
-                'status': exploration_summary.status,
-                'ratings': exploration_summary.ratings,
-                'community_owned': exploration_summary.community_owned,
-                'human_readable_contributors_summary':
-                    get_human_readable_contributors_summary(
-                        exploration_summary.contributors_summary),
-                'contributor_names': user_services.get_human_readable_user_ids(
-                    exploration_summary.contributor_ids),
-                'tags': exploration_summary.tags,
-                'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
-                    exploration_summary.category),
-                'thumbnail_bg_color': utils.get_hex_color_for_category(
-                    exploration_summary.category),
-                'num_views': view_counts[ind],
-            })
+            if not editor_user_id:
+                continue
+            if not rights_manager.Actor(editor_user_id).can_edit(
+                    rights_manager.ACTIVITY_TYPE_EXPLORATION,
+                    exploration_summary.id):
+                continue
+
+        displayable_exp_summaries.append({
+            'id': exploration_summary.id,
+            'title': exploration_summary.title,
+            'category': exploration_summary.category,
+            'objective': exploration_summary.objective,
+            'language_code': exploration_summary.language_code,
+            'last_updated_msec': utils.get_time_in_millisecs(
+                exploration_summary.exploration_model_last_updated
+            ),
+            'status': exploration_summary.status,
+            'ratings': exploration_summary.ratings,
+            'community_owned': exploration_summary.community_owned,
+            'human_readable_contributors_summary':
+                get_human_readable_contributors_summary(
+                    exploration_summary.contributors_summary),
+            'tags': exploration_summary.tags,
+            'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
+                exploration_summary.category),
+            'thumbnail_bg_color': utils.get_hex_color_for_category(
+                exploration_summary.category),
+            'num_views': view_counts[ind],
+        })
 
     return displayable_exp_summaries

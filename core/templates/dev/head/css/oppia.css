@@ -68,6 +68,12 @@ button.md-button.md-default-theme.oppia-learner-continue-button:hover {
 .material-icons.md-18 {
   font-size: 18px;
 }
+.material-icons.md-100 {
+  font-size: 100px;
+}
+.material-icons.md-40 {
+  font-size: 40px;
+}
 .material-icons.md-dark {
   color: rgba(0, 0, 0, 0.54);
 }
@@ -554,6 +560,58 @@ textarea {
 }
 
 /*
+  Styles for footer
+*/
+.oppia-footer {
+  background-color: #094142;
+  bottom: 0;
+  color: #FFFFFF;
+  font-size: 13px;
+  line-height: 20px;
+  position: absolute;
+  width: 100%;
+}
+
+.oppia-footer-container {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  padding-left: 80px;
+  padding-right: 80px;
+}
+
+.oppia-footer-container a {
+  color: #FFFFFF;
+  text-transform: capitalize;
+}
+
+.oppia-footer-container h4 {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.oppia-footer-container ul {
+  padding-left: 0;
+}
+
+.oppia-footer-container li {
+  list-style-position: inside;
+  list-style-type: none;
+}
+
+.oppia-footer-padding {
+  height: 200px;
+}
+
+@media (max-width: 768px) {
+  .oppia-footer-padding {
+    height: 500px;
+  }
+}
+
+/*
   This is needed for proper display of tabs. See
 
   https://github.com/angular-ui/bootstrap/commit/8620aedba99b05822311
@@ -573,7 +631,7 @@ textarea {
   font-size: 16px;
   font-weight: 400;
   height: 56px;
-  padding-top: 17px;
+  padding-top: 16px;
 }
 
 .oppia-navbar-breadcrumb {
@@ -621,6 +679,7 @@ textarea {
 
 .navbar-default .dropdown-menu {
   background: #fff;
+  margin-top: 0px;
 }
 
 .navbar-default .navbar-nav > li > a, {
@@ -768,19 +827,18 @@ textarea {
 .oppia-navbar-button-container > .dropdown-menu > li > a {
   white-space: normal;
 }
-.btn.oppia-navbar-add-exploration-button {
-  background-color: rgba(5, 190, 178, 0.9);
-  color: rgba(255,255,255,0.9);
-  font-size: 16px;
+.btn.oppia-navbar-button {
+  background-color: rgba(0,0,0,0.2);
+  color: rgba(255,255,255,1.0);
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 14px;
   margin-right: 5px;
+  margin-left: 5px;
+  text-transform: uppercase;
 }
-.btn.oppia-navbar-add-exploration-button:hover {
+.btn.oppia-navbar-button:hover {
   background-color: rgba(5, 190, 178, 1);
   color: rgba(255,255,255,1);
-}
-.oppia-navbar-add-exploration-button-plus {
-  font-weight: bold;
-  margin-right: 5px;
 }
 
 @media (max-width: 1050px) {
@@ -816,7 +874,7 @@ textarea {
 }
 
 @media (max-width: 768px) {
-  .oppia-navbar-add-exploration-button {
+  .oppia-navbar-hide-on-small-width {
     display: none;
   }
 }
@@ -2031,6 +2089,11 @@ div#ng-curtain {
   z-index: 997;
 }
 
+/* Add inter-paragraph spacing to the ng-joyride tutorial contents. */
+.ng-joyride .popover-content p {
+  margin-top: 10px;
+}
+
 .oppia-navbar {
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
   cursor: default;
@@ -2076,7 +2139,21 @@ div#ng-curtain {
   margin-left: 6px;
   margin-top: 8px;
 }
-.oppia-navbar-profile-dropdown-toggle {
+
+.oppia-navbar-tabs-narrow {
+  min-width: 210px;
+}
+.oppia-navbar-tabs {
+  min-width: 500px;
+}
+.nav > li > a.oppia-navbar-tab {
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 14px;
+  padding: 17px 12px 10px 12px;
+  text-transform: uppercase;
+}
+.oppia-navbar-dropdown-toggle,
+.oppia-navbar-tab {
   height: 56px;
   color: #fff;
 }
@@ -2410,6 +2487,11 @@ div#ng-curtain {
   min-height: 80px;
 }
 
+.form-control.oppia-rte-content img.block-element {
+  display: block;
+  margin: auto;
+}
+
 /* Styles for the editor training interfaces. */
 
 .preview-conversation-skin-card-row-container {
@@ -2597,14 +2679,8 @@ md-card.preview-conversation-skin-supplemental-card {
   padding: 0;
 }
 
-.oppia-info-card-bottom-row ul li {
-  list-style-type: none;
-}
-
 .oppia-info-card-bottom-row ul li a img {
-  border-radius: 2px;
   height: 20px;
-  margin: 3px;
   width: 20px;
 }
 

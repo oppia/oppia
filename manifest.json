@@ -260,9 +260,9 @@
         }
       },
       "textAngular": {
-        "version": "1.3.7",
+        "version": "1.4.5",
         "downloadFormat": "zip",
-        "url": "https://github.com/fraywing/textAngular/archive/v1.3.7.zip",
+        "url": "https://github.com/fraywing/textAngular/archive/v1.4.5.zip",
         "rootDirPrefix": "textAngular-",
         "targetDirPrefix": "textAngular-",
         "bundle": {

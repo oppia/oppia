@@ -247,6 +247,85 @@ def is_collection_summary_editable(collection_summary, user_id=None):
         or collection_summary.community_owned)
 
 
+def get_learner_collection_dict_by_id(
+        collection_id, user_id, strict=True, allow_invalid_explorations=False,
+        version=None):
+    """Creates and returns a dictionary representation of a collection given by
+    the provided collection ID. This dictionary contains extra information
+    along with the dict returned by collection_domain.Collection.to_dict()
+    which includes useful data for the collection learner view. The information
+    includes progress in the collection, information about explorations
+    referenced within the collection, and a slightly nicer data structure for
+    frontend work.
+
+    This raises a ValidationError if the collection retrieved using the given ID
+    references non-existent explorations.
+    """
+    collection = get_collection_by_id(
+        collection_id, strict=strict, version=version)
+
+    exp_ids = collection.exploration_ids
+    exp_summary_dicts = (
+        summary_services.get_displayable_exp_summary_dicts_matching_ids(
+            exp_ids, editor_user_id=user_id))
+    exp_summaries_dict_map = {
+        exp_summary_dict['id']: exp_summary_dict
+        for exp_summary_dict in exp_summary_dicts
+    }
+
+    # TODO(bhenning): Users should not be recommended explorations they have
+    # completed outside the context of a collection (see #1461).
+    next_exploration_ids = None
+    completed_exploration_ids = None
+    if user_id:
+        completed_exploration_ids = _get_valid_completed_exploration_ids(
+            user_id, collection_id, collection)
+        next_exploration_ids = collection.get_next_exploration_ids(
+            completed_exploration_ids)
+    else:
+        # If the user is not logged in or they have not completed any of
+        # the explorations yet within the context of this collection,
+        # recommend the initial explorations.
+        next_exploration_ids = collection.init_exploration_ids
+        completed_exploration_ids = []
+
+    collection_dict = collection.to_dict()
+    collection_dict['skills'] = collection.skills
+    collection_dict['playthrough_dict'] = {
+        'next_exploration_ids': next_exploration_ids,
+        'completed_exploration_ids': completed_exploration_ids
+    }
+    collection_dict['version'] = collection.version
+
+    collection_is_public = rights_manager.is_collection_public(collection_id)
+
+    # Insert an 'exploration' dict into each collection node, where the
+    # dict includes meta information about the exploration (ID and title).
+    for collection_node in collection_dict['nodes']:
+        exploration_id = collection_node['exploration_id']
+        summary_dict = exp_summaries_dict_map.get(exploration_id)
+        if not allow_invalid_explorations:
+            if not summary_dict:
+                raise utils.ValidationError(
+                    'Expected collection to only reference valid '
+                    'explorations, but found an exploration with ID: %s (was '
+                    'the exploration deleted or is it a private exploration '
+                    'that you do not have edit access to?)'
+                    % exploration_id)
+            if collection_is_public and rights_manager.is_exploration_private(
+                    exploration_id):
+                raise utils.ValidationError(
+                    'Cannot reference a private exploration within a public '
+                    'collection, exploration ID: %s' % exploration_id)
+
+        if summary_dict:
+            collection_node['exploration_summary'] = summary_dict
+        else:
+            collection_node['exploration_summary'] = None
+
+    return collection_dict
+
+
 # Query methods.
 def get_collection_titles_and_categories(collection_ids):
     """Returns collection titles and categories for the given ids.

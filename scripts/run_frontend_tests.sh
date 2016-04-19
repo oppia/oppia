@@ -72,12 +72,13 @@ echo ""
 echo "  Running test in development environment"
 echo ""
 
-$NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.js
+$XVFB_PREFIX $NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.js
 
 echo ""
 echo "  Running test in production environment"
 echo ""
 
-$NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.js --minify=True
+  $XVFB_PREFIX $NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.js --minify=True
+fi
 
 echo Done!
