@@ -171,7 +171,7 @@ class ExplorationDisplayableSummaries(
 
         displayable_summaries = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                [self.EXP_ID_3, self.EXP_ID_2, self.EXP_ID_1]))
+                [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3]))
         expected_summary = {
             'status': u'public',
             'thumbnail_bg_color': '#05a69a',
@@ -225,6 +225,67 @@ class ExplorationDisplayableSummaries(
         }
         self.assertDictContainsSubset(expected_summary,
                                       exploration_summary[0])
+
+
+class ExplorationCategories(
+        exp_services_test.ExplorationServicesUnitTests):
+    """Test functions for getting exploration categories summary dicts."""
+
+    def setUp(self):
+        """Populate the database of explorations and their summaries.
+
+        The sequence of events is:
+        - (1) Admin logs in.
+        - (2) Admin access admin page.
+        - (3) Admin reloads exploration with id =2.
+        - (4) Admin logs out.
+        """
+
+        super(ExplorationCategories, self).setUp()
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        response = self.testapp.get('/admin')
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.post_json('/adminhandler', {
+            'action': 'reload_exploration',
+            'exploration_id': '2'
+        }, csrf_token)
+        self.logout()
+        
+    def test_get_gallery_category_groupings(self):
+        """Exploration with id property of 2 is an exploration with 
+        category property of Mathematics. The call to 
+        get_gallery_catergory_groupings() should return the exploration
+        in Mathematics & Statistics category. 
+        """
+        gallery_category_groupings = (
+            summary_services.get_gallery_category_groupings([]))
+        print gallery_category_groupings
+        expected_exploration_summary = {
+            'status': u'public',
+            'thumbnail_bg_color': '#058ca6',
+            'community_owned': True,
+            'tags': [],
+            'thumbnail_icon_url': '/images/gallery/thumbnails/Mathematics.svg',
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'human_readable_contributors_summary': {},
+            'id': '2',
+            'category': u'Mathematics',
+            'ratings': feconf.get_empty_ratings(),
+            'title':  u'The Lazy Magician',
+            'num_views': 0,
+            'objective': u'discover the binary search algorithm'
+        }
+        expected_gallery_group = {
+            'categories': ['Mathematics', 'Statistics'],
+            'header': 'Mathematics & Statistics',
+        }
+
+        self.assertDictContainsSubset(expected_gallery_group,
+            gallery_category_groupings[0])
+        actual_exploration = (
+            gallery_category_groupings[0]["activity_summary_dicts"][0])
+        self.assertDictContainsSubset(expected_exploration_summary,
+            actual_exploration)
 
 
 class FeaturedExplorationDisplayableSummaries(
