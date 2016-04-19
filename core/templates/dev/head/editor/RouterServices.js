@@ -124,7 +124,7 @@ oppia.factory('routerService', [
       }
     };
 
-    var _actuallyNavigate = function(newStateName, pathType) {
+    var _actuallyNavigate = function(pathType, newStateName) {
       if (pathType != 'preview' && pathType != 'gui') {
         return;
       }
@@ -161,27 +161,27 @@ oppia.factory('routerService', [
 
         if (_tabs.active === MAIN_TAB) {
           $('.oppia-editor-cards-container').fadeOut(function() {
-            _actuallyNavigate(stateName, 'gui');
+            _actuallyNavigate('gui', stateName);
             $rootScope.$apply();
             $timeout(function() {
               $('.oppia-editor-cards-container').fadeIn();
             }, 150);
           });
         } else {
-          _actuallyNavigate(stateName, 'gui');
+          _actuallyNavigate('gui', stateName);
         }
       },
       navigateToPreviewTab: function(stateName) {
         if (_tabs.active === PREVIEW_TAB) {
           $('.conversation-skin-cards-container').fadeOut(function() {
-            _actuallyNavigate(stateName, 'preview');
+            _actuallyNavigate('preview', stateName);
             $rootScope.$apply();
             $timeout(function() {
               $('.conversation-skin-cards-container').fadeIn();
             }, 150);
           });
         } else {
-          _actuallyNavigate(stateName, 'preview');
+          _actuallyNavigate('preview', stateName);
         }
       },
       navigateToStatsTab: function() {
