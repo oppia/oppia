@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Unit tests for Logic Proof rules.
+ *
+ * @author wxyxinyu@gmail.com (Xinyu Wu)
  */
 
 describe('Logic Proof rules service', function() {

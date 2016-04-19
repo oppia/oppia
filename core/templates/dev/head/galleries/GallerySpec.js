@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Unit tests for the controller of the gallery page.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 describe('Gallery controller', function() {
@@ -75,7 +77,7 @@ describe('Gallery controller', function() {
       rootScope = $rootScope;
       ctrl = $controller('Gallery', {
         $scope: scope,
-        alertsService: null,
+        warningsData: null,
         ExplorationCreationButtonService: {
           showCreateExplorationModal: null,
           showUploadExplorationModal: null

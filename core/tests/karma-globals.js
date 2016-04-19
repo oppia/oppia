@@ -12,6 +12,8 @@
 
 /**
  * @fileoverview Globals for the Karma test environment.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 var GLOBALS = {

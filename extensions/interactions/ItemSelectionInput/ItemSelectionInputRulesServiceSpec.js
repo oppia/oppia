@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Unit tests for Item Selection rules.
+ *
+ * @author wxyxinyu@gmail.com (Xinyu Wu)
  */
 
 describe('Item Selection rules service', function() {

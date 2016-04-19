@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview End-to-end tests of the history tab.
+ *
+ * @author Xinyu Wu (wxyxinyu@gmail.com)
  */
 
 var general = require('../protractor_utils/general.js');
@@ -25,8 +27,8 @@ var player = require('../protractor_utils/player.js');
 
 describe('Exploration history', function() {
   it('should display the history', function() {
-    users.createUser('user@historyTab.com', 'userHistoryTab');
-    users.login('user@historyTab.com');
+    users.createUser('history@example.com', 'explorationhistory');
+    users.login('history@example.com');
     workflow.createExploration('history', 'history');
 
     // Constants for colors of nodes in history graph

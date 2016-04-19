@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Unit tests for Pencil Code Editor rules.
+ *
+ * @author wxyxinyu@gmail.com (Xinyu Wu)
  */
 
 describe('Pencil Code Editor rules service', function() {

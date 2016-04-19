@@ -15,6 +15,8 @@
 /**
  * @fileoverview Service that provides information about how to display the
  * status label for a thread in the feedback tab of the exploration editor.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 oppia.factory('threadStatusDisplayService', [function() {

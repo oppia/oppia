@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Service for computing the average rating.
+ *
+ * @author Jacob Davis
  */
 
 oppia.factory('RatingComputationService', [function() {

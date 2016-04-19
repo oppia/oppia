@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Object factory for creating stopwatches.
+ *
+ * @author sean@seanlip.org (Sean Lip)
  */
 
 // A simple service that provides stopwatch instances. Each stopwatch can be

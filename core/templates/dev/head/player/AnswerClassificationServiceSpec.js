@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Unit tests for the answer classification service
+ *
+ * @author wxyxinyu@gmail.com (Xinyu Wu)
  */
 
 describe('Answer classification service', function() {

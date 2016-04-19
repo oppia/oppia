@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Directives for schema-based form builders.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 // NOTE TO DEVELOPERS: This forms framework accepts an external event
@@ -702,14 +704,13 @@ oppia.factory('rteHelperService', [
 oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [
     '$delegate', '$modal', '$timeout', 'focusService', 'taRegisterTool',
-    'rteHelperService', 'alertsService', 'explorationContextService',
+    'rteHelperService', 'warningsData', 'explorationContextService',
     'PAGE_CONTEXT',
     function(
         taOptions, $modal, $timeout, focusService, taRegisterTool,
-        rteHelperService, alertsService, explorationContextService,
+        rteHelperService, warningsData, explorationContextService,
         PAGE_CONTEXT) {
       taOptions.disableSanitizer = true;
-      taOptions.forceTextAngularSanitize = false;
       taOptions.classes.textEditor = 'form-control oppia-rte-content';
       taOptions.setup.textEditorSetup = function($element) {
         $timeout(function() {
@@ -804,7 +805,7 @@ oppia.config(['$provide', function($provide) {
               if (!canUseFs && componentDefn.requiresFs) {
                 var FS_UNAUTHORIZED_WARNING = 'Unfortunately, only ' +
                   'exploration authors can make changes involving files.';
-                alertsService.addWarning(FS_UNAUTHORIZED_WARNING);
+                warningsData.addWarning(FS_UNAUTHORIZED_WARNING);
                 // Without this, the view will not update to show the warning.
                 textAngular.$editor().$parent.$apply();
                 return;
@@ -890,9 +891,9 @@ oppia.config(['$provide', function($provide) {
 }]);
 
 oppia.directive('textAngularRte', [
-    '$filter', 'oppiaHtmlEscaper', 'rteHelperService', '$timeout',
+    '$filter', 'oppiaHtmlEscaper', 'rteHelperService',
     function(
-      $filter, oppiaHtmlEscaper, rteHelperService, $timeout) {
+      $filter, oppiaHtmlEscaper, rteHelperService) {
       return {
         restrict: 'E',
         scope: {
@@ -949,10 +950,10 @@ oppia.directive('textAngularRte', [
 
           // It is possible for the content of the RTE to be changed externally,
           // e.g. if there are several RTEs in a list, and one is deleted.
-          $scope.$on('externalHtmlContentChange', function() {
-            $timeout(function() {
-              $scope.tempContent = _convertHtmlToRte($scope.htmlContent);
-            });
+          $scope.$watch('htmlContent', function(newVal, oldVal) {
+            if (newVal !== oldVal) {
+              $scope.tempContent = _convertHtmlToRte(newVal);
+            }
           });
         }]
       };
@@ -1673,8 +1674,6 @@ oppia.directive('schemaBasedListEditor', [
             'submittedSchemaBasedUnicodeForm', $scope._onChildFormSubmit);
 
           $scope.deleteElement = function(index) {
-            // Need to let the RTE know that HtmlContent has been changed.
-            $scope.$broadcast('externalHtmlContentChange');
             $scope.localValue.splice(index, 1);
           };
         } else {

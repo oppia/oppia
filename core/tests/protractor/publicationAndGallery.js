@@ -15,6 +15,8 @@
 /**
  * @fileoverview End-to-end tests of the publication and featuring process, and
  * the resultant display of explorations in the gallery.
+ *
+ * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var general = require('../protractor_utils/general.js');
@@ -35,27 +37,23 @@ describe('Gallery view', function() {
     var LANGUAGE_FRANCAIS = 'français';
     var LANGUAGE_DEUTSCH = 'Deutsch';
 
-    users.createModerator(
-      'varda@publicationAndGallery.com', 'vardaPublicationAndGallery');
-    users.createUser(
-      'feanor@publicationAndGallery.com', 'feanorPublicationAndGallery');
-    users.createUser(
-      'celebrimor@publicationAndGallery.com', 'celebriorPublicationAndGallery');
-    users.createUser(
-      'earendil@publicationAndGallery.com', 'earendilPublicationAndGallery');
+    users.createModerator('varda@example.com', 'Varda');
+    users.createUser('feanor@exmple.com', 'Feanor');
+    users.createUser('celebrimbor@example.com', 'Celebrimbor');
+    users.createUser('earendil@example.com', 'Earendil');
 
-    users.login('feanor@publicationAndGallery.com');
+    users.login('feanor@exmple.com');
     workflow.createAndPublishExploration(
       EXPLORATION_SILMARILS, CATEGORY_ENVIRONMENT,
       'hold the light of the two trees', LANGUAGE_DEUTSCH);
     users.logout();
 
-    users.login('earendil@publicationAndGallery.com');
+    users.login('earendil@example.com');
     workflow.createAndPublishExploration(
       EXPLORATION_VINGILOT, CATEGORY_BUSINESS, 'seek the aid of the Valar');
     users.logout();
 
-    users.login('varda@publicationAndGallery.com');
+    users.login('varda@example.com');
     browser.get(general.GALLERY_URL_SUFFIX);
     gallery.playExploration(EXPLORATION_VINGILOT);
     general.moveToEditor();
@@ -65,7 +63,7 @@ describe('Gallery view', function() {
     workflow.markExplorationAsFeatured();
     users.logout();
 
-    users.login('celebrimor@publicationAndGallery.com');
+    users.login('celebrimbor@example.com');
     workflow.createExploration('Vilya', 'rings');
     editor.setContent(forms.toRichText('Celebrimbor wrote this'));
     editor.setInteraction('EndExploration');

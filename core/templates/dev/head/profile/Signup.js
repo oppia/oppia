@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Data and controllers for the Oppia profile page.
+ *
+ * @author sfederwisch@google.com (Stephanie Federwisch)
  */
 
 oppia.controller('Signup', [
@@ -67,7 +69,7 @@ oppia.controller('Signup', [
       if ($scope.hasUsername) {
         return;
       }
-      alertsService.clearWarnings();
+      warningsData.clear();
       $scope.blurredAtLeastOnce = true;
       $scope.updateWarningText(username);
       if (!$scope.warningText) {
@@ -112,7 +114,7 @@ oppia.controller('Signup', [
     $scope.submitPrerequisitesForm = function(
         agreedToTerms, username, canReceiveEmailUpdates) {
       if (!agreedToTerms) {
-        alertsService.addWarning(
+        warningsData.addWarning(
           'In order to edit explorations on this site, you will need to ' +
           'agree to the site terms.');
         return;

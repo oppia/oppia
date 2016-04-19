@@ -15,6 +15,8 @@
 /**
  * @fileoverview A service that maintains the current set of parameters for the
  * learner.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 oppia.factory('LearnerParamsService', [function() {

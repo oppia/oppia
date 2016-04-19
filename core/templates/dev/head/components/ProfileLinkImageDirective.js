@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Directive for creating image links to a user's profile page.
+ *
+ * @author raine@stanford.edu (Raine Hoover)
  */
 
 oppia.directive('profileLinkImage', [function() {
@@ -31,8 +33,7 @@ oppia.directive('profileLinkImage', [function() {
       };
 
       $scope.profileImageUrl = (
-        '/preferenceshandler/profile_picture_by_username/' +
-        $scope.username());
+        '/preferenceshandler/profile_picture_by_username/' + $scope.username());
       $scope.profilePicture = DEFAULT_PROFILE_IMAGE_PATH;
 
       // Returns a promise for the user profile picture, or the default image
@@ -44,6 +45,5 @@ oppia.directive('profileLinkImage', [function() {
           DEFAULT_PROFILE_IMAGE_PATH);
       });
     }]
-
   };
 }]);

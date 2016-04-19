@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Unit tests for the MusicNotesInput interaction.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 describe('MusicNotesInput interaction', function() {

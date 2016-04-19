@@ -29,9 +29,6 @@ import utils
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
-COLLECTION_PROPERTY_TITLE = 'title'
-COLLECTION_PROPERTY_CATEGORY = 'category'
-COLLECTION_PROPERTY_OBJECTIVE = 'objective'
 COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS = 'prerequisite_skills'
 COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS = 'acquired_skills'
 
@@ -41,10 +38,10 @@ CMD_ADD_COLLECTION_NODE = 'add_collection_node'
 CMD_DELETE_COLLECTION_NODE = 'delete_collection_node'
 # This takes additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
-CMD_EDIT_COLLECTION_PROPERTY = 'edit_collection_property'
+CMD_EDIT_COLLECTION_NODE_PROPERTY = 'edit_collection_node_property'
 # This takes additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
-CMD_EDIT_COLLECTION_NODE_PROPERTY = 'edit_collection_node_property'
+CMD_EDIT_COLLECTION_PROPERTY = 'edit_collection_property'
 # This takes additional 'from_version' and 'to_version' parameters for logging.
 CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION = 'migrate_schema_to_latest_version'
 
@@ -62,9 +59,7 @@ class CollectionChange(object):
         COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS,
         COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS)
 
-    COLLECTION_PROPERTIES = (
-        COLLECTION_PROPERTY_TITLE, COLLECTION_PROPERTY_CATEGORY,
-        COLLECTION_PROPERTY_OBJECTIVE)
+    COLLECTION_PROPERTIES = ('title', 'category', 'objective')
 
     def __init__(self, change_dict):
         """Initializes an CollectionChange object from a dict.
@@ -383,9 +378,8 @@ class Collection(object):
         """
         acquired_skills = set()
         for completed_exp_id in completed_exploration_ids:
-            collection_node = self.get_node(completed_exp_id)
-            if collection_node:
-                acquired_skills.update(collection_node.acquired_skills)
+            acquired_skills.update(
+                self.get_node(completed_exp_id).acquired_skills)
 
         next_exp_ids = []
         for node in self.nodes:

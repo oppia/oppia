@@ -300,8 +300,6 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         collection_services.publish_collection_and_update_user_profiles(
             self.admin_id, self.COL_ID)
-        exp_services.publish_exploration_and_update_user_profiles(
-            self.admin_id, self.EXP_ID)
 
         # Test all owners and editors of collection after publication have
         # updated first contribution times.

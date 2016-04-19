@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Directive for the header of the response tiles.
+ *
+ * @author sean@seanlip.org (Sean Lip)
  */
 
 oppia.directive('responseHeader', [function() {

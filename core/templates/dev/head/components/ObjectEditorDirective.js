@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Directives for the object editors.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 // Individual object editor directives are in extensions/objects/templates.

@@ -14,10 +14,12 @@
 
 /**
  * @fileoverview Controller for the learner's view of a collection.
+ *
+ * @author henning.benmax@gmail.com (Ben Henning)
  */
 
 oppia.constant(
-  'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');
+  'COLLECTION_DATA_URL', '/collectionhandler/data/<collection_id>');
 
 oppia.animation('.oppia-collection-animate-slide', function() {
   return {
@@ -31,22 +33,21 @@ oppia.animation('.oppia-collection-animate-slide', function() {
 });
 
 oppia.controller('CollectionPlayer', [
-  '$scope', 'CollectionBackendApiService', 'CollectionObjectFactory',
-  'CollectionPlaythroughObjectFactory', 'alertsService',
-  function($scope, CollectionBackendApiService, CollectionObjectFactory,
-    CollectionPlaythroughObjectFactory, alertsService) {
+  '$scope', 'CollectionDataService', 'warningsData',
+  function($scope, CollectionDataService, warningsData) {
     $scope.collection = null;
-    $scope.collectionPlaythrough = null;
     $scope.collectionId = GLOBALS.collectionId;
     $scope.showingAllExplorations = !GLOBALS.isLoggedIn;
 
     $scope.getCollectionNodeForExplorationId = function(explorationId) {
-      var collectionNode = (
-        $scope.collection.getCollectionNodeByExplorationId(explorationId));
-      if (!collectionNode) {
-        alertsService.addWarning('There was an error loading the collection.');
+      for (var i = 0; i < $scope.collection.nodes.length; i++) {
+        var collectionNode = $scope.collection.nodes[i];
+        if (collectionNode.exploration_id == explorationId) {
+          return collectionNode;
+        }
       }
-      return collectionNode;
+      warningsData.addWarning('There was an error loading the collection.');
+      return null;
     };
 
     $scope.getCollectionNodesForExplorationIds = function(explorationIds) {
@@ -58,36 +59,61 @@ oppia.controller('CollectionPlayer', [
       return collectionNodes;
     };
 
+    $scope.hasStartedCollection = function() {
+      return $scope.collection.completed_exploration_ids.length != 0;
+    };
+
+    $scope.hasFinishedCollection = function() {
+      return $scope.collection.next_exploration_ids.length == 0;
+    };
+
+    $scope.getNextRecommendedCollectionNodeCount = function() {
+      return $scope.collection.next_exploration_ids.length;
+    };
+
     $scope.getNextRecommendedCollectionNodes = function() {
       return $scope.getCollectionNodesForExplorationIds(
-        $scope.collectionPlaythrough.getNextExplorationIds());
+        $scope.collection.next_exploration_ids);
+    };
+
+    $scope.getCompletedExplorationNodeCount = function() {
+      return $scope.collection.completed_exploration_ids.length;
     };
 
     $scope.getCompletedExplorationNodes = function() {
       return $scope.getCollectionNodesForExplorationIds(
-        $scope.collectionPlaythrough.getCompletedExplorationIds());
+        $scope.collection.completed_exploration_ids);
     };
 
     $scope.getNonRecommendedCollectionNodeCount = function() {
-      return $scope.collection.getCollectionNodeCount() - (
-        $scope.collectionPlaythrough.getNextRecommendedCollectionNodeCount() +
-        $scope.collectionPlaythrough.getCompletedExplorationNodeCount());
+      return $scope.collection.nodes.length - (
+        $scope.getNextRecommendedCollectionNodeCount() +
+        $scope.getCompletedExplorationNodeCount());
     };
 
     $scope.getNonRecommendedCollectionNodes = function() {
       var displayedExplorationIds = (
-        $scope.collectionPlaythrough.getNextExplorationIds().concat(
-          $scope.collectionPlaythrough.getCompletedExplorationIds()));
+        $scope.collection.next_exploration_ids.concat(
+          $scope.collection.completed_exploration_ids));
       var nonRecommendedCollectionNodes = [];
-      var collectionNodes = $scope.collection.getCollectionNodes();
-      for (var i = 0; i < collectionNodes.length; i++) {
-        var collectionNode = collectionNodes[i];
-        var explorationId = collectionNode.getExplorationId();
-        if (displayedExplorationIds.indexOf(explorationId) == -1) {
+      for (var i = 0; i < $scope.collection.nodes.length; i++) {
+        var collectionNode = $scope.collection.nodes[i];
+        var searchIndex = -1;
+        for (var j = 0; j < displayedExplorationIds.length; j++) {
+          if (displayedExplorationIds[j] === collectionNode.exploration_id) {
+            searchIndex = j;
+            break;
+          }
+        }
+        if (searchIndex == -1) {
           nonRecommendedCollectionNodes.push(collectionNode);
         }
       }
       return nonRecommendedCollectionNodes;
+    };
+
+    $scope.getAllCollectionNodes = function() {
+      return $scope.collection.nodes;
     };
 
     $scope.toggleShowAllExplorations = function() {
@@ -95,21 +121,14 @@ oppia.controller('CollectionPlayer', [
     };
 
     // Load the collection the learner wants to view.
-    CollectionBackendApiService.loadCollection($scope.collectionId).then(
-      function(collectionBackendObject) {
-        $scope.collection = CollectionObjectFactory.create(
-          collectionBackendObject);
-        $scope.collectionPlaythrough = (
-          CollectionPlaythroughObjectFactory.create(
-            collectionBackendObject.playthrough_dict));
+    CollectionDataService.loadCollection($scope.collectionId).then(
+      function(collection) {
+        $scope.collection = collection;
       },
-      function() {
+      function(error) {
         // TODO(bhenning): Handle not being able to load the collection.
-        // NOTE TO DEVELOPERS: Check the backend console for an indication as to
-        // why this error occurred; sometimes the errors are noisy, so they are
-        // not shown to the user.
-        alertsService.addWarning(
-          'There was an error loading the collection.');
+        warningsData.addWarning(
+          error || 'There was an error loading the collection.');
       }
     );
   }

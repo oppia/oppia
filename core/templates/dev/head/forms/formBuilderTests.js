@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Controllers for the form builder test page.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 oppia.directive('formOverlay', ['recursionHelper', function(recursionHelper) {

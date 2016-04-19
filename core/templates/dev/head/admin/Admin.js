@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Data and controllers for the Oppia admin page.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {

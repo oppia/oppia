@@ -15,6 +15,8 @@
 /**
  * @fileoverview Utilities for playing through an exploration and checking its
  * contents when carrying out end-to-end testing with protractor.
+ *
+ * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var forms = require('./forms.js');

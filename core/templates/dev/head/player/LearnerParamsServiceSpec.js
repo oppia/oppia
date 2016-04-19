@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Unit tests for the learner parameters service.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 describe('Learner parameters service', function() {

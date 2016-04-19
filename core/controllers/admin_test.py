@@ -129,11 +129,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             BOTH_MODERATOR_AND_ADMIN_EMAIL, BOTH_MODERATOR_AND_ADMIN_USERNAME)
 
         # Navigate to any page. The role is not set.
-        self.testapp.get('/gallery').mustcontain(no=['/moderator', '/admin'])
+        self.testapp.get('/').mustcontain(no=['/moderator', '/admin'])
 
         # Log in as a superadmin. This gives access to /admin.
         self.login('superadmin@example.com', is_super_admin=True)
-        self.testapp.get('/gallery').mustcontain('/admin', no=['/moderator'])
+        self.testapp.get('/').mustcontain('/admin', no=['/moderator'])
 
         # Add a moderator, an admin, and a person with both roles, then log
         # out.
@@ -164,10 +164,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             '/moderator', no=['/admin'])
         self.logout()
 
-        # Log in as a both-moderator-and-admin.
-        # Only '(Admin)' is shown in the navbar.
+        # Log in as a both-moderator-and-admin. Only '(Admin)' is shown in the
+        # navbar.
         self.login(BOTH_MODERATOR_AND_ADMIN_EMAIL)
-        self.assertEqual(self.testapp.get('/').status_int, 302)
         self.testapp.get(feconf.GALLERY_URL).mustcontain(
             '/moderator', no=['/admin'])
         self.logout()

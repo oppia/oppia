@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview node module that automate tasks.
+ *
+ * @author barnabasmakonda@gmail.com (Barnabas Makonda)
  */
 
 var fs = require('fs');

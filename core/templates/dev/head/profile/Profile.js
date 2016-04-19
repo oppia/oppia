@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Data and controllers for the Oppia profile page.
+ *
+ * @author sean@seanlip.org (Sean Lip)
  */
 
 oppia.controller('Profile', [

@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Unit tests for Interactive Map rules.
+ *
+ * @author wxyxinyu@gmail.com (Xinyu Wu)
  */
 
 describe('Numeric Input service', function() {

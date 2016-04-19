@@ -162,8 +162,6 @@ DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE = True
 REQUIRE_EMAIL_ON_MODERATOR_ACTION = False
 # Whether to allow custom event reporting to Google Analytics.
 CAN_SEND_ANALYTICS_EVENTS = False
-# Timespan in minutes before allowing duplicate emails
-DUPLICATE_EMAIL_INTERVAL_MINS = 2
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
@@ -341,10 +339,7 @@ DEMO_COLLECTIONS = {
 }
 
 # TODO(sll): Add all other URLs here.
-COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
-COLLECTION_WRITABLE_DATA_URL_PREFIX = '/collection_editor_handler/data'
-COLLECTION_RIGHTS_PREFIX = '/collection_editor_handler/rights'
-COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
+COLLECTION_DATA_URL_PREFIX = '/collectionhandler/data'
 COLLECTION_URL_PREFIX = '/collection'
 CONTRIBUTE_GALLERY_URL = '/contribute'
 EDITOR_URL_PREFIX = '/create'

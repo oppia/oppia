@@ -14,6 +14,7 @@
 
 /**
  * @fileoverview Components used by the LogicProof interaction editor.
+ * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var logicProofTeacher = (function() {

@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview End-to-end tests of the exploration rating feature.
+ *
+ * @author Shouvik Roy (shouvik@techie.com)
  */
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
@@ -42,9 +44,9 @@ describe('Gallery view', function() {
 
   it('should display ratings on exploration when minimum ratings have been ' +
      'submitted', function() {
-    users.createUser('user1@explorationRating.com', 'user1Rating');
+    users.createUser('rating@example.com', 'Rating');
     // Create an test exploration
-    users.login('user1@explorationRating.com');
+    users.login('rating@example.com');
     workflow.createAndPublishExploration(
       EXPLORATION_RATINGTEST, CATEGORY_BUSINESS,
       'an objective', LANGUAGE_ENGLISH);
@@ -52,7 +54,7 @@ describe('Gallery view', function() {
 
     // Create test users, play exploration and review them after completion
     for (var i = 0; i < MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS - 1; i++) {
-      var userEmail = 'NoDisplay' + i + '@explorationRating.com';
+      var userEmail = 'NoDisplay' + i + '@example.com';
       var username = 'NoDisplay' + i;
       addRating(userEmail, username, EXPLORATION_RATINGTEST, 4);
     }
@@ -60,7 +62,7 @@ describe('Gallery view', function() {
     browser.get(general.GALLERY_URL_SUFFIX);
     gallery.expectExplorationRatingToEqual(EXPLORATION_RATINGTEST, 'N/A');
 
-    var userEmail = 'Display@explorationRating.com';
+    var userEmail = 'Display@example.com';
     var username = 'Display';
     addRating(userEmail, username, EXPLORATION_RATINGTEST, 4);
 

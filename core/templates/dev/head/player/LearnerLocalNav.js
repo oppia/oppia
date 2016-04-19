@@ -14,11 +14,13 @@
 
 /**
  * @fileoverview Controller for the local navigation in the learner view.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 oppia.controller('LearnerLocalNav', [
-  '$scope', '$modal', '$http', 'oppiaPlayerService', 'alertsService',
-  function($scope, $modal, $http, oppiaPlayerService, alertsService) {
+  '$scope', '$modal', '$http', 'oppiaPlayerService', 'warningsData',
+  function($scope, $modal, $http, oppiaPlayerService, warningsData) {
     $scope.explorationId = oppiaPlayerService.getExplorationId();
     $scope.showLearnerSuggestionModal = function() {
       $modal.open({
@@ -66,7 +68,7 @@ oppia.controller('LearnerLocalNav', [
             value: result.suggestionContent
           }
         }).error(function(res) {
-          alertsService.addWarning(res);
+          warningsData.addWarning(res);
         });
         $modal.open({
           templateUrl: 'modals/learnerSuggestionSubmitted',

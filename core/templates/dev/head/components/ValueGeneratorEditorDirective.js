@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Directives for the parameter generator editors.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 // Individual value generator directives can be found in

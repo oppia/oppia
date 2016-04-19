@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Unit tests for Music Notes rules.
+ *
+ * @author wxyxinyu@gmail.com (Xinyu Wu)
  */
 
 describe('Music Notes Input rules service', function() {

@@ -19,7 +19,6 @@ import logging
 # pylint: disable=relative-import
 from core.controllers import admin
 from core.controllers import base
-from core.controllers import collection_editor
 from core.controllers import collection_viewer
 from core.controllers import editor
 from core.controllers import feedback
@@ -31,7 +30,6 @@ from core.controllers import profile
 from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
-from core.domain import user_services
 from core.platform import models
 import feconf
 # pylint: enable=relative-import
@@ -61,15 +59,6 @@ class WarmupHandler(base.BaseHandler):
     def get(self):
         """Handles GET warmup requests."""
         pass
-
-
-class HomePageRedirectHandler(base.BaseHandler):
-    "Check whether user is logged in or logged out and perform redirects on '/'"
-    def get(self):
-        if self.user_id and user_services.has_fully_registered(self.user_id):
-            self.redirect(feconf.MY_EXPLORATIONS_URL)
-        else:
-            self.redirect(feconf.GALLERY_URL)
 
 
 def get_redirect_route(regex_route, handler, name, defaults=None):
@@ -182,8 +171,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler, 'value_generator_handler'),
 
-    get_redirect_route(r'/', HomePageRedirectHandler, 'home_page'),
-
+    get_redirect_route(r'/', galleries.GalleryPage, 'gallery_page'),
     get_redirect_route(
         r'%s' % feconf.GALLERY_URL, galleries.GalleryPage, 'gallery_page'),
     get_redirect_route(
@@ -202,9 +190,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.NEW_EXPLORATION_URL,
         galleries.NewExploration, 'new_exploration'),
-    get_redirect_route(
-        r'%s' % feconf.NEW_COLLECTION_URL,
-        galleries.NewCollection, 'new_collection'),
     get_redirect_route(
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
         galleries.UploadExploration, 'upload_exploration'),
@@ -350,9 +335,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<exploration_id>/<thread_id>' % feconf.FEEDBACK_THREAD_URL_PREFIX,
         feedback.ThreadHandler, 'feedback_thread_handler'),
     get_redirect_route(
-        r'%s/<exploration_id>' % feconf.FEEDBACK_STATS_URL_PREFIX,
-        feedback.FeedbackStatsHandler, 'feedback_stats_handler'),
-    get_redirect_route(
         r'%s/<exploration_id>' % feconf.SUGGESTION_URL_PREFIX,
         feedback.SuggestionHandler, 'suggestion_handler'),
     get_redirect_route(
@@ -369,17 +351,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_DATA_URL_PREFIX,
         collection_viewer.CollectionDataHandler, 'collection_data_handler'),
-
-    get_redirect_route(
-        r'%s/<collection_id>' % feconf.COLLECTION_EDITOR_URL_PREFIX,
-        collection_editor.CollectionEditorPage, 'collection_editor_page'),
-    get_redirect_route(
-        r'%s/<collection_id>' % feconf.COLLECTION_WRITABLE_DATA_URL_PREFIX,
-        collection_editor.WritableCollectionDataHandler,
-        'writable_collection_data_handler'),
-    get_redirect_route(
-        r'%s/<collection_id>' % feconf.COLLECTION_RIGHTS_PREFIX,
-        collection_editor.CollectionRightsHandler, 'collection_rights_handler'),
 
     get_redirect_route(
         r'/notificationshandler', home.NotificationsHandler,

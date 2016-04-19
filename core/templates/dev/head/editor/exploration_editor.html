@@ -16,7 +16,6 @@
     GLOBALS.ALLOWED_INTERACTION_CATEGORIES = JSON.parse(
       '{{ALLOWED_INTERACTION_CATEGORIES|js_string}}');
     GLOBALS.CATEGORIES_TO_COLORS = JSON.parse('{{CATEGORIES_TO_COLORS|js_string}}');
-    GLOBALS.DEFAULT_OBJECT_VALUES = JSON.parse('{{DEFAULT_OBJECT_VALUES|js_string}}');
     GLOBALS.GADGET_SPECS = JSON.parse('{{GADGET_SPECS|js_string}}');
     GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
     GLOBALS.INVALID_PARAMETER_NAMES = JSON.parse('{{INVALID_PARAMETER_NAMES|js_string}}');
@@ -121,11 +120,6 @@
       <a href="#" tooltip="Feedback" tooltip-placement="bottom">
         <i class="material-icons">&#xE87F;</i>
       </a>
-      <div ng-show="getOpenThreadsCount()" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
-        <span class="oppia-exploration-open-threads-count">
-          <[getOpenThreadsCount()]>
-        </span>
-      </div>
     </li>
 
     {% if username %}

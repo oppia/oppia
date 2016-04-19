@@ -14,6 +14,10 @@
 
         <strong>Oppia tells the learner...</strong>
         <div style="position: relative;">
+          <span ng-if="isEditable()"
+                class="glyphicon glyphicon-pencil oppia-editor-edit-icon pull-right"
+                title="Edit Feedback">
+          </span>
           <span ng-if="isSelfLoopWithNoFeedback(outcome) && !suppressWarnings()">
             <span class="oppia-confusing-outcome-warning-text">
               <i class="material-icons">&#xE002;</i>
@@ -85,6 +89,10 @@
           </span>
           <span ng-if="isSelfLoop(outcome)" style="position: relative;">
             (try again)
+          </span>
+          <span ng-if="isEditable()"
+                class="glyphicon glyphicon-pencil oppia-editor-edit-icon pull-right"
+                title="Edit Destination">
           </span>
         </div>
       </div>

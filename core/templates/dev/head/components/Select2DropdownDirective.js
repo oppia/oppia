@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Directive for the select2 autocomplete component.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 oppia.directive('select2Dropdown', [function() {

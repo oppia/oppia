@@ -15,6 +15,8 @@
 /**
  * @fileoverview Controllers for the state parameter changes section
  * of the editor sidebar.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 oppia.controller('StateParamChangesEditor', [

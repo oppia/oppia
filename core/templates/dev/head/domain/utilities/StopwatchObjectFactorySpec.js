@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Unit tests for StopwatchObjectFactory.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 describe('Stopwatch object factory', function() {

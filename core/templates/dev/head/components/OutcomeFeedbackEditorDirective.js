@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Directives for the outcome feedback editor.
+ *
+ * @author sean@seanlip.org (Sean Lip)
  */
 
 oppia.directive('outcomeFeedbackEditor', [function() {

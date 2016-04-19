@@ -31,7 +31,6 @@ import os
 from core.domain import collection_domain
 from core.domain import exp_services
 from core.domain import rights_manager
-from core.domain import summary_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -373,19 +372,6 @@ def get_completed_exploration_ids(user_id, collection_id):
     return progress_model.completed_explorations if progress_model else []
 
 
-def _get_valid_completed_exploration_ids(user_id, collection_id, collection):
-    """Returns a filtered version of the return value of
-    get_completed_exploration_ids, where explorations not also found within the
-    collection are removed from the returned list.
-    """
-    completed_exploration_ids = get_completed_exploration_ids(
-        user_id, collection_id)
-    return [
-        exp_id for exp_id in completed_exploration_ids
-        if collection.get_node(exp_id)
-    ]
-
-
 def get_next_exploration_ids_to_complete_by_user(user_id, collection_id):
     """Returns a list of exploration IDs in the specified collection that the
     given user has not yet attempted and has the prerequisite skills to play.
@@ -524,14 +510,11 @@ def apply_change_list(collection_id, change_list):
                       collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS): # pylint: disable=line-too-long
                     collection_node.update_acquired_skills(change.new_value)
             elif change.cmd == collection_domain.CMD_EDIT_COLLECTION_PROPERTY:
-                if (change.property_name ==
-                        collection_domain.COLLECTION_PROPERTY_TITLE):
+                if change.property_name == 'title':
                     collection.update_title(change.new_value)
-                elif (change.property_name ==
-                      collection_domain.COLLECTION_PROPERTY_CATEGORY):
+                elif change.property_name == 'category':
                     collection.update_category(change.new_value)
-                elif (change.property_name ==
-                      collection_domain.COLLECTION_PROPERTY_OBJECTIVE):
+                elif change.property_name == 'objective':
                     collection.update_objective(change.new_value)
             elif (
                     change.cmd ==
@@ -551,14 +534,6 @@ def apply_change_list(collection_id, change_list):
         raise
 
 
-def validate_exps_in_collection_are_public(collection):
-    for exploration_id in collection.exploration_ids:
-        if rights_manager.is_exploration_private(exploration_id):
-            raise utils.ValidationError(
-                'Cannot reference a private exploration within a public '
-                'collection, exploration ID: %s' % exploration_id)
-
-
 def _save_collection(committer_id, collection, commit_message, change_list):
     """Validates an collection and commits it to persistent storage.
 
@@ -575,29 +550,6 @@ def _save_collection(committer_id, collection, commit_message, change_list):
         collection.validate(strict=True)
     else:
         collection.validate(strict=False)
-
-    # Validate that all explorations referenced by the collection exist.
-    exp_ids = collection.exploration_ids
-    exp_summaries = (
-        exp_services.get_exploration_summaries_matching_ids(exp_ids))
-    exp_summaries_dict = {
-        exp_id: exp_summaries[ind] for (ind, exp_id) in enumerate(exp_ids)
-    }
-    for collection_node in collection.nodes:
-        if not exp_summaries_dict[collection_node.exploration_id]:
-            raise utils.ValidationError(
-                'Expected collection to only reference valid explorations, '
-                'but found an exploration with ID: %s (was it deleted?)' %
-                collection_node.exploration_id)
-
-    # Ensure no explorations are being added that are 'below' the public status
-    # of this collection. If the collection is private, it can have both
-    # private and public explorations. If it's public, it can only have public
-    # explorations.
-    # TODO(bhenning): Ensure the latter is enforced above when trying to
-    # publish a collection.
-    if rights_manager.is_collection_public(collection.id):
-        validate_exps_in_collection_are_public(collection)
 
     collection_model = collection_models.CollectionModel.get(
         collection.id, strict=False)

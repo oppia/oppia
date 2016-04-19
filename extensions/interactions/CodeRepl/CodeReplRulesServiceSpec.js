@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Unit tests for Code REPL rules.
+ *
+ * @author wxyxinyu@gmail.com (Xinyu Wu)
  */
 
 describe('Code REPL rules service', function() {
