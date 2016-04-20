@@ -143,6 +143,7 @@ class StatisticsAudit(jobs.BaseMapReduceJobManager):
 
 class AnswersAudit(jobs.BaseMapReduceJobManager):
 
+    # pylint: disable=invalid-name
     _STATE_COUNTER_ERROR_KEY = 'State Counter ERROR'
     _UNKNOWN_HANDLER_NAME_COUNTER_KEY = 'UnknownHandlerCounter'
     _SUBMIT_HANDLER_NAME_COUNTER_KEY = 'SubmitHandlerCounter'
