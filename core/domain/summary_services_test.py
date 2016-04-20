@@ -197,19 +197,19 @@ class ExplorationDisplayableSummaries(
                                       displayable_summaries[0])
 
     def test_get_displayable_exp_summary_dicts(self):
-        exp_summary_input = exp_services.get_exploration_summaries_matching_ids(
-            [self.EXP_ID_2])
-        exp_summary_input.insert(0, None)
-        exploration_summary = (
+        # A list of exp_id and None objects are passed in:
+        # Should only return exploration with exp_id
+
+        exp_summaries_partial_list = (
+            exp_services.get_exploration_summaries_matching_ids(
+                [self.EXP_ID_2]))
+        exp_summaries_partial_list.insert(0, None)
+        exploration_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts(
-                exp_summary_input))
-        expected_summary = {
-            'status': u'public',
-            'thumbnail_bg_color': '#05a69a',
+                exp_summaries_partial_list))
+        expected_summary_dict = {
+            'category': u'A category',
             'community_owned': False,
-            'tags': [],
-            'thumbnail_icon_url': '/images/gallery/thumbnails/Lightbulb.svg',
-            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'human_readable_contributors_summary': {
                 self.ALBERT_NAME: {
                     'num_commits': 2,
@@ -217,14 +217,19 @@ class ExplorationDisplayableSummaries(
                 }
             },
             'id': self.EXP_ID_2,
-            'category': u'A category',
-            'ratings': feconf.get_empty_ratings(),
-            'title': u'Exploration 2 Albert title',
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'num_views': 0,
-            'objective': u'An objective'
+            'objective': u'An objective',
+            'ratings': feconf.get_empty_ratings(),
+            'status': u'public',
+            'tags': [],
+            'title': u'Exploration 2 Albert title',
+            'thumbnail_bg_color': '#05a69a',
+            'thumbnail_icon_url': '/images/gallery/thumbnails/Lightbulb.svg'
         }
-        self.assertDictContainsSubset(expected_summary,
-                                      exploration_summary[0])
+        self.assertEqual(len(exploration_summary_dicts), 1)
+        self.assertDictContainsSubset(expected_summary_dict,
+                                      exploration_summary_dicts[0])
 
 
 class ExplorationCategories(
@@ -237,7 +242,7 @@ class ExplorationCategories(
         The sequence of events is:
         - (1) Admin logs in.
         - (2) Admin access admin page.
-        - (3) Admin reloads exploration with id =2.
+        - (3) Admin reloads exploration with id '2'.
         - (4) Admin logs out.
         """
 
@@ -252,40 +257,42 @@ class ExplorationCategories(
         self.logout()
 
     def test_get_gallery_category_groupings(self):
-        """Exploration with id property of 2 is an exploration with
-        category property of Mathematics. The call to
+        """The exploration with id '2' is an exploration in the
+        Mathematics category. The call to
         get_gallery_catergory_groupings() should return the exploration
         in Mathematics & Statistics category.
         """
         gallery_category_groupings = (
             summary_services.get_gallery_category_groupings([]))
-        print gallery_category_groupings
-        expected_exploration_summary = {
-            'status': u'public',
-            'thumbnail_bg_color': '#058ca6',
+        expected_exploration_summary_dict = {
+            'category': u'Mathematics',
             'community_owned': True,
-            'tags': [],
-            'thumbnail_icon_url': '/images/gallery/thumbnails/Mathematics.svg',
-            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'human_readable_contributors_summary': {},
             'id': '2',
-            'category': u'Mathematics',
-            'ratings': feconf.get_empty_ratings(),
-            'title':  u'The Lazy Magician',
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'num_views': 0,
-            'objective': u'discover the binary search algorithm'
+            'objective': u'discover the binary search algorithm',
+            'ratings': feconf.get_empty_ratings(),
+            'status': u'public',
+            'tags': [],
+            'title':  u'The Lazy Magician',
+            'thumbnail_bg_color': '#058ca6',
+            'thumbnail_icon_url': '/images/gallery/thumbnails/Mathematics.svg',
         }
         expected_gallery_group = {
             'categories': ['Mathematics', 'Statistics'],
             'header': 'Mathematics & Statistics',
         }
 
-        self.assertDictContainsSubset(expected_gallery_group, (
-            gallery_category_groupings[0]))
-        actual_exploration = (
-            gallery_category_groupings[0]["activity_summary_dicts"][0])
-        self.assertDictContainsSubset(expected_exploration_summary, (
-            actual_exploration))
+        self.assertEqual(len(gallery_category_groupings), 1)
+        self.assertDictContainsSubset(
+            expected_gallery_group, gallery_category_groupings[0])
+        self.assertEqual(
+            len(gallery_category_groupings[0]['activity_summary_dicts']), 1)
+        actual_exploration_summary_dict = (
+            gallery_category_groupings[0]['activity_summary_dicts'][0])
+        self.assertDictContainsSubset(expected_exploration_summary_dict, (
+            actual_exploration_summary_dict))
 
 
 class FeaturedExplorationDisplayableSummaries(
