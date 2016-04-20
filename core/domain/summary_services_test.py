@@ -201,9 +201,8 @@ class ExplorationDisplayableSummaries(
         # Should only return exploration with exp_id
 
         exp_summaries_partial_list = (
-            exp_services.get_exploration_summaries_matching_ids(
+            [None] + exp_services.get_exploration_summaries_matching_ids(
                 [self.EXP_ID_2]))
-        exp_summaries_partial_list.insert(0, None)
         exploration_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts(
                 exp_summaries_partial_list))
