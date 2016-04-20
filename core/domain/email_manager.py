@@ -78,16 +78,14 @@ SIGNUP_EMAIL_CONTENT = config_domain.ConfigProperty(
         'html_body': _PLACEHOLDER_HTML_BODY,
     })
 
-# pylint: disable=invalid-name
-exploration_role_manager = 'Manager rights'
-exploration_role_editor = 'Editor rights'
-exploration_role_playtester = 'Playtest access'
-# pylint: enable=invalid-name
+EXPLORATION_ROLE_MANAGER = 'manager rights'
+EXPLORATION_ROLE_EDITOR = 'editor rights'
+EXPLORATION_ROLE_PLAYTESTER = 'playtest access'
 
 EDITOR_ROLE_EMAIL_HTML_ROLES = {
-    rights_manager.ROLE_OWNER: exploration_role_manager,
-    rights_manager.ROLE_EDITOR: exploration_role_editor,
-    rights_manager.ROLE_VIEWER: exploration_role_playtester
+    rights_manager.ROLE_OWNER: EXPLORATION_ROLE_MANAGER,
+    rights_manager.ROLE_EDITOR: EXPLORATION_ROLE_EDITOR,
+    rights_manager.ROLE_VIEWER: EXPLORATION_ROLE_PLAYTESTER
 }
 
 _EDITOR_ROLE_EMAIL_HTML_RIGHTS = {
@@ -97,14 +95,14 @@ _EDITOR_ROLE_EMAIL_HTML_RIGHTS = {
 }
 
 EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE = {
-    exploration_role_manager: (
+    EXPLORATION_ROLE_MANAGER: (
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_manage'] +
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_edit'] +
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']),
-    exploration_role_editor: (
+    EXPLORATION_ROLE_EDITOR: (
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_edit'] +
         _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']),
-    exploration_role_playtester: _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']
+    EXPLORATION_ROLE_PLAYTESTER: _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']
 }
 
 PUBLICIZE_EXPLORATION_EMAIL_HTML_BODY = config_domain.ConfigProperty(
@@ -300,10 +298,10 @@ def send_role_notification_email(
     """
     # Editor role email body and email subject templates.
     # pylint: disable=invalid-name
-    editor_role_email_subject_template = (
+    EDITOR_ROLE_EMAIL_SUBJECT_TEMPLATE = (
         '%s invited you to collaborate on Oppia.org')
 
-    editor_role_email_body_template = (
+    EDITOR_ROLE_EMAIL_BODY_TEMPLATE = (
         'Hi %s,<br>'
         '<br>'
         '<b>%s</b> has granted you %s to their learning exploration, '
@@ -312,7 +310,7 @@ def send_role_notification_email(
         '<br>'
         'This allows you to:<br>'
         '<ul>%s</ul><br>'
-        'You can find exploration '
+        'You can find the exploration '
         '<a href="http://www.oppia.org/%s">here</a>.<br>'
         '<br>'
         'Thanks, and happy collaborating!<br>'
@@ -347,9 +345,9 @@ def send_role_notification_email(
     role_descriptipn = EDITOR_ROLE_EMAIL_HTML_ROLES[recipient_role]
     rights_html = EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE[role_descriptipn]
 
-    email_subject = editor_role_email_subject_template % (
+    email_subject = EDITOR_ROLE_EMAIL_SUBJECT_TEMPLATE % (
         inviter_user_settings.username)
-    email_body = editor_role_email_body_template % (
+    email_body = EDITOR_ROLE_EMAIL_BODY_TEMPLATE % (
         recipient_user_settings.username, inviter_user_settings.username,
         role_descriptipn, exploration_id, exploration_title, rights_html,
         exploration_id, EMAIL_FOOTER.value)
