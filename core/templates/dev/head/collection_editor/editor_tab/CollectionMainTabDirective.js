@@ -19,7 +19,9 @@
 oppia.directive('collectionMainTabDirective', [function() {
   return {
     restrict: 'E',
-    scope: { getCollection: '&collection' },
+    scope: {
+      getCollection: '&collection'
+    },
     templateUrl: 'inline/collection_main_tab_directive',
     controller: [function() {}]
   };
