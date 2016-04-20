@@ -78,31 +78,33 @@ SIGNUP_EMAIL_CONTENT = config_domain.ConfigProperty(
         'html_body': _PLACEHOLDER_HTML_BODY,
     })
 
-EXPLORATION_ROLE_MANAGER = 'Manager rights'
-EXPLORATION_ROLE_EDITOR = 'Editor rights'
-EXPLORATION_ROLE_PLAYTESTER = 'Playtest access'
+# pylint: disable=invalid-name
+exploration_role_manager = 'Manager rights'
+exploration_role_editor = 'Editor rights'
+exploration_role_playtester = 'Playtest access'
+# pylint: enable=invalid-name
 
-EDITOR_ROLE_EMAIL_ROLES = {
-    rights_manager.ROLE_OWNER: EXPLORATION_ROLE_MANAGER,
-    rights_manager.ROLE_EDITOR: EXPLORATION_ROLE_EDITOR,
-    rights_manager.ROLE_VIEWER: EXPLORATION_ROLE_PLAYTESTER
+EDITOR_ROLE_EMAIL_HTML_ROLES = {
+    rights_manager.ROLE_OWNER: exploration_role_manager,
+    rights_manager.ROLE_EDITOR: exploration_role_editor,
+    rights_manager.ROLE_VIEWER: exploration_role_playtester
 }
 
-_EDITOR_ROLE_EMAIL_RIGHTS = {
-    'can_manage': '<li>Change exploration permissions</li>',
-    'can_edit': '<li>Edit the exploration</li>',
-    'can_play': '<li>View and playtest exploration</li>'
+_EDITOR_ROLE_EMAIL_HTML_RIGHTS = {
+    'can_manage': '<li>Change the exploration permissions</li><br>',
+    'can_edit': '<li>Edit the exploration</li><br>',
+    'can_play': '<li>View and playtest the exploration</li><br>'
 }
 
 EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE = {
-    EXPLORATION_ROLE_MANAGER: (
-        _EDITOR_ROLE_EMAIL_RIGHTS['can_manage'] +
-        _EDITOR_ROLE_EMAIL_RIGHTS['can_edit'] +
-        _EDITOR_ROLE_EMAIL_RIGHTS['can_play']),
-    EXPLORATION_ROLE_EDITOR: (
-        _EDITOR_ROLE_EMAIL_RIGHTS['can_edit'] +
-        _EDITOR_ROLE_EMAIL_RIGHTS['can_play']),
-    EXPLORATION_ROLE_PLAYTESTER: _EDITOR_ROLE_EMAIL_RIGHTS['can_play']
+    exploration_role_manager: (
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_manage'] +
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_edit'] +
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']),
+    exploration_role_editor: (
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_edit'] +
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']),
+    exploration_role_playtester: _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']
 }
 
 PUBLICIZE_EXPLORATION_EMAIL_HTML_BODY = config_domain.ConfigProperty(
@@ -302,15 +304,22 @@ def send_role_notification_email(
         '%s invited you to collaborate on Oppia.org')
 
     editor_role_email_body_template = (
-        '%s has granted you %s to their learning exploration, '
-        '<a href="http://www.oppia.org/%s">%s</a>'
+        'Hi %s,<br>'
+        '<br>'
+        '<b>%s</b> has granted you %s to their learning exploration, '
+        '<a href="http://www.oppia.org/%s">"%s"</a>'
         ', on Oppia.org.<br>'
-        'This allows you:<br>'
+        '<br>'
+        'This allows you to:<br>'
         '<ul>%s</ul><br>'
-        'You can find exploration'
-        '<a href="http://www.oppia.org/%s">here</a>. Thanks!<br>'
-        '<br>Best Wishes,<br>'
+        'You can find exploration '
+        '<a href="http://www.oppia.org/%s">here</a>.<br>'
+        '<br>'
+        'Thanks, and happy collaborating!<br>'
+        '<br>'
+        'Best Wishes,<br>'
         'The Oppia Team<br>'
+        '<br>%s'
     )
 
     # Return from here if sending email is turned off.
@@ -331,23 +340,19 @@ def send_role_notification_email(
         # Do not send email if recipient has declined.
         return
 
-    if recipient_role not in EDITOR_ROLE_EMAIL_ROLES.keys():
+    if recipient_role not in EDITOR_ROLE_EMAIL_HTML_ROLES:
         raise Exception(
             'Invalid role: %s' % recipient_role)
 
-    access_right_string = EDITOR_ROLE_EMAIL_ROLES[recipient_role]
-    rights_html = EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE[access_right_string]
-
-    raw_email_body = 'Hi %s,<br><br>%s<br><br>%s' % (
-        recipient_user_settings.username,
-        editor_role_email_body_template,
-        EMAIL_FOOTER.value)
+    role_descriptipn = EDITOR_ROLE_EMAIL_HTML_ROLES[recipient_role]
+    rights_html = EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE[role_descriptipn]
 
     email_subject = editor_role_email_subject_template % (
         inviter_user_settings.username)
-    email_body = raw_email_body % (
-        inviter_user_settings.username, access_right_string, exploration_id,
-        exploration_title, rights_html, exploration_id)
+    email_body = editor_role_email_body_template % (
+        recipient_user_settings.username, inviter_user_settings.username,
+        role_descriptipn, exploration_id, exploration_title, rights_html,
+        exploration_id, EMAIL_FOOTER.value)
 
     _send_email(
         recipient_id, feconf.SYSTEM_COMMITTER_ID,

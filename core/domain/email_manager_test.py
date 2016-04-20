@@ -19,8 +19,8 @@ import types
 
 from core.domain import config_services
 from core.domain import email_manager
-from core.domain import user_services
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -90,11 +90,11 @@ class EmailRightsTest(test_utils.GenericTestBase):
         # pylint: enable=protected-access
 
 
-class ExplorationMemebershipEmailTests(test_utils.GenericTestBase):
+class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
     """Tests that sending exploration membership email works as expected."""
 
     def setUp(self):
-        super(ExplorationMemebershipEmailTests, self).setUp()
+        super(ExplorationMembershipEmailTests, self).setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -105,53 +105,8 @@ class ExplorationMemebershipEmailTests(test_utils.GenericTestBase):
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, 'Title')
 
-        self.email_subject_tempate = (
-            '%s invited you to collaborate on Oppia.org')
-
-        self.email_body_template = (
-            '%s has granted you %s to their learning exploration, '
-            '<a href="http://www.oppia.org/%s">%s</a>'
-            ', on Oppia.org.<br>'
-            'This allows you:<br>'
-            '<ul>%s</ul><br>'
-            'You can find exploration'
-            '<a href="http://www.oppia.org/%s">here</a>. Thanks!<br>'
-            '<br>Best Wishes,<br>'
-            'The Oppia Team<br>'
-        )
-
-        self.email_content_template = 'Hi %s,<br><br>%s<br><br>%s' % (
-            self.NEW_USER_USERNAME,
-            self.email_body_template,
-            email_manager.EMAIL_FOOTER.value)
-
-        self.manager_rights = (
-            email_manager.EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE[(
-                email_manager.EXPLORATION_ROLE_MANAGER)]
-        )
-        self.editor_rights = (
-            email_manager.EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE[(
-                email_manager.EXPLORATION_ROLE_EDITOR)]
-        )
-        self.playtester_rights = (
-            email_manager.EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE[(
-                email_manager.EXPLORATION_ROLE_PLAYTESTER)]
-        )
-
-        # pylint: disable=invalid-name
-        self.expected_manager_role_email_body = self.email_content_template % (
-            self.EDITOR_USERNAME, email_manager.EXPLORATION_ROLE_MANAGER,
-            self.exploration.id, self.exploration.title, self.manager_rights,
-            self.exploration.id)
-        self.expected_editor_role_email_body = self.email_content_template % (
-            self.EDITOR_USERNAME, email_manager.EXPLORATION_ROLE_EDITOR,
-            self.exploration.id, self.exploration.title, self.editor_rights,
-            self.exploration.id)
-        self.expected_playtester_role_email_body = (
-            self.email_content_template % (
-                self.EDITOR_USERNAME, email_manager.EXPLORATION_ROLE_PLAYTESTER,
-                self.exploration.id, self.exploration.title,
-                self.playtester_rights, self.exploration.id))
+        self.expected_email_subject = (
+            'editor invited you to collaborate on Oppia.org')
 
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
@@ -216,9 +171,58 @@ class ExplorationMemebershipEmailTests(test_utils.GenericTestBase):
                 feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION)
             self.assertEqual(
                 sent_email_model.subject,
-                self.email_subject_tempate % self.EDITOR_USERNAME)
+                self.expected_email_subject)
 
     def test_correct_rights_are_written_in_manager_role_email_body(self):
+        expected_email_html_body = (
+            'Hi newuser,<br>'
+            '<br>'
+            '<b>editor</b> has granted you Manager rights to their '
+            'learning exploration, '
+            '<a href="http://www.oppia.org/A">"Title"</a>'
+            ', on Oppia.org.<br>'
+            '<br>'
+            'This allows you to:<br>'
+            '<ul>'
+            '<li>Change the exploration permissions</li><br>'
+            '<li>Edit the exploration</li><br>'
+            '<li>View and playtest the exploration</li><br>'
+            '</ul><br>'
+            'You can find exploration '
+            '<a href="http://www.oppia.org/A">here</a>.<br>'
+            '<br>'
+            'Thanks, and happy collaborating!<br>'
+            '<br>'
+            'Best Wishes,<br>'
+            'The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.'
+        )
+
+        expected_email_text_body = (
+            'Hi newuser,\n'
+            '\n'
+            'editor has granted you Manager rights to their '
+            'learning exploration, '
+            '"Title"'
+            ', on Oppia.org.\n'
+            '\n'
+            'This allows you to:\n'
+            'Change the exploration permissions\n'
+            'Edit the exploration\n'
+            'View and playtest the exploration\n'
+            '\n'
+            'You can find exploration here.\n'
+            '\n'
+            'Thanks, and happy collaborating!\n'
+            '\n'
+            'Best Wishes,\n'
+            'The Oppia Team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.'
+        )
+
         with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             # Check that correct email content is sent for Manager.
             email_manager.send_role_notification_email(
@@ -228,15 +232,61 @@ class ExplorationMemebershipEmailTests(test_utils.GenericTestBase):
             messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
 
-            all_models = email_models.SentEmailModel.get_all().fetch()
-            self.assertEqual(len(all_models), 1)
-
-            sent_email_model_manager = all_models[0]
             self.assertEqual(
-                sent_email_model_manager.html_body,
-                self.expected_manager_role_email_body)
+                messages[0].html.decode(),
+                expected_email_html_body)
+            self.assertEqual(
+                messages[0].body.decode(),
+                expected_email_text_body)
 
     def test_correct_rights_are_written_in_editor_role_email_body(self):
+        expected_email_html_body = (
+            'Hi newuser,<br>'
+            '<br>'
+            '<b>editor</b> has granted you Editor rights to their '
+            'learning exploration, '
+            '<a href="http://www.oppia.org/A">"Title"</a>'
+            ', on Oppia.org.<br>'
+            '<br>'
+            'This allows you to:<br>'
+            '<ul>'
+            '<li>Edit the exploration</li><br>'
+            '<li>View and playtest the exploration</li><br>'
+            '</ul><br>'
+            'You can find exploration '
+            '<a href="http://www.oppia.org/A">here</a>.<br>'
+            '<br>'
+            'Thanks, and happy collaborating!<br>'
+            '<br>'
+            'Best Wishes,<br>'
+            'The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.'
+        )
+
+        expected_email_text_body = (
+            'Hi newuser,\n'
+            '\n'
+            'editor has granted you Editor rights to their '
+            'learning exploration, '
+            '"Title"'
+            ', on Oppia.org.\n'
+            '\n'
+            'This allows you to:\n'
+            'Edit the exploration\n'
+            'View and playtest the exploration\n'
+            '\n'
+            'You can find exploration here.\n'
+            '\n'
+            'Thanks, and happy collaborating!\n'
+            '\n'
+            'Best Wishes,\n'
+            'The Oppia Team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.'
+        )
+
         with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             # Check that correct email content is sent for Editor.
             email_manager.send_role_notification_email(
@@ -246,15 +296,59 @@ class ExplorationMemebershipEmailTests(test_utils.GenericTestBase):
             messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
 
-            all_models = email_models.SentEmailModel.get_all().fetch()
-            self.assertEqual(len(all_models), 1)
-
-            sent_email_model_manager = all_models[0]
             self.assertEqual(
-                sent_email_model_manager.html_body,
-                self.expected_editor_role_email_body)
+                messages[0].html.decode(),
+                expected_email_html_body)
+            self.assertEqual(
+                messages[0].body.decode(),
+                expected_email_text_body)
 
     def test_correct_rights_are_written_in_playtester_role_email_body(self):
+        expected_email_html_body = (
+            'Hi newuser,<br>'
+            '<br>'
+            '<b>editor</b> has granted you Playtest access to their '
+            'learning exploration, '
+            '<a href="http://www.oppia.org/A">"Title"</a>'
+            ', on Oppia.org.<br>'
+            '<br>'
+            'This allows you to:<br>'
+            '<ul>'
+            '<li>View and playtest the exploration</li><br>'
+            '</ul><br>'
+            'You can find exploration '
+            '<a href="http://www.oppia.org/A">here</a>.<br>'
+            '<br>'
+            'Thanks, and happy collaborating!<br>'
+            '<br>'
+            'Best Wishes,<br>'
+            'The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.'
+        )
+
+        expected_email_text_body = (
+            'Hi newuser,\n'
+            '\n'
+            'editor has granted you Playtest access to their '
+            'learning exploration, '
+            '"Title"'
+            ', on Oppia.org.\n'
+            '\n'
+            'This allows you to:\n'
+            'View and playtest the exploration\n'
+            '\n'
+            'You can find exploration here.\n'
+            '\n'
+            'Thanks, and happy collaborating!\n'
+            '\n'
+            'Best Wishes,\n'
+            'The Oppia Team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.'
+        )
+
         with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             # Check that correct email content is sent for Playtester.
             email_manager.send_role_notification_email(
@@ -264,15 +358,14 @@ class ExplorationMemebershipEmailTests(test_utils.GenericTestBase):
             messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
 
-            all_models = email_models.SentEmailModel.get_all().fetch()
-            self.assertEqual(len(all_models), 1)
-
-            sent_email_model_manager = all_models[0]
             self.assertEqual(
-                sent_email_model_manager.html_body,
-                self.expected_playtester_role_email_body)
+                messages[0].html.decode(),
+                expected_email_html_body)
+            self.assertEqual(
+                messages[0].body.decode(),
+                expected_email_text_body)
 
-    def test_correct_undefined_role_raises_an_exceptions(self):
+    def test_correct_undefined_role_raises_an_exception(self):
         with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             # Check that an exception is raised when an invalid
             # role is supplied.
