@@ -150,7 +150,12 @@ class AnswersAudit(jobs.BaseMapReduceJobManager):
     _HANDLER_FUZZY_RULE_COUNTER_KEY = 'FuzzyRuleCounter'
     _HANDLER_DEFAULT_RULE_COUNTER_KEY = 'DefaultRuleCounter'
     _HANDLER_STANDARD_RULE_COUNTER_KEY = 'StandardRuleCounter'
+    _FUZZY_RULE_SUBMISSION_COUNTER_KEY = 'FuzzyRuleSubmitCounter'
+    _DEFAULT_RULE_SUBMISSION_COUNTER_KEY = 'DefaultRuleSubmitCounter'
+    _STANDARD_RULE_SUBMISSION_COUNTER_KEY = 'StandardRuleSubmitCounter'
     _HANDLER_ERROR_RULE_COUNTER_KEY = 'ErrorRuleCounter'
+    _UNIQUE_ANSWER_COUNTER_KEY = 'UniqueAnswerCounter'
+    _CUMULATIVE_ANSWER_COUNTER_KEY = 'CumulativeAnswerCounter'
 
     @classmethod
     def _get_consecutive_dot_count(cls, string, idx):
@@ -187,13 +192,29 @@ class AnswersAudit(jobs.BaseMapReduceJobManager):
         item_id = item_id[period_idx+1:]
         rule_str = item_id
 
+        answers = item.answers
+        for _, count in answers.iteritems():
+            yield (AnswersAudit._UNIQUE_ANSWER_COUNTER_KEY, {
+                'reduce_type': AnswersAudit._UNIQUE_ANSWER_COUNTER_KEY
+            })
+            for _ in xrange(count):
+                yield (AnswersAudit._CUMULATIVE_ANSWER_COUNTER_KEY, {
+                    'reduce_type': AnswersAudit._CUMULATIVE_ANSWER_COUNTER_KEY
+                })
+
         if rule_str == 'FuzzyMatches':
             yield (rule_str, {
                 'reduce_type': AnswersAudit._HANDLER_FUZZY_RULE_COUNTER_KEY
             })
+            yield (AnswersAudit._FUZZY_RULE_SUBMISSION_COUNTER_KEY, {
+                'reduce_type': AnswersAudit._FUZZY_RULE_SUBMISSION_COUNTER_KEY
+            })
         elif rule_str == 'Default':
             yield (rule_str, {
                 'reduce_type': AnswersAudit._HANDLER_DEFAULT_RULE_COUNTER_KEY
+            })
+            yield (AnswersAudit._DEFAULT_RULE_SUBMISSION_COUNTER_KEY, {
+                'reduce_type': AnswersAudit._DEFAULT_RULE_SUBMISSION_COUNTER_KEY
             })
         elif '(' in rule_str and rule_str[-1] == ')':
             index = rule_str.index('(')
@@ -203,6 +224,10 @@ class AnswersAudit(jobs.BaseMapReduceJobManager):
                 'reduce_type': AnswersAudit._HANDLER_STANDARD_RULE_COUNTER_KEY,
                 'rule_str': rule_str,
                 'rule_args': rule_args
+            })
+            yield (AnswersAudit._STANDARD_RULE_SUBMISSION_COUNTER_KEY, {
+                'reduce_type': (
+                    AnswersAudit._STANDARD_RULE_SUBMISSION_COUNTER_KEY)
             })
         else:
             yield (rule_str, {
@@ -236,10 +261,123 @@ class AnswersAudit(jobs.BaseMapReduceJobManager):
             yield 'Found default rules %d time(s)' % reduce_count
         elif reduce_type == AnswersAudit._HANDLER_STANDARD_RULE_COUNTER_KEY:
             yield 'Found rule type "%s" %d time(s)' % (key, reduce_count)
+        elif reduce_type == AnswersAudit._FUZZY_RULE_SUBMISSION_COUNTER_KEY:
+            yield 'Fuzzy rule submitted %d time(s)' % reduce_count
+        elif reduce_type == AnswersAudit._DEFAULT_RULE_SUBMISSION_COUNTER_KEY:
+            yield 'Default rule submitted %d time(s)' % reduce_count
+        elif reduce_type == AnswersAudit._STANDARD_RULE_SUBMISSION_COUNTER_KEY:
+            yield 'Standard rule submitted %d time(s)' % reduce_count
         elif reduce_type == AnswersAudit._HANDLER_ERROR_RULE_COUNTER_KEY:
             yield (
                 'Encountered invalid rule string %d time(s) (is it too long?): '
                 '"%s"' % (reduce_count, key))
+        elif reduce_type == AnswersAudit._UNIQUE_ANSWER_COUNTER_KEY:
+            yield 'Total of %d unique answers' % reduce_count
+        elif reduce_type == AnswersAudit._CUMULATIVE_ANSWER_COUNTER_KEY:
+            yield 'Total of %d answers have been submitted' % reduce_count
+        else:
+            yield 'Internal error 2'
+
+
+class AnswersAudit2(jobs.BaseMapReduceJobManager):
+
+    # pylint: disable=invalid-name
+    _HANDLER_FUZZY_RULE_COUNTER_KEY = 'FuzzyRuleCounter'
+    _HANDLER_DEFAULT_RULE_COUNTER_KEY = 'DefaultRuleCounter'
+    _HANDLER_STANDARD_RULE_COUNTER_KEY = 'StandardRuleCounter'
+    _FUZZY_RULE_SUBMISSION_COUNTER_KEY = 'FuzzyRuleSubmitCounter'
+    _DEFAULT_RULE_SUBMISSION_COUNTER_KEY = 'DefaultRuleSubmitCounter'
+    _STANDARD_RULE_SUBMISSION_COUNTER_KEY = 'StandardRuleSubmitCounter'
+    _HANDLER_ERROR_RULE_COUNTER_KEY = 'ErrorRuleCounter'
+    _CUMULATIVE_ANSWER_COUNTER_KEY = 'CumulativeAnswerCounter'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.StateAnswersModel]
+
+    @staticmethod
+    def map(item):
+        for answer in item.answers_list:
+            yield (AnswersAudit2._CUMULATIVE_ANSWER_COUNTER_KEY, {
+                'reduce_type': AnswersAudit2._CUMULATIVE_ANSWER_COUNTER_KEY
+            })
+            exploration = exp_services.get_exploration_by_id(
+                item.exploration_id, strict=False,
+                version=item.exploration_version)
+            state = exploration.states[item.state_name]
+            answer_groups = state.interaction.answer_groups
+            answer_group_index = answer['answer_group_index']
+            if answer_group_index == len(answer_groups):
+                rule_str = 'Default'
+            else:
+                answer_group = answer_groups[answer_group_index]
+                rule_spec = answer_group.rule_specs[answer['rule_spec_index']]
+                rule_str = rule_spec.stringify_classified_rule()
+            if rule_str == 'FuzzyMatches':
+                yield (rule_str, {
+                    'reduce_type': AnswersAudit2._HANDLER_FUZZY_RULE_COUNTER_KEY
+                })
+                yield (AnswersAudit2._FUZZY_RULE_SUBMISSION_COUNTER_KEY, {
+                    'reduce_type': (
+                        AnswersAudit2._FUZZY_RULE_SUBMISSION_COUNTER_KEY)
+                })
+            elif rule_str == 'Default':
+                yield (rule_str, {
+                    'reduce_type': (
+                        AnswersAudit2._HANDLER_DEFAULT_RULE_COUNTER_KEY)
+                })
+                yield (AnswersAudit2._DEFAULT_RULE_SUBMISSION_COUNTER_KEY, {
+                    'reduce_type': (
+                        AnswersAudit2._DEFAULT_RULE_SUBMISSION_COUNTER_KEY)
+                })
+            elif '(' in rule_str and rule_str[-1] == ')':
+                index = rule_str.index('(')
+                rule_type = rule_str[0:index]
+                rule_args = rule_str[index+1:-1]
+                yield (rule_type, {
+                    'reduce_type': (
+                        AnswersAudit2._HANDLER_STANDARD_RULE_COUNTER_KEY),
+                    'rule_str': rule_str,
+                    'rule_args': rule_args
+                })
+                yield (AnswersAudit2._STANDARD_RULE_SUBMISSION_COUNTER_KEY, {
+                    'reduce_type': (
+                        AnswersAudit2._STANDARD_RULE_SUBMISSION_COUNTER_KEY)
+                })
+            else:
+                yield (rule_str, {
+                    'reduce_type': AnswersAudit2._HANDLER_ERROR_RULE_COUNTER_KEY
+                })
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        reduce_type = None
+        reduce_count = len(stringified_values)
+        for value_str in stringified_values:
+            value_dict = ast.literal_eval(value_str)
+            if reduce_type and reduce_type != value_dict['reduce_type']:
+                yield 'Internal error 1'
+            elif not reduce_type:
+                reduce_type = value_dict['reduce_type']
+
+        if reduce_type == AnswersAudit2._HANDLER_FUZZY_RULE_COUNTER_KEY:
+            yield 'Found fuzzy rules %d time(s)' % reduce_count
+        elif reduce_type == AnswersAudit2._HANDLER_DEFAULT_RULE_COUNTER_KEY:
+            yield 'Found default rules %d time(s)' % reduce_count
+        elif reduce_type == AnswersAudit2._HANDLER_STANDARD_RULE_COUNTER_KEY:
+            yield 'Found rule type "%s" %d time(s)' % (key, reduce_count)
+        elif reduce_type == AnswersAudit2._FUZZY_RULE_SUBMISSION_COUNTER_KEY:
+            yield 'Fuzzy rule submitted %d time(s)' % reduce_count
+        elif reduce_type == AnswersAudit2._DEFAULT_RULE_SUBMISSION_COUNTER_KEY:
+            yield 'Default rule submitted %d time(s)' % reduce_count
+        elif reduce_type == AnswersAudit2._STANDARD_RULE_SUBMISSION_COUNTER_KEY:
+            yield 'Standard rule submitted %d time(s)' % reduce_count
+        elif reduce_type == AnswersAudit2._HANDLER_ERROR_RULE_COUNTER_KEY:
+            yield (
+                'Encountered invalid rule string %d time(s) (is it too long?): '
+                '"%s"' % (reduce_count, key))
+        elif reduce_type == AnswersAudit2._CUMULATIVE_ANSWER_COUNTER_KEY:
+            yield 'Total of %d answers have been submitted' % reduce_count
         else:
             yield 'Internal error 2'
 
