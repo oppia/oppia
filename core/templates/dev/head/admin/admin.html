@@ -167,9 +167,10 @@
 
     <div ng-if="showJobOutput">
       <h4>Job Output</h4>
-      <p>
-        <[jobOutput]>
-      </p>
+      <ul ng-if="jobOutput.length != 0">
+        <li ng-repeat="output in jobOutput"><[output]></li>
+      </ul>
+      <em ng-if="jobOutput.length == 0">None</em>
     </div>
 
     <h3>Configuration properties</h3>
