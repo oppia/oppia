@@ -297,11 +297,10 @@ def send_role_notification_email(
     'can_receive_editor_role_email' is set True in recipent's preferences).
     """
     # Editor role email body and email subject templates.
-    # pylint: disable=invalid-name
-    EDITOR_ROLE_EMAIL_SUBJECT_TEMPLATE = (
+    email_subject_template = (
         '%s invited you to collaborate on Oppia.org')
 
-    EDITOR_ROLE_EMAIL_BODY_TEMPLATE = (
+    email_body_template = (
         'Hi %s,<br>'
         '<br>'
         '<b>%s</b> has granted you %s to their learning exploration, '
@@ -345,9 +344,9 @@ def send_role_notification_email(
     role_descriptipn = EDITOR_ROLE_EMAIL_HTML_ROLES[recipient_role]
     rights_html = EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE[role_descriptipn]
 
-    email_subject = EDITOR_ROLE_EMAIL_SUBJECT_TEMPLATE % (
+    email_subject = email_subject_template % (
         inviter_user_settings.username)
-    email_body = EDITOR_ROLE_EMAIL_BODY_TEMPLATE % (
+    email_body = email_body_template % (
         recipient_user_settings.username, inviter_user_settings.username,
         role_descriptipn, exploration_id, exploration_title, rights_html,
         exploration_id, EMAIL_FOOTER.value)
