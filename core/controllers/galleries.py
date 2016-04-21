@@ -95,6 +95,26 @@ class GalleryPage(base.BaseHandler):
         })
         self.render_template('galleries/gallery.html')
 
+class FullGalleryPage(base.BaseHandler):
+    """The exploration gallery page."""
+
+    PAGE_NAME_FOR_CSRF = 'full_gallery'
+
+    def get(self):
+        """Handles GET requests."""
+        self.values.update({
+            'nav_mode': feconf.NAV_MODE_GALLERY,
+            'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
+            'has_fully_registered': bool(
+                self.user_id and
+                user_services.has_fully_registered(self.user_id)),
+            'SPLASH_PAGE_YOUTUBE_VIDEO_ID': SPLASH_PAGE_YOUTUBE_VIDEO_ID.value,
+            'CAROUSEL_SLIDES_CONFIG': CAROUSEL_SLIDES_CONFIG.value,
+            'LANGUAGE_CODES_AND_NAMES': (
+                utils.get_all_language_codes_and_names()),
+        })
+        self.render_template('galleries/full_gallery.html')
+
 
 class DefaultGalleryCategoriesHandler(base.BaseHandler):
     """Provides data for the default gallery page."""
