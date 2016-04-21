@@ -23,7 +23,7 @@ from core.tests import test_utils
 import feconf
 
 
-class ExplorationDisplayableSummaries(
+class ExplorationDisplayableSummariesTest(
         exp_services_test.ExplorationServicesUnitTests):
     """Test functions for getting displayable exploration summary dicts."""
 
@@ -68,7 +68,7 @@ class ExplorationDisplayableSummaries(
         - (3) User_4 edits the title of EXP_ID_4.
         """
 
-        super(ExplorationDisplayableSummaries, self).setUp()
+        super(ExplorationDisplayableSummariesTest, self).setUp()
 
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
@@ -196,8 +196,105 @@ class ExplorationDisplayableSummaries(
         self.assertDictContainsSubset(expected_summary,
                                       displayable_summaries[0])
 
+    def test_get_displayable_exp_summary_dicts(self):
+        # A list of exp_id and None objects are passed in:
+        # Should only return exploration with exp_id
 
-class FeaturedExplorationDisplayableSummaries(
+        exp_summaries_partial_list = (
+            [None] + exp_services.get_exploration_summaries_matching_ids(
+                [self.EXP_ID_2]))
+        exploration_summary_dicts = (
+            summary_services.get_displayable_exp_summary_dicts(
+                exp_summaries_partial_list))
+        expected_summary_dict = {
+            'category': u'A category',
+            'community_owned': False,
+            'human_readable_contributors_summary': {
+                self.ALBERT_NAME: {
+                    'num_commits': 2,
+                    'profile_picture_data_url': None
+                }
+            },
+            'id': self.EXP_ID_2,
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'num_views': 0,
+            'objective': u'An objective',
+            'ratings': feconf.get_empty_ratings(),
+            'status': u'public',
+            'tags': [],
+            'title': u'Exploration 2 Albert title',
+            'thumbnail_bg_color': '#05a69a',
+            'thumbnail_icon_url': '/images/gallery/thumbnails/Lightbulb.svg'
+        }
+        self.assertEqual(len(exploration_summary_dicts), 1)
+        self.assertDictContainsSubset(expected_summary_dict,
+                                      exploration_summary_dicts[0])
+
+
+class GalleryCategoriesTest(
+        exp_services_test.ExplorationServicesUnitTests):
+    """Test functions for getting exploration categories summary dicts."""
+
+    def setUp(self):
+        """Populate the database of explorations and their summaries.
+
+        The sequence of events is:
+        - (1) Admin logs in.
+        - (2) Admin access admin page.
+        - (3) Admin reloads exploration with id '2'.
+        - (4) Admin logs out.
+        """
+
+        super(GalleryCategoriesTest, self).setUp()
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        response = self.testapp.get('/admin')
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.post_json('/adminhandler', {
+            'action': 'reload_exploration',
+            'exploration_id': '2'
+        }, csrf_token)
+        self.logout()
+
+    def test_get_gallery_category_groupings(self):
+        """The exploration with id '2' is an exploration in the
+        Mathematics category. The call to
+        get_gallery_catergory_groupings() should return the exploration
+        in Mathematics & Statistics category.
+        """
+        gallery_category_groupings = (
+            summary_services.get_gallery_category_groupings([]))
+        expected_exploration_summary_dict = {
+            'category': u'Mathematics',
+            'community_owned': True,
+            'human_readable_contributors_summary': {},
+            'id': '2',
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'num_views': 0,
+            'objective': u'discover the binary search algorithm',
+            'ratings': feconf.get_empty_ratings(),
+            'status': u'public',
+            'tags': [],
+            'title':  u'The Lazy Magician',
+            'thumbnail_bg_color': '#058ca6',
+            'thumbnail_icon_url': '/images/gallery/thumbnails/Mathematics.svg',
+        }
+        expected_gallery_group = {
+            'categories': ['Mathematics', 'Statistics'],
+            'header': 'Mathematics & Statistics',
+        }
+
+        self.assertEqual(len(gallery_category_groupings), 1)
+        self.assertDictContainsSubset(
+            expected_gallery_group, gallery_category_groupings[0])
+        self.assertEqual(
+            len(gallery_category_groupings[0]['activity_summary_dicts']), 1)
+        actual_exploration_summary_dict = (
+            gallery_category_groupings[0]['activity_summary_dicts'][0])
+        self.assertDictContainsSubset(expected_exploration_summary_dict, (
+            actual_exploration_summary_dict))
+
+
+class FeaturedExplorationDisplayableSummariesTest(
         test_utils.GenericTestBase):
     """Test functions for getting displayable featured exploration
     summary dicts.
@@ -220,7 +317,7 @@ class FeaturedExplorationDisplayableSummaries(
         - (5) Admin user is set up.
         """
 
-        super(FeaturedExplorationDisplayableSummaries, self).setUp()
+        super(FeaturedExplorationDisplayableSummariesTest, self).setUp()
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
