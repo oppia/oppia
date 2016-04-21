@@ -69,7 +69,7 @@ oppia.factory('routerService', [
         _tabs.active = HISTORY_TAB;
       } else if (newPath === '/feedback') {
         _tabs.active = FEEDBACK_TAB;
-      } else if (newPath.indexOf('/gui/') !== -1) {
+      } else if (newPath.indexOf('/gui/') === 0) {
         _tabs.active = MAIN_TAB;
         _doNavigation(newPath, 'gui');
       } else {
@@ -171,17 +171,9 @@ oppia.factory('routerService', [
           _actuallyNavigate('gui', stateName);
         }
       },
-      navigateToPreviewTab: function(stateName) {
-        if (_tabs.active === PREVIEW_TAB) {
-          $('.conversation-skin-cards-container').fadeOut(function() {
-            _actuallyNavigate('preview', stateName);
-            $rootScope.$apply();
-            $timeout(function() {
-              $('.conversation-skin-cards-container').fadeIn();
-            }, 150);
-          });
-        } else {
-          _actuallyNavigate('preview', stateName);
+      navigateToPreviewTab: function() {
+        if (_tabs.active !== PREVIEW_TAB) {
+          _actuallyNavigate('preview', null);
         }
       },
       navigateToStatsTab: function() {

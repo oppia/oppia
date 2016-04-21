@@ -32,14 +32,14 @@ oppia.controller('ExplorationPreview', [
       explorationCategoryService, explorationParamChangesService,
       explorationGadgetsService, oppiaPlayerService) {
     $scope.isExplorationPopulated = false;
-    explorationData.getData(ignoreCache = true).then(function() {
-      var stateName = editorContextService.getActiveStateName();
+    explorationData.getData().then(function() {
+      var initStateNameForPreview = editorContextService.getActiveStateName();
       // TODO(oparry): This conditional is a temporary fix meant to prevent
       // starting a preview from the middle of an exploration if the exploration
       // makes use of parameters. Once manual entry of parameter values is
       // supported, it can be removed.
       if (!angular.equals({}, explorationParamSpecsService.savedMemento)) {
-        stateName = explorationInitStateNameService.savedMemento;
+        initStateNameForPreview = explorationInitStateNameService.savedMemento;
       }
       // There is a race condition here that can sometimes occur when the editor
       // preview tab is loaded: the exploration in PlayerServices is populated,
@@ -52,7 +52,7 @@ oppia.controller('ExplorationPreview', [
       $timeout(function() {
         oppiaPlayerService.populateExploration({
           category: explorationCategoryService.savedMemento,
-          init_state_name: stateName,
+          init_state_name: initStateNameForPreview,
           param_changes: explorationParamChangesService.savedMemento,
           param_specs: explorationParamSpecsService.savedMemento,
           states: explorationStatesService.getStates(),
