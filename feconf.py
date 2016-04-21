@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2016 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -353,6 +353,7 @@ FEEDBACK_LAST_UPDATED_URL_PREFIX = '/feedback_last_updated'
 FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 FEEDBACK_STATS_URL_PREFIX = '/feedbackstatshandler'
+FULL_GALLERY_URL = '/full_gallery'
 GALLERY_URL = '/gallery'
 GALLERY_DATA_URL = '/galleryhandler/data'
 LEARN_GALLERY_URL = '/learn'

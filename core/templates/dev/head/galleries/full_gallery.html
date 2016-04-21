@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+<!-- Gallery page is a special case: we switch the main and sub titles -->
+{% block maintitle %}
+  Gallery
+{% endblock maintitle %}
+
+{% block subtitle %}
+  Oppia
+{% endblock subtitle %}
+
+{% block navbar_breadcrumb %}
+{% endblock navbar_breadcrumb %}
+
+{% block local_top_nav_options %}
+  <search-bar></search-bar>
+{% endblock %}
+
+{% block header_js %}
+  {{ super() }}
+  <script type="text/javascript">
+    GLOBALS.LANGUAGE_CODES_AND_NAMES = JSON.parse(
+      '{{LANGUAGE_CODES_AND_NAMES|js_string}}');
+    GLOBALS.CAROUSEL_SLIDES_CONFIG = JSON.parse('{{CAROUSEL_SLIDES_CONFIG|js_string}}');
+  </script> 
+
+  <style>
+    html, body {
+      background-color: #eee;
+    }
+  </style>
+{% endblock header_js %}
+
+{% block content %}
+  <div ng-controller="Gallery" class="oppia-gallery-container">
+
+
+      <div class="oppia-gallery-tiles-area" ng-if="inSplashMode">
+        <div class="oppia-gallery-tiles-container">
+          <div class="oppia-gallery-group" ng-repeat="galleryGroup in galleryGroups track by $index">
+            <!-- TODO(sll): Add card at end of the row that, when clicked, does showFullGalleryGroup(galleryGroup)" -->
+            <div>
+              <h2 class="oppia-gallery-group-header">
+                <a ng-click="showFullGalleryGroup(galleryGroup)">
+                  <[galleryGroup.header]>
+                </a>
+              </h2>
+            </div>
+            <md-button class="md-no-ink oppia-gallery-scroll-btn" ng-click="scroll($index, true)" style="cursor: pointer"
+                       ng-hide="leftmostCardIndices[$index] == 0">
+              <i class="material-icons">keyboard_arrow_left</i>
+            </md-button>
+            <div class="oppia-gallery-scroll-btn" ng-show="leftmostCardIndices[$index] == 0"></div>
+            <div class="oppia-gallery-tiles-carousel" ng-swipe-right="scroll($index, true)" ng-swipe-left="scroll($index, false)">
+              <div class="oppia-gallery-tiles-carousel-overlay-left"></div>
+              <div class="oppia-gallery-tiles">
+                <exploration-summary-tile ng-repeat="tile in galleryGroup.activity_summary_dicts"
+                                          exploration-id="tile.id"
+                                          exploration-title="tile.title"
+                                          last-updated-msec="tile.last_updated_msec"
+                                          objective="tile.objective"
+                                          category="tile.category"
+                                          ratings="tile.ratings"
+                                          thumbnail-icon-url="tile.thumbnail_icon_url"
+                                          thumbnail-bg-color="tile.thumbnail_bg_color">
+                </exploration-summary-tile>
+              </div>
+              <div class="oppia-gallery-tiles-carousel-overlay-right"></div>
+            </div>
+            <md-button class="md-no-ink oppia-gallery-scroll-btn" ng-click="scroll($index, false)" style="cursor: pointer"
+                       ng-hide="(galleryGroup.activity_summary_dicts.length - tileDisplayCount) <= leftmostCardIndices[$index]">
+              <i class="material-icons">keyboard_arrow_right</i>
+            </md-button>
+            <div class="oppia-gallery-scroll-btn" ng-show="(galleryGroup.activity_summary_dicts.length - tileDisplayCount) <= leftmostCardIndices[$index]"></div>
+          </div>
+        </div>
+      </div>
+
+    <div class="oppia-gallery-tiles-area" ng-if="!inSplashMode">
+      <div class="oppia-gallery-tiles-area">
+        <div class="oppia-gallery-tiles-container">
+          <div ng-if="allExplorationsInOrder.length === 0" class="oppia-gallery-tiles-introduction">
+            <div class="oppia-gallery-no-match">
+              <img src="/images/general/no_explorations_found.png" alt="No explorations found">
+              <p style="text-align: center;">
+                Oops, it looks like your search didn't match any explorations.<br><br>
+                <!-- NOTE: If you change the links here, please make the corresponding change for the 'Create New Exploration' button. -->
+                {% if not has_fully_registered %}
+                  Would you like to <a href ng-click="onRedirectToLogin('/my_explorations?mode=create')">create one</a>?
+                {% else %}
+                  Would you like to <a ng-click="showCreateExplorationModal()">create one</a>?
+                {% endif %}
+              </p>
+            </div>
+          </div>
+          <activity-tiles-infinity-grid></activity-tiles-infinity-grid>
+        </div>
+      </div>
+      <div class="oppia-gallery-loading-results-message" ng-if="pageLoaderIsBusy">
+        Loading more results
+        <loading-dots></loading-dots>
+      </div>
+    </div>
+  </div>
+
+
+  {% include 'components/exploration_creation_button_modal.html' %}
+  {% include 'components/profile_link_image_directive.html' %}
+  {% include 'components/search_bar_directive.html' %}
+  {% include 'components/circular_image_directive.html' %}
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script>
+    {{ include_js_file('components/ProfileLinkImageDirective.js') }}
+    {{ include_js_file('components/SearchBarDirective.js') }}
+    {{ include_js_file('components/CircularImageDirective.js') }}
+    {{ include_js_file('components/FullGallery.js') }}
+  </script>
+{% endblock footer_js %}
