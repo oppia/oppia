@@ -65,6 +65,7 @@ oppia.factory('searchService', [
   };
 
   var _isCurrentlyFetchingResults = false;
+  var numSearchesInProgress = 0;
 
   return {
     // Note that an empty query results in all explorations being shown.
@@ -77,11 +78,13 @@ oppia.factory('searchService', [
         _getSuffixForQuery(selectedCategories, selectedLanguageCodes));
 
       _isCurrentlyFetchingResults = true;
+      numSearchesInProgress++;
       $http.get(queryUrl).success(function(data) {
         _lastQuery = searchQuery;
         _lastSelectedCategories = angular.copy(selectedCategories);
         _lastSelectedLanguageCodes = angular.copy(selectedLanguageCodes);
         _searchCursor = data.search_cursor;
+        numSearchesInProgress--;
 
         if ($('.oppia-splash-search-input').val() === searchQuery) {
           $rootScope.$broadcast('refreshGalleryData', data,
@@ -92,11 +95,16 @@ oppia.factory('searchService', [
           console.log('SearchQuery: ' + searchQuery);
           console.log('Input: ' + $('.oppia-splash-search-input').val());
         }
+      }).error(function() {
+        numSearchesInProgress--;
       });
 
       if (successCallback) {
         successCallback();
       }
+    },
+    isSearchInProgress: function() {
+      return numSearchesInProgress > 0;
     },
     loadMoreData: function(successCallback) {
       // If a new query is still being sent, do not fetch more results.

@@ -210,14 +210,14 @@ class GalleryPageTest(test_utils.GenericTestBase):
 
         response = self.testapp.get(feconf.GALLERY_URL)
         self.assertEqual(response.status_int, 200)
-        response.mustcontain(no=['ng-click="showUploadExplorationModal'])
+        response.mustcontain(no=['ng-click="showUploadExplorationModal()"'])
 
         config_services.set_property(
             feconf.SYSTEM_COMMITTER_ID, 'allow_yaml_file_upload', True)
 
         response = self.testapp.get(feconf.GALLERY_URL)
         self.assertEqual(response.status_int, 200)
-        response.mustcontain('ng-click="showUploadExplorationModal')
+        response.mustcontain('ng-click="showUploadExplorationModal()"')
 
         self.logout()
 
