@@ -56,7 +56,9 @@
 
     <link rel="apple-touch-icon" href="/images/logo/favicon.png">
     <title itemprop="name">{% block subtitle %}{% endblock %} - {% block maintitle %}Oppia{% endblock %}</title>
-    <base href="/gallery">
+    {% if inSearchPage %}
+      <base href="/search/">
+    {% endif %}
     {% block header_css %}
       {% include 'header_css_libs.html' %}
     {% endblock header_css %}

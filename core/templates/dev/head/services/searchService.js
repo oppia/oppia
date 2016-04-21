@@ -41,7 +41,7 @@ oppia.factory('searchService', [
       }
     }
     if (_categories) {
-      querySuffix += ' category=("' + _categories + '")';
+      querySuffix += '&category=("' + _categories + '")';
     }
 
     var _languageCodes = '';
@@ -54,7 +54,7 @@ oppia.factory('searchService', [
       }
     }
     if (_languageCodes) {
-      querySuffix += ' language_code=("' + _languageCodes + '")';
+      querySuffix += '&language_code=("' + _languageCodes + '")';
     }
 
     return querySuffix;
@@ -74,8 +74,8 @@ oppia.factory('searchService', [
         successCallback) {
       console.log(searchQuery);
       var queryUrl = GALLERY_DATA_URL + '?q=' + encodeURI(
-        searchQuery +
-        _getSuffixForQuery(selectedCategories, selectedLanguageCodes));
+        searchQuery) +
+        _getSuffixForQuery(selectedCategories, selectedLanguageCodes);
 
       _isCurrentlyFetchingResults = true;
       numSearchesInProgress++;
@@ -106,10 +106,10 @@ oppia.factory('searchService', [
     isSearchInProgress: function() {
       return numSearchesInProgress > 0;
     },
-    searchQueryUrl: function(searchQuery, selectedCategories,
+    getSearchUrlQueryString: function(searchQuery, selectedCategories,
       selectedLanguageCodes) {
-      return encodeURI(searchQuery +
-          _getSuffixForQuery(selectedCategories, selectedLanguageCodes));
+      return encodeURI(searchQuery) +
+        _getSuffixForQuery(selectedCategories, selectedLanguageCodes);
     },
     loadMoreData: function(successCallback) {
       // If a new query is still being sent, do not fetch more results.
@@ -118,8 +118,8 @@ oppia.factory('searchService', [
       }
 
       var queryUrl = GALLERY_DATA_URL + '?q=' + encodeURI(
-        _lastQuery + _getSuffixForQuery(
-          _lastSelectedCategories, _lastSelectedLanguageCodes));
+        _lastQuery) + _getSuffixForQuery(
+          _lastSelectedCategories, _lastSelectedLanguageCodes);
 
       if (_searchCursor) {
         queryUrl += '&cursor=' + _searchCursor;

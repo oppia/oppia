@@ -39,9 +39,10 @@ oppia.config(['$interpolateProvider', '$httpProvider', '$locationProvider',
   $interpolateProvider.startSymbol('<[');
   $interpolateProvider.endSymbol(']>');
 
-  $locationProvider.html5Mode({
-    enabled: true
-  });
+  $locationProvider.html5Mode(false);
+  if (window.location.pathname == '/search/find') {
+    $locationProvider.html5Mode(true);
+  }
 
   $httpProvider.defaults.headers.post = {
     'Content-Type': 'application/x-www-form-urlencoded'

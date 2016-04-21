@@ -168,6 +168,12 @@ class GalleryHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         query_string = self.request.get('q')
+        print query_string
+        if self.request.get('category'):
+            query_string += ' category=%s' % self.request.get('category')
+        if self.request.get('language_code'):
+            query_string += ' language_code=%s' % self.request.get(
+                'language_code')
         search_cursor = self.request.get('cursor', None)
 
         explorations_list = get_matching_exploration_dicts(
