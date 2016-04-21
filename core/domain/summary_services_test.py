@@ -23,7 +23,7 @@ from core.tests import test_utils
 import feconf
 
 
-class ExplorationDisplayableSummaries(
+class ExplorationDisplayableSummariesTest(
         exp_services_test.ExplorationServicesUnitTests):
     """Test functions for getting displayable exploration summary dicts."""
 
@@ -68,7 +68,7 @@ class ExplorationDisplayableSummaries(
         - (3) User_4 edits the title of EXP_ID_4.
         """
 
-        super(ExplorationDisplayableSummaries, self).setUp()
+        super(ExplorationDisplayableSummariesTest, self).setUp()
 
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
@@ -231,7 +231,7 @@ class ExplorationDisplayableSummaries(
                                       exploration_summary_dicts[0])
 
 
-class ExplorationCategories(
+class GalleryCategoriesTest(
         exp_services_test.ExplorationServicesUnitTests):
     """Test functions for getting exploration categories summary dicts."""
 
@@ -245,7 +245,7 @@ class ExplorationCategories(
         - (4) Admin logs out.
         """
 
-        super(ExplorationCategories, self).setUp()
+        super(GalleryCategoriesTest, self).setUp()
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
@@ -294,7 +294,7 @@ class ExplorationCategories(
             actual_exploration_summary_dict))
 
 
-class FeaturedExplorationDisplayableSummaries(
+class FeaturedExplorationDisplayableSummariesTest(
         test_utils.GenericTestBase):
     """Test functions for getting displayable featured exploration
     summary dicts.
@@ -317,7 +317,7 @@ class FeaturedExplorationDisplayableSummaries(
         - (5) Admin user is set up.
         """
 
-        super(FeaturedExplorationDisplayableSummaries, self).setUp()
+        super(FeaturedExplorationDisplayableSummariesTest, self).setUp()
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
