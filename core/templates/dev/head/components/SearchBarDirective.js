@@ -148,22 +148,6 @@ oppia.directive('searchBar', [function() {
           }
         };
 
-        var updateSearchFields = function(itemsType, urlComponent) {
-          var itemCodeGroup = urlComponent.match(/\([A-Za-z%20" ]+\)/);
-
-          if (itemCodes != '') {
-            var itemCodes = itemCodes[0].replace('("', '');
-            var itemCodes = itemCodes.replace('")', '');
-          }
-
-          var items = itemCodes.split('" OR "');
-          var selections = $scope.selectionDetails[itemsType].selections;
-          for (var i = 0; i < items.length; i++) {
-            selections[items[i]] = true;
-          }
-          updateSelectionDetails(itemsType);
-        };
-
         var updateSearchFieldsBasedOnUrlQuery = function() {
           $scope.searchQuery = searchService.updateSearchFieldsBasedOnUrlQuery(
             $window.location.search, $scope.selectionDetails);
