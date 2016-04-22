@@ -2999,9 +2999,9 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .about-header {
-  background-color: rgb(54, 222, 207);
+  background-color: rgb(17, 197, 185);
   background-image: url("../images/general/icons-bg.png");
-  background-blend-mode: soft-light;
+  background-blend-mode: color-burn;
   color: #fff;
   text-align: center;
   padding: 10%;
@@ -3078,7 +3078,6 @@ md-card.preview-conversation-skin-supplemental-card {
   color: #fff;
   font-weight: bold;
   font-size: 3em;
-  text-shadow: 1px 2px 3px #38b1a5;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
 }
 
