@@ -3096,7 +3096,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .about-card-content-wide {
   width: 90%;
-  padding: 8% 0;
+  padding: 5% 0;
   margin: 0 auto;
 }
 
@@ -3218,18 +3218,12 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .about-page-buttons {
-  background-color: rgba(5,190,178,0.9);
-  font-family: "Capriola", "Roboto", "Arial", sans-serif;
-  text-transform: uppercase;
-  text-decoration: none;
   margin: 15px;
-  cursor: pointer;
   padding: 15px;
-  color: rgba(255,255,255,0.9);
 }
 
 .about-page-buttons:hover {
-  background-color: rgba(5,190,187,1);
+  background-color: rgba(5,190,178,1);
   color: rgba(255,255,255,1);
 }
 
