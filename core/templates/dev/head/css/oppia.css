@@ -3219,10 +3219,10 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .about-page-buttons {
   background-color: rgba(5,190,178,0.9);
+  font-family: "Capriola", "Roboto", "Arial", sans-serif;
+  text-transform: uppercase;
   text-decoration: none;
-  font-size: 16px;
-  margin: 0 15px;
-  width: 40%;
+  margin: 15px;
   cursor: pointer;
   padding: 15px;
   color: rgba(255,255,255,0.9);
