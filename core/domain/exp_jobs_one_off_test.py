@@ -25,6 +25,8 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import utils
+# pylint: disable=fixme, line-too-long
+
 (job_models, exp_models,) = models.Registry.import_models([
     models.NAMES.job, models.NAMES.exploration])
 search_services = models.Registry.import_search_services()
