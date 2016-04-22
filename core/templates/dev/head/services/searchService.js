@@ -41,7 +41,7 @@ oppia.factory('searchService', [
       }
     }
     if (_categories) {
-      querySuffix += ' category=("' + _categories + '")';
+      querySuffix += '&category=("' + _categories + '")';
     }
 
     var _languageCodes = '';
@@ -54,7 +54,7 @@ oppia.factory('searchService', [
       }
     }
     if (_languageCodes) {
-      querySuffix += ' language_code=("' + _languageCodes + '")';
+      querySuffix += '&language_code=("' + _languageCodes + '")';
     }
 
     return querySuffix;
@@ -64,18 +64,39 @@ oppia.factory('searchService', [
     return _searchCursor === null;
   };
 
+  var updateSearchFields = function(itemsType, urlComponent,
+                                    selectionDetails) {
+    var itemCodeGroup = urlComponent.match(/\([A-Za-z%20" ]+\)/);
+
+    if (itemCodeGroup != '') {
+      var itemCodes = itemCodeGroup[0].replace('("', '');
+      var itemCodes = itemCodes.replace('")', '');
+    }
+
+    var items = itemCodes.split('" OR "');
+    var selections = selectionDetails[itemsType].selections;
+    for (var i = 0; i < items.length; i++) {
+      selections[items[i]] = true;
+    }
+  };
+
   var _isCurrentlyFetchingResults = false;
   var numSearchesInProgress = 0;
 
   return {
+    getSearchUrlQueryString: function(searchQuery, selectedCategories,
+      selectedLanguageCodes) {
+      return encodeURI(searchQuery) +
+        _getSuffixForQuery(selectedCategories, selectedLanguageCodes);
+    },
     // Note that an empty query results in all explorations being shown.
     executeSearchQuery: function(
         searchQuery, selectedCategories, selectedLanguageCodes,
         successCallback) {
       console.log(searchQuery);
-      var queryUrl = GALLERY_DATA_URL + '?q=' + encodeURI(
-        searchQuery +
-        _getSuffixForQuery(selectedCategories, selectedLanguageCodes));
+      var queryUrl = GALLERY_DATA_URL + '?q=' + this.getSearchUrlQueryString(
+        searchQuery, selectedCategories, selectedLanguageCodes
+      );
 
       _isCurrentlyFetchingResults = true;
       numSearchesInProgress++;
@@ -102,11 +123,32 @@ oppia.factory('searchService', [
       if (successCallback) {
         successCallback();
       }
-      return '\?q=' + encodeURI(searchQuery +
-        _getSuffixForQuery(selectedCategories, selectedLanguageCodes));
     },
     isSearchInProgress: function() {
       return numSearchesInProgress > 0;
+    },
+    // The following takes in the url search component as an argument and the
+    // selectionDetails. It will update selectionDetails with the relevant
+    // fields that were extracted from the url. Returns the search query.
+    updateSearchFieldsBasedOnUrlQuery: function(urlComponent,
+                                                selectionDetails) {
+      var urlQuery = urlComponent.substring('?q='.length);
+      // The following will split the urlQuery into 3 components:
+      // 1. query
+      // 2. categories (optional)
+      // 3. language codes (default to 'en')
+      var querySegments = urlQuery.split('&');
+
+      if (querySegments.length == 3) {
+        var categoryUrlComponent = decodeURIComponent(querySegments[1]);
+        updateSearchFields('categories', categoryUrlComponent,
+                           selectionDetails);
+      }
+      var languageUrlComponent = decodeURIComponent(
+        querySegments[querySegments.length - 1]);
+      updateSearchFields('languageCodes', languageUrlComponent,
+                         selectionDetails);
+      return decodeURIComponent(querySegments[0]);
     },
     loadMoreData: function(successCallback) {
       // If a new query is still being sent, do not fetch more results.
@@ -114,9 +156,9 @@ oppia.factory('searchService', [
         return;
       }
 
-      var queryUrl = GALLERY_DATA_URL + '?q=' + encodeURI(
-        _lastQuery + _getSuffixForQuery(
-          _lastSelectedCategories, _lastSelectedLanguageCodes));
+      var queryUrl = GALLERY_DATA_URL + '?q=' + this.getSearchUrlQueryString(
+        _lastQuery, _lastSelectedCategories, _lastSelectedLanguageCodes
+      );
 
       if (_searchCursor) {
         queryUrl += '&cursor=' + _searchCursor;

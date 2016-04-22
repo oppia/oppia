@@ -23,9 +23,8 @@ oppia.directive('searchResults', [function() {
     restrict: 'E',
     templateUrl: 'components/searchResults',
     controller: [
-      '$http', '$scope', '$rootScope',
-      function($http, $scope, $rootScope) {
-        // // Called when the page loads, and after every search query.
+      '$scope', '$rootScope', function($scope, $rootScope) {
+        // Called when the page loads, and after every search query.
         var _refreshGalleryData = function(data, hasPageFinishedLoading) {
           $scope.searchIsLoading = false;
           $scope.allExplorationsInOrder = data.explorations_list;
