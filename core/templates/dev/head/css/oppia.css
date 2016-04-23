@@ -2993,18 +2993,18 @@ md-card.preview-conversation-skin-supplemental-card {
   about / learners / creators pages
 */
 .clearfix {
-  display: table;
-  content: "";
   clear: both;
+  content: "";
+  display: table;
 }
 
 .about-header {
+  background-blend-mode: color-burn;
   background-color: rgb(17, 197, 185);
   background-image: url("../images/general/icons-bg.png");
-  background-blend-mode: color-burn;
   color: #fff;
-  text-align: center;
   padding: 10%;
+  text-align: center;
 }
 
 .about-card {
@@ -3013,8 +3013,8 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .about-content {
-  width: 60%;
   padding: 0;
+  width: 60%;
 }
 
 .about-extra-container {
@@ -3022,63 +3022,63 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .about-extra-content {
-  width: 60%;
   margin: 0 auto;
   position: relative;
+  width: 60%;
 }
 
 .about-otter-container {
-  position: absolute;
-  display: inline-block;
   bottom: -2.3em;
+  display: inline-block;
+  position: absolute;
 }
 
 .otter-speech-card {
-  width: 50%;
   float: right;
+  width: 50%;
 }
 
 .otter-speech-bubble {
-  position: relative;
-  padding: 50px 15px;
-  margin: 1em 0 3em;
-  text-align: center;
   background: #fff;
-  border-radius: 5px;
   border-left: none;
+  border-radius: 5px;
+  margin: 1em 0 3em;
+  padding: 50px 15px;
+  position: relative;
+  text-align: center;
 }
 
 .otter-speech-bubble:before {
-  content: "";
-  position: absolute;
-  z-index: 10;
-  bottom: -1.7em;
-  left: 1em;
-  width: 50px;
-  height: 30px;
   background: #fff;
-  display: block;
   border-bottom-right-radius: 80px 50px;
+  bottom: -1.7em;
+  content: "";
+  display: block;
+  height: 30px;
+  left: 1em;
+  position: absolute;
+  width: 50px;
+  z-index: 10;
 }
 
 .otter-speech-bubble:after {
-  content: "";
-  position: absolute;
-  z-index: 10;
-  bottom: -1.7em;
-  left: 1em;
-  width: 20px;
-  height: 30px;
   background: #eee;
   border-bottom-right-radius: 40px 50px;
+  bottom: -1.7em;
+  content: "";
   display: block;
+  height: 30px;
+  left: 1em;
+  position: absolute;
+  width: 20px;
+  z-index: 10;
 }
 
 .about-header h1 {
   color: #fff;
-  font-weight: bold;
-  font-size: 3em;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 3em;
+  font-weight: bold;
 }
 
 .about-extra-container h1,
@@ -3095,9 +3095,9 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .about-card-content-wide {
-  width: 90%;
-  padding: 5% 0;
   margin: 0 auto;
+  padding: 5% 0;
+  width: 90%;
 }
 
 .about-card-content-narrow {
@@ -3115,9 +3115,9 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .create-three-cols-layout {
-  width: calc((100% - 20px) / 3);
-  padding: 10px;
   margin-right: 10px;
+  padding: 10px;
+  width: calc((100% - 20px) / 3);
 }
 
 .create-three-cols-layout:last-of-type {
@@ -3129,8 +3129,8 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .about-extra-info {
-  width: 100%;
   color: #fff;
+  width: 100%;
 }
 
 .about-otter-buttons {
@@ -3154,9 +3154,9 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .about-visible-content {
-  position: relative;
-  opacity: 1;
   display: block;
+  opacity: 1;
+  position: relative;
   transition: opacity .35s ease;
 }
 
@@ -3182,19 +3182,19 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .about-tab-links {
-  text-align: center;
-  padding: 0;
   display: flex;
   flex-wrap: wrap;
+  padding: 0;
+  text-align: center;
 }
 
 .about-tab-links li {
-  display: inline-block;
-  cursor: pointer;
-  width: calc(100% / 3);
   border-right: 1px solid rgba(0,0,0,0.1);
-  padding: 10px;
+  cursor: pointer;
+  display: inline-block;
   margin-bottom: 0;
+  padding: 10px;
+  width: calc(100% / 3);
 }
 
 .about-tab-links li:last-of-type {
@@ -3218,8 +3218,8 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .about-page-buttons {
-  margin: 15px;
   padding: 15px;
+  margin: 15px;
 }
 
 .about-page-buttons:hover {
