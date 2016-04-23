@@ -585,7 +585,7 @@ oppia.directive('conversationSkin', [function() {
 
         var scrollToBottom = function() {
           $timeout(function() {
-            var tutorCard = $('.conversation-skin-tutor-card-active');
+            var tutorCard = $('.conversation-skin-main-tutor-card');
             var tutorCardBottom = (
               tutorCard.offset().top + tutorCard.outerHeight());
             if ($(window).scrollTop() + $(window).height() < tutorCardBottom) {

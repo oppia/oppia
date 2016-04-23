@@ -37,10 +37,8 @@
         cards, (b) the screen is wide, in which case both cards appear
         side-by-side.
       -->
-      <div class="conversation-skin-main-tutor-card conversation-skin-tutor-card-active"
-          ng-class="{'conversation-skin-left-card': isCurrentSupplementalCardNonempty() && canWindowFitTwoCards(), 'conversation-skin-has-subsidiary-cards': isCurrentSupplementalCardNonempty() && !canWindowFitTwoCards(),
-            'animate-card-width': startCardChangeAnimation}"
-          ng-show="isPanelVisible(PANEL_TUTOR)">
+      <div class="conversation-skin-main-tutor-card" 
+           ng-class="{'animate-card-width': startCardChangeAnimation}">
         <div class="conversation-skin-tutor-card-content conversation-skin-animate-card-contents"
              ng-class="{'animate-card-change': startCardChangeAnimation}">
           <div class="conversation-skin-tutor-card-top-section">
@@ -142,44 +140,39 @@
       </div>
 
       <div ng-if="isCurrentSupplementalCardNonempty()"
-           class="conversation-skin-supplemental-card-container"
-           ng-class="{'conversation-skin-right-card-container': isCurrentSupplementalCardNonempty() && isPanelVisible(PANEL_TUTOR) && isPanelVisible(PANEL_SUPPLEMENTAL)}">
-        <div ng-show="isPanelVisible(PANEL_SUPPLEMENTAL)"
-             class="conversation-skin-supplemental-card">
-
-          <div class="conversation-skin-supplemental-interaction-container">
-            <div class="conversation-skin-help-card" ng-if="helpCardHtml">
-              <img class="conversation-skin-oppia-avatar"
-                   ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt="">
-              <button type="button" class="conversation-skin-close-help-card-button"
-                      ng-click="clearHelpCard()" ng-if="!helpCardHasContinueButton">
-                <i class="material-icons md-18">&#xE5CD;</i>
-              </button>
-              <div class="conversation-skin-help-card-content" angular-html-bind="helpCardHtml">
-              </div>
-              <br>
-              <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
-                 focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
-                 ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)"
-                 ng-if="helpCardHasContinueButton"
-                 style="margin-top: 12px;">
-                Continue to next card
-              </md-button>
+           class="conversation-skin-supplemental-card-container">
+        <div class="conversation-skin-supplemental-interaction-container">
+          <div class="conversation-skin-help-card" ng-if="helpCardHtml">
+            <img class="conversation-skin-oppia-avatar"
+                 ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt="">
+            <button type="button" class="conversation-skin-close-help-card-button"
+                    ng-click="clearHelpCard()" ng-if="!helpCardHasContinueButton">
+              <i class="material-icons md-18">&#xE5CD;</i>
+            </button>
+            <div class="conversation-skin-help-card-content" angular-html-bind="helpCardHtml">
             </div>
-
-            <div ng-if="!exploration.isInteractionInline(activeCard.stateName)">
-              <div class="protractor-test-conversation-input"
-                   angular-html-bind="activeCard.interactionHtml">
-              </div>
-            </div>
-          </div>
-
-          <div ng-if="!canWindowFitTwoCards()">
-            <md-button class="oppia-learner-continue-button" ng-click="setVisiblePanel(PANEL_TUTOR)">
-              <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C4;</i>
-              Instructions
+            <br>
+            <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
+                focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
+                ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)"
+                ng-if="helpCardHasContinueButton"
+                style="margin-top: 12px;">
+              Continue to next card
             </md-button>
           </div>
+
+          <div ng-if="!exploration.isInteractionInline(activeCard.stateName)">
+            <div class="protractor-test-conversation-input"
+                 angular-html-bind="activeCard.interactionHtml">
+            </div>
+          </div>
+        </div>
+
+        <div ng-if="!canWindowFitTwoCards()">
+          <md-button class="oppia-learner-continue-button" ng-click="setVisiblePanel(PANEL_TUTOR)">
+            <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C4;</i>
+            Instructions
+          </md-button>
         </div>
       </div>
     </div>
@@ -227,19 +220,6 @@
           </exploration-summary-tile>
         </div>
       </div>
-    </div>
-  </div>
-
-  <div class="conversation-skin-card-switcher" ng-if="panels.length >= 2">
-    <div class="conversation-skin-card-switcher-thumbnails-container">
-      <span ng-repeat="panelName in panels">
-        <a ng-click="setVisiblePanel(panelName)">
-          <img class="conversation-skin-card-switcher-thumbnail img-circle"
-               alt="<[panelName]>"
-               ng-src="<[getThumbnailSrc(panelName)]>"
-               ng-class="{'conversation-skin-card-switcher-thumbnail-active': isPanelVisible(panelName)}">
-        </a>
-      </span>
     </div>
   </div>
 
@@ -352,11 +332,30 @@
     }
 
     .conversation-skin-cards-container {
-      margin: 0 auto;
-      /* This is the width of the main card, plus the width of the supplemental
-         card, plus a 12px margin between them.
-      */
-      max-width: 1084px;
+      align-items: flex-start;
+      display: flex;
+      justify-content: center;
+      padding: 40px 14px;
+      width: 100%;
+      max-width: 1400px;
+    }
+
+    .conversation-skin-main-tutor-card,
+    .conversation-skin-future-tutor-card {
+      background: #fff;
+      border-radius: 2px;
+      padding-top: 20px;
+      text-align: left;
+      min-width: 360px;
+      flex-basis: 560px;
+      max-width: 560px;
+      z-index: 1;
+    }
+
+    .conversation-skin-supplemental-card-container {
+      margin-left: 12px;
+      min-width: 560px;
+      max-width: 1000px;
     }
 
     .conversation-skin-help-card {
@@ -399,28 +398,6 @@
       top: 2px;
       width: 24px;
       z-index: 200;
-    }
-
-    .conversation-skin-main-tutor-card,
-    .conversation-skin-future-tutor-card {
-      background: #fff;
-      border-radius: 2px;
-      left: 0;
-      margin: 44px auto 60px auto;
-      padding-top: 20px;
-      position: relative;
-      right: 0;
-      text-align: left;
-      width: 560px;
-      z-index: 1;
-    }
-
-    .conversation-skin-main-tutor-card.conversation-skin-left-card,
-    .conversation-skin-future-tutor-card.conversation-skin-left-card {
-      float: left;
-      margin-left: 0;
-      margin-right: 0;
-      width: 472px;
     }
 
     .conversation-skin-main-tutor-card.animate-card-width {
@@ -588,13 +565,6 @@
       -webkit-animation: dot 1.0s infinite;
       -webkit-animation-delay: 0.4s;
       opacity: 0;
-    }
-
-    .conversation-skin-supplemental-card-container {
-      display: inline-block;
-      margin: 0 auto;
-      position: absolute;
-      width: 100%;
     }
 
     .conversation-skin-right-card-container {
