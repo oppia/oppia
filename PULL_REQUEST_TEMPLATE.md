@@ -3,7 +3,7 @@ _Important: Please read the following instructions carefully before submitting a
 1. Make sure that the PR title starts with **"Fix #bugnum: "** (if applicable), followed by a clear one-line present-tense summary of the changes introduced in the PR. For example:
 
     ```
-    Fix #bugnum: Introduce the first version of the collection editor.
+    Fix #bugnum: introduce the first version of the collection editor.
     ```
 
 1. Before submitting, make sure that the backend tests pass. You can run them locally using `bash scripts/run_backend_tests.sh`.
