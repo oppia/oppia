@@ -133,7 +133,7 @@
           popover-placement="bottom" popover-trigger="none"
           popover="To get help in the future, click here!">
         <a href="#" tooltip="Help" tooltip-placement="bottom"
-           ng-click="openEditorTutorial()">
+           ng-click="showUserHelpModal()">
           <i class="material-icons">&#xE887;</i>
         </a>
       </li>
@@ -281,6 +281,7 @@
     </script>
 
     {% include 'components/exploration_welcome_modal_directive.html' %}
+    {% include 'components/help_modal_directive.html' %}
 
     <script type="text/ng-template" id="modals/saveExploration">
       <div class="modal-header">

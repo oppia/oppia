@@ -1,0 +1,60 @@
+<script type="text/ng-template" id="modals/userHelp">
+<div class="modal-body oppia-long-text protractor-test-welcome-modal">
+  <h1>Need Help with Something?</h1>
+  <p>
+    You can check out the resources in our help center or
+    take the tour of the exploration editor
+  </p>
+  <a href="https://oppia.github.io/#/" target="_blank" class="btn btn-success oppia-help-dismiss protractor-test-dismiss-welcome-modal" ng-click="goToHelpCenter()">Visit the Help Center</a>
+  <button class="btn btn-success oppia-welcome-start protractor-test-start-tutorial" ng-click="beginTutorial()">Take the Tour</button>
+</div>
+</script>
+<style>
+  .oppia-help-dismiss,
+  .oppia-help-modal .modal-body,
+  .oppia-help-modal .oppia-long-text p {
+    text-align: center;
+  }
+
+  .oppia-help-modal .modal-body {
+    height: 100%;
+    margin: 0 auto;
+    width: 90%;
+  }
+
+  .oppia-help-modal .modal-content {
+    border-radius: 0;
+    height: 100%;
+  }
+
+  .oppia-help-modal .modal-dialog {
+    height: 50%;
+    width: 40%;
+  }
+
+  .oppia-help-modal .in .modal-dialog {
+    left: 50%;
+    max-height: calc(100% - 100px);
+    padding: 0;
+    position: fixed;
+    top: 50%;
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
+  }
+
+  @media (max-width: 760px) {
+    .oppia-help-modal .modal-dialog {
+      margin: 10% auto;
+      height: 60%;
+      width: 60%;
+    }
+  }
+
+  @media (max-width: 550px) {
+    .oppia-help-dismiss {
+      margin-bottom: 1em;
+    }
+  }
+</style>
