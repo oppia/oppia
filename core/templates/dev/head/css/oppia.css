@@ -3030,7 +3030,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-about-otter-speech-card {
   float: right;
-  width: 50%;
+  width: 65%;
 }
 
 .oppia-about-otter-speech-bubble {
@@ -3038,7 +3038,7 @@ md-card.preview-conversation-skin-supplemental-card {
   border-left: none;
   border-radius: 5px;
   margin: 1em 0 3em;
-  padding: 50px 15px;
+  padding: 20px 10px;
   position: relative;
   text-align: center;
 }
@@ -3235,6 +3235,9 @@ md-card.preview-conversation-skin-supplemental-card {
   .oppia-about-three-cols-layout {
     width: 100%;
     text-align: center;
+  }
+  .oppia-about-otter-speech-card {
+    width: 50%;
   }
   .oppia-about-buttons {
     width: 100%;
