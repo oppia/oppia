@@ -2992,13 +2992,13 @@ md-card.preview-conversation-skin-supplemental-card {
 /*
   about / learners / creators pages
 */
-.clearfix {
+.oppia-about-clearfix {
   clear: both;
   content: "";
   display: table;
 }
 
-.about-header {
+.oppia-about-header {
   background-blend-mode: color-burn;
   background-color: rgb(17, 197, 185);
   background-image: url("../images/general/icons-bg.png");
@@ -3007,38 +3007,33 @@ md-card.preview-conversation-skin-supplemental-card {
   text-align: center;
 }
 
-.about-card {
-  background-color: #fff;
-  border-radius: 5px;
-}
-
-.about-content {
+.oppia-about-content {
   padding: 0;
   width: 60%;
 }
 
-.about-extra-container {
+.oppia-about-extra-container {
   width: 100%;
 }
 
-.about-extra-content {
+.oppia-about-extra-content {
   margin: 0 auto;
   position: relative;
   width: 60%;
 }
 
-.about-otter-container {
+.oppia-about-otter-container {
   bottom: -2.3em;
   display: inline-block;
   position: absolute;
 }
 
-.otter-speech-card {
+.oppia-about-otter-speech-card {
   float: right;
   width: 50%;
 }
 
-.otter-speech-bubble {
+.oppia-about-otter-speech-bubble {
   background: #fff;
   border-left: none;
   border-radius: 5px;
@@ -3048,7 +3043,7 @@ md-card.preview-conversation-skin-supplemental-card {
   text-align: center;
 }
 
-.otter-speech-bubble:before {
+.oppia-about-otter-speech-bubble:before {
   background: #fff;
   border-bottom-right-radius: 80px 50px;
   bottom: -1.7em;
@@ -3061,7 +3056,7 @@ md-card.preview-conversation-skin-supplemental-card {
   z-index: 10;
 }
 
-.otter-speech-bubble:after {
+.oppia-about-otter-speech-bubble:after {
   background: #eee;
   border-bottom-right-radius: 40px 50px;
   bottom: -1.7em;
@@ -3074,61 +3069,61 @@ md-card.preview-conversation-skin-supplemental-card {
   z-index: 10;
 }
 
-.about-header h1 {
+.oppia-about-header h1 {
   color: #fff;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 3em;
   font-weight: bold;
 }
 
-.about-extra-container h1,
-.about-extra-container h2,
-.about-extra-container h3,
-.about-extra-container h4,
-.about-extra-container h5,
-.about-extra-container h6 {
+.oppia-about-extra-container h1,
+.oppia-about-extra-container h2,
+.oppia-about-extra-container h3,
+.oppia-about-extra-container h4,
+.oppia-about-extra-container h5,
+.oppia-about-extra-container h6 {
   text-align: center;
 }
 
-.about-extra-content p {
+.oppia-about-extra-content p {
   margin: 1.5em 0;
 }
 
-.about-card-content-wide {
+.oppia-about-card-content-wide {
   margin: 0 auto;
   padding: 5% 0;
   width: 90%;
 }
 
-.about-card-content-narrow {
+.oppia-about-card-content-narrow {
   width: 70%;
 }
 
-.create-three-cols-container {
+.oppia-about-three-cols-container {
   display: flex;
   flex-wrap: wrap;
   padding: 0 0 8% 0;
 }
 
-.create-three-cols-feature {
+.oppia-about-three-cols-feature {
   text-align: center;
 }
 
-.create-three-cols-layout {
+.oppia-about-three-cols-layout {
   margin-right: 10px;
   padding: 10px;
   width: calc((100% - 20px) / 3);
 }
 
-.create-three-cols-layout:last-of-type {
+.oppia-about-three-cols-layout:last-of-type {
   margin-right: 0;
 }
 
-.letter-groups {
+.oppia-about-credits-letter-groups {
   margin: 0 0 10% 0;
 }
 
-.about-extra-info {
+.oppia-about-extra-info {
   color: #fff;
   width: 100%;
 }
@@ -3149,11 +3144,11 @@ md-card.preview-conversation-skin-supplemental-card {
   background-color: #0d8885;
 }
 
-.about-tab-content {
+.oppia-about-tab-content {
   display: none;
 }
 
-.about-visible-content {
+.oppia-about-visible-content {
   display: block;
   opacity: 1;
   position: relative;
@@ -3164,16 +3159,16 @@ md-card.preview-conversation-skin-supplemental-card {
   text-decoration: none;
 }
 
-.about-content p {
+.oppia-about-content p {
   margin: 1.5em 0;
 }
 
-.about-content ol,
-.about-content ul {
+.oppia-about-content ol,
+.oppia-about-content ul {
   padding: 0;
 }
 
-.about-content h2 {
+.oppia-about-content h2 {
   text-align: center;
 }
 
@@ -3181,14 +3176,14 @@ md-card.preview-conversation-skin-supplemental-card {
   text-align: center;
 }
 
-.about-tab-links {
+.oppia-about-tabs {
   display: flex;
   flex-wrap: wrap;
   padding: 0;
   text-align: center;
 }
 
-.about-tab-links li {
+.oppia-about-tabs li {
   border-right: 1px solid rgba(0,0,0,0.1);
   cursor: pointer;
   display: inline-block;
@@ -3197,32 +3192,32 @@ md-card.preview-conversation-skin-supplemental-card {
   width: calc(100% / 3);
 }
 
-.about-tab-links li:last-of-type {
+.oppia-about-tabs li:last-of-type {
   border-right: none;
 }
 
-.about-tab-links .about-active-tab {
+.oppia-about-tabs .oppia-about-tabs-active {
   border-bottom: 2px solid #009688;
 }
 
-.about-active-tab a {
+.oppia-about-tabs-active a {
   text-decoration: none;
 }
 
-.about-page-otter {
+.oppia-about-otter {
   width: 250px;
 }
 
-.nav-creators ul li{
+.oppia-about-teach-tabs ul li{
   width: calc(100% / 2);
 }
 
-.about-page-buttons {
+.oppia-about-buttons {
   padding: 15px;
   margin: 15px;
 }
 
-.about-page-buttons:hover {
+.oppia-about-buttons:hover {
   background-color: rgba(5,190,178,1);
   color: rgba(255,255,255,1);
 }
@@ -3232,24 +3227,24 @@ md-card.preview-conversation-skin-supplemental-card {
   margin: 0 auto;
 }
 
-.otter-button-container {
+.oppia-about-buttons-container {
   text-align: center;
 }
 
-.otter-buttons {
+.about-otter-buttons {
   display: inline-block;
   margin-right: 20px;
 }
 
-.otter-buttons:last-of-type {
+.about-otter-buttons:last-of-type {
   margin-right: 0;
 }
 
-.letter-groups span {
+.oppia-about-credits-letter-groups span {
   font-size: 1.8em;
 }
 
-.letter-groups ul li {
+.oppia-about-credits-letter-groups ul li {
   list-style-type: none;
 }
 
@@ -3261,50 +3256,50 @@ md-card.preview-conversation-skin-supplemental-card {
   body {
     font-size: 1.7em;
   }
-  .about-content, .about-extra-content {
+  .oppia-about-content, .oppia-about-extra-content {
     width: 960px;
   }
 }
 
 @media only screen and (max-width: 730px) {
-  .about-content, .about-extra-content {
+  .oppia-about-content, .oppia-about-extra-content {
     width: 90%;
   }
-  .about-tab-links li a {
+  .oppia-about-tabs li a {
     padding: 20px;
   }
-  .about-otter-container {
+  .oppia-about-otter-container {
     left: -3em;
     bottom: -1.8em;
   }
-  .about-page-otter {
+  .oppia-about-otter {
     width: 200px;
   }
-  .otter-speech-bubble {
+  .oppia-about-otter-speech-bubble {
     padding: 10px;
   }
 }
 
 @media only screen and (max-width: 500px) {
-  .about-tab-links li, .nav-creators ul li {
+  .oppia-about-tabs li, .oppia-about-teach-tabs ul li {
     width: 100%;
     border-right: none;
     border-bottom: 1px solid rgba(0,0,0,0.1);
   }
-  .about-card-content-wide, .about-card-content-narrow {
+  .oppia-about-card-content-wide, .oppia-about-card-content-narrow {
     width: 80%;
   }
-  .create-three-cols-layout {
+  .oppia-about-three-cols-layout {
     width: 100%;
     text-align: center;
   }
 
-  .about-page-buttons {
+  .oppia-about-buttons {
     width: 100%;
     margin: 20px 0 0 0;
   }
 
-  .about-page-buttons:first-child {
+  .oppia-about-buttons:first-child {
     margin: 0;
   }
 }

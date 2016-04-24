@@ -24,10 +24,10 @@
 {% endblock navbar_breadcrumb %}
 
 {% block content %}
-  <div class="oppia-page-card about-content">
-    <div class="about-nav oppia-profile-tabs md-tab nav-creators">
-      <ul class="about-tab-links">
-        <li class="oppia-profile-tabs about-active-tab">
+  <div class="oppia-page-card oppia-about-content">
+    <div class="about-nav oppia-profile-tabs md-tab oppia-about-teach-tabs">
+      <ul class="oppia-about-tabs">
+        <li class="oppia-profile-tabs oppia-about-tabs-active">
           <a href="about-tab-1">
             Teach on Oppia
           </a>
@@ -41,8 +41,8 @@
     </div>
 
   <div class="about-tab-container">
-    <div class="about-tab-1 about-tab-content about-visible-content">
-      <div class="about-card-content-wide about-card-content-narrow">
+    <div class="about-tab-1 oppia-about-tab-content oppia-about-visible-content">
+      <div class="oppia-about-card-content-wide oppia-about-card-content-narrow">
         <h2>
           Teach on Oppia
         </h2>
@@ -58,8 +58,8 @@
           reach more people with your content.
         </p>
       </div>
-      <div class="about-card-content-wide create-three-cols-container">
-        <div class="create-three-cols-layout create-three-cols-feature">
+      <div class="oppia-about-card-content-wide oppia-about-three-cols-container">
+        <div class="oppia-about-three-cols-layout oppia-about-three-cols-feature">
           <img src="images/general/creator-create-exp.png"/>
           <h3>Create an Exploration</h3>
           <p>
@@ -67,14 +67,14 @@
             that you are passionate about.
           </p>
         </div>
-        <div class="create-three-cols-layout create-three-cols-feature">
+        <div class="oppia-about-three-cols-layout oppia-about-three-cols-feature">
           <img src="images/general/creator-pub-share.png"/>
           <h3>Publish &amp; Share</h3>
           <p>
             Publish and share your work with your community.
           </p>
         </div>
-        <div class="create-three-cols-layout create-three-cols-feature">
+        <div class="oppia-about-three-cols-layout oppia-about-three-cols-feature">
           <img src="images/general/creator-feedback.png" />
           <h3>Earn feedback</h3>
           <p>
@@ -84,8 +84,8 @@
       </div>
     </div>
 
-    <div class="about-tab-2 about-tab-content">
-      <div class="about-card-content-wide about-card-content-narrow">
+    <div class="about-tab-2 oppia-about-tab-content">
+      <div class="oppia-about-card-content-wide oppia-about-card-content-narrow">
         <h2>Community Guidelines</h2>
         <ol>
           <li>
@@ -230,13 +230,13 @@
   </div>
   </div>
   
-  <div class="about-extra-container about-tab-container">
-    <div class="about-tab-content about-visible-content">
-      <div class="about-extra-info about-otter-buttons">
-        <div class="about-content about-extra-content">
-          <div class="about-card-content-wide otter-button-container">
-            <a href="#" class="btn oppia-navbar-button about-page-buttons">Create an exploration</a>
-            <a href="/gallery" class="btn oppia-navbar-button about-page-buttons">Browse all explorations</a>
+  <div class="oppia-about-extra-container about-tab-container">
+    <div class="oppia-about-tab-content oppia-about-visible-content">
+      <div class="oppia-about-extra-info about-otter-buttons">
+        <div class="oppia-about-content oppia-about-extra-content">
+          <div class="oppia-about-card-content-wide oppia-about-buttons-container">
+            <a href="#" class="btn oppia-navbar-button oppia-about-buttons">Create an exploration</a>
+            <a href="/gallery" class="btn oppia-navbar-button oppia-about-buttons">Browse all explorations</a>
           </div>
         </div>
       </div>
@@ -245,12 +245,12 @@
 
   <script>
     $(document).ready(function() {
-      $(".about-tab-links li").on("click", function(event) {
+      $(".oppia-about-tabs li").on("click", function(event) {
         event.preventDefault();
         var tabIndex = $(this).index();
-        $(this).addClass("about-active-tab").siblings().removeClass("about-active-tab");
+        $(this).addClass("oppia-about-tabs-active").siblings().removeClass("oppia-about-tabs-active");
         var currentAttrVal = $(this).children("a").attr("href");
-        $("." + currentAttrVal).addClass("about-visible-content").siblings().removeClass("about-visible-content");
+        $("." + currentAttrVal).addClass("oppia-about-visible-content").siblings().removeClass("oppia-about-visible-content");
       });
     });
   </script>
