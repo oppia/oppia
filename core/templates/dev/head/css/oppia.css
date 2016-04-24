@@ -1358,6 +1358,20 @@ pre.oppia-pre-wrapped-text {
   text-align: left;
 }
 
+.protractor-test-state-content-display > p {
+  margin-top: 18px;
+  margin-bottom: 18px;
+  line-height: 28px;
+}
+
+.protractor-test-state-content-display > p:first-child {
+  margin-top: 0px;
+}
+
+.protractor-test-state-content-display > p:last-child {
+  margin-bottom: 0px;
+}
+
 .oppia-prevent-selection {
   -moz-user-select: none;
   -ms-user-select: none;
@@ -2612,6 +2626,20 @@ div#ng-curtain {
 .form-control.oppia-rte-content img.block-element {
   display: block;
   margin: auto;
+}
+
+.form-control.oppia-rte-content > div > p {
+  margin-top: 18px;
+  margin-bottom: 18px;
+  line-height: 28px;
+}
+
+.form-control.oppia-rte-content > div > p:first-child {
+  margin-top: 0px;
+}
+
+.form-control.oppia-rte-content > div > p:last-child {
+  margin-bottom: 0px;
 }
 
 /* Styles for the editor training interfaces. */
