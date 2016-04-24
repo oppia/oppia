@@ -179,4 +179,149 @@ describe('Search service', function() {
     });
     expect(results.categories.selections).toEqual({});
   });
+
+  it('should not find languages nor categories when ampersand is escaped',
+     function() {
+    var results = {
+      categories: {
+        description: '',
+        itemsName: 'categories',
+        masterList: [],
+        numSelections: 0,
+        selections: {},
+        summary: ''
+      },
+      languageCodes: {
+        description: '',
+        itemsName: 'languages',
+        masterList: [],
+        numSelections: 0,
+        selections: {},
+        summary: ''
+      }
+    };
+    var urlComponent = '?q=protractor%20test%26category=("Mathematics")' +
+                       '%26language_code=("en"%20OR%20"ar")';
+    expect(searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
+      results)).toBe('protractor test&category=("Mathematics")' +
+                     '&language_code=("en" OR "ar")');
+    expect(results.languageCodes.selections).toEqual({});
+    expect(results.categories.selections).toEqual({});
+  });
+
+  it('should only find empty string when ampersand is not escaped anywhere',
+     function() {
+    var results = {
+      categories: {
+        description: '',
+        itemsName: 'categories',
+        masterList: [],
+        numSelections: 0,
+        selections: {},
+        summary: ''
+      },
+      languageCodes: {
+        description: '',
+        itemsName: 'languages',
+        masterList: [],
+        numSelections: 0,
+        selections: {},
+        summary: ''
+      }
+    };
+    var urlComponent = '?q=protractor&test&category=("Mathematics")' +
+                       '&language_code=("en"%20OR%20"ar")';
+    spyOn(window, 'alert');
+    expect(searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
+      results)).toBe('');
+    expect(results.languageCodes.selections).toEqual({});
+    expect(results.categories.selections).toEqual({});
+    expect(window.alert).toHaveBeenCalledWith('Invalid search query url!');
+  });
+
+  it('should error when category selection url component is malformed',
+     function() {
+    var results = {
+      categories: {
+        description: '',
+        itemsName: 'categories',
+        masterList: [],
+        numSelections: 0,
+        selections: {},
+        summary: ''
+      },
+      languageCodes: {
+        description: '',
+        itemsName: 'languages',
+        masterList: [],
+        numSelections: 0,
+        selections: {},
+        summary: ''
+      }
+    };
+    var urlComponent = '?q=protractor%20test&category=(("Mathematics")' +
+                       '&language_code=("en"%20OR%20"ar")';
+    spyOn(window, 'alert');
+    expect(searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
+      results)).toBe('protractor test');
+    expect(results.languageCodes.selections).toEqual({
+      ar: true,
+      en: true
+    });
+    expect(results.categories.selections).toEqual({});
+    expect(window.alert).toHaveBeenCalledWith('Invalid search query url!');
+
+    var urlComponent = '?q=protractor%20test&category=("Mathematics"' +
+                       '&language_code=("en"%20OR%20"ar")';
+    expect(searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
+      results)).toBe('protractor test');
+    expect(results.languageCodes.selections).toEqual({
+      ar: true,
+      en: true
+    });
+    expect(results.categories.selections).toEqual({});
+    expect(window.alert).toHaveBeenCalledWith('Invalid search query url!');
+  });
+
+  it('should error when language selection url component is malformed',
+     function() {
+    var results = {
+      categories: {
+        description: '',
+        itemsName: 'categories',
+        masterList: [],
+        numSelections: 0,
+        selections: {},
+        summary: ''
+      },
+      languageCodes: {
+        description: '',
+        itemsName: 'languages',
+        masterList: [],
+        numSelections: 0,
+        selections: {},
+        summary: ''
+      }
+    };
+    var urlComponent = '?q=protractor%20test&category=("Mathematics")' +
+                       '&language_code="en"%20OR%20"ar")';
+    spyOn(window, 'alert');
+    expect(searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
+      results)).toBe('protractor test');
+    expect(results.languageCodes.selections).toEqual({});
+    expect(results.categories.selections).toEqual({
+      Mathematics: true
+    });
+    expect(window.alert).toHaveBeenCalledWith('Invalid search query url!');
+
+    var urlComponent = '?q=protractor%20test&category=("Mathematics")' +
+                       '&language_code="en"%20OR%20"ar"';
+    expect(searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
+      results)).toBe('protractor test');
+    expect(results.languageCodes.selections).toEqual({});
+    expect(results.categories.selections).toEqual({
+      Mathematics: true
+    });
+    expect(window.alert).toHaveBeenCalledWith('Invalid search query url!');
+  });
 });

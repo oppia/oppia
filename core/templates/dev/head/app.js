@@ -40,8 +40,8 @@ oppia.config(['$interpolateProvider', '$httpProvider', '$locationProvider',
   $interpolateProvider.endSymbol(']>');
 
   $locationProvider.html5Mode(false);
-  // The following prevents the page from reloading if the search query is
-  // changed.
+  // The following prevents the search page from reloading if the search query
+  // is changed.
   if (window.location.pathname == '/search/find') {
     $locationProvider.html5Mode(true);
   }

@@ -16,6 +16,10 @@
   <search-bar></search-bar>
 {% endblock %}
 
+{% block base_url %}
+  <base href="/search/">
+{% endblock %}
+
 {% block header_js %}
   {{ super() }}
   <script type="text/javascript">
