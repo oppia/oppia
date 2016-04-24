@@ -3073,15 +3073,9 @@ md-card.preview-conversation-skin-supplemental-card {
   color: #fff;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 3em;
-  font-weight: bold;
 }
 
-.oppia-about-extra-container h1,
-.oppia-about-extra-container h2,
-.oppia-about-extra-container h3,
-.oppia-about-extra-container h4,
-.oppia-about-extra-container h5,
-.oppia-about-extra-container h6 {
+.oppia-about-extra-container h3 {
   text-align: center;
 }
 
@@ -3102,7 +3096,6 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-about-three-cols-container {
   display: flex;
   flex-wrap: wrap;
-  padding: 0 0 8% 0;
 }
 
 .oppia-about-three-cols-feature {
@@ -3124,24 +3117,9 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-about-extra-info {
+  background-color: #009788;
   color: #fff;
   width: 100%;
-}
-
-.about-otter-buttons {
-  background-color: #009788;
-}
-
-.about-get-involved {
-  background-color: #009788;
-}
-
-.new-explorations {
-  background-color: #16DEB7;
-}
-
-.start-creating {
-  background-color: #0d8885;
 }
 
 .oppia-about-tab-content {
@@ -3150,13 +3128,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-about-visible-content {
   display: block;
-  opacity: 1;
   position: relative;
-  transition: opacity .35s ease;
-}
-
-.inline-links {
-  text-decoration: none;
 }
 
 .oppia-about-content p {
@@ -3172,22 +3144,17 @@ md-card.preview-conversation-skin-supplemental-card {
   text-align: center;
 }
 
-.otter-content h3 {
-  text-align: center;
-}
-
 .oppia-about-tabs {
   display: flex;
   flex-wrap: wrap;
-  padding: 0;
   text-align: center;
+  margin-bottom: 0;
 }
 
 .oppia-about-tabs li {
   border-right: 1px solid rgba(0,0,0,0.1);
   cursor: pointer;
   display: inline-block;
-  margin-bottom: 0;
   padding: 10px;
   width: calc(100% / 3);
 }
@@ -3198,10 +3165,6 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-about-tabs .oppia-about-tabs-active {
   border-bottom: 2px solid #009688;
-}
-
-.oppia-about-tabs-active a {
-  text-decoration: none;
 }
 
 .oppia-about-otter {
@@ -3222,22 +3185,8 @@ md-card.preview-conversation-skin-supplemental-card {
   color: rgba(255,255,255,1);
 }
 
-.about-centered-button {
-  display: block;
-  margin: 0 auto;
-}
-
 .oppia-about-buttons-container {
   text-align: center;
-}
-
-.about-otter-buttons {
-  display: inline-block;
-  margin-right: 20px;
-}
-
-.about-otter-buttons:last-of-type {
-  margin-right: 0;
 }
 
 .oppia-about-credits-letter-groups span {
@@ -3261,9 +3210,6 @@ md-card.preview-conversation-skin-supplemental-card {
 @media only screen and (max-width: 730px) {
   .oppia-about-content, .oppia-about-extra-content {
     width: 90%;
-  }
-  .oppia-about-tabs li a {
-    padding: 20px;
   }
   .oppia-about-otter-container {
     left: -3em;
@@ -3290,12 +3236,10 @@ md-card.preview-conversation-skin-supplemental-card {
     width: 100%;
     text-align: center;
   }
-
   .oppia-about-buttons {
     width: 100%;
     margin: 20px 0 0 0;
   }
-
   .oppia-about-buttons:first-child {
     margin: 0;
   }
