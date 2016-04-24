@@ -371,15 +371,15 @@ oppia.controller('ExplorationEditor', [
 ]);
 
 oppia.controller('EditorNavigation', [
-  '$scope', '$rootScope', '$timeout', 'routerService',
+  '$scope', '$rootScope', '$timeout', '$modal', 'routerService',
   'explorationRightsService', 'explorationWarningsService',
   'stateEditorTutorialFirstTimeService',
-  'threadDataService', '$modal',
+  'threadDataService',
   function(
-    $scope, $rootScope, $timeout, routerService,
+    $scope, $rootScope, $timeout, $modal, routerService,
     explorationRightsService, explorationWarningsService,
     stateEditorTutorialFirstTimeService,
-    threadDataService, $modal) {
+    threadDataService) {
     $scope.postTutorialHelpPopoverIsShown = false;
 
     $scope.$on('openPostTutorialHelpPopover', function() {
