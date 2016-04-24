@@ -3253,9 +3253,6 @@ md-card.preview-conversation-skin-supplemental-card {
 */
 
 @media only screen and (min-width: 1400px) {
-  body {
-    font-size: 1.7em;
-  }
   .oppia-about-content, .oppia-about-extra-content {
     width: 960px;
   }
