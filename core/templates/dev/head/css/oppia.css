@@ -1358,17 +1358,28 @@ pre.oppia-pre-wrapped-text {
   text-align: left;
 }
 
-.protractor-test-state-content-display > p {
-  margin-top: 18px;
-  margin-bottom: 18px;
+/* These rules must be kept in sync with corresponding rules in
+   core/templates/dev/head/player/conversation_skin_directive.html
+   (those with '.conversation-skin-tutor-card-top-content > p,
+   .conversation-skin-oppia-feedback-content > p,
+   .conversation-skin-learner-answer-content > p,
+   .conversation-skin-help-card-content > p' selectors specifying
+    the same line-height, margin-top and margin-bottom attributes)
+*/
+.oppia-state-content-display-html > p,
+.form-control.oppia-rte-content > div > p {
   line-height: 28px;
+  margin-bottom: 18px;
+  margin-top: 18px;
 }
 
-.protractor-test-state-content-display > p:first-child {
+.oppia-state-content-display-html > p:first-child,
+.form-control.oppia-rte-content > div > p:first-child {
   margin-top: 0px;
 }
 
-.protractor-test-state-content-display > p:last-child {
+.oppia-state-content-display-html > p:last-child,
+.form-control.oppia-rte-content > div > p:last-child {
   margin-bottom: 0px;
 }
 
@@ -2626,20 +2637,6 @@ div#ng-curtain {
 .form-control.oppia-rte-content img.block-element {
   display: block;
   margin: auto;
-}
-
-.form-control.oppia-rte-content > div > p {
-  margin-top: 18px;
-  margin-bottom: 18px;
-  line-height: 28px;
-}
-
-.form-control.oppia-rte-content > div > p:first-child {
-  margin-top: 0px;
-}
-
-.form-control.oppia-rte-content > div > p:last-child {
-  margin-bottom: 0px;
 }
 
 /* Styles for the editor training interfaces. */
