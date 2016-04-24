@@ -79,8 +79,6 @@ def get_matching_exploration_dicts(query_string, search_cursor):
     """Given a query string and a search cursor, returns a list of exploration
        dicts that satisfy the search query.
     """
-    # TODO(sll): Figure out what to do about explorations in categories
-    # other than those explicitly listed.
     exp_ids, search_cursor = (
         exp_services.get_exploration_ids_matching_query(
             query_string, cursor=search_cursor))

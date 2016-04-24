@@ -69,7 +69,8 @@ oppia.factory('searchService', [
     var itemCodeGroup = urlComponent.match(/=\("[A-Za-z%20" ]+"\)/);
 
     if (itemCodeGroup == undefined) {
-      alert('Invalid search query url!');
+      throw Error('Invalid search query url fragment for ' +
+                  itemsType + ': ' + urlComponent);
       return;
     }
     var itemCodes = itemCodeGroup[0].replace('=("', '');
@@ -154,8 +155,13 @@ oppia.factory('searchService', [
       if (querySegments.length > 1) {
         var languageUrlComponent = decodeURIComponent(
           querySegments[querySegments.length - 1]);
-        updateSearchFields('languageCodes', languageUrlComponent,
-                           selectionDetails);
+        try {
+          updateSearchFields('languageCodes', languageUrlComponent,
+                             selectionDetails);
+        } catch (error) {
+          selectionDetails.categories.selections = {};
+          throw error;
+        }
       }
       return decodeURIComponent(querySegments[0]);
     },

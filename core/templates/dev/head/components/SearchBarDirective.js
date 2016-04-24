@@ -149,11 +149,16 @@ oppia.directive('searchBar', [function() {
         };
 
         var updateSearchFieldsBasedOnUrlQuery = function() {
+          $scope.selectionDetails.categories.selections = {};
+          $scope.selectionDetails.languageCodes.selections = {};
+
           $scope.searchQuery = searchService.updateSearchFieldsBasedOnUrlQuery(
             $window.location.search, $scope.selectionDetails);
 
           updateSelectionDetails('categories');
           updateSelectionDetails('languageCodes');
+
+          onSearchQueryChangeExec();
         };
 
         $scope.$on('$locationChangeSuccess', function() {
@@ -180,7 +185,7 @@ oppia.directive('searchBar', [function() {
             }
             onSearchQueryChangeExec();
 
-            SearchBarFullyLoaded = true;
+            searchBarFullyLoaded = true;
           }
         );
       }
