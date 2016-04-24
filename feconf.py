@@ -339,6 +339,7 @@ DEMO_EXPLORATIONS = {
     u'14': 'about_oppia.yaml',
     u'15': 'fuzzy_exploration.yaml',
     u'16': 'all_interactions',
+    u'17': 'test_responsive_supplementary'
 }
 
 DEMO_COLLECTIONS = {

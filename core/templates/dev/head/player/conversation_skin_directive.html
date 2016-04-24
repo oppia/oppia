@@ -108,21 +108,13 @@
                 </div>
                 <div ng-if="!exploration.isInteractionInline(activeCard.stateName)"
                      ng-click="setVisiblePanel(PANEL_SUPPLEMENTAL)"
-                     ng-class="{'conversation-skin-interaction-clickable-instructions': panels.length > 1}"
+                     ng-class="{'conversation-skin-interaction-clickable- ': panels.length > 1}"
                      style="opacity: 0.8;">
-
-                  <div ng-if="canWindowFitTwoCards()">
+                  <div>
                     <button style="background: inherit; border: none;">
                       <[exploration.getInteractionInstructions(activeCard.stateName)]>
                       <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
                     </button>
-                  </div>
-
-                  <div ng-if="!canWindowFitTwoCards()">
-                    <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button">
-                      <[exploration.getNarrowInstructions(activeCard.stateName)]>
-                      <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
-                    </md-button>
                   </div>
                 </div>
               </div>
@@ -166,13 +158,6 @@
                  angular-html-bind="activeCard.interactionHtml">
             </div>
           </div>
-        </div>
-
-        <div ng-if="!canWindowFitTwoCards()">
-          <md-button class="oppia-learner-continue-button" ng-click="setVisiblePanel(PANEL_TUTOR)">
-            <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C4;</i>
-            Instructions
-          </md-button>
         </div>
       </div>
     </div>
@@ -347,7 +332,8 @@
       padding-top: 20px;
       text-align: left;
       min-width: 360px;
-      flex-basis: 560px;
+      width: 100%;
+      flex-shrink: 10000;
       max-width: 560px;
       z-index: 1;
     }
@@ -355,6 +341,7 @@
     .conversation-skin-supplemental-card-container {
       margin-left: 12px;
       min-width: 560px;
+      flex-shrink: 1;
       max-width: 1000px;
     }
 

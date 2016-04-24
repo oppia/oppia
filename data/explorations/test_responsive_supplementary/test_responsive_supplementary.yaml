@@ -1,0 +1,174 @@
+author_notes: ''
+blurb: ''
+category: Test
+init_state_name: Image Region
+language_code: en
+objective: Dummy exploration for testing all interactions
+param_changes: []
+param_specs: {}
+schema_version: 10
+skin_customizations:
+  panels_contents:
+    bottom: []
+states:
+  End Exploration:
+    content:
+    - type: text
+      value: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      fallbacks: []
+      id: EndExploration
+    param_changes: []
+  Code Editor:
+    content:
+    - type: text
+      value: <p>Code Editor. Write a program which prints hello to me.</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: End Exploration
+          feedback:
+          - <p>Hello! Let's move onto another interaction.</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: Hello Oppia
+          rule_type: OutputEquals
+      confirmed_unclassified_answers: []
+      customization_args:
+        language:
+          value: python
+        placeholder:
+          value: '# Type your code here.'
+        postCode:
+          value: ''
+        preCode:
+          value: ''
+      default_outcome:
+        dest: Code Editor
+        feedback:
+        - <p>I'm looking for a particular 'Hello Oppia' message. Don't you want to
+          say hello?</p>
+        param_changes: []
+      fallbacks: []
+      id: CodeRepl
+    param_changes: []
+  Image Region:
+    content:
+    - type: text
+      value: <p>Image Region. Please click on the constructor in the Python code shown.</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Image Region
+          feedback:
+          - <p>That's the class definition. Try again.</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: classdef
+          rule_type: IsInRegion
+      - outcome:
+          dest: Image Region
+          feedback:
+          - <p>That's the class's docstring. Try again.</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: docstring
+          rule_type: IsInRegion
+      - outcome:
+          dest: Image Region
+          feedback:
+          - <p>That's a function, which is close to what you're looking for. Try again!</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: instancefunc
+          rule_type: IsInRegion
+      - outcome:
+          dest: Image Region
+          feedback:
+          - <p>That's a classmethod. It does execute code, but it doesn't construct
+            anything. Try again!</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: classfunc
+          rule_type: IsInRegion
+      - outcome:
+          dest: Code Editor
+          feedback:
+          - <p>You found it! This is the code responsible for constructing a new class
+            object.</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: ctor
+          rule_type: IsInRegion
+      confirmed_unclassified_answers: []
+      customization_args:
+        highlightRegionsOnHover:
+          value: true
+        imageAndRegions:
+          value:
+            imagePath: code_sample.png
+            labeledRegions:
+            - label: classdef
+              region:
+                area:
+                - - 0.004291845493562232
+                  - 0.004692192192192192
+                - - 0.40987124463519314
+                  - 0.05874624624624625
+                regionType: Rectangle
+            - label: docstring
+              region:
+                area:
+                - - 0.07296137339055794
+                  - 0.06475225225225226
+                - - 0.9892703862660944
+                  - 0.1218093093093093
+                regionType: Rectangle
+            - label: instancefunc
+              region:
+                area:
+                - - 0.07296137339055794
+                  - 0.15183933933933935
+                - - 0.6995708154506438
+                  - 0.44012762762762764
+                regionType: Rectangle
+            - label: classfunc
+              region:
+                area:
+                - - 0.06866952789699571
+                  - 0.46114864864864863
+                - - 0.6931330472103004
+                  - 0.776463963963964
+                regionType: Rectangle
+            - label: ctor
+              region:
+                area:
+                - - 0.06437768240343347
+                  - 0.821509009009009
+                - - 0.740343347639485
+                  - 0.9926801801801802
+                regionType: Rectangle
+      default_outcome:
+        dest: Image Region
+        feedback:
+        - "<p>Constructors <i>initialize</i>\_an object, or <i>init</i>\_it.Constructors\
+          \ are also functions themselves.</p>"
+        param_changes: []
+      fallbacks: []
+      id: ImageClickInput
+    param_changes: []
+states_schema_version: 7
+tags: []
+title: Test of all interactions
