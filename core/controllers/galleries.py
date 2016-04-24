@@ -75,6 +75,26 @@ CAROUSEL_SLIDES_CONFIG = config_domain.ConfigProperty(
     }])
 
 
+def get_matching_exploration_dicts(query_string, search_cursor):
+    """Given a query string and a search cursor, returns a list of exploration
+       dicts that satisfy the search query.
+    """
+    exp_ids, search_cursor = (
+        exp_services.get_exploration_ids_matching_query(
+            query_string, cursor=search_cursor))
+
+    explorations_list = (
+        summary_services.get_displayable_exp_summary_dicts_matching_ids(
+            exp_ids))
+
+    if len(explorations_list) == feconf.DEFAULT_QUERY_LIMIT:
+        logging.error(
+            '%s explorations were fetched to load the gallery page. '
+            'You may be running up against the default query limits.'
+            % feconf.DEFAULT_QUERY_LIMIT)
+    return explorations_list
+
+
 class GalleryPage(base.BaseHandler):
     """The exploration gallery page."""
 
@@ -82,6 +102,27 @@ class GalleryPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
+        self.values.update({
+            'nav_mode': feconf.NAV_MODE_GALLERY,
+            'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
+            'has_fully_registered': bool(
+                self.user_id and
+                user_services.has_fully_registered(self.user_id)),
+            'SPLASH_PAGE_YOUTUBE_VIDEO_ID': SPLASH_PAGE_YOUTUBE_VIDEO_ID.value,
+            'CAROUSEL_SLIDES_CONFIG': CAROUSEL_SLIDES_CONFIG.value,
+            'LANGUAGE_CODES_AND_NAMES': (
+                utils.get_all_language_codes_and_names()),
+        })
+        self.render_template('galleries/gallery.html')
+
+class GallerySearchPage(base.BaseHandler):
+    """The exploration gallery search page."""
+
+    PAGE_NAME_FOR_CSRF = 'gallery'
+
+    def get(self):
+        """Handles GET requests."""
+
         self.values.update({
             'nav_mode': feconf.NAV_MODE_GALLERY,
             'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
@@ -127,29 +168,22 @@ class GalleryHandler(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        # TODO(sll): Figure out what to do about explorations in categories
-        # other than those explicitly listed.
-
         query_string = self.request.get('q')
+        if self.request.get('category'):
+            query_string += ' category=%s' % self.request.get('category')
+        if self.request.get('language_code'):
+            query_string += ' language_code=%s' % self.request.get(
+                'language_code')
         search_cursor = self.request.get('cursor', None)
-        exp_ids, search_cursor = (
-            exp_services.get_exploration_ids_matching_query(
-                query_string, cursor=search_cursor))
 
-        explorations_list = (
-            summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                exp_ids))
-
-        if len(explorations_list) == feconf.DEFAULT_QUERY_LIMIT:
-            logging.error(
-                '%s explorations were fetched to load the gallery page. '
-                'You may be running up against the default query limits.'
-                % feconf.DEFAULT_QUERY_LIMIT)
+        explorations_list = get_matching_exploration_dicts(
+            query_string, search_cursor)
 
         self.values.update({
             'explorations_list': explorations_list,
             'search_cursor': search_cursor,
         })
+
         self.render_json(self.values)
 
 

@@ -190,6 +190,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.GALLERY_DATA_URL, galleries.GalleryHandler,
         'gallery_handler'),
     get_redirect_route(
+        r'%s' % feconf.GALLERY_SEARCH_URL,
+        galleries.GallerySearchPage, 'gallery_search'),
+    get_redirect_route(
         r'/default_gallery_categories',
         galleries.DefaultGalleryCategoriesHandler,
         'default_gallery_categories'),

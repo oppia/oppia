@@ -16,12 +16,17 @@
   <search-bar></search-bar>
 {% endblock %}
 
+{% block base_url %}
+  <base href="/search/">
+{% endblock %}
+
 {% block header_js %}
   {{ super() }}
   <script type="text/javascript">
     GLOBALS.LANGUAGE_CODES_AND_NAMES = JSON.parse(
       '{{LANGUAGE_CODES_AND_NAMES|js_string}}');
-    GLOBALS.CAROUSEL_SLIDES_CONFIG = JSON.parse('{{CAROUSEL_SLIDES_CONFIG|js_string}}');
+    GLOBALS.CAROUSEL_SLIDES_CONFIG = JSON.parse(
+      '{{CAROUSEL_SLIDES_CONFIG|js_string}}');
   </script>
 
   <style>
@@ -101,36 +106,15 @@
           </div>
         </div>
       </div>
-
       <div class="oppia-gallery-tiles-area" ng-if="!inSplashMode">
-        <div class="oppia-gallery-tiles-container">
-          <div ng-if="allExplorationsInOrder.length === 0" class="oppia-gallery-tiles-introduction">
-            <div class="oppia-gallery-no-match">
-              <i class="material-icons md-100" style="color: #a2a3a2;">&#xE001;</i>
-              <p style="text-align: center;">
-                Oops, it looks like your search didn't match any explorations.<br><br>
-                <!-- NOTE: If you change the links here, please make the corresponding change for the 'Create New Exploration' button. -->
-                {% if not has_fully_registered %}
-                  Would you like to <a href ng-click="onRedirectToLogin('/my_explorations?mode=create')">create one</a>?
-                {% else %}
-                  Would you like to <a ng-click="showCreateExplorationModal()">create one</a>?
-                {% endif %}
-              </p>
-            </div>
-          </div>
-          <activity-tiles-infinity-grid></activity-tiles-infinity-grid>
-        </div>
+        <search-results></search-results>
       </div>
-      <div class="oppia-gallery-loading-results-message" ng-if="pageLoaderIsBusy">
-        Loading more results
-        <loading-dots></loading-dots>
-      </div>
-    </div>
   </div>
 
   {% include 'components/exploration_creation_button_modal.html' %}
   {% include 'components/profile_link_image_directive.html' %}
   {% include 'components/search_bar_directive.html' %}
+  {% include 'components/search_results_directive.html' %}
   {% include 'components/circular_image_directive.html' %}
 {% endblock %}
 
@@ -139,6 +123,7 @@
   <script>
     {{ include_js_file('components/ProfileLinkImageDirective.js') }}
     {{ include_js_file('components/SearchBarDirective.js') }}
+    {{ include_js_file('components/SearchResultsDirective.js') }}
     {{ include_js_file('components/CircularImageDirective.js') }}
     {{ include_js_file('galleries/Gallery.js') }}
   </script>

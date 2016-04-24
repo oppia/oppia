@@ -21,13 +21,13 @@ oppia.directive('searchBar', [function() {
     restrict: 'E',
     templateUrl: 'components/searchBar',
     controller: [
-      '$scope', '$rootScope', '$timeout', '$window', 'searchService',
-      'oppiaDebouncer', 'ExplorationCreationButtonService', 'urlService',
-      'CATEGORY_LIST',
+      '$scope', '$rootScope', '$timeout', '$window', '$location',
+      'searchService', 'oppiaDebouncer', 'oppiaHtmlEscaper',
+      'ExplorationCreationButtonService', 'urlService', 'CATEGORY_LIST',
       function(
-          $scope, $rootScope, $timeout, $window, searchService,
-          oppiaDebouncer, ExplorationCreationButtonService, urlService,
-          CATEGORY_LIST) {
+          $scope, $rootScope, $timeout, $window, $location,
+          searchService, oppiaDebouncer, oppiaHtmlEscaper,
+          ExplorationCreationButtonService, urlService, CATEGORY_LIST) {
         $scope.isSearchInProgress = searchService.isSearchInProgress;
         $scope.ALL_CATEGORIES = CATEGORY_LIST.map(function(categoryName) {
           return {
@@ -65,7 +65,7 @@ oppia.directive('searchBar', [function() {
 
         // Update the description, numSelections and summary fields of the
         // relevant entry of $scope.selectionDetails.
-        var _updateSelectionDetails = function(itemsType) {
+        var updateSelectionDetails = function(itemsType) {
           var itemsName = $scope.selectionDetails[itemsType].itemsName;
           var masterList = $scope.selectionDetails[itemsType].masterList;
 
@@ -100,42 +100,70 @@ oppia.directive('searchBar', [function() {
             selections[optionName] = !selections[optionName];
           }
 
-          _updateSelectionDetails(itemsType);
-          _onSearchQueryChangeExec();
+          updateSelectionDetails(itemsType);
+          onSearchQueryChangeExec();
         };
 
         $scope.deselectAll = function(itemsType) {
           $scope.selectionDetails[itemsType].selections = {};
-          _updateSelectionDetails(itemsType);
+          updateSelectionDetails(itemsType);
         };
 
-        var _searchBarFullyLoaded = false;
+        var searchBarFullyLoaded = false;
 
-        var _hasChangedSearchQuery = Boolean(urlService.getUrlParams().q);
-        var _onSearchQueryChangeExec = function() {
+        var hasChangedSearchQuery = Boolean(urlService.getUrlParams().q);
+        var onSearchQueryChangeExec = function() {
+          $scope.searchIsLoading = true;
           searchService.executeSearchQuery(
               $scope.searchQuery, $scope.selectionDetails.categories.selections,
               $scope.selectionDetails.languageCodes.selections, function() {
-            if (!_hasChangedSearchQuery && _searchBarFullyLoaded) {
-              _hasChangedSearchQuery = true;
+            if (!hasChangedSearchQuery && searchBarFullyLoaded) {
+              hasChangedSearchQuery = true;
               $rootScope.$broadcast('hasChangedSearchQuery');
             }
           });
+
+          var searchUrlQueryString = searchService.getSearchUrlQueryString(
+            $scope.searchQuery, $scope.selectionDetails.categories.selections,
+            $scope.selectionDetails.languageCodes.selections
+          );
+          if ($window.location.pathname == '/search/find') {
+            $location.url('/find?q=' + searchUrlQueryString);
+          } else if ($scope.searchQuery != '') {
+            $window.location.href = '/search/find?q=' + searchUrlQueryString;
+          }
         };
 
         // Initialize the selection descriptions and summaries.
         for (var itemsType in $scope.selectionDetails) {
-          _updateSelectionDetails(itemsType);
+          updateSelectionDetails(itemsType);
         }
 
         $scope.onSearchQueryChange = function(evt) {
           // Query immediately when the enter or space key is pressed.
           if (evt.keyCode == 13 || evt.keyCode == 32) {
-            _onSearchQueryChangeExec();
+            onSearchQueryChangeExec();
           } else {
-            oppiaDebouncer.debounce(_onSearchQueryChangeExec, 400)();
+            oppiaDebouncer.debounce(onSearchQueryChangeExec, 400)();
           }
         };
+
+        var updateSearchFieldsBasedOnUrlQuery = function() {
+          $scope.selectionDetails.categories.selections = {};
+          $scope.selectionDetails.languageCodes.selections = {};
+
+          $scope.searchQuery = searchService.updateSearchFieldsBasedOnUrlQuery(
+            $window.location.search, $scope.selectionDetails);
+
+          updateSelectionDetails('categories');
+          updateSelectionDetails('languageCodes');
+
+          onSearchQueryChangeExec();
+        };
+
+        $scope.$on('$locationChangeSuccess', function() {
+          updateSearchFieldsBasedOnUrlQuery();
+        });
 
         $scope.$on(
           'preferredLanguageCodesLoaded',
@@ -150,10 +178,14 @@ oppia.directive('searchBar', [function() {
               }
             }
 
-            _updateSelectionDetails('languageCodes');
-            _onSearchQueryChangeExec();
+            updateSelectionDetails('languageCodes');
 
-            _searchBarFullyLoaded = true;
+            if (Boolean(urlService.getUrlParams().q)) {
+              updateSearchFieldsBasedOnUrlQuery();
+            }
+            onSearchQueryChangeExec();
+
+            searchBarFullyLoaded = true;
           }
         );
       }

@@ -34,57 +34,6 @@ angular.module('template/carousel/carousel.html', []).run([
 
 oppia.constant('GALLERY_DATA_URL', '/galleryhandler/data');
 
-// Keeps track of the current category and language selections.
-oppia.factory('selectionDataService', [function() {
-  var currentlySelectedCategories = [];
-  var currentlySelectedLanguageCodes = [];
-
-  return {
-    getCurrentlySelectedCategories: function() {
-      return angular.copy(currentlySelectedCategories);
-    },
-    getCurrentlySelectedLanguageCodes: function() {
-      return angular.copy(currentlySelectedLanguageCodes);
-    },
-    clearCategories: function() {
-      currentlySelectedCategories = [];
-    },
-    clearLanguageCodes: function() {
-      currentlySelectedLanguageCodes = [];
-    },
-    addCategoriesToSelection: function(newCategories) {
-      newCategories.forEach(function(category) {
-        if (currentlySelectedCategories.indexOf(category) === -1) {
-          currentlySelectedCategories.push(category);
-        }
-      });
-    },
-    addLanguageCodesToSelection: function(newLanguageCodes) {
-      newLanguageCodes.forEach(function(languageCode) {
-        if (currentlySelectedLanguageCodes.indexOf(languageCode) === -1) {
-          currentlySelectedLanguageCodes.push(languageCode);
-        }
-      });
-    },
-    removeCategoriesFromSelection: function(removedCategories) {
-      removedCategories.forEach(function(category) {
-        var index = currentlySelectedCategories.indexOf(category);
-        if (index !== -1) {
-          currentlySelectedCategories.splice(index, 1);
-        }
-      });
-    },
-    removeLanguageCodesFromSelection: function(removedLanguageCodes) {
-      removedLanguageCodes.forEach(function(languageCode) {
-        var index = currentlySelectedLanguageCodes.indexOf(languageCode);
-        if (index !== -1) {
-          currentlySelectedLanguageCodes.splice(index, 1);
-        }
-      });
-    }
-  };
-}]);
-
 oppia.controller('Gallery', [
   '$scope', '$http', '$rootScope', '$modal', '$window', '$timeout',
   'ExplorationCreationButtonService', 'oppiaDatetimeFormatter',
@@ -251,7 +200,8 @@ oppia.controller('Gallery', [
         CATEGORY_LIST);
     };
 
-    $scope.inSplashMode = ($scope.CAROUSEL_SLIDES.length > 0);
+    // The following checks if gallery is in search mode
+    $scope.inSplashMode = ($window.location.pathname == '/gallery');
     var removeSplashCarousel = function() {
       if ($scope.inSplashMode) {
         $('.oppia-gallery-container').fadeOut(function() {
@@ -262,28 +212,6 @@ oppia.controller('Gallery', [
         });
       }
     };
-
-    $scope.$on('hasChangedSearchQuery', function() {
-      removeSplashCarousel();
-    });
-
-    $scope.allExplorationsInOrder = [];
-
-    // Called when the page loads, and after every search query.
-    var _refreshGalleryData = function(data, hasPageFinishedLoading) {
-      $scope.allExplorationsInOrder = data.explorations_list;
-      $scope.finishedLoadingPage = hasPageFinishedLoading;
-      $rootScope.loadingMessage = '';
-    };
-
-    $scope.pageLoaderIsBusy = false;
-
-    $scope.$on(
-      'refreshGalleryData',
-      function(evt, data, hasPageFinishedLoading) {
-        _refreshGalleryData(data, hasPageFinishedLoading);
-      }
-    );
 
     $scope.showFullGalleryGroup = function(galleryGroup) {
       var selectedCategories = {};
