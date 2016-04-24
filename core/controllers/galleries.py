@@ -135,7 +135,6 @@ class GallerySearchPage(base.BaseHandler):
             'CAROUSEL_SLIDES_CONFIG': CAROUSEL_SLIDES_CONFIG.value,
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
-            'inSearchPage': True,
         })
         self.render_template('galleries/gallery.html')
 
