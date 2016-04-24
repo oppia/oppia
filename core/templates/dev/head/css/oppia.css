@@ -3098,14 +3098,14 @@ md-card.preview-conversation-skin-supplemental-card {
   flex-wrap: wrap;
 }
 
-.oppia-about-three-cols-feature {
+.oppia-about-three-cols-feature,
+.oppia-about-three-cols-feature p {
   text-align: center;
 }
 
 .oppia-about-three-cols-layout {
-  margin-right: 10px;
-  padding: 10px;
-  width: calc((100% - 20px) / 3);
+  margin-right: 20px;
+  width: calc((100% - 40px) / 3);
 }
 
 .oppia-about-three-cols-layout:last-of-type {
@@ -3235,6 +3235,8 @@ md-card.preview-conversation-skin-supplemental-card {
   .oppia-about-three-cols-layout {
     width: 100%;
     text-align: center;
+    padding: 0;
+    margin: 0;
   }
   .oppia-about-otter-speech-card {
     width: 50%;
