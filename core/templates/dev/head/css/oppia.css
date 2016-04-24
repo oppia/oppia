@@ -3080,6 +3080,10 @@ md-card.preview-conversation-skin-supplemental-card {
   text-align: center;
 }
 
+.oppia-about-otter-speech-bubble h3 {
+  color: #000;
+}
+
 .oppia-about-extra-content p {
   margin: 1.5em 0;
 }
