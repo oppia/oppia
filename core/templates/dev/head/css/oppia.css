@@ -3176,8 +3176,9 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-about-buttons {
-  padding: 15px;
   margin: 15px;
+  padding: 15px;
+  white-space: normal;
 }
 
 .oppia-about-buttons:hover {
