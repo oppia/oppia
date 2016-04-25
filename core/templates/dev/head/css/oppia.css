@@ -111,18 +111,12 @@ body {
 }
 
 .oppia-dashboard-container {
+  margin: 60px auto 30px auto;
   max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 60px;
-  margin-bottom: 30px;
 }
 
 .oppia-profile-container {
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 60px;
-  margin-bottom: 30px;
+  margin: 60px auto 30px auto;
   max-width: 980px;
   width: 90%;
 }
@@ -1231,13 +1225,6 @@ md-card.oppia-gallery-tile {
     padding: 15px 15px 15px 50px;
     width: 25em;
   }
-}
-
-.oppia-alert-blocks {
-  left: 20%;
-  position: fixed;
-  width: 60%;
-  z-index: 3000;
 }
 
 .oppia-form input.ng-invalid.ng-dirty {

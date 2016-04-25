@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Data and controllers for the Oppia profile page.
- *
- * @author sean@seanlip.org (Sean Lip)
  */
 
 oppia.controller('Profile', [
@@ -34,9 +32,10 @@ oppia.controller('Profile', [
       $rootScope.loadingMessage = '';
       $scope.username = {
         title: 'Username',
-        value: data.username,
-        helpText: (data.username)
+        value: data.profile_username,
+        helpText: (data.profile_username)
       };
+      $scope.usernameIsLong = data.profile_username.length > 16;
       $scope.userBio = data.user_bio;
       $scope.userDisplayedStatistics = [{
         title: 'Impact',
@@ -73,13 +72,13 @@ oppia.controller('Profile', [
       $scope.PAGE_SIZE = 6;
       $scope.startingExplorationNumber = 1;
       $scope.endingExplorationNumber = 6;
+      $scope.Math = window.Math;
 
       $scope.goToPreviousPage = function() {
         if ($scope.currentPageNumber === 0) {
           console.log('Error: cannot decrement page');
         } else {
           $scope.currentPageNumber--;
-          $scope.updateDisplayedExplorationNumbers();
         }
       };
       $scope.goToNextPage = function() {
@@ -88,7 +87,6 @@ oppia.controller('Profile', [
           console.log('Error: Cannot increment page');
         } else {
           $scope.currentPageNumber++;
-          $scope.updateDisplayedExplorationNumbers();
         }
       };
 

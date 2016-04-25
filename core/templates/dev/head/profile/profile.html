@@ -35,7 +35,8 @@
       <img ng-src="<[profilePictureDataUrl]>"
            class="oppia-profile-picture-fullsize">
       <h2 class="oppia-profile-username-large-screen">
-        <span popover-placement="right" ng-attr-popover="<[username.helpText]>" popover-append-to-body popover-trigger="mouseenter">
+        <span popover-placement="right" ng-attr-popover="<[usernameIsLong ? username.helpText : undefined]>"
+            popover-append-to-body popover-trigger="mouseenter">
           <strong><[username.value| truncate:16]></strong>
         </span>
       </h2>
@@ -99,11 +100,12 @@
             thumbnail-icon-url="expl.thumbnail_icon_url"
             thumbnail-bg-color="expl.thumbnail_bg_color"
             num-views="expl.num_views"
+            is-community-editable="expl.community_editable"
             mobile-cutoff-px="610">
           </exploration-summary-tile>
 
         <div ng-if="userEditedExplorations.length === 0">
-          <em></br>This user hasn't created or edited any explorations yet.</em>
+          <br><em>This user hasn't created or edited any explorations yet.</em>
         </div>
       </md-content>
 
@@ -111,8 +113,8 @@
         <button ng-disabled="currentPageNumber == 0" ng-click="goToPreviousPage()">
           Previous
         </button>
-        Showing <[startingExplorationNumber]> - <[endingExplorationNumber]> of <[numUserPortfolioExplorations]>
-        <button ng-disabled="(currentPageNumber + 1) * PAGE_SIZE >= userEditedExplorations.length" ng-click="goToNextPage();">
+        Showing <[currentPageNumber * PAGE_SIZE + 1]> - <[Math.min(numUserPortfolioExplorations, (currentPageNumber + 1) * PAGE_SIZE)]> of <[numUserPortfolioExplorations]>
+        <button ng-disabled="(currentPageNumber + 1) * PAGE_SIZE >= userEditedExplorations.length" ng-click="goToNextPage()">
           Next
         </button>
       </span>

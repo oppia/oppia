@@ -35,6 +35,10 @@ oppia.directive('explorationSummaryTile', [function() {
       // the summary tile is clicked.
       openInNewWindow: '@openInNewWindow',
       isCommunityOwned: '&isCommunityOwned',
+      // If the screen width is below the threshold defined here, the mobile
+      // version of the summary tile is displayed. This attribute is optional:
+      // if it is not specified, it is treated as 0, which means that the
+      // desktop version of the summary tile is always displayed.
       mobileCutoffPx: '@mobileCutoffPx'
     },
     templateUrl: 'summaryTile/exploration',
@@ -138,8 +142,13 @@ oppia.directive('explorationSummaryTile', [function() {
           return result;
         };
 
+        if ($scope.mobileCutoffPx == null) {
+          $scope.mobileCutoffPx = 0;
+        }
+        console.log($scope.mobileCutoffPx);
         $scope.isWindowLarge = (
           windowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
+        console.log($scope.isWindowLarge);
         $scope.recomputeWindowWidth = function() {
           $scope.isWindowLarge = (
             windowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
