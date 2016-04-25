@@ -233,6 +233,7 @@ oppia.directive('conversationSkin', [function() {
         $scope.lastRequestedHeight = 0;
         $scope.lastRequestedScroll = false;
         $scope.adjustPageHeight = function(scroll, callback) {
+          _adjectCardsPositions();
           $timeout(function() {
             var newHeight = document.body.scrollHeight;
             if (Math.abs($scope.lastRequestedHeight - newHeight) > 50.5 ||
@@ -364,6 +365,7 @@ oppia.directive('conversationSkin', [function() {
           return playerTranscriptService.isLastCard(
             playerPositionService.getActiveCardIndex());
         };
+
         var _addNewCard = function(
             stateName, newParams, contentHtml, interactionHtml) {
           playerTranscriptService.addNewCard(
@@ -374,9 +376,6 @@ oppia.directive('conversationSkin', [function() {
           }
 
           $scope.numProgressDots++;
-          if ($scope.isNarrowViewport()) {
-            $scope.displayTutorCardOnNarrow();
-          }
 
           var totalNumCards = playerTranscriptService.getNumCards();
 
@@ -537,7 +536,7 @@ oppia.directive('conversationSkin', [function() {
 
                     _nextFocusLabel = $scope.CONTINUE_BUTTON_FOCUS_LABEL;
                     focusService.setFocusIfOnDesktop(_nextFocusLabel);
-                    // ScrollToBottom();
+                    scrollToBottom();
                   } else {
                     playerTranscriptService.addNewFeedback(feedbackHtml);
                     $scope.showPendingCard(
@@ -632,11 +631,42 @@ oppia.directive('conversationSkin', [function() {
           }
         });
 
+        var _centerToCardsContainer = function(selector) {
+          cardsContainerWidth = $('.conversation-skin-cards-container').width();
+          console.log(cardsContainerWidth);
+          console.log((cardsContainerWidth - $(selector).width()) / 2);
+          $(selector).css({
+            position: 'absolute',
+            left: (cardsContainerWidth - $(selector).width()) / 2
+          });
+        };
+
+        var _adjectCardsPositions = function() {
+          console.log('adjust');
+          var tutorSelector = '.conversation-skin-main-tutor-card';
+          var supplementalSelector = '.conversation-skin-supplemental' +
+                                     '-card-container';
+          $('.conversation-skin-main-tutor-card').removeAttr('style');
+          if ($scope.isCurrentSupplementalCardNonempty()) {
+            $('.conversation-skin-supplemental-' +
+              'card-container').removeAttr('style');
+          }
+
+          if (!$scope.canWindowFitTwoCards()) {
+            _centerToCardsContainer(tutorSelector);
+            if ($scope.isCurrentSupplementalCardNonempty()) {
+              _centerToCardsContainer(supplementalSelector);
+            }
+          }
+        };
+
         $scope.windowWidth = windowDimensionsService.getWidth();
+
         $window.onresize = function() {
           $scope.adjustPageHeight(false, null);
           $scope.windowWidth = windowDimensionsService.getWidth();
           _recomputeAndResetPanels();
+          _adjectCardsPositions();
         };
 
         $window.addEventListener('scroll', function() {
@@ -670,33 +700,9 @@ oppia.directive('conversationSkin', [function() {
           return $scope.windowWidth >= TWO_CARD_THRESHOLD_PX;
         };
 
-        $scope.isNarrowViewport = function() {
-          return $scope.windowWidth < TWO_CARD_THRESHOLD_PX;
-        };
-
-        $scope.isTutorCardDisplayedOnNarrow = function() {
-          return $scope.isNarrowViewport() &&
-                 $scope._tutorCardDisplayedOnNarrow;
-        };
-
-        $scope.isSupplementalCardDisplayedOnNarrow = function() {
-          return $scope.isNarrowViewport() &&
-                 !$scope._tutorCardDisplayedOnNarrow;
-        };
-
-        $scope.displayTutorCardOnNarrow = function() {
-          if ($scope.isNarrowViewport()) {
-            $scope._tutorCardDisplayedOnNarrow = true;
-          }
-        };
-
-        $scope.displaySupplementaryCardOnNarrow = function() {
-          if ($scope.isNarrowViewport()) {
-            $scope._tutorCardDisplayedOnNarrow = false;
-          }
-        };
-
         $scope.initializePage();
+        _adjectCardsPositions();
+
         LearnerViewRatingService.init(function(userRating) {
           $scope.userRating = userRating;
         });
@@ -707,3 +713,4 @@ oppia.directive('conversationSkin', [function() {
     ]
   };
 }]);
+
