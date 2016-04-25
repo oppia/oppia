@@ -136,9 +136,10 @@ oppia.factory('CollectionCreationButtonService', [
             language_code: result.languageCode,
             objective: $filter('normalizeWhitespace')(result.objective),
             title: result.title
-          }).success(function(data) {
+          }).then(function(response) {
+            var data = response.data;
             window.location = '/collection_editor/create/' + data.collectionId;
-          }).error(function() {
+          }, function() {
             $rootScope.loadingMessage = '';
           });
         });

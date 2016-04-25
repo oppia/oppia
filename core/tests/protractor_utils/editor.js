@@ -27,7 +27,16 @@ var _NEW_STATE_OPTION = 'A New Card Called...';
 var _CURRENT_STATE_OPTION = '(try again)';
 
 var exitTutorialIfNecessary = function() {
-  // If the editor tutorial shows up, exit it.
+  // If the editor welcome modal shows up, exit it.
+  element.all(by.css('.protractor-test-welcome-modal')).then(function(modals) {
+    if (modals.length === 1) {
+      element(by.css('.protractor-test-dismiss-welcome-modal')).click();
+    } else if (modals.length !== 0) {
+      throw 'Expected to find at most one \'welcome modal\'';
+    }
+  });
+
+  // Otherwise, if the editor tutorial shows up, exit it.
   element.all(by.css('.skipBtn')).then(function(buttons) {
     if (buttons.length === 1) {
       buttons[0].click();
@@ -35,6 +44,10 @@ var exitTutorialIfNecessary = function() {
       throw 'Expected to find at most one \'exit tutorial\' button';
     }
   });
+};
+
+var startTutorial = function() {
+  element(by.css('.protractor-test-start-tutorial')).click();
 };
 
 var progressInTutorial = function() {
@@ -64,7 +77,7 @@ var finishTutorial = function() {
 var navigateToMainTab = function() {
   element(by.css('.protractor-test-main-tab')).click();
   // Click a neutral element in order to dismiss any warnings.
-  element(by.css('.protractor-test-editor-neutral-element')).click();
+  element(by.css('.protractor-test-neutral-element')).click();
 };
 
 var navigateToPreviewTab = function() {
@@ -1285,6 +1298,7 @@ var revertToVersion = function(version) {
 };
 
 exports.exitTutorialIfNecessary = exitTutorialIfNecessary;
+exports.startTutorial = startTutorial;
 exports.progressInTutorial = progressInTutorial;
 exports.finishTutorial = finishTutorial;
 

@@ -620,6 +620,58 @@ textarea {
 }
 
 /*
+  Styles for footer
+*/
+.oppia-footer {
+  background-color: #094142;
+  bottom: 0;
+  color: #FFFFFF;
+  font-size: 13px;
+  line-height: 20px;
+  position: absolute;
+  width: 100%;
+}
+
+.oppia-footer-container {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  padding-left: 80px;
+  padding-right: 80px;
+}
+
+.oppia-footer-container a {
+  color: #FFFFFF;
+  text-transform: capitalize;
+}
+
+.oppia-footer-container h4 {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.oppia-footer-container ul {
+  padding-left: 0;
+}
+
+.oppia-footer-container li {
+  list-style-position: inside;
+  list-style-type: none;
+}
+
+.oppia-footer-padding {
+  height: 200px;
+}
+
+@media (max-width: 768px) {
+  .oppia-footer-padding {
+    height: 500px;
+  }
+}
+
+/*
   This is needed for proper display of tabs. See
 
   https://github.com/angular-ui/bootstrap/commit/8620aedba99b05822311
@@ -639,7 +691,7 @@ textarea {
   font-size: 16px;
   font-weight: 400;
   height: 56px;
-  padding-top: 17px;
+  padding-top: 16px;
 }
 
 .oppia-navbar-breadcrumb {
@@ -687,6 +739,7 @@ textarea {
 
 .navbar-default .dropdown-menu {
   background: #fff;
+  margin-top: 0px;
 }
 
 .navbar-default .navbar-nav > li > a, {
@@ -1362,6 +1415,31 @@ pre.oppia-pre-wrapped-text {
 .oppia-state-content-display, .oppia-param-changes-display {
   max-width: 610px;
   text-align: left;
+}
+
+/* These rules must be kept in sync with corresponding rules in
+   core/templates/dev/head/player/conversation_skin_directive.html
+   (those with '.conversation-skin-tutor-card-top-content > p,
+   .conversation-skin-oppia-feedback-content > p,
+   .conversation-skin-learner-answer-content > p,
+   .conversation-skin-help-card-content > p' selectors specifying
+    the same line-height, margin-top and margin-bottom attributes)
+*/
+.oppia-state-content-display-html > p,
+.form-control.oppia-rte-content > div > p {
+  line-height: 28px;
+  margin-bottom: 18px;
+  margin-top: 18px;
+}
+
+.oppia-state-content-display-html > p:first-child,
+.form-control.oppia-rte-content > div > p:first-child {
+  margin-top: 0px;
+}
+
+.oppia-state-content-display-html > p:last-child,
+.form-control.oppia-rte-content > div > p:last-child {
+  margin-bottom: 0px;
 }
 
 .oppia-prevent-selection {
@@ -2169,6 +2247,11 @@ div#ng-curtain {
   z-index: 997;
 }
 
+/* Add inter-paragraph spacing to the ng-joyride tutorial contents. */
+.ng-joyride .popover-content p {
+  margin-top: 10px;
+}
+
 .oppia-navbar {
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
   cursor: default;
@@ -2607,6 +2690,11 @@ div#ng-curtain {
 .form-control.oppia-rte-content > .ta-bind {
   height: auto;
   min-height: 80px;
+}
+
+.form-control.oppia-rte-content img.block-element {
+  display: block;
+  margin: auto;
 }
 
 /* Styles for the editor training interfaces. */

@@ -171,7 +171,8 @@ oppia.factory('oppiaPlayerService', [
           var explorationDataUrl = (
             '/explorehandler/init/' + _explorationId +
             (version ? '?v=' + version : ''));
-          $http.get(explorationDataUrl).success(function(data) {
+          $http.get(explorationDataUrl).then(function(response) {
+            var data = response.data;
             exploration = ExplorationObjectFactory.create(data.exploration);
             version = data.version;
 
@@ -197,8 +198,13 @@ oppia.factory('oppiaPlayerService', [
         return exploration.getUninterpolatedContentHtml(stateName);
       },
       getInteractionHtml: function(stateName, labelForFocusTarget) {
+        var interactionId = exploration.getInteractionId(stateName);
+        if (!interactionId) {
+          return null;
+        }
+
         return oppiaExplorationHtmlFormatterService.getInteractionHtml(
-          exploration.getInteractionId(stateName),
+          interactionId,
           exploration.getInteractionCustomizationArgs(stateName),
           labelForFocusTarget);
       },
@@ -333,8 +339,8 @@ oppia.factory('oppiaPlayerService', [
         if (_isLoggedIn && !_editorPreviewMode) {
           $http.get(
             '/preferenceshandler/profile_picture'
-          ).success(function(data) {
-            var profilePictureDataUrl = data.profile_picture_data_url;
+          ).then(function(response) {
+            var profilePictureDataUrl = response.data.profile_picture_data_url;
             if (profilePictureDataUrl) {
               deferred.resolve(profilePictureDataUrl);
             } else {

@@ -175,9 +175,9 @@ var RichTextEditor = function(elem) {
         by.css('.protractor-test-close-rich-text-component-editor')).click();
       general.waitForSystem();
 
-      // Refocus back into the RTE.
-      elem.all(by.model('html')).first().click();
-      elem.all(by.model('html')).first().sendKeys(protractor.Key.END);
+      // Ensure that the cursor is at the end of the RTE.
+      elem.all(by.model('html')).first().sendKeys(
+        protractor.Key.chord(protractor.Key.CONTROL, protractor.Key.END));
     }
   };
 };
@@ -260,7 +260,7 @@ var MultiSelectEditor = function(elem) {
     // Open the dropdown menu.
     elem.element(by.css('.dropdown-toggle')).click();
 
-    elem.element(by.css('.dropdown-menu')).all(by.tagName('li')).filter(
+    elem.element(by.css('.dropdown-menu')).all(by.tagName('span')).filter(
       function(choiceElem) {
         return choiceElem.getText().then(function(choiceText) {
           return texts.indexOf(choiceText) !== -1;

@@ -7,17 +7,16 @@
       <div class="oppia-rule-preview oppia-transition-200">
         <div class="oppia-click-to-start-editing protractor-test-open-outcome-feedback-editor"
              ng-if="isEditable()" ng-click="openFeedbackEditor()">
-          <span ng-if="isEditable()"
-                class="glyphicon glyphicon-pencil oppia-editor-edit-icon pull-right"
-                title="Edit Feedback">
-          </span>
+          <i ng-if="isEditable()" class="material-icons oppia-editor-edit-icon pull-right"
+             title="Edit Feedback">&#xE254;
+          </i>
         </div>
 
         <strong>Oppia tells the learner...</strong>
         <div style="position: relative;">
           <span ng-if="isSelfLoopWithNoFeedback(outcome) && !suppressWarnings()">
             <span class="oppia-confusing-outcome-warning-text">
-              <span class="glyphicon glyphicon-warning-sign"></span>
+              <i class="material-icons">&#xE002;</i>
               Please give Oppia something useful to say here.
             </span>
           </span>
@@ -72,10 +71,9 @@
       <div class="oppia-rule-preview oppia-transition-200">
         <div class="oppia-click-to-start-editing protractor-test-open-outcome-dest-editor"
              ng-if="isEditable()" ng-click="openDestinationEditor()">
-          <span ng-if="isEditable()"
-                class="glyphicon glyphicon-pencil oppia-editor-edit-icon pull-right"
-                title="Edit Destination">
-          </span>
+          <i ng-if="isEditable()" class="material-icons oppia-editor-edit-icon pull-right"
+             title="Edit Destination">&#xE254;
+          </i>
         </div>
 
         <div ng-if="outcome.dest !== getActiveStateName()">
