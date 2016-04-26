@@ -109,7 +109,7 @@
                 </a>
               </li>
               <li class="oppia-clickable-navbar-element pull-right">
-                <a class="oppia-navbar-tab" id="config" href="#config" tooltip="Config" tooltip-placement="bottom" ng-click="showConfigTab()">
+                <a class="oppia-navbar-tab protractor-test-admin-config-tab" href="#config" tooltip="Config" tooltip-placement="bottom" ng-click="showConfigTab()">
                   Config
                 </a>
               </li>
@@ -135,50 +135,50 @@
     <br>
     
     <div class="row">
-    <div class="col-lg-12 col-md-12 col-sm-12" ng-if="currentTab === 'TAB_ACTIVITIES'" style="margin-top: 16px;">
-      <md-card class="oppia-page-card oppia-long-text" style="max-width:700px">
-        <div class="container" style="margin-left: 0;">
-          <h3>Reload a single exploration</h3>
-          {% for exploration in demo_explorations %}
-          <div class="row protractor-test-reload-exploration-row">
-            <span class="col-lg-4 col-md-4 col-sm-4 protractor-test-reload-exploration-title">
-              {{exploration[1]}}
-            </span>
-            <span class="col-lg-2 col-md-2 col-sm-2">
-              <button type="button" class="btn btn-default protractor-test-reload-exploration-button pull-right" ng-click="reloadExploration({{exploration[0]}})">
-              Reload
-              </button>
-            </span>
+      <div class="col-lg-12 col-md-12 col-sm-12" ng-if="currentTab === TAB_ACTIVITIES" style="margin-top: 16px;">
+        <md-card class="oppia-page-card oppia-long-text" style="max-width:700px">
+          <div class="container" style="margin-left: 0;">
+            <h3>Reload a single exploration</h3>
+            {% for exploration in demo_explorations %}
+              <div class="row protractor-test-reload-exploration-row">
+                <span class="col-lg-4 col-md-4 col-sm-4 protractor-test-reload-exploration-title">
+                  {{exploration[1]}}
+                </span>
+                <span class="col-lg-2 col-md-2 col-sm-2">
+                  <button type="button" class="btn btn-default protractor-test-reload-exploration-button pull-right" ng-click="reloadExploration({{exploration[0]}})">
+                  Reload
+                  </button>
+                </span>
+              </div>
+            {% endfor %}
+            <button type="button" class="btn btn-default protractor-test-reload-all-explorations-button" ng-click="reloadAllExplorations()">
+            Reload All Explorations
+            </button>
           </div>
-          {% endfor %}
-          <button type="button" class="btn btn-default protractor-test-reload-all-explorations-button" ng-click="reloadAllExplorations()">
-          Reload All Explorations
-          </button>
-        </div>
-      </md-card>
+        </md-card>
 
-      <md-card class="oppia-page-card oppia-long-text" style="max-width: 700px">
-        <div class="container" style="margin-left: 0;">
-          <h3>Reload a single collection</h3>
-          {% for collection in demo_collections %}
-          <div class="row protractor-test-reload-collection-row">
-            <span class="col-lg-4 col-md-4 col-sm-4 protractor-test-reload-collection-title">
-              {{collection[1]}}
-            </span>
-            <span class="col-lg-2 col-md-2 col-sm-2">
-              <button type="button" class="btn btn-default protractor-test-reload-collection-button pull-right" ng-click="reloadCollection({{collection[0]}})">
-              Reload
-              </button>
-            </span>
+        <md-card class="oppia-page-card oppia-long-text" style="max-width: 700px">
+          <div class="container" style="margin-left: 0;">
+            <h3>Reload a single collection</h3>
+            {% for collection in demo_collections %}
+              <div class="row protractor-test-reload-collection-row">
+                <span class="col-lg-4 col-md-4 col-sm-4 protractor-test-reload-collection-title">
+                  {{collection[1]}}
+                </span>
+                <span class="col-lg-2 col-md-2 col-sm-2">
+                  <button type="button" class="btn btn-default protractor-test-reload-collection-button pull-right" ng-click="reloadCollection({{collection[0]}})">
+                  Reload
+                  </button>
+                </span>
+              </div>
+            {% endfor %}
           </div>
-          {% endfor %}
-        </div>
-      </md-card>
-    </div><br><br>
+        </md-card>
+      </div><br><br>
 
-    <div class="col-lg-12 col-md-12 col-sm-12" style="margin-top: -30px; margin-bottom: -30px">
-      <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === 'TAB_JOBS'" style="max-width: 900px">
-        <h4>Continuous computations</h4>
+      <div class="col-lg-12 col-md-12 col-sm-12" style="margin-top: -30px; margin-bottom: -30px">
+        <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === TAB_JOBS" style="max-width: 900px">
+          <h4>Continuous computations</h4>
           <table class="table">
             <tr>
               <th>Type</th>
@@ -190,32 +190,32 @@
               <th>Controls</th>
             </tr>
             {% for computation in continuous_computations_data %}
-            <tr>
-              <td>{{computation.computation_type}}</td>
-              <td>{{computation.status_code}}</td>
-              <td>{{computation.human_readable_last_started}}</td>
-              <td>{{computation.human_readable_last_stopped}}</td>
-              <td>{{computation.human_readable_last_finished}}</td>
-              <td>{{computation.active_realtime_layer_index}}</td>
-              <td>
-            {% if computation.is_startable %}
-              <button ng-click="startComputation('{{computation.computation_type}}')">
-                Start
-              </button>
-            {% endif %}
-            {% if computation.is_stoppable %}
-              <button ng-click="stopComputation('{{computation.computation_type}}')">
-                Stop
-              </button>
-            {% endif %}
-              </td>
-            </tr>
+              <tr>
+                <td>{{computation.computation_type}}</td>
+                <td>{{computation.status_code}}</td>
+                <td>{{computation.human_readable_last_started}}</td>
+                <td>{{computation.human_readable_last_stopped}}</td>
+                <td>{{computation.human_readable_last_finished}}</td>
+                <td>{{computation.active_realtime_layer_index}}</td>
+                <td>
+              {% if computation.is_startable %}
+                <button ng-click="startComputation('{{computation.computation_type}}')">
+                  Start
+                </button>
+              {% endif %}
+              {% if computation.is_stoppable %}
+                <button ng-click="stopComputation('{{computation.computation_type}}')">
+                  Stop
+                </button>
+              {% endif %}
+                </td>
+              </tr>
             {% endfor %}
           </table>
-      </md-card>
+        </md-card>
 
-      <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === 'TAB_JOBS'" style="max-width: 900px">
-        <h3>Jobs</h3>
+        <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === TAB_JOBS" style="max-width: 900px">
+          <h3>Jobs</h3>
           <h4>Current time: {{human_readable_current_time}}</h4>
           <h4>One-off jobs</h4>
           <ul>
@@ -233,123 +233,123 @@
               </li>
             {% endfor %}
           </ul>
-      </md-card>
+        </md-card>
 
-      <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === 'TAB_JOBS'" style="max-width: 900px">
-        <h4>Unfinished jobs</h4>
-        <em>Note: This table may be stale; refresh to see the latest state.</em>
-        <table class="table">
-          <tr>
-            <th>Job ID</th>
-            <th>Status</th>
-            <th>Time started</th>
-            <th>Time finished</th>
-            <th></th>
-          </tr>
-          {% for job in unfinished_job_data %}
-          <tr>
-            <td>{{job.id}}</td>
-            <td>{{job.status_code}}</td>
-            <td>{{job.human_readable_time_started}}</td>
-            <td>{{job.human_readable_time_finished}}</td>
-            <td>
-              {% if job.can_be_canceled %}
-                <button ng-click="cancelJob('{{job['id']}}', '{{job['job_type']}}')">
-                  Cancel
-                </button>
-              {% endif %}
-            </td>
-          </tr>
-          {% endfor %}
-        </table>
-      </md-card>
-
-      <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === 'TAB_JOBS'" style="max-width: 900px">
-        <h4>Recent jobs</h4>
-        <em>Note: This table may be stale; refresh to see the latest state.</em>
-        <table class="table">
-          <tr>
-            <th>Job ID</th>
-            <th>Status</th>
-            <th>Time started</th>
-            <th>Time finished</th>
-            <th></th>
-          </tr>
-          {% for job in recent_job_data %}
+        <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === TAB_JOBS" style="max-width: 900px">
+          <h4>Unfinished jobs</h4>
+          <em>Note: This table may be stale; refresh to see the latest state.</em>
+          <table class="table">
             <tr>
-              <td>{{job.id}}</td>
-              <td>{{job.status_code}}</td>
-              <td>{{job.human_readable_time_started}}</td>
-              <td>{{job.human_readable_time_finished}}</td>
-              <td>
-                <button ng-click="getJobOutput('{{job['id']}}')">
-                  View Output
-                </button>
-              </td>
+              <th>Job ID</th>
+              <th>Status</th>
+              <th>Time started</th>
+              <th>Time finished</th>
+              <th></th>
             </tr>
-          {% endfor %}
-        </table>
-        <div ng-if="showJobOutput">
-          <h4>Job Output</h4>
-          <p>
-            <[jobOutput]>
-          </p>
-        </div>
-      </md-card>
+            {% for job in unfinished_job_data %}
+              <tr>
+                <td>{{job.id}}</td>
+                <td>{{job.status_code}}</td>
+                <td>{{job.human_readable_time_started}}</td>
+                <td>{{job.human_readable_time_finished}}</td>
+                <td>
+                  {% if job.can_be_canceled %}
+                    <button ng-click="cancelJob('{{job['id']}}', '{{job['job_type']}}')">
+                      Cancel
+                    </button>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </table>
+        </md-card>
 
-      <md-card class="oppia-page-card oppia-long-text" id="configcard" ng-if="currentTab === 'TAB_CONFIG'" style="max-width: 1050px">
-        <h3>Configuration properties</h3>
-        <div class="container" ng-if="isNonemptyObject(configProperties)" style="margin-left: 0;">
-          <div ng-repeat="(configPropertyId, configPropertyData) in configProperties">
-            <div class="row protractor-test-config-property" style="padding-bottom: 10px;">
-              <span class="col-lg-2 col-md-2 col-sm-2">
-                <em class="protractor-test-config-title"><[configPropertyData.description]></em>
-              </span>
-              <span class="col-lg-6 col-md-6 col-sm-6">
-                <schema-based-editor schema="configPropertyData.schema" local-value="configPropertyData.value">
-                </schema-based-editor>
-              </span>
-              <span class="col-lg-2 col-md-2 col-sm-2">
-                <button type="button" class="btn btn-default" ng-click="revertToDefaultConfigPropertyValue(configPropertyId)">Revert to default</button>
-              </span>
+        <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === TAB_JOBS" style="max-width: 900px">
+          <h4>Recent jobs</h4>
+          <em>Note: This table may be stale; refresh to see the latest state.</em>
+          <table class="table">
+            <tr>
+              <th>Job ID</th>
+              <th>Status</th>
+              <th>Time started</th>
+              <th>Time finished</th>
+              <th></th>
+            </tr>
+            {% for job in recent_job_data %}
+              <tr>
+                <td>{{job.id}}</td>
+                <td>{{job.status_code}}</td>
+                <td>{{job.human_readable_time_started}}</td>
+                <td>{{job.human_readable_time_finished}}</td>
+                <td>
+                  <button ng-click="getJobOutput('{{job['id']}}')">
+                    View Output
+                  </button>
+                </td>
+              </tr>
+            {% endfor %}
+          </table>
+          <div ng-if="showJobOutput">
+            <h4>Job Output</h4>
+            <p>
+              <[jobOutput]>
+            </p>
+          </div>
+        </md-card>
+
+        <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === TAB_CONFIG" style="max-width: 1050px">
+          <h3>Configuration properties</h3>
+          <div class="container" ng-if="isNonemptyObject(configProperties)" style="margin-left: 0;">
+            <div ng-repeat="(configPropertyId, configPropertyData) in configProperties">
+              <div class="row protractor-test-config-property" style="padding-bottom: 10px;">
+                <span class="col-lg-2 col-md-2 col-sm-2">
+                  <em class="protractor-test-config-title"><[configPropertyData.description]></em>
+                </span>
+                <span class="col-lg-6 col-md-6 col-sm-6">
+                  <schema-based-editor schema="configPropertyData.schema" local-value="configPropertyData.value">
+                  </schema-based-editor>
+                </span>
+                <span class="col-lg-2 col-md-2 col-sm-2">
+                  <button type="button" class="btn btn-default" ng-click="revertToDefaultConfigPropertyValue(configPropertyId)">Revert to default</button>
+                </span>
+              </div>
             </div>
+
+            <button ng-click="saveConfigProperties()" class="protractor-test-save-all-configs">Save</button>
+            <button ng-click="reloadConfigProperties()">Undo changes</button>
           </div>
 
-          <button ng-click="saveConfigProperties()" class="protractor-test-save-all-configs">Save</button>
-          <button ng-click="reloadConfigProperties()">Undo changes</button>
-        </div>
+          <div ng-if="!isNonemptyObject(configProperties)">
+            No configuration properties are available.
+          </div>
+        </md-card>
 
-        <div ng-if="!isNonemptyObject(configProperties)">
-          No configuration properties are available.
-        </div>
-      </md-card>
+        <md-card class="oppia-page-card oppia-long-text" style="max-width: 700px;" ng-if="currentTab === TAB_MISC">
+          <h3>Performance Counters</h3>
+          <ul>
+            {% for counter in counters %}
+              <li>
+                {{counter.description}} : {{counter.value}}
+              </li>
+            {% endfor %}
+          </ul>
+        </md-card>
+        <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === TAB_MISC" style="max-width: 700px">
+          <h3>Search Index</h3>
 
-      <md-card class="oppia-page-card oppia-long-text" style="max-width: 700px;" ng-if="currentTab === 'TAB_MISC'">
-        <h3>Performance Counters</h3>
-        <ul>
-          {% for counter in counters %}
-            <li>
-              {{counter.description}} : {{counter.value}}
-            </li>
-          {% endfor %}
-        </ul>
-      </md-card>
-      <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === 'TAB_MISC'" style="max-width: 700px">
-        <h3>Search Index</h3>
-
-        <button ng-click="clearSearchIndex()">Clear Search Index</button>
-      </md-card>
-      <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === 'TAB_MISC'" style="max-width: 700px">
-        <h3>Topic Similarities</h3>
-        <div>
-          Upload a csv file:<br>
-          The first line of data should be a list of topic names. The next lines should be a symmetric adjacency matrix of similarities, which are values between 0 and 1.<br>
-          <input type="file" id="topicSimilaritiesFile">
-          <button ng-click="uploadTopicSimilaritiesFile()">Upload</button><br>
-          <button ng-click="downloadTopicSimilaritiesFile()">Download current topic similarities</button>
-        </div>
-      </md-card>
-    </div>
+          <button ng-click="clearSearchIndex()">Clear Search Index</button>
+        </md-card>
+        <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === TAB_MISC" style="max-width: 700px">
+          <h3>Topic Similarities</h3>
+          <div>
+            Upload a csv file:<br>
+            The first line of data should be a list of topic names. The next lines should be a symmetric adjacency matrix of similarities, which are values between 0 and 1.<br>
+            <input type="file" id="topicSimilaritiesFile">
+            <button ng-click="uploadTopicSimilaritiesFile()">Upload</button><br>
+            <button ng-click="downloadTopicSimilaritiesFile()">Download current topic similarities</button>
+          </div>
+        </md-card>
+      </div>
     </div>
 
     {% if DEV_MODE %}
