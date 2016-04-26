@@ -23,37 +23,22 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
   $scope.adminTopicsCsvDownloadHandlerUrl = '/admintopicscsvdownloadhandler';
   $scope.configProperties = {};
 
-  $scope.activities = true;
-  $scope.jobs = false;
-  $scope.config = false;
-  $scope.misc = false;
+  $scope.currentTab = 'TAB_ACTIVITIES';
 
   $scope.showActivitiesTab = function() {
-    $scope.activities = true;
-    $scope.jobs = false;
-    $scope.config = false;
-    $scope.misc = false;
+    $scope.currentTab = 'TAB_ACTIVITIES';
   };
 
   $scope.showJobsTab = function() {
-    $scope.activities = false;
-    $scope.jobs = true;
-    $scope.config = false;
-    $scope.misc = false;
+    $scope.currentTab = 'TAB_JOBS';
   };
 
   $scope.showConfigTab = function() {
-    $scope.activities = false;
-    $scope.jobs = false;
-    $scope.config = true;
-    $scope.misc = false;
+    $scope.currentTab = 'TAB_CONFIG';
   };
 
   $scope.showMiscTab = function() {
-    $scope.activities = false;
-    $scope.jobs = false;
-    $scope.config = false;
-    $scope.misc = true;
+    $scope.currentTab = 'TAB_MISC';
   };
 
   $scope.showJobOutput = false;
