@@ -47,10 +47,6 @@ oppia.animation('.conversation-skin-animate-cards', function() {
       tutorCardElt.animate({
         'margin-left': '0'
       }, TIME_NUM_CARDS_CHANGE_MSEC, function() {
-        tutorCardElt.css('margin-left', '0');
-        tutorCardElt.css('margin-right', '');
-        tutorCardElt.css('float', 'left');
-
         supplementalCardElt.animate({
           opacity: '1'
         }, TIME_FADEIN_MSEC, function() {
@@ -588,6 +584,10 @@ oppia.directive('conversationSkin', [function() {
         var scrollToBottom = function() {
           $timeout(function() {
             var tutorCard = $('.conversation-skin-main-tutor-card');
+
+            if (tutorCard.length == 0) {
+              return;
+            }
             var tutorCardBottom = (
               tutorCard.offset().top + tutorCard.outerHeight());
             if ($(window).scrollTop() + $(window).height() < tutorCardBottom) {
@@ -675,6 +675,9 @@ oppia.directive('conversationSkin', [function() {
         };
 
         $scope.isTutorCardDisplayedOnNarrow = function() {
+          if (!$scope.isCurrentSupplementalCardNonempty()) {
+            return $scope.isNarrowViewport();
+          }
           return $scope.isNarrowViewport() &&
                  $scope._tutorCardDisplayedOnNarrow;
         };
