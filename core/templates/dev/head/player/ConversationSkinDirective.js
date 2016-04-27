@@ -40,12 +40,14 @@ oppia.animation('.conversation-skin-animate-cards', function() {
     var tutorCardElt = jQuery(element).find(
       '.conversation-skin-main-tutor-card');
     var supplementalCardElt = jQuery(element).find(
-      '.conversation-skin-supplemental-card');
+      '.conversation-skin-supplemental-card-container');
 
     if (className === 'animate-to-two-cards') {
       supplementalCardElt.css('opacity', '0');
+
       tutorCardElt.animate({
-        'margin-left': '0'
+        'margin-left': '0',
+        float: 'left'
       }, TIME_NUM_CARDS_CHANGE_MSEC, function() {
         supplementalCardElt.animate({
           opacity: '1'
