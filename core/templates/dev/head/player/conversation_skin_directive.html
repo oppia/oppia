@@ -122,13 +122,13 @@
         </div>
       </div>
 
+      <img ng-show="isSupplementalCardDisplayedOnNarrow()"
+           class="conversation-skin-oppia-avatar show-tutor-card"
+           ng-src="<[OPPIA_AVATAR_IMAGE_URL]>"
+           ng-click="displayTutorCardOnNarrow()" alt="">
+
       <div ng-if="isCurrentSupplementalCardNonempty()"
            class="conversation-skin-supplemental-card-container">
-        <img ng-if="isSupplementalCardDisplayedOnNarrow()"
-             class="conversation-skin-oppia-avatar show-tutor-card"
-             ng-src="<[OPPIA_AVATAR_IMAGE_URL]>"
-             ng-click="displayTutorCardOnNarrow()" alt="">
-
         <div class="conversation-skin-supplemental-interaction-container">
           <div ng-if="isTutorCardDisplayedOnNarrow()" class="supplemental-mask"></div>
           <div class="conversation-skin-help-card" ng-if="helpCardHtml">
@@ -658,10 +658,6 @@
       }
 
       .conversation-skin-supplemental-card-container {
-        position: absolute;
-        left: 0px;
-        right: 0px;
-        top: 40px;
         margin: 0 auto;
         min-width: 360px;
         max-width: 959px;
@@ -696,14 +692,18 @@
       }
 
       .conversation-skin-oppia-avatar.show-tutor-card {
-        box-shadow: 0 10px 10px rgba(0,0,0,0.24), 0 10px 10px rgba(0,0,0,0.24);
+        box-shadow: 0 3px 3px grey, 0 5px 3px grey;
         border-radius: 50%;
         display: block;
-        height: 36px;
-        width: 36px;
+        height: 45px;
+        width: 45px;
         position: absolute;
-        left: 85%;
-        top: 5%;
+        z-index: 16;
+        top: 10%;
+        left: 75%;
+      }
+      .conversation-skin-oppia-avatar.show-tutor-card:hover {
+        opacity: 0.8;
       }
     }
   </style>

@@ -695,9 +695,23 @@ oppia.directive('conversationSkin', [function() {
           }
         };
 
+        var _animateMinimizeTutorCard = function() {
+          var tutorCard = $('.conversation-skin-main-tutor-card');
+          tutorCard.animate({
+            left: tutorCard.position().left + tutorCard.width(),
+            width: 0,
+            height: 0,
+            opacity: 0
+          }, 500, function() {
+            $scope.$apply(function() {
+              $scope._tutorCardDisplayedOnNarrow = false;
+            });
+          });
+        };
+
         $scope.displaySupplementaryCardOnNarrow = function() {
           if ($scope.isNarrowViewport()) {
-            $scope._tutorCardDisplayedOnNarrow = false;
+            _animateMinimizeTutorCard();
           }
         };
 
