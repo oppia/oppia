@@ -23,6 +23,29 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
   $scope.adminTopicsCsvDownloadHandlerUrl = '/admintopicscsvdownloadhandler';
   $scope.configProperties = {};
 
+  $scope.TAB_ACTIVITIES = 'TAB_ACTIVITIES';
+  $scope.TAB_JOBS = 'TAB_JOBS';
+  $scope.TAB_CONFIG = 'TAB_CONFIG';
+  $scope.TAB_MISC = 'TAB_MISC';
+
+  $scope.currentTab = $scope.TAB_ACTIVITIES;
+
+  $scope.showActivitiesTab = function() {
+    $scope.currentTab = $scope.TAB_ACTIVITIES;
+  };
+
+  $scope.showJobsTab = function() {
+    $scope.currentTab = $scope.TAB_JOBS;
+  };
+
+  $scope.showConfigTab = function() {
+    $scope.currentTab = $scope.TAB_CONFIG;
+  };
+
+  $scope.showMiscTab = function() {
+    $scope.currentTab = $scope.TAB_MISC;
+  };
+
   $scope.showJobOutput = false;
   $scope.getJobOutput = function(jobId) {
     var adminJobOutputUrl = ADMIN_JOB_OUTPUT_URL_PREFIX + '?job_id=' + jobId;
@@ -30,6 +53,17 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
       $scope.showJobOutput = true;
       $scope.jobOutput = response.data.output;
     });
+  };
+
+  $scope.profileDropdownIsActive = false;
+  $scope.onMouseoverProfilePictureOrDropdown = function(evt) {
+    angular.element(evt.currentTarget).parent().addClass('open');
+    $scope.profileDropdownIsActive = true;
+  };
+
+  $scope.onMouseoutProfilePictureOrDropdown = function(evt) {
+    angular.element(evt.currentTarget).parent().removeClass('open');
+    $scope.profileDropdownIsActive = false;
   };
 
   $scope.isNonemptyObject = function(object) {
