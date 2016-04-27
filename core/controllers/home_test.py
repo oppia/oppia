@@ -14,6 +14,7 @@
 
 """Tests for the user notification dashboard and 'my explorations' pages."""
 
+from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import user_jobs_continuous
@@ -181,10 +182,7 @@ class MyExplorationsHandlerTest(test_utils.GenericTestBase):
             response['explorations_list'][0]['num_total_threads'], 0)
 
         def mock_get_thread_analytics(unused_exploration_id):
-            return {
-                'num_open_threads': 2,
-                'num_total_threads': 3,
-            }
+            return feedback_domain.FeedbackAnalytics(self.EXP_ID, 2, 3)
 
         with self.swap(
             feedback_services, 'get_thread_analytics',

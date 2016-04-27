@@ -38,7 +38,7 @@ var CONSOLE_LOG_THRESHOLD = 900;
 var CONSOLE_ERRORS_TO_IGNORE = [
   // This error arises when a logout event takes place before a page has fully
   // loaded.
-  'http://localhost:4445/third_party/static/angularjs-1.4.7/angular.js 12477:24'
+  'http://localhost:9001/third_party/static/angularjs-1.4.7/angular.js 12477:24'
 ];
 
 var checkForConsoleErrors = function(errorsToIgnore) {
@@ -62,7 +62,7 @@ var checkForConsoleErrors = function(errorsToIgnore) {
   });
 };
 
-var SERVER_URL_PREFIX = 'http://localhost:4445';
+var SERVER_URL_PREFIX = 'http://localhost:9001';
 var GALLERY_URL_SUFFIX = '/gallery';
 var EDITOR_URL_SLICE = '/create/';
 var PLAYER_URL_SLICE = '/explore/';

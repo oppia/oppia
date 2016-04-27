@@ -26,7 +26,7 @@ from extensions.objects.models import objects
 import feconf
 
 
-EXPECTED_TOTAL_NUMBER_OF_RULES = 47
+EXPECTED_TOTAL_NUMBER_OF_RULES = 48
 
 
 class FakeRule(rule_domain.Rule):

@@ -28,7 +28,8 @@ oppia.controller('Signup', [
     $scope.showEmailPreferencesForm = GLOBALS.CAN_SEND_EMAILS_TO_USERS;
     $scope.submissionInProcess = false;
 
-    $http.get(_SIGNUP_DATA_URL).success(function(data) {
+    $http.get(_SIGNUP_DATA_URL).then(function(response) {
+      var data = response.data;
       $rootScope.loadingMessage = '';
       $scope.username = data.username;
       $scope.hasEverRegistered = data.has_ever_registered;
@@ -72,8 +73,8 @@ oppia.controller('Signup', [
       if (!$scope.warningText) {
         $http.post('usernamehandler/data', {
           username: $scope.username
-        }).success(function(data) {
-          if (data.username_is_taken) {
+        }).then(function(response) {
+          if (response.data.username_is_taken) {
             $scope.warningText = 'Sorry, this username is already taken.';
           }
         });
@@ -148,10 +149,10 @@ oppia.controller('Signup', [
       siteAnalyticsService.registerNewSignupEvent();
 
       $scope.submissionInProcess = true;
-      $http.post(_SIGNUP_DATA_URL, requestParams).success(function() {
+      $http.post(_SIGNUP_DATA_URL, requestParams).then(function() {
         window.location = window.decodeURIComponent(
           urlService.getUrlParams().return_url);
-      }).error(function() {
+      }, function() {
         $scope.submissionInProcess = false;
       });
     };

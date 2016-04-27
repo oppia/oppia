@@ -31,4 +31,21 @@ export PYTHONPATH=.:$COVERAGE_HOME:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HO
 # Delete old *.pyc files
 find . -iname "*.pyc" -exec rm -f {} \;
 
+echo Checking whether Google App Engine is installed in $GOOGLE_APP_ENGINE_HOME
+if [ ! -d "$GOOGLE_APP_ENGINE_HOME" ]; then
+  echo "Downloading Google App Engine (this may take a little while)..."
+  mkdir -p $GOOGLE_APP_ENGINE_HOME
+  curl --silent https://storage.googleapis.com/appengine-sdks/deprecated/1919/google_appengine_1.9.19.zip -o gae-download.zip
+  # $? contains the (exit) status code of previous command.
+  # If curl was successful, $? will be 0 else non-zero.
+  if [ 0 -eq $? ]; then
+    echo "Download complete. Installing Google App Engine..."
+  else
+    echo "Error downloading Google App Engine. Exiting."
+    exit 1
+  fi
+  unzip -q gae-download.zip -d $TOOLS_DIR/google_appengine_1.9.19/
+  rm gae-download.zip
+fi
+
 export SETUP_GAE_DONE=true
