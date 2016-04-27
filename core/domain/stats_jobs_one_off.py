@@ -150,8 +150,6 @@ class AnswersAudit(jobs.BaseMapReduceJobManager):
     _HANDLER_FUZZY_RULE_COUNTER_KEY = 'FuzzyRuleCounter'
     _HANDLER_DEFAULT_RULE_COUNTER_KEY = 'DefaultRuleCounter'
     _HANDLER_STANDARD_RULE_COUNTER_KEY = 'StandardRuleCounter'
-    _FUZZY_RULE_SUBMISSION_COUNTER_KEY = 'FuzzyRuleSubmitCounter'
-    _DEFAULT_RULE_SUBMISSION_COUNTER_KEY = 'DefaultRuleSubmitCounter'
     _STANDARD_RULE_SUBMISSION_COUNTER_KEY = 'StandardRuleSubmitCounter'
     _HANDLER_ERROR_RULE_COUNTER_KEY = 'ErrorRuleCounter'
     _UNIQUE_ANSWER_COUNTER_KEY = 'UniqueAnswerCounter'
@@ -193,7 +191,9 @@ class AnswersAudit(jobs.BaseMapReduceJobManager):
         rule_str = item_id
 
         answers = item.answers
+        total_submission_count = 0
         for _, count in answers.iteritems():
+            total_submission_count += count
             yield (AnswersAudit._UNIQUE_ANSWER_COUNTER_KEY, {
                 'reduce_type': AnswersAudit._UNIQUE_ANSWER_COUNTER_KEY
             })
@@ -203,36 +203,37 @@ class AnswersAudit(jobs.BaseMapReduceJobManager):
                 })
 
         if rule_str == 'FuzzyMatches':
-            yield (rule_str, {
-                'reduce_type': AnswersAudit._HANDLER_FUZZY_RULE_COUNTER_KEY
-            })
-            yield (AnswersAudit._FUZZY_RULE_SUBMISSION_COUNTER_KEY, {
-                'reduce_type': AnswersAudit._FUZZY_RULE_SUBMISSION_COUNTER_KEY
-            })
+            for _ in xrange(total_submission_count):
+                yield (rule_str, {
+                    'reduce_type': AnswersAudit._HANDLER_FUZZY_RULE_COUNTER_KEY
+                })
         elif rule_str == 'Default':
-            yield (rule_str, {
-                'reduce_type': AnswersAudit._HANDLER_DEFAULT_RULE_COUNTER_KEY
-            })
-            yield (AnswersAudit._DEFAULT_RULE_SUBMISSION_COUNTER_KEY, {
-                'reduce_type': AnswersAudit._DEFAULT_RULE_SUBMISSION_COUNTER_KEY
-            })
+            for _ in xrange(total_submission_count):
+                yield (rule_str, {
+                    'reduce_type': (
+                        AnswersAudit._HANDLER_DEFAULT_RULE_COUNTER_KEY)
+                })
         elif '(' in rule_str and rule_str[-1] == ')':
             index = rule_str.index('(')
             rule_type = rule_str[0:index]
             rule_args = rule_str[index+1:-1]
-            yield (rule_type, {
-                'reduce_type': AnswersAudit._HANDLER_STANDARD_RULE_COUNTER_KEY,
-                'rule_str': rule_str,
-                'rule_args': rule_args
-            })
-            yield (AnswersAudit._STANDARD_RULE_SUBMISSION_COUNTER_KEY, {
-                'reduce_type': (
-                    AnswersAudit._STANDARD_RULE_SUBMISSION_COUNTER_KEY)
-            })
+            for _ in xrange(total_submission_count):
+                yield (rule_type, {
+                    'reduce_type': (
+                        AnswersAudit._HANDLER_STANDARD_RULE_COUNTER_KEY),
+                    'rule_str': rule_str,
+                    'rule_args': rule_args
+                })
+            for _ in xrange(total_submission_count):
+                yield (AnswersAudit._STANDARD_RULE_SUBMISSION_COUNTER_KEY, {
+                    'reduce_type': (
+                        AnswersAudit._STANDARD_RULE_SUBMISSION_COUNTER_KEY)
+                })
         else:
-            yield (rule_str, {
-                'reduce_type': AnswersAudit._HANDLER_ERROR_RULE_COUNTER_KEY
-            })
+            for _ in xrange(total_submission_count):
+                yield (rule_str, {
+                    'reduce_type': AnswersAudit._HANDLER_ERROR_RULE_COUNTER_KEY
+                })
 
     @staticmethod
     def reduce(key, stringified_values):
@@ -261,10 +262,6 @@ class AnswersAudit(jobs.BaseMapReduceJobManager):
             yield 'Found default rules %d time(s)' % reduce_count
         elif reduce_type == AnswersAudit._HANDLER_STANDARD_RULE_COUNTER_KEY:
             yield 'Found rule type "%s" %d time(s)' % (key, reduce_count)
-        elif reduce_type == AnswersAudit._FUZZY_RULE_SUBMISSION_COUNTER_KEY:
-            yield 'Fuzzy rule submitted %d time(s)' % reduce_count
-        elif reduce_type == AnswersAudit._DEFAULT_RULE_SUBMISSION_COUNTER_KEY:
-            yield 'Default rule submitted %d time(s)' % reduce_count
         elif reduce_type == AnswersAudit._STANDARD_RULE_SUBMISSION_COUNTER_KEY:
             yield 'Standard rule submitted %d time(s)' % reduce_count
         elif reduce_type == AnswersAudit._HANDLER_ERROR_RULE_COUNTER_KEY:
@@ -285,8 +282,6 @@ class AnswersAudit2(jobs.BaseMapReduceJobManager):
     _HANDLER_FUZZY_RULE_COUNTER_KEY = 'FuzzyRuleCounter'
     _HANDLER_DEFAULT_RULE_COUNTER_KEY = 'DefaultRuleCounter'
     _HANDLER_STANDARD_RULE_COUNTER_KEY = 'StandardRuleCounter'
-    _FUZZY_RULE_SUBMISSION_COUNTER_KEY = 'FuzzyRuleSubmitCounter'
-    _DEFAULT_RULE_SUBMISSION_COUNTER_KEY = 'DefaultRuleSubmitCounter'
     _STANDARD_RULE_SUBMISSION_COUNTER_KEY = 'StandardRuleSubmitCounter'
     _HANDLER_ERROR_RULE_COUNTER_KEY = 'ErrorRuleCounter'
     _CUMULATIVE_ANSWER_COUNTER_KEY = 'CumulativeAnswerCounter'
@@ -301,34 +296,15 @@ class AnswersAudit2(jobs.BaseMapReduceJobManager):
             yield (AnswersAudit2._CUMULATIVE_ANSWER_COUNTER_KEY, {
                 'reduce_type': AnswersAudit2._CUMULATIVE_ANSWER_COUNTER_KEY
             })
-            exploration = exp_services.get_exploration_by_id(
-                item.exploration_id, strict=False,
-                version=item.exploration_version)
-            state = exploration.states[item.state_name]
-            answer_groups = state.interaction.answer_groups
-            answer_group_index = answer['answer_group_index']
-            if answer_group_index == len(answer_groups):
-                rule_str = 'Default'
-            else:
-                answer_group = answer_groups[answer_group_index]
-                rule_spec = answer_group.rule_specs[answer['rule_spec_index']]
-                rule_str = rule_spec.stringify_classified_rule()
+            rule_str = answer['rule_spec_str']
             if rule_str == 'FuzzyMatches':
                 yield (rule_str, {
                     'reduce_type': AnswersAudit2._HANDLER_FUZZY_RULE_COUNTER_KEY
-                })
-                yield (AnswersAudit2._FUZZY_RULE_SUBMISSION_COUNTER_KEY, {
-                    'reduce_type': (
-                        AnswersAudit2._FUZZY_RULE_SUBMISSION_COUNTER_KEY)
                 })
             elif rule_str == 'Default':
                 yield (rule_str, {
                     'reduce_type': (
                         AnswersAudit2._HANDLER_DEFAULT_RULE_COUNTER_KEY)
-                })
-                yield (AnswersAudit2._DEFAULT_RULE_SUBMISSION_COUNTER_KEY, {
-                    'reduce_type': (
-                        AnswersAudit2._DEFAULT_RULE_SUBMISSION_COUNTER_KEY)
                 })
             elif '(' in rule_str and rule_str[-1] == ')':
                 index = rule_str.index('(')
@@ -366,10 +342,6 @@ class AnswersAudit2(jobs.BaseMapReduceJobManager):
             yield 'Found default rules %d time(s)' % reduce_count
         elif reduce_type == AnswersAudit2._HANDLER_STANDARD_RULE_COUNTER_KEY:
             yield 'Found rule type "%s" %d time(s)' % (key, reduce_count)
-        elif reduce_type == AnswersAudit2._FUZZY_RULE_SUBMISSION_COUNTER_KEY:
-            yield 'Fuzzy rule submitted %d time(s)' % reduce_count
-        elif reduce_type == AnswersAudit2._DEFAULT_RULE_SUBMISSION_COUNTER_KEY:
-            yield 'Default rule submitted %d time(s)' % reduce_count
         elif reduce_type == AnswersAudit2._STANDARD_RULE_SUBMISSION_COUNTER_KEY:
             yield 'Standard rule submitted %d time(s)' % reduce_count
         elif reduce_type == AnswersAudit2._HANDLER_ERROR_RULE_COUNTER_KEY:
@@ -508,6 +480,29 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # This indicates a major issue, also. Just return the latest version.
         return exp_services.get_exploration_from_model(latest_exp_model)
 
+    # This function comes from extensions.answer_summarizers.models.
+    @classmethod
+    def _get_hashable_value(cls, value):
+        """This function returns a hashable version of the input value. If the
+        value itself is hashable, it simply returns that value. If it's a list,
+        it will return a tuple with all of the list's elements converted to
+        hashable types. If it's a dictionary, it will first convert it to a list
+        of pairs, where the key and value of the pair are converted to hashable
+        types, then it will convert this list as any other list would be
+        converted.
+        """
+        if isinstance(value, list):
+            # Avoid needlessly wrapping a single value in a tuple.
+            if len(value) == 1:
+                return cls._get_hashable_value(value[0])
+            return tuple([cls._get_hashable_value(elem) for elem in value])
+        elif isinstance(value, dict):
+            return cls._get_hashable_value(
+                [(cls._get_hashable_value(key), cls._get_hashable_value(value))
+                 for (key, value) in value.iteritems()])
+        else:
+            return value
+
     @classmethod
     def _stringify_classified_rule(cls, rule_spec):
         # This is based on the original
@@ -526,8 +521,15 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _infer_which_answer_group_and_rule_match_answer(cls, state, rule_str):
-        # The first RuleSpec instance to match is the winner.
+        # First, check whether it matches against the default rule, which
+        # thereby translates to the default outcome.
         answer_groups = state.interaction.answer_groups
+        if rule_str == cls._DEFAULT_RULESPEC_STR:
+            return (len(answer_groups), 0)
+
+        # Otherwise, first RuleSpec instance to match is the winner. The first
+        # pass is to stringify parameters and doing a string comparison. This is
+        # efficient and works for most situations.
         for answer_group_index, answer_group in enumerate(answer_groups):
             rule_specs = answer_group.rule_specs
             for rule_spec_index, rule_spec in enumerate(rule_specs):
@@ -536,10 +538,50 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 if rule_str in possible_stringified_rules:
                     return (answer_group_index, rule_spec_index)
 
-        # If none match, check whether it matches against the default rule,
-        # which thereby translates to the default outcome.
-        if rule_str == cls._DEFAULT_RULESPEC_STR:
-            return (len(answer_groups), 0)
+        # The second attempt involves parsing the rule string and doing an exact
+        # match on the rule parameter values. This needs to be done in the event
+        # that the Python-turned-ascii parameters have their own elements out of
+        # order (such as with a dict parameter).
+        if '(' in rule_str and rule_str[-1] == ')':
+            # http://stackoverflow.com/questions/9623114
+            unordered_lists_equal = lambda x, y: (
+                collections.Counter(
+                    AnswerMigrationJob._get_hashable_value(x)) ==
+                collections.Counter(
+                    AnswerMigrationJob._get_hashable_value(y)))
+
+            paren_index = rule_str.index('(')
+            rule_type = rule_str[:paren_index]
+            param_str_list_str = rule_str[paren_index+1:-1]
+            partial_param_str_list = param_str_list_str.split(',')
+            param_str_list = []
+
+            # Correctly split the parameter list by correcting the results from
+            # naively splitting it by merging subsequent elements in the list if
+            # the comma fell within brackets or parentheses.
+            concat_with_previous = False
+            open_group_count = 0
+            for partial_param in partial_param_str_list:
+                if concat_with_previous:
+                    param_str_list[-1] += ',' + partial_param
+                else:
+                    param_str_list.append(partial_param)
+                for char in partial_param:
+                    if char == '(' or char == '[' or char == '{':
+                        open_group_count += 1
+                    elif char == ')' or char == ']' or char == '}':
+                        open_group_count -= 1
+                concat_with_previous = open_group_count != 0
+
+            param_list = [eval(param_str) for param_str in param_str_list]
+            for answer_group_index, answer_group in enumerate(answer_groups):
+                rule_specs = answer_group.rule_specs
+                for rule_spec_index, rule_spec in enumerate(rule_specs):
+                    if rule_spec.rule_type != rule_type:
+                        continue
+                    if unordered_lists_equal(
+                            param_list, rule_spec.inputs.values()):
+                        return (answer_group_index, rule_spec_index)
 
         return (None, None)
 
@@ -562,9 +604,6 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         if '<' in str_value or '>' in str_value:
             return None
         return str_value
-
-    # TODO(bhenning): Ensure these reconstitution methods work with all rules
-    # supported by an interaction.
 
     @classmethod
     def _cb_reconstitute_code_evaluation(
@@ -637,7 +676,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     @classmethod
     def _cb_reconstitute_graph_input(
             cls, interaction, rule_spec, rule_str, answer_str):
-        # pylint: disable=C0301
+        # pylint: disable=line-too-long
         # The Jinja representation for Graph answer strings is:
         #   ({% for vertex in answer.vertices -%}
         #     {% if answer.isLabeled -%}{{vertex.label}}{% else -%}{{loop.index}}{% endif -%}
@@ -654,12 +693,13 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # That leaves 1 lonely graph answer to reconstitute; we're dropping it
         # in favor of avoiding the time needed to build and test the
         # reconstitution of the graph object.
-        return (None, 'Unsupported answer type.')
+        return (None, 'Unsupported answer type: \'%s\' for answer \'%s\'' % (
+            rule_str, answer_str))
 
     @classmethod
     def _cb_reconstitute_image_click_input(cls, interaction, rule_spec,
                                            rule_str, answer_str):
-        # pylint: disable=C0301
+        # pylint: disable=line-too-long
         # The Jinja representation for ClickOnImage answer strings is:
         #   ({{'%0.3f' | format(answer.clickPosition[0]|float)}}, {{'%0.3f'|format(answer.clickPosition[1]|float)}})
         if rule_spec.rule_type == 'IsInRegion':
@@ -689,7 +729,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     @classmethod
     def _cb_reconstitute_interactive_map(
             cls, interaction, rule_spec, rule_str, answer_str):
-        # pylint: disable=C0301
+        # pylint: disable=line-too-long
         # The Jinja representation for CoordTwoDim answer strings is:
         #   ({{'%0.6f' | format(answer[0]|float)}}, {{'%0.6f'|format(answer[1]|float)}})
         supported_rule_types = ['Within', 'NotWithin']
@@ -1085,7 +1125,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def reduce(key, stringified_values):
         # pylint: disable=unused-argument
-        yield stringified_values
+        for value in stringified_values:
+            yield value
 
     # Following are helpers and constants related to reconstituting the
     # CheckedProof object.

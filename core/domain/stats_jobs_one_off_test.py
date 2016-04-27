@@ -86,6 +86,44 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         state_answers = self._get_state_answers(state_name)
         self.assertIsNone(state_answers)
 
+    def test_supports_migrating_params_out_of_order(self):
+        state_name = 'Music Notes Input'
+
+        rule_spec_str = (
+            'Equals([{u\'readableNoteName\': u\'C5\', '
+            'u\'noteDuration\': {u\'den\': 1, u\'num\': 1}}])')
+        html_answer = u'[C5]\n'
+        self._record_old_answer(state_name, rule_spec_str, html_answer)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        self._run_migration_job()
+
+        # The answer should have been properly migrated to the new storage
+        # model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(state_answers.answers_list, [{
+            'answer': [{
+                'readableNoteName': 'C5',
+                'noteDuration': {
+                    'num': 1.0,
+                    'den': 1.0
+                }
+            }],
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'MusicNotesInput',
+            'params': [],
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
+
     def test_migrate_code_repl(self):
         state_name = 'Code Editor'
 
