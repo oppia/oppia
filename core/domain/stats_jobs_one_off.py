@@ -498,9 +498,6 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         converted.
         """
         if isinstance(value, list):
-            # Avoid needlessly wrapping a single value in a tuple.
-            if len(value) == 1:
-                return cls._get_hashable_value(value[0])
             return tuple([cls._get_hashable_value(elem) for elem in value])
         elif isinstance(value, dict):
             return cls._get_hashable_value(
@@ -1108,12 +1105,19 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         if not exploration:
             yield (
                 'Encountered missing exploration referenced to by submitted '
-                'answers %s' % exploration_id)
+                'answers: %s' % exploration_id)
             return
 
         # Another point of failure is the state not matching due to an
         # incorrect exploration version selection.
-        state = exploration.states[state_name]
+        if state_name in exploration.states:
+            state = exploration.states[state_name]
+        else:
+            yield (
+                'Encountered missing state name \'%s\' in exploration %s '
+                'referenced to by submitted answers' % (
+                    state_name, exploration_id))
+            return
 
         for value_dict in value_dict_list:
             item_id = value_dict['item_id']
