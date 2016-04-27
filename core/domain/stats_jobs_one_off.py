@@ -16,6 +16,7 @@
 
 import ast
 import collections
+import datetime
 import itertools
 import re
 
@@ -443,10 +444,6 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     def _find_exploration_immediately_before_timestamp(cls, exp_id, when):
         # Find the latest exploration version before the given time.
 
-        # NOTE(bhenning): This depends on ExplorationCommitLogEntryModel, which
-        # was added in ecbfff0. This means any data added before that time will
-        # assume to be matched to the earliest recorded commit.
-
         # NOTE(bhenning): Also, it's possible some of these answers were
         # submitted during a playthrough where the exploration was changed
         # midway. There's not a lot that can be done about this; hopefully the
@@ -464,20 +461,25 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             # wrong with the answer. Just deal with it.
             return exp_services.get_exploration_from_model(latest_exp_model)
 
-        # TODO(bhenning): Convert calls to CommitLogEntry to own model.
-
         # Look backwards in the history of the exploration, starting with the
-        # latest version.
-        for version in reversed(range(latest_exp_model.version)):
-            exp_commit_model = exp_models.ExplorationCommitLogEntryModel.get(
-                'exploration-%s-%s' % (exp_id, version))
-            if exp_commit_model.created_on < when:
-                # Found the closest exploration to the given
-                exp_model = exp_models.ExplorationModel.get(
-                    exp_id, version=version)
-                return exp_services.get_exploration_from_model(exp_model)
+        # latest version. This depends on ExplorationCommitLogEntryModel, which
+        # was added in ecbfff0.
+        try:
+            for version in reversed(range(latest_exp_model.version)):
+                exp_commit_model = (
+                    exp_models.ExplorationCommitLogEntryModel.get(
+                        'exploration-%s-%s' % (exp_id, version)))
+                if exp_commit_model.created_on < when:
+                    # Found the closest exploration to the given
+                    exp_model = exp_models.ExplorationModel.get(
+                        exp_id, version=version)
+                    return exp_services.get_exploration_from_model(exp_model)
+        except Exception:
+            # No history available for this exploration.
+            pass
 
-        # This indicates a major issue, also. Just return the latest version.
+        # Any data added before ecbfff0 is assumed to match the earliest
+        # recorded commit.
         return exp_services.get_exploration_from_model(latest_exp_model)
 
     # This function comes from extensions.answer_summarizers.models.
@@ -999,15 +1001,38 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             interaction_id)
 
     @classmethod
+    def _evaluate_string_literal(cls, literal_str):
+        class Transformer(ast.NodeTransformer):
+            ALLOWED_NAMES = set(['datetime', 'None', 'False', 'True'])
+            ALLOWED_NODE_TYPES = set(['Expression', 'Tuple', 'Call', 'Name',
+                                      'Load', 'Str', 'Num', 'List', 'Dict',
+                                      'Attribute'])
+
+            # pylint: disable=invalid-name
+            def visit_Name(self, node):
+                if not node.id in self.ALLOWED_NAMES:
+                    raise RuntimeError(
+                        'Name access to %s not allowed' % node.id)
+                return self.generic_visit(node)
+
+            def generic_visit(self, node):
+                node_type_name = type(node).__name__
+                if node_type_name not in self.ALLOWED_NODE_TYPES:
+                    raise RuntimeError(
+                        'Invalid node of type: %s' % node_type_name)
+                return ast.NodeTransformer.generic_visit(self, node)
+
+        tree = ast.parse(literal_str, mode='eval')
+        Transformer().visit(tree)
+        compiled = compile(tree, '<AST>', 'eval')
+        return eval(compiled, {'datetime': datetime})
+
+    @classmethod
     def entity_classes_to_map_over(cls):
         return [stats_models.StateRuleAnswerLogModel]
 
     @staticmethod
     def map(item):
-        # TODO(bhenning): Throw errors for all major points of failure.
-
-        # TODO(bhenning): Reduce on exp id and state name to reduce exp loads.
-
         # Cannot unpack the item ID with a simple split, since the rule_str
         # component can contains periods. The ID is guaranteed to always
         # contain 4 parts: exploration ID, state name, handler name, and
@@ -1038,6 +1063,34 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 'Encountered submitted answer without the standard \'submit\' '
                 'handler: %s' % item.id)
 
+        yield ('%s.%s' % (exp_id, state_name), {
+            'answers': item.answers,
+            'item_id': item.id,
+            'exploration_id': exp_id,
+            'state_name': state_name,
+            'rule_str': rule_str,
+            'created_on': item.created_on
+        })
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        # TODO(bhenning): Throw errors for all major points of failure.
+
+        # Print any errors encountered during the map step.
+        if key == AnswerMigrationJob._ERROR_KEY:
+            for value in stringified_values:
+                yield value
+            return
+
+        value_dict_list = [
+            AnswerMigrationJob._evaluate_string_literal(stringified_value)
+            for stringified_value in stringified_values]
+
+        first_value_dict = value_dict_list[0]
+        exploration_id = first_value_dict['exploration_id']
+        state_name = first_value_dict['state_name']
+        created_on = first_value_dict['created_on']
+
         # One major point of failure is the exploration not existing.
         # Another major point of failure comes from the time matching. Since
         # one entity in StateRuleAnswerLogModel represents many different
@@ -1047,14 +1100,27 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # tricky to work around.
         exploration = (
             AnswerMigrationJob._find_exploration_immediately_before_timestamp(
-                exp_id, item.created_on))
+                exploration_id, created_on))
 
         # Another point of failure is the state not matching due to an
         # incorrect exploration version selection.
         state = exploration.states[state_name]
 
+        for value_dict in value_dict_list:
+            item_id = value_dict['item_id']
+            answers = value_dict['answers']
+            rule_str = value_dict['rule_str']
+            migration_errors = AnswerMigrationJob._migrate_answers(
+                item_id, exploration_id, exploration, state_name, state,
+                answers, rule_str)
+            for error in migration_errors:
+                yield error
+
+    @classmethod
+    def _migrate_answers(cls, item_id, exp_id, exploration, state_name, state,
+                         answers, rule_str):
         classification_categorization = (
-            AnswerMigrationJob._infer_classification_categorization(rule_str))
+            cls._infer_classification_categorization(rule_str))
 
         # Fuzzy rules are not supported by the migration job. No fuzzy rules
         # should have been submitted in production, so all existing rules are
@@ -1068,16 +1134,14 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # differentiating between which soft rule was selected. This problem is
         # also revealed for RuleSpecs which produce the same rule_spec_str.
         (answer_group_index, rule_spec_index) = (
-            AnswerMigrationJob._infer_which_answer_group_and_rule_match_answer(
+            cls._infer_which_answer_group_and_rule_match_answer(
                 state, rule_str))
 
         # Major point of failure: answer_group_index or rule_spec_index may
         # return none when it's not a default result.
         if answer_group_index is None or rule_spec_index is None:
-            yield (
-                AnswerMigrationJob._ERROR_KEY,
-                'Failed to match rule string: \'%s\' for answer \'%s\'' % (
-                    rule_str, item.id))
+            yield ('Failed to match rule string: \'%s\' for answer \'%s\'' % (
+                rule_str, item_id))
             return
 
         answer_groups = state.interaction.answer_groups
@@ -1105,14 +1169,14 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # thus, for different versions of the exploration. This information is
         # practically impossible to recover, so this strategy is considered
         # adequate.
-        for answer_str, answer_frequency in item.answers.iteritems():
+        for answer_str, answer_frequency in answers.iteritems():
             # Major point of failure is if answer returns None; the error
             # variable will contain why the reconstitution failed.
             (answer, error) = AnswerMigrationJob._reconstitute_answer_object(
                 state, rule_spec, rule_str, answer_str)
 
             if error:
-                yield (AnswerMigrationJob._ERROR_KEY, error)
+                yield error
                 continue
 
             for _ in xrange(answer_frequency):
@@ -1121,12 +1185,6 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                     rule_spec_index, classification_categorization, session_id,
                     time_spent_in_sec, params, answer, rule_spec_str=rule_str,
                     answer_str=answer_str)
-
-    @staticmethod
-    def reduce(key, stringified_values):
-        # pylint: disable=unused-argument
-        for value in stringified_values:
-            yield value
 
     # Following are helpers and constants related to reconstituting the
     # CheckedProof object.
