@@ -1358,6 +1358,31 @@ pre.oppia-pre-wrapped-text {
   text-align: left;
 }
 
+/* These rules must be kept in sync with corresponding rules in
+   core/templates/dev/head/player/conversation_skin_directive.html
+   (those with '.conversation-skin-tutor-card-top-content > p,
+   .conversation-skin-oppia-feedback-content > p,
+   .conversation-skin-learner-answer-content > p,
+   .conversation-skin-help-card-content > p' selectors specifying
+    the same line-height, margin-top and margin-bottom attributes)
+*/
+.oppia-state-content-display-html > p,
+.form-control.oppia-rte-content > div > p {
+  line-height: 28px;
+  margin-bottom: 18px;
+  margin-top: 18px;
+}
+
+.oppia-state-content-display-html > p:first-child,
+.form-control.oppia-rte-content > div > p:first-child {
+  margin-top: 0px;
+}
+
+.oppia-state-content-display-html > p:last-child,
+.form-control.oppia-rte-content > div > p:last-child {
+  margin-bottom: 0px;
+}
+
 .oppia-prevent-selection {
   -moz-user-select: none;
   -ms-user-select: none;
@@ -2249,6 +2274,16 @@ div#ng-curtain {
 .oppia-navbar-tabs > li > a:focus {
   background-color: #fff;
   color: #009688;
+}
+.oppia-navbar-profile-admin > li > a:hover,
+.oppia-navbar-profile-admin > li > a:focus,
+.oppia-navbar-profile-admin .open > a,
+.oppia-navbar-profile-admin .open > a:hover,
+.oppia-navbar-profile-admin .open > a:focus,
+.oppia-navbar-tabs-admin > li > a:hover,
+.oppia-navbar-tabs-admin > li > a:focus {
+  background-color: #fff;
+  color: #00376d;
 }
 .oppia-navbar-dropdown {
   border: 0;

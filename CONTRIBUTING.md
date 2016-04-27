@@ -80,7 +80,7 @@ Here's how to make a one-off code change. (If you're working on a larger feature
 
 4. **When your feature is ready to merge, create a pull request.**
   * Go to your fork on GitHub, select your branch from the dropdown menu, and click "pull request". Ensure that the 'base' repository is the main oppia repo and that the 'base' branch is 'develop'.
-  * Add a descriptive comment explaining the purpose of the branch (e.g. "Add a warning when the user leaves a page in the middle of an exploration."). This will tell the reviewer what the purpose of the branch is.
+  * Add a descriptive title explaining the purpose of the PR (e.g. "Fix #bugnum: add a warning when the user leaves a page in the middle of an exploration."). The "Fix #bugnum: " prefix **must** be included if this PR resolves an issue on the issue tracker.
   * Click "Create pull request". An admin will assign a reviewer to your commit.
 5. **Address review comments until all reviewers give LGTM ('looks good to me').**
   * When your reviewer has reviewed the code, you'll get an email. You'll need to respond in two ways:
