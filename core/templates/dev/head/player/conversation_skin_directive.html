@@ -102,11 +102,11 @@
                      ng-click="setVisiblePanel(PANEL_SUPPLEMENTAL)"
                      ng-class="{'conversation-skin-interaction-clickable-instructions': panels.length > 1}"
                      style="opacity: 0.8;">
-                  <button style="background: inherit; border: none;"
+                  <md-button class="instructions-button"
                           ng-click="displaySupplementaryCardOnNarrow()">
                     <[exploration.getInteractionInstructions(activeCard.stateName)]>
                     <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
-                  </button>
+                  </md-button>
                 </div>
               </div>
             </div>
@@ -124,13 +124,13 @@
 
       <div ng-if="isCurrentSupplementalCardNonempty()"
            class="conversation-skin-supplemental-card-container">
-        <div ng-if="isTutorCardDisplayedOnNarrow()" class="supplemental-mask"></div>
         <img ng-if="isSupplementalCardDisplayedOnNarrow()"
              class="conversation-skin-oppia-avatar show-tutor-card"
              ng-src="<[OPPIA_AVATAR_IMAGE_URL]>"
              ng-click="displayTutorCardOnNarrow()" alt="">
 
         <div class="conversation-skin-supplemental-interaction-container">
+          <div ng-if="isTutorCardDisplayedOnNarrow()" class="supplemental-mask"></div>
           <div class="conversation-skin-help-card" ng-if="helpCardHtml">
             <img class="conversation-skin-oppia-avatar"
                  ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt="">
@@ -587,6 +587,7 @@
     }
 
     .conversation-skin-supplemental-interaction-container {
+      position: relative;
       background-color: #fff;
       border-radius: 2px;
       box-shadow: none;
@@ -630,6 +631,11 @@
       transform: translateX(1000px);
     }
 
+    .conversation-skin-main-tutor-card .instructions-button {
+        background: inherit;
+        border: none;
+    }
+
     @media screen and (max-width: 959px) {
       .conversation-skin-cards-container {
         position: relative;
@@ -639,6 +645,8 @@
       }
 
       .conversation-skin-main-tutor-card {
+
+        box-shadow: 0 10px 10px rgba(0,0,0,0.24), 0 10px 10px rgba(0,0,0,0.24);
         position: absolute;
         left: 0px;
         right: 0px;
@@ -660,11 +668,26 @@
       }
 
       .conversation-skin-supplemental-card-container .supplemental-mask {
-        background-color: #000;
+        background-color: #ccc;
+        opacity: 0.7;
         width: 100%;
         height: 100%;
         position: absolute;
+        left: 0px;
+        top: 0px;
         z-index: 14;
+      }
+
+      .conversation-skin-main-tutor-card .instructions-button {
+        background-color: #0D48A1;
+        color: #ffffff;
+        padding: 6px 12px;
+      }
+
+      .conversation-skin-main-tutor-card button.md-button.md-default-theme.instructions-button:focus,
+      .conversation-skin-main-tutor-card button.md-button.md-default-theme.instructions-button:hover {
+        background-color: #115FD4;
+        color: #red;
       }
 
       .conversation-skin-user-avatar,
@@ -677,6 +700,8 @@
       }
 
       .conversation-skin-oppia-avatar.show-tutor-card {
+        box-shadow: 0 10px 10px rgba(0,0,0,0.24), 0 10px 10px rgba(0,0,0,0.24);
+        border-radius: 50%;
         display: block;
         height: 36px;
         width: 36px;
