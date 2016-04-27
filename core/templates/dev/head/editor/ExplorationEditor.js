@@ -366,7 +366,7 @@ oppia.controller('ExplorationEditor', [
 
     $scope.$on(
       'enterEditorForTheFirstTime', $scope.showWelcomeExplorationModal);
-    $scope.$on('openEditorTutorial', $scope.showWelcomeExplorationModal);
+    $scope.$on('openEditorTutorial', $scope.startTutorial);
   }
 ]);
 
