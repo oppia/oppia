@@ -2275,6 +2275,16 @@ div#ng-curtain {
   background-color: #fff;
   color: #009688;
 }
+.oppia-navbar-profile-admin > li > a:hover,
+.oppia-navbar-profile-admin > li > a:focus,
+.oppia-navbar-profile-admin .open > a,
+.oppia-navbar-profile-admin .open > a:hover,
+.oppia-navbar-profile-admin .open > a:focus,
+.oppia-navbar-tabs-admin > li > a:hover,
+.oppia-navbar-tabs-admin > li > a:focus {
+  background-color: #fff;
+  color: #00376d;
+}
 .oppia-navbar-dropdown {
   border: 0;
   border-top-left-radius: 0;
