@@ -111,6 +111,14 @@
         </ul>
       </div>
 
+      <!-- A list of validation errors, if there are any -->
+      <div ng-if="validationIssues.length > 0">
+        <strong>Errors that must be addressed before saving:</strong>
+        <ul>
+          <li ng-repeat="issue in validationIssues"><[issue]></li>
+        </ul>
+      </div>
+
       <!-- Collection changes to be commited -->
       <h3><span ng-if="getChangeListCount() > 0"> <em>(<[getChangeListCount()]> changes pending)</em></h3>
       <br>
