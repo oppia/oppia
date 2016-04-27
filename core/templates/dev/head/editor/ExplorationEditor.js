@@ -366,17 +366,20 @@ oppia.controller('ExplorationEditor', [
 
     $scope.$on(
       'enterEditorForTheFirstTime', $scope.showWelcomeExplorationModal);
-    $scope.$on('openEditorTutorial', $scope.showWelcomeExplorationModal);
+    $scope.$on('openEditorTutorial', $scope.startTutorial);
   }
 ]);
 
 oppia.controller('EditorNavigation', [
-  '$scope', '$rootScope', '$timeout', 'routerService',
+  '$scope', '$rootScope', '$timeout', '$modal', 'routerService',
   'explorationRightsService', 'explorationWarningsService',
+  'stateEditorTutorialFirstTimeService',
   'threadDataService',
   function(
-    $scope, $rootScope, $timeout, routerService,
-    explorationRightsService, explorationWarningsService, threadDataService) {
+    $scope, $rootScope, $timeout, $modal, routerService,
+    explorationRightsService, explorationWarningsService,
+    stateEditorTutorialFirstTimeService,
+    threadDataService) {
     $scope.postTutorialHelpPopoverIsShown = false;
 
     $scope.$on('openPostTutorialHelpPopover', function() {
@@ -391,6 +394,29 @@ oppia.controller('EditorNavigation', [
     // editor tutorial.
     $scope.openEditorTutorial = function() {
       $rootScope.$broadcast('openEditorTutorial');
+    };
+
+    $scope.showUserHelpModal = function() {
+      var modalInstance = $modal.open({
+        templateUrl: 'modals/userHelp',
+        backdrop: true,
+        controller: [
+          '$scope', '$modalInstance', function($scope, $modalInstance) {
+            $scope.beginTutorial = $modalInstance.close;
+
+            $scope.goToHelpCenter = function() {
+              $modalInstance.dismiss('cancel');
+            };
+          }
+        ],
+        windowClass: 'oppia-help-modal'
+      });
+
+      modalInstance.result.then(function() {
+        $scope.openEditorTutorial();
+      }, function() {
+        stateEditorTutorialFirstTimeService.markTutorialFinished();
+      });
     };
 
     $scope.countWarnings = explorationWarningsService.countWarnings;
