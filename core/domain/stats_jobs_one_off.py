@@ -453,13 +453,17 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # demultiplex the stream of answers and identify which session they are
         # associated with.
 
-        latest_exp_model = exp_models.ExplorationModel.get(exp_id)
-        if (latest_exp_model.version == 1 or
-                latest_exp_model.last_updated < when):
-            # Short-circuit: the answer was submitted later than the current
-            # exp version. Otherwise, this is the only version and something is
-            # wrong with the answer. Just deal with it.
-            return exp_services.get_exploration_from_model(latest_exp_model)
+        try:
+            latest_exp_model = exp_models.ExplorationModel.get(exp_id)
+            if (latest_exp_model.version == 1 or
+                    latest_exp_model.last_updated < when):
+                # Short-circuit: the answer was submitted later than the current
+                # exp version. Otherwise, this is the only version and something
+                # is wrong with the answer. Just deal with it.
+                return exp_services.get_exploration_from_model(latest_exp_model)
+        except Exception:
+            # The exploration may have been deleted.
+            return None
 
         # Look backwards in the history of the exploration, starting with the
         # latest version. This depends on ExplorationCommitLogEntryModel, which
@@ -1064,7 +1068,6 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 'handler: %s' % item.id)
 
         yield ('%s.%s' % (exp_id, state_name), {
-            'answers': item.answers,
             'item_id': item.id,
             'exploration_id': exp_id,
             'state_name': state_name,
@@ -1102,17 +1105,23 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             AnswerMigrationJob._find_exploration_immediately_before_timestamp(
                 exploration_id, created_on))
 
+        if not exploration:
+            yield (
+                'Encountered missing exploration referenced to by submitted '
+                'answers %s' % exploration_id)
+            return
+
         # Another point of failure is the state not matching due to an
         # incorrect exploration version selection.
         state = exploration.states[state_name]
 
         for value_dict in value_dict_list:
             item_id = value_dict['item_id']
-            answers = value_dict['answers']
+            item = stats_models.StateRuleAnswerLogModel.get(item_id)
             rule_str = value_dict['rule_str']
             migration_errors = AnswerMigrationJob._migrate_answers(
                 item_id, exploration_id, exploration, state_name, state,
-                answers, rule_str)
+                item.answers, rule_str)
             for error in migration_errors:
                 yield error
 

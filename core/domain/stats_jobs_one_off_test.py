@@ -124,6 +124,26 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_str': html_answer
         }])
 
+    def test_migrated_answer_from_deleted_exploration_is_ignored(self):
+        state_name = 'Text Input'
+
+        rule_spec_str = 'Contains(ate)'
+        html_answer = 'appreciate'
+        self._record_old_answer(state_name, rule_spec_str, html_answer)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        exp_services.delete_exploration(
+            self.owner_id, self.DEMO_EXP_ID, force_deletion=True)
+
+        self._run_migration_job()
+
+        # There should still be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
     def test_migrate_code_repl(self):
         state_name = 'Code Editor'
 
