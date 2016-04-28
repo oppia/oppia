@@ -29,14 +29,16 @@ var rules = require('../../../extensions/rules/protractor.js');
 describe('State editor', function() {
   it('should walk through the tutorial when user repeatedly clicks Next',
       function() {
-    var NUM_TUTORIAL_STAGES = 5;
+    var NUM_TUTORIAL_STAGES = 8;
     users.createUser(
       'userTutorial@stateEditor.com', 'userTutorialStateEditor');
     users.login('userTutorial@stateEditor.com');
 
     workflow.createExplorationAndStartTutorial('sums', 'maths');
+    editor.startTutorial();
     for (var i = 0; i < NUM_TUTORIAL_STAGES - 1; i++) {
       editor.progressInTutorial();
+      general.waitForSystem();
     }
     editor.finishTutorial();
     users.logout();

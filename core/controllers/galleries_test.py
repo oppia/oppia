@@ -14,6 +14,7 @@
 
 """Tests for the gallery pages."""
 
+import json
 import os
 
 from core.controllers import galleries
@@ -237,3 +238,105 @@ class CategoryConfigTest(test_utils.GenericTestBase):
         utils.get_file_contents(os.path.join(
             'static', 'images', 'gallery', 'thumbnails',
             '%s.svg' % feconf.DEFAULT_THUMBNAIL_ICON))
+
+class ExplorationSummariesHandlerTest(test_utils.GenericTestBase):
+
+    PRIVATE_EXP_ID_EDITOR = 'eid0'
+    PUBLIC_EXP_ID_EDITOR = 'eid1'
+    PRIVATE_EXP_ID_VIEWER = 'eid2'
+
+    def setUp(self):
+        super(ExplorationSummariesHandlerTest, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+
+        self.save_new_valid_exploration(
+            self.PRIVATE_EXP_ID_EDITOR, self.editor_id)
+        self.save_new_valid_exploration(
+            self.PUBLIC_EXP_ID_EDITOR, self.editor_id)
+        self.save_new_valid_exploration(
+            self.PRIVATE_EXP_ID_VIEWER, self.viewer_id)
+
+        rights_manager.publish_exploration(
+            self.editor_id, self.PUBLIC_EXP_ID_EDITOR)
+
+    def test_can_get_public_exploration_summaries(self):
+        self.login(self.VIEWER_EMAIL)
+
+        response_dict = self.get_json(feconf.EXPLORATION_SUMMARIES_DATA_URL, {
+            'stringified_exp_ids': json.dumps([
+                self.PRIVATE_EXP_ID_EDITOR, self.PUBLIC_EXP_ID_EDITOR,
+                self.PRIVATE_EXP_ID_VIEWER])
+        })
+        self.assertIn('summaries', response_dict)
+
+        summaries = response_dict['summaries']
+        self.assertEqual(len(summaries), 1)
+
+        self.assertEqual(summaries[0]['id'], self.PUBLIC_EXP_ID_EDITOR)
+        self.assertEqual(summaries[0]['status'], 'public')
+
+        self.logout()
+
+    def test_can_get_editable_private_exploration_summaries(self):
+        self.login(self.VIEWER_EMAIL)
+
+        response_dict = self.get_json(feconf.EXPLORATION_SUMMARIES_DATA_URL, {
+            'stringified_exp_ids': json.dumps([
+                self.PRIVATE_EXP_ID_EDITOR, self.PUBLIC_EXP_ID_EDITOR,
+                self.PRIVATE_EXP_ID_VIEWER]),
+            'include_private_explorations': True
+        })
+        self.assertIn('summaries', response_dict)
+
+        summaries = response_dict['summaries']
+        self.assertEqual(len(summaries), 2)
+
+        self.assertEqual(summaries[0]['id'], self.PUBLIC_EXP_ID_EDITOR)
+        self.assertEqual(summaries[0]['status'], 'public')
+        self.assertEqual(summaries[1]['id'], self.PRIVATE_EXP_ID_VIEWER)
+        self.assertEqual(summaries[1]['status'], 'private')
+
+        # If the viewer user is granted edit access to the editor user's private
+        # exploration, then it will show up for the next request.
+        rights_manager.assign_role_for_exploration(
+            self.editor_id, self.PRIVATE_EXP_ID_EDITOR, self.viewer_id,
+            rights_manager.ROLE_EDITOR)
+
+        response_dict = self.get_json(feconf.EXPLORATION_SUMMARIES_DATA_URL, {
+            'stringified_exp_ids': json.dumps([
+                self.PRIVATE_EXP_ID_EDITOR, self.PUBLIC_EXP_ID_EDITOR,
+                self.PRIVATE_EXP_ID_VIEWER]),
+            'include_private_explorations': True
+        })
+        self.assertIn('summaries', response_dict)
+
+        summaries = response_dict['summaries']
+        self.assertEqual(len(summaries), 3)
+
+        self.assertEqual(summaries[0]['id'], self.PRIVATE_EXP_ID_EDITOR)
+        self.assertEqual(summaries[0]['status'], 'private')
+        self.assertEqual(summaries[1]['id'], self.PUBLIC_EXP_ID_EDITOR)
+        self.assertEqual(summaries[1]['status'], 'public')
+        self.assertEqual(summaries[2]['id'], self.PRIVATE_EXP_ID_VIEWER)
+        self.assertEqual(summaries[2]['status'], 'private')
+
+        self.logout()
+
+    def test_cannot_get_private_exploration_summaries_when_logged_out(self):
+        response_dict = self.get_json(feconf.EXPLORATION_SUMMARIES_DATA_URL, {
+            'stringified_exp_ids': json.dumps([
+                self.PRIVATE_EXP_ID_EDITOR, self.PUBLIC_EXP_ID_EDITOR,
+                self.PRIVATE_EXP_ID_VIEWER]),
+            'include_private_explorations': True
+        })
+        self.assertIn('summaries', response_dict)
+
+        summaries = response_dict['summaries']
+        self.assertEqual(len(summaries), 1)
+
+        self.assertEqual(summaries[0]['id'], self.PUBLIC_EXP_ID_EDITOR)
+        self.assertEqual(summaries[0]['status'], 'public')

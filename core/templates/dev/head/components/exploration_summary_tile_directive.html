@@ -13,7 +13,7 @@
                           tooltip-placement="right"
                           tooltip-append-to-body="true">
           </circular-image>
-          <div class="avatars-num-minus-one" ng-show="avatarsList.length > 1">
+          <div class="avatars-num-minus-one contributor-indicator contributor-indicator-background" ng-show="avatarsList.length > 1">
             <span ng-if="!isCommunityOwned()">+</span><[avatarsList.length - 1]>
           </div>
 
@@ -176,12 +176,28 @@
   .oppia-exploration-summary-tile .avatars-num-minus-one {
     color: white;
     font-family: Roboto;
-    font-size: x-small;
+    font-size: 0.55em;
     font-weight: bold;
-    left: 18px;
+    left: 12px;
     position: absolute;
-    top: 18px;
-    padding-left: 4px;
+    padding-left: 2px;
+    padding-right: 2px;
+    top: 17px;
+  }
+
+  .oppia-exploration-summary-tile .contributor-indicator {
+    border-radius: 10%;
+    bottom: 10px;
+    height: 13px;
+    position: absolute;
+    right: 5px;
+    text-align: center;
+    width: 16px;
+  }
+
+ .oppia-exploration-summary-tile .contributor-indicator-background {
+    background-color: #4078C0;
+    border: 1px solid rgb(243, 243, 243);
   }
 
   .oppia-exploration-summary-tile .all-avatars .num-remaining-avatars {

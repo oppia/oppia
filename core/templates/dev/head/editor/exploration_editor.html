@@ -65,7 +65,7 @@
 {% endblock navbar_breadcrumb %}
 
 {% block local_top_nav_options %}
-  <ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak" ng-controller="EditorNavigation" style="margin-left: 20px;">
+  <ul class="nav navbar-nav oppia-navbar-nav pull-right ng-cloak" ng-controller="EditorNavigation" style="margin-left: 20px;">
     <li ng-class="{'active': getTabStatuses().active === 'main', 'dropdown': countWarnings()}">
       <a href="#" tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()" class="protractor-test-main-tab">
         <i class="material-icons">&#xE254;</i>
@@ -133,7 +133,7 @@
           popover-placement="bottom" popover-trigger="none"
           popover="To get help in the future, click here!">
         <a href="#" tooltip="Help" tooltip-placement="bottom"
-           ng-click="openEditorTutorial()">
+           ng-click="showUserHelpModal()">
           <i class="material-icons">&#xE887;</i>
         </a>
       </li>
@@ -170,7 +170,7 @@
     <li ng-if="isEditableOutsideTutorialMode()">
       <div dropdown class="btn-group" style="margin-right: 10px; margin-top: 8px;"
            title="<[getSaveButtonTooltip()]>">
-        <button id="tutorialSaveButton" class="btn btn-default protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
+        <button id="tutorialSaveButton" class="btn btn-default protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()" style="width: 135px;">
           <span ng-if="!isSaveInProgress">
             <span ng-if="isPrivate()">
               <span ng-if="!saveModalIsOpening">
@@ -279,6 +279,9 @@
         <button class="btn btn-success protractor-test-confirm-publish" ng-click="publish()">Publish Exploration</button>
       </div>
     </script>
+
+    {% include 'components/exploration_welcome_modal_directive.html' %}
+    {% include 'components/help_modal_directive.html' %}
 
     <script type="text/ng-template" id="modals/saveExploration">
       <div class="modal-header">

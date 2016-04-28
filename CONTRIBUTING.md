@@ -6,12 +6,12 @@ Thanks for your interest in contributing code or design help to the Oppia projec
 
 ## Setting things up
 
-  1. Create a new, empty folder called `opensource/` in your computer's home folder. Navigate to it (`cd opensource`), then [fork and clone](https://help.github.com/articles/fork-a-repo/) the Oppia repo so that it gets downloaded into `opensource/oppia`. Then follow the appropriate installation instructions ([Linux](https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux%29), [Mac OS](https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-OS%29), [Windows](https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Windows%29)).
-  2. Update your GitHub notification settings:
+  1. Please sign the CLA so that we can accept your contributions. If you're contributing as an individual, use the [individual CLA](https://goo.gl/forms/AttNH80OV0). If your company owns the copyright to your contributions, a company representative should sign the [corporate CLA](https://goo.gl/forms/xDq9gK3Zcv).
+  2. Create a new, empty folder called `opensource/` in your computer's home folder. Navigate to it (`cd opensource`), then [fork and clone](https://help.github.com/articles/fork-a-repo/) the Oppia repo so that it gets downloaded into `opensource/oppia`. Then follow the appropriate installation instructions ([Linux](https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux%29), [Mac OS](https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-OS%29), [Windows](https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Windows%29)).
+  3. Update your GitHub notification settings:
     * Go to your settings page (click the Settings option under the profile menu in the top right), then go to 'Notification center' and ensure that everything's as you want it.
     * Go to the [Oppia repo](https://github.com/oppia/oppia), and click 'Watch' at the top right. Ensure that you're not 'ignoring' the repo, so that you'll be notified when someone replies to a conversation you're part of.
-  3. Please sign the CLA so that we can accept your contributions. If you're contributing as an individual, use the [individual CLA](https://goo.gl/forms/AttNH80OV0). If your company owns the copyright to your contributions, a company representative should sign the [corporate CLA](https://goo.gl/forms/xDq9gK3Zcv).
-  4. Fill in [this form](http://goo.gl/forms/kXILyztnfS) to indicate which parts of the codebase you're interested in. (You can always change this later.)
+  4. Fill in the [Oppia contributor survey](http://goo.gl/forms/wz1x3bFfpF) to let us know what your interests are. (You can always change your responses later.)
   5. Join the [oppia-dev@](https://groups.google.com/forum/#!forum/oppia-dev) mailing list, and say hi on the [gitter](https://gitter.im/oppia/oppia-chat) chat channel!
   6. (Optional) You may also want to set up [automatic auth](https://help.github.com/articles/set-up-git/#next-steps-authenticating-with-github-from-git) so you don't have to type in a username and password each time you commit a change.
 
@@ -30,7 +30,7 @@ These issues, also tagged as 'starter projects', are usually local to a small pa
 For reference, here are descriptions of what the other 'TODO' tags mean:
   * **[TODO: tech (instructions)](https://github.com/oppia/oppia/labels/TODO%3A%20tech%20%28instructions%29)** means that the overall solution is generally known, but newcomers to the codebase may need additional instructions to be able to implement them. Adding instructions, such as where to make the necessary changes, will help move these issues to the `TODO: code` stage.
   * **[TODO: tech (breakdown)](https://github.com/oppia/oppia/labels/TODO%3A%20tech%20%28breakdown%29)** means that the approach is known, but needs to be broken down into single-person projects.
-  * **[TODO: tech (design doc)](https://github.com/oppia/oppia/labels/TODO%3A%20tech%20%28design%20doc%29)** means that the problem is known, but the solution needs fleshing out. In that case, the best thing to do is to prepare a short doc outlining the solution approach and implementation plan, then discuss it on the issue thread before starting implementation.
+  * **[TODO: tech (design doc)](https://github.com/oppia/oppia/labels/TODO%3A%20tech%20%28design%20doc%29)** means that the problem is known, but the solution needs fleshing out. In that case, the best thing to do is to prepare a short doc outlining the solution approach and implementation plan, add a link to it on the issue thread, then discuss it before starting implementation.
   * **[TODO: design (breakdown)](https://github.com/oppia/oppia/labels/TODO%3A%20design%20%28breakdown%29)** means the UX design is completed, but the issue needs to be broken down into single-person projects.
   * **[TODO: design (UX)](https://github.com/oppia/oppia/labels/TODO%3A%20design%20%28UX%29)** means the way that the user interacts with this feature needs to be planned. The best way to approach this is to outline the core user journeys (probably using slides), and discuss them on the issue thread, so that the feature can move forward.
   * **[TODO: triage](https://github.com/oppia/oppia/labels/TODO%3A%20triage)** means we aren't sure whether to work on this issue or not. It would be helpful to give comments on this issue in support of or against implementing that feature, or mention if you encountered something similar.
@@ -80,7 +80,7 @@ Here's how to make a one-off code change. (If you're working on a larger feature
 
 4. **When your feature is ready to merge, create a pull request.**
   * Go to your fork on GitHub, select your branch from the dropdown menu, and click "pull request". Ensure that the 'base' repository is the main oppia repo and that the 'base' branch is 'develop'.
-  * Add a descriptive comment explaining the purpose of the branch (e.g. "Add a warning when the user leaves a page in the middle of an exploration."). This will tell the reviewer what the purpose of the branch is.
+  * Add a descriptive title explaining the purpose of the PR (e.g. "Fix #bugnum: add a warning when the user leaves a page in the middle of an exploration."). The "Fix #bugnum: " prefix **must** be included if this PR resolves an issue on the issue tracker.
   * Click "Create pull request". An admin will assign a reviewer to your commit.
 5. **Address review comments until all reviewers give LGTM ('looks good to me').**
   * When your reviewer has reviewed the code, you'll get an email. You'll need to respond in two ways:

@@ -103,7 +103,8 @@ oppia.factory('searchService', [
 
       _isCurrentlyFetchingResults = true;
       numSearchesInProgress++;
-      $http.get(queryUrl).success(function(data) {
+      $http.get(queryUrl).then(function(response) {
+        var data = response.data;
         _lastQuery = searchQuery;
         _lastSelectedCategories = angular.copy(selectedCategories);
         _lastSelectedLanguageCodes = angular.copy(selectedLanguageCodes);
@@ -119,7 +120,7 @@ oppia.factory('searchService', [
           console.log('SearchQuery: ' + searchQuery);
           console.log('Input: ' + $('.oppia-splash-search-input').val());
         }
-      }).error(function() {
+      }, function() {
         numSearchesInProgress--;
       });
 
@@ -180,12 +181,12 @@ oppia.factory('searchService', [
       }
 
       _isCurrentlyFetchingResults = true;
-      $http.get(queryUrl).success(function(data) {
-        _searchCursor = data.search_cursor;
+      $http.get(queryUrl).then(function(response) {
+        _searchCursor = response.data.search_cursor;
         _isCurrentlyFetchingResults = false;
 
         if (successCallback) {
-          successCallback(data, hasPageFinishedLoading());
+          successCallback(response.data, hasPageFinishedLoading());
         }
       });
     }

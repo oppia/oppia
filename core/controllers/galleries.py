@@ -279,7 +279,9 @@ class GalleryRedirectPage(base.BaseHandler):
 
 
 class ExplorationSummariesHandler(base.BaseHandler):
-    """Returns summaries corresponding to ids of public explorations."""
+    """Returns summaries corresponding to ids of public explorations. This
+    controller supports returning private explorations for the given user.
+    """
 
     def get(self):
         """Handles GET requests."""
@@ -287,14 +289,30 @@ class ExplorationSummariesHandler(base.BaseHandler):
             exp_ids = json.loads(self.request.get('stringified_exp_ids'))
         except Exception:
             raise self.PageNotFoundException
+        include_private_exps_str = self.request.get(
+            'include_private_explorations')
+        include_private_exps = (
+            include_private_exps_str.lower() == 'true'
+            if include_private_exps_str else False)
+
+        editor_user_id = self.user_id if include_private_exps else None
+        if not editor_user_id:
+            include_private_exps = False
 
         if (not isinstance(exp_ids, list) or not all([
                 isinstance(exp_id, basestring) for exp_id in exp_ids])):
             raise self.PageNotFoundException
 
-        self.values.update({
-            'summaries': (
+        if include_private_exps:
+            summaries = (
+                summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                    exp_ids,
+                    editor_user_id=editor_user_id))
+        else:
+            summaries = (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
                     exp_ids))
+        self.values.update({
+            'summaries': summaries
         })
         self.render_json(self.values)

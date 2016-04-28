@@ -61,24 +61,40 @@ def get_human_readable_contributors_summary(contributors_summary):
     }
 
 
-def get_displayable_exp_summary_dicts_matching_ids(exploration_ids):
-    """Given a list of exploration ids, filters the list for
-    explorations that are currently non-private and not deleted,
-    and returns a list of dicts of the corresponding exploration summaries.
-    Please use this function when needing summary information to display on
-    exploration summary tiles in the frontend.
+def get_displayable_exp_summary_dicts_matching_ids(
+        exploration_ids, editor_user_id=None):
+    """Given a list of exploration ids, optionally filters the list for
+    explorations that are currently non-private and not deleted, and returns a
+    list of dicts of the corresponding exploration summaries. This function can
+    also filter based on a user ID who has edit access to the corresponding
+    exploration, where the editor ID is for private explorations. Please use
+    this function when needing summary information to display on exploration
+    summary tiles in the frontend.
     """
     exploration_summaries = (
         exp_services.get_exploration_summaries_matching_ids(exploration_ids))
 
-    return get_displayable_exp_summary_dicts(exploration_summaries)
+    filtered_exploration_summaries = []
+    for exploration_summary in exploration_summaries:
+        if not exploration_summary:
+            continue
+        if exploration_summary.status == (
+                rights_manager.ACTIVITY_STATUS_PRIVATE):
+            if editor_user_id is None:
+                continue
+            if not rights_manager.Actor(editor_user_id).can_edit(
+                    rights_manager.ACTIVITY_TYPE_EXPLORATION,
+                    exploration_summary.id):
+                continue
+
+        filtered_exploration_summaries.append(exploration_summary)
+
+    return _get_displayable_exp_summary_dicts(filtered_exploration_summaries)
 
 
-def get_displayable_exp_summary_dicts(exploration_summaries):
-    """Given a list of exploration summary domain objects, returns
-     a list of the human-readable exploration summary dicts that
-     correspond to explorations that are currently non-private
-     and not deleted.
+def _get_displayable_exp_summary_dicts(exploration_summaries):
+    """Given a list of exploration summary domain objects, returns a list of
+    the corresponding human-readable exploration summary dicts.
     """
     exploration_ids = [(
         exploration_summary.id if exploration_summary is not None
@@ -90,30 +106,31 @@ def get_displayable_exp_summary_dicts(exploration_summaries):
     displayable_exp_summaries = []
 
     for ind, exploration_summary in enumerate(exploration_summaries):
-        if exploration_summary and exploration_summary.status != (
-                rights_manager.ACTIVITY_STATUS_PRIVATE):
-            displayable_exp_summaries.append({
-                'id': exploration_summary.id,
-                'title': exploration_summary.title,
-                'category': exploration_summary.category,
-                'objective': exploration_summary.objective,
-                'language_code': exploration_summary.language_code,
-                'last_updated_msec': utils.get_time_in_millisecs(
-                    exploration_summary.exploration_model_last_updated
-                ),
-                'status': exploration_summary.status,
-                'ratings': exploration_summary.ratings,
-                'community_owned': exploration_summary.community_owned,
-                'human_readable_contributors_summary':
-                    get_human_readable_contributors_summary(
-                        exploration_summary.contributors_summary),
-                'tags': exploration_summary.tags,
-                'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
-                    exploration_summary.category),
-                'thumbnail_bg_color': utils.get_hex_color_for_category(
-                    exploration_summary.category),
-                'num_views': view_counts[ind],
-            })
+        if not exploration_summary:
+            continue
+
+        displayable_exp_summaries.append({
+            'id': exploration_summary.id,
+            'title': exploration_summary.title,
+            'category': exploration_summary.category,
+            'objective': exploration_summary.objective,
+            'language_code': exploration_summary.language_code,
+            'last_updated_msec': utils.get_time_in_millisecs(
+                exploration_summary.exploration_model_last_updated
+            ),
+            'status': exploration_summary.status,
+            'ratings': exploration_summary.ratings,
+            'community_owned': exploration_summary.community_owned,
+            'human_readable_contributors_summary':
+                get_human_readable_contributors_summary(
+                    exploration_summary.contributors_summary),
+            'tags': exploration_summary.tags,
+            'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
+                exploration_summary.category),
+            'thumbnail_bg_color': utils.get_hex_color_for_category(
+                exploration_summary.category),
+            'num_views': view_counts[ind],
+        })
 
     return displayable_exp_summaries
 
@@ -157,7 +174,5 @@ def get_featured_exploration_summary_dicts():
     """Returns a list of featured explorations."""
     featured_exp_summaries = (
         exp_services.get_featured_exploration_summaries())
-    featured_exp_summary_dicts = get_displayable_exp_summary_dicts(
+    return _get_displayable_exp_summary_dicts(
         featured_exp_summaries.values())
-
-    return featured_exp_summary_dicts

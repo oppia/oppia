@@ -130,6 +130,14 @@
               </div>
             </div>
           </div>
+
+          <div ng-if="!activeCard.interactionHtml && !isOnTerminalCard()">
+            <div class="conversation-skin-inline-interaction">
+              <span style="color: red;">
+                <strong>Error</strong>: No interaction specified for '<[activeCard.stateName]>'.
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -435,6 +443,32 @@
     .conversation-skin-oppia-feedback-container,
     .conversation-skin-learner-answer-container {
       padding: 0 20px;
+    }
+
+    /* These rules must be kept in sync with corresponding rules in oppia.css
+       (those with '.oppia-state-content-display-html > p,
+         .form-control.oppia-rte-content > div > p' selectors specifying
+        the same line-height, margin-top and margin-bottom attributes)
+    */
+    .conversation-skin-tutor-card-top-content > p,
+    .conversation-skin-oppia-feedback-content > p,
+    .conversation-skin-learner-answer-content > p,
+    .conversation-skin-help-card-content > p {
+      line-height: 28px;
+      margin-bottom: 18px;
+      margin-top: 18px;
+    }
+    .conversation-skin-tutor-card-top-content > p:first-child,
+    .conversation-skin-oppia-feedback-content > p:first-child,
+    .conversation-skin-learner-answer-content > p:first-child,
+    .conversation-skin-help-card-content > p:first-child {
+      margin-top: 0px;
+    }
+    .conversation-skin-tutor-card-top-content > p:last-child,
+    .conversation-skin-oppia-feedback-content > p:last-child,
+    .conversation-skin-learner-answer-content > p:last-child,
+    .conversation-skin-help-card-content > p:last-child {
+      margin-bottom: 0px;
     }
 
     .conversation-skin-tutor-card-top-content,

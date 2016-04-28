@@ -43,6 +43,7 @@ class ExplorationDisplayableSummariesTest(
     EXP_ID_2 = 'eid2'
     EXP_ID_3 = 'eid3'
     EXP_ID_4 = 'eid4'
+    EXP_ID_5 = 'eid5'
 
     EXPECTED_VERSION_1 = 4
     EXPECTED_VERSION_2 = 2
@@ -135,6 +136,8 @@ class ExplorationDisplayableSummariesTest(
                 'new_value': 'Exploration updated title again'
             }], 'Changed title twice.')
 
+        self.save_new_valid_exploration(self.EXP_ID_5, self.bob_id)
+
     def test_get_human_readable_contributors_summary(self):
         contributors_summary = {self.albert_id: 10, self.bob_id: 13}
         self.assertEqual({
@@ -164,49 +167,16 @@ class ExplorationDisplayableSummariesTest(
 
     def test_get_displayable_exp_summary_dicts_matching_ids(self):
         # A list of exp_id's are passed in:
-        # EXP_ID_1 -- private exploration
-        # EXP_ID_2 -- pubished exploration
+        # EXP_ID_1 -- private exploration owned by Albert
+        # EXP_ID_2 -- pubished exploration owned by Albert
         # EXP_ID_3 -- deleted exploration
+        # EXP_ID_5 -- private exploration owned by Bob
         # Should only return [EXP_ID_2]
 
         displayable_summaries = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3]))
+                [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5]))
         expected_summary = {
-            'status': u'public',
-            'thumbnail_bg_color': '#05a69a',
-            'community_owned': False,
-            'tags': [],
-            'thumbnail_icon_url': '/images/gallery/thumbnails/Lightbulb.svg',
-            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
-            'human_readable_contributors_summary': {
-                self.ALBERT_NAME: {
-                    'num_commits': 2,
-                    'profile_picture_data_url': None
-                }
-            },
-            'id': self.EXP_ID_2,
-            'category': u'A category',
-            'ratings': feconf.get_empty_ratings(),
-            'title': u'Exploration 2 Albert title',
-            'num_views': 0,
-            'objective': u'An objective'
-        }
-        self.assertIn('last_updated_msec', displayable_summaries[0])
-        self.assertDictContainsSubset(expected_summary,
-                                      displayable_summaries[0])
-
-    def test_get_displayable_exp_summary_dicts(self):
-        # A list of exp_id and None objects are passed in:
-        # Should only return exploration with exp_id
-
-        exp_summaries_partial_list = (
-            [None] + exp_services.get_exploration_summaries_matching_ids(
-                [self.EXP_ID_2]))
-        exploration_summary_dicts = (
-            summary_services.get_displayable_exp_summary_dicts(
-                exp_summaries_partial_list))
-        expected_summary_dict = {
             'category': u'A category',
             'community_owned': False,
             'human_readable_contributors_summary': {
@@ -220,15 +190,48 @@ class ExplorationDisplayableSummariesTest(
             'num_views': 0,
             'objective': u'An objective',
             'ratings': feconf.get_empty_ratings(),
-            'status': u'public',
+            'status': 'public',
             'tags': [],
-            'title': u'Exploration 2 Albert title',
             'thumbnail_bg_color': '#05a69a',
-            'thumbnail_icon_url': '/images/gallery/thumbnails/Lightbulb.svg'
+            'thumbnail_icon_url': '/images/gallery/thumbnails/Lightbulb.svg',
+            'title': u'Exploration 2 Albert title',
         }
-        self.assertEqual(len(exploration_summary_dicts), 1)
-        self.assertDictContainsSubset(expected_summary_dict,
-                                      exploration_summary_dicts[0])
+        self.assertIn('last_updated_msec', displayable_summaries[0])
+        self.assertDictContainsSubset(expected_summary,
+                                      displayable_summaries[0])
+
+    def test_get_public_and_filtered_private_summary_dicts_for_creator(self):
+        # If a new exploration is created by another user (Bob) and not public,
+        # then Albert cannot see it when querying for explorations.
+        displayable_summaries = (
+            summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5],
+                editor_user_id=self.albert_id))
+
+        self.assertEqual(len(displayable_summaries), 2)
+        self.assertEqual(displayable_summaries[0]['id'], self.EXP_ID_1)
+        self.assertEqual(displayable_summaries[1]['id'], self.EXP_ID_2)
+
+        # However, if Albert is granted editor access to Bob's exploration, then
+        # Albert has access to the corresponding summary.
+        rights_manager.assign_role_for_exploration(
+            self.bob_id, self.EXP_ID_5, self.albert_id,
+            rights_manager.ROLE_EDITOR)
+
+        displayable_summaries = (
+            summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5],
+                editor_user_id=self.albert_id))
+
+        self.assertEqual(len(displayable_summaries), 3)
+        self.assertEqual(displayable_summaries[0]['status'], 'private')
+        self.assertEqual(displayable_summaries[0]['id'], self.EXP_ID_1)
+
+        self.assertEqual(displayable_summaries[1]['status'], 'public')
+        self.assertEqual(displayable_summaries[1]['id'], self.EXP_ID_2)
+
+        self.assertEqual(displayable_summaries[2]['status'], 'private')
+        self.assertEqual(displayable_summaries[2]['id'], self.EXP_ID_5)
 
 
 class GalleryCategoriesTest(

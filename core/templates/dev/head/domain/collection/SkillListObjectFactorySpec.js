@@ -29,36 +29,36 @@ describe('Skill list object factory', function() {
 
   it('should be creatable from an empty skills array', function() {
     var skillList = SkillListObjectFactory.create([]);
-    expect(skillList.getSkillCount()).toEqual(0);
+    expect(skillList.isEmpty()).toBe(true);
     expect(skillList.getSkills()).toEqual([]);
   });
 
   it('should contain the skills it was created with', function() {
     var skills = ['skill0'];
     var skillList = SkillListObjectFactory.create(skills);
-    expect(skillList.containsSkill('skill0')).toBeTruthy();
+    expect(skillList.containsSkill('skill0')).toBe(true);
   });
 
   it('should be able to add and remove skills', function() {
-    expect(_skillList.containsSkill('skill0')).toBeFalsy();
-    expect(_skillList.addSkill('skill0')).toBeTruthy();
-    expect(_skillList.containsSkill('skill0')).toBeTruthy();
-    expect(_skillList.removeSkillByName('skill0')).toBeTruthy();
-    expect(_skillList.containsSkill('skill0')).toBeFalsy();
+    expect(_skillList.containsSkill('skill0')).toBe(false);
+    expect(_skillList.addSkill('skill0')).toBe(true);
+    expect(_skillList.containsSkill('skill0')).toBe(true);
+    expect(_skillList.removeSkillByName('skill0')).toBe(true);
+    expect(_skillList.containsSkill('skill0')).toBe(false);
   });
 
   it('should not be able to add duplicate skills', function() {
-    expect(_skillList.addSkill('skill0')).toBeTruthy();
-    expect(_skillList.addSkill('skill0')).toBeFalsy();
+    expect(_skillList.addSkill('skill0')).toBe(true);
+    expect(_skillList.addSkill('skill0')).toBe(false);
   });
 
   it('should not be able to remove non-existent skills by name', function() {
-    expect(_skillList.containsSkill('skill0')).toBeFalsy();
-    expect(_skillList.removeSkillByName('skill0')).toBeFalsy();
+    expect(_skillList.containsSkill('skill0')).toBe(false);
+    expect(_skillList.removeSkillByName('skill0')).toBe(false);
   });
 
   it('should be able to add a list of skills, ignoring duplicates', function() {
-    expect(_skillList.getSkillCount()).toEqual(0);
+    expect(_skillList.isEmpty()).toBe(true);
 
     var skills1 = ['skill0', 'skill1'];
     expect(_skillList.addSkills(skills1)).toBeTruthy();
@@ -87,12 +87,43 @@ describe('Skill list object factory', function() {
     expect(skillList.getSkills()).toEqual(['skill2', 'skill0', 'skill1']);
   });
 
+  it('should be able to detect being a superset of another skill list',
+      function() {
+    var skillList1 = SkillListObjectFactory.create(['skill0', 'skill1']);
+    var skillList2 = SkillListObjectFactory.create(['skill0']);
+
+    expect(skillList1.isSupersetOfSkillList(skillList2)).toBe(true);
+    expect(skillList2.isSupersetOfSkillList(skillList1)).toBe(false);
+
+    // The empty list is a subset of all lists.
+    var skillList3 = SkillListObjectFactory.create([]);
+    expect(skillList1.isSupersetOfSkillList(skillList3)).toBe(true);
+    expect(skillList2.isSupersetOfSkillList(skillList3)).toBe(true);
+    expect(skillList3.isSupersetOfSkillList(skillList1)).toBe(false);
+    expect(skillList3.isSupersetOfSkillList(skillList2)).toBe(false);
+
+    // A list is the superset of itself, including the empty list.
+    expect(skillList1.isSupersetOfSkillList(skillList1)).toBe(true);
+    expect(skillList2.isSupersetOfSkillList(skillList2)).toBe(true);
+    expect(skillList3.isSupersetOfSkillList(skillList3)).toBe(true);
+
+    // A list can be made the superset of another.
+    var skillList4 = SkillListObjectFactory.create([]);
+    skillList4.addSkillsFromSkillList(skillList1);
+    expect(skillList1.isSupersetOfSkillList(skillList4)).toBe(true);
+    expect(skillList4.isSupersetOfSkillList(skillList1)).toBe(true);
+    skillList4.removeSkillByIndex(0);
+    expect(skillList1.isSupersetOfSkillList(skillList4)).toBe(true);
+    expect(skillList4.isSupersetOfSkillList(skillList1)).toBe(false);
+  });
+
   it('should be able to clear skills', function() {
     var skillList = SkillListObjectFactory.create(['first', 'second']);
     expect(skillList.getSkillCount()).toEqual(2);
+    expect(skillList.isEmpty()).toBe(false);
 
     skillList.clearSkills();
-    expect(skillList.getSkillCount()).toEqual(0);
+    expect(skillList.isEmpty()).toBe(true);
   });
 
   it('should be able to retrieve a skill by its index', function() {
@@ -118,14 +149,14 @@ describe('Skill list object factory', function() {
 
   it('should be able to remove skills by their index', function() {
     var skillList = SkillListObjectFactory.create(['skill0', 'skill1']);
-    expect(skillList.removeSkillByIndex(1)).toBeTruthy();
+    expect(skillList.removeSkillByIndex(1)).toBe(true);
     expect(skillList.getSkills()).toEqual(['skill0']);
   });
 
   it('should fail to remove skills with an invalid index', function() {
     var skillList = SkillListObjectFactory.create(['skill0', 'skill1']);
-    expect(skillList.removeSkillByIndex(-1)).toBeFalsy();
-    expect(skillList.removeSkillByIndex(2)).toBeFalsy();
+    expect(skillList.removeSkillByIndex(-1)).toBe(false);
+    expect(skillList.removeSkillByIndex(2)).toBe(false);
     expect(skillList.getSkills()).toEqual(['skill0', 'skill1']);
   });
 

@@ -114,7 +114,7 @@
               <div ng-if="hasPageLoaded">
                 <select2-dropdown choices="LANGUAGE_CHOICES"
                   item="$parent.preferredLanguageCodes" allow-multiple-choices="true"
-                  new-choice-regex=".^" width="400"
+                  new-choice-regex=".^" width="100%"
                   placeholder="Select preferred languages..."
                   on-selection-change="savePreferredLanguageCodes($parent.preferredLanguageCodes)">
                 </select2-dropdown>
@@ -147,8 +147,14 @@
             <div class="col-lg-10 col-md-10 col-sm-10">
               <div class="checkbox">
                 <label>
-                  <input type="checkbox" ng-model="canReceiveEmailUpdates" ng-change="saveCanReceiveEmailUpdates(canReceiveEmailUpdates)">
+                  <input type="checkbox" ng-model="canReceiveEmailUpdates" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail)">
                   Receive news and updates about the site
+                </label>
+              </div>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" ng-model="canReceiveEditorRoleEmail" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail)">
+                  Receive emails when someone gives you edit rights to an exploration
                 </label>
               </div>
             </div>
@@ -202,6 +208,10 @@
       </script>
     </md-card>
   </div>
+{% endblock %}
+
+{% block footer%}
+  {% include 'footer.html' %}
 {% endblock %}
 
 {% block footer_js %}

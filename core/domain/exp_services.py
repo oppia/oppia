@@ -42,8 +42,9 @@ import utils
 memcache_services = models.Registry.import_memcache_services()
 search_services = models.Registry.import_search_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
-(exp_models, feedback_models) = models.Registry.import_models(
-    [models.NAMES.exploration, models.NAMES.feedback])
+(exp_models, feedback_models, user_models) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
+])
 
 # This takes additional 'title' and 'category' parameters.
 CMD_CREATE_NEW = 'create_new'
@@ -291,7 +292,7 @@ def get_exploration_titles_and_categories(exp_ids):
     return result
 
 
-def _get_exploration_summary_dicts_from_models(exp_summary_models):
+def _get_exploration_summaries_from_models(exp_summary_models):
     """Given an iterable of ExpSummaryModel instances, create a dict containing
     corresponding exploration summary domain objects, keyed by id.
     """
@@ -362,7 +363,7 @@ def get_non_private_exploration_summaries():
     """Returns a dict with all non-private exploration summary domain objects,
     keyed by their id.
     """
-    return _get_exploration_summary_dicts_from_models(
+    return _get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_non_private())
 
 
@@ -370,7 +371,7 @@ def get_featured_exploration_summaries():
     """Returns a dict with all featured exploration summary domain objects,
     keyed by their id.
     """
-    return _get_exploration_summary_dicts_from_models(
+    return _get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_featured())
 
 
@@ -378,7 +379,7 @@ def get_all_exploration_summaries():
     """Returns a dict with all exploration summary domain objects,
     keyed by their id.
     """
-    return _get_exploration_summary_dicts_from_models(
+    return _get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_all())
 
 
@@ -1012,6 +1013,16 @@ def update_exploration(
 
     exploration = apply_change_list(exploration_id, change_list)
     _save_exploration(committer_id, exploration, commit_message, change_list)
+
+    # If there is an existing exploration draft for this user, clear it.
+    exp_user_data = user_models.ExplorationUserDataModel.get(
+        committer_id, exploration_id)
+    if exp_user_data:
+        exp_user_data.draft_change_list = None
+        exp_user_data.draft_change_list_last_updated = None
+        exp_user_data.draft_change_list_exp_version = None
+        exp_user_data.put()
+
     # Update summary of changed exploration.
     update_exploration_summary(exploration.id, committer_id)
     user_services.add_edited_exploration_id(committer_id, exploration.id)
@@ -1493,9 +1504,9 @@ def _create_change_list_from_suggestion(suggestion):
     """Creates a change list from a suggestion object."""
 
     return [{'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-             'state_name': suggestion['state_name'],
+             'state_name': suggestion.state_name,
              'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-             'new_value': [suggestion['state_content']]}]
+             'new_value': [suggestion.state_content]}]
 
 
 def _get_commit_message_for_suggestion(
@@ -1525,7 +1536,7 @@ def accept_suggestion(editor_id, thread_id, exploration_id, commit_message):
     else:
         suggestion = feedback_services.get_suggestion(
             exploration_id, thread_id)
-        suggestion_author_username = suggestion['author_name']
+        suggestion_author_username = suggestion.get_author_name()
         change_list = _create_change_list_from_suggestion(suggestion)
         update_exploration(
             editor_id, exploration_id, change_list,
@@ -1551,3 +1562,45 @@ def reject_suggestion(editor_id, thread_id, exploration_id):
             feedback_models.STATUS_CHOICES_IGNORED,
             None, 'Suggestion rejected.')
         thread.put()
+
+
+def is_draft_version_valid(exp_id, user_id):
+    """Checks if the draft version is the same as the latest version of the
+    exploration."""
+
+    draft_version = user_models.ExplorationUserDataModel.get(
+        user_id, exp_id).draft_change_list_exp_version
+    exp_version = get_exploration_by_id(exp_id).version
+    return draft_version == exp_version
+
+
+def create_or_update_draft(
+        exp_id, user_id, change_list, exp_version, current_datetime):
+    """Create a draft with the given change list, or update the change list
+    of the draft if it already exists. A draft is updated only if the change
+    list timestamp of the new change list is greater than the change list
+    timestamp of the draft.
+    The method assumes that a ExplorationUserDataModel object exists for the
+    given user and exploration."""
+
+    exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
+    if (exp_user_data.draft_change_list and
+            exp_user_data.draft_change_list_last_updated > current_datetime):
+        return
+    updated_exploration = apply_change_list(exp_id, change_list)
+    updated_exploration.validate(strict=False)
+    exp_user_data.draft_change_list = change_list
+    exp_user_data.draft_change_list_last_updated = current_datetime
+    exp_user_data.draft_change_list_exp_version = exp_version
+    exp_user_data.put()
+
+
+def get_exp_with_draft_applied(exp_id, user_id):
+    """If a draft exists for the given user and exploration,
+    apply it to the exploration."""
+
+    exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
+    return (
+        apply_change_list(exp_id, exp_user_data.draft_change_list)
+        if exp_user_data.draft_change_list
+        else get_exploration_by_id(exp_id))
