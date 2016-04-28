@@ -67,16 +67,24 @@ oppia.factory('searchService', [
   var updateSearchFields = function(itemsType, urlComponent,
                                     selectionDetails) {
     var itemCodeGroup = urlComponent.match(/=\("[A-Za-z%20" ]+"\)/);
+    var itemCodes = itemCodeGroup ? itemCodeGroup[0] : null;
 
-    if (itemCodeGroup == undefined) {
+    var EXPECTED_PREFIX = '=("';
+    var EXPECTED_SUFFIX = '")';
+
+    if (!itemCodes ||
+        itemCodes.indexOf(EXPECTED_PREFIX) !== 0 ||
+        itemCodes.lastIndexOf(EXPECTED_SUFFIX) !==
+          itemCodes.length - EXPECTED_SUFFIX.length) {
       throw Error('Invalid search query url fragment for ' +
                   itemsType + ': ' + urlComponent);
       return;
     }
-    var itemCodes = itemCodeGroup[0].replace('=("', '');
-    itemCodes = itemCodes.replace('")', '');
 
-    var items = itemCodes.split('" OR "');
+    var items = itemCodes.substring(
+      EXPECTED_PREFIX.length, itemCodes.length - EXPECTED_SUFFIX.length
+    ).split('" OR "');
+
     var selections = selectionDetails[itemsType].selections;
     for (var i = 0; i < items.length; i++) {
       selections[items[i]] = true;
@@ -138,8 +146,8 @@ oppia.factory('searchService', [
     // selectionDetails. It will update selectionDetails with the relevant
     // fields that were extracted from the url. It returns the unencoded search
     // query string.
-    updateSearchFieldsBasedOnUrlQuery: function(urlComponent,
-                                                selectionDetails) {
+    updateSearchFieldsBasedOnUrlQuery: function(
+        urlComponent, selectionDetails) {
       var urlQuery = urlComponent.substring('?q='.length);
       // The following will split the urlQuery into 3 components:
       // 1. query
@@ -152,22 +160,28 @@ oppia.factory('searchService', [
         return '';
       }
 
-      if (querySegments.length == 3) {
-        var categoryUrlComponent = decodeURIComponent(querySegments[1]);
-        updateSearchFields('categories', categoryUrlComponent,
-                           selectionDetails);
-      }
-      if (querySegments.length > 1) {
-        var languageUrlComponent = decodeURIComponent(
-          querySegments[querySegments.length - 1]);
+      for (var i = 1; i < querySegments.length; i++) {
+        var urlComponent = decodeURIComponent(querySegments[i]);
+
+        var itemsType = null;
+        if (urlComponent.indexOf('category') === 0) {
+          itemsType = 'categories';
+        } else if (urlComponent.indexOf('language_code') === 0) {
+          itemsType = 'languageCodes';
+        } else {
+          console.error('Invalid search query component: ' + urlComponent);
+          continue;
+        }
+
         try {
-          updateSearchFields('languageCodes', languageUrlComponent,
-                             selectionDetails);
+          updateSearchFields(
+            itemsType, urlComponent, selectionDetails);
         } catch (error) {
-          selectionDetails.categories.selections = {};
+          selectionDetails[itemsType].selections = {};
           throw error;
         }
       }
+
       return decodeURIComponent(querySegments[0]);
     },
     loadMoreData: function(successCallback) {
