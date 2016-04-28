@@ -305,7 +305,9 @@ describe('Search service', function() {
     }).toThrow(new Error('Invalid search query url fragment for ' +
                          'languageCodes: language_code="en" OR "ar")'));
     expect(results.languageCodes.selections).toEqual({});
-    expect(results.categories.selections).toEqual({});
+    expect(results.categories.selections).toEqual({
+      Mathematics: true
+    });
 
     var urlComponent = '?q=protractor%20test&category=("Mathematics")' +
                        '&language_code="en" OR "ar"';
@@ -314,6 +316,8 @@ describe('Search service', function() {
     }).toThrow(new Error('Invalid search query url fragment for ' +
                          'languageCodes: language_code="en" OR "ar"'));
     expect(results.languageCodes.selections).toEqual({});
-    expect(results.categories.selections).toEqual({});
+    expect(results.categories.selections).toEqual({
+      Mathematics: true
+    });
   });
 });

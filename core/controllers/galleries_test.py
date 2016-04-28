@@ -47,7 +47,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
 
     def test_gallery_handler_demo_exploration(self):
         """Test the gallery data handler on demo explorations."""
-        response_dict = self.get_json(feconf.GALLERY_DATA_URL)
+        response_dict = self.get_json(feconf.GALLERY_SEARCH_DATA_URL)
         self.assertEqual({
             'is_admin': False,
             'is_moderator': False,
@@ -61,7 +61,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
         exp_services.load_demo('0')
 
         # Test gallery
-        response_dict = self.get_json(feconf.GALLERY_DATA_URL)
+        response_dict = self.get_json(feconf.GALLERY_SEARCH_DATA_URL)
         self.assertEqual(len(response_dict['explorations_list']), 1)
         self.assertDictContainsSubset({
             'id': '0',
@@ -100,7 +100,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'Change title and category')
 
         # Test gallery
-        response_dict = self.get_json(feconf.GALLERY_DATA_URL)
+        response_dict = self.get_json(feconf.GALLERY_SEARCH_DATA_URL)
         self.assertEqual(len(response_dict['explorations_list']), 1)
         self.assertDictContainsSubset({
             'id': '0',
@@ -116,7 +116,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
 
         self.login(self.ADMIN_EMAIL)
-        response_dict = self.get_json(feconf.GALLERY_DATA_URL)
+        response_dict = self.get_json(feconf.GALLERY_SEARCH_DATA_URL)
         self.assertEqual({
             'is_admin': True,
             'is_moderator': True,
@@ -136,7 +136,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             self.admin_id, exploration, 'Exploration A', [])
 
         # Test that the private exploration isn't displayed.
-        response_dict = self.get_json(feconf.GALLERY_DATA_URL)
+        response_dict = self.get_json(feconf.GALLERY_SEARCH_DATA_URL)
         self.assertEqual(response_dict['explorations_list'], [])
 
         # Create exploration B
@@ -154,7 +154,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
         exp_services.index_explorations_given_ids(['A', 'B'])
 
         # Test gallery
-        response_dict = self.get_json(feconf.GALLERY_DATA_URL)
+        response_dict = self.get_json(feconf.GALLERY_SEARCH_DATA_URL)
         self.assertEqual(len(response_dict['explorations_list']), 2)
         self.assertDictContainsSubset({
             'id': 'B',
@@ -177,7 +177,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
         exp_services.delete_exploration(self.admin_id, 'A')
 
         # Test gallery
-        response_dict = self.get_json(feconf.GALLERY_DATA_URL)
+        response_dict = self.get_json(feconf.GALLERY_SEARCH_DATA_URL)
         self.assertEqual(len(response_dict['explorations_list']), 1)
         self.assertDictContainsSubset({
             'id': 'B',
