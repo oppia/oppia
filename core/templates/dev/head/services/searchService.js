@@ -16,11 +16,11 @@
  * @fileoverview search service for activityTilesInfinityGrid
  */
 
-oppia.constant('GALLERY_DATA_URL', '/galleryhandler/data');
+oppia.constant('SEARCH_DATA_URL', '/searchhandler/data');
 
 oppia.factory('searchService', [
-  '$http', '$rootScope', 'GALLERY_DATA_URL',
-  function($http, $rootScope, GALLERY_DATA_URL) {
+  '$http', '$rootScope', 'SEARCH_DATA_URL',
+  function($http, $rootScope, SEARCH_DATA_URL) {
   var _lastQuery = null;
   var _lastSelectedCategories = {};
   var _lastSelectedLanguageCodes = {};
@@ -86,20 +86,23 @@ oppia.factory('searchService', [
   var _isCurrentlyFetchingResults = false;
   var numSearchesInProgress = 0;
 
+  var getQueryUrl = function(searchUrlQueryString) {
+    return SEARCH_DATA_URL + '?q=' + searchUrlQueryString;
+  };
+
   return {
     getSearchUrlQueryString: function(searchQuery, selectedCategories,
       selectedLanguageCodes) {
-      return encodeURI(searchQuery) +
+      return encodeURIComponent(searchQuery) +
         _getSuffixForQuery(selectedCategories, selectedLanguageCodes);
     },
     // Note that an empty query results in all explorations being shown.
     executeSearchQuery: function(
         searchQuery, selectedCategories, selectedLanguageCodes,
         successCallback) {
-      console.log(searchQuery);
-      var queryUrl = GALLERY_DATA_URL + '?q=' + this.getSearchUrlQueryString(
-        searchQuery, selectedCategories, selectedLanguageCodes
-      );
+      var queryUrl = getQueryUrl(
+        this.getSearchUrlQueryString(
+          searchQuery, selectedCategories, selectedLanguageCodes));
 
       _isCurrentlyFetchingResults = true;
       numSearchesInProgress++;
@@ -133,7 +136,8 @@ oppia.factory('searchService', [
     },
     // The following takes in the url search component as an argument and the
     // selectionDetails. It will update selectionDetails with the relevant
-    // fields that were extracted from the url. Returns the search query.
+    // fields that were extracted from the url. It returns the unencoded search
+    // query string.
     updateSearchFieldsBasedOnUrlQuery: function(urlComponent,
                                                 selectionDetails) {
       var urlQuery = urlComponent.substring('?q='.length);
@@ -172,9 +176,9 @@ oppia.factory('searchService', [
         return;
       }
 
-      var queryUrl = GALLERY_DATA_URL + '?q=' + this.getSearchUrlQueryString(
-        _lastQuery, _lastSelectedCategories, _lastSelectedLanguageCodes
-      );
+      var queryUrl = getQueryUrl(
+        this.getSearchUrlQueryString(
+          _lastQuery, _lastSelectedCategories, _lastSelectedLanguageCodes));
 
       if (_searchCursor) {
         queryUrl += '&cursor=' + _searchCursor;

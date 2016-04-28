@@ -445,3 +445,8 @@ def get_all_language_codes_and_names():
         'code': lc['code'],
         'name': _get_short_language_description(lc['description']),
     } for lc in feconf.ALL_LANGUAGE_CODES]
+
+
+def unescape_encoded_uri_component(escaped_string):
+    """Unescape a string that is encoded with encodeURIComponent."""
+    return urllib.unquote(escaped_string).decode('utf-8')

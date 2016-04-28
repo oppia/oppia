@@ -16,8 +16,6 @@
  * @fileoverview Data and controllers for the Oppia gallery search page.
  */
 
-oppia.constant('GALLERY_DATA_URL', '/galleryhandler/data');
-
 oppia.directive('searchResults', [function() {
   return {
     restrict: 'E',

@@ -16,6 +16,7 @@
 
 import json
 import logging
+import string
 
 from core.controllers import base
 from core.domain import collection_domain
@@ -79,7 +80,7 @@ def get_matching_exploration_dicts(query_string, search_cursor):
     """Given a query string and a search cursor, returns a list of exploration
        dicts that satisfy the search query.
     """
-    exp_ids, search_cursor = (
+    exp_ids, new_search_cursor = (
         exp_services.get_exploration_ids_matching_query(
             query_string, cursor=search_cursor))
 
@@ -92,7 +93,7 @@ def get_matching_exploration_dicts(query_string, search_cursor):
             '%s explorations were fetched to load the gallery page. '
             'You may be running up against the default query limits.'
             % feconf.DEFAULT_QUERY_LIMIT)
-    return explorations_list
+    return explorations_list, new_search_cursor
 
 
 class GalleryPage(base.BaseHandler):
@@ -114,6 +115,7 @@ class GalleryPage(base.BaseHandler):
                 utils.get_all_language_codes_and_names()),
         })
         self.render_template('galleries/gallery.html')
+
 
 class GallerySearchPage(base.BaseHandler):
     """The exploration gallery search page."""
@@ -163,12 +165,21 @@ class DefaultGalleryCategoriesHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class GalleryHandler(base.BaseHandler):
-    """Provides data for the exploration gallery page."""
+class SearchHandler(base.BaseHandler):
+    """Provides data for exploration search results."""
 
     def get(self):
         """Handles GET requests."""
-        query_string = self.request.get('q')
+        query_string = utils.unescape_encoded_uri_component(
+            self.request.get('q'))
+
+        # Remove all punctuation from the query string, and replace it with
+        # spaces. See http://stackoverflow.com/a/266162 and
+        # http://stackoverflow.com/a/11693937
+        remove_punctuation_map = dict(
+            (ord(char), None) for char in string.punctuation)
+        query_string = query_string.translate(remove_punctuation_map)
+
         if self.request.get('category'):
             query_string += ' category=%s' % self.request.get('category')
         if self.request.get('language_code'):
@@ -176,12 +187,12 @@ class GalleryHandler(base.BaseHandler):
                 'language_code')
         search_cursor = self.request.get('cursor', None)
 
-        explorations_list = get_matching_exploration_dicts(
+        explorations_list, new_search_cursor = get_matching_exploration_dicts(
             query_string, search_cursor)
 
         self.values.update({
             'explorations_list': explorations_list,
-            'search_cursor': search_cursor,
+            'search_cursor': new_search_cursor,
         })
 
         self.render_json(self.values)
