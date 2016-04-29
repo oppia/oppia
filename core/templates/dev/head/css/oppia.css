@@ -116,8 +116,10 @@ body {
 }
 
 .oppia-profile-container {
-  margin: 60px auto 30px auto;
+  margin: 30px auto 30px auto;
   max-width: 980px;
+  overflow: auto;
+  position: relative;
   width: 90%;
 }
 
@@ -126,6 +128,7 @@ body {
   float: left;
   margin-right: 28px;
   padding: 24px;
+  position: relative;
   width: 220px;
 }
 
@@ -226,7 +229,6 @@ body {
 .oppia-profile-content-card {
   background-color: #fff;
   float: left;
-  margin-bottom: 80px;
   min-height: 630px;
   padding: 30px;
   position: relative;

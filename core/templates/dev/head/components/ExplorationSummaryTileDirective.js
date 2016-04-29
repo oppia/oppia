@@ -145,10 +145,8 @@ oppia.directive('explorationSummaryTile', [function() {
         if ($scope.mobileCutoffPx == null) {
           $scope.mobileCutoffPx = 0;
         }
-        console.log($scope.mobileCutoffPx);
         $scope.isWindowLarge = (
           windowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
-        console.log($scope.isWindowLarge);
         $scope.recomputeWindowWidth = function() {
           $scope.isWindowLarge = (
             windowDimensionsService.getWidth() >= $scope.mobileCutoffPx);

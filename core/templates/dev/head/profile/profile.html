@@ -32,8 +32,10 @@
 {% block content %}
   <div class="oppia-profile-container" ng-controller="Profile">
     <md-card class="oppia-profile-user-card">
+
       <img ng-src="<[profilePictureDataUrl]>"
            class="oppia-profile-picture-fullsize">
+
       <h2 class="oppia-profile-username-large-screen">
         <span popover-placement="right" ng-attr-popover="<[usernameIsLong ? username.helpText : undefined]>"
             popover-append-to-body popover-trigger="mouseenter">
@@ -45,9 +47,11 @@
           <strong><[username.value| truncate:11]></strong>
         </span>
       </h2>
+
       <p class="oppia-profile-first-contributed" ng-if="firstContributionMsec">
         Contributing since: <[getLocaleDateString(firstContributionMsec)]>
       </p>
+
       <div class="oppia-profile-user-stat-container-large-screen">
         <div ng-repeat="stat in userDisplayedStatistics" class="oppia-profile-user-stat">
           <div popover-placement="right" ng-attr-popover="<[stat.helpText]>" popover-append-to-body popover-trigger="mouseenter">
@@ -56,12 +60,14 @@
           </div>
         </div>
       </div>
+
       <p class="oppia-profile-user-bio">
         <span ng-if="userBio" style="white-space: pre-wrap;"><[userBio]></span>
         <span ng-if="!userBio">
           <em>This user has not supplied a bio yet.</em>
         </span>
       </p>
+
       <p class="oppia-profile-subject-interest-container">
         Interests:
         <span ng-if="subjectInterests.length > 0"><br>
@@ -75,6 +81,7 @@
           <em>none specified</em>
         </span>
       </p>
+
       <hr class="oppia-profile-stat-container-line-small-screen">
       <div class="oppia-profile-user-stat-container-small-screen">
         <div ng-repeat="stat in userDisplayedStatistics" class="oppia-profile-user-stat">
@@ -90,19 +97,19 @@
     <md-card class="oppia-profile-content-card">
       <strong>Portfolio</strong>
       <md-content class="oppia-profile-portfolio-container">
-          <exploration-summary-tile ng-repeat="expl in getExplorationsToDisplay()"
-            exploration-id="expl.id"
-            exploration-title="expl.title"
-            last-updated-msec="expl.last_updated_msec"
-            objective="expl.objective"
-            category="expl.category"
-            ratings="expl.ratings"
-            thumbnail-icon-url="expl.thumbnail_icon_url"
-            thumbnail-bg-color="expl.thumbnail_bg_color"
-            num-views="expl.num_views"
-            is-community-editable="expl.community_editable"
-            mobile-cutoff-px="610">
-          </exploration-summary-tile>
+        <exploration-summary-tile ng-repeat="expl in getExplorationsToDisplay()"
+          exploration-id="expl.id"
+          exploration-title="expl.title"
+          last-updated-msec="expl.last_updated_msec"
+          objective="expl.objective"
+          category="expl.category"
+          ratings="expl.ratings"
+          thumbnail-icon-url="expl.thumbnail_icon_url"
+          thumbnail-bg-color="expl.thumbnail_bg_color"
+          num-views="expl.num_views"
+          is-community-editable="expl.community_editable"
+          mobile-cutoff-px="610">
+        </exploration-summary-tile>
 
         <div ng-if="userEditedExplorations.length === 0">
           <br><em>This user hasn't created or edited any explorations yet.</em>
@@ -110,21 +117,19 @@
       </md-content>
 
       <span class="oppia-profile-portfolio-pages" ng-if="numUserPortfolioExplorations > 6">
-        <button ng-disabled="currentPageNumber == 0" ng-click="goToPreviousPage()">
-          Previous
-        </button>
+        <li class="glyphicon glyphicon-arrow-left" ng-disabled="currentPageNumber == 0" ng-click="goToPreviousPage()"></li>
         Showing <[currentPageNumber * PAGE_SIZE + 1]> - <[Math.min(numUserPortfolioExplorations, (currentPageNumber + 1) * PAGE_SIZE)]> of <[numUserPortfolioExplorations]>
-        <button ng-disabled="(currentPageNumber + 1) * PAGE_SIZE >= userEditedExplorations.length" ng-click="goToNextPage()">
-          Next
-        </button>
+        <li class="glyphicon glyphicon-arrow-right" ng-disabled="(currentPageNumber + 1) * PAGE_SIZE >= userEditedExplorations.length"
+            ng-click="goToNextPage()">
+        </li>
       </span>
     </md-card>
   </div>
 {% endblock %}
-      
+
 {% block footer%}
   {% include 'footer.html' %}
-{% endblock %}      
+{% endblock %}
 
 {% block footer_js %}
   {{ super() }}
