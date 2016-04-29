@@ -16,11 +16,11 @@
  * @fileoverview search service for activityTilesInfinityGrid
  */
 
-oppia.constant('GALLERY_DATA_URL', '/galleryhandler/data');
+oppia.constant('SEARCH_DATA_URL', '/searchhandler/data');
 
 oppia.factory('searchService', [
-  '$http', '$rootScope', 'GALLERY_DATA_URL',
-  function($http, $rootScope, GALLERY_DATA_URL) {
+  '$http', '$rootScope', 'SEARCH_DATA_URL',
+  function($http, $rootScope, SEARCH_DATA_URL) {
   var _lastQuery = null;
   var _lastSelectedCategories = {};
   var _lastSelectedLanguageCodes = {};
@@ -67,16 +67,24 @@ oppia.factory('searchService', [
   var updateSearchFields = function(itemsType, urlComponent,
                                     selectionDetails) {
     var itemCodeGroup = urlComponent.match(/=\("[A-Za-z%20" ]+"\)/);
+    var itemCodes = itemCodeGroup ? itemCodeGroup[0] : null;
 
-    if (itemCodeGroup == undefined) {
+    var EXPECTED_PREFIX = '=("';
+    var EXPECTED_SUFFIX = '")';
+
+    if (!itemCodes ||
+        itemCodes.indexOf(EXPECTED_PREFIX) !== 0 ||
+        itemCodes.lastIndexOf(EXPECTED_SUFFIX) !==
+          itemCodes.length - EXPECTED_SUFFIX.length) {
       throw Error('Invalid search query url fragment for ' +
                   itemsType + ': ' + urlComponent);
       return;
     }
-    var itemCodes = itemCodeGroup[0].replace('=("', '');
-    itemCodes = itemCodes.replace('")', '');
 
-    var items = itemCodes.split('" OR "');
+    var items = itemCodes.substring(
+      EXPECTED_PREFIX.length, itemCodes.length - EXPECTED_SUFFIX.length
+    ).split('" OR "');
+
     var selections = selectionDetails[itemsType].selections;
     for (var i = 0; i < items.length; i++) {
       selections[items[i]] = true;
@@ -86,20 +94,23 @@ oppia.factory('searchService', [
   var _isCurrentlyFetchingResults = false;
   var numSearchesInProgress = 0;
 
+  var getQueryUrl = function(searchUrlQueryString) {
+    return SEARCH_DATA_URL + '?q=' + searchUrlQueryString;
+  };
+
   return {
     getSearchUrlQueryString: function(searchQuery, selectedCategories,
       selectedLanguageCodes) {
-      return encodeURI(searchQuery) +
+      return encodeURIComponent(searchQuery) +
         _getSuffixForQuery(selectedCategories, selectedLanguageCodes);
     },
     // Note that an empty query results in all explorations being shown.
     executeSearchQuery: function(
         searchQuery, selectedCategories, selectedLanguageCodes,
         successCallback) {
-      console.log(searchQuery);
-      var queryUrl = GALLERY_DATA_URL + '?q=' + this.getSearchUrlQueryString(
-        searchQuery, selectedCategories, selectedLanguageCodes
-      );
+      var queryUrl = getQueryUrl(
+        this.getSearchUrlQueryString(
+          searchQuery, selectedCategories, selectedLanguageCodes));
 
       _isCurrentlyFetchingResults = true;
       numSearchesInProgress++;
@@ -133,9 +144,10 @@ oppia.factory('searchService', [
     },
     // The following takes in the url search component as an argument and the
     // selectionDetails. It will update selectionDetails with the relevant
-    // fields that were extracted from the url. Returns the search query.
-    updateSearchFieldsBasedOnUrlQuery: function(urlComponent,
-                                                selectionDetails) {
+    // fields that were extracted from the url. It returns the unencoded search
+    // query string.
+    updateSearchFieldsBasedOnUrlQuery: function(
+        urlComponent, selectionDetails) {
       var urlQuery = urlComponent.substring('?q='.length);
       // The following will split the urlQuery into 3 components:
       // 1. query
@@ -148,22 +160,28 @@ oppia.factory('searchService', [
         return '';
       }
 
-      if (querySegments.length == 3) {
-        var categoryUrlComponent = decodeURIComponent(querySegments[1]);
-        updateSearchFields('categories', categoryUrlComponent,
-                           selectionDetails);
-      }
-      if (querySegments.length > 1) {
-        var languageUrlComponent = decodeURIComponent(
-          querySegments[querySegments.length - 1]);
+      for (var i = 1; i < querySegments.length; i++) {
+        var urlComponent = decodeURIComponent(querySegments[i]);
+
+        var itemsType = null;
+        if (urlComponent.indexOf('category') === 0) {
+          itemsType = 'categories';
+        } else if (urlComponent.indexOf('language_code') === 0) {
+          itemsType = 'languageCodes';
+        } else {
+          console.error('Invalid search query component: ' + urlComponent);
+          continue;
+        }
+
         try {
-          updateSearchFields('languageCodes', languageUrlComponent,
-                             selectionDetails);
+          updateSearchFields(
+            itemsType, urlComponent, selectionDetails);
         } catch (error) {
-          selectionDetails.categories.selections = {};
+          selectionDetails[itemsType].selections = {};
           throw error;
         }
       }
+
       return decodeURIComponent(querySegments[0]);
     },
     loadMoreData: function(successCallback) {
@@ -172,9 +190,9 @@ oppia.factory('searchService', [
         return;
       }
 
-      var queryUrl = GALLERY_DATA_URL + '?q=' + this.getSearchUrlQueryString(
-        _lastQuery, _lastSelectedCategories, _lastSelectedLanguageCodes
-      );
+      var queryUrl = getQueryUrl(
+        this.getSearchUrlQueryString(
+          _lastQuery, _lastSelectedCategories, _lastSelectedLanguageCodes));
 
       if (_searchCursor) {
         queryUrl += '&cursor=' + _searchCursor;

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for load more activity tiles
+ * @fileoverview Directive for an infinitely-scrollable view of activity tiles
  */
 
 oppia.directive('activityTilesInfinityGrid', [function() {

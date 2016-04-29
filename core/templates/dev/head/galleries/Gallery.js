@@ -32,18 +32,16 @@ angular.module('template/carousel/carousel.html', []).run([
     '</div>\n');
 }]);
 
-oppia.constant('GALLERY_DATA_URL', '/galleryhandler/data');
-
 oppia.controller('Gallery', [
   '$scope', '$http', '$rootScope', '$modal', '$window', '$timeout',
   'ExplorationCreationButtonService', 'oppiaDatetimeFormatter',
-  'oppiaDebouncer', 'urlService', 'GALLERY_DATA_URL', 'CATEGORY_LIST',
-  'searchService', 'siteAnalyticsService',
+  'oppiaDebouncer', 'urlService', 'CATEGORY_LIST', 'searchService',
+  'siteAnalyticsService',
   function(
       $scope, $http, $rootScope, $modal, $window, $timeout,
       ExplorationCreationButtonService, oppiaDatetimeFormatter,
-      oppiaDebouncer, urlService, GALLERY_DATA_URL, CATEGORY_LIST,
-      searchService, siteAnalyticsService) {
+      oppiaDebouncer, urlService, CATEGORY_LIST, searchService,
+      siteAnalyticsService) {
     $rootScope.loadingMessage = 'Loading';
 
     // Below is the width of each tile (width + margins), which can be found
