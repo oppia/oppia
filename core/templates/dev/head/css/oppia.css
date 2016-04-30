@@ -110,36 +110,101 @@ body {
   width: 100%;
 }
 
-exploration-summary-tile {
-  display: inline-block;
+.oppia-dashboard-container {
+  margin: 60px auto 30px auto;
+  max-width: 800px;
 }
 
-.oppia-profile-container, .oppia-dashboard-container {
-  max-width: 800px;
+.oppia-profile-container {
+  margin: 30px auto 30px auto;
+  max-width: 980px;
+  overflow: auto;
+  position: relative;
+  width: 90%;
+}
+
+.oppia-profile-user-card {
+  background-color: #fff;
+  float: left;
+  margin-right: 28px;
+  padding: 24px;
+  position: relative;
+  width: 220px;
+}
+
+.oppia-profile-picture-fullsize {
+  border-radius: 4px;
+  display: block;
+  height: auto;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 60px;
-  margin-bottom: 30px;
-  padding-left: 30px;
-  padding-right: 30px;
+  max-width: 160px;
+  width: 90%;
 }
 
-@media (max-width: 500px) {
-  .oppia-dashboard-container {
-    margin-left: 10px;
-    margin-right: 10px;
-  }
+.oppia-profile-username-large-screen {
+  display: block;
+  font-size: 130%;
+  margin-top: 20px;
+  text-align: center;
 }
 
-.oppia-profile-top-card {
-  background-color: #fff;
-  margin: 0 0 24px 0;
-  padding: 24px;
+.oppia-profile-username-small-screen {
+  display: none;
+  font-size: 110%;
+  margin-top: 20px;
+  text-align: left;
+}
+
+.oppia-profile-first-contributed {
+  display: block;
+  font-size: 0.7em;
+  line-height: 120%;
+  text-align: center;
+}
+
+.oppia-profile-user-stat-container-large-screen {
+  display: block;
+  font-size: 12px;
+  margin-top: 16px;
+  max-width: 220px;
+  text-align: center;
+}
+
+.oppia-profile-user-stat-container-small-screen {
+  display: none;
+  font-size: 12px;
+  margin-top: 16px;
+  max-width: 100%;
+  text-align: center;
+}
+
+.oppia-profile-stat-container-line-small-screen {
+  display: none;
+}
+
+.oppia-profile-user-stat {
+  display: inline-block;
+  width: 33%;
+}
+
+.oppia-profile-user-stat span {
+  display: block;
+}
+
+.oppia-profile-user-bio {
+  display: block;
+  font-size: 0.7em;
+  line-height: 130%;
+  margin-top: 16px;
+  width: 100%;
 }
 
 .oppia-profile-subject-interest-container {
+  display: block;
+  font-size: .8em;
   font-weight: bold;
-  margin-top: 16px;
+  margin-top: 6px;
 }
 
 .oppia-profile-subject-interest {
@@ -147,7 +212,7 @@ exploration-summary-tile {
   border-radius: .25em;
   color: #fff;
   display: inline;
-  font-size: 0.75em;
+  font-size: 0.8em;
   line-height: 1;
   margin: 0 2px;
   padding: .3em .35em .3em .5em;
@@ -157,101 +222,79 @@ exploration-summary-tile {
 }
 
 .oppia-profile-no-interests-text {
-  color: #888;
+  font-size: .9em;
   font-weight: normal;
 }
 
-.oppia-profile-picture-fullsize {
-  /* This maintains the aspect ratio of the picture. */
-  border-radius: 4px;
-  height: auto;
-  margin-bottom: 12px;
-  max-width: 180px;
-  width: 100%;
-}
-
-.oppia-profile-username {
-  margin-top: 4px;
-}
-
-.oppia-profile-first-contributed {
-  color: #888;
-  font-size: 0.9em;
-  font-style: italic;
-  margin-top: 16px;
-}
-
-.oppia-profile-tabs {
+.oppia-profile-content-card {
   background-color: #fff;
-  margin: 0;
-  padding: 0;
+  float: left;
+  min-height: 630px;
+  padding: 30px;
+  position: relative;
+  width: calc(100% - 280px);
 }
 
-.oppia-profile-tabs-content {
-  padding: 24px 24px 48px 24px;
-}
-
-.oppia-profile-tabs md-content h1:first-child {
-  margin-top: 0;
-}
-
-.oppia-profile-tabs md-tab {
-  background-color: #009688;
-  border: 1px solid rgba(0,0,0,0.1);
-}
-
-.oppia-profile-tabs md-tabs.md-default-theme md-tab:focus {
-  border: 1px solid rgba(0,0,0,0.1);
-}
-
-.oppia-profile-tabs md-tabs-ink-bar {
-  background: #0D47A1 !important;
-  /* Without this, the ink bar does not show up on initial load. */
-  /* TODO(sll): Find a better fix for this. The current fix has an
-    ink bar that is too large on small-width screens.
-  */
-  display: block !important;
-  height: 6px;
-  width: 266px;
-}
-
-.oppia-profile-tabs md-tab-label {
-  color: #ffffff;
-}
-
-.oppia-stat-container-top {
-  display: inline-block;
-  width: 30%;
-}
-
-.oppia-stat-big-container {
-  display: block;
-  text-align: center;
+.oppia-profile-portfolio-container {
+  margin: 0 auto;
+  margin-bottom: 20px;
   width: 100%;
 }
 
-.oppia-stat-container-top span {
+.oppia-profile-portfolio-pages {
+  bottom: 0;
   display: block;
+  font-size: .7em;
+  margin-bottom: 20px;
+  margin-right: 40px;
+  position: absolute;
+  right: 0;
+  text-align: right;
 }
 
-.oppia-stat-container-top .oppia-big-number {
-  font-size: 48px;
-}
-
-.oppia-profile-explorations-container {
-  margin: 0 auto;
-  width: 644px;
-}
-
-@media (max-width: 656px) {
-  .oppia-profile-explorations-container {
-    width: 428px;
+@media (max-width: 610px) {
+  .oppia-profile-container {
+    width: 90%;
   }
-}
-
-@media (max-width: 460px) {
-  .oppia-profile-explorations-container {
-    width: 208px;
+  .oppia-profile-user-card {
+    float: none;
+    margin: 0 auto 12px auto;
+    padding: 30px;
+    width: 90%;
+  }
+  .oppia-profile-content-card {
+    width: 90%;
+    float: none;
+    margin: 0 auto;
+  }
+  .oppia-profile-picture-fullsize {
+    display: inline-block;
+    float: left;
+    margin-right: 20px;
+    width: calc(80% - 70px);
+  }
+  .oppia-profile-username-large-screen {
+    display: none;
+  }
+  .oppia-profile-username-small-screen {
+    display: inline-block;
+  }
+  .oppia-profile-first-contributed {
+    text-align: left;
+    font-size: .6em;
+  }
+  .oppia-profile-user-stat-container-large-screen {
+    display: none;
+  }
+  .oppia-profile-user-stat-container-small-screen {
+    display: block;
+  }
+  .oppia-profile-stat-container-line-small-screen {
+    display: block;
+    border-top: 1px solid #7e7e7e;
+  }
+  .oppia-profile-user-bio {
+    display: inline-block;
   }
 }
 
@@ -835,8 +878,8 @@ textarea {
   border-radius: 0;
   margin-top: 10px;
 }
-/* In Bootstrap,white-space for dropdown list is no-wrap.Use this instead to allign ticks and
-   dropdown options
+/* In Bootstrap, white-space for dropdown list is no-wrap. Use this instead
+   to align ticks and dropdown options.
 */
 .oppia-navbar-button-container > .dropdown-menu > li > a {
   white-space: normal;
@@ -1222,6 +1265,7 @@ md-card.oppia-gallery-tile {
   position: fixed;
   z-index: 999999;
 }
+
 .oppia-toast-container * {
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
@@ -2642,14 +2686,13 @@ div#ng-curtain {
   float: right;
 }
 
-@media (max-width: 500px) {
-
+ @media (max-width: 500px) {
   .oppia-notification-content,
   .oppia-notification-last-updated {
     display: inline;
   }
 
-}
+ }
 
 .oppia-about-anchor {
   display: block;

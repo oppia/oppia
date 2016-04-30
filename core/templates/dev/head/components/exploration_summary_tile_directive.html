@@ -1,11 +1,14 @@
 <script type="text/ng-template" id="summaryTile/exploration">
   <md-card class="oppia-exploration-summary-tile">
     <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
-      <div class="top-section" style="background-color: <[getThumbnailBgColor()]>;">
+      <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
         <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
-        <h2 class="exploration-title protractor-test-exp-summary-tile-title"><[getExplorationTitle()]></h2>
+        <h2 class="exploration-title protractor-test-exp-summary-tile-title">
+          <span ng-if="isWindowLarge"><[getExplorationTitle()]></span>
+          <span ng-if="!isWindowLarge"><[getExplorationTitle()|truncate:32]></span>
+        </h2>
 
-        <div class="exploration-summary-avatars" ng-show="avatarsList.length > 0">
+        <div ng-if="isWindowLarge" class="exploration-summary-avatars" ng-show="avatarsList.length > 0">
           <circular-image ng-if="avatarsList.length > 0"
                           src="avatarsList[0].image"
                           link="avatarsList[0].link"
@@ -35,10 +38,10 @@
           </div>
         </div>
       </div>
-      <div class="top-section-mask mask"></div>
+      <div class="title-section-mask"></div>
 
-      <div>
-        <div class="objective protractor-test-exp-summary-tile-objective">
+      <div ng-attr-section="<[isWindowLarge ? undefined : 'right-section']>">
+        <div ng-if="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
           <[getObjective() | truncateAndCapitalize: 60]>
           <span ng-if="!getObjective()">No objective specified.</span>
         </div>
@@ -117,14 +120,14 @@
     box-shadow: 0 6px 13px rgba(0,0,0,0.17), 0 4px 6px rgba(0,0,0,0.23);
   }
 
-  .oppia-exploration-summary-tile .top-section {
+  .oppia-exploration-summary-tile .title-section {
     height: 144px;
     position: relative;
     width: 100%;
   }
 
   .oppia-exploration-summary-tile,
-  .oppia-exploration-summary-tile .top-section {
+  .oppia-exploration-summary-tile .title-section {
     -webkit-transition: all 300ms;
     transition: all 300ms;
   }
@@ -150,7 +153,7 @@
     z-index: 10;
   }
 
-  .oppia-exploration-summary-tile:hover .top-section-mask {
+  .oppia-exploration-summary-tile:hover .title-section-mask {
     background-color: #eee;
     height: 144px;
     left: 0px;
@@ -252,6 +255,15 @@
     opacity: 0.5;
   }
 
+  .oppia-exploration-summary-tile [section="right-section"] {
+    display: inline-block;
+    float: left;
+    height: 80px;
+    position: relative;
+    text-align: center;
+    width: 30%;
+  }
+
   .oppia-exploration-summary-tile .metrics {
     height: 30px;
     margin: 0 12px;
@@ -277,5 +289,66 @@
     font-size: 0.8em;
     font-weight: bold;
     padding: 5px 8px 4px 8px;
+  }
+
+  @media (max-width: 610px) {
+    .oppia-exploration-summary-tile {
+      height: 80px;
+      width: 95%;
+    }
+    .oppia-exploration-summary-tile .title-section {
+      float: left;
+      height: 80px;
+      width: 70%;
+    }
+    .oppia-exploration-summary-tile .exploration-summary-tile-mask {
+      width: 70%;
+    }
+    .oppia-exploration-summary-tile:hover .title-section-mask {
+      height: 80px;
+      width: 70%;
+    }
+    .oppia-exploration-summary-tile .thumbnail-image {
+      height: 20px;
+      margin: 8px;
+      right: 0px;
+      top: 0px;
+      position: absolute;
+      width: 20px;
+    }
+    .oppia-exploration-summary-tile .exploration-title {
+      margin: 10px;
+      top: 0;
+      width: 75%;
+    }
+    .oppia-exploration-summary-tile .metrics {
+      display: inline-block;
+      margin-top: 12px;
+    }
+    .oppia-exploration-summary-tile .metrics li {
+      display: block;
+      font-size: 0.7em;
+      text-align: left;
+    }
+    .oppia-exploration-summary-tile .metrics li .fa {
+      margin-bottom: 10px;
+    }
+    .oppia-exploration-summary-tile .recently-updated {
+      background-color: rgb(19,105,193);
+      border-radius: 8px;
+      color: white;
+      font-size: 0.6em;
+      font-weight: bold;
+      padding: 5px 8px 4px 8px;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .oppia-exploration-summary-tile .metrics li {
+      font-size: 0.6em;
+    }
+    .oppia-exploration-summary-tile .recently-updated {
+      display: none;
+    }
   }
 </style>
