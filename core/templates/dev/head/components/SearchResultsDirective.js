@@ -20,16 +20,29 @@ oppia.directive('searchResults', [function() {
   return {
     restrict: 'E',
     templateUrl: 'components/searchResults',
-    controller: ['$scope', '$rootScope', function($scope, $rootScope) {
-      // Called when the page loads, and after every search query.
-      $scope.$on(
-        'refreshSearchResults',
-        function(evt, data, endOfPageIsReached) {
-          $scope.searchIsLoading = false;
-          $scope.allExplorationsInOrder = data.explorations_list;
-          $rootScope.loadingMessage = '';
-        }
-      );
-    }]
+    controller: [
+      '$scope', '$rootScope', '$timeout', 'siteAnalyticsService',
+      function($scope, $rootScope, $timeout, siteAnalyticsService) {
+        $rootScope.loadingMessage = 'Loading...';
+        $scope.someResultsExist = true;
+
+        // Called when the first batch of search results is retrieved from the
+        // server.
+        $scope.$on(
+          'initialSearchResultsLoaded', function(evt, explorationsList) {
+            $scope.someResultsExist = explorationsList.length > 0;
+            $rootScope.loadingMessage = '';
+          }
+        );
+
+        $scope.onRedirectToLogin = function(destinationUrl) {
+          siteAnalyticsService.registerStartLoginEvent('noSearchResults');
+          $timeout(function() {
+            $window.location = destinationUrl;
+          }, 150);
+          return false;
+        };
+      }
+    ]
   };
 }]);

@@ -123,8 +123,8 @@ oppia.factory('searchService', [
         numSearchesInProgress--;
 
         if ($('.oppia-splash-search-input').val() === searchQuery) {
-          $rootScope.$broadcast('refreshSearchResults', data,
-                                hasReachedEndOfPage());
+          $rootScope.$broadcast(
+            'initialSearchResultsLoaded', data.explorations_list);
           _isCurrentlyFetchingResults = false;
         } else {
           console.log('Mismatch');

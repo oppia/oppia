@@ -23,6 +23,17 @@ oppia.directive('activityTilesInfinityGrid', [function() {
     controller: [
       '$scope', '$rootScope', 'searchService',
       function($scope, $rootScope, searchService) {
+        $scope.endOfPageIsReached = false;
+        $scope.allExplorationsInOrder = [];
+
+        // Called when the first batch of search results is retrieved from the
+        // server.
+        $scope.$on(
+          'initialSearchResultsLoaded', function(evt, explorationsList) {
+            $scope.allExplorationsInOrder = explorationsList;
+          }
+        );
+
         $scope.showMoreExplorations = function() {
           if (!$rootScope.loadingMessage && !$scope.endOfPageIsReached) {
             $scope.searchResultsAreLoading = true;
