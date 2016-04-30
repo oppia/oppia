@@ -69,7 +69,7 @@ class HomePageRedirectHandler(base.BaseHandler):
         if self.user_id and user_services.has_fully_registered(self.user_id):
             self.redirect(feconf.MY_EXPLORATIONS_URL)
         else:
-            self.redirect(feconf.GALLERY_URL)
+            self.redirect(feconf.SPLASH_URL)
 
 
 def get_redirect_route(regex_route, handler, name, defaults=None):
@@ -150,6 +150,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/myexplorationshandler/data', home.MyExplorationsHandler,
         'my_explorations_handler'),
 
+    get_redirect_route(feconf.SPLASH_URL, pages.SplashPage, 'splash_page'),
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
     get_redirect_route(
         r'/participate', pages.ParticipatePage, 'participate_page'),

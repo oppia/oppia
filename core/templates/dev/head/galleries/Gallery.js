@@ -16,32 +16,14 @@
  * @fileoverview Data and controllers for the Oppia contributors' gallery page.
  */
 
-// Overwrite the default ui-bootstrap carousel template to remove the
-// on-mouseover behaviour, as well as the left and right arrows.
-angular.module('template/carousel/carousel.html', []).run([
-    '$templateCache', function($templateCache) {
-  $templateCache.put('template/carousel/carousel.html',
-    '<div class=\"carousel\" ng-swipe-right=\"prev()\" ' +
-    '     ng-swipe-left=\"next()\">\n' +
-    '  <ol class=\"carousel-indicators\" ng-show=\"slides.length > 1\">\n' +
-    '    <li ng-repeat=\"slide in slides track by $index\" ' +
-    '        ng-class=\"{active: isActive(slide)}\" ' +
-    '        ng-click=\"select(slide)\"></li>\n' +
-    '  </ol>\n' +
-    '  <div class=\"carousel-inner\" ng-transclude></div>\n' +
-    '</div>\n');
-}]);
-
 oppia.controller('Gallery', [
-  '$scope', '$http', '$rootScope', '$modal', '$window', '$timeout',
-  'ExplorationCreationButtonService', 'oppiaDatetimeFormatter',
-  'oppiaDebouncer', 'urlService', 'CATEGORY_LIST', 'searchService',
-  'siteAnalyticsService',
+  '$scope', '$http', '$rootScope', '$window', '$timeout',
+  'ExplorationCreationButtonService', 'urlService', 'CATEGORY_LIST',
+  'searchService', 'siteAnalyticsService',
   function(
-      $scope, $http, $rootScope, $modal, $window, $timeout,
-      ExplorationCreationButtonService, oppiaDatetimeFormatter,
-      oppiaDebouncer, urlService, CATEGORY_LIST, searchService,
-      siteAnalyticsService) {
+      $scope, $http, $rootScope, $window, $timeout,
+      ExplorationCreationButtonService, urlService, CATEGORY_LIST,
+      searchService, siteAnalyticsService) {
     $rootScope.loadingMessage = 'Loading';
 
     // Below is the width of each tile (width + margins), which can be found
@@ -183,27 +165,17 @@ oppia.controller('Gallery', [
       });
     });
 
-    $scope.CAROUSEL_INTERVAL = 3500;
-    $scope.CAROUSEL_SLIDES = GLOBALS.CAROUSEL_SLIDES_CONFIG || [];
-
-    // Preload images, otherwise they will only start showing up some time after
-    // the carousel slide appears. See: http://stackoverflow.com/q/1373142
-    for (var i = 0; i < $scope.CAROUSEL_SLIDES.length; i++) {
-      var pic = new Image();
-      pic.src = '/images/splash/' + $scope.CAROUSEL_SLIDES[i].image_filename;
-    }
-
     $scope.showCreateExplorationModal = function() {
       ExplorationCreationButtonService.showCreateExplorationModal(
         CATEGORY_LIST);
     };
 
     // The following checks if gallery is in search mode
-    $scope.inSplashMode = ($window.location.pathname == '/gallery');
-    var removeSplashCarousel = function() {
-      if ($scope.inSplashMode) {
+    $scope.inSearchMode = ($window.location.pathname.indexOf('/search') === 0);
+    var activateSearchMode = function() {
+      if (!$scope.inSearchMode) {
         $('.oppia-gallery-container').fadeOut(function() {
-          $scope.inSplashMode = false;
+          $scope.inSearchMode = true;
           $timeout(function() {
             $('.oppia-gallery-container').fadeIn();
           }, 50);
@@ -217,7 +189,7 @@ oppia.controller('Gallery', [
         selectedCategories[galleryGroup.categories[i]] = true;
       }
       searchService.executeSearchQuery('', selectedCategories, '', function() {
-        removeSplashCarousel();
+        activateSearchMode();
       });
       // TODO(sll): Clear the search query from the search bar, too.
     };

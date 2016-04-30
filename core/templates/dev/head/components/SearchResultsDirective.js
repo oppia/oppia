@@ -13,30 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Data and controllers for the Oppia gallery search page.
+ * @fileoverview Directive for showing search results.
  */
 
 oppia.directive('searchResults', [function() {
   return {
     restrict: 'E',
     templateUrl: 'components/searchResults',
-    controller: [
-      '$scope', '$rootScope', function($scope, $rootScope) {
-        // Called when the page loads, and after every search query.
-        var _refreshGalleryData = function(data, hasPageFinishedLoading) {
+    controller: ['$scope', '$rootScope', function($scope, $rootScope) {
+      // Called when the page loads, and after every search query.
+      $scope.$on(
+        'refreshSearchResults',
+        function(evt, data, endOfPageIsReached) {
           $scope.searchIsLoading = false;
           $scope.allExplorationsInOrder = data.explorations_list;
-          $scope.finishedLoadingPage = hasPageFinishedLoading;
           $rootScope.loadingMessage = '';
-        };
-
-        $scope.$on(
-          'refreshGalleryData',
-          function(evt, data, hasPageFinishedLoading) {
-            _refreshGalleryData(data, hasPageFinishedLoading);
-          }
-        );
-      }
-    ]
+        }
+      );
+    }]
   };
 }]);

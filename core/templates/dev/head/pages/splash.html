@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block maintitle %}
+  Home
+{% endblock maintitle %}
+
+{% block subtitle %}
+  Oppia
+{% endblock subtitle %}
+
+{% block navbar_breadcrumb %}
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+  <div class="oppia-gallery-container">
+    <div class="oppia-gallery-banner-container" style="background-color: #888;">
+      <div class="oppia-gallery-banner-content" style="height: 100%; width: 100%;">
+        Hi, I&rsquo;m Oppia.
+        <br>
+        <span style="font-size: 0.8em;">
+          This splash page needs to be replaced.
+        </span>
+      </div>
+    </div>
+  </div>
+
+  {% include 'components/profile_link_image_directive.html' %}
+  {% include 'components/circular_image_directive.html' %}
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script>
+    {{ include_js_file('components/ProfileLinkImageDirective.js') }}
+    {{ include_js_file('components/CircularImageDirective.js') }}
+  </script>
+{% endblock footer_js %}

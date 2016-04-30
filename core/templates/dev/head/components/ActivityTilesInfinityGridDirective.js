@@ -24,15 +24,17 @@ oppia.directive('activityTilesInfinityGrid', [function() {
       '$scope', '$rootScope', 'searchService',
       function($scope, $rootScope, searchService) {
         $scope.showMoreExplorations = function() {
-          if (!$rootScope.loadingMessage) {
-            $scope.pageLoaderIsBusy = true;
-            searchService.loadMoreData(function(data,
-              hasPageFinishedLoading) {
+          if (!$rootScope.loadingMessage && !$scope.endOfPageIsReached) {
+            $scope.searchResultsAreLoading = true;
+            searchService.loadMoreData(function(data, endOfPageIsReached) {
               $scope.allExplorationsInOrder =
               $scope.allExplorationsInOrder.concat(
                 data.explorations_list);
-              $scope.finishedLoadingPage = hasPageFinishedLoading;
-              $scope.pageLoaderIsBusy = false;
+              $scope.endOfPageIsReached = endOfPageIsReached;
+              $scope.searchResultsAreLoading = false;
+            }, function(endOfPageIsReached) {
+              $scope.endOfPageIsReached = endOfPageIsReached;
+              $scope.searchResultsAreLoading = false;
             });
           }
         };
