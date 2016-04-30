@@ -39,6 +39,11 @@
     <div style="position: relative; z-index: 3;">
       <div class="oppia-gallery-tiles-area" ng-if="!inSearchMode">
         <div class="oppia-gallery-tiles-container">
+          <div ng-if="galleryGroups.length === 0"
+               style="margin: 150px auto; text-align: center; width: 100%;">
+            There are no groups of explorations available to display.
+          </div>
+
           <div class="oppia-gallery-group" ng-repeat="galleryGroup in galleryGroups track by $index">
             <!-- TODO(sll): Add card at end of the row that, when clicked, does showFullGalleryGroup(galleryGroup)" -->
             <div>
@@ -48,12 +53,17 @@
                 </a>
               </h2>
             </div>
-            <md-button class="md-no-ink oppia-gallery-scroll-btn" ng-click="scroll($index, true)" style="cursor: pointer"
+
+            <md-button class="md-no-ink oppia-gallery-scroll-btn"
+                       ng-click="scroll($index, true)"
                        ng-hide="leftmostCardIndices[$index] == 0">
               <i class="material-icons">keyboard_arrow_left</i>
             </md-button>
-            <div class="oppia-gallery-scroll-btn" ng-show="leftmostCardIndices[$index] == 0"></div>
-            <div class="oppia-gallery-tiles-carousel" ng-swipe-right="scroll($index, true)" ng-swipe-left="scroll($index, false)">
+            <div class="oppia-gallery-scroll-btn" ng-if="leftmostCardIndices[$index] == 0"></div>
+
+            <div class="oppia-gallery-tiles-carousel"
+                 ng-swipe-right="scroll($index, true)"
+                 ng-swipe-left="scroll($index, false)">
               <div class="oppia-gallery-tiles-carousel-overlay-left"></div>
               <div class="oppia-gallery-tiles">
                 <exploration-summary-tile ng-repeat="tile in galleryGroup.activity_summary_dicts"
@@ -70,33 +80,37 @@
               </div>
               <div class="oppia-gallery-tiles-carousel-overlay-right"></div>
             </div>
-            <md-button class="md-no-ink oppia-gallery-scroll-btn" ng-click="scroll($index, false)" style="cursor: pointer"
+
+            <md-button class="md-no-ink oppia-gallery-scroll-btn"
+                       ng-click="scroll($index, false)"
                        ng-hide="(galleryGroup.activity_summary_dicts.length - tileDisplayCount) <= leftmostCardIndices[$index]">
               <i class="material-icons">keyboard_arrow_right</i>
             </md-button>
-            <div class="oppia-gallery-scroll-btn" ng-show="(galleryGroup.activity_summary_dicts.length - tileDisplayCount) <= leftmostCardIndices[$index]"></div>
+            <div class="oppia-gallery-scroll-btn" ng-if="(galleryGroup.activity_summary_dicts.length - tileDisplayCount) <= leftmostCardIndices[$index]"></div>
           </div>
         </div>
       </div>
+
       <div class="oppia-gallery-tiles-area" ng-if="inSearchMode">
         <search-results></search-results>
       </div>
+    </div>
   </div>
 
-  {% include 'components/exploration_creation_button_modal.html' %}
+  {% include 'components/circular_image_directive.html' %}
   {% include 'components/profile_link_image_directive.html' %}
   {% include 'components/search_bar_directive.html' %}
   {% include 'components/search_results_directive.html' %}
-  {% include 'components/circular_image_directive.html' %}
 {% endblock %}
 
 {% block footer_js %}
   {{ super() }}
   <script>
+    {{ include_js_file('components/CircularImageDirective.js') }}
     {{ include_js_file('components/ProfileLinkImageDirective.js') }}
     {{ include_js_file('components/SearchBarDirective.js') }}
     {{ include_js_file('components/SearchResultsDirective.js') }}
-    {{ include_js_file('components/CircularImageDirective.js') }}
+
     {{ include_js_file('galleries/Gallery.js') }}
   </script>
 {% endblock footer_js %}

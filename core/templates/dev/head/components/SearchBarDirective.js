@@ -109,19 +109,10 @@ oppia.directive('searchBar', [function() {
           updateSelectionDetails(itemsType);
         };
 
-        var searchBarFullyLoaded = false;
-
-        var hasChangedSearchQuery = Boolean(urlService.getUrlParams().q);
         var onSearchQueryChangeExec = function() {
-          $scope.searchIsLoading = true;
           searchService.executeSearchQuery(
-              $scope.searchQuery, $scope.selectionDetails.categories.selections,
-              $scope.selectionDetails.languageCodes.selections, function() {
-            if (!hasChangedSearchQuery && searchBarFullyLoaded) {
-              hasChangedSearchQuery = true;
-              $rootScope.$broadcast('hasChangedSearchQuery');
-            }
-          });
+            $scope.searchQuery, $scope.selectionDetails.categories.selections,
+            $scope.selectionDetails.languageCodes.selections);
 
           var searchUrlQueryString = searchService.getSearchUrlQueryString(
             $scope.searchQuery, $scope.selectionDetails.categories.selections,
@@ -129,7 +120,7 @@ oppia.directive('searchBar', [function() {
           );
           if ($window.location.pathname == '/search/find') {
             $location.url('/find?q=' + searchUrlQueryString);
-          } else if ($scope.searchQuery != '') {
+          } else {
             $window.location.href = '/search/find?q=' + searchUrlQueryString;
           }
         };
@@ -162,30 +153,32 @@ oppia.directive('searchBar', [function() {
         };
 
         $scope.$on('$locationChangeSuccess', function() {
-          updateSearchFieldsBasedOnUrlQuery();
+          if (urlService.getUrlParams().hasOwnProperty('q')) {
+            updateSearchFieldsBasedOnUrlQuery();
+          }
         });
 
         $scope.$on(
           'preferredLanguageCodesLoaded',
           function(evt, preferredLanguageCodesList) {
-            for (var i = 0; i < preferredLanguageCodesList.length; i++) {
+            preferredLanguageCodesList.forEach(function(languageCode) {
               var selections = $scope.selectionDetails.languageCodes.selections;
-              var languageCode = preferredLanguageCodesList[i];
               if (!selections.hasOwnProperty(languageCode)) {
                 selections[languageCode] = true;
               } else {
                 selections[languageCode] = !selections[languageCode];
               }
-            }
+            });
 
             updateSelectionDetails('languageCodes');
 
-            if (Boolean(urlService.getUrlParams().q)) {
+            if (urlService.getUrlParams().hasOwnProperty('q')) {
               updateSearchFieldsBasedOnUrlQuery();
             }
-            onSearchQueryChangeExec();
 
-            searchBarFullyLoaded = true;
+            if ($window.location.pathname == '/search/find') {
+              onSearchQueryChangeExec();
+            }
           }
         );
       }

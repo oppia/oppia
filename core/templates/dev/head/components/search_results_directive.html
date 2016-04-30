@@ -1,6 +1,6 @@
 <script type="text/ng-template" id="components/searchResults">
   <div class="oppia-gallery-tiles-container">
-    <div ng-if="allExplorationsInOrder.length === 0" class="oppia-gallery-tiles-introduction">
+    <div ng-if="!someResultsExist" class="oppia-gallery-tiles-introduction" ng-cloak>
       <div class="oppia-gallery-no-match">
         <i class="material-icons md-100" style="color: #a2a3a2;">&#xE001;</i>
         <p style="text-align: center;">
@@ -13,6 +13,7 @@
         </p>
       </div>
     </div>
+
     <activity-tiles-infinity-grid></activity-tiles-infinity-grid>
   </div>
 </script>

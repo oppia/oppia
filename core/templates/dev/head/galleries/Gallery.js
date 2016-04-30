@@ -19,11 +19,11 @@
 oppia.controller('Gallery', [
   '$scope', '$http', '$rootScope', '$window', '$timeout',
   'ExplorationCreationButtonService', 'urlService', 'CATEGORY_LIST',
-  'searchService', 'siteAnalyticsService',
+  'searchService',
   function(
       $scope, $http, $rootScope, $window, $timeout,
       ExplorationCreationButtonService, urlService, CATEGORY_LIST,
-      searchService, siteAnalyticsService) {
+      searchService) {
     $rootScope.loadingMessage = 'Loading';
 
     // Below is the width of each tile (width + margins), which can be found
@@ -39,12 +39,6 @@ oppia.controller('Gallery', [
 
       $rootScope.$broadcast(
         'preferredLanguageCodesLoaded', data.preferred_language_codes);
-
-      if (data.username) {
-        if (urlService.getUrlParams().mode === 'create') {
-          $scope.showCreateExplorationModal(CATEGORY_LIST);
-        }
-      }
 
       $rootScope.loadingMessage = '';
 
@@ -165,12 +159,7 @@ oppia.controller('Gallery', [
       });
     });
 
-    $scope.showCreateExplorationModal = function() {
-      ExplorationCreationButtonService.showCreateExplorationModal(
-        CATEGORY_LIST);
-    };
-
-    // The following checks if gallery is in search mode
+    // The following checks if gallery is in search mode.
     $scope.inSearchMode = ($window.location.pathname.indexOf('/search') === 0);
     var activateSearchMode = function() {
       if (!$scope.inSearchMode) {
@@ -188,18 +177,10 @@ oppia.controller('Gallery', [
       for (i = 0; i < galleryGroup.categories.length; i++) {
         selectedCategories[galleryGroup.categories[i]] = true;
       }
-      searchService.executeSearchQuery('', selectedCategories, '', function() {
-        activateSearchMode();
-      });
-      // TODO(sll): Clear the search query from the search bar, too.
-    };
 
-    $scope.onRedirectToLogin = function(destinationUrl) {
-      siteAnalyticsService.registerStartLoginEvent('noSearchResults');
-      $timeout(function() {
-        $window.location = destinationUrl;
-      }, 150);
-      return false;
+      var targetSearchQueryUrl = searchService.getSearchUrlQueryString(
+        '', selectedCategories, {});
+      $window.location.href = '/search/find?q=' + targetSearchQueryUrl;
     };
   }
 ]);
