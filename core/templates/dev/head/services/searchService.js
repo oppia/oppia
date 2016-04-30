@@ -60,7 +60,7 @@ oppia.factory('searchService', [
     return querySuffix;
   };
 
-  var hasPageFinishedLoading = function() {
+  var hasReachedEndOfPage = function() {
     return _searchCursor === null;
   };
 
@@ -123,8 +123,8 @@ oppia.factory('searchService', [
         numSearchesInProgress--;
 
         if ($('.oppia-splash-search-input').val() === searchQuery) {
-          $rootScope.$broadcast('refreshGalleryData', data,
-                                hasPageFinishedLoading());
+          $rootScope.$broadcast('refreshSearchResults', data,
+                                hasReachedEndOfPage());
           _isCurrentlyFetchingResults = false;
         } else {
           console.log('Mismatch');
@@ -174,8 +174,7 @@ oppia.factory('searchService', [
         }
 
         try {
-          updateSearchFields(
-            itemsType, urlComponent, selectionDetails);
+          updateSearchFields(itemsType, urlComponent, selectionDetails);
         } catch (error) {
           selectionDetails[itemsType].selections = {};
           throw error;
@@ -184,9 +183,11 @@ oppia.factory('searchService', [
 
       return decodeURIComponent(querySegments[0]);
     },
-    loadMoreData: function(successCallback) {
-      // If a new query is still being sent, do not fetch more results.
-      if (_isCurrentlyFetchingResults) {
+    loadMoreData: function(successCallback, failureCallback) {
+      // If a new query is still being sent, or the end of the page has been
+      // reached, do not fetch more results.
+      if (_isCurrentlyFetchingResults || hasReachedEndOfPage()) {
+        failureCallback(hasReachedEndOfPage());
         return;
       }
 
@@ -204,7 +205,7 @@ oppia.factory('searchService', [
         _isCurrentlyFetchingResults = false;
 
         if (successCallback) {
-          successCallback(response.data, hasPageFinishedLoading());
+          successCallback(response.data, hasReachedEndOfPage());
         }
       });
     }

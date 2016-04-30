@@ -25,8 +25,6 @@
   <script type="text/javascript">
     GLOBALS.LANGUAGE_CODES_AND_NAMES = JSON.parse(
       '{{LANGUAGE_CODES_AND_NAMES|js_string}}');
-    GLOBALS.CAROUSEL_SLIDES_CONFIG = JSON.parse(
-      '{{CAROUSEL_SLIDES_CONFIG|js_string}}');
   </script>
 
   <style>
@@ -38,35 +36,8 @@
 
 {% block content %}
   <div ng-controller="Gallery" class="oppia-gallery-container">
-    <div ng-if="inSplashMode" class="oppia-gallery-banner-container">
-      <div class="oppia-gallery-banner-content">
-        Hi, I&rsquo;m Oppia
-      </div>
-      <carousel interval="CAROUSEL_INTERVAL">
-        <slide ng-repeat="slide in CAROUSEL_SLIDES track by $index" active="slide.active">
-          <div class="oppia-gallery-banner" style="background-image: url(/images/splash/<[slide.image_filename]>);">
-            <div class="oppia-gallery-banner-tagline">
-              Your personal tutor for
-              <a ng-href="/explore/<[slide.exploration_id]>" class="oppia-gallery-banner-link">
-                <[slide.topic]>
-              </a>
-            </div>
-          </div>
-        </slide>
-      </carousel>
-    </div>
-
     <div style="position: relative; z-index: 3;">
-      <div ng-if="inSplashMode" class="oppia-gallery-interstitial">
-        <span>
-          Oppia.org is a community for learning.
-          <div style="display: inline-block;">
-            <a href="/about">Find out more.</a>
-          </div>
-        </span>
-      </div>
-
-      <div class="oppia-gallery-tiles-area" ng-if="inSplashMode">
+      <div class="oppia-gallery-tiles-area" ng-if="!inSearchMode">
         <div class="oppia-gallery-tiles-container">
           <div class="oppia-gallery-group" ng-repeat="galleryGroup in galleryGroups track by $index">
             <!-- TODO(sll): Add card at end of the row that, when clicked, does showFullGalleryGroup(galleryGroup)" -->
@@ -107,7 +78,7 @@
           </div>
         </div>
       </div>
-      <div class="oppia-gallery-tiles-area" ng-if="!inSplashMode">
+      <div class="oppia-gallery-tiles-area" ng-if="inSearchMode">
         <search-results></search-results>
       </div>
   </div>

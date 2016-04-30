@@ -41,6 +41,7 @@ class ConfigProperty(object):
     these names:
     - admin_email_address
     - banner_alt_text
+    - carousel_slides_config
     - contribute_gallery_page_announcement
     - editor_page_announcement
     - editor_prerequisites_agreement

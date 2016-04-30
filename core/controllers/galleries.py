@@ -47,34 +47,6 @@ ALLOW_YAML_FILE_UPLOAD = config_domain.ConfigProperty(
     'Whether to allow file uploads via YAML in the gallery page.',
     default_value=False)
 
-CAROUSEL_SLIDES_CONFIG = config_domain.ConfigProperty(
-    'carousel_slides_config', {
-        'type': 'list',
-        'items': {
-            'type': 'dict',
-            'properties': [{
-                'name': 'topic',
-                'description': 'Topic of the exploration',
-                'schema': {'type': 'unicode'},
-            }, {
-                'name': 'exploration_id',
-                'description': 'The exploration ID',
-                'schema': {'type': 'unicode'},
-            }, {
-                'name': 'image_filename',
-                'description': (
-                    'Filename of the carousel image (in /images/splash)'),
-                'schema': {'type': 'unicode'},
-            }]
-        }
-    },
-    'Configuration for slides in the gallery carousel.',
-    default_value=[{
-        'topic': 'anything',
-        'exploration_id': '0',
-        'image_filename': 'default.jpg',
-    }])
-
 
 def get_matching_exploration_dicts(query_string, search_cursor):
     """Given a query string and a search cursor, returns a list of exploration
@@ -110,7 +82,6 @@ class GalleryPage(base.BaseHandler):
                 self.user_id and
                 user_services.has_fully_registered(self.user_id)),
             'SPLASH_PAGE_YOUTUBE_VIDEO_ID': SPLASH_PAGE_YOUTUBE_VIDEO_ID.value,
-            'CAROUSEL_SLIDES_CONFIG': CAROUSEL_SLIDES_CONFIG.value,
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
         })
@@ -132,7 +103,6 @@ class GallerySearchPage(base.BaseHandler):
                 self.user_id and
                 user_services.has_fully_registered(self.user_id)),
             'SPLASH_PAGE_YOUTUBE_VIDEO_ID': SPLASH_PAGE_YOUTUBE_VIDEO_ID.value,
-            'CAROUSEL_SLIDES_CONFIG': CAROUSEL_SLIDES_CONFIG.value,
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
         })
