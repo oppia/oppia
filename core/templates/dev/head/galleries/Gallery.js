@@ -19,11 +19,11 @@
 oppia.controller('Gallery', [
   '$scope', '$http', '$rootScope', '$window', '$timeout',
   'ExplorationCreationButtonService', 'urlService', 'CATEGORY_LIST',
-  'searchService', 'siteAnalyticsService',
+  'searchService',
   function(
       $scope, $http, $rootScope, $window, $timeout,
       ExplorationCreationButtonService, urlService, CATEGORY_LIST,
-      searchService, siteAnalyticsService) {
+      searchService) {
     $rootScope.loadingMessage = 'Loading';
 
     // Below is the width of each tile (width + margins), which can be found
