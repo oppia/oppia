@@ -42,6 +42,17 @@ SITE_FORUM_URL = config_domain.ConfigProperty(
     default_value='https://site/forum/url')
 
 
+class SplashPage(base.BaseHandler):
+    """Landing page for Oppia."""
+
+    def get(self):
+        """Handles GET requests."""
+        self.values.update({
+            'nav_mode': feconf.NAV_MODE_SPLASH,
+        })
+        self.render_template('pages/splash.html')
+
+
 class AboutPage(base.BaseHandler):
     """Page with information about Oppia."""
 

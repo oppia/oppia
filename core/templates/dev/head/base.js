@@ -16,6 +16,8 @@
  * @fileoverview Oppia's base controller.
  */
 
+// TODO(sll): Get this to read from a common JSON file; it's replicated in
+// feconf.
 oppia.constant('CATEGORY_LIST', [
   'Architecture',
   'Art',
@@ -29,7 +31,6 @@ oppia.constant('CATEGORY_LIST', [
   'Environment',
   'Geography',
   'Government',
-  'Hobbies',
   'Languages',
   'Law',
   'Life Skills',
@@ -42,7 +43,6 @@ oppia.constant('CATEGORY_LIST', [
   'Psychology',
   'Puzzles',
   'Reading',
-  'Religion',
   'Sport',
   'Statistics',
   'Welcome'
@@ -124,40 +124,6 @@ oppia.controller('Base', [
       return true;
     };
 
-    /**
-     * Adds content to an iframe.
-     * @param {Element} iframe - The iframe element to add content to.
-     * @param {string} content - The code for the iframe.
-     */
-    $scope.addContentToIframe = function(iframe, content) {
-      if (typeof iframe == 'string') {
-        iframe = document.getElementById(iframe);
-      }
-      if (!iframe) {
-        $log.error('Could not add content to iframe: no iframe found.');
-        return;
-      }
-      if (iframe.contentDocument) {
-        doc = iframe.contentDocument;
-      } else {
-        doc = (
-          iframe.contentWindow ? iframe.contentWindow.document :
-          iframe.document);
-      }
-      doc.open();
-      doc.writeln(content);
-      doc.close();
-    };
-
-    /**
-     * Adds content to an iframe where iframe is specified by its ID.
-     * @param {string} iframeId - The id of the iframe to add content to.
-     * @param {string} content - The code for the iframe.
-     */
-    $scope.addContentToIframeWithId = function(iframeId, content) {
-      $scope.addContentToIframe(document.getElementById(iframeId), content);
-    };
-
     // This method is here because the trigger for the tutorial is in the site
     // navbar. It broadcasts an event to tell the exploration editor to open the
     // editor tutorial.
@@ -212,19 +178,28 @@ oppia.controller('Base', [
       return false;
     };
 
-    $scope.windowIsNarrow = windowDimensionsService.getWidth() <= 1171;
+    var doesNavbarHaveSearchBar = function() {
+      return (
+        $window.location.pathname.indexOf('/search') === 0 ||
+        $window.location.pathname.indexOf('/gallery') === 0 ||
+        $window.location.pathname.indexOf('/library') === 0);
+    };
 
-    //  Method to check if the window size is narrow
-    $scope.recomputeWindowWidth = function() {
-      $scope.windowIsNarrow = windowDimensionsService.getWidth() <= 1171;
+    var navbarCutoffWidthPx = doesNavbarHaveSearchBar() ? 1171 : 630;
+
+    $scope.windowIsNarrow = (
+      windowDimensionsService.getWidth() <= navbarCutoffWidthPx);
+
+    windowDimensionsService.registerOnResizeHook(function() {
+      $scope.windowIsNarrow = (
+        windowDimensionsService.getWidth() <= navbarCutoffWidthPx);
       $scope.$apply();
 
       // If the window is now wide, and the sidebar is still open, close it.
       if (!$scope.windowIsNarrow) {
         $scope.sidebarIsShown = false;
       }
-    };
-    windowDimensionsService.registerOnResizeHook($scope.recomputeWindowWidth);
+    });
 
     $scope.pageHasLoaded = false;
     $scope.pendingSidebarClick = false;

@@ -142,7 +142,7 @@ def require_editor(handler):
         if not escaped_state_name:
             return handler(self, exploration_id, **kwargs)
 
-        state_name = self.unescape_state_name(escaped_state_name)
+        state_name = utils.unescape_encoded_uri_component(escaped_state_name)
         if state_name not in exploration.states:
             logging.error('Could not find state: %s' % state_name)
             logging.error('Available states: %s' % exploration.states.keys())
@@ -423,6 +423,9 @@ class ExplorationRightsHandler(EditorHandler):
 
             rights_manager.assign_role_for_exploration(
                 self.user_id, exploration_id, new_member_id, new_member_role)
+            email_manager.send_role_notification_email(
+                self.user_id, new_member_id, new_member_role, exploration_id,
+                exploration.title)
 
         elif is_public is not None:
             exploration = exp_services.get_exploration_by_id(exploration_id)
@@ -576,7 +579,7 @@ class UntrainedAnswersHandler(EditorHandler):
         except:
             raise self.PageNotFoundException
 
-        state_name = self.unescape_state_name(escaped_state_name)
+        state_name = utils.unescape_encoded_uri_component(escaped_state_name)
         if state_name not in exploration.states:
             # If trying to access a non-existing state, there is no training
             # data associated with it.
@@ -818,7 +821,7 @@ class StateRulesStatsHandler(EditorHandler):
         except:
             raise self.PageNotFoundException
 
-        state_name = self.unescape_state_name(escaped_state_name)
+        state_name = utils.unescape_encoded_uri_component(escaped_state_name)
         if state_name not in exploration.states:
             logging.error('Could not find state: %s' % state_name)
             logging.error('Available states: %s' % exploration.states.keys())

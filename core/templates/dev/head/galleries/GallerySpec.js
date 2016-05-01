@@ -28,7 +28,7 @@ describe('Gallery controller', function() {
 
     beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
       $httpBackend = _$httpBackend_;
-      $httpBackend.expectGET('/galleryhandler/data').respond({
+      $httpBackend.expectGET('/searchhandler/data').respond({
         allow_yaml_file_upload: false,
         explorations_list: [{
           id: '3',

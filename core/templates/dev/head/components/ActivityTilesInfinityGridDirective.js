@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for load more activity tiles
+ * @fileoverview Directive for an infinitely-scrollable view of activity tiles
  */
 
 oppia.directive('activityTilesInfinityGrid', [function() {
@@ -23,16 +23,29 @@ oppia.directive('activityTilesInfinityGrid', [function() {
     controller: [
       '$scope', '$rootScope', 'searchService',
       function($scope, $rootScope, searchService) {
+        $scope.endOfPageIsReached = false;
+        $scope.allExplorationsInOrder = [];
+
+        // Called when the first batch of search results is retrieved from the
+        // server.
+        $scope.$on(
+          'initialSearchResultsLoaded', function(evt, explorationsList) {
+            $scope.allExplorationsInOrder = explorationsList;
+          }
+        );
+
         $scope.showMoreExplorations = function() {
-          if (!$rootScope.loadingMessage) {
-            $scope.pageLoaderIsBusy = true;
-            searchService.loadMoreData(function(data,
-              hasPageFinishedLoading) {
+          if (!$rootScope.loadingMessage && !$scope.endOfPageIsReached) {
+            $scope.searchResultsAreLoading = true;
+            searchService.loadMoreData(function(data, endOfPageIsReached) {
               $scope.allExplorationsInOrder =
               $scope.allExplorationsInOrder.concat(
                 data.explorations_list);
-              $scope.finishedLoadingPage = hasPageFinishedLoading;
-              $scope.pageLoaderIsBusy = false;
+              $scope.endOfPageIsReached = endOfPageIsReached;
+              $scope.searchResultsAreLoading = false;
+            }, function(endOfPageIsReached) {
+              $scope.endOfPageIsReached = endOfPageIsReached;
+              $scope.searchResultsAreLoading = false;
             });
           }
         };
