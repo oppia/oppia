@@ -131,10 +131,7 @@
         <slide ng-repeat="slide in CAROUSEL_SLIDES track by $index" active="slide.active">
           <div class="oppia-gallery-banner" style="background-image: url(/images/splash/<[slide.image_filename]>);">
             <div class="oppia-gallery-banner-tagline">
-              <span translate="I18N_GALLERY_SUBTITLE"></span>
-              <a ng-href="/explore/<[slide.exploration_id]>" class="oppia-gallery-banner-link">
-                <[slide.topic | translate]>
-              </a>
+              <span translate="<[slide.translationKey]>" translate-values="{hrefUrl: '/explore/<[slide.exploration_id]>', classes:'oppia-gallery-banner-link'}"></span>
             </div>
           </div>
         </slide>

@@ -41,17 +41,6 @@ describe('Site language', function() {
     general.ensurePageHasNoTranslationIds();
   });
 
-  it('should not change between different pages', function() {
-    _selectLanguage('Español');
-    // Go to a different page
-    users.login('melia@example.com');
-    browser.get('/signup?return_url=http%3A%2F%2Flocalhost%3A4445%2F');
-    // Spanish is still selected
-    var title = element(by.css('.protractor-test-signup-page-title'));
-    expect(title.getText()).toEqual('Completa tu registro');
-    general.ensurePageHasNoTranslationIds();
-  });
-
   it('should use language selected in the Preferences page.', function() {
     users.createUser('varda@example.com', 'Varda');
     users.login('varda@example.com');

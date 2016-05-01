@@ -141,12 +141,12 @@ oppia.controller('Gallery', [
   '$scope', '$http', '$rootScope', '$modal', '$window', '$timeout',
   '$translate', 'ExplorationCreationButtonService', 'oppiaDatetimeFormatter',
   'oppiaDebouncer', 'urlService', 'GALLERY_DATA_URL', 'CATEGORY_LIST',
-  'searchService',
+  'searchService', 'i18nIdService',
   function(
       $scope, $http, $rootScope, $modal, $window, $timeout,
       $translate, ExplorationCreationButtonService, oppiaDatetimeFormatter,
       oppiaDebouncer, urlService, GALLERY_DATA_URL, CATEGORY_LIST,
-      searchService) {
+      searchService, i18nIdService) {
     $window.addEventListener('scroll', function() {
       var oppiaBanner = $('.oppia-gallery-banner-container');
       var oppiaTagline = $('.oppia-gallery-banner-tagline');
@@ -171,6 +171,9 @@ oppia.controller('Gallery', [
     for (var i = 0; i < $scope.CAROUSEL_SLIDES.length; i++) {
       var pic = new Image();
       pic.src = '/images/splash/' + $scope.CAROUSEL_SLIDES[i].image_filename;
+      // Generate the translation keys
+      $scope.CAROUSEL_SLIDES[i].translationKey = i18nIdService.getGalleryId(
+        'CAROUSEL_TITLE', $scope.CAROUSEL_SLIDES[i].topic);
     }
 
     $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {

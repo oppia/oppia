@@ -1,8 +1,7 @@
 {
   "I18N_GALLERY_PAGE_TITLE": "Oppia - Gallery",
   "I18N_GALLERY_TITLE": "Hi, I'm Oppia",
-  "I18N_GALLERY_SUBTITLE": "Your personal tutor for ",
-  "I18N_GALLERY_SUBTITLE_COLOR_anything": "anything",
+  "I18N_GALLERY_CAROUSEL_TITLE_ANYTHING": "Your personal tutor for <a href=\"<[hrefUrl]>\" class=\"<[classes]>\">anything</a>",
   "I18N_GALLERY_CREATE_EXPLORATION": "Create exploration",
   "I18N_GALLERY_UPLOAD_EXPLORATION": "Upload exploration",
   "I18N_GALLERY_SEARCH_PLACEHOLDER": "What are you curious about?",
