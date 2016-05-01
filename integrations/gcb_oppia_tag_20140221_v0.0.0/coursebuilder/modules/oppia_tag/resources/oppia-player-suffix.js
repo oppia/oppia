@@ -14,6 +14,8 @@
 
 /**
  * Custom suffix script for integrating Oppia with Course Builder.
+ *
+ * @author sll@google.com (Sean Lip)
  */
 
 /**

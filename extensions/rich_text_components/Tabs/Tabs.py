@@ -51,6 +51,7 @@ class Tabs(base.BaseRichTextComponent):
     frontend_name = 'tabs'
     tooltip = 'Insert tabs (e.g. for hints)'
     is_complex = True
+    is_block_element = True
 
     _customization_arg_specs = [{
         'name': 'tab_contents',
@@ -71,4 +72,3 @@ class Tabs(base.BaseRichTextComponent):
             'content': 'This is a first hint.'
         }],
     }]
-

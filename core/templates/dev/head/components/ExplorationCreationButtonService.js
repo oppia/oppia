@@ -159,14 +159,14 @@ oppia.factory('ExplorationCreationButtonService', [
               language_code: result.languageCode,
               objective: $filter('normalizeWhitespace')(result.objective),
               title: result.title
-            }).success(function(data) {
+            }).then(function(response) {
               siteAnalyticsService.registerCreateNewExplorationEvent(
-                data.explorationId);
+                response.data.explorationId);
               $timeout(function() {
-                $window.location = '/create/' + data.explorationId;
+                $window.location = '/create/' + response.data.explorationId;
               }, 150);
               return false;
-            }).error(function() {
+            }, function() {
               $rootScope.loadingMessage = '';
             });
           });

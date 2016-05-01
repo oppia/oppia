@@ -17,7 +17,6 @@
  * collection domain objects.
  */
 
-// TODO(bhenning): Implement validation functions and related tests.
 oppia.factory('CollectionObjectFactory', [
     'CollectionNodeObjectFactory', 'SkillListObjectFactory',
     function(CollectionNodeObjectFactory, SkillListObjectFactory) {
@@ -146,6 +145,14 @@ oppia.factory('CollectionObjectFactory', [
     // object.
     Collection.prototype.getBindableCollectionNodes = function() {
       return this._nodes;
+    };
+
+    // Returns a list of collection nodes which are initially available to play
+    // by the player.
+    Collection.prototype.getStartingCollectionNodes = function() {
+      return this._nodes.filter(function(collectionNode) {
+        return collectionNode.getPrerequisiteSkillList().isEmpty();
+      });
     };
 
     // Returns a list of all exploration IDs referenced by this collection.

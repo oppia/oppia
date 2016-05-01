@@ -94,9 +94,9 @@ describe('Exploration context service', function() {
       expect(ecs.getExplorationId).toThrow();
     });
 
-    it('should throw an error when trying to retrieve the page context',
+    it('should retrieve other as page context',
         function() {
-      expect(ecs.getPageContext).toThrow();
+      expect(ecs.getPageContext()).toBe('other');
     });
   });
 });

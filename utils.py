@@ -287,7 +287,7 @@ def convert_to_hash(input_string, max_length):
             (input_string, type(input_string)))
 
     encoded_string = base64.urlsafe_b64encode(
-        hashlib.sha1(input_string).digest())
+        hashlib.sha1(input_string.encode('utf-8')).digest())
 
     return encoded_string[:max_length]
 
