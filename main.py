@@ -151,6 +151,7 @@ URLS = MAPREDUCE_HANDLERS + [
         'my_explorations_handler'),
 
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
+    get_redirect_route(r'/splash', pages.SplashPage, 'splash_page'),
     get_redirect_route(
         r'/participate', pages.ParticipatePage, 'participate_page'),
     get_redirect_route(

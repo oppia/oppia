@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block subtitle %}
+  Splash
+{% endblock subtitle %}
+
+{% block header_js %}
+  {{ super() }}
+
+  <style>
+    html, body {
+      background-color: #AFD2EB;
+    }
+  </style>
+{% endblock %}
+
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+    <li>
+      <!--
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      Splash
+      -->
+    </li>
+  </ul>
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+
+  <div id="oppia-splash-section-one" class="text-center">
+    <h1 class="oppia-splash-h1">Think outside the books.</h1>
+    <div class="oppia-splash-background">
+      <img src="images/splash/Economics.svg" class="oppia-splash-back-images" />
+      <img src="images/splash/Computing.svg" class="oppia-splash-back-images" />
+      <img src="images/splash/Law.svg" class="oppia-splash-back-images" />
+      <img src="images/splash/Art.svg" class="oppia-splash-back-images" />
+      <img src="images/splash/Creativity.svg" class="oppia-splash-back-images" />
+      <img src="images/splash/Physics.svg" class="oppia-splash-back-images" />
+      <img src="images/splash/Language.svg" class="oppia-splash-back-images" />
+      <img src="images/splash/Arithmetic.svg" class="oppia-splash-back-images" />
+      <img src="images/splash/Chess.svg" class="oppia-splash-back-images" />
+
+      <img src="images/splash/Geography.svg" class="oppia-splash-back-images" />
+      <img src="images/splash/Biology.svg" class="oppia-splash-back-images" />
+      <img src="images/splash/Genetics.svg" class="oppia-splash-back-images" />
+      <img src="images/splash/Space.svg" class="oppia-splash-back-images" />
+      <img src="images/splash/Algebra.svg" class="oppia-splash-back-images" />
+      <img src="images/splash/Music.svg" class="oppia-splash-back-images" />
+      <img src="images/splash/Chemistry.svg" class="oppia-splash-back-images" />
+      <img src="images/splash/Poetry.svg" class="oppia-splash-back-images" />
+      <img src="images/splash/Puzzles.svg" class="oppia-splash-back-images" />
+
+      <img src="images/splash/Humor.svg" class="oppia-splash-back-images" />
+      <img src="images/splash/Philosophy.svg" class="oppia-splash-back-images" />
+      <img src="images/splash/Mathematics.svg" class="oppia-splash-back-images" />
+      <img src="images/splash/Religion.svg" class="oppia-splash-back-images" />
+      <img src="images/splash/Cooking.svg" class="oppia-splash-back-images" />
+      <img src="images/splash/Engineering.svg" class="oppia-splash-back-images" />
+      <img src="images/splash/Microbiology.svg" class="oppia-splash-back-images" />
+      <img src="images/splash/History.svg" class="oppia-splash-back-images" />
+      <img src="images/splash/Architecture.svg" class="oppia-splash-back-images" />
+    </div>
+    <img src="images/splash/books.svg" id="oppia-splash-books" />
+    <h2 class="oppia-splash-h2">Oppia makes it easy to create interactive explorations<br>that educate and engage.</h2>
+    <div class="row oppia-splash-buttons-row">
+      <button class="oppia-splash-buttons">BROWSE OUR EXPLORATIONS</button>
+      <button class="oppia-splash-buttons">CREATE YOUR OWN EXPLORATIONS</button>
+    </div>
+  </div>
+
+  <div id="oppia-splash-section-two">
+    <div class="oppia-splash-text">
+      <div class="row oppia-splash-bullet-row">
+        <div class="col-md-6">
+          Explorations are interactive lessons<br>that provide more immersive<br>experiences than static videos or text,<br>helping users learn by doing.
+        </div>
+        <div class="col-md-6">
+          <img class="oppia-splash-images" src="images/splash/bullet1icon.svg" />
+        </div>
+      </div>
+
+      <div class="row oppia-splash-bullet-row">
+        <div class="col-md-6">
+          <img class="oppia-splash-images" src="images/splash/bullet2icon.svg" />
+        </div>
+        <div class="col-md-6">
+          Explorations are simple to create. They are<br>easily adapted based on individual student<br>feedback and trends in the experience of<br>your learners around the world.
+        </div>
+      </div>
+
+      <div class="row oppia-splash-bullet-row">
+        <div class="col-md-6">
+          Oppia lets you create explorations<br>on a wide range of subjects,<br>limited only by your imagination.
+        </div>
+        <div class="col-md-6">
+          <img class="oppia-splash-images" src="images/splash/bullet3icon.svg" />
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // This scrolls the page to the anchor clicked on in the quick links menu.
+    $('a[href*=#]:not([href=#])').click(function() {
+      if (location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '')) {
+        var target = $('[name=' + this.hash.slice(1) +']');
+        if (target.length) {
+          $('html,body').animate({
+            scrollTop: target.offset().top
+          }, 1000);
+          return false;
+        }
+      }
+    });
+  </script>
+{% endblock %}

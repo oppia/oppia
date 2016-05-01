@@ -115,3 +115,12 @@ class PrivacyPage(base.BaseHandler):
             raise self.PageNotFoundException
 
         self.render_template('pages/privacy.html')
+
+
+class SplashPage(base.BaseHandler):
+    """New Splash page for Oppia"""
+
+    def get(self):
+        """Handles GET requests."""
+
+        return self.render_template('pages/splash.html')
