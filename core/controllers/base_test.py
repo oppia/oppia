@@ -97,7 +97,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         # Logged out state
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 302)
-        self.assertIn('gallery', response.headers['location'])
+        self.assertIn('splash', response.headers['location'])
 
         # Login and assert that there is a redirect
         self.login('user@example.com')
