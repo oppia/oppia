@@ -15,7 +15,6 @@
 # limitations under the License.
 
 import logging
-from contextlib import nested
 import os
 
 from core.domain import collection_services
@@ -139,39 +138,57 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_fetch_gravatar_success(self):
         user_email = 'user@example.com'
-        gravatar_filepath = os.path.join(
+        expected_gravatar_filepath = os.path.join(
             'static', 'images', 'avatar', 'gravatar_example.png')
-        with open(gravatar_filepath, 'r') as f:
+        with open(expected_gravatar_filepath, 'r') as f:
             gravatar = f.read()
         with self.urlfetch_mock(content=gravatar):
             profile_picture = user_services.fetch_gravatar(user_email)
-            gravatar_data_url = utils.convert_png_to_data_url(gravatar_filepath)
+            gravatar_data_url = utils.convert_png_to_data_url(
+                expected_gravatar_filepath)
             self.assertEqual(profile_picture, gravatar_data_url)
 
     def test_fetch_gravatar_failure_404(self):
         user_email = 'user@example.com'
-        logging_error_mock = test_utils.CallCounter(lambda x: x)
+        error_messages = []
+        def log_mock(message):
+            error_messages.append(message)
+
+        gravatar_url = user_services.get_gravatar_url(user_email)
+        expected_error_message = (
+            '[Status 404] Failed to fetch Gravatar from %s' % gravatar_url)
+        logging_error_mock = test_utils.CallCounter(log_mock)
         urlfetch_counter = test_utils.CallCounter(urlfetch.fetch)
-        with nested(
-            self.urlfetch_mock(status_code=404),
-            self.swap(logging, 'error', logging_error_mock),
-            self.swap(urlfetch, 'fetch', urlfetch_counter)):
+        urlfetch_mock_ctx = self.urlfetch_mock(status_code=404)
+        log_swap_ctx = self.swap(logging, 'error', logging_error_mock)
+        fetch_swap_ctx = self.swap(urlfetch, 'fetch', urlfetch_counter)
+        with urlfetch_mock_ctx, log_swap_ctx, fetch_swap_ctx:
             profile_picture = user_services.fetch_gravatar(user_email)
             self.assertEqual(urlfetch_counter.times_called, 1)
             self.assertEqual(logging_error_mock.times_called, 1)
+            self.assertEqual(expected_error_message, error_messages[0])
             self.assertEqual(
                 profile_picture, user_services.DEFAULT_IDENTICON_DATA_URL)
 
     def test_fetch_gravatar_failure_exception(self):
         user_email = 'user@example.com'
-        logging_error_mock = test_utils.CallCounter(lambda x: x)
+        error_messages = []
+        def log_mock(message):
+            error_messages.append(message)
+
+        gravatar_url = user_services.get_gravatar_url(user_email)
+        expected_error_message = (
+            'Failed to fetch Gravatar from %s' % gravatar_url)
+        logging_error_mock = test_utils.CallCounter(log_mock)
         urlfetch_fail_mock = test_utils.FailingFunction(
-            urlfetch.fetch, urlfetch.InvalidURLError, 'infinity')
-        with nested(
-            self.swap(logging, 'error', logging_error_mock),
-            self.swap(urlfetch, 'fetch', urlfetch_fail_mock)):
+            urlfetch.fetch, urlfetch.InvalidURLError,
+            test_utils.FailingFunction.INFINITY)
+        log_swap_ctx = self.swap(logging, 'error', logging_error_mock)
+        fetch_swap_ctx = self.swap(urlfetch, 'fetch', urlfetch_fail_mock)
+        with log_swap_ctx, fetch_swap_ctx:
             profile_picture = user_services.fetch_gravatar(user_email)
             self.assertEqual(logging_error_mock.times_called, 1)
+            self.assertEqual(expected_error_message, error_messages[0])
             self.assertEqual(
                 profile_picture, user_services.DEFAULT_IDENTICON_DATA_URL)
 

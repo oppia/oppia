@@ -229,7 +229,7 @@ def get_random_choice(alist):
 
 
 def convert_png_binary_to_data_url(content):
-    """Converts a png image string(content) to a data URL."""
+    """Converts a png image string (represented by 'content') to a data URL."""
     if imghdr.what(None, content) == 'png':
         return 'data:image/png;base64,%s' % urllib.quote(
             content.encode('base64'))

@@ -71,8 +71,10 @@ class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
         self.response = None
         self.request = None
 
-    def set_return_values(self, **kwargs):
-        self.return_values = kwargs
+    def set_return_values(self, content='', status_code=200, headers=None):
+        self.return_values['content'] = content
+        self.return_values['status_code'] = status_code
+        self.return_values['headers'] = headers
 
     def _Dynamic_Fetch(self, request, response): # pylint: disable=invalid-name
         return_values = self.return_values
@@ -280,7 +282,8 @@ class TestBase(unittest.TestCase):
         self.login(email)
         # Signup uses a custom urlfetch mock (URLFetchServiceMock), instead
         # of the stub provided by testbed. This custom mock is disabled
-        # immediately once the signup is complete.
+        # immediately once the signup is complete. This is done to avoid external 
+        # calls being made to Gravatar when running the backend tests.
         with self.urlfetch_mock():
             response = self.testapp.get(feconf.SIGNUP_URL)
             self.assertEqual(response.status_int, 200)
@@ -601,14 +604,15 @@ class AppEngineTestBase(TestBase):
         context of a 'with' statement.
 
         This mock is currently used for signup to prevent external HTTP
-        requests to fetch the Gravatar profile picture for new users.
+        requests to fetch the Gravatar profile picture for new users while the
+        backend tests are being run.
 
         args:
           - content: Response content or body.
           - status_code: Response status code.
           - headers: Response headers.
         """
-        if not headers:
+        if headers is None:
             response_headers = {}
         else:
             response_headers = headers
