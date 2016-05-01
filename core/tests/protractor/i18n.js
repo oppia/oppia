@@ -21,6 +21,7 @@
 
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
+var admin = require('../protractor_utils/admin.js');
 
 var _selectLanguage = function(language) {
   element(by.name('protractor-test-i18n-language-' + language)).click();
@@ -43,10 +44,10 @@ describe('Site language', function() {
   it('should not change between different pages', function() {
     _selectLanguage('Español');
     // Go to a different page
-    users.login('varda@example.com');
+    users.login('melia@example.com');
     browser.get('/signup?return_url=http%3A%2F%2Flocalhost%3A4445%2F');
     // Spanish is still selected
-    title = element(by.css('.protractor-test-signup-page-title'));
+    var title = element(by.css('.protractor-test-signup-page-title'));
     expect(title.getText()).toEqual('Completa tu registro');
     general.ensurePageHasNoTranslationIds();
   });
@@ -56,17 +57,15 @@ describe('Site language', function() {
     users.login('varda@example.com');
     browser.get('/preferences');
     element(by.css('.protractor-test-system-language-selector')).click();
-    element.all(by.css('.select2-drop-active li div')).each(
-      function(optionElem) {
-        optionElem.getText().then(function(text) {
-          if (text == 'Español') {
-            optionElem.click();
-            // The language has already changed
-            expect(element(by.css('.protractor-test-preferences-title'))
-              .getText()).toEqual('Preferencias');
-          }
+    var options = element.all(by.css('.select2-drop-active li div')).filter(
+      function(elem) {
+        return elem.getText().then(function(text) {
+          return text == 'Español';
         });
       });
+    options.first().click();
+    expect(element(by.css('.protractor-test-preferences-title'))
+      .getText()).toEqual('Preferencias');
     general.ensurePageHasNoTranslationIds();
     users.logout();
   });
@@ -95,5 +94,21 @@ describe('Site language', function() {
     _selectLanguage('Español');
     expect(browser.getTitle()).toEqual('Acerca de - Oppia');
     general.ensurePageHasNoTranslationIds();
+  });
+
+  it('should not change in an exploration', function() {
+    users.createUser('mangue@example.com', 'Mangue');
+    users.login('mangue@example.com', true);
+    browser.get('/gallery');
+    _selectLanguage('Español');
+    admin.reloadExploration('protractor_test_1.yaml');
+    // Open exploration
+    general.openPlayer('12');
+    // Spanish is still selected
+    var placeholder = element(by.css('.protractor-test-float-form-input'))
+      .getAttribute('placeholder');
+    expect(placeholder).toEqual('Ingresa un número');
+    general.ensurePageHasNoTranslationIds();
+    users.logout();
   });
 });

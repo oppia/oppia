@@ -45,20 +45,26 @@ oppia.constant('DEFAULT_TRANSLATIONS', {
 });
 
 oppia.controller('I18nFooter', [
-    '$rootScope', '$scope', '$translate',
-    function($rootScope, $scope, $translate) {
+    '$http', '$rootScope', '$scope', '$translate',
+    function($http, $rootScope, $scope, $translate) {
   // Changes the language of the translations.
+  var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
+  var _SAVE_SITE_LANGUAGE_URL = '/save_site_language';
   $scope.supportedSiteLanguages = GLOBALS.SUPPORTED_SITE_LANGUAGES;
+  if (GLOBALS.userIsLoggedIn) {
+    $http.get(_PREFERENCES_DATA_URL).success(function(data) {
+      $translate.use(data.preferred_site_language_code);
+    });
+  }
   $scope.changeLanguage = function(langCode) {
     $translate.use(langCode);
+    if (GLOBALS.userIsLoggedIn) {
+      $http.put(_SAVE_SITE_LANGUAGE_URL, {
+        site_language_code: langCode,
+        requestIsFromFooter: true
+      });
+    }
   };
-
-  // After loading default translations, change the language for the stored
-  // language if necessary.
-  $rootScope.$on('$translateLoadingSuccess', function() {
-    var currentLang = $translate.proposedLanguage() || $translate.use();
-    $translate.use(currentLang);
-  });
 }]);
 
 oppia.config([

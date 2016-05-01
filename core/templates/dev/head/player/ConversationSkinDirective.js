@@ -444,12 +444,15 @@ oppia.directive('conversationSkin', [function() {
             // If the exploration is embedded, use the exploration language
             // as site language. If the exploration language is not supported
             // as site language, English is used as default.
-            var siteLanguage = oppiaPlayerService.getExplorationLanguageCode();
-            if ($window.GLOBALS.SUPPORTED_SITE_LANGUAGES[siteLanguage] &&
-                $scope.isIframed) {
-              $translate.use(oppiaPlayerService.getExplorationLanguageCode());
-            } else {
-              $translate.use('en');
+            if ($scope.isIframed) {
+              console.log('Framed');
+              var siteLanguage = oppiaPlayerService
+                .getExplorationLanguageCode();
+              if ($window.GLOBALS.SUPPORTED_SITE_LANGUAGES[siteLanguage]) {
+                $translate.use(siteLanguage);
+              } else {
+                $translate.use('en');
+              }
             }
 
             $scope.adjustPageHeight(false, null);

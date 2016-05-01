@@ -437,9 +437,12 @@ class BaseHandler(webapp2.RequestHandler):
         # that tokens generated in one handler will be sent back to a handler
         # with the same page name.
         values['csrf_token'] = ''
+        values['csrf_token_for_footer'] = ''
         if self.REQUIRE_PAYLOAD_CSRF_CHECK and self.PAGE_NAME_FOR_CSRF:
             values['csrf_token'] = CsrfTokenManager.create_csrf_token(
                 self.user_id, self.PAGE_NAME_FOR_CSRF)
+            values['csrf_token_for_footer'] = (
+                CsrfTokenManager.create_csrf_token(self.user_id, 'footer'))
 
         self.response.cache_control.no_cache = True
         self.response.cache_control.must_revalidate = True

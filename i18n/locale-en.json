@@ -214,7 +214,7 @@
   "I18N_PLAYER_CONTINUE_NEXT_CARD": "Continue to next card",
   "I18N_ERROR_DISABLED_EXPLORATION_PAGE_TITLE": "Disabled Exploration - Oppia",
   "I18N_ERROR_DISABLED_EXPLORATION": "Disabled Exploration",
-  "I18N_ERROR_DISABLED_EXPLORATION_MESSAGE": "Sorry, but the exploration you clicked on is currently disabled. Please try again later. <[lala]>",
+  "I18N_ERROR_DISABLED_EXPLORATION_MESSAGE": "Sorry, but the exploration you clicked on is currently disabled. Please try again later.",
   "I18N_ERROR_NEXT_STEPS": "The best thing to do now is probably to return to the <a href=\"<[homeUrl]>\">home page</a>. However, if this issue recurs, and you think it shouldn't, please let us know on our <a href=\"<[issueTrackerUrl]>\" target=\"_blank\">issue tracker</a>. Sorry about this.",
   "I18N_ERROR_400_PAGE_TITLE": "Error 400 - Bad Request - Oppia",
   "I18N_ERROR_TITLE_400": "Error 400 - Bad Request",
