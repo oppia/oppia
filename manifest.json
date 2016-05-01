@@ -124,6 +124,26 @@
           "js": ["angular-translate-storage-cookie.min.js"]
         }
       },
+      "messageFormat": {
+        "version": "0.3.1",
+        "downloadFormat": "zip",
+        "url": "https://github.com/SlexAxton/messageformat.js/archive/v0.3.1.zip",
+        "targetDirPrefix": "messageformat-",
+        "rootDirPrefix": "messageformat.js-",
+        "bundle": {
+          "js": ["messageformat.js"]
+        }
+      },
+      "angularTranslateInterpolationMessageFormat": {
+        "version": "2.11.0",
+        "downloadFormat": "zip",
+        "url": "https://github.com/angular-translate/bower-angular-translate-interpolation-messageformat/archive/2.11.0.zip",
+        "rootDirPrefix": "bower-angular-translate-interpolation-messageformat-",
+        "targetDirPrefix": "bower-angular-translate-interpolation-messageformat-",
+        "bundle": {
+          "js": ["angular-translate-interpolation-messageformat.min.js"]
+        }
+      },
       "bootstrap": {
         "version": "3.3.4",
         "downloadFormat": "zip",

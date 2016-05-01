@@ -264,9 +264,11 @@ oppia.controller('SearchBar', [
       $scope.searchBarPlaceholder = $translate.instant(
         'I18N_GALLERY_SEARCH_PLACEHOLDER');
       $scope.categoryButtonText = $translate.instant(
-        $scope.selectionDetails.categories.summary, $scope.translationData);
+        $scope.selectionDetails.categories.summary, $scope.translationData,
+        'messageformat');
       $scope.languageButtonText = $translate.instant(
-        $scope.selectionDetails.languageCodes.summary, $scope.translationData);
+        $scope.selectionDetails.languageCodes.summary, $scope.translationData,
+        'messageformat');
     });
 
     $scope.searchIsLoading = false;

@@ -85,6 +85,7 @@ oppia.config([
     .fallbackLanguage('en')
     .determinePreferredLanguage()
     .useCookieStorage()
+    .addInterpolation('$translateMessageFormatInterpolation')
     // The strategy 'sanitize' does not support utf-8 encoding.
     // https://github.com/angular-translate/angular-translate/issues/1131
     // The strategy 'escape' will brake strings with raw html, like hyperlinks
