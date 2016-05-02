@@ -586,8 +586,7 @@ class UserProfilePictureOneOffJobTests(test_utils.GenericTestBase):
         def _mock_fetch_gravatar(unused_email):
             return self.FETCHED_GRAVATAR
 
-        with self.swap(
-                user_services, 'fetch_gravatar', _mock_fetch_gravatar):
+        with self.swap(user_services, 'fetch_gravatar', _mock_fetch_gravatar):
             self.process_and_flush_pending_tasks()
 
         # After the job runs, the data URL has been updated.
@@ -611,8 +610,7 @@ class UserProfilePictureOneOffJobTests(test_utils.GenericTestBase):
         def _mock_fetch_gravatar(unused_email):
             return self.FETCHED_GRAVATAR
 
-        with self.swap(
-                user_services, 'fetch_gravatar', _mock_fetch_gravatar):
+        with self.swap(user_services, 'fetch_gravatar', _mock_fetch_gravatar):
             self.process_and_flush_pending_tasks()
 
         # After the job runs, the data URL is still the manually-added one.
