@@ -3180,17 +3180,18 @@ md-card.preview-conversation-skin-supplemental-card {
   padding-bottom: 20px;
 }
 
-#oppia-splash-section-one {
+.oppia-splash-section-one {
   background-color: #AFD2EB;
 }
 
-#oppia-splash-section-two {
+.oppia-splash-section-two {
   background-color: #1DACB6;
   overflow: auto;
   color: #FFFFFF;
+  padding-top: 50px;
 }
 
-#oppia-splash-books {
+.oppia-splash-books {
   max-width: 70%;
   z-index: 5;
   margin-top: -25%;
