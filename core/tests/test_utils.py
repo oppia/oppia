@@ -282,8 +282,9 @@ class TestBase(unittest.TestCase):
         self.login(email)
         # Signup uses a custom urlfetch mock (URLFetchServiceMock), instead
         # of the stub provided by testbed. This custom mock is disabled
-        # immediately once the signup is complete. This is done to avoid external 
-        # calls being made to Gravatar when running the backend tests.
+        # immediately once the signup is complete. This is done to avoid
+        # external  calls being made to Gravatar when running the backend
+        # tests.
         with self.urlfetch_mock():
             response = self.testapp.get(feconf.SIGNUP_URL)
             self.assertEqual(response.status_int, 200)
