@@ -42,7 +42,10 @@
         <div ui-codemirror="{onLoad: initCodeEditor}">
         </div>
       </div>
-      <md-button type="submit" class="md-raised" ng-disabled="!hasLoaded">Run</md-button>
+	
+	<md-button type="button" class="md-raised" ng-click="testRun(code)" value = "test" >Test Run</md-button>
+	<md-button type="submit" class="md-raised" ng-disabled="!hasLoaded" value = "submit" >Submit</md-button>      
+	
       <span class="code-repl-language">
         <em>Language: <[language]></em>
       </span>

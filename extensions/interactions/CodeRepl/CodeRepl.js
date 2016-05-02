@@ -128,7 +128,23 @@ oppia.directive('oppiaInteractiveCodeRepl', [
             Sk.importMainWithBody('<stdin>', false, codeInput, true);
           }).then(function() {
             // Finished evaluating.
+
             $scope.sendResponse('', '');
+          }, function(err) {
+            if (!(err instanceof Sk.builtin.TimeLimitError)) {
+              $scope.sendResponse('', String(err));
+            }
+          });
+        };
+
+	$scope.testRun = function(codeInput) {
+          $scope.code = codeInput;
+          $scope.output = '';
+	   //Evaluation begins
+          Sk.misceval.asyncToPromise(function() {
+            Sk.importMainWithBody('<stdin>', false, codeInput, true);
+	   //finished evaluation
+          }).then(function() {     
           }, function(err) {
             if (!(err instanceof Sk.builtin.TimeLimitError)) {
               $scope.sendResponse('', String(err));
