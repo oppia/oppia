@@ -122,7 +122,6 @@ oppia.directive('oppiaInteractiveCodeRepl', [
         $scope.runCode = function(codeInput) {
           $scope.code = codeInput;
           $scope.output = '';
-
           // Evaluate the program asynchronously using Skulpt.
           Sk.misceval.asyncToPromise(function() {
             Sk.importMainWithBody('<stdin>', false, codeInput, true);
@@ -135,9 +134,9 @@ oppia.directive('oppiaInteractiveCodeRepl', [
               $scope.sendResponse('', String(err));
             }
           });
-        };
+    };
 
-	$scope.testRun = function(codeInput) {
+          $scope.testRun = function(codeInput) {
           $scope.code = codeInput;
           $scope.output = '';
 	   //Evaluation begins
