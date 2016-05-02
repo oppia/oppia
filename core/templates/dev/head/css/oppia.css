@@ -3165,30 +3165,47 @@ md-card.preview-conversation-skin-supplemental-card {
 /* New Splash page */
 
 .oppia-splash-h1, .oppia-splash-h2 {
-  color: #005C5E;
+  color: #005c5e;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
+  margin-top: 1em;
 }
 
-.oppia-splash-h1 {
-  font-size: 50px;
+@media (min-width: 610px) {
+  .oppia-splash-h1 {
+    font-size: 4vw;
+  }
+  .oppia-splash-h2 {
+    font-size: 3vw;
+  }
+}
+@media (max-width: 609px) {
+  .oppia-splash-h1 {
+    font-size: 2em;
+  }
+  .oppia-splash-h2 {
+    font-size: 1em;
+  }
 }
 
 .oppia-splash-h2 {
-  font-size: 30px;
   margin: 0 auto;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding-top: 30px;
+  padding-bottom: 30px;
 }
 
 .oppia-splash-section-one {
-  background-color: #AFD2EB;
+  background-color: #afd2eb;
 }
 
 .oppia-splash-section-two {
-  background-color: #1DACB6;
+  background-color: #51a8b6;
   overflow: auto;
-  color: #FFFFFF;
+  color: #fff;
   padding-top: 50px;
+}
+
+.oppia-splash-section-two-content {
+  margin: 50px 100px;
 }
 
 .oppia-splash-books {
@@ -3197,38 +3214,64 @@ md-card.preview-conversation-skin-supplemental-card {
   margin-top: -25%;
 }
 
-.oppia-splash-text {
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 1.1em;
-  margin: 50px 50px 50px 50px;
-  text-align: center;
-}
-
 .oppia-splash-bullet-row {
-  margin-bottom: 60px;
+  margin-bottom: 200px;
+  text-align: left;
 }
 
 .oppia-splash-buttons-row {
+  margin: 0 100px;
   position: relative;
   top: 21px;
 }
 
-.oppia-splash-buttons {
+.oppia-splash-column {
+  text-align: center;
+}
+.oppia-splash-text-block {
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  text-align: left;
+}
+.oppia-splash-image-block {
+  text-align: center;
+}
+
+@media (min-width: 610px) {
+  .oppia-splash-text-block {
+    font-size: 1.8vw;
+  }
+}
+@media (max-width: 610px) {
+  .oppia-splash-text-block {
+    font-size: 1.1em;
+  }
+}
+
+.oppia-splash-button {
   background-color: #006055;
-  border: none;
-  color: #FFFFFF;
+  border: 1px solid black;
+  border-radius: 0;
+  color: #fff;
+  font-size: 18px;
   padding: 10px;
+  width: 100%;
+}
+.oppia-splash-button:hover {
+  background-color: #006055;
+  font-weight: bold;
+  color: #fff;
 }
 
 .oppia-splash-background {
-  margin-left: -110px;
-  margin-right: -110px;
+  margin-left: -80px;
+  margin-right: -80px;
 }
 
 .oppia-splash-back-images {
-  max-width: 10%;
+  margin: -1px;
+  width: 10%;
 }
 
 .oppia-splash-images {
-  max-width: 80%;
+  width: 95%;
 }
