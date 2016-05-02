@@ -107,6 +107,44 @@ Here's how to make a one-off code change. (If you're working on a larger feature
   ```
 
 7. **Celebrate.** Congratulations, you have contributed to Oppia!
+ 
+### Style rules
+
+The pre-push hook should take care of most of the style issues (for Python and JavaScript code). However, we follow a few additional rules that aren't baked into the linter. Please adhere to these as well, in order to minimize back-and-forth during review.
+
+General
+- The last character in each file should be a newline. (If you're using Sublime, you can enforce this locally by adding `"ensure_newline_at_eof_on_save": true` to your user preferences file.)
+
+Python
+- There should be two empty lines before any top-level class or function definition.
+- When indenting from an open parenthesis ('('), prefer indenting by 4 rather than indenting from the position of the parenthesis. For example, prefer:
+
+  ```
+    my_function_with_a_really_long_name(
+        'abc', 'def', None)
+  ```
+over
+
+  ```
+    my_function_with_a_really_long_name('abc',
+                                        'def',
+                                        None)
+  ```
+- Docstrings should start with """ and end with """. The content of each docstring should be left-aligned. For example:
+
+  ```
+    """Check whether an email message with the same recipient_id,
+    email_subject and (cleaned) email_html_body has been sent in
+    the last DUPLICATE_EMAIL_INTERVAL_MINS.
+    """
+  ```
+
+JavaScript
+- We are moving away from using underscores as prefixes for variable names, so, in the future, use `var localVariable` and not `var _localVariable`. Instead, we are adopting the convention that anything declared using `var` is private to the controller/service/etc. If you want a variable to be accessible to the controller, declare it on $scope instead.
+
+CSS
+- Within each CSS rule, attributes should be alphabetized (e.g. 'height' before 'margin' before 'top'). This makes it easy to find the value of an attribute if there are lots of them.
+
 
 ### Notes
 
