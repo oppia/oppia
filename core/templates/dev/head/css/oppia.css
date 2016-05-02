@@ -3161,3 +3161,74 @@ md-card.preview-conversation-skin-supplemental-card {
   color: red;
   margin-bottom: 10px;
 }
+
+/* New Splash page */
+
+.oppia-splash-h1, .oppia-splash-h2 {
+  color: #005C5E;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+}
+
+.oppia-splash-h1 {
+  font-size: 50px;
+}
+
+.oppia-splash-h2 {
+  font-size: 30px;
+  margin: 0 auto;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.oppia-splash-section-one {
+  background-color: #AFD2EB;
+}
+
+.oppia-splash-section-two {
+  background-color: #1DACB6;
+  overflow: auto;
+  color: #FFFFFF;
+  padding-top: 50px;
+}
+
+.oppia-splash-books {
+  max-width: 70%;
+  z-index: 5;
+  margin-top: -25%;
+}
+
+.oppia-splash-text {
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 1.1em;
+  margin: 50px 50px 50px 50px;
+  text-align: center;
+}
+
+.oppia-splash-bullet-row {
+  margin-bottom: 60px;
+}
+
+.oppia-splash-buttons-row {
+  position: relative;
+  top: 21px;
+}
+
+.oppia-splash-buttons {
+  background-color: #006055;
+  border: none;
+  color: #FFFFFF;
+  padding: 10px;
+}
+
+.oppia-splash-background {
+  margin-left: -110px;
+  margin-right: -110px;
+}
+
+.oppia-splash-back-images {
+  max-width: 10%;
+}
+
+.oppia-splash-images {
+  max-width: 80%;
+}
