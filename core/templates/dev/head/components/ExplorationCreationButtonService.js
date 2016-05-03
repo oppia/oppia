@@ -130,7 +130,7 @@ oppia.factory('ExplorationCreationButtonService', [
         // render.
         $timeout(function() {
           focusService.setFocus('newActivityModalOpened');
-        }, 300);
+        }, 500);
       });
 
       return modalInstance;

@@ -367,6 +367,14 @@ def get_non_private_exploration_summaries():
         exp_models.ExpSummaryModel.get_non_private())
 
 
+def get_featured_exploration_summaries():
+    """Returns a dict with all featured exploration summary domain objects,
+    keyed by their id.
+    """
+    return _get_exploration_summaries_from_models(
+        exp_models.ExpSummaryModel.get_featured())
+
+
 def get_all_exploration_summaries():
     """Returns a dict with all exploration summary domain objects,
     keyed by their id.
@@ -1367,7 +1375,6 @@ def _get_search_rank(exp_id):
     and bad ones will lower it.
     """
     # TODO(sll): Improve this calculation.
-    time_now_msec = utils.get_current_time_in_millisecs()
     rating_weightings = {'1': -5, '2': -2, '3': 2, '4': 5, '5': 10}
 
     rights = rights_manager.get_exploration_rights(exp_id)
@@ -1382,17 +1389,6 @@ def _get_search_rank(exp_id):
             rank += (
                 summary.ratings[rating_value] *
                 rating_weightings[rating_value])
-
-    last_human_update_ms = _get_last_updated_by_human_ms(exp_id)
-
-    time_delta_days = int(
-        (time_now_msec - last_human_update_ms) / _MS_IN_ONE_DAY)
-    if time_delta_days == 0:
-        rank += 80
-    elif time_delta_days == 1:
-        rank += 50
-    elif 2 <= time_delta_days <= 7:
-        rank += 35
 
     # Ranks must be non-negative.
     return max(rank, 0)
@@ -1471,7 +1467,7 @@ def search_explorations(query, limit, sort=None, cursor=None):
           If there are more documents that match the query than 'limit', this
           function will return a cursor to get the next page.
 
-    returns: a tuple:
+    returns: a 2-tuple consisting of:
       - a list of exploration ids that match the query.
       - a cursor if there are more matching explorations to fetch, None
           otherwise. If a cursor is returned, it will be a web-safe string that

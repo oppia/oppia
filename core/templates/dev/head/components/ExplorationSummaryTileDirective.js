@@ -142,18 +142,17 @@ oppia.directive('explorationSummaryTile', [function() {
           return result;
         };
 
-        if ($scope.mobileCutoffPx == null) {
+        if (!$scope.mobileCutoffPx) {
           $scope.mobileCutoffPx = 0;
         }
         $scope.isWindowLarge = (
           windowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
-        $scope.recomputeWindowWidth = function() {
+
+        windowDimensionsService.registerOnResizeHook(function() {
           $scope.isWindowLarge = (
             windowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
           $scope.$apply();
-        };
-        windowDimensionsService.registerOnResizeHook(
-          $scope.recomputeWindowWidth);
+        });
       }
     ]
   };

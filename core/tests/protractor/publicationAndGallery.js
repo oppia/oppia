@@ -111,7 +111,7 @@ describe('Gallery view', function() {
     }];
 
     // We now check explorations are visible under the right conditions.
-    browser.get('/gallery');
+    browser.get('/search/find?q=&language_code=("en")');
     // The initial language selection should be just English.
     gallery.expectCurrentLanguageSelectionToBe([LANGUAGE_ENGLISH]);
     // At the start, no categories are selected.

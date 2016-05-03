@@ -16,6 +16,7 @@
 
 import json
 import logging
+import string
 
 from core.controllers import base
 from core.domain import collection_domain
@@ -33,11 +34,6 @@ import utils
     models.NAMES.base_model, models.NAMES.exploration])
 current_user_services = models.Registry.import_current_user_services()
 
-SPLASH_PAGE_YOUTUBE_VIDEO_ID = config_domain.ConfigProperty(
-    'splash_page_youtube_video_id', {'type': 'unicode'},
-    'The (optional) video id for the Splash page',
-    default_value='')
-
 EXPLORATION_ID_KEY = 'explorationId'
 COLLECTION_ID_KEY = 'collectionId'
 
@@ -46,37 +42,31 @@ ALLOW_YAML_FILE_UPLOAD = config_domain.ConfigProperty(
     'Whether to allow file uploads via YAML in the gallery page.',
     default_value=False)
 
-CAROUSEL_SLIDES_CONFIG = config_domain.ConfigProperty(
-    'carousel_slides_config', {
-        'type': 'list',
-        'items': {
-            'type': 'dict',
-            'properties': [{
-                'name': 'topic',
-                'description': 'Topic of the exploration',
-                'schema': {'type': 'unicode'},
-            }, {
-                'name': 'exploration_id',
-                'description': 'The exploration ID',
-                'schema': {'type': 'unicode'},
-            }, {
-                'name': 'image_filename',
-                'description': (
-                    'Filename of the carousel image (in /images/splash)'),
-                'schema': {'type': 'unicode'},
-            }]
-        }
-    },
-    'Configuration for slides in the gallery carousel.',
-    default_value=[{
-        'topic': 'anything',
-        'exploration_id': '0',
-        'image_filename': 'default.jpg',
-    }])
+
+def get_matching_exploration_dicts(query_string, search_cursor):
+    """Given a query string and a search cursor, returns a list of exploration
+       dicts that satisfy the search query.
+    """
+    exp_ids, new_search_cursor = (
+        exp_services.get_exploration_ids_matching_query(
+            query_string, cursor=search_cursor))
+
+    explorations_list = (
+        summary_services.get_displayable_exp_summary_dicts_matching_ids(
+            exp_ids))
+
+    if len(explorations_list) == feconf.DEFAULT_QUERY_LIMIT:
+        logging.error(
+            '%s explorations were fetched to load the gallery page. '
+            'You may be running up against the default query limits.'
+            % feconf.DEFAULT_QUERY_LIMIT)
+    return explorations_list, new_search_cursor
 
 
 class GalleryPage(base.BaseHandler):
-    """The exploration gallery page."""
+    """The exploration gallery page. Used for both the default list of
+    categories and for search results.
+    """
 
     PAGE_NAME_FOR_CSRF = 'gallery'
 
@@ -88,48 +78,75 @@ class GalleryPage(base.BaseHandler):
             'has_fully_registered': bool(
                 self.user_id and
                 user_services.has_fully_registered(self.user_id)),
-            'SPLASH_PAGE_YOUTUBE_VIDEO_ID': SPLASH_PAGE_YOUTUBE_VIDEO_ID.value,
-            'CAROUSEL_SLIDES_CONFIG': CAROUSEL_SLIDES_CONFIG.value,
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
+            'GALLERY_CATEGORY_FEATURED_EXPLORATIONS': (
+                feconf.GALLERY_CATEGORY_FEATURED_EXPLORATIONS),
         })
         self.render_template('galleries/gallery.html')
 
 
-class GalleryHandler(base.BaseHandler):
-    """Provides data for the exploration gallery page."""
+class DefaultGalleryCategoriesHandler(base.BaseHandler):
+    """Provides data for the default gallery page."""
 
     def get(self):
         """Handles GET requests."""
-        # TODO(sll): Figure out what to do about explorations in categories
-        # other than those explicitly listed.
-
-        query_string = self.request.get('q')
-        search_cursor = self.request.get('cursor', None)
-        exp_ids, search_cursor = (
-            exp_services.get_exploration_ids_matching_query(
-                query_string, cursor=search_cursor))
-
-        explorations_list = (
-            summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                exp_ids))
-
-        if len(explorations_list) == feconf.DEFAULT_QUERY_LIMIT:
-            logging.error(
-                '%s explorations were fetched to load the gallery page. '
-                'You may be running up against the default query limits.'
-                % feconf.DEFAULT_QUERY_LIMIT)
+        language_codes = self.request.get('language_codes', [])
+        summary_dicts_by_category = (
+            summary_services.get_gallery_category_groupings(language_codes))
 
         preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
+        featured_activity_summary_dicts = (
+            summary_services.get_featured_exploration_summary_dicts())
         if self.user_id:
             user_settings = user_services.get_user_settings(self.user_id)
             preferred_language_codes = user_settings.preferred_language_codes
 
+        if featured_activity_summary_dicts:
+            summary_dicts_by_category.insert(0, {
+                'activity_summary_dicts': featured_activity_summary_dicts,
+                'categories': [],
+                'header': feconf.GALLERY_CATEGORY_FEATURED_EXPLORATIONS,
+            })
+
+        self.values.update({
+            'activity_summary_dicts_by_category': (
+                summary_dicts_by_category),
+            'preferred_language_codes': preferred_language_codes,
+        })
+        self.render_json(self.values)
+
+
+class SearchHandler(base.BaseHandler):
+    """Provides data for exploration search results."""
+
+    def get(self):
+        """Handles GET requests."""
+        query_string = utils.unescape_encoded_uri_component(
+            self.request.get('q'))
+
+        # Remove all punctuation from the query string, and replace it with
+        # spaces. See http://stackoverflow.com/a/266162 and
+        # http://stackoverflow.com/a/11693937
+        remove_punctuation_map = dict(
+            (ord(char), None) for char in string.punctuation)
+        query_string = query_string.translate(remove_punctuation_map)
+
+        if self.request.get('category'):
+            query_string += ' category=%s' % self.request.get('category')
+        if self.request.get('language_code'):
+            query_string += ' language_code=%s' % self.request.get(
+                'language_code')
+        search_cursor = self.request.get('cursor', None)
+
+        explorations_list, new_search_cursor = get_matching_exploration_dicts(
+            query_string, search_cursor)
+
         self.values.update({
             'explorations_list': explorations_list,
-            'preferred_language_codes': preferred_language_codes,
-            'search_cursor': search_cursor,
+            'search_cursor': new_search_cursor,
         })
+
         self.render_json(self.values)
 
 

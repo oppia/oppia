@@ -57,7 +57,7 @@
 
     <link rel="apple-touch-icon" href="/images/logo/favicon.png">
     <title itemprop="name">{% block subtitle %}{% endblock %} - {% block maintitle %}Oppia{% endblock %}</title>
-
+    {% block base_url %}{% endblock base_url %}
     {% block header_css %}
       {% include 'header_css_libs.html' %}
     {% endblock header_css %}
@@ -121,7 +121,7 @@
                     <a ng-if="windowIsNarrow" ng-click="openSidebar()" class="navbar-brand oppia-navbar-menu oppia-transition-200">
                       <i class="material-icons oppia-navbar-menu-icon">&#xE5D2;</i>
                     </a>
-                    <a class="oppia-navbar-brand-name oppia-transition-200" href="/gallery" focus-on="<[LABEL_FOR_CLEARING_FOCUS]>">
+                    <a class="oppia-navbar-brand-name oppia-transition-200" href="/" focus-on="<[LABEL_FOR_CLEARING_FOCUS]>">
                       <img src="/images/logo/288x128_logo_white.png" class="oppia-logo" ng-class="windowIsNarrow ? 'oppia-logo-small' : 'oppia-logo-wide'">
                     </a>
                     <!-- This is needed for the correct image to appear when an exploration is shared using G+. -->
@@ -261,7 +261,7 @@
                             </li>
                             <li class="oppia-clickable-navbar-element pull-right">
                               <a class="oppia-navbar-tab" href="/gallery">
-                                Explore
+                                Library
                               </a>
                             </li>
                           </ul>
@@ -314,7 +314,8 @@
     {% include 'components/exploration_summary_tile_directive.html' %}
     {% include 'components/rating_display.html' %}
     {% include 'components/create_exploration_button_directive.html' %}
-    {% include 'components/activity_tiles_infinity_grid.html' %}
+    {% include 'components/activity_tiles_infinity_grid_directive.html' %}
+    {% include 'components/loading_dots_directive.html' %}
 
     <script>
       {{ include_js_file('app.js') }}
@@ -337,7 +338,7 @@
       {{ include_js_file('components/Select2DropdownDirective.js') }}
       {{ include_js_file('components/CreateExplorationButtonDirective.js') }}
       {{ include_js_file('components/ExplorationCreationButtonService.js') }}
-      {{ include_js_file('components/activityTilesInfinityGrid.js') }}
+      {{ include_js_file('components/ActivityTilesInfinityGridDirective.js') }}
 
       {{ include_js_file('expressions/expressionSyntaxTree.js') }}
       {{ include_js_file('expressions/evaluator.js') }}

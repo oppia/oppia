@@ -367,6 +367,15 @@ class ExpSummaryModel(base_models.BaseModel):
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
+    def get_featured(cls):
+        """Returns an iterable with featured exp summary models."""
+        return ExpSummaryModel.query().filter(
+            ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PUBLICIZED
+        ).filter(
+            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
     def get_private_at_least_viewable(cls, user_id):
         """Returns an iterable with private exp summaries that are at least
         viewable by the given user.
