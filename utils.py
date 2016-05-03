@@ -17,6 +17,7 @@
 import base64
 import datetime
 import hashlib
+import imghdr
 import json
 import os
 import random
@@ -227,14 +228,19 @@ def get_random_choice(alist):
     return alist[index]
 
 
-def convert_png_to_data_url(filepath):
-    """Converts the png file at filepath to a data URL.
+def convert_png_binary_to_data_url(content):
+    """Converts a png image string (represented by 'content') to a data URL."""
+    if imghdr.what(None, content) == 'png':
+        return 'data:image/png;base64,%s' % urllib.quote(
+            content.encode('base64'))
+    else:
+        raise Exception('The given string does not represent a PNG image.')
 
-    This method is currently used only in tests for RTE extensions.
-    """
+
+def convert_png_to_data_url(filepath):
+    """Converts the png file at filepath to a data URL."""
     file_contents = get_file_contents(filepath, raw_bytes=True, mode='rb')
-    return 'data:image/png;base64,%s' % urllib.quote(
-        file_contents.encode('base64'))
+    return convert_png_binary_to_data_url(file_contents)
 
 
 def camelcase_to_hyphenated(camelcase_str):

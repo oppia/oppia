@@ -58,7 +58,7 @@ class ProfilePage(base.BaseHandler):
 
         self.values.update({
             'nav_mode': feconf.NAV_MODE_PROFILE,
-            'PROFILE_USERNAME': username,
+            'PROFILE_USERNAME': user_settings.username,
         })
         self.render_template('profile/profile.html')
 
@@ -91,6 +91,7 @@ class ProfileHandler(base.BaseHandler):
                     user_contributions.edited_exploration_ids))
 
         self.values.update({
+            'profile_username': user_settings.username,
             'user_bio': user_settings.user_bio,
             'subject_interests': user_settings.subject_interests,
             'first_contribution_msec': (
@@ -279,6 +280,8 @@ class SignupHandler(base.BaseHandler):
         # time.
         if feconf.CAN_SEND_EMAILS_TO_USERS and not has_ever_registered:
             email_manager.send_post_signup_email(self.user_id)
+
+        user_services.generate_initial_profile_picture(self.user_id)
 
         self.render_json({})
 
