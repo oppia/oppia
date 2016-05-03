@@ -49,6 +49,7 @@ class ConfigProperty(object):
     - sharing_options_twitter_text
     - splash_page_exploration_id
     - splash_page_exploration_version
+    - splash_page_youtube_video_id
     """
 
     def refresh_default_value(self, default_value):

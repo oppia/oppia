@@ -34,11 +34,6 @@ import utils
     models.NAMES.base_model, models.NAMES.exploration])
 current_user_services = models.Registry.import_current_user_services()
 
-SPLASH_PAGE_YOUTUBE_VIDEO_ID = config_domain.ConfigProperty(
-    'splash_page_youtube_video_id', {'type': 'unicode'},
-    'The (optional) video id for the Splash page',
-    default_value='')
-
 EXPLORATION_ID_KEY = 'explorationId'
 COLLECTION_ID_KEY = 'collectionId'
 
@@ -69,7 +64,9 @@ def get_matching_exploration_dicts(query_string, search_cursor):
 
 
 class GalleryPage(base.BaseHandler):
-    """The exploration gallery page."""
+    """The exploration gallery page. Used for both the default list of
+    categories and for search results.
+    """
 
     PAGE_NAME_FOR_CSRF = 'gallery'
 
@@ -81,32 +78,10 @@ class GalleryPage(base.BaseHandler):
             'has_fully_registered': bool(
                 self.user_id and
                 user_services.has_fully_registered(self.user_id)),
-            'SPLASH_PAGE_YOUTUBE_VIDEO_ID': SPLASH_PAGE_YOUTUBE_VIDEO_ID.value,
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
             'GALLERY_CATEGORY_FEATURED_EXPLORATIONS': (
                 feconf.GALLERY_CATEGORY_FEATURED_EXPLORATIONS),
-        })
-        self.render_template('galleries/gallery.html')
-
-
-class GallerySearchPage(base.BaseHandler):
-    """The exploration gallery search page."""
-
-    PAGE_NAME_FOR_CSRF = 'gallery'
-
-    def get(self):
-        """Handles GET requests."""
-
-        self.values.update({
-            'nav_mode': feconf.NAV_MODE_GALLERY,
-            'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
-            'has_fully_registered': bool(
-                self.user_id and
-                user_services.has_fully_registered(self.user_id)),
-            'SPLASH_PAGE_YOUTUBE_VIDEO_ID': SPLASH_PAGE_YOUTUBE_VIDEO_ID.value,
-            'LANGUAGE_CODES_AND_NAMES': (
-                utils.get_all_language_codes_and_names()),
         })
         self.render_template('galleries/gallery.html')
 

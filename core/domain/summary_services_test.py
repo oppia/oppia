@@ -356,12 +356,6 @@ class FeaturedExplorationDisplayableSummariesTest(
             'tags': [],
             'thumbnail_icon_url': '/images/gallery/thumbnails/Lightbulb.svg',
             'language_code': feconf.DEFAULT_LANGUAGE_CODE,
-            'human_readable_contributors_summary': {
-                self.ALBERT_NAME: {
-                    'num_commits': 1,
-                    'profile_picture_data_url': None
-                }
-            },
             'id': self.EXP_ID_2,
             'category': u'A category',
             'ratings': feconf.get_empty_ratings(),
@@ -369,5 +363,5 @@ class FeaturedExplorationDisplayableSummariesTest(
             'num_views': 0,
             'objective': u'An objective'
         }
-        self.assertDictContainsSubset(expected_summary,
-                                      featured_exploration_summaries[0])
+        self.assertDictContainsSubset(
+            expected_summary, featured_exploration_summaries[0])
