@@ -3171,13 +3171,23 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-splash-h1, .oppia-splash-h2 {
   color: #005c5e;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  margin-top: 1em;
+  padding-top: 1em;
+}
+
+.oppia-splash-h1 {
+  margin: 0 auto;
+  padding-bottom: 1em;
+}
+
+.oppia-splash-h2-container {
+  margin: 0 auto;
+  max-width: 900px;
 }
 
 .oppia-splash-h2 {
   line-height: 1.6em;
   margin: 0 auto;
-  padding-bottom: 30px;
+  padding-bottom: 50px;
 }
 
 @media (min-width: 630px) {
@@ -3231,6 +3241,11 @@ md-card.preview-conversation-skin-supplemental-card {
   }
 }
 
+.oppia-splash-section-two {
+  background-color: #51a8b6;
+  color: #fff;
+}
+
 .oppia-splash-button {
   background-color: #015c53;
   border-radius: 0;
@@ -3258,43 +3273,40 @@ md-card.preview-conversation-skin-supplemental-card {
   margin-top: 50px;
 }
 
-.oppia-splash-section-two {
-  background-color: #51a8b6;
-  color: #fff;
-}
-
 .oppia-splash-section-two-content {
-  margin: 50px 100px;
   padding-top: 160px;
 }
 
-.oppia-splash-bullet-row {
-  margin-bottom: 200px;
-  text-align: left;
+.oppia-splash-bullet {
+  margin: 0 auto 80px;
+  max-width: 900px;
+  overflow: hidden;
+  position: relative;
+  width: 80%;
 }
 
 .oppia-splash-column {
   text-align: center;
 }
-.oppia-splash-text-block {
+.oppia-splash-bullet-block {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 1.1em;
+  margin-bottom: 10px;
+  max-width: 500px;
   text-align: left;
-}
-.oppia-splash-image-block {
-  text-align: center;
+  width: 100%;
 }
 
 @media (min-width: 610px) {
-  .oppia-splash-text-block {
-    font-size: 1.8vw;
+  .oppia-splash-bullet-block {
+    display: inline-block;
+    width: 48%;
   }
-}
-@media (max-width: 610px) {
-  .oppia-splash-text-block {
-    font-size: 1.1em;
-  }
-}
 
-.oppia-splash-images {
-  width: 95%;
+  .oppia-splash-block-left {
+    float: left;
+  }
+  .oppia-splash-block-right {
+    float: right;
+  }
 }
