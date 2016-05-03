@@ -152,7 +152,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
           });
         };
 
-         var initMarkers = function(editor) {
+        var initMarkers = function(editor) {
           var doc = editor.getDoc();
 
           // The -1 here is because prepended code ends with a newline.
