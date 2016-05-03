@@ -55,7 +55,7 @@ Here's how to make a one-off code change. (If you're working on a larger feature
 
 3. **Make a commit to your feature branch.** Each commit should be self-contained and have a descriptive commit message that helps other developers understand why the changes were made.
   * You can refer to relevant issues in the commit message by writing, e.g., "Fixes #105".
-  * In general, code should be formatted consistently with other code around it; we use Google's [Python](http://google-styleguide.googlecode.com/svn/trunk/pyguide.html) and [JavaScript](https://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml) style guides as a reference. If you use [Sublime Text](http://www.sublimetext.com/), consider installing the SublimeLinter, [SublimeLinter-jscs](https://github.com/SublimeLinter/SublimeLinter-jscs) and [SublimeLinter-pylint](https://github.com/SublimeLinter/SublimeLinter-pylint) plugins, following the instructions on their respective pages.
+  * In general, code should be formatted consistently with other code around it; we use Google's [Python](http://google-styleguide.googlecode.com/svn/trunk/pyguide.html) and [JavaScript](https://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml) style guides as a reference. If you use [Sublime Text](http://www.sublimetext.com/), consider installing the SublimeLinter, [SublimeLinter-jscs](https://github.com/SublimeLinter/SublimeLinter-jscs) and [SublimeLinter-pylint](https://github.com/SublimeLinter/SublimeLinter-pylint) plugins, following the instructions on their respective pages. Please also ensure that your code follows [these additional style rules](https://github.com/oppia/oppia/blob/develop/CONTRIBUTING.md#style-rules).
   * Please ensure that the code you write is well-tested.
   * Before making the commit, start up a local instance of Oppia and do some manual testing in order to check that you haven't broken anything! After that, ensure that the added code has no lint errors and passes all automated tests by running the presubmit script:
 
@@ -107,6 +107,46 @@ Here's how to make a one-off code change. (If you're working on a larger feature
   ```
 
 7. **Celebrate.** Congratulations, you have contributed to Oppia!
+ 
+### Style rules
+
+The pre-push hook should take care of most of the style issues (for Python and JavaScript code). However, we follow a few additional rules that aren't baked into the linter. Please adhere to these as well, in order to minimize back-and-forth during review.
+
+General
+- The last character in each file should be a newline. (If you're using Sublime, you can enforce this locally by adding `"ensure_newline_at_eof_on_save": true` to your user preferences file.)
+
+Python
+- There should be two empty lines before any top-level class or function definition.
+- When indenting from an open parenthesis ('('), prefer indenting by 4 rather than indenting from the position of the parenthesis. For example, prefer:
+
+  ```
+    my_function_with_a_really_long_name(
+        'abc', 'def', None)
+  ```
+over
+
+  ```
+    my_function_with_a_really_long_name('abc',
+                                        'def',
+                                        None)
+  ```
+- Docstrings should start with """ and end with """. The content of each docstring should be left-aligned. For example:
+
+  ```
+    """Check whether an email message with the same recipient_id,
+    email_subject and (cleaned) email_html_body has been sent in
+    the last DUPLICATE_EMAIL_INTERVAL_MINS.
+    """
+  ```
+
+JavaScript
+- We are moving away from using underscores as prefixes for variable names, so, in the future, use `var localVariable` and not `var _localVariable`. Instead, we are adopting the convention that anything declared using `var` is private to the controller/service/etc. If you want a variable to be accessible to the controller, declare it on $scope instead.
+
+CSS
+- Within each CSS rule, attributes should be alphabetized (e.g. 'height' before 'margin' before 'top'). This makes it easy to find the value of an attribute if there are lots of them.
+- If the CSS class is oppia-specific, prefix it with `oppia-`. This helps distinguish it from CSS classes used by other third-party libraries. 
+- For directives, include the CSS in the directive template file, similar to what we do in `core/templates/dev/head/components/exploration_summary_tile_directive.html`. (Note that, in this case, all CSS rules should start with the top-level CSS class of the directive, so that they don't affect other elements outside it.) All other CSS should go in `core/templates/dev/head/css/oppia.css`.
+
 
 ### Notes
 

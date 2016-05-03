@@ -735,7 +735,7 @@ textarea {
 
 .navbar-default .dropdown-menu {
   background: #fff;
-  margin-top: 0px;
+  margin-top: 0;
 }
 
 .navbar-default .navbar-nav > li > a, {
@@ -1403,11 +1403,34 @@ md-card.oppia-gallery-tile {
   font-style: italic;
 }
 
+@media(max-width: 1099px) {
+  .oppia-publish-exploration-button {
+    padding-bottom: 3px;
+  }
+  .oppia-save-draft-button {
+    padding-bottom: 3px;
+    width: 40px;
+  }
+}
+
 @media(min-width: 1100px) {
   .material-icons.oppia-save-publish-button-icon,
   .oppia-save-publish-loading.oppia-save-publish-button-icon {
     display: none;
   }
+
+  .oppia-publish-exploration-button {
+    padding-bottom: 6px;
+  }
+  .oppia-save-draft-button {
+    padding-bottom: 6px;
+    width: 95px;
+  }
+}
+
+/* Overwrite the Bootstrap defaults. */
+.nav > li > a.oppia-editor-navbar-tab-anchor {
+  padding: 15px 11px;
 }
 
 .oppia-save-publish-loading.oppia-save-publish-button-icon {

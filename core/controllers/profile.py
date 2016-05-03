@@ -281,6 +281,8 @@ class SignupHandler(base.BaseHandler):
         if feconf.CAN_SEND_EMAILS_TO_USERS and not has_ever_registered:
             email_manager.send_post_signup_email(self.user_id)
 
+        user_services.generate_initial_profile_picture(self.user_id)
+
         self.render_json({})
 
 
