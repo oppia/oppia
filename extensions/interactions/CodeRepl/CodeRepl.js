@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 /**
  * Directive for the CodeRepl interaction.
  *
@@ -20,287 +19,285 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaInteractiveCodeRepl', [
-  'oppiaHtmlEscaper', 'codeReplRulesService',
-  function(oppiaHtmlEscaper, codeReplRulesService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: 'interaction/CodeRepl',
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.language = oppiaHtmlEscaper.escapedJsonToObj(
-          $attrs.languageWithValue);
-        $scope.placeholder = oppiaHtmlEscaper.escapedJsonToObj(
-          $attrs.placeholderWithValue);
-        $scope.preCode = oppiaHtmlEscaper.escapedJsonToObj(
-          $attrs.preCodeWithValue);
-        $scope.postCode = oppiaHtmlEscaper.escapedJsonToObj(
-          $attrs.postCodeWithValue);
+    'oppiaHtmlEscaper', 'codeReplRulesService',
+    function(oppiaHtmlEscaper, codeReplRulesService) {
+        return {
+            restrict: 'E',
+            scope: {},
+            templateUrl: 'interaction/CodeRepl',
+            controller: ['$scope', '$attrs', function($scope, $attrs) {
+                $scope.language = oppiaHtmlEscaper.escapedJsonToObj(
+                    $attrs.languageWithValue);
+                $scope.placeholder = oppiaHtmlEscaper.escapedJsonToObj(
+                    $attrs.placeholderWithValue);
+                $scope.preCode = oppiaHtmlEscaper.escapedJsonToObj(
+                    $attrs.preCodeWithValue);
+                $scope.postCode = oppiaHtmlEscaper.escapedJsonToObj(
+                    $attrs.postCodeWithValue);
 
-        // Make sure $scope.preCode ends with a newline:
-        if ($scope.preCode.trim().length === 0) {
-          $scope.preCode = '';
-        } else if (!$scope.preCode.endsWith('\n')) {
-          $scope.preCode += '\n';
-        }
+                // Make sure $scope.preCode ends with a newline:
+                if ($scope.preCode.trim().length === 0) {
+                    $scope.preCode = '';
+                } else if (!$scope.preCode.endsWith('\n')) {
+                    $scope.preCode += '\n';
+                }
 
-        // Make sure $scope.placeholder ends with a newline.
-        if (!$scope.placeholder.endsWith('\n')) {
-          $scope.placeholder += '\n';
-        }
+                // Make sure $scope.placeholder ends with a newline.
+                if (!$scope.placeholder.endsWith('\n')) {
+                    $scope.placeholder += '\n';
+                }
 
-        $scope.hasLoaded = false;
+                $scope.hasLoaded = false;
 
-        // Keep the code string given by the user and the stdout from the
-        // evaluation until sending them back to the server.
-        $scope.code = (
-          $scope.preCode + $scope.placeholder + $scope.postCode);
-        $scope.output = '';
+                // Keep the code string given by the user and the stdout from the
+                // evaluation until sending them back to the server.
+                $scope.code = (
+                    $scope.preCode + $scope.placeholder + $scope.postCode);
+                $scope.output = '';
 
-        $scope.initCodeEditor = function(editor) {
-          editor.setValue($scope.code);
+                $scope.initCodeEditor = function(editor) {
+                    editor.setValue($scope.code);
 
-          // Options for the ui-codemirror display.
-          editor.setOption('lineNumbers', true);
-          editor.setOption('indentWithTabs', true);
-          editor.setOption('indentUnit', 4);
-          editor.setOption('mode', 'python');
-          editor.setOption('extraKeys', {
-            Tab: function(cm) {
-              var spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
-              cm.replaceSelection(spaces);
-              // Move the cursor to the end of the selection.
-              var endSelectionPos = cm.getDoc().getCursor('head');
-              cm.getDoc().setCursor(endSelectionPos);
-            }
-          });
-          editor.setOption('theme', 'preview default');
+                    // Options for the ui-codemirror display.
+                    editor.setOption('lineNumbers', true);
+                    editor.setOption('indentWithTabs', true);
+                    editor.setOption('indentUnit', 4);
+                    editor.setOption('mode', 'python');
+                    editor.setOption('extraKeys', {
+                        Tab: function(cm) {
+                            var spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
+                            cm.replaceSelection(spaces);
+                            // Move the cursor to the end of the selection.
+                            var endSelectionPos = cm.getDoc().getCursor('head');
+                            cm.getDoc().setCursor(endSelectionPos);
+                        }
+                    });
+                    editor.setOption('theme', 'preview default');
 
-          // NOTE: this is necessary to avoid the textarea being greyed-out.
-          setTimeout(function() {
-            editor.refresh();
-            initMarkers(editor);
-          }, 200);
+                    // NOTE: this is necessary to avoid the textarea being greyed-out.
+                    setTimeout(function() {
+                        editor.refresh();
+                        initMarkers(editor);
+                    }, 200);
 
-          editor.on('change', function() {
-            $scope.code = editor.getValue();
-          });
+                    editor.on('change', function() {
+                        $scope.code = editor.getValue();
+                    });
 
-          // Without this, the editor does not show up correctly on small
-          // screens when the user switches to the supplemental interaction.
-          $scope.$on('showInteraction', function() {
-            setTimeout(function() {
-              editor.refresh();
-              initMarkers(editor);
-            }, 200);
-          });
+                    // Without this, the editor does not show up correctly on small
+                    // screens when the user switches to the supplemental interaction.
+                    $scope.$on('showInteraction', function() {
+                        setTimeout(function() {
+                            editor.refresh();
+                            initMarkers(editor);
+                        }, 200);
+                    });
 
-          $scope.hasLoaded = true;
+                    $scope.hasLoaded = true;
+                };
+
+                // Configure Skulpt.
+                Sk.configure({
+                    output: function(out) {
+                        // This output function is called continuously throughout the
+                        // runtime of the script.
+                        $scope.output += out;
+                    },
+                    read: function(name) {
+                        // This function is called when a builtin module is imported
+                        if (Sk.builtinFiles.files[name] === undefined) {
+                            // If corresponding module is not present then,
+                            // removal of this block also results in failure of import.
+                            throw 'module ' + name + ' not found';
+                        }
+                        return Sk.builtinFiles.files[name];
+                    },
+                    timeoutMsg: function() {
+                        $scope.sendResponse('', 'timeout');
+                    },
+                    execLimit: 10000
+                });
+
+                $scope.runCode = function(codeInput) {
+                    $scope.code = codeInput;
+                    $scope.output = '';
+                    // Evaluate the program asynchronously using Skulpt.
+                    Sk.misceval.asyncToPromise(function() {
+                        Sk.importMainWithBody('<stdin>', false, codeInput, true);
+                    }).then(function() {
+                        // Finished evaluating.
+
+                        $scope.sendResponse('', '');
+                    }, function(err) {
+                        if (!(err instanceof Sk.builtin.TimeLimitError)) {
+                            $scope.sendResponse('', String(err));
+                        }
+                    });
+                };
+
+                $scope.testRun = function(codeInput) {
+                    $scope.code = codeInput;
+                    $scope.output = '';
+                    //Evaluation begins
+                    Sk.misceval.asyncToPromise(function() {
+                        Sk.importMainWithBody('<stdin>', false, codeInput, true);
+                        //finished evaluation
+                    }).then(function() {}, function(err) {
+                        if (!(err instanceof Sk.builtin.TimeLimitError)) {
+                            $scope.sendResponse('', String(err));
+                        }
+                    });
+                };
+
+                var initMarkers = function(editor) {
+                    var doc = editor.getDoc();
+
+                    // The -1 here is because prepended code ends with a newline.
+                    var preCodeNumLines = $scope.preCode.split('\n').length - 1;
+                    var postCodeNumLines = $scope.postCode.split('\n').length;
+                    var fullCodeNumLines = $scope.code.split('\n').length;
+                    var userCodeNumLines = (
+                        fullCodeNumLines - preCodeNumLines - postCodeNumLines);
+
+                    // Mark pre- and post- code as uneditable, and give it some styling.
+                    var markOptions = {
+                        atomic: true,
+                        readOnly: true,
+                        inclusiveLeft: true,
+                        inclusiveRight: true
+                    };
+
+                    if ($scope.preCode.length !== 0) {
+                        doc.markText({
+                                line: 0,
+                                ch: 0
+                            }, {
+                                line: preCodeNumLines,
+                                ch: 0
+                            },
+                            angular.extend({}, markOptions, {
+                                inclusiveRight: false
+                            }));
+
+                        for (var i = 0; i < preCodeNumLines; i++) {
+                            editor.addLineClass(i, 'text', 'code-repl-noneditable-line');
+                        }
+                    }
+
+                    if ($scope.postCode.length !== 0) {
+                        doc.markText({
+                                line: preCodeNumLines + userCodeNumLines,
+                                ch: 0
+                            }, {
+                                line: fullCodeNumLines,
+                                ch: 0
+                            },
+                            markOptions);
+
+                        for (var i = 0; i < postCodeNumLines; i++) {
+                            editor.addLineClass(preCodeNumLines + userCodeNumLines + i,
+                                'text', 'code-repl-noneditable-line');
+                        }
+                    }
+                };
+
+                $scope.sendResponse = function(evaluation, err) {
+                    $scope.evaluation = (evaluation || '');
+                    $scope.fullError = err || '';
+                    $scope.$parent.submitAnswer({
+                        // Replace tabs with 2 spaces.
+                        // TODO(sll): Change the default Python indentation to 4 spaces.
+                        code: $scope.code.replace(/\t/g, '  ') || '',
+                        output: $scope.output,
+                        evaluation: $scope.evaluation,
+                        error: (err || '')
+                    }, codeReplRulesService);
+                };
+            }]
         };
-
-        // Configure Skulpt.
-        Sk.configure({
-          output: function(out) {
-            // This output function is called continuously throughout the
-            // runtime of the script.
-            $scope.output += out;
-          },
-          read: function(name) {
-            // This function is called when a builtin module is imported
-            if (Sk.builtinFiles.files[name] === undefined) {
-              // If corresponding module is not present then,
-              // removal of this block also results in failure of import.
-              throw 'module ' + name + ' not found';
-            }
-            return Sk.builtinFiles.files[name];
-          },
-          timeoutMsg: function() {
-            $scope.sendResponse('', 'timeout');
-          },
-          execLimit: 10000
-        });
-
-        $scope.runCode = function(codeInput) {
-          $scope.code = codeInput;
-          $scope.output = '';
-          // Evaluate the program asynchronously using Skulpt.
-          Sk.misceval.asyncToPromise(function() {
-            Sk.importMainWithBody('<stdin>', false, codeInput, true);
-          }).then(function() {
-            // Finished evaluating.
-
-            $scope.sendResponse('', '');
-          }, function(err) {
-            if (!(err instanceof Sk.builtin.TimeLimitError)) {
-              $scope.sendResponse('', String(err));
-            }
-          });
-    };
-
-          $scope.testRun = function(codeInput) {
-          $scope.code = codeInput;
-          $scope.output = '';
-	   //Evaluation begins
-          Sk.misceval.asyncToPromise(function() {
-            Sk.importMainWithBody('<stdin>', false, codeInput, true);
-	   //finished evaluation
-          }).then(function() {     
-          }, function(err) {
-            if (!(err instanceof Sk.builtin.TimeLimitError)) {
-              $scope.sendResponse('', String(err));
-            }
-          });
-        };
-
-        var initMarkers = function(editor) {
-          var doc = editor.getDoc();
-
-          // The -1 here is because prepended code ends with a newline.
-          var preCodeNumLines = $scope.preCode.split('\n').length - 1;
-          var postCodeNumLines = $scope.postCode.split('\n').length;
-          var fullCodeNumLines = $scope.code.split('\n').length;
-          var userCodeNumLines = (
-              fullCodeNumLines - preCodeNumLines - postCodeNumLines);
-
-          // Mark pre- and post- code as uneditable, and give it some styling.
-          var markOptions = {
-            atomic: true,
-            readOnly: true,
-            inclusiveLeft: true,
-            inclusiveRight: true
-          };
-
-          if ($scope.preCode.length !== 0) {
-            doc.markText(
-              {
-                line: 0,
-                ch: 0
-              },
-              {
-                line: preCodeNumLines,
-                ch: 0
-              },
-              angular.extend({}, markOptions, {
-                inclusiveRight: false
-              }));
-
-            for (var i = 0; i < preCodeNumLines; i++) {
-              editor.addLineClass(i, 'text', 'code-repl-noneditable-line');
-            }
-          }
-
-          if ($scope.postCode.length !== 0) {
-            doc.markText(
-              {
-                line: preCodeNumLines + userCodeNumLines,
-                ch: 0
-              },
-              {
-                line: fullCodeNumLines,
-                ch: 0
-              },
-              markOptions);
-
-            for (var i = 0; i < postCodeNumLines; i++) {
-              editor.addLineClass(preCodeNumLines + userCodeNumLines + i,
-               'text', 'code-repl-noneditable-line');
-            }
-          }
-        };
-
-        $scope.sendResponse = function(evaluation, err) {
-          $scope.evaluation = (evaluation || '');
-          $scope.fullError = err || '';
-          $scope.$parent.submitAnswer({
-            // Replace tabs with 2 spaces.
-            // TODO(sll): Change the default Python indentation to 4 spaces.
-            code: $scope.code.replace(/\t/g, '  ') || '',
-            output: $scope.output,
-            evaluation: $scope.evaluation,
-            error: (err || '')
-          }, codeReplRulesService);
-        };
-      }]
-    };
-  }
+    }
 ]);
 
 oppia.directive('oppiaResponseCodeRepl', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: 'response/CodeRepl',
-      controller: [
-        '$scope', '$attrs', 'focusService',
-        function($scope, $attrs, focusService) {
-          $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+    'oppiaHtmlEscaper',
+    function(oppiaHtmlEscaper) {
+        return {
+            restrict: 'E',
+            scope: {},
+            templateUrl: 'response/CodeRepl',
+            controller: [
+                '$scope', '$attrs', 'focusService',
+                function($scope, $attrs, focusService) {
+                    $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
 
-          if ($scope.answer.error) {
-            $scope.errorFocusLabel = focusService.generateFocusLabel();
-            focusService.setFocus($scope.errorFocusLabel);
-          }
-        }
-      ]
-    };
-  }
+                    if ($scope.answer.error) {
+                        $scope.errorFocusLabel = focusService.generateFocusLabel();
+                        focusService.setFocus($scope.errorFocusLabel);
+                    }
+                }
+            ]
+        };
+    }
 ]);
 
 oppia.directive('oppiaShortResponseCodeRepl', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: 'shortResponse/CodeRepl',
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
-      }]
-    };
-  }
+    'oppiaHtmlEscaper',
+    function(oppiaHtmlEscaper) {
+        return {
+            restrict: 'E',
+            scope: {},
+            templateUrl: 'shortResponse/CodeRepl',
+            controller: ['$scope', '$attrs', function($scope, $attrs) {
+                $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+            }]
+        };
+    }
 ]);
 
 oppia.factory('codeReplRulesService', [
     '$filter', 'codeNormalizationService',
     function($filter, codeNormalizationService) {
-  return {
-    CodeEquals: function(answer, inputs) {
-      var normalizedCode =
-        codeNormalizationService.getNormalizedCode(answer.code);
-      var normalizedExpectedCode =
-        codeNormalizationService.getNormalizedCode(inputs.x);
-      return normalizedCode == normalizedExpectedCode;
-    },
-    CodeContains: function(answer, inputs) {
-      var normalizedCode =
-        codeNormalizationService.getNormalizedCode(answer.code);
-      var normalizedSnippet =
-        codeNormalizationService.getNormalizedCode(inputs.x);
-      return normalizedCode.indexOf(normalizedSnippet) != -1;
-    },
-    CodeDoesNotContain: function(answer, inputs) {
-      var normalizedCode =
-        codeNormalizationService.getNormalizedCode(answer.code);
-      var normalizedSnippet =
-        codeNormalizationService.getNormalizedCode(inputs.x);
-      return normalizedCode.indexOf(normalizedSnippet) == -1;
-    },
-    OutputContains: function(answer, inputs) {
-      var normalizedOutput = $filter('normalizeWhitespace')(answer.output);
-      var normalizedSnippet = $filter('normalizeWhitespace')(inputs.x);
-      return normalizedOutput.indexOf(normalizedSnippet) != -1;
-    },
-    OutputEquals: function(answer, inputs) {
-      var normalizedOutput = $filter('normalizeWhitespace')(answer.output);
-      var normalizedExpectedOutput =
-        $filter('normalizeWhitespace')(inputs.x);
-      return normalizedOutput == normalizedExpectedOutput;
-    },
-    ResultsInError: function(answer) {
-      return !!(answer.error.trim());
-    },
-    ErrorContains: function(answer, inputs) {
-      var normalizedError = $filter('normalizeWhitespace')(answer.error);
-      var normalizedSnippet = $filter('normalizeWhitespace')(inputs.x);
-      return normalizedError.indexOf(normalizedSnippet) != -1;
+        return {
+            CodeEquals: function(answer, inputs) {
+                var normalizedCode =
+                    codeNormalizationService.getNormalizedCode(answer.code);
+                var normalizedExpectedCode =
+                    codeNormalizationService.getNormalizedCode(inputs.x);
+                return normalizedCode == normalizedExpectedCode;
+            },
+            CodeContains: function(answer, inputs) {
+                var normalizedCode =
+                    codeNormalizationService.getNormalizedCode(answer.code);
+                var normalizedSnippet =
+                    codeNormalizationService.getNormalizedCode(inputs.x);
+                return normalizedCode.indexOf(normalizedSnippet) != -1;
+            },
+            CodeDoesNotContain: function(answer, inputs) {
+                var normalizedCode =
+                    codeNormalizationService.getNormalizedCode(answer.code);
+                var normalizedSnippet =
+                    codeNormalizationService.getNormalizedCode(inputs.x);
+                return normalizedCode.indexOf(normalizedSnippet) == -1;
+            },
+            OutputContains: function(answer, inputs) {
+                var normalizedOutput = $filter('normalizeWhitespace')(answer.output);
+                var normalizedSnippet = $filter('normalizeWhitespace')(inputs.x);
+                return normalizedOutput.indexOf(normalizedSnippet) != -1;
+            },
+            OutputEquals: function(answer, inputs) {
+                var normalizedOutput = $filter('normalizeWhitespace')(answer.output);
+                var normalizedExpectedOutput =
+                    $filter('normalizeWhitespace')(inputs.x);
+                return normalizedOutput == normalizedExpectedOutput;
+            },
+            ResultsInError: function(answer) {
+                return !!(answer.error.trim());
+            },
+            ErrorContains: function(answer, inputs) {
+                var normalizedError = $filter('normalizeWhitespace')(answer.error);
+                var normalizedSnippet = $filter('normalizeWhitespace')(inputs.x);
+                return normalizedError.indexOf(normalizedSnippet) != -1;
+            }
+        };
     }
-  };
-}]);
+]);
