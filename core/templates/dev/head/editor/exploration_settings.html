@@ -47,10 +47,13 @@
               </div>
             </div>
             <div class="form-group">
-              <label for="explorationInitStateName" class="col-lg-2 col-md-2 col-sm-2">First State</label>
+              <label for="explorationInitStateName" class="col-lg-2 col-md-2 col-sm-2">Name of first card</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
                 <select id="explorationInitStateName" class="form-control protractor-test-initial-state-select" ng-model="explorationInitStateNameService.displayed" ng-change="saveExplorationInitStateName()" ng-options="name as name for name in stateNames track by name">
                 </select>
+                <span class="help-block" style="font-size: smaller">
+                  <em>This is the first card the learner sees when playing your exploration.</em>
+                </span>
               </div>
             </div>
             <div class="form-group">
@@ -67,7 +70,7 @@
                   </select2-dropdown>
                 </div>
                 <span class="help-block" style="font-size: smaller">
-                  <em>Tags help learners discover your exploration.</em>
+                  <em>Tags help learners discover your exploration when searching.</em>
                 </span>
               </div>
             </div>
@@ -275,12 +278,6 @@
 
         <div class="col-lg-7 col-md-7 col-sm-7">
           <h3>Permissions</h3>
-          <div class="pull-right">
-            <button class="btn btn-default" ng-click="toggleViewabilityIfPrivate()" ng-if="explorationRightsService.isPrivate()">
-              Toggle visibility
-            </button>
-          </div>
-
           <p ng-if="explorationRightsService.isPrivate() &&explorationRightsService.viewableIfPrivate()">
             This exploration is <strong>private</strong>. Anyone with the link can access it.
           </p>
@@ -299,6 +296,8 @@
             <em>Link to share:</em>
             <input class="form-control" type="text" value="<[getExplorePageUrl(explorationId)]>" readonly="readonly" onClick="this.select();">
           </p>
+
+          <br>
 
           <p ng-if="explorationRightsService.isPrivate()">
             It is <strong>not shown</strong> in the gallery.

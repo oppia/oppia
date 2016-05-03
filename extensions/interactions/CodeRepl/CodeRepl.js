@@ -203,6 +203,10 @@ oppia.directive('oppiaInteractiveCodeRepl', [
             evaluation: $scope.evaluation,
             error: (err || '')
           }, codeReplRulesService);
+
+          // Without this, the error message displayed in the user-facing
+          // console will sometimes not update.
+          $scope.$apply();
         };
       }]
     };

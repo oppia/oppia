@@ -4,8 +4,12 @@
       <div class="top-section" style="background-color: <[getThumbnailBgColor()]>;">
         <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
         <h2 class="title protractor-test-exp-summary-tile-title"><[getExplorationTitle()]></h2>
+        <h2 class="title protractor-test-exp-summary-tile-title">
+          <span ng-if="isWindowLarge"><[getExplorationTitle()]></span>
+          <span ng-if="!isWindowLarge"><[getExplorationTitle()|truncate:32]></span>
+        </h2>
 
-        <div class="exploration-summary-avatars" ng-show="avatarsList.length > 0">
+        <div ng-if="isWindowLarge" class="exploration-summary-avatars" ng-show="avatarsList.length > 0">
           <circular-image ng-if="avatarsList.length > 0"
                           src="avatarsList[0].image"
                           link="avatarsList[0].link"
@@ -35,10 +39,10 @@
           </div>
         </div>
       </div>
-      <div class="top-section-mask mask"></div>
+      <div class="title-section-mask"></div>
 
-      <div>
-        <div class="objective protractor-test-exp-summary-tile-objective">
+      <div ng-attr-section="<[isWindowLarge ? undefined : 'right-section']>">
+        <div ng-if="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
           <[getObjective() | truncateAndCapitalize: 60]>
           <span ng-if="!getObjective()">No objective specified.</span>
         </div>
