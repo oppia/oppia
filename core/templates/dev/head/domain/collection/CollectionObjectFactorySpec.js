@@ -203,6 +203,25 @@ describe('Collection object factory', function() {
     expect(_getCollectionNode('exp_id1')).toEqual(collectionNodes[1]);
   });
 
+  it('should provide starting explorations with no prerequisite skills',
+      function() {
+    expect(_sampleCollection.getStartingCollectionNodes()).toEqual([]);
+
+    _addCollectionNode('exp_id0');
+    _addCollectionNode('exp_id1');
+
+    var startingNodes = _sampleCollection.getStartingCollectionNodes();
+    expect(startingNodes.length).toEqual(2);
+    expect(startingNodes[0].getExplorationId()).toEqual('exp_id0');
+    expect(startingNodes[1].getExplorationId()).toEqual('exp_id1');
+
+    startingNodes[0].getPrerequisiteSkillList().addSkill('example');
+
+    startingNodes = _sampleCollection.getStartingCollectionNodes();
+    expect(startingNodes.length).toEqual(1);
+    expect(startingNodes[0].getExplorationId()).toEqual('exp_id1');
+  });
+
   it('should return a list of referenced exporation IDs', function() {
     _addCollectionNode('exp_id0');
     _addCollectionNode('exp_id1');

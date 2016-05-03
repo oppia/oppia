@@ -98,7 +98,6 @@ oppia.controller('Gallery', [
 
     // Called when the page loads, and after every search query.
     var _refreshGalleryData = function(data, hasPageFinishedLoading) {
-      $scope.searchIsLoading = false;
       $scope.allExplorationsInOrder = data.explorations_list;
       $scope.finishedLoadingPage = hasPageFinishedLoading;
       $rootScope.loadingMessage = '';
@@ -114,14 +113,14 @@ oppia.controller('Gallery', [
     );
 
     // Retrieves gallery data from the server.
-    $http.get(GALLERY_DATA_URL).success(function(data) {
-      $scope.currentUserIsModerator = Boolean(data.is_moderator);
+    $http.get(GALLERY_DATA_URL).then(function(response) {
+      $scope.currentUserIsModerator = Boolean(response.data.is_moderator);
 
       // Note that this will cause an initial search query to be sent.
       $rootScope.$broadcast(
-        'preferredLanguageCodesLoaded', data.preferred_language_codes);
+        'preferredLanguageCodesLoaded', response.data.preferred_language_codes);
 
-      if (data.username) {
+      if (response.data.username) {
         if (urlService.getUrlParams().mode === 'create') {
           $scope.showCreateExplorationModal(CATEGORY_LIST);
         }

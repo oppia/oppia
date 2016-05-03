@@ -448,6 +448,9 @@ class Collection(object):
     def validate(self, strict=True):
         """Validates all properties of this collection and its constituents."""
 
+        # NOTE TO DEVELOPERS: Please ensure that this validation logic is the
+        # same as that in the frontend CollectionValidatorService.
+
         if not isinstance(self.title, basestring):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' % self.title)

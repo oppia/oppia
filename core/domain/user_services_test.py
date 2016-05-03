@@ -132,6 +132,41 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             user_services.get_user_id_from_username('fakeUsername'))
 
+    def test_set_and_get_user_email_preferences(self):
+        user_id = 'someUser'
+        username = 'username'
+        user_email = 'user@example.com'
+
+        user_services.get_or_create_user(user_id, user_email)
+        user_services.set_username(user_id, username)
+
+        # When UserEmailPreferencesModel is yet to be created,
+        # the value returned by get_email_preferences() should be True.
+        email_preferences = user_services.get_email_preferences(user_id)
+        self.assertEquals(
+            email_preferences['can_receive_editor_role_email'],
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+
+        # The user retrieves their email preferences. This initializes
+        # a UserEmailPreferencesModel instance with the default values.
+        user_services.update_email_preferences(
+            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+
+        email_preferences = user_services.get_email_preferences(user_id)
+        self.assertEquals(
+            email_preferences['can_receive_editor_role_email'],
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+
+        # The user sets their membership email preference to False.
+        user_services.update_email_preferences(
+            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE, False)
+
+        email_preferences = user_services.get_email_preferences(user_id)
+        self.assertEquals(
+            email_preferences['can_receive_editor_role_email'],
+            False)
+
 
 class UpdateContributionMsecTests(test_utils.GenericTestBase):
     """Test whether contribution date changes with publication of

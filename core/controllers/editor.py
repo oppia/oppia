@@ -67,6 +67,14 @@ MODERATOR_REQUEST_FORUM_URL = config_domain.ConfigProperty(
     'in the gallery',
     default_value=MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE)
 
+DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = config_domain.ConfigProperty(
+    'default_twitter_share_message_editor', {
+        'type': 'unicode',
+    },
+    'Default text for the Twitter share message for the editor',
+    default_value=(
+        'Check out this interactive lesson I created on Oppia - a free '
+        'platform for teaching and learning!'))
 
 def get_value_generators_js():
     """Return a string that concatenates the JS for all value generators."""
@@ -205,6 +213,9 @@ class ExplorationPage(EditorHandler):
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'PANEL_SPECS': feconf.PANELS_PROPERTIES,
             'DEFAULT_OBJECT_VALUES': rule_domain.get_default_object_values(),
+            'SHARING_OPTIONS': base.SHARING_OPTIONS.value,
+            'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR': (
+                DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR.value),
             'additional_angular_modules': additional_angular_modules,
             'can_delete': rights_manager.Actor(
                 self.user_id).can_delete(
@@ -412,6 +423,9 @@ class ExplorationRightsHandler(EditorHandler):
 
             rights_manager.assign_role_for_exploration(
                 self.user_id, exploration_id, new_member_id, new_member_role)
+            email_manager.send_role_notification_email(
+                self.user_id, new_member_id, new_member_role, exploration_id,
+                exploration.title)
 
         elif is_public is not None:
             exploration = exp_services.get_exploration_by_id(exploration_id)

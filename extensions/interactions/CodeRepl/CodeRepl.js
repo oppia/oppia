@@ -268,6 +268,11 @@ oppia.factory('codeReplRulesService', [
         codeNormalizationService.getNormalizedCode(inputs.x);
       return normalizedCode.indexOf(normalizedSnippet) == -1;
     },
+    OutputContains: function(answer, inputs) {
+      var normalizedOutput = $filter('normalizeWhitespace')(answer.output);
+      var normalizedSnippet = $filter('normalizeWhitespace')(inputs.x);
+      return normalizedOutput.indexOf(normalizedSnippet) != -1;
+    },
     OutputEquals: function(answer, inputs) {
       var normalizedOutput = $filter('normalizeWhitespace')(answer.output);
       var normalizedExpectedOutput =

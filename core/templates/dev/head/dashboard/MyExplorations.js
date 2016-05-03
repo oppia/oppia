@@ -37,7 +37,8 @@ oppia.controller('MyExplorations', [
     };
 
     $rootScope.loadingMessage = 'Loading';
-    $http.get('/myexplorationshandler/data').success(function(data) {
+    $http.get('/myexplorationshandler/data').then(function(response) {
+      var data = response.data;
       $scope.explorationsList = data.explorations_list;
       $rootScope.loadingMessage = '';
 

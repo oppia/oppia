@@ -1,26 +1,29 @@
 category: Welcome
 nodes:
 - acquired_skills:
-  - Introduced to Oppia
+  - Intro to Oppia
   exploration_id: '0'
   prerequisite_skills: []
-- acquired_skills: []
+- acquired_skills:
+  - Intro to Solar System
   exploration_id: '13'
   prerequisite_skills:
-  - Introduced to Oppia
-- acquired_skills: []
+  - Intro to Oppia
+- acquired_skills:
+  - Intro to Three Balls
   exploration_id: '4'
   prerequisite_skills:
-  - Introduced to Oppia
+  - Intro to Solar System
 - acquired_skills:
-  - Learned Oppia
+  - Learned Collections
   exploration_id: '14'
   prerequisite_skills:
-  - Introduced to Oppia
-- acquired_skills: []
+  - Intro to Fuzzy
+- acquired_skills:
+  - Intro to Fuzzy
   exploration_id: '15'
   prerequisite_skills:
-  - Learned Oppia
+  - Intro to Three Balls
 objective: To introduce collections using demo explorations.
 schema_version: 1
 title: Introduction to Collections in Oppia
