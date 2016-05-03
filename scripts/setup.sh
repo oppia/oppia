@@ -200,8 +200,14 @@ elif [ "$VAGRANT" = true ]; then
   export XVFB_PREFIX="/usr/bin/xvfb-run"
   # Enforce proper ownership on oppia, oppia_tools, and node_modules or else NPM installs will fail.
   sudo chown -R vagrant.vagrant /home/vagrant/oppia /home/vagrant/oppia_tools /home/vagrant/node_modules
-elif [ -f "/usr/bin/google-chrome" ]; then
+
+
+elif [ -f "/usr/bin/chromium-browser" ]; then
   # Unix.
+  export CHROME_BIN="/usr/bin/chromium-browser"
+
+
+
   export CHROME_BIN="/usr/bin/google-chrome"
 elif [ -f "/c/Program Files (x86)/Google/Chrome/Application/chrome.exe" ]; then
   # Windows.
