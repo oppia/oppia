@@ -135,7 +135,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
             }
           });
         };
-        
+
         $scope.testRun = function(codeInput) {
           $scope.code = codeInput;
           $scope.output = '';
