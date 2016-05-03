@@ -25,6 +25,8 @@
   <script type="text/javascript">
     GLOBALS.LANGUAGE_CODES_AND_NAMES = JSON.parse(
       '{{LANGUAGE_CODES_AND_NAMES|js_string}}');
+    GLOBALS.GALLERY_CATEGORY_FEATURED_EXPLORATIONS = JSON.parse(
+      '{{GALLERY_CATEGORY_FEATURED_EXPLORATIONS|js_string}}');
   </script>
 
   <style>
@@ -45,7 +47,9 @@
           </div>
 
           <div class="oppia-gallery-group" ng-repeat="galleryGroup in galleryGroups track by $index">
-            <!-- TODO(sll): Add card at end of the row that, when clicked, does showFullGalleryGroup(galleryGroup)" -->
+            <hr ng-if="$index !== 0 && galleryGroups[$index - 1].header === GALLERY_CATEGORY_FEATURED_EXPLORATIONS"
+                class="oppia-gallery-featured-explorations-separator">
+
             <div>
               <h2 class="oppia-gallery-group-header">
                 <a ng-click="showFullGalleryGroup(galleryGroup)">
@@ -54,40 +58,43 @@
               </h2>
             </div>
 
-            <md-button class="md-no-ink oppia-gallery-scroll-btn"
-                       ng-click="scroll($index, true)"
-                       ng-hide="leftmostCardIndices[$index] == 0">
-              <i class="material-icons">keyboard_arrow_left</i>
-            </md-button>
-            <div class="oppia-gallery-scroll-btn" ng-if="leftmostCardIndices[$index] == 0"></div>
+            <div>
+              <!-- TODO(sll): Add card at end of the row that, when clicked, does showFullGalleryGroup(galleryGroup)" -->
+              <md-button class="md-no-ink oppia-gallery-scroll-btn"
+                         ng-click="scroll($index, true)"
+                         ng-hide="leftmostCardIndices[$index] == 0">
+                <i class="material-icons">keyboard_arrow_left</i>
+              </md-button>
+              <div class="oppia-gallery-scroll-btn" ng-if="leftmostCardIndices[$index] == 0"></div>
 
-            <div class="oppia-gallery-tiles-carousel"
-                 ng-swipe-right="scroll($index, true)"
-                 ng-swipe-left="scroll($index, false)">
-              <div class="oppia-gallery-tiles-carousel-overlay-left"></div>
-              <div class="oppia-gallery-tiles">
-                <exploration-summary-tile ng-repeat="tile in galleryGroup.activity_summary_dicts"
-                                          exploration-id="tile.id"
-                                          exploration-title="tile.title"
-                                          last-updated-msec="tile.last_updated_msec"
-                                          objective="tile.objective"
-                                          category="tile.category"
-                                          ratings="tile.ratings"
-                                          num-views="tile.num_views"
-                                          thumbnail-icon-url="tile.thumbnail_icon_url"
-                                          thumbnail-bg-color="tile.thumbnail_bg_color"
-                                          class="protractor-test-gallery-tile">
-                </exploration-summary-tile>
+              <div class="oppia-gallery-tiles-carousel"
+                   ng-swipe-right="scroll($index, true)"
+                   ng-swipe-left="scroll($index, false)">
+                <div class="oppia-gallery-tiles-carousel-overlay-left"></div>
+                <div class="oppia-gallery-tiles">
+                  <exploration-summary-tile ng-repeat="tile in galleryGroup.activity_summary_dicts"
+                                            exploration-id="tile.id"
+                                            exploration-title="tile.title"
+                                            last-updated-msec="tile.last_updated_msec"
+                                            objective="tile.objective"
+                                            category="tile.category"
+                                            ratings="tile.ratings"
+                                            num-views="tile.num_views"
+                                            thumbnail-icon-url="tile.thumbnail_icon_url"
+                                            thumbnail-bg-color="tile.thumbnail_bg_color"
+                                            class="protractor-test-gallery-tile">
+                  </exploration-summary-tile>
+                </div>
+                <div class="oppia-gallery-tiles-carousel-overlay-right"></div>
               </div>
-              <div class="oppia-gallery-tiles-carousel-overlay-right"></div>
-            </div>
 
-            <md-button class="md-no-ink oppia-gallery-scroll-btn"
-                       ng-click="scroll($index, false)"
-                       ng-hide="(galleryGroup.activity_summary_dicts.length - tileDisplayCount) <= leftmostCardIndices[$index]">
-              <i class="material-icons">keyboard_arrow_right</i>
-            </md-button>
-            <div class="oppia-gallery-scroll-btn" ng-if="(galleryGroup.activity_summary_dicts.length - tileDisplayCount) <= leftmostCardIndices[$index]"></div>
+              <md-button class="md-no-ink oppia-gallery-scroll-btn"
+                         ng-click="scroll($index, false)"
+                         ng-hide="(galleryGroup.activity_summary_dicts.length - tileDisplayCount) <= leftmostCardIndices[$index]">
+                <i class="material-icons">keyboard_arrow_right</i>
+              </md-button>
+              <div class="oppia-gallery-scroll-btn" ng-if="(galleryGroup.activity_summary_dicts.length - tileDisplayCount) <= leftmostCardIndices[$index]"></div>
+            </div>
           </div>
         </div>
       </div>

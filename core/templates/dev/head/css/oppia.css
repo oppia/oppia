@@ -918,6 +918,11 @@ textarea {
   }
 }
 
+.oppia-gallery-featured-explorations-separator {
+  border-top: 1px solid #aad;
+  margin: 40px 20% 10px;
+}
+
 .oppia-gallery-loading-results-message {
   background-color: #888;
   bottom: 0;

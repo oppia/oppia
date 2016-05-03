@@ -84,6 +84,8 @@ class GalleryPage(base.BaseHandler):
             'SPLASH_PAGE_YOUTUBE_VIDEO_ID': SPLASH_PAGE_YOUTUBE_VIDEO_ID.value,
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
+            'GALLERY_CATEGORY_FEATURED_EXPLORATIONS': (
+                feconf.GALLERY_CATEGORY_FEATURED_EXPLORATIONS),
         })
         self.render_template('galleries/gallery.html')
 
@@ -125,11 +127,16 @@ class DefaultGalleryCategoriesHandler(base.BaseHandler):
             user_settings = user_services.get_user_settings(self.user_id)
             preferred_language_codes = user_settings.preferred_language_codes
 
+        if featured_activity_summary_dicts:
+            summary_dicts_by_category.insert(0, {
+                'activity_summary_dicts': featured_activity_summary_dicts,
+                'categories': [],
+                'header': feconf.GALLERY_CATEGORY_FEATURED_EXPLORATIONS,
+            })
+
         self.values.update({
             'activity_summary_dicts_by_category': (
                 summary_dicts_by_category),
-            'featured_activity_summary_dicts': (
-                featured_activity_summary_dicts),
             'preferred_language_codes': preferred_language_codes,
         })
         self.render_json(self.values)

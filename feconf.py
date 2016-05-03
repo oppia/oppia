@@ -486,6 +486,9 @@ CATEGORIES_TO_COLORS = {
 # A sorted list of default categories.
 DEFAULT_CATEGORIES = sorted(CATEGORIES_TO_COLORS.keys())
 
+# The header for the "Featured Explorations" category in the gallery.
+GALLERY_CATEGORY_FEATURED_EXPLORATIONS = 'Featured Explorations'
+
 # List of supported language codes. Each description has a
 # parenthetical part that may be stripped out to give a shorter
 # description.

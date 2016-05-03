@@ -26,10 +26,13 @@ oppia.controller('Gallery', [
       searchService) {
     $rootScope.loadingMessage = 'Loading';
 
+    $scope.GALLERY_CATEGORY_FEATURED_EXPLORATIONS = (
+      GLOBALS.GALLERY_CATEGORY_FEATURED_EXPLORATIONS);
+
     // Below is the width of each tile (width + margins), which can be found
     // in core/templates/dev/head/components/
     //         exploration_summary_tile_directive.html
-    var tileDisplayWidth = null;
+    var tileDisplayWidth = 0;
 
     // Keeps track of the index of the left-most visible card of each group.
     $scope.leftmostCardIndices = [];
@@ -43,9 +46,12 @@ oppia.controller('Gallery', [
       $rootScope.loadingMessage = '';
 
       // Pause is necessary to ensure all elements have loaded, same for
-      // initCarousels
+      // initCarousels.
+      // TODO(sll): On small screens, the tiles do not have a defined width.
+      // The use of 208 here is a hack, and the underlying problem of the tiles
+      // not having a defined width on small screens needs to be fixed.
       $timeout(function() {
-        tileDisplayWidth = $('exploration-summary-tile').width();
+        tileDisplayWidth = $('exploration-summary-tile').width() || 208;
       }, 20);
 
       // The following initializes the gallery carousel(s).
