@@ -8,8 +8,8 @@
   </div>
   <p> Prerequisite skills: </p>
   <div ng-if="getCollectionNode().getPrerequisiteSkillList().getSkillCount() > 0">
-    <div class="collection-editor-node-skill" ng-repeat="skill in getCollectionNode().getPrerequisiteSkillList().getBindableSkills() track by $index">
-      <em><[skill]></em>
+    <div class="collection-editor-node-skill-list" ng-repeat="skill in getCollectionNode().getPrerequisiteSkillList().getBindableSkills() track by $index">
+      <span class="collection-editor-node-skill-name"><[skill]></span>
       <button ng-click="removePrerequisiteSkill($index)">Del</button>
     </div>
   </div>
@@ -19,13 +19,14 @@
 
   <p> Acquired skills: </p>
   <div ng-if="getCollectionNode().getAcquiredSkillList().getSkillCount() > 0">
-    <div class="collection-editor-node-skill" ng-repeat="skill in getCollectionNode().getAcquiredSkillList().getBindableSkills() track by $index">
-      <em><[skill]></em>
+    <div class="collection-editor-node-skill-list" ng-repeat="skill in getCollectionNode().getAcquiredSkillList().getBindableSkills() track by $index">
+      <span class="collection-editor-node-skill-name"><[skill]></span>
       <button ng-click="removeAcquiredSkill($index)">Del</button>
     </div>
   </div>
   <input ng-model="acquiredSkillName" type="text" placeholder="Skill name">
   <button ng-click="addNewAcquiredSkill()">Add</button>
+  <br>
   <br>
   <br>
 </script>
@@ -41,9 +42,13 @@
     padding-left: 16px;
   }
 
-  .collection-editor-node-skill{
+  .collection-editor-node-skill-list {
     text-align: left;
     padding-left: 10px;
+  }
+
+  .collection-editor-node-skill-name {
+    color: rgba(0, 0, 0, 0.54);
   }
 
   /* TODO(mgowano): Implement horizontal scrolling using Javascript. */
