@@ -97,7 +97,7 @@ Here's how to make a one-off code change. (If you're working on a larger feature
     git commit -a
     git push origin new-branch-name
   ```
-  * Once you've finished addressing everything, and would like the reviewer to take another look, please write a top-level comment explicitly asking them to do so.
+  * Once you've finished addressing everything, and would like the reviewer to take another look, **please write a top-level comment explicitly asking them to do so**.
   * At the end, the reviewer will merge the pull request.
 6. **Tidy up!** Delete the feature branch from your both your local clone and the GitHub repository:
 
