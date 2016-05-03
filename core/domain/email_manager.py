@@ -171,7 +171,7 @@ def _send_email(
         return
 
     raw_plaintext_body = cleaned_html_body.replace('<br/>', '\n').replace(
-        '<br>', '\n').replace('</p><p>', '</p>\n<p>')
+        '<br>', '\n').replace('<li>', '<li>- ').replace('</p><p>', '</p>\n<p>')
     cleaned_plaintext_body = html_cleaner.strip_html_tags(raw_plaintext_body)
 
     if email_models.SentEmailModel.check_duplicate_message(
