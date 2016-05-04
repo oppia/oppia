@@ -63,7 +63,7 @@ var checkForConsoleErrors = function(errorsToIgnore) {
 };
 
 var SERVER_URL_PREFIX = 'http://localhost:9001';
-var GALLERY_URL_SUFFIX = '/gallery';
+var LIBRARY_URL_SUFFIX = '/library';
 var EDITOR_URL_SLICE = '/create/';
 var PLAYER_URL_SLICE = '/explore/';
 var LOGIN_URL_SUFFIX = '/_ah/login';
@@ -130,7 +130,7 @@ exports.waitForSystem = waitForSystem;
 exports.checkForConsoleErrors = checkForConsoleErrors;
 
 exports.SERVER_URL_PREFIX = SERVER_URL_PREFIX;
-exports.GALLERY_URL_SUFFIX = GALLERY_URL_SUFFIX;
+exports.LIBRARY_URL_SUFFIX = LIBRARY_URL_SUFFIX;
 exports.EDITOR_URL_SLICE = EDITOR_URL_SLICE;
 exports.LOGIN_URL_SUFFIX = LOGIN_URL_SUFFIX;
 exports.ADMIN_URL_SUFFIX = ADMIN_URL_SUFFIX;

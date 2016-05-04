@@ -60,12 +60,11 @@ MAX_ITERATIONS = 10
 _BASE_ENTITY_STATE = 'state'
 _BASE_ENTITY_GADGET = 'gadget'
 
-# Constants used for gallery ranking.
+# Constants used for search ranking.
 _STATUS_PUBLICIZED_BONUS = 30
 # This is done to prevent the rank hitting 0 too easily. Note that
 # negative ranks are disallowed in the Search API.
 _DEFAULT_RANK = 20
-_MS_IN_ONE_DAY = 24 * 60 * 60 * 1000
 
 
 def _migrate_states_schema(versioned_exploration_states):
@@ -319,16 +318,16 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
     """Returns a list with all exploration ids matching the given search query
     string, as well as a search cursor for future fetches.
 
-    This method returns exactly feconf.GALLERY_PAGE_SIZE results if there are
-    at least that many, otherwise it returns all remaining results. (If this
-    behaviour does not occur, an error will be logged.) The method also returns
-    a search cursor.
+    This method returns exactly feconf.SEARCH_RESULTS_PAGE_SIZE results if
+    there are at least that many, otherwise it returns all remaining results.
+    (If this behaviour does not occur, an error will be logged.) The method
+    also returns a search cursor.
     """
     returned_exploration_ids = []
     search_cursor = cursor
 
     for _ in range(MAX_ITERATIONS):
-        remaining_to_fetch = feconf.GALLERY_PAGE_SIZE - len(
+        remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_exploration_ids)
 
         exp_ids, search_cursor = search_explorations(
@@ -342,15 +341,15 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
             else:
                 invalid_exp_ids.append(exp_ids[ind])
 
-        if len(returned_exploration_ids) == feconf.GALLERY_PAGE_SIZE or (
-                search_cursor is None):
+        if (len(returned_exploration_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE
+                or search_cursor is None):
             break
         else:
             logging.error(
                 'Search index contains stale exploration ids: %s' %
                 ', '.join(invalid_exp_ids))
 
-    if (len(returned_exploration_ids) < feconf.GALLERY_PAGE_SIZE
+    if (len(returned_exploration_ids) < feconf.SEARCH_RESULTS_PAGE_SIZE
             and search_cursor is not None):
         logging.error(
             'Could not fulfill search request for query string %s; at least '
@@ -365,6 +364,14 @@ def get_non_private_exploration_summaries():
     """
     return _get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_non_private())
+
+
+def get_featured_exploration_summaries():
+    """Returns a dict with all featured exploration summary domain objects,
+    keyed by their id.
+    """
+    return _get_exploration_summaries_from_models(
+        exp_models.ExpSummaryModel.get_featured())
 
 
 def get_all_exploration_summaries():
@@ -1367,7 +1374,6 @@ def _get_search_rank(exp_id):
     and bad ones will lower it.
     """
     # TODO(sll): Improve this calculation.
-    time_now_msec = utils.get_current_time_in_millisecs()
     rating_weightings = {'1': -5, '2': -2, '3': 2, '4': 5, '5': 10}
 
     rights = rights_manager.get_exploration_rights(exp_id)
@@ -1382,17 +1388,6 @@ def _get_search_rank(exp_id):
             rank += (
                 summary.ratings[rating_value] *
                 rating_weightings[rating_value])
-
-    last_human_update_ms = _get_last_updated_by_human_ms(exp_id)
-
-    time_delta_days = int(
-        (time_now_msec - last_human_update_ms) / _MS_IN_ONE_DAY)
-    if time_delta_days == 0:
-        rank += 80
-    elif time_delta_days == 1:
-        rank += 50
-    elif 2 <= time_delta_days <= 7:
-        rank += 35
 
     # Ranks must be non-negative.
     return max(rank, 0)
@@ -1471,7 +1466,7 @@ def search_explorations(query, limit, sort=None, cursor=None):
           If there are more documents that match the query than 'limit', this
           function will return a cursor to get the next page.
 
-    returns: a tuple:
+    returns: a 2-tuple consisting of:
       - a list of exploration ids that match the query.
       - a cursor if there are more matching explorations to fetch, None
           otherwise. If a cursor is returned, it will be a web-safe string that

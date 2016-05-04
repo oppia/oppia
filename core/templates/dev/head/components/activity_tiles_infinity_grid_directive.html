@@ -1,7 +1,6 @@
 <script type="text/ng-template" id="components/activityTilesInfinityGrid">
-
   <div infinite-scroll="showMoreExplorations()" infinite-scroll-distance="1"
-       infinite-scroll-disabled="finishedLoadingPage || pageLoaderIsBusy">
+       infinite-scroll-disabled="endOfPageIsReached || searchResultsAreLoading">
     <exploration-summary-tile ng-repeat="exp in allExplorationsInOrder track by $index"
                               exploration-id="exp.id"
                               exploration-title="exp.title"
@@ -14,9 +13,29 @@
                               num-views="exp.num_views"
                               contributors-summary="exp.human_readable_contributors_summary"
                               is-community-owned="exp.community_owned"
-                              class="protractor-test-gallery-tile"
+                              is-community-editable="expl.community_editable"
+                              mobile-cutoff-px="610"
+                              class="protractor-test-exp-summary-tile"
                               style="display: inline-block;">
     </exploration-summary-tile>
   </div>
-
+  <div class="oppia-search-results-loading-message"
+       ng-if="searchResultsAreLoading">
+    Loading more results
+    <loading-dots></loading-dots>
+  </div>
 </script>
+
+<style>
+  .oppia-search-results-loading-message {
+    background-color: #888;
+    bottom: 0;
+    color: white;
+    height: 30px;
+    opacity: 0.9;
+    padding-top: 5px;
+    text-align: center;
+    width: 100%;
+    z-index: 50;
+  }
+</style>

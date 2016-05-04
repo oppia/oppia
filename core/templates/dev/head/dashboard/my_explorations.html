@@ -42,8 +42,8 @@
     <div ng-if="explorationsList.length > 0">
       <ul class="oppia-dashboard-tiles">
         <li ng-repeat="exploration in explorationsList">
-          <md-card layout="row" class="oppia-dashboard-tile protractor-test-gallery-tile">
-            <a ng-href="/create/<[exploration.id]>" class="oppia-gallery-tile-container-link" style="text-decoration: none;">
+          <md-card layout="row" class="oppia-dashboard-tile protractor-test-exp-summary-tile">
+            <a ng-href="/create/<[exploration.id]>" class="oppia-dashboard-exp-tile-container-link" style="text-decoration: none;">
               <div class="oppia-dashboard-tile-metadata-parent hidden-xs">
                 <div class="oppia-dashboard-tile-metadata">
                   Created: <span style="color: black;"><[getLocaleAbbreviatedDatetimeString(exploration.created_on)]></span>
@@ -82,14 +82,14 @@
                   </span>
                 </div>
               </div>
-              <div class="oppia-gallery-tile-contents">
-                <span class="oppia-gallery-tile-image-container" style="position: absolute;">
-                  <img class="oppia-gallery-tile-image" ng-src="<[exploration.thumbnail_image_url]>">
+              <div class="oppia-dashboard-exp-tile-contents">
+                <span class="oppia-dashboard-exp-tile-image-container" style="position: absolute;">
+                  <img class="oppia-dashboard-exp-tile-image" ng-src="<[exploration.thumbnail_image_url]>">
                 </span>
 
-                <div class="oppia-gallery-tile-details">
-                  <div class="oppia-gallery-tile-first-row">
-                    <span class="oppia-gallery-tile-title protractor-test-gallery-tile-title">
+                <div class="oppia-dashboard-exp-tile-details">
+                  <div class="oppia-dashboard-exp-tile-first-row">
+                    <span class="oppia-dashboard-exp-tile-title">
                       <[exploration.title]>
                     </span>
                     <span style="font-weight: bold;">&middot;</span>
@@ -103,7 +103,7 @@
                     </span>
                   </div>
 
-                  <div class="oppia-gallery-tile-second-row">
+                  <div class="oppia-dashboard-exp-tile-second-row">
                     <span style="color: #888">
                       <strong><[exploration.category]></strong>
                       <span style="font-weight: bold;">&middot;</span>
