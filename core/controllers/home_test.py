@@ -14,6 +14,7 @@
 
 """Tests for the user notification dashboard and 'my explorations' pages."""
 
+from core.controllers import home
 from core.domain import config_services
 from core.domain import feedback_domain
 from core.domain import feedback_services
@@ -260,6 +261,27 @@ class NotificationsDashboardHandlerTest(test_utils.GenericTestBase):
 
 
 class CreationButtonsTest(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(CreationButtonsTest, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+
+    def test_new_exploration_ids(self):
+        """Test generation of exploration ids."""
+        self.login(self.EDITOR_EMAIL)
+
+        response = self.testapp.get('/my_explorations')
+        self.assertEqual(response.status_int, 200)
+        csrf_token = self.get_csrf_token_from_response(response)
+        exp_a_id = self.post_json(feconf.NEW_EXPLORATION_URL, {
+            'title': self.UNICODE_TEST_STRING,
+            'category': self.UNICODE_TEST_STRING,
+            'objective': 'Learn how to generate exploration ids.',
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE
+        }, csrf_token)[home.EXPLORATION_ID_KEY]
+        self.assertEqual(len(exp_a_id), 12)
+
+        self.logout()
 
     def test_exploration_upload_button(self):
         """Test that the exploration upload button appears when appropriate."""

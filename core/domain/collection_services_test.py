@@ -1731,8 +1731,7 @@ class CollectionSearchTests(CollectionServicesUnitTests):
     def test_get_search_rank(self):
         self.save_new_valid_collection(self.COLLECTION_ID, self.owner_id)
 
-        # The search rank has a 'last updated' bonus of 80.
-        base_search_rank = 20 + 80
+        base_search_rank = 20
 
         self.assertEqual(
             collection_services._get_search_rank(self.COLLECTION_ID),

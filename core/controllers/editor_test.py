@@ -802,7 +802,8 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
             feconf.SYSTEM_COMMITTER_ID, 'banned_usernames', ['joe'])
 
         # Test that Joe is banned. (He can still access the library page.)
-        response = self.testapp.get(feconf.LIBRARY_INDEX_URL, expect_errors=True)
+        response = self.testapp.get(
+            feconf.LIBRARY_INDEX_URL, expect_errors=True)
         self.assertEqual(response.status_int, 200)
         response = self.testapp.get('/create/%s' % exp_id, expect_errors=True)
         self.assertEqual(response.status_int, 200)

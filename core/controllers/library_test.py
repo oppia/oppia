@@ -17,7 +17,6 @@
 import json
 import os
 
-from core.controllers import library
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import rights_manager
@@ -186,23 +185,6 @@ class LibraryPageTest(test_utils.GenericTestBase):
             'objective': 'Objective B',
             'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
         }, response_dict['explorations_list'][0])
-
-    def test_new_exploration_ids(self):
-        """Test generation of exploration ids."""
-        self.login(self.EDITOR_EMAIL)
-
-        response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
-        self.assertEqual(response.status_int, 200)
-        csrf_token = self.get_csrf_token_from_response(response)
-        exp_a_id = self.post_json(feconf.NEW_EXPLORATION_URL, {
-            'title': self.UNICODE_TEST_STRING,
-            'category': self.UNICODE_TEST_STRING,
-            'objective': 'Learn how to generate exploration ids.',
-            'language_code': feconf.DEFAULT_LANGUAGE_CODE
-        }, csrf_token)[library.EXPLORATION_ID_KEY]
-        self.assertEqual(len(exp_a_id), 12)
-
-        self.logout()
 
 
 class CategoryConfigTest(test_utils.GenericTestBase):
