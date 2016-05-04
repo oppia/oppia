@@ -44,7 +44,7 @@ describe('CodeRepl interaction', function() {
 
     afterEach(function() {
       scope.$apply();
-      $httpBackend.verifyNoOutstandingExpectation();
+      $httpBackend.verifyNoOutstandingExpectation();repl-inrepl-in
       $httpBackend.verifyNoOutstandingRequest();
     });
 
