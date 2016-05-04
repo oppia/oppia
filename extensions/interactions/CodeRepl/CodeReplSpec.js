@@ -44,12 +44,13 @@ describe('CodeRepl interaction', function() {
 
     afterEach(function() {
       scope.$apply();
-      $httpBackend.verifyNoOutstandingExpectation();repl-inrepl-in
+      $httpBackend.verifyNoOutstandingExpectation();
       $httpBackend.verifyNoOutstandingRequest();
     });
 
     it('loads the code template', function() {
       expect(elt.html()).toContain('code-repl-input-box');
+      expect(elt.html()).toContain('runCode(code)');
     });
   });
 });
