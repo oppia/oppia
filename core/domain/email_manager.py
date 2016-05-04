@@ -306,20 +306,18 @@ def send_role_notification_email(
         'Hi %s,<br>'
         '<br>'
         '<b>%s</b> has granted you %s to their learning exploration, '
-        '<a href="http://www.oppia.org/%s">"%s"</a>'
-        ', on Oppia.org.<br>'
+        '"<a href="http://www.oppia.org/create/%s">%s</a>", on Oppia.org.<br>'
         '<br>'
         'This allows you to:<br>'
-        '<ul>%s</ul><br>'
+        '<ul>%s</ul>'
         'You can find the exploration '
-        '<a href="http://www.oppia.org/%s">here</a>.<br>'
+        '<a href="http://www.oppia.org/create/%s">here</a>.<br>'
         '<br>'
         'Thanks, and happy collaborating!<br>'
         '<br>'
-        'Best Wishes,<br>'
+        'Best wishes,<br>'
         'The Oppia Team<br>'
-        '<br>%s'
-    )
+        '<br>%s')
 
     # Return from here if sending email is turned off.
     if not feconf.CAN_SEND_EMAILS_TO_USERS:
