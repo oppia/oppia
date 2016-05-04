@@ -204,6 +204,11 @@ elif [ "$VAGRANT" = true ]; then
 elif [ -f "/usr/bin/chromium-browser" ]; then
   # Unix.
   export CHROME_BIN="/usr/bin/chromium-browser"
+
+elif [ -f "/usr/bin/chromium-browser" ]; then
+  # Unix.
+  export CHROME_BIN="/usr/bin/google-chrome"
+
 elif [ -f "/c/Program Files (x86)/Google/Chrome/Application/chrome.exe" ]; then
   # Windows.
   export CHROME_BIN="/c/Program Files (x86)/Google/Chrome/Application/chrome.exe"
