@@ -291,7 +291,7 @@ class ExpSummaryModel(base_models.BaseModel):
     """Summary model for an Oppia exploration.
 
     This should be used whenever the content blob of the exploration is not
-    needed (e.g. gallery, search, etc).
+    needed (e.g. in search results, etc).
 
     A ExpSummaryModel instance stores the following information:
 

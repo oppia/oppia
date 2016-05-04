@@ -15,13 +15,27 @@
                               is-community-owned="exp.community_owned"
                               is-community-editable="expl.community_editable"
                               mobile-cutoff-px="610"
-                              class="protractor-test-gallery-tile"
+                              class="protractor-test-exp-summary-tile"
                               style="display: inline-block;">
     </exploration-summary-tile>
   </div>
-  <div class="oppia-gallery-loading-results-message"
+  <div class="oppia-search-results-loading-message"
        ng-if="searchResultsAreLoading">
     Loading more results
     <loading-dots></loading-dots>
   </div>
 </script>
+
+<style>
+  .oppia-search-results-loading-message {
+    background-color: #888;
+    bottom: 0;
+    color: white;
+    height: 30px;
+    opacity: 0.9;
+    padding-top: 5px;
+    text-align: center;
+    width: 100%;
+    z-index: 50;
+  }
+</style>

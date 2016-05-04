@@ -14,6 +14,7 @@
 
 """Tests for the user notification dashboard and 'my explorations' pages."""
 
+from core.domain import config_services
 from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.domain import rights_manager
@@ -256,3 +257,23 @@ class NotificationsDashboardHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(
                 response['recent_notifications'][0]['author_username'], '')
             self.assertNotIn('author_id', response['recent_notifications'][0])
+
+
+class CreationButtonsTest(test_utils.GenericTestBase):
+
+    def test_exploration_upload_button(self):
+        """Test that the exploration upload button appears when appropriate."""
+        self.login(self.EDITOR_EMAIL)
+
+        response = self.testapp.get('/my_explorations')
+        self.assertEqual(response.status_int, 200)
+        response.mustcontain(no=['ng-click="showUploadExplorationModal()"'])
+
+        config_services.set_property(
+            feconf.SYSTEM_COMMITTER_ID, 'allow_yaml_file_upload', True)
+
+        response = self.testapp.get('/my_explorations')
+        self.assertEqual(response.status_int, 200)
+        response.mustcontain('ng-click="showUploadExplorationModal()"')
+
+        self.logout()

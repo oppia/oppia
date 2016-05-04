@@ -13,13 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the controller of the gallery page.
+ * @fileoverview Unit tests for the controller of the library page.
  */
 
-describe('Gallery controller', function() {
+describe('Library controller', function() {
   beforeEach(module('oppia'));
 
-  describe('Gallery', function() {
+  describe('Library', function() {
     var scope, ctrl, rootScope, $httpBackend;
 
     beforeEach(function() {
@@ -73,7 +73,7 @@ describe('Gallery controller', function() {
       }];
       scope = $rootScope.$new();
       rootScope = $rootScope;
-      ctrl = $controller('Gallery', {
+      ctrl = $controller('Library', {
         $scope: scope,
         alertsService: null,
         ExplorationCreationButtonService: {
@@ -85,9 +85,7 @@ describe('Gallery controller', function() {
     }));
 
     it('should show correct explorations', function() {
-      // Temporarily removed test for now, since we split up the gallery
-      // controllers.
-      // TODO(sll): Reinstate tests (and write more tests for the gallery).
+      // TODO(sll): Write tests for the library pages.
     });
   });
 });

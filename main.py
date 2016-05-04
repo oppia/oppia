@@ -23,8 +23,8 @@ from core.controllers import collection_editor
 from core.controllers import collection_viewer
 from core.controllers import editor
 from core.controllers import feedback
-from core.controllers import galleries
 from core.controllers import home
+from core.controllers import library
 from core.controllers import moderator
 from core.controllers import pages
 from core.controllers import profile
@@ -64,7 +64,9 @@ class WarmupHandler(base.BaseHandler):
 
 
 class HomePageRedirectHandler(base.BaseHandler):
-    "Check whether user is logged in or logged out and perform redirects on '/'"
+    """When a request is made to '/', check the user's login status, and
+    redirect them appropriately.
+    """
     def get(self):
         if self.user_id and user_services.has_fully_registered(self.user_id):
             self.redirect(feconf.MY_EXPLORATIONS_URL)
@@ -186,39 +188,39 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/', HomePageRedirectHandler, 'home_page'),
 
     get_redirect_route(
-        r'%s' % feconf.GALLERY_URL, galleries.GalleryPage, 'gallery_page'),
+        r'%s' % feconf.LIBRARY_INDEX_URL, library.LibraryPage,
+        'library_index_page'),
     get_redirect_route(
-        r'%s' % feconf.GALLERY_SEARCH_DATA_URL, galleries.SearchHandler,
-        'gallery_search_handler'),
+        r'/libraryindexhandler', library.LibraryIndexHandler,
+        'library_index_handler'),
     get_redirect_route(
-        r'%s' % feconf.GALLERY_SEARCH_URL, galleries.GalleryPage,
-        'gallery_search_page'),
+        r'%s' % feconf.LIBRARY_SEARCH_URL, library.LibraryPage,
+        'library_search_page'),
     get_redirect_route(
-        r'/default_gallery_categories',
-        galleries.DefaultGalleryCategoriesHandler,
-        'default_gallery_categories'),
-
+        r'%s' % feconf.LIBRARY_SEARCH_DATA_URL, library.SearchHandler,
+        'library_search_handler'),
     get_redirect_route(
-        r'%s' % feconf.LEARN_GALLERY_URL, galleries.GalleryRedirectPage,
-        'learn_gallery_page'),
+        r'/gallery', library.LibraryRedirectPage, 'old_gallery_page_1'),
     get_redirect_route(
-        r'%s' % feconf.PLAYTEST_QUEUE_URL, galleries.GalleryRedirectPage,
-        'playtest_queue_page'),
+        r'/contribute', library.LibraryRedirectPage, 'old_gallery_page_2'),
     get_redirect_route(
-        r'%s' % feconf.CONTRIBUTE_GALLERY_URL, galleries.GalleryRedirectPage,
-        'contribute_gallery_page'),
+        r'/learn', library.LibraryRedirectPage, 'old_gallery_page_3'),
     get_redirect_route(
-        r'%s' % feconf.NEW_EXPLORATION_URL,
-        galleries.NewExploration, 'new_exploration'),
-    get_redirect_route(
-        r'%s' % feconf.NEW_COLLECTION_URL,
-        galleries.NewCollection, 'new_collection'),
-    get_redirect_route(
-        r'%s' % feconf.UPLOAD_EXPLORATION_URL,
-        galleries.UploadExploration, 'upload_exploration'),
+        r'/playtest', library.LibraryRedirectPage, 'old_gallery_page_4'),
     get_redirect_route(
         feconf.EXPLORATION_SUMMARIES_DATA_URL,
-        galleries.ExplorationSummariesHandler, 'exploration_summaries_handler'),
+        library.ExplorationSummariesHandler,
+        'exploration_summaries_handler'),
+
+    get_redirect_route(
+        r'%s' % feconf.NEW_EXPLORATION_URL,
+        home.NewExploration, 'new_exploration'),
+    get_redirect_route(
+        r'%s' % feconf.NEW_COLLECTION_URL,
+        home.NewCollection, 'new_collection'),
+    get_redirect_route(
+        r'%s' % feconf.UPLOAD_EXPLORATION_URL,
+        home.UploadExploration, 'upload_exploration'),
 
     get_redirect_route(
         r'/profile/<username>', profile.ProfilePage, 'profile_page'),
@@ -387,7 +389,8 @@ URLS = MAPREDUCE_HANDLERS + [
         'writable_collection_data_handler'),
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_RIGHTS_PREFIX,
-        collection_editor.CollectionRightsHandler, 'collection_rights_handler'),
+        collection_editor.CollectionRightsHandler,
+        'collection_rights_handler'),
 
     get_redirect_route(
         r'/notificationshandler', home.NotificationsHandler,
