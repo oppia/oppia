@@ -528,7 +528,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # thereby translates to the default outcome.
         answer_groups = state.interaction.answer_groups
         if rule_str == cls._DEFAULT_RULESPEC_STR:
-            return (len(answer_groups), 0)
+            return (len(answer_groups), 0, None)
 
         # Otherwise, first RuleSpec instance to match is the winner. The first
         # pass is to stringify parameters and doing a string comparison. This is
@@ -539,7 +539,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 possible_stringified_rules = list(
                     cls._stringify_classified_rule(rule_spec))
                 if rule_str in possible_stringified_rules:
-                    return (answer_group_index, rule_spec_index)
+                    return (answer_group_index, rule_spec_index, None)
 
         # The second attempt involves parsing the rule string and doing an exact
         # match on the rule parameter values. This needs to be done in the event
@@ -576,17 +576,25 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                         open_group_count -= 1
                 concat_with_previous = open_group_count != 0
 
-            param_list = [eval(param_str) for param_str in param_str_list]
-            for answer_group_index, answer_group in enumerate(answer_groups):
-                rule_specs = answer_group.rule_specs
-                for rule_spec_index, rule_spec in enumerate(rule_specs):
-                    if rule_spec.rule_type != rule_type:
-                        continue
-                    if unordered_lists_equal(
-                            param_list, rule_spec.inputs.values()):
-                        return (answer_group_index, rule_spec_index)
+            try:
+                param_list = [eval(param_str) for param_str in param_str_list]
+                for answer_group_index, answer_group in enumerate(
+                        answer_groups):
+                    rule_specs = answer_group.rule_specs
+                    for rule_spec_index, rule_spec in enumerate(rule_specs):
+                        if rule_spec.rule_type != rule_type:
+                            continue
+                        if unordered_lists_equal(
+                                param_list, rule_spec.inputs.values()):
+                            return (answer_group_index, rule_spec_index, None)
+            except Exception:
+                # This failure indicates a serious mismatch with the parameter
+                # string.
+                return (
+                    None, None,
+                    'failing to evaluate param string: %s' % param_str_list)
 
-        return (None, None)
+        return (None, None, 'Failed to match rule string')
 
     @classmethod
     def _infer_classification_categorization(cls, rule_str):
@@ -1146,15 +1154,16 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # wrong for soft rules, since previously there was no way of
         # differentiating between which soft rule was selected. This problem is
         # also revealed for RuleSpecs which produce the same rule_spec_str.
-        (answer_group_index, rule_spec_index) = (
+        (answer_group_index, rule_spec_index, error_string) = (
             cls._infer_which_answer_group_and_rule_match_answer(
                 state, rule_str))
 
         # Major point of failure: answer_group_index or rule_spec_index may
         # return none when it's not a default result.
         if answer_group_index is None or rule_spec_index is None:
-            yield ('Failed to match rule string: \'%s\' for answer \'%s\'' % (
-                rule_str, item_id))
+            yield (
+                'Failed to match rule string: \'%s\' for answer \'%s\' '
+                'because of %s' % (rule_str, item_id, error_string))
             return
 
         answer_groups = state.interaction.answer_groups

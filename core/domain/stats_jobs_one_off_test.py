@@ -18,6 +18,7 @@
 
 import logging
 
+from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_services
@@ -39,9 +40,10 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
 
     # This is based on the old stats_models.process_submitted_answer().
     def _record_old_answer(
-            self, state_name, rule_spec_str, answer_html_str):
+            self, state_name, rule_spec_str, answer_html_str,
+            exploration_id=DEMO_EXP_ID):
         answer_log = stats_models.StateRuleAnswerLogModel.get_or_create(
-            self.DEMO_EXP_ID, state_name, rule_spec_str)
+            exploration_id, state_name, rule_spec_str)
         if answer_html_str in answer_log.answers:
             answer_log.answers[answer_html_str] += 1
         else:
@@ -56,6 +58,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         job_id = stats_jobs_one_off.AnswerMigrationJob.create_new()
         stats_jobs_one_off.AnswerMigrationJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
+        return jobs.get_job_output(job_id)
 
     def _get_state_answers(self, state_name, exploration_version=1):
         return stats_services.get_state_answers(
@@ -80,11 +83,12 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         state_answers = self._get_state_answers(state_name)
         self.assertIsNone(state_answers)
 
-        self._run_migration_job()
+        job_output = self._run_migration_job()
 
         # The answer should not be properly migrated.
         state_answers = self._get_state_answers(state_name)
         self.assertIsNone(state_answers)
+        self.assertEqual(job_output, [])
 
     def test_supports_migrating_params_out_of_order(self):
         state_name = 'Music Notes Input'
@@ -99,7 +103,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         state_answers = self._get_state_answers(state_name)
         self.assertIsNone(state_answers)
 
-        self._run_migration_job()
+        job_output = self._run_migration_job()
 
         # The answer should have been properly migrated to the new storage
         # model.
@@ -123,6 +127,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
+        self.assertEqual(job_output, [])
 
     def test_migrated_answer_from_deleted_exploration_is_ignored(self):
         state_name = 'Text Input'
@@ -138,11 +143,69 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         exp_services.delete_exploration(
             self.owner_id, self.DEMO_EXP_ID, force_deletion=True)
 
-        self._run_migration_job()
+        job_output = self._run_migration_job()
 
         # There should still be no answers in the new data storage model.
         state_answers = self._get_state_answers(state_name)
         self.assertIsNone(state_answers)
+
+        self.assertEqual(len(job_output), 1)
+        self.assertIn(
+            'Encountered missing exploration referenced', job_output[0])
+
+    def test_rule_parameter_evaluation_with_invalid_characters(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id0', self.owner_id, end_state_name='End')
+        state_name = exploration.init_state_name
+        initial_state = exploration.states[state_name]
+        exp_services.update_exploration(self.owner_id, 'exp_id0', [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'MathExpressionInput',
+            'old_value': initial_state.interaction.id
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+            'new_value': [{
+                'rule_specs': [{
+                    'rule_type': 'IsMathematicallyEquivalentTo',
+                    'inputs': {
+                        'x': 'y=mx+b'
+                    }
+                }],
+                'outcome': {
+                    'dest': 'End',
+                    'feedback': ['Yes'],
+                    'param_changes': []
+                }
+            }],
+            'old_value': [
+                answer_group.to_dict()
+                for answer_group in initial_state.interaction.answer_groups]
+        }], 'Add state with bad parameter')
+
+        rule_spec_str = 'IsMathematicallyEquivalentTo(F\'(G(x))=e^{x^{3}})'
+        html_answer = (
+            '{\'ascii\': u\'y=(1)/(2)mx+b\', '
+            '\'latex\': u\'y=\\\\dfract{1}{2}mx+b\'}')
+        self._record_old_answer(
+            state_name, rule_spec_str, html_answer, exploration_id='exp_id0')
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+
+        # The answer should not be migrated due to an invalid rule str.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        self.assertEqual(len(job_output), 1)
+        self.assertIn('failing to evaluate param string', job_output[0])
 
     def test_migrate_code_repl(self):
         state_name = 'Code Editor'
@@ -155,7 +218,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         state_answers = self._get_state_answers(state_name)
         self.assertIsNone(state_answers)
 
-        self._run_migration_job()
+        job_output = self._run_migration_job()
 
         # The answer should have been properly migrated to the new storage
         # model.
@@ -178,6 +241,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': rule_spec_str,
             'answer_str': code_answer
         }])
+        self.assertEqual(job_output, [])
 
     def test_migrate_continue(self):
         state_name = 'Continue'
@@ -187,7 +251,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         state_answers = self._get_state_answers(state_name)
         self.assertIsNone(state_answers)
 
-        self._run_migration_job()
+        job_output = self._run_migration_job()
 
         # The answer should have been properly migrated to the new storage
         # model.
@@ -205,6 +269,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': 'Default',
             'answer_str': ''
         }])
+        self.assertEqual(job_output, [])
 
     def test_migrate_image_click_input(self):
         state_name = 'Image Region'
@@ -217,7 +282,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         state_answers = self._get_state_answers(state_name)
         self.assertIsNone(state_answers)
 
-        self._run_migration_job()
+        job_output = self._run_migration_job()
 
         # The answer should have been properly migrated to the new storage
         # model.
@@ -238,6 +303,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
+        self.assertEqual(job_output, [])
 
     def test_migrate_interactive_map(self):
         state_name = 'World Map'
@@ -251,7 +317,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         state_answers = self._get_state_answers(state_name)
         self.assertIsNone(state_answers)
 
-        self._run_migration_job()
+        job_output = self._run_migration_job()
 
         # The answer should have been properly migrated to the new storage
         # model.
@@ -269,6 +335,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
+        self.assertEqual(job_output, [])
 
     def test_migrate_item_selection_input(self):
         state_name = 'Item Selection'
@@ -283,7 +350,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         state_answers = self._get_state_answers(state_name)
         self.assertIsNone(state_answers)
 
-        self._run_migration_job()
+        job_output = self._run_migration_job()
 
         # The answer should have been properly migrated to the new storage
         # model.
@@ -301,6 +368,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
+        self.assertEqual(job_output, [])
 
     def test_migrate_logic_proof(self):
         state_name = 'Logic Proof'
@@ -313,7 +381,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         state_answers = self._get_state_answers(state_name)
         self.assertIsNone(state_answers)
 
-        self._run_migration_job()
+        job_output = self._run_migration_job()
 
         # The answer should have been properly migrated to the new storage
         # model.
@@ -336,6 +404,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
+        self.assertEqual(job_output, [])
 
     def test_migrate_math_expression_input(self):
         state_name = 'Math Expression Input'
@@ -350,7 +419,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         state_answers = self._get_state_answers(state_name)
         self.assertIsNone(state_answers)
 
-        self._run_migration_job()
+        job_output = self._run_migration_job()
 
         # The answer should have been properly migrated to the new storage
         # model.
@@ -371,6 +440,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
+        self.assertEqual(job_output, [])
 
     def test_migrate_multiple_choice_input(self):
         state_name = 'Multiple Choice'
@@ -383,7 +453,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         state_answers = self._get_state_answers(state_name)
         self.assertIsNone(state_answers)
 
-        self._run_migration_job()
+        job_output = self._run_migration_job()
 
         # The answer should have been properly migrated to the new storage
         # model.
@@ -401,6 +471,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
+        self.assertEqual(job_output, [])
 
     def test_migrate_music_notes_input(self):
         state_name = 'Music Notes Input'
@@ -415,7 +486,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         state_answers = self._get_state_answers(state_name)
         self.assertIsNone(state_answers)
 
-        self._run_migration_job()
+        job_output = self._run_migration_job()
 
         # The answer should have been properly migrated to the new storage
         # model.
@@ -439,6 +510,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
+        self.assertEqual(job_output, [])
 
     def test_migrate_numeric_input(self):
         state_name = 'Number Input'
@@ -451,7 +523,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         state_answers = self._get_state_answers(state_name)
         self.assertIsNone(state_answers)
 
-        self._run_migration_job()
+        job_output = self._run_migration_job()
 
         # The answer should have been properly migrated to the new storage
         # model.
@@ -469,6 +541,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
+        self.assertEqual(job_output, [])
 
     def test_migrate_pencil_code_editor(self):
         state_name = 'Pencil Code Editor'
@@ -484,7 +557,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         state_answers = self._get_state_answers(state_name)
         self.assertIsNone(state_answers)
 
-        self._run_migration_job()
+        job_output = self._run_migration_job()
 
         # The answer should have been properly migrated to the new storage
         # model.
@@ -508,6 +581,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
+        self.assertEqual(job_output, [])
 
     def test_migrate_set_input(self):
         state_name = 'Set Input'
@@ -521,7 +595,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         state_answers = self._get_state_answers(state_name)
         self.assertIsNone(state_answers)
 
-        self._run_migration_job()
+        job_output = self._run_migration_job()
 
         # The answer should have been properly migrated to the new storage
         # model.
@@ -539,6 +613,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
+        self.assertEqual(job_output, [])
 
     def test_migrate_text_input(self):
         state_name = 'Text Input'
@@ -551,7 +626,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         state_answers = self._get_state_answers(state_name)
         self.assertIsNone(state_answers)
 
-        self._run_migration_job()
+        job_output = self._run_migration_job()
 
         # The answer should have been properly migrated to the new storage
         # model.
@@ -569,3 +644,4 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'rule_spec_str': rule_spec_str,
             'answer_str': html_answer
         }])
+        self.assertEqual(job_output, [])
