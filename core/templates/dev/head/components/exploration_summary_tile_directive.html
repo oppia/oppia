@@ -42,7 +42,7 @@
 
       <div ng-attr-section="<[isWindowLarge ? undefined : 'right-section']>">
         <div ng-if="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
-          <[getObjective() | truncateAndCapitalize: 60]>
+          <[getObjective() | truncateAndCapitalize: 50]>
           <span ng-if="!getObjective()">No objective specified.</span>
         </div>
         <ul layout="row" class="metrics" layout-align="space-between center">
