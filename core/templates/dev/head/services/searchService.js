@@ -156,8 +156,7 @@ oppia.factory('searchService', [
       var querySegments = urlQuery.split('&');
 
       if (querySegments.length > 3) {
-        alert('Invalid search query url!');
-        return '';
+        throw Error('Invalid search query url: ' + urlQuery);
       }
 
       for (var i = 1; i < querySegments.length; i++) {

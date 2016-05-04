@@ -2972,8 +2972,8 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-splash-section-two {
-  background-color: #51a8b6;
-  color: #fff;
+  background-color: #f2f2ee;
+  color: #2c4841;
 }
 
 .oppia-splash-button {
@@ -3033,8 +3033,9 @@ md-card.preview-conversation-skin-supplemental-card {
   text-align: center;
 }
 .oppia-splash-bullet-block {
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 1.1em;
+  font-family: "Rubik", "Roboto", Arial, sans-serif;
+  font-size: 1.17em;
+  line-height: 128%;
   margin-bottom: 10px;
   max-width: 500px;
   text-align: left;

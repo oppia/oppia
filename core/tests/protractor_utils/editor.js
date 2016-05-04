@@ -18,9 +18,9 @@
  */
 
 var forms = require('./forms.js');
+var gadgets = require('../../../extensions/gadgets/protractor.js');
 var general = require('./general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
-var gadgets = require('../../../extensions/gadgets/protractor.js');
 var rules = require('../../../extensions/rules/protractor.js');
 
 var _NEW_STATE_OPTION = 'A New Card Called...';
@@ -48,6 +48,7 @@ var exitTutorialIfNecessary = function() {
 
 var startTutorial = function() {
   element(by.css('.protractor-test-start-tutorial')).click();
+  general.waitForSystem();
 };
 
 var progressInTutorial = function() {
