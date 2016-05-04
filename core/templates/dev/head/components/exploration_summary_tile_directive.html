@@ -1,5 +1,5 @@
 <script type="text/ng-template" id="summaryTile/exploration">
-  <md-card class="oppia-exploration-summary-tile">
+  <md-card class="oppia-exploration-summary-tile" ng-class="{'small-width': !isWindowLarge}">
     <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
       <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
         <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
@@ -90,6 +90,7 @@
     position: relative;
     text-align: left;
     vertical-align: top;
+    white-space: normal;
     width: 200px;
   }
 
@@ -290,63 +291,63 @@
     padding: 5px 8px 4px 8px;
   }
 
-  @media (max-width: 610px) {
-    .oppia-exploration-summary-tile {
-      height: 80px;
-      width: 95%;
-    }
-    .oppia-exploration-summary-tile .title-section {
-      float: left;
-      height: 80px;
-      width: 70%;
-    }
-    .oppia-exploration-summary-tile .exploration-summary-tile-mask {
-      width: 70%;
-    }
-    .oppia-exploration-summary-tile:hover .title-section-mask {
-      height: 80px;
-      width: 70%;
-    }
-    .oppia-exploration-summary-tile .thumbnail-image {
-      height: 20px;
-      margin: 8px;
-      right: 0px;
-      top: 0px;
-      position: absolute;
-      width: 20px;
-    }
-    .oppia-exploration-summary-tile .exploration-title {
-      margin: 10px;
-      top: 0;
-      width: 75%;
-    }
-    .oppia-exploration-summary-tile .metrics {
-      display: inline-block;
-      margin-top: 12px;
-    }
-    .oppia-exploration-summary-tile .metrics li {
-      display: block;
-      font-size: 0.7em;
-      text-align: left;
-    }
-    .oppia-exploration-summary-tile .metrics li .fa {
-      margin-bottom: 10px;
-    }
-    .oppia-exploration-summary-tile .recently-updated {
-      background-color: rgb(19,105,193);
-      border-radius: 8px;
-      color: white;
-      font-size: 0.6em;
-      font-weight: bold;
-      padding: 5px 8px 4px 8px;
-    }
+  /* Styles for small-width screens. */
+
+  .oppia-exploration-summary-tile.small-width {
+    height: 80px;
+    width: 95%;
+  }
+  .oppia-exploration-summary-tile.small-width .title-section {
+    float: left;
+    height: 80px;
+    width: 70%;
+  }
+  .oppia-exploration-summary-tile.small-width .exploration-summary-tile-mask {
+    width: 70%;
+  }
+  .oppia-exploration-summary-tile.small-width:hover .title-section-mask {
+    height: 80px;
+    width: 70%;
+  }
+  .oppia-exploration-summary-tile.small-width .thumbnail-image {
+    height: 20px;
+    margin: 8px;
+    right: 0px;
+    top: 0px;
+    position: absolute;
+    width: 20px;
+  }
+  .oppia-exploration-summary-tile.small-width .exploration-title {
+    margin: 10px;
+    top: 0;
+    width: 75%;
+  }
+  .oppia-exploration-summary-tile.small-width .metrics {
+    display: inline-block;
+    margin-top: 12px;
+  }
+  .oppia-exploration-summary-tile.small-width .metrics li {
+    display: block;
+    font-size: 0.7em;
+    text-align: left;
+  }
+  .oppia-exploration-summary-tile.small-width .metrics li .fa {
+    margin-bottom: 10px;
+  }
+  .oppia-exploration-summary-tile.small-width .recently-updated {
+    background-color: rgb(19,105,193);
+    border-radius: 8px;
+    color: white;
+    font-size: 0.6em;
+    font-weight: bold;
+    padding: 5px 8px 4px 8px;
   }
 
   @media (max-width: 420px) {
-    .oppia-exploration-summary-tile .metrics li {
+    .oppia-exploration-summary-tile.small-width .metrics li {
       font-size: 0.6em;
     }
-    .oppia-exploration-summary-tile .recently-updated {
+    .oppia-exploration-summary-tile.small-width .recently-updated {
       display: none;
     }
   }

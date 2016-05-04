@@ -361,7 +361,8 @@ EXPLORATION_URL_PREFIX = '/explore'
 FEEDBACK_STATS_URL_PREFIX = '/feedbackstatshandler'
 FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
-GALLERY_DATA_URL = '/galleryhandler/data'
+GALLERY_SEARCH_DATA_URL = '/searchhandler/data'
+GALLERY_SEARCH_URL = '/search/find'
 GALLERY_URL = '/gallery'
 LEARN_GALLERY_URL = '/learn'
 MY_EXPLORATIONS_URL = '/my_explorations'
@@ -373,6 +374,7 @@ RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
+SPLASH_URL = '/splash'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
@@ -387,6 +389,7 @@ NAV_MODE_HOME = 'home'
 NAV_MODE_PARTICIPATE = 'participate'
 NAV_MODE_PROFILE = 'profile'
 NAV_MODE_SIGNUP = 'signup'
+NAV_MODE_SPLASH = 'splash'
 
 # Event types.
 EVENT_TYPE_STATE_HIT = 'state_hit'
@@ -462,7 +465,6 @@ CATEGORIES_TO_COLORS = {
     'Environment': COLOR_GUNMETAL,
     'Geography': COLOR_SALMON,
     'Government': COLOR_SALMON,
-    'Hobbies': COLOR_TEAL,
     'Languages': COLOR_SUNNYSIDE,
     'Law': COLOR_SALMON,
     'Life Skills': COLOR_TEAL,
@@ -475,14 +477,17 @@ CATEGORIES_TO_COLORS = {
     'Psychology': COLOR_SALMON,
     'Puzzles': COLOR_TEAL,
     'Reading': COLOR_TEAL,
-    'Religion': COLOR_SALMON,
     'Sport': COLOR_SUNNYSIDE,
     'Statistics': COLOR_SHARKFIN,
     'Welcome': COLOR_TEAL,
 }
 
+
 # A sorted list of default categories.
 DEFAULT_CATEGORIES = sorted(CATEGORIES_TO_COLORS.keys())
+
+# The header for the "Featured Explorations" category in the gallery.
+GALLERY_CATEGORY_FEATURED_EXPLORATIONS = 'Featured Explorations'
 
 # List of supported language codes. Each description has a
 # parenthetical part that may be stripped out to give a shorter

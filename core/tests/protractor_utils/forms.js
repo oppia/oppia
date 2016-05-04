@@ -278,6 +278,9 @@ var MultiSelectEditor = function(elem) {
         expect(filteredElements[i].getAttribute('class')).toMatch(
           expectedClassBeforeToggle);
         filteredElements[i].click();
+        // Reopen the dropdown menu, since it closes after an item is
+        // toggled.
+        elem.element(by.css('.dropdown-toggle')).click();
       }
 
       // Close the dropdown menu at the end.

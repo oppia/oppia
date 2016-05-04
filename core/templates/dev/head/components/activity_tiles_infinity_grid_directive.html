@@ -1,7 +1,6 @@
 <script type="text/ng-template" id="components/activityTilesInfinityGrid">
-
   <div infinite-scroll="showMoreExplorations()" infinite-scroll-distance="1"
-       infinite-scroll-disabled="finishedLoadingPage || pageLoaderIsBusy">
+       infinite-scroll-disabled="endOfPageIsReached || searchResultsAreLoading">
     <exploration-summary-tile ng-repeat="exp in allExplorationsInOrder track by $index"
                               exploration-id="exp.id"
                               exploration-title="exp.title"
@@ -20,5 +19,9 @@
                               style="display: inline-block;">
     </exploration-summary-tile>
   </div>
-
+  <div class="oppia-gallery-loading-results-message"
+       ng-if="searchResultsAreLoading">
+    Loading more results
+    <loading-dots></loading-dots>
+  </div>
 </script>

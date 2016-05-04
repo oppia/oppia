@@ -97,7 +97,7 @@ Here's how to make a one-off code change. (If you're working on a larger feature
     git commit -a
     git push origin new-branch-name
   ```
-  * Once you've finished addressing everything, and would like the reviewer to take another look, please write a top-level comment explicitly asking them to do so.
+  * Once you've finished addressing everything, and would like the reviewer to take another look, **please write a top-level comment explicitly asking them to do so**.
   * At the end, the reviewer will merge the pull request.
 6. **Tidy up!** Delete the feature branch from your both your local clone and the GitHub repository:
 
@@ -144,6 +144,8 @@ JavaScript
 
 CSS
 - Within each CSS rule, attributes should be alphabetized (e.g. 'height' before 'margin' before 'top'). This makes it easy to find the value of an attribute if there are lots of them.
+- If the CSS class is oppia-specific, prefix it with `oppia-`. This helps distinguish it from CSS classes used by other third-party libraries. 
+- For directives, include the CSS in the directive template file, similar to what we do in `core/templates/dev/head/components/exploration_summary_tile_directive.html`. (Note that, in this case, all CSS rules should start with the top-level CSS class of the directive, so that they don't affect other elements outside it.) All other CSS should go in `core/templates/dev/head/css/oppia.css`.
 
 
 ### Notes

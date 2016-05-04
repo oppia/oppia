@@ -22,6 +22,28 @@ from core.domain import stats_jobs_continuous
 from core.domain import user_services
 import utils
 
+_GALLERY_CATEGORY_GROUPINGS = [{
+    'header': 'Computation & Programming',
+    'search_categories': ['Computing', 'Programming'],
+}, {
+    'header': 'Mathematics & Statistics',
+    'search_categories': ['Mathematics', 'Statistics'],
+}, {
+    'header': 'Biology, Chemistry & Medicine',
+    'search_categories': ['Biology', 'Chemistry', 'Medicine'],
+}, {
+    'header': 'Physics, Astronomy & Engineering',
+    'search_categories': ['Physics', 'Astronomy', 'Engineering'],
+}, {
+    'header': 'Languages & Reading',
+    'search_categories': ['Languages', 'Reading'],
+}, {
+    'header': 'Environment & Geography',
+    'search_categories': ['Environment', 'Geography'],
+}, {
+    'header': 'Business, Economics, Government & Law',
+    'search_categories': ['Business', 'Economics', 'Government', 'Law'],
+}]
 
 def get_human_readable_contributors_summary(contributors_summary):
     contributor_ids = contributors_summary.keys()
@@ -49,24 +71,43 @@ def get_displayable_exp_summary_dicts_matching_ids(
     this function when needing summary information to display on exploration
     summary tiles in the frontend.
     """
-    displayable_exp_summaries = []
     exploration_summaries = (
         exp_services.get_exploration_summaries_matching_ids(exploration_ids))
-    view_counts = (
-        stats_jobs_continuous.StatisticsAggregator.get_views_multi(
-            exploration_ids))
 
-    for ind, exploration_summary in enumerate(exploration_summaries):
+    filtered_exploration_summaries = []
+    for exploration_summary in exploration_summaries:
         if not exploration_summary:
             continue
         if exploration_summary.status == (
                 rights_manager.ACTIVITY_STATUS_PRIVATE):
-            if not editor_user_id:
+            if editor_user_id is None:
                 continue
             if not rights_manager.Actor(editor_user_id).can_edit(
                     rights_manager.ACTIVITY_TYPE_EXPLORATION,
                     exploration_summary.id):
                 continue
+
+        filtered_exploration_summaries.append(exploration_summary)
+
+    return _get_displayable_exp_summary_dicts(filtered_exploration_summaries)
+
+
+def _get_displayable_exp_summary_dicts(exploration_summaries):
+    """Given a list of exploration summary domain objects, returns a list of
+    the corresponding human-readable exploration summary dicts.
+    """
+    exploration_ids = [(
+        exploration_summary.id if exploration_summary is not None
+        else None) for exploration_summary in exploration_summaries]
+
+    view_counts = (
+        stats_jobs_continuous.StatisticsAggregator.get_views_multi(
+            exploration_ids))
+    displayable_exp_summaries = []
+
+    for ind, exploration_summary in enumerate(exploration_summaries):
+        if not exploration_summary:
+            continue
 
         displayable_exp_summaries.append({
             'id': exploration_summary.id,
@@ -92,3 +133,46 @@ def get_displayable_exp_summary_dicts_matching_ids(
         })
 
     return displayable_exp_summaries
+
+
+def get_gallery_category_groupings(language_codes):
+    """Returns a list of groups in the gallery. Each group has a header and
+    a list of dicts representing activity summaries.
+    """
+    language_codes_suffix = ''
+    if language_codes:
+        language_codes_suffix = ' language_code=("%s")' % (
+            '" OR "'.join(language_codes))
+
+    def _generate_query(categories):
+        # This assumes that 'categories' is non-empty.
+        return 'category=("%s")%s' % (
+            '" OR "'.join(categories), language_codes_suffix)
+
+    results = []
+    for gallery_group in _GALLERY_CATEGORY_GROUPINGS:
+        # TODO(sll): Extend this to include collections.
+        exp_ids = exp_services.search_explorations(
+            _generate_query(gallery_group['search_categories']), 10)[0]
+
+        summary_dicts = get_displayable_exp_summary_dicts_matching_ids(
+            exp_ids)
+
+        if not summary_dicts:
+            continue
+
+        results.append({
+            'header': gallery_group['header'],
+            'categories': gallery_group['search_categories'],
+            'activity_summary_dicts': summary_dicts,
+        })
+
+    return results
+
+
+def get_featured_exploration_summary_dicts():
+    """Returns a list of featured explorations."""
+    featured_exp_summaries = (
+        exp_services.get_featured_exploration_summaries())
+    return _get_displayable_exp_summary_dicts(
+        featured_exp_summaries.values())
