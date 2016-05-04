@@ -108,6 +108,10 @@ if [ -d "../protractor-screenshots" ]; then
 fi
 
 # Pass different suites for tests.
+# For performing a full test, no argument is required.
+# For performing tests on editors, use --suite=editor
+# For performing tests on user management, use --suite=usermanagement
+# For performing miscellaneous tests, use --suite=misc
 SUITE="full"
 for j in "$@"; do
   # Match each space-separated argument passed to the shell file to a separate
