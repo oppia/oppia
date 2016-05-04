@@ -1247,9 +1247,9 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 expression['top_kind_name'] == 'binary_relation' or
                 expression['top_kind_name'] == 'binary_function'):
             formatted_result = (
-                '(%s)' % processed_arguments.join(symbol)
+                '(%s)' % symbol.join(processed_arguments)
                 if desirability_of_brackets > 0
-                else processed_arguments.join(symbol))
+                else symbol.join(processed_arguments))
         elif expression['top_kind_name'] == 'unary_connective':
             output = '%s%s' % (symbol, processed_arguments[0])
             formatted_result = (
@@ -1267,7 +1267,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         elif (expression['top_kind_name'] == 'prefix_relation'
               or expression['top_kind_name'] == 'prefix_function'):
             formatted_result = (
-                '%s(%s)' % (symbol, processed_arguments.join(',')))
+                '%s(%s)' % (symbol, ','.join(processed_arguments)))
         elif expression['top_kind_name'] == 'ranged_function':
             formatted_result = '%s{%s | %s}' % (
                 symbol, processed_arguments[0], processed_arguments[1])
