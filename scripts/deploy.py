@@ -30,7 +30,7 @@ IMPORTANT NOTES:
     contain:
     - one file: favicon.ico
     - five folders: /avatar, /general, /logo, /splash and /sidebar, containing
-        images used for the avatar, general-purpose usage, logo, gallery
+        images used for the avatar, general-purpose usage, logo, splash
         carousel and sidebar, respectively.
 
 2.  Before running this script, you must install third-party dependencies by

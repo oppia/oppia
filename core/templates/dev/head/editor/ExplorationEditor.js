@@ -594,7 +594,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       } else if ($scope.isExplorationLockedForEditing()) {
         return 'Please save your changes before publishing.';
       } else {
-        return 'Publish to Gallery';
+        return 'Publish to Oppia Library';
       }
     };
 

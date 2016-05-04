@@ -121,8 +121,8 @@ exports.config = {
       displaySpecDuration: true
     }));
 
-    // Set a wide enough window size for the navbar in the gallery to display
-    // fully.
+    // Set a wide enough window size for the navbar in the library pages to
+    // display fully.
     browser.driver.manage().window().setSize(1200, 1000);
   },
 

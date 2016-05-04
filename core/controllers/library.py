@@ -12,17 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for the gallery pages."""
+"""Controllers for the library page."""
 
 import json
 import logging
 import string
 
 from core.controllers import base
-from core.domain import collection_domain
-from core.domain import collection_services
-from core.domain import config_domain
-from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import summary_services
 from core.domain import user_services
@@ -33,14 +29,6 @@ import utils
 (base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration])
 current_user_services = models.Registry.import_current_user_services()
-
-EXPLORATION_ID_KEY = 'explorationId'
-COLLECTION_ID_KEY = 'collectionId'
-
-ALLOW_YAML_FILE_UPLOAD = config_domain.ConfigProperty(
-    'allow_yaml_file_upload', {'type': 'bool'},
-    'Whether to allow file uploads via YAML in the gallery page.',
-    default_value=False)
 
 
 def get_matching_exploration_dicts(query_string, search_cursor):
@@ -57,43 +45,40 @@ def get_matching_exploration_dicts(query_string, search_cursor):
 
     if len(explorations_list) == feconf.DEFAULT_QUERY_LIMIT:
         logging.error(
-            '%s explorations were fetched to load the gallery page. '
+            '%s explorations were fetched to load the search results. '
             'You may be running up against the default query limits.'
             % feconf.DEFAULT_QUERY_LIMIT)
     return explorations_list, new_search_cursor
 
 
-class GalleryPage(base.BaseHandler):
-    """The exploration gallery page. Used for both the default list of
-    categories and for search results.
+class LibraryPage(base.BaseHandler):
+    """The main library page. Used for both the default list of categories and
+    for search results.
     """
-
-    PAGE_NAME_FOR_CSRF = 'gallery'
 
     def get(self):
         """Handles GET requests."""
         self.values.update({
-            'nav_mode': feconf.NAV_MODE_GALLERY,
-            'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
+            'nav_mode': feconf.NAV_MODE_LIBRARY,
             'has_fully_registered': bool(
                 self.user_id and
                 user_services.has_fully_registered(self.user_id)),
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
-            'GALLERY_CATEGORY_FEATURED_EXPLORATIONS': (
-                feconf.GALLERY_CATEGORY_FEATURED_EXPLORATIONS),
+            'LIBRARY_CATEGORY_FEATURED_EXPLORATIONS': (
+                feconf.LIBRARY_CATEGORY_FEATURED_EXPLORATIONS),
         })
-        self.render_template('galleries/gallery.html')
+        self.render_template('library/library.html')
 
 
-class DefaultGalleryCategoriesHandler(base.BaseHandler):
-    """Provides data for the default gallery page."""
+class LibraryIndexHandler(base.BaseHandler):
+    """Provides data for the default library index page."""
 
     def get(self):
         """Handles GET requests."""
         language_codes = self.request.get('language_codes', [])
         summary_dicts_by_category = (
-            summary_services.get_gallery_category_groupings(language_codes))
+            summary_services.get_library_groups(language_codes))
 
         preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
         featured_activity_summary_dicts = (
@@ -106,7 +91,7 @@ class DefaultGalleryCategoriesHandler(base.BaseHandler):
             summary_dicts_by_category.insert(0, {
                 'activity_summary_dicts': featured_activity_summary_dicts,
                 'categories': [],
-                'header': feconf.GALLERY_CATEGORY_FEATURED_EXPLORATIONS,
+                'header': feconf.LIBRARY_CATEGORY_FEATURED_EXPLORATIONS,
             })
 
         self.values.update({
@@ -150,95 +135,12 @@ class SearchHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class NewExploration(base.BaseHandler):
-    """Creates a new exploration."""
-
-    PAGE_NAME_FOR_CSRF = 'gallery'
-
-    @base.require_fully_signed_up
-    def post(self):
-        """Handles POST requests."""
-        title = self.payload.get('title')
-        category = self.payload.get('category')
-        objective = self.payload.get('objective')
-        language_code = self.payload.get('language_code')
-
-        if not title:
-            raise self.InvalidInputException('No title supplied.')
-        if not category:
-            raise self.InvalidInputException('No category chosen.')
-        if not language_code:
-            raise self.InvalidInputException('No language chosen.')
-
-        new_exploration_id = exp_services.get_new_exploration_id()
-        exploration = exp_domain.Exploration.create_default_exploration(
-            new_exploration_id, title, category,
-            objective=objective, language_code=language_code)
-        exp_services.save_new_exploration(self.user_id, exploration)
-
-        self.render_json({EXPLORATION_ID_KEY: new_exploration_id})
-
-
-class NewCollection(base.BaseHandler):
-    """Creates a new collection."""
-
-    PAGE_NAME_FOR_CSRF = 'gallery'
-
-    @base.require_fully_signed_up
-    def post(self):
-        """Handles POST requests."""
-        title = self.payload.get('title')
-        category = self.payload.get('category')
-        objective = self.payload.get('objective')
-        # TODO(bhenning): Implement support for language codes in collections.
-
-        if not title:
-            raise self.InvalidInputException('No title supplied.')
-        if not category:
-            raise self.InvalidInputException('No category chosen.')
-
-        new_collection_id = collection_services.get_new_collection_id()
-        collection = collection_domain.Collection.create_default_collection(
-            new_collection_id, title, category, objective=objective)
-        collection_services.save_new_collection(self.user_id, collection)
-
-        self.render_json({COLLECTION_ID_KEY: new_collection_id})
-
-
-class UploadExploration(base.BaseHandler):
-    """Uploads a new exploration."""
-
-    PAGE_NAME_FOR_CSRF = 'gallery'
-
-    @base.require_fully_signed_up
-    def post(self):
-        """Handles POST requests."""
-        title = self.payload.get('title')
-        category = self.payload.get('category')
-        yaml_content = self.request.get('yaml_file')
-
-        if not title:
-            raise self.InvalidInputException('No title supplied.')
-        if not category:
-            raise self.InvalidInputException('No category chosen.')
-
-        new_exploration_id = exp_services.get_new_exploration_id()
-        if ALLOW_YAML_FILE_UPLOAD.value:
-            exp_services.save_new_exploration_from_yaml_and_assets(
-                self.user_id, yaml_content, title, category,
-                new_exploration_id, [])
-            self.render_json({EXPLORATION_ID_KEY: new_exploration_id})
-        else:
-            raise self.InvalidInputException(
-                'This server does not allow file uploads.')
-
-
-class GalleryRedirectPage(base.BaseHandler):
-    """An old exploration gallery page."""
+class LibraryRedirectPage(base.BaseHandler):
+    """An old 'gallery' page that should redirect to the library index page."""
 
     def get(self):
         """Handles GET requests."""
-        self.redirect('/gallery')
+        self.redirect('/library')
 
 
 class ExplorationSummariesHandler(base.BaseHandler):

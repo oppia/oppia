@@ -66,9 +66,9 @@ CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 7
 # number must be changed.
 CURRENT_COLLECTION_SCHEMA_VERSION = 1
 
-# The default number of exploration tiles to load at a time in the gallery
-# page.
-GALLERY_PAGE_SIZE = 20
+# The default number of exploration tiles to load at a time in the search
+# results page.
+SEARCH_RESULTS_PAGE_SIZE = 20
 
 # The default number of commits to show on a page in the exploration history
 # tab.
@@ -238,8 +238,8 @@ DEFAULT_SKIN_ID = 'conversation_v1'
 COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
 
 # User id and username for exploration migration bot. Commits made by this bot
-# are not reflected in the exploration summary models (for the gallery and
-# last-updated timestamps), but are recorded in the exploration commit log.
+# are not reflected in the exploration summary models, but are recorded in the
+# exploration commit log.
 MIGRATION_BOT_USER_ID = 'OppiaMigrationBot'
 MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
 
@@ -351,7 +351,6 @@ COLLECTION_WRITABLE_DATA_URL_PREFIX = '/collection_editor_handler/data'
 COLLECTION_RIGHTS_PREFIX = '/collection_editor_handler/rights'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
-CONTRIBUTE_GALLERY_URL = '/contribute'
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
@@ -361,15 +360,14 @@ EXPLORATION_URL_PREFIX = '/explore'
 FEEDBACK_STATS_URL_PREFIX = '/feedbackstatshandler'
 FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
-GALLERY_SEARCH_DATA_URL = '/searchhandler/data'
-GALLERY_SEARCH_URL = '/search/find'
-GALLERY_URL = '/gallery'
-LEARN_GALLERY_URL = '/learn'
+LIBRARY_INDEX_URL = '/library'
+LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
+LIBRARY_SEARCH_URL = '/search/find'
+LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
 MY_EXPLORATIONS_URL = '/my_explorations'
 MY_EXPLORATIONS_CREATE_MODE_URL = '%s?mode=create' % MY_EXPLORATIONS_URL
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
-PLAYTEST_QUEUE_URL = '/playtest'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 SIGNUP_DATA_URL = '/signuphandler/data'
@@ -384,7 +382,7 @@ USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 NAV_MODE_ABOUT = 'about'
 NAV_MODE_CREATE = 'create'
 NAV_MODE_EXPLORE = 'explore'
-NAV_MODE_GALLERY = 'gallery'
+NAV_MODE_LIBRARY = 'library'
 NAV_MODE_HOME = 'home'
 NAV_MODE_PARTICIPATE = 'participate'
 NAV_MODE_PROFILE = 'profile'
@@ -486,8 +484,9 @@ CATEGORIES_TO_COLORS = {
 # A sorted list of default categories.
 DEFAULT_CATEGORIES = sorted(CATEGORIES_TO_COLORS.keys())
 
-# The header for the "Featured Explorations" category in the gallery.
-GALLERY_CATEGORY_FEATURED_EXPLORATIONS = 'Featured Explorations'
+# The header for the "Featured Explorations" category in the library index
+# page.
+LIBRARY_CATEGORY_FEATURED_EXPLORATIONS = 'Featured Explorations'
 
 # List of supported language codes. Each description has a
 # parenthetical part that may be stripped out to give a shorter

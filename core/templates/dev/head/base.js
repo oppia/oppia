@@ -181,7 +181,6 @@ oppia.controller('Base', [
     var doesNavbarHaveSearchBar = function() {
       return (
         $window.location.pathname.indexOf('/search') === 0 ||
-        $window.location.pathname.indexOf('/gallery') === 0 ||
         $window.location.pathname.indexOf('/library') === 0);
     };
 

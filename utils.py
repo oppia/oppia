@@ -415,7 +415,7 @@ def get_info_card_url_for_category(category):
         feconf.CATEGORIES_TO_COLORS[category] if
         category in feconf.CATEGORIES_TO_COLORS else feconf.DEFAULT_COLOR)
     return (
-        '/images/gallery/exploration_background_%s_large.png' %
+        '/images/library/exploration_background_%s_large.png' %
         info_card_color)
 
 
@@ -432,7 +432,7 @@ def get_thumbnail_icon_url_for_category(category):
         category if category in feconf.DEFAULT_CATEGORIES
         else feconf.DEFAULT_THUMBNAIL_ICON)
     # Remove all spaces from the string.
-    return '/images/gallery/thumbnails/%s.svg' % icon_name.replace(' ', '')
+    return '/images/library/thumbnails/%s.svg' % icon_name.replace(' ', '')
 
 
 def _get_short_language_description(full_language_description):

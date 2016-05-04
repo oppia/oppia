@@ -460,7 +460,8 @@ var _setRuleParameters = function(ruleElement, interactionId, ruleName) {
         by.tagName('button')
       ).click();
       parameterElement.element(
-        by.cssContainingText('.oppia-html-select-option', parameterValues[i])
+        by.cssContainingText(
+          '.protractor-test-html-select-option', parameterValues[i])
       ).click();
     } else {
       parameterEditor.setValue(parameterValues[i]);

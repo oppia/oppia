@@ -1544,7 +1544,8 @@ oppia.factory('stateEditorTutorialFirstTimeService', [
 oppia.constant('WARNING_TYPES', {
   // These must be fixed before the exploration can be saved.
   CRITICAL: 'critical',
-  // These must be fixed before publishing an exploration to the gallery.
+  // These must be fixed before publishing an exploration to the public
+  // library.
   ERROR: 'error'
 });
 

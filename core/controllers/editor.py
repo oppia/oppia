@@ -64,7 +64,7 @@ MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE = (
 MODERATOR_REQUEST_FORUM_URL = config_domain.ConfigProperty(
     'moderator_request_forum_url', {'type': 'unicode'},
     'A link to the forum for nominating explorations to be featured '
-    'in the gallery',
+    'in the Oppia library',
     default_value=MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE)
 
 DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = config_domain.ConfigProperty(
