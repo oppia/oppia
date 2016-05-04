@@ -26,7 +26,7 @@
                    ng-class="{'conversation-skin-progress-dots-iframed': isIframed, 'conversation-skin-progress-dots-not-iframed': !isIframed}">
     </progress-dots>
 
-    <div class="conversation-skin-cards-container"
+    <div class="conversation-skin-cards-container conversation-skin-animate-cards"
          ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
       <div ng-show='!isNarrowViewport() || isTutorCardDisplayedOnNarrow()'
            class="conversation-skin-main-tutor-card"
