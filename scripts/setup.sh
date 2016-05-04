@@ -67,7 +67,7 @@ function maybeInstallDependencies {
     install_node_module karma-coverage 0.5.2
     install_node_module karma-ng-html2js-preprocessor 0.1.0
     install_node_module karma-chrome-launcher 0.1.4
-    install_node_module protractor 2.5.0
+    install_node_module protractor 3.3.0
     install_node_module protractor-screenshot-reporter 0.0.5
     install_node_module jasmine-spec-reporter 2.2.2
 
@@ -201,14 +201,9 @@ elif [ "$VAGRANT" = true ]; then
   # Enforce proper ownership on oppia, oppia_tools, and node_modules or else NPM installs will fail.
   sudo chown -R vagrant.vagrant /home/vagrant/oppia /home/vagrant/oppia_tools /home/vagrant/node_modules
 
-
 elif [ -f "/usr/bin/chromium-browser" ]; then
   # Unix.
   export CHROME_BIN="/usr/bin/chromium-browser"
-
-
-
-  export CHROME_BIN="/usr/bin/google-chrome"
 elif [ -f "/c/Program Files (x86)/Google/Chrome/Application/chrome.exe" ]; then
   # Windows.
   export CHROME_BIN="/c/Program Files (x86)/Google/Chrome/Application/chrome.exe"
@@ -292,3 +287,4 @@ install_node_module() {
 export -f install_node_module
 
 export SETUP_DONE=true
+
