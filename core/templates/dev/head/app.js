@@ -427,6 +427,14 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
     registerNewSignupEvent: function() {
       _sendEventToGoogleAnalytics('SignupButton', 'click', '');
     },
+    registerClickBrowseLibraryButtonEvent: function() {
+      _sendEventToGoogleAnalytics(
+        'BrowseLibraryButton', 'click', $window.location.pathname);
+    },
+    registerClickCreateExplorationButtonEvent: function() {
+      _sendEventToGoogleAnalytics(
+        'CreateExplorationButton', 'click', $window.location.pathname);
+    },
     registerOpenExplorationCreationModalEvent: function() {
       _sendEventToGoogleAnalytics(
         'CreateExplorationModal', 'open', $window.location.pathname);
