@@ -207,6 +207,27 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self.assertEqual(len(job_output), 1)
         self.assertIn('failing to evaluate param string', job_output[0])
 
+    def test_migration_job_catches_answer_which_fails_normalization(self):
+        state_name = 'Set Input'
+
+        rule_spec_str = (
+            'HasElementsIn([u\'orange\', u\'purple\', u\'silver\'])')
+        html_answer = '[u\'purple\', u\'orange\', u\'purple\']'
+        self._record_old_answer(state_name, rule_spec_str, html_answer)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+
+        # The answer should fail to migrate because it cannot be normalized.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        self.assertEqual(len(job_output), 1)
+        self.assertIn('Failed to normalize', job_output[0])
+
     def test_migrate_code_repl(self):
         state_name = 'Code Editor'
 

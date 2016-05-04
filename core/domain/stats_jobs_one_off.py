@@ -617,6 +617,21 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         return str_value
 
     @classmethod
+    def _normalize_raw_answer_object(
+            cls, answer_object, raw_answer, answer_str):
+        try:
+            return (
+                answer_object.normalize(raw_answer), None)
+        except AssertionError as error:
+            answer_object_type_name = type(answer_object).__name__
+            error_str = str(error)
+            return (
+                None,
+                'Failed to normalize %s: %s (answer: \'%s\'), because of: '
+                '%s' % (
+                    answer_object_type_name, raw_answer, answer_str, error_str))
+
+    @classmethod
     def _cb_reconstitute_code_evaluation(
             cls, interaction, rule_spec, rule_str, answer_str):
         # The Jinja representation for CodeEvaluation answer strings is:
@@ -645,8 +660,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 'evaluation': '',
                 'error': ''
             }
-            return (
-                objects.CodeEvaluation.normalize(code_evaluation_dict), None)
+            return cls._normalize_raw_answer_object(
+                objects.CodeEvaluation, code_evaluation_dict, answer_str)
         elif rule_spec.rule_type in rule_types_without_output:
             code = cls._get_plaintext(answer_str)
             if not code:
@@ -657,8 +672,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 'evaluation': '',
                 'error': ''
             }
-            return (
-                objects.CodeEvaluation.normalize(code_evaluation_dict), None)
+            return cls._normalize_raw_answer_object(
+                objects.CodeEvaluation, code_evaluation_dict, answer_str)
         return (
             None,
             'Cannot reconstitute a CodeEvaluation object without OutputEquals, '
@@ -731,7 +746,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 ],
                 'clickedRegions': [region_name]
             }
-            return (objects.ClickOnImage.normalize(click_on_image_dict), None)
+            return cls._normalize_raw_answer_object(
+                objects.ClickOnImage, click_on_image_dict, answer_str)
         return (
             None,
             'Cannot reconstitute ImageClickInput object without an IsInRegion '
@@ -761,7 +777,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         coord_two_dim_list = [
             float(match.group('x')), float(match.group('y'))
         ]
-        return (objects.CoordTwoDim.normalize(coord_two_dim_list), None)
+        return cls._normalize_raw_answer_object(
+            objects.CoordTwoDim, coord_two_dim_list, answer_str)
 
     @classmethod
     def _cb_reconstitute_item_selection_input(
@@ -777,7 +794,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 return (
                     None,
                     'Bad answer string in ItemSelectionInput Equals rule.')
-            return (objects.SetOfHtmlString.normalize(option_list), None)
+            return cls._normalize_raw_answer_object(
+                objects.SetOfHtmlString, option_list, answer_str)
         return (
             None,
             'Cannot reconstitute ItemSelectionInput object without an Equals '
@@ -830,12 +848,12 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             target_string = AnswerMigrationJob._display_expression_helper(
                 results[0], operators, 0)
 
-            return (objects.CheckedProof.normalize({
+            return cls._normalize_raw_answer_object(objects.CheckedProof, {
                 'assumptions_string': assumptions_string,
                 'target_string': target_string,
                 'proof_string': answer_str,
                 'correct': True
-            }), None)
+            }, answer_str)
         return (
             None,
             'Cannot reconstitute CheckedProof object without a Correct rule.')
@@ -850,8 +868,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                     None,
                     'Bad answer string in MathExpressionInput '
                     'IsMathematicallyEquivalentTo rule.')
-            return (
-                objects.MathExpression.normalize(math_expression_dict), None)
+            return cls._normalize_raw_answer_object(
+                objects.MathExpression, math_expression_dict, answer_str)
         return (
             None,
             'Cannot reconstitute MathExpressionInput object without an '
@@ -873,7 +891,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                     'Clicked index %d and submitted answer \'%s\' does not '
                     'match corresponding choice in the exploration: \'%s\'' % (
                         clicked_index, answer_str, choices[clicked_index]))
-            return (objects.NonnegativeInt.normalize(clicked_index), None)
+            return cls._normalize_raw_answer_object(
+                objects.NonnegativeInt, clicked_index, answer_str)
         return (
             None,
             'Cannot reconstitute MultipleChoiceInput object without an Equals '
@@ -905,7 +924,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 'reconstitute MusicPhrase object: %s' % rule_spec.rule_type)
         answer_str = answer_str.rstrip()
         if answer_str == 'No answer given.':
-            return (objects.MusicPhrase.normalize([]), None)
+            return cls._normalize_raw_answer_object(
+                objects.MusicPhrase, [], answer_str)
         if answer_str[0] != '[' or answer_str[-1] != ']' or ' ' in answer_str:
             return (None, 'Invalid music note answer string: %s' % answer_str)
         note_list_str = answer_str[1:-1]
@@ -916,13 +936,13 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                     None,
                     'Invalid music note answer string (bad note: %s): %s' % (
                         note_str, answer_str))
-        return (objects.MusicPhrase.normalize([{
+        return cls._normalize_raw_answer_object(objects.MusicPhrase, [{
             'readableNoteName': note_str,
             'noteDuration': {
                 'num': AnswerMigrationJob._NOTE_DURATION_FRACTION_PART,
                 'den': AnswerMigrationJob._NOTE_DURATION_FRACTION_PART
             }
-        } for note_str in note_list]), None)
+        } for note_str in note_list], answer_str)
 
     @classmethod
     def _cb_reconstitute_numeric_input(
@@ -938,7 +958,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 'Unsupported rule type encountered while attempting to '
                 'reconstitute NumericInput object: %s' % rule_spec.rule_type)
         input_value = float(cls._get_plaintext(answer_str))
-        return (objects.Real.normalize(input_value), None)
+        return cls._normalize_raw_answer_object(
+            objects.Real, input_value, answer_str)
 
     @classmethod
     def _cb_reconstitute_pencil_code_editor(
@@ -948,9 +969,9 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             # just the code; it's easier to reconstitute.
             code_evaluation_dict = eval(cls._get_plaintext(answer_str))
             if not isinstance(code_evaluation_dict, dict):
-                return (None, 'Failed to recover code: %s' % answer_str)
-            return (
-                objects.CodeEvaluation.normalize(code_evaluation_dict), None)
+                return (None, 'Failed to recover pencil code: %s' % answer_str)
+            return cls._normalize_raw_answer_object(
+                objects.CodeEvaluation, code_evaluation_dict, answer_str)
         return (
             None,
             'Cannot reconstitute a CodeEvaluation object without an '
@@ -971,9 +992,9 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
         unicode_string_list = eval(cls._get_plaintext(answer_str))
         if not isinstance(unicode_string_list, list):
-            return (None, 'Failed to recover code: %s' % answer_str)
-        return (
-            objects.SetOfUnicodeString.normalize(unicode_string_list), None)
+            return (None, 'Failed to recover set: %s' % answer_str)
+        return cls._normalize_raw_answer_object(
+            objects.SetOfUnicodeString, unicode_string_list, answer_str)
 
     @classmethod
     def _cb_reconstitute_text_input(
@@ -988,7 +1009,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 'Unsupported rule type encountered while attempting to '
                 'reconstitute TextInput object: %s' % rule_spec.rule_type)
         input_value = cls._get_plaintext(answer_str)
-        return (objects.NormalizedString.normalize(input_value), None)
+        return cls._normalize_raw_answer_object(
+            objects.NormalizedString, input_value, answer_str)
 
     @classmethod
     def _reconstitute_answer_object(
