@@ -34,6 +34,16 @@ oppia.animation('.conversation-skin-responses-animate-slide', function() {
   };
 });
 
+var adjustTutorAvatar = function() {
+  var supplementalCard = $('.conversation-skin-supplemental-card-container');
+  var oppiaAvatar = $('.conversation-skin-oppia-avatar.show-tutor-card');
+  oppiaAvatar.css({
+    left: supplementalCard.position().left +
+          supplementalCard.width() - oppiaAvatar.width(),
+    top: supplementalCard.position().top
+  });
+};
+
 oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
   var tutorCardLeft, tutorCardWidth, tutorCardHeight;
 
@@ -43,6 +53,8 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
       return;
     }
     var tutorCard = element;
+    var supplementalCard = $('.conversation-skin-supplemental-card-container');
+
     tutorCardLeft = tutorCard.position().left;
     tutorCardWidth = tutorCard.width();
     tutorCardHeight = tutorCard.height();
@@ -53,7 +65,9 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
       height: 0,
       opacity: 0
     }, 500, function() {
-      $('.conversation-skin-oppia-avatar.show-tutor-card').show();
+      adjustTutorAvatar();
+      var oppiaAvatar = $('.conversation-skin-oppia-avatar.show-tutor-card');
+      oppiaAvatar.show();
       tutorCard.css({
         left: '',
         width: '',
@@ -334,7 +348,7 @@ oppia.directive('conversationSkin', [function() {
           $scope.activeCard = playerTranscriptService.getCard(index);
           $scope.arePreviousResponsesShown = false;
           $scope.clearHelpCard();
-
+          $scope._tutorCardDisplayedOnNarrow = true;
           if (_nextFocusLabel && playerTranscriptService.isLastCard(index)) {
             focusService.setFocusIfOnDesktop(_nextFocusLabel);
           } else {
@@ -443,7 +457,6 @@ oppia.directive('conversationSkin', [function() {
                 exploration.initStateName, _nextFocusLabel));
             $rootScope.loadingMessage = '';
             $scope.hasFullyLoaded = true;
-
             $scope.adjustPageHeight(false, null);
             $window.scrollTo(0, 0);
             focusService.setFocusIfOnDesktop(_nextFocusLabel);
@@ -540,7 +553,7 @@ oppia.directive('conversationSkin', [function() {
 
                     _nextFocusLabel = $scope.CONTINUE_BUTTON_FOCUS_LABEL;
                     focusService.setFocusIfOnDesktop(_nextFocusLabel);
-                    // ScrollToBottom();
+                    scrollToBottom();
                   } else {
                     playerTranscriptService.addNewFeedback(feedbackHtml);
                     $scope.showPendingCard(
@@ -643,6 +656,9 @@ oppia.directive('conversationSkin', [function() {
         $window.onresize = function() {
           $scope.adjustPageHeight(false, null);
           $scope.windowWidth = windowDimensionsService.getWidth();
+          if ($scope.isSupplementalCardDisplayedOnNarrow()) {
+            adjustTutorAvatar();
+          }
         };
 
         $window.addEventListener('scroll', function() {
