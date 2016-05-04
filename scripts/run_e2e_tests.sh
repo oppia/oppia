@@ -29,7 +29,7 @@
 #         sharding.
 # Sharding must be disabled (either by passing in false to --sharding or 1 to
 # --sharding-instances) if running any tests in isolation (iit or ddescribe).
-#
+#   --suite=suite_name Performs test for different suites.
 # The root folder MUST be named 'oppia'.
 
 function cleanup {
