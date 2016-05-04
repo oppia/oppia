@@ -300,13 +300,13 @@
           <br>
 
           <p ng-if="explorationRightsService.isPrivate()">
-            It is <strong>not shown</strong> in the gallery.
+            It is <strong>not shown</strong> in the Oppia library.
           </p>
           <p ng-if="explorationRightsService.isPublic()">
-            It is <strong>shown</strong> in the gallery.
+            It is <strong>shown</strong> in the Oppia library.
           </p>
           <p ng-if="explorationRightsService.isPublicized()">
-            It is <strong>featured</strong> in the gallery.
+            It is <strong>featured</strong> in the Oppia library.
           </p>
         </div>
       </div>
@@ -317,10 +317,10 @@
       <div>
         This exploration is <strong>public</strong> and <strong>community-editable</strong>.
         <p ng-if="explorationRightsService.isPublic()">
-          It is <strong>shown</strong> in the gallery.
+          It is <strong>shown</strong> in the Oppia library.
         </p>
         <p ng-if="explorationRightsService.isPublicized()">
-          It is <strong>featured</strong> in the gallery.
+          It is <strong>featured</strong> in the Oppia library.
         </p>
       </div>
     </div>
@@ -361,7 +361,7 @@
         {% endif %}
 
         <p class="oppia-exploration-ctrl" ng-if="editabilityService.isEditable() && explorationRightsService.isPublic()">
-          <button type="button" class="btn btn-default" ng-click="showNominateExplorationModal()" ng-disabled="isExplorationLockedForEditing()" ng-class="{'btn-success': !isExplorationLockedForEditing()}" tooltip="Click this button to nominate this exploration for featured status in the gallery." tooltip-placement="bottom">
+          <button type="button" class="btn btn-default" ng-click="showNominateExplorationModal()" ng-disabled="isExplorationLockedForEditing()" ng-class="{'btn-success': !isExplorationLockedForEditing()}" tooltip="Click this button to nominate this exploration for featured status in the Oppia library." tooltip-placement="bottom">
             Nominate for Featured Status
           </button>
         </p>
@@ -488,7 +488,7 @@
       You are about to unpublish this exploration.
     </p>
     <p ng-if="action === 'publicize_exploration'">
-      You are about to feature this exploration in the gallery.
+      You are about to feature this exploration in the Oppia library.
     </p>
 
     <div ng-if="willEmailBeSent">
@@ -536,7 +536,7 @@
 
   <div class="modal-body">
     <p>
-      Congratulations, you are about to nominate this exploration for featured status in the gallery!
+      Congratulations, you are about to nominate this exploration for featured status in the Oppia library!
     </p>
 
     <p>

@@ -122,14 +122,14 @@ oppia.factory('searchService', [
         _searchCursor = data.search_cursor;
         numSearchesInProgress--;
 
-        if ($('.oppia-splash-search-input').val() === searchQuery) {
+        if ($('.oppia-search-bar-input').val() === searchQuery) {
           $rootScope.$broadcast(
             'initialSearchResultsLoaded', data.explorations_list);
           _isCurrentlyFetchingResults = false;
         } else {
           console.log('Mismatch');
           console.log('SearchQuery: ' + searchQuery);
-          console.log('Input: ' + $('.oppia-splash-search-input').val());
+          console.log('Input: ' + $('.oppia-search-bar-input').val());
         }
       }, function() {
         numSearchesInProgress--;

@@ -467,8 +467,8 @@ textarea {
 }
 
 /*
-  Note that adding "overflow-y: scroll;" will
-  break infinite scrolling in the gallery page.
+  Note that adding "overflow-y: scroll;" will break infinite scrolling in the
+  search results page.
 */
 .oppia-content-container {
   height: 100%;
@@ -898,43 +898,6 @@ textarea {
   color: rgba(255,255,255,1);
 }
 
-@media (max-width: 1050px) {
-  .oppia-gallery-language-selector {
-    display: none;
-  }
-  .oppia-gallery-category-selector .btn {
-    border-bottom-right-radius: 4px;
-    border-top-right-radius: 4px;
-  }
-}
-
-@media (max-width: 890px) {
-  .oppia-gallery-category-selector {
-    display: none;
-  }
-  .oppia-splash-search-text-input {
-    border-bottom-right-radius: 4px;
-    border-top-right-radius: 4px;
-  }
-}
-
-.oppia-gallery-featured-explorations-separator {
-  border-top: 1px solid #aad;
-  margin: 40px 20% 10px;
-}
-
-.oppia-gallery-loading-results-message {
-  background-color: #888;
-  bottom: 0;
-  color: white;
-  height: 30px;
-  opacity: 0.9;
-  padding-top: 5px;
-  text-align: center;
-  width: 100%;
-  z-index: 50;
-}
-
 @media (max-width: 768px) {
   .oppia-navbar-hide-on-small-width {
     display: none;
@@ -956,33 +919,71 @@ textarea {
   background-color: #eee;
 }
 
-.oppia-gallery-group {
+.oppia-library-tiles-area {
+  background-color: #eee;
+}
+
+.oppia-exp-summary-tiles-container {
+  display: block;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 928px;
+  min-height: 500px;
+  padding-bottom: 24px;
+  padding-top: 24px;
+  width: 100vw;
+}
+/* Ensure that the summary tiles tiles remain centered. Note that these values
+   would need to be updated if the summary tiles are changed. */
+@media (max-width: 844px) {
+  .oppia-exp-summary-tiles-container {
+    margin-left: 5vw;
+    margin-right: 5vw;
+    max-width: 89vw;
+    width: 632px;
+  }
+}
+@media (max-width: 632px) {
+  .oppia-exp-summary-tiles-container {
+    margin-left: 2vw;
+    margin-right: 2vw;
+    max-width: 96vw;
+    width: 420px;
+  }
+}
+@media (max-width: 420px) {
+  .oppia-exp-summary-tiles-container {
+    width: 208px;
+  }
+}
+
+.oppia-library-group {
   display: block;
   height: 332px;
   max-width: 928px;
   width: 100vw;
 }
-
-.oppia-gallery-tiles-area {
-  background-color: #eee;
-}
-
-.oppia-gallery-group-header {
+.oppia-library-group-header {
   display: inline-block;
   margin-bottom: 6px;
   margin-left: 44px;
   margin-top: 36px;
 }
-
-.oppia-gallery-group-header a {
+.oppia-library-group-header a {
   color: black;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
 }
-.oppia-gallery-group-header a:hover {
+.oppia-library-group-header a:hover {
   color: #0844aa;
 }
 
-.oppia-gallery-scroll-btn {
+.oppia-library-featured-explorations-separator {
+  border-top: 1px solid #aad;
+  margin: 40px 20% 10px;
+}
+
+.oppia-library-carousel-scroll-btn {
   cursor: pointer;
   float: left;
   height: 60px;
@@ -992,21 +993,14 @@ textarea {
   position: relative;
   width: 10vw;
 }
-
-.oppia-gallery-scroll-btn i {
+.oppia-library-carousel-scroll-btn i {
   font-size: 36px;
   margin: 0;
   padding: 0;
   top: 50%;
 }
 
-.oppia-gallery-tiles-introduction {
-  font-size: 1.6em;
-  padding-bottom: 40px;
-  padding-top: 40px;
-}
-
-.oppia-gallery-tiles {
+.oppia-library-carousel-tiles {
   /*The height is adjusted to hide the scrollbars*/
   height: 290px;
   left: 0;
@@ -1018,7 +1012,7 @@ textarea {
   white-space: nowrap;
 }
 
-.oppia-gallery-tiles-carousel {
+.oppia-library-carousel {
   height: 264px;
   float: left;
   max-width: 848px;
@@ -1026,12 +1020,12 @@ textarea {
   position: relative;
 }
 
-.oppia-gallery-tiles-carousel-overlay-left {
+.oppia-library-carousel-overlay-left {
   background: #b5bdc8;
   background: -moz-linear-gradient(left, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%);
   background: -webkit-linear-gradient(left, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%);
   background: linear-gradient(to right, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%);
-  /*The display is set with Gallery.js*/
+  /*The display is set in Library.js*/
   display: none;
   height: 240px;
   left: 0;
@@ -1042,12 +1036,12 @@ textarea {
   z-index: 99;
 }
 
-.oppia-gallery-tiles-carousel-overlay-right {
+.oppia-library-carousel-overlay-right {
   background: #b5bdc8;
   background: -moz-linear-gradient(left, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%);
   background: -webkit-linear-gradient(left, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%);
   background: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%);
-  /*The display is set with Gallery.js*/
+  /*The display is set in Library.js*/
   display: none;
   height: 240px;
   right: 0;
@@ -1058,50 +1052,9 @@ textarea {
   z-index: 99;
 }
 
-.oppia-gallery-no-match, .oppia-gallery-no-match p {
-  font-size: 0.85em;
-  text-align: center;
-}
+/* Rules for the tiles in the "My Explorations" page. */
 
-.oppia-gallery-tiles-container {
-  display: block;
-  height: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 928px;
-  min-height: 500px;
-  padding-bottom: 24px;
-  padding-top: 24px;
-  width: 100vw;
-}
-
-/* Ensure that the gallery tiles remain centered. Note that these values would
-   need to be updated if the gallery tiles are changed. */
-@media (max-width: 844px) {
-  .oppia-gallery-tiles-container {
-    margin-left: 5vw;
-    margin-right: 5vw;
-    max-width: 89vw;
-    width: 632px;
-  }
-}
-
-@media (max-width: 632px) {
-  .oppia-gallery-tiles-container {
-    margin-left: 2vw;
-    margin-right: 2vw;
-    max-width: 96vw;
-    width: 420px;
-  }
-}
-
-@media (max-width: 420px) {
-  .oppia-gallery-tiles-container {
-    width: 208px;
-  }
-}
-
-md-card.oppia-gallery-tile {
+md-card.oppia-dashboard-exp-tile {
   background-color: #fff;
   color: #888;
   height: 120px;
@@ -1110,148 +1063,59 @@ md-card.oppia-gallery-tile {
   position: relative;
   width: 100%;
 }
-.oppia-gallery-tile:hover {
+.oppia-dashboard-exp-tile:hover {
   background-color: #f9f9f9;
 }
 
-.oppia-gallery-tile-container-link {
+.oppia-dashboard-exp-tile-container-link {
   height: 100%;
   width: 100%;
 }
 
-.oppia-gallery-tile-image-container {
+.oppia-dashboard-exp-tile-contents {
+  height: 100%;
+  padding: 23px 58px;
+  width: 100%;
+}
+.oppia-dashboard-exp-tile-contents:hover {
+  text-decoration: none;
+}
+
+.oppia-dashboard-exp-tile-image-container {
   height: 120px;
   left: 0;
   top: 0;
   width: 120px;
 }
 /* This centers the image horizontally and vertically. */
-.oppia-gallery-tile-image {
+.oppia-dashboard-exp-tile-image {
   height: 120px;
   width: 120px;
 }
-
-.oppia-gallery-tile-contents {
-  height: 100%;
-  padding: 23px 58px;
-  width: 100%;
-}
-.oppia-gallery-tile-contents:hover {
-  text-decoration: none;
-}
-
-.oppia-gallery-tile-details {
+.oppia-dashboard-exp-tile-details {
   padding-left: 100px;
   padding-top: 5px;
 }
-.oppia-gallery-tile-first-row {
+.oppia-dashboard-exp-tile-first-row {
   margin-bottom: 8px;
 }
-.oppia-gallery-tile-title {
+.oppia-dashboard-exp-tile-title {
   color: #333;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-weight: bold;
 }
-
-.oppia-gallery-tile-objective {
-  color: rgba(0,0,0,0.7);
-}
-
 @media (max-width: 365px) {
-  .oppia-gallery-tile-image-container {
+  .oppia-dashboard-exp-tile-image-container {
     display: none;
   }
-  .oppia-gallery-tile-details {
+  .oppia-dashboard-exp-tile-details {
     padding-left: 0;
   }
 }
-@media (max-width: 800px) {
-  .oppia-gallery-tiles-introduction {
-    margin-left: 20px;
-    margin-right: 20px;
-  }
-}
 
-.oppia-gallery-tile-second-row {
+.oppia-dashboard-exp-tile-second-row {
   color: rgba(0,0,0,0.65);
   font-size: 0.9em;
-}
-.oppia-gallery-tile-ratings {
-  color: black;
-  letter-spacing: 2px;
-}
-
-.oppia-gallery-edit-btn {
-  font-size: 0.75em;
-  margin-top: 10px;
-  position: absolute;
-  right: 1px;
-  top: -9px;
-  border-color:transparent;
-  background-color: transparent;
-
-}
-.oppia-gallery-edit-btn:hover {
-  background: transparent;
-  border-color: transparent;
-  color: green;
-}
-
-.oppia-html-select {
-  position: relative;
-  width: 80%;
-}
-
-.oppia-html-select .oppia-html-select-selection-element {
-  overflow: hidden;
-  padding-top: 5px;
-}
-
-.oppia-html-select .oppia-html-select-selection-caret {
-  bottom: 0;
-  color: black;
-  margin: auto;
-  position: absolute;
-  right: 5px;
-  top: 0;
-}
-
-.oppia-html-select .oppia-html-select-selection {
-  padding-right: 20px;
-  position: relative;
-  text-decoration: none;
-  width: inherit;
-}
-
-.oppia-html-select .oppia-html-select-option {
-  padding-top: 10px;
-  overflow: hidden;
-  margin-right: 10px;
-}
-
-.oppia-html-select .oppia-html-select-option:hover {
-  background: #1485E6;
-  color: white;
-}
-
-.oppia-html-select .oppia-html-select-option oppia-noninteractive-image {
-  display: inline-block;
-  margin-bottom: 0;
-}
-
-.oppia-create-exploration-label {
-  margin-top: 5px;
-}
-
-.carousel-indicators {
-  margin-bottom: 120px;
-}
-
-.carousel-control .glyphicon-chevron-left,
-.carousel-control .glyphicon-chevron-right,
-.carousel-control .icon-prev,
-.carousel-control .icon-next {
-  margin-top: -80px;
 }
 
 .oppia-signup-page-title {
@@ -1336,18 +1200,6 @@ md-card.oppia-gallery-tile {
 
 .oppia-form input.ng-invalid.ng-dirty {
   border: 2px solid #FA787E;
-}
-
-.oppia-gallery-frame {
-  border-radius: 20px;
-  margin: 10px;
-  padding: 10px;
-  width: 100%;
-}
-
-.oppia-grayed {
-  color: gray;
-  opacity: 0.5;
 }
 
 .oppia-help {
@@ -2126,49 +1978,6 @@ ul.oppia-dashboard-tiles {
   pointer-events: none;
 }
 
-/* Splash page. */
-
-.oppia-splash-search-form {
-  margin-top: 10px;
-  padding-right: 0;
-}
-
-.oppia-splash-search-input {
-  background: #04857c;
-  border: 1px solid #018c7f;
-  border-radius: 0;
-  color: white;
-  font-size: 15px;
-  height: 34px;
-}
-
-.oppia-splash-search-input.btn {
-  color: rgba(255,255,255,0.7);
-}
-
-.oppia-splash-search-input.btn:hover {
-  color: #fff;
-}
-
-.oppia-splash-search-input::-webkit-input-placeholder {
-  color: rgba(255,255,255,0.7);
-}
-.oppia-splash-search-input:-moz-placeholder {
-  color: rgba(255,255,255,0.7);
-}
-.oppia-splash-search-input::-moz-placeholder {
-  color: rgba(255,255,255,0.7);
-}
-.oppia-splash-search-input:-ms-input-placeholder {
-  color: rgba(255,255,255,0.7);
-}
-
-.oppia-splash-search-icon {
-  background: #04857c;
-  border: 1px solid #018c7f;
-  color: rgba(255,255,255,0.7);
-}
-
 /* CSS3 Animations */
 @-ms-keyframes spin {
   from { -ms-transform: rotate(0deg); }
@@ -2207,114 +2016,6 @@ ul.oppia-dashboard-tiles {
   animation-duration: 1000ms;
   animation-iteration-count: infinite;
   animation-timing-function: ease-in-out;
-}
-
-.oppia-gallery-banner-container {
-  height: 700px;
-  position: fixed;
-  top: 56px;
-  width: 100%;
-  z-index: 0;
-}
-.oppia-gallery-banner {
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  height: 700px;
-  width: 100%;
-}
-.oppia-gallery-banner-content {
-  color: #fff;
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 4em;
-  position: absolute;
-  text-align: center;
-  top: 155px;
-  width: 100%;
-  z-index: 100;
-}
-@media(max-width: 468px) {
-  .oppia-gallery-banner-content {
-    font-size: 3em;
-    top: 100px;
-  }
-}
-
-.oppia-gallery-banner-tagline {
-  color: #fff;
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 2em;
-  padding-top: 250px;
-}
-@media(max-width: 468px) {
-  .oppia-gallery-banner-tagline {
-    top: 300px;
-  }
-}
-
-.oppia-gallery-banner-link {
-  color: rgba(251, 234, 43, 1);
-}
-.oppia-gallery-banner-link:hover {
-  color: rgba(255, 238, 47, 1);
-  text-decoration: none;
-}
-
-.oppia-gallery-interstitial {
-  background-color: #fff;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-  font-size: 1.6em;
-  margin-top: 600px;
-  padding-bottom: 45px;
-  padding-left: 10px;
-  padding-right: 10px;
-  padding-top: 45px;
-  position: relative;
-  text-align: center;
-  width: 100%;
-  z-index: 3;
-}
-.oppia-gallery-interstitial-video {
-  opacity: 0.85;
-  transition: ease-in-out all .2s;
-  -webkit-transition: ease-in-out all .2s;
-  user-drag: none;
-  -moz-user-select: none;
-  -webkit-user-drag: none;
-}
-.oppia-gallery-interstitial-video:hover {
-  background-color: #fff;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-  cursor: pointer;
-  opacity: 1;
-  transition: ease-in-out all .2s;
-  -webkit-transition: ease-in-out all .2s;
-}
-
-.oppia-gallery-interstitial-content {
-  margin-top: 10px;
-  text-align: center;
-}
-
-.oppia-gallery-interstitial-content > img {
-  display: inline-block;
-  margin: 10px 40px;
-}
-
-.oppia-gallery-modal .modal-body {
-  padding: 0;
-}
-.oppia-gallery-modal .modal-dialog {
-  margin-top: 50px;
-}
-
-.oppia-modal-close {
-  cursor: pointer;
-  height: 30px;
-  position: absolute;
-  right: -30px;
-  top: -30px;
-  width: 30px;
 }
 
 oppia-expression-error-tag {

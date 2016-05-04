@@ -32,8 +32,8 @@ class SearchRanker(jobs.BaseContinuousComputationManager):
     """A continuous-computation job that refreshes the search ranking.
 
     This job does not have a realtime component. There will be a delay in
-    propagating new updates to the gallery; the length of the delay will be
-    approximately the time it takes a batch job to run.
+    propagating new updates to the search result pages; the length of the delay
+    will be approximately the time it takes a batch job to run.
     """
     @classmethod
     def get_event_types_listened_to(cls):

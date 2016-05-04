@@ -216,8 +216,9 @@ def clear_index(index_name):
         index.delete(doc_ids)
 
 
-def search(query_string, index, cursor=None, limit=feconf.GALLERY_PAGE_SIZE,
-           sort='', ids_only=False, retries=DEFAULT_NUM_RETRIES):
+def search(query_string, index, cursor=None,
+           limit=feconf.SEARCH_RESULTS_PAGE_SIZE, sort='', ids_only=False,
+           retries=DEFAULT_NUM_RETRIES):
     """Searches for documents in an index.
 
     Args:

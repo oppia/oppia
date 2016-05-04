@@ -22,7 +22,7 @@ from core.domain import stats_jobs_continuous
 from core.domain import user_services
 import utils
 
-_GALLERY_CATEGORY_GROUPINGS = [{
+_LIBRARY_INDEX_GROUPS = [{
     'header': 'Computation & Programming',
     'search_categories': ['Computing', 'Programming'],
 }, {
@@ -44,6 +44,7 @@ _GALLERY_CATEGORY_GROUPINGS = [{
     'header': 'Business, Economics, Government & Law',
     'search_categories': ['Business', 'Economics', 'Government', 'Law'],
 }]
+
 
 def get_human_readable_contributors_summary(contributors_summary):
     contributor_ids = contributors_summary.keys()
@@ -135,9 +136,9 @@ def _get_displayable_exp_summary_dicts(exploration_summaries):
     return displayable_exp_summaries
 
 
-def get_gallery_category_groupings(language_codes):
-    """Returns a list of groups in the gallery. Each group has a header and
-    a list of dicts representing activity summaries.
+def get_library_groups(language_codes):
+    """Returns a list of groups for the library index page. Each group has a
+    header and a list of dicts representing activity summaries.
     """
     language_codes_suffix = ''
     if language_codes:
@@ -150,10 +151,10 @@ def get_gallery_category_groupings(language_codes):
             '" OR "'.join(categories), language_codes_suffix)
 
     results = []
-    for gallery_group in _GALLERY_CATEGORY_GROUPINGS:
+    for group in _LIBRARY_INDEX_GROUPS:
         # TODO(sll): Extend this to include collections.
         exp_ids = exp_services.search_explorations(
-            _generate_query(gallery_group['search_categories']), 10)[0]
+            _generate_query(group['search_categories']), 10)[0]
 
         summary_dicts = get_displayable_exp_summary_dicts_matching_ids(
             exp_ids)
@@ -162,8 +163,8 @@ def get_gallery_category_groupings(language_codes):
             continue
 
         results.append({
-            'header': gallery_group['header'],
-            'categories': gallery_group['search_categories'],
+            'header': group['header'],
+            'categories': group['search_categories'],
             'activity_summary_dicts': summary_dicts,
         })
 

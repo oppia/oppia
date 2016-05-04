@@ -12,13 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the gallery pages."""
+"""Tests for the library page and associated handlers."""
 
 import json
 import os
 
-from core.controllers import galleries
-from core.domain import config_services
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import rights_manager
@@ -29,25 +27,26 @@ import utils
 
 CAN_EDIT_STR = 'can_edit'
 
-class GalleryPageTest(test_utils.GenericTestBase):
+
+class LibraryPageTest(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(GalleryPageTest, self).setUp()
+        super(LibraryPageTest, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
-    def test_gallery_page(self):
-        """Test access to the gallery page."""
-        response = self.testapp.get(feconf.GALLERY_URL)
+    def test_library_page(self):
+        """Test access to the library page."""
+        response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
         self.assertEqual(response.status_int, 200)
-        response.mustcontain('Gallery', 'Categories')
+        response.mustcontain('Library', 'Categories')
 
-    def test_gallery_handler_demo_exploration(self):
-        """Test the gallery data handler on demo explorations."""
-        response_dict = self.get_json(feconf.GALLERY_SEARCH_DATA_URL)
+    def test_library_handler_demo_exploration(self):
+        """Test the library data handler on demo explorations."""
+        response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
         self.assertEqual({
             'is_admin': False,
             'is_moderator': False,
@@ -60,8 +59,8 @@ class GalleryPageTest(test_utils.GenericTestBase):
         # Load a public demo exploration.
         exp_services.load_demo('0')
 
-        # Test gallery
-        response_dict = self.get_json(feconf.GALLERY_SEARCH_DATA_URL)
+        # Load the search results with an empty query.
+        response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
         self.assertEqual(len(response_dict['explorations_list']), 1)
         self.assertDictContainsSubset({
             'id': '0',
@@ -78,7 +77,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
 
         # Run migration job to create exploration summaries.
         # This is not necessary, but serves as additional check that
-        # the migration job works well and gives correct galleries.
+        # the migration job works well and gives correct results.
         self.process_and_flush_pending_tasks()
         job_id = (exp_jobs_one_off.ExpSummariesCreationOneOffJob.create_new())
         exp_jobs_one_off.ExpSummariesCreationOneOffJob.enqueue(job_id)
@@ -99,8 +98,8 @@ class GalleryPageTest(test_utils.GenericTestBase):
             }],
             'Change title and category')
 
-        # Test gallery
-        response_dict = self.get_json(feconf.GALLERY_SEARCH_DATA_URL)
+        # Load the search results with an empty query.
+        response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
         self.assertEqual(len(response_dict['explorations_list']), 1)
         self.assertDictContainsSubset({
             'id': '0',
@@ -111,12 +110,12 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
         }, response_dict['explorations_list'][0])
 
-    def test_gallery_handler_for_created_explorations(self):
-        """Test the gallery data handler for manually created explirations."""
+    def test_library_handler_for_created_explorations(self):
+        """Test the library data handler for manually created explirations."""
         self.set_admins([self.ADMIN_USERNAME])
 
         self.login(self.ADMIN_EMAIL)
-        response_dict = self.get_json(feconf.GALLERY_SEARCH_DATA_URL)
+        response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
         self.assertDictContainsSubset({
             'is_admin': True,
             'is_moderator': True,
@@ -135,7 +134,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             self.admin_id, exploration, 'Exploration A', [])
 
         # Test that the private exploration isn't displayed.
-        response_dict = self.get_json(feconf.GALLERY_SEARCH_DATA_URL)
+        response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
         self.assertEqual(response_dict['explorations_list'], [])
 
         # Create exploration B
@@ -152,8 +151,8 @@ class GalleryPageTest(test_utils.GenericTestBase):
 
         exp_services.index_explorations_given_ids(['A', 'B'])
 
-        # Test gallery
-        response_dict = self.get_json(feconf.GALLERY_SEARCH_DATA_URL)
+        # Load the search results with an empty query.
+        response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
         self.assertEqual(len(response_dict['explorations_list']), 2)
         self.assertDictContainsSubset({
             'id': 'B',
@@ -175,8 +174,8 @@ class GalleryPageTest(test_utils.GenericTestBase):
         # Delete exploration A
         exp_services.delete_exploration(self.admin_id, 'A')
 
-        # Test gallery
-        response_dict = self.get_json(feconf.GALLERY_SEARCH_DATA_URL)
+        # Load the search results with an empty query.
+        response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
         self.assertEqual(len(response_dict['explorations_list']), 1)
         self.assertDictContainsSubset({
             'id': 'B',
@@ -187,40 +186,6 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
         }, response_dict['explorations_list'][0])
 
-    def test_new_exploration_ids(self):
-        """Test generation of exploration ids."""
-        self.login(self.EDITOR_EMAIL)
-
-        response = self.testapp.get(feconf.GALLERY_URL)
-        self.assertEqual(response.status_int, 200)
-        csrf_token = self.get_csrf_token_from_response(response)
-        exp_a_id = self.post_json(feconf.NEW_EXPLORATION_URL, {
-            'title': self.UNICODE_TEST_STRING,
-            'category': self.UNICODE_TEST_STRING,
-            'objective': 'Learn how to generate exploration ids.',
-            'language_code': feconf.DEFAULT_LANGUAGE_CODE
-        }, csrf_token)[galleries.EXPLORATION_ID_KEY]
-        self.assertEqual(len(exp_a_id), 12)
-
-        self.logout()
-
-    def test_exploration_upload_button(self):
-        """Test that the exploration upload button appears when appropriate."""
-        self.login(self.EDITOR_EMAIL)
-
-        response = self.testapp.get(feconf.GALLERY_URL)
-        self.assertEqual(response.status_int, 200)
-        response.mustcontain(no=['ng-click="showUploadExplorationModal()"'])
-
-        config_services.set_property(
-            feconf.SYSTEM_COMMITTER_ID, 'allow_yaml_file_upload', True)
-
-        response = self.testapp.get(feconf.GALLERY_URL)
-        self.assertEqual(response.status_int, 200)
-        response.mustcontain('ng-click="showUploadExplorationModal()"')
-
-        self.logout()
-
 
 class CategoryConfigTest(test_utils.GenericTestBase):
 
@@ -230,13 +195,14 @@ class CategoryConfigTest(test_utils.GenericTestBase):
         # Test that an icon exists for each default category.
         for category in all_categories:
             utils.get_file_contents(os.path.join(
-                'static', 'images', 'gallery', 'thumbnails',
+                'static', 'images', 'library', 'thumbnails',
                 '%s.svg' % category.replace(' ', '')))
 
         # Test that the default icon exists.
         utils.get_file_contents(os.path.join(
-            'static', 'images', 'gallery', 'thumbnails',
+            'static', 'images', 'library', 'thumbnails',
             '%s.svg' % feconf.DEFAULT_THUMBNAIL_ICON))
+
 
 class ExplorationSummariesHandlerTest(test_utils.GenericTestBase):
 
@@ -299,8 +265,8 @@ class ExplorationSummariesHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(summaries[1]['id'], self.PRIVATE_EXP_ID_VIEWER)
         self.assertEqual(summaries[1]['status'], 'private')
 
-        # If the viewer user is granted edit access to the editor user's private
-        # exploration, then it will show up for the next request.
+        # If the viewer user is granted edit access to the editor user's
+        # private exploration, then it will show up for the next request.
         rights_manager.assign_role_for_exploration(
             self.editor_id, self.PRIVATE_EXP_ID_EDITOR, self.viewer_id,
             rights_manager.ROLE_EDITOR)

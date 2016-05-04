@@ -272,10 +272,10 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             self._create_search_query(['in'], ['Architecture', 'Welcome'], []))
         self.assertEqual(sorted(exp_ids), [self.EXP_ID_0, self.EXP_ID_3])
 
-    def test_exploration_summaries_pagination_in_filled_gallery(self):
-        # Ensure the maximum number of explorations that can fit on the gallery
-        # page is maintained by the summaries function.
-        with self.swap(feconf, 'GALLERY_PAGE_SIZE', 3):
+    def test_exploration_summaries_pagination_in_filled_search_results(self):
+        # Ensure the maximum number of explorations that can fit on the search
+        # results page is maintained by the summaries function.
+        with self.swap(feconf, 'SEARCH_RESULTS_PAGE_SIZE', 3):
             # Need to load 3 pages to find all of the explorations. Since the
             # returned order is arbitrary, we need to concatenate the results
             # to ensure all explorations are returned. We validate the correct

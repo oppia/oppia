@@ -110,12 +110,14 @@ PUBLICIZE_EXPLORATION_EMAIL_HTML_BODY = config_domain.ConfigProperty(
     'Default content for the email sent after an exploration is publicized by '
     'a moderator. These emails are only sent if the functionality is enabled '
     'in feconf.py. Leave this field blank if emails should not be sent.',
-    'Congratulations, your exploration has been featured in the gallery!')
+    'Congratulations, your exploration has been featured in the Oppia '
+    'library!')
 UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY = config_domain.ConfigProperty(
     'unpublish_exploration_email_html_body', EMAIL_HTML_BODY_SCHEMA,
-    'Default content for the email sent after an exploration is unpublished by '
-    'a moderator. These emails are only sent if the functionality is enabled '
-    'in feconf.py. Leave this field blank if emails should not be sent.',
+    'Default content for the email sent after an exploration is unpublished '
+    'by a moderator. These emails are only sent if the functionality is '
+    'enabled in feconf.py. Leave this field blank if emails should not be '
+    'sent.',
     'I\'m writing to inform you that I have unpublished the above '
     'exploration.')
 

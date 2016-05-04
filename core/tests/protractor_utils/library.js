@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utilities for the gallery in end-to-end tests with protractor.
+ * @fileoverview Utilities for the library pages in end-to-end tests.
  */
 
 var editor = require('./editor.js');
@@ -21,43 +21,43 @@ var forms = require('./forms.js');
 
 var selectLanguages = function(languages) {
   forms.MultiSelectEditor(
-    element(by.css('.protractor-test-gallery-language-selector'))
+    element(by.css('.protractor-test-search-bar-language-selector'))
   ).selectValues(languages);
 };
 
 var deselectLanguages = function(languages) {
   forms.MultiSelectEditor(
-    element(by.css('.protractor-test-gallery-language-selector'))
+    element(by.css('.protractor-test-search-bar-language-selector'))
   ).deselectValues(languages);
 };
 
 var expectCurrentLanguageSelectionToBe = function(expectedLanguages) {
   forms.MultiSelectEditor(
-    element(by.css('.protractor-test-gallery-language-selector'))
+    element(by.css('.protractor-test-search-bar-language-selector'))
   ).expectCurrentSelectionToBe(expectedLanguages);
 };
 
 var selectCategories = function(categories) {
   forms.MultiSelectEditor(
-    element(by.css('.protractor-test-gallery-category-selector'))
+    element(by.css('.protractor-test-search-bar-category-selector'))
   ).selectValues(categories);
 };
 
 var deselectCategories = function(categories) {
   forms.MultiSelectEditor(
-    element(by.css('.protractor-test-gallery-category-selector'))
+    element(by.css('.protractor-test-search-bar-category-selector'))
   ).deselectValues(categories);
 };
 
 var expectCurrentCategorySelectionToBe = function(expectedCategories) {
   forms.MultiSelectEditor(
-    element(by.css('.protractor-test-gallery-category-selector'))
+    element(by.css('.protractor-test-search-bar-category-selector'))
   ).expectCurrentSelectionToBe(expectedCategories);
 };
 
 // Returns a promise of all explorations with the given name.
 var _getExplorationElements = function(name) {
-  return element.all(by.css('.protractor-test-gallery-tile')).filter(
+  return element.all(by.css('.protractor-test-exp-summary-tile')).filter(
       function(tile) {
     return tile.element(by.css('.protractor-test-exp-summary-tile-title')).
         getText().then(function(tileTitle) {

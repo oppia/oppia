@@ -60,12 +60,11 @@ MAX_ITERATIONS = 10
 _BASE_ENTITY_STATE = 'state'
 _BASE_ENTITY_GADGET = 'gadget'
 
-# Constants used for gallery ranking.
+# Constants used for search ranking.
 _STATUS_PUBLICIZED_BONUS = 30
 # This is done to prevent the rank hitting 0 too easily. Note that
 # negative ranks are disallowed in the Search API.
 _DEFAULT_RANK = 20
-_MS_IN_ONE_DAY = 24 * 60 * 60 * 1000
 
 
 def _migrate_states_schema(versioned_exploration_states):
@@ -319,16 +318,16 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
     """Returns a list with all exploration ids matching the given search query
     string, as well as a search cursor for future fetches.
 
-    This method returns exactly feconf.GALLERY_PAGE_SIZE results if there are
-    at least that many, otherwise it returns all remaining results. (If this
-    behaviour does not occur, an error will be logged.) The method also returns
-    a search cursor.
+    This method returns exactly feconf.SEARCH_RESULTS_PAGE_SIZE results if
+    there are at least that many, otherwise it returns all remaining results.
+    (If this behaviour does not occur, an error will be logged.) The method
+    also returns a search cursor.
     """
     returned_exploration_ids = []
     search_cursor = cursor
 
     for _ in range(MAX_ITERATIONS):
-        remaining_to_fetch = feconf.GALLERY_PAGE_SIZE - len(
+        remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_exploration_ids)
 
         exp_ids, search_cursor = search_explorations(
@@ -342,15 +341,15 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
             else:
                 invalid_exp_ids.append(exp_ids[ind])
 
-        if len(returned_exploration_ids) == feconf.GALLERY_PAGE_SIZE or (
-                search_cursor is None):
+        if (len(returned_exploration_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE
+                or search_cursor is None):
             break
         else:
             logging.error(
                 'Search index contains stale exploration ids: %s' %
                 ', '.join(invalid_exp_ids))
 
-    if (len(returned_exploration_ids) < feconf.GALLERY_PAGE_SIZE
+    if (len(returned_exploration_ids) < feconf.SEARCH_RESULTS_PAGE_SIZE
             and search_cursor is not None):
         logging.error(
             'Could not fulfill search request for query string %s; at least '

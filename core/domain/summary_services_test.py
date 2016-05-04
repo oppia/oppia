@@ -197,7 +197,7 @@ class ExplorationDisplayableSummariesTest(
             'status': 'public',
             'tags': [],
             'thumbnail_bg_color': '#05a69a',
-            'thumbnail_icon_url': '/images/gallery/thumbnails/Lightbulb.svg',
+            'thumbnail_icon_url': '/images/library/thumbnails/Lightbulb.svg',
             'title': u'Exploration 2 Albert title',
         }
         self.assertIn('last_updated_msec', displayable_summaries[0])
@@ -216,8 +216,8 @@ class ExplorationDisplayableSummariesTest(
         self.assertEqual(displayable_summaries[0]['id'], self.EXP_ID_1)
         self.assertEqual(displayable_summaries[1]['id'], self.EXP_ID_2)
 
-        # However, if Albert is granted editor access to Bob's exploration, then
-        # Albert has access to the corresponding summary.
+        # However, if Albert is granted editor access to Bob's exploration,
+        # then Albert has access to the corresponding summary.
         rights_manager.assign_role_for_exploration(
             self.bob_id, self.EXP_ID_5, self.albert_id,
             rights_manager.ROLE_EDITOR)
@@ -238,9 +238,8 @@ class ExplorationDisplayableSummariesTest(
         self.assertEqual(displayable_summaries[2]['id'], self.EXP_ID_5)
 
 
-class GalleryCategoriesTest(
-        exp_services_test.ExplorationServicesUnitTests):
-    """Test functions for getting exploration categories summary dicts."""
+class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
+    """Test functions for getting summary dicts for library groups."""
 
     def setUp(self):
         """Populate the database of explorations and their summaries.
@@ -252,7 +251,7 @@ class GalleryCategoriesTest(
         - (4) Admin logs out.
         """
 
-        super(GalleryCategoriesTest, self).setUp()
+        super(LibraryGroupsTest, self).setUp()
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
@@ -262,14 +261,12 @@ class GalleryCategoriesTest(
         }, csrf_token)
         self.logout()
 
-    def test_get_gallery_category_groupings(self):
-        """The exploration with id '2' is an exploration in the
-        Mathematics category. The call to
-        get_gallery_catergory_groupings() should return the exploration
-        in Mathematics & Statistics category.
+    def test_get_library_groups(self):
+        """The exploration with id '2' is an exploration in the Mathematics
+        category. The call to get_library_groups() should return the
+        exploration as part of the Mathematics & Statistics group.
         """
-        gallery_category_groupings = (
-            summary_services.get_gallery_category_groupings([]))
+        library_groups = summary_services.get_library_groups([])
         expected_exploration_summary_dict = {
             'category': u'Mathematics',
             'community_owned': True,
@@ -283,20 +280,19 @@ class GalleryCategoriesTest(
             'tags': [],
             'title':  u'The Lazy Magician',
             'thumbnail_bg_color': '#058ca6',
-            'thumbnail_icon_url': '/images/gallery/thumbnails/Mathematics.svg',
+            'thumbnail_icon_url': '/images/library/thumbnails/Mathematics.svg',
         }
-        expected_gallery_group = {
+        expected_group = {
             'categories': ['Mathematics', 'Statistics'],
             'header': 'Mathematics & Statistics',
         }
 
-        self.assertEqual(len(gallery_category_groupings), 1)
-        self.assertDictContainsSubset(
-            expected_gallery_group, gallery_category_groupings[0])
+        self.assertEqual(len(library_groups), 1)
+        self.assertDictContainsSubset(expected_group, library_groups[0])
         self.assertEqual(
-            len(gallery_category_groupings[0]['activity_summary_dicts']), 1)
+            len(library_groups[0]['activity_summary_dicts']), 1)
         actual_exploration_summary_dict = (
-            gallery_category_groupings[0]['activity_summary_dicts'][0])
+            library_groups[0]['activity_summary_dicts'][0])
         self.assertDictContainsSubset(expected_exploration_summary_dict, (
             actual_exploration_summary_dict))
 
@@ -354,7 +350,7 @@ class FeaturedExplorationDisplayableSummariesTest(
             'thumbnail_bg_color': '#05a69a',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': '/images/gallery/thumbnails/Lightbulb.svg',
+            'thumbnail_icon_url': '/images/library/thumbnails/Lightbulb.svg',
             'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
             'category': u'A category',
