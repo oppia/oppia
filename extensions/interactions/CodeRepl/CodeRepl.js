@@ -129,7 +129,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
           }).then(function() {
             // Finished evaluating.
             if(status == 'SUBMIT') {
-            $scope.sendResponse('', '');
+              $scope.sendResponse('', '');
             }
           }, function(err) {
             if (!(err instanceof Sk.builtin.TimeLimitError)) {
