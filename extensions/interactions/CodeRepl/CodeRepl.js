@@ -119,7 +119,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
           execLimit: 10000
         });
 
-        $scope.runAndSubmitCode = function(codeInput,state) {
+        $scope.runAndSubmitCode = function(codeInput, state) {
           $scope.code = codeInput;
           $scope.output = '';
           
