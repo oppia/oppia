@@ -128,7 +128,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
             Sk.importMainWithBody('<stdin>', false, codeInput, true);
           }).then(function() {
             // Finished evaluating.
-            if(status == 'SUBMIT') {
+            if (status == 'SUBMIT') {
               $scope.sendResponse('', '');
             }
           }, function(err) {
