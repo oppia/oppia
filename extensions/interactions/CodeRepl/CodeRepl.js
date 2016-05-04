@@ -119,32 +119,17 @@ oppia.directive('oppiaInteractiveCodeRepl', [
           execLimit: 10000
         });
 
-        $scope.runCode = function(codeInput) {
+          $scope.runAndSubmitCode = function(codeInput,state) {
           $scope.code = codeInput;
           $scope.output = '';
-
+          
           // Evaluate the program asynchronously using Skulpt.
           Sk.misceval.asyncToPromise(function() {
             Sk.importMainWithBody('<stdin>', false, codeInput, true);
           }).then(function() {
             // Finished evaluating.
-            $scope.sendResponse('', '');
-          }, function(err) {
-            if (!(err instanceof Sk.builtin.TimeLimitError)) {
-              $scope.sendResponse('', String(err));
-            }
-          });
-        };
-
-        $scope.testRun = function(codeInput) {
-          $scope.code = codeInput;
-          $scope.output = '';
-
-          // Evaluate the program asynchronously using Skulpt.
-          Sk.misceval.asyncToPromise(function() {
-            Sk.importMainWithBody('<stdin>', false, codeInput, true);
-          }).then(function() {
-            // Finished evaluating.
+            if(state=="SUBMIT") {
+            $scope.sendResponse('','');}
           }, function(err) {
             if (!(err instanceof Sk.builtin.TimeLimitError)) {
               $scope.sendResponse('', String(err));
