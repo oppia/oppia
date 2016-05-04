@@ -26,13 +26,13 @@
                    ng-class="{'conversation-skin-progress-dots-iframed': isIframed, 'conversation-skin-progress-dots-not-iframed': !isIframed}">
     </progress-dots>
 
-    <div class="conversation-skin-cards-container conversation-skin-animate-cards"
+    <div class="conversation-skin-cards-container"
          ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
-
-      <div ng-if='!isNarrowViewport() || isTutorCardDisplayedOnNarrow()'
+      <div ng-show='!isNarrowViewport() || isTutorCardDisplayedOnNarrow()'
            class="conversation-skin-main-tutor-card"
            ng-class="{'animate-card-width': startCardChangeAnimation,
-                      'tutor-card-shadow': isNarrowViewport() && isCurrentSupplementalCardNonempty()}">
+                      'tutor-card-shadow': isNarrowViewport() && isCurrentSupplementalCardNonempty(),
+                      'conversation-skin-animate-tutor-card-on-narrow': isNarrowViewport()}">
         <div class="conversation-skin-tutor-card-content conversation-skin-animate-card-contents"
              ng-class="{'animate-card-change': startCardChangeAnimation}">
           <div class="conversation-skin-tutor-card-top-section">
@@ -101,8 +101,6 @@
                   </div>
                 </div>
                 <div ng-if="!exploration.isInteractionInline(activeCard.stateName)"
-                     ng-click="setVisiblePanel(PANEL_SUPPLEMENTAL)"
-                     ng-class="{'conversation-skin-interaction-clickable-instructions': panels.length > 1}"
                      style="opacity: 0.8;">
                   <md-button class="instructions-button"
                           ng-click="displaySupplementaryCardOnNarrow()">
@@ -124,8 +122,8 @@
         </div>
       </div>
 
-      <img ng-show="isSupplementalCardDisplayedOnNarrow()"
-           class="conversation-skin-oppia-avatar show-tutor-card"
+      <img class="conversation-skin-oppia-avatar show-tutor-card"
+           ng-show="isSupplementalCardDisplayedOnNarrow()"
            ng-src="<[OPPIA_AVATAR_IMAGE_URL]>"
            ng-click="displayTutorCardOnNarrow()" alt="">
 
@@ -161,7 +159,6 @@
       </div>
     </div>
   </div>
-
 
   <oppia-gadget-panel panel-contents="exploration.getGadgetPanelsContents().bottom"
                       class="conversation-skin-bottom-gadget-panel"
@@ -530,10 +527,6 @@
     .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-feedback-content::before,
     .conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-content::before {
       display: none;
-    }
-
-    .conversation-skin-interaction-clickable-instructions {
-      cursor: pointer;
     }
 
     .conversation-skin-inline-interaction {
