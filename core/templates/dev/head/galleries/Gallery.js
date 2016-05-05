@@ -266,6 +266,8 @@ oppia.controller('SearchBar', [
       // them here and update the translation every time the language is changed
       $scope.searchBarPlaceholder = $translate.instant(
         'I18N_GALLERY_SEARCH_PLACEHOLDER');
+      // 'messageformat' is the interpolation method for plural forms.
+      // http://angular-translate.github.io/docs/#/guide/14_pluralization.
       $scope.categoryButtonText = $translate.instant(
         $scope.selectionDetails.categories.summary, $scope.translationData,
         'messageformat');

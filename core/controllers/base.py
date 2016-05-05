@@ -442,7 +442,8 @@ class BaseHandler(webapp2.RequestHandler):
             values['csrf_token'] = CsrfTokenManager.create_csrf_token(
                 self.user_id, self.PAGE_NAME_FOR_CSRF)
             values['csrf_token_for_footer'] = (
-                CsrfTokenManager.create_csrf_token(self.user_id, 'footer'))
+                CsrfTokenManager.create_csrf_token(
+                    self.user_id, feconf.CSRF_PAGE_NAME_FOOTER))
 
         self.response.cache_control.no_cache = True
         self.response.cache_control.must_revalidate = True

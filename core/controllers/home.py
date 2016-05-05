@@ -201,10 +201,10 @@ class NotificationsHandler(base.BaseHandler):
         })
 
 
-class SaveSiteLanguageHandler(base.BaseHandler):
+class SiteLanguageHandler(base.BaseHandler):
     """Changes the preferred system language in the user's preferences."""
 
-    PAGE_NAME_FOR_CSRF = 'footer'
+    PAGE_NAME_FOR_CSRF = feconf.CSRF_PAGE_NAME_FOOTER
 
     def put(self):
         """Handles PUT requests."""

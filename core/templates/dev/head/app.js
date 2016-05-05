@@ -56,7 +56,7 @@ oppia.config(['$interpolateProvider', '$httpProvider',
           // JSON-stringify it and store it under 'payload'.
           var csrfToken = '';
           if (config.data) {
-            if (config.data.requestIsFromFooter) {
+            if (config.requestIsFromFooter) {
               csrfToken = GLOBALS.csrf_token_for_footer;
             } else {
               csrfToken = GLOBALS.csrf_token;

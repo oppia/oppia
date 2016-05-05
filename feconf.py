@@ -353,7 +353,7 @@ NEW_EXPLORATION_URL = '/contributehandler/create_new'
 PLAYTEST_QUEUE_URL = '/playtest'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
-SAVE_SITE_LANGUAGE = '/save_site_language'
+SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_URL = '/signup'
 SIGNUP_DATA_URL = '/signuphandler/data'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
@@ -558,3 +558,5 @@ SUPPORTED_SITE_LANGUAGES = {
 }
 SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 SYSTEM_USER_IDS = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
+
+CSRF_PAGE_NAME_FOOTER = 'footer'

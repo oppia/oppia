@@ -28,8 +28,7 @@ class HomePageTest(test_utils.GenericTestBase):
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 200)
         response.mustcontain(
-            'I18N_GALLERY_SUBTITLE', 'I18N_GALLERY_PAGE_TITLE',
-            'I18N_GALLERY_PAGE_SUBTITLE', 'I18N_SIDEBAR_HOME_ABOUT',
+            'I18N_GALLERY_PAGE_TITLE', 'I18N_SIDEBAR_HOME_ABOUT',
             'I18N_TOPNAV_SIGN_IN', no=['I18N_TOPNAV_LOGOUT'])
 
     def test_notifications_dashboard_redirects_for_logged_out_users(self):
@@ -262,7 +261,7 @@ class NotificationsDashboardHandlerTest(test_utils.GenericTestBase):
             self.assertNotIn('author_id', response['recent_notifications'][0])
 
 
-class SaveSiteLanguageHandlerTests(test_utils.GenericTestBase):
+class SiteLanguageHandlerTests(test_utils.GenericTestBase):
 
     def test_save_site_language_handler(self):
         """Test the language is saved in the preferences when handler is called.
@@ -274,7 +273,7 @@ class SaveSiteLanguageHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(response,
                                                        for_footer=True)
-        self.put_json(feconf.SAVE_SITE_LANGUAGE, {
+        self.put_json(feconf.SITE_LANGUAGE_DATA_URL, {
             'site_language_code': language_code,
         }, csrf_token)
 
@@ -286,12 +285,11 @@ class SaveSiteLanguageHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_save_site_language_no_user(self):
-        """The SaveSiteLanguageHandler handler can be called without a user."""
+        """The SiteLanguageHandler handler can be called without a user."""
         response = self.testapp.get(feconf.GALLERY_URL)
         self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(response,
                                                        for_footer=True)
-        self.put_json(feconf.SAVE_SITE_LANGUAGE, {
+        self.put_json(feconf.SITE_LANGUAGE_DATA_URL, {
             'site_language_code': 'es',
-            'requestIsFromFooter': True
         }, csrf_token)

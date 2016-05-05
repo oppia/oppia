@@ -24,7 +24,6 @@
 // See http://angular-translate.github.io/docs/#/guide/12_asynchronous-loading
 oppia.constant('DEFAULT_TRANSLATIONS', {
   I18N_GALLERY_PAGE_TITLE: 'Gallery',
-  I18N_GALLERY_PAGE_SUBTITLE: 'Oppia',
   I18N_GALLERY_LOADING: 'Loading',
   I18N_SIGNUP_PAGE_SUBTITLE: 'Registration',
   I18N_SIGNUP_PAGE_TITLE: 'Oppia',
@@ -45,22 +44,28 @@ oppia.constant('DEFAULT_TRANSLATIONS', {
 });
 
 oppia.controller('I18nFooter', [
-    '$http', '$rootScope', '$scope', '$translate',
-    function($http, $rootScope, $scope, $translate) {
+    '$http', '$rootScope', '$scope', '$translate', '$translateCookieStorage',
+    function($http, $rootScope, $scope, $translate, $translateCookieStorage) {
   // Changes the language of the translations.
-  var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
-  var _SAVE_SITE_LANGUAGE_URL = '/save_site_language';
+  var preferencesDataUrl = '/preferenceshandler/data';
+  var siteLanguageUrl = '/save_site_language';
   $scope.supportedSiteLanguages = GLOBALS.SUPPORTED_SITE_LANGUAGES;
   if (GLOBALS.userIsLoggedIn) {
-    $http.get(_PREFERENCES_DATA_URL).success(function(data) {
-      $translate.use(data.preferred_site_language_code);
-    });
+    // Only send the get request if the preferred site language has not been
+    // asked before.
+    if ($translateCookieStorage.get('preferenceLanguageSet') === undefined) {
+      $translateCookieStorage.set('preferenceLanguageSet', true);
+      $http.get(preferencesDataUrl).success(function(data) {
+        $translate.use(data.preferred_site_language_code);
+      });
+    }
   }
   $scope.changeLanguage = function(langCode) {
     $translate.use(langCode);
     if (GLOBALS.userIsLoggedIn) {
-      $http.put(_SAVE_SITE_LANGUAGE_URL, {
-        site_language_code: langCode,
+      $http.put(siteLanguageUrl, {
+        site_language_code: langCode
+      }, {
         requestIsFromFooter: true
       });
     }
@@ -91,6 +96,9 @@ oppia.config([
     .fallbackLanguage('en')
     .determinePreferredLanguage()
     .useCookieStorage()
+    // The messageformat interpolation method is necessary for pluralization.
+    // Is optional and should be passed as argument to the translate call. See
+    // https://angular-translate.github.io/docs/#/guide/14_pluralization
     .addInterpolation('$translateMessageFormatInterpolation')
     // The strategy 'sanitize' does not support utf-8 encoding.
     // https://github.com/angular-translate/angular-translate/issues/1131
