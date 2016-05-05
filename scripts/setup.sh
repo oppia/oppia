@@ -205,7 +205,7 @@ elif [ -f "/usr/bin/chromium-browser" ]; then
   # Unix.
   export CHROME_BIN="/usr/bin/chromium-browser"
 
-elif [ -f "/usr/bin/chromium-browser" ]; then
+elif [ -f "/usr/bin/google-chrome" ]; then
   # Unix.
   export CHROME_BIN="/usr/bin/google-chrome"
 
