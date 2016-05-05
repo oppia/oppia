@@ -480,6 +480,8 @@ CATEGORIES_TO_COLORS = {
     'Welcome': COLOR_TEAL,
 }
 
+ALL_CATEGORIES = sorted(CATEGORIES_TO_COLORS.keys())
+
 
 # A sorted list of default categories.
 DEFAULT_CATEGORIES = sorted(CATEGORIES_TO_COLORS.keys())

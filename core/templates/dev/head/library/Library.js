@@ -19,11 +19,11 @@
 oppia.controller('Library', [
   '$scope', '$http', '$rootScope', '$window', '$timeout',
   'ExplorationCreationButtonService', 'urlService', 'CATEGORY_LIST',
-  'searchService',
+  'searchService', 'windowDimensionsService',
   function(
       $scope, $http, $rootScope, $window, $timeout,
       ExplorationCreationButtonService, urlService, CATEGORY_LIST,
-      searchService) {
+      searchService, windowDimensionsService) {
     $rootScope.loadingMessage = 'Loading';
 
     // Below is the width of each tile (width + margins), which can be found
@@ -70,6 +70,12 @@ oppia.controller('Library', [
     $scope.tileDisplayCount = 0;
 
     var initCarousels = function() {
+      // This prevents unnecessary execution of this method immediately after
+      // a window resize event is fired.
+      if (!$scope.libraryGroups) {
+        return;
+      }
+
       var windowWidth = $(window).width() * 0.85;
       $scope.tileDisplayCount = Math.min(
         Math.floor(windowWidth / tileDisplayWidth), MAX_NUM_TILES_PER_ROW);
@@ -79,7 +85,7 @@ oppia.controller('Library', [
       });
 
       // The following determines whether to enable left scroll after resize.
-      for (i = 0; i < $scope.libraryGroups.length; i++) {
+      for (var i = 0; i < $scope.libraryGroups.length; i++) {
         var carouselJQuerySelector = (
           '.oppia-library-carousel-tiles:eq(n)'.replace('n', i));
         var carouselScrollPositionPx = $(carouselJQuerySelector).scrollLeft();
@@ -120,6 +126,7 @@ oppia.controller('Library', [
 
       var newScrollPositionPx = carouselScrollPositionPx +
         ($scope.tileDisplayCount * tileDisplayWidth * direction);
+
       $(carouselJQuerySelector).animate({
         scrollLeft: newScrollPositionPx
       }, {
@@ -139,6 +146,15 @@ oppia.controller('Library', [
         duration: 800,
         queue: false
       });
+    };
+
+    // The carousels do not work when the width is 1 card long, so we need to
+    // handle this case discretely.
+    $scope.incrementLeftmostCardIndex = function(ind) {
+      $scope.leftmostCardIndices[ind]++;
+    };
+    $scope.decrementLeftmostCardIndex = function(ind) {
+      $scope.leftmostCardIndices[ind]--;
     };
 
     $(window).resize(function() {
@@ -171,5 +187,15 @@ oppia.controller('Library', [
         '', selectedCategories, {});
       $window.location.href = '/search/find?q=' + targetSearchQueryUrl;
     };
+
+    var libraryWindowCutoffPx = 530;
+    $scope.libraryWindowIsNarrow = (
+      windowDimensionsService.getWidth() <= libraryWindowCutoffPx);
+
+    windowDimensionsService.registerOnResizeHook(function() {
+      $scope.libraryWindowIsNarrow = (
+        windowDimensionsService.getWidth() <= libraryWindowCutoffPx);
+      $scope.$apply();
+    });
   }
 ]);
