@@ -23,26 +23,24 @@ from core.domain import user_services
 import utils
 
 _LIBRARY_INDEX_GROUPS = [{
-    'header': 'Computation & Programming',
-    'search_categories': ['Computing', 'Programming'],
-}, {
     'header': 'Mathematics & Statistics',
     'search_categories': ['Mathematics', 'Statistics'],
 }, {
-    'header': 'Biology, Chemistry & Medicine',
-    'search_categories': ['Biology', 'Chemistry', 'Medicine'],
+    'header': 'Computing',
+    'search_categories': ['Computing', 'Programming'],
 }, {
-    'header': 'Physics, Astronomy & Engineering',
-    'search_categories': ['Physics', 'Astronomy', 'Engineering'],
+    'header': 'Science',
+    'search_categories': [
+        'Astronomy', 'Biology', 'Chemistry', 'Engineering', 'Environment',
+        'Medicine', 'Physics'
+    ],
 }, {
-    'header': 'Languages & Reading',
+    'header': 'Languages',
     'search_categories': ['Languages', 'Reading'],
 }, {
-    'header': 'Environment & Geography',
-    'search_categories': ['Environment', 'Geography'],
-}, {
-    'header': 'Business, Economics, Government & Law',
-    'search_categories': ['Business', 'Economics', 'Government', 'Law'],
+    'header': 'Social Science',
+    'search_categories': [
+        'Business', 'Economics', 'Geography', 'Government', 'Law'],
 }]
 
 

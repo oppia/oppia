@@ -197,7 +197,7 @@ class ExplorationDisplayableSummariesTest(
             'status': 'public',
             'tags': [],
             'thumbnail_bg_color': '#05a69a',
-            'thumbnail_icon_url': '/images/library/thumbnails/Lightbulb.svg',
+            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
             'title': u'Exploration 2 Albert title',
         }
         self.assertIn('last_updated_msec', displayable_summaries[0])
@@ -280,7 +280,7 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
             'tags': [],
             'title':  u'The Lazy Magician',
             'thumbnail_bg_color': '#058ca6',
-            'thumbnail_icon_url': '/images/library/thumbnails/Mathematics.svg',
+            'thumbnail_icon_url': '/images/subjects/Mathematics.svg',
         }
         expected_group = {
             'categories': ['Mathematics', 'Statistics'],
@@ -350,7 +350,7 @@ class FeaturedExplorationDisplayableSummariesTest(
             'thumbnail_bg_color': '#05a69a',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': '/images/library/thumbnails/Lightbulb.svg',
+            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
             'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
             'category': u'A category',

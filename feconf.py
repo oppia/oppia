@@ -440,11 +440,11 @@ DEFAULT_COLOR = COLOR_TEAL
 DEFAULT_THUMBNAIL_ICON = 'Lightbulb'
 
 COLORS_TO_HEX_VALUES = {
-    COLOR_TEAL: '#05a69a',
-    COLOR_SALMON: '#f35f55',
-    COLOR_SUNNYSIDE: '#f7a541',
-    COLOR_SHARKFIN: '#058ca6',
-    COLOR_GUNMETAL: '#607d8b',
+    COLOR_TEAL: '#7c8952',
+    COLOR_SALMON: '#b05a27',
+    COLOR_SUNNYSIDE: '#cf972b',
+    COLOR_SHARKFIN: '#ce672b',
+    COLOR_GUNMETAL: '#185269',
 }
 
 # List of supported default categories. For now, each category has

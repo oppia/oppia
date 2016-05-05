@@ -4,8 +4,8 @@
       <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
         <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
         <h2 class="exploration-title protractor-test-exp-summary-tile-title">
-          <span ng-if="isWindowLarge"><[getExplorationTitle()]></span>
-          <span ng-if="!isWindowLarge"><[getExplorationTitle()|truncate:32]></span>
+          <span ng-if="isWindowLarge"><[getExplorationTitle()|truncate:22]></span>
+          <span ng-if="!isWindowLarge"><[getExplorationTitle()|truncate:22]></span>
         </h2>
 
         <div ng-if="isWindowLarge" class="exploration-summary-avatars" ng-show="avatarsList.length > 0">
@@ -42,7 +42,7 @@
 
       <div ng-attr-section="<[isWindowLarge ? undefined : 'right-section']>">
         <div ng-if="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
-          <[getObjective() | truncateAndCapitalize: 50]>
+          <[getObjective() | truncateAndCapitalize: 40]>
           <span ng-if="!getObjective()">No objective specified.</span>
         </div>
         <ul layout="row" class="metrics" layout-align="space-between center">
@@ -225,17 +225,17 @@
 
   .oppia-exploration-summary-tile .thumbnail-image {
     display: block;
+    height: 75px;
     margin: 0 auto;
-    height: 40px;
-    top: 36px;
     position: relative;
-    width: 40px;
+    top: 22px;
+    width: 75px;
   }
 
   .oppia-exploration-summary-tile .exploration-title {
     bottom: 0;
     color: white;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-family: "Rubik", "Roboto", Arial, sans-serif;
     font-size: 1em;
     line-height: 1.2em;
     margin: 12px;
@@ -245,9 +245,8 @@
 
   .oppia-exploration-summary-tile .objective {
     height: 60px;
-    font-family: Roboto;
+    font-family: "Rubik", "Roboto", Arial, sans-serif;
     font-size: 0.85em;
-    font-style: italic;
     padding: 12px;
   }
 
@@ -283,10 +282,8 @@
   }
 
   .oppia-exploration-summary-tile .recently-updated {
-    background-color: rgb(19,105,193);
-    border-radius: 10px;
-    color: white;
-    font-size: 0.8em;
+    color: rgb(19,105,193);
+    font-size: 1.1em;
     font-weight: bold;
     padding: 5px 8px 4px 8px;
   }

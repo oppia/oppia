@@ -432,7 +432,7 @@ def get_thumbnail_icon_url_for_category(category):
         category if category in feconf.DEFAULT_CATEGORIES
         else feconf.DEFAULT_THUMBNAIL_ICON)
     # Remove all spaces from the string.
-    return '/images/library/thumbnails/%s.svg' % icon_name.replace(' ', '')
+    return '/images/subjects/%s.svg' % icon_name.replace(' ', '')
 
 
 def _get_short_language_description(full_language_description):

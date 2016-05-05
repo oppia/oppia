@@ -26,9 +26,6 @@ oppia.controller('Library', [
       searchService) {
     $rootScope.loadingMessage = 'Loading';
 
-    $scope.LIBRARY_CATEGORY_FEATURED_EXPLORATIONS = (
-      GLOBALS.LIBRARY_CATEGORY_FEATURED_EXPLORATIONS);
-
     // Below is the width of each tile (width + margins), which can be found
     // in core/templates/dev/head/components/
     //         exploration_summary_tile_directive.html

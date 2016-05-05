@@ -181,10 +181,10 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_get_thumbnail_icon_url_for_category(self):
         self.assertEqual(
             utils.get_thumbnail_icon_url_for_category('Architecture'),
-            '/images/library/thumbnails/Architecture.svg')
+            '/images/subjects/Architecture.svg')
         self.assertEqual(
             utils.get_thumbnail_icon_url_for_category('Life Skills'),
-            '/images/library/thumbnails/LifeSkills.svg')
+            '/images/subjects/LifeSkills.svg')
         self.assertEqual(
             utils.get_thumbnail_icon_url_for_category('Nonexistent'),
-            '/images/library/thumbnails/Lightbulb.svg')
+            '/images/subjects/Lightbulb.svg')

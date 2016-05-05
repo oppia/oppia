@@ -25,13 +25,11 @@
   <script type="text/javascript">
     GLOBALS.LANGUAGE_CODES_AND_NAMES = JSON.parse(
       '{{LANGUAGE_CODES_AND_NAMES|js_string}}');
-    GLOBALS.LIBRARY_CATEGORY_FEATURED_EXPLORATIONS = JSON.parse(
-      '{{LIBRARY_CATEGORY_FEATURED_EXPLORATIONS|js_string}}');
   </script>
 
   <style>
     html, body {
-      background-color: #eee;
+      background-color: #afd2eb;
     }
   </style>
 {% endblock header_js %}
@@ -39,7 +37,7 @@
 {% block content %}
   <div ng-controller="Library" class="oppia-library-container">
     <div style="position: relative; z-index: 3;">
-      <div class="oppia-library-tiles-area">
+      <div>
         <div class="oppia-exp-summary-tiles-container" ng-if="inSearchMode">
           <search-results></search-results>
         </div>
@@ -51,9 +49,6 @@
           </div>
 
           <div class="oppia-library-group" ng-repeat="group in libraryGroups track by $index">
-            <hr ng-if="$index !== 0 && libraryGroups[$index - 1].header === LIBRARY_CATEGORY_FEATURED_EXPLORATIONS"
-                class="oppia-library-featured-explorations-separator">
-
             <div>
               <h2 class="oppia-library-group-header">
                 <a ng-click="showAllResultsForCategories(group.categories)">
