@@ -32,7 +32,7 @@ states:
     interaction:
       answer_groups:
       - outcome:
-          dest: End Exploration
+          dest: Pencil Code Editor
           feedback:
           - <p>Hello! Let's move onto another interaction.</p>
           param_changes: []
@@ -58,6 +58,44 @@ states:
         param_changes: []
       fallbacks: []
       id: CodeRepl
+    param_changes: []
+  Pencil Code Editor:
+    content:
+    - type: text
+      value: <p>Pencil Code Editor. Similar to before, but instead write a goodbye
+        message to me.</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: End Exploration
+          feedback:
+          - <p>Goodbye! Well, not quite. We still have a little more to explore.</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: Bye Oppia
+          rule_type: OutputEquals
+      - outcome:
+          dest: End Exploration
+          feedback:
+          - <p>Goodbye! Well, not quite. We still have a little more to explore.<br></p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: Goodbye Oppia
+          rule_type: CodeEquals
+      confirmed_unclassified_answers: []
+      customization_args:
+        initial_code:
+          value: '# Write a goodbye to me, below.'
+      default_outcome:
+        dest: Pencil Code Editor
+        feedback:
+        - <p>Where are your manners? You should say goodbye to me. We've explored
+          so much, together!</p>
+        param_changes: []
+      fallbacks: []
+      id: PencilCodeEditor
     param_changes: []
   Image Region:
     content:

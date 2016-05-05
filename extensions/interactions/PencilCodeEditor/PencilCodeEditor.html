@@ -1,5 +1,5 @@
 <script type="text/ng-template" id="interaction/PencilCodeEditor">
-  <div style="height: 500px; width: 1000px; min-width: 560px; max-width: 1000px; position: relative;">
+  <div class="code-editor">
     <div></div>
   </div>
   <div style="margin-top: 4px;">
@@ -8,6 +8,14 @@
       <span style="color: #333;">Reset Code</span>
     </md-button>
   </div>
+   <style>
+    .code-editor {
+      height: 500px;
+      width: 890px;
+      min-width: 560px;
+      max-width: 100%;
+    }
+  </style>
 </script>
 
 <script type="text/ng-template" id="response/PencilCodeEditor">
