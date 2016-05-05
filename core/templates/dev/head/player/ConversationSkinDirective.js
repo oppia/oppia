@@ -126,8 +126,7 @@ oppia.animation('.conversation-skin-animate-cards', function() {
       supplementalCardElt.css('opacity', '0');
       $('.conversation-skin-oppia-avatar.show-tutor-card').hide();
       tutorCardElt.animate({
-        'margin-left': '0',
-        float: 'left'
+        'margin-left': '0'
       }, TIME_NUM_CARDS_CHANGE_MSEC, function() {
         supplementalCardElt.animate({
           opacity: '1'
@@ -391,9 +390,6 @@ oppia.directive('conversationSkin', [function() {
           }
 
           $scope.numProgressDots++;
-          if ($scope.isNarrowViewport()) {
-            $scope.displayTutorCardOnNarrow();
-          }
 
           var totalNumCards = playerTranscriptService.getNumCards();
 

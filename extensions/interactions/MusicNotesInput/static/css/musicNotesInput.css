@@ -106,7 +106,7 @@
 
 .oppia-music-input-on-staff {
   position: absolute;
-  z-index: 1000;
+  z-index: 14;
 }
 
 .oppia-music-input-control-buttons {
