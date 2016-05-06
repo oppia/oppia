@@ -144,7 +144,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
             Sk.importMainWithBody('<stdin>', false, codeInput, true);
 	         // finished evaluation
 	         
-          }).then(function() {     
+          }).then(function() {
           }, function(err) {
             if (!(err instanceof Sk.builtin.TimeLimitError)) {
               $scope.sendResponse('', String(err));
