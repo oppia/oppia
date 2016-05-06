@@ -106,6 +106,8 @@
 
 .oppia-music-input-on-staff {
   position: absolute;
+  /* Maximum 14, otherwise it will be above
+     the tutorcard if viewport is less than 960 */
   z-index: 14;
 }
 
