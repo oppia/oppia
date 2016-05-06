@@ -8,28 +8,31 @@
           <span ng-if="!isWindowLarge"><[getExplorationTitle()|truncate:22]></span>
         </h2>
 
-        <div ng-if="isWindowLarge" class="exploration-summary-avatars" ng-show="avatarsList.length > 0">
-          <circular-image ng-if="avatarsList.length > 0"
-                          src="avatarsList[0].image"
-                          link="avatarsList[0].link"
-                          tooltip="<[avatarsList[0].tooltipText | truncate:14]>"
-                          tooltip-placement="right"
-                          tooltip-append-to-body="true">
-          </circular-image>
+        <!-- Note that if this is ng-if instead, the avatar area will not detect a mouseover and the tile will behave incorrectly. -->
+        <div ng-show="isWindowLarge" class="exploration-summary-avatars" ng-show="avatarsList.length > 0">
+          <div class="circular-image-container">
+            <circular-image ng-if="avatarsList.length > 0"
+                            src="avatarsList[0].image"
+                            link="avatarsList[0].link"
+                            tooltip="<[avatarsList[0].tooltipText | truncate:14]>"
+                            tooltip-placement="right">
+            </circular-image>
+          </div>
           <div class="avatars-num-minus-one contributor-indicator contributor-indicator-background" ng-show="avatarsList.length > 1">
             <span ng-if="!isCommunityOwned()">+</span><[avatarsList.length - 1]>
           </div>
 
           <div class="all-avatars" style="display: none;">
-            <circular-image ng-repeat="avatar in avatarsList | limitTo:MAX_AVATARS_TO_DISPLAY-1:1"
-                            src="avatar.image"
-                            link="avatar.link"
-                            tooltip="<[avatar.tooltipText | truncate:14]>"
-                            tooltip-placement="right"
-                            tooltip-append-to-body="true">
-            </circular-image>
+            <div class="circular-image-container">
+              <circular-image ng-repeat="avatar in avatarsList | limitTo:MAX_AVATARS_TO_DISPLAY-1:1"
+                              src="avatar.image"
+                              link="avatar.link"
+                              tooltip="<[avatar.tooltipText | truncate:14]>"
+                              tooltip-placement="right">
+              </circular-image>
+            </div>
 
-            <div style="position:relative;" ng-show="avatarsList.length > MAX_AVATARS_TO_DISPLAY">
+            <div style="position: relative;" ng-show="avatarsList.length > MAX_AVATARS_TO_DISPLAY">
               <div class="exploration-black-profile"></div>
               <div class="num-remaining-avatars" ng-show="avatarsList.length > MAX_AVATARS_TO_DISPLAY">
                 +<[avatarsList.length - MAX_AVATARS_TO_DISPLAY]>
@@ -120,6 +123,12 @@
     box-shadow: 0 6px 13px rgba(0,0,0,0.17), 0 4px 6px rgba(0,0,0,0.23);
   }
 
+  .oppia-exploration-summary-tile .circular-image-container {
+    border: 2px solid white;
+    border-radius: 50%;
+    margin-bottom: 5px;
+  }
+
   .oppia-exploration-summary-tile .title-section {
     height: 144px;
     position: relative;
@@ -200,7 +209,6 @@
 
  .oppia-exploration-summary-tile .contributor-indicator-background {
     background-color: #4078C0;
-    border: 1px solid rgb(243, 243, 243);
   }
 
   .oppia-exploration-summary-tile .all-avatars .num-remaining-avatars {
