@@ -1374,7 +1374,7 @@ def get_search_rank_from_exp_summary(exp_summary):
     and bad ones will lower it.
     """
     # TODO(sll): Improve this calculation.
-    RATING_WEIGHTINGS = {'1': -5, '2': -2, '3': 2, '4': 5, '5': 10}
+    rating_weightings = {'1': -5, '2': -2, '3': 2, '4': 5, '5': 10}
 
     rank = _DEFAULT_RANK + (
         _STATUS_PUBLICIZED_BONUS
@@ -1385,7 +1385,7 @@ def get_search_rank_from_exp_summary(exp_summary):
         for rating_value in exp_summary.ratings:
             rank += (
                 exp_summary.ratings[rating_value] *
-                RATING_WEIGHTINGS[rating_value])
+                rating_weightings[rating_value])
 
     # Ranks must be non-negative.
     return max(rank, 0)
