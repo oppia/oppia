@@ -53,6 +53,7 @@ DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = config_domain.ConfigProperty(
         'Check out this interactive lesson from Oppia - a free, open-source '
         'learning platform!'))
 
+
 def require_playable(handler):
     """Decorator that checks if the user can play the given exploration."""
     def test_can_play(self, exploration_id, **kwargs):
@@ -366,8 +367,6 @@ class ExplorationHandler(base.BaseHandler):
                 rights_manager.Actor(self.user_id).can_edit(
                     rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id)),
             'exploration': exploration.to_player_dict(),
-            'info_card_image_url': utils.get_info_card_url_for_category(
-                exploration.category),
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
             'version': exploration.version,
