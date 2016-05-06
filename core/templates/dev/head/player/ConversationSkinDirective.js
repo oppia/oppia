@@ -652,7 +652,7 @@ oppia.directive('conversationSkin', [function() {
         $window.onresize = function() {
           $scope.adjustPageHeight(false, null);
           $scope.windowWidth = windowDimensionsService.getWidth();
-          if ($scope.isSupplementalCardDisplayedOnNarrow()) {
+          if ($scope.isScreenNarrowAndShowingSupplementalCard()) {
             adjustTutorAvatar();
           }
         };
@@ -688,31 +688,31 @@ oppia.directive('conversationSkin', [function() {
           return $scope.windowWidth >= TWO_CARD_THRESHOLD_PX;
         };
 
-        $scope.isNarrowViewport = function() {
+        $scope.isViewportNarrow = function() {
           return $scope.windowWidth < TWO_CARD_THRESHOLD_PX;
         };
 
-        $scope.isTutorCardDisplayedOnNarrow = function() {
+        $scope.isScreenNarrowAndShowingTutorCard = function() {
           if (!$scope.isCurrentSupplementalCardNonempty()) {
-            return $scope.isNarrowViewport();
+            return $scope.isViewportNarrow();
           }
-          return $scope.isNarrowViewport() &&
+          return $scope.isViewportNarrow() &&
                  $scope._tutorCardDisplayedOnNarrow;
         };
 
-        $scope.isSupplementalCardDisplayedOnNarrow = function() {
-          return $scope.isNarrowViewport() &&
+        $scope.isScreenNarrowAndShowingSupplementalCard = function() {
+          return $scope.isViewportNarrow() &&
                  !$scope._tutorCardDisplayedOnNarrow;
         };
 
-        $scope.displayTutorCardOnNarrow = function() {
-          if ($scope.isNarrowViewport()) {
+        $scope.showTutorCardIfScreenIsNarrow = function() {
+          if ($scope.isViewportNarrow()) {
             $scope._tutorCardDisplayedOnNarrow = true;
           }
         };
 
-        $scope.displaySupplementaryCardOnNarrow = function() {
-          if ($scope.isNarrowViewport()) {
+        $scope.showSupplementalCardIfScreenIsNarrow = function() {
+          if ($scope.isViewportNarrow()) {
             $scope._tutorCardDisplayedOnNarrow = false;
           }
         };
