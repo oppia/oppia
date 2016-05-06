@@ -130,8 +130,8 @@ oppia.directive('oppiaInteractiveCodeRepl', [
 
             $scope.sendResponse('', '');
           }, function(err) {
-              if (!(err instanceof Sk.builtin.TimeLimitError)) {
-                $scope.sendResponse('', String(err));
+            if (!(err instanceof Sk.builtin.TimeLimitError)) {
+              $scope.sendResponse('', String(err));
             }
           });
         };
