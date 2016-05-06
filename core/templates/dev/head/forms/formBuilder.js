@@ -1163,7 +1163,10 @@ oppia.directive('schemaBasedEditor', [function() {
       onInputFocus: '='
     },
     templateUrl: 'schemaBasedEditor/master',
-    restrict: 'E'
+    restrict: 'E',
+    controller: function() {
+      document.execCommand('enableObjectResizing', false, false);
+    }
   };
 }]);
 
