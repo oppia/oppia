@@ -32,17 +32,18 @@
   .CodeMirror-lines {
     background-color: white;
   }
-  
+
 </style>
 
 <script type="text/ng-template" id="interaction/CodeRepl">
   <div>
-    <form ng-submit="runCode(code)">
+    <form ng-submit="runAndSubmitCode(code)">
       <div class="code-repl-input-box">
         <div ui-codemirror="{onLoad: initCodeEditor}">
         </div>
       </div>
-      <md-button type="submit" class="md-raised" ng-disabled="!hasLoaded">Run</md-button>
+      <md-button type="button" class="md-raised" ng-click="runCode(code)" ng-disabled="!hasLoaded">Test Run</md-button>
+      <md-button type="submit" class="md-raised" ng-disabled="!hasLoaded">Submit</md-button>
       <span class="code-repl-language">
         <em>Language: <[language]></em>
       </span>
