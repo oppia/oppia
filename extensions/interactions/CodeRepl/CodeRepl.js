@@ -147,7 +147,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
           }).then(function() {     
           }, function(err) {
               if (!(err instanceof Sk.builtin.TimeLimitError)) {
-                $scope.sendResponse('', String(err));
+              $scope.sendResponse('', String(err));
             }
           });
         };
