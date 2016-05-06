@@ -37,12 +37,13 @@
 
 <script type="text/ng-template" id="interaction/CodeRepl">
   <div>
-    <form ng-submit="runCode(code)">
+    <form>
       <div class="code-repl-input-box">
         <div ui-codemirror="{onLoad: initCodeEditor}">
         </div>
       </div>
-      <md-button type="submit" class="md-raised" ng-disabled="!hasLoaded">Run</md-button>
+      <md-button type="submit" class="md-raised" ng-click="runCode(code)">Test Run</md-button>
+      <md-button type="submit" class="md-raised" ng-click="runAndSubmitCode(code)">Submit</md-button>
       <span class="code-repl-language">
         <em>Language: <[language]></em>
       </span>
@@ -92,3 +93,4 @@
     <font color=red>Error: <[answer.error]></font><br>
   </span>
 </script>
+
