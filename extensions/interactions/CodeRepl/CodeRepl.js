@@ -139,10 +139,10 @@ oppia.directive('oppiaInteractiveCodeRepl', [
         $scope.runCode = function(codeInput) {
           $scope.code = codeInput;
           $scope.output = '';
-	        // Evaluation begins
+	         // Evaluation begins
           Sk.misceval.asyncToPromise(function() {
             Sk.importMainWithBody('<stdin>', false, codeInput, true);
-	        // finished evaluation
+	         // finished evaluation
           }).then(function() {     
           }, function(err) {
             if (!(err instanceof Sk.builtin.TimeLimitError)) {
