@@ -120,7 +120,6 @@ oppia.directive('oppiaInteractiveCodeRepl', [
         });
 
         $scope.runAndSubmitCode = function(codeInput) {
-        
           Sk.misceval.asyncToPromise(function() {
             $scope.runCode(codeInput);
           }).then(function() {
