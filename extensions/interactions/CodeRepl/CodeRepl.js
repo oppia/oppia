@@ -119,18 +119,31 @@ oppia.directive('oppiaInteractiveCodeRepl', [
           execLimit: 10000
         });
 
-        $scope.runAndSubmitCode = function(codeInput, status) {
+        $scope.runAndSubmitCode = function(codeInput) {
           $scope.code = codeInput;
           $scope.output = '';
-
           // Evaluate the program asynchronously using Skulpt.
           Sk.misceval.asyncToPromise(function() {
-            Sk.importMainWithBody('<stdin>', false, codeInput, true);
+            $scope.runCode(codeInput);
           }).then(function() {
-            // Finished evaluating.
-            if (status == 'SUBMIT') {
-              $scope.sendResponse('', '');
+            // Finished evaluating
+
+            $scope.sendResponse('', '');
+          }, function(err) {
+            if (!(err instanceof Sk.builtin.TimeLimitError)) {
+              $scope.sendResponse('', String(err));
             }
+          });
+        };
+
+        $scope.runCode = function(codeInput) {
+          $scope.code = codeInput;
+          $scope.output = '';
+	        //Evaluation begins
+          Sk.misceval.asyncToPromise(function() {
+            Sk.importMainWithBody('<stdin>', false, codeInput, true);
+	        //finished evaluation
+          }).then(function() {     
           }, function(err) {
             if (!(err instanceof Sk.builtin.TimeLimitError)) {
               $scope.sendResponse('', String(err));
@@ -205,10 +218,6 @@ oppia.directive('oppiaInteractiveCodeRepl', [
             evaluation: $scope.evaluation,
             error: (err || '')
           }, codeReplRulesService);
-
-          // Without this, the error message displayed in the user-facing
-          // console will sometimes not update.
-          $scope.$apply();
         };
       }]
     };
@@ -295,4 +304,3 @@ oppia.factory('codeReplRulesService', [
     }
   };
 }]);
-
