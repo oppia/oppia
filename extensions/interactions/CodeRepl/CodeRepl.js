@@ -146,7 +146,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
 	         
           }).then(function() {     
           }, function(err) {
-              if (!(err instanceof Sk.builtin.TimeLimitError)) {
+            if (!(err instanceof Sk.builtin.TimeLimitError)) {
               $scope.sendResponse('', String(err));
             }
           });
