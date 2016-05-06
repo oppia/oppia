@@ -120,14 +120,11 @@ oppia.directive('oppiaInteractiveCodeRepl', [
         });
 
         $scope.runAndSubmitCode = function(codeInput) {
-          $scope.code = codeInput;
-          $scope.output = '';
-          // Evaluate the program asynchronously using Skulpt.
+        
           Sk.misceval.asyncToPromise(function() {
             $scope.runCode(codeInput);
           }).then(function() {
-            // Finished evaluating
-
+            // After Evaluation
             $scope.sendResponse('', '');
           }, function(err) {
             if (!(err instanceof Sk.builtin.TimeLimitError)) {
