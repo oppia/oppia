@@ -123,8 +123,8 @@ oppia.directive('oppiaInteractiveCodeRepl', [
           Sk.misceval.asyncToPromise(function() {
             $scope.runCode(codeInput);
           }).then(function() {
-           // After Evaluation
-           $scope.sendResponse('', '');
+            // After Evaluation
+            $scope.sendResponse('', '');
           });
         };
 
