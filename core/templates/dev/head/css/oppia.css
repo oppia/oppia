@@ -1254,6 +1254,10 @@ md-card.oppia-dashboard-exp-tile {
   font-style: italic;
 }
 
+.oppia-save-draft-button, .oppia-publish-exploration-button {
+  height: 34px;
+}
+
 @media(max-width: 1099px) {
   .oppia-publish-exploration-button {
     padding-bottom: 3px;
