@@ -723,6 +723,7 @@ oppia.config(['$provide', function($provide) {
       var _openCustomizationModal = function(
           customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
           onDismissCallback, refocusFn) {
+        document.execCommand('enableObjectResizing', false, false);
         var modalDialog = $modal.open({
           templateUrl: 'modals/customizeRteComponent',
           backdrop: 'static',
@@ -1163,10 +1164,7 @@ oppia.directive('schemaBasedEditor', [function() {
       onInputFocus: '='
     },
     templateUrl: 'schemaBasedEditor/master',
-    restrict: 'E',
-    controller: function() {
-      document.execCommand('enableObjectResizing', false, false);
-    }
+    restrict: 'E'
   };
 }]);
 
