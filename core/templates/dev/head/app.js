@@ -29,66 +29,74 @@ var oppia = angular.module(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
                    : []));
 
-// Set the AngularJS interpolators as <[ and ]>, to not conflict with Jinja2
-// templates.
-// Set default headers for POST and PUT requests.
-// Add an interceptor to convert requests to strings and to log and show
-// warnings for error responses.
-oppia.config(['$interpolateProvider', '$httpProvider', '$locationProvider',
-  function($interpolateProvider, $httpProvider, $locationProvider) {
-  $interpolateProvider.startSymbol('<[');
-  $interpolateProvider.endSymbol(']>');
+oppia.config([
+  '$compileProvider', '$httpProvider', '$interpolateProvider',
+  '$locationProvider',
+  function(
+      $compileProvider, $httpProvider, $interpolateProvider,
+      $locationProvider) {
+    // Disable debug data to improve performance. See
+    //   https://code.angularjs.org/1.5.5/docs/guide/production
+    $compileProvider.debugInfoEnabled(false);
 
-  $locationProvider.html5Mode(false);
-  // The following prevents the search page from reloading if the search query
-  // is changed.
-  if (window.location.pathname == '/search/find') {
-    $locationProvider.html5Mode(true);
-  }
+    // Set the AngularJS interpolators as <[ and ]>, to not conflict with
+    // Jinja2 templates.
+    $interpolateProvider.startSymbol('<[');
+    $interpolateProvider.endSymbol(']>');
 
-  $httpProvider.defaults.headers.post = {
-    'Content-Type': 'application/x-www-form-urlencoded'
-  };
-  $httpProvider.defaults.headers.put = {
-    'Content-Type': 'application/x-www-form-urlencoded'
-  };
-
-  $httpProvider.interceptors.push([
-    '$q', '$log', 'alertsService', function($q, $log, alertsService) {
-      return {
-        request: function(config) {
-          // If this request carries data (in the form of a JS object),
-          // JSON-stringify it and store it under 'payload'.
-          if (config.data) {
-            config.data = $.param({
-              csrf_token: GLOBALS.csrf_token,
-              payload: JSON.stringify(config.data),
-              source: document.URL
-            }, true);
-          }
-          return config;
-        },
-        responseError: function(rejection) {
-          // A rejection status of -1 seems to indicate (it's hard to find
-          // documentation) that the response has not completed,
-          // which can occur if the user navigates away from the page
-          // while the response is pending, This should not be considered
-          // an error.
-          if (rejection.status !== -1) {
-            $log.error(rejection.data);
-
-            var warningMessage = 'Error communicating with server.';
-            if (rejection.data && rejection.data.error) {
-              warningMessage = rejection.data.error;
-            }
-            alertsService.addWarning(warningMessage);
-          }
-          return $q.reject(rejection);
-        }
-      };
+    // Prevent the search page from reloading if the search query is changed.
+    $locationProvider.html5Mode(false);
+    if (window.location.pathname == '/search/find') {
+      $locationProvider.html5Mode(true);
     }
-  ]);
-}]);
+
+    // Set default headers for POST and PUT requests.
+    $httpProvider.defaults.headers.post = {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    };
+    $httpProvider.defaults.headers.put = {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    };
+
+    // Add an interceptor to convert requests to strings and to log and show
+    // warnings for error responses.
+    $httpProvider.interceptors.push([
+      '$q', '$log', 'alertsService', function($q, $log, alertsService) {
+        return {
+          request: function(config) {
+            // If this request carries data (in the form of a JS object),
+            // JSON-stringify it and store it under 'payload'.
+            if (config.data) {
+              config.data = $.param({
+                csrf_token: GLOBALS.csrf_token,
+                payload: JSON.stringify(config.data),
+                source: document.URL
+              }, true);
+            }
+            return config;
+          },
+          responseError: function(rejection) {
+            // A rejection status of -1 seems to indicate (it's hard to find
+            // documentation) that the response has not completed,
+            // which can occur if the user navigates away from the page
+            // while the response is pending, This should not be considered
+            // an error.
+            if (rejection.status !== -1) {
+              $log.error(rejection.data);
+
+              var warningMessage = 'Error communicating with server.';
+              if (rejection.data && rejection.data.error) {
+                warningMessage = rejection.data.error;
+              }
+              alertsService.addWarning(warningMessage);
+            }
+            return $q.reject(rejection);
+          }
+        };
+      }
+    ]);
+  }
+]);
 
 oppia.config(['$provide', function($provide) {
   $provide.decorator('$log', ['$delegate', function($delegate) {
