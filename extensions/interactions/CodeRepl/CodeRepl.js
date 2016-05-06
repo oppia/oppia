@@ -143,7 +143,6 @@ oppia.directive('oppiaInteractiveCodeRepl', [
           Sk.misceval.asyncToPromise(function() {
             Sk.importMainWithBody('<stdin>', false, codeInput, true);
 	         // finished evaluation
-	         
           }).then(function() {
           }, function(err) {
             if (!(err instanceof Sk.builtin.TimeLimitError)) {
