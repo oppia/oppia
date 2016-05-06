@@ -1366,7 +1366,7 @@ def _should_index(exp):
     return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
 
 
-def _get_search_rank(exp_id):
+def get_search_rank_from_exp_summary(exp_summary):
     """Returns an integer determining the document's rank in search.
 
     Featured explorations get a ranking bump, and so do explorations that
@@ -1374,23 +1374,26 @@ def _get_search_rank(exp_id):
     and bad ones will lower it.
     """
     # TODO(sll): Improve this calculation.
-    rating_weightings = {'1': -5, '2': -2, '3': 2, '4': 5, '5': 10}
+    RATING_WEIGHTINGS = {'1': -5, '2': -2, '3': 2, '4': 5, '5': 10}
 
-    rights = rights_manager.get_exploration_rights(exp_id)
-    summary = get_exploration_summary_by_id(exp_id)
     rank = _DEFAULT_RANK + (
         _STATUS_PUBLICIZED_BONUS
-        if rights.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED
+        if exp_summary.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED
         else 0)
 
-    if summary.ratings:
-        for rating_value in summary.ratings:
+    if exp_summary.ratings:
+        for rating_value in exp_summary.ratings:
             rank += (
-                summary.ratings[rating_value] *
-                rating_weightings[rating_value])
+                exp_summary.ratings[rating_value] *
+                RATING_WEIGHTINGS[rating_value])
 
     # Ranks must be non-negative.
     return max(rank, 0)
+
+
+def get_search_rank(exp_id):
+    exp_summary = get_exploration_summary_by_id(exp_id)
+    return get_search_rank_from_exp_summary(exp_summary)
 
 
 def _exp_to_search_dict(exp):
@@ -1404,7 +1407,7 @@ def _exp_to_search_dict(exp):
         'blurb': exp.blurb,
         'objective': exp.objective,
         'author_notes': exp.author_notes,
-        'rank': _get_search_rank(exp.id),
+        'rank': get_search_rank(exp.id),
     }
     doc.update(_exp_rights_to_search_dict(rights))
     return doc
@@ -1460,7 +1463,7 @@ def search_explorations(query, limit, sort=None, cursor=None):
           '-' character indicating whether to sort in ascending or descending
           order respectively. This character should be followed by a field name
           to sort on. When this is None, results are based on 'rank'. See
-          _get_search_rank to see how rank is determined.
+          get_search_rank to see how rank is determined.
       - limit: the maximum number of results to return.
       - cursor: A cursor, used to get the next page of results.
           If there are more documents that match the query than 'limit', this

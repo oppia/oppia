@@ -135,7 +135,7 @@ oppia.directive('searchBar', [function() {
           if (evt.keyCode == 13 || evt.keyCode == 32) {
             onSearchQueryChangeExec();
           } else {
-            oppiaDebouncer.debounce(onSearchQueryChangeExec, 400)();
+            oppiaDebouncer.debounce(onSearchQueryChangeExec, 650)();
           }
         };
 

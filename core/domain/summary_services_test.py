@@ -196,7 +196,7 @@ class ExplorationDisplayableSummariesTest(
             'ratings': feconf.get_empty_ratings(),
             'status': 'public',
             'tags': [],
-            'thumbnail_bg_color': '#05a69a',
+            'thumbnail_bg_color': '#7c8952',
             'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
             'title': u'Exploration 2 Albert title',
         }
@@ -279,7 +279,7 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
             'status': u'public',
             'tags': [],
             'title':  u'The Lazy Magician',
-            'thumbnail_bg_color': '#058ca6',
+            'thumbnail_bg_color': '#ce672b',
             'thumbnail_icon_url': '/images/subjects/Mathematics.svg',
         }
         expected_group = {
@@ -344,10 +344,11 @@ class FeaturedExplorationDisplayableSummariesTest(
         rights_manager.publicize_exploration(self.admin_id, self.EXP_ID_2)
 
         featured_exploration_summaries = (
-            summary_services.get_featured_exploration_summary_dicts())
+            summary_services.get_featured_exploration_summary_dicts([
+                feconf.DEFAULT_LANGUAGE_CODE]))
         expected_summary = {
             'status': u'publicized',
-            'thumbnail_bg_color': '#05a69a',
+            'thumbnail_bg_color': '#7c8952',
             'community_owned': False,
             'tags': [],
             'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
