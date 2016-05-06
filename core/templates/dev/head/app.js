@@ -447,6 +447,10 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
       _sendEventToGoogleAnalytics(
         'CommitToPrivateExploration', 'click', explorationId);
     },
+    registerOpenPublishExplorationModalEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'PublishExplorationModal', 'open', explorationId);
+    },
     registerPublishExplorationEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
         'PublishExploration', 'click', explorationId);

@@ -558,6 +558,9 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     };
 
     $scope.showPublishExplorationModal = function() {
+      siteAnalyticsService.registerOpenPublishExplorationModalEvent(
+        explorationData.explorationId);
+
       $scope.publishModalIsOpening = true;
       alertsService.clearWarnings();
       var modalInstance = $modal.open({
