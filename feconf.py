@@ -426,58 +426,59 @@ UPDATE_TYPE_EXPLORATION_COMMIT = 'exploration_commit'
 UPDATE_TYPE_COLLECTION_COMMIT = 'collection_commit'
 UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
 
-# Default color
-COLOR_TEAL = 'teal'
-# Social sciences
-COLOR_SALMON = 'salmon'
-# Art
-COLOR_SUNNYSIDE = 'sunnyside'
-# Mathematics and computing
-COLOR_SHARKFIN = 'sharkfin'
-# Science
-COLOR_GUNMETAL = 'gunmetal'
-DEFAULT_COLOR = COLOR_TEAL
+DEFAULT_COLOR = '#a33f40'
 DEFAULT_THUMBNAIL_ICON = 'Lightbulb'
-
-COLORS_TO_HEX_VALUES = {
-    COLOR_TEAL: '#7c8952',
-    COLOR_SALMON: '#b05a27',
-    COLOR_SUNNYSIDE: '#cf972b',
-    COLOR_SHARKFIN: '#ce672b',
-    COLOR_GUNMETAL: '#185269',
-}
 
 # List of supported default categories. For now, each category has
 # a specific color associated with it. Each category also has a thumbnail icon
 # whose filename is "{{CategoryName}}.svg".
 CATEGORIES_TO_COLORS = {
-    'Architecture': COLOR_SUNNYSIDE,
-    'Art': COLOR_SUNNYSIDE,
-    'Biology': COLOR_GUNMETAL,
-    'Business': COLOR_SALMON,
-    'Chemistry': COLOR_GUNMETAL,
-    'Computing': COLOR_SHARKFIN,
-    'Economics': COLOR_SALMON,
-    'Education': COLOR_TEAL,
-    'Engineering': COLOR_GUNMETAL,
-    'Environment': COLOR_GUNMETAL,
-    'Geography': COLOR_SALMON,
-    'Government': COLOR_SALMON,
-    'Languages': COLOR_SUNNYSIDE,
-    'Law': COLOR_SALMON,
-    'Life Skills': COLOR_TEAL,
-    'Mathematics': COLOR_SHARKFIN,
-    'Medicine': COLOR_GUNMETAL,
-    'Music': COLOR_SUNNYSIDE,
-    'Philosophy': COLOR_SALMON,
-    'Physics': COLOR_GUNMETAL,
-    'Programming': COLOR_SHARKFIN,
-    'Psychology': COLOR_SALMON,
-    'Puzzles': COLOR_TEAL,
-    'Reading': COLOR_TEAL,
-    'Sport': COLOR_SUNNYSIDE,
-    'Statistics': COLOR_SHARKFIN,
-    'Welcome': COLOR_TEAL,
+    'Mathematics': '#cd672b',
+    'Algebra': '#cd672b',
+    'Arithmetic': '#d68453',
+    'Calculus': '#b86330',
+    'Logic': '#d68453',
+    'Combinatorics': '#cf5935',
+    'Graph Theory': '#cf5935',
+    'Probability': '#cf5935',
+    'Statistics': '#cd672b',
+    'Geometry': '#d46949',
+    'Trigonometry': '#d46949',
+
+    'Algorithms': '#d0982a',
+    'Computing': '#bb8b2f',
+    'Programming': '#d9aa53',
+
+    'Astronomy': '#879d6c',
+    'Biology': '#97a766',
+    'Chemistry': '#aab883',
+    'Engineering': '#8b9862',
+    'Environment': '#aba86d',
+    'Medicine': '#97a766',
+    'Physics': '#879d6c',
+
+    'Architecture': '#6e3466',
+    'Art': '#895a83',
+    'Music': '#6a3862',
+    'Philosophy': '#613968',
+    'Poetry': '#7f507f',
+
+    'English': '#193a69',
+    'Languages': '#1b4174',
+    'Latin': '#3d5a89',
+    'Reading': '#193a69',
+
+    'Business': '#387163',
+    'Economics': '#5d8b7f',
+    'Geography': '#3c6d62',
+    'Government': '#538270',
+    'History': '#3d6b52',
+    'Law': '#538270',
+
+    'Education': '#942e20',
+    'Puzzles': '#a8554a',
+    'Sport': '#893327',
+    'Welcome': '#992a2b',
 }
 
 ALL_CATEGORIES = sorted(CATEGORIES_TO_COLORS.keys())

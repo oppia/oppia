@@ -420,11 +420,10 @@ def get_info_card_url_for_category(category):
 
 
 def get_hex_color_for_category(category):
-    color = (
+    return (
         feconf.CATEGORIES_TO_COLORS[category]
         if category in feconf.CATEGORIES_TO_COLORS
         else feconf.DEFAULT_COLOR)
-    return feconf.COLORS_TO_HEX_VALUES[color]
 
 
 def get_thumbnail_icon_url_for_category(category):

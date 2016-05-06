@@ -24,23 +24,32 @@ import utils
 
 _LIBRARY_INDEX_GROUPS = [{
     'header': 'Mathematics & Statistics',
-    'search_categories': ['Mathematics', 'Statistics'],
+    'search_categories': [
+        'Mathematics', 'Algebra', 'Arithmetic', 'Calculus', 'Combinatorics',
+        'Geometry', 'Graph Theory', 'Logic', 'Probability', 'Statistics',
+        'Trigonometry',
+    ],
 }, {
     'header': 'Computing',
-    'search_categories': ['Computing', 'Programming'],
+    'search_categories': ['Algorithms', 'Computing', 'Programming'],
 }, {
     'header': 'Science',
     'search_categories': [
         'Astronomy', 'Biology', 'Chemistry', 'Engineering', 'Environment',
-        'Medicine', 'Physics'
+        'Medicine', 'Physics',
+    ],
+}, {
+    'header': 'Humanities',
+    'search_categories': [
+        'Architecture', 'Art', 'Music', 'Philosophy', 'Poetry'
     ],
 }, {
     'header': 'Languages',
-    'search_categories': ['Languages', 'Reading'],
+    'search_categories': ['Languages', 'Reading', 'English', 'Latin'],
 }, {
     'header': 'Social Science',
     'search_categories': [
-        'Business', 'Economics', 'Geography', 'Government', 'Law'],
+        'Business', 'Economics', 'Geography', 'Government', 'History', 'Law'],
 }]
 
 

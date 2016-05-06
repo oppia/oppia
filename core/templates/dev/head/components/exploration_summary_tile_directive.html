@@ -9,7 +9,7 @@
         </h2>
 
         <!-- Note that if this is ng-if instead, the avatar area will not detect a mouseover and the tile will behave incorrectly. -->
-        <div ng-show="isWindowLarge" class="exploration-summary-avatars" ng-show="avatarsList.length > 0">
+        <div ng-show="isWindowLarge && avatarsList.length > 0" class="exploration-summary-avatars" ng-show="avatarsList.length > 0">
           <div class="circular-image-container">
             <circular-image ng-if="avatarsList.length > 0"
                             src="avatarsList[0].image"

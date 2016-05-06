@@ -1,12 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg width="50px" height="50px" viewBox="0 0 50 50" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
-    <!-- Generator: Sketch 3.4.3 (16044) - http://www.bohemiancoding.com/sketch -->
-    <title>Astronomy</title>
-    <desc>Created with Sketch.</desc>
-    <defs></defs>
-    <g id="Gallery-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
-        <g id="Astronomy" sketch:type="MSArtboardGroup" fill="#FFFFFF">
-            <path d="M39.3484865,20.6136271 C39.6968195,21.7544998 39.9128163,22.9531188 39.9785874,24.1915943 C36.6731999,25.2807458 30.9750787,26 24.5,26 C18.6295385,26 13.3977105,25.4087968 10.0086165,24.4867363 C10.0573215,23.0382438 10.3113982,21.6418096 10.7426512,20.325629 C7.7942305,21.0342193 6,21.9718053 6,23 C6,25.209139 14.2827321,27 24.5,27 C34.7172679,27 43,25.209139 43,23 C43,22.1056236 41.6424114,21.2798055 39.3484865,20.6136271 Z M39.167872,20.0609685 C37.126003,14.2031809 31.5538542,10 25,10 C18.4461458,10 12.873997,14.2031809 10.832128,20.0609685 C5.45542063,20.9761936 2,22.4003733 2,24 C2,26.7614237 12.2974508,29 25,29 C37.7025492,29 48,26.7614237 48,24 C48,22.4003733 44.5445794,20.9761936 39.167872,20.0609685 Z M39.5537361,28.6462682 C37.9249311,35.1684383 32.0267014,40 25,40 C17.9732986,40 12.0750689,35.1684383 10.4462639,28.6462682 C14.4108192,29.4923812 19.4781682,30 25,30 C30.5218318,30 35.5891808,29.4923812 39.5537361,28.6462682 Z" id="Oval-3" sketch:type="MSShapeGroup" transform="translate(25.000000, 25.000000) rotate(-347.000000) translate(-25.000000, -25.000000) "></path>
-        </g>
-    </g>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 18.1.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="astronomy_1_" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
+	 y="0px" viewBox="0 0 186.9 187.2" enable-background="new 0 0 186.9 187.2" xml:space="preserve">
+<rect x="0.2" y="0" fill="none" width="186.7" height="186.7"/>
+<path fill="#EFF4FB" d="M93.6,13.8C49.6,13.8,14,49.4,14,93.4c0,43.9,35.6,79.5,79.5,79.5c43.9,0,79.5-35.6,79.5-79.5
+	C173.1,49.4,137.5,13.8,93.6,13.8z M128.7,128.2l-28.2-17l-6.9,53.1l-6.9-53.1l-28.4,17l17-28.2l-45-6.9l45-6.9l-17-28.4l28.4,17
+	L93.6,23l6.9,51.9l28.4-17l-17.3,28.4l46.2,6.8l-46.2,6.8L128.7,128.2z"/>
 </svg>

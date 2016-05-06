@@ -2921,7 +2921,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-splash-h2 {
   line-height: 1.6em;
   margin: 0 auto;
-  padding-bottom: 50px;
+  padding-bottom: 72px;
 }
 
 @media (min-width: 630px) {
@@ -2930,7 +2930,7 @@ md-card.preview-conversation-skin-supplemental-card {
   }
   .oppia-splash-h2 {
     font-size: 1.8em;
-    padding-top: 150px;
+    padding-top: 130px;
   }
 }
 @media (max-width: 629px) {
@@ -2959,7 +2959,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-splash-books {
   left: 50%;
   position: absolute;
-  top: 80px;
+  top: 95px;
   z-index: 5;
 }
 @media (min-width: 630px) {
