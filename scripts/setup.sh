@@ -43,14 +43,6 @@ function maybeInstallDependencies {
       shift
       ;;
 
-      --suite=*)
-      SUITE="${i#*=}"
-      shift
-      ;;
-
-      *)
-      echo "Error: Unknown command line option: $i"
-      ;;
     esac
   done
 

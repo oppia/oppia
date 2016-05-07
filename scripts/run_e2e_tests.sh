@@ -30,6 +30,11 @@
 # Sharding must be disabled (either by passing in false to --sharding or 1 to
 # --sharding-instances) if running any tests in isolation (iit or ddescribe).
 #   --suite=suite_name Performs test for different suites.
+#   For performing a full test, no argument is required.
+#   For performing tests on editors, use --suite=editor
+#   For performing tests on user management, use --suite=usermanagement
+#   For performing miscellaneous tests, use --suite=misc
+#
 # The root folder MUST be named 'oppia'.
 
 function cleanup {
@@ -107,15 +112,15 @@ if [ -d "../protractor-screenshots" ]; then
   rm -r ../protractor-screenshots
 fi
 
-# Pass different suites for tests.
-# For performing a full test, no argument is required.
-# For performing tests on editors, use --suite=editor
-# For performing tests on user management, use --suite=usermanagement
-# For performing miscellaneous tests, use --suite=misc
+# Parse additional command line arguments that may be passed to protractor.
+# Credit: http://stackoverflow.com/questions/192249
+# Passing different suites and sharding parameters for tests.
 SUITE="full"
+SHARDING=true
+SHARD_INSTANCES=3
 for j in "$@"; do
   # Match each space-separated argument passed to the shell file to a separate
-  # case label, based on a pattern. E.g. Match to -suite=*, where the
+  # case label, based on a pattern. E.g. Match to -suite=*, -sharding=*, where the
   # asterisk refers to any characters following the equals sign, other than
   # whitespace.
   case $j in
@@ -127,39 +132,19 @@ for j in "$@"; do
     # Shifts the argument parameters over by one. E.g. $2 becomes $1, etc.
     shift
     ;;
- 
-    *)
-    echo "Error: Unknown suite type: $j"
-    ;;
-  esac
-done
 
-# Parse additional command line arguments that may be passed to protractor.
-# Credit: http://stackoverflow.com/questions/192249
-SHARDING=true
-SHARD_INSTANCES=3
-for i in "$@"; do
-  # Match each space-separated argument passed to the shell file to a separate
-  # case label, based on a pattern. E.g. Match to -sharding=*, where the
-  # asterisk refers to any characters following the equals sign, other than
-  # whitespace.
-  case $i in
     --sharding=*)
-    # Extract the value right of the equal sign by substringing the $i variable
-    # at the equal sign.
-    # http://tldp.org/LDP/abs/html/string-manipulation.html
-    SHARDING="${i#*=}"
-    # Shifts the argument parameters over by one. E.g. $2 becomes $1, etc.
+    SHARDING="${j#*=}"
     shift
     ;;
 
     --sharding-instances=*)
-    SHARD_INSTANCES="${i#*=}"
+    SHARD_INSTANCES="${j#*=}"
     shift
     ;;
-
+ 
     *)
-    echo "Error: Unknown command line option: $i"
+    echo "Error: Unknown command line option: $j"
     ;;
   esac
 done
