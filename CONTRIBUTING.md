@@ -15,6 +15,12 @@ Thanks for your interest in contributing code or design help to the Oppia projec
   5. Join the [oppia-dev@](https://groups.google.com/forum/#!forum/oppia-dev) mailing list, and say hi on the [gitter](https://gitter.im/oppia/oppia-chat) chat channel!
   6. (Optional) You may also want to set up [automatic auth](https://help.github.com/articles/set-up-git/#next-steps-authenticating-with-github-from-git) so you don't have to type in a username and password each time you commit a change.
 
+## Getting in touch with the team
+
+The primary chat channel that the team uses is [Gitter](https://gitter.im/oppia/oppia-chat). Feel free to hang out there! (You might also consider 'pinning' the tab in your browser, so that it's easily accessible.)
+
+We have also recently started offering office hours for new contributors on Gitter, where you can get your questions answered! You can find the schedule on the [wiki homepage](https://github.com/oppia/oppia/wiki). We also maintain a list of [Frequently Asked Questions](https://github.com/oppia/oppia/wiki/Frequently-Asked-Questions).
+
 ## Finding something to do
 
 If you have an idea for something to do, first check if it's already on the [issue tracker](https://github.com/oppia/oppia/issues). If so, add a comment to the issue saying you'd like to work on it, and we'll help you get started! Otherwise, please file a new issue, and say you'd like to work on it.
