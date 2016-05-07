@@ -29,9 +29,9 @@ IMPORTANT NOTES:
     folder should contain a folder called /images, which in turn should
     contain:
     - one file: favicon.ico
-    - five folders: /avatar, /general, /logo, /splash and /sidebar, containing
-        images used for the avatar, general-purpose usage, logo, splash
-        carousel and sidebar, respectively.
+    - four folders: /avatar, /general, /logo and /sidebar, containing
+        images used for the avatar, general-purpose usage, logo and sidebar,
+        respectively.
 
 2.  Before running this script, you must install third-party dependencies by
     running
@@ -84,8 +84,8 @@ LOG_FILE_PATH = os.path.join('..', 'deploy.log')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
 DEPLOY_DATA_PATH = os.path.join(os.getcwd(), '..', 'deploy_data', APP_NAME)
 
-SPLASH_PAGE_FILES = ['favicon.ico']
-IMAGE_DIRS = ['avatar', 'general', 'splash', 'sidebar', 'logo']
+IMAGE_FILES_AT_ROOT = ['favicon.ico']
+IMAGE_DIRS = ['avatar', 'general', 'sidebar', 'logo']
 
 
 def preprocess_release():
@@ -105,12 +105,11 @@ def preprocess_release():
     d = open('app.yaml', 'w+')
     d.write(content)
 
-    # Substitute image files for the splash page.
     if not os.path.exists(DEPLOY_DATA_PATH):
         raise Exception(
             'Could not find deploy_data directory at %s' % DEPLOY_DATA_PATH)
 
-    for filename in SPLASH_PAGE_FILES:
+    for filename in IMAGE_FILES_AT_ROOT:
         src = os.path.join(DEPLOY_DATA_PATH, 'images', filename)
         dst = os.path.join(os.getcwd(), 'static', 'images', filename)
         if not os.path.exists(src):
