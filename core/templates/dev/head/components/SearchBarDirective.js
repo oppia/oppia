@@ -23,18 +23,21 @@ oppia.directive('searchBar', [function() {
     controller: [
       '$scope', '$rootScope', '$timeout', '$window', '$location',
       'searchService', 'oppiaDebouncer', 'oppiaHtmlEscaper',
-      'ExplorationCreationButtonService', 'urlService', 'CATEGORY_LIST',
+      'ExplorationCreationButtonService', 'urlService',
       function(
           $scope, $rootScope, $timeout, $window, $location,
           searchService, oppiaDebouncer, oppiaHtmlEscaper,
-          ExplorationCreationButtonService, urlService, CATEGORY_LIST) {
+          ExplorationCreationButtonService, urlService) {
         $scope.isSearchInProgress = searchService.isSearchInProgress;
-        $scope.ALL_CATEGORIES = CATEGORY_LIST.map(function(categoryName) {
-          return {
-            id: categoryName,
-            text: categoryName
-          };
-        });
+        $scope.SEARCH_DROPDOWN_CATEGORIES = (
+          GLOBALS.SEARCH_DROPDOWN_CATEGORIES.map(
+            function(categoryName) {
+              return {
+                id: categoryName,
+                text: categoryName
+              };
+            }
+          ));
         $scope.ALL_LANGUAGE_CODES = GLOBALS.LANGUAGE_CODES_AND_NAMES.map(
           function(languageItem) {
             return {
@@ -48,7 +51,7 @@ oppia.directive('searchBar', [function() {
           categories: {
             description: '',
             itemsName: 'categories',
-            masterList: $scope.ALL_CATEGORIES,
+            masterList: $scope.SEARCH_DROPDOWN_CATEGORIES,
             numSelections: 0,
             selections: {},
             summary: ''

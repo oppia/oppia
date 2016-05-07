@@ -419,7 +419,7 @@ def get_hex_color_for_category(category):
 
 def get_thumbnail_icon_url_for_category(category):
     icon_name = (
-        category if category in feconf.DEFAULT_CATEGORIES
+        category if category in feconf.ALL_CATEGORIES
         else feconf.DEFAULT_THUMBNAIL_ICON)
     # Remove all spaces from the string.
     return '/images/subjects/%s.svg' % icon_name.replace(' ', '')

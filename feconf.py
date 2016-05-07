@@ -481,11 +481,30 @@ CATEGORIES_TO_COLORS = {
     'Welcome': '#992a2b',
 }
 
+# A sorted list of default categories for which icons and background colours
+# exist.
 ALL_CATEGORIES = sorted(CATEGORIES_TO_COLORS.keys())
 
-
-# A sorted list of default categories.
-DEFAULT_CATEGORIES = sorted(CATEGORIES_TO_COLORS.keys())
+# These categories are shown in the library navbar.
+SEARCH_DROPDOWN_CATEGORIES = sorted([
+    'Mathematics',
+    'Statistics',
+    'Algorithms',
+    'Programming',
+    'Biology',
+    'Chemistry',
+    'Physics',
+    'Medicine',
+    'English',
+    'Architecture',
+    'Art',
+    'Music',
+    'Reading',
+    'Business',
+    'Economics',
+    'Geography',
+    'History',
+])
 
 # The header for the "Featured Explorations" category in the library index
 # page.

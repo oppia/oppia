@@ -196,7 +196,7 @@ class ExplorationDisplayableSummariesTest(
             'ratings': feconf.get_empty_ratings(),
             'status': 'public',
             'tags': [],
-            'thumbnail_bg_color': '#7c8952',
+            'thumbnail_bg_color': '#a33f40',
             'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
             'title': u'Exploration 2 Albert title',
         }
@@ -268,7 +268,7 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
         """
         library_groups = summary_services.get_library_groups([])
         expected_exploration_summary_dict = {
-            'category': u'Mathematics',
+            'category': u'Algorithms',
             'community_owned': True,
             'human_readable_contributors_summary': {},
             'id': '2',
@@ -279,12 +279,12 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
             'status': u'public',
             'tags': [],
             'title':  u'The Lazy Magician',
-            'thumbnail_bg_color': '#ce672b',
-            'thumbnail_icon_url': '/images/subjects/Mathematics.svg',
+            'thumbnail_bg_color': '#d0982a',
+            'thumbnail_icon_url': '/images/subjects/Algorithms.svg',
         }
         expected_group = {
-            'categories': ['Mathematics', 'Statistics'],
-            'header': 'Mathematics & Statistics',
+            'categories': ['Algorithms', 'Computing', 'Programming'],
+            'header': 'Computing',
         }
 
         self.assertEqual(len(library_groups), 1)
@@ -348,7 +348,7 @@ class FeaturedExplorationDisplayableSummariesTest(
                 feconf.DEFAULT_LANGUAGE_CODE]))
         expected_summary = {
             'status': u'publicized',
-            'thumbnail_bg_color': '#7c8952',
+            'thumbnail_bg_color': '#a33f40',
             'community_owned': False,
             'tags': [],
             'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
