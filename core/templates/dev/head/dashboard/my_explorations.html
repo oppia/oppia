@@ -72,7 +72,7 @@
                   </span>
                   <span ng-if="exploration.num_open_threads == 0 && exploration.status !== 'private'">
                     <span class="oppia-dashboard-status-green">
-                      Good
+                      Published
                     </span>
                   </span>
                   <span ng-if="exploration.status === 'private'">
@@ -84,7 +84,7 @@
               </div>
               <div class="oppia-dashboard-exp-tile-contents">
                 <span class="oppia-dashboard-exp-tile-image-container" style="position: absolute;">
-                  <img class="oppia-dashboard-exp-tile-image" ng-src="<[exploration.thumbnail_icon_url]>" style="background-color: <[exploration.thumbnail_bg_color]>">
+                  <img class="oppia-dashboard-exp-tile-image" ng-src="<[exploration.thumbnail_icon_url]>" style="background-color: <[exploration.thumbnail_bg_color]>" ng-class="{'oppia-dashboard-exp-tile-image-private': exploration.status === 'private'}">
                 </span>
 
                 <div class="oppia-dashboard-exp-tile-details">

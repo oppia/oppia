@@ -1114,6 +1114,9 @@ md-card.oppia-dashboard-exp-tile {
   height: 120px;
   width: 120px;
 }
+.oppia-dashboard-exp-tile-image-private {
+  opacity: 0.2;
+}
 .oppia-dashboard-exp-tile-details {
   padding-left: 100px;
   padding-top: 5px;

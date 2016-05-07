@@ -1980,7 +1980,9 @@ oppia.factory('explorationWarningsService', [
       if (!explorationObjectiveService.displayed) {
         _warningsList.push({
           type: WARNING_TYPES.ERROR,
-          message: 'Please specify an objective (in the Settings tab).'
+          message: (
+            'Please specify a goal for this exploration (in the Settings ' +
+            'tab).')
         });
       }
 
