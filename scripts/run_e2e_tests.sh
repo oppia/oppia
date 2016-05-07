@@ -29,6 +29,11 @@
 #         sharding.
 # Sharding must be disabled (either by passing in false to --sharding or 1 to
 # --sharding-instances) if running any tests in isolation (iit or ddescribe).
+#   --suite=suite_name Performs test for different suites.
+#   For performing a full test, no argument is required.
+#   For performing tests on editors, use --suite=editor
+#   For performing tests on user management, use --suite=usermanagement
+#   For performing miscellaneous tests, use --suite=misc
 #
 # The root folder MUST be named 'oppia'.
 
@@ -109,30 +114,37 @@ fi
 
 # Parse additional command line arguments that may be passed to protractor.
 # Credit: http://stackoverflow.com/questions/192249
+# Passing different suites and sharding parameters for tests.
+SUITE="full"
 SHARDING=true
 SHARD_INSTANCES=3
-for i in "$@"; do
+for j in "$@"; do
   # Match each space-separated argument passed to the shell file to a separate
-  # case label, based on a pattern. E.g. Match to -sharding=*, where the
+  # case label, based on a pattern. E.g. Match to -suite=*, -sharding=*, where the
   # asterisk refers to any characters following the equals sign, other than
   # whitespace.
-  case $i in
-    --sharding=*)
+  case $j in
+    --suite=*)
     # Extract the value right of the equal sign by substringing the $i variable
     # at the equal sign.
     # http://tldp.org/LDP/abs/html/string-manipulation.html
-    SHARDING="${i#*=}"
+    SUITE="${j#*=}"
     # Shifts the argument parameters over by one. E.g. $2 becomes $1, etc.
     shift
     ;;
 
-    --sharding-instances=*)
-    SHARD_INSTANCES="${i#*=}"
+    --sharding=*)
+    SHARDING="${j#*=}"
     shift
     ;;
 
+    --sharding-instances=*)
+    SHARD_INSTANCES="${j#*=}"
+    shift
+    ;;
+ 
     *)
-    echo "Error: Unknown command line option: $i"
+    echo "Error: Unknown command line option: $j"
     ;;
   esac
 done
@@ -143,7 +155,7 @@ done
 # in at all.
 # TODO(bhenning): Figure out if this is a bug with protractor.
 if [ "$SHARDING" = "false" ] || [ "$SHARD_INSTANCES" = "1" ]; then
-  $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js
+  $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --suite "$SUITE"
 else
-  $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES
+  $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE"
 fi

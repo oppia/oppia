@@ -56,7 +56,31 @@ exports.config = {
   // When run without a command line parameter, all suites will run. If run
   // with --suite=smoke, only the patterns matched by that suite will run.
   suites: {
-    full: 'protractor/*.js'
+    full: [
+      'protractor/*.js'
+    ],
+
+    editor: [
+      'protractor/editorAndPlayer.js',
+      'protractor/gadgetEditor.js',
+      'protractor/stateEditor.js'
+    ],
+
+    usermanagement: [
+      'protractor/userManagement.js'
+    ],
+
+    misc: [
+      'protractor/embedding.js',
+      'protractor/explorationRating.js',
+      'protractor/fallbacks.js',
+      'protractor/historyTab.js',
+      'protractor/interactions.js',
+      'protractor/preferences.js',
+      'protractor/privileges.js',
+      'protractor/publicationAndGallery.js',
+      'protractor/richTextComponents.js'
+    ]
   },
 
   // ----- Capabilities to be passed to the webdriver instance ----
