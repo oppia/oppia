@@ -1076,6 +1076,32 @@ textarea {
 
 /* Rules for the tiles in the "My Explorations" page. */
 
+.oppia-dashboard-intro-card {
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+}
+.oppia-dashboard-intro-card p {
+  margin-bottom: 12px;
+}
+.oppia-dashboard-intro-picture {
+  width: 400px;
+}
+.oppia-dashboard-intro-button {
+  background-color: #015c53;
+  border-radius: 0;
+  color: #fff;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 14px;
+  margin-top: 10px;
+  text-transform: uppercase;
+  width: 200px;
+}
+.oppia-dashboard-intro-button:hover,
+.oppia-dashboard-intro-button:focus,
+.oppia-dashboard-intro-button:active {
+  background-color: rgba(5, 190, 178, 1);
+  color: #fff;
+}
+
 md-card.oppia-dashboard-exp-tile {
   background-color: #fff;
   color: #888;

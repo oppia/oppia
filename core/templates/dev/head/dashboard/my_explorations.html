@@ -36,10 +36,9 @@
 
 {% block content %}
   <div class="oppia-dashboard-container" ng-controller="MyExplorations">
-
-    <h2 class="oppia-page-heading">My Explorations</h2>
-
     <div ng-if="explorationsList.length > 0">
+      <h2 class="oppia-page-heading">My Explorations</h2>
+
       <ul class="oppia-dashboard-tiles">
         <li ng-repeat="exploration in explorationsList">
           <md-card layout="row" class="oppia-dashboard-tile protractor-test-exp-summary-tile">
@@ -132,9 +131,23 @@
     </div>
 
     <div ng-if="explorationsList.length === 0">
-      <p>
-        <em>You currently aren't managing or collaborating on any explorations.</em>
-      </p>
+      <h2 style="margin-left: 52px;">My Explorations</h2>
+      <md-card layout="row" class="oppia-page-card oppia-dashboard-intro-card">
+        <div>
+          <p>
+            It looks like you haven't created any explorations yet.
+            Let's get started!
+          </p>
+          <button type="button"
+                  class="btn oppia-dashboard-intro-button oppia-transition-200"
+                  ng-click="showCreateExplorationModal()">
+            Create Exploration
+          </button>
+        </div>
+        <div class="oppia-dashboard-intro-picture">
+          <img src="/images/general/empty_dashboard.svg">
+        </div>
+      </md-card>
     </div>
   </div>
 
