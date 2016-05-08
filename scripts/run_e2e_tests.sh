@@ -32,7 +32,8 @@
 #   --suite=suite_name Performs test for different suites.
 #   For performing a full test, no argument is required.
 #   For performing tests on editors, use --suite=editor
-#   For performing tests on user management, use --suite=usermanagement
+#   For performing tests on extensions, use --suite=extensions
+#   For performing tests on library, use --suite=library
 #   For performing miscellaneous tests, use --suite=misc
 #
 # The root folder MUST be named 'oppia'.
