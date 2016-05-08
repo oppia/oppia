@@ -2036,3 +2036,58 @@ oppia.factory('explorationWarningsService', [
     };
   }
 ]);
+
+// Service for displaying different types of modals depending on the type of
+// response received as a result of the autosaving request.
+oppia.factory('autosaveInfoModalsService', [
+  '$modal', '$timeout',
+  function(
+    $modal, $timeout) {
+    return {
+      showNonStrictFailModal: function() {
+        $modal.open({
+          templateUrl: 'modals/saveValidationFail',
+          backdrop: true,
+          controller: [
+            '$scope', '$modalInstance',
+            function(
+              $scope, $modalInstance
+            ) {
+              $scope.close = function() {
+                $modalInstance.dismiss('cancel');
+              };
+            }
+          ]
+        }).result.then(function() {
+          // User refreshes the page - Flow for exploration loaded is followed.
+        });
+      },
+      showVersionMismatchModal: function() {
+        $modal.open({
+          templateUrl: 'modals/saveVersionMismatch',
+          backdrop: true,
+          controller: [
+            '$scope', '$modalInstance',
+            function(
+              $scope, $modalInstance
+            ) {
+              $scope.cancel = function() {
+                $modalInstance.dismiss('cancel');
+              };
+              $scope.discardChanges = function() {
+                // Send request to backend to set draft_changes to None.
+                // If the request succeeds ->
+                $timeout(function() {
+                  // Refresh the page.
+                }, 1000);
+              };
+            }
+          ]
+        }).result.then(function() {
+          // What if the modal is closed without clicking the
+          // 'Discard Changes' button ?
+        });
+      }
+    };
+  }
+]);

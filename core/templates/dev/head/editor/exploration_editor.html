@@ -366,6 +366,40 @@
       </div>
     </script>
 
+    <script type="text/ng-template" id="modals/saveValidationFail">
+        <div class="modal-header">
+            <h3>Error in saving</h3>
+        </div>
+
+        <div class="modal-body">
+            <p>
+                Sorry, an error has occurred. Please refresh the page to get back to the most recent ‘good’ state.
+            </p>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-default" ng-click="close()">Close</button>
+        </div>
+    </script>
+
+    <script type="text/ng-template" id="modals/saveVersionMismatch">
+        <div class="modal-header">
+            <h3>Error in saving</h3>
+        </div>
+
+        <div class="modal-body">
+            <p>
+                Sorry, the changes could not be saved. It's possible that someone else has committed to the exploration and so these changes have been lost.
+            </p>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-default" ng-click="discardChanges()">Discard Changes</button>
+            <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+        </div>
+    </script>
+
+
     <div class="container-fluid oppia-editor-page-container" ng-joy-ride="tutorialInProgress" config="EDITOR_TUTORIAL_OPTIONS" on-finish="onLeaveTutorial()" on-skip="onLeaveTutorial()">
       <div class="row" ng-if="explorationRightsService.isCloned()">
         <div class="col-lg-12 col-md-12 col-sm-12">
