@@ -17,16 +17,21 @@
       width: 560px;
     }
 
+    .interactive-map-container {
+      background: #fff;
+      padding: 8px;
+    }
+
     @media screen and (max-width: 959px) {
       #map_canvas {
         max-width: 560px;
-        min-width: 360px;
+        min-width: 560px;
         width: 100%;
       }
     }
   </style>
 
-  <div>
+  <div class="interactive-map-container">
     <div id="map_canvas" ui-map="map" ui-options="mapOptions"
          ui-event="{'map-click': 'registerClick($event, $params)'}">
     </div>

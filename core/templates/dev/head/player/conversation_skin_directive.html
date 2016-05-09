@@ -130,31 +130,29 @@
 
       <div ng-if="isCurrentSupplementalCardNonempty()"
            class="conversation-skin-supplemental-card-container">
-        <div class="conversation-skin-supplemental-interaction-container">
-          <div ng-if="isScreenNarrowAndShowingTutorCard()" class="supplemental-mask"></div>
-          <div class="conversation-skin-help-card" ng-if="helpCardHtml">
-            <img class="conversation-skin-oppia-avatar"
-                 ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt="">
-            <button type="button" class="conversation-skin-close-help-card-button"
+        <div ng-if="isScreenNarrowAndShowingTutorCard()" class="supplemental-mask"></div>
+        <div class="conversation-skin-help-card" ng-if="helpCardHtml">
+          <img class="conversation-skin-oppia-avatar"
+               ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt="">
+          <button type="button" class="conversation-skin-close-help-card-button"
                     ng-click="clearHelpCard()" ng-if="!helpCardHasContinueButton">
-              <i class="material-icons md-18">&#xE5CD;</i>
-            </button>
-            <div class="conversation-skin-help-card-content" angular-html-bind="helpCardHtml">
-            </div>
-            <br>
-            <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
-                focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
-                ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)"
-                ng-if="helpCardHasContinueButton"
-                style="margin-top: 12px;">
-              Continue to next card
-            </md-button>
+            <i class="material-icons md-18">&#xE5CD;</i>
+          </button>
+          <div class="conversation-skin-help-card-content" angular-html-bind="helpCardHtml">
           </div>
+          <br>
+          <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
+              focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
+              ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)"
+              ng-if="helpCardHasContinueButton"
+              style="margin-top: 12px;">
+            Continue to next card
+          </md-button>
+        </div>
 
-          <div ng-if="!exploration.isInteractionInline(activeCard.stateName)">
-            <div class="protractor-test-conversation-input"
-                 angular-html-bind="activeCard.interactionHtml">
-            </div>
+        <div ng-if="!exploration.isInteractionInline(activeCard.stateName)">
+          <div class="protractor-test-conversation-input"
+               angular-html-bind="activeCard.interactionHtml">
           </div>
         </div>
       </div>
@@ -583,15 +581,6 @@
       opacity: 0;
     }
 
-    .conversation-skin-supplemental-interaction-container {
-      background-color: #fff;
-      border-radius: 2px;
-      box-shadow: none;
-      margin-bottom: 8px;
-      padding: 8px;
-      position: relative;
-    }
-
     .conversation-skin-final-ratings {
       text-align: center;
     }
@@ -656,9 +645,12 @@
       }
 
       .conversation-skin-supplemental-card-container {
+        left: 50%;
         margin: 0 auto;
         max-width: 959px;
         min-width: 360px;
+        position: absolute;
+        transform: translateX(-50%);
       }
 
       .conversation-skin-supplemental-card-container .supplemental-mask {
