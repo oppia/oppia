@@ -67,12 +67,6 @@
         ADDITIONAL_ANGULAR_MODULES: [],
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
         DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}'),
-        NAV_MODE:
-          {% if nav_mode %}
-            JSON.parse('{{nav_mode|js_string}}'),
-          {% else %}
-            null,
-          {% endif %}
         INVALID_NAME_CHARS: JSON.parse('{{INVALID_NAME_CHARS|js_string}}'),
         ACTIVITY_STATUS_PRIVATE: JSON.parse(
           '{{ACTIVITY_STATUS_PRIVATE|js_string}}'),
@@ -80,8 +74,8 @@
           '{{ACTIVITY_STATUS_PUBLIC|js_string}}'),
         ACTIVITY_STATUS_PUBLICIZED: JSON.parse(
           '{{ACTIVITY_STATUS_PUBLICIZED|js_string}}'),
-        ALL_LANGUAGE_CODES: JSON.parse(
-          '{{ALL_LANGUAGE_CODES|js_string}}'),
+        ALL_CATEGORIES: JSON.parse('{{ALL_CATEGORIES|js_string}}'),
+        ALL_LANGUAGE_CODES: JSON.parse('{{ALL_LANGUAGE_CODES|js_string}}'),
         DEFAULT_LANGUAGE_CODE: JSON.parse(
           '{{DEFAULT_LANGUAGE_CODE|js_string}}'),
         RTE_COMPONENT_SPECS: JSON.parse('{{RTE_COMPONENT_SPECS|js_string}}'),
@@ -330,15 +324,16 @@
       {{ include_js_file('services/autoplayedVideosService.js') }}
       {{ include_js_file('services/searchService.js') }}
 
+      {{ include_js_file('components/ActivityTilesInfinityGridDirective.js') }}
       {{ include_js_file('components/AlertMessageDirective.js') }}
-      {{ include_js_file('components/ObjectEditorDirective.js') }}
+      {{ include_js_file('components/CreateExplorationButtonDirective.js') }}
+      {{ include_js_file('components/ExplorationCreationButtonService.js') }}
       {{ include_js_file('components/ExplorationSummaryTileDirective.js') }}
+      {{ include_js_file('components/LoadingDotsDirective.js') }}
+      {{ include_js_file('components/ObjectEditorDirective.js') }}
       {{ include_js_file('components/RatingComputationService.js')}}
       {{ include_js_file('components/RatingDisplayDirective.js')}}
       {{ include_js_file('components/Select2DropdownDirective.js') }}
-      {{ include_js_file('components/CreateExplorationButtonDirective.js') }}
-      {{ include_js_file('components/ExplorationCreationButtonService.js') }}
-      {{ include_js_file('components/ActivityTilesInfinityGridDirective.js') }}
 
       {{ include_js_file('expressions/expressionSyntaxTree.js') }}
       {{ include_js_file('expressions/evaluator.js') }}

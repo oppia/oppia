@@ -196,8 +196,8 @@ class ExplorationDisplayableSummariesTest(
             'ratings': feconf.get_empty_ratings(),
             'status': 'public',
             'tags': [],
-            'thumbnail_bg_color': '#05a69a',
-            'thumbnail_icon_url': '/images/library/thumbnails/Lightbulb.svg',
+            'thumbnail_bg_color': '#a33f40',
+            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
             'title': u'Exploration 2 Albert title',
         }
         self.assertIn('last_updated_msec', displayable_summaries[0])
@@ -268,7 +268,7 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
         """
         library_groups = summary_services.get_library_groups([])
         expected_exploration_summary_dict = {
-            'category': u'Mathematics',
+            'category': u'Algorithms',
             'community_owned': True,
             'human_readable_contributors_summary': {},
             'id': '2',
@@ -279,12 +279,12 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
             'status': u'public',
             'tags': [],
             'title':  u'The Lazy Magician',
-            'thumbnail_bg_color': '#058ca6',
-            'thumbnail_icon_url': '/images/library/thumbnails/Mathematics.svg',
+            'thumbnail_bg_color': '#d0982a',
+            'thumbnail_icon_url': '/images/subjects/Algorithms.svg',
         }
         expected_group = {
-            'categories': ['Mathematics', 'Statistics'],
-            'header': 'Mathematics & Statistics',
+            'categories': ['Algorithms', 'Computing', 'Programming'],
+            'header': 'Computing',
         }
 
         self.assertEqual(len(library_groups), 1)
@@ -344,13 +344,14 @@ class FeaturedExplorationDisplayableSummariesTest(
         rights_manager.publicize_exploration(self.admin_id, self.EXP_ID_2)
 
         featured_exploration_summaries = (
-            summary_services.get_featured_exploration_summary_dicts())
+            summary_services.get_featured_exploration_summary_dicts([
+                feconf.DEFAULT_LANGUAGE_CODE]))
         expected_summary = {
             'status': u'publicized',
-            'thumbnail_bg_color': '#05a69a',
+            'thumbnail_bg_color': '#a33f40',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': '/images/library/thumbnails/Lightbulb.svg',
+            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
             'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
             'category': u'A category',

@@ -276,7 +276,7 @@ def search(query_string, index, cursor=None,
     try:
         logging.debug('attempting a search with query %s' % query)
         results = index.search(query)
-    except gae_search.TransientError as e:
+    except Exception as e:
         logging.exception('something went wrong while searching.')
         if retries > 1:
             logging.debug('%d attempts left, retrying...' % (retries - 1))

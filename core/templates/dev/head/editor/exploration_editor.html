@@ -15,7 +15,6 @@
     GLOBALS.ALLOWED_GADGETS = JSON.parse('{{ALLOWED_GADGETS|js_string}}');
     GLOBALS.ALLOWED_INTERACTION_CATEGORIES = JSON.parse(
       '{{ALLOWED_INTERACTION_CATEGORIES|js_string}}');
-    GLOBALS.CATEGORIES_TO_COLORS = JSON.parse('{{CATEGORIES_TO_COLORS|js_string}}');
     GLOBALS.DEFAULT_OBJECT_VALUES = JSON.parse('{{DEFAULT_OBJECT_VALUES|js_string}}');
     GLOBALS.GADGET_SPECS = JSON.parse('{{GADGET_SPECS|js_string}}');
     GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
@@ -188,14 +187,10 @@
               </span>
 
               <span ng-if="saveModalIsOpening">
-                <i class="oppia-save-publish-loading oppia-save-publish-button-icon"
-               alt="Saving...">
-                  <loading-dots></loading-dots>
-                </i>
                 <span class="oppia-save-publish-button-label">
                   Saving
-                  <loading-dots></loading-dots>
                 </span>
+                <loading-dots></loading-dots>
               </span>
             </span>
             <span ng-if="!isPrivate()" title="Publish Changes">
@@ -206,26 +201,21 @@
               </span>
 
               <span ng-if="saveModalIsOpening">
-                <i class="oppia-save-publish-loading oppia-save-publish-button-icon"
-               alt="Saving...">
-                  <loading-dots></loading-dots>
-                </i>
                 <span class="oppia-save-publish-button-label">
-                  Saving
-                  <loading-dots></loading-dots>
+                  Publishing
                 </span>
+                <loading-dots></loading-dots>
               </span>
             </span>
           </span>
           <span ng-if="isSaveInProgress">
-            <span ng-if="isPrivate()">
+            <span ng-if="isPrivate()" class="oppia-save-publish-button-label">
               Saving
-              <loading-dots></loading-dots>
             </span>
-            <span ng-if="!isPrivate()">
+            <span ng-if="!isPrivate()" class="oppia-save-publish-button-label">
               Publishing
-              <loading-dots></loading-dots>
             </span>
+            <loading-dots></loading-dots>
           </span>
         </button>
         <button type="button" class="btn btn-default dropdown-toggle protractor-test-save-discard-toggle"
@@ -493,7 +483,6 @@
     {{ include_js_file('components/GadgetDirective.js') }}
     {{ include_js_file('components/GadgetPanelDirective.js') }}
     {{ include_js_file('components/HtmlSelectDirective.js') }}
-    {{ include_js_file('components/LoadingDotsDirective.js') }}
     {{ include_js_file('components/OutcomeEditorDirective.js') }}
     {{ include_js_file('components/OutcomeDestinationEditorDirective.js') }}
     {{ include_js_file('components/OutcomeFeedbackEditorDirective.js') }}

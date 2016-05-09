@@ -172,9 +172,11 @@ class MyExplorationsHandler(base.BaseHandler):
                 'status': exp_summary.status,
                 'community_owned': exp_summary.community_owned,
                 'is_editable': True,
-                'thumbnail_image_url': (
-                    '/images/library/exploration_background_%s_small.png' %
-                    _get_intro_card_color(exp_summary.category)),
+                'thumbnail_icon_url': (
+                    utils.get_thumbnail_icon_url_for_category(
+                        exp_summary.category)),
+                'thumbnail_bg_color': utils.get_hex_color_for_category(
+                    exp_summary.category),
                 'ratings': exp_summary.ratings,
                 'num_open_threads': (
                     feedback_thread_analytics.num_open_threads),

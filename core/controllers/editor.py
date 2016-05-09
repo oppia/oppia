@@ -254,8 +254,6 @@ class ExplorationPage(EditorHandler):
             'ALLOWED_GADGETS': feconf.ALLOWED_GADGETS,
             'ALLOWED_INTERACTION_CATEGORIES': (
                 feconf.ALLOWED_INTERACTION_CATEGORIES),
-            # This is needed for the exploration preview.
-            'CATEGORIES_TO_COLORS': feconf.CATEGORIES_TO_COLORS,
             'INVALID_PARAMETER_NAMES': feconf.INVALID_PARAMETER_NAMES,
             'NEW_STATE_TEMPLATE': NEW_STATE_TEMPLATE,
             'SHOW_TRAINABLE_UNRESOLVED_ANSWERS': (

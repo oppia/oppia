@@ -65,8 +65,7 @@ class LibraryPage(base.BaseHandler):
                 user_services.has_fully_registered(self.user_id)),
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
-            'LIBRARY_CATEGORY_FEATURED_EXPLORATIONS': (
-                feconf.LIBRARY_CATEGORY_FEATURED_EXPLORATIONS),
+            'SEARCH_DROPDOWN_CATEGORIES': feconf.SEARCH_DROPDOWN_CATEGORIES,
         })
         self.render_template('library/library.html')
 
@@ -76,13 +75,14 @@ class LibraryIndexHandler(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        language_codes = self.request.get('language_codes', [])
-        summary_dicts_by_category = (
-            summary_services.get_library_groups(language_codes))
+        # TODO(sll): Support index pages for other language codes.
+        summary_dicts_by_category = summary_services.get_library_groups([
+            feconf.DEFAULT_LANGUAGE_CODE])
+        featured_activity_summary_dicts = (
+            summary_services.get_featured_exploration_summary_dicts(
+                [feconf.DEFAULT_LANGUAGE_CODE]))
 
         preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
-        featured_activity_summary_dicts = (
-            summary_services.get_featured_exploration_summary_dicts())
         if self.user_id:
             user_settings = user_services.get_user_settings(self.user_id)
             preferred_language_codes = user_settings.preferred_language_codes

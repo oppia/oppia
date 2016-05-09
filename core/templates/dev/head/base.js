@@ -18,35 +18,7 @@
 
 // TODO(sll): Get this to read from a common JSON file; it's replicated in
 // feconf.
-oppia.constant('CATEGORY_LIST', [
-  'Architecture',
-  'Art',
-  'Biology',
-  'Business',
-  'Chemistry',
-  'Computing',
-  'Economics',
-  'Education',
-  'Engineering',
-  'Environment',
-  'Geography',
-  'Government',
-  'Languages',
-  'Law',
-  'Life Skills',
-  'Mathematics',
-  'Medicine',
-  'Music',
-  'Philosophy',
-  'Physics',
-  'Programming',
-  'Psychology',
-  'Puzzles',
-  'Reading',
-  'Sport',
-  'Statistics',
-  'Welcome'
-]);
+oppia.constant('CATEGORY_LIST', GLOBALS.ALL_CATEGORIES || []);
 
 // We use a slash because this character is forbidden in a state name.
 oppia.constant('PLACEHOLDER_OUTCOME_DEST', '/');
@@ -184,7 +156,7 @@ oppia.controller('Base', [
         $window.location.pathname.indexOf('/library') === 0);
     };
 
-    var navbarCutoffWidthPx = doesNavbarHaveSearchBar() ? 1171 : 630;
+    var navbarCutoffWidthPx = doesNavbarHaveSearchBar() ? 1171 : 800;
 
     $scope.windowIsNarrow = (
       windowDimensionsService.getWidth() <= navbarCutoffWidthPx);

@@ -29,8 +29,8 @@ describe('Library index page', function() {
   it('should display private, published and featured explorations', function() {
     var EXPLORATION_SILMARILS = 'silmarils';
     var EXPLORATION_VINGILOT = 'Vingilot';
+    var CATEGORY_ARCHITECTURE = 'Architecture';
     var CATEGORY_BUSINESS = 'Business';
-    var CATEGORY_ENVIRONMENT = 'Environment';
     var LANGUAGE_ENGLISH = 'English';
     var LANGUAGE_FRANCAIS = 'français';
     var LANGUAGE_DEUTSCH = 'Deutsch';
@@ -46,7 +46,7 @@ describe('Library index page', function() {
 
     users.login('feanor@publicationAndLibrary.com');
     workflow.createAndPublishExploration(
-      EXPLORATION_SILMARILS, CATEGORY_ENVIRONMENT,
+      EXPLORATION_SILMARILS, CATEGORY_ARCHITECTURE,
       'hold the light of the two trees', LANGUAGE_DEUTSCH);
     users.logout();
 
@@ -93,19 +93,19 @@ describe('Library index page', function() {
       languages: [LANGUAGE_ENGLISH, LANGUAGE_DEUTSCH, LANGUAGE_FRANCAIS],
       expectVisible: [EXPLORATION_SILMARILS, EXPLORATION_VINGILOT]
     }, {
-      categories: [CATEGORY_ENVIRONMENT],
+      categories: [CATEGORY_ARCHITECTURE],
       languages: [],
       expectVisible: [EXPLORATION_SILMARILS]
     }, {
-      categories: [CATEGORY_ENVIRONMENT, CATEGORY_BUSINESS],
+      categories: [CATEGORY_ARCHITECTURE, CATEGORY_BUSINESS],
       languages: [],
       expectVisible: [EXPLORATION_SILMARILS, EXPLORATION_VINGILOT]
     }, {
-      categories: [CATEGORY_ENVIRONMENT],
+      categories: [CATEGORY_ARCHITECTURE],
       languages: [LANGUAGE_DEUTSCH],
       expectVisible: [EXPLORATION_SILMARILS]
     }, {
-      categories: [CATEGORY_ENVIRONMENT],
+      categories: [CATEGORY_ARCHITECTURE],
       languages: [LANGUAGE_FRANCAIS],
       expectVisible: []
     }];

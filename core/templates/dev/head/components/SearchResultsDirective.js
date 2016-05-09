@@ -23,7 +23,7 @@ oppia.directive('searchResults', [function() {
     controller: [
       '$scope', '$rootScope', '$timeout', 'siteAnalyticsService',
       function($scope, $rootScope, $timeout, siteAnalyticsService) {
-        $rootScope.loadingMessage = 'Loading...';
+        $rootScope.loadingMessage = 'Loading';
         $scope.someResultsExist = true;
 
         // Called when the first batch of search results is retrieved from the
