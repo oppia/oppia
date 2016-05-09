@@ -338,8 +338,7 @@ DEMO_EXPLORATIONS = {
     u'13': 'solar_system',
     u'14': 'about_oppia.yaml',
     u'15': 'fuzzy_exploration.yaml',
-    u'16': 'all_interactions',
-    u'17': 'test_responsive_supplementary'
+    u'16': 'all_interactions'
 }
 
 DEMO_COLLECTIONS = {

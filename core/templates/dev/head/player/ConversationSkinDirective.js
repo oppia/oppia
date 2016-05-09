@@ -34,39 +34,27 @@ oppia.animation('.conversation-skin-responses-animate-slide', function() {
   };
 });
 
-var adjustTutorAvatar = function() {
-  var supplementalCard = $('.conversation-skin-supplemental-card-container');
-  var oppiaAvatar = $('.conversation-skin-oppia-avatar.show-tutor-card');
-  oppiaAvatar.css({
-    left: supplementalCard.position().left +
-          supplementalCard.width() - oppiaAvatar.width(),
-    top: supplementalCard.position().top
-  });
-};
-
 oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
   var tutorCardLeft, tutorCardWidth, tutorCardHeight;
 
-  var _beforeAddClass = function(element, className, done) {
+  var beforeAddClass = function(element, className, done) {
     if (className !== 'ng-hide') {
       done();
       return;
     }
     var tutorCard = element;
     var supplementalCard = $('.conversation-skin-supplemental-card-container');
-
+    var oppiaAvatar = $('.conversation-skin-oppia-avatar.show-tutor-card');
     tutorCardLeft = tutorCard.position().left;
     tutorCardWidth = tutorCard.width();
     tutorCardHeight = tutorCard.height();
-
+    oppiaAvatar.hide();
     tutorCard.animate({
       left: tutorCardLeft + tutorCardWidth,
       width: 0,
       height: 0,
       opacity: 0
     }, 500, function() {
-      adjustTutorAvatar();
-      var oppiaAvatar = $('.conversation-skin-oppia-avatar.show-tutor-card');
       oppiaAvatar.show();
       tutorCard.css({
         left: '',
@@ -78,7 +66,7 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
     });
   };
 
-  var _removeClass = function(element, className, done) {
+  var removeClass = function(element, className, done) {
     if (className !== 'ng-hide') {
       done();
       return;
@@ -109,8 +97,8 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
   };
 
   return {
-    beforeAddClass: _beforeAddClass,
-    removeClass: _removeClass
+    beforeAddClass: beforeAddClass,
+    removeClass: removeClass
   };
 });
 
@@ -124,7 +112,6 @@ oppia.animation('.conversation-skin-animate-cards', function() {
 
     if (className === 'animate-to-two-cards') {
       supplementalCardElt.css('opacity', '0');
-      $('.conversation-skin-oppia-avatar.show-tutor-card').hide();
       tutorCardElt.animate({
         'margin-left': '0'
       }, TIME_NUM_CARDS_CHANGE_MSEC, function() {
@@ -266,6 +253,9 @@ oppia.directive('conversationSkin', [function() {
         var hasInteractedAtLeastOnce = false;
         var _answerIsBeingProcessed = false;
         var _nextFocusLabel = null;
+        // This variable is used only when viewport is narrow.
+        // Indicates whether tutor card is active or supplemental card
+        var isTutorCardDisplayedIfNarrow = true;
 
         $scope.isInPreviewMode = oppiaPlayerService.isInPreviewMode();
         $scope.isIframed = urlService.isIframed();
@@ -347,7 +337,7 @@ oppia.directive('conversationSkin', [function() {
           $scope.activeCard = playerTranscriptService.getCard(index);
           $scope.arePreviousResponsesShown = false;
           $scope.clearHelpCard();
-          $scope._tutorCardDisplayedOnNarrow = true;
+          isTutorCardDisplayedIfNarrow = true;
           if (_nextFocusLabel && playerTranscriptService.isLastCard(index)) {
             focusService.setFocusIfOnDesktop(_nextFocusLabel);
           } else {
@@ -652,9 +642,6 @@ oppia.directive('conversationSkin', [function() {
         $window.onresize = function() {
           $scope.adjustPageHeight(false, null);
           $scope.windowWidth = windowDimensionsService.getWidth();
-          if ($scope.isScreenNarrowAndShowingSupplementalCard()) {
-            adjustTutorAvatar();
-          }
         };
 
         $window.addEventListener('scroll', function() {
@@ -697,23 +684,23 @@ oppia.directive('conversationSkin', [function() {
             return $scope.isViewportNarrow();
           }
           return $scope.isViewportNarrow() &&
-                 $scope._tutorCardDisplayedOnNarrow;
+                 isTutorCardDisplayedIfNarrow;
         };
 
         $scope.isScreenNarrowAndShowingSupplementalCard = function() {
           return $scope.isViewportNarrow() &&
-                 !$scope._tutorCardDisplayedOnNarrow;
+                 !isTutorCardDisplayedIfNarrow;
         };
 
         $scope.showTutorCardIfScreenIsNarrow = function() {
           if ($scope.isViewportNarrow()) {
-            $scope._tutorCardDisplayedOnNarrow = true;
+            isTutorCardDisplayedIfNarrow = true;
           }
         };
 
         $scope.showSupplementalCardIfScreenIsNarrow = function() {
           if ($scope.isViewportNarrow()) {
-            $scope._tutorCardDisplayedOnNarrow = false;
+            isTutorCardDisplayedIfNarrow = false;
           }
         };
 

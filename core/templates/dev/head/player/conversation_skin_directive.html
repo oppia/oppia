@@ -31,7 +31,7 @@
       <div ng-show='!isViewportNarrow() || isScreenNarrowAndShowingTutorCard()'
            class="conversation-skin-main-tutor-card"
            ng-class="{'animate-card-width': startCardChangeAnimation,
-                      'tutor-card-shadow': isViewportNarrow() && isCurrentSupplementalCardNonempty(),
+                      'has-shadow': isViewportNarrow() && isCurrentSupplementalCardNonempty(),
                       'conversation-skin-animate-tutor-card-on-narrow': isViewportNarrow() &&
                       isCurrentSupplementalCardNonempty()}">
         <div class="conversation-skin-tutor-card-content conversation-skin-animate-card-contents"
@@ -123,13 +123,14 @@
         </div>
       </div>
 
-      <img class="conversation-skin-oppia-avatar show-tutor-card"
-           ng-if="isScreenNarrowAndShowingSupplementalCard() && isCurrentSupplementalCardNonempty()"
-           ng-src="<[OPPIA_AVATAR_IMAGE_URL]>"
-           ng-click="showTutorCardIfScreenIsNarrow()" alt="">
-
       <div ng-if="isCurrentSupplementalCardNonempty()"
            class="conversation-skin-supplemental-card-container">
+
+        <img class="conversation-skin-oppia-avatar show-tutor-card"
+             ng-if="isScreenNarrowAndShowingSupplementalCard() && isCurrentSupplementalCardNonempty()"
+             ng-src="<[OPPIA_AVATAR_IMAGE_URL]>"
+             ng-click="showTutorCardIfScreenIsNarrow()" alt="">
+
         <div ng-if="isScreenNarrowAndShowingTutorCard()" class="supplemental-mask"></div>
         <div class="conversation-skin-help-card" ng-if="helpCardHtml">
           <img class="conversation-skin-oppia-avatar"
@@ -640,7 +641,7 @@
         z-index: 15;
       }
 
-      .tutor-card-shadow {
+      .has-shadow {
         box-shadow: 0 10px 10px rgba(0,0,0,0.24), 0 10px 10px rgba(0,0,0,0.24);
       }
 
@@ -685,8 +686,10 @@
         box-shadow: 0 3px 3px grey, 0 5px 3px grey;
         display: block;
         height: 45px;
+        left: 100%;
         position: absolute;
-        top: -1000px;
+        position: absolute;
+        transform: translateX(-100%);
         width: 45px;
         z-index: 16;
       }
