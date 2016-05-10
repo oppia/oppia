@@ -12,10 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for the user dashboard and for notifications."""
+"""Controllers for the creator dashboard, notifications, and creating new
+activities.
+"""
 
 from core.controllers import base
+from core.domain import collection_domain
+from core.domain import collection_services
 from core.domain import config_domain
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import subscription_services
@@ -23,6 +28,14 @@ from core.domain import user_jobs_continuous
 from core.domain import user_services
 import feconf
 import utils
+
+EXPLORATION_ID_KEY = 'explorationId'
+COLLECTION_ID_KEY = 'collectionId'
+
+ALLOW_YAML_FILE_UPLOAD = config_domain.ConfigProperty(
+    'allow_yaml_file_upload', {'type': 'bool'},
+    'Whether to allow exploration uploads via YAML.',
+    default_value=False)
 
 
 class NotificationsDashboardPage(base.BaseHandler):
@@ -48,9 +61,7 @@ class NotificationsDashboardPage(base.BaseHandler):
 class NotificationsDashboardHandler(base.BaseHandler):
     """Provides data for the user notifications dashboard."""
 
-    # We use 'gallery' because the createExploration() modal makes a call
-    # there.
-    PAGE_NAME_FOR_CSRF = 'gallery'
+    PAGE_NAME_FOR_CSRF = 'dashboard'
 
     def get(self):
         """Handles GET requests."""
@@ -97,9 +108,8 @@ class NotificationsDashboardHandler(base.BaseHandler):
 
 class MyExplorationsPage(base.BaseHandler):
     """Page showing the user's explorations."""
-    # We use 'gallery' because the createExploration() modal makes a call
-    # there.
-    PAGE_NAME_FOR_CSRF = 'gallery'
+
+    PAGE_NAME_FOR_CSRF = 'dashboard'
 
     @base.require_user
     def get(self):
@@ -111,7 +121,9 @@ class MyExplorationsPage(base.BaseHandler):
                 'nav_mode': feconf.NAV_MODE_HOME,
                 'can_create_collections': (
                     self.username in
-                    config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value)
+                    config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value
+                ),
+                'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
             })
             self.render_template(
                 'dashboard/my_explorations.html', redirect_url_on_logout='/')
@@ -160,14 +172,16 @@ class MyExplorationsHandler(base.BaseHandler):
                 'status': exp_summary.status,
                 'community_owned': exp_summary.community_owned,
                 'is_editable': True,
-                'thumbnail_image_url': (
-                    '/images/gallery/exploration_background_%s_small.png' %
-                    _get_intro_card_color(exp_summary.category)),
+                'thumbnail_icon_url': (
+                    utils.get_thumbnail_icon_url_for_category(
+                        exp_summary.category)),
+                'thumbnail_bg_color': utils.get_hex_color_for_category(
+                    exp_summary.category),
                 'ratings': exp_summary.ratings,
                 'num_open_threads': (
-                    feedback_thread_analytics['num_open_threads']),
+                    feedback_thread_analytics.num_open_threads),
                 'num_total_threads': (
-                    feedback_thread_analytics['num_total_threads']),
+                    feedback_thread_analytics.num_total_threads),
             })
 
         explorations_list = sorted(
@@ -202,3 +216,92 @@ class NotificationsHandler(base.BaseHandler):
         self.render_json({
             'num_unseen_notifications': num_unseen_notifications,
         })
+
+
+class NewExploration(base.BaseHandler):
+    """Creates a new exploration."""
+
+    PAGE_NAME_FOR_CSRF = 'dashboard'
+
+    @base.require_fully_signed_up
+    def post(self):
+        """Handles POST requests."""
+        title = self.payload.get('title')
+        category = self.payload.get('category')
+        objective = self.payload.get('objective')
+        language_code = self.payload.get('language_code')
+
+        if not title:
+            raise self.InvalidInputException('No title supplied.')
+        if not category:
+            raise self.InvalidInputException('No category chosen.')
+        if not language_code:
+            raise self.InvalidInputException('No language chosen.')
+
+        new_exploration_id = exp_services.get_new_exploration_id()
+        exploration = exp_domain.Exploration.create_default_exploration(
+            new_exploration_id, title, category,
+            objective=objective, language_code=language_code)
+        exp_services.save_new_exploration(self.user_id, exploration)
+
+        self.render_json({
+            EXPLORATION_ID_KEY: new_exploration_id
+        })
+
+
+class NewCollection(base.BaseHandler):
+    """Creates a new collection."""
+
+    PAGE_NAME_FOR_CSRF = 'dashboard'
+
+    @base.require_fully_signed_up
+    def post(self):
+        """Handles POST requests."""
+        title = self.payload.get('title')
+        category = self.payload.get('category')
+        objective = self.payload.get('objective')
+        # TODO(bhenning): Implement support for language codes in collections.
+
+        if not title:
+            raise self.InvalidInputException('No title supplied.')
+        if not category:
+            raise self.InvalidInputException('No category chosen.')
+
+        new_collection_id = collection_services.get_new_collection_id()
+        collection = collection_domain.Collection.create_default_collection(
+            new_collection_id, title, category, objective=objective)
+        collection_services.save_new_collection(self.user_id, collection)
+
+        self.render_json({
+            COLLECTION_ID_KEY: new_collection_id
+        })
+
+
+class UploadExploration(base.BaseHandler):
+    """Uploads a new exploration."""
+
+    PAGE_NAME_FOR_CSRF = 'dashboard'
+
+    @base.require_fully_signed_up
+    def post(self):
+        """Handles POST requests."""
+        title = self.payload.get('title')
+        category = self.payload.get('category')
+        yaml_content = self.request.get('yaml_file')
+
+        if not title:
+            raise self.InvalidInputException('No title supplied.')
+        if not category:
+            raise self.InvalidInputException('No category chosen.')
+
+        new_exploration_id = exp_services.get_new_exploration_id()
+        if ALLOW_YAML_FILE_UPLOAD.value:
+            exp_services.save_new_exploration_from_yaml_and_assets(
+                self.user_id, yaml_content, title, category,
+                new_exploration_id, [])
+            self.render_json({
+                EXPLORATION_ID_KEY: new_exploration_id
+            })
+        else:
+            raise self.InvalidInputException(
+                'This server does not allow file uploads.')

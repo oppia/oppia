@@ -61,6 +61,38 @@ DEFAULT_TOPIC_SIMILARITIES_STRING = ("""Architecture,Art,Biology,Business,Chemis
 0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,1.0""")
 # pylint: enable=line-too-long
 
+RECOMMENDATION_CATEGORIES = [
+    'Architecture',
+    'Art',
+    'Biology',
+    'Business',
+    'Chemistry',
+    'Computing',
+    'Economics',
+    'Education',
+    'Engineering',
+    'Environment',
+    'Geography',
+    'Government',
+    'Hobbies',
+    'Languages',
+    'Law',
+    'Life Skills',
+    'Mathematics',
+    'Medicine',
+    'Music',
+    'Philosophy',
+    'Physics',
+    'Programming',
+    'Psychology',
+    'Puzzles',
+    'Reading',
+    'Religion',
+    'Sport',
+    'Statistics',
+    'Welcome'
+]
+
 
 def get_topic_similarities_dict():
     """Returns a 2d dict of topic similarities. Creates the default similarity
@@ -102,8 +134,9 @@ def _create_default_topic_similarities():
 
     Returns the newly created TopicSimilaritiesModel."""
 
-    topic_similarities_dict = {topic: {}
-                               for topic in feconf.DEFAULT_CATEGORIES}
+    topic_similarities_dict = {
+        topic: {} for topic in RECOMMENDATION_CATEGORIES
+    }
     data = DEFAULT_TOPIC_SIMILARITIES_STRING.splitlines()
     data = list(csv.reader(data))
     topics_list = data[0]
@@ -123,8 +156,8 @@ def get_topic_similarity(topic_1, topic_2):
     not, it returns the default similarity if the topics are different or 1 if
     the topics are the same."""
 
-    if (topic_1 in feconf.DEFAULT_CATEGORIES and
-            topic_2 in feconf.DEFAULT_CATEGORIES):
+    if (topic_1 in RECOMMENDATION_CATEGORIES and
+            topic_2 in RECOMMENDATION_CATEGORIES):
         topic_similarities = get_topic_similarities_dict()
         return topic_similarities[topic_1][topic_2]
     else:
@@ -143,10 +176,10 @@ def get_topic_similarities_as_csv():
 
     output = StringIO.StringIO()
     writer = csv.writer(output)
-    writer.writerow(feconf.DEFAULT_CATEGORIES)
+    writer.writerow(RECOMMENDATION_CATEGORIES)
 
     topic_similarities = get_topic_similarities_dict()
-    for topic in feconf.DEFAULT_CATEGORIES:
+    for topic in RECOMMENDATION_CATEGORIES:
         topic_similarities_row = [value for _, value in sorted(
             topic_similarities[topic].iteritems())]
         writer.writerow(topic_similarities_row)
@@ -176,7 +209,7 @@ def _validate_topic_similarities(data):
             'Length of topic similarities columns does not match topic list.')
 
     for topic in topics_list:
-        if topic not in feconf.DEFAULT_CATEGORIES:
+        if topic not in RECOMMENDATION_CATEGORIES:
             raise Exception('Topic %s not in list of known topics.' % topic)
 
     for index, topic in enumerate(topics_list):

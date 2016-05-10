@@ -34,29 +34,92 @@ oppia.animation('.conversation-skin-responses-animate-slide', function() {
   };
 });
 
+oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
+  var tutorCardLeft, tutorCardWidth, tutorCardHeight;
+
+  var beforeAddClass = function(element, className, done) {
+    if (className !== 'ng-hide') {
+      done();
+      return;
+    }
+    var tutorCard = element;
+    var supplementalCard = $('.conversation-skin-supplemental-card-container');
+    var oppiaAvatar = $('.conversation-skin-oppia-avatar.show-tutor-card');
+    tutorCardLeft = tutorCard.position().left;
+    tutorCardWidth = tutorCard.width();
+    tutorCardHeight = tutorCard.height();
+    oppiaAvatar.hide();
+    tutorCard.animate({
+      left: tutorCardLeft + tutorCardWidth,
+      width: 0,
+      height: 0,
+      opacity: 0
+    }, 500, function() {
+      oppiaAvatar.show();
+      tutorCard.css({
+        left: '',
+        width: '',
+        height: '',
+        opacity: ''
+      });
+      done();
+    });
+  };
+
+  var removeClass = function(element, className, done) {
+    if (className !== 'ng-hide') {
+      done();
+      return;
+    }
+    var tutorCard = element;
+    $('.conversation-skin-oppia-avatar.show-tutor-card').hide(0, function() {
+      tutorCard.css({
+        left: tutorCardLeft + tutorCardWidth,
+        width: 0,
+        height: 0,
+        opacity: 0
+      });
+      tutorCard.animate({
+        left: tutorCardLeft,
+        width: tutorCardWidth,
+        height: tutorCardHeight,
+        opacity: 1
+      }, 500, function() {
+        tutorCard.css({
+          left: '',
+          width: '',
+          height: '',
+          opacity: ''
+        });
+        done();
+      });
+    });
+  };
+
+  return {
+    beforeAddClass: beforeAddClass,
+    removeClass: removeClass
+  };
+});
+
 oppia.animation('.conversation-skin-animate-cards', function() {
   // This removes the newly-added class once the animation is finished.
   var animateCards = function(element, className, done) {
     var tutorCardElt = jQuery(element).find(
       '.conversation-skin-main-tutor-card');
     var supplementalCardElt = jQuery(element).find(
-      '.conversation-skin-supplemental-card');
+      '.conversation-skin-supplemental-card-container');
 
     if (className === 'animate-to-two-cards') {
       supplementalCardElt.css('opacity', '0');
       tutorCardElt.animate({
         'margin-left': '0'
       }, TIME_NUM_CARDS_CHANGE_MSEC, function() {
-        tutorCardElt.css('margin-left', '0');
-        tutorCardElt.css('margin-right', '');
-        tutorCardElt.css('float', 'left');
-
         supplementalCardElt.animate({
           opacity: '1'
         }, TIME_FADEIN_MSEC, function() {
           supplementalCardElt.css('opacity', '1');
           jQuery(element).removeClass('animate-to-two-cards');
-
           tutorCardElt.css('margin-left', '');
           tutorCardElt.css('margin-right', '');
           tutorCardElt.css('float', '');
@@ -181,7 +244,7 @@ oppia.directive('conversationSkin', [function() {
 
         // The minimum width, in pixels, needed to be able to show two cards
         // side-by-side.
-        var TWO_CARD_THRESHOLD_PX = 1120;
+        var TWO_CARD_THRESHOLD_PX = 960;
         var TIME_PADDING_MSEC = 250;
         var TIME_SCROLL_MSEC = 600;
         var MIN_CARD_LOADING_DELAY_MSEC = 950;
@@ -190,6 +253,9 @@ oppia.directive('conversationSkin', [function() {
         var hasInteractedAtLeastOnce = false;
         var _answerIsBeingProcessed = false;
         var _nextFocusLabel = null;
+        // This variable is used only when viewport is narrow.
+        // Indicates whether the tutor card is displayed.
+        var tutorCardIsDisplayedIfNarrow = true;
 
         $scope.isInPreviewMode = oppiaPlayerService.isInPreviewMode();
         $scope.isIframed = urlService.isIframed();
@@ -206,10 +272,6 @@ oppia.directive('conversationSkin', [function() {
         $scope.upcomingStateName = null;
         $scope.upcomingContentHtml = null;
         $scope.upcomingInlineInteractionHtml = null;
-
-        $scope.panels = [];
-        $scope.PANEL_TUTOR = 'tutor';
-        $scope.PANEL_SUPPLEMENTAL = 'supplemental';
 
         $scope.helpCardHtml = null;
         $scope.helpCardHasContinueButton = false;
@@ -254,19 +316,6 @@ oppia.directive('conversationSkin', [function() {
           }, 100);
         };
 
-        $scope.getThumbnailSrc = function(panelName) {
-          if (panelName === $scope.PANEL_TUTOR) {
-            return $scope.OPPIA_AVATAR_IMAGE_URL;
-          } else if (panelName === $scope.PANEL_SUPPLEMENTAL) {
-            return $scope.exploration.getInteractionThumbnailSrc(
-              $scope.activeCard.stateName);
-          } else {
-            throw Error(
-              'Found a panel not corresponding to a tutor or interaction: ' +
-              panelName);
-          }
-        };
-
         $scope.isOnTerminalCard = function() {
           return $scope.activeCard &&
             $scope.exploration.isStateTerminal($scope.activeCard.stateName);
@@ -281,48 +330,6 @@ oppia.directive('conversationSkin', [function() {
             $scope.activeCard);
         };
 
-        var _recomputeAndResetPanels = function() {
-          $scope.clearHelpCard();
-
-          $scope.panels = [];
-          if (!$scope.canWindowFitTwoCards()) {
-            $scope.panels.push($scope.PANEL_TUTOR);
-          }
-          if ($scope.isCurrentSupplementalCardNonempty()) {
-            $scope.panels.push($scope.PANEL_SUPPLEMENTAL);
-          }
-          $scope.resetVisiblePanel();
-        };
-
-        $scope.currentVisiblePanelName = null;
-
-        $scope.isPanelVisible = function(panelName) {
-          if (panelName === $scope.PANEL_TUTOR &&
-              $scope.canWindowFitTwoCards()) {
-            return true;
-          } else {
-            return panelName == $scope.currentVisiblePanelName;
-          }
-        };
-
-        $scope.setVisiblePanel = function(panelName) {
-          $scope.currentVisiblePanelName = panelName;
-          if (panelName === $scope.PANEL_TUTOR) {
-            $scope.clearHelpCard();
-          }
-          if (panelName === $scope.PANEL_SUPPLEMENTAL) {
-            $scope.$broadcast('showInteraction');
-          }
-        };
-
-        $scope.resetVisiblePanel = function() {
-          if ($scope.panels.length === 0) {
-            $scope.currentVisiblePanelName = null;
-          } else {
-            $scope.currentVisiblePanelName = $scope.panels[0];
-          }
-        };
-
         // Navigates to the currently-active card, and resets the 'show previous
         // responses' setting.
         var _navigateToActiveCard = function() {
@@ -330,8 +337,7 @@ oppia.directive('conversationSkin', [function() {
           $scope.activeCard = playerTranscriptService.getCard(index);
           $scope.arePreviousResponsesShown = false;
           $scope.clearHelpCard();
-
-          _recomputeAndResetPanels();
+          tutorCardIsDisplayedIfNarrow = true;
           if (_nextFocusLabel && playerTranscriptService.isLastCard(index)) {
             focusService.setFocusIfOnDesktop(_nextFocusLabel);
           } else {
@@ -364,7 +370,6 @@ oppia.directive('conversationSkin', [function() {
           return playerTranscriptService.isLastCard(
             playerPositionService.getActiveCardIndex());
         };
-
         var _addNewCard = function(
             stateName, newParams, contentHtml, interactionHtml) {
           playerTranscriptService.addNewCard(
@@ -438,7 +443,6 @@ oppia.directive('conversationSkin', [function() {
                 exploration.initStateName, _nextFocusLabel));
             $rootScope.loadingMessage = '';
             $scope.hasFullyLoaded = true;
-
             $scope.adjustPageHeight(false, null);
             $window.scrollTo(0, 0);
             focusService.setFocusIfOnDesktop(_nextFocusLabel);
@@ -585,7 +589,11 @@ oppia.directive('conversationSkin', [function() {
 
         var scrollToBottom = function() {
           $timeout(function() {
-            var tutorCard = $('.conversation-skin-tutor-card-active');
+            var tutorCard = $('.conversation-skin-main-tutor-card');
+
+            if (tutorCard.length == 0) {
+              return;
+            }
             var tutorCardBottom = (
               tutorCard.offset().top + tutorCard.outerHeight());
             if ($(window).scrollTop() + $(window).height() < tutorCardBottom) {
@@ -634,7 +642,6 @@ oppia.directive('conversationSkin', [function() {
         $window.onresize = function() {
           $scope.adjustPageHeight(false, null);
           $scope.windowWidth = windowDimensionsService.getWidth();
-          _recomputeAndResetPanels();
         };
 
         $window.addEventListener('scroll', function() {
@@ -666,6 +673,35 @@ oppia.directive('conversationSkin', [function() {
 
         $scope.canWindowFitTwoCards = function() {
           return $scope.windowWidth >= TWO_CARD_THRESHOLD_PX;
+        };
+
+        $scope.isViewportNarrow = function() {
+          return $scope.windowWidth < TWO_CARD_THRESHOLD_PX;
+        };
+
+        $scope.isScreenNarrowAndShowingTutorCard = function() {
+          if (!$scope.isCurrentSupplementalCardNonempty()) {
+            return $scope.isViewportNarrow();
+          }
+          return $scope.isViewportNarrow() &&
+                 tutorCardIsDisplayedIfNarrow;
+        };
+
+        $scope.isScreenNarrowAndShowingSupplementalCard = function() {
+          return $scope.isViewportNarrow() &&
+                 !tutorCardIsDisplayedIfNarrow;
+        };
+
+        $scope.showTutorCardIfScreenIsNarrow = function() {
+          if ($scope.isViewportNarrow()) {
+            tutorCardIsDisplayedIfNarrow = true;
+          }
+        };
+
+        $scope.showSupplementalCardIfScreenIsNarrow = function() {
+          if ($scope.isViewportNarrow()) {
+            tutorCardIsDisplayedIfNarrow = false;
+          }
         };
 
         $scope.initializePage();

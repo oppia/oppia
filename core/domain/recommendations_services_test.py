@@ -202,7 +202,7 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
 
 
 class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
-    """Test recommendations services."""
+    """Test recommendations services relating to exploration comparison."""
 
     EXP_DATA = {
         'exp_id_1': {
@@ -258,9 +258,14 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.set_admins([self.ADMIN_USERNAME])
 
-
-class ExplorationRecommendationsUnitTests(RecommendationsServicesUnitTests):
-    """Test recommendations services relating to exploration comparison."""
+    def test_recommendation_categories_and_matrix_headers_match(self):
+        topic_similarities_lines = (
+            recommendations_services.DEFAULT_TOPIC_SIMILARITIES_STRING.split(
+                '\n'))
+        matrix_categories = sorted(topic_similarities_lines[0].split(','))
+        self.assertEqual(
+            matrix_categories,
+            sorted(recommendations_services.RECOMMENDATION_CATEGORIES))
 
     def test_get_item_similarity(self):
         exp_summaries = exp_services.get_all_exploration_summaries()

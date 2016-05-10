@@ -148,6 +148,65 @@ describe('Code REPL rules service', function() {
     });
   });
 
+  describe('\'output contains\' rule', function() {
+    var RULE_INPUT = {
+      x: '1'
+    };
+
+    var RULE_INPUT_1 = {
+      x: 'a b c'
+    };
+
+    var RULE_INPUT_2 = {
+      x: 'a\nb\nc'
+    };
+
+    it('should check if output contains some content', function() {
+      expect(crrs.OutputContains({
+        output: '1 2 3 4'
+      }, RULE_INPUT)).toBe(true);
+      expect(crrs.OutputContains({
+        output: '\n1\n2\n3\n4\n'
+      }, RULE_INPUT)).toBe(true);
+      expect(crrs.OutputContains({
+        output: ''
+      }, RULE_INPUT)).toBe(false);
+      expect(crrs.OutputContains({
+        output: 'bad output'
+      }, RULE_INPUT)).toBe(false);
+      expect(crrs.OutputContains({
+        output: 'a b c d e'
+      }, RULE_INPUT_1)).toBe(true);
+      expect(crrs.OutputContains({
+        output: 'a\nb\nc\nd\n'
+      }, RULE_INPUT_1)).toBe(false);
+      expect(crrs.OutputContains({
+        output: 'ab\nc\n'
+      }, RULE_INPUT_1)).toBe(false);
+      expect(crrs.OutputContains({
+        output: ''
+      }, RULE_INPUT_1)).toBe(false);
+      expect(crrs.OutputContains({
+        output: 'bad output'
+      }, RULE_INPUT_1)).toBe(false);
+      expect(crrs.OutputContains({
+        output: 'a\nb\nc\nd\ne'
+      }, RULE_INPUT_2)).toBe(true);
+      expect(crrs.OutputContains({
+        output: '\nabc\ndef\nfgh\n'
+      }, RULE_INPUT_2)).toBe(false);
+      expect(crrs.OutputContains({
+        output: 'a b c'
+      }, RULE_INPUT_2)).toBe(false);
+      expect(crrs.OutputContains({
+        output: ''
+      }, RULE_INPUT_2)).toBe(false);
+      expect(crrs.OutputContains({
+        output: 'bad output'
+      }, RULE_INPUT_2)).toBe(false);
+    });
+  });
+
   describe('\'output equals\' rule', function() {
     var RULE_INPUT = {
       x: '1'

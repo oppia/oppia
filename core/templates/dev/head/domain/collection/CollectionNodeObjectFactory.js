@@ -91,7 +91,7 @@ oppia.factory('CollectionNodeObjectFactory', [
     // this function is null if doesExplorationExist() returns false.
     CollectionNode.prototype.getExplorationSummaryObject = function() {
       // TODO(bhenning): This should be represented by a frontend summary domain
-      // object that is also shared with the gallery and profile pages.
+      // object that is also shared with the search result and profile pages.
       return angular.copy(this._explorationSummaryObject);
     };
 

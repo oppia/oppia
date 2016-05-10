@@ -216,8 +216,9 @@ def clear_index(index_name):
         index.delete(doc_ids)
 
 
-def search(query_string, index, cursor=None, limit=feconf.GALLERY_PAGE_SIZE,
-           sort='', ids_only=False, retries=DEFAULT_NUM_RETRIES):
+def search(query_string, index, cursor=None,
+           limit=feconf.SEARCH_RESULTS_PAGE_SIZE, sort='', ids_only=False,
+           retries=DEFAULT_NUM_RETRIES):
     """Searches for documents in an index.
 
     Args:
@@ -275,7 +276,7 @@ def search(query_string, index, cursor=None, limit=feconf.GALLERY_PAGE_SIZE,
     try:
         logging.debug('attempting a search with query %s' % query)
         results = index.search(query)
-    except gae_search.TransientError as e:
+    except Exception as e:
         logging.exception('something went wrong while searching.')
         if retries > 1:
             logging.debug('%d attempts left, retrying...' % (retries - 1))

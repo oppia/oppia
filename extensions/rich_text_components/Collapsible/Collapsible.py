@@ -26,6 +26,7 @@ class Collapsible(base.BaseRichTextComponent):
     frontend_name = 'collapsible'
     tooltip = 'Insert collapsible block'
     is_complex = True
+    is_block_element = True
 
     _customization_arg_specs = [{
         'name': 'heading',
@@ -45,4 +46,3 @@ class Collapsible(base.BaseRichTextComponent):
         },
         'default_value': 'You have opened the collapsible block.'
     }]
-

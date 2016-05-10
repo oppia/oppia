@@ -64,7 +64,7 @@ MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE = (
 MODERATOR_REQUEST_FORUM_URL = config_domain.ConfigProperty(
     'moderator_request_forum_url', {'type': 'unicode'},
     'A link to the forum for nominating explorations to be featured '
-    'in the gallery',
+    'in the Oppia library',
     default_value=MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE)
 
 DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = config_domain.ConfigProperty(
@@ -142,7 +142,7 @@ def require_editor(handler):
         if not escaped_state_name:
             return handler(self, exploration_id, **kwargs)
 
-        state_name = self.unescape_state_name(escaped_state_name)
+        state_name = utils.unescape_encoded_uri_component(escaped_state_name)
         if state_name not in exploration.states:
             logging.error('Could not find state: %s' % state_name)
             logging.error('Available states: %s' % exploration.states.keys())
@@ -254,8 +254,6 @@ class ExplorationPage(EditorHandler):
             'ALLOWED_GADGETS': feconf.ALLOWED_GADGETS,
             'ALLOWED_INTERACTION_CATEGORIES': (
                 feconf.ALLOWED_INTERACTION_CATEGORIES),
-            # This is needed for the exploration preview.
-            'CATEGORIES_TO_COLORS': feconf.CATEGORIES_TO_COLORS,
             'INVALID_PARAMETER_NAMES': feconf.INVALID_PARAMETER_NAMES,
             'NEW_STATE_TEMPLATE': NEW_STATE_TEMPLATE,
             'SHOW_TRAINABLE_UNRESOLVED_ANSWERS': (
@@ -423,6 +421,9 @@ class ExplorationRightsHandler(EditorHandler):
 
             rights_manager.assign_role_for_exploration(
                 self.user_id, exploration_id, new_member_id, new_member_role)
+            email_manager.send_role_notification_email(
+                self.user_id, new_member_id, new_member_role, exploration_id,
+                exploration.title)
 
         elif is_public is not None:
             exploration = exp_services.get_exploration_by_id(exploration_id)
@@ -576,7 +577,7 @@ class UntrainedAnswersHandler(EditorHandler):
         except:
             raise self.PageNotFoundException
 
-        state_name = self.unescape_state_name(escaped_state_name)
+        state_name = utils.unescape_encoded_uri_component(escaped_state_name)
         if state_name not in exploration.states:
             # If trying to access a non-existing state, there is no training
             # data associated with it.
@@ -818,7 +819,7 @@ class StateRulesStatsHandler(EditorHandler):
         except:
             raise self.PageNotFoundException
 
-        state_name = self.unescape_state_name(escaped_state_name)
+        state_name = utils.unescape_encoded_uri_component(escaped_state_name)
         if state_name not in exploration.states:
             logging.error('Could not find state: %s' % state_name)
             logging.error('Available states: %s' % exploration.states.keys())
