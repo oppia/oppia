@@ -254,8 +254,8 @@ oppia.directive('conversationSkin', [function() {
         var _answerIsBeingProcessed = false;
         var _nextFocusLabel = null;
         // This variable is used only when viewport is narrow.
-        // Indicates whether tutor card is active or supplemental card
-        var isTutorCardDisplayedIfNarrow = true;
+        // Indicates whether the tutor card is displayed.
+        var tutorCardIsDisplayedIfNarrow = true;
 
         $scope.isInPreviewMode = oppiaPlayerService.isInPreviewMode();
         $scope.isIframed = urlService.isIframed();
@@ -337,7 +337,7 @@ oppia.directive('conversationSkin', [function() {
           $scope.activeCard = playerTranscriptService.getCard(index);
           $scope.arePreviousResponsesShown = false;
           $scope.clearHelpCard();
-          isTutorCardDisplayedIfNarrow = true;
+          tutorCardIsDisplayedIfNarrow = true;
           if (_nextFocusLabel && playerTranscriptService.isLastCard(index)) {
             focusService.setFocusIfOnDesktop(_nextFocusLabel);
           } else {
@@ -684,23 +684,23 @@ oppia.directive('conversationSkin', [function() {
             return $scope.isViewportNarrow();
           }
           return $scope.isViewportNarrow() &&
-                 isTutorCardDisplayedIfNarrow;
+                 tutorCardIsDisplayedIfNarrow;
         };
 
         $scope.isScreenNarrowAndShowingSupplementalCard = function() {
           return $scope.isViewportNarrow() &&
-                 !isTutorCardDisplayedIfNarrow;
+                 !tutorCardIsDisplayedIfNarrow;
         };
 
         $scope.showTutorCardIfScreenIsNarrow = function() {
           if ($scope.isViewportNarrow()) {
-            isTutorCardDisplayedIfNarrow = true;
+            tutorCardIsDisplayedIfNarrow = true;
           }
         };
 
         $scope.showSupplementalCardIfScreenIsNarrow = function() {
           if ($scope.isViewportNarrow()) {
-            isTutorCardDisplayedIfNarrow = false;
+            tutorCardIsDisplayedIfNarrow = false;
           }
         };
 
