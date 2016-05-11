@@ -106,7 +106,6 @@ oppia.factory('answerClassificationService', [
             answer, answerGroups, defaultOutcome, interactionRulesService);
           deferred.resolve(result);
         }
-        console.log(INTERACTION_SPECS);
 
         if (result === null || (result.outcome == defaultOutcome &&
             INTERACTION_SPECS[oldState.interaction.id]
