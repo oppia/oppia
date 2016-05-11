@@ -17,15 +17,12 @@
 # Pre-submission script for Oppia.
 # This script checks for unaccepted text patterns in the commit.
 
-import os
 import fnmatch
+import os
 import subprocess
 
-pattern = ["__author__","datetime.datetime.now()"]
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
-total_files_checked = 0
-total_error_count = 0
 
 def _get_changed_filenames():
     """Returns a list of modified files (both staged and unstaged)
@@ -40,22 +37,28 @@ def _get_changed_filenames():
         '--diff-filter=ACM']).splitlines()
     return unstaged_files + staged_files
 
-def pre_submission_check(dir):
-    global total_files_checked
-    global total_error_count
+
+def check_for_bad_patterns(dir):
+    total_files_checked = 0
+    total_error_count = 0
     files = _get_changed_filenames()
-    if len(files)!=0:
-        print files
+    if len(files) != 0:
         for file in files:
             with open(file) as f:
                 content = f.read()
-                total_files_checked+=1
-                for value in pattern:
-                    if value in content:
-                        total_error_count+=1
-                        print file + " --> " + value + " --> Incorrect Pattern"
+                total_files_checked += 1
+                if "__author__" in content:
+                	print file + " --> " + "Please remove author tags from this file."
+                	total_error_count += 1
+                if "datetime.datetime.now()" in content:
+                	print file + " --> " + "Please use datetime.datetime.utcnow() instead of datetime.datetime.now()."
+                	total_error_count += 1
+
+    return total_files_checked, total_error_count
+
 
 def main():
+    total_files_checked, total_error_count = check_for_bad_patterns(_PARENT_DIR)
     print ''
     print '+------------------+'
     print '| SUMMARY OF TESTS |'
@@ -64,11 +67,11 @@ def main():
     if total_files_checked == 0:
         print ('WARNING: No files were checked.')
     else:
-        if total_files_checked and total_error_count==0:
+        if total_files_checked and total_error_count == 0:
             print '(%s FILES CHECKED, %s ERRORS FOUND)' % (total_files_checked, total_error_count)
         else:
             exit(1)
 
+
 if __name__ == '__main__':
-    pre_submission_check(_PARENT_DIR)
     main()
