@@ -29,7 +29,7 @@ oppia.factory('CollectionCreationButtonService', [
     var getModalInstance = function(categoryList) {
       var modalInstance = $modal.open({
         backdrop: true,
-        templateUrl: 'modals/galleryCreateNew',
+        templateUrl: 'modals/createNewActivity',
         resolve: {
           categoriesForDropdown: function() {
             var result = [];
@@ -136,9 +136,10 @@ oppia.factory('CollectionCreationButtonService', [
             language_code: result.languageCode,
             objective: $filter('normalizeWhitespace')(result.objective),
             title: result.title
-          }).success(function(data) {
+          }).then(function(response) {
+            var data = response.data;
             window.location = '/collection_editor/create/' + data.collectionId;
-          }).error(function() {
+          }, function() {
             $rootScope.loadingMessage = '';
           });
         });

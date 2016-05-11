@@ -6,13 +6,20 @@ Thanks for your interest in contributing code or design help to the Oppia projec
 
 ## Setting things up
 
-  1. Create a new, empty folder called `opensource/` in your computer's home folder. Navigate to it (`cd opensource`), then [fork and clone](https://help.github.com/articles/fork-a-repo/) the Oppia repo so that it gets downloaded into `opensource/oppia`. Then follow the appropriate installation instructions ([Linux](https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux%29), [Mac OS](https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-OS%29), [Windows](https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Windows%29)).
-  2. Update your GitHub notification settings:
+  1. Please sign the CLA so that we can accept your contributions. If you're contributing as an individual, use the [individual CLA](https://goo.gl/forms/AttNH80OV0). If your company owns the copyright to your contributions, a company representative should sign the [corporate CLA](https://goo.gl/forms/xDq9gK3Zcv).
+  2. Create a new, empty folder called `opensource/` in your computer's home folder. Navigate to it (`cd opensource`), then [fork and clone](https://help.github.com/articles/fork-a-repo/) the Oppia repo so that it gets downloaded into `opensource/oppia`. Then follow the appropriate installation instructions ([Linux](https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux%29), [Mac OS](https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-OS%29), [Windows](https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Windows%29)).
+  3. Update your GitHub notification settings:
     * Go to your settings page (click the Settings option under the profile menu in the top right), then go to 'Notification center' and ensure that everything's as you want it.
     * Go to the [Oppia repo](https://github.com/oppia/oppia), and click 'Watch' at the top right. Ensure that you're not 'ignoring' the repo, so that you'll be notified when someone replies to a conversation you're part of.
-  3. Please sign the CLA so that we can accept your contributions. If you're contributing as an individual, use the [individual CLA](https://goo.gl/forms/AttNH80OV0). If your company owns the copyright to your contributions, a company representative should sign the [corporate CLA](https://goo.gl/forms/xDq9gK3Zcv).
-  4. Fill in [this form](http://goo.gl/forms/kXILyztnfS) to indicate which parts of the codebase you're interested in. (You can always change this later.)
-  5. (Optional) You may also want to set up [automatic auth](https://help.github.com/articles/set-up-git/#next-steps-authenticating-with-github-from-git) so you don't have to type in a username and password each time you commit a change.
+  4. Fill in the [Oppia contributor survey](http://goo.gl/forms/wz1x3bFfpF) to let us know what your interests are. (You can always change your responses later.)
+  5. Join the [oppia-dev@](https://groups.google.com/forum/#!forum/oppia-dev) mailing list, and say hi on the [gitter](https://gitter.im/oppia/oppia-chat) chat channel!
+  6. (Optional) You may also want to set up [automatic auth](https://help.github.com/articles/set-up-git/#next-steps-authenticating-with-github-from-git) so you don't have to type in a username and password each time you commit a change.
+
+## Getting in touch with the team
+
+The primary chat channel that the team uses is [Gitter](https://gitter.im/oppia/oppia-chat). Feel free to hang out there! (You might also consider 'pinning' the tab in your browser, so that it's easily accessible.)
+
+We have also recently started offering office hours for new contributors on Gitter, where you can get your questions answered! You can find the schedule on the [wiki homepage](https://github.com/oppia/oppia/wiki). We also maintain a list of [Frequently Asked Questions](https://github.com/oppia/oppia/wiki/Frequently-Asked-Questions).
 
 ## Finding something to do
 
@@ -29,7 +36,7 @@ These issues, also tagged as 'starter projects', are usually local to a small pa
 For reference, here are descriptions of what the other 'TODO' tags mean:
   * **[TODO: tech (instructions)](https://github.com/oppia/oppia/labels/TODO%3A%20tech%20%28instructions%29)** means that the overall solution is generally known, but newcomers to the codebase may need additional instructions to be able to implement them. Adding instructions, such as where to make the necessary changes, will help move these issues to the `TODO: code` stage.
   * **[TODO: tech (breakdown)](https://github.com/oppia/oppia/labels/TODO%3A%20tech%20%28breakdown%29)** means that the approach is known, but needs to be broken down into single-person projects.
-  * **[TODO: tech (design doc)](https://github.com/oppia/oppia/labels/TODO%3A%20tech%20%28design%20doc%29)** means that the problem is known, but the solution needs fleshing out. In that case, the best thing to do is to prepare a short doc outlining the solution approach and implementation plan, then discuss it on the issue thread before starting implementation.
+  * **[TODO: tech (design doc)](https://github.com/oppia/oppia/labels/TODO%3A%20tech%20%28design%20doc%29)** means that the problem is known, but the solution needs fleshing out. In that case, the best thing to do is to prepare a short doc outlining the solution approach and implementation plan, add a link to it on the issue thread, then discuss it before starting implementation.
   * **[TODO: design (breakdown)](https://github.com/oppia/oppia/labels/TODO%3A%20design%20%28breakdown%29)** means the UX design is completed, but the issue needs to be broken down into single-person projects.
   * **[TODO: design (UX)](https://github.com/oppia/oppia/labels/TODO%3A%20design%20%28UX%29)** means the way that the user interacts with this feature needs to be planned. The best way to approach this is to outline the core user journeys (probably using slides), and discuss them on the issue thread, so that the feature can move forward.
   * **[TODO: triage](https://github.com/oppia/oppia/labels/TODO%3A%20triage)** means we aren't sure whether to work on this issue or not. It would be helpful to give comments on this issue in support of or against implementing that feature, or mention if you encountered something similar.
@@ -54,7 +61,7 @@ Here's how to make a one-off code change. (If you're working on a larger feature
 
 3. **Make a commit to your feature branch.** Each commit should be self-contained and have a descriptive commit message that helps other developers understand why the changes were made.
   * You can refer to relevant issues in the commit message by writing, e.g., "Fixes #105".
-  * In general, code should be formatted consistently with other code around it; we use Google's [Python](http://google-styleguide.googlecode.com/svn/trunk/pyguide.html) and [JavaScript](https://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml) style guides as a reference. If you use [Sublime Text](http://www.sublimetext.com/), consider installing the SublimeLinter, [SublimeLinter-jscs](https://github.com/SublimeLinter/SublimeLinter-jscs) and [SublimeLinter-pylint](https://github.com/SublimeLinter/SublimeLinter-pylint) plugins, following the instructions on their respective pages.
+  * In general, code should be formatted consistently with other code around it; we use Google's [Python](http://google-styleguide.googlecode.com/svn/trunk/pyguide.html) and [JavaScript](https://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml) style guides as a reference. If you use [Sublime Text](http://www.sublimetext.com/), consider installing the SublimeLinter, [SublimeLinter-jscs](https://github.com/SublimeLinter/SublimeLinter-jscs) and [SublimeLinter-pylint](https://github.com/SublimeLinter/SublimeLinter-pylint) plugins, following the instructions on their respective pages. Please also ensure that your code follows [these additional style rules](https://github.com/oppia/oppia/blob/develop/CONTRIBUTING.md#style-rules).
   * Please ensure that the code you write is well-tested.
   * Before making the commit, start up a local instance of Oppia and do some manual testing in order to check that you haven't broken anything! After that, ensure that the added code has no lint errors and passes all automated tests by running the presubmit script:
 
@@ -79,7 +86,7 @@ Here's how to make a one-off code change. (If you're working on a larger feature
 
 4. **When your feature is ready to merge, create a pull request.**
   * Go to your fork on GitHub, select your branch from the dropdown menu, and click "pull request". Ensure that the 'base' repository is the main oppia repo and that the 'base' branch is 'develop'.
-  * Add a descriptive comment explaining the purpose of the branch (e.g. "Add a warning when the user leaves a page in the middle of an exploration."). This will tell the reviewer what the purpose of the branch is.
+  * Add a descriptive title explaining the purpose of the PR (e.g. "Fix #bugnum: add a warning when the user leaves a page in the middle of an exploration."). The "Fix #bugnum: " prefix **must** be included if this PR resolves an issue on the issue tracker.
   * Click "Create pull request". An admin will assign a reviewer to your commit.
 5. **Address review comments until all reviewers give LGTM ('looks good to me').**
   * When your reviewer has reviewed the code, you'll get an email. You'll need to respond in two ways:
@@ -96,7 +103,7 @@ Here's how to make a one-off code change. (If you're working on a larger feature
     git commit -a
     git push origin new-branch-name
   ```
-  * Once you've finished addressing everything, and would like the reviewer to take another look, please write a top-level comment explicitly asking them to do so.
+  * Once you've finished addressing everything, and would like the reviewer to take another look, **please write a top-level comment explicitly asking them to do so**.
   * At the end, the reviewer will merge the pull request.
 6. **Tidy up!** Delete the feature branch from your both your local clone and the GitHub repository:
 
@@ -106,6 +113,46 @@ Here's how to make a one-off code change. (If you're working on a larger feature
   ```
 
 7. **Celebrate.** Congratulations, you have contributed to Oppia!
+ 
+### Style rules
+
+The pre-push hook should take care of most of the style issues (for Python and JavaScript code). However, we follow a few additional rules that aren't baked into the linter. Please adhere to these as well, in order to minimize back-and-forth during review.
+
+General
+- The last character in each file should be a newline. (If you're using Sublime, you can enforce this locally by adding `"ensure_newline_at_eof_on_save": true` to your user preferences file.)
+
+Python
+- There should be two empty lines before any top-level class or function definition.
+- When indenting from an open parenthesis ('('), prefer indenting by 4 rather than indenting from the position of the parenthesis. For example, prefer:
+
+  ```
+    my_function_with_a_really_long_name(
+        'abc', 'def', None)
+  ```
+over
+
+  ```
+    my_function_with_a_really_long_name('abc',
+                                        'def',
+                                        None)
+  ```
+- Docstrings should start with """ and end with """. The content of each docstring should be left-aligned. For example:
+
+  ```
+    """Check whether an email message with the same recipient_id,
+    email_subject and (cleaned) email_html_body has been sent in
+    the last DUPLICATE_EMAIL_INTERVAL_MINS.
+    """
+  ```
+
+JavaScript
+- We are moving away from using underscores as prefixes for variable names, so, in the future, use `var localVariable` and not `var _localVariable`. Instead, we are adopting the convention that anything declared using `var` is private to the controller/service/etc. If you want a variable to be accessible to the controller, declare it on $scope instead.
+
+CSS
+- Within each CSS rule, attributes should be alphabetized (e.g. 'height' before 'margin' before 'top'). This makes it easy to find the value of an attribute if there are lots of them.
+- If the CSS class is oppia-specific, prefix it with `oppia-`. This helps distinguish it from CSS classes used by other third-party libraries. 
+- For directives, include the CSS in the directive template file, similar to what we do in `core/templates/dev/head/components/exploration_summary_tile_directive.html`. (Note that, in this case, all CSS rules should start with the top-level CSS class of the directive, so that they don't affect other elements outside it.) All other CSS should go in `core/templates/dev/head/css/oppia.css`.
+
 
 ### Notes
 

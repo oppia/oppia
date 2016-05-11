@@ -31,7 +31,7 @@ oppia.controller('ExplorationEditor', [
   'routerService', 'graphDataService', 'stateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
   'explorationWarningsService', '$templateCache', 'explorationContextService',
-  'explorationAdvancedFeaturesService',
+  'explorationAdvancedFeaturesService', '$modal',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
       explorationData, editorContextService, explorationTitleService,
@@ -42,7 +42,7 @@ oppia.controller('ExplorationEditor', [
       routerService, graphDataService, stateEditorTutorialFirstTimeService,
       explorationParamSpecsService, explorationParamChangesService,
       explorationWarningsService, $templateCache, explorationContextService,
-      explorationAdvancedFeaturesService) {
+      explorationAdvancedFeaturesService, $modal) {
     $scope.editabilityService = editabilityService;
     $scope.editorContextService = editorContextService;
 
@@ -167,30 +167,17 @@ oppia.controller('ExplorationEditor', [
 
     var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
     var _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
+    var _ID_TUTORIAL_EXPLORATION_OVERVIEW = '.oppia-state-graph-container';
     var _ID_TUTORIAL_PREVIEW_TAB = '#tutorialPreviewTab';
     var _ID_TUTORIAL_SAVE_BUTTON = '#tutorialSaveButton';
 
     $scope.EDITOR_TUTORIAL_OPTIONS = [{
       type: 'title',
-      heading: 'Tutorial',
+      heading: 'Creating in Oppia',
       text: (
-        'Creating an Oppia exploration is easy! ' +
-        'Click \'Next\' to learn how to use the exploration editor.<br><br> ' +
-        'You might also find these resources helpful for creating your ' +
-        'exploration: ' +
-        '<ul>' +
-        '<li>' +
-        '<a href="https://oppia.github.io/#/AWorkedExample" target="_blank">' +
-        '        Walkthrough of the Oppia Editor' +
-        '</a></li>' +
-        '<li>' +
-        '<a href="https://oppia.github.io/#/PlanningAnExploration" target="_blank">' + // jscs:disable maximumLineLength
-        '        Planning Your Exploration' +
-        '</a></li>' +
-        '<li><a href="https://oppia.github.io/#/DesignTips" target="_blank">' +
-        '        Exploration Design Tips' +
-        '</li>' +
-        '</ul>')
+        'Explorations are learning experiences that you create using Oppia. ' +
+        'Think of explorations as a conversation between a student ' +
+        'and a tutor.')
     }, {
       type: 'function',
       fn: function(isGoingForward) {
@@ -203,10 +190,11 @@ oppia.controller('ExplorationEditor', [
       selector: _ID_TUTORIAL_STATE_CONTENT,
       heading: 'Content',
       text: (
-        'An Oppia exploration is a conversation between a tutor and a ' +
-        'learner that is divided into several \'cards\'.<br><br>' +
-        'The first part of a card is the <b>content</b>. Here, you can set ' +
-        'the scene and ask the learner a question.'),
+        '<p>An Oppia exploration is divided into several \'cards.\' ' +
+        'The first part of a card is the <b>content</b>.</p>' +
+        '<p>Use the content section to set the scene. ' +
+        'Tell the learner a story, give them some information, ' +
+        'and then ask a relevant question.</p>'),
       placement: 'bottom'
     }, {
       type: 'function',
@@ -220,12 +208,44 @@ oppia.controller('ExplorationEditor', [
       }
     }, {
       type: 'title',
+      selector: _ID_TUTORIAL_STATE_INTERACTION,
       heading: 'Interaction',
       text: (
-        'After telling Oppia what to say, choose how you want the learner to ' +
-        'respond by selecting an <b>interaction type</b>.' +
-        'Then, based on the learner\'s response, you can tell Oppia how to ' +
-        'reply by creating a <b>response</b>.')
+        '<p>After you\'ve written the content of your conversation, ' +
+        'choose an <b>interaction type</b>. ' +
+        'An interaction is how you want your leaner to respond ' +
+        'to your question.</p> ' +
+        '<p>Oppia has several built-in interactions, including:</p>' +
+        '<ul>' +
+        '  <li>' +
+        '    Multiple Choice' +
+        '  </li>' +
+        '  <li>' +
+        '    Text/Number input' +
+        '  </li>' +
+        '  <li>' +
+        '    Code snippets' +
+        '  </li>' +
+        '</ul>' +
+        'and more.')
+    }, {
+      type: 'function',
+      fn: function(isGoingForward) {
+        var idToScrollTo = (
+          isGoingForward ? _ID_TUTORIAL_PREVIEW_TAB :
+          _ID_TUTORIAL_STATE_INTERACTION);
+        $('html, body').animate({
+          scrollTop: angular.element(idToScrollTo).offset().top - 200
+        }, 1000);
+      }
+    }, {
+      type: 'title',
+      heading: 'Responses',
+      text: (
+        'After the learner uses the interaction you created, it\'s your turn ' +
+        'again to choose how your exploration will respond to their input. ' +
+        'You can send a learner to a new card or have them repeat the same ' +
+        'card, depending on how they answer.')
     }, {
       type: 'function',
       fn: function(isGoingForward) {
@@ -238,11 +258,31 @@ oppia.controller('ExplorationEditor', [
       }
     }, {
       type: 'element',
+      selector: _ID_TUTORIAL_EXPLORATION_OVERVIEW,
+      heading: 'Exploration Overview',
+      text: (
+        'The exploration overview gives you a map-like view of all of the ' +
+        'cards in your exploration and how they link together. ' +
+        'You may need to drag around in the overview to see all ' +
+        'of your cards if your exploration is large.'),
+      placement: 'left'
+    }, {
+      type: 'function',
+      fn: function(isGoingForward) {
+        var idToScrollTo = (
+          isGoingForward ? _ID_TUTORIAL_PREVIEW_TAB :
+          _ID_TUTORIAL_EXPLORATION_OVERVIEW);
+        $('html, body').animate({
+          scrollTop: angular.element(idToScrollTo).offset().top - 200
+        }, 1000);
+      }
+    }, {
+      type: 'element',
       selector: _ID_TUTORIAL_PREVIEW_TAB,
       heading: 'Preview',
       text: (
-        'At any time, you can click the preview button to play through ' +
-        'your exploration.'),
+        'At any time, you can click the <b>preview</b> button to play ' +
+        'through your exploration.'),
       placement: 'bottom'
     }, {
       type: 'element',
@@ -250,10 +290,29 @@ oppia.controller('ExplorationEditor', [
       heading: 'Save',
       text: (
         'When you\'re done making changes, ' +
-        'be sure to save your work.<br><br>' +
-        'That\'s the end of the tour! If you run into any issues, feel free ' +
-        'to post in the site forum.'),
+        'be sure to save your work.<br><br>'),
       placement: 'bottom'
+    }, {
+      type: 'title',
+      heading: 'Tutorial Complete',
+      text: (
+        '<h2>Now for the fun part...</h2>' +
+        'That\'s the end of the tour! ' +
+        'To finish up, here are some things we suggest: ' +
+        '<ul>' +
+        '  <li>' +
+        '    Create your first card!' +
+        '  </li>' +
+        '  <li>' +
+        '    Preview your exploration.' +
+        '  </li>' +
+        '  <li>' +
+        '    Check out more resources in the ' +
+        '    <a href="https://oppia.github.io/#/" target="_blank">' +
+        '      Help Center.' +
+        '    </a>' +
+        '  </li>' +
+        '</ul>')
     }];
 
     // Replace the ng-joyride template with one that uses <[...]> interpolators
@@ -273,7 +332,6 @@ oppia.controller('ExplorationEditor', [
     $scope.tutorialInProgress = false;
     $scope.startTutorial = function() {
       routerService.navigateToMainTab();
-
       // The $timeout wrapper is needed for all components on the page to load,
       // otherwise elements within ng-if's are not guaranteed to be present on
       // the page.
@@ -283,23 +341,49 @@ oppia.controller('ExplorationEditor', [
       });
     };
 
+    $scope.showWelcomeExplorationModal = function() {
+      var modalInstance = $modal.open({
+        templateUrl: 'modals/welcomeExploration',
+        backdrop: true,
+        controller: [
+          '$scope', '$modalInstance', function($scope, $modalInstance) {
+            $scope.beginTutorial = $modalInstance.close;
+
+            $scope.cancel = function() {
+              $modalInstance.dismiss('cancel');
+            };
+          }
+        ],
+        windowClass: 'oppia-welcome-modal'
+      });
+
+      modalInstance.result.then(function() {
+        $scope.startTutorial();
+      }, function() {
+        stateEditorTutorialFirstTimeService.markTutorialFinished();
+      });
+    };
+
+    $scope.$on(
+      'enterEditorForTheFirstTime', $scope.showWelcomeExplorationModal);
     $scope.$on('openEditorTutorial', $scope.startTutorial);
   }
 ]);
 
 oppia.controller('EditorNavigation', [
-  '$scope', '$rootScope', '$timeout', 'routerService',
+  '$scope', '$rootScope', '$timeout', '$modal', 'routerService',
   'explorationRightsService', 'explorationWarningsService',
+  'stateEditorTutorialFirstTimeService',
   'threadDataService',
   function(
-    $scope, $rootScope, $timeout, routerService,
-    explorationRightsService, explorationWarningsService, threadDataService) {
+    $scope, $rootScope, $timeout, $modal, routerService,
+    explorationRightsService, explorationWarningsService,
+    stateEditorTutorialFirstTimeService,
+    threadDataService) {
     $scope.postTutorialHelpPopoverIsShown = false;
 
     $scope.$on('openPostTutorialHelpPopover', function() {
       $scope.postTutorialHelpPopoverIsShown = true;
-      // Without this, the popover does not trigger.
-      $scope.$apply();
       $timeout(function() {
         $scope.postTutorialHelpPopoverIsShown = false;
       }, 5000);
@@ -310,6 +394,29 @@ oppia.controller('EditorNavigation', [
     // editor tutorial.
     $scope.openEditorTutorial = function() {
       $rootScope.$broadcast('openEditorTutorial');
+    };
+
+    $scope.showUserHelpModal = function() {
+      var modalInstance = $modal.open({
+        templateUrl: 'modals/userHelp',
+        backdrop: true,
+        controller: [
+          '$scope', '$modalInstance', function($scope, $modalInstance) {
+            $scope.beginTutorial = $modalInstance.close;
+
+            $scope.goToHelpCenter = function() {
+              $modalInstance.dismiss('cancel');
+            };
+          }
+        ],
+        windowClass: 'oppia-help-modal'
+      });
+
+      modalInstance.result.then(function() {
+        $scope.openEditorTutorial();
+      }, function() {
+        stateEditorTutorialFirstTimeService.markTutorialFinished();
+      });
     };
 
     $scope.countWarnings = explorationWarningsService.countWarnings;
@@ -439,7 +546,21 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       return explorationRightsService.isPublic();
     };
 
+    $scope.showCongratulatorySharingModal = function() {
+      $modal.open({
+        templateUrl: 'modals/shareExplorationAfterPublish',
+        backdrop: true,
+        controller: ['$scope', function($scope) {
+          $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
+            GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
+        }]
+      });
+    };
+
     $scope.showPublishExplorationModal = function() {
+      siteAnalyticsService.registerOpenPublishExplorationModalEvent(
+        explorationData.explorationId);
+
       $scope.publishModalIsOpening = true;
       alertsService.clearWarnings();
       var modalInstance = $modal.open({
@@ -462,6 +583,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         });
         siteAnalyticsService.registerPublishExplorationEvent(
           explorationData.explorationId);
+        $scope.showCongratulatorySharingModal();
       });
 
       modalInstance.opened.then(function() {
@@ -475,7 +597,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       } else if ($scope.isExplorationLockedForEditing()) {
         return 'Please save your changes before publishing.';
       } else {
-        return 'Publish to Gallery';
+        return 'Publish to Oppia Library';
       }
     };
 
@@ -506,7 +628,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       $http.post($scope.changeListSummaryUrl, {
         change_list: changeListService.getChangeList(),
         version: explorationData.data.version
-      }).success(function(data) {
+      }).then(function(response) {
+        var data = response.data;
         if (data.error) {
           alertsService.addWarning(data.error);
           return;

@@ -158,8 +158,8 @@ oppia.directive('filepathEditor', [
         $scope.filepathsLoaded = false;
         $http.get(
           '/createhandler/resource_list/' + $scope.explorationId
-        ).success(function(data) {
-          $scope.filepaths = data.filepaths;
+        ).then(function(response) {
+          $scope.filepaths = response.data.filepaths;
           $scope.filepathsLoaded = true;
         });
       }

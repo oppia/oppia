@@ -59,12 +59,12 @@ oppia.factory('threadDataService', [
   };
 
   var _fetchMessages = function(threadId) {
-    $http.get(_THREAD_HANDLER_PREFIX + threadId).success(function(data) {
+    $http.get(_THREAD_HANDLER_PREFIX + threadId).then(function(response) {
       var allThreads = _data.feedbackThreads.concat(_data.suggestionThreads);
       for (var i = 0; i < allThreads.length; i++) {
         if (allThreads[i].thread_id === threadId) {
-          allThreads[i].messages = data.messages;
-          allThreads[i].suggestion = data.suggestion;
+          allThreads[i].messages = response.data.messages;
+          allThreads[i].suggestion = response.data.suggestion;
           break;
         }
       }
@@ -80,8 +80,8 @@ oppia.factory('threadDataService', [
       _fetchMessages(threadId);
     },
     fetchFeedbackStats: function() {
-      $http.get(_FEEDBACK_STATS_HANDLER_URL).success(function(data) {
-        _openThreadsCount = data.num_open_threads;
+      $http.get(_FEEDBACK_STATS_HANDLER_URL).then(function(response) {
+        _openThreadsCount = response.data.num_open_threads;
       });
     },
     getOpenThreadsCount: function() {
@@ -93,12 +93,12 @@ oppia.factory('threadDataService', [
         state_name: null,
         subject: newSubject,
         text: newText
-      }).success(function() {
+      }).then(function() {
         _fetchThreads();
         if (successCallback) {
           successCallback();
         }
-      }).error(function() {
+      }, function() {
         _openThreadsCount -= 1;
         alertsService.addWarning('Error creating new thread.');
       });
@@ -137,13 +137,13 @@ oppia.factory('threadDataService', [
         text: newMessage
       };
 
-      $http.post(url, payload).success(function() {
+      $http.post(url, payload).then(function() {
         _fetchMessages(threadId);
 
         if (successCallback) {
           successCallback();
         }
-      }).error(function() {
+      }, function() {
         // Revert changes
         if (newStatus !== oldStatus) {
           if (oldStatus == _THREAD_STATUS_OPEN) {
@@ -167,8 +167,8 @@ oppia.factory('threadDataService', [
         payload.commit_message = commitMsg;
       }
       _openThreadsCount -= 1;
-      $http.put(_SUGGESTION_ACTION_HANDLER_URL + threadId, payload).success(
-        onSuccess).error(function() {
+      $http.put(_SUGGESTION_ACTION_HANDLER_URL + threadId, payload).then(
+        onSuccess, function() {
         _openThreadsCount += 1;
         if (onFailure) {
           onFailure();

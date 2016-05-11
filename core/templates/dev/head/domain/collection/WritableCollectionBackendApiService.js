@@ -43,14 +43,14 @@ oppia.factory('WritableCollectionBackendApiService', [
           });
         collectionDataUrl += '?allow_invalid_explorations=true';
 
-        $http.get(collectionDataUrl).success(function(data) {
-          var collection = angular.copy(data.collection);
+        $http.get(collectionDataUrl).then(function(response) {
+          var collection = angular.copy(response.data.collection);
           if (successCallback) {
             successCallback(collection);
           }
-        }).error(function(error) {
+        }, function(errorResponse) {
           if (errorCallback) {
-            errorCallback(error);
+            errorCallback(errorResponse.data);
           }
         });
       };
@@ -68,9 +68,9 @@ oppia.factory('WritableCollectionBackendApiService', [
           commit_message: commitMessage,
           change_list: changeList
         };
-        $http.put(writableCollectionDataUrl, putData).success(function(data) {
+        $http.put(writableCollectionDataUrl, putData).then(function(response) {
           // The returned data is an updated collection dict.
-          var collection = angular.copy(data);
+          var collection = angular.copy(response.data);
 
           // Update the CollectionBackendApiService's cache with the new
           // collection.
@@ -79,9 +79,9 @@ oppia.factory('WritableCollectionBackendApiService', [
           if (successCallback) {
             successCallback(collection);
           }
-        }).error(function(error) {
+        }, function(errorResponse) {
           if (errorCallback) {
-            errorCallback(error);
+            errorCallback(errorResponse.data);
           }
         });
       };

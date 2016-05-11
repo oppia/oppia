@@ -24,7 +24,6 @@ import os
 import sys
 import time
 import traceback
-import urllib
 import urlparse
 
 import jinja2
@@ -102,6 +101,33 @@ SIDEBAR_MENU_ADDITIONAL_LINKS = config_domain.ConfigProperty(
 SITE_FEEDBACK_FORM_URL = config_domain.ConfigProperty(
     'site_feedback_form_url', {'type': 'unicode'},
     'Site feedback form URL (leave blank if there is no such form)', '')
+
+SHARING_OPTIONS = config_domain.ConfigProperty(
+    'sharing_options', {
+        'type': 'dict',
+        'properties': [{
+            'name': 'gplus',
+            'schema': {
+                'type': 'bool',
+            }
+        }, {
+            'name': 'facebook',
+            'schema': {
+                'type': 'bool',
+            }
+        }, {
+            'name': 'twitter',
+            'schema': {
+                'type': 'bool',
+            }
+        }]
+    },
+    'Sharing options to display in the editor view',
+    default_value={
+        'gplus': False,
+        'facebook': False,
+        'twitter': False,
+    })
 
 SOCIAL_MEDIA_BUTTONS = config_domain.ConfigProperty(
     'social_media_buttons', {
@@ -288,10 +314,6 @@ class BaseHandler(webapp2.RequestHandler):
         else:
             self.payload = None
 
-    def unescape_state_name(self, escaped_state_name):
-        """Unescape a state name that is encoded with encodeURIComponent."""
-        return urllib.unquote(escaped_state_name).decode('utf-8')
-
     def dispatch(self):
         """Overrides dispatch method in webapp2 superclass."""
         # If the request is to the old demo server, redirect it permanently to
@@ -377,6 +399,7 @@ class BaseHandler(webapp2.RequestHandler):
         scheme, netloc, path, _, _ = urlparse.urlsplit(self.request.uri)
 
         values.update({
+            'ALL_CATEGORIES': feconf.ALL_CATEGORIES,
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
                 BEFORE_END_HEAD_TAG_HOOK.value),

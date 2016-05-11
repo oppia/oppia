@@ -43,9 +43,6 @@ function maybeInstallDependencies {
       shift
       ;;
 
-      *)
-      echo "Error: Unknown command line option: $i"
-      ;;
     esac
   done
 
@@ -67,7 +64,7 @@ function maybeInstallDependencies {
     install_node_module karma-coverage 0.5.2
     install_node_module karma-ng-html2js-preprocessor 0.1.0
     install_node_module karma-chrome-launcher 0.1.4
-    install_node_module protractor 2.5.0
+    install_node_module protractor 3.3.0
     install_node_module protractor-screenshot-reporter 0.0.5
     install_node_module jasmine-spec-reporter 2.2.2
 
@@ -190,8 +187,16 @@ if [ ! -d "$NODE_PATH" ]; then
 fi
 
 # Adjust path to support the default Chrome locations for Unix, Windows and Mac OS.
-if [[ $TRAVIS == 'true' ]]; then
-  export CHROME_BIN="chromium-browser"
+if [ "$TRAVIS" = true ]; then
+  export CHROME_BIN="/usr/bin/chromium-browser"
+elif [ "$VAGRANT" = true ]; then
+  # XVFB is required for headless testing in Vagrant
+  sudo apt-get install xvfb chromium-browser
+  export CHROME_BIN="/usr/bin/chromium-browser"
+  # Used in frontend and e2e tests. Only gets set if using Vagrant VM.
+  export XVFB_PREFIX="/usr/bin/xvfb-run"
+  # Enforce proper ownership on oppia, oppia_tools, and node_modules or else NPM installs will fail.
+  sudo chown -R vagrant.vagrant /home/vagrant/oppia /home/vagrant/oppia_tools /home/vagrant/node_modules
 elif [ -f "/usr/bin/google-chrome" ]; then
   # Unix.
   export CHROME_BIN="/usr/bin/google-chrome"

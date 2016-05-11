@@ -31,7 +31,10 @@ describe('Collection node object factory', function() {
       exploration_id: explorationId,
       prerequisite_skills: prerequisiteSkills ? prerequisiteSkills : [],
       acquired_skills: acquiredSkills ? acquiredSkills : [],
-      exploration: {}
+      exploration_summary: {
+        title: 'Title',
+        status: 'private'
+      }
     });
   };
 
@@ -70,14 +73,13 @@ describe('Collection node object factory', function() {
     var explorationSummaryBackendObject = {
       title: 'exp title',
       category: 'exp category',
-      objective: 'exp objective',
-      exists: false
+      objective: 'exp objective'
     };
     var collectionNodeBackendObject = {
       exploration_id: 'exp_id0',
       prerequisite_skills: [],
       acquired_skills: [],
-      exploration: explorationSummaryBackendObject
+      exploration_summary: explorationSummaryBackendObject
     };
 
     var collectionNode = CollectionNodeObjectFactory.create(
@@ -102,9 +104,6 @@ describe('Collection node object factory', function() {
     expect(collectionNode.getExplorationId()).toEqual('exp_id0');
     expect(prerequisiteSkillList.getSkillCount()).toEqual(0);
     expect(acquiredSkillList.getSkillCount()).toEqual(0);
-    expect(collectionNode.getExplorationSummaryObject()).toEqual({
-      exists: true,
-      newlyCreated: true
-    });
+    expect(collectionNode.doesExplorationExist()).toBe(false);
   });
 });

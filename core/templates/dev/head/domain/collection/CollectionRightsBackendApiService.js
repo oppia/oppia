@@ -32,16 +32,16 @@ oppia.factory('CollectionRightsBackendApiService', [
           version: collectionVersion,
           is_public: isPublic
         };
-        $http.put(collectionRightsUrl, putParams).success(function() {
+        $http.put(collectionRightsUrl, putParams).then(function() {
           // TODO(bhenning): Consolidate the backend rights domain objects and
           // implement a frontend activity rights domain object. The rights
           // being passed in here should be used to create one of those objects.
           if (successCallback) {
             successCallback();
           }
-        }).error(function(error) {
+        }, function(errorResponse) {
           if (errorCallback) {
-            errorCallback(error);
+            errorCallback(errorResponse.data);
           }
         });
       };
@@ -55,6 +55,17 @@ oppia.factory('CollectionRightsBackendApiService', [
           return $q(function(resolve, reject) {
             _setCollectionStatus(
               collectionId, collectionVersion, true, resolve, reject);
+          });
+        },
+
+        /**
+         * Updates a collection's rights to be have private learner access,
+         * given its ID and version.
+         */
+        setCollectionPrivate: function(collectionId, collectionVersion) {
+          return $q(function(resolve, reject) {
+            _setCollectionStatus(
+              collectionId, collectionVersion, false, resolve, reject);
           });
         }
       };

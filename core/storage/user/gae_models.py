@@ -52,7 +52,7 @@ class UserSettingsModel(base_models.BaseModel):
     # Language preferences specified by the user.
     # TODO(sll): Add another field for the language that the user wants the
     # site to display in. These language preferences are mainly for the purpose
-    # of figuring out what to show by default in the gallery.
+    # of figuring out what to show by default in the library index page.
     preferred_language_codes = ndb.StringProperty(
         repeated=True,
         indexed=True,
@@ -95,6 +95,11 @@ class UserEmailPreferencesModel(base_models.BaseModel):
     # The user's preference for receiving general site updates. This is set to
     # None if the user has never set a preference.
     site_updates = ndb.BooleanProperty(indexed=True)
+
+    # The user's preference for receiving email when user is added as a member
+    # in exploration. This is set to True when user has never set a preference.
+    editor_role_notifications = ndb.BooleanProperty(
+        indexed=True, default=feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
 
 
 class UserSubscriptionsModel(base_models.BaseModel):

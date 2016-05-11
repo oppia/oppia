@@ -163,7 +163,7 @@ oppia.factory('trainingModalService', ['$rootScope', '$modal', 'alertsService',
               var state = explorationStatesService.getState(currentStateName);
 
               answerClassificationService.getMatchingClassificationResult(
-                explorationId, state, unhandledAnswer, true).success(
+                explorationId, state, unhandledAnswer, true).then(
                     function(classificationResult) {
                   var feedback = 'Nothing';
                   var dest = classificationResult.outcome.dest;
@@ -293,8 +293,8 @@ oppia.factory('trainingDataService', [
       initializeTrainingData: function(explorationId, stateName) {
         var trainingDataUrl = '/createhandler/training_data/' + explorationId +
           '/' + encodeURIComponent(stateName);
-        $http.get(trainingDataUrl).success(function(result) {
-          var unhandledAnswers = result.unhandled_answers;
+        $http.get(trainingDataUrl).then(function(response) {
+          var unhandledAnswers = response.data.unhandled_answers;
           _trainingDataAnswers = [];
           _trainingDataCounts = [];
           for (var i = 0; i < unhandledAnswers.length; i++) {

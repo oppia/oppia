@@ -119,14 +119,17 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isdir(component_dir))
 
             # In this directory there should be a config .py file, an
-            # html file, a JS file, a .png file and a protractor.js file.
+            # html file, a JS file, an icon .png file and a protractor.js file,
+            # and an optional preview .png file.
             dir_contents = self._listdir_omit_ignored(component_dir)
-            self.assertLessEqual(len(dir_contents), 5)
+            self.assertLessEqual(len(dir_contents), 6)
 
             py_file = os.path.join(component_dir, '%s.py' % component_id)
             html_file = os.path.join(component_dir, '%s.html' % component_id)
             js_file = os.path.join(component_dir, '%s.js' % component_id)
             png_file = os.path.join(component_dir, '%s.png' % component_id)
+            preview_file = os.path.join(
+                component_dir, '%sPreview.png' % component_id)
             protractor_file = os.path.join(component_dir, 'protractor.js')
 
             self.assertTrue(os.path.isfile(py_file))
@@ -134,6 +137,8 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isfile(js_file))
             self.assertTrue(os.path.isfile(png_file))
             self.assertTrue(os.path.isfile(protractor_file))
+            if len(dir_contents) == 6:
+                self.assertTrue(os.path.isfile(preview_file))
 
             js_file_content = utils.get_file_contents(js_file)
             html_file_content = utils.get_file_contents(html_file)

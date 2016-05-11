@@ -15,7 +15,6 @@
     GLOBALS.ALLOWED_GADGETS = JSON.parse('{{ALLOWED_GADGETS|js_string}}');
     GLOBALS.ALLOWED_INTERACTION_CATEGORIES = JSON.parse(
       '{{ALLOWED_INTERACTION_CATEGORIES|js_string}}');
-    GLOBALS.CATEGORIES_TO_COLORS = JSON.parse('{{CATEGORIES_TO_COLORS|js_string}}');
     GLOBALS.DEFAULT_OBJECT_VALUES = JSON.parse('{{DEFAULT_OBJECT_VALUES|js_string}}');
     GLOBALS.GADGET_SPECS = JSON.parse('{{GADGET_SPECS|js_string}}');
     GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
@@ -25,6 +24,7 @@
     GLOBALS.PANEL_SPECS = JSON.parse('{{PANEL_SPECS|js_string}}');
     GLOBALS.TAG_REGEX = JSON.parse('{{TAG_REGEX|js_string}}');
     GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = JSON.parse('{{SHOW_TRAINABLE_UNRESOLVED_ANSWERS|js_string}}');
+    GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = JSON.parse('{{DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR|js_string}}');
   </script>
 
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
@@ -64,10 +64,11 @@
 {% endblock navbar_breadcrumb %}
 
 {% block local_top_nav_options %}
-  <ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak" ng-controller="EditorNavigation" style="margin-left: 20px;">
+  <ul class="nav navbar-nav oppia-navbar-nav pull-right ng-cloak" ng-controller="EditorNavigation" style="margin-left: 20px;">
     <li ng-class="{'active': getTabStatuses().active === 'main', 'dropdown': countWarnings()}">
-      <a href="#" tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()" class="protractor-test-main-tab">
-        <span class="glyphicon glyphicon-pencil"></span>
+      <a href="#" tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()"
+         class="oppia-editor-navbar-tab-anchor protractor-test-main-tab">
+        <i class="material-icons">&#xE254;</i>
       </a>
       <div ng-show="countWarnings()" class="oppia-exploration-warnings-indicator" ng-click="selectMainTab()" ng-class="{'oppia-exploration-warnings-critical-color': hasCriticalWarnings(), 'oppia-exploration-warnings-error-color': !hasCriticalWarnings()}">
         <span class="oppia-exploration-warnings-count">
@@ -90,35 +91,41 @@
 
     {% if username %}
       <li id="tutorialPreviewTab" ng-class="{'active': getTabStatuses().active === 'preview'}">
-        <a href="#" tooltip="Preview" tooltip-placement="bottom" ng-click="selectPreviewTab()" class="protractor-test-preview-tab">
-          <span class="glyphicon glyphicon-play"></span>
+        <a href="#" tooltip="Preview" tooltip-placement="bottom" ng-click="selectPreviewTab()"
+           class="oppia-editor-navbar-tab-anchor protractor-test-preview-tab">
+          <i class="material-icons">&#xE037;</i>
         </a>
       </li>
     {% endif %}
 
     <li ng-class="{'active': getTabStatuses().active === 'settings'}">
-      <a href="#" tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()" class="protractor-test-settings-tab">
-        <span class="glyphicon glyphicon-cog"></span>
+      <a href="#" tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()"
+         class="oppia-editor-navbar-tab-anchor protractor-test-settings-tab">
+        <i class="material-icons">&#xE8B8;</i>
       </a>
     </li>
 
     {% if username %}
       <li ng-class="{'active': getTabStatuses().active === 'stats'}">
-        <a href="#" tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()">
-          <span class="glyphicon glyphicon-stats"></span>
+        <a href="#" tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()"
+           class="oppia-editor-navbar-tab-anchor">
+          <i class="material-icons">&#xE24B;</i>
         </a>
       </li>
     {% endif %}
 
     <li ng-class="{'active': getTabStatuses().active === 'history'}">
-      <a href="#" tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()" disabled="explorationRightsService.isCloned()" class="protractor-test-history-tab">
-        <span class="glyphicon glyphicon-time"></span>
+      <a href="#" tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()"
+         disabled="explorationRightsService.isCloned()"
+         class="oppia-editor-navbar-tab-anchor protractor-test-history-tab">
+        <i class="material-icons">&#xE192;</i>
       </a>
     </li>
 
     <li ng-class="{'active': getTabStatuses().active === 'feedback'}" ng-click="selectFeedbackTab()">
-      <a href="#" tooltip="Feedback" tooltip-placement="bottom">
-        <span class="glyphicon glyphicon-comment"></span>
+      <a href="#" tooltip="Feedback" tooltip-placement="bottom"
+         class="oppia-editor-navbar-tab-anchor">
+        <i class="material-icons">&#xE87F;</i>
       </a>
       <div ng-show="getOpenThreadsCount()" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
         <span class="oppia-exploration-open-threads-count">
@@ -132,8 +139,8 @@
           popover-placement="bottom" popover-trigger="none"
           popover="To get help in the future, click here!">
         <a href="#" tooltip="Help" tooltip-placement="bottom"
-           ng-click="openEditorTutorial()">
-          <span class="glyphicon glyphicon-question-sign"></span>
+           class="oppia-editor-navbar-tab-anchor" ng-click="showUserHelpModal()">
+          <i class="material-icons">&#xE887;</i>
         </a>
       </li>
     {% endif %}
@@ -143,18 +150,18 @@
     <li ng-if="isPrivate()">
       <div class="btn-group" style="margin-right: 10px; margin-top: 8px;"
            title="<[getPublishExplorationButtonTooltip()]>">
-        <button type="button" class="btn btn-default protractor-test-publish-exploration"
+        <button type="button" class="btn btn-default oppia-publish-exploration-button protractor-test-publish-exploration"
                 ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}"
                 ng-click="showPublishExplorationModal()"
                 ng-disabled="isExplorationLockedForEditing() || countWarnings()">
           <span ng-if="!publishModalIsOpening">
             <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
-               alt="Publish to Gallery">&#xE2C3;</i>
-            <span class="oppia-save-publish-button-label">Publish to Gallery</span>
+               alt="Publish to Oppia Library">&#xE2C3;</i>
+            <span class="oppia-save-publish-button-label">Publish</span>
           </span>
           <span ng-if="publishModalIsOpening">
             <i class="oppia-save-publish-loading oppia-save-publish-button-icon"
-               alt="Publish to Gallery">
+               alt="Publish to Oppia Library">
                  <loading-dots></loading-dots>
             </i>
             <span class="oppia-save-publish-button-label">
@@ -169,62 +176,53 @@
     <li ng-if="isEditableOutsideTutorialMode()">
       <div dropdown class="btn-group" style="margin-right: 10px; margin-top: 8px;"
            title="<[getSaveButtonTooltip()]>">
-        <button id="tutorialSaveButton" class="btn btn-default protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
+        <button id="tutorialSaveButton" class="btn btn-default oppia-save-draft-button protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
           <span ng-if="!isSaveInProgress">
             <span ng-if="isPrivate()">
               <span ng-if="!saveModalIsOpening">
                 <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
-               alt="Save Draft">&#xE161;</i>
+                   alt="Save Draft">&#xE161;</i>
                 <span class="oppia-save-publish-button-label">Save Draft</span>
                 <span class="hidden-sm hidden-xs" ng-if="getChangeListLength()" style="opacity: 0.5">(<[getChangeListLength()]>)</span>
               </span>
 
               <span ng-if="saveModalIsOpening">
-                <i class="oppia-save-publish-loading oppia-save-publish-button-icon"
-               alt="Saving...">
-                  <loading-dots></loading-dots>
-                </i>
                 <span class="oppia-save-publish-button-label">
                   Saving
-                  <loading-dots></loading-dots>
                 </span>
+                <loading-dots></loading-dots>
               </span>
             </span>
             <span ng-if="!isPrivate()" title="Publish Changes">
               <span ng-if="!saveModalIsOpening">
                 <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
-               alt="Publish Changes">&#xE2C3;</i>
+                   alt="Publish Changes">&#xE2C3;</i>
                 <span class="oppia-save-publish-button-label">Publish Changes</span>
               </span>
 
               <span ng-if="saveModalIsOpening">
-                <i class="oppia-save-publish-loading oppia-save-publish-button-icon"
-               alt="Saving...">
-                  <loading-dots></loading-dots>
-                </i>
                 <span class="oppia-save-publish-button-label">
-                  Saving
-                  <loading-dots></loading-dots>
+                  Publishing
                 </span>
+                <loading-dots></loading-dots>
               </span>
             </span>
           </span>
           <span ng-if="isSaveInProgress">
-            <span ng-if="isPrivate()">
+            <span ng-if="isPrivate()" class="oppia-save-publish-button-label">
               Saving
-              <loading-dots></loading-dots>
             </span>
-            <span ng-if="!isPrivate()">
+            <span ng-if="!isPrivate()" class="oppia-save-publish-button-label">
               Publishing
-              <loading-dots></loading-dots>
             </span>
+            <loading-dots></loading-dots>
           </span>
         </button>
         <button type="button" class="btn btn-default dropdown-toggle protractor-test-save-discard-toggle"
                 ng-disabled="!getChangeListLength()" dropdown-toggle>
           <span class="caret"></span>
         </button>
-        <ul class="dropdown-menu" role="menu">
+        <ul class="dropdown-menu" role="menu" style="min-width: 120px; right: inherit; width: 120px;">
           <li><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="protractor-test-discard-changes" title="Discard all pending changes.">Discard Draft</a></li>
         </ul>
       </div>
@@ -234,6 +232,22 @@
 
 {% block content %}
   <div ng-controller="ExplorationEditor" ng-cloak>
+    <script type="text/ng-template" id="modals/shareExplorationAfterPublish">
+      <div class="modal-header">
+        <h3>Exploration Published</h3>
+      </div>
+
+      <div class="modal-body oppia-long-text">
+        <p>
+          Congratulations! Your exploration was successfully published.
+        </p>
+        <p>
+          <strong>Share your exploration via:</strong>
+        </p>
+        <sharing-links flex="100" layout-type="row" layout-align-type="center center" twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR"></sharing-links>
+      </div>
+    </script>
+
     <script type="text/ng-template" id="modals/publishExploration">
       <div class="modal-header">
         <h3>Publish Exploration</h3>
@@ -252,7 +266,7 @@
           </ul>
         </p>
         <p>
-          Once the exploration is published, it will be available in the gallery for anyone to learn from and provide feedback. You can also check out
+          Once the exploration is published, it will be available in the Oppia library for anyone to learn from and provide feedback. You can also check out
             its stats by clicking on the Stats tab in the top right of the editor.
         </p>
       </div>
@@ -262,6 +276,9 @@
         <button class="btn btn-success protractor-test-confirm-publish" ng-click="publish()">Publish Exploration</button>
       </div>
     </script>
+
+    {% include 'components/exploration_welcome_modal_directive.html' %}
+    {% include 'components/help_modal_directive.html' %}
 
     <script type="text/ng-template" id="modals/saveExploration">
       <div class="modal-header">
@@ -433,7 +450,6 @@
   {% include 'components/gadget_directive.html' %}
   {% include 'components/gadget_panel_directive.html' %}
   {% include 'components/html_select_directive.html' %}
-  {% include 'components/loading_dots_directive.html' %}
   {% include 'components/outcome_editor_directive.html' %}
   {% include 'components/outcome_destination_editor_directive.html' %}
   {% include 'components/outcome_feedback_editor_directive.html' %}
@@ -441,6 +457,7 @@
   {% include 'components/profile_link_text_directive.html' %}
   {% include 'components/response_header_directive.html' %}
   {% include 'components/rule_editor_directive.html' %}
+  {% include 'components/sharing_links_directive.html' %}
   {% include 'components/state_graph_viz_directive.html' %}
 
   {% include 'player/answer_feedback_pair_directive.html' %}
@@ -457,6 +474,7 @@
     {{ include_js_file('editor/ExplorationEditorAdvancedFeaturesService.js') }}
     {{ include_js_file('editor/ExplorationGraph.js') }}
     {{ include_js_file('editor/ExplorationPreview.js') }}
+    {{ include_js_file('editor/ParameterMetadataService.js') }}
 
     {{ include_js_file('components/AnswerGroupEditorDirective.js') }}
     {{ include_js_file('components/BarChartDirective.js') }}
@@ -466,7 +484,6 @@
     {{ include_js_file('components/GadgetDirective.js') }}
     {{ include_js_file('components/GadgetPanelDirective.js') }}
     {{ include_js_file('components/HtmlSelectDirective.js') }}
-    {{ include_js_file('components/LoadingDotsDirective.js') }}
     {{ include_js_file('components/OutcomeEditorDirective.js') }}
     {{ include_js_file('components/OutcomeDestinationEditorDirective.js') }}
     {{ include_js_file('components/OutcomeFeedbackEditorDirective.js') }}
@@ -475,6 +492,7 @@
     {{ include_js_file('components/ResponseHeaderDirective.js') }}
     {{ include_js_file('components/RuleEditorDirective.js') }}
     {{ include_js_file('components/RuleTypeSelectorDirective.js') }}
+    {{ include_js_file('components/SharingLinksDirective.js') }}
     {{ include_js_file('components/StateGraphLayoutService.js') }}
     {{ include_js_file('components/StateGraphVizDirective.js') }}
     {{ include_js_file('components/ValueGeneratorEditorDirective.js') }}

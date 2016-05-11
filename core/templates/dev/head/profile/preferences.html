@@ -54,7 +54,7 @@
             <div class="col-lg-10 col-md-10 col-sm-10">
               <div class="oppia-editable-section" title="Change profile picture" style="height: 150px; width: 150px">
                 <div class="oppia-click-to-start-editing" ng-click="showEditProfilePictureModal()"></div>
-                <span class="glyphicon glyphicon-pencil oppia-editor-edit-icon" style="right: 5px;"></span>
+                <i class="material-icons oppia-editor-edit-icon" style="top: 8px; right: 8px;">&#xE254;</i>
                 <img ng-if="profilePictureDataUrl" ng-src="<[profilePictureDataUrl]>" class="img-thumbnail">
                 <img ng-if="!profilePictureDataUrl" src="/images/general/no_profile_picture.png" class="img-thumbnail">
               </div>
@@ -114,14 +114,14 @@
               <div ng-if="hasPageLoaded">
                 <select2-dropdown choices="LANGUAGE_CHOICES"
                   item="$parent.preferredLanguageCodes" allow-multiple-choices="true"
-                  new-choice-regex=".^" width="400"
+                  new-choice-regex=".^" width="100%"
                   placeholder="Select preferred languages..."
                   on-selection-change="savePreferredLanguageCodes($parent.preferredLanguageCodes)">
                 </select2-dropdown>
               </div>
               <span class="help-block" style="font-size: smaller">
                 These languages will be selected by default when you search the
-                gallery for explorations.
+                library for explorations.
               </span>
             </div>
           </div>
@@ -147,8 +147,14 @@
             <div class="col-lg-10 col-md-10 col-sm-10">
               <div class="checkbox">
                 <label>
-                  <input type="checkbox" ng-model="canReceiveEmailUpdates" ng-change="saveCanReceiveEmailUpdates(canReceiveEmailUpdates)">
+                  <input type="checkbox" ng-model="canReceiveEmailUpdates" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail)">
                   Receive news and updates about the site
+                </label>
+              </div>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" ng-model="canReceiveEditorRoleEmail" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail)">
+                  Receive emails when someone gives you edit rights to an exploration
                 </label>
               </div>
             </div>
@@ -176,7 +182,7 @@
               Drag to crop and resize:
               <div class="oppia-profile-picture-crop-area" ng-show="uploadedImage">
                 <button class="btn btn-default oppia-profile-picture-reset-button" ng-click="reset()">
-                  <span class="glyphicon glyphicon-remove"></span>
+                  <i class="material-icons oppia-vcenter">&#xE14C;</i>
                 </button>
                 <img-crop image="uploadedImage" result-image="croppedImageDataUrl"
                           area-type="square" result-image-size="150"
@@ -202,6 +208,10 @@
       </script>
     </md-card>
   </div>
+{% endblock %}
+
+{% block footer%}
+  {% include 'footer.html' %}
 {% endblock %}
 
 {% block footer_js %}

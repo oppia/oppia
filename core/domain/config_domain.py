@@ -41,12 +41,15 @@ class ConfigProperty(object):
     these names:
     - admin_email_address
     - banner_alt_text
+    - carousel_slides_config
     - contribute_gallery_page_announcement
     - editor_page_announcement
     - editor_prerequisites_agreement
     - full_site_url
+    - sharing_options_twitter_text
     - splash_page_exploration_id
     - splash_page_exploration_version
+    - splash_page_youtube_video_id
     """
 
     def refresh_default_value(self, default_value):

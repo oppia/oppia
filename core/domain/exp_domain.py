@@ -2569,13 +2569,6 @@ class ExplorationSummary(object):
         that the keys need to be strings in order for this dict to be
         JSON-serializable.
         """
-
-        def _get_thumbnail_image_url(category):
-            return '/images/gallery/exploration_background_%s_small.png' % (
-                feconf.CATEGORIES_TO_COLORS[category] if
-                category in feconf.CATEGORIES_TO_COLORS else
-                feconf.DEFAULT_COLOR)
-
         self.id = exploration_id
         self.title = title
         self.category = category
@@ -2593,4 +2586,3 @@ class ExplorationSummary(object):
         self.version = version
         self.exploration_model_created_on = exploration_model_created_on
         self.exploration_model_last_updated = exploration_model_last_updated
-        self.thumbnail_image_url = _get_thumbnail_image_url(category)

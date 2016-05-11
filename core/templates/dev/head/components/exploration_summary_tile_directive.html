@@ -1,32 +1,38 @@
 <script type="text/ng-template" id="summaryTile/exploration">
-  <md-card class="oppia-exploration-summary-tile">
+  <md-card class="oppia-exploration-summary-tile" ng-class="{'small-width': !isWindowLarge}">
     <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
-      <div class="top-section" style="background-color: <[getThumbnailBgColor()]>;">
+      <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
         <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
-        <h2 class="exploration-title protractor-test-exp-summary-tile-title"><[getExplorationTitle()]></h2>
+        <h2 class="exploration-title protractor-test-exp-summary-tile-title">
+          <span ng-if="isWindowLarge"><[getExplorationTitle()|truncate:22]></span>
+          <span ng-if="!isWindowLarge"><[getExplorationTitle()|truncate:22]></span>
+        </h2>
 
-        <div class="exploration-summary-avatars" ng-show="avatarsList.length > 0">
-          <circular-image ng-if="avatarsList.length > 0"
-                          src="avatarsList[0].image"
-                          link="avatarsList[0].link"
-                          tooltip="<[avatarsList[0].tooltipText | truncate:14]>"
-                          tooltip-placement="right"
-                          tooltip-append-to-body="true">
-          </circular-image>
-          <div class="avatars-num-minus-one" ng-show="avatarsList.length > 1">
+        <!-- Note that if this is ng-if instead, the avatar area will not detect a mouseover and the tile will behave incorrectly. -->
+        <div ng-show="isWindowLarge && avatarsList.length > 0" class="exploration-summary-avatars" ng-show="avatarsList.length > 0">
+          <div class="circular-image-container">
+            <circular-image ng-if="avatarsList.length > 0"
+                            src="avatarsList[0].image"
+                            link="avatarsList[0].link"
+                            tooltip="<[avatarsList[0].tooltipText | truncate:14]>"
+                            tooltip-placement="right">
+            </circular-image>
+          </div>
+          <div class="avatars-num-minus-one contributor-indicator contributor-indicator-background" ng-show="avatarsList.length > 1">
             <span ng-if="!isCommunityOwned()">+</span><[avatarsList.length - 1]>
           </div>
 
           <div class="all-avatars" style="display: none;">
-            <circular-image ng-repeat="avatar in avatarsList | limitTo:MAX_AVATARS_TO_DISPLAY-1:1"
-                            src="avatar.image"
-                            link="avatar.link"
-                            tooltip="<[avatar.tooltipText | truncate:14]>"
-                            tooltip-placement="right"
-                            tooltip-append-to-body="true">
-            </circular-image>
+            <div class="circular-image-container">
+              <circular-image ng-repeat="avatar in avatarsList | limitTo:MAX_AVATARS_TO_DISPLAY-1:1"
+                              src="avatar.image"
+                              link="avatar.link"
+                              tooltip="<[avatar.tooltipText | truncate:14]>"
+                              tooltip-placement="right">
+              </circular-image>
+            </div>
 
-            <div style="position:relative;" ng-show="avatarsList.length > MAX_AVATARS_TO_DISPLAY">
+            <div style="position: relative;" ng-show="avatarsList.length > MAX_AVATARS_TO_DISPLAY">
               <div class="exploration-black-profile"></div>
               <div class="num-remaining-avatars" ng-show="avatarsList.length > MAX_AVATARS_TO_DISPLAY">
                 +<[avatarsList.length - MAX_AVATARS_TO_DISPLAY]>
@@ -35,11 +41,11 @@
           </div>
         </div>
       </div>
-      <div class="top-section-mask mask"></div>
+      <div class="title-section-mask"></div>
 
-      <div>
-        <div class="objective protractor-test-exp-summary-tile-objective">
-          <[getObjective() | truncateAndCapitalize: 60]>
+      <div ng-attr-section="<[isWindowLarge ? undefined : 'right-section']>">
+        <div ng-if="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
+          <[getObjective() | truncateAndCapitalize: 40]>
           <span ng-if="!getObjective()">No objective specified.</span>
         </div>
         <ul layout="row" class="metrics" layout-align="space-between center">
@@ -87,6 +93,7 @@
     position: relative;
     text-align: left;
     vertical-align: top;
+    white-space: normal;
     width: 200px;
   }
 
@@ -116,14 +123,20 @@
     box-shadow: 0 6px 13px rgba(0,0,0,0.17), 0 4px 6px rgba(0,0,0,0.23);
   }
 
-  .oppia-exploration-summary-tile .top-section {
+  .oppia-exploration-summary-tile .circular-image-container {
+    border: 2px solid white;
+    border-radius: 50%;
+    margin-bottom: 5px;
+  }
+
+  .oppia-exploration-summary-tile .title-section {
     height: 144px;
     position: relative;
     width: 100%;
   }
 
   .oppia-exploration-summary-tile,
-  .oppia-exploration-summary-tile .top-section {
+  .oppia-exploration-summary-tile .title-section {
     -webkit-transition: all 300ms;
     transition: all 300ms;
   }
@@ -149,7 +162,7 @@
     z-index: 10;
   }
 
-  .oppia-exploration-summary-tile:hover .top-section-mask {
+  .oppia-exploration-summary-tile:hover .title-section-mask {
     background-color: #eee;
     height: 144px;
     left: 0px;
@@ -175,12 +188,27 @@
   .oppia-exploration-summary-tile .avatars-num-minus-one {
     color: white;
     font-family: Roboto;
-    font-size: x-small;
+    font-size: 0.55em;
     font-weight: bold;
-    left: 18px;
+    left: 12px;
     position: absolute;
-    top: 18px;
-    padding-left: 4px;
+    padding-left: 2px;
+    padding-right: 2px;
+    top: 17px;
+  }
+
+  .oppia-exploration-summary-tile .contributor-indicator {
+    border-radius: 10%;
+    bottom: 10px;
+    height: 13px;
+    position: absolute;
+    right: 5px;
+    text-align: center;
+    width: 16px;
+  }
+
+ .oppia-exploration-summary-tile .contributor-indicator-background {
+    background-color: #4078C0;
   }
 
   .oppia-exploration-summary-tile .all-avatars .num-remaining-avatars {
@@ -205,17 +233,17 @@
 
   .oppia-exploration-summary-tile .thumbnail-image {
     display: block;
+    height: 75px;
     margin: 0 auto;
-    height: 40px;
-    top: 36px;
     position: relative;
-    width: 40px;
+    top: 22px;
+    width: 75px;
   }
 
   .oppia-exploration-summary-tile .exploration-title {
     bottom: 0;
     color: white;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-family: "Rubik", "Roboto", Arial, sans-serif;
     font-size: 1em;
     line-height: 1.2em;
     margin: 12px;
@@ -225,14 +253,22 @@
 
   .oppia-exploration-summary-tile .objective {
     height: 60px;
-    font-family: Roboto;
+    font-family: "Rubik", "Roboto", Arial, sans-serif;
     font-size: 0.85em;
-    font-style: italic;
     padding: 12px;
   }
 
   .oppia-exploration-summary-tile .rating-disabled {
     opacity: 0.5;
+  }
+
+  .oppia-exploration-summary-tile [section="right-section"] {
+    display: inline-block;
+    float: left;
+    height: 80px;
+    position: relative;
+    text-align: center;
+    width: 30%;
   }
 
   .oppia-exploration-summary-tile .metrics {
@@ -254,11 +290,70 @@
   }
 
   .oppia-exploration-summary-tile .recently-updated {
-    background-color: rgb(19,105,193);
-    border-radius: 10px;
-    color: white;
-    font-size: 0.8em;
+    color: rgb(19,105,193);
+    font-size: 1.1em;
     font-weight: bold;
     padding: 5px 8px 4px 8px;
+  }
+
+  /* Styles for small-width screens. */
+
+  .oppia-exploration-summary-tile.small-width {
+    height: 80px;
+    width: 95%;
+  }
+  .oppia-exploration-summary-tile.small-width .title-section {
+    float: left;
+    height: 80px;
+    width: 70%;
+  }
+  .oppia-exploration-summary-tile.small-width .exploration-summary-tile-mask {
+    width: 70%;
+  }
+  .oppia-exploration-summary-tile.small-width:hover .title-section-mask {
+    height: 80px;
+    width: 70%;
+  }
+  .oppia-exploration-summary-tile.small-width .thumbnail-image {
+    height: 20px;
+    margin: 8px;
+    right: 0px;
+    top: 0px;
+    position: absolute;
+    width: 20px;
+  }
+  .oppia-exploration-summary-tile.small-width .exploration-title {
+    margin: 10px;
+    top: 0;
+    width: 75%;
+  }
+  .oppia-exploration-summary-tile.small-width .metrics {
+    display: inline-block;
+    margin-top: 12px;
+  }
+  .oppia-exploration-summary-tile.small-width .metrics li {
+    display: block;
+    font-size: 0.7em;
+    text-align: left;
+  }
+  .oppia-exploration-summary-tile.small-width .metrics li .fa {
+    margin-bottom: 10px;
+  }
+  .oppia-exploration-summary-tile.small-width .recently-updated {
+    background-color: rgb(19,105,193);
+    border-radius: 8px;
+    color: white;
+    font-size: 0.6em;
+    font-weight: bold;
+    padding: 5px 8px 4px 8px;
+  }
+
+  @media (max-width: 420px) {
+    .oppia-exploration-summary-tile.small-width .metrics li {
+      font-size: 0.6em;
+    }
+    .oppia-exploration-summary-tile.small-width .recently-updated {
+      display: none;
+    }
   }
 </style>

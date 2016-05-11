@@ -26,6 +26,23 @@ var editor = require('../protractor_utils/editor.js');
 var player = require('../protractor_utils/player.js');
 
 describe('State editor', function() {
+  it('should walk through the tutorial when user repeatedly clicks Next',
+      function() {
+    var NUM_TUTORIAL_STAGES = 8;
+    users.createUser(
+      'userTutorial@stateEditor.com', 'userTutorialStateEditor');
+    users.login('userTutorial@stateEditor.com');
+
+    workflow.createExplorationAndStartTutorial('sums', 'maths');
+    editor.startTutorial();
+    for (var i = 0; i < NUM_TUTORIAL_STAGES - 1; i++) {
+      editor.progressInTutorial();
+      general.waitForSystem();
+    }
+    editor.finishTutorial();
+    users.logout();
+  });
+
   it('should display plain text content', function() {
     users.createUser('user1@stateEditor.com', 'user1StateEditor');
     users.login('user1@stateEditor.com');
@@ -47,20 +64,6 @@ describe('State editor', function() {
     player.submitAnswer('Continue', null);
     player.expectExplorationToBeOver();
 
-    users.logout();
-  });
-
-  it('should walk through the tutorial when user repeatedly clicks Next',
-      function() {
-    var NUM_TUTORIAL_STAGES = 5;
-    users.createUser('user1@stateEditor.com', 'user1StateEditor');
-    users.login('user1@stateEditor.com');
-
-    workflow.createExplorationAndStartTutorial('sums', 'maths');
-    for (var i = 0; i < NUM_TUTORIAL_STAGES - 1; i++) {
-      editor.progressInTutorial();
-    }
-    editor.finishTutorial();
     users.logout();
   });
 

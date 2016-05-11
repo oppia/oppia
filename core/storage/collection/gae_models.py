@@ -260,7 +260,7 @@ class CollectionSummaryModel(base_models.BaseModel):
     """Summary model for an Oppia collection.
 
     This should be used whenever the content blob of the collection is not
-    needed (e.g. gallery, search, etc).
+    needed (e.g. search results, etc).
 
     A CollectionSummaryModel instance stores the following information:
 

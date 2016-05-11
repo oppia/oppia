@@ -119,7 +119,13 @@ oppia.directive('oppiaInteractiveCodeRepl', [
           execLimit: 10000
         });
 
-        $scope.runCode = function(codeInput) {
+        $scope.runAndSubmitCode = function(codeInput) {
+          $scope.runCode(codeInput, function(evaluation, err) {
+            $scope.sendResponse(evaluation, err);
+          });
+        };
+
+        $scope.runCode = function(codeInput, onFinishRunCallback) {
           $scope.code = codeInput;
           $scope.output = '';
 
@@ -128,10 +134,20 @@ oppia.directive('oppiaInteractiveCodeRepl', [
             Sk.importMainWithBody('<stdin>', false, codeInput, true);
           }).then(function() {
             // Finished evaluating.
-            $scope.sendResponse('', '');
+            $scope.evaluation = '';
+            $scope.fullError = '';
+
+            if (onFinishRunCallback) {
+              onFinishRunCallback('', '');
+            }
           }, function(err) {
             if (!(err instanceof Sk.builtin.TimeLimitError)) {
-              $scope.sendResponse('', String(err));
+              $scope.evaluation = '';
+              $scope.fullError = String(err);
+
+              if (onFinishRunCallback) {
+                onFinishRunCallback('', String(err));
+              }
             }
           });
         };
@@ -193,8 +209,6 @@ oppia.directive('oppiaInteractiveCodeRepl', [
         };
 
         $scope.sendResponse = function(evaluation, err) {
-          $scope.evaluation = (evaluation || '');
-          $scope.fullError = err || '';
           $scope.$parent.submitAnswer({
             // Replace tabs with 2 spaces.
             // TODO(sll): Change the default Python indentation to 4 spaces.
@@ -203,6 +217,10 @@ oppia.directive('oppiaInteractiveCodeRepl', [
             evaluation: $scope.evaluation,
             error: (err || '')
           }, codeReplRulesService);
+
+          // Without this, the error message displayed in the user-facing
+          // console will sometimes not update.
+          $scope.$apply();
         };
       }]
     };
@@ -267,6 +285,11 @@ oppia.factory('codeReplRulesService', [
       var normalizedSnippet =
         codeNormalizationService.getNormalizedCode(inputs.x);
       return normalizedCode.indexOf(normalizedSnippet) == -1;
+    },
+    OutputContains: function(answer, inputs) {
+      var normalizedOutput = $filter('normalizeWhitespace')(answer.output);
+      var normalizedSnippet = $filter('normalizeWhitespace')(inputs.x);
+      return normalizedOutput.indexOf(normalizedSnippet) != -1;
     },
     OutputEquals: function(answer, inputs) {
       var normalizedOutput = $filter('normalizeWhitespace')(answer.output);

@@ -37,6 +37,9 @@ import feconf
 import main
 import utils
 
+from google.appengine.api import apiproxy_stub
+from google.appengine.api import apiproxy_stub_map
+
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 current_user_services = models.Registry.import_current_user_services()
 
@@ -56,6 +59,33 @@ def empty_environ():
     os.environ['USER_IS_ADMIN'] = '0'
     os.environ['DEFAULT_VERSION_HOSTNAME'] = '%s:%s' % (
         os.environ['HTTP_HOST'], os.environ['SERVER_PORT'])
+
+class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
+    """Mock for google.appengine.api.urlfetch"""
+
+    def __init__(self, service_name='urlfetch'):
+        super(URLFetchServiceMock, self).__init__(service_name)
+        self.return_values = {}
+        self.response = None
+        self.request = None
+
+    def set_return_values(self, content='', status_code=200, headers=None):
+        self.return_values['content'] = content
+        self.return_values['status_code'] = status_code
+        self.return_values['headers'] = headers
+
+    def _Dynamic_Fetch(self, request, response): # pylint: disable=invalid-name
+        return_values = self.return_values
+        response.set_content(return_values.get('content', ''))
+        response.set_statuscode(return_values.get('status_code', 200))
+        for header_key, header_value in return_values.get(
+                'headers', {}).items():
+            new_header = response.add_header()
+            new_header.set_key(header_key)
+            new_header.set_value(header_value)
+
+        self.request = request
+        self.response = response
 
 
 class TestBase(unittest.TestCase):
@@ -196,11 +226,11 @@ class TestBase(unittest.TestCase):
 
         return json.loads(json_response.body[len(feconf.XSSI_PREFIX):])
 
-    def get_json(self, url):
+    def get_json(self, url, params=None):
         """Get a JSON response, transformed to a Python object. This method
         does not support calling testapp.get() with errors expected in response
         because testapp.get() in that case does not return a JSON object."""
-        json_response = self.testapp.get(url)
+        json_response = self.testapp.get(url, params)
         self.assertEqual(json_response.status_int, 200)
         return self._parse_json_response(json_response, expect_errors=False)
 
@@ -240,19 +270,23 @@ class TestBase(unittest.TestCase):
     def signup(self, email, username):
         """Complete the signup process for the user with the given username."""
         self.login(email)
-
-        response = self.testapp.get(feconf.SIGNUP_URL)
-        self.assertEqual(response.status_int, 200)
-        csrf_token = self.get_csrf_token_from_response(response)
-        response = self.testapp.post(feconf.SIGNUP_DATA_URL, {
-            'csrf_token': csrf_token,
-            'payload': json.dumps({
-                'username': username,
-                'agreed_to_terms': True
+        # Signup uses a custom urlfetch mock (URLFetchServiceMock), instead
+        # of the stub provided by testbed. This custom mock is disabled
+        # immediately once the signup is complete. This is done to avoid
+        # external  calls being made to Gravatar when running the backend
+        # tests.
+        with self.urlfetch_mock():
+            response = self.testapp.get(feconf.SIGNUP_URL)
+            self.assertEqual(response.status_int, 200)
+            csrf_token = self.get_csrf_token_from_response(response)
+            response = self.testapp.post(feconf.SIGNUP_DATA_URL, {
+                'csrf_token': csrf_token,
+                'payload': json.dumps({
+                    'username': username,
+                    'agreed_to_terms': True
+                })
             })
-        })
-        self.assertEqual(response.status_int, 200)
-
+            self.assertEqual(response.status_int, 200)
         self.logout()
 
     def set_config_property(self, config_obj, new_config_value):
@@ -500,6 +534,38 @@ class AppEngineTestBase(TestBase):
 
     def _get_all_queue_names(self):
         return [q['name'] for q in self.taskqueue_stub.GetQueues()]
+
+    @contextlib.contextmanager
+    def urlfetch_mock(
+            self, content='', status_code=200, headers=None):
+        """Enables the custom urlfetch mock (URLFetchServiceMock) within the
+        context of a 'with' statement.
+
+        This mock is currently used for signup to prevent external HTTP
+        requests to fetch the Gravatar profile picture for new users while the
+        backend tests are being run.
+
+        args:
+          - content: Response content or body.
+          - status_code: Response status code.
+          - headers: Response headers.
+        """
+        if headers is None:
+            response_headers = {}
+        else:
+            response_headers = headers
+        self.testbed.init_urlfetch_stub(enable=False)
+        urlfetch_mock = URLFetchServiceMock()
+        apiproxy_stub_map.apiproxy.RegisterStub('urlfetch', urlfetch_mock)
+        urlfetch_mock.set_return_values(
+            content=content, status_code=status_code, headers=response_headers)
+        try:
+            yield
+        finally:
+            # Disables the custom mock
+            self.testbed.init_urlfetch_stub(enable=False)
+            # Enables the testbed urlfetch mock
+            self.testbed.init_urlfetch_stub()
 
     def count_jobs_in_taskqueue(self, queue_name=None):
         """Counts the jobs in the given queue. If queue_name is None,

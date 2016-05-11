@@ -58,7 +58,7 @@ module.exports = function(config) {
       'core/templates/dev/head/error/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/expressions/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/forms/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/galleries/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/library/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/moderator/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/pages/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/player/!(*Spec).js': ['coverage'],

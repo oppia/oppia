@@ -1,7 +1,19 @@
+sudo: required
+# In order to install Chrome stable we need trusty distribution.
+dist: trusty
 language: python
 
 python:
 - 2.7
+
+addons:
+  firefox: latest
+  apt:
+    sources:
+      - google-chrome
+    packages:
+      - google-chrome-stable
+      - google-chrome-beta
 
 branches:
   only:
@@ -9,17 +21,20 @@ branches:
   - develop
 
 env:
-- RUN_BACKEND_TESTS=false RUN_FRONTEND_TESTS=false RUN_LINT=true REPORT_BACKEND_COVERAGE=false
-- RUN_BACKEND_TESTS=false RUN_FRONTEND_TESTS=true RUN_LINT=false REPORT_BACKEND_COVERAGE=false
-- RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false RUN_LINT=false REPORT_BACKEND_COVERAGE=false
-- RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false RUN_LINT=false REPORT_BACKEND_COVERAGE=true
-
-
+  matrix:
+    - RUN_LINT=true
+    - RUN_FRONTEND_TESTS=true
+    - RUN_E2E_TESTS_EDITOR=true
+    - RUN_E2E_TESTS_EXTENSIONS=true
+    - RUN_E2E_TESTS_LIBRARY=true
+    - RUN_E2E_TESTS_MISC=true
+    - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=false
+    - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=true
 matrix:
   allow_failures:
   # The backend tests, with coverage, take too long to run, so we make this
   # optional.
-  - env: RUN_BACKEND_TESTS=true RUN_FRONTEND_TESTS=false RUN_LINT=false REPORT_BACKEND_COVERAGE=true
+  - env: RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=true
   fast_finish: true
 
 notifications:
@@ -30,10 +45,23 @@ notifications:
     - wxy.xinyu@gmail.com
     on_success: change
     on_failure: change
+  irc:
+    channels:
+    - chat.freenode.net#oppia
+    on_success: never
+    on_failure: always
+  webhooks:
+    urls:
+    # This URL can be obtained by going to the Gitter chat room
+    # and clicking Settings > Integrations.
+    - https://webhooks.gitter.im/e/f8f782497ec1ffcea2e7
+    on_success: always
+    on_failure: always
 
 before_install:
 - pip install codecov
-- export CHROME_BIN=chromium-browser
+- pip install numpy==1.6.1
+- export CHROME_BIN=/usr/bin/google-chrome-stable
 - export DISPLAY=:99.0
 - bash -e /etc/init.d/xvfb start
 
@@ -42,13 +70,12 @@ install:
 - pushd $TRAVIS_BUILD_DIR
 - source scripts/setup.sh || exit 1
 - source scripts/setup_gae.sh || exit 1
-- mkdir -p $GOOGLE_APP_ENGINE_HOME
-- curl --silent https://storage.googleapis.com/appengine-sdks/deprecated/1919/google_appengine_1.9.19.zip
-  -o gae-download.zip
-- unzip -qq gae-download.zip -d $TOOLS_DIR/google_appengine_1.9.19/
-- rm gae-download.zip
 
 script:
+- if [ $RUN_E2E_TESTS_EDITOR == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="editor"; fi
+- if [ $RUN_E2E_TESTS_EXTENSIONS == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="extensions"; fi
+- if [ $RUN_E2E_TESTS_LIBRARY == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="library"; fi
+- if [ $RUN_E2E_TESTS_MISC == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="misc"; fi
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report; fi
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'false' ]; then bash scripts/run_backend_tests.sh; fi
 - if [ $RUN_LINT == 'true' ]; then bash scripts/install_third_party.sh; python scripts/pre_commit_linter.py --path=.; fi
@@ -59,3 +86,14 @@ script:
 after_success:
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then codecov; fi
 - if [ $RUN_FRONTEND_TESTS == 'true' ]; then codecov --file ../karma_coverage_reports/coverage-final.json; fi
+
+cache:
+  # Cache Oppia's dependencies.
+  directories:
+    - ../node_modules/
+    - ../oppia_tools/
+    - third_party/
+
+before_cache:
+  # Delete python bytecode to prevent cache rebuild.
+  - find third_party -name "*.pyc" -print -delete

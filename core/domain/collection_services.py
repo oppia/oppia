@@ -60,7 +60,6 @@ _STATUS_PUBLICIZED_BONUS = 30
 # This is done to prevent the rank hitting 0 too easily. Note that
 # negative ranks are disallowed in the Search API.
 _DEFAULT_RANK = 20
-_MS_IN_ONE_DAY = 24 * 60 * 60 * 1000
 
 
 def _migrate_collection_to_latest_schema(versioned_collection):
@@ -268,7 +267,7 @@ def get_learner_collection_dict_by_id(
     exp_ids = collection.exploration_ids
     exp_summary_dicts = (
         summary_services.get_displayable_exp_summary_dicts_matching_ids(
-            exp_ids))
+            exp_ids, editor_user_id=user_id))
     exp_summaries_dict_map = {
         exp_summary_dict['id']: exp_summary_dict
         for exp_summary_dict in exp_summary_dicts
@@ -310,18 +309,19 @@ def get_learner_collection_dict_by_id(
                 raise utils.ValidationError(
                     'Expected collection to only reference valid '
                     'explorations, but found an exploration with ID: %s (was '
-                    'the exploration deleted?)' % exploration_id)
+                    'the exploration deleted or is it a private exploration '
+                    'that you do not have edit access to?)'
+                    % exploration_id)
             if collection_is_public and rights_manager.is_exploration_private(
                     exploration_id):
                 raise utils.ValidationError(
                     'Cannot reference a private exploration within a public '
                     'collection, exploration ID: %s' % exploration_id)
 
-        collection_node['exploration'] = {
-            'exists': bool(summary_dict)
-        }
         if summary_dict:
-            collection_node['exploration'].update(summary_dict)
+            collection_node['exploration_summary'] = summary_dict
+        else:
+            collection_node['exploration_summary'] = None
 
     return collection_dict
 
@@ -448,16 +448,17 @@ def get_collection_summaries_matching_query(query_string, cursor=None):
     """Returns a list with all collection summary domain objects matching the
     given search query string, as well as a search cursor for future fetches.
 
-    This method returns exactly feconf.GALLERY_PAGE_SIZE results if there are
-    at least that many, otherwise it returns all remaining results. (If this
-    behaviour does not occur, an error will be logged.) The method also returns
-    a search cursor.
+    This method returns exactly feconf.SEARCH_RESULTS_PAGE_SIZE results if
+    there are at least that many, otherwise it returns all remaining results.
+    (If this behaviour does not occur, an error will be logged.) The method
+    also returns a search cursor.
     """
     summary_models = []
     search_cursor = cursor
 
     for _ in range(MAX_ITERATIONS):
-        remaining_to_fetch = feconf.GALLERY_PAGE_SIZE - len(summary_models)
+        remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
+            summary_models)
 
         collection_ids, search_cursor = search_collections(
             query_string, remaining_to_fetch, cursor=search_cursor)
@@ -471,7 +472,7 @@ def get_collection_summaries_matching_query(query_string, cursor=None):
             else:
                 invalid_collection_ids.append(collection_ids[ind])
 
-        if len(summary_models) == feconf.GALLERY_PAGE_SIZE or (
+        if len(summary_models) == feconf.SEARCH_RESULTS_PAGE_SIZE or (
                 search_cursor is None):
             break
         else:
@@ -479,7 +480,7 @@ def get_collection_summaries_matching_query(query_string, cursor=None):
                 'Search index contains stale collection ids: %s' %
                 ', '.join(invalid_collection_ids))
 
-    if (len(summary_models) < feconf.GALLERY_PAGE_SIZE
+    if (len(summary_models) < feconf.SEARCH_RESULTS_PAGE_SIZE
             and search_cursor is not None):
         logging.error(
             'Could not fulfill search request for query string %s; at least '
@@ -1032,25 +1033,6 @@ def _get_search_rank(collection_id):
         _STATUS_PUBLICIZED_BONUS
         if rights.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED
         else 0)
-
-    # Iterate backwards through the collection history metadata until we find
-    # the most recent snapshot that was committed by a human.
-    last_human_update_ms = 0
-    snapshots_metadata = get_collection_snapshots_metadata(collection_id)
-    for snapshot_metadata in reversed(snapshots_metadata):
-        if snapshot_metadata['committer_id'] != feconf.MIGRATION_BOT_USER_ID:
-            last_human_update_ms = snapshot_metadata['created_on_ms']
-            break
-
-    _time_now_ms = utils.get_current_time_in_millisecs()
-    time_delta_days = int(
-        (_time_now_ms - last_human_update_ms) / _MS_IN_ONE_DAY)
-    if time_delta_days == 0:
-        rank += 80
-    elif time_delta_days == 1:
-        rank += 50
-    elif 2 <= time_delta_days <= 7:
-        rank += 35
 
     # Ranks must be non-negative.
     return max(rank, 0)

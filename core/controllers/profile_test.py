@@ -170,11 +170,19 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', True):
             self.assertEqual(
                 user_services.get_email_preferences(editor_id),
-                {'can_receive_email_updates': True})
+                {
+                    'can_receive_email_updates': True,
+                    'can_receive_editor_role_email': (
+                        feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+                })
         with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', False):
             self.assertEqual(
                 user_services.get_email_preferences(editor_id),
-                {'can_receive_email_updates': False})
+                {
+                    'can_receive_email_updates': False,
+                    'can_receive_editor_role_email': (
+                        feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+                })
 
     def test_user_allowing_emails_on_signup(self):
         self.login(self.EDITOR_EMAIL)
@@ -191,11 +199,19 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', True):
             self.assertEqual(
                 user_services.get_email_preferences(editor_id),
-                {'can_receive_email_updates': True})
+                {
+                    'can_receive_email_updates': True,
+                    'can_receive_editor_role_email': (
+                        feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+                })
         with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', False):
             self.assertEqual(
                 user_services.get_email_preferences(editor_id),
-                {'can_receive_email_updates': True})
+                {
+                    'can_receive_email_updates': True,
+                    'can_receive_editor_role_email': (
+                        feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+                })
 
     def test_user_disallowing_emails_on_signup(self):
         self.login(self.EDITOR_EMAIL)
@@ -212,11 +228,19 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', True):
             self.assertEqual(
                 user_services.get_email_preferences(editor_id),
-                {'can_receive_email_updates': False})
+                {
+                    'can_receive_email_updates': False,
+                    'can_receive_editor_role_email': (
+                        feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+                })
         with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', False):
             self.assertEqual(
                 user_services.get_email_preferences(editor_id),
-                {'can_receive_email_updates': False})
+                {
+                    'can_receive_email_updates': False,
+                    'can_receive_editor_role_email': (
+                        feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+                })
 
 
 class ProfileLinkTests(test_utils.GenericTestBase):
@@ -236,10 +260,10 @@ class ProfileLinkTests(test_utils.GenericTestBase):
         response_dict = self.get_json(
             '%s%s' % (self.PROFILE_PIC_URL, self.USERNAME)
         )
-        # Although the user has a valid username, they have not yet supplied
-        # a profile picture.
-        self.assertIsNone(
-            response_dict['profile_picture_data_url_for_username'])
+        # Every user must have a profile picture.
+        self.assertEqual(
+            response_dict['profile_picture_data_url_for_username'],
+            user_services.DEFAULT_IDENTICON_DATA_URL)
 
 
 class ProfileDataHandlerTests(test_utils.GenericTestBase):

@@ -60,7 +60,8 @@ oppia.directive('oppiaInteractiveEndExploration', [function() {
               stringified_exp_ids: JSON.stringify(
                 authorRecommendedExplorationIds)
             }
-          }).success(function(data) {
+          }).then(function(response) {
+            var data = response.data;
             var foundExpIds = [];
             data.summaries.map(function(expSummary) {
               foundExpIds.push(expSummary.id);

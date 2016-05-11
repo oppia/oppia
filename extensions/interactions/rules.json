@@ -12,6 +12,9 @@
     "OutputEquals": {
       "description": "has output equal to {{x|CodeString}}"
     },
+    "OutputContains": {
+      "description": "has output that contains {{x|CodeString}}"
+    },
     "ResultsInError": {
       "description": "results in an error when run"
     },
