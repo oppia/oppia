@@ -171,9 +171,10 @@ def get_library_groups(language_codes):
         header_to_exp_ids[group['header']] = exp_ids
         all_exp_ids += exp_ids
 
-    all_summaries = filter(
-        lambda x: x is not None,
-        exp_services.get_exploration_summaries_matching_ids(all_exp_ids))
+    all_summaries = [
+        summary for summary in
+        exp_services.get_exploration_summaries_matching_ids(all_exp_ids)
+        if summary is not None]
     all_summary_dicts = {
         summary_dict['id']: summary_dict
         for summary_dict in _get_displayable_exp_summary_dicts(
