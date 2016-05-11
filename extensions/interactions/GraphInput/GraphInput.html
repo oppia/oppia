@@ -1,5 +1,5 @@
 <script type="text/ng-template" id="interaction/GraphInput">
-  <div>
+  <div class="graph-input-container">
     <graph-viz graph="graph"
       can-add-vertex="canAddVertex"
       can-delete-vertex="canDeleteVertex"
@@ -15,6 +15,18 @@
       <[errorMessage]>
     </span>
   </div>
+  <style>
+    .graph-input-container {
+      background: #fff;
+      padding: 8px;
+    }
+
+    @media screen and (max-width: 959px) {
+      .graph-input-container {
+        width: 100vw;
+      }
+    }
+  </style>
 </script>
 
 <script type="text/ng-template" id="response/GraphInput">
