@@ -103,11 +103,12 @@
                 </div>
                 <div ng-if="!exploration.isInteractionInline(activeCard.stateName)"
                      style="opacity: 0.8;">
-		     <md-button ng-class="{'instructions-button' : (!isCurrentSupplementalCardNonempty() || isScreenNarrowAndShowingTutorCard), 
+		     <md-button ng-class="{'instructions-button' : (!isCurrentSupplementalCardNonempty() || isScreenNarrowAndShowingTutorCard()), 
 			     'instructions-no-button' : (isCurrentSupplementalCardNonempty() && !isScreenNarrowAndShowingTutorCard())}"
-                          ng-click="showSupplementalCardIfScreenIsNarrow()">
+		     ng-click="showSupplementalCardIfScreenIsNarrow()">
+		     
 			  <[exploration.getInteractionInstructions(activeCard.stateName)]>
-                    <i ng-if="(isCurrentSupplementalCardNonempty() && !isScreenNarrowAndShowingTutorCard())" class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
+                    <i ng-if="(!isCurrentSupplementalCardNonempty() || isScreenNarrowAndShowingTutorCard())" class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
                   </md-button>
                 </div>
               </div>
