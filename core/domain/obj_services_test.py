@@ -92,7 +92,7 @@ class ObjectDefaultValuesUnitTests(test_utils.GenericTestBase):
                             param_name))
                     self.assertIn(param_name, object_default_vals)
                     self.assertEqual(default_value,
-                        object_default_vals[param_name])
+                                     object_default_vals[param_name])
 
     def test_get_object_default_values_is_valid(self):
         """Checks that the default values provided by get_default_values()

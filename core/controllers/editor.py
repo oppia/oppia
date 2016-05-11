@@ -611,7 +611,7 @@ class UntrainedAnswersHandler(EditorHandler):
                 trained_answers = set()
                 for answer_group in interaction.answer_groups:
                     for rule_spec in answer_group.rule_specs:
-                        if (rule_spec.rule_type == feconf.CLASSIFIER_RULE_TYPE):
+                        if rule_spec.rule_type == feconf.CLASSIFIER_RULE_TYPE:
                             trained_answers.update(
                                 interaction_instance.normalize_answer(trained)
                                 for trained

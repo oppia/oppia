@@ -492,9 +492,9 @@ class Outcome(object):
 class AnswerGroup(object):
     """Value object for an answer group. Answer groups represent a set of rules
     dictating whether a shared feedback should be shared with the user. These
-    rules are ORed together. Answer groups may also support a classifier/implicit
-    rules that involve soft matching of answers to a set of training data
-    and/or example answers dictated by the creator.
+    rules are ORed together. Answer groups may also support a classifier/
+    implicit rules that involve soft matching of answers to a set of training
+    data and/or example answers dictated by the creator.
     """
     def to_dict(self):
         return {
