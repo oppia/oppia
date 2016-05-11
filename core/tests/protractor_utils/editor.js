@@ -21,12 +21,7 @@ var forms = require('./forms.js');
 var gadgets = require('../../../extensions/gadgets/protractor.js');
 var general = require('./general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
-<<<<<<< HEAD
-var gadgets = require('../../../extensions/gadgets/protractor.js');
 var rulesJson = require('../../../extensions/interactions/rules.json');
-=======
-var rules = require('../../../extensions/rules/protractor.js');
->>>>>>> develop
 
 var _NEW_STATE_OPTION = 'A New Card Called...';
 var _CURRENT_STATE_OPTION = '(try again)';
