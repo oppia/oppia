@@ -353,7 +353,7 @@ class RuleSpec(object):
 
     def stringify_classified_rule(self):
         """Returns a string representation of a rule (for the stats log)."""
-        if self.rule_type == feconf.FUZZY_RULE_TYPE:
+        if self.rule_type == feconf.CLASSIFIER_RULE_TYPE:
             return self.rule_type
         else:
             param_list = [
@@ -492,7 +492,7 @@ class Outcome(object):
 class AnswerGroup(object):
     """Value object for an answer group. Answer groups represent a set of rules
     dictating whether a shared feedback should be shared with the user. These
-    rules are ORed together. Answer groups may also support fuzzy/implicit
+    rules are ORed together. Answer groups may also support a classifier/implicit
     rules that involve soft matching of answers to a set of training data
     and/or example answers dictated by the creator.
     """
@@ -521,7 +521,7 @@ class AnswerGroup(object):
         """Rule validation.
 
         Verifies that all rule classes are valid, and that the AnswerGroup only
-        has one fuzzy rule.
+        has one classifier.
         """
         if not isinstance(self.rule_specs, list):
             raise utils.ValidationError(
@@ -532,17 +532,17 @@ class AnswerGroup(object):
                 'There must be at least one rule for each answer group.'
                 % self.rule_specs)
 
-        seen_fuzzy_rule = False
+        seen_classifier = False
         for rule_spec in self.rule_specs:
             if rule_spec.rule_type not in interaction.rules:
                 raise utils.ValidationError(
                     'Unrecognized rule type: %s' % rule_spec.rule_type)
 
-            if rule_spec.rule_type == feconf.FUZZY_RULE_TYPE:
-                if seen_fuzzy_rule:
+            if rule_spec.rule_type == feconf.CLASSIFIER_RULE_TYPE:
+                if seen_classifier:
                     raise utils.ValidationError(
-                        'AnswerGroups can only have one fuzzy rule.')
-                seen_fuzzy_rule = True
+                        'AnswerGroups can only have one classifier.')
+                seen_classifier = True
 
             rule_spec.validate(
                 interaction.get_rule_param_list(rule_spec.rule_type),
@@ -550,12 +550,12 @@ class AnswerGroup(object):
 
         self.outcome.validate()
 
-    def get_fuzzy_rule_index(self):
-        """Will return the answer group's fuzzy rule index, or None if it
-        doesn't exist.
+    def get_classifier_index(self):
+        """Returns the index of the classifier in the answer group's, or None
+        if it doesn't exist.
         """
         for (rule_spec_index, rule_spec) in enumerate(self.rule_specs):
-            if rule_spec.rule_type == feconf.FUZZY_RULE_TYPE:
+            if rule_spec.rule_type == feconf.CLASSIFIER_RULE_TYPE:
                 return rule_spec_index
         return None
 

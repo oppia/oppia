@@ -465,14 +465,14 @@ oppia.controller('StateResponses', [
           'explorationContextService', 'editorContextService',
           'explorationStatesService', 'trainingDataService',
           'answerClassificationService', 'focusService', 'DEFAULT_RULE_NAME',
-          'FUZZY_RULE_TYPE',
+          'CLASSIFIER_RULE_TYPE',
           function(
               $scope, $modalInstance, oppiaExplorationHtmlFormatterService,
               stateInteractionIdService, stateCustomizationArgsService,
               explorationContextService, editorContextService,
               explorationStatesService, trainingDataService,
               answerClassificationService, focusService, DEFAULT_RULE_NAME,
-              FUZZY_RULE_TYPE) {
+              CLASSIFIER_RULE_TYPE) {
             var _explorationId = explorationContextService.getExplorationId();
             var _stateName = editorContextService.getActiveStateName();
             var _state = explorationStatesService.getState(_stateName);
@@ -532,7 +532,7 @@ oppia.controller('StateResponses', [
                         _state.interaction.answer_groups.length &&
                       _state.interaction.answer_groups[
                         answerGroupIndex].rule_specs[
-                          ruleSpecIndex].rule_type !== FUZZY_RULE_TYPE) {
+                          ruleSpecIndex].rule_type !== CLASSIFIER_RULE_TYPE) {
                     $scope.classification.answerGroupIndex = -1;
                   } else {
                     $scope.classification.answerGroupIndex = (

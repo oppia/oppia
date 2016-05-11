@@ -42,10 +42,10 @@ describe('Base controller', function() {
       expect(isEmpty).toEqual(true);
     });
 
-    it('should have matching fuzzy rule constants',
+    it('should have matching classifier constants',
         inject(function($injector) {
-      expect($injector.get('DEFAULT_FUZZY_RULE').rule_type).toEqual(
-        $injector.get('FUZZY_RULE_TYPE'));
+      expect($injector.get('DEFAULT_CLASSIFIER').rule_type).toEqual(
+        $injector.get('CLASSIFIER_RULE_TYPE'));
     }));
   });
 });

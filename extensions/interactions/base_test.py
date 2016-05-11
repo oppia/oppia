@@ -358,7 +358,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertTrue(at_least_one_rule_found)
 
 
-    def test_trainable_interactions_have_fuzzy_rules(self):
+    def test_trainable_interactions_have_classifiers(self):
         all_interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
 
@@ -367,11 +367,11 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 interaction_id)
             if interaction.is_trainable:
                 self.assertIn(
-                    feconf.FUZZY_RULE_TYPE, interaction.rules,
-                    'Expected to find a fuzzy rule in trainable '
+                    feconf.CLASSIFIER_RULE_TYPE, interaction.rules,
+                    'Expected to find a classifier in trainable '
                     'interaction: %s' % interaction_id)
 
-    def test_untrainable_interactions_do_not_have_fuzzy_rules(self):
+    def test_untrainable_interactions_do_not_have_classifiers(self):
         all_interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
 
@@ -380,11 +380,11 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 interaction_id)
             if not interaction.is_trainable:
                 self.assertNotIn(
-                    feconf.FUZZY_RULE_TYPE, interaction.rules,
-                    'Did not expect to find a fuzzy rule in untrainable '
+                    feconf.CLASSIFIER_RULE_TYPE, interaction.rules,
+                    'Did not expect to find a classifier in untrainable '
                     'interaction: %s' % interaction_id)
 
-    def test_trainable_interactions_have_more_than_just_a_fuzzy_rule(self):
+    def test_trainable_interactions_have_more_than_just_a_classifier(self):
         """This ensures that trainable interactions cannot only have a fuzzy
         rule, as that would break frontend functionality (users would not be
         able to create manual answer groups).
@@ -399,7 +399,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertNotEqual(
                     len(interaction.rules), 1,
                     'Expected trainable interaction to have more than just a '
-                    'fuzzy rule: %s' % interaction_id)
+                    'classifier: %s' % interaction_id)
 
     def test_linear_interactions(self):
         """Sanity-check for the number of linear interactions."""
@@ -415,3 +415,6 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 count += 1
 
         self.assertEqual(count, 1)
+
+    def test_objects_in_rules_have_default_values(self):
+        pass

@@ -1558,12 +1558,12 @@ oppia.factory('explorationWarningsService', [
   '$filter', 'graphDataService', 'explorationStatesService',
   'expressionInterpolationService', 'explorationParamChangesService',
   'explorationObjectiveService', 'INTERACTION_SPECS', 'WARNING_TYPES',
-  'STATE_ERROR_MESSAGES', 'FUZZY_RULE_TYPE',
+  'STATE_ERROR_MESSAGES', 'CLASSIFIER_RULE_TYPE',
   function(
       $filter, graphDataService, explorationStatesService,
       expressionInterpolationService, explorationParamChangesService,
       explorationObjectiveService, INTERACTION_SPECS, WARNING_TYPES,
-      STATE_ERROR_MESSAGES, FUZZY_RULE_TYPE) {
+      STATE_ERROR_MESSAGES, CLASSIFIER_RULE_TYPE) {
     var _warningsList = [];
     var stateWarnings = {};
     var hasCriticalStateWarning = false;
@@ -1857,13 +1857,13 @@ oppia.factory('explorationWarningsService', [
       return paramWarningsList;
     };
 
-    var _getAnswerGroupIndexesWithEmptyFuzzyRules = function(state) {
+    var _getAnswerGroupIndexesWithEmptyClassifiers = function(state) {
       var indexes = [];
       var answerGroups = state.interaction.answer_groups;
       for (var i = 0; i < answerGroups.length; i++) {
         var group = answerGroups[i];
         if (group.rule_specs.length == 1 &&
-            group.rule_specs[0].rule_type == FUZZY_RULE_TYPE &&
+            group.rule_specs[0].rule_type == CLASSIFIER_RULE_TYPE &&
             group.rule_specs[0].inputs.training_data.length == 0) {
           indexes.push(i);
         }
@@ -1871,12 +1871,12 @@ oppia.factory('explorationWarningsService', [
       return indexes;
     };
 
-    var _getStatesAndAnswerGroupsWithEmptyFuzzyRules = function() {
+    var _getStatesAndAnswerGroupsWithEmptyClassifiers = function() {
       var results = [];
 
       var states = explorationStatesService.getStates();
       for (var stateName in states) {
-        var groupIndexes = _getAnswerGroupIndexesWithEmptyFuzzyRules(
+        var groupIndexes = _getAnswerGroupIndexesWithEmptyClassifiers(
           states[stateName]);
         if (groupIndexes.length > 0) {
           results.push({
@@ -1990,15 +1990,15 @@ oppia.factory('explorationWarningsService', [
         });
       };
 
-      var statesWithAnswerGroupsWithEmptyFuzzyRules = (
-        _getStatesAndAnswerGroupsWithEmptyFuzzyRules());
-      statesWithAnswerGroupsWithEmptyFuzzyRules.forEach(function(result) {
+      var statesWithAnswerGroupsWithEmptyClassifiers = (
+        _getStatesAndAnswerGroupsWithEmptyClassifiers());
+      statesWithAnswerGroupsWithEmptyClassifiers.forEach(function(result) {
         var warningMessage = 'In \'' + result.stateName + '\'';
         if (result.groupIndexes.length != 1) {
-          warningMessage += ', the following answer groups have fuzzy rules ';
+          warningMessage += ', the following answer groups have classifiers ';
           warningMessage += 'with no training data: ';
         } else {
-          warningMessage += ', the following answer group has a fuzzy rule ';
+          warningMessage += ', the following answer group has a classifier ';
           warningMessage += 'with no training data: ';
         }
         warningMessage += result.groupIndexes.join(', ');

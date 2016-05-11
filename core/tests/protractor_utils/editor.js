@@ -413,8 +413,7 @@ var setRuleParametersInAddResponseModal = function() {
 // Parses the relevant ruleDescription string, and returns an Array containing
 // the types of the rule input parameters.
 var _getRuleParameterTypes = function(interactionId, ruleName) {
-  var ruleDescription = rules.getDescription(
-    interactions.getInteraction(interactionId).answerObjectType, ruleName);
+  var ruleDescription = _getRuleDescription(interactionId, ruleName);
 
   var parameterStart = (ruleDescription.indexOf('{{') === -1) ?
     undefined : ruleDescription.indexOf('{{');

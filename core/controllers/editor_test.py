@@ -254,7 +254,7 @@ class EditorTest(BaseEditorControllerTest):
             def _create_training_data(*arg):
                 return [_create_answer(value) for value in arg]
 
-            # Load the fuzzy rules demo exploration.
+            # Load the string classifier demo exploration.
             exp_id = '15'
             exp_services.load_demo(exp_id)
             rights_manager.release_ownership_of_exploration(
@@ -264,7 +264,7 @@ class EditorTest(BaseEditorControllerTest):
                 '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
             self.assertEqual(
                 exploration_dict['exploration']['title'],
-                'Demonstrating fuzzy rules')
+                'Demonstrating string classifier')
 
             # This test uses the interaction which supports numeric input.
             state_name = 'text'
@@ -279,7 +279,7 @@ class EditorTest(BaseEditorControllerTest):
                 state_name].interaction.answer_groups
             explicit_rule_spec_string = (
                 answer_groups[0].rule_specs[0].stringify_classified_rule())
-            fuzzy_rule_spec_string = (
+            classifier_spec_string = (
                 answer_groups[1].rule_specs[0].stringify_classified_rule())
 
             # Input happy since there is an explicit rule checking for that.
@@ -291,14 +291,14 @@ class EditorTest(BaseEditorControllerTest):
                 exp_id, 1, state_name, exp_domain.DEFAULT_RULESPEC_STR, 'sad')
 
             # Input cheerful: this is current training data and falls under the
-            # fuzzy rule.
+            # classifier.
             event_services.AnswerSubmissionEventHandler.record(
-                exp_id, 1, state_name, fuzzy_rule_spec_string, 'cheerful')
+                exp_id, 1, state_name, classifier_spec_string, 'cheerful')
 
             # Input joyful: this is not training data but will be classified
-            # under the fuzzy rule.
+            # under the classifier.
             event_services.AnswerSubmissionEventHandler.record(
-                exp_id, 1, state_name, fuzzy_rule_spec_string, 'joyful')
+                exp_id, 1, state_name, classifier_spec_string, 'joyful')
 
             # Log in as an editor.
             self.login(self.EDITOR_EMAIL)
@@ -337,13 +337,13 @@ class EditorTest(BaseEditorControllerTest):
             exploration_dict = self.get_json(
                 '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
 
-            # If one of the values is added to the training data of a fuzzy
-            # rule, then it should not be returned as an unhandled answer.
+            # If one of the values is added to the training data of the
+            # classifier, then it should not be returned as an unhandled answer.
             state = exploration_dict['exploration']['states'][state_name]
             answer_group = state['interaction']['answer_groups'][1]
             rule_spec = answer_group['rule_specs'][0]
             self.assertEqual(
-                rule_spec['rule_type'], feconf.FUZZY_RULE_TYPE)
+                rule_spec['rule_type'], feconf.CLASSIFIER_RULE_TYPE)
             rule_spec['inputs']['training_data'].append('joyful')
 
             self.put_json('/createhandler/data/%s' % exp_id, {
@@ -390,7 +390,7 @@ class EditorTest(BaseEditorControllerTest):
             exploration_dict = self.get_json(
                 '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
 
-            # If one of the existing training data elements in the fuzzy rule
+            # If one of the existing training data elements in the classifier
             # is removed (5 in this case), but it is not backed up by an
             # answer, it will not be returned as potential training data.
             state = exploration_dict['exploration']['states'][state_name]

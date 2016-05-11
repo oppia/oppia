@@ -24,9 +24,6 @@
   "GraphInput": {
     "IsIsomorphicTo": {
       "description": "is isomorphic to {{g|Graph}}, including matching labels"
-    },
-    "FuzzyMatches": {
-      "description": "is similar to {{training_data|ListOfGraph}}"
     }
   },
   "ImageClickInput": {
@@ -40,9 +37,6 @@
     },
     "NotWithin": {
       "description": "is not within {{d|Real}} km of {{p|CoordTwoDim}}"
-    },
-    "FuzzyMatches": {
-      "description": "is similar to {{training_data|ListOfCoordTwoDim}}"
     }
   },
   "ItemSelectionInput": {
@@ -179,7 +173,7 @@
     "FuzzyEquals": {
       "description": "is equal to {{x|NormalizedString}}, misspelled by at most one character"
     },
-    "FuzzyMatches": {
+    "ClassifyMatches": {
       "description": "is similar to {{training_data|SetOfNormalizedString}}"
     }
   }

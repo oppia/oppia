@@ -1,0 +1,24 @@
+{
+    "CodeString": "",
+    "CoordTwoDim": [0.0, 0.0],
+    "Graph": {
+        "edges": [],
+        "isDirected": false,
+        "isLabeled": false,
+        "isWeighted": false,
+        "vertices": []
+    },
+    "GraphProperty": "strongly_connected",
+    "Int": 0,
+    "ListOfCoordTwoDim": [],
+    "ListOfGraph": [],
+    "LogicErrorCategory": "mistake",
+    "MusicPhrase": [],
+    "NonnegativeInt": 0,
+    "NormalizedString": "",
+    "Real": 0.0,
+    "SetOfHtmlString": [],
+    "SetOfNormalizedString": [],
+    "SetOfUnicodeString": [],
+    "UnicodeString": ""
+}

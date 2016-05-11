@@ -97,91 +97,6 @@ def require_playable(handler):
     return test_can_play
 
 
-def _evaluate_rule(rule_spec, rule_description, context_params, answer):
-    """Evaluates a rule spec. Returns a float between 0.0 and 1.0."""
-    # NOTE TO DEVELOPERS: This function does not work. It must be removed
-    # prior to merge into develop.
-    pass
-
-
-def classify_hard_rule(state, params, input_type, normalized_answer):
-    """Find the first hard rule that matches."""
-    best_matched_answer_group = None
-    best_matched_answer_group_index = len(state.interaction.answer_groups)
-    best_matched_rule_spec_index = None
-    best_matched_truth_value = feconf.CERTAIN_FALSE_VALUE
-
-    interaction = interaction_registry.Registry.get_interaction_by_id(
-        state.interaction.id)
-
-    for (answer_group_index, answer_group) in enumerate(
-            state.interaction.answer_groups):
-        ored_truth_value = feconf.CERTAIN_FALSE_VALUE
-        for (rule_spec_index, rule_spec) in enumerate(
-                answer_group.rule_specs):
-            if rule_spec.rule_type != feconf.FUZZY_RULE_TYPE:
-                evaluated_truth_value = _evaluate_rule(
-                    rule_spec,
-                    interaction.get_rule_description(rule_spec.rule_type),
-                    params, normalized_answer)
-                if evaluated_truth_value > ored_truth_value:
-                    ored_truth_value = evaluated_truth_value
-                    best_rule_spec_index = rule_spec_index
-        if ored_truth_value == feconf.CERTAIN_TRUE_VALUE:
-            best_matched_truth_value = ored_truth_value
-            best_matched_answer_group = answer_group
-            best_matched_answer_group_index = answer_group_index
-            best_matched_rule_spec_index = best_rule_spec_index
-            return {
-                'outcome': best_matched_answer_group.outcome.to_dict(),
-                'answer_group_index': best_matched_answer_group_index,
-                'classification_certainty': best_matched_truth_value,
-                'rule_spec_index': best_matched_rule_spec_index,
-            }
-
-    return None
-
-
-def classify_soft_rule(state, params, input_type, normalized_answer):
-    """Find the maximum soft rule that matches. This is done by ORing
-    (maximizing) all truth values of all rules over all answer groups. The
-    group with the highest truth value is considered the best match.
-    """
-    best_matched_answer_group = None
-    best_matched_answer_group_index = len(state.interaction.answer_groups)
-    best_matched_rule_spec_index = None
-    best_matched_truth_value = feconf.CERTAIN_FALSE_VALUE
-
-    interaction = interaction_registry.Registry.get_interaction_by_id(
-        state.interaction.id)
-
-    for (answer_group_index, answer_group) in enumerate(
-            state.interaction.answer_groups):
-        fuzzy_rule_spec_index = answer_group.get_fuzzy_rule_index()
-        if fuzzy_rule_spec_index is not None:
-            fuzzy_rule_spec = answer_group.rule_specs[fuzzy_rule_spec_index]
-        else:
-            fuzzy_rule_spec = None
-        if fuzzy_rule_spec is not None:
-            evaluated_truth_value = _evaluate_rule(
-                fuzzy_rule_spec,
-                interaction.get_rule_description(fuzzy_rule_spec.rule_type),
-                params, normalized_answer)
-            if evaluated_truth_value == feconf.CERTAIN_TRUE_VALUE:
-                best_matched_truth_value = evaluated_truth_value
-                best_matched_rule_spec_index = fuzzy_rule_spec_index
-                best_matched_answer_group = answer_group
-                best_matched_answer_group_index = answer_group_index
-                return {
-                    'outcome': best_matched_answer_group.outcome.to_dict(),
-                    'answer_group_index': best_matched_answer_group_index,
-                    'classification_certainty': best_matched_truth_value,
-                    'rule_spec_index': best_matched_rule_spec_index,
-                }
-
-    return None
-
-
 def classify_string_classifier_rule(state, normalized_answer):
     """Run the classifier if no prediction has been made yet. Currently this
     is behind a development flag.
@@ -196,15 +111,15 @@ def classify_string_classifier_rule(state, normalized_answer):
         [doc, []] for doc in state.interaction.confirmed_unclassified_answers]
     for (answer_group_index, answer_group) in enumerate(
             state.interaction.answer_groups):
-        fuzzy_rule_spec_index = answer_group.get_fuzzy_rule_index()
-        if fuzzy_rule_spec_index is not None:
-            fuzzy_rule_spec = answer_group.rule_specs[fuzzy_rule_spec_index]
+        classifier_spec_index = answer_group.get_classifier_index()
+        if classifier_spec_index is not None:
+            classifier_spec = answer_group.rule_specs[classifier_spec_index]
         else:
-            fuzzy_rule_spec = None
-        if fuzzy_rule_spec is not None:
+            classifier_spec = None
+        if classifier_spec is not None:
             training_examples.extend([
                 [doc, [str(answer_group_index)]]
-                for doc in fuzzy_rule_spec.inputs['training_data']])
+                for doc in classifier_spec.inputs['training_data']])
     if len(training_examples) > 0:
         sc.load_examples(training_examples)
         doc_ids = sc.add_examples_for_predicting([normalized_answer])
@@ -216,8 +131,8 @@ def classify_string_classifier_rule(state, normalized_answer):
                 predicted_answer_group_index]
             best_matched_truth_value = feconf.CERTAIN_TRUE_VALUE
             for rule_spec in predicted_answer_group.rule_specs:
-                if rule_spec.rule_type == feconf.FUZZY_RULE_TYPE:
-                    best_matched_rule_spec_index = fuzzy_rule_spec_index
+                if rule_spec.rule_type == feconf.CLASSIFIER_RULE_TYPE:
+                    best_matched_rule_spec_index = classifier_spec_index
                     break
             best_matched_answer_group = predicted_answer_group
             best_matched_answer_group_index = predicted_answer_group_index
@@ -236,7 +151,7 @@ def classify_string_classifier_rule(state, normalized_answer):
 # TODO(bhenning): Add more tests for classification, such as testing multiple
 # rule specs over multiple answer groups and making sure the best match over all
 # those rules is picked.
-def classify(exp_id, state, answer, params):
+def classify(state, answer):
     """Normalize the answer and select among the answer groups the group in
     which the answer best belongs. The best group is decided by finding the
     first rule best satisfied by the answer. Returns a dict with the following
@@ -260,16 +175,13 @@ def classify(exp_id, state, answer, params):
     interaction_instance = interaction_registry.Registry.get_interaction_by_id(
         state.interaction.id)
     normalized_answer = interaction_instance.normalize_answer(answer)
+    response = None
 
-    input_type = interaction_instance.answer_type
-
-    response = classify_hard_rule(state, params, input_type, normalized_answer)
-    if response is None:
-        response = classify_soft_rule(
-            state, params, input_type, normalized_answer)
     if (interaction_instance.is_string_classifier_trainable and
-            feconf.ENABLE_STRING_CLASSIFIER and response is None):
+            feconf.ENABLE_STRING_CLASSIFIER):
         response = classify_string_classifier_rule(state, normalized_answer)
+    elif feconf.ENABLE_STRING_CLASSIFIER:
+        raise Exception('No classifier found for interaction.')
 
     # The best matched group must match above a certain threshold. If no group
     # meets this requirement, then the default 'group' automatically matches
@@ -497,7 +409,7 @@ class ClassifyHandler(base.BaseHandler):
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     @require_playable
-    def post(self, exploration_id):
+    def post(self, unused_exploration_id):
         """Handles POST requests."""
         # A domain object representing the old state.
         old_state = exp_domain.State.from_dict(self.payload.get('old_state'))
@@ -507,7 +419,7 @@ class ClassifyHandler(base.BaseHandler):
         params = self.payload.get('params')
         params['answer'] = answer
 
-        self.render_json(classify(exploration_id, old_state, answer, params))
+        self.render_json(classify(old_state, answer))
 
 
 class ReaderFeedbackHandler(base.BaseHandler):

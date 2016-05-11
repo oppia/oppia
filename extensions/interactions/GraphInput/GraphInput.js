@@ -914,11 +914,6 @@ oppia.factory('graphInputRulesService', [
     },
     IsIsomorphicTo: function(answer, inputs) {
       return isIsomorphic(answer, inputs.g);
-    },
-    FuzzyMatches: function(answer, inputs) {
-      return inputs.training_data.some(function(trainingGraph) {
-        return isIsomorphic(answer, trainingGraph);
-      });
     }
   };
 }]);

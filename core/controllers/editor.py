@@ -31,9 +31,9 @@ from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import gadget_registry
 from core.domain import interaction_registry
+from core.domain import obj_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
-from core.domain import rule_domain
 from core.domain import stats_services
 from core.domain import user_services
 from core.domain import value_generators_domain
@@ -204,7 +204,7 @@ class ExplorationPage(EditorHandler):
             'GADGET_SPECS': gadget_registry.Registry.get_all_specs(),
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'PANEL_SPECS': feconf.PANELS_PROPERTIES,
-            'DEFAULT_OBJECT_VALUES': rule_domain.get_default_object_values(),
+            'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
             'additional_angular_modules': additional_angular_modules,
             'can_delete': rights_manager.Actor(
                 self.user_id).can_delete(
@@ -589,10 +589,10 @@ class UntrainedAnswersHandler(EditorHandler):
 
         # The total number of possible answers is 100 because it requests the
         # top 50 answers matched to the default rule and the top 50 answers
-        # matched to a fuzzy rule individually.
+        # matched to the classifier individually.
         answers = stats_services.get_top_state_rule_answers(
             exploration_id, state_name, [
-                exp_domain.DEFAULT_RULESPEC_STR, feconf.FUZZY_RULE_TYPE],
+                exp_domain.DEFAULT_RULESPEC_STR, feconf.CLASSIFIER_RULE_TYPE],
             self.NUMBER_OF_TOP_ANSWERS_PER_RULE)
 
         interaction = state.interaction
@@ -611,7 +611,7 @@ class UntrainedAnswersHandler(EditorHandler):
                 trained_answers = set()
                 for answer_group in interaction.answer_groups:
                     for rule_spec in answer_group.rule_specs:
-                        if rule_spec.rule_type == feconf.FUZZY_RULE_TYPE:
+                        if (rule_spec.rule_type == feconf.CLASSIFIER_RULE_TYPE):
                             trained_answers.update(
                                 interaction_instance.normalize_answer(trained)
                                 for trained

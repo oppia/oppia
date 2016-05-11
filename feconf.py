@@ -49,11 +49,13 @@ FRONTEND_TEMPLATES_DIR = os.path.join(
     'core', 'templates', TEMPLATES_DIR_PREFIX, 'head')
 DEPENDENCIES_TEMPLATES_DIR = os.path.join('extensions', 'dependencies')
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
+OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
+    'extensions', 'interactions', 'object_defaults.json')
 
 # Constants related to rules.
 CERTAIN_TRUE_VALUE = 1.0
 CERTAIN_FALSE_VALUE = 0.0
-FUZZY_RULE_TYPE = 'FuzzyMatches'
+CLASSIFIER_RULE_TYPE = 'ClassifyMatches'
 
 # The maximum number of results to retrieve in a datastore query.
 DEFAULT_QUERY_LIMIT = 1000
@@ -333,7 +335,7 @@ DEMO_EXPLORATIONS = {
     u'12': 'protractor_test_1.yaml',
     u'13': 'solar_system',
     u'14': 'about_oppia.yaml',
-    u'15': 'fuzzy_exploration.yaml',
+    u'15': 'classifier_demo_exploration.yaml',
     u'16': 'all_interactions',
 }
 
@@ -410,6 +412,7 @@ COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
+# Synchronize this with base.js
 ENABLE_STRING_CLASSIFIER = False
 
 # Output formats of downloaded explorations.

@@ -19,6 +19,16 @@
 describe('Answer classification service', function() {
   beforeEach(module('oppia'));
 
+  beforeEach(function() {
+    module(function($provide) {
+      $provide.constant('INTERACTION_SPECS', {
+        RuleTest: {
+          is_string_classifier_trainable: false
+        }
+      });
+    });
+  });
+
   var acs, $httpBackend, successHandler, failHandler, $rootScope, state;
   beforeEach(inject(function($injector) {
     acs = $injector.get('answerClassificationService');
@@ -34,6 +44,7 @@ describe('Answer classification service', function() {
         value: 'content'
       }],
       interaction: {
+        id: 'RuleTest',
         answer_groups: [{
           outcome: 'outcome 1',
           rule_specs: [{

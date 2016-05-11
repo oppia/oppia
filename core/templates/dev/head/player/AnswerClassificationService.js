@@ -17,12 +17,12 @@
  */
 
 oppia.factory('answerClassificationService', [
-  '$http', '$q', 'LearnerParamsService',
-  function($http, $q, LearnerParamsService) {
+  '$http', '$q', 'LearnerParamsService', 'INTERACTION_SPECS',
+  'ENABLE_STRING_CLASSIFIER',
+  function($http, $q, LearnerParamsService, INTERACTION_SPECS,
+      ENABLE_STRING_CLASSIFIER, CLASSIFIER_RULE_TYPE) {
     /**
-     * Finds the first answer group with a rule that returns true. This should
-     * be synced with the backend classify() function in
-     * core/controllers/reader.
+     * Finds the first answer group with a rule that returns true.
      *
      * @param {*} answer - The answer that the user has submitted.
      * @param {array} answerGroups - The answer groups of the interaction. Each
@@ -46,8 +46,9 @@ oppia.factory('answerClassificationService', [
       for (var i = 0; i < answerGroups.length; i++) {
         for (var j = 0; j < answerGroups[i].rule_specs.length; j++) {
           var ruleSpec = answerGroups[i].rule_specs[j];
-          if (interactionRulesService[ruleSpec.rule_type](
-              answer, ruleSpec.inputs)) {
+          if (ruleSpec.rule_type != CLASSIFIER_RULE_TYPE &&
+              interactionRulesService[ruleSpec.rule_type](
+                answer, ruleSpec.inputs)) {
             return {
               outcome: answerGroups[i].outcome,
               answerGroupIndex: i,
@@ -96,13 +97,21 @@ oppia.factory('answerClassificationService', [
           explorationId, oldState, answer, isInEditorMode,
           interactionRulesService) {
         var deferred = $q.defer();
-        if (interactionRulesService) {
-          var answerGroups = oldState.interaction.answer_groups;
-          var defaultOutcome = oldState.interaction.default_outcome;
+        var result = null;
+        var answerGroups = oldState.interaction.answer_groups;
+        var defaultOutcome = oldState.interaction.default_outcome;
 
-          deferred.resolve(classifyAnswer(
-            answer, answerGroups, defaultOutcome, interactionRulesService));
-        } else {
+        if (interactionRulesService) {
+          result = classifyAnswer(
+            answer, answerGroups, defaultOutcome, interactionRulesService);
+          deferred.resolve(result);
+        }
+        console.log(INTERACTION_SPECS);
+
+        if (result === null || (result.outcome == defaultOutcome &&
+            INTERACTION_SPECS[oldState.interaction.id]
+              .is_string_classifier_trainable &&
+            ENABLE_STRING_CLASSIFIER)) {
           // TODO(bhenning): Figure out a long-term solution for determining
           // what params should be passed to the batch classifier.
           var classifyUrl = '/explorehandler/classify/' + explorationId;

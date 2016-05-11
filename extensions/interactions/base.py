@@ -79,7 +79,7 @@ class BaseInteraction(object):
     is_terminal = False
     # Whether the interaction has only one possible answer.
     is_linear = False
-    # Whether this interaction supports training and fuzzy classification.
+    # Whether this interaction supports training and classification.
     is_trainable = False
     # Whether this interaction supports the string classifier.
     # TODO(chiangs): remove once classifier_services is generalized.

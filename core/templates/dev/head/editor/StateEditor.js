@@ -123,7 +123,7 @@ oppia.controller('StateEditor', [
 ]);
 
 // A service which handles opening and closing the training modal used for both
-// unresolved answers and answers within the training data of a fuzzy rule.
+// unresolved answers and answers within the training data of a classifier.
 oppia.factory('trainingModalService', ['$rootScope', '$modal', 'alertsService',
     function($rootScope, $modal, alertsService) {
   return {
@@ -199,13 +199,13 @@ oppia.factory('trainingModalService', ['$rootScope', '$modal', 'alertsService',
 
 // A service that, given an exploration ID and state name, determines all of the
 // answers which do not have certain classification and are not currently used
-// as part of any fuzzy rule training models.
+// as part of any classifier training models.
 oppia.factory('trainingDataService', [
-  '$rootScope', '$http', 'responsesService', 'FUZZY_RULE_TYPE',
-  'DEFAULT_FUZZY_RULE',
+  '$rootScope', '$http', 'responsesService', 'CLASSIFIER_RULE_TYPE',
+  'DEFAULT_CLASSIFIER',
   function(
-      $rootScope, $http, responsesService, FUZZY_RULE_TYPE,
-      DEFAULT_FUZZY_RULE) {
+      $rootScope, $http, responsesService, CLASSIFIER_RULE_TYPE,
+      DEFAULT_CLASSIFIER) {
     var _trainingDataAnswers = [];
     var _trainingDataCounts = [];
 
@@ -247,22 +247,22 @@ oppia.factory('trainingDataService', [
         var answerGroup = answerGroups[i];
         var ruleSpecs = answerGroup.rule_specs;
         var trainingData = null;
-        var fuzzyRuleIndex = -1;
+        var classifierIndex = -1;
         for (var j = 0; j < ruleSpecs.length; j++) {
           var ruleSpec = ruleSpecs[j];
-          if (ruleSpec.rule_type == FUZZY_RULE_TYPE) {
+          if (ruleSpec.rule_type == CLASSIFIER_RULE_TYPE) {
             trainingData = ruleSpec.inputs.training_data;
-            fuzzyRuleIndex = j;
+            classifierIndex = j;
             break;
           }
         }
         if (trainingData &&
             _removeAnswerFromTrainingData(answer, trainingData) != -1) {
           if (trainingData.length == 0 && ruleSpecs.length > 1) {
-            // If the last of the training data for a fuzzy rule has been
-            // removed and the fuzzy rule is not the only rule in the group,
+            // If the last of the training data for a classifier has been
+            // removed and the classifier is not the only rule in the group,
             // remove the rule since it is no longer doing anything.
-            ruleSpecs.splice(fuzzyRuleIndex, 1);
+            ruleSpecs.splice(classifierIndex, 1);
           }
           updatedAnswerGroups = true;
         }
@@ -336,27 +336,27 @@ oppia.factory('trainingDataService', [
         var answerGroup = responsesService.getAnswerGroup(answerGroupIndex);
         var rules = answerGroup.rule_specs;
 
-        // Ensure the answer group has a fuzzy rule.
-        var fuzzyRule = null;
+        // Ensure the answer group has a classifier.
+        var classifier = null;
         for (var i = 0; i < rules.length; i++) {
           var rule = rules[i];
-          if (rule.rule_type == FUZZY_RULE_TYPE) {
-            fuzzyRule = rule;
+          if (rule.rule_type == CLASSIFIER_RULE_TYPE) {
+            classifier = rule;
             break;
           }
         }
-        if (!fuzzyRule) {
-          // Create new fuzzy rule for classification. All fuzzy rules should
+        if (!classifier) {
+          // Create new classifier for classification. All classifiers should
           // match this schema.
-          fuzzyRule = angular.copy(DEFAULT_FUZZY_RULE);
-          rules.push(fuzzyRule);
+          classifier = angular.copy(DEFAULT_CLASSIFIER);
+          rules.push(classifier);
         }
 
         // Train the rule to include this answer, but only if it's not already
         // in the training data.
         if (_getIndexOfTrainingData(
-            answer, fuzzyRule.inputs.training_data) == -1) {
-          fuzzyRule.inputs.training_data.push(answer);
+            answer, classifier.inputs.training_data) == -1) {
+          classifier.inputs.training_data.push(answer);
         }
 
         responsesService.updateAnswerGroup(answerGroupIndex, {

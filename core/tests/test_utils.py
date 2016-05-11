@@ -117,14 +117,6 @@ class TestBase(unittest.TestCase):
     def tearDown(self):
         raise NotImplementedError
 
-    def assertFuzzyTrue(self, value):  # pylint: disable=invalid-name
-        self.assertEqual(value, feconf.CERTAIN_TRUE_VALUE)
-        self.assertTrue(isinstance(value, float))
-
-    def assertFuzzyFalse(self, value):  # pylint: disable=invalid-name
-        self.assertEqual(value, feconf.CERTAIN_FALSE_VALUE)
-        self.assertTrue(isinstance(value, float))
-
     def _assert_validation_error(self, item, error_substring):
         """Checks that the given item passes default validation."""
         with self.assertRaisesRegexp(utils.ValidationError, error_substring):
