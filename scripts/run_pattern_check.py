@@ -19,6 +19,11 @@
 
 import subprocess
 
+BAD_PATTERNS = {'__author__': 'Please remove author tags from \
+this file.',
+                'datetime.datetime.now()': 'Please use datetime.datetime.u\
+tcnow() instead of datetime.datetime.now().'
+               }
 
 def _get_changed_filenames():
     """Returns a list of modified files (both staged and unstaged)
@@ -37,19 +42,17 @@ def _get_changed_filenames():
 def check_for_bad_patterns():
     total_files_checked = 0
     total_error_count = 0
-    files = _get_changed_filenames()
-    if len(files) != 0:
-        for filename in files:
-            with open(filename) as f:
+    filenames = _get_changed_filenames()
+    if len(filenames) != 0:
+        for i in filenames:
+            with open(i) as f:
                 content = f.read()
                 total_files_checked += 1
-                if "__author__" in content:
-                    print filename + " --> " + "Please remove author tags from\
-                    this file."
+                if '__author__' in content:
+                    print i, ' --> ', BAD_PATTERNS['__author__']
                     total_error_count += 1
-                if "datetime.datetime.now()" in content:
-                    print filename + " --> " + "Please use datetime.datetime.u\
-                    tcnow() instead of datetime.datetime.now()."
+                if 'datetime.datetime.now()' in content:
+                    print i, ' --> ', BAD_PATTERNS['datetime.datetime.now()']
                     total_error_count += 1
 
     return total_files_checked, total_error_count
