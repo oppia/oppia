@@ -1,0 +1,24 @@
+# Source files
+# ============
+*.pxd		  text eol=lf
+*.py 		  text eol=lf
+*.py3 		text eol=lf
+*.pyw 		text eol=lf
+*.pyx  		text eol=lf
+*.sh      text eol=lf
+*.js      text eol=lf
+*.txt     text eol=lf
+*.css     text eol=lf
+*.html    text eol=lf
+*.md      text eol=lf
+*.yml     text eol=lf
+*.json    text eol=lf
+
+# Binary files
+# ============
+*.db		binary
+*.p 		binary
+*.pkl 		binary
+*.pyc 		binary
+*.pyd		binary
+*.pyo 		binary
