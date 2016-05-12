@@ -17,32 +17,39 @@
 # Pre-submission script for Oppia.
 # This script checks for unaccepted text patterns in the commit.
 
-import subprocess
+import fnmatch
+import os
+import sys
 
-BAD_PATTERNS = {'__author__': 'Please remove author tags from \
-this file.',
-                'datetime.datetime.now()': 'Please use datetime.datetime.u\
-tcnow() instead of datetime.datetime.now().'
-               }
+BAD_PATTERNS = {
+    '__author__': (
+        'Please remove author tags from this file.'),
+    'datetime.datetime.now()': (
+        'Please use datetime.datetime.utcnow() instead of'
+        'datetime.datetime.now().')
+    }
 
-def _get_changed_filenames():
-    """Returns a list of modified files (both staged and unstaged)
 
-    Returns:
-        a list of filenames of modified files
-    """
-    unstaged_files = subprocess.check_output([
-        'git', 'diff', '--name-only']).splitlines()
-    staged_files = subprocess.check_output([
-        'git', 'diff', '--cached', '--name-only',
-        '--diff-filter=ACM']).splitlines()
-    return unstaged_files + staged_files
+EXCLUDE = ['third_party/*', '.git/*', '*.pyc', 'CHANGELOG']
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_TEST_PATH = os.path.join(_PARENT_DIR, 'oppia')
 
+
+def _get_all_files(dir_path, excluded_patterns):
+    files_in_directory = []
+    for _dir, _, files in os.walk(dir_path):
+        for file_name in files:
+            filename = os.path.relpath(
+                os.path.join(_dir, file_name), os.getcwd())
+            if not any([fnmatch.fnmatch(filename, gp) for gp in
+                        excluded_patterns]):
+                files_in_directory.append(filename)
+    return files_in_directory
 
 def check_for_bad_patterns():
     total_files_checked = 0
     total_error_count = 0
-    filenames = _get_changed_filenames()
+    filenames = _get_all_files(_TEST_PATH, EXCLUDE)
     if len(filenames) != 0:
         for i in filenames:
             with open(i) as f:
@@ -72,7 +79,7 @@ def main():
             print '(%s FILES CHECKED, %s ERRORS FOUND)' % (total_files_checked\
             , total_error_count)
         else:
-            exit(1)
+            sys.exit(1)
 
 
 if __name__ == '__main__':
