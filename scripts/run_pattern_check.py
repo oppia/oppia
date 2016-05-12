@@ -30,7 +30,10 @@ BAD_PATTERNS = {
     }
 
 
-EXCLUDE = ['third_party/*', '.git/*', '*.pyc', 'CHANGELOG', 'scripts/run_pattern_check.py', 'integrations/*', 'integrations_dev/*']
+EXCLUDE = ['third_party/*', '.git/*', '*.pyc', 'CHANGELOG',
+           'scripts/run_pattern_check.py', 'integrations/*',
+           'integrations_dev/*']
+
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _TEST_PATH = os.path.join(_PARENT_DIR, 'oppia')
 
