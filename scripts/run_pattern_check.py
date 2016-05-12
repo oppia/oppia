@@ -76,9 +76,11 @@ def main():
         print "WARNING: No files were checked."
     else:
         if total_files_checked and total_error_count == 0:
-            print '(%s FILES CHECKED, %s ERRORS FOUND)' % (total_files_checked\
-            , total_error_count)
+            print '(%s FILES CHECKED, %s ERRORS FOUND)' % (total_files_checked
+                                                           , total_error_count)
         else:
+            print '(%s FILES CHECKED, %s ERRORS FOUND)' % (total_files_checked
+                                                           , total_error_count)
             sys.exit(1)
 
 
