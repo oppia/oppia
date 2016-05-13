@@ -103,7 +103,8 @@
                 </div>
                 <div ng-if="!exploration.isInteractionInline(activeCard.stateName)"
                      style="opacity: 0.8;">
-		     <div style="text-transform: uppercase;padding: 6px 12px;" ng-if ="isCurrentSupplementalCardNonempty() && !isScreenNarrowAndShowingTutorCard()">
+		     <div ng-if ="isCurrentSupplementalCardNonempty() && !isScreenNarrowAndShowingTutorCard()" 
+			     style="text-transform: uppercase;padding: 6px 12px;"> 
 				  <[exploration.getInteractionInstructions(activeCard.stateName)]>
 		     </div>
 		   <div ng-if="(!isCurrentSupplementalCardNonempty() || isScreenNarrowAndShowingTutorCard())">
