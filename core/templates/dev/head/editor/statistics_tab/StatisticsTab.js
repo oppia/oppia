@@ -17,7 +17,7 @@
  * exploration editor.
  */
 
-oppia.controller('ExplorationStatistics', [
+oppia.controller('StatisticsTab', [
   '$scope', '$http', '$modal', 'alertsService', 'explorationStatesService',
   'explorationData', 'computeGraphService', 'oppiaDatetimeFormatter',
   function(
