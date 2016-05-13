@@ -103,13 +103,16 @@
                 </div>
                 <div ng-if="!exploration.isInteractionInline(activeCard.stateName)"
                      style="opacity: 0.8;">
-		     <md-button ng-class="{'instructions-button' : (!isCurrentSupplementalCardNonempty() || isScreenNarrowAndShowingTutorCard()), 
-			     'instructions-no-button' : (isCurrentSupplementalCardNonempty() && !isScreenNarrowAndShowingTutorCard())}"
-		     ng-click="showSupplementalCardIfScreenIsNarrow()">
-		     
-			  <[exploration.getInteractionInstructions(activeCard.stateName)]>
-                    <i ng-if="(!isCurrentSupplementalCardNonempty() || isScreenNarrowAndShowingTutorCard())" class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
-                  </md-button>
+		     <div style="text-transform: uppercase;padding: 6px 12px;" ng-if ="isCurrentSupplementalCardNonempty() && !isScreenNarrowAndShowingTutorCard()">
+				  <[exploration.getInteractionInstructions(activeCard.stateName)]>
+		     </div>
+		   <div ng-if="(!isCurrentSupplementalCardNonempty() || isScreenNarrowAndShowingTutorCard())">
+			<md-button class="instructions-button"
+			     ng-click="showSupplementalCardIfScreenIsNarrow()">
+				  <[exploration.getInteractionInstructions(activeCard.stateName)]>
+			          <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
+			</md-button>
+		  </div>
                 </div>
               </div>
             </div>
@@ -624,12 +627,6 @@
     .conversation-skin-main-tutor-card .instructions-button {
         background: inherit;
         border: none;
-    }
-
-    .conversation-skin-main-tutor-card .instructions-no-button:hover,
-    .conversation-skin-main-tutor-card .instructions-no-button:active {
-    	background-color: transparent !important;
-        cursor: default !important;
     }
 
     @media screen and (max-width: 959px) {
