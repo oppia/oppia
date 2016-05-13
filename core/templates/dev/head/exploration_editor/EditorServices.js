@@ -18,8 +18,8 @@
 
 // Service for handling all interactions with the exploration editor backend.
 oppia.factory('explorationData', [
-  '$http', '$log', 'alertsService', '$q',
-  function($http, $log, alertsService, $q) {
+  '$http', '$log', 'alertsService', '$q', 'changeListService',
+  function($http, $log, alertsService, $q, changeListService) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
     var pathnameArray = window.location.pathname.split('/');
@@ -59,7 +59,17 @@ oppia.factory('explorationData', [
             $log.info('Retrieved exploration data.');
             $log.info(response.data);
 
-            explorationData.data = response.data;
+            // FIXME: Update this value based on what exactly is being sent from
+            // the backend (corresponding to the ‘current exploration’ data).
+            if (response.data.currentExplorationData) {
+              explorationData.data = response.data.currentExplorationData;
+              // Initialize the changeList by the one received from the backend.
+              changeListService.loadAutosavedChangeList(
+                response.data.changeList);
+            } else {
+              explorationData.data = response.data;
+            }
+
             return response.data;
           });
         }
@@ -69,6 +79,21 @@ oppia.factory('explorationData', [
         $http.put(
             resolvedAnswersUrlPrefix + '/' + encodeURIComponent(stateName), {
           resolved_answers: resolvedAnswersList
+        });
+      },
+      autosaveChangeList: function(changeList, successCallback, errorCallback) {
+        // FIXME: put in the autosave PUT request url here.
+        $http.put('', {
+          change_list: changeList,
+          version: explorationData.data.version
+        }).then(function(response) {
+          if (successCallback) {
+            successCallback(response);
+          }
+        }, function() {
+          if (errorCallback) {
+            errorCallback();
+          }
         });
       },
       /**
@@ -156,11 +181,12 @@ oppia.factory('editabilityService', [function() {
 // A service that maintains a provisional list of changes to be committed to
 // the server.
 oppia.factory('changeListService', [
-    '$rootScope', 'alertsService', function($rootScope, alertsService) {
-  // TODO(sll): Implement undo, redo functionality. Show a message on each step
-  // saying what the step is doing.
-  // TODO(sll): Allow the user to view the list of changes made so far, as well
-  // as the list of changes in the undo stack.
+  '$rootScope', 'alertsService',
+  function($rootScope, alertsService) {
+  // TODO(sll): Implement undo, redo functionality. Show a message on each
+  // step saying what the step is doing.
+  // TODO(sll): Allow the user to view the list of changes made so far, as
+  // well as the list of changes in the undo stack.
 
   // Temporary buffer for changes made to the exploration.
   var explorationChangeList = [];
@@ -215,6 +241,18 @@ oppia.factory('changeListService', [
     }
     explorationChangeList.push(changeDict);
     undoneChangeStack = [];
+
+    // FIXME: Uncomment this block when the autosave PUT request url is fixed.
+    // explorationData.autosaveChangeList(explorationChangeList,
+    //   function(response) {
+    //   // Check for error in response:
+    //   // If error is present -> Check for the type of error occurred
+    //   // Display the corresponding modals in both cases:
+    //   // 1. Non-strict Validation Fail:
+    //   // autosaveInfoModalsService.showNonStrictFailModal()
+    //   // 2. Version Mismatch:
+    //   // autosaveInfoModalsService.showVersionMismatchModal()
+    // });
   };
 
   return {
@@ -348,6 +386,15 @@ oppia.factory('changeListService', [
     },
     isExplorationLockedForEditing: function() {
       return explorationChangeList.length > 0;
+    },
+    /**
+     * Initializes the current changeList with the one received from backend.
+     * This behavior exists only in case of an autosave.
+     *
+     * @param {object} changeList - Autosaved changeList data (from backend)
+     */
+    loadAutosavedChangeList: function(changeList) {
+      explorationChangeList = changeList;
     },
     /**
      * Saves a change dict that represents the renaming of a gadget.
