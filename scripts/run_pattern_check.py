@@ -26,13 +26,15 @@ BAD_PATTERNS = {
         'Please remove author tags from this file.'),
     'datetime.datetime.now()': (
         'Please use datetime.datetime.utcnow() instead of'
-        'datetime.datetime.now().')
+        'datetime.datetime.now().'),
+    '\t': (
+        'Please use spaces instead of tabs.')
     }
 
 
 EXCLUDE = ['third_party/*', '.git/*', '*.pyc', 'CHANGELOG',
            'scripts/run_pattern_check.py', 'integrations/*',
-           'integrations_dev/*']
+           'integrations_dev/*', 'static/*', '*.png', '*.zip']
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _TEST_PATH = os.path.join(_PARENT_DIR, 'oppia')
@@ -63,6 +65,9 @@ def check_for_bad_patterns():
                     total_error_count += 1
                 if 'datetime.datetime.now()' in content:
                     print i, ' --> ', BAD_PATTERNS['datetime.datetime.now()']
+                    total_error_count += 1
+                if '\t' in content:
+                    print i, ' --> ', BAD_PATTERNS['\t']
                     total_error_count += 1
 
     return total_files_checked, total_error_count
