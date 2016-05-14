@@ -345,7 +345,15 @@ def _pre_commit_linter():
 
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             summary_messages]):
+        return 1
+
+
+def main():
+    status_linter = _pre_commit_linter()
+    status_pattern = os.system('python scripts/run_pattern_check.py')
+    if status_linter == 1 or status_pattern == 256:
         sys.exit(1)
 
+
 if __name__ == '__main__':
-    _pre_commit_linter()
+    main()

@@ -29,12 +29,13 @@ BAD_PATTERNS = {
         'datetime.datetime.now().'),
     '\t': (
         'Please use spaces instead of tabs.')
-    }
+}
 
 
-EXCLUDE = ['third_party/*', '.git/*', '*.pyc', 'CHANGELOG',
-           'scripts/run_pattern_check.py', 'integrations/*',
-           'integrations_dev/*', '*.svg', '*.png', '*.zip', '*.ico', '*.jpg']
+EXCLUDED_PATHS = [
+    'third_party/*', '.git/*', '*.pyc', 'CHANGELOG',
+    'scripts/run_pattern_check.py', 'integrations/*',
+    'integrations_dev/*', '*.svg', '*.png', '*.zip', '*.ico', '*.jpg']
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _TEST_PATH = os.path.join(_PARENT_DIR, 'oppia')
@@ -51,10 +52,11 @@ def _get_all_files(dir_path, excluded_patterns):
                 files_in_directory.append(filename)
     return files_in_directory
 
+
 def check_for_bad_patterns():
     total_files_checked = 0
     total_error_count = 0
-    filenames = _get_all_files(_TEST_PATH, EXCLUDE)
+    filenames = _get_all_files(_TEST_PATH, EXCLUDED_PATHS)
     if len(filenames) != 0:
         for i in filenames:
             with open(i) as f:
@@ -74,21 +76,18 @@ def check_for_bad_patterns():
 
 
 def main():
+    print 'Starting Pattern Checks'
+    print '----------------------------------------'
     total_files_checked, total_error_count = check_for_bad_patterns()
     print ''
-    print '+------------------+'
-    print '| SUMMARY OF TESTS |'
-    print '+------------------+'
+    print '----------------------------------------'
     print ''
     if total_files_checked == 0:
         print "WARNING: No files were checked."
     else:
-        if total_files_checked and total_error_count == 0:
-            print '(%s FILES CHECKED, %s ERRORS FOUND)' % (total_files_checked
-                                                           , total_error_count)
-        else:
-            print '(%s FILES CHECKED, %s ERRORS FOUND)' % (total_files_checked
-                                                           , total_error_count)
+        print '(%s FILES CHECKED, %s ERRORS FOUND)' % (
+            total_files_checked, total_error_count)
+        if total_error_count != 0:
             sys.exit(1)
 
 
