@@ -1560,15 +1560,13 @@ oppia.constant('STATE_ERROR_MESSAGES', {
 oppia.factory('explorationWarningsService', [
   '$filter', 'graphDataService', 'explorationStatesService',
   'expressionInterpolationService', 'explorationParamChangesService',
-  'explorationObjectiveService', 'parameterMetadataService',
-  'INTERACTION_SPECS', 'WARNING_TYPES', 'STATE_ERROR_MESSAGES',
-  'FUZZY_RULE_TYPE',
+  'parameterMetadataService', 'INTERACTION_SPECS', 'WARNING_TYPES',
+  'STATE_ERROR_MESSAGES', 'FUZZY_RULE_TYPE',
   function(
       $filter, graphDataService, explorationStatesService,
       expressionInterpolationService, explorationParamChangesService,
-      explorationObjectiveService, parameterMetadataService,
-      INTERACTION_SPECS, WARNING_TYPES, STATE_ERROR_MESSAGES,
-      FUZZY_RULE_TYPE) {
+      parameterMetadataService, INTERACTION_SPECS, WARNING_TYPES,
+      STATE_ERROR_MESSAGES, FUZZY_RULE_TYPE) {
     var _warningsList = [];
     var stateWarnings = {};
     var hasCriticalStateWarning = false;
@@ -1789,15 +1787,6 @@ oppia.factory('explorationWarningsService', [
 
         _warningsList = _warningsList.concat(_verifyParameters([
           _graphData.initStateId]));
-      }
-
-      if (!explorationObjectiveService.displayed) {
-        _warningsList.push({
-          type: WARNING_TYPES.ERROR,
-          message: (
-            'Please specify a goal for this exploration (in the Settings ' +
-            'tab).')
-        });
       }
 
       if (Object.keys(stateWarnings).length) {
