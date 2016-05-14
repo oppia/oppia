@@ -34,7 +34,7 @@ BAD_PATTERNS = {
 
 EXCLUDE = ['third_party/*', '.git/*', '*.pyc', 'CHANGELOG',
            'scripts/run_pattern_check.py', 'integrations/*',
-           'integrations_dev/*', 'static/*', '*.png', '*.zip']
+           'integrations_dev/*', '*.svg', '*.png', '*.zip', '*.ico', '*.jpg']
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _TEST_PATH = os.path.join(_PARENT_DIR, 'oppia')
