@@ -44,21 +44,14 @@ oppia.constant('DEFAULT_TRANSLATIONS', {
 });
 
 oppia.controller('I18nFooter', [
-    '$http', '$rootScope', '$scope', '$translate', '$translateCookieStorage',
-    function($http, $rootScope, $scope, $translate, $translateCookieStorage) {
+    '$http', '$rootScope', '$scope', '$translate',
+    function($http, $rootScope, $scope, $translate) {
   // Changes the language of the translations.
   var preferencesDataUrl = '/preferenceshandler/data';
   var siteLanguageUrl = '/save_site_language';
   $scope.supportedSiteLanguages = GLOBALS.SUPPORTED_SITE_LANGUAGES;
-  if (GLOBALS.userIsLoggedIn) {
-    // Only send the get request if the preferred site language has not been
-    // asked before.
-    if ($translateCookieStorage.get('preferenceLanguageSet') === undefined) {
-      $translateCookieStorage.set('preferenceLanguageSet', true);
-      $http.get(preferencesDataUrl).success(function(data) {
-        $translate.use(data.preferred_site_language_code);
-      });
-    }
+  if (GLOBALS.userIsLoggedIn && GLOBALS.preferredSiteLanguageCode) {
+    $translate.use(GLOBALS.preferredSiteLanguageCode);
   }
   $scope.changeLanguage = function(langCode) {
     $translate.use(langCode);

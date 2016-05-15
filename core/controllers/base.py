@@ -259,6 +259,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.has_seen_editor_tutorial = False
         self.partially_logged_in = False
         self.values['profile_picture_data_url'] = None
+        self.preferred_site_language_code = None
 
         if self.user_id:
             email = current_user_services.get_user_email(self.user)
@@ -273,6 +274,8 @@ class BaseHandler(webapp2.RequestHandler):
                 self.user_id = None
             else:
                 self.username = user_settings.username
+                self.preferred_site_language_code = (
+                    user_settings.preferred_site_language_code)
                 self.values['username'] = self.username
                 self.values['profile_picture_data_url'] = (
                     user_settings.profile_picture_data_url)
@@ -413,6 +416,7 @@ class BaseHandler(webapp2.RequestHandler):
             'SYSTEM_USERNAMES': feconf.SYSTEM_USERNAMES,
             'user_is_logged_in': user_services.has_fully_registered(
                 self.user_id),
+            'preferred_site_language_code': self.preferred_site_language_code
         })
 
         if 'meta_name' not in values:
