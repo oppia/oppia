@@ -101,13 +101,16 @@
                        angular-html-bind="activeCard.interactionHtml">
                   </div>
                 </div>
-                <div ng-if="!exploration.isInteractionInline(activeCard.stateName)"
-                     style="opacity: 0.8;">
-                  <md-button class="instructions-button"
-                          ng-click="showSupplementalCardIfScreenIsNarrow()">
+                <div ng-if="!exploration.isInteractionInline(activeCard.stateName)" style="opacity: 0.8;">
+                  <div ng-if="isCurrentSupplementalCardNonempty() && !isScreenNarrowAndShowingTutorCard()" style="padding: 6px 12px;"> 
                     <[exploration.getInteractionInstructions(activeCard.stateName)]>
                     <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
-                  </md-button>
+                  </div>
+                  <div ng-if="!isCurrentSupplementalCardNonempty() || isScreenNarrowAndShowingTutorCard()">
+                    <md-button class="instructions-button" ng-click="showSupplementalCardIfScreenIsNarrow()">
+                      <[exploration.getInteractionInstructions(activeCard.stateName)]>
+                    </md-button>
+                  </div>
                 </div>
               </div>
             </div>
