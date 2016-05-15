@@ -109,6 +109,9 @@ body {
   padding: 0;
   width: 100%;
 }
+.reduce-space{
+  margin-right: -40px;
+}
 
 .oppia-dashboard-container {
   margin: 60px auto 30px auto;
