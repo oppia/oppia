@@ -35,7 +35,7 @@ oppia.animation('.conversation-skin-responses-animate-slide', function() {
 });
 
 oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
-  var tutorCardLeft, tutorCardWidth, tutorCardHeight;
+  var tutorCardLeft, tutorCardWidth, tutorCardHeight, oppiaAvatarLeft;
 
   var beforeAddClass = function(element, className, done) {
     if (className !== 'ng-hide') {
@@ -48,9 +48,11 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
     tutorCardLeft = tutorCard.position().left;
     tutorCardWidth = tutorCard.width();
     tutorCardHeight = tutorCard.height();
+    oppiaAvatarLeft = supplementalCard.position().left +
+                      supplementalCard.width() - oppiaAvatar.width();
     oppiaAvatar.hide();
     tutorCard.animate({
-      left: tutorCardLeft + tutorCardWidth,
+      left: oppiaAvatarLeft,
       width: 0,
       height: 0,
       opacity: 0
@@ -74,7 +76,7 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
     var tutorCard = element;
     $('.conversation-skin-oppia-avatar.show-tutor-card').hide(0, function() {
       tutorCard.css({
-        left: tutorCardLeft + tutorCardWidth,
+        left: oppiaAvatarLeft,
         width: 0,
         height: 0,
         opacity: 0
