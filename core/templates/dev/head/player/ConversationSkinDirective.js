@@ -445,10 +445,11 @@ oppia.directive('conversationSkin', [function() {
             // as site language. If the exploration language is not supported
             // as site language, English is used as default.
             if ($scope.isIframed) {
-              var siteLanguage = oppiaPlayerService
-                .getExplorationLanguageCode();
-              if ($window.GLOBALS.SUPPORTED_SITE_LANGUAGES[siteLanguage]) {
-                $translate.use(siteLanguage);
+              var explorationLanguageCode = (
+                oppiaPlayerService.getExplorationLanguageCode());
+              if ($window.GLOBALS.SUPPORTED_SITE_LANGUAGES[
+                    explorationLanguageCode]) {
+                $translate.use(explorationLanguageCode);
               } else {
                 $translate.use('en');
               }
