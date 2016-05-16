@@ -370,7 +370,7 @@ def _pre_commit_linter():
     total_error_count = 0
     all_files = [
         filename for filename in all_files if not
-        filename.endswith(EXCLUDED_PATHS)]
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
     for filename in all_files:
         if len(filename) != 0:
             with open(filename) as f:
