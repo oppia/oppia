@@ -73,6 +73,21 @@ _EXCLUSIVE_GROUP.add_argument(
     help='specific files to be linted. Space separated list',
     action='store')
 
+BAD_PATTERNS = {
+    '__author__': (
+        'Please remove author tags from this file.'),
+    'datetime.datetime.now()': (
+        'Please use datetime.datetime.utcnow() instead of'
+        'datetime.datetime.now().'),
+    '\t': (
+        'Please use spaces instead of tabs.')
+}
+
+EXCLUDED_PATHS = (
+    'third_party/*', '.git/*', '*.pyc', 'CHANGELOG',
+    'scripts/pre_commit_linter.py', 'integrations/*',
+    'integrations_dev/*', '*.svg', '*.png', '*.zip', '*.ico', '*.jpg')
+
 if not os.getcwd().endswith('oppia'):
     print ''
     print 'ERROR    Please run this script from the oppia root directory.'
@@ -343,15 +358,49 @@ def _pre_commit_linter():
     print '\n'.join(summary_messages)
     print ''
 
+    linting_status = 0
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             summary_messages]):
-        return 1
+        linting_status = 1
+
+    # This part is used for detecting bad patterns.
+    print 'Starting Pattern Checks'
+    print '----------------------------------------'
+    total_files_checked = 0
+    total_error_count = 0
+    all_files = [
+        filename for filename in all_files if not
+        filename.endswith(EXCLUDED_PATHS)]
+    for filename in all_files:
+        if len(filename) != 0:
+            with open(filename) as f:
+                content = f.read()
+                total_files_checked += 1
+                if '__author__' in content:
+                    print filename, ' --> ', BAD_PATTERNS['__author__']
+                    total_error_count += 1
+                if 'datetime.datetime.now()' in content:
+                    print filename, ' --> ', BAD_PATTERNS[
+                        'datetime.datetime.now()']
+                    total_error_count += 1
+                if '\t' in content:
+                    print filename, ' --> ', BAD_PATTERNS['\t']
+                    total_error_count += 1
+    print ''
+    print '----------------------------------------'
+    print ''
+    if total_files_checked == 0:
+        print "WARNING: No files were checked."
+    else:
+        print '(%s FILES CHECKED, %s ERRORS FOUND)' % (
+            total_files_checked, total_error_count)
+
+    return total_error_count, linting_status
 
 
 def main():
-    status_linter = _pre_commit_linter()
-    status_pattern = os.system('python scripts/run_pattern_check.py')
-    if status_linter == 1 or status_pattern == 256:
+    total_error_count, linting_status = _pre_commit_linter()
+    if linting_status == 1 or total_error_count > 0:
         sys.exit(1)
 
 
