@@ -311,6 +311,7 @@
     {% include 'directives.html' %}
     {% include 'forms/form_builder_templates.html' %}
     {% include 'footer_js_libs.html' %}
+    {% include 'components/collection_summary_tile_directive.html' %}
     {% include 'components/exploration_summary_tile_directive.html' %}
     {% include 'components/rating_display.html' %}
     {% include 'components/create_exploration_button_directive.html' %}
@@ -331,6 +332,7 @@
       {{ include_js_file('services/searchService.js') }}
 
       {{ include_js_file('components/AlertMessageDirective.js') }}
+      {{ include_js_file('components/CollectionSummaryTileDirective.js') }}
       {{ include_js_file('components/ObjectEditorDirective.js') }}
       {{ include_js_file('components/ExplorationSummaryTileDirective.js') }}
       {{ include_js_file('components/RatingComputationService.js')}}

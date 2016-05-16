@@ -31,7 +31,6 @@ import os
 from core.domain import collection_domain
 from core.domain import exp_services
 from core.domain import rights_manager
-from core.domain import summary_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -249,30 +248,14 @@ def is_collection_summary_editable(collection_summary, user_id=None):
 
 
 def get_learner_collection_dict_by_id(
-        collection_id, user_id, strict=True, allow_invalid_explorations=False,
-        version=None):
+        collection_id, user_id, strict=True, version=None):
     """Creates and returns a dictionary representation of a collection given by
     the provided collection ID. This dictionary contains extra information
     along with the dict returned by collection_domain.Collection.to_dict()
-    which includes useful data for the collection learner view. The information
-    includes progress in the collection, information about explorations
-    referenced within the collection, and a slightly nicer data structure for
-    frontend work.
-
-    This raises a ValidationError if the collection retrieved using the given ID
-    references non-existent explorations.
+    which includes useful data for the collection learner view.
     """
     collection = get_collection_by_id(
         collection_id, strict=strict, version=version)
-
-    exp_ids = collection.exploration_ids
-    exp_summary_dicts = (
-        summary_services.get_displayable_exp_summary_dicts_matching_ids(
-            exp_ids, editor_user_id=user_id))
-    exp_summaries_dict_map = {
-        exp_summary_dict['id']: exp_summary_dict
-        for exp_summary_dict in exp_summary_dicts
-    }
 
     # TODO(bhenning): Users should not be recommended explorations they have
     # completed outside the context of a collection (see #1461).
@@ -297,32 +280,6 @@ def get_learner_collection_dict_by_id(
         'completed_exploration_ids': completed_exploration_ids
     }
     collection_dict['version'] = collection.version
-
-    collection_is_public = rights_manager.is_collection_public(collection_id)
-
-    # Insert an 'exploration' dict into each collection node, where the
-    # dict includes meta information about the exploration (ID and title).
-    for collection_node in collection_dict['nodes']:
-        exploration_id = collection_node['exploration_id']
-        summary_dict = exp_summaries_dict_map.get(exploration_id)
-        if not allow_invalid_explorations:
-            if not summary_dict:
-                raise utils.ValidationError(
-                    'Expected collection to only reference valid '
-                    'explorations, but found an exploration with ID: %s (was '
-                    'the exploration deleted or is it a private exploration '
-                    'that you do not have edit access to?)'
-                    % exploration_id)
-            if collection_is_public and rights_manager.is_exploration_private(
-                    exploration_id):
-                raise utils.ValidationError(
-                    'Cannot reference a private exploration within a public '
-                    'collection, exploration ID: %s' % exploration_id)
-
-        if summary_dict:
-            collection_node['exploration_summary'] = summary_dict
-        else:
-            collection_node['exploration_summary'] = None
 
     return collection_dict
 
@@ -445,20 +402,21 @@ def get_collection_summaries_matching_ids(collection_ids):
 # TODO(bhenning): Update this function to support also matching the query to
 # explorations contained within this collection. Introduce tests to verify this
 # behavior.
-def get_collection_summaries_matching_query(query_string, cursor=None):
-    """Returns a list with all collection summary domain objects matching the
-    given search query string, as well as a search cursor for future fetches.
+def get_collection_ids_matching_query(query_string, cursor=None):
+    """Returns a list with all collection ids matching the given search query
+    string, as well as a search cursor for future fetches.
 
     This method returns exactly feconf.GALLERY_PAGE_SIZE results if there are
     at least that many, otherwise it returns all remaining results. (If this
     behaviour does not occur, an error will be logged.) The method also returns
     a search cursor.
     """
-    summary_models = []
+    returned_collection_ids = []
     search_cursor = cursor
 
     for _ in range(MAX_ITERATIONS):
-        remaining_to_fetch = feconf.GALLERY_PAGE_SIZE - len(summary_models)
+        remaining_to_fetch = feconf.GALLERY_PAGE_SIZE - len(
+            returned_collection_ids)
 
         collection_ids, search_cursor = search_collections(
             query_string, remaining_to_fetch, cursor=search_cursor)
@@ -468,11 +426,11 @@ def get_collection_summaries_matching_query(query_string, cursor=None):
                 collection_models.CollectionSummaryModel.get_multi(
                     collection_ids)):
             if model is not None:
-                summary_models.append(model)
+                returned_collection_ids.append(collection_ids[ind])
             else:
                 invalid_collection_ids.append(collection_ids[ind])
 
-        if len(summary_models) == feconf.GALLERY_PAGE_SIZE or (
+        if len(returned_collection_ids) == feconf.GALLERY_PAGE_SIZE or (
                 search_cursor is None):
             break
         else:
@@ -480,17 +438,13 @@ def get_collection_summaries_matching_query(query_string, cursor=None):
                 'Search index contains stale collection ids: %s' %
                 ', '.join(invalid_collection_ids))
 
-    if (len(summary_models) < feconf.GALLERY_PAGE_SIZE
+    if (len(returned_collection_ids) < feconf.GALLERY_PAGE_SIZE
             and search_cursor is not None):
         logging.error(
             'Could not fulfill search request for query string %s; at least '
             '%s retries were needed.' % (query_string, MAX_ITERATIONS))
 
-    return ([
-        get_collection_summary_from_model(summary_model)
-        for summary_model in summary_models
-    ], search_cursor)
-
+    return (returned_collection_ids, search_cursor)
 
 # Repository SAVE and DELETE methods.
 def apply_change_list(collection_id, change_list):

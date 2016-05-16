@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Gallery tile component.
+ * @fileoverview Gallery tile component for exploration.
  */
 
 oppia.directive('explorationSummaryTile', [function() {

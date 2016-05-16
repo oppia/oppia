@@ -16,11 +16,13 @@
 
 """Commands that can be used to operate on exploration summaries."""
 
+from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import stats_jobs_continuous
 from core.domain import user_services
 import utils
+
 
 _GALLERY_CATEGORY_GROUPINGS = [{
     'header': 'Computation & Programming',
@@ -59,6 +61,34 @@ def get_human_readable_contributors_summary(contributors_summary):
         }
         for ind in xrange(len(contributor_ids))
     }
+
+
+def get_displayable_col_summary_dicts_matching_ids(col_ids):
+    """Returns a list with all collection summary objects that can be
+    displayed on the gallery page as collection summary tiles.
+    """
+    col_summaries_to_display = []
+    col_summaries = collection_services.get_collection_summaries_matching_ids(
+        col_ids)
+    for col_summary in col_summaries:
+        if col_summary and col_summary.status != (
+                rights_manager.ACTIVITY_STATUS_PRIVATE):
+            col_summaries_to_display.append({
+                'id': col_summary.id,
+                'title': col_summary.title,
+                'category': col_summary.category,
+                'activity_type': rights_manager.ACTIVITY_TYPE_COLLECTION,
+                'objective': col_summary.objective,
+                'num_explorations': len(
+                    collection_services.get_collection_by_id(
+                        col_summary.id).nodes),
+                'last_updated_msec': utils.get_time_in_millisecs(
+                    col_summary.collection_model_last_updated),
+                'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
+                    col_summary.category),
+                'thumbnail_bg_color': utils.get_hex_color_for_category(
+                    col_summary.category)})
+    return col_summaries_to_display
 
 
 def get_displayable_exp_summary_dicts_matching_ids(
@@ -112,6 +142,7 @@ def _get_displayable_exp_summary_dicts(exploration_summaries):
         displayable_exp_summaries.append({
             'id': exploration_summary.id,
             'title': exploration_summary.title,
+            'activity_type': rights_manager.ACTIVITY_TYPE_EXPLORATION,
             'category': exploration_summary.category,
             'objective': exploration_summary.objective,
             'language_code': exploration_summary.language_code,
@@ -135,6 +166,7 @@ def _get_displayable_exp_summary_dicts(exploration_summaries):
     return displayable_exp_summaries
 
 
+
 def get_gallery_category_groupings(language_codes):
     """Returns a list of groups in the gallery. Each group has a header and
     a list of dicts representing activity summaries.
@@ -151,12 +183,13 @@ def get_gallery_category_groupings(language_codes):
 
     results = []
     for gallery_group in _GALLERY_CATEGORY_GROUPINGS:
-        # TODO(sll): Extend this to include collections.
         exp_ids = exp_services.search_explorations(
             _generate_query(gallery_group['search_categories']), 10)[0]
-
-        summary_dicts = get_displayable_exp_summary_dicts_matching_ids(
-            exp_ids)
+        col_ids = collection_services.search_collections(
+            _generate_query(gallery_group['search_categories']), 10)[0]
+        summary_dicts = []
+        summary_dicts = get_displayable_col_summary_dicts_matching_ids(col_ids)
+        summary_dicts += get_displayable_exp_summary_dicts_matching_ids(exp_ids)
 
         if not summary_dicts:
             continue

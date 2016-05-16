@@ -29,8 +29,8 @@ oppia.directive('searchResults', [function() {
         // Called when the first batch of search results is retrieved from the
         // server.
         $scope.$on(
-          'initialSearchResultsLoaded', function(evt, explorationsList) {
-            $scope.someResultsExist = explorationsList.length > 0;
+          'initialSearchResultsLoaded', function(evt, activityList) {
+            $scope.someResultsExist = activityList.length > 0;
             $rootScope.loadingMessage = '';
           }
         );

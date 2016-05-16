@@ -43,24 +43,33 @@ ALLOW_YAML_FILE_UPLOAD = config_domain.ConfigProperty(
     default_value=False)
 
 
-def get_matching_exploration_dicts(query_string, search_cursor):
-    """Given a query string and a search cursor, returns a list of exploration
+def get_matching_activity_dicts(query_string, search_cursor):
+    """Given a query string and a search cursor, returns a list of activities
        dicts that satisfy the search query.
     """
+    # TODO(mgowano): Remove '' in query to allow for collection searches once
+    # languages are supported in collections
+    collection_ids, search_cursor = (
+        collection_services.get_collection_ids_matching_query(
+            '', cursor=search_cursor))
     exp_ids, new_search_cursor = (
         exp_services.get_exploration_ids_matching_query(
             query_string, cursor=search_cursor))
 
-    explorations_list = (
+    activity_list = []
+    activity_list = (
+        summary_services.get_displayable_col_summary_dicts_matching_ids(
+            collection_ids))
+    activity_list += (
         summary_services.get_displayable_exp_summary_dicts_matching_ids(
             exp_ids))
 
-    if len(explorations_list) == feconf.DEFAULT_QUERY_LIMIT:
+    if len(activity_list) == feconf.DEFAULT_QUERY_LIMIT:
         logging.error(
-            '%s explorations were fetched to load the gallery page. '
+            '%s activities were fetched to load the gallery page. '
             'You may be running up against the default query limits.'
             % feconf.DEFAULT_QUERY_LIMIT)
-    return explorations_list, new_search_cursor
+    return activity_list, new_search_cursor
 
 
 class GalleryPage(base.BaseHandler):
@@ -118,7 +127,7 @@ class DefaultGalleryCategoriesHandler(base.BaseHandler):
 
 
 class SearchHandler(base.BaseHandler):
-    """Provides data for exploration search results."""
+    """Provides data for activity search results."""
 
     def get(self):
         """Handles GET requests."""
@@ -139,11 +148,11 @@ class SearchHandler(base.BaseHandler):
                 'language_code')
         search_cursor = self.request.get('cursor', None)
 
-        explorations_list, new_search_cursor = get_matching_exploration_dicts(
+        activity_list, new_search_cursor = get_matching_activity_dicts(
             query_string, search_cursor)
 
         self.values.update({
-            'explorations_list': explorations_list,
+            'activity_list': activity_list,
             'search_cursor': new_search_cursor,
         })
 
