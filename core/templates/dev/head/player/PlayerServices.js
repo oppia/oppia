@@ -189,7 +189,7 @@ oppia.factory('oppiaPlayerService', [
             exploration = ExplorationObjectFactory.create(data.exploration);
             version = data.version;
 
-            initParams({});
+            initParams([]);
 
             StatsReportingService.initSession(
               _explorationId, data.version, data.session_id,
