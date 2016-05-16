@@ -18,10 +18,12 @@ import urllib
 import urlparse
 
 from core.controllers import base
-from core.controllers import editor
 from core.domain import config_domain
 import feconf
 
+
+MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE = (
+    'https://moderator/request/forum/url')
 
 ABOUT_PAGE_YOUTUBE_VIDEO_ID = config_domain.ConfigProperty(
     'about_page_youtube_video_id', {'type': 'unicode'},
@@ -40,6 +42,11 @@ SITE_FORUM_URL = config_domain.ConfigProperty(
     'site_forum_url', {'type': 'unicode'},
     'The site forum URL (for links; the Forum page is configured separately)',
     default_value='https://site/forum/url')
+MODERATOR_REQUEST_FORUM_URL = config_domain.ConfigProperty(
+    'moderator_request_forum_url', {'type': 'unicode'},
+    'A link to the forum for nominating explorations to be featured '
+    'in the Oppia library',
+    default_value=MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE)
 
 
 class SplashPage(base.BaseHandler):
@@ -73,8 +80,7 @@ class ParticipatePage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.values.update({
-            'MODERATOR_REQUEST_FORUM_URL': (
-                editor.MODERATOR_REQUEST_FORUM_URL.value),
+            'MODERATOR_REQUEST_FORUM_URL': MODERATOR_REQUEST_FORUM_URL.value,
             'SITE_FORUM_URL': SITE_FORUM_URL.value,
             'nav_mode': feconf.NAV_MODE_PARTICIPATE,
         })
