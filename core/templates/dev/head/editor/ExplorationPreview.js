@@ -50,7 +50,7 @@ oppia.controller('ExplorationPreview', [
           skin_customizations: {
             panels_contents: explorationGadgetsService.getPanelsContents()
           }
-        });
+        }, []);
         $scope.isExplorationPopulated = true;
       }, 200);
     });
