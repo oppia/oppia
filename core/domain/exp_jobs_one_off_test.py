@@ -113,7 +113,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             self.ONE_OFF_JOB_MANAGERS_FOR_TESTS
             ):
 
-            default_specs = {
+            default_spec = {
                 'title': default_title,
                 'category': default_category,
                 'status': default_status
@@ -130,8 +130,8 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             self.save_new_valid_exploration(
                 exp_id,
                 admin_id,
-                title=default_specs['title'],
-                category=default_specs['category'])
+                title=default_spec['title'],
+                category=default_spec['category'])
             exploration = exp_services.get_exploration_by_id(exp_id)
             exp_services.delete_exploration(admin_id, exp_id)
 
@@ -141,7 +141,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
 
             for ind in range(num_exps):
                 exp_id = str(ind)
-                spec = default_specs
+                spec = default_spec
                 spec.update(exp_specs[ind])
                 self.save_new_valid_exploration(
                     exp_id,
@@ -169,7 +169,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                 exploration_model_last_updated = exploration.last_updated
                 exploration_model_created_on = exploration.created_on
 
-                # Manually create the expectated summary specifying title,
+                # Manually create the expected summary specifying title,
                 # category, etc.
                 expected_job_output[exp_id] = exp_domain.ExplorationSummary(
                     exp_id,
@@ -310,7 +310,8 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
 
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, user_a_id)
-        job_id = exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new()
+        job_id = (
+            exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new())
         exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
@@ -337,7 +338,8 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
             user_a_id, 'Changed title.', [])
 
         # Run the job to compute the contributor ids.
-        job_id = exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new()
+        job_id = (
+            exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new())
         exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
@@ -370,7 +372,8 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         exp_services.revert_exploration(user_b_id, self.EXP_ID, 2, 1)
 
         # Run the job to compute the contributor ids.
-        job_id = exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new()
+        job_id = (
+            exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new())
         exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
@@ -387,7 +390,8 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, feconf.SYSTEM_COMMITTER_ID, title='Original Title')
         # Run the job to compute the contributor ids.
-        job_id = exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new()
+        job_id = (
+            exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new())
         exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
         # Check that the system id was not added to the exploration's
@@ -405,7 +409,8 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         exploration_model.commit(
             feconf.MIGRATION_BOT_USERNAME, 'Changed title.', [])
         # Run the job to compute the contributor ids.
-        job_id = exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new()
+        job_id = (
+            exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new())
         exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
         # Check that the migration bot id was not added to the exploration's

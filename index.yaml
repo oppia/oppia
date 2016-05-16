@@ -97,6 +97,11 @@ indexes:
   - name: realtime_layer
   - name: created_on
 
+- kind: SentEmailModel
+  properties:
+  - name: email_hash
+  - name: sent_datetime
+
 - kind: StatisticsRealtimeModel
   properties:
   - name: realtime_layer

@@ -366,17 +366,20 @@ oppia.controller('ExplorationEditor', [
 
     $scope.$on(
       'enterEditorForTheFirstTime', $scope.showWelcomeExplorationModal);
-    $scope.$on('openEditorTutorial', $scope.showWelcomeExplorationModal);
+    $scope.$on('openEditorTutorial', $scope.startTutorial);
   }
 ]);
 
 oppia.controller('EditorNavigation', [
-  '$scope', '$rootScope', '$timeout', 'routerService',
+  '$scope', '$rootScope', '$timeout', '$modal', 'routerService',
   'explorationRightsService', 'explorationWarningsService',
+  'stateEditorTutorialFirstTimeService',
   'threadDataService',
   function(
-    $scope, $rootScope, $timeout, routerService,
-    explorationRightsService, explorationWarningsService, threadDataService) {
+    $scope, $rootScope, $timeout, $modal, routerService,
+    explorationRightsService, explorationWarningsService,
+    stateEditorTutorialFirstTimeService,
+    threadDataService) {
     $scope.postTutorialHelpPopoverIsShown = false;
 
     $scope.$on('openPostTutorialHelpPopover', function() {
@@ -391,6 +394,29 @@ oppia.controller('EditorNavigation', [
     // editor tutorial.
     $scope.openEditorTutorial = function() {
       $rootScope.$broadcast('openEditorTutorial');
+    };
+
+    $scope.showUserHelpModal = function() {
+      var modalInstance = $modal.open({
+        templateUrl: 'modals/userHelp',
+        backdrop: true,
+        controller: [
+          '$scope', '$modalInstance', function($scope, $modalInstance) {
+            $scope.beginTutorial = $modalInstance.close;
+
+            $scope.goToHelpCenter = function() {
+              $modalInstance.dismiss('cancel');
+            };
+          }
+        ],
+        windowClass: 'oppia-help-modal'
+      });
+
+      modalInstance.result.then(function() {
+        $scope.openEditorTutorial();
+      }, function() {
+        stateEditorTutorialFirstTimeService.markTutorialFinished();
+      });
     };
 
     $scope.countWarnings = explorationWarningsService.countWarnings;
@@ -447,11 +473,13 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
   'alertsService', 'changeListService', 'focusService', 'routerService',
   'explorationData', 'explorationRightsService', 'editabilityService',
   'explorationWarningsService', 'siteAnalyticsService',
+  'explorationObjectiveService',
   function(
       $scope, $http, $rootScope, $window, $timeout, $modal,
       alertsService, changeListService, focusService, routerService,
       explorationData, explorationRightsService, editabilityService,
-      explorationWarningsService, siteAnalyticsService) {
+      explorationWarningsService, siteAnalyticsService,
+      explorationObjectiveService) {
     // Whether or not a save action is currently in progress.
     $scope.isSaveInProgress = false;
     // Whether or not a discard action is currently in progress.
@@ -531,10 +559,38 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       });
     };
 
-    $scope.showPublishExplorationModal = function() {
+    var saveDraftToBackend = function(commitMessage, successCallback) {
+      var changeList = changeListService.getChangeList();
+
+      if ($scope.isPrivate()) {
+        siteAnalyticsService.registerCommitChangesToPrivateExplorationEvent(
+          explorationData.explorationId);
+      } else {
+        siteAnalyticsService.registerCommitChangesToPublicExplorationEvent(
+          explorationData.explorationId);
+      }
+
+      $scope.isSaveInProgress = true;
+      explorationData.save(changeList, commitMessage, function() {
+        changeListService.discardAllChanges();
+        $rootScope.$broadcast('initExplorationPage');
+        $rootScope.$broadcast('refreshVersionHistory', {
+          forceRefresh: true
+        });
+        alertsService.addSuccessMessage('Changes saved.');
+        $scope.lastSaveOrDiscardAction = 'save';
+        $scope.isSaveInProgress = false;
+        if (successCallback) {
+          successCallback();
+        }
+      }, function() {
+        $scope.isSaveInProgress = false;
+      });
+    };
+
+    var openPublishExplorationModal = function() {
       $scope.publishModalIsOpening = true;
-      alertsService.clearWarnings();
-      var modalInstance = $modal.open({
+      var publishModalInstance = $modal.open({
         templateUrl: 'modals/publishExploration',
         backdrop: true,
         controller: [
@@ -545,10 +601,11 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               $modalInstance.dismiss('cancel');
               alertsService.clearWarnings();
             };
-          }]
+          }
+        ]
       });
 
-      modalInstance.result.then(function() {
+      publishModalInstance.result.then(function() {
         explorationRightsService.saveChangeToBackend({
           is_public: true
         });
@@ -557,9 +614,54 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         $scope.showCongratulatorySharingModal();
       });
 
-      modalInstance.opened.then(function() {
+      publishModalInstance.opened.then(function() {
         $scope.publishModalIsOpening = false;
       });
+    };
+
+    $scope.showPublishExplorationModal = function() {
+      siteAnalyticsService.registerOpenPublishExplorationModalEvent(
+        explorationData.explorationId);
+      alertsService.clearWarnings();
+
+      // If the objective has not yet been specified, open the pre-publication
+      // 'add exploration metadata' modal.
+      if (!explorationObjectiveService.savedMemento) {
+        $modal.open({
+          templateUrl: 'modals/addExplorationMetadata',
+          backdrop: true,
+          controller: [
+            '$scope', '$modalInstance', 'explorationObjectiveService',
+            function($scope, $modalInstance, explorationObjectiveService) {
+              // If no objective has been specified yet, require the creator
+              // to specify it.
+              $scope.explorationObjectiveService = explorationObjectiveService;
+              $scope.requireObjectiveToBeSpecified = (
+                !explorationObjectiveService.savedMemento);
+
+              $scope.save = function() {
+                if ($scope.requireObjectiveToBeSpecified) {
+                  if (!explorationObjectiveService.displayed) {
+                    throw Error('Please specify an objective');
+                  }
+                  explorationObjectiveService.saveDisplayedValue();
+                }
+                $modalInstance.close();
+              };
+
+              $scope.cancel = function() {
+                $modalInstance.dismiss('cancel');
+                alertsService.clearWarnings();
+              };
+            }
+          ]
+        }).result.then(function() {
+          saveDraftToBackend('Add an objective.', openPublishExplorationModal);
+        });
+      } else {
+        // No further metadata is needed. Open the publish modal immediately.
+        openPublishExplorationModal();
+      }
     };
 
     $scope.getPublishExplorationButtonTooltip = function() {
@@ -568,7 +670,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       } else if ($scope.isExplorationLockedForEditing()) {
         return 'Please save your changes before publishing.';
       } else {
-        return 'Publish to Gallery';
+        return 'Publish to Oppia Library';
       }
     };
 
@@ -843,30 +945,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         });
 
         modalInstance.result.then(function(commitMessage) {
-          $scope.isSaveInProgress = true;
           _modalIsOpen = false;
-
-          var changeList = changeListService.getChangeList();
-          explorationData.save(changeList, commitMessage, function() {
-            changeListService.discardAllChanges();
-            $rootScope.$broadcast('initExplorationPage');
-            $rootScope.$broadcast('refreshVersionHistory', {
-              forceRefresh: true
-            });
-            alertsService.addSuccessMessage('Changes saved.');
-            $scope.lastSaveOrDiscardAction = 'save';
-            $scope.isSaveInProgress = false;
-          }, function() {
-            $scope.isSaveInProgress = false;
-          });
-
-          if ($scope.isPrivate()) {
-            siteAnalyticsService.registerCommitChangesToPrivateExplorationEvent(
-              explorationData.explorationId);
-          } else {
-            siteAnalyticsService.registerCommitChangesToPublicExplorationEvent(
-              explorationData.explorationId);
-          }
+          saveDraftToBackend(commitMessage);
         }, function() {
           _modalIsOpen = false;
         });

@@ -42,7 +42,7 @@ oppia.factory('explorationContextService', [
         var hash = $window.location.hash;
         if (hash.indexOf('#/gui') === 0) {
           return EDITOR_TAB_CONTEXT.EDITOR;
-        } else if (hash.indexOf('#/preview')) {
+        } else if (hash.indexOf('#/preview') === 0) {
           return EDITOR_TAB_CONTEXT.PREVIEW;
         } else {
           return null;

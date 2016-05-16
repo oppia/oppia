@@ -33,8 +33,8 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
             pencilCodeEditorRulesService) {
           $scope.initialCode = oppiaHtmlEscaper.escapedJsonToObj(
             $attrs.initialCodeWithValue);
-
-          var pce = new PencilCodeEmbed($element[0].children[0]);
+          var iframeDiv = $element.find('.pencil-code-editor-iframe').get(0);
+          var pce = new PencilCodeEmbed(iframeDiv);
           pce.beginLoad($scope.initialCode);
           pce.on('load', function() {
             // Hides the error console at the bottom right, and prevents it

@@ -43,9 +43,6 @@ function maybeInstallDependencies {
       shift
       ;;
 
-      *)
-      echo "Error: Unknown command line option: $i"
-      ;;
     esac
   done
 
@@ -67,7 +64,7 @@ function maybeInstallDependencies {
     install_node_module karma-coverage 0.5.2
     install_node_module karma-ng-html2js-preprocessor 0.1.0
     install_node_module karma-chrome-launcher 0.1.4
-    install_node_module protractor 2.5.0
+    install_node_module protractor 3.3.0
     install_node_module protractor-screenshot-reporter 0.0.5
     install_node_module jasmine-spec-reporter 2.2.2
 
@@ -203,6 +200,9 @@ elif [ "$VAGRANT" = true ]; then
 elif [ -f "/usr/bin/google-chrome" ]; then
   # Unix.
   export CHROME_BIN="/usr/bin/google-chrome"
+elif [ -f "/usr/bin/chromium-browser" ]; then
+  # Unix.
+  export CHROME_BIN="/usr/bin/chromium-browser"
 elif [ -f "/c/Program Files (x86)/Google/Chrome/Application/chrome.exe" ]; then
   # Windows.
   export CHROME_BIN="/c/Program Files (x86)/Google/Chrome/Application/chrome.exe"

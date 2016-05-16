@@ -80,13 +80,17 @@ oppia.controller('ExplorationSettings', [
       // settings tab directly (by entering a URL that ends with /settings)
       // results in a console error.
       if (_states) {
-        var newCategory = {
-          id: explorationCategoryService.displayed,
-          text: explorationCategoryService.displayed
-        };
+        var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2.some(
+          function(categoryItem) {
+            return categoryItem.id === explorationCategoryService.savedMemento;
+          }
+        );
 
-        if ($scope.CATEGORY_LIST_FOR_SELECT2.indexOf(newCategory) === -1) {
-          $scope.CATEGORY_LIST_FOR_SELECT2.push(newCategory);
+        if (!categoryIsInSelect2) {
+          $scope.CATEGORY_LIST_FOR_SELECT2.push({
+            id: explorationCategoryService.savedMemento,
+            text: explorationCategoryService.savedMemento
+          });
         }
 
         $scope.stateNames = Object.keys(_states);
@@ -118,7 +122,6 @@ oppia.controller('ExplorationSettings', [
 
     $scope.saveExplorationObjective = function() {
       explorationObjectiveService.saveDisplayedValue();
-      explorationWarningsService.updateWarnings();
     };
 
     $scope.saveExplorationLanguageCode = function() {

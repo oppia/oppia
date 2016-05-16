@@ -175,9 +175,9 @@ var RichTextEditor = function(elem) {
         by.css('.protractor-test-close-rich-text-component-editor')).click();
       general.waitForSystem();
 
-      // Refocus back into the RTE.
-      elem.all(by.model('html')).first().click();
-      elem.all(by.model('html')).first().sendKeys(protractor.Key.END);
+      // Ensure that the cursor is at the end of the RTE.
+      elem.all(by.model('html')).first().sendKeys(
+        protractor.Key.chord(protractor.Key.CONTROL, protractor.Key.END));
     }
   };
 };
@@ -278,6 +278,9 @@ var MultiSelectEditor = function(elem) {
         expect(filteredElements[i].getAttribute('class')).toMatch(
           expectedClassBeforeToggle);
         filteredElements[i].click();
+        // Reopen the dropdown menu, since it closes after an item is
+        // toggled.
+        elem.element(by.css('.dropdown-toggle')).click();
       }
 
       // Close the dropdown menu at the end.

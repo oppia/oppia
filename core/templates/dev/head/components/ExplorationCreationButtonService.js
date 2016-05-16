@@ -28,7 +28,7 @@ oppia.factory('ExplorationCreationButtonService', [
     var getModalInstance = function(categoryList, isUploadModal) {
       var modalInstance = $modal.open({
         backdrop: true,
-        templateUrl: 'modals/galleryCreateNew',
+        templateUrl: 'modals/createNewActivity',
         resolve: {
           categoriesForDropdown: function() {
             var result = [];
@@ -130,7 +130,7 @@ oppia.factory('ExplorationCreationButtonService', [
         // render.
         $timeout(function() {
           focusService.setFocus('newActivityModalOpened');
-        }, 300);
+        }, 500);
       });
 
       return modalInstance;
