@@ -122,7 +122,6 @@ oppia.controller('SettingsTab', [
 
     $scope.saveExplorationObjective = function() {
       explorationObjectiveService.saveDisplayedValue();
-      explorationWarningsService.updateWarnings();
     };
 
     $scope.saveExplorationLanguageCode = function() {
