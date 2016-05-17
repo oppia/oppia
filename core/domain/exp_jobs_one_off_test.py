@@ -435,12 +435,13 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
         super(ExplorationContributorsSummaryOneOffJobTest, self).setUp()
         self.signup(self.EMAIL_A, self.USERNAME_A)
         self.signup(self.EMAIL_B, self.USERNAME_B)
-        
+
     def test_contributors_for_valid_nonrevert_contribution(self):
         """Test that if only non-revert commits are made by
         contributor then the contributions summary shows same
         exact number of commits for that contributor's ID
         """
+
         user_a_id = self.get_user_id_from_email(self.EMAIL_A)
 
         # Let USER A make three commits.
@@ -511,8 +512,8 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
         # Check that the contributors_summary does not contains user_b_id
         self.assertNotIn(user_b_id, exploration_summary.contributors_summary)
 
-        # Check that the User A has only 2 commits after user b has 
-        # reverted to version 2
+        # Check that the User A has only 2 commits after user b has reverted
+        # to version 2
         self.assertEquals(2, exploration_summary.contributors_summary[user_a_id]) # pylint: disable=line-too-long
 
     def test_reverts_not_counted(self):
