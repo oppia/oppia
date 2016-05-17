@@ -51,6 +51,9 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
     oppiaAvatarLeft = supplementalCard.position().left +
                       supplementalCard.width() - oppiaAvatar.width();
     oppiaAvatar.hide();
+    tutorCard.css({
+      'min-width': 0
+    });
     tutorCard.animate({
       left: oppiaAvatarLeft,
       width: 0,
@@ -62,7 +65,8 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
         left: '',
         width: '',
         height: '',
-        opacity: ''
+        opacity: '',
+        'min-width': ''
       });
       done();
     });
@@ -79,7 +83,8 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
         left: oppiaAvatarLeft,
         width: 0,
         height: 0,
-        opacity: 0
+        opacity: 0,
+        'min-width': 0
       });
       tutorCard.animate({
         left: tutorCardLeft,
@@ -91,7 +96,8 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
           left: '',
           width: '',
           height: '',
-          opacity: ''
+          opacity: '',
+          'min-width': ''
         });
         done();
       });
