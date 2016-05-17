@@ -17,7 +17,7 @@
  * editor page.
  */
 
-oppia.controller('ExplorationPreview', [
+oppia.controller('PreviewTab', [
   '$scope', '$timeout', 'LearnerParamsService',
   'explorationData', 'editorContextService',
   'explorationStatesService', 'explorationInitStateNameService',
@@ -60,7 +60,7 @@ oppia.controller('ExplorationPreview', [
           skin_customizations: {
             panels_contents: explorationGadgetsService.getPanelsContents()
           }
-        });
+        }, []);
         $scope.isExplorationPopulated = true;
       }, 200);
     });
