@@ -17,7 +17,7 @@
  * editor page.
  */
 
-oppia.controller('ExplorationPreview', [
+oppia.controller('PreviewTab', [
   '$scope', '$timeout', 'LearnerParamsService', 'explorationData',
   'explorationStatesService', 'explorationInitStateNameService',
   'explorationParamSpecsService', 'explorationTitleService',
