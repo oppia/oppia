@@ -35,10 +35,9 @@ oppia.config([
   function(
       $compileProvider, $httpProvider, $interpolateProvider,
       $locationProvider) {
-    // TODO(sll): Turn this on in order to disable debug data to improve
-    // performance. See https://code.angularjs.org/1.5.5/docs/guide/production.
-    // However, we can't do it yet because it causes the karma tests to fail.
-    // $compileProvider.debugInfoEnabled(false);
+    // This improves performance by disabling debug data. For more details,
+    // see https://code.angularjs.org/1.5.5/docs/guide/production
+    $compileProvider.debugInfoEnabled(false);
 
     // Set the AngularJS interpolators as <[ and ]>, to not conflict with
     // Jinja2 templates.

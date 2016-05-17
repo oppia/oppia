@@ -63,23 +63,26 @@ exports.config = {
     editor: [
       'protractor/editorAndPlayer.js',
       'protractor/gadgetEditor.js',
-      'protractor/stateEditor.js'
+      'protractor/stateEditor.js',
+      'protractor/fallbacks.js',
+      'protractor/historyTab.js'
     ],
 
-    usermanagement: [
-      'protractor/userManagement.js'
+    extensions: [
+      'protractor/richTextComponents.js',
+      'protractor/interactions.js'
+    ],
+
+    library: [
+      'protractor/explorationRating.js',
+      'protractor/privileges.js',
+      'protractor/publicationAndLibrary.js'
     ],
 
     misc: [
+      'protractor/userManagement.js',
       'protractor/embedding.js',
-      'protractor/explorationRating.js',
-      'protractor/fallbacks.js',
-      'protractor/historyTab.js',
-      'protractor/interactions.js',
-      'protractor/preferences.js',
-      'protractor/privileges.js',
-      'protractor/publicationAndGallery.js',
-      'protractor/richTextComponents.js'
+      'protractor/preferences.js'
     ]
   },
 
