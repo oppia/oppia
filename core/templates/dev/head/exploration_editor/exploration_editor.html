@@ -377,29 +377,29 @@
       </div>
 
       <div ng-show="getTabStatuses().active === 'main'">
-        {% include 'editor/main_tab/main_tab.html' %}
+        {% include 'exploration_editor/main_tab/main_tab.html' %}
       </div>
 
       <!-- This is an ng-if, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
       <div ng-if="getTabStatuses().active === 'preview'">
-        {% include 'editor/preview_tab/preview_tab.html' %}
+        {% include 'exploration_editor/preview_tab/preview_tab.html' %}
       </div>
 
       <div ng-show="getTabStatuses().active === 'stats'">
-        {% include 'editor/statistics_tab/statistics_tab.html' %}
+        {% include 'exploration_editor/statistics_tab/statistics_tab.html' %}
       </div>
 
       <div ng-show="getTabStatuses().active === 'settings'">
-        {% include 'editor/settings_tab/settings_tab.html' %}
+        {% include 'exploration_editor/settings_tab/settings_tab.html' %}
       </div>
 
       <div ng-show="getTabStatuses().active === 'history'">
-        {% include 'editor/history_tab/history_tab.html' %}
+        {% include 'exploration_editor/history_tab/history_tab.html' %}
       </div>
 
       <div ng-show="getTabStatuses().active === 'feedback'">
-        {% include 'editor/feedback_tab/feedback_tab.html' %}
-        {% include 'editor/feedback_tab/thread_table_directive.html' %}
+        {% include 'exploration_editor/feedback_tab/feedback_tab.html' %}
+        {% include 'exploration_editor/feedback_tab/thread_table_directive.html' %}
       </div>
     </div>
   </div>
@@ -454,12 +454,12 @@
   <script>
     {{ value_generators_js }}
 
-    {{ include_js_file('editor/ExplorationEditor.js') }}
-    {{ include_js_file('editor/EditorServices.js') }}
-    {{ include_js_file('editor/ExplorationEditorAdvancedFeaturesService.js') }}
-    {{ include_js_file('editor/GadgetValidationService.js') }}
-    {{ include_js_file('editor/ParameterMetadataService.js') }}
-    {{ include_js_file('editor/RouterServices.js') }}
+    {{ include_js_file('exploration_editor/ExplorationEditor.js') }}
+    {{ include_js_file('exploration_editor/EditorServices.js') }}
+    {{ include_js_file('exploration_editor/ExplorationEditorAdvancedFeaturesService.js') }}
+    {{ include_js_file('exploration_editor/GadgetValidationService.js') }}
+    {{ include_js_file('exploration_editor/ParameterMetadataService.js') }}
+    {{ include_js_file('exploration_editor/RouterServices.js') }}
 
     {{ include_js_file('components/AnswerGroupEditorDirective.js') }}
     {{ include_js_file('components/BarChartDirective.js') }}
@@ -486,25 +486,25 @@
     {{ include_js_file('services/explorationServices.js') }}
     {{ include_js_file('services/messengerService.js') }}
 
-    {{ include_js_file('editor/main_tab/ExplorationGraph.js') }}
-    {{ include_js_file('editor/main_tab/GadgetEditor.js') }}
-    {{ include_js_file('editor/main_tab/SidebarStateName.js') }}
-    {{ include_js_file('editor/main_tab/StateEditor.js') }}
-    {{ include_js_file('editor/main_tab/StateFallbacks.js') }}
-    {{ include_js_file('editor/main_tab/StateInteraction.js') }}
-    {{ include_js_file('editor/main_tab/StateParameterChanges.js') }}
-    {{ include_js_file('editor/main_tab/StateResponses.js') }}
-    {{ include_js_file('editor/main_tab/StateStatistics.js') }}
+    {{ include_js_file('exploration_editor/main_tab/ExplorationGraph.js') }}
+    {{ include_js_file('exploration_editor/main_tab/GadgetEditor.js') }}
+    {{ include_js_file('exploration_editor/main_tab/SidebarStateName.js') }}
+    {{ include_js_file('exploration_editor/main_tab/StateEditor.js') }}
+    {{ include_js_file('exploration_editor/main_tab/StateFallbacks.js') }}
+    {{ include_js_file('exploration_editor/main_tab/StateInteraction.js') }}
+    {{ include_js_file('exploration_editor/main_tab/StateParameterChanges.js') }}
+    {{ include_js_file('exploration_editor/main_tab/StateResponses.js') }}
+    {{ include_js_file('exploration_editor/main_tab/StateStatistics.js') }}
 
-    {{ include_js_file('editor/preview_tab/PreviewTab.js') }}
-    {{ include_js_file('editor/statistics_tab/StatisticsTab.js') }}
-    {{ include_js_file('editor/settings_tab/SettingsTab.js') }}
-    {{ include_js_file('editor/history_tab/HistoryTab.js') }}
-    {{ include_js_file('editor/history_tab/HistoryServices.js') }}
-    {{ include_js_file('editor/feedback_tab/FeedbackTab.js') }}
-    {{ include_js_file('editor/feedback_tab/ThreadDataService.js') }}
-    {{ include_js_file('editor/feedback_tab/ThreadStatusDisplayService.js') }}
-    {{ include_js_file('editor/feedback_tab/ThreadTableDirective.js') }}
+    {{ include_js_file('exploration_editor/preview_tab/PreviewTab.js') }}
+    {{ include_js_file('exploration_editor/statistics_tab/StatisticsTab.js') }}
+    {{ include_js_file('exploration_editor/settings_tab/SettingsTab.js') }}
+    {{ include_js_file('exploration_editor/history_tab/HistoryTab.js') }}
+    {{ include_js_file('exploration_editor/history_tab/HistoryServices.js') }}
+    {{ include_js_file('exploration_editor/feedback_tab/FeedbackTab.js') }}
+    {{ include_js_file('exploration_editor/feedback_tab/ThreadDataService.js') }}
+    {{ include_js_file('exploration_editor/feedback_tab/ThreadStatusDisplayService.js') }}
+    {{ include_js_file('exploration_editor/feedback_tab/ThreadTableDirective.js') }}
 
     {{ include_js_file('domain/exploration/ExplorationObjectFactory.js') }}
     {{ include_js_file('domain/exploration/StateObjectFactory.js') }}
