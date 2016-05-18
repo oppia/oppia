@@ -52,7 +52,7 @@ class UserSettingsModel(base_models.BaseModel):
     # Language preferences specified by the user.
     # TODO(sll): Add another field for the language that the user wants the
     # site to display in. These language preferences are mainly for the purpose
-    # of figuring out what to show by default in the gallery.
+    # of figuring out what to show by default in the library index page.
     preferred_language_codes = ndb.StringProperty(
         repeated=True,
         indexed=True,

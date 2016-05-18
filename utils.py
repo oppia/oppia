@@ -410,29 +410,19 @@ def capitalize_string(input_string):
         return input_string
 
 
-def get_info_card_url_for_category(category):
-    info_card_color = (
-        feconf.CATEGORIES_TO_COLORS[category] if
-        category in feconf.CATEGORIES_TO_COLORS else feconf.DEFAULT_COLOR)
-    return (
-        '/images/gallery/exploration_background_%s_large.png' %
-        info_card_color)
-
-
 def get_hex_color_for_category(category):
-    color = (
+    return (
         feconf.CATEGORIES_TO_COLORS[category]
         if category in feconf.CATEGORIES_TO_COLORS
         else feconf.DEFAULT_COLOR)
-    return feconf.COLORS_TO_HEX_VALUES[color]
 
 
 def get_thumbnail_icon_url_for_category(category):
     icon_name = (
-        category if category in feconf.DEFAULT_CATEGORIES
+        category if category in feconf.ALL_CATEGORIES
         else feconf.DEFAULT_THUMBNAIL_ICON)
     # Remove all spaces from the string.
-    return '/images/gallery/thumbnails/%s.svg' % icon_name.replace(' ', '')
+    return '/images/subjects/%s.svg' % icon_name.replace(' ', '')
 
 
 def _get_short_language_description(full_language_description):

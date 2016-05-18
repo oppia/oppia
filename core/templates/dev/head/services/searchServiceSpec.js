@@ -231,12 +231,11 @@ describe('Search service', function() {
     };
     var urlComponent = '?q=protractor&test&category=("Mathematics")' +
                        '&language_code=("en"%20OR%20"ar")';
-    spyOn(window, 'alert');
-    expect(searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent,
-      results)).toBe('');
-    expect(results.languageCodes.selections).toEqual({});
-    expect(results.categories.selections).toEqual({});
-    expect(window.alert).toHaveBeenCalledWith('Invalid search query url!');
+    expect(function() {
+      searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
+    }).toThrow(new Error(
+      'Invalid search query url: protractor&test&category=("Mathematics")' +
+      '&language_code=("en"%20OR%20"ar")'));
   });
 
   it('should error when category selection url component is malformed',

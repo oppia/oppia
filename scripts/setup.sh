@@ -43,9 +43,6 @@ function maybeInstallDependencies {
       shift
       ;;
 
-      *)
-      echo "Error: Unknown command line option: $i"
-      ;;
     esac
   done
 
@@ -203,6 +200,9 @@ elif [ "$VAGRANT" = true ]; then
 elif [ -f "/usr/bin/google-chrome" ]; then
   # Unix.
   export CHROME_BIN="/usr/bin/google-chrome"
+elif [ -f "/usr/bin/chromium-browser" ]; then
+  # Unix.
+  export CHROME_BIN="/usr/bin/chromium-browser"
 elif [ -f "/c/Program Files (x86)/Google/Chrome/Application/chrome.exe" ]; then
   # Windows.
   export CHROME_BIN="/c/Program Files (x86)/Google/Chrome/Application/chrome.exe"

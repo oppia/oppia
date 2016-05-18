@@ -97,8 +97,6 @@ class CollectionDataHandler(base.BaseHandler):
                 self.user_id and rights_manager.Actor(self.user_id).can_edit(
                     rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id)),
             'collection': collection_dict,
-            'info_card_image_url': utils.get_info_card_url_for_category(
-                collection_dict['category']),
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
         })

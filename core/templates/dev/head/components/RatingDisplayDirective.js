@@ -31,6 +31,14 @@ oppia.directive('ratingDisplay', [function() {
       ratingValue: '='
     },
     templateUrl: 'components/ratingSummary',
+    link: function(scope, element) {
+      // This is needed in order for the scope to be retrievable during Karma
+      // unit testing. See http://stackoverflow.com/a/29833832 for more
+      // details.
+      element[0].isolateScope = function() {
+        return scope;
+      };
+    },
     controller: ['$scope', function($scope) {
       var POSSIBLE_RATINGS = [1, 2, 3, 4, 5];
       $scope.stars = POSSIBLE_RATINGS.map(function(starValue) {

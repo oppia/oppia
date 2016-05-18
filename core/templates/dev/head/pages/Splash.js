@@ -20,16 +20,27 @@ oppia.controller('Splash', [
   '$scope', '$timeout', '$window', 'siteAnalyticsService',
   function($scope, $timeout, $window, siteAnalyticsService) {
     $scope.onRedirectToLogin = function(destinationUrl) {
-      siteAnalyticsService.registerStartLoginEvent(
-        'createExplorationButton');
+      siteAnalyticsService.registerStartLoginEvent('createExplorationButton');
       $timeout(function() {
         $window.location = destinationUrl;
       }, 150);
       return false;
     };
 
-    $scope.navigateTo = function(destinationUrl) {
-      $window.location.href = destinationUrl;
+    $scope.onClickBrowseLibraryButton = function() {
+      siteAnalyticsService.registerClickBrowseLibraryButtonEvent();
+      $timeout(function() {
+        $window.location = '/library';
+      }, 150);
+      return false;
+    };
+
+    $scope.onClickCreateExplorationButton = function() {
+      siteAnalyticsService.registerClickCreateExplorationButtonEvent();
+      $timeout(function() {
+        $window.location = '/my_explorations?mode=create';
+      }, 150);
+      return false;
     };
   }
 ]);

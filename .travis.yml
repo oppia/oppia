@@ -24,7 +24,10 @@ env:
   matrix:
     - RUN_LINT=true
     - RUN_FRONTEND_TESTS=true
-    - RUN_E2E_TESTS=true
+    - RUN_E2E_TESTS_EDITOR=true
+    - RUN_E2E_TESTS_EXTENSIONS=true
+    - RUN_E2E_TESTS_LIBRARY=true
+    - RUN_E2E_TESTS_MISC=true
     - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=false
     - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=true
 matrix:
@@ -69,7 +72,10 @@ install:
 - source scripts/setup_gae.sh || exit 1
 
 script:
-- if [ $RUN_E2E_TESTS == 'true' ]; then bash scripts/run_e2e_tests.sh; fi
+- if [ $RUN_E2E_TESTS_EDITOR == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="editor"; fi
+- if [ $RUN_E2E_TESTS_EXTENSIONS == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="extensions"; fi
+- if [ $RUN_E2E_TESTS_LIBRARY == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="library"; fi
+- if [ $RUN_E2E_TESTS_MISC == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="misc"; fi
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report; fi
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'false' ]; then bash scripts/run_backend_tests.sh; fi
 - if [ $RUN_LINT == 'true' ]; then bash scripts/install_third_party.sh; python scripts/pre_commit_linter.py --path=.; fi

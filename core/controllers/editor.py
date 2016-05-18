@@ -64,7 +64,7 @@ MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE = (
 MODERATOR_REQUEST_FORUM_URL = config_domain.ConfigProperty(
     'moderator_request_forum_url', {'type': 'unicode'},
     'A link to the forum for nominating explorations to be featured '
-    'in the gallery',
+    'in the Oppia library',
     default_value=MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE)
 
 DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = config_domain.ConfigProperty(
@@ -254,8 +254,6 @@ class ExplorationPage(EditorHandler):
             'ALLOWED_GADGETS': feconf.ALLOWED_GADGETS,
             'ALLOWED_INTERACTION_CATEGORIES': (
                 feconf.ALLOWED_INTERACTION_CATEGORIES),
-            # This is needed for the exploration preview.
-            'CATEGORIES_TO_COLORS': feconf.CATEGORIES_TO_COLORS,
             'INVALID_PARAMETER_NAMES': feconf.INVALID_PARAMETER_NAMES,
             'NEW_STATE_TEMPLATE': NEW_STATE_TEMPLATE,
             'SHOW_TRAINABLE_UNRESOLVED_ANSWERS': (
@@ -263,7 +261,7 @@ class ExplorationPage(EditorHandler):
             'TAG_REGEX': feconf.TAG_REGEX,
         })
 
-        self.render_template('editor/exploration_editor.html')
+        self.render_template('exploration_editor/exploration_editor.html')
 
 
 class ExplorationHandler(EditorHandler):
