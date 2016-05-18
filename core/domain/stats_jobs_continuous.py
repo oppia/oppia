@@ -412,6 +412,7 @@ class InteractionAnswerSummariesMRJobManager(
 
     @staticmethod
     def map(item):
+        # pylint: disable=line-too-long
         if InteractionAnswerSummariesMRJobManager._entity_created_before_job_queued(
                 item):
             state_answers_dict = {
@@ -419,7 +420,8 @@ class InteractionAnswerSummariesMRJobManager(
                 'exploration_version': item.exploration_version,
                 'state_name': item.state_name,
                 'interaction_id': item.interaction_id,
-                'answers_list': copy.deepcopy(item.answers_list)
+                'submitted_answer_list': copy.deepcopy(
+                    item.submitted_answer_list)
             }
 
             # Output answers submitted to the exploration for this exp version.
@@ -436,10 +438,10 @@ class InteractionAnswerSummariesMRJobManager(
                 item.state_name), state_answers_dict)
 
     @staticmethod
-    def reduce(key, stringified_state_answers_list):
+    def reduce(key, stringified_submitted_answer_list):
         exploration_id, exploration_version, state_name = key.split(':')
         interaction_id = ast.literal_eval(
-            stringified_state_answers_list[0])['interaction_id']
+            stringified_submitted_answer_list[0])['interaction_id']
 
         # Collapse the list of answers into a single answer dict. This
         # aggregates across multiple answers if the key ends with VERSION_ALL.
@@ -448,18 +450,18 @@ class InteractionAnswerSummariesMRJobManager(
             'exploration_version': exploration_version,
             'state_name': state_name,
             'interaction_id': interaction_id,
-            'answers_list': list(itertools.chain.from_iterable(
-                ast.literal_eval(state_answers)['answers_list']
-                for state_answers in stringified_state_answers_list))
+            'submitted_answer_list': list(itertools.chain.from_iterable(
+                ast.literal_eval(state_answers)['submitted_answer_list']
+                for state_answers in stringified_submitted_answer_list))
         }
 
-        # NOTE TO DEVELOPERS: 'answers_list' above is being converted into a
-        # list. This means ALL answers will be placed into memory at this
-        # point. This is needed because 'answers_list' is iterated multiple
-        # times by different computations. The iterable could also be tee'd,
-        # but that also can take significant memory. Adding this note here in
-        # case it leads to significant memory consumption in the future, as
-        # well as pointing out a possible solution which may consume less
+        # NOTE TO DEVELOPERS: 'submitted_answer_list' above is being converted
+        # into a list. This means ALL answers will be placed into memory at this
+        # point. This is needed because 'submitted_answer_list' is iterated
+        # multiple times by different computations. The iterable could also be
+        # tee'd, but that also can take significant memory. Adding this note
+        # here in case it leads to significant memory consumption in the future,
+        # as well as pointing out a possible solution which may consume less
         # memory.
 
         # Get all desired calculations for the current interaction id.

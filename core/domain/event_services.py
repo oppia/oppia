@@ -19,7 +19,8 @@
 import inspect
 
 from core import jobs_registry
-from core.domain import exp_domain
+from core.domain import exp_services
+from core.domain import stats_domain
 from core.domain import stats_services
 from core.platform import models
 import feconf
@@ -82,10 +83,14 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
         user.
         """
         # TODO(sll): Escape these args?
+        exploration = exp_services.get_exploration_by_id(
+            exploration_id, version=exploration_version)
+        interaction_id = exploration.states[state_name].interaction.id
         stats_services.record_answer(
-            exploration_id, exploration_version, state_name,
-            answer_group_index, rule_spec_index, classification_categorization,
-            session_id, time_spent_in_secs, params, normalized_answer)
+            exploration, state_name, stats_domain.SubmittedAnswer(
+                normalized_answer, interaction_id, answer_group_index,
+                rule_spec_index, classification_categorization, params,
+                session_id, time_spent_in_secs))
 
 
 class StartExplorationEventHandler(BaseEventHandler):

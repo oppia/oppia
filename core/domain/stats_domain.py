@@ -17,13 +17,15 @@
 """Domain object for statistics models."""
 
 import copy
+import logging
 import operator
 import sys
 import utils
 
-from core.domain import exp_services
 from core.domain import interaction_registry
 from core.platform import models
+import feconf
+
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 
@@ -40,6 +42,7 @@ MIGRATED_STATE_ANSWER_SESSION_ID = 'migrated_state_answer_session_id'
 MIGRATED_STATE_ANSWER_TIME_SPENT_IN_SEC = 0.0
 
 
+# TODO(bhenning): Remove this.
 class StateRuleAnswerLog(object):
     """Domain object that stores answers which match different state rules.
 
@@ -99,24 +102,31 @@ class StateRuleAnswerLog(object):
 
 
 class StateAnswers(object):
-    """Domain object containing answers of states."""
+    """Domain object containing answers submitted to an exploration state."""
 
     def __init__(self, exploration_id, exploration_version, state_name,
-                 interaction_id, answers_list):
+                 interaction_id, submitted_answer_list,
+                 schema_version=feconf.CURRENT_STATE_ANSWERS_SCHEMA_VERSION):
         """Initialize domain object for state answers.
 
         interaction_id contains the interaction type of the state, e.g.
         multiple choice.
 
-        answers_list contains a list of answer dicts, each of which
-        contains information about an answer, e.g. answer_value, session_id,
-        time_spent_in_sec.
+        submitted_answer_list contains a list of SubmittedAnswer objects.
         """
         self.exploration_id = exploration_id
         self.exploration_version = exploration_version
         self.state_name = state_name
         self.interaction_id = interaction_id
-        self.answers_list = answers_list
+        self.submitted_answer_list = submitted_answer_list
+        self.schema_version = schema_version
+
+    def get_submitted_answer_dict_list(self):
+        """Returns the submitted_answer_list stored within this object as a list
+        of StateAnswer dicts.
+        """
+        return [state_answer.to_dict()
+                for state_answer in self.submitted_answer_list]
 
     def validate(self):
         """Validates StateAnswers domain object entity."""
@@ -143,15 +153,125 @@ class StateAnswers(object):
                 raise utils.ValidationError(
                     'Unknown interaction id %s' % self.interaction_id)
 
-        if not isinstance(self.answers_list, list):
+        if not isinstance(self.submitted_answer_list, list):
             raise utils.ValidationError(
-                'Expected answers_list to be a list, received %s' %
-                self.answers_list)
+                'Expected submitted_answer_list to be a list, received %s' %
+                self.submitted_answer_list)
 
-        # Note: There is no need to validate content of answers_list here
-        # because each answer is validated before it is appended to
-        # answers_list (which is faster than validating whole answers_list
-        # each time a new answer is recorded).
+        # Note: There is no need to validate content of submitted_answer_list
+        # here because each answer is validated before it is appended to
+        # submitted_answer_list (which is faster than validating whole
+        # submitted_answer_list each time a new answer is recorded).
+
+
+class SubmittedAnswer(object):
+    """Domain object representing an answer submitted to a state."""
+
+    # There is a danger of data overflow if the answer log exceeds 1 MB. Given
+    # 1000-5000 answers, each answer must be at most 200-1000 bytes in size. We
+    # will address this later if it happens regularly. At the moment, a
+    # ValidationError is raised if an answer exceeds the maximum size.
+    _MAX_BYTES_PER_ANSWER = 2500
+
+    # Prefix of strings that are cropped because they are too long.
+    _CROPPED_PREFIX_STRING = 'CROPPED: '
+
+    # Answer value that is stored if non-string answer is too big
+    _PLACEHOLDER_FOR_TOO_LARGE_NONSTRING = 'TOO LARGE NONSTRING'
+
+    # NOTE TO DEVELOPERS: do not use the rule_spec_str and answer_str
+    # parameters, as they are here as part of the answer migration.
+    def __init__(self, normalized_answer, interaction_id, answer_group_index,
+                 rule_spec_index, classification_categorization, params,
+                 session_id, time_spent_in_sec, rule_spec_str=None,
+                 answer_str=None):
+        self.normalized_answer = normalized_answer
+        self.interaction_id = interaction_id
+        self.answer_group_index = answer_group_index
+        self.rule_spec_index = rule_spec_index
+        self.classification_categorization = classification_categorization
+        self.params = params
+        self.session_id = session_id
+        self.time_spent_in_sec = time_spent_in_sec
+        self.rule_spec_str = rule_spec_str
+        self.answer_str = answer_str
+
+    def to_dict(self):
+        submitted_answer_dict = {
+            'answer': self.normalized_answer,
+            'interaction_id': self.interaction_id,
+            'answer_group_index': self.answer_group_index,
+            'rule_spec_index': self.rule_spec_index,
+            'classification_categorization': self.classification_categorization,
+            'params': self.params,
+            'session_id': self.session_id,
+            'time_spent_in_sec': self.time_spent_in_sec
+        }
+        if self.rule_spec_str:
+            submitted_answer_dict['rule_spec_str'] = self.rule_spec_str
+        if self.answer_str:
+            submitted_answer_dict['answer_str'] = self.answer_str
+        return submitted_answer_dict
+
+    @classmethod
+    def from_dict(cls, submitted_answer_dict):
+        return cls(
+            submitted_answer_dict['answer'],
+            submitted_answer_dict['interaction_id'],
+            submitted_answer_dict['answer_group_index'],
+            submitted_answer_dict['rule_spec_index'],
+            submitted_answer_dict['classification_categorization'],
+            submitted_answer_dict['params'],
+            submitted_answer_dict['session_id'],
+            submitted_answer_dict['time_spent_in_sec'],
+            rule_spec_str=submitted_answer_dict.get('rule_spec_str'),
+            answer_str=submitted_answer_dict.get('answer_str'))
+
+    def validate(self):
+        """Validates this submitted answer object."""
+        # TODO(bhenning): Remove the truncation/omission of submitted rules and
+        # implement a linked-list data structure for answers.
+
+        # TODO(msl): These validation methods need tests to ensure that
+        # the right errors show up in the various cases.
+
+        if self.normalized_answer is None:
+            raise utils.ValidationError(
+                'SubmittedAnswers must have a provided normalized_answer')
+        if self.time_spent_in_sec is None:
+            raise utils.ValidationError(
+                'SubmittedAnswers must have a provided time_spent_in_sec')
+        if self.session_id is None:
+            raise utils.ValidationError(
+                'SubmittedAnswers must have a provided session_id')
+
+        if sys.getsizeof(self.normalized_answer) > self._MAX_BYTES_PER_ANSWER:
+            if isinstance(self.normalized_answer, str):
+                logging.error(
+                    'Answer is too large to be stored: %s ...' % (
+                        self.normalized_answer[:self._MAX_BYTES_PER_ANSWER]))
+                self.normalized_answer = '%s%s ...' % (
+                    self._CROPPED_PREFIX_STRING,
+                    self.normalized_answer[:self._MAX_BYTES_PER_ANSWER])
+            else:
+                logging.warning('answer is too big to be stored')
+                self.normalized_answer = (
+                    self._PLACEHOLDER_FOR_TOO_LARGE_NONSTRING)
+
+        if not isinstance(self.session_id, basestring):
+            raise utils.ValidationError(
+                'Expected session_id to be a string, received %s' %
+                str(self.session_id))
+
+        if not isinstance(self.time_spent_in_sec, float):
+            raise utils.ValidationError(
+                'Expected time_spent_in_sec to be a float, received %s' %
+                str(self.time_spent_in_sec))
+
+        if self.time_spent_in_sec < 0.:
+            raise utils.ValidationError(
+                'Expected time_spent_in_sec to be non-negative, received %f' %
+                self.time_spent_in_sec)
 
 
 class StateAnswersCalcOutput(object):
@@ -205,7 +325,7 @@ class StateAnswersCalcOutput(object):
                 self.calculation_id)
 
         output_data = self.calculation_output
-        if not (sys.getsizeof(output_data) <= MAX_BYTES_PER_CALC_OUTPUT_DATA):
+        if sys.getsizeof(output_data) > MAX_BYTES_PER_CALC_OUTPUT_DATA:
             # TODO(msl): find a better way to deal with big
             # calculation output data, e.g. just skip. At the moment,
             # too long answers produce a ValidationError.

@@ -85,7 +85,7 @@ class StateAnswersTests(test_utils.GenericTestBase):
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid4', TIME_SPENT, PARAMS,
             self.UNICODE_TEST_STRING)
 
-        expected_answers_list1 = [{
+        expected_submitted_answer_list1 = [{
             'answer': 'answer1', 'time_spent_in_sec': 5.0,
             'answer_group_index': 0, 'rule_spec_index': 0,
             'classification_categorization': 'explicit', 'session_id': 'sid1',
@@ -101,7 +101,7 @@ class StateAnswersTests(test_utils.GenericTestBase):
             'classification_categorization': 'explicit', 'session_id': 'sid1',
             'interaction_id': 'TextInput', 'params': {}
         }]
-        expected_answers_list2 = [{
+        expected_submitted_answer_list2 = [{
             'answer': [2, 4, 8], 'time_spent_in_sec': 5.0,
             'answer_group_index': 2, 'rule_spec_index': 0,
             'classification_categorization': 'explicit', 'session_id': 'sid3',
@@ -115,8 +115,12 @@ class StateAnswersTests(test_utils.GenericTestBase):
 
         state_answers = stats_services.get_state_answers(
             'eid', exp_version, FIRST_STATE_NAME)
-        self.assertEquals(state_answers.answers_list, expected_answers_list1)
+        self.assertEquals(
+            state_answers.submitted_answer_list,
+            expected_submitted_answer_list1)
 
         state_answers = stats_services.get_state_answers(
             'eid', exp_version, SECOND_STATE_NAME)
-        self.assertEquals(state_answers.answers_list, expected_answers_list2)
+        self.assertEquals(
+            state_answers.submitted_answer_list,
+            expected_submitted_answer_list2)

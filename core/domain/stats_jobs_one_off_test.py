@@ -41,13 +41,13 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
     # This is based on the old stats_models.process_submitted_answer().
     def _record_old_answer(
             self, state_name, rule_spec_str, answer_html_str,
-            exploration_id=DEMO_EXP_ID):
+            exploration_id=DEMO_EXP_ID, submitted_answer_count=1):
         answer_log = stats_models.StateRuleAnswerLogModel.get_or_create(
             exploration_id, state_name, rule_spec_str)
         if answer_html_str in answer_log.answers:
-            answer_log.answers[answer_html_str] += 1
+            answer_log.answers[answer_html_str] += submitted_answer_count
         else:
-            answer_log.answers[answer_html_str] = 1
+            answer_log.answers[answer_html_str] = submitted_answer_count
         try:
             answer_log.put()
         except Exception as e:
@@ -108,7 +108,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.answers_list, [{
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
             'answer': [{
                 'readableNoteName': 'C5',
                 'noteDuration': {
@@ -228,6 +228,30 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self.assertEqual(len(job_output), 1)
         self.assertIn('Failed to normalize', job_output[0])
 
+    def test_migration_job_should_support_very_large_answers(self):
+        """This test ensures the migration job does not fail when submitting
+        large numbers of answers to the new data store that would require the
+        new data store to begin using its linked-list functionality.
+        """
+        state_name = 'Text Input'
+
+        rule_spec_str = 'Contains(ate)'
+        html_answer = ''.join([str(x) for x in xrange(1024)])
+        self._record_old_answer(
+            state_name, rule_spec_str, html_answer, submitted_answer_count=1000)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+
+        # All 1,000 answers should be retrievable, even though they exceed the
+        # size limit of a single entity.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(len(state_answers.submitted_answer_list), 1000)
+        self.assertEqual(job_output, [])
+
     def test_migrate_code_repl(self):
         state_name = 'Code Editor'
 
@@ -244,7 +268,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.answers_list, [{
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
             'answer': {
                 'code': code_answer,
                 'output': 'Hello Oppia',
@@ -277,7 +301,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.answers_list, [{
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
             'answer': None,
             'time_spent_in_sec': 0.0,
             'answer_group_index': 0,
@@ -308,7 +332,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.answers_list, [{
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
             'answer': {
                 'clickPosition': [0.307, 0.871],
                 'clickedRegions': ['ctor']
@@ -343,7 +367,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.answers_list, [{
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
             'answer': [18.979026, -99.316406],
             'time_spent_in_sec': 0.0,
             'answer_group_index': 2,
@@ -376,7 +400,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.answers_list, [{
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
             'answer': ['<p>Good option A.</p>', '<p>Good option C.</p>'],
             'time_spent_in_sec': 0.0,
             'answer_group_index': 0,
@@ -407,7 +431,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.answers_list, [{
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
             'answer': {
                 'assumptions_string': 'p',
                 'target_string': 'p',
@@ -445,7 +469,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.answers_list, [{
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
             'answer': {
                 'ascii': 'y=(1)/(2)mx+b',
                 'latex': 'y=\\dfract{1}{2}mx+b'
@@ -479,7 +503,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.answers_list, [{
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
             'answer': 1,
             'time_spent_in_sec': 0.0,
             'answer_group_index': 0,
@@ -512,7 +536,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.answers_list, [{
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
             'answer': [{
                 'readableNoteName': 'C5',
                 'noteDuration': {
@@ -549,7 +573,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.answers_list, [{
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
             'answer': 89.0,
             'time_spent_in_sec': 0.0,
             'answer_group_index': 0,
@@ -583,7 +607,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.answers_list, [{
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
             'answer': {
                 'error': '',
                 'evaluation': '',
@@ -621,7 +645,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.answers_list, [{
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
             'answer': ['purple'],
             'time_spent_in_sec': 0.0,
             'answer_group_index': 0,
@@ -652,7 +676,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         # The answer should have been properly migrated to the new storage
         # model.
         state_answers = self._get_state_answers(state_name)
-        self.assertEqual(state_answers.answers_list, [{
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
             'answer': 'appreciate',
             'time_spent_in_sec': 0.0,
             'answer_group_index': 0,

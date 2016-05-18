@@ -62,7 +62,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         are calculated correctly for interaction answer views.
         """
         # Some answers.
-        dummy_answers_list = [
+        dummy_submitted_answer_list = [
             self._create_sample_answer('First choice', 4., 'sid1'),
             self._create_sample_answer('Second choice', 5., 'sid1'),
             self._create_sample_answer('Fourth choice', 2.5, 'sid1'),
@@ -78,7 +78,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
             'exploration_version': 1,
             'state_name': 'Welcome!',
             'interaction_id': 'MultipleChoiceInput',
-            'answers_list': dummy_answers_list
+            'submitted_answer_list': dummy_submitted_answer_list
         }
 
         # Calculate answer counts. Input a state answers dict as the continuous
@@ -248,7 +248,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
             'exploration_version': 1,
             'state_name': 'What language',
             'interaction_id': 'TextInput',
-            'answers_list': answer_list
+            'submitted_answer_list': submitted_answer_list
         }
 
         # Calculate answer counts..
@@ -304,7 +304,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
             'exploration_version': 1,
             'state_name': 'What language',
             'interaction_id': 'TextInput',
-            'answers_list': [answer],
+            'submitted_answer_list': [answer],
         }
 
         # Calculate answer counts.
@@ -348,7 +348,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
             'exploration_version': 1,
             'state_name': 'State',
             'interaction_id': 'TextInput',
-            'answers_list': []
+            'submitted_answer_list': []
         }
 
         actual_state_answers_calc_output = (
@@ -365,11 +365,12 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
 
         # Only submitting a hard rule should result in only one returned
         # category.
-        dummy_answers_list = [
+        dummy_submitted_answer_list = [
             self._create_sample_answer('Hard A', 0., 'sid1',
                 exp_domain.EXPLICIT_CLASSIFICATION),
         ]
-        state_answers_dict['answers_list'] = dummy_answers_list
+        state_answers_dict['submitted_answer_list'] = (
+            dummy_submitted_answer_list)
 
         actual_state_answers_calc_output = (
             calculation_instance.calculate_from_state_answers_dict(
@@ -386,7 +387,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
 
         # Multiple categories of answers should be identified and properly
         # aggregated.
-        dummy_answers_list = [
+        dummy_submitted_answer_list = [
             self._create_sample_answer('Explicit A', 0., 'sid1',
                 exp_domain.EXPLICIT_CLASSIFICATION),
             self._create_sample_answer('Explicit B', 0., 'sid1',
@@ -415,7 +416,8 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
             self._create_sample_answer('Default B', 0., 'sid1',
                 exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
         ]
-        state_answers_dict['answers_list'] = dummy_answers_list
+        state_answers_dict['submitted_answer_list'] = (
+            dummy_submitted_answer_list)
 
         actual_state_answers_calc_output = (
             calculation_instance.calculate_from_state_answers_dict(
@@ -464,7 +466,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
                 'TopAnswersByCategorization'))
 
         # Create an answer with an unknown classification category.
-        dummy_answers_list = [
+        dummy_submitted_answer_list = [
             self._create_sample_answer('Hard A', 0., 'sid1',
                 classify_category='unknown_category'),
         ]
@@ -473,7 +475,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
             'exploration_version': 1,
             'state_name': 'State',
             'interaction_id': 'TextInput',
-            'answers_list': dummy_answers_list
+            'submitted_answer_list': dummy_submitted_answer_list
         }
 
         with self.assertRaisesRegexp(

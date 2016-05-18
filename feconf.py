@@ -67,6 +67,10 @@ CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 7
 # number must be changed.
 CURRENT_COLLECTION_SCHEMA_VERSION = 1
 
+# This value should be updated in the event of any
+# StateAnswersModel.submitted_answer_list schema change.
+CURRENT_STATE_ANSWERS_SCHEMA_VERSION = 1
+
 # The default number of exploration tiles to load at a time in the gallery
 # page.
 GALLERY_PAGE_SIZE = 20

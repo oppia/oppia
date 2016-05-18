@@ -123,7 +123,7 @@ class AnswerFrequencies(BaseCalculation):
         This method is run from within the context of a MapReduce job.
         """
         answer_counts_as_list_of_pairs = _count_answers(
-            state_answers_dict['answers_list'])
+            state_answers_dict['submitted_answer_list'])
 
         calculation_output = []
         for item in answer_counts_as_list_of_pairs:
@@ -151,7 +151,7 @@ class Top5AnswerFrequencies(BaseCalculation):
         This method is run from within the context of a MapReduce job.
         """
         top_5_answer_counts_as_list_of_pairs = (
-            _count_answers(state_answers_dict['answers_list'])[:5])
+            _count_answers(state_answers_dict['submitted_answer_list'])[:5])
 
         calculation_output = []
         for item in top_5_answer_counts_as_list_of_pairs:
@@ -184,7 +184,7 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
         # u"[u'abc']", u"[u'xyz']", u"[u'xyz', u'abc']"]
         answer_values = [
             answer_dict['answer']
-            for answer_dict in state_answers_dict['answers_list']]
+            for answer_dict in state_answers_dict['submitted_answer_list']]
 
         # For each stringified set, replace '[' and ']' by empty string,
         # and split at commas ', ' to convert string to set.
@@ -237,7 +237,7 @@ class TopAnswersByCategorization(BaseCalculation):
         This method is run from within the context of a MapReduce job.
         """
         top_answer_counts_as_list_of_pairs = _count_answers(
-            state_answers_dict['answers_list'])
+            state_answers_dict['submitted_answer_list'])
 
         calculation_output = {
             exp_domain.EXPLICIT_CLASSIFICATION: [],

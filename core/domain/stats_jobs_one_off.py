@@ -293,7 +293,7 @@ class AnswersAudit2(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        for answer in item.answers_list:
+        for answer in item.submitted_answer_list:
             yield (AnswersAudit2._CUMULATIVE_ANSWER_COUNTER_KEY, {
                 'reduce_type': AnswersAudit2._CUMULATIVE_ANSWER_COUNTER_KEY
             })
@@ -1154,14 +1154,13 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             item = stats_models.StateRuleAnswerLogModel.get(item_id)
             rule_str = value_dict['rule_str']
             migration_errors = AnswerMigrationJob._migrate_answers(
-                item_id, exploration_id, exploration, state_name, state,
-                item.answers, rule_str)
+                item_id, exploration, state_name, state, item.answers, rule_str)
             for error in migration_errors:
                 yield error
 
     @classmethod
-    def _migrate_answers(cls, item_id, exp_id, exploration, state_name, state,
-                         answers, rule_str):
+    def _migrate_answers(cls, item_id, exploration, state_name, state, answers,
+                         rule_str):
         classification_categorization = (
             cls._infer_classification_categorization(rule_str))
 
@@ -1213,6 +1212,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # thus, for different versions of the exploration. This information is
         # practically impossible to recover, so this strategy is considered
         # adequate.
+        interaction_id = state.interaction.id
         for answer_str, answer_frequency in answers.iteritems():
             # Major point of failure is if answer returns None; the error
             # variable will contain why the reconstitution failed.
@@ -1223,12 +1223,12 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 yield error
                 continue
 
-            for _ in xrange(answer_frequency):
-                stats_services.record_answer(
-                    exp_id, exploration.version, state_name, answer_group_index,
-                    rule_spec_index, classification_categorization, session_id,
-                    time_spent_in_sec, params, answer, rule_spec_str=rule_str,
-                    answer_str=answer_str)
+            stats_services.record_answers(exploration, state_name, [
+                stats_domain.SubmittedAnswer(
+                    answer, interaction_id, answer_group_index,
+                    rule_spec_index, classification_categorization, params,
+                    session_id, time_spent_in_sec, rule_spec_str=rule_str,
+                    answer_str=answer_str)] * answer_frequency)
 
     # Following are helpers and constants related to reconstituting the
     # CheckedProof object.
