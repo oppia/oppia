@@ -473,13 +473,15 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
   'alertsService', 'changeListService', 'focusService', 'routerService',
   'explorationData', 'explorationRightsService', 'editabilityService',
   'explorationWarningsService', 'siteAnalyticsService',
-  'explorationObjectiveService',
+  'explorationObjectiveService', 'explorationTitleService',
+  'explorationCategoryService', 'explorationStatesService','CATEGORY_LIST',
   function(
       $scope, $http, $rootScope, $window, $timeout, $modal,
       alertsService, changeListService, focusService, routerService,
       explorationData, explorationRightsService, editabilityService,
       explorationWarningsService, siteAnalyticsService,
-      explorationObjectiveService) {
+      explorationObjectiveService, explorationTitleService,
+      explorationCategoryService, explorationStatesService, CATEGORY_LIST) {
     // Whether or not a save action is currently in progress.
     $scope.isSaveInProgress = false;
     // Whether or not a discard action is currently in progress.
@@ -620,49 +622,94 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     };
 
     $scope.showPublishExplorationModal = function() {
-      siteAnalyticsService.registerOpenPublishExplorationModalEvent(
-        explorationData.explorationId);
-      alertsService.clearWarnings();
+       siteAnalyticsService.registerOpenPublishExplorationModalEvent(
+         explorationData.explorationId);
+       alertsService.clearWarnings();
 
-      // If the objective has not yet been specified, open the pre-publication
-      // 'add exploration metadata' modal.
-      if (!explorationObjectiveService.savedMemento) {
-        $modal.open({
-          templateUrl: 'modals/addExplorationMetadata',
-          backdrop: true,
-          controller: [
-            '$scope', '$modalInstance', 'explorationObjectiveService',
-            function($scope, $modalInstance, explorationObjectiveService) {
-              // If no objective has been specified yet, require the creator
-              // to specify it.
-              $scope.explorationObjectiveService = explorationObjectiveService;
-              $scope.requireObjectiveToBeSpecified = (
-                !explorationObjectiveService.savedMemento);
+       // If the objective has not yet been specified, open the pre-publication
+       // 'add exploration metadata' modal.
+       if (explorationObjectiveService.savedMemento) {
+         $modal.open({
+           templateUrl: 'modals/addExplorationMetadata',
+           backdrop: true,
+           controller: [
+             '$scope', '$modalInstance', 'explorationObjectiveService',
+             'explorationTitleService', 'explorationCategoryService',
+             'explorationStatesService', 'CATEGORY_LIST',
+             'explorationLanguageCodeService',
+             function($scope, $modalInstance, explorationObjectiveService,
+             explorationTitleService, explorationCategoryService,
+             explorationStatesService, CATEGORY_LIST,
+             explorationLanguageCodeService) {
+               // If no objective has been specified yet, require the creator
+               // to specify it.
+               $scope.explorationTitleService = explorationTitleService;
+               $scope.explorationObjectiveService = explorationObjectiveService;
+               $scope.explorationCategoryService = explorationCategoryService;
+               $scope.explorationLanguageCodeService = explorationLanguageCodeService;
+               $scope.requireTitleToBeSpecified = (
+                 !explorationTitleService.savedMemento);
+               $scope.requireObjectiveToBeSpecified = (
+                 !explorationObjectiveService.savedMemento);
+               $scope.requireCategoryToBeSpecified = (
+                 !explorationCategoryService.savedMemento);
+               $scope.requireLanguageToBeSpecified = (
+                 !explorationLanguageCodeService.savedMemento);
+               $scope.CATEGORY_LIST_FOR_SELECT2 = [];
 
-              $scope.save = function() {
-                if ($scope.requireObjectiveToBeSpecified) {
-                  if (!explorationObjectiveService.displayed) {
-                    throw Error('Please specify an objective');
+              for (var i = 0; i < CATEGORY_LIST.length; i++) {
+                $scope.CATEGORY_LIST_FOR_SELECT2.push({
+                  id: CATEGORY_LIST[i],
+                  text: CATEGORY_LIST[i]
+                });
+              }
+
+              var _states = explorationStatesService.getStates();
+                if (_states) {
+                  var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2.some(
+                    function(categoryItem) {
+                      return categoryItem.id === explorationCategoryService.savedMemento;
+                    }
+                  );
+
+                  if (!categoryIsInSelect2) {
+                    $scope.CATEGORY_LIST_FOR_SELECT2.push({
+                      id: explorationCategoryService.savedMemento,
+                      text: explorationCategoryService.savedMemento
+                    });
                   }
-                  explorationObjectiveService.saveDisplayedValue();
                 }
-                $modalInstance.close();
-              };
 
-              $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
-                alertsService.clearWarnings();
-              };
-            }
-          ]
-        }).result.then(function() {
-          saveDraftToBackend('Add an objective.', openPublishExplorationModal);
-        });
-      } else {
-        // No further metadata is needed. Open the publish modal immediately.
-        openPublishExplorationModal();
-      }
-    };
+               $scope.save = function() {
+                 console.log(explorationCategoryService.savedMemento);
+                 console.log(explorationCategoryService.displayed);
+                 console.log(explorationLanguageCodeService.savedMemento);
+                 console.log(explorationLanguageCodeService.displayed);
+                 explorationObjectiveService.saveDisplayedValue();
+                 explorationTitleService.saveDisplayedValue();
+                 explorationCategoryService.saveDisplayedValue();
+                 explorationLanguageCodeService.saveDisplayedValue();
+                 $modalInstance.close();
+                 console.log(explorationCategoryService.savedMemento);
+                 console.log(explorationCategoryService.displayed);
+                 console.log(explorationLanguageCodeService.savedMemento);
+                 console.log(explorationLanguageCodeService.displayed);
+               };
+
+               $scope.cancel = function() {
+                 $modalInstance.dismiss('cancel');
+                 alertsService.clearWarnings();
+               };
+             }
+           ]
+         }).result.then(function() {
+           saveDraftToBackend('Add an objective.', openPublishExplorationModal);
+         });
+       } else {
+         // No further metadata is needed. Open the publish modal immediately.
+         openPublishExplorationModal();
+       }
+     };
 
     $scope.getPublishExplorationButtonTooltip = function() {
       if (explorationWarningsService.countWarnings() > 0) {

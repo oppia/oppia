@@ -35,7 +35,6 @@ oppia.controller('ExplorationSettings', [
       explorationParamChangesService, explorationWarningsService,
       CATEGORY_LIST, explorationAdvancedFeaturesService) {
     $scope.CATEGORY_LIST_FOR_SELECT2 = [];
-
     for (var i = 0; i < CATEGORY_LIST.length; i++) {
       $scope.CATEGORY_LIST_FOR_SELECT2.push({
         id: CATEGORY_LIST[i],
@@ -117,7 +116,15 @@ oppia.controller('ExplorationSettings', [
     };
 
     $scope.saveExplorationCategory = function() {
+      console.log(explorationCategoryService.savedMemento);
+      console.log(explorationCategoryService.displayed);
+      console.log(explorationTitleService.savedMemento);
+      console.log(explorationTitleService.displayed);
       explorationCategoryService.saveDisplayedValue();
+      console.log(explorationCategoryService.savedMemento);
+      console.log(explorationCategoryService.displayed);
+      console.log(explorationTitleService.savedMemento);
+      console.log(explorationTitleService.displayed);
     };
 
     $scope.saveExplorationObjective = function() {
