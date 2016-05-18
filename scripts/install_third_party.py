@@ -27,6 +27,11 @@ import zipfile
 
 import common
 
+#set the proxy to empty sting if the installation is through Vagrant so that
+#their is no error like the one at pastebin http://pastebin.com/z34hsmi9
+if 'VAGRANT' in os.environ:
+    os.environ['http_proxy'] = ''
+    
 TOOLS_DIR = os.path.join('..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
 THIRD_PARTY_STATIC_DIR = os.path.join(THIRD_PARTY_DIR, 'static')
