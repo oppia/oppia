@@ -44,7 +44,7 @@ ALLOW_YAML_FILE_UPLOAD = config_domain.ConfigProperty(
 
 
 def get_matching_activity_dicts(query_string, search_cursor):
-    """Given a query string and a search cursor, returns a list of activities
+    """Given a query string and a search cursor, returns a list of activity
        dicts that satisfy the search query.
     """
     # TODO(mgowano): Remove '' in query to allow for collection searches once
@@ -55,7 +55,6 @@ def get_matching_activity_dicts(query_string, search_cursor):
     exp_ids, new_search_cursor = (
         exp_services.get_exploration_ids_matching_query(
             query_string, cursor=search_cursor))
-
     activity_list = []
     activity_list = (
         summary_services.get_displayable_col_summary_dicts_matching_ids(

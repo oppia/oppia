@@ -87,41 +87,11 @@ class CollectionDataHandler(base.BaseHandler):
 
         try:
             collection_dict = (
-                collection_services.get_learner_collection_dict_by_id(
-                    collection_id, self.user_id))
+                summary_services.get_learner_collection_dict_by_id(
+                    collection_id, self.user_id,
+                    allow_invalid_explorations=allow_invalid_explorations))
         except Exception as e:
             raise self.PageNotFoundException(e)
-
-        collection_is_public = rights_manager.is_collection_public(
-            collection_id)
-
-        # Insert an 'exploration' dict into each collection node, where the
-        # dict includes meta information about the exploration (ID and title).
-        for collection_node in collection_dict['nodes']:
-            exploration_id = collection_node['exploration_id']
-            exploration_is_private = rights_manager.is_exploration_private(
-                exploration_id)
-            # Temporary variable to avoid line-too-long lint error
-            x = summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                exploration_id, self.user_id)
-            summary_dict = x
-            if not allow_invalid_explorations:
-                if not summary_dict:
-                    raise utils.ValidationError(
-                        'Expected collection to only reference valid '
-                        'explorations, but found an exploration with ID: %s '
-                        '(was the exploration deleted or is it a private '
-                        'exploration that you do not have edit access to?)'
-                        % exploration_id)
-                if collection_is_public and exploration_is_private:
-                    raise utils.ValidationError(
-                        'Cannot reference a private exploration within a '
-                        'public collection, exploration ID: %s'
-                        % exploration_id)
-            if summary_dict:
-                collection_node['exploration_summary'] = summary_dict[0]
-            else:
-                collection_node['exploration_summary'] = None
 
         self.values.update({
             'can_edit': (

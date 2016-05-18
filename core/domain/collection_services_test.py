@@ -1446,7 +1446,7 @@ class CollectionSearchTests(CollectionServicesUnitTests):
 
         collection_services.load_demo('0')
         results = collection_services.search_collections('Mathematics', 2)[0]
-        self.assertEqual(results, ['0'])
+        self.assertEqual(results, [])
 
     def test_index_collections_given_ids(self):
         all_collection_ids = ['id0', 'id1', 'id2', 'id3', 'id4']
