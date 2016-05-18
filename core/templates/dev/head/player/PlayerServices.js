@@ -99,24 +99,15 @@ oppia.factory('oppiaPlayerService', [
     var _loadInitialState = function(successCallback) {
       var initialState = exploration.getInitialState();
 
-      var baseParams = {};
-      for (var paramName in exploration.paramSpecs) {
-        // TODO(sll): This assumes all parameters are of type UnicodeString.
-        // We should generalize this to other default values for different
-        // types of parameters.
-        baseParams[paramName] = '';
-      }
-
-      var startingParams = makeParams(
-        baseParams,
-        exploration.paramChanges.concat(initialState.paramChanges),
-        [baseParams]);
-      if (startingParams === null) {
+      var oldParams = LearnerParamsService.getAllParams();
+      var newParams = makeParams(
+        oldParams, initialState.paramChanges, [oldParams]);
+      if (newParams === null) {
         alertsService.addWarning('Expression parsing error.');
         return;
       }
 
-      var questionHtml = makeQuestion(initialState, [startingParams]);
+      var questionHtml = makeQuestion(initialState, [newParams]);
       if (questionHtml === null) {
         alertsService.addWarning('Expression parsing error.');
         return;
@@ -124,18 +115,41 @@ oppia.factory('oppiaPlayerService', [
 
       if (!_editorPreviewMode) {
         StatsReportingService.recordExplorationStarted(
-          exploration.initStateName, startingParams);
+          exploration.initStateName, newParams);
       }
 
       $rootScope.$broadcast('playerStateChange');
-      successCallback(exploration, questionHtml, startingParams);
+      successCallback(exploration, questionHtml, newParams);
+    };
+
+    // Initialize the parameters in the exploration as specified in the
+    // exploration-level initial parameter changes list, followed by any
+    // manual parameter changes (in editor preview mode).
+    var initParams = function(manualParamChanges) {
+      var baseParams = {};
+      for (var paramName in exploration.paramSpecs) {
+        // TODO(sll): This assumes all parameters are of type
+        // UnicodeString. We should generalize this to other default values
+        // for different types of parameters.
+        baseParams[paramName] = '';
+      }
+
+      var startingParams = makeParams(
+        baseParams,
+        exploration.paramChanges.concat(manualParamChanges),
+        [baseParams]);
+
+      LearnerParamsService.init(startingParams);
     };
 
     return {
-      // This should only be used in editor preview mode.
-      populateExploration: function(explorationData) {
+      // This should only be used in editor preview mode. It sets the
+      // exploration data from what's currently specified in the editor, and
+      // also initializes the parameters to empty strings.
+      populateExploration: function(explorationData, manualParamChanges) {
         if (_editorPreviewMode) {
           exploration = ExplorationObjectFactory.create(explorationData);
+          initParams(manualParamChanges);
         } else {
           throw 'Error: cannot populate exploration in learner mode.';
         }
@@ -156,7 +170,6 @@ oppia.factory('oppiaPlayerService', [
        */
       init: function(successCallback) {
         answerIsBeingProcessed = false;
-        LearnerParamsService.init({});
         playerTranscriptService.init();
 
         if (_editorPreviewMode) {
@@ -175,6 +188,8 @@ oppia.factory('oppiaPlayerService', [
             var data = response.data;
             exploration = ExplorationObjectFactory.create(data.exploration);
             version = data.version;
+
+            initParams([]);
 
             StatsReportingService.initSession(
               _explorationId, data.version, data.session_id,

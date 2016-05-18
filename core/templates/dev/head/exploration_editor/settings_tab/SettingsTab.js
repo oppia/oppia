@@ -16,7 +16,7 @@
  * @fileoverview Controllers for the exploration settings tab.
  */
 
-oppia.controller('ExplorationSettings', [
+oppia.controller('SettingsTab', [
   '$scope', '$http', '$window', '$modal', '$rootScope',
   'explorationData', 'explorationTitleService', 'explorationCategoryService',
   'explorationObjectiveService', 'explorationLanguageCodeService',

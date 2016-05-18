@@ -261,7 +261,7 @@ class ExplorationPage(EditorHandler):
             'TAG_REGEX': feconf.TAG_REGEX,
         })
 
-        self.render_template('editor/exploration_editor.html')
+        self.render_template('exploration_editor/exploration_editor.html')
 
 
 class ExplorationHandler(EditorHandler):
