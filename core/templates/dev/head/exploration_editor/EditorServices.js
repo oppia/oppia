@@ -1774,14 +1774,14 @@ oppia.factory('explorationWarningsService', [
             _getReversedLinks(_graphData.links), false);
           if (deadEndStates.length) {
             angular.forEach(deadEndStates, function(deadEndState) {
-             if (stateWarnings.hasOwnProperty(deadEndState)) {
-               stateWarnings[deadEndState].push(
-                 STATE_ERROR_MESSAGES.UNABLE_TO_END_EXPLORATION);
-             } else {
-               stateWarnings[deadEndState] = [
-                 STATE_ERROR_MESSAGES.UNABLE_TO_END_EXPLORATION];
-             }
-           });
+              if (stateWarnings.hasOwnProperty(deadEndState)) {
+                stateWarnings[deadEndState].push(
+                  STATE_ERROR_MESSAGES.UNABLE_TO_END_EXPLORATION);
+              } else {
+                stateWarnings[deadEndState] = [
+                  STATE_ERROR_MESSAGES.UNABLE_TO_END_EXPLORATION];
+              }
+            });
           }
         }
 
