@@ -23,29 +23,36 @@ from core.domain import stats_jobs_continuous
 from core.domain import user_services
 import utils
 
-
-_GALLERY_CATEGORY_GROUPINGS = [{
-    'header': 'Computation & Programming',
-    'search_categories': ['Computing', 'Programming'],
-}, {
+_LIBRARY_INDEX_GROUPS = [{
     'header': 'Mathematics & Statistics',
-    'search_categories': ['Mathematics', 'Statistics'],
+    'search_categories': [
+        'Mathematics', 'Algebra', 'Arithmetic', 'Calculus', 'Combinatorics',
+        'Geometry', 'Graph Theory', 'Logic', 'Probability', 'Statistics',
+        'Trigonometry',
+    ],
 }, {
-    'header': 'Biology, Chemistry & Medicine',
-    'search_categories': ['Biology', 'Chemistry', 'Medicine'],
+    'header': 'Computing',
+    'search_categories': ['Algorithms', 'Computing', 'Programming'],
 }, {
-    'header': 'Physics, Astronomy & Engineering',
-    'search_categories': ['Physics', 'Astronomy', 'Engineering'],
+    'header': 'Science',
+    'search_categories': [
+        'Astronomy', 'Biology', 'Chemistry', 'Engineering', 'Environment',
+        'Medicine', 'Physics',
+    ],
 }, {
-    'header': 'Languages & Reading',
-    'search_categories': ['Languages', 'Reading'],
+    'header': 'Humanities',
+    'search_categories': [
+        'Architecture', 'Art', 'Music', 'Philosophy', 'Poetry'
+    ],
 }, {
-    'header': 'Environment & Geography',
-    'search_categories': ['Environment', 'Geography'],
+    'header': 'Languages',
+    'search_categories': ['Languages', 'Reading', 'English', 'Latin'],
 }, {
-    'header': 'Business, Economics, Government & Law',
-    'search_categories': ['Business', 'Economics', 'Government', 'Law'],
+    'header': 'Social Science',
+    'search_categories': [
+        'Business', 'Economics', 'Geography', 'Government', 'History', 'Law'],
 }]
+
 
 def get_human_readable_contributors_summary(contributors_summary):
     contributor_ids = contributors_summary.keys()
@@ -144,28 +151,9 @@ def get_displayable_col_summary_dicts_matching_ids(col_ids):
     """Returns a list with all collection summary objects that can be
     displayed on the gallery page as collection summary tiles.
     """
-    col_summaries_to_display = []
     col_summaries = collection_services.get_collection_summaries_matching_ids(
         col_ids)
-    for col_summary in col_summaries:
-        if col_summary and col_summary.status != (
-                rights_manager.ACTIVITY_STATUS_PRIVATE):
-            col_summaries_to_display.append({
-                'id': col_summary.id,
-                'title': col_summary.title,
-                'category': col_summary.category,
-                'activity_type': rights_manager.ACTIVITY_TYPE_COLLECTION,
-                'objective': col_summary.objective,
-                'num_explorations': len(
-                    collection_services.get_collection_by_id(
-                        col_summary.id).nodes),
-                'last_updated_msec': utils.get_time_in_millisecs(
-                    col_summary.collection_model_last_updated),
-                'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
-                    col_summary.category),
-                'thumbnail_bg_color': utils.get_hex_color_for_category(
-                    col_summary.category)})
-    return col_summaries_to_display
+    return _get_displayable_col_summary_dicts(col_summaries)
 
 
 def get_displayable_exp_summary_dicts_matching_ids(
@@ -183,7 +171,7 @@ def get_displayable_exp_summary_dicts_matching_ids(
 
     filtered_exploration_summaries = []
     for exploration_summary in exploration_summaries:
-        if not exploration_summary:
+        if exploration_summary is None:
             continue
         if exploration_summary.status == (
                 rights_manager.ACTIVITY_STATUS_PRIVATE):
@@ -200,12 +188,16 @@ def get_displayable_exp_summary_dicts_matching_ids(
 
 
 def _get_displayable_exp_summary_dicts(exploration_summaries):
-    """Given a list of exploration summary domain objects, returns a list of
-    the corresponding human-readable exploration summary dicts.
+    """Given a list of exploration summary domain objects, returns a list,
+    with the same number of elements, of the corresponding human-readable
+    exploration summary dicts.
+
+    This assumes that all the exploration summary domain objects passed in are
+    valid (i.e., none of them are None).
     """
-    exploration_ids = [(
-        exploration_summary.id if exploration_summary is not None
-        else None) for exploration_summary in exploration_summaries]
+    exploration_ids = [
+        exploration_summary.id
+        for exploration_summary in exploration_summaries]
 
     view_counts = (
         stats_jobs_continuous.StatisticsAggregator.get_views_multi(
@@ -242,46 +234,33 @@ def _get_displayable_exp_summary_dicts(exploration_summaries):
 
     return displayable_exp_summaries
 
-
-def update_collection_dict(
-        collection_id, collection_dict, user_id,
-        allow_invalid_explorations=False):
-    collection_is_public = rights_manager.is_collection_public(
-        collection_id)
-
-    # Insert an 'exploration' dict into each collection node, where the
-    # dict includes meta information about the exploration (ID and title).
-    for collection_node in collection_dict['nodes']:
-        exploration_id = collection_node['exploration_id']
-        exploration_is_private = rights_manager.is_exploration_private(
-            exploration_id)
-        # Temporary variable to avoid line-too-long lint error
-        exploration_ids = []
-        exploration_ids.append(exploration_id)
-        summary_dicts = get_displayable_exp_summary_dicts_matching_ids(
-            exploration_ids, user_id)
-        if not allow_invalid_explorations:
-            if not summary_dicts:
-                raise utils.ValidationError(
-                    'Expected collection to only reference valid '
-                    'explorations, but found an exploration with ID: %s '
-                    '(was the exploration deleted or is it a private '
-                    'exploration that you do not have edit access to?)'
-                    % exploration_id)
-            if collection_is_public and exploration_is_private:
-                raise utils.ValidationError(
-                    'Cannot reference a private exploration within a '
-                    'public collection, exploration ID: %s'
-                    % exploration_id)
-        if summary_dicts:
-            collection_node['exploration_summary'] = summary_dicts[0]
-        else:
-            collection_node['exploration_summary'] = None
+def _get_displayable_col_summary_dicts(col_summaries):
+    col_summaries_to_display = []
+    for col_summary in col_summaries:
+        if col_summary and col_summary.status != (
+                rights_manager.ACTIVITY_STATUS_PRIVATE):
+            col_summaries_to_display.append({
+                'id': col_summary.id,
+                'title': col_summary.title,
+                'category': col_summary.category,
+                'activity_type': rights_manager.ACTIVITY_TYPE_COLLECTION,
+                'objective': col_summary.objective,
+                'num_explorations': len(
+                    collection_services.get_collection_by_id(
+                        col_summary.id).nodes),
+                'last_updated_msec': utils.get_time_in_millisecs(
+                    col_summary.collection_model_last_updated),
+                'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
+                    col_summary.category),
+                'thumbnail_bg_color': utils.get_hex_color_for_category(
+                    col_summary.category)})
+    return col_summaries_to_display
 
 
-def get_gallery_category_groupings(language_codes):
-    """Returns a list of groups in the gallery. Each group has a header and
-    a list of dicts representing activity summaries.
+
+def get_library_groups(language_codes):
+    """Returns a list of groups for the library index page. Each group has a
+    header and a list of dicts representing activity summaries.
     """
     language_codes_suffix = ''
     if language_codes:
@@ -293,31 +272,94 @@ def get_gallery_category_groupings(language_codes):
         return 'category=("%s")%s' % (
             '" OR "'.join(categories), language_codes_suffix)
 
-    results = []
-    for gallery_group in _GALLERY_CATEGORY_GROUPINGS:
-        exp_ids = exp_services.search_explorations(
-            _generate_query(gallery_group['search_categories']), 10)[0]
+    # Collect all collection ids so that the summary details can be retrieved
+    # with a single get_multi() call.
+    all_col_ids = []
+    header_to_col_ids = {}
+    for group in _LIBRARY_INDEX_GROUPS:
         col_ids = collection_services.search_collections(
-            _generate_query(gallery_group['search_categories']), 10)[0]
+            _generate_query(group['search_categories']), 8)[0]
+        header_to_col_ids[group['header']] = col_ids
+        all_col_ids += col_ids
+
+    col_summaries = [
+        summary for summary in
+        collection_services.get_collection_summaries_matching_ids(all_col_ids)
+        if summary is not None]
+
+
+    col_summary_dicts = {
+        summary_dict['id']: summary_dict
+        for summary_dict in _get_displayable_col_summary_dicts(
+            col_summaries)
+    }
+
+
+    # Collect all exp ids so that the summary details can be retrieved with a
+    # single get_multi() call.
+    all_exp_ids = []
+    header_to_exp_ids = {}
+    for group in _LIBRARY_INDEX_GROUPS:
+        exp_ids = exp_services.search_explorations(
+            _generate_query(group['search_categories']), 8)[0]
+        header_to_exp_ids[group['header']] = exp_ids
+        all_exp_ids += exp_ids
+
+    exp_summaries = [
+        summary for summary in
+        exp_services.get_exploration_summaries_matching_ids(all_exp_ids)
+        if summary is not None]
+
+    exp_summary_dicts = {
+        summary_dict['id']: summary_dict
+        for summary_dict in _get_displayable_exp_summary_dicts(
+            exp_summaries)
+    }
+
+    results = []
+    for group in _LIBRARY_INDEX_GROUPS:
         summary_dicts = []
-        summary_dicts = get_displayable_col_summary_dicts_matching_ids(col_ids)
-        summary_dicts += get_displayable_exp_summary_dicts_matching_ids(exp_ids)
+        col_ids_to_display = header_to_col_ids[group['header']]
+        summary_dicts = [
+            col_summary_dicts[col_id] for col_id in col_ids_to_display
+            if col_id in col_summary_dicts]
+
+        exp_ids_to_display = header_to_exp_ids[group['header']]
+        summary_dicts += [
+            exp_summary_dicts[exp_id] for exp_id in exp_ids_to_display
+            if exp_id in exp_summary_dicts]
 
         if not summary_dicts:
             continue
 
         results.append({
-            'header': gallery_group['header'],
-            'categories': gallery_group['search_categories'],
+            'header': group['header'],
+            'categories': group['search_categories'],
             'activity_summary_dicts': summary_dicts,
         })
 
     return results
 
 
-def get_featured_exploration_summary_dicts():
-    """Returns a list of featured explorations."""
-    featured_exp_summaries = (
-        exp_services.get_featured_exploration_summaries())
-    return _get_displayable_exp_summary_dicts(
-        featured_exp_summaries.values())
+def get_featured_exploration_summary_dicts(language_codes):
+    """Returns a list of featured explorations with the given language code.
+
+    The return value is sorted in decreasing order of search rank.
+    """
+    filtered_exp_summaries = [
+        exp_summary for exp_summary in
+        exp_services.get_featured_exploration_summaries().values()
+        if exp_summary.language_code in language_codes]
+
+    search_ranks = {
+        exp_summary.id: exp_services.get_search_rank_from_exp_summary(
+            exp_summary)
+        for exp_summary in filtered_exp_summaries
+    }
+
+    sorted_exp_summaries = sorted(
+        filtered_exp_summaries,
+        key=lambda exp_summary: search_ranks[exp_summary.id],
+        reverse=True)
+
+    return _get_displayable_exp_summary_dicts(sorted_exp_summaries)

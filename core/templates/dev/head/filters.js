@@ -212,8 +212,8 @@ oppia.filter('parameterizeRuleDescription', [
             }
           }
         }
-      // TODO(sll): Generalize this to use the inline string representation of
-      // an object type.
+        // TODO(sll): Generalize this to use the inline string representation of
+        // an object type.
       } else if (varType === 'MusicPhrase') {
         replacementText = '[';
         for (var i = 0; i < inputs[varName].length; i++) {

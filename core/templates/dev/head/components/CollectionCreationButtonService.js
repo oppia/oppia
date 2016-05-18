@@ -29,7 +29,7 @@ oppia.factory('CollectionCreationButtonService', [
     var getModalInstance = function(categoryList) {
       var modalInstance = $modal.open({
         backdrop: true,
-        templateUrl: 'modals/galleryCreateNew',
+        templateUrl: 'modals/createNewActivity',
         resolve: {
           categoriesForDropdown: function() {
             var result = [];

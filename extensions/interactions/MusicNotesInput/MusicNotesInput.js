@@ -85,6 +85,13 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
       scope: {},
       templateUrl: 'interaction/MusicNotesInput',
       link: function(scope, element, attrs) {
+        // This is needed in order for the scope to be retrievable during Karma
+        // unit testing. See http://stackoverflow.com/a/29833832 for more
+        // details.
+        element[0].isolateScope = function() {
+          return scope;
+        };
+
         scope.SOUNDFONT_URL = '/third_party/static/midi-js-2ef687/soundfont/';
         scope.sequenceToGuess = oppiaHtmlEscaper.escapedJsonToObj(
           attrs.sequenceToGuessWithValue);

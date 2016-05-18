@@ -30,7 +30,7 @@ var createExploration = function(name, category) {
 // Creates a new exploration and wait for the exploration
 // tutorial to start.
 var createExplorationAndStartTutorial = function(name, category) {
-  browser.get(general.GALLERY_URL_SUFFIX);
+  browser.get(general.LIBRARY_URL_SUFFIX);
   element(by.css('.protractor-test-create-exploration')).click();
   browser.waitForAngular();
   element(by.css('.protractor-test-new-exploration-title')).sendKeys(name);

@@ -122,14 +122,14 @@ oppia.factory('searchService', [
         _searchCursor = data.search_cursor;
         numSearchesInProgress--;
 
-        if ($('.oppia-splash-search-input').val() === searchQuery) {
+        if ($('.oppia-search-bar-input').val() === searchQuery) {
           $rootScope.$broadcast(
             'initialSearchResultsLoaded', data.activity_list);
           _isCurrentlyFetchingResults = false;
         } else {
           console.log('Mismatch');
           console.log('SearchQuery: ' + searchQuery);
-          console.log('Input: ' + $('.oppia-splash-search-input').val());
+          console.log('Input: ' + $('.oppia-search-bar-input').val());
         }
       }, function() {
         numSearchesInProgress--;
@@ -156,8 +156,7 @@ oppia.factory('searchService', [
       var querySegments = urlQuery.split('&');
 
       if (querySegments.length > 3) {
-        alert('Invalid search query url!');
-        return '';
+        throw Error('Invalid search query url: ' + urlQuery);
       }
 
       for (var i = 1; i < querySegments.length; i++) {

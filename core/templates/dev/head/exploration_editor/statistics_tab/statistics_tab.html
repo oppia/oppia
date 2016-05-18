@@ -1,0 +1,90 @@
+<div ng-controller="StatisticsTab">
+  <div ng-if="!hasTabLoaded" class="oppia-align-center">
+    Loading
+    <loading-dots></loading-dots>
+  </div>
+  <div ng-if="hasTabLoaded">
+    <md-card class="oppia-editor-card">
+      <div ng-if="hasExplorationBeenVisited">
+        <div class="oppia-statistics-display">
+          <h3>Exploration Completion Rate</h3>
+          <bar-chart data="chartData"
+                     options="COMPLETION_RATE_CHART_OPTIONS">
+          </bar-chart>
+
+          <h3>Common learner paths</h3>
+          <div style="font-size: smaller" ng-if="lastUpdated">
+            <em>Last updated: <[getLocaleAbbreviatedDatetimeString(lastUpdated)]></em>
+          </div>
+          <div class="container">
+            <div class="row">
+              <div class="col-lg-12 col-md-12 col-sm-12">
+                <div state-graph-viz graph-data="statsGraphData" node-fill="darkseagreen" opacity-map="statsGraphOpacities" highlight-states="highlightStates" state-stats="stateStats" on-click-function="onClickStateInStatsGraph">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div ng-if="!hasExplorationBeenVisited">
+        <em>
+          This exploration has not been visited by anyone yet, so there are no statistics to display.
+        </em>
+      </div>
+    </md-card>
+  </div>
+</div>
+
+<script type="text/ng-template" id="modals/stateStats">
+  <div class="modal-header">
+    <h3>Statistics for <[stateName]></h3>
+  </div>
+
+  <div class="modal-body">
+    <div ng-if="improvementType == 'May be confusing'">
+      <i class="material-icons">&#xE002;</i>
+      <em>
+        This state may be confusing. Learners often leave the exploration when encountering it.
+      </em>
+    </div>
+
+    <div ng-if="improvementType == 'Needs more feedback'">
+      <i class="material-icons">&#xE002;</i>
+      <em>
+        This state may need more feedback. Learners often return to it after giving an answer.
+      </em>
+    </div>
+
+    <p>
+      <strong>Times entered</strong>: <[stateStats.totalEntryCount]>
+    </p>
+
+    <div ng-if="stateStats.totalEntryCount">
+      <h5>Answers</h5>
+      <div ng-show="doesAnswerExist()">
+        <ul>
+          <li ng-repeat="(rule, ruleData) in rulesStats" ng-show="ruleData.answers.length > 0">
+            <[getHumanReadableRuleName(rule)]>
+            <ul>
+              <li ng-repeat="answerData in ruleData.answers track by $index">
+                <span class="label label-info pull-right">
+                  <[getNumTimesString(answerData[1])]>
+                </span>
+                <pre><[answerData[0]]></pre>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+      <div ng-if="!doesAnswerExist()">
+        <em>No one has given any answers that need to be resolved.</em>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">Close</button>
+  </div>
+</script>

@@ -56,7 +56,34 @@ exports.config = {
   // When run without a command line parameter, all suites will run. If run
   // with --suite=smoke, only the patterns matched by that suite will run.
   suites: {
-    full: 'protractor/*.js'
+    full: [
+      'protractor/*.js'
+    ],
+
+    editor: [
+      'protractor/editorAndPlayer.js',
+      'protractor/gadgetEditor.js',
+      'protractor/stateEditor.js',
+      'protractor/fallbacks.js',
+      'protractor/historyTab.js'
+    ],
+
+    extensions: [
+      'protractor/richTextComponents.js',
+      'protractor/interactions.js'
+    ],
+
+    library: [
+      'protractor/explorationRating.js',
+      'protractor/privileges.js',
+      'protractor/publicationAndLibrary.js'
+    ],
+
+    misc: [
+      'protractor/userManagement.js',
+      'protractor/embedding.js',
+      'protractor/preferences.js'
+    ]
   },
 
   // ----- Capabilities to be passed to the webdriver instance ----
@@ -121,8 +148,8 @@ exports.config = {
       displaySpecDuration: true
     }));
 
-    // Set a wide enough window size for the navbar in the gallery to display
-    // fully.
+    // Set a wide enough window size for the navbar in the library pages to
+    // display fully.
     browser.driver.manage().window().setSize(1200, 1000);
   },
 
