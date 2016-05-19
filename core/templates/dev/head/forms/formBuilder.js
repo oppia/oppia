@@ -744,6 +744,10 @@ oppia.run([
       var ckName = 'oppia' + componentDefn.name;
       var tagName = 'oppia-noninteractive-' + componentDefn.name;
       var customizationArgSpecs = componentDefn.customizationArgSpecs;
+      // For some reason, frontend tests will error without this check.
+      if (CKEDITOR.plugins.registered[ckName] !== undefined) {
+        return;
+      }
       CKEDITOR.plugins.add(ckName, {
         init: function(editor) {
           // Create the widget itself.
@@ -820,8 +824,22 @@ oppia.directive('ckEditorRte', [
       template: '<div contenteditable="true"></div>',
       require: '?ngModel',
       link: function(scope, el, attr, ngModel) {
+        var widgets = [
+          'Link',
+          'Math',
+          'Image',
+          'Collapsible',
+          'Tabs',
+          'Video'
+        ];
+        var widgetNames = widgets.map(function(widget) {
+          return 'oppia' + widget.toLowerCase();
+        }).join(',');
+        var buttonNames = widgets.map(function(widget) {
+          return 'Oppia' + widget.toLowerCase();
+        });
         var ck = CKEDITOR.inline(el[0].children[0], {
-          extraPlugins: 'widget,lineutils,oppialink,oppiamath',
+          extraPlugins: 'widget,lineutils,' + widgetNames,
           allowedContent: true,
           startupFocus: true,
           toolbar: [
@@ -835,7 +853,7 @@ oppia.directive('ckEditorRte', [
             },
             {
               name: 'rtecomponents',
-              items: ['Oppialink', 'Oppiamath']
+              items: buttonNames
             },
             {
               name: 'document',
@@ -845,6 +863,14 @@ oppia.directive('ckEditorRte', [
         });
 
         ck.on('instanceReady', function() {
+          // Set the icons for each toolbar button.
+          widgets.forEach(function(widget) {
+            var bgStyle = 'url("/extensions/rich_text_components/' +
+                          widget + '/static/' + widget +
+                          '.png") no-repeat center';
+            $(`.cke_button__oppia${widget.toLowerCase()}`).css(
+              'background', bgStyle);
+          });
           ck.setData(ngModel.$viewValue);
         });
 
