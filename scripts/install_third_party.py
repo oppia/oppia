@@ -27,8 +27,8 @@ import zipfile
 
 import common
 
-#set the proxy to empty sting if the installation is through Vagrant so that
-#their is no error like the one at pastebin http://pastebin.com/z34hsmi9
+# These two lines prevent a "IOError: [Errno socket error] [Errno -2] Name or service not known" error
+# in urllib.urlretrieve, if the user is behind a proxy.
 if 'VAGRANT' in os.environ:
     os.environ['http_proxy'] = ''
 
