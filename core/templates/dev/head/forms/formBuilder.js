@@ -670,6 +670,198 @@ oppia.factory('rteHelperService', [
   }
 ]);
 
+// Dynamically generate CKEditor widgets for the rich text components.
+oppia.run([
+  '$modal', 'rteHelperService', 'oppiaHtmlEscaper',
+  function($modal, rteHelperService, oppiaHtmlEscaper) {
+    var _RICH_TEXT_COMPONENTS = rteHelperService.getRichTextComponents();
+    _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
+      var ckName = 'oppia' + componentDefn.name;
+      var tagName = 'oppia-noninteractive-' + componentDefn.name;
+      var customizationArgSpecs = componentDefn.customizationArgSpecs;
+      CKEDITOR.plugins.add(ckName, {
+        init: function(editor) {
+          var _openCustomizationModal = function(
+            customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
+            onDismissCallback, refocusFn) {
+              var modalDialog = $modal.open({
+                templateUrl: 'modals/customizeRteComponent',
+                backdrop: 'static',
+                resolve: {},
+                controller: [
+                  '$scope', '$modalInstance', '$timeout',
+                  function($scope, $modalInstance, $timeout) {
+                    $scope.customizationArgSpecs = customizationArgSpecs;
+
+                    // Without this code, the focus will remain in the background RTE
+                    // even after the modal loads. This switches the focus to a
+                    // temporary field in the modal which is then removed from the DOM.
+                    // TODO(sll): Make this switch to the first input field in the modal
+                    // instead.
+                    /*
+                    $scope.modalIsLoading = true;
+                    focusService.setFocus('tmpFocusPoint');
+                    $timeout(function() {
+                      $scope.modalIsLoading = false;
+                    });
+                    */
+
+                    $scope.tmpCustomizationArgs = [];
+                    for (var i = 0; i < customizationArgSpecs.length; i++) {
+                      var caName = customizationArgSpecs[i].name;
+                      $scope.tmpCustomizationArgs.push({
+                        name: caName,
+                        value: (
+                          attrsCustomizationArgsDict.hasOwnProperty(caName) ?
+                          attrsCustomizationArgsDict[caName] :
+                          customizationArgSpecs[i].default_value)
+                      });
+                    }
+
+                    $scope.cancel = function() {
+                      $modalInstance.dismiss('cancel');
+                    };
+
+                    $scope.save = function() {
+                      $scope.$broadcast('externalSave');
+
+                      var customizationArgsDict = {};
+                      for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
+                        var caName = $scope.tmpCustomizationArgs[i].name;
+                        customizationArgsDict[caName] = (
+                          $scope.tmpCustomizationArgs[i].value);
+                      }
+
+                      $modalInstance.close(customizationArgsDict);
+                  };
+                }
+              ]
+            });
+
+            modalDialog.result.then(onSubmitCallback, onDismissCallback);
+            // 'finally' is a JS keyword. If it is just used in its ".finally" form,
+            // the minification process throws an error.
+            modalDialog.result['finally'](refocusFn);
+          };
+
+          // Create the widget itself.
+          editor.widgets.add(ckName, {
+            button: componentDefn.tooltip,
+            inline: true,
+            template: `<${tagName}></${tagName}>`,
+            edit: function(event) {
+              // Prevent default action since we are using our own edit modal.
+              event.cancel();
+              // Save this for creating the widget later.
+              var container = this.wrapper.getParent(true);
+              var that = this;
+              var customizationArgs = {};
+              customizationArgSpecs.forEach(function(spec) {
+                customizationArgs[spec.name] = that.data[spec.name] ||
+                                               spec.default_value;
+              });
+
+              _openCustomizationModal(
+                customizationArgSpecs,
+                customizationArgs,
+                function(customizationArgsDict) {
+                  for (var arg in customizationArgsDict) {
+                    if (customizationArgsDict.hasOwnProperty(arg)) {
+                      that.setData(arg, customizationArgsDict[arg]);
+                    }
+                  }
+                  // Actually create the widget.
+                  editor.widgets.finalizeCreation(container);
+                },
+                function() {},
+                function() {});
+            },
+            upcast: function(element) {
+              return element.name === tagName;
+            },
+            data: function() {
+              var that = this;
+              customizationArgSpecs.forEach(function(spec) {
+                if (that.data[spec.name]) {
+                  that.element.setAttribute(
+                    spec.name + '-with-value',
+                    oppiaHtmlEscaper.objToEscapedJson(that.data[spec.name]));
+                }
+              });
+            },
+            init: function() {
+              var that = this;
+              customizationArgSpecs.forEach(function(spec) {
+                var value = that.element.getAttribute(
+                  spec.name + '-with-value');
+                if (value) {
+                  that.setData(
+                    spec.name, oppiaHtmlEscaper.escapedJsonToObj(value));
+                }
+              });
+            }
+          });
+        }
+      });
+    });
+  }
+]);
+
+oppia.directive('ckEditorRte', [
+  '$compile',
+  function($compile) {
+    return {
+      restrict: 'E',
+      scope: {
+        uiConfig: '&'
+      },
+      template: '<div contenteditable="true"></div>',
+      require: '?ngModel',
+      link: function(scope, el, attr, ngModel) {
+        var ck = CKEDITOR.inline(el[0].children[0], {
+          extraPlugins: 'widget,lineutils,oppialink,oppiamath',
+          allowedContent: true,
+          startupFocus: true,
+          toolbar: [
+            {
+              name: 'basicstyles',
+              items: ['Bold', 'Italic', '-', 'RemoveFormat']
+            },
+            {
+              name: 'paragraph',
+              items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent']
+            },
+            {
+              name: 'rtecomponents',
+              items: ['Oppialink', 'Oppiamath']
+            },
+            {
+              name: 'document',
+              items: ['Source']
+            }
+          ]
+        });
+
+        ck.on('instanceReady', function() {
+          ck.setData(ngModel.$viewValue);
+        });
+
+        ngModel.$render = function() {
+          ck.setData(ngModel.$viewValue);
+        };
+
+        var updateHtmlContent = function() {
+          // Need to manually $compile so that directives render in rte.
+          $compile(el.contents())(scope);
+          ngModel.$setViewValue(ck.getData());
+        };
+
+        ck.on('change', updateHtmlContent);
+      }
+    };
+  }
+]);
+
 // Add RTE extensions to textAngular toolbar options.
 oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [
@@ -860,60 +1052,6 @@ oppia.config(['$provide', function($provide) {
     }
   ]);
 }]);
-
-oppia.directive('ckEditorRte', [
-  '$compile',
-  function($compile) {
-    return {
-      restrict: 'E',
-      scope: {
-        uiConfig: '&'
-      },
-      template: '<div contenteditable="true"></div>',
-      require: '?ngModel',
-      link: function(scope, el, attr, ngModel) {
-        // Replace the textarea with the CKEditor.
-        var ck = CKEDITOR.inline(el[0].children[0], {
-          extraPlugins: 'widget,lineutils,oppialink',
-          allowedContent: true,
-          toolbar: [
-            {
-              name: 'basicstyles',
-              items: ['Bold', 'Italic', '-', 'RemoveFormat']
-            },
-            {
-              name: 'paragraph',
-              items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent']
-            },
-            {
-              name: 'rtecomponents',
-              items: ['Oppialink']
-            },
-            {
-              name: 'document',
-              items: ['Source']
-            }
-          ]
-        });
-
-        ck.on('instanceReady', function() {
-          ck.setData(ngModel.$viewValue);
-        });
-
-        ngModel.$render = function() {
-          ck.setData(ngModel.$viewValue);
-        };
-
-        var updateHtmlContent = function() {
-          $compile(el.contents())(scope);
-          ngModel.$setViewValue(ck.getData());
-        };
-
-        ck.on('change', updateHtmlContent);
-      }
-    };
-  }
-]);
 
 oppia.directive('textAngularRte', [
     '$filter', 'oppiaHtmlEscaper', 'rteHelperService', '$timeout',
