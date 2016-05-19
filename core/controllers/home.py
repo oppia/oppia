@@ -260,7 +260,7 @@ class NewCollection(base.BaseHandler):
         title = self.payload.get('title')
         category = self.payload.get('category')
         objective = self.payload.get('objective')
-        # TODO(bhenning): Implement support for language codes in collections.
+        language_code = self.payload.get('language_code')
 
         if not title:
             raise self.InvalidInputException('No title supplied.')
@@ -269,7 +269,8 @@ class NewCollection(base.BaseHandler):
 
         new_collection_id = collection_services.get_new_collection_id()
         collection = collection_domain.Collection.create_default_collection(
-            new_collection_id, title, category, objective=objective)
+            new_collection_id, title, category, objective=objective,
+            language_code=language_code)
         collection_services.save_new_collection(self.user_id, collection)
 
         self.render_json({
