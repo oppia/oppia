@@ -526,7 +526,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
 
         user_a_id = self.get_user_id_from_email(self.EMAIL_A)
 
-        # Let USER A make 2 non-revert commits and 1 revert
+        # Let USER A make 3 non-revert commits and 1 revert
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, user_a_id, title='Exploration Title')
         exp_services.update_exploration(
@@ -542,7 +542,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
                 'new_value': 'New Objective'
             }], 'Changed Objective.')
 
-        # Let USER A revert version 2 to version 1
+        # Let USER A revert version 3 to version 2
         exp_services.revert_exploration(user_a_id, self.EXP_ID, 3, 2)
 
         # Run the job to compute the contributor summary.
@@ -568,7 +568,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
                 system_id, self.EXP_ID, [{
                     'cmd': 'edit_exploration_property',
                     'property_name': 'title',
-                    'new_value': 'Title changed by ' + system_id
+                    'new_value': 'Title changed by %s' % system_id
                 }], 'Changed title.')
 
         # Run the job to compute the contributor summary.
