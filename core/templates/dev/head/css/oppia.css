@@ -110,6 +110,11 @@ body {
   width: 100%;
 }
 
+/*Added to not show warning content when Javascript is not enabled. */
+[ng\:cloak], [ng-cloak], .ng-cloak {
+  display: none !important;
+}
+
 .oppia-dashboard-container {
   margin: 60px auto 30px auto;
   max-width: 800px;
