@@ -193,16 +193,17 @@ class AnswerStatsTests(test_utils.GenericTestBase):
                 'answer a', 'TextInput', 0, 1,
                 exp_domain.EXPLICIT_CLASSIFICATION, [], 'session_id_v', 10.0),
             stats_domain.SubmittedAnswer(
-                'answer c', 'TextInput', 1, 1,
+                'answer ccc', 'TextInput', 1, 1,
                 exp_domain.EXPLICIT_CLASSIFICATION, [], 'session_id_v', 3.0),
             stats_domain.SubmittedAnswer(
-                'answer b', 'TextInput', 1, 0,
+                'answer bbbbb', 'TextInput', 1, 0,
                 exp_domain.EXPLICIT_CLASSIFICATION, [], 'session_id_v', 7.5),
         ]
         stats_services.record_answers(
             self.exploration, self.exploration.init_state_name,
             submitted_answer_list)
 
+        # The order of the answers returned depends on the size of the answers.
         state_answers = stats_services.get_state_answers(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name)
@@ -220,7 +221,7 @@ class AnswerStatsTests(test_utils.GenericTestBase):
             'interaction_id': 'TextInput',
             'params': []
         }, {
-            'answer': 'answer c',
+            'answer': 'answer ccc',
             'time_spent_in_sec': 3.0,
             'answer_group_index': 1,
             'rule_spec_index': 1,
@@ -229,7 +230,7 @@ class AnswerStatsTests(test_utils.GenericTestBase):
             'interaction_id': 'TextInput',
             'params': []
         }, {
-            'answer': 'answer b',
+            'answer': 'answer bbbbb',
             'time_spent_in_sec': 7.5,
             'answer_group_index': 1,
             'rule_spec_index': 0,
@@ -243,7 +244,7 @@ class AnswerStatsTests(test_utils.GenericTestBase):
         stats_services.record_answer(
             self.exploration, self.exploration.init_state_name,
             stats_domain.SubmittedAnswer(
-                'first answer', 'TextInput', 0,
+                '1 answer', 'TextInput', 0,
                 0, exp_domain.EXPLICIT_CLASSIFICATION, [],
                 'a_session_id_val', 1.0))
 
@@ -251,7 +252,7 @@ class AnswerStatsTests(test_utils.GenericTestBase):
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name)
         self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
-            'answer': 'first answer',
+            'answer': '1 answer',
             'time_spent_in_sec': 1.0,
             'answer_group_index': 0,
             'rule_spec_index': 0,
@@ -263,19 +264,20 @@ class AnswerStatsTests(test_utils.GenericTestBase):
 
         submitted_answer_list = [
             stats_domain.SubmittedAnswer(
-                'answer a', 'TextInput', 0, 1,
+                'answer aaa', 'TextInput', 0, 1,
                 exp_domain.EXPLICIT_CLASSIFICATION, [], 'session_id_v', 10.0),
             stats_domain.SubmittedAnswer(
-                'answer c', 'TextInput', 1, 1,
+                'answer ccccc', 'TextInput', 1, 1,
                 exp_domain.EXPLICIT_CLASSIFICATION, [], 'session_id_v', 3.0),
             stats_domain.SubmittedAnswer(
-                'answer b', 'TextInput', 1, 0,
+                'answer bbbbbbb', 'TextInput', 1, 0,
                 exp_domain.EXPLICIT_CLASSIFICATION, [], 'session_id_v', 7.5),
         ]
         stats_services.record_answers(
             self.exploration, self.exploration.init_state_name,
             submitted_answer_list)
 
+        # The order of the answers returned depends on the size of the answers.
         state_answers = stats_services.get_state_answers(
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name)
@@ -284,7 +286,7 @@ class AnswerStatsTests(test_utils.GenericTestBase):
         self.assertEqual(state_answers.state_name, 'First Card')
         self.assertEqual(state_answers.interaction_id, 'TextInput')
         self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
-            'answer': 'first answer',
+            'answer': '1 answer',
             'time_spent_in_sec': 1.0,
             'answer_group_index': 0,
             'rule_spec_index': 0,
@@ -293,7 +295,7 @@ class AnswerStatsTests(test_utils.GenericTestBase):
             'interaction_id': 'TextInput',
             'params': []
         }, {
-            'answer': 'answer a',
+            'answer': 'answer aaa',
             'time_spent_in_sec': 10.0,
             'answer_group_index': 0,
             'rule_spec_index': 1,
@@ -302,7 +304,7 @@ class AnswerStatsTests(test_utils.GenericTestBase):
             'interaction_id': 'TextInput',
             'params': []
         }, {
-            'answer': 'answer c',
+            'answer': 'answer ccccc',
             'time_spent_in_sec': 3.0,
             'answer_group_index': 1,
             'rule_spec_index': 1,
@@ -311,7 +313,7 @@ class AnswerStatsTests(test_utils.GenericTestBase):
             'interaction_id': 'TextInput',
             'params': []
         }, {
-            'answer': 'answer b',
+            'answer': 'answer bbbbbbb',
             'time_spent_in_sec': 7.5,
             'answer_group_index': 1,
             'rule_spec_index': 0,
@@ -320,6 +322,7 @@ class AnswerStatsTests(test_utils.GenericTestBase):
             'interaction_id': 'TextInput',
             'params': []
         }])
+
 
 class ExplorationStatsTests(test_utils.GenericTestBase):
     """Tests for stats functions related to explorations."""

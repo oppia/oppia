@@ -145,9 +145,9 @@ class StateAnswers(object):
             if not isinstance(self.interaction_id, basestring):
                 raise utils.ValidationError(
                     'Expected interaction_id to be a string, received %s' %
-                    str(self.interaction_id))
+                    self.interaction_id)
 
-            # check if interaction_id is valid
+            # Verify interaction_id is valid.
             if (self.interaction_id not in
                     interaction_registry.Registry.get_all_interaction_ids()):
                 raise utils.ValidationError(
@@ -158,10 +158,8 @@ class StateAnswers(object):
                 'Expected submitted_answer_list to be a list, received %s' %
                 self.submitted_answer_list)
 
-        # Note: There is no need to validate content of submitted_answer_list
-        # here because each answer is validated before it is appended to
-        # submitted_answer_list (which is faster than validating whole
-        # submitted_answer_list each time a new answer is recorded).
+        for submitted_answer in self.submitted_answer_list:
+            submitted_answer.validate()
 
 
 class SubmittedAnswer(object):
@@ -207,9 +205,9 @@ class SubmittedAnswer(object):
             'session_id': self.session_id,
             'time_spent_in_sec': self.time_spent_in_sec
         }
-        if self.rule_spec_str:
+        if self.rule_spec_str is not None:
             submitted_answer_dict['rule_spec_str'] = self.rule_spec_str
-        if self.answer_str:
+        if self.answer_str is not None:
             submitted_answer_dict['answer_str'] = self.answer_str
         return submitted_answer_dict
 
@@ -229,34 +227,20 @@ class SubmittedAnswer(object):
 
     def validate(self):
         """Validates this submitted answer object."""
-        # TODO(bhenning): Remove the truncation/omission of submitted rules and
-        # implement a linked-list data structure for answers.
-
         # TODO(msl): These validation methods need tests to ensure that
         # the right errors show up in the various cases.
 
-        if self.normalized_answer is None:
-            raise utils.ValidationError(
-                'SubmittedAnswers must have a provided normalized_answer')
+        # It's valid for normalized_answer to be None if the interaction type is
+        # Continue.
+        # TODO(bhenning): Validate the normalized answer against future answer
+        # objects after #956 is addressed.
+
         if self.time_spent_in_sec is None:
             raise utils.ValidationError(
                 'SubmittedAnswers must have a provided time_spent_in_sec')
         if self.session_id is None:
             raise utils.ValidationError(
                 'SubmittedAnswers must have a provided session_id')
-
-        if sys.getsizeof(self.normalized_answer) > self._MAX_BYTES_PER_ANSWER:
-            if isinstance(self.normalized_answer, str):
-                logging.error(
-                    'Answer is too large to be stored: %s ...' % (
-                        self.normalized_answer[:self._MAX_BYTES_PER_ANSWER]))
-                self.normalized_answer = '%s%s ...' % (
-                    self._CROPPED_PREFIX_STRING,
-                    self.normalized_answer[:self._MAX_BYTES_PER_ANSWER])
-            else:
-                logging.warning('answer is too big to be stored')
-                self.normalized_answer = (
-                    self._PLACEHOLDER_FOR_TOO_LARGE_NONSTRING)
 
         if not isinstance(self.session_id, basestring):
             raise utils.ValidationError(

@@ -116,11 +116,11 @@ class StateAnswersTests(test_utils.GenericTestBase):
         state_answers = stats_services.get_state_answers(
             'eid', exp_version, FIRST_STATE_NAME)
         self.assertEquals(
-            state_answers.submitted_answer_list,
+            state_answers.get_submitted_answer_dict_list(),
             expected_submitted_answer_list1)
 
         state_answers = stats_services.get_state_answers(
             'eid', exp_version, SECOND_STATE_NAME)
         self.assertEquals(
-            state_answers.submitted_answer_list,
+            state_answers.get_submitted_answer_dict_list(),
             expected_submitted_answer_list2)

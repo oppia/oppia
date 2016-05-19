@@ -17,7 +17,9 @@
 """Models for Oppia statistics."""
 
 import datetime
+import json
 import logging
+import sys
 
 from core.platform import models
 import feconf
@@ -483,18 +485,32 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
 
 
 class StateAnswersModel(base_models.BaseModel):
-    """Store all answers of a state.
+    """Store all answers of a state. This model encapsulates a sharded storage
+    system for answers. Multiple entries in the model may contain answers for
+    the same state. The initial entry has a shard ID of 0 and contains
+    information about how many shards exist for this state. All other meta
+    information is duplicated across all shards, since they are immutable or are
+    local to that shard.
 
     The id/key of instances of this class has the form
-        [EXPLORATION_ID]:[EXPLORATION_VERSION]:[STATE_NAME].
+        [EXPLORATION_ID]:[EXPLORATION_VERSION]:[STATE_NAME]:[SHARD_ID].
     """
+    # This provides about 48k of padding for the other properties and entity
+    # storage overhead (since the max entity size is 1MB).
+    _MAX_ANSWER_LIST_BYTE_SIZE = 100000
+
     # Explicitly store exploration id, exploration version and state name
     # so we can easily do queries on them.
     exploration_id = ndb.StringProperty(indexed=True, required=True)
     exploration_version = ndb.IntegerProperty(indexed=True, required=True)
     state_name = ndb.StringProperty(indexed=True, required=True)
+    shard_id = ndb.IntegerProperty(indexed=True, required=True)
     # Store interaction type to know which calculations should be performed
     interaction_id = ndb.StringProperty(indexed=True, required=True)
+    # Store how many extra shards are associated with this state. This is only
+    # present when shard_id is 0. This starts at 0 (the main shard is not
+    # counted).
+    shard_count = ndb.IntegerProperty(indexed=True, required=False)
     # List of answer dicts, each of which is stored as JSON blob. The content
     # of answer dicts is specified in core.domain.stats_domain.StateAnswers.
     submitted_answer_list = ndb.JsonProperty(repeated=True, indexed=False)
@@ -505,38 +521,149 @@ class StateAnswersModel(base_models.BaseModel):
         indexed=True, default=feconf.CURRENT_STATE_ANSWERS_SCHEMA_VERSION)
 
     @classmethod
-    def get_model(cls, exploration_id, exploration_version, state_name):
+    def _get_model(
+            cls, exploration_id, exploration_version, state_name, shard_id):
         entity_id = cls._get_entity_id(
-            exploration_id, str(exploration_version), state_name)
+            exploration_id, exploration_version, state_name, shard_id)
         instance = cls.get(entity_id, strict=False)
         return instance
 
     @classmethod
-    def create_or_update(
-            cls, exploration_id, exploration_version, state_name,
-            interaction_id, submitted_answer_list):
-        entity_id = cls._get_entity_id(
-            exploration_id, str(exploration_version), state_name)
-        instance = cls(id=entity_id, exploration_id=exploration_id,
-                       exploration_version=exploration_version,
-                       state_name=state_name,
-                       interaction_id=interaction_id,
-                       submitted_answer_list=submitted_answer_list)
-        return instance
+    def get_all_models(cls, exploration_id, exploration_version, state_name):
+        """Retrieves all models and shards associated with the specific
+        exploration state. Returns None if no answers have yet been submitted to
+        the specified exploration state.
+        """
+        main_shard = cls._get_model(
+            exploration_id, exploration_version, state_name, 0)
+        if main_shard:
+            all_models = [main_shard]
+            if main_shard.shard_count > 0:
+                shard_ids = [
+                    cls._get_entity_id(
+                        exploration_id, exploration_version, state_name,
+                        shard_id)
+                    for shard_id in xrange(1, main_shard.shard_count + 1)]
+                all_models += cls.get_multi(shard_ids)
+            return all_models
+        else:
+            return None
 
     @classmethod
-    def _get_entity_id(cls, exploration_id, exploration_version, state_name):
-        return ':'.join([exploration_id,
-                         str(exploration_version),
-                         state_name])
+    def insert_submitted_answers(
+            cls, exploration_id, exploration_version, state_name,
+            interaction_id, new_submitted_answer_dict_list):
+        """Given an exploration ID, version, state name, and interaction ID,
+        attempt to insert a list of specified SubmittedAnswers into this model,
+        performing sharding operations as necessary. This method automatically
+        commits updated/new models to the data store. This method returns
+        nothing.
+        """
+        # The main shard always needs to be retrieved. At most one other shard
+        # needs to be retrieved (the last one).
+        main_shard = cls._get_model(
+            exploration_id, exploration_version, state_name, 0)
+        last_shard = main_shard
 
-    def save(self):
-        """Commit to storage."""
-        # This may fail if submitted_answer_list is too large.
-        try:
-            self.put()
-        except Exception as e:
-            logging.error(e)
+        if not main_shard:
+            entity_id = cls._get_entity_id(
+                exploration_id, exploration_version, state_name, 0)
+            main_shard = cls(
+                id=entity_id, exploration_id=exploration_id,
+                exploration_version=exploration_version, state_name=state_name,
+                shard_id=0, interaction_id=interaction_id, shard_count=0,
+                submitted_answer_list=[])
+            last_shard = main_shard
+        elif main_shard.shard_count > 0:
+            last_shard = cls._get_model(
+                exploration_id, exploration_version, state_name,
+                main_shard.shard_count)
+
+        sharded_answer_lists = cls._shard_answers(
+            last_shard.submitted_answer_list, new_submitted_answer_dict_list)
+        new_shard_count = main_shard.shard_count + len(sharded_answer_lists) - 1
+
+        # Collect all entities to update to efficiently send them as a single
+        # update.
+        entities_to_put = []
+        last_shard_is_main = main_shard.shard_count == 0
+
+        # Update the last shard if it changed.
+        if sharded_answer_lists[0] != last_shard.submitted_answer_list:
+            last_shard.submitted_answer_list = sharded_answer_lists[0]
+            last_shard_updated = True
+        else:
+            last_shard_updated = False
+
+        # Insert any new shards.
+        for i in xrange(1, len(sharded_answer_lists)):
+            shard_id = main_shard.shard_count + i
+            entity_id = cls._get_entity_id(
+                exploration_id, exploration_version, state_name, shard_id)
+            new_shard = cls(
+                id=entity_id, exploration_id=exploration_id,
+                exploration_version=exploration_version, state_name=state_name,
+                shard_id=shard_id, interaction_id=interaction_id,
+                submitted_answer_list=sharded_answer_lists[i])
+            entities_to_put.append(new_shard)
+
+        # Update the shard count if any new shards were added.
+        if main_shard.shard_count != new_shard_count:
+            main_shard.shard_count = new_shard_count
+            main_shard_updated = True
+        else:
+            main_shard_updated = False
+
+        if last_shard_is_main and (main_shard_updated or last_shard_updated):
+            entities_to_put.append(main_shard)
+        else:
+            if main_shard_updated:
+                entities_to_put.append(main_shard)
+            if last_shard_updated:
+                entities_to_put.append(last_shard)
+
+        cls.put_multi(entities_to_put)
+
+    @classmethod
+    def _get_entity_id(
+            cls, exploration_id, exploration_version, state_name, shard_id):
+        return ':'.join([
+            exploration_id, str(exploration_version), state_name,
+            str(shard_id)])
+
+    @classmethod
+    def _shard_answers(cls, current_answer_list, new_answer_list):
+        """Given a current answer list which can fit within one NDB entity and
+        a list of new answers which need to try and fit in the current answer
+        list, shard the answers such that a list of answer lists are returned.
+        The first entry is guaranteed to contain all answers of the current
+        answer list.
+        """
+        current_answer_size_list = [{
+            'answer_dict': answer_dict,
+            'json_size': sys.getsizeof(json.dumps(answer_dict))
+        } for answer_dict in current_answer_list]
+        # Sort the new answers to insert in a descending by size in bytes.
+        new_answer_size_list = sorted([{
+            'answer_dict': answer_dict,
+            'json_size': sys.getsizeof(json.dumps(answer_dict))
+        } for answer_dict in new_answer_list], key=lambda x: x['json_size'])
+        sharded_answer_lists = [current_answer_size_list]
+        last_answer_list_size = reduce(
+            lambda x, y: x + y['json_size'],
+            sharded_answer_lists[-1], 0)
+        for size_answer_dict in new_answer_size_list:
+            answer_size = size_answer_dict['json_size']
+            if (last_answer_list_size + answer_size <=
+                    cls._MAX_ANSWER_LIST_BYTE_SIZE):
+                sharded_answer_lists[-1].append(size_answer_dict)
+                last_answer_list_size += answer_size
+            else:
+                sharded_answer_lists.append([size_answer_dict])
+                last_answer_list_size = answer_size
+        return [[sharded_answer['answer_dict']
+                 for sharded_answer in sharded_answer_list]
+                for sharded_answer_list in sharded_answer_lists]
 
 
 class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):

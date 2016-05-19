@@ -171,48 +171,34 @@ def record_answers(exploration, state_name, submitted_answer_list):
     """Optimally record a group of answers using an already loaded exploration..
     The submitted_answer_list is a list of SubmittedAnswer domain objects.
     """
-    for submitted_answer in submitted_answer_list:
-        submitted_answer.validate()
-
-    state_answers = get_state_answers(
-        exploration.id, exploration.version, state_name)
-
-    # Add answer to state_answers (or create a new one) and commit it.
-    if state_answers:
-        state_answers.submitted_answer_list += submitted_answer_list
-    else:
-        state_answers = stats_domain.StateAnswers(
-            exploration.id, exploration.version,
-            state_name, exploration.states[state_name].interaction.id,
-            submitted_answer_list)
-    _save_state_answers(state_answers)
-
-
-def _save_state_answers(state_answers):
-    """Validate StateAnswers domain object and commit to storage."""
-
+    state_answers = stats_domain.StateAnswers(
+        exploration.id, exploration.version, state_name,
+        exploration.states[state_name].interaction.id, submitted_answer_list)
     state_answers.validate()
-    state_answers_model = stats_models.StateAnswersModel.create_or_update(
+
+    stats_models.StateAnswersModel.insert_submitted_answers(
         state_answers.exploration_id, state_answers.exploration_version,
         state_answers.state_name, state_answers.interaction_id,
         state_answers.get_submitted_answer_dict_list())
-    state_answers_model.save()
 
 
 def get_state_answers(exploration_id, exploration_version, state_name):
-    """Get a state answers domain object represented by a StateAnswersModel
-    instance stored in the data store and retrieved using the provided
-    exploration ID, version, and state name.
+    """Returns a StateAnswers object containing all answers associated with the
+    specified exploration state, or None if no such answers have yet been
+    submitted.
     """
-    state_answers_model = stats_models.StateAnswersModel.get_model(
+    state_answers_models = stats_models.StateAnswersModel.get_all_models(
         exploration_id, exploration_version, state_name)
-    if state_answers_model:
+    if state_answers_models:
+        main_state_answers_model = state_answers_models[0]
+        submitted_answer_dict_list = itertools.chain.from_iterable([
+            state_answers_model.submitted_answer_list
+            for state_answers_model in state_answers_models])
         return stats_domain.StateAnswers(
             exploration_id, exploration_version, state_name,
-            state_answers_model.interaction_id,
+            main_state_answers_model.interaction_id,
             [stats_domain.SubmittedAnswer.from_dict(submitted_answer_dict)
-             for submitted_answer_dict
-             in state_answers_model.submitted_answer_list],
-            schema_version=state_answers_model.schema_version)
+             for submitted_answer_dict in submitted_answer_dict_list],
+            schema_version=main_state_answers_model.schema_version)
     else:
         return None

@@ -248,7 +248,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
             'exploration_version': 1,
             'state_name': 'What language',
             'interaction_id': 'TextInput',
-            'submitted_answer_list': submitted_answer_list
+            'submitted_answer_list': answer_list
         }
 
         # Calculate answer counts..
