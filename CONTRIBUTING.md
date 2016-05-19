@@ -125,6 +125,16 @@ General
 
 Python
 - There should be two empty lines before any top-level class or function definition.
+- Prefer string interpolation over concatenation -- e.g. prefer:
+
+  ```
+  'My string %s' % varname
+  ```
+over
+
+  ```
+  'My string ' + varname
+  ```
 - When indenting from an open parenthesis ('('), prefer indenting by 4 rather than indenting from the position of the parenthesis. For example, prefer:
 
   ```
