@@ -350,7 +350,6 @@ class Collection(object):
                 % e)
 
         collection_schema_version = collection_dict.get('schema_version')
-        initial_schema_version = collection_schema_version
         if collection_schema_version is None:
             raise Exception('Invalid YAML file: no schema version specified.')
         if not (1 <= collection_schema_version
