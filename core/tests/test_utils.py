@@ -415,23 +415,27 @@ class TestBase(unittest.TestCase):
 
     def save_new_default_collection(
             self, collection_id, owner_id, title='A title',
-            category='A category', objective='An objective'):
+            category='A category', objective='An objective',
+            language_code=feconf.DEFAULT_LANGUAGE_CODE):
         """Saves a new default collection written by owner_id.
 
         Returns the collection domain object.
         """
         collection = collection_domain.Collection.create_default_collection(
-            collection_id, title, category, objective)
+            collection_id, title, category, objective,
+            language_code=language_code)
         collection_services.save_new_collection(owner_id, collection)
         return collection
 
     def save_new_valid_collection(
             self, collection_id, owner_id, title='A title',
             category='A category', objective='An objective',
+            language_code=feconf.DEFAULT_LANGUAGE_CODE,
             exploration_id='an_exploration_id',
             end_state_name=DEFAULT_END_STATE_NAME):
         collection = collection_domain.Collection.create_default_collection(
-            collection_id, title, category, objective=objective)
+            collection_id, title, category, objective,
+            language_code=language_code)
         collection.add_node(
             self.save_new_valid_exploration(
                 exploration_id, owner_id, title, category, objective,

@@ -863,6 +863,25 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
             self.COLLECTION_ID)
         self.assertEqual(collection.objective, 'Some new objective')
 
+    def test_update_collection_language_code(self):
+        # Verify initial language code.
+        collection = collection_services.get_collection_by_id(
+            self.COLLECTION_ID)
+        self.assertEqual(collection.language_code, 'en')
+
+        # Update the language code.
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+                'property_name': 'language_code',
+                'new_value': 'fi'
+            }], 'Changed the language to Finnish')
+
+        # Verify the language is different.
+        collection = collection_services.get_collection_by_id(
+            self.COLLECTION_ID)
+        self.assertEqual(collection.language_code, 'fi')
+
     def test_update_collection_node_prerequisite_skills(self):
         # Verify initial prerequisite skills are empty.
         collection = collection_services.get_collection_by_id(

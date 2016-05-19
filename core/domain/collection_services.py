@@ -125,6 +125,7 @@ def get_collection_from_model(collection_model, run_conversion=True):
     return collection_domain.Collection(
         collection_model.id, collection_model.title,
         collection_model.category, collection_model.objective,
+        collection_model.language_code,
         versioned_collection['schema_version'], [
             collection_domain.CollectionNode.from_dict(collection_node_dict)
             for collection_node_dict in versioned_collection['nodes']
@@ -137,7 +138,7 @@ def get_collection_summary_from_model(collection_summary_model):
     return collection_domain.CollectionSummary(
         collection_summary_model.id, collection_summary_model.title,
         collection_summary_model.category, collection_summary_model.objective,
-        collection_summary_model.status,
+        collection_summary_model.language_code, collection_summary_model.status,
         collection_summary_model.community_owned,
         collection_summary_model.owner_ids,
         collection_summary_model.editor_ids,
@@ -533,6 +534,9 @@ def apply_change_list(collection_id, change_list):
                 elif (change.property_name ==
                       collection_domain.COLLECTION_PROPERTY_OBJECTIVE):
                     collection.update_objective(change.new_value)
+                elif (change.property_name ==
+                      collection_domain.COLLECTION_PROPERTY_LANGUAGE_CODE):
+                    collection.update_language_code(change.new_value)
             elif (
                     change.cmd ==
                     collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
@@ -618,6 +622,7 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     collection_model.category = collection.category
     collection_model.title = collection.title
     collection_model.objective = collection.objective
+    collection_model.language_code = collection.language_code
     collection_model.schema_version = collection.schema_version
     collection_model.nodes = [
         collection_node.to_dict() for collection_node in collection.nodes
@@ -645,6 +650,7 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
         category=collection.category,
         title=collection.title,
         objective=collection.objective,
+        language_code=collection.language_code,
         schema_version=collection.schema_version,
         nodes=[
             collection_node.to_dict() for collection_node in collection.nodes
@@ -820,10 +826,10 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
 
     collection_summary = collection_domain.CollectionSummary(
         collection.id, collection.title, collection.category,
-        collection.objective, collection_rights.status,
-        collection_rights.community_owned, collection_rights.owner_ids,
-        collection_rights.editor_ids, collection_rights.viewer_ids,
-        contributor_ids, contributors_summary,
+        collection.objective, collection.language_code,
+        collection_rights.status, collection_rights.community_owned,
+        collection_rights.owner_ids, collection_rights.editor_ids,
+        collection_rights.viewer_ids, contributor_ids, contributors_summary,
         collection.version, collection_model_created_on,
         collection_model_last_updated
     )
@@ -866,6 +872,7 @@ def save_collection_summary(collection_summary):
         title=collection_summary.title,
         category=collection_summary.category,
         objective=collection_summary.objective,
+        language_code=collection_summary.language_code,
         status=collection_summary.status,
         community_owned=collection_summary.community_owned,
         owner_ids=collection_summary.owner_ids,
@@ -1045,6 +1052,7 @@ def _collection_to_search_dict(collection):
         'title': collection.title,
         'category': collection.category,
         'objective': collection.objective,
+        'language_code': collection.language_code,
         'rank': _get_search_rank(collection.id),
     }
     doc.update(_collection_rights_to_search_dict(rights))

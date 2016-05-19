@@ -310,8 +310,7 @@ class ExpSummaryModel(base_models.BaseModel):
     # The objective of this exploration.
     objective = ndb.TextProperty(required=True, indexed=False)
     # The ISO 639-1 code for the language this exploration is written in.
-    language_code = ndb.StringProperty(
-        required=True, indexed=True)
+    language_code = ndb.StringProperty(required=True, indexed=True)
     # Tags associated with this exploration.
     tags = ndb.StringProperty(repeated=True, indexed=True)
 
