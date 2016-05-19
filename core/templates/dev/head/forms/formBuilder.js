@@ -548,8 +548,11 @@ oppia.filter('sanitizeHtmlForRte', ['$sanitize', function($sanitize) {
 }]);
 
 oppia.factory('rteHelperService', [
-  '$filter', '$log', 'RTE_COMPONENT_SPECS', 'oppiaHtmlEscaper',
-  function($filter, $log, RTE_COMPONENT_SPECS, oppiaHtmlEscaper) {
+  '$filter', '$log', '$modal', 'RTE_COMPONENT_SPECS',
+  'oppiaHtmlEscaper', 'focusService',
+  function(
+    $filter, $log, $modal, RTE_COMPONENT_SPECS,
+    oppiaHtmlEscaper, focusService) {
     var _RICH_TEXT_COMPONENTS = [];
 
     Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
@@ -665,6 +668,68 @@ oppia.factory('rteHelperService', [
       },
       getRichTextComponents: function() {
         return angular.copy(_RICH_TEXT_COMPONENTS);
+      },
+      _openCustomizationModal: function(
+          customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
+          onDismissCallback, refocusFn) {
+        var modalDialog = $modal.open({
+          templateUrl: 'modals/customizeRteComponent',
+          backdrop: 'static',
+          resolve: {},
+          controller: [
+            '$scope', '$modalInstance', '$timeout',
+            function($scope, $modalInstance, $timeout) {
+            $scope.customizationArgSpecs = customizationArgSpecs;
+
+            // Without this code, the focus will remain in the background RTE
+            // even after the modal loads. This switches the focus to a
+            // temporary field in the modal which is then removed from the DOM.
+            // TODO(sll): Make this switch to the first input field in the modal
+            // instead.
+            $scope.modalIsLoading = true;
+            focusService.setFocus('tmpFocusPoint');
+            $timeout(function() {
+              $scope.modalIsLoading = false;
+            });
+
+            $scope.tmpCustomizationArgs = [];
+            for (var i = 0; i < customizationArgSpecs.length; i++) {
+              var caName = customizationArgSpecs[i].name;
+              $scope.tmpCustomizationArgs.push({
+                name: caName,
+                value: (
+                  attrsCustomizationArgsDict.hasOwnProperty(caName) ?
+                  attrsCustomizationArgsDict[caName] :
+                  customizationArgSpecs[i].default_value)
+              });
+            }
+
+            $scope.cancel = function() {
+              $modalInstance.dismiss('cancel');
+            };
+
+            $scope.save = function() {
+              $scope.$broadcast('externalSave');
+
+              var customizationArgsDict = {};
+              for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
+                var caName = $scope.tmpCustomizationArgs[i].name;
+                customizationArgsDict[caName] = (
+                  $scope.tmpCustomizationArgs[i].value);
+              }
+
+              $modalInstance.close(customizationArgsDict);
+            };
+          }]
+        });
+
+        modalDialog.result.then(onSubmitCallback, onDismissCallback);
+        // The refocusFn arg is a function that restores focus to the text
+        // editor after exiting the modal, and moves the cursor back to
+        // where it was before the modal was opened.
+        // 'finally' is a JS keyword. If it is just used in its ".finally" form,
+        // the minification process throws an error.
+        modalDialog.result['finally'](refocusFn);
       }
     };
   }
@@ -672,8 +737,8 @@ oppia.factory('rteHelperService', [
 
 // Dynamically generate CKEditor widgets for the rich text components.
 oppia.run([
-  '$modal', 'rteHelperService', 'oppiaHtmlEscaper',
-  function($modal, rteHelperService, oppiaHtmlEscaper) {
+  'rteHelperService', 'oppiaHtmlEscaper',
+  function(rteHelperService, oppiaHtmlEscaper) {
     var _RICH_TEXT_COMPONENTS = rteHelperService.getRichTextComponents();
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
       var ckName = 'oppia' + componentDefn.name;
@@ -681,69 +746,6 @@ oppia.run([
       var customizationArgSpecs = componentDefn.customizationArgSpecs;
       CKEDITOR.plugins.add(ckName, {
         init: function(editor) {
-          var _openCustomizationModal = function(
-            customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
-            onDismissCallback, refocusFn) {
-              var modalDialog = $modal.open({
-                templateUrl: 'modals/customizeRteComponent',
-                backdrop: 'static',
-                resolve: {},
-                controller: [
-                  '$scope', '$modalInstance', '$timeout',
-                  function($scope, $modalInstance, $timeout) {
-                    $scope.customizationArgSpecs = customizationArgSpecs;
-
-                    // Without this code, the focus will remain in the background RTE
-                    // even after the modal loads. This switches the focus to a
-                    // temporary field in the modal which is then removed from the DOM.
-                    // TODO(sll): Make this switch to the first input field in the modal
-                    // instead.
-                    /*
-                    $scope.modalIsLoading = true;
-                    focusService.setFocus('tmpFocusPoint');
-                    $timeout(function() {
-                      $scope.modalIsLoading = false;
-                    });
-                    */
-
-                    $scope.tmpCustomizationArgs = [];
-                    for (var i = 0; i < customizationArgSpecs.length; i++) {
-                      var caName = customizationArgSpecs[i].name;
-                      $scope.tmpCustomizationArgs.push({
-                        name: caName,
-                        value: (
-                          attrsCustomizationArgsDict.hasOwnProperty(caName) ?
-                          attrsCustomizationArgsDict[caName] :
-                          customizationArgSpecs[i].default_value)
-                      });
-                    }
-
-                    $scope.cancel = function() {
-                      $modalInstance.dismiss('cancel');
-                    };
-
-                    $scope.save = function() {
-                      $scope.$broadcast('externalSave');
-
-                      var customizationArgsDict = {};
-                      for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
-                        var caName = $scope.tmpCustomizationArgs[i].name;
-                        customizationArgsDict[caName] = (
-                          $scope.tmpCustomizationArgs[i].value);
-                      }
-
-                      $modalInstance.close(customizationArgsDict);
-                  };
-                }
-              ]
-            });
-
-            modalDialog.result.then(onSubmitCallback, onDismissCallback);
-            // 'finally' is a JS keyword. If it is just used in its ".finally" form,
-            // the minification process throws an error.
-            modalDialog.result['finally'](refocusFn);
-          };
-
           // Create the widget itself.
           editor.widgets.add(ckName, {
             button: componentDefn.tooltip,
@@ -761,7 +763,7 @@ oppia.run([
                                                spec.default_value;
               });
 
-              _openCustomizationModal(
+              rteHelperService._openCustomizationModal(
                 customizationArgSpecs,
                 customizationArgs,
                 function(customizationArgsDict) {
@@ -865,13 +867,11 @@ oppia.directive('ckEditorRte', [
 // Add RTE extensions to textAngular toolbar options.
 oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [
-    '$delegate', '$modal', '$timeout', 'focusService', 'taRegisterTool',
+    '$delegate', '$timeout', 'taRegisterTool', 'PAGE_CONTEXT',
     'rteHelperService', 'alertsService', 'explorationContextService',
-    'PAGE_CONTEXT',
     function(
-        taOptions, $modal, $timeout, focusService, taRegisterTool,
-        rteHelperService, alertsService, explorationContextService,
-        PAGE_CONTEXT) {
+        taOptions, $timeout, taRegisterTool, PAGE_CONTEXT,
+        rteHelperService, alertsService, explorationContextService) {
       taOptions.disableSanitizer = true;
       taOptions.forceTextAngularSanitize = false;
       taOptions.classes.textEditor = 'form-control oppia-rte-content';
@@ -879,69 +879,6 @@ oppia.config(['$provide', function($provide) {
         $timeout(function() {
           $element.trigger('focus');
         });
-      };
-
-      // The refocusFn arg is a function that restores focus to the text editor
-      // after exiting the modal, and moves the cursor back to where it was
-      // before the modal was opened.
-      var _openCustomizationModal = function(
-          customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
-          onDismissCallback, refocusFn) {
-        var modalDialog = $modal.open({
-          templateUrl: 'modals/customizeRteComponent',
-          backdrop: 'static',
-          resolve: {},
-          controller: [
-            '$scope', '$modalInstance', '$timeout',
-            function($scope, $modalInstance, $timeout) {
-            $scope.customizationArgSpecs = customizationArgSpecs;
-
-            // Without this code, the focus will remain in the background RTE
-            // even after the modal loads. This switches the focus to a
-            // temporary field in the modal which is then removed from the DOM.
-            // TODO(sll): Make this switch to the first input field in the modal
-            // instead.
-            $scope.modalIsLoading = true;
-            focusService.setFocus('tmpFocusPoint');
-            $timeout(function() {
-              $scope.modalIsLoading = false;
-            });
-
-            $scope.tmpCustomizationArgs = [];
-            for (var i = 0; i < customizationArgSpecs.length; i++) {
-              var caName = customizationArgSpecs[i].name;
-              $scope.tmpCustomizationArgs.push({
-                name: caName,
-                value: (
-                  attrsCustomizationArgsDict.hasOwnProperty(caName) ?
-                  attrsCustomizationArgsDict[caName] :
-                  customizationArgSpecs[i].default_value)
-              });
-            }
-
-            $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
-            };
-
-            $scope.save = function() {
-              $scope.$broadcast('externalSave');
-
-              var customizationArgsDict = {};
-              for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
-                var caName = $scope.tmpCustomizationArgs[i].name;
-                customizationArgsDict[caName] = (
-                  $scope.tmpCustomizationArgs[i].value);
-              }
-
-              $modalInstance.close(customizationArgsDict);
-            };
-          }]
-        });
-
-        modalDialog.result.then(onSubmitCallback, onDismissCallback);
-        // 'finally' is a JS keyword. If it is just used in its ".finally" form,
-        // the minification process throws an error.
-        modalDialog.result['finally'](refocusFn);
       };
 
       rteHelperService.getRichTextComponents().forEach(function(componentDefn) {
@@ -986,7 +923,7 @@ oppia.config(['$provide', function($provide) {
 
               // Temporarily pauses sanitizer so rangy markers save position
               textAngular.$editor().$parent.isCustomizationModalOpen = true;
-              _openCustomizationModal(
+              rteHelperService._openCustomizationModal(
                 componentDefn.customizationArgSpecs,
                 rteHelperService.createCustomizationArgDictFromAttrs(
                   $element[0].attributes),
@@ -1015,7 +952,7 @@ oppia.config(['$provide', function($provide) {
 
             // Temporarily pauses sanitizer so rangy markers save position.
             textAngular.$editor().$parent.isCustomizationModalOpen = true;
-            _openCustomizationModal(
+            rteHelperService._openCustomizationModal(
               componentDefn.customizationArgSpecs,
               {},
               function(customizationArgsDict) {
