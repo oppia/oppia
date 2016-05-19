@@ -82,10 +82,14 @@ oppia.factory('explorationData', [
         });
       },
       autosaveChangeList: function(changeList, successCallback, errorCallback) {
-        // FIXME: put in the autosave PUT request url here.
-        $http.put('', {
+        var draftAutosaveUrl = '/editorautosave';
+        $http.put(draftAutosaveUrl, {
           change_list: changeList,
           version: explorationData.data.version
+        }, {
+          params: {
+            exploration_id: explorationId
+          }
         }).then(function(response) {
           if (successCallback) {
             successCallback(response);
@@ -1894,7 +1898,7 @@ oppia.factory('autosaveInfoModalsService', [
   function(
     $modal, $timeout) {
     return {
-      showNonStrictFailModal: function() {
+      showNonStrictValidationFailModal: function() {
         $modal.open({
           templateUrl: 'modals/saveValidationFail',
           backdrop: true,
