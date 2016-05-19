@@ -30,6 +30,7 @@ oppia.constant(
 oppia.constant('COLLECTION_PROPERTY_TITLE', 'title');
 oppia.constant('COLLECTION_PROPERTY_CATEGORY', 'category');
 oppia.constant('COLLECTION_PROPERTY_OBJECTIVE', 'objective');
+oppia.constant('COLLECTION_PROPERTY_LANGUAGE_CODE', 'language_code');
 oppia.constant(
   'COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS', 'prerequisite_skills');
 oppia.constant('COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS', 'acquired_skills');
@@ -40,6 +41,7 @@ oppia.factory('CollectionUpdateService', [
     'CMD_EDIT_COLLECTION_PROPERTY', 'CMD_EDIT_COLLECTION_NODE_PROPERTY',
     'COLLECTION_PROPERTY_TITLE', 'COLLECTION_PROPERTY_CATEGORY',
     'COLLECTION_PROPERTY_OBJECTIVE',
+    'COLLECTION_PROPERTY_LANGUAGE_CODE',
     'COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS',
     'COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS', function(
       CollectionNodeObjectFactory, ChangeObjectFactory, UndoRedoService,
@@ -47,6 +49,7 @@ oppia.factory('CollectionUpdateService', [
       CMD_EDIT_COLLECTION_PROPERTY, CMD_EDIT_COLLECTION_NODE_PROPERTY,
       COLLECTION_PROPERTY_TITLE, COLLECTION_PROPERTY_CATEGORY,
       COLLECTION_PROPERTY_OBJECTIVE,
+      COLLECTION_PROPERTY_LANGUAGE_CODE,
       COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS,
       COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS) {
       // Creates a change using an apply function, reverse function, a change
@@ -198,7 +201,7 @@ oppia.factory('CollectionUpdateService', [
         },
 
         /**
-         * Changes the title of a category and records the change in the
+         * Changes the category of a collection and records the change in the
          * undo/redo service.
          */
         setCollectionCategory: function(collection, category) {
@@ -216,7 +219,7 @@ oppia.factory('CollectionUpdateService', [
         },
 
         /**
-         * Changes the title of an objective and records the change in the
+         * Changes the objective of a collection and records the change in the
          * undo/redo service.
          */
         setCollectionObjective: function(collection, objective) {
@@ -230,6 +233,25 @@ oppia.factory('CollectionUpdateService', [
             }, function(changeDict, collection) {
               // Undo.
               collection.setObjective(oldObjective);
+            });
+        },
+
+        /**
+         * Changes the language code of a collection and records the change in
+         * the undo/redo service.
+         */
+        setCollectionLanguageCode: function(collection, languageCode) {
+          var oldLanguageCode = angular.copy(collection.getLanguageCode());
+          _applyPropertyChange(
+            collection, COLLECTION_PROPERTY_LANGUAGE_CODE, languageCode,
+            oldLanguageCode,
+            function(changeDict, collection) {
+              // Apply.
+              var languageCode = _getNewPropertyValueFromChangeDict(changeDict);
+              collection.setLanguageCode(languageCode);
+            }, function(changeDict, collection) {
+              // Undo.
+              collection.setLanguageCode(oldLanguageCode);
             });
         },
 
