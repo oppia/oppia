@@ -740,6 +740,7 @@ oppia.run([
   'rteHelperService', 'oppiaHtmlEscaper',
   function(rteHelperService, oppiaHtmlEscaper) {
     var _RICH_TEXT_COMPONENTS = rteHelperService.getRichTextComponents();
+    var inlineCapable = ['link', 'math'];
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
       var ckName = 'oppia' + componentDefn.name;
       var tagName = 'oppia-noninteractive-' + componentDefn.name;
@@ -753,7 +754,7 @@ oppia.run([
           // Create the widget itself.
           editor.widgets.add(ckName, {
             button: componentDefn.tooltip,
-            inline: true,
+            inline: inlineCapable.indexOf(componentDefn.name) !== -1,
             template: `<${tagName}></${tagName}>`,
             edit: function(event) {
               // Prevent default action since we are using our own edit modal.
@@ -821,7 +822,8 @@ oppia.directive('ckEditorRte', [
       scope: {
         uiConfig: '&'
       },
-      template: '<div contenteditable="true"></div>',
+      template: '<div contenteditable="true" style="outline: 1px solid gray">' +
+                '</div>',
       require: '?ngModel',
       link: function(scope, el, attr, ngModel) {
         var widgets = [
@@ -842,6 +844,7 @@ oppia.directive('ckEditorRte', [
           extraPlugins: 'widget,lineutils,' + widgetNames,
           allowedContent: true,
           startupFocus: true,
+          floatSpacePreferRight: true,
           toolbar: [
             {
               name: 'basicstyles',
