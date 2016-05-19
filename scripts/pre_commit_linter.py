@@ -271,7 +271,6 @@ def _pre_commit_linter():
     root directory, node-jscs dependencies are installed
     and pass JSCS binary path
     """
-
     jscsrc_path = os.path.join(os.getcwd(), '.jscsrc')
     pylintrc_path = os.path.join(os.getcwd(), '.pylintrc')
 
@@ -357,13 +356,11 @@ def _pre_commit_linter():
     summary_messages.append(py_result.get())
     print '\n'.join(summary_messages)
     print ''
+    return all_files, summary_messages
 
-    linting_status = 0
-    if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
-            summary_messages]):
-        linting_status = 1
 
-    # This part is used for detecting bad patterns.
+# This part is used for detecting bad patterns.
+def _check_bad_patterns(all_files, summary_messages):
     print 'Starting Pattern Checks'
     print '----------------------------------------'
     total_files_checked = 0
@@ -372,35 +369,33 @@ def _pre_commit_linter():
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
     for filename in all_files:
-        if len(filename) != 0:
-            with open(filename) as f:
-                content = f.read()
-                total_files_checked += 1
-                if '__author__' in content:
-                    print filename, ' --> ', BAD_PATTERNS['__author__']
+        with open(filename) as f:
+            content = f.read()
+            total_files_checked += 1
+            for pattern in BAD_PATTERNS:
+                if pattern in content:
+                    summary_messages.append(_MESSAGE_TYPE_FAILED)
+                    print '%s --> %s' % (
+                        filename, BAD_PATTERNS[pattern])
                     total_error_count += 1
-                if 'datetime.datetime.now()' in content:
-                    print filename, ' --> ', BAD_PATTERNS[
-                        'datetime.datetime.now()']
-                    total_error_count += 1
-                if '\t' in content:
-                    print filename, ' --> ', BAD_PATTERNS['\t']
-                    total_error_count += 1
+
     print ''
     print '----------------------------------------'
     print ''
     if total_files_checked == 0:
-        print "WARNING: No files were checked."
+        print "There are no files to be checked."
     else:
-        print '(%s FILES CHECKED, %s ERRORS FOUND)' % (
+        print '(%s files checked, %s errors found)' % (
             total_files_checked, total_error_count)
 
-    return total_error_count, linting_status
+    return summary_messages
 
 
 def main():
-    total_error_count, linting_status = _pre_commit_linter()
-    if linting_status == 1 or total_error_count > 0:
+    all_files, summary_messages = _pre_commit_linter()
+    summary_messages = _check_bad_patterns(all_files, summary_messages)
+    if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
+            summary_messages]):
         sys.exit(1)
 
 
