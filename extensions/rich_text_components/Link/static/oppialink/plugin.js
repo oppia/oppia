@@ -14,9 +14,6 @@ CKEDITOR.plugins.add('oppialink', {
       upcast: function(element) {
         return element.name === 'oppia-noninteractive-link';
       },
-      downcast: function(el) {
-        el.setHtml('');
-      },
       data: function() {
         this.element.setAttribute(
           'open_link_in_same_window-with-value',
@@ -30,9 +27,6 @@ CKEDITOR.plugins.add('oppialink', {
           this.element.setAttribute(
             'url-with-value', `&quot;${this.data.url}&quot;`);
         }
-
-        var display = this.data.text || this.data.url;
-        this.element.setHtml(`<a>${display}</a>`);
       },
       init: function() {
         var openInSame = this.element.getAttribute(

@@ -862,17 +862,18 @@ oppia.config(['$provide', function($provide) {
 }]);
 
 oppia.directive('ckEditorRte', [
-  function() {
+  '$compile',
+  function($compile) {
     return {
       restrict: 'E',
       scope: {
         uiConfig: '&'
       },
-      template: '<textarea></textarea>',
+      template: '<div contenteditable="true"></div>',
       require: '?ngModel',
       link: function(scope, el, attr, ngModel) {
         // Replace the textarea with the CKEditor.
-        var ck = CKEDITOR.replace(el[0].children[0], {
+        var ck = CKEDITOR.inline(el[0].children[0], {
           extraPlugins: 'widget,lineutils,oppialink',
           allowedContent: true,
           toolbar: [
@@ -904,8 +905,8 @@ oppia.directive('ckEditorRte', [
         };
 
         var updateHtmlContent = function() {
+          $compile(el.contents())(scope);
           ngModel.$setViewValue(ck.getData());
-          scope.$apply();
         };
 
         ck.on('change', updateHtmlContent);
