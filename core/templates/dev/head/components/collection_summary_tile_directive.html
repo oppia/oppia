@@ -33,21 +33,24 @@
               </li>
             </ul>
           </div>
-          <div class="title-section-mask"></div>
+          <div class="title-section-mask top-card-mask"></div>
         </a>
       </md-card>
+      <div class="title-section-mask"></div>
     </md-card>
+    <div class="title-section-mask"></div>
   </md-card>
 </script>
 
 <style>
 .middle-card, .top-card {
-  margin: -140px 3px;
   box-shadow: -1px -1px 5px 0 rgba(0, 0, 0, 0.26);
+  margin: -140px 3px;
+  z-index: 11;
 }
 .bottom-card {
-  margin: 4px 8px 12px -4px;
   box-shadow: 8px 10px 5px 0 rgba(0, 0, 0, 0.26);
+  margin: 4px 8px 12px -4px;
 }
 
 .oppia-library-carousel-tiles .oppia-gallery-summary-tile.middle-card.oppia-gallery-summary-tile.top-card {
