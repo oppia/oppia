@@ -30,6 +30,7 @@ from core.domain import stats_services
 from core.platform import models
 from extensions.objects.models import objects
 
+import feconf
 import utils
 
 (base_models, stats_models, exp_models,) = models.Registry.import_models([
@@ -1157,6 +1158,9 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 item_id, exploration, state_name, state, item.answers, rule_str)
             for error in migration_errors:
                 yield error
+
+            if feconf.DELETE_ANSWERS_AFTER_MIGRATION:
+                item.delete()
 
     @classmethod
     def _migrate_answers(cls, item_id, exploration, state_name, state, answers,

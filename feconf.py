@@ -413,6 +413,10 @@ COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 ENABLE_STRING_CLASSIFIER = False
 
+# Temporary feature for the answer migration job. DO NOT ENABLE THIS WHEN
+# RUNNING THE JOB IN MAIN PRODUCTION.
+DELETE_ANSWERS_AFTER_MIGRATION = True
+
 # Output formats of downloaded explorations.
 OUTPUT_FORMAT_JSON = 'json'
 OUTPUT_FORMAT_ZIP = 'zip'
