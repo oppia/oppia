@@ -301,6 +301,13 @@
         "rootDir": "lineutils",
         "targetDir": "lineutils"
       },
+      "sharedspace": {
+        "version": "4.5.9",
+        "downloadFormat": "zip",
+        "url": "http://download.ckeditor.com/sharedspace/releases/sharedspace_4.5.9.zip",
+        "rootDir": "sharedspace",
+        "targetDir": "sharedspace"
+      },
       "textAngular": {
         "version": "1.4.5",
         "downloadFormat": "zip",

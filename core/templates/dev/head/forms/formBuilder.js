@@ -824,8 +824,9 @@ oppia.directive('ckEditorRte', [
       scope: {
         uiConfig: '&'
       },
-      template: '<div contenteditable="true" style="outline: 1px solid gray">' +
-                '</div>',
+      template: '<div><div></div><br>' +
+                '<div contenteditable="true" style="outline: 1px solid gray">' +
+                '</div></div>',
       require: '?ngModel',
       link: function(scope, el, attr, ngModel) {
         var widgets = [
@@ -844,11 +845,13 @@ oppia.directive('ckEditorRte', [
         });
 
         // Initialize ckeditor.
-        var ck = CKEDITOR.inline(el[0].children[0], {
-          extraPlugins: 'widget,lineutils,' + widgetNames,
+        var ck = CKEDITOR.inline(el[0].children[0].children[2], {
+          extraPlugins: 'widget,lineutils,sharedspace,' + widgetNames,
           allowedContent: true,
           startupFocus: true,
-          floatSpaceDockedOffsetY: 15,
+          sharedSpaces: {
+            top: el[0].children[0].children[0]
+          },
           toolbar: [
             {
               name: 'basicstyles',
@@ -861,10 +864,6 @@ oppia.directive('ckEditorRte', [
             {
               name: 'rtecomponents',
               items: buttonNames
-            },
-            {
-              name: 'document',
-              items: ['Source']
             }
           ]
         });
