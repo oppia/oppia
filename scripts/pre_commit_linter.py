@@ -266,8 +266,11 @@ def _lint_py_files(config_pylint, files_to_lint, result):
             _MESSAGE_TYPE_SUCCESS, num_py_files, time.time() - start_time))
 
 
-# Returns a list of all the files for linting and pattern checks.
 def _get_all_files():
+    """This function is used to check if this script is ran from
+    root directory and to return a list of all the files for linting and
+    pattern checks.
+    """
     jscsrc_path = os.path.join(os.getcwd(), '.jscsrc')
     parsed_args = _PARSER.parse_args()
     if parsed_args.path:
@@ -298,12 +301,11 @@ def _get_all_files():
         all_files = valid_filepaths
     else:
         all_files = _get_changed_filenames()
-
     return all_files
 
+
 def _pre_commit_linter(all_files):
-    """This function is used to check if this script is ran from
-    root directory, node-jscs dependencies are installed
+    """This function is used to check if node-jscs dependencies are installed
     and pass JSCS binary path
     """
     jscsrc_path = os.path.join(os.getcwd(), '.jscsrc')
@@ -364,32 +366,34 @@ def _pre_commit_linter(all_files):
     return summary_messages
 
 
-# This part is used for detecting bad patterns.
-def _check_bad_patterns(all_files, summary_messages):
+def _check_bad_patterns(all_files):
+    """This function is used for detecting bad patterns.
+    """
     print 'Starting Pattern Checks'
     print '----------------------------------------'
     total_files_checked = 0
     total_error_count = 0
+    summary_messages = []
     all_files = [
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
+    failed = False
     for filename in all_files:
         with open(filename) as f:
             content = f.read()
             total_files_checked += 1
-            failed = False
             for pattern in BAD_PATTERNS:
                 if pattern in content:
                     failed = True
                     print '%s --> %s' % (
                         filename, BAD_PATTERNS[pattern])
                     total_error_count += 1
-            if failed:
-                summary_messages.append('%s   Pattern checks failed'
-                                        % _MESSAGE_TYPE_FAILED)
-            else:
-                summary_messages.append('%s   Pattern checks passed'
-                                        % _MESSAGE_TYPE_SUCCESS)
+    if failed:
+        summary_message = '%s   Pattern checks failed' % _MESSAGE_TYPE_FAILED
+        summary_messages.append(summary_message)
+    else:
+        summary_message = '%s   Pattern checks passed' % _MESSAGE_TYPE_SUCCESS
+        summary_messages.append(summary_message)
 
     print ''
     print '----------------------------------------'
@@ -399,17 +403,18 @@ def _check_bad_patterns(all_files, summary_messages):
     else:
         print '(%s files checked, %s errors found)' % (
             total_files_checked, total_error_count)
-        print summary_messages[len(summary_messages)-1]
+        print summary_message
 
     return summary_messages
 
 
 def main():
     all_files = _get_all_files()
-    summary_messages = _pre_commit_linter(all_files)
-    summary_messages = _check_bad_patterns(all_files, summary_messages)
+    linter_messages = _pre_commit_linter(all_files)
+    pattern_messages = _check_bad_patterns(all_files)
+    all_messages = linter_messages + pattern_messages
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
-            summary_messages]):
+            all_messages]):
         sys.exit(1)
 
 
