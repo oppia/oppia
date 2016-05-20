@@ -110,7 +110,8 @@ body {
   width: 100%;
 }
 
-/*Added to not show warning content when Javascript is not enabled. */
+/* According to the Angular documentation - https://docs.angularjs.org/api/ng/directive/ngCloak - 
+   the following rule needs to be added to the css file in order for ng-cloak to work.  */
 [ng\:cloak], [ng-cloak], .ng-cloak {
   display: none !important;
 }
