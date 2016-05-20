@@ -737,8 +737,8 @@ oppia.factory('rteHelperService', [
 
 // Dynamically generate CKEditor widgets for the rich text components.
 oppia.run([
-  'rteHelperService', 'oppiaHtmlEscaper',
-  function(rteHelperService, oppiaHtmlEscaper) {
+  '$rootScope', 'rteHelperService', 'oppiaHtmlEscaper',
+  function($rootScope, rteHelperService, oppiaHtmlEscaper) {
     var _RICH_TEXT_COMPONENTS = rteHelperService.getRichTextComponents();
     var inlineCapable = ['link', 'math'];
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
@@ -779,6 +779,7 @@ oppia.run([
                   }
                   // Actually create the widget.
                   editor.widgets.finalizeCreation(container);
+                  $rootScope.$broadcast('render-rte-components');
                 },
                 function() {},
                 function() {});
@@ -806,6 +807,7 @@ oppia.run([
                     spec.name, oppiaHtmlEscaper.escapedJsonToObj(value));
                 }
               });
+              $rootScope.$broadcast('render-rte-components');
             }
           });
         }
@@ -840,11 +842,13 @@ oppia.directive('ckEditorRte', [
         var buttonNames = widgets.map(function(widget) {
           return 'Oppia' + widget.toLowerCase();
         });
+
+        // Initialize ckeditor.
         var ck = CKEDITOR.inline(el[0].children[0], {
           extraPlugins: 'widget,lineutils,' + widgetNames,
           allowedContent: true,
           startupFocus: true,
-          floatSpacePreferRight: true,
+          floatSpaceDockedOffsetY: 15,
           toolbar: [
             {
               name: 'basicstyles',
@@ -865,6 +869,13 @@ oppia.directive('ckEditorRte', [
           ]
         });
 
+        var renderDirectivesInEditor = function() {
+          // Need to manually $compile so that directives render in rte.
+          $compile(el.contents())(scope);
+        };
+
+        scope.$on('render-rte-components', renderDirectivesInEditor);
+
         ck.on('instanceReady', function() {
           // Set the icons for each toolbar button.
           widgets.forEach(function(widget) {
@@ -882,8 +893,6 @@ oppia.directive('ckEditorRte', [
         };
 
         var updateHtmlContent = function() {
-          // Need to manually $compile so that directives render in rte.
-          $compile(el.contents())(scope);
           ngModel.$setViewValue(ck.getData());
         };
 
