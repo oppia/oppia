@@ -22,27 +22,29 @@ oppia.constant('GADGET_SPECS', GLOBALS.GADGET_SPECS);
 oppia.constant('PANEL_SPECS', GLOBALS.PANEL_SPECS);
 
 oppia.controller('ExplorationEditor', [
-  '$scope', '$http', '$window', '$rootScope', '$log', '$timeout',
-  'explorationData', 'editorContextService', 'explorationTitleService',
-  'explorationCategoryService', 'explorationGadgetsService',
-  'explorationObjectiveService', 'explorationLanguageCodeService',
-  'explorationRightsService', 'explorationInitStateNameService',
-  'explorationTagsService', 'editabilityService', 'explorationStatesService',
-  'routerService', 'graphDataService', 'stateEditorTutorialFirstTimeService',
+  '$scope', '$http', '$window', '$rootScope', '$templateCache', '$timeout',
+  '$modal', '$log', 'explorationData', 'editorContextService',
+  'explorationTitleService', 'explorationCategoryService',
+  'explorationGadgetsService', 'explorationObjectiveService',
+  'explorationLanguageCodeService', 'explorationRightsService',
+  'explorationInitStateNameService', 'explorationTagsService',
+  'editabilityService', 'explorationStatesService', 'routerService',
+  'graphDataService', 'stateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
-  'explorationWarningsService', '$templateCache', 'explorationContextService',
-  'explorationAdvancedFeaturesService', '$modal',
+  'explorationWarningsService', 'explorationContextService',
+  'explorationAdvancedFeaturesService',
   function(
-      $scope, $http, $window, $rootScope, $log, $timeout,
-      explorationData, editorContextService, explorationTitleService,
-      explorationCategoryService, explorationGadgetsService,
-      explorationObjectiveService, explorationLanguageCodeService,
-      explorationRightsService, explorationInitStateNameService,
-      explorationTagsService, editabilityService, explorationStatesService,
-      routerService, graphDataService, stateEditorTutorialFirstTimeService,
+      $scope, $http, $window, $rootScope, $templateCache, $timeout,
+      $modal, $log, explorationData, editorContextService,
+      explorationTitleService, explorationCategoryService,
+      explorationGadgetsService, explorationObjectiveService,
+      explorationLanguageCodeService, explorationRightsService,
+      explorationInitStateNameService, explorationTagsService,
+      editabilityService, explorationStatesService, routerService,
+      graphDataService, stateEditorTutorialFirstTimeService,
       explorationParamSpecsService, explorationParamChangesService,
-      explorationWarningsService, $templateCache, explorationContextService,
-      explorationAdvancedFeaturesService, $modal) {
+      explorationWarningsService, explorationContextService,
+      explorationAdvancedFeaturesService) {
     $scope.editabilityService = editabilityService;
     $scope.editorContextService = editorContextService;
 
@@ -357,11 +359,7 @@ oppia.controller('ExplorationEditor', [
         windowClass: 'oppia-welcome-modal'
       });
 
-      modalInstance.result.then(function() {
-        $scope.startTutorial();
-      }, function() {
-        stateEditorTutorialFirstTimeService.markTutorialFinished();
-      });
+      modalInstance.result.then($scope.startTutorial);
     };
 
     $scope.$on(
@@ -412,11 +410,7 @@ oppia.controller('EditorNavigation', [
         windowClass: 'oppia-help-modal'
       });
 
-      modalInstance.result.then(function() {
-        $scope.openEditorTutorial();
-      }, function() {
-        stateEditorTutorialFirstTimeService.markTutorialFinished();
-      });
+      modalInstance.result.then($scope.openEditorTutorial);
     };
 
     $scope.countWarnings = explorationWarningsService.countWarnings;
