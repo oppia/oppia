@@ -14,6 +14,7 @@
 
 """Tests for the exploration editor page."""
 
+import datetime
 import os
 import StringIO
 import zipfile
@@ -22,12 +23,16 @@ from core.controllers import editor
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import param_domain
 from core.domain import stats_domain
 from core.domain import rights_manager
 from core.domain import rule_domain
+from core.platform import models
 from core.tests import test_utils
 import feconf
 
+(exp_models, feedback_models, user_models) = models.Registry.import_models([                                                                                                                                                                                                            models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
+])
 
 class BaseEditorControllerTest(test_utils.GenericTestBase):
 
@@ -1220,3 +1225,127 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
                 expected_status_int=401)
 
             self.logout()
+
+
+class EditorAutosaveTest(BaseEditorControllerTest):
+    """Test the handling of editor autosave actions."""
+
+    EXP_ID1 = '1'
+    EXP_ID2 = '2'
+    EXP_ID3 = '3'
+    NEWER_DATETIME = datetime.datetime.strptime('2017-03-16', '%Y-%m-%d')
+    OLDER_DATETIME = datetime.datetime.strptime('2015-03-16', '%Y-%m-%d')
+    DRAFT_CHANGELIST = [{
+        'cmd': 'add_state',
+        'state_name': 'State 5'}]
+    NEW_CHANGELIST = [{ 
+        'cmd': 'edit_exploration_property',
+        'property_name': 'title',
+        'new_value': 'New title'}]
+    INVALID_CHANGELIST = [{ 
+        'cmd': 'edit_exploration_property',
+        'property_name': 'title',
+        'new_value': 1}]
+
+    def setUp(self):
+        super(EditorAutosaveTest, self).setUp()
+        self.login(self.OWNER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        # Create explorations.
+        self.save_new_valid_exploration(self.EXP_ID1, self.owner_id)
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID1)
+        exploration.add_states(['State A'])
+        exploration.states['State A'].update_interaction_id('TextInput')
+        self.save_new_valid_exploration(self.EXP_ID2, self.owner_id)
+        self.save_new_valid_exploration(self.EXP_ID3, self.owner_id)
+        # Explorations with draft set.
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.owner_id, self.EXP_ID1), user_id=self.owner_id,
+            exploration_id=self.EXP_ID1,
+            draft_change_list=self.DRAFT_CHANGELIST,
+            draft_change_list_last_updated=self.NEWER_DATETIME,
+            draft_change_list_exp_version=1).put()
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.owner_id, self.EXP_ID2), user_id=self.owner_id,
+            exploration_id=self.EXP_ID2,
+            draft_change_list=self.DRAFT_CHANGELIST,
+            draft_change_list_last_updated=self.OLDER_DATETIME,
+            draft_change_list_exp_version=1).put()
+        # Exploration with no draft.
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.owner_id, self.EXP_ID3), user_id=self.owner_id,
+            exploration_id=self.EXP_ID3).put()
+        # Go to the exploration editor page.
+        response = self.testapp.get('/create/%s' % self.EXP_ID1)
+        self.csrf_token = self.get_csrf_token_from_response(response)
+
+    def _null_method(self, *args):
+        pass
+
+    def test_draft_not_updated_newer_draft_exists(self):
+        payload = {
+            'change_list': self.NEW_CHANGELIST,
+            'version': 1,
+        }
+        apply_change_list_counter = test_utils.CallCounter(self._null_method)
+        with self.swap(exp_services, 'apply_change_list', apply_change_list_counter):
+            response = self.put_json(
+                '/createhandler/autosave_draft/%s' % self.EXP_ID1, payload, 
+                self.csrf_token)
+        self.assertEqual(apply_change_list_counter.times_called, 0)
+        self.assertTrue(response['is_draft_version_valid'])
+
+    def test_draft_not_updated_validation_error(self):
+        payload = {
+            'change_list': self.INVALID_CHANGELIST,
+            'version': 1,
+        }
+        response = self.put_json(
+            '/createhandler/autosave_draft/%s' % self.EXP_ID2, payload, 
+            self.csrf_token, expect_errors=True, expected_status_int=400)
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.owner_id, self.EXP_ID2))
+        self.assertIsNone(exp_user_data.draft_change_list)
+        self.assertIsNone(exp_user_data.draft_change_list_last_updated)
+        self.assertIsNone(exp_user_data.draft_change_list_exp_version)
+
+    def test_draft_updated_version_valid(self):
+        payload = {
+            'change_list': self.NEW_CHANGELIST,
+            'version': 1,
+        }
+        response = self.put_json(
+            '/createhandler/autosave_draft/%s' % self.EXP_ID2, payload, 
+            self.csrf_token)
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.owner_id, self.EXP_ID2))
+        self.assertEqual(exp_user_data.draft_change_list, self.NEW_CHANGELIST)
+        self.assertEqual(exp_user_data.draft_change_list_exp_version, 1)
+        self.assertTrue(response['is_draft_version_valid'])
+
+    def test_draft_updated_version_invalid(self):
+        payload = {
+            'change_list': self.NEW_CHANGELIST,
+            'version': 10,
+        }
+        response = self.put_json(
+            '/createhandler/autosave_draft/%s' % self.EXP_ID2, payload, 
+            self.csrf_token)
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.owner_id, self.EXP_ID2))
+        self.assertEqual(exp_user_data.draft_change_list, self.NEW_CHANGELIST)
+        self.assertEqual(exp_user_data.draft_change_list_exp_version, 10)
+        self.assertFalse(response['is_draft_version_valid'])
+
+    def test_discard_draft(self):
+        # We are using testapp.post() directly here because post_json() expects
+        # the data to be application/javascript, while the data received as
+        # post response here is text/html.
+        json_response = self.testapp.post(
+            '/createhandler/autosave_draft/%s' % self.EXP_ID2, {})
+        self.assertEqual(json_response.status_int, 200)
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.owner_id, self.EXP_ID2))
+        self.assertIsNone(exp_user_data.draft_change_list)
+        self.assertIsNone(exp_user_data.draft_change_list_last_updated)
+        self.assertIsNone(exp_user_data.draft_change_list_exp_version)

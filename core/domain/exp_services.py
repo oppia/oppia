@@ -1014,13 +1014,7 @@ def update_exploration(
     _save_exploration(committer_id, exploration, commit_message, change_list)
 
     # If there is an existing exploration draft for this user, clear it.
-    exp_user_data = user_models.ExplorationUserDataModel.get(
-        committer_id, exploration_id)
-    if exp_user_data:
-        exp_user_data.draft_change_list = None
-        exp_user_data.draft_change_list_last_updated = None
-        exp_user_data.draft_change_list_exp_version = None
-        exp_user_data.put()
+    discard_draft(exploration_id, committer_id)
 
     # Update summary of changed exploration.
     update_exploration_summary(exploration.id, committer_id)
@@ -1568,10 +1562,12 @@ def reject_suggestion(editor_id, thread_id, exploration_id):
 
 def is_draft_version_valid(exp_id, user_id):
     """Checks if the draft version is the same as the latest version of the
-    exploration."""
+    exploration. Returns None if a draft does not exist."""
 
-    draft_version = user_models.ExplorationUserDataModel.get(
-        user_id, exp_id).draft_change_list_exp_version
+    exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
+    if not (exp_user_data and exp_user_data.draft_change_list):
+        return None
+    draft_version = exp_user_data.draft_change_list_exp_version
     exp_version = get_exploration_by_id(exp_id).version
     return draft_version == exp_version
 
@@ -1584,7 +1580,6 @@ def create_or_update_draft(
     timestamp of the draft.
     The method assumes that a ExplorationUserDataModel object exists for the
     given user and exploration."""
-
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
     if (exp_user_data.draft_change_list and
             exp_user_data.draft_change_list_last_updated > current_datetime):
@@ -1597,12 +1592,24 @@ def create_or_update_draft(
     exp_user_data.put()
 
 
-def get_exp_with_draft_applied(exp_id, user_id):
+def get_exp_with_draft_applied(exp_id, user_id, version=None):
     """If a draft exists for the given user and exploration,
     apply it to the exploration."""
 
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
     return (
         apply_change_list(exp_id, exp_user_data.draft_change_list)
-        if exp_user_data.draft_change_list
-        else get_exploration_by_id(exp_id))
+        if exp_user_data and exp_user_data.draft_change_list
+        else get_exploration_by_id(exp_id, version=version))
+
+
+def discard_draft(exp_id, user_id):
+    """Discard the draft for the given user and exploration."""
+
+    exp_user_data = user_models.ExplorationUserDataModel.get(
+        user_id, exp_id)
+    if exp_user_data:
+        exp_user_data.draft_change_list = None
+        exp_user_data.draft_change_list_last_updated = None
+        exp_user_data.draft_change_list_exp_version = None
+        exp_user_data.put()

@@ -3129,6 +3129,10 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         self.assertFalse(exp_services.is_draft_version_valid(
             self.EXP_ID2, self.USER_ID))
 
+    def test_draft_version_no_draft_exists(self):
+        self.assertIsNone(exp_services.is_draft_version_valid(
+            self.EXP_ID3, self.USER_ID))
+
     def test_create_or_update_draft_older_draft_exists(self):
         exp_services.create_or_update_draft(
             self.EXP_ID1, self.USER_ID, self.NEW_CHANGELIST, 5,
@@ -3186,3 +3190,11 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         updated_exp = exp_services.get_exp_with_draft_applied(
             self.EXP_ID3, self.USER_ID)
         self.assertEqual(updated_exp.init_state.param_changes, [])
+
+    def test_draft_discarded(self):
+        exp_services.discard_draft(self.EXP_ID1, self.USER_ID,)
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.USER_ID, self.EXP_ID1))
+        self.assertIsNone(exp_user_data.draft_change_list)
+        self.assertIsNone(exp_user_data.draft_change_list_last_updated)
+        self.assertIsNone(exp_user_data.draft_change_list_exp_version)
