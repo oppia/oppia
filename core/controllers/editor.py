@@ -59,14 +59,6 @@ NEW_STATE_TEMPLATE = {
     'unresolved_answers': {},
 }
 
-MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE = (
-    'https://moderator/request/forum/url')
-MODERATOR_REQUEST_FORUM_URL = config_domain.ConfigProperty(
-    'moderator_request_forum_url', {'type': 'unicode'},
-    'A link to the forum for nominating explorations to be featured '
-    'in the Oppia library',
-    default_value=MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE)
-
 DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = config_domain.ConfigProperty(
     'default_twitter_share_message_editor', {
         'type': 'unicode',
@@ -245,7 +237,6 @@ class ExplorationPage(EditorHandler):
                 interaction_templates),
             'interaction_validators_html': jinja2.utils.Markup(
                 interaction_validators_html),
-            'moderator_request_forum_url': MODERATOR_REQUEST_FORUM_URL.value,
             'nav_mode': feconf.NAV_MODE_CREATE,
             'value_generators_js': jinja2.utils.Markup(
                 get_value_generators_js()),

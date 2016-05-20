@@ -359,12 +359,6 @@
             </button>
           </p>
         {% endif %}
-
-        <p class="oppia-exploration-ctrl" ng-if="editabilityService.isEditable() && explorationRightsService.isPublic()">
-          <button type="button" class="btn btn-default" ng-click="showNominateExplorationModal()" ng-disabled="isExplorationLockedForEditing()" ng-class="{'btn-success': !isExplorationLockedForEditing()}" tooltip="Click this button to nominate this exploration for featured status in the Oppia library." tooltip-placement="bottom">
-            Nominate for Featured Status
-          </button>
-        </p>
       </div>
 
       <div class="col-lg-6 col-md-6 col-sm-6" ng-if="currentUserIsAdmin || currentUserIsModerator">
@@ -526,38 +520,5 @@
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
     <button class="btn btn-danger" ng-click="reallyDelete()">Delete Exploration</button>
-  </div>
-</script>
-
-<script type="text/ng-template" id="modals/nominateExploration">
-  <div class="modal-header">
-    <h3>Nominate for featured status</h3>
-  </div>
-
-  <div class="modal-body">
-    <p>
-      Congratulations, you are about to nominate this exploration for featured status in the Oppia library!
-    </p>
-
-    <p>
-      Currently, the decision to feature an exploration is based on moderator review.
-      When you submit an exploration for review, a moderator will play through
-      it, look at its structure, and decide whether it fits the
-      <a href="/about#publication-criteria">criteria for featured status</a>.
-      If not, the moderator will make a series of specific suggestions on how
-      to make the exploration satisfy the criteria, and work with the editor(s)
-      to get it featured.
-    </p>
-
-    <p>
-      <strong>To kick off the review process</strong>, please make a post to the
-      <a href="{{moderator_request_forum_url}}" target="_blank">request forum</a>, and
-      include a link to the exploration.
-    </p>
-  </div>
-
-  <div class="modal-footer">
-    <button class="btn btn-default" ng-click="close()">Close</button>
-    <a class="btn btn-success" href="{{moderator_request_forum_url}}" target="_blank">Post in the request forum</a>
   </div>
 </script>
