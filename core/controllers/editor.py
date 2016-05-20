@@ -969,3 +969,4 @@ class EditorAutosaveHandler(ExplorationHandler):
     def post(self, exploration_id):
         """Handles POST request for discarding draft changes."""
         exp_services.discard_draft(exploration_id, self.user_id)
+        self.render_json({})

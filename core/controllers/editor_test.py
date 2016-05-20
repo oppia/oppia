@@ -1338,12 +1338,9 @@ class EditorAutosaveTest(BaseEditorControllerTest):
         self.assertFalse(response['is_draft_version_valid'])
 
     def test_discard_draft(self):
-        # We are using testapp.post() directly here because post_json() expects
-        # the data to be application/javascript, while the data received as
-        # post response here is text/html.
-        json_response = self.testapp.post(
-            '/createhandler/autosave_draft/%s' % self.EXP_ID2, {})
-        self.assertEqual(json_response.status_int, 200)
+        response = self.post_json(
+            '/createhandler/autosave_draft/%s' % self.EXP_ID2, {},
+            self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.owner_id, self.EXP_ID2))
         self.assertIsNone(exp_user_data.draft_change_list)
