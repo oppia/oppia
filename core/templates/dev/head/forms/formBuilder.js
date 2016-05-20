@@ -755,7 +755,7 @@ oppia.run([
           editor.widgets.add(ckName, {
             button: componentDefn.tooltip,
             inline: inlineCapable.indexOf(componentDefn.name) !== -1,
-            template: `<${tagName}></${tagName}>`,
+            template: '<' + tagName + '></' + tagName + '>',
             edit: function(event) {
               // Prevent default action since we are using our own edit modal.
               event.cancel();
@@ -882,7 +882,7 @@ oppia.directive('ckEditorRte', [
             var bgStyle = 'url("/extensions/rich_text_components/' +
                           widget + '/static/' + widget +
                           '.png") no-repeat center';
-            $(`.cke_button__oppia${widget.toLowerCase()}`).css(
+            $('.cke_button__oppia' + widget.toLowerCase()).css(
               'background', bgStyle);
           });
           ck.setData(ngModel.$viewValue);
