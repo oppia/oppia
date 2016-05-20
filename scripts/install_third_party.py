@@ -27,7 +27,7 @@ import zipfile
 
 import common
 
-#These two lines prevent a "IOError: [Errno socket error] 
+#These two lines prevent a "IOError: [Errno socket error]
 #[Errno -2] Name or service not known" error
 # in urllib.urlretrieve, if the user is behind a proxy.
 if 'VAGRANT' in os.environ:
