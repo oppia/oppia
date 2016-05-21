@@ -900,6 +900,7 @@ var addFallback = function(
 
 // NOTE: if the state is not visible in the state graph this function will fail
 var moveToState = function(targetName) {
+  general.scrollToTop();
   element.all(by.css('.protractor-test-node')).map(function(stateElement) {
     return stateElement.element(by.css('.protractor-test-node-label')).
       getText();

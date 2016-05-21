@@ -33,6 +33,10 @@ var waitForSystem = function() {
   browser.sleep(waitTime);
 };
 
+var scrollToTop = function() {
+  browser.executeScript('window.scrollTo(0,0);');
+};
+
 // We will report all console logs of level greater than this.
 var CONSOLE_LOG_THRESHOLD = 900;
 var CONSOLE_ERRORS_TO_IGNORE = [
@@ -127,6 +131,7 @@ var expect404Error = function() {
 };
 
 exports.waitForSystem = waitForSystem;
+exports.scrollToTop = scrollToTop;
 exports.checkForConsoleErrors = checkForConsoleErrors;
 
 exports.SERVER_URL_PREFIX = SERVER_URL_PREFIX;
