@@ -110,6 +110,12 @@ body {
   width: 100%;
 }
 
+/* According to the Angular documentation - https://docs.angularjs.org/api/ng/directive/ngCloak - 
+   the following rule needs to be added to the css file in order for ng-cloak to work.  */
+[ng\:cloak], [ng-cloak], .ng-cloak {
+  display: none !important;
+}
+
 .oppia-dashboard-container {
   margin: 60px auto 30px auto;
   max-width: 800px;
