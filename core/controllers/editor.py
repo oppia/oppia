@@ -948,7 +948,7 @@ class EditorAutosaveHandler(ExplorationHandler):
         # validation.
         try:
             change_list = self.payload.get('change_list')
-            version = self.payload.get('version') 
+            version = self.payload.get('version')
             exp_services.create_or_update_draft(
                 exploration_id, self.user_id, change_list, version,
                 datetime.datetime.utcnow())
