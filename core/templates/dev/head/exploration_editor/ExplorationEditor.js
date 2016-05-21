@@ -474,14 +474,16 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
   'explorationData', 'explorationRightsService', 'editabilityService',
   'explorationWarningsService', 'siteAnalyticsService',
   'explorationObjectiveService', 'explorationTitleService',
-  'explorationCategoryService', 'explorationStatesService','CATEGORY_LIST',
+  'explorationCategoryService', 'explorationStatesService', 'CATEGORY_LIST',
+  'explorationLanguageCodeService',
   function(
       $scope, $http, $rootScope, $window, $timeout, $modal,
       alertsService, changeListService, focusService, routerService,
       explorationData, explorationRightsService, editabilityService,
       explorationWarningsService, siteAnalyticsService,
       explorationObjectiveService, explorationTitleService,
-      explorationCategoryService, explorationStatesService, CATEGORY_LIST) {
+      explorationCategoryService, explorationStatesService, CATEGORY_LIST,
+      explorationLanguageCodeService) {
     // Whether or not a save action is currently in progress.
     $scope.isSaveInProgress = false;
     // Whether or not a discard action is currently in progress.
@@ -626,9 +628,12 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
          explorationData.explorationId);
        alertsService.clearWarnings();
 
-       // If the objective has not yet been specified, open the pre-publication
+       // If the metedata has not yet been specified, open the pre-publication
        // 'add exploration metadata' modal.
-       if (explorationObjectiveService.savedMemento) {
+       if (!explorationTitleService.savedMemento ||
+          !explorationObjectiveService.savedMemento ||
+          !explorationCategoryService.savedMemento ||
+          !explorationLanguageCodeService.savedMemento) {
          $modal.open({
            templateUrl: 'modals/addExplorationMetadata',
            backdrop: true,
@@ -641,12 +646,15 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
              explorationTitleService, explorationCategoryService,
              explorationStatesService, CATEGORY_LIST,
              explorationLanguageCodeService) {
-               // If no objective has been specified yet, require the creator
-               // to specify it.
-               $scope.explorationTitleService = explorationTitleService;
-               $scope.explorationObjectiveService = explorationObjectiveService;
-               $scope.explorationCategoryService = explorationCategoryService;
-               $scope.explorationLanguageCodeService = explorationLanguageCodeService;
+               $scope.explorationTitleService =
+               explorationTitleService;
+               $scope.explorationObjectiveService =
+               explorationObjectiveService;
+               $scope.explorationCategoryService =
+               explorationCategoryService;
+               $scope.explorationLanguageCodeService =
+               explorationLanguageCodeService;
+
                $scope.requireTitleToBeSpecified = (
                  !explorationTitleService.savedMemento);
                $scope.requireObjectiveToBeSpecified = (
@@ -655,45 +663,75 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
                  !explorationCategoryService.savedMemento);
                $scope.requireLanguageToBeSpecified = (
                  !explorationLanguageCodeService.savedMemento);
+
+               $scope.metadataList = [];
+
                $scope.CATEGORY_LIST_FOR_SELECT2 = [];
 
-              for (var i = 0; i < CATEGORY_LIST.length; i++) {
-                $scope.CATEGORY_LIST_FOR_SELECT2.push({
-                  id: CATEGORY_LIST[i],
-                  text: CATEGORY_LIST[i]
-                });
-              }
+               for (var i = 0; i < CATEGORY_LIST.length; i++) {
+                 $scope.CATEGORY_LIST_FOR_SELECT2.push({
+                   id: CATEGORY_LIST[i],
+                   text: CATEGORY_LIST[i]
+                 });
+               }
 
-              var _states = explorationStatesService.getStates();
-                if (_states) {
-                  var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2.some(
-                    function(categoryItem) {
-                      return categoryItem.id === explorationCategoryService.savedMemento;
-                    }
-                  );
+               var _states = explorationStatesService.getStates();
+               if (_states) {
+                 var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2
+                 .some(
+                   function(categoryItem) {
+                     return categoryItem.id ===
+                     explorationCategoryService.savedMemento;
+                   }
+                 );
 
-                  if (!categoryIsInSelect2) {
-                    $scope.CATEGORY_LIST_FOR_SELECT2.push({
-                      id: explorationCategoryService.savedMemento,
-                      text: explorationCategoryService.savedMemento
-                    });
-                  }
-                }
+                 if (!categoryIsInSelect2) {
+                   $scope.CATEGORY_LIST_FOR_SELECT2.push({
+                     id: explorationCategoryService.savedMemento,
+                     text: explorationCategoryService.savedMemento
+                   });
+                 }
+               }
 
                $scope.save = function() {
-                 console.log(explorationCategoryService.savedMemento);
-                 console.log(explorationCategoryService.displayed);
-                 console.log(explorationLanguageCodeService.savedMemento);
-                 console.log(explorationLanguageCodeService.displayed);
+                 // If no objective has been specified yet, require the creator
+                 // to specify it.
+                 if ($scope.requireObjectiveToBeSpecified) {
+                   if (!explorationObjectiveService.displayed) {
+                     throw Error('Please specify an objective');
+                   }
+                   explorationObjectiveService.saveDisplayedValue();
+                   $scope.metadataList.push('objective');
+                 }
+
+                 if ($scope.requireTitleToBeSpecified) {
+                   if (!explorationTitleService.displayed) {
+                     throw Error('Please specify a title');
+                   }
+                   explorationTitleService.saveDisplayedValue();
+                   $scope.metadataList.push('title');
+                 }
+
+                 if ($scope.requireCategoryToBeSpecified) {
+                   if (!explorationCategoryService.displayed) {
+                     throw Error('Please specify a category');
+                   }
+                   explorationCategoryService.saveDisplayedValue();
+                   $scope.metadataList.push('category');
+                 }
+
+                 if ($scope.requireLanguageToBeSpecified) {
+                   if (!explorationLanguageCodeService.displayed) {
+                     throw Error('Please specify a language');
+                   }
+                   explorationLanguageCodeService.saveDisplayedValue();
+                   $scope.metadataList.push('language');
+                 }
                  explorationObjectiveService.saveDisplayedValue();
                  explorationTitleService.saveDisplayedValue();
                  explorationCategoryService.saveDisplayedValue();
                  explorationLanguageCodeService.saveDisplayedValue();
-                 $modalInstance.close();
-                 console.log(explorationCategoryService.savedMemento);
-                 console.log(explorationCategoryService.displayed);
-                 console.log(explorationLanguageCodeService.savedMemento);
-                 console.log(explorationLanguageCodeService.displayed);
+                 $modalInstance.close($scope.metadataList);
                };
 
                $scope.cancel = function() {
@@ -702,8 +740,18 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
                };
              }
            ]
-         }).result.then(function() {
-           saveDraftToBackend('Add an objective.', openPublishExplorationModal);
+         }).result.then(function(metadataList) {
+           var commitMessage = 'Add metadata to the exploration: ';
+           for (var i = 0; i < metadataList.length; i++) {
+             commitMessage += metadataList[i];
+             if (i === metadataList.length - 1) {
+               commitMessage += '.';
+             } else {
+               commitMessage += ', ';
+             }
+           }
+           saveDraftToBackend(commitMessage, openPublishExplorationModal);
+           console.log(commitMessage);
          });
        } else {
          // No further metadata is needed. Open the publish modal immediately.
