@@ -1928,24 +1928,24 @@ oppia.factory('humanReadableLostChangesService', function() {
   var _getStateChangesInfo = function(lostChange) {
     var lostChangeInfo = _getEmtpyChangeObject();
     switch (lostChange.cmd) {
-    case 'add_state':
-      lostChangeInfo.label = 'Added state ' + lostChange.state_name;
-      lostChangeInfo.type = TYPE_ADD_STATE;
-      break;
-    case 'rename_state':
-      lostChangeInfo.label = 'Renamed state ' + lostChange.old_state_name +
-        ' to ' + lostChange.new_state_name;
-      lostChangeInfo.type = TYPE_RENAME_STATE;
-      break;
-    case 'delete_state':
-      lostChangeInfo.label = 'Deleted state ' + lostChange.state_name;
-      lostChangeInfo.type = TYPE_DELETE_STATE;
-      break;
-    case 'edit_state_property':
-      lostChangeInfo.label = 'Edits in state ' + lostChange.state_name;
-      lostChangeInfo.type = TYPE_EDIT_STATE_PROPERTY;
-      lostChangeInfo.stateName = lostChange.state_name;
-      break;
+      case 'add_state':
+        lostChangeInfo.label = 'Added state ' + lostChange.state_name;
+        lostChangeInfo.type = TYPE_ADD_STATE;
+        break;
+      case 'rename_state':
+        lostChangeInfo.label = 'Renamed state ' + lostChange.old_state_name +
+          ' to ' + lostChange.new_state_name;
+        lostChangeInfo.type = TYPE_RENAME_STATE;
+        break;
+      case 'delete_state':
+        lostChangeInfo.label = 'Deleted state ' + lostChange.state_name;
+        lostChangeInfo.type = TYPE_DELETE_STATE;
+        break;
+      case 'edit_state_property':
+        lostChangeInfo.label = 'Edits in state ' + lostChange.state_name;
+        lostChangeInfo.type = TYPE_EDIT_STATE_PROPERTY;
+        lostChangeInfo.stateName = lostChange.state_name;
+        break;
     }
     return lostChangeInfo;
   };
@@ -1953,65 +1953,65 @@ oppia.factory('humanReadableLostChangesService', function() {
   var _getEditedStatePropertyInfo = function(lostChange, newValue, oldValue) {
     var editedStatePropertyInfo = _getEmtpyChangeObject();
     switch (lostChange.property_name) {
-    case 'content':
-      editedStatePropertyInfo.label = 'Edited content ';
-      if (newValue !== null) {
-        editedStatePropertyInfo.label += newValue.value;
-      }
-      editedStatePropertyInfo.type = TYPE_CONTENT;
-      break;
-    case 'widget_id':
-      if (oldValue === null) {
-        if (newValue !== 'EndExploration') {
-          editedStatePropertyInfo.label = 'Added Interaction ' + newValue;
-          editedStatePropertyInfo.type = TYPE_ADD_INTERACTION;
-        } else {
-          editedStatePropertyInfo.label = 'Ended Exploration';
-          editedStatePropertyInfo.type = TYPE_END_EXPLORATION;
+      case 'content':
+        editedStatePropertyInfo.label = 'Edited content ';
+        if (newValue !== null) {
+          editedStatePropertyInfo.label += newValue.value;
         }
-      } else {
-        editedStatePropertyInfo.label = 'Deleted Interaction ' + oldValue;
-        editedStatePropertyInfo.type = TYPE_DELETE_INTERACTION;
-      }
-      break;
-    case 'widget_customization_args':
-      if (_isEmpty(oldValue)) {
-        editedStatePropertyInfo.label = 'Added Interaction Customizations';
-        editedStatePropertyInfo.type = TYPE_ADD_WIDGET_CUSTOMIZATIONS;
-      } else if (_isEmpty(newValue)) {
-        editedStatePropertyInfo.label = 'Removed Interaction Customizations';
-        editedStatePropertyInfo.type = TYPE_DELETE_WIDGET_CUSTOMIZATIONS;
-      } else {
-        editedStatePropertyInfo.label = 'Edited Interaction Customizations';
-        editedStatePropertyInfo.type = TYPE_EDIT_WIDGET_CUSTOMIZATIONS;
-      }
-      break;
-    case 'answer_groups':
-      var answerGroupChanges = _getRelativeChangeToGroups(lostChange);
-      if (answerGroupChanges === 'added') {
-        editedStatePropertyInfo.label = 'Added answer group';
-        editedStatePropertyInfo.type = TYPE_ADD_ANSWER_GROUP;
-      } else if (answerGroupChanges === 'edited') {
-        editedStatePropertyInfo.label = 'Edited answer group';
-        editedStatePropertyInfo.type = TYPE_EDIT_ANSWER_GROUP;
-      } else {
-        editedStatePropertyInfo.label = 'Deleted answer group';
-        editedStatePropertyInfo.type = TYPE_DELETE_ANSWER_GROUP;;
-      }
-      break;
-    case 'default_outcome':
-      var defaultOutcomeChanges = _getRelativeChangeToGroups(lostChange);
-      if (defaultOutcomeChanges === 'added') {
-        editedStatePropertyInfo.label = 'Added default outcome';
-        editedStatePropertyInfo.type = TYPE_ADD_DEFAULT_OUTCOME;
-      } else if (defaultOutcomeChanges === 'edited') {
-        editedStatePropertyInfo.label = 'Edited default outcome';
-        editedStatePropertyInfo.type = TYPE_EDIT_DEFAULT_OUTCOME;
-      } else {
-        editedStatePropertyInfo.label = 'Deleted default outcome';
-        editedStatePropertyInfo.type = TYPE_DELETE_DEFAULT_OUTCOME;
-      }
-      break;
+        editedStatePropertyInfo.type = TYPE_CONTENT;
+        break;
+      case 'widget_id':
+        if (oldValue === null) {
+          if (newValue !== 'EndExploration') {
+            editedStatePropertyInfo.label = 'Added Interaction ' + newValue;
+            editedStatePropertyInfo.type = TYPE_ADD_INTERACTION;
+          } else {
+            editedStatePropertyInfo.label = 'Ended Exploration';
+            editedStatePropertyInfo.type = TYPE_END_EXPLORATION;
+          }
+        } else {
+          editedStatePropertyInfo.label = 'Deleted Interaction ' + oldValue;
+          editedStatePropertyInfo.type = TYPE_DELETE_INTERACTION;
+        }
+        break;
+      case 'widget_customization_args':
+        if (_isEmpty(oldValue)) {
+          editedStatePropertyInfo.label = 'Added Interaction Customizations';
+          editedStatePropertyInfo.type = TYPE_ADD_WIDGET_CUSTOMIZATIONS;
+        } else if (_isEmpty(newValue)) {
+          editedStatePropertyInfo.label = 'Removed Interaction Customizations';
+          editedStatePropertyInfo.type = TYPE_DELETE_WIDGET_CUSTOMIZATIONS;
+        } else {
+          editedStatePropertyInfo.label = 'Edited Interaction Customizations';
+          editedStatePropertyInfo.type = TYPE_EDIT_WIDGET_CUSTOMIZATIONS;
+        }
+        break;
+      case 'answer_groups':
+        var answerGroupChanges = _getRelativeChangeToGroups(lostChange);
+        if (answerGroupChanges === 'added') {
+          editedStatePropertyInfo.label = 'Added answer group';
+          editedStatePropertyInfo.type = TYPE_ADD_ANSWER_GROUP;
+        } else if (answerGroupChanges === 'edited') {
+          editedStatePropertyInfo.label = 'Edited answer group';
+          editedStatePropertyInfo.type = TYPE_EDIT_ANSWER_GROUP;
+        } else {
+          editedStatePropertyInfo.label = 'Deleted answer group';
+          editedStatePropertyInfo.type = TYPE_DELETE_ANSWER_GROUP;;
+        }
+        break;
+      case 'default_outcome':
+        var defaultOutcomeChanges = _getRelativeChangeToGroups(lostChange);
+        if (defaultOutcomeChanges === 'added') {
+          editedStatePropertyInfo.label = 'Added default outcome';
+          editedStatePropertyInfo.type = TYPE_ADD_DEFAULT_OUTCOME;
+        } else if (defaultOutcomeChanges === 'edited') {
+          editedStatePropertyInfo.label = 'Edited default outcome';
+          editedStatePropertyInfo.type = TYPE_EDIT_DEFAULT_OUTCOME;
+        } else {
+          editedStatePropertyInfo.label = 'Deleted default outcome';
+          editedStatePropertyInfo.type = TYPE_DELETE_DEFAULT_OUTCOME;
+        }
+        break;
     }
     return editedStatePropertyInfo;
   };
