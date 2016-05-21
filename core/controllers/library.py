@@ -36,11 +36,9 @@ def get_matching_activity_dicts(query_string, search_cursor):
     """Given a query string and a search cursor, returns a list of activity
        dicts that satisfy the search query.
     """
-    # TODO(mgowano): Remove '' in query to allow for collection searches once
-    # languages are supported in collections
     collection_ids, search_cursor = (
         collection_services.get_collection_ids_matching_query(
-            '', cursor=search_cursor))
+            query_string, cursor=search_cursor))
     exp_ids, new_search_cursor = (
         exp_services.get_exploration_ids_matching_query(
             query_string, cursor=search_cursor))
