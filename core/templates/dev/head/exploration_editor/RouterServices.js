@@ -31,6 +31,9 @@ oppia.factory('routerService', [
     var HISTORY_TAB = 'history';
     var FEEDBACK_TAB = 'feedback';
 
+    var SLUG_GUI = 'gui';
+    var SLUG_PREVIEW = 'preview';
+
     var _tabs = {
       active: MAIN_TAB
     };
@@ -54,7 +57,7 @@ oppia.factory('routerService', [
 
       if (newPath.indexOf('/preview/') === 0) {
         _tabs.active = PREVIEW_TAB;
-        _doNavigation(newPath, 'preview');
+        _doNavigation(newPath, SLUG_PREVIEW);
       } else if (newPath === '/settings') {
         _tabs.active = SETTINGS_TAB;
         $rootScope.$broadcast('refreshSettingsTab');
@@ -71,7 +74,7 @@ oppia.factory('routerService', [
         _tabs.active = FEEDBACK_TAB;
       } else if (newPath.indexOf('/gui/') === 0) {
         _tabs.active = MAIN_TAB;
-        _doNavigation(newPath, 'gui');
+        _doNavigation(newPath, SLUG_GUI);
       } else {
         if (explorationInitStateNameService.savedMemento) {
           $location.path(
@@ -89,7 +92,7 @@ oppia.factory('routerService', [
           $interval.cancel(waitForStatesToLoad);
           if (allStates.hasOwnProperty(putativeStateName)) {
             editorContextService.setActiveStateName(putativeStateName);
-            if (pathType === 'gui') {
+            if (pathType === SLUG_GUI) {
               $rootScope.$broadcast('refreshStateEditor');
             }
             // TODO(sll): Fire an event to center the graph, in the case
@@ -125,7 +128,7 @@ oppia.factory('routerService', [
     };
 
     var _actuallyNavigate = function(pathType, newStateName) {
-      if (pathType != 'preview' && pathType != 'gui') {
+      if (pathType !== SLUG_GUI && pathType !== SLUG_PREVIEW) {
         return;
       }
       if (newStateName) {
@@ -161,19 +164,19 @@ oppia.factory('routerService', [
 
         if (_tabs.active === MAIN_TAB) {
           $('.oppia-editor-cards-container').fadeOut(function() {
-            _actuallyNavigate('gui', stateName);
+            _actuallyNavigate(SLUG_GUI, stateName);
             $rootScope.$apply();
             $timeout(function() {
               $('.oppia-editor-cards-container').fadeIn();
             }, 150);
           });
         } else {
-          _actuallyNavigate('gui', stateName);
+          _actuallyNavigate(SLUG_GUI, stateName);
         }
       },
       navigateToPreviewTab: function() {
         if (_tabs.active !== PREVIEW_TAB) {
-          _actuallyNavigate('preview', null);
+          _actuallyNavigate(SLUG_PREVIEW, null);
         }
       },
       navigateToStatsTab: function() {
