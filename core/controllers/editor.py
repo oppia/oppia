@@ -941,18 +941,17 @@ class StartedTutorialEventHandler(EditorHandler):
 class EditorAutosaveHandler(ExplorationHandler):
     """Handles requests from the editor for draft autosave."""
 
-    @require_editor 
+    @require_editor
     def put(self, exploration_id):
         """Handles PUT requests for draft updation."""
         # Raise an Exception if the draft change list fails non-strict
         # validation.
         try:
             change_list = self.payload.get('change_list')
-            version = self.payload.get('version')
-             
+            version = self.payload.get('version') 
             exp_services.create_or_update_draft(
                 exploration_id, self.user_id, change_list, version,
-                datetime.datetime.utcnow()) 
+                datetime.datetime.utcnow())
         except utils.ValidationError as e:
             # If this exception is raised, let the user know that their changes
             # have been auto discarded.
