@@ -255,7 +255,7 @@ oppia.factory('changeListService', [
     //   // 1. Non-strict Validation Fail:
     //   // autosaveInfoModalsService.showNonStrictFailModal()
     //   // 2. Version Mismatch:
-    //   // autosaveInfoModalsService.showVersionMismatchModal()
+    //   // autosaveInfoModalsService.showVersionMismatchModal(lostChanges)
     // });
   };
 
@@ -1891,12 +1891,223 @@ oppia.factory('explorationWarningsService', [
   }
 ]);
 
+oppia.factory('humanReadableLostChangesService', function() {
+  var TYPE_ADD_STATE = 'add_state';
+  var TYPE_DELETE_STATE = 'delete_state';
+  var TYPE_RENAME_STATE = 'rename_state';
+  var TYPE_EDIT_STATE_PROPERTY = 'edit_state_property';
+
+  var TYPE_CONTENT = 'content';
+
+  var TYPE_ADD_INTERACTION = 'add_interaction';
+  var TYPE_DELETE_INTERACTION = 'delete_interaction';
+  var TYPE_END_EXPLORATION = 'end_exploration';
+
+  var TYPE_ADD_WIDGET_CUSTOMIZATIONS = 'add_widget_customizations';
+  var TYPE_DELETE_WIDGET_CUSTOMIZATIONS = 'delete_widget_customizations';
+  var TYPE_EDIT_WIDGET_CUSTOMIZATIONS = 'edit_widget_customizations';
+
+  var TYPE_ADD_ANSWER_GROUP = 'add_answer_group';
+  var TYPE_DELETE_ANSWER_GROUP = 'delete_answer_group';
+  var TYPE_EDIT_ANSWER_GROUP = 'edit_answer_group';
+
+  var TYPE_RULE = 'rule';
+
+  var TYPE_ADD_DEFAULT_OUTCOME = 'add_default_outcome';
+  var TYPE_DELETE_DEFAULT_OUTCOME = 'delete_default_outcome';
+  var TYPE_EDIT_DEFAULT_OUTCOME = 'edit_default_outcome';
+
+  var _getEmtpyChangeObject = function() {
+    return {
+      label: '',
+      type: '',
+      value: []
+    };
+  };
+
+  var _getStateChangesInfo = function(lostChange) {
+    var lostChangeInfo = _getEmtpyChangeObject();
+    switch (lostChange.cmd) {
+    case 'add_state':
+      lostChangeInfo.label = 'Added state ' + lostChange.state_name;
+      lostChangeInfo.type = TYPE_ADD_STATE;
+      break;
+    case 'rename_state':
+      lostChangeInfo.label = 'Renamed state ' + lostChange.old_state_name +
+        ' to ' + lostChange.new_state_name;
+      lostChangeInfo.type = TYPE_RENAME_STATE;
+      break;
+    case 'delete_state':
+      lostChangeInfo.label = 'Deleted state ' + lostChange.state_name;
+      lostChangeInfo.type = TYPE_DELETE_STATE;
+      break;
+    case 'edit_state_property':
+      lostChangeInfo.label = 'Edits in state ' + lostChange.state_name;
+      lostChangeInfo.type = TYPE_EDIT_STATE_PROPERTY;
+      lostChangeInfo.stateName = lostChange.state_name;
+      break;
+    }
+    return lostChangeInfo;
+  };
+
+  var _getEditedStatePropertyInfo = function(lostChange, newValue, oldValue) {
+    var editedStatePropertyInfo = _getEmtpyChangeObject();
+    switch (lostChange.property_name) {
+    case 'content':
+      editedStatePropertyInfo.label = 'Edited content ';
+      if (newValue !== null) {
+        editedStatePropertyInfo.label += newValue.value;
+      }
+      editedStatePropertyInfo.type = TYPE_CONTENT;
+      break;
+    case 'widget_id':
+      if (oldValue === null) {
+        if (newValue !== 'EndExploration') {
+          editedStatePropertyInfo.label = 'Added Interaction ' + newValue;
+          editedStatePropertyInfo.type = TYPE_ADD_INTERACTION;
+        } else {
+          editedStatePropertyInfo.label = 'Ended Exploration';
+          editedStatePropertyInfo.type = TYPE_END_EXPLORATION;
+        }
+      } else {
+        editedStatePropertyInfo.label = 'Deleted Interaction ' + oldValue;
+        editedStatePropertyInfo.type = TYPE_DELETE_INTERACTION;
+      }
+      break;
+    case 'widget_customization_args':
+      if (_isEmpty(oldValue)) {
+        editedStatePropertyInfo.label = 'Added Interaction Customizations';
+        editedStatePropertyInfo.type = TYPE_ADD_WIDGET_CUSTOMIZATIONS;
+      } else if (_isEmpty(newValue)) {
+        editedStatePropertyInfo.label = 'Removed Interaction Customizations';
+        editedStatePropertyInfo.type = TYPE_DELETE_WIDGET_CUSTOMIZATIONS;
+      } else {
+        editedStatePropertyInfo.label = 'Edited Interaction Customizations';
+        editedStatePropertyInfo.type = TYPE_EDIT_WIDGET_CUSTOMIZATIONS;
+      }
+      break;
+    case 'answer_groups':
+      var answerGroupChanges = _getRelativeChangeToGroups(lostChange);
+      if (answerGroupChanges === 'added') {
+        editedStatePropertyInfo.label = 'Added answer group';
+        editedStatePropertyInfo.type = TYPE_ADD_ANSWER_GROUP;
+      } else if (answerGroupChanges === 'edited') {
+        editedStatePropertyInfo.label = 'Edited answer group';
+        editedStatePropertyInfo.type = TYPE_EDIT_ANSWER_GROUP;
+      } else {
+        editedStatePropertyInfo.label = 'Deleted answer group';
+        editedStatePropertyInfo.type = TYPE_DELETE_ANSWER_GROUP;;
+      }
+      break;
+    case 'default_outcome':
+      var defaultOutcomeChanges = _getRelativeChangeToGroups(lostChange);
+      if (defaultOutcomeChanges === 'added') {
+        editedStatePropertyInfo.label = 'Added default outcome';
+        editedStatePropertyInfo.type = TYPE_ADD_DEFAULT_OUTCOME;
+      } else if (defaultOutcomeChanges === 'edited') {
+        editedStatePropertyInfo.label = 'Edited default outcome';
+        editedStatePropertyInfo.type = TYPE_EDIT_DEFAULT_OUTCOME;
+      } else {
+        editedStatePropertyInfo.label = 'Deleted default outcome';
+        editedStatePropertyInfo.type = TYPE_DELETE_DEFAULT_OUTCOME;
+      }
+      break;
+    }
+    return editedStatePropertyInfo;
+  };
+
+  var _isArray = function(object) {
+    return Object.prototype.toString.call(
+      object) === '[object Array]';
+  };
+
+  var _getStatePropertyValue = function(
+    statePropertyValue) {
+    return _isArray(statePropertyValue) ?
+      statePropertyValue[statePropertyValue.length - 1] : statePropertyValue;
+  };
+
+  var _isEmpty = function(obj) {
+    for (var property in obj) {
+      if (obj.hasOwnProperty(property)) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  var _pushChangeToList = function(valueArray, changeObject) {
+    if (changeObject.label !== '') {
+      valueArray.push(changeObject);
+    }
+    return valueArray;
+  };
+
+  var _getRelativeChangeToGroups = function(changeObject) {
+    var newValue = changeObject.new_value;
+    var oldValue = changeObject.old_value;
+    var result = '';
+
+    if (_isArray(newValue) && _isArray(oldValue)) {
+      result = (newValue.length > oldValue.length) ?
+        'added' : (newValue.length === oldValue.length) ?
+        'edited' : 'deleted';
+    } else {
+      if (!_isEmpty(oldValue)) {
+        if (!_isEmpty(newValue)) {
+          result = 'edited';
+        } else {
+          result = 'deleted';
+        }
+      } else if (!_isEmpty(newValue)) {
+        result = 'added';
+      }
+    }
+    return result;
+  };
+
+  var makeLostChangesHumanReadable = function(lostChanges) {
+    var humanReadableLostChanges = [];
+    var stateEditGroups = {};
+
+    lostChanges.forEach(function(lostChange) {
+      var readableChange = _getStateChangesInfo(lostChange);
+
+      if (readableChange.type === TYPE_EDIT_STATE_PROPERTY) {
+        var newValue = _getStatePropertyValue(lostChange.new_value);
+        var oldValue = _getStatePropertyValue(lostChange.old_value);
+        var editedStateProperty = _getEditedStatePropertyInfo(
+          lostChange, newValue, oldValue);
+        var stateEdits = stateEditGroups[readableChange.stateName];
+
+        if (!stateEdits) {
+          stateEdits =
+            stateEditGroups[readableChange.stateName] =
+            readableChange;
+        }
+        stateEdits.value =
+          _pushChangeToList(stateEdits.value, editedStateProperty);
+      } else {
+        humanReadableLostChanges =
+          _pushChangeToList(humanReadableLostChanges, readableChange);
+      }
+    });
+    for (var stateName in stateEditGroups) {
+      humanReadableLostChanges.push(stateEditGroups[stateName]);
+    }
+  };
+
+  return {
+    makeLostChangesHumanReadable: makeLostChangesHumanReadable
+  };
+});
+
 // Service for displaying different types of modals depending on the type of
 // response received as a result of the autosaving request.
 oppia.factory('autosaveInfoModalsService', [
-  '$modal', '$timeout',
+  '$modal', '$timeout', 'humanReadableLostChangesService',
   function(
-    $modal, $timeout) {
+    $modal, $timeout, humanReadableLostChangesService) {
     return {
       showNonStrictValidationFailModal: function() {
         $modal.open({
@@ -1916,7 +2127,7 @@ oppia.factory('autosaveInfoModalsService', [
           // User refreshes the page - Flow for exploration loaded is followed.
         });
       },
-      showVersionMismatchModal: function() {
+      showVersionMismatchModal: function(lostChanges) {
         $modal.open({
           templateUrl: 'modals/saveVersionMismatch',
           backdrop: true,
@@ -1935,6 +2146,10 @@ oppia.factory('autosaveInfoModalsService', [
                   // Refresh the page.
                 }, 1000);
               };
+
+              $scope.lostChanges = (
+                humanReadableLostChangesService.makeLostChangesHumanReadable(
+                  lostChanges));
             }
           ]
         }).result.then(function() {
