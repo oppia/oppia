@@ -23,7 +23,6 @@ from core.controllers import editor
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import param_domain
 from core.domain import stats_domain
 from core.domain import rights_manager
 from core.domain import rule_domain
@@ -31,8 +30,8 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(exp_models, feedback_models, user_models) = models.Registry.import_models([                                                                                                                                                                                                            models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
-])
+(user_models,) = models.Registry.import_models([models.NAMES.user])
+
 
 class BaseEditorControllerTest(test_utils.GenericTestBase):
 
@@ -1238,11 +1237,11 @@ class EditorAutosaveTest(BaseEditorControllerTest):
     DRAFT_CHANGELIST = [{
         'cmd': 'add_state',
         'state_name': 'State 5'}]
-    NEW_CHANGELIST = [{ 
+    NEW_CHANGELIST = [{
         'cmd': 'edit_exploration_property',
         'property_name': 'title',
         'new_value': 'New title'}]
-    INVALID_CHANGELIST = [{ 
+    INVALID_CHANGELIST = [{
         'cmd': 'edit_exploration_property',
         'property_name': 'title',
         'new_value': 1}]
@@ -1288,9 +1287,10 @@ class EditorAutosaveTest(BaseEditorControllerTest):
             'version': 1,
         }
         apply_change_list_counter = test_utils.CallCounter(self._null_method)
-        with self.swap(exp_services, 'apply_change_list', apply_change_list_counter):
+        with self.swap(exp_services, 'apply_change_list',
+                       apply_change_list_counter):
             response = self.put_json(
-                '/createhandler/autosave_draft/%s' % self.EXP_ID1, payload, 
+                '/createhandler/autosave_draft/%s' % self.EXP_ID1, payload,
                 self.csrf_token)
         self.assertEqual(apply_change_list_counter.times_called, 0)
         self.assertTrue(response['is_draft_version_valid'])
@@ -1300,8 +1300,8 @@ class EditorAutosaveTest(BaseEditorControllerTest):
             'change_list': self.INVALID_CHANGELIST,
             'version': 1,
         }
-        response = self.put_json(
-            '/createhandler/autosave_draft/%s' % self.EXP_ID2, payload, 
+        self.put_json(
+            '/createhandler/autosave_draft/%s' % self.EXP_ID2, payload,
             self.csrf_token, expect_errors=True, expected_status_int=400)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.owner_id, self.EXP_ID2))
@@ -1315,7 +1315,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
             'version': 1,
         }
         response = self.put_json(
-            '/createhandler/autosave_draft/%s' % self.EXP_ID2, payload, 
+            '/createhandler/autosave_draft/%s' % self.EXP_ID2, payload,
             self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.owner_id, self.EXP_ID2))
@@ -1329,7 +1329,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
             'version': 10,
         }
         response = self.put_json(
-            '/createhandler/autosave_draft/%s' % self.EXP_ID2, payload, 
+            '/createhandler/autosave_draft/%s' % self.EXP_ID2, payload,
             self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.owner_id, self.EXP_ID2))
@@ -1338,7 +1338,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
         self.assertFalse(response['is_draft_version_valid'])
 
     def test_discard_draft(self):
-        response = self.post_json(
+        self.post_json(
             '/createhandler/autosave_draft/%s' % self.EXP_ID2, {},
             self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
