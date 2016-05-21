@@ -1917,113 +1917,160 @@ oppia.factory('humanReadableLostChangesService', function() {
   var TYPE_DELETE_DEFAULT_OUTCOME = 'delete_default_outcome';
   var TYPE_EDIT_DEFAULT_OUTCOME = 'edit_default_outcome';
 
-  var _getEmtpyChangeObject = function() {
-    return {
-      label: '',
-      type: '',
-      value: []
+  var _createChangeObject = function(label, type, value, stateName) {
+    var changeObject = {
+      label: label || '',
+      type: type || '',
+      value: value || []
     };
+    if (type === TYPE_EDIT_STATE_PROPERTY) {
+      changeObject.stateName = stateName || '';
+    }
+
+    return changeObject;
   };
 
   var _getStateChangesInfo = function(lostChange) {
-    var lostChangeInfo = _getEmtpyChangeObject();
+    var label = '';
+    var type = '';
+    var value;
+    var stateName = '';
     switch (lostChange.cmd) {
       case 'add_state':
-        lostChangeInfo.label = 'Added state ' + lostChange.state_name;
-        lostChangeInfo.type = TYPE_ADD_STATE;
+        label = 'Added state ' + lostChange.state_name;
+        type = TYPE_ADD_STATE;
         break;
       case 'rename_state':
-        lostChangeInfo.label = 'Renamed state ' + lostChange.old_state_name +
+        label = 'Renamed state ' + lostChange.old_state_name +
           ' to ' + lostChange.new_state_name;
-        lostChangeInfo.type = TYPE_RENAME_STATE;
+        type = TYPE_RENAME_STATE;
         break;
       case 'delete_state':
-        lostChangeInfo.label = 'Deleted state ' + lostChange.state_name;
-        lostChangeInfo.type = TYPE_DELETE_STATE;
+        label = 'Deleted state ' + lostChange.state_name;
+        type = TYPE_DELETE_STATE;
         break;
       case 'edit_state_property':
-        lostChangeInfo.label = 'Edits in state ' + lostChange.state_name;
-        lostChangeInfo.type = TYPE_EDIT_STATE_PROPERTY;
-        lostChangeInfo.stateName = lostChange.state_name;
+        label = 'Edits in state ' + lostChange.state_name;
+        type = TYPE_EDIT_STATE_PROPERTY;
+        stateName = lostChange.state_name;
         break;
     }
-    return lostChangeInfo;
+
+    return _createChangeObject(label, type, value, stateName);
   };
 
+  var _createRule = function(ruleSpec) {
+    var label = ruleSpec.rule_type;
+    var type = TYPE_RULE;
+    var value = (
+      Object.keys(ruleSpec.inputs).map(function(input) {
+        return ruleSpec.inputs[input];
+      })
+    ).toString();
+
+    return _createChangeObject(label, type, value);
+  };
+
+  var _getRulesList = function(value) {
+    var rulesList = [];
+    value.rule_specs.forEach(function(ruleSpec) {
+      rulesList.push(_createRule(ruleSpec));
+    });
+
+    return rulesList;
+  };
+
+  var _getAnswerGroupOrDefaultOutcomeEdits =
+        function(changeObject, type, newValue) {
+          var computedStateEdit = {};
+          if (type === 'answer_group') {
+            computedStateEdit.destination = newValue.outcome.dest;
+            computedStateEdit.feedback = newValue.outcome.feedback;
+            computedStateEdit.rules = _getRulesList(newValue);
+          }
+          if (type === 'default_outcome') {
+            computedStateEdit.destination = newValue.dest;
+            computedStateEdit.feedback = newValue.feedback;
+          }
+          return computedStateEdit;
+        };
+
   var _getEditedStatePropertyInfo = function(lostChange, newValue, oldValue) {
-    var editedStatePropertyInfo = _getEmtpyChangeObject();
+    var label = '';
+    var type = '';
+    var value;
     switch (lostChange.property_name) {
       case 'content':
-        editedStatePropertyInfo.label = 'Edited content ';
+        label = 'Edited content ';
         if (newValue !== null) {
-          editedStatePropertyInfo.label += newValue.value;
+          label += newValue.value;
         }
-        editedStatePropertyInfo.type = TYPE_CONTENT;
+        type = TYPE_CONTENT;
         break;
       case 'widget_id':
         if (oldValue === null) {
           if (newValue !== 'EndExploration') {
-            editedStatePropertyInfo.label = 'Added Interaction ' + newValue;
-            editedStatePropertyInfo.type = TYPE_ADD_INTERACTION;
+            label = 'Added Interaction ' + newValue;
+            type = TYPE_ADD_INTERACTION;
           } else {
-            editedStatePropertyInfo.label = 'Ended Exploration';
-            editedStatePropertyInfo.type = TYPE_END_EXPLORATION;
+            label = 'Ended Exploration';
+            type = TYPE_END_EXPLORATION;
           }
         } else {
-          editedStatePropertyInfo.label = 'Deleted Interaction ' + oldValue;
-          editedStatePropertyInfo.type = TYPE_DELETE_INTERACTION;
+          label = 'Deleted Interaction ' + oldValue;
+          type = TYPE_DELETE_INTERACTION;
         }
         break;
       case 'widget_customization_args':
         if (_isEmpty(oldValue)) {
-          editedStatePropertyInfo.label = 'Added Interaction Customizations';
-          editedStatePropertyInfo.type = TYPE_ADD_WIDGET_CUSTOMIZATIONS;
+          label = 'Added Interaction Customizations';
+          type = TYPE_ADD_WIDGET_CUSTOMIZATIONS;
         } else if (_isEmpty(newValue)) {
-          editedStatePropertyInfo.label = 'Removed Interaction Customizations';
-          editedStatePropertyInfo.type = TYPE_DELETE_WIDGET_CUSTOMIZATIONS;
+          label = 'Removed Interaction Customizations';
+          type = TYPE_DELETE_WIDGET_CUSTOMIZATIONS;
         } else {
-          editedStatePropertyInfo.label = 'Edited Interaction Customizations';
-          editedStatePropertyInfo.type = TYPE_EDIT_WIDGET_CUSTOMIZATIONS;
+          label = 'Edited Interaction Customizations';
+          type = TYPE_EDIT_WIDGET_CUSTOMIZATIONS;
         }
         break;
       case 'answer_groups':
         var answerGroupChanges = _getRelativeChangeToGroups(lostChange);
         if (answerGroupChanges === 'added') {
-          editedStatePropertyInfo.label = 'Added answer group';
-          editedStatePropertyInfo.type = TYPE_ADD_ANSWER_GROUP;
+          label = 'Added answer group';
+          type = TYPE_ADD_ANSWER_GROUP;
+          value = _getAnswerGroupOrDefaultOutcomeEdits(
+            lostChange, 'answer_group', newValue);
         } else if (answerGroupChanges === 'edited') {
-          editedStatePropertyInfo.label = 'Edited answer group';
-          editedStatePropertyInfo.type = TYPE_EDIT_ANSWER_GROUP;
+          label = 'Edited answer group';
+          type = TYPE_EDIT_ANSWER_GROUP;
         } else {
-          editedStatePropertyInfo.label = 'Deleted answer group';
-          editedStatePropertyInfo.type = TYPE_DELETE_ANSWER_GROUP;;
+          label = 'Deleted answer group';
+          type = TYPE_DELETE_ANSWER_GROUP;;
         }
         break;
       case 'default_outcome':
         var defaultOutcomeChanges = _getRelativeChangeToGroups(lostChange);
         if (defaultOutcomeChanges === 'added') {
-          editedStatePropertyInfo.label = 'Added default outcome';
-          editedStatePropertyInfo.type = TYPE_ADD_DEFAULT_OUTCOME;
+          label = 'Added default outcome';
+          type = TYPE_ADD_DEFAULT_OUTCOME;
+          value = _getAnswerGroupOrDefaultOutcomeEdits(
+            lostChange, 'default_outcome', newValue);
         } else if (defaultOutcomeChanges === 'edited') {
-          editedStatePropertyInfo.label = 'Edited default outcome';
-          editedStatePropertyInfo.type = TYPE_EDIT_DEFAULT_OUTCOME;
+          label = 'Edited default outcome';
+          type = TYPE_EDIT_DEFAULT_OUTCOME;
         } else {
-          editedStatePropertyInfo.label = 'Deleted default outcome';
-          editedStatePropertyInfo.type = TYPE_DELETE_DEFAULT_OUTCOME;
+          label = 'Deleted default outcome';
+          type = TYPE_DELETE_DEFAULT_OUTCOME;
         }
         break;
-    }
-    return editedStatePropertyInfo;
-  };
+    };
 
-  var _isArray = function(object) {
-    return Object.prototype.toString.call(
-      object) === '[object Array]';
+    return _createChangeObject(label, type, value);
   };
 
   var _getStatePropertyValue = function(
     statePropertyValue) {
-    return _isArray(statePropertyValue) ?
+    return angular.isArray(statePropertyValue) ?
       statePropertyValue[statePropertyValue.length - 1] : statePropertyValue;
   };
 
@@ -2048,7 +2095,7 @@ oppia.factory('humanReadableLostChangesService', function() {
     var oldValue = changeObject.old_value;
     var result = '';
 
-    if (_isArray(newValue) && _isArray(oldValue)) {
+    if (angular.isArray(newValue) && angular.isArray(oldValue)) {
       result = (newValue.length > oldValue.length) ?
         'added' : (newValue.length === oldValue.length) ?
         'edited' : 'deleted';
