@@ -25,11 +25,19 @@ var TIME_NUM_CARDS_CHANGE_MSEC = 500;
 
 oppia.animation('.conversation-skin-responses-animate-slide', function() {
   return {
-    enter: function(element) {
-      element.hide().slideDown();
+    removeClass: function(element, className, done) {
+      if (className !== 'ng-hide') {
+        done();
+        return;
+      }
+      element.hide().slideDown(400, done);
     },
-    leave: function(element) {
-      element.slideUp();
+    addClass: function(element, className, done) {
+      if (className !== 'ng-hide') {
+        done();
+        return;
+      }
+      element.slideUp(400, done);
     }
   };
 });

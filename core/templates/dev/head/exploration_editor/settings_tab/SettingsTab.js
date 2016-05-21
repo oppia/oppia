@@ -222,22 +222,6 @@ oppia.controller('SettingsTab', [
       });
     };
 
-    $scope.showNominateExplorationModal = function() {
-      alertsService.clearWarnings();
-      $modal.open({
-        templateUrl: 'modals/nominateExploration',
-        backdrop: true,
-        controller: [
-          '$scope', '$modalInstance', function($scope, $modalInstance) {
-            $scope.close = function() {
-              $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
-            };
-          }
-        ]
-      });
-    };
-
     $scope.deleteExploration = function(role) {
       alertsService.clearWarnings();
 
