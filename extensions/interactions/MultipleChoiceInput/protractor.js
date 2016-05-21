@@ -59,14 +59,10 @@ var answerObjectType = 'NonnegativeInt';
 var testSuite = [{
   interactionArguments: [[function(editor) {
       editor.appendBoldText('right');
-    }, function(editor) {
-      editor.appendUnderlineText('wrong');
     }]],
   ruleArguments: ['Equals', ['right']],
   expectedInteractionDetails: [[function(checker) {
       checker.readBoldText('right');
-    }, function(checker) {
-      checker.readUnderlineText('wrong');
     }]],
   wrongAnswers: ['wrong'],
   correctAnswers: ['right']
