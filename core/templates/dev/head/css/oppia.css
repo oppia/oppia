@@ -2931,3 +2931,20 @@ md-card.preview-conversation-skin-supplemental-card {
   color: red;
   margin-bottom: 10px;
 }
+
+.component-container {
+  position: relative;
+}
+
+.component-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.ckeditor-rte{
+    outline: 1px solid gray;
+    margin-top: 15px;
+}

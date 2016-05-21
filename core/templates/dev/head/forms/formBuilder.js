@@ -669,6 +669,10 @@ oppia.factory('rteHelperService', [
       getRichTextComponents: function() {
         return angular.copy(_RICH_TEXT_COMPONENTS);
       },
+      isInlineComponent: function(richTextComponent) {
+        var inlineComponents = ['link', 'math'];
+        return inlineComponents.indexOf(richTextComponent) !== -1;
+      },
       _openCustomizationModal: function(
           customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
           onDismissCallback, refocusFn) {
@@ -740,22 +744,33 @@ oppia.run([
   '$rootScope', 'rteHelperService', 'oppiaHtmlEscaper',
   function($rootScope, rteHelperService, oppiaHtmlEscaper) {
     var _RICH_TEXT_COMPONENTS = rteHelperService.getRichTextComponents();
-    var inlineCapable = ['link', 'math'];
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
       var ckName = 'oppia' + componentDefn.name;
-      var tagName = 'oppia-noninteractive-' + componentDefn.name;
-      var customizationArgSpecs = componentDefn.customizationArgSpecs;
       // For some reason, frontend tests will error without this check.
       if (CKEDITOR.plugins.registered[ckName] !== undefined) {
         return;
+      }
+      var tagName = 'oppia-noninteractive-' + componentDefn.name;
+      var customizationArgSpecs = componentDefn.customizationArgSpecs;
+      var isInline = rteHelperService.isInlineComponent(componentDefn.name);
+      if (isInline) {
+        var componentTemplate = '<span type="' + tagName + '">' +
+                                '<' + tagName + '></' + tagName + '>' +
+                                '</span>';
+      } else {
+        var componentTemplate = '<div class="component-container" type="' +
+                                tagName + '">' +
+                                '<' + tagName + '></' + tagName + '>' +
+                                '<div class="component-overlay"></div>' +
+                                '</div>';
       }
       CKEDITOR.plugins.add(ckName, {
         init: function(editor) {
           // Create the widget itself.
           editor.widgets.add(ckName, {
             button: componentDefn.tooltip,
-            inline: inlineCapable.indexOf(componentDefn.name) !== -1,
-            template: '<' + tagName + '></' + tagName + '>',
+            inline: isInline,
+            template: componentTemplate,
             edit: function(event) {
               // Prevent default action since we are using our own edit modal.
               event.cancel();
@@ -784,14 +799,22 @@ oppia.run([
                 function() {},
                 function() {});
             },
+            downcast: function(element) {
+              element.children[0].setHtml('');
+              return element.children[0];
+            },
             upcast: function(element) {
-              return element.name === tagName;
+              return element.name === tagName ||
+                     (element.name !== 'p' &&
+                      element.children.length > 0 &&
+                      element.children[0].name === tagName);
             },
             data: function() {
               var that = this;
+              // Set attributes of component according to data values.
               customizationArgSpecs.forEach(function(spec) {
                 if (that.data[spec.name]) {
-                  that.element.setAttribute(
+                  that.element.getChild(0).setAttribute(
                     spec.name + '-with-value',
                     oppiaHtmlEscaper.objToEscapedJson(that.data[spec.name]));
                 }
@@ -800,7 +823,7 @@ oppia.run([
             init: function() {
               var that = this;
               customizationArgSpecs.forEach(function(spec) {
-                var value = that.element.getAttribute(
+                var value = that.element.getChild(0).getAttribute(
                   spec.name + '-with-value');
                 if (value) {
                   that.setData(
@@ -817,19 +840,19 @@ oppia.run([
 ]);
 
 oppia.directive('ckEditorRte', [
-  '$compile',
-  function($compile) {
+  '$compile', 'rteHelperService',
+  function($compile, rteHelperService) {
     return {
       restrict: 'E',
       scope: {
         uiConfig: '&'
       },
-      template: '<div><div></div><br>' +
-                '<div contenteditable="true" style="outline: 1px solid gray">' +
+      template: '<div><div></div>' +
+                '<div contenteditable="true" class="ckeditor-rte">' +
                 '</div></div>',
       require: '?ngModel',
       link: function(scope, el, attr, ngModel) {
-        var widgets = [
+        var richTextComponents = [
           'Link',
           'Math',
           'Image',
@@ -837,16 +860,16 @@ oppia.directive('ckEditorRte', [
           'Tabs',
           'Video'
         ];
-        var widgetNames = widgets.map(function(widget) {
+        var pluginNames = richTextComponents.map(function(widget) {
           return 'oppia' + widget.toLowerCase();
         }).join(',');
-        var buttonNames = widgets.map(function(widget) {
+        var buttonNames = richTextComponents.map(function(widget) {
           return 'Oppia' + widget.toLowerCase();
         });
 
         // Initialize ckeditor.
-        var ck = CKEDITOR.inline(el[0].children[0].children[2], {
-          extraPlugins: 'widget,lineutils,sharedspace,' + widgetNames,
+        var ck = CKEDITOR.inline(el[0].children[0].children[1], {
+          extraPlugins: 'widget,lineutils,sharedspace,' + pluginNames,
           allowedContent: true,
           startupFocus: true,
           sharedSpaces: {
@@ -868,27 +891,48 @@ oppia.directive('ckEditorRte', [
           ]
         });
 
+        // Need to manually $compile so that directives render in rte.
         var renderDirectivesInEditor = function() {
-          // Need to manually $compile so that directives render in rte.
           $compile(el.contents())(scope);
+        };
+
+        // Befoe data is loaded into CKEditor, we need to wrap every rte
+        // component in a span (inline) or div (block).
+        // For block elements, we add an overlay div as well.
+        var wrapComponents = function(html) {
+          var re = new RegExp(
+            '<oppia-noninteractive-([^\\s]+)[^<]+' +
+            '<\\/oppia-noninteractive-[^>]+>', 'g');
+          var processed = html.replace(re, function(match, name) {
+            if (rteHelperService.isInlineComponent(name)) {
+              return '<span type="oppia-noninteractive-' + name + '">' +
+                    match + '</span>';
+            } else {
+              return '<div type="oppia-noninteractive-' + name + '"' +
+                     'class="component-container">' + match +
+                     '<div class="component-overlay"></div></div>';
+            }
+          });
+          console.log(processed);
+          return processed;
         };
 
         scope.$on('render-rte-components', renderDirectivesInEditor);
 
         ck.on('instanceReady', function() {
           // Set the icons for each toolbar button.
-          widgets.forEach(function(widget) {
+          richTextComponents.forEach(function(widget) {
             var bgStyle = 'url("/extensions/rich_text_components/' +
                           widget + '/static/' + widget +
                           '.png") no-repeat center';
             $('.cke_button__oppia' + widget.toLowerCase()).css(
               'background', bgStyle);
           });
-          ck.setData(ngModel.$viewValue);
+          ck.setData(wrapComponents(ngModel.$viewValue));
         });
 
         ngModel.$render = function() {
-          ck.setData(ngModel.$viewValue);
+          ck.setData(wrapComponents(ngModel.$viewValue));
         };
 
         var updateHtmlContent = function() {
