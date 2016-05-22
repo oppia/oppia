@@ -36,6 +36,7 @@ oppia.animation('.conversation-skin-responses-animate-slide', function() {
 
 oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
   var tutorCardLeft, tutorCardWidth, tutorCardHeight, oppiaAvatarLeft;
+  var tutorCardAnimatedLeft, tutorCardAnimatedWidth;
 
   var beforeAddClass = function(element, className, done) {
     if (className !== 'ng-hide') {
@@ -45,20 +46,31 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
     var tutorCard = element;
     var supplementalCard = $('.conversation-skin-supplemental-card-container');
     var oppiaAvatar = $('.conversation-skin-oppia-avatar.show-tutor-card');
+    oppiaAvatarLeft = supplementalCard.position().left +
+                      supplementalCard.width() - oppiaAvatar.width();
     tutorCardLeft = tutorCard.position().left;
     tutorCardWidth = tutorCard.width();
     tutorCardHeight = tutorCard.height();
-    oppiaAvatarLeft = supplementalCard.position().left +
-                      supplementalCard.width() - oppiaAvatar.width();
+
+    if (tutorCard.offset().left + tutorCardWidth > oppiaAvatar.offset().left) {
+      var animationLength = Math.min(oppiaAvatarLeft - tutorCard.offset().left,
+                                     tutorCardWidth);
+      tutorCardAnimatedLeft = tutorCardLeft + animationLength;
+      tutorCardAnimatedWidth = tutorCardWidth - animationLength;
+    } else {
+      tutorCardAnimatedLeft = oppiaAvatarLeft;
+      tutorCardAnimatedWidth = 0;
+    }
+
     oppiaAvatar.hide();
     tutorCard.css({
       'min-width': 0
     });
     tutorCard.animate({
-      left: oppiaAvatarLeft,
-      width: 0,
+      left: tutorCardAnimatedLeft,
+      width: tutorCardAnimatedWidth,
       height: 0,
-      opacity: 0
+      opacity: 1
     }, 500, function() {
       oppiaAvatar.show();
       tutorCard.css({
@@ -80,8 +92,8 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
     var tutorCard = element;
     $('.conversation-skin-oppia-avatar.show-tutor-card').hide(0, function() {
       tutorCard.css({
-        left: oppiaAvatarLeft,
-        width: 0,
+        left: tutorCardAnimatedLeft,
+        width: tutorCardAnimatedWidth,
         height: 0,
         opacity: 0,
         'min-width': 0
