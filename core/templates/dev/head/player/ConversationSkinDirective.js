@@ -153,29 +153,25 @@ oppia.animation('.conversation-skin-animate-cards', function() {
         }
       };
     } else if (className === 'animate-to-one-card') {
-      supplementalCardElt.css('opacity', '0');
-      tutorCardElt.animate({
-        'margin-left': '262px'
+      supplementalCardElt.css({
+        opacity: 0,
+        'min-width': 0
+      });
+      supplementalCardElt.animate({
+        width: 0
       }, TIME_NUM_CARDS_CHANGE_MSEC, function() {
-        tutorCardElt.css('margin-left', 'auto');
-        tutorCardElt.css('margin-right', 'auto');
-        tutorCardElt.css('float', '');
-
-        supplementalCardElt.css('opacity', '');
-
         jQuery(element).removeClass('animate-to-one-card');
         done();
       });
 
       return function(cancel) {
         if (cancel) {
-          supplementalCardElt.css('opacity', '0');
+          supplementalCardElt.css({
+            opacity: '',
+            'min-width': '',
+            width: ''
+          });
           supplementalCardElt.stop();
-
-          tutorCardElt.css('margin-left', '');
-          tutorCardElt.css('margin-right', '');
-          tutorCardElt.css('float', '');
-          tutorCardElt.stop();
 
           jQuery(element).removeClass('animate-to-one-card');
         }
@@ -405,10 +401,9 @@ oppia.directive('conversationSkin', [function() {
           if (totalNumCards > 1 && $scope.canWindowFitTwoCards() &&
               !previousSupplementalCardIsNonempty &&
               nextSupplementalCardIsNonempty) {
-            animateToTwoCards(function() {
-              playerPositionService.setActiveCardIndex(
+            playerPositionService.setActiveCardIndex(
                 $scope.numProgressDots - 1);
-            });
+            animateToTwoCards(function() {});
           } else if (
               totalNumCards > 1 && $scope.canWindowFitTwoCards() &&
               previousSupplementalCardIsNonempty &&
