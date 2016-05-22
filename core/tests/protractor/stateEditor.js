@@ -78,7 +78,6 @@ describe('State editor', function() {
       richTextEditor.appendPlainText(' ');
       richTextEditor.appendItalicText('italic text');
       richTextEditor.appendPlainText(' ');
-      richTextEditor.appendUnderlineText('underline text');
       richTextEditor.appendPlainText(' ');
       richTextEditor.appendOrderedList(['entry 1', 'entry 2']);
       richTextEditor.appendUnorderedList(['an entry', 'another entry']);

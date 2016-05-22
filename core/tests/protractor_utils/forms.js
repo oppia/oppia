@@ -133,11 +133,6 @@ var RichTextEditor = function(elem) {
       _appendContentText(text);
       _clickToolbarButton('italics');
     },
-    appendUnderlineText: function(text) {
-      _clickToolbarButton('underline');
-      _appendContentText(text);
-      _clickToolbarButton('underline');
-    },
     appendOrderedList: function(textArray) {
       _appendContentText('\n');
       _clickToolbarButton('ol');
@@ -411,9 +406,6 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
     },
     readItalicText: function(text) {
       _readFormattedText(text, 'i');
-    },
-    readUnderlineText: function(text) {
-      _readFormattedText(text, 'u');
     },
     // TODO(Jacob): add functions for other rich text components.
     // Additional arguments may be sent to this function, and they will be
