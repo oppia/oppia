@@ -625,15 +625,18 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
     $scope.showPublishExplorationModal = function() {
       siteAnalyticsService.registerOpenPublishExplorationModalEvent(
-         explorationData.explorationId);
+        explorationData.explorationId);
       alertsService.clearWarnings();
 
-      // If the metedata has not yet been specified, open the pre-publication
+      var additionalMetadataNeeded = (
+        !explorationTitleService.savedMemento ||
+        !explorationObjectiveService.savedMemento ||
+        !explorationCategoryService.savedMemento ||
+        !explorationLanguageCodeService.savedMemento);
+
+      // If the metadata has not yet been specified, open the pre-publication
       // 'add exploration metadata' modal.
-      if (!explorationTitleService.savedMemento ||
-          !explorationObjectiveService.savedMemento ||
-          !explorationCategoryService.savedMemento ||
-          !explorationLanguageCodeService.savedMemento) {
+      if (additionalMetadataNeeded) {
         $modal.open({
            templateUrl: 'modals/addExplorationMetadata',
            backdrop: true,
@@ -649,8 +652,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
                $scope.explorationTitleService = explorationTitleService;
                $scope.explorationObjectiveService = explorationObjectiveService;
                $scope.explorationCategoryService = explorationCategoryService;
-               $scope.explorationLanguageCodeService =
-               explorationLanguageCodeService;
+               $scope.explorationLanguageCodeService = (
+                 explorationLanguageCodeService);
 
                $scope.requireTitleToBeSpecified = (
                  !explorationTitleService.savedMemento);
@@ -690,44 +693,55 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
                  }
                }
 
+               $scope.isSavingAllowed = function() {
+                 var allMetadataDisplayed = (
+                   explorationObjectiveService.displayed &&
+                   explorationTitleService.displayed &&
+                   explorationCategoryService.displayed &&
+                   explorationLanguageCodeService.displayed);
+
+                 if (allMetadataDisplayed) {
+                   return false;
+                 } else {
+                   return true;
+                 }
+               };
+
                $scope.save = function() {
                  // If no objective has been specified yet, require the creator
                  // to specify it.
                  if ($scope.requireObjectiveToBeSpecified) {
                    if (!explorationObjectiveService.displayed) {
                      throw Error('Please specify an objective');
-                   } else {
-                     explorationObjectiveService.saveDisplayedValue();
-                     $scope.metadataList.push('objective');
                    }
+                   explorationObjectiveService.saveDisplayedValue();
+                   $scope.metadataList.push('objective');
                  }
 
                  if ($scope.requireTitleToBeSpecified) {
                    if (!explorationTitleService.displayed) {
                      throw Error('Please specify a title');
-                   } else {
-                     explorationTitleService.saveDisplayedValue();
-                     $scope.metadataList.push('title');
                    }
+                   explorationTitleService.saveDisplayedValue();
+                   $scope.metadataList.push('title');
                  }
 
                  if ($scope.requireCategoryToBeSpecified) {
                    if (!explorationCategoryService.displayed) {
                      throw Error('Please specify a category');
-                   } else {
-                     explorationCategoryService.saveDisplayedValue();
-                     $scope.metadataList.push('category');
                    }
+                   explorationCategoryService.saveDisplayedValue();
+                   $scope.metadataList.push('category');
                  }
 
                  if ($scope.requireLanguageToBeSpecified) {
                    if (!explorationLanguageCodeService.displayed) {
                      throw Error('Please specify a language');
-                   } else {
-                     explorationLanguageCodeService.saveDisplayedValue();
-                     $scope.metadataList.push('language');
                    }
+                   explorationLanguageCodeService.saveDisplayedValue();
+                   $scope.metadataList.push('language');
                  }
+
                  explorationObjectiveService.saveDisplayedValue();
                  explorationTitleService.saveDisplayedValue();
                  explorationCategoryService.saveDisplayedValue();
