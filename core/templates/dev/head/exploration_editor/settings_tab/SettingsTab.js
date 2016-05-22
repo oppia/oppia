@@ -116,15 +116,7 @@ oppia.controller('SettingsTab', [
     };
 
     $scope.saveExplorationCategory = function() {
-      console.log(explorationCategoryService.savedMemento);
-      console.log(explorationCategoryService.displayed);
-      console.log(explorationTitleService.savedMemento);
-      console.log(explorationTitleService.displayed);
       explorationCategoryService.saveDisplayedValue();
-      console.log(explorationCategoryService.savedMemento);
-      console.log(explorationCategoryService.displayed);
-      console.log(explorationTitleService.savedMemento);
-      console.log(explorationTitleService.displayed);
     };
 
     $scope.saveExplorationObjective = function() {

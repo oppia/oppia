@@ -624,17 +624,17 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     };
 
     $scope.showPublishExplorationModal = function() {
-       siteAnalyticsService.registerOpenPublishExplorationModalEvent(
+      siteAnalyticsService.registerOpenPublishExplorationModalEvent(
          explorationData.explorationId);
-       alertsService.clearWarnings();
+      alertsService.clearWarnings();
 
-       // If the metedata has not yet been specified, open the pre-publication
-       // 'add exploration metadata' modal.
-       if (!explorationTitleService.savedMemento ||
+      // If the metedata has not yet been specified, open the pre-publication
+      // 'add exploration metadata' modal.
+      if (!explorationTitleService.savedMemento ||
           !explorationObjectiveService.savedMemento ||
           !explorationCategoryService.savedMemento ||
           !explorationLanguageCodeService.savedMemento) {
-         $modal.open({
+        $modal.open({
            templateUrl: 'modals/addExplorationMetadata',
            backdrop: true,
            controller: [
@@ -646,12 +646,9 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
              explorationTitleService, explorationCategoryService,
              explorationStatesService, CATEGORY_LIST,
              explorationLanguageCodeService) {
-               $scope.explorationTitleService =
-               explorationTitleService;
-               $scope.explorationObjectiveService =
-               explorationObjectiveService;
-               $scope.explorationCategoryService =
-               explorationCategoryService;
+               $scope.explorationTitleService = explorationTitleService;
+               $scope.explorationObjectiveService = explorationObjectiveService;
+               $scope.explorationCategoryService = explorationCategoryService;
                $scope.explorationLanguageCodeService =
                explorationLanguageCodeService;
 
@@ -699,33 +696,37 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
                  if ($scope.requireObjectiveToBeSpecified) {
                    if (!explorationObjectiveService.displayed) {
                      throw Error('Please specify an objective');
+                   } else {
+                     explorationObjectiveService.saveDisplayedValue();
+                     $scope.metadataList.push('objective');
                    }
-                   explorationObjectiveService.saveDisplayedValue();
-                   $scope.metadataList.push('objective');
                  }
 
                  if ($scope.requireTitleToBeSpecified) {
                    if (!explorationTitleService.displayed) {
                      throw Error('Please specify a title');
+                   } else {
+                     explorationTitleService.saveDisplayedValue();
+                     $scope.metadataList.push('title');
                    }
-                   explorationTitleService.saveDisplayedValue();
-                   $scope.metadataList.push('title');
                  }
 
                  if ($scope.requireCategoryToBeSpecified) {
                    if (!explorationCategoryService.displayed) {
                      throw Error('Please specify a category');
+                   } else {
+                     explorationCategoryService.saveDisplayedValue();
+                     $scope.metadataList.push('category');
                    }
-                   explorationCategoryService.saveDisplayedValue();
-                   $scope.metadataList.push('category');
                  }
 
                  if ($scope.requireLanguageToBeSpecified) {
                    if (!explorationLanguageCodeService.displayed) {
                      throw Error('Please specify a language');
+                   } else {
+                     explorationLanguageCodeService.saveDisplayedValue();
+                     $scope.metadataList.push('language');
                    }
-                   explorationLanguageCodeService.saveDisplayedValue();
-                   $scope.metadataList.push('language');
                  }
                  explorationObjectiveService.saveDisplayedValue();
                  explorationTitleService.saveDisplayedValue();
@@ -751,13 +752,12 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
              }
            }
            saveDraftToBackend(commitMessage, openPublishExplorationModal);
-           console.log(commitMessage);
          });
-       } else {
-         // No further metadata is needed. Open the publish modal immediately.
-         openPublishExplorationModal();
-       }
-     };
+      } else {
+        // No further metadata is needed. Open the publish modal immediately.
+        openPublishExplorationModal();
+      }
+    };
 
     $scope.getPublishExplorationButtonTooltip = function() {
       if (explorationWarningsService.countWarnings() > 0) {
