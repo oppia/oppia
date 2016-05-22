@@ -2999,7 +2999,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-about-header {
-  background-blend-mode: color-burn;
+  background-blend-mode: multiply;
   background-color: rgb(17, 197, 185);
   background-image: url("../images/general/icons-bg.png");
   color: #fff;
