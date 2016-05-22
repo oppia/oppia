@@ -1980,19 +1980,49 @@ oppia.factory('humanReadableLostChangesService', function() {
     return rulesList;
   };
 
-  var _getAnswerGroupOrDefaultOutcomeEdits =
-        function(changeObject, type, newValue) {
-          var computedStateEdit = {};
+  var _getAnswerGroupOrDefaultOutcomeDetails =
+        function(changeObject, type, value) {
+          var computedDetails = {};
           if (type === 'answer_group') {
-            computedStateEdit.destination = newValue.outcome.dest;
-            computedStateEdit.feedback = newValue.outcome.feedback;
-            computedStateEdit.rules = _getRulesList(newValue);
+            computedDetails.destination = value.outcome.dest;
+            computedDetails.feedback = value.outcome.feedback;
+            computedDetails.rules = _getRulesList(value);
           }
           if (type === 'default_outcome') {
-            computedStateEdit.destination = newValue.dest;
-            computedStateEdit.feedback = newValue.feedback;
+            computedDetails.destination = value.dest;
+            computedDetails.feedback = value.feedback;
           }
-          return computedStateEdit;
+
+          return computedDetails;
+        };
+
+  var _getAnswerGroupOrDefaultOutcomeEdits =
+        function(changeObject, type, newValue, oldValue) {
+          var changes = {};
+          if (type === 'answer_group') {
+            if (newValue.outcome.dest !== oldValue.outcome.dest) {
+              changes.destination = newValue.outcome.dest;
+            }
+            if (!angular.equals(
+              newValue.outcome.feedback, oldValue.outcome.feedback)) {
+              changes.feedback = newValue.outcome.feedback;
+            }
+            if (!angular.equals
+                (newValue.rule_specs, oldValue.rule_specs)) {
+              changes.rules = _getRulesList(newValue);
+            }
+          }
+          if (type === 'default_outcome') {
+            if (newValue.dest !== oldValue.dest) {
+              changes.destination = newValue.dest;
+            }
+            if (!angular.equals(
+              newValue.feedback, oldValue.feedback)) {
+              changes.feedback = newValue.feedback;
+            }
+          }
+
+          return changes;
         };
 
   var _getEditedStatePropertyInfo = function(lostChange, newValue, oldValue) {
@@ -2038,14 +2068,16 @@ oppia.factory('humanReadableLostChangesService', function() {
         if (answerGroupChanges === 'added') {
           label = 'Added answer group';
           type = TYPE_ADD_ANSWER_GROUP;
-          value = _getAnswerGroupOrDefaultOutcomeEdits(
+          value = _getAnswerGroupOrDefaultOutcomeDetails(
             lostChange, 'answer_group', newValue);
         } else if (answerGroupChanges === 'edited') {
-          label = 'Edited answer group';
+          label = 'Edited answer group.';
           type = TYPE_EDIT_ANSWER_GROUP;
+          value = _getAnswerGroupOrDefaultOutcomeEdits(
+            lostChange, 'answer_group', newValue, oldValue);
         } else {
           label = 'Deleted answer group';
-          type = TYPE_DELETE_ANSWER_GROUP;;
+          type = TYPE_DELETE_ANSWER_GROUP;
         }
         break;
       case 'default_outcome':
@@ -2053,11 +2085,13 @@ oppia.factory('humanReadableLostChangesService', function() {
         if (defaultOutcomeChanges === 'added') {
           label = 'Added default outcome';
           type = TYPE_ADD_DEFAULT_OUTCOME;
-          value = _getAnswerGroupOrDefaultOutcomeEdits(
+          value = _getAnswerGroupOrDefaultOutcomeDetails(
             lostChange, 'default_outcome', newValue);
         } else if (defaultOutcomeChanges === 'edited') {
           label = 'Edited default outcome';
           type = TYPE_EDIT_DEFAULT_OUTCOME;
+          value = _getAnswerGroupOrDefaultOutcomeEdits(
+            lostChange, 'default_outcome', newValue, oldValue);
         } else {
           label = 'Deleted default outcome';
           type = TYPE_DELETE_DEFAULT_OUTCOME;
