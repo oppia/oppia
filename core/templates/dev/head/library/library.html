@@ -81,7 +81,7 @@
                 <div class="oppia-library-carousel-overlay-left"></div>
                 <div class="oppia-library-carousel-tiles">
                   <div ng-repeat="tile in group.activity_summary_dicts">
-                    <exploration-summary-tile ng-if="tile.activity_type=='exploration'"
+                    <exploration-summary-tile ng-if="tile.activity_type == 'exploration'"
                                               exploration-id="tile.id"
                                               exploration-title="tile.title"
                                               last-updated-msec="tile.last_updated_msec"
@@ -93,7 +93,7 @@
                                               thumbnail-bg-color="tile.thumbnail_bg_color"
                                               class="protractor-test-exp-summary-tile">
                     </exploration-summary-tile>
-                    <collection-summary-tile ng-if="tile.activity_type=='collection'"
+                    <collection-summary-tile ng-if="tile.activity_type == 'collection'"
                                              collection-id="tile.id"
                                              collection-title="tile.title"
                                              last-updated-msec="tile.last_updated_msec"
