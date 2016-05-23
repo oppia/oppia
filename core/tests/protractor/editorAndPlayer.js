@@ -145,12 +145,11 @@ describe('Full exploration editor', function() {
 
       // Setup a terminating state
       editor.moveToState('final card');
-      editor.setContent(forms.toRichText('final card content'));
       editor.setInteraction('EndExploration');
 
       // Check that preview/editor switch doesn't change state
       editor.navigateToPreviewTab();
-      player.expectContentToMatch(forms.toRichText('final card content'));
+      player.expectExplorationToBeOver();
       editor.navigateToMainTab();
       editor.expectCurrentStateToBe('final card');
       editor.moveToState('second');
