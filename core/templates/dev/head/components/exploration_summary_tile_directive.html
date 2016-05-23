@@ -4,8 +4,8 @@
       <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
         <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
         <h2 class="activity-title protractor-test-exp-summary-tile-title">
-          <span ng-if="isWindowLarge"><[getExplorationTitle()|truncate:22]></span>
-          <span ng-if="!isWindowLarge"><[getExplorationTitle()|truncate:22]></span>
+          <span ng-if="isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
+          <span ng-if="!isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
         </h2>
 
         <!-- Note that if this is ng-if instead, the avatar area will not detect a mouseover and the tile will behave incorrectly. -->

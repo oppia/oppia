@@ -124,6 +124,7 @@
                     </a>
                   </div>
 
+
                   {% if nav_mode != 'signup' %}
                     <div ng-cloak class="navbar-header pull-right">
                       <ul class="nav oppia-navbar-nav oppia-navbar-profile">
@@ -279,6 +280,16 @@
 
               {{ warnings_and_loader() }}
             </div>
+
+            <noscript>
+              <div class="oppia-page-cards-container">
+                <div class="md-default-theme oppia-page-card oppia-long-text">
+                  <h2>We Need JavaScript in Your Browser <i class="material-icons">&#xE811;</i></h2>
+                  <p>Oppia is a free, open-source learning platform full of interactive activities called 'explorations'.  Sadly, Oppia requires JavaScript to be enabled in your web browser in order to function properly and your web browser has JavaScript disabled.  If you need help enabling JavaScript, <a href="http://www.enable-javascript.com/">click here.</a></p>
+                  <p>Thank you.</p>
+                </div>
+              </div>
+            </noscript>
 
             {% include 'side_nav.html' %}
 
