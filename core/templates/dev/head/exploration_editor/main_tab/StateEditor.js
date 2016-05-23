@@ -18,14 +18,12 @@
 
 oppia.controller('StateEditor', [
   '$scope', '$rootScope', 'editorContextService', 'changeListService',
-  'editabilityService', 'explorationStatesService', 'stateInteractionIdService',
-  'INTERACTION_SPECS', 'explorationInitStateNameService',
-  'explorationAdvancedFeaturesService',
+  'editabilityService', 'explorationStatesService', 'INTERACTION_SPECS',
+  'explorationInitStateNameService', 'explorationAdvancedFeaturesService',
   function(
       $scope, $rootScope, editorContextService, changeListService,
-      editabilityService, explorationStatesService, stateInteractionIdService,
-      INTERACTION_SPECS, explorationInitStateNameService,
-      explorationAdvancedFeaturesService) {
+      editabilityService, explorationStatesService, INTERACTION_SPECS,
+      explorationInitStateNameService, explorationAdvancedFeaturesService) {
     $scope.STATE_CONTENT_SCHEMA = {
       type: 'html'
     };

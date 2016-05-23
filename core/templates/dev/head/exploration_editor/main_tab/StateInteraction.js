@@ -93,11 +93,9 @@ oppia.controller('StateInteraction', [
       $scope.stateName = editorContextService.getActiveStateName();
 
       stateInteractionIdService.init(
-        $scope.stateName, stateData.interaction.id,
-        stateData.interaction, 'widget_id');
+        $scope.stateName, stateData.interaction.id);
       stateCustomizationArgsService.init(
-        $scope.stateName, stateData.interaction.customization_args,
-        stateData.interaction, 'widget_customization_args');
+        $scope.stateName, stateData.interaction.customization_args);
 
       $rootScope.$broadcast('initializeAnswerGroups', {
         interactionId: stateData.interaction.id,
@@ -142,11 +140,11 @@ oppia.controller('StateInteraction', [
         stateInteractionIdService.displayed !==
         stateInteractionIdService.savedMemento);
       if (hasInteractionIdChanged) {
-        stateInteractionIdService.saveDisplayedValue();
         if (INTERACTION_SPECS[
               stateInteractionIdService.displayed].is_terminal) {
           updateDefaultTerminalStateContentIfEmpty();
         }
+        stateInteractionIdService.saveDisplayedValue();
       }
 
       stateCustomizationArgsService.saveDisplayedValue();
@@ -162,7 +160,6 @@ oppia.controller('StateInteraction', [
           'onInteractionIdChanged', stateInteractionIdService.savedMemento);
       }
 
-      _updateStatesDict();
       graphDataService.recompute();
       _updateInteractionPreviewAndAnswerChoices();
 
@@ -301,7 +298,6 @@ oppia.controller('StateInteraction', [
         stateCustomizationArgsService.saveDisplayedValue();
         $rootScope.$broadcast(
           'onInteractionIdChanged', stateInteractionIdService.savedMemento);
-        _updateStatesDict();
         graphDataService.recompute();
         _updateInteractionPreviewAndAnswerChoices();
       });
@@ -349,16 +345,6 @@ oppia.controller('StateInteraction', [
       } else {
         $rootScope.$broadcast('updateAnswerChoices', null);
       }
-    };
-
-    var _updateStatesDict = function() {
-      var activeStateName = editorContextService.getActiveStateName();
-      var _stateDict = explorationStatesService.getState(activeStateName);
-      _stateDict.interaction.id = angular.copy(
-        stateInteractionIdService.savedMemento);
-      _stateDict.interaction.customization_args = angular.copy(
-        stateCustomizationArgsService.savedMemento);
-      explorationStatesService.setState(activeStateName, _stateDict);
     };
   }
 ]);

@@ -70,14 +70,9 @@ oppia.factory('responsesService', [
         _answerGroups = newAnswerGroups;
         $rootScope.$broadcast('answerGroupChanged');
 
-        changeListService.editStateProperty(
-          editorContextService.getActiveStateName(), 'answer_groups',
-          angular.copy(newAnswerGroups), angular.copy(oldAnswerGroups));
-
-        var activeStateName = editorContextService.getActiveStateName();
-        var _stateDict = explorationStatesService.getState(activeStateName);
-        _stateDict.interaction.answer_groups = angular.copy(_answerGroups);
-        explorationStatesService.setState(activeStateName, _stateDict);
+        explorationStatesService.saveInteractionAnswerGroups(
+          editorContextService.getActiveStateName(),
+          angular.copy(newAnswerGroups));
 
         graphDataService.recompute();
         _answerGroupsMemento = angular.copy(newAnswerGroups);
@@ -103,16 +98,9 @@ oppia.factory('responsesService', [
       if (!angular.equals(newDefaultOutcome, oldDefaultOutcome)) {
         _defaultOutcome = newDefaultOutcome;
 
-        changeListService.editStateProperty(
+        explorationStatesService.saveInteractionDefaultOutcome(
           editorContextService.getActiveStateName(),
-          'default_outcome', angular.copy(newDefaultOutcome),
-          angular.copy(oldDefaultOutcome));
-
-        var activeStateName = editorContextService.getActiveStateName();
-        var _stateDict = explorationStatesService.getState(activeStateName);
-        _stateDict.interaction.default_outcome = angular.copy(
-          _defaultOutcome);
-        explorationStatesService.setState(activeStateName, _stateDict);
+          angular.copy(newDefaultOutcome));
 
         graphDataService.recompute();
         _defaultOutcomeMemento = angular.copy(newDefaultOutcome);
@@ -127,17 +115,9 @@ oppia.factory('responsesService', [
           newConfirmedUnclassifiedAnswers, oldConfirmedUnclassifiedAnswers)) {
         _confirmedUnclassifiedAnswers = newConfirmedUnclassifiedAnswers;
 
-        changeListService.editStateProperty(
+        explorationStatesService.saveConfirmedUnclassifiedAnswers(
           editorContextService.getActiveStateName(),
-          'confirmed_unclassified_answers',
-          angular.copy(newConfirmedUnclassifiedAnswers),
-          angular.copy(oldConfirmedUnclassifiedAnswers));
-
-        var activeStateName = editorContextService.getActiveStateName();
-        var _stateDict = explorationStatesService.getState(activeStateName);
-        _stateDict.interaction.confirmed_unclassified_answers = angular.copy(
-          _confirmedUnclassifiedAnswers);
-        explorationStatesService.setState(activeStateName, _stateDict);
+          angular.copy(newConfirmedUnclassifiedAnswers));
 
         _confirmedUnclassifiedAnswersMemento = angular.copy(
           newConfirmedUnclassifiedAnswers);

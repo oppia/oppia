@@ -30,8 +30,8 @@ oppia.controller('StateFallbacks', [
 
     $scope.$on('stateEditorInitialized', function(evt, stateData) {
       stateFallbacksService.init(
-        $scope.stateName, stateData.interaction.fallbacks,
-        stateData.interaction, 'fallbacks');
+        editorContextService.getActiveStateName(),
+        stateData.interaction.fallbacks);
 
       $scope.activeFallbackIndex = null;
     });
@@ -185,12 +185,6 @@ oppia.controller('StateFallbacks', [
 
     var saveFallbacksChanges = function() {
       stateFallbacksService.saveDisplayedValue();
-
-      var activeStateName = editorContextService.getActiveStateName();
-      var _stateDict = explorationStatesService.getState(activeStateName);
-      _stateDict.interaction.fallbacks = angular.copy(
-        stateFallbacksService.savedMemento);
-      explorationStatesService.setState(activeStateName, _stateDict);
     };
   }
 ]);
