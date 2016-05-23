@@ -336,7 +336,7 @@ oppia.factory('oppiaPlayerService', [
             }
           }
 
-          $rootScope.$broadcast('updateActiveState', newStateName);
+          $rootScope.$broadcast('updateActiveStateIfInEditor', newStateName);
           $rootScope.$broadcast('playerStateChange');
           successCallback(
             newStateName, refreshInteraction, feedbackHtml, questionHtml,

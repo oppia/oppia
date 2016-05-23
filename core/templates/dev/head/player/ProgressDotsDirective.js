@@ -61,7 +61,7 @@ oppia.directive('progressDots', [function() {
 
         $scope.changeActiveDot = function(index) {
           playerPositionService.setActiveCardIndex(index);
-          $rootScope.$broadcast('updateActiveState',
+          $rootScope.$broadcast('updateActiveStateIfInEditor',
                                 playerPositionService.getCurrentStateName());
           $scope.currentDotIndex = index;
         };

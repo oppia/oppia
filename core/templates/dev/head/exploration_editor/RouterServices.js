@@ -53,11 +53,13 @@ oppia.factory('routerService', [
         return;
       }
 
+      // TODO(oparry): Determine whether this is necessary, since
+      // _savePendingChanges() is called by each of the navigateTo... functions
       $rootScope.$broadcast('externalSave');
 
       if (newPath.indexOf('/preview/') === 0) {
         _tabs.active = PREVIEW_TAB;
-        _doNavigation(newPath, SLUG_PREVIEW);
+        _doNavigationWithState(newPath, SLUG_PREVIEW);
       } else if (newPath === '/settings') {
         _tabs.active = SETTINGS_TAB;
         $rootScope.$broadcast('refreshSettingsTab');
@@ -74,7 +76,7 @@ oppia.factory('routerService', [
         _tabs.active = FEEDBACK_TAB;
       } else if (newPath.indexOf('/gui/') === 0) {
         _tabs.active = MAIN_TAB;
-        _doNavigation(newPath, SLUG_GUI);
+        _doNavigationWithState(newPath, SLUG_GUI);
       } else {
         if (explorationInitStateNameService.savedMemento) {
           $location.path(
@@ -83,7 +85,7 @@ oppia.factory('routerService', [
       }
     });
 
-    var _doNavigation = function(path, pathType) {
+    var _doNavigationWithState = function(path, pathType) {
       var pathBase = '/' + pathType + '/';
       var putativeStateName = path.substring(pathBase.length);
       var waitForStatesToLoad = $interval(function() {
@@ -176,6 +178,7 @@ oppia.factory('routerService', [
       },
       navigateToPreviewTab: function() {
         if (_tabs.active !== PREVIEW_TAB) {
+          _savePendingChanges();
           _actuallyNavigate(SLUG_PREVIEW, null);
         }
       },
