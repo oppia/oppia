@@ -371,7 +371,7 @@ oppia.directive('conversationSkin', [function() {
             if (doneCallback) {
               doneCallback();
             }
-          }, TIME_NUM_CARDS_CHANGE_MSEC + TIME_FADEIN_MSEC + TIME_PADDING_MSEC);
+          }, TIME_NUM_CARDS_CHANGE_MSEC);
         };
 
         $scope.isCurrentCardAtEndOfTranscript = function() {
