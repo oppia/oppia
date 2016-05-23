@@ -56,14 +56,13 @@ oppia.controller('StateEditor', [
           newInteractionId].is_terminal);
     });
 
+    $scope.contentEditorIsOpen = false;
+
     $scope.initStateEditor = function() {
       $scope.stateName = editorContextService.getActiveStateName();
 
       var stateData = explorationStatesService.getState($scope.stateName);
       $scope.content = stateData.content;
-
-      // This should only be non-null when the content editor is open.
-      $scope.contentMemento = null;
 
       if ($scope.stateName && stateData) {
         $rootScope.$broadcast('stateEditorInitialized', stateData);
@@ -77,34 +76,24 @@ oppia.controller('StateEditor', [
         $scope.isInteractionShown = true;
       }
 
+      $scope.$on('externalSave', function() {
+        $scope.saveTextContent();
+      });
+
       $rootScope.loadingMessage = '';
     };
 
     $scope.openStateContentEditor = function() {
       if (editabilityService.isEditable()) {
-        $scope.contentMemento = angular.copy($scope.content);
+        $scope.contentEditorIsOpen = true;
       }
     };
 
     $scope.saveTextContent = function() {
-      if ($scope.contentMemento !== null &&
-          !angular.equals($scope.contentMemento, $scope.content)) {
-        changeListService.editStateProperty(
-          editorContextService.getActiveStateName(), 'content',
-          angular.copy($scope.content), angular.copy($scope.contentMemento));
-
-        var _stateData = explorationStatesService.getState(
-          editorContextService.getActiveStateName());
-        _stateData.content = angular.copy($scope.content);
-        explorationStatesService.setState(
-          editorContextService.getActiveStateName(), _stateData);
-      }
-      $scope.contentMemento = null;
+      explorationStatesService.saveStateContent(
+        editorContextService.getActiveStateName(), $scope.content);
+      $scope.contentEditorIsOpen = false;
     };
-
-    $scope.$on('externalSave', function() {
-      $scope.saveTextContent();
-    });
 
     $scope.onSaveContentButtonClicked = function() {
       $scope.saveTextContent();
@@ -117,7 +106,7 @@ oppia.controller('StateEditor', [
       var _stateData = explorationStatesService.getState(
         editorContextService.getActiveStateName());
       $scope.content = angular.copy(_stateData.content);
-      $scope.contentMemento = null;
+      $scope.contentEditorIsOpen = false;
     };
   }
 ]);

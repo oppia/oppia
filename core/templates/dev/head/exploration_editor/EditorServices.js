@@ -700,6 +700,21 @@ oppia.factory('explorationStatesService', [
         return (
           validatorsService.isValidStateName(newStateName, showWarnings));
       },
+      getStateContentMemento: function(stateName) {
+        return angular.copy(this.getState(stateName).content);
+      },
+      saveStateContent: function(stateName, newContent) {
+        var oldContent = this.getStateContentMemento(stateName);
+
+        if (!angular.equals(oldContent, newContent)) {
+          changeListService.editStateProperty(
+            stateName, 'content', angular.copy(newContent), oldContent);
+
+          var stateData = this.getState(stateName);
+          stateData.content = angular.copy(newContent);
+          this.setState(stateName, stateData);
+        }
+      },
       addState: function(newStateName, successCallback) {
         newStateName = $filter('normalizeWhitespace')(newStateName);
         if (!validatorsService.isValidStateName(newStateName, true)) {
