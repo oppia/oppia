@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Unit tests for the MusicNotesInput interaction.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 describe('MusicNotesInput interaction', function() {
@@ -42,7 +40,7 @@ describe('MusicNotesInput interaction', function() {
       elt = angular.element('<' + TAG_NAME + '></' + TAG_NAME + '>');
       $compile(elt)(scope);
       scope.$digest();
-      ctrlScope = elt.isolateScope();
+      ctrlScope = elt[0].isolateScope();
     }));
 
     afterEach(function() {

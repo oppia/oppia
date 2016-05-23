@@ -10,7 +10,7 @@
     <script type="text/javascript">
       GLOBALS.GADGET_SPECS = JSON.parse('{{GADGET_SPECS|js_string}}');
       GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
-      GLOBALS.SHARING_OPTIONS_TWITTER_TEXT = JSON.parse('{{SHARING_OPTIONS_TWITTER_TEXT|js_string}}');
+      GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = JSON.parse('{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER|js_string}}');
       GLOBALS.explorationVersion = JSON.parse('{{exploration_version|js_string}}');
       GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
       GLOBALS.collectionTitle = JSON.parse('{{collection_title|js_string}}');
@@ -83,6 +83,11 @@
   {% include 'components/gadget_directive.html' %}
   {% include 'components/gadget_panel_directive.html' %}
   {% include 'components/profile_link_image_directive.html' %}
+<<<<<<< HEAD
+=======
+  {% include 'components/sharing_links_directive.html' %}
+
+>>>>>>> develop
   {% include 'player/answer_feedback_pair_directive.html' %}
   {% include 'player/conversation_skin_directive.html' %}
   {% include 'player/feedback_popup_directive.html' %}
@@ -100,6 +105,7 @@
     {{ include_js_file('components/GadgetDirective.js') }}
     {{ include_js_file('components/GadgetPanelDirective.js') }}
     {{ include_js_file('components/ProfileLinkImageDirective.js') }}
+    {{ include_js_file('components/SharingLinksDirective.js') }}
 
     {{ include_js_file('domain/exploration/ExplorationObjectFactory.js') }}
     {{ include_js_file('domain/exploration/StateObjectFactory.js') }}

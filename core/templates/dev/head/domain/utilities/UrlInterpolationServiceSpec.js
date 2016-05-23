@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Unit tests for UrlInterpolationService.
- *
- * @author henning.benmax@gmail.com (Ben Henning)
  */
 
 describe('URL Interpolation Service', function() {

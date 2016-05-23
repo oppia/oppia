@@ -15,8 +15,6 @@
 /**
  * @fileoverview Utilities for interacting with forms when carrrying
  * out end-to-end testing with protractor.
- *
- * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var interactions = require('../../../extensions/interactions/protractor.js');
@@ -177,9 +175,9 @@ var RichTextEditor = function(elem) {
         by.css('.protractor-test-close-rich-text-component-editor')).click();
       general.waitForSystem();
 
-      // Refocus back into the RTE.
-      elem.all(by.model('html')).first().click();
-      elem.all(by.model('html')).first().sendKeys(protractor.Key.END);
+      // Ensure that the cursor is at the end of the RTE.
+      elem.all(by.model('html')).first().sendKeys(
+        protractor.Key.chord(protractor.Key.CONTROL, protractor.Key.END));
     }
   };
 };
@@ -262,7 +260,7 @@ var MultiSelectEditor = function(elem) {
     // Open the dropdown menu.
     elem.element(by.css('.dropdown-toggle')).click();
 
-    elem.element(by.css('.dropdown-menu')).all(by.tagName('li')).filter(
+    elem.element(by.css('.dropdown-menu')).all(by.tagName('span')).filter(
       function(choiceElem) {
         return choiceElem.getText().then(function(choiceText) {
           return texts.indexOf(choiceText) !== -1;
@@ -280,6 +278,9 @@ var MultiSelectEditor = function(elem) {
         expect(filteredElements[i].getAttribute('class')).toMatch(
           expectedClassBeforeToggle);
         filteredElements[i].click();
+        // Reopen the dropdown menu, since it closes after an item is
+        // toggled.
+        elem.element(by.css('.dropdown-toggle')).click();
       }
 
       // Close the dropdown menu at the end.
@@ -330,9 +331,13 @@ var MultiSelectEditor = function(elem) {
 //   handler.readRteComponent('Math', ...);
 var expectRichText = function(elem) {
   var toMatch = function(richTextInstructions) {
-    // We remove all <p> elements since these are plain text that is
-    // sometimes represented just by text nodes.
-    elem.all(by.xpath('./*[not(self::p)]')).map(function(entry) {
+    // We select all top-level non-paragraph elements, as well as all children
+    // of paragraph elements. (Note that it is possible for <p> elements to
+    // surround, e.g., <i> tags, so we can't just ignore the <p> elements
+    // altogether.)
+    var XPATH_SELECTOR = './p/*|./*[not(self::p)]';
+
+    elem.all(by.xpath(XPATH_SELECTOR)).map(function(entry) {
       // It is necessary to obtain the texts of the elements in advance since
       // applying .getText() while the RichTextChecker is running would be
       // asynchronous and so not allow us to update the textPointer
@@ -342,7 +347,7 @@ var expectRichText = function(elem) {
       });
     }).then(function(arrayOfTexts) {
       // We re-derive the array of elements as we need it too.
-      elem.all(by.xpath('./*[not(self::p)]')).then(function(arrayOfElements) {
+      elem.all(by.xpath(XPATH_SELECTOR)).then(function(arrayOfElements) {
         elem.getText().then(function(fullText) {
           var checker = RichTextChecker(
             arrayOfElements, arrayOfTexts, fullText);

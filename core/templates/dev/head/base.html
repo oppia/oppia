@@ -1,12 +1,17 @@
 {% macro warnings_and_loader() -%}
   <div ng-cloak>
-    <div class="oppia-alert-blocks">
-      <div ng-repeat="warning in (warningsData.warnings | limitTo:5) track by $index">
-        <p class="alert alert-warning">
-          <button type="button" class="close" ng-click="warningsData.deleteWarning($index)">&times;</button>
-          <strong>Warning!</strong>
-          <[warning]>
-        </p>
+    <div class="oppia-toast-container toast-top-center">
+      <div ng-repeat="warning in (alertsService.warnings | limitTo:5) track by $index" class="toast toast-warning oppia-toast">
+        <button type="button" class="toast-close-button" ng-click="alertsService.deleteWarning(warning)" role="button">&times;</button>
+        <div class="toast-message">
+          <[warning.content]>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div ng-repeat="message in alertsService.messages track by $index">
+        <alert-message message-object="message" message-index="$index"></alert-message>
       </div>
     </div>
 
@@ -20,7 +25,11 @@
     </div>
     <div ng-show="!loadingMessage">
       {% block content %}{% endblock %}
+<<<<<<< HEAD
 
+=======
+      {% block footer %}{% endblock %}
+>>>>>>> develop
     </div>
   </div>
 {%- endmacro %}
@@ -51,6 +60,7 @@
     <meta property="og:image" content="{{DOMAIN_URL}}/images/logo/288x288_logo_mint.png">
 
     <link rel="apple-touch-icon" href="/images/logo/favicon.png">
+<<<<<<< HEAD
     <!-- The title is bound to the rootScope. The content of the block
     maintitle can be a string or a translation id. If it is a translation it
     will be replaced by its translation when the page is loading. If it is a
@@ -59,6 +69,10 @@
     any other controller. -->
     <title itemprop="name" translate="{% block maintitle %}Oppia{% endblock maintitle %}"></title>
 
+=======
+    <title itemprop="name">{% block subtitle %}{% endblock %} - {% block maintitle %}Oppia{% endblock %}</title>
+    {% block base_url %}{% endblock base_url %}
+>>>>>>> develop
     {% block header_css %}
       {% include 'header_css_libs.html' %}
     {% endblock header_css %}
@@ -69,12 +83,6 @@
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
         csrf_token_for_footer: JSON.parse('{{csrf_token_for_footer|js_string}}'),
         DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}'),
-        NAV_MODE:
-          {% if nav_mode %}
-            JSON.parse('{{nav_mode|js_string}}'),
-          {% else %}
-            null,
-          {% endif %}
         INVALID_NAME_CHARS: JSON.parse('{{INVALID_NAME_CHARS|js_string}}'),
         ACTIVITY_STATUS_PRIVATE: JSON.parse(
           '{{ACTIVITY_STATUS_PRIVATE|js_string}}'),
@@ -82,11 +90,13 @@
           '{{ACTIVITY_STATUS_PUBLIC|js_string}}'),
         ACTIVITY_STATUS_PUBLICIZED: JSON.parse(
           '{{ACTIVITY_STATUS_PUBLICIZED|js_string}}'),
-        ALL_LANGUAGE_CODES: JSON.parse(
-          '{{ALL_LANGUAGE_CODES|js_string}}'),
+        ALL_CATEGORIES: JSON.parse('{{ALL_CATEGORIES|js_string}}'),
+        ALL_LANGUAGE_CODES: JSON.parse('{{ALL_LANGUAGE_CODES|js_string}}'),
         DEFAULT_LANGUAGE_CODE: JSON.parse(
           '{{DEFAULT_LANGUAGE_CODE|js_string}}'),
         RTE_COMPONENT_SPECS: JSON.parse('{{RTE_COMPONENT_SPECS|js_string}}'),
+        CAN_SEND_ANALYTICS_EVENTS: JSON.parse(
+          '{{CAN_SEND_ANALYTICS_EVENTS|js_string}}'),
         /* A list of functions to be called when an exploration is completed. */
         POST_COMPLETION_HOOKS: [],
         SYSTEM_USERNAMES: JSON.parse('{{SYSTEM_USERNAMES|js_string}}'),
@@ -120,11 +130,11 @@
               <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation">
                 <div class="navbar-container">
                   <div class="navbar-header protractor-test-navbar-header pull-left">
-                    <a ng-click="openSidebar()" class="navbar-brand oppia-navbar-menu oppia-transition-200">
-                      <img src="/images/general/menu.png">
+                    <a ng-if="windowIsNarrow" ng-click="openSidebar()" class="navbar-brand oppia-navbar-menu oppia-transition-200">
+                      <i class="material-icons oppia-navbar-menu-icon">&#xE5D2;</i>
                     </a>
-                    <a class="oppia-navbar-brand-name oppia-transition-200" href="/gallery" focus-on="<[LABEL_FOR_CLEARING_FOCUS]>">
-                      <img src="/images/logo/288x128_logo_white.png" class="oppia-logo">
+                    <a class="oppia-navbar-brand-name oppia-transition-200" href="/" focus-on="<[LABEL_FOR_CLEARING_FOCUS]>">
+                      <img src="/images/logo/288x128_logo_white.png" class="oppia-logo" ng-class="windowIsNarrow ? 'oppia-logo-small' : 'oppia-logo-wide'">
                     </a>
                     <!-- This is needed for the correct image to appear when an exploration is shared using G+. -->
                     <a style="display: none;">
@@ -132,20 +142,21 @@
                     </a>
                   </div>
 
+
                   {% if nav_mode != 'signup' %}
-                    <div class="navbar-header pull-right">
+                    <div ng-cloak class="navbar-header pull-right">
                       <ul class="nav oppia-navbar-nav oppia-navbar-profile">
                         {% if username %}
                           <li class="dropdown pull-right">
-                            <a class="dropdown-toggle oppia-navbar-profile-dropdown-toggle" data-toggle="dropdown" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
+                            <a class="dropdown-toggle oppia-navbar-dropdown-toggle" data-toggle="dropdown" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
                               <div class="oppia-navbar-profile-picture-container" ng-cloak>
                                 {% if profile_picture_data_url %}
                                   <img src="{{profile_picture_data_url}}" class="oppia-navbar-profile-picture img-circle">
+                                  <span class="caret" style="margin-top: 10px;"></span>
                                 {% else %}
-                                  <img ng-if="profileDropdownIsActive" src="/images/avatar/user_mint_48px.png" class="oppia-navbar-profile-picture">
-                                  <img ng-if="!profileDropdownIsActive" src="/images/avatar/user_white_48px.png" class="oppia-navbar-profile-picture">
+                                  <i class="material-icons md-40" style="margin-top: -1px;">&#xE853;</i>
+                                  <span class="caret" style="margin-top: -26px;"></span>
                                 {% endif %}
-                                <span class="caret" style="margin-top: 10px;"></span>
 
                                 <div class="oppia-navbar-dashboard-indicator ng-cloak" ng-if="numUnseenNotifications > 0">
                                   <span class="oppia-navbar-dashboard-indicator-text">
@@ -169,8 +180,12 @@
                                 {% endif %}
                               </div>
                             </a>
+<<<<<<< HEAD
 
                             <ul class="dropdown-menu ng-cloak oppia-navbar-profile-dropdown" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)" ng-show="profileDropdownIsActive">
+=======
+                            <ul class="dropdown-menu ng-cloak oppia-navbar-dropdown" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)" ng-show="profileDropdownIsActive">
+>>>>>>> develop
                               <li>
                                 <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/profile/{{username}}">
                                   <strong>{{username}}</strong>
@@ -220,18 +235,66 @@
                           </li>
                         {% else %}
                           <li class="dropdown oppia-clickable-dropdown pull-right">
+<<<<<<< HEAD
                             <a href="{{login_url}}" class="oppia-navbar-profile-dropdown-toggle" style="font-size: 1em; padding-top: 17px;">
                               <span translate="I18N_TOPNAV_SIGN_IN"></span>
                               <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu oppia-navbar-profile-dropdown" role="menu" style="padding: 0;" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
+=======
+                            <div class="oppia-navbar-button-container" style="margin-right: 10px;">
+                              <button class="btn oppia-navbar-button"
+                                      ng-click="onLoginButtonClicked('{{login_url}}')">
+                                <span>Sign in</span>
+                                <span class="caret"></span>
+                              </button>
+                            </div>
+                            <ul class="dropdown-menu oppia-navbar-dropdown" role="menu" style="margin-right: 15px; padding: 0;" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
+>>>>>>> develop
                               <li>
-                                <a href="{{login_url}}" style="padding: 0; width: 200px;">
+                                <a href style="padding: 0; width: 200px;" ng-click="onLoginButtonClicked('{{login_url}}')">
                                   <img src="/images/signin/Red-signin-Long-base-44dp.png">
                                 </a>
                               </li>
                             </ul>
                           </li>
+                        {% endif %}
+                        {% if nav_mode != 'create' and nav_mode != 'explore' %}
+                          <ul ng-if="windowIsNarrow" class="nav oppia-navbar-tabs-narrow">
+                            <create-exploration-button></create-exploration-button>
+                          </ul>
+                          <ul ng-if="!windowIsNarrow" class="nav oppia-navbar-tabs">
+                            <create-exploration-button></create-exploration-button>
+                            {% if SHOW_CUSTOM_PAGES %}
+                              <li class="oppia-clickable-navbar-element pull-right">
+                                <a class="oppia-navbar-tab" href="/forum">
+                                  Forum
+                                </a>
+                              </li>
+                            {% endif %}
+                            <li class="dropdown oppia-clickable-dropdown pull-right">
+                              <a class="oppia-navbar-tab">
+                                About
+                                <span class="caret"></span>
+                              </a>
+                              <ul class="dropdown-menu oppia-navbar-dropdown" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
+                                <li><a href="/about">About Oppia</a></li>
+                                <li><a href="/participate">Participation Playbook</a></li>
+                                {% for additional_link in SIDEBAR_MENU_ADDITIONAL_LINKS %}
+                                  <li><a href="{{additional_link['link']}}" target="_blank">{{additional_link['name']}}</a></li>
+                                {% endfor %}
+                                {% if SHOW_CUSTOM_PAGES %}
+                                  <li><a href="/terms">Terms of Service</a></li>
+                                  <li><a href="/privacy">Privacy Policy</a></li>
+                                {% endif %}
+                              </ul>
+                            </li>
+                            <li class="oppia-clickable-navbar-element pull-right">
+                              <a class="oppia-navbar-tab" href="/library">
+                                Library
+                              </a>
+                            </li>
+                          </ul>
                         {% endif %}
                       </ul>
                     </div>
@@ -245,7 +308,6 @@
                     {% endblock %}
                   </div>
                 </div>
-                </div>
               </nav>
 
               <div class="oppia-top-of-page-padding">
@@ -253,6 +315,20 @@
 
               {{ warnings_and_loader() }}
             </div>
+<<<<<<< HEAD
+=======
+
+            <noscript>
+              <div class="oppia-page-cards-container">
+                <div class="md-default-theme oppia-page-card oppia-long-text">
+                  <h2>We Need JavaScript in Your Browser <i class="material-icons">&#xE811;</i></h2>
+                  <p>Oppia is a free, open-source learning platform full of interactive activities called 'explorations'.  Sadly, Oppia requires JavaScript to be enabled in your web browser in order to function properly and your web browser has JavaScript disabled.  If you need help enabling JavaScript, <a href="http://www.enable-javascript.com/">click here.</a></p>
+                  <p>Thank you.</p>
+                </div>
+              </div>
+            </noscript>
+
+>>>>>>> develop
             {% include 'side_nav.html' %}
 
           </div>
@@ -281,6 +357,9 @@
     {% include 'footer_js_libs.html' %}
     {% include 'components/exploration_summary_tile_directive.html' %}
     {% include 'components/rating_display.html' %}
+    {% include 'components/create_exploration_button_directive.html' %}
+    {% include 'components/activity_tiles_infinity_grid_directive.html' %}
+    {% include 'components/loading_dots_directive.html' %}
 
     <script>
       {{ include_js_file('app.js') }}
@@ -291,12 +370,18 @@
 
       {{ include_js_file('forms/formBuilder.js') }}
 
-      {{ include_js_file('services/activeInputData.js') }}
-      {{ include_js_file('services/warningsData.js') }}
+      {{ include_js_file('services/alertsService.js') }}
       {{ include_js_file('services/explorationContextService.js') }}
+      {{ include_js_file('services/autoplayedVideosService.js') }}
+      {{ include_js_file('services/searchService.js') }}
 
-      {{ include_js_file('components/ObjectEditorDirective.js') }}
+      {{ include_js_file('components/ActivityTilesInfinityGridDirective.js') }}
+      {{ include_js_file('components/AlertMessageDirective.js') }}
+      {{ include_js_file('components/CreateExplorationButtonDirective.js') }}
+      {{ include_js_file('components/ExplorationCreationButtonService.js') }}
       {{ include_js_file('components/ExplorationSummaryTileDirective.js') }}
+      {{ include_js_file('components/LoadingDotsDirective.js') }}
+      {{ include_js_file('components/ObjectEditorDirective.js') }}
       {{ include_js_file('components/RatingComputationService.js')}}
       {{ include_js_file('components/RatingDisplayDirective.js')}}
       {{ include_js_file('components/Select2DropdownDirective.js') }}

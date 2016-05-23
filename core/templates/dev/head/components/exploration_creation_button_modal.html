@@ -1,9 +1,6 @@
-<script type="text/ng-template" id="modals/galleryCreateNew">
+<script type="text/ng-template" id="modals/createNewActivity">
   <div class="modal-header">
-    <h3>
-      <span ng-if="isUploadModal">Upload an Exploration</span>
-      <span ng-if="!isUploadModal">Create New Exploration</span>
-    </h3>
+    <h3><[createNewTitle]></h3>
   </div>
 
   <div class="modal-body">
@@ -17,12 +14,12 @@
 
     <form role="form" class="form-horizontal">
       <fieldset>
-        <div class="form-group" ng-class="{'has-error': !newExplorationTitle}">
-          <label for="newExplorationTitle" class="oppia-create-exploration-label col-lg-2 col-md-2 col-sm-2">
+        <div class="form-group" ng-class="{'has-error': !newActivityTitle}">
+          <label for="newActivityTitle" class="oppia-create-exploration-label col-lg-2 col-md-2 col-sm-2">
             Title
           </label>
           <div class="col-lg-10 col-md-10 col-sm-10">
-            <input id="newExplorationTitle" type="text" class="form-control protractor-test-new-exploration-title" ng-model="newExplorationTitle" name="newExplorationTitle" ng-change="isTitleValid(newExplorationTitle, true)" required focus-on="newExplorationModalOpened">
+            <input id="newActivityTitle" type="text" class="form-control protractor-test-new-exploration-title" ng-model="newActivityTitle" name="newActivityTitle" ng-change="isTitleValid(newActivityTitle, true)" required focus-on="newActivityModalOpened">
             <span style="color: red;" aria-live="assertive" ng-show="changedAtLeastOnce">
               <[warningText]>
             </span>
@@ -31,32 +28,32 @@
 
         <div ng-hide="isUploadModal">
           <div class="form-group">
-            <label for="newExplorationObjective" class="oppia-create-exploration-label col-lg-2 col-md-2 col-sm-2">
+            <label for="newActivityObjective" class="oppia-create-exploration-label col-lg-2 col-md-2 col-sm-2">
               Goal
             </label>
             <div class="col-lg-10 col-md-10 col-sm-10">
-              <input id="newExplorationObjective" type="text" class="form-control" ng-model="newExplorationObjective" placeholder="What will people learn from this exploration?" name="newExplorationObjective">
+              <input id="newActivityObjective" type="text" class="form-control" ng-model="newActivityObjective" placeholder="What will people learn from this <[activityName]>?" name="newActivityObjective">
             </div>
           </div>
         </div>
 
-        <div class="form-group" ng-class="{'has-error': !newExplorationCategory}">
-          <label for="newExplorationCategory" class="col-lg-2 col-md-2 col-sm-2">
+        <div class="form-group" ng-class="{'has-error': !newActivityCategory}">
+          <label for="newActivityCategory" class="col-lg-2 col-md-2 col-sm-2">
             Category
           </label>
           <div class="col-lg-10 col-md-10 col-sm-10">
-            <select2-dropdown class="protractor-test-new-exploration-category" item="newExplorationCategory" choices="categoriesForDropdown" placeholder="Select a category, or enter a new one" new-choice-regex="^[A-Z a-z]+$" width="100%" invalid-search-term-message="Invalid category name">
+            <select2-dropdown class="protractor-test-new-exploration-category" item="newActivityCategory" choices="categoriesForDropdown" placeholder="Select a category, or enter a new one" new-choice-regex="^[A-Z a-z]+$" width="100%" invalid-search-term-message="Invalid category name">
             </select2-dropdown>
           </div>
         </div>
 
         <div ng-hide="isUploadModal">
           <div class="form-group">
-            <label for="newExplorationLanguageCode" class="oppia-create-exploration-label col-lg-2 col-md-2 col-sm-2">
+            <label for="newActivityLanguageCode" class="oppia-create-exploration-label col-lg-2 col-md-2 col-sm-2">
               Language
             </label>
             <div class="col-lg-10 col-md-10 col-sm-10">
-              <select id="newExplorationLanguageCode" class="form-control" ng-model="newExplorationLanguageCode" ng-options="lc.code as lc.description for lc in getAllLanguageCodes()">
+              <select id="newActivityLanguageCode" class="form-control" ng-model="newActivityLanguageCode" ng-options="lc.code as lc.description for lc in getAllLanguageCodes()">
               </select>
             </div>
           </div>
@@ -75,9 +72,15 @@
   </div>
   <div class="modal-footer">
     <button class="btn btn-default protractor-test-cancel-create" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-success protractor-test-submit-new-exploration" type="submit" ng-click="save(newExplorationTitle, newExplorationCategory, newExplorationObjective, newExplorationLanguageCode)"
-      ng-disabled="!isTitleValid(newExplorationTitle, false) || !newExplorationCategory || !newExplorationLanguageCode">
-        Create New Exploration
+    <button class="btn btn-success protractor-test-submit-new-exploration" type="submit" ng-click="save(newActivityTitle, newActivityCategory, newActivityObjective, newActivityLanguageCode)"
+      ng-disabled="!isTitleValid(newActivityTitle, false) || !newActivityCategory || !newActivityLanguageCode">
+        <[createNewTitle]>
     </button>
   </div>
 </script>
+
+<style>
+  .oppia-create-exploration-label {
+    margin-top: 5px;
+  }
+</style>

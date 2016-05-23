@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview End-to-end tests of embedding explorations in other websites.
- *
- * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var forms = require('../protractor_utils/forms.js');
@@ -62,8 +60,8 @@ describe('Embedding', function() {
       'Exploration completed'
     ];
 
-    users.createUser('embedder@example.com', 'Embedder');
-    users.login('embedder@example.com', true);
+    users.createUser('user1@embedding.com', 'user1Embedding');
+    users.login('user1@embedding.com', true);
     admin.reloadExploration('protractor_test_1.yaml');
 
     general.openEditor('12');

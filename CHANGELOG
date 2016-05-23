@@ -2,6 +2,196 @@ This file contains a summary of changes to the Oppia code base. For a full chang
 
     https://github.com/oppia/oppia/commits/master
 
+v2.2.0 (7 May 2016)
+-------------------
+Overall site design and navigation:
+* Fix #1510: separate the library page from the splash page.
+* Clicking on the logo at the top left redirects to the appropriate home page.
+* Fix #1075: use material icons instead of glyphicons.
+* Fix #1615: add a footer to all informational pages on the site
+
+Splash page:
+* Redesign the splash page.
+
+Library page:
+* Rename 'gallery' to 'library' throughout the codebase.
+* Add an index page with explorations in different categories.
+* Fix #1360: add a separate category for featured explorations.
+* Fix #1681: redesign the number-of-contributors indicator on the exploration summary tiles.
+* Create new category icons.
+* Reduce the number of categories in the category dropdown menu.
+* Add stable URLs for search result pages.
+* Redesign the 'loading more results' indicator.
+
+Editor page:
+* Redesign the editor onboarding flow.
+* Fix #1537: send an email when a user is granted new rights to an exploration.
+* Fix (part of) #798: clarify the message shown when an interaction is missing.
+* Fix #1679: in the editor view, prevent the feedback tab overlapping the sign-in menu.
+* Reduce the widths of the editor tabs.
+* Tidy up the save/publish button styling in the navbar.
+* Fix #1676: remove the small gap between the "Save Draft" and "Discard Draft" buttons.
+* Remove the visibility toggle for private explorations from the Settings tab.
+* Fix a bug in getEditorTabContext() that resulted in incorrect detection of the editor preview mode.
+* Fix #1788: correctly align parameter input fields in Firefox.
+
+Learner:
+* Fix #1497: ensure that the inter-paragraph spacing behaves correctly.
+* Fix #1678: prevent share links from being squashed in the information card.
+
+Interactions:
+* CodeRepl:
+  - Fix #1682: add an OutputContains rule.
+  - Fix #1671: make text highlighting visible.
+  - Fix #1767: add a 'test run' button.
+  - Fix a bug where the error message displayed in the user-facing console was not updated promptly.
+
+Rich-text editor:
+* Add indent/outdent functionality.
+* Add block-style previews for some RTE components.
+* Fix #914: remove the RTE icon resize handlebars in Firefox.
+
+Profile page:
+* Fix #1350: redesign the profile page to include a portfolio section and display responsively.
+* Fix #1544: Fetch Gravatar images or identicons when a new user signs up.
+
+Other pages:
+* Fix #1703 (preferences page): fix the preferred languages dropdown width.
+* Fix #1712 (admin page): add a navigation bar, and separate the page into different categories.
+* "My explorations" page:
+  - Autofocus correctly when the 'create exploration' modal is opened.
+  - Redesign the page to be more useful to new creators.
+  - Show a more informative status ("Published" instead of "Good") for published explorations that have no unresolved feedback messages.
+
+Developer workflow:
+* Fix #995: add Protractor e2e tests to Travis-CI.
+* Improve Travis-CI build times by caching specific directories.
+* Fix #1717: enforce correct permissions on the node_modules/ dir in Vagrant.
+
+Infrastructure and tests:
+* Update protractor to 3.3.0.
+* Fix #1434: replace deprecated $http.success & $http.error with $http.then.
+* Fix #1369: add a domain layer for objects related to feedback threads.
+* Fix #1729: add tests for summary_services.py.
+* Add analytics events for buttons on the splash page, and for opening the 'publish exploration' modal.
+
+
+v2.1.5 (3 Apr 2016)
+-------------------
+Overall site design and navigation:
+* Fix #1347: redesign the navbar, and include a "create" button on more pages.
+* Fix #1533: make "My Explorations" the homepage for logged-in users.
+* Fix #1531: introduce an alertsService to display warnings and transitory info messages.
+* Fix #1622: replace PNG images with icon fonts (where possible) to improve performance.
+
+Gallery page:
+* Fix #1617: add a "deselect all" option in the category and language selectors in the search bar.
+* Fix #1550: return profile pictures together with the other data in the exploration summary tiles, in order to avoid multiple unnecessary fetches to the server.
+* Fix #1543: for community-editable explorations, the first avatar in the exploration summary tile should be a globe.
+* Fix #1668: reinstate the search loading indicator.
+* Fix #1529: truncate long usernames in the gallery card tooltips so that they don't overflow.
+* Create new directives for the search bar and the grid of exploration summary tiles.
+
+Editor page:
+* Fix #473: changing the rule type should preserve existing rule input fields, whenever possible.
+* Fix #1613: after publishing, creators should be encouraged to share their explorations.
+* Fix #1575: correctly restore the "Save Draft" button after the user tries to save changes that have no net effect.
+* Fix #1656: fix alignment of status and state in feedback/suggestion threads.
+* Fix #1370: show the number of open feedback/suggestion threads in the exploration editor navbar.
+* Fix #1566: clicking the edit icons in the Oppia response editor should open up the response editor.
+* Generate default rule input values in the backend and send these to the frontend, thus reducing the need for the core code to special-case on particular interaction ids.
+* Fix #1536: within the multiple-choice option dropdown in the rule selector, images should not overlap.
+* Partially address #1287: implement a storage layer to support auto-saving of drafts.
+* Remove unnecessary two-way binding in the rule type dropdown selector.
+
+Learner page:
+* Fix #1637: prevent the feedback popup from overflowing off the screen.
+* Increase the size of the first avatar on each exploration card.
+* Adjust the progress-dot tooltips to point towards the left.
+
+Interactions:
+* CodeRepl: display underscores correctly in the code editor.
+* ItemSelectionInput: make the UI more similar to that of MultipleChoiceInput.
+* LogicProof: update the Angular reference in the JavaScript generating helper file.
+* PencilCodeEditor: hide the Pencil Code error console.
+* SetInput: remove the error that arises in the editor when trying to add an element to a rule input.
+* SetInput: explicitly instruct the learner to add one item per line.
+* TextInput: always show the "submit" button.
+
+Rich-text editor:
+* Fix #945: improve the rich-text editor performance by removing unnecessary internal $watch statements.
+* Fix #448: redesign the icons for all the RTE components.
+* Fix #1534: prevent long math LaTeX formulas from spilling out of the rule selector dropdown.
+* Fix #1496: ensure that videos stay within their container when they are inserted into a Collapsible RTE component.
+
+Collections:
+* Fix #1564: make it possible to unpublish collections.
+* Fix #1649: pass num_views to collection learner view
+* Fix #1216: fix the display of the collection viewer tiles on small screens.
+* Add collection editor frontend and backend controllers, so that the collection editor is fully functional.
+
+Other pages:
+* Fix #1288 (profile page): redesign the calculation of the impact score.
+* Fix #1368 (notifications page): make the page display correctly on small screens.
+* Fix #1628 ("my explorations" page): ensure that the "Unresolved Feedback" status message does not overflow the exploration card.
+* Fix #1633 (about page): reinstate the missing "Oppia Foundation" anchor.
+* Fix #1631 (privacy page): de-italicize the text in the sidebar.
+
+Developer workflow:
+* Install XVFB and adjust setup.sh to prepend xvfb-run to frontend test commands for developers who are using Vagrant.
+* Fix #1568: add an error message if the GAE download via curl fails.
+* Fix #1488: make the pre_push hook switch to the correct branch before linting.
+* Update run_frontend_tests.sh to not run the minified tests by default, and add an optional flag to skip the installation process. These two flags together significantly speed up running the frontend tests.
+* Fix #1643: report build status on gitter and IRC.
+* Update the README to point to the new IRC channel.
+
+Infrastructure and tests:
+* Fix #1504: update textAngular to v1.4.5, and add Rangy (v1.3.0) as a third-party dependency.
+* Fix #1416: guard against the backend sending duplicate emails.
+* Fix #1579: introduce a standard naming scheme for example users in the Protractor tests.
+* Add an analytics event for new signups.
+* Remove all author tags from the codebase.
+
+
+v2.1.4 (28 Feb 2016)
+--------------------
+Learner page:
+* Fix #1471: show the exploration ID correctly in the embedding instructions.
+
+Gallery page:
+* Fix #1438: show contributors' icons on the gallery cards.
+* Fix #1437: fix a race condition when searching in the gallery.
+
+Rich-text components:
+* Fix #1380: autoplay videos only if the learner is seeing them for the first time, and the video is in view.
+* Fix #318: in the RTE, auto-prepend "https://" to links which don't specify a protocol.
+* Fix #1466: prevent an error from occurring when spaces are typed into the link editor.
+* Fix #1421: update MathJax to v2.6.0 to prevent the Math component from showing a black vertical bar on the right border.
+* Fix #1432: MP4 video components used to load inconsistently; to avoid this, we now clear the 'src' tag after a video leaves the user's view to release memory and browser resources.
+
+Editor page:
+* Add an html-select-directive, so that LaTeX and images are displayed correctly in multiple choice options.
+* Fix #1088: hide the feedback editor for the Continue Button interaction.
+* Fix #1089: do not show a default warning for multiple-choice interactions if all choices have been catered for.
+* Fix #1516: prevent a console error from arising when the first state's default answer group feedback is edited.
+
+Infrastructure:
+* Add full instructions for installing Oppia on Windows.
+* Remove ComputedProperty construct in order to speed up requests.
+* Add infrastructure for frontend event reporting.
+* Replace the deprecated gulp-minify-css library with gulp-clean-css.
+* Modify the pre-push hook to only trigger when a branch is pushed (and not when a tag is pushed or a branch is deleted).
+* Add a max-line-length check to .pylintrc.
+* Fix #1440: remove the activeInputData service from the frontend.
+
+Demo explorations:
+* Fix #1509: address warnings/errors in demo explorations.
+
+Other:
+* Add an ISSUE_TEMPLATE.md file to the root of the repository.
+* Add a link to the Google Drive folder in CONTRIBUTING.md.
+
+
 v2.1.3 (31 Jan 2016)
 --------------------
 Learner page:

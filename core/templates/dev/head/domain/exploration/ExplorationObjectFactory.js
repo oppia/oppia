@@ -15,8 +15,6 @@
 /**
  * @fileoverview Factory for creating new frontend instances of Exploration
  * domain objects.
- *
- * @author sean@seanlip.org (Sean Lip)
  */
 
 oppia.factory('ExplorationObjectFactory', [

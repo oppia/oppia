@@ -14,6 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+import os
+
 from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import rights_manager
@@ -22,6 +25,7 @@ from core.tests import test_utils
 import feconf
 import utils
 
+from google.appengine.api import urlfetch
 
 class UserServicesUnitTests(test_utils.GenericTestBase):
     """Test the user services methods."""
@@ -132,6 +136,105 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             user_services.get_user_id_from_username('fakeUsername'))
 
+    def test_fetch_gravatar_success(self):
+        user_email = 'user@example.com'
+        expected_gravatar_filepath = os.path.join(
+            'static', 'images', 'avatar', 'gravatar_example.png')
+        with open(expected_gravatar_filepath, 'r') as f:
+            gravatar = f.read()
+        with self.urlfetch_mock(content=gravatar):
+            profile_picture = user_services.fetch_gravatar(user_email)
+            gravatar_data_url = utils.convert_png_to_data_url(
+                expected_gravatar_filepath)
+            self.assertEqual(profile_picture, gravatar_data_url)
+
+    def test_fetch_gravatar_failure_404(self):
+        user_email = 'user@example.com'
+        error_messages = []
+        def log_mock(message):
+            error_messages.append(message)
+
+        gravatar_url = user_services.get_gravatar_url(user_email)
+        expected_error_message = (
+            '[Status 404] Failed to fetch Gravatar from %s' % gravatar_url)
+        logging_error_mock = test_utils.CallCounter(log_mock)
+        urlfetch_counter = test_utils.CallCounter(urlfetch.fetch)
+        urlfetch_mock_ctx = self.urlfetch_mock(status_code=404)
+        log_swap_ctx = self.swap(logging, 'error', logging_error_mock)
+        fetch_swap_ctx = self.swap(urlfetch, 'fetch', urlfetch_counter)
+        with urlfetch_mock_ctx, log_swap_ctx, fetch_swap_ctx:
+            profile_picture = user_services.fetch_gravatar(user_email)
+            self.assertEqual(urlfetch_counter.times_called, 1)
+            self.assertEqual(logging_error_mock.times_called, 1)
+            self.assertEqual(expected_error_message, error_messages[0])
+            self.assertEqual(
+                profile_picture, user_services.DEFAULT_IDENTICON_DATA_URL)
+
+    def test_fetch_gravatar_failure_exception(self):
+        user_email = 'user@example.com'
+        error_messages = []
+        def log_mock(message):
+            error_messages.append(message)
+
+        gravatar_url = user_services.get_gravatar_url(user_email)
+        expected_error_message = (
+            'Failed to fetch Gravatar from %s' % gravatar_url)
+        logging_error_mock = test_utils.CallCounter(log_mock)
+        urlfetch_fail_mock = test_utils.FailingFunction(
+            urlfetch.fetch, urlfetch.InvalidURLError,
+            test_utils.FailingFunction.INFINITY)
+        log_swap_ctx = self.swap(logging, 'error', logging_error_mock)
+        fetch_swap_ctx = self.swap(urlfetch, 'fetch', urlfetch_fail_mock)
+        with log_swap_ctx, fetch_swap_ctx:
+            profile_picture = user_services.fetch_gravatar(user_email)
+            self.assertEqual(logging_error_mock.times_called, 1)
+            self.assertEqual(expected_error_message, error_messages[0])
+            self.assertEqual(
+                profile_picture, user_services.DEFAULT_IDENTICON_DATA_URL)
+
+    def test_default_identicon_data_url(self):
+        identicon_filepath = os.path.join(
+            'static', 'images', 'avatar', 'user_blue_72px.png')
+        identicon_data_url = utils.convert_png_to_data_url(
+            identicon_filepath)
+        self.assertEqual(
+            identicon_data_url, user_services.DEFAULT_IDENTICON_DATA_URL)
+
+    def test_set_and_get_user_email_preferences(self):
+        user_id = 'someUser'
+        username = 'username'
+        user_email = 'user@example.com'
+
+        user_services.get_or_create_user(user_id, user_email)
+        user_services.set_username(user_id, username)
+
+        # When UserEmailPreferencesModel is yet to be created,
+        # the value returned by get_email_preferences() should be True.
+        email_preferences = user_services.get_email_preferences(user_id)
+        self.assertEquals(
+            email_preferences['can_receive_editor_role_email'],
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+
+        # The user retrieves their email preferences. This initializes
+        # a UserEmailPreferencesModel instance with the default values.
+        user_services.update_email_preferences(
+            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+
+        email_preferences = user_services.get_email_preferences(user_id)
+        self.assertEquals(
+            email_preferences['can_receive_editor_role_email'],
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+
+        # The user sets their membership email preference to False.
+        user_services.update_email_preferences(
+            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE, False)
+
+        email_preferences = user_services.get_email_preferences(user_id)
+        self.assertEquals(
+            email_preferences['can_receive_editor_role_email'],
+            False)
+
 
 class UpdateContributionMsecTests(test_utils.GenericTestBase):
     """Test whether contribution date changes with publication of
@@ -150,7 +253,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_EMAIL])
+        self.set_admins([self.ADMIN_USERNAME])
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -265,13 +368,16 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         collection_services.publish_collection_and_update_user_profiles(
             self.admin_id, self.COL_ID)
+        exp_services.publish_exploration_and_update_user_profiles(
+            self.admin_id, self.EXP_ID)
 
         # Test all owners and editors of collection after publication have
         # updated first contribution times.
         self.assertIsNotNone(user_services.get_user_settings(
             self.admin_id).first_contribution_msec)
 
-        # Test editor of published collection has updated first contribution time.
+        # Test editor of published collection has updated
+        # first contribution time.
         rights_manager.release_ownership_of_collection(
             self.admin_id, self.COL_ID)
 
@@ -285,7 +391,8 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         self.assertIsNotNone(user_services.get_user_settings(
             self.editor_id).first_contribution_msec)
 
-    def test_contribution_msec_does_not_update_until_collection_is_published(self):
+    def test_contribution_msec_does_not_update_until_collection_is_published(
+            self):
         self.save_new_valid_collection(
             self.COL_ID, self.admin_id, title=self.COLLECTION_TITLE,
             category=self.COLLECTION_CATEGORY,
@@ -330,7 +437,8 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         self.assertIsNotNone(user_services.get_user_settings(
             self.editor_id).first_contribution_msec)
 
-    def test_contribution_msec_does_not_change_if_no_contribution_to_collection(self):
+    def test_contribution_msec_does_not_change_if_no_contribution_to_collection(
+            self):
         self.save_new_valid_collection(
             self.COL_ID, self.admin_id, title=self.COLLECTION_TITLE,
             category=self.COLLECTION_CATEGORY,

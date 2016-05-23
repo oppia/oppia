@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Unit tests for the CodeRepl interaction.
- *
- * @author sfederwisch@google.com (Stephanie Federwisch)
  */
 
 describe('CodeRepl interaction', function() {

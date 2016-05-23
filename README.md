@@ -44,10 +44,7 @@ You can help with Oppia's development in many ways, including art, coding, desig
   * **Developers**: please see the [CONTRIBUTING](CONTRIBUTING.md) file for instructions on how to set things up and commit changes.
   * **All other contributors**: please see our [general contributor guidelines](https://github.com/oppia/oppia/wiki/Contributing-to-Oppia).
 
-In addition, if you're making contributions to the codebase, please sign the CLA so that we can accept your contributions.
-  * If you're contributing as an individual, use the [individual CLA](https://goo.gl/forms/AttNH80OV0).
-  * If your company owns the copyright to your contributions, a company representative should sign the [corporate CLA](https://goo.gl/forms/xDq9gK3Zcv).
-
+In addition, if you'd like to make contributions to the codebase, please follow [these instructions](https://github.com/oppia/oppia/blob/develop/CONTRIBUTING.md#setting-things-up), which will walk you through setting things up, signing the CLA, and joining the developer mailing list. Thanks!
 
 ## Support
 
@@ -68,4 +65,5 @@ The Oppia code is released under the [Apache v2 license](https://github.com/oppi
   * [Announcements mailing list](http://groups.google.com/group/oppia-announce)
   * Social media: [G+](https://plus.google.com/109898456505810251700/about), [YouTube](https://www.youtube.com/channel/UC5c1G7BNDCfv1rczcBp9FPw), [FB](https://www.facebook.com/oppiaorg), [Twitter](https://twitter.com/oppiaorg)
 
-We also have a public chat room on Gitter: [https://gitter.im/oppia/oppia-chat](https://gitter.im/oppia/oppia-chat). Drop by and say hello!
+We also have public chat rooms on Gitter: [https://gitter.im/oppia/oppia-chat](https://gitter.im/oppia/oppia-chat) and the #oppia channel on Freenode IRC. Drop by and say hello!
+

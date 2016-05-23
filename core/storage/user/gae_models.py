@@ -52,7 +52,7 @@ class UserSettingsModel(base_models.BaseModel):
     # Exploration language preferences specified by the user.
     # TODO(sll): Add another field for the language that the user wants the
     # site to display in. These language preferences are mainly for the purpose
-    # of figuring out what to show by default in the gallery.
+    # of figuring out what to show by default in the library index page.
     preferred_language_codes = ndb.StringProperty(
         repeated=True,
         indexed=True,
@@ -99,6 +99,11 @@ class UserEmailPreferencesModel(base_models.BaseModel):
     # The user's preference for receiving general site updates. This is set to
     # None if the user has never set a preference.
     site_updates = ndb.BooleanProperty(indexed=True)
+
+    # The user's preference for receiving email when user is added as a member
+    # in exploration. This is set to True when user has never set a preference.
+    editor_role_notifications = ndb.BooleanProperty(
+        indexed=True, default=feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
 
 
 class UserSubscriptionsModel(base_models.BaseModel):
@@ -157,6 +162,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     # The user id.
     user_id = ndb.StringProperty(required=True, indexed=True)
+
     # The exploration id.
     exploration_id = ndb.StringProperty(required=True, indexed=True)
 
@@ -166,6 +172,15 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     # When the most recent rating was awarded, or None if not rated.
     rated_on = ndb.DateTimeProperty(default=None, indexed=False)
+
+    # List of uncommitted changes made by the user to the exploration.
+    draft_change_list = ndb.JsonProperty(default=None)
+
+    # Timestamp of when the change list was last updated.
+    draft_change_list_last_updated = ndb.DateTimeProperty(default=None)
+
+    # The exploration version that this change list applied to.
+    draft_change_list_exp_version = ndb.IntegerProperty(default=None)
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):

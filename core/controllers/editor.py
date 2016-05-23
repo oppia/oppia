@@ -59,6 +59,14 @@ NEW_STATE_TEMPLATE = {
     'unresolved_answers': {},
 }
 
+DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = config_domain.ConfigProperty(
+    'default_twitter_share_message_editor', {
+        'type': 'unicode',
+    },
+    'Default text for the Twitter share message for the editor',
+    default_value=(
+        'Check out this interactive lesson I created on Oppia - a free '
+        'platform for teaching and learning!'))
 
 def get_value_generators_js():
     """Return a string that concatenates the JS for all value generators."""
@@ -68,18 +76,6 @@ def get_value_generators_js():
     for _, generator_cls in all_value_generators.iteritems():
         value_generators_js += generator_cls.get_js_template()
     return value_generators_js
-
-VALUE_GENERATORS_JS = config_domain.ComputedProperty(
-    'value_generators_js', {'type': 'unicode'},
-    'JavaScript code for the value generators', get_value_generators_js)
-
-MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE = (
-    'https://moderator/request/forum/url')
-MODERATOR_REQUEST_FORUM_URL = config_domain.ConfigProperty(
-    'moderator_request_forum_url', {'type': 'unicode'},
-    'A link to the forum for nominating explorations to be featured '
-    'in the gallery',
-    default_value=MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE)
 
 
 def _require_valid_version(version_from_payload, exploration_version):
@@ -96,7 +92,7 @@ def _require_valid_version(version_from_payload, exploration_version):
 
 
 def require_editor(handler):
-    """Decorator that checks if the user can edit the given entity."""
+    """Decorator that checks if the user can edit the given exploration."""
     def test_editor(self, exploration_id, escaped_state_name=None, **kwargs):
         """Gets the user and exploration id if the user can edit it.
 
@@ -138,7 +134,7 @@ def require_editor(handler):
         if not escaped_state_name:
             return handler(self, exploration_id, **kwargs)
 
-        state_name = self.unescape_state_name(escaped_state_name)
+        state_name = utils.unescape_encoded_uri_component(escaped_state_name)
         if state_name not in exploration.states:
             logging.error('Could not find state: %s' % state_name)
             logging.error('Available states: %s' % exploration.states.keys())
@@ -182,8 +178,6 @@ class ExplorationPage(EditorHandler):
             rights_manager.Actor(self.user_id).can_edit(
                 rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id))
 
-        value_generators_js = VALUE_GENERATORS_JS.value
-
         interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
 
@@ -210,6 +204,10 @@ class ExplorationPage(EditorHandler):
             'GADGET_SPECS': gadget_registry.Registry.get_all_specs(),
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'PANEL_SPECS': feconf.PANELS_PROPERTIES,
+            'DEFAULT_OBJECT_VALUES': rule_domain.get_default_object_values(),
+            'SHARING_OPTIONS': base.SHARING_OPTIONS.value,
+            'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR': (
+                DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR.value),
             'additional_angular_modules': additional_angular_modules,
             'can_delete': rights_manager.Actor(
                 self.user_id).can_delete(
@@ -239,16 +237,14 @@ class ExplorationPage(EditorHandler):
                 interaction_templates),
             'interaction_validators_html': jinja2.utils.Markup(
                 interaction_validators_html),
-            'moderator_request_forum_url': MODERATOR_REQUEST_FORUM_URL.value,
             'nav_mode': feconf.NAV_MODE_CREATE,
-            'value_generators_js': jinja2.utils.Markup(value_generators_js),
+            'value_generators_js': jinja2.utils.Markup(
+                get_value_generators_js()),
             'title': exploration.title,
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'ALLOWED_GADGETS': feconf.ALLOWED_GADGETS,
             'ALLOWED_INTERACTION_CATEGORIES': (
                 feconf.ALLOWED_INTERACTION_CATEGORIES),
-            # This is needed for the exploration preview.
-            'CATEGORIES_TO_COLORS': feconf.CATEGORIES_TO_COLORS,
             'INVALID_PARAMETER_NAMES': feconf.INVALID_PARAMETER_NAMES,
             'NEW_STATE_TEMPLATE': NEW_STATE_TEMPLATE,
             'SHOW_TRAINABLE_UNRESOLVED_ANSWERS': (
@@ -256,7 +252,7 @@ class ExplorationPage(EditorHandler):
             'TAG_REGEX': feconf.TAG_REGEX,
         })
 
-        self.render_template('editor/exploration_editor.html')
+        self.render_template('exploration_editor/exploration_editor.html')
 
 
 class ExplorationHandler(EditorHandler):
@@ -402,7 +398,8 @@ class ExplorationRightsHandler(EditorHandler):
         if new_member_username:
             if not rights_manager.Actor(
                     self.user_id).can_modify_roles(
-                        rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
+                        rights_manager.ACTIVITY_TYPE_EXPLORATION,
+                        exploration_id):
                 raise self.UnauthorizedUserException(
                     'Only an owner of this exploration can add or change '
                     'roles.')
@@ -415,6 +412,9 @@ class ExplorationRightsHandler(EditorHandler):
 
             rights_manager.assign_role_for_exploration(
                 self.user_id, exploration_id, new_member_id, new_member_role)
+            email_manager.send_role_notification_email(
+                self.user_id, new_member_id, new_member_role, exploration_id,
+                exploration.title)
 
         elif is_public is not None:
             exploration = exp_services.get_exploration_by_id(exploration_id)
@@ -568,7 +568,7 @@ class UntrainedAnswersHandler(EditorHandler):
         except:
             raise self.PageNotFoundException
 
-        state_name = self.unescape_state_name(escaped_state_name)
+        state_name = utils.unescape_encoded_uri_component(escaped_state_name)
         if state_name not in exploration.states:
             # If trying to access a non-existing state, there is no training
             # data associated with it.
@@ -810,7 +810,7 @@ class StateRulesStatsHandler(EditorHandler):
         except:
             raise self.PageNotFoundException
 
-        state_name = self.unescape_state_name(escaped_state_name)
+        state_name = utils.unescape_encoded_uri_component(escaped_state_name)
         if state_name not in exploration.states:
             logging.error('Could not find state: %s' % state_name)
             logging.error('Available states: %s' % exploration.states.keys())

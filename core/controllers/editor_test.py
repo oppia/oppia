@@ -46,7 +46,7 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-        self.set_admins([self.ADMIN_EMAIL])
+        self.set_admins([self.ADMIN_USERNAME])
 
     def assert_can_edit(self, response_body):
         """Returns True if the response body indicates that the exploration is
@@ -243,6 +243,7 @@ class EditorTest(BaseEditorControllerTest):
         with self.swap(feconf, 'SHOW_TRAINABLE_UNRESOLVED_ANSWERS', True):
             def _create_answer(value, count=1):
                 return {'value': value, 'count': count}
+
             def _create_training_data(*arg):
                 return [_create_answer(value) for value in arg]
 
@@ -302,7 +303,7 @@ class EditorTest(BaseEditorControllerTest):
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': state_name,
                     'property_name': (
-                        exp_domain.STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS),
+                        exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS),
                     'new_value': ['sad']
                 }],
                 'commit_message': 'Update confirmed unclassified answers',
@@ -330,7 +331,7 @@ class EditorTest(BaseEditorControllerTest):
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': state_name,
                     'property_name': (
-                        exp_domain.STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS),
+                        exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS),
                     'new_value': []
                 }, {
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -357,7 +358,7 @@ class EditorTest(BaseEditorControllerTest):
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': state_name,
                     'property_name': (
-                        exp_domain.STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS),
+                        exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS),
                     'new_value': ['sad']
                 }],
                 'commit_message': 'Update confirmed unclassified answers',
@@ -790,7 +791,7 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
         # Joe logs in.
         self.login('joe@example.com')
 
-        response = self.testapp.get(feconf.GALLERY_URL)
+        response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
         self.assertEqual(response.status_int, 200)
         response = self.testapp.get('/create/%s' % exp_id)
         self.assertEqual(response.status_int, 200)
@@ -800,8 +801,9 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
         config_services.set_property(
             feconf.SYSTEM_COMMITTER_ID, 'banned_usernames', ['joe'])
 
-        # Test that Joe is banned. (He can still access the gallery.)
-        response = self.testapp.get(feconf.GALLERY_URL, expect_errors=True)
+        # Test that Joe is banned. (He can still access the library page.)
+        response = self.testapp.get(
+            feconf.LIBRARY_INDEX_URL, expect_errors=True)
         self.assertEqual(response.status_int, 200)
         response = self.testapp.get('/create/%s' % exp_id, expect_errors=True)
         self.assertEqual(response.status_int, 200)
@@ -982,7 +984,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.set_moderators([self.MODERATOR_EMAIL])
+        self.set_moderators([self.MODERATOR_USERNAME])
 
         # The editor publishes an exploration.
         self.save_new_valid_exploration(

@@ -22,6 +22,9 @@ good-names=e,_,d,f,i,l,p,w,fn,fs,id,pc,sc,zf,setUp,tearDown,longMessage,maxDiff
 # Regex for dummy variables (to prevent 'unused argument' errors)
 dummy-variables-rgx=_|unused_*
 
+# Regular expression which should match good variable names
+variable-rgx=[a-z_]+
+
 [DESIGN]
 
 # Minimum number of public methods for a class (see R0903).
@@ -31,6 +34,8 @@ min-public-methods=0
 bad-functions=apply,input
 
 [FORMAT]
+
+max-line-length=80
 
 indent-string='    '
 

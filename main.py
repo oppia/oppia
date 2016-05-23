@@ -19,17 +19,19 @@ import logging
 # pylint: disable=relative-import
 from core.controllers import admin
 from core.controllers import base
+from core.controllers import collection_editor
 from core.controllers import collection_viewer
 from core.controllers import editor
 from core.controllers import feedback
-from core.controllers import galleries
 from core.controllers import home
+from core.controllers import library
 from core.controllers import moderator
 from core.controllers import pages
 from core.controllers import profile
 from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
+from core.domain import user_services
 from core.platform import models
 import feconf
 # pylint: enable=relative-import
@@ -59,6 +61,17 @@ class WarmupHandler(base.BaseHandler):
     def get(self):
         """Handles GET warmup requests."""
         pass
+
+
+class HomePageRedirectHandler(base.BaseHandler):
+    """When a request is made to '/', check the user's login status, and
+    redirect them appropriately.
+    """
+    def get(self):
+        if self.user_id and user_services.has_fully_registered(self.user_id):
+            self.redirect(feconf.MY_EXPLORATIONS_URL)
+        else:
+            self.redirect(feconf.SPLASH_URL)
 
 
 def get_redirect_route(regex_route, handler, name, defaults=None):
@@ -142,6 +155,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.SITE_LANGUAGE_DATA_URL,
         home.SiteLanguageHandler, 'save_site_language'),
 
+    get_redirect_route(feconf.SPLASH_URL, pages.SplashPage, 'splash_page'),
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
     get_redirect_route(
         r'/participate', pages.ParticipatePage, 'participate_page'),
@@ -174,31 +188,42 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler, 'value_generator_handler'),
 
-    get_redirect_route(r'/', galleries.GalleryPage, 'gallery_page'),
-    get_redirect_route(
-        r'%s' % feconf.GALLERY_URL, galleries.GalleryPage, 'gallery_page'),
-    get_redirect_route(
-        r'%s' % feconf.GALLERY_DATA_URL, galleries.GalleryHandler,
-        'gallery_handler'),
+    get_redirect_route(r'/', HomePageRedirectHandler, 'home_page'),
 
     get_redirect_route(
-        r'%s' % feconf.LEARN_GALLERY_URL, galleries.GalleryRedirectPage,
-        'learn_gallery_page'),
+        r'%s' % feconf.LIBRARY_INDEX_URL, library.LibraryPage,
+        'library_index_page'),
     get_redirect_route(
-        r'%s' % feconf.PLAYTEST_QUEUE_URL, galleries.GalleryRedirectPage,
-        'playtest_queue_page'),
+        r'/libraryindexhandler', library.LibraryIndexHandler,
+        'library_index_handler'),
     get_redirect_route(
-        r'%s' % feconf.CONTRIBUTE_GALLERY_URL, galleries.GalleryRedirectPage,
-        'contribute_gallery_page'),
+        r'%s' % feconf.LIBRARY_SEARCH_URL, library.LibraryPage,
+        'library_search_page'),
+    get_redirect_route(
+        r'%s' % feconf.LIBRARY_SEARCH_DATA_URL, library.SearchHandler,
+        'library_search_handler'),
+    get_redirect_route(
+        r'/gallery', library.LibraryRedirectPage, 'old_gallery_page_1'),
+    get_redirect_route(
+        r'/contribute', library.LibraryRedirectPage, 'old_gallery_page_2'),
+    get_redirect_route(
+        r'/learn', library.LibraryRedirectPage, 'old_gallery_page_3'),
+    get_redirect_route(
+        r'/playtest', library.LibraryRedirectPage, 'old_gallery_page_4'),
+    get_redirect_route(
+        feconf.EXPLORATION_SUMMARIES_DATA_URL,
+        library.ExplorationSummariesHandler,
+        'exploration_summaries_handler'),
+
     get_redirect_route(
         r'%s' % feconf.NEW_EXPLORATION_URL,
-        galleries.NewExploration, 'new_exploration'),
+        home.NewExploration, 'new_exploration'),
+    get_redirect_route(
+        r'%s' % feconf.NEW_COLLECTION_URL,
+        home.NewCollection, 'new_collection'),
     get_redirect_route(
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
-        galleries.UploadExploration, 'upload_exploration'),
-    get_redirect_route(
-        r'/explorationsummarieshandler/data',
-        galleries.ExplorationSummariesHandler, 'exploration_summaries_handler'),
+        home.UploadExploration, 'upload_exploration'),
 
     get_redirect_route(
         r'/profile/<username>', profile.ProfilePage, 'profile_page'),
@@ -286,7 +311,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/imageupload/<exploration_id>',
         editor.ImageUploadHandler, 'image_upload_handler'),
     get_redirect_route(
-        r'/createhandler/resolved_answers/<exploration_id>/<escaped_state_name>',
+        r'/createhandler/resolved_answers/<exploration_id>/' +
+        r'<escaped_state_name>',
         editor.ResolvedAnswersHandler, 'resolved_answers_handler'),
     get_redirect_route(
         r'/createhandler/training_data/<exploration_id>/<escaped_state_name>',
@@ -309,12 +335,14 @@ URLS = MAPREDUCE_HANDLERS + [
         editor.ExplorationSnapshotsHandler, 'exploration_snapshots_handler'),
     get_redirect_route(
         r'/createhandler/statisticsversion/<exploration_id>',
-        editor.ExplorationStatsVersionsHandler, 'exploration_stats_versions_handler'),
+        editor.ExplorationStatsVersionsHandler,
+        'exploration_stats_versions_handler'),
     get_redirect_route(
         r'/createhandler/statistics/<exploration_id>/<exploration_version>',
         editor.ExplorationStatisticsHandler, 'exploration_statistics_handler'),
     get_redirect_route(
-        r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',
+        r'/createhandler/state_rules_stats/<exploration_id>/' +
+        r'<escaped_state_name>',
         editor.StateRulesStatsHandler, 'state_rules_stats_handler'),
     get_redirect_route(
         r'/createhandler/started_tutorial_event',
@@ -329,14 +357,14 @@ URLS = MAPREDUCE_HANDLERS + [
         'recent_feedback_messages_handler'),
 
     get_redirect_route(
-        r'%s/<exploration_id>' % feconf.FEEDBACK_LAST_UPDATED_URL_PREFIX,
-        feedback.FeedbackLastUpdatedHandler, 'feedback_last_updated_handler'),
-    get_redirect_route(
         r'%s/<exploration_id>' % feconf.FEEDBACK_THREADLIST_URL_PREFIX,
         feedback.ThreadListHandler, 'feedback_threadlist_handler'),
     get_redirect_route(
         r'%s/<exploration_id>/<thread_id>' % feconf.FEEDBACK_THREAD_URL_PREFIX,
         feedback.ThreadHandler, 'feedback_thread_handler'),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.FEEDBACK_STATS_URL_PREFIX,
+        feedback.FeedbackStatsHandler, 'feedback_stats_handler'),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.SUGGESTION_URL_PREFIX,
         feedback.SuggestionHandler, 'suggestion_handler'),
@@ -354,6 +382,18 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_DATA_URL_PREFIX,
         collection_viewer.CollectionDataHandler, 'collection_data_handler'),
+
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_EDITOR_URL_PREFIX,
+        collection_editor.CollectionEditorPage, 'collection_editor_page'),
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_WRITABLE_DATA_URL_PREFIX,
+        collection_editor.WritableCollectionDataHandler,
+        'writable_collection_data_handler'),
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_RIGHTS_PREFIX,
+        collection_editor.CollectionRightsHandler,
+        'collection_rights_handler'),
 
     get_redirect_route(
         r'/notificationshandler', home.NotificationsHandler,

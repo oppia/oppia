@@ -14,21 +14,21 @@
 
 /**
  * @fileoverview Modal and functionality for the create exploration button.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 // Service for the create/upload exploration buttons and modals.
 oppia.factory('ExplorationCreationButtonService', [
-  '$filter', '$http', '$modal', '$timeout', '$rootScope',
-  'validatorsService', 'warningsData', 'focusService',
+  '$filter', '$http', '$modal', '$timeout', '$rootScope', '$window',
+  'validatorsService', 'alertsService', 'focusService',
+  'siteAnalyticsService', 'urlService',
   function(
-      $filter, $http, $modal, $timeout, $rootScope,
-      validatorsService, warningsData, focusService) {
+      $filter, $http, $modal, $timeout, $rootScope, $window,
+      validatorsService, alertsService, focusService,
+      siteAnalyticsService, urlService) {
     var getModalInstance = function(categoryList, isUploadModal) {
       var modalInstance = $modal.open({
         backdrop: true,
-        templateUrl: 'modals/galleryCreateNew',
+        templateUrl: 'modals/createNewActivity',
         resolve: {
           categoriesForDropdown: function() {
             var result = [];
@@ -49,11 +49,15 @@ oppia.factory('ExplorationCreationButtonService', [
           '$scope', '$modalInstance', 'categoriesForDropdown', 'isUploadModal',
           function(
               $scope, $modalInstance, categoriesForDropdown, isUploadModal) {
+            $scope.createNewTitle = (
+              isUploadModal ? 'Upload an Exploration' :
+              'Create New Exploration');
+            $scope.activityName = 'exploration';
             $scope.categoriesForDropdown = categoriesForDropdown;
-            $scope.newExplorationTitle = '';
-            $scope.newExplorationCategory = '';
-            $scope.newExplorationObjective = '';
-            $scope.newExplorationLanguageCode = GLOBALS.DEFAULT_LANGUAGE_CODE;
+            $scope.newActivityTitle = '';
+            $scope.newActivityCategory = '';
+            $scope.newActivityObjective = '';
+            $scope.newActivityLanguageCode = GLOBALS.DEFAULT_LANGUAGE_CODE;
             $scope.isUploadModal = isUploadModal;
             $scope.changedAtLeastOnce = false;
 
@@ -67,7 +71,7 @@ oppia.factory('ExplorationCreationButtonService', [
               }
 
               if (!category) {
-                warningsData.addWarning(
+                alertsService.addWarning(
                   'Please specify a category for this exploration.');
                 return;
               }
@@ -80,7 +84,7 @@ oppia.factory('ExplorationCreationButtonService', [
               if ($scope.isUploadModal) {
                 var file = document.getElementById('newFileInput').files[0];
                 if (!file || !file.size) {
-                  warningsData.addWarning('Empty file detected.');
+                  alertsService.addWarning('Empty file detected.');
                   return;
                 }
                 returnObj.yamlFile = file;
@@ -115,7 +119,7 @@ oppia.factory('ExplorationCreationButtonService', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              warningsData.clear();
+              alertsService.clearWarnings();
             };
           }
         ]
@@ -125,8 +129,8 @@ oppia.factory('ExplorationCreationButtonService', [
         // The $timeout seems to be needed in order to give the modal time to
         // render.
         $timeout(function() {
-          focusService.setFocus('newExplorationModalOpened');
-        }, 300);
+          focusService.setFocus('newActivityModalOpened');
+        }, 500);
       });
 
       return modalInstance;
@@ -134,29 +138,42 @@ oppia.factory('ExplorationCreationButtonService', [
 
     return {
       showCreateExplorationModal: function(categoryList) {
-        warningsData.clear();
+        alertsService.clearWarnings();
 
-        getModalInstance(categoryList, false).result.then(function(result) {
-          var category = $filter('normalizeWhitespace')(result.category);
-          if (!validatorsService.isValidEntityName(category, true)) {
-            return;
-          }
+        var currentPathname = urlService.getPathname();
 
-          $rootScope.loadingMessage = 'Creating exploration';
-          $http.post('/contributehandler/create_new', {
-            category: category,
-            language_code: result.languageCode,
-            objective: $filter('normalizeWhitespace')(result.objective),
-            title: result.title
-          }).success(function(data) {
-            window.location = '/create/' + data.explorationId;
-          }).error(function() {
-            $rootScope.loadingMessage = '';
+        if (currentPathname !== '/my_explorations') {
+          window.location.replace('/my_explorations?mode=create');
+        } else {
+          siteAnalyticsService.registerOpenExplorationCreationModalEvent();
+
+          getModalInstance(categoryList, false).result.then(function(result) {
+            var category = $filter('normalizeWhitespace')(result.category);
+            if (!validatorsService.isValidEntityName(category, true)) {
+              return;
+            }
+
+            $rootScope.loadingMessage = 'Creating exploration';
+            $http.post('/contributehandler/create_new', {
+              category: category,
+              language_code: result.languageCode,
+              objective: $filter('normalizeWhitespace')(result.objective),
+              title: result.title
+            }).then(function(response) {
+              siteAnalyticsService.registerCreateNewExplorationEvent(
+                response.data.explorationId);
+              $timeout(function() {
+                $window.location = '/create/' + response.data.explorationId;
+              }, 150);
+              return false;
+            }, function() {
+              $rootScope.loadingMessage = '';
+            });
           });
-        });
+        }
       },
       showUploadExplorationModal: function(categoryList) {
-        warningsData.clear();
+        alertsService.clearWarnings();
 
         getModalInstance(categoryList, true).result.then(function(result) {
           var title = result.title;
@@ -193,7 +210,7 @@ oppia.factory('ExplorationCreationButtonService', [
           }).fail(function(data) {
             var transformedData = data.responseText.substring(5);
             var parsedResponse = JSON.parse(transformedData);
-            warningsData.addWarning(
+            alertsService.addWarning(
               parsedResponse.error || 'Error communicating with server.');
             $rootScope.loadingMessage = '';
             $scope.$apply();

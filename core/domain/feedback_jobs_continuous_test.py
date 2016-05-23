@@ -60,15 +60,17 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
             self.ALL_CC_MANAGERS_FOR_TESTS)
 
-    def _run_job_and_check_results(self, exp_id, expected_thread_analytics):
+    def _run_job_and_check_results(self, exp_id,
+                                   expected_thread_analytics_dict):
         self.process_and_flush_pending_tasks()
         ModifiedFeedbackAnalyticsAggregator.start_computation()
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)
         self.process_and_flush_pending_tasks()
 
         self.assertEqual(
-            ModifiedFeedbackAnalyticsAggregator.get_thread_analytics(exp_id),
-            expected_thread_analytics)
+            ModifiedFeedbackAnalyticsAggregator.get_thread_analytics(
+                exp_id).to_dict(),
+            expected_thread_analytics_dict)
 
     def test_no_threads(self):
         with self._get_swap_context():
@@ -147,14 +149,14 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
             self.assertEqual(
                 ModifiedFeedbackAnalyticsAggregator.get_thread_analytics(
-                    exp_id_1),
+                    exp_id_1).to_dict(),
                 {
                     'num_open_threads': 2,
                     'num_total_threads': 2,
                 })
             self.assertEqual(
                 ModifiedFeedbackAnalyticsAggregator.get_thread_analytics(
-                    exp_id_2),
+                    exp_id_2).to_dict(),
                 {
                     'num_open_threads': 2,
                     'num_total_threads': 2,
@@ -306,11 +308,11 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             self.ALL_CC_MANAGERS_FOR_TESTS)
 
     def _flush_tasks_and_check_analytics(
-            self, exp_id, expected_thread_analytics):
+            self, exp_id, expected_thread_analytics_dict):
         self.process_and_flush_pending_tasks()
         self.assertEqual(
-            ModifiedFeedbackAnalyticsAggregator.get_thread_analytics(exp_id),
-            expected_thread_analytics)
+            ModifiedFeedbackAnalyticsAggregator.get_thread_analytics(
+                exp_id).to_dict(), expected_thread_analytics_dict)
 
     def test_no_threads(self):
         with self._get_swap_context():
@@ -401,7 +403,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
 
             # Trigger close event.
             threadlist = feedback_services.get_all_threads(exp_id, False)
-            thread_id = threadlist[0]['thread_id']
+            thread_id = threadlist[0].get_thread_id()
             feedback_services.create_message(
                 exp_id, thread_id, 'author',
                 feedback_models.STATUS_CHOICES_FIXED, None, 'some text')
@@ -428,7 +430,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
 
             # Trigger close event.
             threadlist = feedback_services.get_all_threads(exp_id, False)
-            thread_id = threadlist[0]['thread_id']
+            thread_id = threadlist[0].get_thread_id()
             feedback_services.create_message(
                 exp_id, thread_id, 'author',
                 feedback_models.STATUS_CHOICES_FIXED, None, 'some text')
@@ -439,7 +441,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
 
             # Trigger reopen event.
             threadlist = feedback_services.get_all_threads(exp_id, False)
-            thread_id = threadlist[0]['thread_id']
+            thread_id = threadlist[0].get_thread_id()
             feedback_services.create_message(
                 exp_id, thread_id, 'author',
                 feedback_models.STATUS_CHOICES_OPEN, None, 'some text')
@@ -466,7 +468,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
 
             # Trigger close event.
             threadlist = feedback_services.get_all_threads(exp_id, False)
-            thread_id = threadlist[0]['thread_id']
+            thread_id = threadlist[0].get_thread_id()
             feedback_services.create_message(
                 exp_id, thread_id, 'author',
                 feedback_models.STATUS_CHOICES_FIXED, None, 'some text')
@@ -477,7 +479,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
 
             # Trigger thread status change event.
             threadlist = feedback_services.get_all_threads(exp_id, False)
-            thread_id = threadlist[0]['thread_id']
+            thread_id = threadlist[0].get_thread_id()
             feedback_services.create_message(
                 exp_id, thread_id, 'author',
                 feedback_models.STATUS_CHOICES_IGNORED, None, 'some text')

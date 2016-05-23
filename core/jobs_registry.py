@@ -24,6 +24,7 @@ from core.domain import stats_jobs_continuous
 from core.domain import stats_jobs_one_off
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
+from core.domain import email_jobs_one_off
 
 # List of all manager classes for one-off batch jobs for which to show controls
 # on the admin dashboard.
@@ -38,7 +39,9 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ExpSummariesContributorsOneOffJob,
     user_jobs_one_off.UserFirstContributionMsecOneOffJob,
     exp_jobs_one_off.ExplorationMigrationJobManager,
-    exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob]
+    exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob,
+    email_jobs_one_off.EmailHashRegenerationOneOffJob,
+    user_jobs_one_off.UserProfilePictureOneOffJob]
 
 # List of all ContinuousComputation managers to show controls for on the
 # admin dashboard.

@@ -32,8 +32,13 @@
           {% endif %}
         <br>
 
+<<<<<<< HEAD
 	<img src="/images/general/oops_mint.png" alt="Oops!" width="299" height="142"/>
         <p>
+=======
+        <img src="/images/general/oops_mint.png" alt="Oops!" width="299" height="142"/>
+        <p><h3>
+>>>>>>> develop
           {% if code == 400 %}
             <h3 translate="I18N_ERROR_MESSAGE_400"></h3>
           {% elif code == 401 %}
@@ -49,4 +54,8 @@
     </div>
 
   </div>
+{% endblock %}
+
+{% block footer%}
+  {% include 'footer.html' %}
 {% endblock %}

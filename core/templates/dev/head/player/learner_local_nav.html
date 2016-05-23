@@ -1,18 +1,28 @@
 <ul class="nav navbar-nav oppia-navbar-nav navbar-right"
     ng-controller="LearnerLocalNav" style="margin-right: 0px;">
   <li popover-placement="bottom" popover-template="'popover/feedback'" popover-trigger="click">
+<<<<<<< HEAD
     <a href="" tooltip="<['I18N_PLAYER_FEEDBACK_TOOLTIP' | translate]>" tooltip-placement="bottom">
       <span class="glyphicon glyphicon-comment"></span>
+=======
+    <a href="" tooltip="Feedback" tooltip-placement="bottom">
+      <i class="material-icons">&#xE87F;</i>
+>>>>>>> develop
     </a>
   </li>
   <li>
     {% if can_edit %}
+<<<<<<< HEAD
       <a ng-href="/create/<[explorationId]>" tooltip="<['I18N_PLAYER_EDIT_TOOLTIP' | translate]>" tooltip-placement="bottom" target="_blank">
         <span class="glyphicon glyphicon-pencil"></span>
+=======
+      <a ng-href="/create/<[explorationId]>" tooltip="Edit" tooltip-placement="bottom" target="_blank">
+        <i class="material-icons">&#xE254;</i>
+>>>>>>> develop
       </a>
     {% elif username %}
       <a ng-click="showLearnerSuggestionModal()" tooltip="Suggest Changes" tooltip-placement="bottom" target="_blank">
-        <span class="glyphicon glyphicon-pencil"></span>
+        <i class="material-icons">&#xE254;</i>
       </a>
     {% endif %}
   </li>

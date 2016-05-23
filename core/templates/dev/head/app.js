@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Initialization and basic configuration for the Oppia module.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 // TODO(sll): Remove the check for window.GLOBALS. This check is currently
@@ -24,30 +22,41 @@
 // in order to make the testing and production environments match.
 var oppia = angular.module(
   'oppia', [
+<<<<<<< HEAD
     'ngMaterial', 'ngAnimate', 'ngSanitize', 'ngResource', 'ui.bootstrap',
     'ui.sortable', 'infinite-scroll', 'ngJoyRide', 'ngImgCrop', 'ui.validate',
     'textAngular', 'pascalprecht.translate', 'ngCookies'
+=======
+    'ngMaterial', 'ngAnimate', 'ngSanitize', 'ngTouch', 'ngResource',
+    'ui.bootstrap', 'ui.sortable', 'infinite-scroll', 'ngJoyRide', 'ngImgCrop',
+    'ui.validate', 'textAngular', 'toastr'
+>>>>>>> develop
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
                    : []));
 
-// Set the AngularJS interpolators as <[ and ]>, to not conflict with Jinja2
-// templates.
-// Set default headers for POST and PUT requests.
-// Add an interceptor to convert requests to strings and to log and show
-// warnings for error responses.
-oppia.config(['$interpolateProvider', '$httpProvider',
-    function($interpolateProvider, $httpProvider) {
-  $interpolateProvider.startSymbol('<[');
-  $interpolateProvider.endSymbol(']>');
+oppia.config([
+  '$compileProvider', '$httpProvider', '$interpolateProvider',
+  '$locationProvider',
+  function(
+      $compileProvider, $httpProvider, $interpolateProvider,
+      $locationProvider) {
+    // This improves performance by disabling debug data. For more details,
+    // see https://code.angularjs.org/1.5.5/docs/guide/production
+    $compileProvider.debugInfoEnabled(false);
 
-  $httpProvider.defaults.headers.post = {
-    'Content-Type': 'application/x-www-form-urlencoded'
-  };
-  $httpProvider.defaults.headers.put = {
-    'Content-Type': 'application/x-www-form-urlencoded'
-  };
+    // Set the AngularJS interpolators as <[ and ]>, to not conflict with
+    // Jinja2 templates.
+    $interpolateProvider.startSymbol('<[');
+    $interpolateProvider.endSymbol(']>');
 
+    // Prevent the search page from reloading if the search query is changed.
+    $locationProvider.html5Mode(false);
+    if (window.location.pathname == '/search/find') {
+      $locationProvider.html5Mode(true);
+    }
+
+<<<<<<< HEAD
   $httpProvider.interceptors.push([
     '$q', '$log', 'warningsData', function($q, $log, warningsData) {
       return {
@@ -81,15 +90,55 @@ oppia.config(['$interpolateProvider', '$httpProvider',
             var warningMessage = 'Error communicating with server.';
             if (rejection.data && rejection.data.error) {
               warningMessage = rejection.data.error;
+=======
+    // Set default headers for POST and PUT requests.
+    $httpProvider.defaults.headers.post = {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    };
+    $httpProvider.defaults.headers.put = {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    };
+
+    // Add an interceptor to convert requests to strings and to log and show
+    // warnings for error responses.
+    $httpProvider.interceptors.push([
+      '$q', '$log', 'alertsService', function($q, $log, alertsService) {
+        return {
+          request: function(config) {
+            // If this request carries data (in the form of a JS object),
+            // JSON-stringify it and store it under 'payload'.
+            if (config.data) {
+              config.data = $.param({
+                csrf_token: GLOBALS.csrf_token,
+                payload: JSON.stringify(config.data),
+                source: document.URL
+              }, true);
             }
-            warningsData.addWarning(warningMessage);
+            return config;
+          },
+          responseError: function(rejection) {
+            // A rejection status of -1 seems to indicate (it's hard to find
+            // documentation) that the response has not completed,
+            // which can occur if the user navigates away from the page
+            // while the response is pending, This should not be considered
+            // an error.
+            if (rejection.status !== -1) {
+              $log.error(rejection.data);
+
+              var warningMessage = 'Error communicating with server.';
+              if (rejection.data && rejection.data.error) {
+                warningMessage = rejection.data.error;
+              }
+              alertsService.addWarning(warningMessage);
+>>>>>>> develop
+            }
+            return $q.reject(rejection);
           }
-          return $q.reject(rejection);
-        }
-      };
-    }
-  ]);
-}]);
+        };
+      }
+    ]);
+  }
+]);
 
 oppia.config(['$provide', function($provide) {
   $provide.decorator('$log', ['$delegate', function($delegate) {
@@ -111,6 +160,24 @@ oppia.config(['$provide', function($provide) {
 
     return $delegate;
   }]);
+}]);
+
+oppia.config(['toastrConfig', function(toastrConfig) {
+  angular.extend(toastrConfig, {
+    allowHtml: false,
+    iconClasses: {
+      error: 'toast-error',
+      info: 'toast-info',
+      success: 'toast-success',
+      warning: 'toast-warning'
+    },
+    positionClass: 'toast-bottom-right',
+    messageClass: 'toast-message',
+    progressBar: false,
+    tapToDismiss: true,
+    timeOut: 1500,
+    titleClass: 'toast-title'
+  });
 }]);
 
 // Returns true if the user is on a mobile device.
@@ -232,7 +299,7 @@ oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
 // Service for validating things and (optionally) displaying warning messages
 // if the validation fails.
 oppia.factory('validatorsService', [
-    '$filter', 'warningsData', function($filter, warningsData) {
+    '$filter', 'alertsService', function($filter, alertsService) {
   return {
     /**
      * Checks whether an entity name is valid, and displays a warning message
@@ -246,7 +313,7 @@ oppia.factory('validatorsService', [
       input = $filter('normalizeWhitespace')(input);
       if (!input) {
         if (showWarnings) {
-          warningsData.addWarning('Please enter a non-empty name.');
+          alertsService.addWarning('Please enter a non-empty name.');
         }
         return false;
       }
@@ -254,7 +321,7 @@ oppia.factory('validatorsService', [
       for (var i = 0; i < GLOBALS.INVALID_NAME_CHARS.length; i++) {
         if (input.indexOf(GLOBALS.INVALID_NAME_CHARS[i]) !== -1) {
           if (showWarnings) {
-            warningsData.addWarning(
+            alertsService.addWarning(
              'Invalid input. Please use a non-empty description consisting ' +
              'of alphanumeric characters, spaces and/or hyphens.'
             );
@@ -273,7 +340,7 @@ oppia.factory('validatorsService', [
 
       if (input.length > 50) {
         if (showWarnings) {
-          warningsData.addWarning(
+          alertsService.addWarning(
             'Card names should be at most 50 characters long.');
         }
         return false;
@@ -286,7 +353,7 @@ oppia.factory('validatorsService', [
         if (showWarnings) {
           // TODO(sll): Allow this warning to be more specific in terms of what
           // needs to be entered.
-          warningsData.addWarning('Please enter a non-empty value.');
+          alertsService.addWarning('Please enter a non-empty value.');
         }
         return false;
       }
@@ -346,17 +413,108 @@ oppia.factory('urlService', ['$window', function($window) {
     },
     isIframed: function() {
       return !!(this.getUrlParams().iframed);
+    },
+    getPathname: function() {
+      return window.location.pathname;
     }
   };
 }]);
 
 // Service for computing the window dimensions.
 oppia.factory('windowDimensionsService', ['$window', function($window) {
+  var onResizeHooks = [];
+
+  $window.onresize = function() {
+    onResizeHooks.forEach(function(hookFn) {
+      hookFn();
+    });
+  };
   return {
     getWidth: function() {
       return (
         $window.innerWidth || document.documentElement.clientWidth ||
         document.body.clientWidth);
+    },
+    registerOnResizeHook: function(hookFn) {
+      onResizeHooks.push(hookFn);
+    }
+  };
+}]);
+
+// Service for sending events to Google Analytics.
+//
+// Note that events are only sent if the CAN_SEND_ANALYTICS_EVENTS flag is
+// turned on. This flag must be turned on explicitly by the application
+// owner in feconf.py.
+oppia.factory('siteAnalyticsService', ['$window', function($window) {
+  var CAN_SEND_ANALYTICS_EVENTS = GLOBALS.CAN_SEND_ANALYTICS_EVENTS;
+
+  // For definitions of the various arguments, please see:
+  // developers.google.com/analytics/devguides/collection/analyticsjs/events
+  var _sendEventToGoogleAnalytics = function(
+      eventCategory, eventAction, eventLabel) {
+    if ($window.ga && CAN_SEND_ANALYTICS_EVENTS) {
+      $window.ga('send', 'event', eventCategory, eventAction, eventLabel);
+    }
+  };
+
+  // For definitions of the various arguments, please see:
+  // developers.google.com/analytics/devguides/collection/analyticsjs/
+  //   social-interactions
+  var _sendSocialEventToGoogleAnalytics = function(
+      network, action, targetUrl) {
+    if ($window.ga && CAN_SEND_ANALYTICS_EVENTS) {
+      $window.ga('send', 'social', network, action, targetUrl);
+    }
+  };
+
+  return {
+    // The srcElement refers to the element on the page that is clicked.
+    registerStartLoginEvent: function(srcElement) {
+      _sendEventToGoogleAnalytics(
+        'LoginButton', 'click', $window.location.pathname + ' ' + srcElement);
+    },
+    registerNewSignupEvent: function() {
+      _sendEventToGoogleAnalytics('SignupButton', 'click', '');
+    },
+    registerClickBrowseLibraryButtonEvent: function() {
+      _sendEventToGoogleAnalytics(
+        'BrowseLibraryButton', 'click', $window.location.pathname);
+    },
+    registerClickCreateExplorationButtonEvent: function() {
+      _sendEventToGoogleAnalytics(
+        'CreateExplorationButton', 'click', $window.location.pathname);
+    },
+    registerOpenExplorationCreationModalEvent: function() {
+      _sendEventToGoogleAnalytics(
+        'CreateExplorationModal', 'open', $window.location.pathname);
+    },
+    registerCreateNewExplorationEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'NewExploration', 'create', explorationId);
+    },
+    registerCommitChangesToPrivateExplorationEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'CommitToPrivateExploration', 'click', explorationId);
+    },
+    registerOpenPublishExplorationModalEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'PublishExplorationModal', 'open', explorationId);
+    },
+    registerPublishExplorationEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'PublishExploration', 'click', explorationId);
+    },
+    registerShareExplorationEvent: function(network) {
+      _sendSocialEventToGoogleAnalytics(
+        network, 'share', $window.location.pathname);
+    },
+    registerOpenEmbedInfoEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics('EmbedInfoModal', 'open', explorationId);
+    },
+    registerCommitChangesToPublicExplorationEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'CommitToPublicExploration', 'click', explorationId);
     }
   };
 }]);

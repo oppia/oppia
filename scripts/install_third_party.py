@@ -27,6 +27,12 @@ import zipfile
 
 import common
 
+#These two lines prevent a "IOError: [Errno socket error]
+#[Errno -2] Name or service not known" error
+# in urllib.urlretrieve, if the user is behind a proxy.
+if 'VAGRANT' in os.environ:
+    os.environ['http_proxy'] = ''
+
 TOOLS_DIR = os.path.join('..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
 THIRD_PARTY_STATIC_DIR = os.path.join(THIRD_PARTY_DIR, 'static')
@@ -220,7 +226,9 @@ def test_manifest_syntax(dependency_type, dependency_dict):
                 print '------------------------------------------'
                 print 'There is syntax error in this dependency'
                 print dependency_dict
-                print 'Only one of these keys pair must be used: "%s".' % str(optional_keys)
+                print (
+                    'Only one of these keys pair must be used: "%s".'
+                    % str(optional_keys))
                 print 'Exiting'
                 sys.exit(1)
 
@@ -308,7 +316,7 @@ def download_manifest_files(filepath):
                     dependency_tar_root_name, dependency_target_root_name)
 
 
-MATHJAX_REV = '2.4-latest'
+MATHJAX_REV = '2.6.0'
 MATHJAX_ROOT_NAME = 'MathJax-%s' % MATHJAX_REV
 MATHJAX_TARGET_ROOT_NAME = MATHJAX_ROOT_NAME
 MATHJAX_DIR_PREFIX = os.path.join(
@@ -322,7 +330,7 @@ def _install_third_party_libs():
 
     # MathJax is too big. Remove many unneeded files by following these
     # instructions:
-    #   https://github.com/mathjax/MathJax/wiki/Shrinking-MathJax-for-%22local%22-installation
+    # https://github.com/mathjax/MathJax/wiki/Shrinking-MathJax-for-%22local%22-installation pylint: disable=line-too-long
     for subdir in MATHJAX_SUBDIRS_TO_REMOVE:
         full_dir = os.path.join(MATHJAX_DIR_PREFIX, subdir)
         if os.path.isdir(full_dir):

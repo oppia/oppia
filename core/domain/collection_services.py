@@ -31,6 +31,7 @@ import os
 from core.domain import collection_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import summary_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -59,7 +60,6 @@ _STATUS_PUBLICIZED_BONUS = 30
 # This is done to prevent the rank hitting 0 too easily. Note that
 # negative ranks are disallowed in the Search API.
 _DEFAULT_RANK = 20
-_MS_IN_ONE_DAY = 24 * 60 * 60 * 1000
 
 
 def _migrate_collection_to_latest_schema(versioned_collection):
@@ -125,6 +125,7 @@ def get_collection_from_model(collection_model, run_conversion=True):
     return collection_domain.Collection(
         collection_model.id, collection_model.title,
         collection_model.category, collection_model.objective,
+        collection_model.language_code,
         versioned_collection['schema_version'], [
             collection_domain.CollectionNode.from_dict(collection_node_dict)
             for collection_node_dict in versioned_collection['nodes']
@@ -137,7 +138,7 @@ def get_collection_summary_from_model(collection_summary_model):
     return collection_domain.CollectionSummary(
         collection_summary_model.id, collection_summary_model.title,
         collection_summary_model.category, collection_summary_model.objective,
-        collection_summary_model.status,
+        collection_summary_model.language_code, collection_summary_model.status,
         collection_summary_model.community_owned,
         collection_summary_model.owner_ids,
         collection_summary_model.editor_ids,
@@ -247,6 +248,85 @@ def is_collection_summary_editable(collection_summary, user_id=None):
         or collection_summary.community_owned)
 
 
+def get_learner_collection_dict_by_id(
+        collection_id, user_id, strict=True, allow_invalid_explorations=False,
+        version=None):
+    """Creates and returns a dictionary representation of a collection given by
+    the provided collection ID. This dictionary contains extra information
+    along with the dict returned by collection_domain.Collection.to_dict()
+    which includes useful data for the collection learner view. The information
+    includes progress in the collection, information about explorations
+    referenced within the collection, and a slightly nicer data structure for
+    frontend work.
+
+    This raises a ValidationError if the collection retrieved using the given ID
+    references non-existent explorations.
+    """
+    collection = get_collection_by_id(
+        collection_id, strict=strict, version=version)
+
+    exp_ids = collection.exploration_ids
+    exp_summary_dicts = (
+        summary_services.get_displayable_exp_summary_dicts_matching_ids(
+            exp_ids, editor_user_id=user_id))
+    exp_summaries_dict_map = {
+        exp_summary_dict['id']: exp_summary_dict
+        for exp_summary_dict in exp_summary_dicts
+    }
+
+    # TODO(bhenning): Users should not be recommended explorations they have
+    # completed outside the context of a collection (see #1461).
+    next_exploration_ids = None
+    completed_exploration_ids = None
+    if user_id:
+        completed_exploration_ids = _get_valid_completed_exploration_ids(
+            user_id, collection_id, collection)
+        next_exploration_ids = collection.get_next_exploration_ids(
+            completed_exploration_ids)
+    else:
+        # If the user is not logged in or they have not completed any of
+        # the explorations yet within the context of this collection,
+        # recommend the initial explorations.
+        next_exploration_ids = collection.init_exploration_ids
+        completed_exploration_ids = []
+
+    collection_dict = collection.to_dict()
+    collection_dict['skills'] = collection.skills
+    collection_dict['playthrough_dict'] = {
+        'next_exploration_ids': next_exploration_ids,
+        'completed_exploration_ids': completed_exploration_ids
+    }
+    collection_dict['version'] = collection.version
+
+    collection_is_public = rights_manager.is_collection_public(collection_id)
+
+    # Insert an 'exploration' dict into each collection node, where the
+    # dict includes meta information about the exploration (ID and title).
+    for collection_node in collection_dict['nodes']:
+        exploration_id = collection_node['exploration_id']
+        summary_dict = exp_summaries_dict_map.get(exploration_id)
+        if not allow_invalid_explorations:
+            if not summary_dict:
+                raise utils.ValidationError(
+                    'Expected collection to only reference valid '
+                    'explorations, but found an exploration with ID: %s (was '
+                    'the exploration deleted or is it a private exploration '
+                    'that you do not have edit access to?)'
+                    % exploration_id)
+            if collection_is_public and rights_manager.is_exploration_private(
+                    exploration_id):
+                raise utils.ValidationError(
+                    'Cannot reference a private exploration within a public '
+                    'collection, exploration ID: %s' % exploration_id)
+
+        if summary_dict:
+            collection_node['exploration_summary'] = summary_dict
+        else:
+            collection_node['exploration_summary'] = None
+
+    return collection_dict
+
+
 # Query methods.
 def get_collection_titles_and_categories(collection_ids):
     """Returns collection titles and categories for the given ids.
@@ -291,6 +371,19 @@ def get_completed_exploration_ids(user_id, collection_id):
     progress_model = user_models.CollectionProgressModel.get(
         user_id, collection_id)
     return progress_model.completed_explorations if progress_model else []
+
+
+def _get_valid_completed_exploration_ids(user_id, collection_id, collection):
+    """Returns a filtered version of the return value of
+    get_completed_exploration_ids, where explorations not also found within the
+    collection are removed from the returned list.
+    """
+    completed_exploration_ids = get_completed_exploration_ids(
+        user_id, collection_id)
+    return [
+        exp_id for exp_id in completed_exploration_ids
+        if collection.get_node(exp_id)
+    ]
 
 
 def get_next_exploration_ids_to_complete_by_user(user_id, collection_id):
@@ -356,16 +449,17 @@ def get_collection_summaries_matching_query(query_string, cursor=None):
     """Returns a list with all collection summary domain objects matching the
     given search query string, as well as a search cursor for future fetches.
 
-    This method returns exactly feconf.GALLERY_PAGE_SIZE results if there are
-    at least that many, otherwise it returns all remaining results. (If this
-    behaviour does not occur, an error will be logged.) The method also returns
-    a search cursor.
+    This method returns exactly feconf.SEARCH_RESULTS_PAGE_SIZE results if
+    there are at least that many, otherwise it returns all remaining results.
+    (If this behaviour does not occur, an error will be logged.) The method
+    also returns a search cursor.
     """
     summary_models = []
     search_cursor = cursor
 
     for _ in range(MAX_ITERATIONS):
-        remaining_to_fetch = feconf.GALLERY_PAGE_SIZE - len(summary_models)
+        remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
+            summary_models)
 
         collection_ids, search_cursor = search_collections(
             query_string, remaining_to_fetch, cursor=search_cursor)
@@ -379,7 +473,7 @@ def get_collection_summaries_matching_query(query_string, cursor=None):
             else:
                 invalid_collection_ids.append(collection_ids[ind])
 
-        if len(summary_models) == feconf.GALLERY_PAGE_SIZE or (
+        if len(summary_models) == feconf.SEARCH_RESULTS_PAGE_SIZE or (
                 search_cursor is None):
             break
         else:
@@ -387,7 +481,7 @@ def get_collection_summaries_matching_query(query_string, cursor=None):
                 'Search index contains stale collection ids: %s' %
                 ', '.join(invalid_collection_ids))
 
-    if (len(summary_models) < feconf.GALLERY_PAGE_SIZE
+    if (len(summary_models) < feconf.SEARCH_RESULTS_PAGE_SIZE
             and search_cursor is not None):
         logging.error(
             'Could not fulfill search request for query string %s; at least '
@@ -424,20 +518,25 @@ def apply_change_list(collection_id, change_list):
                     collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY):
                 collection_node = collection.get_node(change.exploration_id)
                 if (change.property_name ==
-                        collection_domain.COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS):
+                        collection_domain.COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS): # pylint: disable=line-too-long
                     collection_node.update_prerequisite_skills(
                         change.new_value)
-                elif (
-                        change.property_name ==
-                        collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS):
+                elif (change.property_name ==
+                      collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS): # pylint: disable=line-too-long
                     collection_node.update_acquired_skills(change.new_value)
             elif change.cmd == collection_domain.CMD_EDIT_COLLECTION_PROPERTY:
-                if change.property_name == 'title':
+                if (change.property_name ==
+                        collection_domain.COLLECTION_PROPERTY_TITLE):
                     collection.update_title(change.new_value)
-                elif change.property_name == 'category':
+                elif (change.property_name ==
+                      collection_domain.COLLECTION_PROPERTY_CATEGORY):
                     collection.update_category(change.new_value)
-                elif change.property_name == 'objective':
+                elif (change.property_name ==
+                      collection_domain.COLLECTION_PROPERTY_OBJECTIVE):
                     collection.update_objective(change.new_value)
+                elif (change.property_name ==
+                      collection_domain.COLLECTION_PROPERTY_LANGUAGE_CODE):
+                    collection.update_language_code(change.new_value)
             elif (
                     change.cmd ==
                     collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
@@ -456,6 +555,14 @@ def apply_change_list(collection_id, change_list):
         raise
 
 
+def validate_exps_in_collection_are_public(collection):
+    for exploration_id in collection.exploration_ids:
+        if rights_manager.is_exploration_private(exploration_id):
+            raise utils.ValidationError(
+                'Cannot reference a private exploration within a public '
+                'collection, exploration ID: %s' % exploration_id)
+
+
 def _save_collection(committer_id, collection, commit_message, change_list):
     """Validates an collection and commits it to persistent storage.
 
@@ -472,6 +579,29 @@ def _save_collection(committer_id, collection, commit_message, change_list):
         collection.validate(strict=True)
     else:
         collection.validate(strict=False)
+
+    # Validate that all explorations referenced by the collection exist.
+    exp_ids = collection.exploration_ids
+    exp_summaries = (
+        exp_services.get_exploration_summaries_matching_ids(exp_ids))
+    exp_summaries_dict = {
+        exp_id: exp_summaries[ind] for (ind, exp_id) in enumerate(exp_ids)
+    }
+    for collection_node in collection.nodes:
+        if not exp_summaries_dict[collection_node.exploration_id]:
+            raise utils.ValidationError(
+                'Expected collection to only reference valid explorations, '
+                'but found an exploration with ID: %s (was it deleted?)' %
+                collection_node.exploration_id)
+
+    # Ensure no explorations are being added that are 'below' the public status
+    # of this collection. If the collection is private, it can have both
+    # private and public explorations. If it's public, it can only have public
+    # explorations.
+    # TODO(bhenning): Ensure the latter is enforced above when trying to
+    # publish a collection.
+    if rights_manager.is_collection_public(collection.id):
+        validate_exps_in_collection_are_public(collection)
 
     collection_model = collection_models.CollectionModel.get(
         collection.id, strict=False)
@@ -492,6 +622,7 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     collection_model.category = collection.category
     collection_model.title = collection.title
     collection_model.objective = collection.objective
+    collection_model.language_code = collection.language_code
     collection_model.schema_version = collection.schema_version
     collection_model.nodes = [
         collection_node.to_dict() for collection_node in collection.nodes
@@ -519,6 +650,7 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
         category=collection.category,
         title=collection.title,
         objective=collection.objective,
+        language_code=collection.language_code,
         schema_version=collection.schema_version,
         nodes=[
             collection_node.to_dict() for collection_node in collection.nodes
@@ -644,7 +776,8 @@ def update_collection(
 def create_collection_summary(collection_id, contributor_id_to_add):
     """Create summary of a collection and store in datastore."""
     collection = get_collection_by_id(collection_id)
-    collection_summary = compute_summary_of_collection(collection, contributor_id_to_add)
+    collection_summary = compute_summary_of_collection(
+        collection, contributor_id_to_add)
     save_collection_summary(collection_summary)
 
 
@@ -693,10 +826,10 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
 
     collection_summary = collection_domain.CollectionSummary(
         collection.id, collection.title, collection.category,
-        collection.objective, collection_rights.status,
-        collection_rights.community_owned, collection_rights.owner_ids,
-        collection_rights.editor_ids, collection_rights.viewer_ids,
-        contributor_ids, contributors_summary,
+        collection.objective, collection.language_code,
+        collection_rights.status, collection_rights.community_owned,
+        collection_rights.owner_ids, collection_rights.editor_ids,
+        collection_rights.viewer_ids, contributor_ids, contributors_summary,
         collection.version, collection_model_created_on,
         collection_model_last_updated
     )
@@ -723,7 +856,8 @@ def compute_collection_contributors_summary(collection_id):
             break
 
         if is_revert:
-            current_version = snapshot_metadata['commit_cmds'][0]['version_number']
+            current_version = snapshot_metadata['commit_cmds'][0][
+                'version_number']
         else:
             current_version -= 1
     return contributors_summary
@@ -738,6 +872,7 @@ def save_collection_summary(collection_summary):
         title=collection_summary.title,
         category=collection_summary.category,
         objective=collection_summary.objective,
+        language_code=collection_summary.language_code,
         status=collection_summary.status,
         community_owned=collection_summary.community_owned,
         owner_ids=collection_summary.owner_ids,
@@ -870,7 +1005,7 @@ def get_next_page_of_all_non_private_commits(
             "max_age must be a datetime.timedelta instance. or None.")
 
     results, new_urlsafe_start_cursor, more = (
-        collection_models.CollectionCommitLogEntryModel.get_all_non_private_commits(
+        collection_models.CollectionCommitLogEntryModel.get_all_non_private_commits( # pylint: disable=line-too-long
             page_size, urlsafe_start_cursor, max_age=max_age))
 
     return ([collection_domain.CollectionCommitLogEntry(
@@ -906,25 +1041,6 @@ def _get_search_rank(collection_id):
         if rights.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED
         else 0)
 
-    # Iterate backwards through the collection history metadata until we find
-    # the most recent snapshot that was committed by a human.
-    last_human_update_ms = 0
-    snapshots_metadata = get_collection_snapshots_metadata(collection_id)
-    for snapshot_metadata in reversed(snapshots_metadata):
-        if snapshot_metadata['committer_id'] != feconf.MIGRATION_BOT_USER_ID:
-            last_human_update_ms = snapshot_metadata['created_on_ms']
-            break
-
-    _time_now_ms = utils.get_current_time_in_millisecs()
-    time_delta_days = int(
-        (_time_now_ms - last_human_update_ms) / _MS_IN_ONE_DAY)
-    if time_delta_days == 0:
-        rank += 80
-    elif time_delta_days == 1:
-        rank += 50
-    elif 2 <= time_delta_days <= 7:
-        rank += 35
-
     # Ranks must be non-negative.
     return max(rank, 0)
 
@@ -936,6 +1052,7 @@ def _collection_to_search_dict(collection):
         'title': collection.title,
         'category': collection.category,
         'objective': collection.objective,
+        'language_code': collection.language_code,
         'rank': _get_search_rank(collection.id),
     }
     doc.update(_collection_rights_to_search_dict(rights))

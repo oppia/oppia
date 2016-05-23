@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Tests for the form builders.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 describe('HTML to text', function() {
@@ -181,7 +179,8 @@ describe('RTE helper service', function() {
         frontend_name: 'image',
         backend_name: 'Image',
         tooltip: 'Insert image',
-        icon_data_url: _DATA_URI
+        icon_data_url: _DATA_URI,
+        preview_url_template: _DATA_URI
       }]);
     });
   });

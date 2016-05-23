@@ -14,13 +14,11 @@
 
 /**
  * @fileoverview Unit tests for the editor prerequisites page.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 describe('Signup controller', function() {
   describe('SignupCtrl', function() {
-    var scope, ctrl, $httpBackend, rootScope, mockWarningsData, urlParams;
+    var scope, ctrl, $httpBackend, rootScope, mockAlertsService, urlParams;
 
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
@@ -32,10 +30,10 @@ describe('Signup controller', function() {
       });
       rootScope = $rootScope;
 
-      mockWarningsData = {
+      mockAlertsService = {
         addWarning: function() {}
       };
-      spyOn(mockWarningsData, 'addWarning');
+      spyOn(mockAlertsService, 'addWarning');
 
       scope = {
         getUrlParams: function() {
@@ -49,14 +47,20 @@ describe('Signup controller', function() {
         $scope: scope,
         $http: $http,
         $rootScope: rootScope,
-        warningsData: mockWarningsData
+        alertsService: mockAlertsService
       });
     }));
 
     it('should show warning if user has not agreed to terms', function() {
       scope.submitPrerequisitesForm(false, null);
+<<<<<<< HEAD
       expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
         'I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
+=======
+      expect(mockAlertsService.addWarning).toHaveBeenCalledWith(
+        'In order to edit explorations on this site, you will need to agree ' +
+        'to the site terms.');
+>>>>>>> develop
     });
 
     it('should get data correctly from the server', function() {
@@ -73,8 +77,14 @@ describe('Signup controller', function() {
 
     it('should show warning if terms are not agreed to', function() {
       scope.submitPrerequisitesForm(false, '');
+<<<<<<< HEAD
       expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
         'I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
+=======
+      expect(mockAlertsService.addWarning).toHaveBeenCalledWith(
+        'In order to edit explorations on this site, you will need to ' +
+        'agree to the site terms.');
+>>>>>>> develop
     });
 
     it('should show warning if no username provided', function() {

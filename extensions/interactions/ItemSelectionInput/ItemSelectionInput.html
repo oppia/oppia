@@ -5,7 +5,12 @@
   }
 
   .item-selection-input-checkbox {
-    margin: 5px;
+    font-weight: normal;
+    margin: 2px;
+  }
+
+  md-checkbox.item-selection-input-checkbox.md-default-theme .md-icon {
+    border-color: #0d48a1;
   }
 
   .item-selection-input-form-container {
@@ -14,10 +19,9 @@
   .item-selection-input-item {
     background: none;
     border: none;
-    color: rgba(0,0,0,0.5);
+    color: #0d48a1;
     margin: 0;
     padding-left: 0;
-    padding-top: 9px;
     text-align: left;
     /* This is needed so that images stay bounded by the container in Firefox. */
     width: 100%;
@@ -31,8 +35,49 @@
     border-bottom: 0px;
   }
 
-  .item-selection-input-item:hover {
-    color: #00897B;
+  .multiple-choice-option-container {
+    padding: 4px 0;
+  }
+
+  .multiple-choice-option {
+    background: none;
+    border: none;
+    color: #0D48A1;
+    text-align: left;
+    /* This is needed so that images stay bounded by the container in Firefox. */
+    width: 100%;
+  }
+
+  .multiple-choice-radio-button-container,
+  .multiple-choice-content-container {
+    display: table-cell;
+  }
+
+  .multiple-choice-option:hover {
+    color: #115FD4;
+  }
+
+  .multiple-choice-option:hover .multiple-choice-inner-radio-button {
+    background-color: #115FD4;
+    border-radius: 50%;
+    display: block;
+    height: 8px;
+    margin: 2px;
+    width: 8px;
+  }
+
+  .multiple-choice-option:hover .multiple-choice-outer-adio-button {
+    border-color: #115FD4;
+  }
+
+  .multiple-choice-outer-radio-button {
+    border: 2px solid #0D48A1;
+    border-radius: 50%;
+    display: inline-block;
+    height: 16px;
+    margin-bottom: -2px;
+    margin-right: 12px;
+    width: 16px;
   }
 </style>
 
@@ -40,19 +85,27 @@
   <div class="item-selection-input-form-container">
     <form ng-submit="submitAnswer()">
       <div class="item-selection-input-container" ng-repeat="choice in choices track by $index">
-        <label class="item-selection-input-item">
-          <div ng-if="displayCheckboxes">
+        <div ng-if="displayCheckboxes">
+          <label class="item-selection-input-item">
             <md-checkbox class="item-selection-input-checkbox" ng-model="userSelections[choice]" ng-checked="userSelections[choice]"
               ng-change="onToggleCheckbox()" ng-disabled="preventAdditionalSelections && !userSelections[choice]" aria-label="choice">
               <span angular-html-bind="choice"></span>
             </md-checkbox>
-          </div>
+          </label>
+        </div>
 
-          <div ng-if="!displayCheckboxes">
-            <input type="radio" value="true" ng-model="userSelections[choice]" ng-change="submitAnswer(userSelections)" aria-label="choice" class="item-selection-input-radio-button">
-            <div angular-html-bind="choice" style="cursor: pointer; width: 100%;"></div>
-          </div>
-        </label>
+        <div ng-if="!displayCheckboxes">
+          <button class="multiple-choice-option" ng-click="submitMultipleChoiceAnswer($index)">
+            <div class="multiple-choice-radio-button-container">
+              <span class="multiple-choice-outer-radio-button">
+              <span class="multiple-choice-inner-radio-button"></span>
+              </span>
+            </div>
+            <div class="multiple-choice-content-container">
+              <span class="protractor-test-multiple-choice-option" angular-html-bind="choice"></span>
+            </div>
+          </button>
+        </div>
       </div>
 
       <!-- The following div will only show if maxAllowableSelectionCount is at
@@ -79,7 +132,15 @@
 </script>
 
 <script type="text/ng-template" id="response/ItemSelectionInput">
-  <ul>
+  <div ng-if="answer.length === 0">
+    <em>No choices selected.</em>
+  </div>
+
+  <div ng-if="answer.length === 1">
+    <span angular-html-bind="answer[0]"></span>
+  </div>
+
+  <ul ng-if="answer.length > 1">
     <li ng-repeat="response in answer track by $index">
       <span angular-html-bind="response"></span>
     </li>
@@ -87,7 +148,15 @@
 </script>
 
 <script type="text/ng-template" id="shortResponse/ItemSelectionInput">
-  <ul>
+  <div ng-if="answer.length === 0">
+    <em>No choices selected.</em>
+  </div>
+
+  <div ng-if="answer.length === 1">
+    <span angular-html-bind="answer[0]"></span>
+  </div>
+
+  <ul ng-if="answer.length > 1">
     <li ng-repeat="response in answer track by $index">
       <span angular-html-bind="response"></span>
     </li>

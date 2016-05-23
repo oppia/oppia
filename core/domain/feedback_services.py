@@ -16,29 +16,16 @@
 
 """Commands for feedback thread and message operations."""
 
+from core.domain import feedback_domain
 from core.domain import feedback_jobs_continuous
 from core.domain import subscription_services
-from core.domain import user_services
 from core.platform import models
 import feconf
-import utils
 
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
 
 DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a learner'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
-
-
-def _get_thread_dict_from_model_instance(thread):
-    return {
-        'last_updated': utils.get_time_in_millisecs(thread.last_updated),
-        'original_author_username': user_services.get_username(
-            thread.original_author_id) if thread.original_author_id else None,
-        'state_name': thread.state_name,
-        'status': thread.status,
-        'subject': thread.subject,
-        'summary': thread.summary,
-        'thread_id': get_thread_id_from_full_thread_id(thread.id)}
 
 
 def _create_models_for_thread_and_first_message(
@@ -75,33 +62,6 @@ def create_thread(
     _create_models_for_thread_and_first_message(
         exploration_id, state_name, original_author_id, subject, text, False)
 
-
-def get_exp_id_from_full_thread_id(full_thread_id):
-    return full_thread_id.split('.')[0]
-
-def get_thread_id_from_full_thread_id(full_thread_id):
-    return full_thread_id.split('.')[1]
-
-
-def _get_message_dict(message_instance):
-    return {
-        'author_username': (
-            user_services.get_username(message_instance.author_id)
-            if message_instance.author_id else None),
-        'created_on': utils.get_time_in_millisecs(message_instance.created_on),
-        'exploration_id': message_instance.exploration_id,
-        'message_id': message_instance.message_id,
-        'text': message_instance.text,
-        'updated_status': message_instance.updated_status,
-        'updated_subject': message_instance.updated_subject,
-    }
-
-
-def get_messages(exploration_id, thread_id):
-    return [
-        _get_message_dict(m)
-        for m in feedback_models.FeedbackMessageModel.get_messages(
-            exploration_id, thread_id)]
 
 def create_message(
         exploration_id, thread_id, author_id, updated_status, updated_subject,
@@ -157,6 +117,21 @@ def create_message(
     return True
 
 
+def _get_message_from_model(message_model):
+    return feedback_domain.FeedbackMessage(
+        message_model.id, message_model.thread_id, message_model.message_id,
+        message_model.author_id, message_model.updated_status,
+        message_model.updated_subject, message_model.text,
+        message_model.created_on, message_model.last_updated)
+
+
+def get_messages(exploration_id, thread_id):
+    return [
+        _get_message_from_model(m)
+        for m in feedback_models.FeedbackMessageModel.get_messages(
+            exploration_id, thread_id)]
+
+
 def get_next_page_of_all_feedback_messages(
         page_size=feconf.FEEDBACK_TAB_PAGE_SIZE, urlsafe_start_cursor=None):
     """Returns a page of feedback messages in reverse time order.
@@ -170,19 +145,8 @@ def get_next_page_of_all_feedback_messages(
         feedback_models.FeedbackMessageModel.get_all_messages(
             page_size, urlsafe_start_cursor))
 
-    result_dicts = [_get_message_dict(m) for m in results]
-    return (result_dicts, new_urlsafe_start_cursor, more)
-
-
-def get_last_updated_time(exploration_id):
-    """Returns the most recent time a thread for this exploration was updated.
-
-    If this exploration has no threads, returns None.
-    """
-    threadlist = get_all_threads(exploration_id, False)
-    return max(
-        [thread['last_updated'] for thread in threadlist]
-    ) if threadlist else None
+    result_messages = [_get_message_from_model(m) for m in results]
+    return (result_messages, new_urlsafe_start_cursor, more)
 
 
 def get_thread_analytics(exploration_id):
@@ -194,7 +158,7 @@ def get_thread_analytics(exploration_id):
     - 'num_total_threads': the total number of feedback threads for this
          exploration.
     """
-    return feedback_jobs_continuous.FeedbackAnalyticsAggregator.get_thread_analytics(
+    return feedback_jobs_continuous.FeedbackAnalyticsAggregator.get_thread_analytics( # pylint: disable=line-too-long
         exploration_id)
 
 
@@ -216,22 +180,32 @@ def create_suggestion(exploration_id, author_id, exploration_version,
     subscription_services.subscribe_to_thread(author_id, full_thread_id)
 
 
-def _get_suggestion_dict_from_model_instance(suggestion):
-    if suggestion is None:
-        return suggestion
-    return {
-        'author_name': user_services.get_username(suggestion.author_id),
-        'exploration_id': suggestion.exploration_id,
-        'exploration_version': suggestion.exploration_version,
-        'state_name': suggestion.state_name,
-        'description': suggestion.description,
-        'state_content': suggestion.state_content}
+def _get_suggestion_from_model(suggestion_model):
+    return feedback_domain.Suggestion(
+        suggestion_model.id, suggestion_model.author_id,
+        suggestion_model.exploration_id, suggestion_model.exploration_version,
+        suggestion_model.state_name, suggestion_model.description,
+        suggestion_model.state_content)
 
 
 def get_suggestion(exploration_id, thread_id):
-    return _get_suggestion_dict_from_model_instance(
-        feedback_models.SuggestionModel.get_by_exploration_and_thread_id(
-            exploration_id, thread_id))
+    model = feedback_models.SuggestionModel.get_by_exploration_and_thread_id(
+        exploration_id, thread_id)
+    return _get_suggestion_from_model(model) if model else None
+
+
+def _get_thread_from_model(thread_model):
+    return feedback_domain.FeedbackThread(
+        thread_model.id, thread_model.exploration_id, thread_model.state_name,
+        thread_model.original_author_id, thread_model.status,
+        thread_model.subject, thread_model.summary, thread_model.has_suggestion,
+        thread_model.created_on, thread_model.last_updated)
+
+
+def get_threads(exploration_id):
+    thread_models = feedback_models.FeedbackThreadModel.get_threads(
+        exploration_id)
+    return [_get_thread_from_model(model) for model in thread_models]
 
 
 def get_open_threads(exploration_id, has_suggestion):
@@ -239,41 +213,35 @@ def get_open_threads(exploration_id, has_suggestion):
     suggestion, otherwise return a list of all open threads that do not have a
     suggestion."""
 
-    threads = feedback_models.FeedbackThreadModel.get_threads(exploration_id)
+    threads = get_threads(exploration_id)
     open_threads = []
     for thread in threads:
         if (thread.has_suggestion == has_suggestion and
                 thread.status == feedback_models.STATUS_CHOICES_OPEN):
             open_threads.append(thread)
-    return [
-        _get_thread_dict_from_model_instance(t)
-        for t in open_threads]
-
+    return open_threads
 
 def get_closed_threads(exploration_id, has_suggestion):
     """If has_suggestion is True, return a list of all closed threads that have
     a suggestion, otherwise return a list of all closed threads that do not have
     a suggestion."""
 
-    threads = feedback_models.FeedbackThreadModel.get_threads(exploration_id)
+    threads = get_threads(exploration_id)
     closed_threads = []
     for thread in threads:
         if (thread.has_suggestion == has_suggestion and
                 thread.status != feedback_models.STATUS_CHOICES_OPEN):
             closed_threads.append(thread)
-    return [
-        _get_thread_dict_from_model_instance(t)
-        for t in closed_threads]
+    return closed_threads
 
 
 def get_all_threads(exploration_id, has_suggestion):
-    """Return a list of all threads with suggestions."""
+    """Returns a list of all threads with suggestions if has_suggestion is True;
+    otherwise, returns a list of all threads with no suggestions."""
 
-    threads = feedback_models.FeedbackThreadModel.get_threads(exploration_id)
+    threads = get_threads(exploration_id)
     all_threads = []
     for thread in threads:
         if thread.has_suggestion == has_suggestion:
             all_threads.append(thread)
-    return [
-        _get_thread_dict_from_model_instance(t)
-        for t in all_threads]
+    return all_threads

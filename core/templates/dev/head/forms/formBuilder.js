@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Directives for schema-based form builders.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 // NOTE TO DEVELOPERS: This forms framework accepts an external event
@@ -550,8 +548,10 @@ oppia.filter('sanitizeHtmlForRte', ['$sanitize', function($sanitize) {
 }]);
 
 oppia.factory('rteHelperService', [
-  '$filter', '$log', 'RTE_COMPONENT_SPECS', 'oppiaHtmlEscaper',
-  function($filter, $log, RTE_COMPONENT_SPECS, oppiaHtmlEscaper) {
+  '$filter', '$log', '$interpolate', 'explorationContextService',
+  'RTE_COMPONENT_SPECS', 'oppiaHtmlEscaper',
+  function($filter, $log, $interpolate, explorationContextService,
+    RTE_COMPONENT_SPECS, oppiaHtmlEscaper) {
     var _RICH_TEXT_COMPONENTS = [];
 
     Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
@@ -561,7 +561,10 @@ oppia.factory('rteHelperService', [
           RTE_COMPONENT_SPECS[componentId].customization_arg_specs),
         name: RTE_COMPONENT_SPECS[componentId].frontend_name,
         iconDataUrl: RTE_COMPONENT_SPECS[componentId].icon_data_url,
+        previewUrlTemplate:
+          RTE_COMPONENT_SPECS[componentId].preview_url_template,
         isComplex: RTE_COMPONENT_SPECS[componentId].is_complex,
+        isBlockElement: RTE_COMPONENT_SPECS[componentId].is_block_element,
         requiresFs: RTE_COMPONENT_SPECS[componentId].requires_fs,
         tooltip: RTE_COMPONENT_SPECS[componentId].tooltip
       });
@@ -600,9 +603,26 @@ oppia.factory('rteHelperService', [
       // Returns a DOM node.
       createRteElement: function(componentDefn, customizationArgsDict) {
         var el = $('<img/>');
-        el.attr('src', componentDefn.iconDataUrl);
+        if (explorationContextService.isInExplorationContext()) {
+          customizationArgsDict = angular.extend(customizationArgsDict,
+            {
+              explorationId: explorationContextService.getExplorationId()
+            }
+          );
+        }
+        var interpolatedUrl = $interpolate(
+          componentDefn.previewUrlTemplate, false, null, true)(
+            customizationArgsDict);
+        if (!interpolatedUrl) {
+          $log.error(
+            'Error interpolating url : ' + componentDefn.previewUrlTemplate);
+        } else {
+          el.attr('src', interpolatedUrl);
+        }
         el.addClass('oppia-noninteractive-' + componentDefn.name);
-
+        if (componentDefn.isBlockElement) {
+          el.addClass('block-element');
+        }
         for (var attrName in customizationArgsDict) {
           el.attr(
             $filter('camelCaseToHyphens')(attrName) + '-with-value',
@@ -652,7 +672,13 @@ oppia.factory('rteHelperService', [
           elt.find(
             'img.oppia-noninteractive-' + componentDefn.name
           ).replaceWith(function() {
-            var jQueryElt = $('<' + this.className + '/>');
+            // Look for a class name starting with oppia-noninteractive-*.
+            var tagNameMatch = /(^|\s)(oppia-noninteractive-[a-z0-9\-]+)/.exec(
+              this.className);
+            if (!tagNameMatch) {
+              $log.error('RTE Error: invalid class name ' + this.className);
+            }
+            var jQueryElt = $('<' + tagNameMatch[2] + '/>');
             for (var i = 0; i < this.attributes.length; i++) {
               var attr = this.attributes[i];
               if (attr.name !== 'class' && attr.name !== 'src') {
@@ -675,14 +701,15 @@ oppia.factory('rteHelperService', [
 // Add RTE extensions to textAngular toolbar options.
 oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [
-    '$delegate', '$modal', '$timeout', 'focusService', 'taRegisterTool',
-    'rteHelperService', 'warningsData', 'explorationContextService',
-    'PAGE_CONTEXT',
+    '$delegate', '$document', '$modal', '$timeout', 'focusService',
+    'taRegisterTool', 'rteHelperService', 'alertsService',
+    'explorationContextService', 'PAGE_CONTEXT',
     function(
-        taOptions, $modal, $timeout, focusService, taRegisterTool,
-        rteHelperService, warningsData, explorationContextService,
-        PAGE_CONTEXT) {
+        taOptions, $document, $modal, $timeout, focusService,
+        taRegisterTool, rteHelperService, alertsService,
+        explorationContextService, PAGE_CONTEXT) {
       taOptions.disableSanitizer = true;
+      taOptions.forceTextAngularSanitize = false;
       taOptions.classes.textEditor = 'form-control oppia-rte-content';
       taOptions.setup.textEditorSetup = function($element) {
         $timeout(function() {
@@ -696,6 +723,7 @@ oppia.config(['$provide', function($provide) {
       var _openCustomizationModal = function(
           customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
           onDismissCallback, refocusFn) {
+        $document[0].execCommand('enableObjectResizing', false, false);
         var modalDialog = $modal.open({
           templateUrl: 'modals/customizeRteComponent',
           backdrop: 'static',
@@ -777,7 +805,7 @@ oppia.config(['$provide', function($provide) {
               if (!canUseFs && componentDefn.requiresFs) {
                 var FS_UNAUTHORIZED_WARNING = 'Unfortunately, only ' +
                   'exploration authors can make changes involving files.';
-                warningsData.addWarning(FS_UNAUTHORIZED_WARNING);
+                alertsService.addWarning(FS_UNAUTHORIZED_WARNING);
                 // Without this, the view will not update to show the warning.
                 textAngular.$editor().$parent.$apply();
                 return;
@@ -863,9 +891,9 @@ oppia.config(['$provide', function($provide) {
 }]);
 
 oppia.directive('textAngularRte', [
-    '$filter', 'oppiaHtmlEscaper', 'rteHelperService',
+    '$filter', 'oppiaHtmlEscaper', 'rteHelperService', '$timeout',
     function(
-      $filter, oppiaHtmlEscaper, rteHelperService) {
+      $filter, oppiaHtmlEscaper, rteHelperService, $timeout) {
       return {
         restrict: 'E',
         scope: {
@@ -882,7 +910,7 @@ oppia.directive('textAngularRte', [
           $scope.isCustomizationModalOpen = false;
           var toolbarOptions = [
             ['bold', 'italics', 'underline'],
-            ['ol', 'ul', 'pre'],
+            ['ol', 'ul', 'pre', 'indent', 'outdent'],
             []
           ];
 
@@ -922,10 +950,10 @@ oppia.directive('textAngularRte', [
 
           // It is possible for the content of the RTE to be changed externally,
           // e.g. if there are several RTEs in a list, and one is deleted.
-          $scope.$watch('htmlContent', function(newVal, oldVal) {
-            if (newVal !== oldVal) {
-              $scope.tempContent = _convertHtmlToRte(newVal);
-            }
+          $scope.$on('externalHtmlContentChange', function() {
+            $timeout(function() {
+              $scope.tempContent = _convertHtmlToRte($scope.htmlContent);
+            });
           });
         }]
       };
@@ -1646,6 +1674,8 @@ oppia.directive('schemaBasedListEditor', [
             'submittedSchemaBasedUnicodeForm', $scope._onChildFormSubmit);
 
           $scope.deleteElement = function(index) {
+            // Need to let the RTE know that HtmlContent has been changed.
+            $scope.$broadcast('externalHtmlContentChange');
             $scope.localValue.splice(index, 1);
           };
         } else {

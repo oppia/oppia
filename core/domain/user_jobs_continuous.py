@@ -16,12 +16,11 @@
 
 import ast
 import logging
-import math
 
 from core import jobs
 from core.domain import exp_services
+from core.domain import feedback_domain
 from core.domain import feedback_services
-from core.domain import rating_services
 from core.domain import stats_jobs_continuous
 from core.platform import models
 import feconf
@@ -204,11 +203,8 @@ class RecentUpdatesMRJobManager(
         for exp_model in tracked_exp_models_for_feedback:
             threads = feedback_services.get_all_threads(exp_model.id, False)
             for thread in threads:
-                full_thread_id = (
-                    feedback_models.FeedbackThreadModel.generate_full_thread_id(
-                        exp_model.id, thread['thread_id']))
-                if full_thread_id not in feedback_thread_ids_list:
-                    feedback_thread_ids_list.append(full_thread_id)
+                if thread.id not in feedback_thread_ids_list:
+                    feedback_thread_ids_list.append(thread.id)
 
         # TODO(bhenning): Implement a solution to having feedback threads for
         # collections.
@@ -222,10 +218,12 @@ class RecentUpdatesMRJobManager(
             yield (reducer_key, recent_activity_commit_dict)
 
         for feedback_thread_id in feedback_thread_ids_list:
-            exp_id = feedback_services.get_exp_id_from_full_thread_id(
-                feedback_thread_id)
-            thread_id = feedback_services.get_thread_id_from_full_thread_id(
-                feedback_thread_id)
+            exp_id = (
+                feedback_domain.FeedbackThread.get_exp_id_from_full_thread_id(
+                    feedback_thread_id))
+            thread_id = (
+                feedback_domain.FeedbackThread.get_thread_id_from_full_thread_id( # pylint: disable=line-too-long
+                    feedback_thread_id))
             last_message = (
                 feedback_models.FeedbackMessageModel.get_most_recent_message(
                     exp_id, thread_id))
@@ -293,98 +291,74 @@ class UserImpactAggregator(jobs.BaseContinuousComputationManager):
 
 class UserImpactMRJobManager(
         jobs.BaseMapReduceJobManagerForContinuousComputations):
-    """Manager for a MapReduce job that computes the impact score for every
-    user, where impact score is defined as follows:
-    Sum of (
-    ln(playthroughs) * (ratings_scaler) * (average(ratings) - 2.5))
-    *(multiplier),
-    where multiplier = 10, and ratings_scaler is .1 * (number of ratings)
-    if there are < 10 ratings for that exploration.
-
-    The impact score is 0 for an exploration with 0 playthroughs or with an
-    average rating of less than 2.5.
-
-    Impact scores are calculated over explorations for which a user
-    is listed as a contributor.
-    """
+    # Impact of user is defined as S^(2/3) where S is the sum
+    # over all explorations this user has contributed to of
+    #  value (per_user) * reach * fractional contribution
+    # Value per user: average rating - 2
+    # Reach: sum over all cards of count of answers given ^ (2/3)
+    # Fractional contribution: percent of commits by this user
+    # The final number will be rounded to the nearest integer.
     @classmethod
     def _get_continuous_computation_class(cls):
         return UserImpactAggregator
 
-    MULTIPLIER = 10
-    MIN_AVERAGE_RATING = 2.5
-    NUM_RATINGS_SCALER_CUTOFF = 10
-    NUM_RATINGS_SCALER = .1
-
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @classmethod
-    def _get_exp_impact_score(cls, exploration_id):
-        # Get ratings and compute average rating score.
-        rating_frequencies = rating_services.get_overall_ratings_for_exploration(
-            exploration_id)
-        total_num_ratings = 0
-        total_rating = 0.0
-        for rating, num_ratings in rating_frequencies.iteritems():
-            total_rating += (int(rating) * num_ratings)
-            total_num_ratings += num_ratings
-        # Only divide by a non-zero number.
-        if total_num_ratings == 0:
-            return 0
-        average_rating = total_rating / total_num_ratings
-
-        # Get rating term to use in impact calculation.
-        rating_term = average_rating - cls.MIN_AVERAGE_RATING
-        # Only explorations with an average rating greater than the minimum
-        # have an impact.
-        if rating_term <= 0:
-            return 0
-
-        # Get num_ratings_scaler.
-        if total_num_ratings < cls.NUM_RATINGS_SCALER_CUTOFF:
-            num_ratings_scaler = cls.NUM_RATINGS_SCALER * total_num_ratings
-        else:
-            num_ratings_scaler = 1.0
-
-        # Get number of completions/playthroughs.
-        num_completions = stats_jobs_continuous.StatisticsAggregator.get_statistics(
-            exploration_id,
-            stats_jobs_continuous.VERSION_ALL)['complete_exploration_count']
-        # Only take the log of a non-zero number.
-        if num_completions <= 0:
-            return 0
-        num_completions_term = math.log(num_completions)
-
-        exploration_impact_score = (
-            rating_term *
-            num_completions_term *
-            num_ratings_scaler *
-            cls.MULTIPLIER
-        )
-
-        return exploration_impact_score
+        return [exp_models.ExpSummaryModel]
 
     @staticmethod
     def map(item):
         if item.deleted:
             return
 
-        exploration_impact_score = (
-            UserImpactMRJobManager._get_exp_impact_score(item.id))
+        exponent = 2.0/3
 
-        if exploration_impact_score > 0:
-            # Get exploration summary and contributor ids,
-            # yield for each contributor.
-            exploration_summary = exp_services.get_exploration_summary_by_id(
-                item.id)
-            contributor_ids = exploration_summary.contributor_ids
-            for contributor_id in contributor_ids:
-                yield (contributor_id, exploration_impact_score)
+        # Get average rating and value per user
+        total_rating = 0
+        for ratings_value in item.ratings:
+            total_rating += item.ratings[ratings_value] * int(ratings_value)
+        if not sum(item.ratings.itervalues()):
+            return
+        average_rating = total_rating / sum(item.ratings.itervalues())
+        value_per_user = average_rating - 2
+        if value_per_user <= 0:
+            return
+
+        statistics = (
+            stats_jobs_continuous.StatisticsAggregator.get_statistics(
+                item.id, stats_jobs_continuous.VERSION_ALL))
+        answer_count = 0
+        # Find number of users per state (card), and subtract no answer
+        # This will not count people who have been back to a state twice
+        # but did not give an answer the second time, but is probably the
+        # closest we can get with current statistics to "number of users
+        # who gave an answer" since it is "number of users who always gave
+        # an answer".
+        for state_name in statistics['state_hit_counts']:
+            state_stats = statistics['state_hit_counts'][state_name]
+            first_entry_count = state_stats.get('first_entry_count', 0)
+            no_answer_count = state_stats.get('no_answer_count', 0)
+            answer_count += first_entry_count - no_answer_count
+        # Turn answer count into reach
+        reach = answer_count**exponent
+
+        exploration_summary = exp_services.get_exploration_summary_by_id(
+            item.id)
+        contributors = exploration_summary.contributors_summary
+        total_commits = sum(contributors.itervalues())
+        if total_commits == 0:
+            return
+        for contrib_id in contributors:
+            # Find fractional contribution for each contributor
+            contribution = contributors[contrib_id] / float(total_commits)
+            # Find score for this specific exploration
+            exploration_impact_score = value_per_user * reach * contribution
+            yield (contrib_id, exploration_impact_score)
 
     @staticmethod
     def reduce(key, stringified_values):
         values = [ast.literal_eval(v) for v in stringified_values]
-        user_impact_score = int(round(sum(values)))
+        exponent = 2.0/3
+        # Find the final score and round to a whole number
+        user_impact_score = int(round(sum(values) ** exponent))
         user_models.UserStatsModel(id=key, impact_score=user_impact_score).put()

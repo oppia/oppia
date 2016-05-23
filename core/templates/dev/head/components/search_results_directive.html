@@ -1,0 +1,38 @@
+<script type="text/ng-template" id="components/searchResults">
+  <div>
+    <div ng-if="!someResultsExist" class="oppia-search-results-intro" ng-cloak>
+      <div class="oppia-search-results-no-match">
+        <img src="/images/general/no_explorations_found.png" alt="No explorations found">
+        <p style="text-align: center;">
+          Oops, it looks like your search did not match any explorations.<br><br>
+          {% if not has_fully_registered %}
+            Would you like to <a href ng-click="onRedirectToLogin('/my_explorations?mode=create')">create one</a>?
+          {% else %}
+            Would you like to <a href="/my_explorations?mode=create">create one</a>?
+          {% endif %}
+        </p>
+      </div>
+    </div>
+
+    <activity-tiles-infinity-grid></activity-tiles-infinity-grid>
+  </div>
+</script>
+
+<style>
+  .oppia-search-results-no-match, .oppia-search-results-no-match p {
+    font-size: 0.85em;
+    text-align: center;
+  }
+
+  .oppia-search-results-intro {
+    font-size: 1.6em;
+    padding-bottom: 40px;
+    padding-top: 40px;
+  }
+  @media (max-width: 800px) {
+    .oppia-search-results-intro {
+      margin-left: 20px;
+      margin-right: 20px;
+    }
+  }
+</style>

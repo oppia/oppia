@@ -15,8 +15,6 @@
 /**
  * @fileoverview Utilities for interacting with the admin page, for use in
  * Protractor tests.
- *
- * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var general = require('./general.js');
@@ -33,6 +31,7 @@ var editConfigProperty = function(
     propertyName, objectType, editingInstructions) {
   general.waitForSystem();
   browser.get(general.ADMIN_URL_SUFFIX);
+  element(by.css('.protractor-test-admin-config-tab')).click();
   element.all(by.css('.protractor-test-config-property')).
       map(function(configProperty) {
     return configProperty.element(by.css('.protractor-test-config-title')).

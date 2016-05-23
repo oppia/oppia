@@ -14,41 +14,11 @@
 
 /**
  * @fileoverview Oppia's base controller.
- *
- * @author sll@google.com (Sean Lip)
  */
 
-oppia.constant('CATEGORY_LIST', [
-  'Architecture',
-  'Art',
-  'Biology',
-  'Business',
-  'Chemistry',
-  'Computing',
-  'Economics',
-  'Education',
-  'Engineering',
-  'Environment',
-  'Geography',
-  'Government',
-  'Hobbies',
-  'Languages',
-  'Law',
-  'Life Skills',
-  'Mathematics',
-  'Medicine',
-  'Music',
-  'Philosophy',
-  'Physics',
-  'Programming',
-  'Psychology',
-  'Puzzles',
-  'Reading',
-  'Religion',
-  'Sport',
-  'Statistics',
-  'Welcome'
-]);
+// TODO(sll): Get this to read from a common JSON file; it's replicated in
+// feconf.
+oppia.constant('CATEGORY_LIST', GLOBALS.ALL_CATEGORIES || []);
 
 // We use a slash because this character is forbidden in a state name.
 oppia.constant('PLACEHOLDER_OUTCOME_DEST', '/');
@@ -63,6 +33,8 @@ oppia.constant('DEFAULT_FUZZY_RULE', {
     training_data: []
   }
 });
+
+oppia.constant('EVENT_HTML_CHANGED', 'htmlChanged');
 
 oppia.constant('PARAMETER_TYPES', {
   REAL: 'Real',
@@ -82,14 +54,15 @@ oppia.constant('MAX_NODE_LABEL_LENGTH', 15);
 // Global utility methods.
 oppia.controller('Base', [
   '$scope', '$http', '$rootScope', '$window', '$timeout', '$document', '$log',
-  'warningsData', 'activeInputData', 'LABEL_FOR_CLEARING_FOCUS',
+  'alertsService', 'LABEL_FOR_CLEARING_FOCUS', 'siteAnalyticsService',
+  'windowDimensionsService',
   function(
       $scope, $http, $rootScope, $window, $timeout, $document, $log,
-      warningsData, activeInputData, LABEL_FOR_CLEARING_FOCUS) {
+      alertsService, LABEL_FOR_CLEARING_FOCUS, siteAnalyticsService,
+      windowDimensionsService) {
     $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
 
-    $scope.warningsData = warningsData;
-    $scope.activeInputData = activeInputData;
+    $scope.alertsService = alertsService;
     $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
 
     // If this is nonempty, the whole page goes into 'Loading...' mode.
@@ -98,7 +71,8 @@ oppia.controller('Base', [
     if (GLOBALS.userIsLoggedIn) {
       // Show the number of unseen notifications in the navbar and page title,
       // unless the user is already on the dashboard page.
-      $http.get('/notificationshandler').success(function(data) {
+      $http.get('/notificationshandler').then(function(response) {
+        var data = response.data;
         if ($window.location.pathname !== '/') {
           $scope.numUnseenNotifications = data.num_unseen_notifications;
           if ($scope.numUnseenNotifications > 0) {
@@ -109,52 +83,6 @@ oppia.controller('Base', [
         }
       });
     }
-
-    /**
-     * Checks if an object is empty.
-     */
-    $scope.isEmpty = function(obj) {
-      for (var property in obj) {
-        if (obj.hasOwnProperty(property)) {
-          return false;
-        }
-      }
-      return true;
-    };
-
-    /**
-     * Adds content to an iframe.
-     * @param {Element} iframe - The iframe element to add content to.
-     * @param {string} content - The code for the iframe.
-     */
-    $scope.addContentToIframe = function(iframe, content) {
-      if (typeof iframe == 'string') {
-        iframe = document.getElementById(iframe);
-      }
-      if (!iframe) {
-        $log.error('Could not add content to iframe: no iframe found.');
-        return;
-      }
-      if (iframe.contentDocument) {
-        doc = iframe.contentDocument;
-      } else {
-        doc = (
-          iframe.contentWindow ? iframe.contentWindow.document :
-          iframe.document);
-      }
-      doc.open();
-      doc.writeln(content);
-      doc.close();
-    };
-
-    /**
-     * Adds content to an iframe where iframe is specified by its ID.
-     * @param {string} iframeId - The id of the iframe to add content to.
-     * @param {string} content - The code for the iframe.
-     */
-    $scope.addContentToIframeWithId = function(iframeId, content) {
-      $scope.addContentToIframe(document.getElementById(iframeId), content);
-    };
 
     // This method is here because the trigger for the tutorial is in the site
     // navbar. It broadcasts an event to tell the exploration editor to open the
@@ -201,6 +129,36 @@ oppia.controller('Base', [
     $scope.onMouseoutDropdownMenu = function(evt) {
       angular.element(evt.currentTarget).parent().removeClass('open');
     };
+
+    $scope.onLoginButtonClicked = function(loginUrl) {
+      siteAnalyticsService.registerStartLoginEvent('loginButton');
+      $timeout(function() {
+        $window.location = loginUrl;
+      }, 150);
+      return false;
+    };
+
+    var doesNavbarHaveSearchBar = function() {
+      return (
+        $window.location.pathname.indexOf('/search') === 0 ||
+        $window.location.pathname.indexOf('/library') === 0);
+    };
+
+    var navbarCutoffWidthPx = doesNavbarHaveSearchBar() ? 1171 : 800;
+
+    $scope.windowIsNarrow = (
+      windowDimensionsService.getWidth() <= navbarCutoffWidthPx);
+
+    windowDimensionsService.registerOnResizeHook(function() {
+      $scope.windowIsNarrow = (
+        windowDimensionsService.getWidth() <= navbarCutoffWidthPx);
+      $scope.$apply();
+
+      // If the window is now wide, and the sidebar is still open, close it.
+      if (!$scope.windowIsNarrow) {
+        $scope.sidebarIsShown = false;
+      }
+    });
 
     $scope.pageHasLoaded = false;
     $scope.pendingSidebarClick = false;

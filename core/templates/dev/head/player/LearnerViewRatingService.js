@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Service for the rating functionality in the learner view.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.factory('LearnerViewRatingService', [
@@ -26,9 +24,9 @@ oppia.factory('LearnerViewRatingService', [
     var userRating;
     return {
       init: function(successCallback) {
-        $http.get(ratingsUrl).success(function(data) {
-          successCallback(data.user_rating);
-          userRating = data.user_rating;
+        $http.get(ratingsUrl).then(function(response) {
+          successCallback(response.data.user_rating);
+          userRating = response.data.user_rating;
           $rootScope.$broadcast('ratingServiceInitialized');
         });
       },

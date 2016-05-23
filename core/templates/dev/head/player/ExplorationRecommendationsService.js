@@ -15,8 +15,6 @@
 /**
  * @fileoverview Service for recommending explorations at the end of an
  * exploration.
- *
- * @author sean@seanlip.org (Sean Lip)
  */
 
 oppia.factory('explorationRecommendationsService', [
@@ -49,8 +47,8 @@ oppia.factory('explorationRecommendationsService', [
 
         $http.get('/explorehandler/recommendations/' + explorationId, {
           params: recommendationsUrlParams
-        }).success(function(data) {
-          successCallback(data.summaries);
+        }).then(function(response) {
+          successCallback(response.data.summaries);
         });
       }
     };

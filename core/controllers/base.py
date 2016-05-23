@@ -24,7 +24,6 @@ import os
 import sys
 import time
 import traceback
-import urllib
 import urlparse
 
 import jinja2
@@ -71,11 +70,6 @@ BEFORE_END_BODY_TAG_HOOK = config_domain.ConfigProperty(
     },
     'Code to insert just before the closing </body> tag in all pages.', '')
 
-OBJECT_EDITORS_JS = config_domain.ComputedProperty(
-    'object_editors_js', {'type': 'unicode'},
-    'JavaScript code for the object editors',
-    obj_services.get_all_object_editor_js_templates)
-
 SIDEBAR_MENU_ADDITIONAL_LINKS = config_domain.ConfigProperty(
     'sidebar_menu_additional_links', {
         'type': 'list',
@@ -107,6 +101,33 @@ SIDEBAR_MENU_ADDITIONAL_LINKS = config_domain.ConfigProperty(
 SITE_FEEDBACK_FORM_URL = config_domain.ConfigProperty(
     'site_feedback_form_url', {'type': 'unicode'},
     'Site feedback form URL (leave blank if there is no such form)', '')
+
+SHARING_OPTIONS = config_domain.ConfigProperty(
+    'sharing_options', {
+        'type': 'dict',
+        'properties': [{
+            'name': 'gplus',
+            'schema': {
+                'type': 'bool',
+            }
+        }, {
+            'name': 'facebook',
+            'schema': {
+                'type': 'bool',
+            }
+        }, {
+            'name': 'twitter',
+            'schema': {
+                'type': 'bool',
+            }
+        }]
+    },
+    'Sharing options to display in the editor view',
+    default_value={
+        'gplus': False,
+        'facebook': False,
+        'twitter': False,
+    })
 
 SOCIAL_MEDIA_BUTTONS = config_domain.ConfigProperty(
     'social_media_buttons', {
@@ -296,10 +317,6 @@ class BaseHandler(webapp2.RequestHandler):
         else:
             self.payload = None
 
-    def unescape_state_name(self, escaped_state_name):
-        """Unescape a state name that is encoded with encodeURIComponent."""
-        return urllib.unquote(escaped_state_name).decode('utf-8')
-
     def dispatch(self):
         """Overrides dispatch method in webapp2 superclass."""
         # If the request is to the old demo server, redirect it permanently to
@@ -385,11 +402,13 @@ class BaseHandler(webapp2.RequestHandler):
         scheme, netloc, path, _, _ = urlparse.urlsplit(self.request.uri)
 
         values.update({
+            'ALL_CATEGORIES': feconf.ALL_CATEGORIES,
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
                 BEFORE_END_HEAD_TAG_HOOK.value),
             'BEFORE_END_BODY_TAG_HOOK': jinja2.utils.Markup(
                 BEFORE_END_BODY_TAG_HOOK.value),
+            'CAN_SEND_ANALYTICS_EVENTS': feconf.CAN_SEND_ANALYTICS_EVENTS,
             'DEFAULT_LANGUAGE_CODE': feconf.ALL_LANGUAGE_CODES[0]['code'],
             'DEV_MODE': feconf.DEV_MODE,
             'DOMAIN_URL': '%s://%s' % (scheme, netloc),
@@ -403,7 +422,8 @@ class BaseHandler(webapp2.RequestHandler):
             'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
             # TODO(sll): Consider including the obj_editor html directly as
             # part of the base HTML template?
-            'OBJECT_EDITORS_JS': jinja2.utils.Markup(OBJECT_EDITORS_JS.value),
+            'OBJECT_EDITORS_JS': jinja2.utils.Markup(
+                obj_services.get_all_object_editor_js_templates()),
             'RTE_COMPONENT_SPECS': (
                 rte_component_registry.Registry.get_all_specs()),
             'SHOW_CUSTOM_PAGES': feconf.SHOW_CUSTOM_PAGES,

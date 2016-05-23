@@ -38,15 +38,19 @@ PADDING = 1
 
 class BaseHandlerTest(test_utils.GenericTestBase):
 
+    def setUp(self):
+        super(BaseHandlerTest, self).setUp()
+        self.signup('user@example.com', 'user')
+
     def test_dev_indicator_appears_in_dev_and_not_in_production(self):
         """Test dev indicator appears in dev and not in production."""
 
         with self.swap(feconf, 'DEV_MODE', True):
-            response = self.testapp.get('/gallery')
+            response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
             self.assertIn('<div class="oppia-dev-mode">', response.body)
 
         with self.swap(feconf, 'DEV_MODE', False):
-            response = self.testapp.get('/gallery')
+            response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
             self.assertNotIn('<div class="oppia-dev-mode">', response.body)
 
     def test_that_no_get_results_in_500_error(self):
@@ -75,17 +79,32 @@ class BaseHandlerTest(test_utils.GenericTestBase):
     def test_requests_for_invalid_paths(self):
         """Test that requests for invalid paths result in a 404 error."""
 
-        response = self.testapp.get('/gallery/extra', expect_errors=True)
+        response = self.testapp.get('/library/extra', expect_errors=True)
         self.assertEqual(response.status_int, 404)
 
-        response = self.testapp.get('/gallery/data/extra', expect_errors=True)
+        response = self.testapp.get('/library/data/extra', expect_errors=True)
         self.assertEqual(response.status_int, 404)
 
-        response = self.testapp.post('/gallery/extra', {}, expect_errors=True)
+        response = self.testapp.post('/library/extra', {}, expect_errors=True)
         self.assertEqual(response.status_int, 404)
 
-        response = self.testapp.put('/gallery/extra', {}, expect_errors=True)
+        response = self.testapp.put('/library/extra', {}, expect_errors=True)
         self.assertEqual(response.status_int, 404)
+
+    def test_redirect_in_both_logged_in_and_logged_out_states(self):
+        "Test for a redirect in both logged in and logged out states on '/'."
+
+        # Logged out state
+        response = self.testapp.get('/')
+        self.assertEqual(response.status_int, 302)
+        self.assertIn('splash', response.headers['location'])
+
+        # Login and assert that there is a redirect
+        self.login('user@example.com')
+        response = self.testapp.get('/')
+        self.assertEqual(response.status_int, 302)
+        self.assertIn('my_explorations', response.headers['location'])
+        self.logout()
 
 
 class CsrfTokenManagerTest(test_utils.GenericTestBase):
@@ -126,44 +145,51 @@ class CsrfTokenManagerTest(test_utils.GenericTestBase):
             types.MethodType(_get_current_time, base.CsrfTokenManager)):
             # Create a token and check that it expires correctly.
             token = base.CsrfTokenManager().create_csrf_token('uid', 'page')
-            self.assertTrue(
-                base.CsrfTokenManager.is_csrf_token_valid('uid', 'page', token))
+            self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(
+                'uid', 'page', token))
 
             current_time = orig_time + 1
-            self.assertTrue(
-                base.CsrfTokenManager.is_csrf_token_valid('uid', 'page', token))
+            self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(
+                'uid', 'page', token))
 
             current_time = orig_time + FORTY_EIGHT_HOURS_IN_SECS - PADDING
-            self.assertTrue(
-                base.CsrfTokenManager.is_csrf_token_valid('uid', 'page', token))
+            self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(
+                'uid', 'page', token))
 
             current_time = orig_time + FORTY_EIGHT_HOURS_IN_SECS + PADDING
-            self.assertFalse(
-                base.CsrfTokenManager.is_csrf_token_valid('uid', 'page', token))
+            self.assertFalse(base.CsrfTokenManager.is_csrf_token_valid(
+                'uid', 'page', token))
 
             # Check that the expiry of one token does not cause the other to
             # expire.
             current_time = orig_time
             token1 = base.CsrfTokenManager.create_csrf_token('uid', 'page1')
             self.assertTrue(
-                base.CsrfTokenManager.is_csrf_token_valid('uid', 'page1', token1))
+                base.CsrfTokenManager.is_csrf_token_valid(
+                    'uid', 'page1', token1))
 
             current_time = orig_time + 100
             token2 = base.CsrfTokenManager.create_csrf_token('uid', 'page2')
             self.assertTrue(
-                base.CsrfTokenManager.is_csrf_token_valid('uid', 'page2', token2))
+                base.CsrfTokenManager.is_csrf_token_valid(
+                    'uid', 'page2', token2))
 
             current_time = orig_time + FORTY_EIGHT_HOURS_IN_SECS + PADDING
             self.assertFalse(
-                base.CsrfTokenManager.is_csrf_token_valid('uid', 'page1', token1))
+                base.CsrfTokenManager.is_csrf_token_valid(
+                    'uid', 'page1', token1))
             self.assertTrue(
-                base.CsrfTokenManager.is_csrf_token_valid('uid', 'page2', token2))
+                base.CsrfTokenManager.is_csrf_token_valid(
+                    'uid', 'page2', token2))
 
-            current_time = orig_time + 100 + FORTY_EIGHT_HOURS_IN_SECS + PADDING
+            current_time = (
+                orig_time + 100 + FORTY_EIGHT_HOURS_IN_SECS + PADDING)
             self.assertFalse(
-                base.CsrfTokenManager.is_csrf_token_valid('uid', 'page1', token1))
+                base.CsrfTokenManager.is_csrf_token_valid(
+                    'uid', 'page1', token1))
             self.assertFalse(
-                base.CsrfTokenManager.is_csrf_token_valid('uid', 'page2', token2))
+                base.CsrfTokenManager.is_csrf_token_valid(
+                    'uid', 'page2', token2))
 
 
 class EscapingTest(test_utils.GenericTestBase):

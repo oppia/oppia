@@ -73,7 +73,7 @@ class CollectionViewerPermissionsTest(test_utils.GenericTestBase):
 
     def test_unpublished_collections_are_visible_to_admins(self):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_EMAIL])
+        self.set_admins([self.ADMIN_USERNAME])
         self.login(self.ADMIN_EMAIL)
         response = self.testapp.get(
             '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
@@ -131,8 +131,10 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
         # explorations to be completed, and that there are no explorations
         # currently completed within the context of this collection.
         self.assertEqual(len(collection_dict['nodes']), 5)
-        self.assertEqual(collection_dict['next_exploration_ids'], ['0'])
-        self.assertEqual(collection_dict['completed_exploration_ids'], [])
+
+        playthrough_dict = collection_dict['playthrough_dict']
+        self.assertEqual(playthrough_dict['next_exploration_ids'], ['0'])
+        self.assertEqual(playthrough_dict['completed_exploration_ids'], [])
 
         # 'Complete' the first exploration. This should lead to 3 more being
         # suggested to the learner.
@@ -142,9 +144,10 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
             '%s/0' % feconf.COLLECTION_DATA_URL_PREFIX)
         collection_dict = response_dict['collection']
 
+        playthrough_dict = collection_dict['playthrough_dict']
         self.assertEqual(
-            collection_dict['next_exploration_ids'], ['13', '4', '14'])
-        self.assertEqual(collection_dict['completed_exploration_ids'], ['0'])
+            playthrough_dict['next_exploration_ids'], ['13', '4', '14'])
+        self.assertEqual(playthrough_dict['completed_exploration_ids'], ['0'])
 
         # Completing the 'Solar System' exploration results in no branching.
         collection_services.record_played_exploration_in_collection_context(
@@ -153,10 +156,11 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
             '%s/0' % feconf.COLLECTION_DATA_URL_PREFIX)
         collection_dict = response_dict['collection']
 
+        playthrough_dict = collection_dict['playthrough_dict']
         self.assertEqual(
-            collection_dict['next_exploration_ids'], ['4', '14'])
+            playthrough_dict['next_exploration_ids'], ['4', '14'])
         self.assertEqual(
-            collection_dict['completed_exploration_ids'], ['0', '13'])
+            playthrough_dict['completed_exploration_ids'], ['0', '13'])
 
         # Completing the 'About Oppia' exploration results in another
         # exploration being suggested.
@@ -166,10 +170,11 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
             '%s/0' % feconf.COLLECTION_DATA_URL_PREFIX)
         collection_dict = response_dict['collection']
 
+        playthrough_dict = collection_dict['playthrough_dict']
         self.assertEqual(
-            collection_dict['next_exploration_ids'], ['4', '15'])
+            playthrough_dict['next_exploration_ids'], ['4', '15'])
         self.assertEqual(
-            collection_dict['completed_exploration_ids'], ['0', '13', '14'])
+            playthrough_dict['completed_exploration_ids'], ['0', '13', '14'])
 
         # Completing all explorations should lead to no other suggestions.
         collection_services.record_played_exploration_in_collection_context(
@@ -180,7 +185,8 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
             '%s/0' % feconf.COLLECTION_DATA_URL_PREFIX)
         collection_dict = response_dict['collection']
 
-        self.assertEqual(collection_dict['next_exploration_ids'], [])
+        playthrough_dict = collection_dict['playthrough_dict']
+        self.assertEqual(playthrough_dict['next_exploration_ids'], [])
         self.assertEqual(
-            collection_dict['completed_exploration_ids'],
+            playthrough_dict['completed_exploration_ids'],
             ['0', '13', '14', '15', '4'])

@@ -49,7 +49,7 @@ echo ''
 
 # Run frontend unit tests.
 echo 'Running frontend unit tests'
-source $(dirname $0)/run_frontend_tests.sh || exit 1
+source $(dirname $0)/run_frontend_tests.sh --run-minified-tests=true || exit 1
 echo 'Frontend tests passed.'
 echo ''
 

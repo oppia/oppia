@@ -1,6 +1,6 @@
 author_notes: ''
 blurb: ''
-category: Coding
+category: Programming
 init_state_name: Intro
 language_code: en
 objective: solve Problem 1 on the Project Euler site
@@ -269,7 +269,9 @@ states:
       answer_groups:
       - outcome:
           dest: Second Question Coding
-          feedback: []
+          feedback:
+          - <p>Oops, it looks like the code has an error! Have a look at the error
+            message in the terminal; that might help you fix it.</p>
           param_changes: []
         rule_specs:
         - inputs: {}

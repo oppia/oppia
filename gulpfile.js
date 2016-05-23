@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview node module that automate tasks.
- *
- * @author barnabasmakonda@gmail.com (Barnabas Makonda)
  */
 
 var fs = require('fs');
@@ -53,7 +51,7 @@ var gulp = require('gulp');
 var gulpStartGae = require('./scripts/gulp-start-gae-devserver');
 var gulpUtil = require('gulp-util');
 var manifest = require('./manifest.json');
-var minifyCss = require('gulp-minify-css');
+var cleanCss = require('gulp-clean-css');
 var path = require('path');
 var sourcemaps = require('gulp-sourcemaps');
 var minify = require('gulp-minify');
@@ -145,7 +143,7 @@ gulp.task('collectDependencyFilepaths', function() {
 gulp.task('generateCss', function() {
   requireFilesExist(cssFilePaths);
   gulp.src(cssFilePaths)
-    .pipe(isMinificationNeeded ? minifyCss() : gulpUtil.noop())
+    .pipe(isMinificationNeeded ? cleanCss({}) : gulpUtil.noop())
     .pipe(concat('third_party.css'))
     .pipe(gulp.dest(generatedCssTargetDir));
 });

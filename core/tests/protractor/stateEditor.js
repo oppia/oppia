@@ -15,21 +15,38 @@
 /**
  * @fileoverview End-to-end tests of the interaction between the player and
  * editor.
- *
- * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var general = require('../protractor_utils/general.js');
+var interactions = require('../../../extensions/interactions/protractor.js');
 var forms = require('../protractor_utils/forms.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
 var player = require('../protractor_utils/player.js');
+var rules = require('../../../extensions/rules/protractor.js');
 
 describe('State editor', function() {
+  it('should walk through the tutorial when user repeatedly clicks Next',
+      function() {
+    var NUM_TUTORIAL_STAGES = 8;
+    users.createUser(
+      'userTutorial@stateEditor.com', 'userTutorialStateEditor');
+    users.login('userTutorial@stateEditor.com');
+
+    workflow.createExplorationAndStartTutorial('sums', 'maths');
+    editor.startTutorial();
+    for (var i = 0; i < NUM_TUTORIAL_STAGES - 1; i++) {
+      editor.progressInTutorial();
+      general.waitForSystem();
+    }
+    editor.finishTutorial();
+    users.logout();
+  });
+
   it('should display plain text content', function() {
-    users.createUser('user1@example.com', 'user1');
-    users.login('user1@example.com');
+    users.createUser('user1@stateEditor.com', 'user1StateEditor');
+    users.login('user1@stateEditor.com');
 
     workflow.createExploration('sums', 'maths');
     editor.setContent(forms.toRichText('plain text'));
@@ -51,23 +68,9 @@ describe('State editor', function() {
     users.logout();
   });
 
-  it('should walk through the tutorial when user repeatedly clicks Next',
-      function() {
-    var NUM_TUTORIAL_STAGES = 5;
-    users.createUser('user@example.com', 'user');
-    users.login('user@example.com');
-
-    workflow.createExplorationAndStartTutorial('sums', 'maths');
-    for (var i = 0; i < NUM_TUTORIAL_STAGES - 1; i++) {
-      editor.progressInTutorial();
-    }
-    editor.finishTutorial();
-    users.logout();
-  });
-
   it('should create content and multiple choice interactions', function() {
-    users.createUser('user2@example.com', 'user2');
-    users.login('user2@example.com');
+    users.createUser('user2@stateEditor.com', 'user2StateEditor');
+    users.login('user2@stateEditor.com');
 
     workflow.createExploration('sums', 'maths');
     editor.setContent(function(richTextEditor) {
@@ -102,8 +105,8 @@ describe('State editor', function() {
   });
 
   it('should obey numeric interaction rules and display feedback', function() {
-    users.createUser('user3@example.com', 'user3');
-    users.login('user3@example.com');
+    users.createUser('user3@stateEditor.com', 'user3StateEditor');
+    users.login('user3@stateEditor.com');
 
     workflow.createExploration('sums', 'maths');
     editor.setContent(forms.toRichText('some content'));
@@ -131,6 +134,27 @@ describe('State editor', function() {
     player.clickThroughToNextCard();
     player.expectExplorationToBeOver();
 
+    users.logout();
+  });
+
+  it('should preserve input value when rule type changes in' +
+      ' add response modal', function() {
+    users.createUser('stateEditorUser1@example.com', 'stateEditorUser1');
+    users.login('stateEditorUser1@example.com');
+    workflow.createExploration('sums', 'maths');
+    editor.setContent(forms.toRichText('some content'));
+
+    editor.openInteraction('TextInput');
+    editor.customizeInteraction('TextInput', 'My PlaceHolder', 2);
+    editor.selectRuleInAddResponseModal('TextInput', 'Equals');
+    editor.setRuleParametersInAddResponseModal('TextInput',
+      'Equals', 'Some Text');
+    editor.expectRuleParametersToBe('TextInput', 'Equals', 'Some Text');
+    editor.selectRuleInAddResponseModal('TextInput', 'Contains');
+    editor.expectRuleParametersToBe('TextInput', 'Equals', 'Some Text');
+    editor.closeAddResponseModal();
+
+    editor.saveChanges();
     users.logout();
   });
 });

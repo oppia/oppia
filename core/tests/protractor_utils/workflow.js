@@ -15,8 +15,6 @@
 /**
  * @fileoverview Utilities for exploration creation, publication ect. when
  * carrrying out end-to-end testing with protractor.
- *
- * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var forms = require('./forms.js');
@@ -32,7 +30,7 @@ var createExploration = function(name, category) {
 // Creates a new exploration and wait for the exploration
 // tutorial to start.
 var createExplorationAndStartTutorial = function(name, category) {
-  browser.get(general.GALLERY_URL_SUFFIX);
+  browser.get(general.LIBRARY_URL_SUFFIX);
   element(by.css('.protractor-test-create-exploration')).click();
   browser.waitForAngular();
   element(by.css('.protractor-test-new-exploration-title')).sendKeys(name);

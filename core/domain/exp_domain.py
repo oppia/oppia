@@ -50,7 +50,7 @@ STATE_PROPERTY_INTERACTION_ID = 'widget_id'
 STATE_PROPERTY_INTERACTION_CUST_ARGS = 'widget_customization_args'
 STATE_PROPERTY_INTERACTION_ANSWER_GROUPS = 'answer_groups'
 STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME = 'default_outcome'
-STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS = (
+STATE_PROPERTY_UNCLASSIFIED_ANSWERS = (
     'confirmed_unclassified_answers')
 STATE_PROPERTY_INTERACTION_FALLBACKS = 'fallbacks'
 # These two properties are kept for legacy purposes and are not used anymore.
@@ -174,7 +174,7 @@ class ExplorationChange(object):
         STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
         STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
         STATE_PROPERTY_INTERACTION_FALLBACKS,
-        STATE_PROPERTY_INTERACTION_UNCLASSIFIED_ANSWERS)
+        STATE_PROPERTY_UNCLASSIFIED_ANSWERS)
 
     GADGET_PROPERTIES = (
         GADGET_PROPERTY_VISIBILITY,
@@ -2413,8 +2413,8 @@ class Exploration(object):
         if not (1 <= exploration_schema_version
                 <= cls.CURRENT_EXP_SCHEMA_VERSION):
             raise Exception(
-                'Sorry, we can only process v1 to v%s YAML files at '
-                'present.' % cls.CURRENT_EXP_SCHEMA_VERSION)
+                'Sorry, we can only process v1 to v%s exploration YAML files '
+                'at present.' % cls.CURRENT_EXP_SCHEMA_VERSION)
         if exploration_schema_version == 1:
             exploration_dict = cls._convert_v1_dict_to_v2_dict(
                 exploration_dict)
@@ -2580,13 +2580,6 @@ class ExplorationSummary(object):
         that the keys need to be strings in order for this dict to be
         JSON-serializable.
         """
-
-        def _get_thumbnail_image_url(category):
-            return '/images/gallery/exploration_background_%s_small.png' % (
-                feconf.CATEGORIES_TO_COLORS[category] if
-                category in feconf.CATEGORIES_TO_COLORS else
-                feconf.DEFAULT_COLOR)
-
         self.id = exploration_id
         self.title = title
         self.category = category
@@ -2604,4 +2597,3 @@ class ExplorationSummary(object):
         self.version = version
         self.exploration_model_created_on = exploration_model_created_on
         self.exploration_model_last_updated = exploration_model_last_updated
-        self.thumbnail_image_url = _get_thumbnail_image_url(category)

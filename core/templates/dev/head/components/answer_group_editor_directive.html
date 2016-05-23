@@ -42,10 +42,11 @@
 
     <br ng-if="rules">
 
-    <outcome-editor is-editable="isEditable"
+    <outcome-editor is-editable="isEditable" display-feedback="displayFeedback"
                     on-save-dest="getOnSaveAnswerGroupDestFn()"
                     on-save-feedback="getOnSaveAnswerGroupFeedbackFn()"
-                    outcome="outcome">
+                    outcome="outcome"
+                    suppress-warnings="suppressWarnings()">
     </outcome-editor>
   </div>
 </script>

@@ -68,12 +68,13 @@
           "angular-resource.min.js", "angular-resource.min.js.map", "angular-route.js",
           "angular-route.min.js", "angular-route.min.js.map", "angular-sanitize.js",
           "angular-sanitize.min.js", "angular-sanitize.min.js.map", "angular-aria.js",
-          "angular-aria.min.js", "angular-aria.min.js.map"
+          "angular-aria.min.js", "angular-aria.min.js.map", "angular-touch.js",
+          "angular-touch.min.js", "angular-touch.min.js.map"
         ],
         "bundle": {
           "js": [
             "angular-animate.js", "angular-resource.js", "angular-sanitize.js",
-            "angular-aria.js"
+            "angular-touch.js", "angular-aria.js"
           ]
         }
       },
@@ -84,6 +85,7 @@
         "targetDirPrefix": "angularjs-",
         "files": ["angular-mocks.js", "angular-scenario.js"]
       },
+<<<<<<< HEAD
       "angularTranslate": {
         "version": "2.8.1",
         "downloadFormat": "zip",
@@ -142,6 +144,17 @@
         "targetDirPrefix": "bower-angular-translate-interpolation-messageformat-",
         "bundle": {
           "js": ["angular-translate-interpolation-messageformat.min.js"]
+=======
+      "angularToastr": {
+        "version": "1.7.0",
+        "downloadFormat": "zip",
+        "url": "https://github.com/Foxandxss/angular-toastr/archive/1.7.0.zip",
+        "rootDirPrefix": "angular-toastr-",
+        "targetDirPrefix": "angular-toastr-",
+        "bundle": {
+          "css": ["dist/angular-toastr.min.css"],
+          "js": ["dist/angular-toastr.tpls.min.js"]
+>>>>>>> develop
         }
       },
       "bootstrap": {
@@ -270,9 +283,9 @@
         "targetDir": "math-expressions-762ffd"
       },
       "mathJax": {
-        "version": "2.4-latest",
+        "version": "2.6.0",
         "downloadFormat": "zip",
-        "url": "https://github.com/mathjax/MathJax/archive/v2.4-latest.zip",
+        "url": "https://github.com/mathjax/MathJax/archive/2.6.0.zip",
         "rootDirPrefix": "MathJax-",
         "targetDirPrefix": "MathJax-"
       },
@@ -316,6 +329,16 @@
           "js": ["ng-infinite-scroll.min.js"]
         }
       },
+      "rangy": {
+        "version": "1.3.0",
+        "downloadFormat": "zip",
+        "url": "https://github.com/timdown/rangy/archive/1.3.0.zip",
+        "rootDirPrefix": "rangy-",
+        "targetDirPrefix": "rangy-",
+        "bundle": {
+          "js": ["lib/rangy-core.js", "lib/rangy-selectionsaverestore.js"]
+        }
+      },
       "select2": {
         "version": "3.5.1",
         "downloadFormat": "zip",
@@ -330,16 +353,14 @@
         }
       },
       "textAngular": {
-        "version": "1.3.7",
+        "version": "1.4.5",
         "downloadFormat": "zip",
-        "url": "https://github.com/fraywing/textAngular/archive/v1.3.7.zip",
+        "url": "https://github.com/fraywing/textAngular/archive/v1.4.5.zip",
         "rootDirPrefix": "textAngular-",
         "targetDirPrefix": "textAngular-",
         "bundle": {
-          "css": ["src/textAngular.css"],
-          "js": [
-            "src/textAngular.js", "src/textAngularSetup.js",
-            "dist/textAngular-rangy.min.js"]
+          "css": ["dist/textAngular.css"],
+          "js": ["dist/textAngular.js", "dist/textAngularSetup.js"]
         }
       },
       "uiBootstrap": {

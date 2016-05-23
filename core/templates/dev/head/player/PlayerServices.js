@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Utility service for the learner's view of an exploration.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.constant('GADGET_SPECS', GLOBALS.GADGET_SPECS);
@@ -33,13 +31,13 @@ oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 // mode. Add tests to ensure this.
 oppia.factory('oppiaPlayerService', [
   '$http', '$rootScope', '$q', 'LearnerParamsService',
-  'warningsData', 'answerClassificationService', 'explorationContextService',
+  'alertsService', 'answerClassificationService', 'explorationContextService',
   'PAGE_CONTEXT', 'oppiaExplorationHtmlFormatterService',
   'playerTranscriptService', 'ExplorationObjectFactory',
   'expressionInterpolationService', 'StatsReportingService',
   function(
       $http, $rootScope, $q, LearnerParamsService,
-      warningsData, answerClassificationService, explorationContextService,
+      alertsService, answerClassificationService, explorationContextService,
       PAGE_CONTEXT, oppiaExplorationHtmlFormatterService,
       playerTranscriptService, ExplorationObjectFactory,
       expressionInterpolationService, StatsReportingService) {
@@ -101,43 +99,57 @@ oppia.factory('oppiaPlayerService', [
     var _loadInitialState = function(successCallback) {
       var initialState = exploration.getInitialState();
 
-      var baseParams = {};
-      for (var paramName in exploration.paramSpecs) {
-        // TODO(sll): This assumes all parameters are of type UnicodeString.
-        // We should generalize this to other default values for different
-        // types of parameters.
-        baseParams[paramName] = '';
-      }
-
-      var startingParams = makeParams(
-        baseParams,
-        exploration.paramChanges.concat(initialState.paramChanges),
-        [baseParams]);
-      if (startingParams === null) {
-        warningsData.addWarning('Expression parsing error.');
+      var oldParams = LearnerParamsService.getAllParams();
+      var newParams = makeParams(
+        oldParams, initialState.paramChanges, [oldParams]);
+      if (newParams === null) {
+        alertsService.addWarning('Expression parsing error.');
         return;
       }
 
-      var questionHtml = makeQuestion(initialState, [startingParams]);
+      var questionHtml = makeQuestion(initialState, [newParams]);
       if (questionHtml === null) {
-        warningsData.addWarning('Expression parsing error.');
+        alertsService.addWarning('Expression parsing error.');
         return;
       }
 
       if (!_editorPreviewMode) {
         StatsReportingService.recordExplorationStarted(
-          exploration.initStateName, startingParams);
+          exploration.initStateName, newParams);
       }
 
       $rootScope.$broadcast('playerStateChange');
-      successCallback(exploration, questionHtml, startingParams);
+      successCallback(exploration, questionHtml, newParams);
+    };
+
+    // Initialize the parameters in the exploration as specified in the
+    // exploration-level initial parameter changes list, followed by any
+    // manual parameter changes (in editor preview mode).
+    var initParams = function(manualParamChanges) {
+      var baseParams = {};
+      for (var paramName in exploration.paramSpecs) {
+        // TODO(sll): This assumes all parameters are of type
+        // UnicodeString. We should generalize this to other default values
+        // for different types of parameters.
+        baseParams[paramName] = '';
+      }
+
+      var startingParams = makeParams(
+        baseParams,
+        exploration.paramChanges.concat(manualParamChanges),
+        [baseParams]);
+
+      LearnerParamsService.init(startingParams);
     };
 
     return {
-      // This should only be used in editor preview mode.
-      populateExploration: function(explorationData) {
+      // This should only be used in editor preview mode. It sets the
+      // exploration data from what's currently specified in the editor, and
+      // also initializes the parameters to empty strings.
+      populateExploration: function(explorationData, manualParamChanges) {
         if (_editorPreviewMode) {
           exploration = ExplorationObjectFactory.create(explorationData);
+          initParams(manualParamChanges);
         } else {
           throw 'Error: cannot populate exploration in learner mode.';
         }
@@ -158,14 +170,13 @@ oppia.factory('oppiaPlayerService', [
        */
       init: function(successCallback) {
         answerIsBeingProcessed = false;
-        LearnerParamsService.init({});
         playerTranscriptService.init();
 
         if (_editorPreviewMode) {
           if (exploration) {
             _loadInitialState(successCallback);
           } else {
-            warningsData.addWarning(
+            alertsService.addWarning(
               'Could not initialize exploration, because it was not yet ' +
               'populated.');
           }
@@ -173,9 +184,12 @@ oppia.factory('oppiaPlayerService', [
           var explorationDataUrl = (
             '/explorehandler/init/' + _explorationId +
             (version ? '?v=' + version : ''));
-          $http.get(explorationDataUrl).success(function(data) {
+          $http.get(explorationDataUrl).then(function(response) {
+            var data = response.data;
             exploration = ExplorationObjectFactory.create(data.exploration);
             version = data.version;
+
+            initParams([]);
 
             StatsReportingService.initSession(
               _explorationId, data.version, data.session_id,
@@ -202,8 +216,13 @@ oppia.factory('oppiaPlayerService', [
         return exploration.getUninterpolatedContentHtml(stateName);
       },
       getInteractionHtml: function(stateName, labelForFocusTarget) {
+        var interactionId = exploration.getInteractionId(stateName);
+        if (!interactionId) {
+          return null;
+        }
+
         return oppiaExplorationHtmlFormatterService.getInteractionHtml(
-          exploration.getInteractionId(stateName),
+          interactionId,
           exploration.getInteractionCustomizationArgs(stateName),
           labelForFocusTarget);
       },
@@ -277,7 +296,7 @@ oppia.factory('oppiaPlayerService', [
           var feedbackHtml = makeFeedback(outcome.feedback, [oldParams]);
           if (feedbackHtml === null) {
             answerIsBeingProcessed = false;
-            warningsData.addWarning('Expression parsing error.');
+            alertsService.addWarning('Expression parsing error.');
             return;
           }
 
@@ -286,7 +305,7 @@ oppia.factory('oppiaPlayerService', [
               oldParams, newState.paramChanges, [oldParams]) : oldParams);
           if (newParams === null) {
             answerIsBeingProcessed = false;
-            warningsData.addWarning('Expression parsing error.');
+            alertsService.addWarning('Expression parsing error.');
             return;
           }
 
@@ -295,7 +314,7 @@ oppia.factory('oppiaPlayerService', [
           }]);
           if (questionHtml === null) {
             answerIsBeingProcessed = false;
-            warningsData.addWarning('Expression parsing error.');
+            alertsService.addWarning('Expression parsing error.');
             return;
           }
 
@@ -338,8 +357,8 @@ oppia.factory('oppiaPlayerService', [
         if (_isLoggedIn && !_editorPreviewMode) {
           $http.get(
             '/preferenceshandler/profile_picture'
-          ).success(function(data) {
-            var profilePictureDataUrl = data.profile_picture_data_url;
+          ).then(function(response) {
+            var profilePictureDataUrl = response.data.profile_picture_data_url;
             if (profilePictureDataUrl) {
               deferred.resolve(profilePictureDataUrl);
             } else {

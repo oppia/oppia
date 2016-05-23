@@ -14,16 +14,14 @@
 
 /**
  * @fileoverview Controllers for the page showing the user's explorations.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.controller('MyExplorations', [
-  '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
-  'RatingComputationService',
+  '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter', 'CATEGORY_LIST',
+  'RatingComputationService', 'urlService', 'ExplorationCreationButtonService',
   function(
-      $scope, $http, $rootScope, oppiaDatetimeFormatter,
-      RatingComputationService) {
+      $scope, $http, $rootScope, oppiaDatetimeFormatter, CATEGORY_LIST,
+      RatingComputationService, urlService, ExplorationCreationButtonService) {
     $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
       return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
         millisSinceEpoch);
@@ -33,10 +31,22 @@ oppia.controller('MyExplorations', [
       return RatingComputationService.computeAverageRating(ratings);
     };
 
+    $scope.showCreateExplorationModal = function() {
+      ExplorationCreationButtonService.showCreateExplorationModal(
+        CATEGORY_LIST);
+    };
+
     $rootScope.loadingMessage = 'Loading';
-    $http.get('/myexplorationshandler/data').success(function(data) {
+    $http.get('/myexplorationshandler/data').then(function(response) {
+      var data = response.data;
       $scope.explorationsList = data.explorations_list;
       $rootScope.loadingMessage = '';
+
+      if (data.username) {
+        if (urlService.getUrlParams().mode === 'create') {
+          $scope.showCreateExplorationModal(CATEGORY_LIST);
+        }
+      }
     });
   }
 ]);
@@ -47,6 +57,15 @@ oppia.controller('CreateExplorationButton', [
     $scope.showCreateExplorationModal = function() {
       ExplorationCreationButtonService.showCreateExplorationModal(
         CATEGORY_LIST);
+    };
+  }
+]);
+
+oppia.controller('CreateCollectionButton', [
+  '$scope', 'CATEGORY_LIST', 'CollectionCreationButtonService',
+  function($scope, CATEGORY_LIST, CollectionCreationButtonService) {
+    $scope.showCreateCollectionModal = function() {
+      CollectionCreationButtonService.showCreateCollectionModal(CATEGORY_LIST);
     };
   }
 ]);

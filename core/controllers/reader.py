@@ -44,38 +44,11 @@ import utils
 
 MAX_SYSTEM_RECOMMENDATIONS = 4
 
-SHARING_OPTIONS = config_domain.ConfigProperty(
-    'sharing_options', {
-        'type': 'dict',
-        'properties': [{
-            'name': 'gplus',
-            'schema': {
-                'type': 'bool',
-            }
-        }, {
-            'name': 'facebook',
-            'schema': {
-                'type': 'bool',
-            }
-        }, {
-            'name': 'twitter',
-            'schema': {
-                'type': 'bool',
-            }
-        }]
-    },
-    'Sharing options to display in the learner view',
-    default_value={
-        'gplus': False,
-        'facebook': False,
-        'twitter': False,
-    })
-
-SHARING_OPTIONS_TWITTER_TEXT = config_domain.ConfigProperty(
-    'sharing_options_twitter_text', {
+DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = config_domain.ConfigProperty(
+    'default_twitter_share_message_player', {
         'type': 'unicode',
     },
-    'Default text for the Twitter share message',
+    'Default text for the Twitter share message for the learner view',
     default_value=(
         'Check out this interactive lesson from Oppia - a free, open-source '
         'learning platform!'))
@@ -338,8 +311,9 @@ class ExplorationPage(base.BaseHandler):
         self.values.update({
             'GADGET_SPECS': gadget_registry.Registry.get_all_specs(),
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
-            'SHARING_OPTIONS': SHARING_OPTIONS.value,
-            'SHARING_OPTIONS_TWITTER_TEXT': SHARING_OPTIONS_TWITTER_TEXT.value,
+            'SHARING_OPTIONS': base.SHARING_OPTIONS.value,
+            'DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER': (
+                DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER.value),
             'additional_angular_modules': additional_angular_modules,
             'can_edit': (
                 bool(self.username) and
@@ -393,8 +367,6 @@ class ExplorationHandler(base.BaseHandler):
                 rights_manager.Actor(self.user_id).can_edit(
                     rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id)),
             'exploration': exploration.to_player_dict(),
-            'info_card_image_url': utils.get_info_card_url_for_category(
-                exploration.category),
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
             'version': exploration.version,
@@ -643,7 +615,7 @@ class RecommendationsHandler(base.BaseHandler):
         auto_recommended_exp_ids = []
         if self.user_id and collection_id:
             next_exp_ids_in_collection = (
-                collection_services.get_next_exploration_ids_to_complete_by_user(
+                collection_services.get_next_exploration_ids_to_complete_by_user( # pylint: disable=line-too-long
                     self.user_id, collection_id))
             auto_recommended_exp_ids = list(
                 set(next_exp_ids_in_collection) -

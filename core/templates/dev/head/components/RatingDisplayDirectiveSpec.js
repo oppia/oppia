@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Tests that ratings are being displayed correctly.
- *
- * @author Jacob Davis
  */
 
 describe('Rating display directive', function() {
@@ -38,13 +36,13 @@ describe('Rating display directive', function() {
       '</rating-display>');
     compiledElem = $compile(elt)(scope);
     scope.$digest();
-    ctrlScope = elt.isolateScope();
+    ctrlScope = elt[0].isolateScope();
   }));
 
   it('should display the correct number of stars', function() {
     ctrlScope.ratingValue = 4.2;
     scope.$digest();
-    // Note the array here is zero-indexed but ratings are one-indexed
+    // Note the array here is zero-indexed but ratings are one-indexed.
     expect(ctrlScope.stars[0].cssClass).toBe('fa-star');
     expect(ctrlScope.stars[1].cssClass).toBe('fa-star');
     expect(ctrlScope.stars[2].cssClass).toBe('fa-star');

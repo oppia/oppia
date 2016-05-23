@@ -14,23 +14,22 @@
 
 /**
  * @fileoverview Data and controllers for the Oppia profile page.
- *
- * @author sfederwisch@google.com (Stephanie Federwisch)
  */
 
 oppia.controller('Signup', [
-  '$scope', '$http', '$rootScope', '$modal', 'warningsData', 'urlService',
-  'focusService',
+  '$scope', '$http', '$rootScope', '$modal', 'alertsService', 'urlService',
+  'focusService', 'siteAnalyticsService',
   function(
-      $scope, $http, $rootScope, $modal, warningsData, urlService,
-      focusService) {
+      $scope, $http, $rootScope, $modal, alertsService, urlService,
+      focusService, siteAnalyticsService) {
     var _SIGNUP_DATA_URL = '/signuphandler/data';
     $rootScope.loadingMessage = 'I18N_SIGNUP_LOADING';
     $scope.warningI18nCode = '';
     $scope.showEmailPreferencesForm = GLOBALS.CAN_SEND_EMAILS_TO_USERS;
     $scope.submissionInProcess = false;
 
-    $http.get(_SIGNUP_DATA_URL).success(function(data) {
+    $http.get(_SIGNUP_DATA_URL).then(function(response) {
+      var data = response.data;
       $rootScope.loadingMessage = '';
       $scope.username = data.username;
       $scope.hasEverRegistered = data.has_ever_registered;
@@ -68,15 +67,21 @@ oppia.controller('Signup', [
       if ($scope.hasUsername) {
         return;
       }
-      warningsData.clear();
+      alertsService.clearWarnings();
       $scope.blurredAtLeastOnce = true;
       $scope.updateWarningText(username);
       if (!$scope.warningText) {
         $http.post('usernamehandler/data', {
           username: $scope.username
+<<<<<<< HEAD
         }).success(function(data) {
           if (data.username_is_taken) {
             $scope.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_TAKEN';
+=======
+        }).then(function(response) {
+          if (response.data.username_is_taken) {
+            $scope.warningText = 'Sorry, this username is already taken.';
+>>>>>>> develop
           }
         });
       }
@@ -113,7 +118,13 @@ oppia.controller('Signup', [
     $scope.submitPrerequisitesForm = function(
         agreedToTerms, username, canReceiveEmailUpdates) {
       if (!agreedToTerms) {
+<<<<<<< HEAD
         warningsData.addWarning('I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
+=======
+        alertsService.addWarning(
+          'In order to edit explorations on this site, you will need to ' +
+          'agree to the site terms.');
+>>>>>>> develop
         return;
       }
 
@@ -145,11 +156,13 @@ oppia.controller('Signup', [
         }
       }
 
+      siteAnalyticsService.registerNewSignupEvent();
+
       $scope.submissionInProcess = true;
-      $http.post(_SIGNUP_DATA_URL, requestParams).success(function() {
+      $http.post(_SIGNUP_DATA_URL, requestParams).then(function() {
         window.location = window.decodeURIComponent(
           urlService.getUrlParams().return_url);
-      }).error(function() {
+      }, function() {
         $scope.submissionInProcess = false;
       });
     };

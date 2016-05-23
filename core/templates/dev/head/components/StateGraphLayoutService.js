@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Directives for reusable data visualization components.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 // Service for computing layout of state graph nodes.

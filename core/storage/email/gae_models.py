@@ -16,6 +16,8 @@
 
 """Models for the content of sent emails."""
 
+import datetime
+
 from core.platform import models
 import feconf
 import utils
@@ -49,6 +51,7 @@ class SentEmailModel(base_models.BaseModel):
         feconf.EMAIL_INTENT_SIGNUP,
         feconf.EMAIL_INTENT_MARKETING,
         feconf.EMAIL_INTENT_DAILY_BATCH,
+        feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION,
         feconf.EMAIL_INTENT_PUBLICIZE_EXPLORATION,
         feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION,
         feconf.EMAIL_INTENT_DELETE_EXPLORATION,
@@ -59,6 +62,8 @@ class SentEmailModel(base_models.BaseModel):
     html_body = ndb.TextProperty(required=True)
     # The datetime the email was sent, in UTC.
     sent_datetime = ndb.DateTimeProperty(required=True, indexed=True)
+    # The hash of the recipient id, email subject and message body.
+    email_hash = ndb.StringProperty(indexed=True)
 
     @classmethod
     def _generate_id(cls, intent):
@@ -77,10 +82,6 @@ class SentEmailModel(base_models.BaseModel):
             'The id generator for SentEmailModel is producing too many '
             'collisions.')
 
-    def put(self):
-        """Once written, instances of this class should be read-only."""
-        raise NotImplementedError
-
     @classmethod
     def create(
             cls, recipient_id, recipient_email, sender_id, sender_email,
@@ -92,8 +93,75 @@ class SentEmailModel(base_models.BaseModel):
             recipient_email=recipient_email, sender_id=sender_id,
             sender_email=sender_email, intent=intent, subject=subject,
             html_body=html_body, sent_datetime=sent_datetime)
-        # We only allow the model instance to be saved once, when it is
-        # first created. To do this, we bypass the instance's put() method,
-        # which raises an error, and use the put() method of its superclass
-        # instead.
-        super(SentEmailModel, email_model_instance).put()
+
+        email_model_instance.put()
+
+    def put(self):
+        email_hash = self._generate_hash(
+            self.recipient_id, self.subject, self.html_body)
+        self.email_hash = email_hash
+        super(SentEmailModel, self).put()
+
+    @classmethod
+    def get_by_hash(cls, email_hash, sent_datetime_lower_bound=None):
+        """Returns all messages with a given email_hash.
+
+        This also takes an optional sent_datetime_lower_bound argument,
+        which is a datetime instance. If this is given, only
+        SentEmailModel instances sent after sent_datetime_lower_bound
+        should be returned.
+        """
+
+        if sent_datetime_lower_bound is not None:
+            if not isinstance(sent_datetime_lower_bound, datetime.datetime):
+                raise Exception(
+                    'Expected datetime, received %s of type %s' %
+                    (sent_datetime_lower_bound,
+                     type(sent_datetime_lower_bound)))
+
+        query = cls.query().filter(cls.email_hash == email_hash)
+
+        if sent_datetime_lower_bound is not None:
+            query = query.filter(cls.sent_datetime > sent_datetime_lower_bound)
+
+        messages = query.fetch()
+
+        return messages
+
+    @classmethod
+    def _generate_hash(cls, recipient_id, email_subject, email_body):
+        """Generate hash for a given recipient_id, email_subject and cleaned
+        email_body.
+        """
+        hash_value = utils.convert_to_hash(
+            recipient_id + email_subject + email_body,
+            100)
+
+        return hash_value
+
+    @classmethod
+    def check_duplicate_message(cls, recipient_id, email_subject, email_body):
+        """Check for a given recipient_id, email_subject and cleaned
+        email_body, whether a similar message has been sent in the last
+        DUPLICATE_EMAIL_INTERVAL_MINS.
+        """
+
+        email_hash = cls._generate_hash(
+            recipient_id, email_subject, email_body)
+
+        datetime_now = datetime.datetime.utcnow()
+        time_interval = datetime.timedelta(
+            minutes=feconf.DUPLICATE_EMAIL_INTERVAL_MINS)
+
+        sent_datetime_lower_bound = datetime_now - time_interval
+
+        messages = cls.get_by_hash(
+            email_hash, sent_datetime_lower_bound=sent_datetime_lower_bound)
+
+        for message in messages:
+            if (message.recipient_id == recipient_id and
+                    message.subject == email_subject and
+                    message.html_body == email_body):
+                return True
+
+        return False

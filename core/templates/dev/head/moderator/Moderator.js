@@ -14,8 +14,6 @@
 
 /**
 * @fileoverview Data and controllers for the Oppia moderator page.
-*
-* @author yanamal@google.com (Yana Malysheva)
 */
 
 oppia.controller('Moderator', [
@@ -50,9 +48,10 @@ oppia.controller('Moderator', [
       recentCommitsUrl += ('?cursor=' + $scope.recentCommitsCursor);
     }
 
-    $http.get(recentCommitsUrl).success(function(data) {
+    $http.get(recentCommitsUrl).then(function(response) {
       // Update the explorationData object with information about newly-
       // discovered explorations.
+      var data = response.data;
       var explorationIdsToExplorationData = data.exp_ids_to_exp_data;
       for (var expId in explorationIdsToExplorationData) {
         if (!$scope.explorationData.hasOwnProperty(expId)) {
@@ -87,7 +86,8 @@ oppia.controller('Moderator', [
         '?cursor=' + $scope.recentFeedbackMessagesCursor);
     }
 
-    $http.get(recentFeedbackMessagesUrl).success(function(data) {
+    $http.get(recentFeedbackMessagesUrl).then(function(response) {
+      var data = response.data;
       for (var i = 0; i < data.results.length; i++) {
         $scope.allFeedbackMessages.push(data.results[i]);
       }

@@ -15,8 +15,6 @@
 /**
  * @fileoverview Unit tests for the services and controllers of the exploration
  *   editor page.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 describe('Exploration context service', function() {
@@ -103,9 +101,9 @@ describe('Exploration context service', function() {
       expect(ecs.getExplorationId).toThrow();
     });
 
-    it('should throw an error when trying to retrieve the page context',
+    it('should retrieve other as page context',
         function() {
-      expect(ecs.getPageContext).toThrow();
+      expect(ecs.getPageContext()).toBe('other');
     });
   });
 });
