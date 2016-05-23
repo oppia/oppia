@@ -59,12 +59,12 @@ oppia.controller('StateEditor', [
     $scope.contentEditorIsOpen = false;
 
     $scope.initStateEditor = function() {
-      $scope.stateName = editorContextService.getActiveStateName();
+      var stateName = editorContextService.getActiveStateName();
+      $scope.content = explorationStatesService.getStateContentMemento(
+        stateName);
 
-      var stateData = explorationStatesService.getState($scope.stateName);
-      $scope.content = stateData.content;
-
-      if ($scope.stateName && stateData) {
+      var stateData = explorationStatesService.getState(stateName);
+      if (stateName && stateData) {
         $rootScope.$broadcast('stateEditorInitialized', stateData);
         $scope.isInteractionIdSet = Boolean(stateData.interaction.id);
         $scope.isCurrentStateTerminal = (
@@ -103,9 +103,8 @@ oppia.controller('StateEditor', [
     };
 
     $scope.cancelEdit = function() {
-      var _stateData = explorationStatesService.getState(
+      $scope.content = explorationStatesService.getStateContentMemento(
         editorContextService.getActiveStateName());
-      $scope.content = angular.copy(_stateData.content);
       $scope.contentEditorIsOpen = false;
     };
   }

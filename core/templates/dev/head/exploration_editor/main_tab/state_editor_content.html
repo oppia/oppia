@@ -5,7 +5,6 @@
     <i ng-if="editabilityService.isEditable()" class="material-icons oppia-editor-edit-icon"
        title="Edit Card Content">&#xE254;
     </i>
-    </span>
     <div class="oppia-state-content-display oppia-transition-200" ng-class="{'oppia-prevent-selection': editabilityService.isEditable()}" title="Card Content">
       <span ng-show="content[0].value == '' && isCurrentStateInitialState()" class="oppia-placeholder">
         This is the first card of your exploration. Use this space to introduce your topic and engage the learner, then ask them a question.

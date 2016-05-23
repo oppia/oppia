@@ -123,23 +123,22 @@ describe('State Editor controller', function() {
     it('should initialize the state name and related properties', function() {
       ecs.setActiveStateName('Third State');
       scope.initStateEditor();
-      expect(scope.contentMemento).toBeNull();
+      expect(scope.contentEditorIsOpen).toBe(false);
       expect(scope.content[0].value).toEqual('This is some content.');
     });
 
     it('should correctly handle no-op edits', function() {
       ecs.setActiveStateName('First State');
       scope.initStateEditor();
-      expect(scope.contentMemento).toBeNull();
+      expect(scope.contentEditorIsOpen).toBe(false);
       expect(scope.content).toEqual(scope.getContent('First State Content'));
       scope.content = scope.getContent(
         'And now for something completely different.'
       );
       scope.openStateContentEditor();
-      expect(scope.contentMemento[0].value)
-        .toEqual('And now for something completely different.');
+      expect(scope.contentEditorIsOpen).toBe(true);
       scope.saveTextContent();
-      expect(scope.contentMemento).toEqual(null);
+      expect(scope.contentEditorIsOpen).toBe(false);
       expect(cls.getChangeList()).toEqual([]);
     });
 
@@ -147,13 +146,13 @@ describe('State Editor controller', function() {
        function() {
       ecs.setActiveStateName('Third State');
       expect(cls.getChangeList()).toEqual([]);
-      scope.content = scope.getContent('abababab');
       scope.openStateContentEditor();
       scope.content = scope.getContent('babababa');
       scope.saveTextContent();
       expect(cls.getChangeList().length).toBe(1);
       expect(cls.getChangeList()[0].new_value[0].value).toEqual('babababa');
-      expect(cls.getChangeList()[0].old_value[0].value).toEqual('abababab');
+      expect(cls.getChangeList()[0].old_value[0].value).toEqual(
+        'This is some content.');
 
       scope.openStateContentEditor();
       scope.content = scope.getContent(
@@ -170,7 +169,7 @@ describe('State Editor controller', function() {
       ecs.setActiveStateName('Second State');
       scope.initStateEditor();
       expect(cls.getChangeList()).toEqual([]);
-      expect(scope.contentMemento).toBeNull();
+      expect(scope.contentEditorIsOpen).toBe(false);
       scope.content = scope.getContent('Eroica');
       scope.saveTextContent();
       expect(cls.getChangeList()).toEqual([]);
@@ -183,7 +182,7 @@ describe('State Editor controller', function() {
       var contentBeforeEdit = angular.copy(scope.content);
       scope.content = scope.getContent('Test Content');
       scope.cancelEdit();
-      expect(scope.contentMemento).toBeNull();
+      expect(scope.contentEditorIsOpen).toBe(false);
       expect(scope.content).toEqual(contentBeforeEdit);
     });
   });
