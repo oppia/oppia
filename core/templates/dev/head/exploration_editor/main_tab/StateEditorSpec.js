@@ -132,11 +132,9 @@ describe('State Editor controller', function() {
       scope.initStateEditor();
       expect(scope.contentEditorIsOpen).toBe(false);
       expect(scope.content).toEqual(scope.getContent('First State Content'));
-      scope.content = scope.getContent(
-        'And now for something completely different.'
-      );
       scope.openStateContentEditor();
       expect(scope.contentEditorIsOpen).toBe(true);
+      scope.content = scope.getContent('First State Content');
       scope.saveTextContent();
       expect(scope.contentEditorIsOpen).toBe(false);
       expect(cls.getChangeList()).toEqual([]);
@@ -163,16 +161,6 @@ describe('State Editor controller', function() {
       expect(cls.getChangeList()[1].new_value[0].value)
         .toEqual('And now for something completely different.');
       expect(cls.getChangeList()[1].old_value[0].value).toEqual('babababa');
-    });
-
-    it('should not re-save unedited content', function() {
-      ecs.setActiveStateName('Second State');
-      scope.initStateEditor();
-      expect(cls.getChangeList()).toEqual([]);
-      expect(scope.contentEditorIsOpen).toBe(false);
-      scope.content = scope.getContent('Eroica');
-      scope.saveTextContent();
-      expect(cls.getChangeList()).toEqual([]);
     });
 
     it('should not save any changes to content when an edit is cancelled',
