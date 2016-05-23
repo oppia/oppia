@@ -82,7 +82,9 @@ oppia.controller('StateEditor', [
       }
 
       $scope.$on('externalSave', function() {
-        $scope.saveTextContent();
+        if ($scope.contentEditorIsOpen) {
+          $scope.saveTextContent();
+        }
       });
 
       $rootScope.loadingMessage = '';
