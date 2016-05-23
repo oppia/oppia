@@ -49,6 +49,11 @@ oppia.controller('StateEditor', [
       $scope.initStateEditor();
     });
 
+    $scope.$on('refreshStateContent', function() {
+      $scope.content = explorationStatesService.getStateContentMemento(
+        editorContextService.getActiveStateName());
+    });
+
     $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
       $scope.isInteractionIdSet = Boolean(newInteractionId);
       $scope.isCurrentStateTerminal = (

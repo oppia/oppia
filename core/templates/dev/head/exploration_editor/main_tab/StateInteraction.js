@@ -45,16 +45,14 @@ oppia.factory('interactionDetailsCache', [function() {
 
 oppia.controller('StateInteraction', [
   '$scope', '$http', '$rootScope', '$modal', '$filter', 'alertsService',
-  'editorContextService', 'changeListService', 'oppiaHtmlEscaper',
-  'INTERACTION_SPECS', 'stateInteractionIdService',
-  'stateCustomizationArgsService', 'editabilityService',
-  'explorationStatesService', 'graphDataService',
+  'editorContextService', 'oppiaHtmlEscaper', 'INTERACTION_SPECS',
+  'stateInteractionIdService', 'stateCustomizationArgsService',
+  'editabilityService', 'explorationStatesService', 'graphDataService',
   'interactionDetailsCache', 'oppiaExplorationHtmlFormatterService',
   function($scope, $http, $rootScope, $modal, $filter, alertsService,
-      editorContextService, changeListService, oppiaHtmlEscaper,
-      INTERACTION_SPECS, stateInteractionIdService,
-      stateCustomizationArgsService, editabilityService,
-      explorationStatesService, graphDataService,
+      editorContextService, oppiaHtmlEscaper, INTERACTION_SPECS,
+      stateInteractionIdService, stateCustomizationArgsService,
+      editabilityService, explorationStatesService, graphDataService,
       interactionDetailsCache, oppiaExplorationHtmlFormatterService) {
     var DEFAULT_TERMINAL_STATE_CONTENT = 'Congratulations, you have finished!';
 
@@ -119,30 +117,24 @@ oppia.controller('StateInteraction', [
     // active state is a terminal one.
     var updateDefaultTerminalStateContentIfEmpty = function() {
       // Get current state.
-      var activeStateName = editorContextService.getActiveStateName();
-      var state = explorationStatesService.getState(activeStateName);
+      var stateName = editorContextService.getActiveStateName();
 
       // Check if the content is currently empty, as expected.
-      if (state.content.length != 1 ||
-          state.content[0].value !== '' ||
-          state.content[0].type != 'text') {
+      var previousContent = explorationStatesService.getStateContentMemento(
+        stateName);
+      if (previousContent.length != 1 || previousContent[0].value !== '' ||
+          previousContent[0].type != 'text') {
         return;
       }
 
       // Update the state's content.
-      var previousContent = angular.copy(state.content);
-      state.content = [{
+      explorationStatesService.saveStateContent(stateName, [{
         type: 'text',
         value: DEFAULT_TERMINAL_STATE_CONTENT
-      }];
+      }]);
 
-      // Fire property change for editing the state's content.
-      changeListService.editStateProperty(
-        activeStateName, 'content',
-        angular.copy(state.content), previousContent);
-
-      // Save state.
-      explorationStatesService.setState(activeStateName, state);
+      // Update the state content editor view.
+      $rootScope.$broadcast('refreshStateContent');
     };
 
     $scope.onCustomizationModalSavePostHook = function() {
