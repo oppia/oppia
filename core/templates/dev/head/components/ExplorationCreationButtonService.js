@@ -54,7 +54,6 @@ oppia.factory('ExplorationCreationButtonService', [
               'Create New Exploration');
             $scope.activityName = 'exploration';
             $scope.categoriesForDropdown = categoriesForDropdown;
-            $scope.newActivityTitle = '';
             $scope.newActivityCategory = '';
             $scope.newActivityObjective = '';
             $scope.newActivityLanguageCode = GLOBALS.DEFAULT_LANGUAGE_CODE;
@@ -65,11 +64,7 @@ oppia.factory('ExplorationCreationButtonService', [
               return GLOBALS.ALL_LANGUAGE_CODES;
             };
 
-            $scope.save = function(title, category, objective, languageCode) {
-              if (!$scope.isTitleValid(title)) {
-                return;
-              }
-
+            $scope.save = function(category, objective, languageCode) {
               if (!category) {
                 alertsService.addWarning(
                   'Please specify a category for this exploration.');
@@ -77,8 +72,7 @@ oppia.factory('ExplorationCreationButtonService', [
               }
 
               var returnObj = {
-                category: category,
-                title: title
+                category: category
               };
 
               if ($scope.isUploadModal) {
@@ -94,27 +88,6 @@ oppia.factory('ExplorationCreationButtonService', [
               }
 
               $modalInstance.close(returnObj);
-            };
-
-            // Checks the validity of exploration title.
-            $scope.isTitleValid = function(title, changedAtLeastOnce) {
-              if (changedAtLeastOnce) {
-                $scope.changedAtLeastOnce = true;
-              }
-
-              if (!title) {
-                $scope.warningText = 'Please enter an exploration title.';
-                return false;
-              }
-
-              if (!validatorsService.isValidEntityName(title, false)) {
-                $scope.warningText = 'Please use ' +
-                  'letters, numbers, hyphens and spaces only.';
-                return false;
-              }
-
-              $scope.warningText = '';
-              return true;
             };
 
             $scope.cancel = function() {
@@ -157,8 +130,7 @@ oppia.factory('ExplorationCreationButtonService', [
             $http.post('/contributehandler/create_new', {
               category: category,
               language_code: result.languageCode,
-              objective: $filter('normalizeWhitespace')(result.objective),
-              title: result.title
+              objective: $filter('normalizeWhitespace')(result.objective)
             }).then(function(response) {
               siteAnalyticsService.registerCreateNewExplorationEvent(
                 response.data.explorationId);
@@ -176,7 +148,6 @@ oppia.factory('ExplorationCreationButtonService', [
         alertsService.clearWarnings();
 
         getModalInstance(categoryList, true).result.then(function(result) {
-          var title = result.title;
           var category = $filter('normalizeWhitespace')(result.category);
           var yamlFile = result.yamlFile;
 
@@ -189,8 +160,7 @@ oppia.factory('ExplorationCreationButtonService', [
           var form = new FormData();
           form.append('yaml_file', yamlFile);
           form.append('payload', JSON.stringify({
-            category: category,
-            title: title
+            category: category
           }));
           form.append('csrf_token', GLOBALS.csrf_token);
 

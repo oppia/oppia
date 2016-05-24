@@ -1441,7 +1441,6 @@ class Exploration(object):
         if not isinstance(self.title, basestring):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' % self.title)
-        utils.require_valid_name(self.title, 'the exploration title')
 
         if not isinstance(self.category, basestring):
             raise utils.ValidationError(
@@ -1640,6 +1639,11 @@ class Exploration(object):
 
         if strict:
             warnings_list = []
+
+            try:
+                utils.require_valid_name(self.title, 'the exploration title')
+            except utils.ValidationError as e:
+                warnings_list.append(unicode(e))
 
             try:
                 self._verify_all_states_reachable()

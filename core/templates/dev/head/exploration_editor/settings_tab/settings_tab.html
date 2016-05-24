@@ -8,7 +8,7 @@
             <div class="form-group" ng-class="{'has-error': !explorationTitleService.displayed}">
               <label for="explorationTitle" class="col-lg-2 col-md-2 col-sm-2">Title</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
-                <input id="explorationTitle" type="text" class="form-control protractor-test-exploration-title-input" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()">
+                <input id="explorationTitle" type="text" class="form-control protractor-test-exploration-title-input" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()" placeholder="Choose a title for your exploration.">
               </div>
             </div>
             <div class="form-group" ng-class="{'has-error': !explorationObjectiveService.displayed}">

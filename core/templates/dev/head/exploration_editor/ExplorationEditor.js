@@ -445,6 +445,8 @@ oppia.controller('EditorNavbarBreadcrumb', [
       if ($scope.navbarTitle.length > _MAX_TITLE_LENGTH) {
         $scope.navbarTitle = (
           $scope.navbarTitle.substring(0, _MAX_TITLE_LENGTH - 3) + '...');
+      } else if ($scope.navbarTitle.length === 0) {
+        $scope.navbarTitle = 'Untitled Exploration';
       }
     });
 
