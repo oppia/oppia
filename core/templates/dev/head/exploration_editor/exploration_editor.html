@@ -257,17 +257,17 @@
         <p>
           Just a few more things before you publish:
         </p>
-        <p>
+        <p ng-if="!explorationTitleService.displayed">
           Add a title: what should your exploration be called?
           <input type="text" class="form-control" ng-model="explorationTitleService.displayed"
                  placeholder="Music in the 19th Century">
         </p>
-        <p>
+        <p ng-if="!explorationObjectiveService.displayed">
           Add a goal: what does the exploration help people to do?
           <input type="text" class="form-control" ng-model="explorationObjectiveService.displayed"
                  placeholder="Learn how to ...">
         </p>
-        <p>
+        <p ng-if="!explorationCategoryService.displayed">
           Add a category: how would you categorize your exploration?
           <select2-dropdown id="explorationCategory" class="protractor-test-new-exploration-category"
             item="explorationCategoryService.displayed"
@@ -276,7 +276,7 @@
             width="100%" invalid-search-term-message="Invalid category name">
           </select2-dropdown>
         </p>
-        <p>
+        <p ng-if="!explorationLanguageCodeService.displayed">
           Update the language: what language does your exploration use?
           <select id="explorationLanguageCode" class="form-control protractor-test-exploration-language-select" ng-model="explorationLanguageCodeService.displayed" ng-change="saveExplorationLanguageCode()" ng-options="lc.code as lc.description for lc in explorationLanguageCodeService.getAllLanguageCodes()">
           </select>
