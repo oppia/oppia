@@ -21,8 +21,8 @@ oppia.directive('searchResults', [function() {
     restrict: 'E',
     templateUrl: 'components/searchResults',
     controller: [
-      '$scope', '$rootScope', '$timeout', 'siteAnalyticsService',
-      function($scope, $rootScope, $timeout, siteAnalyticsService) {
+      '$scope', '$rootScope', '$timeout', '$window', 'siteAnalyticsService',
+      function($scope, $rootScope, $timeout, $window, siteAnalyticsService) {
         $rootScope.loadingMessage = 'Loading';
         $scope.someResultsExist = true;
 

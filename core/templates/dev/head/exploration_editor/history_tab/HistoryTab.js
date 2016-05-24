@@ -16,7 +16,7 @@
  * @fileoverview Controllers for the exploration history tab.
  */
 
-oppia.controller('ExplorationHistory', [
+oppia.controller('HistoryTab', [
   '$scope', '$http', '$rootScope', '$location', '$log', '$modal',
   'explorationData', 'versionsTreeService', 'compareVersionsService',
   'graphDataService', 'oppiaDatetimeFormatter',
@@ -496,47 +496,3 @@ oppia.controller('ExplorationHistory', [
     };
   }
 ]);
-
-oppia.directive('codemirrorMergeview', function() {
-  return {
-    restrict: 'E',
-    link: function(scope, element, attrs) {
-      // Require CodeMirror
-      if (angular.isUndefined(window.CodeMirror)) {
-        throw new Error('CodeMirror not found.');
-      }
-
-      var options, codeMirrorInstance;
-
-      options = scope.$eval(attrs.codemirrorMergeviewOptions);
-
-      // 'value', 'orig' are initial values of left and right pane respectively
-      codeMirrorInstance = new window.CodeMirror.MergeView(
-        element[0], angular.extend({
-          value: ' ',
-          orig: ' '
-        }, options));
-
-      if (!attrs.leftValue) {
-        throw new Error('Left pane value is not defined.');
-      }
-      if (!attrs.rightValue) {
-        throw new Error('Right pane value is not defined.');
-      }
-
-      // Watch for changes and set value in left pane
-      scope.$watch(attrs.leftValue, function(newValue) {
-        if (angular.isString(newValue)) {
-          codeMirrorInstance.edit.setValue(newValue);
-        }
-      });
-
-      // Watch for changes and set value in right pane
-      scope.$watch(attrs.rightValue, function(newValue) {
-        if (angular.isString(newValue)) {
-          codeMirrorInstance.right.orig.setValue(newValue);
-        }
-      });
-    }
-  };
-});

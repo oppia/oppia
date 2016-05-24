@@ -25,17 +25,26 @@ var TIME_NUM_CARDS_CHANGE_MSEC = 500;
 
 oppia.animation('.conversation-skin-responses-animate-slide', function() {
   return {
-    enter: function(element) {
-      element.hide().slideDown();
+    removeClass: function(element, className, done) {
+      if (className !== 'ng-hide') {
+        done();
+        return;
+      }
+      element.hide().slideDown(400, done);
     },
-    leave: function(element) {
-      element.slideUp();
+    addClass: function(element, className, done) {
+      if (className !== 'ng-hide') {
+        done();
+        return;
+      }
+      element.slideUp(400, done);
     }
   };
 });
 
 oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
-  var tutorCardLeft, tutorCardWidth, tutorCardHeight;
+  var tutorCardLeft, tutorCardWidth, tutorCardHeight, oppiaAvatarLeft;
+  var tutorCardAnimatedLeft, tutorCardAnimatedWidth;
 
   var beforeAddClass = function(element, className, done) {
     if (className !== 'ng-hide') {
@@ -45,22 +54,39 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
     var tutorCard = element;
     var supplementalCard = $('.conversation-skin-supplemental-card-container');
     var oppiaAvatar = $('.conversation-skin-oppia-avatar.show-tutor-card');
+    oppiaAvatarLeft = supplementalCard.position().left +
+                      supplementalCard.width() - oppiaAvatar.width();
     tutorCardLeft = tutorCard.position().left;
     tutorCardWidth = tutorCard.width();
     tutorCardHeight = tutorCard.height();
+
+    if (tutorCard.offset().left + tutorCardWidth > oppiaAvatar.offset().left) {
+      var animationLength = Math.min(oppiaAvatarLeft - tutorCard.offset().left,
+                                     tutorCardWidth);
+      tutorCardAnimatedLeft = tutorCardLeft + animationLength;
+      tutorCardAnimatedWidth = tutorCardWidth - animationLength;
+    } else {
+      tutorCardAnimatedLeft = oppiaAvatarLeft;
+      tutorCardAnimatedWidth = 0;
+    }
+
     oppiaAvatar.hide();
+    tutorCard.css({
+      'min-width': 0
+    });
     tutorCard.animate({
-      left: tutorCardLeft + tutorCardWidth,
-      width: 0,
+      left: tutorCardAnimatedLeft,
+      width: tutorCardAnimatedWidth,
       height: 0,
-      opacity: 0
+      opacity: 1
     }, 500, function() {
       oppiaAvatar.show();
       tutorCard.css({
         left: '',
         width: '',
         height: '',
-        opacity: ''
+        opacity: '',
+        'min-width': ''
       });
       done();
     });
@@ -74,10 +100,11 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
     var tutorCard = element;
     $('.conversation-skin-oppia-avatar.show-tutor-card').hide(0, function() {
       tutorCard.css({
-        left: tutorCardLeft + tutorCardWidth,
-        width: 0,
+        left: tutorCardAnimatedLeft,
+        width: tutorCardAnimatedWidth,
         height: 0,
-        opacity: 0
+        opacity: 0,
+        'min-width': 0
       });
       tutorCard.animate({
         left: tutorCardLeft,
@@ -89,7 +116,8 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
           left: '',
           width: '',
           height: '',
-          opacity: ''
+          opacity: '',
+          'min-width': ''
         });
         done();
       });
@@ -111,59 +139,59 @@ oppia.animation('.conversation-skin-animate-cards', function() {
       '.conversation-skin-supplemental-card-container');
 
     if (className === 'animate-to-two-cards') {
-      supplementalCardElt.css('opacity', '0');
-      tutorCardElt.animate({
-        'margin-left': '0'
+      var supplementalWidth = supplementalCardElt.width();
+      supplementalCardElt.css({
+        width: 0,
+        'min-width': '0',
+        opacity: '0'
+      });
+      supplementalCardElt.animate({
+        width: supplementalWidth
       }, TIME_NUM_CARDS_CHANGE_MSEC, function() {
         supplementalCardElt.animate({
           opacity: '1'
         }, TIME_FADEIN_MSEC, function() {
-          supplementalCardElt.css('opacity', '1');
+          supplementalCardElt.css({
+            width: '',
+            'min-width': '',
+            opacity: ''
+          });
           jQuery(element).removeClass('animate-to-two-cards');
-          tutorCardElt.css('margin-left', '');
-          tutorCardElt.css('margin-right', '');
-          tutorCardElt.css('float', '');
           done();
         });
       });
 
       return function(cancel) {
         if (cancel) {
-          tutorCardElt.css('margin-left', '0');
-          tutorCardElt.css('margin-right', '');
-          tutorCardElt.css('float', 'left');
-          tutorCardElt.stop();
-
-          supplementalCardElt.css('opacity', '1');
+          supplementalCardElt.css({
+            width: '',
+            'min-width': '',
+            opacity: ''
+          });
           supplementalCardElt.stop();
-
           jQuery(element).removeClass('animate-to-two-cards');
         }
       };
     } else if (className === 'animate-to-one-card') {
-      supplementalCardElt.css('opacity', '0');
-      tutorCardElt.animate({
-        'margin-left': '262px'
+      supplementalCardElt.css({
+        opacity: 0,
+        'min-width': 0
+      });
+      supplementalCardElt.animate({
+        width: 0
       }, TIME_NUM_CARDS_CHANGE_MSEC, function() {
-        tutorCardElt.css('margin-left', 'auto');
-        tutorCardElt.css('margin-right', 'auto');
-        tutorCardElt.css('float', '');
-
-        supplementalCardElt.css('opacity', '');
-
         jQuery(element).removeClass('animate-to-one-card');
         done();
       });
 
       return function(cancel) {
         if (cancel) {
-          supplementalCardElt.css('opacity', '0');
+          supplementalCardElt.css({
+            opacity: '',
+            'min-width': '',
+            width: ''
+          });
           supplementalCardElt.stop();
-
-          tutorCardElt.css('margin-left', '');
-          tutorCardElt.css('margin-right', '');
-          tutorCardElt.css('float', '');
-          tutorCardElt.stop();
 
           jQuery(element).removeClass('animate-to-one-card');
         }
@@ -363,7 +391,7 @@ oppia.directive('conversationSkin', [function() {
             if (doneCallback) {
               doneCallback();
             }
-          }, TIME_NUM_CARDS_CHANGE_MSEC + TIME_FADEIN_MSEC + TIME_PADDING_MSEC);
+          }, TIME_NUM_CARDS_CHANGE_MSEC);
         };
 
         $scope.isCurrentCardAtEndOfTranscript = function() {
@@ -393,10 +421,9 @@ oppia.directive('conversationSkin', [function() {
           if (totalNumCards > 1 && $scope.canWindowFitTwoCards() &&
               !previousSupplementalCardIsNonempty &&
               nextSupplementalCardIsNonempty) {
-            animateToTwoCards(function() {
-              playerPositionService.setActiveCardIndex(
+            playerPositionService.setActiveCardIndex(
                 $scope.numProgressDots - 1);
-            });
+            animateToTwoCards(function() {});
           } else if (
               totalNumCards > 1 && $scope.canWindowFitTwoCards() &&
               previousSupplementalCardIsNonempty &&

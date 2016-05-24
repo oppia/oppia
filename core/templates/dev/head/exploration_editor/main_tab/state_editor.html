@@ -1,34 +1,34 @@
 <div ng-controller="StateEditor" class="oppia-editor-cards-container">
   <div class="oppia-editor-header">
-    {% include 'editor/sidebar_state_name.html' %}
+    {% include 'exploration_editor/main_tab/sidebar_state_name.html' %}
   </div>
 
   <div ng-if="areParametersEnabled()">
-    {% include 'editor/state_parameter_changes.html' %}
+    {% include 'exploration_editor/main_tab/state_parameter_changes.html' %}
   </div>
 
   <md-card class="oppia-editor-card-with-avatar">
-    <div class="oppia-editor-card-body" ng-show="!!stateName">
+    <div class="oppia-editor-card-body">
       <img src="/images/avatar/oppia_black_72px.png" alt="" class="oppia-editor-card-avatar">
       <div id="tutorialStateContent" class="oppia-editor-card-section" style="padding-top: 36px; padding-bottom: 36px;">
-        {% include 'editor/state_editor_content.html' %}
+        {% include 'exploration_editor/main_tab/state_editor_content.html' %}
       </div>
     </div>
   </md-card>
 
   <div ng-show="isInteractionShown">
-    {% include 'editor/state_editor_interaction.html' %}
+    {% include 'exploration_editor/main_tab/state_editor_interaction.html' %}
   </div>
 
   <div ng-hide="!isInteractionIdSet || isCurrentStateTerminal">
-    {% include 'editor/state_editor_responses.html' %}
+    {% include 'exploration_editor/main_tab/state_editor_responses.html' %}
     <div ng-if="areFallbacksEnabled()">
-      {% include 'editor/state_editor_fallbacks.html' %}
+      {% include 'exploration_editor/main_tab/state_editor_fallbacks.html' %}
     </div>
   </div>
 
   <div>
-    {% include 'editor/state_statistics.html' %}
+    {% include 'exploration_editor/main_tab/state_statistics.html' %}
   </div>
 </div>
 

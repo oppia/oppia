@@ -16,7 +16,7 @@
  * @fileoverview Controllers for the exploration settings tab.
  */
 
-oppia.controller('ExplorationSettings', [
+oppia.controller('SettingsTab', [
   '$scope', '$http', '$window', '$modal', '$rootScope',
   'explorationData', 'explorationTitleService', 'explorationCategoryService',
   'explorationObjectiveService', 'explorationLanguageCodeService',
@@ -35,7 +35,6 @@ oppia.controller('ExplorationSettings', [
       explorationParamChangesService, explorationWarningsService,
       CATEGORY_LIST, explorationAdvancedFeaturesService) {
     $scope.CATEGORY_LIST_FOR_SELECT2 = [];
-
     for (var i = 0; i < CATEGORY_LIST.length; i++) {
       $scope.CATEGORY_LIST_FOR_SELECT2.push({
         id: CATEGORY_LIST[i],
@@ -122,7 +121,6 @@ oppia.controller('ExplorationSettings', [
 
     $scope.saveExplorationObjective = function() {
       explorationObjectiveService.saveDisplayedValue();
-      explorationWarningsService.updateWarnings();
     };
 
     $scope.saveExplorationLanguageCode = function() {
@@ -220,22 +218,6 @@ oppia.controller('ExplorationSettings', [
         explorationRightsService.saveChangeToBackend({
           is_community_owned: true
         });
-      });
-    };
-
-    $scope.showNominateExplorationModal = function() {
-      alertsService.clearWarnings();
-      $modal.open({
-        templateUrl: 'modals/nominateExploration',
-        backdrop: true,
-        controller: [
-          '$scope', '$modalInstance', function($scope, $modalInstance) {
-            $scope.close = function() {
-              $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
-            };
-          }
-        ]
       });
     };
 

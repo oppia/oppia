@@ -102,7 +102,11 @@
                   </div>
                 </div>
                 <div ng-if="!exploration.isInteractionInline(activeCard.stateName)" style="opacity: 0.8;">
+<<<<<<< HEAD
+                  <div ng-if="isCurrentSupplementalCardNonempty() && !isScreenNarrowAndShowingTutorCard()" style="padding: 6px 12px;"> 
+=======
                   <div ng-if="isCurrentSupplementalCardNonempty() && !isScreenNarrowAndShowingTutorCard()" style="padding: 6px 12px;">
+>>>>>>> upstream/develop
                     <[exploration.getInteractionInstructions(activeCard.stateName)]>
                     <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
                   </div>
