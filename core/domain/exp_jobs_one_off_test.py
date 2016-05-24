@@ -526,7 +526,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
 
         user_a_id = self.get_user_id_from_email(self.EMAIL_A)
 
-        # Let USER A make 3 non-revert commits and 1 revert
+        # Let USER A make 3 non-revert commits
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, user_a_id, title='Exploration Title')
         exp_services.update_exploration(
