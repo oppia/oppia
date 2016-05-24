@@ -703,7 +703,7 @@ oppia.factory('rteHelperService', [
                 name: caName,
                 value: (
                   attrsCustomizationArgsDict.hasOwnProperty(caName) ?
-                  attrsCustomizationArgsDict[caName] :
+                  angular.copy(attrsCustomizationArgsDict[caName]) :
                   customizationArgSpecs[i].default_value)
               });
             }
