@@ -405,6 +405,8 @@
       <!-- This is an ng-if, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
       <div ng-if="getTabStatuses().active === 'preview'">
         {% include 'exploration_editor/preview_tab/preview_tab.html' %}
+        {% include 'exploration_editor/preview_tab/preview_set_parameters_modal_directive.html' %}
+
       </div>
 
       <div ng-show="getTabStatuses().active === 'stats'">

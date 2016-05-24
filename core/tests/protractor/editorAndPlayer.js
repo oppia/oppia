@@ -147,6 +147,13 @@ describe('Full exploration editor', function() {
       editor.moveToState('final card');
       editor.setInteraction('EndExploration');
 
+      // Check that preview/editor switch doesn't change state
+      editor.navigateToPreviewTab();
+      player.expectExplorationToBeOver();
+      editor.navigateToMainTab();
+      editor.expectCurrentStateToBe('final card');
+      editor.moveToState('second');
+
       // Check editor preview tab
       editor.navigateToPreviewTab();
       player.expectContentToMatch(function(richTextEditor) {
