@@ -638,135 +638,135 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       // 'add exploration metadata' modal.
       if (additionalMetadataNeeded) {
         $modal.open({
-           templateUrl: 'modals/addExplorationMetadata',
-           backdrop: true,
-           controller: [
-             '$scope', '$modalInstance', 'explorationObjectiveService',
-             'explorationTitleService', 'explorationCategoryService',
-             'explorationStatesService', 'CATEGORY_LIST',
-             'explorationLanguageCodeService',
-             function($scope, $modalInstance, explorationObjectiveService,
-             explorationTitleService, explorationCategoryService,
-             explorationStatesService, CATEGORY_LIST,
-             explorationLanguageCodeService) {
-               $scope.explorationTitleService = explorationTitleService;
-               $scope.explorationObjectiveService = explorationObjectiveService;
-               $scope.explorationCategoryService = explorationCategoryService;
-               $scope.explorationLanguageCodeService = (
-                 explorationLanguageCodeService);
+          templateUrl: 'modals/addExplorationMetadata',
+          backdrop: true,
+          controller: [
+            '$scope', '$modalInstance', 'explorationObjectiveService',
+            'explorationTitleService', 'explorationCategoryService',
+            'explorationStatesService', 'CATEGORY_LIST',
+            'explorationLanguageCodeService',
+            function($scope, $modalInstance, explorationObjectiveService,
+            explorationTitleService, explorationCategoryService,
+            explorationStatesService, CATEGORY_LIST,
+            explorationLanguageCodeService) {
+              $scope.explorationTitleService = explorationTitleService;
+              $scope.explorationObjectiveService = explorationObjectiveService;
+              $scope.explorationCategoryService = explorationCategoryService;
+              $scope.explorationLanguageCodeService = (
+                explorationLanguageCodeService);
 
-               $scope.requireTitleToBeSpecified = (
-                 !explorationTitleService.savedMemento);
-               $scope.requireObjectiveToBeSpecified = (
-                 !explorationObjectiveService.savedMemento);
-               $scope.requireCategoryToBeSpecified = (
-                 !explorationCategoryService.savedMemento);
-               $scope.requireLanguageToBeSpecified = (
-                 !explorationLanguageCodeService.savedMemento);
+              $scope.requireTitleToBeSpecified = (
+                !explorationTitleService.savedMemento);
+              $scope.requireObjectiveToBeSpecified = (
+                !explorationObjectiveService.savedMemento);
+              $scope.requireCategoryToBeSpecified = (
+                !explorationCategoryService.savedMemento);
+              $scope.requireLanguageToBeSpecified = (
+                !explorationLanguageCodeService.savedMemento);
 
-               $scope.metadataList = [];
+              $scope.metadataList = [];
 
-               $scope.CATEGORY_LIST_FOR_SELECT2 = [];
+              $scope.CATEGORY_LIST_FOR_SELECT2 = [];
 
-               for (var i = 0; i < CATEGORY_LIST.length; i++) {
-                 $scope.CATEGORY_LIST_FOR_SELECT2.push({
-                   id: CATEGORY_LIST[i],
-                   text: CATEGORY_LIST[i]
-                 });
-               }
+              for (var i = 0; i < CATEGORY_LIST.length; i++) {
+                $scope.CATEGORY_LIST_FOR_SELECT2.push({
+                  id: CATEGORY_LIST[i],
+                  text: CATEGORY_LIST[i]
+                });
+              }
 
-               var _states = explorationStatesService.getStates();
-               if (_states) {
-                 var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2
-                 .some(
-                   function(categoryItem) {
-                     return categoryItem.id ===
-                     explorationCategoryService.savedMemento;
-                   }
-                 );
+              var _states = explorationStatesService.getStates();
+              if (_states) {
+                var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2
+                .some(
+                  function(categoryItem) {
+                    return categoryItem.id ===
+                    explorationCategoryService.savedMemento;
+                  }
+                );
 
-                 if (!categoryIsInSelect2) {
-                   $scope.CATEGORY_LIST_FOR_SELECT2.push({
-                     id: explorationCategoryService.savedMemento,
-                     text: explorationCategoryService.savedMemento
-                   });
-                 }
-               }
+                if (!categoryIsInSelect2) {
+                  $scope.CATEGORY_LIST_FOR_SELECT2.push({
+                    id: explorationCategoryService.savedMemento,
+                    text: explorationCategoryService.savedMemento
+                  });
+                }
+              }
 
-               $scope.isSavingAllowed = function() {
-                 var allMetadataDisplayed = (
-                   explorationObjectiveService.displayed &&
-                   explorationTitleService.displayed &&
-                   explorationCategoryService.displayed &&
-                   explorationLanguageCodeService.displayed);
+              $scope.isSavingAllowed = function() {
+                var allMetadataDisplayed = (
+                  explorationObjectiveService.displayed &&
+                  explorationTitleService.displayed &&
+                  explorationCategoryService.displayed &&
+                  explorationLanguageCodeService.displayed);
 
-                 if (allMetadataDisplayed) {
-                   return false;
-                 } else {
-                   return true;
-                 }
-               };
+                if (allMetadataDisplayed) {
+                  return false;
+                } else {
+                  return true;
+                }
+              };
 
-               $scope.save = function() {
-                 // If no objective has been specified yet, require the creator
-                 // to specify it.
-                 if ($scope.requireObjectiveToBeSpecified) {
-                   if (!explorationObjectiveService.displayed) {
-                     throw Error('Please specify an objective');
-                   }
-                   explorationObjectiveService.saveDisplayedValue();
-                   $scope.metadataList.push('objective');
-                 }
+              $scope.save = function() {
+                // If no objective has been specified yet, require the creator
+                // to specify it.
+                if ($scope.requireObjectiveToBeSpecified) {
+                  if (!explorationObjectiveService.displayed) {
+                    throw Error('Please specify an objective');
+                  }
+                  explorationObjectiveService.saveDisplayedValue();
+                  $scope.metadataList.push('objective');
+                }
 
-                 if ($scope.requireTitleToBeSpecified) {
-                   if (!explorationTitleService.displayed) {
-                     throw Error('Please specify a title');
-                   }
-                   explorationTitleService.saveDisplayedValue();
-                   $scope.metadataList.push('title');
-                 }
+                if ($scope.requireTitleToBeSpecified) {
+                  if (!explorationTitleService.displayed) {
+                    throw Error('Please specify a title');
+                  }
+                  explorationTitleService.saveDisplayedValue();
+                  $scope.metadataList.push('title');
+                }
 
-                 if ($scope.requireCategoryToBeSpecified) {
-                   if (!explorationCategoryService.displayed) {
-                     throw Error('Please specify a category');
-                   }
-                   explorationCategoryService.saveDisplayedValue();
-                   $scope.metadataList.push('category');
-                 }
+                if ($scope.requireCategoryToBeSpecified) {
+                  if (!explorationCategoryService.displayed) {
+                    throw Error('Please specify a category');
+                  }
+                  explorationCategoryService.saveDisplayedValue();
+                  $scope.metadataList.push('category');
+                }
 
-                 if ($scope.requireLanguageToBeSpecified) {
-                   if (!explorationLanguageCodeService.displayed) {
-                     throw Error('Please specify a language');
-                   }
-                   explorationLanguageCodeService.saveDisplayedValue();
-                   $scope.metadataList.push('language');
-                 }
+                if ($scope.requireLanguageToBeSpecified) {
+                  if (!explorationLanguageCodeService.displayed) {
+                    throw Error('Please specify a language');
+                  }
+                  explorationLanguageCodeService.saveDisplayedValue();
+                  $scope.metadataList.push('language');
+                }
 
-                 explorationObjectiveService.saveDisplayedValue();
-                 explorationTitleService.saveDisplayedValue();
-                 explorationCategoryService.saveDisplayedValue();
-                 explorationLanguageCodeService.saveDisplayedValue();
-                 $modalInstance.close($scope.metadataList);
-               };
+                explorationObjectiveService.saveDisplayedValue();
+                explorationTitleService.saveDisplayedValue();
+                explorationCategoryService.saveDisplayedValue();
+                explorationLanguageCodeService.saveDisplayedValue();
+                $modalInstance.close($scope.metadataList);
+              };
 
-               $scope.cancel = function() {
-                 $modalInstance.dismiss('cancel');
-                 alertsService.clearWarnings();
-               };
-             }
-           ]
-         }).result.then(function(metadataList) {
-           var commitMessage = 'Add metadata to the exploration: ';
-           for (var i = 0; i < metadataList.length; i++) {
-             commitMessage += metadataList[i];
-             if (i === metadataList.length - 1) {
-               commitMessage += '.';
-             } else {
-               commitMessage += ', ';
-             }
-           }
-           saveDraftToBackend(commitMessage, openPublishExplorationModal);
-         });
+              $scope.cancel = function() {
+                $modalInstance.dismiss('cancel');
+                alertsService.clearWarnings();
+              };
+            }
+          ]
+        }).result.then(function(metadataList) {
+          var commitMessage = 'Add metadata to the exploration: ';
+          for (var i = 0; i < metadataList.length; i++) {
+            commitMessage += metadataList[i];
+            if (i === metadataList.length - 1) {
+              commitMessage += '.';
+            } else {
+              commitMessage += ', ';
+            }
+          }
+          saveDraftToBackend(commitMessage, openPublishExplorationModal);
+        });
       } else {
         // No further metadata is needed. Open the publish modal immediately.
         openPublishExplorationModal();
