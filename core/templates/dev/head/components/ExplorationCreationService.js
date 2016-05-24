@@ -17,66 +17,12 @@
  */
 
 // Service for the create/upload exploration buttons and modals.
-oppia.factory('ExplorationCreationButtonService', [
-  '$filter', '$http', '$modal', '$timeout', '$rootScope', '$window',
-  'validatorsService', 'alertsService', 'focusService',
-  'siteAnalyticsService', 'urlService',
+oppia.factory('ExplorationCreationService', [
+  '$http', '$modal', '$timeout', '$rootScope', '$window',
+  'alertsService', 'siteAnalyticsService', 'urlService',
   function(
-      $filter, $http, $modal, $timeout, $rootScope, $window,
-      validatorsService, alertsService, focusService,
-      siteAnalyticsService, urlService) {
-    var getModalInstance = function(isUploadModal) {
-      var modalInstance = $modal.open({
-        backdrop: true,
-        templateUrl: 'modals/createNewActivity',
-        resolve: {
-          isUploadModal: function() {
-            return isUploadModal;
-          }
-        },
-        controller: [
-          '$scope', '$modalInstance', 'isUploadModal',
-          function($scope, $modalInstance, isUploadModal) {
-            $scope.createNewTitle = (
-              isUploadModal ? 'Upload an Exploration' :
-              'Create New Exploration');
-            $scope.activityName = 'exploration';
-            $scope.isUploadModal = isUploadModal;
-            $scope.changedAtLeastOnce = false;
-
-            $scope.save = function() {
-              var returnObj = {};
-              if ($scope.isUploadModal) {
-                var file = document.getElementById('newFileInput').files[0];
-                if (!file || !file.size) {
-                  alertsService.addWarning('Empty file detected.');
-                  return;
-                }
-                returnObj.yamlFile = file;
-              }
-
-              $modalInstance.close(returnObj);
-            };
-
-            $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
-            };
-          }
-        ]
-      });
-
-      modalInstance.opened.then(function() {
-        // The $timeout seems to be needed in order to give the modal time to
-        // render.
-        $timeout(function() {
-          focusService.setFocus('newActivityModalOpened');
-        }, 500);
-      });
-
-      return modalInstance;
-    };
-
+      $http, $modal, $timeout, $rootScope, $window,
+      alertsService, siteAnalyticsService, urlService) {
     return {
       createNewExploration: function() {
         alertsService.clearWarnings();
@@ -106,7 +52,30 @@ oppia.factory('ExplorationCreationButtonService', [
       showUploadExplorationModal: function() {
         alertsService.clearWarnings();
 
-        getModalInstance(true).result.then(function(result) {
+        $modal.open({
+          backdrop: true,
+          templateUrl: 'modals/uploadActivity',
+          controller: [
+            '$scope', '$modalInstance', function($scope, $modalInstance) {
+              $scope.save = function() {
+                var returnObj = {};
+                var file = document.getElementById('newFileInput').files[0];
+                if (!file || !file.size) {
+                  alertsService.addWarning('Empty file detected.');
+                  return;
+                }
+                returnObj.yamlFile = file;
+
+                $modalInstance.close(returnObj);
+              };
+
+              $scope.cancel = function() {
+                $modalInstance.dismiss('cancel');
+                alertsService.clearWarnings();
+              };
+            }
+          ]
+        }).result.then(function(result) {
           var yamlFile = result.yamlFile;
 
           $rootScope.loadingMessage = 'Creating exploration';
@@ -128,7 +97,7 @@ oppia.factory('ExplorationCreationButtonService', [
             type: 'POST',
             url: 'contributehandler/upload'
           }).done(function(data) {
-            window.location = '/create/' + data.explorationId;
+            $window.location = '/create/' + data.explorationId;
           }).fail(function(data) {
             var transformedData = data.responseText.substring(5);
             var parsedResponse = JSON.parse(transformedData);

@@ -46,7 +46,6 @@ describe('MyExplorations controller', function() {
       scope = $rootScope.$new();
       ctrl = $controller('MyExplorations', {
         $scope: scope,
-        ExplorationCreationButtonService: {},
         alertsService: null
       });
     }));

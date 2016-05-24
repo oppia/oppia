@@ -22,12 +22,10 @@ oppia.directive('searchBar', [function() {
     templateUrl: 'components/searchBar',
     controller: [
       '$scope', '$rootScope', '$timeout', '$window', '$location',
-      'searchService', 'oppiaDebouncer', 'oppiaHtmlEscaper',
-      'ExplorationCreationButtonService', 'urlService',
+      'searchService', 'oppiaDebouncer', 'oppiaHtmlEscaper', 'urlService',
       function(
           $scope, $rootScope, $timeout, $window, $location,
-          searchService, oppiaDebouncer, oppiaHtmlEscaper,
-          ExplorationCreationButtonService, urlService) {
+          searchService, oppiaDebouncer, oppiaHtmlEscaper, urlService) {
         $scope.isSearchInProgress = searchService.isSearchInProgress;
         $scope.SEARCH_DROPDOWN_CATEGORIES = (
           GLOBALS.SEARCH_DROPDOWN_CATEGORIES.map(

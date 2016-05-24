@@ -17,11 +17,11 @@
  */
 
 oppia.controller('MyExplorations', [
-  '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter', 'CATEGORY_LIST',
-  'RatingComputationService', 'urlService', 'ExplorationCreationButtonService',
+  '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
+  'RatingComputationService', 'urlService', 'ExplorationCreationService',
   function(
-      $scope, $http, $rootScope, oppiaDatetimeFormatter, CATEGORY_LIST,
-      RatingComputationService, urlService, ExplorationCreationButtonService) {
+      $scope, $http, $rootScope, oppiaDatetimeFormatter,
+      RatingComputationService, urlService, ExplorationCreationService) {
     $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
       return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
         millisSinceEpoch);
@@ -32,8 +32,7 @@ oppia.controller('MyExplorations', [
     };
 
     $scope.createNewExploration = function() {
-      ExplorationCreationButtonService.createNewExploration(
-        CATEGORY_LIST);
+      ExplorationCreationService.createNewExploration();
     };
 
     $rootScope.loadingMessage = 'Loading';
@@ -52,10 +51,10 @@ oppia.controller('MyExplorations', [
 ]);
 
 oppia.controller('CreateCollectionButton', [
-  '$scope', 'CATEGORY_LIST', 'CollectionCreationButtonService',
-  function($scope, CATEGORY_LIST, CollectionCreationButtonService) {
+  '$scope', 'CATEGORY_LIST', 'CollectionCreationService',
+  function($scope, CATEGORY_LIST, CollectionCreationService) {
     $scope.showCreateCollectionModal = function() {
-      CollectionCreationButtonService.showCreateCollectionModal(CATEGORY_LIST);
+      CollectionCreationService.showCreateCollectionModal(CATEGORY_LIST);
     };
   }
 ]);
