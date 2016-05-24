@@ -1,6 +1,6 @@
 <div ng-controller="SettingsTab">
   <md-card class="oppia-editor-card">
-    <h3>General</h3>
+    <h3>Basic Settings</h3>
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12">
         <div ng-if="editabilityService.isEditable()">
@@ -8,7 +8,7 @@
             <div class="form-group" ng-class="{'has-error': !explorationTitleService.displayed}">
               <label for="explorationTitle" class="col-lg-2 col-md-2 col-sm-2">Title</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
-                <input id="explorationTitle" type="text" class="form-control protractor-test-exploration-title-input" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()" placeholder="Choose a title for your exploration.">
+                <input id="explorationTitle" type="text" class="form-control protractor-test-exploration-title-input" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()" placeholder="Choose a title for your exploration." focus-on="<[EXPLORATION_TITLE_INPUT_FOCUS_LABEL]>">
               </div>
             </div>
             <div class="form-group" ng-class="{'has-error': !explorationObjectiveService.displayed}">

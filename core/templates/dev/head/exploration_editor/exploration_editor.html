@@ -56,6 +56,9 @@
           <[getCurrentTabName()]>
         </span>
       </span>
+      <span ng-if="navbarTitle === ''" ng-click="editTitle()" style="opacity: 0.6;">
+        Untitled Exploration
+      </span>
       <span ng-if="navbarTitle === null">
         Loading...
       </span>

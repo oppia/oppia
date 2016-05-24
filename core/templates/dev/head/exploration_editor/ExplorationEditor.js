@@ -20,6 +20,9 @@
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 oppia.constant('GADGET_SPECS', GLOBALS.GADGET_SPECS);
 oppia.constant('PANEL_SPECS', GLOBALS.PANEL_SPECS);
+oppia.constant(
+  'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
+  'explorationTitleInputFocusLabel');
 
 oppia.controller('ExplorationEditor', [
   '$scope', '$http', '$window', '$rootScope', '$log', '$timeout',
@@ -436,8 +439,11 @@ oppia.controller('EditorNavigation', [
 ]);
 
 oppia.controller('EditorNavbarBreadcrumb', [
-  '$scope', 'explorationTitleService', 'routerService',
-  function($scope, explorationTitleService, routerService) {
+  '$scope', 'explorationTitleService', 'routerService', 'focusService',
+  'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
+  function(
+      $scope, explorationTitleService, routerService, focusService,
+      EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
     $scope.navbarTitle = null;
     $scope.$on('explorationPropertyChanged', function() {
       var _MAX_TITLE_LENGTH = 20;
@@ -445,10 +451,13 @@ oppia.controller('EditorNavbarBreadcrumb', [
       if ($scope.navbarTitle.length > _MAX_TITLE_LENGTH) {
         $scope.navbarTitle = (
           $scope.navbarTitle.substring(0, _MAX_TITLE_LENGTH - 3) + '...');
-      } else if ($scope.navbarTitle.length === 0) {
-        $scope.navbarTitle = 'Untitled Exploration';
       }
     });
+
+    $scope.editTitle = function() {
+      routerService.navigateToSettingsTab();
+      focusService.setFocus(EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
+    };
 
     var _TAB_NAMES_TO_HUMAN_READABLE_NAMES = {
       main: 'Edit',
