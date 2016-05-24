@@ -55,16 +55,10 @@ oppia.factory('ExplorationCreationButtonService', [
             $scope.activityName = 'exploration';
             $scope.categoriesForDropdown = categoriesForDropdown;
             $scope.newActivityCategory = '';
-            $scope.newActivityObjective = '';
-            $scope.newActivityLanguageCode = GLOBALS.DEFAULT_LANGUAGE_CODE;
             $scope.isUploadModal = isUploadModal;
             $scope.changedAtLeastOnce = false;
 
-            $scope.getAllLanguageCodes = function() {
-              return GLOBALS.ALL_LANGUAGE_CODES;
-            };
-
-            $scope.save = function(category, objective, languageCode) {
+            $scope.save = function(category) {
               if (!category) {
                 alertsService.addWarning(
                   'Please specify a category for this exploration.');
@@ -82,9 +76,6 @@ oppia.factory('ExplorationCreationButtonService', [
                   return;
                 }
                 returnObj.yamlFile = file;
-              } else {
-                returnObj.objective = objective;
-                returnObj.languageCode = languageCode;
               }
 
               $modalInstance.close(returnObj);
@@ -129,8 +120,6 @@ oppia.factory('ExplorationCreationButtonService', [
             $rootScope.loadingMessage = 'Creating exploration';
             $http.post('/contributehandler/create_new', {
               category: category,
-              language_code: result.languageCode,
-              objective: $filter('normalizeWhitespace')(result.objective)
             }).then(function(response) {
               siteAnalyticsService.registerCreateNewExplorationEvent(
                 response.data.explorationId);

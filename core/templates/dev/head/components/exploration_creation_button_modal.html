@@ -14,17 +14,6 @@
 
     <form role="form" class="form-horizontal">
       <fieldset>
-        <div ng-hide="isUploadModal">
-          <div class="form-group">
-            <label for="newActivityObjective" class="oppia-create-exploration-label col-lg-2 col-md-2 col-sm-2">
-              Goal
-            </label>
-            <div class="col-lg-10 col-md-10 col-sm-10">
-              <input id="newActivityObjective" type="text" class="form-control" ng-model="newActivityObjective" placeholder="What will people learn from this <[activityName]>?" name="newActivityObjective">
-            </div>
-          </div>
-        </div>
-
         <div class="form-group" ng-class="{'has-error': !newActivityCategory}">
           <label for="newActivityCategory" class="col-lg-2 col-md-2 col-sm-2">
             Category
@@ -32,18 +21,6 @@
           <div class="col-lg-10 col-md-10 col-sm-10">
             <select2-dropdown class="protractor-test-new-exploration-category" item="newActivityCategory" choices="categoriesForDropdown" placeholder="Select a category, or enter a new one" new-choice-regex="^[A-Z a-z]+$" width="100%" invalid-search-term-message="Invalid category name">
             </select2-dropdown>
-          </div>
-        </div>
-
-        <div ng-hide="isUploadModal">
-          <div class="form-group">
-            <label for="newActivityLanguageCode" class="oppia-create-exploration-label col-lg-2 col-md-2 col-sm-2">
-              Language
-            </label>
-            <div class="col-lg-10 col-md-10 col-sm-10">
-              <select id="newActivityLanguageCode" class="form-control" ng-model="newActivityLanguageCode" ng-options="lc.code as lc.description for lc in getAllLanguageCodes()">
-              </select>
-            </div>
           </div>
         </div>
 
@@ -60,9 +37,10 @@
   </div>
   <div class="modal-footer">
     <button class="btn btn-default protractor-test-cancel-create" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-success protractor-test-submit-new-exploration" type="submit" ng-click="save(newActivityCategory, newActivityObjective, newActivityLanguageCode)"
-      ng-disabled="!newActivityCategory || !newActivityLanguageCode">
-        <[createNewTitle]>
+    <button class="btn btn-success protractor-test-submit-new-exploration" type="submit"
+            ng-click="save(newActivityCategory)"
+            ng-disabled="!newActivityCategory">
+      <[createNewTitle]>
     </button>
   </div>
 </script>

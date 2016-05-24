@@ -579,12 +579,17 @@ oppia.factory('explorationCategoryService', [
 // be displayed and edited in multiple places in the UI.
 oppia.factory('explorationObjectiveService', [
     'explorationPropertyService', '$filter', 'validatorsService',
-    function(explorationPropertyService, $filter, validatorsService) {
+    'explorationRightsService',
+    function(
+      explorationPropertyService, $filter, validatorsService,
+      explorationRightsService) {
   var child = Object.create(explorationPropertyService);
   child.propertyName = 'objective';
   child._normalize = $filter('normalizeWhitespace');
   child._isValid = function(value) {
-    return validatorsService.isNonempty(value, false);
+    return (
+      explorationRightsService.isPrivate() ||
+      validatorsService.isNonempty(value, false));
   };
   return child;
 }]);
