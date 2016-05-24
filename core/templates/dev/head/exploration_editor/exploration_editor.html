@@ -257,16 +257,35 @@
         <p>
           Just a few more things before you publish:
         </p>
+        <p ng-if="requireTitleToBeSpecified">
+          Add a title: what should your exploration be called?
+          <input type="text" class="form-control" ng-model="explorationTitleService.displayed"
+                 placeholder="Music in the 19th Century">
+        </p>
         <p ng-if="requireObjectiveToBeSpecified">
-          Add a goal: what does thie exploration help people to do?
+          Add a goal: what does the exploration help people to do?
           <input type="text" class="form-control" ng-model="explorationObjectiveService.displayed"
                  placeholder="Learn how to ...">
+        </p>
+        <p ng-if="requireCategoryToBeSpecified">
+          Add a category: how would you categorize your exploration?
+          <select2-dropdown id="explorationCategory" class="protractor-test-new-exploration-category"
+            item="explorationCategoryService.displayed"
+            choices="CATEGORY_LIST_FOR_SELECT2" placeholder="Choose or type new"
+            new-choice-regex="^[A-Z a-z]+$"
+            width="100%" invalid-search-term-message="Invalid category name">
+          </select2-dropdown>
+        </p>
+        <p ng-if="requireLanguageToBeSpecified">
+          Update the language: what language does your exploration use?
+          <select id="explorationLanguageCode" class="form-control protractor-test-exploration-language-select" ng-model="explorationLanguageCodeService.displayed" ng-change="saveExplorationLanguageCode()" ng-options="lc.code as lc.description for lc in explorationLanguageCodeService.getAllLanguageCodes()">
+          </select>
         </p>
       </div>
 
       <div class="modal-footer">
         <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-        <button class="btn btn-success" ng-click="save()" ng-disabled="!explorationObjectiveService.displayed">Save Changes</button>
+        <button class="btn btn-success" ng-click="save()" ng-disabled="isSavingAllowed()">Save Changes</button>
       </div>
     </script>
 

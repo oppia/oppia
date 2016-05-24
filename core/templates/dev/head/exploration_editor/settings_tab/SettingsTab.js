@@ -35,7 +35,6 @@ oppia.controller('SettingsTab', [
       explorationParamChangesService, explorationWarningsService,
       CATEGORY_LIST, explorationAdvancedFeaturesService) {
     $scope.CATEGORY_LIST_FOR_SELECT2 = [];
-
     for (var i = 0; i < CATEGORY_LIST.length; i++) {
       $scope.CATEGORY_LIST_FOR_SELECT2.push({
         id: CATEGORY_LIST[i],
