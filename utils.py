@@ -378,14 +378,15 @@ def require_valid_name(name, name_type, allow_empty=False):
         'a state name'. This will be shown in error messages.
       allow_empty: if True, empty strings are allowed.
     """
-    if not allow_empty and len(name) < 1:
-        raise ValidationError(
-            'The length of %s should be between 1 and 50 '
-            'characters; received %s' % (name_type, name))
+    if not isinstance(name, basestring):
+        raise ValidationError('%s must be a string.' % name_type)
+
+    if allow_empty and name == '':
+        return
 
     # This check is needed because state names are used in URLs and as ids
     # for statistics, so the name length should be bounded above.
-    if len(name) > 50:
+    if len(name) > 50 or len(name) < 1:
         raise ValidationError(
             'The length of %s should be between 1 and 50 '
             'characters; received %s' % (name_type, name))

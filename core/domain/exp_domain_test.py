@@ -277,16 +277,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.init_state_name = ''
         exploration.states = {}
 
-        self._assert_validation_error(
-            exploration, 'between 1 and 50 characters')
-
         exploration.title = 'Hello #'
         self._assert_validation_error(exploration, 'Invalid character #')
 
         exploration.title = 'Title'
-        self._assert_validation_error(
-            exploration, 'between 1 and 50 characters')
-
         exploration.category = 'Category'
 
         # Note: If '/' ever becomes a valid state name, ensure that the rule

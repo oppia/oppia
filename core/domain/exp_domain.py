@@ -1448,7 +1448,8 @@ class Exploration(object):
             raise utils.ValidationError(
                 'Expected category to be a string, received %s'
                 % self.category)
-        utils.require_valid_name(self.category, 'the exploration category')
+        utils.require_valid_name(
+            self.category, 'the exploration category', allow_empty=True)
 
         if not isinstance(self.objective, basestring):
             raise utils.ValidationError(
@@ -1644,6 +1645,12 @@ class Exploration(object):
 
             try:
                 utils.require_valid_name(self.title, 'the exploration title')
+            except utils.ValidationError as e:
+                warnings_list.append(unicode(e))
+
+            try:
+                utils.require_valid_name(
+                    self.title, 'the exploration category')
             except utils.ValidationError as e:
                 warnings_list.append(unicode(e))
 

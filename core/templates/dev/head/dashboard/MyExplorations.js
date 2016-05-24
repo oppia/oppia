@@ -31,8 +31,8 @@ oppia.controller('MyExplorations', [
       return RatingComputationService.computeAverageRating(ratings);
     };
 
-    $scope.showCreateExplorationModal = function() {
-      ExplorationCreationButtonService.showCreateExplorationModal(
+    $scope.createNewExploration = function() {
+      ExplorationCreationButtonService.createNewExploration(
         CATEGORY_LIST);
     };
 
@@ -44,20 +44,10 @@ oppia.controller('MyExplorations', [
 
       if (data.username) {
         if (urlService.getUrlParams().mode === 'create') {
-          $scope.showCreateExplorationModal(CATEGORY_LIST);
+          $scope.createNewExploration();
         }
       }
     });
-  }
-]);
-
-oppia.controller('CreateExplorationButton', [
-  '$scope', 'CATEGORY_LIST', 'ExplorationCreationButtonService',
-  function($scope, CATEGORY_LIST, ExplorationCreationButtonService) {
-    $scope.showCreateExplorationModal = function() {
-      ExplorationCreationButtonService.showCreateExplorationModal(
-        CATEGORY_LIST);
-    };
   }
 ]);
 

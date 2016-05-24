@@ -26,13 +26,14 @@ oppia.directive('createExplorationButton', [function() {
       function(
           $scope, $timeout, $window, ExplorationCreationButtonService,
           siteAnalyticsService, CATEGORY_LIST) {
-        $scope.showCreateExplorationModal = function() {
-          ExplorationCreationButtonService.showCreateExplorationModal(
-            CATEGORY_LIST);
+        $scope.explorationCreationInProgress = false;
+
+        $scope.createNewExploration = function() {
+          $scope.explorationCreationInProgress = true;
+          ExplorationCreationButtonService.createNewExploration();
         };
         $scope.showUploadExplorationModal = function() {
-          ExplorationCreationButtonService.showUploadExplorationModal(
-            CATEGORY_LIST);
+          ExplorationCreationButtonService.showUploadExplorationModal();
         };
 
         $scope.onRedirectToLogin = function(destinationUrl) {
