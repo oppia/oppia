@@ -535,7 +535,8 @@ oppia.controller('StateResponses', [
 
       $modal.open({
         templateUrl: 'modals/addAnswerGroup',
-        backdrop: true,
+        // Clicking outside this modal should not dismiss it.
+        backdrop: 'static',
         controller: [
           '$scope', '$modalInstance', 'responsesService',
           'editorContextService',
