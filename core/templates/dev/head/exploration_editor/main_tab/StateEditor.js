@@ -18,14 +18,12 @@
 
 oppia.controller('StateEditor', [
   '$scope', '$rootScope', 'editorContextService', 'changeListService',
-  'editabilityService', 'explorationStatesService', 'stateInteractionIdService',
-  'INTERACTION_SPECS', 'explorationInitStateNameService',
-  'explorationAdvancedFeaturesService',
+  'editabilityService', 'explorationStatesService', 'INTERACTION_SPECS',
+  'explorationInitStateNameService', 'explorationAdvancedFeaturesService',
   function(
       $scope, $rootScope, editorContextService, changeListService,
-      editabilityService, explorationStatesService, stateInteractionIdService,
-      INTERACTION_SPECS, explorationInitStateNameService,
-      explorationAdvancedFeaturesService) {
+      editabilityService, explorationStatesService, INTERACTION_SPECS,
+      explorationInitStateNameService, explorationAdvancedFeaturesService) {
     $scope.STATE_CONTENT_SCHEMA = {
       type: 'html'
     };
@@ -49,6 +47,11 @@ oppia.controller('StateEditor', [
       $scope.initStateEditor();
     });
 
+    $scope.$on('refreshStateContent', function() {
+      $scope.content = explorationStatesService.getStateContentMemento(
+        editorContextService.getActiveStateName());
+    });
+
     $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
       $scope.isInteractionIdSet = Boolean(newInteractionId);
       $scope.isCurrentStateTerminal = (
@@ -56,55 +59,48 @@ oppia.controller('StateEditor', [
           newInteractionId].is_terminal);
     });
 
+    $scope.contentEditorIsOpen = false;
+
     $scope.initStateEditor = function() {
-      $scope.stateName = editorContextService.getActiveStateName();
+      var stateName = editorContextService.getActiveStateName();
+      var stateData = explorationStatesService.getState(stateName);
+      if (stateName && stateData) {
+        $scope.content = explorationStatesService.getStateContentMemento(
+          stateName);
 
-      var stateData = explorationStatesService.getState($scope.stateName);
-      $scope.content = stateData.content;
-
-      // This should only be non-null when the content editor is open.
-      $scope.contentMemento = null;
-
-      if ($scope.stateName && stateData) {
         $rootScope.$broadcast('stateEditorInitialized', stateData);
-        $scope.isInteractionIdSet = Boolean(stateData.interaction.id);
+        var interactionId = explorationStatesService.getInteractionIdMemento(
+          stateName);
+        $scope.isInteractionIdSet = Boolean(interactionId);
         $scope.isCurrentStateTerminal = (
           $scope.isInteractionIdSet &&
-          INTERACTION_SPECS[stateData.interaction.id].is_terminal);
-      }
+          INTERACTION_SPECS[interactionId].is_terminal);
 
-      if ($scope.content[0].value || stateData.interaction.id) {
-        $scope.isInteractionShown = true;
-      }
+        if ($scope.content[0].value || stateData.interaction.id) {
+          $scope.isInteractionShown = true;
+        }
 
-      $rootScope.loadingMessage = '';
+        $scope.$on('externalSave', function() {
+          if ($scope.contentEditorIsOpen) {
+            $scope.saveTextContent();
+          }
+        });
+
+        $rootScope.loadingMessage = '';
+      }
     };
 
     $scope.openStateContentEditor = function() {
       if (editabilityService.isEditable()) {
-        $scope.contentMemento = angular.copy($scope.content);
+        $scope.contentEditorIsOpen = true;
       }
     };
 
     $scope.saveTextContent = function() {
-      if ($scope.contentMemento !== null &&
-          !angular.equals($scope.contentMemento, $scope.content)) {
-        changeListService.editStateProperty(
-          editorContextService.getActiveStateName(), 'content',
-          angular.copy($scope.content), angular.copy($scope.contentMemento));
-
-        var _stateData = explorationStatesService.getState(
-          editorContextService.getActiveStateName());
-        _stateData.content = angular.copy($scope.content);
-        explorationStatesService.setState(
-          editorContextService.getActiveStateName(), _stateData);
-      }
-      $scope.contentMemento = null;
+      explorationStatesService.saveStateContent(
+        editorContextService.getActiveStateName(), $scope.content);
+      $scope.contentEditorIsOpen = false;
     };
-
-    $scope.$on('externalSave', function() {
-      $scope.saveTextContent();
-    });
 
     $scope.onSaveContentButtonClicked = function() {
       $scope.saveTextContent();
@@ -114,10 +110,9 @@ oppia.controller('StateEditor', [
     };
 
     $scope.cancelEdit = function() {
-      var _stateData = explorationStatesService.getState(
+      $scope.content = explorationStatesService.getStateContentMemento(
         editorContextService.getActiveStateName());
-      $scope.content = angular.copy(_stateData.content);
-      $scope.contentMemento = null;
+      $scope.contentEditorIsOpen = false;
     };
   }
 ]);
