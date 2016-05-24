@@ -732,6 +732,7 @@ oppia.factory('explorationStatesService', [
       }
     };
 
+    // TODO(sll): Add unit tests for all get/save methods.
     return {
       init: function(value) {
         _states = angular.copy(value);
@@ -1004,8 +1005,6 @@ oppia.factory('statePropertyService', [
         if (this.setterMethodKey === null) {
           throw 'State property setter method key cannot be null.';
         }
-
-        $log.info('Initializing state ' + this.setterMethodKey + ':', value);
 
         // The name of the state.
         this.stateName = stateName;

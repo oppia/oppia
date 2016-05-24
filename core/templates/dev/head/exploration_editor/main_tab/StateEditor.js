@@ -63,29 +63,31 @@ oppia.controller('StateEditor', [
 
     $scope.initStateEditor = function() {
       var stateName = editorContextService.getActiveStateName();
-      $scope.content = explorationStatesService.getStateContentMemento(
-        stateName);
-
       var stateData = explorationStatesService.getState(stateName);
       if (stateName && stateData) {
+        $scope.content = explorationStatesService.getStateContentMemento(
+          stateName);
+
         $rootScope.$broadcast('stateEditorInitialized', stateData);
-        $scope.isInteractionIdSet = Boolean(stateData.interaction.id);
+        var interactionId = explorationStatesService.getInteractionIdMemento(
+          stateName);
+        $scope.isInteractionIdSet = Boolean(interactionId);
         $scope.isCurrentStateTerminal = (
           $scope.isInteractionIdSet &&
-          INTERACTION_SPECS[stateData.interaction.id].is_terminal);
-      }
+          INTERACTION_SPECS[interactionId].is_terminal);
 
-      if ($scope.content[0].value || stateData.interaction.id) {
-        $scope.isInteractionShown = true;
-      }
-
-      $scope.$on('externalSave', function() {
-        if ($scope.contentEditorIsOpen) {
-          $scope.saveTextContent();
+        if ($scope.content[0].value || stateData.interaction.id) {
+          $scope.isInteractionShown = true;
         }
-      });
 
-      $rootScope.loadingMessage = '';
+        $scope.$on('externalSave', function() {
+          if ($scope.contentEditorIsOpen) {
+            $scope.saveTextContent();
+          }
+        });
+
+        $rootScope.loadingMessage = '';
+      }
     };
 
     $scope.openStateContentEditor = function() {

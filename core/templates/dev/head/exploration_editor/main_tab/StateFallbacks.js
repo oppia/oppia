@@ -127,7 +127,7 @@ oppia.controller('StateFallbacks', [
         ]
       }).result.then(function(result) {
         stateFallbacksService.displayed.push(result.fallback);
-        saveFallbacksChanges();
+        stateFallbacksService.saveDisplayedValue();
       });
     };
 
@@ -148,7 +148,7 @@ oppia.controller('StateFallbacks', [
         ui.placeholder.height(ui.item.height());
       },
       stop: function() {
-        saveFallbacksChanges();
+        stateFallbacksService.saveDisplayedValue();
       }
     };
 
@@ -175,15 +175,11 @@ oppia.controller('StateFallbacks', [
         ]
       }).result.then(function() {
         stateFallbacksService.displayed.splice(index, 1);
-        saveFallbacksChanges();
+        stateFallbacksService.saveDisplayedValue();
       });
     };
 
     $scope.onComponentSave = function() {
-      saveFallbacksChanges();
-    };
-
-    var saveFallbacksChanges = function() {
       stateFallbacksService.saveDisplayedValue();
     };
   }
