@@ -56,6 +56,7 @@ var publishExploration = function() {
 // Creates and publishes a minimal exploration
 var createAndPublishExploration = function(
     title, category, objective, language) {
+    name, category, objective, language) {
   createExploration();
   editor.setContent(forms.toRichText('new exploration'));
   editor.setInteraction('TextInput');
