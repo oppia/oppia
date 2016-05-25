@@ -293,6 +293,8 @@ class ExplorationHandler(EditorHandler):
             states[state_name] = state_dict
         exp_user_data = user_models.ExplorationUserDataModel.get(
             self.user_id, exploration_id)
+        draft_changes = (exp_user_data.draft_change_list if exp_user_data
+                         and exp_user_data.draft_change_list else None)
         editor_dict = {
             'category': exploration.category,
             'exploration_id': exploration_id,
@@ -313,7 +315,7 @@ class ExplorationHandler(EditorHandler):
             'version': exploration.version,
             'is_draft_version_valid': exp_services.is_draft_version_valid(
                 exploration_id, exp_user_data),
-            'draft_changes': exp_user_data.draft_change_list
+            'draft_changes': draft_changes
         }
 
         return editor_dict
