@@ -1178,9 +1178,6 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             for error in migration_errors:
                 yield error
 
-            if feconf.DELETE_ANSWERS_AFTER_MIGRATION:
-                item.delete()
-
     @classmethod
     def _migrate_answers(cls, item_id, exploration, state_name, state, answers,
                          rule_str):
