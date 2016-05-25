@@ -963,8 +963,9 @@ var runFromSettingsTab = function(callbackFunction) {
 
 var setTitle = function(title) {
   runFromSettingsTab(function() {
-    element(by.css('protractor-test-exploration-title-input')).clear();
-    element(by.css('protractor-test-exploration-title-input')).sendKeys(title);
+    element(by.css('.protractor-test-exploration-title-input')).clear();
+    element(by.css('.protractor-test-exploration-title-input')).sendKeys(
+      title);
   });
 };
 
