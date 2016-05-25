@@ -795,8 +795,12 @@ oppia.run([
                       that.setData(arg, customizationArgsDict[arg]);
                     }
                   }
-                  // Actually create the widget.
-                  editor.widgets.finalizeCreation(container);
+
+
+                  if (!that.isReady()) {
+                    // Actually create the widget, if we have not already.
+                    editor.widgets.finalizeCreation(container);
+                  }
                   // Need to manually $compile so the directive renders.
                   $compile($(that.element.$).contents())($rootScope);
                 },
@@ -837,6 +841,7 @@ oppia.run([
                   isMissingAttributes = true;
                 }
               });
+
               if (!isMissingAttributes) {
                 // Need to manually $compile so the directive renders.
                 $compile($(this.element.$).contents())($rootScope);
