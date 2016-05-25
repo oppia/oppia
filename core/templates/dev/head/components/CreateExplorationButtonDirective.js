@@ -22,10 +22,10 @@ oppia.directive('createExplorationButton', [function() {
     templateUrl: 'components/createExplorationButton',
     controller: [
       '$scope', '$timeout', '$window', 'ExplorationCreationService',
-      'siteAnalyticsService', 'CATEGORY_LIST',
+      'siteAnalyticsService',
       function(
           $scope, $timeout, $window, ExplorationCreationService,
-          siteAnalyticsService, CATEGORY_LIST) {
+          siteAnalyticsService) {
         $scope.explorationCreationInProgress = false;
 
         $scope.createNewExploration = function() {

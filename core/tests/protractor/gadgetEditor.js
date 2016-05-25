@@ -29,7 +29,7 @@ describe('Gadget editor', function() {
     users.createUser('user1@gadgetEditor.com', 'user1GadgetEditor');
     users.login('user1@gadgetEditor.com');
 
-    workflow.createExploration('sums', 'maths');
+    workflow.createExploration();
 
     editor.enableParameters();
     editor.enableGadgets();
@@ -67,7 +67,7 @@ describe('Gadget editor', function() {
     users.createUser('user2@gadgetEditor.com', 'user2GadgetEditor');
     users.login('user2@gadgetEditor.com');
 
-    workflow.createExploration('sums', 'maths');
+    workflow.createExploration();
 
     // Setup the first state.
     editor.setStateName('first');
@@ -125,7 +125,7 @@ describe('Gadget editor', function() {
     users.createUser('user3@gadgetEditor.com', 'user3GadgetEditor');
     users.login('user3@gadgetEditor.com');
 
-    workflow.createExploration('sums', 'maths');
+    workflow.createExploration();
 
     // Setup the first state.
     editor.setStateName('first');
