@@ -19,6 +19,7 @@ import StringIO
 import zipfile
 
 from core.controllers import editor
+from core.controllers import home
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -102,6 +103,28 @@ class EditorTest(BaseEditorControllerTest):
             feconf.DEFAULT_INIT_STATE_NAME].to_dict()
         new_state_dict['unresolved_answers'] = {}
         self.assertEqual(new_state_dict, editor.NEW_STATE_TEMPLATE)
+
+    def test_that_default_exploration_cannot_be_published(self):
+        """Test that publishing a default exploration raises an error
+        due to failing strict validation.
+        """
+        self.login(self.EDITOR_EMAIL)
+
+        response = self.testapp.get('/my_explorations')
+        self.assertEqual(response.status_int, 200)
+        csrf_token = self.get_csrf_token_from_response(response)
+        exp_id = self.post_json(
+            feconf.NEW_EXPLORATION_URL, {}, csrf_token
+        )[home.EXPLORATION_ID_KEY]
+
+        response = self.testapp.get('/create/%s' % exp_id)
+        csrf_token = self.get_csrf_token_from_response(response)
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        self.put_json(rights_url, {
+            'is_public': True,
+        }, csrf_token, expect_errors=True, expected_status_int=400)
+
+        self.logout()
 
     def test_add_new_state_error_cases(self):
         """Test the error cases for adding a new state to an exploration."""

@@ -714,8 +714,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
               $scope.isSavingAllowed = function() {
                 var allMetadataDisplayed = (
-                  explorationObjectiveService.displayed &&
                   explorationTitleService.displayed &&
+                  explorationObjectiveService.displayed &&
                   explorationCategoryService.displayed &&
                   explorationLanguageCodeService.displayed);
 
@@ -727,26 +727,28 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               };
 
               $scope.save = function() {
-                // Throw an error if any values are invalid.
-                if (!explorationObjectiveService.displayed) {
-                  throw Error('Please specify an objective');
-                }
                 if (!explorationTitleService.displayed) {
-                  throw Error('Please specify a title');
+                  alertsService.addWarning('Please specify a title');
+                  return;
+                }
+                if (!explorationObjectiveService.displayed) {
+                  alertsService.addWarning('Please specify an objective');
+                  return;
                 }
                 if (!explorationCategoryService.displayed) {
-                  throw Error('Please specify a category');
+                  alertsService.addWarning('Please specify a category');
+                  return;
                 }
 
                 // Record any fields that have changed.
                 if (explorationTitleService.hasChanged()) {
                   $scope.metadataList.push('title');
                 }
-                if (explorationCategoryService.hasChanged()) {
-                  $scope.metadataList.push('category');
-                }
                 if (explorationObjectiveService.hasChanged()) {
                   $scope.metadataList.push('objective');
+                }
+                if (explorationCategoryService.hasChanged()) {
+                  $scope.metadataList.push('category');
                 }
                 if (explorationLanguageCodeService.hasChanged()) {
                   $scope.metadataList.push('language');
@@ -757,8 +759,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
                 // Save all the displayed values.
                 explorationTitleService.saveDisplayedValue();
-                explorationCategoryService.saveDisplayedValue();
                 explorationObjectiveService.saveDisplayedValue();
+                explorationCategoryService.saveDisplayedValue();
                 explorationLanguageCodeService.saveDisplayedValue();
                 explorationTagsService.saveDisplayedValue();
 

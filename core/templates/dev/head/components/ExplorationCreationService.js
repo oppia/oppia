@@ -17,7 +17,6 @@
  * modal.
  */
 
-// Service for the create/upload exploration buttons and modals.
 oppia.factory('ExplorationCreationService', [
   '$http', '$modal', '$timeout', '$rootScope', '$window',
   'alertsService', 'siteAnalyticsService', 'urlService',

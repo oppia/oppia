@@ -434,7 +434,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         """Tests that explorations are removed from the search index when
         deleted.
         """
-
         self.save_new_default_exploration(self.EXP_ID, self.owner_id)
 
         def mock_delete_docs(doc_ids, index):
@@ -451,6 +450,15 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         exploration = exp_domain.Exploration.create_default_exploration(
             self.EXP_ID)
         exp_services.save_new_exploration(self.owner_id, exploration)
+
+    def test_that_default_exploration_fails_strict_validation(self):
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID)
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'This state does not have any interaction specified.'
+            ):
+            exploration.validate(strict=True)
 
     def test_save_and_retrieve_exploration(self):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)

@@ -22,18 +22,11 @@ oppia.controller('MyExplorations', [
   function(
       $scope, $http, $rootScope, oppiaDatetimeFormatter,
       RatingComputationService, urlService, ExplorationCreationService) {
-    $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
-      return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
-        millisSinceEpoch);
-    };
-
-    $scope.getAverageRating = function(ratings) {
-      return RatingComputationService.computeAverageRating(ratings);
-    };
-
-    $scope.createNewExploration = function() {
-      ExplorationCreationService.createNewExploration();
-    };
+    $scope.getAverageRating = RatingComputationService.computeAverageRating;
+    $scope.createNewExploration = (
+      ExplorationCreationService.createNewExploration);
+    $scope.getLocaleAbbreviatedDatetimeString = (
+      oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString);
 
     $rootScope.loadingMessage = 'Loading';
     $http.get('/myexplorationshandler/data').then(function(response) {
