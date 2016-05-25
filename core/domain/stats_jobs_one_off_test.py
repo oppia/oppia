@@ -660,6 +660,38 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         }])
         self.assertEqual(job_output, [])
 
+    def test_migrate_set_input_with_html(self):
+        state_name = 'Set Input'
+
+        rule_spec_str = (
+            'HasElementsIn([u\'orange\', u\'purple\', u\'silver\'])')
+        html_answer = '[u\'<p>some element</p>\']'
+        self._record_old_answer(state_name, rule_spec_str, html_answer)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+
+        # The answer should have been properly migrated to the new storage
+        # model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': ['<p>some element</p>'],
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'SetInput',
+            'params': [],
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
+        self.assertEqual(job_output, [])
+
     def test_migrate_text_input(self):
         state_name = 'Text Input'
 

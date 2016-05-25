@@ -991,7 +991,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 'Unsupported rule type encountered while attempting to '
                 'reconstitute SetInput object: %s' % rule_spec.rule_type)
 
-        unicode_string_list = eval(cls._get_plaintext(answer_str))
+        unicode_string_list = eval(answer_str)
         if not isinstance(unicode_string_list, list):
             return (None, 'Failed to recover set: %s' % answer_str)
         return cls._normalize_raw_answer_object(
