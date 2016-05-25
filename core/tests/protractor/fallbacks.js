@@ -29,7 +29,7 @@ describe('Fallbacks editor', function() {
     users.createUser('user1@fallbacks.com', 'user1Fallbacks');
     users.login('user1@fallbacks.com');
 
-    workflow.createExploration('sums', 'maths');
+    workflow.createExploration();
     general.getExplorationIdFromEditor().then(function(explorationId) {
       editor.enableFallbacks();
 
