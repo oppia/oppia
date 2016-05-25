@@ -50,6 +50,8 @@ describe('Fallbacks editor', function() {
       editor.setStateName('new name for final card');
       editor.setInteraction('EndExploration');
 
+      editor.setTitle('Fallbacks');
+      editor.setCategory('Test');
       editor.setObjective('To test fallbacks.');
       editor.saveChanges();
       workflow.publishExploration();
