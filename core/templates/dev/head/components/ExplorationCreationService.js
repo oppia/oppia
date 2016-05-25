@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2016 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,27 +13,34 @@
 // limitations under the License.
 
 /**
- * @fileoverview Modal and functionality for the create exploration button.
+ * @fileoverview Functionality for the create exploration button and upload
+ * modal.
  */
 
 // Service for the create/upload exploration buttons and modals.
 oppia.factory('ExplorationCreationService', [
   '$http', '$modal', '$timeout', '$rootScope', '$window',
   'alertsService', 'siteAnalyticsService', 'urlService',
+  'UrlInterpolationService',
   function(
       $http, $modal, $timeout, $rootScope, $window,
-      alertsService, siteAnalyticsService, urlService) {
+      alertsService, siteAnalyticsService, urlService,
+      UrlInterpolationService) {
+    var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
+
+    var explorationCreationInProgress = false;
+
     return {
       createNewExploration: function() {
+        if (explorationCreationInProgress) {
+          return;
+        }
+
+        explorationCreationInProgress = true;
         alertsService.clearWarnings();
-
-        var currentPathname = urlService.getPathname();
-
-        if (currentPathname !== '/my_explorations') {
+        if (urlService.getPathname() !== '/my_explorations') {
           $window.location.replace('/my_explorations?mode=create');
         } else {
-          siteAnalyticsService.registerOpenExplorationCreationModalEvent();
-
           $rootScope.loadingMessage = 'Creating exploration';
           $http.post(
             '/contributehandler/create_new', {}
@@ -41,7 +48,11 @@ oppia.factory('ExplorationCreationService', [
             siteAnalyticsService.registerCreateNewExplorationEvent(
               response.data.explorationId);
             $timeout(function() {
-              $window.location = '/create/' + response.data.explorationId;
+              $window.location = UrlInterpolationService.interpolateUrl(
+                CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
+                  exploration_id: response.data.explorationId
+                }
+              );
             }, 150);
             return false;
           }, function() {
@@ -97,7 +108,11 @@ oppia.factory('ExplorationCreationService', [
             type: 'POST',
             url: 'contributehandler/upload'
           }).done(function(data) {
-            $window.location = '/create/' + data.explorationId;
+            $window.location = UrlInterpolationService.interpolateUrl(
+              CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
+                exploration_id: data.explorationId
+              }
+            );
           }).fail(function(data) {
             var transformedData = data.responseText.substring(5);
             var parsedResponse = JSON.parse(transformedData);

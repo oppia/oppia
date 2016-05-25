@@ -449,7 +449,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_no_errors_are_raised_when_creating_default_exploration(self):
         exploration = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, '', '')
+            self.EXP_ID)
         exp_services.save_new_exploration(self.owner_id, exploration)
 
     def test_save_and_retrieve_exploration(self):

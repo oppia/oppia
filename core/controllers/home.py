@@ -228,7 +228,7 @@ class NewExploration(base.BaseHandler):
         """Handles POST requests."""
         new_exploration_id = exp_services.get_new_exploration_id()
         exploration = exp_domain.Exploration.create_default_exploration(
-            new_exploration_id, '', '')
+            new_exploration_id)
         exp_services.save_new_exploration(self.user_id, exploration)
 
         self.render_json({
@@ -278,7 +278,7 @@ class UploadExploration(base.BaseHandler):
         new_exploration_id = exp_services.get_new_exploration_id()
         if ALLOW_YAML_FILE_UPLOAD.value:
             exp_services.save_new_exploration_from_yaml_and_assets(
-                self.user_id, yaml_content, '', '', new_exploration_id, [])
+                self.user_id, yaml_content, new_exploration_id, [])
             self.render_json({
                 EXPLORATION_ID_KEY: new_exploration_id
             })

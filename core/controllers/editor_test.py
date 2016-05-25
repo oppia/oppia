@@ -591,7 +591,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
         """Test rights management for deletion of unpublished explorations."""
         unpublished_exp_id = 'unpublished_eid'
         exploration = exp_domain.Exploration.create_default_exploration(
-            unpublished_exp_id, 'A title', 'A category')
+            unpublished_exp_id)
         exp_services.save_new_exploration(self.owner_id, exploration)
 
         rights_manager.assign_role_for_exploration(
@@ -620,7 +620,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
         """Test rights management for deletion of published explorations."""
         published_exp_id = 'published_eid'
         exploration = exp_domain.Exploration.create_default_exploration(
-            published_exp_id, 'A title', 'A category')
+            published_exp_id, title='A title', category='A category')
         exp_services.save_new_exploration(self.owner_id, exploration)
 
         rights_manager.assign_role_for_exploration(
