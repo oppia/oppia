@@ -20,6 +20,9 @@
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 oppia.constant('GADGET_SPECS', GLOBALS.GADGET_SPECS);
 oppia.constant('PANEL_SPECS', GLOBALS.PANEL_SPECS);
+oppia.constant(
+  'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
+  'explorationTitleInputFocusLabel');
 
 oppia.controller('ExplorationEditor', [
   '$scope', '$http', '$window', '$rootScope', '$log', '$timeout',
@@ -436,8 +439,11 @@ oppia.controller('EditorNavigation', [
 ]);
 
 oppia.controller('EditorNavbarBreadcrumb', [
-  '$scope', 'explorationTitleService', 'routerService',
-  function($scope, explorationTitleService, routerService) {
+  '$scope', 'explorationTitleService', 'routerService', 'focusService',
+  'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
+  function(
+      $scope, explorationTitleService, routerService, focusService,
+      EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
     $scope.navbarTitle = null;
     $scope.$on('explorationPropertyChanged', function() {
       var _MAX_TITLE_LENGTH = 20;
@@ -447,6 +453,11 @@ oppia.controller('EditorNavbarBreadcrumb', [
           $scope.navbarTitle.substring(0, _MAX_TITLE_LENGTH - 3) + '...');
       }
     });
+
+    $scope.editTitle = function() {
+      routerService.navigateToSettingsTab();
+      focusService.setFocus(EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
+    };
 
     var _TAB_NAMES_TO_HUMAN_READABLE_NAMES = {
       main: 'Edit',
@@ -475,7 +486,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
   'explorationWarningsService', 'siteAnalyticsService',
   'explorationObjectiveService', 'explorationTitleService',
   'explorationCategoryService', 'explorationStatesService', 'CATEGORY_LIST',
-  'explorationLanguageCodeService',
+  'explorationLanguageCodeService', 'explorationTagsService',
   function(
       $scope, $http, $rootScope, $window, $timeout, $modal,
       alertsService, changeListService, focusService, routerService,
@@ -483,7 +494,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       explorationWarningsService, siteAnalyticsService,
       explorationObjectiveService, explorationTitleService,
       explorationCategoryService, explorationStatesService, CATEGORY_LIST,
-      explorationLanguageCodeService) {
+      explorationLanguageCodeService, explorationTagsService) {
     // Whether or not a save action is currently in progress.
     $scope.isSaveInProgress = false;
     // Whether or not a discard action is currently in progress.
@@ -632,7 +643,9 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         !explorationTitleService.savedMemento ||
         !explorationObjectiveService.savedMemento ||
         !explorationCategoryService.savedMemento ||
-        !explorationLanguageCodeService.savedMemento);
+        explorationLanguageCodeService.savedMemento ===
+          GLOBALS.DEFAULT_LANGUAGE_CODE ||
+        explorationTagsService.savedMemento.length === 0);
 
       // If the metadata has not yet been specified, open the pre-publication
       // 'add exploration metadata' modal.
@@ -644,16 +657,17 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
             '$scope', '$modalInstance', 'explorationObjectiveService',
             'explorationTitleService', 'explorationCategoryService',
             'explorationStatesService', 'CATEGORY_LIST',
-            'explorationLanguageCodeService',
+            'explorationLanguageCodeService', 'explorationTagsService',
             function($scope, $modalInstance, explorationObjectiveService,
             explorationTitleService, explorationCategoryService,
             explorationStatesService, CATEGORY_LIST,
-            explorationLanguageCodeService) {
+            explorationLanguageCodeService, explorationTagsService) {
               $scope.explorationTitleService = explorationTitleService;
               $scope.explorationObjectiveService = explorationObjectiveService;
               $scope.explorationCategoryService = explorationCategoryService;
               $scope.explorationLanguageCodeService = (
                 explorationLanguageCodeService);
+              $scope.explorationTagsService = explorationTagsService;
 
               $scope.requireTitleToBeSpecified = (
                 !explorationTitleService.savedMemento);
@@ -661,10 +675,15 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
                 !explorationObjectiveService.savedMemento);
               $scope.requireCategoryToBeSpecified = (
                 !explorationCategoryService.savedMemento);
-              $scope.requireLanguageToBeSpecified = (
-                !explorationLanguageCodeService.savedMemento);
+              $scope.askForLanguageCheck = (
+                explorationLanguageCodeService.savedMemento ===
+                GLOBALS.DEFAULT_LANGUAGE_CODE);
+              $scope.askForTags = (
+                explorationTagsService.savedMemento.length === 0);
 
               $scope.metadataList = [];
+
+              $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
 
               $scope.CATEGORY_LIST_FOR_SELECT2 = [];
 
@@ -695,8 +714,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
               $scope.isSavingAllowed = function() {
                 var allMetadataDisplayed = (
-                  explorationObjectiveService.displayed &&
                   explorationTitleService.displayed &&
+                  explorationObjectiveService.displayed &&
                   explorationCategoryService.displayed &&
                   explorationLanguageCodeService.displayed);
 
@@ -708,44 +727,43 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               };
 
               $scope.save = function() {
-                // If no objective has been specified yet, require the creator
-                // to specify it.
-                if ($scope.requireObjectiveToBeSpecified) {
-                  if (!explorationObjectiveService.displayed) {
-                    throw Error('Please specify an objective');
-                  }
-                  explorationObjectiveService.saveDisplayedValue();
-                  $scope.metadataList.push('objective');
+                if (!explorationTitleService.displayed) {
+                  alertsService.addWarning('Please specify a title');
+                  return;
+                }
+                if (!explorationObjectiveService.displayed) {
+                  alertsService.addWarning('Please specify an objective');
+                  return;
+                }
+                if (!explorationCategoryService.displayed) {
+                  alertsService.addWarning('Please specify a category');
+                  return;
                 }
 
-                if ($scope.requireTitleToBeSpecified) {
-                  if (!explorationTitleService.displayed) {
-                    throw Error('Please specify a title');
-                  }
-                  explorationTitleService.saveDisplayedValue();
+                // Record any fields that have changed.
+                if (explorationTitleService.hasChanged()) {
                   $scope.metadataList.push('title');
                 }
-
-                if ($scope.requireCategoryToBeSpecified) {
-                  if (!explorationCategoryService.displayed) {
-                    throw Error('Please specify a category');
-                  }
-                  explorationCategoryService.saveDisplayedValue();
+                if (explorationObjectiveService.hasChanged()) {
+                  $scope.metadataList.push('objective');
+                }
+                if (explorationCategoryService.hasChanged()) {
                   $scope.metadataList.push('category');
                 }
-
-                if ($scope.requireLanguageToBeSpecified) {
-                  if (!explorationLanguageCodeService.displayed) {
-                    throw Error('Please specify a language');
-                  }
-                  explorationLanguageCodeService.saveDisplayedValue();
+                if (explorationLanguageCodeService.hasChanged()) {
                   $scope.metadataList.push('language');
                 }
+                if (explorationTagsService.hasChanged()) {
+                  $scope.metadataList.push('tags');
+                }
 
-                explorationObjectiveService.saveDisplayedValue();
+                // Save all the displayed values.
                 explorationTitleService.saveDisplayedValue();
+                explorationObjectiveService.saveDisplayedValue();
                 explorationCategoryService.saveDisplayedValue();
                 explorationLanguageCodeService.saveDisplayedValue();
+                explorationTagsService.saveDisplayedValue();
+
                 $modalInstance.close($scope.metadataList);
               };
 
@@ -756,16 +774,20 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
             }
           ]
         }).result.then(function(metadataList) {
-          var commitMessage = 'Add metadata to the exploration: ';
-          for (var i = 0; i < metadataList.length; i++) {
-            commitMessage += metadataList[i];
-            if (i === metadataList.length - 1) {
-              commitMessage += '.';
-            } else {
-              commitMessage += ', ';
+          if (metadataList.length > 0) {
+            var commitMessage = 'Add metadata to the exploration: ';
+            for (var i = 0; i < metadataList.length; i++) {
+              commitMessage += metadataList[i];
+              if (i === metadataList.length - 1) {
+                commitMessage += '.';
+              } else {
+                commitMessage += ', ';
+              }
             }
+            saveDraftToBackend(commitMessage, openPublishExplorationModal);
+          } else {
+            openPublishExplorationModal();
           }
-          saveDraftToBackend(commitMessage, openPublishExplorationModal);
         });
       } else {
         // No further metadata is needed. Open the publish modal immediately.

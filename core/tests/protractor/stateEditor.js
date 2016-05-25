@@ -34,7 +34,7 @@ describe('State editor', function() {
       'userTutorial@stateEditor.com', 'userTutorialStateEditor');
     users.login('userTutorial@stateEditor.com');
 
-    workflow.createExplorationAndStartTutorial('sums', 'maths');
+    workflow.createExplorationAndStartTutorial();
     editor.startTutorial();
     for (var i = 0; i < NUM_TUTORIAL_STAGES - 1; i++) {
       editor.progressInTutorial();
@@ -48,7 +48,7 @@ describe('State editor', function() {
     users.createUser('user1@stateEditor.com', 'user1StateEditor');
     users.login('user1@stateEditor.com');
 
-    workflow.createExploration('sums', 'maths');
+    workflow.createExploration();
     editor.setContent(forms.toRichText('plain text'));
     editor.setInteraction('Continue', 'click here');
     editor.setDefaultOutcome(null, 'final card', true);
@@ -72,7 +72,7 @@ describe('State editor', function() {
     users.createUser('user2@stateEditor.com', 'user2StateEditor');
     users.login('user2@stateEditor.com');
 
-    workflow.createExploration('sums', 'maths');
+    workflow.createExploration();
     editor.setContent(function(richTextEditor) {
       richTextEditor.appendBoldText('bold text');
       richTextEditor.appendPlainText(' ');
@@ -107,7 +107,7 @@ describe('State editor', function() {
     users.createUser('user3@stateEditor.com', 'user3StateEditor');
     users.login('user3@stateEditor.com');
 
-    workflow.createExploration('sums', 'maths');
+    workflow.createExploration();
     editor.setContent(forms.toRichText('some content'));
     editor.setInteraction('NumericInput');
     editor.addResponse('NumericInput', function(richTextEditor) {
@@ -140,7 +140,7 @@ describe('State editor', function() {
       ' add response modal', function() {
     users.createUser('stateEditorUser1@example.com', 'stateEditorUser1');
     users.login('stateEditorUser1@example.com');
-    workflow.createExploration('sums', 'maths');
+    workflow.createExploration();
     editor.setContent(forms.toRichText('some content'));
 
     editor.openInteraction('TextInput');

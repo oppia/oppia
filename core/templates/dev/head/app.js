@@ -443,10 +443,6 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
       _sendEventToGoogleAnalytics(
         'CreateExplorationButton', 'click', $window.location.pathname);
     },
-    registerOpenExplorationCreationModalEvent: function() {
-      _sendEventToGoogleAnalytics(
-        'CreateExplorationModal', 'open', $window.location.pathname);
-    },
     registerCreateNewExplorationEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
         'NewExploration', 'create', explorationId);

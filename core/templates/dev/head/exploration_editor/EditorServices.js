@@ -546,12 +546,17 @@ oppia.factory('explorationPropertyService', [
 // displayed and edited in multiple places in the UI.
 oppia.factory('explorationTitleService', [
     'explorationPropertyService', '$filter', 'validatorsService',
-    function(explorationPropertyService, $filter, validatorsService) {
+    'explorationRightsService',
+    function(
+      explorationPropertyService, $filter, validatorsService,
+      explorationRightsService) {
   var child = Object.create(explorationPropertyService);
   child.propertyName = 'title';
   child._normalize = $filter('normalizeWhitespace');
   child._isValid = function(value) {
-    return validatorsService.isValidEntityName(value, true);
+    return (
+      explorationRightsService.isPrivate() ||
+      validatorsService.isValidEntityName(value, true));
   };
   return child;
 }]);
@@ -560,12 +565,17 @@ oppia.factory('explorationTitleService', [
 // displayed and edited in multiple places in the UI.
 oppia.factory('explorationCategoryService', [
     'explorationPropertyService', '$filter', 'validatorsService',
-    function(explorationPropertyService, $filter, validatorsService) {
+    'explorationRightsService',
+    function(
+      explorationPropertyService, $filter, validatorsService,
+      explorationRightsService) {
   var child = Object.create(explorationPropertyService);
   child.propertyName = 'category';
   child._normalize = $filter('normalizeWhitespace');
   child._isValid = function(value) {
-    return validatorsService.isValidEntityName(value, true);
+    return (
+      explorationRightsService.isPrivate() ||
+      validatorsService.isValidEntityName(value, true));
   };
   return child;
 }]);
@@ -574,12 +584,17 @@ oppia.factory('explorationCategoryService', [
 // be displayed and edited in multiple places in the UI.
 oppia.factory('explorationObjectiveService', [
     'explorationPropertyService', '$filter', 'validatorsService',
-    function(explorationPropertyService, $filter, validatorsService) {
+    'explorationRightsService',
+    function(
+      explorationPropertyService, $filter, validatorsService,
+      explorationRightsService) {
   var child = Object.create(explorationPropertyService);
   child.propertyName = 'objective';
   child._normalize = $filter('normalizeWhitespace');
   child._isValid = function(value) {
-    return validatorsService.isNonempty(value, false);
+    return (
+      explorationRightsService.isPrivate() ||
+      validatorsService.isNonempty(value, false));
   };
   return child;
 }]);

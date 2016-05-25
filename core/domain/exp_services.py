@@ -1223,13 +1223,12 @@ def get_demo_exploration_components(demo_path):
 
 
 def save_new_exploration_from_yaml_and_assets(
-        committer_id, yaml_content, title, category, exploration_id,
-        assets_list):
-    """Note that the title and category will be ignored if the YAML
-    schema version is greater than
+        committer_id, yaml_content, exploration_id, assets_list):
+    """Note that the default title and category will be used if the YAML
+    schema version is less than
     exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
-    since in that case there will already be a title and category present in
-    the YAML schema.
+    since in that case the YAML schema will not have a title and category
+    present.
     """
     if assets_list is None:
         assets_list = []
@@ -1244,7 +1243,8 @@ def save_new_exploration_from_yaml_and_assets(
         # The schema of the YAML file for older explorations did not include
         # a title and a category; these need to be manually specified.
         exploration = exp_domain.Exploration.from_untitled_yaml(
-            exploration_id, title, category, yaml_content)
+            exploration_id, feconf.DEFAULT_EXPLORATION_TITLE,
+            feconf.DEFAULT_EXPLORATION_CATEGORY, yaml_content)
     else:
         exploration = exp_domain.Exploration.from_yaml(
             exploration_id, yaml_content)
@@ -1294,8 +1294,8 @@ def load_demo(exploration_id):
 
     yaml_content, assets_list = get_demo_exploration_components(exp_filename)
     save_new_exploration_from_yaml_and_assets(
-        feconf.SYSTEM_COMMITTER_ID, yaml_content, None, None,
-        exploration_id, assets_list)
+        feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
+        assets_list)
 
     publish_exploration_and_update_user_profiles(
         feconf.SYSTEM_COMMITTER_ID, exploration_id)
