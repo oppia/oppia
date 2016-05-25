@@ -153,6 +153,8 @@ class BaseJobManager(object):
     @classmethod
     def register_completion(cls, job_id, output):
         """Marks a job as completed."""
+        _MAX_OUTPUT_LENGTH = 900000
+
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_valid_transition(
@@ -161,6 +163,9 @@ class BaseJobManager(object):
 
         model.status_code = STATUS_CODE_COMPLETED
         model.time_finished_msec = utils.get_current_time_in_millisecs()
+        if len(output) > _MAX_OUTPUT_LENGTH:
+            output = output[:_MAX_OUTPUT_LENGTH]
+            output += ' <TRUNCATED>'
         model.output = output
         model.put()
 
