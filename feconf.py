@@ -415,7 +415,7 @@ ENABLE_STRING_CLASSIFIER = False
 
 # Temporary feature for the answer migration job. DO NOT ENABLE THIS WHEN
 # RUNNING THE JOB IN MAIN PRODUCTION.
-DELETE_ANSWERS_AFTER_MIGRATION = True
+DELETE_ANSWERS_AFTER_MIGRATION = False
 
 # Output formats of downloaded explorations.
 OUTPUT_FORMAT_JSON = 'json'

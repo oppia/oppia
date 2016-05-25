@@ -356,6 +356,25 @@ class AnswersAudit2(jobs.BaseMapReduceJobManager):
             yield 'Internal error 2'
 
 
+class ClearMigratedAnswersJob(jobs.BaseMapReduceJobManager):
+    """This job deletes all answers stored in the
+    stats_models.StateAnswersModel. As an extra precaution, this job is a no-op
+    unless feconf.DELETE_ANSWERS_AFTER_MIGRATION is enabled.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.StateAnswersModel]
+
+    @staticmethod
+    def map(item):
+        if feconf.DELETE_ANSWERS_AFTER_MIGRATION:
+            item.delete()
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        pass
+
+
 class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     """This job is responsible for migrating all answers stored within
     stats_models.StateRuleAnswerLogModel to stats_models.StateAnswersModel
