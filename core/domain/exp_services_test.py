@@ -3121,19 +3121,25 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(exp_user_data.draft_change_list_last_updated)
         self.assertIsNone(exp_user_data.draft_change_list_exp_version)
 
-    def test_draft_version_valid_true(self):
+    def test_draft_version_valid_returns_true(self):
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.USER_ID, self.EXP_ID1))
         self.assertTrue(exp_services.is_draft_version_valid(
-            self.EXP_ID1, self.USER_ID))
+            self.EXP_ID1, exp_user_data))
 
-    def test_draft_version_valid_false(self):
+    def test_draft_version_valid_returns_false(self):
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.USER_ID, self.EXP_ID2))
         self.assertFalse(exp_services.is_draft_version_valid(
-            self.EXP_ID2, self.USER_ID))
+            self.EXP_ID2, exp_user_data))
 
-    def test_draft_version_no_draft_exists(self):
+    def test_draft_version_valid_when_no_draft_exists(self):
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.USER_ID, self.EXP_ID3))
         self.assertIsNone(exp_services.is_draft_version_valid(
-            self.EXP_ID3, self.USER_ID))
+            self.EXP_ID3, exp_user_data))
 
-    def test_create_or_update_draft_older_draft_exists(self):
+    def test_create_or_update_draft_when_older_draft_exists(self):
         exp_services.create_or_update_draft(
             self.EXP_ID1, self.USER_ID, self.NEW_CHANGELIST, 5,
             self.NEWER_DATETIME)
@@ -3146,7 +3152,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
                          self.NEWER_DATETIME)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 5)
 
-    def test_create_or_update_draft_newer_draft_exists(self):
+    def test_create_or_update_draft_when_newer_draft_exists(self):
         exp_services.create_or_update_draft(
             self.EXP_ID1, self.USER_ID, self.NEW_CHANGELIST, 5,
             self.OLDER_DATETIME)
@@ -3159,7 +3165,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             exp_user_data.draft_change_list_last_updated, self.DATETIME)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 2)
 
-    def test_create_or_update_draft_draft_does_not_exist(self):
+    def test_create_or_update_draft_when_draft_does_not_exist(self):
         exp_services.create_or_update_draft(
             self.EXP_ID3, self.USER_ID, self.NEW_CHANGELIST, 5,
             self.NEWER_DATETIME)
@@ -3172,7 +3178,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
                          self.NEWER_DATETIME)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 5)
 
-    def test_get_exp_with_draft_applied_draft_exists(self):
+    def test_get_exp_with_draft_applied_when_draft_exists(self):
         exploration = exp_services.get_exploration_by_id(self.EXP_ID1)
         self.assertEqual(exploration.init_state.param_changes, [])
         updated_exp = exp_services.get_exp_with_draft_applied(
@@ -3184,11 +3190,18 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             param_changes._customization_args,
             {'list_of_values': ['1', '2'], 'parse_with_jinja': False})
 
-    def test_get_exp_with_draft_applied_draft_does_not_exist(self):
+    def test_get_exp_with_draft_applied_when_draft_does_not_exist(self):
         exploration = exp_services.get_exploration_by_id(self.EXP_ID3)
         self.assertEqual(exploration.init_state.param_changes, [])
         updated_exp = exp_services.get_exp_with_draft_applied(
             self.EXP_ID3, self.USER_ID)
+        self.assertEqual(updated_exp.init_state.param_changes, [])
+
+    def test_get_exp_with_draft_applied_when_draft_version_is_invalid(self):
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID2)
+        self.assertEqual(exploration.init_state.param_changes, [])
+        updated_exp = exp_services.get_exp_with_draft_applied(
+            self.EXP_ID2, self.USER_ID)
         self.assertEqual(updated_exp.init_state.param_changes, [])
 
     def test_draft_discarded(self):

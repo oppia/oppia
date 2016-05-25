@@ -1013,9 +1013,7 @@ def update_exploration(
     exploration = apply_change_list(exploration_id, change_list)
     _save_exploration(committer_id, exploration, commit_message, change_list)
 
-    # If there is an existing exploration draft for this user, clear it.
     discard_draft(exploration_id, committer_id)
-
     # Update summary of changed exploration.
     update_exploration_summary(exploration.id, committer_id)
     user_services.add_edited_exploration_id(committer_id, exploration.id)
@@ -1560,16 +1558,14 @@ def reject_suggestion(editor_id, thread_id, exploration_id):
         thread.put()
 
 
-def is_draft_version_valid(exp_id, user_id):
+def is_draft_version_valid(exp_id, exp_user_data):
     """Checks if the draft version is the same as the latest version of the
     exploration. Returns None if a draft does not exist."""
 
-    exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
     if not (exp_user_data and exp_user_data.draft_change_list):
         return None
-    draft_version = exp_user_data.draft_change_list_exp_version
     exp_version = get_exploration_by_id(exp_id).version
-    return draft_version == exp_version
+    return exp_user_data.draft_change_list_exp_version == exp_version
 
 
 def create_or_update_draft(
@@ -1592,15 +1588,17 @@ def create_or_update_draft(
     exp_user_data.put()
 
 
-def get_exp_with_draft_applied(exp_id, user_id, version=None):
+def get_exp_with_draft_applied(exp_id, user_id):
     """If a draft exists for the given user and exploration,
     apply it to the exploration."""
 
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
+    exploration = get_exploration_by_id(exp_id)
     return (
         apply_change_list(exp_id, exp_user_data.draft_change_list)
         if exp_user_data and exp_user_data.draft_change_list
-        else get_exploration_by_id(exp_id, version=version))
+        and is_draft_version_valid(exp_id, exp_user_data)
+        else exploration)
 
 
 def discard_draft(exp_id, user_id):

@@ -43,6 +43,7 @@ import feconf
 import utils
 
 current_user_services = models.Registry.import_current_user_services()
+(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 # The frontend template for a new state. It is sent to the frontend when the
 # exploration editor page is first loaded, so that new states can be
@@ -270,11 +271,16 @@ class ExplorationHandler(EditorHandler):
 
     PAGE_NAME_FOR_CSRF = 'editor'
 
-    def _get_exploration_data(self, exploration_id, version=None):
+    def _get_exploration_data(
+            self, exploration_id, apply_draft=False, version=None):
         """Returns a description of the given exploration."""
         try:
-            exploration = exp_services.get_exp_with_draft_applied(
-                exploration_id, self.user_id, version=version)
+            if apply_draft:
+                exploration = exp_services.get_exp_with_draft_applied(
+                    exploration_id, self.user_id)
+            else:
+                exploration = exp_services.get_exploration_by_id(
+                    exploration_id, version=version)
         except:
             raise self.PageNotFoundException
 
@@ -285,7 +291,8 @@ class ExplorationHandler(EditorHandler):
                 stats_services.get_top_unresolved_answers_for_default_rule(
                     exploration_id, state_name))
             states[state_name] = state_dict
-
+        exp_user_data = user_models.ExplorationUserDataModel.get(
+            self.user_id, exploration_id)
         editor_dict = {
             'category': exploration.category,
             'exploration_id': exploration_id,
@@ -305,7 +312,8 @@ class ExplorationHandler(EditorHandler):
             'title': exploration.title,
             'version': exploration.version,
             'is_draft_version_valid': exp_services.is_draft_version_valid(
-                exploration_id, self.user_id)
+                exploration_id, exp_user_data),
+            'draft_changes': exp_user_data.draft_change_list
         }
 
         return editor_dict
@@ -315,10 +323,11 @@ class ExplorationHandler(EditorHandler):
         if not rights_manager.Actor(self.user_id).can_view(
                 rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             raise self.PageNotFoundException
-
         version = self.request.get('v', default_value=None)
+        apply_draft = self.request.get('apply_draft', default_value=False)
         self.values.update(
-            self._get_exploration_data(exploration_id, version=version))
+            self._get_exploration_data(
+                exploration_id, apply_draft=apply_draft, version=version))
         self.render_json(self.values)
 
     @require_editor
@@ -960,9 +969,11 @@ class EditorAutosaveHandler(ExplorationHandler):
 
         # If the value passed here is False, have the user discard the draft
         # changes.
+        exp_user_data = user_models.ExplorationUserDataModel.get(
+            self.user_id, exploration_id)
         self.render_json({
             'is_draft_version_valid': exp_services.is_draft_version_valid(
-                exploration_id, self.user_id)})
+                exploration_id, exp_user_data)})
 
     @require_editor
     def post(self, exploration_id):
