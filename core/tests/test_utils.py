@@ -423,7 +423,7 @@ class TestBase(unittest.TestCase):
         Returns the collection domain object.
         """
         collection = collection_domain.Collection.create_default_collection(
-            collection_id, title, category, objective,
+            collection_id, title=title, category=category, objective=objective,
             language_code=language_code)
         collection_services.save_new_collection(owner_id, collection)
         return collection

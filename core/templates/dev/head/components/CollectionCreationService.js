@@ -21,128 +21,34 @@
 // ExplorationCreationService.
 
 oppia.factory('CollectionCreationService', [
-  '$filter', '$http', '$modal', '$timeout', '$rootScope',
-  'validatorsService', 'alertsService', 'focusService',
+  '$http', '$window', '$rootScope', 'alertsService', 'UrlInterpolationService',
   function(
-      $filter, $http, $modal, $timeout, $rootScope,
-      validatorsService, alertsService, focusService) {
-    var getModalInstance = function(categoryList) {
-      var modalInstance = $modal.open({
-        backdrop: true,
-        templateUrl: 'modals/createNewActivity',
-        resolve: {
-          categoriesForDropdown: function() {
-            var result = [];
-            var sortedCategories = categoryList.sort();
-            for (var i = 0; i < sortedCategories.length; i++) {
-              result.push({
-                id: sortedCategories[i],
-                text: sortedCategories[i]
-              });
-            }
-            return result;
-          }
-        },
-        controller: [
-          '$scope', '$modalInstance', 'categoriesForDropdown',
-          function(
-              $scope, $modalInstance, categoriesForDropdown) {
-            $scope.createNewTitle = 'Create New Collection';
-            $scope.activityName = 'collection';
-            $scope.categoriesForDropdown = categoriesForDropdown;
-            $scope.newActivityTitle = '';
-            $scope.newActivityCategory = '';
-            $scope.newActivityObjective = '';
-            $scope.newActivityLanguageCode = GLOBALS.DEFAULT_LANGUAGE_CODE;
-            $scope.isUploadModal = false;
-            $scope.changedAtLeastOnce = false;
-
-            $scope.getAllLanguageCodes = function() {
-              return GLOBALS.ALL_LANGUAGE_CODES;
-            };
-
-            $scope.save = function(title, category, objective, languageCode) {
-              if (!$scope.isTitleValid(title)) {
-                return;
-              }
-
-              if (!category) {
-                alertsService.addWarning(
-                  'Please specify a category for this collection.');
-                return;
-              }
-
-              $modalInstance.close({
-                category: category,
-                title: title,
-                objective: objective,
-                languageCode: languageCode
-              });
-            };
-
-            // Checks the validity of the colleciton title.
-            $scope.isTitleValid = function(title, changedAtLeastOnce) {
-              if (changedAtLeastOnce) {
-                $scope.changedAtLeastOnce = true;
-              }
-
-              if (!title) {
-                $scope.warningText = 'Please enter a collection title.';
-                return false;
-              }
-
-              if (!validatorsService.isValidEntityName(title, false)) {
-                $scope.warningText = 'Please use ' +
-                  'letters, numbers, hyphens and spaces only.';
-                return false;
-              }
-
-              $scope.warningText = '';
-              return true;
-            };
-
-            $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
-            };
-          }
-        ]
-      });
-
-      modalInstance.opened.then(function() {
-        // The $timeout seems to be needed in order to give the modal time to
-        // render.
-        $timeout(function() {
-          focusService.setFocus('newActivityModalOpened');
-        }, 300);
-      });
-
-      return modalInstance;
-    };
+      $http, $window, $rootScope, alertsService, UrlInterpolationService) {
+    var CREATE_NEW_COLLECTION_URL_TEMPLATE = (
+      '/collection_editor/create/<collection_id>');
+    var collectionCreationInProgress = false;
 
     return {
-      showCreateCollectionModal: function(categoryList) {
+      createNewCollection: function() {
+        if (collectionCreationInProgress) {
+          return;
+        }
+
+        collectionCreationInProgress = true;
         alertsService.clearWarnings();
 
-        getModalInstance(categoryList, false).result.then(function(result) {
-          var category = $filter('normalizeWhitespace')(result.category);
-          if (!validatorsService.isValidEntityName(category, true)) {
-            return;
-          }
-
-          $rootScope.loadingMessage = 'Creating collection';
-          $http.post('/collection_editor_handler/create_new', {
-            category: category,
-            language_code: result.languageCode,
-            objective: $filter('normalizeWhitespace')(result.objective),
-            title: result.title
-          }).then(function(response) {
-            var data = response.data;
-            window.location = '/collection_editor/create/' + data.collectionId;
+        $rootScope.loadingMessage = 'Creating collection';
+        $http.post('/collection_editor_handler/create_new', {}).then(
+          function(response) {
+            $window.location = UrlInterpolationService.interpolateUrl(
+              CREATE_NEW_COLLECTION_URL_TEMPLATE, {
+                collection_id: response.data.collectionId
+              }
+            );
           }, function() {
             $rootScope.loadingMessage = '';
-          });
-        });
+          }
+        );
       }
     };
   }

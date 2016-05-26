@@ -143,6 +143,38 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
             'Expected to have at least 1 exploration with no prerequisite '
             'skills.')
 
+    def test_metadata_validation(self):
+        self.collection.title = ''
+        self.collection.objective = ''
+        self.collection.category = ''
+        self.collection.nodes = []
+        self.collection.add_node('exp_id_1')
+
+        # Having no title is fine for non-strict validation.
+        self.collection.validate(strict=False)
+        # But it's not okay for strict validation.
+        self._assert_validation_error(
+            'A title must be specified for the collection.')
+        self.collection.title = 'A title'
+
+        # Having no objective is fine for non-strict validation.
+        self.collection.validate(strict=False)
+        # But it's not okay for strict validation.
+        self._assert_validation_error(
+            'An objective must be specified for the collection.')
+        self.collection.objective = 'An objective'
+
+        # Having no category is fine for non-strict validation.
+        self.collection.validate(strict=False)
+        # But it's not okay for strict validation.
+        self._assert_validation_error(
+            'A category must be specified for the collection.')
+        self.collection.category = 'A category'
+
+        # Now the collection passes both strict and non-strict validation.
+        self.collection.validate(strict=False)
+        self.collection.validate(strict=True)
+
     def test_collection_completability_validation(self):
         # Add another exploration, but make it impossible to reach exp_id_1.
         self.collection.add_node('exp_id_1')
@@ -205,16 +237,14 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
 
     def test_is_demo_property(self):
         """Test the is_demo property."""
-        demo = collection_domain.Collection.create_default_collection(
-            '0', 'title', 'category', 'objective')
+        demo = collection_domain.Collection.create_default_collection('0')
         self.assertEqual(demo.is_demo, True)
 
-        notdemo1 = collection_domain.Collection.create_default_collection(
-            'a', 'title', 'category', 'objective')
+        notdemo1 = collection_domain.Collection.create_default_collection('a')
         self.assertEqual(notdemo1.is_demo, False)
 
         notdemo2 = collection_domain.Collection.create_default_collection(
-            'abcd', 'title', 'category', 'objective')
+            'abcd')
         self.assertEqual(notdemo2.is_demo, False)
 
     def test_collection_export_import(self):
@@ -224,7 +254,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             '0', 'user@example.com', end_state_name='End')
         collection = collection_domain.Collection.create_default_collection(
-            '0', 'title', 'category', 'objective')
+            '0', title='title', category='category', objective='objective')
         collection_dict = collection.to_dict()
         collection_from_dict = collection_domain.Collection.from_dict(
             collection_dict)
@@ -234,7 +264,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         """Test that add_node and delete_node fail in the correct situations.
         """
         collection = collection_domain.Collection.create_default_collection(
-            '0', 'title', 'category', 'objective')
+            '0')
         self.assertEqual(len(collection.nodes), 0)
 
         collection.add_node('test_exp')
@@ -263,7 +293,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
 
     def test_skills_property(self):
         collection = collection_domain.Collection.create_default_collection(
-            '0', 'title', 'category', 'objective')
+            '0')
 
         self.assertEqual(collection.skills, [])
 
@@ -294,7 +324,7 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
         exploration.
         """
         collection = collection_domain.Collection.create_default_collection(
-            'collection_id', 'A title', 'A category', 'An objective')
+            'collection_id')
 
         # If there are no explorations in the collection, there can be no
         # initial explorations.
@@ -323,7 +353,7 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
         in the collection.
         """
         collection = collection_domain.Collection.create_default_collection(
-            'collection_id', 'A title', 'A category', 'An objective')
+            'collection_id')
 
         # There should be no next explorations for an empty collection.
         self.assertEqual(collection.get_next_exploration_ids([]), [])
@@ -405,7 +435,7 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
 
     def test_next_explorations_with_invalid_exploration_ids(self):
         collection = collection_domain.Collection.create_default_collection(
-            'collection_id', 'A title', 'A category', 'An objective')
+            'collection_id')
         collection.add_node('exp_id_1')
 
         # There should be one suggested exploration to complete by default.
@@ -430,7 +460,8 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
             self.EXPLORATION_ID, 'user@example.com', end_state_name='End')
 
         collection = collection_domain.Collection.create_default_collection(
-            self.COLLECTION_ID, 'A title', 'A category', 'An objective')
+            self.COLLECTION_ID, title='A title', category='A category',
+            objective='An objective')
         collection.add_node(self.EXPLORATION_ID)
         self.assertEqual(len(collection.nodes), 1)
 
