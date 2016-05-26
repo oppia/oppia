@@ -226,22 +226,9 @@ class NewExploration(base.BaseHandler):
     @base.require_fully_signed_up
     def post(self):
         """Handles POST requests."""
-        title = self.payload.get('title')
-        category = self.payload.get('category')
-        objective = self.payload.get('objective')
-        language_code = self.payload.get('language_code')
-
-        if not title:
-            raise self.InvalidInputException('No title supplied.')
-        if not category:
-            raise self.InvalidInputException('No category chosen.')
-        if not language_code:
-            raise self.InvalidInputException('No language chosen.')
-
         new_exploration_id = exp_services.get_new_exploration_id()
         exploration = exp_domain.Exploration.create_default_exploration(
-            new_exploration_id, title, category,
-            objective=objective, language_code=language_code)
+            new_exploration_id)
         exp_services.save_new_exploration(self.user_id, exploration)
 
         self.render_json({
@@ -260,7 +247,7 @@ class NewCollection(base.BaseHandler):
         title = self.payload.get('title')
         category = self.payload.get('category')
         objective = self.payload.get('objective')
-        # TODO(bhenning): Implement support for language codes in collections.
+        language_code = self.payload.get('language_code')
 
         if not title:
             raise self.InvalidInputException('No title supplied.')
@@ -269,7 +256,8 @@ class NewCollection(base.BaseHandler):
 
         new_collection_id = collection_services.get_new_collection_id()
         collection = collection_domain.Collection.create_default_collection(
-            new_collection_id, title, category, objective=objective)
+            new_collection_id, title, category, objective=objective,
+            language_code=language_code)
         collection_services.save_new_collection(self.user_id, collection)
 
         self.render_json({
@@ -285,20 +273,12 @@ class UploadExploration(base.BaseHandler):
     @base.require_fully_signed_up
     def post(self):
         """Handles POST requests."""
-        title = self.payload.get('title')
-        category = self.payload.get('category')
         yaml_content = self.request.get('yaml_file')
-
-        if not title:
-            raise self.InvalidInputException('No title supplied.')
-        if not category:
-            raise self.InvalidInputException('No category chosen.')
 
         new_exploration_id = exp_services.get_new_exploration_id()
         if ALLOW_YAML_FILE_UPLOAD.value:
             exp_services.save_new_exploration_from_yaml_and_assets(
-                self.user_id, yaml_content, title, category,
-                new_exploration_id, [])
+                self.user_id, yaml_content, new_exploration_id, [])
             self.render_json({
                 EXPLORATION_ID_KEY: new_exploration_id
             })

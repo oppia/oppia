@@ -43,6 +43,8 @@ For reference, here are descriptions of what the other 'TODO' tags mean:
 
 ## Instructions for making a code change
 
+**Working on your first Pull Request?** You can learn how from this free series: [How to Contribute to an Open Source Project on GitHub](https://egghead.io/series/how-to-contribute-to-an-open-source-project-on-github).
+
 *If your change isn't trivial, please [talk to us](https://gitter.im/oppia/oppia-chat) before you start working on it -- this helps avoid duplication of effort, and allows us to offer advice and suggestions. For larger changes, it may be better to first create a short doc outlining a suggested implementation plan, and send it to the dev team for feedback.*
 
 Our central development branch is `develop`, which should be clean and ready for release at any time. In general, all changes should be done as feature branches based off of `develop`. (In case you're interested, we mainly use the [Gitflow workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow), which also incorporates `master`, `hotfix-` and `release-` branches -- but you don't need to worry about these.)
@@ -123,6 +125,16 @@ General
 
 Python
 - There should be two empty lines before any top-level class or function definition.
+- Prefer string interpolation over concatenation -- e.g. prefer:
+
+  ```
+  'My string %s' % varname
+  ```
+over
+
+  ```
+  'My string ' + varname
+  ```
 - When indenting from an open parenthesis ('('), prefer indenting by 4 rather than indenting from the position of the parenthesis. For example, prefer:
 
   ```

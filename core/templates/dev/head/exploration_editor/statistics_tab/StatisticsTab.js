@@ -17,7 +17,7 @@
  * exploration editor.
  */
 
-oppia.controller('ExplorationStatistics', [
+oppia.controller('StatisticsTab', [
   '$scope', '$http', '$modal', 'alertsService', 'explorationStatesService',
   'explorationData', 'computeGraphService', 'oppiaDatetimeFormatter',
   function(
@@ -140,10 +140,10 @@ oppia.controller('ExplorationStatistics', [
           },
           controller: [
             '$scope', '$modalInstance', 'stateName', 'stateStats',
-            'improvementType', 'rulesStats',
+            'improvementType', 'rulesStats', 'utilsService',
             function(
                 $scope, $modalInstance, stateName,
-                stateStats, improvementType, rulesStats) {
+                stateStats, improvementType, rulesStats, utilsService) {
               $scope.stateName = stateName;
               $scope.stateStats = stateStats;
               $scope.improvementType = improvementType;
@@ -158,14 +158,7 @@ oppia.controller('ExplorationStatistics', [
                 return ruleName.substring('submit.'.length);
               };
 
-              $scope.isEmpty = function(obj) {
-                for (var property in obj) {
-                  if (obj.hasOwnProperty(property)) {
-                    return false;
-                  }
-                }
-                return true;
-              };
+              $scope.isEmpty = utilsService.isEmpty;
 
               $scope.doesAnswerExist = function() {
                 for (var rule in $scope.rulesStats) {

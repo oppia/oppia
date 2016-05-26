@@ -63,7 +63,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.signup(other_editor_email, 'othereditorusername')
 
         other_exploration = exp_domain.Exploration.create_default_exploration(
-            'eid2', 'A title', 'A category')
+            'eid2')
         exp_services.save_new_exploration(
             other_editor_email, other_exploration)
 
@@ -225,9 +225,8 @@ class ReaderClassifyTests(test_utils.GenericTestBase):
         yaml_content = utils.get_file_contents(test_exp_filepath)
         assets_list = []
         exp_services.save_new_exploration_from_yaml_and_assets(
-            feconf.SYSTEM_COMMITTER_ID, yaml_content,
-            'Testing String Classifier', 'Test',
-            exploration_id, assets_list)
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
+            assets_list)
 
         self.exp_id = exploration_id
         self.exp_state = (

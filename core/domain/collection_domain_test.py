@@ -30,6 +30,7 @@ import utils
 # utils.dict_from_yaml can isolate differences quickly.
 
 SAMPLE_YAML_CONTENT = ("""category: A category
+language_code: en
 nodes:
 - acquired_skills:
   - Skill0a
@@ -81,6 +82,16 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
 
         self.collection.objective = 0
         self._assert_validation_error('Expected objective to be a string')
+
+    def test_language_code_validation(self):
+        self.collection.language_code = ''
+        self._assert_validation_error('language must be specified')
+
+        self.collection.language_code = 0
+        self._assert_validation_error('Expected language code to be a string')
+
+        self.collection.language_code = 'xz'
+        self._assert_validation_error('Invalid language code')
 
     def test_schema_version_validation(self):
         self.collection.schema_version = 'some_schema_version'
@@ -456,8 +467,21 @@ objective: ''
 schema_version: 1
 title: A title
 """)
+    YAML_CONTENT_V2 = ("""category: A category
+language_code: en
+nodes:
+- acquired_skills:
+  - Skill1
+  - Skill2
+  exploration_id: Exp1
+  prerequisite_skills: []
+objective: ''
+schema_version: 2
+title: A title
+""")
 
     _LATEST_YAML_CONTENT = YAML_CONTENT_V1
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V2
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -465,4 +489,12 @@ title: A title
             'Exp1', 'user@example.com', end_state_name='End')
         collection = collection_domain.Collection.from_yaml(
             'cid', self.YAML_CONTENT_V1)
+        self.assertEqual(collection.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v2(self):
+        """Test direct loading from a v2 yaml file."""
+        self.save_new_valid_exploration(
+            'Exp1', 'user@example.com', end_state_name='End')
+        collection = collection_domain.Collection.from_yaml(
+            'cid', self.YAML_CONTENT_V2)
         self.assertEqual(collection.to_yaml(), self._LATEST_YAML_CONTENT)

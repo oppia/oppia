@@ -19,24 +19,12 @@
 
 oppia.controller('StateParamChangesEditor', [
   '$scope', 'editorContextService', 'stateParamChangesService',
-  'explorationStatesService',
-  function(
-      $scope, editorContextService, stateParamChangesService,
-      explorationStatesService) {
+  function($scope, editorContextService, stateParamChangesService) {
     $scope.stateParamChangesService = stateParamChangesService;
 
     $scope.$on('stateEditorInitialized', function(evt, stateData) {
       stateParamChangesService.init(
-        editorContextService.getActiveStateName(),
-        stateData.param_changes, stateData, 'param_changes');
+        editorContextService.getActiveStateName(), stateData.param_changes);
     });
-
-    $scope.postSaveHook = function() {
-      var activeStateName = editorContextService.getActiveStateName();
-      var _stateDict = explorationStatesService.getState(activeStateName);
-      _stateDict.param_changes = angular.copy(
-        stateParamChangesService.savedMemento);
-      explorationStatesService.setState(activeStateName, _stateDict);
-    };
   }
 ]);

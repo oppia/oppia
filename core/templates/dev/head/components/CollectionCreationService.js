@@ -17,10 +17,10 @@
  */
 
 // TODO(bhenning): Refactor this to match the frontend design spec and reduce
-// duplicated code between CollectionCreationButtonService and
-// ExplorationCreationButtonService.
+// duplicated code between CollectionCreationService and
+// ExplorationCreationService.
 
-oppia.factory('CollectionCreationButtonService', [
+oppia.factory('CollectionCreationService', [
   '$filter', '$http', '$modal', '$timeout', '$rootScope',
   'validatorsService', 'alertsService', 'focusService',
   function(

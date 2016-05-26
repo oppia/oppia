@@ -1325,7 +1325,9 @@ class Exploration(object):
 
     @classmethod
     def create_default_exploration(
-            cls, exploration_id, title, category, objective='',
+            cls, exploration_id, title=feconf.DEFAULT_EXPLORATION_TITLE,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
             language_code=feconf.DEFAULT_LANGUAGE_CODE):
         init_state_dict = State.create_default_state(
             feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
@@ -1348,8 +1350,8 @@ class Exploration(object):
         # from an ExplorationModel/dictionary MUST be exhaustive and complete.
         exploration = cls.create_default_exploration(
             exploration_dict['id'],
-            exploration_dict['title'],
-            exploration_dict['category'],
+            title=exploration_dict['title'],
+            category=exploration_dict['category'],
             objective=exploration_dict['objective'],
             language_code=exploration_dict['language_code'])
         exploration.tags = exploration_dict['tags']
@@ -1441,13 +1443,15 @@ class Exploration(object):
         if not isinstance(self.title, basestring):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' % self.title)
-        utils.require_valid_name(self.title, 'the exploration title')
+        utils.require_valid_name(
+            self.title, 'the exploration title', allow_empty=True)
 
         if not isinstance(self.category, basestring):
             raise utils.ValidationError(
                 'Expected category to be a string, received %s'
                 % self.category)
-        utils.require_valid_name(self.category, 'the exploration category')
+        utils.require_valid_name(
+            self.category, 'the exploration category', allow_empty=True)
 
         if not isinstance(self.objective, basestring):
             raise utils.ValidationError(
@@ -1650,6 +1654,14 @@ class Exploration(object):
                 self._verify_no_dead_ends()
             except utils.ValidationError as e:
                 warnings_list.append(unicode(e))
+
+            if not self.title:
+                warnings_list.append(
+                    'A title must be specified (in the \'Settings\' tab).')
+
+            if not self.category:
+                warnings_list.append(
+                    'A category must be specified (in the \'Settings\' tab).')
 
             if not self.objective:
                 warnings_list.append(
@@ -2413,8 +2425,8 @@ class Exploration(object):
         if not (1 <= exploration_schema_version
                 <= cls.CURRENT_EXP_SCHEMA_VERSION):
             raise Exception(
-                'Sorry, we can only process v1 to v%s YAML files at '
-                'present.' % cls.CURRENT_EXP_SCHEMA_VERSION)
+                'Sorry, we can only process v1 to v%s exploration YAML files '
+                'at present.' % cls.CURRENT_EXP_SCHEMA_VERSION)
         if exploration_schema_version == 1:
             exploration_dict = cls._convert_v1_dict_to_v2_dict(
                 exploration_dict)

@@ -900,6 +900,7 @@ var addFallback = function(
 
 // NOTE: if the state is not visible in the state graph this function will fail
 var moveToState = function(targetName) {
+  general.scrollToTop();
   element.all(by.css('.protractor-test-node')).map(function(stateElement) {
     return stateElement.element(by.css('.protractor-test-node-label')).
       getText();
@@ -962,16 +963,17 @@ var runFromSettingsTab = function(callbackFunction) {
 
 var setTitle = function(title) {
   runFromSettingsTab(function() {
-    element(by.css('protractor-test-exploration-title-input')).clear();
-    element(by.css('protractor-test-exploration-title-input')).sendKeys(title);
+    element(by.css('.protractor-test-exploration-title-input')).clear();
+    element(by.css('.protractor-test-exploration-title-input')).sendKeys(
+      title);
   });
 };
 
 var setCategory = function(category) {
   runFromSettingsTab(function() {
-    element(by.css('.protractor-test-exploration-category-input')).clear();
-    element(by.css('.protractor-test-exploration-category-input')).
-      sendKeys(category);
+    forms.AutocompleteDropdownEditor(
+      element(by.css('.protractor-test-exploration-category-input'))
+    ).setValue(category);
   });
 };
 
