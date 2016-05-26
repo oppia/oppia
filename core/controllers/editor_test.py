@@ -1294,7 +1294,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
             '/createhandler/data/%s' % self.EXP_ID2, {'apply_draft': True})
         # Title updated because chanhe list was applied.
         self.assertEqual(response['title'], 'Updated title')
-        self.assertTrue(response['is_draft_version_valid'])
+        self.assertTrue(response['is_version_of_draft_valid'])
 
     def test_exploration_loaded_without_draft_when_draft_version_invalid(self):
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
@@ -1305,21 +1305,21 @@ class EditorAutosaveTest(BaseEditorControllerTest):
             '/createhandler/data/%s' % self.EXP_ID2, {'apply_draft': True})
         # Title not updated because change list not applied.
         self.assertEqual(response['title'], 'A title')
-        self.assertFalse(response['is_draft_version_valid'])
+        self.assertFalse(response['is_version_of_draft_valid'])
 
     def test_draft_not_updated_because_newer_draft_exists(self):
         payload = {
             'change_list': self.NEW_CHANGELIST,
             'version': 1,
         }
-        apply_change_list_counter = test_utils.CallCounter(self._null_method)
-        with self.swap(
-            exp_services, 'apply_change_list', apply_change_list_counter):
-            response = self.put_json(
-                '/createhandler/autosave_draft/%s' % self.EXP_ID1, payload,
-                self.csrf_token)
-        self.assertEqual(apply_change_list_counter.times_called, 0)
-        self.assertTrue(response['is_draft_version_valid'])
+        response = self.put_json(
+            '/createhandler/autosave_draft/%s' % self.EXP_ID1, payload,
+            self.csrf_token)
+        # Check that draft change list hasn't been updated.
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.owner_id, self.EXP_ID1))
+        self.assertEqual(exp_user_data.draft_change_list, self.DRAFT_CHANGELIST)
+        self.assertTrue(response['is_version_of_draft_valid'])
 
     def test_draft_not_updated_validation_error(self):
         payload = {
@@ -1350,7 +1350,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
             '%s.%s' % (self.owner_id, self.EXP_ID2))
         self.assertEqual(exp_user_data.draft_change_list, self.NEW_CHANGELIST)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 1)
-        self.assertTrue(response['is_draft_version_valid'])
+        self.assertTrue(response['is_version_of_draft_valid'])
 
     def test_draft_updated_version_invalid(self):
         payload = {
@@ -1364,7 +1364,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
             '%s.%s' % (self.owner_id, self.EXP_ID2))
         self.assertEqual(exp_user_data.draft_change_list, self.NEW_CHANGELIST)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 10)
-        self.assertFalse(response['is_draft_version_valid'])
+        self.assertFalse(response['is_version_of_draft_valid'])
 
     def test_discard_draft(self):
         self.post_json(

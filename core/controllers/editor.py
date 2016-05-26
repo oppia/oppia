@@ -295,6 +295,9 @@ class ExplorationHandler(EditorHandler):
             self.user_id, exploration_id)
         draft_changes = (exp_user_data.draft_change_list if exp_user_data
                          and exp_user_data.draft_change_list else None)
+        draft_exp_version = (
+            exp_user_data.draft_change_list_exp_version if exp_user_data and
+            exp_user_data.draft_change_list_exp_version else None)
         editor_dict = {
             'category': exploration.category,
             'exploration_id': exploration_id,
@@ -313,8 +316,8 @@ class ExplorationHandler(EditorHandler):
             'tags': exploration.tags,
             'title': exploration.title,
             'version': exploration.version,
-            'is_draft_version_valid': exp_services.is_draft_version_valid(
-                exploration_id, exp_user_data),
+            'is_version_of_draft_valid': exp_services.is_version_of_draft_valid(
+                exploration_id, draft_exp_version),
             'draft_changes': draft_changes
         }
 
@@ -325,6 +328,9 @@ class ExplorationHandler(EditorHandler):
         if not rights_manager.Actor(self.user_id).can_view(
                 rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             raise self.PageNotFoundException
+        # 'apply_draft' and 'v'(version) are optional parameters because the
+        # exploration history tab also uses this handler, and these parameters
+        # are not used by that tab.
         version = self.request.get('v', default_value=None)
         apply_draft = self.request.get('apply_draft', default_value=False)
         self.values.update(
@@ -970,12 +976,11 @@ class EditorAutosaveHandler(ExplorationHandler):
             raise self.InvalidInputException(e)
 
         # If the value passed here is False, have the user discard the draft
-        # changes.
-        exp_user_data = user_models.ExplorationUserDataModel.get(
-            self.user_id, exploration_id)
+        # changes. We save the draft to the datastore even if the version is
+        # invalid, so that it is available for recovery later.
         self.render_json({
-            'is_draft_version_valid': exp_services.is_draft_version_valid(
-                exploration_id, exp_user_data)})
+            'is_version_of_draft_valid': exp_services.is_version_of_draft_valid(
+                exploration_id, version)})
 
     @require_editor
     def post(self, exploration_id):

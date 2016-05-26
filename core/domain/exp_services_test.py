@@ -3124,20 +3124,20 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
     def test_draft_version_valid_returns_true(self):
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.USER_ID, self.EXP_ID1))
-        self.assertTrue(exp_services.is_draft_version_valid(
-            self.EXP_ID1, exp_user_data))
+        self.assertTrue(exp_services.is_version_of_draft_valid(
+            self.EXP_ID1, exp_user_data.draft_change_list_exp_version))
 
     def test_draft_version_valid_returns_false(self):
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.USER_ID, self.EXP_ID2))
-        self.assertFalse(exp_services.is_draft_version_valid(
-            self.EXP_ID2, exp_user_data))
+        self.assertFalse(exp_services.is_version_of_draft_valid(
+            self.EXP_ID2, exp_user_data.draft_change_list_exp_version))
 
     def test_draft_version_valid_when_no_draft_exists(self):
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.USER_ID, self.EXP_ID3))
-        self.assertIsNone(exp_services.is_draft_version_valid(
-            self.EXP_ID3, exp_user_data))
+        self.assertIsNone(exp_services.is_version_of_draft_valid(
+            self.EXP_ID3, exp_user_data.draft_change_list_exp_version))
 
     def test_create_or_update_draft_when_older_draft_exists(self):
         exp_services.create_or_update_draft(

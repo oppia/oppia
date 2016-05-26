@@ -1558,14 +1558,13 @@ def reject_suggestion(editor_id, thread_id, exploration_id):
         thread.put()
 
 
-def is_draft_version_valid(exp_id, exp_user_data):
+def is_version_of_draft_valid(exp_id, version):
     """Checks if the draft version is the same as the latest version of the
-    exploration. Returns None if a draft does not exist."""
+    exploration. Returns None if version is None."""
 
-    if not (exp_user_data and exp_user_data.draft_change_list):
-        return None
-    exp_version = get_exploration_by_id(exp_id).version
-    return exp_user_data.draft_change_list_exp_version == exp_version
+    if version:
+        return get_exploration_by_id(exp_id).version == version
+    return version
 
 
 def create_or_update_draft(
@@ -1596,8 +1595,9 @@ def get_exp_with_draft_applied(exp_id, user_id):
     exploration = get_exploration_by_id(exp_id)
     return (
         apply_change_list(exp_id, exp_user_data.draft_change_list)
-        if exp_user_data and exp_user_data.draft_change_list
-        and is_draft_version_valid(exp_id, exp_user_data)
+        if exp_user_data and exp_user_data.draft_change_list and
+        is_version_of_draft_valid(
+            exp_id, exp_user_data.draft_change_list_exp_version)
         else exploration)
 
 
