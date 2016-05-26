@@ -148,6 +148,20 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     # The impact score.
     impact_score = ndb.FloatProperty(indexed=True)
 
+class UserDashboardStatsModel(base_models.BaseMapReduceBatchResultsModel):
+    """
+    Aggregated Statistics for the creator dashboard.
+
+    Values for total plays and average ratings are recorded by aggregating over
+    all explorations owned by a user.
+    """
+
+    # The total plays of all the explorations.
+    total_plays = ndb.IntegerProperty(indexed=False)
+
+    # The average of average ratings of all explorations.
+    average_ratings = ndb.FloatProperty(indexed=False)
+
 
 class ExplorationUserDataModel(base_models.BaseModel):
     """User-specific data pertaining to a specific exploration.
