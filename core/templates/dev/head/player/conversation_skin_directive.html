@@ -135,16 +135,15 @@
              ng-click="showTutorCardIfScreenIsNarrow()" alt="">
 
         <div ng-if="isScreenNarrowAndShowingTutorCard()" class="supplemental-mask"></div>
-          <div ng-class="{'conversation-skin-help-card help-card-standard' : !isWindowTall(),
-                          'conversation-skin-help-card help-card-tall' : isWindowTall()}" ng-if="helpCardHtml">
+        <div ng-class="{'conversation-skin-help-card help-card-standard': !isWindowTall(),
+                        'conversation-skin-help-card help-card-tall': isWindowTall()}" ng-if="helpCardHtml">
           <img class="conversation-skin-oppia-avatar"
                ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt="">
           <button type="button" class="conversation-skin-close-help-card-button"
                     ng-click="clearHelpCard()" ng-if="!helpCardHasContinueButton">
             <i class="material-icons md-18">&#xE5CD;</i>
           </button>
-          <div class="conversation-skin-help-card-content" angular-html-bind="helpCardHtml">
-          </div>
+          <div class="conversation-skin-help-card-content" angular-html-bind="helpCardHtml"></div>
           <br>
           <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
               focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
