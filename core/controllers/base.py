@@ -450,7 +450,7 @@ class BaseHandler(webapp2.RequestHandler):
                     redirect_url_on_logout))
         else:
             values['login_url'] = (
-                current_user_services.create_login_url(self.request.uri))
+                current_user_services.create_login_url('/'))
 
         # Create a new csrf token for inclusion in HTML responses. This assumes
         # that tokens generated in one handler will be sent back to a handler
