@@ -362,3 +362,85 @@ class UserImpactMRJobManager(
         # Find the final score and round to a whole number
         user_impact_score = int(round(sum(values) ** exponent))
         user_models.UserStatsModel(id=key, impact_score=user_impact_score).put()
+
+
+class CreatorDashboardStatsRealtimeModel(
+        jobs.BaseRealtimeDatastoreClassForContinuousComputations):
+    pass
+
+
+class CreatorDashboardStatsAggregator(jobs.BaseContinuousComputationManager):
+    """A continuous-computation job that computes 'average ratings' and
+    'total plays' for a creator's explorations.
+
+    This job does not have a working realtime component as some
+    delay in calculating these statistics can be tolerated.
+    """
+    @classmethod
+    def get_event_types_listened_to(cls):
+        return []
+
+    @classmethod
+    def _get_realtime_datastore_class(cls):
+        return CreatorDashboardStatsRealtimeModel
+
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        return CreatorDashboardStatsMRJobManager
+
+    @classmethod
+    def _handle_incoming_event(cls, active_realtime_layer, event_type, *args):
+        pass
+
+
+class CreatorDashboardStatsMRJobManager(
+        jobs.BaseMapReduceJobManagerForContinuousComputations):
+    """Job that calculates stats models for each creator.
+    Includes: * average of average ratings across of all explorations
+              * sum of total plays of all explorations
+    """
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        return CreatorDashboardStatsAggregator
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserStatsModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        # Get average rating and total plays per exploration
+        statistics = (
+            stats_jobs_continuous.StatisticsAggregator.get_statistics(
+                item.id, stats_jobs_continuous.VERSION_ALL))
+        num_starts = statistics['start_exploration_count']
+
+        total_rating = 0
+        average_rating = 0.0
+        for ratings_value in item.ratings:
+            total_rating += item.ratings[ratings_value] * int(ratings_value)
+        if sum(item.ratings.itervalues()):
+            average_rating = total_rating / sum(item.ratings.itervalues())
+
+        exploration_summary = exp_services.get_exploration_summary_by_id(
+            item.id)
+        for owner_id in exploration_summary.owner_ids:
+            yield (owner_id, {
+                'average_rating': average_rating,
+                'total_plays': num_starts
+            })
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        values = [ast.literal_eval(v) for v in stringified_values]
+        # Find average of average rating of each exploration
+        average_ratings = (
+            sum(values['average_ratings']) / len(values['average_rating']))
+        # Find sum total of plays of all explorations
+        total_plays = sum(values['total_plays'])
+        user_models.UserStatsModel(
+            id=key, average_ratings=average_ratings, total_plays=total_plays
+        ).put()
