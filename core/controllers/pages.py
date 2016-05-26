@@ -74,6 +74,19 @@ class AboutPage(base.BaseHandler):
         self.render_template('pages/about.html')
 
 
+class TeachPage(base.BaseHandler):
+    """Page with information about how to teach on Oppia."""
+
+    def get(self):
+        """Handles GET requests."""
+        self.values.update({
+            'SITE_FORUM_URL': SITE_FORUM_URL.value,
+            'MODERATOR_REQUEST_FORUM_URL': (
+                editor.MODERATOR_REQUEST_FORUM_URL.value),
+        })
+        self.render_template('pages/teach.html')
+
+
 class ParticipatePage(base.BaseHandler):
     """Page with information about participating in Oppia."""
 
