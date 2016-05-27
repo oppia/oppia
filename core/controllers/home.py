@@ -244,20 +244,9 @@ class NewCollection(base.BaseHandler):
     @base.require_fully_signed_up
     def post(self):
         """Handles POST requests."""
-        title = self.payload.get('title')
-        category = self.payload.get('category')
-        objective = self.payload.get('objective')
-        language_code = self.payload.get('language_code')
-
-        if not title:
-            raise self.InvalidInputException('No title supplied.')
-        if not category:
-            raise self.InvalidInputException('No category chosen.')
-
         new_collection_id = collection_services.get_new_collection_id()
         collection = collection_domain.Collection.create_default_collection(
-            new_collection_id, title, category, objective=objective,
-            language_code=language_code)
+            new_collection_id)
         collection_services.save_new_collection(self.user_id, collection)
 
         self.render_json({

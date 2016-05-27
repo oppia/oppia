@@ -44,10 +44,8 @@ oppia.controller('MyExplorations', [
 ]);
 
 oppia.controller('CreateCollectionButton', [
-  '$scope', 'CATEGORY_LIST', 'CollectionCreationService',
-  function($scope, CATEGORY_LIST, CollectionCreationService) {
-    $scope.showCreateCollectionModal = function() {
-      CollectionCreationService.showCreateCollectionModal(CATEGORY_LIST);
-    };
+  '$scope', 'CollectionCreationService',
+  function($scope, CollectionCreationService) {
+    $scope.createNewCollection = CollectionCreationService.createNewCollection;
   }
 ]);
