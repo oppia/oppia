@@ -285,28 +285,28 @@
         "downloadFormat": "zip",
         "url": "http://download.cksource.com/CKEditor/CKEditor/CKEditor%204.5.8/ckeditor_4.5.8_standard.zip",
         "rootDir": "ckeditor",
-        "targetDir": "ckeditor"
+        "targetDirPrefix": "ckeditor-"
       },
-      "widget": {
+      "ckeditorWidget": {
         "version": "4.5.8",
         "downloadFormat": "zip",
         "url": "http://download.ckeditor.com/widget/releases/widget_4.5.8.zip",
         "rootDir": "widget",
-        "targetDir": "widget"
+        "targetDir": "ckeditor-widget"
       },
-      "lineutils": {
+      "ckeditorLineutils": {
         "version": "4.5.8",
         "downloadFormat": "zip",
         "url": "http://download.ckeditor.com/lineutils/releases/lineutils_4.5.8.zip",
         "rootDir": "lineutils",
-        "targetDir": "lineutils"
+        "targetDir": "ckeditor-lineutils"
       },
-      "sharedspace": {
+      "ckeditorSharedspace": {
         "version": "4.5.9",
         "downloadFormat": "zip",
         "url": "http://download.ckeditor.com/sharedspace/releases/sharedspace_4.5.9.zip",
         "rootDir": "sharedspace",
-        "targetDir": "sharedspace"
+        "targetDir": "ckeditor-sharedspace"
       },
       "textAngular": {
         "version": "1.4.5",

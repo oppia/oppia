@@ -23,14 +23,14 @@ bundled js at the header will block rendering.-->
   MathJax.Hub.Configured();
 </script>
 <script src="/third_party/static/MathJax-2.6.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-<script src="/third_party/static/ckeditor/ckeditor.js"></script>
+<script src="/third_party/static/ckeditor-4.5.8/ckeditor.js"></script>
 
 <script>
   // Required for custom widgets.
   CKEDITOR.plugins.addExternal(
-  'widget', '/third_party/static/widget/', 'plugin.js');
+  'widget', '/third_party/static/ckeditor-widget/', 'plugin.js');
   CKEDITOR.plugins.addExternal(
-  'lineutils', '/third_party/static/lineutils/', 'plugin.js');
+  'lineutils', '/third_party/static/ckeditor-lineutils/', 'plugin.js');
   CKEDITOR.plugins.addExternal(
-  'sharedspace', '/third_party/static/sharedspace/', 'plugin.js');
+  'sharedspace', '/third_party/static/ckeditor-sharedspace/', 'plugin.js');
 </script>
