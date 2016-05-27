@@ -1335,12 +1335,8 @@ class EditorAutosaveTest(BaseEditorControllerTest):
         self.assertEqual(response['draft_changes'], self.DRAFT_CHANGELIST)
 
     def test_exploration_loaded_without_draft_as_draft_does_not_exist(self):
-        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
-            '%s.%s' % (self.owner_id, self.EXP_ID3))
-        exp_user_data.draft_change_list_exp_version = 20
-        exp_user_data.put()
         response = self.get_json(
-            '/createhandler/data/%s' % self.EXP_ID2, {'apply_draft': True})
+            '/createhandler/data/%s' % self.EXP_ID3, {'apply_draft': True})
         # Title not updated because change list not applied.
         self.assertEqual(response['title'], 'A title')
         self.assertIsNone(response['is_version_of_draft_valid'])
