@@ -741,8 +741,8 @@ oppia.factory('rteHelperService', [
 
 // Dynamically generate CKEditor widgets for the rich text components.
 oppia.run([
-  '$compile', '$rootScope', 'rteHelperService', 'oppiaHtmlEscaper',
-  function($compile, $rootScope, rteHelperService, oppiaHtmlEscaper) {
+  '$timeout', '$compile', '$rootScope', 'rteHelperService', 'oppiaHtmlEscaper',
+  function($timeout, $compile, $rootScope, rteHelperService, oppiaHtmlEscaper) {
     var _RICH_TEXT_COMPONENTS = rteHelperService.getRichTextComponents();
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
       // The name of the CKEditor widget corresponding to this component.
@@ -775,6 +775,9 @@ oppia.run([
             inline: isInline,
             template: componentTemplate,
             edit: function(event) {
+              editor.fire('lockSnapshot', {
+                dontUpdate: true
+              });
               // Prevent default action since we are using our own edit modal.
               event.cancel();
               // Save this for creating the widget later.
@@ -796,13 +799,16 @@ oppia.run([
                     }
                   }
 
-
                   if (!that.isReady()) {
                     // Actually create the widget, if we have not already.
                     editor.widgets.finalizeCreation(container);
                   }
                   // Need to manually $compile so the directive renders.
                   $compile($(that.element.$).contents())($rootScope);
+                  $timeout(function() {
+                    editor.fire('unlockSnapshot');
+                    editor.fire('saveSnapshot');
+                  });
                 },
                 function() {},
                 function() {});
@@ -828,6 +834,9 @@ oppia.run([
               });
             },
             init: function() {
+              editor.fire('lockSnapshot', {
+                dontUpdate: true
+              });
               var that = this;
               var isMissingAttributes = false;
               // On init, read values from component attributes and save them.
@@ -846,6 +855,10 @@ oppia.run([
                 // Need to manually $compile so the directive renders.
                 $compile($(this.element.$).contents())($rootScope);
               }
+              $timeout(function() {
+                editor.fire('unlockSnapshot');
+                editor.fire('saveSnapshot');
+              });
             }
           });
         }
@@ -892,6 +905,10 @@ oppia.directive('ckEditorRte', [
           },
           toolbar: [
             {
+              name: 'history',
+              items: ['Undo', 'Redo']
+            },
+            {
               name: 'basicstyles',
               items: ['Bold', 'Italic', '-', 'RemoveFormat']
             },
@@ -906,27 +923,28 @@ oppia.directive('ckEditorRte', [
           ]
         });
 
-        // Befoe data is loaded into CKEditor, we need to wrap every rte
+        // A RegExp for matching rich text components.
+        var componentRe = (
+          /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
+        );
+
+        // Before data is loaded into CKEditor, we need to wrap every rte
         // component in a span (inline) or div (block).
         // For block elements, we add an overlay div as well.
         var wrapComponents = function(html) {
           if (html === undefined) {
             return html;
           }
-          var re = new RegExp(
-            '<oppia-noninteractive-([^\\s]+)[^<]+' +
-            '<\\/oppia-noninteractive-[^>]+>', 'g');
-          var processed = html.replace(re, function(match, name) {
-            if (rteHelperService.isInlineComponent(name)) {
-              return '<span type="oppia-noninteractive-' + name + '">' +
+          return html.replace(componentRe, function(match, p1, p2, p3) {
+            if (rteHelperService.isInlineComponent(p3)) {
+              return '<span type="oppia-noninteractive-' + p3 + '">' +
                     match + '</span>';
             } else {
-              return '<div type="oppia-noninteractive-' + name + '"' +
+              return '<div type="oppia-noninteractive-' + p3 + '"' +
                      'class="component-container">' + match +
                      '<div class="component-overlay"></div></div>';
             }
           });
-          return processed;
         };
 
         ck.on('instanceReady', function() {
@@ -941,15 +959,21 @@ oppia.directive('ckEditorRte', [
           ck.setData(wrapComponents(ngModel.$viewValue));
         });
 
+        // Angular rendering of components confuses CKEditor's undo system, so
+        // we hide all of that stuff away from CKEditor.
+        ck.on('getSnapshot', function(event) {
+          event.data = event.data.replace(componentRe, function(match, p1, p2) {
+            return p1 + '</' + p2 + '>';
+          });
+        }, null, null, 20);
+
+        ck.on('change', function() {
+          ngModel.$setViewValue(ck.getData());
+        });
+
         ngModel.$render = function() {
           ck.setData(wrapComponents(ngModel.$viewValue));
         };
-
-        var updateHtmlContent = function() {
-          ngModel.$setViewValue(ck.getData());
-        };
-
-        ck.on('change', updateHtmlContent);
       }
     };
   }
