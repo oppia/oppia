@@ -2172,7 +2172,7 @@ div#ng-curtain {
 }
 
 .oppia-navbar-tabs-narrow {
-  min-width: 210px;
+  width: 100px;
 }
 .oppia-navbar-tabs {
   min-width: 500px;
