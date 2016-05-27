@@ -286,9 +286,11 @@ class ExplorationHandler(EditorHandler):
             self.user_id, exploration_id)
         draft_changes = (exp_user_data.draft_change_list if exp_user_data
                          and exp_user_data.draft_change_list else None)
-        draft_exp_version = (
-            exp_user_data.draft_change_list_exp_version if exp_user_data and
-            exp_user_data.draft_change_list_exp_version else None)
+        is_version_of_draft_valid = (
+            exp_services.is_version_of_draft_valid(
+                exploration_id, exp_user_data.draft_change_list_exp_version)
+            if exp_user_data and exp_user_data.draft_change_list_exp_version
+            else None)
         editor_dict = {
             'category': exploration.category,
             'exploration_id': exploration_id,
@@ -307,8 +309,7 @@ class ExplorationHandler(EditorHandler):
             'tags': exploration.tags,
             'title': exploration.title,
             'version': exploration.version,
-            'is_version_of_draft_valid': exp_services.is_version_of_draft_valid(
-                exploration_id, draft_exp_version),
+            'is_version_of_draft_valid': is_version_of_draft_valid,
             'draft_changes': draft_changes
         }
 

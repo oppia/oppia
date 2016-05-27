@@ -1560,11 +1560,9 @@ def reject_suggestion(editor_id, thread_id, exploration_id):
 
 def is_version_of_draft_valid(exp_id, version):
     """Checks if the draft version is the same as the latest version of the
-    exploration. Returns None if version is None."""
+    exploration."""
 
-    if version:
-        return get_exploration_by_id(exp_id).version == version
-    return version
+    return get_exploration_by_id(exp_id).version == version
 
 
 def create_or_update_draft(

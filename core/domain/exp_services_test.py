@@ -3138,7 +3138,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
     def test_draft_version_valid_when_no_draft_exists(self):
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.USER_ID, self.EXP_ID3))
-        self.assertIsNone(exp_services.is_version_of_draft_valid(
+        self.assertFalse(exp_services.is_version_of_draft_valid(
             self.EXP_ID3, exp_user_data.draft_change_list_exp_version))
 
     def test_create_or_update_draft_when_older_draft_exists(self):
