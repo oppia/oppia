@@ -3219,6 +3219,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-about-card-content-wide {
   margin: 0 auto;
+  max-width: 600px;
   padding: 5% 0;
   width: 90%;
 }
@@ -3309,13 +3310,18 @@ md-card.preview-conversation-skin-supplemental-card {
   width: calc(100% / 2);
 }
 
-.oppia-about-buttons {
+.oppia-about-button {
+  background-color: rgba(0,0,0,0.2);
+  color: rgba(255,255,255,1.0);
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 18px;
   margin: 15px;
   padding: 15px;
+  text-transform: uppercase;
   white-space: normal;
 }
 
-.oppia-about-buttons:hover {
+.oppia-about-button:hover {
   background-color: rgba(5,190,178,1);
   color: rgba(255,255,255,1);
 }

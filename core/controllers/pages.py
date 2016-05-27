@@ -82,6 +82,7 @@ class TeachPage(base.BaseHandler):
         self.values.update({
             'SITE_FORUM_URL': SITE_FORUM_URL.value,
             'MODERATOR_REQUEST_FORUM_URL': MODERATOR_REQUEST_FORUM_URL.value,
+            'nav_mode': feconf.NAV_MODE_TEACH,
         })
         self.render_template('pages/teach.html')
 
