@@ -893,19 +893,21 @@ oppia.directive('ckEditorRte', [
                 '</div></div>',
       require: '?ngModel',
       link: function(scope, el, attr, ngModel) {
-        var richTextComponents = [
-          'Link',
-          'Math',
-          'Image',
-          'Collapsible',
-          'Tabs',
-          'Video'
-        ];
-        var pluginNames = richTextComponents.map(function(widget) {
-          return 'oppia' + widget.toLowerCase();
+        var _RICH_TEXT_COMPONENTS = rteHelperService.getRichTextComponents();
+        var names = [];
+        _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
+          if (!(scope.uiConfig() &&
+                scope.uiConfig().hide_complex_extensions &&
+                componentDefn.isComplex)) {
+            names.push(componentDefn.name);
+          }
+        });
+
+        var pluginNames = names.map(function(name) {
+          return 'oppia' + name;
         }).join(',');
-        var buttonNames = richTextComponents.map(function(widget) {
-          return 'Oppia' + widget.toLowerCase();
+        var buttonNames = names.map(function(name) {
+          return 'Oppia' + name;
         });
 
         // Initialize ckeditor.
@@ -962,11 +964,12 @@ oppia.directive('ckEditorRte', [
 
         ck.on('instanceReady', function() {
           // Set the icons for each toolbar button.
-          richTextComponents.forEach(function(widget) {
+          names.forEach(function(name) {
+            var upperCasedName = name.charAt(0).toUpperCase() + name.slice(1);
             var bgStyle = 'url("/extensions/rich_text_components/' +
-                          widget + '/static/' + widget +
+                          upperCasedName + '/static/' + upperCasedName +
                           '.png") no-repeat center';
-            $('.cke_button__oppia' + widget.toLowerCase()).css(
+            $('.cke_button__oppia' + name).css(
               'background', bgStyle);
           });
           ck.setData(wrapComponents(ngModel.$viewValue));
