@@ -895,20 +895,25 @@ oppia.directive('ckEditorRte', [
       link: function(scope, el, attr, ngModel) {
         var _RICH_TEXT_COMPONENTS = rteHelperService.getRichTextComponents();
         var names = [];
+        var icons = [];
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
           if (!(scope.uiConfig() &&
                 scope.uiConfig().hide_complex_extensions &&
                 componentDefn.isComplex)) {
             names.push(componentDefn.name);
+            icons.push(componentDefn.iconDataUrl);
           }
         });
 
         var pluginNames = names.map(function(name) {
           return 'oppia' + name;
         }).join(',');
-        var buttonNames = names.map(function(name) {
-          return 'Oppia' + name;
+        var buttonNames = [];
+        names.forEach(function(name) {
+          buttonNames.push('Oppia' + name);
+          buttonNames.push('-');
         });
+        buttonNames.pop();
 
         // Initialize ckeditor.
         var ck = CKEDITOR.inline(el[0].children[0].children[1], {
@@ -918,18 +923,24 @@ oppia.directive('ckEditorRte', [
           sharedSpaces: {
             top: el[0].children[0].children[0]
           },
+          skin: 'bootstrapck,/third_party/static/ckeditor-bootstrapck/',
           toolbar: [
             {
               name: 'history',
-              items: ['Undo', 'Redo']
+              items: ['Undo', '-', 'Redo']
             },
             {
               name: 'basicstyles',
-              items: ['Bold', 'Italic', '-', 'RemoveFormat']
+              items: ['Bold', '-', 'Italic', '-', 'RemoveFormat']
             },
             {
               name: 'paragraph',
-              items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent']
+              items: [
+                'NumberedList', '-',
+                'BulletedList', '-',
+                'Outdent', '-',
+                'Indent'
+              ]
             },
             {
               name: 'rtecomponents',
@@ -964,13 +975,13 @@ oppia.directive('ckEditorRte', [
 
         ck.on('instanceReady', function() {
           // Set the icons for each toolbar button.
-          names.forEach(function(name) {
+          names.forEach(function(name, index) {
+            var icon = icons[index];
             var upperCasedName = name.charAt(0).toUpperCase() + name.slice(1);
-            var bgStyle = 'url("/extensions/rich_text_components/' +
-                          upperCasedName + '/static/' + upperCasedName +
-                          '.png") no-repeat center';
-            $('.cke_button__oppia' + name).css(
-              'background', bgStyle);
+            $('.cke_button__oppia' + name)
+               .css('background-image', 'url("' + icon + '")')
+               .css('background-position', 'center')
+               .css('background-repeat', 'no-repeat');
           });
           ck.setData(wrapComponents(ngModel.$viewValue));
         });
@@ -978,6 +989,9 @@ oppia.directive('ckEditorRte', [
         // Angular rendering of components confuses CKEditor's undo system, so
         // we hide all of that stuff away from CKEditor.
         ck.on('getSnapshot', function(event) {
+          if (event.data === undefined) {
+            return;
+          }
           event.data = event.data.replace(componentRe, function(match, p1, p2) {
             return p1 + '</' + p2 + '>';
           });
