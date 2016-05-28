@@ -50,9 +50,8 @@ ONE_OFF_JOB_MANAGERS = [
 ALL_CONTINUOUS_COMPUTATION_MANAGERS = [
     exp_jobs_continuous.SearchRanker,
     stats_jobs_continuous.StatisticsAggregator,
-    user_jobs_continuous.CreatorDashboardStatsAggregator,
     user_jobs_continuous.DashboardRecentUpdatesAggregator,
-    user_jobs_continuous.UserImpactAggregator,
+    user_jobs_continuous.UserStatsAggregator,
     feedback_jobs_continuous.FeedbackAnalyticsAggregator,
     recommendations_jobs_continuous.ExplorationRecommendationsAggregator]
 
