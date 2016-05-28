@@ -808,6 +808,14 @@ oppia.run([
                   $timeout(function() {
                     editor.fire('unlockSnapshot');
                     editor.fire('saveSnapshot');
+                    if (isInline) {
+                      // Move caret after the newly created widget.
+                      var range = editor.createRange();
+                      var widgetContainer = that.element.getParent();
+                      range.moveToPosition(
+                        widgetContainer, CKEDITOR.POSITION_AFTER_END);
+                      editor.getSelection().selectRanges([range]);
+                    }
                   });
                 },
                 function() {},
@@ -974,6 +982,11 @@ oppia.directive('ckEditorRte', [
         ngModel.$render = function() {
           ck.setData(wrapComponents(ngModel.$viewValue));
         };
+
+        scope.$on('$destroy', function() {
+          // Clean up CKEditor instance when directive is removed.
+          ck.destroy();
+        });
       }
     };
   }
