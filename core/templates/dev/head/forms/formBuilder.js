@@ -806,8 +806,6 @@ oppia.run([
                   // Need to manually $compile so the directive renders.
                   $compile($(that.element.$).contents())($rootScope);
                   $timeout(function() {
-                    editor.fire('unlockSnapshot');
-                    editor.fire('saveSnapshot');
                     if (isInline) {
                       // Move caret after the newly created widget.
                       var range = editor.createRange();
@@ -815,6 +813,13 @@ oppia.run([
                       range.moveToPosition(
                         widgetContainer, CKEDITOR.POSITION_AFTER_END);
                       editor.getSelection().selectRanges([range]);
+                      $timeout(function() {
+                        editor.fire('unlockSnapshot');
+                        editor.fire('saveSnapshot');
+                      });
+                    } else {
+                      editor.fire('unlockSnapshot');
+                      editor.fire('saveSnapshot');
                     }
                   });
                 },
