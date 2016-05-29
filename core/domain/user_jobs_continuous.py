@@ -366,8 +366,8 @@ class UserStatsMRJobManager(
                 # Get num starts (total plays) for the exploration
                 num_starts = statistics['start_exploration_count']
                 exploration_data.update({
-                    'exploration_total_plays': num_starts,
-                    'exploration_average_rating': average_rating
+                    'total_plays_for_owned_exp': num_starts,
+                    'average_rating_for_owned_exp': average_rating
                 })
             yield (contrib_id, exploration_data)
 
@@ -382,12 +382,12 @@ class UserStatsMRJobManager(
 
         # Sum up the total plays for all explorations
         total_plays = sum(
-            value['exploration_total_plays'] for value in values
-            if value.get('exploration_total_plays'))
+            value['total_plays_for_owned_exp'] for value in values
+            if value.get('total_plays_for_owned_exp'))
 
         # Find the average of all average ratings
-        ratings = [value['exploration_average_rating'] for value in values
-                   if value.get('exploration_average_rating')]
+        ratings = [value['average_rating_for_owned_exp'] for value in values
+                   if value.get('average_rating_for_owned_exp')]
         average_ratings = (sum(ratings) / float(len(ratings))
                            if len(ratings) else 0.0)
 
