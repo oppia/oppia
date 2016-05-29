@@ -43,17 +43,10 @@
       </div>
       <div class="title-section-mask"></div>
 
-<<<<<<< HEAD
-      <div>
-        <div class="objective protractor-test-exp-summary-tile-objective">
-          <[getObjective() | truncateAndCapitalize: 45]>
-          <span ng-if="!getObjective()" translate="I18N_GALLERY_NO_OBJECTIVE"></span>
-=======
       <div ng-attr-section="<[isWindowLarge ? undefined : 'right-section']>">
         <div ng-if="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
           <[getObjective() | truncateAndCapitalize: 40]>
-          <span ng-if="!getObjective()">No objective specified.</span>
->>>>>>> develop
+          <span ng-if="!getObjective()" translate="I18N_GALLERY_NO_OBJECTIVE"></span>
         </div>
         <ul layout="row" class="metrics" layout-align="space-between center">
           <li>

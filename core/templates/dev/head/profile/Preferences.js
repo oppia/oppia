@@ -17,24 +17,10 @@
  */
 
 oppia.controller('Preferences', [
-<<<<<<< HEAD
   '$scope', '$http', '$rootScope', '$modal', '$timeout', '$translate',
-  'warningsData',
+  'alertsService',
   function(
-      $scope, $http, $rootScope, $modal, $timeout, $translate, warningsData) {
-    var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
-    $rootScope.loadingMessage = 'Loading';
-    $scope.profilePictureDataUrl = '';
-
-    var _saveDataItem = function(updateType, data) {
-      $http.put(_PREFERENCES_DATA_URL, {
-        update_type: updateType,
-        data: data
-      });
-    };
-=======
-    '$scope', '$http', '$rootScope', '$modal', '$timeout', 'alertsService',
-    function($scope, $http, $rootScope, $modal, $timeout, alertsService) {
+      $scope, $http, $rootScope, $modal, $timeout, $translate, alertsService) {
   var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
   $rootScope.loadingMessage = 'Loading';
   $scope.profilePictureDataUrl = '';
@@ -53,74 +39,24 @@ oppia.controller('Preferences', [
   $scope.subjectInterestsChangedAtLeastOnce = false;
   $scope.subjectInterestsWarningText = null;
   $scope.TAG_REGEX_STRING = '^[a-z ]+$';
->>>>>>> develop
 
-    $scope.saveUserBio = function(userBio) {
-      _saveDataItem('user_bio', userBio);
-    };
+  $scope.updateSubjectInterestsWarning = function(subjectInterests) {
+    var TAG_REGEX = new RegExp($scope.TAG_REGEX_STRING);
 
-    $scope.subjectInterestsChangedAtLeastOnce = false;
-    $scope.subjectInterestsWarningText = null;
-    $scope.TAG_REGEX_STRING = '^[a-z ]+$';
-
-    $scope.updateSubjectInterestsWarning = function(subjectInterests) {
-      var TAG_REGEX = new RegExp($scope.TAG_REGEX_STRING);
-
-      if (subjectInterests instanceof Array) {
-        for (var i = 0; i < subjectInterests.length; i++) {
-          if (typeof subjectInterests[i] === 'string') {
-            if (!TAG_REGEX.test(subjectInterests[i])) {
-              $scope.subjectInterestsWarningText = (
-                'Subject interests should use only lowercase letters.');
-            }
-          } else {
-            console.error(
-              'Error: received bad value for a subject interest. Expected a ' +
-              'string, got ', subjectInterests[i]);
-            throw Error('Error: received bad value for a subject interest.');
+    if (subjectInterests instanceof Array) {
+      for (var i = 0; i < subjectInterests.length; i++) {
+        if (typeof subjectInterests[i] === 'string') {
+          if (!TAG_REGEX.test(subjectInterests[i])) {
+            $scope.subjectInterestsWarningText = (
+              'Subject interests should use only lowercase letters.');
           }
+        } else {
+          console.error(
+            'Error: received bad value for a subject interest. Expected a ' +
+            'string, got ', subjectInterests[i]);
+          throw Error('Error: received bad value for a subject interest.');
         }
-      } else {
-        console.error(
-          'Error: received bad value for subject interests. Expected list of ' +
-          'strings, got ', subjectInterests);
-        throw Error('Error: received bad value for subject interests.');
       }
-<<<<<<< HEAD
-    };
-
-    $scope.onSubjectInterestsSelectionChange = function(subjectInterests) {
-      warningsData.clear();
-      $scope.subjectInterestsChangedAtLeastOnce = true;
-      $scope.subjectInterestsWarningText = null;
-      $scope.updateSubjectInterestsWarning(subjectInterests);
-      if ($scope.subjectInterestsWarningText == null) {
-        _saveDataItem('subject_interests', subjectInterests);
-      }
-    };
-
-    $scope.saveCanReceiveEmailUpdates = function(canReceiveEmailUpdates) {
-      _saveDataItem('can_receive_email_updates', canReceiveEmailUpdates);
-    };
-
-    $scope.savePreferredLanguageCodes = function(preferredLanguageCodes) {
-      _saveDataItem('preferred_language_codes', preferredLanguageCodes);
-    };
-
-    $scope.savePreferredSiteLanguageCodes = function(
-      preferredSiteLanguageCode) {
-      $translate.use(preferredSiteLanguageCode);
-      _saveDataItem(
-        'preferred_site_language_code', preferredSiteLanguageCode);
-    };
-
-    $scope.showEditProfilePictureModal = function() {
-      $modal.open({
-        templateUrl: 'modals/editProfilePicture',
-        backdrop: true,
-        controller: [
-          '$scope', '$modalInstance', function($scope, $modalInstance) {
-=======
     } else {
       console.error(
         'Error: received bad value for subject interests. Expected list of ' +
@@ -137,6 +73,13 @@ oppia.controller('Preferences', [
     if ($scope.subjectInterestsWarningText == null) {
       _saveDataItem('subject_interests', subjectInterests);
     }
+  };
+
+  $scope.savePreferredSiteLanguageCodes = function(
+    preferredSiteLanguageCode) {
+    $translate.use(preferredSiteLanguageCode);
+    _saveDataItem(
+      'preferred_site_language_code', preferredSiteLanguageCode);
   };
 
   $scope.saveEmailPreferences = function(
@@ -186,77 +129,15 @@ oppia.controller('Preferences', [
           };
 
           $scope.onInvalidImageLoaded = function() {
->>>>>>> develop
             $scope.uploadedImage = null;
             $scope.croppedImageDataUrl = '';
-            $scope.invalidImageWarningIsShown = false;
+            $scope.invalidImageWarningIsShown = true;
+          };
 
-            $scope.onFileChanged = function(file) {
-              $('.oppia-profile-image-uploader').fadeOut(function() {
-                $scope.invalidImageWarningIsShown = false;
+          $scope.confirm = function() {
+            $modalInstance.close($scope.croppedImageDataUrl);
+          };
 
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                  $scope.$apply(function() {
-                    $scope.uploadedImage = e.target.result;
-                  });
-                };
-                reader.readAsDataURL(file);
-
-                $timeout(function() {
-                  $('.oppia-profile-image-uploader').fadeIn();
-                }, 100);
-              });
-            };
-
-            $scope.reset = function() {
-              $scope.uploadedImage = null;
-              $scope.croppedImageDataUrl = '';
-            };
-
-            $scope.onInvalidImageLoaded = function() {
-              $scope.uploadedImage = null;
-              $scope.croppedImageDataUrl = '';
-              $scope.invalidImageWarningIsShown = true;
-            };
-
-            $scope.confirm = function() {
-              $modalInstance.close($scope.croppedImageDataUrl);
-            };
-
-            $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
-            };
-          }
-        ]
-      }).result.then(function(newProfilePictureDataUrl) {
-        $http.put(_PREFERENCES_DATA_URL, {
-          update_type: 'profile_picture_data_url',
-          data: newProfilePictureDataUrl
-        }).success(function() {
-          // The reload is needed in order to update the profile picture in the
-          // top-right corner.
-          location.reload();
-        });
-      });
-    };
-
-    $scope.LANGUAGE_CHOICES = GLOBALS.LANGUAGE_CODES_AND_NAMES.map(
-      function(languageItem) {
-        return {
-          id: languageItem.code,
-          text: languageItem.name
-        };
-      }
-    );
-
-<<<<<<< HEAD
-    $scope.SITE_LANGUAGE_CHOICES = [];
-    for (var languageKey in GLOBALS.SUPPORTED_SITE_LANGUAGES) {
-      $scope.SITE_LANGUAGE_CHOICES.push({
-        id: languageKey,
-        text: GLOBALS.SUPPORTED_SITE_LANGUAGES[languageKey]
-=======
           $scope.cancel = function() {
             $modalInstance.dismiss('cancel');
           };
@@ -270,24 +151,8 @@ oppia.controller('Preferences', [
         // The reload is needed in order to update the profile picture in the
         // top-right corner.
         location.reload();
->>>>>>> develop
       });
-    };
-
-    $scope.hasPageLoaded = false;
-    $http.get(_PREFERENCES_DATA_URL).success(function(data) {
-      $rootScope.loadingMessage = '';
-      $scope.userBio = data.user_bio;
-      $scope.subjectInterests = data.subject_interests;
-      $scope.preferredLanguageCodes = data.preferred_language_codes;
-      $scope.profilePictureDataUrl = data.profile_picture_data_url;
-      $scope.canReceiveEmailUpdates = data.can_receive_email_updates;
-      $scope.preferredSiteLanguageCode = data.preferred_site_language_code;
-      $scope.hasPageLoaded = true;
     });
-<<<<<<< HEAD
-  }]);
-=======
   };
 
   $scope.LANGUAGE_CHOICES = GLOBALS.LANGUAGE_CODES_AND_NAMES.map(
@@ -299,6 +164,14 @@ oppia.controller('Preferences', [
     }
   );
 
+  $scope.SITE_LANGUAGE_CHOICES = [];
+  for (var languageKey in GLOBALS.SUPPORTED_SITE_LANGUAGES) {
+    $scope.SITE_LANGUAGE_CHOICES.push({
+      id: languageKey,
+      text: GLOBALS.SUPPORTED_SITE_LANGUAGES[languageKey]
+    });
+  }
+
   $scope.hasPageLoaded = false;
   $http.get(_PREFERENCES_DATA_URL).then(function(response) {
     var data = response.data;
@@ -309,7 +182,7 @@ oppia.controller('Preferences', [
     $scope.profilePictureDataUrl = data.profile_picture_data_url;
     $scope.canReceiveEmailUpdates = data.can_receive_email_updates;
     $scope.canReceiveEditorRoleEmail = data.can_receive_editor_role_email;
+    $scope.preferredSiteLanguageCode = data.preferred_site_language_code;
     $scope.hasPageLoaded = true;
   });
 }]);
->>>>>>> develop

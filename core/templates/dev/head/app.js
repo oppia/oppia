@@ -22,15 +22,10 @@
 // in order to make the testing and production environments match.
 var oppia = angular.module(
   'oppia', [
-<<<<<<< HEAD
-    'ngMaterial', 'ngAnimate', 'ngSanitize', 'ngResource', 'ui.bootstrap',
-    'ui.sortable', 'infinite-scroll', 'ngJoyRide', 'ngImgCrop', 'ui.validate',
-    'textAngular', 'pascalprecht.translate', 'ngCookies'
-=======
     'ngMaterial', 'ngAnimate', 'ngSanitize', 'ngTouch', 'ngResource',
     'ui.bootstrap', 'ui.sortable', 'infinite-scroll', 'ngJoyRide', 'ngImgCrop',
-    'ui.validate', 'textAngular', 'toastr'
->>>>>>> develop
+    'ui.validate', 'textAngular', 'pascalprecht.translate', 'ngCookies',
+    'toastr'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
                    : []));
@@ -56,41 +51,6 @@ oppia.config([
       $locationProvider.html5Mode(true);
     }
 
-<<<<<<< HEAD
-  $httpProvider.interceptors.push([
-    '$q', '$log', 'warningsData', function($q, $log, warningsData) {
-      return {
-        request: function(config) {
-          // If this request carries data (in the form of a JS object),
-          // JSON-stringify it and store it under 'payload'.
-          var csrfToken = '';
-          if (config.data) {
-            if (config.requestIsFromFooter) {
-              csrfToken = GLOBALS.csrf_token_for_footer;
-            } else {
-              csrfToken = GLOBALS.csrf_token;
-            }
-            config.data = $.param({
-              csrf_token: csrfToken,
-              payload: JSON.stringify(config.data),
-              source: document.URL
-            }, true);
-          }
-          return config;
-        },
-        responseError: function(rejection) {
-          // A rejection status of -1 seems to indicate (it's hard to find
-          // documentation) that the response has not completed,
-          // which can occur if the user navigates away from the page
-          // while the response is pending, This should not be considered
-          // an error.
-          if (rejection.status !== -1) {
-            $log.error(rejection.data);
-
-            var warningMessage = 'Error communicating with server.';
-            if (rejection.data && rejection.data.error) {
-              warningMessage = rejection.data.error;
-=======
     // Set default headers for POST and PUT requests.
     $httpProvider.defaults.headers.post = {
       'Content-Type': 'application/x-www-form-urlencoded'
@@ -107,9 +67,15 @@ oppia.config([
           request: function(config) {
             // If this request carries data (in the form of a JS object),
             // JSON-stringify it and store it under 'payload'.
+            var csrfToken = '';
             if (config.data) {
+              if (config.requestIsFromFooter) {
+                csrfToken = GLOBALS.csrf_token_for_footer;
+              } else {
+                csrfToken = GLOBALS.csrf_token;
+              }
               config.data = $.param({
-                csrf_token: GLOBALS.csrf_token,
+                csrf_token: csrfToken,
                 payload: JSON.stringify(config.data),
                 source: document.URL
               }, true);
@@ -130,7 +96,6 @@ oppia.config([
                 warningMessage = rejection.data.error;
               }
               alertsService.addWarning(warningMessage);
->>>>>>> develop
             }
             return $q.reject(rejection);
           }

@@ -16,15 +16,10 @@
  * @fileoverview Unit tests for the controller of the library page.
  */
 
-<<<<<<< HEAD:core/templates/dev/head/galleries/GallerySpec.js
-describe('Gallery controller', function() {
-  describe('Gallery', function() {
-=======
 describe('Library controller', function() {
   beforeEach(module('oppia'));
 
   describe('Library', function() {
->>>>>>> develop:core/templates/dev/head/library/LibrarySpec.js
     var scope, ctrl, rootScope, $httpBackend;
 
     beforeEach(function() {

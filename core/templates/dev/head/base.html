@@ -25,11 +25,7 @@
     </div>
     <div ng-show="!loadingMessage">
       {% block content %}{% endblock %}
-<<<<<<< HEAD
-
-=======
       {% block footer %}{% endblock %}
->>>>>>> develop
     </div>
   </div>
 {%- endmacro %}
@@ -60,7 +56,7 @@
     <meta property="og:image" content="{{DOMAIN_URL}}/images/logo/288x288_logo_mint.png">
 
     <link rel="apple-touch-icon" href="/images/logo/favicon.png">
-<<<<<<< HEAD
+
     <!-- The title is bound to the rootScope. The content of the block
     maintitle can be a string or a translation id. If it is a translation it
     will be replaced by its translation when the page is loading. If it is a
@@ -68,11 +64,8 @@
     the page title because the head of the file is outside the scope of
     any other controller. -->
     <title itemprop="name" translate="{% block maintitle %}Oppia{% endblock maintitle %}"></title>
-
-=======
-    <title itemprop="name">{% block subtitle %}{% endblock %} - {% block maintitle %}Oppia{% endblock %}</title>
     {% block base_url %}{% endblock base_url %}
->>>>>>> develop
+
     {% block header_css %}
       {% include 'header_css_libs.html' %}
     {% endblock header_css %}
@@ -180,12 +173,9 @@
                                 {% endif %}
                               </div>
                             </a>
-<<<<<<< HEAD
 
-                            <ul class="dropdown-menu ng-cloak oppia-navbar-profile-dropdown" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)" ng-show="profileDropdownIsActive">
-=======
                             <ul class="dropdown-menu ng-cloak oppia-navbar-dropdown" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)" ng-show="profileDropdownIsActive">
->>>>>>> develop
+
                               <li>
                                 <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/profile/{{username}}">
                                   <strong>{{username}}</strong>
@@ -235,22 +225,14 @@
                           </li>
                         {% else %}
                           <li class="dropdown oppia-clickable-dropdown pull-right">
-<<<<<<< HEAD
-                            <a href="{{login_url}}" class="oppia-navbar-profile-dropdown-toggle" style="font-size: 1em; padding-top: 17px;">
-                              <span translate="I18N_TOPNAV_SIGN_IN"></span>
-                              <span class="caret"></span>
-                            </a>
-                            <ul class="dropdown-menu oppia-navbar-profile-dropdown" role="menu" style="padding: 0;" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
-=======
                             <div class="oppia-navbar-button-container" style="margin-right: 10px;">
                               <button class="btn oppia-navbar-button"
                                       ng-click="onLoginButtonClicked('{{login_url}}')">
-                                <span>Sign in</span>
+                                <span translate="I18N_TOPNAV_SIGN_IN"></span>
                                 <span class="caret"></span>
                               </button>
                             </div>
                             <ul class="dropdown-menu oppia-navbar-dropdown" role="menu" style="margin-right: 15px; padding: 0;" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
->>>>>>> develop
                               <li>
                                 <a href style="padding: 0; width: 200px;" ng-click="onLoginButtonClicked('{{login_url}}')">
                                   <img src="/images/signin/Red-signin-Long-base-44dp.png">
@@ -315,8 +297,6 @@
 
               {{ warnings_and_loader() }}
             </div>
-<<<<<<< HEAD
-=======
 
             <noscript>
               <div class="oppia-page-cards-container">
@@ -328,7 +308,7 @@
               </div>
             </noscript>
 
->>>>>>> develop
+
             {% include 'side_nav.html' %}
 
           </div>

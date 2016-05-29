@@ -192,6 +192,8 @@ describe('State Editor controller', function() {
     var $httpBackend;
     var scope, siis, ecs, cls, rs, tds, ess, IS, FUZZY_RULE_TYPE;
 
+    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+
     beforeEach(function() {
       module('oppia');
       // Set a global value for INTERACTION_SPECS that will be used by all the

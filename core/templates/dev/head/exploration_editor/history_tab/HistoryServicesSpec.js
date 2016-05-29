@@ -171,6 +171,7 @@ describe('Compare versions service', function() {
     var treeParents = null;
     var $httpBackend = null;
 
+    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
     beforeEach(function() {
       mockExplorationData = {
         explorationId: 0
@@ -179,7 +180,6 @@ describe('Compare versions service', function() {
         $provide.value('explorationData', mockExplorationData);
       });
     });
-    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
     beforeEach(inject(function($injector) {
       cvs = $injector.get('compareVersionsService');

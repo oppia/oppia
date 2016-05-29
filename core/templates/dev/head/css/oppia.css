@@ -110,7 +110,7 @@ body {
   width: 100%;
 }
 
-/* According to the Angular documentation - https://docs.angularjs.org/api/ng/directive/ngCloak - 
+/* According to the Angular documentation - https://docs.angularjs.org/api/ng/directive/ngCloak -
    the following rule needs to be added to the css file in order for ng-cloak to work.  */
 [ng\:cloak], [ng-cloak], .ng-cloak {
   display: none !important;
@@ -2566,7 +2566,6 @@ div#ng-curtain {
   min-height: 80px;
 }
 
-<<<<<<< HEAD
 .oppia-footer, .oppia-base-container:after {
   height: 60px;
 }
@@ -2577,11 +2576,11 @@ div#ng-curtain {
   padding: 20px 25px;
   position: relative;
   z-index: 1;
-=======
+}
+
 .form-control.oppia-rte-content img.block-element {
   display: block;
   margin: auto;
->>>>>>> develop
 }
 
 /* Styles for the editor training interfaces. */

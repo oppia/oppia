@@ -141,15 +141,10 @@ class PreferencesHandler(base.BaseHandler):
             'profile_picture_data_url': user_settings.profile_picture_data_url,
             'user_bio': user_settings.user_bio,
             'subject_interests': user_settings.subject_interests,
-<<<<<<< HEAD
-            'can_receive_email_updates': user_services.get_email_preferences(
-                self.user_id)['can_receive_email_updates']
-=======
             'can_receive_email_updates': (
                 user_email_preferences['can_receive_email_updates']),
             'can_receive_editor_role_email': (
                 user_email_preferences['can_receive_editor_role_email'])
->>>>>>> develop
         })
         self.render_json(self.values)
 
