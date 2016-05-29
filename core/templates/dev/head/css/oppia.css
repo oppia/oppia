@@ -3103,6 +3103,10 @@ md-card.preview-conversation-skin-supplemental-card {
   text-align: left;
   width: 100%;
 }
+.oppia-splash-bullet-block img {
+  width: 90%;
+  text-align: center;
+}
 
 @media (min-width: 610px) {
   .oppia-splash-bullet-block {
