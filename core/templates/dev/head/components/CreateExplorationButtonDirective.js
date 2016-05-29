@@ -21,16 +21,21 @@ oppia.directive('createExplorationButton', [function() {
     restrict: 'E',
     templateUrl: 'components/createExplorationButton',
     controller: [
-      '$scope', '$timeout', '$window', 'ExplorationCreationService',
-      'siteAnalyticsService',
+      '$scope', '$timeout', '$window', '$modal', 'ExplorationCreationService',
+      'siteAnalyticsService', 'CollectionCreationService',
       function(
-          $scope, $timeout, $window, ExplorationCreationService,
-          siteAnalyticsService) {
+          $scope, $timeout, $window, $modal, ExplorationCreationService,
+          siteAnalyticsService, CollectionCreationService) {
         $scope.explorationCreationInProgress = false;
 
         $scope.createNewExploration = function() {
           $scope.explorationCreationInProgress = true;
           ExplorationCreationService.createNewExploration();
+        };
+
+        $scope.createNewCollection = function() {
+          $scope.collectionCreationInProgress = true;
+          CollectionCreationService.createNewCollection();
         };
 
         $scope.showUploadExplorationModal = (
@@ -43,6 +48,43 @@ oppia.directive('createExplorationButton', [function() {
             $window.location = destinationUrl;
           }, 150);
           return false;
+        };
+
+        $scope.showCreationChoiceModal = function() {
+          var modalInstance = $modal.open({
+            templateUrl: 'modals/createExplorationOrCollection',
+            backdrop: true,
+            controller: [
+              '$scope', '$modalInstance', function($scope, $modalInstance) {
+                $scope.choseExploration = false;
+                $scope.choseCollection = true;
+                $scope.chooseExploration = function () {
+                  $scope.choseExploration = true;
+                  $modalInstance.close({exploration: $scope.choseExploration, collection: $scope.choseCollection});
+                };
+
+                $scope.chooseCollection = function() {
+                  $scope.choseCollection = true;
+                  $modalInstance.close({exploration: $scope.choseExploration, collection: $scope.choseCollection});
+                  console.log($scope.choseCollection);
+                };
+
+                $scope.cancel = function() {
+                  $modalInstance.dismiss('cancel');
+                };
+              }
+            ],
+            windowClass: 'oppia-creation-modal'
+          });
+
+          modalInstance.result.then(function(creationChoice) {
+            if (creationChoice.exploration) {
+              $scope.createNewExploration();
+            }
+            if (creationChoice.collection) {
+              $scope.createNewCollection();
+            }
+          });
         };
       }
     ]

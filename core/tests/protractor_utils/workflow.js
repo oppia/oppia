@@ -27,6 +27,14 @@ var createExploration = function() {
   editor.exitTutorialIfNecessary();
 };
 
+var createCollection = function() {
+  browser.get(general.LIBRARY_URL_SUFFIX);
+  element(by.css('.protractor-test-create-collection')).click();
+
+  // Wait for the editor to fully load.
+  browser.waitForAngular();
+};
+
 // Creates a new exploration and wait for the exploration tutorial to start.
 var createExplorationAndStartTutorial = function() {
   browser.get(general.LIBRARY_URL_SUFFIX);
