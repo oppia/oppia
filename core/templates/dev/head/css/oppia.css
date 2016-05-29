@@ -3296,16 +3296,14 @@ md-card.preview-conversation-skin-supplemental-card {
   border-right: none;
 }
 
-.oppia-about-tabs .oppia-about-tabs-active {
-  border-bottom: 2px solid #009688;
-}
-
 .oppia-about-tabs-active .oppia-about-tabs-text {
   color: #009688;
+  border-bottom: none;
 }
 
 .oppia-about-tabs-text {
-  color: #ccc;
+  color: #009688;
+  border-bottom: 2px solid #009688;
   padding: 10px;
   text-decoration: none;
   width: 100%;
