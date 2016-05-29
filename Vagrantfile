@@ -17,7 +17,7 @@ SCRIPT
 Vagrant.configure(2) do |config|
   config.vm.provider "virtualbox" do |v|
     v.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/v-root", "1"]
-    v.memory = 1024
+    v.memory = 2048
   end
   # General-purpose env var to let scripts know we are in Vagrant.
   config.vm.provision "shell", inline: 'echo "export VAGRANT=true" >> /etc/profile'
