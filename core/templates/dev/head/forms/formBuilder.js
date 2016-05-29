@@ -905,6 +905,12 @@ oppia.directive('ckEditorRte', [
           }
         });
 
+        // Rules to prevent CKEDITOR from filtering components and wrappers.
+        var componentFilterRules = names.map(function(name) {
+          return 'oppia-noninteractive-' + name;
+        }).join(' ') + '(*)[*];';
+        var wrapperFilterRules = ' div span[type];';
+
         var pluginNames = names.map(function(name) {
           return 'oppia' + name;
         }).join(',');
@@ -918,8 +924,8 @@ oppia.directive('ckEditorRte', [
         // Initialize ckeditor.
         var ck = CKEDITOR.inline(el[0].children[0].children[1], {
           extraPlugins: 'widget,lineutils,sharedspace,' + pluginNames,
-          allowedContent: true,
           startupFocus: true,
+          extraAllowedContent: componentFilterRules + wrapperFilterRules,
           sharedSpaces: {
             top: el[0].children[0].children[0]
           },
