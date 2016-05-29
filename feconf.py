@@ -396,6 +396,7 @@ NAV_MODE_PROFILE = 'profile'
 NAV_MODE_SIGNUP = 'signup'
 NAV_MODE_SPLASH = 'splash'
 NAV_MODE_TEACH = 'teach'
+NAV_MODE_CONTACT = 'contact'
 
 # Event types.
 EVENT_TYPE_STATE_HIT = 'state_hit'
