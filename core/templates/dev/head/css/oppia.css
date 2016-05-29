@@ -2947,4 +2947,5 @@ md-card.preview-conversation-skin-supplemental-card {
 .ckeditor-rte{
     outline: 1px solid gray;
     margin-top: 15px;
+    padding: 8px;
 }
