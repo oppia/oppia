@@ -1891,224 +1891,38 @@ oppia.factory('explorationWarningsService', [
   }
 ]);
 
-oppia.factory('humanReadableLostChangesService', function() {
-  var TYPE_ADD_STATE = 'add_state';
-  var TYPE_DELETE_STATE = 'delete_state';
-  var TYPE_RENAME_STATE = 'rename_state';
-  var TYPE_EDIT_STATE_PROPERTY = 'edit_state_property';
+oppia.factory('lostChangesService', function() {
+  var CMD_ADD_STATE = 'add_state';
+  var CMD_RENAME_STATE = 'rename_state';
+  var CMD_DELETE_STATE = 'delete_state';
+  var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
 
-  var TYPE_CONTENT = 'content';
-
-  var TYPE_ADD_INTERACTION = 'add_interaction';
-  var TYPE_DELETE_INTERACTION = 'delete_interaction';
-  var TYPE_END_EXPLORATION = 'end_exploration';
-
-  var TYPE_ADD_WIDGET_CUSTOMIZATIONS = 'add_widget_customizations';
-  var TYPE_DELETE_WIDGET_CUSTOMIZATIONS = 'delete_widget_customizations';
-  var TYPE_EDIT_WIDGET_CUSTOMIZATIONS = 'edit_widget_customizations';
-
-  var TYPE_ADD_ANSWER_GROUP = 'add_answer_group';
-  var TYPE_DELETE_ANSWER_GROUP = 'delete_answer_group';
-  var TYPE_EDIT_ANSWER_GROUP = 'edit_answer_group';
-
-  var TYPE_RULE = 'rule';
-
-  var TYPE_ADD_DEFAULT_OUTCOME = 'add_default_outcome';
-  var TYPE_DELETE_DEFAULT_OUTCOME = 'delete_default_outcome';
-  var TYPE_EDIT_DEFAULT_OUTCOME = 'edit_default_outcome';
-
-  var _createChangeObject = function(label, type, value, stateName) {
-    var changeObject = {
-      label: label || '',
-      type: type || '',
-      value: value || []
-    };
-    if (type === TYPE_EDIT_STATE_PROPERTY) {
-      changeObject.stateName = stateName || '';
-    }
-
-    return changeObject;
-  };
-
-  var _getStateChangesInfo = function(lostChange) {
-    var label = '';
-    var type = '';
-    var value;
-    var stateName = '';
-    switch (lostChange.cmd) {
-      case 'add_state':
-        label = 'Added state ' + lostChange.state_name;
-        type = TYPE_ADD_STATE;
-        break;
-      case 'rename_state':
-        label = 'Renamed state ' + lostChange.old_state_name +
-          ' to ' + lostChange.new_state_name;
-        type = TYPE_RENAME_STATE;
-        break;
-      case 'delete_state':
-        label = 'Deleted state ' + lostChange.state_name;
-        type = TYPE_DELETE_STATE;
-        break;
-      case 'edit_state_property':
-        label = 'Edits in state ' + lostChange.state_name;
-        type = TYPE_EDIT_STATE_PROPERTY;
-        stateName = lostChange.state_name;
-        break;
-    }
-
-    return _createChangeObject(label, type, value, stateName);
-  };
-
-  var _createRule = function(ruleSpec) {
-    var label = ruleSpec.rule_type;
-    var type = TYPE_RULE;
-    var value = (
-      Object.keys(ruleSpec.inputs).map(function(input) {
-        return ruleSpec.inputs[input];
-      })
-    ).toString();
-
-    return _createChangeObject(label, type, value);
-  };
-
-  var _getRulesList = function(value) {
+  var getRulesList = function(value) {
     var rulesList = [];
     value.rule_specs.forEach(function(ruleSpec) {
-      rulesList.push(_createRule(ruleSpec));
+      var ruleElm = angular.element('<div></div>');
+      ruleElm.append('<p>Type: ' + ruleSpec.rule_type + '</p>');
+      ruleElm.append(
+        '<p>Value: ' +
+          (
+            Object.keys(ruleSpec.inputs).map(function(input) {
+              return ruleSpec.inputs[input];
+            })
+          ).toString() +
+          '</p>');
+      rulesList.push(ruleElm);
     });
 
     return rulesList;
   };
 
-  var _getAnswerGroupOrDefaultOutcomeDetails =
-        function(changeObject, type, value) {
-          var computedDetails = {};
-          if (type === 'answer_group') {
-            computedDetails.destination = value.outcome.dest;
-            computedDetails.feedback = value.outcome.feedback;
-            computedDetails.rules = _getRulesList(value);
-          }
-          if (type === 'default_outcome') {
-            computedDetails.destination = value.dest;
-            computedDetails.feedback = value.feedback;
-          }
-
-          return computedDetails;
-        };
-
-  var _getAnswerGroupOrDefaultOutcomeEdits =
-        function(changeObject, type, newValue, oldValue) {
-          var changes = {};
-          if (type === 'answer_group') {
-            if (newValue.outcome.dest !== oldValue.outcome.dest) {
-              changes.destination = newValue.outcome.dest;
-            }
-            if (!angular.equals(
-              newValue.outcome.feedback, oldValue.outcome.feedback)) {
-              changes.feedback = newValue.outcome.feedback;
-            }
-            if (!angular.equals
-                (newValue.rule_specs, oldValue.rule_specs)) {
-              changes.rules = _getRulesList(newValue);
-            }
-          }
-          if (type === 'default_outcome') {
-            if (newValue.dest !== oldValue.dest) {
-              changes.destination = newValue.dest;
-            }
-            if (!angular.equals(
-              newValue.feedback, oldValue.feedback)) {
-              changes.feedback = newValue.feedback;
-            }
-          }
-
-          return changes;
-        };
-
-  var _getEditedStatePropertyInfo = function(lostChange, newValue, oldValue) {
-    var label = '';
-    var type = '';
-    var value;
-    switch (lostChange.property_name) {
-      case 'content':
-        label = 'Edited content ';
-        if (newValue !== null) {
-          label += newValue.value;
-        }
-        type = TYPE_CONTENT;
-        break;
-      case 'widget_id':
-        if (oldValue === null) {
-          if (newValue !== 'EndExploration') {
-            label = 'Added Interaction ' + newValue;
-            type = TYPE_ADD_INTERACTION;
-          } else {
-            label = 'Ended Exploration';
-            type = TYPE_END_EXPLORATION;
-          }
-        } else {
-          label = 'Deleted Interaction ' + oldValue;
-          type = TYPE_DELETE_INTERACTION;
-        }
-        break;
-      case 'widget_customization_args':
-        if (_isEmpty(oldValue)) {
-          label = 'Added Interaction Customizations';
-          type = TYPE_ADD_WIDGET_CUSTOMIZATIONS;
-        } else if (_isEmpty(newValue)) {
-          label = 'Removed Interaction Customizations';
-          type = TYPE_DELETE_WIDGET_CUSTOMIZATIONS;
-        } else {
-          label = 'Edited Interaction Customizations';
-          type = TYPE_EDIT_WIDGET_CUSTOMIZATIONS;
-        }
-        break;
-      case 'answer_groups':
-        var answerGroupChanges = _getRelativeChangeToGroups(lostChange);
-        if (answerGroupChanges === 'added') {
-          label = 'Added answer group';
-          type = TYPE_ADD_ANSWER_GROUP;
-          value = _getAnswerGroupOrDefaultOutcomeDetails(
-            lostChange, 'answer_group', newValue);
-        } else if (answerGroupChanges === 'edited') {
-          label = 'Edited answer group.';
-          type = TYPE_EDIT_ANSWER_GROUP;
-          value = _getAnswerGroupOrDefaultOutcomeEdits(
-            lostChange, 'answer_group', newValue, oldValue);
-        } else {
-          label = 'Deleted answer group';
-          type = TYPE_DELETE_ANSWER_GROUP;
-        }
-        break;
-      case 'default_outcome':
-        var defaultOutcomeChanges = _getRelativeChangeToGroups(lostChange);
-        if (defaultOutcomeChanges === 'added') {
-          label = 'Added default outcome';
-          type = TYPE_ADD_DEFAULT_OUTCOME;
-          value = _getAnswerGroupOrDefaultOutcomeDetails(
-            lostChange, 'default_outcome', newValue);
-        } else if (defaultOutcomeChanges === 'edited') {
-          label = 'Edited default outcome';
-          type = TYPE_EDIT_DEFAULT_OUTCOME;
-          value = _getAnswerGroupOrDefaultOutcomeEdits(
-            lostChange, 'default_outcome', newValue, oldValue);
-        } else {
-          label = 'Deleted default outcome';
-          type = TYPE_DELETE_DEFAULT_OUTCOME;
-        }
-        break;
-    };
-
-    return _createChangeObject(label, type, value);
-  };
-
-  var _getStatePropertyValue = function(
+  var getStatePropertyValue = function(
     statePropertyValue) {
     return angular.isArray(statePropertyValue) ?
       statePropertyValue[statePropertyValue.length - 1] : statePropertyValue;
   };
 
-  var _isEmpty = function(obj) {
+  var isEmpty = function(obj) {
     for (var property in obj) {
       if (obj.hasOwnProperty(property)) {
         return false;
@@ -2117,14 +1931,7 @@ oppia.factory('humanReadableLostChangesService', function() {
     return true;
   };
 
-  var _pushChangeToList = function(valueArray, changeObject) {
-    if (changeObject.label !== '') {
-      valueArray.push(changeObject);
-    }
-    return valueArray;
-  };
-
-  var _getRelativeChangeToGroups = function(changeObject) {
+  var getRelativeChangeToGroups = function(changeObject) {
     var newValue = changeObject.new_value;
     var oldValue = changeObject.old_value;
     var result = '';
@@ -2134,61 +1941,187 @@ oppia.factory('humanReadableLostChangesService', function() {
         'added' : (newValue.length === oldValue.length) ?
         'edited' : 'deleted';
     } else {
-      if (!_isEmpty(oldValue)) {
-        if (!_isEmpty(newValue)) {
+      if (!isEmpty(oldValue)) {
+        if (!isEmpty(newValue)) {
           result = 'edited';
         } else {
           result = 'deleted';
         }
-      } else if (!_isEmpty(newValue)) {
+      } else if (!isEmpty(newValue)) {
         result = 'added';
       }
     }
     return result;
   };
 
-  var makeLostChangesHumanReadable = function(lostChanges) {
-    var humanReadableLostChanges = [];
-    var stateEditGroups = {};
+  var makeHumanReadable = function(lostChanges) {
+    var outerHtml = angular.element('<ul></ul>');
+    var statesWiseEditsMapping = {};
 
     lostChanges.forEach(function(lostChange) {
-      var readableChange = _getStateChangesInfo(lostChange);
+      var lostChangeEl = angular.element('<li></li>');
+      var lostChangeValue;
+      switch (lostChange.cmd) {
+        case CMD_ADD_STATE:
+          lostChangeValue = 'Added state: ' + lostChange.state_name;
+          break;
+        case CMD_RENAME_STATE:
+          lostChangeValue = ('Renamed state: ' + lostChange.old_state_name +
+                             ' to ' + lostChange.new_state_name);
+          break;
+        case CMD_DELETE_STATE:
+          lostChangeValue = 'Deleted state: ' + lostChange.state_name;
+          break;
+        case CMD_EDIT_STATE_PROPERTY:
+          var newValue = getStatePropertyValue(lostChange.new_value);
+          var oldValue = getStatePropertyValue(lostChange.old_value);
+          var stateName = lostChange.state_name;
 
-      if (readableChange.type === TYPE_EDIT_STATE_PROPERTY) {
-        var newValue = _getStatePropertyValue(lostChange.new_value);
-        var oldValue = _getStatePropertyValue(lostChange.old_value);
-        var editedStateProperty = _getEditedStatePropertyInfo(
-          lostChange, newValue, oldValue);
-        var stateEdits = stateEditGroups[readableChange.stateName];
+          switch (lostChange.property_name) {
+            case 'content':
+              lostChangeValue = 'Edited content: ';
+              if (newValue !== null) {
+                lostChangeValue += newValue.value;
+              }
+              break;
 
-        if (!stateEdits) {
-          stateEdits =
-            stateEditGroups[readableChange.stateName] =
-            readableChange;
+            case 'widget_id':
+              if (oldValue === null) {
+                if (newValue !== 'EndExploration') {
+                  lostChangeValue = 'Added Interaction: ' + newValue;
+                } else {
+                  lostChangeValue = 'Ended Exploration';
+                }
+              } else {
+                lostChangeValue = 'Deleted Interaction: ' + oldValue;
+              }
+              break;
+
+            case 'widget_customization_args':
+              if (isEmpty(oldValue)) {
+                lostChangeValue = 'Added Interaction Customizations';
+              } else if (isEmpty(newValue)) {
+                lostChangeValue = 'Removed Interaction Customizations';
+              } else {
+                lostChangeValue = 'Edited Interaction Customizations';
+              }
+              break;
+
+            case 'answer_groups':
+              var answerGroupChanges = getRelativeChangeToGroups(lostChange);
+              var changesEl = angular.element('<div></div>');
+              if (answerGroupChanges === 'added') {
+                lostChangeValue = angular.element(
+                  '<div>Added answer group: </div>');
+                changesEl.append(
+                  '<p>Destination: ' + newValue.outcome.dest + '</p>');
+                changesEl.append(
+                  '<p>Feedback:' + newValue.outcome.feedback + '</p>');
+                var rulesList = getRulesList(newValue);
+                if (rulesList.length) {
+                  changesEl.append('<div>Rules: <div>');
+                  for (var rule in rulesList) {
+                    changesEl.append(rulesList[rule]);
+                  }
+                }
+                lostChangeValue.append(changesEl);
+              } else if (answerGroupChanges === 'edited') {
+                lostChangeValue = angular.element(
+                  '<div>Edited answer group: </div>');
+                if (newValue.outcome.dest !== oldValue.outcome.dest) {
+                  changesEl.append(
+                    '<p>Destination: ' + newValue.outcome.dest + '</p>');
+                }
+                if (!angular.equals(
+                  newValue.outcome.feedback, oldValue.outcome.feedback)) {
+                  changesEl.append(
+                    '<p>Feedback: ' + newValue.outcome.feedback + '</p>');
+                }
+                if (!angular.equals
+                    (newValue.rule_specs, oldValue.rule_specs)) {
+                  var rulesList = getRulesList(newValue);
+                  if (rulesList.length) {
+                    changesEl.append('<div>Rules: <div>');
+                    for (var rule in rulesList) {
+                      changesEl.append(rulesList[rule]);
+                    }
+                  }
+                }
+                lostChangeValue.append(changesEl);
+              } else {
+                lostChangeValue = 'Deleted answer group';
+              }
+              break;
+
+            case 'default_outcome':
+              var defaultOutcomeChanges = getRelativeChangeToGroups(lostChange);
+              var changesEl = angular.element('<div></div>');
+              if (defaultOutcomeChanges === 'added') {
+                lostChangeValue = angular.element(
+                  '<div>Added default outcome: </div>');
+                changesEl.append(
+                  '<p>Destination: ' + newValue.dest + '</p>');
+                changesEl.append(
+                  '<p>Feedback: ' + newValue.feedback + '</p>');
+                lostChangeValue.append(changesEl);
+              } else if (defaultOutcomeChanges === 'edited') {
+                lostChangeValue = angular.element(
+                  '<div>Edited default outcome: </div>');
+                if (newValue.dest !== oldValue.dest) {
+                  changesEl.append(
+                    '<p>Destination: ' + newValue.dest + '</p>');
+                }
+                if (!angular.equals(
+                  newValue.feedback, oldValue.feedback)) {
+                  changesEl.append(
+                    '<p>Feedback: ' + newValue.feedback + '</p>');
+                }
+                lostChangeValue.append(changesEl);
+              } else {
+                lostChangeValue = 'Deleted default outcome';
+              }
+              break;
+          };
+
+          var existingEditsToState = statesWiseEditsMapping[stateName];
+          if (!existingEditsToState) {
+            statesWiseEditsMapping[stateName] = [];
+          }
+          statesWiseEditsMapping[stateName].push(lostChangeEl);
+          break;
+      }
+
+      if (lostChangeValue) {
+        lostChangeEl.html(lostChangeValue);
+        if (lostChangeEl) {
+          outerHtml.append(lostChangeEl);
         }
-        stateEdits.value =
-          _pushChangeToList(stateEdits.value, editedStateProperty);
-      } else {
-        humanReadableLostChanges =
-          _pushChangeToList(humanReadableLostChanges, readableChange);
       }
     });
-    for (var stateName in stateEditGroups) {
-      humanReadableLostChanges.push(stateEditGroups[stateName]);
+
+    for (var stateName in statesWiseEditsMapping) {
+      var stateChangesEl = angular.element(
+        '<li>Edits to state: ' + stateName + '</li>');
+      for (var stateEdit in statesWiseEditsMapping[stateName]) {
+        stateChangesEl.append(statesWiseEditsMapping[stateName][stateEdit]);
+      }
+      outerHtml.append(stateChangesEl);
     }
+
+    return outerHtml;
   };
 
   return {
-    makeLostChangesHumanReadable: makeLostChangesHumanReadable
+    makeHumanReadable: makeHumanReadable
   };
 });
 
 // Service for displaying different types of modals depending on the type of
 // response received as a result of the autosaving request.
 oppia.factory('autosaveInfoModalsService', [
-  '$modal', '$timeout', 'humanReadableLostChangesService',
+  '$modal', '$timeout', 'lostChangesService', 'changeListService',
   function(
-    $modal, $timeout, humanReadableLostChangesService) {
+    $modal, $timeout, lostChangesService, changeListService) {
     return {
       showNonStrictValidationFailModal: function() {
         $modal.open({
@@ -2208,7 +2141,7 @@ oppia.factory('autosaveInfoModalsService', [
           // User refreshes the page - Flow for exploration loaded is followed.
         });
       },
-      showVersionMismatchModal: function(lostChanges) {
+      showVersionMismatchModal: function() {
         $modal.open({
           templateUrl: 'modals/saveVersionMismatch',
           backdrop: true,
@@ -2228,9 +2161,15 @@ oppia.factory('autosaveInfoModalsService', [
                 }, 1000);
               };
 
-              $scope.lostChanges = (
-                humanReadableLostChangesService.makeLostChangesHumanReadable(
-                  lostChanges));
+              $scope.lostChanges = changeListService.getChangeList();
+
+              $scope.lostChangesHtml = (
+                lostChangesService.makeHumanReadable(
+                  $scope.lostChanges).html());
+
+              // $scope.lostChanges = (
+              //   humanReadableLostChangesService.makeLostChangesHumanReadable(
+              //     lostChanges));
             }
           ]
         }).result.then(function() {
