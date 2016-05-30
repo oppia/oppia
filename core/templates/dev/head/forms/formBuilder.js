@@ -800,20 +800,37 @@ oppia.run([
                     }
                   }
 
+                  /**
+                   * This checks whether the widget has already been inited
+                   * and set up before (if we are editing a widget that
+                   * has already been inserted into the RTE, we do not
+                   * need to finalizeCreation again).
+                   */
                   if (!that.isReady()) {
-                    // Actually create the widget, if we have not already.
+                    // Actually insert the widget, if we have not already.
                     editor.widgets.finalizeCreation(container);
                   }
-                  // Need to manually $compile so the directive renders.
+
+                  /**
+                   * Need to manually $compile so the directive renders.
+                   * Note that.element.$ is the native DOM object
+                   * represented by that.element. See:
+                   * http://docs.ckeditor.com/#!/api/CKEDITOR.dom.element
+                   */
                   $compile($(that.element.$).contents())($rootScope);
+                  // $timeout ensures we do not take the undo snapshot until
+                  // after angular finishes its changes to the component tags
                   $timeout(function() {
+                    // For inline widgets, place the caret after the
+                    // widget so the user can continue typing immediately.
                     if (isInline) {
-                      // Move caret after the newly created widget.
                       var range = editor.createRange();
                       var widgetContainer = that.element.getParent();
                       range.moveToPosition(
                         widgetContainer, CKEDITOR.POSITION_AFTER_END);
                       editor.getSelection().selectRanges([range]);
+                      // Another timeout needed so the undo snapshot is
+                      // not taken until the caret is in the right place.
                       $timeout(function() {
                         editor.fire('unlockSnapshot');
                         editor.fire('saveSnapshot');
@@ -827,12 +844,23 @@ oppia.run([
                 function() {},
                 function() {});
             },
+            /**
+             * This is how the widget will be represented in the outputs source,
+             * so it is called when we call editor.getData().
+             */
             downcast: function(element) {
+              // Clear the angular rendering content, which we don't
+              // want in the output.
               element.children[0].setHtml('');
+              // Return just the rich text component, without its wrapper.
               return element.children[0];
             },
+            /**
+             * This is how a widget is recognized by CKEditor, for example
+             * when we first load data in. Returns a boolean,
+             * true iff "element" is an instance of this widget.
+             */
             upcast: function(element) {
-              // This is how the widget is recognized by CKEditor.
               return (element.name !== 'p' &&
                       element.children.length > 0 &&
                       element.children[0].name === tagName);
@@ -906,8 +934,12 @@ oppia.directive('ckEditorRte', [
           }
         });
 
-        // See format of filtering rules here:
-        // http://docs.ckeditor.com/#!/guide/dev_allowed_content_rules
+        /**
+         * Create rules to whitelist all the rich text components and
+         * their wrappers and overlays.
+         * See format of filtering rules here:
+         * http://docs.ckeditor.com/#!/guide/dev_allowed_content_rules
+         */
         // Whitelist the component tags with any attributes and classes.
         var componentRule = names.map(function(name) {
           return 'oppia-noninteractive-' + name;
@@ -976,9 +1008,11 @@ oppia.directive('ckEditorRte', [
           /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
         );
 
-        // Before data is loaded into CKEditor, we need to wrap every rte
-        // component in a span (inline) or div (block).
-        // For block elements, we add an overlay div as well.
+        /**
+         * Before data is loaded into CKEditor, we need to wrap every rte
+         * component in a span (inline) or div (block).
+         * For block elements, we add an overlay div as well.
+         */
         var wrapComponents = function(html) {
           if (html === undefined) {
             return html;
