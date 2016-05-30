@@ -270,7 +270,6 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
         expected_exploration_summary_dict = {
             'category': u'Algorithms',
             'community_owned': True,
-            'human_readable_contributors_summary': {},
             'id': '2',
             'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'num_views': 0,
