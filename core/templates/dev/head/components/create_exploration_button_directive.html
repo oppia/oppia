@@ -21,43 +21,70 @@
   </div>
 </script>
 <script type="text/ng-template" id="modals/createExplorationOrCollection">
-  <div class="modal-body oppia-long-text">
-    <div class="row">
-      <div class="col-sm-12">
-        <h1 class="oppia-creation-modal-h1">
-          Ready to Create
-        </h1>
-        <p class="oppia-creation-modal-p">
-          What do you want to create?
-        </p>
-      </div>
-
-      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 text-center">
-        <img class="oppia-creation-modal-img" src="../../../images/creation/exploration.svg" />
-        <button type="button"
-                class="btn oppia-creation-modal-button oppia-transition-200 protractor-test-create-exploration"
-                ng-click="chooseExploration()">
-          Create Exploration
-        </button>
-      </div>
-      {% if ENABLE_COLLECTION_EDITOR %}
+  <div class="modal-body oppia-long-text protractor-test-creation-modal">
+    {% if ENABLE_COLLECTION_EDITOR %}
+      <div class="row">
+        <div class="col-sm-12">
+          <h1 class="oppia-creation-modal-h1">
+            Ready to Create
+          </h1>
+          <p class="oppia-creation-modal-p">
+            What do you want to create?
+          </p>
+        </div>
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 text-center">
-          <img class="oppia-creation-modal-img" src="../../../images/creation/collection.svg" />
+          <img class="oppia-creation-modal-img" src="../../../images/creation/exploration.svg" />
           <button type="button"
-                  class="btn oppia-creation-modal-button oppia-transition-200 protractor-test-create-collection"
-                  ng-click="chooseCollection()">
-            Create Collection
+                  class="btn oppia-creation-modal-button oppia-transition-200 protractor-test-create-exploration"
+                  ng-click="chooseExploration()">
+            Create Exploration
           </button>
         </div>
-      {% endif %}
-      <div class="col-sm-12 col-xs-12 text-center">
-        <button type="button"
-                class="btn oppia-creation-modal-button oppia-transition-200"
-                ng-click="cancel()">
-          Neither, Thanks
-        </button>
+          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 text-center">
+            <img class="oppia-creation-modal-img" src="../../../images/creation/collection.svg" />
+            <button type="button"
+                    class="btn oppia-creation-modal-button oppia-transition-200 protractor-test-create-collection"
+                    ng-click="chooseCollection()">
+              Create Collection
+            </button>
+          </div>
+        <div class="col-sm-12 col-xs-12 text-center">
+          <button type="button"
+                  class="btn oppia-creation-modal-button oppia-transition-200 protractor-test-dismiss-creation-modal"
+                  ng-click="cancel()">
+            Neither, Thanks
+          </button>
+        </div>
       </div>
-    </div>
+    {% else %}
+      <div class="row">
+        <div class="col-sm-12">
+          <h1 class="oppia-creation-modal-h1">
+            Ready to Create
+          </h1>
+          <p class="oppia-creation-modal-p">
+            Do you want to create an exploration?
+          </p>
+        </div>
+        <div class="col-sm-12 col-xs-12 text-center">
+          <img class="oppia-creation-modal-img" src="../../../images/creation/exploration.svg" />
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 text-center">
+          <button type="button"
+                  class="btn oppia-creation-modal-button oppia-transition-200 protractor-test-create-exploration"
+                  ng-click="chooseExploration()">
+            Yes, please!
+          </button>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 text-center">
+          <button type="button"
+                  class="btn oppia-creation-modal-button oppia-transition-200 protractor-test-dismiss-creation-modal"
+                  ng-click="cancel()">
+            No, Thanks
+          </button>
+        </div>
+      </div>
+    {% endif %}
   </div>
   <style>
     .oppia-creation-modal .modal-body {

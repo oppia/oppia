@@ -25,14 +25,26 @@ var general = require('./general.js');
 var createExploration = function() {
   createExplorationAndStartTutorial();
   editor.exitTutorialIfNecessary();
+  exitCreationModalIfNecessary();
 };
 
 var createCollection = function() {
   browser.get(general.LIBRARY_URL_SUFFIX);
   element(by.css('.protractor-test-create-collection')).click();
-
-  // Wait for the editor to fully load.
+  exitCreationModalIfNecessary();
+  // Wait for the collection editor to fully load.
   browser.waitForAngular();
+};
+
+var exitCreationModalIfNecessary = function() {
+  // If the creation modal shows up, exit it.
+  element.all(by.css('.protractor-test-creation-modal')).then(function(modals) {
+    if (modals.length === 1) {
+      element(by.css('.protractor-test-dismiss-creation-modal')).click();
+    } else if (modals.length !== 0) {
+      throw 'Expected to find at most one \'creation modal\'';
+    }
+  });
 };
 
 // Creates a new exploration and wait for the exploration tutorial to start.
