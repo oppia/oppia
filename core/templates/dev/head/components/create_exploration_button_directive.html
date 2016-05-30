@@ -40,14 +40,16 @@
           Create Exploration
         </button>
       </div>
-      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 text-center">
-        <img class="oppia-creation-modal-img" src="../../../images/creation/collection.svg" />
-        <button type="button"
-                class="btn oppia-creation-modal-button oppia-transition-200 protractor-test-create-collection"
-                ng-click="chooseCollection()">
-          Create Collection
-        </button>
-      </div>
+      {% if ENABLE_COLLECTION_EDITOR %}
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 text-center">
+          <img class="oppia-creation-modal-img" src="../../../images/creation/collection.svg" />
+          <button type="button"
+                  class="btn oppia-creation-modal-button oppia-transition-200 protractor-test-create-collection"
+                  ng-click="chooseCollection()">
+            Create Collection
+          </button>
+        </div>
+      {% endif %}
       <div class="col-sm-12 col-xs-12 text-center">
         <button type="button"
                 class="btn oppia-creation-modal-button oppia-transition-200"
@@ -124,7 +126,7 @@
       .oppia-creation-modal .modal-dialog {
         margin: 10% auto;
         width: 95%;
-        height: 95%;
+        height: 100%;
       }
     }
   </style>
