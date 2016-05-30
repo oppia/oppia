@@ -32,8 +32,8 @@ PLATFORM = 'gae'
 if PLATFORM == 'gae':
     DEV_MODE = (
         (not os.environ.get('SERVER_SOFTWARE')
-                or os.environ['SERVER_SOFTWARE'].startswith('Development'))
-         and os.environ.get('MINIFICATION') is None)
+         or os.environ['SERVER_SOFTWARE'].startswith('Development'))
+        and os.environ.get('MINIFICATION') is None)
 else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
 
