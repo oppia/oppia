@@ -2013,7 +2013,7 @@ oppia.factory('explorationWarningsService', [
   }
 ]);
 
-oppia.factory('lostChangesService', function() {
+oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
   var CMD_ADD_STATE = 'add_state';
   var CMD_RENAME_STATE = 'rename_state';
   var CMD_DELETE_STATE = 'delete_state';
@@ -2044,14 +2044,7 @@ oppia.factory('lostChangesService', function() {
       statePropertyValue[statePropertyValue.length - 1] : statePropertyValue;
   };
 
-  var isEmpty = function(obj) {
-    for (var property in obj) {
-      if (obj.hasOwnProperty(property)) {
-        return false;
-      }
-    }
-    return true;
-  };
+  var isEmpty = utilsService.isEmpty;
 
   var getRelativeChangeToGroups = function(changeObject) {
     var newValue = changeObject.new_value;
@@ -2236,7 +2229,7 @@ oppia.factory('lostChangesService', function() {
   return {
     makeHumanReadable: makeHumanReadable
   };
-});
+}]);
 
 // Service for displaying different types of modals depending on the type of
 // response received as a result of the autosaving request.
