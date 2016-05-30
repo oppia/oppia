@@ -2932,20 +2932,20 @@ md-card.preview-conversation-skin-supplemental-card {
   margin-bottom: 10px;
 }
 
-.component-container {
+.oppia-rte-component-container {
   position: relative;
 }
 
-.component-overlay {
+.oppia-rte-component-overlay {
+  height: 100%;
+  left: 0;
   position: absolute;
   top: 0;
-  left: 0;
   width: 100%;
-  height: 100%;
 }
 
-.ckeditor-rte{
-    outline: 1px solid gray;
-    margin-top: 15px;
-    padding: 8px;
+.oppia-rte {
+  margin-top: 15px;
+  outline: 1px solid gray;
+  padding: 8px;
 }

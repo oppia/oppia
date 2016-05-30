@@ -761,10 +761,11 @@ oppia.run([
                                 '<' + tagName + '></' + tagName + '>' +
                                 '</span>';
       } else {
-        var componentTemplate = '<div class="component-container" type="' +
-                                tagName + '">' +
+        var componentTemplate = '<div class="oppia-rte-component-container" ' +
+                                'type="' + tagName + '">' +
                                 '<' + tagName + '></' + tagName + '>' +
-                                '<div class="component-overlay"></div>' +
+                                '<div class="oppia-rte-component-overlay">' +
+                                '</div>' +
                                 '</div>';
       }
       CKEDITOR.plugins.add(ckName, {
@@ -889,7 +890,7 @@ oppia.directive('ckEditorRte', [
         uiConfig: '&'
       },
       template: '<div><div></div>' +
-                '<div contenteditable="true" class="ckeditor-rte">' +
+                '<div contenteditable="true" class="oppia-rte">' +
                 '</div></div>',
       require: '?ngModel',
       link: function(scope, el, attr, ngModel) {
@@ -905,11 +906,26 @@ oppia.directive('ckEditorRte', [
           }
         });
 
-        // Rules to prevent CKEDITOR from filtering components and wrappers.
-        var componentFilterRules = names.map(function(name) {
+        // See format of filtering rules here:
+        // http://docs.ckeditor.com/#!/guide/dev_allowed_content_rules
+        // Whitelist the component tags with any attributes and classes.
+        var componentRule = names.map(function(name) {
           return 'oppia-noninteractive-' + name;
         }).join(' ') + '(*)[*];';
-        var wrapperFilterRules = ' div span[type];';
+        // Whitelist the inline component wrapper, which is a
+        // span with a "type" attribute.
+        var inlineWrapperRule = ' span[type];';
+        // Whitelist the block component wrapper, which is a div
+        // with a "type" attribute and a CSS class.
+        var blockWrapperRule = ' div(oppia-rte-component-container)[type];';
+        // Whitelist the transparent block component overlay, which is
+        // a div with a CSS class.
+        var blockOverlayRule = ' div(oppia-rte-component-overlay);';
+        // Put all the rules together.
+        var extraAllowedContentRules = componentRule +
+                                       inlineWrapperRule +
+                                       blockWrapperRule +
+                                       blockOverlayRule;
 
         var pluginNames = names.map(function(name) {
           return 'oppia' + name;
@@ -925,7 +941,7 @@ oppia.directive('ckEditorRte', [
         var ck = CKEDITOR.inline(el[0].children[0].children[1], {
           extraPlugins: 'widget,lineutils,sharedspace,' + pluginNames,
           startupFocus: true,
-          extraAllowedContent: componentFilterRules + wrapperFilterRules,
+          extraAllowedContent: extraAllowedContentRules,
           sharedSpaces: {
             top: el[0].children[0].children[0]
           },
@@ -973,8 +989,8 @@ oppia.directive('ckEditorRte', [
                     match + '</span>';
             } else {
               return '<div type="oppia-noninteractive-' + p3 + '"' +
-                     'class="component-container">' + match +
-                     '<div class="component-overlay"></div></div>';
+                     'class="oppia-rte-component-container">' + match +
+                     '<div class="oppia-rte-component-overlay"></div></div>';
             }
           });
         };
