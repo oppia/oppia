@@ -38,7 +38,7 @@
           <a class="oppia-about-tabs-text" href="foundation" name="foundation">The Oppia Foundation</a>
         </li>
         <li class="oppia-profile-tabs">
-          <a class="oppia-about-tabs-text" href="credits">Credits</a>
+          <a class="oppia-about-tabs-text" href="credits" name="credits">Credits</a>
         </li>
       </ul>
     </div>
@@ -378,12 +378,38 @@
 
   <script>
     $(document).ready(function() {
+      var activeTabClass = "oppia-about-tabs-active";
+      var hash = window.location.hash.slice(1);
+      var visibleContent = "oppia-about-visible-content";
+
+      function activateTab(tabName) {
+        $("a[name='" + tabName + "']").parent().addClass(activeTabClass).siblings().removeClass(activeTabClass);
+        $("." + tabName).addClass(visibleContent).siblings().removeClass(visibleContent);
+      }
+
+      if(hash === "foundation") {
+        activateTab("foundation");
+      }
+      
+      if(hash === "credits") {
+        activateTab("credits");
+      }
+
+      window.onhashchange = function() {
+        var hashChange = window.location.hash.slice(1);
+        if(hashChange === "foundation") {
+          activateTab("foundation");
+        }
+        else if(hashChange === "credits") {
+          activateTab("credits");
+        }
+      }
+
       $(".oppia-about-tabs li").on("click", function(event) {
         event.preventDefault();
-        var tabIndex = $(this).index();
-        $(this).addClass("oppia-about-tabs-active").siblings().removeClass("oppia-about-tabs-active");
+        $(this).addClass(activeTabClass).siblings().removeClass(activeTabClass);
         var currentAttrVal = $(this).children("a").attr("href");
-        $("." + currentAttrVal).addClass("oppia-about-visible-content").siblings().removeClass("oppia-about-visible-content");
+        $("." + currentAttrVal).addClass(visibleContent).siblings().removeClass(visibleContent);
       });
     });
   </script>
