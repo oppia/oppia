@@ -45,6 +45,34 @@ oppia.factory('explorationData', [
     // Put exploration variables here.
     var explorationData = {
       explorationId: explorationId,
+      autosaveChangeList: function(changeList, successCallback, errorCallback) {
+        var draftAutosaveUrl = '/createhandler/autosave_draft/' + explorationId;
+        $http.put(draftAutosaveUrl, {
+          change_list: changeList,
+          version: explorationData.data.version
+        }).then(function(response) {
+          if (successCallback) {
+            successCallback(response);
+          }
+        }, function() {
+          if (errorCallback) {
+            errorCallback();
+          }
+        });
+      },
+      discardDraft: function(successCallback, errorCallback) {
+        var discardDraftUrl = '/createhandler/autosave_draft/' + explorationId;
+        $http.post(discardDraftUrl, {})
+          .then(function() {
+            if (successCallback) {
+              successCallback();
+            }
+          }, function() {
+            if (errorCallback) {
+              errorCallback();
+            }
+          });
+      },
       // Returns a promise that supplies the data for the current exploration.
       getData: function() {
         if (explorationData.data) {
@@ -79,25 +107,6 @@ oppia.factory('explorationData', [
         $http.put(
             resolvedAnswersUrlPrefix + '/' + encodeURIComponent(stateName), {
           resolved_answers: resolvedAnswersList
-        });
-      },
-      autosaveChangeList: function(changeList, successCallback, errorCallback) {
-        var draftAutosaveUrl = '/editorautosave';
-        $http.put(draftAutosaveUrl, {
-          change_list: changeList,
-          version: explorationData.data.version
-        }, {
-          params: {
-            exploration_id: explorationId
-          }
-        }).then(function(response) {
-          if (successCallback) {
-            successCallback(response);
-          }
-        }, function() {
-          if (errorCallback) {
-            errorCallback();
-          }
         });
       },
       /**
@@ -2119,9 +2128,11 @@ oppia.factory('lostChangesService', function() {
 // Service for displaying different types of modals depending on the type of
 // response received as a result of the autosaving request.
 oppia.factory('autosaveInfoModalsService', [
-  '$modal', '$timeout', 'lostChangesService', 'changeListService',
+  '$modal', '$timeout', '$window',
+  'lostChangesService', 'changeListService', 'explorationData',
   function(
-    $modal, $timeout, lostChangesService, changeListService) {
+    $modal, $timeout, $window,
+    lostChangesService, changeListService, explorationData) {
     return {
       showNonStrictValidationFailModal: function() {
         $modal.open({
@@ -2153,28 +2164,23 @@ oppia.factory('autosaveInfoModalsService', [
               $scope.cancel = function() {
                 $modalInstance.dismiss('cancel');
               };
+              // When the user clicks on discard changes button,
+              // signal backend to discard the draft and
+              // reload the page thereafter.
               $scope.discardChanges = function() {
-                // Send request to backend to set draft_changes to None.
-                // If the request succeeds ->
-                $timeout(function() {
-                  // Refresh the page.
-                }, 1000);
+                explorationData.discardDraft(function() {
+                  $timeout(function() {
+                    $window.location.reload();
+                  }, 500);
+                });
               };
-
               $scope.lostChanges = changeListService.getChangeList();
 
               $scope.lostChangesHtml = (
                 lostChangesService.makeHumanReadable(
                   $scope.lostChanges).html());
-
-              // $scope.lostChanges = (
-              //   humanReadableLostChangesService.makeLostChangesHumanReadable(
-              //     lostChanges));
             }
           ]
-        }).result.then(function() {
-          // What if the modal is closed without clicking the
-          // 'Discard Changes' button ?
         });
       }
     };
