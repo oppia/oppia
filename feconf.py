@@ -20,6 +20,7 @@ import copy
 import datetime
 import os
 
+
 # Whether to unconditionally log info messages.
 DEBUG = False
 
@@ -30,8 +31,9 @@ PLATFORM = 'gae'
 # Whether we should serve the development or production experience.
 if PLATFORM == 'gae':
     DEV_MODE = (
-        not os.environ.get('SERVER_SOFTWARE')
-        or os.environ['SERVER_SOFTWARE'].startswith('Development'))
+        (not os.environ.get('SERVER_SOFTWARE')
+                or os.environ['SERVER_SOFTWARE'].startswith('Development'))
+         and os.environ.get('MINIFICATION') is None)
 else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
 

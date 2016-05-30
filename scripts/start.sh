@@ -82,9 +82,18 @@ fi
 # Argument passed to dev_appserver.py to indicate whether or not to
 # clear the datastore.
 CLEAR_DATASTORE_ARG="--clear_datastore=true"
+# Argument passed to gulpfile.js to help build with minification
+MINIFICATION=false
 for arg in "$@"; do
   if [ "$arg" == "--save_datastore" ]; then
     CLEAR_DATASTORE_ARG=""
+  fi
+  # if you want to start run oppia in production enviroment
+  # while in development environment
+  if [ "$arg" == "--prod_env" ]; then
+    MINIFICATION=true
+    $PYTHON_CMD -c "import os; os.environ['MINIFICATION']='True';"
+    $PYTHON_CMD scripts/build.py
   fi
 done
 
@@ -95,7 +104,10 @@ echo Starting GAE development server
 # settings in feconf.py. Be careful with this -- you do not want to spam people
 # accidentally!
 
-
-$NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js start_devserver --gae_devserver_path=$GOOGLE_APP_ENGINE_HOME/dev_appserver.py --clear_datastore=$CLEAR_DATASTORE_ARG
+if [[ "$MINIFICATION" == "true" ]]; then
+  $NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js start_devserver --prod_env=True --gae_devserver_path=$GOOGLE_APP_ENGINE_HOME/dev_appserver.py --clear_datastore=$CLEAR_DATASTORE_ARG
+else
+  $NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js start_devserver --gae_devserver_path=$GOOGLE_APP_ENGINE_HOME/dev_appserver.py --clear_datastore=$CLEAR_DATASTORE_ARG
+fi
 
 echo Done!
