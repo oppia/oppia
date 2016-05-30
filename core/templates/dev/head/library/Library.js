@@ -92,7 +92,12 @@ oppia.controller('Library', [
       }
     };
 
+    var isAnyCarouselCurrentlyScrolling = false;
+
     $scope.scroll = function(ind, isLeftScroll) {
+      if (isAnyCarouselCurrentlyScrolling) {
+        return;
+      }
       var carouselJQuerySelector = (
         '.oppia-library-carousel-tiles:eq(n)'.replace('n', ind));
       var leftOverlaySelector =
@@ -129,7 +134,13 @@ oppia.controller('Library', [
         scrollLeft: newScrollPositionPx
       }, {
         duration: 800,
-        queue: false
+        queue: false,
+        start: function() {
+          isAnyCarouselCurrentlyScrolling = true;
+        },
+        complete: function() {
+          isAnyCarouselCurrentlyScrolling = false;
+        }
       });
 
       $(leftOverlaySelector).css({
