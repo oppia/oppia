@@ -152,10 +152,10 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     impact_score = ndb.FloatProperty(indexed=True)
 
     # The total plays of all the explorations.
-    total_plays = ndb.IntegerProperty(indexed=True)
+    total_plays = ndb.IntegerProperty(default=0, indexed=True)
 
     # The average of average ratings of all explorations.
-    average_ratings = ndb.FloatProperty(indexed=True)
+    average_ratings = ndb.FloatProperty(default=None, indexed=True)
 
 
 class ExplorationUserDataModel(base_models.BaseModel):

@@ -322,9 +322,9 @@ class UserStatsMRJobManager(
         total_rating = 0
         for ratings_value in item.ratings:
             total_rating += item.ratings[ratings_value] * int(ratings_value)
+        sum_of_ratings = sum(item.ratings.itervalues())
         average_rating = (
-            total_rating / sum(item.ratings.itervalues())
-            if sum(item.ratings.itervalues()) else 0)
+            total_rating / sum_of_ratings if sum_of_ratings else None)
         value_per_user = average_rating - 2
 
         statistics = (
@@ -367,8 +367,12 @@ class UserStatsMRJobManager(
                 num_starts = statistics['start_exploration_count']
                 exploration_data.update({
                     'total_plays_for_owned_exp': num_starts,
-                    'average_rating_for_owned_exp': average_rating
                 })
+                # Update data with average rating only if it is not None.
+                if average_rating is not None:
+                    exploration_data.update({
+                        'average_rating_for_owned_exp': average_rating
+                    })
             yield (contrib_id, exploration_data)
 
     @staticmethod
@@ -388,11 +392,15 @@ class UserStatsMRJobManager(
         # Find the average of all average ratings
         ratings = [value['average_rating_for_owned_exp'] for value in values
                    if value.get('average_rating_for_owned_exp')]
-        average_ratings = (sum(ratings) / float(len(ratings))
-                           if len(ratings) else 0.0)
-
-        user_models.UserStatsModel(
-            id=key,
-            impact_score=user_impact_score,
-            total_plays=total_plays,
-            average_ratings=average_ratings).put()
+        if len(ratings) != 0:
+            average_ratings = (sum(ratings) / float(len(ratings)))
+            user_models.UserStatsModel(
+                id=key,
+                impact_score=user_impact_score,
+                total_plays=total_plays,
+                average_ratings=average_ratings).put()
+        else:
+            user_models.UserStatsModel(
+                id=key,
+                impact_score=user_impact_score,
+                total_plays=total_plays).put()
