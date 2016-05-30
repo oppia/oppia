@@ -92,10 +92,10 @@ oppia.controller('Library', [
       }
     };
 
-    var isCarouselScrolling = false;
+    var isAnyCarouselCurrentlyScrolling = false;
 
     $scope.scroll = function(ind, isLeftScroll) {
-      if (isCarouselScrolling) {
+      if (isAnyCarouselCurrentlyScrolling) {
         return;
       }
       var carouselJQuerySelector = (
@@ -136,10 +136,10 @@ oppia.controller('Library', [
         duration: 800,
         queue: false,
         start: function() {
-          isCarouselScrolling = true;
+          isAnyCarouselCurrentlyScrolling = true;
         },
         complete: function() {
-          isCarouselScrolling = false;
+          isAnyCarouselCurrentlyScrolling = false;
         }
       });
 
