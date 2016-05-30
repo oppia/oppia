@@ -452,6 +452,8 @@ textarea {
   opacity: 0.5;
   padding: 4px 8px;
   position: fixed;
+  /* This is needed so that the exploration summary tiles don't overlap the button in the library page. */
+  z-index: 3;
 }
 .oppia-site-feedback:hover,
 .oppia-site-feedback:focus,
