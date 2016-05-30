@@ -28,7 +28,7 @@ describe('Interactions', function() {
   it('should pass their own test suites', function() {
     users.createUser('user@interactions.com', 'userInteractions');
     users.login('user@interactions.com');
-    workflow.createExploration('interactions', 'userInteractions');
+    workflow.createExploration();
     editor.setStateName('first');
     editor.setContent(forms.toRichText('some content'));
 

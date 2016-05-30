@@ -31,6 +31,9 @@ oppia.factory('routerService', [
     var HISTORY_TAB = 'history';
     var FEEDBACK_TAB = 'feedback';
 
+    var SLUG_GUI = 'gui';
+    var SLUG_PREVIEW = 'preview';
+
     var _tabs = {
       active: MAIN_TAB
     };
@@ -50,10 +53,13 @@ oppia.factory('routerService', [
         return;
       }
 
+      // TODO(oparry): Determine whether this is necessary, since
+      // _savePendingChanges() is called by each of the navigateTo... functions
       $rootScope.$broadcast('externalSave');
 
-      if (newPath === '/preview') {
+      if (newPath.indexOf('/preview/') === 0) {
         _tabs.active = PREVIEW_TAB;
+        _doNavigationWithState(newPath, SLUG_PREVIEW);
       } else if (newPath === '/settings') {
         _tabs.active = SETTINGS_TAB;
         $rootScope.$broadcast('refreshSettingsTab');
@@ -68,28 +74,9 @@ oppia.factory('routerService', [
         _tabs.active = HISTORY_TAB;
       } else if (newPath === '/feedback') {
         _tabs.active = FEEDBACK_TAB;
-      } else if (newPath.indexOf('/gui/') !== -1) {
+      } else if (newPath.indexOf('/gui/') === 0) {
         _tabs.active = MAIN_TAB;
-        var putativeStateName = newPath.substring('/gui/'.length);
-
-        var waitForStatesToLoad = $interval(function() {
-          var allStates = explorationStatesService.getStates();
-          if (allStates) {
-            $interval.cancel(waitForStatesToLoad);
-
-            if (allStates.hasOwnProperty(putativeStateName)) {
-              editorContextService.setActiveStateName(putativeStateName);
-              $rootScope.$broadcast('refreshStateEditor');
-              // TODO(sll): Fire an event to center the graph, in the case
-              // where another tab is loaded first and then the user switches
-              // to the editor tab. We used to redraw the graph completely but
-              // this is taking lots of time and is probably not worth it.
-            } else {
-              $location.path(
-                '/gui/' + explorationInitStateNameService.savedMemento);
-            }
-          }
-        }, 300);
+        _doNavigationWithState(newPath, SLUG_GUI);
       } else {
         if (explorationInitStateNameService.savedMemento) {
           $location.path(
@@ -97,6 +84,30 @@ oppia.factory('routerService', [
         }
       }
     });
+
+    var _doNavigationWithState = function(path, pathType) {
+      var pathBase = '/' + pathType + '/';
+      var putativeStateName = path.substring(pathBase.length);
+      var waitForStatesToLoad = $interval(function() {
+        var allStates = explorationStatesService.getStates();
+        if (allStates) {
+          $interval.cancel(waitForStatesToLoad);
+          if (allStates.hasOwnProperty(putativeStateName)) {
+            editorContextService.setActiveStateName(putativeStateName);
+            if (pathType === SLUG_GUI) {
+              $rootScope.$broadcast('refreshStateEditor');
+            }
+            // TODO(sll): Fire an event to center the graph, in the case
+            // where another tab is loaded first and then the user switches
+            // to the editor tab. We used to redraw the graph completely but
+            // this is taking lots of time and is probably not worth it.
+          } else {
+            $location.path(pathBase +
+                           explorationInitStateNameService.savedMemento);
+          }
+        }
+      }, 300);
+    };
 
     var _savePendingChanges = function() {
       try {
@@ -118,6 +129,18 @@ oppia.factory('routerService', [
       }
     };
 
+    var _actuallyNavigate = function(pathType, newStateName) {
+      if (pathType !== SLUG_GUI && pathType !== SLUG_PREVIEW) {
+        return;
+      }
+      if (newStateName) {
+        editorContextService.setActiveStateName(newStateName);
+      }
+      $location.path('/' + pathType + '/' +
+                     editorContextService.getActiveStateName());
+      $window.scrollTo(0, 0);
+    };
+
     var routerService = {
       savePendingChanges: function() {
         _savePendingChanges();
@@ -137,34 +160,27 @@ oppia.factory('routerService', [
       },
       navigateToMainTab: function(stateName) {
         _savePendingChanges();
-
         if (_getCurrentStateFromLocationPath() === stateName) {
           return;
         }
 
-        var _actuallyNavigate = function(newStateName) {
-          if (newStateName) {
-            editorContextService.setActiveStateName(newStateName);
-          }
-          $location.path('/gui/' + editorContextService.getActiveStateName());
-          $window.scrollTo(0, 0);
-        };
-
         if (_tabs.active === MAIN_TAB) {
           $('.oppia-editor-cards-container').fadeOut(function() {
-            _actuallyNavigate(stateName);
+            _actuallyNavigate(SLUG_GUI, stateName);
             $rootScope.$apply();
             $timeout(function() {
               $('.oppia-editor-cards-container').fadeIn();
             }, 150);
           });
         } else {
-          _actuallyNavigate(stateName);
+          _actuallyNavigate(SLUG_GUI, stateName);
         }
       },
       navigateToPreviewTab: function() {
-        _savePendingChanges();
-        $location.path('/preview');
+        if (_tabs.active !== PREVIEW_TAB) {
+          _savePendingChanges();
+          _actuallyNavigate(SLUG_PREVIEW, null);
+        }
       },
       navigateToStatsTab: function() {
         _savePendingChanges();

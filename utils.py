@@ -369,14 +369,21 @@ def vfs_normpath(path):
     return path or dot
 
 
-def require_valid_name(name, name_type):
+def require_valid_name(name, name_type, allow_empty=False):
     """Generic name validation.
 
     Args:
       name: the name to validate.
       name_type: a human-readable string, like 'the exploration title' or
         'a state name'. This will be shown in error messages.
+      allow_empty: if True, empty strings are allowed.
     """
+    if not isinstance(name, basestring):
+        raise ValidationError('%s must be a string.' % name_type)
+
+    if allow_empty and name == '':
+        return
+
     # This check is needed because state names are used in URLs and as ids
     # for statistics, so the name length should be bounded above.
     if len(name) > 50 or len(name) < 1:

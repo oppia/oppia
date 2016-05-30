@@ -14,7 +14,6 @@
 
 """Tests for the admin page."""
 
-from core.controllers import editor
 from core.controllers import pages
 from core.domain import config_domain
 from core.tests import test_utils
@@ -77,13 +76,13 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response_dict = self.get_json('/adminhandler')
         response_config_properties = response_dict['config_properties']
         self.assertDictContainsSubset({
-            'value': editor.MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE,
-        }, response_config_properties[editor.MODERATOR_REQUEST_FORUM_URL.name])
+            'value': pages.MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE,
+        }, response_config_properties[pages.MODERATOR_REQUEST_FORUM_URL.name])
 
         payload = {
             'action': 'save_config_properties',
             'new_config_property_values': {
-                editor.MODERATOR_REQUEST_FORUM_URL.name: (
+                pages.MODERATOR_REQUEST_FORUM_URL.name: (
                     self.UNICODE_TEST_STRING),
             }
         }
@@ -93,7 +92,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response_config_properties = response_dict['config_properties']
         self.assertDictContainsSubset({
             'value': self.UNICODE_TEST_STRING,
-        }, response_config_properties[editor.MODERATOR_REQUEST_FORUM_URL.name])
+        }, response_config_properties[pages.MODERATOR_REQUEST_FORUM_URL.name])
 
         self.logout()
 

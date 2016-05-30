@@ -1,6 +1,6 @@
 <div ng-controller="SettingsTab">
   <md-card class="oppia-editor-card">
-    <h3>General</h3>
+    <h3>Basic Settings</h3>
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12">
         <div ng-if="editabilityService.isEditable()">
@@ -8,7 +8,7 @@
             <div class="form-group" ng-class="{'has-error': !explorationTitleService.displayed}">
               <label for="explorationTitle" class="col-lg-2 col-md-2 col-sm-2">Title</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
-                <input id="explorationTitle" type="text" class="form-control protractor-test-exploration-title-input" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()">
+                <input id="explorationTitle" type="text" class="form-control protractor-test-exploration-title-input" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()" placeholder="Choose a title for your exploration." focus-on="<[EXPLORATION_TITLE_INPUT_FOCUS_LABEL]>">
               </div>
             </div>
             <div class="form-group" ng-class="{'has-error': !explorationObjectiveService.displayed}">
@@ -25,10 +25,15 @@
               <label for="explorationCategory" class="col-lg-2 col-md-2 col-sm-2">Category</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
                 <div ng-if="hasPageLoaded">
-                  <select2-dropdown id="explorationCategory" item="explorationCategoryService.displayed"
-                    choices="CATEGORY_LIST_FOR_SELECT2" placeholder="Choose or type new"
-                    new-choice-regex="^[A-Z a-z]+$" on-selection-change="saveExplorationCategory()"
-                    width="100%" invalid-search-term-message="Invalid category name">
+                  <select2-dropdown id="explorationCategory"
+                                    class="protractor-test-exploration-category-input"
+                                    item="explorationCategoryService.displayed"
+                                    choices="CATEGORY_LIST_FOR_SELECT2"
+                                    placeholder="Choose or type new"
+                                    new-choice-regex="^[A-Z a-z]+$"
+                                    on-selection-change="saveExplorationCategory()"
+                                    width="100%"
+                                    invalid-search-term-message="Invalid category name">
                   </select2-dropdown>
                 </div>
               </div>
@@ -359,12 +364,6 @@
             </button>
           </p>
         {% endif %}
-
-        <p class="oppia-exploration-ctrl" ng-if="editabilityService.isEditable() && explorationRightsService.isPublic()">
-          <button type="button" class="btn btn-default" ng-click="showNominateExplorationModal()" ng-disabled="isExplorationLockedForEditing()" ng-class="{'btn-success': !isExplorationLockedForEditing()}" tooltip="Click this button to nominate this exploration for featured status in the Oppia library." tooltip-placement="bottom">
-            Nominate for Featured Status
-          </button>
-        </p>
       </div>
 
       <div class="col-lg-6 col-md-6 col-sm-6" ng-if="currentUserIsAdmin || currentUserIsModerator">
@@ -526,38 +525,5 @@
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
     <button class="btn btn-danger" ng-click="reallyDelete()">Delete Exploration</button>
-  </div>
-</script>
-
-<script type="text/ng-template" id="modals/nominateExploration">
-  <div class="modal-header">
-    <h3>Nominate for featured status</h3>
-  </div>
-
-  <div class="modal-body">
-    <p>
-      Congratulations, you are about to nominate this exploration for featured status in the Oppia library!
-    </p>
-
-    <p>
-      Currently, the decision to feature an exploration is based on moderator review.
-      When you submit an exploration for review, a moderator will play through
-      it, look at its structure, and decide whether it fits the
-      <a href="/about#publication-criteria">criteria for featured status</a>.
-      If not, the moderator will make a series of specific suggestions on how
-      to make the exploration satisfy the criteria, and work with the editor(s)
-      to get it featured.
-    </p>
-
-    <p>
-      <strong>To kick off the review process</strong>, please make a post to the
-      <a href="{{moderator_request_forum_url}}" target="_blank">request forum</a>, and
-      include a link to the exploration.
-    </p>
-  </div>
-
-  <div class="modal-footer">
-    <button class="btn btn-default" ng-click="close()">Close</button>
-    <a class="btn btn-success" href="{{moderator_request_forum_url}}" target="_blank">Post in the request forum</a>
   </div>
 </script>

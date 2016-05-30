@@ -64,7 +64,7 @@ CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 7
 # structure within the Collection domain object). If any backward-incompatible
 # changes are made to any of the blob schemas in the data store, this version
 # number must be changed.
-CURRENT_COLLECTION_SCHEMA_VERSION = 1
+CURRENT_COLLECTION_SCHEMA_VERSION = 2
 
 # The default number of exploration tiles to load at a time in the search
 # results page.
@@ -78,10 +78,24 @@ COMMIT_LIST_PAGE_SIZE = 50
 # tab.
 FEEDBACK_TAB_PAGE_SIZE = 20
 
+# Default title for a newly-minted exploration.
+DEFAULT_EXPLORATION_TITLE = ''
+# Default category for a newly-minted exploration.
+DEFAULT_EXPLORATION_CATEGORY = ''
+# Default objective for a newly-minted exploration.
+DEFAULT_EXPLORATION_OBJECTIVE = ''
+
 # Default name for the initial state of an exploration.
 DEFAULT_INIT_STATE_NAME = 'First Card'
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
+
+# Default title for a newly-minted collection.
+DEFAULT_COLLECTION_TITLE = ''
+# Default category for a newly-minted collection.
+DEFAULT_COLLECTION_CATEGORY = ''
+# Default objective for a newly-minted collection.
+DEFAULT_COLLECTION_OBJECTIVE = ''
 
 # The threshold the truth value of an evaluated answer group must equal or
 # exceed in order to be considered a better classification than the default

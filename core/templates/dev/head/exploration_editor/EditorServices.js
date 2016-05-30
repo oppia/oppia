@@ -606,12 +606,17 @@ oppia.factory('explorationPropertyService', [
 // displayed and edited in multiple places in the UI.
 oppia.factory('explorationTitleService', [
     'explorationPropertyService', '$filter', 'validatorsService',
-    function(explorationPropertyService, $filter, validatorsService) {
+    'explorationRightsService',
+    function(
+      explorationPropertyService, $filter, validatorsService,
+      explorationRightsService) {
   var child = Object.create(explorationPropertyService);
   child.propertyName = 'title';
   child._normalize = $filter('normalizeWhitespace');
   child._isValid = function(value) {
-    return validatorsService.isValidEntityName(value, true);
+    return (
+      explorationRightsService.isPrivate() ||
+      validatorsService.isValidEntityName(value, true));
   };
   return child;
 }]);
@@ -620,12 +625,17 @@ oppia.factory('explorationTitleService', [
 // displayed and edited in multiple places in the UI.
 oppia.factory('explorationCategoryService', [
     'explorationPropertyService', '$filter', 'validatorsService',
-    function(explorationPropertyService, $filter, validatorsService) {
+    'explorationRightsService',
+    function(
+      explorationPropertyService, $filter, validatorsService,
+      explorationRightsService) {
   var child = Object.create(explorationPropertyService);
   child.propertyName = 'category';
   child._normalize = $filter('normalizeWhitespace');
   child._isValid = function(value) {
-    return validatorsService.isValidEntityName(value, true);
+    return (
+      explorationRightsService.isPrivate() ||
+      validatorsService.isValidEntityName(value, true));
   };
   return child;
 }]);
@@ -634,12 +644,17 @@ oppia.factory('explorationCategoryService', [
 // be displayed and edited in multiple places in the UI.
 oppia.factory('explorationObjectiveService', [
     'explorationPropertyService', '$filter', 'validatorsService',
-    function(explorationPropertyService, $filter, validatorsService) {
+    'explorationRightsService',
+    function(
+      explorationPropertyService, $filter, validatorsService,
+      explorationRightsService) {
   var child = Object.create(explorationPropertyService);
   child.propertyName = 'objective';
   child._normalize = $filter('normalizeWhitespace');
   child._isValid = function(value) {
-    return validatorsService.isNonempty(value, false);
+    return (
+      explorationRightsService.isPrivate() ||
+      validatorsService.isNonempty(value, false));
   };
   return child;
 }]);
@@ -733,6 +748,66 @@ oppia.factory('explorationStatesService', [
       editorContextService, validatorsService, newStateTemplateService,
       explorationGadgetsService) {
     var _states = null;
+
+    // Maps backend names to the corresponding frontend dict accessor lists.
+    var PROPERTY_REF_DATA = {
+      answer_groups: ['interaction', 'answer_groups'],
+      confirmed_unclassified_answers: [
+        'interaction', 'confirmed_unclassified_answers'],
+      content: ['content'],
+      default_outcome: ['interaction', 'default_outcome'],
+      param_changes: ['param_changes'],
+      fallbacks: ['interaction', 'fallbacks'],
+      widget_id: ['interaction', 'id'],
+      widget_customization_args: ['interaction', 'customization_args']
+    };
+
+    var _setState = function(stateName, stateData, refreshGraph) {
+      _states[stateName] = angular.copy(stateData);
+      if (refreshGraph) {
+        $rootScope.$broadcast('refreshGraph');
+      }
+    };
+
+    var getStatePropertyMemento = function(stateName, backendName) {
+      var accessorList = PROPERTY_REF_DATA[backendName];
+
+      var propertyRef = _states[stateName];
+      accessorList.forEach(function(key) {
+        propertyRef = propertyRef[key];
+      });
+
+      return angular.copy(propertyRef);
+    };
+
+    var saveStateProperty = function(stateName, backendName, newValue) {
+      var oldValue = getStatePropertyMemento(stateName, backendName);
+
+      if (!angular.equals(oldValue, newValue)) {
+        changeListService.editStateProperty(
+          stateName, backendName, newValue, oldValue);
+
+        var newStateData = angular.copy(_states[stateName]);
+        var accessorList = PROPERTY_REF_DATA[backendName];
+
+        var propertyRef = newStateData;
+        for (var i = 0; i < accessorList.length - 1; i++) {
+          propertyRef = propertyRef[accessorList[i]];
+        }
+        propertyRef[accessorList[accessorList.length - 1]] = angular.copy(
+          newValue);
+
+        // We do not refresh the state editor immediately after the interaction
+        // id alone is saved, because the customization args dict will be
+        // temporarily invalid. A change in interaction id will always entail
+        // a change in the customization args dict anyway, so the graph will
+        // get refreshed after both properties have been updated.
+        var refreshGraph = (backendName !== 'widget_id');
+        _setState(stateName, newStateData, refreshGraph);
+      }
+    };
+
+    // TODO(sll): Add unit tests for all get/save methods.
     return {
       init: function(value) {
         _states = angular.copy(value);
@@ -747,8 +822,7 @@ oppia.factory('explorationStatesService', [
         return angular.copy(_states[stateName]);
       },
       setState: function(stateName, stateData) {
-        _states[stateName] = angular.copy(stateData);
-        $rootScope.$broadcast('refreshGraph');
+        _setState(stateName, stateData, true);
       },
       isNewStateNameValid: function(newStateName, showWarnings) {
         if (_states.hasOwnProperty(newStateName)) {
@@ -759,6 +833,58 @@ oppia.factory('explorationStatesService', [
         }
         return (
           validatorsService.isValidStateName(newStateName, showWarnings));
+      },
+      getStateContentMemento: function(stateName) {
+        return getStatePropertyMemento(stateName, 'content');
+      },
+      saveStateContent: function(stateName, newContent) {
+        saveStateProperty(stateName, 'content', newContent);
+      },
+      getStateParamChangesMemento: function(stateName) {
+        return getStatePropertyMemento(stateName, 'param_changes');
+      },
+      saveStateParamChanges: function(stateName, newParamChanges) {
+        saveStateProperty(stateName, 'param_changes', newParamChanges);
+      },
+      getInteractionIdMemento: function(stateName) {
+        return getStatePropertyMemento(stateName, 'widget_id');
+      },
+      saveInteractionId: function(stateName, newInteractionId) {
+        saveStateProperty(stateName, 'widget_id', newInteractionId);
+      },
+      getInteractionCustomizationArgsMemento: function(stateName) {
+        return getStatePropertyMemento(stateName, 'widget_customization_args');
+      },
+      saveInteractionCustomizationArgs: function(
+          stateName, newCustomizationArgs) {
+        saveStateProperty(
+          stateName, 'widget_customization_args', newCustomizationArgs);
+      },
+      getInteractionAnswerGroupsMemento: function(stateName) {
+        return getStatePropertyMemento(stateName, 'answer_groups');
+      },
+      saveInteractionAnswerGroups: function(stateName, newAnswerGroups) {
+        saveStateProperty(stateName, 'answer_groups', newAnswerGroups);
+      },
+      getConfirmedUnclassifiedAnswersMemento: function(stateName) {
+        return getStatePropertyMemento(
+          stateName, 'confirmed_unclassified_answers');
+      },
+      saveConfirmedUnclassifiedAnswers: function(stateName, newAnswers) {
+        saveStateProperty(
+          stateName, 'confirmed_unclassified_answers', newAnswers);
+      },
+      getInteractionDefaultOutcomeMemento: function(stateName) {
+        return getStatePropertyMemento(stateName, 'default_outcome');
+      },
+      saveInteractionDefaultOutcome: function(stateName, newDefaultOutcome) {
+        saveStateProperty(stateName, 'default_outcome', newDefaultOutcome);
+      },
+      getFallbacksMemento: function(stateName) {
+        return getStatePropertyMemento(stateName, 'fallbacks');
+      },
+      saveFallbacks: function(stateName, newFallbacks) {
+        saveStateProperty(stateName, 'fallbacks', newFallbacks);
       },
       addState: function(newStateName, successCallback) {
         newStateName = $filter('normalizeWhitespace')(newStateName);
@@ -940,32 +1066,21 @@ oppia.factory('explorationStatesService', [
 ]);
 
 oppia.factory('statePropertyService', [
-  '$log', 'changeListService', 'alertsService',
-  function($log, changeListService, alertsService) {
+  '$log', 'changeListService', 'alertsService', 'explorationStatesService',
+  function($log, changeListService, alertsService, explorationStatesService) {
     // Public base API for data services corresponding to state properties
-    // (interaction id, content, etc.) Note that this does not update
-    // explorationStatesService; it is maintained only locally.
+    // (interaction id, content, etc.)
     // WARNING: This should be initialized only in the context of the state
     // editor, and every time the state is loaded, so that proper behavior is
     // maintained if e.g. the state is renamed.
-    // TODO(sll): Make this update explorationStatesService.
+    // TODO(sll): Remove this service and its descendants, in favour of using
+    // explorationStatesService directly.
     return {
-      init: function(stateName, value, statesAccessorDict, statesAccessorKey) {
-        if (!statesAccessorDict || !statesAccessorKey) {
-          throw 'Not enough args passed into statePropertyService.init().';
+      init: function(stateName, value) {
+        if (this.setterMethodKey === null) {
+          throw 'State property setter method key cannot be null.';
         }
 
-        if (this.propertyName === null) {
-          throw 'State property name cannot be null.';
-        }
-
-        $log.info('Initializing state ' + this.propertyName + ':', value);
-
-        // A reference to the state dict that should be updated.
-        this.statesAccessorDict = statesAccessorDict;
-        // The name of the key in statesAccessorDict whose value should be
-        // updated.
-        this.statesAccessorKey = statesAccessorKey;
         // The name of the state.
         this.stateName = stateName;
         // The current value of the property (which may not have been saved to
@@ -980,9 +1095,9 @@ oppia.factory('statePropertyService', [
       hasChanged: function() {
         return !angular.equals(this.savedMemento, this.displayed);
       },
-      // The backend name for this property. THIS MUST BE SPECIFIED BY
-      // SUBCLASSES.
-      propertyName: null,
+      // The name of the setter method in explorationStatesService for this
+      // property. THIS MUST BE SPECIFIED BY SUBCLASSES.
+      setterMethodKey: null,
       // Transforms the given value into a normalized form. THIS CAN BE
       // OVERRIDDEN BY SUBCLASSES. The default behavior is to do nothing.
       _normalize: function(value) {
@@ -997,8 +1112,8 @@ oppia.factory('statePropertyService', [
       // Creates a new entry in the change list, and updates the memento to the
       // displayed value.
       saveDisplayedValue: function() {
-        if (this.propertyName === null) {
-          throw 'State property name cannot be null.';
+        if (this.setterMethodKey === null) {
+          throw 'State property setter method key cannot be null.';
         }
 
         this.displayed = this._normalize(this.displayed);
@@ -1012,12 +1127,10 @@ oppia.factory('statePropertyService', [
         }
 
         alertsService.clearWarnings();
-        changeListService.editStateProperty(
-          this.stateName, this.propertyName, this.displayed, this.savedMemento);
 
-        // Update $scope.states.
-        this.statesAccessorDict[this.statesAccessorKey] = angular.copy(
-          this.displayed);
+        var setterFunc = explorationStatesService[this.setterMethodKey];
+        setterFunc(this.stateName, angular.copy(this.displayed));
+
         this.savedMemento = angular.copy(this.displayed);
       },
       // Reverts the displayed value to the saved memento.
@@ -1033,7 +1146,7 @@ oppia.factory('statePropertyService', [
 oppia.factory('stateParamChangesService', [
     'statePropertyService', function(statePropertyService) {
   var child = Object.create(statePropertyService);
-  child.propertyName = 'param_changes';
+  child.setterMethodKey = 'saveStateParamChanges';
   return child;
 }]);
 
@@ -1042,7 +1155,7 @@ oppia.factory('stateParamChangesService', [
 oppia.factory('stateInteractionIdService', [
     'statePropertyService', function(statePropertyService) {
   var child = Object.create(statePropertyService);
-  child.propertyName = 'widget_id';
+  child.setterMethodKey = 'saveInteractionId';
   return child;
 }]);
 
@@ -1053,7 +1166,7 @@ oppia.factory('stateInteractionIdService', [
 oppia.factory('stateCustomizationArgsService', [
     'statePropertyService', function(statePropertyService) {
   var child = Object.create(statePropertyService);
-  child.propertyName = 'widget_customization_args';
+  child.setterMethodKey = 'saveInteractionCustomizationArgs';
   return child;
 }]);
 
@@ -1061,7 +1174,7 @@ oppia.factory('stateCustomizationArgsService', [
 oppia.factory('stateFallbacksService', [
     'statePropertyService', function(statePropertyService) {
   var child = Object.create(statePropertyService);
-  child.propertyName = 'fallbacks';
+  child.setterMethodKey = 'saveFallbacks';
   return child;
 }]);
 
@@ -1834,14 +1947,14 @@ oppia.factory('explorationWarningsService', [
             _getReversedLinks(_graphData.links), false);
           if (deadEndStates.length) {
             angular.forEach(deadEndStates, function(deadEndState) {
-             if (stateWarnings.hasOwnProperty(deadEndState)) {
-               stateWarnings[deadEndState].push(
-                 STATE_ERROR_MESSAGES.UNABLE_TO_END_EXPLORATION);
-             } else {
-               stateWarnings[deadEndState] = [
-                 STATE_ERROR_MESSAGES.UNABLE_TO_END_EXPLORATION];
-             }
-           });
+              if (stateWarnings.hasOwnProperty(deadEndState)) {
+                stateWarnings[deadEndState].push(
+                  STATE_ERROR_MESSAGES.UNABLE_TO_END_EXPLORATION);
+              } else {
+                stateWarnings[deadEndState] = [
+                  STATE_ERROR_MESSAGES.UNABLE_TO_END_EXPLORATION];
+              }
+            });
           }
         }
 

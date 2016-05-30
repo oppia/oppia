@@ -25,6 +25,7 @@ oppia.controller('SettingsTab', [
   'changeListService', 'alertsService', 'explorationStatesService',
   'explorationParamChangesService', 'explorationWarningsService',
   'CATEGORY_LIST', 'explorationAdvancedFeaturesService',
+  'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
   function(
       $scope, $http, $window, $modal, $rootScope,
       explorationData, explorationTitleService, explorationCategoryService,
@@ -33,9 +34,12 @@ oppia.controller('SettingsTab', [
       explorationInitStateNameService, explorationParamSpecsService,
       changeListService, alertsService, explorationStatesService,
       explorationParamChangesService, explorationWarningsService,
-      CATEGORY_LIST, explorationAdvancedFeaturesService) {
-    $scope.CATEGORY_LIST_FOR_SELECT2 = [];
+      CATEGORY_LIST, explorationAdvancedFeaturesService,
+      EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
+    $scope.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
+      EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
 
+    $scope.CATEGORY_LIST_FOR_SELECT2 = [];
     for (var i = 0; i < CATEGORY_LIST.length; i++) {
       $scope.CATEGORY_LIST_FOR_SELECT2.push({
         id: CATEGORY_LIST[i],
@@ -219,22 +223,6 @@ oppia.controller('SettingsTab', [
         explorationRightsService.saveChangeToBackend({
           is_community_owned: true
         });
-      });
-    };
-
-    $scope.showNominateExplorationModal = function() {
-      alertsService.clearWarnings();
-      $modal.open({
-        templateUrl: 'modals/nominateExploration',
-        backdrop: true,
-        controller: [
-          '$scope', '$modalInstance', function($scope, $modalInstance) {
-            $scope.close = function() {
-              $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
-            };
-          }
-        ]
       });
     };
 

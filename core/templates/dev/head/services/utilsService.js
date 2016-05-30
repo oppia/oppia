@@ -13,18 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the state parameter changes section
- * of the editor sidebar.
+ * @fileoverview Service for storing all generic functions which have to be
+ * used at multiple places in the codebase.
  */
 
-oppia.controller('StateParamChangesEditor', [
-  '$scope', 'editorContextService', 'stateParamChangesService',
-  function($scope, editorContextService, stateParamChangesService) {
-    $scope.stateParamChangesService = stateParamChangesService;
-
-    $scope.$on('stateEditorInitialized', function(evt, stateData) {
-      stateParamChangesService.init(
-        editorContextService.getActiveStateName(), stateData.param_changes);
-    });
-  }
-]);
+oppia.factory('utilsService', [function() {
+  var utils = {
+    isEmpty: function(obj) {
+      for (var property in obj) {
+        if (obj.hasOwnProperty(property)) {
+          return false;
+        }
+      }
+      return true;
+    }
+  };
+  return utils;
+}]);

@@ -4,8 +4,8 @@
       <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
         <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
         <h2 class="exploration-title protractor-test-exp-summary-tile-title">
-          <span ng-if="isWindowLarge"><[getExplorationTitle()|truncate:22]></span>
-          <span ng-if="!isWindowLarge"><[getExplorationTitle()|truncate:22]></span>
+          <span ng-if="isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
+          <span ng-if="!isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
         </h2>
 
         <!-- Note that if this is ng-if instead, the avatar area will not detect a mouseover and the tile will behave incorrectly. -->
@@ -23,9 +23,9 @@
           </div>
 
           <div class="all-avatars" style="display: none;">
-            <div class="circular-image-container">
-              <circular-image ng-repeat="avatar in avatarsList | limitTo:MAX_AVATARS_TO_DISPLAY-1:1"
-                              src="avatar.image"
+            <div class="circular-image-container"
+                 ng-repeat="avatar in avatarsList | limitTo:MAX_AVATARS_TO_DISPLAY-1:1">
+              <circular-image src="avatar.image"
                               link="avatar.link"
                               tooltip="<[avatar.tooltipText | truncate:14]>"
                               tooltip-placement="right">
@@ -87,7 +87,7 @@
     background-color: #fff;
     cursor: pointer;
     display: inline-block;
-    height: 240px;
+    height: 258px;
     margin: 12px 4px;
     padding: 0;
     position: relative;
@@ -130,7 +130,7 @@
   }
 
   .oppia-exploration-summary-tile .title-section {
-    height: 144px;
+    height: 162px;
     position: relative;
     width: 100%;
   }
@@ -153,7 +153,7 @@
 
   .oppia-exploration-summary-tile .exploration-summary-tile-mask {
     background-color: #eee;
-    height: 240px;
+    height: 258px;
     left: 0px;
     opacity: 0.7;
     position: absolute;
@@ -164,7 +164,7 @@
 
   .oppia-exploration-summary-tile:hover .title-section-mask {
     background-color: #eee;
-    height: 144px;
+    height: 162px;
     left: 0px;
     opacity: 0.4;
     position: absolute;

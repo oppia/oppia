@@ -110,6 +110,12 @@ body {
   width: 100%;
 }
 
+/* According to the Angular documentation - https://docs.angularjs.org/api/ng/directive/ngCloak - 
+   the following rule needs to be added to the css file in order for ng-cloak to work.  */
+[ng\:cloak], [ng-cloak], .ng-cloak {
+  display: none !important;
+}
+
 .oppia-dashboard-container {
   margin: 60px auto 30px auto;
   max-width: 800px;
@@ -925,7 +931,7 @@ textarea {
   margin-left: auto;
   margin-right: auto;
   max-width: 928px;
-  min-height: 500px;
+  min-height: 300px;
   padding-bottom: 24px;
   padding-top: 24px;
   width: 100vw;
@@ -956,7 +962,7 @@ textarea {
 
 .oppia-library-group {
   display: block;
-  height: 332px;
+  height: 350px;
   margin-bottom: 72px;
   margin-top: 36px;
   max-width: 928px;
@@ -1035,7 +1041,7 @@ textarea {
 }
 
 .oppia-library-carousel {
-  height: 264px;
+  height: 282px;
   float: left;
   max-width: 848px;
   overflow: hidden;
