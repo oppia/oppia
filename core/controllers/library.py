@@ -81,6 +81,9 @@ class LibraryIndexHandler(base.BaseHandler):
         featured_activity_summary_dicts = (
             summary_services.get_featured_exploration_summary_dicts(
                 [feconf.DEFAULT_LANGUAGE_CODE]))
+        top_rated_activity_summary_dicts = (
+            summary_services.get_top_rated_exploration_summary_dicts(
+                [feconf.DEFAULT_LANGUAGE_CODE]))
 
         preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
         if self.user_id:
@@ -92,6 +95,12 @@ class LibraryIndexHandler(base.BaseHandler):
                 'activity_summary_dicts': featured_activity_summary_dicts,
                 'categories': [],
                 'header': feconf.LIBRARY_CATEGORY_FEATURED_EXPLORATIONS,
+            })
+        if top_rated_activity_summary_dicts:
+            summary_dicts_by_category.insert(0, {
+                'activity_summary_dicts': top_rated_activity_summary_dicts,
+                'categories': [],
+                'header': feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS,
             })
 
         self.values.update({
