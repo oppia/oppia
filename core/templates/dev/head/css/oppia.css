@@ -3280,6 +3280,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-about-tabs {
+  border-bottom: 1px solid #eee;
   display: flex;
   flex-wrap: wrap;
   text-align: center;
@@ -3287,23 +3288,19 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-about-tabs li {
-  border-right: 1px solid rgba(0,0,0,0.1);
   display: flex;
+  margin-bottom: 0;
   width: calc(100% / 3);
-}
-
-.oppia-about-tabs li:last-of-type {
-  border-right: none;
 }
 
 .oppia-about-tabs-active .oppia-about-tabs-text {
   color: #009688;
-  border-bottom: none;
+  border-bottom: 2px solid #009688;
 }
 
 .oppia-about-tabs-text {
   color: #009688;
-  border-bottom: 2px solid #009688;
+  border-bottom: none;
   padding: 10px;
   text-decoration: none;
   width: 100%;
