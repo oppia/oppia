@@ -385,6 +385,8 @@ class TopRatedExplorationDisplayableSummariesTest(
     EXP_ID_5 = 'eid5'
     EXP_ID_6 = 'eid6'
     EXP_ID_7 = 'eid7'
+    EXP_ID_8 = 'eid8'
+    EXP_ID_9 = 'eid9'
 
     def setUp(self):
         """Populate the database of explorations and their summaries.
@@ -397,14 +399,18 @@ class TopRatedExplorationDisplayableSummariesTest(
         - (5) Albert creates EXP_ID_5.
         - (6) Albert creates EXP_ID_6.
         - (7) Albert creates EXP_ID_7.
-        - (8) Albert publishes EXP_ID_1.
-        - (9) Albert publishes EXP_ID_2.
-        - (10) Albert publishes EXP_ID_3.
-        - (11) Albert publishes EXP_ID_4.
-        - (12) Albert publishes EXP_ID_5.
-        - (13) Albert publishes EXP_ID_6.
-        - (14) Albert publishes EXP_ID_7.
-        - (15) Admin user is set up.
+        - (8) Albert creates EXP_ID_8.
+        - (9) Albert creates EXP_ID_9.
+        - (10) Albert publishes EXP_ID_1.
+        - (11) Albert publishes EXP_ID_2.
+        - (12) Albert publishes EXP_ID_3.
+        - (13) Albert publishes EXP_ID_4.
+        - (14) Albert publishes EXP_ID_5.
+        - (15) Albert publishes EXP_ID_6.
+        - (16) Albert publishes EXP_ID_7.
+        - (17) Albert publishes EXP_ID_8.
+        - (18) Albert publishes EXP_ID_9.
+        - (19) Admin user is set up.
         """
 
         super(TopRatedExplorationDisplayableSummariesTest, self).setUp()
@@ -426,6 +432,8 @@ class TopRatedExplorationDisplayableSummariesTest(
         self.save_new_valid_exploration(self.EXP_ID_5, self.albert_id)
         self.save_new_valid_exploration(self.EXP_ID_6, self.albert_id)
         self.save_new_valid_exploration(self.EXP_ID_7, self.albert_id)
+        self.save_new_valid_exploration(self.EXP_ID_8, self.albert_id)
+        self.save_new_valid_exploration(self.EXP_ID_9, self.albert_id)
 
         rights_manager.publish_exploration(self.albert_id, self.EXP_ID_1)
         rights_manager.publish_exploration(self.albert_id, self.EXP_ID_2)
@@ -434,6 +442,8 @@ class TopRatedExplorationDisplayableSummariesTest(
         rights_manager.publish_exploration(self.albert_id, self.EXP_ID_5)
         rights_manager.publish_exploration(self.albert_id, self.EXP_ID_6)
         rights_manager.publish_exploration(self.albert_id, self.EXP_ID_7)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_8)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_9)
 
         self.set_admins([self.ADMIN_USERNAME])
 
@@ -478,4 +488,4 @@ class TopRatedExplorationDisplayableSummariesTest(
         self.assertDictContainsSubset(
             expected_summary, top_rated_exploration_summaries[0])
 
-        self.assertEqual(7, len(top_rated_exploration_summaries))
+        self.assertEqual(8, len(top_rated_exploration_summaries))

@@ -235,20 +235,23 @@ def get_top_rated_exploration_summary_dicts(language_codes):
         exp_services.get_non_private_exploration_summaries().values()
         if exp_summary.language_code in language_codes]
 
-    average_rankings = {
-        exp_summary.id: exp_services.get_average_rank_from_exp_summary(
+    average_ratings = {
+        exp_summary.id: exp_services.get_average_rating_from_exp_summary(
             exp_summary)
         for exp_summary in filtered_exp_summaries
     }
 
-    sorted_by_ranking_count_exp_summaries = sorted(
+    # The following two calls to 'sorted' ensure that the return list is sorted
+    # by average rating, breaking ties by the number of ratings.
+
+    sorted_by_ratings_count_exp_summaries = sorted(
         filtered_exp_summaries,
         key=lambda exp_summary: len(exp_summary.ratings.keys()),
         reverse=True)
 
     sorted_exp_summaries = sorted(
-        sorted_by_ranking_count_exp_summaries,
-        key=lambda exp_summary: average_rankings[exp_summary.id],
+        sorted_by_ratings_count_exp_summaries,
+        key=lambda exp_summary: average_ratings[exp_summary.id],
         reverse=True)[:NUMBER_OF_TOP_RATED_EXPLORATIONS]
 
     return _get_displayable_exp_summary_dicts(sorted_exp_summaries)
