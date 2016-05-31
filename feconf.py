@@ -510,6 +510,10 @@ SEARCH_DROPDOWN_CATEGORIES = sorted([
 # page.
 LIBRARY_CATEGORY_FEATURED_EXPLORATIONS = 'Featured Explorations'
 
+# The header for the "Recently Published" category in the library index
+# page.
+LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'Recently Published'
+
 # List of supported language codes. Each description has a
 # parenthetical part that may be stripped out to give a shorter
 # description.

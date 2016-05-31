@@ -81,11 +81,22 @@ class LibraryIndexHandler(base.BaseHandler):
         featured_activity_summary_dicts = (
             summary_services.get_featured_exploration_summary_dicts(
                 [feconf.DEFAULT_LANGUAGE_CODE]))
+        
+        recently_published_summary_dicts = (
+            summary_services.get_recently_published_exploration_summary_dicts(
+                [feconf.DEFAULT_LANGUAGE_CODE]))
 
         preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
         if self.user_id:
             user_settings = user_services.get_user_settings(self.user_id)
             preferred_language_codes = user_settings.preferred_language_codes
+
+        if recently_published_summary_dicts:
+            summary_dicts_by_category.insert(0, {
+                'activity_summary_dicts': recently_published_summary_dicts,
+                'categories': [],
+                'header': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
+            })
 
         if featured_activity_summary_dicts:
             summary_dicts_by_category.insert(0, {
