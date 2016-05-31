@@ -673,7 +673,7 @@ oppia.factory('rteHelperService', [
         var inlineComponents = ['link', 'math'];
         return inlineComponents.indexOf(richTextComponent) !== -1;
       },
-      _openCustomizationModal: function(
+      openCustomizationModal: function(
           customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
           onDismissCallback, refocusFn) {
         var modalDialog = $modal.open({
@@ -775,12 +775,12 @@ oppia.run([
             button: componentDefn.tooltip,
             inline: isInline,
             template: componentTemplate,
-            edit: function(event) {
+            edit: function(evt) {
               editor.fire('lockSnapshot', {
                 dontUpdate: true
               });
               // Prevent default action since we are using our own edit modal.
-              event.cancel();
+              evt.cancel();
               // Save this for creating the widget later.
               var container = this.wrapper.getParent(true);
               var that = this;
@@ -790,7 +790,7 @@ oppia.run([
                                                spec.default_value;
               });
 
-              rteHelperService._openCustomizationModal(
+              rteHelperService.openCustomizationModal(
                 customizationArgSpecs,
                 customizationArgs,
                 function(customizationArgsDict) {
@@ -920,16 +920,16 @@ oppia.directive('ckEditorRte', [
       template: '<div><div></div>' +
                 '<div contenteditable="true" class="oppia-rte">' +
                 '</div></div>',
-      require: '?ngModel',
+      require: 'ngModel',
       link: function(scope, el, attr, ngModel) {
         var _RICH_TEXT_COMPONENTS = rteHelperService.getRichTextComponents();
-        var names = [];
+        var componentNames = [];
         var icons = [];
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
           if (!(scope.uiConfig() &&
                 scope.uiConfig().hide_complex_extensions &&
                 componentDefn.isComplex)) {
-            names.push(componentDefn.name);
+            componentNames.push(componentDefn.name);
             icons.push(componentDefn.iconDataUrl);
           }
         });
@@ -941,7 +941,7 @@ oppia.directive('ckEditorRte', [
          * http://docs.ckeditor.com/#!/guide/dev_allowed_content_rules
          */
         // Whitelist the component tags with any attributes and classes.
-        var componentRule = names.map(function(name) {
+        var componentRule = componentNames.map(function(name) {
           return 'oppia-noninteractive-' + name;
         }).join(' ') + '(*)[*];';
         // Whitelist the inline component wrapper, which is a
@@ -959,11 +959,13 @@ oppia.directive('ckEditorRte', [
                                        blockWrapperRule +
                                        blockOverlayRule;
 
-        var pluginNames = names.map(function(name) {
+        var pluginNames = componentNames.map(function(name) {
           return 'oppia' + name;
         }).join(',');
+        // The button corresponding to a widget has the same name,
+        // with a capitalized first letter.
         var buttonNames = [];
-        names.forEach(function(name) {
+        componentNames.forEach(function(name) {
           buttonNames.push('Oppia' + name);
           buttonNames.push('-');
         });
@@ -1003,7 +1005,12 @@ oppia.directive('ckEditorRte', [
           ]
         });
 
-        // A RegExp for matching rich text components.
+        /**
+         * A RegExp for matching rich text components. It has 3 capture groups:
+         * p1: The entire opening tag, including brackets and all attributes.
+         * p2: Just the name of the tag, e.g. "oppia-noninteractive-math"
+         * p3: Just the name of the component, e.g. "math"
+         */
         var componentRe = (
           /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
         );
@@ -1031,7 +1038,7 @@ oppia.directive('ckEditorRte', [
 
         ck.on('instanceReady', function() {
           // Set the icons for each toolbar button.
-          names.forEach(function(name, index) {
+          componentNames.forEach(function(name, index) {
             var icon = icons[index];
             var upperCasedName = name.charAt(0).toUpperCase() + name.slice(1);
             $('.cke_button__oppia' + name)
@@ -1044,11 +1051,11 @@ oppia.directive('ckEditorRte', [
 
         // Angular rendering of components confuses CKEditor's undo system, so
         // we hide all of that stuff away from CKEditor.
-        ck.on('getSnapshot', function(event) {
-          if (event.data === undefined) {
+        ck.on('getSnapshot', function(evt) {
+          if (evt.data === undefined) {
             return;
           }
-          event.data = event.data.replace(componentRe, function(match, p1, p2) {
+          evt.data = evt.data.replace(componentRe, function(match, p1, p2) {
             return p1 + '</' + p2 + '>';
           });
         }, null, null, 20);
@@ -1129,7 +1136,7 @@ oppia.config(['$provide', function($provide) {
 
               // Temporarily pauses sanitizer so rangy markers save position
               textAngular.$editor().$parent.isCustomizationModalOpen = true;
-              rteHelperService._openCustomizationModal(
+              rteHelperService.openCustomizationModal(
                 componentDefn.customizationArgSpecs,
                 rteHelperService.createCustomizationArgDictFromAttrs(
                   $element[0].attributes),
@@ -1158,7 +1165,7 @@ oppia.config(['$provide', function($provide) {
 
             // Temporarily pauses sanitizer so rangy markers save position.
             textAngular.$editor().$parent.isCustomizationModalOpen = true;
-            rteHelperService._openCustomizationModal(
+            rteHelperService.openCustomizationModal(
               componentDefn.customizationArgSpecs,
               {},
               function(customizationArgsDict) {
