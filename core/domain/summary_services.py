@@ -228,7 +228,7 @@ def get_featured_exploration_summary_dicts(language_codes):
 def get_top_rated_exploration_summary_dicts(language_codes):
     """Returns a list of top rated explorations with the given language code.
 
-    The return value is sorted in decreasing order of search rank.
+    The return value is sorted in decreasing order of average rating.
     """
     filtered_exp_summaries = [
         exp_summary for exp_summary in
