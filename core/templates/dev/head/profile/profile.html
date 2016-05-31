@@ -33,15 +33,17 @@
   <div class="oppia-profile-container" ng-controller="Profile">
     <md-card class="oppia-profile-user-card">
 
-    <div ng-if=" '{{username}}' == '{{PROFILE_USERNAME}}' ">
-      <a HREF="/preferences"> <img ng-src="<[profilePictureDataUrl]>"
-           class="oppia-profile-picture-fullsize"> </a>
-    </div>
+      <div ng-if=" '{{username}}' == '{{PROFILE_USERNAME}}' ">
+        <a href="/preferences"> 
+          <img ng-src="<[profilePictureDataUrl]>"
+             class="oppia-profile-picture-fullsize"> 
+        </a>
+      </div>
 
-    <div ng-if=" '{{username}}' != '{{PROFILE_USERNAME}}' ">
-      <img ng-src="<[profilePictureDataUrl]>"
-           class="oppia-profile-picture-fullsize">
-    </div>
+      <div ng-if=" 'username' != 'PROFILE_USERNAME' ">
+        <img ng-src="<[profilePictureDataUrl]>"
+             class="oppia-profile-picture-fullsize">
+      </div>
 
       <h2 class="oppia-profile-username-large-screen">
         <span popover-placement="right" ng-attr-popover="<[usernameIsLong ? username.helpText : undefined]>"
