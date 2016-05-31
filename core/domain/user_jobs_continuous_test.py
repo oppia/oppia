@@ -662,8 +662,7 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
         return self.get_user_id_from_email(user_email)
 
     def _create_exploration(self, exp_id, user_id):
-        exploration = exp_domain.Exploration.create_default_exploration(
-            exp_id, 'A title', 'A category')
+        exploration = exp_domain.Exploration.create_default_exploration(exp_id)
         exp_services.save_new_exploration(user_id, exploration)
         return exploration
 

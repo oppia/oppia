@@ -273,12 +273,9 @@ class CreationButtonsTest(test_utils.GenericTestBase):
         response = self.testapp.get('/my_explorations')
         self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(response)
-        exp_a_id = self.post_json(feconf.NEW_EXPLORATION_URL, {
-            'title': self.UNICODE_TEST_STRING,
-            'category': self.UNICODE_TEST_STRING,
-            'objective': 'Learn how to generate exploration ids.',
-            'language_code': feconf.DEFAULT_LANGUAGE_CODE
-        }, csrf_token)[home.EXPLORATION_ID_KEY]
+        exp_a_id = self.post_json(
+            feconf.NEW_EXPLORATION_URL, {}, csrf_token
+        )[home.EXPLORATION_ID_KEY]
         self.assertEqual(len(exp_a_id), 12)
 
         self.logout()

@@ -39,6 +39,7 @@ describe('Collection update service', function() {
       id: 'collection_id',
       title: 'a title',
       objective: 'an objective',
+      language_code: 'en',
       category: 'a category',
       version: '1',
       nodes: [{
@@ -158,6 +159,26 @@ describe('Collection update service', function() {
       property_name: 'objective',
       new_value: 'new objective',
       old_value: 'an objective'
+    }]);
+  });
+
+  it('should set/unset changes to a collection\'s language code', function() {
+    expect(_sampleCollection.getLanguageCode()).toEqual('en');
+    CollectionUpdateService.setCollectionLanguageCode(_sampleCollection, 'fi');
+    expect(_sampleCollection.getLanguageCode()).toEqual('fi');
+
+    UndoRedoService.undoChange(_sampleCollection);
+    expect(_sampleCollection.getLanguageCode()).toEqual('en');
+  });
+
+  it('should create a proper backend change dict for changing language codes',
+      function() {
+    CollectionUpdateService.setCollectionLanguageCode(_sampleCollection, 'fi');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'edit_collection_property',
+      property_name: 'language_code',
+      new_value: 'fi',
+      old_value: 'en'
     }]);
   });
 

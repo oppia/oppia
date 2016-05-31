@@ -171,15 +171,12 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(USER_ID), [])
         exp_services.save_new_exploration(
-            USER_ID,
-            exp_domain.Exploration.create_default_exploration(
-                EXP_ID, 'Title', 'Category'))
+            USER_ID, exp_domain.Exploration.create_default_exploration(EXP_ID))
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(USER_ID), [EXP_ID])
 
     def test_adding_new_exploration_owner_or_editor_role_results_in_subscription(self): # pylint: disable=line-too-long
-        exploration = exp_domain.Exploration.create_default_exploration(
-            EXP_ID, 'Title', 'Category')
+        exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)
         exp_services.save_new_exploration(self.owner_id, exploration)
 
         self.assertEqual(
@@ -197,8 +194,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             self._get_exploration_ids_subscribed_to(self.editor_id), [EXP_ID])
 
     def test_adding_new_exploration_viewer_role_does_not_result_in_subscription(self): # pylint: disable=line-too-long
-        exploration = exp_domain.Exploration.create_default_exploration(
-            EXP_ID, 'Title', 'Category')
+        exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)
         exp_services.save_new_exploration(self.owner_id, exploration)
 
         self.assertEqual(
@@ -209,8 +205,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             self._get_exploration_ids_subscribed_to(self.viewer_id), [])
 
     def test_deleting_exploration_does_not_delete_subscription(self):
-        exploration = exp_domain.Exploration.create_default_exploration(
-            EXP_ID, 'Title', 'Category')
+        exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)
         exp_services.save_new_exploration(self.owner_id, exploration)
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.owner_id), [EXP_ID])

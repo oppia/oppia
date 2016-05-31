@@ -25,7 +25,7 @@
       <li>
         <div class="oppia-navbar-button-container" style="margin-right: 25px;">
           <a class="btn oppia-navbar-button protractor-test-create-exploration oppia-transition-200"
-             ng-click="showCreateCollectionModal()" style="margin-right: 0;">
+             ng-click="createNewCollection()" style="margin-right: 0;">
             <span>Create Collection</span>
           </a>
         </div>
@@ -89,7 +89,8 @@
                 <div class="oppia-dashboard-exp-tile-details">
                   <div class="oppia-dashboard-exp-tile-first-row">
                     <span class="oppia-dashboard-exp-tile-title">
-                      <[exploration.title]>
+                      <span ng-if="exploration.title"><[exploration.title]></span>
+                      <span ng-if="!exploration.title">Untitled</span>
                     </span>
                     <span style="font-weight: bold;">&middot;</span>
                     <span style="color: #888; font-size: 0.9em;" class="protractor-test-exploration-objective">
@@ -105,7 +106,7 @@
                   <div class="oppia-dashboard-exp-tile-second-row">
                     <span style="color: #888">
                       <strong><[exploration.category]></strong>
-                      <span style="font-weight: bold;">&middot;</span>
+                      <span style="font-weight: bold;" ng-if="exploration.category">&middot;</span>
                       Last updated <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
                     </span>
 
@@ -140,7 +141,7 @@
           </p>
           <button type="button"
                   class="btn oppia-dashboard-intro-button oppia-transition-200"
-                  ng-click="showCreateExplorationModal()">
+                  ng-click="createNewExploration()">
             Create Exploration
           </button>
         </div>
@@ -151,13 +152,13 @@
     </div>
   </div>
 
-  {% include 'components/exploration_creation_button_modal.html' %}
+  {% include 'components/upload_activity_modal.html' %}
 {% endblock %}
 
 {% block footer_js %}
   {{ super() }}
   <script>
-    {{ include_js_file('components/CollectionCreationButtonService.js') }}
+    {{ include_js_file('components/CollectionCreationService.js') }}
     {{ include_js_file('dashboard/MyExplorations.js') }}
   </script>
 {% endblock footer_js %}

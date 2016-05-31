@@ -27,8 +27,7 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
     DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
 
     def test_state_rule_answer_logs(self):
-        exp = exp_domain.Exploration.create_default_exploration(
-            'eid', 'title', 'category')
+        exp = exp_domain.Exploration.create_default_exploration('eid')
         exp_services.save_new_exploration('user_id', exp)
 
         state_name = exp.init_state_name
@@ -78,8 +77,7 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
             answer_log.get_top_answers(2), [('answer2', 3), ('answer1', 2)])
 
     def test_recording_answer_for_different_rules(self):
-        exp = exp_domain.Exploration.create_default_exploration(
-            'eid', 'title', 'category')
+        exp = exp_domain.Exploration.create_default_exploration('eid')
         exp_services.save_new_exploration('user_id', exp)
 
         rule = exp_domain.RuleSpec.from_dict({
@@ -106,8 +104,7 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
         self.assertEquals(other_rule_answer_log.total_answer_count, 1)
 
     def test_resolving_answers(self):
-        exp = exp_domain.Exploration.create_default_exploration(
-            'eid', 'title', 'category')
+        exp = exp_domain.Exploration.create_default_exploration('eid')
         exp_services.save_new_exploration('user_id', exp)
 
         state_name = exp.init_state_name

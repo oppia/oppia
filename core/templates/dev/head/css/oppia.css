@@ -110,6 +110,12 @@ body {
   width: 100%;
 }
 
+/* According to the Angular documentation - https://docs.angularjs.org/api/ng/directive/ngCloak -
+   the following rule needs to be added to the css file in order for ng-cloak to work.  */
+[ng\:cloak], [ng-cloak], .ng-cloak {
+  display: none !important;
+}
+
 .oppia-dashboard-container {
   margin: 60px auto 30px auto;
   max-width: 800px;
@@ -446,6 +452,8 @@ textarea {
   opacity: 0.5;
   padding: 4px 8px;
   position: fixed;
+  /* This is needed so that the exploration summary tiles don't overlap the button in the library page. */
+  z-index: 3;
 }
 .oppia-site-feedback:hover,
 .oppia-site-feedback:focus,
@@ -925,7 +933,7 @@ textarea {
   margin-left: auto;
   margin-right: auto;
   max-width: 928px;
-  min-height: 500px;
+  min-height: 300px;
   padding-bottom: 24px;
   padding-top: 24px;
   width: 100vw;
@@ -956,7 +964,7 @@ textarea {
 
 .oppia-library-group {
   display: block;
-  height: 332px;
+  height: 350px;
   margin-bottom: 72px;
   margin-top: 36px;
   max-width: 928px;
@@ -1006,7 +1014,7 @@ textarea {
 
 .oppia-library-carousel-scroll-btn {
   color: #2c4841;
-  cursor: pointer;
+  cursor: default;
   float: left;
   height: 60px;
   margin-top: 100px;
@@ -1035,11 +1043,23 @@ textarea {
 }
 
 .oppia-library-carousel {
-  height: 264px;
+  height: 282px;
   float: left;
   max-width: 848px;
   overflow: hidden;
   position: relative;
+}
+
+.oppia-library-carousel-overlay-left,
+.oppia-library-carousel-overlay-right {
+  /*The display is set in Library.js*/
+  display: none;
+  height: 258px;
+  margin-top: 12px;
+  position: absolute;
+  top: 0;
+  width: 20px;
+  z-index: 99;
 }
 
 .oppia-library-carousel-overlay-left {
@@ -1047,15 +1067,7 @@ textarea {
   background: -moz-linear-gradient(left, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%);
   background: -webkit-linear-gradient(left, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%);
   background: linear-gradient(to right, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%);
-  /*The display is set in Library.js*/
-  display: none;
-  height: 240px;
   left: 0;
-  margin-top: 12px;
-  position: absolute;
-  top: 0;
-  width: 20px;
-  z-index: 99;
 }
 
 .oppia-library-carousel-overlay-right {
@@ -1063,15 +1075,7 @@ textarea {
   background: -moz-linear-gradient(left, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%);
   background: -webkit-linear-gradient(left, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%);
   background: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%);
-  /*The display is set in Library.js*/
-  display: none;
-  height: 240px;
   right: 0;
-  margin-top: 12px;
-  position: absolute;
-  top: 0;
-  width: 20px;
-  z-index: 99;
 }
 
 /* Rules for the tiles in the "My Explorations" page. */
