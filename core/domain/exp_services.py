@@ -1366,6 +1366,22 @@ def _should_index(exp):
     return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
 
 
+def get_average_rank_from_exp_summary(exp_summary):
+    """Returns the average rating of the document. If there are no ratings,
+    it will return 0.
+    """
+    rating_weightings = {'1': 1, '2': 2, '3': 3, '4': 4, '5': 5}
+    if exp_summary.ratings:
+        ranking_sum = 0
+        number_of_rankings = 0
+        for rating_value, rating_count in exp_summary.ratings.items():
+            ranking_sum += rating_weightings[rating_value] * rating_count
+            number_of_rankings += rating_count
+        if number_of_rankings > 0:
+            return ranking_sum / number_of_rankings
+    return 0
+
+
 def get_search_rank_from_exp_summary(exp_summary):
     """Returns an integer determining the document's rank in search.
 

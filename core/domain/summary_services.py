@@ -52,7 +52,7 @@ _LIBRARY_INDEX_GROUPS = [{
         'Business', 'Economics', 'Geography', 'Government', 'History', 'Law'],
 }]
 
-NUMBER_OF_TOP_RATED_EXPLORATIONS = 6
+NUMBER_OF_TOP_RATED_EXPLORATIONS = 8
 
 def get_human_readable_contributors_summary(contributors_summary):
     contributor_ids = contributors_summary.keys()
@@ -224,6 +224,7 @@ def get_featured_exploration_summary_dicts(language_codes):
 
     return _get_displayable_exp_summary_dicts(sorted_exp_summaries)
 
+
 def get_top_rated_exploration_summary_dicts(language_codes):
     """Returns a list of top rated explorations with the given language code.
 
@@ -234,15 +235,20 @@ def get_top_rated_exploration_summary_dicts(language_codes):
         exp_services.get_non_private_exploration_summaries().values()
         if exp_summary.language_code in language_codes]
 
-    search_ranks = {
-        exp_summary.id: exp_services.get_search_rank_from_exp_summary(
+    average_rankings = {
+        exp_summary.id: exp_services.get_average_rank_from_exp_summary(
             exp_summary)
         for exp_summary in filtered_exp_summaries
     }
 
-    sorted_exp_summaries = sorted(
+    sorted_by_ranking_count_exp_summaries = sorted(
         filtered_exp_summaries,
-        key=lambda exp_summary: search_ranks[exp_summary.id],
+        key=lambda exp_summary: len(exp_summary.ratings.keys()),
+        reverse=True)
+
+    sorted_exp_summaries = sorted(
+        sorted_by_ranking_count_exp_summaries,
+        key=lambda exp_summary: average_rankings[exp_summary.id],
         reverse=True)[:NUMBER_OF_TOP_RATED_EXPLORATIONS]
 
     return _get_displayable_exp_summary_dicts(sorted_exp_summaries)

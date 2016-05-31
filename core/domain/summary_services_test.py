@@ -16,6 +16,7 @@
 
 from core.domain import exp_services
 from core.domain import exp_services_test
+from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import summary_services
 from core.domain import user_services
@@ -370,11 +371,20 @@ class TopRatedExplorationDisplayableSummariesTest(
     summary dicts.
     """
 
-    ALBERT_NAME = 'albert'
     ALBERT_EMAIL = 'albert@example.com'
+    ALICE_EMAIL = 'alice@example.com'
+    BOB_EMAIL = 'bob@example.com'
+    ALBERT_NAME = 'albert'
+    ALICE_NAME = 'alice'
+    BOB_NAME = 'bob'
 
     EXP_ID_1 = 'eid1'
     EXP_ID_2 = 'eid2'
+    EXP_ID_3 = 'eid3'
+    EXP_ID_4 = 'eid4'
+    EXP_ID_5 = 'eid5'
+    EXP_ID_6 = 'eid6'
+    EXP_ID_7 = 'eid7'
 
     def setUp(self):
         """Populate the database of explorations and their summaries.
@@ -382,39 +392,76 @@ class TopRatedExplorationDisplayableSummariesTest(
         The sequence of events is:
         - (1) Albert creates EXP_ID_1.
         - (2) Albert creates EXP_ID_2.
-        - (3) Albert publishes EXP_ID_1.
-        - (4) Albert publishes EXP_ID_2.
-        - (5) Admin user is set up.
+        - (3) Albert creates EXP_ID_3.
+        - (4) Albert creates EXP_ID_4.
+        - (5) Albert creates EXP_ID_5.
+        - (6) Albert creates EXP_ID_6.
+        - (7) Albert creates EXP_ID_7.
+        - (8) Albert publishes EXP_ID_1.
+        - (9) Albert publishes EXP_ID_2.
+        - (10) Albert publishes EXP_ID_3.
+        - (11) Albert publishes EXP_ID_4.
+        - (12) Albert publishes EXP_ID_5.
+        - (13) Albert publishes EXP_ID_6.
+        - (14) Albert publishes EXP_ID_7.
+        - (15) Admin user is set up.
         """
 
         super(TopRatedExplorationDisplayableSummariesTest, self).setUp()
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.alice_id = self.get_user_id_from_email(self.ALICE_EMAIL)
+        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
+
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.signup(self.ALICE_EMAIL, self.ALICE_NAME)
+        self.signup(self.BOB_EMAIL, self.BOB_NAME)
 
         self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
         self.save_new_valid_exploration(self.EXP_ID_2, self.albert_id)
+        self.save_new_valid_exploration(self.EXP_ID_3, self.albert_id)
+        self.save_new_valid_exploration(self.EXP_ID_4, self.albert_id)
+        self.save_new_valid_exploration(self.EXP_ID_5, self.albert_id)
+        self.save_new_valid_exploration(self.EXP_ID_6, self.albert_id)
+        self.save_new_valid_exploration(self.EXP_ID_7, self.albert_id)
 
         rights_manager.publish_exploration(self.albert_id, self.EXP_ID_1)
         rights_manager.publish_exploration(self.albert_id, self.EXP_ID_2)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_3)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_4)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_5)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_6)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_7)
 
         self.set_admins([self.ADMIN_USERNAME])
 
     def test_for_top_rated_explorations(self):
-        """Note that EXP_ID_1 is public, and EXP_ID_2 is publicized.
-        The call to get_top_rated_explorations() should only return
-        [EXP_ID_2].
-        """
-
-        rights_manager.publicize_exploration(self.admin_id, self.EXP_ID_2)
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_2, 5)
+        rating_services.assign_rating_to_exploration(
+            self.alice_id, self.EXP_ID_3, 5)
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_3, 4)
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_4, 4)
+        rating_services.assign_rating_to_exploration(
+            self.alice_id, self.EXP_ID_5, 4)
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_5, 3)
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_6, 3)
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_6, 2)
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_7, 1)
 
         top_rated_exploration_summaries = (
             summary_services.get_top_rated_exploration_summary_dicts([
                 feconf.DEFAULT_LANGUAGE_CODE]))
         expected_summary = {
-            'status': u'publicized',
+            'status': u'public',
             'thumbnail_bg_color': '#a33f40',
             'community_owned': False,
             'tags': [],
@@ -422,10 +469,13 @@ class TopRatedExplorationDisplayableSummariesTest(
             'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
             'category': u'A category',
-            'ratings': feconf.get_empty_ratings(),
+            'ratings': {u'1': 0, u'3': 0, u'2': 0, u'5': 1, u'4': 0},
             'title': u'A title',
             'num_views': 0,
             'objective': u'An objective'
         }
+
         self.assertDictContainsSubset(
             expected_summary, top_rated_exploration_summaries[0])
+
+        self.assertEqual(7, len(top_rated_exploration_summaries))
