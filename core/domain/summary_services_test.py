@@ -465,7 +465,13 @@ class TopRatedExplorationDisplayableSummariesTest(
         rating_services.assign_rating_to_exploration(
             self.bob_id, self.EXP_ID_6, 2)
         rating_services.assign_rating_to_exploration(
-            self.bob_id, self.EXP_ID_7, 1)
+            self.bob_id, self.EXP_ID_7, 2)
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_8, 2)
+        rating_services.assign_rating_to_exploration(
+            self.alice_id, self.EXP_ID_8, 2)
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_9, 2)
 
         top_rated_exploration_summaries = (
             summary_services.get_top_rated_exploration_summary_dicts([
@@ -488,4 +494,11 @@ class TopRatedExplorationDisplayableSummariesTest(
         self.assertDictContainsSubset(
             expected_summary, top_rated_exploration_summaries[0])
 
-        self.assertEqual(8, len(top_rated_exploration_summaries))
+        expected_ordering = [
+            self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_4, self.EXP_ID_5,
+            self.EXP_ID_6, self.EXP_ID_7, self.EXP_ID_8, self.EXP_ID_9]
+
+        actual_orderings = [exploration['id'] for exploration in
+                            top_rated_exploration_summaries]
+
+        self.assertEqual(expected_ordering, actual_orderings)
