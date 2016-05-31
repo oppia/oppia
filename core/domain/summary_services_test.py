@@ -448,6 +448,8 @@ class TopRatedExplorationDisplayableSummariesTest(
         self.set_admins([self.ADMIN_USERNAME])
 
     def test_for_top_rated_explorations(self):
+        """Note that at most 8 explorations should be returned.
+        """
         rating_services.assign_rating_to_exploration(
             self.bob_id, self.EXP_ID_2, 5)
         rating_services.assign_rating_to_exploration(
