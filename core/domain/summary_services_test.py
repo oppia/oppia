@@ -507,8 +507,7 @@ class TopRatedExplorationDisplayableSummariesTest(
 
         self.assertEqual(expected_ordering, actual_ordering)
 
-
-    def test_all_top_rated_explorations_have_ratings(self):
+    def test_only_explorations_with_ratings_are_returned(self):
         """Note that only explorations with ratings will be included
         """
         rating_services.assign_rating_to_exploration(
