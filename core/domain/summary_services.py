@@ -246,7 +246,7 @@ def get_top_rated_exploration_summary_dicts(language_codes):
 
     sorted_by_ratings_count_exp_summaries = sorted(
         filtered_exp_summaries,
-        key=lambda exp_summary: len(exp_summary.ratings.keys()),
+        key=lambda exp_summary: sum(exp_summary.ratings.values()),
         reverse=True)
 
     sorted_exp_summaries = sorted(

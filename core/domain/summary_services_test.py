@@ -463,13 +463,13 @@ class TopRatedExplorationDisplayableSummariesTest(
         rating_services.assign_rating_to_exploration(
             self.bob_id, self.EXP_ID_6, 3)
         rating_services.assign_rating_to_exploration(
-            self.bob_id, self.EXP_ID_6, 2)
-        rating_services.assign_rating_to_exploration(
-            self.bob_id, self.EXP_ID_7, 2)
+            self.alice_id, self.EXP_ID_6, 2)
         rating_services.assign_rating_to_exploration(
             self.bob_id, self.EXP_ID_8, 2)
         rating_services.assign_rating_to_exploration(
             self.alice_id, self.EXP_ID_8, 2)
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_7, 2)
         rating_services.assign_rating_to_exploration(
             self.bob_id, self.EXP_ID_9, 2)
 
@@ -496,9 +496,9 @@ class TopRatedExplorationDisplayableSummariesTest(
 
         expected_ordering = [
             self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_4, self.EXP_ID_5,
-            self.EXP_ID_6, self.EXP_ID_7, self.EXP_ID_8, self.EXP_ID_9]
+            self.EXP_ID_6, self.EXP_ID_8, self.EXP_ID_7, self.EXP_ID_9]
 
-        actual_orderings = [exploration['id'] for exploration in
-                            top_rated_exploration_summaries]
+        actual_ordering = [exploration['id'] for exploration in
+                           top_rated_exploration_summaries]
 
-        self.assertEqual(expected_ordering, actual_orderings)
+        self.assertEqual(expected_ordering, actual_ordering)
