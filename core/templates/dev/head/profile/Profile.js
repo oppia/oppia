@@ -75,11 +75,12 @@ oppia.controller('Profile', [
       $scope.Math = window.Math;
 
       $scope.profileIsOfCurrentUser = function() {
-        if GLOBALS.PROFILE_USERNAME == data.profile_username
-          $scope.profileIsOfCurrentUser = True
-        else
-          $scope.profileIsOfCurrentUser = False
-      }
+        if (GLOBALS.PROFILE_USERNAME == data.profile_username) {
+          ($scope.profileIsOfCurrentUser = True);
+        } else {
+          ($scope.profileIsOfCurrentUser = False);
+        }
+      };
 
       $scope.goToPreviousPage = function() {
         if ($scope.currentPageNumber === 0) {
