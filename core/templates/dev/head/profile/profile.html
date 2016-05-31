@@ -33,14 +33,13 @@
   <div class="oppia-profile-container" ng-controller="Profile">
     <md-card class="oppia-profile-user-card">
 
-      <div ng-if=" '{{username}}' == '{{PROFILE_USERNAME}}' ">
+      <div ng-if="profileIsOfCurrentUser">
         <a href="/preferences"> 
-          <img ng-src="<[profilePictureDataUrl]>"
-             class="oppia-profile-picture-fullsize"> 
+          <img ng-src="<[profilePictureDataUrl]>" class="oppia-profile-picture-fullsize"> 
         </a>
       </div>
 
-      <div ng-if=" 'username' != 'PROFILE_USERNAME' ">
+      <div ng-if="profileIsOfCurrentUser">
         <img ng-src="<[profilePictureDataUrl]>"
              class="oppia-profile-picture-fullsize">
       </div>

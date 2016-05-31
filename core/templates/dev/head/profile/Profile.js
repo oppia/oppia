@@ -74,6 +74,13 @@ oppia.controller('Profile', [
       $scope.endingExplorationNumber = 6;
       $scope.Math = window.Math;
 
+      $scope.profileIsOfCurrentUser = function() {
+        if GLOBALS.PROFILE_USERNAME == data.profile_username
+          $scope.profileIsOfCurrentUser = True
+        else
+          $scope.profileIsOfCurrentUser = False
+      }
+
       $scope.goToPreviousPage = function() {
         if ($scope.currentPageNumber === 0) {
           console.log('Error: cannot decrement page');
@@ -116,6 +123,7 @@ oppia.controller('Profile', [
       $scope.profilePictureDataUrl = (
         data.profile_picture_data_url || DEFAULT_PROFILE_PICTURE_URL);
       $rootScope.loadingMessage = '';
+
     });
   }
 ]);
