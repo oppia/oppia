@@ -23,6 +23,17 @@ from core.domain import user_services
 import utils
 
 _LIBRARY_INDEX_GROUPS = [{
+    'header': 'Recently Published',
+    'search_categories': [
+        'Mathematics', 'Algebra', 'Arithmetic', 'Calculus', 'Combinatorics',
+        'Geometry', 'Graph Theory', 'Logic', 'Probability', 'Statistics',
+        'Trigonometry', 'Algorithms', 'Computing', 'Programming', 'Astronomy',
+        'Biology', 'Chemistry', 'Engineering', 'Environment',
+        'Medicine', 'Physics', 'Architecture', 'Art', 'Music', 'Philosophy',
+        'Poetry', 'Languages', 'Reading', 'English', 'Latin', 'Business',
+        'Economics', 'Geography', 'Government', 'History', 'Law'
+    ],
+}, {
     'header': 'Mathematics & Statistics',
     'search_categories': [
         'Mathematics', 'Algebra', 'Arithmetic', 'Calculus', 'Combinatorics',
@@ -130,6 +141,9 @@ def _get_displayable_exp_summary_dicts(exploration_summaries):
             'last_updated_msec': utils.get_time_in_millisecs(
                 exploration_summary.exploration_model_last_updated
             ),
+            'created_on': utils.get_time_in_millisecs(
+                exploration_summary.exploration_model_created_on
+            ),
             'status': exploration_summary.status,
             'ratings': exploration_summary.ratings,
             'community_owned': exploration_summary.community_owned,
@@ -187,7 +201,7 @@ def get_library_groups(language_codes):
         summary_dicts = [
             all_summary_dicts[exp_id] for exp_id in exp_ids_to_display
             if exp_id in all_summary_dicts]
-
+        summary_dicts = sorted(summary_dicts, key=lambda k: k['created_on'])
         if not summary_dicts:
             continue
 
