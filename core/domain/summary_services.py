@@ -97,7 +97,8 @@ def get_displayable_exp_summary_dicts_matching_ids(
 
         filtered_exploration_summaries.append(exploration_summary)
 
-    return _get_displayable_exp_summary_dicts(filtered_exploration_summaries)
+    return _get_displayable_exp_summary_dicts(
+        filtered_exploration_summaries, include_contributors=False)
 
 
 def _get_displayable_exp_summary_dicts(

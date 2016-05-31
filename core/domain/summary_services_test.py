@@ -182,13 +182,6 @@ class ExplorationDisplayableSummariesTest(
         expected_summary = {
             'category': u'A category',
             'community_owned': False,
-            'human_readable_contributors_summary': {
-                self.ALBERT_NAME: {
-                    'num_commits': 2,
-                    'profile_picture_data_url': (
-                        user_services.DEFAULT_IDENTICON_DATA_URL)
-                }
-            },
             'id': self.EXP_ID_2,
             'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'num_views': 0,
