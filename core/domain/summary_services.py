@@ -233,7 +233,8 @@ def get_top_rated_exploration_summary_dicts(language_codes):
     filtered_exp_summaries = [
         exp_summary for exp_summary in
         exp_services.get_non_private_exploration_summaries().values()
-        if exp_summary.language_code in language_codes]
+        if exp_summary.language_code in language_codes and
+        sum(exp_summary.ratings.values()) > 0]
 
     average_ratings = {
         exp_summary.id: exp_services.get_average_rating_from_exp_summary(

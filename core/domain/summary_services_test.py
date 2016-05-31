@@ -447,7 +447,7 @@ class TopRatedExplorationDisplayableSummariesTest(
 
         self.set_admins([self.ADMIN_USERNAME])
 
-    def test_for_top_rated_explorations(self):
+    def test_at_most_eight_top_rated_explorations(self):
         """Note that at most 8 explorations should be returned.
         """
         rating_services.assign_rating_to_exploration(
@@ -474,6 +474,8 @@ class TopRatedExplorationDisplayableSummariesTest(
             self.bob_id, self.EXP_ID_7, 2)
         rating_services.assign_rating_to_exploration(
             self.bob_id, self.EXP_ID_9, 2)
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_1, 1)
 
         top_rated_exploration_summaries = (
             summary_services.get_top_rated_exploration_summary_dicts([
@@ -499,6 +501,41 @@ class TopRatedExplorationDisplayableSummariesTest(
         expected_ordering = [
             self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_4, self.EXP_ID_5,
             self.EXP_ID_6, self.EXP_ID_8, self.EXP_ID_7, self.EXP_ID_9]
+
+        actual_ordering = [exploration['id'] for exploration in
+                           top_rated_exploration_summaries]
+
+        self.assertEqual(expected_ordering, actual_ordering)
+
+
+    def test_all_top_rated_explorations_have_ratings(self):
+        """Note that only explorations with ratings will be included
+        """
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_2, 5)
+
+        top_rated_exploration_summaries = (
+            summary_services.get_top_rated_exploration_summary_dicts([
+                feconf.DEFAULT_LANGUAGE_CODE]))
+
+        expected_summary = {
+            'status': u'public',
+            'thumbnail_bg_color': '#a33f40',
+            'community_owned': False,
+            'tags': [],
+            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'id': self.EXP_ID_2,
+            'category': u'A category',
+            'ratings': {u'1': 0, u'3': 0, u'2': 0, u'5': 1, u'4': 0},
+            'title': u'A title',
+            'num_views': 0,
+            'objective': u'An objective'
+        }
+        self.assertDictContainsSubset(
+            expected_summary, top_rated_exploration_summaries[0])
+
+        expected_ordering = [self.EXP_ID_2]
 
         actual_ordering = [exploration['id'] for exploration in
                            top_rated_exploration_summaries]
