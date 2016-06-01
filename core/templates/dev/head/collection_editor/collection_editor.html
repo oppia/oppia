@@ -27,49 +27,53 @@
 {% endblock header_js %}
 
 {% block content %}
-  <div ng-controller="CollectionEditor">
-    <div ng-if="collection">
-      <!-- Collection details -->
-      <collection-details-editor-directive collection="collection">
-      </collection-details-editor-directive>
-      <a ng-href="/collection/<[collection.getId()]>" target="_blank">Go to Collection</a>
+  <div class="oppia-page-cards-container">
+    <md-card class="oppia-page-card oppia-long-text">
+      <div ng-controller="CollectionEditor">
+        <div ng-if="collection">
+          <!-- Collection details -->
+          <collection-details-editor-directive collection="collection">
+          </collection-details-editor-directive>
+          <a ng-href="/collection/<[collection.getId()]>" target="_blank">Go to Collection</a>
 
-      <!-- List of acquired and pre-requisite skills -->
-      <br>
-      <br>
-      <strong>Skills</strong>
-      <collection-skill-list-directive collection-skill-list="collectionSkillList">
-      </collection-skill-list-directive>
+          <!-- List of acquired and pre-requisite skills -->
+          <br>
+          <br>
+          <strong>Skills</strong>
+          <collection-skill-list-directive collection-skill-list="collectionSkillList">
+          </collection-skill-list-directive>
 
-      <!-- List of explorations -->
-      <br>
-      <strong>Explorations</strong>
-      <ul>
-        <li ng-repeat="node in collection.getBindableCollectionNodes()">
-          <collection-node-editor-directive collection="collection" collection-node="node" update-skill-list="updateSkillList()">
-          </collection-node-editor-directive>
-        </li>
-      </ul>
+          <!-- List of explorations -->
+          <br>
+          <strong>Explorations</strong>
+          <ul>
+            <li ng-repeat="node in collection.getBindableCollectionNodes()">
+              <collection-node-editor-directive collection="collection" collection-node="node" update-skill-list="updateSkillList()">
+              </collection-node-editor-directive>
+            </li>
+          </ul>
 
-      <!-- A list of validation errors, if there are any -->
-      <div ng-if="validationIssues.length > 0">
-        <strong>Errors that must be addressed before saving:</strong>
-        <ul>
-          <li ng-repeat="issue in validationIssues"><[issue]></li>
-        </ul>
+          <!-- A list of validation errors, if there are any -->
+          <div ng-if="validationIssues.length > 0">
+            <strong>Errors that must be addressed before saving:</strong>
+            <ul>
+              <li ng-repeat="issue in validationIssues"><[issue]></li>
+            </ul>
+          </div>
+
+          <!-- Collection changes to be commited -->
+          <h3><span ng-if="getChangeListCount() > 0"> <em>(<[getChangeListCount()]> changes pending)</em></h3>
+          <br>
+          <input ng-model="commitMessage" type="text" placeholder="Commit Message"><button ng-click="saveCollection(commitMessage)" ng-disabled="validationIssues.length > 0">Save Collection</button>
+          <button ng-click="publishCollection()" ng-if="isPrivate">Publish Collection</button>
+          <button ng-click="unpublishCollection()" ng-if="!isPrivate && canUnpublish">Unpublish Collection</button>
+
+          <hr>
+
+          <collection-new-node-creator collection="collection">
+          </collection-new-node-creator>
+        </div>
       </div>
-
-      <!-- Collection changes to be commited -->
-      <h3><span ng-if="getChangeListCount() > 0"> <em>(<[getChangeListCount()]> changes pending)</em></h3>
-      <br>
-      <input ng-model="commitMessage" type="text" placeholder="Commit Message"><button ng-click="saveCollection(commitMessage)" ng-disabled="validationIssues.length > 0">Save Collection</button>
-      <button ng-click="publishCollection()" ng-if="isPrivate">Publish Collection</button>
-      <button ng-click="unpublishCollection()" ng-if="!isPrivate && canUnpublish">Unpublish Collection</button>
-
-      <hr>
-
-      <collection-new-node-creator collection="collection">
-      </collection-new-node-creator>
     </div>
   </div>
 
