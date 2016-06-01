@@ -473,6 +473,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
             self.EXP_ID)
         self.assertIsNone(collection_node_dicts[1]['exploration_summary'])
 
+
 class TopRatedExplorationDisplayableSummariesTest(
         test_utils.GenericTestBase):
     """Test functions for getting displayable top rated exploration
