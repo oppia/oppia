@@ -16,6 +16,7 @@
 
 from core.domain import exp_services
 from core.domain import exp_services_test
+from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import summary_services
 from core.domain import user_services
@@ -182,13 +183,6 @@ class ExplorationDisplayableSummariesTest(
         expected_summary = {
             'category': u'A category',
             'community_owned': False,
-            'human_readable_contributors_summary': {
-                self.ALBERT_NAME: {
-                    'num_commits': 2,
-                    'profile_picture_data_url': (
-                        user_services.DEFAULT_IDENTICON_DATA_URL)
-                }
-            },
             'id': self.EXP_ID_2,
             'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'num_views': 0,
@@ -270,7 +264,6 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
         expected_exploration_summary_dict = {
             'category': u'Algorithms',
             'community_owned': True,
-            'human_readable_contributors_summary': {},
             'id': '2',
             'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'num_views': 0,
@@ -362,3 +355,180 @@ class FeaturedExplorationDisplayableSummariesTest(
         }
         self.assertDictContainsSubset(
             expected_summary, featured_exploration_summaries[0])
+
+
+class TopRatedExplorationDisplayableSummariesTest(
+        test_utils.GenericTestBase):
+    """Test functions for getting displayable top rated exploration
+    summary dicts.
+    """
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALICE_EMAIL = 'alice@example.com'
+    BOB_EMAIL = 'bob@example.com'
+    ALBERT_NAME = 'albert'
+    ALICE_NAME = 'alice'
+    BOB_NAME = 'bob'
+
+    EXP_ID_1 = 'eid1'
+    EXP_ID_2 = 'eid2'
+    EXP_ID_3 = 'eid3'
+    EXP_ID_4 = 'eid4'
+    EXP_ID_5 = 'eid5'
+    EXP_ID_6 = 'eid6'
+    EXP_ID_7 = 'eid7'
+    EXP_ID_8 = 'eid8'
+    EXP_ID_9 = 'eid9'
+
+    def setUp(self):
+        """Populate the database of explorations and their summaries.
+
+        The sequence of events is:
+        - (1) Albert creates EXP_ID_1.
+        - (2) Albert creates EXP_ID_2.
+        - (3) Albert creates EXP_ID_3.
+        - (4) Albert creates EXP_ID_4.
+        - (5) Albert creates EXP_ID_5.
+        - (6) Albert creates EXP_ID_6.
+        - (7) Albert creates EXP_ID_7.
+        - (8) Albert creates EXP_ID_8.
+        - (9) Albert creates EXP_ID_9.
+        - (10) Albert publishes EXP_ID_1.
+        - (11) Albert publishes EXP_ID_2.
+        - (12) Albert publishes EXP_ID_3.
+        - (13) Albert publishes EXP_ID_4.
+        - (14) Albert publishes EXP_ID_5.
+        - (15) Albert publishes EXP_ID_6.
+        - (16) Albert publishes EXP_ID_7.
+        - (17) Albert publishes EXP_ID_8.
+        - (18) Albert publishes EXP_ID_9.
+        - (19) Admin user is set up.
+        """
+
+        super(TopRatedExplorationDisplayableSummariesTest, self).setUp()
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.alice_id = self.get_user_id_from_email(self.ALICE_EMAIL)
+        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
+
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.signup(self.ALICE_EMAIL, self.ALICE_NAME)
+        self.signup(self.BOB_EMAIL, self.BOB_NAME)
+
+        self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
+        self.save_new_valid_exploration(self.EXP_ID_2, self.albert_id)
+        self.save_new_valid_exploration(self.EXP_ID_3, self.albert_id)
+        self.save_new_valid_exploration(self.EXP_ID_4, self.albert_id)
+        self.save_new_valid_exploration(self.EXP_ID_5, self.albert_id)
+        self.save_new_valid_exploration(self.EXP_ID_6, self.albert_id)
+        self.save_new_valid_exploration(self.EXP_ID_7, self.albert_id)
+        self.save_new_valid_exploration(self.EXP_ID_8, self.albert_id)
+        self.save_new_valid_exploration(self.EXP_ID_9, self.albert_id)
+
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_1)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_2)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_3)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_4)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_5)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_6)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_7)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_8)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_9)
+
+        self.set_admins([self.ADMIN_USERNAME])
+
+    def test_at_most_eight_top_rated_explorations(self):
+        """Note that at most 8 explorations should be returned.
+        """
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_2, 5)
+        rating_services.assign_rating_to_exploration(
+            self.alice_id, self.EXP_ID_3, 5)
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_3, 4)
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_4, 4)
+        rating_services.assign_rating_to_exploration(
+            self.alice_id, self.EXP_ID_5, 4)
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_5, 3)
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_6, 3)
+        rating_services.assign_rating_to_exploration(
+            self.alice_id, self.EXP_ID_6, 2)
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_8, 2)
+        rating_services.assign_rating_to_exploration(
+            self.alice_id, self.EXP_ID_8, 2)
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_7, 2)
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_9, 2)
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_1, 1)
+
+        top_rated_exploration_summaries = (
+            summary_services.get_top_rated_exploration_summary_dicts([
+                feconf.DEFAULT_LANGUAGE_CODE]))
+        expected_summary = {
+            'status': u'public',
+            'thumbnail_bg_color': '#a33f40',
+            'community_owned': False,
+            'tags': [],
+            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'id': self.EXP_ID_3,
+            'category': u'A category',
+            'ratings': {u'1': 0, u'3': 0, u'2': 0, u'5': 1, u'4': 1},
+            'title': u'A title',
+            'num_views': 0,
+            'objective': u'An objective'
+        }
+
+        self.assertDictContainsSubset(
+            expected_summary, top_rated_exploration_summaries[0])
+
+        expected_ordering = [
+            self.EXP_ID_3, self.EXP_ID_2, self.EXP_ID_5, self.EXP_ID_4,
+            self.EXP_ID_6, self.EXP_ID_8, self.EXP_ID_7, self.EXP_ID_9]
+
+        actual_ordering = [exploration['id'] for exploration in
+                           top_rated_exploration_summaries]
+
+        self.assertEqual(expected_ordering, actual_ordering)
+
+    def test_only_explorations_with_ratings_are_returned(self):
+        """Note that only explorations with ratings will be included
+        """
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_2, 5)
+
+        top_rated_exploration_summaries = (
+            summary_services.get_top_rated_exploration_summary_dicts([
+                feconf.DEFAULT_LANGUAGE_CODE]))
+
+        expected_summary = {
+            'status': u'public',
+            'thumbnail_bg_color': '#a33f40',
+            'community_owned': False,
+            'tags': [],
+            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'id': self.EXP_ID_2,
+            'category': u'A category',
+            'ratings': {u'1': 0, u'3': 0, u'2': 0, u'5': 1, u'4': 0},
+            'title': u'A title',
+            'num_views': 0,
+            'objective': u'An objective'
+        }
+        self.assertDictContainsSubset(
+            expected_summary, top_rated_exploration_summaries[0])
+
+        expected_ordering = [self.EXP_ID_2]
+
+        actual_ordering = [exploration['id'] for exploration in
+                           top_rated_exploration_summaries]
+
+        self.assertEqual(expected_ordering, actual_ordering)
