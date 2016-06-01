@@ -238,21 +238,13 @@ def get_top_rated_exploration_summary_dicts(language_codes):
 
     lower_bound_wilson_scores = {
         exp_summary.id:
-            exp_services.get_lower_bound_wilson_score_from_exp_summary(
+            exp_services.get_scaled_average_rating_from_exp_summary(
                 exp_summary)
         for exp_summary in filtered_exp_summaries
     }
 
-    # The following two calls to 'sorted' ensure that the return list is sorted
-    # by average rating, breaking ties by the number of ratings.
-
-    sorted_by_ratings_count_exp_summaries = sorted(
-        filtered_exp_summaries,
-        key=lambda exp_summary: sum(exp_summary.ratings.values()),
-        reverse=True)
-
     sorted_exp_summaries = sorted(
-        sorted_by_ratings_count_exp_summaries,
+        filtered_exp_summaries,
         key=lambda exp_summary: lower_bound_wilson_scores[exp_summary.id],
         reverse=True)[:NUMBER_OF_TOP_RATED_EXPLORATIONS]
 
