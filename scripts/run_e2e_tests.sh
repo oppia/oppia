@@ -25,13 +25,8 @@
 #   --skip-install=true/false If true, skips installing dependencies. The
 #         default value is false.
 #   --sharding=true/false Disables/Enables parallelization of protractor tests.
-<<<<<<< HEAD
-#   --sharding-instances=# Sets the number of parallel browsers to open while sharding.
-#   --specs=path/to/specFile.js  Runs only the test in specFile.js
-=======
 #   --sharding-instances=# Sets the number of parallel browsers to open while
 #         sharding.
->>>>>>> develop
 # Sharding must be disabled (either by passing in false to --sharding or 1 to
 # --sharding-instances) if running any tests in isolation (iit or ddescribe).
 #   --suite=suite_name Performs test for different suites.
@@ -145,19 +140,11 @@ for j in "$@"; do
     shift
     ;;
 
-<<<<<<< HEAD
-    --specs=*)
-    SPECS="--specs=${i#*=}"
-    shift
-    ;;
-
-=======
     --sharding-instances=*)
     SHARD_INSTANCES="${j#*=}"
     shift
     ;;
- 
->>>>>>> develop
+
     *)
     echo "Error: Unknown command line option: $j"
     ;;
@@ -170,11 +157,7 @@ done
 # in at all.
 # TODO(bhenning): Figure out if this is a bug with protractor.
 if [ "$SHARDING" = "false" ] || [ "$SHARD_INSTANCES" = "1" ]; then
-<<<<<<< HEAD
-  $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js "$SPECS"
-=======
   $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --suite "$SUITE"
->>>>>>> develop
 else
   $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE"
 fi

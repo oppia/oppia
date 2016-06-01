@@ -108,24 +108,13 @@
               <div ng-if="hasPageLoaded">
                 <select2-dropdown choices="LANGUAGE_CHOICES"
                   item="$parent.preferredLanguageCodes" allow-multiple-choices="true"
-<<<<<<< HEAD
-                  new-choice-regex=".^" width="400"
+                  new-choice-regex=".^" width="100%"
                   placeholder="<['I18N_PREFERENCES_SELECT_EXPLORATION_LANGUAGE' | translate]>"
                   on-selection-change="savePreferredLanguageCodes($parent.preferredLanguageCodes)">
                 </select2-dropdown>
               </div>
-              <span class="help-block" style="font-size: smaller" translate="I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE_EXPLAIN"></span>
-=======
-                  new-choice-regex=".^" width="100%"
-                  placeholder="Select preferred languages..."
-                  on-selection-change="savePreferredLanguageCodes($parent.preferredLanguageCodes)">
-                </select2-dropdown>
-              </div>
-              <span class="help-block" style="font-size: smaller">
-                These languages will be selected by default when you search the
-                library for explorations.
+              <span class="help-block" style="font-size: smaller" translate="I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE_EXPLAIN">
               </span>
->>>>>>> develop
             </div>
           </div>
         </div>
@@ -172,13 +161,8 @@
             <div class="col-lg-10 col-md-10 col-sm-10">
               <div class="checkbox">
                 <label>
-<<<<<<< HEAD
-                  <input type="checkbox" ng-model="canReceiveEmailUpdates" ng-change="saveCanReceiveEmailUpdates(canReceiveEmailUpdates)">
-                  <span translate="I18N_PREFERENCES_EMAIL_RECEIVE_NEWS"></span>
-=======
                   <input type="checkbox" ng-model="canReceiveEmailUpdates" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail)">
-                  Receive news and updates about the site
->>>>>>> develop
+                  <span translate="I18N_PREFERENCES_EMAIL_RECEIVE_NEWS"></span>
                 </label>
               </div>
               <div class="checkbox">

@@ -218,11 +218,10 @@ class NotificationsHandler(base.BaseHandler):
         })
 
 
-<<<<<<< HEAD
 class SiteLanguageHandler(base.BaseHandler):
     """Changes the preferred system language in the user's preferences."""
 
-    PAGE_NAME_FOR_CSRF = feconf.CSRF_PAGE_NAME_FOOTER
+    PAGE_NAME_FOR_CSRF = feconf.FOOTER_PAGE_NAME_FOR_CSRF
 
     def put(self):
         """Handles PUT requests."""
@@ -231,7 +230,8 @@ class SiteLanguageHandler(base.BaseHandler):
             user_services.update_preferred_site_language_code(
                 self.user_id, site_language_code)
         self.render_json({})
-=======
+
+
 class NewExploration(base.BaseHandler):
     """Creates a new exploration."""
 
@@ -320,4 +320,3 @@ class UploadExploration(base.BaseHandler):
         else:
             raise self.InvalidInputException(
                 'This server does not allow file uploads.')
->>>>>>> develop

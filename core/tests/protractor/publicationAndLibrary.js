@@ -166,12 +166,12 @@ describe('Library index page', function() {
       EXPLORATION_VINGILOT, CATEGORY_ENVIRONMENT, 'seek the aid of the Valar');
     users.logout();
 
-    browser.get('/gallery');
-    expect(browser.getTitle()).toEqual('Gallery - Oppia');
+    browser.get('/library');
+    expect(browser.getTitle()).toEqual('Oppia - Library');
     general.ensurePageHasNoTranslationIds();
 
-    // Filter gallery explorations
-    gallery.selectLanguages([LANGUAGE_FRANCAIS]);
+    // Filter library explorations
+    library.selectLanguages([LANGUAGE_FRANCAIS]);
     general.ensurePageHasNoTranslationIds();
   });
 

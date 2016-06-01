@@ -129,38 +129,6 @@
       </div>
 
       <div ng-if="isCurrentSupplementalCardNonempty()"
-<<<<<<< HEAD
-           class="conversation-skin-supplemental-card-container"
-           ng-class="{'conversation-skin-right-card-container': isCurrentSupplementalCardNonempty() && isPanelVisible(PANEL_TUTOR) && isPanelVisible(PANEL_SUPPLEMENTAL)}">
-        <div ng-show="isPanelVisible(PANEL_SUPPLEMENTAL)"
-             class="conversation-skin-supplemental-card">
-
-          <div class="conversation-skin-supplemental-interaction-container">
-            <div class="conversation-skin-help-card" ng-if="helpCardHtml">
-              <img class="conversation-skin-oppia-avatar"
-                   ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt="">
-              <button type="button" class="conversation-skin-close-help-card-button"
-                      ng-click="clearHelpCard()" ng-if="!helpCardHasContinueButton">
-                <i class="material-icons md-18">&#xE5CD;</i>
-              </button>
-              <div class="conversation-skin-help-card-content" angular-html-bind="helpCardHtml">
-              </div>
-              <br>
-              <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
-                 focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
-                 ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)"
-                 ng-if="helpCardHasContinueButton"
-                 style="margin-top: 12px;"
-                 translate="I18N_PLAYER_CONTINUE_NEXT_CARD">
-              </md-button>
-            </div>
-
-            <div ng-if="!exploration.isInteractionInline(activeCard.stateName)">
-              <div class="protractor-test-conversation-input"
-                   angular-html-bind="activeCard.interactionHtml">
-              </div>
-            </div>
-=======
            class="conversation-skin-supplemental-card-container">
 
         <img class="conversation-skin-oppia-avatar show-tutor-card"
@@ -177,15 +145,14 @@
             <i class="material-icons md-18">&#xE5CD;</i>
           </button>
           <div class="conversation-skin-help-card-content" angular-html-bind="helpCardHtml">
->>>>>>> develop
           </div>
           <br>
           <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
               focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
               ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)"
               ng-if="helpCardHasContinueButton"
-              style="margin-top: 12px;">
-            Continue to next card
+              style="margin-top: 12px;"
+              translate="I18N_PLAYER_CONTINUE_NEXT_CARD">
           </md-button>
         </div>
 
@@ -218,40 +185,8 @@
   <div ng-if="isOnTerminalCard() && !isIframed && isCurrentCardAtEndOfTranscript() &&
        recommendedExplorationSummaries.length > 0"
        class="conversation-skin-final-recommendations">
-<<<<<<< HEAD
-      <span style="color: #eee;" translate="I18N_PLAYER_RECOMMEND_EXPLORATIONS"></span>
 
-      <div class="oppia-gallery-tiles-container" style="padding-top: 10px;">
-        <exploration-summary-tile ng-repeat="exp in (recommendedExplorationSummaries|limitTo:3) track by $index"
-                                  collection-id="collectionId"
-                                  exploration-id="exp.id"
-                                  exploration-title="exp.title"
-                                  last-updated-msec="exp.last_updated_msec"
-                                  objective="exp.objective"
-                                  category="exp.category"
-                                  ratings="exp.ratings"
-                                  thumbnail-icon-url="exp.thumbnail_icon_url"
-                                  thumbnail-bg-color="exp.thumbnail_bg_color"
-                                  num-views="exp.num_views"
-                                  ng-attr-open-in-new-window="<[isIframed ? 'true' : undefined]>">
-          </exploration-summary-tile>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="conversation-skin-card-switcher" ng-if="panels.length >= 2">
-    <div class="conversation-skin-card-switcher-thumbnails-container">
-      <span ng-repeat="panelName in panels">
-        <a ng-click="setVisiblePanel(panelName)">
-          <img class="conversation-skin-card-switcher-thumbnail img-circle"
-               alt="<[panelName]>"
-               ng-src="<[getThumbnailSrc(panelName)]>"
-               ng-class="{'conversation-skin-card-switcher-thumbnail-active': isPanelVisible(panelName)}">
-        </a>
-      </span>
-=======
-    <span style="color: #eee;">Suggested next:</span>
+    <span style="color: #eee;" translate="I18N_PLAYER_RECOMMEND_EXPLORATIONS"></span>
 
     <div class="oppia-exp-summary-tiles-container" style="padding-top: 10px;">
       <exploration-summary-tile ng-repeat="exp in (recommendedExplorationSummaries|limitTo:3) track by $index"
@@ -268,7 +203,7 @@
                                 is-community-owned="exp.community_owned"
                                 ng-attr-open-in-new-window="<[isIframed ? 'true' : undefined]>">
       </exploration-summary-tile>
->>>>>>> develop
+
     </div>
   </div>
 

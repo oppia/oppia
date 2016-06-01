@@ -470,7 +470,6 @@ oppia.directive('conversationSkin', [function() {
                 exploration.initStateName, _nextFocusLabel));
             $rootScope.loadingMessage = '';
             $scope.hasFullyLoaded = true;
-<<<<<<< HEAD
 
             // If the exploration is embedded, use the exploration language
             // as site language. If the exploration language is not supported
@@ -485,9 +484,6 @@ oppia.directive('conversationSkin', [function() {
                 $translate.use('en');
               }
             }
-
-=======
->>>>>>> develop
             $scope.adjustPageHeight(false, null);
             $window.scrollTo(0, 0);
             focusService.setFocusIfOnDesktop(_nextFocusLabel);

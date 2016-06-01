@@ -42,11 +42,7 @@ class LibraryPageTest(test_utils.GenericTestBase):
         """Test access to the library page."""
         response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
         self.assertEqual(response.status_int, 200)
-<<<<<<< HEAD:core/controllers/galleries_test.py
-        response.mustcontain('I18N_GALLERY_PAGE_TITLE', 'CATEGORIES')
-=======
-        response.mustcontain('Library', 'Categories')
->>>>>>> develop:core/controllers/library_test.py
+        response.mustcontain('I18N_LIBRARY_PAGE_TITLE', 'CATEGORIES')
 
     def test_library_handler_demo_exploration(self):
         """Test the library data handler on demo explorations."""
@@ -190,43 +186,6 @@ class LibraryPageTest(test_utils.GenericTestBase):
             'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
         }, response_dict['explorations_list'][0])
 
-<<<<<<< HEAD:core/controllers/galleries_test.py
-    def test_new_exploration_ids(self):
-        """Test generation of exploration ids."""
-        self.login(self.EDITOR_EMAIL)
-
-        response = self.testapp.get(feconf.GALLERY_URL)
-        self.assertEqual(response.status_int, 200)
-        csrf_token = self.get_csrf_token_from_response(response)
-        exp_a_id = self.post_json(feconf.NEW_EXPLORATION_URL, {
-            'title': self.UNICODE_TEST_STRING,
-            'category': self.UNICODE_TEST_STRING,
-            'objective': 'Learn how to generate exploration ids.',
-            'language_code': feconf.DEFAULT_LANGUAGE_CODE
-        }, csrf_token)[galleries.EXPLORATION_ID_KEY]
-        self.assertEqual(len(exp_a_id), 12)
-
-        self.logout()
-
-    def test_exploration_upload_button(self):
-        """Test that the exploration upload button appears when appropriate."""
-        self.login(self.EDITOR_EMAIL)
-
-        response = self.testapp.get(feconf.GALLERY_URL)
-        self.assertEqual(response.status_int, 200)
-        response.mustcontain(no=['I18N_GALLERY_UPLOAD_EXPLORATION'])
-
-        config_services.set_property(
-            feconf.SYSTEM_COMMITTER_ID, 'allow_yaml_file_upload', True)
-
-        response = self.testapp.get(feconf.GALLERY_URL)
-        self.assertEqual(response.status_int, 200)
-        response.mustcontain('I18N_GALLERY_UPLOAD_EXPLORATION')
-
-        self.logout()
-
-=======
->>>>>>> develop:core/controllers/library_test.py
 
 class CategoryConfigTest(test_utils.GenericTestBase):
 

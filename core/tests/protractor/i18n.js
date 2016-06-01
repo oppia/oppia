@@ -30,14 +30,14 @@ var _selectLanguage = function(language) {
 describe('Site language', function() {
   beforeEach(function() {
     // Starting language is English
-    browser.get('/gallery');
+    browser.get('/library');
     _selectLanguage('English');
-    expect(browser.getTitle()).toEqual('Oppia - Gallery');
+    expect(browser.getTitle()).toEqual('Oppia - Library');
   });
 
   it('should change after selecting a different language', function() {
     _selectLanguage('Español');
-    expect(browser.getTitle()).toEqual('Oppia - Galería');
+    expect(browser.getTitle()).toEqual('Oppia - Librería');
     general.ensurePageHasNoTranslationIds();
   });
 
@@ -63,9 +63,9 @@ describe('Site language', function() {
       function() {
     users.createUser('feanor@example.com', 'Feanor');
     users.login('feanor@example.com');
-    browser.get('/gallery');
+    browser.get('/library');
     _selectLanguage('Español');
-    expect(browser.getTitle()).toEqual('Oppia - Galería');
+    expect(browser.getTitle()).toEqual('Oppia - Librería');
 
     // The preference page shows the last selected language
     browser.get('/preferences');
@@ -79,6 +79,7 @@ describe('Site language', function() {
 
   it('should be used in titles of pages without controllers', function() {
     browser.get('/about');
+    _selectLanguage('English');
     expect(browser.getTitle()).toEqual('About - Oppia');
     _selectLanguage('Español');
     expect(browser.getTitle()).toEqual('Acerca de - Oppia');
@@ -88,7 +89,7 @@ describe('Site language', function() {
   it('should not change in an exploration', function() {
     users.createUser('mangue@example.com', 'Mangue');
     users.login('mangue@example.com', true);
-    browser.get('/gallery');
+    browser.get('/library');
     _selectLanguage('Español');
     admin.reloadExploration('protractor_test_1.yaml');
     // Open exploration

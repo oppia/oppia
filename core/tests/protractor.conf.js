@@ -83,6 +83,10 @@ exports.config = {
       'protractor/userManagement.js',
       'protractor/embedding.js',
       'protractor/preferences.js'
+    ],
+
+    i18n: [
+      'protractor/i18n.js'
     ]
   },
 

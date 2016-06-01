@@ -29,17 +29,12 @@ class HomePageTest(test_utils.GenericTestBase):
     def test_logged_out_homepage(self):
         """Test the logged-out version of the home page."""
         response = self.testapp.get('/')
-<<<<<<< HEAD
-        self.assertEqual(response.status_int, 200)
-        response.mustcontain(
-            'I18N_GALLERY_PAGE_TITLE', 'I18N_SIDEBAR_HOME_ABOUT',
-            'I18N_TOPNAV_SIGN_IN', no=['I18N_TOPNAV_LOGOUT'])
-=======
+
         self.assertEqual(response.status_int, 302)
         self.assertIn('splash', response.headers['location'])
         response.follow().mustcontain(
-            'Oppia - Home', 'About', 'Sign in', no=['Logout'])
->>>>>>> develop
+            'I18N_LIBRARY_PAGE_TITLE', 'I18N_SIDEBAR_ABOUT_LINK',
+            'I18N_TOPNAV_SIGN_IN', no=['I18N_TOPNAV_LOGOUT'])
 
     def test_notifications_dashboard_redirects_for_logged_out_users(self):
         """Test the logged-out view of the notifications dashboard."""
@@ -67,12 +62,7 @@ class HomePageTest(test_utils.GenericTestBase):
         response.mustcontain(
             'I18N_TOPNAV_NOTIFICATIONS', 'I18N_TOPNAV_LOGOUT',
             self.get_expected_logout_url('/'),
-<<<<<<< HEAD
             no=['>I18N_TOPNAV_SIGN_IN<', self.get_expected_login_url('/')])
-=======
-            no=['Sign in', 'Your personal tutor',
-                self.get_expected_login_url('/')])
->>>>>>> develop
         self.logout()
 
 
@@ -273,7 +263,6 @@ class NotificationsDashboardHandlerTest(test_utils.GenericTestBase):
             self.assertNotIn('author_id', response['recent_notifications'][0])
 
 
-<<<<<<< HEAD
 class SiteLanguageHandlerTests(test_utils.GenericTestBase):
 
     def test_save_site_language_handler(self):
@@ -282,10 +271,9 @@ class SiteLanguageHandlerTests(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         language_code = 'es'
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get(feconf.GALLERY_URL)
+        response = self.testapp.get('/preferences')
         self.assertEqual(response.status_int, 200)
-        csrf_token = self.get_csrf_token_from_response(response,
-                                                       for_footer=True)
+        csrf_token = self.get_csrf_token_from_response(response)
         self.put_json(feconf.SITE_LANGUAGE_DATA_URL, {
             'site_language_code': language_code,
         }, csrf_token)
@@ -299,14 +287,15 @@ class SiteLanguageHandlerTests(test_utils.GenericTestBase):
 
     def test_save_site_language_no_user(self):
         """The SiteLanguageHandler handler can be called without a user."""
-        response = self.testapp.get(feconf.GALLERY_URL)
+        response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
         self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(response,
                                                        for_footer=True)
         self.put_json(feconf.SITE_LANGUAGE_DATA_URL, {
             'site_language_code': 'es',
         }, csrf_token)
-=======
+
+
 class CreationButtonsTest(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -346,4 +335,3 @@ class CreationButtonsTest(test_utils.GenericTestBase):
         response.mustcontain('ng-click="showUploadExplorationModal()"')
 
         self.logout()
->>>>>>> develop

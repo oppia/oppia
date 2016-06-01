@@ -23,17 +23,17 @@
 // Flash of Untranslated Content.
 // See http://angular-translate.github.io/docs/#/guide/12_asynchronous-loading
 oppia.constant('DEFAULT_TRANSLATIONS', {
-  I18N_GALLERY_PAGE_TITLE: 'Gallery',
-  I18N_GALLERY_LOADING: 'Loading',
+  I18N_LIBRARY_PAGE_TITLE: 'Library',
+  I18N_LIBRARY_LOADING: 'Loading',
   I18N_SIGNUP_PAGE_SUBTITLE: 'Registration',
   I18N_SIGNUP_PAGE_TITLE: 'Oppia',
-  I18N_GALLERY_SEARCH_PLACEHOLDER: 'What are you curious about?',
-  I18N_GALLERY_ALL_LANGUAGES: 'All Languages',
-  I18N_GALLERY_LANGUAGES_EN: 'English',
-  I18N_GALLERY_ALL_CATEGORIES: 'All Categories',
-  I18N_GALLERY_CREATE_EXPLORATION: 'Create exploration',
-  I18N_SIDEBAR_HOME_LINK: 'Home',
-  I18N_SIDEBAR_HOME_ABOUT: 'About',
+  I18N_LIBRARY_SEARCH_PLACEHOLDER: 'What are you curious about?',
+  I18N_LIBRARY_ALL_LANGUAGES: 'All Languages',
+  I18N_LIBRARY_LANGUAGES_EN: 'English',
+  I18N_LIBRARY_ALL_CATEGORIES: 'All Categories',
+  I18N_LIBRARY_CREATE_EXPLORATION: 'Create exploration',
+  I18N_SIDEBAR_LIBRARY_LINK: 'Home',
+  I18N_SIDEBAR_ABOUT_LINK: 'About',
   I18N_SIDEBAR_PARTICIPATION_PLAYBOOK: 'Participation Playbook',
   I18N_SIDEBAR_FORUM: 'Forum',
   I18N_SIDEBAR_FOLLOW_US: 'Follow Us',
@@ -104,10 +104,10 @@ oppia.config([
 oppia.factory('i18nIdService', function() {
   return {
     // Construct a translation id for gallery from name and a prefix.
-    // Ex: 'categories', 'art' -> 'I18N_GALLERY_CATEGORIES_ART'
+    // Ex: 'categories', 'art' -> 'I18N_LIBRARY_CATEGORIES_ART'
     getGalleryId: function(prefix, name) {
       return (
-        'I18N_GALLERY_' + prefix.toUpperCase() + '_' +
+        'I18N_LIBRARY_' + prefix.toUpperCase() + '_' +
         name.toUpperCase().replace(' ', '_'));
     }
   };

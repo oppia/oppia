@@ -43,33 +43,26 @@
       </div>
       <div class="title-section-mask"></div>
 
-<<<<<<< HEAD
-      <div>
-        <div class="objective protractor-test-exp-summary-tile-objective">
-          <[getObjective() | truncateAndCapitalize: 45]>
-          <span ng-if="!getObjective()" translate="I18N_GALLERY_NO_OBJECTIVE"></span>
-=======
       <div ng-attr-section="<[isWindowLarge ? undefined : 'right-section']>">
         <div ng-if="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
           <[getObjective() | truncateAndCapitalize: 40]>
-          <span ng-if="!getObjective()">No objective specified.</span>
->>>>>>> develop
+          <span ng-if="!getObjective()" translate="I18N_LIBRARY_NO_OBJECTIVE"></span>
         </div>
         <ul layout="row" class="metrics" layout-align="space-between center">
           <li>
             <span class="protractor-test-exp-summary-tile-rating" ng-class="{'rating-disabled': !getAverageRating()}">
-              <span class="fa fa-star fa-lg" tooltip="<['I18N_GALLERY_RATINGS_TOOLTIP' | translate]>" tooltip-placement="top">
+              <span class="fa fa-star fa-lg" tooltip="<['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]>" tooltip-placement="top">
               </span>
               <span ng-if="getAverageRating()">
                 <[getAverageRating() | number:1]>
               </span>
-              <span ng-if="!getAverageRating()" translate="I18N_GALLERY_N/A">
+              <span ng-if="!getAverageRating()" translate="I18N_LIBRARY_N/A">
               </span>
             </span>
           </li>
 
           <li>
-            <span class="fa fa-eye fa-lg" tooltip="<['I18N_GALLERY_VIEWS_TOOLTIP' | translate]>" tooltip-placement="top">
+            <span class="fa fa-eye fa-lg" tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>" tooltip-placement="top">
             </span>
             <[getNumViews() | summarizeNonnegativeNumber]>
           </li>
@@ -78,7 +71,7 @@
             <span ng-if="!wasRecentlyUpdated()">
               <[getLastUpdatedDatetime()]>
             </span>
-            <span ng-if="wasRecentlyUpdated()" class="recently-updated" translate="I18N_GALLERY_UPDATED">
+            <span ng-if="wasRecentlyUpdated()" class="recently-updated" translate="I18N_LIBRARY_UPDATED">
             </span>
           </li>
         </ul>

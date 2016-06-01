@@ -73,15 +73,9 @@ oppia.controller('Signup', [
       if (!$scope.warningText) {
         $http.post('usernamehandler/data', {
           username: $scope.username
-<<<<<<< HEAD
-        }).success(function(data) {
-          if (data.username_is_taken) {
-            $scope.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_TAKEN';
-=======
         }).then(function(response) {
           if (response.data.username_is_taken) {
-            $scope.warningText = 'Sorry, this username is already taken.';
->>>>>>> develop
+            $scope.warningText = 'I18N_SIGNUP_ERROR_USERNAME_TAKEN';
           }
         });
       }
@@ -118,13 +112,7 @@ oppia.controller('Signup', [
     $scope.submitPrerequisitesForm = function(
         agreedToTerms, username, canReceiveEmailUpdates) {
       if (!agreedToTerms) {
-<<<<<<< HEAD
-        warningsData.addWarning('I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
-=======
-        alertsService.addWarning(
-          'In order to edit explorations on this site, you will need to ' +
-          'agree to the site terms.');
->>>>>>> develop
+        alertsService.addWarning('I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
         return;
       }
 
