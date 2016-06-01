@@ -145,6 +145,7 @@ def get_collection_summary_from_model(collection_summary_model):
         collection_summary_model.contributor_ids,
         collection_summary_model.contributors_summary,
         collection_summary_model.version,
+        collection_summary_model.node_count,
         collection_summary_model.collection_model_created_on,
         collection_summary_model.collection_model_last_updated
     )
@@ -543,7 +544,7 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     collection_model.nodes = [
         collection_node.to_dict() for collection_node in collection.nodes
     ]
-
+    collection_model.node_count = len(collection_model.nodes)
     collection_model.commit(committer_id, commit_message, change_list)
     memcache_services.delete(_get_collection_memcache_key(collection.id))
     index_collections_given_ids([collection.id])
@@ -739,6 +740,7 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
 
     collection_model_last_updated = collection.last_updated
     collection_model_created_on = collection.created_on
+    collection_model_node_count = len(collection.nodes)
 
     collection_summary = collection_domain.CollectionSummary(
         collection.id, collection.title, collection.category,
@@ -746,7 +748,8 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
         collection_rights.status, collection_rights.community_owned,
         collection_rights.owner_ids, collection_rights.editor_ids,
         collection_rights.viewer_ids, contributor_ids, contributors_summary,
-        collection.version, collection_model_created_on,
+        collection.version, collection_model_node_count,
+        collection_model_created_on,
         collection_model_last_updated
     )
 
@@ -797,6 +800,7 @@ def save_collection_summary(collection_summary):
         contributor_ids=collection_summary.contributor_ids,
         contributors_summary=collection_summary.contributors_summary,
         version=collection_summary.version,
+        node_count=collection_summary.node_count,
         collection_model_last_updated=(
             collection_summary.collection_model_last_updated),
         collection_model_created_on=(

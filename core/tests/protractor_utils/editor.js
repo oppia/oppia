@@ -963,16 +963,17 @@ var runFromSettingsTab = function(callbackFunction) {
 
 var setTitle = function(title) {
   runFromSettingsTab(function() {
-    element(by.css('protractor-test-exploration-title-input')).clear();
-    element(by.css('protractor-test-exploration-title-input')).sendKeys(title);
+    element(by.css('.protractor-test-exploration-title-input')).clear();
+    element(by.css('.protractor-test-exploration-title-input')).sendKeys(
+      title);
   });
 };
 
 var setCategory = function(category) {
   runFromSettingsTab(function() {
-    element(by.css('.protractor-test-exploration-category-input')).clear();
-    element(by.css('.protractor-test-exploration-category-input')).
-      sendKeys(category);
+    forms.AutocompleteDropdownEditor(
+      element(by.css('.protractor-test-exploration-category-input'))
+    ).setValue(category);
   });
 };
 

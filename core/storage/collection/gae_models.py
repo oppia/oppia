@@ -325,6 +325,8 @@ class CollectionSummaryModel(base_models.BaseModel):
     # The version number of the collection after this commit. Only populated
     # for commits to an collection (as opposed to its rights, etc.)
     version = ndb.IntegerProperty()
+    # The number of nodes(explorations) that are within this collection.
+    node_count = ndb.IntegerProperty()
 
     @classmethod
     def get_non_private(cls):

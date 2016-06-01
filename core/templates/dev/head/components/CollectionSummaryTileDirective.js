@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2016 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ oppia.directive('collectionSummaryTile', [function() {
       getCollectionId: '&collectionId',
       getCollectionTitle: '&collectionTitle',
       getObjective: '&objective',
-      getNumExplorations: '&numExplorations',
+      getNodeCount: '&nodeCount',
       getLastUpdatedMsec: '&lastUpdatedMsec',
       getThumbnailIconUrl: '&thumbnailIconUrl',
       getThumbnailBgColor: '&thumbnailBgColor'
@@ -47,9 +47,8 @@ oppia.directive('collectionSummaryTile', [function() {
 
         $scope.getCollectionLink = function() {
           return UrlInterpolationService.interpolateUrl(
-            COLLECTION_VIEWER_URL,
-            {
-              collection_id: ($scope.getCollectionId()).toString()
+            COLLECTION_VIEWER_URL, {
+              collection_id: $scope.getCollectionId()
             }
           );
         };

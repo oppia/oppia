@@ -593,16 +593,11 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             collection_services.delete_collection(
                 self.owner_id, self.COLLECTION_ID)
 
-    def test_create_new_collection_error_cases(self):
-        collection = collection_domain.Collection.create_default_collection(
-            self.COLLECTION_ID, '', '', '')
-        with self.assertRaisesRegexp(Exception, 'between 1 and 50 characters'):
-            collection_services.save_new_collection(self.owner_id, collection)
-
-        collection = collection_domain.Collection.create_default_collection(
-            self.COLLECTION_ID, 'title', '', '')
-        with self.assertRaisesRegexp(Exception, 'between 1 and 50 characters'):
-            collection_services.save_new_collection(self.owner_id, collection)
+    def test_create_new_collection(self):
+        # Test that creating a new collection (with an empty title, etc.)
+        # succeeds.
+        collection_domain.Collection.create_default_collection(
+            self.COLLECTION_ID)
 
     def test_save_and_retrieve_collection(self):
         collection = self.save_new_valid_collection(
@@ -1464,8 +1459,8 @@ class CollectionSearchTests(CollectionServicesUnitTests):
         self.assertEqual(results, [])
 
         collection_services.load_demo('0')
-        results = collection_services.search_collections('Mathematics', 2)[0]
-        self.assertEqual(results, [])
+        results = collection_services.search_collections('Welcome', 2)[0]
+        self.assertEqual(results, ['0'])
 
     def test_index_collections_given_ids(self):
         all_collection_ids = ['id0', 'id1', 'id2', 'id3', 'id4']

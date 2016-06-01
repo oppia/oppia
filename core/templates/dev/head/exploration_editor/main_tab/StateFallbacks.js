@@ -30,8 +30,8 @@ oppia.controller('StateFallbacks', [
 
     $scope.$on('stateEditorInitialized', function(evt, stateData) {
       stateFallbacksService.init(
-        $scope.stateName, stateData.interaction.fallbacks,
-        stateData.interaction, 'fallbacks');
+        editorContextService.getActiveStateName(),
+        stateData.interaction.fallbacks);
 
       $scope.activeFallbackIndex = null;
     });
@@ -127,7 +127,7 @@ oppia.controller('StateFallbacks', [
         ]
       }).result.then(function(result) {
         stateFallbacksService.displayed.push(result.fallback);
-        saveFallbacksChanges();
+        stateFallbacksService.saveDisplayedValue();
       });
     };
 
@@ -148,7 +148,7 @@ oppia.controller('StateFallbacks', [
         ui.placeholder.height(ui.item.height());
       },
       stop: function() {
-        saveFallbacksChanges();
+        stateFallbacksService.saveDisplayedValue();
       }
     };
 
@@ -175,22 +175,12 @@ oppia.controller('StateFallbacks', [
         ]
       }).result.then(function() {
         stateFallbacksService.displayed.splice(index, 1);
-        saveFallbacksChanges();
+        stateFallbacksService.saveDisplayedValue();
       });
     };
 
     $scope.onComponentSave = function() {
-      saveFallbacksChanges();
-    };
-
-    var saveFallbacksChanges = function() {
       stateFallbacksService.saveDisplayedValue();
-
-      var activeStateName = editorContextService.getActiveStateName();
-      var _stateDict = explorationStatesService.getState(activeStateName);
-      _stateDict.interaction.fallbacks = angular.copy(
-        stateFallbacksService.savedMemento);
-      explorationStatesService.setState(activeStateName, _stateDict);
     };
   }
 ]);

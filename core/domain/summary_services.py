@@ -53,6 +53,7 @@ _LIBRARY_INDEX_GROUPS = [{
         'Business', 'Economics', 'Geography', 'Government', 'History', 'Law'],
 }]
 
+NUMBER_OF_TOP_RATED_EXPLORATIONS = 8
 
 def get_human_readable_contributors_summary(contributors_summary):
     contributor_ids = contributors_summary.keys()
@@ -88,8 +89,8 @@ def get_learner_collection_dict_by_id(
         collection_id, strict=strict, version=version)
 
     exp_ids = collection.exploration_ids
-    exp_summary_dicts = (get_displayable_exp_summary_dicts_matching_ids(
-        exp_ids, editor_user_id=user_id))
+    exp_summary_dicts = get_displayable_exp_summary_dicts_matching_ids(
+        exp_ids, editor_user_id=user_id)
     exp_summaries_dict_map = {
         exp_summary_dict['id']: exp_summary_dict
         for exp_summary_dict in exp_summary_dicts
@@ -147,13 +148,13 @@ def get_learner_collection_dict_by_id(
     return collection_dict
 
 
-def get_displayable_col_summary_dicts_matching_ids(col_ids):
+def get_displayable_collection_summary_dicts_matching_ids(collection_ids):
     """Returns a list with all collection summary objects that can be
     displayed on the gallery page as collection summary tiles.
     """
-    col_summaries = collection_services.get_collection_summaries_matching_ids(
-        col_ids)
-    return _get_displayable_col_summary_dicts(col_summaries)
+    collection_summaries = collection_services.get_collection_summaries_matching_ids(
+        collection_ids)
+    return _get_displayable_collection_summary_dicts(collection_summaries)
 
 
 def get_displayable_exp_summary_dicts_matching_ids(
@@ -234,29 +235,25 @@ def _get_displayable_exp_summary_dicts(exploration_summaries):
 
     return displayable_exp_summaries
 
-def _get_displayable_col_summary_dicts(col_summaries):
-    col_summaries_to_display = []
-    for col_summary in col_summaries:
-        if col_summary and col_summary.status != (
+def _get_displayable_collection_summary_dicts(collection_summaries):
+    displayable_collection_summaries = []
+    for collection_summary in collection_summaries:
+        if collection_summary and collection_summary.status != (
                 rights_manager.ACTIVITY_STATUS_PRIVATE):
-            col_summaries_to_display.append({
-                'id': col_summary.id,
-                'title': col_summary.title,
-                'category': col_summary.category,
+            displayable_collection_summaries.append({
+                'id': collection_summary.id,
+                'title': collection_summary.title,
+                'category': collection_summary.category,
                 'activity_type': rights_manager.ACTIVITY_TYPE_COLLECTION,
-                'objective': col_summary.objective,
-                'num_explorations': len(
-                    collection_services.get_collection_by_id(
-                        col_summary.id).nodes),
+                'objective': collection_summary.objective,
+                'node_count': collection_summary.node_count,
                 'last_updated_msec': utils.get_time_in_millisecs(
-                    col_summary.collection_model_last_updated),
+                    collection_summary.collection_model_last_updated),
                 'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
-                    col_summary.category),
+                    collection_summary.category),
                 'thumbnail_bg_color': utils.get_hex_color_for_category(
-                    col_summary.category)})
-    return col_summaries_to_display
-
-
+                    collection_summary.category)})
+    return displayable_collection_summaries
 
 def get_library_groups(language_codes):
     """Returns a list of groups for the library index page. Each group has a
@@ -274,24 +271,22 @@ def get_library_groups(language_codes):
 
     # Collect all collection ids so that the summary details can be retrieved
     # with a single get_multi() call.
-    all_col_ids = []
-    header_to_col_ids = {}
+    all_collection_ids = []
+    header_to_collection_ids = {}
     for group in _LIBRARY_INDEX_GROUPS:
-        col_ids = collection_services.search_collections(
+        collection_ids = collection_services.search_collections(
             _generate_query(group['search_categories']), 8)[0]
-        header_to_col_ids[group['header']] = col_ids
-        all_col_ids += col_ids
+        header_to_collection_ids[group['header']] = collection_ids
+        all_collection_ids += collection_ids
 
-    col_summaries = [
+    collection_summaries = [
         summary for summary in
-        collection_services.get_collection_summaries_matching_ids(all_col_ids)
+        collection_services.get_collection_summaries_matching_ids(all_collection_ids) # pylint: disable=line-too-long
         if summary is not None]
-
-
-    col_summary_dicts = {
+    collection_summary_dicts = {
         summary_dict['id']: summary_dict
-        for summary_dict in _get_displayable_col_summary_dicts(
-            col_summaries)
+        for summary_dict in _get_displayable_collection_summary_dicts(
+            collection_summaries)
     }
 
 
@@ -319,10 +314,10 @@ def get_library_groups(language_codes):
     results = []
     for group in _LIBRARY_INDEX_GROUPS:
         summary_dicts = []
-        col_ids_to_display = header_to_col_ids[group['header']]
+        collection_ids_to_display = header_to_collection_ids[group['header']]
         summary_dicts = [
-            col_summary_dicts[col_id] for col_id in col_ids_to_display
-            if col_id in col_summary_dicts]
+            collection_summary_dicts[collection_id] for collection_id in collection_ids_to_display # pylint: disable=line-too-long
+            if collection_id in collection_summary_dicts]
 
         exp_ids_to_display = header_to_exp_ids[group['header']]
         summary_dicts += [
@@ -361,5 +356,38 @@ def get_featured_exploration_summary_dicts(language_codes):
         filtered_exp_summaries,
         key=lambda exp_summary: search_ranks[exp_summary.id],
         reverse=True)
+
+    return _get_displayable_exp_summary_dicts(sorted_exp_summaries)
+
+
+def get_top_rated_exploration_summary_dicts(language_codes):
+    """Returns a list of top rated explorations with the given language code.
+
+    The return value is sorted in decreasing order of average rating.
+    """
+    filtered_exp_summaries = [
+        exp_summary for exp_summary in
+        exp_services.get_non_private_exploration_summaries().values()
+        if exp_summary.language_code in language_codes and
+        sum(exp_summary.ratings.values()) > 0]
+
+    average_ratings = {
+        exp_summary.id: exp_services.get_average_rating_from_exp_summary(
+            exp_summary)
+        for exp_summary in filtered_exp_summaries
+    }
+
+    # The following two calls to 'sorted' ensure that the return list is sorted
+    # by average rating, breaking ties by the number of ratings.
+
+    sorted_by_ratings_count_exp_summaries = sorted(
+        filtered_exp_summaries,
+        key=lambda exp_summary: sum(exp_summary.ratings.values()),
+        reverse=True)
+
+    sorted_exp_summaries = sorted(
+        sorted_by_ratings_count_exp_summaries,
+        key=lambda exp_summary: average_ratings[exp_summary.id],
+        reverse=True)[:NUMBER_OF_TOP_RATED_EXPLORATIONS]
 
     return _get_displayable_exp_summary_dicts(sorted_exp_summaries)

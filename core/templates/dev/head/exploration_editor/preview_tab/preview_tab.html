@@ -1,5 +1,8 @@
 <div ng-controller="PreviewTab">
   <div ng-if="isExplorationPopulated">
+    <div ng-if="previewWarning">
+      <div class="oppia-preview-state-warning"><[previewWarning]></div>
+    </div>
     <conversation-skin></conversation-skin>
   </div>
 
@@ -14,3 +17,22 @@
     </table>
   </div>
 </div>
+
+<style>
+  .oppia-preview-state-warning {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    display: block;
+    font-size: 16px;
+    font-weight: bold;
+    left: 6px;
+    max-width: 296px;
+    padding: 3px;
+    position: absolute;
+    text-align: left;
+    top: 63px;
+    white-space: normal;
+    z-index: 1060;
+  }
+</style>

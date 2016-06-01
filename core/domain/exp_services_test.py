@@ -434,7 +434,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         """Tests that explorations are removed from the search index when
         deleted.
         """
-
         self.save_new_default_exploration(self.EXP_ID, self.owner_id)
 
         def mock_delete_docs(doc_ids, index):
@@ -447,16 +446,19 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         with delete_docs_swap:
             exp_services.delete_exploration(self.owner_id, self.EXP_ID)
 
-    def test_create_new_exploration_error_cases(self):
+    def test_no_errors_are_raised_when_creating_default_exploration(self):
         exploration = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, '', '')
-        with self.assertRaisesRegexp(Exception, 'between 1 and 50 characters'):
-            exp_services.save_new_exploration(self.owner_id, exploration)
+            self.EXP_ID)
+        exp_services.save_new_exploration(self.owner_id, exploration)
 
+    def test_that_default_exploration_fails_strict_validation(self):
         exploration = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, 'title', '')
-        with self.assertRaisesRegexp(Exception, 'between 1 and 50 characters'):
-            exp_services.save_new_exploration(self.owner_id, exploration)
+            self.EXP_ID)
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'This state does not have any interaction specified.'
+            ):
+            exploration.validate(strict=True)
 
     def test_save_and_retrieve_exploration(self):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
@@ -1806,6 +1808,8 @@ class ExplorationCommitLogSpecialCasesUnitTests(ExplorationServicesUnitTests):
 class ExplorationSearchTests(ExplorationServicesUnitTests):
     """Test exploration search."""
 
+    USER_ID_1 = 'user_1'
+
     def test_demo_explorations_are_added_to_search_index(self):
         results, _ = exp_services.search_explorations('Welcome', 2)
         self.assertEqual(results, [])
@@ -1970,6 +1974,26 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
 
         self.assertEqual(cursor, expected_result_cursor)
         self.assertEqual(result, doc_ids)
+
+    def test_get_average_rating_from_exp_summary(self):
+        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+
+        self.assertEqual(
+            exp_services.get_average_rating_from_exp_summary(exp), 0)
+
+        rating_services.assign_rating_to_exploration(
+            self.owner_id, self.EXP_ID, 5)
+        self.assertEqual(
+            exp_services.get_average_rating_from_exp_summary(exp), 5)
+
+        rating_services.assign_rating_to_exploration(
+            self.USER_ID_1, self.EXP_ID, 2)
+
+        exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+        self.assertEqual(
+            exp_services.get_average_rating_from_exp_summary(exp), 3.5)
+
 
     def test_get_search_rank(self):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)

@@ -2,17 +2,17 @@
   <div infinite-scroll="showMoreActivities()" infinite-scroll-distance="1"
        infinite-scroll-disabled="endOfPageIsReached || searchResultsAreLoading">
     <div ng-repeat="activity in allActivitiesInOrder track by $index" style="display: inline-block;">
-      <collection-summary-tile ng-if="activity.activity_type=='collection'"
+      <collection-summary-tile ng-if="activity.activity_type === 'collection'"
                                collection-id="activity.id"
                                collection-title="activity.title"
                                last-updated-msec="activity.last_updated_msec"
-                               num-explorations="activity.num_explorations"
+                               node-count="activity.node_count"
                                objective="activity.objective"
                                thumbnail-icon-url="activity.thumbnail_icon_url"
                                thumbnail-bg-color="activity.thumbnail_bg_color"
                                style="margin-right: 3px;">
       </collection-summary-tile>
-      <exploration-summary-tile ng-if="activity.activity_type=='exploration'"
+      <exploration-summary-tile ng-if="activity.activity_type === 'exploration'"
                                 exploration-id="activity.id"
                                 exploration-title="activity.title"
                                 last-updated-msec="activity.last_updated_msec"
