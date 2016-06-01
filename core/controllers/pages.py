@@ -87,6 +87,20 @@ class TeachPage(base.BaseHandler):
         self.render_template('pages/teach.html')
 
 
+class ContactPage(base.BaseHandler):
+    """Page with information about how to contact Oppia."""
+
+    def get(self):
+        """Handles GET requests."""
+        self.values.update({
+            'CONTACT_EMAIL_ADDRESS': CONTACT_EMAIL_ADDRESS.value,
+            'SITE_FEEDBACK_FORM_URL': MODERATOR_REQUEST_FORUM_URL.value,
+            'SITE_FORUM_URL': SITE_FORUM_URL.value,
+            'nav_mode': feconf.NAV_MODE_CONTACT,
+        })
+        self.render_template('pages/contact.html')
+
+
 class ParticipatePage(base.BaseHandler):
     """Page with information about participating in Oppia."""
 

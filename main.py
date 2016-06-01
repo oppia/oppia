@@ -161,7 +161,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/site_guidelines', pages.ParticipatePage,
         'redirect_to_participate_page'),
     get_redirect_route(
-        r'/contact', pages.AboutPage, 'redirect_to_about_page'),
+        r'/contact', pages.ContactPage, 'contact_page'),
 
     get_redirect_route(r'/forum', pages.ForumPage, 'forum_page'),
     get_redirect_route(r'/terms', pages.TermsPage, 'terms_page'),

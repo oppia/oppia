@@ -3129,7 +3129,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-about-header {
   background-blend-mode: multiply;
-  background-color: rgb(17, 197, 185);
+  background-color: #afd2eb;
   background-image: url("../images/general/icons-bg.png");
   color: #fff;
   padding: 10%;
@@ -3280,6 +3280,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-about-tabs {
+  border-bottom: 1px solid #eee;
   display: flex;
   flex-wrap: wrap;
   text-align: center;
@@ -3287,19 +3288,29 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-about-tabs li {
-  border-right: 1px solid rgba(0,0,0,0.1);
-  cursor: pointer;
-  display: inline-block;
-  padding: 10px;
+  display: flex;
+  margin-bottom: 0;
   width: calc(100% / 3);
 }
 
-.oppia-about-tabs li:last-of-type {
-  border-right: none;
+.oppia-about-tabs-active .oppia-about-tabs-text {
+  color: #009688;
+  border-bottom: 2px solid #009688;
 }
 
-.oppia-about-tabs .oppia-about-tabs-active {
-  border-bottom: 2px solid #009688;
+.oppia-about-tabs-text {
+  color: #009688;
+  border-bottom: none;
+  padding: 10px;
+  text-decoration: none;
+  width: 100%;
+}
+
+.oppia-about-tabs-text:hover,
+.oppia-about-tabs-text:focus
+{
+  color: #009688;
+  text-decoration: none;
 }
 
 .oppia-about-otter {

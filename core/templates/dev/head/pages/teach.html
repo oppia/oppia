@@ -28,12 +28,12 @@
     <div class="about-nav oppia-profile-tabs md-tab oppia-about-teach-tabs">
       <ul class="oppia-about-tabs">
         <li class="oppia-profile-tabs oppia-about-tabs-active">
-          <a href="about-tab-1">
+          <a class="oppia-about-tabs-text" href="teach" name="teach">
             Teach with Oppia
           </a>
         </li>
         <li class="oppia-profile-tabs">
-          <a href="about-tab-2">
+          <a class="oppia-about-tabs-text" href="playbook" name="playbook">
             Participation Playbook
           </a>
         </li>
@@ -41,7 +41,7 @@
     </div>
 
     <div class="about-tab-container">
-      <div class="about-tab-1 oppia-about-tab-content oppia-about-visible-content">
+      <div class="teach oppia-about-tab-content oppia-about-visible-content">
 
         <div class="oppia-about-card-content-wide oppia-about-card-content-narrow">
           <h2>
@@ -102,7 +102,7 @@
         </div>
       </div>
 
-      <div class="about-tab-2 oppia-about-tab-content">
+      <div class="playbook oppia-about-tab-content">
         <div class="oppia-about-card-content-wide oppia-about-card-content-narrow">
           <h2>Community Guidelines</h2>
           <ol>
@@ -263,12 +263,37 @@
 
   <script>
     $(document).ready(function() {
+      var activeTabClass = "oppia-about-tabs-active";
+      var hash = window.location.hash.slice(1);
+      var visibleContent = "oppia-about-visible-content";
+
+      function activateTab(tabName) {
+        $("a[name='" + tabName + "']").parent().addClass(activeTabClass).siblings().removeClass(activeTabClass);
+        $("." + tabName).addClass(visibleContent).siblings().removeClass(visibleContent);
+      }
+
+      if(hash === "teach") {
+        activateTab("teach");
+      }
+      else if(hash === "playbook") {
+        activateTab("playbook");
+      }
+
+      window.onhashchange = function() {
+        var hashChange = window.location.hash.slice(1);
+        if(hashChange === "teach") {
+          activateTab("teach");
+        }
+        else if(hashChange === "playbook") {
+          activateTab("playbook");
+        }
+      }
+
       $(".oppia-about-tabs li").on("click", function(event) {
         event.preventDefault();
-        var tabIndex = $(this).index();
-        $(this).addClass("oppia-about-tabs-active").siblings().removeClass("oppia-about-tabs-active");
+        $(this).addClass(activeTabClass).siblings().removeClass(activeTabClass);
         var currentAttrVal = $(this).children("a").attr("href");
-        $("." + currentAttrVal).addClass("oppia-about-visible-content").siblings().removeClass("oppia-about-visible-content");
+        $("." + currentAttrVal).addClass(visibleContent).siblings().removeClass(visibleContent);
       });
     });
   </script>
