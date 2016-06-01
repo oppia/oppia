@@ -2200,28 +2200,28 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
 
             case 'default_outcome':
               var defaultOutcomeChanges = getRelativeChangeToGroups(lostChange);
-              var answerGroupHtml = '';
+              var defaultOutcomeHtml = '';
               if (defaultOutcomeChanges === 'added') {
-                answerGroupHtml += (
+                defaultOutcomeHtml += (
                   '<p>Destination: ' + newValue.dest + '</p>');
-                answerGroupHtml += (
+                defaultOutcomeHtml += (
                   '<p>Feedback: ' + newValue.feedback + '</p>');
                 stateWiseEditsMapping[stateName].push(
                   angular.element('<div>Added default outcome: </div>')
-                    .append(answerGroupHtml));
+                    .append(defaultOutcomeHtml));
               } else if (defaultOutcomeChanges === 'edited') {
                 if (newValue.dest !== oldValue.dest) {
-                  answerGroupHtml += (
+                  defaultOutcomeHtml += (
                     '<p>Destination: ' + newValue.dest + '</p>');
                 }
                 if (!angular.equals(
                   newValue.feedback, oldValue.feedback)) {
-                  answerGroupHtml += (
+                  defaultOutcomeHtml += (
                     '<p>Feedback: ' + newValue.feedback + '</p>');
                 }
                 stateWiseEditsMapping[stateName].push(
                   angular.element('<div>Edited default outcome: </div>')
-                    .append(answerGroupHtml));
+                    .append(defaultOutcomeHtml));
               } else {
                 stateWiseEditsMapping[stateName].push(
                   angular.element('<div>Deleted default outcome</div>'));
