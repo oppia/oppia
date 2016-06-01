@@ -446,8 +446,9 @@ DEFAULT_THUMBNAIL_ICON = 'Lightbulb'
 # List of supported default categories. For now, each category has
 # a specific color associated with it. Each category also has a thumbnail icon
 # whose filename is "{{CategoryName}}.svg".
+# The blank category was added to address #1894.
 CATEGORIES_TO_COLORS = {
-    'Mathematics': '#cd672b',
+    '': '',
     'Algebra': '#cd672b',
     'Arithmetic': '#d68453',
     'Calculus': '#b86330',

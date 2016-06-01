@@ -194,9 +194,10 @@ class CategoryConfigTest(test_utils.GenericTestBase):
 
         # Test that an icon exists for each default category.
         for category in all_categories:
-            utils.get_file_contents(os.path.join(
-                'static', 'images', 'subjects',
-                '%s.svg' % category.replace(' ', '')))
+            if category:
+                utils.get_file_contents(os.path.join(
+                    'static', 'images', 'subjects',
+                    '%s.svg' % category.replace(' ', '')))
 
         # Test that the default icon exists.
         utils.get_file_contents(os.path.join(
