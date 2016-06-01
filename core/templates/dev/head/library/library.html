@@ -80,7 +80,7 @@
                    ng-swipe-left="scroll($index, false)">
                 <div class="oppia-library-carousel-overlay-left"></div>
                 <div class="oppia-library-carousel-tiles">
-                  <div ng-repeat="tile in group.activity_summary_dicts">
+                  <div ng-repeat="tile in group.activity_summary_dicts" style="display: inline-block;">
                     <collection-summary-tile ng-if="tile.activity_type == 'collection'"
                                              collection-id="tile.id"
                                              collection-title="tile.title"

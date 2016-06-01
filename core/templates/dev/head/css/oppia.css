@@ -1032,7 +1032,6 @@ textarea {
 
 .oppia-library-carousel-tiles {
   /*The height is adjusted to hide the scrollbars*/
-  display: flex;
   height: 290px;
   left: 0;
   margin: 0;
