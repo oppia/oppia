@@ -68,7 +68,6 @@ class AboutPage(base.BaseHandler):
         self.values.update({
             'ABOUT_PAGE_YOUTUBE_VIDEO_ID': ABOUT_PAGE_YOUTUBE_VIDEO_ID.value,
             'CONTACT_EMAIL_ADDRESS': CONTACT_EMAIL_ADDRESS.value,
-            'SITE_FORUM_URL': SITE_FORUM_URL.value,
             'nav_mode': feconf.NAV_MODE_ABOUT,
         })
         self.render_template('pages/about.html')
