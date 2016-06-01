@@ -1999,12 +1999,12 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
         exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
 
         self.assertEqual(
-            exp_services.get_lower_bound_wilson_score_from_exp_summary(exp), 0)
+            exp_services.get_scaled_average_rating_from_exp_summary(exp), 0)
 
         rating_services.assign_rating_to_exploration(
             self.owner_id, self.EXP_ID, 5)
         self.assertAlmostEqual(
-            exp_services.get_lower_bound_wilson_score_from_exp_summary(exp),
+            exp_services.get_scaled_average_rating_from_exp_summary(exp),
             1.8261731658956, places=4)
 
         rating_services.assign_rating_to_exploration(
@@ -2012,7 +2012,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
 
         exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
         self.assertAlmostEqual(
-            exp_services.get_lower_bound_wilson_score_from_exp_summary(exp),
+            exp_services.get_scaled_average_rating_from_exp_summary(exp),
             2.056191454757, places=4)
 
 
