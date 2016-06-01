@@ -82,9 +82,10 @@ oppia.directive('collectionNewNodeCreator', [function() {
           }
 
           // Create a new exploration with the given title.
-          // TODO(sll): Actually send the title.
           $http.post(
-            '/contributehandler/create_new', {}
+            '/contributehandler/create_new', {
+              title: title
+            }
           ).then(function(response) {
             $scope.newExplorationTitle = '';
 
@@ -92,12 +93,9 @@ oppia.directive('collectionNewNodeCreator', [function() {
             siteAnalyticsService.registerCreateNewExplorationInCollectionEvent(
               newExplorationId);
 
-            // Open the exploration editor in a new tab.
-            $window.open(UrlInterpolationService.interpolateUrl(
-              CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
-                exploration_id: newExplorationId
-              }
-            ), '_blank');
+            // Note that we cannot open the exploration editor directly in a
+            // new tab directly, because Chrome blocks the pop-up. The creator
+            // will need to click on the exploration to edit it.
 
             // Add this exploration to the collection.
             addExplorationToCollection(newExplorationId);
