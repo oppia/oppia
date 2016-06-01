@@ -1,3 +1,5 @@
+// Copyright 2016 The Oppia Authors. All Rights Reserved.
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -20,15 +22,14 @@ var GLOBALS = {
   PANEL_SPECS: {}
 };
 
-// jscs:disable maximumLineLength
 /* This function overwrites the translationProvider for a dummy function
  * (customLoader). This is necessary to prevent the js test warnings about an
  * "unexpected GET request" when the translationProvider tries to load the
  * translation files.
- * More info in the angular-translate documentation
- * http://angular-translate.github.io/docs/#/guide/22_unit-testing-with-angular-translate
+ * More info in the angular-translate documentation:
+ *   http://angular-translate.github.io/docs/#/guide
+ * (see the "Unit Testing" section).
  */
-// jscs:enable maximumLineLength
 GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS = function($provide, $translateProvider) {
   $provide.factory('customLoader', function($q) {
     return function() {
