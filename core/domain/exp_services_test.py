@@ -1994,6 +1994,27 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exp_services.get_average_rating_from_exp_summary(exp), 3.5)
 
+    def test_get_lower_bound_wilson_rating_from_exp_summary(self):
+        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+
+        self.assertEqual(
+            exp_services.get_scaled_average_rating_from_exp_summary(exp), 0)
+
+        rating_services.assign_rating_to_exploration(
+            self.owner_id, self.EXP_ID, 5)
+        self.assertAlmostEqual(
+            exp_services.get_scaled_average_rating_from_exp_summary(exp),
+            1.8261731658956, places=4)
+
+        rating_services.assign_rating_to_exploration(
+            self.USER_ID_1, self.EXP_ID, 4)
+
+        exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+        self.assertAlmostEqual(
+            exp_services.get_scaled_average_rating_from_exp_summary(exp),
+            2.056191454757, places=4)
+
 
     def test_get_search_rank(self):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)

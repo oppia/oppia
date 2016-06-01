@@ -25,6 +25,7 @@ import collections
 import copy
 import datetime
 import logging
+import math
 import os
 import pprint
 import StringIO
@@ -1380,6 +1381,26 @@ def get_average_rating_from_exp_summary(exp_summary):
         if number_of_ratings > 0:
             return rating_sum / number_of_ratings
     return 0
+
+
+def get_scaled_average_rating_from_exp_summary(exp_summary):
+    """Returns the lower bound wilson score of the document as a float. If
+    there are no ratings, it will return 0. The confidence of this result is
+    95%.
+    """
+    # The following is the number of ratings.
+    n = sum(exp_summary.ratings.values())
+    if n == 0:
+        return 0
+    average_rating = get_average_rating_from_exp_summary(exp_summary)
+    z = 1.9599639715843482
+    x = (average_rating - 1) / 4
+    # The following calculates the lower bound Wilson Score as documented
+    # http://www.goproblems.com/test/wilson/wilson.php?v1=0&v2=0&v3=0&v4=&v5=1
+    a = x + (z**2)/(2*n)
+    b = z * math.sqrt((x*(1-x))/n + (z**2)/(4*n**2))
+    wilson_score_lower_bound = (a - b)/(1 + z**2/n)
+    return 1 + 4 * wilson_score_lower_bound
 
 
 def get_search_rank_from_exp_summary(exp_summary):

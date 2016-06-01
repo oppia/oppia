@@ -479,9 +479,9 @@ class TopRatedExplorationDisplayableSummariesTest(
             'tags': [],
             'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
             'language_code': feconf.DEFAULT_LANGUAGE_CODE,
-            'id': self.EXP_ID_2,
+            'id': self.EXP_ID_3,
             'category': u'A category',
-            'ratings': {u'1': 0, u'3': 0, u'2': 0, u'5': 1, u'4': 0},
+            'ratings': {u'1': 0, u'3': 0, u'2': 0, u'5': 1, u'4': 1},
             'title': u'A title',
             'num_views': 0,
             'objective': u'An objective'
@@ -491,7 +491,7 @@ class TopRatedExplorationDisplayableSummariesTest(
             expected_summary, top_rated_exploration_summaries[0])
 
         expected_ordering = [
-            self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_4, self.EXP_ID_5,
+            self.EXP_ID_3, self.EXP_ID_2, self.EXP_ID_5, self.EXP_ID_4,
             self.EXP_ID_6, self.EXP_ID_8, self.EXP_ID_7, self.EXP_ID_9]
 
         actual_ordering = [exploration['id'] for exploration in
