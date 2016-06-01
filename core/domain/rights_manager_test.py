@@ -123,8 +123,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
                 rights_manager.ACTIVITY_TYPE_EXPLORATION, '3'))
 
     def test_ownership_of_exploration(self):
-        exp = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, 'A title', 'A category')
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
 
         rights_manager.assign_role_for_exploration(
@@ -143,8 +142,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
                 rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
 
     def test_newly_created_exploration(self):
-        exp = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, 'A title', 'A category')
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
 
         self.assertTrue(
@@ -187,8 +185,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
                 rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
 
     def test_inviting_collaborator_to_exploration(self):
-        exp = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, 'A title', 'A category')
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
 
         self.assertFalse(
@@ -222,8 +219,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
                 rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
 
     def test_inviting_playtester_to_exploration(self):
-        exp = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, 'A title', 'A category')
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
 
         self.assertFalse(
@@ -257,8 +253,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
                 rights_manager.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID))
 
     def test_setting_rights_of_exploration(self):
-        exp = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, 'A title', 'A category')
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
 
         rights_manager.assign_role_for_exploration(
@@ -295,7 +290,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_publishing_and_unpublishing_exploration(self):
         exp = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, 'A title', 'A category')
+            self.EXP_ID, title='A title', category='A category')
         exp_services.save_new_exploration(self.user_id_a, exp)
 
         self.assertFalse(
@@ -334,7 +329,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_can_only_delete_unpublished_explorations(self):
         exp = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, 'A title', 'A category')
+            self.EXP_ID, title='A title', category='A category')
         exp_services.save_new_exploration(self.user_id_a, exp)
 
         self.assertTrue(
@@ -355,7 +350,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_can_publicize_exploration(self):
         exp = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, 'A title', 'A category')
+            self.EXP_ID, title='A title', category='A category')
         exp_services.save_new_exploration(self.user_id_a, exp)
 
         rights_manager.publish_exploration(self.user_id_a, self.EXP_ID)
@@ -369,7 +364,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_changing_viewability_of_exploration(self):
         exp = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, 'A title', 'A category')
+            self.EXP_ID, title='A title', category='A category')
         exp_services.save_new_exploration(self.user_id_a, exp)
 
         self.assertFalse(

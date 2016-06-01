@@ -22,6 +22,37 @@ from core.domain import stats_jobs_continuous
 from core.domain import user_services
 import utils
 
+_LIBRARY_INDEX_GROUPS = [{
+    'header': 'Mathematics & Statistics',
+    'search_categories': [
+        'Mathematics', 'Algebra', 'Arithmetic', 'Calculus', 'Combinatorics',
+        'Geometry', 'Graph Theory', 'Logic', 'Probability', 'Statistics',
+        'Trigonometry',
+    ],
+}, {
+    'header': 'Computing',
+    'search_categories': ['Algorithms', 'Computing', 'Programming'],
+}, {
+    'header': 'Science',
+    'search_categories': [
+        'Astronomy', 'Biology', 'Chemistry', 'Engineering', 'Environment',
+        'Medicine', 'Physics',
+    ],
+}, {
+    'header': 'Humanities',
+    'search_categories': [
+        'Architecture', 'Art', 'Music', 'Philosophy', 'Poetry'
+    ],
+}, {
+    'header': 'Languages',
+    'search_categories': ['Languages', 'Reading', 'English', 'Latin'],
+}, {
+    'header': 'Social Science',
+    'search_categories': [
+        'Business', 'Economics', 'Geography', 'Government', 'History', 'Law'],
+}]
+
+NUMBER_OF_TOP_RATED_EXPLORATIONS = 8
 
 def get_human_readable_contributors_summary(contributors_summary):
     contributor_ids = contributors_summary.keys()
@@ -49,24 +80,47 @@ def get_displayable_exp_summary_dicts_matching_ids(
     this function when needing summary information to display on exploration
     summary tiles in the frontend.
     """
-    displayable_exp_summaries = []
     exploration_summaries = (
         exp_services.get_exploration_summaries_matching_ids(exploration_ids))
-    view_counts = (
-        stats_jobs_continuous.StatisticsAggregator.get_views_multi(
-            exploration_ids))
 
-    for ind, exploration_summary in enumerate(exploration_summaries):
-        if not exploration_summary:
+    filtered_exploration_summaries = []
+    for exploration_summary in exploration_summaries:
+        if exploration_summary is None:
             continue
         if exploration_summary.status == (
                 rights_manager.ACTIVITY_STATUS_PRIVATE):
-            if not editor_user_id:
+            if editor_user_id is None:
                 continue
             if not rights_manager.Actor(editor_user_id).can_edit(
                     rights_manager.ACTIVITY_TYPE_EXPLORATION,
                     exploration_summary.id):
                 continue
+
+        filtered_exploration_summaries.append(exploration_summary)
+
+    return _get_displayable_exp_summary_dicts(filtered_exploration_summaries)
+
+
+def _get_displayable_exp_summary_dicts(exploration_summaries):
+    """Given a list of exploration summary domain objects, returns a list,
+    with the same number of elements, of the corresponding human-readable
+    exploration summary dicts.
+
+    This assumes that all the exploration summary domain objects passed in are
+    valid (i.e., none of them are None).
+    """
+    exploration_ids = [
+        exploration_summary.id
+        for exploration_summary in exploration_summaries]
+
+    view_counts = (
+        stats_jobs_continuous.StatisticsAggregator.get_views_multi(
+            exploration_ids))
+    displayable_exp_summaries = []
+
+    for ind, exploration_summary in enumerate(exploration_summaries):
+        if not exploration_summary:
+            continue
 
         displayable_exp_summaries.append({
             'id': exploration_summary.id,
@@ -92,3 +146,113 @@ def get_displayable_exp_summary_dicts_matching_ids(
         })
 
     return displayable_exp_summaries
+
+
+def get_library_groups(language_codes):
+    """Returns a list of groups for the library index page. Each group has a
+    header and a list of dicts representing activity summaries.
+    """
+    language_codes_suffix = ''
+    if language_codes:
+        language_codes_suffix = ' language_code=("%s")' % (
+            '" OR "'.join(language_codes))
+
+    def _generate_query(categories):
+        # This assumes that 'categories' is non-empty.
+        return 'category=("%s")%s' % (
+            '" OR "'.join(categories), language_codes_suffix)
+
+    # Collect all exp ids so that the summary details can be retrieved with a
+    # single get_multi() call.
+    all_exp_ids = []
+    header_to_exp_ids = {}
+    for group in _LIBRARY_INDEX_GROUPS:
+        exp_ids = exp_services.search_explorations(
+            _generate_query(group['search_categories']), 8)[0]
+        header_to_exp_ids[group['header']] = exp_ids
+        all_exp_ids += exp_ids
+
+    all_summaries = [
+        summary for summary in
+        exp_services.get_exploration_summaries_matching_ids(all_exp_ids)
+        if summary is not None]
+    all_summary_dicts = {
+        summary_dict['id']: summary_dict
+        for summary_dict in _get_displayable_exp_summary_dicts(
+            all_summaries)
+    }
+
+    results = []
+    for group in _LIBRARY_INDEX_GROUPS:
+        exp_ids_to_display = header_to_exp_ids[group['header']]
+        summary_dicts = [
+            all_summary_dicts[exp_id] for exp_id in exp_ids_to_display
+            if exp_id in all_summary_dicts]
+
+        if not summary_dicts:
+            continue
+
+        results.append({
+            'header': group['header'],
+            'categories': group['search_categories'],
+            'activity_summary_dicts': summary_dicts,
+        })
+
+    return results
+
+
+def get_featured_exploration_summary_dicts(language_codes):
+    """Returns a list of featured explorations with the given language code.
+
+    The return value is sorted in decreasing order of search rank.
+    """
+    filtered_exp_summaries = [
+        exp_summary for exp_summary in
+        exp_services.get_featured_exploration_summaries().values()
+        if exp_summary.language_code in language_codes]
+
+    search_ranks = {
+        exp_summary.id: exp_services.get_search_rank_from_exp_summary(
+            exp_summary)
+        for exp_summary in filtered_exp_summaries
+    }
+
+    sorted_exp_summaries = sorted(
+        filtered_exp_summaries,
+        key=lambda exp_summary: search_ranks[exp_summary.id],
+        reverse=True)
+
+    return _get_displayable_exp_summary_dicts(sorted_exp_summaries)
+
+
+def get_top_rated_exploration_summary_dicts(language_codes):
+    """Returns a list of top rated explorations with the given language code.
+
+    The return value is sorted in decreasing order of average rating.
+    """
+    filtered_exp_summaries = [
+        exp_summary for exp_summary in
+        exp_services.get_non_private_exploration_summaries().values()
+        if exp_summary.language_code in language_codes and
+        sum(exp_summary.ratings.values()) > 0]
+
+    average_ratings = {
+        exp_summary.id: exp_services.get_average_rating_from_exp_summary(
+            exp_summary)
+        for exp_summary in filtered_exp_summaries
+    }
+
+    # The following two calls to 'sorted' ensure that the return list is sorted
+    # by average rating, breaking ties by the number of ratings.
+
+    sorted_by_ratings_count_exp_summaries = sorted(
+        filtered_exp_summaries,
+        key=lambda exp_summary: sum(exp_summary.ratings.values()),
+        reverse=True)
+
+    sorted_exp_summaries = sorted(
+        sorted_by_ratings_count_exp_summaries,
+        key=lambda exp_summary: average_ratings[exp_summary.id],
+        reverse=True)[:NUMBER_OF_TOP_RATED_EXPLORATIONS]
+
+    return _get_displayable_exp_summary_dicts(sorted_exp_summaries)

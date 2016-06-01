@@ -288,7 +288,7 @@ class ReaderViewLoadTest(object):
 
         body = self._get('%s/explore/%s' % (self.host, self.exp_id))
         assert_contains('Learn', body)
-        assert_contains('Return to the gallery', body)
+        assert_contains('Return to Library', body)
 
         body = self._get_json(
             '%s/explorehandler/init/%s' % (self.host, self.exp_id))

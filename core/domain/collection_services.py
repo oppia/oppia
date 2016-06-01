@@ -60,7 +60,6 @@ _STATUS_PUBLICIZED_BONUS = 30
 # This is done to prevent the rank hitting 0 too easily. Note that
 # negative ranks are disallowed in the Search API.
 _DEFAULT_RANK = 20
-_MS_IN_ONE_DAY = 24 * 60 * 60 * 1000
 
 
 def _migrate_collection_to_latest_schema(versioned_collection):
@@ -126,6 +125,7 @@ def get_collection_from_model(collection_model, run_conversion=True):
     return collection_domain.Collection(
         collection_model.id, collection_model.title,
         collection_model.category, collection_model.objective,
+        collection_model.language_code,
         versioned_collection['schema_version'], [
             collection_domain.CollectionNode.from_dict(collection_node_dict)
             for collection_node_dict in versioned_collection['nodes']
@@ -138,7 +138,7 @@ def get_collection_summary_from_model(collection_summary_model):
     return collection_domain.CollectionSummary(
         collection_summary_model.id, collection_summary_model.title,
         collection_summary_model.category, collection_summary_model.objective,
-        collection_summary_model.status,
+        collection_summary_model.language_code, collection_summary_model.status,
         collection_summary_model.community_owned,
         collection_summary_model.owner_ids,
         collection_summary_model.editor_ids,
@@ -449,16 +449,17 @@ def get_collection_summaries_matching_query(query_string, cursor=None):
     """Returns a list with all collection summary domain objects matching the
     given search query string, as well as a search cursor for future fetches.
 
-    This method returns exactly feconf.GALLERY_PAGE_SIZE results if there are
-    at least that many, otherwise it returns all remaining results. (If this
-    behaviour does not occur, an error will be logged.) The method also returns
-    a search cursor.
+    This method returns exactly feconf.SEARCH_RESULTS_PAGE_SIZE results if
+    there are at least that many, otherwise it returns all remaining results.
+    (If this behaviour does not occur, an error will be logged.) The method
+    also returns a search cursor.
     """
     summary_models = []
     search_cursor = cursor
 
     for _ in range(MAX_ITERATIONS):
-        remaining_to_fetch = feconf.GALLERY_PAGE_SIZE - len(summary_models)
+        remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
+            summary_models)
 
         collection_ids, search_cursor = search_collections(
             query_string, remaining_to_fetch, cursor=search_cursor)
@@ -472,7 +473,7 @@ def get_collection_summaries_matching_query(query_string, cursor=None):
             else:
                 invalid_collection_ids.append(collection_ids[ind])
 
-        if len(summary_models) == feconf.GALLERY_PAGE_SIZE or (
+        if len(summary_models) == feconf.SEARCH_RESULTS_PAGE_SIZE or (
                 search_cursor is None):
             break
         else:
@@ -480,7 +481,7 @@ def get_collection_summaries_matching_query(query_string, cursor=None):
                 'Search index contains stale collection ids: %s' %
                 ', '.join(invalid_collection_ids))
 
-    if (len(summary_models) < feconf.GALLERY_PAGE_SIZE
+    if (len(summary_models) < feconf.SEARCH_RESULTS_PAGE_SIZE
             and search_cursor is not None):
         logging.error(
             'Could not fulfill search request for query string %s; at least '
@@ -533,6 +534,9 @@ def apply_change_list(collection_id, change_list):
                 elif (change.property_name ==
                       collection_domain.COLLECTION_PROPERTY_OBJECTIVE):
                     collection.update_objective(change.new_value)
+                elif (change.property_name ==
+                      collection_domain.COLLECTION_PROPERTY_LANGUAGE_CODE):
+                    collection.update_language_code(change.new_value)
             elif (
                     change.cmd ==
                     collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
@@ -618,6 +622,7 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     collection_model.category = collection.category
     collection_model.title = collection.title
     collection_model.objective = collection.objective
+    collection_model.language_code = collection.language_code
     collection_model.schema_version = collection.schema_version
     collection_model.nodes = [
         collection_node.to_dict() for collection_node in collection.nodes
@@ -645,6 +650,7 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
         category=collection.category,
         title=collection.title,
         objective=collection.objective,
+        language_code=collection.language_code,
         schema_version=collection.schema_version,
         nodes=[
             collection_node.to_dict() for collection_node in collection.nodes
@@ -820,10 +826,10 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
 
     collection_summary = collection_domain.CollectionSummary(
         collection.id, collection.title, collection.category,
-        collection.objective, collection_rights.status,
-        collection_rights.community_owned, collection_rights.owner_ids,
-        collection_rights.editor_ids, collection_rights.viewer_ids,
-        contributor_ids, contributors_summary,
+        collection.objective, collection.language_code,
+        collection_rights.status, collection_rights.community_owned,
+        collection_rights.owner_ids, collection_rights.editor_ids,
+        collection_rights.viewer_ids, contributor_ids, contributors_summary,
         collection.version, collection_model_created_on,
         collection_model_last_updated
     )
@@ -866,6 +872,7 @@ def save_collection_summary(collection_summary):
         title=collection_summary.title,
         category=collection_summary.category,
         objective=collection_summary.objective,
+        language_code=collection_summary.language_code,
         status=collection_summary.status,
         community_owned=collection_summary.community_owned,
         owner_ids=collection_summary.owner_ids,
@@ -1034,25 +1041,6 @@ def _get_search_rank(collection_id):
         if rights.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED
         else 0)
 
-    # Iterate backwards through the collection history metadata until we find
-    # the most recent snapshot that was committed by a human.
-    last_human_update_ms = 0
-    snapshots_metadata = get_collection_snapshots_metadata(collection_id)
-    for snapshot_metadata in reversed(snapshots_metadata):
-        if snapshot_metadata['committer_id'] != feconf.MIGRATION_BOT_USER_ID:
-            last_human_update_ms = snapshot_metadata['created_on_ms']
-            break
-
-    _time_now_ms = utils.get_current_time_in_millisecs()
-    time_delta_days = int(
-        (_time_now_ms - last_human_update_ms) / _MS_IN_ONE_DAY)
-    if time_delta_days == 0:
-        rank += 80
-    elif time_delta_days == 1:
-        rank += 50
-    elif 2 <= time_delta_days <= 7:
-        rank += 35
-
     # Ranks must be non-negative.
     return max(rank, 0)
 
@@ -1064,6 +1052,7 @@ def _collection_to_search_dict(collection):
         'title': collection.title,
         'category': collection.category,
         'objective': collection.objective,
+        'language_code': collection.language_code,
         'rank': _get_search_rank(collection.id),
     }
     doc.update(_collection_rights_to_search_dict(rights))

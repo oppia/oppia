@@ -272,10 +272,10 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             self._create_search_query(['in'], ['Architecture', 'Welcome'], []))
         self.assertEqual(sorted(exp_ids), [self.EXP_ID_0, self.EXP_ID_3])
 
-    def test_exploration_summaries_pagination_in_filled_gallery(self):
-        # Ensure the maximum number of explorations that can fit on the gallery
-        # page is maintained by the summaries function.
-        with self.swap(feconf, 'GALLERY_PAGE_SIZE', 3):
+    def test_exploration_summaries_pagination_in_filled_search_results(self):
+        # Ensure the maximum number of explorations that can fit on the search
+        # results page is maintained by the summaries function.
+        with self.swap(feconf, 'SEARCH_RESULTS_PAGE_SIZE', 3):
             # Need to load 3 pages to find all of the explorations. Since the
             # returned order is arbitrary, we need to concatenate the results
             # to ensure all explorations are returned. We validate the correct
@@ -434,7 +434,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         """Tests that explorations are removed from the search index when
         deleted.
         """
-
         self.save_new_default_exploration(self.EXP_ID, self.owner_id)
 
         def mock_delete_docs(doc_ids, index):
@@ -447,16 +446,19 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         with delete_docs_swap:
             exp_services.delete_exploration(self.owner_id, self.EXP_ID)
 
-    def test_create_new_exploration_error_cases(self):
+    def test_no_errors_are_raised_when_creating_default_exploration(self):
         exploration = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, '', '')
-        with self.assertRaisesRegexp(Exception, 'between 1 and 50 characters'):
-            exp_services.save_new_exploration(self.owner_id, exploration)
+            self.EXP_ID)
+        exp_services.save_new_exploration(self.owner_id, exploration)
 
+    def test_that_default_exploration_fails_strict_validation(self):
         exploration = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, 'title', '')
-        with self.assertRaisesRegexp(Exception, 'between 1 and 50 characters'):
-            exp_services.save_new_exploration(self.owner_id, exploration)
+            self.EXP_ID)
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'This state does not have any interaction specified.'
+            ):
+            exploration.validate(strict=True)
 
     def test_save_and_retrieve_exploration(self):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
@@ -1806,6 +1808,8 @@ class ExplorationCommitLogSpecialCasesUnitTests(ExplorationServicesUnitTests):
 class ExplorationSearchTests(ExplorationServicesUnitTests):
     """Test exploration search."""
 
+    USER_ID_1 = 'user_1'
+
     def test_demo_explorations_are_added_to_search_index(self):
         results, _ = exp_services.search_explorations('Welcome', 2)
         self.assertEqual(results, [])
@@ -1971,52 +1975,70 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
         self.assertEqual(cursor, expected_result_cursor)
         self.assertEqual(result, doc_ids)
 
-    def test_get_search_rank(self):
+    def test_get_average_rating_from_exp_summary(self):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
-
-        # The search rank has a 'last updated' bonus of 80.
-        base_search_rank = 20 + 80
+        exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
 
         self.assertEqual(
-            exp_services._get_search_rank(self.EXP_ID), base_search_rank)
-
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
-        rights_manager.publicize_exploration(self.user_id_admin, self.EXP_ID)
-        self.assertEqual(
-            exp_services._get_search_rank(self.EXP_ID), base_search_rank + 30)
+            exp_services.get_average_rating_from_exp_summary(exp), 0)
 
         rating_services.assign_rating_to_exploration(
             self.owner_id, self.EXP_ID, 5)
         self.assertEqual(
-            exp_services._get_search_rank(self.EXP_ID), base_search_rank + 40)
+            exp_services.get_average_rating_from_exp_summary(exp), 5)
+
+        rating_services.assign_rating_to_exploration(
+            self.USER_ID_1, self.EXP_ID, 2)
+
+        exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+        self.assertEqual(
+            exp_services.get_average_rating_from_exp_summary(exp), 3.5)
+
+
+    def test_get_search_rank(self):
+        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+
+        base_search_rank = 20
+
+        self.assertEqual(
+            exp_services.get_search_rank(self.EXP_ID), base_search_rank)
+
+        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
+        rights_manager.publicize_exploration(self.user_id_admin, self.EXP_ID)
+        self.assertEqual(
+            exp_services.get_search_rank(self.EXP_ID), base_search_rank + 30)
+
+        rating_services.assign_rating_to_exploration(
+            self.owner_id, self.EXP_ID, 5)
+        self.assertEqual(
+            exp_services.get_search_rank(self.EXP_ID), base_search_rank + 40)
 
         rating_services.assign_rating_to_exploration(
             self.user_id_admin, self.EXP_ID, 2)
         self.assertEqual(
-            exp_services._get_search_rank(self.EXP_ID), base_search_rank + 38)
+            exp_services.get_search_rank(self.EXP_ID), base_search_rank + 38)
 
     def test_search_ranks_cannot_be_negative(self):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
 
-        # The search rank has a 'last updated' bonus of 80.
-        base_search_rank = 20 + 80
+        base_search_rank = 20
 
         self.assertEqual(
-            exp_services._get_search_rank(self.EXP_ID), base_search_rank)
+            exp_services.get_search_rank(self.EXP_ID), base_search_rank)
 
         # A user can (down-)rate an exploration at most once.
         for i in xrange(50):
             rating_services.assign_rating_to_exploration(
                 'user_id_1', self.EXP_ID, 1)
         self.assertEqual(
-            exp_services._get_search_rank(self.EXP_ID), base_search_rank - 5)
+            exp_services.get_search_rank(self.EXP_ID), base_search_rank - 5)
 
         for i in xrange(50):
             rating_services.assign_rating_to_exploration(
                 'user_id_%s' % i, self.EXP_ID, 1)
 
         # The rank will be at least 0.
-        self.assertEqual(exp_services._get_search_rank(self.EXP_ID), 0)
+        self.assertEqual(exp_services.get_search_rank(self.EXP_ID), 0)
 
 
 class ExplorationSummaryTests(ExplorationServicesUnitTests):

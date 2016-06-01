@@ -701,13 +701,13 @@ oppia.factory('rteHelperService', [
 // Add RTE extensions to textAngular toolbar options.
 oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [
-    '$delegate', '$modal', '$timeout', 'focusService', 'taRegisterTool',
-    'rteHelperService', 'alertsService', 'explorationContextService',
-    'PAGE_CONTEXT',
+    '$delegate', '$document', '$modal', '$timeout', 'focusService',
+    'taRegisterTool', 'rteHelperService', 'alertsService',
+    'explorationContextService', 'PAGE_CONTEXT',
     function(
-        taOptions, $modal, $timeout, focusService, taRegisterTool,
-        rteHelperService, alertsService, explorationContextService,
-        PAGE_CONTEXT) {
+        taOptions, $document, $modal, $timeout, focusService,
+        taRegisterTool, rteHelperService, alertsService,
+        explorationContextService, PAGE_CONTEXT) {
       taOptions.disableSanitizer = true;
       taOptions.forceTextAngularSanitize = false;
       taOptions.classes.textEditor = 'form-control oppia-rte-content';
@@ -723,6 +723,7 @@ oppia.config(['$provide', function($provide) {
       var _openCustomizationModal = function(
           customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
           onDismissCallback, refocusFn) {
+        $document[0].execCommand('enableObjectResizing', false, false);
         var modalDialog = $modal.open({
           templateUrl: 'modals/customizeRteComponent',
           backdrop: 'static',
@@ -908,7 +909,7 @@ oppia.directive('textAngularRte', [
           // the editor context.
           $scope.isCustomizationModalOpen = false;
           var toolbarOptions = [
-            ['bold', 'italics', 'underline'],
+            ['bold', 'italics'],
             ['ol', 'ul', 'pre', 'indent', 'outdent'],
             []
           ];

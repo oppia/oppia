@@ -24,7 +24,6 @@ import os
 import sys
 import time
 import traceback
-import urllib
 import urlparse
 
 import jinja2
@@ -315,10 +314,6 @@ class BaseHandler(webapp2.RequestHandler):
         else:
             self.payload = None
 
-    def unescape_state_name(self, escaped_state_name):
-        """Unescape a state name that is encoded with encodeURIComponent."""
-        return urllib.unquote(escaped_state_name).decode('utf-8')
-
     def dispatch(self):
         """Overrides dispatch method in webapp2 superclass."""
         # If the request is to the old demo server, redirect it permanently to
@@ -404,6 +399,7 @@ class BaseHandler(webapp2.RequestHandler):
         scheme, netloc, path, _, _ = urlparse.urlsplit(self.request.uri)
 
         values.update({
+            'ALL_CATEGORIES': feconf.ALL_CATEGORIES,
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
                 BEFORE_END_HEAD_TAG_HOOK.value),
@@ -453,8 +449,11 @@ class BaseHandler(webapp2.RequestHandler):
                 current_user_services.create_logout_url(
                     redirect_url_on_logout))
         else:
+            target_url = (
+                '/' if self.request.uri.endswith(feconf.SPLASH_URL)
+                else self.request.uri)
             values['login_url'] = (
-                current_user_services.create_login_url(self.request.uri))
+                current_user_services.create_login_url(target_url))
 
         # Create a new csrf token for inclusion in HTML responses. This assumes
         # that tokens generated in one handler will be sent back to a handler

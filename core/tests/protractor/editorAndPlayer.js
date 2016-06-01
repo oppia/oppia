@@ -28,7 +28,7 @@ describe('Full exploration editor', function() {
     users.createUser('user4@editorAndPlayer.com', 'user4EditorAndPlayer');
     users.login('user4@editorAndPlayer.com');
 
-    workflow.createExploration('sums', 'maths');
+    workflow.createExploration();
     editor.setStateName('card 1');
     editor.setContent(forms.toRichText('this is card 1'));
     editor.setInteraction('NumericInput');
@@ -73,7 +73,7 @@ describe('Full exploration editor', function() {
     users.createUser('user5@editorAndPlayer.com', 'user5EditorAndPlayer');
     users.login('user5@editorAndPlayer.com');
 
-    workflow.createExploration('sums', 'maths');
+    workflow.createExploration();
     general.getExplorationIdFromEditor().then(function(explorationId) {
       // Check discarding of changes
       editor.setStateName('card1');
@@ -147,6 +147,13 @@ describe('Full exploration editor', function() {
       editor.moveToState('final card');
       editor.setInteraction('EndExploration');
 
+      // Check that preview/editor switch doesn't change state
+      editor.navigateToPreviewTab();
+      player.expectExplorationToBeOver();
+      editor.navigateToMainTab();
+      editor.expectCurrentStateToBe('final card');
+      editor.moveToState('second');
+
       // Check editor preview tab
       editor.navigateToPreviewTab();
       player.expectContentToMatch(function(richTextEditor) {
@@ -169,7 +176,7 @@ describe('Full exploration editor', function() {
     users.createUser('user6@editorAndPlayer.com', 'user6EditorAndPlayer');
     users.createUser('user7@editorAndPlayer.com', 'user7EditorAndPlayer');
     users.login('user6@editorAndPlayer.com');
-    workflow.createExploration('sums', 'maths');
+    workflow.createExploration();
 
     general.getExplorationIdFromEditor().then(function(explorationId) {
       // Create an exploration with multiple groups.
@@ -195,6 +202,8 @@ describe('Full exploration editor', function() {
       editor.setInteraction('EndExploration');
 
       // Save.
+      editor.setTitle('Testing multiple rules');
+      editor.setCategory('Answer Groups');
       editor.setObjective('To assess happiness.');
       editor.saveChanges();
       workflow.publishExploration();

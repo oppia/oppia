@@ -15,15 +15,15 @@
 /**
  * @fileoverview End-to-end tests of the exploration rating feature.
  */
+var editor = require('../protractor_utils/editor.js');
+var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
+var library = require('../protractor_utils/library.js');
+var player = require('../protractor_utils/player.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
-var editor = require('../protractor_utils/editor.js');
-var player = require('../protractor_utils/player.js');
-var gallery = require('../protractor_utils/gallery.js');
-var forms = require('../protractor_utils/forms.js');
 
-describe('Gallery view', function() {
+describe('Library index page', function() {
   var EXPLORATION_RATINGTEST = 'RatingTest';
   var CATEGORY_BUSINESS = 'Business';
   var LANGUAGE_ENGLISH = 'English';
@@ -31,8 +31,8 @@ describe('Gallery view', function() {
   var addRating = function(userEmail, userName, explorationName, ratingValue) {
     users.createUser(userEmail, userName);
     users.login(userEmail);
-    browser.get(general.GALLERY_URL_SUFFIX);
-    gallery.playExploration(EXPLORATION_RATINGTEST);
+    browser.get(general.LIBRARY_URL_SUFFIX);
+    library.playExploration(EXPLORATION_RATINGTEST);
     player.expectExplorationNameToBe(explorationName);
     player.submitAnswer('Continue');
     player.rateExploration(ratingValue);
@@ -57,17 +57,17 @@ describe('Gallery view', function() {
       addRating(userEmail, username, EXPLORATION_RATINGTEST, 4);
     }
 
-    browser.get(general.GALLERY_URL_SUFFIX);
-    gallery.expectExplorationRatingToEqual(EXPLORATION_RATINGTEST, 'N/A');
+    browser.get(general.LIBRARY_URL_SUFFIX);
+    library.expectExplorationRatingToEqual(EXPLORATION_RATINGTEST, 'N/A');
 
     var userEmail = 'Display@explorationRating.com';
     var username = 'Display';
     addRating(userEmail, username, EXPLORATION_RATINGTEST, 4);
 
-    browser.get(general.GALLERY_URL_SUFFIX);
-    gallery.expectExplorationRatingToEqual(EXPLORATION_RATINGTEST, '4.0');
+    browser.get(general.LIBRARY_URL_SUFFIX);
+    library.expectExplorationRatingToEqual(EXPLORATION_RATINGTEST, '4.0');
 
-    gallery.playExploration(EXPLORATION_RATINGTEST);
+    library.playExploration(EXPLORATION_RATINGTEST);
     player.expectExplorationRatingOnInformationCardToEqual('4.0');
   });
   afterEach(function() {

@@ -433,10 +433,10 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
             self._summaries_to_ids(col_summaries),
             [self.COL_ID_0, self.COL_ID_2])
 
-    def test_collection_summaries_pagination_in_filled_gallery(self):
-        # Ensure the maximum number of collections that can fit on the gallery
-        # page is maintained by the summaries function.
-        with self.swap(feconf, 'GALLERY_PAGE_SIZE', 2):
+    def test_collection_summaries_pagination_in_filled_search_results(self):
+        # Ensure the maximum number of collections that can fit on the search
+        # results page is maintained by the summaries function.
+        with self.swap(feconf, 'SEARCH_RESULTS_PAGE_SIZE', 2):
             # Need to load 3 pages to find all of the collections. Since the
             # returned order is arbitrary, we need to concatenate the results
             # to ensure all collections are returned. We validate the correct
@@ -607,16 +607,11 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             collection_services.delete_collection(
                 self.owner_id, self.COLLECTION_ID)
 
-    def test_create_new_collection_error_cases(self):
-        collection = collection_domain.Collection.create_default_collection(
-            self.COLLECTION_ID, '', '', '')
-        with self.assertRaisesRegexp(Exception, 'between 1 and 50 characters'):
-            collection_services.save_new_collection(self.owner_id, collection)
-
-        collection = collection_domain.Collection.create_default_collection(
-            self.COLLECTION_ID, 'title', '', '')
-        with self.assertRaisesRegexp(Exception, 'between 1 and 50 characters'):
-            collection_services.save_new_collection(self.owner_id, collection)
+    def test_create_new_collection(self):
+        # Test that creating a new collection (with an empty title, etc.)
+        # succeeds.
+        collection_domain.Collection.create_default_collection(
+            self.COLLECTION_ID)
 
     def test_save_and_retrieve_collection(self):
         collection = self.save_new_valid_collection(
@@ -862,6 +857,25 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
         self.assertEqual(collection.objective, 'Some new objective')
+
+    def test_update_collection_language_code(self):
+        # Verify initial language code.
+        collection = collection_services.get_collection_by_id(
+            self.COLLECTION_ID)
+        self.assertEqual(collection.language_code, 'en')
+
+        # Update the language code.
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+                'property_name': 'language_code',
+                'new_value': 'fi'
+            }], 'Changed the language to Finnish')
+
+        # Verify the language is different.
+        collection = collection_services.get_collection_by_id(
+            self.COLLECTION_ID)
+        self.assertEqual(collection.language_code, 'fi')
 
     def test_update_collection_node_prerequisite_skills(self):
         # Verify initial prerequisite skills are empty.
@@ -1731,8 +1745,7 @@ class CollectionSearchTests(CollectionServicesUnitTests):
     def test_get_search_rank(self):
         self.save_new_valid_collection(self.COLLECTION_ID, self.owner_id)
 
-        # The search rank has a 'last updated' bonus of 80.
-        base_search_rank = 20 + 80
+        base_search_rank = 20
 
         self.assertEqual(
             collection_services._get_search_rank(self.COLLECTION_ID),
