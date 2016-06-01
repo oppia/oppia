@@ -11,7 +11,7 @@
 </style>
 
 <script type="text/ng-template" id="interaction/LogicProof">
-  <div>
+  <div class="logic-proof-container">
     <[questionString]>
     <div class="logic-proof-input-box">
       <div ui-codemirror="{onLoad: codeEditor}">
@@ -22,6 +22,18 @@
     <button class="btn btn-default" ng-click="showHelp()">Possible lines</button>
     <p class="logic-proof-error-message"> <[errorMessage]>  </p>
   </div>
+
+  <style>
+    .logic-proof-container {
+      background: #fff;
+      padding: 8px;
+    }
+    @media screen and (max-width: 959px) {
+      .logic-proof-container {
+        width: 100vw;
+      }
+    }
+  </style>
 </script>
 
 <script type="text/ng-template" id="response/LogicProof">

@@ -25,6 +25,7 @@ import collections
 import copy
 import datetime
 import logging
+import math
 import os
 import pprint
 import StringIO
@@ -42,8 +43,9 @@ import utils
 memcache_services = models.Registry.import_memcache_services()
 search_services = models.Registry.import_search_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
-(exp_models, feedback_models) = models.Registry.import_models(
-    [models.NAMES.exploration, models.NAMES.feedback])
+(exp_models, feedback_models, user_models) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
+])
 
 # This takes additional 'title' and 'category' parameters.
 CMD_CREATE_NEW = 'create_new'
@@ -59,12 +61,11 @@ MAX_ITERATIONS = 10
 _BASE_ENTITY_STATE = 'state'
 _BASE_ENTITY_GADGET = 'gadget'
 
-# Constants used for gallery ranking.
+# Constants used for search ranking.
 _STATUS_PUBLICIZED_BONUS = 30
 # This is done to prevent the rank hitting 0 too easily. Note that
 # negative ranks are disallowed in the Search API.
 _DEFAULT_RANK = 20
-_MS_IN_ONE_DAY = 24 * 60 * 60 * 1000
 
 
 def _migrate_states_schema(versioned_exploration_states):
@@ -291,7 +292,7 @@ def get_exploration_titles_and_categories(exp_ids):
     return result
 
 
-def _get_exploration_summary_dicts_from_models(exp_summary_models):
+def _get_exploration_summaries_from_models(exp_summary_models):
     """Given an iterable of ExpSummaryModel instances, create a dict containing
     corresponding exploration summary domain objects, keyed by id.
     """
@@ -318,16 +319,16 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
     """Returns a list with all exploration ids matching the given search query
     string, as well as a search cursor for future fetches.
 
-    This method returns exactly feconf.GALLERY_PAGE_SIZE results if there are
-    at least that many, otherwise it returns all remaining results. (If this
-    behaviour does not occur, an error will be logged.) The method also returns
-    a search cursor.
+    This method returns exactly feconf.SEARCH_RESULTS_PAGE_SIZE results if
+    there are at least that many, otherwise it returns all remaining results.
+    (If this behaviour does not occur, an error will be logged.) The method
+    also returns a search cursor.
     """
     returned_exploration_ids = []
     search_cursor = cursor
 
     for _ in range(MAX_ITERATIONS):
-        remaining_to_fetch = feconf.GALLERY_PAGE_SIZE - len(
+        remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_exploration_ids)
 
         exp_ids, search_cursor = search_explorations(
@@ -341,15 +342,15 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
             else:
                 invalid_exp_ids.append(exp_ids[ind])
 
-        if len(returned_exploration_ids) == feconf.GALLERY_PAGE_SIZE or (
-                search_cursor is None):
+        if (len(returned_exploration_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE
+                or search_cursor is None):
             break
         else:
             logging.error(
                 'Search index contains stale exploration ids: %s' %
                 ', '.join(invalid_exp_ids))
 
-    if (len(returned_exploration_ids) < feconf.GALLERY_PAGE_SIZE
+    if (len(returned_exploration_ids) < feconf.SEARCH_RESULTS_PAGE_SIZE
             and search_cursor is not None):
         logging.error(
             'Could not fulfill search request for query string %s; at least '
@@ -362,15 +363,23 @@ def get_non_private_exploration_summaries():
     """Returns a dict with all non-private exploration summary domain objects,
     keyed by their id.
     """
-    return _get_exploration_summary_dicts_from_models(
+    return _get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_non_private())
+
+
+def get_featured_exploration_summaries():
+    """Returns a dict with all featured exploration summary domain objects,
+    keyed by their id.
+    """
+    return _get_exploration_summaries_from_models(
+        exp_models.ExpSummaryModel.get_featured())
 
 
 def get_all_exploration_summaries():
     """Returns a dict with all exploration summary domain objects,
     keyed by their id.
     """
-    return _get_exploration_summary_dicts_from_models(
+    return _get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_all())
 
 
@@ -1004,6 +1013,8 @@ def update_exploration(
 
     exploration = apply_change_list(exploration_id, change_list)
     _save_exploration(committer_id, exploration, commit_message, change_list)
+
+    discard_draft(exploration_id, committer_id)
     # Update summary of changed exploration.
     update_exploration_summary(exploration.id, committer_id)
     user_services.add_edited_exploration_id(committer_id, exploration.id)
@@ -1205,13 +1216,12 @@ def get_demo_exploration_components(demo_path):
 
 
 def save_new_exploration_from_yaml_and_assets(
-        committer_id, yaml_content, title, category, exploration_id,
-        assets_list):
-    """Note that the title and category will be ignored if the YAML
-    schema version is greater than
+        committer_id, yaml_content, exploration_id, assets_list):
+    """Note that the default title and category will be used if the YAML
+    schema version is less than
     exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
-    since in that case there will already be a title and category present in
-    the YAML schema.
+    since in that case the YAML schema will not have a title and category
+    present.
     """
     if assets_list is None:
         assets_list = []
@@ -1226,7 +1236,8 @@ def save_new_exploration_from_yaml_and_assets(
         # The schema of the YAML file for older explorations did not include
         # a title and a category; these need to be manually specified.
         exploration = exp_domain.Exploration.from_untitled_yaml(
-            exploration_id, title, category, yaml_content)
+            exploration_id, feconf.DEFAULT_EXPLORATION_TITLE,
+            feconf.DEFAULT_EXPLORATION_CATEGORY, yaml_content)
     else:
         exploration = exp_domain.Exploration.from_yaml(
             exploration_id, yaml_content)
@@ -1276,8 +1287,8 @@ def load_demo(exploration_id):
 
     yaml_content, assets_list = get_demo_exploration_components(exp_filename)
     save_new_exploration_from_yaml_and_assets(
-        feconf.SYSTEM_COMMITTER_ID, yaml_content, None, None,
-        exploration_id, assets_list)
+        feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
+        assets_list)
 
     publish_exploration_and_update_user_profiles(
         feconf.SYSTEM_COMMITTER_ID, exploration_id)
@@ -1348,7 +1359,43 @@ def _should_index(exp):
     return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
 
 
-def _get_search_rank(exp_id):
+def get_average_rating_from_exp_summary(exp_summary):
+    """Returns the average rating of the document as a float. If there are no
+    ratings, it will return 0.
+    """
+    rating_weightings = {'1': 1, '2': 2, '3': 3, '4': 4, '5': 5}
+    if exp_summary.ratings:
+        rating_sum = 0.0
+        number_of_ratings = 0.0
+        for rating_value, rating_count in exp_summary.ratings.items():
+            rating_sum += rating_weightings[rating_value] * rating_count
+            number_of_ratings += rating_count
+        if number_of_ratings > 0:
+            return rating_sum / number_of_ratings
+    return 0
+
+
+def get_scaled_average_rating_from_exp_summary(exp_summary):
+    """Returns the lower bound wilson score of the document as a float. If
+    there are no ratings, it will return 0. The confidence of this result is
+    95%.
+    """
+    # The following is the number of ratings.
+    n = sum(exp_summary.ratings.values())
+    if n == 0:
+        return 0
+    average_rating = get_average_rating_from_exp_summary(exp_summary)
+    z = 1.9599639715843482
+    x = (average_rating - 1) / 4
+    # The following calculates the lower bound Wilson Score as documented
+    # http://www.goproblems.com/test/wilson/wilson.php?v1=0&v2=0&v3=0&v4=&v5=1
+    a = x + (z**2)/(2*n)
+    b = z * math.sqrt((x*(1-x))/n + (z**2)/(4*n**2))
+    wilson_score_lower_bound = (a - b)/(1 + z**2/n)
+    return 1 + 4 * wilson_score_lower_bound
+
+
+def get_search_rank_from_exp_summary(exp_summary):
     """Returns an integer determining the document's rank in search.
 
     Featured explorations get a ranking bump, and so do explorations that
@@ -1356,35 +1403,26 @@ def _get_search_rank(exp_id):
     and bad ones will lower it.
     """
     # TODO(sll): Improve this calculation.
-    time_now_msec = utils.get_current_time_in_millisecs()
     rating_weightings = {'1': -5, '2': -2, '3': 2, '4': 5, '5': 10}
 
-    rights = rights_manager.get_exploration_rights(exp_id)
-    summary = get_exploration_summary_by_id(exp_id)
     rank = _DEFAULT_RANK + (
         _STATUS_PUBLICIZED_BONUS
-        if rights.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED
+        if exp_summary.status == rights_manager.ACTIVITY_STATUS_PUBLICIZED
         else 0)
 
-    if summary.ratings:
-        for rating_value in summary.ratings:
+    if exp_summary.ratings:
+        for rating_value in exp_summary.ratings:
             rank += (
-                summary.ratings[rating_value] *
+                exp_summary.ratings[rating_value] *
                 rating_weightings[rating_value])
-
-    last_human_update_ms = _get_last_updated_by_human_ms(exp_id)
-
-    time_delta_days = int(
-        (time_now_msec - last_human_update_ms) / _MS_IN_ONE_DAY)
-    if time_delta_days == 0:
-        rank += 80
-    elif time_delta_days == 1:
-        rank += 50
-    elif 2 <= time_delta_days <= 7:
-        rank += 35
 
     # Ranks must be non-negative.
     return max(rank, 0)
+
+
+def get_search_rank(exp_id):
+    exp_summary = get_exploration_summary_by_id(exp_id)
+    return get_search_rank_from_exp_summary(exp_summary)
 
 
 def _exp_to_search_dict(exp):
@@ -1398,7 +1436,7 @@ def _exp_to_search_dict(exp):
         'blurb': exp.blurb,
         'objective': exp.objective,
         'author_notes': exp.author_notes,
-        'rank': _get_search_rank(exp.id),
+        'rank': get_search_rank(exp.id),
     }
     doc.update(_exp_rights_to_search_dict(rights))
     return doc
@@ -1454,13 +1492,13 @@ def search_explorations(query, limit, sort=None, cursor=None):
           '-' character indicating whether to sort in ascending or descending
           order respectively. This character should be followed by a field name
           to sort on. When this is None, results are based on 'rank'. See
-          _get_search_rank to see how rank is determined.
+          get_search_rank to see how rank is determined.
       - limit: the maximum number of results to return.
       - cursor: A cursor, used to get the next page of results.
           If there are more documents that match the query than 'limit', this
           function will return a cursor to get the next page.
 
-    returns: a tuple:
+    returns: a 2-tuple consisting of:
       - a list of exploration ids that match the query.
       - a cursor if there are more matching explorations to fetch, None
           otherwise. If a cursor is returned, it will be a web-safe string that
@@ -1497,9 +1535,9 @@ def _create_change_list_from_suggestion(suggestion):
     """Creates a change list from a suggestion object."""
 
     return [{'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-             'state_name': suggestion['state_name'],
+             'state_name': suggestion.state_name,
              'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-             'new_value': [suggestion['state_content']]}]
+             'new_value': [suggestion.state_content]}]
 
 
 def _get_commit_message_for_suggestion(
@@ -1529,7 +1567,7 @@ def accept_suggestion(editor_id, thread_id, exploration_id, commit_message):
     else:
         suggestion = feedback_services.get_suggestion(
             exploration_id, thread_id)
-        suggestion_author_username = suggestion['author_name']
+        suggestion_author_username = suggestion.get_author_name()
         change_list = _create_change_list_from_suggestion(suggestion)
         update_exploration(
             editor_id, exploration_id, change_list,
@@ -1555,3 +1593,56 @@ def reject_suggestion(editor_id, thread_id, exploration_id):
             feedback_models.STATUS_CHOICES_IGNORED,
             None, 'Suggestion rejected.')
         thread.put()
+
+
+def is_version_of_draft_valid(exp_id, version):
+    """Checks if the draft version is the same as the latest version of the
+    exploration."""
+
+    return get_exploration_by_id(exp_id).version == version
+
+
+def create_or_update_draft(
+        exp_id, user_id, change_list, exp_version, current_datetime):
+    """Create a draft with the given change list, or update the change list
+    of the draft if it already exists. A draft is updated only if the change
+    list timestamp of the new change list is greater than the change list
+    timestamp of the draft.
+    The method assumes that a ExplorationUserDataModel object exists for the
+    given user and exploration."""
+    exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
+    if (exp_user_data.draft_change_list and
+            exp_user_data.draft_change_list_last_updated > current_datetime):
+        return
+    updated_exploration = apply_change_list(exp_id, change_list)
+    updated_exploration.validate(strict=False)
+    exp_user_data.draft_change_list = change_list
+    exp_user_data.draft_change_list_last_updated = current_datetime
+    exp_user_data.draft_change_list_exp_version = exp_version
+    exp_user_data.put()
+
+
+def get_exp_with_draft_applied(exp_id, user_id):
+    """If a draft exists for the given user and exploration,
+    apply it to the exploration."""
+
+    exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
+    exploration = get_exploration_by_id(exp_id)
+    return (
+        apply_change_list(exp_id, exp_user_data.draft_change_list)
+        if exp_user_data and exp_user_data.draft_change_list and
+        is_version_of_draft_valid(
+            exp_id, exp_user_data.draft_change_list_exp_version)
+        else exploration)
+
+
+def discard_draft(exp_id, user_id):
+    """Discard the draft for the given user and exploration."""
+
+    exp_user_data = user_models.ExplorationUserDataModel.get(
+        user_id, exp_id)
+    if exp_user_data:
+        exp_user_data.draft_change_list = None
+        exp_user_data.draft_change_list_last_updated = None
+        exp_user_data.draft_change_list_exp_version = None
+        exp_user_data.put()

@@ -14,6 +14,9 @@
 
 """Tests for the user notification dashboard and 'my explorations' pages."""
 
+from core.controllers import home
+from core.domain import config_services
+from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import user_jobs_continuous
@@ -27,10 +30,9 @@ class HomePageTest(test_utils.GenericTestBase):
         """Test the logged-out version of the home page."""
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 302)
-        self.assertIn('gallery', response.headers['location'])
+        self.assertIn('splash', response.headers['location'])
         response.follow().mustcontain(
-            'Your personal tutor',
-            'Oppia - Gallery', 'About', 'Sign in', no=['Logout'])
+            'Oppia - Home', 'About', 'Sign in', no=['Logout'])
 
     def test_notifications_dashboard_redirects_for_logged_out_users(self):
         """Test the logged-out view of the notifications dashboard."""
@@ -181,10 +183,7 @@ class MyExplorationsHandlerTest(test_utils.GenericTestBase):
             response['explorations_list'][0]['num_total_threads'], 0)
 
         def mock_get_thread_analytics(unused_exploration_id):
-            return {
-                'num_open_threads': 2,
-                'num_total_threads': 3,
-            }
+            return feedback_domain.FeedbackAnalytics(self.EXP_ID, 2, 3)
 
         with self.swap(
             feedback_services, 'get_thread_analytics',
@@ -259,3 +258,41 @@ class NotificationsDashboardHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(
                 response['recent_notifications'][0]['author_username'], '')
             self.assertNotIn('author_id', response['recent_notifications'][0])
+
+
+class CreationButtonsTest(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(CreationButtonsTest, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+
+    def test_new_exploration_ids(self):
+        """Test generation of exploration ids."""
+        self.login(self.EDITOR_EMAIL)
+
+        response = self.testapp.get('/my_explorations')
+        self.assertEqual(response.status_int, 200)
+        csrf_token = self.get_csrf_token_from_response(response)
+        exp_a_id = self.post_json(
+            feconf.NEW_EXPLORATION_URL, {}, csrf_token
+        )[home.EXPLORATION_ID_KEY]
+        self.assertEqual(len(exp_a_id), 12)
+
+        self.logout()
+
+    def test_exploration_upload_button(self):
+        """Test that the exploration upload button appears when appropriate."""
+        self.login(self.EDITOR_EMAIL)
+
+        response = self.testapp.get('/my_explorations')
+        self.assertEqual(response.status_int, 200)
+        response.mustcontain(no=['ng-click="showUploadExplorationModal()"'])
+
+        config_services.set_property(
+            feconf.SYSTEM_COMMITTER_ID, 'allow_yaml_file_upload', True)
+
+        response = self.testapp.get('/my_explorations')
+        self.assertEqual(response.status_int, 200)
+        response.mustcontain('ng-click="showUploadExplorationModal()"')
+
+        self.logout()

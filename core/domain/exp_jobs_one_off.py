@@ -34,10 +34,9 @@ _COMMIT_TYPE_REVERT = 'revert'
 
 
 class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
-    """Job that calculates summaries of explorations, which can be
-    used to get e.g. the gallery. For every ExplorationModel entity,
-    create a ExpSummaryModel entity containing information described
-    in ExpSummariesAggregator.
+    """Job that calculates summaries of explorations. For every
+    ExplorationModel entity, create a ExpSummaryModel entity containing
+    information described in ExpSummariesAggregator.
 
     The summaries store the following information:
         title, category, objective, language_code, tags,

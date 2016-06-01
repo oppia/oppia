@@ -154,8 +154,7 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
             ModifiedStatisticsAggregator.get_statistics)
 
     def test_get_state_improvements(self):
-        exp = exp_domain.Exploration.create_default_exploration(
-            'eid', 'A title', 'A category')
+        exp = exp_domain.Exploration.create_default_exploration('eid')
         exp_services.save_new_exploration('fake@user.com', exp)
 
         for ind in range(5):
@@ -185,8 +184,7 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
                 }])
 
     def test_single_default_rule_hit(self):
-        exp = exp_domain.Exploration.create_default_exploration(
-            'eid', 'A title', 'A category')
+        exp = exp_domain.Exploration.create_default_exploration('eid')
         exp_services.save_new_exploration('fake@user.com', exp)
         state_name = exp.init_state_name
 
@@ -234,8 +232,7 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
         self.assertEquals(stats_services.get_state_improvements('eid', 1), [])
 
     def test_incomplete_and_default_flags(self):
-        exp = exp_domain.Exploration.create_default_exploration(
-            'eid', 'A title', 'A category')
+        exp = exp_domain.Exploration.create_default_exploration('eid')
         exp_services.save_new_exploration('fake@user.com', exp)
         state_name = exp.init_state_name
 

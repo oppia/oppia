@@ -39,7 +39,7 @@ class DependencyControllerTests(test_utils.GenericTestBase):
     """Tests for dependency loading on user-facing pages."""
 
     def test_no_dependencies_in_non_exploration_pages(self):
-        response = self.testapp.get(feconf.GALLERY_URL)
+        response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
         self.assertEqual(response.status_int, 200)
         response.mustcontain(no=['skulpt'])
 

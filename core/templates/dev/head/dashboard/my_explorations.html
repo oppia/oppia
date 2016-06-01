@@ -14,7 +14,7 @@
 
   <style>
     html, body {
-      background-color: #eee;
+      background-color: #f2f2ee;
     }
   </style>
 {% endblock navbar_breadcrumb %}
@@ -25,7 +25,7 @@
       <li>
         <div class="oppia-navbar-button-container" style="margin-right: 25px;">
           <a class="btn oppia-navbar-button protractor-test-create-exploration oppia-transition-200"
-             ng-click="showCreateCollectionModal()" style="margin-right: 0;">
+             ng-click="createNewCollection()" style="margin-right: 0;">
             <span>Create Collection</span>
           </a>
         </div>
@@ -36,14 +36,13 @@
 
 {% block content %}
   <div class="oppia-dashboard-container" ng-controller="MyExplorations">
-
-    <h2 class="oppia-page-heading">My Explorations</h2>
-
     <div ng-if="explorationsList.length > 0">
+      <h2 class="oppia-page-heading">My Explorations</h2>
+
       <ul class="oppia-dashboard-tiles">
         <li ng-repeat="exploration in explorationsList">
-          <md-card layout="row" class="oppia-dashboard-tile protractor-test-gallery-tile">
-            <a ng-href="/create/<[exploration.id]>" class="oppia-gallery-tile-container-link" style="text-decoration: none;">
+          <md-card layout="row" class="oppia-dashboard-tile protractor-test-exp-summary-tile">
+            <a ng-href="/create/<[exploration.id]>" class="oppia-dashboard-exp-tile-container-link" style="text-decoration: none;">
               <div class="oppia-dashboard-tile-metadata-parent hidden-xs">
                 <div class="oppia-dashboard-tile-metadata">
                   Created: <span style="color: black;"><[getLocaleAbbreviatedDatetimeString(exploration.created_on)]></span>
@@ -72,7 +71,7 @@
                   </span>
                   <span ng-if="exploration.num_open_threads == 0 && exploration.status !== 'private'">
                     <span class="oppia-dashboard-status-green">
-                      Good
+                      Published
                     </span>
                   </span>
                   <span ng-if="exploration.status === 'private'">
@@ -82,15 +81,16 @@
                   </span>
                 </div>
               </div>
-              <div class="oppia-gallery-tile-contents">
-                <span class="oppia-gallery-tile-image-container" style="position: absolute;">
-                  <img class="oppia-gallery-tile-image" ng-src="<[exploration.thumbnail_image_url]>">
+              <div class="oppia-dashboard-exp-tile-contents">
+                <span class="oppia-dashboard-exp-tile-image-container" style="position: absolute;">
+                  <img class="oppia-dashboard-exp-tile-image" ng-src="<[exploration.thumbnail_icon_url]>" style="background-color: <[exploration.thumbnail_bg_color]>" ng-class="{'oppia-dashboard-exp-tile-image-private': exploration.status === 'private'}">
                 </span>
 
-                <div class="oppia-gallery-tile-details">
-                  <div class="oppia-gallery-tile-first-row">
-                    <span class="oppia-gallery-tile-title protractor-test-gallery-tile-title">
-                      <[exploration.title]>
+                <div class="oppia-dashboard-exp-tile-details">
+                  <div class="oppia-dashboard-exp-tile-first-row">
+                    <span class="oppia-dashboard-exp-tile-title">
+                      <span ng-if="exploration.title"><[exploration.title]></span>
+                      <span ng-if="!exploration.title">Untitled</span>
                     </span>
                     <span style="font-weight: bold;">&middot;</span>
                     <span style="color: #888; font-size: 0.9em;" class="protractor-test-exploration-objective">
@@ -103,10 +103,10 @@
                     </span>
                   </div>
 
-                  <div class="oppia-gallery-tile-second-row">
+                  <div class="oppia-dashboard-exp-tile-second-row">
                     <span style="color: #888">
                       <strong><[exploration.category]></strong>
-                      <span style="font-weight: bold;">&middot;</span>
+                      <span style="font-weight: bold;" ng-if="exploration.category">&middot;</span>
                       Last updated <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
                     </span>
 
@@ -132,19 +132,33 @@
     </div>
 
     <div ng-if="explorationsList.length === 0">
-      <p>
-        <em>You currently aren't managing or collaborating on any explorations.</em>
-      </p>
+      <h2 style="margin-left: 52px;">My Explorations</h2>
+      <md-card layout="row" class="oppia-page-card oppia-dashboard-intro-card">
+        <div>
+          <p>
+            It looks like you haven't created any explorations yet.
+            Let's get started!
+          </p>
+          <button type="button"
+                  class="btn oppia-dashboard-intro-button oppia-transition-200"
+                  ng-click="createNewExploration()">
+            Create Exploration
+          </button>
+        </div>
+        <div class="oppia-dashboard-intro-picture">
+          <img src="/images/general/empty_dashboard.svg">
+        </div>
+      </md-card>
     </div>
   </div>
 
-  {% include 'components/exploration_creation_button_modal.html' %}
+  {% include 'components/upload_activity_modal.html' %}
 {% endblock %}
 
 {% block footer_js %}
   {{ super() }}
   <script>
-    {{ include_js_file('components/CollectionCreationButtonService.js') }}
+    {{ include_js_file('components/CollectionCreationService.js') }}
     {{ include_js_file('dashboard/MyExplorations.js') }}
   </script>
 {% endblock footer_js %}

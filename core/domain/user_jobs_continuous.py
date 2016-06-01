@@ -19,6 +19,7 @@ import logging
 
 from core import jobs
 from core.domain import exp_services
+from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.domain import stats_jobs_continuous
 from core.platform import models
@@ -202,11 +203,8 @@ class RecentUpdatesMRJobManager(
         for exp_model in tracked_exp_models_for_feedback:
             threads = feedback_services.get_all_threads(exp_model.id, False)
             for thread in threads:
-                full_thread_id = (
-                    feedback_models.FeedbackThreadModel.generate_full_thread_id(
-                        exp_model.id, thread['thread_id']))
-                if full_thread_id not in feedback_thread_ids_list:
-                    feedback_thread_ids_list.append(full_thread_id)
+                if thread.id not in feedback_thread_ids_list:
+                    feedback_thread_ids_list.append(thread.id)
 
         # TODO(bhenning): Implement a solution to having feedback threads for
         # collections.
@@ -220,10 +218,12 @@ class RecentUpdatesMRJobManager(
             yield (reducer_key, recent_activity_commit_dict)
 
         for feedback_thread_id in feedback_thread_ids_list:
-            exp_id = feedback_services.get_exp_id_from_full_thread_id(
-                feedback_thread_id)
-            thread_id = feedback_services.get_thread_id_from_full_thread_id(
-                feedback_thread_id)
+            exp_id = (
+                feedback_domain.FeedbackThread.get_exp_id_from_full_thread_id(
+                    feedback_thread_id))
+            thread_id = (
+                feedback_domain.FeedbackThread.get_thread_id_from_full_thread_id( # pylint: disable=line-too-long
+                    feedback_thread_id))
             last_message = (
                 feedback_models.FeedbackMessageModel.get_most_recent_message(
                     exp_id, thread_id))

@@ -27,7 +27,7 @@ describe('Exploration history', function() {
   it('should display the history', function() {
     users.createUser('user@historyTab.com', 'userHistoryTab');
     users.login('user@historyTab.com');
-    workflow.createExploration('history', 'history');
+    workflow.createExploration();
 
     // Constants for colors of nodes in history graph
     var COLOR_ADDED = 'rgb(78, 162, 78)';

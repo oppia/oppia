@@ -25,6 +25,7 @@
     </div>
     <div ng-show="!loadingMessage">
       {% block content %}{% endblock %}
+      {% block footer %}{% endblock %}
     </div>
   </div>
 {%- endmacro %}
@@ -56,7 +57,7 @@
 
     <link rel="apple-touch-icon" href="/images/logo/favicon.png">
     <title itemprop="name">{% block subtitle %}{% endblock %} - {% block maintitle %}Oppia{% endblock %}</title>
-
+    {% block base_url %}{% endblock base_url %}
     {% block header_css %}
       {% include 'header_css_libs.html' %}
     {% endblock header_css %}
@@ -66,12 +67,6 @@
         ADDITIONAL_ANGULAR_MODULES: [],
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
         DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}'),
-        NAV_MODE:
-          {% if nav_mode %}
-            JSON.parse('{{nav_mode|js_string}}'),
-          {% else %}
-            null,
-          {% endif %}
         INVALID_NAME_CHARS: JSON.parse('{{INVALID_NAME_CHARS|js_string}}'),
         ACTIVITY_STATUS_PRIVATE: JSON.parse(
           '{{ACTIVITY_STATUS_PRIVATE|js_string}}'),
@@ -79,8 +74,8 @@
           '{{ACTIVITY_STATUS_PUBLIC|js_string}}'),
         ACTIVITY_STATUS_PUBLICIZED: JSON.parse(
           '{{ACTIVITY_STATUS_PUBLICIZED|js_string}}'),
-        ALL_LANGUAGE_CODES: JSON.parse(
-          '{{ALL_LANGUAGE_CODES|js_string}}'),
+        ALL_CATEGORIES: JSON.parse('{{ALL_CATEGORIES|js_string}}'),
+        ALL_LANGUAGE_CODES: JSON.parse('{{ALL_LANGUAGE_CODES|js_string}}'),
         DEFAULT_LANGUAGE_CODE: JSON.parse(
           '{{DEFAULT_LANGUAGE_CODE|js_string}}'),
         RTE_COMPONENT_SPECS: JSON.parse('{{RTE_COMPONENT_SPECS|js_string}}'),
@@ -120,7 +115,7 @@
                     <a ng-if="windowIsNarrow" ng-click="openSidebar()" class="navbar-brand oppia-navbar-menu oppia-transition-200">
                       <i class="material-icons oppia-navbar-menu-icon">&#xE5D2;</i>
                     </a>
-                    <a class="oppia-navbar-brand-name oppia-transition-200" href="/gallery" focus-on="<[LABEL_FOR_CLEARING_FOCUS]>">
+                    <a class="oppia-navbar-brand-name oppia-transition-200" href="/" focus-on="<[LABEL_FOR_CLEARING_FOCUS]>">
                       <img src="/images/logo/288x128_logo_white.png" class="oppia-logo" ng-class="windowIsNarrow ? 'oppia-logo-small' : 'oppia-logo-wide'">
                     </a>
                     <!-- This is needed for the correct image to appear when an exploration is shared using G+. -->
@@ -128,6 +123,7 @@
                       <img src="/images/logo/288x128_logo_mint.png" itemprop="image">
                     </a>
                   </div>
+
 
                   {% if nav_mode != 'signup' %}
                     <div ng-cloak class="navbar-header pull-right">
@@ -248,7 +244,7 @@
                               </a>
                               <ul class="dropdown-menu oppia-navbar-dropdown" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
                                 <li><a href="/about">About Oppia</a></li>
-                                <li><a href="/participate">Participation Playbook</a></li>
+                                <li><a href="/teach">Teach with Oppia</a></li>
                                 {% for additional_link in SIDEBAR_MENU_ADDITIONAL_LINKS %}
                                   <li><a href="{{additional_link['link']}}" target="_blank">{{additional_link['name']}}</a></li>
                                 {% endfor %}
@@ -259,8 +255,8 @@
                               </ul>
                             </li>
                             <li class="oppia-clickable-navbar-element pull-right">
-                              <a class="oppia-navbar-tab" href="/gallery">
-                                Explore
+                              <a class="oppia-navbar-tab" href="/library">
+                                Library
                               </a>
                             </li>
                           </ul>
@@ -284,6 +280,16 @@
 
               {{ warnings_and_loader() }}
             </div>
+
+            <noscript>
+              <div class="oppia-page-cards-container">
+                <div class="md-default-theme oppia-page-card oppia-long-text">
+                  <h2>We Need JavaScript in Your Browser <i class="material-icons">&#xE811;</i></h2>
+                  <p>Oppia is a free, open-source learning platform full of interactive activities called 'explorations'.  Sadly, Oppia requires JavaScript to be enabled in your web browser in order to function properly and your web browser has JavaScript disabled.  If you need help enabling JavaScript, <a href="http://www.enable-javascript.com/">click here.</a></p>
+                  <p>Thank you.</p>
+                </div>
+              </div>
+            </noscript>
 
             {% include 'side_nav.html' %}
 
@@ -313,7 +319,8 @@
     {% include 'components/exploration_summary_tile_directive.html' %}
     {% include 'components/rating_display.html' %}
     {% include 'components/create_exploration_button_directive.html' %}
-    {% include 'components/activity_tiles_infinity_grid.html' %}
+    {% include 'components/activity_tiles_infinity_grid_directive.html' %}
+    {% include 'components/loading_dots_directive.html' %}
 
     <script>
       {{ include_js_file('app.js') }}
@@ -328,19 +335,22 @@
       {{ include_js_file('services/autoplayedVideosService.js') }}
       {{ include_js_file('services/searchService.js') }}
 
+      {{ include_js_file('components/ActivityTilesInfinityGridDirective.js') }}
       {{ include_js_file('components/AlertMessageDirective.js') }}
-      {{ include_js_file('components/ObjectEditorDirective.js') }}
+      {{ include_js_file('components/CreateExplorationButtonDirective.js') }}
+      {{ include_js_file('components/ExplorationCreationService.js') }}
       {{ include_js_file('components/ExplorationSummaryTileDirective.js') }}
+      {{ include_js_file('components/LoadingDotsDirective.js') }}
+      {{ include_js_file('components/ObjectEditorDirective.js') }}
       {{ include_js_file('components/RatingComputationService.js')}}
       {{ include_js_file('components/RatingDisplayDirective.js')}}
       {{ include_js_file('components/Select2DropdownDirective.js') }}
-      {{ include_js_file('components/CreateExplorationButtonDirective.js') }}
-      {{ include_js_file('components/ExplorationCreationButtonService.js') }}
-      {{ include_js_file('components/activityTilesInfinityGrid.js') }}
 
       {{ include_js_file('expressions/expressionSyntaxTree.js') }}
       {{ include_js_file('expressions/evaluator.js') }}
       {{ include_js_file('expressions/parser.js') }}
+
+      {{ include_js_file('domain/utilities/UrlInterpolationService.js') }}
 
       {{ OBJECT_EDITORS_JS }}
     </script>

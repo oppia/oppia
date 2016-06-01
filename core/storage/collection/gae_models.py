@@ -51,6 +51,9 @@ class CollectionModel(base_models.VersionedModel):
     category = ndb.StringProperty(required=True, indexed=True)
     # The objective of this collection.
     objective = ndb.TextProperty(default='', indexed=False)
+    # The language code of this collection.
+    language_code = ndb.StringProperty(
+        default=feconf.DEFAULT_LANGUAGE_CODE, indexed=True)
 
     # The version of all property blob schemas.
     schema_version = ndb.IntegerProperty(
@@ -260,7 +263,7 @@ class CollectionSummaryModel(base_models.BaseModel):
     """Summary model for an Oppia collection.
 
     This should be used whenever the content blob of the collection is not
-    needed (e.g. gallery, search, etc).
+    needed (e.g. search results, etc).
 
     A CollectionSummaryModel instance stores the following information:
 
@@ -278,6 +281,8 @@ class CollectionSummaryModel(base_models.BaseModel):
     category = ndb.StringProperty(required=True, indexed=True)
     # The objective of this collection.
     objective = ndb.TextProperty(required=True, indexed=False)
+    # The ISO 639-1 code for the language this collection is written in.
+    language_code = ndb.StringProperty(required=True, indexed=True)
 
     # Aggregate user-assigned ratings of the collection
     ratings = ndb.JsonProperty(default=None, indexed=False)

@@ -32,6 +32,7 @@ import utils
 COLLECTION_PROPERTY_TITLE = 'title'
 COLLECTION_PROPERTY_CATEGORY = 'category'
 COLLECTION_PROPERTY_OBJECTIVE = 'objective'
+COLLECTION_PROPERTY_LANGUAGE_CODE = 'language_code'
 COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS = 'prerequisite_skills'
 COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS = 'acquired_skills'
 
@@ -64,7 +65,7 @@ class CollectionChange(object):
 
     COLLECTION_PROPERTIES = (
         COLLECTION_PROPERTY_TITLE, COLLECTION_PROPERTY_CATEGORY,
-        COLLECTION_PROPERTY_OBJECTIVE)
+        COLLECTION_PROPERTY_OBJECTIVE, COLLECTION_PROPERTY_LANGUAGE_CODE)
 
     def __init__(self, change_dict):
         """Initializes an CollectionChange object from a dict.
@@ -256,7 +257,7 @@ class Collection(object):
     """Domain object for an Oppia collection."""
 
     def __init__(self, collection_id, title, category, objective,
-                 schema_version, nodes, version, created_on=None,
+                 language_code, schema_version, nodes, version, created_on=None,
                  last_updated=None):
         """Constructs a new collection given all the information necessary to
         represent a collection.
@@ -277,6 +278,7 @@ class Collection(object):
         self.title = title
         self.category = category
         self.objective = objective
+        self.language_code = language_code
         self.schema_version = schema_version
         self.nodes = nodes
         self.version = version
@@ -288,6 +290,7 @@ class Collection(object):
             'id': self.id,
             'title': self.title,
             'category': self.category,
+            'language_code': self.language_code,
             'objective': self.objective,
             'schema_version': self.schema_version,
             'nodes': [
@@ -297,9 +300,12 @@ class Collection(object):
 
     @classmethod
     def create_default_collection(
-            cls, collection_id, title, category, objective):
+            cls, collection_id, title=feconf.DEFAULT_COLLECTION_TITLE,
+            category=feconf.DEFAULT_COLLECTION_CATEGORY,
+            objective=feconf.DEFAULT_COLLECTION_OBJECTIVE,
+            language_code=feconf.DEFAULT_LANGUAGE_CODE):
         return cls(
-            collection_id, title, category, objective,
+            collection_id, title, category, objective, language_code,
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION, [], 0)
 
     @classmethod
@@ -309,8 +315,9 @@ class Collection(object):
         collection = cls(
             collection_dict['id'], collection_dict['title'],
             collection_dict['category'], collection_dict['objective'],
-            collection_dict['schema_version'], [], collection_version,
-            collection_created_on, collection_last_updated)
+            collection_dict['language_code'], collection_dict['schema_version'],
+            [], collection_version, collection_created_on,
+            collection_last_updated)
 
         for node_dict in collection_dict['nodes']:
             collection.nodes.append(
@@ -328,7 +335,14 @@ class Collection(object):
         return utils.yaml_from_dict(collection_dict)
 
     @classmethod
-    def from_yaml(cls, collection_id, yaml_content):
+    def _convert_v1_dict_to_v2_dict(cls, collection_dict):
+        """Converts a v1 collection dict into a v2 collection dict."""
+        collection_dict['schema_version'] = 2
+        collection_dict['language_code'] = feconf.DEFAULT_LANGUAGE_CODE
+        return collection_dict
+
+    @classmethod
+    def _migrate_to_latest_yaml_version(cls, yaml_content):
         try:
             collection_dict = utils.dict_from_yaml(yaml_content)
         except Exception as e:
@@ -336,6 +350,25 @@ class Collection(object):
                 'Please ensure that you are uploading a YAML text file, not '
                 'a zip file. The YAML parser returned the following error: %s'
                 % e)
+
+        collection_schema_version = collection_dict.get('schema_version')
+        if collection_schema_version is None:
+            raise Exception('Invalid YAML file: no schema version specified.')
+        if not (1 <= collection_schema_version
+                <= feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
+            raise Exception(
+                'Sorry, we can only process v1 to v%s collection YAML files at '
+                'present.' % feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
+
+        if collection_schema_version == 1:
+            collection_dict = cls._convert_v1_dict_to_v2_dict(collection_dict)
+            collection_schema_version = 2
+
+        return collection_dict
+
+    @classmethod
+    def from_yaml(cls, collection_id, yaml_content):
+        collection_dict = cls._migrate_to_latest_yaml_version(yaml_content)
 
         collection_dict['id'] = collection_id
         return Collection.from_dict(collection_dict)
@@ -356,8 +389,7 @@ class Collection(object):
         """Returns a list of all the exploration IDs that are part of this
         collection.
         """
-        return [
-            node.exploration_id for node in self.nodes]
+        return [node.exploration_id for node in self.nodes]
 
     @property
     def init_exploration_ids(self):
@@ -415,6 +447,9 @@ class Collection(object):
     def update_objective(self, objective):
         self.objective = objective
 
+    def update_language_code(self, language_code):
+        self.language_code = language_code
+
     def _find_node(self, exploration_id):
         for ind, node in enumerate(self.nodes):
             if node.exploration_id == exploration_id:
@@ -448,25 +483,40 @@ class Collection(object):
     def validate(self, strict=True):
         """Validates all properties of this collection and its constituents."""
 
+        # NOTE TO DEVELOPERS: Please ensure that this validation logic is the
+        # same as that in the frontend CollectionValidatorService.
+
         if not isinstance(self.title, basestring):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' % self.title)
-        utils.require_valid_name(self.title, 'the collection title')
+        utils.require_valid_name(
+            self.title, 'the collection title', allow_empty=True)
 
         if not isinstance(self.category, basestring):
             raise utils.ValidationError(
                 'Expected category to be a string, received %s'
                 % self.category)
-        utils.require_valid_name(self.category, 'the collection category')
+        utils.require_valid_name(
+            self.category, 'the collection category', allow_empty=True)
 
         if not isinstance(self.objective, basestring):
             raise utils.ValidationError(
                 'Expected objective to be a string, received %s' %
                 self.objective)
 
-        if not self.objective:
+        if not isinstance(self.language_code, basestring):
             raise utils.ValidationError(
-                'An objective must be specified (in the \'Settings\' tab).')
+                'Expected language code to be a string, received %s' %
+                self.language_code)
+
+        if not self.language_code:
+            raise utils.ValidationError(
+                'A language must be specified (in the \'Settings\' tab).')
+
+        if not any([self.language_code == lc['code']
+                    for lc in feconf.ALL_LANGUAGE_CODES]):
+            raise utils.ValidationError(
+                'Invalid language code: %s' % self.language_code)
 
         if not isinstance(self.schema_version, int):
             raise utils.ValidationError(
@@ -494,6 +544,18 @@ class Collection(object):
             node.validate()
 
         if strict:
+            if not self.title:
+                raise utils.ValidationError(
+                    'A title must be specified for the collection.')
+
+            if not self.objective:
+                raise utils.ValidationError(
+                    'An objective must be specified for the collection.')
+
+            if not self.category:
+                raise utils.ValidationError(
+                    'A category must be specified for the collection.')
+
             if not self.nodes:
                 raise utils.ValidationError(
                     'Expected to have at least 1 exploration in the '
@@ -529,7 +591,7 @@ class Collection(object):
 class CollectionSummary(object):
     """Domain object for an Oppia collection summary."""
 
-    def __init__(self, collection_id, title, category, objective,
+    def __init__(self, collection_id, title, category, objective, language_code,
                  status, community_owned, owner_ids, editor_ids,
                  viewer_ids, contributor_ids, contributors_summary, version,
                  collection_model_created_on, collection_model_last_updated):
@@ -537,6 +599,7 @@ class CollectionSummary(object):
         self.title = title
         self.category = category
         self.objective = objective
+        self.language_code = language_code
         self.status = status
         self.community_owned = community_owned
         self.owner_ids = owner_ids
@@ -554,6 +617,7 @@ class CollectionSummary(object):
             'title': self.title,
             'category': self.category,
             'objective': self.objective,
+            'language_code': self.language_code,
             'status': self.status,
             'community_owned': self.community_owned,
             'owner_ids': self.owner_ids,

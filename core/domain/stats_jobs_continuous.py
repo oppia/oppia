@@ -171,7 +171,8 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
     @classmethod
     def get_views_multi(cls, exploration_ids):
         """Given a list of exploration ids, returns a list of view counts
-        for the explorations therein.
+        for the explorations therein. If any of the exploration_ids are
+        None, the corresponding return value is 0.
         """
         entity_ids = [stats_models.ExplorationAnnotationsModel.get_entity_id(
             exploration_id, VERSION_ALL) for exploration_id in exploration_ids]

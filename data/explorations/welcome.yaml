@@ -175,8 +175,8 @@ states:
     content:
     - type: text
       value: <p>That's a very quick sample of Oppia. For more sample explorations,
-        check out the gallery. You can also create new explorations, like this one,
-        by clicking on the "Create exploration" button in the gallery.</p><br><div>We
+        check out the Library. You can also create new explorations, like this one,
+        by clicking on the "Create" button in the top right of the page.</p><br><div>We
         hope you enjoy using Oppia. If you have feedback, please let us know at our
         <oppia-noninteractive-link open_link_in_same_window-with-value="false" text-with-value="&amp;quot;discussion
         forum&amp;quot;" url-with-value="&amp;quot;https://groups.google.com/forum/?fromgroups#!forum/oppia&amp;quot;"></oppia-noninteractive-link>!</div><p></p>

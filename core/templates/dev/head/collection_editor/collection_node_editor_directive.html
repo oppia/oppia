@@ -1,8 +1,6 @@
 <script type="text/ng-template" id="inline/collection_node_editor_directive">
   <div>
     [<[getCollectionNode().getExplorationId()]>] <em><[getCollectionNode().getExplorationTitle()]></em>
-    <span ng-if="!getCollectionNode().doesExplorationExist()"><strong>Warning: This exploration no longer exists.</strong></span>
-    <span ng-if="getCollectionNode().isExplorationNew()"><strong>Warning: Please save the collection before details will appear for this exploration.</strong></span>
     <button ng-click="deleteCollectionNode()">Delete</button>
   </div>
   <p> Prerequisite skills: </p>
