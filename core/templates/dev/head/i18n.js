@@ -44,8 +44,8 @@ oppia.constant('DEFAULT_TRANSLATIONS', {
 });
 
 oppia.controller('I18nFooter', [
-    '$http', '$rootScope', '$scope', '$translate',
-    function($http, $rootScope, $scope, $translate) {
+    '$http', '$rootScope', '$scope', '$translate', '$timeout',
+    function($http, $rootScope, $scope, $translate, $timeout) {
   // Changes the language of the translations.
   var preferencesDataUrl = '/preferenceshandler/data';
   var siteLanguageUrl = '/save_site_language';
@@ -53,11 +53,18 @@ oppia.controller('I18nFooter', [
   if (GLOBALS.userIsLoggedIn && GLOBALS.preferredSiteLanguageCode) {
     $translate.use(GLOBALS.preferredSiteLanguageCode);
   }
-  $scope.changeLanguage = function(langCode) {
-    $translate.use(langCode);
+
+  // The $timeout seems to be necessary for the dropdown to show anything
+  // at the outset, if the default language is not English.
+  $timeout(function() {
+    $scope.currentLanguageCode = $translate.use();
+  }, 5);
+
+  $scope.changeLanguage = function() {
+    $translate.use($scope.currentLanguageCode);
     if (GLOBALS.userIsLoggedIn) {
       $http.put(siteLanguageUrl, {
-        site_language_code: langCode
+        site_language_code: $scope.currentLanguageCode
       }, {
         requestIsFromFooter: true
       });
@@ -103,9 +110,9 @@ oppia.config([
 // Service to dynamically construct translation ids for i18n.
 oppia.factory('i18nIdService', function() {
   return {
-    // Construct a translation id for gallery from name and a prefix.
+    // Construct a translation id for library from name and a prefix.
     // Ex: 'categories', 'art' -> 'I18N_LIBRARY_CATEGORIES_ART'
-    getGalleryId: function(prefix, name) {
+    getLibraryId: function(prefix, name) {
       return (
         'I18N_LIBRARY_' + prefix.toUpperCase() + '_' +
         name.toUpperCase().replace(' ', '_'));

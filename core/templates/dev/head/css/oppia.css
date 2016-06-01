@@ -469,7 +469,6 @@ textarea {
   margin-left: auto;
   margin-right: auto;
   min-height: 100%;
-  padding-bottom: 50px;
   position: relative;
 }
 
@@ -628,7 +627,7 @@ textarea {
 .oppia-footer {
   background-color: #094142;
   bottom: 0;
-  color: #FFFFFF;
+  color: #fff;
   font-size: 13px;
   line-height: 20px;
   position: absolute;
@@ -646,8 +645,7 @@ textarea {
 }
 
 .oppia-footer-container a {
-  color: #FFFFFF;
-  text-transform: capitalize;
+  color: #fff;
 }
 
 .oppia-footer-container h4 {
@@ -2565,12 +2563,6 @@ div#ng-curtain {
 .form-control.oppia-rte-content > .ta-bind {
   height: auto;
   min-height: 80px;
-}
-
-.oppia-language-footer {
-  padding: 15px 25px;
-  position: relative;
-  z-index: 1;
 }
 
 .form-control.oppia-rte-content img.block-element {

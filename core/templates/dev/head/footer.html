@@ -14,15 +14,10 @@
         </ul>
       </div>
       <div class="col-sm-3">
-        <h4>TEACH</h4>
+        <h4>TEACH/LEARN</h4>
         <ul>
-          <li><a href="/about#teach">Teach on Oppia</a></li>
+          <li><a href="/about#teach">Teach with Oppia</a></li>
           <li><a href="/participate">Participation Playbook</a></li>
-        </ul>
-      </div>
-      <div class="col-sm-3">
-        <h4>LEARN</h4>
-        <ul>
           <li><a href="/library">Browse the Library</a></li>
         </ul>
       </div>
@@ -31,6 +26,17 @@
         <ul>
           <li><a href="/forum">Forum</a></li>
           <li><a href="/about#contact">Contact Us</a></li>
+        </ul>
+      </div>
+      <div class="col-sm-3">
+        <h4><span translate="I18N_LANGUAGE_FOOTER_VIEW_IN"></span></h4>
+        <ul ng-controller="I18nFooter">
+          <select ng-model="currentLanguageCode"
+                  ng-change="changeLanguage()"
+                  ng-options="langCode as langName for (langCode, langName) in supportedSiteLanguages"
+                  class="protractor-test-i18n-language-selector"
+                  style="color: black;">
+          </select>
         </ul>
       </div>
     </div>
