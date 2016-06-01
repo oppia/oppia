@@ -153,7 +153,7 @@ class BaseJobManager(object):
     @classmethod
     def register_completion(cls, job_id, output):
         """Marks a job as completed."""
-        _MAX_OUTPUT_LENGTH = 900000
+        _MAX_OUTPUT_LENGTH = 100000
 
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)
