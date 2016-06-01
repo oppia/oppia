@@ -33,7 +33,7 @@ class HomePageTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 302)
         self.assertIn('splash', response.headers['location'])
         response.follow().mustcontain(
-            'I18N_GALLERY_PAGE_TITLE', 'I18N_SIDEBAR_HOME_ABOUT',
+            'I18N_GALLERY_PAGE_TITLE', 'I18N_SIDEBAR_ABOUT_LINK',
             'I18N_TOPNAV_SIGN_IN', no=['I18N_TOPNAV_LOGOUT'])
 
     def test_notifications_dashboard_redirects_for_logged_out_users(self):
@@ -274,9 +274,6 @@ class SiteLanguageHandlerTests(test_utils.GenericTestBase):
         response = self.testapp.get('/preferences')
         self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(response)
-        print "lalalala", csrf_token
-        csrf_token = self.get_csrf_token_from_response(response,
-                                                       for_footer=True)
         self.put_json(feconf.SITE_LANGUAGE_DATA_URL, {
             'site_language_code': language_code,
         }, csrf_token)
