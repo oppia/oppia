@@ -253,7 +253,7 @@
       <div class="oppia-about-extra-info about-otter-buttons">
         <div class="oppia-about-content oppia-about-extra-content">
           <div class="oppia-about-card-content-wide oppia-about-buttons-container">
-            <a href="#" class="btn oppia-about-button">Create an exploration</a>
+            <a href="/my_explorations?mode=create" class="btn oppia-about-button">Create an exploration</a>
             <a href="/library" class="btn oppia-about-button">Browse all explorations</a>
           </div>
         </div>
@@ -263,37 +263,35 @@
 
   <script>
     $(document).ready(function() {
-      var activeTabClass = "oppia-about-tabs-active";
+      var activeTabClass = 'oppia-about-tabs-active';
       var hash = window.location.hash.slice(1);
-      var visibleContent = "oppia-about-visible-content";
+      var visibleContent = 'oppia-about-visible-content';
 
       function activateTab(tabName) {
         $("a[name='" + tabName + "']").parent().addClass(activeTabClass).siblings().removeClass(activeTabClass);
-        $("." + tabName).addClass(visibleContent).siblings().removeClass(visibleContent);
+        $('.' + tabName).addClass(visibleContent).siblings().removeClass(visibleContent);
       }
 
-      if(hash === "teach") {
-        activateTab("teach");
-      }
-      else if(hash === "playbook") {
+      if (hash === 'teach') {
+        activateTab('teach');
+      } else if (hash === 'playbook') {
         activateTab("playbook");
       }
 
       window.onhashchange = function() {
         var hashChange = window.location.hash.slice(1);
-        if(hashChange === "teach") {
-          activateTab("teach");
-        }
-        else if(hashChange === "playbook") {
-          activateTab("playbook");
+        if (hashChange === 'teach') {
+          activateTab('teach');
+        } else if (hashChange === 'playbook') {
+          activateTab('playbook');
         }
       }
 
-      $(".oppia-about-tabs li").on("click", function(event) {
-        event.preventDefault();
+      $('.oppia-about-tabs li').on('click', function(evt) {
+        evt.preventDefault();
         $(this).addClass(activeTabClass).siblings().removeClass(activeTabClass);
-        var currentAttrVal = $(this).children("a").attr("href");
-        $("." + currentAttrVal).addClass(visibleContent).siblings().removeClass(visibleContent);
+        var currentAttrVal = $(this).children('a').attr('href');
+        $('.' + currentAttrVal).addClass(visibleContent).siblings().removeClass(visibleContent);
       });
     });
   </script>

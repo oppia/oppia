@@ -94,7 +94,6 @@ class ContactPage(base.BaseHandler):
         """Handles GET requests."""
         self.values.update({
             'CONTACT_EMAIL_ADDRESS': CONTACT_EMAIL_ADDRESS.value,
-            'SITE_FEEDBACK_FORM_URL': MODERATOR_REQUEST_FORUM_URL.value,
             'SITE_FORUM_URL': SITE_FORUM_URL.value,
             'nav_mode': feconf.NAV_MODE_CONTACT,
         })

@@ -104,7 +104,7 @@
 
       <div class="credits oppia-about-tab-content">
         <div class="oppia-about-card-content-wide">
-          <h2>Oppia Contributors</h2>
+          <h2>Credits</h2>
           <p>
             Oppia's contributors come from all over the world -- many of us are
             students, recent students and teachers. We'd like to thank the
@@ -357,7 +357,7 @@
   <div class="oppia-about-extra-container">
     <div class="oppia-about-extra-content oppia-about-clearfix">
       <div class="oppia-about-otter-container">
-        <img src="images/general/about-page-otter.png" class="oppia-about-otter" alt="Otter">
+        <img src="images/general/about_page_mascot.png" class="oppia-about-otter" alt="Otter">
       </div>
       <div class="oppia-about-otter-speech-card">
         <blockquote class="oppia-about-otter-speech-bubble">
@@ -378,38 +378,41 @@
 
   <script>
     $(document).ready(function() {
-      var activeTabClass = "oppia-about-tabs-active";
+      var activeTabClass = 'oppia-about-tabs-active';
       var hash = window.location.hash.slice(1);
-      var visibleContent = "oppia-about-visible-content";
+      var visibleContent = 'oppia-about-visible-content';
 
       function activateTab(tabName) {
-        $("a[name='" + tabName + "']").parent().addClass(activeTabClass).siblings().removeClass(activeTabClass);
-        $("." + tabName).addClass(visibleContent).siblings().removeClass(visibleContent);
+        $("a[name='" + tabName + "']").parent().addClass(
+          activeTabClass
+        ).siblings().removeClass(activeTabClass);
+        $('.' + tabName).addClass(visibleContent).siblings().removeClass(
+          visibleContent);
       }
 
-      if(hash === "foundation") {
-        activateTab("foundation");
+      if (hash === 'foundation') {
+        activateTab('foundation');
       }
-      
-      if(hash === "credits") {
-        activateTab("credits");
+
+      if (hash === 'credits') {
+        activateTab('credits');
       }
 
       window.onhashchange = function() {
         var hashChange = window.location.hash.slice(1);
-        if(hashChange === "foundation") {
-          activateTab("foundation");
-        }
-        else if(hashChange === "credits") {
-          activateTab("credits");
+        if (hashChange === 'foundation') {
+          activateTab('foundation');
+        } else if (hashChange === 'credits') {
+          activateTab('credits');
         }
       }
 
-      $(".oppia-about-tabs li").on("click", function(event) {
-        event.preventDefault();
+      $('.oppia-about-tabs li').on('click', function(evt) {
+        evt.preventDefault();
         $(this).addClass(activeTabClass).siblings().removeClass(activeTabClass);
-        var currentAttrVal = $(this).children("a").attr("href");
-        $("." + currentAttrVal).addClass(visibleContent).siblings().removeClass(visibleContent);
+        var currentAttrVal = $(this).children('a').attr('href');
+        $('.' + currentAttrVal).addClass(visibleContent).siblings().removeClass(
+          visibleContent);
       });
     });
   </script>
