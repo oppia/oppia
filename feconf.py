@@ -402,6 +402,8 @@ NAV_MODE_PARTICIPATE = 'participate'
 NAV_MODE_PROFILE = 'profile'
 NAV_MODE_SIGNUP = 'signup'
 NAV_MODE_SPLASH = 'splash'
+NAV_MODE_TEACH = 'teach'
+NAV_MODE_CONTACT = 'contact'
 
 # Event types.
 EVENT_TYPE_STATE_HIT = 'state_hit'
@@ -523,6 +525,9 @@ SEARCH_DROPDOWN_CATEGORIES = sorted([
 # The header for the "Featured Explorations" category in the library index
 # page.
 LIBRARY_CATEGORY_FEATURED_EXPLORATIONS = 'Featured Explorations'
+# The header for the "Top Rated Explorations" category in the library index
+# page.
+LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = 'Top Rated Explorations'
 
 # List of supported language codes. Each description has a
 # parenthetical part that may be stripped out to give a shorter
