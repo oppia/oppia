@@ -328,7 +328,7 @@ class BaseHandler(webapp2.RequestHandler):
             self.redirect(users.create_logout_url(self.request.uri))
             return
 
-        if self.payload and self.REQUIRE_PAYLOAD_CSRF_CHECK:
+        if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
             try:
                 if not self.PAGE_NAME_FOR_CSRF:
                     raise Exception('No CSRF page name specified for this '
