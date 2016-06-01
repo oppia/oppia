@@ -453,6 +453,8 @@ textarea {
   opacity: 0.5;
   padding: 4px 8px;
   position: fixed;
+  /* This is needed so that the exploration summary tiles don't overlap the button in the library page. */
+  z-index: 3;
 }
 .oppia-site-feedback:hover,
 .oppia-site-feedback:focus,
@@ -930,7 +932,7 @@ textarea {
   margin-left: auto;
   margin-right: auto;
   max-width: 928px;
-  min-height: 500px;
+  min-height: 300px;
   padding-bottom: 24px;
   padding-top: 24px;
   width: 100vw;
@@ -1047,15 +1049,11 @@ textarea {
   position: relative;
 }
 
-.oppia-library-carousel-overlay-left {
-  background: #b5bdc8;
-  background: -moz-linear-gradient(left, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%);
-  background: -webkit-linear-gradient(left, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%);
-  background: linear-gradient(to right, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%);
+.oppia-library-carousel-overlay-left,
+.oppia-library-carousel-overlay-right {
   /*The display is set in Library.js*/
   display: none;
-  height: 240px;
-  left: 0;
+  height: 258px;
   margin-top: 12px;
   position: absolute;
   top: 0;
@@ -1063,20 +1061,20 @@ textarea {
   z-index: 99;
 }
 
+.oppia-library-carousel-overlay-left {
+  background: #b5bdc8;
+  background: -moz-linear-gradient(left, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%);
+  background: -webkit-linear-gradient(left, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%);
+  background: linear-gradient(to right, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%);
+  left: 0;
+}
+
 .oppia-library-carousel-overlay-right {
   background: #b5bdc8;
   background: -moz-linear-gradient(left, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%);
   background: -webkit-linear-gradient(left, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%);
   background: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%);
-  /*The display is set in Library.js*/
-  display: none;
-  height: 240px;
   right: 0;
-  margin-top: 12px;
-  position: absolute;
-  top: 0;
-  width: 20px;
-  z-index: 99;
 }
 
 /* Rules for the tiles in the "My Explorations" page. */

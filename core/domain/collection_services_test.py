@@ -607,16 +607,11 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             collection_services.delete_collection(
                 self.owner_id, self.COLLECTION_ID)
 
-    def test_create_new_collection_error_cases(self):
-        collection = collection_domain.Collection.create_default_collection(
-            self.COLLECTION_ID, '', '', '')
-        with self.assertRaisesRegexp(Exception, 'between 1 and 50 characters'):
-            collection_services.save_new_collection(self.owner_id, collection)
-
-        collection = collection_domain.Collection.create_default_collection(
-            self.COLLECTION_ID, 'title', '', '')
-        with self.assertRaisesRegexp(Exception, 'between 1 and 50 characters'):
-            collection_services.save_new_collection(self.owner_id, collection)
+    def test_create_new_collection(self):
+        # Test that creating a new collection (with an empty title, etc.)
+        # succeeds.
+        collection_domain.Collection.create_default_collection(
+            self.COLLECTION_ID)
 
     def test_save_and_retrieve_collection(self):
         collection = self.save_new_valid_collection(

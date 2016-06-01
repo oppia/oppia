@@ -345,7 +345,7 @@ class TestBase(unittest.TestCase):
         Returns the exploration domain object.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
-            exploration_id, title, 'A category')
+            exploration_id, title=title, category='A category')
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 
@@ -359,7 +359,8 @@ class TestBase(unittest.TestCase):
         Returns the exploration domain object.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
-            exploration_id, title, category, language_code=language_code)
+            exploration_id, title=title, category=category,
+            language_code=language_code)
         exploration.states[exploration.init_state_name].update_interaction_id(
             'TextInput')
         exploration.objective = objective
@@ -426,7 +427,7 @@ class TestBase(unittest.TestCase):
         Returns the collection domain object.
         """
         collection = collection_domain.Collection.create_default_collection(
-            collection_id, title, category, objective,
+            collection_id, title=title, category=category, objective=objective,
             language_code=language_code)
         collection_services.save_new_collection(owner_id, collection)
         return collection

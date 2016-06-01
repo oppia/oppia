@@ -80,6 +80,9 @@ class LibraryIndexHandler(base.BaseHandler):
         # TODO(sll): Support index pages for other language codes.
         summary_dicts_by_category = summary_services.get_library_groups([
             feconf.DEFAULT_LANGUAGE_CODE])
+        top_rated_activity_summary_dicts = (
+            summary_services.get_top_rated_exploration_summary_dicts(
+                [feconf.DEFAULT_LANGUAGE_CODE]))
         featured_activity_summary_dicts = (
             summary_services.get_featured_exploration_summary_dicts(
                 [feconf.DEFAULT_LANGUAGE_CODE]))
@@ -89,6 +92,12 @@ class LibraryIndexHandler(base.BaseHandler):
             user_settings = user_services.get_user_settings(self.user_id)
             preferred_language_codes = user_settings.preferred_language_codes
 
+        if top_rated_activity_summary_dicts:
+            summary_dicts_by_category.insert(0, {
+                'activity_summary_dicts': top_rated_activity_summary_dicts,
+                'categories': [],
+                'header': feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS,
+            })
         if featured_activity_summary_dicts:
             summary_dicts_by_category.insert(0, {
                 'activity_summary_dicts': featured_activity_summary_dicts,

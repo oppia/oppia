@@ -454,8 +454,11 @@ class BaseHandler(webapp2.RequestHandler):
                 current_user_services.create_logout_url(
                     redirect_url_on_logout))
         else:
+            target_url = (
+                '/' if self.request.uri.endswith(feconf.SPLASH_URL)
+                else self.request.uri)
             values['login_url'] = (
-                current_user_services.create_login_url(self.request.uri))
+                current_user_services.create_login_url(target_url))
 
         # Create a new csrf token for inclusion in HTML responses. This assumes
         # that tokens generated in one handler will be sent back to a handler
