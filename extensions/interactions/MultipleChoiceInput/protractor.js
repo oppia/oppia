@@ -60,13 +60,13 @@ var testSuite = [{
   interactionArguments: [[function(editor) {
       editor.appendBoldText('right');
     }, function(editor) {
-      editor.appendUnderlineText('wrong');
+      editor.appendItalicText('wrong');
     }]],
   ruleArguments: ['Equals', ['right']],
   expectedInteractionDetails: [[function(checker) {
       checker.readBoldText('right');
     }, function(checker) {
-      checker.readUnderlineText('wrong');
+      checker.readItalicText('wrong');
     }]],
   wrongAnswers: ['wrong'],
   correctAnswers: ['right']

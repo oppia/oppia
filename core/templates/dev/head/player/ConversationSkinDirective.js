@@ -706,6 +706,10 @@ oppia.directive('conversationSkin', [function() {
           return $scope.windowWidth < TWO_CARD_THRESHOLD_PX;
         };
 
+        $scope.isWindowTall = function() {
+          return document.body.scrollHeight > $window.innerHeight;
+        };
+
         $scope.isScreenNarrowAndShowingTutorCard = function() {
           if (!$scope.isCurrentSupplementalCardNonempty()) {
             return $scope.isViewportNarrow();

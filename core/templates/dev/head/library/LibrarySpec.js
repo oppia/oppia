@@ -76,10 +76,6 @@ describe('Library controller', function() {
       ctrl = $controller('Library', {
         $scope: scope,
         alertsService: null,
-        ExplorationCreationButtonService: {
-          showCreateExplorationModal: null,
-          showUploadExplorationModal: null
-        },
         oppiaDatetimeFormatter: null
       });
     }));
