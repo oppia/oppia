@@ -185,13 +185,16 @@ def get_displayable_exp_summary_dicts_matching_ids(
 
         filtered_exploration_summaries.append(exploration_summary)
 
-    return _get_displayable_exp_summary_dicts(filtered_exploration_summaries)
+    return _get_displayable_exp_summary_dicts(
+        filtered_exploration_summaries, include_contributors=False)
 
 
-def _get_displayable_exp_summary_dicts(exploration_summaries):
+def _get_displayable_exp_summary_dicts(
+        exploration_summaries, include_contributors=True):
     """Given a list of exploration summary domain objects, returns a list,
     with the same number of elements, of the corresponding human-readable
-    exploration summary dicts.
+    exploration summary dicts. If include_contributors is False, the resulting
+    dicts will not have a 'human_readable_contributors_summary' attribute.
 
     This assumes that all the exploration summary domain objects passed in are
     valid (i.e., none of them are None).
@@ -209,7 +212,7 @@ def _get_displayable_exp_summary_dicts(exploration_summaries):
         if not exploration_summary:
             continue
 
-        displayable_exp_summaries.append({
+        summary_dict = {
             'id': exploration_summary.id,
             'title': exploration_summary.title,
             'activity_type': rights_manager.ACTIVITY_TYPE_EXPLORATION,
@@ -222,16 +225,20 @@ def _get_displayable_exp_summary_dicts(exploration_summaries):
             'status': exploration_summary.status,
             'ratings': exploration_summary.ratings,
             'community_owned': exploration_summary.community_owned,
-            'human_readable_contributors_summary':
-                get_human_readable_contributors_summary(
-                    exploration_summary.contributors_summary),
             'tags': exploration_summary.tags,
             'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
                 exploration_summary.category),
             'thumbnail_bg_color': utils.get_hex_color_for_category(
                 exploration_summary.category),
             'num_views': view_counts[ind],
-        })
+        }
+
+        if include_contributors:
+            summary_dict['human_readable_contributors_summary'] = (
+                get_human_readable_contributors_summary(
+                    exploration_summary.contributors_summary))
+
+        displayable_exp_summaries.append(summary_dict)
 
     return displayable_exp_summaries
 
@@ -308,7 +315,7 @@ def get_library_groups(language_codes):
     exp_summary_dicts = {
         summary_dict['id']: summary_dict
         for summary_dict in _get_displayable_exp_summary_dicts(
-            exp_summaries)
+            exp_summaries, include_contributors=False)
     }
 
     results = []
@@ -357,7 +364,8 @@ def get_featured_exploration_summary_dicts(language_codes):
         key=lambda exp_summary: search_ranks[exp_summary.id],
         reverse=True)
 
-    return _get_displayable_exp_summary_dicts(sorted_exp_summaries)
+    return _get_displayable_exp_summary_dicts(
+        sorted_exp_summaries, include_contributors=False)
 
 
 def get_top_rated_exploration_summary_dicts(language_codes):
@@ -371,23 +379,17 @@ def get_top_rated_exploration_summary_dicts(language_codes):
         if exp_summary.language_code in language_codes and
         sum(exp_summary.ratings.values()) > 0]
 
-    average_ratings = {
-        exp_summary.id: exp_services.get_average_rating_from_exp_summary(
-            exp_summary)
+    lower_bound_wilson_scores = {
+        exp_summary.id:
+            exp_services.get_scaled_average_rating_from_exp_summary(
+                exp_summary)
         for exp_summary in filtered_exp_summaries
     }
 
-    # The following two calls to 'sorted' ensure that the return list is sorted
-    # by average rating, breaking ties by the number of ratings.
-
-    sorted_by_ratings_count_exp_summaries = sorted(
-        filtered_exp_summaries,
-        key=lambda exp_summary: sum(exp_summary.ratings.values()),
-        reverse=True)
-
     sorted_exp_summaries = sorted(
-        sorted_by_ratings_count_exp_summaries,
-        key=lambda exp_summary: average_ratings[exp_summary.id],
+        filtered_exp_summaries,
+        key=lambda exp_summary: lower_bound_wilson_scores[exp_summary.id],
         reverse=True)[:NUMBER_OF_TOP_RATED_EXPLORATIONS]
 
-    return _get_displayable_exp_summary_dicts(sorted_exp_summaries)
+    return _get_displayable_exp_summary_dicts(
+        sorted_exp_summaries, include_contributors=False)
