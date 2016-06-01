@@ -344,6 +344,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/createhandler/started_tutorial_event',
         editor.StartedTutorialEventHandler, 'started_tutorial_event_handler'),
+    get_redirect_route(
+        r'/createhandler/autosave_draft/<exploration_id>',
+        editor.EditorAutosaveHandler, 'editor_autosave_handler'),
 
     get_redirect_route(
         r'%s' % feconf.RECENT_COMMITS_DATA_URL,
