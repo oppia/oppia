@@ -2019,9 +2019,9 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
   var CMD_DELETE_STATE = 'delete_state';
   var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
 
-  var getRulesList = function(value) {
+  var makeRulesListHumanReadable = function(answerGroupValue) {
     var rulesList = [];
-    value.rule_specs.forEach(function(ruleSpec) {
+    answerGroupValue.rule_specs.forEach(function(ruleSpec) {
       var ruleElm = angular.element('<div></div>');
       ruleElm.append('<p>Type: ' + ruleSpec.rule_type + '</p>');
       ruleElm.append(
@@ -2038,14 +2038,16 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
     return rulesList;
   };
 
-  var getStatePropertyValue = function(
-    statePropertyValue) {
+  // An edit is represented either as an object or an array. If it's an object,
+  // then simply return that object. In case of an array, return the last item
+  var getStatePropertyValue = function(statePropertyValue) {
     return angular.isArray(statePropertyValue) ?
       statePropertyValue[statePropertyValue.length - 1] : statePropertyValue;
   };
 
-  var isEmpty = utilsService.isEmpty;
-
+  // Detects whether an object of the type 'answer_group' or 'default_outcome'
+  // has been added, edited or deleted.
+  // Returns - 'addded', 'edited' or 'deleted' accordingly.
   var getRelativeChangeToGroups = function(changeObject) {
     var newValue = changeObject.new_value;
     var oldValue = changeObject.old_value;
@@ -2056,13 +2058,13 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
         'added' : (newValue.length === oldValue.length) ?
         'edited' : 'deleted';
     } else {
-      if (!isEmpty(oldValue)) {
-        if (!isEmpty(newValue)) {
+      if (!utilsService.isEmpty(oldValue)) {
+        if (!utilsService.isEmpty(newValue)) {
           result = 'edited';
         } else {
           result = 'deleted';
         }
-      } else if (!isEmpty(newValue)) {
+      } else if (!utilsService.isEmpty(newValue)) {
         result = 'added';
       }
     }
@@ -2071,32 +2073,55 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
 
   var makeHumanReadable = function(lostChanges) {
     var outerHtml = angular.element('<ul></ul>');
-    var statesWiseEditsMapping = {};
+    var stateWiseEditsMapping = {};
+    // The variable stateWiseEditsMapping stores the edits grouped by state.
+    // For instance, you made the following edits:
+    // 1. Changed content to 'Welcome' instead of '' in 'First Card'.
+    // 2. Added an interaction in this state.
+    // 2. Added a new state 'End'.
+    // 3. Ended Exporation from state 'End'.
+    // stateWiseEditsMapping will look something like this:
+    // - 'First Card': [
+    //   - 'Edited Content: Welcome!',:
+    //   - 'Added Interaction: Continue',
+    //   - 'Added interaction customizations']
+    // - 'End': ['Ended exploration']
 
     lostChanges.forEach(function(lostChange) {
       var lostChangeEl = angular.element('<li></li>');
       var lostChangeValue;
+
       switch (lostChange.cmd) {
         case CMD_ADD_STATE:
-          lostChangeValue = 'Added state: ' + lostChange.state_name;
+          outerHtml.append(
+            angular.element('<li></li>').html(
+              'Added state: ' + lostChange.state_name));
           break;
         case CMD_RENAME_STATE:
-          lostChangeValue = ('Renamed state: ' + lostChange.old_state_name +
-                             ' to ' + lostChange.new_state_name);
+          outerHtml.append(
+            angular.element('<li></li>').html(
+              'Renamed state: ' + lostChange.old_state_name + ' to ' +
+                lostChange.new_state_name));
           break;
         case CMD_DELETE_STATE:
-          lostChangeValue = 'Deleted state: ' + lostChange.state_name;
+          outerHtml.append(
+            angular.element('<li></li>').html(
+              'Deleted state: ' + lostChange.state_name));
           break;
         case CMD_EDIT_STATE_PROPERTY:
           var newValue = getStatePropertyValue(lostChange.new_value);
           var oldValue = getStatePropertyValue(lostChange.old_value);
           var stateName = lostChange.state_name;
+          if (!stateWiseEditsMapping[stateName]) {
+            stateWiseEditsMapping[stateName] = [];
+          }
 
           switch (lostChange.property_name) {
             case 'content':
-              lostChangeValue = 'Edited content: ';
               if (newValue !== null) {
-                lostChangeValue += newValue.value;
+                stateWiseEditsMapping[stateName].push(
+                  angular.element('<div></div>').html('Edited content: ' +
+                                                      newValue.value));
               }
               break;
 
@@ -2110,118 +2135,112 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
               } else {
                 lostChangeValue = 'Deleted Interaction: ' + oldValue;
               }
+              stateWiseEditsMapping[stateName].push(
+                angular.element('<div></div>').html(lostChangeValue));
               break;
 
             case 'widget_customization_args':
-              if (isEmpty(oldValue)) {
+              if (utilsService.isEmpty(oldValue)) {
                 lostChangeValue = 'Added Interaction Customizations';
-              } else if (isEmpty(newValue)) {
+              } else if (utilsService.isEmpty(newValue)) {
                 lostChangeValue = 'Removed Interaction Customizations';
               } else {
                 lostChangeValue = 'Edited Interaction Customizations';
               }
+              stateWiseEditsMapping[stateName].push(
+                angular.element('<div></div>').html(lostChangeValue));
               break;
 
             case 'answer_groups':
               var answerGroupChanges = getRelativeChangeToGroups(lostChange);
-              var changesEl = angular.element('<div></div>');
+              var answerGroupHtml = '';
               if (answerGroupChanges === 'added') {
-                lostChangeValue = angular.element(
-                  '<div>Added answer group: </div>');
-                changesEl.append(
+                answerGroupHtml += (
                   '<p>Destination: ' + newValue.outcome.dest + '</p>');
-                changesEl.append(
+                answerGroupHtml += (
                   '<p>Feedback:' + newValue.outcome.feedback + '</p>');
-                var rulesList = getRulesList(newValue);
+                var rulesList = makeRulesListHumanReadable(newValue);
                 if (rulesList.length) {
-                  changesEl.append('<div>Rules: <div>');
+                  answerGroupHtml += ('<div>Rules: <div>');
                   for (var rule in rulesList) {
-                    changesEl.append(rulesList[rule]);
+                    answerGroupHtml += rulesList[rule].html();
                   }
                 }
-                lostChangeValue.append(changesEl);
+                stateWiseEditsMapping[stateName].push(
+                  angular.element('<div>Added answer group: </div>')
+                    .html(answerGroupHtml));
               } else if (answerGroupChanges === 'edited') {
-                lostChangeValue = angular.element(
-                  '<div>Edited answer group: </div>');
                 if (newValue.outcome.dest !== oldValue.outcome.dest) {
-                  changesEl.append(
+                  answerGroupHtml += (
                     '<p>Destination: ' + newValue.outcome.dest + '</p>');
                 }
                 if (!angular.equals(
                   newValue.outcome.feedback, oldValue.outcome.feedback)) {
-                  changesEl.append(
+                  answerGroupHtml += (
                     '<p>Feedback: ' + newValue.outcome.feedback + '</p>');
                 }
                 if (!angular.equals
                     (newValue.rule_specs, oldValue.rule_specs)) {
-                  var rulesList = getRulesList(newValue);
+                  var rulesList = makeRulesListHumanReadable(newValue);
                   if (rulesList.length) {
-                    changesEl.append('<div>Rules: <div>');
+                    answerGroupHtml += ('<div>Rules: <div>');
                     for (var rule in rulesList) {
-                      changesEl.append(rulesList[rule]);
+                      answerGroupHtml += (rulesList[rule]).html();
                     }
                   }
                 }
-                lostChangeValue.append(changesEl);
+                stateWiseEditsMapping[stateName].push(
+                  angular.element('<div>Edited answer group: </div>')
+                    .append(answerGroupHtml));
               } else {
-                lostChangeValue = 'Deleted answer group';
+                stateWiseEditsMapping[stateName].push(
+                  angular.element('<div>Deleted answer group</div>'));
               }
               break;
 
             case 'default_outcome':
               var defaultOutcomeChanges = getRelativeChangeToGroups(lostChange);
-              var changesEl = angular.element('<div></div>');
+              var answerGroupHtml = '';
               if (defaultOutcomeChanges === 'added') {
-                lostChangeValue = angular.element(
-                  '<div>Added default outcome: </div>');
-                changesEl.append(
+                answerGroupHtml += (
                   '<p>Destination: ' + newValue.dest + '</p>');
-                changesEl.append(
+                answerGroupHtml += (
                   '<p>Feedback: ' + newValue.feedback + '</p>');
-                lostChangeValue.append(changesEl);
+                stateWiseEditsMapping[stateName].push(
+                  angular.element('<div>Added default outcome: </div>')
+                    .append(answerGroupHtml));
               } else if (defaultOutcomeChanges === 'edited') {
-                lostChangeValue = angular.element(
-                  '<div>Edited default outcome: </div>');
                 if (newValue.dest !== oldValue.dest) {
-                  changesEl.append(
+                  answerGroupHtml += (
                     '<p>Destination: ' + newValue.dest + '</p>');
                 }
                 if (!angular.equals(
                   newValue.feedback, oldValue.feedback)) {
-                  changesEl.append(
+                  answerGroupHtml += (
                     '<p>Feedback: ' + newValue.feedback + '</p>');
                 }
-                lostChangeValue.append(changesEl);
+                stateWiseEditsMapping[stateName].push(
+                  angular.element('<div>Edited default outcome: </div>')
+                    .append(answerGroupHtml));
               } else {
-                lostChangeValue = 'Deleted default outcome';
+                stateWiseEditsMapping[stateName].push(
+                  angular.element('<div>Deleted default outcome</div>'));
               }
               break;
           };
-
-          var existingEditsToState = statesWiseEditsMapping[stateName];
-          if (!existingEditsToState) {
-            statesWiseEditsMapping[stateName] = [];
-          }
-          statesWiseEditsMapping[stateName].push(lostChangeEl);
           break;
-      }
-
-      if (lostChangeValue) {
-        lostChangeEl.html(lostChangeValue);
-        if (lostChangeEl) {
-          outerHtml.append(lostChangeEl);
-        }
       }
     });
 
-    for (var stateName in statesWiseEditsMapping) {
+    for (var stateName in stateWiseEditsMapping) {
       var stateChangesEl = angular.element(
         '<li>Edits to state: ' + stateName + '</li>');
-      for (var stateEdit in statesWiseEditsMapping[stateName]) {
-        stateChangesEl.append(statesWiseEditsMapping[stateName][stateEdit]);
+      for (var stateEdit in stateWiseEditsMapping[stateName]) {
+        stateChangesEl.append(stateWiseEditsMapping[stateName][stateEdit]);
       }
       outerHtml.append(stateChangesEl);
     }
+    console.log(outerHtml);
 
     return outerHtml;
   };
