@@ -1808,6 +1808,8 @@ class ExplorationCommitLogSpecialCasesUnitTests(ExplorationServicesUnitTests):
 class ExplorationSearchTests(ExplorationServicesUnitTests):
     """Test exploration search."""
 
+    USER_ID_1 = 'user_1'
+
     def test_demo_explorations_are_added_to_search_index(self):
         results, _ = exp_services.search_explorations('Welcome', 2)
         self.assertEqual(results, [])
@@ -1972,6 +1974,26 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
 
         self.assertEqual(cursor, expected_result_cursor)
         self.assertEqual(result, doc_ids)
+
+    def test_get_average_rating_from_exp_summary(self):
+        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+
+        self.assertEqual(
+            exp_services.get_average_rating_from_exp_summary(exp), 0)
+
+        rating_services.assign_rating_to_exploration(
+            self.owner_id, self.EXP_ID, 5)
+        self.assertEqual(
+            exp_services.get_average_rating_from_exp_summary(exp), 5)
+
+        rating_services.assign_rating_to_exploration(
+            self.USER_ID_1, self.EXP_ID, 2)
+
+        exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+        self.assertEqual(
+            exp_services.get_average_rating_from_exp_summary(exp), 3.5)
+
 
     def test_get_search_rank(self):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
