@@ -24,7 +24,6 @@
 # Optional arguments:
 #   --skip-install=true/false If true, skips installing dependencies. The
 #         default value is false.
-#   --specs=path/to/specFile.js  Runs only the test in specFile.js
 #   --sharding=true/false Disables/Enables parallelization of protractor tests.
 #   --sharding-instances=# Sets the number of parallel browsers to open while
 #         sharding.
@@ -141,11 +140,6 @@ for j in "$@"; do
     shift
     ;;
 
-    --specs=*)
-    SPECS="--specs=${i#*=}"
-    shift
-    ;;
-
     --sharding-instances=*)
     SHARD_INSTANCES="${j#*=}"
     shift
@@ -163,7 +157,7 @@ done
 # in at all.
 # TODO(bhenning): Figure out if this is a bug with protractor.
 if [ "$SHARDING" = "false" ] || [ "$SHARD_INSTANCES" = "1" ]; then
-  $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js "$SPECS" --suite "$SUITE"
+  $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --suite "$SUITE"
 else
   $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE"
 fi
