@@ -183,13 +183,6 @@ class ExplorationDisplayableSummariesTest(
         expected_summary = {
             'category': u'A category',
             'community_owned': False,
-            'human_readable_contributors_summary': {
-                self.ALBERT_NAME: {
-                    'num_commits': 2,
-                    'profile_picture_data_url': (
-                        user_services.DEFAULT_IDENTICON_DATA_URL)
-                }
-            },
             'id': self.EXP_ID_2,
             'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'num_views': 0,
@@ -271,7 +264,6 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
         expected_exploration_summary_dict = {
             'category': u'Algorithms',
             'community_owned': True,
-            'human_readable_contributors_summary': {},
             'id': '2',
             'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'num_views': 0,
@@ -487,9 +479,9 @@ class TopRatedExplorationDisplayableSummariesTest(
             'tags': [],
             'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
             'language_code': feconf.DEFAULT_LANGUAGE_CODE,
-            'id': self.EXP_ID_2,
+            'id': self.EXP_ID_3,
             'category': u'A category',
-            'ratings': {u'1': 0, u'3': 0, u'2': 0, u'5': 1, u'4': 0},
+            'ratings': {u'1': 0, u'3': 0, u'2': 0, u'5': 1, u'4': 1},
             'title': u'A title',
             'num_views': 0,
             'objective': u'An objective'
@@ -499,7 +491,7 @@ class TopRatedExplorationDisplayableSummariesTest(
             expected_summary, top_rated_exploration_summaries[0])
 
         expected_ordering = [
-            self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_4, self.EXP_ID_5,
+            self.EXP_ID_3, self.EXP_ID_2, self.EXP_ID_5, self.EXP_ID_4,
             self.EXP_ID_6, self.EXP_ID_8, self.EXP_ID_7, self.EXP_ID_9]
 
         actual_ordering = [exploration['id'] for exploration in
