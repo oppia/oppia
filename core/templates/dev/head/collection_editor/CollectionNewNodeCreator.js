@@ -27,12 +27,12 @@ oppia.directive('collectionNewNodeCreator', [function() {
       '$scope', '$http', '$window', '$filter', 'alertsService',
       'validatorsService', 'CollectionUpdateService',
       'CollectionNodeObjectFactory', 'ExplorationSummaryBackendApiService',
-      'siteAnalyticsService', 'UrlInterpolationService',
+      'siteAnalyticsService',
       function(
           $scope, $http, $window, $filter, alertsService,
           validatorsService, CollectionUpdateService,
           CollectionNodeObjectFactory, ExplorationSummaryBackendApiService,
-          siteAnalyticsService, UrlInterpolationService) {
+          siteAnalyticsService) {
         $scope.newExplorationId = '';
         $scope.newExplorationTitle = '';
         var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
