@@ -704,8 +704,11 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
                   }
                 );
 
+                // Changed from to unshift to address #1894, now focus
+                // in the dropdown list always on first element if element
+                // not in list.
                 if (!categoryIsInSelect2) {
-                  $scope.CATEGORY_LIST_FOR_SELECT2.push({
+                  $scope.CATEGORY_LIST_FOR_SELECT2.unshift({
                     id: explorationCategoryService.savedMemento,
                     text: explorationCategoryService.savedMemento
                   });
