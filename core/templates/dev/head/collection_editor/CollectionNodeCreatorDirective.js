@@ -16,7 +16,7 @@
  * @fileoverview Directive for creating a new collection node.
  */
 
-oppia.directive('collectionNewNodeCreator', [function() {
+oppia.directive('collectionNodeCreator', [function() {
   return {
     restrict: 'E',
     scope: {
