@@ -448,7 +448,6 @@ DEFAULT_THUMBNAIL_ICON = 'Lightbulb'
 # whose filename is "{{CategoryName}}.svg".
 # The blank category was added to address #1894.
 CATEGORIES_TO_COLORS = {
-    '': '',
     'Algebra': '#cd672b',
     'Arithmetic': '#d68453',
     'Calculus': '#b86330',
