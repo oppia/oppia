@@ -18,8 +18,8 @@
 
 // Service for handling all interactions with the exploration editor backend.
 oppia.factory('explorationData', [
-  '$http', '$log', 'alertsService', '$q', 'changeListService',
-  function($http, $log, alertsService, $q, changeListService) {
+  '$http', '$log', 'alertsService', '$q', 'changeListService', 'autosaveInfoModalsService',
+  function($http, $log, alertsService, $q, changeListService, autosaveInfoModalsService) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
     var pathnameArray = window.location.pathname.split('/');
@@ -87,15 +87,15 @@ oppia.factory('explorationData', [
             $log.info('Retrieved exploration data.');
             $log.info(response.data);
 
-            // FIXME: Update this value based on what exactly is being sent from
-            // the backend (corresponding to the ‘current exploration’ data).
-            if (response.data.currentExplorationData) {
-              explorationData.data = response.data.currentExplorationData;
-              // Initialize the changeList by the one received from the backend.
-              changeListService.loadAutosavedChangeList(
-                response.data.changeList);
-            } else {
-              explorationData.data = response.data;
+            // Initialize the changeList by the one received from the backend.
+            explorationData.data = response.data;
+            changeListService.loadAutosavedChangeList(
+              response.data.draft_changes);
+            // Show modal displaying lost changes
+            // if the version of draft changes is invalid.
+            if (!response.data.is_version_of_draft_valid) {
+              autosaveInfoModalsService.showVersionMismatchModal(
+                changeListService.getChangeList());
             }
 
             return response.data;
@@ -194,8 +194,9 @@ oppia.factory('editabilityService', [function() {
 // A service that maintains a provisional list of changes to be committed to
 // the server.
 oppia.factory('changeListService', [
-  '$rootScope', 'alertsService',
-  function($rootScope, alertsService) {
+  '$rootScope', 'alertsService', 'explorationData', 'autosaveInfoModalsService',
+  function(
+    $rootScope, alertsService, explorationData, autosaveInfoModalsService) {
   // TODO(sll): Implement undo, redo functionality. Show a message on each
   // step saying what the step is doing.
   // TODO(sll): Allow the user to view the list of changes made so far, as
@@ -255,17 +256,19 @@ oppia.factory('changeListService', [
     explorationChangeList.push(changeDict);
     undoneChangeStack = [];
 
-    // FIXME: Uncomment this block when the autosave PUT request url is fixed.
-    // explorationData.autosaveChangeList(explorationChangeList,
-    //   function(response) {
-    //   // Check for error in response:
-    //   // If error is present -> Check for the type of error occurred
-    //   // Display the corresponding modals in both cases:
-    //   // 1. Non-strict Validation Fail:
-    //   // autosaveInfoModalsService.showNonStrictFailModal()
-    //   // 2. Version Mismatch:
-    //   // autosaveInfoModalsService.showVersionMismatchModal(lostChanges)
-    // });
+    explorationData.autosaveChangeList(
+      explorationChangeList,
+      function(response) {
+        // Check for error in response:
+        // If error is present -> Check for the type of error occurred
+        // (Display the corresponding modals in both cases):
+        // 1. Non-strict Validation Fail.
+        // 2. Version Mismatch.
+        if (!response.data.is_version_of_draft_valid) {
+          autosaveInfoModalsService.showVersionMismatchModal(
+            explorationChangeList);
+        }
+      });
   };
 
   return {
@@ -2121,6 +2124,7 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
               break;
 
             case 'widget_id':
+              var lostChangeValue = '';
               if (oldValue === null) {
                 if (newValue !== 'EndExploration') {
                   lostChangeValue = 'Added Interaction: ' + newValue;
@@ -2135,6 +2139,7 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
               break;
 
             case 'widget_customization_args':
+              var lostChangeValue = '';
               if (utilsService.isEmpty(oldValue)) {
                 lostChangeValue = 'Added Interaction Customizations';
               } else if (utilsService.isEmpty(newValue)) {
@@ -2155,7 +2160,7 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
                 answerGroupHtml += (
                   '<p>Feedback:' + newValue.outcome.feedback + '</p>');
                 var rulesList = makeRulesListHumanReadable(newValue);
-                if (rulesList.length) {
+                if (rulesList.length > 0) {
                   answerGroupHtml += ('<div>Rules: <div>');
                   for (var rule in rulesList) {
                     answerGroupHtml += rulesList[rule].html();
@@ -2170,12 +2175,11 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
                     '<p>Destination: ' + newValue.outcome.dest + '</p>');
                 }
                 if (!angular.equals(
-                  newValue.outcome.feedback, oldValue.outcome.feedback)) {
+                    newValue.outcome.feedback, oldValue.outcome.feedback)) {
                   answerGroupHtml += (
                     '<p>Feedback: ' + newValue.outcome.feedback + '</p>');
                 }
-                if (!angular.equals
-                    (newValue.rule_specs, oldValue.rule_specs)) {
+                if (!angular.equals(newValue.rule_specs, oldValue.rule_specs)) {
                   var rulesList = makeRulesListHumanReadable(newValue);
                   if (rulesList.length) {
                     answerGroupHtml += ('<div>Rules: <div>');
@@ -2209,15 +2213,14 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
                   defaultOutcomeHtml += (
                     '<p>Destination: ' + newValue.dest + '</p>');
                 }
-                if (!angular.equals(
-                  newValue.feedback, oldValue.feedback)) {
+                if (!angular.equals(newValue.feedback, oldValue.feedback)) {
                   defaultOutcomeHtml += (
                     '<p>Feedback: ' + newValue.feedback + '</p>');
                 }
                 stateWiseEditsMapping[stateName].push(
                   angular.element('<div>Edited default outcome: </div>')
                     .append(defaultOutcomeHtml));
-              } else {
+              } else if (defaultOutcomeChanges === 'deleted') {
                 stateWiseEditsMapping[stateName].push(
                   angular.element('<div>Deleted default outcome</div>'));
               }
