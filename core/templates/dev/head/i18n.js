@@ -58,7 +58,7 @@ oppia.controller('I18nFooter', [
   // at the outset, if the default language is not English.
   $timeout(function() {
     $scope.currentLanguageCode = $translate.use();
-  }, 5);
+  }, 50);
 
   $scope.changeLanguage = function() {
     $translate.use($scope.currentLanguageCode);
@@ -66,7 +66,7 @@ oppia.controller('I18nFooter', [
       $http.put(siteLanguageUrl, {
         site_language_code: $scope.currentLanguageCode
       }, {
-        requestIsFromFooter: true
+        requestIsForI18n: true
       });
     }
   };

@@ -1,6 +1,13 @@
 <script type="text/ng-template" id="inline/collection_node_editor_directive">
   <div>
-    [<[getCollectionNode().getExplorationId()]>] <em><[getCollectionNode().getExplorationTitle()]></em>
+    <a ng-href="/create/<[getCollectionNode().getExplorationId()]>" target="_blank">
+      <span ng-if="getCollectionNode().getExplorationTitle()">
+        <[getCollectionNode().getExplorationTitle()]>
+      </span>
+      <span ng-if="!getCollectionNode().getExplorationTitle()">
+        <em>Untitled Exploration</em>
+      </span>
+    </a>
     <button ng-click="deleteCollectionNode()">Delete</button>
   </div>
   <p> Prerequisite skills: </p>

@@ -74,7 +74,8 @@
       var GLOBALS = {
         ADDITIONAL_ANGULAR_MODULES: [],
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
-        csrf_token_for_footer: JSON.parse('{{csrf_token_for_footer|js_string}}'),
+        csrf_token_i18n: JSON.parse('{{csrf_token_i18n|js_string}}'),
+        csrf_token_create_exploration: JSON.parse('{{csrf_token_create_exploration|js_string}}'),
         DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}'),
         INVALID_NAME_CHARS: JSON.parse('{{INVALID_NAME_CHARS|js_string}}'),
         ACTIVITY_STATUS_PRIVATE: JSON.parse(
@@ -261,7 +262,7 @@
                               </a>
                               <ul class="dropdown-menu oppia-navbar-dropdown" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
                                 <li><a href="/about">About Oppia</a></li>
-                                <li><a href="/participate">Participation Playbook</a></li>
+                                <li><a href="/teach">Teach with Oppia</a></li>
                                 {% for additional_link in SIDEBAR_MENU_ADDITIONAL_LINKS %}
                                   <li><a href="{{additional_link['link']}}" target="_blank">{{additional_link['name']}}</a></li>
                                 {% endfor %}

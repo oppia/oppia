@@ -47,8 +47,10 @@ current_user_services = models.Registry.import_current_user_services()
 
 CSRF_REGEX = (
     r'csrf_token: JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\)')
-CSRF_FOR_FOOTER_REGEX = (
-    r'csrf_token_for_footer: JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\)')
+CSRF_I18N_REGEX = (
+    r'csrf_token_i18n: JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\)')
+CSRF_CREATE_EXPLORATION_REGEX = (
+    r'csrf_token_create_exploration: JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\)') # pylint: disable=line-too-long
 # Prefix to append to all lines printed by tests to the console.
 LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
 
@@ -275,11 +277,18 @@ class TestBase(unittest.TestCase):
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
 
-    def get_csrf_token_from_response(self, response, for_footer=False):
+    def get_csrf_token_from_response(self, response, token_type=None):
         """Retrieve the CSRF token from a GET response."""
-        if not for_footer:
-            return re.search(CSRF_REGEX, response.body).group(1)
-        return re.search(CSRF_FOR_FOOTER_REGEX, response.body).group(1)
+        if token_type is None:
+            regex = CSRF_REGEX
+        elif token_type == feconf.CSRF_PAGE_NAME_CREATE_EXPLORATION:
+            regex = CSRF_CREATE_EXPLORATION_REGEX
+        elif token_type == feconf.CSRF_PAGE_NAME_I18N:
+            regex = CSRF_I18N_REGEX
+        else:
+            raise Exception('Invalid CSRF token type: %s' % token_type)
+
+        return re.search(regex, response.body).group(1)
 
     def signup(self, email, username):
         """Complete the signup process for the user with the given username."""

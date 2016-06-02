@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block subtitle %}
+  Contact
+{% endblock subtitle %}
+
+{% block header_js %}
+  {{ super() }}
+
+  <style>
+    html, body {
+      background-color: #eee;
+    }
+  </style>
+{% endblock %}
+
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      Contact
+    </li>
+  </ul>
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+  <div class="oppia-page-card oppia-about-content">
+    <div class="oppia-about-card-content-wide">
+      <h2>Get involved!</h2>
+      <p>
+        Oppia is an open commons for education. And, true to this ethos,
+        it is an open-source website created through the hard work and
+        creativity of people like you! To get involved in the Oppia
+        project and help us bring about our mission of free, high-quality
+        universal education, reach out via our
+        <a href="https://groups.google.com/forum/#!forum/oppia-dev">oppia-dev@</a> Google Group, or contact us at
+        <a href="mailto:{{CONTACT_EMAIL_ADDRESS}}" class="inline-links">admin@oppia.org</a>.
+        We're excited to hear from you!
+      </p>
+      <p>
+        Questions about the site? Post to our <a href="{{SITE_FORUM_URL}}" class="inline-links">forum</a>.
+      </p>
+      <p>
+        Any feedback? Please let us know via our <a href="{{SITE_FEEDBACK_FORM_URL}}">feedback form</a>, or
+        email <strong>admin@oppia.org</strong>. Thanks!
+      </p>
+    </div>
+  </div>
+{% endblock %}
+
+{% block footer%}
+  {% include 'footer.html' %}
+{% endblock %}

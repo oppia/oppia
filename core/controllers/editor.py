@@ -16,6 +16,7 @@
 
 """Controllers for the editor view."""
 
+import datetime
 import imghdr
 import logging
 
@@ -42,6 +43,7 @@ import feconf
 import utils
 
 current_user_services = models.Registry.import_current_user_services()
+(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 # The frontend template for a new state. It is sent to the frontend when the
 # exploration editor page is first loaded, so that new states can be
@@ -260,11 +262,16 @@ class ExplorationHandler(EditorHandler):
 
     PAGE_NAME_FOR_CSRF = 'editor'
 
-    def _get_exploration_data(self, exploration_id, version=None):
+    def _get_exploration_data(
+            self, exploration_id, apply_draft=False, version=None):
         """Returns a description of the given exploration."""
         try:
-            exploration = exp_services.get_exploration_by_id(
-                exploration_id, version=version)
+            if apply_draft:
+                exploration = exp_services.get_exp_with_draft_applied(
+                    exploration_id, self.user_id)
+            else:
+                exploration = exp_services.get_exploration_by_id(
+                    exploration_id, version=version)
         except:
             raise self.PageNotFoundException
 
@@ -275,7 +282,15 @@ class ExplorationHandler(EditorHandler):
                 stats_services.get_top_unresolved_answers_for_default_rule(
                     exploration_id, state_name))
             states[state_name] = state_dict
-
+        exp_user_data = user_models.ExplorationUserDataModel.get(
+            self.user_id, exploration_id)
+        draft_changes = (exp_user_data.draft_change_list if exp_user_data
+                         and exp_user_data.draft_change_list else None)
+        is_version_of_draft_valid = (
+            exp_services.is_version_of_draft_valid(
+                exploration_id, exp_user_data.draft_change_list_exp_version)
+            if exp_user_data and exp_user_data.draft_change_list_exp_version
+            else None)
         editor_dict = {
             'category': exploration.category,
             'exploration_id': exploration_id,
@@ -294,6 +309,8 @@ class ExplorationHandler(EditorHandler):
             'tags': exploration.tags,
             'title': exploration.title,
             'version': exploration.version,
+            'is_version_of_draft_valid': is_version_of_draft_valid,
+            'draft_changes': draft_changes
         }
 
         return editor_dict
@@ -303,10 +320,14 @@ class ExplorationHandler(EditorHandler):
         if not rights_manager.Actor(self.user_id).can_view(
                 rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             raise self.PageNotFoundException
-
+        # 'apply_draft' and 'v'(version) are optional parameters because the
+        # exploration history tab also uses this handler, and these parameters
+        # are not used by that tab.
         version = self.request.get('v', default_value=None)
+        apply_draft = self.request.get('apply_draft', default_value=False)
         self.values.update(
-            self._get_exploration_data(exploration_id, version=version))
+            self._get_exploration_data(
+                exploration_id, apply_draft=apply_draft, version=version))
         self.render_json(self.values)
 
     @require_editor
@@ -924,3 +945,37 @@ class StartedTutorialEventHandler(EditorHandler):
     def post(self):
         """Handles GET requests."""
         user_services.record_user_started_state_editor_tutorial(self.user_id)
+
+
+class EditorAutosaveHandler(ExplorationHandler):
+    """Handles requests from the editor for draft autosave."""
+
+    @require_editor
+    def put(self, exploration_id):
+        """Handles PUT requests for draft updation."""
+        # Raise an Exception if the draft change list fails non-strict
+        # validation.
+        try:
+            change_list = self.payload.get('change_list')
+            version = self.payload.get('version')
+            exp_services.create_or_update_draft(
+                exploration_id, self.user_id, change_list, version,
+                datetime.datetime.utcnow())
+        except utils.ValidationError as e:
+            # If this exception is raised, let the user know that their changes
+            # have been auto discarded.
+            exp_services.discard_draft(exploration_id, self.user_id)
+            raise self.InvalidInputException(e)
+
+        # If the value passed here is False, have the user discard the draft
+        # changes. We save the draft to the datastore even if the version is
+        # invalid, so that it is available for recovery later.
+        self.render_json({
+            'is_version_of_draft_valid': exp_services.is_version_of_draft_valid(
+                exploration_id, version)})
+
+    @require_editor
+    def post(self, exploration_id):
+        """Handles POST request for discarding draft changes."""
+        exp_services.discard_draft(exploration_id, self.user_id)
+        self.render_json({})
