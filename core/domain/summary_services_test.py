@@ -591,8 +591,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         """
 
         recently_published_exploration_summaries = (
-            summary_services.get_recently_published_exploration_summary_dicts([
-                feconf.DEFAULT_LANGUAGE_CODE]))
+            summary_services.get_recently_published_exploration_summary_dicts())
         test_summary_1 = {
             'status': 'public',
             'thumbnail_bg_color': '#a33f40',
@@ -603,7 +602,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             'id': self.EXP_ID_1,
             'category': u'A category',
             'ratings': feconf.get_empty_ratings(),
-            'title': u'Title 1',
+            'title': u'A title',
             'num_views': 0,
             'objective': u'An objective'
         }
@@ -617,7 +616,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             'id': self.EXP_ID_2,
             'category': u'A category',
             'ratings': feconf.get_empty_ratings(),
-            'title': u'Title 2',
+            'title': u'A title',
             'num_views': 0,
             'objective': u'An objective'
         }
@@ -631,7 +630,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             'id': self.EXP_ID_3,
             'category': u'A category',
             'ratings': feconf.get_empty_ratings(),
-            'title': u'Title 3',
+            'title': u'A title',
             'num_views': 0,
             'objective': u'An objective'
         }
@@ -642,7 +641,3 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             test_summary_1, recently_published_exploration_summaries[1])
         self.assertDictContainsSubset(
             test_summary_2, recently_published_exploration_summaries[2])
-
-        test_summary_1['title'] = u'New title'
-        self.assertDictContainsSubset(
-            test_summary_3, recently_published_exploration_summaries[0])

@@ -79,8 +79,7 @@ class LibraryIndexHandler(base.BaseHandler):
         summary_dicts_by_category = summary_services.get_library_groups([
             feconf.DEFAULT_LANGUAGE_CODE])
         recently_published_summary_dicts = (
-            summary_services.get_recently_published_exploration_summary_dicts(
-                [feconf.DEFAULT_LANGUAGE_CODE]))
+            summary_services.get_recently_published_exploration_summary_dicts())
         top_rated_activity_summary_dicts = (
             summary_services.get_top_rated_exploration_summary_dicts(
                 [feconf.DEFAULT_LANGUAGE_CODE]))

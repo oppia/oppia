@@ -325,7 +325,7 @@ class ExpSummaryModel(base_models.BaseModel):
     # with created_on, which is the time when the exploration *summary*
     # model was created)
     exploration_model_created_on = ndb.DateTimeProperty(indexed=True)
-
+    # Time when the exploration model was first published
     exp_model_first_published_msec = ndb.FloatProperty(indexed=True)
 
     # The publication status of this exploration.

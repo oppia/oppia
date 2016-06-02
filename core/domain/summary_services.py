@@ -258,16 +258,16 @@ def get_top_rated_exploration_summary_dicts(language_codes):
     return _get_displayable_exp_summary_dicts(sorted_exp_summaries)
 
 
-def get_recently_published_exploration_summary_dicts(language_codes):
+def get_recently_published_exploration_summary_dicts():
     """Returns a list of recently published explorations
      with the given language code.
     """
-    collect_all_exp_summaries = [
+    recently_published_exploration_summaries = [
         exp_summary for exp_summary in
-        exp_services.get_recently_published_exploration_summaries().values()
-        if exp_summary.language_code in language_codes]
+        exp_services.get_recently_published_exploration_summaries().values()]
 
-    summary_dicts = sorted(collect_all_exp_summaries, key=lambda exp_summary:
+    summary_dicts = sorted(recently_published_exploration_summaries,
+                           key=lambda exp_summary:
                            exp_summary.exp_model_first_published_msec,
                            reverse=True)
 
