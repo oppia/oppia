@@ -116,7 +116,8 @@ class EditorTest(BaseEditorControllerTest):
 
         response = self.testapp.get('/my_explorations')
         self.assertEqual(response.status_int, 200)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token_from_response(
+            response, token_type=feconf.CSRF_PAGE_NAME_CREATE_EXPLORATION)
         exp_id = self.post_json(
             feconf.NEW_EXPLORATION_URL, {}, csrf_token
         )[home.EXPLORATION_ID_KEY]
