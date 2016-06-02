@@ -8,7 +8,7 @@
       </button>
     {% else %}
       <button class="btn oppia-navbar-button oppia-navbar-hide-on-small-width protractor-test-create-exploration oppia-transition-200"
-         ng-click="createNewExploration()" ng-disabled="explorationCreationInProgress">
+         ng-click="showCreationChoiceModal()" ng-disabled="explorationCreationInProgress">
         <span>Create</span>
       </button>
       {% if allow_yaml_file_upload %}
@@ -19,4 +19,142 @@
       {% endif %}
     {% endif %}
   </div>
+</script>
+<script type="text/ng-template" id="modals/createExplorationOrCollection">
+  <div class="modal-body oppia-long-text protractor-test-creation-modal">
+    {% if ENABLE_COLLECTION_EDITOR %}
+      <div class="row">
+        <div class="col-sm-12">
+          <h1 class="oppia-creation-modal-h1">
+            Ready to Create
+          </h1>
+          <p class="oppia-creation-modal-p">
+            What do you want to create?
+          </p>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 text-center">
+          <img class="oppia-creation-modal-img" src="../../../images/creation/exploration.svg" />
+          <button type="button"
+                  class="btn oppia-creation-modal-button oppia-transition-200 protractor-test-create-exploration"
+                  ng-click="chooseExploration()">
+            Create Exploration
+          </button>
+        </div>
+          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 text-center">
+            <img class="oppia-creation-modal-img" src="../../../images/creation/collection.svg" />
+            <button type="button"
+                    class="btn oppia-creation-modal-button oppia-transition-200 protractor-test-create-collection"
+                    ng-click="chooseCollection()">
+              Create Collection
+            </button>
+          </div>
+        <div class="col-sm-12 col-xs-12 text-center">
+          <button type="button"
+                  class="btn oppia-creation-modal-button oppia-transition-200 protractor-test-dismiss-creation-modal"
+                  ng-click="cancel()">
+            Neither, Thanks
+          </button>
+        </div>
+      </div>
+    {% else %}
+      <div class="row">
+        <div class="col-sm-12">
+          <h1 class="oppia-creation-modal-h1">
+            Ready to Create
+          </h1>
+          <p class="oppia-creation-modal-p">
+            Do you want to create an exploration?
+          </p>
+        </div>
+        <div class="col-sm-12 col-xs-12 text-center">
+          <img class="oppia-creation-modal-img" src="../../../images/creation/exploration.svg" />
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 text-center">
+          <button type="button"
+                  class="btn oppia-creation-modal-button oppia-transition-200 protractor-test-create-exploration"
+                  ng-click="chooseExploration()">
+            Yes, please!
+          </button>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 text-center">
+          <button type="button"
+                  class="btn oppia-creation-modal-button oppia-transition-200 protractor-test-dismiss-creation-modal"
+                  ng-click="cancel()">
+            No, Thanks
+          </button>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+  <style>
+    .oppia-creation-modal .modal-body {
+      font-family: "Capriola", "Roboto", Arial, sans-serif;
+      height: 100%;
+      margin: 0 auto;
+      top: 7%;
+      width: 95%;
+    }
+
+    .oppia-creation-modal .oppia-creation-modal-h1 {
+      color: #015c53;
+    }
+
+    .oppia-creation-modal .oppia-creation-modal-p {
+      font-size: 0.9em;
+      margin-top: 0;
+      margin-bottom: 6px;
+    }
+
+    .oppia-creation-modal .oppia-creation-modal-button {
+      background-color: #015c53;
+      border-radius: 0;
+      color: #fff;
+      font-family: "Capriola", "Roboto", Arial, sans-serif;
+      font-size: 14px;
+      margin-top: 10px;
+      text-transform: uppercase;
+      width: 100%;
+      text-align: center;
+    }
+
+    .oppia-creation-modal .oppia-creation-modal-button:hover,
+    .oppia-creation-modal .oppia-creation-modal-button:focus,
+    .oppia-creation-modal .oppia-creation-modal-button:active {
+      background-color: rgba(5, 190, 178, 1);
+      color: #fff;
+    }
+
+    .oppia-creation-modal .oppia-creation-modal-img {
+      width: 100%;
+      max-height: 200px;
+      padding-top: 10px;
+    }
+
+    .oppia-creation-modal .modal-content {
+      border-radius: 0;
+      height: 100%;
+      min-height: 450px;
+    }
+
+    .oppia-creation-modal .modal-dialog {
+      height: 70%;
+      width: 70%;
+    }
+
+    .oppia-creation-modal .modal-footer {
+      border-top: none;
+    }
+
+    @media (max-width: 770px) {
+      .oppia-creation-modal .modal-body {
+        top: 5%;
+      }
+
+      .oppia-creation-modal .modal-dialog {
+        margin: 10% auto;
+        width: 95%;
+        height: 100%;
+      }
+    }
+  </style>
 </script>
