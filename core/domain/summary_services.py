@@ -394,7 +394,8 @@ def get_top_rated_exploration_summary_dicts(language_codes):
         key=lambda exp_summary: lower_bound_wilson_scores[exp_summary.id],
         reverse=True)[:NUMBER_OF_TOP_RATED_EXPLORATIONS]
 
-    return _get_displayable_exp_summary_dicts(sorted_exp_summaries)
+    return _get_displayable_exp_summary_dicts(
+        sorted_exp_summaries, include_contributors=False)
 
 
 def get_recently_published_exploration_summary_dicts():
@@ -411,3 +412,4 @@ def get_recently_published_exploration_summary_dicts():
                            reverse=True)
 
     return _get_displayable_exp_summary_dicts(summary_dicts)
+    
