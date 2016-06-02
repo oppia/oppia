@@ -569,7 +569,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         """
 
         super(RecentlyPublishedExplorationDisplayableSummariesTest,
-         self).setUp()
+              self).setUp()
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -580,8 +580,8 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         self.save_new_valid_exploration(self.EXP_ID_2, self.albert_id)
         self.save_new_valid_exploration(self.EXP_ID_3, self.albert_id)
 
-        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_1)
         rights_manager.publish_exploration(self.albert_id, self.EXP_ID_2)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_1)
         rights_manager.publish_exploration(self.albert_id, self.EXP_ID_3)
 
         self.set_admins([self.ADMIN_USERNAME])
@@ -639,9 +639,9 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         self.assertDictContainsSubset(
             test_summary_3, recently_published_exploration_summaries[0])
         self.assertDictContainsSubset(
-            test_summary_2, recently_published_exploration_summaries[1])
+            test_summary_1, recently_published_exploration_summaries[1])
         self.assertDictContainsSubset(
-            test_summary_1, recently_published_exploration_summaries[2])        
+            test_summary_2, recently_published_exploration_summaries[2])
 
         test_summary_1['title'] = u'New title'
         self.assertDictContainsSubset(

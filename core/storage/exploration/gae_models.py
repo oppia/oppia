@@ -326,6 +326,8 @@ class ExpSummaryModel(base_models.BaseModel):
     # model was created)
     exploration_model_created_on = ndb.DateTimeProperty(indexed=True)
 
+    exp_model_first_published_msec = ndb.FloatProperty(indexed=True)
+
     # The publication status of this exploration.
     status = ndb.StringProperty(
         default=feconf.ACTIVITY_STATUS_PRIVATE, indexed=True,
@@ -400,3 +402,17 @@ class ExpSummaryModel(base_models.BaseModel):
         ).filter(
             ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def get_recently_published(cls):
+        """Returns an iterable with exp summaries that are recently
+        published.
+        """
+        return ExpSummaryModel.query().filter(
+            ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PUBLIC
+        ).filter(
+            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+        ).order(
+            -ExpSummaryModel.exp_model_first_published_msec
+        ).fetch(feconf.RECENTLY_PUBLISHED_QUERY_LIMIT)
+

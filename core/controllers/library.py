@@ -92,7 +92,7 @@ class LibraryIndexHandler(base.BaseHandler):
         if self.user_id:
             user_settings = user_services.get_user_settings(self.user_id)
             preferred_language_codes = user_settings.preferred_language_codes
-        
+
         if recently_published_summary_dicts:
             summary_dicts_by_category.insert(0, {
                 'activity_summary_dicts': recently_published_summary_dicts,

@@ -54,6 +54,11 @@ VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
 # The maximum number of results to retrieve in a datastore query.
 DEFAULT_QUERY_LIMIT = 1000
 
+""" The maximum number of results to retrieve in a datastore query
+for recently published explorations.
+"""
+RECENTLY_PUBLISHED_QUERY_LIMIT = 8
+
 # The current version of the exploration states blob schema. If any backward-
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
