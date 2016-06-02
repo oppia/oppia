@@ -31,8 +31,7 @@ oppia.directive('oppiaNoninteractiveImage', [
           $attrs.filepathWithValue);
         $scope.imageUrl = $sce.trustAsResourceUrl(
           '/imagehandler/' + explorationContextService.getExplorationId() +
-          '/' + encodeURIComponent($scope.filepath));
-         
+          '/' + encodeURIComponent($scope.filepath));  
         $scope.imageAltText = '';
         if ($attrs.altWithValue) {
           $scope.imageAltText = oppiaHtmlEscaper.escapedJsonToObj(
@@ -42,8 +41,7 @@ oppia.directive('oppiaNoninteractiveImage', [
         $scope.height = oppiaHtmlEscaper.escapedJsonToObj(
           $attrs.heightWithValue);
         $scope.width = oppiaHtmlEscaper.escapedJsonToObj(
-          $attrs.widthWithValue);
-          
+          $attrs.widthWithValue);  
       }]
     };
   }
