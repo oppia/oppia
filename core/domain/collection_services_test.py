@@ -1455,7 +1455,7 @@ class CollectionSearchTests(CollectionServicesUnitTests):
     """Test collection search."""
 
     def test_demo_collections_are_added_to_search_index(self):
-        results = collection_services.search_collections('Mathematics', 2)[0]
+        results = collection_services.search_collections('Welcome', 2)[0]
         self.assertEqual(results, [])
 
         collection_services.load_demo('0')

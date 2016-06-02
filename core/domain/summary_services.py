@@ -242,6 +242,7 @@ def _get_displayable_exp_summary_dicts(
 
     return displayable_exp_summaries
 
+
 def _get_displayable_collection_summary_dicts(collection_summaries):
     displayable_collection_summaries = []
     for collection_summary in collection_summaries:
@@ -261,6 +262,7 @@ def _get_displayable_collection_summary_dicts(collection_summaries):
                 'thumbnail_bg_color': utils.get_hex_color_for_category(
                     collection_summary.category)})
     return displayable_collection_summaries
+
 
 def get_library_groups(language_codes):
     """Returns a list of groups for the library index page. Each group has a
@@ -288,7 +290,8 @@ def get_library_groups(language_codes):
 
     collection_summaries = [
         summary for summary in
-        collection_services.get_collection_summaries_matching_ids(all_collection_ids) # pylint: disable=line-too-long
+        collection_services.get_collection_summaries_matching_ids(
+            all_collection_ids)
         if summary is not None]
     collection_summary_dicts = {
         summary_dict['id']: summary_dict
