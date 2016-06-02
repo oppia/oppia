@@ -255,6 +255,11 @@ class BaseHandler(webapp2.RequestHandler):
     # TODO(sll): A weakness of the current approach is that the source and
     # destination page names have to be the same. Consider fixing this.
     PAGE_NAME_FOR_CSRF = ''
+    # Whether the page includes a button for creating explorations. If this is
+    # set to True, a CSRF token for that button will be generated. This is
+    # needed because "create exploration" requests can come from multiple
+    # pages.
+    PAGE_HAS_CREATE_EXP_REQUEST = False
     # Whether to redirect requests corresponding to a logged-in user who has
     # not completed signup in to the signup page. This ensures that logged-in
     # users have agreed to the latest terms.
@@ -459,9 +464,17 @@ class BaseHandler(webapp2.RequestHandler):
         # that tokens generated in one handler will be sent back to a handler
         # with the same page name.
         values['csrf_token'] = ''
-        if self.REQUIRE_PAYLOAD_CSRF_CHECK and self.PAGE_NAME_FOR_CSRF:
-            values['csrf_token'] = CsrfTokenManager.create_csrf_token(
-                self.user_id, self.PAGE_NAME_FOR_CSRF)
+        values['csrf_token_create_exploration'] = ''
+        if self.REQUIRE_PAYLOAD_CSRF_CHECK:
+            if self.PAGE_NAME_FOR_CSRF:
+                values['csrf_token'] = CsrfTokenManager.create_csrf_token(
+                    self.user_id, self.PAGE_NAME_FOR_CSRF)
+            if self.PAGE_HAS_CREATE_EXP_REQUEST:
+                values['csrf_token_create_exploration'] = (
+                    CsrfTokenManager.create_csrf_token(
+                        self.user_id, feconf.CSRF_PAGE_NAME_CREATE_EXPLORATION
+                    )
+                )
 
         self.response.cache_control.no_cache = True
         self.response.cache_control.must_revalidate = True

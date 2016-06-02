@@ -67,8 +67,13 @@ oppia.config([
             // If this request carries data (in the form of a JS object),
             // JSON-stringify it and store it under 'payload'.
             if (config.data) {
+              var csrfToken = (
+                config.requestIsForCreateExploration ?
+                GLOBALS.csrf_token_create_exploration :
+                GLOBALS.csrf_token);
+
               config.data = $.param({
-                csrf_token: GLOBALS.csrf_token,
+                csrf_token: csrfToken,
                 payload: JSON.stringify(config.data),
                 source: document.URL
               }, true);
@@ -289,6 +294,21 @@ oppia.factory('validatorsService', [
       }
       return true;
     },
+    isValidExplorationTitle: function(input, showWarnings) {
+      if (!this.isValidEntityName(input, showWarnings)) {
+        return false;
+      }
+
+      if (input.length > 40) {
+        if (showWarnings) {
+          alertsService.addWarning(
+            'Exploration titles should be at most 40 characters long.');
+        }
+        return false;
+      }
+
+      return true;
+    },
     // NB: this does not check whether the card name already exists in the
     // states dict.
     isValidStateName: function(input, showWarnings) {
@@ -446,6 +466,10 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
     registerCreateNewExplorationEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
         'NewExploration', 'create', explorationId);
+    },
+    registerCreateNewExplorationInCollectionEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'NewExplorationFromCollection', 'create', explorationId);
     },
     registerCommitChangesToPrivateExplorationEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
