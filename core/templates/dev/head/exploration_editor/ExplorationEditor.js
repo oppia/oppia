@@ -686,6 +686,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
 
               $scope.CATEGORY_LIST_FOR_SELECT2 = [];
+              //Empty category added to force dropdown to scroll top
+              $scope.CATEGORY_LIST_FOR_SELECT2.push({id: '', text: ''});
 
               for (var i = 0; i < CATEGORY_LIST.length; i++) {
                 $scope.CATEGORY_LIST_FOR_SELECT2.push({
