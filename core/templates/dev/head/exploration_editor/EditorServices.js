@@ -2025,13 +2025,11 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
       var ruleElm = angular.element('<div></div>');
       ruleElm.append('<p>Type: ' + ruleSpec.rule_type + '</p>');
       ruleElm.append(
-        '<p>Value: ' +
-          (
-            Object.keys(ruleSpec.inputs).map(function(input) {
-              return ruleSpec.inputs[input];
-            })
-          ).toString() +
-          '</p>');
+        '<p>Value: ' + (
+          Object.keys(ruleSpec.inputs).map(function(input) {
+            return ruleSpec.inputs[input];
+          })
+        ).toString() + '</p>');
       rulesList.push(ruleElm);
     });
 
@@ -2076,7 +2074,7 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
     var stateWiseEditsMapping = {};
     // The variable stateWiseEditsMapping stores the edits grouped by state.
     // For instance, you made the following edits:
-    // 1. Changed content to 'Welcome' instead of '' in 'First Card'.
+    // 1. Changed content to 'Welcome!' instead of '' in 'First Card'.
     // 2. Added an interaction in this state.
     // 2. Added a new state 'End'.
     // 3. Ended Exporation from state 'End'.
@@ -2088,9 +2086,6 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
     // - 'End': ['Ended exploration']
 
     lostChanges.forEach(function(lostChange) {
-      var lostChangeEl = angular.element('<li></li>');
-      var lostChangeValue;
-
       switch (lostChange.cmd) {
         case CMD_ADD_STATE:
           outerHtml.append(
@@ -2120,8 +2115,8 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
             case 'content':
               if (newValue !== null) {
                 stateWiseEditsMapping[stateName].push(
-                  angular.element('<div></div>').html('Edited content: ' +
-                                                      newValue.value));
+                  angular.element('<div></div>').html(
+                    'Edited content: ' + newValue.value));
               }
               break;
 
@@ -2192,7 +2187,7 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
                 stateWiseEditsMapping[stateName].push(
                   angular.element('<div>Edited answer group: </div>')
                     .append(answerGroupHtml));
-              } else {
+              } else if (answerGroupChanges === 'deleted') {
                 stateWiseEditsMapping[stateName].push(
                   angular.element('<div>Deleted answer group</div>'));
               }
@@ -2226,9 +2221,7 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
                 stateWiseEditsMapping[stateName].push(
                   angular.element('<div>Deleted default outcome</div>'));
               }
-              break;
           };
-          break;
       }
     });
 
@@ -2240,7 +2233,6 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
       }
       outerHtml.append(stateChangesEl);
     }
-    console.log(outerHtml);
 
     return outerHtml;
   };
