@@ -52,7 +52,7 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
 
         // The following indicates that the number of answers is less than
         // minAllowableSelectionCount.
-        $scope.notEnoughSelections = true;
+        $scope.notEnoughSelections = ($scope.minAllowableSelectionCount > 0);
 
         $scope.onToggleCheckbox = function() {
           $scope.newQuestion = false;

@@ -291,7 +291,7 @@ class ExpSummaryModel(base_models.BaseModel):
     """Summary model for an Oppia exploration.
 
     This should be used whenever the content blob of the exploration is not
-    needed (e.g. gallery, search, etc).
+    needed (e.g. in search results, etc).
 
     A ExpSummaryModel instance stores the following information:
 
@@ -310,8 +310,7 @@ class ExpSummaryModel(base_models.BaseModel):
     # The objective of this exploration.
     objective = ndb.TextProperty(required=True, indexed=False)
     # The ISO 639-1 code for the language this exploration is written in.
-    language_code = ndb.StringProperty(
-        required=True, indexed=True)
+    language_code = ndb.StringProperty(required=True, indexed=True)
     # Tags associated with this exploration.
     tags = ndb.StringProperty(repeated=True, indexed=True)
 
@@ -362,6 +361,15 @@ class ExpSummaryModel(base_models.BaseModel):
         """Returns an iterable with non-private exp summary models."""
         return ExpSummaryModel.query().filter(
             ExpSummaryModel.status != feconf.ACTIVITY_STATUS_PRIVATE
+        ).filter(
+            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def get_featured(cls):
+        """Returns an iterable with featured exp summary models."""
+        return ExpSummaryModel.query().filter(
+            ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PUBLICIZED
         ).filter(
             ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)

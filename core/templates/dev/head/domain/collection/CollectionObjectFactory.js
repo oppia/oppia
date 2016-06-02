@@ -24,6 +24,7 @@ oppia.factory('CollectionObjectFactory', [
       this._id = collectionBackendObject.id;
       this._title = collectionBackendObject.title;
       this._objective = collectionBackendObject.objective;
+      this._languageCode = collectionBackendObject.language_code;
       this._category = collectionBackendObject.category;
       this._version = collectionBackendObject.version;
       this._nodes = [];
@@ -59,6 +60,14 @@ oppia.factory('CollectionObjectFactory', [
 
     Collection.prototype.setObjective = function(objective) {
       this._objective = objective;
+    };
+
+    Collection.prototype.getLanguageCode = function() {
+      return this._languageCode;
+    };
+
+    Collection.prototype.setLanguageCode = function(languageCode) {
+      this._languageCode = languageCode;
     };
 
     Collection.prototype.getCategory = function() {

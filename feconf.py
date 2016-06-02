@@ -64,11 +64,11 @@ CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 7
 # structure within the Collection domain object). If any backward-incompatible
 # changes are made to any of the blob schemas in the data store, this version
 # number must be changed.
-CURRENT_COLLECTION_SCHEMA_VERSION = 1
+CURRENT_COLLECTION_SCHEMA_VERSION = 2
 
-# The default number of exploration tiles to load at a time in the gallery
-# page.
-GALLERY_PAGE_SIZE = 20
+# The default number of exploration tiles to load at a time in the search
+# results page.
+SEARCH_RESULTS_PAGE_SIZE = 20
 
 # The default number of commits to show on a page in the exploration history
 # tab.
@@ -78,10 +78,24 @@ COMMIT_LIST_PAGE_SIZE = 50
 # tab.
 FEEDBACK_TAB_PAGE_SIZE = 20
 
+# Default title for a newly-minted exploration.
+DEFAULT_EXPLORATION_TITLE = ''
+# Default category for a newly-minted exploration.
+DEFAULT_EXPLORATION_CATEGORY = ''
+# Default objective for a newly-minted exploration.
+DEFAULT_EXPLORATION_OBJECTIVE = ''
+
 # Default name for the initial state of an exploration.
 DEFAULT_INIT_STATE_NAME = 'First Card'
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
+
+# Default title for a newly-minted collection.
+DEFAULT_COLLECTION_TITLE = ''
+# Default category for a newly-minted collection.
+DEFAULT_COLLECTION_CATEGORY = ''
+# Default objective for a newly-minted collection.
+DEFAULT_COLLECTION_OBJECTIVE = ''
 
 # The threshold the truth value of an evaluated answer group must equal or
 # exceed in order to be considered a better classification than the default
@@ -238,8 +252,8 @@ DEFAULT_SKIN_ID = 'conversation_v1'
 COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
 
 # User id and username for exploration migration bot. Commits made by this bot
-# are not reflected in the exploration summary models (for the gallery and
-# last-updated timestamps), but are recorded in the exploration commit log.
+# are not reflected in the exploration summary models, but are recorded in the
+# exploration commit log.
 MIGRATION_BOT_USER_ID = 'OppiaMigrationBot'
 MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
 
@@ -351,7 +365,6 @@ COLLECTION_WRITABLE_DATA_URL_PREFIX = '/collection_editor_handler/data'
 COLLECTION_RIGHTS_PREFIX = '/collection_editor_handler/rights'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
-CONTRIBUTE_GALLERY_URL = '/contribute'
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
@@ -361,18 +374,19 @@ EXPLORATION_URL_PREFIX = '/explore'
 FEEDBACK_STATS_URL_PREFIX = '/feedbackstatshandler'
 FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
-GALLERY_DATA_URL = '/galleryhandler/data'
-GALLERY_URL = '/gallery'
-LEARN_GALLERY_URL = '/learn'
+LIBRARY_INDEX_URL = '/library'
+LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
+LIBRARY_SEARCH_URL = '/search/find'
+LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
 MY_EXPLORATIONS_URL = '/my_explorations'
 MY_EXPLORATIONS_CREATE_MODE_URL = '%s?mode=create' % MY_EXPLORATIONS_URL
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
-PLAYTEST_QUEUE_URL = '/playtest'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
+SPLASH_URL = '/splash'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
@@ -382,11 +396,14 @@ USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 NAV_MODE_ABOUT = 'about'
 NAV_MODE_CREATE = 'create'
 NAV_MODE_EXPLORE = 'explore'
-NAV_MODE_GALLERY = 'gallery'
+NAV_MODE_LIBRARY = 'library'
 NAV_MODE_HOME = 'home'
 NAV_MODE_PARTICIPATE = 'participate'
 NAV_MODE_PROFILE = 'profile'
 NAV_MODE_SIGNUP = 'signup'
+NAV_MODE_SPLASH = 'splash'
+NAV_MODE_TEACH = 'teach'
+NAV_MODE_CONTACT = 'contact'
 
 # Event types.
 EVENT_TYPE_STATE_HIT = 'state_hit'
@@ -425,64 +442,92 @@ UPDATE_TYPE_EXPLORATION_COMMIT = 'exploration_commit'
 UPDATE_TYPE_COLLECTION_COMMIT = 'collection_commit'
 UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
 
-# Default color
-COLOR_TEAL = 'teal'
-# Social sciences
-COLOR_SALMON = 'salmon'
-# Art
-COLOR_SUNNYSIDE = 'sunnyside'
-# Mathematics and computing
-COLOR_SHARKFIN = 'sharkfin'
-# Science
-COLOR_GUNMETAL = 'gunmetal'
-DEFAULT_COLOR = COLOR_TEAL
+DEFAULT_COLOR = '#a33f40'
 DEFAULT_THUMBNAIL_ICON = 'Lightbulb'
-
-COLORS_TO_HEX_VALUES = {
-    COLOR_TEAL: '#05a69a',
-    COLOR_SALMON: '#f35f55',
-    COLOR_SUNNYSIDE: '#f7a541',
-    COLOR_SHARKFIN: '#058ca6',
-    COLOR_GUNMETAL: '#607d8b',
-}
 
 # List of supported default categories. For now, each category has
 # a specific color associated with it. Each category also has a thumbnail icon
 # whose filename is "{{CategoryName}}.svg".
 CATEGORIES_TO_COLORS = {
-    'Architecture': COLOR_SUNNYSIDE,
-    'Art': COLOR_SUNNYSIDE,
-    'Biology': COLOR_GUNMETAL,
-    'Business': COLOR_SALMON,
-    'Chemistry': COLOR_GUNMETAL,
-    'Computing': COLOR_SHARKFIN,
-    'Economics': COLOR_SALMON,
-    'Education': COLOR_TEAL,
-    'Engineering': COLOR_GUNMETAL,
-    'Environment': COLOR_GUNMETAL,
-    'Geography': COLOR_SALMON,
-    'Government': COLOR_SALMON,
-    'Hobbies': COLOR_TEAL,
-    'Languages': COLOR_SUNNYSIDE,
-    'Law': COLOR_SALMON,
-    'Life Skills': COLOR_TEAL,
-    'Mathematics': COLOR_SHARKFIN,
-    'Medicine': COLOR_GUNMETAL,
-    'Music': COLOR_SUNNYSIDE,
-    'Philosophy': COLOR_SALMON,
-    'Physics': COLOR_GUNMETAL,
-    'Programming': COLOR_SHARKFIN,
-    'Psychology': COLOR_SALMON,
-    'Puzzles': COLOR_TEAL,
-    'Reading': COLOR_TEAL,
-    'Religion': COLOR_SALMON,
-    'Sport': COLOR_SUNNYSIDE,
-    'Statistics': COLOR_SHARKFIN,
-    'Welcome': COLOR_TEAL,
+    'Mathematics': '#cd672b',
+    'Algebra': '#cd672b',
+    'Arithmetic': '#d68453',
+    'Calculus': '#b86330',
+    'Logic': '#d68453',
+    'Combinatorics': '#cf5935',
+    'Graph Theory': '#cf5935',
+    'Probability': '#cf5935',
+    'Statistics': '#cd672b',
+    'Geometry': '#d46949',
+    'Trigonometry': '#d46949',
+
+    'Algorithms': '#d0982a',
+    'Computing': '#bb8b2f',
+    'Programming': '#d9aa53',
+
+    'Astronomy': '#879d6c',
+    'Biology': '#97a766',
+    'Chemistry': '#aab883',
+    'Engineering': '#8b9862',
+    'Environment': '#aba86d',
+    'Medicine': '#97a766',
+    'Physics': '#879d6c',
+
+    'Architecture': '#6e3466',
+    'Art': '#895a83',
+    'Music': '#6a3862',
+    'Philosophy': '#613968',
+    'Poetry': '#7f507f',
+
+    'English': '#193a69',
+    'Languages': '#1b4174',
+    'Latin': '#3d5a89',
+    'Reading': '#193a69',
+
+    'Business': '#387163',
+    'Economics': '#5d8b7f',
+    'Geography': '#3c6d62',
+    'Government': '#538270',
+    'History': '#3d6b52',
+    'Law': '#538270',
+
+    'Education': '#942e20',
+    'Puzzles': '#a8554a',
+    'Sport': '#893327',
+    'Welcome': '#992a2b',
 }
 
-# A sorted list of default categories.
-DEFAULT_CATEGORIES = sorted(CATEGORIES_TO_COLORS.keys())
+# A sorted list of default categories for which icons and background colours
+# exist.
+ALL_CATEGORIES = sorted(CATEGORIES_TO_COLORS.keys())
+
+# These categories are shown in the library navbar.
+SEARCH_DROPDOWN_CATEGORIES = sorted([
+    'Mathematics',
+    'Statistics',
+    'Algorithms',
+    'Programming',
+    'Biology',
+    'Chemistry',
+    'Physics',
+    'Medicine',
+    'English',
+    'Architecture',
+    'Art',
+    'Music',
+    'Reading',
+    'Business',
+    'Economics',
+    'Geography',
+    'History',
+])
+
+# The header for the "Featured Explorations" category in the library index
+# page.
+LIBRARY_CATEGORY_FEATURED_EXPLORATIONS = 'Featured Explorations'
+# The header for the "Top Rated Explorations" category in the library index
+# page.
+LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = 'Top Rated Explorations'
 
 # List of supported language codes. Each description has a
 # parenthetical part that may be stripped out to give a shorter
@@ -571,3 +616,5 @@ SAME_TOPIC_SIMILARITY = 1.0
 
 SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 SYSTEM_USER_IDS = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
+
+CSRF_PAGE_NAME_CREATE_EXPLORATION = 'create_exploration'

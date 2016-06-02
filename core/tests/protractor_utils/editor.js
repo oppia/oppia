@@ -18,9 +18,9 @@
  */
 
 var forms = require('./forms.js');
+var gadgets = require('../../../extensions/gadgets/protractor.js');
 var general = require('./general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
-var gadgets = require('../../../extensions/gadgets/protractor.js');
 var rules = require('../../../extensions/rules/protractor.js');
 
 var _NEW_STATE_OPTION = 'A New Card Called...';
@@ -48,6 +48,7 @@ var exitTutorialIfNecessary = function() {
 
 var startTutorial = function() {
   element(by.css('.protractor-test-start-tutorial')).click();
+  general.waitForSystem();
 };
 
 var progressInTutorial = function() {
@@ -460,7 +461,8 @@ var _setRuleParameters = function(ruleElement, interactionId, ruleName) {
         by.tagName('button')
       ).click();
       parameterElement.element(
-        by.cssContainingText('.oppia-html-select-option', parameterValues[i])
+        by.cssContainingText(
+          '.protractor-test-html-select-option', parameterValues[i])
       ).click();
     } else {
       parameterEditor.setValue(parameterValues[i]);
@@ -898,6 +900,7 @@ var addFallback = function(
 
 // NOTE: if the state is not visible in the state graph this function will fail
 var moveToState = function(targetName) {
+  general.scrollToTop();
   element.all(by.css('.protractor-test-node')).map(function(stateElement) {
     return stateElement.element(by.css('.protractor-test-node-label')).
       getText();
@@ -960,16 +963,17 @@ var runFromSettingsTab = function(callbackFunction) {
 
 var setTitle = function(title) {
   runFromSettingsTab(function() {
-    element(by.css('protractor-test-exploration-title-input')).clear();
-    element(by.css('protractor-test-exploration-title-input')).sendKeys(title);
+    element(by.css('.protractor-test-exploration-title-input')).clear();
+    element(by.css('.protractor-test-exploration-title-input')).sendKeys(
+      title);
   });
 };
 
 var setCategory = function(category) {
   runFromSettingsTab(function() {
-    element(by.css('.protractor-test-exploration-category-input')).clear();
-    element(by.css('.protractor-test-exploration-category-input')).
-      sendKeys(category);
+    forms.AutocompleteDropdownEditor(
+      element(by.css('.protractor-test-exploration-category-input'))
+    ).setValue(category);
   });
 };
 
