@@ -594,7 +594,8 @@ class CollectionSummary(object):
     def __init__(self, collection_id, title, category, objective, language_code,
                  status, community_owned, owner_ids, editor_ids,
                  viewer_ids, contributor_ids, contributors_summary, version,
-                 collection_model_created_on, collection_model_last_updated):
+                 node_count, collection_model_created_on,
+                 collection_model_last_updated):
         self.id = collection_id
         self.title = title
         self.category = category
@@ -608,6 +609,7 @@ class CollectionSummary(object):
         self.contributor_ids = contributor_ids
         self.contributors_summary = contributors_summary
         self.version = version
+        self.node_count = node_count
         self.collection_model_created_on = collection_model_created_on
         self.collection_model_last_updated = collection_model_last_updated
 
