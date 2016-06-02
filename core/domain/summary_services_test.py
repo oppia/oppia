@@ -746,6 +746,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         self.assertDictContainsSubset(
             test_summary_2, recently_published_exploration_summaries[2])
 
+        # Test whether an edited exploration appears as recently published.
         exp_services.update_exploration(
             self.albert_id, self.EXP_ID_1, [{
                 'cmd': 'edit_exploration_property',
@@ -755,5 +756,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
 
         recently_published_exploration_summaries = (
             summary_services.get_recently_published_exploration_summary_dicts())
+        self.assertEqual(
+            recently_published_exploration_summaries[1]['title'], 'New title')
         self.assertDictContainsSubset(
             test_summary_3, recently_published_exploration_summaries[0])

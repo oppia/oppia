@@ -326,7 +326,7 @@ class ExpSummaryModel(base_models.BaseModel):
     # model was created)
     exploration_model_created_on = ndb.DateTimeProperty(indexed=True)
     # Time when the exploration model was first published
-    exp_model_first_published_msec = ndb.FloatProperty(indexed=True)
+    first_published_msec = ndb.FloatProperty(indexed=True)
 
     # The publication status of this exploration.
     status = ndb.StringProperty(
@@ -409,10 +409,11 @@ class ExpSummaryModel(base_models.BaseModel):
         published.
         """
         return ExpSummaryModel.query().filter(
-            ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PUBLIC
+            ndb.OR(ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PUBLIC,
+                   ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PUBLICIZED)
         ).filter(
             ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).order(
-            -ExpSummaryModel.exp_model_first_published_msec
+            -ExpSummaryModel.first_published_msec
         ).fetch(feconf.RECENTLY_PUBLISHED_QUERY_LIMIT)
 

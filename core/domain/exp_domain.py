@@ -2587,7 +2587,7 @@ class ExplorationSummary(object):
                  viewer_ids, contributor_ids, contributors_summary, version,
                  exploration_model_created_on,
                  exploration_model_last_updated,
-                 exp_model_first_published_msec):
+                 first_published_msec):
         """'ratings' is a dict whose keys are '1', '2', '3', '4', '5' and whose
         values are nonnegative integers representing frequency counts. Note
         that the keys need to be strings in order for this dict to be
@@ -2610,4 +2610,4 @@ class ExplorationSummary(object):
         self.version = version
         self.exploration_model_created_on = exploration_model_created_on
         self.exploration_model_last_updated = exploration_model_last_updated
-        self.exp_model_first_published_msec = exp_model_first_published_msec
+        self.first_published_msec = first_published_msec

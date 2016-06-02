@@ -2270,7 +2270,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 self.EXPECTED_VERSION_2,
                 actual_summaries[self.EXP_ID_2].exploration_model_created_on,
                 actual_summaries[self.EXP_ID_2].exploration_model_last_updated,
-                actual_summaries[self.EXP_ID_2].exp_model_first_published_msec
+                actual_summaries[self.EXP_ID_2].first_published_msec
                 )}
 
         # check actual summaries equal expected summaries
@@ -2301,7 +2301,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 {self.albert_id: 1, self.bob_id: 1}, self.EXPECTED_VERSION_1,
                 actual_summaries[self.EXP_ID_1].exploration_model_created_on,
                 actual_summaries[self.EXP_ID_1].exploration_model_last_updated,
-                actual_summaries[self.EXP_ID_1].exp_model_first_published_msec
+                actual_summaries[self.EXP_ID_1].first_published_msec
             ),
             self.EXP_ID_2: exp_domain.ExplorationSummary(
                 self.EXP_ID_2, 'Exploration 2 Albert title',
@@ -2312,7 +2312,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 {self.albert_id: 1}, self.EXPECTED_VERSION_2,
                 actual_summaries[self.EXP_ID_2].exploration_model_created_on,
                 actual_summaries[self.EXP_ID_2].exploration_model_last_updated,
-                actual_summaries[self.EXP_ID_2].exp_model_first_published_msec
+                actual_summaries[self.EXP_ID_2].first_published_msec
             )
         }
 

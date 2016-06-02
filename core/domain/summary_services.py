@@ -405,11 +405,10 @@ def get_recently_published_exploration_summary_dicts():
     recently_published_exploration_summaries = [
         exp_summary for exp_summary in
         exp_services.get_recently_published_exploration_summaries().values()]
-
+    
     summary_dicts = sorted(recently_published_exploration_summaries,
                            key=lambda exp_summary:
-                           exp_summary.exp_model_first_published_msec,
+                           exp_summary.first_published_msec,
                            reverse=True)
 
     return _get_displayable_exp_summary_dicts(summary_dicts)
-    
