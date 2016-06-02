@@ -24,19 +24,28 @@ var users = require('../protractor_utils/users.js');
 var admin = require('../protractor_utils/admin.js');
 
 var _selectLanguage = function(language) {
-  element(by.name('protractor-test-i18n-language-' + language)).click();
+  element(by.css('.protractor-test-i18n-language-selector')).
+    element(by.cssContainingText('option', language)).click();
 };
 
 describe('Site language', function() {
   beforeEach(function() {
     // Starting language is English
-    browser.get('/library');
+    browser.get('/splash');
     _selectLanguage('English');
-    expect(browser.getTitle()).toEqual('Oppia - Library');
+    expect(browser.getTitle()).toEqual('Home - Oppia');
+  });
+
+  afterEach(function() {
+    // Reset language back to English
+    browser.get('/splash');
+    _selectLanguage('English');
   });
 
   it('should change after selecting a different language', function() {
+    browser.get('/splash');
     _selectLanguage('Español');
+    browser.get('/library');
     expect(browser.getTitle()).toEqual('Oppia - Librería');
     general.ensurePageHasNoTranslationIds();
   });
@@ -63,8 +72,9 @@ describe('Site language', function() {
       function() {
     users.createUser('feanor@example.com', 'Feanor');
     users.login('feanor@example.com');
-    browser.get('/library');
+    browser.get('/splash');
     _selectLanguage('Español');
+    browser.get('/library');
     expect(browser.getTitle()).toEqual('Oppia - Librería');
 
     // The preference page shows the last selected language
@@ -89,7 +99,7 @@ describe('Site language', function() {
   it('should not change in an exploration', function() {
     users.createUser('mangue@example.com', 'Mangue');
     users.login('mangue@example.com', true);
-    browser.get('/library');
+    browser.get('/splash');
     _selectLanguage('Español');
     admin.reloadExploration('protractor_test_1.yaml');
     // Open exploration

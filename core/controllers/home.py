@@ -110,6 +110,7 @@ class MyExplorationsPage(base.BaseHandler):
     """Page showing the user's explorations."""
 
     PAGE_NAME_FOR_CSRF = 'dashboard'
+    PAGE_HAS_CREATE_EXP_REQUEST = True
 
     @base.require_user
     def get(self):
@@ -221,7 +222,7 @@ class NotificationsHandler(base.BaseHandler):
 class SiteLanguageHandler(base.BaseHandler):
     """Changes the preferred system language in the user's preferences."""
 
-    PAGE_NAME_FOR_CSRF = feconf.FOOTER_PAGE_NAME_FOR_CSRF
+    PAGE_NAME_FOR_CSRF = feconf.CSRF_PAGE_NAME_I18N
 
     def put(self):
         """Handles PUT requests."""
@@ -235,27 +236,16 @@ class SiteLanguageHandler(base.BaseHandler):
 class NewExploration(base.BaseHandler):
     """Creates a new exploration."""
 
-    PAGE_NAME_FOR_CSRF = 'dashboard'
+    PAGE_NAME_FOR_CSRF = feconf.CSRF_PAGE_NAME_CREATE_EXPLORATION
 
     @base.require_fully_signed_up
     def post(self):
         """Handles POST requests."""
-        title = self.payload.get('title')
-        category = self.payload.get('category')
-        objective = self.payload.get('objective')
-        language_code = self.payload.get('language_code')
-
-        if not title:
-            raise self.InvalidInputException('No title supplied.')
-        if not category:
-            raise self.InvalidInputException('No category chosen.')
-        if not language_code:
-            raise self.InvalidInputException('No language chosen.')
+        title = self.payload.get('title', feconf.DEFAULT_EXPLORATION_TITLE)
 
         new_exploration_id = exp_services.get_new_exploration_id()
         exploration = exp_domain.Exploration.create_default_exploration(
-            new_exploration_id, title, category,
-            objective=objective, language_code=language_code)
+            new_exploration_id, title=title)
         exp_services.save_new_exploration(self.user_id, exploration)
 
         self.render_json({
@@ -271,20 +261,9 @@ class NewCollection(base.BaseHandler):
     @base.require_fully_signed_up
     def post(self):
         """Handles POST requests."""
-        title = self.payload.get('title')
-        category = self.payload.get('category')
-        objective = self.payload.get('objective')
-        language_code = self.payload.get('language_code')
-
-        if not title:
-            raise self.InvalidInputException('No title supplied.')
-        if not category:
-            raise self.InvalidInputException('No category chosen.')
-
         new_collection_id = collection_services.get_new_collection_id()
         collection = collection_domain.Collection.create_default_collection(
-            new_collection_id, title, category, objective=objective,
-            language_code=language_code)
+            new_collection_id)
         collection_services.save_new_collection(self.user_id, collection)
 
         self.render_json({
@@ -300,20 +279,12 @@ class UploadExploration(base.BaseHandler):
     @base.require_fully_signed_up
     def post(self):
         """Handles POST requests."""
-        title = self.payload.get('title')
-        category = self.payload.get('category')
         yaml_content = self.request.get('yaml_file')
-
-        if not title:
-            raise self.InvalidInputException('No title supplied.')
-        if not category:
-            raise self.InvalidInputException('No category chosen.')
 
         new_exploration_id = exp_services.get_new_exploration_id()
         if ALLOW_YAML_FILE_UPLOAD.value:
             exp_services.save_new_exploration_from_yaml_and_assets(
-                self.user_id, yaml_content, title, category,
-                new_exploration_id, [])
+                self.user_id, yaml_content, new_exploration_id, [])
             self.render_json({
                 EXPLORATION_ID_KEY: new_exploration_id
             })

@@ -19,8 +19,8 @@
 oppia.constant('SEARCH_DATA_URL', '/searchhandler/data');
 
 oppia.factory('searchService', [
-  '$http', '$rootScope', 'SEARCH_DATA_URL',
-  function($http, $rootScope, SEARCH_DATA_URL) {
+  '$http', '$rootScope', '$translate', 'SEARCH_DATA_URL',
+  function($http, $rootScope, $translate, SEARCH_DATA_URL) {
   var _lastQuery = null;
   var _lastSelectedCategories = {};
   var _lastSelectedLanguageCodes = {};
@@ -134,6 +134,9 @@ oppia.factory('searchService', [
       }, function() {
         numSearchesInProgress--;
       });
+
+      // Translate the new explorations loaded.
+      $translate.refresh();
 
       if (successCallback) {
         successCallback();

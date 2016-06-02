@@ -80,7 +80,9 @@ BAD_PATTERNS = {
         'Please use datetime.datetime.utcnow() instead of'
         'datetime.datetime.now().'),
     '\t': (
-        'Please use spaces instead of tabs.')
+        'Please use spaces instead of tabs.'),
+    '\r': (
+        'Please make sure all files only have LF endings (no CRLF).')
 }
 
 EXCLUDED_PATHS = (

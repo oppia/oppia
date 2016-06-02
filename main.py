@@ -157,13 +157,14 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(feconf.SPLASH_URL, pages.SplashPage, 'splash_page'),
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
+    get_redirect_route(r'/teach', pages.TeachPage, 'teach_page'),
     get_redirect_route(
         r'/participate', pages.ParticipatePage, 'participate_page'),
     get_redirect_route(
         r'/site_guidelines', pages.ParticipatePage,
         'redirect_to_participate_page'),
     get_redirect_route(
-        r'/contact', pages.AboutPage, 'redirect_to_about_page'),
+        r'/contact', pages.ContactPage, 'contact_page'),
 
     get_redirect_route(r'/forum', pages.ForumPage, 'forum_page'),
     get_redirect_route(r'/terms', pages.TermsPage, 'terms_page'),
@@ -347,6 +348,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/createhandler/started_tutorial_event',
         editor.StartedTutorialEventHandler, 'started_tutorial_event_handler'),
+    get_redirect_route(
+        r'/createhandler/autosave_draft/<exploration_id>',
+        editor.EditorAutosaveHandler, 'editor_autosave_handler'),
 
     get_redirect_route(
         r'%s' % feconf.RECENT_COMMITS_DATA_URL,

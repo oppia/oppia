@@ -66,7 +66,7 @@ describe('Library index page', function() {
     users.logout();
 
     users.login('celebrimor@publicationAndLibrary.com');
-    workflow.createExploration('Vilya', 'rings');
+    workflow.createExploration();
     editor.setContent(forms.toRichText('Celebrimbor wrote this'));
     editor.setInteraction('EndExploration');
     editor.setObjective('preserve the works of the elves');

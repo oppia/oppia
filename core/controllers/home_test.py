@@ -274,23 +274,24 @@ class SiteLanguageHandlerTests(test_utils.GenericTestBase):
         response = self.testapp.get('/preferences')
         self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(response)
-        self.put_json(feconf.SITE_LANGUAGE_DATA_URL, {
-            'site_language_code': language_code,
+        self.put_json('/preferenceshandler/data', {
+            'update_type': 'preferred_site_language_code',
+            'data': language_code,
         }, csrf_token)
 
         preferences = self.get_json('/preferenceshandler/data')
         self.assertIsNotNone(preferences)
-        self.assertEqual(preferences['preferred_site_language_code'],
-                         language_code)
+        self.assertEqual(
+            preferences['preferred_site_language_code'], language_code)
 
         self.logout()
 
     def test_save_site_language_no_user(self):
         """The SiteLanguageHandler handler can be called without a user."""
-        response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
+        response = self.testapp.get(feconf.SPLASH_URL)
         self.assertEqual(response.status_int, 200)
-        csrf_token = self.get_csrf_token_from_response(response,
-                                                       for_footer=True)
+        csrf_token = self.get_csrf_token_from_response(
+            response, token_type=feconf.CSRF_PAGE_NAME_I18N)
         self.put_json(feconf.SITE_LANGUAGE_DATA_URL, {
             'site_language_code': 'es',
         }, csrf_token)
@@ -308,13 +309,11 @@ class CreationButtonsTest(test_utils.GenericTestBase):
 
         response = self.testapp.get('/my_explorations')
         self.assertEqual(response.status_int, 200)
-        csrf_token = self.get_csrf_token_from_response(response)
-        exp_a_id = self.post_json(feconf.NEW_EXPLORATION_URL, {
-            'title': self.UNICODE_TEST_STRING,
-            'category': self.UNICODE_TEST_STRING,
-            'objective': 'Learn how to generate exploration ids.',
-            'language_code': feconf.DEFAULT_LANGUAGE_CODE
-        }, csrf_token)[home.EXPLORATION_ID_KEY]
+        csrf_token = self.get_csrf_token_from_response(
+            response, token_type=feconf.CSRF_PAGE_NAME_CREATE_EXPLORATION)
+        exp_a_id = self.post_json(
+            feconf.NEW_EXPLORATION_URL, {}, csrf_token
+        )[home.EXPLORATION_ID_KEY]
         self.assertEqual(len(exp_a_id), 12)
 
         self.logout()

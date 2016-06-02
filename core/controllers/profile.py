@@ -161,8 +161,8 @@ class PreferencesHandler(base.BaseHandler):
         elif update_type == 'preferred_language_codes':
             user_services.update_preferred_language_codes(self.user_id, data)
         elif update_type == 'preferred_site_language_code':
-            user_services.update_preferred_site_language_code(self.user_id,
-                                                              data)
+            user_services.update_preferred_site_language_code(
+                self.user_id, data)
         elif update_type == 'profile_picture_data_url':
             user_services.update_profile_picture_data_url(self.user_id, data)
         elif update_type == 'email_preferences':

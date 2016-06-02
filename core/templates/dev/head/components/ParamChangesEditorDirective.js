@@ -202,7 +202,9 @@ oppia.directive('paramChangesEditor', [function() {
 
           explorationParamSpecsService.saveDisplayedValue();
           $scope.paramChangesService.saveDisplayedValue();
-          $scope.postSaveHook();
+          if ($scope.postSaveHook) {
+            $scope.postSaveHook();
+          }
         };
 
         $scope.deleteParamChange = function(index) {

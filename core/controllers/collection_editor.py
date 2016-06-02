@@ -95,6 +95,8 @@ class CollectionEditorHandler(base.BaseHandler):
 class CollectionEditorPage(CollectionEditorHandler):
     """The editor page for a single collection."""
 
+    PAGE_HAS_CREATE_EXP_REQUEST = True
+
     # TODO(bhenning): Implement read-only version of the editor. Until that
     # exists, ensure the user has proper permission to edit this collection
     # before seeing the editor.

@@ -21,19 +21,20 @@ oppia.directive('createExplorationButton', [function() {
     restrict: 'E',
     templateUrl: 'components/createExplorationButton',
     controller: [
-      '$scope', '$timeout', '$window', 'ExplorationCreationButtonService',
-      'siteAnalyticsService', 'CATEGORY_LIST',
+      '$scope', '$timeout', '$window', 'ExplorationCreationService',
+      'siteAnalyticsService',
       function(
-          $scope, $timeout, $window, ExplorationCreationButtonService,
-          siteAnalyticsService, CATEGORY_LIST) {
-        $scope.showCreateExplorationModal = function() {
-          ExplorationCreationButtonService.showCreateExplorationModal(
-            CATEGORY_LIST);
+          $scope, $timeout, $window, ExplorationCreationService,
+          siteAnalyticsService) {
+        $scope.explorationCreationInProgress = false;
+
+        $scope.createNewExploration = function() {
+          $scope.explorationCreationInProgress = true;
+          ExplorationCreationService.createNewExploration();
         };
-        $scope.showUploadExplorationModal = function() {
-          ExplorationCreationButtonService.showUploadExplorationModal(
-            CATEGORY_LIST);
-        };
+
+        $scope.showUploadExplorationModal = (
+          ExplorationCreationService.showUploadExplorationModal);
 
         $scope.onRedirectToLogin = function(destinationUrl) {
           siteAnalyticsService.registerStartLoginEvent(
