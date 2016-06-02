@@ -38,9 +38,25 @@ class Image(base.BaseRichTextComponent):
             'obj_type': 'Filepath',
         },
         'default_value': '',
+        #'height':'640',
+        #'width':'480',
     }, {
         'name': 'alt',
         'description': 'Alternative text (for screen readers)',
+        'schema': {
+            'type': 'unicode',
+        },
+        'default_value': '',
+    },  {
+        'name': 'height',
+        'description': 'Height of the image',
+        'schema': {
+            'type': 'unicode',
+        },
+        'default_value': '',
+    },  {
+        'name': 'width',
+        'description': 'Width of the image',
         'schema': {
             'type': 'unicode',
         },
