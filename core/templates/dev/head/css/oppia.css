@@ -628,9 +628,11 @@ textarea {
 */
 .oppia-footer {
   background-color: #094142;
+  bottom: 0;
   color: #FFFFFF;
   font-size: 13px;
   line-height: 20px;
+  position: absolute;
   width: 100%;
 }
 
@@ -661,12 +663,12 @@ textarea {
 }
 
 .oppia-footer-padding {
-  height: 200px;
+  height: 198px;
 }
 
 @media (max-width: 768px) {
   .oppia-footer-padding {
-    height: 500px;
+    height: 300px;
   }
 }
 
@@ -3055,7 +3057,7 @@ md-card.preview-conversation-skin-supplemental-card {
   background-color: rgba(5, 190, 178, 1);
   color: #fff;
 }
-@media (min-width: 800px) {
+@media (min-width: 768px) {
   .oppia-splash-button-browse {
     left: calc(50% - 200px);
   }
@@ -3067,7 +3069,7 @@ md-card.preview-conversation-skin-supplemental-card {
     padding-top: 80px;
   }
 }
-@media (max-width: 799px) {
+@media (max-width: 768px) {
   .oppia-splash-button-browse {
     left: 50%;
   }
@@ -3250,6 +3252,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-about-extra-info {
   background-color: #009788;
   color: #fff;
+  height: 220px;
   width: 100%;
 }
 
@@ -3355,7 +3358,7 @@ md-card.preview-conversation-skin-supplemental-card {
   }
 }
 
-@media only screen and (max-width: 730px) {
+@media only screen and (max-width: 768px) {
   .oppia-about-content, .oppia-about-extra-content {
     width: 90%;
   }
@@ -3368,6 +3371,9 @@ md-card.preview-conversation-skin-supplemental-card {
   }
   .oppia-about-otter-speech-bubble {
     padding: 10px;
+  }
+  .oppia-about-extra-info {
+    height: 400px;
   }
 }
 
@@ -3398,5 +3404,8 @@ md-card.preview-conversation-skin-supplemental-card {
   }
   .oppia-about-buttons:first-child {
     margin: 0;
+  }
+  .oppia-about-extra-info {
+    height: 400px;
   }
 }
