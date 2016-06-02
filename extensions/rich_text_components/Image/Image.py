@@ -38,8 +38,6 @@ class Image(base.BaseRichTextComponent):
             'obj_type': 'Filepath',
         },
         'default_value': '',
-        #'height':'640',
-        #'width':'480',
     }, {
         'name': 'alt',
         'description': 'Alternative text (for screen readers)',
