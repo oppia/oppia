@@ -20,6 +20,7 @@ from core.controllers import base
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import rights_manager
+from core.domain import summary_services
 from core.platform import models
 import utils
 
@@ -167,7 +168,7 @@ class WritableCollectionDataHandler(CollectionEditorHandler):
 
         # Retrieve the updated collection.
         collection_dict = (
-            collection_services.get_learner_collection_dict_by_id(
+            summary_services.get_learner_collection_dict_by_id(
                 collection_id, self.user_id, allow_invalid_explorations=True))
 
         # Send the updated collection back to the frontend.
@@ -214,4 +215,3 @@ class CollectionRightsHandler(CollectionEditorHandler):
             'rights': rights_manager.get_collection_rights(
                 collection_id).to_dict()
         })
-
