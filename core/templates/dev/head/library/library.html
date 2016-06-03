@@ -45,9 +45,9 @@
         </div>
 
         <div class="oppia-exp-summary-tiles-container" ng-if="!inSearchMode">
+        <img src="/images/library/library_banner.svg" width="100%" align="center">
           <div ng-if="libraryGroups.length === 0"
                style="margin: 150px auto; text-align: center; width: 100%;">
-            There are no groups of explorations available to display.
           </div>
 
           <div class="oppia-library-group" ng-repeat="group in libraryGroups track by $index">
@@ -80,30 +80,18 @@
                    ng-swipe-left="scroll($index, false)">
                 <div class="oppia-library-carousel-overlay-left"></div>
                 <div class="oppia-library-carousel-tiles">
-                  <div ng-repeat="tile in group.activity_summary_dicts" style="display: inline-block;">
-                    <collection-summary-tile ng-if="tile.activity_type == 'collection'"
-                                             collection-id="tile.id"
-                                             collection-title="tile.title"
-                                             last-updated-msec="tile.last_updated_msec"
-                                             objective="tile.objective"
-                                             node-count="tile.node_count"
-                                             category="tile.category"
-                                             thumbnail-icon-url="tile.thumbnail_icon_url"
-                                             thumbnail-bg-color="tile.thumbnail_bg_color">
-                    </collection-summary-tile>
-                    <exploration-summary-tile ng-if="tile.activity_type == 'exploration'"
-                                              exploration-id="tile.id"
-                                              exploration-title="tile.title"
-                                              last-updated-msec="tile.last_updated_msec"
-                                              objective="tile.objective"
-                                              category="tile.category"
-                                              ratings="tile.ratings"
-                                              num-views="tile.num_views"
-                                              thumbnail-icon-url="tile.thumbnail_icon_url"
-                                              thumbnail-bg-color="tile.thumbnail_bg_color"
-                                              class="protractor-test-exp-summary-tile">
-                    </exploration-summary-tile>
-                  </div>
+                  <exploration-summary-tile ng-repeat="tile in group.activity_summary_dicts"
+                                            exploration-id="tile.id"
+                                            exploration-title="tile.title"
+                                            last-updated-msec="tile.last_updated_msec"
+                                            objective="tile.objective"
+                                            category="tile.category"
+                                            ratings="tile.ratings"
+                                            num-views="tile.num_views"
+                                            thumbnail-icon-url="tile.thumbnail_icon_url"
+                                            thumbnail-bg-color="tile.thumbnail_bg_color"
+                                            class="protractor-test-exp-summary-tile">
+                  </exploration-summary-tile>
                 </div>
                 <div class="oppia-library-carousel-overlay-right"></div>
               </div>
