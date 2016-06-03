@@ -65,9 +65,9 @@ class ProfilePage(base.BaseHandler):
 
 class ProfileHandler(base.BaseHandler):
     """Provides data for the profile page."""
-    
+
     PAGE_NAME_FOR_CSRF = 'profile'
-    
+
     def get(self, username):
         """Handles GET requests."""
         if not username:
