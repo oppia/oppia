@@ -104,7 +104,7 @@ oppia.factory('searchService', [
       return encodeURIComponent(searchQuery) +
         _getSuffixForQuery(selectedCategories, selectedLanguageCodes);
     },
-    // Note that an empty query results in all explorations being shown.
+    // Note that an empty query results in all activities being shown.
     executeSearchQuery: function(
         searchQuery, selectedCategories, selectedLanguageCodes,
         successCallback) {
@@ -124,7 +124,7 @@ oppia.factory('searchService', [
 
         if ($('.oppia-search-bar-input').val() === searchQuery) {
           $rootScope.$broadcast(
-            'initialSearchResultsLoaded', data.explorations_list);
+            'initialSearchResultsLoaded', data.activity_list);
           _isCurrentlyFetchingResults = false;
         } else {
           console.log('Mismatch');

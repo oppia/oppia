@@ -73,18 +73,30 @@
                    ng-swipe-left="scroll($index, false)">
                 <div class="oppia-library-carousel-overlay-left"></div>
                 <div class="oppia-library-carousel-tiles">
-                  <exploration-summary-tile ng-repeat="tile in group.activity_summary_dicts"
-                                            exploration-id="tile.id"
-                                            exploration-title="tile.title"
-                                            last-updated-msec="tile.last_updated_msec"
-                                            objective="tile.objective"
-                                            category="tile.category"
-                                            ratings="tile.ratings"
-                                            num-views="tile.num_views"
-                                            thumbnail-icon-url="tile.thumbnail_icon_url"
-                                            thumbnail-bg-color="tile.thumbnail_bg_color"
-                                            class="protractor-test-exp-summary-tile">
-                  </exploration-summary-tile>
+                  <div ng-repeat="tile in group.activity_summary_dicts" style="display: inline-block;">
+                    <collection-summary-tile ng-if="tile.activity_type == 'collection'"
+                                             collection-id="tile.id"
+                                             collection-title="tile.title"
+                                             last-updated-msec="tile.last_updated_msec"
+                                             objective="tile.objective"
+                                             node-count="tile.node_count"
+                                             category="tile.category"
+                                             thumbnail-icon-url="tile.thumbnail_icon_url"
+                                             thumbnail-bg-color="tile.thumbnail_bg_color">
+                    </collection-summary-tile>
+                    <exploration-summary-tile ng-if="tile.activity_type == 'exploration'"
+                                              exploration-id="tile.id"
+                                              exploration-title="tile.title"
+                                              last-updated-msec="tile.last_updated_msec"
+                                              objective="tile.objective"
+                                              category="tile.category"
+                                              ratings="tile.ratings"
+                                              num-views="tile.num_views"
+                                              thumbnail-icon-url="tile.thumbnail_icon_url"
+                                              thumbnail-bg-color="tile.thumbnail_bg_color"
+                                              class="protractor-test-exp-summary-tile">
+                    </exploration-summary-tile>
+                  </div>
                 </div>
                 <div class="oppia-library-carousel-overlay-right"></div>
               </div>
@@ -144,6 +156,14 @@
   {% include 'components/search_results_directive.html' %}
 {% endblock %}
 
+{% block footer %}
+  <div ng-controller="LibraryFooter">
+    <div ng-if="!inSearchMode">
+      {% include 'footer.html' %}
+    </div>
+  </div>
+{% endblock footer %}
+
 {% block footer_js %}
   {{ super() }}
   <script>
@@ -153,5 +173,6 @@
     {{ include_js_file('components/SearchResultsDirective.js') }}
 
     {{ include_js_file('library/Library.js') }}
+    {{ include_js_file('library/LibraryFooter.js') }}
   </script>
 {% endblock footer_js %}
