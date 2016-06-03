@@ -16,7 +16,7 @@
  * @fileoverview Controller for the statistics tab of the collection editor.
  */
 
-oppia.directive('collectionStatisticsTabDirective', [function() {
+oppia.directive('collectionStatisticsTab', [function() {
   return {
     restrict: 'E',
     templateUrl: 'inline/collection_statistics_tab_directive',

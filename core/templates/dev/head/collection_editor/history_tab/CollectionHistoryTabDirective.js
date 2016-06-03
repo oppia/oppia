@@ -16,7 +16,7 @@
  * @fileoverview Controller for the history tab of the collection editor.
  */
 
-oppia.directive('collectionHistoryTabDirective', [function() {
+oppia.directive('collectionHistoryTab', [function() {
   return {
     restrict: 'E',
     templateUrl: 'inline/collection_history_tab_directive',

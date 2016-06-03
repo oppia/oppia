@@ -16,7 +16,7 @@
  * @fileoverview Controller for the preview tab of the collection editor.
  */
 
-oppia.directive('collectionPreviewTabDirective', [function() {
+oppia.directive('collectionPreviewTab', [function() {
   return {
     restrict: 'E',
     templateUrl: 'inline/collection_preview_tab_directive',

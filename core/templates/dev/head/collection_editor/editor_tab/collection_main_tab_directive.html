@@ -1,8 +1,8 @@
 <script type="text/ng-template" id="inline/collection_main_tab_directive">
   <div ng-if="getCollection()">
     <!-- Collection details -->
-    <collection-details-editor-directive collection="getCollection()">
-    </collection-details-editor-directive>
+    <collection-details-editor collection="getCollection()">
+    </collection-details-editor>
 
     <a
       ng-href="/collection/<[getCollection().getId()]>"
@@ -14,41 +14,20 @@
     <br>
     <br>
     <strong>Skills</strong>
-    <collection-skill-list-directive
-      collection-skill-list="collectionSkillList">
-    </collection-skill-list-directive>
+    <collection-skill-list collection-skill-list="getCollectionSkillList()">
+    </collection-skill-list>
 
     <!-- List of explorations -->
     <br>
     <strong>Explorations</strong>
     <ul>
-      <li
-        ng-repeat="node in getCollection().getBindableCollectionNodes()">
-        <collection-node-editor-directive
+      <li ng-repeat="node in getCollection().getBindableCollectionNodes()">
+        <collection-node-editor
           collection="getCollection()"
           collection-node="node"
           update-skill-list="updateSkillList()">
-        </collection-node-editor-directive>
+        </collection-node-editor>
       </li>
     </ul>
-
-    <!-- Collection changes to be commited -->
-    <h3>
-      <span ng-if="getChangeListCount() > 0">
-        <em>(<[getChangeListCount()]> changes pending)</em>
-      </span>
-    </h3>
-
-    <br>
-    <input
-      ng-model="commitMessage"
-      type="text"
-      placeholder="Commit Message">
-    <button ng-click="saveCollection(commitMessage)">Save Collection</button>
-    <button
-      ng-click="publishCollection()"
-      ng-if="!isPublic">
-      Publish Collection
-    </button>
   </div>
 </script>

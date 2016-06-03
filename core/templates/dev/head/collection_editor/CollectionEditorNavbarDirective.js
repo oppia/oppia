@@ -16,7 +16,7 @@
  * @fileoverview Controller for the navbar of the collection editor.
  */
 
-oppia.directive('collectionEditorNavbarDirective', [function() {
+oppia.directive('collectionEditorNavbar', [function() {
   return {
     restrict: 'E',
     templateUrl: 'inline/collection_editor_navbar_directive',

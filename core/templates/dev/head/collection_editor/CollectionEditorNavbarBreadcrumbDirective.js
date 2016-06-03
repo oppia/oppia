@@ -16,7 +16,7 @@
  * @fileoverview Controller for the navbar breadcrumb of the collection editor.
  */
 
-oppia.directive('collectionEditorNavbarBreadcrumbDirective', [function() {
+oppia.directive('collectionEditorNavbarBreadcrumb', [function() {
   return {
     restrict: 'E',
     scope: {

@@ -17,7 +17,7 @@
  * pre-requisite skills) associated with a collection.
  */
 
-oppia.directive('collectionSkillListDirective', [function() {
+oppia.directive('collectionSkillList', [function() {
   return {
     restrict: 'E',
     scope: {

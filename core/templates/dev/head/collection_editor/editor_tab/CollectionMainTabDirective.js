@@ -16,13 +16,15 @@
  * @fileoverview Controller for the main tab of the collection editor.
  */
 
-oppia.directive('collectionMainTabDirective', [function() {
+oppia.directive('collectionMainTab', [function() {
   return {
     restrict: 'E',
     scope: {
-      getCollection: '&collection'
+      getCollection: '&collection',
+      getCollectionSkillList: '&collectionSkillList'
     },
     templateUrl: 'inline/collection_main_tab_directive',
-    controller: [function() {}]
+    controller: [function() {
+    }]
   };
 }]);

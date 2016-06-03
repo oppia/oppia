@@ -16,7 +16,7 @@
  * @fileoverview Controller for the settings tab of the collection editor.
  */
 
-oppia.directive('collectionSettingsTabDirective', [function() {
+oppia.directive('collectionSettingsTab', [function() {
   return {
     restrict: 'E',
     templateUrl: 'inline/collection_settings_tab_directive',

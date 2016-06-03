@@ -18,7 +18,7 @@
  * and also delete the collection node represented by this directive.
  */
 
-oppia.directive('collectionNodeEditorDirective', [function() {
+oppia.directive('collectionNodeEditor', [function() {
   return {
     restrict: 'E',
     scope: {

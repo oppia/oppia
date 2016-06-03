@@ -28,46 +28,83 @@
 
 {% block navbar_breadcrumb %}
   <div ng-controller="CollectionEditor">
-    <collection-editor-navbar-breadcrumb-directive collection="collection">
-    </collection-editor-navbar-breadcrumb-directive>
+    <collection-editor-navbar-breadcrumb collection="collection">
+    </collection-editor-navbar-breadcrumb>
   </div>
 {% endblock navbar_breadcrumb %}
 
 {% block local_top_nav_options %}
-  <collection-editor-navbar-directive>
-  </collection-editor-navbar-directive>
+  <collection-editor-navbar>
+  </collection-editor-navbar>
 {% endblock local_top_nav_options %}
 
 {% block content %}
   <div ng-controller="CollectionEditor">
     <div ng-if="getTabStatuses().active === 'main'">
-      <collection-main-tab-directive collection="collection">
-      </collection-main-tab-directive>
+      <collection-main-tab
+        collection="collection"
+        collection-skill-list="collectionSkillList">
+      </collection-main-tab>
+
+      <!-- A list of validation errors, if there are any -->
+      <div ng-if="validationIssues.length > 0">
+        <strong>Errors that must be addressed before saving:</strong>
+        <ul>
+          <li ng-repeat="issue in validationIssues"><[issue]></li>
+        </ul>
+      </div>
+
+      <!-- Collection changes to be commited -->
+      <h3>
+        <span ng-if="getChangeListCount() > 0">
+          <em>(<[getChangeListCount()]> changes pending)</em>
+      </h3>
+
+      <br>
+      <input
+        ng-model="commitMessage"
+        type="text"
+        placeholder="Commit Message">
+      <button
+        ng-click="saveCollection(commitMessage)"
+        ng-disabled="validationIssues.length > 0">
+        Save Collection
+      </button>
+      <button
+        ng-click="publishCollection()"
+        ng-if="isPrivate">
+        Publish Collection
+      </button>
+      <button
+        ng-click="unpublishCollection()"
+        ng-if="!isPrivate && canUnpublish">
+        Unpublish Collection
+      </button>
     </div>
 
     <div ng-if="getTabStatuses().active === 'preview'">
-      <collection-preview-tab-directive>
-      </collection-preview-tab-directive>
+      <collection-preview-tab>
+      </collection-preview-tab>
     </div>
 
     <div ng-show="getTabStatuses().active === 'settings'">
-      <collection-settings-tab-directive>
-      </collection-settings-tab-directive>
+      <collection-settings-tab>
+      </collection-settings-tab>
     </div>
 
     <div ng-show="getTabStatuses().active === 'history'">
-      <collection-history-tab-directive>
-      </collection-history-tab-directive>
+      <collection-history-tab>
+      </collection-history-tab>
     </div>
 
     <div ng-show="getTabStatuses().active === 'feedback'">
-      <collection-feedback-tab-directive>
-      </collection-feedback-tab-directive>
+      <collection-feedback-tab>
+      </collection-feedback-tab>
     </div>
 
     <div ng-show="getTabStatuses().active === 'stats'">
-      <collection-statistics-tab-directive>
-      </collection-statistics-tab-directive>
+      <collection-statistics-tab>
+      </collection-statistics-tab>
     </div>
   </div>
 
@@ -90,11 +127,10 @@
     {{ include_js_file('collection_editor/CollectionEditor.js') }}
     {{ include_js_file('collection_editor/CollectionEditorNavbarBreadcrumbDirective.js') }}
     {{ include_js_file('collection_editor/CollectionEditorNavbarDirective.js') }}
-    {{ include_js_file('collection_editor/editor_tab/CollectionNodeEditorDirective.js') }}
-    {{ include_js_file('collection_editor/editor_tab/CollectionSkillListDirective.js') }}
-
     {{ include_js_file('collection_editor/editor_tab/CollectionDetailsEditorDirective.js') }}
     {{ include_js_file('collection_editor/editor_tab/CollectionMainTabDirective.js') }}
+    {{ include_js_file('collection_editor/editor_tab/CollectionNodeEditorDirective.js') }}
+    {{ include_js_file('collection_editor/editor_tab/CollectionSkillListDirective.js') }}
     {{ include_js_file('collection_editor/feedback_tab/CollectionFeedbackTabDirective.js') }}
     {{ include_js_file('collection_editor/history_tab/CollectionHistoryTabDirective.js') }}
     {{ include_js_file('collection_editor/preview_tab/CollectionPreviewTabDirective.js') }}
@@ -106,6 +142,7 @@
     {{ include_js_file('domain/collection/CollectionObjectFactory.js') }}
     {{ include_js_file('domain/collection/CollectionRightsBackendApiService.js') }}
     {{ include_js_file('domain/collection/CollectionUpdateService.js') }}
+    {{ include_js_file('domain/collection/CollectionValidationService.js') }}
     {{ include_js_file('domain/collection/SkillListObjectFactory.js') }}
     {{ include_js_file('domain/collection/WritableCollectionBackendApiService.js') }}
     {{ include_js_file('domain/editor/ChangeObjectFactory.js') }}

@@ -16,7 +16,7 @@
  * @fileoverview Controller for the feedback tab of the collection editor.
  */
 
-oppia.directive('collectionFeedbackTabDirective', [function() {
+oppia.directive('collectionFeedbackTab', [function() {
   return {
     restrict: 'E',
     templateUrl: 'inline/collection_feedback_tab_directive',
