@@ -160,7 +160,7 @@ over
 
  ```
      my_variable = (
-         my_very_long_class_name.my_really_long_method_name())
+         my_very_long_module_name.my_really_long_function_name())
   ```
 
 JavaScript
