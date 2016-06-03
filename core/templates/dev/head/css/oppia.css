@@ -138,6 +138,10 @@ body {
   width: 220px;
 }
 
+.oppia-profile-picture-container {
+  position: relative;
+}
+
 .oppia-profile-picture-fullsize {
   border-radius: 4px;
   display: block;
@@ -2436,6 +2440,34 @@ div#ng-curtain {
   -webkit-border-radius: 6px 0 6px 6px;
 }
 
+.oppia-profile-picture .oppia-profile-picture-mask {
+  background-color: #eee;
+  bottom: 0;
+  height: 100%;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 10;
+}
+.oppia-profile-picture:hover .oppia-profile-picture-mask {
+  border-radius: 4px;
+  opacity: 0.7;
+  transition: all 200ms;
+  -webkit-transition: all 200ms;
+}
+
+.oppia-profile-picture-edit-prompt {
+  background-color: #333;
+  border-radius: 5px;
+  color: white;
+  left: 50%;
+  min-width: 120px;
+  padding: 5px;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
 
 .oppia-profile-picture-crop-area {
   background: #E4E4E4;
