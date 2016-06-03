@@ -68,8 +68,6 @@ class ProfileHandler(base.BaseHandler):
     PAGE_NAME_FOR_CSRF = 'profile'
     def get(self, username):
         """Handles GET requests."""
-        print 'LOOK AT ME %s' % self.username
-        print (self.values)
         if not username:
             raise self.PageNotFoundException
 
