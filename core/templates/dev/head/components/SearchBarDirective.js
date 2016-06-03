@@ -214,12 +214,10 @@ oppia.directive('searchBar', [function() {
           // http://angular-translate.github.io/docs/#/guide/14_pluralization.
           $scope.categoryButtonText = $translate.instant(
             $scope.selectionDetails.categories.summary,
-            $scope.translationData,
-            'messageformat');
+            $scope.translationData, 'messageformat');
           $scope.languageButtonText = $translate.instant(
             $scope.selectionDetails.languageCodes.summary,
-            $scope.translationData,
-            'messageformat');
+            $scope.translationData, 'messageformat');
         };
 
         $rootScope.$on('$translateChangeSuccess', refreshSearchBarLabels);

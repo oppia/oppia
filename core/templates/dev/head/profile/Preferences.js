@@ -75,8 +75,7 @@ oppia.controller('Preferences', [
     }
   };
 
-  $scope.savePreferredSiteLanguageCodes = function(
-    preferredSiteLanguageCode) {
+  $scope.savePreferredSiteLanguageCodes = function(preferredSiteLanguageCode) {
     $translate.use(preferredSiteLanguageCode);
     _saveDataItem(
       'preferred_site_language_code', preferredSiteLanguageCode);

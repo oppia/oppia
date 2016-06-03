@@ -164,14 +164,14 @@ describe('Embedding', function() {
     users.login('embedder2@example.com', true);
     admin.reloadExploration('protractor_test_1.yaml');
 
-    // Change language to Thai, wich is not supported as site language
+    // Change language to Thai, which is not a supported site language.
     general.openEditor('12');
     editor.setLanguage('ภาษาไทย');
     editor.saveChanges('Changing the language to a not supported one.');
     // We expect the default language, English
     checkPlaceholder('Type a number');
 
-    // Change language to Spanish, which is supported as site language
+    // Change language to Spanish, which is a supported site language.
     general.openEditor('12');
     editor.setLanguage('español');
     editor.saveChanges('Changing the language to a supported one.');

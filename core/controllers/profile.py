@@ -136,8 +136,8 @@ class PreferencesHandler(base.BaseHandler):
             self.user_id)
         self.values.update({
             'preferred_language_codes': user_settings.preferred_language_codes,
-            'preferred_site_language_code':
-                user_settings.preferred_site_language_code,
+            'preferred_site_language_code': (
+                user_settings.preferred_site_language_code),
             'profile_picture_data_url': user_settings.profile_picture_data_url,
             'user_bio': user_settings.user_bio,
             'subject_interests': user_settings.subject_interests,

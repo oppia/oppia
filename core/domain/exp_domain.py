@@ -2559,7 +2559,7 @@ class Exploration(object):
                 for (state_name, state) in self.states.iteritems()
             },
             'title': self.title,
-            'language_code': self.language_code
+            'language_code': self.language_code,
         }
 
     def get_gadget_types(self):

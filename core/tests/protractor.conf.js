@@ -99,9 +99,13 @@ exports.config = {
   capabilities: {
     browserName: 'chrome',
     chromeOptions: {
-      args: [ 'lang=en-EN' ],
-      prefs: {intl: { accept_languages: "en-EN" }},
-    },
+      args: ['lang=en-EN'],
+      prefs: {
+        intl: {
+          accept_languages: 'en-EN'
+        }
+      }
+    }
   },
 
   // If you would like to run more than one instance of webdriver on the same

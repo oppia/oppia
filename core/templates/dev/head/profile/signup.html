@@ -32,7 +32,7 @@
 
   <div class="oppia-page-cards-container" ng-controller="Signup">
     <md-card class="oppia-page-card">
-      <h2 class="oppia-signup-page-title protractor-test-signup-page-title" translate="I18N_SIGNUP_COMPLETE_REGISTRATION"></h2>
+      <h2 class="oppia-signup-page-title" translate="I18N_SIGNUP_COMPLETE_REGISTRATION"></h2>
 
       <form ng-submit="submitPrerequisitesForm(hasAgreedToLatestTerms, username, canReceiveEmailUpdates)">
         <div ng-show="!hasUsername" role="form" class="form-horizontal">
@@ -104,7 +104,9 @@
 
         <br>
 
-        <button type="submit" class="btn btn-success protractor-test-register-user" ng-disabled="warningText || !hasAgreedToLatestTerms || submissionInProcess" translate="I18N_SIGNUP_BUTTON_SUBMIT">
+        <button type="submit" class="btn btn-success protractor-test-register-user"
+                ng-disabled="warningI18nCode || !hasAgreedToLatestTerms || submissionInProcess"
+                translate="I18N_SIGNUP_BUTTON_SUBMIT">
         </button>
       </form>
     </md-card>

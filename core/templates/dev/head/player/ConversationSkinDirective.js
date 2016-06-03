@@ -260,8 +260,8 @@ oppia.directive('conversationSkin', [function() {
       'playerPositionService', 'explorationRecommendationsService',
       'StatsReportingService',
       function(
-          $scope, $timeout, $rootScope, $window, $translate, messengerService,
-          oppiaPlayerService, urlService, focusService,
+          $scope, $timeout, $rootScope, $window, $translate,
+          messengerService, oppiaPlayerService, urlService, focusService,
           LearnerViewRatingService, windowDimensionsService,
           playerTranscriptService, LearnerParamsService,
           playerPositionService, explorationRecommendationsService,

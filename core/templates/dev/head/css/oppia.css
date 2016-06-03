@@ -468,6 +468,7 @@ textarea {
   Styles for the global navigation sidebar menu.
 */
 .oppia-base-container {
+  height: 100%;
   margin-left: auto;
   margin-right: auto;
   min-height: 100%;

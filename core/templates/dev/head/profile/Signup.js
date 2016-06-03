@@ -70,12 +70,12 @@ oppia.controller('Signup', [
       alertsService.clearWarnings();
       $scope.blurredAtLeastOnce = true;
       $scope.updateWarningText(username);
-      if (!$scope.warningText) {
+      if (!$scope.warningI18nCode) {
         $http.post('usernamehandler/data', {
           username: $scope.username
         }).then(function(response) {
           if (response.data.username_is_taken) {
-            $scope.warningText = 'I18N_SIGNUP_ERROR_USERNAME_TAKEN';
+            $scope.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_TAKEN';
           }
         });
       }
@@ -116,7 +116,7 @@ oppia.controller('Signup', [
         return;
       }
 
-      if (!$scope.hasUsername && $scope.warningText) {
+      if (!$scope.hasUsername && $scope.warningI18nCode) {
         return;
       }
 

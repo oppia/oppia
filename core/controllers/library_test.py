@@ -42,7 +42,7 @@ class LibraryPageTest(test_utils.GenericTestBase):
         """Test access to the library page."""
         response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
         self.assertEqual(response.status_int, 200)
-        response.mustcontain('I18N_LIBRARY_PAGE_TITLE', 'CATEGORIES')
+        response.mustcontain('I18N_LIBRARY_PAGE_TITLE')
 
     def test_library_handler_demo_exploration(self):
         """Test the library data handler on demo explorations."""
