@@ -83,7 +83,11 @@ oppia.factory('explorationData', [
           return deferred.promise;
         } else {
           // Retrieve data from the server.
-          return $http.get(explorationDataUrl).then(function(response) {
+          return $http.get(explorationDataUrl, {
+            params: {
+              apply_draft: true
+            }
+          }).then(function(response) {
             $log.info('Retrieved exploration data.');
             $log.info(response.data);
 
