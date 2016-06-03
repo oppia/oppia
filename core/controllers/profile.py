@@ -65,6 +65,7 @@ class ProfilePage(base.BaseHandler):
 
 class ProfileHandler(base.BaseHandler):
     """Provides data for the profile page."""
+    
     PAGE_NAME_FOR_CSRF = 'profile'
     def get(self, username):
         """Handles GET requests."""
@@ -89,9 +90,8 @@ class ProfileHandler(base.BaseHandler):
                     user_contributions.edited_exploration_ids))
         profile_is_of_current_user = (self.username == username)
 
-
         self.values.update({
-            'profileIsOfCurrentUser': profile_is_of_current_user,
+            'profile_is_of_current_user': profile_is_of_current_user,
             'profile_username': user_settings.username,
             'user_bio': user_settings.user_bio,
             'subject_interests': user_settings.subject_interests,
