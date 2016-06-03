@@ -3183,10 +3183,10 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-activity-summary-tile .exploration-summary-tile-mask {
   background-color: #eee;
   height: 240px;
-  left: 0px;
+  left: 0;
   opacity: 0.7;
   position: absolute;
-  top: 0px;
+  top: 0;
   width: 200px;
   z-index: 10;
 }
@@ -3194,10 +3194,10 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-activity-summary-tile:hover .title-section-mask {
   background-color: #eee;
   height: 144px;
-  left: 0px;
+  left: 0;
   opacity: 0.4;
   position: absolute;
-  top: 0px;
+  top: 0;
   width: 200px;
   z-index: 10;
 }
@@ -3210,8 +3210,8 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-activity-summary-tile .exploration-summary-avatars profile-link-image {
+  display: block;
   margin-bottom: 3px;
-  display:block;
 }
 
 .oppia-activity-summary-tile .avatars-num-minus-one {
@@ -3238,7 +3238,6 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-activity-summary-tile .contributor-indicator-background {
   background-color: #4078C0;
-  border: 1px solid rgb(243, 243, 243);
 }
 
 .oppia-activity-summary-tile .all-avatars .num-remaining-avatars {
@@ -3263,11 +3262,11 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-activity-summary-tile .thumbnail-image {
   display: block;
+  height: 75px;
   margin: 0 auto;
-  height: 40px;
-  top: 36px;
   position: relative;
-  width: 40px;
+  top: 22px;
+  width: 75px;
 }
 
 .oppia-activity-summary-tile .activity-title {
@@ -3283,9 +3282,8 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-activity-summary-tile .objective {
   height: 60px;
-  font-family: Roboto;
+  font-family: "Rubik", "Roboto", Arial, sans-serif;
   font-size: 0.85em;
-  font-style: italic;
   padding: 12px;
 }
 
@@ -3321,10 +3319,8 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-activity-summary-tile .recently-updated {
-  background-color: rgb(19,105,193);
-  border-radius: 10px;
-  color: white;
-  font-size: 0.8em;
+  color: rgb(19,105,193);
+  font-size: 1.1em;
   font-weight: bold;
   padding: 5px 8px 4px 8px;
 }
@@ -3350,8 +3346,8 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-activity-summary-tile.small-width .thumbnail-image {
   height: 20px;
   margin: 8px;
-  right: 0px;
-  top: 0px;
+  right: 0;
+  top: 0;
   position: absolute;
   width: 20px;
 }
