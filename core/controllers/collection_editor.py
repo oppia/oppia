@@ -20,6 +20,7 @@ from core.controllers import base
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import rights_manager
+from core.domain import summary_services
 from core.platform import models
 import feconf
 import utils
@@ -95,6 +96,8 @@ class CollectionEditorHandler(base.BaseHandler):
 
 class CollectionEditorPage(CollectionEditorHandler):
     """The editor page for a single collection."""
+
+    PAGE_HAS_CREATE_EXP_REQUEST = True
 
     # TODO(bhenning): Implement read-only version of the editor. Until that
     # exists, ensure the user has proper permission to edit this collection
@@ -176,7 +179,7 @@ class WritableCollectionDataHandler(CollectionEditorHandler):
 
         # Retrieve the updated collection.
         collection_dict = (
-            collection_services.get_learner_collection_dict_by_id(
+            summary_services.get_learner_collection_dict_by_id(
                 collection_id, self.user_id, allow_invalid_explorations=True))
 
         # Send the updated collection back to the frontend.
@@ -223,4 +226,3 @@ class CollectionRightsHandler(CollectionEditorHandler):
             'rights': rights_manager.get_collection_rights(
                 collection_id).to_dict()
         })
-

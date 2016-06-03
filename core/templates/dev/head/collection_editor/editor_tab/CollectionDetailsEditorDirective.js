@@ -25,49 +25,9 @@ oppia.directive('collectionDetailsEditor', [function() {
       getCollection: '&collection'
     },
     templateUrl: 'inline/collection_details_editor_directive',
-    controller: ['$scope', 'CollectionUpdateService',
-    'CollectionNodeObjectFactory', 'ExplorationSummaryBackendApiService',
-    'alertsService', function(
-      $scope, CollectionUpdateService,
-      CollectionNodeObjectFactory, ExplorationSummaryBackendApiService,
-      alertsService) {
-      $scope.addExploration = function() {
-        if (!$scope.newExplorationId) {
-          alertsService.addWarning('Cannot add an empty exploration ID.');
-          return;
-        }
-        var collection = $scope.getCollection();
-        if (collection.containsCollectionNode($scope.newExplorationId)) {
-          alertsService.addWarning(
-            'Exploration with id ' + $scope.newExplorationId +
-            ' is already added');
-          return;
-        }
-
-        var newExplorationId = angular.copy($scope.newExplorationId);
-        ExplorationSummaryBackendApiService
-          .loadPublicAndPrivateExplorationSummaries(
-            [newExplorationId]).then(function(summaries) {
-            var summaryBackendObject = null;
-            if (summaries.length != 0 && summaries[0].id == newExplorationId) {
-              summaryBackendObject = summaries[0];
-            }
-            if (summaryBackendObject) {
-              CollectionUpdateService.addCollectionNode(
-                collection, newExplorationId, summaryBackendObject);
-            } else {
-              alertsService.addWarning(
-                'That exploration does not exist or you do not have edit ' +
-                'access to it.');
-            }
-          }, function() {
-            alertsService.addWarning(
-              'There was an error while adding an exploration to the ' +
-              'collection.');
-          });
-        $scope.newExplorationId = '';
-      };
-
+    controller: [
+        '$scope', 'CollectionUpdateService', 'alertsService',
+        function($scope, CollectionUpdateService, alertsService) {
       $scope.updateCollectionTitle = function() {
         if (!$scope.newCollectionTitle) {
           alertsService.addWarning('Cannot set empty collection title.');

@@ -1,22 +1,33 @@
 <script type="text/ng-template" id="components/activityTilesInfinityGrid">
-  <div infinite-scroll="showMoreExplorations()" infinite-scroll-distance="1"
+  <div infinite-scroll="showMoreActivities()" infinite-scroll-distance="1"
        infinite-scroll-disabled="endOfPageIsReached || searchResultsAreLoading">
-    <exploration-summary-tile ng-repeat="exp in allExplorationsInOrder track by $index"
-                              exploration-id="exp.id"
-                              exploration-title="exp.title"
-                              last-updated-msec="exp.last_updated_msec"
-                              objective="exp.objective"
-                              category="exp.category"
-                              ratings="exp.ratings"
-                              thumbnail-icon-url="exp.thumbnail_icon_url"
-                              thumbnail-bg-color="exp.thumbnail_bg_color"
-                              num-views="exp.num_views"
-                              contributors-summary="exp.human_readable_contributors_summary"
-                              is-community-owned="exp.community_owned"
-                              is-community-editable="expl.community_editable"
-                              class="protractor-test-exp-summary-tile"
-                              style="display: inline-block;">
-    </exploration-summary-tile>
+    <div ng-repeat="activity in allActivitiesInOrder track by $index" style="display: inline-block;">
+      <collection-summary-tile ng-if="activity.activity_type === 'collection'"
+                               collection-id="activity.id"
+                               collection-title="activity.title"
+                               last-updated-msec="activity.last_updated_msec"
+                               node-count="activity.node_count"
+                               objective="activity.objective"
+                               thumbnail-icon-url="activity.thumbnail_icon_url"
+                               thumbnail-bg-color="activity.thumbnail_bg_color"
+                               style="margin-right: 3px;">
+      </collection-summary-tile>
+      <exploration-summary-tile ng-if="activity.activity_type === 'exploration'"
+                                exploration-id="activity.id"
+                                exploration-title="activity.title"
+                                last-updated-msec="activity.last_updated_msec"
+                                objective="activity.objective"
+                                category="activity.category"
+                                ratings="activity.ratings"
+                                thumbnail-icon-url="activity.thumbnail_icon_url"
+                                thumbnail-bg-color="activity.thumbnail_bg_color"
+                                num-views="activity.num_views"
+                                contributors-summary="activity.human_readable_contributors_summary"
+                                is-community-owned="activity.community_owned"
+                                is-community-editable="activity.community_editable"
+                                class="protractor-test-exp-summary-tile">
+      </exploration-summary-tile>
+    </div>
   </div>
   <div class="oppia-search-results-loading-message"
        ng-if="searchResultsAreLoading">

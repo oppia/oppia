@@ -41,9 +41,9 @@ oppia.factory('ExplorationCreationService', [
           $window.location.replace('/my_explorations?mode=create');
         } else {
           $rootScope.loadingMessage = 'Creating exploration';
-          $http.post(
-            '/contributehandler/create_new', {}
-          ).then(function(response) {
+          $http.post('/contributehandler/create_new', {}, {
+            requestIsForCreateExploration: true
+          }).then(function(response) {
             siteAnalyticsService.registerCreateNewExplorationEvent(
               response.data.explorationId);
             $timeout(function() {

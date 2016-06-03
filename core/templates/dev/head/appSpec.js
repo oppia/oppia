@@ -43,6 +43,23 @@ describe('Validators service', function() {
       expect(vs.isValidEntityName('bx')).toBe(false);
     });
 
+    it('should correctly validate exploration titles', function() {
+      GLOBALS = {
+        INVALID_NAME_CHARS: '#'
+      };
+
+      expect(vs.isValidExplorationTitle('b')).toBe(true);
+      expect(vs.isValidExplorationTitle('abc def')).toBe(true);
+
+      expect(vs.isValidExplorationTitle('')).toBe(false);
+      expect(vs.isValidExplorationTitle(null)).toBe(false);
+      expect(vs.isValidExplorationTitle(undefined)).toBe(false);
+      expect(vs.isValidExplorationTitle(
+        'A title with invalid characters #')).toBe(false);
+      expect(vs.isValidExplorationTitle(
+        'A title that is way way way way way way way too long.')).toBe(false);
+    });
+
     it('should correctly validate non-emptiness', function() {
       expect(vs.isNonempty('b')).toBe(true);
       expect(vs.isNonempty('abc def')).toBe(true);

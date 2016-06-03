@@ -25,6 +25,7 @@ import collections
 import copy
 import datetime
 import logging
+import math
 import os
 import pprint
 import StringIO
@@ -1013,15 +1014,7 @@ def update_exploration(
     exploration = apply_change_list(exploration_id, change_list)
     _save_exploration(committer_id, exploration, commit_message, change_list)
 
-    # If there is an existing exploration draft for this user, clear it.
-    exp_user_data = user_models.ExplorationUserDataModel.get(
-        committer_id, exploration_id)
-    if exp_user_data:
-        exp_user_data.draft_change_list = None
-        exp_user_data.draft_change_list_last_updated = None
-        exp_user_data.draft_change_list_exp_version = None
-        exp_user_data.put()
-
+    discard_draft(exploration_id, committer_id)
     # Update summary of changed exploration.
     update_exploration_summary(exploration.id, committer_id)
     user_services.add_edited_exploration_id(committer_id, exploration.id)
@@ -1382,6 +1375,26 @@ def get_average_rating_from_exp_summary(exp_summary):
     return 0
 
 
+def get_scaled_average_rating_from_exp_summary(exp_summary):
+    """Returns the lower bound wilson score of the document as a float. If
+    there are no ratings, it will return 0. The confidence of this result is
+    95%.
+    """
+    # The following is the number of ratings.
+    n = sum(exp_summary.ratings.values())
+    if n == 0:
+        return 0
+    average_rating = get_average_rating_from_exp_summary(exp_summary)
+    z = 1.9599639715843482
+    x = (average_rating - 1) / 4
+    # The following calculates the lower bound Wilson Score as documented
+    # http://www.goproblems.com/test/wilson/wilson.php?v1=0&v2=0&v3=0&v4=&v5=1
+    a = x + (z**2)/(2*n)
+    b = z * math.sqrt((x*(1-x))/n + (z**2)/(4*n**2))
+    wilson_score_lower_bound = (a - b)/(1 + z**2/n)
+    return 1 + 4 * wilson_score_lower_bound
+
+
 def get_search_rank_from_exp_summary(exp_summary):
     """Returns an integer determining the document's rank in search.
 
@@ -1582,14 +1595,11 @@ def reject_suggestion(editor_id, thread_id, exploration_id):
         thread.put()
 
 
-def is_draft_version_valid(exp_id, user_id):
+def is_version_of_draft_valid(exp_id, version):
     """Checks if the draft version is the same as the latest version of the
     exploration."""
 
-    draft_version = user_models.ExplorationUserDataModel.get(
-        user_id, exp_id).draft_change_list_exp_version
-    exp_version = get_exploration_by_id(exp_id).version
-    return draft_version == exp_version
+    return get_exploration_by_id(exp_id).version == version
 
 
 def create_or_update_draft(
@@ -1600,7 +1610,6 @@ def create_or_update_draft(
     timestamp of the draft.
     The method assumes that a ExplorationUserDataModel object exists for the
     given user and exploration."""
-
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
     if (exp_user_data.draft_change_list and
             exp_user_data.draft_change_list_last_updated > current_datetime):
@@ -1618,7 +1627,22 @@ def get_exp_with_draft_applied(exp_id, user_id):
     apply it to the exploration."""
 
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
+    exploration = get_exploration_by_id(exp_id)
     return (
         apply_change_list(exp_id, exp_user_data.draft_change_list)
-        if exp_user_data.draft_change_list
-        else get_exploration_by_id(exp_id))
+        if exp_user_data and exp_user_data.draft_change_list and
+        is_version_of_draft_valid(
+            exp_id, exp_user_data.draft_change_list_exp_version)
+        else exploration)
+
+
+def discard_draft(exp_id, user_id):
+    """Discard the draft for the given user and exploration."""
+
+    exp_user_data = user_models.ExplorationUserDataModel.get(
+        user_id, exp_id)
+    if exp_user_data:
+        exp_user_data.draft_change_list = None
+        exp_user_data.draft_change_list_last_updated = None
+        exp_user_data.draft_change_list_exp_version = None
+        exp_user_data.put()
