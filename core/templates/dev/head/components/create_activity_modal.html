@@ -1,0 +1,115 @@
+<script type="text/ng-template" id="modals/createActivity">
+  <div class="oppia-create-activity-modal">
+    <div class="modal-body oppia-long-text protractor-test-creation-modal">
+        <div class="row">
+          {% if can_create_collections %}
+            <div class="col-sm-12">
+              <h1>Create an Activity</h1>
+              <p>
+                What do you want to create?
+              </p>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 text-center">
+              <img src="/images/activity/exploration.svg">
+              <button type="button"
+                      class="btn oppia-transition-200 protractor-test-create-exploration"
+                      ng-click="chooseExploration()">
+                Create Exploration
+              </button>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 text-center">
+              <img src="/images/activity/collection.svg">
+              <button type="button"
+                      class="btn oppia-transition-200 protractor-test-create-collection"
+                      ng-click="chooseCollection()">
+                Create Collection
+              </button>
+            </div>
+            <div class="col-sm-12 col-xs-12 text-center">
+              <button type="button"
+                      class="btn oppia-transition-200 protractor-test-dismiss-creation-modal"
+                      ng-click="cancel()">
+                Neither, Thanks
+              </button>
+            </div>
+          </div>
+        {% else %}
+          <div class="col-sm-12">
+            <h1>Create an Exploration</h1>
+            <p>
+              Do you want to create an exploration?
+            </p>
+          </div>
+          <div class="col-sm-12 col-xs-12 text-center">
+            <img src="/images/activity/exploration.svg">
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 text-center">
+            <button type="button"
+                    class="btn oppia-transition-200 protractor-test-create-exploration"
+                    ng-click="chooseExploration()">
+              Yes, please!
+            </button>
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 text-center">
+            <button type="button"
+                    class="btn oppia-transition-200 protractor-test-dismiss-creation-modal"
+                    ng-click="cancel()">
+              No, Thanks
+            </button>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</script>
+
+<style>
+  .oppia-create-activity-modal .modal-body {
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    height: 100%;
+    margin: 0 auto;
+    top: 7%;
+    width: 95%;
+  }
+
+  .oppia-create-activity-modal h1 {
+    color: #015c53;
+  }
+
+  .oppia-create-activity-modal p {
+    font-size: 0.9em;
+    margin-top: 0;
+    margin-bottom: 6px;
+  }
+
+  .oppia-create-activity-modal button {
+    background-color: #015c53;
+    border-radius: 0;
+    color: #fff;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 14px;
+    margin-top: 10px;
+    text-transform: uppercase;
+    width: 100%;
+    text-align: center;
+  }
+
+  .oppia-create-activity-modal button:hover,
+  .oppia-create-activity-modal button:focus,
+  .oppia-create-activity-modal button:active {
+    background-color: rgba(5, 190, 178, 1);
+    color: #fff;
+  }
+
+  .oppia-create-activity-modal img {
+    width: 100%;
+    max-height: 200px;
+    padding-top: 10px;
+  }
+
+  @media (max-width: 770px) {
+    .oppia-create-activity-modal .modal-body {
+      top: 5%;
+    }
+  }
+</style>
