@@ -34,7 +34,8 @@ oppia.controller('ExplorationEditor', [
   'routerService', 'graphDataService', 'stateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
   'explorationWarningsService', '$templateCache', 'explorationContextService',
-  'explorationAdvancedFeaturesService', '$modal',
+  'explorationAdvancedFeaturesService', '$modal', 'changeListService',
+  'autosaveInfoModalsService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
       explorationData, editorContextService, explorationTitleService,
@@ -45,7 +46,8 @@ oppia.controller('ExplorationEditor', [
       routerService, graphDataService, stateEditorTutorialFirstTimeService,
       explorationParamSpecsService, explorationParamChangesService,
       explorationWarningsService, $templateCache, explorationContextService,
-      explorationAdvancedFeaturesService, $modal) {
+      explorationAdvancedFeaturesService, $modal, changeListService,
+      autosaveInfoModalsService) {
     $scope.editabilityService = editabilityService;
     $scope.editorContextService = editorContextService;
 
@@ -89,6 +91,7 @@ oppia.controller('ExplorationEditor', [
     // page load.
     $scope.initExplorationPage = function(successCallback) {
       explorationData.getData().then(function(data) {
+
         explorationStatesService.init(data.states);
 
         explorationTitleService.init(data.title);
@@ -142,6 +145,17 @@ oppia.controller('ExplorationEditor', [
         }
 
         explorationWarningsService.updateWarnings();
+
+        // Initialize changeList by the one received from the backend.
+        if (data.draft_changes) {
+          changeListService.loadAutosavedChangeList(data.draft_changes);
+        }
+        // Show modal displaying lost changes
+        // if the version of draft changes is invalid.
+        if (data.is_version_of_draft_valid === false) {
+          autosaveInfoModalsService.showVersionMismatchModal(
+            changeListService.getChangeList());
+        }
 
         $scope.$broadcast('refreshStatisticsTab');
         $scope.$broadcast('refreshVersionHistory', {

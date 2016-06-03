@@ -18,8 +18,8 @@
 
 // Service for handling all interactions with the exploration editor backend.
 oppia.factory('explorationData', [
-  '$http', '$log', 'alertsService', '$q', 'changeListService', 'autosaveInfoModalsService',
-  function($http, $log, alertsService, $q, changeListService, autosaveInfoModalsService) {
+  '$http', '$log', 'alertsService', '$q',
+  function($http, $log, alertsService, $q) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
     var pathnameArray = window.location.pathname.split('/');
@@ -87,16 +87,7 @@ oppia.factory('explorationData', [
             $log.info('Retrieved exploration data.');
             $log.info(response.data);
 
-            // Initialize the changeList by the one received from the backend.
             explorationData.data = response.data;
-            changeListService.loadAutosavedChangeList(
-              response.data.draft_changes);
-            // Show modal displaying lost changes
-            // if the version of draft changes is invalid.
-            if (!response.data.is_version_of_draft_valid) {
-              autosaveInfoModalsService.showVersionMismatchModal(
-                changeListService.getChangeList());
-            }
 
             return response.data;
           });
@@ -2248,11 +2239,9 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
 // Service for displaying different types of modals depending on the type of
 // response received as a result of the autosaving request.
 oppia.factory('autosaveInfoModalsService', [
-  '$modal', '$timeout', '$window',
-  'lostChangesService', 'changeListService', 'explorationData',
+  '$modal', '$timeout', '$window', 'lostChangesService', 'explorationData',
   function(
-    $modal, $timeout, $window,
-    lostChangesService, changeListService, explorationData) {
+    $modal, $timeout, $window, lostChangesService, explorationData) {
     return {
       showNonStrictValidationFailModal: function() {
         $modal.open({
@@ -2268,11 +2257,9 @@ oppia.factory('autosaveInfoModalsService', [
               };
             }
           ]
-        }).result.then(function() {
-          // User refreshes the page - Flow for exploration loaded is followed.
         });
       },
-      showVersionMismatchModal: function() {
+      showVersionMismatchModal: function(lostChanges) {
         $modal.open({
           templateUrl: 'modals/saveVersionMismatch',
           backdrop: true,
@@ -2294,11 +2281,10 @@ oppia.factory('autosaveInfoModalsService', [
                   }, 500);
                 });
               };
-              $scope.lostChanges = changeListService.getChangeList();
-
-              $scope.lostChangesHtml = (
-                lostChangesService.makeHumanReadable(
-                  $scope.lostChanges).html());
+              if (lostChanges) {
+                $scope.lostChangesHtml = (
+                  lostChangesService.makeHumanReadable(lostChanges).html());
+              }
             }
           ]
         });
