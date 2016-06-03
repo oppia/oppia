@@ -163,6 +163,14 @@
   {% include 'components/search_results_directive.html' %}
 {% endblock %}
 
+{% block footer %}
+  <div ng-controller="LibraryFooter">
+    <div ng-if="!inSearchMode">
+      {% include 'footer.html' %}
+    </div>
+  </div>
+{% endblock footer %}
+
 {% block footer_js %}
   {{ super() }}
   <script>
@@ -172,5 +180,6 @@
     {{ include_js_file('components/SearchResultsDirective.js') }}
 
     {{ include_js_file('library/Library.js') }}
+    {{ include_js_file('library/LibraryFooter.js') }}
   </script>
 {% endblock footer_js %}
