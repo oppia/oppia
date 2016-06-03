@@ -467,12 +467,14 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
         'CreateExplorationButton', 'click', $window.location.pathname);
     },
     registerCreateNewExplorationEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'NewExploration', 'create', explorationId);
+      _sendEventToGoogleAnalytics('NewExploration', 'create', explorationId);
     },
     registerCreateNewExplorationInCollectionEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
         'NewExplorationFromCollection', 'create', explorationId);
+    },
+    registerCreateNewCollectionEvent: function(collectionId) {
+      _sendEventToGoogleAnalytics('NewCollection', 'create', collectionId);
     },
     registerCommitChangesToPrivateExplorationEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(

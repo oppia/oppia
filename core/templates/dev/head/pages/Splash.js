@@ -20,7 +20,8 @@ oppia.controller('Splash', [
   '$scope', '$timeout', '$window', 'siteAnalyticsService',
   function($scope, $timeout, $window, siteAnalyticsService) {
     $scope.onRedirectToLogin = function(destinationUrl) {
-      siteAnalyticsService.registerStartLoginEvent('createExplorationButton');
+      siteAnalyticsService.registerStartLoginEvent(
+        'splashPageCreateExplorationButton');
       $timeout(function() {
         $window.location = destinationUrl;
       }, 150);

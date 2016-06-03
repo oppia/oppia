@@ -244,10 +244,10 @@
                         {% endif %}
                         {% if nav_mode != 'create' and nav_mode != 'explore' %}
                           <ul ng-if="windowIsNarrow" class="nav oppia-navbar-tabs-narrow">
-                            <create-exploration-button></create-exploration-button>
+                            <create-activity-button></create-activity-button>
                           </ul>
                           <ul ng-if="!windowIsNarrow" class="nav oppia-navbar-tabs">
-                            <create-exploration-button></create-exploration-button>
+                            <create-activity-button></create-activity-button>
                             {% if SHOW_CUSTOM_PAGES %}
                               <li class="oppia-clickable-navbar-element pull-right">
                                 <a class="oppia-navbar-tab" href="/forum" translate="I18N_TOPNAV_FORUM">
@@ -338,7 +338,7 @@
     {% include 'components/collection_summary_tile_directive.html' %}
     {% include 'components/exploration_summary_tile_directive.html' %}
     {% include 'components/rating_display.html' %}
-    {% include 'components/create_exploration_button_directive.html' %}
+    {% include 'components/create_activity_button_directive.html' %}
     {% include 'components/activity_tiles_infinity_grid_directive.html' %}
     {% include 'components/loading_dots_directive.html' %}
 
@@ -358,8 +358,9 @@
 
       {{ include_js_file('components/ActivityTilesInfinityGridDirective.js') }}
       {{ include_js_file('components/AlertMessageDirective.js') }}
+      {{ include_js_file('components/CollectionCreationService.js') }}
       {{ include_js_file('components/CollectionSummaryTileDirective.js') }}
-      {{ include_js_file('components/CreateExplorationButtonDirective.js') }}
+      {{ include_js_file('components/CreateActivityButtonDirective.js') }}
       {{ include_js_file('components/ExplorationCreationService.js') }}
       {{ include_js_file('components/ExplorationSummaryTileDirective.js') }}
       {{ include_js_file('components/LoadingDotsDirective.js') }}
