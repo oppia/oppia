@@ -44,9 +44,7 @@
 {% block content %}
   <div ng-controller="CollectionEditor">
     <div ng-if="getTabStatuses().active === 'main'">
-      <collection-main-tab
-        collection="collection"
-        collection-skill-list="collectionSkillList">
+      <collection-main-tab collection="collection" collection-skill-list="collectionSkillList">
       </collection-main-tab>
 
       <!-- A list of validation errors, if there are any -->
@@ -61,26 +59,18 @@
       <h3>
         <span ng-if="getChangeListCount() > 0">
           <em>(<[getChangeListCount()]> changes pending)</em>
+        </span>
       </h3>
 
       <br>
-      <input
-        ng-model="commitMessage"
-        type="text"
-        placeholder="Commit Message">
-      <button
-        ng-click="saveCollection(commitMessage)"
-        ng-disabled="validationIssues.length > 0">
+      <input ng-model="commitMessage" type="text" placeholder="Commit Message">
+      <button ng-click="saveCollection(commitMessage)" ng-disabled="validationIssues.length > 0">
         Save Collection
       </button>
-      <button
-        ng-click="publishCollection()"
-        ng-if="isPrivate">
+      <button ng-click="publishCollection()" ng-if="isPrivate">
         Publish Collection
       </button>
-      <button
-        ng-click="unpublishCollection()"
-        ng-if="!isPrivate && canUnpublish">
+      <button ng-click="unpublishCollection()" ng-if="!isPrivate && canUnpublish">
         Unpublish Collection
       </button>
 
