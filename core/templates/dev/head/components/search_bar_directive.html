@@ -8,15 +8,18 @@
             <i class="material-icons md-18 oppia-animate-spin">&#xE863;</i>
           </span>
         </div>
-        <input type="text" class="form-control oppia-search-bar-input oppia-search-bar-text-input" placeholder="What are you curious about?" ng-model="searchQuery" ng-keyup="onSearchQueryChange($event)">
+        <input type="text" class="form-control oppia-search-bar-input oppia-search-bar-text-input"
+               ng-attr-placeholder="<[searchBarPlaceholder]>" ng-model="searchQuery"
+               ng-keyup="onSearchQueryChange($event)">
       </div>
     </div>
   </form>
 
   <div dropdown class="dropdown navbar-left oppia-navbar-button-container oppia-search-bar-category-selector protractor-test-search-bar-category-selector">
     <button dropdown-toggle type="button" class="btn dropdown-toggle oppia-search-bar-input ng-cloak"
-            title="<[selectionDetails.categories.description]>" style="max-width: 130px;">
-      <[selectionDetails.categories.summary | truncate:14 ]>
+            title="<[selectionDetails.categories.description | translate]>"
+            style="max-width: 130px;">
+      <[categoryButtonText|truncate:14]>
       <span class="caret"></span>
     </button>
     <!-- The $event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
@@ -24,7 +27,7 @@
       <li ng-repeat="item in selectionDetails.categories.masterList track by $index"
           ng-if="selectionDetails.categories.selections[item.id]">
         <a href ng-click="toggleSelection('categories', item.id)">
-          <span class="protractor-test-selected"><[item.text]></span>
+          <span translate="<[item.text]>" class="protractor-test-selected"></span>
           <i ng-if="selectionDetails.categories.selections[item.id]" class="material-icons md-18 pull-right">&#xE876;</i>
         </a>
       </li>
@@ -35,7 +38,7 @@
       <li ng-repeat="item in selectionDetails.categories.masterList track by $index"
           ng-if="!selectionDetails.categories.selections[item.id]">
         <a href ng-click="toggleSelection('categories', item.id)">
-          <span class="protractor-test-deselected"><[item.text]></span>
+          <span translate="<[item.text]>" class="protractor-test-deselected"></span>
           <i ng-if="selectionDetails.categories.selections[item.id]" class="material-icons md-18 pull-right">&#xE876;</i>
         </a>
       </li>
@@ -45,8 +48,8 @@
   <div dropdown class="dropdown navbar-left oppia-navbar-button-container oppia-search-bar-language-selector protractor-test-search-bar-language-selector">
     <button dropdown-toggle type="button" class="btn dropdown-toggle oppia-search-bar-input ng-cloak"
             style="border-bottom-right-radius: 4px; border-top-right-radius: 4px; max-width: 130px;"
-            title="<[selectionDetails.languageCodes.description]>">
-      <[selectionDetails.languageCodes.summary | truncate:14 ]>
+            title="<[selectionDetails.languageCodes.description | translate]>">
+      <[languageButtonText|truncate:14]>
       <span class="caret"></span>
     </button>
     <!-- The $event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
@@ -54,7 +57,7 @@
       <li ng-repeat="item in selectionDetails.languageCodes.masterList track by $index"
           ng-if="selectionDetails.languageCodes.selections[item.id]">
         <a href ng-click="toggleSelection('languageCodes', item.id)">
-          <span class="protractor-test-selected"><[item.text]></span>
+          <span translate="<[item.text]>" class="protractor-test-selected"></span>
           <i ng-if="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 pull-right">&#xE876;</i>
         </a>
       </li>
@@ -65,7 +68,7 @@
       <li ng-repeat="item in selectionDetails.languageCodes.masterList track by $index"
           ng-if="!selectionDetails.languageCodes.selections[item.id]">
         <a href ng-click="toggleSelection('languageCodes', item.id)">
-          <span class="protractor-test-deselected"><[item.text]></span>
+          <span translate="<[item.text]>" class="protractor-test-deselected"></span>
           <i ng-if="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 pull-right">&#xE876;</i>
         </a>
       </li>
@@ -114,7 +117,7 @@
     color: rgba(255,255,255,0.7);
   }
 
-  @media (max-width: 1050px) {
+  @media (max-width: 1185px) {
     .oppia-search-bar-language-selector {
       display: none;
     }
@@ -124,7 +127,7 @@
     }
   }
 
-  @media (max-width: 890px) {
+  @media (max-width: 940px) {
     .oppia-search-bar-text-input {
       border-bottom-right-radius: 4px;
       border-top-right-radius: 4px;

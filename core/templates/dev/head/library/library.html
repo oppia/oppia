@@ -1,13 +1,8 @@
 {% extends "base.html" %}
 
-<!-- The Library page is a special case: we switch the main and sub titles -->
 {% block maintitle %}
-  Library
+  I18N_LIBRARY_PAGE_TITLE
 {% endblock maintitle %}
-
-{% block subtitle %}
-  Oppia
-{% endblock subtitle %}
 
 {% block navbar_breadcrumb %}
 {% endblock navbar_breadcrumb %}
@@ -46,21 +41,19 @@
 
         <div class="oppia-exp-summary-tiles-container" ng-if="!inSearchMode">
           <div ng-if="libraryGroups.length === 0"
-               style="margin: 150px auto; text-align: center; width: 100%;">
-            There are no groups of explorations available to display.
+               style="margin: 150px auto; text-align: center; width: 100%;"
+               translate="I18N_LIBRARY_NO_EXPLORATION_GROUPS">
           </div>
 
           <div class="oppia-library-group" ng-repeat="group in libraryGroups track by $index">
             <div>
               <div class="pull-right">
-                <button class="btn oppia-library-group-view-all-btn oppia-transition-200" ng-click="showAllResultsForCategories(group.categories)">
-                  View all
+                <button class="btn oppia-library-group-view-all-btn oppia-transition-200" ng-click="showAllResultsForCategories(group.categories)" translate="I18N_LIBRARY_VIEW_ALL">
                 </button>
               </div>
               <div class="oppia-library-group-header-container">
                 <h2 class="oppia-library-group-header">
-                  <a ng-click="showAllResultsForCategories(group.categories)">
-                    <[group.header]>
+                  <a ng-click="showAllResultsForCategories(group.categories)" translate="<[group.translationId]>">
                   </a>
                 </h2>
               </div>

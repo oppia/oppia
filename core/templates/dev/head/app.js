@@ -24,7 +24,8 @@ var oppia = angular.module(
   'oppia', [
     'ngMaterial', 'ngAnimate', 'ngSanitize', 'ngTouch', 'ngResource',
     'ui.bootstrap', 'ui.sortable', 'infinite-scroll', 'ngJoyRide', 'ngImgCrop',
-    'ui.validate', 'textAngular', 'toastr'
+    'ui.validate', 'textAngular', 'pascalprecht.translate', 'ngCookies',
+    'toastr'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
                    : []));
@@ -66,10 +67,12 @@ oppia.config([
           request: function(config) {
             // If this request carries data (in the form of a JS object),
             // JSON-stringify it and store it under 'payload'.
+            var csrfToken = '';
             if (config.data) {
               var csrfToken = (
                 config.requestIsForCreateExploration ?
-                GLOBALS.csrf_token_create_exploration :
+                  GLOBALS.csrf_token_create_exploration :
+                config.requestIsForI18n ? GLOBALS.csrf_token_i18n :
                 GLOBALS.csrf_token);
 
               config.data = $.param({

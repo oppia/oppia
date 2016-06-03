@@ -437,6 +437,7 @@ textarea {
   /* This allows clicks to 'pass through' the element. */
   pointer-events: none;
   position: fixed;
+  z-index: 100;
 }
 
 /*
@@ -629,7 +630,7 @@ textarea {
 .oppia-footer {
   background-color: #094142;
   bottom: 0;
-  color: #FFFFFF;
+  color: #fff;
   font-size: 13px;
   line-height: 20px;
   position: absolute;
@@ -644,8 +645,7 @@ textarea {
 }
 
 .oppia-footer-container a {
-  color: #FFFFFF;
-  text-transform: capitalize;
+  color: #fff;
 }
 
 .oppia-footer-container h4 {
@@ -2172,10 +2172,18 @@ div#ng-curtain {
 }
 
 .oppia-navbar-tabs-narrow {
-  min-width: 210px;
+  /*
+    This needs to take i18n of the "Create" and "Sign in" buttons into
+    account.
+  */
+  min-width: 260px;
 }
 .oppia-navbar-tabs {
-  min-width: 500px;
+  /*
+    This needs to take i18n of the "Create" and "Sign in" buttons into
+    account.
+  */
+  min-width: 530px;
 }
 .nav > li > a.oppia-navbar-tab {
   font-family: "Capriola", "Roboto", Arial, sans-serif;

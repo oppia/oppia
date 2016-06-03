@@ -388,6 +388,7 @@ NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
+SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
 SPLASH_URL = '/splash'
@@ -621,7 +622,12 @@ ALL_LANGUAGE_CODES = [{
 DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
 
+SUPPORTED_SITE_LANGUAGES = {
+    'en': 'English',
+    'es': 'Español'
+}
 SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 SYSTEM_USER_IDS = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 
 CSRF_PAGE_NAME_CREATE_EXPLORATION = 'create_exploration'
+CSRF_PAGE_NAME_I18N = 'i18n'

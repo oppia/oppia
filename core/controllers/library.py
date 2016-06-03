@@ -63,6 +63,8 @@ class LibraryPage(base.BaseHandler):
     for search results.
     """
 
+    PAGE_NAME_FOR_CSRF = 'library'
+
     def get(self):
         """Handles GET requests."""
         self.values.update({
