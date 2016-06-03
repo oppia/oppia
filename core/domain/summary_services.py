@@ -408,9 +408,9 @@ def get_recently_published_exploration_summary_dicts():
 
     # Arranging recently published exploration summaries with respect to time.
     # sorted() is used to sort the random list of recently published summaries.
-    summary_dicts = sorted(recently_published_exploration_summaries,
-                           key=lambda exp_summary:
-                           exp_summary.first_published_msec,
-                           reverse=True)
+    summaries = sorted(
+        recently_published_exploration_summaries,
+        key=lambda exp_summary: exp_summary.first_published_msec,
+        reverse=True)
 
-    return _get_displayable_exp_summary_dicts(summary_dicts)
+    return _get_displayable_exp_summary_dicts(summaries)

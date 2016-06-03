@@ -34,13 +34,6 @@ indexes:
   properties:
   - name: deleted
   - name: status
-  - name: exp_model_first_published_msec
-    direction: desc
-
-- kind: ExpSummaryModel
-  properties:
-  - name: deleted
-  - name: status
   - name: first_published_msec
     direction: desc
 

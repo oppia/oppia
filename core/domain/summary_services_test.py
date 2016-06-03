@@ -677,12 +677,15 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
 
-        self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id,
-                                        end_state_name='End')
-        self.save_new_valid_exploration(self.EXP_ID_2, self.albert_id,
-                                        end_state_name='End')
-        self.save_new_valid_exploration(self.EXP_ID_3, self.albert_id,
-                                        end_state_name='End')
+        self.save_new_valid_exploration(
+            self.EXP_ID_1, self.albert_id,
+            end_state_name='End')
+        self.save_new_valid_exploration(
+            self.EXP_ID_2, self.albert_id,
+            end_state_name='End')
+        self.save_new_valid_exploration(
+            self.EXP_ID_3, self.albert_id,
+            end_state_name='End')
 
         rights_manager.publish_exploration(self.albert_id, self.EXP_ID_2)
         rights_manager.publish_exploration(self.albert_id, self.EXP_ID_1)
@@ -746,7 +749,8 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         self.assertDictContainsSubset(
             test_summary_2, recently_published_exploration_summaries[2])
 
-        # Test whether an edited exploration appears as recently published.
+        # Test that editing an exploration does not change its
+        # 'recently-published' status.
         exp_services.update_exploration(
             self.albert_id, self.EXP_ID_1, [{
                 'cmd': 'edit_exploration_property',
