@@ -5,7 +5,11 @@
 {% endblock maintitle %}
 
 {% block subtitle %}
-  {{ title }}
+  {% if title %}
+    {{ title }}
+  {% else %}
+    Untitled Exploration
+  {% endif %}
 {% endblock subtitle %}
 
 {% block header_js %}
