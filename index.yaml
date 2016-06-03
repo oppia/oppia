@@ -63,6 +63,11 @@ indexes:
   - name: deleted
   - name: status
 
+- kind: ExplorationScaledAverageRatingRealtimeModel
+  properties:
+  - name: realtime_layer
+  - name: created_on
+
 - kind: FeedbackAnalyticsRealtimeModel
   properties:
   - name: realtime_layer

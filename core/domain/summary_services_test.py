@@ -14,17 +14,43 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from core import jobs_registry
 from core.domain import collection_domain
 from core.domain import collection_services
+from core.domain import exp_jobs_continuous
 from core.domain import exp_services
 from core.domain import exp_services_test
 from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import summary_services
 from core.domain import user_services
+from core.platform import models
 from core.tests import test_utils
 import feconf
 import utils
+
+taskqueue_services = models.Registry.import_taskqueue_services()
+
+class ModifiedExplorationScaledAverageRatingCalculator(
+        exp_jobs_continuous.ExplorationScaledAverageRatingCalculator):
+    """A modified ModifiedExplorationScaledAverageRatingCalculator that does
+    not start a new batch job when the previous one has finished.
+    """
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        return ModifiedExplorationScaledAverageRatingCalculatorMRJobManager
+
+    @classmethod
+    def _kickoff_batch_job_after_previous_one_ends(cls):
+        pass
+
+
+class ModifiedExplorationScaledAverageRatingCalculatorMRJobManager(
+        exp_jobs_continuous.ExplorationScaledAverageRatingMRJobManager):
+
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        return ModifiedExplorationScaledAverageRatingCalculator
 
 
 class ExplorationDisplayableSummariesTest(
@@ -489,6 +515,9 @@ class TopRatedExplorationDisplayableSummariesTest(
     EXP_ID_8 = 'eid8'
     EXP_ID_9 = 'eid9'
 
+    ALL_CC_MANAGERS_FOR_TESTS = [
+        ModifiedExplorationScaledAverageRatingCalculator]
+
     def setUp(self):
         """Populate the database of explorations and their summaries.
 
@@ -548,96 +577,117 @@ class TopRatedExplorationDisplayableSummariesTest(
 
         self.set_admins([self.ADMIN_USERNAME])
 
+    def _get_test_context(self):
+        return self.swap(
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.ALL_CC_MANAGERS_FOR_TESTS)
+
     def test_at_most_eight_top_rated_explorations(self):
         """Note that at most 8 explorations should be returned.
         """
-        rating_services.assign_rating_to_exploration(
-            self.bob_id, self.EXP_ID_2, 5)
-        rating_services.assign_rating_to_exploration(
-            self.alice_id, self.EXP_ID_3, 5)
-        rating_services.assign_rating_to_exploration(
-            self.bob_id, self.EXP_ID_3, 4)
-        rating_services.assign_rating_to_exploration(
-            self.bob_id, self.EXP_ID_4, 4)
-        rating_services.assign_rating_to_exploration(
-            self.alice_id, self.EXP_ID_5, 4)
-        rating_services.assign_rating_to_exploration(
-            self.bob_id, self.EXP_ID_5, 3)
-        rating_services.assign_rating_to_exploration(
-            self.bob_id, self.EXP_ID_6, 3)
-        rating_services.assign_rating_to_exploration(
-            self.alice_id, self.EXP_ID_6, 2)
-        rating_services.assign_rating_to_exploration(
-            self.bob_id, self.EXP_ID_8, 2)
-        rating_services.assign_rating_to_exploration(
-            self.alice_id, self.EXP_ID_8, 2)
-        rating_services.assign_rating_to_exploration(
-            self.bob_id, self.EXP_ID_7, 2)
-        rating_services.assign_rating_to_exploration(
-            self.bob_id, self.EXP_ID_9, 2)
-        rating_services.assign_rating_to_exploration(
-            self.bob_id, self.EXP_ID_1, 1)
+        with self._get_test_context():
+            rating_services.assign_rating_to_exploration(
+                self.bob_id, self.EXP_ID_2, 5)
+            rating_services.assign_rating_to_exploration(
+                self.alice_id, self.EXP_ID_3, 5)
+            rating_services.assign_rating_to_exploration(
+                self.bob_id, self.EXP_ID_3, 4)
+            rating_services.assign_rating_to_exploration(
+                self.bob_id, self.EXP_ID_4, 4)
+            rating_services.assign_rating_to_exploration(
+                self.alice_id, self.EXP_ID_5, 4)
+            rating_services.assign_rating_to_exploration(
+                self.bob_id, self.EXP_ID_5, 3)
+            rating_services.assign_rating_to_exploration(
+                self.bob_id, self.EXP_ID_6, 3)
+            rating_services.assign_rating_to_exploration(
+                self.alice_id, self.EXP_ID_6, 2)
+            rating_services.assign_rating_to_exploration(
+                self.bob_id, self.EXP_ID_8, 2)
+            rating_services.assign_rating_to_exploration(
+                self.alice_id, self.EXP_ID_8, 2)
+            rating_services.assign_rating_to_exploration(
+                self.bob_id, self.EXP_ID_7, 2)
+            rating_services.assign_rating_to_exploration(
+                self.bob_id, self.EXP_ID_9, 2)
+            rating_services.assign_rating_to_exploration(
+                self.bob_id, self.EXP_ID_1, 1)
 
-        top_rated_exploration_summaries = (
-            summary_services.get_top_rated_exploration_summary_dicts([
-                feconf.DEFAULT_LANGUAGE_CODE]))
-        expected_summary = {
-            'status': u'public',
-            'thumbnail_bg_color': '#a33f40',
-            'community_owned': False,
-            'tags': [],
-            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
-            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
-            'id': self.EXP_ID_3,
-            'category': u'A category',
-            'ratings': {u'1': 0, u'3': 0, u'2': 0, u'5': 1, u'4': 1},
-            'title': u'A title',
-            'num_views': 0,
-            'objective': u'An objective'
-        }
+            ModifiedExplorationScaledAverageRatingCalculator.start_computation()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                1)
+            self.process_and_flush_pending_tasks()
 
-        self.assertDictContainsSubset(
-            expected_summary, top_rated_exploration_summaries[0])
+            top_rated_exploration_summaries = (
+                summary_services.get_top_rated_exploration_summary_dicts([
+                    feconf.DEFAULT_LANGUAGE_CODE]))
+            expected_summary = {
+                'status': u'public',
+                'thumbnail_bg_color': '#a33f40',
+                'community_owned': False,
+                'tags': [],
+                'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
+                'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+                'id': self.EXP_ID_3,
+                'category': u'A category',
+                'ratings': {u'1': 0, u'3': 0, u'2': 0, u'5': 1, u'4': 1},
+                'title': u'A title',
+                'num_views': 0,
+                'objective': u'An objective'
+            }
 
-        expected_ordering = [
-            self.EXP_ID_3, self.EXP_ID_2, self.EXP_ID_5, self.EXP_ID_4,
-            self.EXP_ID_6, self.EXP_ID_8, self.EXP_ID_7, self.EXP_ID_9]
+            self.assertDictContainsSubset(
+                expected_summary, top_rated_exploration_summaries[0])
 
-        actual_ordering = [exploration['id'] for exploration in
-                           top_rated_exploration_summaries]
+            expected_ordering = [
+                self.EXP_ID_3, self.EXP_ID_2, self.EXP_ID_5, self.EXP_ID_4,
+                self.EXP_ID_6, self.EXP_ID_8, self.EXP_ID_7, self.EXP_ID_9]
 
-        self.assertEqual(expected_ordering, actual_ordering)
+            actual_ordering = [exploration['id'] for exploration in
+                               top_rated_exploration_summaries]
+
+            self.assertEqual(expected_ordering, actual_ordering)
 
     def test_only_explorations_with_ratings_are_returned(self):
         """Note that only explorations with ratings will be included
         """
-        rating_services.assign_rating_to_exploration(
-            self.bob_id, self.EXP_ID_2, 5)
+        with self._get_test_context():
+            rating_services.assign_rating_to_exploration(
+                self.bob_id, self.EXP_ID_2, 5)
 
-        top_rated_exploration_summaries = (
-            summary_services.get_top_rated_exploration_summary_dicts([
-                feconf.DEFAULT_LANGUAGE_CODE]))
+            ModifiedExplorationScaledAverageRatingCalculator.start_computation()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                1)
+            self.process_and_flush_pending_tasks()
 
-        expected_summary = {
-            'status': u'public',
-            'thumbnail_bg_color': '#a33f40',
-            'community_owned': False,
-            'tags': [],
-            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
-            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
-            'id': self.EXP_ID_2,
-            'category': u'A category',
-            'ratings': {u'1': 0, u'3': 0, u'2': 0, u'5': 1, u'4': 0},
-            'title': u'A title',
-            'num_views': 0,
-            'objective': u'An objective'
-        }
-        self.assertDictContainsSubset(
-            expected_summary, top_rated_exploration_summaries[0])
+            top_rated_exploration_summaries = (
+                summary_services.get_top_rated_exploration_summary_dicts([
+                    feconf.DEFAULT_LANGUAGE_CODE]))
 
-        expected_ordering = [self.EXP_ID_2]
+            expected_summary = {
+                'status': u'public',
+                'thumbnail_bg_color': '#a33f40',
+                'community_owned': False,
+                'tags': [],
+                'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
+                'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+                'id': self.EXP_ID_2,
+                'category': u'A category',
+                'ratings': {u'1': 0, u'3': 0, u'2': 0, u'5': 1, u'4': 0},
+                'title': u'A title',
+                'num_views': 0,
+                'objective': u'An objective'
+            }
+            self.assertDictContainsSubset(
+                expected_summary, top_rated_exploration_summaries[0])
 
-        actual_ordering = [exploration['id'] for exploration in
-                           top_rated_exploration_summaries]
+            expected_ordering = [self.EXP_ID_2]
 
-        self.assertEqual(expected_ordering, actual_ordering)
+            actual_ordering = [exploration['id'] for exploration in
+                               top_rated_exploration_summaries]
+
+            self.assertEqual(expected_ordering, actual_ordering)

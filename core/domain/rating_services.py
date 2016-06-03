@@ -74,6 +74,33 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
     exp_services.save_exploration_summary(exploration_summary)
 
 
+def assign_scaled_rating_to_exploration(exploration_id, new_rating):
+    """Records the scaled average rating for the exploration it validates the
+    exploration id prior to saving.
+
+     - 'new_rating' should be an float between 1 and 5
+    """
+    if not isinstance(new_rating, float):
+        raise ValueError(
+            'Expected the rating to be an float, received %s' % new_rating)
+
+    if new_rating < 0 or new_rating > 5:
+        raise ValueError('Expected a rating 1-5, received %s.' % new_rating)
+
+    try:
+        exp_services.get_exploration_by_id(exploration_id)
+    except:
+        raise Exception('Invalid exploration id %s' % exploration_id)
+
+    exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_id)
+    if exploration_summary.scaled_average_rating:
+        exploration_summary.scaled_average_rating = \
+            feconf.EMPTY_SCALED_AVERAGE_RATING
+    exploration_summary.scaled_average_rating = new_rating
+    exp_services.save_exploration_summary(exploration_summary)
+
+
 def get_user_specific_rating_for_exploration(user_id, exploration_id):
     """
     Returns:
