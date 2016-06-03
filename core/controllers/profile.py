@@ -87,11 +87,7 @@ class ProfileHandler(base.BaseHandler):
             edited_exp_summary_dicts = (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
                     user_contributions.edited_exploration_ids))
-            ### function to determine whether current user is same as user on page ###
-            if (self.username == username):
-                profile_is_of_current_user = True
-            if (self.username != username):
-                profile_is_of_current_user = False
+        profile_is_of_current_user = (self.username == username)
 
 
         self.values.update({
