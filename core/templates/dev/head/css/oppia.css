@@ -2171,19 +2171,21 @@ div#ng-curtain {
   margin-left: 6px;
 }
 
-.oppia-navbar-tabs-narrow {
-  /*
-    This needs to take i18n of the "Create" and "Sign in" buttons into
-    account.
-  */
-  min-width: 260px;
-}
-.oppia-navbar-tabs {
-  /*
-    This needs to take i18n of the "Create" and "Sign in" buttons into
-    account.
-  */
-  min-width: 530px;
+@media (min-width: 500px) {
+  .oppia-navbar-tabs-narrow {
+    /*
+      This needs to take i18n of the "Create" and "Sign in" buttons into
+      account.
+    */
+    min-width: 260px;
+  }
+  .oppia-navbar-tabs {
+    /*
+      This needs to take i18n of the "Create" and "Sign in" buttons into
+      account.
+    */
+    min-width: 530px;
+  }
 }
 .nav > li > a.oppia-navbar-tab {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
@@ -2195,6 +2197,9 @@ div#ng-curtain {
 .oppia-navbar-tab {
   height: 56px;
   color: #fff;
+}
+.oppia-navbar-profile {
+  float: right;
 }
 .oppia-navbar-profile > li > a:hover,
 .oppia-navbar-profile > li > a:focus,
