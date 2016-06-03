@@ -97,7 +97,10 @@ oppia.controller('Base', [
       if (!$scope.sidebarIsShown) {
         $scope.sidebarIsShown = true;
         $scope.pendingSidebarClick = true;
-      }
+      } else {
+        $scope.sidebarIsShown = false;
+        $scope.pendingSidebarClick = false;
+	  }
     };
 
     // TODO(sll): use 'touchstart' for mobile.
