@@ -60,6 +60,17 @@ oppia.directive('collectionNodeCreator', [function() {
               if (summaryBackendObject) {
                 CollectionUpdateService.addCollectionNode(
                   collection, newExplorationId, summaryBackendObject);
+                var acquiredSkills = [];
+                acquiredSkills.push(summaryBackendObject.title);
+                CollectionUpdateService.setAcquiredSkills(collection,
+                    newExplorationId, acquiredSkills);
+                var nodeCount = collection.getCollectionNodeCount();
+                if (nodeCount > 1) {
+                  var lastNode = collection.getCollectionNodes()[nodeCount - 2];
+                  CollectionUpdateService.setPrerequisiteSkills(collection,
+                    newExplorationId,
+                    lastNode.getAcquiredSkillList().getSkills());
+                }
               } else {
                 alertsService.addWarning(
                   'That exploration does not exist or you do not have edit ' +

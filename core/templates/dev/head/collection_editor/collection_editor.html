@@ -71,7 +71,7 @@
     <div ng-if="collection">
       <!-- Collection node graph -->
       <div class="collection-editor-node-list-container">
-        <div class="collection-editor-node-container" ng-repeat="node in collection.getCollectionNodes() | customSorter">
+        <div class="collection-editor-node-container" ng-repeat="node in collection.getCollectionNodes() | sortCollectionNodesByProgressionOrder:collection">
           <md-card class="collection-editor-node">
             <collection-node-editor-directive collection="collection" collection-node="node" update-skill-list="updateSkillList()">
             </collection-node-editor-directive>
@@ -84,7 +84,7 @@
                 </marker>
               </defs>
 
-              <line x1="0" y1="5" x2="35" y2="5" stroke="#88888A" stroke-width="2" marker-end="url(#arrow)" />
+              <line x1="0" y1="15" x2="35" y2="15" stroke="#88888A" stroke-width="2" marker-end="url(#arrow)" />
             </svg>
           </div>
         </div>

@@ -28,64 +28,6 @@ oppia.constant(
 oppia.constant(
   'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', '/explorationsummarieshandler/data');
 
-// Sorts the node list for display in collection editor frontend. The list
-// starts with a startNode which contains no prerequisite skills. After that
-// nodes are added to the list if their prerequisite skills match the acquired
-// skills of the last node that was added to the node list.
-oppia.filter('customSorter', function() {
-  return function(nodes) {
-    // Get starting node
-    var startingNode;
-    for (var i = 0; i < nodes.length; i++) {
-      if (nodes[i].getPrerequisiteSkillList().isEmpty()) {
-        startingNode = nodes[i];
-        break;
-      }
-    }
-
-    // Populate node list
-    var nodeList = [];
-    nodeList.push(startingNode);
-    while (true) {
-      for (var i = 0; i < nodes.length; i++) {
-        var nodePrerequisiteSkills =
-          nodes[i].getPrerequisiteSkillList()._skillList;
-        var currNodeAcquiredSkills =
-          nodeList[nodeList.length - 1].getAcquiredSkillList()._skillList;
-        if (!nodePrerequisiteSkills.length == 0 && compareTwoArrays(
-              nodePrerequisiteSkills, currNodeAcquiredSkills)) {
-          nodeList.push(nodes[i]);
-          break;
-        }
-      }
-      if (i == nodes.length) {
-        break;
-      }
-    }
-    return nodeList;
-  };
-});
-
-// Compare that contents of two arrays are the same, ignores ordering.
-// TODO(mgowano): Add testing for this method.
-var compareTwoArrays = function(arr1, arr2) {
-  if (arr1 && arr2 && arr1.length == arr2.length) {
-    for (var i = 0; i < arr1.length; i++) {
-      var currItem = arr1[i];
-      for (var j = 0; j < arr2.length; j++) {
-        if (currItem == arr2[j]) {
-          break;
-        }
-      }
-      if (j == arr2.length) {
-        return false;
-      }
-    }
-    return true;
-  }
-  return false;
-};
-
 oppia.controller('CollectionEditor', [
   '$scope', 'WritableCollectionBackendApiService',
   'CollectionRightsBackendApiService', 'CollectionObjectFactory',

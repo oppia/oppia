@@ -102,9 +102,9 @@ oppia.factory('CollectionValidationService', [
       }
 
       var startingExpIds = _getStartingExplorationIds(collection);
-      if (collectionHasNodes && startingExpIds.length == 0) {
+      if (collectionHasNodes && startingExpIds.length != 1) {
         issues.push(
-          'There should be at least 1 exploration initially available to the ' +
+          'There should be exactly 1 exploration initially available to the ' +
           'learner');
       }
 
@@ -139,6 +139,23 @@ oppia.factory('CollectionValidationService', [
           issues.push(
             'Private explorations cannot be added to a public collection: ' +
             privateExpIds.join(', '));
+        }
+      }
+
+      var completedExpIds = _getStartingExplorationIds(collection);
+      var nextExpIds = _getNextExplorationIds(collection, completedExpIds);
+      if (nextExpIds.length > 1) {
+        issues.push('The collection should have a linear progression. The ' +
+          'following explorations are a part of a branch: ' +
+          nextExpIds.join(', '));
+      }
+      while (nextExpIds.length > 0) {
+        completedExpIds = completedExpIds.concat(nextExpIds);
+        nextExpIds = _getNextExplorationIds(collection, completedExpIds);
+        if (nextExpIds.length > 1) {
+          issues.push('The collection should have a linear progression. The ' +
+            'following explorations are a part of a branch: ' +
+            nextExpIds.join(', '));
         }
       }
 

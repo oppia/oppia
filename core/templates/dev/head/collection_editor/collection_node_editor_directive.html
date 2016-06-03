@@ -6,49 +6,17 @@
     <span ng-if="!getCollectionNode().doesExplorationExist()"><strong>Warning: This exploration no longer exists.</strong></span>
     <span ng-if="getCollectionNode().isExplorationNew()"><strong>Warning: Please save the collection before details will appear for this exploration.</strong></span>
   </div>
-  <p> Prerequisite skills: </p>
-  <div ng-if="getCollectionNode().getPrerequisiteSkillList().getSkillCount() > 0">
-    <div class="collection-editor-node-skill-list" ng-repeat="skill in getCollectionNode().getPrerequisiteSkillList().getBindableSkills() track by $index">
-      <span class="collection-editor-node-skill-name"><[skill]></span>
-      <button ng-click="removePrerequisiteSkill($index)">Del</button>
-    </div>
-  </div>
-  <input ng-model="prerequisiteSkillName" type="text" placeholder="Skill name">
-  <button ng-click="addNewPrerequisiteSkill()">Add</button>
-  <br>
-
-  <p> Acquired skills: </p>
-  <div ng-if="getCollectionNode().getAcquiredSkillList().getSkillCount() > 0">
-    <div class="collection-editor-node-skill-list" ng-repeat="skill in getCollectionNode().getAcquiredSkillList().getBindableSkills() track by $index">
-      <span class="collection-editor-node-skill-name"><[skill]></span>
-      <button ng-click="removeAcquiredSkill($index)">Del</button>
-    </div>
-  </div>
-  <input ng-model="acquiredSkillName" type="text" placeholder="Skill name">
-  <button ng-click="addNewAcquiredSkill()">Add</button>
-  <br>
-  <br>
-  <br>
 </script>
 
 <style>
   .glyphicon-remove-circle {
     color: #EF5350;
-    top: 2px;
+    top: -20px;
     left: 5px;
   }
 
   .collection-editor-node-title {
     padding-left: 16px;
-  }
-
-  .collection-editor-node-skill-list {
-    text-align: left;
-    padding-left: 10px;
-  }
-
-  .collection-editor-node-skill-name {
-    color: rgba(0, 0, 0, 0.54);
   }
 
   /* TODO(mgowano): Implement horizontal scrolling using Javascript. */
