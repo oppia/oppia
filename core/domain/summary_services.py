@@ -396,3 +396,21 @@ def get_top_rated_exploration_summary_dicts(language_codes):
 
     return _get_displayable_exp_summary_dicts(
         sorted_exp_summaries, include_contributors=False)
+
+
+def get_recently_published_exploration_summary_dicts():
+    """Returns a list of recently published explorations
+     with the given language code.
+    """
+    recently_published_exploration_summaries = [
+        exp_summary for exp_summary in
+        exp_services.get_recently_published_exploration_summaries().values()]
+
+    # Arranging recently published exploration summaries with respect to time.
+    # sorted() is used to sort the random list of recently published summaries.
+    summaries = sorted(
+        recently_published_exploration_summaries,
+        key=lambda exp_summary: exp_summary.first_published_msec,
+        reverse=True)
+
+    return _get_displayable_exp_summary_dicts(summaries)
