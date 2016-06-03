@@ -54,6 +54,10 @@ VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
 # The maximum number of results to retrieve in a datastore query.
 DEFAULT_QUERY_LIMIT = 1000
 
+# The maximum number of results to retrieve in a datastore query
+# for recently published explorations.
+RECENTLY_PUBLISHED_QUERY_LIMIT = 8
+
 # The current version of the exploration states blob schema. If any backward-
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
@@ -529,6 +533,9 @@ LIBRARY_CATEGORY_FEATURED_EXPLORATIONS = 'Featured Explorations'
 # The header for the "Top Rated Explorations" category in the library index
 # page.
 LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = 'Top Rated Explorations'
+# The header for the "Recently Published" category in the library index
+# page.
+LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'Recently Published'
 
 # List of supported language codes. Each description has a
 # parenthetical part that may be stripped out to give a shorter

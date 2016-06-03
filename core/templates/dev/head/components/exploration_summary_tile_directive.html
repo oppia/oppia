@@ -10,7 +10,7 @@
 
         <!-- Note that if this is ng-if instead, the avatar area will not detect a mouseover and the tile will behave incorrectly. -->
         <div ng-show="isWindowLarge && avatarsList.length > 0" class="exploration-summary-avatars" ng-show="avatarsList.length > 0">
-          <div class="circular-image-container">
+          <div>
             <circular-image ng-if="avatarsList.length > 0"
                             src="avatarsList[0].image"
                             link="avatarsList[0].link"
@@ -23,8 +23,7 @@
           </div>
 
           <div class="all-avatars" style="display: none;">
-            <div class="circular-image-container"
-                 ng-repeat="avatar in avatarsList | limitTo:MAX_AVATARS_TO_DISPLAY-1:1">
+            <div ng-repeat="avatar in avatarsList | limitTo:MAX_AVATARS_TO_DISPLAY-1:1">
               <circular-image src="avatar.image"
                               link="avatar.link"
                               tooltip="<[avatar.tooltipText | truncate:14]>"

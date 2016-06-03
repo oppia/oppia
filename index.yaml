@@ -30,6 +30,13 @@ indexes:
   - name: deleted
   - name: status
 
+- kind: ExpSummaryModel
+  properties:
+  - name: deleted
+  - name: status
+  - name: first_published_msec
+    direction: desc
+
 - kind: ExpSummaryRealtimeModel
   properties:
   - name: realtime_layer
