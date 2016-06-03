@@ -16,11 +16,16 @@
  * @fileoverview Controller for the navbar breadcrumb of the collection editor.
  */
 
+// TODO(bhenning): After the navbar is moved to a directive, this directive
+// should be updated to say 'Loading...' if the collection editor's controller
+// is not yet finished loading the collection. Also, this directive should
+// support both displaying the current title of the collection (or untitled if
+// it does not yet have one) or setting a new title in the case of an untitled
+// collection.
 oppia.directive('collectionEditorNavbarBreadcrumb', [function() {
   return {
     restrict: 'E',
     scope: {
-      getCollection: '&collection'
     },
     templateUrl: 'inline/collection_editor_navbar_breadcrumb_directive',
     controller: ['$scope', 'routerService',
@@ -33,6 +38,8 @@ oppia.directive('collectionEditorNavbarBreadcrumb', [function() {
         history: 'History',
         feedback: 'Feedback'
       };
+
+      $scope.collectionTitle = GLOBALS.collectionTitle;
 
       $scope.getCurrentTabName = function() {
         return _TAB_NAMES_TO_HUMAN_READABLE_NAMES[

@@ -12,6 +12,7 @@
   {{ super() }}
   <script type="text/javascript">
     GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
+    GLOBALS.collectionTitle = JSON.parse('{{title|js_string}}');
     GLOBALS.isPrivate = JSON.parse('{{is_private|js_string}}');
     GLOBALS.canEdit = JSON.parse('{{can_edit|js_string}}');
     GLOBALS.canUnpublish = JSON.parse('{{can_unpublish|js_string}}');
@@ -27,10 +28,8 @@
 {% endblock header_js %}
 
 {% block navbar_breadcrumb %}
-  <div ng-controller="CollectionEditor">
-    <collection-editor-navbar-breadcrumb collection="collection">
-    </collection-editor-navbar-breadcrumb>
-  </div>
+  <collection-editor-navbar-breadcrumb>
+  </collection-editor-navbar-breadcrumb>
 {% endblock navbar_breadcrumb %}
 
 {% block local_top_nav_options %}
