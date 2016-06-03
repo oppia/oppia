@@ -706,7 +706,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
                 // If the current category is not in the dropdown, add it
                 // as the first option.
-                if (!categoryIsInSelect2) {
+                if (!categoryIsInSelect2 &&
+                    explorationCategoryService.savedMemento) {
                   $scope.CATEGORY_LIST_FOR_SELECT2.unshift({
                     id: explorationCategoryService.savedMemento,
                     text: explorationCategoryService.savedMemento
