@@ -90,9 +90,7 @@ oppia.controller('SettingsTab', [
           }
         );
 
-        // Changed from to unshift to address #1894, now focus
-        // in the dropdown list always on first element if element
-        // not in list.
+        // If the current category is not in the dropdown, add it as the first option.
         if (!categoryIsInSelect2) {
           $scope.CATEGORY_LIST_FOR_SELECT2.unshift({
             id: explorationCategoryService.savedMemento,
