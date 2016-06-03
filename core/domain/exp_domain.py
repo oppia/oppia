@@ -2574,7 +2574,8 @@ class Exploration(object):
     def get_interaction_ids(self):
         """Get all interaction ids used in this exploration."""
         return list(set([
-            state.interaction.id for state in self.states.itervalues()]))
+            state.interaction.id for state in self.states.itervalues()
+            if state.interaction.id is not None]))
 
 
 class ExplorationSummary(object):
