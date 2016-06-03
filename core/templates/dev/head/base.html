@@ -250,32 +250,28 @@
                             <create-exploration-button></create-exploration-button>
                             {% if SHOW_CUSTOM_PAGES %}
                               <li class="oppia-clickable-navbar-element pull-right">
-                                <a class="oppia-navbar-tab" href="/forum">
-                                  Forum
+                                <a class="oppia-navbar-tab" href="/forum" translate="I18N_TOPNAV_FORUM">
                                 </a>
                               </li>
                             {% endif %}
                             <li class="dropdown oppia-clickable-dropdown pull-right">
-                              <a class="oppia-navbar-tab">
-                                About
+                              <a class="oppia-navbar-tab" translate="I18N_TOPNAV_ABOUT">
                                 <span class="caret"></span>
                               </a>
                               <ul class="dropdown-menu oppia-navbar-dropdown" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
-                                <li><a href="/about">About Oppia</a></li>
-                                <li><a href="/teach">Teach with Oppia</a></li>
+                                <li><a href="/about" translate="I18N_TOPNAV_ABOUT_OPPIA"></a></li>
+                                <li><a href="/teach" translate="I18N_TOPNAV_TEACH_WITH_OPPIA"></a></li>
                                 {% for additional_link in SIDEBAR_MENU_ADDITIONAL_LINKS %}
                                   <li><a href="{{additional_link['link']}}" target="_blank">{{additional_link['name']}}</a></li>
                                 {% endfor %}
                                 {% if SHOW_CUSTOM_PAGES %}
-                                  <li><a href="/terms">Terms of Service</a></li>
-                                  <li><a href="/privacy">Privacy Policy</a></li>
+                                  <li><a href="/terms" translate="I18N_TOPNAV_TERMS_OF_SERVICE"></a></li>
+                                  <li><a href="/privacy" translate="I18N_TOPNAV_PRIVACY_POLICY"></a></li>
                                 {% endif %}
                               </ul>
                             </li>
                             <li class="oppia-clickable-navbar-element pull-right">
-                              <a class="oppia-navbar-tab" href="/library">
-                                Library
-                              </a>
+                              <a class="oppia-navbar-tab" href="/library" translate="I18N_TOPNAV_LIBRARY"></a>
                             </li>
                           </ul>
                         {% endif %}
@@ -302,9 +298,12 @@
             <noscript>
               <div class="oppia-page-cards-container">
                 <div class="md-default-theme oppia-page-card oppia-long-text">
-                  <h2>We Need JavaScript in Your Browser <i class="material-icons">&#xE811;</i></h2>
-                  <p>Oppia is a free, open-source learning platform full of interactive activities called 'explorations'.  Sadly, Oppia requires JavaScript to be enabled in your web browser in order to function properly and your web browser has JavaScript disabled.  If you need help enabling JavaScript, <a href="http://www.enable-javascript.com/">click here.</a></p>
-                  <p>Thank you.</p>
+                  <h2>
+                  <span translate="I18N_SPLASH_JAVASCRIPT_ERROR_TITLE"></span>
+                  <i class="material-icons">&#xE811;</i>
+                  </h2>
+                  <p translate="I18N_SPLASH_JAVASCRIPT_ERROR_TITLE" translate-values="{hrefUrl: 'http://www.enable-javascript.com/'}"></p>
+                  <p translate="I18N_SPLASH_JAVASCRIPT_ERROR_THANKS"></p>
                 </div>
               </div>
             </noscript>
@@ -326,7 +325,7 @@
         <a href="{{SITE_FEEDBACK_FORM_URL}}" target="_blank"
            class="oppia-site-feedback oppia-transition-200">
           <i class="material-icons md-18" style="vertical-align: middle;">&#xE87F;</i>
-            Site Feedback
+            <span translate="I18N_SPLASH_SITE_FEEDBACK"></span>
           </i>
         </a>
       {% endif %}

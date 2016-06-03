@@ -31,13 +31,6 @@ oppia.constant('DEFAULT_TRANSLATIONS', {
   I18N_LIBRARY_ALL_LANGUAGES: 'All Languages',
   I18N_LIBRARY_LANGUAGES_EN: 'English',
   I18N_LIBRARY_ALL_CATEGORIES: 'All Categories',
-  I18N_LIBRARY_CREATE_EXPLORATION: 'Create exploration',
-  I18N_SIDEBAR_LIBRARY_LINK: 'Home',
-  I18N_SIDEBAR_ABOUT_LINK: 'About',
-  I18N_SIDEBAR_PARTICIPATION_PLAYBOOK: 'Participation Playbook',
-  I18N_SIDEBAR_FORUM: 'Forum',
-  I18N_SIDEBAR_FOLLOW_US: 'Follow Us',
-  I18N_SIDEBAR_ADDITIONAL_LINK_SITE_FEEDBACK: 'Site Feedback',
   I18N_TOPNAV_SIGN_IN: 'Sign in',
   I18N_SIGNUP_REGISTRATION: 'Registration',
   I18N_SIGNUP_LOADING: 'Loading'
@@ -115,7 +108,7 @@ oppia.factory('i18nIdService', function() {
     getLibraryId: function(prefix, name) {
       return (
         'I18N_LIBRARY_' + prefix.toUpperCase() + '_' +
-        name.toUpperCase().replace(' ', '_'));
+        name.toUpperCase().split(' ').join('_'));
     }
   };
 });
