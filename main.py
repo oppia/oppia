@@ -151,6 +151,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/myexplorationshandler/data', home.MyExplorationsHandler,
         'my_explorations_handler'),
+    get_redirect_route(
+        r'%s' % feconf.SITE_LANGUAGE_DATA_URL,
+        home.SiteLanguageHandler, 'save_site_language'),
 
     get_redirect_route(feconf.SPLASH_URL, pages.SplashPage, 'splash_page'),
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),

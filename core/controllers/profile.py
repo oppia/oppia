@@ -89,8 +89,10 @@ class ProfileHandler(base.BaseHandler):
             edited_exp_summary_dicts = (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
                     user_contributions.edited_exploration_ids))
+        profile_is_of_current_user = (self.username == username)
 
         self.values.update({
+            'profile_is_of_current_user': profile_is_of_current_user,
             'profile_username': user_settings.username,
             'user_bio': user_settings.user_bio,
             'subject_interests': user_settings.subject_interests,
@@ -136,6 +138,8 @@ class PreferencesHandler(base.BaseHandler):
             self.user_id)
         self.values.update({
             'preferred_language_codes': user_settings.preferred_language_codes,
+            'preferred_site_language_code': (
+                user_settings.preferred_site_language_code),
             'profile_picture_data_url': user_settings.profile_picture_data_url,
             'user_bio': user_settings.user_bio,
             'subject_interests': user_settings.subject_interests,
@@ -158,6 +162,9 @@ class PreferencesHandler(base.BaseHandler):
             user_services.update_subject_interests(self.user_id, data)
         elif update_type == 'preferred_language_codes':
             user_services.update_preferred_language_codes(self.user_id, data)
+        elif update_type == 'preferred_site_language_code':
+            user_services.update_preferred_site_language_code(
+                self.user_id, data)
         elif update_type == 'profile_picture_data_url':
             user_services.update_profile_picture_data_url(self.user_id, data)
         elif update_type == 'email_preferences':

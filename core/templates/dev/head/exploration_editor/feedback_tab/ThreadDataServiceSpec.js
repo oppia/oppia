@@ -19,6 +19,7 @@
 
 describe('retrieving threads service', function() {
   var expId = '12345';
+  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
   beforeEach(function() {
     module('oppia');
     module(function($provide) {

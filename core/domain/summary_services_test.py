@@ -641,3 +641,126 @@ class TopRatedExplorationDisplayableSummariesTest(
                            top_rated_exploration_summaries]
 
         self.assertEqual(expected_ordering, actual_ordering)
+
+
+class RecentlyPublishedExplorationDisplayableSummariesTest(
+        test_utils.GenericTestBase):
+    """Test functions for getting displayable recently published exploration
+    summary dicts.
+    """
+
+    ALBERT_NAME = 'albert'
+    ALBERT_EMAIL = 'albert@example.com'
+
+    EXP_ID_1 = 'eid1'
+    EXP_ID_2 = 'eid2'
+    EXP_ID_3 = 'eid3'
+
+    def setUp(self):
+        """Populate the database of explorations and their summaries.
+
+        The sequence of events is:
+        - (1) Albert creates EXP_ID_1.
+        - (2) Albert creates EXP_ID_2.
+        - (3) Albert creates EXP_ID_3.
+        - (4) Albert publishes EXP_ID_1.
+        - (5) Albert publishes EXP_ID_2.
+        - (6) Albert publishes EXP_ID_3.
+        - (7) Admin user is set up.
+        """
+
+        super(RecentlyPublishedExplorationDisplayableSummariesTest,
+              self).setUp()
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+
+        self.save_new_valid_exploration(
+            self.EXP_ID_1, self.albert_id,
+            end_state_name='End')
+        self.save_new_valid_exploration(
+            self.EXP_ID_2, self.albert_id,
+            end_state_name='End')
+        self.save_new_valid_exploration(
+            self.EXP_ID_3, self.albert_id,
+            end_state_name='End')
+
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_2)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_1)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_3)
+
+        self.set_admins([self.ADMIN_USERNAME])
+
+    def test_for_recently_published_explorations(self):
+        """ Tests for recently published explorations.
+        """
+
+        recently_published_exploration_summaries = (
+            summary_services.get_recently_published_exploration_summary_dicts())
+        test_summary_1 = {
+            'status': 'public',
+            'thumbnail_bg_color': '#a33f40',
+            'community_owned': False,
+            'tags': [],
+            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'id': self.EXP_ID_1,
+            'category': u'A category',
+            'ratings': feconf.get_empty_ratings(),
+            'title': u'A title',
+            'num_views': 0,
+            'objective': u'An objective'
+        }
+        test_summary_2 = {
+            'status': 'public',
+            'thumbnail_bg_color': '#a33f40',
+            'community_owned': False,
+            'tags': [],
+            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'id': self.EXP_ID_2,
+            'category': u'A category',
+            'ratings': feconf.get_empty_ratings(),
+            'title': u'A title',
+            'num_views': 0,
+            'objective': u'An objective'
+        }
+        test_summary_3 = {
+            'status': 'public',
+            'thumbnail_bg_color': '#a33f40',
+            'community_owned': False,
+            'tags': [],
+            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'id': self.EXP_ID_3,
+            'category': u'A category',
+            'ratings': feconf.get_empty_ratings(),
+            'title': u'A title',
+            'num_views': 0,
+            'objective': u'An objective'
+        }
+
+        self.assertDictContainsSubset(
+            test_summary_3, recently_published_exploration_summaries[0])
+        self.assertDictContainsSubset(
+            test_summary_1, recently_published_exploration_summaries[1])
+        self.assertDictContainsSubset(
+            test_summary_2, recently_published_exploration_summaries[2])
+
+        # Test that editing an exploration does not change its
+        # 'recently-published' status.
+        exp_services.update_exploration(
+            self.albert_id, self.EXP_ID_1, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'New title'
+            }], 'Changed title.')
+
+        recently_published_exploration_summaries = (
+            summary_services.get_recently_published_exploration_summary_dicts())
+        self.assertEqual(
+            recently_published_exploration_summaries[1]['title'], 'New title')
+        self.assertDictContainsSubset(
+            test_summary_3, recently_published_exploration_summaries[0])

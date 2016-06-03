@@ -167,6 +167,8 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                 exploration = exp_services.get_exploration_by_id(exp_id)
                 exploration_model_last_updated = exploration.last_updated
                 exploration_model_created_on = exploration.created_on
+                first_published_msec = (
+                    exp_rights_model.first_published_msec)
 
                 # Manually create the expected summary specifying title,
                 # category, etc.
@@ -187,7 +189,8 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                     {admin_id: 1},
                     exploration.version,
                     exploration_model_created_on,
-                    exploration_model_last_updated)
+                    exploration_model_last_updated,
+                    first_published_msec)
 
                 # Note: Calling constructor for fields that are not required
                 # and have no default value does not work, because

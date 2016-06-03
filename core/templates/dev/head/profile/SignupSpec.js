@@ -20,9 +20,7 @@ describe('Signup controller', function() {
   describe('SignupCtrl', function() {
     var scope, ctrl, $httpBackend, rootScope, mockAlertsService, urlParams;
 
-    beforeEach(function() {
-      module('oppia');
-    });
+    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
     beforeEach(inject(function(_$httpBackend_, $http, $rootScope, $controller) {
       $httpBackend = _$httpBackend_;
@@ -56,8 +54,7 @@ describe('Signup controller', function() {
     it('should show warning if user has not agreed to terms', function() {
       scope.submitPrerequisitesForm(false, null);
       expect(mockAlertsService.addWarning).toHaveBeenCalledWith(
-        'In order to edit explorations on this site, you will need to agree ' +
-        'to the site terms.');
+        'I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
     });
 
     it('should get data correctly from the server', function() {
@@ -67,7 +64,7 @@ describe('Signup controller', function() {
     });
 
     it('should show a loading message until the data is retrieved', function() {
-      expect(rootScope.loadingMessage).toBe('Loading');
+      expect(rootScope.loadingMessage).toBe('I18N_SIGNUP_LOADING');
       $httpBackend.flush();
       expect(rootScope.loadingMessage).toBeFalsy();
     });
@@ -75,36 +72,35 @@ describe('Signup controller', function() {
     it('should show warning if terms are not agreed to', function() {
       scope.submitPrerequisitesForm(false, '');
       expect(mockAlertsService.addWarning).toHaveBeenCalledWith(
-        'In order to edit explorations on this site, you will need to ' +
-        'agree to the site terms.');
+        'I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
     });
 
     it('should show warning if no username provided', function() {
       scope.updateWarningText('');
-      expect(scope.warningText).toEqual('Please choose a username.');
+      expect(scope.warningI18nCode).toEqual('I18N_SIGNUP_ERROR_NO_USERNAME');
 
       scope.submitPrerequisitesForm(false);
-      expect(scope.warningText).toEqual('Please choose a username.');
+      expect(scope.warningI18nCode).toEqual('I18N_SIGNUP_ERROR_NO_USERNAME');
     });
 
     it('should show warning if username is too long', function() {
       scope.updateWarningText(
         'abcdefghijklmnopqrstuvwxyzyxwvutsrqponmlkjihgfedcba');
-      expect(scope.warningText).toEqual(
-        'A username can have at most 50 characters.');
+      expect(scope.warningI18nCode).toEqual(
+        'I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS');
     });
 
     it('should show warning if username has non-alphanumeric characters',
         function() {
       scope.updateWarningText('a-a');
-      expect(scope.warningText).toEqual(
-        'Usernames can only have alphanumeric characters.');
+      expect(scope.warningI18nCode).toEqual(
+        'I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM');
     });
 
     it('should show warning if username has \'admin\' in it', function() {
       scope.updateWarningText('administrator');
-      expect(scope.warningText).toEqual(
-        'User names with \'admin\' are reserved.');
+      expect(scope.warningI18nCode).toEqual(
+        'I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN');
     });
   });
 });

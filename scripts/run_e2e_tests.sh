@@ -143,7 +143,7 @@ for j in "$@"; do
     SHARD_INSTANCES="${j#*=}"
     shift
     ;;
- 
+
     *)
     echo "Error: Unknown command line option: $j"
     ;;
