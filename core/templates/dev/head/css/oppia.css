@@ -2172,10 +2172,18 @@ div#ng-curtain {
 }
 
 .oppia-navbar-tabs-narrow {
-  min-width: 210px;
+  /*
+    This needs to take i18n of the "Create" and "Sign in" buttons into
+    account.
+  */
+  min-width: 260px;
 }
 .oppia-navbar-tabs {
-  min-width: 600px;
+  /*
+    This needs to take i18n of the "Create" and "Sign in" buttons into
+    account.
+  */
+  min-width: 530px;
 }
 .nav > li > a.oppia-navbar-tab {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
