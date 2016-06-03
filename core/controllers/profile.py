@@ -65,11 +65,11 @@ class ProfilePage(base.BaseHandler):
 
 class ProfileHandler(base.BaseHandler):
     """Provides data for the profile page."""
-
     PAGE_NAME_FOR_CSRF = 'profile'
-
     def get(self, username):
         """Handles GET requests."""
+        print 'LOOK AT ME %s' % self.username
+        print (self.values)
         if not username:
             raise self.PageNotFoundException
 
@@ -89,8 +89,15 @@ class ProfileHandler(base.BaseHandler):
             edited_exp_summary_dicts = (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
                     user_contributions.edited_exploration_ids))
+            ### function to determine whether current user is same as user on page ###
+            if (self.username == username):
+                profile_is_of_current_user = True
+            if (self.username != username):
+                profile_is_of_current_user = False
+
 
         self.values.update({
+            'profileIsOfCurrentUser': profile_is_of_current_user,
             'profile_username': user_settings.username,
             'user_bio': user_settings.user_bio,
             'subject_interests': user_settings.subject_interests,
