@@ -70,6 +70,22 @@ class RatingServicesTests(test_utils.GenericTestBase):
             rating_services.get_overall_ratings_for_exploration(self.EXP_ID),
             {'1': 0, '2': 0, '3': 0, '4': 2, '5': 0})
 
+    def test_scaled_rating_assignation(self):
+        """Check scaled average ratings are correctly assigned to an
+        exploration.
+        """
+        exp_services.save_new_exploration(
+            self.EXP_ID,
+            exp_domain.Exploration.create_default_exploration(self.EXP_ID))
+
+        exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+
+        self.assertEqual(exp.scaled_average_rating, 0)
+        rating_services.assign_scaled_rating_to_exploration(exp.id, 1.0)
+
+        exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+        self.assertEqual(exp.scaled_average_rating, 1.0)
+
     def test_time_of_ratings_recorded(self):
         """Check that the time a rating is given is recorded correctly."""
 

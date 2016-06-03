@@ -317,6 +317,9 @@ class ExpSummaryModel(base_models.BaseModel):
     # Aggregate user-assigned ratings of the exploration
     ratings = ndb.JsonProperty(default=None, indexed=False)
 
+    # Scaled Lower bound Wilson score of the exploration
+    scaled_average_rating = ndb.FloatProperty()
+
     # Time when the exploration model was last updated (not to be
     # confused with last_updated, which is the time when the
     # exploration *summary* model was last updated)

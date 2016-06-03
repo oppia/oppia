@@ -49,6 +49,7 @@ ONE_OFF_JOB_MANAGERS = [
 # it should be registered here.
 ALL_CONTINUOUS_COMPUTATION_MANAGERS = [
     exp_jobs_continuous.SearchRanker,
+    exp_jobs_continuous.ExplorationScaledAverageRatingCalculator,
     stats_jobs_continuous.StatisticsAggregator,
     user_jobs_continuous.DashboardRecentUpdatesAggregator,
     user_jobs_continuous.UserImpactAggregator,

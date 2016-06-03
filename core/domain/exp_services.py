@@ -159,10 +159,10 @@ def get_exploration_summary_from_model(exp_summary_model):
         exp_summary_model.id, exp_summary_model.title,
         exp_summary_model.category, exp_summary_model.objective,
         exp_summary_model.language_code, exp_summary_model.tags,
-        exp_summary_model.ratings, exp_summary_model.status,
-        exp_summary_model.community_owned, exp_summary_model.owner_ids,
-        exp_summary_model.editor_ids, exp_summary_model.viewer_ids,
-        exp_summary_model.contributor_ids,
+        exp_summary_model.ratings, exp_summary_model.scaled_average_rating,
+        exp_summary_model.status, exp_summary_model.community_owned,
+        exp_summary_model.owner_ids, exp_summary_model.editor_ids,
+        exp_summary_model.viewer_ids, exp_summary_model.contributor_ids,
         exp_summary_model.contributors_summary, exp_summary_model.version,
         exp_summary_model.exploration_model_created_on,
         exp_summary_model.exploration_model_last_updated
@@ -374,6 +374,12 @@ def get_featured_exploration_summaries():
     return _get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_featured())
 
+def get_rated_summaries():
+    """Returns a dict with all featured exploration summary domain objects,
+    keyed by their id.
+    """
+    return _get_exploration_summaries_from_models(
+        exp_models.ExpSummaryModel.get_rated())
 
 def get_all_exploration_summaries():
     """Returns a dict with all exploration summary domain objects,
@@ -1059,10 +1065,13 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
     if exp_summary_model:
         old_exp_summary = get_exploration_summary_from_model(exp_summary_model)
         ratings = old_exp_summary.ratings or feconf.get_empty_ratings()
+        scaled_average_rating = old_exp_summary.scaled_average_rating or \
+            feconf.EMPTY_SCALED_AVERAGE_RATING
         contributor_ids = old_exp_summary.contributor_ids or []
         contributors_summary = old_exp_summary.contributors_summary or {}
     else:
         ratings = feconf.get_empty_ratings()
+        scaled_average_rating = feconf.EMPTY_SCALED_AVERAGE_RATING
         contributor_ids = []
         contributors_summary = {}
 
@@ -1092,7 +1101,7 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
     exp_summary = exp_domain.ExplorationSummary(
         exploration.id, exploration.title, exploration.category,
         exploration.objective, exploration.language_code,
-        exploration.tags, ratings, exp_rights.status,
+        exploration.tags, ratings, scaled_average_rating, exp_rights.status,
         exp_rights.community_owned, exp_rights.owner_ids,
         exp_rights.editor_ids, exp_rights.viewer_ids, contributor_ids,
         contributors_summary, exploration.version,
@@ -1138,6 +1147,7 @@ def save_exploration_summary(exp_summary):
         language_code=exp_summary.language_code,
         tags=exp_summary.tags,
         ratings=exp_summary.ratings,
+        scaled_average_rating=exp_summary.scaled_average_rating,
         status=exp_summary.status,
         community_owned=exp_summary.community_owned,
         owner_ids=exp_summary.owner_ids,
@@ -1391,7 +1401,7 @@ def get_scaled_average_rating_from_exp_summary(exp_summary):
     # The following is the number of ratings.
     n = sum(exp_summary.ratings.values())
     if n == 0:
-        return 0
+        return 0.0
     average_rating = get_average_rating_from_exp_summary(exp_summary)
     z = 1.9599639715843482
     x = (average_rating - 1) / 4

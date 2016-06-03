@@ -2263,7 +2263,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             self.EXP_ID_2: exp_domain.ExplorationSummary(
                 self.EXP_ID_2, 'Exploration 2 Albert title',
                 'A category', 'An objective', 'en', [],
-                feconf.get_empty_ratings(),
+                feconf.get_empty_ratings(), feconf.EMPTY_SCALED_AVERAGE_RATING,
                 rights_manager.ACTIVITY_STATUS_PUBLIC,
                 False, [self.albert_id], [], [], [self.albert_id],
                 {self.albert_id: 1},
@@ -2294,7 +2294,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             self.EXP_ID_1: exp_domain.ExplorationSummary(
                 self.EXP_ID_1, 'Exploration 1 title',
                 'A category', 'An objective', 'en', [],
-                feconf.get_empty_ratings(),
+                feconf.get_empty_ratings(), feconf.EMPTY_SCALED_AVERAGE_RATING,
                 rights_manager.ACTIVITY_STATUS_PRIVATE,
                 False, [self.albert_id], [], [], [self.albert_id, self.bob_id],
                 {self.albert_id: 1, self.bob_id: 1}, self.EXPECTED_VERSION_1,
@@ -2304,7 +2304,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             self.EXP_ID_2: exp_domain.ExplorationSummary(
                 self.EXP_ID_2, 'Exploration 2 Albert title',
                 'A category', 'An objective', 'en', [],
-                feconf.get_empty_ratings(),
+                feconf.get_empty_ratings(), feconf.EMPTY_SCALED_AVERAGE_RATING,
                 rights_manager.ACTIVITY_STATUS_PUBLIC,
                 False, [self.albert_id], [], [], [self.albert_id],
                 {self.albert_id: 1}, self.EXPECTED_VERSION_2,
