@@ -45,7 +45,7 @@ oppia.factory('explorationData', [
     // Put exploration variables here.
     var explorationData = {
       explorationId: explorationId,
-      autosaveChangeList: function(changeList, successCallback, errorCallback) {
+      autosaveChangeList: function(changeList) {
         var draftAutosaveUrl = '/createhandler/autosave_draft/' + explorationId;
         $http.put(draftAutosaveUrl, {
           change_list: changeList,
@@ -256,9 +256,7 @@ oppia.factory('changeListService', [
     // (Display the corresponding modals in both cases, if not already opened):
     // - Version Mismatch.
     // - Non-strict Validation Fail.
-    explorationData.autosaveChangeList(
-      explorationChangeList,
-      function(response) {
+    explorationData.autosaveChangeList(explorationChangeList, function(response) {
         if (!response.data.is_version_of_draft_valid) {
           if (!autosaveInfoModalsService.isVersionMismatchModalOpen()) {
             autosaveInfoModalsService.showVersionMismatchModal(
@@ -2042,15 +2040,15 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
   };
 
   // An edit is represented either as an object or an array. If it's an object,
-  // then simply return that object. In case of an array, return the last item
+  // then simply return that object. In case of an array, return the last item.
   var getStatePropertyValue = function(statePropertyValue) {
     return angular.isArray(statePropertyValue) ?
       statePropertyValue[statePropertyValue.length - 1] : statePropertyValue;
   };
 
   // Detects whether an object of the type 'answer_group' or 'default_outcome'
-  // has been added, edited or deleted.
-  // Returns - 'addded', 'edited' or 'deleted' accordingly.
+  // has been added, edited or deleted. Returns - 'addded', 'edited' or
+  // 'deleted' accordingly.
   var getRelativeChangeToGroups = function(changeObject) {
     var newValue = changeObject.new_value;
     var oldValue = changeObject.old_value;
@@ -2263,9 +2261,7 @@ oppia.factory('autosaveInfoModalsService', [
           backdrop: true,
           controller: [
             '$scope', '$modalInstance',
-            function(
-              $scope, $modalInstance
-            ) {
+            function($scope, $modalInstance) {
               $scope.close = function() {
                 $modalInstance.dismiss('cancel');
               };
@@ -2288,15 +2284,9 @@ oppia.factory('autosaveInfoModalsService', [
           backdrop: true,
           controller: [
             '$scope', '$modalInstance',
-            function(
-              $scope, $modalInstance
-            ) {
-              $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
-              };
-              // When the user clicks on discard changes button,
-              // signal backend to discard the draft and
-              // reload the page thereafter.
+            function($scope, $modalInstance) {
+              // When the user clicks on discard changes button, signal backend
+              // to discard the draft and reload the page thereafter.
               $scope.discardChanges = function() {
                 explorationData.discardDraft(function() {
                   $timeout(function() {
