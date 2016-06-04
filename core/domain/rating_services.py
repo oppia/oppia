@@ -72,10 +72,9 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
     if old_rating:
         exploration_summary.ratings[str(old_rating)] -= 1
 
-    calculated_scaled_average_rating = (
+    exploration_summary.scaled_average_rating = (
         exp_services.get_scaled_average_rating_from_exp_summary(
-            exploration_summary))
-    exploration_summary.scaled_average_rating = calculated_scaled_average_rating
+            exploration_summary.ratings))
 
     exp_services.save_exploration_summary(exploration_summary)
 
