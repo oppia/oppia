@@ -180,6 +180,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                     exploration.language_code,
                     exploration.tags,
                     feconf.get_empty_ratings(),
+                    feconf.EMPTY_SCALED_AVERAGE_RATING,
                     spec['status'],
                     exp_rights_model.community_owned,
                     exp_rights_model.owner_ids,

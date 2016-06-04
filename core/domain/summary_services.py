@@ -378,20 +378,13 @@ def get_top_rated_exploration_summary_dicts(language_codes):
     """
     filtered_exp_summaries = [
         exp_summary for exp_summary in
-        exp_services.get_non_private_exploration_summaries().values()
+        exp_services.get_top_rated_exploration_summaries().values()
         if exp_summary.language_code in language_codes and
         sum(exp_summary.ratings.values()) > 0]
 
-    lower_bound_wilson_scores = {
-        exp_summary.id:
-            exp_services.get_scaled_average_rating_from_exp_summary(
-                exp_summary)
-        for exp_summary in filtered_exp_summaries
-    }
-
     sorted_exp_summaries = sorted(
         filtered_exp_summaries,
-        key=lambda exp_summary: lower_bound_wilson_scores[exp_summary.id],
+        key=lambda exp_summary: exp_summary.scaled_average_rating,
         reverse=True)[:NUMBER_OF_TOP_RATED_EXPLORATIONS]
 
     return _get_displayable_exp_summary_dicts(
