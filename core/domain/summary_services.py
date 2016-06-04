@@ -21,6 +21,7 @@ from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import stats_jobs_continuous
 from core.domain import user_services
+import feconf
 import utils
 
 _LIBRARY_INDEX_GROUPS = [{
@@ -53,7 +54,6 @@ _LIBRARY_INDEX_GROUPS = [{
         'Business', 'Economics', 'Geography', 'Government', 'History', 'Law'],
 }]
 
-NUMBER_OF_TOP_RATED_EXPLORATIONS = 8
 
 def get_human_readable_contributors_summary(contributors_summary):
     contributor_ids = contributors_summary.keys()
@@ -386,7 +386,7 @@ def get_top_rated_exploration_summary_dicts(language_codes):
     sorted_exp_summaries = sorted(
         filtered_exp_summaries,
         key=lambda exp_summary: exp_summary.scaled_average_rating,
-        reverse=True)[:NUMBER_OF_TOP_RATED_EXPLORATIONS]
+        reverse=True)[:feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS]
 
     return _get_displayable_exp_summary_dicts(
         sorted_exp_summaries, include_contributors=False)

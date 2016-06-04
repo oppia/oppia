@@ -1069,7 +1069,7 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
     if exp_summary_model:
         old_exp_summary = get_exploration_summary_from_model(exp_summary_model)
         ratings = old_exp_summary.ratings or feconf.get_empty_ratings()
-        scaled_average_rating = get_scaled_average_rating_from_exp_summary(
+        scaled_average_rating = get_scaled_average_rating(
             old_exp_summary.ratings)
         contributor_ids = old_exp_summary.contributor_ids or []
         contributors_summary = old_exp_summary.contributors_summary or {}
@@ -1384,7 +1384,7 @@ def _should_index(exp):
     return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
 
 
-def get_average_rating_from_exp_summary(exp_summary_ratings):
+def get_average_rating(exp_summary_ratings):
     """Returns the average rating of the ratings as a float. If there are no
     ratings, it will return 0.
     """
@@ -1400,7 +1400,7 @@ def get_average_rating_from_exp_summary(exp_summary_ratings):
     return 0
 
 
-def get_scaled_average_rating_from_exp_summary(exp_summary_ratings):
+def get_scaled_average_rating(exp_summary_ratings):
     """Returns the lower bound wilson score of the ratings as a float. If
     there are no ratings, it will return 0. The confidence of this result is
     95%.
@@ -1409,7 +1409,7 @@ def get_scaled_average_rating_from_exp_summary(exp_summary_ratings):
     n = sum(exp_summary_ratings.values())
     if n == 0:
         return 0
-    average_rating = get_average_rating_from_exp_summary(exp_summary_ratings)
+    average_rating = get_average_rating(exp_summary_ratings)
     z = 1.9599639715843482
     x = (average_rating - 1) / 4
     # The following calculates the lower bound Wilson Score as documented

@@ -55,6 +55,10 @@ VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
 DEFAULT_QUERY_LIMIT = 1000
 
 # The maximum number of results to retrieve in a datastore query
+# for top rated published explorations.
+NUMBER_OF_TOP_RATED_EXPLORATIONS = 8
+
+# The maximum number of results to retrieve in a datastore query
 # for recently published explorations.
 RECENTLY_PUBLISHED_QUERY_LIMIT = 8
 

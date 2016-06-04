@@ -391,7 +391,7 @@ class ExpSummaryModel(base_models.BaseModel):
             ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).order(
             -ExpSummaryModel.scaled_average_rating
-        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        ).fetch(feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS)
 
     @classmethod
     def get_private_at_least_viewable(cls, user_id):
