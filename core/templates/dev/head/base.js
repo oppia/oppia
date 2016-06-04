@@ -98,7 +98,7 @@ oppia.controller('Base', [
         $scope.sidebarIsShown = true;
         $scope.pendingSidebarClick = true;
       } else {
-		$scope.sidebarIsShown = false;
+        $scope.sidebarIsShown = false;
         $scope.pendingSidebarClick = false;
 	  }
     };
