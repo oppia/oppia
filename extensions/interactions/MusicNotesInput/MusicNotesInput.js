@@ -933,13 +933,13 @@ oppia.factory('musicNotesInputRulesService', [
     IsEqualToExceptFor: function(answer, inputs) {
       var targetSequence = _convertSequenceToMidi(inputs.x);
       var userSequence = _convertSequenceToMidi(answer);
-      if (userSequence.length != targetSequence.length) {
+      if (userSequence.length !== targetSequence.length) {
         return false;
       }
 
       var numWrongNotes = 0;
       userSequence.map(function(noteValue, index) {
-        if (noteValue != targetSequence[index]) {
+        if (noteValue !== targetSequence[index]) {
           numWrongNotes++;
         }
       });
@@ -948,23 +948,23 @@ oppia.factory('musicNotesInputRulesService', [
     IsTranspositionOf: function(answer, inputs) {
       var targetSequence = _convertSequenceToMidi(inputs.x);
       var userSequence = _convertSequenceToMidi(answer);
-      if (userSequence.length != targetSequence.length) {
+      if (userSequence.length !== targetSequence.length) {
         return false;
       }
       return userSequence.every(function(noteValue, index) {
-        return targetSequence[index] + inputs.y == noteValue;
+        return targetSequence[index] + inputs.y === noteValue;
       });
     },
     IsTranspositionOfExceptFor: function(answer, inputs) {
       var targetSequence = _convertSequenceToMidi(inputs.x);
       var userSequence = _convertSequenceToMidi(answer);
-      if (userSequence.length != targetSequence.length) {
+      if (userSequence.length !== targetSequence.length) {
         return false;
       }
 
       var numWrongNotes = 0;
       userSequence.map(function(noteValue, index) {
-        if (targetSequence[index] + inputs.y != noteValue) {
+        if (targetSequence[index] + inputs.y !== noteValue) {
           numWrongNotes++;
         }
       });

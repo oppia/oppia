@@ -53,8 +53,8 @@ oppia.directive('collectionNodeCreator', [function() {
             .loadPublicAndPrivateExplorationSummaries(
                 [newExplorationId]).then(function(summaries) {
               var summaryBackendObject = null;
-              if (summaries.length != 0 &&
-                  summaries[0].id == newExplorationId) {
+              if (summaries.length !== 0 &&
+                  summaries[0].id === newExplorationId) {
                 summaryBackendObject = summaries[0];
               }
               if (summaryBackendObject) {

@@ -51,8 +51,8 @@ describe('Expression evaluator service', function() {
       ['23 % 5', []],
       ['1 <= numZero || 1 >= numZero', ['numZero']],
       ['100 < num100_001 && 1 > num100_001', ['num100_001']],
-      ['boolTrue == boolFalse', ['boolFalse', 'boolTrue']],
-      ['strNull != strXYZ', ['strNull', 'strXYZ']],
+      ['boolTrue === boolFalse', ['boolFalse', 'boolTrue']],
+      ['strNull !== strXYZ', ['strNull', 'strXYZ']],
       ['if boolFalse then boolTrue else numZero', [
         'boolFalse', 'boolTrue', 'numZero']],
       ['num100_001 / 0', ['num100_001']],
@@ -65,7 +65,7 @@ describe('Expression evaluator service', function() {
       var expectedParams = test[1];
 
       var parsed = (
-        typeof expression == 'string' ? eps.parse(expression) : expression);
+        typeof expression === 'string' ? eps.parse(expression) : expression);
       var parsedJson = JSON.stringify(parsed);
       var failed = false;
 
@@ -108,8 +108,8 @@ describe('Expression evaluator service', function() {
       ['23 % 5', 3],
       ['1 <= numZero || 1 >= numZero', true],
       ['100 < num100_001 && 1 > num100_001', false],
-      ['boolTrue == boolFalse', false],
-      ['strNull != strXYZ', true],
+      ['boolTrue === boolFalse', false],
+      ['strNull !== strXYZ', true],
       ['if boolFalse then boolTrue else numZero', 0],
       ['num100_001 / 0', Infinity],
       ['abs(-3)', 3],
@@ -129,7 +129,7 @@ describe('Expression evaluator service', function() {
       // 'expression' is either a string (in which case parsed) or an array
       // (representing a parse tree).
       var parsed = (
-        typeof expression == 'string' ? eps.parse(expression) : expression);
+        typeof expression === 'string' ? eps.parse(expression) : expression);
       var parsedJson = JSON.stringify(parsed);
       var failed = false;
 
@@ -160,7 +160,7 @@ describe('Expression evaluator service', function() {
       }
       expect(failed).toBe(false);
 
-      if (typeof expression != 'string') {
+      if (typeof expression !== 'string') {
         return;
       }
 

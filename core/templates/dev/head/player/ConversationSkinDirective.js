@@ -632,7 +632,7 @@ oppia.directive('conversationSkin', [function() {
           $timeout(function() {
             var tutorCard = $('.conversation-skin-main-tutor-card');
 
-            if (tutorCard.length == 0) {
+            if (tutorCard.length === 0) {
               return;
             }
             var tutorCardBottom = (

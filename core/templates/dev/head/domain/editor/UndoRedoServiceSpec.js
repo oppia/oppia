@@ -34,10 +34,10 @@ describe('Undo/Redo Service', function() {
   };
 
   var _createChangeDomainObject = function(backendObj, applyFunc, reverseFunc) {
-    if (applyFunc == null) {
+    if (applyFunc === null) {
       applyFunc = function() {};
     }
-    if (reverseFunc == null) {
+    if (reverseFunc === null) {
       reverseFunc = function() {};
     }
     return ChangeObjectFactory.create(backendObj, applyFunc, reverseFunc);

@@ -289,7 +289,7 @@ oppia.factory('CollectionUpdateService', [
          */
         isAddingCollectionNode: function(changeObject) {
           var backendChangeObject = changeObject.getBackendChangeObject();
-          return backendChangeObject.cmd == CMD_ADD_COLLECTION_NODE;
+          return backendChangeObject.cmd === CMD_ADD_COLLECTION_NODE;
         },
 
         /**

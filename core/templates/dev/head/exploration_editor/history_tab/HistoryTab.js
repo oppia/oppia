@@ -219,15 +219,15 @@ oppia.controller('HistoryTab', [
         nodesData = response.nodes;
         for (var nodeId in nodesData) {
           var nodeStateProperty = nodesData[nodeId].stateProperty;
-          if (nodeStateProperty == STATE_PROPERTY_ADDED) {
+          if (nodeStateProperty === STATE_PROPERTY_ADDED) {
             diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
             $scope.diffGraphNodeColors[nodeId] = COLOR_ADDED;
             _stateTypeUsed[NODE_TYPE_ADDED] = true;
-          } else if (nodeStateProperty == STATE_PROPERTY_DELETED) {
+          } else if (nodeStateProperty === STATE_PROPERTY_DELETED) {
             diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
             $scope.diffGraphNodeColors[nodeId] = COLOR_DELETED;
             _stateTypeUsed[NODE_TYPE_DELETED] = true;
-          } else if (nodeStateProperty == STATE_PROPERTY_CHANGED) {
+          } else if (nodeStateProperty === STATE_PROPERTY_CHANGED) {
             diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
             $scope.diffGraphNodeColors[nodeId] = COLOR_CHANGED;
             if (nodesData[nodeId].originalStateName !=
@@ -239,7 +239,7 @@ oppia.controller('HistoryTab', [
             } else {
               _stateTypeUsed[NODE_TYPE_CHANGED] = true;
             }
-          } else if (nodeStateProperty == STATE_PROPERTY_UNCHANGED) {
+          } else if (nodeStateProperty === STATE_PROPERTY_UNCHANGED) {
             diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
             $scope.diffGraphNodeColors[nodeId] = COLOR_UNCHANGED;
             if (nodesData[nodeId].originalStateName !=
@@ -327,7 +327,7 @@ oppia.controller('HistoryTab', [
     // Check if other checkboxes should be disabled once two are selected.
     $scope.isCheckboxDisabled = function(versionNumber) {
       if ($scope.selectedVersionsArray.length === 2) {
-        return ($scope.selectedVersionsArray.indexOf(versionNumber) == -1);
+        return ($scope.selectedVersionsArray.indexOf(versionNumber) === -1);
       }
       return false;
     };
@@ -410,7 +410,7 @@ oppia.controller('HistoryTab', [
             if (oldStateName === undefined) {
               oldStateName = stateName;
             }
-            if (stateProperty != STATE_PROPERTY_DELETED) {
+            if (stateProperty !== STATE_PROPERTY_DELETED) {
               $http.get(
                 stateDownloadUrl + '?v=' +
                 $scope.compareVersionMetadata.laterVersion.versionNumber +
@@ -426,7 +426,7 @@ oppia.controller('HistoryTab', [
               }, 200);
             }
 
-            if (stateProperty != STATE_PROPERTY_ADDED) {
+            if (stateProperty !== STATE_PROPERTY_ADDED) {
               $http.get(
                 stateDownloadUrl + '?v=' +
                 $scope.compareVersionMetadata.earlierVersion.versionNumber +

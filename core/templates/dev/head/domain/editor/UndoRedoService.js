@@ -62,7 +62,7 @@ var UndoRedoService = function() {
    * available.
    */
   UndoRedoService.undoChange = function(domainObject) {
-    if (_appliedChanges.length != 0) {
+    if (_appliedChanges.length !== 0) {
       var change = _appliedChanges.pop();
       _undoneChanges.push(change);
       _reverseChange(change, domainObject);
@@ -78,7 +78,7 @@ var UndoRedoService = function() {
    * available.
    */
   UndoRedoService.redoChange = function(domainObject) {
-    if (_undoneChanges.length != 0) {
+    if (_undoneChanges.length !== 0) {
       var change = _undoneChanges.pop();
       _appliedChanges.push(change);
       _applyChange(change, domainObject);
@@ -122,7 +122,7 @@ var UndoRedoService = function() {
    * Returns whether this service has any applied changes.
    */
   UndoRedoService.hasChanges = function() {
-    return _appliedChanges.length != 0;
+    return _appliedChanges.length !== 0;
   };
 
   /**
