@@ -2976,7 +2976,7 @@ md-card.preview-conversation-skin-supplemental-card {
   color: #ffffff;
   font-family: "Rubik, regular", "Roboto", Arial, sans-serif;
   padding-top: 0em;
-  padding-bottom: 2em;
+  padding-bottom: 1em;
 }
 
 @media (min-width: 630px) {
