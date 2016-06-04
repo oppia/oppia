@@ -1975,36 +1975,36 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
         self.assertEqual(cursor, expected_result_cursor)
         self.assertEqual(result, doc_ids)
 
-    def test_get_average_rating_from_exp_summary(self):
+    def test_get_average_rating(self):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
         exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
 
         self.assertEqual(
-            exp_services.get_average_rating_from_exp_summary(exp), 0)
+            exp_services.get_average_rating(exp.ratings), 0)
 
         rating_services.assign_rating_to_exploration(
             self.owner_id, self.EXP_ID, 5)
         self.assertEqual(
-            exp_services.get_average_rating_from_exp_summary(exp), 5)
+            exp_services.get_average_rating(exp.ratings), 5)
 
         rating_services.assign_rating_to_exploration(
             self.USER_ID_1, self.EXP_ID, 2)
 
         exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
         self.assertEqual(
-            exp_services.get_average_rating_from_exp_summary(exp), 3.5)
+            exp_services.get_average_rating(exp.ratings), 3.5)
 
     def test_get_lower_bound_wilson_rating_from_exp_summary(self):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
         exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
 
         self.assertEqual(
-            exp_services.get_scaled_average_rating_from_exp_summary(exp), 0)
+            exp_services.get_scaled_average_rating(exp.ratings), 0)
 
         rating_services.assign_rating_to_exploration(
             self.owner_id, self.EXP_ID, 5)
         self.assertAlmostEqual(
-            exp_services.get_scaled_average_rating_from_exp_summary(exp),
+            exp_services.get_scaled_average_rating(exp.ratings),
             1.8261731658956, places=4)
 
         rating_services.assign_rating_to_exploration(
@@ -2012,7 +2012,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
 
         exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
         self.assertAlmostEqual(
-            exp_services.get_scaled_average_rating_from_exp_summary(exp),
+            exp_services.get_scaled_average_rating(exp.ratings),
             2.056191454757, places=4)
 
 
@@ -2263,7 +2263,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             self.EXP_ID_2: exp_domain.ExplorationSummary(
                 self.EXP_ID_2, 'Exploration 2 Albert title',
                 'A category', 'An objective', 'en', [],
-                feconf.get_empty_ratings(),
+                feconf.get_empty_ratings(), feconf.EMPTY_SCALED_AVERAGE_RATING,
                 rights_manager.ACTIVITY_STATUS_PUBLIC,
                 False, [self.albert_id], [], [], [self.albert_id],
                 {self.albert_id: 1},
@@ -2277,7 +2277,8 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         self.assertEqual(actual_summaries.keys(),
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',
-                        'language_code', 'tags', 'ratings', 'status',
+                        'language_code', 'tags', 'ratings',
+                        'scaled_average_rating', 'status',
                         'community_owned', 'owner_ids',
                         'editor_ids', 'viewer_ids',
                         'contributor_ids', 'version',
@@ -2295,7 +2296,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             self.EXP_ID_1: exp_domain.ExplorationSummary(
                 self.EXP_ID_1, 'Exploration 1 title',
                 'A category', 'An objective', 'en', [],
-                feconf.get_empty_ratings(),
+                feconf.get_empty_ratings(), feconf.EMPTY_SCALED_AVERAGE_RATING,
                 rights_manager.ACTIVITY_STATUS_PRIVATE,
                 False, [self.albert_id], [], [], [self.albert_id, self.bob_id],
                 {self.albert_id: 1, self.bob_id: 1}, self.EXPECTED_VERSION_1,
@@ -2306,7 +2307,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             self.EXP_ID_2: exp_domain.ExplorationSummary(
                 self.EXP_ID_2, 'Exploration 2 Albert title',
                 'A category', 'An objective', 'en', [],
-                feconf.get_empty_ratings(),
+                feconf.get_empty_ratings(), feconf.EMPTY_SCALED_AVERAGE_RATING,
                 rights_manager.ACTIVITY_STATUS_PUBLIC,
                 False, [self.albert_id], [], [], [self.albert_id],
                 {self.albert_id: 1}, self.EXPECTED_VERSION_2,
