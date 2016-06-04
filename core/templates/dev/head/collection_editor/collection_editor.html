@@ -41,7 +41,8 @@
       display: inline-block;
       font-family: "Capriola", "Roboto", Arial, sans-serif;
       margin: 0;
-      padding-top: 25px;
+      padding-top: 15px;
+      padding-bottom: 15px;
     }
 
     .collection-editor-node-container, .collection-editor-node-connector-container{
@@ -84,8 +85,16 @@
                 </marker>
               </defs>
 
-              <line x1="0" y1="15" x2="35" y2="15" stroke="#88888A" stroke-width="2" marker-end="url(#arrow)" />
+              <line x1="0" y1="25" x2="35" y2="25" stroke="#88888A" stroke-width="2" marker-end="url(#arrow)" />
             </svg>
+          </div>
+
+          <div ng-if="!$first" class="collection-editor-node-shift-left">
+            <span style="float: left" class = "glyphicon glyphicon-arrow-left"></span>
+          </div>
+
+          <div ng-if="!$last" class="collection-editor-node-shift-right">
+            <span class = "glyphicon glyphicon-arrow-right"></span>
           </div>
         </div>
       </div>
