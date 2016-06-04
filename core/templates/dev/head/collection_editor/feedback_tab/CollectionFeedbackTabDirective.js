@@ -13,16 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for creating a list of skills (acquired and
- * pre-requisite skills) associated with a collection.
+ * @fileoverview Controller for the feedback tab of the collection editor.
  */
 
-oppia.directive('collectionSkillListDirective', [function() {
+oppia.directive('collectionFeedbackTab', [function() {
   return {
     restrict: 'E',
-    scope: {
-      getCollectionSkillList: '&collectionSkillList'
-    },
-    templateUrl: 'inline/collection_skill_list_directive'
+    templateUrl: 'inline/collection_feedback_tab_directive',
+    controller: [function() {}]
   };
 }]);

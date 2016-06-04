@@ -18,8 +18,6 @@
  */
 
 describe('MyExplorations controller', function() {
-  beforeEach(module('oppia'));
-
   describe('MyExplorations', function() {
     var scope, ctrl, $httpBackend;
     var explorationsList = [{
@@ -37,6 +35,8 @@ describe('MyExplorations controller', function() {
       status: 'publicized',
       title: 'Featured exploration'
     }];
+
+    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
     beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
       $httpBackend = _$httpBackend_;

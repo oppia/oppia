@@ -114,20 +114,17 @@
       <div ng-if="displayCheckboxes">
         <small class="pull-right">
           <span ng-if="notEnoughSelections">
-            Please select at least
-            <span ng-if="minAllowableSelectionCount > 1"><[minAllowableSelectionCount]></span>
-            <span ng-if="minAllowableSelectionCount == 1">one choice</span>.
+            <span translate="I18N_INTERACTIONS_ITEM_SELECTION_NOT_ENOUGH" translate-values="{minChoiceNumber:<[minAllowableSelectionCount]>}" translate-interpolation="messageformat"></span>
           </span>
 
           <span ng-if="preventAdditionalSelections">
-            At most <[maxAllowableSelectionCount]> choice<[maxAllowableSelectionCount !== 1 ? 's' : '']> may be selected.
+            <span translate="I18N_INTERACTIONS_ITEM_SELECTION_PREVENT_MORE" translate-values="{maxAllowableSelectionCount:<[maxAllowableSelectionCount]>}" translate-interpolation="messageformat">
           </span>
         </small>
 
         <md-button class="md-button-success"
                    ng-click="submitAnswer(userSelections)" aria-label="Submit"
-                   ng-disabled="notEnoughSelections">
-          Submit
+                   ng-disabled="notEnoughSelections" translate="I18N_INTERACTIONS_ITEM_SELECTION_SUBMIT">
         </md-button>
       </div>
     </form>

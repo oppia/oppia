@@ -1847,6 +1847,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             'skin_customizations': (
                 exp_domain.SkinInstance._get_default_skin_customizations()  # pylint: disable=protected-access
             ),
+            'language_code': 'en',
         })
 
 

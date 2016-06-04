@@ -85,6 +85,66 @@
         "targetDirPrefix": "angularjs-",
         "files": ["angular-mocks.js", "angular-scenario.js"]
       },
+      "angularTranslate": {
+        "version": "2.8.1",
+        "downloadFormat": "zip",
+        "url": "https://github.com/angular-translate/bower-angular-translate/archive/2.8.1.zip",
+        "rootDirPrefix": "bower-angular-translate-",
+        "targetDirPrefix": "bower-angular-translate-",
+        "bundle": {
+          "js": ["angular-translate.min.js"]
+        }
+      },
+      "angularTranslateLoader": {
+        "version": "2.8.1",
+        "downloadFormat": "zip",
+        "url": "https://github.com/angular-translate/bower-angular-translate-loader-static-files/archive/2.8.1.zip",
+        "rootDirPrefix": "bower-angular-translate-loader-static-files-",
+        "targetDirPrefix": "bower-angular-translate-loader-static-files-",
+        "bundle": {
+          "js": ["angular-translate-loader-static-files.min.js"]
+        }
+      },
+      "angularCookiesRev": {
+        "version": "1.4.0",
+        "downloadFormat": "zip",
+        "url": "https://github.com/angular/bower-angular-cookies/archive/v1.4.0.zip",
+        "rootDirPrefix": "bower-angular-cookies-",
+        "targetDirPrefix": "bower-angular-cookies-",
+        "bundle": {
+          "js": ["angular-cookies.min.js"]
+        }
+      },
+      "angularStorageCookiesRev": {
+        "version": "2.8.1",
+        "downloadFormat": "zip",
+        "url": "https://github.com/PascalPrecht/bower-angular-translate-storage-cookie/archive/2.8.1.zip",
+        "rootDirPrefix": "bower-angular-translate-storage-cookie-",
+        "targetDirPrefix": "bower-angular-translate-storage-cookie-",
+        "bundle": {
+          "js": ["angular-translate-storage-cookie.min.js"]
+        }
+      },
+      "messageFormat": {
+        "version": "0.3.1",
+        "downloadFormat": "zip",
+        "url": "https://github.com/SlexAxton/messageformat.js/archive/v0.3.1.zip",
+        "targetDirPrefix": "messageformat-",
+        "rootDirPrefix": "messageformat.js-",
+        "bundle": {
+          "js": ["messageformat.js"]
+        }
+      },
+      "angularTranslateInterpolationMessageFormat": {
+        "version": "2.11.0",
+        "downloadFormat": "zip",
+        "url": "https://github.com/angular-translate/bower-angular-translate-interpolation-messageformat/archive/2.11.0.zip",
+        "rootDirPrefix": "bower-angular-translate-interpolation-messageformat-",
+        "targetDirPrefix": "bower-angular-translate-interpolation-messageformat-",
+        "bundle": {
+          "js": ["angular-translate-interpolation-messageformat.min.js"]
+        }
+      },
       "angularToastr": {
         "version": "1.7.0",
         "downloadFormat": "zip",
@@ -106,6 +166,16 @@
           "css": ["css/bootstrap.css"],
           "fontsPath": "fonts",
           "js": ["js/bootstrap.js"]
+        }
+      },
+      "bowerAngularTranslateLoaderPartial": {
+        "version": "2.7.2",
+        "downloadFormat": "zip",
+        "url": "https://github.com/angular-translate/bower-angular-translate-loader-partial/archive/2.7.2.zip",
+        "rootDirPrefix": "bower-angular-translate-loader-partial-",
+        "targetDirPrefix": "bower-angular-translate-loader-partial-",
+        "bundle": {
+          "js": ["angular-translate-loader-partial.min.js"]
         }
       },
       "bowerMaterial": {

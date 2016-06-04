@@ -209,6 +209,9 @@ oppia.factory('oppiaPlayerService', [
       getExplorationVersion: function() {
         return version;
       },
+      getExplorationLanguageCode: function() {
+        return exploration.languageCode;
+      },
       getStateContentHtml: function(stateName) {
         return exploration.getUninterpolatedContentHtml(stateName);
       },

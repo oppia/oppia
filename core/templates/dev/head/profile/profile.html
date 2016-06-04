@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
-{% block subtitle %}
-  Profile
-{% endblock subtitle %}
+{% block maintitle %}
+  Profile - Oppia
+{% endblock maintitle %}
 
 {% block header_js %}
   {{ super() }}
@@ -33,8 +33,15 @@
   <div class="oppia-profile-container" ng-controller="Profile">
     <md-card class="oppia-profile-user-card">
 
-      <img ng-src="<[profilePictureDataUrl]>"
-           class="oppia-profile-picture-fullsize">
+      <div ng-if="profileIsOfCurrentUser">
+        <a href="/preferences"> 
+          <img ng-src="<[profilePictureDataUrl]>" class="oppia-profile-picture-fullsize"> 
+        </a>
+      </div>
+
+      <div ng-if="!profileIsOfCurrentUser">
+        <img ng-src="<[profilePictureDataUrl]>" class="oppia-profile-picture-fullsize">
+      </div>
 
       <h2 class="oppia-profile-username-large-screen">
         <span popover-placement="right" ng-attr-popover="<[usernameIsLong ? username.helpText : undefined]>"

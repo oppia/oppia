@@ -12,14 +12,14 @@
 
 <script type="text/ng-template" id="interaction/LogicProof">
   <div class="logic-proof-container">
-    <[questionString]>
+    <span translate="<[questionString]>" translate-values="<[questionStringData]>"></span>
     <div class="logic-proof-input-box">
       <div ui-codemirror="{onLoad: codeEditor}">
         <textarea ng-trim="false" rows="10"></textarea>
       </div>
     </div>
-    <button class="btn btn-default" ng-click="submitProof()">Submit</button>
-    <button class="btn btn-default" ng-click="showHelp()">Possible lines</button>
+    <button class="btn btn-default" ng-click="submitProof()" translate="I18N_INTERACTIONS_LOGIC_PROOF_SUBMIT"></button>
+    <button class="btn btn-default" ng-click="showHelp()" translate="I18N_INTERACTIONS_LOGIC_PROOF_POSSIBLE_LINES"></button>
     <p class="logic-proof-error-message"> <[errorMessage]>  </p>
   </div>
 
@@ -53,6 +53,6 @@
 </script>
 
 <script type="text/ng-template" id="shortResponse/LogicProof">
-  <span ng-if="answer.correct">Correct: <pre><[answer.displayed_proof[0] | truncateAtFirstLine]></pre></span>
-  <span ng-if="!answer.correct">Incorrect: <pre><[answer.displayed_proof[1] | truncateAtFirstLine]></pre></span>
+  <span ng-if="answer.correct" translate="I18N_INTERACTIONS_LOGIC_PROOF_CORRECT_ANSWERS" translate-values="{answer:'<pre><[answer.displayed_proof[0] | truncateAtFirstLine]></pre>'}" translate-compile></span>
+  <span ng-if="!answer.correct" translate="I18N_INTERACTIONS_LOGIC_PROOF_INCORRECT_ANSWERS" translate-values="{answer:'<pre><[answer.displayed_proof[1] | truncateAtFirstLine]></pre>'}" translate-compile></span>
 </script>

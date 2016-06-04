@@ -962,9 +962,7 @@ class EditorAutosaveHandler(ExplorationHandler):
                 exploration_id, self.user_id, change_list, version,
                 datetime.datetime.utcnow())
         except utils.ValidationError as e:
-            # If this exception is raised, let the user know that their changes
-            # have been auto discarded.
-            exp_services.discard_draft(exploration_id, self.user_id)
+            # We leave any pre-existing draft changes in the datastore.
             raise self.InvalidInputException(e)
 
         # If the value passed here is False, have the user discard the draft
