@@ -2260,8 +2260,7 @@ oppia.factory('autosaveInfoModalsService', [
           templateUrl: 'modals/saveValidationFail',
           backdrop: true,
           controller: [
-            '$scope', '$modalInstance',
-            function($scope, $modalInstance) {
+            '$scope', '$modalInstance', function($scope, $modalInstance) {
               $scope.close = function() {
                 $modalInstance.dismiss('cancel');
               };
@@ -2283,8 +2282,7 @@ oppia.factory('autosaveInfoModalsService', [
           templateUrl: 'modals/saveVersionMismatch',
           backdrop: true,
           controller: [
-            '$scope', '$modalInstance',
-            function($scope, $modalInstance) {
+            '$scope', '$modalInstance', function($scope, $modalInstance) {
               // When the user clicks on discard changes button, signal backend
               // to discard the draft and reload the page thereafter.
               $scope.discardChanges = function() {
