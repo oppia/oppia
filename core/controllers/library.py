@@ -52,7 +52,7 @@ def get_matching_activity_dicts(query_string, search_cursor):
 
     if len(activity_list) == feconf.DEFAULT_QUERY_LIMIT:
         logging.error(
-            '%s activities were fetched to load the gallery page. '
+            '%s activities were fetched to load the library page. '
             'You may be running up against the default query limits.'
             % feconf.DEFAULT_QUERY_LIMIT)
     return activity_list, new_search_cursor
@@ -62,6 +62,8 @@ class LibraryPage(base.BaseHandler):
     """The main library page. Used for both the default list of categories and
     for search results.
     """
+
+    PAGE_NAME_FOR_CSRF = 'library'
 
     def get(self):
         """Handles GET requests."""
@@ -85,6 +87,8 @@ class LibraryIndexHandler(base.BaseHandler):
         # TODO(sll): Support index pages for other language codes.
         summary_dicts_by_category = summary_services.get_library_groups([
             feconf.DEFAULT_LANGUAGE_CODE])
+        recently_published_summary_dicts = (
+            summary_services.get_recently_published_exploration_summary_dicts())
         top_rated_activity_summary_dicts = (
             summary_services.get_top_rated_exploration_summary_dicts(
                 [feconf.DEFAULT_LANGUAGE_CODE]))
@@ -97,6 +101,12 @@ class LibraryIndexHandler(base.BaseHandler):
             user_settings = user_services.get_user_settings(self.user_id)
             preferred_language_codes = user_settings.preferred_language_codes
 
+        if recently_published_summary_dicts:
+            summary_dicts_by_category.insert(0, {
+                'activity_summary_dicts': recently_published_summary_dicts,
+                'categories': [],
+                'header': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
+            })
         if top_rated_activity_summary_dicts:
             summary_dicts_by_category.insert(0, {
                 'activity_summary_dicts': top_rated_activity_summary_dicts,

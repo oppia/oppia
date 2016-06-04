@@ -49,7 +49,9 @@
             <h4 class="conversation-skin-responses-dropdown-container"
                 ng-click="toggleShowPreviousResponses()">
               <span class="conversation-skin-responses-dropdown-text">
-                Previous answers (<[activeCard.answerFeedbackPairs.length - (exploration.isInteractionInline(activeCard.stateName) ? 1 : 0)]>)
+                <span translate="I18N_PLAYER_PREVIOUS_RESPONSES"
+                      translate-values="{previousResponses: <[activeCard.answerFeedbackPairs.length - (exploration.isInteractionInline(activeCard.stateName) ? 1 : 0)]>}">
+                </span>
                 <span class="glyphicon glyphicon-play conversation-skin-responses-dropdown-icon"
                       ng-class="{'conversation-skin-responses-dropdown-icon-rotated': arePreviousResponsesShown}">
                 </span>
@@ -91,8 +93,8 @@
               <div ng-if="activeCard.destStateName && activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].oppiaFeedbackHtml && !helpCardHasContinueButton">
                 <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
                            focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
-                           ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)">
-                  Continue
+                           ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)"
+                           translate="I18N_PLAYER_CONTINUE_BUTTON">
                 </md-button>
               </div>
               <div ng-if="activeCard.interactionHtml && !activeCard.destStateName">
@@ -149,8 +151,8 @@
               focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
               ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)"
               ng-if="helpCardHasContinueButton"
-              style="margin-top: 12px;">
-            Continue to next card
+              style="margin-top: 12px;"
+              translate="I18N_PLAYER_CONTINUE_NEXT_CARD">
           </md-button>
         </div>
 
@@ -169,8 +171,7 @@
   <div ng-if="isOnTerminalCard() && isLoggedIn && !isInPreviewMode && !isIframed && isCurrentCardAtEndOfTranscript()"
        class="conversation-skin-final-ratings">
 
-    <div style="color: #eee; margin-bottom: 20px;">
-      Learned something new? How would you rate this exploration?
+    <div style="color: #eee; margin-bottom: 20px;" translate="I18N_PLAYER_RATE_EXPLORATION">
     </div>
     <div popover-placement="bottom" popover-template="'popover/feedback'" popover-trigger="click">
       <rating-display rating-value="userRating"
@@ -184,7 +185,8 @@
   <div ng-if="isOnTerminalCard() && !isIframed && isCurrentCardAtEndOfTranscript() &&
        recommendedExplorationSummaries.length > 0"
        class="conversation-skin-final-recommendations">
-    <span style="color: #eee;">Suggested next:</span>
+
+    <span style="color: #eee;" translate="I18N_PLAYER_RECOMMEND_EXPLORATIONS"></span>
 
     <div class="oppia-exp-summary-tiles-container" style="padding-top: 10px;">
       <exploration-summary-tile ng-repeat="exp in (recommendedExplorationSummaries|limitTo:3) track by $index"
@@ -201,6 +203,7 @@
                                 is-community-owned="exp.community_owned"
                                 ng-attr-open-in-new-window="<[isIframed ? 'true' : undefined]>">
       </exploration-summary-tile>
+
     </div>
   </div>
 

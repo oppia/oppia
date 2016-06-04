@@ -22,6 +22,7 @@ from core.domain import config_domain
 from core.domain import rights_manager
 from core.domain import summary_services
 from core.platform import models
+import feconf
 import utils
 
 current_user_services = models.Registry.import_current_user_services()
@@ -127,7 +128,15 @@ class CollectionEditorPage(CollectionEditorHandler):
             'title': collection.title,
             'can_unpublish': rights_manager.Actor(
                 self.user_id).can_unpublish(
-                    rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id)
+                    rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id),
+            'SHOW_COLLECTION_NAVIGATION_TAB_SETTINGS': (
+                feconf.SHOW_COLLECTION_NAVIGATION_TAB_SETTINGS),
+            'SHOW_COLLECTION_NAVIGATION_TAB_HISTORY': (
+                feconf.SHOW_COLLECTION_NAVIGATION_TAB_HISTORY),
+            'SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK': (
+                feconf.SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK),
+            'SHOW_COLLECTION_NAVIGATION_TAB_STATS': (
+                feconf.SHOW_COLLECTION_NAVIGATION_TAB_STATS)
         })
 
         self.render_template('collection_editor/collection_editor.html')

@@ -24,6 +24,7 @@ describe('Collection rights backend API service', function() {
   var $httpBackend = null;
 
   beforeEach(module('oppia'));
+  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
   beforeEach(inject(function($injector) {
     CollectionRightsBackendApiService = $injector.get(
