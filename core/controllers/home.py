@@ -141,20 +141,25 @@ class DashboardHandler(base.BaseHandler):
         if self.user_id is None:
             raise self.PageNotFoundException
 
-        subscribed_summaries = (
-            exp_services.get_exploration_summaries_matching_ids(
-                subscription_services.get_exploration_ids_subscribed_to(
-                    self.user_id)))
-
         def _get_intro_card_color(category):
             return (
                 feconf.CATEGORIES_TO_COLORS[category] if
                 category in feconf.CATEGORIES_TO_COLORS else
                 feconf.DEFAULT_COLOR)
 
-        explorations_list = []
+        subscribed_exploration_summaries = (
+            exp_services.get_exploration_summaries_matching_ids(
+                subscription_services.get_exploration_ids_subscribed_to(
+                    self.user_id)))
+        subscribed_collection_summaries = (
+            collection_services.get_collection_summaries_matching_ids(
+                subscription_services.get_collection_ids_subscribed_to(
+                    self.user_id)))
 
-        for exp_summary in subscribed_summaries:
+        explorations_list = []
+        collections_list = []
+
+        for exp_summary in subscribed_exploration_summaries:
             if exp_summary is None:
                 continue
 
@@ -190,8 +195,33 @@ class DashboardHandler(base.BaseHandler):
             key=lambda x: (x['num_open_threads'], x['last_updated']),
             reverse=True)
 
+        for collection_summary in subscribed_collection_summaries:
+            if collection_summary is None:
+                continue
+
+            collections_list.append({
+                'id': collection_summary.id,
+                'title': collection_summary.title,
+                'category': collection_summary.category,
+                'objective': collection_summary.objective,
+                'language_code': collection_summary.language_code,
+                'last_updated': utils.get_time_in_millisecs(
+                    collection_summary.collection_model_last_updated),
+                'created_on': utils.get_time_in_millisecs(
+                    collection_summary.collection_model_created_on),
+                'status': collection_summary.status,
+                'community_owned': collection_summary.community_owned,
+                'is_editable': True,
+                'thumbnail_icon_url': (
+                    utils.get_thumbnail_icon_url_for_category(
+                        collection_summary.category)),
+                'thumbnail_bg_color': utils.get_hex_color_for_category(
+                    collection_summary.category),
+            })
+
         self.values.update({
             'explorations_list': explorations_list,
+            'collections_list': collections_list,
         })
         self.render_json(self.values)
 

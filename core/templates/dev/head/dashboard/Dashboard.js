@@ -28,10 +28,16 @@ oppia.controller('Dashboard', [
     $scope.getLocaleAbbreviatedDatetimeString = (
       oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString);
 
+    $scope.activeTab = 'myExplorations';
+    $scope.setActiveTab = function(newActiveTabName) {
+      $scope.activeTab = newActiveTabName;
+    };
+
     $rootScope.loadingMessage = 'Loading';
     $http.get('/dashboardhandler/data').then(function(response) {
       var data = response.data;
       $scope.explorationsList = data.explorations_list;
+      $scope.collectionsList = data.collections_list;
       $rootScope.loadingMessage = '';
     });
   }
