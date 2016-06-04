@@ -150,10 +150,11 @@ def get_learner_collection_dict_by_id(
 
 def get_displayable_collection_summary_dicts_matching_ids(collection_ids):
     """Returns a list with all collection summary objects that can be
-    displayed on the gallery page as collection summary tiles.
+    displayed on the library page as collection summary tiles.
     """
-    collection_summaries = collection_services.get_collection_summaries_matching_ids( # pylint: disable=line-too-long
-        collection_ids)
+    collection_summaries = (
+        collection_services.get_collection_summaries_matching_ids(
+            collection_ids))
     return _get_displayable_collection_summary_dicts(collection_summaries)
 
 

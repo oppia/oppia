@@ -247,7 +247,7 @@
   "I18N_PLAYER_RATE_EXPLORATION": "Learned something new? How would you rate this exploration?",
   "I18N_PLAYER_CARD_NUMBER_TOOLTIP": "Card #",
   "I18N_PLAYER_RECOMMEND_EXPLORATIONS": "Suggested next:",
-  "I18N_PLAYER_RETURN_TO_GALLERY": "Return to gallery",
+  "I18N_PLAYER_RETURN_TO_LIBRARY": "Return to library",
   "I18N_PLAYER_RETURN_TO_EDITOR": "Return to editor",
   "I18N_PLAYER_RETURN_TO_COLLECTION": "Return to <[collectionTitle]>",
   "I18N_PLAYER_FORWARD": "Forward",
