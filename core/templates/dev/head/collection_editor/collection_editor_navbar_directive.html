@@ -7,15 +7,6 @@
       </a>
     </li>
 
-    <!-- Preview -->
-    {% if SHOW_COLLECTION_NAVIGATION_TAB_PREVIEW and username %}
-      <li id="tutorialPreviewTab" ng-class="{'active': getTabStatuses().active === 'preview'}">
-        <a href="#" tooltip="Preview" tooltip-placement="bottom" ng-click="selectPreviewTab()" class="protractor-test-preview-tab">
-          <span class="glyphicon glyphicon-play"></span>
-        </a>
-      </li>
-    {% endif %}
-
     <!-- Settings -->
     {% if SHOW_COLLECTION_NAVIGATION_TAB_SETTINGS %}
     <li ng-class="{'active': getTabStatuses().active === 'settings'}">

@@ -129,8 +129,6 @@ class CollectionEditorPage(CollectionEditorHandler):
             'can_unpublish': rights_manager.Actor(
                 self.user_id).can_unpublish(
                     rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id),
-            'SHOW_COLLECTION_NAVIGATION_TAB_PREVIEW': (
-                feconf.SHOW_COLLECTION_NAVIGATION_TAB_PREVIEW),
             'SHOW_COLLECTION_NAVIGATION_TAB_SETTINGS': (
                 feconf.SHOW_COLLECTION_NAVIGATION_TAB_SETTINGS),
             'SHOW_COLLECTION_NAVIGATION_TAB_HISTORY': (
