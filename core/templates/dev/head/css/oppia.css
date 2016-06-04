@@ -3130,7 +3130,7 @@ md-card.preview-conversation-skin-supplemental-card {
   background-color: #fff;
   cursor: pointer;
   display: inline-block;
-  height: 240px;
+  height: 258px;
   margin: 12px 4px;
   padding: 0;
   position: relative;
@@ -3167,7 +3167,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-activity-summary-tile .title-section {
-  height: 144px;
+  height: 162px;
   position: relative;
   width: 100%;
 }
@@ -3190,7 +3190,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-activity-summary-tile .exploration-summary-tile-mask {
   background-color: #eee;
-  height: 240px;
+  height: 258px;
   left: 0;
   opacity: 0.7;
   position: absolute;
@@ -3201,7 +3201,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-activity-summary-tile:hover .title-section-mask {
   background-color: #eee;
-  height: 144px;
+  height: 162px;
   left: 0;
   opacity: 0.4;
   position: absolute;
