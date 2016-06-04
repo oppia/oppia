@@ -251,17 +251,24 @@ oppia.factory('changeListService', [
     explorationChangeList.push(changeDict);
     undoneChangeStack = [];
 
+    // Send autosave request and check for error in response:
+    // If error is present -> Check for the type of error occurred
+    // (Display the corresponding modals in both cases, if not already opened):
+    // - Version Mismatch.
+    // - Non-strict Validation Fail.
     explorationData.autosaveChangeList(
       explorationChangeList,
       function(response) {
-        // Check for error in response:
-        // If error is present -> Check for the type of error occurred
-        // (Display the corresponding modals in both cases):
-        // 1. Non-strict Validation Fail.
-        // 2. Version Mismatch.
         if (!response.data.is_version_of_draft_valid) {
-          autosaveInfoModalsService.showVersionMismatchModal(
-            explorationChangeList);
+          if (!autosaveInfoModalsService.isVersionMismatchModalOpen()) {
+            autosaveInfoModalsService.showVersionMismatchModal(
+              explorationChangeList);
+          }
+        }
+      }, function(error) {
+        alertsService.clearWarnings();
+        if (!autosaveInfoModalsService.isNonStrictFailModalOpen()) {
+          autosaveInfoModalsService.showNonStrictValidationFailModal();
         }
       });
   };
@@ -402,7 +409,7 @@ oppia.factory('changeListService', [
      * Initializes the current changeList with the one received from backend.
      * This behavior exists only in case of an autosave.
      *
-     * @param {object} changeList - Autosaved changeList data (from backend)
+     * @param {object} changeList - Autosaved changeList data
      */
     loadAutosavedChangeList: function(changeList) {
       explorationChangeList = changeList;
@@ -2246,6 +2253,9 @@ oppia.factory('autosaveInfoModalsService', [
   '$modal', '$timeout', '$window', 'lostChangesService', 'explorationData',
   function(
     $modal, $timeout, $window, lostChangesService, explorationData) {
+    var _isNonStrictFailModalOpen = false;
+    var _isVersionMismatchModalOpen = false;
+
     return {
       showNonStrictValidationFailModal: function() {
         $modal.open({
@@ -2261,7 +2271,16 @@ oppia.factory('autosaveInfoModalsService', [
               };
             }
           ]
+        }).result.then(function() {
+          _isNonStrictFailModalOpen = false;
+        }, function() {
+          _isNonStrictFailModalOpen = false;
         });
+
+        _isNonStrictFailModalOpen = true;
+      },
+      isNonStrictFailModalOpen: function() {
+        return _isNonStrictFailModalOpen;
       },
       showVersionMismatchModal: function(lostChanges) {
         $modal.open({
@@ -2291,7 +2310,16 @@ oppia.factory('autosaveInfoModalsService', [
               }
             }
           ]
+        }).result.then(function() {
+          _isVersionMismatchModalOpen = false;
+        }, function() {
+          _isVersionMismatchModalOpen = false;
         });
+
+        _isVersionMismatchModalOpen = true;
+      },
+      isVersionMismatchModalOpen: function() {
+        return _isVersionMismatchModalOpen;
       }
     };
   }
