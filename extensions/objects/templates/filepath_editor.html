@@ -1,3 +1,4 @@
+<link href='http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css' rel='stylesheet' type='text/css'>
 <style>
   .filepath-editor-image-upload-reset-button {
     position: absolute;
@@ -22,12 +23,13 @@
         <[filepath]>
       </label>
     </div>
-    <img ng-if="localValue.label" ng-src="<[getPreviewUrl(localValue.label)]>"/>
+    <img ng-if="localValue.label" ng-src="<[getPreviewUrl(localValue.label)]>" id="target-image"/>
 
     <br><br>
     <button type="button" class="btn btn-default" ng-click="openImageUploader()">Upload a new image</button>
+    
   </div>
-
+  
   <div ng-if="imageUploaderIsActive" style="border: 1px solid black; padding: 5px;">
     <div class="oppia-warning">
       Before uploading any images, please ensure that they are compatible with the <a href="/about#license" target="_blank">license terms</a> of this site (the link opens in a new window).
@@ -50,9 +52,10 @@
         <span class="glyphicon glyphicon-remove"></span>
       </button>
 
-      <img ng-src="<[imagePreview]>" style="display: block; margin-left: auto; margin-right: auto;">
+      <img ng-src="<[imagePreview]>" style="display: block; margin-left: auto; margin-right: auto;" id="image">
     </div>
-
+    
+    
     <br>
     Choose a filename:
     <input type="text" ng-model="currentFilename" class="protractor-test-file-name">
@@ -60,4 +63,30 @@
     <button type="button" class="btn btn-success" ng-click="saveUploadedFile(currentFile, currentFilename)" ng-disabled="!currentFile || !currentFilename">Save</button>
     <button type="button" class="btn btn-default" ng-click="closeImageUploader()">Cancel</button>
   </div>
+
+  <div style="margin-top:20px;">
+    <div id="slider" style="width:200px;"></div>
+    <span id="infoSlider"></span>
+  </div>
+  <script>
+        var orginalWidth = $("#image").width();
+
+        $("#infoSlider").text(orginalWidth + ', 100%');
+
+        $("#slider").slider({
+            value: 0,
+            min: -50,
+            max: 50,
+            step: 10,
+            slide: function (event, ui) {
+                var fraction = (1 + ui.value / 100),
+                    newWidth = orginalWidth * fraction;
+  
+                $("#infoSlider").text(newWidth + ', ' + Math.floor(fraction * 100) + '%');
+
+                $("#image").width(newWidth);
+                $("#target-image").width(newWidth);
+          }
+      });
+  </script>
 </div>
