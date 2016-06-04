@@ -2278,7 +2278,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',
                         'language_code', 'tags', 'ratings',
-                        'scaled_average_rating','status',
+                        'scaled_average_rating', 'status',
                         'community_owned', 'owner_ids',
                         'editor_ids', 'viewer_ids',
                         'contributor_ids', 'version',
