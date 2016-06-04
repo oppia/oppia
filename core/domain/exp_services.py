@@ -1384,15 +1384,15 @@ def _should_index(exp):
     return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
 
 
-def get_average_rating(exp_summary_ratings):
+def get_average_rating(ratings):
     """Returns the average rating of the ratings as a float. If there are no
     ratings, it will return 0.
     """
     rating_weightings = {'1': 1, '2': 2, '3': 3, '4': 4, '5': 5}
-    if exp_summary_ratings:
+    if ratings:
         rating_sum = 0.0
         number_of_ratings = 0.0
-        for rating_value, rating_count in exp_summary_ratings.items():
+        for rating_value, rating_count in ratings.items():
             rating_sum += rating_weightings[rating_value] * rating_count
             number_of_ratings += rating_count
         if number_of_ratings > 0:
@@ -1400,16 +1400,16 @@ def get_average_rating(exp_summary_ratings):
     return 0
 
 
-def get_scaled_average_rating(exp_summary_ratings):
+def get_scaled_average_rating(ratings):
     """Returns the lower bound wilson score of the ratings as a float. If
     there are no ratings, it will return 0. The confidence of this result is
     95%.
     """
     # The following is the number of ratings.
-    n = sum(exp_summary_ratings.values())
+    n = sum(ratings.values())
     if n == 0:
         return 0
-    average_rating = get_average_rating(exp_summary_ratings)
+    average_rating = get_average_rating(ratings)
     z = 1.9599639715843482
     x = (average_rating - 1) / 4
     # The following calculates the lower bound Wilson Score as documented
