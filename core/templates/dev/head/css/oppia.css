@@ -2969,13 +2969,11 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-library-h1 {
   color: #033e39;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  padding-top: 0em;
 }
 
 .oppia-library-h2 {
   color: #ffffff;
   font-family: "Rubik, regular", "Roboto", Arial, sans-serif;
-  padding-top: 0em;
   padding-bottom: 1em;
 }
 
@@ -2985,8 +2983,8 @@ md-card.preview-conversation-skin-supplemental-card {
   }
   .oppia-library-h2 {
     font-size: 1.75em;
-    padding-top: 0px;
   }
+
 }
 @media (max-width: 629px) {
   .oppia-library-h1 {
@@ -2994,7 +2992,6 @@ md-card.preview-conversation-skin-supplemental-card {
   }
   .oppia-library-h2 {
     font-size: .85em;
-    padding-top: 0px;
   }
 }
 
