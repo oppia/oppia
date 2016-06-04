@@ -39,41 +39,13 @@
 
 {% block content %}
   <div ng-controller="CollectionEditor">
+    <!-- This directive needs to be moved to the navbar. -->
+    <collection-editor-save-publish collection="collection">
+    </collection-editor-save-publish>
+
     <div ng-if="getTabStatuses().active === 'main'">
       <collection-main-tab collection="collection" collection-skill-list="collectionSkillList">
       </collection-main-tab>
-
-      <!-- This entire div needs to be moved to the navbar. -->
-      <div>
-        <p>Current version: <em><[getCollection().getVersion()]></em></p>
-
-        <!-- A list of validation errors, if there are any -->
-        <div ng-if="validationIssues.length > 0">
-          <strong>Errors that must be addressed before saving:</strong>
-          <ul>
-            <li ng-repeat="issue in validationIssues"><[issue]></li>
-          </ul>
-        </div>
-
-        <!-- Collection changes to be commited -->
-        <h3>
-          <span ng-if="getChangeListCount() > 0">
-            <em>(<[getChangeListCount()]> changes pending)</em>
-          </span>
-        </h3>
-
-        <br>
-        <input ng-model="commitMessage" type="text" placeholder="Commit Message">
-        <button ng-click="saveCollection(commitMessage)" ng-disabled="validationIssues.length > 0">
-          Save Collection
-        </button>
-        <button ng-click="publishCollection()" ng-if="isPrivate">
-          Publish Collection
-        </button>
-        <button ng-click="unpublishCollection()" ng-if="!isPrivate && canUnpublish">
-          Unpublish Collection
-        </button>
-      </div>
     </div>
 
     <div ng-show="getTabStatuses().active === 'settings'">
@@ -99,6 +71,7 @@
 
   {% include 'collection_editor/collection_editor_navbar_breadcrumb_directive.html' %}
   {% include 'collection_editor/collection_editor_navbar_directive.html' %}
+  {% include 'collection_editor/collection_editor_save_publish_directive.html' %}
   {% include 'collection_editor/editor_tab/collection_main_tab_directive.html' %}
   {% include 'collection_editor/editor_tab/collection_node_creator_directive.html' %}
   {% include 'collection_editor/editor_tab/collection_node_editor_directive.html' %}
@@ -116,6 +89,7 @@
     {{ include_js_file('collection_editor/CollectionEditor.js') }}
     {{ include_js_file('collection_editor/CollectionEditorNavbarBreadcrumbDirective.js') }}
     {{ include_js_file('collection_editor/CollectionEditorNavbarDirective.js') }}
+    {{ include_js_file('collection_editor/CollectionEditorSavePublishDirective.js') }}
     {{ include_js_file('collection_editor/editor_tab/CollectionMainTabDirective.js') }}
     {{ include_js_file('collection_editor/editor_tab/CollectionNodeCreatorDirective.js') }}
     {{ include_js_file('collection_editor/editor_tab/CollectionNodeEditorDirective.js') }}
