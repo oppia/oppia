@@ -1638,6 +1638,7 @@ def create_or_update_draft(
     exp_user_data.draft_change_list_exp_version = exp_version
     exp_user_data.put()
 
+
 def get_exp_with_draft_applied(exp_id, user_id):
     """If a draft exists for the given user and exploration,
     apply it to the exploration."""
