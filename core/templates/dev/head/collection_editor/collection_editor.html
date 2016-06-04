@@ -43,37 +43,37 @@
       <collection-main-tab collection="collection" collection-skill-list="collectionSkillList">
       </collection-main-tab>
 
-      <!-- A list of validation errors, if there are any -->
-      <div ng-if="validationIssues.length > 0">
-        <strong>Errors that must be addressed before saving:</strong>
-        <ul>
-          <li ng-repeat="issue in validationIssues"><[issue]></li>
-        </ul>
+      <!-- This entire div needs to be moved to the navbar. -->
+      <div>
+        <p>Current version: <em><[getCollection().getVersion()]></em></p>
+
+        <!-- A list of validation errors, if there are any -->
+        <div ng-if="validationIssues.length > 0">
+          <strong>Errors that must be addressed before saving:</strong>
+          <ul>
+            <li ng-repeat="issue in validationIssues"><[issue]></li>
+          </ul>
+        </div>
+
+        <!-- Collection changes to be commited -->
+        <h3>
+          <span ng-if="getChangeListCount() > 0">
+            <em>(<[getChangeListCount()]> changes pending)</em>
+          </span>
+        </h3>
+
+        <br>
+        <input ng-model="commitMessage" type="text" placeholder="Commit Message">
+        <button ng-click="saveCollection(commitMessage)" ng-disabled="validationIssues.length > 0">
+          Save Collection
+        </button>
+        <button ng-click="publishCollection()" ng-if="isPrivate">
+          Publish Collection
+        </button>
+        <button ng-click="unpublishCollection()" ng-if="!isPrivate && canUnpublish">
+          Unpublish Collection
+        </button>
       </div>
-
-      <!-- Collection changes to be commited -->
-      <h3>
-        <span ng-if="getChangeListCount() > 0">
-          <em>(<[getChangeListCount()]> changes pending)</em>
-        </span>
-      </h3>
-
-      <br>
-      <input ng-model="commitMessage" type="text" placeholder="Commit Message">
-      <button ng-click="saveCollection(commitMessage)" ng-disabled="validationIssues.length > 0">
-        Save Collection
-      </button>
-      <button ng-click="publishCollection()" ng-if="isPrivate">
-        Publish Collection
-      </button>
-      <button ng-click="unpublishCollection()" ng-if="!isPrivate && canUnpublish">
-        Unpublish Collection
-      </button>
-
-      <hr>
-
-      <collection-node-creator collection="collection">
-      </collection-node-creator>
     </div>
 
     <div ng-show="getTabStatuses().active === 'settings'">

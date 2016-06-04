@@ -22,6 +22,8 @@ oppia.directive('collectionEditorNavbar', [function() {
     templateUrl: 'inline/collection_editor_navbar_directive',
     controller: ['$scope', 'routerService',
     function($scope, routerService) {
+      $scope.collectionId = GLOBALS.collectionId;
+
       $scope.getTabStatuses = routerService.getTabStatuses;
       $scope.selectMainTab = routerService.navigateToMainTab;
       $scope.selectPreviewTab = routerService.navigateToPreviewTab;
