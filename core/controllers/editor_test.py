@@ -19,8 +19,8 @@ import os
 import StringIO
 import zipfile
 
+from core.controllers import dashboard
 from core.controllers import editor
-from core.controllers import home
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -120,7 +120,7 @@ class EditorTest(BaseEditorControllerTest):
             response, token_type=feconf.CSRF_PAGE_NAME_CREATE_EXPLORATION)
         exp_id = self.post_json(
             feconf.NEW_EXPLORATION_URL, {}, csrf_token
-        )[home.EXPLORATION_ID_KEY]
+        )[dashboard.EXPLORATION_ID_KEY]
 
         response = self.testapp.get('/create/%s' % exp_id)
         csrf_token = self.get_csrf_token_from_response(response)

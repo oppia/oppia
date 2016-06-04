@@ -48,7 +48,7 @@ class NotificationsDashboardPage(base.BaseHandler):
                 'You do not have the credentials to access this page.')
         elif user_services.has_fully_registered(self.user_id):
             self.values.update({
-                'nav_mode': feconf.NAV_MODE_HOME,
+                'nav_mode': feconf.NAV_MODE_DASHBOARD,
             })
             self.render_template(
                 'dashboard/notifications_dashboard.html',
@@ -119,7 +119,7 @@ class DashboardPage(base.BaseHandler):
                 'You do not have the credentials to access this page.')
         elif user_services.has_fully_registered(self.user_id):
             self.values.update({
-                'nav_mode': feconf.NAV_MODE_HOME,
+                'nav_mode': feconf.NAV_MODE_DASHBOARD,
                 'can_create_collections': (
                     self.username in
                     config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value
@@ -247,20 +247,6 @@ class NotificationsHandler(base.BaseHandler):
         self.render_json({
             'num_unseen_notifications': num_unseen_notifications,
         })
-
-
-class SiteLanguageHandler(base.BaseHandler):
-    """Changes the preferred system language in the user's preferences."""
-
-    PAGE_NAME_FOR_CSRF = feconf.CSRF_PAGE_NAME_I18N
-
-    def put(self):
-        """Handles PUT requests."""
-        if user_services.has_fully_registered(self.user_id):
-            site_language_code = self.payload.get('site_language_code')
-            user_services.update_preferred_site_language_code(
-                self.user_id, site_language_code)
-        self.render_json({})
 
 
 class NewExploration(base.BaseHandler):

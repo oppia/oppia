@@ -14,7 +14,7 @@
 
 """Tests for the user notification dashboard and 'my explorations' pages."""
 
-from core.controllers import home
+from core.controllers import dashboard
 from core.domain import config_services
 from core.domain import feedback_domain
 from core.domain import feedback_services
@@ -261,40 +261,6 @@ class NotificationsDashboardHandlerTest(test_utils.GenericTestBase):
             self.assertNotIn('author_id', response['recent_notifications'][0])
 
 
-class SiteLanguageHandlerTests(test_utils.GenericTestBase):
-
-    def test_save_site_language_handler(self):
-        """Test the language is saved in the preferences when handler is called.
-        """
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        language_code = 'es'
-        self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/preferences')
-        self.assertEqual(response.status_int, 200)
-        csrf_token = self.get_csrf_token_from_response(response)
-        self.put_json('/preferenceshandler/data', {
-            'update_type': 'preferred_site_language_code',
-            'data': language_code,
-        }, csrf_token)
-
-        preferences = self.get_json('/preferenceshandler/data')
-        self.assertIsNotNone(preferences)
-        self.assertEqual(
-            preferences['preferred_site_language_code'], language_code)
-
-        self.logout()
-
-    def test_save_site_language_no_user(self):
-        """The SiteLanguageHandler handler can be called without a user."""
-        response = self.testapp.get(feconf.SPLASH_URL)
-        self.assertEqual(response.status_int, 200)
-        csrf_token = self.get_csrf_token_from_response(
-            response, token_type=feconf.CSRF_PAGE_NAME_I18N)
-        self.put_json(feconf.SITE_LANGUAGE_DATA_URL, {
-            'site_language_code': 'es',
-        }, csrf_token)
-
-
 class CreationButtonsTest(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -311,7 +277,7 @@ class CreationButtonsTest(test_utils.GenericTestBase):
             response, token_type=feconf.CSRF_PAGE_NAME_CREATE_EXPLORATION)
         exp_a_id = self.post_json(
             feconf.NEW_EXPLORATION_URL, {}, csrf_token
-        )[home.EXPLORATION_ID_KEY]
+        )[dashboard.EXPLORATION_ID_KEY]
         self.assertEqual(len(exp_a_id), 12)
 
         self.logout()
