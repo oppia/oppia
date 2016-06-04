@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
-{% block subtitle %}
-  Dashboard
-{% endblock subtitle %}
+{% block maintitle %}
+  Dashboard - Oppia
+{% endblock maintitle %}
 
 {% block navbar_breadcrumb %}
   <ul class="nav navbar-nav oppia-navbar-breadcrumb">
@@ -18,21 +18,6 @@
     }
   </style>
 {% endblock navbar_breadcrumb %}
-
-{% block local_top_nav_options %}
-  {% if can_create_collections %}
-    <ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak" ng-controller="CreateCollectionButton">
-      <li>
-        <div class="oppia-navbar-button-container" style="margin-right: 25px;">
-          <a class="btn oppia-navbar-button protractor-test-create-exploration oppia-transition-200"
-             ng-click="createNewCollection()" style="margin-right: 0;">
-            <span>Create Collection</span>
-          </a>
-        </div>
-      </li>
-    </ul>
-  {% endif %}
-{% endblock local_top_nav_options %}
 
 {% block content %}
   <div class="oppia-dashboard-container" ng-controller="MyExplorations">
@@ -152,6 +137,7 @@
     </div>
   </div>
 
+  {% include 'components/create_activity_modal.html' %}
   {% include 'components/upload_activity_modal.html' %}
 {% endblock %}
 

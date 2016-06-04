@@ -156,6 +156,12 @@ over
     the last DUPLICATE_EMAIL_INTERVAL_MINS.
     """
   ```
+- Never use backslashes to end a line. It's hard to tell whether they're escaping newlines, spaces, or something else. Use parentheses instead to break the line up, e.g.:
+
+ ```
+     my_variable = (
+         my_very_long_module_name.my_really_long_function_name())
+  ```
 
 JavaScript
 - We are moving away from using underscores as prefixes for variable names, so, in the future, use `var localVariable` and not `var _localVariable`. Instead, we are adopting the convention that anything declared using `var` is private to the controller/service/etc. If you want a variable to be accessible to the controller, declare it on $scope instead.

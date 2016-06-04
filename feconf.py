@@ -54,6 +54,10 @@ VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
 # The maximum number of results to retrieve in a datastore query.
 DEFAULT_QUERY_LIMIT = 1000
 
+# The maximum number of results to retrieve in a datastore query
+# for recently published explorations.
+RECENTLY_PUBLISHED_QUERY_LIMIT = 8
+
 # The current version of the exploration states blob schema. If any backward-
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
@@ -384,6 +388,7 @@ NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
+SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
 SPLASH_URL = '/splash'
@@ -532,6 +537,9 @@ LIBRARY_CATEGORY_FEATURED_EXPLORATIONS = 'Featured Explorations'
 # The header for the "Top Rated Explorations" category in the library index
 # page.
 LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = 'Top Rated Explorations'
+# The header for the "Recently Published" category in the library index
+# page.
+LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'Recently Published'
 
 # List of supported language codes. Each description has a
 # parenthetical part that may be stripped out to give a shorter
@@ -618,7 +626,12 @@ ALL_LANGUAGE_CODES = [{
 DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
 
+SUPPORTED_SITE_LANGUAGES = {
+    'en': 'English',
+    'es': 'Español'
+}
 SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 SYSTEM_USER_IDS = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 
 CSRF_PAGE_NAME_CREATE_EXPLORATION = 'create_exploration'
+CSRF_PAGE_NAME_I18N = 'i18n'

@@ -165,7 +165,8 @@ def get_exploration_summary_from_model(exp_summary_model):
         exp_summary_model.contributor_ids,
         exp_summary_model.contributors_summary, exp_summary_model.version,
         exp_summary_model.exploration_model_created_on,
-        exp_summary_model.exploration_model_last_updated
+        exp_summary_model.exploration_model_last_updated,
+        exp_summary_model.first_published_msec
     )
 
 
@@ -373,6 +374,13 @@ def get_featured_exploration_summaries():
     """
     return _get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_featured())
+
+def get_recently_published_exploration_summaries():
+    """Returns a dict with all featured exploration summary domain objects,
+    keyed by their id.
+    """
+    return _get_exploration_summaries_from_models(
+        exp_models.ExpSummaryModel.get_recently_published())
 
 
 def get_all_exploration_summaries():
@@ -1080,7 +1088,7 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
         _get_last_updated_by_human_ms(exploration.id) / 1000.0)
     exploration_model_created_on = exploration.created_on
-
+    first_published_msec = exp_rights.first_published_msec
     exp_summary = exp_domain.ExplorationSummary(
         exploration.id, exploration.title, exploration.category,
         exploration.objective, exploration.language_code,
@@ -1088,7 +1096,8 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
         exp_rights.community_owned, exp_rights.owner_ids,
         exp_rights.editor_ids, exp_rights.viewer_ids, contributor_ids,
         contributors_summary, exploration.version,
-        exploration_model_created_on, exploration_model_last_updated)
+        exploration_model_created_on, exploration_model_last_updated,
+        first_published_msec)
 
     return exp_summary
 
@@ -1141,7 +1150,9 @@ def save_exploration_summary(exp_summary):
         exploration_model_last_updated=(
             exp_summary.exploration_model_last_updated),
         exploration_model_created_on=(
-            exp_summary.exploration_model_created_on)
+            exp_summary.exploration_model_created_on),
+        first_published_msec=(
+            exp_summary.first_published_msec)
     )
 
     exp_summary_model.put()

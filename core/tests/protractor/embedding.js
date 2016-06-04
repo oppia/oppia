@@ -140,9 +140,44 @@ describe('Embedding', function() {
     });
 
     users.logout();
+    general.checkForConsoleErrors([]);
   });
 
-  afterEach(function() {
+  it('should use the exploration language as site language.', function() {
+    // Opens the test file and checks the placeholder in the exploration is
+    // correct.
+    var checkPlaceholder = function(expectedPlaceholder) {
+      var driver = browser.driver;
+      driver.get(
+        general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE +
+        'embedding_tests_dev_i18n_0.0.1.html');
+      browser.switchTo().frame(driver.findElement(by.xpath(
+          "//div[@class='protractor-test-embedded-exploration']/iframe")));
+      general.waitForSystem();
+      browser.waitForAngular();
+      expect(driver.findElement(by.css('.protractor-test-float-form-input'))
+          .getAttribute('placeholder')).toBe(expectedPlaceholder);
+      browser.switchTo().defaultContent();
+    };
+
+    users.createUser('embedder2@example.com', 'Embedder2');
+    users.login('embedder2@example.com', true);
+    admin.reloadExploration('protractor_test_1.yaml');
+
+    // Change language to Thai, which is not a supported site language.
+    general.openEditor('12');
+    editor.setLanguage('ภาษาไทย');
+    editor.saveChanges('Changing the language to a not supported one.');
+    // We expect the default language, English
+    checkPlaceholder('Type a number');
+
+    // Change language to Spanish, which is a supported site language.
+    general.openEditor('12');
+    editor.setLanguage('español');
+    editor.saveChanges('Changing the language to a supported one.');
+    checkPlaceholder('Ingresa un número');
+
+    users.logout();
     general.checkForConsoleErrors([]);
   });
 });
