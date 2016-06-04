@@ -92,10 +92,14 @@ for arg in "$@"; do
   # while in development environment
   if [ "$arg" == "--prod_env" ]; then
     MINIFICATION=true
-    $PYTHON_CMD -c "import os; os.environ['MINIFICATION']='True';"
     $PYTHON_CMD scripts/build.py
   fi
 done
+
+yaml_env_variable="MINIFICATION: $MINIFICATION"
+sed -i.bak -e s/"MINIFICATION: .*"/"$yaml_env_variable"/ app.yaml
+# Delete the modified yaml file(-i.bak)
+rm app.yaml.bak
 
 # Set up a local dev instance.
 # TODO(sll): do this in a new shell.

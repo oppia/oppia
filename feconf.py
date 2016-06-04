@@ -33,7 +33,9 @@ if PLATFORM == 'gae':
     DEV_MODE = (
         (not os.environ.get('SERVER_SOFTWARE')
          or os.environ['SERVER_SOFTWARE'].startswith('Development'))
-        and os.environ.get('MINIFICATION') is None)
+        # This should be string comparison, since all environment variables
+        # are converted to string
+        and os.environ.get('MINIFICATION') == 'False')
 else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
 
