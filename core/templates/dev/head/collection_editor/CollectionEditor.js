@@ -38,11 +38,12 @@ oppia.controller('CollectionEditor', [
     SkillListObjectFactory, CollectionValidationService,
     CollectionUpdateService, UndoRedoService, alertsService) {
     $scope.collection = null;
-    $scope.collectionId = GLOBALS.collectionId;
     $scope.collectionSkillList = SkillListObjectFactory.create([]);
     $scope.isPrivate = GLOBALS.isPrivate;
     $scope.canUnpublish = GLOBALS.canUnpublish;
     $scope.validationIssues = [];
+
+    var _collectionId = GLOBALS.collectionId;
 
     var _validateCollection = function() {
       if ($scope.isPrivate) {
@@ -65,7 +66,7 @@ oppia.controller('CollectionEditor', [
 
     // Load the collection to be edited.
     WritableCollectionBackendApiService.fetchWritableCollection(
-      $scope.collectionId).then(
+      _collectionId).then(
         _updateCollection, function(error) {
           alertsService.addWarning(
             error || 'There was an error when loading the collection.');
@@ -109,7 +110,7 @@ oppia.controller('CollectionEditor', [
       // TODO(bhenning): This also needs a confirmation of destructive action
       // since it is not reversible.
       CollectionRightsBackendApiService.setCollectionPublic(
-        $scope.collectionId, $scope.collection.getVersion()).then(
+        _collectionId, $scope.collection.getVersion()).then(
         function() {
           // TODO(bhenning): There should be a scope-level rights object used,
           // instead. The rights object should be loaded with the collection.
@@ -124,7 +125,7 @@ oppia.controller('CollectionEditor', [
     // and the user have access to the collection.
     $scope.unpublishCollection = function() {
       CollectionRightsBackendApiService.setCollectionPrivate(
-        $scope.collectionId, $scope.collection.getVersion()).then(
+        _collectionId, $scope.collection.getVersion()).then(
         function() {
           $scope.isPrivate = true;
         }, function() {
