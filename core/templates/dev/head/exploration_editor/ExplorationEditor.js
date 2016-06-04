@@ -91,7 +91,6 @@ oppia.controller('ExplorationEditor', [
     // page load.
     $scope.initExplorationPage = function(successCallback) {
       explorationData.getData().then(function(data) {
-
         explorationStatesService.init(data.states);
 
         explorationTitleService.init(data.title);
@@ -150,8 +149,8 @@ oppia.controller('ExplorationEditor', [
         if (data.draft_changes) {
           changeListService.loadAutosavedChangeList(data.draft_changes);
         }
-        // Show modal displaying lost changes
-        // if the version of draft changes is invalid.
+        // Show modal displaying lost changes if the version of draft changes is
+        // invalid.
         if (data.is_version_of_draft_valid === false) {
           autosaveInfoModalsService.showVersionMismatchModal(
             changeListService.getChangeList());

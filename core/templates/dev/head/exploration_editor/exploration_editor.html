@@ -447,7 +447,7 @@
 
         <div class="modal-body">
             <p>
-                Sorry someone else has saved a new version of this exploration and so your pending changes cannot be saved. The lost changes are displayed below:
+                Sorry someone else has saved a new version of this exploration and so your pending changes cannot be saved. The lost changes are displayed below. You may want to copy and paste these changes before discarding them.
             </p>
 
             <div class="lost-changes" ng-bind-html="lostChangesHtml">
@@ -456,7 +456,6 @@
 
         <div class="modal-footer">
             <button class="btn btn-default" ng-click="discardChanges()">Discard Changes</button>
-            <button class="btn btn-default" ng-click="cancel()">Cancel</button>
         </div>
     </script>
 
