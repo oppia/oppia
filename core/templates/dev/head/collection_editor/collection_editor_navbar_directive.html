@@ -8,13 +8,11 @@
     </li>
 
     <!-- Settings -->
-    {% if SHOW_COLLECTION_NAVIGATION_TAB_SETTINGS %}
     <li ng-class="{'active': getTabStatuses().active === 'settings'}">
       <a href="#" tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()" class="protractor-test-settings-tab">
         <span class="glyphicon glyphicon-cog"></span>
       </a>
     </li>
-    {% endif %}
 
     <!-- History -->
     {% if SHOW_COLLECTION_NAVIGATION_TAB_HISTORY %}

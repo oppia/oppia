@@ -76,13 +76,8 @@
       </collection-node-creator>
     </div>
 
-    <div ng-if="getTabStatuses().active === 'preview'">
-      <collection-preview-tab>
-      </collection-preview-tab>
-    </div>
-
     <div ng-show="getTabStatuses().active === 'settings'">
-      <collection-settings-tab>
+      <collection-settings-tab collection="collection">
       </collection-settings-tab>
     </div>
 
