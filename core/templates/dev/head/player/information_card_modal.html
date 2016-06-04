@@ -9,27 +9,27 @@
       <p ng-if="objective">
         <[objective | truncateAndCapitalize: 95]>
       </p>
-      <p ng-if="!objective">No objective specified.</p>
+      <p ng-if="!objective" translate="I18N_PLAYER_NO_OBJECTIVE">No objective specified.</p>
 
       <ul layout="row" class="card-metrics" layout-align="space-between center">
         <li class="protractor-test-info-card-rating">
-          <span class="fa fa-star fa-lg" tooltip="Average Rating" tooltip-placement="top"></span>
-          <span ng-if="!averageRating">Unrated</span>
+          <span class="fa fa-star fa-lg" tooltip="<['I18N_PLAYER_RATINGS_TOOLTIP' | translate]>" tooltip-placement="top"></span>
+          <span ng-if="!averageRating" translate="I18N_PLAYER_UNRATED">Unrated</span>
           <span ng-if="averageRating"><[averageRating | number:1]></span>
         </li>
 
         <li>
-          <span class="fa fa-eye fa-lg" tooltip="Views" tooltip-placement="top"></span>
+          <span class="fa fa-eye fa-lg" tooltip="<['I18N_PLAYER_VIEWS_TOOLTIP' | translate]>" tooltip-placement="top"></span>
           <[numViews | summarizeNonnegativeNumber]>
         </li>
 
         <li>
-          <span class="fa fa-clock-o fa-lg" tooltip="Last Updated" tooltip-placement="top"></span>
+          <span class="fa fa-clock-o fa-lg" tooltip="<['I18N_PLAYER_LAST_UPDATED_TOOLTIP' | translate]>" tooltip-placement="top"></span>
           <[lastUpdatedString]>
         </li>
 
         <ul layout="row" layout-align="space-between center" class="oppia-info-card-exploration-contributors-profile">
-          <i class="material-icons" tooltip="Contributors" tooltip-placement="top" style="cursor: default; margin-right: 5px;">&#xE7EF;</i>
+          <i class="material-icons" tooltip="<['I18N_PLAYER_CONTRIBUTORS_TOOLTIP' | translate]>" tooltip-placement="top" style="cursor: default; margin-right: 5px;">&#xE7EF;</i>
           <li ng-repeat="name in contributorNames| limitTo: 2"
             tooltip="<[name]>" tooltip-placement="top">
             <profile-link-image username="name">
@@ -41,7 +41,8 @@
             tooltip-placement="top">+<[contributorNames.length - 2]>
           </li>
           <li ng-if="contributorNames.length === 0"
-              tooltip="Community editable" tooltip-placement="top">
+              tooltip="<['I18N_PLAYER_COMMUNITY_EDITABLE_TOOLTIP' | translate]>"
+              tooltip-placement="top">
             <span class="fa fa-globe fa-lg oppia-info-card-community-editable-icon"></span>
           </li>
         </ul>
@@ -51,27 +52,28 @@
         <div flex="40">
           <md-content layout="row">
             <div class="oppia-info-card-tag-icon">
-              <span class="fa fa-tags fa-lg" tooltip-append-to-body="true" tooltip="Tags"
-                tooltip-placement="top">
+              <span class="fa fa-tags fa-lg" tooltip-append-to-body="true"
+                    tooltip="<['I18N_PLAYER_TAGS_TOOLTIP' | translate]>"
+                    tooltip-placement="top">
               </span>
             </div>
             <md-chips layout-align="center center">
               <md-chip ng-if="explorationTags.tagsInTooltip.length > 0" class="oppia-info-card-tooltip-more"
                 tooltip-append-to-body="true" tooltip="<[explorationTags.tagsInTooltip.join(', ')]>"
-                tooltip-placement="right">
-                <[explorationTags.tagsInTooltip.length]>+ more tags
+                tooltip-placement="right"
+                translate="I18N_PLAYER_PLUS_TAGS"
+                translate-values="{additionalTagNumber: <[explorationTags.tagsInTooltip.length]>}">
               </md-chip>
               <md-chip ng-if="explorationTags.tagsToShow.length > 0">
                 <[explorationTags.tagsToShow.join(", ")]>
               </md-chip>
               <md-chip ng-if="explorationTags.tagsToShow.length === 0 &&
                 explorationTags.tagsInTooltip.length === 0">
-                <span><em>No tags specified.</em></span>
+                <span><em translate="I18N_PLAYER_NO_TAGS"></em></span>
               <md-chip>
             </md-chips>
           </md-content>
         </div>
-
         <div flex="60">
           <sharing-links flex="45" layout-type="row" layout-align-type="end center"
                          twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER">

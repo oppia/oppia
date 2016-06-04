@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
 {% block maintitle %}
-  Oppia Editor
+  {% if title %}
+    {{ title }} - Oppia Editor
+  {% else %}
+    Untitled Exploration - Oppia Editor
+  {% endif %}
 {% endblock maintitle %}
-
-{% block subtitle %}
-  {{ title }}
-{% endblock subtitle %}
 
 {% block header_js %}
   {{ super() }}

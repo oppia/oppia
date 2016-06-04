@@ -42,6 +42,10 @@ class RatingServicesTests(test_utils.GenericTestBase):
             rating_services.get_overall_ratings_for_exploration(self.EXP_ID),
             {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0})
 
+        exp_summary = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+        self.assertEqual(
+            exp_summary.scaled_average_rating, 0)
+
         self.assertEqual(
             rating_services.get_user_specific_rating_for_exploration(
                 self.USER_ID_1, self.EXP_ID), None)
@@ -52,6 +56,10 @@ class RatingServicesTests(test_utils.GenericTestBase):
             self.USER_ID_2, self.EXP_ID, 4)
         rating_services.assign_rating_to_exploration(
             self.USER_ID_1, self.EXP_ID, 3)
+
+        exp_summary = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+        self.assertAlmostEqual(
+            exp_summary.scaled_average_rating, 1.5667471839848, places=4)
 
         self.assertEqual(
             rating_services.get_user_specific_rating_for_exploration(

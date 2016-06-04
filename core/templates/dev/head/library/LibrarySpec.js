@@ -26,6 +26,8 @@ describe('Library controller', function() {
       module('ui.bootstrap');
     });
 
+    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+
     beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
       $httpBackend = _$httpBackend_;
       $httpBackend.expectGET('/searchhandler/data').respond({

@@ -9,10 +9,10 @@
       can-delete-edge="canDeleteEdge"
       can-edit-edge-weight="canEditEdgeWeight">
     </graph-viz>
-    <md-button class="md-raised" ng-click="submitGraph()">Submit</md-button>
-    <md-button class="md-raised" ng-click="resetGraph()">Reset</md-button>
+    <md-button class="md-raised" ng-click="submitGraph()" translate="I18N_INTERACTIONS_GRAPH_SUBMIT_BUTTON"></md-button>
+    <md-button class="md-raised" ng-click="resetGraph()" translate="I18N_INTERACTIONS_GRAPH_RESET_BUTTON"></md-button>
     <span ng-show="errorMessage" style="color: red; margin-left: 30px;" aria-live="assertive">
-      <[errorMessage]>
+      <[errorMessage | translate]>
     </span>
   </div>
   <style>
@@ -87,7 +87,11 @@
 </script>
 
 <script type="text/ng-template" id="shortResponse/GraphInput">
-  <span><[graph.edges.length]> edge<span ng-if="graph.edges.length != 1">s</span> and <[graph.vertices.length]> <span ng-if="graph.vertices.length != 1">vertices</span><span ng-if="graph.vertices.length == 1">vertex</span></span>
+  <!-- TODO(mili) Replace this logic for the correct pluralize tool when there are more cases that justify the use of the library -->
+  <span translate="I18N_INTERACTIONS_GRAPH_RESPONSE_EDGES" translate-values="{edges: <[graph.edges.length]>}" ng-if="graph.edges.length != 1"></span>
+  <span translate="I18N_INTERACTIONS_GRAPH_RESPONSE_EDGE" translate-values="{edges: <[graph.edges.length]>}" ng-if="graph.edges.length == 1"></span>
+  <span translate="I18N_INTERACTIONS_GRAPH_RESPONSE_VERTICES" translate-values="{vertices: <[graph.vertices.length]>}" ng-if="graph.vertices.length != 1"></span>
+  <span translate="I18N_INTERACTIONS_GRAPH_RESPONSE_VERTEX" translate-values="{vertices: <[graph.vertices.length]>}" ng-if="graph.vertices.length == 1"></span>
 </script>
 
 <script type="text/ng-template" id="graphViz/graphVizSvg">
@@ -134,7 +138,7 @@
       </svg>
 
       <g ng-repeat="button in buttons">
-        <rect width="96"
+        <rect width="140"
           height="30"
           x="10"
           ng-attr-y="<[10 + 50 * $index]>"
@@ -148,8 +152,8 @@
         <text class="oppia-graph-button-label unselectable-text unclickable-text" x="18" ng-attr-y="<[32 + 50 * $index]>">
           <[button.text]>
         </text>
-        <text class="unselectable-text unclickable-text" x="68" ng-attr-y="<[30 + 50 * $index]>" text-anchor="middle">
-          <[button.description]>
+        <text class="unselectable-text unclickable-text" x="40" ng-attr-y="<[30 + 50 * $index]>" text-anchor="right">
+          <[button.description | translate]>
         </text>
       </g>
 
@@ -221,11 +225,11 @@
   <div style="float: right; height: 35px;">
     <div ng-if="state.selectedVertex !== null && graph.isLabeled && canEditVertexLabel">
       <input type="text" ng-model="selectedVertexLabelGetterSetter" ng-model-options="{getterSetter: true}" focus-on="vertexLabelEditBegun"></input>
-      <md-button class="md-raised" ng-click="state.selectedVertex = null;">Update Label</md-button>
+      <md-button class="md-raised" ng-click="state.selectedVertex = null;" translate="I18N_INTERACTIONS_GRAPH_UPDATE_LABEL"></md-button>
     </div>
     <div ng-if="state.selectedEdge !== null && graph.isWeighted && canEditEdgeWeight">
       <input type="number" ng-model="selectedEdgeWeight" ng-model-options="{getterSetter: true}" focus-on="edgeWeightEditBegun"></input>
-      <md-button class="md-raised" ng-click="state.selectedEdge = null;">Update Weight</md-button>
+      <md-button class="md-raised" ng-click="state.selectedEdge = null;" translate="I18N_INTERACTIONS_GRAPH_UPDATE_WEIGHT"></md-button>
     </div>
   </div>
 </script>

@@ -18,10 +18,10 @@
 
 oppia.controller('MyExplorations', [
   '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
-  'RatingComputationService', 'urlService', 'ExplorationCreationService',
+  'RatingComputationService', 'ExplorationCreationService',
   function(
       $scope, $http, $rootScope, oppiaDatetimeFormatter,
-      RatingComputationService, urlService, ExplorationCreationService) {
+      RatingComputationService, ExplorationCreationService) {
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
     $scope.createNewExploration = (
       ExplorationCreationService.createNewExploration);
@@ -33,19 +33,6 @@ oppia.controller('MyExplorations', [
       var data = response.data;
       $scope.explorationsList = data.explorations_list;
       $rootScope.loadingMessage = '';
-
-      if (data.username) {
-        if (urlService.getUrlParams().mode === 'create') {
-          $scope.createNewExploration();
-        }
-      }
     });
-  }
-]);
-
-oppia.controller('CreateCollectionButton', [
-  '$scope', 'CollectionCreationService',
-  function($scope, CollectionCreationService) {
-    $scope.createNewCollection = CollectionCreationService.createNewCollection;
   }
 ]);
