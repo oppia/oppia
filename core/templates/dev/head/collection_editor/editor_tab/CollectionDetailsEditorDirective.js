@@ -26,39 +26,70 @@ oppia.directive('collectionDetailsEditor', [function() {
     },
     templateUrl: 'inline/collection_details_editor_directive',
     controller: [
-        '$scope', 'CollectionUpdateService', 'alertsService',
-        function($scope, CollectionUpdateService, alertsService) {
-      $scope.updateCollectionTitle = function() {
-        if (!$scope.newCollectionTitle) {
-          alertsService.addWarning('Cannot set empty collection title.');
-          return;
-        }
-        var collection = $scope.getCollection();
-        CollectionUpdateService.setCollectionTitle(
-          collection, $scope.newCollectionTitle);
-        $scope.newCollectionTitle = '';
-      };
+        '$scope', 'CollectionUpdateService', 'alertsService', 'CATEGORY_LIST',
+        function(
+          $scope, CollectionUpdateService, alertsService, CATEGORY_LIST) {
+      $scope.hasPageLoaded = false;
+      $scope.CATEGORY_LIST_FOR_SELECT2 = CATEGORY_LIST.map(function(category) {
+        return {
+          id: category,
+          text: category
+        };
+      });
 
-      $scope.updateCollectionCategory = function() {
-        if (!$scope.newCollectionCategory) {
-          alertsService.addWarning('Cannot set empty collection category.');
+      $scope.$on('collectionLoaded', function() {
+        $scope.displayedCollectionTitle = $scope.getCollection().getTitle();
+        $scope.displayedCollectionObjective = (
+          $scope.getCollection().getObjective());
+        $scope.displayedCollectionCategory = (
+          $scope.getCollection().getCategory());
+
+        var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2.some(
+          function(categoryItem) {
+            return categoryItem.id === $scope.getCollection().getCategory();
+          }
+        );
+
+        // If the current category is not in the dropdown, add it as the first
+        // option.
+        if (!categoryIsInSelect2 && $scope.getCollection().getCategory()) {
+          $scope.CATEGORY_LIST_FOR_SELECT2.unshift({
+            id: $scope.getCollection().getCategory(),
+            text: $scope.getCollection().getCategory()
+          });
+        }
+
+        $scope.hasPageLoaded = true;
+      });
+
+      $scope.updateCollectionTitle = function() {
+        if (!$scope.displayedCollectionTitle) {
+          alertsService.addWarning(
+            'Please specify a title for the collection.');
           return;
         }
-        var collection = $scope.getCollection();
-        CollectionUpdateService.setCollectionCategory(
-          collection, $scope.newCollectionCategory);
-        $scope.newCollectionCategory = '';
+        CollectionUpdateService.setCollectionTitle(
+          $scope.getCollection(), $scope.displayedCollectionTitle);
       };
 
       $scope.updateCollectionObjective = function() {
-        if (!$scope.newCollectionObjective) {
-          alertsService.addWarning('Cannot set empty collection objective.');
+        if (!$scope.displayedCollectionObjective) {
+          alertsService.addWarning(
+            'Please specify a goal for the collection.');
           return;
         }
-        var collection = $scope.getCollection();
         CollectionUpdateService.setCollectionObjective(
-          collection, $scope.newCollectionObjective);
-        $scope.newCollectionObjective = '';
+          $scope.getCollection(), $scope.displayedCollectionObjective);
+      };
+
+      $scope.updateCollectionCategory = function() {
+        if (!$scope.displayedCollectionCategory) {
+          alertsService.addWarning(
+            'Please specify a category for the collection.');
+          return;
+        }
+        CollectionUpdateService.setCollectionCategory(
+          $scope.getCollection(), $scope.displayedCollectionCategory);
       };
     }]
   };

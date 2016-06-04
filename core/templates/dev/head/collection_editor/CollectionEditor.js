@@ -62,6 +62,8 @@ oppia.controller('CollectionEditor', [
         newBackendCollectionObject);
       $scope.collectionSkillList.setSkills(newBackendCollectionObject.skills);
       _validateCollection();
+
+      $scope.$broadcast('collectionLoaded');
     };
 
     // Load the collection to be edited.

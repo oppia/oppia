@@ -1,15 +1,43 @@
 <script type="text/ng-template" id="inline/collection_details_editor_directive">
-  <p>title: <[getCollection().getTitle()]> </p>
-  <p>category: <[getCollection().getCategory()]> </p>
-  <p>objective: <[getCollection().getObjective()]> </p>
-  <p>version: <em><[getCollection().getVersion()]></em></p>
+  <div role="form" class="form-horizontal">
+    <div class="form-group" ng-class="{'has-error': !displayedCollectionTitle}">
+      <label for="collectionTitle" class="col-lg-2 col-md-2 col-sm-2">Title</label>
+      <div class="col-lg-10 col-md-10 col-sm-10">
+        <input id="collectionTitle" type="text" class="form-control"
+               ng-model="displayedCollectionTitle"
+               ng-blur="updateCollectionTitle()"
+               placeholder="Choose a title for your collection.">
+      </div>
+    </div>
 
-  <br>
-  <input ng-model="newCollectionTitle" type="text" placeholder="New collection title"><button ng-click="updateCollectionTitle()">Set Collection Title</button>
-  <br>
-  <input ng-model="newCollectionCategory" type="text" placeholder="New collection category"><button ng-click="updateCollectionCategory()">Set Collection Category</button>
-  <br>
-  <input ng-model="newCollectionObjective" type="text" placeholder="New collection objective"><button ng-click="updateCollectionObjective()">Set Collection Objective</button>
-  <br>
-  <br>
+    <div class="form-group" ng-class="{'has-error': !displayedCollectionObjective}">
+      <label for="collectionObjective" class="col-lg-2 col-md-2 col-sm-2">Goal</label>
+      <div class="col-lg-10 col-md-10 col-sm-10">
+        <input id="collectionObjective" type="text" class="form-control"
+               ng-model="displayedCollectionObjective"
+               ng-blur="updateCollectionObjective()"
+               placeholder="Learn how to ...">
+        <span class="help-block" style="font-size: smaller">
+          What does this collection help people to do?
+        </span>
+      </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': !displayedCollectionCategory}">
+      <label for="collectionCategory" class="col-lg-2 col-md-2 col-sm-2">Category</label>
+      <div class="col-lg-10 col-md-10 col-sm-10">
+        <div ng-if="hasPageLoaded">
+          <select2-dropdown id="collectionCategory"
+                            item="$parent.displayedCollectionCategory"
+                            choices="CATEGORY_LIST_FOR_SELECT2"
+                            placeholder="Choose or type new"
+                            new-choice-regex="^[A-Z a-z]+$"
+                            on-selection-change="updateCollectionCategory()"
+                            width="100%"
+                            invalid-search-term-message="Invalid category name">
+          </select2-dropdown>
+        </div>
+      </div>
+    </div>
+  </div>
 </script>
