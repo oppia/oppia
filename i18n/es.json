@@ -208,7 +208,7 @@
   "I18N_PLAYER_RATE_EXPLORATION": "¿Has aprendido algo nuevo? ¿Cómo calificarías esta exploración?",
   "I18N_PLAYER_CARD_NUMBER_TOOLTIP": "Carta #",
   "I18N_PLAYER_RECOMMEND_EXPLORATIONS": "Otras exploraciones que tal vez te gusten",
-  "I18N_PLAYER_RETURN_TO_GALLERY": "Volver a la galería",
+  "I18N_PLAYER_RETURN_TO_LIBRARY": "Volver a la librería",
   "I18N_PLAYER_RETURN_TO_EDITOR": "Volver al editor",
   "I18N_PLAYER_RETURN_TO_COLLECTION": "Volver a <[collectionTitle]>",
   "I18N_PLAYER_FORWARD": "Forward",
