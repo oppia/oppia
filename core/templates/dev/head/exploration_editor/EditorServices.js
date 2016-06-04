@@ -37,17 +37,17 @@ oppia.factory('explorationData', [
       return {};
     }
 
-    var explorationUrl = '/create/' + explorationId;
     var explorationDataUrl = '/createhandler/data/' + explorationId;
     var resolvedAnswersUrlPrefix = (
       '/createhandler/resolved_answers/' + explorationId);
+    var explorationDraftAutosaveUrl = (
+      '/createhandler/autosave_draft/' + explorationId);
 
     // Put exploration variables here.
     var explorationData = {
       explorationId: explorationId,
-      autosaveChangeList: function(changeList) {
-        var draftAutosaveUrl = '/createhandler/autosave_draft/' + explorationId;
-        $http.put(draftAutosaveUrl, {
+      autosaveChangeList: function(changeList, successCallback, errorCallback) {
+        $http.put(explorationDraftAutosaveUrl, {
           change_list: changeList,
           version: explorationData.data.version
         }).then(function(response) {
@@ -61,8 +61,7 @@ oppia.factory('explorationData', [
         });
       },
       discardDraft: function(successCallback, errorCallback) {
-        var discardDraftUrl = '/createhandler/autosave_draft/' + explorationId;
-        $http.post(discardDraftUrl, {})
+        $http.post(explorationDraftAutosaveUrl, {})
           .then(function() {
             if (successCallback) {
               successCallback();
