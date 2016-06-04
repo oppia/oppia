@@ -318,7 +318,7 @@ class ExpSummaryModel(base_models.BaseModel):
     ratings = ndb.JsonProperty(default=None, indexed=False)
 
     # Scaled average rating for the exploration.
-    scaled_average_rating = ndb.FloatProperty()
+    scaled_average_rating = ndb.FloatProperty(indexed=True)
 
     # Time when the exploration model was last updated (not to be
     # confused with last_updated, which is the time when the

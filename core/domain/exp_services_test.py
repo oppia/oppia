@@ -1999,22 +1999,21 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
         exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
 
         self.assertEqual(
-            exp_services.get_scaled_average_rating(
-                exp.ratings), 0)
+            exp_services.get_scaled_average_rating(exp.ratings), 0)
 
         rating_services.assign_rating_to_exploration(
             self.owner_id, self.EXP_ID, 5)
         self.assertAlmostEqual(
-            exp_services.get_scaled_average_rating(
-                exp.ratings), 1.8261731658956, places=4)
+            exp_services.get_scaled_average_rating(exp.ratings),
+            1.8261731658956, places=4)
 
         rating_services.assign_rating_to_exploration(
             self.USER_ID_1, self.EXP_ID, 4)
 
         exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
         self.assertAlmostEqual(
-            exp_services.get_scaled_average_rating(
-                exp.ratings), 2.056191454757, places=4)
+            exp_services.get_scaled_average_rating(exp.ratings),
+            2.056191454757, places=4)
 
 
     def test_get_search_rank(self):
