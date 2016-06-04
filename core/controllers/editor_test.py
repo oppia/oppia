@@ -114,7 +114,7 @@ class EditorTest(BaseEditorControllerTest):
         """
         self.login(self.EDITOR_EMAIL)
 
-        response = self.testapp.get('/my_explorations')
+        response = self.testapp.get(feconf.DASHBOARD_URL)
         self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(
             response, token_type=feconf.CSRF_PAGE_NAME_CREATE_EXPLORATION)

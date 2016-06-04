@@ -13,10 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the page showing the user's explorations.
+ * @fileoverview Controllers for the creator dashboard.
  */
 
-oppia.controller('MyExplorations', [
+oppia.controller('Dashboard', [
   '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
   'RatingComputationService', 'ExplorationCreationService',
   function(
@@ -29,7 +29,7 @@ oppia.controller('MyExplorations', [
       oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString);
 
     $rootScope.loadingMessage = 'Loading';
-    $http.get('/myexplorationshandler/data').then(function(response) {
+    $http.get('/dashboardhandler/data').then(function(response) {
       var data = response.data;
       $scope.explorationsList = data.explorations_list;
       $rootScope.loadingMessage = '';

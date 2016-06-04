@@ -17,8 +17,8 @@
  * user's explorations.
  */
 
-describe('MyExplorations controller', function() {
-  describe('MyExplorations', function() {
+describe('Creator dashboard controller', function() {
+  describe('Dashboard', function() {
     var scope, ctrl, $httpBackend;
     var explorationsList = [{
       category: 'Private category',
@@ -40,11 +40,11 @@ describe('MyExplorations controller', function() {
 
     beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
       $httpBackend = _$httpBackend_;
-      $httpBackend.expectGET('/myexplorationshandler/data').respond({
+      $httpBackend.expectGET('/dashboardhandler/data').respond({
         explorations_list: explorationsList
       });
       scope = $rootScope.$new();
-      ctrl = $controller('MyExplorations', {
+      ctrl = $controller('Dashboard', {
         $scope: scope,
         alertsService: null
       });

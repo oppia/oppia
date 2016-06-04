@@ -106,8 +106,8 @@ class NotificationsDashboardHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class MyExplorationsPage(base.BaseHandler):
-    """Page showing the user's explorations."""
+class DashboardPage(base.BaseHandler):
+    """Page showing the user's creator dashboard."""
 
     PAGE_NAME_FOR_CSRF = 'dashboard'
     PAGE_HAS_CREATE_EXP_REQUEST = True
@@ -127,14 +127,14 @@ class MyExplorationsPage(base.BaseHandler):
                 'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
             })
             self.render_template(
-                'dashboard/my_explorations.html', redirect_url_on_logout='/')
+                'dashboard/dashboard.html', redirect_url_on_logout='/')
         else:
             self.redirect(utils.set_url_query_parameter(
-                feconf.SIGNUP_URL, 'return_url', '/my_explorations'))
+                feconf.SIGNUP_URL, 'return_url', feconf.DASHBOARD_URL))
 
 
-class MyExplorationsHandler(base.BaseHandler):
-    """Provides data for the user's explorations page."""
+class DashboardHandler(base.BaseHandler):
+    """Provides data for the user's creator dashboard page."""
 
     def get(self):
         """Handles GET requests."""

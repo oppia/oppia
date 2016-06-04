@@ -8,7 +8,7 @@
   <ul class="nav navbar-nav oppia-navbar-breadcrumb">
     <li>
       <span class="oppia-navbar-breadcrumb-separator"></span>
-      My Explorations
+      Creator Dashboard
     </li>
   </ul>
 
@@ -20,9 +20,9 @@
 {% endblock navbar_breadcrumb %}
 
 {% block content %}
-  <div class="oppia-dashboard-container" ng-controller="MyExplorations">
+  <div class="oppia-dashboard-container" ng-controller="Dashboard">
     <div ng-if="explorationsList.length > 0">
-      <h2 class="oppia-page-heading">My Explorations</h2>
+      <h2 class="oppia-page-heading">Creator Dashboard</h2>
 
       <ul class="oppia-dashboard-tiles">
         <li ng-repeat="exploration in explorationsList">
@@ -117,7 +117,7 @@
     </div>
 
     <div ng-if="explorationsList.length === 0">
-      <h2 style="margin-left: 52px;">My Explorations</h2>
+      <h2 style="margin-left: 52px;">Creator Dashboard</h2>
       <md-card layout="row" class="oppia-page-card oppia-dashboard-intro-card">
         <div>
           <p>
@@ -145,6 +145,6 @@
   {{ super() }}
   <script>
     {{ include_js_file('components/CollectionCreationService.js') }}
-    {{ include_js_file('dashboard/MyExplorations.js') }}
+    {{ include_js_file('dashboard/Dashboard.js') }}
   </script>
 {% endblock footer_js %}

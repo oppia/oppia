@@ -69,7 +69,7 @@ class HomePageRedirectHandler(base.BaseHandler):
     """
     def get(self):
         if self.user_id and user_services.has_fully_registered(self.user_id):
-            self.redirect(feconf.MY_EXPLORATIONS_URL)
+            self.redirect(feconf.DASHBOARD_URL)
         else:
             self.redirect(feconf.SPLASH_URL)
 
@@ -147,10 +147,10 @@ URLS = MAPREDUCE_HANDLERS + [
         home.NotificationsDashboardHandler,
         'notifications_dashboard_handler'),
     get_redirect_route(
-        r'/my_explorations', home.MyExplorationsPage, 'my_explorations_page'),
+        r'%s' % feconf.DASHBOARD_URL, home.DashboardPage, 'dashboard_page'),
     get_redirect_route(
-        r'/myexplorationshandler/data', home.MyExplorationsHandler,
-        'my_explorations_handler'),
+        r'%s' % feconf.DASHBOARD_DATA_URL, home.DashboardHandler,
+        'dashboard_handler'),
     get_redirect_route(
         r'%s' % feconf.SITE_LANGUAGE_DATA_URL,
         home.SiteLanguageHandler, 'save_site_language'),
