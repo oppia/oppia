@@ -1622,11 +1622,17 @@ def create_or_update_draft(
     The method assumes that a ExplorationUserDataModel object exists for the
     given user and exploration."""
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
-    if (exp_user_data.draft_change_list and
+    if (exp_user_data and exp_user_data.draft_change_list and
             exp_user_data.draft_change_list_last_updated > current_datetime):
         return
+
     updated_exploration = apply_change_list(exp_id, change_list)
     updated_exploration.validate(strict=False)
+
+    if exp_user_data is None:
+        exp_user_data = user_models.ExplorationUserDataModel.create(
+            user_id, exp_id)
+
     exp_user_data.draft_change_list = change_list
     exp_user_data.draft_change_list_last_updated = current_datetime
     exp_user_data.draft_change_list_exp_version = exp_version
