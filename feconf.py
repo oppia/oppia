@@ -55,6 +55,10 @@ VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
 DEFAULT_QUERY_LIMIT = 1000
 
 # The maximum number of results to retrieve in a datastore query
+# for top rated published explorations.
+NUMBER_OF_TOP_RATED_EXPLORATIONS = 8
+
+# The maximum number of results to retrieve in a datastore query
 # for recently published explorations.
 RECENTLY_PUBLISHED_QUERY_LIMIT = 8
 
@@ -156,6 +160,9 @@ INVALID_PARAMETER_NAMES = AUTOMATICALLY_SET_PARAMETER_NAMES + [
 _EMPTY_RATINGS = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
 def get_empty_ratings():
     return copy.deepcopy(_EMPTY_RATINGS)
+
+# Empty scaled average rating as a float.
+EMPTY_SCALED_AVERAGE_RATING = 0.0
 
 # Committer id for system actions.
 SYSTEM_COMMITTER_ID = 'admin'
