@@ -40,11 +40,12 @@ oppia.directive('createActivityButton', [function() {
         };
 
         $scope.showCreationChoiceModal = function() {
-          $scope.creationInProgress = true;
-          if (urlService.getPathname() !== '/my_explorations') {
-            $window.location.replace('/my_explorations?mode=create');
-          } else {
-            if ($('.oppia-create-activity-modal').length === 0) {
+          if (!$scope.creationInProgress) {
+            $scope.creationInProgress = true;
+            if (urlService.getPathname() !== '/my_explorations') {
+              $window.location.replace('/my_explorations?mode=create');
+              $scope.creationInProgress = true;
+            } else {
               $modal.open({
                 templateUrl: 'modals/createActivity',
                 backdrop: true,
@@ -69,8 +70,6 @@ oppia.directive('createActivityButton', [function() {
               }).result.then(function() {}, function() {
                 $scope.creationInProgress = false;
               });
-            } else {
-              $scope.creationInProgress = false;
             }
           }
         };
