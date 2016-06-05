@@ -6,7 +6,7 @@
 
         <button class="btn btn-default oppia-save-draft-button"
                 ng-class="{'btn-success': isCollectionSaveable()}"
-                ng-click="saveCollection('')"
+                ng-click="saveChanges()"
                 ng-disabled="!isCollectionSaveable()">
           <span ng-if="!isSaveInProgress()">
             <span ng-if="isPrivate">

@@ -88,6 +88,7 @@ oppia.factory('CollectionEditorStateService', [
           function(error) {
             alertsService.addWarning(
               error || 'There was an error when loading the collection.');
+            _isLoadingCollection = false;
           });
       },
 
@@ -159,6 +160,7 @@ oppia.factory('CollectionEditorStateService', [
           }, function(error) {
             alertsService.addWarning(
               error || 'There was an error when saving the collection.');
+            _isSavingCollection = false;
           });
         return true;
       },

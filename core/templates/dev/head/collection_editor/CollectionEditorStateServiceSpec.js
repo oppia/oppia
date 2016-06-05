@@ -20,6 +20,7 @@ describe('Collection editor state service', function() {
   var CollectionEditorStateService = null;
   var CollectionObjectFactory = null;
   var CollectionUpdateService = null;
+  var fakeWritableCollectionBackendApiService = null;
 
   // TODO(bhenning): Consider moving this to a more shareable location.
   var FakeWritableCollectionBackendApiService = function() {
@@ -42,12 +43,12 @@ describe('Collection editor state service', function() {
 
     return self;
   };
-  var fakeWritableCollectionBackendApiService = (
-    new FakeWritableCollectionBackendApiService());
 
   beforeEach(module('oppia'));
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
   beforeEach(module('oppia', function($provide) {
+    fakeWritableCollectionBackendApiService = (
+      new FakeWritableCollectionBackendApiService());
     $provide.value(
       'WritableCollectionBackendApiService',
       fakeWritableCollectionBackendApiService);
@@ -133,6 +134,18 @@ describe('Collection editor state service', function() {
 
   it('should track whether it is currently loading the collection', function() {
     expect(CollectionEditorStateService.isLoadingCollection()).toBe(false);
+
+    CollectionEditorStateService.loadCollection(5);
+    expect(CollectionEditorStateService.isLoadingCollection()).toBe(true);
+
+    $rootScope.$apply();
+    expect(CollectionEditorStateService.isLoadingCollection()).toBe(false);
+  });
+
+  it('should indicate a collection is no longer loading after an error',
+      function() {
+    expect(CollectionEditorStateService.isLoadingCollection()).toBe(false);
+    fakeWritableCollectionBackendApiService.failure = 'Internal 500 error';
 
     CollectionEditorStateService.loadCollection(5);
     expect(CollectionEditorStateService.isLoadingCollection()).toBe(true);
@@ -287,6 +300,23 @@ describe('Collection editor state service', function() {
     $rootScope.$apply();
 
     expect(CollectionEditorStateService.isSavingCollection()).toBe(false);
+    CollectionEditorStateService.saveCollection('Commit message');
+    expect(CollectionEditorStateService.isSavingCollection()).toBe(true);
+
+    $rootScope.$apply();
+    expect(CollectionEditorStateService.isSavingCollection()).toBe(false);
+  });
+
+  it('should indicate a collection is no longer saving after an error',
+      function() {
+    CollectionEditorStateService.loadCollection(5);
+    CollectionUpdateService.setCollectionTitle(
+      CollectionEditorStateService.getCollection(), 'New title');
+    $rootScope.$apply();
+
+    expect(CollectionEditorStateService.isSavingCollection()).toBe(false);
+    fakeWritableCollectionBackendApiService.failure = 'Internal 500 error';
+
     CollectionEditorStateService.saveCollection('Commit message');
     expect(CollectionEditorStateService.isSavingCollection()).toBe(true);
 

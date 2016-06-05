@@ -22,15 +22,17 @@ oppia.directive('collectionEditorSavePublish', [function() {
     restrict: 'E',
     templateUrl: 'inline/collection_editor_save_publish_directive',
     controller: [
-      '$scope', '$modal', 'UndoRedoService', 'CollectionEditorStateService',
-      'CollectionValidationService', 'CollectionRightsBackendApiService',
+      '$scope', '$modal', 'alertsService', 'UndoRedoService',
+      'CollectionEditorStateService', 'CollectionValidationService',
+      'CollectionRightsBackendApiService',
       'WritableCollectionBackendApiService',
       'COLLECTION_EDITOR_INITIALIZED_COLLECTION',
       'COLLECTION_EDITOR_UPDATED_COLLECTION',
       'UNDO_REDO_SERVICE_CHANGE_APPLIED',
       function(
-          $scope, $modal, UndoRedoService, CollectionEditorStateService,
-          CollectionValidationService, CollectionRightsBackendApiService,
+          $scope, $modal, alertsService, UndoRedoService,
+          CollectionEditorStateService, CollectionValidationService,
+          CollectionRightsBackendApiService,
           WritableCollectionBackendApiService,
           COLLECTION_EDITOR_INITIALIZED_COLLECTION,
           COLLECTION_EDITOR_UPDATED_COLLECTION,
@@ -79,10 +81,32 @@ oppia.directive('collectionEditorSavePublish', [function() {
             $scope.validationIssues.length === 0);
         };
 
-        // An explicit save is needed to push all changes to the backend at once
-        // because some likely working states of the collection will cause
-        // validation errors when trying to incrementally save them.
-        $scope.saveCollection = CollectionEditorStateService.saveCollection;
+        $scope.saveChanges = function() {
+          var isPrivate = $scope.isPrivate;
+          var modalInstance = $modal.open({
+            templateUrl: 'modals/saveCollection',
+            backdrop: true,
+            controller: [
+              '$scope', '$modalInstance', function($scope, $modalInstance) {
+                $scope.isCollectionPrivate = isPrivate;
+
+                $scope.save = function(commitMessage) {
+                  $modalInstance.close(commitMessage);
+                };
+                $scope.cancel = function() {
+                  $modalInstance.dismiss('cancel');
+                };
+              }
+            ]
+          });
+
+          modalInstance.result.then(function(commitMessage) {
+            // An explicit save is needed to push all changes to the backend at
+            // once because some likely working states of the collection will
+            // cause validation errors when trying to incrementally save them.
+            CollectionEditorStateService.saveCollection(commitMessage);
+          });
+        };
 
         $scope.publishCollection = function() {
           // TODO(bhenning): This also needs a confirmation of destructive

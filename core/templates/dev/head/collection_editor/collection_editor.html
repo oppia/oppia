@@ -39,7 +39,7 @@
 
 {% block content %}
   <div ng-controller="CollectionEditor">
-    <!-- This directive needs to be moved to the navbar. -->
+    {# TODO(bhenning): This directive needs to be moved to the navbar. #}
     <collection-editor-save-publish></collection-editor-save-publish>
 
     <div ng-if="getTabStatuses().active === 'main'">
@@ -66,6 +66,7 @@
   {% include 'collection_editor/collection_editor_navbar_breadcrumb_directive.html' %}
   {% include 'collection_editor/collection_editor_navbar_directive.html' %}
   {% include 'collection_editor/collection_editor_save_publish_directive.html' %}
+  {% include 'collection_editor/collection_editor_save_publish_modal.html' %}
   {% include 'collection_editor/editor_tab/collection_main_tab_directive.html' %}
   {% include 'collection_editor/editor_tab/collection_node_creator_directive.html' %}
   {% include 'collection_editor/editor_tab/collection_node_editor_directive.html' %}
