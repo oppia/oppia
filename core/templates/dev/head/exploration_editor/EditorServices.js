@@ -2078,7 +2078,7 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
   };
 
   var makeHumanReadable = function(lostChanges) {
-    var outerHtml = angular.element('<ul><ul>');
+    var outerHtml = angular.element('<ul></ul>');
     var stateWiseEditsMapping = {};
     // The variable stateWiseEditsMapping stores the edits grouped by state.
     // For instance, you made the following edits:
@@ -2232,7 +2232,7 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
                 defaultOutcomeHtml += (
                   '<p><i>Destination: </i>' + newValue.dest + '</p>');
                 defaultOutcomeHtml += (
-                  '<p>Feedback: </i>' + newValue.feedback + '</p>');
+                  '<p><i>Feedback: </i>' + newValue.feedback + '</p>');
                 stateWiseEditsMapping[stateName].push(
                   angular.element('<div>Added default outcome: </div>')
                     .append(defaultOutcomeHtml)
