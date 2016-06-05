@@ -23,13 +23,15 @@ oppia.directive('collectionNodeCreator', [function() {
     controller: [
       '$scope', '$http', '$window', '$filter', 'alertsService',
       'validatorsService', 'CollectionEditorStateService',
-      'CollectionUpdateService', 'CollectionNodeObjectFactory',
-      'ExplorationSummaryBackendApiService', 'siteAnalyticsService',
+      'CollectionLinearizerService', 'CollectionUpdateService',
+      'CollectionNodeObjectFactory', 'ExplorationSummaryBackendApiService',
+      'siteAnalyticsService',
       function(
           $scope, $http, $window, $filter, alertsService,
           validatorsService, CollectionEditorStateService,
-          CollectionUpdateService, CollectionNodeObjectFactory,
-          ExplorationSummaryBackendApiService, siteAnalyticsService) {
+          CollectionLinearizerService, CollectionUpdateService,
+          CollectionNodeObjectFactory, ExplorationSummaryBackendApiService,
+          siteAnalyticsService) {
         $scope.collection = CollectionEditorStateService.getCollection();
         $scope.newExplorationId = '';
         $scope.newExplorationTitle = '';
@@ -55,7 +57,7 @@ oppia.directive('collectionNodeCreator', [function() {
                 summaryBackendObject = summaries[0];
               }
               if (summaryBackendObject) {
-                CollectionUpdateService.addCollectionNode(
+                CollectionLinearizerService.appendCollectionNode(
                   $scope.collection, newExplorationId, summaryBackendObject);
               } else {
                 alertsService.addWarning(

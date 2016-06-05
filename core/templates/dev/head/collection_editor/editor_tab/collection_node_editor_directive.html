@@ -1,40 +1,37 @@
 <script type="text/ng-template" id="inline/collection_node_editor_directive">
-  <div>
-    <a ng-href="/create/<[getCollectionNode().getExplorationId()]>" target="_blank">
-      <span ng-if="getCollectionNode().getExplorationTitle()">
-        <[getCollectionNode().getExplorationTitle()]>
-      </span>
-      <span ng-if="!getCollectionNode().getExplorationTitle()">
-        <em>Untitled Exploration</em>
-      </span>
-    </a>
-    <button ng-click="deleteCollectionNode()">Delete</button>
+  <div class="collection-editor-node-title">
+    <[getCollectionNode().getExplorationTitle()]>
+    <span ng-click="deleteNode()" class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
   </div>
-  <p> Prerequisite skills: </p>
-  <div ng-if="getCollectionNode().getPrerequisiteSkillList().getSkillCount() > 0">
-    <ul>
-      <li ng-repeat="skill in getCollectionNode().getPrerequisiteSkillList().getBindableSkills() track by $index">
-        <em><[skill]></em>
-        <button ng-click="removePrerequisiteSkill($index)">Delete</button>
-      </li>
-    </ul>
-  </div>
-  <input ng-model="prerequisiteSkillName" type="text" placeholder="Skill name">
-  <button ng-click="addNewPrerequisiteSkill()">Add Prerequisite Skill for Exploration</button>
-  <br>
-
-  <p> Acquired skills: </p>
-  <div ng-if="getCollectionNode().getAcquiredSkillList().getSkillCount() > 0">
-    <ul>
-      <li ng-repeat="skill in getCollectionNode().getAcquiredSkillList().getBindableSkills() track by $index">
-        <em><[skill]></em>
-        <button ng-click="removeAcquiredSkill($index)">Delete</button>
-      </li>
-    </ul>
-  </div>
-  <input ng-model="acquiredSkillName" type="text" placeholder="Skill name">
-  <button ng-click="addNewAcquiredSkill()">Add Acquired Skill for Exploration</button>
-  <br>
-  <br>
-  <br>
+  <span ng-click="shiftNodeLeft()" ng-if="getLinearIndex() > 0" class="glyphicon shift-left-arrow" arria-hidden="true">&lt;</span>
+  <span ng-click="shiftNodeRight()" ng-if="getLinearIndex() < collection.getCollectionNodeCount() - 1" class="glyphicon shift-right-arrow" arria-hidden="true">&gt;</span>
 </script>
+
+<style>
+  .glyphicon-remove-circle {
+    color: #EF5350;
+    top: -15px;
+    left: 5px;
+  }
+  .shift-left-arrow {
+    color: #000;
+    opacity: 0.7;
+    top: 15px;
+    float: left;
+  }
+  .shift-right-arrow {
+    color: #000;
+    opacity: 0.7;
+    top: 15px;
+    float: right;
+  }
+
+  .collection-editor-node-title {
+    padding-left: 16px;
+  }
+
+  /* TODO(mgowano): Implement horizontal scrolling using Javascript. */
+  body {
+    overflow-x: auto;
+  }
+</style>
