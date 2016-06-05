@@ -145,15 +145,17 @@ oppia.controller('ExplorationEditor', [
 
         explorationWarningsService.updateWarnings();
 
-        // Initialize changeList by the one received from the backend.
-        if (data.draft_changes) {
-          changeListService.loadAutosavedChangeList(data.draft_changes);
-        }
-        // Show modal displaying lost changes if the version of draft changes is
-        // invalid.
         if (data.is_version_of_draft_valid === false) {
-          autosaveInfoModalsService.showVersionMismatchModal(
-            changeListService.getChangeList());
+          if (data.draft_changes) {
+            // Initialize changeList by the one received from the backend.
+            changeListService.loadAutosavedChangeList(data.draft_changes);
+
+            // Show modal displaying lost changes if the version of draft
+            // changes is invalid, and draft_changes is not `null`.
+            autosaveInfoModalsService.showVersionMismatchModal(
+              changeListService.getChangeList());
+          }
+          return;
         }
 
         $scope.$broadcast('refreshStatisticsTab');

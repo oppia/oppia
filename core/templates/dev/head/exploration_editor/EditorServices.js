@@ -2191,15 +2191,15 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
               } else if (answerGroupChanges === 'edited') {
                 if (newValue.outcome.dest !== oldValue.outcome.dest) {
                   answerGroupHtml += (
-                    '<p class="sub-edit"><i>Destination: ' +
-                      newValue.outcome.dest + '</i></p>');
+                    '<p class="sub-edit"><i>Destination: </i>' +
+                      newValue.outcome.dest + '</p>');
                 }
                 if (!angular.equals(
                     newValue.outcome.feedback, oldValue.outcome.feedback)) {
                   answerGroupHtml += (
                     '<div class="sub-edit"><i>Feedback: </i>' +
-                      '<div class="feedback">' +
-                      newValue.outcome.feedback + '</div></div>');
+                      '<div class="feedback">' + newValue.outcome.feedback +
+                      '</div></div>');
                 }
                 if (!angular.equals(newValue.rule_specs, oldValue.rule_specs)) {
                   var rulesList = makeRulesListHumanReadable(newValue);
@@ -2230,9 +2230,12 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
               var defaultOutcomeHtml = '';
               if (defaultOutcomeChanges === 'added') {
                 defaultOutcomeHtml += (
-                  '<p><i>Destination: </i>' + newValue.dest + '</p>');
+                  '<p class="sub-edit"><i>Destination: </i>' +
+                    newValue.dest + '</p>');
                 defaultOutcomeHtml += (
-                  '<p><i>Feedback: </i>' + newValue.feedback + '</p>');
+                  '<div class="sub-edit"><i>Feedback: </i>' +
+                    '<div class="feedback">' + newValue.feedback +
+                    '</div></div>');
                 stateWiseEditsMapping[stateName].push(
                   angular.element('<div>Added default outcome: </div>')
                     .append(defaultOutcomeHtml)
@@ -2240,11 +2243,14 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
               } else if (defaultOutcomeChanges === 'edited') {
                 if (newValue.dest !== oldValue.dest) {
                   defaultOutcomeHtml += (
-                    '<p><i>Destination: </i>' + newValue.dest + '</p>');
+                    '<p class="sub-edit"><i>Destination: </i>' + newValue.dest +
+                      '</p>');
                 }
                 if (!angular.equals(newValue.feedback, oldValue.feedback)) {
                   defaultOutcomeHtml += (
-                    '<p><i>Feedback: </i>' + newValue.feedback + '</p>');
+                    '<div class="sub-edit"><i>Feedback: </i>' +
+                      '<div class="feedback">' + newValue.feedback +
+                      '</div></div>');
                 }
                 stateWiseEditsMapping[stateName].push(
                   angular.element('<div>Edited default outcome: </div>')
@@ -2325,12 +2331,13 @@ oppia.factory('autosaveInfoModalsService', [
                 _refreshPage(500);
               });
             };
-            $scope.isLostChanges = !!lostChanges;
+            $scope.isLostChanges = lostChanges && lostChanges.length > 0;
             if ($scope.isLostChanges) {
               $scope.lostChangesHtml = (
                 lostChangesService.makeHumanReadable(lostChanges).html());
             }
-          }]
+          }],
+          windowClass: 'oppia-autosave-version-mismatch-modal'
         }).result.then(function() {
           _isModalOpen = false;
         }, function() {
