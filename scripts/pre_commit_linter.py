@@ -131,6 +131,11 @@ from pylint import lint  # pylint: disable=wrong-import-position
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
 
+# This is the number of processes that will be allowed to run in parallel,
+# please note that this setting applies locally ONLY. On Travis, the linting
+# processes will run sequentially.
+CONCURRENT_PROCESS_LIMIT = 2
+
 
 def _get_changed_filenames():
     """Returns a list of modified files (both staged and unstaged)
@@ -335,23 +340,36 @@ def _pre_commit_linter(all_files):
         filename for filename in all_files if filename.endswith('.py')]
 
     js_result = multiprocessing.Queue()
-    linting_processes = []
+    linting_processes_queue = []
     js_stdout = multiprocessing.Queue()
-    linting_processes.append(multiprocessing.Process(
+    linting_processes_queue.append(multiprocessing.Process(
         target=_lint_js_files, args=(node_path, jscs_path, config_jscsrc,
                                      js_files_to_lint, js_stdout, js_result)))
 
     py_result = multiprocessing.Queue()
-    linting_processes.append(multiprocessing.Process(
+    linting_processes_queue.append(multiprocessing.Process(
         target=_lint_py_files,
         args=(config_pylint, py_files_to_lint, py_result)))
     print 'Starting Javascript and Python Linting'
     print '----------------------------------------'
-    for process in linting_processes:
-        process.start()
 
-    for process in linting_processes:
-        process.join()
+    if os.getenv('CONTINUOUS_INTEGRATION'):
+        global CONCURRENT_PROCESS_LIMIT # pylint: disable=global-statement
+        CONCURRENT_PROCESS_LIMIT = 1
+
+    active_processes = []
+    while linting_processes_queue or active_processes:
+        if len(active_processes) < CONCURRENT_PROCESS_LIMIT and \
+           linting_processes_queue:
+            process = linting_processes_queue.pop()
+            active_processes.append(process)
+            process.start()
+
+        for i, _ in enumerate(active_processes):
+            if active_processes[i].exitcode is not None:
+                active_processes.pop(i)
+
+        time.sleep(5)
 
     js_messages = []
     while not js_stdout.empty():
