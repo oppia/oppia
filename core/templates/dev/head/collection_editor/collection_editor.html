@@ -40,7 +40,7 @@
 {% block content %}
   <div ng-controller="CollectionEditor">
     <div ng-if="getTabStatuses().active === 'main'">
-      <collection-main-tab collection="collection" collection-skill-list="collectionSkillList">
+      <collection-main-tab>
       </collection-main-tab>
 
       <!-- A list of validation errors, if there are any -->
@@ -72,7 +72,7 @@
 
       <hr>
 
-      <collection-node-creator collection="collection">
+      <collection-node-creator>
       </collection-node-creator>
     </div>
 
@@ -121,6 +121,7 @@
     {{ include_js_file('collection_editor/CollectionEditor.js') }}
     {{ include_js_file('collection_editor/CollectionEditorNavbarBreadcrumbDirective.js') }}
     {{ include_js_file('collection_editor/CollectionEditorNavbarDirective.js') }}
+    {{ include_js_file('collection_editor/CollectionEditorStateService.js') }}
     {{ include_js_file('collection_editor/editor_tab/CollectionDetailsEditorDirective.js') }}
     {{ include_js_file('collection_editor/editor_tab/CollectionMainTabDirective.js') }}
     {{ include_js_file('collection_editor/editor_tab/CollectionNodeCreatorDirective.js') }}
