@@ -19,12 +19,12 @@
 oppia.directive('collectionMainTab', [function() {
   return {
     restrict: 'E',
-    scope: {
-      getCollection: '&collection',
-      getCollectionSkillList: '&collectionSkillList'
-    },
     templateUrl: 'inline/collection_main_tab_directive',
-    controller: [function() {
+    controller: ['$scope', 'CollectionEditorStateService',
+    function($scope, CollectionEditorStateService) {
+      // TODO(bhenning): Implement isCollectionLoaded.
+      $scope.isCollectionLoaded = (
+        CollectionEditorStateService.isCollectionLoaded);
     }]
   };
 }]);

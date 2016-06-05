@@ -29,38 +29,17 @@ oppia.constant(
   'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', '/explorationsummarieshandler/data');
 
 oppia.controller('CollectionEditor', [
-  '$scope', 'WritableCollectionBackendApiService', 'CollectionObjectFactory',
-  'SkillListObjectFactory', 'alertsService',
+  '$scope', 'CollectionEditorStateService', 'CollectionRightsBackendApiService',
+  'CollectionValidationService', 'UndoRedoService', 'alertsService',
   function(
-      $scope, WritableCollectionBackendApiService, CollectionObjectFactory,
-      SkillListObjectFactory, alertsService) {
-    $scope.collection = null;
-    $scope.collectionSkillList = SkillListObjectFactory.create([]);
-
+    $scope, CollectionEditorStateService, CollectionRightsBackendApiService,
+    CollectionValidationService, UndoRedoService, alertsService) {
     var _collectionId = GLOBALS.collectionId;
 
-    var _updateCollection = function(newBackendCollectionObject) {
-      $scope.collection = CollectionObjectFactory.create(
-        newBackendCollectionObject);
-      $scope.collectionSkillList.setSkills(newBackendCollectionObject.skills);
-
-      $scope.$broadcast('collectionLoaded');
-    };
-
     // Load the collection to be edited.
-    WritableCollectionBackendApiService.fetchWritableCollection(
-      _collectionId).then(
-        _updateCollection, function(error) {
-          alertsService.addWarning(
-            error || 'There was an error when loading the collection.');
-        });
+    CollectionEditorStateService.loadCollection(_collectionId);
 
-    // To be used after mutating the prerequisite and/or acquired skill lists.
-    $scope.updateSkillList = function() {
-      $scope.collectionSkillList.clearSkills();
-      $scope.collectionSkillList.addSkillsFromSkillList(
-        $scope.collection.getSkillList());
-      $scope.collectionSkillList.sortSkills();
-    };
-  }
-]);
+
+
+
+  }]);

@@ -1,21 +1,19 @@
 <script type="text/ng-template" id="inline/collection_main_tab_directive">
-  <div ng-if="getCollection()">
+  <div ng-if="isCollectionLoaded()">
     <!-- List of acquired and pre-requisite skills -->
     <strong>Skills</strong>
-    <collection-skill-list collection-skill-list="getCollectionSkillList()">
-    </collection-skill-list>
+    <collection-skill-list></collection-skill-list>
 
     <!-- List of explorations -->
     <br>
     <strong>Explorations</strong>
     <ul>
-      <li ng-repeat="node in getCollection().getBindableCollectionNodes()">
-        <collection-node-editor collection="getCollection()" collection-node="node" update-skill-list="updateSkillList()">
+      <li ng-repeat="node in collection.getBindableCollectionNodes()">
+        <collection-node-editor collection-node="node">
         </collection-node-editor>
       </li>
     </ul>
 
-    <collection-node-creator collection="getCollection()">
-    </collection-node-creator>
+    <collection-node-creator></collection-node-creator>
   </div>
 </script>

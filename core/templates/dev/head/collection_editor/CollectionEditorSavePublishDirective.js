@@ -20,18 +20,22 @@
 oppia.directive('collectionEditorSavePublish', [function() {
   return {
     restrict: 'E',
-    scope: {
-      getCollection: '&collection'
-    },
     templateUrl: 'inline/collection_editor_save_publish_directive',
     controller: [
-      '$scope', '$modal', 'UndoRedoService', 'CollectionValidationService',
-      'CollectionRightsBackendApiService',
+      '$scope', '$modal', 'UndoRedoService', 'CollectionEditorStateService',
+      'CollectionValidationService', 'CollectionRightsBackendApiService',
       'WritableCollectionBackendApiService',
+      'COLLECTION_EDITOR_INITIALIZED_COLLECTION',
+      'COLLECTION_EDITOR_UPDATED_COLLECTION',
+      'UNDO_REDO_SERVICE_CHANGE_APPLIED',
       function(
-          $scope, $modal, UndoRedoService, CollectionValidationService,
-          CollectionRightsBackendApiService,
-          WritableCollectionBackendApiService) {
+          $scope, $modal, UndoRedoService, CollectionEditorStateService,
+          CollectionValidationService, CollectionRightsBackendApiService,
+          WritableCollectionBackendApiService,
+          COLLECTION_EDITOR_INITIALIZED_COLLECTION,
+          COLLECTION_EDITOR_UPDATED_COLLECTION,
+          UNDO_REDO_SERVICE_CHANGE_APPLIED) {
+        $scope.collection = CollectionEditorStateService.getCollection();
         $scope.isPrivate = GLOBALS.isPrivate;
         $scope.canUnpublish = GLOBALS.canUnpublish;
         $scope.validationIssues = [];
@@ -41,22 +45,21 @@ oppia.directive('collectionEditorSavePublish', [function() {
         var _validateCollection = function() {
           if ($scope.isPrivate) {
             $scope.validationIssues = (
-              CollectionValidationService.
-                findValidationIssuesForPrivateCollection(
-                  $scope.getCollection()));
+              CollectionValidationService
+                .findValidationIssuesForPrivateCollection(
+                  $scope.collection));
           } else {
             $scope.validationIssues = (
-              CollectionValidationService.
-                findValidationIssuesForPublicCollection(
-                  $scope.getCollection()));
+              CollectionValidationService
+                .findValidationIssuesForPublicCollection(
+                  $scope.collection));
           }
         };
 
-        $scope.$on('collectionLoaded', function() {
-          _validateCollection();
-        });
-
-        UndoRedoService.setOnChangedCallback(_validateCollection);
+        $scope.$on(
+          COLLECTION_EDITOR_INITIALIZED_COLLECTION, _validateCollection);
+        $scope.$on(COLLECTION_EDITOR_UPDATED_COLLECTION, _validateCollection);
+        $scope.$on(UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateCollection);
 
         $scope.getChangeListCount = function() {
           return UndoRedoService.getChangeCount();
@@ -75,39 +78,16 @@ oppia.directive('collectionEditorSavePublish', [function() {
             $scope.validationIssues.length === 0);
         };
 
-        // An explicit save is needed to push all changes to the backend at
-        // once because some likely working states of the collection will cause
+        // An explicit save is needed to push all changes to the backend at once
+        // because some likely working states of the collection will cause
         // validation errors when trying to incrementally save them.
-        $scope.saveCollection = function(commitMessage) {
-          // Don't attempt to save the collection if there are no changes
-          // pending.
-          if (!UndoRedoService.hasChanges()) {
-            return;
-          }
-          $scope.isSaveInProgress = true;
-          WritableCollectionBackendApiService.updateCollection(
-            $scope.getCollection().getId(),
-            $scope.getCollection().getVersion(),
-            commitMessage, UndoRedoService.getCommittableChangeList()).then(
-            function(collectionBackendObject) {
-              // TODO(sll): This needs to update the collection object in the
-              // CollectionEditor.js parent controller. It currently fails.
-              _updateCollection(collectionBackendObject);
-              UndoRedoService.clearChanges();
-              $scope.isSaveInProgress = false;
-            }, function(error) {
-              alertsService.addWarning(
-                error || 'There was an error when updating the collection.');
-              $scope.isSaveInProgress = false;
-            }
-          );
-        };
+        $scope.saveCollection = CollectionEditorStateService.saveCollection;
 
         $scope.publishCollection = function() {
           // TODO(bhenning): This also needs a confirmation of destructive
           // action since it is not reversible.
           CollectionRightsBackendApiService.setCollectionPublic(
-            _collectionId, $scope.getCollection().getVersion()).then(
+            _collectionId, $scope.collection.getVersion()).then(
             function() {
               // TODO(bhenning): There should be a scope-level rights object
               // used, instead. The rights object should be loaded with the
@@ -116,22 +96,20 @@ oppia.directive('collectionEditorSavePublish', [function() {
             }, function() {
               alertsService.addWarning(
                 'There was an error when publishing the collection.');
-            }
-          );
+            });
         };
 
         // Unpublish the collection. Will only show up if the collection is
         // public and the user have access to the collection.
         $scope.unpublishCollection = function() {
           CollectionRightsBackendApiService.setCollectionPrivate(
-            _collectionId, $scope.getCollection().getVersion()).then(
+            _collectionId, $scope.collection.getVersion()).then(
             function() {
               $scope.isPrivate = true;
             }, function() {
               alertsService.addWarning(
                 'There was an error when unpublishing the collection.');
-            }
-          );
+            });
         };
       }
     ]

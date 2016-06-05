@@ -21,14 +21,14 @@
 oppia.directive('collectionDetailsEditor', [function() {
   return {
     restrict: 'E',
-    scope: {
-      getCollection: '&collection'
-    },
     templateUrl: 'inline/collection_details_editor_directive',
     controller: [
-        '$scope', 'CollectionUpdateService', 'alertsService', 'CATEGORY_LIST',
+        '$scope', 'CollectionEditorStateService', 'CollectionUpdateService',
+        'alertsService', 'CATEGORY_LIST',
         function(
-          $scope, CollectionUpdateService, alertsService, CATEGORY_LIST) {
+          $scope, CollectionEditorStateService, CollectionUpdateService,
+          alertsService, CATEGORY_LIST) {
+      $scope.collection = CollectionEditorStateService.getCollection();
       $scope.hasPageLoaded = false;
       $scope.CATEGORY_LIST_FOR_SELECT2 = CATEGORY_LIST.map(function(category) {
         return {
@@ -37,25 +37,26 @@ oppia.directive('collectionDetailsEditor', [function() {
         };
       });
 
+      // TODO(bhenning): Fix this.
       $scope.$on('collectionLoaded', function() {
-        $scope.displayedCollectionTitle = $scope.getCollection().getTitle();
+        $scope.displayedCollectionTitle = $scope.collection.getTitle();
         $scope.displayedCollectionObjective = (
-          $scope.getCollection().getObjective());
+          $scope.collection.getObjective());
         $scope.displayedCollectionCategory = (
-          $scope.getCollection().getCategory());
+          $scope.collection.getCategory());
 
         var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2.some(
           function(categoryItem) {
-            return categoryItem.id === $scope.getCollection().getCategory();
+            return categoryItem.id === $scope.collection.getCategory();
           }
         );
 
         // If the current category is not in the dropdown, add it as the first
         // option.
-        if (!categoryIsInSelect2 && $scope.getCollection().getCategory()) {
+        if (!categoryIsInSelect2 && $scope.collection.getCategory()) {
           $scope.CATEGORY_LIST_FOR_SELECT2.unshift({
-            id: $scope.getCollection().getCategory(),
-            text: $scope.getCollection().getCategory()
+            id: $scope.collection.getCategory(),
+            text: $scope.collection.getCategory()
           });
         }
 
@@ -69,7 +70,7 @@ oppia.directive('collectionDetailsEditor', [function() {
           return;
         }
         CollectionUpdateService.setCollectionTitle(
-          $scope.getCollection(), $scope.displayedCollectionTitle);
+          $scope.collection, $scope.displayedCollectionTitle);
       };
 
       $scope.updateCollectionObjective = function() {
@@ -79,7 +80,7 @@ oppia.directive('collectionDetailsEditor', [function() {
           return;
         }
         CollectionUpdateService.setCollectionObjective(
-          $scope.getCollection(), $scope.displayedCollectionObjective);
+          $scope.collection, $scope.displayedCollectionObjective);
       };
 
       $scope.updateCollectionCategory = function() {
@@ -89,7 +90,7 @@ oppia.directive('collectionDetailsEditor', [function() {
           return;
         }
         CollectionUpdateService.setCollectionCategory(
-          $scope.getCollection(), $scope.displayedCollectionCategory);
+          $scope.collection, $scope.displayedCollectionCategory);
       };
     }]
   };
