@@ -22,13 +22,16 @@ oppia.directive('collectionNodeEditor', [function() {
   return {
     restrict: 'E',
     scope: {
-      getCollection: '&collection',
-      getCollectionNode: '&collectionNode',
-      updateSkillList: '&'
+      getCollectionNode: '&collectionNode'
     },
     templateUrl: 'inline/collection_node_editor_directive',
-    controller: ['$scope', 'CollectionUpdateService', 'alertsService',
-      function($scope, CollectionUpdateService, alertsService) {
+    controller: ['$scope', 'CollectionEditorStateService',
+    'CollectionUpdateService', 'alertsService',
+      function(
+        $scope, CollectionEditorStateService,
+        CollectionUpdateService, alertsService) {
+      $scope.collection = CollectionEditorStateService.getCollection();
+
       var _addSkill = function(skillList, newSkillName) {
         // Ensure the user entered a skill name.
         if (!newSkillName) {
@@ -99,9 +102,8 @@ oppia.directive('collectionNodeEditor', [function() {
           return;
         }
         CollectionUpdateService.setPrerequisiteSkills(
-          $scope.getCollection(), collectionNode.getExplorationId(),
+          $scope.collection, collectionNode.getExplorationId(),
           prerequisiteSkillList.getSkills());
-        $scope.updateSkillList();
         $scope.prerequisiteSkillName = '';
       };
 
@@ -112,9 +114,8 @@ oppia.directive('collectionNodeEditor', [function() {
         var prerequisiteSkillList = _copyPrerequisiteSkillList();
         prerequisiteSkillList.removeSkillByIndex(index);
         CollectionUpdateService.setPrerequisiteSkills(
-          $scope.getCollection(), collectionNode.getExplorationId(),
+          $scope.collection, collectionNode.getExplorationId(),
           prerequisiteSkillList.getSkills());
-        $scope.updateSkillList();
       };
 
       // Adds an acquired skill to the frontend collection object and also
@@ -126,9 +127,8 @@ oppia.directive('collectionNodeEditor', [function() {
           return;
         }
         CollectionUpdateService.setAcquiredSkills(
-          $scope.getCollection(), collectionNode.getExplorationId(),
+          $scope.collection, collectionNode.getExplorationId(),
           acquiredSkillList.getSkills());
-        $scope.updateSkillList();
         $scope.acquiredSkillName = '';
       };
 
@@ -139,18 +139,16 @@ oppia.directive('collectionNodeEditor', [function() {
         var acquiredSkillList = _copyAcquiredSkillList();
         acquiredSkillList.removeSkillByIndex(index);
         CollectionUpdateService.setAcquiredSkills(
-          $scope.getCollection(), collectionNode.getExplorationId(),
+          $scope.collection, collectionNode.getExplorationId(),
           acquiredSkillList.getSkills());
-        $scope.updateSkillList();
       };
 
       // Deletes this collection node from the frontend collection object and
       // also updates the changelist.
       $scope.deleteCollectionNode = function() {
-        var collection = $scope.getCollection();
         var collectionNode = $scope.getCollectionNode();
         var explorationId = collectionNode.getExplorationId();
-        if (!collection.containsCollectionNode(explorationId)) {
+        if (!$scope.collection.containsCollectionNode(explorationId)) {
           alertsService.fatalWarning(
             'Internal collection editor error. Could not delete exploration ' +
             'by ID: ' + explorationId);
@@ -174,7 +172,7 @@ oppia.directive('collectionNodeEditor', [function() {
         }
 
         CollectionUpdateService.deleteCollectionNode(
-          collection, explorationId);
+          $scope.collection, explorationId);
       };
     }]
   };
