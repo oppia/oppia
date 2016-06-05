@@ -243,31 +243,35 @@ oppia.factory('changeListService', [
     gadget_visibility: true
   };
 
-  var addChange = function(changeDict) {
-    if ($rootScope.loadingMessage) {
-      return;
-    }
-    explorationChangeList.push(changeDict);
-    undoneChangeStack = [];
-
+  var autosaveChangeListOnChange = function(explorationChangeList) {
     // Send autosave request and check for error in response:
     // If error is present -> Check for the type of error occurred
     // (Display the corresponding modals in both cases, if not already opened):
     // - Version Mismatch.
     // - Non-strict Validation Fail.
-    explorationData.autosaveChangeList(explorationChangeList, function(response) {
+    explorationData.autosaveChangeList(
+      explorationChangeList, function(response) {
         if (!response.data.is_version_of_draft_valid) {
           if (!autosaveInfoModalsService.isVersionMismatchModalOpen()) {
             autosaveInfoModalsService.showVersionMismatchModal(
               explorationChangeList);
           }
         }
-      }, function(error) {
+      }, function() {
         alertsService.clearWarnings();
         if (!autosaveInfoModalsService.isNonStrictFailModalOpen()) {
           autosaveInfoModalsService.showNonStrictValidationFailModal();
         }
       });
+  };
+
+  var addChange = function(changeDict) {
+    if ($rootScope.loadingMessage) {
+      return;
+    }
+    explorationChangeList.push(changeDict);
+    undoneChangeStack = [];
+    autosaveChangeListOnChange(explorationChangeList);
   };
 
   return {
@@ -325,6 +329,7 @@ oppia.factory('changeListService', [
     discardAllChanges: function() {
       explorationChangeList = [];
       undoneChangeStack = [];
+      autosaveChangeListOnChange(explorationChangeList);
     },
     /**
      * Saves a change dict that represents a change to an exploration property
@@ -451,6 +456,7 @@ oppia.factory('changeListService', [
       }
       var lastChange = explorationChangeList.pop();
       undoneChangeStack.push(lastChange);
+      autosaveChangeListOnChange(explorationChangeList);
     }
   };
 }]);
@@ -2280,23 +2286,21 @@ oppia.factory('autosaveInfoModalsService', [
         $modal.open({
           templateUrl: 'modals/saveVersionMismatch',
           backdrop: true,
-          controller: [
-            '$scope', '$modalInstance', function($scope, $modalInstance) {
-              // When the user clicks on discard changes button, signal backend
-              // to discard the draft and reload the page thereafter.
-              $scope.discardChanges = function() {
-                explorationData.discardDraft(function() {
-                  $timeout(function() {
-                    $window.location.reload();
-                  }, 500);
-                });
-              };
-              if (lostChanges) {
-                $scope.lostChangesHtml = (
-                  lostChangesService.makeHumanReadable(lostChanges).html());
-              }
+          controller: ['$scope', function($scope) {
+            // When the user clicks on discard changes button, signal backend
+            // to discard the draft and reload the page thereafter.
+            $scope.discardChanges = function() {
+              explorationData.discardDraft(function() {
+                $timeout(function() {
+                  $window.location.reload();
+                }, 500);
+              });
+            };
+            if (lostChanges) {
+              $scope.lostChangesHtml = (
+                lostChangesService.makeHumanReadable(lostChanges).html());
             }
-          ]
+          }]
         }).result.then(function() {
           _isVersionMismatchModalOpen = false;
         }, function() {
