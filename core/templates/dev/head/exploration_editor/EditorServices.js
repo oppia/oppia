@@ -2186,7 +2186,7 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
                 stateWiseEditsMapping[stateName].push(
                   angular.element('<div><strong>Added answer group: ' +
                                   '</strong></div>')
-                    .html(answerGroupHtml)
+                    .append(answerGroupHtml)
                     .addClass('state-edit-desc answer-group'));
               } else if (answerGroupChanges === 'edited') {
                 if (newValue.outcome.dest !== oldValue.outcome.dest) {

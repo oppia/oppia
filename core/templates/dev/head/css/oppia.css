@@ -2028,9 +2028,10 @@ ul.oppia-dashboard-tiles {
   background-color: #f9f9f9;
 }
 
-.oppia-autosave-version-mismatch-modal {
-    max-height: 80vn;
+.oppia-version-mismatch-modal .oppia-content {
+    max-height: 700px;
     overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 .oppia-vcenter {
