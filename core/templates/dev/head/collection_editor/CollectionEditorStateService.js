@@ -88,6 +88,7 @@ oppia.factory('CollectionEditorStateService', [
           function(error) {
             alertsService.addWarning(
               error || 'There was an error when loading the collection.');
+            _isLoadingCollection = false;
           });
       },
 
@@ -97,6 +98,14 @@ oppia.factory('CollectionEditorStateService', [
        */
       isLoadingCollection: function() {
         return _isLoadingCollection;
+      },
+
+      /**
+       * Returns whether a collection has yet been loaded using either
+       * loadCollection() or setCollection().
+       */
+      hasLoadedCollection: function() {
+        return _collectionIsInitialized;
       },
 
       /**
@@ -151,6 +160,7 @@ oppia.factory('CollectionEditorStateService', [
           }, function(error) {
             alertsService.addWarning(
               error || 'There was an error when saving the collection.');
+            _isSavingCollection = false;
           });
         return true;
       },

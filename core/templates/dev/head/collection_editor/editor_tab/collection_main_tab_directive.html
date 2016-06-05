@@ -1,15 +1,6 @@
 <script type="text/ng-template" id="inline/collection_main_tab_directive">
-  <div ng-if="collection">
-    <!-- Collection details -->
-    <collection-details-editor></collection-details-editor>
-
-    <a ng-href="/collection/<[collection.getId()]>" target="_blank">
-      Go to Collection
-    </a>
-
+  <div ng-if="hasLoadedCollection()">
     <!-- List of acquired and pre-requisite skills -->
-    <br>
-    <br>
     <strong>Skills</strong>
     <collection-skill-list></collection-skill-list>
 
@@ -22,5 +13,7 @@
         </collection-node-editor>
       </li>
     </ul>
+
+    <collection-node-creator></collection-node-creator>
   </div>
 </script>
