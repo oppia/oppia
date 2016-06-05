@@ -1,18 +1,26 @@
 <script type="text/ng-template" id="inline/collection_main_tab_directive">
   <div ng-if="hasLoadedCollection()">
-    <!-- List of acquired and pre-requisite skills -->
-    <strong>Skills</strong>
-    <collection-skill-list></collection-skill-list>
+    <!-- Collection node list graph -->
+    <div class="collection-editor-node-list-container">
+      <div class="collection-editor-node-container" ng-repeat="node in collection | sortCollectionLinearly">
+        <md-card class="collection-editor-node">
+          <collection-node-editor collection-node="node" linear-index="$index">
+          </collection-node-editor>
+        </md-card>
 
-    <!-- List of explorations -->
-    <br>
-    <strong>Explorations</strong>
-    <ul>
-      <li ng-repeat="node in collection.getBindableCollectionNodes()">
-        <collection-node-editor collection-node="node">
-        </collection-node-editor>
-      </li>
-    </ul>
+        <div ng-if="!$last" class="collection-editor-node-connector-container">
+          <svg class="collection-editor-node-connector">
+            <defs>
+              <marker id="arrow" markerWidth="10" markerHeight="10" refx="0" refy="3" orient="auto" markerUnits="strokeWidth" viewBox="0 0 20 20">
+                <path d="M0,0 L0,6 L9,3 z" stroke="#88888A"/>
+              </marker>
+            </defs>
+
+            <line x1="0" y1="25" x2="35" y2="25" stroke="#88888A" stroke-width="2" marker-end="url(#arrow)" />
+          </svg>
+        </div>
+      </div>
+    </div>
 
     <collection-node-creator></collection-node-creator>
   </div>

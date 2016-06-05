@@ -395,3 +395,12 @@ oppia.filter('removeDuplicatesInArray', [function() {
     });
   };
 }]);
+
+// Filters a collection by return a list of collection nodes which represent a
+// valid, linear path through the collection.
+oppia.filter('sortCollectionLinearly', [
+  'CollectionLinearizerService', function(CollectionLinearizerService) {
+      return function(collection) {
+        return CollectionLinearizerService.getCollectionNodesInPlayableOrder(collection);
+      };
+    }]);

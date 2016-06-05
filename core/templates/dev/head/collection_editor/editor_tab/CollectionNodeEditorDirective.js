@@ -22,14 +22,15 @@ oppia.directive('collectionNodeEditor', [function() {
   return {
     restrict: 'E',
     scope: {
-      getCollectionNode: '&collectionNode'
+      getCollectionNode: '&collectionNode',
+      getLinearIndex: '&linearIndex'
     },
     templateUrl: 'inline/collection_node_editor_directive',
     controller: ['$scope', 'CollectionEditorStateService',
-    'CollectionUpdateService', 'alertsService',
+    'CollectionLinearizerService', 'CollectionUpdateService', 'alertsService',
       function(
         $scope, CollectionEditorStateService,
-        CollectionUpdateService, alertsService) {
+        CollectionLinearizerService, CollectionUpdateService, alertsService) {
       $scope.collection = CollectionEditorStateService.getCollection();
 
       var _addSkill = function(skillList, newSkillName) {
@@ -106,16 +107,38 @@ oppia.directive('collectionNodeEditor', [function() {
 
       // Deletes this collection node from the frontend collection object and
       // also updates the changelist.
-      $scope.deleteCollectionNode = function() {
-        var collectionNode = $scope.getCollectionNode();
-        var explorationId = collectionNode.getExplorationId();
-        if (!$scope.collection.containsCollectionNode(explorationId)) {
+      $scope.deleteNode = function() {
+        var explorationId = $scope.getCollectionNode().getExplorationId();
+        if (!CollectionLinearizerService.removeCollectionNode(
+            $scope.collection, explorationId)) {
           alertsService.fatalWarning(
             'Internal collection editor error. Could not delete exploration ' +
             'by ID: ' + explorationId);
         }
-        CollectionUpdateService.deleteCollectionNode(
-          $scope.collection, explorationId);
+      };
+
+      // Shifts this collection node left in the linearized list of the
+      // collection, if possible.
+      $scope.shiftNodeLeft = function() {
+        var explorationId = $scope.getCollectionNode().getExplorationId();
+        if (!CollectionLinearizerService.shiftNodeLeft(
+            $scope.collection, explorationId)) {
+          alertsService.fatalWarning(
+            'Internal collection editor error. Could not shift node left ' +
+            'with ID: ' + explorationId);
+        }
+      };
+
+      // Shifts this collection node right in the linearized list of the
+      // collection, if possible.
+      $scope.shiftNodeRight = function() {
+        var explorationId = $scope.getCollectionNode().getExplorationId();
+        if (!CollectionLinearizerService.shiftNodeRight(
+            $scope.collection, explorationId)) {
+          alertsService.fatalWarning(
+            'Internal collection editor error. Could not shift node right ' +
+            'with ID: ' + explorationId);
+        }
       };
     }]
   };

@@ -22,6 +22,47 @@
     html, body {
       background-color: #eee;
     }
+
+    /* TODO(mgowano): Implement horizontal scrolling using Javascript. */
+    .collection-editor-node-list-container {
+      background-color: white;
+      display: block;
+      margin: 30px auto;
+      min-width: 98%;
+      overflow-x: auto;
+      padding: 70px 20px;
+      text-align: center;
+      white-space: nowrap;
+      width: 98%;
+    }
+
+    .collection-editor-node {
+      background-color: #F5F5F5;
+      color: #424242;
+      display: inline-block;
+      font-family: "Capriola", "Roboto", Arial, sans-serif;
+      margin: 0;
+      padding-top: 15px;
+      padding-bottom: 15px;
+    }
+
+    .collection-editor-node-container, .collection-editor-node-connector-container{
+      display: inline-block;
+    }
+
+    .collection-editor-node-connector-container {
+      margin-left: -4px;
+      width: 45px;
+    }
+
+    .collection-editor-node-connector {
+      width: 50px;
+      height: 30px;
+    }
+
+    svg {
+      color: #88888A;
+    }
   </style>
 
   {{dependencies_html}}
@@ -86,6 +127,7 @@
     {{ include_js_file('collection_editor/CollectionEditorNavbarDirective.js') }}
     {{ include_js_file('collection_editor/CollectionEditorSavePublishDirective.js') }}
     {{ include_js_file('collection_editor/CollectionEditorStateService.js') }}
+    {{ include_js_file('collection_editor/editor_tab/CollectionLinearizerService.js') }}
     {{ include_js_file('collection_editor/editor_tab/CollectionMainTabDirective.js') }}
     {{ include_js_file('collection_editor/editor_tab/CollectionNodeCreatorDirective.js') }}
     {{ include_js_file('collection_editor/editor_tab/CollectionNodeEditorDirective.js') }}
