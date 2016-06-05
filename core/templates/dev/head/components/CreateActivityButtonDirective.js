@@ -40,37 +40,39 @@ oppia.directive('createActivityButton', [function() {
         };
 
         $scope.showCreationChoiceModal = function() {
-          if (!$scope.creationInProgress) {
-            $scope.creationInProgress = true;
-            if (urlService.getPathname() !== '/my_explorations') {
-              $window.location.replace('/my_explorations?mode=create');
-              $scope.creationInProgress = true;
-            } else {
-              $modal.open({
-                templateUrl: 'modals/createActivity',
-                backdrop: true,
-                controller: [
-                    '$scope', '$modalInstance',
-                    function($scope, $modalInstance) {
-                  $scope.chooseExploration = function() {
-                    ExplorationCreationService.createNewExploration();
-                    $modalInstance.close();
-                  };
+          // Without this, the modal keeps reopening when the window is resized.
+          if ($scope.creationInProgress) {
+            return;
+          }
 
-                  $scope.chooseCollection = function() {
-                    CollectionCreationService.createNewCollection();
-                    $modalInstance.close();
-                  };
+          $scope.creationInProgress = true;
+          if (urlService.getPathname() !== '/my_explorations') {
+            $window.location.replace('/my_explorations?mode=create');
+          } else {
+            $modal.open({
+              templateUrl: 'modals/createActivity',
+              backdrop: true,
+              controller: [
+                  '$scope', '$modalInstance',
+                  function($scope, $modalInstance) {
+                $scope.chooseExploration = function() {
+                  ExplorationCreationService.createNewExploration();
+                  $modalInstance.close();
+                };
 
-                  $scope.cancel = function() {
-                    $modalInstance.dismiss('cancel');
-                  };
-                }],
-                windowClass: 'oppia-creation-modal'
-              }).result.then(function() {}, function() {
-                $scope.creationInProgress = false;
-              });
-            }
+                $scope.chooseCollection = function() {
+                  CollectionCreationService.createNewCollection();
+                  $modalInstance.close();
+                };
+
+                $scope.cancel = function() {
+                  $modalInstance.dismiss('cancel');
+                };
+              }],
+              windowClass: 'oppia-creation-modal'
+            }).result.then(function() {}, function() {
+              $scope.creationInProgress = false;
+            });
           }
         };
 
