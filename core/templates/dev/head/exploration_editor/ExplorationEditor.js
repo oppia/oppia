@@ -532,19 +532,16 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     };
 
     $scope.discardChanges = function() {
-      var confirmDiscard = confirm('Do you want to discard your changes?');
-      if (confirmDiscard) {
-        alertsService.clearWarnings();
-        $rootScope.$broadcast('externalSave');
+      alertsService.clearWarnings();
+      $rootScope.$broadcast('externalSave');
 
-        $scope.isDiscardInProgress = true;
-        changeListService.discardAllChanges();
-        alertsService.addSuccessMessage('Changes discarded.');
-        $rootScope.$broadcast('initExplorationPage', function() {
-          $scope.lastSaveOrDiscardAction = 'discard';
-          $scope.isDiscardInProgress = false;
-        });
-      }
+      $scope.isDiscardInProgress = true;
+      changeListService.discardAllChanges();
+      alertsService.addSuccessMessage('Changes discarded.');
+      $rootScope.$broadcast('initExplorationPage', function() {
+        $scope.lastSaveOrDiscardAction = 'discard';
+        $scope.isDiscardInProgress = false;
+      });
     };
 
     $scope.getChangeListLength = function() {

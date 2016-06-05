@@ -252,14 +252,14 @@ oppia.factory('changeListService', [
     explorationData.autosaveChangeList(
       explorationChangeList, function(response) {
         if (!response.data.is_version_of_draft_valid) {
-          if (!autosaveInfoModalsService.isVersionMismatchModalOpen()) {
+          if (!autosaveInfoModalsService.isModalOpen()) {
             autosaveInfoModalsService.showVersionMismatchModal(
               explorationChangeList);
           }
         }
       }, function() {
         alertsService.clearWarnings();
-        if (!autosaveInfoModalsService.isNonStrictFailModalOpen()) {
+        if (!autosaveInfoModalsService.isModalOpen()) {
           autosaveInfoModalsService.showNonStrictValidationFailModal();
         }
       });
@@ -2256,8 +2256,12 @@ oppia.factory('autosaveInfoModalsService', [
   '$modal', '$timeout', '$window', 'lostChangesService', 'explorationData',
   function(
     $modal, $timeout, $window, lostChangesService, explorationData) {
-    var _isNonStrictFailModalOpen = false;
-    var _isVersionMismatchModalOpen = false;
+    var _isModalOpen = false;
+    var _refreshPage = function(delay) {
+      $timeout(function() {
+        $window.location.reload();
+      }, delay);
+    };
 
     return {
       showNonStrictValidationFailModal: function() {
@@ -2266,21 +2270,22 @@ oppia.factory('autosaveInfoModalsService', [
           backdrop: true,
           controller: [
             '$scope', '$modalInstance', function($scope, $modalInstance) {
-              $scope.close = function() {
+              $scope.closeAndRefresh = function() {
                 $modalInstance.dismiss('cancel');
+                _refreshPage(500);
               };
             }
           ]
         }).result.then(function() {
-          _isNonStrictFailModalOpen = false;
+          _isModalOpen = false;
         }, function() {
-          _isNonStrictFailModalOpen = false;
+          _isModalOpen = false;
         });
 
-        _isNonStrictFailModalOpen = true;
+        _isModalOpen = true;
       },
-      isNonStrictFailModalOpen: function() {
-        return _isNonStrictFailModalOpen;
+      isModalOpen: function() {
+        return _isModalOpen;
       },
       showVersionMismatchModal: function(lostChanges) {
         $modal.open({
@@ -2291,9 +2296,7 @@ oppia.factory('autosaveInfoModalsService', [
             // to discard the draft and reload the page thereafter.
             $scope.discardChanges = function() {
               explorationData.discardDraft(function() {
-                $timeout(function() {
-                  $window.location.reload();
-                }, 500);
+                _refreshPage(500);
               });
             };
             if (lostChanges) {
@@ -2302,15 +2305,12 @@ oppia.factory('autosaveInfoModalsService', [
             }
           }]
         }).result.then(function() {
-          _isVersionMismatchModalOpen = false;
+          _isModalOpen = false;
         }, function() {
-          _isVersionMismatchModalOpen = false;
+          _isModalOpen = false;
         });
 
-        _isVersionMismatchModalOpen = true;
-      },
-      isVersionMismatchModalOpen: function() {
-        return _isVersionMismatchModalOpen;
+        _isModalOpen = true;
       }
     };
   }
