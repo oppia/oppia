@@ -2299,7 +2299,8 @@ oppia.factory('autosaveInfoModalsService', [
                 _refreshPage(500);
               });
             };
-            if (lostChanges) {
+            $scope.isLostChanges = !!lostChanges;
+            if ($scope.isLostChanges) {
               $scope.lostChangesHtml = (
                 lostChangesService.makeHumanReadable(lostChanges).html());
             }
