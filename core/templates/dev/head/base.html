@@ -176,7 +176,6 @@
                             </a>
 
                             <ul class="dropdown-menu ng-cloak oppia-navbar-dropdown" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)" ng-show="profileDropdownIsActive">
-
                               <li>
                                 <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/profile/{{username}}">
                                   <strong>{{username}}</strong>
@@ -225,7 +224,7 @@
                             </ul>
                           </li>
                         {% else %}
-                          <li class="dropdown oppia-clickable-dropdown pull-right">
+                          <li class="dropdown oppia-navbar-clickable-dropdown pull-right">
                             <div class="oppia-navbar-button-container" style="margin-right: 10px;">
                               <button class="btn oppia-navbar-button"
                                       ng-click="onLoginButtonClicked('{{login_url}}')">
@@ -242,6 +241,8 @@
                             </ul>
                           </li>
                         {% endif %}
+                      </ul>
+                      <ul class="nav oppia-navbar-nav">
                         {% if nav_mode != 'create' and nav_mode != 'explore' %}
                           <ul ng-if="windowIsNarrow" class="nav oppia-navbar-tabs-narrow">
                             <create-activity-button></create-activity-button>
@@ -254,8 +255,9 @@
                                 </a>
                               </li>
                             {% endif %}
-                            <li class="dropdown oppia-clickable-dropdown pull-right">
-                              <a class="oppia-navbar-tab" translate="I18N_TOPNAV_ABOUT">
+                            <li class="dropdown oppia-navbar-clickable-dropdown pull-right">
+                              <a class="oppia-navbar-tab">
+                                <span translate="I18N_TOPNAV_ABOUT"></span>
                                 <span class="caret"></span>
                               </a>
                               <ul class="dropdown-menu oppia-navbar-dropdown" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">

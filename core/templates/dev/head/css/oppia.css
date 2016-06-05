@@ -784,7 +784,7 @@ textarea {
    clicked -- so, in such cases (e.g. for the 'Sign in' link at the top right),
    we use this instead.
 */
-.oppia-clickable-dropdown:hover ul.dropdown-menu,
+.oppia-navbar-clickable-dropdown:hover ul.dropdown-menu,
 .oppia-clickable-navbar-element:hover {
   display: block;
 }
@@ -2175,19 +2175,21 @@ div#ng-curtain {
   margin-left: 6px;
 }
 
-.oppia-navbar-tabs-narrow {
-  /*
-    This needs to take i18n of the "Create" and "Sign in" buttons into
-    account.
-  */
-  min-width: 260px;
-}
-.oppia-navbar-tabs {
-  /*
-    This needs to take i18n of the "Create" and "Sign in" buttons into
-    account.
-  */
-  min-width: 530px;
+@media (min-width: 500px) {
+  .oppia-navbar-tabs-narrow {
+    /*
+      This needs to take i18n of the "Create" and "Sign in" buttons into
+      account.
+    */
+    min-width: 260px;
+  }
+  .oppia-navbar-tabs {
+    /*
+      This needs to take i18n of the "Create" and "Sign in" buttons into
+      account.
+    */
+    min-width: 530px;
+  }
 }
 .nav > li > a.oppia-navbar-tab {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
@@ -2200,11 +2202,14 @@ div#ng-curtain {
   height: 56px;
   color: #fff;
 }
-.oppia-navbar-profile > li > a:hover,
-.oppia-navbar-profile > li > a:focus,
-.oppia-navbar-profile .open > a,
-.oppia-navbar-profile .open > a:hover,
-.oppia-navbar-profile .open > a:focus,
+.oppia-navbar-profile {
+  float: right;
+}
+.oppia-navbar-nav > li > a:hover,
+.oppia-navbar-nav > li > a:focus,
+.oppia-navbar-nav .open > a,
+.oppia-navbar-nav .open > a:hover,
+.oppia-navbar-nav .open > a:focus,
 .oppia-navbar-tabs > li > a:hover,
 .oppia-navbar-tabs > li > a:focus {
   background-color: #fff;
