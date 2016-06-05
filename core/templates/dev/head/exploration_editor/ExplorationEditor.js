@@ -562,15 +562,6 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       );
     };
 
-    $window.addEventListener('beforeunload', function(e) {
-      if ($scope.isExplorationLockedForEditing()) {
-        var confirmationMessage = (
-          'You have unsaved changes which will be lost if you leave the page.');
-        (e || $window.event).returnValue = confirmationMessage;
-        return confirmationMessage;
-      }
-    });
-
     $scope.isPublic = function() {
       return explorationRightsService.isPublic();
     };

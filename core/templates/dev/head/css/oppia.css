@@ -2678,6 +2678,31 @@ md-card.preview-conversation-skin-supplemental-card {
   padding: 0;
 }
 
+.lost-changes > li {
+    margin: 5px 0 5px 10px;
+}
+
+.lost-changes > li > .state-edit-desc {
+    margin: 3px auto auto 25px;
+}
+
+.lost-changes > li .state-edit-desc .content > *,
+.lost-changes > li .state-edit-desc .feedback > * {
+    padding: 4px 0 0 20px;
+}
+
+.lost-changes > li > .state-edit-desc > .sub-edit {
+    margin-left: 20px;
+}
+
+.lost-changes > li > .state-edit-desc > .rules-list > li {
+    margin-left: 20px;
+}
+
+/* .lost-changes > li > .state-edit-group > p { */
+/*     margin: 3px auto auto 35px; */
+/* } */
+
 .oppia-info-card-title {
   bottom: 0;
   color: white;
