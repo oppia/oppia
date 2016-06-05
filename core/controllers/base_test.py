@@ -106,7 +106,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         self.login('user@example.com')
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 302)
-        self.assertIn('my_explorations', response.headers['location'])
+        self.assertIn('dashboard', response.headers['location'])
         self.logout()
 
 

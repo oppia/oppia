@@ -133,7 +133,7 @@
         {% if not user_is_logged_in %}
           <!-- User must complete the registration process. -->
           <button type="button"
-                  ng-click="onRedirectToLogin('/my_explorations?mode=create')"
+                  ng-click="onRedirectToLogin('/dashboard?mode=create')"
                   class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200" translate="I18N_SPLASH_CREATE_EXPLORATION">
           </button>
         {% else %}
@@ -145,7 +145,7 @@
         {% endif %}
 
         <button type="button"
-                ng-click="onRedirectToLogin('/my_explorations?mode=create')"
+                ng-click="onRedirectToLogin('/dashboard?mode=create')"
                 class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200"
                 translate="I18N_SPLASH_CREATE_EXPLORATION">
         </button>

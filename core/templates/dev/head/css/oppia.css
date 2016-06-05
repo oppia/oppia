@@ -672,7 +672,7 @@ textarea {
 
 @media (max-width: 768px) {
   .oppia-footer-padding {
-    height: 300px;
+    height: 464px;
   }
 }
 
@@ -784,7 +784,7 @@ textarea {
    clicked -- so, in such cases (e.g. for the 'Sign in' link at the top right),
    we use this instead.
 */
-.oppia-clickable-dropdown:hover ul.dropdown-menu,
+.oppia-navbar-clickable-dropdown:hover ul.dropdown-menu,
 .oppia-clickable-navbar-element:hover {
   display: block;
 }
@@ -1079,7 +1079,43 @@ textarea {
   right: 0;
 }
 
-/* Rules for the tiles in the "My Explorations" page. */
+.oppia-dashboard-tabs {
+  border-bottom: 1px solid #eee;
+  display: flex;
+  flex-wrap: wrap;
+  padding-left: 0;
+  text-align: center;
+  margin-bottom: 0;
+}
+.oppia-dashboard-tabs li {
+  display: flex;
+  margin-bottom: 0;
+  width: 200px;
+}
+.oppia-dashboard-tabs-active .oppia-dashboard-tabs-text {
+  border-bottom: 4px solid #009688;
+  color: #009688;
+}
+.oppia-dashboard-tabs-text {
+  border-bottom: none;
+  color: #009688;
+  font-size: 1em;
+  padding: 10px;
+  text-decoration: none;
+  text-transform: uppercase;
+  width: 100%;
+}
+.oppia-dashboard-tabs-text:hover,
+.oppia-dashboard-tabs-text:focus {
+  color: #009688;
+  text-decoration: none;
+}
+.oppia-dashboard-empty-text {
+  padding-left: 20px;
+  padding-top: 50px;
+}
+
+/* Rules for the tiles in the creator dashboard. */
 
 .oppia-dashboard-intro-card {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
@@ -1107,7 +1143,7 @@ textarea {
   color: #fff;
 }
 
-md-card.oppia-dashboard-exp-tile {
+md-card.oppia-dashboard-tile {
   background-color: #fff;
   color: #888;
   height: 120px;
@@ -1116,60 +1152,70 @@ md-card.oppia-dashboard-exp-tile {
   position: relative;
   width: 100%;
 }
-.oppia-dashboard-exp-tile:hover {
+.oppia-dashboard-tile:hover {
   background-color: #f9f9f9;
 }
 
-.oppia-dashboard-exp-tile-container-link {
+.oppia-dashboard-tile-container-link {
   height: 100%;
   width: 100%;
 }
 
-.oppia-dashboard-exp-tile-contents {
+.oppia-dashboard-tile-contents {
   height: 100%;
   padding: 23px 58px;
   width: 100%;
 }
-.oppia-dashboard-exp-tile-contents:hover {
+.oppia-dashboard-tile-contents:hover {
   text-decoration: none;
 }
 
-.oppia-dashboard-exp-tile-image-container {
+.oppia-dashboard-tile-collection-label {
+  background-color: #333;
+  border-radius: 5px;
+  bottom: 0;
+  color: #f0f0f0;
+  padding: 5px;
+  position: absolute;
+  right: 0;
+}
+
+.oppia-dashboard-tile-image-container {
   height: 120px;
   left: 0;
   top: 0;
   width: 120px;
 }
 /* This centers the image horizontally and vertically. */
-.oppia-dashboard-exp-tile-image {
+.oppia-dashboard-tile-image {
   height: 120px;
   width: 120px;
 }
-.oppia-dashboard-exp-tile-image-private {
+.oppia-dashboard-tile-image-private {
   opacity: 0.2;
 }
-.oppia-dashboard-exp-tile-details {
+.oppia-dashboard-tile-details {
   padding-left: 100px;
   padding-top: 5px;
 }
-.oppia-dashboard-exp-tile-first-row {
+.oppia-dashboard-tile-first-row {
   margin-bottom: 8px;
 }
-.oppia-dashboard-exp-tile-title {
+.oppia-dashboard-tile-title {
   color: #333;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-weight: bold;
 }
 @media (max-width: 365px) {
-  .oppia-dashboard-exp-tile-image-container {
+  .oppia-dashboard-tile-image-container {
     display: none;
   }
-  .oppia-dashboard-exp-tile-details {
+  .oppia-dashboard-tile-details {
     padding-left: 0;
   }
 }
 
-.oppia-dashboard-exp-tile-second-row {
+.oppia-dashboard-tile-second-row {
   color: rgba(0,0,0,0.65);
   font-size: 0.9em;
 }
@@ -2175,19 +2221,21 @@ div#ng-curtain {
   margin-left: 6px;
 }
 
-.oppia-navbar-tabs-narrow {
-  /*
-    This needs to take i18n of the "Create" and "Sign in" buttons into
-    account.
-  */
-  min-width: 260px;
-}
-.oppia-navbar-tabs {
-  /*
-    This needs to take i18n of the "Create" and "Sign in" buttons into
-    account.
-  */
-  min-width: 530px;
+@media (min-width: 500px) {
+  .oppia-navbar-tabs-narrow {
+    /*
+      This needs to take i18n of the "Create" and "Sign in" buttons into
+      account.
+    */
+    min-width: 260px;
+  }
+  .oppia-navbar-tabs {
+    /*
+      This needs to take i18n of the "Create" and "Sign in" buttons into
+      account.
+    */
+    min-width: 530px;
+  }
 }
 .nav > li > a.oppia-navbar-tab {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
@@ -2200,11 +2248,14 @@ div#ng-curtain {
   height: 56px;
   color: #fff;
 }
-.oppia-navbar-profile > li > a:hover,
-.oppia-navbar-profile > li > a:focus,
-.oppia-navbar-profile .open > a,
-.oppia-navbar-profile .open > a:hover,
-.oppia-navbar-profile .open > a:focus,
+.oppia-navbar-profile {
+  float: right;
+}
+.oppia-navbar-nav > li > a:hover,
+.oppia-navbar-nav > li > a:focus,
+.oppia-navbar-nav .open > a,
+.oppia-navbar-nav .open > a:hover,
+.oppia-navbar-nav .open > a:focus,
 .oppia-navbar-tabs > li > a:hover,
 .oppia-navbar-tabs > li > a:focus {
   background-color: #fff;
@@ -3004,6 +3055,35 @@ md-card.preview-conversation-skin-supplemental-card {
   color: #005c5e;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   padding-top: 1em;
+}
+
+.oppia-library-h1 {
+  color: #033e39;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+}
+
+.oppia-library-h2 {
+  color: #ffffff;
+  font-family: "Rubik, regular", "Roboto", Arial, sans-serif;
+  padding-bottom: 1em;
+}
+
+@media (min-width: 630px) {
+  .oppia-library-h1 {
+    font-size: 2.5em;
+  }
+  .oppia-library-h2 {
+    font-size: 1.75em;
+  }
+
+}
+@media (max-width: 629px) {
+  .oppia-library-h1 {
+    font-size: 1.2em;
+  }
+  .oppia-library-h2 {
+    font-size: .85em;
+  }
 }
 
 .oppia-splash-h1 {
