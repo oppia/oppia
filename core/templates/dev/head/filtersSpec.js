@@ -35,7 +35,7 @@ describe('Testing filters', function() {
     'summarizeDefaultOutcome',
     'summarizeNonnegativeNumber',
     'truncateAndCapitalize',
-    'sortCollectionNodesByProgressionOrder'
+    'sortCollectionLinearly'
   ];
 
   beforeEach(angular.mock.module('oppia'));

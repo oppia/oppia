@@ -20,7 +20,8 @@
  */
 
 oppia.factory('CollectionValidationService', [
-  'SkillListObjectFactory', function(SkillListObjectFactory) {
+  'CollectionLinearizerService', 'SkillListObjectFactory',
+  function(CollectionLinearizerService, SkillListObjectFactory) {
     var _getStartingExplorationIds = function(collection) {
       var startingCollectionNodes = collection.getStartingCollectionNodes();
       return startingCollectionNodes.map(function(collectionNode) {
@@ -40,33 +41,14 @@ oppia.factory('CollectionValidationService', [
       return overlappingSkillList.getSkills();
     };
 
-    var _getNextExplorationIds = function(collection, completedExpIds) {
-      var acquiredSkillList = completedExpIds.reduce(
-        function(skillList, explorationId) {
-          var collectionNode = collection.getCollectionNodeByExplorationId(
-            explorationId);
-          skillList.addSkillsFromSkillList(
-            collectionNode.getAcquiredSkillList());
-          return skillList;
-        }, SkillListObjectFactory.create([]));
-
-      // Pick all collection nodes whose prerequisite skills are satisified by
-      // the currently acquired skills and which have not yet been completed.
-      return collection.getExplorationIds().filter(function(explorationId) {
-        var collectionNode = collection.getCollectionNodeByExplorationId(
-          explorationId);
-        return completedExpIds.indexOf(explorationId) == -1 &&
-          acquiredSkillList.isSupersetOfSkillList(
-            collectionNode.getPrerequisiteSkillList());
-      });
-    };
-
     var _getUnreachableExplorationIds = function(collection) {
       var completedExpIds = _getStartingExplorationIds(collection);
-      var nextExpIds = _getNextExplorationIds(collection, completedExpIds);
+      var nextExpIds = CollectionLinearizerService.getNextExplorationIds(
+        collection, completedExpIds);
       while (nextExpIds.length > 0) {
         completedExpIds = completedExpIds.concat(nextExpIds);
-        nextExpIds = _getNextExplorationIds(collection, completedExpIds);
+        nextExpIds = CollectionLinearizerService.getNextExplorationIds(
+          collection, completedExpIds);
       }
 
       return collection.getExplorationIds().filter(function(explorationId) {
@@ -143,17 +125,19 @@ oppia.factory('CollectionValidationService', [
       }
 
       var completedExpIds = _getStartingExplorationIds(collection);
-      var nextExpIds = _getNextExplorationIds(collection, completedExpIds);
+      var nextExpIds = CollectionLinearizerService.getNextExplorationIds(
+        collection, completedExpIds);
       if (nextExpIds.length > 1) {
-        issues.push('The collection should have a linear progression. The ' +
+        issues.push('The collection should have linear progression. The ' +
           'following explorations are a part of a branch: ' +
           nextExpIds.join(', '));
       }
       while (nextExpIds.length > 0) {
         completedExpIds = completedExpIds.concat(nextExpIds);
-        nextExpIds = _getNextExplorationIds(collection, completedExpIds);
+        nextExpIds = CollectionLinearizerService.getNextExplorationIds(
+          collection, completedExpIds);
         if (nextExpIds.length > 1) {
-          issues.push('The collection should have a linear progression. The ' +
+          issues.push('The collection should have linear progression. The ' +
             'following explorations are a part of a branch: ' +
             nextExpIds.join(', '));
         }

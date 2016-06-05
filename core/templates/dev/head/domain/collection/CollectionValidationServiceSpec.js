@@ -77,7 +77,7 @@ describe('Collection validation service', function() {
   });
 
   it('should expect at least one collection node', function() {
-    expect(_sampleCollection.deleteCollectionNode('exp_id0')).toBeTruthy();
+    expect(_sampleCollection.deleteCollectionNode('exp_id0')).toBe(true);
     expect(_sampleCollection.getCollectionNodeCount()).toEqual(0);
 
     var issues = _findPrivateValidationIssues();
@@ -103,10 +103,10 @@ describe('Collection validation service', function() {
   });
 
   it('should detect non-linear progression', function() {
-    expect(_addCollectionNode('exp_id1', EXISTS, PRIVATE_STATUS)).toBeTruthy();
-    expect(_addCollectionNode('exp_id2', EXISTS, PRIVATE_STATUS)).toBeTruthy();
-    expect(_addCollectionNode('exp_id3', EXISTS, PRIVATE_STATUS)).toBeTruthy();
-    expect(_addCollectionNode('exp_id4', EXISTS, PRIVATE_STATUS)).toBeTruthy();
+    expect(_addCollectionNode('exp_id1', EXISTS, PRIVATE_STATUS)).toBe(true);
+    expect(_addCollectionNode('exp_id2', EXISTS, PRIVATE_STATUS)).toBe(true);
+    expect(_addCollectionNode('exp_id3', EXISTS, PRIVATE_STATUS)).toBe(true);
+    expect(_addCollectionNode('exp_id4', EXISTS, PRIVATE_STATUS)).toBe(true);
 
     var node0 = _getCollectionNode('exp_id0');
     var node1 = _getCollectionNode('exp_id1');
@@ -124,16 +124,16 @@ describe('Collection validation service', function() {
 
     var issues = _findPrivateValidationIssues();
     expect(issues).toEqual([
-      'The collection should have a linear progression. The following ' +
+      'The collection should have linear progression. The following ' +
       'explorations are a part of a branch: exp_id1, exp_id2',
-      'The collection should have a linear progression. The following ' +
+      'The collection should have linear progression. The following ' +
       'explorations are a part of a branch: exp_id3, exp_id4'
     ]);
   });
 
   it('should detect nodes with similar acquired and prereq skills', function() {
-    expect(_addCollectionNode('exp_id1', EXISTS, PRIVATE_STATUS)).toBeTruthy();
-    expect(_addCollectionNode('exp_id2', EXISTS, PRIVATE_STATUS)).toBeTruthy();
+    expect(_addCollectionNode('exp_id1', EXISTS, PRIVATE_STATUS)).toBe(true);
+    expect(_addCollectionNode('exp_id2', EXISTS, PRIVATE_STATUS)).toBe(true);
 
     var node0 = _getCollectionNode('exp_id0');
     var node1 = _getCollectionNode('exp_id1');
@@ -181,8 +181,8 @@ describe('Collection validation service', function() {
   });
 
   it('should detect unreachable explorations', function() {
-    expect(_addCollectionNode('exp_id1', EXISTS, PRIVATE_STATUS)).toBeTruthy();
-    expect(_addCollectionNode('exp_id2', EXISTS, PRIVATE_STATUS)).toBeTruthy();
+    expect(_addCollectionNode('exp_id1', EXISTS, PRIVATE_STATUS)).toBe(true);
+    expect(_addCollectionNode('exp_id2', EXISTS, PRIVATE_STATUS)).toBe(true);
 
     var node0 = _getCollectionNode('exp_id0');
     var node1 = _getCollectionNode('exp_id1');
@@ -212,7 +212,7 @@ describe('Collection validation service', function() {
 
   it('should detect nonexistent/inaccessible explorations', function() {
     expect(_addCollectionNode(
-      'exp_id1', DOES_NOT_EXIST, PRIVATE_STATUS)).toBeTruthy();
+      'exp_id1', DOES_NOT_EXIST, PRIVATE_STATUS)).toBe(true);
     var node0 = _getCollectionNode('exp_id0');
     var node1 = _getCollectionNode('exp_id1');
     node0.getPrerequisiteSkillList().addSkill('skill0');
@@ -227,8 +227,8 @@ describe('Collection validation service', function() {
 
   it('should allow private and public explorations in a private collection',
       function() {
-    expect(_addCollectionNode('exp_id1', EXISTS, PRIVATE_STATUS)).toBeTruthy();
-    expect(_addCollectionNode('exp_id2', EXISTS, PUBLIC_STATUS)).toBeTruthy();
+    expect(_addCollectionNode('exp_id1', EXISTS, PRIVATE_STATUS)).toBe(true);
+    expect(_addCollectionNode('exp_id2', EXISTS, PUBLIC_STATUS)).toBe(true);
     var node0 = _getCollectionNode('exp_id0');
     var node1 = _getCollectionNode('exp_id1');
     var node2 = _getCollectionNode('exp_id2');
@@ -242,7 +242,7 @@ describe('Collection validation service', function() {
 
   it('should not allow private explorations in a public collection',
       function() {
-    expect(_addCollectionNode('exp_id1', EXISTS, PUBLIC_STATUS)).toBeTruthy();
+    expect(_addCollectionNode('exp_id1', EXISTS, PUBLIC_STATUS)).toBe(true);
     var node1 = _getCollectionNode('exp_id1');
     var node0 = _getCollectionNode('exp_id0');
     node0.getAcquiredSkillList().addSkill('skill0');
@@ -254,14 +254,14 @@ describe('Collection validation service', function() {
     ]);
 
     node1.getPrerequisiteSkillList().removeSkillByName('skill0');
-    expect(_sampleCollection.deleteCollectionNode('exp_id0')).toBeTruthy();
+    expect(_sampleCollection.deleteCollectionNode('exp_id0')).toBe(true);
     issues = _findPublicValidationIssues();
     expect(issues).toEqual([]);
   });
 
   it('should be able to detect multiple validation issues', function() {
-    expect(_addCollectionNode('exp_id1', EXISTS, PUBLIC_STATUS)).toBeTruthy();
-    expect(_addCollectionNode('exp_id2', EXISTS, PRIVATE_STATUS)).toBeTruthy();
+    expect(_addCollectionNode('exp_id1', EXISTS, PUBLIC_STATUS)).toBe(true);
+    expect(_addCollectionNode('exp_id2', EXISTS, PRIVATE_STATUS)).toBe(true);
 
     var node0 = _getCollectionNode('exp_id0');
     var node1 = _getCollectionNode('exp_id1');

@@ -396,47 +396,11 @@ oppia.filter('removeDuplicatesInArray', [function() {
   };
 }]);
 
-// Sorts the node list for display in collection editor frontend. The list
-// starts with a startNode which contains no prerequisite skills. After that
-// nodes are added to the list if their prerequisite skills match the acquired
-// skills of the last node that was added to the node list.
-oppia.filter('sortCollectionNodesByProgressionOrder', ['SkillListObjectFactory',
-    function(SkillListObjectFactory) {
-        var _getNextExplorationIds = function(collection, completedExpIds) {
-          var acquiredSkillList = completedExpIds.reduce(
-            function(skillList, explorationId) {
-              var collectionNode = collection.getCollectionNodeByExplorationId(
-                 explorationId);
-              skillList.addSkillsFromSkillList(
-                 collectionNode.getAcquiredSkillList());
-              return skillList;
-            }, SkillListObjectFactory.create([]));
-
-          // Pick all collection nodes whose prerequisite skills are satisified
-          // by the currently acquired skills and which have not yet been
-          // completed.
-          return collection.getExplorationIds().filter(
-          function(explorationId) {
-            var collectionNode = collection.getCollectionNodeByExplorationId(
-                explorationId);
-            return completedExpIds.indexOf(explorationId) == -1 &&
-                acquiredSkillList.isSupersetOfSkillList(
-                    collectionNode.getPrerequisiteSkillList());
-          });
-        };
-        return function(nodes, collection) {
-          var nodeList = collection.getStartingCollectionNodes();
-          var completedExpIds = nodeList.map(function(collectionNode) {
-            return collectionNode.getExplorationId();
-          });
-
-          var nextExpIds = _getNextExplorationIds(collection, completedExpIds);
-          while (nextExpIds.length > 0) {
-            completedExpIds = completedExpIds.concat(nextExpIds);
-            nodeList.push(collection.getCollectionNodeByExplorationId(
-                nextExpIds[0]));
-            nextExpIds = _getNextExplorationIds(collection, completedExpIds);
-          }
-          return nodeList;
-        };
-      }]);
+// Filters a collection by return a list of collection nodes which represent a
+// valid, linear path through the collection.
+oppia.filter('sortCollectionLinearly', [
+  'CollectionLinearizerService', function(CollectionLinearizerService) {
+      return function(collection) {
+        return CollectionLinearizerService.getCollectionNodesInPlayableOrder(collection);
+      };
+    }]);

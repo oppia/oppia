@@ -23,13 +23,15 @@ oppia.directive('collectionNodeCreator', [function() {
     controller: [
       '$scope', '$http', '$window', '$filter', 'alertsService',
       'validatorsService', 'CollectionEditorStateService',
-      'CollectionUpdateService', 'CollectionNodeObjectFactory',
-      'ExplorationSummaryBackendApiService', 'siteAnalyticsService',
+      'CollectionLinearizerService', 'CollectionUpdateService',
+      'CollectionNodeObjectFactory', 'ExplorationSummaryBackendApiService',
+      'siteAnalyticsService',
       function(
           $scope, $http, $window, $filter, alertsService,
           validatorsService, CollectionEditorStateService,
-          CollectionUpdateService, CollectionNodeObjectFactory,
-          ExplorationSummaryBackendApiService, siteAnalyticsService) {
+          CollectionLinearizerService, CollectionUpdateService,
+          CollectionNodeObjectFactory, ExplorationSummaryBackendApiService,
+          siteAnalyticsService) {
         $scope.collection = CollectionEditorStateService.getCollection();
         $scope.newExplorationId = '';
         $scope.newExplorationTitle = '';
@@ -55,19 +57,8 @@ oppia.directive('collectionNodeCreator', [function() {
                 summaryBackendObject = summaries[0];
               }
               if (summaryBackendObject) {
-                CollectionUpdateService.addCollectionNode(
+                CollectionLinearizerService.appendCollectionNode(
                   $scope.collection, newExplorationId, summaryBackendObject);
-                var acquiredSkills = [];
-                acquiredSkills.push(summaryBackendObject.title);
-                CollectionUpdateService.setAcquiredSkills(collection,
-                    newExplorationId, acquiredSkills);
-                var nodeCount = collection.getCollectionNodeCount();
-                if (nodeCount > 1) {
-                  var lastNode = collection.getCollectionNodes()[nodeCount - 2];
-                  CollectionUpdateService.setPrerequisiteSkills(collection,
-                    newExplorationId,
-                    lastNode.getAcquiredSkillList().getSkills());
-                }
               } else {
                 alertsService.addWarning(
                   'That exploration does not exist or you do not have edit ' +

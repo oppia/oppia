@@ -2,9 +2,9 @@
   <div ng-if="hasLoadedCollection()">
     <!-- Collection node list graph -->
     <div class="collection-editor-node-list-container">
-      <div class="collection-editor-node-container" ng-repeat="node in collection.getBindableCollectionNodes() | sortCollectionNodesByProgressionOrder:collection">
+      <div class="collection-editor-node-container" ng-repeat="node in collection | sortCollectionLinearly">
         <md-card class="collection-editor-node">
-          <collection-node-editor collection="collection" collection-node="node">
+          <collection-node-editor collection-node="node">
           </collection-node-editor>
         </md-card>
 
