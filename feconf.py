@@ -28,14 +28,16 @@ DEBUG = False
 # code in core/platform.
 PLATFORM = 'gae'
 
+# This should be string comparison, since all environment variables
+# are converted to string
+IS_MINIFIED = os.environ.get('MINIFICATION') == 'True'
+
 # Whether we should serve the development or production experience.
 if PLATFORM == 'gae':
     DEV_MODE = (
         (not os.environ.get('SERVER_SOFTWARE')
          or os.environ['SERVER_SOFTWARE'].startswith('Development'))
-        # This should be string comparison, since all environment variables
-        # are converted to string
-        and os.environ.get('MINIFICATION') == 'False')
+        and not IS_MINIFIED)
 else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
 
