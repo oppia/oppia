@@ -100,6 +100,14 @@ oppia.factory('CollectionEditorStateService', [
       },
 
       /**
+       * Returns whether a collection has yet been loaded using either
+       * loadCollection() or setCollection().
+       */
+      hasLoadedCollection: function() {
+        return _collectionIsInitialized;
+      },
+
+      /**
        * Returns the current collection to be shared among the collection
        * editor. Please note any changes to this collection will be propogated
        * to all bindings to it. This collection object will be retained for the

@@ -141,6 +141,27 @@ describe('Collection editor state service', function() {
     expect(CollectionEditorStateService.isLoadingCollection()).toBe(false);
   });
 
+  it('it should report that a collection has loaded through loadCollection()',
+      function() {
+    expect(CollectionEditorStateService.hasLoadedCollection()).toBe(false);
+
+    CollectionEditorStateService.loadCollection(5);
+    expect(CollectionEditorStateService.hasLoadedCollection()).toBe(false);
+
+    $rootScope.$apply();
+    expect(CollectionEditorStateService.hasLoadedCollection()).toBe(true);
+  });
+
+  it('it should report that a collection has loaded through setCollection()',
+      function() {
+    expect(CollectionEditorStateService.hasLoadedCollection()).toBe(false);
+
+    var newCollection = CollectionObjectFactory.create(
+      secondBackendCollectionObject);
+    CollectionEditorStateService.setCollection(newCollection);
+    expect(CollectionEditorStateService.hasLoadedCollection()).toBe(true);
+  });
+
   it('should initially return an empty collection', function() {
     var collection = CollectionEditorStateService.getCollection();
     expect(collection.getId()).toBeUndefined();

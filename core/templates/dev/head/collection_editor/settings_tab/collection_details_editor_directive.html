@@ -26,7 +26,7 @@
     <div class="form-group" ng-class="{'has-error': !displayedCollectionCategory}">
       <label for="collectionCategory" class="col-lg-2 col-md-2 col-sm-2">Category</label>
       <div class="col-lg-10 col-md-10 col-sm-10">
-        <div ng-if="hasPageLoaded">
+        <div ng-if="hasPageLoaded()">
           <select2-dropdown id="collectionCategory"
                             item="$parent.displayedCollectionCategory"
                             choices="CATEGORY_LIST_FOR_SELECT2"

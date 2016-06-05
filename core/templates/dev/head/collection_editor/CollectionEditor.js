@@ -28,18 +28,8 @@ oppia.constant(
 oppia.constant(
   'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', '/explorationsummarieshandler/data');
 
-oppia.controller('CollectionEditor', [
-  '$scope', 'CollectionEditorStateService', 'CollectionRightsBackendApiService',
-  'CollectionValidationService', 'UndoRedoService', 'alertsService',
-  function(
-    $scope, CollectionEditorStateService, CollectionRightsBackendApiService,
-    CollectionValidationService, UndoRedoService, alertsService) {
-    var _collectionId = GLOBALS.collectionId;
-
+oppia.controller('CollectionEditor', ['CollectionEditorStateService',
+  function(CollectionEditorStateService) {
     // Load the collection to be edited.
-    CollectionEditorStateService.loadCollection(_collectionId);
-
-
-
-
+    CollectionEditorStateService.loadCollection(GLOBALS.collectionId);
   }]);

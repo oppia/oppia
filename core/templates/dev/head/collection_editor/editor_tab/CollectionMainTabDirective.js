@@ -23,8 +23,8 @@ oppia.directive('collectionMainTab', [function() {
     controller: ['$scope', 'CollectionEditorStateService',
     function($scope, CollectionEditorStateService) {
       // TODO(bhenning): Implement isCollectionLoaded.
-      $scope.isCollectionLoaded = (
-        CollectionEditorStateService.isCollectionLoaded);
+      $scope.hasLoadedCollection = (
+        CollectionEditorStateService.hasLoadedCollection);
     }]
   };
 }]);

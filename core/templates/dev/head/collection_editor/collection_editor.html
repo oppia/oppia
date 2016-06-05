@@ -40,32 +40,26 @@
 {% block content %}
   <div ng-controller="CollectionEditor">
     <!-- This directive needs to be moved to the navbar. -->
-    <collection-editor-save-publish>
-    </collection-editor-save-publish>
+    <collection-editor-save-publish></collection-editor-save-publish>
 
     <div ng-if="getTabStatuses().active === 'main'">
-      <collection-main-tab>
-      </collection-main-tab>
+      <collection-main-tab></collection-main-tab>
     </div>
 
     <div ng-show="getTabStatuses().active === 'settings'">
-      <collection-settings-tab>
-      </collection-settings-tab>
+      <collection-settings-tab></collection-settings-tab>
     </div>
 
     <div ng-show="getTabStatuses().active === 'history'">
-      <collection-history-tab>
-      </collection-history-tab>
+      <collection-history-tab></collection-history-tab>
     </div>
 
     <div ng-show="getTabStatuses().active === 'feedback'">
-      <collection-feedback-tab>
-      </collection-feedback-tab>
+      <collection-feedback-tab></collection-feedback-tab>
     </div>
 
     <div ng-show="getTabStatuses().active === 'stats'">
-      <collection-statistics-tab>
-      </collection-statistics-tab>
+      <collection-statistics-tab></collection-statistics-tab>
     </div>
   </div>
 

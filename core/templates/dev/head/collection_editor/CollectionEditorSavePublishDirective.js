@@ -39,7 +39,8 @@ oppia.directive('collectionEditorSavePublish', [function() {
         $scope.isPrivate = GLOBALS.isPrivate;
         $scope.canUnpublish = GLOBALS.canUnpublish;
         $scope.validationIssues = [];
-        $scope.isSaveInProgress = false;
+        $scope.isSaveInProgress = (
+          CollectionEditorStateService.isSavingCollection);
         var _collectionId = GLOBALS.collectionId;
 
         var _validateCollection = function() {

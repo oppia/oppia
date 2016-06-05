@@ -8,7 +8,7 @@
                 ng-class="{'btn-success': isCollectionSaveable()}"
                 ng-click="saveCollection('')"
                 ng-disabled="!isCollectionSaveable()">
-          <span ng-if="!isSaveInProgress">
+          <span ng-if="!isSaveInProgress()">
             <span ng-if="isPrivate">
               <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
                  alt="Save Collection">&#xE161;</i>
@@ -25,7 +25,7 @@
             </span>
           </span>
 
-          <span ng-if="isSaveInProgress">
+          <span ng-if="isSaveInProgress()">
             <span ng-if="isPrivate" class="oppia-save-publish-button-label">Saving</span>
             <span ng-if="!isPrivate" class="oppia-save-publish-button-label">Publishing</span>
             <loading-dots></loading-dots>

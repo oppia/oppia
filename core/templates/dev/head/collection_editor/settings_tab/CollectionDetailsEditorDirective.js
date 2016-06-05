@@ -25,11 +25,14 @@ oppia.directive('collectionDetailsEditor', [function() {
     controller: [
         '$scope', 'CollectionEditorStateService', 'CollectionUpdateService',
         'alertsService', 'CATEGORY_LIST',
+        'COLLECTION_EDITOR_INITIALIZED_COLLECTION',
         function(
           $scope, CollectionEditorStateService, CollectionUpdateService,
-          alertsService, CATEGORY_LIST) {
+          alertsService, CATEGORY_LIST,
+          COLLECTION_EDITOR_INITIALIZED_COLLECTION) {
       $scope.collection = CollectionEditorStateService.getCollection();
-      $scope.hasPageLoaded = false;
+      $scope.hasPageLoaded = (
+        CollectionEditorStateService.hasLoadedCollection);
       $scope.CATEGORY_LIST_FOR_SELECT2 = CATEGORY_LIST.map(function(category) {
         return {
           id: category,
@@ -37,8 +40,7 @@ oppia.directive('collectionDetailsEditor', [function() {
         };
       });
 
-      // TODO(bhenning): Fix this.
-      $scope.$on('collectionLoaded', function() {
+      $scope.$on(COLLECTION_EDITOR_INITIALIZED_COLLECTION, function() {
         $scope.displayedCollectionTitle = $scope.collection.getTitle();
         $scope.displayedCollectionObjective = (
           $scope.collection.getObjective());
@@ -59,8 +61,6 @@ oppia.directive('collectionDetailsEditor', [function() {
             text: $scope.collection.getCategory()
           });
         }
-
-        $scope.hasPageLoaded = true;
       });
 
       $scope.updateCollectionTitle = function() {
