@@ -44,29 +44,34 @@ oppia.directive('createActivityButton', [function() {
           if (urlService.getPathname() !== '/my_explorations') {
             $window.location.replace('/my_explorations?mode=create');
           } else {
-            $modal.open({
-              templateUrl: 'modals/createActivity',
-              backdrop: true,
-              controller: [
-                  '$scope', '$modalInstance', function($scope, $modalInstance) {
-                $scope.chooseExploration = function() {
-                  ExplorationCreationService.createNewExploration();
-                  $modalInstance.close();
-                };
+            if ($('.oppia-create-activity-modal').length === 0) {
+              $modal.open({
+                templateUrl: 'modals/createActivity',
+                backdrop: true,
+                controller: [
+                    '$scope', '$modalInstance',
+                    function($scope, $modalInstance) {
+                  $scope.chooseExploration = function() {
+                    ExplorationCreationService.createNewExploration();
+                    $modalInstance.close();
+                  };
 
-                $scope.chooseCollection = function() {
-                  CollectionCreationService.createNewCollection();
-                  $modalInstance.close();
-                };
+                  $scope.chooseCollection = function() {
+                    CollectionCreationService.createNewCollection();
+                    $modalInstance.close();
+                  };
 
-                $scope.cancel = function() {
-                  $modalInstance.dismiss('cancel');
-                };
-              }],
-              windowClass: 'oppia-creation-modal'
-            }).result.then(function() {}, function() {
+                  $scope.cancel = function() {
+                    $modalInstance.dismiss('cancel');
+                  };
+                }],
+                windowClass: 'oppia-creation-modal'
+              }).result.then(function() {}, function() {
+                $scope.creationInProgress = false;
+              });
+            } else {
               $scope.creationInProgress = false;
-            });
+            }
           }
         };
 
