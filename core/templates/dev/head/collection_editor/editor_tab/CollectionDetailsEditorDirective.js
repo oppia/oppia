@@ -21,21 +21,21 @@
 oppia.directive('collectionDetailsEditor', [function() {
   return {
     restrict: 'E',
-    scope: {
-      getCollection: '&collection'
-    },
     templateUrl: 'inline/collection_details_editor_directive',
     controller: [
-        '$scope', 'CollectionUpdateService', 'alertsService',
-        function($scope, CollectionUpdateService, alertsService) {
+        '$scope', 'CollectionEditorStateService', 'CollectionUpdateService',
+        'alertsService',
+        function(
+          $scope, CollectionEditorStateService, CollectionUpdateService,
+          alertsService) {
+      $scope.collection = CollectionEditorStateService.getCollection();
       $scope.updateCollectionTitle = function() {
         if (!$scope.newCollectionTitle) {
           alertsService.addWarning('Cannot set empty collection title.');
           return;
         }
-        var collection = $scope.getCollection();
         CollectionUpdateService.setCollectionTitle(
-          collection, $scope.newCollectionTitle);
+          $scope.collection, $scope.newCollectionTitle);
         $scope.newCollectionTitle = '';
       };
 
@@ -44,9 +44,8 @@ oppia.directive('collectionDetailsEditor', [function() {
           alertsService.addWarning('Cannot set empty collection category.');
           return;
         }
-        var collection = $scope.getCollection();
         CollectionUpdateService.setCollectionCategory(
-          collection, $scope.newCollectionCategory);
+          $scope.collection, $scope.newCollectionCategory);
         $scope.newCollectionCategory = '';
       };
 
@@ -55,9 +54,8 @@ oppia.directive('collectionDetailsEditor', [function() {
           alertsService.addWarning('Cannot set empty collection objective.');
           return;
         }
-        var collection = $scope.getCollection();
         CollectionUpdateService.setCollectionObjective(
-          collection, $scope.newCollectionObjective);
+          $scope.collection, $scope.newCollectionObjective);
         $scope.newCollectionObjective = '';
       };
     }]
