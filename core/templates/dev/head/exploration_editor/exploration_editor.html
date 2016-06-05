@@ -447,11 +447,11 @@
 
         <div class="modal-body">
             <p>
-                Sorry someone else has saved a new version of this exploration and so your pending changes cannot be saved. The lost changes are displayed below. You may want to copy and paste these changes before discarding them.
+                Sorry someone else has saved a new version of this exploration and so your pending changes cannot be saved.
+                <span ng-show="isLostChanges">The lost changes are displayed below. You may want to copy and paste these changes before discarding them.</span>
             </p>
 
-            <div class="lost-changes" ng-bind-html="lostChangesHtml">
-            </div>
+            <div class="lost-changes" ng-bind-html="lostChangesHtml"></div>
         </div>
 
         <div class="modal-footer">

@@ -500,6 +500,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
   'explorationObjectiveService', 'explorationTitleService',
   'explorationCategoryService', 'explorationStatesService', 'CATEGORY_LIST',
   'explorationLanguageCodeService', 'explorationTagsService',
+  'autosaveInfoModalsService',
   function(
       $scope, $http, $rootScope, $window, $timeout, $modal,
       alertsService, changeListService, focusService, routerService,
@@ -507,7 +508,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       explorationWarningsService, siteAnalyticsService,
       explorationObjectiveService, explorationTitleService,
       explorationCategoryService, explorationStatesService, CATEGORY_LIST,
-      explorationLanguageCodeService, explorationTagsService) {
+      explorationLanguageCodeService, explorationTagsService,
+      autosaveInfoModalsService) {
     // Whether or not a save action is currently in progress.
     $scope.isSaveInProgress = false;
     // Whether or not a discard action is currently in progress.
@@ -847,8 +849,9 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         version: explorationData.data.version
       }).then(function(response) {
         var data = response.data;
-        if (data.error) {
-          alertsService.addWarning(data.error);
+        if (data.is_version_of_draft_valid === false) {
+          autosaveInfoModalsService.showVersionMismatchModal(
+            changeListService.getChangeList());
           return;
         }
 
