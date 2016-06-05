@@ -17,37 +17,38 @@
  * Changes may be undone, redone, or replaced.
  */
 
+oppia.constant(
+  'UNDO_REDO_SERVICE_CHANGE_APPLIED', 'undoRedoServiceChangeApplied');
+
 /**
  * Stores a stack of changes to a domain object. Please note that only one
  * instance of this service exists at a time, so multiple undo/redo stacks are
  * not currently supported.
  */
-var UndoRedoService = function() {
+var UndoRedoServiceDeps = ['$rootScope', 'UNDO_REDO_SERVICE_CHANGE_APPLIED'];
+var UndoRedoService = function($rootScope, UNDO_REDO_SERVICE_CHANGE_APPLIED) {
   var UndoRedoService = {};
 
   var _appliedChanges = [];
   var _undoneChanges = [];
-  var _mutationCallback = null;
 
-  var _dispatchMutation = function(changeObject, isForwardChange) {
-    if (_mutationCallback) {
-      _mutationCallback(changeObject, isForwardChange);
-    }
+  var _dispatchMutation = function() {
+    $rootScope.$broadcast(UNDO_REDO_SERVICE_CHANGE_APPLIED);
   };
   var _applyChange = function(changeObject, domainObject) {
     changeObject.applyChange(domainObject);
-    _dispatchMutation(changeObject, true);
+    _dispatchMutation();
   };
   var _reverseChange = function(changeObject, domainObject) {
     changeObject.reverseChange(domainObject);
-    _dispatchMutation(changeObject, false);
+    _dispatchMutation();
   };
 
   /**
    * Pushes a change domain object onto the change stack and applies it to the
    * provided domain object. When a new change is applied, all undone changes
-   * are lost and cannot be redone. This will invoke the latest callback
-   * provided to setOnChangedCallback(), if one is available.
+   * are lost and cannot be redone. This will fire an event as defined by the
+   * constant UNDO_REDO_SERVICE_CHANGE_APPLIED.
    */
   UndoRedoService.applyChange = function(changeObject, domainObject) {
     _appliedChanges.push(changeObject);
@@ -57,9 +58,8 @@ var UndoRedoService = function() {
 
   /**
    * Undoes the last change to the provided domain object. This function returns
-   * false if there are no changes to undo, and true otherwise. This will invoke
-   * the latest callback provided to setOnChangedCallback(), if one is
-   * available.
+   * false if there are no changes to undo, and true otherwise. This will fire
+   * an event as defined by the constant UNDO_REDO_SERVICE_CHANGE_APPLIED.
    */
   UndoRedoService.undoChange = function(domainObject) {
     if (_appliedChanges.length != 0) {
@@ -73,9 +73,8 @@ var UndoRedoService = function() {
 
   /**
    * Reverses an undo for the given domain object. This function returns false
-   * if there are no changes to redo, and true if otherwise. This will invoke
-   * the latest callback provided to setOnChangedCallback(), if one is
-   * available.
+   * if there are no changes to redo, and true if otherwise. This will fire an
+   * event as defined by the constant UNDO_REDO_SERVICE_CHANGE_APPLIED.
    */
   UndoRedoService.redoChange = function(domainObject) {
     if (_undoneChanges.length != 0) {
@@ -127,28 +126,16 @@ var UndoRedoService = function() {
 
   /**
    * Clears the change history. This does not reverse any of the changes applied
-   * from applyChange() or redoChange(). This will invoke the latest callback
-   * provided to setOnChangedCallback(), if one is available.
+   * from applyChange() or redoChange(). This will fire an event as defined by
+   * the constant UNDO_REDO_SERVICE_CHANGE_APPLIED.
    */
   UndoRedoService.clearChanges = function() {
     _appliedChanges = [];
     _undoneChanges = [];
-    _dispatchMutation(null);
-  };
-
-  /**
-   * Sets a callback which will be called whenever the UndoRedoService changes.
-   * Please note that the callback is only called after a change is applied. The
-   * function may take two arguments, where the first one is a change being
-   * applied and the second is a boolean on whether that change is being applied
-   * or reverted. The change object passed to the callback will be null if the
-   * UndoRedoService is being cleared of changes.
-   */
-  UndoRedoService.setOnChangedCallback = function(callback) {
-    _mutationCallback = callback;
+    _dispatchMutation();
   };
 
   return UndoRedoService;
 };
 
-oppia.factory('UndoRedoService', UndoRedoService);
+oppia.factory('UndoRedoService', UndoRedoServiceDeps.concat(UndoRedoService));

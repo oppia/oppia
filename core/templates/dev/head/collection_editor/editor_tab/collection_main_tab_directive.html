@@ -1,10 +1,9 @@
 <script type="text/ng-template" id="inline/collection_main_tab_directive">
-  <div ng-if="getCollection()">
+  <div ng-if="collection">
     <!-- Collection details -->
-    <collection-details-editor collection="getCollection()">
-    </collection-details-editor>
+    <collection-details-editor></collection-details-editor>
 
-    <a ng-href="/collection/<[getCollection().getId()]>" target="_blank">
+    <a ng-href="/collection/<[collection.getId()]>" target="_blank">
       Go to Collection
     </a>
 
@@ -12,15 +11,14 @@
     <br>
     <br>
     <strong>Skills</strong>
-    <collection-skill-list collection-skill-list="getCollectionSkillList()">
-    </collection-skill-list>
+    <collection-skill-list></collection-skill-list>
 
     <!-- List of explorations -->
     <br>
     <strong>Explorations</strong>
     <ul>
-      <li ng-repeat="node in getCollection().getBindableCollectionNodes()">
-        <collection-node-editor collection="getCollection()" collection-node="node" update-skill-list="updateSkillList()">
+      <li ng-repeat="node in collection.getBindableCollectionNodes()">
+        <collection-node-editor collection-node="node">
         </collection-node-editor>
       </li>
     </ul>
