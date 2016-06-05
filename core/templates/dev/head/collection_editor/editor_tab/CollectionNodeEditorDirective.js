@@ -51,6 +51,45 @@ oppia.directive('collectionNodeEditor', [function() {
         return angular.copy(collectionNode.getAcquiredSkillList());
       };
 
+      var _getNextNode = function(explorationId, currNode, collection) {
+        var nextNode = null;
+        var completedExpIds = [];
+        completedExpIds.push(explorationId);
+        var acquiredSkillsList = currNode.getAcquiredSkillList().getSkills();
+        if (acquiredSkillsList) {
+          var acquiredSkill = acquiredSkillsList[0];
+          var collectionNodes = collection.getCollectionNodes().filter(
+              function(collectionNode) {
+                var prerequisiteSkillList =
+                    collectionNode.getPrerequisiteSkillList().getSkills();
+                return prerequisiteSkillList &&
+                    acquiredSkill == prerequisiteSkillList[0];
+              });
+          nextNode = collectionNodes[0];
+        }
+        return nextNode;
+      };
+
+      var _getPrevNode = function(explorationId, currNode, collection) {
+        var prevNode = null;
+        var completedExpIds = [];
+        completedExpIds.push(explorationId);
+        var prerequisiteSkillsList =
+            currNode.getPrerequisiteSkillList().getSkills();
+        if (prerequisiteSkillsList) {
+          var prerequisitSkill = prerequisiteSkillsList[0];
+          var collectionNodes = collection.getCollectionNodes().filter(
+              function(collectionNode) {
+                var acquiredSkillsList =
+                    collectionNode.getAcquiredSkillList().getSkills();
+                return acquiredSkillsList &&
+                    prerequisitSkill == acquiredSkillsList[0];
+              });
+          prevNode = collectionNodes[0];
+        }
+        return prevNode;
+      };
+
       // Adds a prerequisite skill to the frontend collection object and also
       // updates the changelist.
       $scope.addNewPrerequisiteSkill = function() {
@@ -116,6 +155,24 @@ oppia.directive('collectionNodeEditor', [function() {
             'Internal collection editor error. Could not delete exploration ' +
             'by ID: ' + explorationId);
         }
+        // Get the next node (node to the right of the deleted node)
+        var nextCollectionNode = _getNextNode(explorationId, collectionNode,
+            collection);
+
+        // Update the pre-requisite and acquired skills of the next node.
+        if (nextCollectionNode) {
+          CollectionUpdateService.setPrerequisiteSkills(collection,
+              nextCollectionNode.getExplorationId(), []);
+          // Get the previous node (node to the left of the deleted node)
+          var prevCollectionNode = _getPrevNode(explorationId, collectionNode,
+              collection);
+          if (prevCollectionNode) {
+            CollectionUpdateService.setPrerequisiteSkills(collection,
+                nextCollectionNode.getExplorationId(),
+                prevCollectionNode.getAcquiredSkillList());
+          }
+        }
+
         CollectionUpdateService.deleteCollectionNode(
           collection, explorationId);
       };
