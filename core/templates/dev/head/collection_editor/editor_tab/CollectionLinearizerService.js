@@ -89,6 +89,67 @@ oppia.factory('CollectionLinearizerService', [
       return nodeIndex < lastIndex ? linearNodeList[nodeIndex + 1] : null;
     };
 
+    // Swap the node at the specified index with the node immediately to the
+    // left of it.
+    var _swapLeft = function(collection, linearNodeList, nodeIndex) {
+      // There are three cases when swapping a node left:
+      //   1. There is a node right of it but not left
+      //   2. There is a node left of it but not right
+      //   3. There are nodes both to the left and right of it
+
+      var node = linearNodeList[nodeIndex];
+      var leftNode = _getNodeLeftOf(linearNodeList, nodeIndex);
+      var rightNode = _getNodeRightOf(linearNodeList, nodeIndex);
+      if (!leftNode) {
+        // Case 1 is a no-op: there's nothing to swap with.
+        return;
+      }
+
+      // Case 2 involves two shifts. Take for instance: a->b
+      // First, b needs to have the same prerequisites as a: a, b
+      var leftPrereqSkills = leftNode.getPrerequisiteSkillList().getSkills();
+      CollectionUpdateService.setPrerequisiteSkills(
+        collection, node.getExplorationId(), leftPrereqSkills);
+
+      // Second, a needs to prerequire b's acquired skills: b->a
+      var centerAcquiredSkills = node.getAcquiredSkillList().getSkills();
+      CollectionUpdateService.setPrerequisiteSkills(
+        collection, leftNode.getExplorationId(), centerAcquiredSkills);
+
+      if (rightNode) {
+        // Case 3 has a third shift beyond case two. With example: a->b->c
+        // Step 1: a, b->c
+        // Step 2: b->c
+        //          \
+        //           -a
+        // Step 3 involves updating c to prerequire a's acquired skills: b->a->c
+        var leftAcquiredSkills = leftNode.getAcquiredSkillList().getSkills();
+        CollectionUpdateService.setPrerequisiteSkills(
+          collection, rightNode.getExplorationId(), leftAcquiredSkills);
+      }
+    };
+    var _swapRight = function(collection, linearNodeList, nodeIndex) {
+      // Swapping right is the same as swapping the node one to the right
+      // leftward.
+      if (nodeIndex < linearNodeList.length - 1) {
+        _swapLeft(collection, linearNodeList, nodeIndex + 1);
+      }
+      // Otherwise it is a no-op (cannot swap the last node right).
+    };
+
+    var _shiftNode = function(collection, explorationId, swapFunction) {
+      // There is nothing to shift if the collection has only 1 node.
+      if (collection.getCollectionNodeCount() > 1) {
+        var linearNodeList = _getCollectionNodesInPlayableOrder(collection);
+        var nodeIndex = _findNodeIndex(linearNodeList, explorationId);
+        if (nodeIndex == -1) {
+          return false;
+        }
+        swapFunction(collection, linearNodeList, nodeIndex);
+      }
+      return true;
+    };
+
     return {
       /**
        * Given a collection and a list of completed exploration IDs within the
@@ -162,6 +223,28 @@ oppia.factory('CollectionLinearizerService', [
         }
         CollectionUpdateService.deleteCollectionNode(collection, explorationId);
         return true;
+      },
+
+      /**
+       * Looks up a collection node given an exploration ID in the specified
+       * collection and attempts to shift it left in the linear ordering of the
+       * collection. If the node is the first exploration played by the player,
+       * then this function is a no-op. Returns false if the specified
+       * exploration ID does not associate to any nodes in the collection.
+       */
+      shiftNodeLeft: function(collection, explorationId) {
+        return _shiftNode(collection, explorationId, _swapLeft);
+      },
+
+      /**
+       * Looks up a collection node given an exploration ID in the specified
+       * collection and attempts to shift it right in the linear ordering of the
+       * collection. If the node is the last exploration played by the player,
+       * then this function is a no-op. Returns false if the specified
+       * exploration ID does not associate to any nodes in the collection.
+       */
+      shiftNodeRight: function(collection, explorationId) {
+        return _shiftNode(collection, explorationId, _swapRight);
       }
     };
   }]);

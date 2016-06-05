@@ -1,9 +1,10 @@
 <script type="text/ng-template" id="inline/collection_node_editor_directive">
   <div class="collection-editor-node-title">
     <[getCollectionNode().getExplorationTitle()]>
-    <span ng-click="deleteCollectionNode()" class="glyphicon glyphicon-remove-circle" aria-hidden="true">
-    </span>
+    <span ng-click="deleteNode()" class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
   </div>
+  <span ng-click="shiftNodeLeft()" ng-if="getLinearIndex() > 0" class="glyphicon shift-left-arrow" arria-hidden="true">&lt;</span>
+  <span ng-click="shiftNodeRight()" ng-if="getLinearIndex() < collection.getCollectionNodeCount() - 1" class="glyphicon shift-right-arrow" arria-hidden="true">&gt;</span>
 </script>
 
 <style>
@@ -11,6 +12,18 @@
     color: #EF5350;
     top: -15px;
     left: 5px;
+  }
+  .shift-left-arrow {
+    color: #000;
+    opacity: 0.7;
+    top: 15px;
+    float: left;
+  }
+  .shift-right-arrow {
+    color: #000;
+    opacity: 0.7;
+    top: 15px;
+    float: right;
   }
 
   .collection-editor-node-title {

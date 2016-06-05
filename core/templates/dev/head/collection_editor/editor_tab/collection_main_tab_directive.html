@@ -4,7 +4,7 @@
     <div class="collection-editor-node-list-container">
       <div class="collection-editor-node-container" ng-repeat="node in collection | sortCollectionLinearly">
         <md-card class="collection-editor-node">
-          <collection-node-editor collection-node="node">
+          <collection-node-editor collection-node="node" linear-index="$index">
           </collection-node-editor>
         </md-card>
 
