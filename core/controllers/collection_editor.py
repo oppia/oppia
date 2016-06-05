@@ -122,15 +122,14 @@ class CollectionEditorPage(CollectionEditorHandler):
                 rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id))
 
         self.values.update({
-            'is_private': rights_manager.is_collection_private(collection_id),
             'can_edit': can_edit,
-            'collection_id': collection.id,
-            'title': collection.title,
             'can_unpublish': rights_manager.Actor(
                 self.user_id).can_unpublish(
                     rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id),
-            'SHOW_COLLECTION_NAVIGATION_TAB_SETTINGS': (
-                feconf.SHOW_COLLECTION_NAVIGATION_TAB_SETTINGS),
+            'collection_id': collection.id,
+            'is_private': rights_manager.is_collection_private(collection_id),
+            'nav_mode': feconf.NAV_MODE_CREATE,
+            'title': collection.title,
             'SHOW_COLLECTION_NAVIGATION_TAB_HISTORY': (
                 feconf.SHOW_COLLECTION_NAVIGATION_TAB_HISTORY),
             'SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK': (

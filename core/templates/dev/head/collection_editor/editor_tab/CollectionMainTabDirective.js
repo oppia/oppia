@@ -22,7 +22,9 @@ oppia.directive('collectionMainTab', [function() {
     templateUrl: 'inline/collection_main_tab_directive',
     controller: ['$scope', 'CollectionEditorStateService',
     function($scope, CollectionEditorStateService) {
-      $scope.collection = CollectionEditorStateService.getCollection();
+      // TODO(bhenning): Implement isCollectionLoaded.
+      $scope.hasLoadedCollection = (
+        CollectionEditorStateService.hasLoadedCollection);
     }]
   };
 }]);

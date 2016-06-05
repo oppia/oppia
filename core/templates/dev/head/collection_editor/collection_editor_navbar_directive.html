@@ -3,24 +3,22 @@
     <!-- Editor -->
     <li ng-class="{'active': getTabStatuses().active === 'main'}">
       <a href="#" tooltip="Editor" ng-click="selectMainTab()" class="protractor-test-main-tab">
-        <span class="glyphicon glyphicon-pencil"></span>
+        <i class="material-icons">&#xE254;</i>
       </a>
     </li>
 
     <!-- Settings -->
-    {% if SHOW_COLLECTION_NAVIGATION_TAB_SETTINGS %}
     <li ng-class="{'active': getTabStatuses().active === 'settings'}">
       <a href="#" tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()" class="protractor-test-settings-tab">
-        <span class="glyphicon glyphicon-cog"></span>
+        <i class="material-icons">&#xE8B8;</i>
       </a>
     </li>
-    {% endif %}
 
     <!-- History -->
     {% if SHOW_COLLECTION_NAVIGATION_TAB_HISTORY %}
     <li ng-class="{'active': getTabStatuses().active === 'history'}">
       <a href="#" tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()" class="protractor-test-history-tab">
-        <span class="glyphicon glyphicon-time"></span>
+        <i class="material-icons">&#xE192;</i>
       </a>
     </li>
     {% endif %}
@@ -29,7 +27,7 @@
     {% if SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK %}
     <li ng-class="{'active': getTabStatuses().active === 'feedback'}">
       <a href="#" tooltip="Feedback" tooltip-placement="bottom" ng-click="selectFeedbackTab()">
-        <span class="glyphicon glyphicon-comment"></span>
+        <i class="material-icons">&#xE87F;</i>
       </a>
     </li>
     {% endif %}
@@ -38,9 +36,16 @@
     {% if SHOW_COLLECTION_NAVIGATION_TAB_STATS and username %}
       <li ng-class="{'active': getTabStatuses().active === 'stats'}">
         <a href="#" tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()">
-          <span class="glyphicon glyphicon-stats"></span>
+          <i class="material-icons">&#xE24B;</i>
         </a>
       </li>
     {% endif %}
+
+    <!-- Player -->
+    <li>
+      <a ng-href="/collection/<[collectionId]>" target="_blank" tooltip="Player (new tab)" tooltip-placement="bottom">
+        <i class="material-icons">&#xE037;</i>
+      </a>
+    </li>
   </div>
 </script>
