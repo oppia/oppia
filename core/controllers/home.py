@@ -110,6 +110,7 @@ class MyExplorationsPage(base.BaseHandler):
     """Page showing the user's explorations."""
 
     PAGE_NAME_FOR_CSRF = 'dashboard'
+    PAGE_HAS_CREATE_EXP_REQUEST = True
 
     @base.require_user
     def get(self):
@@ -218,17 +219,33 @@ class NotificationsHandler(base.BaseHandler):
         })
 
 
+class SiteLanguageHandler(base.BaseHandler):
+    """Changes the preferred system language in the user's preferences."""
+
+    PAGE_NAME_FOR_CSRF = feconf.CSRF_PAGE_NAME_I18N
+
+    def put(self):
+        """Handles PUT requests."""
+        if user_services.has_fully_registered(self.user_id):
+            site_language_code = self.payload.get('site_language_code')
+            user_services.update_preferred_site_language_code(
+                self.user_id, site_language_code)
+        self.render_json({})
+
+
 class NewExploration(base.BaseHandler):
     """Creates a new exploration."""
 
-    PAGE_NAME_FOR_CSRF = 'dashboard'
+    PAGE_NAME_FOR_CSRF = feconf.CSRF_PAGE_NAME_CREATE_EXPLORATION
 
     @base.require_fully_signed_up
     def post(self):
         """Handles POST requests."""
+        title = self.payload.get('title', feconf.DEFAULT_EXPLORATION_TITLE)
+
         new_exploration_id = exp_services.get_new_exploration_id()
         exploration = exp_domain.Exploration.create_default_exploration(
-            new_exploration_id)
+            new_exploration_id, title=title)
         exp_services.save_new_exploration(self.user_id, exploration)
 
         self.render_json({

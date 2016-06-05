@@ -24,7 +24,8 @@ var oppia = angular.module(
   'oppia', [
     'ngMaterial', 'ngAnimate', 'ngSanitize', 'ngTouch', 'ngResource',
     'ui.bootstrap', 'ui.sortable', 'infinite-scroll', 'ngJoyRide', 'ngImgCrop',
-    'ui.validate', 'textAngular', 'toastr'
+    'ui.validate', 'textAngular', 'pascalprecht.translate', 'ngCookies',
+    'toastr'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
                    : []));
@@ -66,9 +67,16 @@ oppia.config([
           request: function(config) {
             // If this request carries data (in the form of a JS object),
             // JSON-stringify it and store it under 'payload'.
+            var csrfToken = '';
             if (config.data) {
+              var csrfToken = (
+                config.requestIsForCreateExploration ?
+                  GLOBALS.csrf_token_create_exploration :
+                config.requestIsForI18n ? GLOBALS.csrf_token_i18n :
+                GLOBALS.csrf_token);
+
               config.data = $.param({
-                csrf_token: GLOBALS.csrf_token,
+                csrf_token: csrfToken,
                 payload: JSON.stringify(config.data),
                 source: document.URL
               }, true);
@@ -289,6 +297,21 @@ oppia.factory('validatorsService', [
       }
       return true;
     },
+    isValidExplorationTitle: function(input, showWarnings) {
+      if (!this.isValidEntityName(input, showWarnings)) {
+        return false;
+      }
+
+      if (input.length > 40) {
+        if (showWarnings) {
+          alertsService.addWarning(
+            'Exploration titles should be at most 40 characters long.');
+        }
+        return false;
+      }
+
+      return true;
+    },
     // NB: this does not check whether the card name already exists in the
     // states dict.
     isValidStateName: function(input, showWarnings) {
@@ -444,8 +467,14 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
         'CreateExplorationButton', 'click', $window.location.pathname);
     },
     registerCreateNewExplorationEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics('NewExploration', 'create', explorationId);
+    },
+    registerCreateNewExplorationInCollectionEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
-        'NewExploration', 'create', explorationId);
+        'NewExplorationFromCollection', 'create', explorationId);
+    },
+    registerCreateNewCollectionEvent: function(collectionId) {
+      _sendEventToGoogleAnalytics('NewCollection', 'create', collectionId);
     },
     registerCommitChangesToPrivateExplorationEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(

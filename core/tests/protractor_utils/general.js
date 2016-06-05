@@ -130,6 +130,21 @@ var expect404Error = function() {
     toMatch('Error 404');
 };
 
+// Checks no untranslated values are shown in the page.
+var ensurePageHasNoTranslationIds = function() {
+  // The use of the InnerHTML is hacky, but is faster than checking each
+  // individual component that contains text.
+  element(by.css('.oppia-base-container')).getInnerHtml().then(
+    function(promiseValue) {
+      // First remove all the attributes translate and variables that are
+      // not displayed
+      var REGEX_TRANSLATE_ATTR = new RegExp('translate="I18N_', 'g');
+      var REGEX_NG_VARIABLE = new RegExp('<\\[\'I18N_', 'g');
+      expect(promiseValue.replace(REGEX_TRANSLATE_ATTR, '')
+        .replace(REGEX_NG_VARIABLE, '')).not.toContain('I18N');
+    });
+};
+
 exports.waitForSystem = waitForSystem;
 exports.scrollToTop = scrollToTop;
 exports.checkForConsoleErrors = checkForConsoleErrors;
@@ -149,3 +164,5 @@ exports.openPlayer = openPlayer;
 exports.moveToPlayer = moveToPlayer;
 exports.moveToEditor = moveToEditor;
 exports.expect404Error = expect404Error;
+
+exports.ensurePageHasNoTranslationIds = ensurePageHasNoTranslationIds;

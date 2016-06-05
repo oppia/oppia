@@ -73,6 +73,7 @@ oppia.controller('Profile', [
       $scope.startingExplorationNumber = 1;
       $scope.endingExplorationNumber = 6;
       $scope.Math = window.Math;
+      $scope.profileIsOfCurrentUser = data.profile_is_of_current_user;
 
       $scope.goToPreviousPage = function() {
         if ($scope.currentPageNumber === 0) {

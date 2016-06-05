@@ -58,6 +58,14 @@ VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
 # The maximum number of results to retrieve in a datastore query.
 DEFAULT_QUERY_LIMIT = 1000
 
+# The maximum number of results to retrieve in a datastore query
+# for top rated published explorations.
+NUMBER_OF_TOP_RATED_EXPLORATIONS = 8
+
+# The maximum number of results to retrieve in a datastore query
+# for recently published explorations.
+RECENTLY_PUBLISHED_QUERY_LIMIT = 8
+
 # The current version of the exploration states blob schema. If any backward-
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
@@ -156,6 +164,9 @@ INVALID_PARAMETER_NAMES = AUTOMATICALLY_SET_PARAMETER_NAMES + [
 _EMPTY_RATINGS = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
 def get_empty_ratings():
     return copy.deepcopy(_EMPTY_RATINGS)
+
+# Empty scaled average rating as a float.
+EMPTY_SCALED_AVERAGE_RATING = 0.0
 
 # Committer id for system actions.
 SYSTEM_COMMITTER_ID = 'admin'
@@ -388,6 +399,7 @@ NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
+SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
 SPLASH_URL = '/splash'
@@ -406,6 +418,8 @@ NAV_MODE_PARTICIPATE = 'participate'
 NAV_MODE_PROFILE = 'profile'
 NAV_MODE_SIGNUP = 'signup'
 NAV_MODE_SPLASH = 'splash'
+NAV_MODE_TEACH = 'teach'
+NAV_MODE_CONTACT = 'contact'
 
 # Event types.
 EVENT_TYPE_STATE_HIT = 'state_hit'
@@ -434,6 +448,10 @@ COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 ENABLE_STRING_CLASSIFIER = False
+SHOW_COLLECTION_NAVIGATION_TAB_SETTINGS = False
+SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
+SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK = False
+SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
 
 # Output formats of downloaded explorations.
 OUTPUT_FORMAT_JSON = 'json'
@@ -527,6 +545,12 @@ SEARCH_DROPDOWN_CATEGORIES = sorted([
 # The header for the "Featured Explorations" category in the library index
 # page.
 LIBRARY_CATEGORY_FEATURED_EXPLORATIONS = 'Featured Explorations'
+# The header for the "Top Rated Explorations" category in the library index
+# page.
+LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = 'Top Rated Explorations'
+# The header for the "Recently Published" category in the library index
+# page.
+LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'Recently Published'
 
 # List of supported language codes. Each description has a
 # parenthetical part that may be stripped out to give a shorter
@@ -613,5 +637,12 @@ ALL_LANGUAGE_CODES = [{
 DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
 
+SUPPORTED_SITE_LANGUAGES = {
+    'en': 'English',
+    'es': 'Español'
+}
 SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 SYSTEM_USER_IDS = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
+
+CSRF_PAGE_NAME_CREATE_EXPLORATION = 'create_exploration'
+CSRF_PAGE_NAME_I18N = 'i18n'

@@ -17,8 +17,10 @@
  */
 
 oppia.controller('Preferences', [
-    '$scope', '$http', '$rootScope', '$modal', '$timeout', 'alertsService',
-    function($scope, $http, $rootScope, $modal, $timeout, alertsService) {
+  '$scope', '$http', '$rootScope', '$modal', '$timeout', '$translate',
+  'alertsService',
+  function(
+      $scope, $http, $rootScope, $modal, $timeout, $translate, alertsService) {
   var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
   $rootScope.loadingMessage = 'Loading';
   $scope.profilePictureDataUrl = '';
@@ -71,6 +73,12 @@ oppia.controller('Preferences', [
     if ($scope.subjectInterestsWarningText == null) {
       _saveDataItem('subject_interests', subjectInterests);
     }
+  };
+
+  $scope.savePreferredSiteLanguageCodes = function(preferredSiteLanguageCode) {
+    $translate.use(preferredSiteLanguageCode);
+    _saveDataItem(
+      'preferred_site_language_code', preferredSiteLanguageCode);
   };
 
   $scope.saveEmailPreferences = function(
@@ -155,6 +163,14 @@ oppia.controller('Preferences', [
     }
   );
 
+  $scope.SITE_LANGUAGE_CHOICES = [];
+  for (var languageKey in GLOBALS.SUPPORTED_SITE_LANGUAGES) {
+    $scope.SITE_LANGUAGE_CHOICES.push({
+      id: languageKey,
+      text: GLOBALS.SUPPORTED_SITE_LANGUAGES[languageKey]
+    });
+  }
+
   $scope.hasPageLoaded = false;
   $http.get(_PREFERENCES_DATA_URL).then(function(response) {
     var data = response.data;
@@ -165,6 +181,7 @@ oppia.controller('Preferences', [
     $scope.profilePictureDataUrl = data.profile_picture_data_url;
     $scope.canReceiveEmailUpdates = data.can_receive_email_updates;
     $scope.canReceiveEditorRoleEmail = data.can_receive_editor_role_email;
+    $scope.preferredSiteLanguageCode = data.preferred_site_language_code;
     $scope.hasPageLoaded = true;
   });
 }]);
