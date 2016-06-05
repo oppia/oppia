@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block maintitle %}
-  Dashboard - Oppia
+  Creator Dashboard - Oppia
 {% endblock maintitle %}
 
 {% block navbar_breadcrumb %}
@@ -29,110 +29,134 @@
              translate="I18N_DASHBOARD_MY_EXPLORATIONS">
           </a>
         </li>
-        <li ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myCollections'}">
-          <a class="oppia-dashboard-tabs-text" ng-click="setActiveTab('myCollections')"
-             translate="I18N_DASHBOARD_MY_COLLECTIONS">
-          </a>
-        </li>
-      </ul>
-
-      <div ng-if="activeTab === 'myExplorations'">
-        <div ng-if="explorationsList.length === 0" class="oppia-dashboard-empty-text">
-          <em>There are no explorations to display.</em>
-        </div>
-
-        <ul class="oppia-dashboard-tiles" ng-if="explorationsList.length > 0">
-          <li ng-repeat="exploration in explorationsList">
-            <md-card layout="row" class="oppia-dashboard-tile protractor-test-exp-summary-tile">
-              <a ng-href="/create/<[exploration.id]>" class="oppia-dashboard-tile-container-link" style="text-decoration: none;">
-                <div class="oppia-dashboard-tile-metadata-parent hidden-xs">
-                  <div class="oppia-dashboard-tile-metadata">
-                    Created: <span style="color: black;"><[getLocaleAbbreviatedDatetimeString(exploration.created_on)]></span>
-
-                    <br>
-
-                    <div ng-show="exploration.num_total_threads == 0">
-                      <br>
-                    </div>
-                    <div ng-show="exploration.num_total_threads > 0">
-                      Feedback:
-                      <span style="color: black;">
-                        <[exploration.num_total_threads]>
-                        <span ng-if="exploration.num_open_threads > 0">
-                          (<[exploration.num_open_threads]> unresolved)
-                        </span>
-                      </span>
-                    </div>
-                    <br>
-
-                    Status:
-                    <span ng-if="exploration.num_open_threads > 0 && exploration.status !== 'private'">
-                      <span class="oppia-dashboard-status-orange">
-                        Unresolved Feedback
-                      </span>
-                    </span>
-                    <span ng-if="exploration.num_open_threads == 0 && exploration.status !== 'private'">
-                      <span class="oppia-dashboard-status-green">
-                        Published
-                      </span>
-                    </span>
-                    <span ng-if="exploration.status === 'private'">
-                      <span class="oppia-dashboard-status-grey">
-                        Private
-                      </span>
-                    </span>
-                  </div>
-                </div>
-                <div class="oppia-dashboard-tile-contents">
-                  <span class="oppia-dashboard-tile-image-container" style="position: absolute;">
-                    <img class="oppia-dashboard-tile-image" ng-src="<[exploration.thumbnail_icon_url]>" style="background-color: <[exploration.thumbnail_bg_color]>" ng-class="{'oppia-dashboard-tile-image-private': exploration.status === 'private'}">
-                  </span>
-
-                  <div class="oppia-dashboard-tile-details">
-                    <div class="oppia-dashboard-tile-first-row">
-                      <span class="oppia-dashboard-tile-title">
-                        <span ng-if="exploration.title"><[exploration.title]></span>
-                        <span ng-if="!exploration.title">Untitled</span>
-                      </span>
-                      <span style="font-weight: bold;">&middot;</span>
-                      <span style="color: #888; font-size: 0.9em;" class="protractor-test-exploration-objective">
-                        <span ng-if="exploration.objective">
-                          <[exploration.objective | truncateAndCapitalize: 105]>
-                        </span>
-                        <span ng-if="!exploration.objective">
-                          <em>No objective specified.</em>
-                        </span>
-                      </span>
-                    </div>
-
-                    <div class="oppia-dashboard-tile-second-row">
-                      <span style="color: #888">
-                        <strong><[exploration.category]></strong>
-                        <span style="font-weight: bold;" ng-if="exploration.category">&middot;</span>
-                        Last updated <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
-                      </span>
-
-                      <span ng-if="exploration.status === 'publicized'">
-                        <span style="font-weight: bold;">&middot;</span>
-                        <span style="color: #888">Featured</span>
-                      </span>
-
-                      <span ng-if="getAverageRating(exploration.ratings)">
-                        <span style="font-weight: bold;">&middot;</span>
-                        <span style="color: #888">
-                          Average rating <[getAverageRating(exploration.ratings) | number:1]>
-                        </span>
-                      </span>
-                    </div>
-
-                  </div>
-                </div>
-              </a>
-            </md-card>
+        {% if can_create_collections %}
+          <li ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myCollections'}">
+            <a class="oppia-dashboard-tabs-text" ng-click="setActiveTab('myCollections')"
+               translate="I18N_DASHBOARD_MY_COLLECTIONS">
+            </a>
           </li>
-        </ul>
+        {% endif %}
+      </ul>
+    </div>
+
+    <div ng-if="explorationsList.length === 0 && collectionsList.length === 0">
+      <h2 style="margin-bottom: -20px; margin-left: 52px;">Creator Dashboard</h2>
+    </div>
+
+    <div ng-if="activeTab === 'myExplorations'">
+      <div ng-if="explorationsList.length === 0" class="oppia-dashboard-empty-text">
+        <md-card layout="row" class="oppia-page-card oppia-dashboard-intro-card"
+                 style="margin-top: 0;">
+          <div>
+            <p>
+              It looks like you haven't created any explorations yet.
+              Let's get started!
+            </p>
+            <button type="button"
+                    class="btn oppia-dashboard-intro-button oppia-transition-200"
+                    ng-click="createNewExploration()">
+              Create Exploration
+            </button>
+          </div>
+          <div class="oppia-dashboard-intro-picture">
+            <img src="/images/general/empty_dashboard.svg">
+          </div>
+        </md-card>
       </div>
 
+      <ul class="oppia-dashboard-tiles" ng-if="explorationsList.length > 0">
+        <li ng-repeat="exploration in explorationsList">
+          <md-card layout="row" class="oppia-dashboard-tile protractor-test-exp-summary-tile">
+            <a ng-href="/create/<[exploration.id]>" class="oppia-dashboard-tile-container-link" style="text-decoration: none;">
+              <div class="oppia-dashboard-tile-metadata-parent hidden-xs">
+                <div class="oppia-dashboard-tile-metadata">
+                  Created: <span style="color: black;"><[getLocaleAbbreviatedDatetimeString(exploration.created_on)]></span>
+
+                  <br>
+
+                  <div ng-show="exploration.num_total_threads == 0">
+                    <br>
+                  </div>
+                  <div ng-show="exploration.num_total_threads > 0">
+                    Feedback:
+                    <span style="color: black;">
+                      <[exploration.num_total_threads]>
+                      <span ng-if="exploration.num_open_threads > 0">
+                        (<[exploration.num_open_threads]> unresolved)
+                      </span>
+                    </span>
+                  </div>
+                  <br>
+
+                  Status:
+                  <span ng-if="exploration.num_open_threads > 0 && exploration.status !== 'private'">
+                    <span class="oppia-dashboard-status-orange">
+                      Unresolved Feedback
+                    </span>
+                  </span>
+                  <span ng-if="exploration.num_open_threads == 0 && exploration.status !== 'private'">
+                    <span class="oppia-dashboard-status-green">
+                      Published
+                    </span>
+                  </span>
+                  <span ng-if="exploration.status === 'private'">
+                    <span class="oppia-dashboard-status-grey">
+                      Private
+                    </span>
+                  </span>
+                </div>
+              </div>
+              <div class="oppia-dashboard-tile-contents">
+                <span class="oppia-dashboard-tile-image-container" style="position: absolute;">
+                  <img class="oppia-dashboard-tile-image" ng-src="<[exploration.thumbnail_icon_url]>" style="background-color: <[exploration.thumbnail_bg_color]>" ng-class="{'oppia-dashboard-tile-image-private': exploration.status === 'private'}">
+                </span>
+
+                <div class="oppia-dashboard-tile-details">
+                  <div class="oppia-dashboard-tile-first-row">
+                    <span class="oppia-dashboard-tile-title">
+                      <span ng-if="exploration.title"><[exploration.title]></span>
+                      <span ng-if="!exploration.title">Untitled</span>
+                    </span>
+                    <span style="font-weight: bold;">&middot;</span>
+                    <span style="color: #888; font-size: 0.9em;" class="protractor-test-exploration-objective">
+                      <span ng-if="exploration.objective">
+                        <[exploration.objective | truncateAndCapitalize: 105]>
+                      </span>
+                      <span ng-if="!exploration.objective">
+                        <em>No objective specified.</em>
+                      </span>
+                    </span>
+                  </div>
+
+                  <div class="oppia-dashboard-tile-second-row">
+                    <span style="color: #888">
+                      <strong><[exploration.category]></strong>
+                      <span style="font-weight: bold;" ng-if="exploration.category">&middot;</span>
+                      Last updated <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
+                    </span>
+
+                    <span ng-if="exploration.status === 'publicized'">
+                      <span style="font-weight: bold;">&middot;</span>
+                      <span style="color: #888">Featured</span>
+                    </span>
+
+                    <span ng-if="getAverageRating(exploration.ratings)">
+                      <span style="font-weight: bold;">&middot;</span>
+                      <span style="color: #888">
+                        Average rating <[getAverageRating(exploration.ratings) | number:1]>
+                      </span>
+                    </span>
+                  </div>
+
+                </div>
+              </div>
+            </a>
+          </md-card>
+        </li>
+      </ul>
+    </div>
+
+    {% if can_create_collections %}
       <div ng-if="activeTab === 'myCollections'">
         <div ng-if="collectionsList.length === 0" class="oppia-dashboard-empty-text">
           <em>There are no collections to display.</em>
@@ -205,27 +229,7 @@
           </li>
         </ul>
       </div>
-    </div>
-
-    <div ng-if="explorationsList.length === 0">
-      <h2 style="margin-left: 52px;">Creator Dashboard</h2>
-      <md-card layout="row" class="oppia-page-card oppia-dashboard-intro-card">
-        <div>
-          <p>
-            It looks like you haven't created any explorations yet.
-            Let's get started!
-          </p>
-          <button type="button"
-                  class="btn oppia-dashboard-intro-button oppia-transition-200"
-                  ng-click="createNewExploration()">
-            Create Exploration
-          </button>
-        </div>
-        <div class="oppia-dashboard-intro-picture">
-          <img src="/images/general/empty_dashboard.svg">
-        </div>
-      </md-card>
-    </div>
+    {% endif %}
   </div>
 
   {% include 'components/create_activity_modal.html' %}

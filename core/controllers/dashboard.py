@@ -165,6 +165,8 @@ class DashboardHandler(base.BaseHandler):
 
             feedback_thread_analytics = feedback_services.get_thread_analytics(
                 exp_summary.id)
+            # TODO(sll): Reuse _get_displayable_exp_summary_dicts() in
+            # summary_services, instead of replicating it like this.
             explorations_list.append({
                 'id': exp_summary.id,
                 'title': exp_summary.title,
@@ -177,7 +179,6 @@ class DashboardHandler(base.BaseHandler):
                     exp_summary.exploration_model_created_on),
                 'status': exp_summary.status,
                 'community_owned': exp_summary.community_owned,
-                'is_editable': True,
                 'thumbnail_icon_url': (
                     utils.get_thumbnail_icon_url_for_category(
                         exp_summary.category)),
@@ -195,29 +196,32 @@ class DashboardHandler(base.BaseHandler):
             key=lambda x: (x['num_open_threads'], x['last_updated']),
             reverse=True)
 
-        for collection_summary in subscribed_collection_summaries:
-            if collection_summary is None:
-                continue
+        if (self.username in
+                config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value):
+            for collection_summary in subscribed_collection_summaries:
+                if collection_summary is None:
+                    continue
 
-            collections_list.append({
-                'id': collection_summary.id,
-                'title': collection_summary.title,
-                'category': collection_summary.category,
-                'objective': collection_summary.objective,
-                'language_code': collection_summary.language_code,
-                'last_updated': utils.get_time_in_millisecs(
-                    collection_summary.collection_model_last_updated),
-                'created_on': utils.get_time_in_millisecs(
-                    collection_summary.collection_model_created_on),
-                'status': collection_summary.status,
-                'community_owned': collection_summary.community_owned,
-                'is_editable': True,
-                'thumbnail_icon_url': (
-                    utils.get_thumbnail_icon_url_for_category(
-                        collection_summary.category)),
-                'thumbnail_bg_color': utils.get_hex_color_for_category(
-                    collection_summary.category),
-            })
+                # TODO(sll): Reuse _get_displayable_collection_summary_dicts()
+                # in summary_services, instead of replicating it like this.
+                collections_list.append({
+                    'id': collection_summary.id,
+                    'title': collection_summary.title,
+                    'category': collection_summary.category,
+                    'objective': collection_summary.objective,
+                    'language_code': collection_summary.language_code,
+                    'last_updated': utils.get_time_in_millisecs(
+                        collection_summary.collection_model_last_updated),
+                    'created_on': utils.get_time_in_millisecs(
+                        collection_summary.collection_model_created_on),
+                    'status': collection_summary.status,
+                    'community_owned': collection_summary.community_owned,
+                    'thumbnail_icon_url': (
+                        utils.get_thumbnail_icon_url_for_category(
+                            collection_summary.category)),
+                    'thumbnail_bg_color': utils.get_hex_color_for_category(
+                        collection_summary.category),
+                })
 
         self.values.update({
             'explorations_list': explorations_list,

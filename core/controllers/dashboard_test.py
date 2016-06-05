@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the user notification dashboard and 'my explorations' pages."""
+"""Tests for the creator dashboard and the notifications dashboard."""
 
 from core.controllers import dashboard
 from core.domain import config_services
