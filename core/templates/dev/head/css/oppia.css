@@ -3057,6 +3057,35 @@ md-card.preview-conversation-skin-supplemental-card {
   padding-top: 1em;
 }
 
+.oppia-library-h1 {
+  color: #033e39;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+}
+
+.oppia-library-h2 {
+  color: #ffffff;
+  font-family: "Rubik, regular", "Roboto", Arial, sans-serif;
+  padding-bottom: 1em;
+}
+
+@media (min-width: 630px) {
+  .oppia-library-h1 {
+    font-size: 2.5em;
+  }
+  .oppia-library-h2 {
+    font-size: 1.75em;
+  }
+
+}
+@media (max-width: 629px) {
+  .oppia-library-h1 {
+    font-size: 1.2em;
+  }
+  .oppia-library-h2 {
+    font-size: .85em;
+  }
+}
+
 .oppia-splash-h1 {
   margin: 0 auto;
   padding-bottom: 1em;
