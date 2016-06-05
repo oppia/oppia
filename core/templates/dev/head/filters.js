@@ -400,7 +400,9 @@ oppia.filter('removeDuplicatesInArray', [function() {
 // valid, linear path through the collection.
 oppia.filter('sortCollectionLinearly', [
   'CollectionLinearizerService', function(CollectionLinearizerService) {
-      return function(collection) {
-        return CollectionLinearizerService.getCollectionNodesInPlayableOrder(collection);
-      };
-    }]);
+    return function(collection) {
+      return CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+        collection);
+    };
+  }
+]);

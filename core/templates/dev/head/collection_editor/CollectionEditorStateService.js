@@ -19,26 +19,19 @@
  * also maintains a list of all skills stored within the collection.
  */
 
-oppia.constant(
-  'COLLECTION_EDITOR_INITIALIZED_COLLECTION',
-  'collectionEditorInitializedCollection');
-oppia.constant(
-  'COLLECTION_EDITOR_UPDATED_COLLECTION', 'collectionEditorUpdatedCollection');
+oppia.constant('EVENT_COLLECTION_INITIALIZED', 'collectionInitialized');
+oppia.constant('EVENT_COLLECTION_UPDATED', 'collectionUpdated');
 
 oppia.factory('CollectionEditorStateService', [
   '$rootScope', 'alertsService', 'CollectionObjectFactory',
   'SkillListObjectFactory', 'UndoRedoService',
-  'WritableCollectionBackendApiService',
-  'COLLECTION_EDITOR_INITIALIZED_COLLECTION',
-  'COLLECTION_EDITOR_UPDATED_COLLECTION',
-  'UNDO_REDO_SERVICE_CHANGE_APPLIED',
+  'WritableCollectionBackendApiService', 'EVENT_COLLECTION_INITIALIZED',
+  'EVENT_COLLECTION_UPDATED', 'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
   function(
-    $rootScope, alertsService, CollectionObjectFactory,
-    SkillListObjectFactory, UndoRedoService,
-    WritableCollectionBackendApiService,
-    COLLECTION_EDITOR_INITIALIZED_COLLECTION,
-    COLLECTION_EDITOR_UPDATED_COLLECTION,
-    UNDO_REDO_SERVICE_CHANGE_APPLIED) {
+      $rootScope, alertsService, CollectionObjectFactory,
+      SkillListObjectFactory, UndoRedoService,
+      WritableCollectionBackendApiService, EVENT_COLLECTION_INITIALIZED,
+      EVENT_COLLECTION_UPDATED, EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
     var _collection = CollectionObjectFactory.createEmptyCollection();
     var _collectionSkillList = SkillListObjectFactory.create([]);
     var _collectionIsInitialized = false;
@@ -53,9 +46,9 @@ oppia.factory('CollectionEditorStateService', [
     var _setCollection = function(collection) {
       _collection.copyFromCollection(collection);
       if (_collectionIsInitialized) {
-        $rootScope.$broadcast(COLLECTION_EDITOR_UPDATED_COLLECTION);
+        $rootScope.$broadcast(EVENT_COLLECTION_UPDATED);
       } else {
-        $rootScope.$broadcast(COLLECTION_EDITOR_INITIALIZED_COLLECTION);
+        $rootScope.$broadcast(EVENT_COLLECTION_INITIALIZED);
         _collectionIsInitialized = true;
       }
       _updateSkillList();
@@ -69,7 +62,7 @@ oppia.factory('CollectionEditorStateService', [
     // whether it was a forward change from the UndoRedoService through the
     // event pipeline, then checking whether the change actually affects the
     // skill list before recomputing it.
-    $rootScope.$on(UNDO_REDO_SERVICE_CHANGE_APPLIED, _updateSkillList);
+    $rootScope.$on(EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _updateSkillList);
 
     return {
       /**
@@ -124,8 +117,8 @@ oppia.factory('CollectionEditorStateService', [
        * Sets the collection stored within this service, propogating changes to
        * all bindings to the collection returned by getCollection(). The first
        * time this is called it will fire a global event based on the
-       * COLLECTION_EDITOR_INITIALIZED_COLLECTION constant. All subsequent
-       * calls will similarly fire a COLLECTION_EDITOR_UPDATED_COLLECTION event.
+       * EVENT_COLLECTION_INITIALIZED constant. All subsequent
+       * calls will similarly fire a EVENT_COLLECTION_UPDATED event.
        */
       setCollection: function(collection) {
         _setCollection(collection);
@@ -182,4 +175,5 @@ oppia.factory('CollectionEditorStateService', [
         return _collectionSkillList;
       }
     };
-  }]);
+  }
+]);

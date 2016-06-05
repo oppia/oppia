@@ -26,17 +26,16 @@ oppia.directive('collectionEditorSavePublish', [function() {
       'CollectionEditorStateService', 'CollectionValidationService',
       'CollectionRightsBackendApiService',
       'WritableCollectionBackendApiService',
-      'COLLECTION_EDITOR_INITIALIZED_COLLECTION',
-      'COLLECTION_EDITOR_UPDATED_COLLECTION',
-      'UNDO_REDO_SERVICE_CHANGE_APPLIED',
+      'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_UPDATED',
+      'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
       function(
           $scope, $modal, alertsService, UndoRedoService,
           CollectionEditorStateService, CollectionValidationService,
           CollectionRightsBackendApiService,
           WritableCollectionBackendApiService,
-          COLLECTION_EDITOR_INITIALIZED_COLLECTION,
-          COLLECTION_EDITOR_UPDATED_COLLECTION,
-          UNDO_REDO_SERVICE_CHANGE_APPLIED) {
+          EVENT_COLLECTION_INITIALIZED,
+          EVENT_COLLECTION_UPDATED,
+          EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
         $scope.collection = CollectionEditorStateService.getCollection();
         $scope.isPrivate = GLOBALS.isPrivate;
         $scope.canUnpublish = GLOBALS.canUnpublish;
@@ -60,9 +59,9 @@ oppia.directive('collectionEditorSavePublish', [function() {
         };
 
         $scope.$on(
-          COLLECTION_EDITOR_INITIALIZED_COLLECTION, _validateCollection);
-        $scope.$on(COLLECTION_EDITOR_UPDATED_COLLECTION, _validateCollection);
-        $scope.$on(UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateCollection);
+          EVENT_COLLECTION_INITIALIZED, _validateCollection);
+        $scope.$on(EVENT_COLLECTION_UPDATED, _validateCollection);
+        $scope.$on(EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateCollection);
 
         $scope.getChangeListCount = function() {
           return UndoRedoService.getChangeCount();
@@ -101,9 +100,6 @@ oppia.directive('collectionEditorSavePublish', [function() {
           });
 
           modalInstance.result.then(function(commitMessage) {
-            // An explicit save is needed to push all changes to the backend at
-            // once because some likely working states of the collection will
-            // cause validation errors when trying to incrementally save them.
             CollectionEditorStateService.saveCollection(commitMessage);
           });
         };
@@ -125,7 +121,7 @@ oppia.directive('collectionEditorSavePublish', [function() {
         };
 
         // Unpublish the collection. Will only show up if the collection is
-        // public and the user have access to the collection.
+        // public and the user has access to the collection.
         $scope.unpublishCollection = function() {
           CollectionRightsBackendApiService.setCollectionPrivate(
             _collectionId, $scope.collection.getVersion()).then(
