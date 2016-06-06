@@ -48,7 +48,7 @@ class NotificationsDashboardPage(base.BaseHandler):
                 'You do not have the credentials to access this page.')
         elif user_services.has_fully_registered(self.user_id):
             self.values.update({
-                'nav_mode': feconf.NAV_MODE_HOME,
+                'nav_mode': feconf.NAV_MODE_DASHBOARD,
             })
             self.render_template(
                 'dashboard/notifications_dashboard.html',
@@ -106,8 +106,8 @@ class NotificationsDashboardHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class MyExplorationsPage(base.BaseHandler):
-    """Page showing the user's explorations."""
+class DashboardPage(base.BaseHandler):
+    """Page showing the user's creator dashboard."""
 
     PAGE_NAME_FOR_CSRF = 'dashboard'
     PAGE_HAS_CREATE_EXP_REQUEST = True
@@ -119,7 +119,7 @@ class MyExplorationsPage(base.BaseHandler):
                 'You do not have the credentials to access this page.')
         elif user_services.has_fully_registered(self.user_id):
             self.values.update({
-                'nav_mode': feconf.NAV_MODE_HOME,
+                'nav_mode': feconf.NAV_MODE_DASHBOARD,
                 'can_create_collections': (
                     self.username in
                     config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value
@@ -127,24 +127,19 @@ class MyExplorationsPage(base.BaseHandler):
                 'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
             })
             self.render_template(
-                'dashboard/my_explorations.html', redirect_url_on_logout='/')
+                'dashboard/dashboard.html', redirect_url_on_logout='/')
         else:
             self.redirect(utils.set_url_query_parameter(
-                feconf.SIGNUP_URL, 'return_url', '/my_explorations'))
+                feconf.SIGNUP_URL, 'return_url', feconf.DASHBOARD_URL))
 
 
-class MyExplorationsHandler(base.BaseHandler):
-    """Provides data for the user's explorations page."""
+class DashboardHandler(base.BaseHandler):
+    """Provides data for the user's creator dashboard page."""
 
     def get(self):
         """Handles GET requests."""
         if self.user_id is None:
             raise self.PageNotFoundException
-
-        subscribed_summaries = (
-            exp_services.get_exploration_summaries_matching_ids(
-                subscription_services.get_exploration_ids_subscribed_to(
-                    self.user_id)))
 
         def _get_intro_card_color(category):
             return (
@@ -152,14 +147,26 @@ class MyExplorationsHandler(base.BaseHandler):
                 category in feconf.CATEGORIES_TO_COLORS else
                 feconf.DEFAULT_COLOR)
 
-        explorations_list = []
+        subscribed_exploration_summaries = (
+            exp_services.get_exploration_summaries_matching_ids(
+                subscription_services.get_exploration_ids_subscribed_to(
+                    self.user_id)))
+        subscribed_collection_summaries = (
+            collection_services.get_collection_summaries_matching_ids(
+                subscription_services.get_collection_ids_subscribed_to(
+                    self.user_id)))
 
-        for exp_summary in subscribed_summaries:
+        explorations_list = []
+        collections_list = []
+
+        for exp_summary in subscribed_exploration_summaries:
             if exp_summary is None:
                 continue
 
             feedback_thread_analytics = feedback_services.get_thread_analytics(
                 exp_summary.id)
+            # TODO(sll): Reuse _get_displayable_exp_summary_dicts() in
+            # summary_services, instead of replicating it like this.
             explorations_list.append({
                 'id': exp_summary.id,
                 'title': exp_summary.title,
@@ -172,7 +179,6 @@ class MyExplorationsHandler(base.BaseHandler):
                     exp_summary.exploration_model_created_on),
                 'status': exp_summary.status,
                 'community_owned': exp_summary.community_owned,
-                'is_editable': True,
                 'thumbnail_icon_url': (
                     utils.get_thumbnail_icon_url_for_category(
                         exp_summary.category)),
@@ -190,8 +196,36 @@ class MyExplorationsHandler(base.BaseHandler):
             key=lambda x: (x['num_open_threads'], x['last_updated']),
             reverse=True)
 
+        if (self.username in
+                config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value):
+            for collection_summary in subscribed_collection_summaries:
+                if collection_summary is None:
+                    continue
+
+                # TODO(sll): Reuse _get_displayable_collection_summary_dicts()
+                # in summary_services, instead of replicating it like this.
+                collections_list.append({
+                    'id': collection_summary.id,
+                    'title': collection_summary.title,
+                    'category': collection_summary.category,
+                    'objective': collection_summary.objective,
+                    'language_code': collection_summary.language_code,
+                    'last_updated': utils.get_time_in_millisecs(
+                        collection_summary.collection_model_last_updated),
+                    'created_on': utils.get_time_in_millisecs(
+                        collection_summary.collection_model_created_on),
+                    'status': collection_summary.status,
+                    'community_owned': collection_summary.community_owned,
+                    'thumbnail_icon_url': (
+                        utils.get_thumbnail_icon_url_for_category(
+                            collection_summary.category)),
+                    'thumbnail_bg_color': utils.get_hex_color_for_category(
+                        collection_summary.category),
+                })
+
         self.values.update({
             'explorations_list': explorations_list,
+            'collections_list': collections_list,
         })
         self.render_json(self.values)
 
@@ -217,20 +251,6 @@ class NotificationsHandler(base.BaseHandler):
         self.render_json({
             'num_unseen_notifications': num_unseen_notifications,
         })
-
-
-class SiteLanguageHandler(base.BaseHandler):
-    """Changes the preferred system language in the user's preferences."""
-
-    PAGE_NAME_FOR_CSRF = feconf.CSRF_PAGE_NAME_I18N
-
-    def put(self):
-        """Handles PUT requests."""
-        if user_services.has_fully_registered(self.user_id):
-            site_language_code = self.payload.get('site_language_code')
-            user_services.update_preferred_site_language_code(
-                self.user_id, site_language_code)
-        self.render_json({})
 
 
 class NewExploration(base.BaseHandler):

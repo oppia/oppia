@@ -18,7 +18,7 @@
  * adding a new exploration.
  */
 
-oppia.directive('collectionDetailsEditorDirective', [function() {
+oppia.directive('collectionDetailsEditor', [function() {
   return {
     restrict: 'E',
     scope: {
