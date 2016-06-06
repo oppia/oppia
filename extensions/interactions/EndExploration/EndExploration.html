@@ -3,7 +3,7 @@
     <a ng-href="/collection/<[collectionId]>" ng-if="collectionId">
       <md-button class="oppia-learner-continue-button"
                  translate="I18N_PLAYER_RETURN_TO_COLLECTION"
-                 translate-values="{collectionTitle: <[collectionTitle]>}">
+                 translate-values="{collectionTitle: getCollectionTitle()}">
       </md-button>
     </a>
     <a href="/library">
