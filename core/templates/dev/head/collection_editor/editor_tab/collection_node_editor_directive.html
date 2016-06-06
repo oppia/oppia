@@ -1,37 +1,66 @@
 <script type="text/ng-template" id="inline/collection_node_editor_directive">
-  <div class="collection-editor-node-title">
-    <[getCollectionNode().getExplorationTitle()]>
-    <span ng-click="deleteNode()" class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
-  </div>
-  <span ng-click="shiftNodeLeft()" ng-if="getLinearIndex() > 0" class="glyphicon shift-left-arrow" arria-hidden="true">&lt;</span>
-  <span ng-click="shiftNodeRight()" ng-if="getLinearIndex() < collection.getCollectionNodeCount() - 1" class="glyphicon shift-right-arrow" arria-hidden="true">&gt;</span>
+  <md-card class="collection-editor-node">
+    <div class="collection-editor-node-title">
+      <a ng-href="/create/<[getCollectionNode().getExplorationId()]>" target="_blank">
+        <[getCollectionNode().getExplorationTitle()]>
+      </a>
+    </div>
+    <span class="collection-editor-delete-node">
+      <span ng-click="deleteNode()" aria-hidden="true">
+        <i class="material-icons md-18">&#xE14C;</i>
+      </span>
+    </span>
+    <span ng-click="shiftNodeLeft()"
+          ng-if="getLinearIndex() > 0"
+          class="collection-editor-shift-left-arrow"
+          aria-hidden="true">
+      <i class="material-icons">&#xE5CB;</i>
+    </span>
+    <span ng-click="shiftNodeRight()"
+          ng-if="getLinearIndex() < collection.getCollectionNodeCount() - 1"
+          class="collection-editor-shift-right-arrow"
+          aria-hidden="true">
+      <i class="material-icons">&#xE5CC;</i>
+    </span>
+  </md-card>
 </script>
 
 <style>
-  .glyphicon-remove-circle {
-    color: #EF5350;
-    top: -15px;
-    left: 5px;
+  .collection-editor-node {
+    background-color: #F5F5F5;
+    color: #424242;
+    display: inline-block;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    margin: 0;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    position: relative;
+    text-align: center;
   }
-  .shift-left-arrow {
-    color: #000;
-    opacity: 0.7;
-    top: 15px;
-    float: left;
+
+  .collection-editor-delete-node {
+    color: #ef5350;
+    position: absolute;
+    right: 0;
+    top: 0;
   }
-  .shift-right-arrow {
+
+  .collection-editor-shift-left-arrow {
+    bottom: 0;
     color: #000;
+    left: 0;
     opacity: 0.7;
-    top: 15px;
-    float: right;
+    position: absolute;
+  }
+  .collection-editor-shift-right-arrow {
+    bottom: 0;
+    color: #000;
+    position: absolute;
+    opacity: 0.7;
+    right: 0;
   }
 
   .collection-editor-node-title {
-    padding-left: 16px;
-  }
-
-  /* TODO(mgowano): Implement horizontal scrolling using Javascript. */
-  body {
-    overflow-x: auto;
+    padding: 16px 16px 20px 16px;
   }
 </style>

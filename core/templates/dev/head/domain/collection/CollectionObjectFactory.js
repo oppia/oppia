@@ -128,7 +128,7 @@ oppia.factory('CollectionObjectFactory', [
       // to this array and they can't be reset to empty arrays.See for context:
       // http://stackoverflow.com/a/1232046
       this._nodes.length = 0;
-      this._explorationIdToNodeIndexMap  = {};
+      this._explorationIdToNodeIndexMap = {};
     };
 
     // Returns whether any collection nodes in this collection reference the
@@ -224,7 +224,9 @@ oppia.factory('CollectionObjectFactory', [
     // Create a new, empty collection. This is not guaranteed to pass validation
     // tests.
     Collection.createEmptyCollection = function() {
-      return new Collection({ nodes: [] })
+      return new Collection({
+        nodes: []
+      });
     };
 
     return Collection;

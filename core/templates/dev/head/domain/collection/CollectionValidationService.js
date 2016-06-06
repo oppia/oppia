@@ -80,14 +80,14 @@ oppia.factory('CollectionValidationService', [
       var collectionHasNodes = collection.getCollectionNodeCount() > 0;
       if (!collectionHasNodes) {
         issues.push(
-          'There should be at least 1 exploration in the collection');
+          'There should be at least 1 exploration in the collection.');
       }
 
       var startingExpIds = _getStartingExplorationIds(collection);
       if (collectionHasNodes && startingExpIds.length != 1) {
         issues.push(
           'There should be exactly 1 exploration initially available to the ' +
-          'learner');
+          'learner.');
       }
 
       collection.getCollectionNodes().forEach(function(collectionNode) {

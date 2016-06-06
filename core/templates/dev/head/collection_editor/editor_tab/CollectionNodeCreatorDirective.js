@@ -44,7 +44,8 @@ oppia.directive('collectionNodeCreator', [function() {
           }
           if ($scope.collection.containsCollectionNode(newExplorationId)) {
             alertsService.addWarning(
-              'Exploration with id ' + newExplorationId + ' is already added');
+              'There is already an exploration in this collection with that ' +
+              'id.');
             return;
           }
 
