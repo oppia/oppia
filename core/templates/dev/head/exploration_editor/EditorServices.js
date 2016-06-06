@@ -2337,7 +2337,7 @@ oppia.factory('autosaveInfoModalsService', [
                 lostChangesService.makeHumanReadable(lostChanges).html());
             }
           }],
-          windowClass: 'oppia-autosave-version-mismatch-modal'
+          windowClass: 'oppia-version-mismatch-modal'
         }).result.then(function() {
           _isModalOpen = false;
         }, function() {
