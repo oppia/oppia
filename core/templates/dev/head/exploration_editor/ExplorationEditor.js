@@ -145,16 +145,16 @@ oppia.controller('ExplorationEditor', [
 
         explorationWarningsService.updateWarnings();
 
-        if (data.is_version_of_draft_valid === false) {
-          if (data.draft_changes) {
-            // Initialize changeList by the one received from the backend.
-            changeListService.loadAutosavedChangeList(data.draft_changes);
+        // Initialize changeList by draft changes if they exist.
+        if (data.draft_changes) {
+          changeListService.loadAutosavedChangeList(data.draft_changes);
+        }
 
-            // Show modal displaying lost changes if the version of draft
-            // changes is invalid, and draft_changes is not `null`.
-            autosaveInfoModalsService.showVersionMismatchModal(
-              changeListService.getChangeList());
-          }
+        if (data.is_version_of_draft_valid === false && data.draft_changes) {
+          // Show modal displaying lost changes if the version of draft
+          // changes is invalid, and draft_changes is not `null`.
+          autosaveInfoModalsService.showVersionMismatchModal(
+            changeListService.getChangeList());
           return;
         }
 
