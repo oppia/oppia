@@ -195,280 +195,283 @@ oppia.factory('changeListService', [
   '$rootScope', 'alertsService', 'explorationData', 'autosaveInfoModalsService',
   function(
     $rootScope, alertsService, explorationData, autosaveInfoModalsService) {
-  // TODO(sll): Implement undo, redo functionality. Show a message on each
-  // step saying what the step is doing.
-  // TODO(sll): Allow the user to view the list of changes made so far, as
-  // well as the list of changes in the undo stack.
+    // TODO(sll): Implement undo, redo functionality. Show a message on each
+    // step saying what the step is doing.
+    // TODO(sll): Allow the user to view the list of changes made so far, as
+    // well as the list of changes in the undo stack.
 
-  // Temporary buffer for changes made to the exploration.
-  var explorationChangeList = [];
-  // Stack for storing undone changes. The last element is the most recently
-  // undone change.
-  var undoneChangeStack = [];
+    // Temporary buffer for changes made to the exploration.
+    var explorationChangeList = [];
+    // Stack for storing undone changes. The last element is the most recently
+    // undone change.
+    var undoneChangeStack = [];
 
-  // All these constants should correspond to those in exp_domain.py.
-  // TODO(sll): Enforce this in code.
-  var CMD_ADD_STATE = 'add_state';
-  var CMD_RENAME_STATE = 'rename_state';
-  var CMD_DELETE_STATE = 'delete_state';
-  var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
-  var CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property';
-  // All gadget commands
-  var CMD_ADD_GADGET = 'add_gadget';
-  var CMD_RENAME_GADGET = 'rename_gadget';
-  var CMD_DELETE_GADGET = 'delete_gadget';
-  var CMD_EDIT_GADGET_PROPERTY = 'edit_gadget_property';
+    // All these constants should correspond to those in exp_domain.py.
+    // TODO(sll): Enforce this in code.
+    var CMD_ADD_STATE = 'add_state';
+    var CMD_RENAME_STATE = 'rename_state';
+    var CMD_DELETE_STATE = 'delete_state';
+    var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
+    var CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property';
+    // All gadget commands
+    var CMD_ADD_GADGET = 'add_gadget';
+    var CMD_RENAME_GADGET = 'rename_gadget';
+    var CMD_DELETE_GADGET = 'delete_gadget';
+    var CMD_EDIT_GADGET_PROPERTY = 'edit_gadget_property';
 
-  var ALLOWED_EXPLORATION_BACKEND_NAMES = {
-    category: true,
-    init_state_name: true,
-    language_code: true,
-    objective: true,
-    param_changes: true,
-    param_specs: true,
-    tags: true,
-    title: true
-  };
+    var ALLOWED_EXPLORATION_BACKEND_NAMES = {
+      category: true,
+      init_state_name: true,
+      language_code: true,
+      objective: true,
+      param_changes: true,
+      param_specs: true,
+      tags: true,
+      title: true
+    };
 
-  var ALLOWED_STATE_BACKEND_NAMES = {
-    answer_groups: true,
-    confirmed_unclassified_answers: true,
-    content: true,
-    default_outcome: true,
-    fallbacks: true,
-    param_changes: true,
-    state_name: true,
-    widget_customization_args: true,
-    widget_id: true
-  };
+    var ALLOWED_STATE_BACKEND_NAMES = {
+      answer_groups: true,
+      confirmed_unclassified_answers: true,
+      content: true,
+      default_outcome: true,
+      fallbacks: true,
+      param_changes: true,
+      state_name: true,
+      widget_customization_args: true,
+      widget_id: true
+    };
 
-  var ALLOWED_GADGET_BACKEND_NAMES = {
-    gadget_customization_args: true,
-    gadget_visibility: true
-  };
+    var ALLOWED_GADGET_BACKEND_NAMES = {
+      gadget_customization_args: true,
+      gadget_visibility: true
+    };
 
-  var autosaveChangeListOnChange = function(explorationChangeList) {
-    // Asynchronously send an autosave request, and check for errors in the
-    // response:
-    // If error is present -> Check for the type of error occurred
-    // (Display the corresponding modals in both cases, if not already opened):
-    // - Version Mismatch.
-    // - Non-strict Validation Fail.
-    explorationData.autosaveChangeList(
-      explorationChangeList, function(response) {
-        if (!response.data.is_version_of_draft_valid) {
-          if (!autosaveInfoModalsService.isModalOpen()) {
-            autosaveInfoModalsService.showVersionMismatchModal(
-              explorationChangeList);
+    var autosaveChangeListOnChange = function(explorationChangeList) {
+      // Asynchronously send an autosave request, and check for errors in the
+      // response:
+      // If error is present -> Check for the type of error occurred
+      // (Display the corresponding modals in both cases, if not already
+      // opened):
+      // - Version Mismatch.
+      // - Non-strict Validation Fail.
+      explorationData.autosaveChangeList(
+        explorationChangeList, function(response) {
+          if (!response.data.is_version_of_draft_valid) {
+            if (!autosaveInfoModalsService.isModalOpen()) {
+              autosaveInfoModalsService.showVersionMismatchModal(
+                explorationChangeList);
+            }
           }
-        }
-      }, function() {
-        alertsService.clearWarnings();
-        if (!autosaveInfoModalsService.isModalOpen()) {
-          autosaveInfoModalsService.showNonStrictValidationFailModal();
-        }
-      });
-  };
+        }, function() {
+          alertsService.clearWarnings();
+          if (!autosaveInfoModalsService.isModalOpen()) {
+            autosaveInfoModalsService.showNonStrictValidationFailModal();
+          }
+        });
+    };
 
-  var addChange = function(changeDict) {
-    if ($rootScope.loadingMessage) {
-      return;
-    }
-    explorationChangeList.push(changeDict);
-    undoneChangeStack = [];
-    autosaveChangeListOnChange(explorationChangeList);
-  };
-
-  return {
-    /**
-     * Saves a gadget dict that represents a new gadget.
-     *
-     * It is the responsbility of the caller to check that the gadget dict
-     * is correctly formed
-     *
-     * @param {object} gadgetData - The dict containing new gadget information.
-     */
-    addGadget: function(gadgetData) {
-      addChange({
-        cmd: CMD_ADD_GADGET,
-        gadget_dict: gadgetData,
-        panel: gadgetData.panel
-      });
-    },
-    /**
-     * Saves a change dict that represents adding a new state. It is the
-     * responsbility of the caller to check that the new state name is valid.
-     *
-     * @param {string} stateName - The name of the newly-added state
-     */
-    addState: function(stateName) {
-      addChange({
-        cmd: CMD_ADD_STATE,
-        state_name: stateName
-      });
-    },
-    /**
-     * Deletes the gadget with the specified name.
-     *
-     * @param {string} gadgetName - Unique name of the gadget to delete.
-     */
-    deleteGadget: function(gadgetName) {
-      addChange({
-        cmd: CMD_DELETE_GADGET,
-        gadget_name: gadgetName
-      });
-    },
-    /**
-     * Saves a change dict that represents deleting a new state. It is the
-     * responsbility of the caller to check that the deleted state name
-     * corresponds to an existing state.
-     *
-     * @param {string} stateName - The name of the deleted state.
-     */
-    deleteState: function(stateName) {
-      addChange({
-        cmd: CMD_DELETE_STATE,
-        state_name: stateName
-      });
-    },
-    discardAllChanges: function(successCallback) {
-      explorationChangeList = [];
+    var addChange = function(changeDict) {
+      if ($rootScope.loadingMessage) {
+        return;
+      }
+      explorationChangeList.push(changeDict);
       undoneChangeStack = [];
       autosaveChangeListOnChange(explorationChangeList);
-      // The reload is necessary because, otherwise, the
-      // exploration-with-draft-changes will be reloaded (since it is already
-      // cached in explorationData).
-      location.reload();
-    },
-    /**
-     * Saves a change dict that represents a change to an exploration property
-     * (such as its title, category, ...). It is the responsibility of the
-     * caller to check that the old and new values are not equal.
-     *
-     * @param {string} backendName - The backend name of the property
-     *   (e.g. title, category)
-     * @param {string} newValue - The new value of the property
-     * @param {string} oldValue - The previous value of the property
-     */
-    editExplorationProperty: function(backendName, newValue, oldValue) {
-      if (!ALLOWED_EXPLORATION_BACKEND_NAMES.hasOwnProperty(backendName)) {
-        alertsService.addWarning(
-          'Invalid exploration property: ' + backendName);
-        return;
+    };
+
+    return {
+      /**
+       * Saves a gadget dict that represents a new gadget.
+       *
+       * It is the responsbility of the caller to check that the gadget dict
+       * is correctly formed
+       *
+       * @param {object} gadgetData - The dict containing new gadget info.
+       */
+      addGadget: function(gadgetData) {
+        addChange({
+          cmd: CMD_ADD_GADGET,
+          gadget_dict: gadgetData,
+          panel: gadgetData.panel
+        });
+      },
+      /**
+       * Saves a change dict that represents adding a new state. It is the
+       * responsbility of the caller to check that the new state name is valid.
+       *
+       * @param {string} stateName - The name of the newly-added state
+       */
+      addState: function(stateName) {
+        addChange({
+          cmd: CMD_ADD_STATE,
+          state_name: stateName
+        });
+      },
+      /**
+       * Deletes the gadget with the specified name.
+       *
+       * @param {string} gadgetName - Unique name of the gadget to delete.
+       */
+      deleteGadget: function(gadgetName) {
+        addChange({
+          cmd: CMD_DELETE_GADGET,
+          gadget_name: gadgetName
+        });
+      },
+      /**
+       * Saves a change dict that represents deleting a new state. It is the
+       * responsbility of the caller to check that the deleted state name
+       * corresponds to an existing state.
+       *
+       * @param {string} stateName - The name of the deleted state.
+       */
+      deleteState: function(stateName) {
+        addChange({
+          cmd: CMD_DELETE_STATE,
+          state_name: stateName
+        });
+      },
+      discardAllChanges: function() {
+        explorationChangeList = [];
+        undoneChangeStack = [];
+        autosaveChangeListOnChange(explorationChangeList);
+        // The reload is necessary because, otherwise, the
+        // exploration-with-draft-changes will be reloaded (since it is already
+        // cached in explorationData).
+        location.reload();
+      },
+      /**
+       * Saves a change dict that represents a change to an exploration
+       * property (such as its title, category, ...). It is the responsibility
+       * of the caller to check that the old and new values are not equal.
+       *
+       * @param {string} backendName - The backend name of the property
+       *   (e.g. title, category)
+       * @param {string} newValue - The new value of the property
+       * @param {string} oldValue - The previous value of the property
+       */
+      editExplorationProperty: function(backendName, newValue, oldValue) {
+        if (!ALLOWED_EXPLORATION_BACKEND_NAMES.hasOwnProperty(backendName)) {
+          alertsService.addWarning(
+            'Invalid exploration property: ' + backendName);
+          return;
+        }
+        addChange({
+          cmd: CMD_EDIT_EXPLORATION_PROPERTY,
+          new_value: angular.copy(newValue),
+          old_value: angular.copy(oldValue),
+          property_name: backendName
+        });
+      },
+      /**
+       * Saves a change dict that represents a change to a gadget property.
+       *
+       * It is the responsibility of the caller to check that the old and new
+       * values are not equal.
+       *
+       * @param {string} gadgetName - The name of the gadget being edited
+       * @param {string} backendName - The backend name of the edited property
+       * @param {string} newValue - The new value of the property
+       * @param {string} oldValue - The previous value of the property
+       */
+      editGadgetProperty: function(
+          gadgetName, backendName, newValue, oldValue) {
+        if (!ALLOWED_GADGET_BACKEND_NAMES.hasOwnProperty(backendName)) {
+          alertsService.addWarning('Invalid gadget property: ' + backendName);
+          return;
+        }
+        addChange({
+          cmd: CMD_EDIT_GADGET_PROPERTY,
+          gadget_name: gadgetName,
+          new_value: angular.copy(newValue),
+          old_value: angular.copy(oldValue),
+          property_name: backendName
+        });
+      },
+      /**
+       * Saves a change dict that represents a change to a state property. It
+       * is the responsibility of the caller to check that the old and new
+       * values are not equal.
+       *
+       * @param {string} stateName - The name of the state that is being edited
+       * @param {string} backendName - The backend name of the edited property
+       * @param {string} newValue - The new value of the property
+       * @param {string} oldValue - The previous value of the property
+       */
+      editStateProperty: function(stateName, backendName, newValue, oldValue) {
+        if (!ALLOWED_STATE_BACKEND_NAMES.hasOwnProperty(backendName)) {
+          alertsService.addWarning('Invalid state property: ' + backendName);
+          return;
+        }
+        addChange({
+          cmd: CMD_EDIT_STATE_PROPERTY,
+          new_value: angular.copy(newValue),
+          old_value: angular.copy(oldValue),
+          property_name: backendName,
+          state_name: stateName
+        });
+      },
+      getChangeList: function() {
+        return angular.copy(explorationChangeList);
+      },
+      isExplorationLockedForEditing: function() {
+        return explorationChangeList.length > 0;
+      },
+      /**
+       * Initializes the current changeList with the one received from backend.
+       * This behavior exists only in case of an autosave.
+       *
+       * @param {object} changeList - Autosaved changeList data
+       */
+      loadAutosavedChangeList: function(changeList) {
+        explorationChangeList = changeList;
+      },
+      /**
+       * Saves a change dict that represents the renaming of a gadget.
+       *
+       * It is the responsibility of the caller to check that the two names
+       * are not equal.
+       *
+       * @param {string} oldGadgetName - The previous name of the gadget
+       * @param {string} newGadgetName - The new name of the gadget
+       */
+      renameGadget: function(oldGadgetName, newGadgetName) {
+        addChange({
+          cmd: CMD_RENAME_GADGET,
+          new_gadget_name: newGadgetName,
+          old_gadget_name: oldGadgetName
+        });
+      },
+      /**
+       * Saves a change dict that represents the renaming of a state. This
+       * is also intended to change the initial state name if necessary
+       * (that is, the latter change is implied and does not have to be
+       * recorded separately in another change dict). It is the responsibility
+       * of the caller to check that the two names are not equal.
+       *
+       * @param {string} newStateName - The new name of the state
+       * @param {string} oldStateName - The previous name of the state
+       */
+      renameState: function(newStateName, oldStateName) {
+        addChange({
+          cmd: CMD_RENAME_STATE,
+          new_state_name: newStateName,
+          old_state_name: oldStateName
+        });
+      },
+      undoLastChange: function() {
+        if (explorationChangeList.length === 0) {
+          alertsService.addWarning('There are no changes to undo.');
+          return;
+        }
+        var lastChange = explorationChangeList.pop();
+        undoneChangeStack.push(lastChange);
+        autosaveChangeListOnChange(explorationChangeList);
       }
-      addChange({
-        cmd: CMD_EDIT_EXPLORATION_PROPERTY,
-        new_value: angular.copy(newValue),
-        old_value: angular.copy(oldValue),
-        property_name: backendName
-      });
-    },
-    /**
-     * Saves a change dict that represents a change to a gadget property.
-     *
-     * It is the responsibility of the caller to check that the old and new
-     * values are not equal.
-     *
-     * @param {string} gadgetName - The name of the gadget that is being edited
-     * @param {string} backendName - The backend name of the edited property
-     * @param {string} newValue - The new value of the property
-     * @param {string} oldValue - The previous value of the property
-     */
-    editGadgetProperty: function(gadgetName, backendName, newValue, oldValue) {
-      if (!ALLOWED_GADGET_BACKEND_NAMES.hasOwnProperty(backendName)) {
-        alertsService.addWarning('Invalid gadget property: ' + backendName);
-        return;
-      }
-      addChange({
-        cmd: CMD_EDIT_GADGET_PROPERTY,
-        gadget_name: gadgetName,
-        new_value: angular.copy(newValue),
-        old_value: angular.copy(oldValue),
-        property_name: backendName
-      });
-    },
-    /**
-     * Saves a change dict that represents a change to a state property. It is
-     * the responsibility of the caller to check that the old and new values
-     * are not equal.
-     *
-     * @param {string} stateName - The name of the state that is being edited
-     * @param {string} backendName - The backend name of the edited property
-     * @param {string} newValue - The new value of the property
-     * @param {string} oldValue - The previous value of the property
-     */
-    editStateProperty: function(stateName, backendName, newValue, oldValue) {
-      if (!ALLOWED_STATE_BACKEND_NAMES.hasOwnProperty(backendName)) {
-        alertsService.addWarning('Invalid state property: ' + backendName);
-        return;
-      }
-      addChange({
-        cmd: CMD_EDIT_STATE_PROPERTY,
-        new_value: angular.copy(newValue),
-        old_value: angular.copy(oldValue),
-        property_name: backendName,
-        state_name: stateName
-      });
-    },
-    getChangeList: function() {
-      return angular.copy(explorationChangeList);
-    },
-    isExplorationLockedForEditing: function() {
-      return explorationChangeList.length > 0;
-    },
-    /**
-     * Initializes the current changeList with the one received from backend.
-     * This behavior exists only in case of an autosave.
-     *
-     * @param {object} changeList - Autosaved changeList data
-     */
-    loadAutosavedChangeList: function(changeList) {
-      explorationChangeList = changeList;
-    },
-    /**
-     * Saves a change dict that represents the renaming of a gadget.
-     *
-     * It is the responsibility of the caller to check that the two names
-     * are not equal.
-     *
-     * @param {string} oldGadgetName - The previous name of the gadget
-     * @param {string} newGadgetName - The new name of the gadget
-     */
-    renameGadget: function(oldGadgetName, newGadgetName) {
-      addChange({
-        cmd: CMD_RENAME_GADGET,
-        new_gadget_name: newGadgetName,
-        old_gadget_name: oldGadgetName
-      });
-    },
-    /**
-     * Saves a change dict that represents the renaming of a state. This
-     * is also intended to change the initial state name if necessary
-     * (that is, the latter change is implied and does not have to be recorded
-     * separately in another change dict). It is the responsibility of the
-     * caller to check that the two names are not equal.
-     *
-     * @param {string} newStateName - The new name of the state
-     * @param {string} oldStateName - The previous name of the state
-     */
-    renameState: function(newStateName, oldStateName) {
-      addChange({
-        cmd: CMD_RENAME_STATE,
-        new_state_name: newStateName,
-        old_state_name: oldStateName
-      });
-    },
-    undoLastChange: function() {
-      if (explorationChangeList.length === 0) {
-        alertsService.addWarning('There are no changes to undo.');
-        return;
-      }
-      var lastChange = explorationChangeList.pop();
-      undoneChangeStack.push(lastChange);
-      autosaveChangeListOnChange(explorationChangeList);
-    }
-  };
-}]);
+    };
+  }
+]);
 
 // A data service that stores data about the rights for this exploration.
 oppia.factory('explorationRightsService', [
