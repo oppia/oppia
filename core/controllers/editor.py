@@ -239,6 +239,7 @@ class ExplorationPage(EditorHandler):
                 interaction_templates),
             'interaction_validators_html': jinja2.utils.Markup(
                 interaction_validators_html),
+            'meta_description': feconf.CREATE_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_CREATE,
             'value_generators_js': jinja2.utils.Markup(
                 get_value_generators_js()),
