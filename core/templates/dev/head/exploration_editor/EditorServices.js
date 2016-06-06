@@ -622,59 +622,62 @@ oppia.factory('explorationPropertyService', [
 // A data service that stores the current exploration title so that it can be
 // displayed and edited in multiple places in the UI.
 oppia.factory('explorationTitleService', [
-    'explorationPropertyService', '$filter', 'validatorsService',
-    'explorationRightsService',
-    function(
-      explorationPropertyService, $filter, validatorsService,
-      explorationRightsService) {
-  var child = Object.create(explorationPropertyService);
-  child.propertyName = 'title';
-  child._normalize = $filter('normalizeWhitespace');
-  child._isValid = function(value) {
-    return (
-      explorationRightsService.isPrivate() ||
-      validatorsService.isValidEntityName(value, true));
-  };
-  return child;
-}]);
+  'explorationPropertyService', '$filter', 'validatorsService',
+  'explorationRightsService',
+  function(
+    explorationPropertyService, $filter, validatorsService,
+    explorationRightsService) {
+    var child = Object.create(explorationPropertyService);
+    child.propertyName = 'title';
+    child._normalize = $filter('normalizeWhitespace');
+    child._isValid = function(value) {
+      return (
+        explorationRightsService.isPrivate() ||
+        validatorsService.isValidEntityName(value, true));
+    };
+    return child;
+  }
+]);
 
 // A data service that stores the current exploration category so that it can be
 // displayed and edited in multiple places in the UI.
 oppia.factory('explorationCategoryService', [
-    'explorationPropertyService', '$filter', 'validatorsService',
-    'explorationRightsService',
-    function(
-      explorationPropertyService, $filter, validatorsService,
-      explorationRightsService) {
-  var child = Object.create(explorationPropertyService);
-  child.propertyName = 'category';
-  child._normalize = $filter('normalizeWhitespace');
-  child._isValid = function(value) {
-    return (
-      explorationRightsService.isPrivate() ||
-      validatorsService.isValidEntityName(value, true));
-  };
-  return child;
-}]);
+  'explorationPropertyService', '$filter', 'validatorsService',
+  'explorationRightsService',
+  function(
+    explorationPropertyService, $filter, validatorsService,
+    explorationRightsService) {
+    var child = Object.create(explorationPropertyService);
+    child.propertyName = 'category';
+    child._normalize = $filter('normalizeWhitespace');
+    child._isValid = function(value) {
+      return (
+        explorationRightsService.isPrivate() ||
+        validatorsService.isValidEntityName(value, true));
+    };
+    return child;
+  }
+]);
 
 // A data service that stores the current exploration objective so that it can
 // be displayed and edited in multiple places in the UI.
 oppia.factory('explorationObjectiveService', [
-    'explorationPropertyService', '$filter', 'validatorsService',
-    'explorationRightsService',
-    function(
-      explorationPropertyService, $filter, validatorsService,
-      explorationRightsService) {
-  var child = Object.create(explorationPropertyService);
-  child.propertyName = 'objective';
-  child._normalize = $filter('normalizeWhitespace');
-  child._isValid = function(value) {
-    return (
-      explorationRightsService.isPrivate() ||
-      validatorsService.isNonempty(value, false));
-  };
-  return child;
-}]);
+  'explorationPropertyService', '$filter', 'validatorsService',
+  'explorationRightsService',
+  function(
+    explorationPropertyService, $filter, validatorsService,
+    explorationRightsService) {
+    var child = Object.create(explorationPropertyService);
+    child.propertyName = 'objective';
+    child._normalize = $filter('normalizeWhitespace');
+    child._isValid = function(value) {
+      return (
+        explorationRightsService.isPrivate() ||
+        validatorsService.isNonempty(value, false));
+    };
+    return child;
+  }
+]);
 
 // A data service that stores the exploration language code.
 oppia.factory('explorationLanguageCodeService', [

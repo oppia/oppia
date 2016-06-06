@@ -2583,7 +2583,7 @@ class ExplorationSummary(object):
     """Domain object for an Oppia exploration summary."""
 
     def __init__(self, exploration_id, title, category, objective,
-                 language_code, tags, ratings, status,
+                 language_code, tags, ratings, scaled_average_rating, status,
                  community_owned, owner_ids, editor_ids,
                  viewer_ids, contributor_ids, contributors_summary, version,
                  exploration_model_created_on,
@@ -2601,6 +2601,7 @@ class ExplorationSummary(object):
         self.language_code = language_code
         self.tags = tags
         self.ratings = ratings
+        self.scaled_average_rating = scaled_average_rating
         self.status = status
         self.community_owned = community_owned
         self.owner_ids = owner_ids

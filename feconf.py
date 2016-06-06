@@ -55,6 +55,10 @@ VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
 DEFAULT_QUERY_LIMIT = 1000
 
 # The maximum number of results to retrieve in a datastore query
+# for top rated published explorations.
+NUMBER_OF_TOP_RATED_EXPLORATIONS = 8
+
+# The maximum number of results to retrieve in a datastore query
 # for recently published explorations.
 RECENTLY_PUBLISHED_QUERY_LIMIT = 8
 
@@ -156,6 +160,9 @@ INVALID_PARAMETER_NAMES = AUTOMATICALLY_SET_PARAMETER_NAMES + [
 _EMPTY_RATINGS = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
 def get_empty_ratings():
     return copy.deepcopy(_EMPTY_RATINGS)
+
+# Empty scaled average rating as a float.
+EMPTY_SCALED_AVERAGE_RATING = 0.0
 
 # Committer id for system actions.
 SYSTEM_COMMITTER_ID = 'admin'
@@ -369,6 +376,9 @@ COLLECTION_WRITABLE_DATA_URL_PREFIX = '/collection_editor_handler/data'
 COLLECTION_RIGHTS_PREFIX = '/collection_editor_handler/rights'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
+DASHBOARD_URL = '/dashboard'
+DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % DASHBOARD_URL
+DASHBOARD_DATA_URL = '/dashboardhandler/data'
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
@@ -382,8 +392,6 @@ LIBRARY_INDEX_URL = '/library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
 LIBRARY_SEARCH_URL = '/search/find'
 LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
-MY_EXPLORATIONS_URL = '/my_explorations'
-MY_EXPLORATIONS_CREATE_MODE_URL = '%s?mode=create' % MY_EXPLORATIONS_URL
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
@@ -400,9 +408,9 @@ USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 
 NAV_MODE_ABOUT = 'about'
 NAV_MODE_CREATE = 'create'
+NAV_MODE_DASHBOARD = 'dashboard'
 NAV_MODE_EXPLORE = 'explore'
 NAV_MODE_LIBRARY = 'library'
-NAV_MODE_HOME = 'home'
 NAV_MODE_PARTICIPATE = 'participate'
 NAV_MODE_PROFILE = 'profile'
 NAV_MODE_SIGNUP = 'signup'

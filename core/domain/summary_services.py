@@ -21,6 +21,7 @@ from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import stats_jobs_continuous
 from core.domain import user_services
+import feconf
 import utils
 
 _LIBRARY_INDEX_GROUPS = [{
@@ -53,7 +54,6 @@ _LIBRARY_INDEX_GROUPS = [{
         'Business', 'Economics', 'Geography', 'Government', 'History', 'Law'],
 }]
 
-NUMBER_OF_TOP_RATED_EXPLORATIONS = 8
 
 def get_human_readable_contributors_summary(contributors_summary):
     contributor_ids = contributors_summary.keys()
@@ -150,10 +150,11 @@ def get_learner_collection_dict_by_id(
 
 def get_displayable_collection_summary_dicts_matching_ids(collection_ids):
     """Returns a list with all collection summary objects that can be
-    displayed on the gallery page as collection summary tiles.
+    displayed on the library page as collection summary tiles.
     """
-    collection_summaries = collection_services.get_collection_summaries_matching_ids( # pylint: disable=line-too-long
-        collection_ids)
+    collection_summaries = (
+        collection_services.get_collection_summaries_matching_ids(
+            collection_ids))
     return _get_displayable_collection_summary_dicts(collection_summaries)
 
 
@@ -378,21 +379,14 @@ def get_top_rated_exploration_summary_dicts(language_codes):
     """
     filtered_exp_summaries = [
         exp_summary for exp_summary in
-        exp_services.get_non_private_exploration_summaries().values()
+        exp_services.get_top_rated_exploration_summaries().values()
         if exp_summary.language_code in language_codes and
         sum(exp_summary.ratings.values()) > 0]
 
-    lower_bound_wilson_scores = {
-        exp_summary.id:
-            exp_services.get_scaled_average_rating_from_exp_summary(
-                exp_summary)
-        for exp_summary in filtered_exp_summaries
-    }
-
     sorted_exp_summaries = sorted(
         filtered_exp_summaries,
-        key=lambda exp_summary: lower_bound_wilson_scores[exp_summary.id],
-        reverse=True)[:NUMBER_OF_TOP_RATED_EXPLORATIONS]
+        key=lambda exp_summary: exp_summary.scaled_average_rating,
+        reverse=True)[:feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS]
 
     return _get_displayable_exp_summary_dicts(
         sorted_exp_summaries, include_contributors=False)

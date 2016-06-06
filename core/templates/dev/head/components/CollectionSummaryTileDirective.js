@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Gallery tile component for collections.
+ * @fileoverview Summary tile for collections.
  */
 
 oppia.constant(

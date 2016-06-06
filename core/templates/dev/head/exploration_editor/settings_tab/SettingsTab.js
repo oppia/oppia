@@ -51,7 +51,7 @@ oppia.controller('SettingsTab', [
 
     $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
 
-    var MY_EXPLORATIONS_PAGE_URL = '/my_explorations';
+    var DASHBOARD_PAGE_URL = '/dashboard';
     var EXPLORE_PAGE_PREFIX = '/explore/';
 
     $scope.getExplorePageUrl = function() {
@@ -251,7 +251,7 @@ oppia.controller('SettingsTab', [
           deleteUrl += ('?role=' + role);
         }
         $http['delete'](deleteUrl).then(function() {
-          $window.location = MY_EXPLORATIONS_PAGE_URL;
+          $window.location = DASHBOARD_PAGE_URL;
         });
       });
     };
