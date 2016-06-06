@@ -80,7 +80,7 @@ class EditorTest(BaseEditorControllerTest):
         # Check that non-editors can access, but not edit, the editor page.
         response = self.testapp.get('/create/0')
         self.assertEqual(response.status_int, 200)
-        self.assertIn('Welcome to Oppia!', response.body)
+        self.assertIn('Create an Exploration -- Oppia', response.body)
         self.assert_cannot_edit(response.body)
 
         # Log in as an editor.
@@ -88,7 +88,7 @@ class EditorTest(BaseEditorControllerTest):
 
         # Check that it is now possible to access and edit the editor page.
         response = self.testapp.get('/create/0')
-        self.assertIn('Welcome to Oppia!', response.body)
+        self.assertIn('Create an Exploration -- Oppia', response.body)
         self.assertEqual(response.status_int, 200)
         self.assert_can_edit(response.body)
         self.assertIn('Stats', response.body)
