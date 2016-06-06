@@ -100,7 +100,7 @@ oppia.controller('Base', [
       } else {
         $scope.sidebarIsShown = false;
         $scope.pendingSidebarClick = false;
-	  }
+      }
     };
 
     // TODO(sll): use 'touchstart' for mobile.
