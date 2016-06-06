@@ -2078,6 +2078,12 @@ ul.oppia-dashboard-tiles {
   background-color: #f9f9f9;
 }
 
+.oppia-version-mismatch-modal .oppia-content {
+  max-height: 700px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
 .oppia-vcenter {
   display: table-cell;
   float: none;
@@ -2759,6 +2765,27 @@ md-card.preview-conversation-skin-supplemental-card {
   border-radius:0;
   margin: 0;
   padding: 0;
+}
+
+.oppia-lost-changes > li {
+  margin: 5px 0 5px 10px;
+}
+
+.oppia-lost-changes > li > .state-edit-desc {
+  margin: 3px auto auto 25px;
+}
+
+.oppia-lost-changes > li .state-edit-desc .content > *,
+.oppia-lost-changes > li .state-edit-desc .feedback > * {
+  padding: 4px 0 0 20px;
+}
+
+.oppia-lost-changes > li > .state-edit-desc > .sub-edit {
+  margin-left: 20px;
+}
+
+.oppia-lost-changes > li > .state-edit-desc > .rules-list > li {
+  margin-left: 20px;
 }
 
 .oppia-info-card-title {

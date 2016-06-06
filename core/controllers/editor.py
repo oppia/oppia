@@ -787,6 +787,7 @@ class ExplorationRevertHandler(EditorHandler):
                 'Cannot revert to version %s from version %s.' %
                 (revert_to_version, current_version))
 
+        exp_services.discard_draft(exploration_id, self.user_id)
         exp_services.revert_exploration(
             self.user_id, exploration_id, current_version, revert_to_version)
         self.render_json({})
@@ -906,19 +907,9 @@ class ChangeListSummaryHandler(EditorHandler):
             exploration_id)
 
         if version != current_exploration.version:
-            # TODO(sll): Improve this.
+            # TODO(sll): Improve the handling of merge conflicts.
             self.render_json({
-                'error': (
-                    'Sorry! Someone else has edited and committed changes to '
-                    'this exploration while you were editing it. We suggest '
-                    'opening another browser tab -- which will load the new '
-                    'version of the exploration -- then transferring your '
-                    'changes there. We will try to make this easier in the '
-                    'future -- we have not done it yet because figuring out '
-                    'how to merge different people\'s changes is hard. '
-                    '(Trying to edit version %s, but the current version is '
-                    '%s.).' % (version, current_exploration.version)
-                )
+                'is_version_of_draft_valid': False
             })
         else:
             utils.recursively_remove_key(change_list, '$$hashKey')
