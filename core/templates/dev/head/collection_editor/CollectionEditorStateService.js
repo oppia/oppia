@@ -132,7 +132,7 @@ oppia.factory('CollectionEditorStateService', [
        * will clear the UndoRedoService of pending changes. This function also
        * shares behavior with setCollection(), when it succeeds.
        */
-      saveCollection: function(commitMessage) {
+      saveCollection: function(commitMessage, successCallback) {
         if (!_collectionIsInitialized) {
           alertsService.fatalWarning(
             'Cannot save a collection before one is loaded.');
@@ -150,6 +150,9 @@ oppia.factory('CollectionEditorStateService', [
             _updateCollection(collectionBackendObject);
             UndoRedoService.clearChanges();
             _isSavingCollection = false;
+            if (successCallback) {
+              successCallback();
+            }
           }, function(error) {
             alertsService.addWarning(
               error || 'There was an error when saving the collection.');

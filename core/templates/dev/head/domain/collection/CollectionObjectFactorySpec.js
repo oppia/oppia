@@ -58,9 +58,10 @@ describe('Collection object factory', function() {
     var collection = CollectionObjectFactory.createEmptyCollection();
     expect(collection.getId()).toBeUndefined();
     expect(collection.getTitle()).toBeUndefined();
+    expect(collection.getCategory()).toBeUndefined();
     expect(collection.getObjective()).toBeUndefined();
     expect(collection.getLanguageCode()).toBeUndefined();
-    expect(collection.getCategory()).toBeUndefined();
+    expect(collection.getTags()).toBeUndefined();
     expect(collection.getVersion()).toBeUndefined();
     expect(collection.getCollectionNodes()).toEqual([]);
   });

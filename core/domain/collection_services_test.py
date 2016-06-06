@@ -863,6 +863,25 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
             self.COLLECTION_ID)
         self.assertEqual(collection.language_code, 'fi')
 
+    def test_update_collection_tags(self):
+        # Verify initial tags.
+        collection = collection_services.get_collection_by_id(
+            self.COLLECTION_ID)
+        self.assertEqual(collection.tags, [])
+
+        # Update the tags.
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+                'property_name': 'tags',
+                'new_value': ['test']
+            }], 'Add a new tag')
+
+        # Verify that the tags are different.
+        collection = collection_services.get_collection_by_id(
+            self.COLLECTION_ID)
+        self.assertEqual(collection.tags, ['test'])
+
     def test_update_collection_node_prerequisite_skills(self):
         # Verify initial prerequisite skills are empty.
         collection = collection_services.get_collection_by_id(

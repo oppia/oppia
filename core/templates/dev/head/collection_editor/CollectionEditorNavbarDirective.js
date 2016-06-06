@@ -64,6 +64,22 @@ oppia.directive('collectionEditorNavbar', [function() {
           }
         };
 
+        var _publishCollection = function() {
+          // TODO(bhenning): This also needs a confirmation of destructive
+          // action since it is not reversible.
+          CollectionRightsBackendApiService.setCollectionPublic(
+            $scope.collectionId, $scope.collection.getVersion()).then(
+            function() {
+              // TODO(bhenning): There should be a scope-level rights object
+              // used, instead. The rights object should be loaded with the
+              // collection.
+              $scope.isPrivate = false;
+            }, function() {
+              alertsService.addWarning(
+                'There was an error when publishing the collection.');
+            });
+        };
+
         $scope.$on(
           EVENT_COLLECTION_INITIALIZED, _validateCollection);
         $scope.$on(EVENT_COLLECTION_REINITIALIZED, _validateCollection);
@@ -115,19 +131,97 @@ oppia.directive('collectionEditorNavbar', [function() {
         };
 
         $scope.publishCollection = function() {
-          // TODO(bhenning): This also needs a confirmation of destructive
-          // action since it is not reversible.
-          CollectionRightsBackendApiService.setCollectionPublic(
-            $scope.collectionId, $scope.collection.getVersion()).then(
-            function() {
-              // TODO(bhenning): There should be a scope-level rights object
-              // used, instead. The rights object should be loaded with the
-              // collection.
-              $scope.isPrivate = false;
-            }, function() {
-              alertsService.addWarning(
-                'There was an error when publishing the collection.');
+          var additionalMetadataNeeded = (
+            !$scope.collection.getTitle() ||
+            !$scope.collection.getObjective() ||
+            !$scope.collection.getCategory());
+
+          if (additionalMetadataNeeded) {
+            $modal.open({
+              templateUrl: 'modals/addCollectionMetadata',
+              backdrop: true,
+              controller: [
+                '$scope', '$modalInstance', 'CollectionEditorStateService',
+                'CollectionUpdateService', 'CATEGORY_LIST',
+                function(
+                    $scope, $modalInstance, CollectionEditorStatesService,
+                    CollectionUpdateService, CATEGORY_LIST) {
+                  var collection = (
+                    CollectionEditorStateService.getCollection());
+
+                  $scope.requireTitleToBeSpecified = !collection.getTitle();
+                  $scope.requireObjectiveToBeSpecified = (
+                    !collection.getObjective());
+                  $scope.requireCategoryToBeSpecified = (
+                    !collection.getCategory());
+
+                  $scope.newTitle = collection.getTitle();
+                  $scope.newObjective = collection.getObjective();
+                  $scope.newCategory = collection.getCategory();
+
+                  $scope.CATEGORY_LIST_FOR_SELECT2 = [];
+                  for (var i = 0; i < CATEGORY_LIST.length; i++) {
+                    $scope.CATEGORY_LIST_FOR_SELECT2.push({
+                      id: CATEGORY_LIST[i],
+                      text: CATEGORY_LIST[i]
+                    });
+                  }
+
+                  $scope.isSavingAllowed = function() {
+                    return Boolean(
+                      $scope.newTitle && $scope.newObjective &&
+                      $scope.newCategory);
+                  };
+
+                  $scope.save = function() {
+                    if (!$scope.newTitle) {
+                      alertsService.addWarning('Please specify a title');
+                      return;
+                    }
+                    if (!$scope.newObjective) {
+                      alertsService.addWarning('Please specify an objective');
+                      return;
+                    }
+                    if (!$scope.newCategory) {
+                      alertsService.addWarning('Please specify a category');
+                      return;
+                    }
+
+                    // Record any fields that have changed.
+                    var metadataList = [];
+                    if ($scope.newTitle !== collection.getTitle()) {
+                      metadataList.push('title');
+                      CollectionUpdateService.setCollectionTitle(
+                        collection, $scope.newTitle);
+                    }
+                    if ($scope.newObjective !== collection.getObjective()) {
+                      metadataList.push('objective');
+                      CollectionUpdateService.setCollectionObjective(
+                        collection, $scope.newObjective);
+                    }
+                    if ($scope.newCategory !== collection.getCategory()) {
+                      metadataList.push('category');
+                      CollectionUpdateService.setCollectionCategory(
+                        collection, $scope.newCategory);
+                    }
+
+                    $modalInstance.close(metadataList);
+                  };
+
+                  $scope.cancel = function() {
+                    $modalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            }).result.then(function(metadataList) {
+              var commitMessage = (
+                'Add metadata: ' + metadataList.join(', ') + '.');
+              CollectionEditorStateService.saveCollection(
+                commitMessage, _publishCollection);
             });
+          } else {
+            _publishCollection();
+          }
         };
 
         // Unpublish the collection. Will only show up if the collection is
