@@ -548,6 +548,11 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         $scope.lastSaveOrDiscardAction = 'discard';
         $scope.isDiscardInProgress = false;
       });
+
+      // The reload is necessary because, otherwise, the
+      // exploration-with-draft-changes will be reloaded (since it is already
+      // cached in explorationData).
+      location.reload();
     };
 
     $scope.getChangeListLength = function() {

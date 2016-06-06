@@ -171,6 +171,16 @@ describe('Change list service', function() {
       expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
     });
 
+    it('should correctly discard all changes', function() {
+      expect(cls.getChangeList()).toEqual([]);
+      cls.addState('newState');
+      expect(cls.getChangeList()).not.toBe([]);
+      cls.discardAllChanges();
+      expect(cls.getChangeList()).toEqual([]);
+      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
+    });
+
     it('should correctly handle multiple changes in succession', function() {
       expect(cls.getChangeList()).toEqual([]);
 
