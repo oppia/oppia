@@ -538,21 +538,26 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     };
 
     $scope.discardChanges = function() {
-      alertsService.clearWarnings();
-      $rootScope.$broadcast('externalSave');
+      var confirmDiscard = confirm(
+        'Are you sure you want to discard your changes?');
 
-      $scope.isDiscardInProgress = true;
-      changeListService.discardAllChanges();
-      alertsService.addSuccessMessage('Changes discarded.');
-      $rootScope.$broadcast('initExplorationPage', function() {
-        $scope.lastSaveOrDiscardAction = 'discard';
-        $scope.isDiscardInProgress = false;
-      });
+      if (confirmDiscard) {
+        alertsService.clearWarnings();
+        $rootScope.$broadcast('externalSave');
 
-      // The reload is necessary because, otherwise, the
-      // exploration-with-draft-changes will be reloaded (since it is already
-      // cached in explorationData).
-      location.reload();
+        $scope.isDiscardInProgress = true;
+        changeListService.discardAllChanges();
+        alertsService.addSuccessMessage('Changes discarded.');
+        $rootScope.$broadcast('initExplorationPage', function() {
+          $scope.lastSaveOrDiscardAction = 'discard';
+          $scope.isDiscardInProgress = false;
+        });
+
+        // The reload is necessary because, otherwise, the
+        // exploration-with-draft-changes will be reloaded (since it is already
+        // cached in explorationData).
+        location.reload();
+      }
     };
 
     $scope.getChangeListLength = function() {

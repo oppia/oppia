@@ -61,16 +61,15 @@ oppia.factory('explorationData', [
         });
       },
       discardDraft: function(successCallback, errorCallback) {
-        $http.post(explorationDraftAutosaveUrl, {})
-          .then(function() {
-            if (successCallback) {
-              successCallback();
-            }
-          }, function() {
-            if (errorCallback) {
-              errorCallback();
-            }
-          });
+        $http.post(explorationDraftAutosaveUrl, {}).then(function() {
+          if (successCallback) {
+            successCallback();
+          }
+        }, function() {
+          if (errorCallback) {
+            errorCallback();
+          }
+        });
       },
       // Returns a promise that supplies the data for the current exploration.
       getData: function() {

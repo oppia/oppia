@@ -907,7 +907,7 @@ class ChangeListSummaryHandler(EditorHandler):
             exploration_id)
 
         if version != current_exploration.version:
-            # TODO(sll): Improve this.
+            # TODO(sll): Improve the handling of merge conflicts.
             self.render_json({
                 'is_version_of_draft_valid': False
             })
