@@ -3,53 +3,48 @@
 {% block navbar_breadcrumb %}
 {% endblock navbar_breadcrumb %}
 
-{% block subtitle %}
+{% block maintitle %}
   {% if code == 400 %}
-    Error 400 - Bad Request
+    I18N_ERROR_400_PAGE_TITLE
   {% elif code == 401 %}
-    Error 401 - Unauthorized
+    I18N_ERROR_401_PAGE_TITLE
   {% elif code == 404 %}
-    Error 404 - Page Not Found
+    I18N_ERROR_404_PAGE_TITLE
   {% elif code == 500 %}
-    Error 500 - System Error
+    I18N_ERROR_500_PAGE_TITLE
   {% endif %}
-{% endblock subtitle %}
+{% endblock maintitle %}
 
 {% block content %}
   <div class="oppia-content">
     <br>
 
-    <div class="oppia-wide-panel">
+    <div class="oppia-wide-panel oppia-error-wide-container">
       <div class="oppia-wide-panel-content protractor-test-error-container">
-        <h4>
           {% if code == 400 %}
-            Error 400 - Bad Request
+            <h4 translate="I18N_ERROR_TITLE_400"></h4>
           {% elif code == 401 %}
-            Error 401 - Unauthorized
+            <h4 translate="I18N_ERROR_TITLE_401"></h4>
           {% elif code == 404 %}
-            Error 404 - Page Not Found
+            <h4 translate="I18N_ERROR_TITLE_404"></h4>
           {% elif code == 500 %}
-            Error 500 - System Error
+            <h4 translate="I18N_ERROR_TITLE_500"></h4>
           {% endif %}
-        </h4>
         <br>
 
         <img src="/images/general/oops_mint.png" alt="Oops!" width="299" height="142"/>
         <p><h3>
           {% if code == 400 %}
-            Sometimes machines can't understand humans. This is one of those times.
+            <h3 translate="I18N_ERROR_MESSAGE_400"></h3>
           {% elif code == 401 %}
-            You can't get in there. Quick, go back before the teacher comes!
+            <h3 translate="I18N_ERROR_MESSAGE_401"></h3>
           {% elif code == 404 %}
-            Sorry, we looked and looked but we just couldn't find that page.
+            <h3 translate="I18N_ERROR_MESSAGE_404"></h3>
           {% elif code == 500 %}
-            Something went horribly wrong. But it wasn't your fault. An internal error occurred.
+            <h3 translate="I18N_ERROR_MESSAGE_500"></h3>
           {% endif %}
-        </h3></p>
-        <p>
-          The best thing to do now is probably to return to the <a href="/">home page</a>. However, if this issue recurs, and you think it
-          shouldn't, please let us know on our <a href="https://github.com/oppia/oppia/issues/new?title=Describe%20your%20feature%20request%20or%20bug%20report%20succinctly&body=If%20you%27d%20like%20to%20propose%20a%20feature,%20describe%20what%20you%27d%20like%20to%20see.%20Mock%20ups%20would%20be%20great!%0A%0AIf%20you%27re%20reporting%20a%20bug,%20please%20be%20sure%20to%20include%20the%20expected%20behaviour,%20the%20observed%20behaviour,%20and%20steps%20to%20reproduce%20the%20problem.%20Console%20copy-pastes%20and%20any%20background%20on%20the%20environment%20would%20also%20be%20helpful.%0A%0AThanks!" target="_blank">issue tracker</a>. Sorry about this.
         </p>
+        <p><span translate="I18N_ERROR_NEXT_STEPS" translate-values="{issueTrackerUrl: 'https://github.com/oppia/oppia/issues/new', homeUrl: '/'}"></span></p>
       </div>
     </div>
 

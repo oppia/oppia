@@ -20,7 +20,8 @@ oppia.controller('Splash', [
   '$scope', '$timeout', '$window', 'siteAnalyticsService',
   function($scope, $timeout, $window, siteAnalyticsService) {
     $scope.onRedirectToLogin = function(destinationUrl) {
-      siteAnalyticsService.registerStartLoginEvent('createExplorationButton');
+      siteAnalyticsService.registerStartLoginEvent(
+        'splashPageCreateExplorationButton');
       $timeout(function() {
         $window.location = destinationUrl;
       }, 150);
@@ -38,7 +39,7 @@ oppia.controller('Splash', [
     $scope.onClickCreateExplorationButton = function() {
       siteAnalyticsService.registerClickCreateExplorationButtonEvent();
       $timeout(function() {
-        $window.location = '/my_explorations?mode=create';
+        $window.location = '/dashboard?mode=create';
       }, 150);
       return false;
     };

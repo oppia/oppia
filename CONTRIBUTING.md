@@ -7,12 +7,12 @@ Thanks for your interest in contributing code or design help to the Oppia projec
 ## Setting things up
 
   1. Please sign the CLA so that we can accept your contributions. If you're contributing as an individual, use the [individual CLA](https://goo.gl/forms/AttNH80OV0). If your company owns the copyright to your contributions, a company representative should sign the [corporate CLA](https://goo.gl/forms/xDq9gK3Zcv).
-  2. Create a new, empty folder called `opensource/` in your computer's home folder. Navigate to it (`cd opensource`), then [fork and clone](https://help.github.com/articles/fork-a-repo/) the Oppia repo so that it gets downloaded into `opensource/oppia`. Then follow the appropriate installation instructions ([Linux](https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux%29), [Mac OS](https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-OS%29), [Windows](https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Windows%29)).
-  3. Update your GitHub notification settings:
+  2. Fill in the [Oppia contributor survey](http://goo.gl/forms/wz1x3bFfpF) to let us know what your interests are. (You can always change your responses later.)  
+  3. Join the [oppia-dev@](https://groups.google.com/forum/#!forum/oppia-dev) mailing list, and say hi on the [gitter](https://gitter.im/oppia/oppia-chat) chat channel!  
+  4. While you're waiting for a reply, create a new, empty folder called `opensource/` in your computer's home folder. Navigate to it (`cd opensource`), then [fork and clone](https://help.github.com/articles/fork-a-repo/) the Oppia repo so that it gets downloaded into `opensource/oppia`. Then follow the appropriate installation instructions ([Linux](https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux%29), [Mac OS](https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-OS%29), [Windows](https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Windows%29)).
+  5. Update your GitHub notification settings:
     * Go to your settings page (click the Settings option under the profile menu in the top right), then go to 'Notification center' and ensure that everything's as you want it.
     * Go to the [Oppia repo](https://github.com/oppia/oppia), and click 'Watch' at the top right. Ensure that you're not 'ignoring' the repo, so that you'll be notified when someone replies to a conversation you're part of.
-  4. Fill in the [Oppia contributor survey](http://goo.gl/forms/wz1x3bFfpF) to let us know what your interests are. (You can always change your responses later.)
-  5. Join the [oppia-dev@](https://groups.google.com/forum/#!forum/oppia-dev) mailing list, and say hi on the [gitter](https://gitter.im/oppia/oppia-chat) chat channel!
   6. (Optional) You may also want to set up [automatic auth](https://help.github.com/articles/set-up-git/#next-steps-authenticating-with-github-from-git) so you don't have to type in a username and password each time you commit a change.
 
 ## Getting in touch with the team
@@ -31,7 +31,7 @@ If you don't have an idea for something to do, try searching the issue tracker f
   * **[TODO: design (UI/Interaction)](https://github.com/oppia/oppia/labels/TODO%3A%20design%20%28UI%2Finteraction%29)** means that the issue is suitable for new UI designers, interaction designers, artists and writers. In general, it means that UI design help is needed, and the deliverable would usually be a mockup, drawing, prototype or text that conveys what the feature should look like. 
   * **[TODO: design (usability)](https://github.com/oppia/oppia/labels/TODO%3A%20design%20%28usability%29)** means that the  issue is suitable for new usability testers. In general, it means that we have one (or more) ideas or designs for a project, and usability testing/research is needed to find out which one to go with. 
 
-These issues, also tagged as 'starter projects', are usually local to a small part of the codebase. They tend to be easier, so they give you a chance to get your feet wet without having to understand the entire codebase. If you'd like some help finding an issue to work on, please don't hesitate to reach out to us at the [developers' mailing list](https://groups.google.com/forum/#!forum/oppia-dev) or the [Gitter chat room](https://gitter.im/oppia/oppia-chat).
+These issues, also tagged as 'starter projects', are usually local to a small part of the codebase. They tend to be easier, so they give you a chance to get your feet wet without having to understand the entire codebase. If you'd like some help finding an issue to work on, please don't hesitate to reach out to us at the [developers' mailing list](https://groups.google.com/forum/#!forum/oppia-dev) or the [Gitter chat room](https://gitter.im/oppia/oppia-chat)! Also, if the issue you're working on has a grey label of the form "team-name (@team-lead)", please feel free to reach out to that team lead for help or advice on that issue -- they should be able to answer questions about that area of the codebase.
 
 For reference, here are descriptions of what the other 'TODO' tags mean:
   * **[TODO: tech (instructions)](https://github.com/oppia/oppia/labels/TODO%3A%20tech%20%28instructions%29)** means that the overall solution is generally known, but newcomers to the codebase may need additional instructions to be able to implement them. Adding instructions, such as where to make the necessary changes, will help move these issues to the `TODO: code` stage.
@@ -63,7 +63,7 @@ Here's how to make a one-off code change. (If you're working on a larger feature
 
 3. **Make a commit to your feature branch.** Each commit should be self-contained and have a descriptive commit message that helps other developers understand why the changes were made.
   * You can refer to relevant issues in the commit message by writing, e.g., "Fixes #105".
-  * In general, code should be formatted consistently with other code around it; we use Google's [Python](http://google-styleguide.googlecode.com/svn/trunk/pyguide.html) and [JavaScript](https://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml) style guides as a reference. If you use [Sublime Text](http://www.sublimetext.com/), consider installing the SublimeLinter, [SublimeLinter-jscs](https://github.com/SublimeLinter/SublimeLinter-jscs) and [SublimeLinter-pylint](https://github.com/SublimeLinter/SublimeLinter-pylint) plugins, following the instructions on their respective pages. Please also ensure that your code follows [these additional style rules](https://github.com/oppia/oppia/blob/develop/CONTRIBUTING.md#style-rules).
+  * In general, code should be formatted consistently with other code around it; we use Google's [Python](https://google.github.io/styleguide/pyguide.html) and [JavaScript](https://google.github.io/styleguide/javascriptguide.xml) style guides as a reference. If you use [Sublime Text](http://www.sublimetext.com/), consider installing the SublimeLinter, [SublimeLinter-jscs](https://github.com/SublimeLinter/SublimeLinter-jscs) and [SublimeLinter-pylint](https://github.com/SublimeLinter/SublimeLinter-pylint) plugins, following the instructions on their respective pages. Please also ensure that your code follows [these additional style rules](https://github.com/oppia/oppia/blob/develop/CONTRIBUTING.md#style-rules).
   * Please ensure that the code you write is well-tested.
   * Before making the commit, start up a local instance of Oppia and do some manual testing in order to check that you haven't broken anything! After that, ensure that the added code has no lint errors and passes all automated tests by running the presubmit script:
 
@@ -155,6 +155,12 @@ over
     email_subject and (cleaned) email_html_body has been sent in
     the last DUPLICATE_EMAIL_INTERVAL_MINS.
     """
+  ```
+- Never use backslashes to end a line. It's hard to tell whether they're escaping newlines, spaces, or something else. Use parentheses instead to break the line up, e.g.:
+
+ ```
+     my_variable = (
+         my_very_long_module_name.my_really_long_function_name())
   ```
 
 JavaScript

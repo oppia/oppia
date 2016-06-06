@@ -300,7 +300,9 @@ class Collection(object):
 
     @classmethod
     def create_default_collection(
-            cls, collection_id, title, category, objective,
+            cls, collection_id, title=feconf.DEFAULT_COLLECTION_TITLE,
+            category=feconf.DEFAULT_COLLECTION_CATEGORY,
+            objective=feconf.DEFAULT_COLLECTION_OBJECTIVE,
             language_code=feconf.DEFAULT_LANGUAGE_CODE):
         return cls(
             collection_id, title, category, objective, language_code,
@@ -487,22 +489,20 @@ class Collection(object):
         if not isinstance(self.title, basestring):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' % self.title)
-        utils.require_valid_name(self.title, 'the collection title')
+        utils.require_valid_name(
+            self.title, 'the collection title', allow_empty=True)
 
         if not isinstance(self.category, basestring):
             raise utils.ValidationError(
                 'Expected category to be a string, received %s'
                 % self.category)
-        utils.require_valid_name(self.category, 'the collection category')
+        utils.require_valid_name(
+            self.category, 'the collection category', allow_empty=True)
 
         if not isinstance(self.objective, basestring):
             raise utils.ValidationError(
                 'Expected objective to be a string, received %s' %
                 self.objective)
-
-        if not self.objective:
-            raise utils.ValidationError(
-                'An objective must be specified (in the \'Settings\' tab).')
 
         if not isinstance(self.language_code, basestring):
             raise utils.ValidationError(
@@ -544,6 +544,18 @@ class Collection(object):
             node.validate()
 
         if strict:
+            if not self.title:
+                raise utils.ValidationError(
+                    'A title must be specified for the collection.')
+
+            if not self.objective:
+                raise utils.ValidationError(
+                    'An objective must be specified for the collection.')
+
+            if not self.category:
+                raise utils.ValidationError(
+                    'A category must be specified for the collection.')
+
             if not self.nodes:
                 raise utils.ValidationError(
                     'Expected to have at least 1 exploration in the '
@@ -582,7 +594,8 @@ class CollectionSummary(object):
     def __init__(self, collection_id, title, category, objective, language_code,
                  status, community_owned, owner_ids, editor_ids,
                  viewer_ids, contributor_ids, contributors_summary, version,
-                 collection_model_created_on, collection_model_last_updated):
+                 node_count, collection_model_created_on,
+                 collection_model_last_updated):
         self.id = collection_id
         self.title = title
         self.category = category
@@ -596,6 +609,7 @@ class CollectionSummary(object):
         self.contributor_ids = contributor_ids
         self.contributors_summary = contributors_summary
         self.version = version
+        self.node_count = node_count
         self.collection_model_created_on = collection_model_created_on
         self.collection_model_last_updated = collection_model_last_updated
 

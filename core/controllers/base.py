@@ -255,6 +255,11 @@ class BaseHandler(webapp2.RequestHandler):
     # TODO(sll): A weakness of the current approach is that the source and
     # destination page names have to be the same. Consider fixing this.
     PAGE_NAME_FOR_CSRF = ''
+    # Whether the page includes a button for creating explorations. If this is
+    # set to True, a CSRF token for that button will be generated. This is
+    # needed because "create exploration" requests can come from multiple
+    # pages.
+    PAGE_HAS_CREATE_EXP_REQUEST = False
     # Whether to redirect requests corresponding to a logged-in user who has
     # not completed signup in to the signup page. This ensures that logged-in
     # users have agreed to the latest terms.
@@ -280,6 +285,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.has_seen_editor_tutorial = False
         self.partially_logged_in = False
         self.values['profile_picture_data_url'] = None
+        self.preferred_site_language_code = None
 
         if self.user_id:
             email = current_user_services.get_user_email(self.user)
@@ -294,6 +300,8 @@ class BaseHandler(webapp2.RequestHandler):
                 self.user_id = None
             else:
                 self.username = user_settings.username
+                self.preferred_site_language_code = (
+                    user_settings.preferred_site_language_code)
                 self.values['username'] = self.username
                 self.values['profile_picture_data_url'] = (
                     user_settings.profile_picture_data_url)
@@ -328,7 +336,7 @@ class BaseHandler(webapp2.RequestHandler):
             self.redirect(users.create_logout_url(self.request.uri))
             return
 
-        if self.payload and self.REQUIRE_PAYLOAD_CSRF_CHECK:
+        if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
             try:
                 if not self.PAGE_NAME_FOR_CSRF:
                     raise Exception('No CSRF page name specified for this '
@@ -428,10 +436,12 @@ class BaseHandler(webapp2.RequestHandler):
                 SIDEBAR_MENU_ADDITIONAL_LINKS.value),
             'SITE_FEEDBACK_FORM_URL': SITE_FEEDBACK_FORM_URL.value,
             'SITE_NAME': SITE_NAME.value,
+            'SUPPORTED_SITE_LANGUAGES': feconf.SUPPORTED_SITE_LANGUAGES,
             'SOCIAL_MEDIA_BUTTONS': SOCIAL_MEDIA_BUTTONS.value,
             'SYSTEM_USERNAMES': feconf.SYSTEM_USERNAMES,
             'user_is_logged_in': user_services.has_fully_registered(
                 self.user_id),
+            'preferred_site_language_code': self.preferred_site_language_code
         })
 
         if 'meta_name' not in values:
@@ -449,16 +459,28 @@ class BaseHandler(webapp2.RequestHandler):
                 current_user_services.create_logout_url(
                     redirect_url_on_logout))
         else:
+            target_url = (
+                '/' if self.request.uri.endswith(feconf.SPLASH_URL)
+                else self.request.uri)
             values['login_url'] = (
-                current_user_services.create_login_url(self.request.uri))
+                current_user_services.create_login_url(target_url))
 
         # Create a new csrf token for inclusion in HTML responses. This assumes
         # that tokens generated in one handler will be sent back to a handler
         # with the same page name.
         values['csrf_token'] = ''
+        values['csrf_token_create_exploration'] = ''
+        values['csrf_token_i18n'] = (
+            CsrfTokenManager.create_csrf_token(
+                self.user_id, feconf.CSRF_PAGE_NAME_I18N))
+
         if self.REQUIRE_PAYLOAD_CSRF_CHECK and self.PAGE_NAME_FOR_CSRF:
             values['csrf_token'] = CsrfTokenManager.create_csrf_token(
                 self.user_id, self.PAGE_NAME_FOR_CSRF)
+        if self.PAGE_HAS_CREATE_EXP_REQUEST:
+            values['csrf_token_create_exploration'] = (
+                CsrfTokenManager.create_csrf_token(
+                    self.user_id, feconf.CSRF_PAGE_NAME_CREATE_EXPLORATION))
 
         self.response.cache_control.no_cache = True
         self.response.cache_control.must_revalidate = True

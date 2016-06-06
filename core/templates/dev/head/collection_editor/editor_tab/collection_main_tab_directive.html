@@ -1,0 +1,28 @@
+<script type="text/ng-template" id="inline/collection_main_tab_directive">
+  <div ng-if="getCollection()">
+    <!-- Collection details -->
+    <collection-details-editor collection="getCollection()">
+    </collection-details-editor>
+
+    <a ng-href="/collection/<[getCollection().getId()]>" target="_blank">
+      Go to Collection
+    </a>
+
+    <!-- List of acquired and pre-requisite skills -->
+    <br>
+    <br>
+    <strong>Skills</strong>
+    <collection-skill-list collection-skill-list="getCollectionSkillList()">
+    </collection-skill-list>
+
+    <!-- List of explorations -->
+    <br>
+    <strong>Explorations</strong>
+    <ul>
+      <li ng-repeat="node in getCollection().getBindableCollectionNodes()">
+        <collection-node-editor collection="getCollection()" collection-node="node" update-skill-list="updateSkillList()">
+        </collection-node-editor>
+      </li>
+    </ul>
+  </div>
+</script>

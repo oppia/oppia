@@ -253,15 +253,15 @@ oppia.directive('conversationSkin', [function() {
     scope: {},
     templateUrl: 'skins/Conversation',
     controller: [
-      '$scope', '$timeout', '$rootScope', '$window', 'messengerService',
-      'oppiaPlayerService', 'urlService', 'focusService',
+      '$scope', '$timeout', '$rootScope', '$window', '$translate',
+       'messengerService', 'oppiaPlayerService', 'urlService', 'focusService',
       'LearnerViewRatingService', 'windowDimensionsService',
       'playerTranscriptService', 'LearnerParamsService',
       'playerPositionService', 'explorationRecommendationsService',
       'StatsReportingService',
       function(
-          $scope, $timeout, $rootScope, $window, messengerService,
-          oppiaPlayerService, urlService, focusService,
+          $scope, $timeout, $rootScope, $window, $translate,
+          messengerService, oppiaPlayerService, urlService, focusService,
           LearnerViewRatingService, windowDimensionsService,
           playerTranscriptService, LearnerParamsService,
           playerPositionService, explorationRecommendationsService,
@@ -470,6 +470,20 @@ oppia.directive('conversationSkin', [function() {
                 exploration.initStateName, _nextFocusLabel));
             $rootScope.loadingMessage = '';
             $scope.hasFullyLoaded = true;
+
+            // If the exploration is embedded, use the exploration language
+            // as site language. If the exploration language is not supported
+            // as site language, English is used as default.
+            if ($scope.isIframed) {
+              var explorationLanguageCode = (
+                oppiaPlayerService.getExplorationLanguageCode());
+              if ($window.GLOBALS.SUPPORTED_SITE_LANGUAGES[
+                    explorationLanguageCode]) {
+                $translate.use(explorationLanguageCode);
+              } else {
+                $translate.use('en');
+              }
+            }
             $scope.adjustPageHeight(false, null);
             $window.scrollTo(0, 0);
             focusService.setFocusIfOnDesktop(_nextFocusLabel);
@@ -704,6 +718,10 @@ oppia.directive('conversationSkin', [function() {
 
         $scope.isViewportNarrow = function() {
           return $scope.windowWidth < TWO_CARD_THRESHOLD_PX;
+        };
+
+        $scope.isWindowTall = function() {
+          return document.body.scrollHeight > $window.innerHeight;
         };
 
         $scope.isScreenNarrowAndShowingTutorCard = function() {

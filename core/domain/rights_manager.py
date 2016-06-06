@@ -625,17 +625,14 @@ def _change_activity_status(
 
     if new_status != ACTIVITY_STATUS_PRIVATE:
         activity_rights.viewer_ids = []
+        if activity_rights.first_published_msec is None:
+            activity_rights.first_published_msec = (
+                utils.get_current_time_in_millisecs())
 
     _save_activity_rights(
         committer_id, activity_rights, activity_type, commit_message,
         commit_cmds)
     _update_activity_summary(activity_type, activity_rights)
-
-    if new_status != ACTIVITY_STATUS_PRIVATE:
-        # Change first_published_msec in activity rights if necessary.
-        if activity_rights.first_published_msec is None:
-            activity_rights.first_published_msec = (
-                utils.get_current_time_in_millisecs())
 
 
 def _publish_activity(committer_id, activity_id, activity_type):

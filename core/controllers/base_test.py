@@ -17,6 +17,8 @@
 """Tests for generic controller behavior."""
 
 import datetime
+import json
+import os
 import re
 import types
 
@@ -26,6 +28,7 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import main
+import utils
 
 import webapp2
 import webtest
@@ -103,7 +106,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         self.login('user@example.com')
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 302)
-        self.assertIn('my_explorations', response.headers['location'])
+        self.assertIn('dashboard', response.headers['location'])
         self.logout()
 
 
@@ -200,8 +203,7 @@ class EscapingTest(test_utils.GenericTestBase):
         def get(self):
             """Handles GET requests."""
             self.values.update({
-                'CONTACT_EMAIL_ADDRESS': ['<[angular_tag]>'],
-                'SITE_FORUM_URL': 'x{{51 * 3}}y',
+                'CONTACT_EMAIL_ADDRESS': ['<[angular_tag]> x{{51 * 3}}y'],
             })
             self.render_template('pages/about.html')
 
@@ -253,3 +255,25 @@ class LogoutPageTest(test_utils.GenericTestBase):
         self.assertTrue(
             datetime.datetime.utcnow() > datetime.datetime.strptime(
                 expiry_date[1], '%a, %d %b %Y %H:%M:%S GMT',))
+
+
+class I18nDictsTest(test_utils.GenericTestBase):
+
+    def _extract_keys_from_json_file(self, filename):
+        return sorted(json.loads(utils.get_file_contents(
+            os.path.join(os.getcwd(), 'i18n', filename)
+        )).keys())
+
+    def test_i18n_keys(self):
+        """Tests that all JSON files in i18n.js have the same set of keys."""
+        master_key_list = self._extract_keys_from_json_file('en.json')
+        self.assertGreater(len(master_key_list), 0)
+
+        filenames = os.listdir(os.path.join(os.getcwd(), 'i18n'))
+        for filename in filenames:
+            if filename == 'en.json':
+                continue
+
+            key_list = self._extract_keys_from_json_file(filename)
+            # All other JSON files should have a subset of the keys in en.json.
+            self.assertEqual(len(set(key_list) - set(master_key_list)), 0)

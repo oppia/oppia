@@ -19,8 +19,8 @@
 describe('Rating display directive', function() {
   var elt, scope, $httpBackend, compiledElem, ctrlScope;
 
-  beforeEach(module('oppia'));
   beforeEach(module('directiveTemplates'));
+  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
   beforeEach(inject(function(
       $rootScope, $compile, _$httpBackend_, $templateCache) {
     $httpBackend = _$httpBackend_;

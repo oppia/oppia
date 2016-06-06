@@ -19,12 +19,10 @@
 
 oppia.factory('ExplorationCreationService', [
   '$http', '$modal', '$timeout', '$rootScope', '$window',
-  'alertsService', 'siteAnalyticsService', 'urlService',
-  'UrlInterpolationService',
+  'alertsService', 'siteAnalyticsService', 'UrlInterpolationService',
   function(
       $http, $modal, $timeout, $rootScope, $window,
-      alertsService, siteAnalyticsService, urlService,
-      UrlInterpolationService) {
+      alertsService, siteAnalyticsService, UrlInterpolationService) {
     var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
 
     var explorationCreationInProgress = false;
@@ -37,27 +35,25 @@ oppia.factory('ExplorationCreationService', [
 
         explorationCreationInProgress = true;
         alertsService.clearWarnings();
-        if (urlService.getPathname() !== '/my_explorations') {
-          $window.location.replace('/my_explorations?mode=create');
-        } else {
-          $rootScope.loadingMessage = 'Creating exploration';
-          $http.post(
-            '/contributehandler/create_new', {}
-          ).then(function(response) {
-            siteAnalyticsService.registerCreateNewExplorationEvent(
-              response.data.explorationId);
-            $timeout(function() {
-              $window.location = UrlInterpolationService.interpolateUrl(
-                CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
-                  exploration_id: response.data.explorationId
-                }
-              );
-            }, 150);
-            return false;
-          }, function() {
-            $rootScope.loadingMessage = '';
-          });
-        }
+        $rootScope.loadingMessage = 'Creating exploration';
+
+        $http.post('/contributehandler/create_new', {}, {
+          requestIsForCreateExploration: true
+        }).then(function(response) {
+          siteAnalyticsService.registerCreateNewExplorationEvent(
+            response.data.explorationId);
+          $timeout(function() {
+            $window.location = UrlInterpolationService.interpolateUrl(
+              CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
+                exploration_id: response.data.explorationId
+              }
+            );
+          }, 150);
+          return false;
+        }, function() {
+          $rootScope.loadingMessage = '';
+          explorationCreationInProgress = false;
+        });
       },
       showUploadExplorationModal: function() {
         alertsService.clearWarnings();
