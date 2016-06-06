@@ -67,14 +67,12 @@ class LibraryPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        search_mode = (self.request.route.name == 'library_search_page')
-
-        meta_description = feconf.LIBRARY_PAGE_DESCRIPTION
-        if search_mode:
-            meta_description = feconf.SEARCH_PAGE_DESCRIPTION
+        search_mode = 'search' in self.request.url
 
         self.values.update({
-            'meta_description': meta_description,
+            'meta_description': (
+                feconf.SEARCH_PAGE_DESCRIPTION if search_mode
+                else feconf.LIBRARY_PAGE_DESCRIPTION),
             'nav_mode': feconf.NAV_MODE_LIBRARY,
             'has_fully_registered': bool(
                 self.user_id and
