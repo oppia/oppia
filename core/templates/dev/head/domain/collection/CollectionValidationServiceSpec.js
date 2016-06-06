@@ -82,7 +82,7 @@ describe('Collection validation service', function() {
 
     var issues = _findPrivateValidationIssues();
     expect(issues).toEqual([
-      'There should be at least 1 exploration in the collection']);
+      'There should be at least 1 exploration in the collection.']);
   });
 
   it('should expect at least one node with no prereq skills', function() {
@@ -93,7 +93,7 @@ describe('Collection validation service', function() {
     expect(issues.length).toEqual(2);
     expect(issues[0]).toEqual(
       'There should be exactly 1 exploration initially available to the ' +
-      'learner');
+      'learner.');
 
     // However, removing the prerequisite skill makes the node accessible again.
     node.getPrerequisiteSkillList().clearSkills();
@@ -275,7 +275,7 @@ describe('Collection validation service', function() {
     var issues = _findPublicValidationIssues();
     expect(issues).toEqual([
       'There should be exactly 1 exploration initially available to the ' +
-      'learner',
+      'learner.',
       'The following exploration(s) are unreachable from the initial ' +
       'exploration(s): exp_id0, exp_id1, exp_id2',
       'Private explorations cannot be added to a public collection: ' +

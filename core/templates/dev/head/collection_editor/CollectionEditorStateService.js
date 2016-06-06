@@ -20,18 +20,18 @@
  */
 
 oppia.constant('EVENT_COLLECTION_INITIALIZED', 'collectionInitialized');
-oppia.constant('EVENT_COLLECTION_UPDATED', 'collectionUpdated');
+oppia.constant('EVENT_COLLECTION_REINITIALIZED', 'collectionReinitialized');
 
 oppia.factory('CollectionEditorStateService', [
   '$rootScope', 'alertsService', 'CollectionObjectFactory',
   'SkillListObjectFactory', 'UndoRedoService',
   'WritableCollectionBackendApiService', 'EVENT_COLLECTION_INITIALIZED',
-  'EVENT_COLLECTION_UPDATED', 'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
+  'EVENT_COLLECTION_REINITIALIZED', 'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
   function(
       $rootScope, alertsService, CollectionObjectFactory,
       SkillListObjectFactory, UndoRedoService,
       WritableCollectionBackendApiService, EVENT_COLLECTION_INITIALIZED,
-      EVENT_COLLECTION_UPDATED, EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
+      EVENT_COLLECTION_REINITIALIZED, EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
     var _collection = CollectionObjectFactory.createEmptyCollection();
     var _collectionSkillList = SkillListObjectFactory.create([]);
     var _collectionIsInitialized = false;
@@ -46,7 +46,7 @@ oppia.factory('CollectionEditorStateService', [
     var _setCollection = function(collection) {
       _collection.copyFromCollection(collection);
       if (_collectionIsInitialized) {
-        $rootScope.$broadcast(EVENT_COLLECTION_UPDATED);
+        $rootScope.$broadcast(EVENT_COLLECTION_REINITIALIZED);
       } else {
         $rootScope.$broadcast(EVENT_COLLECTION_INITIALIZED);
         _collectionIsInitialized = true;
@@ -58,8 +58,8 @@ oppia.factory('CollectionEditorStateService', [
         newBackendCollectionObject));
     };
 
-    // TODO(bhenning): Do this more efficiently by passing the change object and
-    // whether it was a forward change from the UndoRedoService through the
+    // TODO(bhenning): Do this more efficiently by passing the change object
+    // and whether it was a forward change from the UndoRedoService through the
     // event pipeline, then checking whether the change actually affects the
     // skill list before recomputing it.
     $rootScope.$on(EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _updateSkillList);
@@ -118,7 +118,7 @@ oppia.factory('CollectionEditorStateService', [
        * all bindings to the collection returned by getCollection(). The first
        * time this is called it will fire a global event based on the
        * EVENT_COLLECTION_INITIALIZED constant. All subsequent
-       * calls will similarly fire a EVENT_COLLECTION_UPDATED event.
+       * calls will similarly fire a EVENT_COLLECTION_REINITIALIZED event.
        */
       setCollection: function(collection) {
         _setCollection(collection);

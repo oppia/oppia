@@ -114,7 +114,7 @@ describe('Collection editor state service', function() {
     $rootScope.$apply();
 
     expect($rootScope.$broadcast).toHaveBeenCalledWith(
-      'collectionEditorInitializedCollection');
+      'collectionInitialized');
   });
 
   it('should fire an update event after loading more collections', function() {
@@ -129,7 +129,7 @@ describe('Collection editor state service', function() {
     $rootScope.$apply();
 
     expect($rootScope.$broadcast).toHaveBeenCalledWith(
-      'collectionEditorUpdatedCollection');
+      'collectionReinitialized');
   });
 
   it('should track whether it is currently loading the collection', function() {
@@ -235,7 +235,7 @@ describe('Collection editor state service', function() {
     CollectionEditorStateService.setCollection(newCollection);
 
     expect($rootScope.$broadcast).toHaveBeenCalledWith(
-      'collectionEditorUpdatedCollection');
+      'collectionReinitialized');
   });
 
   it('should fail to save the collection without first loading one',
@@ -290,7 +290,7 @@ describe('Collection editor state service', function() {
     $rootScope.$apply();
 
     expect($rootScope.$broadcast).toHaveBeenCalledWith(
-      'collectionEditorUpdatedCollection');
+      'collectionReinitialized');
   });
 
   it('should track whether it is currently saving the collection', function() {
