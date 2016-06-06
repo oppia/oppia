@@ -425,40 +425,46 @@
     </script>
 
     <script type="text/ng-template" id="modals/saveValidationFail">
-        <div class="modal-header">
-            <h3>Saving error - non-strict validation failure</h3>
-        </div>
+      <div class="modal-header">
+        <h3>Error Saving Exploration</h3>
+      </div>
 
-        <div class="modal-body">
-            <p>
-                Sorry, an error has occurred. Please refresh the page to get back to the most recent ‘good’ state.
-            </p>
-        </div>
+      <div class="modal-body">
+        <p>
+          Sorry, an unexpected error occurred. Please refresh the page to
+          return to the most recent draft of your exploration.
+        </p>
+      </div>
 
-        <div class="modal-footer">
-            <button class="btn btn-default" ng-click="closeAndRefresh()">Close and Refresh</button>
-        </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" ng-click="closeAndRefresh()">
+          Close and Refresh
+        </button>
+      </div>
     </script>
 
     <script type="text/ng-template" id="modals/saveVersionMismatch">
-        <div class="modal-header">
-            <h3>Saving error - Version mismatch</h3>
-        </div>
+      <div class="modal-header">
+        <h3>Error Saving Exploration</h3>
+      </div>
 
-        <div class="modal-body">
-            <p>
-                Sorry someone else has saved a new version of this exploration and so your pending changes cannot be saved.
-                <span ng-show="isLostChanges">The lost changes are displayed below. You may want to copy and paste these changes before discarding them.</span>
-            </p>
+      <div class="modal-body">
+        <p>
+          Sorry, someone else has saved a new version of this exploration, and
+          so your pending changes cannot be saved.
+          <span ng-show="hasLostChanges">
+            The lost changes are displayed below. You may want to copy and
+            paste these changes before discarding them.
+          </span>
+        </p>
 
-            <div class="lost-changes" ng-bind-html="lostChangesHtml"></div>
-        </div>
+        <div class="lost-changes" ng-bind-html="lostChangesHtml"></div>
+      </div>
 
-        <div class="modal-footer">
-            <button class="btn btn-default" ng-click="discardChanges()">Discard Changes</button>
-        </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" ng-click="discardChanges()">Discard Changes</button>
+      </div>
     </script>
-
 
     <div class="container-fluid oppia-editor-page-container" ng-joy-ride="tutorialInProgress" config="EDITOR_TUTORIAL_OPTIONS" on-finish="onLeaveTutorial()" on-skip="onLeaveTutorial()">
       <div class="row" ng-if="explorationRightsService.isCloned()">

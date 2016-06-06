@@ -192,9 +192,11 @@ oppia.factory('editabilityService', [function() {
 // A service that maintains a provisional list of changes to be committed to
 // the server.
 oppia.factory('changeListService', [
-  '$rootScope', 'alertsService', 'explorationData', 'autosaveInfoModalsService',
+  '$rootScope', '$log', 'alertsService', 'explorationData',
+  'autosaveInfoModalsService',
   function(
-    $rootScope, alertsService, explorationData, autosaveInfoModalsService) {
+      $rootScope, $log, alertsService, explorationData,
+      autosaveInfoModalsService) {
     // TODO(sll): Implement undo, redo functionality. Show a message on each
     // step saying what the step is doing.
     // TODO(sll): Allow the user to view the list of changes made so far, as
@@ -256,19 +258,25 @@ oppia.factory('changeListService', [
       // - Version Mismatch.
       // - Non-strict Validation Fail.
       explorationData.autosaveChangeList(
-        explorationChangeList, function(response) {
+        explorationChangeList,
+        function(response) {
           if (!response.data.is_version_of_draft_valid) {
             if (!autosaveInfoModalsService.isModalOpen()) {
               autosaveInfoModalsService.showVersionMismatchModal(
                 explorationChangeList);
             }
           }
-        }, function() {
+        },
+        function() {
           alertsService.clearWarnings();
+          $log.error(
+            'nonStrictValidationFailure: ' +
+            JSON.stringify(explorationChangeList));
           if (!autosaveInfoModalsService.isModalOpen()) {
             autosaveInfoModalsService.showNonStrictValidationFailModal();
           }
-        });
+        }
+      );
     };
 
     var addChange = function(changeDict) {
@@ -2342,8 +2350,8 @@ oppia.factory('autosaveInfoModalsService', [
                 _refreshPage(500);
               });
             };
-            $scope.isLostChanges = lostChanges && lostChanges.length > 0;
-            if ($scope.isLostChanges) {
+            $scope.hasLostChanges = lostChanges && lostChanges.length > 0;
+            if ($scope.hasLostChanges) {
               $scope.lostChangesHtml = (
                 lostChangesService.makeHumanReadable(lostChanges).html());
             }
