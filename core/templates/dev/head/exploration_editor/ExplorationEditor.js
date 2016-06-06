@@ -698,8 +698,6 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               $scope.askForTags = (
                 explorationTagsService.savedMemento.length === 0);
 
-              $scope.metadataList = [];
-
               $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
 
               $scope.CATEGORY_LIST_FOR_SELECT2 = [];
@@ -733,17 +731,11 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               }
 
               $scope.isSavingAllowed = function() {
-                var allMetadataDisplayed = (
+                return Boolean(
                   explorationTitleService.displayed &&
                   explorationObjectiveService.displayed &&
                   explorationCategoryService.displayed &&
                   explorationLanguageCodeService.displayed);
-
-                if (allMetadataDisplayed) {
-                  return false;
-                } else {
-                  return true;
-                }
               };
 
               $scope.save = function() {
@@ -761,20 +753,21 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
                 }
 
                 // Record any fields that have changed.
+                var metadataList = [];
                 if (explorationTitleService.hasChanged()) {
-                  $scope.metadataList.push('title');
+                  metadataList.push('title');
                 }
                 if (explorationObjectiveService.hasChanged()) {
-                  $scope.metadataList.push('objective');
+                  metadataList.push('objective');
                 }
                 if (explorationCategoryService.hasChanged()) {
-                  $scope.metadataList.push('category');
+                  metadataList.push('category');
                 }
                 if (explorationLanguageCodeService.hasChanged()) {
-                  $scope.metadataList.push('language');
+                  metadataList.push('language');
                 }
                 if (explorationTagsService.hasChanged()) {
-                  $scope.metadataList.push('tags');
+                  metadataList.push('tags');
                 }
 
                 // Save all the displayed values.
@@ -784,7 +777,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
                 explorationLanguageCodeService.saveDisplayedValue();
                 explorationTagsService.saveDisplayedValue();
 
-                $modalInstance.close($scope.metadataList);
+                $modalInstance.close(metadataList);
               };
 
               $scope.cancel = function() {

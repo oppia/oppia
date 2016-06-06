@@ -39,6 +39,7 @@ nodes:
   prerequisite_skills: []
 objective: An objective
 schema_version: %d
+tags: []
 title: A title
 """) % (feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
@@ -92,6 +93,31 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
 
         self.collection.language_code = 'xz'
         self._assert_validation_error('Invalid language code')
+
+    def test_tags_validation(self):
+        self.collection.tags = 'abc'
+        self._assert_validation_error('Expected tags to be a list')
+
+        self.collection.tags = [2, 3]
+        self._assert_validation_error('Expected each tag to be a string')
+
+        self.collection.tags = ['', 'tag']
+        self._assert_validation_error('Tags should be non-empty')
+
+        self.collection.tags = ['234']
+        self._assert_validation_error(
+            'Tags should only contain lowercase letters and spaces')
+
+        self.collection.tags = ['   abc']
+        self._assert_validation_error(
+            'Tags should not start or end with whitespace')
+
+        self.collection.tags = ['abc  def']
+        self._assert_validation_error(
+            'Adjacent whitespace in tags should be collapsed')
+
+        self.collection.tags = ['abc', 'abc']
+        self._assert_validation_error('Some tags duplicate each other')
 
     def test_schema_version_validation(self):
         self.collection.schema_version = 'some_schema_version'
@@ -508,6 +534,7 @@ nodes:
   prerequisite_skills: []
 objective: ''
 schema_version: 2
+tags: []
 title: A title
 """)
 
