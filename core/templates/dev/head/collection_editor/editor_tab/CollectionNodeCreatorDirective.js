@@ -19,20 +19,20 @@
 oppia.directive('collectionNodeCreator', [function() {
   return {
     restrict: 'E',
-    scope: {
-      getCollection: '&collection'
-    },
     templateUrl: 'collectionEditor/newNodeCreator',
     controller: [
       '$scope', '$http', '$window', '$filter', 'alertsService',
-      'validatorsService', 'CollectionUpdateService',
+      'validatorsService', 'CollectionEditorStateService',
+      'CollectionLinearizerService', 'CollectionUpdateService',
       'CollectionNodeObjectFactory', 'ExplorationSummaryBackendApiService',
       'siteAnalyticsService',
       function(
           $scope, $http, $window, $filter, alertsService,
-          validatorsService, CollectionUpdateService,
+          validatorsService, CollectionEditorStateService,
+          CollectionLinearizerService, CollectionUpdateService,
           CollectionNodeObjectFactory, ExplorationSummaryBackendApiService,
           siteAnalyticsService) {
+        $scope.collection = CollectionEditorStateService.getCollection();
         $scope.newExplorationId = '';
         $scope.newExplorationTitle = '';
         var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
@@ -42,10 +42,10 @@ oppia.directive('collectionNodeCreator', [function() {
             alertsService.addWarning('Cannot add an empty exploration ID.');
             return;
           }
-          var collection = $scope.getCollection();
-          if (collection.containsCollectionNode(newExplorationId)) {
+          if ($scope.collection.containsCollectionNode(newExplorationId)) {
             alertsService.addWarning(
-              'Exploration with id ' + newExplorationId + ' is already added');
+              'There is already an exploration in this collection with that ' +
+              'id.');
             return;
           }
 
@@ -58,8 +58,8 @@ oppia.directive('collectionNodeCreator', [function() {
                 summaryBackendObject = summaries[0];
               }
               if (summaryBackendObject) {
-                CollectionUpdateService.addCollectionNode(
-                  collection, newExplorationId, summaryBackendObject);
+                CollectionLinearizerService.appendCollectionNode(
+                  $scope.collection, newExplorationId, summaryBackendObject);
               } else {
                 alertsService.addWarning(
                   'That exploration does not exist or you do not have edit ' +
