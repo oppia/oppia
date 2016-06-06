@@ -117,6 +117,7 @@ class PreferencesPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.values.update({
+            'meta_description': feconf.PREFERENCES_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_PROFILE,
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
@@ -224,6 +225,7 @@ class SignupPage(base.BaseHandler):
             return
 
         self.values.update({
+            'meta_description': feconf.SIGNUP_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_SIGNUP,
             'CAN_SEND_EMAILS_TO_USERS': feconf.CAN_SEND_EMAILS_TO_USERS,
         })

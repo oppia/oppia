@@ -67,13 +67,21 @@ class LibraryPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
+        search_mode = (self.request.route.name == 'library_search_page')
+
+        meta_description = feconf.LIBRARY_PAGE_DESCRIPTION
+        if search_mode:
+            meta_description = feconf.SEARCH_PAGE_DESCRIPTION
+
         self.values.update({
+            'meta_description': meta_description,
             'nav_mode': feconf.NAV_MODE_LIBRARY,
             'has_fully_registered': bool(
                 self.user_id and
                 user_services.has_fully_registered(self.user_id)),
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
+            'search_mode': search_mode,
             'SEARCH_DROPDOWN_CATEGORIES': feconf.SEARCH_DROPDOWN_CATEGORIES,
         })
         self.render_template('library/library.html')

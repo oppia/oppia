@@ -1,4 +1,5 @@
 {
+  "I18N_SPLASH_PAGE_TITLE": "Oppia: Enseñar, Aprender, Explorar",
   "I18N_SPLASH_TITLE": "Piensa más allá de los libros.",
   "I18N_SPLASH_SUBTITLE": "Con Oppia es fácil crear exploraciones interactivas que educan y entretienen.",
   "I18N_SPLASH_BROWSE_EXPLORATIONS": "Navega nuestras exploraciones",
@@ -10,7 +11,7 @@
   "I18N_SPLASH_JAVASCRIPT_ERROR_DESCRIPTION": "Oppia es una plataforma de aprendizaje gratuita, libre y de código abierto Oppia llena de actividades interactivas llamadas exploraciones. Lamentablemente, Oppia requiere que JavaScript esté activado en tu navegador para funcionar apropiadamente y tu navegador ha desactivado JavaScript. Si necesitas ayuda activando JavaScript, <a href=\"<[hrefUrl]>\">haz click aquí.</a>",
   "I18N_SPLASH_SITE_FEEDBACK": "Comentarios al sitio",
   "I18N_SPLASH_JAVASCRIPT_ERROR_THANKS": "Thank you.",
-  "I18N_LIBRARY_PAGE_TITLE": "Oppia - Librería",
+  "I18N_LIBRARY_PAGE_TITLE": "Librería -- Oppia",
   "I18N_LIBRARY_SEARCH_PLACEHOLDER": "¿Sobre qué tienes curiosidad?",
   "I18N_LIBRARY_ALL_CATEGORIES": "Todas las áreas",
   "I18N_LIBRARY_ALL_CATEGORIES_SELECTED": "Todas las áreas están seleccionadas",
@@ -111,7 +112,7 @@
   "I18N_CREATE_NEITHER_THANKS": "Ninguno de los dos, gracias",
   "I18N_CREATE_YES_PLEASE": "¡Sí, por favor!",
   "I18N_CREATE_NO_THANKS": "No, gracias",
-  "I18N_SIGNUP_PAGE_TITLE": "Registro - Oppia",
+  "I18N_SIGNUP_PAGE_TITLE": "Únete a la comunidad - Oppia",
   "I18N_SIGNUP_REGISTRATION": "Registro",
   "I18N_SIGNUP_COMPLETE_REGISTRATION": "Completa tu registro",
   "I18N_SIGNUP_EMAIL": "Correo electrónico",
