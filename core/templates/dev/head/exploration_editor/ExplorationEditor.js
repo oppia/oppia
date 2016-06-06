@@ -146,11 +146,13 @@ oppia.controller('ExplorationEditor', [
         explorationWarningsService.updateWarnings();
 
         // Initialize changeList by draft changes if they exist.
-        if (data.draft_changes) {
+        if (data.draft_changes !== null) {
           changeListService.loadAutosavedChangeList(data.draft_changes);
         }
 
-        if (data.is_version_of_draft_valid === false && data.draft_changes) {
+        if (data.is_version_of_draft_valid === false &&
+            data.draft_changes !== null &&
+            data.draft.changes.length > 0) {
           // Show modal displaying lost changes if the version of draft
           // changes is invalid, and draft_changes is not `null`.
           autosaveInfoModalsService.showVersionMismatchModal(
