@@ -19,11 +19,11 @@
 oppia.controller('HistoryTab', [
   '$scope', '$http', '$rootScope', '$location', '$log', '$modal',
   'explorationData', 'versionsTreeService', 'compareVersionsService',
-  'graphDataService', 'oppiaDatetimeFormatter',
+  'graphDataService', 'oppiaDatetimeFormatter', 'changeListService',
   function(
       $scope, $http, $rootScope, $location, $log, $modal,
       explorationData, versionsTreeService, compareVersionsService,
-      graphDataService, oppiaDatetimeFormatter) {
+      graphDataService, oppiaDatetimeFormatter, changeListService) {
     $scope.explorationId = explorationData.explorationId;
     $scope.explorationAllSnapshotsUrl =
         '/createhandler/snapshots/' + $scope.explorationId;
@@ -486,6 +486,8 @@ oppia.controller('HistoryTab', [
           }
         ]
       }).result.then(function(version) {
+        changeListService.discardAllChanges();
+
         $http.post($scope.revertExplorationUrl, {
           current_version: explorationData.data.version,
           revert_to_version: version
