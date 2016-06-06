@@ -19,12 +19,24 @@
 oppia.directive('collectionMainTab', [function() {
   return {
     restrict: 'E',
-    scope: {
-      getCollection: '&collection',
-      getCollectionSkillList: '&collectionSkillList'
-    },
+    scope: {},
     templateUrl: 'inline/collection_main_tab_directive',
-    controller: [function() {
-    }]
+    controller: [
+      '$scope', 'CollectionEditorStateService', 'CollectionLinearizerService',
+      function(
+          $scope, CollectionEditorStateService, CollectionLinearizerService) {
+        $scope.hasLoadedCollection = (
+          CollectionEditorStateService.hasLoadedCollection);
+        $scope.collection = CollectionEditorStateService.getCollection();
+
+        // Returns a list of collection nodes which represents a valid linear
+        // path through the collection.
+        $scope.getLinearlySortedNodes = function() {
+          return (
+            CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+              $scope.collection));
+        };
+      }
+    ]
   };
 }]);
