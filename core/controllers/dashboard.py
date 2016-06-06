@@ -48,6 +48,7 @@ class NotificationsDashboardPage(base.BaseHandler):
                 'You do not have the credentials to access this page.')
         elif user_services.has_fully_registered(self.user_id):
             self.values.update({
+                'meta_description': feconf.DASHBOARD_PAGE_DESCRIPTION,
                 'nav_mode': feconf.NAV_MODE_DASHBOARD,
             })
             self.render_template(

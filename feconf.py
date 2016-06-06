@@ -642,3 +642,40 @@ SYSTEM_USER_IDS = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 
 CSRF_PAGE_NAME_CREATE_EXPLORATION = 'create_exploration'
 CSRF_PAGE_NAME_I18N = 'i18n'
+
+# The following are all page descriptions for the meta tag.
+ABOUT_PAGE_DESCRIPTION = (
+    'Oppia is an open source learning platform that connects a community of '
+    'teachers and learners. You can use this site to create 1-1 learning '
+    'scenarios for others.')
+CREATE_PAGE_DESCRIPTION = (
+    'Help others learn new things. Create lessons through explorations and '
+    'share your knowledge with the community.')
+DASHBOARD_PAGE_DESCRIPTION = (
+    'Keep track of the lessons you have created, as well as feedback from '
+    'learners.')
+FORUM_PAGE_DESCRIPTION = (
+    'Engage with the Oppia community by discussing questions, bugs and '
+    'explorations in the forum.')
+LIBRARY_PAGE_DESCRIPTION = (
+    'Looking to learn something new? Find explorations created by professors, '
+    'teachers and Oppia users in a subject you\'re interested in, and start '
+    'exploring!')
+PARTICIPATE_PAGE_DESCRIPTION = (
+    'The Oppia library is full of user-created lessons called \'explorations\'.'
+    ' Read about how to participate in the community and begin creating '
+    'explorations.')
+PREFERENCES_PAGE_DESCRIPTION = (
+    'Change your Oppia profile settings and preferences')
+SEARCH_PAGE_DESCRIPTION = (
+    'Discover a new exploration to learn from, or help improve an existing '
+    'one for the community.')
+SIGNUP_PAGE_DESCRIPTION = 'Sign up for Oppia and begin exploring a new subject.'
+SPLASH_PAGE_DESCRIPTION = (
+    'Oppia is a free site for sharing knowledge via interactive lessons '
+    'called \'explorations\'. Learn from user-created explorations, or teach '
+    'and create your own.')
+TERMS_PAGE_DESCRIPTION = (
+    'Oppia is a 501(c)(3) registered non-profit open-source e-learning '
+    'platform. Learn about our terms and conditions for creating and '
+    'distributing learning material.')
