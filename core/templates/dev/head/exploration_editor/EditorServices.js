@@ -82,6 +82,10 @@ oppia.factory('explorationData', [
           return deferred.promise;
         } else {
           // Retrieve data from the server.
+          // WARNING: Note that this is a version of the exploration with draft
+          // changes applied. This makes a force-refresh necessary when changes
+          // are discarded, otherwise the exploration-with-draft-changes
+          // (which is cached here) will be reused.
           return $http.get(explorationDataUrl, {
             params: {
               apply_draft: true
@@ -244,7 +248,8 @@ oppia.factory('changeListService', [
   };
 
   var autosaveChangeListOnChange = function(explorationChangeList) {
-    // Send autosave request and check for error in response:
+    // Asynchronously send an autosave request, and check for errors in the
+    // response:
     // If error is present -> Check for the type of error occurred
     // (Display the corresponding modals in both cases, if not already opened):
     // - Version Mismatch.
@@ -326,10 +331,14 @@ oppia.factory('changeListService', [
         state_name: stateName
       });
     },
-    discardAllChanges: function() {
+    discardAllChanges: function(successCallback) {
       explorationChangeList = [];
       undoneChangeStack = [];
       autosaveChangeListOnChange(explorationChangeList);
+      // The reload is necessary because, otherwise, the
+      // exploration-with-draft-changes will be reloaded (since it is already
+      // cached in explorationData).
+      location.reload();
     },
     /**
      * Saves a change dict that represents a change to an exploration property
