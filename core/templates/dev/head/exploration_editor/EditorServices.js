@@ -2301,9 +2301,11 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
 // Service for displaying different types of modals depending on the type of
 // response received as a result of the autosaving request.
 oppia.factory('autosaveInfoModalsService', [
-  '$modal', '$timeout', '$window', 'lostChangesService', 'explorationData',
+  '$log', '$modal', '$timeout', '$window', 'lostChangesService',
+  'explorationData',
   function(
-    $modal, $timeout, $window, lostChangesService, explorationData) {
+      $log, $modal, $timeout, $window, lostChangesService,
+      explorationData) {
     var _isModalOpen = false;
     var _refreshPage = function(delay) {
       $timeout(function() {
@@ -2347,10 +2349,11 @@ oppia.factory('autosaveInfoModalsService', [
                 _refreshPage(500);
               });
             };
-            $scope.hasLostChanges = lostChanges && lostChanges.length > 0;
+            $scope.hasLostChanges = (lostChanges && lostChanges.length > 0);
             if ($scope.hasLostChanges) {
               $scope.lostChangesHtml = (
                 lostChangesService.makeHumanReadable(lostChanges).html());
+              $log.error('Lost changes: ' + JSON.stringify(lostChanges));
             }
           }],
           windowClass: 'oppia-autosave-version-mismatch-modal'
