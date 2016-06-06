@@ -86,6 +86,7 @@ describe('Collection editor state service', function() {
       category: 'Test',
       objective: 'To be interesting',
       language_code: 'en',
+      tags: [],
       schema_version: '2',
       version: '3',
       nodes: [{

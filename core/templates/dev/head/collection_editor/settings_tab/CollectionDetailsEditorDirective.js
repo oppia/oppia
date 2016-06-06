@@ -25,11 +25,11 @@ oppia.directive('collectionDetailsEditor', [function() {
     controller: [
       '$scope', 'CollectionEditorStateService', 'CollectionUpdateService',
       'alertsService', 'CATEGORY_LIST', 'EVENT_COLLECTION_INITIALIZED',
-      'COLLECTION_TITLE_INPUT_FOCUS_LABEL',
+      'EVENT_COLLECTION_REINITIALIZED', 'COLLECTION_TITLE_INPUT_FOCUS_LABEL',
       function(
           $scope, CollectionEditorStateService, CollectionUpdateService,
           alertsService, CATEGORY_LIST, EVENT_COLLECTION_INITIALIZED,
-          COLLECTION_TITLE_INPUT_FOCUS_LABEL) {
+          EVENT_COLLECTION_REINITIALIZED, COLLECTION_TITLE_INPUT_FOCUS_LABEL) {
         $scope.collection = CollectionEditorStateService.getCollection();
         $scope.COLLECTION_TITLE_INPUT_FOCUS_LABEL = (
           COLLECTION_TITLE_INPUT_FOCUS_LABEL);
@@ -44,7 +44,7 @@ oppia.directive('collectionDetailsEditor', [function() {
           }
         );
 
-        $scope.$on(EVENT_COLLECTION_INITIALIZED, function() {
+        var refreshSettingsTab = function() {
           $scope.displayedCollectionTitle = $scope.collection.getTitle();
           $scope.displayedCollectionObjective = (
             $scope.collection.getObjective());
@@ -65,7 +65,10 @@ oppia.directive('collectionDetailsEditor', [function() {
               text: $scope.collection.getCategory()
             });
           }
-        });
+        };
+
+        $scope.$on(EVENT_COLLECTION_INITIALIZED, refreshSettingsTab);
+        $scope.$on(EVENT_COLLECTION_REINITIALIZED, refreshSettingsTab);
 
         $scope.updateCollectionTitle = function() {
           if (!$scope.displayedCollectionTitle) {
