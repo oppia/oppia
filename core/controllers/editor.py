@@ -787,6 +787,7 @@ class ExplorationRevertHandler(EditorHandler):
                 'Cannot revert to version %s from version %s.' %
                 (revert_to_version, current_version))
 
+        exp_services.discard_draft(exploration_id, self.user_id)
         exp_services.revert_exploration(
             self.user_id, exploration_id, current_version, revert_to_version)
         self.render_json({})
