@@ -40,15 +40,21 @@ oppia.directive('createActivityButton', [function() {
         };
 
         $scope.showCreationChoiceModal = function() {
+          // Without this, the modal keeps reopening when the window is resized.
+          if ($scope.creationInProgress) {
+            return;
+          }
+
           $scope.creationInProgress = true;
-          if (urlService.getPathname() !== '/my_explorations') {
-            $window.location.replace('/my_explorations?mode=create');
+          if (urlService.getPathname() !== '/dashboard') {
+            $window.location.replace('/dashboard?mode=create');
           } else {
             $modal.open({
               templateUrl: 'modals/createActivity',
               backdrop: true,
               controller: [
-                  '$scope', '$modalInstance', function($scope, $modalInstance) {
+                  '$scope', '$modalInstance',
+                  function($scope, $modalInstance) {
                 $scope.chooseExploration = function() {
                   ExplorationCreationService.createNewExploration();
                   $modalInstance.close();

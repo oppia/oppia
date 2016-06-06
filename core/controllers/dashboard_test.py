@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the user notification dashboard and 'my explorations' pages."""
+"""Tests for the creator dashboard and the notifications dashboard."""
 
-from core.controllers import home
+from core.controllers import dashboard
 from core.domain import config_services
 from core.domain import feedback_domain
 from core.domain import feedback_services
@@ -66,9 +66,7 @@ class HomePageTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class MyExplorationsHandlerTest(test_utils.GenericTestBase):
-
-    MY_EXPLORATIONS_DATA_URL = '/myexplorationshandler/data'
+class DashboardHandlerTest(test_utils.GenericTestBase):
 
     COLLABORATOR_EMAIL = 'collaborator@example.com'
     COLLABORATOR_USERNAME = 'collaborator'
@@ -77,7 +75,7 @@ class MyExplorationsHandlerTest(test_utils.GenericTestBase):
     EXP_TITLE = 'Exploration title'
 
     def setUp(self):
-        super(MyExplorationsHandlerTest, self).setUp()
+        super(DashboardHandlerTest, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -89,7 +87,7 @@ class MyExplorationsHandlerTest(test_utils.GenericTestBase):
 
     def test_no_explorations(self):
         self.login(self.OWNER_EMAIL)
-        response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(response['explorations_list'], [])
         self.logout()
 
@@ -99,21 +97,21 @@ class MyExplorationsHandlerTest(test_utils.GenericTestBase):
         self.set_admins([self.OWNER_USERNAME])
 
         self.login(self.OWNER_EMAIL)
-        response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
             rights_manager.ACTIVITY_STATUS_PRIVATE)
 
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
-        response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
             rights_manager.ACTIVITY_STATUS_PUBLIC)
 
         rights_manager.publicize_exploration(self.owner_id, self.EXP_ID)
-        response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
@@ -129,21 +127,21 @@ class MyExplorationsHandlerTest(test_utils.GenericTestBase):
         self.set_admins([self.OWNER_USERNAME])
 
         self.login(self.COLLABORATOR_EMAIL)
-        response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
             rights_manager.ACTIVITY_STATUS_PRIVATE)
 
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
-        response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
             rights_manager.ACTIVITY_STATUS_PUBLIC)
 
         rights_manager.publicize_exploration(self.owner_id, self.EXP_ID)
-        response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
@@ -160,15 +158,15 @@ class MyExplorationsHandlerTest(test_utils.GenericTestBase):
         self.set_admins([self.OWNER_USERNAME])
 
         self.login(self.VIEWER_EMAIL)
-        response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(response['explorations_list'], [])
 
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
-        response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(response['explorations_list'], [])
 
         rights_manager.publicize_exploration(self.owner_id, self.EXP_ID)
-        response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(response['explorations_list'], [])
         self.logout()
 
@@ -178,7 +176,7 @@ class MyExplorationsHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.OWNER_EMAIL)
 
-        response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['num_open_threads'], 0)
@@ -192,7 +190,7 @@ class MyExplorationsHandlerTest(test_utils.GenericTestBase):
             feedback_services, 'get_thread_analytics',
             mock_get_thread_analytics):
 
-            response = self.get_json(self.MY_EXPLORATIONS_DATA_URL)
+            response = self.get_json(feconf.DASHBOARD_DATA_URL)
             self.assertEqual(len(response['explorations_list']), 1)
             self.assertEqual(
                 response['explorations_list'][0]['num_open_threads'], 2)
@@ -263,40 +261,6 @@ class NotificationsDashboardHandlerTest(test_utils.GenericTestBase):
             self.assertNotIn('author_id', response['recent_notifications'][0])
 
 
-class SiteLanguageHandlerTests(test_utils.GenericTestBase):
-
-    def test_save_site_language_handler(self):
-        """Test the language is saved in the preferences when handler is called.
-        """
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        language_code = 'es'
-        self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/preferences')
-        self.assertEqual(response.status_int, 200)
-        csrf_token = self.get_csrf_token_from_response(response)
-        self.put_json('/preferenceshandler/data', {
-            'update_type': 'preferred_site_language_code',
-            'data': language_code,
-        }, csrf_token)
-
-        preferences = self.get_json('/preferenceshandler/data')
-        self.assertIsNotNone(preferences)
-        self.assertEqual(
-            preferences['preferred_site_language_code'], language_code)
-
-        self.logout()
-
-    def test_save_site_language_no_user(self):
-        """The SiteLanguageHandler handler can be called without a user."""
-        response = self.testapp.get(feconf.SPLASH_URL)
-        self.assertEqual(response.status_int, 200)
-        csrf_token = self.get_csrf_token_from_response(
-            response, token_type=feconf.CSRF_PAGE_NAME_I18N)
-        self.put_json(feconf.SITE_LANGUAGE_DATA_URL, {
-            'site_language_code': 'es',
-        }, csrf_token)
-
-
 class CreationButtonsTest(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -307,13 +271,13 @@ class CreationButtonsTest(test_utils.GenericTestBase):
         """Test generation of exploration ids."""
         self.login(self.EDITOR_EMAIL)
 
-        response = self.testapp.get('/my_explorations')
+        response = self.testapp.get(feconf.DASHBOARD_URL)
         self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(
             response, token_type=feconf.CSRF_PAGE_NAME_CREATE_EXPLORATION)
         exp_a_id = self.post_json(
             feconf.NEW_EXPLORATION_URL, {}, csrf_token
-        )[home.EXPLORATION_ID_KEY]
+        )[dashboard.EXPLORATION_ID_KEY]
         self.assertEqual(len(exp_a_id), 12)
 
         self.logout()
@@ -322,14 +286,14 @@ class CreationButtonsTest(test_utils.GenericTestBase):
         """Test that the exploration upload button appears when appropriate."""
         self.login(self.EDITOR_EMAIL)
 
-        response = self.testapp.get('/my_explorations')
+        response = self.testapp.get(feconf.DASHBOARD_URL)
         self.assertEqual(response.status_int, 200)
         response.mustcontain(no=['ng-click="showUploadExplorationModal()"'])
 
         config_services.set_property(
             feconf.SYSTEM_COMMITTER_ID, 'allow_yaml_file_upload', True)
 
-        response = self.testapp.get('/my_explorations')
+        response = self.testapp.get(feconf.DASHBOARD_URL)
         self.assertEqual(response.status_int, 200)
         response.mustcontain('ng-click="showUploadExplorationModal()"')
 

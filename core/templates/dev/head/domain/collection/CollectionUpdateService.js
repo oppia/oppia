@@ -31,6 +31,7 @@ oppia.constant('COLLECTION_PROPERTY_TITLE', 'title');
 oppia.constant('COLLECTION_PROPERTY_CATEGORY', 'category');
 oppia.constant('COLLECTION_PROPERTY_OBJECTIVE', 'objective');
 oppia.constant('COLLECTION_PROPERTY_LANGUAGE_CODE', 'language_code');
+oppia.constant('COLLECTION_PROPERTY_TAGS', 'tags');
 oppia.constant(
   'COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS', 'prerequisite_skills');
 oppia.constant('COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS', 'acquired_skills');
@@ -41,7 +42,7 @@ oppia.factory('CollectionUpdateService', [
     'CMD_EDIT_COLLECTION_PROPERTY', 'CMD_EDIT_COLLECTION_NODE_PROPERTY',
     'COLLECTION_PROPERTY_TITLE', 'COLLECTION_PROPERTY_CATEGORY',
     'COLLECTION_PROPERTY_OBJECTIVE',
-    'COLLECTION_PROPERTY_LANGUAGE_CODE',
+    'COLLECTION_PROPERTY_LANGUAGE_CODE', 'COLLECTION_PROPERTY_TAGS',
     'COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS',
     'COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS', function(
       CollectionNodeObjectFactory, ChangeObjectFactory, UndoRedoService,
@@ -49,7 +50,7 @@ oppia.factory('CollectionUpdateService', [
       CMD_EDIT_COLLECTION_PROPERTY, CMD_EDIT_COLLECTION_NODE_PROPERTY,
       COLLECTION_PROPERTY_TITLE, COLLECTION_PROPERTY_CATEGORY,
       COLLECTION_PROPERTY_OBJECTIVE,
-      COLLECTION_PROPERTY_LANGUAGE_CODE,
+      COLLECTION_PROPERTY_LANGUAGE_CODE, COLLECTION_PROPERTY_TAGS,
       COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS,
       COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS) {
       // Creates a change using an apply function, reverse function, a change
@@ -252,6 +253,24 @@ oppia.factory('CollectionUpdateService', [
             }, function(changeDict, collection) {
               // Undo.
               collection.setLanguageCode(oldLanguageCode);
+            });
+        },
+
+        /**
+         * Changes the tags of a collection and records the change in
+         * the undo/redo service.
+         */
+        setCollectionTags: function(collection, tags) {
+          var oldTags = angular.copy(collection.getTags());
+          _applyPropertyChange(
+            collection, COLLECTION_PROPERTY_TAGS, tags, oldTags,
+            function(changeDict, collection) {
+              // Apply.
+              var tags = _getNewPropertyValueFromChangeDict(changeDict);
+              collection.setTags(tags);
+            }, function(changeDict, collection) {
+              // Undo.
+              collection.setTags(oldTags);
             });
         },
 

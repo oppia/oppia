@@ -17,6 +17,7 @@
     "fileExtensions": [".js"],
     "extract": ["*.html"],
     "maxErrors": null,
+    "verbose": true,
 
     "disallowEmptyBlocks": true,
     "disallowFunctionDeclarations": true,

@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 
 {% block maintitle %}
-  I18N_LIBRARY_PAGE_TITLE
+  {% if search_mode %}
+    Find explorations to learn from - Oppia
+  {% else %}
+    I18N_LIBRARY_PAGE_TITLE
+  {% endif %}
 {% endblock maintitle %}
 
 {% block navbar_breadcrumb %}
@@ -40,6 +44,12 @@
         </div>
 
         <div class="oppia-exp-summary-tiles-container" ng-if="!inSearchMode">
+          <img src="/images/library/banner.svg" align="center" width="100%">
+          <div style="text-align: center; width: 100%;">
+            <h1 class="oppia-library-h1">Imagine what you could master today....</h1>
+            <h2 class="oppia-library-h2">Begin your adventure by browsing our explorations.</h2>
+          </div>
+
           <div ng-if="libraryGroups.length === 0"
                style="margin: 150px auto; text-align: center; width: 100%;"
                translate="I18N_LIBRARY_NO_EXPLORATION_GROUPS">
