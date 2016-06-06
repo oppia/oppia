@@ -605,6 +605,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       $scope.isSaveInProgress = true;
       explorationData.save(changeList, commitMessage, function() {
         changeListService.discardAllChanges();
+        $rootScope.$broadcast('initExplorationPage');
         $rootScope.$broadcast('refreshVersionHistory', {
           forceRefresh: true
         });
