@@ -2079,9 +2079,9 @@ ul.oppia-dashboard-tiles {
 }
 
 .oppia-version-mismatch-modal .oppia-content {
-    max-height: 700px;
-    overflow-y: scroll;
-    overflow-x: hidden;
+  max-height: 700px;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 .oppia-vcenter {
@@ -2767,25 +2767,25 @@ md-card.preview-conversation-skin-supplemental-card {
   padding: 0;
 }
 
-.lost-changes > li {
-    margin: 5px 0 5px 10px;
+.oppia-lost-changes > li {
+  margin: 5px 0 5px 10px;
 }
 
-.lost-changes > li > .state-edit-desc {
-    margin: 3px auto auto 25px;
+.oppia-lost-changes > li > .state-edit-desc {
+  margin: 3px auto auto 25px;
 }
 
-.lost-changes > li .state-edit-desc .content > *,
-.lost-changes > li .state-edit-desc .feedback > * {
-    padding: 4px 0 0 20px;
+.oppia-lost-changes > li .state-edit-desc .content > *,
+.oppia-lost-changes > li .state-edit-desc .feedback > * {
+  padding: 4px 0 0 20px;
 }
 
-.lost-changes > li > .state-edit-desc > .sub-edit {
-    margin-left: 20px;
+.oppia-lost-changes > li > .state-edit-desc > .sub-edit {
+  margin-left: 20px;
 }
 
-.lost-changes > li > .state-edit-desc > .rules-list > li {
-    margin-left: 20px;
+.oppia-lost-changes > li > .state-edit-desc > .rules-list > li {
+  margin-left: 20px;
 }
 
 .oppia-info-card-title {
