@@ -638,9 +638,8 @@ oppia.factory('explorationTitleService', [
     child.propertyName = 'title';
     child._normalize = $filter('normalizeWhitespace');
     child._isValid = function(value) {
-      return (
-        explorationRightsService.isPrivate() ||
-        validatorsService.isValidEntityName(value, true));
+      return validatorsService.isValidEntityName(
+        value, true, explorationRightsService.isPrivate());
     };
     return child;
   }
@@ -658,9 +657,8 @@ oppia.factory('explorationCategoryService', [
     child.propertyName = 'category';
     child._normalize = $filter('normalizeWhitespace');
     child._isValid = function(value) {
-      return (
-        explorationRightsService.isPrivate() ||
-        validatorsService.isValidEntityName(value, true));
+      return validatorsService.isValidEntityName(
+        value, true, explorationRightsService.isPrivate());
     };
     return child;
   }

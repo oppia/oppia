@@ -275,9 +275,9 @@ oppia.factory('validatorsService', [
      *   butterbar.
      * @return {boolean} True if the entity name is valid, false otherwise.
      */
-    isValidEntityName: function(input, showWarnings) {
+    isValidEntityName: function(input, showWarnings, allowEmpty) {
       input = $filter('normalizeWhitespace')(input);
-      if (!input) {
+      if (!input && !allowEmpty) {
         if (showWarnings) {
           alertsService.addWarning('Please enter a non-empty name.');
         }
