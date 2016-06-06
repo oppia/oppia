@@ -336,10 +336,6 @@ oppia.factory('changeListService', [
         explorationChangeList = [];
         undoneChangeStack = [];
         autosaveChangeListOnChange(explorationChangeList);
-        // The reload is necessary because, otherwise, the
-        // exploration-with-draft-changes will be reloaded (since it is already
-        // cached in explorationData).
-        location.reload();
       },
       /**
        * Saves a change dict that represents a change to an exploration
