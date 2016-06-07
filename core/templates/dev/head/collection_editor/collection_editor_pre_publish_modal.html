@@ -1,0 +1,36 @@
+<script type="text/ng-template" id="modals/addCollectionMetadata">
+  <div class="modal-header">
+    <h3>Add Some Details</h3>
+  </div>
+
+  <div class="modal-body oppia-long-text">
+    <p>
+      Just a few more things before you publish:
+    </p>
+    <p ng-if="requireTitleToBeSpecified">
+      Add a title: what should your collection be called?
+      <input type="text" class="form-control" ng-model="$parent.newTitle"
+             placeholder="Music in the 19th Century">
+    </p>
+    <p ng-if="requireObjectiveToBeSpecified">
+      Add a goal: what does the collection help people to do?
+      <input type="text" class="form-control" ng-model="$parent.newObjective"
+             placeholder="Learn how to ...">
+    </p>
+    <p ng-if="requireCategoryToBeSpecified">
+      Add a category: how would you categorize your collection?
+      <select2-dropdown item="$parent.newCategory"
+                        choices="CATEGORY_LIST_FOR_SELECT2"
+                        placeholder="Choose or type new"
+                        new-choice-regex="^[A-Z a-z]+$"
+                        width="100%"
+                        invalid-search-term-message="Invalid category name">
+      </select2-dropdown>
+    </p>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-success" ng-click="save()" ng-disabled="!isSavingAllowed()">Save Changes</button>
+  </div>
+</script>

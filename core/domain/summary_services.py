@@ -255,6 +255,8 @@ def _get_displayable_collection_summary_dicts(collection_summaries):
                 'category': collection_summary.category,
                 'activity_type': rights_manager.ACTIVITY_TYPE_COLLECTION,
                 'objective': collection_summary.objective,
+                'language_code': collection_summary.language_code,
+                'tags': collection_summary.tags,
                 'node_count': collection_summary.node_count,
                 'last_updated_msec': utils.get_time_in_millisecs(
                     collection_summary.collection_model_last_updated),

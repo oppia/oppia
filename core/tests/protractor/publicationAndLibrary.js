@@ -167,7 +167,7 @@ describe('Library index page', function() {
     users.logout();
 
     browser.get('/library');
-    expect(browser.getTitle()).toEqual('Oppia - Library');
+    expect(browser.getTitle()).toEqual('Exploration Library - Oppia');
     general.ensurePageHasNoTranslationIds();
 
     // Filter library explorations

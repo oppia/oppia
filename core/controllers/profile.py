@@ -117,6 +117,7 @@ class PreferencesPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.values.update({
+            'meta_description': feconf.PREFERENCES_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_PROFILE,
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
@@ -224,6 +225,7 @@ class SignupPage(base.BaseHandler):
             return
 
         self.values.update({
+            'meta_description': feconf.SIGNUP_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_SIGNUP,
             'CAN_SEND_EMAILS_TO_USERS': feconf.CAN_SEND_EMAILS_TO_USERS,
         })
@@ -312,3 +314,17 @@ class UsernameCheckHandler(base.BaseHandler):
         self.render_json({
             'username_is_taken': username_is_taken,
         })
+
+
+class SiteLanguageHandler(base.BaseHandler):
+    """Changes the preferred system language in the user's preferences."""
+
+    PAGE_NAME_FOR_CSRF = feconf.CSRF_PAGE_NAME_I18N
+
+    def put(self):
+        """Handles PUT requests."""
+        if user_services.has_fully_registered(self.user_id):
+            site_language_code = self.payload.get('site_language_code')
+            user_services.update_preferred_site_language_code(
+                self.user_id, site_language_code)
+        self.render_json({})
