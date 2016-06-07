@@ -47,11 +47,14 @@ _LIBRARY_INDEX_GROUPS = [{
     ],
 }, {
     'header': 'Languages',
-    'search_categories': ['Languages', 'Reading', 'English', 'Latin'],
+    'search_categories': [
+        'Languages', 'Reading', 'English', 'Latin', 'Spanish', 'Gaulish'
+    ],
 }, {
     'header': 'Social Science',
     'search_categories': [
-        'Business', 'Economics', 'Geography', 'Government', 'History', 'Law'],
+        'Business', 'Economics', 'Geography', 'Government', 'History', 'Law'
+    ],
 }]
 
 
