@@ -24,8 +24,8 @@ oppia.directive('progressDots', [function() {
     },
     templateUrl: 'components/progressDots',
     controller: [
-      '$scope', 'playerPositionService',
-      function($scope, playerPositionService) {
+      '$scope', '$rootScope', 'playerPositionService',
+      function($scope, $rootScope, playerPositionService) {
         $scope.MAX_DOTS = 18;
         $scope.dots = [];
         $scope.currentDotIndex = playerPositionService.getActiveCardIndex();
@@ -43,7 +43,6 @@ oppia.directive('progressDots', [function() {
             return;
           } else if (newValue === oldValue + 1) {
             $scope.dots.push({});
-            playerPositionService.setActiveCardIndex($scope.dots.length - 1);
             $scope.currentDotIndex = $scope.dots.length - 1;
             $scope.rightmostVisibleDotIndex = $scope.dots.length - 1;
             if ($scope.dots.length > $scope.MAX_DOTS) {
@@ -61,6 +60,8 @@ oppia.directive('progressDots', [function() {
 
         $scope.changeActiveDot = function(index) {
           playerPositionService.setActiveCardIndex(index);
+          $rootScope.$broadcast('updateActiveStateIfInEditor',
+                                playerPositionService.getCurrentStateName());
           $scope.currentDotIndex = index;
         };
 

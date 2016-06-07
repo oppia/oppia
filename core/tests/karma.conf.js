@@ -26,7 +26,13 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*.js',
       'core/templates/dev/head/components/rating_display.html',
       'extensions/**/*.js',
-      'extensions/interactions/**/*.html'
+      'extensions/interactions/**/*.html',
+      {
+        pattern: 'i18n/**/*.json',
+        watched: true,
+        served: true,
+        included: false
+      }
     ],
     exclude: [
       'core/templates/dev/head/**/*-e2e.js',
@@ -46,13 +52,14 @@ module.exports = function(config) {
       // for it, which is easily fixed.
       'core/templates/dev/head/admin/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/collection_player/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/collection_editor/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/components/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/css/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/dashboard/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/domain/editor/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/domain/collection/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/domain/utilities/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/editor/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/exploration_editor/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/error/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/expressions/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/forms/!(*Spec).js': ['coverage'],

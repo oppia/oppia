@@ -89,8 +89,10 @@ class ProfileHandler(base.BaseHandler):
             edited_exp_summary_dicts = (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
                     user_contributions.edited_exploration_ids))
+        profile_is_of_current_user = (self.username == username)
 
         self.values.update({
+            'profile_is_of_current_user': profile_is_of_current_user,
             'profile_username': user_settings.username,
             'user_bio': user_settings.user_bio,
             'subject_interests': user_settings.subject_interests,
@@ -115,6 +117,7 @@ class PreferencesPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.values.update({
+            'meta_description': feconf.PREFERENCES_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_PROFILE,
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
@@ -136,6 +139,8 @@ class PreferencesHandler(base.BaseHandler):
             self.user_id)
         self.values.update({
             'preferred_language_codes': user_settings.preferred_language_codes,
+            'preferred_site_language_code': (
+                user_settings.preferred_site_language_code),
             'profile_picture_data_url': user_settings.profile_picture_data_url,
             'user_bio': user_settings.user_bio,
             'subject_interests': user_settings.subject_interests,
@@ -158,6 +163,9 @@ class PreferencesHandler(base.BaseHandler):
             user_services.update_subject_interests(self.user_id, data)
         elif update_type == 'preferred_language_codes':
             user_services.update_preferred_language_codes(self.user_id, data)
+        elif update_type == 'preferred_site_language_code':
+            user_services.update_preferred_site_language_code(
+                self.user_id, data)
         elif update_type == 'profile_picture_data_url':
             user_services.update_profile_picture_data_url(self.user_id, data)
         elif update_type == 'email_preferences':
@@ -217,6 +225,7 @@ class SignupPage(base.BaseHandler):
             return
 
         self.values.update({
+            'meta_description': feconf.SIGNUP_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_SIGNUP,
             'CAN_SEND_EMAILS_TO_USERS': feconf.CAN_SEND_EMAILS_TO_USERS,
         })
@@ -305,3 +314,17 @@ class UsernameCheckHandler(base.BaseHandler):
         self.render_json({
             'username_is_taken': username_is_taken,
         })
+
+
+class SiteLanguageHandler(base.BaseHandler):
+    """Changes the preferred system language in the user's preferences."""
+
+    PAGE_NAME_FOR_CSRF = feconf.CSRF_PAGE_NAME_I18N
+
+    def put(self):
+        """Handles PUT requests."""
+        if user_services.has_fully_registered(self.user_id):
+            site_language_code = self.payload.get('site_language_code')
+            user_services.update_preferred_site_language_code(
+                self.user_id, site_language_code)
+        self.render_json({})

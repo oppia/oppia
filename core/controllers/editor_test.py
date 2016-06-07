@@ -14,10 +14,12 @@
 
 """Tests for the exploration editor page."""
 
+import datetime
 import os
 import StringIO
 import zipfile
 
+from core.controllers import dashboard
 from core.controllers import editor
 from core.domain import config_services
 from core.domain import exp_domain
@@ -25,8 +27,11 @@ from core.domain import exp_services
 from core.domain import stats_domain
 from core.domain import rights_manager
 from core.domain import rule_domain
+from core.platform import models
 from core.tests import test_utils
 import feconf
+
+(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
 class BaseEditorControllerTest(test_utils.GenericTestBase):
@@ -75,7 +80,7 @@ class EditorTest(BaseEditorControllerTest):
         # Check that non-editors can access, but not edit, the editor page.
         response = self.testapp.get('/create/0')
         self.assertEqual(response.status_int, 200)
-        self.assertIn('Welcome to Oppia!', response.body)
+        self.assertIn('Help others learn new things.', response.body)
         self.assert_cannot_edit(response.body)
 
         # Log in as an editor.
@@ -83,7 +88,7 @@ class EditorTest(BaseEditorControllerTest):
 
         # Check that it is now possible to access and edit the editor page.
         response = self.testapp.get('/create/0')
-        self.assertIn('Welcome to Oppia!', response.body)
+        self.assertIn('Help others learn new things.', response.body)
         self.assertEqual(response.status_int, 200)
         self.assert_can_edit(response.body)
         self.assertIn('Stats', response.body)
@@ -102,6 +107,29 @@ class EditorTest(BaseEditorControllerTest):
             feconf.DEFAULT_INIT_STATE_NAME].to_dict()
         new_state_dict['unresolved_answers'] = {}
         self.assertEqual(new_state_dict, editor.NEW_STATE_TEMPLATE)
+
+    def test_that_default_exploration_cannot_be_published(self):
+        """Test that publishing a default exploration raises an error
+        due to failing strict validation.
+        """
+        self.login(self.EDITOR_EMAIL)
+
+        response = self.testapp.get(feconf.DASHBOARD_URL)
+        self.assertEqual(response.status_int, 200)
+        csrf_token = self.get_csrf_token_from_response(
+            response, token_type=feconf.CSRF_PAGE_NAME_CREATE_EXPLORATION)
+        exp_id = self.post_json(
+            feconf.NEW_EXPLORATION_URL, {}, csrf_token
+        )[dashboard.EXPLORATION_ID_KEY]
+
+        response = self.testapp.get('/create/%s' % exp_id)
+        csrf_token = self.get_csrf_token_from_response(response)
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        self.put_json(rights_url, {
+            'is_public': True,
+        }, csrf_token, expect_errors=True, expected_status_int=400)
+
+        self.logout()
 
     def test_add_new_state_error_cases(self):
         """Test the error cases for adding a new state to an exploration."""
@@ -591,7 +619,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
         """Test rights management for deletion of unpublished explorations."""
         unpublished_exp_id = 'unpublished_eid'
         exploration = exp_domain.Exploration.create_default_exploration(
-            unpublished_exp_id, 'A title', 'A category')
+            unpublished_exp_id)
         exp_services.save_new_exploration(self.owner_id, exploration)
 
         rights_manager.assign_role_for_exploration(
@@ -620,7 +648,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
         """Test rights management for deletion of published explorations."""
         published_exp_id = 'published_eid'
         exploration = exp_domain.Exploration.create_default_exploration(
-            published_exp_id, 'A title', 'A category')
+            published_exp_id, title='A title', category='A category')
         exp_services.save_new_exploration(self.owner_id, exploration)
 
         rights_manager.assign_role_for_exploration(
@@ -1220,3 +1248,167 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
                 expected_status_int=401)
 
             self.logout()
+
+
+class EditorAutosaveTest(BaseEditorControllerTest):
+    """Test the handling of editor autosave actions."""
+
+    EXP_ID1 = '1'
+    EXP_ID2 = '2'
+    EXP_ID3 = '3'
+    NEWER_DATETIME = datetime.datetime.strptime('2017-03-16', '%Y-%m-%d')
+    OLDER_DATETIME = datetime.datetime.strptime('2015-03-16', '%Y-%m-%d')
+    DRAFT_CHANGELIST = [{
+        'cmd': 'edit_exploration_property',
+        'property_name': 'title',
+        'new_value': 'Updated title'}]
+    NEW_CHANGELIST = [{
+        'cmd': 'edit_exploration_property',
+        'property_name': 'title',
+        'new_value': 'New title'}]
+    INVALID_CHANGELIST = [{
+        'cmd': 'edit_exploration_property',
+        'property_name': 'title',
+        'new_value': 1}]
+
+    def _create_explorations_for_tests(self):
+        self.save_new_valid_exploration(self.EXP_ID1, self.owner_id)
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID1)
+        exploration.add_states(['State A'])
+        exploration.states['State A'].update_interaction_id('TextInput')
+        self.save_new_valid_exploration(self.EXP_ID2, self.owner_id)
+        self.save_new_valid_exploration(self.EXP_ID3, self.owner_id)
+
+    def _create_exp_user_data_model_objects_for_tests(self):
+        # Explorations with draft set.
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.owner_id, self.EXP_ID1), user_id=self.owner_id,
+            exploration_id=self.EXP_ID1,
+            draft_change_list=self.DRAFT_CHANGELIST,
+            draft_change_list_last_updated=self.NEWER_DATETIME,
+            draft_change_list_exp_version=1).put()
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.owner_id, self.EXP_ID2), user_id=self.owner_id,
+            exploration_id=self.EXP_ID2,
+            draft_change_list=self.DRAFT_CHANGELIST,
+            draft_change_list_last_updated=self.OLDER_DATETIME,
+            draft_change_list_exp_version=1).put()
+
+        # Exploration with no draft.
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.owner_id, self.EXP_ID3), user_id=self.owner_id,
+            exploration_id=self.EXP_ID3).put()
+
+    def setUp(self):
+        super(EditorAutosaveTest, self).setUp()
+        self.login(self.OWNER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self._create_explorations_for_tests()
+        self._create_exp_user_data_model_objects_for_tests()
+
+        # Generate CSRF token.
+        response = self.testapp.get('/create/%s' % self.EXP_ID1)
+        self.csrf_token = self.get_csrf_token_from_response(response)
+
+    def test_exploration_loaded_with_draft_applied(self):
+        response = self.get_json(
+            '/createhandler/data/%s' % self.EXP_ID2, {'apply_draft': True})
+        # Title updated because chanhe list was applied.
+        self.assertEqual(response['title'], 'Updated title')
+        self.assertTrue(response['is_version_of_draft_valid'])
+        # Draft changes passed to UI.
+        self.assertEqual(response['draft_changes'], self.DRAFT_CHANGELIST)
+
+    def test_exploration_loaded_without_draft_when_draft_version_invalid(self):
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.owner_id, self.EXP_ID2))
+        exp_user_data.draft_change_list_exp_version = 20
+        exp_user_data.put()
+        response = self.get_json(
+            '/createhandler/data/%s' % self.EXP_ID2, {'apply_draft': True})
+        # Title not updated because change list not applied.
+        self.assertEqual(response['title'], 'A title')
+        self.assertFalse(response['is_version_of_draft_valid'])
+        # Draft changes passed to UI even when version is invalid.
+        self.assertEqual(response['draft_changes'], self.DRAFT_CHANGELIST)
+
+    def test_exploration_loaded_without_draft_as_draft_does_not_exist(self):
+        response = self.get_json(
+            '/createhandler/data/%s' % self.EXP_ID3, {'apply_draft': True})
+        # Title not updated because change list not applied.
+        self.assertEqual(response['title'], 'A title')
+        self.assertIsNone(response['is_version_of_draft_valid'])
+        # Draft changes None.
+        self.assertIsNone(response['draft_changes'])
+
+    def test_draft_not_updated_because_newer_draft_exists(self):
+        payload = {
+            'change_list': self.NEW_CHANGELIST,
+            'version': 1,
+        }
+        response = self.put_json(
+            '/createhandler/autosave_draft/%s' % self.EXP_ID1, payload,
+            self.csrf_token)
+        # Check that draft change list hasn't been updated.
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.owner_id, self.EXP_ID1))
+        self.assertEqual(
+            exp_user_data.draft_change_list, self.DRAFT_CHANGELIST)
+        self.assertTrue(response['is_version_of_draft_valid'])
+
+    def test_draft_not_updated_validation_error(self):
+        self.put_json(
+            '/createhandler/autosave_draft/%s' % self.EXP_ID2, {
+                'change_list': self.DRAFT_CHANGELIST,
+                'version': 1,
+            }, self.csrf_token)
+        response = self.put_json(
+            '/createhandler/autosave_draft/%s' % self.EXP_ID2, {
+                'change_list': self.INVALID_CHANGELIST,
+                'version': 2,
+            }, self.csrf_token, expect_errors=True, expected_status_int=400)
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.owner_id, self.EXP_ID2))
+        self.assertEqual(
+            exp_user_data.draft_change_list, self.DRAFT_CHANGELIST)
+        self.assertEqual(
+            response, {'code': 400,
+                       'error': 'Expected title to be a string, received 1'})
+
+    def test_draft_updated_version_valid(self):
+        payload = {
+            'change_list': self.NEW_CHANGELIST,
+            'version': 1,
+        }
+        response = self.put_json(
+            '/createhandler/autosave_draft/%s' % self.EXP_ID2, payload,
+            self.csrf_token)
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.owner_id, self.EXP_ID2))
+        self.assertEqual(exp_user_data.draft_change_list, self.NEW_CHANGELIST)
+        self.assertEqual(exp_user_data.draft_change_list_exp_version, 1)
+        self.assertTrue(response['is_version_of_draft_valid'])
+
+    def test_draft_updated_version_invalid(self):
+        payload = {
+            'change_list': self.NEW_CHANGELIST,
+            'version': 10,
+        }
+        response = self.put_json(
+            '/createhandler/autosave_draft/%s' % self.EXP_ID2, payload,
+            self.csrf_token)
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.owner_id, self.EXP_ID2))
+        self.assertEqual(exp_user_data.draft_change_list, self.NEW_CHANGELIST)
+        self.assertEqual(exp_user_data.draft_change_list_exp_version, 10)
+        self.assertFalse(response['is_version_of_draft_valid'])
+
+    def test_discard_draft(self):
+        self.post_json(
+            '/createhandler/autosave_draft/%s' % self.EXP_ID2, {},
+            self.csrf_token)
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.owner_id, self.EXP_ID2))
+        self.assertIsNone(exp_user_data.draft_change_list)
+        self.assertIsNone(exp_user_data.draft_change_list_last_updated)
+        self.assertIsNone(exp_user_data.draft_change_list_exp_version)

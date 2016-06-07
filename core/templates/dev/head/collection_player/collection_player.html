@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
-{% block subtitle %}
-  {{ collection_title }}
-{% endblock subtitle %}
+{% block maintitle %}
+  {{ collection_title }} - Oppia
+{% endblock maintitle %}
 
 {% block header_js %}
   {{ super() }}
@@ -106,6 +106,5 @@
     {{ include_js_file('domain/collection/CollectionObjectFactory.js') }}
     {{ include_js_file('domain/collection/CollectionPlaythroughObjectFactory.js') }}
     {{ include_js_file('domain/collection/SkillListObjectFactory.js') }}
-    {{ include_js_file('domain/utilities/UrlInterpolationService.js') }}
   </script>
 {% endblock footer_js %}

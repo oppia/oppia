@@ -24,7 +24,8 @@ var oppia = angular.module(
   'oppia', [
     'ngMaterial', 'ngAnimate', 'ngSanitize', 'ngTouch', 'ngResource',
     'ui.bootstrap', 'ui.sortable', 'infinite-scroll', 'ngJoyRide', 'ngImgCrop',
-    'ui.validate', 'textAngular', 'toastr'
+    'ui.validate', 'textAngular', 'pascalprecht.translate', 'ngCookies',
+    'toastr'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
                    : []));
@@ -35,10 +36,9 @@ oppia.config([
   function(
       $compileProvider, $httpProvider, $interpolateProvider,
       $locationProvider) {
-    // TODO(sll): Turn this on in order to disable debug data to improve
-    // performance. See https://code.angularjs.org/1.5.5/docs/guide/production.
-    // However, we can't do it yet because it causes the karma tests to fail.
-    // $compileProvider.debugInfoEnabled(false);
+    // This improves performance by disabling debug data. For more details,
+    // see https://code.angularjs.org/1.5.5/docs/guide/production
+    $compileProvider.debugInfoEnabled(false);
 
     // Set the AngularJS interpolators as <[ and ]>, to not conflict with
     // Jinja2 templates.
@@ -67,9 +67,16 @@ oppia.config([
           request: function(config) {
             // If this request carries data (in the form of a JS object),
             // JSON-stringify it and store it under 'payload'.
+            var csrfToken = '';
             if (config.data) {
+              var csrfToken = (
+                config.requestIsForCreateExploration ?
+                  GLOBALS.csrf_token_create_exploration :
+                config.requestIsForI18n ? GLOBALS.csrf_token_i18n :
+                GLOBALS.csrf_token);
+
               config.data = $.param({
-                csrf_token: GLOBALS.csrf_token,
+                csrf_token: csrfToken,
                 payload: JSON.stringify(config.data),
                 source: document.URL
               }, true);
@@ -268,9 +275,9 @@ oppia.factory('validatorsService', [
      *   butterbar.
      * @return {boolean} True if the entity name is valid, false otherwise.
      */
-    isValidEntityName: function(input, showWarnings) {
+    isValidEntityName: function(input, showWarnings, allowEmpty) {
       input = $filter('normalizeWhitespace')(input);
-      if (!input) {
+      if (!input && !allowEmpty) {
         if (showWarnings) {
           alertsService.addWarning('Please enter a non-empty name.');
         }
@@ -288,6 +295,21 @@ oppia.factory('validatorsService', [
           return false;
         }
       }
+      return true;
+    },
+    isValidExplorationTitle: function(input, showWarnings) {
+      if (!this.isValidEntityName(input, showWarnings)) {
+        return false;
+      }
+
+      if (input.length > 40) {
+        if (showWarnings) {
+          alertsService.addWarning(
+            'Exploration titles should be at most 40 characters long.');
+        }
+        return false;
+      }
+
       return true;
     },
     // NB: this does not check whether the card name already exists in the
@@ -444,13 +466,15 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
       _sendEventToGoogleAnalytics(
         'CreateExplorationButton', 'click', $window.location.pathname);
     },
-    registerOpenExplorationCreationModalEvent: function() {
-      _sendEventToGoogleAnalytics(
-        'CreateExplorationModal', 'open', $window.location.pathname);
-    },
     registerCreateNewExplorationEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics('NewExploration', 'create', explorationId);
+    },
+    registerCreateNewExplorationInCollectionEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
-        'NewExploration', 'create', explorationId);
+        'NewExplorationFromCollection', 'create', explorationId);
+    },
+    registerCreateNewCollectionEvent: function(collectionId) {
+      _sendEventToGoogleAnalytics('NewCollection', 'create', collectionId);
     },
     registerCommitChangesToPrivateExplorationEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(

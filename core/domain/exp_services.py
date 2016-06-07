@@ -25,6 +25,7 @@ import collections
 import copy
 import datetime
 import logging
+import math
 import os
 import pprint
 import StringIO
@@ -158,13 +159,15 @@ def get_exploration_summary_from_model(exp_summary_model):
         exp_summary_model.id, exp_summary_model.title,
         exp_summary_model.category, exp_summary_model.objective,
         exp_summary_model.language_code, exp_summary_model.tags,
-        exp_summary_model.ratings, exp_summary_model.status,
-        exp_summary_model.community_owned, exp_summary_model.owner_ids,
-        exp_summary_model.editor_ids, exp_summary_model.viewer_ids,
+        exp_summary_model.ratings, exp_summary_model.scaled_average_rating,
+        exp_summary_model.status, exp_summary_model.community_owned,
+        exp_summary_model.owner_ids, exp_summary_model.editor_ids,
+        exp_summary_model.viewer_ids,
         exp_summary_model.contributor_ids,
         exp_summary_model.contributors_summary, exp_summary_model.version,
         exp_summary_model.exploration_model_created_on,
-        exp_summary_model.exploration_model_last_updated
+        exp_summary_model.exploration_model_last_updated,
+        exp_summary_model.first_published_msec
     )
 
 
@@ -372,6 +375,22 @@ def get_featured_exploration_summaries():
     """
     return _get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_featured())
+
+
+def get_top_rated_exploration_summaries():
+    """Returns a dict with top rated exploration summary domain objects,
+    keyed by their id.
+    """
+    return _get_exploration_summaries_from_models(
+        exp_models.ExpSummaryModel.get_top_rated())
+
+
+def get_recently_published_exploration_summaries():
+    """Returns a dict with all featured exploration summary domain objects,
+    keyed by their id.
+    """
+    return _get_exploration_summaries_from_models(
+        exp_models.ExpSummaryModel.get_recently_published())
 
 
 def get_all_exploration_summaries():
@@ -1013,15 +1032,7 @@ def update_exploration(
     exploration = apply_change_list(exploration_id, change_list)
     _save_exploration(committer_id, exploration, commit_message, change_list)
 
-    # If there is an existing exploration draft for this user, clear it.
-    exp_user_data = user_models.ExplorationUserDataModel.get(
-        committer_id, exploration_id)
-    if exp_user_data:
-        exp_user_data.draft_change_list = None
-        exp_user_data.draft_change_list_last_updated = None
-        exp_user_data.draft_change_list_exp_version = None
-        exp_user_data.put()
-
+    discard_draft(exploration_id, committer_id)
     # Update summary of changed exploration.
     update_exploration_summary(exploration.id, committer_id)
     user_services.add_edited_exploration_id(committer_id, exploration.id)
@@ -1058,10 +1069,13 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
     if exp_summary_model:
         old_exp_summary = get_exploration_summary_from_model(exp_summary_model)
         ratings = old_exp_summary.ratings or feconf.get_empty_ratings()
+        scaled_average_rating = get_scaled_average_rating(
+            old_exp_summary.ratings)
         contributor_ids = old_exp_summary.contributor_ids or []
         contributors_summary = old_exp_summary.contributors_summary or {}
     else:
         ratings = feconf.get_empty_ratings()
+        scaled_average_rating = feconf.EMPTY_SCALED_AVERAGE_RATING
         contributor_ids = []
         contributors_summary = {}
 
@@ -1087,15 +1101,16 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
         _get_last_updated_by_human_ms(exploration.id) / 1000.0)
     exploration_model_created_on = exploration.created_on
-
+    first_published_msec = exp_rights.first_published_msec
     exp_summary = exp_domain.ExplorationSummary(
         exploration.id, exploration.title, exploration.category,
         exploration.objective, exploration.language_code,
-        exploration.tags, ratings, exp_rights.status,
+        exploration.tags, ratings, scaled_average_rating, exp_rights.status,
         exp_rights.community_owned, exp_rights.owner_ids,
         exp_rights.editor_ids, exp_rights.viewer_ids, contributor_ids,
         contributors_summary, exploration.version,
-        exploration_model_created_on, exploration_model_last_updated)
+        exploration_model_created_on, exploration_model_last_updated,
+        first_published_msec)
 
     return exp_summary
 
@@ -1137,6 +1152,7 @@ def save_exploration_summary(exp_summary):
         language_code=exp_summary.language_code,
         tags=exp_summary.tags,
         ratings=exp_summary.ratings,
+        scaled_average_rating=exp_summary.scaled_average_rating,
         status=exp_summary.status,
         community_owned=exp_summary.community_owned,
         owner_ids=exp_summary.owner_ids,
@@ -1148,7 +1164,9 @@ def save_exploration_summary(exp_summary):
         exploration_model_last_updated=(
             exp_summary.exploration_model_last_updated),
         exploration_model_created_on=(
-            exp_summary.exploration_model_created_on)
+            exp_summary.exploration_model_created_on),
+        first_published_msec=(
+            exp_summary.first_published_msec)
     )
 
     exp_summary_model.put()
@@ -1223,13 +1241,12 @@ def get_demo_exploration_components(demo_path):
 
 
 def save_new_exploration_from_yaml_and_assets(
-        committer_id, yaml_content, title, category, exploration_id,
-        assets_list):
-    """Note that the title and category will be ignored if the YAML
-    schema version is greater than
+        committer_id, yaml_content, exploration_id, assets_list):
+    """Note that the default title and category will be used if the YAML
+    schema version is less than
     exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
-    since in that case there will already be a title and category present in
-    the YAML schema.
+    since in that case the YAML schema will not have a title and category
+    present.
     """
     if assets_list is None:
         assets_list = []
@@ -1244,7 +1261,8 @@ def save_new_exploration_from_yaml_and_assets(
         # The schema of the YAML file for older explorations did not include
         # a title and a category; these need to be manually specified.
         exploration = exp_domain.Exploration.from_untitled_yaml(
-            exploration_id, title, category, yaml_content)
+            exploration_id, feconf.DEFAULT_EXPLORATION_TITLE,
+            feconf.DEFAULT_EXPLORATION_CATEGORY, yaml_content)
     else:
         exploration = exp_domain.Exploration.from_yaml(
             exploration_id, yaml_content)
@@ -1294,8 +1312,8 @@ def load_demo(exploration_id):
 
     yaml_content, assets_list = get_demo_exploration_components(exp_filename)
     save_new_exploration_from_yaml_and_assets(
-        feconf.SYSTEM_COMMITTER_ID, yaml_content, None, None,
-        exploration_id, assets_list)
+        feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
+        assets_list)
 
     publish_exploration_and_update_user_profiles(
         feconf.SYSTEM_COMMITTER_ID, exploration_id)
@@ -1364,6 +1382,42 @@ def _exp_rights_to_search_dict(rights):
 def _should_index(exp):
     rights = rights_manager.get_exploration_rights(exp.id)
     return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
+
+
+def get_average_rating(ratings):
+    """Returns the average rating of the ratings as a float. If there are no
+    ratings, it will return 0.
+    """
+    rating_weightings = {'1': 1, '2': 2, '3': 3, '4': 4, '5': 5}
+    if ratings:
+        rating_sum = 0.0
+        number_of_ratings = 0.0
+        for rating_value, rating_count in ratings.items():
+            rating_sum += rating_weightings[rating_value] * rating_count
+            number_of_ratings += rating_count
+        if number_of_ratings > 0:
+            return rating_sum / number_of_ratings
+    return 0
+
+
+def get_scaled_average_rating(ratings):
+    """Returns the lower bound wilson score of the ratings as a float. If
+    there are no ratings, it will return 0. The confidence of this result is
+    95%.
+    """
+    # The following is the number of ratings.
+    n = sum(ratings.values())
+    if n == 0:
+        return 0
+    average_rating = get_average_rating(ratings)
+    z = 1.9599639715843482
+    x = (average_rating - 1) / 4
+    # The following calculates the lower bound Wilson Score as documented
+    # http://www.goproblems.com/test/wilson/wilson.php?v1=0&v2=0&v3=0&v4=&v5=1
+    a = x + (z**2)/(2*n)
+    b = z * math.sqrt((x*(1-x))/n + (z**2)/(4*n**2))
+    wilson_score_lower_bound = (a - b)/(1 + z**2/n)
+    return 1 + 4 * wilson_score_lower_bound
 
 
 def get_search_rank_from_exp_summary(exp_summary):
@@ -1566,14 +1620,11 @@ def reject_suggestion(editor_id, thread_id, exploration_id):
         thread.put()
 
 
-def is_draft_version_valid(exp_id, user_id):
+def is_version_of_draft_valid(exp_id, version):
     """Checks if the draft version is the same as the latest version of the
     exploration."""
 
-    draft_version = user_models.ExplorationUserDataModel.get(
-        user_id, exp_id).draft_change_list_exp_version
-    exp_version = get_exploration_by_id(exp_id).version
-    return draft_version == exp_version
+    return get_exploration_by_id(exp_id).version == version
 
 
 def create_or_update_draft(
@@ -1584,13 +1635,18 @@ def create_or_update_draft(
     timestamp of the draft.
     The method assumes that a ExplorationUserDataModel object exists for the
     given user and exploration."""
-
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
-    if (exp_user_data.draft_change_list and
+    if (exp_user_data and exp_user_data.draft_change_list and
             exp_user_data.draft_change_list_last_updated > current_datetime):
         return
+
     updated_exploration = apply_change_list(exp_id, change_list)
     updated_exploration.validate(strict=False)
+
+    if exp_user_data is None:
+        exp_user_data = user_models.ExplorationUserDataModel.create(
+            user_id, exp_id)
+
     exp_user_data.draft_change_list = change_list
     exp_user_data.draft_change_list_last_updated = current_datetime
     exp_user_data.draft_change_list_exp_version = exp_version
@@ -1602,7 +1658,22 @@ def get_exp_with_draft_applied(exp_id, user_id):
     apply it to the exploration."""
 
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
+    exploration = get_exploration_by_id(exp_id)
     return (
         apply_change_list(exp_id, exp_user_data.draft_change_list)
-        if exp_user_data.draft_change_list
-        else get_exploration_by_id(exp_id))
+        if exp_user_data and exp_user_data.draft_change_list and
+        is_version_of_draft_valid(
+            exp_id, exp_user_data.draft_change_list_exp_version)
+        else exploration)
+
+
+def discard_draft(exp_id, user_id):
+    """Discard the draft for the given user and exploration."""
+
+    exp_user_data = user_models.ExplorationUserDataModel.get(
+        user_id, exp_id)
+    if exp_user_data:
+        exp_user_data.draft_change_list = None
+        exp_user_data.draft_change_list_last_updated = None
+        exp_user_data.draft_change_list_exp_version = None
+        exp_user_data.put()

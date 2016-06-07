@@ -1,12 +1,8 @@
 {% extends "base.html" %}
 
 {% block maintitle %}
-  Home
+  I18N_SPLASH_PAGE_TITLE
 {% endblock maintitle %}
-
-{% block subtitle %}
-  Oppia
-{% endblock subtitle %}
 
 {% block header_js %}
   {{ super() }}
@@ -24,7 +20,7 @@
 {% block content %}
   <div ng-controller="Splash">
     <div class="oppia-splash-section-one text-center">
-      <h1 class="oppia-splash-h1">Think outside the books.</h1>
+      <h1 class="oppia-splash-h1" translate="I18N_SPLASH_TITLE"></h1>
       <div class="oppia-splash-background-icon-row">
         <img src="/images/splash/books.svg" class="oppia-splash-books">
 
@@ -123,64 +119,63 @@
         <img src="/images/subjects/Chess.svg" class="oppia-splash-background-icon">
       </div>
       <div class="oppia-splash-h2-container">
-        <h2 class="oppia-splash-h2">Oppia makes it easy to create interactive explorations that educate and engage.</h2>
+        <h2 class="oppia-splash-h2" translate="I18N_SPLASH_SUBTITLE"></h2>
       </div>
     </div>
 
     <div class="oppia-splash-section-two">
       <div>
         <button type="button" ng-click="onClickBrowseLibraryButton()"
-                class="btn oppia-splash-button oppia-splash-button-browse oppia-transition-200">
-          Browse our explorations
+                class="btn oppia-splash-button oppia-splash-button-browse oppia-transition-200"
+                translate="I18N_SPLASH_BROWSE_EXPLORATIONS">
         </button>
 
         {% if not user_is_logged_in %}
           <!-- User must complete the registration process. -->
           <button type="button"
-                  ng-click="onRedirectToLogin('/my_explorations?mode=create')"
-                  class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200">
-            Create your own exploration
+                  ng-click="onRedirectToLogin('/dashboard?mode=create')"
+                  class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200" translate="I18N_SPLASH_CREATE_EXPLORATION">
           </button>
         {% else %}
           <button type="button"
                   ng-click="onClickCreateExplorationButton()"
-                  class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200">
-            Create your own exploration
+                  class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200"
+                  translate="I18N_SPLASH_CREATE_EXPLORATION">
           </button>
         {% endif %}
 
         <button type="button"
-                ng-click="onRedirectToLogin('/my_explorations?mode=create')"
-                class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200">
-          Create your own exploration
+                ng-click="onRedirectToLogin('/dashboard?mode=create')"
+                class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200"
+                translate="I18N_SPLASH_CREATE_EXPLORATION">
         </button>
       </div>
 
       <div class="oppia-splash-section-two-content">
         <div class="oppia-splash-bullet">
-          <div class="oppia-splash-bullet-block oppia-splash-block-right">
+          <div class="oppia-splash-bullet-block oppia-splash-block-left-image">
             <img src="/images/splash/bullet1icon.svg">
           </div>
-          <div class="oppia-splash-bullet-block oppia-splash-block-left">
-            Explorations are interactive lessons that provide more immersive experiences than static videos or text, helping users learn by doing.
+          <div class="oppia-splash-bullet-block oppia-splash-block-right-text"
+               translate="I18N_SPLASH_FIRST_EXPLORATION_DESCRIPTION">
           </div>
         </div>
 
         <div class="oppia-splash-bullet">
-          <div class="oppia-splash-bullet-block oppia-splash-block-left">
+          <div class="oppia-splash-bullet-block oppia-splash-block-right-image">
             <img src="/images/splash/bullet2icon.svg">
           </div>
-          <div class="oppia-splash-bullet-block oppia-splash-block-right">
-            Explorations are simple to create. They are easily adapted based on individual student feedback and trends in the experience of your learners around the world.
+          <div class="oppia-splash-bullet-block oppia-splash-block-left-text"
+               translate="I18N_SPLASH_SECOND_EXPLORATION_DESCRIPTION">
           </div>
         </div>
 
         <div class="oppia-splash-bullet">
-          <div class="oppia-splash-bullet-block oppia-splash-block-right">
+          <div class="oppia-splash-bullet-block oppia-splash-block-left-image">
             <img src="/images/splash/bullet3icon.svg">
           </div>
-          <div class="oppia-splash-bullet-block oppia-splash-block-left">
-            Oppia lets you create explorations on a wide range of subjects, limited only by your imagination.
+          <div class="oppia-splash-bullet-block oppia-splash-block-right-text"
+               translate="I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION">
           </div>
         </div>
       </div>

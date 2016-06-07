@@ -84,18 +84,6 @@ oppia.controller('Base', [
       });
     }
 
-    /**
-     * Checks if an object is empty.
-     */
-    $scope.isEmpty = function(obj) {
-      for (var property in obj) {
-        if (obj.hasOwnProperty(property)) {
-          return false;
-        }
-      }
-      return true;
-    };
-
     // This method is here because the trigger for the tutorial is in the site
     // navbar. It broadcasts an event to tell the exploration editor to open the
     // editor tutorial.
@@ -109,6 +97,9 @@ oppia.controller('Base', [
       if (!$scope.sidebarIsShown) {
         $scope.sidebarIsShown = true;
         $scope.pendingSidebarClick = true;
+      } else {
+        $scope.sidebarIsShown = false;
+        $scope.pendingSidebarClick = false;
       }
     };
 

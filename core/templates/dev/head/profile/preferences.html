@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
-{% block subtitle %}
-  Preferences
-{% endblock subtitle %}
+{% block maintitle %}
+  I18N_PREFERENCES_PAGE_TITLE
+{% endblock maintitle %}
 
 {% block navbar_breadcrumb %}
   <ul class="nav navbar-nav oppia-navbar-breadcrumb">
     <li>
       <span class="oppia-navbar-breadcrumb-separator"></span>
-      Preferences
+      <span translate="I18N_PREFERENCES_BREADCRUMB"></span>
     </li>
   </ul>
 {% endblock navbar_breadcrumb %}
@@ -29,20 +29,19 @@
 
 {% block content %}
   <div class="oppia-dashboard-container ng-scope" ng-controller="Preferences">
-    <h2 class="oppia-page-heading">Preferences</h2>
-    <div class="oppia-page-heading-subtext">
-      Any changes that you make on this page will be auto-saved.
-    </div>
+    <h2 class="oppia-page-heading protractor-test-preferences-title"
+        translate="I18N_PREFERENCES_HEADING"></h2>
+    <div class="oppia-page-heading-subtext" translate="I18N_PREFERENCES_HEADING_SUBTEXT"></div>
     <md-card class="oppia-page-card">
       <div class="row">
         <div role="form" class="form-horizontal">
           <div class="form-group">
-            <label class="col-lg-2 col-md-2 col-sm-2">Username</label>
+            <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_USERNAME"></label>
             <div class="col-lg-10 col-md-10 col-sm-10">
               {% if username %}
                 <a href="/profile/{{username}}">{{username}}</a>
               {% else %}
-                <em>Not yet selected</em>
+                <em translate="I18N_PREFERENCES_USERNAME_NOT_SELECTED"></em>
               {% endif %}
             </div>
           </div>
@@ -50,9 +49,9 @@
 
         <div role="form" class="form-horizontal">
           <div class="form-group">
-            <label class="col-lg-2 col-md-2 col-sm-2">Picture</label>
+            <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_PICTURE"></label>
             <div class="col-lg-10 col-md-10 col-sm-10">
-              <div class="oppia-editable-section" title="Change profile picture" style="height: 150px; width: 150px">
+              <div class="oppia-editable-section" title="<['I18N_PREFERENCES_CHANGE_PICTURE' | translate]>" style="height: 150px; width: 150px">
                 <div class="oppia-click-to-start-editing" ng-click="showEditProfilePictureModal()"></div>
                 <i class="material-icons oppia-editor-edit-icon" style="top: 8px; right: 8px;">&#xE254;</i>
                 <img ng-if="profilePictureDataUrl" ng-src="<[profilePictureDataUrl]>" class="img-thumbnail">
@@ -64,20 +63,17 @@
 
         <div role="form" class="form-horizontal">
           <div class="form-group">
-            <label class="col-lg-2 col-md-2 col-sm-2">Bio</label>
+            <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_BIO"></label>
             <div class="col-lg-10 col-md-10 col-sm-10">
               <textarea ng-model="userBio" ng-blur="saveUserBio(userBio)" rows="5"></textarea>
-              <span class="help-block" style="font-size: smaller">
-                This field is optional. Anything you write here is public and
-                world-viewable.
-              </span>
+              <span class="help-block" style="font-size: smaller" translate="I18N_PREFERENCES_BIO_EXPLAIN_TEXT"></span>
             </div>
           </div>
         </div>
 
         <div role="form" class="form-horizontal">
           <div class="form-group">
-            <label class="col-lg-2 col-md-2 col-sm-2">Subject Interests</label>
+            <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_SUBJECT_INTERESTS"></label>
             <div class="col-lg-10 col-md-10 col-sm-10">
               <div ng-if="hasPageLoaded">
                 <select2-dropdown
@@ -85,15 +81,13 @@
                   ng-model="subjectInterests"
                   tag-mode="true" allow-multiple-choices="true"
                   new-choice-regex="<[TAG_REGEX_STRING]>" width="100%"
-                  placeholder="Enter subject interests..."
+                  placeholder="<['I18N_PREFERENCES_SUBJECT_INTERESTS_PLACEHOLDER' | translate]>"
                   ng-change="onSubjectInterestsSelectionChange($parent.subjectInterests)"
-                  invalid-search-term-message="Add a new subject interest (using lowercase letters and spaces)..."
+                  invalid-search-term-message="<['I18N_PREFERENCES_SUBJECT_INTERESTS_INVALID_SEARCH' | translate]>"
                   on-selection-change="onSubjectInterestsSelectionChange($parent.subjectInterests)">
                 </select2-dropdown>
               </div>
-              <span class="help-block" style="font-size: smaller">
-                E.g.: mathematics, computer science, art, ...
-              </span>
+              <span class="help-block" style="font-size: smaller" translate="I18N_PREFERENCES_SUBJECT_INTERESTS_HELP_BLOCK"></span>
               <div style="height: 18px; width: 550px;">
                 <span style="color: red; font-size: 0.8em;" aria-live="assertive" ng-show="changedAtLeastOnce">
                   <[subjectInterestsWarningText]>
@@ -105,7 +99,7 @@
 
         <div role="form" class="form-horizontal">
           <div class="form-group">
-            <label class="col-lg-2 col-md-2 col-sm-2">Preferred Languages</label>
+            <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE"></label>
             <div class="col-lg-10 col-md-10 col-sm-10">
               <!--
                 If the ng-if is omitted, the select2-dropdown directive won't be
@@ -115,28 +109,48 @@
                 <select2-dropdown choices="LANGUAGE_CHOICES"
                   item="$parent.preferredLanguageCodes" allow-multiple-choices="true"
                   new-choice-regex=".^" width="100%"
-                  placeholder="Select preferred languages..."
+                  placeholder="<['I18N_PREFERENCES_SELECT_EXPLORATION_LANGUAGE' | translate]>"
                   on-selection-change="savePreferredLanguageCodes($parent.preferredLanguageCodes)">
                 </select2-dropdown>
               </div>
-              <span class="help-block" style="font-size: smaller">
-                These languages will be selected by default when you search the
-                library for explorations.
+              <span class="help-block" style="font-size: smaller" translate="I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE_EXPLAIN">
               </span>
             </div>
           </div>
         </div>
 
+        <div role="form" class="form-horizontal">
+          <div class="form-group">
+            <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE"></label>
+            <div class="col-lg-10 col-md-10 col-sm-10">
+              <!--
+                If the ng-if is omitted, the select2-dropdown directive won't be
+                updated after the initial page load.
+              -->
+              <div ng-if="hasPageLoaded">
+                <select2-dropdown choices="SITE_LANGUAGE_CHOICES"
+                  class="protractor-test-system-language-selector"
+                  item="$parent.preferredSiteLanguageCode"
+                  allow-multiple-choices="false"
+                  new-choice-regex=".^" width="400"
+                  placeholder="<['I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE_PLACEHOLDER' | translate]>"
+                  on-selection-change="savePreferredSiteLanguageCodes($parent.preferredSiteLanguageCode)">
+                </select2-dropdown>
+              </div>
+              <span class="help-block" style="font-size: smaller" translate="I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE_EXPLAIN"></span>
+            </div>
+          </div>
+        </div>
+
+
         <hr>
 
         <div role="form" class="form-horizontal">
           <div class="form-group">
-            <label class="col-lg-2 col-md-2 col-sm-2">Email</label>
+            <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_EMAIL"></label>
             <div class="col-lg-10 col-md-10 col-sm-10">
               {{user_email}}
-              <span class="help-block" style="font-size: smaller">
-                Only moderators and site admins can see this.
-              </span>
+              <span class="help-block" style="font-size: smaller" translate="I18N_PREFERENCES_EMAIL_EXPLAIN"></span>
             </div>
           </div>
         </div>
@@ -148,7 +162,7 @@
               <div class="checkbox">
                 <label>
                   <input type="checkbox" ng-model="canReceiveEmailUpdates" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail)">
-                  Receive news and updates about the site
+                  <span translate="I18N_PREFERENCES_EMAIL_RECEIVE_NEWS"></span>
                 </label>
               </div>
               <div class="checkbox">
@@ -164,7 +178,7 @@
 
       <script type="text/ng-template" id="modals/editProfilePicture">
         <div class="modal-header">
-          <h3>Upload Profile Picture</h3>
+          <h3 translate="I18N_PREFERENCES_PROFILE_PICTURE_UPLOAD"></h3>
         </div>
 
         <div class="modal-body" style="min-height: 300px;">
@@ -174,12 +188,10 @@
               </image-uploader>
             </div>
 
-            <div class="oppia-form-error" ng-if="invalidImageWarningIsShown" style="margin-top: 15px;">
-              Error: Could not read image file.
-            </div>
+            <div class="oppia-form-error" ng-if="invalidImageWarningIsShown" style="margin-top: 15px;" translate="I18N_PREFERENCES_PROFILE_PICTURE_ERROR"></div>
 
             <div ng-show="uploadedImage">
-              Drag to crop and resize:
+              <span translate="I18N_PREFERENCES_PROFILE_PICTURE_DRAG"></span>
               <div class="oppia-profile-picture-crop-area" ng-show="uploadedImage">
                 <button class="btn btn-default oppia-profile-picture-reset-button" ng-click="reset()">
                   <i class="material-icons oppia-vcenter">&#xE14C;</i>
@@ -195,15 +207,13 @@
         </div>
 
         <div class="modal-footer">
-          <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+          <button class="btn btn-default" ng-click="cancel()" translate="I18N_PREFERENCES_CANCEL_BUTTON"></button>
           <!--
             The two checks for ng-disabled are necessary. The former is needed because
             img-crop loads a default white image even when nothing is uploaded. The latter
             is needed to prevent the saving of invalid files.
           -->
-          <button class="btn btn-success" ng-click="confirm()" ng-disabled="!uploadedImage || !croppedImageDataUrl">
-            Add Profile Picture
-          </button>
+          <button class="btn btn-success" ng-click="confirm()" ng-disabled="!uploadedImage || !croppedImageDataUrl" translate="I18N_PREFERENCES_PROFILE_PICTURE_ADD"></button>
         </div>
       </script>
     </md-card>

@@ -22,24 +22,21 @@ var editor = require('./editor.js');
 var general = require('./general.js');
 
 // Creates an exploration and opens its editor.
-var createExploration = function(name, category) {
-  createExplorationAndStartTutorial(name, category);
+var createExploration = function() {
+  createExplorationAndStartTutorial();
   editor.exitTutorialIfNecessary();
 };
 
-// Creates a new exploration and wait for the exploration
-// tutorial to start.
-var createExplorationAndStartTutorial = function(name, category) {
+// Creates a new exploration and wait for the exploration tutorial to start.
+var createExplorationAndStartTutorial = function() {
   browser.get(general.LIBRARY_URL_SUFFIX);
-  element(by.css('.protractor-test-create-exploration')).click();
-  browser.waitForAngular();
-  element(by.css('.protractor-test-new-exploration-title')).sendKeys(name);
-  forms.AutocompleteDropdownEditor(
-    element(by.css('.protractor-test-new-exploration-category'))
-  ).setValue(category);
-  element(by.css('.protractor-test-submit-new-exploration')).click();
+  element(by.css('.protractor-test-create-activity')).click();
 
-  // We now want to wait for the editor to fully load.
+  // Wait for the "create activity" modal to load.
+  browser.waitForAngular();
+  element(by.css('.protractor-test-create-exploration')).click();
+
+  // Wait for the editor to fully load.
   browser.waitForAngular();
 };
 
@@ -49,16 +46,26 @@ var publishExploration = function() {
   element(by.css('.protractor-test-publish-exploration')).click();
   browser.waitForAngular();
   general.waitForSystem();
+
+  var prePublicationButtonElem = element(by.css(
+    '.protractor-test-confirm-pre-publication'));
+  prePublicationButtonElem.isPresent().then(function() {
+    prePublicationButtonElem.click();
+    general.waitForSystem();
+  });
+
   element(by.css('.protractor-test-confirm-publish')).click();
 };
 
 // Creates and publishes a minimal exploration
 var createAndPublishExploration = function(
-    name, category, objective, language) {
-  createExploration(name, category);
+    title, category, objective, language) {
+  createExploration();
   editor.setContent(forms.toRichText('new exploration'));
   editor.setInteraction('TextInput');
   editor.setDefaultOutcome(null, 'final state', true);
+  editor.setTitle(title);
+  editor.setCategory(category);
   editor.setObjective(objective);
   if (language) {
     editor.setLanguage(language);

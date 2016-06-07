@@ -1,0 +1,33 @@
+<script type="text/ng-template" id="modals/previewParams">
+  <div class="modal-body oppia-preview-set-params-modal">
+    <p>Please enter values for the following parameters:</p>
+    <table class="oppia-preview-set-params-modal-table">
+      <tr ng-repeat="paramChange in manualParamChanges">
+        <td class="oppia-preview-set-params-modal-td">
+          <[paramChange.name]>
+        </td>
+        <td class="oppia-preview-set-params-modal-td">
+          <input type="text" ng-model="paramChange.customization_args.value">
+        </td>
+      </tr>
+    </table>
+    <button class="btn btn-success" ng-click="previewParamModalOk()">
+      OK
+    </button>
+    <button class="btn btn-danger" ng-click="previewParamModalCancel()">
+      Cancel
+    </button>
+  </div>
+</script>
+
+<style>
+  .oppia-preview-set-params-modal {
+    padding: 15px 10px 15px 10px;
+  }
+  .oppia-preview-set-params-modal .oppia-preview-set-params-modal-table {
+    margin: 5px 0px 15px 0px
+  }
+  .oppia-preview-set-params-modal .oppia-preview-set-params-modal-td {
+    padding: 1px 5px;
+  }
+</style>

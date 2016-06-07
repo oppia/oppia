@@ -17,14 +17,12 @@
  */
 
 oppia.controller('Library', [
-  '$scope', '$http', '$rootScope', '$window', '$timeout',
-  'ExplorationCreationButtonService', 'urlService', 'CATEGORY_LIST',
-  'searchService', 'windowDimensionsService',
+  '$scope', '$http', '$rootScope', '$window', '$timeout', 'i18nIdService',
+  'urlService', 'CATEGORY_LIST', 'searchService', 'windowDimensionsService',
   function(
-      $scope, $http, $rootScope, $window, $timeout,
-      ExplorationCreationButtonService, urlService, CATEGORY_LIST,
-      searchService, windowDimensionsService) {
-    $rootScope.loadingMessage = 'Loading';
+      $scope, $http, $rootScope, $window, $timeout, i18nIdService,
+      urlService, CATEGORY_LIST, searchService, windowDimensionsService) {
+    $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
 
     // Below is the width of each tile (width + margins), which can be found
     // in core/templates/dev/head/components/
@@ -56,9 +54,12 @@ oppia.controller('Library', [
 
       // The following initializes the tracker to have all
       // elements flush left.
+      // Transforms the group names into translation ids
       $scope.leftmostCardIndices = [];
       for (i = 0; i < $scope.libraryGroups.length; i++) {
         $scope.leftmostCardIndices.push(0);
+        $scope.libraryGroups[i].translationId = i18nIdService.getLibraryId(
+          'groups', $scope.libraryGroups[i].header);
       }
     });
 
@@ -94,7 +95,12 @@ oppia.controller('Library', [
       }
     };
 
+    var isAnyCarouselCurrentlyScrolling = false;
+
     $scope.scroll = function(ind, isLeftScroll) {
+      if (isAnyCarouselCurrentlyScrolling) {
+        return;
+      }
       var carouselJQuerySelector = (
         '.oppia-library-carousel-tiles:eq(n)'.replace('n', ind));
       var leftOverlaySelector =
@@ -131,7 +137,13 @@ oppia.controller('Library', [
         scrollLeft: newScrollPositionPx
       }, {
         duration: 800,
-        queue: false
+        queue: false,
+        start: function() {
+          isAnyCarouselCurrentlyScrolling = true;
+        },
+        complete: function() {
+          isAnyCarouselCurrentlyScrolling = false;
+        }
       });
 
       $(leftOverlaySelector).css({

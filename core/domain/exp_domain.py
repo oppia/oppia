@@ -1325,7 +1325,9 @@ class Exploration(object):
 
     @classmethod
     def create_default_exploration(
-            cls, exploration_id, title, category, objective='',
+            cls, exploration_id, title=feconf.DEFAULT_EXPLORATION_TITLE,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
             language_code=feconf.DEFAULT_LANGUAGE_CODE):
         init_state_dict = State.create_default_state(
             feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
@@ -1348,8 +1350,8 @@ class Exploration(object):
         # from an ExplorationModel/dictionary MUST be exhaustive and complete.
         exploration = cls.create_default_exploration(
             exploration_dict['id'],
-            exploration_dict['title'],
-            exploration_dict['category'],
+            title=exploration_dict['title'],
+            category=exploration_dict['category'],
             objective=exploration_dict['objective'],
             language_code=exploration_dict['language_code'])
         exploration.tags = exploration_dict['tags']
@@ -1441,13 +1443,15 @@ class Exploration(object):
         if not isinstance(self.title, basestring):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' % self.title)
-        utils.require_valid_name(self.title, 'the exploration title')
+        utils.require_valid_name(
+            self.title, 'the exploration title', allow_empty=True)
 
         if not isinstance(self.category, basestring):
             raise utils.ValidationError(
                 'Expected category to be a string, received %s'
                 % self.category)
-        utils.require_valid_name(self.category, 'the exploration category')
+        utils.require_valid_name(
+            self.category, 'the exploration category', allow_empty=True)
 
         if not isinstance(self.objective, basestring):
             raise utils.ValidationError(
@@ -1650,6 +1654,14 @@ class Exploration(object):
                 self._verify_no_dead_ends()
             except utils.ValidationError as e:
                 warnings_list.append(unicode(e))
+
+            if not self.title:
+                warnings_list.append(
+                    'A title must be specified (in the \'Settings\' tab).')
+
+            if not self.category:
+                warnings_list.append(
+                    'A category must be specified (in the \'Settings\' tab).')
 
             if not self.objective:
                 warnings_list.append(
@@ -2413,8 +2425,8 @@ class Exploration(object):
         if not (1 <= exploration_schema_version
                 <= cls.CURRENT_EXP_SCHEMA_VERSION):
             raise Exception(
-                'Sorry, we can only process v1 to v%s YAML files at '
-                'present.' % cls.CURRENT_EXP_SCHEMA_VERSION)
+                'Sorry, we can only process v1 to v%s exploration YAML files '
+                'at present.' % cls.CURRENT_EXP_SCHEMA_VERSION)
         if exploration_schema_version == 1:
             exploration_dict = cls._convert_v1_dict_to_v2_dict(
                 exploration_dict)
@@ -2547,6 +2559,7 @@ class Exploration(object):
                 for (state_name, state) in self.states.iteritems()
             },
             'title': self.title,
+            'language_code': self.language_code,
         }
 
     def get_gadget_types(self):
@@ -2562,18 +2575,20 @@ class Exploration(object):
     def get_interaction_ids(self):
         """Get all interaction ids used in this exploration."""
         return list(set([
-            state.interaction.id for state in self.states.itervalues()]))
+            state.interaction.id for state in self.states.itervalues()
+            if state.interaction.id is not None]))
 
 
 class ExplorationSummary(object):
     """Domain object for an Oppia exploration summary."""
 
     def __init__(self, exploration_id, title, category, objective,
-                 language_code, tags, ratings, status,
+                 language_code, tags, ratings, scaled_average_rating, status,
                  community_owned, owner_ids, editor_ids,
                  viewer_ids, contributor_ids, contributors_summary, version,
                  exploration_model_created_on,
-                 exploration_model_last_updated):
+                 exploration_model_last_updated,
+                 first_published_msec):
         """'ratings' is a dict whose keys are '1', '2', '3', '4', '5' and whose
         values are nonnegative integers representing frequency counts. Note
         that the keys need to be strings in order for this dict to be
@@ -2586,6 +2601,7 @@ class ExplorationSummary(object):
         self.language_code = language_code
         self.tags = tags
         self.ratings = ratings
+        self.scaled_average_rating = scaled_average_rating
         self.status = status
         self.community_owned = community_owned
         self.owner_ids = owner_ids
@@ -2596,3 +2612,4 @@ class ExplorationSummary(object):
         self.version = version
         self.exploration_model_created_on = exploration_model_created_on
         self.exploration_model_last_updated = exploration_model_last_updated
+        self.first_published_msec = first_published_msec

@@ -19,8 +19,8 @@
 describe('Rating display directive', function() {
   var elt, scope, $httpBackend, compiledElem, ctrlScope;
 
-  beforeEach(module('oppia'));
   beforeEach(module('directiveTemplates'));
+  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
   beforeEach(inject(function(
       $rootScope, $compile, _$httpBackend_, $templateCache) {
     $httpBackend = _$httpBackend_;
@@ -36,13 +36,13 @@ describe('Rating display directive', function() {
       '</rating-display>');
     compiledElem = $compile(elt)(scope);
     scope.$digest();
-    ctrlScope = elt.isolateScope();
+    ctrlScope = elt[0].isolateScope();
   }));
 
   it('should display the correct number of stars', function() {
     ctrlScope.ratingValue = 4.2;
     scope.$digest();
-    // Note the array here is zero-indexed but ratings are one-indexed
+    // Note the array here is zero-indexed but ratings are one-indexed.
     expect(ctrlScope.stars[0].cssClass).toBe('fa-star');
     expect(ctrlScope.stars[1].cssClass).toBe('fa-star');
     expect(ctrlScope.stars[2].cssClass).toBe('fa-star');

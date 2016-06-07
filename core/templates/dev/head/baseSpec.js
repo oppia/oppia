@@ -31,17 +31,6 @@ describe('Base controller', function() {
       });
     }));
 
-    it('should check if an object is empty', function() {
-      var a = {
-        a: 'b'
-      };
-      var isEmpty = scope.isEmpty(a);
-      expect(isEmpty).toEqual(false);
-      var b = {};
-      var isEmpty = scope.isEmpty(b);
-      expect(isEmpty).toEqual(true);
-    });
-
     it('should have matching fuzzy rule constants',
         inject(function($injector) {
       expect($injector.get('DEFAULT_FUZZY_RULE').rule_type).toEqual(

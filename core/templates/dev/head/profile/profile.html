@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
-{% block subtitle %}
-  Profile
-{% endblock subtitle %}
+{% block maintitle %}
+  Profile - Oppia
+{% endblock maintitle %}
 
 {% block header_js %}
   {{ super() }}
@@ -32,9 +32,22 @@
 {% block content %}
   <div class="oppia-profile-container" ng-controller="Profile">
     <md-card class="oppia-profile-user-card">
+      <div class="oppia-profile-picture-container">
+        <div ng-if="profileIsOfCurrentUser" class="oppia-profile-picture">
+          <a href="/preferences">
+            <div class="oppia-profile-picture-mask">
+              <div class="oppia-profile-picture-edit-prompt">
+                Edit avatar
+                <i class="material-icons md-18" title="Edit Profile Picture">&#xE254;</i>
+              </div>
+            </div>
+          </a>
+          <img ng-src="<[profilePictureDataUrl]>" class="oppia-profile-picture-fullsize">
+        </div>
 
-      <img ng-src="<[profilePictureDataUrl]>"
-           class="oppia-profile-picture-fullsize">
+        <img ng-if="!profileIsOfCurrentUser" ng-src="<[profilePictureDataUrl]>"
+             class="oppia-profile-picture-fullsize">
+      </div>
 
       <h2 class="oppia-profile-username-large-screen">
         <span popover-placement="right" ng-attr-popover="<[usernameIsLong ? username.helpText : undefined]>"
@@ -71,11 +84,8 @@
       <p class="oppia-profile-subject-interest-container">
         Interests:
         <span ng-if="subjectInterests.length > 0"><br>
-          <span ng-repeat="interest in subjectInterests track by $index">
-            <span class="oppia-profile-subject-interest">
-              <[interest]>
-            </span>
-          </span>
+          <!-- The following tag should remain on a single line due to http://bugzilla.mozilla.org/show_bug.cgi?id=922773. -->
+          <span ng-repeat="interest in subjectInterests track by $index"><span class="oppia-profile-subject-interest"><[interest]></span></span>
         </span>
         <span ng-if="subjectInterests.length === 0" class="oppia-profile-no-interests-text">
           <em>none specified</em>

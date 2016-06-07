@@ -21,28 +21,29 @@ oppia.directive('searchBar', [function() {
     restrict: 'E',
     templateUrl: 'components/searchBar',
     controller: [
-      '$scope', '$rootScope', '$timeout', '$window', '$location',
-      'searchService', 'oppiaDebouncer', 'oppiaHtmlEscaper',
-      'ExplorationCreationButtonService', 'urlService',
+      '$scope', '$rootScope', '$timeout', '$window', '$location', '$translate',
+      'searchService', 'oppiaDebouncer', 'oppiaHtmlEscaper', 'urlService',
+      'i18nIdService',
       function(
-          $scope, $rootScope, $timeout, $window, $location,
-          searchService, oppiaDebouncer, oppiaHtmlEscaper,
-          ExplorationCreationButtonService, urlService) {
+          $scope, $rootScope, $timeout, $window, $location, $translate,
+          searchService, oppiaDebouncer, oppiaHtmlEscaper, urlService,
+          i18nIdService) {
         $scope.isSearchInProgress = searchService.isSearchInProgress;
         $scope.SEARCH_DROPDOWN_CATEGORIES = (
           GLOBALS.SEARCH_DROPDOWN_CATEGORIES.map(
             function(categoryName) {
               return {
                 id: categoryName,
-                text: categoryName
+                text: i18nIdService.getLibraryId('categories', categoryName)
               };
             }
-          ));
+          )
+        );
         $scope.ALL_LANGUAGE_CODES = GLOBALS.LANGUAGE_CODES_AND_NAMES.map(
           function(languageItem) {
             return {
               id: languageItem.code,
-              text: languageItem.name
+              text: i18nIdService.getLibraryId('languages', languageItem.code)
             };
           });
 
@@ -66,6 +67,10 @@ oppia.directive('searchBar', [function() {
           }
         };
 
+        // Non-translatable parts of the html strings, like numbers or user
+        // names.
+        $scope.translationData = {};
+
         // Update the description, numSelections and summary fields of the
         // relevant entry of $scope.selectionDetails.
         var updateSelectionDetails = function(itemsType) {
@@ -84,15 +89,25 @@ oppia.directive('searchBar', [function() {
           $scope.selectionDetails[itemsType].numSelections = totalCount;
 
           $scope.selectionDetails[itemsType].summary = (
-            totalCount === 0 ? (
-              'All ' + itemsName.charAt(0).toUpperCase() +
-                       itemsName.substr(1)) :
+            totalCount === 0 ? 'I18N_LIBRARY_ALL_' + itemsName.toUpperCase() :
             totalCount === 1 ? selectedItems[0] :
-            totalCount + ' ' + itemsName);
+            'I18N_LIBRARY_N_' + itemsName.toUpperCase());
+          $scope.translationData[itemsName + 'Count'] = totalCount;
 
-          $scope.selectionDetails[itemsType].description = (
-            selectedItems.length > 0 ? selectedItems.join(', ') :
-            'All ' + itemsName + ' selected');
+          // TODO(milit): When the language changes, the translations won't
+          // change until the user changes the selection and this function is
+          // re-executed.
+          if (selectedItems.length > 0) {
+            var translatedItems = [];
+            for (var i = 0; i < selectedItems.length; i++) {
+              translatedItems.push($translate.instant(selectedItems[i]));
+            };
+            $scope.selectionDetails[itemsType].description = (
+              translatedItems.join(', '));
+          } else {
+            $scope.selectionDetails[itemsType].description = (
+              'I18N_LIBRARY_ALL_' + itemsName.toUpperCase() + '_SELECTED');
+          }
         };
 
         $scope.toggleSelection = function(itemsType, optionName) {
@@ -182,8 +197,30 @@ oppia.directive('searchBar', [function() {
             if ($window.location.pathname == '/search/find') {
               onSearchQueryChangeExec();
             }
+
+            refreshSearchBarLabels();
           }
         );
+
+        var refreshSearchBarLabels = function() {
+          // If you translate these strings in the html, then you must use a
+          // filter because only the first 14 characters are displayed. That
+          // would generate FOUC for languages other than English. As an
+          // exception, we translate them here and update the translation every
+          // time the language is changed.
+          $scope.searchBarPlaceholder = $translate.instant(
+            'I18N_LIBRARY_SEARCH_PLACEHOLDER');
+          // 'messageformat' is the interpolation method for plural forms.
+          // http://angular-translate.github.io/docs/#/guide/14_pluralization.
+          $scope.categoryButtonText = $translate.instant(
+            $scope.selectionDetails.categories.summary,
+            $scope.translationData, 'messageformat');
+          $scope.languageButtonText = $translate.instant(
+            $scope.selectionDetails.languageCodes.summary,
+            $scope.translationData, 'messageformat');
+        };
+
+        $rootScope.$on('$translateChangeSuccess', refreshSearchBarLabels);
       }
     ]
   };

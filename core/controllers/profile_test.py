@@ -28,7 +28,8 @@ class SignupTest(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get(feconf.SIGNUP_URL)
         self.assertEqual(response.status_int, 200)
-        response.mustcontain(no=['Logout', 'Sign in'])
+        # Sign in can't be inside an html tag, but can appear inside js code
+        response.mustcontain(no=['Logout', '>Sign in'])
         self.logout()
 
     def test_going_somewhere_else_while_signing_in_logs_user_out(self):
@@ -268,6 +269,27 @@ class ProfileLinkTests(test_utils.GenericTestBase):
 
 class ProfileDataHandlerTests(test_utils.GenericTestBase):
 
+    def test_preference_page_updates(self):
+        self.signup(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+        response = self.testapp.get('/preferences')
+        csrf_token = self.get_csrf_token_from_response(response)
+        original_preferences = self.get_json('/preferenceshandler/data')
+        self.assertEqual(
+            ['en'], original_preferences['preferred_language_codes'])
+        self.assertIsNone(original_preferences['preferred_site_language_code'])
+        self.put_json(
+            '/preferenceshandler/data',
+            {'update_type': 'preferred_site_language_code', 'data': 'en'},
+            csrf_token=csrf_token)
+        self.put_json(
+            '/preferenceshandler/data',
+            {'update_type': 'preferred_language_codes', 'data': ['de']},
+            csrf_token=csrf_token)
+        new_preferences = self.get_json('/preferenceshandler/data')
+        self.assertEqual(new_preferences['preferred_language_codes'], ['de'])
+        self.assertEqual(new_preferences['preferred_site_language_code'], 'en')
+
     def test_profile_data_is_independent_of_currently_logged_in_user(self):
         self.signup(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)
@@ -432,3 +454,37 @@ class UserContributionsTests(test_utils.GenericTestBase):
         self.assertEqual(
             response_dict['edited_exp_summary_dicts'][0]['objective'],
             'the objective')
+
+
+class SiteLanguageHandlerTests(test_utils.GenericTestBase):
+
+    def test_save_site_language_handler(self):
+        """Test the language is saved in the preferences when handler is called.
+        """
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        language_code = 'es'
+        self.login(self.EDITOR_EMAIL)
+        response = self.testapp.get('/preferences')
+        self.assertEqual(response.status_int, 200)
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.put_json('/preferenceshandler/data', {
+            'update_type': 'preferred_site_language_code',
+            'data': language_code,
+        }, csrf_token)
+
+        preferences = self.get_json('/preferenceshandler/data')
+        self.assertIsNotNone(preferences)
+        self.assertEqual(
+            preferences['preferred_site_language_code'], language_code)
+
+        self.logout()
+
+    def test_save_site_language_no_user(self):
+        """The SiteLanguageHandler handler can be called without a user."""
+        response = self.testapp.get(feconf.SPLASH_URL)
+        self.assertEqual(response.status_int, 200)
+        csrf_token = self.get_csrf_token_from_response(
+            response, token_type=feconf.CSRF_PAGE_NAME_I18N)
+        self.put_json(feconf.SITE_LANGUAGE_DATA_URL, {
+            'site_language_code': 'es',
+        }, csrf_token)

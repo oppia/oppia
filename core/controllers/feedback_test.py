@@ -246,7 +246,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
     def test_no_username_shown_for_logged_out_learners(self):
         new_exp_id = 'new_eid'
         exploration = exp_domain.Exploration.create_default_exploration(
-            new_exp_id, 'A title', 'A category')
+            new_exp_id, title='A title', category='A category')
         exp_services.save_new_exploration(self.editor_id, exploration)
         rights_manager.publish_exploration(self.editor_id, new_exp_id)
 

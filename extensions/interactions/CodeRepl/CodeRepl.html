@@ -11,6 +11,7 @@
     background-color: #222;
     color: white;
     font-weight: bold;
+    max-height: 600px;
   }
   .code-repl-terminal-error {
     background-color: #222;
@@ -32,32 +33,44 @@
   .CodeMirror-lines {
     background-color: white;
   }
+  .code-repl-container {
+    background: #fff;
+    padding: 8px;
+    width: 100%;
+  }
 
+  @media screen and (max-width: 959px) {
+    .code-repl-container {
+      width: 100vw;
+    }
+  }
 </style>
 
 <script type="text/ng-template" id="interaction/CodeRepl">
-  <div>
-    <form ng-submit="runAndSubmitCode(code)">
-      <div class="code-repl-input-box">
-        <div ui-codemirror="{onLoad: initCodeEditor}">
+  <div class="code-repl-container">
+    <div>
+      <form ng-submit="runAndSubmitCode(code)">
+        <div class="code-repl-input-box">
+          <div ui-codemirror="{onLoad: initCodeEditor}">
+          </div>
         </div>
-      </div>
-      <md-button type="button" class="md-raised" ng-click="runCode(code)" ng-disabled="!hasLoaded">Test Run</md-button>
-      <md-button type="submit" class="md-raised" ng-disabled="!hasLoaded">Submit</md-button>
-      <span class="code-repl-language">
-        <em>Language: <[language]></em>
-      </span>
-    </form>
-  </div>
+        <md-button type="button" class="md-raised" ng-click="runCode(code)" ng-disabled="!hasLoaded">Test Run</md-button>
+        <md-button type="submit" class="md-raised" ng-disabled="!hasLoaded">Submit</md-button>
+        <span class="code-repl-language">
+          <em>Language: <[language]></em>
+        </span>
+      </form>
+    </div>
 
-  <hr>
+    <hr>
 
-  <div ng-if="fullError">
-    <pre class="code-repl-terminal-error"><[fullError]></pre>
-  </div>
-  <div ng-if="!fullError">
-    <pre ng-if="output" class="code-repl-terminal"><[output]></pre>
-    <pre ng-if="!output" class="code-repl-terminal">[No terminal output]</pre>
+    <div ng-if="fullError">
+      <pre class="code-repl-terminal-error"><[fullError]></pre>
+    </div>
+    <div ng-if="!fullError">
+      <pre ng-if="output" class="code-repl-terminal"><[output]></pre>
+      <pre ng-if="!output" class="code-repl-terminal">[No terminal output]</pre>
+    </div>
   </div>
 </script>
 

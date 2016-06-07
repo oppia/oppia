@@ -503,7 +503,7 @@ class MapReduceJobIntegrationTests(test_utils.GenericTestBase):
         """Create an exploration so that there is something to count."""
         super(MapReduceJobIntegrationTests, self).setUp()
         exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id', 'title', 'A category')
+            'exp_id')
         exp_services.save_new_exploration('owner_id', exploration)
         self.process_and_flush_pending_tasks()
 
@@ -603,7 +603,7 @@ class TwoClassesMapReduceJobIntegrationTests(test_utils.GenericTestBase):
         """Create an exploration so that there is something to count."""
         super(TwoClassesMapReduceJobIntegrationTests, self).setUp()
         exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id', 'title', 'A category')
+            'exp_id')
         # Note that this ends up creating an entry in the
         # ExplorationRightsModel as well.
         exp_services.save_new_exploration('owner_id', exploration)
@@ -741,7 +741,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         super(ContinuousComputationTests, self).setUp()
 
         exploration = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, 'title', 'A category')
+            self.EXP_ID)
         exp_services.save_new_exploration('owner_id', exploration)
         self.process_and_flush_pending_tasks()
 

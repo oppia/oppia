@@ -73,6 +73,23 @@ _EXCLUSIVE_GROUP.add_argument(
     help='specific files to be linted. Space separated list',
     action='store')
 
+BAD_PATTERNS = {
+    '__author__': (
+        'Please remove author tags from this file.'),
+    'datetime.datetime.now()': (
+        'Please use datetime.datetime.utcnow() instead of'
+        'datetime.datetime.now().'),
+    '\t': (
+        'Please use spaces instead of tabs.'),
+    '\r': (
+        'Please make sure all files only have LF endings (no CRLF).')
+}
+
+EXCLUDED_PATHS = (
+    'third_party/*', '.git/*', '*.pyc', 'CHANGELOG',
+    'scripts/pre_commit_linter.py', 'integrations/*',
+    'integrations_dev/*', '*.svg', '*.png', '*.zip', '*.ico', '*.jpg')
+
 if not os.getcwd().endswith('oppia'):
     print ''
     print 'ERROR    Please run this script from the oppia root directory.'
@@ -251,15 +268,12 @@ def _lint_py_files(config_pylint, files_to_lint, result):
             _MESSAGE_TYPE_SUCCESS, num_py_files, time.time() - start_time))
 
 
-def _pre_commit_linter():
+def _get_all_files():
     """This function is used to check if this script is ran from
-    root directory, node-jscs dependencies are installed
-    and pass JSCS binary path
+    root directory and to return a list of all the files for linting and
+    pattern checks.
     """
-
     jscsrc_path = os.path.join(os.getcwd(), '.jscsrc')
-    pylintrc_path = os.path.join(os.getcwd(), '.pylintrc')
-
     parsed_args = _PARSER.parse_args()
     if parsed_args.path:
         input_path = os.path.join(os.getcwd(), parsed_args.path)
@@ -289,6 +303,15 @@ def _pre_commit_linter():
         all_files = valid_filepaths
     else:
         all_files = _get_changed_filenames()
+    return all_files
+
+
+def _pre_commit_linter(all_files):
+    """This function is used to check if node-jscs dependencies are installed
+    and pass JSCS binary path
+    """
+    jscsrc_path = os.path.join(os.getcwd(), '.jscsrc')
+    pylintrc_path = os.path.join(os.getcwd(), '.pylintrc')
 
     config_jscsrc = '--config=%s' % jscsrc_path
     config_pylint = '--rcfile=%s' % pylintrc_path
@@ -342,10 +365,60 @@ def _pre_commit_linter():
     summary_messages.append(py_result.get())
     print '\n'.join(summary_messages)
     print ''
+    return summary_messages
 
+
+def _check_bad_patterns(all_files):
+    """This function is used for detecting bad patterns.
+    """
+    print 'Starting Pattern Checks'
+    print '----------------------------------------'
+    total_files_checked = 0
+    total_error_count = 0
+    summary_messages = []
+    all_files = [
+        filename for filename in all_files if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
+    failed = False
+    for filename in all_files:
+        with open(filename) as f:
+            content = f.read()
+            total_files_checked += 1
+            for pattern in BAD_PATTERNS:
+                if pattern in content:
+                    failed = True
+                    print '%s --> %s' % (
+                        filename, BAD_PATTERNS[pattern])
+                    total_error_count += 1
+    if failed:
+        summary_message = '%s   Pattern checks failed' % _MESSAGE_TYPE_FAILED
+        summary_messages.append(summary_message)
+    else:
+        summary_message = '%s   Pattern checks passed' % _MESSAGE_TYPE_SUCCESS
+        summary_messages.append(summary_message)
+
+    print ''
+    print '----------------------------------------'
+    print ''
+    if total_files_checked == 0:
+        print "There are no files to be checked."
+    else:
+        print '(%s files checked, %s errors found)' % (
+            total_files_checked, total_error_count)
+        print summary_message
+
+    return summary_messages
+
+
+def main():
+    all_files = _get_all_files()
+    linter_messages = _pre_commit_linter(all_files)
+    pattern_messages = _check_bad_patterns(all_files)
+    all_messages = linter_messages + pattern_messages
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
-            summary_messages]):
+            all_messages]):
         sys.exit(1)
 
+
 if __name__ == '__main__':
-    _pre_commit_linter()
+    main()
