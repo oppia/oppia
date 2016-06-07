@@ -349,6 +349,49 @@ class UnresolvedAnswersTests(test_utils.GenericTestBase):
             stats_services.get_top_unresolved_answers_for_default_rule(
                 'eid', 'sid'), {})
 
+    def test_get_total_unresolved_answers_exploration(self):
+        exp = exp_domain.Exploration.create_default_exploration('eid')
+        exp_services.save_new_exploration('fake@user.com', exp)
+
+        state_1 = exp.init_state_name
+        state_2 = 'State 2'
+        exp_services.update_exploration('fake@user.com', 'eid', [{
+            'cmd': 'edit_state_property',
+            'state_name': state_1,
+            'property_name': 'widget_id',
+            'new_value': 'TextInput',
+        }, {
+            'cmd': 'add_state',
+            'state_name': state_2,
+        }, {
+            'cmd': 'edit_state_property',
+            'state_name': state_2,
+            'property_name': 'widget_id',
+            'new_value': 'TextInput',
+        }], 'Add new state')
+
+        self.assertEquals(
+            stats_services.get_total_unresolved_answers_for_exploration(
+                'eid'), 0)
+
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid', 1, state_1, self.DEFAULT_RULESPEC_STR, 'a1')
+        self.assertEquals(
+            stats_services.get_total_unresolved_answers_for_exploration(
+                'eid'), 1)
+
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid', 1, state_1, self.DEFAULT_RULESPEC_STR, 'a2')
+        self.assertEquals(
+            stats_services.get_total_unresolved_answers_for_exploration(
+                'eid'), 2)
+
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid', 1, state_2, self.DEFAULT_RULESPEC_STR, 'a3')
+        self.assertEquals(
+            stats_services.get_total_unresolved_answers_for_exploration(
+                'eid'), 3)
+
 
 class EventLogEntryTests(test_utils.GenericTestBase):
     """Test for the event log creation."""
