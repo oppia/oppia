@@ -499,6 +499,8 @@ CATEGORIES_TO_COLORS = {
     'Languages': '#1b4174',
     'Latin': '#3d5a89',
     'Reading': '#193a69',
+    'Spanish': '#405185',
+    'Gaulish': '#1b4174',
 
     'Business': '#387163',
     'Economics': '#5d8b7f',
