@@ -13,6 +13,8 @@
   "I18N_SPLASH_SITE_FEEDBACK": "Site Feedback",
   "I18N_LIBRARY_PAGE_TITLE": "Exploration Library - Oppia",
   "I18N_LIBRARY_SEARCH_PLACEHOLDER": "What are you curious about?",
+  "I18N_LIBRARY_MAIN_HEADER": "Imagine what you could learn today...",
+  "I18N_LIBRARY_SUB_HEADER": "Begin your adventure by browsing our explorations.",
   "I18N_LIBRARY_ALL_CATEGORIES": "All Categories",
   "I18N_LIBRARY_ALL_CATEGORIES_SELECTED": "All categories selected",
   "I18N_LIBRARY_CATEGORIES_ALGORITHMS": "Algorithms",
