@@ -165,3 +165,11 @@ class PrivacyPage(base.BaseHandler):
             raise self.PageNotFoundException
 
         self.render_template('pages/privacy.html')
+
+
+class AboutRedirectPage(base.BaseHandler):
+    """An page that redirects to the main About page."""
+
+    def get(self):
+        """Handles GET requests."""
+        self.redirect('/about')
