@@ -3257,12 +3257,27 @@ md-card.preview-conversation-skin-supplemental-card {
     width: 48%;
   }
 
-  .oppia-splash-block-left {
+  .oppia-splash-block-left-image {
     float: left;
   }
-  .oppia-splash-block-right {
+  .oppia-splash-block-right-image {
     float: right;
   }
+
+  .oppia-splash-block-left-text {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    float: left;
+  }
+  .oppia-splash-block-right-text {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    float: right;
+  }
+
+
 }
 
 .oppia-activity-summary-tile {
