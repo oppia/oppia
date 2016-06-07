@@ -13,6 +13,8 @@
   "I18N_SPLASH_JAVASCRIPT_ERROR_THANKS": "Thank you.",
   "I18N_LIBRARY_PAGE_TITLE": "Librería - Oppia",
   "I18N_LIBRARY_SEARCH_PLACEHOLDER": "¿Sobre qué tienes curiosidad?",
+  "I18N_LIBRARY_MAIN_HEADER": "Imagina lo que podrías aprender hoy...",
+  "I18N_LIBRARY_SUB_HEADER": "Comienza tu aventura dando un vistazo a nuestras exploraciones.",
   "I18N_LIBRARY_ALL_CATEGORIES": "Todas las áreas",
   "I18N_LIBRARY_ALL_CATEGORIES_SELECTED": "Todas las áreas están seleccionadas",
   "I18N_LIBRARY_CATEGORIES_ALGORITHMS": "Algoritmos",
