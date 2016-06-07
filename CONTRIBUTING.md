@@ -164,7 +164,7 @@ over
   ```
 
 JavaScript
-- We are moving away from using underscores as prefixes for variable names, so, in the future, use `var localVariable` and not `var _localVariable`. Instead, we are adopting the convention that anything declared using `var` is private to the controller/service/etc. If you want a variable to be accessible to the controller, declare it on $scope instead.
+- We are moving away from using underscores as prefixes for variable names, so, in the future, use `var localVariable` and not `var local_variable`. Also, we are adopting the convention that anything declared using `var` is private to the controller/service/etc. If you want a variable to be accessible to the controller, declare it on $scope instead.
 
 CSS
 - Within each CSS rule, attributes should be alphabetized (e.g. 'height' before 'margin' before 'top'). This makes it easy to find the value of an attribute if there are lots of them.
