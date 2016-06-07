@@ -342,7 +342,7 @@ oppia.factory('changeListService', [
       discardAllChanges: function() {
         explorationChangeList = [];
         undoneChangeStack = [];
-        autosaveChangeListOnChange(explorationChangeList);
+        explorationData.discardDraft();
       },
       /**
        * Saves a change dict that represents a change to an exploration
@@ -2351,6 +2351,8 @@ oppia.factory('autosaveInfoModalsService', [
             };
             $scope.hasLostChanges = (lostChanges && lostChanges.length > 0);
             if ($scope.hasLostChanges) {
+              // TODO(sll): This should also include changes to exploration
+              // properties (such as the exploration title, category, etc.).
               $scope.lostChangesHtml = (
                 lostChangesService.makeHumanReadable(lostChanges).html());
               $log.error('Lost changes: ' + JSON.stringify(lostChanges));

@@ -2240,7 +2240,7 @@ div#ng-curtain {
       This needs to take i18n of the "Create" and "Sign in" buttons into
       account.
     */
-    min-width: 530px;
+    min-width: 535px;
   }
 }
 .nav > li > a.oppia-navbar-tab {
@@ -3090,7 +3090,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-library-h2 {
-  color: #ffffff;
+  color: #04857c;
   font-family: "Rubik, regular", "Roboto", Arial, sans-serif;
   padding-bottom: 1em;
 }

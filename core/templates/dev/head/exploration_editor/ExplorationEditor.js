@@ -777,7 +777,14 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
                 explorationLanguageCodeService.saveDisplayedValue();
                 explorationTagsService.saveDisplayedValue();
 
-                $modalInstance.close(metadataList);
+                // TODO(sll): Get rid of the $timeout here. It's currently used
+                // because there is a race condition: the saveDisplayedValue()
+                // calls above result in autosave calls. These race with the
+                // discardDraft() call that will be called when the draft
+                // changes entered here are properly saved to the backend.
+                $timeout(function() {
+                  $modalInstance.close(metadataList);
+                }, 500);
               };
 
               $scope.cancel = function() {
@@ -788,15 +795,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
           ]
         }).result.then(function(metadataList) {
           if (metadataList.length > 0) {
-            var commitMessage = 'Add metadata to the exploration: ';
-            for (var i = 0; i < metadataList.length; i++) {
-              commitMessage += metadataList[i];
-              if (i === metadataList.length - 1) {
-                commitMessage += '.';
-              } else {
-                commitMessage += ', ';
-              }
-            }
+            var commitMessage = (
+              'Add metadata: ' + metadataList.join(', ') + '.');
             saveDraftToBackend(commitMessage, openPublishExplorationModal);
           } else {
             openPublishExplorationModal();
