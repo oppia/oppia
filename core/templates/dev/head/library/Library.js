@@ -79,7 +79,8 @@ oppia.controller('Library', [
 
       var windowWidth = $(window).width() * 0.85;
       $scope.tileDisplayCount = Math.min(
-        Math.floor(windowWidth / tileDisplayWidth), MAX_NUM_TILES_PER_ROW);
+        Math.floor(windowWidth / (tileDisplayWidth + 20)),
+        MAX_NUM_TILES_PER_ROW);
 
       $('.oppia-library-carousel').css({
         width: ($scope.tileDisplayCount * tileDisplayWidth) + 'px'
