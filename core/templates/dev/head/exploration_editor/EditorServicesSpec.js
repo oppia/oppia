@@ -66,7 +66,8 @@ describe('Change list service', function() {
       spyOn(mockWarningsData, 'addWarning');
       mockExplorationData = {
         explorationId: 0,
-        autosaveChangeList: function() {}
+        autosaveChangeList: function() {},
+        discardDraft: function() {}
       };
       module(function($provide) {
         $provide.value('explorationData', mockExplorationData);
