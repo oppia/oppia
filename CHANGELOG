@@ -2,6 +2,92 @@ This file contains a summary of changes to the Oppia code base. For a full chang
 
     https://github.com/oppia/oppia/commits/master
 
+v2.3.0 (7 Jun 2016)
+-------------------
+Site-wide features:
+* Add suppport for internationalization.
+* Add title and meta descriptions.
+* Fix #1845: add a warning if the user has disabled JavaScript.
+* Fix #1900: correctly close the sidebar menu on mobile.
+* Fix #1842: prevent the profile avatar dropping off the top of the page on small screens.
+
+Splash/About pages:
+* Add new About, Teach and Get Involved pages.
+* Reverse the text and update the images in the lower half of the splash page.
+* Redirect to the creator dashboard if the user logs in from the splash page.
+* Use absolute paths for images on the splash page.
+
+Library page:
+* Add a recently-published group to the library index page.
+* Add a top-rated group to the library index page.
+* Add a banner and text to the top of the library index page.
+* Add a footer to the library index page.
+* Filter null explorations from showing up in the library index page.
+* Fix #1456: create summary tiles for collections.
+* Fix #1860: elongate exploration summary tiles to allow two lines of the exploration title to show.
+* Fix #1840: fix the oval around the contributor icons in the exploration summary tiles.
+* Remove avatars from the exploration summary tiles due to latency issues.
+* Remove the on-hover indicator from the library carousel scroll button.
+* Fix #1864: fix carousel behaviour when the user clicks on the scroll button multiple times in rapid succession.
+* Fix #1911: fix incorrect carousel shadow height.
+* Fix #1918: Prevent the site feedback button from being hidden in the library index page.
+* Add new subject icons for Spanish and Gaulish.
+
+Exploration editor:
+* Add functionality for autosaving drafts.
+* Allow jumping to a particular state in preview mode.
+* Prompt for missing metadata fields just before publication.
+* Streamline the saving flow for the various state properties.
+* Refactor the parameter metadata computation into a separate service.
+* Fix #1877: prevent the 'add new response' modal from exiting when a creator clicks outside it.
+* Fix #1829: in the history tab, reduce the space between the committer's username and the exploration version.
+* Fix #1894: prevent the category dropdown list from unnecessarily scrolling to the bottom.
+* Remove the underline button from the rich-text editor toolbar.
+* Remove the "nominate exploration" button from the editor settings page.
+* Remove the 'missing objective' warning.
+
+Collection editor:
+* Introduce a new collection editor (currently in beta).
+
+Creator dashboard:
+* Rename 'My Explorations' to 'Creator Dashboard'.
+* Fix #1954: add collection tiles to the creator dashboard.
+* Fix #1696: introduce a modal for choosing which type of activity to create.
+* Fix #1705: remove the old exploration creation modal.
+
+Learner page:
+* Fix #1489: make the learner view responsive.
+* Fix #1881: remove unnecessary scroll bar.
+* Fix #1814: remove unnecessary button styling and arrows in the tutor card.
+* Fix #1815: place the tutor avatar above the supplemental card.
+* Fix #1818: show the help card at the bottom of the viewport if the interaction is too tall.
+* Fix jerky animation for showing previous answers.
+* Fix #1816: fix single-card to double-card animation.
+* Fix #1817: center the animation at the Oppia avatar position.
+
+Interactions:
+* ItemSelectionInput:
+  - Fix #1766: correctly initialize the notEnoughSelections flag.
+
+Profile page:
+* Fix #1793: allow the user to click on their profile image in order to edit it in their Preferences page.
+* Fix #1826: show subject interests properly in Firefox.
+
+Infrastructure and tests:
+* Improve application performance by disabling debug data.
+* Fix #1540: add tests for detecting bad patterns.
+* Add a one-off test case to check the computation of exploration contributor summaries.
+* Support setting CHROME_BIN to the Chromium browser path in Unix-based systems.
+* Fix #1394: fix Python version check in setup.sh.
+* Fix #1848: set the appropriate http_proxy environment variable if the user is on Vagrant.
+* Increase the default memory in the Vagrantfile to 2048MB.
+* Fix #1836: add a .gitattributes file to set proper EOL terminators.
+* Tighten CSRF payload checks to correctly handle empty request data.
+* Fix #1757: divide e2e tests into separate suites.
+* Fix #1779: split e2e tests into separate suites on Travis-CI.
+* Protractor bugfix: scroll to the top of the page before clicking on the state graph.
+
+
 v2.2.0 (7 May 2016)
 -------------------
 Overall site design and navigation:
@@ -35,7 +121,7 @@ Editor page:
 * Fix a bug in getEditorTabContext() that resulted in incorrect detection of the editor preview mode.
 * Fix #1788: correctly align parameter input fields in Firefox.
 
-Learner:
+Learner page:
 * Fix #1497: ensure that the inter-paragraph spacing behaves correctly.
 * Fix #1678: prevent share links from being squashed in the information card.
 
