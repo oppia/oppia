@@ -318,14 +318,22 @@ class UserStatsMRJobManager(
 
         exponent = 2.0/3
 
+        # This is set to False only when the exploration impact score is not
+        # valid to be calculated.
+        calculate_exploration_impact_score = True
+
         # Get average rating and value per user
         total_rating = 0
         for ratings_value in item.ratings:
             total_rating += item.ratings[ratings_value] * int(ratings_value)
         sum_of_ratings = sum(item.ratings.itervalues())
-        average_rating = (
-            total_rating / sum_of_ratings if sum_of_ratings else None)
-        value_per_user = average_rating - 2
+
+        if not sum_of_ratings:
+            average_rating = None
+            calculate_exploration_impact_score = False
+        else:
+            average_rating = (total_rating / sum_of_ratings)
+            value_per_user = average_rating - 2
 
         statistics = (
             stats_jobs_continuous.StatisticsAggregator.get_statistics(
@@ -349,24 +357,32 @@ class UserStatsMRJobManager(
             item.id)
         contributors = exploration_summary.contributors_summary
         total_commits = sum(contributors.itervalues())
+        if total_commits == 0:
+            calculate_exploration_impact_score = False
+
         for contrib_id in contributors:
-            # Find fractional contribution for each contributor
-            contribution = (
-                contributors[contrib_id] / float(total_commits)
-                if total_commits else 0)
-            # Find score for this specific exploration
-            exploration_impact_score = (value_per_user * reach * contribution
-                                        if value_per_user > 0 else 0)
-            exploration_data = {
-                'exploration_impact_score': exploration_impact_score
-            }
+            exploration_data = {}
+
+            # Set the value of exploration impact score only if it needs to be
+            # calculated.
+            if calculate_exploration_impact_score:
+                # Find fractional contribution for each contributor
+                contribution = (
+                    contributors[contrib_id] / float(total_commits))
+
+                # Find score for this specific exploration
+                exploration_data.update({
+                    'exploration_impact_score': (
+                        value_per_user * reach * contribution)
+                })
+
             # if the user is an owner for the exploration, then update dict with
             # 'average ratings' and 'total plays' as well.
             if contrib_id in exploration_summary.owner_ids:
                 # Get num starts (total plays) for the exploration
-                num_starts = statistics['start_exploration_count']
                 exploration_data.update({
-                    'total_plays_for_owned_exp': num_starts,
+                    'total_plays_for_owned_exp': (
+                        statistics['start_exploration_count']),
                 })
                 # Update data with average rating only if it is not None.
                 if average_rating is not None:

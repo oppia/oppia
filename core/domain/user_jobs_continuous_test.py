@@ -598,12 +598,15 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
     def setUp(self):
         super(UserStatsAggregatorTest, self).setUp()
         self.num_completions = defaultdict(int)
+        self.num_starts = defaultdict(int)
 
     def _mock_get_statistics(self, exp_id, unused_version):
         current_completions = {
             self.EXP_ID_1: {
                 'complete_exploration_count': (
                     self.num_completions[self.EXP_ID_1]),
+                'start_exploration_count': (
+                    self.num_starts[self.EXP_ID_1]),
                 'state_hit_counts': {
                     'state1': {
                         'first_entry_count': 3,
@@ -618,6 +621,8 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
             self.EXP_ID_2: {
                 'complete_exploration_count': (
                     self.num_completions[self.EXP_ID_2]),
+                'start_exploration_count': (
+                    self.num_starts[self.EXP_ID_2]),
                 'state_hit_counts': {
                     'state1': {
                         'first_entry_count': 3,
@@ -630,6 +635,8 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
                 }
             },
             self.EXP_ID_3: {
+                'start_exploration_count': (
+                    self.num_starts[self.EXP_ID_3]),
                 'state_hit_counts': {}
             }
         }
@@ -689,131 +696,132 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
             user_a_id, strict=False)
         self.assertIsNone(user_stats_model)
 
-    # def test_standard_user_stats_calculation_one_exploration(self):
-    #     # Sign up a user and have them create an exploration.
-    #     user_a_id = self._sign_up_user(
-    #         self.USER_A_EMAIL, self.USER_A_USERNAME)
-    #     exploration = self._create_exploration(self.EXP_ID_1, user_a_id)
-    #     # Give this exploration an average rating of 4
-    #     avg_rating = 4
-    #     self._rate_exploration(exploration.id, 5, avg_rating)
+    def test_standard_user_stats_calculation_one_exploration(self):
+        # Sign up a user and have them create an exploration.
+        user_a_id = self._sign_up_user(
+            self.USER_A_EMAIL, self.USER_A_USERNAME)
+        exploration = self._create_exploration(self.EXP_ID_1, user_a_id)
+        # Give this exploration an average rating of 4
+        avg_rating = 4
+        self._rate_exploration(exploration.id, 5, avg_rating)
 
-    #     # See state counts in _mock_get_statistics(), above.
-    #     expected_answer_count = 8
-    #     reach = expected_answer_count ** self.EXPONENT
-    #     expected_user_impact_score = round(
-    #         ((avg_rating - 2) * reach) ** self.EXPONENT)
+        # See state counts in _mock_get_statistics(), above.
+        expected_answer_count = 8
+        reach = expected_answer_count ** self.EXPONENT
+        expected_user_impact_score = round(
+            ((avg_rating - 2) * reach) ** self.EXPONENT)
 
-    #     # Verify that the impact score matches the expected.
-    #     self._run_computation()
-    #     user_stats_model = user_models.UserStatsModel.get(user_a_id)
-    #     self.assertEqual(
-    #         user_stats_model.impact_score, expected_user_impact_score)
+        # Verify that the impact score matches the expected.
+        self._run_computation()
+        # self.process_and_flush_pending_tasks()
+        user_stats_model = user_models.UserStatsModel.get(user_a_id)
+        self.assertEqual(
+            user_stats_model.impact_score, expected_user_impact_score)
 
-    # def test_exploration_multiple_contributors(self):
-    #     # Sign up a user and have them create an exploration.
-    #     user_a_id = self._sign_up_user(
-    #         self.USER_A_EMAIL, self.USER_A_USERNAME)
-    #     user_b_id = self._sign_up_user(
-    #         self.USER_B_EMAIL, self.USER_B_USERNAME)
-    #     exploration = self._create_exploration(self.EXP_ID_1, user_a_id)
-    #     # Give this exploration an average rating of 4
-    #     avg_rating = 4
-    #     self._rate_exploration(exploration.id, 5, avg_rating)
-    #     exp_services.update_exploration(user_b_id, self.EXP_ID_1, [], '')
+    def test_exploration_multiple_contributors(self):
+        # Sign up a user and have them create an exploration.
+        user_a_id = self._sign_up_user(
+            self.USER_A_EMAIL, self.USER_A_USERNAME)
+        user_b_id = self._sign_up_user(
+            self.USER_B_EMAIL, self.USER_B_USERNAME)
+        exploration = self._create_exploration(self.EXP_ID_1, user_a_id)
+        # Give this exploration an average rating of 4
+        avg_rating = 4
+        self._rate_exploration(exploration.id, 5, avg_rating)
+        exp_services.update_exploration(user_b_id, self.EXP_ID_1, [], '')
 
-    #     # See state counts in _mock_get_statistics(), above.
-    #     expected_answer_count = 8
-    #     reach = expected_answer_count ** self.EXPONENT
-    #     contrib = 0.5
-    #     expected_user_impact_score = round(
-    #         ((avg_rating - 2) * reach * contrib) ** self.EXPONENT)
+        # See state counts in _mock_get_statistics(), above.
+        expected_answer_count = 8
+        reach = expected_answer_count ** self.EXPONENT
+        contrib = 0.5
+        expected_user_impact_score = round(
+            ((avg_rating - 2) * reach * contrib) ** self.EXPONENT)
 
-    #     # Verify that the impact score matches the expected.
-    #     self._run_computation()
-    #     user_stats_model = user_models.UserStatsModel.get(user_a_id)
-    #     self.assertEqual(
-    #         user_stats_model.impact_score, expected_user_impact_score)
-    #     user_stats_model = user_models.UserStatsModel.get(user_b_id)
-    #     self.assertEqual(
-    #         user_stats_model.impact_score, expected_user_impact_score)
+        # Verify that the impact score matches the expected.
+        self._run_computation()
+        user_stats_model = user_models.UserStatsModel.get(user_a_id)
+        self.assertEqual(
+            user_stats_model.impact_score, expected_user_impact_score)
+        user_stats_model = user_models.UserStatsModel.get(user_b_id)
+        self.assertEqual(
+            user_stats_model.impact_score, expected_user_impact_score)
 
-    # def test_standard_user_stats_calculation_multiple_explorations(self):
-    #     # Sign up a user and have them create two explorations.
-    #     user_a_id = self._sign_up_user(
-    #         self.USER_A_EMAIL, self.USER_A_USERNAME)
-    #     exploration_1 = self._create_exploration(self.EXP_ID_1, user_a_id)
-    #     exploration_2 = self._create_exploration(self.EXP_ID_2, user_a_id)
-    #     avg_rating = 4
-    #     self._rate_exploration(exploration_1.id, 2, avg_rating)
-    #     self._rate_exploration(exploration_2.id, 2, avg_rating)
+    def test_standard_user_stats_calculation_multiple_explorations(self):
+        # Sign up a user and have them create two explorations.
+        user_a_id = self._sign_up_user(
+            self.USER_A_EMAIL, self.USER_A_USERNAME)
+        exploration_1 = self._create_exploration(self.EXP_ID_1, user_a_id)
+        exploration_2 = self._create_exploration(self.EXP_ID_2, user_a_id)
+        avg_rating = 4
+        self._rate_exploration(exploration_1.id, 2, avg_rating)
+        self._rate_exploration(exploration_2.id, 2, avg_rating)
 
-    #     # See state counts in _mock_get_statistics(), above.
-    #     expected_answer_count = 8
-    #     reach = expected_answer_count ** self.EXPONENT
-    #     impact_per_exp = ((avg_rating - 2) * reach) # * 1 for contribution
-    #     expected_user_impact_score = round(
-    #         (impact_per_exp * 2) ** self.EXPONENT)
+        # See state counts in _mock_get_statistics(), above.
+        expected_answer_count = 8
+        reach = expected_answer_count ** self.EXPONENT
+        impact_per_exp = ((avg_rating - 2) * reach) # * 1 for contribution
+        expected_user_impact_score = round(
+            (impact_per_exp * 2) ** self.EXPONENT)
 
-    #     # Verify that the impact score matches the expected.
-    #     self._run_computation()
-    #     user_stats_model = user_models.UserStatsModel.get(user_a_id)
-    #     self.assertEqual(
-    #         user_stats_model.impact_score, expected_user_impact_score)
+        # Verify that the impact score matches the expected.
+        self._run_computation()
+        user_stats_model = user_models.UserStatsModel.get(user_a_id)
+        self.assertEqual(
+            user_stats_model.impact_score, expected_user_impact_score)
 
-    # def test_only_yield_when_rating_greater_than_two(self):
-    #     """Tests that map only yields an impact score for an
-    #     exploration when the impact score is greater than 0."""
-    #     # Sign up a user and have them create an exploration.
-    #     user_a_id = self._sign_up_user(
-    #         self.USER_A_EMAIL, self.USER_A_USERNAME)
-    #     self._create_exploration(self.EXP_ID_1, user_a_id)
+    def test_only_yield_when_rating_greater_than_two(self):
+        """Tests that map only yields an impact score for an
+        exploration when the impact score is greater than 0."""
+        # Sign up a user and have them create an exploration.
+        user_a_id = self._sign_up_user(
+            self.USER_A_EMAIL, self.USER_A_USERNAME)
+        self._create_exploration(self.EXP_ID_1, user_a_id)
 
-    #     # Give two ratings of 1.
-    #     self._rate_exploration(self.EXP_ID_1, 2, 1)
-    #     self._run_computation()
-    #     user_stats_model = user_models.UserStatsModel.get(
-    #         user_a_id, strict=False)
-    #     self.assertIsNone(user_stats_model)
-    #     ModifiedUserStatsAggregator.stop_computation(user_a_id)
+        # Give two ratings of 1.
+        self._rate_exploration(self.EXP_ID_1, 2, 1)
+        self._run_computation()
+        user_stats_model = user_models.UserStatsModel.get(
+            user_a_id, strict=False)
+        self.assertEqual(user_stats_model.impact_score, 0)
+        ModifiedUserStatsAggregator.stop_computation(user_a_id)
 
-    #     # Give two ratings of 2.
-    #     self._rate_exploration(self.EXP_ID_1, 2, 2)
-    #     self._run_computation()
-    #     user_stats_model = user_models.UserStatsModel.get(
-    #         user_a_id, strict=False)
-    #     self.assertIsNone(user_stats_model)
-    #     ModifiedUserStatsAggregator.stop_computation(user_a_id)
+        # Give two ratings of 2.
+        self._rate_exploration(self.EXP_ID_1, 2, 2)
+        self._run_computation()
+        user_stats_model = user_models.UserStatsModel.get(
+            user_a_id, strict=False)
+        self.assertEqual(user_stats_model.impact_score, 0)
+        ModifiedUserStatsAggregator.stop_computation(user_a_id)
 
-    #     # Give two ratings of 3. The impact score should now be nonzero.
-    #     self._rate_exploration(self.EXP_ID_1, 2, 3)
-    #     self._run_computation()
-    #     user_stats_model = user_models.UserStatsModel.get(
-    #         user_a_id, strict=False)
-    #     self.assertIsNotNone(user_stats_model)
-    #     self.assertGreater(user_stats_model.impact_score, 0)
+        # Give two ratings of 3. The impact score should now be nonzero.
+        self._rate_exploration(self.EXP_ID_1, 2, 3)
+        self._run_computation()
+        user_stats_model = user_models.UserStatsModel.get(
+            user_a_id, strict=False)
+        self.assertIsNotNone(user_stats_model)
+        self.assertGreater(user_stats_model.impact_score, 0)
 
-    # def test_impact_for_exp_with_no_answers(self):
-    #     """Test that when an exploration has no answers, it is considered to
-    #     have no reach.
-    #     """
-    #     # Sign up a user and have them create an exploration.
-    #     user_a_id = self._sign_up_user(
-    #         self.USER_A_EMAIL, self.USER_A_USERNAME)
-    #     exploration = self._create_exploration(self.EXP_ID_3, user_a_id)
-    #     self._rate_exploration(exploration.id, 5, 3)
-    #     self._run_computation()
-    #     user_stats_model = user_models.UserStatsModel.get(user_a_id)
-    #     self.assertEqual(user_stats_model.impact_score, 0)
+    def test_impact_for_exp_with_no_answers(self):
+        """Test that when an exploration has no answers, it is considered to
+        have no reach.
+        """
+        # Sign up a user and have them create an exploration.
+        user_a_id = self._sign_up_user(
+            self.USER_A_EMAIL, self.USER_A_USERNAME)
+        exploration = self._create_exploration(self.EXP_ID_3, user_a_id)
+        self._rate_exploration(exploration.id, 5, 3)
+        self._run_computation()
+        user_stats_model = user_models.UserStatsModel.get(user_a_id)
+        self.assertEqual(user_stats_model.impact_score, 0)
 
-    # def test_impact_for_exp_with_no_ratings(self):
-    #     """Test that when an exploration has no ratings, the impact returned
-    #     from the impact function is 0.
-    #     """
-    #     # Sign up a user and have them create an exploration.
-    #     user_a_id = self._sign_up_user(
-    #         self.USER_A_EMAIL, self.USER_A_USERNAME)
-    #     self._create_exploration(self.EXP_ID_1, user_a_id)
-    #     user_stats_model = user_models.UserStatsModel.get(
-    #         user_a_id, strict=False)
-    #     self.assertEqual(user_stats_model, None)
+    def test_impact_for_exp_with_no_ratings(self):
+        """Test that when an exploration has no ratings, the impact returned
+        from the impact function is 0.
+        """
+        # Sign up a user and have them create an exploration.
+        user_a_id = self._sign_up_user(
+            self.USER_A_EMAIL, self.USER_A_USERNAME)
+        self._create_exploration(self.EXP_ID_1, user_a_id)
+        user_stats_model = user_models.UserStatsModel.get(
+            user_a_id, strict=False)
+        self.assertEqual(user_stats_model, None)
