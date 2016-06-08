@@ -104,17 +104,6 @@
       {% endif %}
     </script>
 
-    <script type="text/javascript" language="JavaScript">
-       NumberOfClouds = 4;
-       FirstPart = '<img src="/images/library/banner';
-       LastPart = '.svg" align="center" width="100%">';
-       function printImage() {
-       var r = Math.ceil(Math.random() * NumberOfClouds);
-       document.write(FirstPart + r + LastPart);
-       }
-       //-->
-    </script>
-
     {% block header_js %}
       {% include 'header_js_libs.html' %}
     {% endblock header_js %}
