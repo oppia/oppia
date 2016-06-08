@@ -378,8 +378,7 @@ class ModifiedInteractionAnswerSummariesMRJobManager(
 class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
     """Tests for interaction answer view aggregations."""
 
-    CONTINUOUS_MANAGERS_FOR_TESTS = [
-        ModifiedInteractionAnswerSummariesAggregator]
+    ALL_CC_MANAGERS_FOR_TESTS = [ModifiedInteractionAnswerSummariesAggregator]
 
     def _record_start(self, exp_id, exp_version, state_name, session_id):
         event_services.StartExplorationEventHandler.record(
@@ -389,7 +388,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
     def test_one_answer(self):
         with self.swap(
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-            self.CONTINUOUS_MANAGERS_FOR_TESTS):
+            self.ALL_CC_MANAGERS_FOR_TESTS):
 
             # setup example exploration
             exp_id = 'eid'
@@ -489,7 +488,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
     def test_answers_across_multiple_exploration_versions(self):
         with self.swap(
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-            self.CONTINUOUS_MANAGERS_FOR_TESTS):
+            self.ALL_CC_MANAGERS_FOR_TESTS):
 
             # Setup example exploration.
             exp_id = 'eid'
@@ -642,7 +641,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
     def test_multiple_computations_in_one_job(self):
         with self.swap(
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-            self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+            self.ALL_CC_MANAGERS_FOR_TESTS):
 
             # setup example exploration
             exp_id = 'eid'

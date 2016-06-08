@@ -27,7 +27,6 @@ from core.tests import test_utils
 class StateAnswersTests(test_utils.GenericTestBase):
     """Test the state answers domain object."""
 
-    DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
     SESSION_ID = 'SESSION_ID'
     TIME_SPENT = 5.0
     PARAMS = {}

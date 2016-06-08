@@ -151,9 +151,9 @@ class BaseJobManager(object):
         cls._post_start_hook(job_id)
 
     @classmethod
-    def register_completion(cls, job_id, output):
+    def register_completion(cls, job_id, output_list):
         """Marks a job as completed."""
-        _MAX_OUTPUT_LENGTH = 100000
+        _MAX_OUTPUT_LENGTH = 900000
 
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)
@@ -163,10 +163,21 @@ class BaseJobManager(object):
 
         model.status_code = STATUS_CODE_COMPLETED
         model.time_finished_msec = utils.get_current_time_in_millisecs()
-        if len(output) > _MAX_OUTPUT_LENGTH:
-            output = output[:_MAX_OUTPUT_LENGTH]
-            output += ' <TRUNCATED>'
-        model.output = output
+
+        # TODO(bhenning): Add tests for this.
+        output_str_list = ['%s' % output_value for output_value in output_list]
+
+        cutoff_index = 0
+        total_output_size = 0
+        for idx, output_str in enumerate(output_str_list):
+            cutoff_index += 1
+            total_output_size += len(output_str)
+            if total_output_size >= _MAX_OUTPUT_LENGTH:
+                max_element_length = total_output_size - _MAX_OUTPUT_LENGTH
+                output_str_list[idx] = output_str[:max_element_length]
+                output_str_list[idx] += ' <TRUNCATED>'
+                break
+        model.output = output_str_list[:cutoff_index]
         model.put()
 
         cls._post_completed_hook(job_id)
@@ -359,7 +370,7 @@ class BaseDeferredJobManager(BaseJobManager):
         # Note that the job may have been canceled after it started and before
         # it reached this stage. This will result in an exception when the
         # validity of the status code transition is checked.
-        cls.register_completion(job_id, result)
+        cls.register_completion(job_id, [result])
         logging.info(
             'Job %s completed at %s' %
             (job_id, utils.get_current_time_in_millisecs()))
