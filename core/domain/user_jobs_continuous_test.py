@@ -713,7 +713,6 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
 
         # Verify that the impact score matches the expected.
         self._run_computation()
-        # self.process_and_flush_pending_tasks()
         user_stats_model = user_models.UserStatsModel.get(user_a_id)
         self.assertEqual(
             user_stats_model.impact_score, expected_user_impact_score)

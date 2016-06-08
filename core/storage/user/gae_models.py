@@ -142,7 +142,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     Impact scores are calculated over explorations for which a user
     is listed as a contributor
 
-    The impact score for a particular user, where impact is defined as:
+    The impact score for a particular user is defined as:
     Sum of (
     ln(playthroughs) * (ratings_scaler) * (average(ratings) - 2.5))
     *(multiplier),

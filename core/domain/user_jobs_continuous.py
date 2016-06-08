@@ -264,8 +264,8 @@ class UserStatsRealtimeModel(
 
 
 class UserStatsAggregator(jobs.BaseContinuousComputationManager):
-    """A continuous-computation job that computes the impact score
-    for every user.
+    """A continuous-computation job that computes user stats for creator
+    dashboard.
 
     This job does not have a working realtime component: the
     UserStatsRealtimeModel does nothing. There will be a delay in
