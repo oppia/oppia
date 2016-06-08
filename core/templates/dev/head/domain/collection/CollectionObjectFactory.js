@@ -17,7 +17,6 @@
  * collection domain objects.
  */
 
-// TODO(bhenning): Implement validation functions and related tests.
 oppia.factory('CollectionObjectFactory', [
     'CollectionNodeObjectFactory', 'SkillListObjectFactory',
     function(CollectionNodeObjectFactory, SkillListObjectFactory) {
@@ -25,6 +24,8 @@ oppia.factory('CollectionObjectFactory', [
       this._id = collectionBackendObject.id;
       this._title = collectionBackendObject.title;
       this._objective = collectionBackendObject.objective;
+      this._languageCode = collectionBackendObject.language_code;
+      this._tags = collectionBackendObject.tags;
       this._category = collectionBackendObject.category;
       this._version = collectionBackendObject.version;
       this._nodes = [];
@@ -54,6 +55,14 @@ oppia.factory('CollectionObjectFactory', [
       this._title = title;
     };
 
+    Collection.prototype.getCategory = function() {
+      return this._category;
+    };
+
+    Collection.prototype.setCategory = function(category) {
+      this._category = category;
+    };
+
     Collection.prototype.getObjective = function() {
       return this._objective;
     };
@@ -62,12 +71,20 @@ oppia.factory('CollectionObjectFactory', [
       this._objective = objective;
     };
 
-    Collection.prototype.getCategory = function() {
-      return this._category;
+    Collection.prototype.getLanguageCode = function() {
+      return this._languageCode;
     };
 
-    Collection.prototype.setCategory = function(category) {
-      this._category = category;
+    Collection.prototype.setLanguageCode = function(languageCode) {
+      this._languageCode = languageCode;
+    };
+
+    Collection.prototype.getTags = function() {
+      return this._tags;
+    };
+
+    Collection.prototype.setTags = function(tags) {
+      this._tags = tags;
     };
 
     Collection.prototype.getVersion = function() {
@@ -114,6 +131,15 @@ oppia.factory('CollectionObjectFactory', [
       return false;
     };
 
+    // Deletes all collection nodes within this collection.
+    Collection.prototype.clearCollectionNodes = function() {
+      // Clears the existing array in-place, since there may be Angular bindings
+      // to this array and they can't be reset to empty arrays.See for context:
+      // http://stackoverflow.com/a/1232046
+      this._nodes.length = 0;
+      this._explorationIdToNodeIndexMap = {};
+    };
+
     // Returns whether any collection nodes in this collection reference the
     // provided exploration ID.
     Collection.prototype.containsCollectionNode = function(explorationId) {
@@ -148,6 +174,14 @@ oppia.factory('CollectionObjectFactory', [
       return this._nodes;
     };
 
+    // Returns a list of collection nodes which are initially available to play
+    // by the player.
+    Collection.prototype.getStartingCollectionNodes = function() {
+      return this._nodes.filter(function(collectionNode) {
+        return collectionNode.getPrerequisiteSkillList().isEmpty();
+      });
+    };
+
     // Returns a list of all exploration IDs referenced by this collection.
     // Changes to the list itself will not be reflected in this collection.
     Collection.prototype.getExplorationIds = function() {
@@ -169,11 +203,40 @@ oppia.factory('CollectionObjectFactory', [
       return skillList;
     };
 
+    // Reassigns all values within this collection to match the existing
+    // collection. This is performed as a deep copy such that none of the
+    // internal, bindable objects are changed within this collection. Note that
+    // the collection nodes within this collection will be completely redefined
+    // as copies from the specified collection.
+    Collection.prototype.copyFromCollection = function(otherCollection) {
+      this._id = otherCollection.getId();
+      this.setTitle(otherCollection.getTitle());
+      this.setCategory(otherCollection.getCategory());
+      this.setObjective(otherCollection.getObjective());
+      this.setLanguageCode(otherCollection.getLanguageCode());
+      this.setTags(otherCollection.getTags());
+      this._version = otherCollection.getVersion();
+      this.clearCollectionNodes();
+
+      var nodes = otherCollection.getCollectionNodes();
+      for (var i = 0; i < nodes.length; i++) {
+        this.addCollectionNode(angular.copy(nodes[i]));
+      }
+    };
+
     // Static class methods. Note that "this" is not available in static
     // contexts. This function takes a JSON object which represents a backend
     // collection python dict.
     Collection.create = function(collectionBackendObject) {
       return new Collection(collectionBackendObject);
+    };
+
+    // Create a new, empty collection. This is not guaranteed to pass validation
+    // tests.
+    Collection.createEmptyCollection = function() {
+      return new Collection({
+        nodes: []
+      });
     };
 
     return Collection;

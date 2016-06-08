@@ -49,7 +49,7 @@ def get_visualizations_info(exploration_id, state_name):
         # state.
         # pylint: disable=line-too-long
         calc_output_domain_object = (
-            stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output(
+            stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
                 exploration_id, state_name, calculation_id))
 
         # If the calculation job has not yet been run for this state, we simply

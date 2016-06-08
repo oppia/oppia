@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Directives for all reusable data visualization components.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 // Each visualization receives two variables: 'data' and 'options'. The exact
@@ -25,7 +23,8 @@ oppia.directive('oppiaVisualizationBarChart', [function() {
   return {
     restrict: 'E',
     scope: {},
-    controller: ['$scope', '$attrs', '$element', 'oppiaHtmlEscaper', function($scope, $attrs, $element, oppiaHtmlEscaper) {
+    controller: ['$scope', '$attrs', '$element', 'oppiaHtmlEscaper',
+    function($scope, $attrs, $element, oppiaHtmlEscaper) {
       $scope.data = oppiaHtmlEscaper.escapedJsonToObj($attrs.data);
       $scope.options = oppiaHtmlEscaper.escapedJsonToObj($attrs.options);
 
@@ -37,12 +36,16 @@ oppia.directive('oppiaVisualizationBarChart', [function() {
       var data = google.visualization.arrayToDataTable(dataArray);
 
       var options = {
-        chartArea: {width: '60%'},
+        chartArea: {
+          width: '60%'
+        },
         hAxis: {
           title: 'Number of times answer was submitted',
           minValue: 0
         },
-        legend: {position: 'none'}
+        legend: {
+          position: 'none'
+        }
       };
 
       var chart = new google.visualization.BarChart($element[0]);
@@ -51,13 +54,13 @@ oppia.directive('oppiaVisualizationBarChart', [function() {
   };
 }]);
 
-
 oppia.directive('oppiaVisualizationFrequencyTable', [function() {
   return {
     restrict: 'E',
     scope: {},
     templateUrl: 'visualizations/FrequencyTable',
-    controller: ['$scope', '$attrs', 'oppiaHtmlEscaper', function($scope, $attrs, oppiaHtmlEscaper) {
+    controller: ['$scope', '$attrs', 'oppiaHtmlEscaper',
+    function($scope, $attrs, oppiaHtmlEscaper) {
       $scope.data = oppiaHtmlEscaper.escapedJsonToObj($attrs.data);
       $scope.options = oppiaHtmlEscaper.escapedJsonToObj($attrs.options);
     }]

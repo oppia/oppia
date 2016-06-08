@@ -22,18 +22,10 @@
 oppia.factory('oppiaExplorationHtmlFormatterService', [
   '$filter', 'extensionTagAssemblerService', 'oppiaHtmlEscaper',
   function($filter, extensionTagAssemblerService, oppiaHtmlEscaper) {
-    var _NULL_INTERACTION_HTML = (
-      '<span style="color: red;"><strong>Error</strong>: ' +
-      'No interaction specified.</span>');
-
     return {
       getInteractionHtml: function(
           interactionId, interactionCustomizationArgSpecs,
           labelForFocusTarget) {
-        if (!interactionId) {
-          return _NULL_INTERACTION_HTML;
-        }
-
         var htmlInteractionId = $filter('camelCaseToHyphens')(interactionId);
         var element = $('<oppia-interactive-' + htmlInteractionId + '>');
 

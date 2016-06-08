@@ -22,66 +22,89 @@
 // in order to make the testing and production environments match.
 var oppia = angular.module(
   'oppia', [
-    'ngMaterial', 'ngAnimate', 'ngSanitize', 'ngResource', 'ui.bootstrap',
-    'ui.sortable', 'infinite-scroll', 'ngJoyRide', 'ngImgCrop', 'ui.validate',
-    'textAngular', 'toastr'
+    'ngMaterial', 'ngAnimate', 'ngSanitize', 'ngTouch', 'ngResource',
+    'ui.bootstrap', 'ui.sortable', 'infinite-scroll', 'ngJoyRide', 'ngImgCrop',
+    'ui.validate', 'textAngular', 'pascalprecht.translate', 'ngCookies',
+    'toastr'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
                    : []));
 
-// Set the AngularJS interpolators as <[ and ]>, to not conflict with Jinja2
-// templates.
-// Set default headers for POST and PUT requests.
-// Add an interceptor to convert requests to strings and to log and show
-// warnings for error responses.
-oppia.config(['$interpolateProvider', '$httpProvider',
-    function($interpolateProvider, $httpProvider) {
-  $interpolateProvider.startSymbol('<[');
-  $interpolateProvider.endSymbol(']>');
+oppia.config([
+  '$compileProvider', '$httpProvider', '$interpolateProvider',
+  '$locationProvider',
+  function(
+      $compileProvider, $httpProvider, $interpolateProvider,
+      $locationProvider) {
+    // This improves performance by disabling debug data. For more details,
+    // see https://code.angularjs.org/1.5.5/docs/guide/production
+    $compileProvider.debugInfoEnabled(false);
 
-  $httpProvider.defaults.headers.post = {
-    'Content-Type': 'application/x-www-form-urlencoded'
-  };
-  $httpProvider.defaults.headers.put = {
-    'Content-Type': 'application/x-www-form-urlencoded'
-  };
+    // Set the AngularJS interpolators as <[ and ]>, to not conflict with
+    // Jinja2 templates.
+    $interpolateProvider.startSymbol('<[');
+    $interpolateProvider.endSymbol(']>');
 
-  $httpProvider.interceptors.push([
-    '$q', '$log', 'alertsService', function($q, $log, alertsService) {
-      return {
-        request: function(config) {
-          // If this request carries data (in the form of a JS object),
-          // JSON-stringify it and store it under 'payload'.
-          if (config.data) {
-            config.data = $.param({
-              csrf_token: GLOBALS.csrf_token,
-              payload: JSON.stringify(config.data),
-              source: document.URL
-            }, true);
-          }
-          return config;
-        },
-        responseError: function(rejection) {
-          // A rejection status of -1 seems to indicate (it's hard to find
-          // documentation) that the response has not completed,
-          // which can occur if the user navigates away from the page
-          // while the response is pending, This should not be considered
-          // an error.
-          if (rejection.status !== -1) {
-            $log.error(rejection.data);
-
-            var warningMessage = 'Error communicating with server.';
-            if (rejection.data && rejection.data.error) {
-              warningMessage = rejection.data.error;
-            }
-            alertsService.addWarning(warningMessage);
-          }
-          return $q.reject(rejection);
-        }
-      };
+    // Prevent the search page from reloading if the search query is changed.
+    $locationProvider.html5Mode(false);
+    if (window.location.pathname == '/search/find') {
+      $locationProvider.html5Mode(true);
     }
-  ]);
-}]);
+
+    // Set default headers for POST and PUT requests.
+    $httpProvider.defaults.headers.post = {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    };
+    $httpProvider.defaults.headers.put = {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    };
+
+    // Add an interceptor to convert requests to strings and to log and show
+    // warnings for error responses.
+    $httpProvider.interceptors.push([
+      '$q', '$log', 'alertsService', function($q, $log, alertsService) {
+        return {
+          request: function(config) {
+            // If this request carries data (in the form of a JS object),
+            // JSON-stringify it and store it under 'payload'.
+            var csrfToken = '';
+            if (config.data) {
+              var csrfToken = (
+                config.requestIsForCreateExploration ?
+                  GLOBALS.csrf_token_create_exploration :
+                config.requestIsForI18n ? GLOBALS.csrf_token_i18n :
+                GLOBALS.csrf_token);
+
+              config.data = $.param({
+                csrf_token: csrfToken,
+                payload: JSON.stringify(config.data),
+                source: document.URL
+              }, true);
+            }
+            return config;
+          },
+          responseError: function(rejection) {
+            // A rejection status of -1 seems to indicate (it's hard to find
+            // documentation) that the response has not completed,
+            // which can occur if the user navigates away from the page
+            // while the response is pending, This should not be considered
+            // an error.
+            if (rejection.status !== -1) {
+              $log.error(rejection.data);
+
+              var warningMessage = 'Error communicating with server.';
+              if (rejection.data && rejection.data.error) {
+                warningMessage = rejection.data.error;
+              }
+              alertsService.addWarning(warningMessage);
+            }
+            return $q.reject(rejection);
+          }
+        };
+      }
+    ]);
+  }
+]);
 
 oppia.config(['$provide', function($provide) {
   $provide.decorator('$log', ['$delegate', function($delegate) {
@@ -252,9 +275,9 @@ oppia.factory('validatorsService', [
      *   butterbar.
      * @return {boolean} True if the entity name is valid, false otherwise.
      */
-    isValidEntityName: function(input, showWarnings) {
+    isValidEntityName: function(input, showWarnings, allowEmpty) {
       input = $filter('normalizeWhitespace')(input);
-      if (!input) {
+      if (!input && !allowEmpty) {
         if (showWarnings) {
           alertsService.addWarning('Please enter a non-empty name.');
         }
@@ -272,6 +295,21 @@ oppia.factory('validatorsService', [
           return false;
         }
       }
+      return true;
+    },
+    isValidExplorationTitle: function(input, showWarnings) {
+      if (!this.isValidEntityName(input, showWarnings)) {
+        return false;
+      }
+
+      if (input.length > 40) {
+        if (showWarnings) {
+          alertsService.addWarning(
+            'Exploration titles should be at most 40 characters long.');
+        }
+        return false;
+      }
+
       return true;
     },
     // NB: this does not check whether the card name already exists in the
@@ -420,17 +458,31 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
     registerNewSignupEvent: function() {
       _sendEventToGoogleAnalytics('SignupButton', 'click', '');
     },
-    registerOpenExplorationCreationModalEvent: function() {
+    registerClickBrowseLibraryButtonEvent: function() {
       _sendEventToGoogleAnalytics(
-        'CreateExplorationModal', 'open', $window.location.pathname);
+        'BrowseLibraryButton', 'click', $window.location.pathname);
+    },
+    registerClickCreateExplorationButtonEvent: function() {
+      _sendEventToGoogleAnalytics(
+        'CreateExplorationButton', 'click', $window.location.pathname);
     },
     registerCreateNewExplorationEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics('NewExploration', 'create', explorationId);
+    },
+    registerCreateNewExplorationInCollectionEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
-        'NewExploration', 'create', explorationId);
+        'NewExplorationFromCollection', 'create', explorationId);
+    },
+    registerCreateNewCollectionEvent: function(collectionId) {
+      _sendEventToGoogleAnalytics('NewCollection', 'create', collectionId);
     },
     registerCommitChangesToPrivateExplorationEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
         'CommitToPrivateExploration', 'click', explorationId);
+    },
+    registerOpenPublishExplorationModalEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'PublishExplorationModal', 'open', explorationId);
     },
     registerPublishExplorationEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(

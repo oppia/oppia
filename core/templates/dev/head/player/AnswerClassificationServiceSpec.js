@@ -18,6 +18,7 @@
 
 describe('Answer classification service', function() {
   beforeEach(module('oppia'));
+  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
   var EXPLICIT_CLASSIFICATION = 'explicit';
   var DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome';

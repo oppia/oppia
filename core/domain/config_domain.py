@@ -1,3 +1,5 @@
+# coding: utf-8
+#
 # Copyright 2014 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,6 +43,7 @@ class ConfigProperty(object):
     these names:
     - admin_email_address
     - banner_alt_text
+    - carousel_slides_config
     - contribute_gallery_page_announcement
     - editor_page_announcement
     - editor_prerequisites_agreement
@@ -48,6 +51,7 @@ class ConfigProperty(object):
     - sharing_options_twitter_text
     - splash_page_exploration_id
     - splash_page_exploration_version
+    - splash_page_youtube_video_id
     """
 
     def refresh_default_value(self, default_value):

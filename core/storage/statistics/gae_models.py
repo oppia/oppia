@@ -160,7 +160,9 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
     client_time_spent_in_secs = ndb.FloatProperty(indexed=True)
     # Current parameter values, map of parameter name to value
     params = ndb.JsonProperty(indexed=False)
-    # Which type of play-through this is (preview, from gallery)
+    # Which type of play-through this is (editor preview, or learner view).
+    # Note that the 'playtest' option is legacy, since editor preview
+    # playthroughs no longer emit events.
     play_type = ndb.StringProperty(indexed=True,
                                    choices=[feconf.PLAY_TYPE_PLAYTEST,
                                             feconf.PLAY_TYPE_NORMAL])
@@ -250,7 +252,9 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     client_time_spent_in_secs = ndb.FloatProperty(indexed=True)
     # Current parameter values, map of parameter name to value
     params = ndb.JsonProperty(indexed=False)
-    # Which type of play-through this is (preview, from gallery)
+    # Which type of play-through this is (editor preview, or learner view).
+    # Note that the 'playtest' option is legacy, since editor preview
+    # playthroughs no longer emit events.
     play_type = ndb.StringProperty(indexed=True,
                                    choices=[feconf.PLAY_TYPE_PLAYTEST,
                                             feconf.PLAY_TYPE_NORMAL])
@@ -334,7 +338,9 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     client_time_spent_in_secs = ndb.FloatProperty(indexed=True)
     # Current parameter values, map of parameter name to value
     params = ndb.JsonProperty(indexed=False)
-    # Which type of play-through this is (preview, from gallery)
+    # Which type of play-through this is (editor preview, or learner view).
+    # Note that the 'playtest' option is legacy, since editor preview
+    # playthroughs no longer emit events.
     play_type = ndb.StringProperty(indexed=True,
                                    choices=[feconf.PLAY_TYPE_PLAYTEST,
                                             feconf.PLAY_TYPE_NORMAL])
@@ -403,7 +409,9 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
     session_id = ndb.StringProperty(indexed=True)
     # Current parameter values, map of parameter name to value
     params = ndb.JsonProperty(indexed=False)
-    # Which type of play-through this is (preview, from gallery)
+    # Which type of play-through this is (editor preview, or learner view).
+    # Note that the 'playtest' option is legacy, since editor preview
+    # playthroughs no longer emit events.
     play_type = ndb.StringProperty(indexed=True,
                                    choices=[feconf.PLAY_TYPE_PLAYTEST,
                                             feconf.PLAY_TYPE_NORMAL])
@@ -699,7 +707,6 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
             instance.put()
         except Exception as e:
             logging.error(e)
-            pass
 
     @classmethod
     def get_model(cls, exploration_id, exploration_version, state_name,

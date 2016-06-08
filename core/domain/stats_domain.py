@@ -291,7 +291,7 @@ class StateAnswersCalcOutput(object):
         # There is a danger of data overflow if answer_opts exceeds 1MB. This
         # will be addressed later if it happens regularly. At the moment, a
         # ValidationError is raised if an answer exceeds the maximum size.
-        MAX_BYTES_PER_CALC_OUTPUT_DATA = 999999
+        max_bytes_per_calc_output_data = 999999
 
         if not isinstance(self.exploration_id, basestring):
             raise utils.ValidationError(
@@ -309,7 +309,7 @@ class StateAnswersCalcOutput(object):
                 self.calculation_id)
 
         output_data = self.calculation_output
-        if sys.getsizeof(output_data) > MAX_BYTES_PER_CALC_OUTPUT_DATA:
+        if sys.getsizeof(output_data) > max_bytes_per_calc_output_data:
             # TODO(msl): find a better way to deal with big
             # calculation output data, e.g. just skip. At the moment,
             # too long answers produce a ValidationError.

@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+
+{% block subtitle %}
+  Teach
+{% endblock subtitle %}
+
+{% block header_js %}
+  {{ super() }}
+
+  <style>
+    html, body {
+      background-color: #eee;
+    }
+  </style>
+{% endblock %}
+
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      Teach with Oppia
+    </li>
+  </ul>
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+  <div class="oppia-page-card oppia-about-content">
+    <div class="about-nav oppia-profile-tabs md-tab oppia-about-teach-tabs">
+      <ul class="oppia-about-tabs">
+        <li class="oppia-profile-tabs oppia-about-tabs-active">
+          <a class="oppia-about-tabs-text" href="teach" name="teach">
+            Teach with Oppia
+          </a>
+        </li>
+        <li class="oppia-profile-tabs">
+          <a class="oppia-about-tabs-text" href="playbook" name="playbook">
+            Participation Playbook
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="about-tab-container">
+      <div class="teach oppia-about-tab-content oppia-about-visible-content">
+
+        <div class="oppia-about-card-content-wide oppia-about-card-content-narrow">
+          <h2>
+            Teach with Oppia
+          </h2>
+
+          <div class="oppia-about-card-content-wide oppia-about-three-cols-container">
+            <div class="oppia-about-three-cols-layout oppia-about-three-cols-feature">
+              <img src="images/general/creator-create-exp.png">
+              <h3>Create an Exploration</h3>
+              <p style="margin-top: -10px;">
+                about a topic you care about.
+              </p>
+            </div>
+            <div class="oppia-about-three-cols-layout oppia-about-three-cols-feature">
+              <img src="images/general/creator-pub-share.png">
+              <h3>Publish &amp; Share</h3>
+              <p style="margin-top: -10px;">
+                your creations with the community.
+              </p>
+            </div>
+            <div class="oppia-about-three-cols-layout oppia-about-three-cols-feature">
+              <img src="images/general/creator-feedback.png">
+              <h3>Earn feedback</h3>
+              <p style="margin-top: -10px;">
+                to improve your exploration.
+              </p>
+            </div>
+          </div>
+
+          <hr>
+
+          <p>
+            How do pendulums work? Is light a particle or a wave? What is art?
+            Can you explain topics like these to a student who wants to learn
+            more? If so, you can use Oppia's unique technology to recreate 1-on-1
+            tutoring and reach students around the world by creating and sharing
+            a single piece of learning material.
+          </p>
+
+          <p>
+            With Oppia, you can create <em>explorations</em> that help students
+            learn in a fun and creative way, using videos, images, and open-ended
+            questions. Students often have similar misconceptions, and Oppia
+            helps you organize these so that you can give targeted feedback to a
+            group of students at a time. By teaching with Oppia, you can
+            communicate with students around the world, understand different
+            points of view, and improve your skills in communication and empathy.
+          </p>
+          <p>
+            Don't feel comfortable enough to teach yet? You can
+            also collaborate with other Oppia creators by sharing feedback on
+            lessons to help create a better experience for students. Whether
+            you're a K-12 educator, a graduate student, or an individual who's
+            passionate about a specific subject and wants to share your
+            knowledge, Oppia welcomes you!
+          </p>
+        </div>
+      </div>
+
+      <div class="playbook oppia-about-tab-content">
+        <div class="oppia-about-card-content-wide oppia-about-card-content-narrow">
+          <h2>Community Guidelines</h2>
+          <ol>
+            <li>
+              <p>
+                <strong>Once published, explorations can be played and commented on by anyone in the Oppia community.</strong>
+                With everyone's input, we can continuously improve explorations and make learning as perfect as possible.
+              </p>
+            </li>
+            <li>
+              <p>
+                <strong>Use good judgement when publishing explorations.</strong>
+                Explorations should have significant educational value and
+                cannot contain advertising, spam, vandalism and/or abuse.
+              </p>
+            </li>
+            <li>
+              <p>
+                <strong>Be a good citizen.</strong>
+                Creating multiple accounts, using explorations to trick users,
+                circumventing features meant to encourage improvement of explorations or
+                other such antisocial behavior will not be tolerated and may result in account suspension.
+              </p>
+            </li>
+          </ol>
+          <p>
+            If you're unsure about an exploration topic or
+            need clarification on guidelines, you can ask us on our <a href="{{SITE_FORUM_URL}}" class="inline-links">forum</a>.
+          </p>
+
+          <h2>Publication Criteria</h2>
+          <p>
+            These publication criteria ensure explorations can be meaningfully tested,
+            continually developed, and refined in a way that makes them fit to be featured.
+            They're meant to be objective and precise so you can easily determine whether an exploration is fit for publication.
+          </p>
+          <strong>
+            <em>An exploration should:</em>
+          </strong>
+          <p>
+            <strong>Teach something meaningful</strong>
+            - Present information that's new to the target audience.
+            Don't just test knowledge the target audience is already assumed to have.
+          </p>
+          <p>
+            <strong>Teach more than a single factoid</strong>
+            - Explorations should be either "deep" or "broad".
+            "Deep" means an involved, tricky concept that has nuances and depth.
+            "Broad" means a collection of related, interesting facts the learner can understand and
+            better remember after completing the exploration.
+          </p>
+          <p>
+            <strong>Give informative feedback</strong>
+            - Don't just tell learners if they're correct or incorrect — explain reasoning.
+            Tell learners why something is right or wrong, and how to correct it if necessary.
+            Make your exploration more than just a quiz!
+          </p>
+          <p>
+            <strong>Avoid duplicating existing explorations</strong>
+            - The beauty of Oppia is that everyone works together to make explorations maximally effective.
+            If you'd like to teach an existing topic, first try submitting feedback for the current exploration or improving it.
+            Only if you use a significantly different teaching style should you create a completely new exploration.
+          </p>
+          <a name="featured-criteria"></a>
+          <h2>"Featured criteria"</h2>
+          <p>
+            Featured explorations are educational, are interesting to learners, and
+            use our interactive, discovery-based learning style.
+            For help on crafting useful feedback and creating explorations that fit these "Featured" criteria,
+            check out our <a href="http://oppia.github.io/#/DesignTips" class="inline-links">Design Tips</a> page!
+          </p>
+          <strong>
+            <em>A featured exploration is:</em>
+          </strong>
+          <p>
+            <strong>More than memorization</strong>
+            - The exploration does more than simply provide facts to memorize.
+            It helps the user genuinely understand interesting concepts.
+          </p>
+          <p>
+            <strong>Learning, not assessment</strong>
+            - The exploration doesn't just quiz the learner.
+            It presents and builds upon new concepts.
+          </p>
+          <p>
+            <strong>Interactive</strong>
+            - Users learn by doing. They have a chance to reason about concepts, try out new knowledge, and
+            receive useful feedback on responses.
+          </p>
+          <p>
+            <strong>Formative feedback</strong>
+            - The exploration's feedback gives learners new, useful insights.
+            It finds a good middle ground between telling the learner they're wrong (or right), and
+            giving the entire answer away. Also, the feedback should cover a wide range of potential replies.
+          </p>
+          <p>
+            <strong>Complete and polished</strong>
+              - Not only is the exploration free of typos, factual errors and bugs, it's well-written and easy to read.
+              Additionally, it delivers all the content promised in the learning objective and in the exploration itself.
+          </p>
+
+          <h2>Publication policy</h2>
+          <p>
+            The following policies help Oppia moderators enforce the criteria for publishing and featuring explorations.
+          </p>
+
+          <strong>Publishing an Exploration</strong>
+          <p>
+            Any owner of a private exploration can publish it at any time.
+            However, if the exploration does not fit the publication criteria, the site moderators may unpublish or delete it.
+            (The norm is to unpublish; deletion is only likely in egregious cases, such as outright spam.)
+          </p>
+
+          <strong>Editing rights</strong>
+          <p>
+            Explorations are meant to be polished and developed until they're "featured exploration" material.
+            An exploration that hasn't been edited for a long time may be considered "orphaned".
+            In this case, ownership may be handed to the community at large (at moderator discretion),
+            so that Oppia community members can continue to improve it.
+          </p>
+          <p>
+            Note that when you embed a particular version of your exploration in your site,
+            it won't change unless the original exploration is unpublished or deleted.
+            This means that even if you or other community members make changes to the exploration,
+            the version embedded on your website will remain the same.
+          </p>
+
+          <strong>Releasing an exploration</strong>
+          <p>
+            We hope to make the exploration-release process community-driven soon,
+            but here's how it works now: When an owner of an exploration
+            — or anyone involved in the process — thinks the exploration is ready to be featured,
+            they can post to the
+            <a href="{{MODERATOR_REQUEST_FORUM_URL}}" class="inline-links">Moderator Requests forum</a>.
+            A moderator will play through the exploration, look at its structure, and
+            decide whether it fits the
+            <a href="#featured-criteria" class="inline-links">"Featured" criteria</a>.
+            If it does, the exploration will be marked as featured.
+            If it doesn't, the moderator will work with the creator(s) to improve the exploration.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="oppia-about-extra-container about-tab-container">
+    <div class="oppia-about-tab-content oppia-about-visible-content">
+      <div class="oppia-about-extra-info about-otter-buttons">
+        <div class="oppia-about-content oppia-about-extra-content">
+          <div class="oppia-about-card-content-wide oppia-about-buttons-container">
+            <a href="/dashboard?mode=create" class="btn oppia-about-button">Create an exploration</a>
+            <a href="/library" class="btn oppia-about-button">Browse all explorations</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    $(document).ready(function() {
+      var activeTabClass = 'oppia-about-tabs-active';
+      var hash = window.location.hash.slice(1);
+      var visibleContent = 'oppia-about-visible-content';
+
+      function activateTab(tabName) {
+        $("a[name='" + tabName + "']").parent().addClass(activeTabClass).siblings().removeClass(activeTabClass);
+        $('.' + tabName).addClass(visibleContent).siblings().removeClass(visibleContent);
+      }
+
+      if (hash === 'teach') {
+        activateTab('teach');
+      } else if (hash === 'playbook') {
+        activateTab("playbook");
+      }
+
+      window.onhashchange = function() {
+        var hashChange = window.location.hash.slice(1);
+        if (hashChange === 'teach') {
+          activateTab('teach');
+        } else if (hashChange === 'playbook') {
+          activateTab('playbook');
+        }
+      };
+
+      $('.oppia-about-tabs li').on('click', function(evt) {
+        evt.preventDefault();
+        $(this).addClass(activeTabClass).siblings().removeClass(activeTabClass);
+        var currentAttrVal = $(this).children('a').attr('href');
+        $('.' + currentAttrVal).addClass(visibleContent).siblings().removeClass(visibleContent);
+      });
+    });
+  </script>
+{% endblock %}
+
+{% block footer%}
+  {% include 'footer.html' %}
+{% endblock %}

@@ -44,7 +44,8 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UserFirstContributionMsecOneOffJob,
     exp_jobs_one_off.ExplorationMigrationJobManager,
     exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob,
-    email_jobs_one_off.EmailHashRegenerationOneOffJob]
+    email_jobs_one_off.EmailHashRegenerationOneOffJob,
+    user_jobs_one_off.UserProfilePictureOneOffJob]
 
 # List of all ContinuousComputation managers to show controls for on the
 # admin dashboard.

@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
-{% block subtitle %}
-  {{ exploration_title }}
-{% endblock subtitle %}
+{% block maintitle %}
+  {{ exploration_title }} - Oppia
+{% endblock maintitle %}
 
 {% block header_js %}
   {{ super() }}
@@ -26,7 +26,7 @@
       <span class="oppia-navbar-breadcrumb-separator"></span>
       <span class="protractor-test-exploration-header" itemprop="description">{{exploration_title}}</span>
     </li>
-    <li ng-click="showInformationCard()" tooltip="Info" tooltip-placement="bottom" style="cursor: pointer;" class="protractor-test-exploration-info-icon">
+    <li ng-click="showInformationCard()" tooltip="<['I18N_PLAYER_INFO_TOOLTIP' | translate]>" tooltip-placement="bottom" style="cursor: pointer;" class="protractor-test-exploration-info-icon">
       <i class="material-icons oppia-navbar-breadcrumb-icon" style="font-size: 20px; vertical-align: middle;">&#xE88E;</i>
     </li>
   </ul>
@@ -107,7 +107,6 @@
     {{ include_js_file('domain/exploration/ExplorationObjectFactory.js') }}
     {{ include_js_file('domain/exploration/StateObjectFactory.js') }}
     {{ include_js_file('domain/utilities/StopwatchObjectFactory.js') }}
-    {{ include_js_file('domain/utilities/UrlInterpolationService.js') }}
 
     {{ include_js_file('player/AnswerClassificationService.js') }}
     {{ include_js_file('player/AnswerFeedbackPairDirective.js') }}

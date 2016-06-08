@@ -75,7 +75,8 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
         pass
 
     @classmethod
-    def _handle_event(cls, exploration_id, exploration_version, state_name,
+    def _handle_event(
+            cls, exploration_id, exploration_version, state_name,
             answer_group_index, rule_spec_index, classification_categorization,
             session_id, time_spent_in_secs, params, normalized_answer):
         """Records an event when an answer triggers a rule. The answer recorded
@@ -99,8 +100,9 @@ class StartExplorationEventHandler(BaseEventHandler):
     EVENT_TYPE = feconf.EVENT_TYPE_START_EXPLORATION
 
     @classmethod
-    def _handle_event(cls, exp_id, exp_version, state_name, session_id,
-                      params, play_type):
+    def _handle_event(
+            cls, exp_id, exp_version, state_name, session_id, params,
+            play_type):
         stats_models.StartExplorationEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id, params,
             play_type)

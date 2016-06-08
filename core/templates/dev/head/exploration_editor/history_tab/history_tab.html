@@ -1,0 +1,133 @@
+<style>
+  .CodeMirror-merge-copy {
+    display: none;
+  }
+  .CodeMirror-merge, .CodeMirror-merge .CodeMirror {
+    height: 55vh;
+  }
+  .state-diff-modal .modal-dialog {
+    max-width: 1200px;
+    width: 90%;
+  }
+  .state-diff-modal .modal-body {
+    height: 60vh;
+  }
+  #legend-graph .node rect {
+    pointer-events: none;
+  }
+</style>
+<div ng-controller="HistoryTab" class="container-fluid" style="word-wrap: break-word;">
+  <md-card class="oppia-editor-card">
+    <h3>List of Changes</h3>
+    <div ng-repeat="versionCheckbox in versionCheckboxArray " class="row">
+      <div class="col-sm-4 col-md-4 col-lg-4">
+        <input type="checkbox" name="compareVer" ng-model="versionCheckbox.selected" ng-init="init()" ng-click="changeSelectedVersions($event, versionCheckbox.vnum)" ng-disabled="isCheckboxDisabled(versionCheckbox.vnum)" ng-hide="comparisonsAreDisabled" class='protractor-test-history-checkbox-selector'>
+        [<[versionCheckbox.vnum]>]
+        <strong><profile-link-text username="explorationVersionMetadata[versionCheckbox.vnum].committerId"></profile-link-text></strong>
+      </div>
+      <div class="col-sm-4 col-md-4 col-lg-4">
+        <[explorationVersionMetadata[versionCheckbox.vnum].commitMessage]>
+      </div>
+      <div class="col-sm-4 col-md-4 col-lg-4">
+        <span>
+          <em><[explorationVersionMetadata[versionCheckbox.vnum].createdOnStr]></em>
+          <span ng-if="versionCheckbox.vnum !== currentVersion && editabilityService.isEditable()">
+            | <a href="#" class='protractor-test-revert-version' ng-click="showRevertExplorationModal(versionCheckbox.vnum)">Revert</a>
+          </span>
+          <span>
+            | <a href="#" ng-click="downloadExplorationWithVersion(versionCheckbox.vnum)" title="Download exploration as a zip file.">Download</a>
+          </span>
+        </span>
+      </div>
+    </div>
+
+    <br>
+
+    <div ng-hide="!explorationVersionMetadata || compareVersionsButtonIsHidden">
+      <button class="btn protractor-test-show-history-graph" ng-class="{'btn-success': areCompareVersionsSelected(), 'btn-default': !areCompareVersionsSelected()}" ng-click="compareSelectedVersions()" ng-disabled="!areCompareVersionsSelected()">Compare selected revisions</button>
+      <div class="version-count-prompt">
+        <[versionCountPrompt]>
+      </div>
+    </div>
+
+  </md-card>
+
+  <md-card class="oppia-editor-card" ng-hide="hideHistoryGraph || !explorationVersionMetadata" style="position: relative;">
+    <h3>Changes from version <[compareVersionMetadata.earlierVersion.versionNumber]> to version <[compareVersionMetadata.laterVersion.versionNumber]></h3>
+
+    <div ng-hide="diffGraphData" class="oppia-align-center">
+      Loading
+      <loading-dots></loading-dots>
+    </div>
+    <div state-graph-viz class='protractor-test-history-graph' graph-data="diffGraphData" node-colors="diffGraphNodeColors" node-secondary-labels="diffGraphSecondaryLabels" init-state-id2="v1InitStateId" link-property-mapping="DIFF_GRAPH_LINK_PROPERTY_MAPPING" on-click-function="onClickStateInHistoryGraph">
+    </div>
+
+    <div style="position: absolute; right: -100px; top: 10px;" ng-show="diffGraphData">
+      <h4>Exploration Graph Legend</h4>
+      <div ng-disabled="true" state-graph-viz graph-data="legendGraph" node-colors="LEGEND_GRAPH_COLORS" node-secondary-labels="LEGEND_GRAPH_SECONDARY_LABELS" link-property-mapping="LEGEND_GRAPH_LINK_PROPERTY_MAPPING" id="legend-graph"></div>
+    </div>
+  </md-card>
+</div>
+
+<script type="text/ng-template" id="modals/stateDiff">
+  <div class="modal-header">
+    <h3>Changes for <[stateName]><span ng-show="oldStateName"> (was: <[oldStateName]>)</span></h3>
+  </div>
+  <table class="table" style="margin-left: 20px; table-layout: fixed; width: 97%">
+    <!-- Spacing on the left of table and in the middle of the table is to ensure text above each pane is aligned to codemirror gutter. -->
+    <td style="width: 47%; word-wrap: break-word">
+      <div>
+        <strong>Revision #<[compareVersionMetadata.laterVersion.versionNumber]></strong>
+        by
+        <strong><[compareVersionMetadata.laterVersion.committerId]></strong>
+        on
+        <strong><[compareVersionMetadata.laterVersion.createdOn]></strong>
+      </div>
+      <[compareVersionMetadata.laterVersion.commitMessage]>
+    </td>
+    <td style="width: 6%"></td>
+    <td style="width: 47%; word-wrap: break-word">
+      <div>
+        <strong>Revision #<[compareVersionMetadata.earlierVersion.versionNumber]></strong>
+        by
+        <strong><[compareVersionMetadata.earlierVersion.committerId]></strong>
+        on
+        <strong><[compareVersionMetadata.earlierVersion.createdOn]></strong>
+      </div>
+      <[compareVersionMetadata.earlierVersion.commitMessage]>
+    </td>
+  </table>
+  <div class="modal-body" style="margin-top: -30px">
+    <codemirror-mergeview codemirror-mergeview-options="CODEMIRROR_MERGEVIEW_OPTIONS" left-value="yamlStrs.leftPane" right-value="yamlStrs.rightPane"></codemirror-mergeview>
+    <div align="center" style="margin-bottom: 20px">
+      <strong>Click arrows to desynchronize scrolling</strong>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default protractor-test-close-history-state-modal" ng-click="cancel()">Done</button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="modals/revertExploration">
+  <div class="modal-header">
+    <h3>Revert Exploration</h3>
+  </div>
+
+  <div class="modal-body oppia-long-text">
+    <p>
+      You are about to revert this exploration to version <[version]>. All changes made since that older version will be retracted and you will lose any unsaved changes.
+    </p>
+    <p>
+      Before reverting, you can preview the exploration you are reverting to by following <a ng-href="<[getExplorationUrl(version)]>" target="_blank">this link</a>. (It opens in a new window.)
+    </p>
+    <p>
+      Are you sure you want to revert this exploration to version <[version]>?
+    </p>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-danger protractor-test-confirm-revert" ng-click="revert()">Revert</button>
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+  </div>
+</script>

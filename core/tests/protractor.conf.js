@@ -56,7 +56,38 @@ exports.config = {
   // When run without a command line parameter, all suites will run. If run
   // with --suite=smoke, only the patterns matched by that suite will run.
   suites: {
-    full: 'protractor/*.js'
+    full: [
+      'protractor/*.js',
+    ],
+
+    editor: [
+      'protractor/editorAndPlayer.js',
+      'protractor/gadgetEditor.js',
+      'protractor/stateEditor.js',
+      'protractor/fallbacks.js',
+      'protractor/historyTab.js'
+    ],
+
+    extensions: [
+      'protractor/richTextComponents.js',
+      'protractor/interactions.js'
+    ],
+
+    library: [
+      'protractor/explorationRating.js',
+      'protractor/privileges.js',
+      'protractor/publicationAndLibrary.js'
+    ],
+
+    misc: [
+      'protractor/userManagement.js',
+      'protractor/embedding.js',
+      'protractor/preferences.js'
+    ],
+
+    i18n: [
+      'protractor/i18n.js'
+    ]
   },
 
   // ----- Capabilities to be passed to the webdriver instance ----
@@ -66,7 +97,15 @@ exports.config = {
   // and
   // https://code.google.com/p/selenium/source/browse/javascript/webdriver/capabilities.js
   capabilities: {
-    browserName: 'chrome'
+    browserName: 'chrome',
+    chromeOptions: {
+      args: ['lang=en-EN'],
+      prefs: {
+        intl: {
+          accept_languages: 'en-EN'
+        }
+      }
+    }
   },
 
   // If you would like to run more than one instance of webdriver on the same
@@ -78,7 +117,7 @@ exports.config = {
   //
   // A base URL for your application under test. Calls to protractor.get()
   // with relative paths will be prepended with this.
-  baseUrl: 'http://localhost:4445',
+  baseUrl: 'http://localhost:9001',
 
   // Selector for the element housing the angular app - this defaults to
   // body, but is necessary if ng-app is on a descendant of <body>
@@ -121,8 +160,8 @@ exports.config = {
       displaySpecDuration: true
     }));
 
-    // Set a wide enough window size for the navbar in the gallery to display
-    // fully.
+    // Set a wide enough window size for the navbar in the library pages to
+    // display fully.
     browser.driver.manage().window().setSize(1200, 1000);
   },
 

@@ -18,6 +18,7 @@ from core.controllers import base
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import rights_manager
+from core.domain import summary_services
 from core.platform import models
 import utils
 
@@ -86,7 +87,7 @@ class CollectionDataHandler(base.BaseHandler):
 
         try:
             collection_dict = (
-                collection_services.get_learner_collection_dict_by_id(
+                summary_services.get_learner_collection_dict_by_id(
                     collection_id, self.user_id,
                     allow_invalid_explorations=allow_invalid_explorations))
         except Exception as e:
@@ -97,8 +98,6 @@ class CollectionDataHandler(base.BaseHandler):
                 self.user_id and rights_manager.Actor(self.user_id).can_edit(
                     rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id)),
             'collection': collection_dict,
-            'info_card_image_url': utils.get_info_card_url_for_category(
-                collection_dict['category']),
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
         })

@@ -66,7 +66,7 @@ class Registry(object):
             cls._refresh_registry()
         if visualization_id not in cls.visualizations_dict:
             raise TypeError(
-            	'\'%s\' is not a valid visualization id.' % visualization_id)
+                '\'%s\' is not a valid visualization id.' % visualization_id)
         return cls.visualizations_dict[visualization_id]
 
     @classmethod

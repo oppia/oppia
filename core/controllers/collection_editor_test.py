@@ -113,8 +113,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
 
         # Check that collection cannot be unpublished by non admin.
         with self.assertRaisesRegexp(
-            Exception, 'This collection cannot be unpublished.'
-            ):
+            Exception, 'This collection cannot be unpublished.'):
             rights_manager.unpublish_collection(self.owner_id, collection_id)
         collection_rights = rights_manager.get_collection_rights(collection_id)
         self.assertEqual(collection_rights.status,

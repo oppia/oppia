@@ -14,23 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Classes for calculations to get interaction answer views."""
+"""Classes for calculations to get interaction answer views.
 
-__author__ = 'Marcel Schmittfull'
-
-import collections
-import copy
-import os
-
-from core.domain import exp_domain
-from core.domain import stats_domain
-import feconf
-import schema_utils
-import utils
-
-
-"""
-Calculations performed on recorded state answers.
+Calculations are performed on recorded state answers.
 
 NOTE TO DEVELOPERS: To specify calculations desired for an interaction named
 <INTERACTION_NAME>, edit
@@ -51,6 +37,11 @@ visualization and calculation may look like this:
     }]
 """
 
+import collections
+
+from core.domain import exp_domain
+from core.domain import stats_domain
+
 
 def _get_hashable_value(value):
     """This function returns a hashable version of the input value. If the
@@ -68,7 +59,7 @@ def _get_hashable_value(value):
     elif isinstance(value, dict):
         return _get_hashable_value(
             [(_get_hashable_value(key), _get_hashable_value(value))
-            for (key, value) in value.iteritems()])
+             for (key, value) in value.iteritems()])
     else:
         return value
 
@@ -84,8 +75,8 @@ def _count_answers(answer_dicts_list):
     answer_frequencies = collections.Counter(hashable_answer_values)
     return [
         ([answer_dicts_list[idx]
-            for idx, val in enumerate(hashable_answer_values)
-            if val == hashable_answer][0], frequency)
+          for idx, val in enumerate(hashable_answer_values)
+          if val == hashable_answer][0], frequency)
         for (hashable_answer, frequency) in answer_frequencies.most_common()]
 
 
@@ -196,7 +187,7 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
         list_of_all_elements = []
         for setstring in answer_values:
             elts_this_set = (
-                setstring.replace('[','').replace(']','').split(', '))
+                setstring.replace('[', '').replace(']', '').split(', '))
             list_of_all_elements += elts_this_set
 
         elements_as_list_of_pairs = sorted(

@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for user dashboard computations."""
+"""Tests for user-related one-off computations."""
 
 from core.domain import collection_domain
 from core.domain import collection_services
@@ -216,7 +216,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
                 self.EXP_ID_1, None, self.user_b_id, 'subject', 'text')
             # User C adds to that thread.
             thread_id = feedback_services.get_all_threads(
-                self.EXP_ID_1, False)[0]['thread_id']
+                self.EXP_ID_1, False)[0].get_thread_id()
             feedback_services.create_message(
                 self.EXP_ID_1, thread_id, self.user_c_id, None, None,
                 'more text')
@@ -560,3 +560,61 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
         self.assertIsNone(user_services.get_user_settings(
             self.owner_id).first_contribution_msec)
+
+
+class UserProfilePictureOneOffJobTests(test_utils.GenericTestBase):
+
+    FETCHED_GRAVATAR = 'fetched_gravatar'
+
+    def setUp(self):
+        super(UserProfilePictureOneOffJobTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+    def test_new_profile_picture_is_generated_if_it_does_not_exist(self):
+        user_services.update_profile_picture_data_url(self.owner_id, None)
+
+        # Before the job runs, the data URL is None.
+        user_settings = user_services.get_user_settings(self.owner_id)
+        self.assertIsNone(user_settings.profile_picture_data_url)
+
+        job_id = (
+            user_jobs_one_off.UserProfilePictureOneOffJob.create_new())
+        user_jobs_one_off.UserProfilePictureOneOffJob.enqueue(job_id)
+
+        def _mock_fetch_gravatar(unused_email):
+            return self.FETCHED_GRAVATAR
+
+        with self.swap(user_services, 'fetch_gravatar', _mock_fetch_gravatar):
+            self.process_and_flush_pending_tasks()
+
+        # After the job runs, the data URL has been updated.
+        new_user_settings = user_services.get_user_settings(self.owner_id)
+        self.assertEqual(
+            new_user_settings.profile_picture_data_url, self.FETCHED_GRAVATAR)
+
+    def test_profile_picture_is_not_regenerated_if_it_already_exists(self):
+        user_services.update_profile_picture_data_url(
+            self.owner_id, 'manually_added_data_url')
+
+        # Before the job runs, the data URL is the manually-added one.
+        user_settings = user_services.get_user_settings(self.owner_id)
+        self.assertEqual(
+            user_settings.profile_picture_data_url, 'manually_added_data_url')
+
+        job_id = (
+            user_jobs_one_off.UserProfilePictureOneOffJob.create_new())
+        user_jobs_one_off.UserProfilePictureOneOffJob.enqueue(job_id)
+
+        def _mock_fetch_gravatar(unused_email):
+            return self.FETCHED_GRAVATAR
+
+        with self.swap(user_services, 'fetch_gravatar', _mock_fetch_gravatar):
+            self.process_and_flush_pending_tasks()
+
+        # After the job runs, the data URL is still the manually-added one.
+        new_user_settings = user_services.get_user_settings(self.owner_id)
+        self.assertEqual(
+            new_user_settings.profile_picture_data_url,
+            'manually_added_data_url')

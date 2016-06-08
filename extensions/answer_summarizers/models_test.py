@@ -16,20 +16,9 @@
 
 """Test calculations to get interaction answer views."""
 
-__author__ = 'Marcel Schmittfull'
-
-import copy
-import os
-import sys
-
 from core.domain import calculation_registry
 from core.domain import exp_domain
-from core.domain import exp_services
-from core.domain import stats_services
 from core.tests import test_utils
-import feconf
-import schema_utils
-import utils
 
 
 class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
@@ -366,8 +355,8 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         # Only submitting a hard rule should result in only one returned
         # category.
         dummy_submitted_answer_list = [
-            self._create_sample_answer('Hard A', 0., 'sid1',
-                exp_domain.EXPLICIT_CLASSIFICATION),
+            self._create_sample_answer(
+                'Hard A', 0., 'sid1', exp_domain.EXPLICIT_CLASSIFICATION),
         ]
         state_answers_dict['submitted_answer_list'] = (
             dummy_submitted_answer_list)
@@ -388,32 +377,38 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         # Multiple categories of answers should be identified and properly
         # aggregated.
         dummy_submitted_answer_list = [
-            self._create_sample_answer('Explicit A', 0., 'sid1',
-                exp_domain.EXPLICIT_CLASSIFICATION),
-            self._create_sample_answer('Explicit B', 0., 'sid1',
-                exp_domain.EXPLICIT_CLASSIFICATION),
-            self._create_sample_answer('Explicit A', 0., 'sid1',
-                exp_domain.EXPLICIT_CLASSIFICATION),
+            self._create_sample_answer(
+                'Explicit A', 0., 'sid1', exp_domain.EXPLICIT_CLASSIFICATION),
+            self._create_sample_answer(
+                'Explicit B', 0., 'sid1', exp_domain.EXPLICIT_CLASSIFICATION),
+            self._create_sample_answer(
+                'Explicit A', 0., 'sid1', exp_domain.EXPLICIT_CLASSIFICATION),
 
-            self._create_sample_answer('Tained data A', 0., 'sid1',
+            self._create_sample_answer(
+                'Tained data A', 0., 'sid1',
                 exp_domain.TRAINING_DATA_CLASSIFICATION),
-            self._create_sample_answer('Tained data B', 0., 'sid1',
+            self._create_sample_answer(
+                'Tained data B', 0., 'sid1',
                 exp_domain.TRAINING_DATA_CLASSIFICATION),
-            self._create_sample_answer('Tained data B', 0., 'sid1',
+            self._create_sample_answer(
+                'Tained data B', 0., 'sid1',
                 exp_domain.TRAINING_DATA_CLASSIFICATION),
 
-            self._create_sample_answer('Stats B', 0., 'sid1',
-                exp_domain.STATISTICAL_CLASSIFICATION),
-            self._create_sample_answer('Stats C', 0., 'sid1',
-                exp_domain.STATISTICAL_CLASSIFICATION),
-            self._create_sample_answer('Stats C', 0., 'sid1',
-                exp_domain.STATISTICAL_CLASSIFICATION),
+            self._create_sample_answer(
+                'Stats B', 0., 'sid1', exp_domain.STATISTICAL_CLASSIFICATION),
+            self._create_sample_answer(
+                'Stats C', 0., 'sid1', exp_domain.STATISTICAL_CLASSIFICATION),
+            self._create_sample_answer(
+                'Stats C', 0., 'sid1', exp_domain.STATISTICAL_CLASSIFICATION),
 
-            self._create_sample_answer('Default C', 0., 'sid1',
+            self._create_sample_answer(
+                'Default C', 0., 'sid1',
                 exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
-            self._create_sample_answer('Default C', 0., 'sid1',
+            self._create_sample_answer(
+                'Default C', 0., 'sid1',
                 exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
-            self._create_sample_answer('Default B', 0., 'sid1',
+            self._create_sample_answer(
+                'Default B', 0., 'sid1',
                 exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
         ]
         state_answers_dict['submitted_answer_list'] = (
@@ -456,7 +451,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
             }]
         })
 
-    def test_top_answers_by_categorization_cannot_classify_invalid_category(self):
+    def test_top_answers_by_categorization_cannot_classify_invalid_category(self): # pylint: disable=line-too-long
         """The TopAnswersByCategorization calculation cannot use answers with
         unknown categorizations. It will throw an exception in these
         situations.
@@ -467,8 +462,8 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
 
         # Create an answer with an unknown classification category.
         dummy_submitted_answer_list = [
-            self._create_sample_answer('Hard A', 0., 'sid1',
-                classify_category='unknown_category'),
+            self._create_sample_answer(
+                'Hard A', 0., 'sid1', classify_category='unknown_category'),
         ]
         state_answers_dict = {
             'exploration_id': '0',
@@ -479,7 +474,6 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         }
 
         with self.assertRaisesRegexp(
-                Exception, 'Cannot aggregate answer with unknown rule'):
-            actual_state_answers_calc_output = (
-                calculation_instance.calculate_from_state_answers_dict(
-                    state_answers_dict))
+            Exception, 'Cannot aggregate answer with unknown rule'):
+            calculation_instance.calculate_from_state_answers_dict(
+                state_answers_dict)

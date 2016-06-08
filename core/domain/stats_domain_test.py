@@ -17,7 +17,6 @@
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import event_services
-from core.domain import stats_domain
 from core.domain import stats_services
 from core.tests import test_utils
 
@@ -28,62 +27,64 @@ from core.tests import test_utils
 class StateAnswersTests(test_utils.GenericTestBase):
     """Test the state answers domain object."""
 
+    DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
+    SESSION_ID = 'SESSION_ID'
+    TIME_SPENT = 5.0
+    PARAMS = {}
+
     def test_record_answer(self):
         self.save_new_default_exploration('eid', 'fake@user.com')
         exp = exp_services.get_exploration_by_id('eid')
 
-        FIRST_STATE_NAME = exp.init_state_name
-        SECOND_STATE_NAME = 'State 2'
+        first_state_name = exp.init_state_name
+        second_state_name = 'State 2'
         exp_services.update_exploration('fake@user.com', 'eid', [{
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': FIRST_STATE_NAME,
+            'state_name': first_state_name,
             'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
             'new_value': 'TextInput',
         }, {
             'cmd': exp_domain.CMD_ADD_STATE,
-            'state_name': SECOND_STATE_NAME,
+            'state_name': second_state_name,
         }, {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': SECOND_STATE_NAME,
+            'state_name': second_state_name,
             'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
             'new_value': 'TextInput',
         }], 'Add new state')
         exp = exp_services.get_exploration_by_id('eid')
 
-        SESSION_ID = 'SESSION_ID'
-        TIME_SPENT = 5.0
         exp_version = exp.version
-        PARAMS = {}
 
-        for state_name in [FIRST_STATE_NAME, SECOND_STATE_NAME]:
+        for state_name in [first_state_name, second_state_name]:
             state_answers = stats_services.get_state_answers(
                 'eid', exp_version, state_name)
             self.assertEquals(state_answers, None)
 
         # answer is a string
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', exp_version, FIRST_STATE_NAME, 0, 0,
-            exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', TIME_SPENT, PARAMS,
-            'answer1')
+            'eid', exp_version, first_state_name, 0, 0,
+            exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', self.TIME_SPENT,
+            self.PARAMS, 'answer1')
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', exp_version, FIRST_STATE_NAME, 0, 1,
-            exp_domain.EXPLICIT_CLASSIFICATION, 'sid2', TIME_SPENT, PARAMS,
-            'answer1')
+            'eid', exp_version, first_state_name, 0, 1,
+            exp_domain.EXPLICIT_CLASSIFICATION, 'sid2', self.TIME_SPENT,
+            self.PARAMS, 'answer1')
         # answer is a dict
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', exp_version, FIRST_STATE_NAME, 1, 0,
-            exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', TIME_SPENT, PARAMS,
-            {'x': 1.0, 'y': 5.0})
+            'eid', exp_version, first_state_name, 1, 0,
+            exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', self.TIME_SPENT,
+            self.PARAMS, {'x': 1.0, 'y': 5.0})
         # answer is a list
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', exp_version, SECOND_STATE_NAME, 2, 0,
-            exp_domain.EXPLICIT_CLASSIFICATION, 'sid3', TIME_SPENT, PARAMS,
-            [2, 4, 8])
+            'eid', exp_version, second_state_name, 2, 0,
+            exp_domain.EXPLICIT_CLASSIFICATION, 'sid3', self.TIME_SPENT,
+            self.PARAMS, [2, 4, 8])
         # answer is a unicode string
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', exp_version, SECOND_STATE_NAME, 1, 1,
-            exp_domain.EXPLICIT_CLASSIFICATION, 'sid4', TIME_SPENT, PARAMS,
-            self.UNICODE_TEST_STRING)
+            'eid', exp_version, second_state_name, 1, 1,
+            exp_domain.EXPLICIT_CLASSIFICATION, 'sid4', self.TIME_SPENT,
+            self.PARAMS, self.UNICODE_TEST_STRING)
 
         expected_submitted_answer_list1 = [{
             'answer': 'answer1', 'time_spent_in_sec': 5.0,
@@ -114,13 +115,13 @@ class StateAnswersTests(test_utils.GenericTestBase):
         }]
 
         state_answers = stats_services.get_state_answers(
-            'eid', exp_version, FIRST_STATE_NAME)
+            'eid', exp_version, first_state_name)
         self.assertEquals(
             state_answers.get_submitted_answer_dict_list(),
             expected_submitted_answer_list1)
 
         state_answers = stats_services.get_state_answers(
-            'eid', exp_version, SECOND_STATE_NAME)
+            'eid', exp_version, second_state_name)
         self.assertEquals(
             state_answers.get_submitted_answer_dict_list(),
             expected_submitted_answer_list2)

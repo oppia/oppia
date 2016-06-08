@@ -77,17 +77,47 @@ SIGNUP_EMAIL_CONTENT = config_domain.ConfigProperty(
         'subject': _PLACEHOLDER_SUBJECT,
         'html_body': _PLACEHOLDER_HTML_BODY,
     })
+
+EXPLORATION_ROLE_MANAGER = 'manager rights'
+EXPLORATION_ROLE_EDITOR = 'editor rights'
+EXPLORATION_ROLE_PLAYTESTER = 'playtest access'
+
+EDITOR_ROLE_EMAIL_HTML_ROLES = {
+    rights_manager.ROLE_OWNER: EXPLORATION_ROLE_MANAGER,
+    rights_manager.ROLE_EDITOR: EXPLORATION_ROLE_EDITOR,
+    rights_manager.ROLE_VIEWER: EXPLORATION_ROLE_PLAYTESTER
+}
+
+_EDITOR_ROLE_EMAIL_HTML_RIGHTS = {
+    'can_manage': '<li>Change the exploration permissions</li><br>',
+    'can_edit': '<li>Edit the exploration</li><br>',
+    'can_play': '<li>View and playtest the exploration</li><br>'
+}
+
+EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE = {
+    EXPLORATION_ROLE_MANAGER: (
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_manage'] +
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_edit'] +
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']),
+    EXPLORATION_ROLE_EDITOR: (
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_edit'] +
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']),
+    EXPLORATION_ROLE_PLAYTESTER: _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']
+}
+
 PUBLICIZE_EXPLORATION_EMAIL_HTML_BODY = config_domain.ConfigProperty(
     'publicize_exploration_email_html_body', EMAIL_HTML_BODY_SCHEMA,
     'Default content for the email sent after an exploration is publicized by '
     'a moderator. These emails are only sent if the functionality is enabled '
     'in feconf.py. Leave this field blank if emails should not be sent.',
-    'Congratulations, your exploration has been featured in the gallery!')
+    'Congratulations, your exploration has been featured in the Oppia '
+    'library!')
 UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY = config_domain.ConfigProperty(
     'unpublish_exploration_email_html_body', EMAIL_HTML_BODY_SCHEMA,
-    'Default content for the email sent after an exploration is unpublished by '
-    'a moderator. These emails are only sent if the functionality is enabled '
-    'in feconf.py. Leave this field blank if emails should not be sent.',
+    'Default content for the email sent after an exploration is unpublished '
+    'by a moderator. These emails are only sent if the functionality is '
+    'enabled in feconf.py. Leave this field blank if emails should not be '
+    'sent.',
     'I\'m writing to inform you that I have unpublished the above '
     'exploration.')
 
@@ -98,6 +128,8 @@ SENDER_VALIDATORS = {
     feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: (
         lambda x: rights_manager.Actor(x).is_moderator()),
     feconf.EMAIL_INTENT_DAILY_BATCH: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_MARKETING: (
         lambda x: rights_manager.Actor(x).is_admin()),
@@ -141,7 +173,7 @@ def _send_email(
         return
 
     raw_plaintext_body = cleaned_html_body.replace('<br/>', '\n').replace(
-        '<br>', '\n').replace('</p><p>', '</p>\n<p>')
+        '<br>', '\n').replace('<li>', '<li>- ').replace('</p><p>', '</p>\n<p>')
     cleaned_plaintext_body = html_cleaner.strip_html_tags(raw_plaintext_body)
 
     if email_models.SentEmailModel.check_duplicate_message(
@@ -255,3 +287,70 @@ def send_moderator_action_email(
     _send_email(
         recipient_id, sender_id, intent, email_subject, full_email_content,
         bcc_admin=True)
+
+
+def send_role_notification_email(
+        inviter_id, recipient_id, recipient_role, exploration_id,
+        exploration_title):
+    """Sends a email when a new user is given activity rights (Manager, Editor,
+    Viewer) to an exploration by creator of exploration.
+
+    Email will only be sent if recipient wants to receive these emails (i.e.
+    'can_receive_editor_role_email' is set True in recipent's preferences).
+    """
+    # Editor role email body and email subject templates.
+    email_subject_template = (
+        '%s invited you to collaborate on Oppia.org')
+
+    email_body_template = (
+        'Hi %s,<br>'
+        '<br>'
+        '<b>%s</b> has granted you %s to their learning exploration, '
+        '"<a href="http://www.oppia.org/create/%s">%s</a>", on Oppia.org.<br>'
+        '<br>'
+        'This allows you to:<br>'
+        '<ul>%s</ul>'
+        'You can find the exploration '
+        '<a href="http://www.oppia.org/create/%s">here</a>.<br>'
+        '<br>'
+        'Thanks, and happy collaborating!<br>'
+        '<br>'
+        'Best wishes,<br>'
+        'The Oppia Team<br>'
+        '<br>%s')
+
+    # Return from here if sending email is turned off.
+    if not feconf.CAN_SEND_EMAILS_TO_USERS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    # Return from here is sending editor role email is disabled.
+    if not feconf.CAN_SEND_EDITOR_ROLE_EMAILS:
+        log_new_error('This app cannot send editor role emails to users.')
+        return
+
+    recipient_user_settings = user_services.get_user_settings(recipient_id)
+    inviter_user_settings = user_services.get_user_settings(inviter_id)
+    recipient_preferences = user_services.get_email_preferences(recipient_id)
+
+    if not recipient_preferences['can_receive_editor_role_email']:
+        # Do not send email if recipient has declined.
+        return
+
+    if recipient_role not in EDITOR_ROLE_EMAIL_HTML_ROLES:
+        raise Exception(
+            'Invalid role: %s' % recipient_role)
+
+    role_descriptipn = EDITOR_ROLE_EMAIL_HTML_ROLES[recipient_role]
+    rights_html = EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE[role_descriptipn]
+
+    email_subject = email_subject_template % (
+        inviter_user_settings.username)
+    email_body = email_body_template % (
+        recipient_user_settings.username, inviter_user_settings.username,
+        role_descriptipn, exploration_id, exploration_title, rights_html,
+        exploration_id, EMAIL_FOOTER.value)
+
+    _send_email(
+        recipient_id, feconf.SYSTEM_COMMITTER_ID,
+        feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION, email_subject, email_body)

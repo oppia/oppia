@@ -299,7 +299,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             self._validate_dependencies(interaction.dependency_ids)
 
             answer_visualization_specs = (
-                interaction._answer_visualization_specs)
+                interaction.answer_visualization_specs)
             self._validate_answer_visualization_specs(
                 answer_visualization_specs)
 

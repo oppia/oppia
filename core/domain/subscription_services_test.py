@@ -20,6 +20,7 @@ from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import subscription_services
@@ -146,10 +147,11 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             self.viewer_id)
         self.assertEqual(len(thread_ids_subscribed_to), 1)
         full_thread_id = thread_ids_subscribed_to[0]
-        thread_id = feedback_services.get_thread_id_from_full_thread_id(
-            full_thread_id)
+        thread_id = (
+            feedback_domain.FeedbackThread.get_thread_id_from_full_thread_id(
+                full_thread_id))
         self.assertEqual(
-            feedback_services.get_messages('exp_id', thread_id)[0]['text'],
+            feedback_services.get_messages('exp_id', thread_id)[0].text,
             message_text)
 
         # The editor posts a follow-up message to the thread.
@@ -169,15 +171,12 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(USER_ID), [])
         exp_services.save_new_exploration(
-            USER_ID,
-            exp_domain.Exploration.create_default_exploration(
-                EXP_ID, 'Title', 'Category'))
+            USER_ID, exp_domain.Exploration.create_default_exploration(EXP_ID))
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(USER_ID), [EXP_ID])
 
     def test_adding_new_exploration_owner_or_editor_role_results_in_subscription(self): # pylint: disable=line-too-long
-        exploration = exp_domain.Exploration.create_default_exploration(
-            EXP_ID, 'Title', 'Category')
+        exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)
         exp_services.save_new_exploration(self.owner_id, exploration)
 
         self.assertEqual(
@@ -195,8 +194,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             self._get_exploration_ids_subscribed_to(self.editor_id), [EXP_ID])
 
     def test_adding_new_exploration_viewer_role_does_not_result_in_subscription(self): # pylint: disable=line-too-long
-        exploration = exp_domain.Exploration.create_default_exploration(
-            EXP_ID, 'Title', 'Category')
+        exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)
         exp_services.save_new_exploration(self.owner_id, exploration)
 
         self.assertEqual(
@@ -207,8 +205,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             self._get_exploration_ids_subscribed_to(self.viewer_id), [])
 
     def test_deleting_exploration_does_not_delete_subscription(self):
-        exploration = exp_domain.Exploration.create_default_exploration(
-            EXP_ID, 'Title', 'Category')
+        exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)
         exp_services.save_new_exploration(self.owner_id, exploration)
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.owner_id), [EXP_ID])

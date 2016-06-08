@@ -22,6 +22,10 @@ describe('Collection update service', function() {
   var UndoRedoService = null;
   var SkillListObjectFactory = null;
   var _sampleCollection = null;
+  var _sampleExplorationSummaryBackendObject = {
+    title: 'Title',
+    status: 'public'
+  };
 
   beforeEach(module('oppia'));
 
@@ -35,6 +39,8 @@ describe('Collection update service', function() {
       id: 'collection_id',
       title: 'a title',
       objective: 'an objective',
+      language_code: 'en',
+      tags: [],
       category: 'a category',
       version: '1',
       nodes: [{
@@ -55,7 +61,8 @@ describe('Collection update service', function() {
   it('should add/remove a new collection node to/from a collection',
       function() {
     expect(_sampleCollection.getExplorationIds()).toEqual(['exp_id0']);
-    CollectionUpdateService.addCollectionNode(_sampleCollection, 'exp_id1');
+    CollectionUpdateService.addCollectionNode(
+      _sampleCollection, 'exp_id1', _sampleExplorationSummaryBackendObject);
     expect(_sampleCollection.getExplorationIds()).toEqual([
       'exp_id0', 'exp_id1'
     ]);
@@ -66,7 +73,8 @@ describe('Collection update service', function() {
 
   it('should create a proper backend change dict for adding collection nodes',
       function() {
-    CollectionUpdateService.addCollectionNode(_sampleCollection, 'exp_id1');
+    CollectionUpdateService.addCollectionNode(
+      _sampleCollection, 'exp_id1', _sampleExplorationSummaryBackendObject);
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'add_collection_node',
       exploration_id: 'exp_id1'
@@ -152,6 +160,46 @@ describe('Collection update service', function() {
       property_name: 'objective',
       new_value: 'new objective',
       old_value: 'an objective'
+    }]);
+  });
+
+  it('should set/unset changes to a collection\'s language code', function() {
+    expect(_sampleCollection.getLanguageCode()).toEqual('en');
+    CollectionUpdateService.setCollectionLanguageCode(_sampleCollection, 'fi');
+    expect(_sampleCollection.getLanguageCode()).toEqual('fi');
+
+    UndoRedoService.undoChange(_sampleCollection);
+    expect(_sampleCollection.getLanguageCode()).toEqual('en');
+  });
+
+  it('should create a proper backend change dict for changing language codes',
+      function() {
+    CollectionUpdateService.setCollectionLanguageCode(_sampleCollection, 'fi');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'edit_collection_property',
+      property_name: 'language_code',
+      new_value: 'fi',
+      old_value: 'en'
+    }]);
+  });
+
+  it('should set/unset changes to a collection\'s tags', function() {
+    expect(_sampleCollection.getTags()).toEqual([]);
+    CollectionUpdateService.setCollectionTags(_sampleCollection, ['test']);
+    expect(_sampleCollection.getTags()).toEqual(['test']);
+
+    UndoRedoService.undoChange(_sampleCollection);
+    expect(_sampleCollection.getTags()).toEqual([]);
+  });
+
+  it('should create a proper backend change dict for changing tags',
+      function() {
+    CollectionUpdateService.setCollectionTags(_sampleCollection, ['test']);
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'edit_collection_property',
+      property_name: 'tags',
+      new_value: ['test'],
+      old_value: []
     }]);
   });
 

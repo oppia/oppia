@@ -16,11 +16,11 @@
  * @fileoverview search service for activityTilesInfinityGrid
  */
 
-oppia.constant('GALLERY_DATA_URL', '/galleryhandler/data');
+oppia.constant('SEARCH_DATA_URL', '/searchhandler/data');
 
 oppia.factory('searchService', [
-  '$http', '$rootScope', 'GALLERY_DATA_URL',
-  function($http, $rootScope, GALLERY_DATA_URL) {
+  '$http', '$rootScope', '$translate', 'SEARCH_DATA_URL',
+  function($http, $rootScope, $translate, SEARCH_DATA_URL) {
   var _lastQuery = null;
   var _lastSelectedCategories = {};
   var _lastSelectedLanguageCodes = {};
@@ -41,7 +41,7 @@ oppia.factory('searchService', [
       }
     }
     if (_categories) {
-      querySuffix += ' category=("' + _categories + '")';
+      querySuffix += '&category=("' + _categories + '")';
     }
 
     var _languageCodes = '';
@@ -54,49 +54,89 @@ oppia.factory('searchService', [
       }
     }
     if (_languageCodes) {
-      querySuffix += ' language_code=("' + _languageCodes + '")';
+      querySuffix += '&language_code=("' + _languageCodes + '")';
     }
 
     return querySuffix;
   };
 
-  var hasPageFinishedLoading = function() {
+  var hasReachedEndOfPage = function() {
     return _searchCursor === null;
+  };
+
+  var updateSearchFields = function(itemsType, urlComponent,
+                                    selectionDetails) {
+    var itemCodeGroup = urlComponent.match(/=\("[A-Za-z%20" ]+"\)/);
+    var itemCodes = itemCodeGroup ? itemCodeGroup[0] : null;
+
+    var EXPECTED_PREFIX = '=("';
+    var EXPECTED_SUFFIX = '")';
+
+    if (!itemCodes ||
+        itemCodes.indexOf(EXPECTED_PREFIX) !== 0 ||
+        itemCodes.lastIndexOf(EXPECTED_SUFFIX) !==
+          itemCodes.length - EXPECTED_SUFFIX.length) {
+      throw Error('Invalid search query url fragment for ' +
+                  itemsType + ': ' + urlComponent);
+      return;
+    }
+
+    var items = itemCodes.substring(
+      EXPECTED_PREFIX.length, itemCodes.length - EXPECTED_SUFFIX.length
+    ).split('" OR "');
+
+    var selections = selectionDetails[itemsType].selections;
+    for (var i = 0; i < items.length; i++) {
+      selections[items[i]] = true;
+    }
   };
 
   var _isCurrentlyFetchingResults = false;
   var numSearchesInProgress = 0;
 
+  var getQueryUrl = function(searchUrlQueryString) {
+    return SEARCH_DATA_URL + '?q=' + searchUrlQueryString;
+  };
+
   return {
-    // Note that an empty query results in all explorations being shown.
+    getSearchUrlQueryString: function(searchQuery, selectedCategories,
+      selectedLanguageCodes) {
+      return encodeURIComponent(searchQuery) +
+        _getSuffixForQuery(selectedCategories, selectedLanguageCodes);
+    },
+    // Note that an empty query results in all activities being shown.
     executeSearchQuery: function(
         searchQuery, selectedCategories, selectedLanguageCodes,
         successCallback) {
-      var queryUrl = GALLERY_DATA_URL + '?q=' + encodeURI(
-        searchQuery +
-        _getSuffixForQuery(selectedCategories, selectedLanguageCodes));
+      var queryUrl = getQueryUrl(
+        this.getSearchUrlQueryString(
+          searchQuery, selectedCategories, selectedLanguageCodes));
 
       _isCurrentlyFetchingResults = true;
       numSearchesInProgress++;
-      $http.get(queryUrl).success(function(data) {
+      $http.get(queryUrl).then(function(response) {
+        var data = response.data;
         _lastQuery = searchQuery;
         _lastSelectedCategories = angular.copy(selectedCategories);
         _lastSelectedLanguageCodes = angular.copy(selectedLanguageCodes);
         _searchCursor = data.search_cursor;
         numSearchesInProgress--;
 
-        if ($('.oppia-splash-search-input').val() === searchQuery) {
-          $rootScope.$broadcast('refreshGalleryData', data,
-                                hasPageFinishedLoading());
+        if ($('.oppia-search-bar-input').val() === searchQuery) {
+          $rootScope.$broadcast(
+            'initialSearchResultsLoaded', data.activity_list);
           _isCurrentlyFetchingResults = false;
         } else {
           console.log('Mismatch');
           console.log('SearchQuery: ' + searchQuery);
-          console.log('Input: ' + $('.oppia-splash-search-input').val());
+          console.log('Input: ' + $('.oppia-search-bar-input').val());
         }
-      }).error(function() {
+      }, function() {
         numSearchesInProgress--;
       });
+
+      // Translate the new explorations loaded.
+      $translate.refresh();
 
       if (successCallback) {
         successCallback();
@@ -105,27 +145,69 @@ oppia.factory('searchService', [
     isSearchInProgress: function() {
       return numSearchesInProgress > 0;
     },
-    loadMoreData: function(successCallback) {
-      // If a new query is still being sent, do not fetch more results.
-      if (_isCurrentlyFetchingResults) {
+    // The following takes in the url search component as an argument and the
+    // selectionDetails. It will update selectionDetails with the relevant
+    // fields that were extracted from the url. It returns the unencoded search
+    // query string.
+    updateSearchFieldsBasedOnUrlQuery: function(
+        urlComponent, selectionDetails) {
+      var urlQuery = urlComponent.substring('?q='.length);
+      // The following will split the urlQuery into 3 components:
+      // 1. query
+      // 2. categories (optional)
+      // 3. language codes (default to 'en')
+      var querySegments = urlQuery.split('&');
+
+      if (querySegments.length > 3) {
+        throw Error('Invalid search query url: ' + urlQuery);
+      }
+
+      for (var i = 1; i < querySegments.length; i++) {
+        var urlComponent = decodeURIComponent(querySegments[i]);
+
+        var itemsType = null;
+        if (urlComponent.indexOf('category') === 0) {
+          itemsType = 'categories';
+        } else if (urlComponent.indexOf('language_code') === 0) {
+          itemsType = 'languageCodes';
+        } else {
+          console.error('Invalid search query component: ' + urlComponent);
+          continue;
+        }
+
+        try {
+          updateSearchFields(itemsType, urlComponent, selectionDetails);
+        } catch (error) {
+          selectionDetails[itemsType].selections = {};
+          throw error;
+        }
+      }
+
+      return decodeURIComponent(querySegments[0]);
+    },
+    loadMoreData: function(successCallback, failureCallback) {
+      // If a new query is still being sent, or the end of the page has been
+      // reached, do not fetch more results.
+      if (_isCurrentlyFetchingResults || hasReachedEndOfPage()) {
+        failureCallback(hasReachedEndOfPage());
         return;
       }
 
-      var queryUrl = GALLERY_DATA_URL + '?q=' + encodeURI(
-        _lastQuery + _getSuffixForQuery(
-          _lastSelectedCategories, _lastSelectedLanguageCodes));
+      var queryUrl = getQueryUrl(
+        this.getSearchUrlQueryString(
+          _lastQuery, _lastSelectedCategories, _lastSelectedLanguageCodes));
 
       if (_searchCursor) {
         queryUrl += '&cursor=' + _searchCursor;
       }
 
       _isCurrentlyFetchingResults = true;
-      $http.get(queryUrl).success(function(data) {
-        _searchCursor = data.search_cursor;
+      $http.get(queryUrl).then(function(response) {
+        _searchCursor = response.data.search_cursor;
         _isCurrentlyFetchingResults = false;
 
         if (successCallback) {
-          successCallback(data, hasPageFinishedLoading());
+          successCallback(response.data, hasReachedEndOfPage());
         }
       });
     }

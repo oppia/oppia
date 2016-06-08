@@ -21,25 +21,29 @@ oppia.directive('searchBar', [function() {
     restrict: 'E',
     templateUrl: 'components/searchBar',
     controller: [
-      '$scope', '$rootScope', '$timeout', '$window', 'searchService',
-      'oppiaDebouncer', 'ExplorationCreationButtonService', 'urlService',
-      'CATEGORY_LIST',
+      '$scope', '$rootScope', '$timeout', '$window', '$location', '$translate',
+      'searchService', 'oppiaDebouncer', 'oppiaHtmlEscaper', 'urlService',
+      'i18nIdService',
       function(
-          $scope, $rootScope, $timeout, $window, searchService,
-          oppiaDebouncer, ExplorationCreationButtonService, urlService,
-          CATEGORY_LIST) {
+          $scope, $rootScope, $timeout, $window, $location, $translate,
+          searchService, oppiaDebouncer, oppiaHtmlEscaper, urlService,
+          i18nIdService) {
         $scope.isSearchInProgress = searchService.isSearchInProgress;
-        $scope.ALL_CATEGORIES = CATEGORY_LIST.map(function(categoryName) {
-          return {
-            id: categoryName,
-            text: categoryName
-          };
-        });
+        $scope.SEARCH_DROPDOWN_CATEGORIES = (
+          GLOBALS.SEARCH_DROPDOWN_CATEGORIES.map(
+            function(categoryName) {
+              return {
+                id: categoryName,
+                text: i18nIdService.getLibraryId('categories', categoryName)
+              };
+            }
+          )
+        );
         $scope.ALL_LANGUAGE_CODES = GLOBALS.LANGUAGE_CODES_AND_NAMES.map(
           function(languageItem) {
             return {
               id: languageItem.code,
-              text: languageItem.name
+              text: i18nIdService.getLibraryId('languages', languageItem.code)
             };
           });
 
@@ -48,7 +52,7 @@ oppia.directive('searchBar', [function() {
           categories: {
             description: '',
             itemsName: 'categories',
-            masterList: $scope.ALL_CATEGORIES,
+            masterList: $scope.SEARCH_DROPDOWN_CATEGORIES,
             numSelections: 0,
             selections: {},
             summary: ''
@@ -63,9 +67,13 @@ oppia.directive('searchBar', [function() {
           }
         };
 
+        // Non-translatable parts of the html strings, like numbers or user
+        // names.
+        $scope.translationData = {};
+
         // Update the description, numSelections and summary fields of the
         // relevant entry of $scope.selectionDetails.
-        var _updateSelectionDetails = function(itemsType) {
+        var updateSelectionDetails = function(itemsType) {
           var itemsName = $scope.selectionDetails[itemsType].itemsName;
           var masterList = $scope.selectionDetails[itemsType].masterList;
 
@@ -81,15 +89,25 @@ oppia.directive('searchBar', [function() {
           $scope.selectionDetails[itemsType].numSelections = totalCount;
 
           $scope.selectionDetails[itemsType].summary = (
-            totalCount === 0 ? (
-              'All ' + itemsName.charAt(0).toUpperCase() +
-                       itemsName.substr(1)) :
+            totalCount === 0 ? 'I18N_LIBRARY_ALL_' + itemsName.toUpperCase() :
             totalCount === 1 ? selectedItems[0] :
-            totalCount + ' ' + itemsName);
+            'I18N_LIBRARY_N_' + itemsName.toUpperCase());
+          $scope.translationData[itemsName + 'Count'] = totalCount;
 
-          $scope.selectionDetails[itemsType].description = (
-            selectedItems.length > 0 ? selectedItems.join(', ') :
-            'All ' + itemsName + ' selected');
+          // TODO(milit): When the language changes, the translations won't
+          // change until the user changes the selection and this function is
+          // re-executed.
+          if (selectedItems.length > 0) {
+            var translatedItems = [];
+            for (var i = 0; i < selectedItems.length; i++) {
+              translatedItems.push($translate.instant(selectedItems[i]));
+            };
+            $scope.selectionDetails[itemsType].description = (
+              translatedItems.join(', '));
+          } else {
+            $scope.selectionDetails[itemsType].description = (
+              'I18N_LIBRARY_ALL_' + itemsName.toUpperCase() + '_SELECTED');
+          }
         };
 
         $scope.toggleSelection = function(itemsType, optionName) {
@@ -100,62 +118,109 @@ oppia.directive('searchBar', [function() {
             selections[optionName] = !selections[optionName];
           }
 
-          _updateSelectionDetails(itemsType);
-          _onSearchQueryChangeExec();
+          updateSelectionDetails(itemsType);
+          onSearchQueryChangeExec();
         };
 
         $scope.deselectAll = function(itemsType) {
           $scope.selectionDetails[itemsType].selections = {};
-          _updateSelectionDetails(itemsType);
+          updateSelectionDetails(itemsType);
         };
 
-        var _searchBarFullyLoaded = false;
-
-        var _hasChangedSearchQuery = Boolean(urlService.getUrlParams().q);
-        var _onSearchQueryChangeExec = function() {
+        var onSearchQueryChangeExec = function() {
           searchService.executeSearchQuery(
-              $scope.searchQuery, $scope.selectionDetails.categories.selections,
-              $scope.selectionDetails.languageCodes.selections, function() {
-            if (!_hasChangedSearchQuery && _searchBarFullyLoaded) {
-              _hasChangedSearchQuery = true;
-              $rootScope.$broadcast('hasChangedSearchQuery');
-            }
-          });
+            $scope.searchQuery, $scope.selectionDetails.categories.selections,
+            $scope.selectionDetails.languageCodes.selections);
+
+          var searchUrlQueryString = searchService.getSearchUrlQueryString(
+            $scope.searchQuery, $scope.selectionDetails.categories.selections,
+            $scope.selectionDetails.languageCodes.selections
+          );
+          if ($window.location.pathname == '/search/find') {
+            $location.url('/find?q=' + searchUrlQueryString);
+          } else {
+            $window.location.href = '/search/find?q=' + searchUrlQueryString;
+          }
         };
 
         // Initialize the selection descriptions and summaries.
         for (var itemsType in $scope.selectionDetails) {
-          _updateSelectionDetails(itemsType);
+          updateSelectionDetails(itemsType);
         }
 
         $scope.onSearchQueryChange = function(evt) {
           // Query immediately when the enter or space key is pressed.
           if (evt.keyCode == 13 || evt.keyCode == 32) {
-            _onSearchQueryChangeExec();
+            onSearchQueryChangeExec();
           } else {
-            oppiaDebouncer.debounce(_onSearchQueryChangeExec, 400)();
+            oppiaDebouncer.debounce(onSearchQueryChangeExec, 650)();
           }
         };
+
+        var updateSearchFieldsBasedOnUrlQuery = function() {
+          $scope.selectionDetails.categories.selections = {};
+          $scope.selectionDetails.languageCodes.selections = {};
+
+          $scope.searchQuery = searchService.updateSearchFieldsBasedOnUrlQuery(
+            $window.location.search, $scope.selectionDetails);
+
+          updateSelectionDetails('categories');
+          updateSelectionDetails('languageCodes');
+
+          onSearchQueryChangeExec();
+        };
+
+        $scope.$on('$locationChangeSuccess', function() {
+          if (urlService.getUrlParams().hasOwnProperty('q')) {
+            updateSearchFieldsBasedOnUrlQuery();
+          }
+        });
 
         $scope.$on(
           'preferredLanguageCodesLoaded',
           function(evt, preferredLanguageCodesList) {
-            for (var i = 0; i < preferredLanguageCodesList.length; i++) {
+            preferredLanguageCodesList.forEach(function(languageCode) {
               var selections = $scope.selectionDetails.languageCodes.selections;
-              var languageCode = preferredLanguageCodesList[i];
               if (!selections.hasOwnProperty(languageCode)) {
                 selections[languageCode] = true;
               } else {
                 selections[languageCode] = !selections[languageCode];
               }
+            });
+
+            updateSelectionDetails('languageCodes');
+
+            if (urlService.getUrlParams().hasOwnProperty('q')) {
+              updateSearchFieldsBasedOnUrlQuery();
             }
 
-            _updateSelectionDetails('languageCodes');
-            _onSearchQueryChangeExec();
+            if ($window.location.pathname == '/search/find') {
+              onSearchQueryChangeExec();
+            }
 
-            _searchBarFullyLoaded = true;
+            refreshSearchBarLabels();
           }
         );
+
+        var refreshSearchBarLabels = function() {
+          // If you translate these strings in the html, then you must use a
+          // filter because only the first 14 characters are displayed. That
+          // would generate FOUC for languages other than English. As an
+          // exception, we translate them here and update the translation every
+          // time the language is changed.
+          $scope.searchBarPlaceholder = $translate.instant(
+            'I18N_LIBRARY_SEARCH_PLACEHOLDER');
+          // 'messageformat' is the interpolation method for plural forms.
+          // http://angular-translate.github.io/docs/#/guide/14_pluralization.
+          $scope.categoryButtonText = $translate.instant(
+            $scope.selectionDetails.categories.summary,
+            $scope.translationData, 'messageformat');
+          $scope.languageButtonText = $translate.instant(
+            $scope.selectionDetails.languageCodes.summary,
+            $scope.translationData, 'messageformat');
+        };
+
+        $rootScope.$on('$translateChangeSuccess', refreshSearchBarLabels);
       }
     ]
   };

@@ -1,25 +1,40 @@
 <link rel="stylesheet" type="text/css" href="/extensions/interactions/MusicNotesInput/static/css/musicNotesInput.css">
 
 <script type="text/ng-template" id="interaction/MusicNotesInput">
-  <div class="oppia-music-input-valid-note-area">
-    <button type="button" class="btn btn-default oppia-music-input-btn oppia-music-input-play-btn"
+  <div class="music-notes-input-container">
+    <div class="oppia-music-input-valid-note-area">
+      <button type="button" class="btn btn-default oppia-music-input-btn oppia-music-input-play-btn"
             ng-click="playCurrentSequence()">
-      <span class="glyphicon glyphicon-play"></span>
-      Play
-    </button>
-    <div class="oppia-music-input-note-choices"></div>
-    <div class="oppia-music-input-staff"></div>
-  </div>
-  <div class="oppia-music-input-control-buttons">
-    <button type="button" class="btn btn-default oppia-music-input-btn"
-            ng-click="playSequenceToGuess()">Play Target Sequence</button>
-    <div class="pull-right">
+        <span class="glyphicon glyphicon-play"></span>
+        <span translate="I18N_INTERACTIONS_MUSIC_PLAY"></span>
+      </button>
+      <div class="oppia-music-input-note-choices"></div>
+      <div class="oppia-music-input-staff"></div>
+    </div>
+
+    <div class="oppia-music-input-control-buttons">
       <button type="button" class="btn btn-default oppia-music-input-btn"
-              ng-click="clearSequence()">Clear</button>
-      <button type="button" class="btn btn-default oppia-music-input-btn"
-              ng-click="submitAnswer(noteSequence)">Submit</button>
+              ng-click="playSequenceToGuess()" translate="I18N_INTERACTIONS_MUSIC_PLAY_SEQUENCE"></button>
+      <div class="pull-right">
+        <button type="button" class="btn btn-default oppia-music-input-btn"
+                ng-click="clearSequence()" translate="I18N_INTERACTIONS_MUSIC_CLEAR"></button>
+        <button type="button" class="btn btn-default oppia-music-input-btn"
+                ng-click="submitAnswer(noteSequence)" translate="I18N_INTERACTIONS_MUSIC_SUBMIT"></button>
+      </div>
     </div>
   </div>
+  <style>
+    .music-notes-input-container {
+      background: #fff;
+      padding: 8px;
+    }
+    @media screen and (max-width: 959px) {
+      .music-notes-input-container {
+        max-width: 100vw;
+        width: 560px;
+      }
+    }
+  </style>
 </script>
 
 <script type="text/ng-template" id="response/MusicNotesInput">

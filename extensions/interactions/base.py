@@ -41,7 +41,6 @@ from core.domain import obj_services
 from core.domain import rule_domain
 from core.domain import visualization_registry
 from extensions import domain
-from extensions.visualizations import models
 import feconf
 import jinja_utils
 import utils
@@ -124,6 +123,10 @@ class BaseInteraction(object):
         return [
             domain.CustomizationArgSpec(**cas)
             for cas in self._customization_arg_specs]
+
+    @property
+    def answer_visualization_specs(self):
+        return self._answer_visualization_specs
 
     @property
     def answer_visualizations(self):
