@@ -178,7 +178,8 @@ oppia.controller('StatisticsTab', [
                 for (var i = 0; i < visualizationsInfo.length; i++) {
                   var el = $(
                     '<oppia-visualization-' +
-                    $filter('camelCaseToHyphens')(visualizationsInfo[i].id) + '/>');
+                    $filter('camelCaseToHyphens')(visualizationsInfo[i].id) +
+                    '/>');
                   el.attr('data', oppiaHtmlEscaper.objToEscapedJson(
                     visualizationsInfo[i].data));
                   el.attr('options', oppiaHtmlEscaper.objToEscapedJson(
