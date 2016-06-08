@@ -72,9 +72,9 @@ class HomePageTest(test_utils.GenericTestBase):
 
 
 class DashboardStatisticsTest(test_utils.GenericTestBase):
-    # TODO: Replace the model reads in each of the tests inside this class by
-    # calls to services/controllers, when they have been written. Ensure that
-    # there should be no need to import `user_model` thereafter.
+    # TODO(526avijitgupta): Replace the model reads in each of the tests inside
+    # this class by calls to services/controllers, when they have been written.
+    # Ensure that there should be no need to import `user_model` thereafter.
 
     OWNER_EMAIL_1 = 'owner1@example.com'
     OWNER_USERNAME_1 = 'owner1'
