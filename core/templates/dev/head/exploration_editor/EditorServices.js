@@ -2317,12 +2317,13 @@ oppia.factory('autosaveInfoModalsService', [
       showNonStrictValidationFailModal: function() {
         $modal.open({
           templateUrl: 'modals/saveValidationFail',
-          backdrop: true,
+          // Prevent modal from closing when the user clicks outside it.
+          backdrop: 'static',
           controller: [
             '$scope', '$modalInstance', function($scope, $modalInstance) {
               $scope.closeAndRefresh = function() {
                 $modalInstance.dismiss('cancel');
-                _refreshPage(500);
+                _refreshPage(20);
               };
             }
           ]
@@ -2340,15 +2341,17 @@ oppia.factory('autosaveInfoModalsService', [
       showVersionMismatchModal: function(lostChanges) {
         $modal.open({
           templateUrl: 'modals/saveVersionMismatch',
-          backdrop: true,
+          // Prevent modal from closing when the user clicks outside it.
+          backdrop: 'static',
           controller: ['$scope', function($scope) {
             // When the user clicks on discard changes button, signal backend
             // to discard the draft and reload the page thereafter.
             $scope.discardChanges = function() {
               explorationData.discardDraft(function() {
-                _refreshPage(500);
+                _refreshPage(20);
               });
             };
+
             $scope.hasLostChanges = (lostChanges && lostChanges.length > 0);
             if ($scope.hasLostChanges) {
               // TODO(sll): This should also include changes to exploration
