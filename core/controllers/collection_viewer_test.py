@@ -146,7 +146,7 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
 
         playthrough_dict = collection_dict['playthrough_dict']
         self.assertEqual(
-            playthrough_dict['next_exploration_ids'], ['13', '4', '14'])
+            playthrough_dict['next_exploration_ids'], ['13'])
         self.assertEqual(playthrough_dict['completed_exploration_ids'], ['0'])
 
         # Completing the 'Solar System' exploration results in no branching.
@@ -158,7 +158,7 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
 
         playthrough_dict = collection_dict['playthrough_dict']
         self.assertEqual(
-            playthrough_dict['next_exploration_ids'], ['4', '14'])
+            playthrough_dict['next_exploration_ids'], ['4'])
         self.assertEqual(
             playthrough_dict['completed_exploration_ids'], ['0', '13'])
 
@@ -172,7 +172,7 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
 
         playthrough_dict = collection_dict['playthrough_dict']
         self.assertEqual(
-            playthrough_dict['next_exploration_ids'], ['4', '15'])
+            playthrough_dict['next_exploration_ids'], ['4'])
         self.assertEqual(
             playthrough_dict['completed_exploration_ids'], ['0', '13', '14'])
 

@@ -37,6 +37,19 @@ describe('State Interaction controller', function() {
     });
 
     var scope, ecs, cls, ess, siis, scas, idc, IS;
+    var $httpBackend;
+    var mockExplorationData;
+
+    beforeEach(function() {
+      mockExplorationData = {
+        explorationId: 0,
+        autosaveChangeList: function() {}
+      };
+      module(function($provide) {
+        $provide.value('explorationData', mockExplorationData);
+      });
+      spyOn(mockExplorationData, 'autosaveChangeList');
+    });
 
     beforeEach(inject(function($rootScope, $controller, $injector) {
       scope = $rootScope.$new();
@@ -47,6 +60,7 @@ describe('State Interaction controller', function() {
       scas = $injector.get('stateCustomizationArgsService');
       idc = $injector.get('interactionDetailsCache');
       IS = $injector.get('INTERACTION_SPECS');
+      $httpBackend = $injector.get('$httpBackend');
       scope.stateInteractionIdService = siis;
       scope.stateCustomizationArgsService = scas;
       scope.interactionDetailsCache = idc;
@@ -136,7 +150,7 @@ describe('State Interaction controller', function() {
     });
 
     it('should change to default text when adding a terminal interaction',
-        function() {
+       function() {
       ecs.setActiveStateName('End State');
       scope.initStateEditor();
 
