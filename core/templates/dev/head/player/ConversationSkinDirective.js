@@ -601,13 +601,15 @@ oppia.directive('conversationSkin', [function() {
           $scope.startCardChangeAnimation = true;
 
           $timeout(function() {
+            var newInteractionHtml = oppiaPlayerService.getInteractionHtml(
+              newStateName, _nextFocusLabel);
+            // Note that newInteractionHtml may be null.
+            if (newInteractionHtml) {
+              newInteractionHtml += oppiaPlayerService.getRandomSuffix();
+            }
+
             _addNewCard(
-              newStateName,
-              newParams,
-              newContentHtml,
-              oppiaPlayerService.getInteractionHtml(
-                newStateName, _nextFocusLabel
-              ) + oppiaPlayerService.getRandomSuffix());
+              newStateName, newParams, newContentHtml, newInteractionHtml);
 
             $scope.upcomingStateName = null;
             $scope.upcomingParams = null;
