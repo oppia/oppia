@@ -20,8 +20,13 @@ from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import user_jobs_continuous
+from core.domain import user_jobs_continuous_test
 from core.tests import test_utils
+from core.platform import models
 import feconf
+
+(user_models,) = models.Registry.import_models([models.NAMES.user])
+taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 class HomePageTest(test_utils.GenericTestBase):
@@ -63,6 +68,66 @@ class HomePageTest(test_utils.GenericTestBase):
             'I18N_TOPNAV_NOTIFICATIONS', 'I18N_TOPNAV_LOGOUT',
             self.get_expected_logout_url('/'),
             no=['>I18N_TOPNAV_SIGN_IN<', self.get_expected_login_url('/')])
+        self.logout()
+
+
+class DashboardStatisticsTest(test_utils.GenericTestBase):
+    # TODO: Replace the model reads in each of the tests inside this class by
+    # calls to services/controllers, when they have been written. Ensure that
+    # there should be no need to import `user_model` thereafter.
+
+    OWNER_EMAIL_1 = 'owner1@example.com'
+    OWNER_USERNAME_1 = 'owner1'
+    OWNER_EMAIL_2 = 'owner2@example.com'
+    OWNER_USERNAME_2 = 'owner2'
+
+    COLLABORATOR_EMAIL_1 = 'collaborator1@example.com'
+    COLLABORATOR_USERNAME_1 = 'collaborator1'
+    COLLABORATOR_EMAIL_2 = 'collaborator2@example.com'
+    COLLABORATOR_USERNAME_2 = 'collaborator2'
+
+    EXP_ID_1 = 'exp_id_1'
+    EXP_TITLE_1 = 'Exploration title 1'
+    EXP_ID_2 = 'exp_id_2'
+    EXP_TITLE_2 = 'Exploration title 2'
+
+    def setUp(self):
+        super(DashboardStatisticsTest, self).setUp()
+        self.signup(self.OWNER_EMAIL_1, self.OWNER_USERNAME_1)
+        self.signup(self.OWNER_EMAIL_2, self.OWNER_USERNAME_2)
+        self.signup(self.COLLABORATOR_EMAIL_1, self.COLLABORATOR_USERNAME_1)
+        self.signup(self.COLLABORATOR_EMAIL_2, self.COLLABORATOR_USERNAME_2)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+        self.owner_id_1 = self.get_user_id_from_email(self.OWNER_EMAIL_1)
+        self.owner_id_2 = self.get_user_id_from_email(self.OWNER_EMAIL_2)
+        self.collaborator_id_1 = self.get_user_id_from_email(
+            self.COLLABORATOR_EMAIL_1)
+        self.collaborator_id_2 = self.get_user_id_from_email(
+            self.COLLABORATOR_EMAIL_2)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+
+    def _start_computation_job(self):
+        (user_jobs_continuous_test.ModifiedUserStatsAggregator.
+         start_computation())
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
+        self.process_and_flush_pending_tasks()
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+            0)
+        self.process_and_flush_pending_tasks()
+
+    def test_stats_no_explorations(self):
+        self.login(self.OWNER_EMAIL_1)
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        self.assertEqual(response['explorations_list'], [])
+        self._start_computation_job()
+        self.assertIsNone(user_models.UserStatsModel.get(
+            self.owner_id_1, strict=False))
         self.logout()
 
 
