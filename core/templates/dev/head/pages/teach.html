@@ -166,7 +166,7 @@
             If you'd like to teach an existing topic, first try submitting feedback for the current exploration or improving it.
             Only if you use a significantly different teaching style should you create a completely new exploration.
           </p>
-
+          <a name="featured-criteria"></a>
           <h2>"Featured criteria"</h2>
           <p>
             Featured explorations are educational, are interesting to learners, and
@@ -239,7 +239,7 @@
             <a href="{{MODERATOR_REQUEST_FORUM_URL}}" class="inline-links">Moderator Requests forum</a>.
             A moderator will play through the exploration, look at its structure, and
             decide whether it fits the
-            <a href="#publication-criteria" class="inline-links">"Featured" criteria</a>.
+            <a href="#featured-criteria" class="inline-links">"Featured" criteria</a>.
             If it does, the exploration will be marked as featured.
             If it doesn't, the moderator will work with the creator(s) to improve the exploration.
           </p>
@@ -253,7 +253,7 @@
       <div class="oppia-about-extra-info about-otter-buttons">
         <div class="oppia-about-content oppia-about-extra-content">
           <div class="oppia-about-card-content-wide oppia-about-buttons-container">
-            <a href="/my_explorations?mode=create" class="btn oppia-about-button">Create an exploration</a>
+            <a href="/dashboard?mode=create" class="btn oppia-about-button">Create an exploration</a>
             <a href="/library" class="btn oppia-about-button">Browse all explorations</a>
           </div>
         </div>
@@ -285,7 +285,7 @@
         } else if (hashChange === 'playbook') {
           activateTab('playbook');
         }
-      }
+      };
 
       $('.oppia-about-tabs li').on('click', function(evt) {
         evt.preventDefault();

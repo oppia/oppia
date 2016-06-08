@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
 {% block maintitle %}
-  Oppia Editor
+  {% if title %}
+    {{ title }} - Oppia Editor
+  {% else %}
+    Untitled Exploration - Oppia Editor
+  {% endif %}
 {% endblock maintitle %}
-
-{% block subtitle %}
-  {{ title }}
-{% endblock subtitle %}
 
 {% block header_js %}
   {{ super() }}
@@ -73,15 +73,15 @@
          class="oppia-editor-navbar-tab-anchor protractor-test-main-tab">
         <i class="material-icons">&#xE254;</i>
       </a>
-      <div ng-show="countWarnings()" class="oppia-exploration-warnings-indicator" ng-click="selectMainTab()" ng-class="{'oppia-exploration-warnings-critical-color': hasCriticalWarnings(), 'oppia-exploration-warnings-error-color': !hasCriticalWarnings()}">
-        <span class="oppia-exploration-warnings-count">
+      <div ng-show="countWarnings()" class="oppia-editor-warnings-indicator" ng-click="selectMainTab()" ng-class="{'oppia-editor-warnings-critical-color': hasCriticalWarnings(), 'oppia-editor-warnings-error-color': !hasCriticalWarnings()}">
+        <span class="oppia-editor-warnings-count">
           <[countWarnings()]>
         </span>
       </div>
-      <ul class="dropdown-menu oppia-exploration-warnings-box">
-        <span class="oppia-exploration-warnings-header">Warnings</span>
-        <li class="oppia-exploration-warnings-text" ng-repeat="warning in getWarnings() track by $index">
-          <hr class="oppia-exploration-warnings-separator">
+      <ul class="dropdown-menu oppia-editor-warnings-box">
+        <span class="oppia-editor-warnings-header">Warnings</span>
+        <li class="oppia-editor-warnings-text" ng-repeat="warning in getWarnings() track by $index">
+          <hr class="oppia-editor-warnings-separator">
           <span ng-if="warning.type === 'critical'">
             <strong><[warning.message]></strong>
           </span>
@@ -153,7 +153,7 @@
     <li ng-if="isPrivate()">
       <div class="btn-group" style="margin-right: 10px; margin-top: 8px;"
            title="<[getPublishExplorationButtonTooltip()]>">
-        <button type="button" class="btn btn-default oppia-publish-exploration-button protractor-test-publish-exploration"
+        <button type="button" class="btn btn-default oppia-editor-publish-button protractor-test-publish-exploration"
                 ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}"
                 ng-click="showPublishExplorationModal()"
                 ng-disabled="isExplorationLockedForEditing() || countWarnings()">
@@ -302,7 +302,7 @@
 
       <div class="modal-footer">
         <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-        <button class="btn btn-success protractor-test-confirm-pre-publication" ng-click="save()" ng-disabled="isSavingAllowed()">Save Changes</button>
+        <button class="btn btn-success protractor-test-confirm-pre-publication" ng-click="save()" ng-disabled="!isSavingAllowed()">Save Changes</button>
       </div>
     </script>
 
@@ -424,6 +424,50 @@
       </div>
     </script>
 
+    <script type="text/ng-template" id="modals/saveValidationFail">
+      <div class="modal-header">
+        <h3>Error Saving Exploration</h3>
+      </div>
+
+      <div class="modal-body">
+        <p>
+          Sorry, an unexpected error occurred. Please refresh the page to
+          return to the most recent draft of your exploration.
+        </p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-default" ng-click="closeAndRefresh()">
+          Close and Refresh
+        </button>
+      </div>
+    </script>
+
+    <script type="text/ng-template" id="modals/saveVersionMismatch">
+      <div class="modal-header">
+        <h3>Error Saving Exploration</h3>
+      </div>
+
+      <div class="modal-body">
+        <p>
+          Sorry! Someone else has saved a new version of this exploration, so
+          your pending changes cannot be saved.
+        </p>
+
+        <p ng-show="hasLostChanges">
+          The lost changes are displayed below. You may want to copy and
+          paste these changes before discarding them.
+        </p>
+
+        <div class="oppia-lost-changes" ng-bind-html="lostChangesHtml">
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-default" ng-click="discardChanges()">Discard Changes</button>
+      </div>
+    </script>
+
     <div class="container-fluid oppia-editor-page-container" ng-joy-ride="tutorialInProgress" config="EDITOR_TUTORIAL_OPTIONS" on-finish="onLeaveTutorial()" on-skip="onLeaveTutorial()">
       <div class="row" ng-if="explorationRightsService.isCloned()">
         <div class="col-lg-12 col-md-12 col-sm-12">
@@ -442,7 +486,6 @@
       <div ng-if="getTabStatuses().active === 'preview'">
         {% include 'exploration_editor/preview_tab/preview_tab.html' %}
         {% include 'exploration_editor/preview_tab/preview_set_parameters_modal_directive.html' %}
-
       </div>
 
       <div ng-show="getTabStatuses().active === 'stats'">
@@ -545,6 +588,7 @@
 
     {{ include_js_file('services/explorationServices.js') }}
     {{ include_js_file('services/messengerService.js') }}
+    {{ include_js_file('services/utilsService.js') }}
 
     {{ include_js_file('exploration_editor/main_tab/ExplorationGraph.js') }}
     {{ include_js_file('exploration_editor/main_tab/GadgetEditor.js') }}

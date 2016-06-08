@@ -253,15 +253,15 @@ oppia.directive('conversationSkin', [function() {
     scope: {},
     templateUrl: 'skins/Conversation',
     controller: [
-      '$scope', '$timeout', '$rootScope', '$window', 'messengerService',
-      'oppiaPlayerService', 'urlService', 'focusService',
+      '$scope', '$timeout', '$rootScope', '$window', '$translate',
+       'messengerService', 'oppiaPlayerService', 'urlService', 'focusService',
       'LearnerViewRatingService', 'windowDimensionsService',
       'playerTranscriptService', 'LearnerParamsService',
       'playerPositionService', 'explorationRecommendationsService',
       'StatsReportingService',
       function(
-          $scope, $timeout, $rootScope, $window, messengerService,
-          oppiaPlayerService, urlService, focusService,
+          $scope, $timeout, $rootScope, $window, $translate,
+          messengerService, oppiaPlayerService, urlService, focusService,
           LearnerViewRatingService, windowDimensionsService,
           playerTranscriptService, LearnerParamsService,
           playerPositionService, explorationRecommendationsService,
@@ -470,6 +470,20 @@ oppia.directive('conversationSkin', [function() {
                 exploration.initStateName, _nextFocusLabel));
             $rootScope.loadingMessage = '';
             $scope.hasFullyLoaded = true;
+
+            // If the exploration is embedded, use the exploration language
+            // as site language. If the exploration language is not supported
+            // as site language, English is used as default.
+            if ($scope.isIframed) {
+              var explorationLanguageCode = (
+                oppiaPlayerService.getExplorationLanguageCode());
+              if ($window.GLOBALS.SUPPORTED_SITE_LANGUAGES[
+                    explorationLanguageCode]) {
+                $translate.use(explorationLanguageCode);
+              } else {
+                $translate.use('en');
+              }
+            }
             $scope.adjustPageHeight(false, null);
             $window.scrollTo(0, 0);
             focusService.setFocusIfOnDesktop(_nextFocusLabel);
@@ -587,13 +601,15 @@ oppia.directive('conversationSkin', [function() {
           $scope.startCardChangeAnimation = true;
 
           $timeout(function() {
+            var newInteractionHtml = oppiaPlayerService.getInteractionHtml(
+              newStateName, _nextFocusLabel);
+            // Note that newInteractionHtml may be null.
+            if (newInteractionHtml) {
+              newInteractionHtml += oppiaPlayerService.getRandomSuffix();
+            }
+
             _addNewCard(
-              newStateName,
-              newParams,
-              newContentHtml,
-              oppiaPlayerService.getInteractionHtml(
-                newStateName, _nextFocusLabel
-              ) + oppiaPlayerService.getRandomSuffix());
+              newStateName, newParams, newContentHtml, newInteractionHtml);
 
             $scope.upcomingStateName = null;
             $scope.upcomingParams = null;

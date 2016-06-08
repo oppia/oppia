@@ -47,7 +47,14 @@ describe('Change list service', function() {
 
   describe('change list service', function() {
     var cls = null;
+    var $httpBackend = null;
     var mockWarningsData;
+    var mockExplorationData;
+
+    var autosaveDraftUrl = 'createhandler/autosave_draft/0';
+    var validAutosaveResponse = {
+      is_version_of_draft_valid: true
+    };
 
     beforeEach(function() {
       mockWarningsData = {
@@ -57,10 +64,20 @@ describe('Change list service', function() {
         $provide.value('alertsService', mockWarningsData);
       });
       spyOn(mockWarningsData, 'addWarning');
+      mockExplorationData = {
+        explorationId: 0,
+        autosaveChangeList: function() {},
+        discardDraft: function() {}
+      };
+      module(function($provide) {
+        $provide.value('explorationData', mockExplorationData);
+      });
+      spyOn(mockExplorationData, 'autosaveChangeList');
     });
 
     beforeEach(inject(function($injector) {
       cls = $injector.get('changeListService');
+      $httpBackend = $injector.get('$httpBackend');
     }));
 
     it('should correctly get and save changes', function() {
@@ -68,6 +85,8 @@ describe('Change list service', function() {
       cls.addState('newState');
       expect(cls.getChangeList()).not.toBe([]);
       expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
+      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     });
 
     it('should correctly add a new state', function() {
@@ -78,6 +97,8 @@ describe('Change list service', function() {
         state_name: 'newState'
       }]);
       expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
+      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     });
 
     it('should correctly rename a state', function() {
@@ -89,6 +110,8 @@ describe('Change list service', function() {
         new_state_name: 'newName'
       }]);
       expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
+      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     });
 
     it('should correctly delete a state', function() {
@@ -99,6 +122,8 @@ describe('Change list service', function() {
         state_name: 'deletedState'
       }]);
       expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
+      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     });
 
     it('should correctly edit an exploration property', function() {
@@ -111,6 +136,8 @@ describe('Change list service', function() {
         old_value: 'oldTitle'
       }]);
       expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
+      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     });
 
     it('should detect invalid exploration properties', function() {
@@ -118,6 +145,7 @@ describe('Change list service', function() {
       cls.editExplorationProperty('fake_property', 'newThing', 'oldThing');
       expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
         'Invalid exploration property: fake_property');
+      expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
     });
 
     it('should correctly edit a state property', function() {
@@ -131,6 +159,8 @@ describe('Change list service', function() {
         old_value: 'oldC'
       }]);
       expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
+      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     });
 
     it('should detect invalid exploration properties', function() {
@@ -139,6 +169,7 @@ describe('Change list service', function() {
         'stateName', 'fake_property', 'newThing', 'oldThing');
       expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
         'Invalid state property: fake_property');
+      expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
     });
 
     it('should correctly discard all changes', function() {
@@ -147,6 +178,8 @@ describe('Change list service', function() {
       expect(cls.getChangeList()).not.toBe([]);
       cls.discardAllChanges();
       expect(cls.getChangeList()).toEqual([]);
+      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     });
 
     it('should correctly handle multiple changes in succession', function() {
@@ -161,6 +194,8 @@ describe('Change list service', function() {
         cmd: 'add_state',
         state_name: 'newState2'
       }]);
+      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     });
 
     it('should correctly undo changes', function() {
@@ -184,6 +219,8 @@ describe('Change list service', function() {
 
       cls.undoLastChange();
       expect(cls.getChangeList()).toEqual([]);
+      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     });
 
     it('should correctly add a gadget', function() {
@@ -228,6 +265,8 @@ describe('Change list service', function() {
           visible_in_states: ['newState1']
         }
       }]);
+      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     });
 
     it('should correctly rename a gadget', function() {
@@ -239,6 +278,8 @@ describe('Change list service', function() {
         new_gadget_name: 'newName'
       }]);
       expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
+      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     });
 
     it('should correctly delete a gadget', function() {
@@ -249,6 +290,8 @@ describe('Change list service', function() {
         gadget_name: 'gadgetName'
       }]);
       expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
+      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     });
 
     it('should correctly edit gadget customization args', function() {
@@ -316,6 +359,8 @@ describe('Change list service', function() {
           }
         }
       }]);
+      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     });
 
     it('should correctly edit a gadget visibility property', function() {
@@ -335,6 +380,8 @@ describe('Change list service', function() {
         new_value: ['new state name'],
         old_value: ['old_state_name']
       }]);
+      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     });
   });
 });
@@ -344,9 +391,28 @@ describe('Exploration title service', function() {
 
   describe('exploration title service', function() {
     var ets = null;
+    var $httpBackend = null;
+    var mockExplorationData;
+
+    var autosaveDraftUrl = 'createhandler/autosave_draft/0';
+    var validAutosaveResponse = {
+      is_version_of_draft_valid: true
+    };
+
+    beforeEach(function() {
+      mockExplorationData = {
+        explorationId: 0,
+        autosaveChangeList: function() {}
+      };
+      module(function($provide) {
+        $provide.value('explorationData', mockExplorationData);
+      });
+      spyOn(mockExplorationData, 'autosaveChangeList');
+    });
 
     beforeEach(inject(function($injector) {
       ets = $injector.get('explorationTitleService');
+      $httpBackend = $injector.get('$httpBackend');
     }));
 
     it('correctly initializes the service', function() {
@@ -362,6 +428,7 @@ describe('Exploration title service', function() {
       ets.displayed = 'New title';
       expect(ets.displayed).toEqual('New title');
       expect(ets.savedMemento).toEqual('A title');
+      expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
     });
 
     it('restores correctly from the memento', function() {
@@ -378,6 +445,8 @@ describe('Exploration title service', function() {
       expect(ets.savedMemento).toEqual('A title');
       ets.saveDisplayedValue();
       expect(ets.savedMemento).toEqual('New title');
+      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     });
 
     it('reports whether the title has changed since it was saved', function() {
@@ -391,6 +460,7 @@ describe('Exploration title service', function() {
       expect(ets.hasChanged()).toBe(false);
 
       ets.saveDisplayedValue();
+      expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
       expect(ets.hasChanged()).toBe(false);
     });
   });
@@ -472,8 +542,15 @@ describe('Exploration gadgets service', function() {
 
   describe('exploration gadgets service', function() {
     var egs = null;
+    var $httpBackend = null;
     var mockWarningsData;
+    var mockExplorationData;
     var TEST_GADGET_NAME = 'TestGadget1';
+
+    var autosaveDraftUrl = 'createhandler/autosave_draft/0';
+    var validAutosaveResponse = {
+      is_version_of_draft_valid: true
+    };
 
     var GADGET_SPECS = {
       ScoreBar: {
@@ -609,10 +686,19 @@ describe('Exploration gadgets service', function() {
         $provide.constant('GADGET_SPECS', GADGET_SPECS);
       });
       spyOn(mockWarningsData, 'addWarning');
+      mockExplorationData = {
+        explorationId: 0,
+        autosaveChangeList: function() {}
+      };
+      module(function($provide) {
+        $provide.value('explorationData', mockExplorationData);
+      });
+      spyOn(mockExplorationData, 'autosaveChangeList');
     });
 
     beforeEach(inject(function($injector) {
       egs = $injector.get('explorationGadgetsService');
+      $httpBackend = $injector.get('$httpBackend');
       GLOBALS.PANEL_SPECS = {
         bottom: {
           stackable_axis: 'horizontal',
@@ -631,6 +717,8 @@ describe('Exploration gadgets service', function() {
       expect(egs.getGadgets()[TEST_GADGET_NAME].visible_in_states).toEqual(
         ['Example2']
       );
+      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     });
 
     it('Update gadgets data when state is renamed', function() {
@@ -640,6 +728,8 @@ describe('Exploration gadgets service', function() {
       expect(egs.getGadgets()[TEST_GADGET_NAME].visible_in_states).toEqual(
         ['Example1', 'newStateName']
       );
+      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     });
 
     it('should detect invalid data passed for initialization', function() {

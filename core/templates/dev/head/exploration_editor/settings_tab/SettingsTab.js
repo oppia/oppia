@@ -51,7 +51,7 @@ oppia.controller('SettingsTab', [
 
     $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
 
-    var MY_EXPLORATIONS_PAGE_URL = '/my_explorations';
+    var DASHBOARD_PAGE_URL = '/dashboard';
     var EXPLORE_PAGE_PREFIX = '/explore/';
 
     $scope.getExplorePageUrl = function() {
@@ -90,8 +90,11 @@ oppia.controller('SettingsTab', [
           }
         );
 
-        if (!categoryIsInSelect2) {
-          $scope.CATEGORY_LIST_FOR_SELECT2.push({
+        // If the current category is not in the dropdown, add it
+        // as the first option.
+        if (!categoryIsInSelect2 &&
+            explorationCategoryService.savedMemento) {
+          $scope.CATEGORY_LIST_FOR_SELECT2.unshift({
             id: explorationCategoryService.savedMemento,
             text: explorationCategoryService.savedMemento
           });
@@ -248,7 +251,7 @@ oppia.controller('SettingsTab', [
           deleteUrl += ('?role=' + role);
         }
         $http['delete'](deleteUrl).then(function() {
-          $window.location = MY_EXPLORATIONS_PAGE_URL;
+          $window.location = DASHBOARD_PAGE_URL;
         });
       });
     };

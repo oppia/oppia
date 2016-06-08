@@ -31,7 +31,6 @@ import os
 from core.domain import collection_domain
 from core.domain import exp_services
 from core.domain import rights_manager
-from core.domain import summary_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -125,7 +124,7 @@ def get_collection_from_model(collection_model, run_conversion=True):
     return collection_domain.Collection(
         collection_model.id, collection_model.title,
         collection_model.category, collection_model.objective,
-        collection_model.language_code,
+        collection_model.language_code, collection_model.tags,
         versioned_collection['schema_version'], [
             collection_domain.CollectionNode.from_dict(collection_node_dict)
             for collection_node_dict in versioned_collection['nodes']
@@ -138,7 +137,8 @@ def get_collection_summary_from_model(collection_summary_model):
     return collection_domain.CollectionSummary(
         collection_summary_model.id, collection_summary_model.title,
         collection_summary_model.category, collection_summary_model.objective,
-        collection_summary_model.language_code, collection_summary_model.status,
+        collection_summary_model.language_code, collection_summary_model.tags,
+        collection_summary_model.status,
         collection_summary_model.community_owned,
         collection_summary_model.owner_ids,
         collection_summary_model.editor_ids,
@@ -146,6 +146,7 @@ def get_collection_summary_from_model(collection_summary_model):
         collection_summary_model.contributor_ids,
         collection_summary_model.contributors_summary,
         collection_summary_model.version,
+        collection_summary_model.node_count,
         collection_summary_model.collection_model_created_on,
         collection_summary_model.collection_model_last_updated
     )
@@ -248,85 +249,6 @@ def is_collection_summary_editable(collection_summary, user_id=None):
         or collection_summary.community_owned)
 
 
-def get_learner_collection_dict_by_id(
-        collection_id, user_id, strict=True, allow_invalid_explorations=False,
-        version=None):
-    """Creates and returns a dictionary representation of a collection given by
-    the provided collection ID. This dictionary contains extra information
-    along with the dict returned by collection_domain.Collection.to_dict()
-    which includes useful data for the collection learner view. The information
-    includes progress in the collection, information about explorations
-    referenced within the collection, and a slightly nicer data structure for
-    frontend work.
-
-    This raises a ValidationError if the collection retrieved using the given ID
-    references non-existent explorations.
-    """
-    collection = get_collection_by_id(
-        collection_id, strict=strict, version=version)
-
-    exp_ids = collection.exploration_ids
-    exp_summary_dicts = (
-        summary_services.get_displayable_exp_summary_dicts_matching_ids(
-            exp_ids, editor_user_id=user_id))
-    exp_summaries_dict_map = {
-        exp_summary_dict['id']: exp_summary_dict
-        for exp_summary_dict in exp_summary_dicts
-    }
-
-    # TODO(bhenning): Users should not be recommended explorations they have
-    # completed outside the context of a collection (see #1461).
-    next_exploration_ids = None
-    completed_exploration_ids = None
-    if user_id:
-        completed_exploration_ids = _get_valid_completed_exploration_ids(
-            user_id, collection_id, collection)
-        next_exploration_ids = collection.get_next_exploration_ids(
-            completed_exploration_ids)
-    else:
-        # If the user is not logged in or they have not completed any of
-        # the explorations yet within the context of this collection,
-        # recommend the initial explorations.
-        next_exploration_ids = collection.init_exploration_ids
-        completed_exploration_ids = []
-
-    collection_dict = collection.to_dict()
-    collection_dict['skills'] = collection.skills
-    collection_dict['playthrough_dict'] = {
-        'next_exploration_ids': next_exploration_ids,
-        'completed_exploration_ids': completed_exploration_ids
-    }
-    collection_dict['version'] = collection.version
-
-    collection_is_public = rights_manager.is_collection_public(collection_id)
-
-    # Insert an 'exploration' dict into each collection node, where the
-    # dict includes meta information about the exploration (ID and title).
-    for collection_node in collection_dict['nodes']:
-        exploration_id = collection_node['exploration_id']
-        summary_dict = exp_summaries_dict_map.get(exploration_id)
-        if not allow_invalid_explorations:
-            if not summary_dict:
-                raise utils.ValidationError(
-                    'Expected collection to only reference valid '
-                    'explorations, but found an exploration with ID: %s (was '
-                    'the exploration deleted or is it a private exploration '
-                    'that you do not have edit access to?)'
-                    % exploration_id)
-            if collection_is_public and rights_manager.is_exploration_private(
-                    exploration_id):
-                raise utils.ValidationError(
-                    'Cannot reference a private exploration within a public '
-                    'collection, exploration ID: %s' % exploration_id)
-
-        if summary_dict:
-            collection_node['exploration_summary'] = summary_dict
-        else:
-            collection_node['exploration_summary'] = None
-
-    return collection_dict
-
-
 # Query methods.
 def get_collection_titles_and_categories(collection_ids):
     """Returns collection titles and categories for the given ids.
@@ -373,7 +295,7 @@ def get_completed_exploration_ids(user_id, collection_id):
     return progress_model.completed_explorations if progress_model else []
 
 
-def _get_valid_completed_exploration_ids(user_id, collection_id, collection):
+def get_valid_completed_exploration_ids(user_id, collection_id, collection):
     """Returns a filtered version of the return value of
     get_completed_exploration_ids, where explorations not also found within the
     collection are removed from the returned list.
@@ -445,21 +367,21 @@ def get_collection_summaries_matching_ids(collection_ids):
 # TODO(bhenning): Update this function to support also matching the query to
 # explorations contained within this collection. Introduce tests to verify this
 # behavior.
-def get_collection_summaries_matching_query(query_string, cursor=None):
-    """Returns a list with all collection summary domain objects matching the
-    given search query string, as well as a search cursor for future fetches.
+def get_collection_ids_matching_query(query_string, cursor=None):
+    """Returns a list with all collection ids matching the given search query
+    string, as well as a search cursor for future fetches.
 
     This method returns exactly feconf.SEARCH_RESULTS_PAGE_SIZE results if
     there are at least that many, otherwise it returns all remaining results.
     (If this behaviour does not occur, an error will be logged.) The method
     also returns a search cursor.
     """
-    summary_models = []
+    returned_collection_ids = []
     search_cursor = cursor
 
     for _ in range(MAX_ITERATIONS):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
-            summary_models)
+            returned_collection_ids)
 
         collection_ids, search_cursor = search_collections(
             query_string, remaining_to_fetch, cursor=search_cursor)
@@ -469,11 +391,11 @@ def get_collection_summaries_matching_query(query_string, cursor=None):
                 collection_models.CollectionSummaryModel.get_multi(
                     collection_ids)):
             if model is not None:
-                summary_models.append(model)
+                returned_collection_ids.append(collection_ids[ind])
             else:
                 invalid_collection_ids.append(collection_ids[ind])
 
-        if len(summary_models) == feconf.SEARCH_RESULTS_PAGE_SIZE or (
+        if len(returned_collection_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE or (
                 search_cursor is None):
             break
         else:
@@ -481,17 +403,13 @@ def get_collection_summaries_matching_query(query_string, cursor=None):
                 'Search index contains stale collection ids: %s' %
                 ', '.join(invalid_collection_ids))
 
-    if (len(summary_models) < feconf.SEARCH_RESULTS_PAGE_SIZE
+    if (len(returned_collection_ids) < feconf.SEARCH_RESULTS_PAGE_SIZE
             and search_cursor is not None):
         logging.error(
             'Could not fulfill search request for query string %s; at least '
             '%s retries were needed.' % (query_string, MAX_ITERATIONS))
 
-    return ([
-        get_collection_summary_from_model(summary_model)
-        for summary_model in summary_models
-    ], search_cursor)
-
+    return (returned_collection_ids, search_cursor)
 
 # Repository SAVE and DELETE methods.
 def apply_change_list(collection_id, change_list):
@@ -537,6 +455,9 @@ def apply_change_list(collection_id, change_list):
                 elif (change.property_name ==
                       collection_domain.COLLECTION_PROPERTY_LANGUAGE_CODE):
                     collection.update_language_code(change.new_value)
+                elif (change.property_name ==
+                      collection_domain.COLLECTION_PROPERTY_TAGS):
+                    collection.update_tags(change.new_value)
             elif (
                     change.cmd ==
                     collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
@@ -623,11 +544,12 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     collection_model.title = collection.title
     collection_model.objective = collection.objective
     collection_model.language_code = collection.language_code
+    collection_model.tags = collection.tags
     collection_model.schema_version = collection.schema_version
     collection_model.nodes = [
         collection_node.to_dict() for collection_node in collection.nodes
     ]
-
+    collection_model.node_count = len(collection_model.nodes)
     collection_model.commit(committer_id, commit_message, change_list)
     memcache_services.delete(_get_collection_memcache_key(collection.id))
     index_collections_given_ids([collection.id])
@@ -651,6 +573,7 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
         title=collection.title,
         objective=collection.objective,
         language_code=collection.language_code,
+        tags=collection.tags,
         schema_version=collection.schema_version,
         nodes=[
             collection_node.to_dict() for collection_node in collection.nodes
@@ -823,14 +746,16 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
 
     collection_model_last_updated = collection.last_updated
     collection_model_created_on = collection.created_on
+    collection_model_node_count = len(collection.nodes)
 
     collection_summary = collection_domain.CollectionSummary(
         collection.id, collection.title, collection.category,
-        collection.objective, collection.language_code,
+        collection.objective, collection.language_code, collection.tags,
         collection_rights.status, collection_rights.community_owned,
         collection_rights.owner_ids, collection_rights.editor_ids,
         collection_rights.viewer_ids, contributor_ids, contributors_summary,
-        collection.version, collection_model_created_on,
+        collection.version, collection_model_node_count,
+        collection_model_created_on,
         collection_model_last_updated
     )
 
@@ -873,6 +798,7 @@ def save_collection_summary(collection_summary):
         category=collection_summary.category,
         objective=collection_summary.objective,
         language_code=collection_summary.language_code,
+        tags=collection_summary.tags,
         status=collection_summary.status,
         community_owned=collection_summary.community_owned,
         owner_ids=collection_summary.owner_ids,
@@ -881,6 +807,7 @@ def save_collection_summary(collection_summary):
         contributor_ids=collection_summary.contributor_ids,
         contributors_summary=collection_summary.contributors_summary,
         version=collection_summary.version,
+        node_count=collection_summary.node_count,
         collection_model_last_updated=(
             collection_summary.collection_model_last_updated),
         collection_model_created_on=(
@@ -1053,6 +980,7 @@ def _collection_to_search_dict(collection):
         'category': collection.category,
         'objective': collection.objective,
         'language_code': collection.language_code,
+        'tags': collection.tags,
         'rank': _get_search_rank(collection.id),
     }
     doc.update(_collection_rights_to_search_dict(rights))

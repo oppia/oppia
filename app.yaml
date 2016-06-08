@@ -1,5 +1,5 @@
 application: oppiaserver
-version: 2-2-0
+version: 2-3-0
 runtime: python27
 api_version: 1
 threadsafe: false
@@ -53,6 +53,11 @@ handlers:
   http_headers:
     Cache-Control: 'public, max-age=2592000'
     Vary: Accept-Encoding
+- url: /i18n
+  static_dir: i18n
+  secure: always
+  http_headers:
+    Cache-Control: 'no-cache'
 - url: /third_party/generated
   static_dir: third_party/generated
   secure: always

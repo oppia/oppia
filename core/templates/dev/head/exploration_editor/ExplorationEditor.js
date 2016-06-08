@@ -34,7 +34,8 @@ oppia.controller('ExplorationEditor', [
   'routerService', 'graphDataService', 'stateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
   'explorationWarningsService', '$templateCache', 'explorationContextService',
-  'explorationAdvancedFeaturesService', '$modal',
+  'explorationAdvancedFeaturesService', '$modal', 'changeListService',
+  'autosaveInfoModalsService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
       explorationData, editorContextService, explorationTitleService,
@@ -45,7 +46,8 @@ oppia.controller('ExplorationEditor', [
       routerService, graphDataService, stateEditorTutorialFirstTimeService,
       explorationParamSpecsService, explorationParamChangesService,
       explorationWarningsService, $templateCache, explorationContextService,
-      explorationAdvancedFeaturesService, $modal) {
+      explorationAdvancedFeaturesService, $modal, changeListService,
+      autosaveInfoModalsService) {
     $scope.editabilityService = editabilityService;
     $scope.editorContextService = editorContextService;
 
@@ -142,6 +144,21 @@ oppia.controller('ExplorationEditor', [
         }
 
         explorationWarningsService.updateWarnings();
+
+        // Initialize changeList by draft changes if they exist.
+        if (data.draft_changes !== null) {
+          changeListService.loadAutosavedChangeList(data.draft_changes);
+        }
+
+        if (data.is_version_of_draft_valid === false &&
+            data.draft_changes !== null &&
+            data.draft_changes.length > 0) {
+          // Show modal displaying lost changes if the version of draft
+          // changes is invalid, and draft_changes is not `null`.
+          autosaveInfoModalsService.showVersionMismatchModal(
+            changeListService.getChangeList());
+          return;
+        }
 
         $scope.$broadcast('refreshStatisticsTab');
         $scope.$broadcast('refreshVersionHistory', {
@@ -487,6 +504,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
   'explorationObjectiveService', 'explorationTitleService',
   'explorationCategoryService', 'explorationStatesService', 'CATEGORY_LIST',
   'explorationLanguageCodeService', 'explorationTagsService',
+  'autosaveInfoModalsService',
   function(
       $scope, $http, $rootScope, $window, $timeout, $modal,
       alertsService, changeListService, focusService, routerService,
@@ -494,7 +512,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       explorationWarningsService, siteAnalyticsService,
       explorationObjectiveService, explorationTitleService,
       explorationCategoryService, explorationStatesService, CATEGORY_LIST,
-      explorationLanguageCodeService, explorationTagsService) {
+      explorationLanguageCodeService, explorationTagsService,
+      autosaveInfoModalsService) {
     // Whether or not a save action is currently in progress.
     $scope.isSaveInProgress = false;
     // Whether or not a discard action is currently in progress.
@@ -519,7 +538,9 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
     };
 
     $scope.discardChanges = function() {
-      var confirmDiscard = confirm('Do you want to discard your changes?');
+      var confirmDiscard = confirm(
+        'Are you sure you want to discard your changes?');
+
       if (confirmDiscard) {
         alertsService.clearWarnings();
         $rootScope.$broadcast('externalSave');
@@ -531,6 +552,11 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
           $scope.lastSaveOrDiscardAction = 'discard';
           $scope.isDiscardInProgress = false;
         });
+
+        // The reload is necessary because, otherwise, the
+        // exploration-with-draft-changes will be reloaded (since it is already
+        // cached in explorationData).
+        location.reload();
       }
     };
 
@@ -549,15 +575,6 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         )
       );
     };
-
-    $window.addEventListener('beforeunload', function(e) {
-      if ($scope.isExplorationLockedForEditing()) {
-        var confirmationMessage = (
-          'You have unsaved changes which will be lost if you leave the page.');
-        (e || $window.event).returnValue = confirmationMessage;
-        return confirmationMessage;
-      }
-    });
 
     $scope.isPublic = function() {
       return explorationRightsService.isPublic();
@@ -681,8 +698,6 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               $scope.askForTags = (
                 explorationTagsService.savedMemento.length === 0);
 
-              $scope.metadataList = [];
-
               $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
 
               $scope.CATEGORY_LIST_FOR_SELECT2 = [];
@@ -704,8 +719,11 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
                   }
                 );
 
-                if (!categoryIsInSelect2) {
-                  $scope.CATEGORY_LIST_FOR_SELECT2.push({
+                // If the current category is not in the dropdown, add it
+                // as the first option.
+                if (!categoryIsInSelect2 &&
+                    explorationCategoryService.savedMemento) {
+                  $scope.CATEGORY_LIST_FOR_SELECT2.unshift({
                     id: explorationCategoryService.savedMemento,
                     text: explorationCategoryService.savedMemento
                   });
@@ -713,17 +731,11 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               }
 
               $scope.isSavingAllowed = function() {
-                var allMetadataDisplayed = (
+                return Boolean(
                   explorationTitleService.displayed &&
                   explorationObjectiveService.displayed &&
                   explorationCategoryService.displayed &&
                   explorationLanguageCodeService.displayed);
-
-                if (allMetadataDisplayed) {
-                  return false;
-                } else {
-                  return true;
-                }
               };
 
               $scope.save = function() {
@@ -741,20 +753,21 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
                 }
 
                 // Record any fields that have changed.
+                var metadataList = [];
                 if (explorationTitleService.hasChanged()) {
-                  $scope.metadataList.push('title');
+                  metadataList.push('title');
                 }
                 if (explorationObjectiveService.hasChanged()) {
-                  $scope.metadataList.push('objective');
+                  metadataList.push('objective');
                 }
                 if (explorationCategoryService.hasChanged()) {
-                  $scope.metadataList.push('category');
+                  metadataList.push('category');
                 }
                 if (explorationLanguageCodeService.hasChanged()) {
-                  $scope.metadataList.push('language');
+                  metadataList.push('language');
                 }
                 if (explorationTagsService.hasChanged()) {
-                  $scope.metadataList.push('tags');
+                  metadataList.push('tags');
                 }
 
                 // Save all the displayed values.
@@ -764,7 +777,14 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
                 explorationLanguageCodeService.saveDisplayedValue();
                 explorationTagsService.saveDisplayedValue();
 
-                $modalInstance.close($scope.metadataList);
+                // TODO(sll): Get rid of the $timeout here. It's currently used
+                // because there is a race condition: the saveDisplayedValue()
+                // calls above result in autosave calls. These race with the
+                // discardDraft() call that will be called when the draft
+                // changes entered here are properly saved to the backend.
+                $timeout(function() {
+                  $modalInstance.close(metadataList);
+                }, 500);
               };
 
               $scope.cancel = function() {
@@ -775,15 +795,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
           ]
         }).result.then(function(metadataList) {
           if (metadataList.length > 0) {
-            var commitMessage = 'Add metadata to the exploration: ';
-            for (var i = 0; i < metadataList.length; i++) {
-              commitMessage += metadataList[i];
-              if (i === metadataList.length - 1) {
-                commitMessage += '.';
-              } else {
-                commitMessage += ', ';
-              }
-            }
+            var commitMessage = (
+              'Add metadata: ' + metadataList.join(', ') + '.');
             saveDraftToBackend(commitMessage, openPublishExplorationModal);
           } else {
             openPublishExplorationModal();
@@ -834,8 +847,9 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         version: explorationData.data.version
       }).then(function(response) {
         var data = response.data;
-        if (data.error) {
-          alertsService.addWarning(data.error);
+        if (data.is_version_of_draft_valid === false) {
+          autosaveInfoModalsService.showVersionMismatchModal(
+            changeListService.getChangeList());
           return;
         }
 

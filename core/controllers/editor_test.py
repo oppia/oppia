@@ -19,8 +19,8 @@ import os
 import StringIO
 import zipfile
 
+from core.controllers import dashboard
 from core.controllers import editor
-from core.controllers import home
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -80,7 +80,7 @@ class EditorTest(BaseEditorControllerTest):
         # Check that non-editors can access, but not edit, the editor page.
         response = self.testapp.get('/create/0')
         self.assertEqual(response.status_int, 200)
-        self.assertIn('Welcome to Oppia!', response.body)
+        self.assertIn('Help others learn new things.', response.body)
         self.assert_cannot_edit(response.body)
 
         # Log in as an editor.
@@ -88,7 +88,7 @@ class EditorTest(BaseEditorControllerTest):
 
         # Check that it is now possible to access and edit the editor page.
         response = self.testapp.get('/create/0')
-        self.assertIn('Welcome to Oppia!', response.body)
+        self.assertIn('Help others learn new things.', response.body)
         self.assertEqual(response.status_int, 200)
         self.assert_can_edit(response.body)
         self.assertIn('Stats', response.body)
@@ -114,12 +114,13 @@ class EditorTest(BaseEditorControllerTest):
         """
         self.login(self.EDITOR_EMAIL)
 
-        response = self.testapp.get('/my_explorations')
+        response = self.testapp.get(feconf.DASHBOARD_URL)
         self.assertEqual(response.status_int, 200)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token_from_response(
+            response, token_type=feconf.CSRF_PAGE_NAME_CREATE_EXPLORATION)
         exp_id = self.post_json(
             feconf.NEW_EXPLORATION_URL, {}, csrf_token
-        )[home.EXPLORATION_ID_KEY]
+        )[dashboard.EXPLORATION_ID_KEY]
 
         response = self.testapp.get('/create/%s' % exp_id)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -1309,9 +1310,6 @@ class EditorAutosaveTest(BaseEditorControllerTest):
         response = self.testapp.get('/create/%s' % self.EXP_ID1)
         self.csrf_token = self.get_csrf_token_from_response(response)
 
-    def _null_method(self, *args):
-        pass
-
     def test_exploration_loaded_with_draft_applied(self):
         response = self.get_json(
             '/createhandler/data/%s' % self.EXP_ID2, {'apply_draft': True})
@@ -1354,22 +1352,25 @@ class EditorAutosaveTest(BaseEditorControllerTest):
         # Check that draft change list hasn't been updated.
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.owner_id, self.EXP_ID1))
-        self.assertEqual(exp_user_data.draft_change_list, self.DRAFT_CHANGELIST)
+        self.assertEqual(
+            exp_user_data.draft_change_list, self.DRAFT_CHANGELIST)
         self.assertTrue(response['is_version_of_draft_valid'])
 
     def test_draft_not_updated_validation_error(self):
-        payload = {
-            'change_list': self.INVALID_CHANGELIST,
-            'version': 1,
-        }
+        self.put_json(
+            '/createhandler/autosave_draft/%s' % self.EXP_ID2, {
+                'change_list': self.DRAFT_CHANGELIST,
+                'version': 1,
+            }, self.csrf_token)
         response = self.put_json(
-            '/createhandler/autosave_draft/%s' % self.EXP_ID2, payload,
-            self.csrf_token, expect_errors=True, expected_status_int=400)
+            '/createhandler/autosave_draft/%s' % self.EXP_ID2, {
+                'change_list': self.INVALID_CHANGELIST,
+                'version': 2,
+            }, self.csrf_token, expect_errors=True, expected_status_int=400)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.owner_id, self.EXP_ID2))
-        self.assertIsNone(exp_user_data.draft_change_list)
-        self.assertIsNone(exp_user_data.draft_change_list_last_updated)
-        self.assertIsNone(exp_user_data.draft_change_list_exp_version)
+        self.assertEqual(
+            exp_user_data.draft_change_list, self.DRAFT_CHANGELIST)
         self.assertEqual(
             response, {'code': 400,
                        'error': 'Expected title to be a string, received 1'})

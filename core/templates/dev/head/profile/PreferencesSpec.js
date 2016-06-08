@@ -20,6 +20,8 @@ describe('Preferences Controller', function() {
       module('oppia');
     });
 
+    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+
     beforeEach(inject(function(_$httpBackend_, $http, $rootScope, $controller) {
       $httpBackend = _$httpBackend_;
       $httpBackend.expectGET('/preferenceshandler/data').respond({

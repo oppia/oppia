@@ -20,6 +20,8 @@
 describe('State Editor controller', function() {
   describe('StateEditor', function() {
     var scope, ctrl, ecs, cls, ess;
+    var $httpBackend;
+    var mockExplorationData;
 
     beforeEach(function() {
       module('oppia');
@@ -33,10 +35,19 @@ describe('State Editor controller', function() {
           }
         });
       });
+      mockExplorationData = {
+        explorationId: 0,
+        autosaveChangeList: function() {}
+      };
+      module(function($provide) {
+        $provide.value('explorationData', mockExplorationData);
+      });
+      spyOn(mockExplorationData, 'autosaveChangeList');
     });
 
     beforeEach(inject(function($rootScope, $controller, $injector) {
       scope = $rootScope.$new();
+      $httpBackend = $injector.get('$httpBackend');
       ecs = $injector.get('editorContextService');
       cls = $injector.get('changeListService');
       ess = $injector.get('explorationStatesService');
@@ -136,6 +147,7 @@ describe('State Editor controller', function() {
       expect(scope.contentEditorIsOpen).toBe(true);
       scope.content = scope.getContent('First State Content');
       scope.saveTextContent();
+
       expect(scope.contentEditorIsOpen).toBe(false);
       expect(cls.getChangeList()).toEqual([]);
     });
@@ -178,6 +190,9 @@ describe('State Editor controller', function() {
   describe('TrainingDataService', function() {
     var $httpBackend;
     var scope, siis, ecs, cls, rs, tds, ess, IS, FUZZY_RULE_TYPE;
+    var mockExplorationData;
+
+    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
     beforeEach(function() {
       module('oppia');
@@ -191,6 +206,14 @@ describe('State Editor controller', function() {
           }
         });
       });
+      mockExplorationData = {
+        explorationId: 0,
+        autosaveChangeList: function() {}
+      };
+      module(function($provide) {
+        $provide.value('explorationData', mockExplorationData);
+      });
+      spyOn(mockExplorationData, 'autosaveChangeList');
     });
 
     beforeEach(inject(function($rootScope, $controller, $injector) {

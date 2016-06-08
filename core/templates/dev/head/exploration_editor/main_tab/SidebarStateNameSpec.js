@@ -19,9 +19,27 @@
 describe('Sidebar state name controller', function() {
   describe('SidebarStateName', function() {
     var scope, filter, ctrl, ecs, fs, ess;
+    var $httpBackend;
+    var mockExplorationData;
+
+    var autosaveDraftUrl = 'createhandler/autosave_draft/0';
+    var validAutosaveResponse = {
+      is_version_of_draft_valid: true
+    };
 
     beforeEach(function() {
       module('oppia');
+    });
+
+    beforeEach(function() {
+      mockExplorationData = {
+        explorationId: 0,
+        autosaveChangeList: function() {}
+      };
+      module(function($provide) {
+        $provide.value('explorationData', mockExplorationData);
+      });
+      spyOn(mockExplorationData, 'autosaveChangeList');
     });
 
     beforeEach(inject(function(
@@ -32,6 +50,7 @@ describe('Sidebar state name controller', function() {
       ecs = $injector.get('editorContextService');
       fs = $injector.get('focusService');
       ess = $injector.get('explorationStatesService');
+      $httpBackend = $injector.get('$httpBackend');
 
       GLOBALS.INVALID_NAME_CHARS = '#@&^%$';
 
@@ -148,10 +167,14 @@ describe('Sidebar state name controller', function() {
       scope.saveStateName('Fourth State');
       expect(scope.stateName).toEqual('Fourth State');
       expect(ecs.getActiveStateName()).toEqual('Fourth State');
+      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
 
       scope.saveStateName('Fifth State');
       expect(scope.stateName).toEqual('Fifth State');
       expect(ecs.getActiveStateName()).toEqual('Fifth State');
+      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     });
 
     it('should allow state names to be variations of \'END\'', function() {
@@ -174,6 +197,8 @@ describe('Sidebar state name controller', function() {
       scope.saveStateName('Fifth State');
       expect(ess.getState('Fifth State')).toBeTruthy();
       expect(ess.getState('First State')).toBeFalsy();
+      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     });
 
     it('should not re-save unedited state names', function() {
@@ -191,20 +216,24 @@ describe('Sidebar state name controller', function() {
       // This is not a valid state name.
       scope.saveStateName('#!% State');
       expect(ecs.getActiveStateName()).toEqual('Third State');
+      expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
 
       // Long state names will not save.
       scope.saveStateName(
         'This state name is too long to be saved. Try to be brief next time.'
       );
       expect(ecs.getActiveStateName()).toEqual('Third State');
+      expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
 
       // This will not save because it is an already existing state name.
       scope.saveStateName('First State');
       expect(ecs.getActiveStateName()).toEqual('Third State');
+      expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
 
       // Will not save because the memento is the same as the new state name.
       scope.saveStateName('Third State');
       expect(ecs.getActiveStateName()).toEqual('Third State');
+      expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
     });
   });
 });

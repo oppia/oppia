@@ -13,39 +13,32 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the page showing the user's explorations.
+ * @fileoverview Controllers for the creator dashboard.
  */
 
-oppia.controller('MyExplorations', [
+oppia.controller('Dashboard', [
   '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
-  'RatingComputationService', 'urlService', 'ExplorationCreationService',
+  'RatingComputationService', 'ExplorationCreationService',
   function(
       $scope, $http, $rootScope, oppiaDatetimeFormatter,
-      RatingComputationService, urlService, ExplorationCreationService) {
+      RatingComputationService, ExplorationCreationService) {
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
     $scope.createNewExploration = (
       ExplorationCreationService.createNewExploration);
     $scope.getLocaleAbbreviatedDatetimeString = (
       oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString);
 
+    $scope.activeTab = 'myExplorations';
+    $scope.setActiveTab = function(newActiveTabName) {
+      $scope.activeTab = newActiveTabName;
+    };
+
     $rootScope.loadingMessage = 'Loading';
-    $http.get('/myexplorationshandler/data').then(function(response) {
+    $http.get('/dashboardhandler/data').then(function(response) {
       var data = response.data;
       $scope.explorationsList = data.explorations_list;
+      $scope.collectionsList = data.collections_list;
       $rootScope.loadingMessage = '';
-
-      if (data.username) {
-        if (urlService.getUrlParams().mode === 'create') {
-          $scope.createNewExploration();
-        }
-      }
     });
-  }
-]);
-
-oppia.controller('CreateCollectionButton', [
-  '$scope', 'CollectionCreationService',
-  function($scope, CollectionCreationService) {
-    $scope.createNewCollection = CollectionCreationService.createNewCollection;
   }
 ]);

@@ -317,6 +317,9 @@ class ExpSummaryModel(base_models.BaseModel):
     # Aggregate user-assigned ratings of the exploration
     ratings = ndb.JsonProperty(default=None, indexed=False)
 
+    # Scaled average rating for the exploration.
+    scaled_average_rating = ndb.FloatProperty(indexed=True)
+
     # Time when the exploration model was last updated (not to be
     # confused with last_updated, which is the time when the
     # exploration *summary* model was last updated)
@@ -325,6 +328,8 @@ class ExpSummaryModel(base_models.BaseModel):
     # with created_on, which is the time when the exploration *summary*
     # model was created)
     exploration_model_created_on = ndb.DateTimeProperty(indexed=True)
+    # Time when the exploration was first published.
+    first_published_msec = ndb.FloatProperty(indexed=True)
 
     # The publication status of this exploration.
     status = ndb.StringProperty(
@@ -375,6 +380,20 @@ class ExpSummaryModel(base_models.BaseModel):
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
+    def get_top_rated(cls):
+        """Returns an iterable with the top rated exp summaries that are
+        public in descending order.
+        """
+        return ExpSummaryModel.query().filter(
+            ndb.OR(ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PUBLIC,
+                   ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PUBLICIZED)
+        ).filter(
+            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+        ).order(
+            -ExpSummaryModel.scaled_average_rating
+        ).fetch(feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS)
+
+    @classmethod
     def get_private_at_least_viewable(cls, user_id):
         """Returns an iterable with private exp summaries that are at least
         viewable by the given user.
@@ -400,3 +419,17 @@ class ExpSummaryModel(base_models.BaseModel):
         ).filter(
             ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def get_recently_published(cls):
+        """Returns an iterable with exp summaries that are recently
+        published.
+        """
+        return ExpSummaryModel.query().filter(
+            ndb.OR(ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PUBLIC,
+                   ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PUBLICIZED)
+        ).filter(
+            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+        ).order(
+            -ExpSummaryModel.first_published_msec
+        ).fetch(feconf.RECENTLY_PUBLISHED_QUERY_LIMIT)

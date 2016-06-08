@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from core.domain import collection_domain
+from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import exp_services_test
 from core.domain import rating_services
@@ -22,6 +24,7 @@ from core.domain import summary_services
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
+import utils
 
 
 class ExplorationDisplayableSummariesTest(
@@ -357,6 +360,112 @@ class FeaturedExplorationDisplayableSummariesTest(
             expected_summary, featured_exploration_summaries[0])
 
 
+class CollectionLearnerDictTests(test_utils.GenericTestBase):
+    """Test get_learner_collection_dict_by_id."""
+
+    EXP_ID = 'exploration_id'
+    EXP_ID_1 = 'exp_id1'
+    COLLECTION_ID = 'A_collection_id'
+
+    def setUp(self):
+        super(CollectionLearnerDictTests, self).setUp()
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        user_services.get_or_create_user(self.owner_id, self.OWNER_EMAIL)
+        user_services.get_or_create_user(self.editor_id, self.EDITOR_EMAIL)
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+
+    def test_get_learner_dict_with_deleted_exp_fails_validation(self):
+        self.save_new_valid_collection(
+            self.COLLECTION_ID, self.owner_id, exploration_id=self.EXP_ID)
+        summary_services.get_learner_collection_dict_by_id(
+            self.COLLECTION_ID, self.owner_id)
+
+        exp_services.delete_exploration(self.owner_id, self.EXP_ID)
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected collection to only reference valid explorations, but '
+            'found an exploration with ID: exploration_id'):
+            summary_services.get_learner_collection_dict_by_id(
+                self.COLLECTION_ID, self.owner_id)
+
+    def test_get_learner_dict_when_referencing_inaccessible_explorations(self):
+        self.save_new_default_collection(self.COLLECTION_ID, self.owner_id)
+        self.save_new_valid_exploration(self.EXP_ID, self.editor_id)
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                'exploration_id': self.EXP_ID
+            }], 'Added another creator\'s private exploration')
+
+        # A collection cannot access someone else's private exploration.
+        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected collection to only reference valid explorations, but '
+            'found an exploration with ID: exploration_id'):
+            summary_services.get_learner_collection_dict_by_id(
+                self.COLLECTION_ID, self.owner_id)
+
+        # After the exploration is published, the dict can now be created.
+        rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
+        summary_services.get_learner_collection_dict_by_id(
+            self.COLLECTION_ID, self.owner_id)
+
+    def test_get_learner_dict_with_private_exp_fails_validation(self):
+        self.save_new_valid_collection(
+            self.COLLECTION_ID, self.owner_id, exploration_id=self.EXP_ID)
+
+        # Since both the collection and exploration are private, the learner
+        # dict can be created.
+        summary_services.get_learner_collection_dict_by_id(
+            self.COLLECTION_ID, self.owner_id)
+
+        # A public collection referencing a private exploration is bad, however.
+        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Cannot reference a private exploration within a public '
+            'collection, exploration ID: exploration_id'):
+            summary_services.get_learner_collection_dict_by_id(
+                self.COLLECTION_ID, self.owner_id)
+
+        # After the exploration is published, the learner dict can be crated
+        # again.
+        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
+        summary_services.get_learner_collection_dict_by_id(
+            self.COLLECTION_ID, self.owner_id)
+
+    def test_get_learner_dict_with_allowed_private_exps(self):
+        self.save_new_valid_collection(
+            self.COLLECTION_ID, self.owner_id, exploration_id=self.EXP_ID)
+        self.save_new_valid_exploration(self.EXP_ID_1, self.editor_id)
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                'exploration_id': self.EXP_ID_1
+            }], 'Added another creator\'s private exploration')
+
+        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+
+        collection_dict = summary_services.get_learner_collection_dict_by_id(
+            self.COLLECTION_ID, self.owner_id, allow_invalid_explorations=True)
+
+        # The author's private exploration will be contained in the public
+        # collection since invalid explorations are being allowed, but the
+        # private exploration of another author will not.
+        collection_node_dicts = collection_dict['nodes']
+        self.assertEqual(
+            collection_node_dicts[0]['exploration_summary']['id'],
+            self.EXP_ID)
+        self.assertIsNone(collection_node_dicts[1]['exploration_summary'])
+
+
 class TopRatedExplorationDisplayableSummariesTest(
         test_utils.GenericTestBase):
     """Test functions for getting displayable top rated exploration
@@ -532,3 +641,126 @@ class TopRatedExplorationDisplayableSummariesTest(
                            top_rated_exploration_summaries]
 
         self.assertEqual(expected_ordering, actual_ordering)
+
+
+class RecentlyPublishedExplorationDisplayableSummariesTest(
+        test_utils.GenericTestBase):
+    """Test functions for getting displayable recently published exploration
+    summary dicts.
+    """
+
+    ALBERT_NAME = 'albert'
+    ALBERT_EMAIL = 'albert@example.com'
+
+    EXP_ID_1 = 'eid1'
+    EXP_ID_2 = 'eid2'
+    EXP_ID_3 = 'eid3'
+
+    def setUp(self):
+        """Populate the database of explorations and their summaries.
+
+        The sequence of events is:
+        - (1) Albert creates EXP_ID_1.
+        - (2) Albert creates EXP_ID_2.
+        - (3) Albert creates EXP_ID_3.
+        - (4) Albert publishes EXP_ID_1.
+        - (5) Albert publishes EXP_ID_2.
+        - (6) Albert publishes EXP_ID_3.
+        - (7) Admin user is set up.
+        """
+
+        super(RecentlyPublishedExplorationDisplayableSummariesTest,
+              self).setUp()
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+
+        self.save_new_valid_exploration(
+            self.EXP_ID_1, self.albert_id,
+            end_state_name='End')
+        self.save_new_valid_exploration(
+            self.EXP_ID_2, self.albert_id,
+            end_state_name='End')
+        self.save_new_valid_exploration(
+            self.EXP_ID_3, self.albert_id,
+            end_state_name='End')
+
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_2)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_1)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_3)
+
+        self.set_admins([self.ADMIN_USERNAME])
+
+    def test_for_recently_published_explorations(self):
+        """ Tests for recently published explorations.
+        """
+
+        recently_published_exploration_summaries = (
+            summary_services.get_recently_published_exploration_summary_dicts())
+        test_summary_1 = {
+            'status': 'public',
+            'thumbnail_bg_color': '#a33f40',
+            'community_owned': False,
+            'tags': [],
+            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'id': self.EXP_ID_1,
+            'category': u'A category',
+            'ratings': feconf.get_empty_ratings(),
+            'title': u'A title',
+            'num_views': 0,
+            'objective': u'An objective'
+        }
+        test_summary_2 = {
+            'status': 'public',
+            'thumbnail_bg_color': '#a33f40',
+            'community_owned': False,
+            'tags': [],
+            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'id': self.EXP_ID_2,
+            'category': u'A category',
+            'ratings': feconf.get_empty_ratings(),
+            'title': u'A title',
+            'num_views': 0,
+            'objective': u'An objective'
+        }
+        test_summary_3 = {
+            'status': 'public',
+            'thumbnail_bg_color': '#a33f40',
+            'community_owned': False,
+            'tags': [],
+            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'id': self.EXP_ID_3,
+            'category': u'A category',
+            'ratings': feconf.get_empty_ratings(),
+            'title': u'A title',
+            'num_views': 0,
+            'objective': u'An objective'
+        }
+
+        self.assertDictContainsSubset(
+            test_summary_3, recently_published_exploration_summaries[0])
+        self.assertDictContainsSubset(
+            test_summary_1, recently_published_exploration_summaries[1])
+        self.assertDictContainsSubset(
+            test_summary_2, recently_published_exploration_summaries[2])
+
+        # Test that editing an exploration does not change its
+        # 'recently-published' status.
+        exp_services.update_exploration(
+            self.albert_id, self.EXP_ID_1, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'New title'
+            }], 'Changed title.')
+
+        recently_published_exploration_summaries = (
+            summary_services.get_recently_published_exploration_summary_dicts())
+        self.assertEqual(
+            recently_published_exploration_summaries[1]['title'], 'New title')
+        self.assertDictContainsSubset(
+            test_summary_3, recently_published_exploration_summaries[0])
