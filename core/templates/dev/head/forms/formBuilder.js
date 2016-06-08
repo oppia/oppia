@@ -908,8 +908,8 @@ oppia.run([
 ]);
 
 oppia.directive('ckEditorRte', [
-  'rteHelperService',
-  function(rteHelperService) {
+  'explorationContextService', 'PAGE_CONTEXT', 'rteHelperService',
+  function(explorationContextService, PAGE_CONTEXT, rteHelperService) {
     return {
       restrict: 'E',
       scope: {
@@ -921,6 +921,8 @@ oppia.directive('ckEditorRte', [
                 '</div></div>',
       require: 'ngModel',
       link: function(scope, el, attr, ngModel) {
+        var canUseFs = explorationContextService.getPageContext() ===
+          PAGE_CONTEXT.EDITOR;
         var _RICH_TEXT_COMPONENTS = rteHelperService.getRichTextComponents();
         // List of components which will be available.
         var componentNames = [];
@@ -929,9 +931,10 @@ oppia.directive('ckEditorRte', [
         // CKEditor plugin/widget name for each component.
         var pluginNames = [];
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-          if (!(scope.uiConfig() &&
-                scope.uiConfig().hide_complex_extensions &&
-                componentDefn.isComplex)) {
+          if (!((scope.uiConfig() &&
+                 scope.uiConfig().hide_complex_extensions &&
+                 componentDefn.isComplex) ||
+                 (!canUseFs && componentDefn.requiresFs))) {
             componentNames.push(componentDefn.name);
             icons.push(componentDefn.iconDataUrl);
             pluginNames.push(componentDefn.ckWidgetName);

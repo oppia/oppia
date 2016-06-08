@@ -54,7 +54,7 @@
     </div>
 
     <div class="modal-body">
-      <text-angular-rte ng-show="showEditor" html-content="suggestionContent"></text-angular-rte>
+      <ck-editor-rte ng-show="showEditor" ng-model="suggestionContent"></ck-editor-rte>
       <br>
       Briefly describe your changes (required):
       <input type="text" ng-model="description" style="width: 100%">
