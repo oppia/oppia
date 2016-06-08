@@ -36,6 +36,9 @@ class BaseRichTextComponent(object):
     # The category the rich-text component falls under in the repository.
     # Overridden in subclasses.
     category = ''
+    # The component's name in the CKEditor widget system.
+    # Overriden in subclasses.
+    ck_widget_name = ''
     # A description of the rich-text component. Overridden in subclasses.
     description = ''
     # The HTML tag name for the component. Overridden in subclasses.
@@ -46,6 +49,8 @@ class BaseRichTextComponent(object):
     # Whether the component is large enough to discourage its use when the
     # rich-text editor is intended to be lightweight.
     is_complex = False
+    # Whether the component is inline with text, or a block.
+    is_inline = False
     # Whether the component requires the filesystem in some way that
     # prevents it from being used by unauthorized users.
     requires_fs = False
@@ -89,10 +94,12 @@ class BaseRichTextComponent(object):
                 'default_value': ca_spec.default_value,
                 'schema': ca_spec.schema,
             } for ca_spec in self.customization_arg_specs],
+            'ck_widget_name': self.ck_widget_name,
             'frontend_name': self.frontend_name,
             'icon_data_url': utils.convert_png_to_data_url(os.path.join(
                 feconf.RTE_EXTENSIONS_DIR, self.id, '%s.png' % self.id)),
             'is_complex': self.is_complex,
+            'is_inline': self.is_inline,
             'requires_fs': self.requires_fs,
-            'tooltip': self.tooltip,
+            'tooltip': self.tooltip
         }

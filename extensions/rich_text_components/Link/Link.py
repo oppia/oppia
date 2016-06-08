@@ -22,8 +22,10 @@ class Link(base.BaseRichTextComponent):
 
     name = 'Link'
     category = 'Basic Input'
+    ck_widget_name = 'oppialink'
     description = 'A link to a URL.'
     frontend_name = 'link'
+    is_inline = True
     tooltip = 'Insert link'
 
     _customization_arg_specs = [{

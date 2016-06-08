@@ -558,11 +558,13 @@ oppia.factory('rteHelperService', [
     Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
       _RICH_TEXT_COMPONENTS.push({
         backendName: RTE_COMPONENT_SPECS[componentId].backend_name,
+        ckWidgetName: RTE_COMPONENT_SPECS[componentId].ck_widget_name,
         customizationArgSpecs: angular.copy(
           RTE_COMPONENT_SPECS[componentId].customization_arg_specs),
-        name: RTE_COMPONENT_SPECS[componentId].frontend_name,
         iconDataUrl: RTE_COMPONENT_SPECS[componentId].icon_data_url,
         isComplex: RTE_COMPONENT_SPECS[componentId].is_complex,
+        isInline: RTE_COMPONENT_SPECS[componentId].is_inline,
+        name: RTE_COMPONENT_SPECS[componentId].frontend_name,
         requiresFs: RTE_COMPONENT_SPECS[componentId].requires_fs,
         tooltip: RTE_COMPONENT_SPECS[componentId].tooltip
       });
@@ -669,10 +671,6 @@ oppia.factory('rteHelperService', [
       getRichTextComponents: function() {
         return angular.copy(_RICH_TEXT_COMPONENTS);
       },
-      isInlineComponent: function(richTextComponent) {
-        var inlineComponents = ['link', 'math'];
-        return inlineComponents.indexOf(richTextComponent) !== -1;
-      },
       openCustomizationModal: function(
           customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
           onDismissCallback, refocusFn) {
@@ -746,14 +744,14 @@ oppia.run([
     var _RICH_TEXT_COMPONENTS = rteHelperService.getRichTextComponents();
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
       // The name of the CKEditor widget corresponding to this component.
-      var ckName = 'oppia' + componentDefn.name;
+      var ckName = componentDefn.ckWidgetName;
       // For some reason, frontend tests will error without this check.
       if (CKEDITOR.plugins.registered[ckName] !== undefined) {
         return;
       }
       var tagName = 'oppia-noninteractive-' + componentDefn.name;
       var customizationArgSpecs = componentDefn.customizationArgSpecs;
-      var isInline = rteHelperService.isInlineComponent(componentDefn.name);
+      var isInline = componentDefn.isInline;
       // Inline components will be wrapped in a span, while block components
       // will be wrapped in a div.
       if (isInline) {
@@ -917,20 +915,26 @@ oppia.directive('ckEditorRte', [
       scope: {
         uiConfig: '&'
       },
+      // The empty div in this template will become the toolbar.
       template: '<div><div></div>' +
                 '<div contenteditable="true" class="oppia-rte">' +
                 '</div></div>',
       require: 'ngModel',
       link: function(scope, el, attr, ngModel) {
         var _RICH_TEXT_COMPONENTS = rteHelperService.getRichTextComponents();
+        // List of components which will be available.
         var componentNames = [];
+        // Icon for each component.
         var icons = [];
+        // CKEditor plugin/widget name for each component.
+        var pluginNames = [];
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
           if (!(scope.uiConfig() &&
                 scope.uiConfig().hide_complex_extensions &&
                 componentDefn.isComplex)) {
             componentNames.push(componentDefn.name);
             icons.push(componentDefn.iconDataUrl);
+            pluginNames.push(componentDefn.ckWidgetName);
           }
         });
 
@@ -959,24 +963,25 @@ oppia.directive('ckEditorRte', [
                                        blockWrapperRule +
                                        blockOverlayRule;
 
-        var pluginNames = componentNames.map(function(name) {
-          return 'oppia' + name;
-        }).join(',');
         // The button corresponding to a widget has the same name,
         // with a capitalized first letter.
         var buttonNames = [];
-        componentNames.forEach(function(name) {
-          buttonNames.push('Oppia' + name);
+        pluginNames.forEach(function(pluginName) {
+          buttonNames.push(pluginName.charAt(0).toUpperCase() +
+                           pluginName.slice(1, pluginName.length));
+          // '-' adds the vertical divider between toolbar buttons.
           buttonNames.push('-');
         });
+        // Remove the last '-' from the list.
         buttonNames.pop();
 
         // Initialize ckeditor.
         var ck = CKEDITOR.inline(el[0].children[0].children[1], {
-          extraPlugins: 'widget,lineutils,sharedspace,' + pluginNames,
+          extraPlugins: 'widget,lineutils,sharedspace,' + pluginNames.join(','),
           startupFocus: true,
           extraAllowedContent: extraAllowedContentRules,
           sharedSpaces: {
+            // Select the directive template's empty div.
             top: el[0].children[0].children[0]
           },
           skin: 'bootstrapck,/third_party/static/ckeditor-bootstrapck/',
@@ -1040,7 +1045,6 @@ oppia.directive('ckEditorRte', [
           // Set the icons for each toolbar button.
           componentNames.forEach(function(name, index) {
             var icon = icons[index];
-            var upperCasedName = name.charAt(0).toUpperCase() + name.slice(1);
             $('.cke_button__oppia' + name)
                .css('background-image', 'url("' + icon + '")')
                .css('background-position', 'center')
@@ -1049,8 +1053,12 @@ oppia.directive('ckEditorRte', [
           ck.setData(wrapComponents(ngModel.$viewValue));
         });
 
-        // Angular rendering of components confuses CKEditor's undo system, so
-        // we hide all of that stuff away from CKEditor.
+        /**
+         * Angular rendering of components confuses CKEditor's undo system, so
+         * we hide all of that stuff away from CKEditor with a listener that
+         * filters snapshot data. The fourth param specifies listener priority,
+         * and is set somewhat arbitrarily at 20 so that our listener acts last.
+         */
         ck.on('getSnapshot', function(evt) {
           if (evt.data === undefined) {
             return;

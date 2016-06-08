@@ -47,10 +47,11 @@ class Tabs(base.BaseRichTextComponent):
 
     name = 'Tabs'
     category = 'Basic Input'
+    ck_widget_name = 'oppiatabs'
     description = 'A series of tabs.'
     frontend_name = 'tabs'
-    tooltip = 'Insert tabs (e.g. for hints)'
     is_complex = True
+    tooltip = 'Insert tabs (e.g. for hints)'
 
     _customization_arg_specs = [{
         'name': 'tab_contents',

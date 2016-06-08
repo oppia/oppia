@@ -22,10 +22,11 @@ class Collapsible(base.BaseRichTextComponent):
 
     name = 'Collapsible'
     category = 'Basic Input'
+    ck_widget_name = 'oppiacollapsible'
     description = 'A collapsible block of HTML.'
     frontend_name = 'collapsible'
-    tooltip = 'Insert collapsible block'
     is_complex = True
+    tooltip = 'Insert collapsible block'
 
     _customization_arg_specs = [{
         'name': 'heading',

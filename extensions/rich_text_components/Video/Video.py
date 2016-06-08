@@ -31,6 +31,7 @@ class Video(base.BaseRichTextComponent):
 
     name = 'Video'
     category = 'Basic Input'
+    ck_widget_name = 'oppiavideo'
     description = 'A YouTube video.'
     frontend_name = 'video'
     tooltip = 'Insert video'

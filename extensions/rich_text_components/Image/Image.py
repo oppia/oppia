@@ -22,10 +22,11 @@ class Image(base.BaseRichTextComponent):
 
     name = 'Image'
     category = 'Basic Input'
+    ck_widget_name = 'oppiaimage'
     description = 'An image.'
     frontend_name = 'image'
-    tooltip = 'Insert image'
     requires_fs = True
+    tooltip = 'Insert image'
 
     _customization_arg_specs = [{
         'name': 'filepath',

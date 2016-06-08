@@ -22,9 +22,11 @@ class Math(base.BaseRichTextComponent):
 
     name = 'Math'
     category = 'Basic Input'
+    ck_widget_name = 'oppiamath'
     description = 'A math formula.'
     frontend_name = 'math'
     tooltip = 'Insert mathematical formula'
+    is_inline = True
 
     _customization_arg_specs = [{
         'name': 'raw_latex',

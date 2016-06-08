@@ -22,6 +22,7 @@ class VideoMp4(base.BaseRichTextComponent):
 
     name = 'MP4 Video'
     category = 'Basic Input'
+    ck_widget_name = 'oppiavideomp4'
     description = 'A link to an MP4 video.'
     frontend_name = 'video-mp4'
     tooltip = 'Insert MP4 video'
