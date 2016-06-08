@@ -78,8 +78,11 @@ oppia.controller('Library', [
       }
 
       var windowWidth = $(window).width() * 0.85;
+      // The number 20 is added to tileDisplayWidth in order to compensate
+      // for padding and margins. 20 is just an arbitrary number.
       $scope.tileDisplayCount = Math.min(
-        Math.floor(windowWidth / tileDisplayWidth), MAX_NUM_TILES_PER_ROW);
+        Math.floor(windowWidth / (tileDisplayWidth + 20)),
+        MAX_NUM_TILES_PER_ROW);
 
       $('.oppia-library-carousel').css({
         width: ($scope.tileDisplayCount * tileDisplayWidth) + 'px'
