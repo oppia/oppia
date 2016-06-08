@@ -467,7 +467,6 @@ class TestBase(unittest.TestCase):
             self, exploration_id, state_name, answer,
             params=None, unused_exploration_version=None,
             session_id='dummy_session_id',
-            rule_spec_string='Default',
             client_time_spent_in_secs=0.0):
         """Submits an answer as an exploration player and returns the
         corresponding dict. This function has strong parallels to code in
@@ -495,7 +494,6 @@ class TestBase(unittest.TestCase):
         # Next, ensure the submission is recorded.
         self.post_json(
             '/explorehandler/answer_submitted_event/%s' % exploration_id, {
-                'old_state_name': state_name,
                 'answer': answer,
                 'params': params,
                 'version': exploration.version,

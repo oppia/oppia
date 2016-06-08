@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Directives for all reusable data visualization components.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 // Each visualization receives two variables: 'data' and 'options'. The exact

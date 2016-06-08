@@ -16,42 +16,33 @@
 
 """Test calculations to get interaction answer views."""
 
-__author__ = 'Marcel Schmittfull'
-
-import copy
-import os
-import sys
-
 from core.domain import calculation_registry
 from core.domain import exp_domain
-from core.domain import exp_services
-from core.domain import stats_services
 from core.tests import test_utils
-import feconf
-import schema_utils
-import utils
 
 
 class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
     """Tests for answer summary calculations."""
 
     def _create_sample_answer(
-            self, answer_value, time_spent_in_card, session_id):
+            self, answer, time_spent_in_card, session_id,
+            classify_category=exp_domain.EXPLICIT_CLASSIFICATION):
         return {
-            'answer_value': answer_value,
+            'answer': answer,
             'time_spent_in_sec': time_spent_in_card,
-            'session_id': session_id
+            'session_id': session_id,
+            'classification_categorization': classify_category,
         }
 
     def _create_sample_answers(
-            self, repeated_answer_value, times_spent_in_card, session_ids,
+            self, repeated_answer, times_spent_in_card, session_ids,
             repeat_count):
         """This is similar to _create_sample_answer, except it repeats a single
         answer N times. It reuses times_spent_in_card and session_ids
         cyclically as it constructs the list of sample answers.
         """
         return [self._create_sample_answer(
-            repeated_answer_value,
+            repeated_answer,
             times_spent_in_card[i % len(times_spent_in_card)],
             session_ids[i % len(session_ids)]) for i in range(repeat_count)]
 
@@ -59,15 +50,8 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         """For multiple choice interactions, test if the most common answers
         are calculated correctly for interaction answer views.
         """
-        exp_id = '0'
-        exp_version = 1
-        state_name = 'Welcome!'
-        params = {}
-        DEFAULT_RULE_STR = exp_domain.DEFAULT_RULESPEC_STR
-        exp_services.load_demo(exp_id)
-
         # Some answers.
-        dummy_answers_list = [
+        dummy_submitted_answer_list = [
             self._create_sample_answer('First choice', 4., 'sid1'),
             self._create_sample_answer('Second choice', 5., 'sid1'),
             self._create_sample_answer('Fourth choice', 2.5, 'sid1'),
@@ -78,32 +62,28 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
             self._create_sample_answer('First choice', 20., 'sid3')
         ]
 
-        # Record answers.
-        for answer in dummy_answers_list:
-            stats_services.record_answer(
-                exp_id, exp_version, state_name, DEFAULT_RULE_STR,
-                answer['session_id'], answer['time_spent_in_sec'], params,
-                answer['answer_value'])
+        state_answers_dict = {
+            'exploration_id': '0',
+            'exploration_version': 1,
+            'state_name': 'Welcome!',
+            'interaction_id': 'MultipleChoiceInput',
+            'submitted_answer_list': dummy_submitted_answer_list
+        }
 
-        # Retrieve state answers from storage and get corresponding
-        # StateAnswers domain object.
-        state_answers = stats_services.get_state_answers(
-            exp_id, exp_version, state_name)
-        self.assertEquals(state_answers.interaction_id, 'MultipleChoiceInput')
-
-        # Calculate answer counts. Input is dummy StateAnswersModel entity,
-        # output is a list of dicts, each with keys 'answer' and 'frequency'.
+        # Calculate answer counts. Input a state answers dict as the continuous
+        # job does in order to retrieve calculation results.
         calculation_instance = (
             calculation_registry.Registry.get_calculation_by_id(
                 'AnswerFrequencies'))
         actual_state_answers_calc_output = (
-            calculation_instance.calculate_from_state_answers_entity(
-                state_answers))
+            calculation_instance.calculate_from_state_answers_dict(
+                state_answers_dict))
 
         self.assertEquals(
             actual_state_answers_calc_output.calculation_id,
             'AnswerFrequencies')
-        actual_calc_output = actual_state_answers_calc_output.calculation_output
+        actual_calc_output = (
+            actual_state_answers_calc_output.calculation_output)
 
         # Expected answer counts (result of calculation)
         # TODO(msl): Include answers that were never clicked and received 0
@@ -127,13 +107,6 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
     def test_top5_answer_frequencies_calculation(self):
         """Ensure the top 5 most frequent answers are submitted for TextInput.
         """
-        exp_id = '0'
-        exp_version = 1
-        state_name = 'What language'
-        params = {}
-        DEFAULT_RULE_STR = exp_domain.DEFAULT_RULESPEC_STR
-        exp_services.load_demo(exp_id)
-
         # Since this test is looking for the top 5 answers, it will submit ten
         # different answers with varying frequency:
         #   English (12 times), French (9), Finnish (7), Italian (4),
@@ -165,7 +138,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         # This is a combined list of answers generated above. This list is a
         # special selection of answers from the generated lists such that
         # answers are submitted in varying orders and times.
-        answer_submission_queue = [
+        answer_list = [
             all_answer_lists['french'][0],
             all_answer_lists['finnish'][4],
             all_answer_lists['english'][11],
@@ -216,84 +189,70 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         total_answer_count = sum([
             len(all_answer_lists[list_name])
             for list_name in all_answer_lists])
-        self.assertEquals(total_answer_count, len(answer_submission_queue))
+        self.assertEquals(total_answer_count, len(answer_list))
 
         # Verify the frequencies of answers in the submission queue. This is
         # another quick check to protect changes to this test.
         self.assertEquals(len([
-            answer_submission
-            for answer_submission in answer_submission_queue
-            if answer_submission['answer_value'] == 'English']), 12)
+            answer_submission for answer_submission in answer_list
+            if answer_submission['answer'] == 'English']), 12)
         self.assertEquals(len([
-            answer_submission
-            for answer_submission in answer_submission_queue
-            if answer_submission['answer_value'] == 'French']), 9)
+            answer_submission for answer_submission in answer_list
+            if answer_submission['answer'] == 'French']), 9)
         self.assertEquals(len([
-            answer_submission
-            for answer_submission in answer_submission_queue
-            if answer_submission['answer_value'] == 'Finnish']), 7)
+            answer_submission for answer_submission in answer_list
+            if answer_submission['answer'] == 'Finnish']), 7)
         self.assertEquals(len([
-            answer_submission
-            for answer_submission in answer_submission_queue
-            if answer_submission['answer_value'] == 'Italian']), 4)
+            answer_submission for answer_submission in answer_list
+            if answer_submission['answer'] == 'Italian']), 4)
         self.assertEquals(len([
-            answer_submission
-            for answer_submission in answer_submission_queue
-            if answer_submission['answer_value'] == 'Spanish']), 3)
+            answer_submission for answer_submission in answer_list
+            if answer_submission['answer'] == 'Spanish']), 3)
         self.assertEquals(len([
-            answer_submission
-            for answer_submission in answer_submission_queue
-            if answer_submission['answer_value'] == 'Japanese']), 3)
+            answer_submission for answer_submission in answer_list
+            if answer_submission['answer'] == 'Japanese']), 3)
         self.assertEquals(len([
-            answer_submission
-            for answer_submission in answer_submission_queue
-            if answer_submission['answer_value'] == 'Hungarian']), 2)
+            answer_submission for answer_submission in answer_list
+            if answer_submission['answer'] == 'Hungarian']), 2)
         self.assertEquals(len([
-            answer_submission
-            for answer_submission in answer_submission_queue
-            if answer_submission['answer_value'] == 'Portuguese']), 1)
+            answer_submission for answer_submission in answer_list
+            if answer_submission['answer'] == 'Portuguese']), 1)
         self.assertEquals(len([
-            answer_submission
-            for answer_submission in answer_submission_queue
-            if answer_submission['answer_value'] == 'German']), 1)
+            answer_submission for answer_submission in answer_list
+            if answer_submission['answer'] == 'German']), 1)
         self.assertEquals(len([
-            answer_submission
-            for answer_submission in answer_submission_queue
-            if answer_submission['answer_value'] == 'Gaelic']), 1)
+            answer_submission for answer_submission in answer_list
+            if answer_submission['answer'] == 'Gaelic']), 1)
 
         # Finally, verify that all of the answers in the answer lists are
-        # represents in the submission queue (in case another answer is added to
-        # the answer list but not added to the queue).
+        # represents in the submission queue (in case another answer is added
+        # to the answer list but not added to the queue).
         self.assertEquals(len(set([
-            answer_submission['answer_value']
-            for answer_submission in answer_submission_queue])), 10)
+            answer_submission['answer']
+            for answer_submission in answer_list])), 10)
 
-        # Record answers.
-        for answer in answer_submission_queue:
-            stats_services.record_answer(
-                exp_id, exp_version, state_name, DEFAULT_RULE_STR,
-                answer['session_id'], answer['time_spent_in_sec'], params,
-                answer['answer_value'])
+        # Construct the answers dict.
+        state_answers_dict = {
+            'exploration_id': '0',
+            'exploration_version': 1,
+            'state_name': 'What language',
+            'interaction_id': 'TextInput',
+            'submitted_answer_list': answer_list
+        }
 
-        # Retrieve state answers from storage and get corresponding
-        # StateAnswers domain object.
-        state_answers = stats_services.get_state_answers(
-            exp_id, exp_version, state_name)
-        self.assertEquals(state_answers.interaction_id, 'TextInput')
-
-        # Calculate answer counts. Input is dummy StateAnswersModel entity,
-        # output is a list of dicts, each with keys 'answer' and 'frequency'.
+        # Calculate answer counts..
         calculation_instance = (
             calculation_registry.Registry.get_calculation_by_id(
                 'Top5AnswerFrequencies'))
         actual_state_answers_calc_output = (
-            calculation_instance.calculate_from_state_answers_entity(
-                state_answers))
+            calculation_instance.calculate_from_state_answers_dict(
+                state_answers_dict))
 
         self.assertEquals(
             actual_state_answers_calc_output.calculation_id,
             'Top5AnswerFrequencies')
-        actual_calc_output = actual_state_answers_calc_output.calculation_output
+        actual_calc_output = (
+            actual_state_answers_calc_output.calculation_output)
 
         # TODO(msl): Include answers that were never clicked and received 0
         # count from the calculation. This is useful to help creators identify
@@ -327,38 +286,29 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         """Verify the top 5 answer frequencies calculation still works if only
         one answer is submitted.
         """
-        exp_id = '0'
-        exp_version = 1
-        state_name = 'What language'
-        params = {}
-        DEFAULT_RULE_STR = exp_domain.DEFAULT_RULESPEC_STR
-        exp_services.load_demo(exp_id)
-
         answer = self._create_sample_answer('English', 2., 'sid1')
-        stats_services.record_answer(
-            exp_id, exp_version, state_name, DEFAULT_RULE_STR,
-            answer['session_id'], answer['time_spent_in_sec'], params,
-            answer['answer_value'])
 
-        # Retrieve state answers from storage and get corresponding
-        # StateAnswers domain object.
-        state_answers = stats_services.get_state_answers(
-            exp_id, exp_version, state_name)
-        self.assertEquals(state_answers.interaction_id, 'TextInput')
+        state_answers_dict = {
+            'exploration_id': '0',
+            'exploration_version': 1,
+            'state_name': 'What language',
+            'interaction_id': 'TextInput',
+            'submitted_answer_list': [answer],
+        }
 
-        # Calculate answer counts. Input is dummy StateAnswersModel entity,
-        # output is a list of dicts, each with keys 'answer' and 'frequency'.
+        # Calculate answer counts.
         calculation_instance = (
             calculation_registry.Registry.get_calculation_by_id(
                 'Top5AnswerFrequencies'))
         actual_state_answers_calc_output = (
-            calculation_instance.calculate_from_state_answers_entity(
-                state_answers))
+            calculation_instance.calculate_from_state_answers_dict(
+                state_answers_dict))
 
         self.assertEquals(
             actual_state_answers_calc_output.calculation_id,
             'Top5AnswerFrequencies')
-        actual_calc_output = actual_state_answers_calc_output.calculation_output
+        actual_calc_output = (
+            actual_state_answers_calc_output.calculation_output)
 
         expected_answer_counts = [{
             'answer': 'English',
@@ -371,3 +321,159 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
     def test_frequency_commonly_submitted_elements_calculation(self):
         # TODO(msl): Implement this test.
         pass
+
+    def test_top_answers_by_categorization(self):
+        """Test top answers are recorded based on both their frequency and
+        classification categorization.
+        """
+        calculation_instance = (
+            calculation_registry.Registry.get_calculation_by_id(
+                'TopAnswersByCategorization'))
+
+        # Verify an empty calculation produces the right calculation ID, as
+        # well as an empty result.
+        state_answers_dict = {
+            'exploration_id': '0',
+            'exploration_version': 1,
+            'state_name': 'State',
+            'interaction_id': 'TextInput',
+            'submitted_answer_list': []
+        }
+
+        actual_state_answers_calc_output = (
+            calculation_instance.calculate_from_state_answers_dict(
+                state_answers_dict))
+
+        self.assertEquals(
+            actual_state_answers_calc_output.calculation_id,
+            'TopAnswersByCategorization')
+
+        actual_calc_output = (
+            actual_state_answers_calc_output.calculation_output)
+        self.assertEquals(actual_calc_output, {})
+
+        # Only submitting a hard rule should result in only one returned
+        # category.
+        dummy_submitted_answer_list = [
+            self._create_sample_answer(
+                'Hard A', 0., 'sid1', exp_domain.EXPLICIT_CLASSIFICATION),
+        ]
+        state_answers_dict['submitted_answer_list'] = (
+            dummy_submitted_answer_list)
+
+        actual_state_answers_calc_output = (
+            calculation_instance.calculate_from_state_answers_dict(
+                state_answers_dict))
+        actual_calc_output = (
+            actual_state_answers_calc_output.calculation_output)
+
+        self.assertEquals(actual_calc_output, {
+            'explicit': [{
+                'answer': 'Hard A',
+                'frequency': 1
+            }]
+        })
+
+        # Multiple categories of answers should be identified and properly
+        # aggregated.
+        dummy_submitted_answer_list = [
+            self._create_sample_answer(
+                'Explicit A', 0., 'sid1', exp_domain.EXPLICIT_CLASSIFICATION),
+            self._create_sample_answer(
+                'Explicit B', 0., 'sid1', exp_domain.EXPLICIT_CLASSIFICATION),
+            self._create_sample_answer(
+                'Explicit A', 0., 'sid1', exp_domain.EXPLICIT_CLASSIFICATION),
+
+            self._create_sample_answer(
+                'Tained data A', 0., 'sid1',
+                exp_domain.TRAINING_DATA_CLASSIFICATION),
+            self._create_sample_answer(
+                'Tained data B', 0., 'sid1',
+                exp_domain.TRAINING_DATA_CLASSIFICATION),
+            self._create_sample_answer(
+                'Tained data B', 0., 'sid1',
+                exp_domain.TRAINING_DATA_CLASSIFICATION),
+
+            self._create_sample_answer(
+                'Stats B', 0., 'sid1', exp_domain.STATISTICAL_CLASSIFICATION),
+            self._create_sample_answer(
+                'Stats C', 0., 'sid1', exp_domain.STATISTICAL_CLASSIFICATION),
+            self._create_sample_answer(
+                'Stats C', 0., 'sid1', exp_domain.STATISTICAL_CLASSIFICATION),
+
+            self._create_sample_answer(
+                'Default C', 0., 'sid1',
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+            self._create_sample_answer(
+                'Default C', 0., 'sid1',
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+            self._create_sample_answer(
+                'Default B', 0., 'sid1',
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+        ]
+        state_answers_dict['submitted_answer_list'] = (
+            dummy_submitted_answer_list)
+
+        actual_state_answers_calc_output = (
+            calculation_instance.calculate_from_state_answers_dict(
+                state_answers_dict))
+        actual_calc_output = (
+            actual_state_answers_calc_output.calculation_output)
+
+        self.assertEquals(actual_calc_output, {
+            'explicit': [{
+                'answer': 'Explicit A',
+                'frequency': 2
+            }, {
+                'answer': 'Explicit B',
+                'frequency': 1
+            }],
+            'training_data_match': [{
+                'answer': 'Tained data B',
+                'frequency': 2
+            }, {
+                'answer': 'Tained data A',
+                'frequency': 1
+            }],
+            'statistical_classifier': [{
+                'answer': 'Stats C',
+                'frequency': 2
+            }, {
+                'answer': 'Stats B',
+                'frequency': 1
+            }],
+            'default_outcome': [{
+                'answer': 'Default C',
+                'frequency': 2
+            }, {
+                'answer': 'Default B',
+                'frequency': 1
+            }]
+        })
+
+    def test_top_answers_by_categorization_cannot_classify_invalid_category(self): # pylint: disable=line-too-long
+        """The TopAnswersByCategorization calculation cannot use answers with
+        unknown categorizations. It will throw an exception in these
+        situations.
+        """
+        calculation_instance = (
+            calculation_registry.Registry.get_calculation_by_id(
+                'TopAnswersByCategorization'))
+
+        # Create an answer with an unknown classification category.
+        dummy_submitted_answer_list = [
+            self._create_sample_answer(
+                'Hard A', 0., 'sid1', classify_category='unknown_category'),
+        ]
+        state_answers_dict = {
+            'exploration_id': '0',
+            'exploration_version': 1,
+            'state_name': 'State',
+            'interaction_id': 'TextInput',
+            'submitted_answer_list': dummy_submitted_answer_list
+        }
+
+        with self.assertRaisesRegexp(
+            Exception, 'Cannot aggregate answer with unknown rule'):
+            calculation_instance.calculate_from_state_answers_dict(
+                state_answers_dict)

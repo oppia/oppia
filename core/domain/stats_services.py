@@ -102,8 +102,9 @@ def get_visualizations_info(exploration_id, exploration_version, state_name):
         # This is None if the calculation job has not yet been run for this
         # state.
         calc_output_domain_object = (
-            stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output(
-                exploration_id, exploration_version, state_name, calculation_id))
+            stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
+                exploration_id, exploration_version, state_name,
+                calculation_id))
 
         # If the calculation job has not yet been run for this state, we simply
         # exclude the corresponding visualization results.
@@ -117,8 +118,9 @@ def get_visualizations_info(exploration_id, exploration_version, state_name):
         'id': visualization.id,
         'data': calculation_ids_to_outputs[visualization.calculation_id],
         'options': visualization.options,
-    } for visualization in visualizations if
-        visualization.calculation_id in calculation_ids_to_outputs]
+    } for visualization in visualizations
+                    if visualization.calculation_id
+                    in calculation_ids_to_outputs]
 
     return results_list
 
@@ -247,8 +249,9 @@ def get_exploration_stats(exploration_id, exploration_version):
     }
 
 
-def record_answer(exploration_id, exploration_version, state_name, rule_str,
-        session_id, time_spent_in_sec, params, answer_value):
+def record_answer(
+        exploration_id, exploration_version, state_name, rule_str, session_id,
+        time_spent_in_sec, params, answer_value):
     """Record an answer by storing it to the corresponding StateAnswers entity.
     """
     # Retrieve state_answers from storage
@@ -330,7 +333,7 @@ def _validate_answer(answer_dict):
     # the right errors show up in the various cases.
 
     # Minimum set of keys required for answer_dicts in answers_list
-    REQUIRED_ANSWER_DICT_KEYS = ['answer_value', 'time_spent_in_sec',
+    required_answer_dict_keys = ['answer_value', 'time_spent_in_sec',
                                  'session_id']
 
     # There is a danger of data overflow if the answer log exceeds
@@ -338,12 +341,12 @@ def _validate_answer(answer_dict):
     # 200-1000 bytes in size. We will address this later if it
     # happens regularly. At the moment, a ValidationError is raised if
     # an answer exceeds the maximum size.
-    MAX_BYTES_PER_ANSWER_VALUE = 500
+    max_bytes_per_answer_value = 500
 
     # Prefix of strings that are cropped because they are too long.
-    CROPPED_PREFIX_STRING = 'CROPPED: '
+    cropped_prefix_string = 'CROPPED: '
     # Answer value that is stored if non-string answer is too big
-    PLACEHOLDER_FOR_TOO_LARGE_NONSTRING = 'TOO LARGE NONSTRING'
+    placeholder_for_too_large_nonstring = 'TOO LARGE NONSTRING'
 
     # check type is dict
     if not isinstance(answer_dict, dict):
@@ -352,7 +355,7 @@ def _validate_answer(answer_dict):
             answer_dict)
 
     # check keys
-    required_keys = set(REQUIRED_ANSWER_DICT_KEYS)
+    required_keys = set(required_answer_dict_keys)
     actual_keys = set(answer_dict.keys())
     if not required_keys.issubset(actual_keys):
         missing_keys = required_keys.difference(actual_keys)
@@ -361,17 +364,18 @@ def _validate_answer(answer_dict):
 
     # check entries of answer_dict
     if (sys.getsizeof(answer_dict['answer_value']) >
-            MAX_BYTES_PER_ANSWER_VALUE):
+            max_bytes_per_answer_value):
 
-        if type(answer_dict['answer_value']) == str:
+        if isinstance(answer_dict['answer_value'], str):
             logging.warning(
                 'answer_value is too big to be stored: %s ...' %
-                str(answer_dict['answer_value'][:MAX_BYTES_PER_ANSWER_VALUE]))
-            answer_dict['answer_value'] = '%s%s ...' % (CROPPED_PREFIX_STRING,
-                str(answer_dict['answer_value'][:MAX_BYTES_PER_ANSWER_VALUE]))
+                str(answer_dict['answer_value'][:max_bytes_per_answer_value]))
+            answer_dict['answer_value'] = '%s%s ...' % (
+                cropped_prefix_string, str(
+                    answer_dict['answer_value'][:max_bytes_per_answer_value]))
         else:
             logging.warning('answer_value is too big to be stored')
-            answer_dict['answer_value'] = PLACEHOLDER_FOR_TOO_LARGE_NONSTRING
+            answer_dict['answer_value'] = placeholder_for_too_large_nonstring
 
     if not isinstance(answer_dict['session_id'], basestring):
         raise utils.ValidationError(

@@ -83,7 +83,7 @@ class AnalyticsEventHandlersUnitTests(test_utils.GenericTestBase):
 
     def test_resolve_answers_for_default_rule(self):
         exp = exp_domain.Exploration.create_default_exploration(
-        'eid', 'A title', 'A category')
+            'eid', 'A title', 'A category')
         exp_services.save_new_exploration('fake@user.com', exp)
         state_name = exp.init_state_name
 

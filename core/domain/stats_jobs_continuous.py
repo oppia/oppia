@@ -412,12 +412,13 @@ class InteractionAnswerSummariesMRJobManager(
 
     @staticmethod
     def map(item):
-        if InteractionAnswerSummariesMRJobManager._entity_created_before_job_queued(
+        if InteractionAnswerSummariesMRJobManager._entity_created_before_job_queued( # pylint: disable=line-too-long
                 item):
 
             # All visualizations desired for the interaction.
-            visualizations = interaction_registry.Registry.get_interaction_by_id(
-                item.interaction_id).answer_visualizations
+            visualizations = (
+                interaction_registry.Registry.get_interaction_by_id(
+                    item.interaction_id).answer_visualizations)
 
             # Get all desired calculations for the current state interaction id.
             calc_ids = list(set(viz.calculation_id for viz in visualizations))
@@ -432,6 +433,7 @@ class InteractionAnswerSummariesMRJobManager(
 
     @staticmethod
     def reduce(id, state_answers_model):
+        # pylint: disable=redefined-builtin
         pass
 
 

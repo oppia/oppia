@@ -16,11 +16,8 @@
 
 """Tests for methods in the visualization registry."""
 
-__author__ = 'Sean Lip'
-
 from core.domain import visualization_registry
 from core.tests import test_utils
-from extensions.interactions import base
 
 
 class VisualizationRegistryUnitTests(test_utils.GenericTestBase):

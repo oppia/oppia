@@ -591,7 +591,6 @@ class StateAnswersModel(base_models.BaseModel):
             self.put()
         except Exception as e:
             logging.error(e)
-            pass
 
 
 class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
@@ -625,13 +624,13 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
             instance.put()
         except Exception as e:
             logging.error(e)
-            pass
 
     @classmethod
     def get_model(cls, exploration_id, exploration_version, state_name,
                   calculation_id):
         entity_id = cls._get_entity_id(
-            exploration_id, str(exploration_version), state_name, calculation_id)
+            exploration_id, str(exploration_version), state_name,
+            calculation_id)
         instance = cls.get(entity_id, strict=False)
         return instance
 

@@ -17,11 +17,8 @@
 """Registry for calculations."""
 
 import inspect
-import os
 
 from extensions.answer_summarizers import models
-import feconf
-import utils
 
 
 class Registry(object):
@@ -57,5 +54,5 @@ class Registry(object):
             cls._refresh_registry()
         if calculation_id not in cls.calculations_dict:
             raise TypeError(
-            	'\'%s\' is not a valid calculation id.' % calculation_id)
+                '\'%s\' is not a valid calculation id.' % calculation_id)
         return cls.calculations_dict[calculation_id]()

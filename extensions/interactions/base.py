@@ -41,7 +41,6 @@ from core.domain import obj_services
 from core.domain import rule_domain
 from core.domain import visualization_registry
 from extensions import domain
-from extensions.visualizations import models
 import feconf
 import jinja_utils
 import utils
@@ -123,17 +122,18 @@ class BaseInteraction(object):
             for cas in self._customization_arg_specs]
 
     @property
+    def answer_visualization_specs(self):
+        return self._answer_visualization_specs
+
+    @property
     def answer_visualizations(self):
         result = []
         for spec in self._answer_visualization_specs:
             factory_cls = (
-                visualization_registry.Registry.get_visualization_class(spec['id']))
+                visualization_registry.Registry.get_visualization_class(
+                    spec['id']))
             result.append(factory_cls(spec['calculation_id'], spec['options']))
         return result
-
-    @property
-    def handlers(self):
-        return [AnswerHandler(**ah) for ah in self._handlers]
 
     @property
     def dependency_ids(self):
