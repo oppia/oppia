@@ -3,7 +3,6 @@
 This file contains selenium + browsermobproxy to fetch performance data.
 """
 
-import json
 import urlparse
 import os
 
@@ -11,17 +10,23 @@ from browsermobproxy import Server
 from selenium import webdriver
 from xvfbwrapper import Xvfb
 
+# Help Needed:
+# Need to curl both these binaries and install them with the setup process.
+# Also, need references to them to use here.
+# pylint: disable=line-too-long
 CHROME_DRIVER = '/home/vg/Desktop/gsoc/opensource/node_modules/protractor/selenium/chromedriver_2.21'
+# pylint: enable=line-too-long
 BROWSERMOB_PROXY = '/home/vg/Downloads/perf-oppia/browsermob-proxy-2.1.1/bin/browsermob-proxy'
 
-class NetworkCapture():
 
+class CaptureData(object):
+    """Class to fetch performance data"""
 
     def __init__(self, browser='chrome'):
         if browser in ['chrome', 'firefox']:
             self.browser = browser
         else:
-            # TODO: Raise error here.
+            # ToDo: Raise error here.
             pass
 
         if self.browser == 'chrome':
@@ -36,6 +41,11 @@ class NetworkCapture():
         pass
 
     def get_har(self, page_url):
+        """Method to get HTTP Archive (HAR) for a page_url
+
+        To get a HAR we require to use a proxy server.
+        """
+
         self._setup_proxy()
         self._setup_driver(use_proxy=True)
 
@@ -53,6 +63,8 @@ class NetworkCapture():
         return result
 
     def get_timings(self, page_url):
+        """Method to get Timings data for a page_url"""
+
         self._setup_driver(use_proxy=False)
 
         self.check_valid_url(page_url)
@@ -72,7 +84,7 @@ class NetworkCapture():
 
         return performance
 
-    def _setup_proxy(self, downstream = None, upstream = None, latency = None):
+    def _setup_proxy(self, downstream=None, upstream=None, latency=None):
         self.server = Server(self.browser_mob)
         self.server.start()
         self.proxy = self.server.create_proxy()
@@ -83,7 +95,9 @@ class NetworkCapture():
             limits_specified = True
         if limits_specified:
             self.proxy.limits(
-                {'downstream_kbps': downstream, 'upstream_kbps': upstream, 'latency': latency})
+                {'downstream_kbps': downstream,
+                 'upstream_kbps': upstream,
+                 'latency': latency})
 
     def _setup_driver(self, use_proxy=False):
 
@@ -91,17 +105,17 @@ class NetworkCapture():
             chrome_options = webdriver.ChromeOptions()
             # To prevent background networking from interfering with our tests.
             chrome_options.add_argument("--disable-background-networking")
-            
-            if use_proxy and self.check_proxy():                
+
+            if use_proxy and self._check_proxy():
                 proxy_url = urlparse.urlparse(self.proxy.proxy).path
                 chrome_options.add_argument("--proxy-server={0}".format(proxy_url))
 
             self.driver = webdriver.Chrome(self.chrome_driver, chrome_options=chrome_options)
 
-        if self.browser == 'firefox':
+        elif self.browser == 'firefox':
             firefox_profile = webdriver.FirefoxProfile()
 
-            if use_proxy and self.check_proxy():
+            if use_proxy and self._check_proxy():
                 firefox_profile.set_proxy(self.proxy.selenium_proxy())
 
             self.driver = webdriver.Firefox(firefox_profile=firefox_profile)
@@ -114,7 +128,7 @@ class NetworkCapture():
         self.driver.quit()
         self.driver = None
 
-    def check_proxy(self):
+    def _check_proxy(self):
         if not self.proxy:
             # ToDo: Raise Error or start the proxy.
             pass
@@ -123,11 +137,11 @@ class NetworkCapture():
 
 def main():
     # For testing
-    nc = NetworkCapture(browser='firefox')
+    capture = CaptureData(browser='firefox')
     url = "http://localhost:8181/splash"
 
-    har = nc.get_har(url)
-    performance = nc.get_timings(url)
+    har = capture.get_har(url)
+    performance = capture.get_timings(url)
 
     print performance
     print len(har['log']['entries'])
