@@ -8,7 +8,7 @@ import os
 
 from browsermobproxy import Server
 from selenium import webdriver
-from xvfbwrapper import Xvfb
+# from xvfbwrapper import Xvfb
 
 # Help Needed:
 # Need to curl both these binaries and install them with the setup process.
@@ -118,7 +118,9 @@ class CaptureData(object):
             if use_proxy and self._check_proxy():
                 firefox_profile.set_proxy(self.proxy.selenium_proxy())
 
+            # pylint: disable=redefined-variable-type
             self.driver = webdriver.Firefox(firefox_profile=firefox_profile)
+            # pylint: enable=redefined-variable-type
 
     def _clear_proxy(self):
         self.server.stop()
@@ -136,7 +138,7 @@ class CaptureData(object):
         return True
 
 def main():
-    # For testing
+    """For testing"""
     capture = CaptureData(browser='firefox')
     url = "http://localhost:8181/splash"
 
