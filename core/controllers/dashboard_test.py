@@ -16,16 +16,19 @@
 
 from core.controllers import dashboard
 from core.domain import config_services
+from core.domain import event_services
 from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.domain import rights_manager
+from core.domain import stats_jobs_continuous_test
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_continuous_test
 from core.tests import test_utils
 from core.platform import models
 import feconf
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models, stats_models) = models.Registry.import_models(
+    [models.NAMES.user, models.NAMES.statistics])
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
@@ -107,9 +110,28 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
             self.COLLABORATOR_EMAIL_2)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
+    def _record_start(self, exp_id, exp_version, state, session_id):
+        event_services.StartExplorationEventHandler.record(
+            exp_id, exp_version, state, session_id, {},
+            feconf.PLAY_TYPE_NORMAL)
+
     def _start_computation_job(self):
         (user_jobs_continuous_test.ModifiedUserStatsAggregator.
          start_computation())
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
+        self.process_and_flush_pending_tasks()
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+            0)
+        self.process_and_flush_pending_tasks()
+
+    def _start_job_to_compute_num_plays(self):
+        (stats_jobs_continuous_test.ModifiedStatisticsAggregator
+         .start_computation())
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
@@ -128,6 +150,29 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         self._start_computation_job()
         self.assertIsNone(user_models.UserStatsModel.get(
             self.owner_id_1, strict=False))
+        self.logout()
+
+    def test_one_play_only_single_exploration(self):
+        exploration = self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
+
+        self.login(self.OWNER_EMAIL_1)
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['explorations_list']), 1)
+
+        exp_version = 1
+        exp_id = self.EXP_ID_1
+        state = exploration.init_state_name
+
+        self._record_start(exp_id, exp_version, state, 'session1')
+        self._start_job_to_compute_num_plays()
+
+        self._start_computation_job()
+        user_model = user_models.UserStatsModel.get(
+            self.owner_id_1, strict=False)
+        self.assertEquals(user_model.total_plays, 1)
+        self.assertEquals(user_model.impact_score, 0.0)
+        self.assertIsNone(user_model.average_ratings)
         self.logout()
 
 
