@@ -1359,17 +1359,14 @@ oppia.directive('schemaBasedFloatEditor', [function() {
           }
         };
 
-        if($scope.uiConfig().slider){
-          console.log("slider works!");
-          
-          if(!$scope.localValue){
-            $scope.localValue=300.0;
+        if ($scope.uiConfig().slider) {
+          if (!$scope.localValue) {
+            $scope.localValue = 300.0;
           }
 
           $scope.$watch('localValue', function(newValue) {
-            localStorage.setItem("width", $scope.localValue);
+            localStorage.setItem('width', newValue);
           });
-
         }
 
         if ($scope.localValue === undefined) {

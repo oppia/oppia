@@ -55,7 +55,7 @@ oppia.directive('filepathEditor', [
             $scope.$parent.value = newValue;
           }
         });
-                
+
         $scope.getPreviewUrl = function(filepath) {
           var encodedFilepath = window.encodeURIComponent(filepath);
           return $sce.trustAsResourceUrl(
@@ -162,8 +162,8 @@ oppia.directive('filepathEditor', [
           $scope.filepaths = response.data.filepaths;
           $scope.filepathsLoaded = true;
         });
-        setInterval(function () {
-        $('#target-image').width(localStorage.getItem("width"));
+        setInterval(function() {
+          $('#target-image').width(localStorage.getItem('width'));
         }, 1);
       }
     };
