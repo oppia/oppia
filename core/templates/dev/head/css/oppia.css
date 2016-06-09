@@ -2237,7 +2237,7 @@ div#ng-curtain {
   }
   .oppia-navbar-tabs {
     /*
-      This needs to take i18n of the Create" and "Sign in" buttons into
+      This needs to take i18n of the "Create" and "Sign in" buttons into
       account.
     */
     min-width: 580px;
