@@ -60,10 +60,13 @@ exports.config = {
       'protractor/*.js',
     ],
 
-    editor: [
+    mainEditor: [
       'protractor/editorAndPlayer.js',
+      'protractor/stateEditor.js'
+    ],
+
+    editorFeatures: [
       'protractor/gadgetEditor.js',
-      'protractor/stateEditor.js',
       'protractor/fallbacks.js',
       'protractor/historyTab.js'
     ],
