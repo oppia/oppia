@@ -292,7 +292,7 @@
           <div ng-if="showJobOutput">
             <h4>Job Output</h4>
             <ul ng-if="jobOutput.length != 0">
-              <li ng-repeat="output in jobOutput"><[output]></li>
+              <li ng-repeat="output in jobOutput track by $index"><[output]></li>
             </ul>
             <em ng-if="jobOutput.length == 0">None</em>
           </div>
