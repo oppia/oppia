@@ -1,5 +1,4 @@
 <!-- SCHEMA-BASED EDITOR TEMPLATES -->
-
 <script type="text/ng-template" id="schemaBasedEditor/master">
   <schema-based-choices-editor ng-if="schema().choices" local-value="$parent.localValue"
                                schema="schema()" choices="schema().choices"
@@ -24,7 +23,7 @@
   <schema-based-float-editor ng-if="schema().type === 'float' && !schema().choices"
                              local-value="$parent.localValue" is-disabled="isDisabled()"
                              allow-expressions="allowExpressions()"
-                             validators="schema().validators"
+                             validators="schema().validators" ui-config="schema().ui_config"
                              label-for-focus-target="labelForFocusTarget()"
                              on-input-blur="onInputBlur"
                              on-input-focus="onInputFocus">
@@ -132,13 +131,12 @@
 <script type="text/ng-template" id="schemaBasedEditor/float">
   <span ng-model="localValue" ui-validate="'validate($value)'">
     <span ng-form="floatForm">
-      <span ng-if="!expressionMode">
+      <span ng-if="!expressionMode && !uiConfig()">
         <input type="text" ng-model="$parent.localValue" class="form-control"
                name="floatValue" placeholder="Type a number" ng-disabled="isDisabled()"
-               require-is-float apply-validation="validators()"
+               require-is-float apply-validation="validators()" ui_config="uiConfig()"
                focus-on="<[labelForFocusTarget()]>" ng-keypress="onKeypress($event)"
                ng-blur="onBlur()" ng-focus="onFocus()" style="display: inline;">
-
         <span ng-if="hasLoaded && !isUserCurrentlyTyping && hasFocusedAtLeastOnce"
               style="font-size: 0.85em; position: absolute;"
               tabindex="-1" focus-on="<[labelForErrorFocusTarget]>">
@@ -156,7 +154,7 @@
         </span>
       </span>
 
-      <span ng-if="allowExpressions()">
+      <span ng-if="allowExpressions() && !uiConfig()">
         <schema-based-expression-editor ng-if="expressionMode" is-disabled="isDisabled()"
                                         local-value="$parent.$parent.localValue"
                                         param-names="paramNames" output-type="float"
@@ -168,6 +166,15 @@
             <span ng-if="expressionMode"><del>E</del></span>
           </button>
         </span>
+      </span>
+
+      <span ng-if="uiConfig().slider">
+          <md-slider-container>
+          <md-slider flex="" min="0" max="600" ng-model="$parent.$parent.$parent.localValue" aria-label="red" id="red-slider" step="0.5"></md-slider>
+          <md-input-container>
+            <input flex="" ng-model="$parent.$parent.$parent.localValue" aria-label="red" aria-controls="red-slider" type="number" id="input-width" step="0.5">
+          </md-input-container>
+          </md-slider-container>     
       </span>
     </span>
   </span>

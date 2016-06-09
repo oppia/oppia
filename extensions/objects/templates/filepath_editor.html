@@ -1,4 +1,6 @@
+
 <link href='http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css' rel='stylesheet' type='text/css'>
+
 <style>
   .filepath-editor-image-upload-reset-button {
     position: absolute;
@@ -18,13 +20,12 @@
     <div ng-repeat="filepath in filepaths track by $index">
       <label>
         <input type="radio" ng-model="localValue.label"
-               name="choiceGroup" id="<[filepath]>"
+               name="choiceGroup" id="simbly"
                value="<[filepath]>">
         <[filepath]>
       </label>
     </div>
     <img ng-if="localValue.label" ng-src="<[getPreviewUrl(localValue.label)]>" id="target-image"/>
-
     <br><br>
     <button type="button" class="btn btn-default" ng-click="openImageUploader()">Upload a new image</button>
     
@@ -63,30 +64,4 @@
     <button type="button" class="btn btn-success" ng-click="saveUploadedFile(currentFile, currentFilename)" ng-disabled="!currentFile || !currentFilename">Save</button>
     <button type="button" class="btn btn-default" ng-click="closeImageUploader()">Cancel</button>
   </div>
-
-  <div style="margin-top:20px;">
-    <div id="slider" style="width:200px;"></div>
-    <span id="infoSlider"></span>
-  </div>
-  <script>
-        var orginalWidth = $("#image").width();
-
-        $("#infoSlider").text(orginalWidth + ', 100%');
-
-        $("#slider").slider({
-            value: 0,
-            min: -50,
-            max: 50,
-            step: 10,
-            slide: function (event, ui) {
-                var fraction = (1 + ui.value / 100),
-                    newWidth = orginalWidth * fraction;
-  
-                $("#infoSlider").text(newWidth + ', ' + Math.floor(fraction * 100) + '%');
-
-                $("#image").width(newWidth);
-                $("#target-image").width(newWidth);
-          }
-      });
-  </script>
 </div>

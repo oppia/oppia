@@ -37,9 +37,7 @@ oppia.directive('oppiaNoninteractiveImage', [
           $scope.imageAltText = oppiaHtmlEscaper.escapedJsonToObj(
             $attrs.altWithValue);
         }
-
-        $scope.height = oppiaHtmlEscaper.escapedJsonToObj(
-          $attrs.heightWithValue);
+        
         $scope.width = oppiaHtmlEscaper.escapedJsonToObj(
           $attrs.widthWithValue);
       }]

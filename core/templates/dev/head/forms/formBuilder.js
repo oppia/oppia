@@ -1291,6 +1291,7 @@ oppia.directive('schemaBasedFloatEditor', [function() {
     scope: {
       localValue: '=',
       isDisabled: '&',
+      uiConfig: '&',
       allowExpressions: '&',
       validators: '&',
       labelForFocusTarget: '&',
@@ -1357,6 +1358,19 @@ oppia.directive('schemaBasedFloatEditor', [function() {
             $scope.isUserCurrentlyTyping = true;
           }
         };
+
+        if($scope.uiConfig().slider){
+          console.log("slider works!");
+          
+          if(!$scope.localValue){
+            $scope.localValue=300.0;
+          }
+
+          $scope.$watch('localValue', function(newValue) {
+            localStorage.setItem("width", $scope.localValue);
+          });
+
+        }
 
         if ($scope.localValue === undefined) {
           $scope.localValue = 0.0;
