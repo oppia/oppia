@@ -46,7 +46,7 @@ describe('Site language', function() {
     browser.get('/splash');
     _selectLanguage('Español');
     browser.get('/library');
-    expect(browser.getTitle()).toEqual('Oppia - Librería');
+    expect(browser.getTitle()).toEqual('Oppia - Biblioteca');
     general.ensurePageHasNoTranslationIds();
   });
 
@@ -75,7 +75,7 @@ describe('Site language', function() {
     browser.get('/splash');
     _selectLanguage('Español');
     browser.get('/library');
-    expect(browser.getTitle()).toEqual('Oppia - Librería');
+    expect(browser.getTitle()).toEqual('Oppia - Biblioteca');
 
     // The preference page shows the last selected language
     browser.get('/preferences');
