@@ -1,4 +1,4 @@
-<script type="text/ng-template" id="skins/Conversation">
+<script type="text/ng-template" id="skins/ConversationEmbed">
   <!--
     Off-screen preview of the next card in order to pre-determine the target
     height for the card content transition animation.
@@ -20,16 +20,12 @@
     </div>
   </div>
 
-  <div role="main" style="margin: 0 auto; position: relative;" ng-if="hasFullyLoaded">
-    <progress-dots num-dots="numProgressDots"
-                   class="conversation-skin-progress-dots"
-                   ng-class="{'conversation-skin-progress-dots-iframed': isIframed, 'conversation-skin-progress-dots-not-iframed': !isIframed}">
-    </progress-dots>
-
+  <div role="main" style="margin: 0 auto; position: absolute; width:100%; height:100%" ng-if="hasFullyLoaded">
     <div class="conversation-skin-cards-container conversation-skin-animate-cards"
          ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
       <div ng-show='!isViewportNarrow() || isScreenNarrowAndShowingTutorCard()'
-           class="conversation-skin-main-tutor-card"
+           ng-class="{'conversation-skin-main-tutor-card-embed': isIframed,
+           'conversation-skin-main-tutor-card': !isIframed}"
            ng-class="{'animate-card-width': startCardChangeAnimation,
                       'has-shadow': isViewportNarrow() && isCurrentSupplementalCardNonempty(),
                       'conversation-skin-animate-tutor-card-on-narrow': isViewportNarrow() &&
@@ -91,7 +87,7 @@
           <div ng-if="(!waitingForOppiaFeedback || !exploration.isInteractionInline(activeCard.stateName)) && ((activeCard.interactionHtml && !activeCard.destStateName) || (activeCard.destStateName && !helpCardHasContinueButton)) && (!isOnTerminalCard() || !isIframed || (activeCard.destStateName && !helpCardHasContinueButton)) && isCurrentCardAtEndOfTranscript()">
             <div class="conversation-skin-inline-interaction">
               <div ng-if="activeCard.destStateName && activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].oppiaFeedbackHtml && !helpCardHasContinueButton">
-                <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
+                <md-button aria-label="" class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
                            focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
                            ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)"
                            translate="I18N_PLAYER_CONTINUE_BUTTON">
@@ -159,6 +155,14 @@
         <div class="protractor-test-conversation-input"
              angular-html-bind="activeCard.interactionHtml">
         </div>
+      </div>
+      <div class="bottom-nav-container">
+        <nav class="bottom-nav">
+          <progress-dots num-dots="numProgressDots"
+                   class="conversation-skin-progress-dots-in-bottom-nav">
+          </progress-dots>
+          <img class="logo_bottom_nav_bar" src="/images/logo/288x128_logo_mint.png">
+        </nav>
       </div>
     </div>
   </div>
@@ -235,6 +239,13 @@
       left: 0;
       margin: 0 auto;
       position: fixed;
+      right: 0;
+      z-index: 1;
+    }
+    .conversation-skin-progress-dots-in-bottom-nav {
+      position: relative;
+      left: 0;
+      margin: 0 auto;
       right: 0;
       z-index: 1;
     }
@@ -324,12 +335,15 @@
     }
 
     .conversation-skin-cards-container {
-      align-items: flex-start;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      align-content: flex-start; 
+      height: 100%;
       margin: 0 auto;
       max-width: 1400px;
-      padding: 40px 14px;
+      padding:0px;
       width: 100%;
     }
 
@@ -343,6 +357,18 @@
       padding-top: 20px;
       text-align: left;
       width: 100%;
+      z-index: 1;
+    }
+    .conversation-skin-main-tutor-card-embed,
+    .conversation-skin-future-tutor-card-embed {
+      background: #fff;
+      border-radius: 2px;
+      flex-shrink: 10000;
+      /*max-width: 560px;*/
+      min-width: 360px;
+      padding-top: 20px;
+      text-align: left;
+      width: 90%;
       z-index: 1;
     }
 
@@ -635,6 +661,26 @@
         background: inherit;
         border: none;
     }
+    .bottom-nav-container {
+      width: 100%;
+      padding: 10px 7px;
+      background-color: #015c53;
+      bottom: 0px;
+      align-self: flex-end;
+      position: relative;
+      min-height: 60px;
+    }
+    .bottom-nav {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo_bottom_nav_bar {
+    	align-self: flex-end;
+    	right: 0px;
+    	height: 50px;
+    }
 
     @media screen and (max-width: 959px) {
       .conversation-skin-cards-container {
@@ -709,6 +755,10 @@
       .conversation-skin-oppia-avatar.show-tutor-card:hover {
         opacity: 0.8;
       }
+    }
+    .oppia-progress-dot {
+    	width: 24px;
+    	height: 24px;
     }
   </style>
 </script>

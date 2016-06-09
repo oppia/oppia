@@ -20,7 +20,8 @@
 oppia.constant('PAGE_CONTEXT', {
   EDITOR: 'editor',
   LEARNER: 'learner',
-  OTHER: 'other'
+  OTHER: 'other',
+  EMBED: 'iframe'
 });
 
 oppia.constant('EDITOR_TAB_CONTEXT', {
@@ -64,6 +65,9 @@ oppia.factory('explorationContextService', [
             } else if (pathnameArray[i] === 'create') {
               _pageContext = PAGE_CONTEXT.EDITOR;
               return PAGE_CONTEXT.EDITOR;
+            } else if(pathnameArray[i] === 'embed') {
+              _pageContext = PAGE_CONTEXT.EMBED
+              return PAGE_CONTEXT.EMBED
             }
           }
 
@@ -73,7 +77,8 @@ oppia.factory('explorationContextService', [
 
       isInExplorationContext: function() {
         return (this.getPageContext() == PAGE_CONTEXT.EDITOR ||
-          this.getPageContext() == PAGE_CONTEXT.LEARNER);
+          this.getPageContext() == PAGE_CONTEXT.LEARNER ||
+          this.getPageContext() == PAGE_CONTEXT.EMBED);
       },
 
       // Returns a string representing the explorationId (obtained from the
@@ -87,7 +92,8 @@ oppia.factory('explorationContextService', [
           var pathnameArray = $window.location.pathname.split('/');
           for (var i = 0; i < pathnameArray.length; i++) {
             if (pathnameArray[i] === 'explore' ||
-                pathnameArray[i] === 'create') {
+                pathnameArray[i] === 'create' ||
+                pathnameArray[i] === 'embed') {
               _explorationId = pathnameArray[i + 1];
               return pathnameArray[i + 1];
             }

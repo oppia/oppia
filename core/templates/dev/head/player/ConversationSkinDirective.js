@@ -247,11 +247,15 @@ oppia.animation('.conversation-skin-animate-card-contents', function() {
   };
 });
 
-oppia.directive('conversationSkin', [function() {
+oppia.directive('conversationSkin', ['urlService', function(urlService) {
   return {
     restrict: 'E',
     scope: {},
-    templateUrl: 'skins/Conversation',
+    link: function(scope){
+      var isIframed = urlService.isIframed();
+      scope.myTemplate = isIframed ? 'skins/ConversationEmbed': 'skins/Conversation';
+    },
+    template: "<div ng-include='myTemplate'></div>",
     controller: [
       '$scope', '$timeout', '$rootScope', '$window', '$translate',
        'messengerService', 'oppiaPlayerService', 'urlService', 'focusService',

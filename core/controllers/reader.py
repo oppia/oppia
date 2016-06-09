@@ -288,7 +288,8 @@ class ExplorationPage(base.BaseHandler):
                 rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             raise self.PageNotFoundException
 
-        is_iframed = (self.request.get('iframed') == 'true')
+        url_parts = [x.strip() for x in self.request.path.split('/')]
+        is_iframed = 'embed' in url_parts
 
         # TODO(sll): Cache these computations.
         gadget_types = exploration.get_gadget_types()
