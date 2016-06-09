@@ -8,7 +8,7 @@ import os
 
 from browsermobproxy import Server
 from selenium import webdriver
-# from xvfbwrapper import Xvfb
+from xvfbwrapper import Xvfb
 
 # Help Needed:
 # Need to curl both these binaries and install them with the setup process.
@@ -45,15 +45,15 @@ class CaptureData(object):
 
         To get a HAR we require to use a proxy server.
         """
+        with Xvfb() as xvfb:
+            self._setup_proxy()
+            self._setup_driver(use_proxy=True)
 
-        self._setup_proxy()
-        self._setup_driver(use_proxy=True)
+            self.check_valid_url(page_url)
 
-        self.check_valid_url(page_url)
+            self.proxy.new_har(page_url, options={'captureHeaders': True})
 
-        self.proxy.new_har(page_url, options={'captureHeaders': True})
-
-        self.driver.get(page_url)
+            self.driver.get(page_url)
 
         result = self.proxy.har
 
@@ -64,21 +64,21 @@ class CaptureData(object):
 
     def get_timings(self, page_url):
         """Method to get Timings data for a page_url"""
+        with Xvfb() as xvfb:
+            self._setup_driver(use_proxy=False)
 
-        self._setup_driver(use_proxy=False)
+            self.check_valid_url(page_url)
 
-        self.check_valid_url(page_url)
+            self.driver.get(page_url)
 
-        self.driver.get(page_url)
-
-        # Future ToDo: Firefox currently return function toJSON() for some keys.
-        # It return values for window.performance.timing, which is precisely
-        # what we need for now.
-        # To get entries for all the resources:
-        #   driver.execute_script("return window.performance.getEntries();")
-        # To get only the timing:
-        #   driver.execute_script("return window.performance.timing;")
-        performance = self.driver.execute_script("return window.performance")
+            # Future ToDo: Firefox currently return function toJSON() for some keys.
+            # It return values for window.performance.timing, which is precisely
+            # what we need for now.
+            # To get entries for all the resources:
+            #   driver.execute_script("return window.performance.getEntries();")
+            # To get only the timing:
+            #   driver.execute_script("return window.performance.timing;")
+            performance = self.driver.execute_script("return window.performance")
 
         self._clear_driver()
 

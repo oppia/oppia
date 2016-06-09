@@ -11,7 +11,7 @@ import unittest
 
 
 class TestBase(unittest.TestCase):
-    """Tests for `primes.py`."""
+    """Base class for tests."""
 
     def setUp(self):
         self.capture_data = CaptureData(browser='chrome')
