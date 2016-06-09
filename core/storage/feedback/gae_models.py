@@ -287,3 +287,15 @@ class SuggestionModel(base_models.BaseModel):
         Returns None if it doesn't match anything."""
 
         return cls.get_by_id(cls._get_instance_id(exploration_id, thread_id))
+
+
+class FeedbackMessageEmailDataModel(base_models.BaseModel):
+    """Instance of this model feedback message detail for sending email later.
+
+    This model instance is created per user with id set to user_id"""
+
+    # This contains exploraion_id, thread_id and message_id which is used to get
+    # instance of FeedbackMessageModel.
+    feedback_messages = ndb.JsonProperty(repeated=True, indexed=True)
+    # Retires count for sending an email.
+    retries = ndb.IntegerProperty(default=0, required=True, indexed=True)
