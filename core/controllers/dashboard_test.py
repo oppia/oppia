@@ -116,6 +116,7 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         # exploration one rating.
         user_ids = ['user%d' % i for i in range(num_ratings)]
         rating = rating_start
+        self.process_and_flush_pending_tasks()
         for user_id in user_ids:
             rating_services.assign_rating_to_exploration(
                 user_id, exp_id, rating)
@@ -155,6 +156,9 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
     def _get_default_value_of_impact_score(self):
         return 0.0
 
+    def _get_default_version_of_exploration(self):
+        return 1
+
     def test_stats_no_explorations(self):
         self.login(self.OWNER_EMAIL_1)
         response = self.get_json(feconf.DASHBOARD_DATA_URL)
@@ -172,11 +176,11 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
 
-        exp_version = 1
+        exp_version = self._get_default_version_of_exploration()
         exp_id = self.EXP_ID_1
         state = exploration.init_state_name
-        self._record_start(exp_id, exp_version, state)
 
+        self._record_start(exp_id, exp_version, state)
         self._start_job_to_compute_num_plays()
 
         self._start_computation_job()
@@ -217,10 +221,10 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
 
         exp_id = self.EXP_ID_1
 
-        exp_version = 1
+        exp_version = self._get_default_version_of_exploration()
         state = exploration.init_state_name
-        self._record_start(exp_id, exp_version, state)
 
+        self._record_start(exp_id, exp_version, state)
         self._start_job_to_compute_num_plays()
 
         rating_start = 3
@@ -242,7 +246,7 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
 
-        exp_version = 1
+        exp_version = self._get_default_version_of_exploration()
         exp_id = self.EXP_ID_1
         state = exploration.init_state_name
 
@@ -274,11 +278,11 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 2)
 
-        exp_version_1 = 1
+        exp_version = self._get_default_version_of_exploration()
         exp_id_1 = self.EXP_ID_1
         state_1 = exploration_1.init_state_name
 
-        self._record_start(exp_id_1, exp_version_1, state_1)
+        self._record_start(exp_id_1, exp_version, state_1)
         self._start_job_to_compute_num_plays()
 
         rating_start = 4
@@ -290,6 +294,113 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         self.assertEquals(user_model.total_plays, 1)
         self.assertEquals(user_model.impact_score, self._get_default_value_of_impact_score())
         self.assertEquals(user_model.average_ratings, 4)
+        self.logout()
+
+    def test_multiple_plays_and_ratings_for_multiple_explorations(self):
+        exploration_1 = self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
+
+        exploration_2 = self.save_new_default_exploration(
+            self.EXP_ID_2, self.owner_id_1, title=self.EXP_TITLE_2)
+
+        self.login(self.OWNER_EMAIL_1)
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['explorations_list']), 2)
+
+        exp_version = self._get_default_version_of_exploration()
+
+        exp_id_1 = self.EXP_ID_1
+        state_1 = exploration_1.init_state_name
+        exp_id_2 = self.EXP_ID_2
+        state_2 = exploration_2.init_state_name
+
+        self._record_start(exp_id_1, exp_version, state_1)
+        self._record_start(exp_id_2, exp_version, state_2)
+        self._record_start(exp_id_2, exp_version, state_2)
+        self._start_job_to_compute_num_plays()
+
+        rating_start_1 = 4
+        self._rate_exploration(exp_id_1, 1, rating_start_1)
+        rating_start_2 = 3
+        self._rate_exploration(exp_id_2, 1, rating_start_2)
+
+        self._start_computation_job()
+        user_model = user_models.UserStatsModel.get(
+            self.owner_id_1, strict=False)
+        self.assertEquals(user_model.total_plays, 3)
+        self.assertEquals(user_model.impact_score, self._get_default_value_of_impact_score())
+        self.assertEquals(user_model.average_ratings, 3.5)
+        self.logout()
+
+    def test_stats_for_single_exploration_with_multiple_owners(self):
+        exploration = self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
+
+        rights_manager.assign_role_for_exploration(
+            self.owner_id_1, self.EXP_ID_1, self.owner_id_2, rights_manager.ROLE_OWNER)
+
+        self.login(self.OWNER_EMAIL_2)
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['explorations_list']), 1)
+
+        exp_version = self._get_default_version_of_exploration()
+        exp_id = self.EXP_ID_1
+        state = exploration.init_state_name
+
+        self._record_start(exp_id, exp_version, state)
+        self._record_start(exp_id, exp_version, state)
+        self._start_job_to_compute_num_plays()
+
+        rating_start = 3
+        self._rate_exploration(exp_id, 3, rating_start)
+
+        self._start_computation_job()
+        user_model = user_models.UserStatsModel.get(
+            self.owner_id_1, strict=False)
+        self.assertEquals(user_model.total_plays, 2)
+        self.assertEquals(user_model.impact_score, self._get_default_value_of_impact_score())
+        self.assertEquals(user_model.average_ratings, 4)
+        self.logout()
+
+    def test_stats_for_multiple_explorations_with_multiple_owners(self):
+        exploration_1 = self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
+        exploration_2 = self.save_new_default_exploration(
+            self.EXP_ID_2, self.owner_id_1, title=self.EXP_TITLE_2)
+
+        rights_manager.assign_role_for_exploration(
+            self.owner_id_1, self.EXP_ID_1, self.owner_id_2, rights_manager.ROLE_OWNER)
+        rights_manager.assign_role_for_exploration(
+            self.owner_id_1, self.EXP_ID_2, self.owner_id_2, rights_manager.ROLE_OWNER)
+
+        self.login(self.OWNER_EMAIL_2)
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['explorations_list']), 2)
+
+        exp_version = self._get_default_version_of_exploration()
+
+        exp_id_1 = self.EXP_ID_1
+        state_1 = exploration_1.init_state_name
+        exp_id_2 = self.EXP_ID_2
+        state_2 = exploration_2.init_state_name
+
+        self._record_start(exp_id_1, exp_version, state_1)
+        self._record_start(exp_id_1, exp_version, state_1)
+        self._record_start(exp_id_2, exp_version, state_2)
+        self._record_start(exp_id_2, exp_version, state_2)
+        self._start_job_to_compute_num_plays()
+
+        rating_start_1 = 3
+        self._rate_exploration(exp_id_1, 1, rating_start_1)
+        rating_start_2 = 2
+        self._rate_exploration(exp_id_2, 1, rating_start_2)
+
+        self._start_computation_job()
+        user_model = user_models.UserStatsModel.get(
+            self.owner_id_1, strict=False)
+        self.assertEquals(user_model.total_plays, 4)
+        self.assertEquals(user_model.impact_score, self._get_default_value_of_impact_score())
+        self.assertEquals(user_model.average_ratings, 2.5)
         self.logout()
 
 class DashboardHandlerTest(test_utils.GenericTestBase):
