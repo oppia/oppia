@@ -183,9 +183,9 @@ CAN_SEND_EMAILS_TO_USERS = False
 # accordingly.
 CAN_SEND_EDITOR_ROLE_EMAILS = False
 # If enabled then emails will be sent to creators for feedback messages.
-CAN_SEND_FEEDBACK_MESSAGES_EMAILS = False
+CAN_SEND_FEEDBACK_MESSAGE_EMAILS = False
 # Time to wait before sending feedback message emails (currently set to 1 hour).
-DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN = 3600
+DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS = 3600
 # Whether to send email updates to a user who has not specified a preference.
 DEFAULT_EMAIL_UPDATES_PREFERENCE = False
 # Whether to send an invitation email when the user is granted
