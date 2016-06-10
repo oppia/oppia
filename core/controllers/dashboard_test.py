@@ -19,6 +19,7 @@ from core.domain import config_services
 from core.domain import event_services
 from core.domain import feedback_domain
 from core.domain import feedback_services
+from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import stats_jobs_continuous_test
 from core.domain import user_jobs_continuous
@@ -84,36 +85,44 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
     OWNER_EMAIL_2 = 'owner2@example.com'
     OWNER_USERNAME_2 = 'owner2'
 
-    COLLABORATOR_EMAIL_1 = 'collaborator1@example.com'
-    COLLABORATOR_USERNAME_1 = 'collaborator1'
-    COLLABORATOR_EMAIL_2 = 'collaborator2@example.com'
-    COLLABORATOR_USERNAME_2 = 'collaborator2'
-
     EXP_ID_1 = 'exp_id_1'
     EXP_TITLE_1 = 'Exploration title 1'
     EXP_ID_2 = 'exp_id_2'
     EXP_TITLE_2 = 'Exploration title 2'
 
+    USER_SESSION = 'session1'
+
     def setUp(self):
         super(DashboardStatisticsTest, self).setUp()
         self.signup(self.OWNER_EMAIL_1, self.OWNER_USERNAME_1)
         self.signup(self.OWNER_EMAIL_2, self.OWNER_USERNAME_2)
-        self.signup(self.COLLABORATOR_EMAIL_1, self.COLLABORATOR_USERNAME_1)
-        self.signup(self.COLLABORATOR_EMAIL_2, self.COLLABORATOR_USERNAME_2)
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
         self.owner_id_1 = self.get_user_id_from_email(self.OWNER_EMAIL_1)
         self.owner_id_2 = self.get_user_id_from_email(self.OWNER_EMAIL_2)
-        self.collaborator_id_1 = self.get_user_id_from_email(
-            self.COLLABORATOR_EMAIL_1)
-        self.collaborator_id_2 = self.get_user_id_from_email(
-            self.COLLABORATOR_EMAIL_2)
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-    def _record_start(self, exp_id, exp_version, state, session_id):
+    def _record_start(self, exp_id, exp_version, state):
+        session_id = self.USER_SESSION
         event_services.StartExplorationEventHandler.record(
             exp_id, exp_version, state, session_id, {},
             feconf.PLAY_TYPE_NORMAL)
+
+    def _rate_exploration(self, exp_id, num_ratings, rating_start):
+        """Create num_ratings ratings for exploration with exp_id,
+        of values starting from rating_start.
+        For example, num_ratings = 3 and rating_start = 2, then exploration
+        will be assigned the ratings 2,3,4.
+        """
+        # Each user id needs to be unique since each user can only give an
+        # exploration one rating.
+        user_ids = ['user%d' % i for i in range(num_ratings)]
+        rating = rating_start
+        for user_id in user_ids:
+            rating_services.assign_rating_to_exploration(
+                user_id, exp_id, rating)
+            rating = rating + 1
+            if rating > 5:
+                rating = 1
+        self.process_and_flush_pending_tasks()
 
     def _start_computation_job(self):
         (user_jobs_continuous_test.ModifiedUserStatsAggregator.
@@ -143,6 +152,9 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
             0)
         self.process_and_flush_pending_tasks()
 
+    def _get_default_value_of_impact_score(self):
+        return 0.0
+
     def test_stats_no_explorations(self):
         self.login(self.OWNER_EMAIL_1)
         response = self.get_json(feconf.DASHBOARD_DATA_URL)
@@ -152,7 +164,77 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
             self.owner_id_1, strict=False))
         self.logout()
 
-    def test_one_play_only_single_exploration(self):
+    def test_one_play_for_single_exploration(self):
+        exploration = self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
+
+        self.login(self.OWNER_EMAIL_1)
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['explorations_list']), 1)
+
+        exp_version = 1
+        exp_id = self.EXP_ID_1
+        state = exploration.init_state_name
+        self._record_start(exp_id, exp_version, state)
+
+        self._start_job_to_compute_num_plays()
+
+        self._start_computation_job()
+        user_model = user_models.UserStatsModel.get(
+            self.owner_id_1, strict=False)
+        self.assertEquals(user_model.total_plays, 1)
+        self.assertEquals(user_model.impact_score, self._get_default_value_of_impact_score())
+        self.assertIsNone(user_model.average_ratings)
+        self.logout()
+
+    def test_one_rating_for_single_exploration(self):
+        exploration = self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
+
+        self.login(self.OWNER_EMAIL_1)
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['explorations_list']), 1)
+
+        exp_id = self.EXP_ID_1
+        rating_start = 4
+        self._rate_exploration(exp_id, 1, rating_start)
+
+        self._start_computation_job()
+        user_model = user_models.UserStatsModel.get(
+            self.owner_id_1, strict=False)
+        self.assertEquals(user_model.total_plays, 0)
+        self.assertEquals(user_model.impact_score, self._get_default_value_of_impact_score())
+        self.assertEquals(user_model.average_ratings, 4)
+        self.logout()
+
+    def test_one_play_and_rating_for_single_exploration(self):
+        exploration = self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
+
+        self.login(self.OWNER_EMAIL_1)
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['explorations_list']), 1)
+
+        exp_id = self.EXP_ID_1
+
+        exp_version = 1
+        state = exploration.init_state_name
+        self._record_start(exp_id, exp_version, state)
+
+        self._start_job_to_compute_num_plays()
+
+        rating_start = 3
+        self._rate_exploration(exp_id, 1, rating_start)
+
+        self._start_computation_job()
+        user_model = user_models.UserStatsModel.get(
+            self.owner_id_1, strict=False)
+        self.assertEquals(user_model.total_plays, 1)
+        self.assertEquals(user_model.impact_score, self._get_default_value_of_impact_score())
+        self.assertEquals(user_model.average_ratings, 3)
+        self.logout()
+
+    def test_multiple_plays_and_ratings_for_single_exploration(self):
         exploration = self.save_new_default_exploration(
             self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
 
@@ -164,17 +246,51 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         exp_id = self.EXP_ID_1
         state = exploration.init_state_name
 
-        self._record_start(exp_id, exp_version, state, 'session1')
+        self._record_start(exp_id, exp_version, state)
+        self._record_start(exp_id, exp_version, state)
+        self._record_start(exp_id, exp_version, state)
+        self._record_start(exp_id, exp_version, state)
         self._start_job_to_compute_num_plays()
+
+        rating_start = 3
+        self._rate_exploration(exp_id, 3, rating_start)
+
+        self._start_computation_job()
+        user_model = user_models.UserStatsModel.get(
+            self.owner_id_1, strict=False)
+        self.assertEquals(user_model.total_plays, 4)
+        self.assertEquals(user_model.impact_score, self._get_default_value_of_impact_score())
+        self.assertEquals(user_model.average_ratings, 4)
+        self.logout()
+
+    def test_one_play_and_rating_for_multiple_explorations(self):
+        exploration_1 = self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
+
+        exploration_2 = self.save_new_default_exploration(
+            self.EXP_ID_2, self.owner_id_1, title=self.EXP_TITLE_2)
+
+        self.login(self.OWNER_EMAIL_1)
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['explorations_list']), 2)
+
+        exp_version_1 = 1
+        exp_id_1 = self.EXP_ID_1
+        state_1 = exploration_1.init_state_name
+
+        self._record_start(exp_id_1, exp_version_1, state_1)
+        self._start_job_to_compute_num_plays()
+
+        rating_start = 4
+        self._rate_exploration(exp_id_1, 1, rating_start)
 
         self._start_computation_job()
         user_model = user_models.UserStatsModel.get(
             self.owner_id_1, strict=False)
         self.assertEquals(user_model.total_plays, 1)
-        self.assertEquals(user_model.impact_score, 0.0)
-        self.assertIsNone(user_model.average_ratings)
+        self.assertEquals(user_model.impact_score, self._get_default_value_of_impact_score())
+        self.assertEquals(user_model.average_ratings, 4)
         self.logout()
-
 
 class DashboardHandlerTest(test_utils.GenericTestBase):
 
