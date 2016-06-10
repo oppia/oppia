@@ -26,21 +26,17 @@ oppia.constant(
   'RTE_COMPONENT_SPECS',
   window.GLOBALS.RTE_COMPONENT_SPECS ? window.GLOBALS.RTE_COMPONENT_SPECS : {});
 
-//Service for retrieving width of the image
+// Service for retrieving width of the image
 oppia.factory('widthService', function() {
-  var _width_of_image = null;
-
-  function get(){
-    return _width_of_image;
-  }
-
-  function set(value){
-    _width_of_image = value;
-  }
+  var imageWidth = null;
 
   return {
-    set: set,
-    get: get
+    set: function(value) {
+      imageWidth = value;
+    },
+    get: function() {
+      return imageWidth;
+    }
   };
 });
 
@@ -1322,7 +1318,8 @@ oppia.directive('schemaBasedFloatEditor', [function() {
       '$scope', '$filter', '$timeout', 'parameterSpecsService',
       'focusService', 'widthService',
       function(
-          $scope, $filter, $timeout, parameterSpecsService, focusService, widthService) {
+          $scope, $filter, $timeout, parameterSpecsService, focusService,
+          widthService) {
         $scope.hasLoaded = false;
         $scope.isUserCurrentlyTyping = false;
         $scope.hasFocusedAtLeastOnce = false;

@@ -163,7 +163,9 @@ oppia.directive('filepathEditor', [
           $scope.filepathsLoaded = true;
         });
         $scope.width = null;
-        $scope.$watch(function() { return widthService.get(); }, function(newValue) {
+        $scope.$watch(function() {
+          return widthService.get();
+        }, function(newValue) {
             $scope.width = newValue;
           });
       }
