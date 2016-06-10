@@ -16,10 +16,10 @@
 
 oppia.directive('filepathEditor', [
   '$compile', '$http', '$sce', 'alertsService', 'explorationContextService',
-  'OBJECT_EDITOR_URL_PREFIX', 'widthService',
+  'OBJECT_EDITOR_URL_PREFIX', 'imageComponentWidthService',
   function(
       $compile, $http, $sce, alertsService, explorationContextService,
-      OBJECT_EDITOR_URL_PREFIX, widthService) {
+      OBJECT_EDITOR_URL_PREFIX, imageComponentWidthService) {
     return {
       link: function(scope, element) {
         scope.getTemplateUrl = function() {
@@ -164,7 +164,7 @@ oppia.directive('filepathEditor', [
         });
         $scope.width = null;
         $scope.$watch(function() {
-          return widthService.get();
+          return imageComponentWidthService.get();
         }, function(newValue) {
             $scope.width = newValue;
           });

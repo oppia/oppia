@@ -27,7 +27,7 @@ oppia.constant(
   window.GLOBALS.RTE_COMPONENT_SPECS ? window.GLOBALS.RTE_COMPONENT_SPECS : {});
 
 // Service for retrieving width of the image
-oppia.factory('widthService', function() {
+oppia.factory('imageComponentWidthService', function() {
   var imageWidth = null;
 
   return {
@@ -1316,10 +1316,10 @@ oppia.directive('schemaBasedFloatEditor', [function() {
     restrict: 'E',
     controller: [
       '$scope', '$filter', '$timeout', 'parameterSpecsService',
-      'focusService', 'widthService',
+      'focusService', 'imageComponentWidthService',
       function(
           $scope, $filter, $timeout, parameterSpecsService, focusService,
-          widthService) {
+          imageComponentWidthService) {
         $scope.hasLoaded = false;
         $scope.isUserCurrentlyTyping = false;
         $scope.hasFocusedAtLeastOnce = false;
@@ -1380,7 +1380,7 @@ oppia.directive('schemaBasedFloatEditor', [function() {
           }
 
           $scope.$watch('localValue', function(newValue) {
-            widthService.set(newValue);
+            imageComponentWidthService.set(newValue);
           });
         }
 
