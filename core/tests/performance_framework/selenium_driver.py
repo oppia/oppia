@@ -1,3 +1,17 @@
+# Copyright 2016 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """Selenium + browsermobproxy
 
 This file contains selenium + browsermobproxy to fetch performance data.
@@ -6,17 +20,25 @@ This file contains selenium + browsermobproxy to fetch performance data.
 import urlparse
 import os
 
+CURR_DIR = os.path.abspath(os.getcwd())
+OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
+
+DIRS_TO_ADD_TO_SYS_PATH = [
+    os.path.join(OPPIA_TOOLS_DIR, 'browsermob-proxy-0.7.1'),
+    os.path.join(OPPIA_TOOLS_DIR, 'selenium-2.53.2')
+]
+
 from browsermobproxy import Server
 from selenium import webdriver
 from xvfbwrapper import Xvfb
 
-# Help Needed:
-# Need to curl both these binaries and install them with the setup process.
-# Also, need references to them to use here.
-# pylint: disable=line-too-long
-CHROME_DRIVER = '/home/vg/Desktop/gsoc/opensource/node_modules/protractor/selenium/chromedriver_2.21'
-# pylint: enable=line-too-long
-BROWSERMOB_PROXY = '/home/vg/Downloads/perf-oppia/browsermob-proxy-2.1.1/bin/browsermob-proxy'
+CHROME_DRIVER_PATH = os.path.join(
+    '..', 'node_modules', 'protractor', 'selenium', 'chromedriver_2.21')
+CHROME_DRIVER = CHROME_DRIVER_PATH
+
+BROWSERMOB_PROXY_PATH = os.path.join(
+    '..', 'oppia_tools', 'browsermob-proxy-2.1.1', 'bin', 'browsermob-proxy')
+BROWSERMOB_PROXY = BROWSERMOB_PROXY_PATH
 
 
 class CaptureData(object):
