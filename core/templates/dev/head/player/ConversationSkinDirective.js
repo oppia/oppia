@@ -348,6 +348,10 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
           }, 100);
         };
 
+        $scope.iframeReloadEprolation = function() {
+          $window.location.reload();
+        };
+
         $scope.isOnTerminalCard = function() {
           return $scope.activeCard &&
             $scope.exploration.isStateTerminal($scope.activeCard.stateName);
