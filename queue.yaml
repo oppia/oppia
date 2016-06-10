@@ -7,3 +7,5 @@ queue:
   rate: 3/m
 - name: events
   rate: 5/s
+- name: emails
+  rate: 5/s 

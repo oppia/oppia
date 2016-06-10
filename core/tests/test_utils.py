@@ -658,6 +658,16 @@ class AppEngineTestBase(TestBase):
         else:
             return len(self.taskqueue_stub.get_filtered_tasks())
 
+    def get_pending_tasks(self, queue_name=None):
+        """Returns the jobs in the given queue. If queue_name is None,
+        defaults to returning the jobs in all queues available.
+        """
+        if queue_name:
+            return self.taskqueue_stub.get_filtered_tasks(
+                queue_names=[queue_name])
+        else:
+            return self.taskqueue_stub.get_filtered_tasks()
+
     def process_and_flush_pending_tasks(self, queue_name=None):
         """Runs and flushes pending tasks. If queue_name is None, does so for
         all queues; otherwise, this only runs and flushes tasks for the
