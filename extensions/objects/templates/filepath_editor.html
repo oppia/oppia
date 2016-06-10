@@ -22,12 +22,11 @@
         <[filepath]>
       </label>
     </div>
-    <img ng-if="localValue.label" ng-src="<[getPreviewUrl(localValue.label)]>" id="target-image" width="<[width]>"/>
+    <img ng-if="localValue.label" ng-src="<[getPreviewUrl(localValue.label)]>" width="<[width]>"/>
     <br><br>
     <button type="button" class="btn btn-default" ng-click="openImageUploader()">Upload a new image</button>
-    
   </div>
-  
+
   <div ng-if="imageUploaderIsActive" style="border: 1px solid black; padding: 5px;">
     <div class="oppia-warning">
       Before uploading any images, please ensure that they are compatible with the <a href="/about#license" target="_blank">license terms</a> of this site (the link opens in a new window).
@@ -50,7 +49,7 @@
         <span class="glyphicon glyphicon-remove"></span>
       </button>
 
-      <img ng-src="<[imagePreview]>" style="display: block; margin-left: auto; margin-right: auto;" id="image">
+      <img ng-src="<[imagePreview]>" style="display: block; margin-left: auto; margin-right: auto;">
     </div>
     
     
