@@ -76,9 +76,9 @@ class HomePageTest(test_utils.GenericTestBase):
 
 
 class DashboardStatisticsTest(test_utils.GenericTestBase):
-    # TODO(526avijitgupta): Replace the model reads in each of the tests inside
-    # this class by calls to services/controllers, when they have been written.
-    # Ensure that there should be no need to import `user_model` thereafter.
+    # The model reads in each of these tests inside this class will not be
+    # replaced by calls to services, since these tests are written to carry out
+    # unit testing.
 
     OWNER_EMAIL_1 = 'owner1@example.com'
     OWNER_USERNAME_1 = 'owner1'
@@ -101,6 +101,10 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         self.owner_id_2 = self.get_user_id_from_email(self.OWNER_EMAIL_2)
 
     def _record_start(self, exp_id, exp_version, state):
+        """Record start event to an exploration.
+        Completing the exploration is not necessary here since the total_plays
+        are currently being counted taking into account only the # of starts.
+        """
         session_id = self.USER_SESSION
         event_services.StartExplorationEventHandler.record(
             exp_id, exp_version, state, session_id, {},
@@ -187,12 +191,13 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         user_model = user_models.UserStatsModel.get(
             self.owner_id_1, strict=False)
         self.assertEquals(user_model.total_plays, 1)
-        self.assertEquals(user_model.impact_score, self._get_default_value_of_impact_score())
+        self.assertEquals(
+            user_model.impact_score, self._get_default_value_of_impact_score())
         self.assertIsNone(user_model.average_ratings)
         self.logout()
 
     def test_one_rating_for_single_exploration(self):
-        exploration = self.save_new_default_exploration(
+        self.save_new_default_exploration(
             self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
 
         self.login(self.OWNER_EMAIL_1)
@@ -207,7 +212,8 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         user_model = user_models.UserStatsModel.get(
             self.owner_id_1, strict=False)
         self.assertEquals(user_model.total_plays, 0)
-        self.assertEquals(user_model.impact_score, self._get_default_value_of_impact_score())
+        self.assertEquals(
+            user_model.impact_score, self._get_default_value_of_impact_score())
         self.assertEquals(user_model.average_ratings, 4)
         self.logout()
 
@@ -234,7 +240,8 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         user_model = user_models.UserStatsModel.get(
             self.owner_id_1, strict=False)
         self.assertEquals(user_model.total_plays, 1)
-        self.assertEquals(user_model.impact_score, self._get_default_value_of_impact_score())
+        self.assertEquals(
+            user_model.impact_score, self._get_default_value_of_impact_score())
         self.assertEquals(user_model.average_ratings, 3)
         self.logout()
 
@@ -263,7 +270,8 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         user_model = user_models.UserStatsModel.get(
             self.owner_id_1, strict=False)
         self.assertEquals(user_model.total_plays, 4)
-        self.assertEquals(user_model.impact_score, self._get_default_value_of_impact_score())
+        self.assertEquals(
+            user_model.impact_score, self._get_default_value_of_impact_score())
         self.assertEquals(user_model.average_ratings, 4)
         self.logout()
 
@@ -271,7 +279,7 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         exploration_1 = self.save_new_default_exploration(
             self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
 
-        exploration_2 = self.save_new_default_exploration(
+        self.save_new_default_exploration(
             self.EXP_ID_2, self.owner_id_1, title=self.EXP_TITLE_2)
 
         self.login(self.OWNER_EMAIL_1)
@@ -292,7 +300,8 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         user_model = user_models.UserStatsModel.get(
             self.owner_id_1, strict=False)
         self.assertEquals(user_model.total_plays, 1)
-        self.assertEquals(user_model.impact_score, self._get_default_value_of_impact_score())
+        self.assertEquals(
+            user_model.impact_score, self._get_default_value_of_impact_score())
         self.assertEquals(user_model.average_ratings, 4)
         self.logout()
 
@@ -328,7 +337,8 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         user_model = user_models.UserStatsModel.get(
             self.owner_id_1, strict=False)
         self.assertEquals(user_model.total_plays, 3)
-        self.assertEquals(user_model.impact_score, self._get_default_value_of_impact_score())
+        self.assertEquals(
+            user_model.impact_score, self._get_default_value_of_impact_score())
         self.assertEquals(user_model.average_ratings, 3.5)
         self.logout()
 
@@ -337,7 +347,8 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
             self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
 
         rights_manager.assign_role_for_exploration(
-            self.owner_id_1, self.EXP_ID_1, self.owner_id_2, rights_manager.ROLE_OWNER)
+            self.owner_id_1, self.EXP_ID_1, self.owner_id_2,
+            rights_manager.ROLE_OWNER)
 
         self.login(self.OWNER_EMAIL_2)
         response = self.get_json(feconf.DASHBOARD_DATA_URL)
@@ -358,7 +369,8 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         user_model = user_models.UserStatsModel.get(
             self.owner_id_1, strict=False)
         self.assertEquals(user_model.total_plays, 2)
-        self.assertEquals(user_model.impact_score, self._get_default_value_of_impact_score())
+        self.assertEquals(
+            user_model.impact_score, self._get_default_value_of_impact_score())
         self.assertEquals(user_model.average_ratings, 4)
         self.logout()
 
@@ -369,9 +381,11 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
             self.EXP_ID_2, self.owner_id_1, title=self.EXP_TITLE_2)
 
         rights_manager.assign_role_for_exploration(
-            self.owner_id_1, self.EXP_ID_1, self.owner_id_2, rights_manager.ROLE_OWNER)
+            self.owner_id_1, self.EXP_ID_1, self.owner_id_2,
+            rights_manager.ROLE_OWNER)
         rights_manager.assign_role_for_exploration(
-            self.owner_id_1, self.EXP_ID_2, self.owner_id_2, rights_manager.ROLE_OWNER)
+            self.owner_id_1, self.EXP_ID_2, self.owner_id_2,
+            rights_manager.ROLE_OWNER)
 
         self.login(self.OWNER_EMAIL_2)
         response = self.get_json(feconf.DASHBOARD_DATA_URL)
@@ -399,7 +413,8 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         user_model = user_models.UserStatsModel.get(
             self.owner_id_1, strict=False)
         self.assertEquals(user_model.total_plays, 4)
-        self.assertEquals(user_model.impact_score, self._get_default_value_of_impact_score())
+        self.assertEquals(
+            user_model.impact_score, self._get_default_value_of_impact_score())
         self.assertEquals(user_model.average_ratings, 2.5)
         self.logout()
 
