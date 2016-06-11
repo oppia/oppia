@@ -65,7 +65,7 @@ oppia.factory('explorationContextService', [
             } else if (pathnameArray[i] === 'create') {
               _pageContext = PAGE_CONTEXT.EDITOR;
               return PAGE_CONTEXT.EDITOR;
-            } else if(pathnameArray[i] === 'embed') {
+            } else if (pathnameArray[i] === 'embed') {
               _pageContext = PAGE_CONTEXT.EMBED;
               return PAGE_CONTEXT.EMBED;
             }
