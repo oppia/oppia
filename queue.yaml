@@ -6,3 +6,5 @@ queue:
   rate: 5/s
 - name: backups
   rate: 5/s
+- name: emails
+  rate: 5/s 
