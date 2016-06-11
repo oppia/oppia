@@ -363,6 +363,7 @@ class UserStatsMRJobManager(
         if total_commits == 0:
             calculate_exploration_impact_score = False
 
+        mapped_owner_ids = []
         for contrib_id in contributors:
             exploration_data = {}
 
@@ -382,6 +383,7 @@ class UserStatsMRJobManager(
             # if the user is an owner for the exploration, then update dict with
             # 'average ratings' and 'total plays' as well.
             if contrib_id in exploration_summary.owner_ids:
+                mapped_owner_ids.append(contrib_id)
                 # Get num starts (total plays) for the exploration
                 exploration_data.update({
                     'total_plays_for_owned_exp': (
@@ -393,6 +395,21 @@ class UserStatsMRJobManager(
                         'average_rating_for_owned_exp': average_rating
                     })
             yield (contrib_id, exploration_data)
+
+        for owner_id in exploration_summary.owner_ids:
+            if owner_id not in mapped_owner_ids:
+                mapped_owner_ids.append(owner_id)
+                # Get num starts (total plays) for the exploration
+                exploration_data = {
+                    'total_plays_for_owned_exp': (
+                        statistics['start_exploration_count']),
+                }
+                # Update data with average rating only if it is not None.
+                if average_rating is not None:
+                    exploration_data.update({
+                        'average_rating_for_owned_exp': average_rating
+                    })
+                yield (owner_id, exploration_data)
 
     @staticmethod
     def reduce(key, stringified_values):
