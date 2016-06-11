@@ -84,15 +84,8 @@
             In addition, if the exploration is iframed, the terminal card will
             have no learner input section, so we do not show it.
           -->
-          <div ng-if="(!waitingForOppiaFeedback || !exploration.isInteractionInline(activeCard.stateName)) && ((activeCard.interactionHtml && !activeCard.destStateName) || (activeCard.destStateName && !helpCardHasContinueButton)) && (!isOnTerminalCard() || !isIframed || (activeCard.destStateName && !helpCardHasContinueButton)) && isCurrentCardAtEndOfTranscript()">
+          <div ng-if="(!waitingForOppiaFeedback || !exploration.isInteractionInline(activeCard.stateName)) && ((activeCard.interactionHtml && !activeCard.destStateName) || (activeCard.destStateName && !helpCardHasContinueButton)) && (!isOnTerminalCard() || (activeCard.destStateName && !helpCardHasContinueButton)) && isCurrentCardAtEndOfTranscript()">
             <div class="conversation-skin-inline-interaction">
-              <div ng-if="activeCard.destStateName && activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].oppiaFeedbackHtml && !helpCardHasContinueButton">
-                <md-button aria-label="" class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
-                           focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
-                           ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)"
-                           translate="I18N_PLAYER_CONTINUE_BUTTON">
-                </md-button>
-              </div>
               <div ng-if="activeCard.interactionHtml && !activeCard.destStateName">
                 <div ng-if="exploration.isInteractionInline(activeCard.stateName)">
                   <div class="protractor-test-conversation-input"
@@ -159,6 +152,13 @@
       <div class="bottom-nav-container">
         <nav class="bottom-nav row">
           <div class="nav-left-content">
+            <div ng-if="activeCard.destStateName && activeCard.answerFeedbackPairs[activeCard.answerFeedbackPairs.length - 1].oppiaFeedbackHtml && !helpCardHasContinueButton">
+              <md-button aria-label="" class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
+                         focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
+                         ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)"
+                         translate="I18N_PLAYER_CONTINUE_BUTTON">
+              </md-button>
+            </div>
           </div>
           <progress-dots num-dots="numProgressDots"
                    class="conversation-skin-progress-dots-in-bottom-nav">
@@ -219,21 +219,14 @@
       z-index: 1;
     }
     .conversation-skin-progress-dots-in-bottom-nav {
-      position: relative;
-      left: 0;
+      align-self: center;
       margin: 0 auto;
-      right: 0;
       z-index: 1;
     }
-
-    .conversation-skin-progress-dots-not-iframed {
-      top: 56px;
+    .oppia-progress-dot {
+      width: 24px;
+      height: 24px;
     }
-
-    .conversation-skin-progress-dots-iframed {
-      top: 6px;
-    }
-
     .conversation-skin-oppia-avatar,
     .conversation-skin-user-avatar {
       height: 36px;
@@ -311,15 +304,15 @@
     }
 
     .conversation-skin-cards-container {
+      align-items: center;
+      align-content: flex-start; 
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: space-between;
-      align-content: flex-start; 
       height: 100%;
       margin: 0 auto;
       max-width: 1400px;
-      padding:0px;
+      padding: 0px;
       width: 100%;
     }
 
@@ -340,7 +333,6 @@
       background: #fff;
       border-radius: 2px;
       flex-shrink: 10000;
-      /*max-width: 560px;*/
       min-width: 360px;
       padding-top: 20px;
       text-align: left;
@@ -638,24 +630,24 @@
         border: none;
     }
     .bottom-nav-container {
-      width: 100%;
-      padding: 10px 7px;
-      background-color: #015c53;
-      bottom: 0px;
       align-self: flex-end;
-      position: relative;
+      background-color: #015c53;
       min-height: 60px;
+      padding: 10px 7px;
+      width: 100%;
     }
     .bottom-nav {
+      align-items: center;
       display: flex;
       flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
     }
     .logo-bottom-nav-bar {
-    	align-self: flex-end;
-    	right: 0px;
-    	height: 50px;
+      align-self: flex-end;
+      right: 0px;
+      height: 50px;
+    }
+    .nav-left-content {
+      padding: 0px 16px;
     }
     .nav-bar-bottom-replay-content{
       display: flex;
@@ -667,9 +659,15 @@
 
     @media screen and (max-width: 959px) {
       .conversation-skin-cards-container {
-        display: block;
-        padding: 65px 0px;
-        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        align-content: flex-start; 
+        height: 100%;
+        margin: 0 auto;
+        max-width: 1400px;
+        padding:0px;
         width: 100%;
       }
 
@@ -738,10 +736,6 @@
       .conversation-skin-oppia-avatar.show-tutor-card:hover {
         opacity: 0.8;
       }
-    }
-    .oppia-progress-dot {
-    	width: 24px;
-    	height: 24px;
     }
   </style>
 </script>

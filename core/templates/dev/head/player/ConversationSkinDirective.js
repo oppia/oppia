@@ -251,9 +251,10 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
   return {
     restrict: 'E',
     scope: {},
-    link: function(scope){
+    link: function(scope) {
       var isIframed = urlService.isIframed();
-      scope.myTemplate = isIframed ? 'skins/ConversationEmbed': 'skins/Conversation';
+      scope.myTemplate = isIframed ?
+        'skins/ConversationEmbed' : 'skins/Conversation';
     },
     template: "<div ng-include='myTemplate'></div>",
     controller: [
@@ -414,6 +415,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
           if (newParams) {
             LearnerParamsService.init(newParams);
           }
+          console.log($scope.activeCard);
 
           $scope.numProgressDots++;
 
