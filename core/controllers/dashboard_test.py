@@ -24,8 +24,8 @@ from core.domain import rights_manager
 from core.domain import stats_jobs_continuous_test
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_continuous_test
-from core.tests import test_utils
 from core.platform import models
+from core.tests import test_utils
 import feconf
 
 (user_models, stats_models) = models.Registry.import_models(
