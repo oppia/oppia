@@ -16,9 +16,8 @@
 
 """Provides a seam for taskqueue-related operations."""
 
-import feconf
-from google.appengine.ext import deferred
 from google.appengine.api import taskqueue
+from google.appengine.ext import deferred
 
 # NOTE: The following constants should match the queue names in queue.yaml.
 # Default queue for processing tasks (including MapReduce ones).
@@ -26,7 +25,7 @@ QUEUE_NAME_DEFAULT = 'default'
 # Deferred queue for processing events outside the request/response cycle.
 QUEUE_NAME_EVENTS = 'events'
 # Taskqueue for sending feedback message email.
-QUEUE_NAME_FEEDBACK_MESSAGE_EMAIL = 'emails'
+QUEUE_NAME_EMAILS = 'emails'
 
 def defer(fn, *args, **kwargs):
     """Adds a new task to the default deferred queue."""
@@ -39,16 +38,13 @@ def defer_to_events_queue(fn, *args, **kwargs):
     # details on the _queue kwarg.
     deferred.defer(fn, *args, _queue=QUEUE_NAME_EVENTS, **kwargs)
 
-def add_feedback_message_email_task(user_id):
+def add_feedback_message_email_task(url, **kwargs):
     """Adds a new task for sending feedback message email."""
     # See https://cloud.google.com/appengine/docs/python/taskqueue for
     # details of various parameters set when adding a new task.
     taskqueue.add(
-        queue_name=QUEUE_NAME_FEEDBACK_MESSAGE_EMAIL,
-        url=feconf.FEEDBACK_MESSAGE_EMAIL_HANDLER_URL,
-        params={'user_id':user_id},
-        countdown=feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS,
-        target=taskqueue.DEFAULT_APP_VERSION)
+        queue_name=QUEUE_NAME_EMAILS, url=url,
+        target=taskqueue.DEFAULT_APP_VERSION, **kwargs)
 
 # A special exception that ensures that the task is not tried again, if it
 # fails.
