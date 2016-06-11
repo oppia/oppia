@@ -82,7 +82,9 @@ BAD_PATTERNS = {
     '\t': (
         'Please use spaces instead of tabs.'),
     '\r': (
-        'Please make sure all files only have LF endings (no CRLF).')
+        'Please make sure all files only have LF endings (no CRLF).'),
+    'glyphicon': (
+        'Please use equivalent material-icons instead of glyhicons.')
 }
 
 EXCLUDED_PATHS = (
