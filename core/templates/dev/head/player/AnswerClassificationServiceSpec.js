@@ -71,7 +71,7 @@ describe('Answer classification service', function() {
       return inputs.x === answer;
     },
     NotEquals: function(answer, inputs) {
-      return inputs.x != answer;
+      return inputs.x !== answer;
     }
   };
 

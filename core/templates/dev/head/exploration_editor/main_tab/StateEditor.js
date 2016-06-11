@@ -165,7 +165,7 @@ oppia.factory('trainingModalService', ['$rootScope', '$modal', 'alertsService',
                   if (classificationResult.outcome.feedback.length > 0) {
                     feedback = classificationResult.outcome.feedback[0];
                   }
-                  if (dest == currentStateName) {
+                  if (dest === currentStateName) {
                     dest = '<em>(try again)</em>';
                   }
 
@@ -220,7 +220,7 @@ oppia.factory('trainingDataService', [
     // successfully removed from the training data, or -1 otherwise.
     var _removeAnswerFromTrainingData = function(answer, trainingData) {
       var index = _getIndexOfTrainingData(answer, trainingData);
-      if (index != -1) {
+      if (index !== -1) {
         trainingData.splice(index, 1);
       }
       return index;
@@ -245,15 +245,15 @@ oppia.factory('trainingDataService', [
         var fuzzyRuleIndex = -1;
         for (var j = 0; j < ruleSpecs.length; j++) {
           var ruleSpec = ruleSpecs[j];
-          if (ruleSpec.rule_type == FUZZY_RULE_TYPE) {
+          if (ruleSpec.rule_type === FUZZY_RULE_TYPE) {
             trainingData = ruleSpec.inputs.training_data;
             fuzzyRuleIndex = j;
             break;
           }
         }
         if (trainingData &&
-            _removeAnswerFromTrainingData(answer, trainingData) != -1) {
-          if (trainingData.length == 0 && ruleSpecs.length > 1) {
+            _removeAnswerFromTrainingData(answer, trainingData) !== -1) {
+          if (trainingData.length === 0 && ruleSpecs.length > 1) {
             // If the last of the training data for a fuzzy rule has been
             // removed and the fuzzy rule is not the only rule in the group,
             // remove the rule since it is no longer doing anything.
@@ -265,7 +265,7 @@ oppia.factory('trainingDataService', [
 
       // Remove the answer from the confirmed unclassified answers.
       updatedConfirmedUnclassifiedAnswers = (_removeAnswerFromTrainingData(
-        answer, confirmedUnclassifiedAnswers) != -1);
+        answer, confirmedUnclassifiedAnswers) !== -1);
 
       if (updatedAnswerGroups) {
         responsesService.save(
@@ -278,7 +278,7 @@ oppia.factory('trainingDataService', [
       }
 
       var index = _removeAnswerFromTrainingData(answer, _trainingDataAnswers);
-      if (index != -1) {
+      if (index !== -1) {
         _trainingDataCounts.splice(index, 1);
         $rootScope.$broadcast('updatedTrainingData');
       }
@@ -335,7 +335,7 @@ oppia.factory('trainingDataService', [
         var fuzzyRule = null;
         for (var i = 0; i < rules.length; i++) {
           var rule = rules[i];
-          if (rule.rule_type == FUZZY_RULE_TYPE) {
+          if (rule.rule_type === FUZZY_RULE_TYPE) {
             fuzzyRule = rule;
             break;
           }
@@ -350,7 +350,7 @@ oppia.factory('trainingDataService', [
         // Train the rule to include this answer, but only if it's not already
         // in the training data.
         if (_getIndexOfTrainingData(
-            answer, fuzzyRule.inputs.training_data) == -1) {
+            answer, fuzzyRule.inputs.training_data) === -1) {
           fuzzyRule.inputs.training_data.push(answer);
         }
 
@@ -366,7 +366,7 @@ oppia.factory('trainingDataService', [
           responsesService.getConfirmedUnclassifiedAnswers());
 
         if (_getIndexOfTrainingData(
-              answer, confirmedUnclassifiedAnswers) == -1) {
+              answer, confirmedUnclassifiedAnswers) === -1) {
           confirmedUnclassifiedAnswers.push(answer);
         }
 
@@ -445,7 +445,7 @@ oppia.directive('trainingPanel', [function() {
         $scope.confirmAnswerGroupIndex = function(index) {
           $scope.classification.answerGroupIndex = index;
 
-          if (index == responsesService.getAnswerGroupCount()) {
+          if (index === responsesService.getAnswerGroupCount()) {
             trainingDataService.trainDefaultResponse($scope.answer);
           } else {
             trainingDataService.trainAnswerGroup(index, $scope.answer);

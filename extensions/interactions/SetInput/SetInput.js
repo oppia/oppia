@@ -97,7 +97,7 @@ oppia.directive('oppiaShortResponseSetInput', [
 oppia.factory('setInputRulesService', [function() {
   return {
     Equals: function(answer, inputs) {
-      return answer.length == inputs.x.length && inputs.x.every(function(val) {
+      return answer.length === inputs.x.length && inputs.x.every(function(val) {
         return answer.indexOf(val) >= 0;
       });
     },
@@ -118,17 +118,17 @@ oppia.factory('setInputRulesService', [function() {
     },
     HasElementsNotIn: function(answer, inputs) {
       return answer.some(function(val) {
-        return inputs.x.indexOf(val) == -1;
+        return inputs.x.indexOf(val) === -1;
       });
     },
     OmitsElementsIn: function(answer, inputs) {
       return inputs.x.some(function(val) {
-        return answer.indexOf(val) == -1;
+        return answer.indexOf(val) === -1;
       });
     },
     IsDisjointFrom: function(answer, inputs) {
       return inputs.x.every(function(val) {
-        return answer.indexOf(val) == -1;
+        return answer.indexOf(val) === -1;
       });
     }
   };

@@ -45,7 +45,7 @@ oppia.directive('mathjaxBind', [function() {
         $scope.$watch($attrs.mathjaxBind, function(value) {
           var $script = angular.element(
             '<script type="math/tex">'
-          ).html(value == undefined ? '' : value);
+          ).html(value === undefined ? '' : value);
           $element.html('');
           $element.append($script);
           MathJax.Hub.Queue(['Reprocess', MathJax.Hub, $element[0]]);
