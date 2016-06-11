@@ -97,23 +97,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
     def test_change_about_page_config_property(self):
         """Test that config property values are changed correctly."""
-        old_config_value = 'old_config_value'
         new_config_value = 'new_config_value'
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.testapp.get('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json('/adminhandler', {
-            'action': 'save_config_properties',
-            'new_config_property_values': {
-                base.BEFORE_END_HEAD_TAG_HOOK.name: old_config_value
-            }
-        }, csrf_token)
-
         response = self.testapp.get('/about')
-        self.assertIn(old_config_value, response.body)
         self.assertNotIn(new_config_value, response.body)
 
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json('/adminhandler', {
@@ -122,10 +111,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 base.BEFORE_END_HEAD_TAG_HOOK.name: new_config_value
             }
         }, csrf_token)
-        self.logout()
 
         response = self.testapp.get('/about')
-        self.assertNotIn(old_config_value, response.body)
         self.assertIn(new_config_value, response.body)
 
     def test_change_rights(self):
