@@ -233,7 +233,7 @@ describe('Exploration history', function() {
       ' ';
 
     editor.expectGraphComparisonOf(1, 2).toBe([{
-      label: 'first (was: First ...',
+      label: 'first (was: Introd...',
       color: COLOR_CHANGED
     }, {
       label: 'second',
@@ -243,14 +243,14 @@ describe('Exploration history', function() {
       color: COLOR_ADDED
     }], [2, 2, 0]);
     editor.expectTextComparisonOf(
-      1, 2, 'first (was: First ...'
+      1, 2, 'first (was: Introd...'
     ).toBeWithHighlighting(
       VERSION_1_STATE_1_CONTENTS, VERSION_2_STATE_1_CONTENTS);
     editor.expectTextComparisonOf(1, 2, 'second').toBe(STATE_2_STRING, ' ');
 
     // Switching the 2 compared versions should give the same result.
     editor.expectGraphComparisonOf(2, 1).toBe([{
-      label: 'first (was: First ...',
+      label: 'first (was: Introd...',
       color: COLOR_CHANGED
     }, {
       label: 'second',
