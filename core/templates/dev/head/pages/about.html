@@ -1,8 +1,6 @@
 {% extends "base.html" %}
 
-{% block subtitle %}
-  About
-{% endblock subtitle %}
+{% block maintitle %}I18N_ABOUT_PAGE_TITLE{% endblock maintitle %}
 
 {% block header_js %}
   {{ super() }}
@@ -24,231 +22,406 @@
 {% endblock navbar_breadcrumb %}
 
 {% block content %}
-  <div class="oppia-page-cards-container">
-    <md-card class="oppia-page-card oppia-long-text">
-
-      {% if ABOUT_PAGE_YOUTUBE_VIDEO_ID %}
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/{{ABOUT_PAGE_YOUTUBE_VIDEO_ID}}?rel=0" frameborder="0" allowfullscreen>
-        </iframe>
-      {% endif %}
-
-      <a class="oppia-about-anchor" name="our-mission"></a>
-      <h3>Our Mission</h3>
-
-      <p>
-        To help anyone learn anything they want in an effective and enjoyable way.
-      </p>
-
-      <a class="oppia-about-anchor" name="meet-oppia"></a>
-      <h3 style="margin-top: 40px;">Meet Oppia</h3>
-
-      <p>
-        Oppia is a free, open-source learning platform. Full of interactive activities
-        called 'explorations', Oppia helps curious minds learn and teach.
-      </p>
-
-      <strong>Learn</strong>
-      <p>
-        Oppia recreates the experience of one-on-one tutoring. It adapts to your
-        needs and lets you learn in the best way possible &mdash; by doing.
-      </p>
-
-      <a class="oppia-about-anchor" name="teach"></a>
-      <strong>Teach</strong>
-      <p>
-        Oppia enables you to share your knowledge with people worldwide. Anyone can create
-        and contribute to an exploration. Find out more in our <a href="/participate">participation playbook</a>.
-      </p>
-
-      <a class="oppia-about-anchor" name="contact"></a>
-      <h3 style="margin-top: 40px;">Contacting Us</h3>
-
-      <p>
-        <strong>For site questions:</strong> Post to our <a href="{{SITE_FORUM_URL}}">forum</a>.
-      </p>
-      <p>
-        <strong>To get involved:</strong> Reach out via our
-        <a href="https://groups.google.com/forum/#!forum/oppia-dev">oppia-dev</a>
-        Google Group, or by contacting {{CONTACT_EMAIL_ADDRESS}}. We'd be delighted
-        to work with you!
-      </p>
-      <p>
-        <strong>For bugs and feature requests:</strong> Create an issue on our
-        <a href="https://github.com/oppia/oppia/issues/new?title=Describe%20your%20feature%20request%20or%20bug%20report%20succinctly&body=If%20you%27d%20like%20to%20propose%20a%20feature,%20describe%20what%20you%27d%20like%20to%20see.%20Mock%20ups%20would%20be%20great!%0A%0AIf%20you%27re%20reporting%20a%20bug,%20please%20be%20sure%20to%20include%20the%20expected%20behaviour,%20the%20observed%20behaviour,%20and%20steps%20to%20reproduce%20the%20problem.%20Console%20copy-pastes%20and%20any%20background%20on%20the%20environment%20would%20also%20be%20helpful.%0A%0AThanks!">Oppia bug tracker</a>.
-        or get in touch via the
-        <a href="https://groups.google.com/forum/#!forum/oppia-dev">developers' forum</a>.
-      </p>
-      <p>
-        <strong>For sensitive issues</strong> (for example, reporting a security bug):
-        Write to {{CONTACT_EMAIL_ADDRESS}}.
-      </p>
-
-      <a class="oppia-about-anchor" name="license"></a>
-      <h3>License</h3>
-
-      <p>
-        All content in Oppia's explorations is licensed under
-        <a href="https://creativecommons.org/licenses/by-sa/4.0/legalcode">CC-BY-SA 4.0</a>
-        with a waiver of the attribution requirement (specifically, Sections 3(a)(1) and 3(a)(2)).
-        If you reuse content from this site, we encourage you to include a link to the
-        relevant exploration page, but do not require it.
-      </p>
-      <p>
-        The software powering Oppia is open source, and its
-        <a href="https://github.com/oppia/oppia/">code</a> is released under an
-        <a href="https://www.apache.org/licenses/">Apache 2.0</a> license.
-      </p>
-
-      <a class="oppia-about-anchor" name="foundation"></a>
-      <h3>The Oppia Foundation</h3>
-      <p>
-        The Oppia website and source code are supported by the Oppia
-        Foundation, a tax-exempt 501(c)(3) nonprofit organization of the
-        State of California.
-      </p>
-      <p>
-        The directors of the Foundation are Amit Deutsch, Jacob Davis and Sean
-        Lip. The Foundation's
-        <a href="https://drive.google.com/folderview?id=0B9KSjiibL_WDfjlpUUpqampZSTBOTmRqM2IyaGN3R3NlVWstZlhKcjlZQ3VMTHJBQWNGTFU&usp=sharing">
-          bylaws and minutes
-        </a>
-        are available to read. If you wish to contact the Foundation, please
-        email {{CONTACT_EMAIL_ADDRESS}}.
-      </p>
-
-      <a class="oppia-about-anchor" name="credits"></a>
-      <h3>Credits</h3>
-      <p>
-        Many people have contributed to the open-source codebase powering Oppia.
-        Thanks to:
-      </p>
-
-      <ul style="font-size: 0.8em;">
-        <li>Abhijit Suresh</li>
-        <li>Abraham Mgowano</li>
-        <li>Alex Gower</li>
-        <li>Allan Zhou</li>
-        <li>Amit Deutsch</li>
-        <li>Andrew Low</li>
-        <li>Andrey Mironyuk</li>
-        <li>Angela Park</li>
-        <li>Arun Kumar</li>
-        <li>Avijit Gupta</li>
-        <li>Barnabas Makonda</li>
-        <li>Ben Henning</li>
-        <li>Ben Targan</li>
-        <li>Bolaji Fatade</li>
-        <li>Brenton Briggs</li>
-        <li>Charisse De Torres</li>
-        <li>Chase Albert</li>
-        <li>Chin Zhan Xiong</li>
-        <li>Debanshu Bhaumik</li>
-        <li>Deepank Agarwal</li>
-        <li>Edward Allison</li>
-        <li>Elizabeth Kemp</li>
-        <li>Estelle Lee</li>
-        <li>Frederik Creemers</li>
-        <li>Grace Guo</li>
-        <li>Hitesh Sharma</li>
-        <li>Jacob Davis</li>
-        <li>Jakub Osika</li>
-        <li>Jasper Deng</li>
-        <li>Jaysinh Shukla</li>
-        <li>Jeremy Emerson</li>
-        <li>Jérôme (zolk232)</li>
-        <li>Jerry Chen</li>
-        <li>Joshua Lusk</li>
-        <li>Karen Rustad</li>
-        <li>Kenneth Ho</li>
-        <li>Kerry Wang</li>
-        <li>Kevin Lee</li>
-        <li>Koji Ashida</li>
-        <li>Kristin Anthony</li>
-        <li>Kumari Shalini</li>
-        <li>Madiyar Aitbayev</li>
-        <li>Manas Tungare</li>
-        <li>Marcel Schmittfull</li>
-        <li>Mark Cabanero</li>
-        <li>Mark Halpin</li>
-        <li>Michael Anuzis</li>
-        <li>Michael Mossey</li>
-        <li>Michael Wagner</li>
-        <li>Milagro Teruel</li>
-        <li>Mungo Dewar</li>
-        <li>Oskar Cieslik</li>
-        <li>Oswell Chan</li>
-        <li>Owen Parry</li>
-        <li>Phil Wagner</li>
-        <li>Philip Hayes</li>
-        <li>Prasanna Patil</li>
-        <li>Raine Hoover</li>
-        <li>Rajat Patwa</li>
-        <li>Reinaldo Aguiar</li>
-        <li>Reto Brunner</li>
-        <li>Richard Cho</li>
-        <li>Samara Trilling</li>
-        <li>Santos Hernandez</li>
-        <li>Sanyam Khurana</li>
-        <li>Satwik Kansal</li>
-        <li>Scott Junner</li>
-        <li>Sean Lip</li>
-        <li>Shafqat Dulal</li>
-        <li>Shantanu Bhowmik</li>
-        <li>Shouvik Roy</li>
-        <li>Sourav Badami</li>
-        <li>Sreenivasulu Giritheja</li>
-        <li>Stephanie Federwisch</li>
-        <li>Stephen Chiang</li>
-        <li>Tarashish Mishra</li>
-        <li>Travis Shafer</li>
-        <li>Tuguldur Baigalmaa</li>
-        <li>Umesh Singla</li>
-        <li>Viraj Prabhu</li>
-        <li>Vishal Gupta</li>
-        <li>Vishal Joisar</li>
-        <li>Wilson Hong</li>
-        <li>Xinyu Wu</li>
-        <li>Yana Malysheva</li>
-        <li>Yi Yan</li>
-        <li>Yousef Hamza</li>
-        <li>Yuan Gu</li>
-        <li>Zoe Madden-Wood</li>
-      </ul>
-
-      <p>
-        The Oppia development team is also grateful for the feedback, ideas,
-        help and suggestions by Alex Kauffmann, Allison Barros, Amy Latten,
-        Ana Francisca Bernardo, Brett Barros, Crystal Kwok, Divya Siddarth,
-        John Cox, John Orr, Katie Berlent, Michael Wawszczak, Mike Gainer,
-        Neil Fraser, Noah Falstein, Nupur Jain, Peter Norvig, Philip Guo,
-        Piotr Mitros, Rachel Chen, Rahim Nathwani, Robyn Choo, Tricia Ngoon,
-        Vikrant Nanda and Vinamrata Singal.
-      </p>
-    </md-card>
+  <div class="oppia-about-header">
+    <h1>Be Part of a Community of Learners</h1>
   </div>
 
-  <div class="nav oppia-about-right-menu hidden-sm hidden-xs">
-    <strong>About Oppia</strong>
-    <p><a href="#our-mission">Our Mission</a></p>
-    <p><a href="#meet-oppia">Meet Oppia</a></p>
-    <p><a href="#contact">Contacting Us</a></p>
-    <p><a href="#license">License</a></p>
-    <p><a href="#foundation">Foundation</a></p>
-    <p><a href="#credits">Credits</a></p>
+  <div class="oppia-page-card oppia-about-content">
+    <div class="about-nav oppia-profile-tabs md-tab">
+      <ul class="oppia-about-tabs">
+        <li class="oppia-profile-tabs oppia-about-tabs-active">
+          <a class="oppia-about-tabs-text" href="about">About Oppia</a>
+        </li>
+        <li class="oppia-profile-tabs">
+          <a class="oppia-about-tabs-text" href="foundation" name="foundation">The Oppia Foundation</a>
+        </li>
+        <li class="oppia-profile-tabs">
+          <a class="oppia-about-tabs-text" href="credits" name="credits">Credits</a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="about-tab-container">
+      <div class="about oppia-about-tab-content oppia-about-visible-content">
+        <div class="oppia-about-card-content-wide oppia-about-card-content-narrow">
+          <div class="pull-right">
+            <em>Oppia "O-pee-yah" (Finnish) - "to learn"</em>
+          </div>
+          <br>
+          <p>
+            <strong>Oppia's mission</strong>: To help anyone learn anything
+            they want in an effective and enjoyable way.
+          </p>
+          <p>
+            The Oppia platform enables curious minds to share knowledge and
+            learn from others in an interactive and enjoyable way. It's free,
+            online, and fully accessible to learners and teachers all over the
+            world.
+          </p>
+          <p>
+            We believe that everyone should be able to learn from and
+            contribute to educational resources that help them to self-improve,
+            and we want to provide the support needed to make this possible.
+          </p>
+          <p>
+            Join the community and start exploring with us!
+          </p>
+        </div>
+      </div>
+
+      <div class="foundation oppia-about-tab-content">
+        <div class="oppia-about-card-content-wide oppia-about-card-content-narrow">
+          <h2>The Oppia Foundation</h2>
+          <p>
+            The Oppia website and source code are supported by the Oppia Foundation,
+            a tax-exempt 501(c)(3) non-profit organization registered in the State of California.
+          </p>
+          <p>
+            The directors of the Foundation are Amit Deutsch, Jacob Davis, and Sean Lip.
+            The Foundation's
+            <a href="https://drive.google.com/folderview?id=0B9KSjiibL_WDfjlpUUpqampZSTBOTmRqM2IyaGN3R3NlVWstZlhKcjlZQ3VMTHJBQWNGTFU&usp=sharing"
+            class="inline-links">bylaws and minutes</a>
+            are available to read. If you wish to contact the Foundation, please email:
+            <a href="mailto:{{CONTACT_EMAIL_ADDRESS}}" class="inline-links">admin@oppia.org</a>.
+          </p>
+          <h3>License</h3>
+          <p>
+            All content in Oppia's explorations is licensed under
+            <a href="https://creativecommons.org/licenses/by-sa/4.0/legalcode" class="inline-links">CC-BY-SA 4.0</a>
+            with a waiver of the attribution requirement (specifically, Sections 3(a)(1) and
+            3(a)(2)). If you reuse content from this site, we encourage you to include a link
+            to the relevant exploration page, but do not require it.
+          </p>
+          <p>
+            The software powering Oppia is open source, and its
+            <a href="https://github.com/oppia/oppia/" class="inline-links">code</a> is released under an
+            <a href="https://www.apache.org/licenses/" class="inline-links">Apache 2.0</a> license.
+          </p>
+        </div>
+      </div>
+
+      <div class="credits oppia-about-tab-content">
+        <div class="oppia-about-card-content-wide">
+          <h2>Credits</h2>
+          <p>
+            Oppia's contributors come from all over the world -- many of us are
+            students, recent students and teachers. We'd like to thank the
+            following contributors who've helped to build the platform. If
+            you'd like to help, join us on
+            <a href="https://github.com/oppia/oppia">GitHub</a>!
+          </p>
+          <div class="oppia-about-three-cols-container">
+            <div class="oppia-about-three-cols-layout">
+              <div class="oppia-about-credits-letter-groups">
+                <span>A</span>
+                <ul>
+                  <li>Abhijit Suresh</li>
+                  <li>Abraham Mgowano</li>
+                  <li>Alex Gower</li>
+                  <li>Allan Zhou</li>
+                  <li>Amit Deutsch</li>
+                  <li>Andrew Low</li>
+                  <li>Andrey Mironyuk</li>
+                  <li>Angela Park</li>
+                  <li>Anmol Shukla</li>
+                  <li>Arun Kumar</li>
+                  <li>Avijit Gupta</li>
+                </ul>
+              </div>
+
+              <div class="oppia-about-credits-letter-groups">
+                <span>B</span>
+                <ul>
+                  <li>Barnabas Makonda</li>
+                  <li>Ben Henning</li>
+                  <li>Ben Targan</li>
+                  <li>BJ Voth</li>
+                  <li>Bolaji Fatade</li>
+                  <li>Brenton Briggs</li>
+                </ul>
+              </div>
+
+              <div class="oppia-about-credits-letter-groups">
+                <span>C</span>
+                <ul>
+                  <li>Charisse De Torres</li>
+                  <li>Chase Albert</li>
+                  <li>Chin Zhan Xiong</li>
+                </ul>
+              </div>
+
+              <div class="oppia-about-credits-letter-groups">
+                <span>D</span>
+                <ul>
+                  <li>Debanshu Bhaumik</li>
+                  <li>Deepank Agarwal</li>
+                </ul>
+              </div>
+
+              <div class="oppia-about-credits-letter-groups">
+                <span>E</span>
+                <ul>
+                  <li>Edward Allison</li>
+                  <li>Elizabeth Kemp</li>
+                  <li>Estelle Lee</li>
+                </ul>
+              </div>
+
+              <div class="oppia-about-credits-letter-groups">
+                <span>F</span>
+                <ul>
+                  <li>Frederik Creemers</li>
+                </ul>
+              </div>
+
+              <div class="oppia-about-credits-letter-groups">
+                <span>G</span>
+                <ul>
+                  <li>Grace Guo</li>
+                </ul>
+              </div>
+
+              <div class="oppia-about-credits-letter-groups">
+                <span>H</span>
+                <ul>
+                  <li>Hitesh Sharma</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="oppia-about-three-cols-layout">
+              <div class="oppia-about-credits-letter-groups">
+                <span>J</span>
+                <ul>
+                  <li>Jacob Davis</li>
+                  <li>Jakub Osika</li>
+                  <li>Jasper Deng</li>
+                  <li>Jaysinh Shukla</li>
+                  <li>Jeremy Emerson</li>
+                  <li>Jérôme (zolk232)</li>
+                  <li>Jerry Chen</li>
+                  <li>John Glennon</li>
+                  <li>Joshua Cano</li>
+                  <li>Joshua Lusk</li>
+                </ul>
+              </div>
+
+              <div class="oppia-about-credits-letter-groups">
+                <span>K</span>
+                <ul>
+                  <li>Karen Rustad</li>
+                  <li>Kathryn Patterson</li>
+                  <li>Kenneth Ho</li>
+                  <li>Kerry Wang</li>
+                  <li>Kevin Lee</li>
+                  <li>Koji Ashida</li>
+                  <li>Kristin Anthony</li>
+                  <li>Kumari Shalini</li>
+                </ul>
+              </div>
+
+              <div class="oppia-about-credits-letter-groups">
+                <span>M</span>
+                <ul>
+                  <li>Madiyar Aitbayev</li>
+                  <li>Manas Tungare</li>
+                  <li>Marcel Schmittfull</li>
+                  <li>Mark Cabanero</li>
+                  <li>Mark Halpin</li>
+                  <li>Michael Anuzis</li>
+                  <li>Michael Mossey</li>
+                  <li>Michael Wagner</li>
+                  <li>Milagro Teruel</li>
+                  <li>Mungo Dewar</li>
+                </ul>
+              </div>
+
+              <div class="oppia-about-credits-letter-groups">
+                <span>O</span>
+                <ul>
+                  <li>Oskar Cieslik</li>
+                  <li>Oswell Chan</li>
+                  <li>Owen Parry</li>
+                </ul>
+              </div>
+
+              <div class="oppia-about-credits-letter-groups">
+                <span>P</span>
+                <ul>
+                  <li>Phil Wagner</li>
+                  <li>Philip Hayes</li>
+                  <li>Prasanna Patil</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="oppia-about-three-cols-layout">
+              <div class="oppia-about-credits-letter-groups">
+                <span>R</span>
+                <ul>
+                  <li>Raine Hoover</li>
+                  <li>Rajat Patwa</li>
+                  <li>Rajendra Kadam</li>
+                  <li>Reinaldo Aguiar</li>
+                  <li>Reto Brunner</li>
+                  <li>Richard Cho</li>
+                </ul>
+              </div>
+
+              <div class="oppia-about-credits-letter-groups">
+                <span>S</span>
+                <ul>
+                  <li>Samara Trilling</li>
+                  <li>Santos Hernandez</li>
+                  <li>Sanyam Khurana</li>
+                  <li>Satwik Kansal</li>
+                  <li>Scott Junner</li>
+                  <li>Sean Lip</li>
+                  <li>Sebastian Zangaro</li>
+                  <li>Seth Beckman</li>
+                  <li>Shafqat Dulal</li>
+                  <li>Shantanu Bhowmik</li>
+                  <li>Shouvik Roy</li>
+                  <li>Sourav Badami</li>
+                  <li>Sreenivasulu Giritheja</li>
+                  <li>Stephanie Federwisch</li>
+                  <li>Stephen Chiang</li>
+                </ul>
+              </div>
+
+              <div class="oppia-about-credits-letter-groups">
+                <span>T</span>
+                <ul>
+                  <li>Tarashish Mishra</li>
+                  <li>Timothy Cyrus</li>
+                  <li>Travis Shafer</li>
+                  <li>Tuguldur Baigalmaa</li>
+                </ul>
+              </div>
+
+              <div class="oppia-about-credits-letter-groups">
+                <span>U</span>
+                <ul>
+                  <li>Umesh Singla</li>
+                </ul>
+              </div>
+
+              <div class="oppia-about-credits-letter-groups">
+                <span>V</span>
+                <ul>
+                  <li>Viraj Prabhu</li>
+                  <li>Vishal Gupta</li>
+                  <li>Vishal Joisar</li>
+                </ul>
+              </div>
+
+              <div class="oppia-about-credits-letter-groups">
+                <span>W</span>
+                <ul>
+                  <li>Wilson Hong</li>
+                </ul>
+              </div>
+
+              <div class="oppia-about-credits-letter-groups">
+                <span>X</span>
+                <ul>
+                  <li>Xinyu Wu</li>
+                </ul>
+              </div>
+
+              <div class="oppia-about-credits-letter-groups">
+                <span>Y</span>
+                <ul>
+                  <li>Yana Malysheva</li>
+                  <li>Yi Yan</li>
+                  <li>Yousef Hamza</li>
+                  <li>Yuan Gu</li>
+                </ul>
+              </div>
+
+              <div class="oppia-about-credits-letter-groups">
+                <span>Z</span>
+                <ul>
+                  <li>Zoe Madden-Wood</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <p>
+            The Oppia development team is also grateful for the feedback, ideas,
+            help and suggestions by Alex Kauffmann, Allison Barros, Amy Latten,
+            Ana Francisca Bernardo, Brett Barros, Crystal Kwok,
+            Daniel Hernandez, Divya Siddarth, John Cox, John Orr,
+            Katie Berlent, Michael Wawszczak, Mike Gainer, Neil Fraser,
+            Noah Falstein, Nupur Jain, Peter Norvig, Philip Guo, Piotr Mitros,
+            Rachel Chen, Rahim Nathwani, Robyn Choo, Tricia Ngoon,
+            Vikrant Nanda, Vinamrata Singal and Yarin Feigenbaum.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="oppia-about-extra-container">
+    <div class="oppia-about-extra-content oppia-about-clearfix">
+      <div class="oppia-about-otter-container">
+        <img src="images/general/about_page_mascot.png" class="oppia-about-otter" alt="Otter">
+      </div>
+      <div class="oppia-about-otter-speech-card">
+        <blockquote class="oppia-about-otter-speech-bubble">
+          <h3>What would you like to do today?</h3>
+        </blockquote>
+      </div>
+    </div>
+
+    <div class="oppia-about-extra-info">
+      <div class="oppia-about-content oppia-about-extra-content">
+        <div class="oppia-about-card-content-wide oppia-about-card-content-narrow oppia-about-buttons-container">
+          <a href="/library" class="btn oppia-about-button">I want to learn</a>
+          <a href="/teach" class="btn oppia-about-button">I want to teach</a>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
-    // This scrolls the page to the anchor clicked on in the quick links menu.
-    $('a[href*=#]:not([href=#])').click(function() {
-      if (location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '')) {
-        var target = $('[name=' + this.hash.slice(1) +']');
-        if (target.length) {
-          $('html,body').animate({
-            scrollTop: target.offset().top
-          }, 1000);
-          return false;
-        }
+    $(document).ready(function() {
+      var activeTabClass = 'oppia-about-tabs-active';
+      var hash = window.location.hash.slice(1);
+      var visibleContent = 'oppia-about-visible-content';
+
+      function activateTab(tabName) {
+        $("a[name='" + tabName + "']").parent().addClass(
+          activeTabClass
+        ).siblings().removeClass(activeTabClass);
+        $('.' + tabName).addClass(visibleContent).siblings().removeClass(
+          visibleContent);
       }
+
+      if (hash === 'foundation') {
+        activateTab('foundation');
+      }
+
+      if (hash === 'credits') {
+        activateTab('credits');
+      }
+
+      window.onhashchange = function() {
+        var hashChange = window.location.hash.slice(1);
+        if (hashChange === 'foundation') {
+          activateTab('foundation');
+        } else if (hashChange === 'credits') {
+          activateTab('credits');
+        }
+      };
+
+      $('.oppia-about-tabs li').on('click', function(evt) {
+        evt.preventDefault();
+        $(this).addClass(activeTabClass).siblings().removeClass(activeTabClass);
+        var currentAttrVal = $(this).children('a').attr('href');
+        $('.' + currentAttrVal).addClass(visibleContent).siblings().removeClass(
+          visibleContent);
+      });
     });
   </script>
 {% endblock %}

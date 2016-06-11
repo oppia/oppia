@@ -21,9 +21,9 @@ from core.controllers import admin
 from core.controllers import base
 from core.controllers import collection_editor
 from core.controllers import collection_viewer
+from core.controllers import dashboard
 from core.controllers import editor
 from core.controllers import feedback
-from core.controllers import home
 from core.controllers import library
 from core.controllers import moderator
 from core.controllers import pages
@@ -69,7 +69,7 @@ class HomePageRedirectHandler(base.BaseHandler):
     """
     def get(self):
         if self.user_id and user_services.has_fully_registered(self.user_id):
-            self.redirect(feconf.MY_EXPLORATIONS_URL)
+            self.redirect(feconf.DASHBOARD_URL)
         else:
             self.redirect(feconf.SPLASH_URL)
 
@@ -139,28 +139,20 @@ mapreduce_parameters.config.BASE_PATH = '/mapreduce/worker'
 URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/_ah/warmup', WarmupHandler, 'warmup_handler'),
 
-    get_redirect_route(
-        r'/notifications_dashboard', home.NotificationsDashboardPage,
-        'notifications_dashboard_handler'),
-    get_redirect_route(
-        r'/notificationsdashboardhandler/data',
-        home.NotificationsDashboardHandler,
-        'notifications_dashboard_handler'),
-    get_redirect_route(
-        r'/my_explorations', home.MyExplorationsPage, 'my_explorations_page'),
-    get_redirect_route(
-        r'/myexplorationshandler/data', home.MyExplorationsHandler,
-        'my_explorations_handler'),
-
     get_redirect_route(feconf.SPLASH_URL, pages.SplashPage, 'splash_page'),
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
+    get_redirect_route(
+        r'/foundation', pages.AboutRedirectPage, 'foundation_page'),
+    get_redirect_route(
+        r'/credits', pages.AboutRedirectPage, 'credits_page'),
+    get_redirect_route(r'/teach', pages.TeachPage, 'teach_page'),
     get_redirect_route(
         r'/participate', pages.ParticipatePage, 'participate_page'),
     get_redirect_route(
         r'/site_guidelines', pages.ParticipatePage,
         'redirect_to_participate_page'),
     get_redirect_route(
-        r'/contact', pages.AboutPage, 'redirect_to_about_page'),
+        r'/contact', pages.ContactPage, 'contact_page'),
 
     get_redirect_route(r'/forum', pages.ForumPage, 'forum_page'),
     get_redirect_route(r'/terms', pages.TermsPage, 'terms_page'),
@@ -174,6 +166,32 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/admintopicscsvdownloadhandler',
         admin.AdminTopicsCsvDownloadHandler,
         'admin_topics_csv_download_handler'),
+
+    get_redirect_route(
+        r'/notifications_dashboard', dashboard.NotificationsDashboardPage,
+        'notifications_dashboard_handler'),
+    get_redirect_route(
+        r'/notificationsdashboardhandler/data',
+        dashboard.NotificationsDashboardHandler,
+        'notifications_dashboard_handler'),
+    get_redirect_route(
+        r'%s' % feconf.DASHBOARD_URL, dashboard.DashboardPage,
+        'dashboard_page'),
+    get_redirect_route(
+        r'%s' % feconf.DASHBOARD_DATA_URL, dashboard.DashboardHandler,
+        'dashboard_handler'),
+    get_redirect_route(
+        r'%s' % feconf.NEW_EXPLORATION_URL,
+        dashboard.NewExploration, 'new_exploration'),
+    get_redirect_route(
+        r'%s' % feconf.NEW_COLLECTION_URL,
+        dashboard.NewCollection, 'new_collection'),
+    get_redirect_route(
+        r'%s' % feconf.UPLOAD_EXPLORATION_URL,
+        dashboard.UploadExploration, 'upload_exploration'),
+    get_redirect_route(
+        r'/notificationshandler', dashboard.NotificationsHandler,
+        'notifications_handler'),
 
     get_redirect_route(
         r'/imagehandler/<exploration_id>/<encoded_filepath>',
@@ -213,16 +231,6 @@ URLS = MAPREDUCE_HANDLERS + [
         'exploration_summaries_handler'),
 
     get_redirect_route(
-        r'%s' % feconf.NEW_EXPLORATION_URL,
-        home.NewExploration, 'new_exploration'),
-    get_redirect_route(
-        r'%s' % feconf.NEW_COLLECTION_URL,
-        home.NewCollection, 'new_collection'),
-    get_redirect_route(
-        r'%s' % feconf.UPLOAD_EXPLORATION_URL,
-        home.UploadExploration, 'upload_exploration'),
-
-    get_redirect_route(
         r'/profile/<username>', profile.ProfilePage, 'profile_page'),
     get_redirect_route(
         r'/profilehandler/data/<username>', profile.ProfileHandler,
@@ -247,6 +255,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.USERNAME_CHECK_DATA_URL,
         profile.UsernameCheckHandler, 'username_check_handler'),
+    get_redirect_route(
+        r'%s' % feconf.SITE_LANGUAGE_DATA_URL,
+        profile.SiteLanguageHandler, 'save_site_language'),
 
     get_redirect_route(
         r'/moderator', moderator.ModeratorPage, 'moderator_page'),
@@ -344,6 +355,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/createhandler/started_tutorial_event',
         editor.StartedTutorialEventHandler, 'started_tutorial_event_handler'),
+    get_redirect_route(
+        r'/createhandler/autosave_draft/<exploration_id>',
+        editor.EditorAutosaveHandler, 'editor_autosave_handler'),
 
     get_redirect_route(
         r'%s' % feconf.RECENT_COMMITS_DATA_URL,
@@ -391,10 +405,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<collection_id>' % feconf.COLLECTION_RIGHTS_PREFIX,
         collection_editor.CollectionRightsHandler,
         'collection_rights_handler'),
-
-    get_redirect_route(
-        r'/notificationshandler', home.NotificationsHandler,
-        'notifications_handler'),
 
     get_redirect_route(
         r'/frontend_errors', FrontendErrorHandler, 'frontend_error_handler'),

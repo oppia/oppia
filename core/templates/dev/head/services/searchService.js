@@ -19,8 +19,8 @@
 oppia.constant('SEARCH_DATA_URL', '/searchhandler/data');
 
 oppia.factory('searchService', [
-  '$http', '$rootScope', 'SEARCH_DATA_URL',
-  function($http, $rootScope, SEARCH_DATA_URL) {
+  '$http', '$rootScope', '$translate', 'SEARCH_DATA_URL',
+  function($http, $rootScope, $translate, SEARCH_DATA_URL) {
   var _lastQuery = null;
   var _lastSelectedCategories = {};
   var _lastSelectedLanguageCodes = {};
@@ -104,7 +104,7 @@ oppia.factory('searchService', [
       return encodeURIComponent(searchQuery) +
         _getSuffixForQuery(selectedCategories, selectedLanguageCodes);
     },
-    // Note that an empty query results in all explorations being shown.
+    // Note that an empty query results in all activities being shown.
     executeSearchQuery: function(
         searchQuery, selectedCategories, selectedLanguageCodes,
         successCallback) {
@@ -124,7 +124,7 @@ oppia.factory('searchService', [
 
         if ($('.oppia-search-bar-input').val() === searchQuery) {
           $rootScope.$broadcast(
-            'initialSearchResultsLoaded', data.explorations_list);
+            'initialSearchResultsLoaded', data.activity_list);
           _isCurrentlyFetchingResults = false;
         } else {
           console.log('Mismatch');
@@ -134,6 +134,9 @@ oppia.factory('searchService', [
       }, function() {
         numSearchesInProgress--;
       });
+
+      // Translate the new explorations loaded.
+      $translate.refresh();
 
       if (successCallback) {
         successCallback();

@@ -55,6 +55,7 @@ class SplashPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.values.update({
+            'meta_description': feconf.SPLASH_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_SPLASH,
         })
         self.render_template('pages/splash.html')
@@ -68,10 +69,36 @@ class AboutPage(base.BaseHandler):
         self.values.update({
             'ABOUT_PAGE_YOUTUBE_VIDEO_ID': ABOUT_PAGE_YOUTUBE_VIDEO_ID.value,
             'CONTACT_EMAIL_ADDRESS': CONTACT_EMAIL_ADDRESS.value,
-            'SITE_FORUM_URL': SITE_FORUM_URL.value,
+            'meta_description': feconf.ABOUT_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_ABOUT,
         })
         self.render_template('pages/about.html')
+
+
+class TeachPage(base.BaseHandler):
+    """Page with information about how to teach on Oppia."""
+
+    def get(self):
+        """Handles GET requests."""
+        self.values.update({
+            'SITE_FORUM_URL': SITE_FORUM_URL.value,
+            'MODERATOR_REQUEST_FORUM_URL': MODERATOR_REQUEST_FORUM_URL.value,
+            'nav_mode': feconf.NAV_MODE_TEACH,
+        })
+        self.render_template('pages/teach.html')
+
+
+class ContactPage(base.BaseHandler):
+    """Page with information about how to contact Oppia."""
+
+    def get(self):
+        """Handles GET requests."""
+        self.values.update({
+            'CONTACT_EMAIL_ADDRESS': CONTACT_EMAIL_ADDRESS.value,
+            'SITE_FORUM_URL': SITE_FORUM_URL.value,
+            'nav_mode': feconf.NAV_MODE_CONTACT,
+        })
+        self.render_template('pages/contact.html')
 
 
 class ParticipatePage(base.BaseHandler):
@@ -80,6 +107,7 @@ class ParticipatePage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.values.update({
+            'meta_description': feconf.PARTICIPATE_PAGE_DESCRIPTION,
             'MODERATOR_REQUEST_FORUM_URL': MODERATOR_REQUEST_FORUM_URL.value,
             'SITE_FORUM_URL': SITE_FORUM_URL.value,
             'nav_mode': feconf.NAV_MODE_PARTICIPATE,
@@ -107,6 +135,7 @@ class ForumPage(base.BaseHandler):
                     urllib.quote(self.request.uri, safe=''),
                 )
             ),
+            'meta_description': feconf.FORUM_PAGE_DESCRIPTION,
             'on_localhost': netloc.startswith('localhost'),
         })
         self.render_template('pages/forum.html')
@@ -120,6 +149,10 @@ class TermsPage(base.BaseHandler):
         if not feconf.SHOW_CUSTOM_PAGES:
             raise self.PageNotFoundException
 
+        self.values.update({
+            'meta_description': feconf.TERMS_PAGE_DESCRIPTION,
+        })
+
         self.render_template('pages/terms.html')
 
 
@@ -132,3 +165,11 @@ class PrivacyPage(base.BaseHandler):
             raise self.PageNotFoundException
 
         self.render_template('pages/privacy.html')
+
+
+class AboutRedirectPage(base.BaseHandler):
+    """An page that redirects to the main About page."""
+
+    def get(self):
+        """Handles GET requests."""
+        self.redirect('/about')

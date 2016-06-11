@@ -54,6 +54,8 @@ class CollectionModel(base_models.VersionedModel):
     # The language code of this collection.
     language_code = ndb.StringProperty(
         default=feconf.DEFAULT_LANGUAGE_CODE, indexed=True)
+    # Tags associated with this collection.
+    tags = ndb.StringProperty(repeated=True, indexed=True)
 
     # The version of all property blob schemas.
     schema_version = ndb.IntegerProperty(
@@ -283,6 +285,8 @@ class CollectionSummaryModel(base_models.BaseModel):
     objective = ndb.TextProperty(required=True, indexed=False)
     # The ISO 639-1 code for the language this collection is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
+    # Tags associated with this collection.
+    tags = ndb.StringProperty(repeated=True, indexed=True)
 
     # Aggregate user-assigned ratings of the collection
     ratings = ndb.JsonProperty(default=None, indexed=False)
@@ -325,6 +329,8 @@ class CollectionSummaryModel(base_models.BaseModel):
     # The version number of the collection after this commit. Only populated
     # for commits to an collection (as opposed to its rights, etc.)
     version = ndb.IntegerProperty()
+    # The number of nodes(explorations) that are within this collection.
+    node_count = ndb.IntegerProperty()
 
     @classmethod
     def get_non_private(cls):

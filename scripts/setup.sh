@@ -222,14 +222,14 @@ function test_python_version() {
   else
     echo "Unrecognizable Python command output: ${PYTHON_VERSION}"
     # Return a false condition if output of tested command is unrecognizable.
-    return 0
-  fi
-  if [[ "${PYTHON_VERSION}" = "${EXPECTED_PYTHON_VERSION_PREFIX}*" ]]; then
-    # The value '1' indicates a true return value,
-    # indicating the version of the input Python command is the expected Python version.
     return 1
-  else
+  fi
+  if [[ "${PYTHON_VERSION}" = ${EXPECTED_PYTHON_VERSION_PREFIX}* ]]; then
+    # Return 0 to indicate a successful match.
+    # Return 1 to indicate a failed match.
     return 0
+  else
+    return 1
   fi
 }
 

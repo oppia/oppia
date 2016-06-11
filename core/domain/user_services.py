@@ -47,7 +47,8 @@ class UserSettings(object):
             last_started_state_editor_tutorial=None,
             profile_picture_data_url=None, user_bio='', subject_interests=None,
             first_contribution_msec=None,
-            preferred_language_codes=None):
+            preferred_language_codes=None,
+            preferred_site_language_code=None):
         self.user_id = user_id
         self.email = email
         self.username = username
@@ -61,6 +62,7 @@ class UserSettings(object):
         self.first_contribution_msec = first_contribution_msec
         self.preferred_language_codes = (
             preferred_language_codes if preferred_language_codes else [])
+        self.preferred_site_language_code = preferred_site_language_code
 
     def validate(self):
         if not isinstance(self.user_id, basestring):
@@ -204,7 +206,9 @@ def get_users_settings(user_ids):
                 user_bio=model.user_bio,
                 subject_interests=model.subject_interests,
                 first_contribution_msec=model.first_contribution_msec,
-                preferred_language_codes=model.preferred_language_codes
+                preferred_language_codes=model.preferred_language_codes,
+                preferred_site_language_code=(
+                    model.preferred_site_language_code)
             ))
         else:
             result.append(None)
@@ -294,7 +298,8 @@ def _save_user_settings(user_settings):
         subject_interests=user_settings.subject_interests,
         first_contribution_msec=user_settings.first_contribution_msec,
         preferred_language_codes=user_settings.preferred_language_codes,
-
+        preferred_site_language_code=(
+            user_settings.preferred_site_language_code)
     ).put()
 
 
@@ -424,6 +429,13 @@ def update_first_contribution_msec_if_not_set(user_id, first_contribution_msec):
 def update_preferred_language_codes(user_id, preferred_language_codes):
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.preferred_language_codes = preferred_language_codes
+    _save_user_settings(user_settings)
+
+
+def update_preferred_site_language_code(user_id, preferred_site_language_code):
+    user_settings = get_user_settings(user_id, strict=True)
+    user_settings.preferred_site_language_code = (
+        preferred_site_language_code)
     _save_user_settings(user_settings)
 
 

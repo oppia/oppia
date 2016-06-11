@@ -37,14 +37,40 @@ oppia.factory('explorationData', [
       return {};
     }
 
-    var explorationUrl = '/create/' + explorationId;
     var explorationDataUrl = '/createhandler/data/' + explorationId;
     var resolvedAnswersUrlPrefix = (
       '/createhandler/resolved_answers/' + explorationId);
+    var explorationDraftAutosaveUrl = (
+      '/createhandler/autosave_draft/' + explorationId);
 
     // Put exploration variables here.
     var explorationData = {
       explorationId: explorationId,
+      autosaveChangeList: function(changeList, successCallback, errorCallback) {
+        $http.put(explorationDraftAutosaveUrl, {
+          change_list: changeList,
+          version: explorationData.data.version
+        }).then(function(response) {
+          if (successCallback) {
+            successCallback(response);
+          }
+        }, function() {
+          if (errorCallback) {
+            errorCallback();
+          }
+        });
+      },
+      discardDraft: function(successCallback, errorCallback) {
+        $http.post(explorationDraftAutosaveUrl, {}).then(function() {
+          if (successCallback) {
+            successCallback();
+          }
+        }, function() {
+          if (errorCallback) {
+            errorCallback();
+          }
+        });
+      },
       // Returns a promise that supplies the data for the current exploration.
       getData: function() {
         if (explorationData.data) {
@@ -55,11 +81,20 @@ oppia.factory('explorationData', [
           return deferred.promise;
         } else {
           // Retrieve data from the server.
-          return $http.get(explorationDataUrl).then(function(response) {
+          // WARNING: Note that this is a version of the exploration with draft
+          // changes applied. This makes a force-refresh necessary when changes
+          // are discarded, otherwise the exploration-with-draft-changes
+          // (which is cached here) will be reused.
+          return $http.get(explorationDataUrl, {
+            params: {
+              apply_draft: true
+            }
+          }).then(function(response) {
             $log.info('Retrieved exploration data.');
             $log.info(response.data);
 
             explorationData.data = response.data;
+
             return response.data;
           });
         }
@@ -156,242 +191,290 @@ oppia.factory('editabilityService', [function() {
 // A service that maintains a provisional list of changes to be committed to
 // the server.
 oppia.factory('changeListService', [
-    '$rootScope', 'alertsService', function($rootScope, alertsService) {
-  // TODO(sll): Implement undo, redo functionality. Show a message on each step
-  // saying what the step is doing.
-  // TODO(sll): Allow the user to view the list of changes made so far, as well
-  // as the list of changes in the undo stack.
+  '$rootScope', '$log', 'alertsService', 'explorationData',
+  'autosaveInfoModalsService',
+  function(
+      $rootScope, $log, alertsService, explorationData,
+      autosaveInfoModalsService) {
+    // TODO(sll): Implement undo, redo functionality. Show a message on each
+    // step saying what the step is doing.
+    // TODO(sll): Allow the user to view the list of changes made so far, as
+    // well as the list of changes in the undo stack.
 
-  // Temporary buffer for changes made to the exploration.
-  var explorationChangeList = [];
-  // Stack for storing undone changes. The last element is the most recently
-  // undone change.
-  var undoneChangeStack = [];
+    // Temporary buffer for changes made to the exploration.
+    var explorationChangeList = [];
+    // Stack for storing undone changes. The last element is the most recently
+    // undone change.
+    var undoneChangeStack = [];
 
-  // All these constants should correspond to those in exp_domain.py.
-  // TODO(sll): Enforce this in code.
-  var CMD_ADD_STATE = 'add_state';
-  var CMD_RENAME_STATE = 'rename_state';
-  var CMD_DELETE_STATE = 'delete_state';
-  var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
-  var CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property';
-  // All gadget commands
-  var CMD_ADD_GADGET = 'add_gadget';
-  var CMD_RENAME_GADGET = 'rename_gadget';
-  var CMD_DELETE_GADGET = 'delete_gadget';
-  var CMD_EDIT_GADGET_PROPERTY = 'edit_gadget_property';
+    // All these constants should correspond to those in exp_domain.py.
+    // TODO(sll): Enforce this in code.
+    var CMD_ADD_STATE = 'add_state';
+    var CMD_RENAME_STATE = 'rename_state';
+    var CMD_DELETE_STATE = 'delete_state';
+    var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
+    var CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property';
+    // All gadget commands
+    var CMD_ADD_GADGET = 'add_gadget';
+    var CMD_RENAME_GADGET = 'rename_gadget';
+    var CMD_DELETE_GADGET = 'delete_gadget';
+    var CMD_EDIT_GADGET_PROPERTY = 'edit_gadget_property';
 
-  var ALLOWED_EXPLORATION_BACKEND_NAMES = {
-    category: true,
-    init_state_name: true,
-    language_code: true,
-    objective: true,
-    param_changes: true,
-    param_specs: true,
-    tags: true,
-    title: true
-  };
+    var ALLOWED_EXPLORATION_BACKEND_NAMES = {
+      category: true,
+      init_state_name: true,
+      language_code: true,
+      objective: true,
+      param_changes: true,
+      param_specs: true,
+      tags: true,
+      title: true
+    };
 
-  var ALLOWED_STATE_BACKEND_NAMES = {
-    answer_groups: true,
-    confirmed_unclassified_answers: true,
-    content: true,
-    default_outcome: true,
-    fallbacks: true,
-    param_changes: true,
-    state_name: true,
-    widget_customization_args: true,
-    widget_id: true
-  };
+    var ALLOWED_STATE_BACKEND_NAMES = {
+      answer_groups: true,
+      confirmed_unclassified_answers: true,
+      content: true,
+      default_outcome: true,
+      fallbacks: true,
+      param_changes: true,
+      state_name: true,
+      widget_customization_args: true,
+      widget_id: true
+    };
 
-  var ALLOWED_GADGET_BACKEND_NAMES = {
-    gadget_customization_args: true,
-    gadget_visibility: true
-  };
+    var ALLOWED_GADGET_BACKEND_NAMES = {
+      gadget_customization_args: true,
+      gadget_visibility: true
+    };
 
-  var addChange = function(changeDict) {
-    if ($rootScope.loadingMessage) {
-      return;
-    }
-    explorationChangeList.push(changeDict);
-    undoneChangeStack = [];
-  };
+    var autosaveChangeListOnChange = function(explorationChangeList) {
+      // Asynchronously send an autosave request, and check for errors in the
+      // response:
+      // If error is present -> Check for the type of error occurred
+      // (Display the corresponding modals in both cases, if not already
+      // opened):
+      // - Version Mismatch.
+      // - Non-strict Validation Fail.
+      explorationData.autosaveChangeList(
+        explorationChangeList,
+        function(response) {
+          if (!response.data.is_version_of_draft_valid) {
+            if (!autosaveInfoModalsService.isModalOpen()) {
+              autosaveInfoModalsService.showVersionMismatchModal(
+                explorationChangeList);
+            }
+          }
+        },
+        function() {
+          alertsService.clearWarnings();
+          $log.error(
+            'nonStrictValidationFailure: ' +
+            JSON.stringify(explorationChangeList));
+          if (!autosaveInfoModalsService.isModalOpen()) {
+            autosaveInfoModalsService.showNonStrictValidationFailModal();
+          }
+        }
+      );
+    };
 
-  return {
-    /**
-     * Saves a gadget dict that represents a new gadget.
-     *
-     * It is the responsbility of the caller to check that the gadget dict
-     * is correctly formed
-     *
-     * @param {object} gadgetData - The dict containing new gadget information.
-     */
-    addGadget: function(gadgetData) {
-      addChange({
-        cmd: CMD_ADD_GADGET,
-        gadget_dict: gadgetData,
-        panel: gadgetData.panel
-      });
-    },
-    /**
-     * Saves a change dict that represents adding a new state. It is the
-     * responsbility of the caller to check that the new state name is valid.
-     *
-     * @param {string} stateName - The name of the newly-added state
-     */
-    addState: function(stateName) {
-      addChange({
-        cmd: CMD_ADD_STATE,
-        state_name: stateName
-      });
-    },
-    /**
-     * Deletes the gadget with the specified name.
-     *
-     * @param {string} gadgetName - Unique name of the gadget to delete.
-     */
-    deleteGadget: function(gadgetName) {
-      addChange({
-        cmd: CMD_DELETE_GADGET,
-        gadget_name: gadgetName
-      });
-    },
-    /**
-     * Saves a change dict that represents deleting a new state. It is the
-     * responsbility of the caller to check that the deleted state name
-     * corresponds to an existing state.
-     *
-     * @param {string} stateName - The name of the deleted state.
-     */
-    deleteState: function(stateName) {
-      addChange({
-        cmd: CMD_DELETE_STATE,
-        state_name: stateName
-      });
-    },
-    discardAllChanges: function() {
-      explorationChangeList = [];
+    var addChange = function(changeDict) {
+      if ($rootScope.loadingMessage) {
+        return;
+      }
+      explorationChangeList.push(changeDict);
       undoneChangeStack = [];
-    },
-    /**
-     * Saves a change dict that represents a change to an exploration property
-     * (such as its title, category, ...). It is the responsibility of the
-     * caller to check that the old and new values are not equal.
-     *
-     * @param {string} backendName - The backend name of the property
-     *   (e.g. title, category)
-     * @param {string} newValue - The new value of the property
-     * @param {string} oldValue - The previous value of the property
-     */
-    editExplorationProperty: function(backendName, newValue, oldValue) {
-      if (!ALLOWED_EXPLORATION_BACKEND_NAMES.hasOwnProperty(backendName)) {
-        alertsService.addWarning(
-          'Invalid exploration property: ' + backendName);
-        return;
+      autosaveChangeListOnChange(explorationChangeList);
+    };
+
+    return {
+      /**
+       * Saves a gadget dict that represents a new gadget.
+       *
+       * It is the responsbility of the caller to check that the gadget dict
+       * is correctly formed
+       *
+       * @param {object} gadgetData - The dict containing new gadget info.
+       */
+      addGadget: function(gadgetData) {
+        addChange({
+          cmd: CMD_ADD_GADGET,
+          gadget_dict: gadgetData,
+          panel: gadgetData.panel
+        });
+      },
+      /**
+       * Saves a change dict that represents adding a new state. It is the
+       * responsbility of the caller to check that the new state name is valid.
+       *
+       * @param {string} stateName - The name of the newly-added state
+       */
+      addState: function(stateName) {
+        addChange({
+          cmd: CMD_ADD_STATE,
+          state_name: stateName
+        });
+      },
+      /**
+       * Deletes the gadget with the specified name.
+       *
+       * @param {string} gadgetName - Unique name of the gadget to delete.
+       */
+      deleteGadget: function(gadgetName) {
+        addChange({
+          cmd: CMD_DELETE_GADGET,
+          gadget_name: gadgetName
+        });
+      },
+      /**
+       * Saves a change dict that represents deleting a new state. It is the
+       * responsbility of the caller to check that the deleted state name
+       * corresponds to an existing state.
+       *
+       * @param {string} stateName - The name of the deleted state.
+       */
+      deleteState: function(stateName) {
+        addChange({
+          cmd: CMD_DELETE_STATE,
+          state_name: stateName
+        });
+      },
+      discardAllChanges: function() {
+        explorationChangeList = [];
+        undoneChangeStack = [];
+        explorationData.discardDraft();
+      },
+      /**
+       * Saves a change dict that represents a change to an exploration
+       * property (such as its title, category, ...). It is the responsibility
+       * of the caller to check that the old and new values are not equal.
+       *
+       * @param {string} backendName - The backend name of the property
+       *   (e.g. title, category)
+       * @param {string} newValue - The new value of the property
+       * @param {string} oldValue - The previous value of the property
+       */
+      editExplorationProperty: function(backendName, newValue, oldValue) {
+        if (!ALLOWED_EXPLORATION_BACKEND_NAMES.hasOwnProperty(backendName)) {
+          alertsService.addWarning(
+            'Invalid exploration property: ' + backendName);
+          return;
+        }
+        addChange({
+          cmd: CMD_EDIT_EXPLORATION_PROPERTY,
+          new_value: angular.copy(newValue),
+          old_value: angular.copy(oldValue),
+          property_name: backendName
+        });
+      },
+      /**
+       * Saves a change dict that represents a change to a gadget property.
+       *
+       * It is the responsibility of the caller to check that the old and new
+       * values are not equal.
+       *
+       * @param {string} gadgetName - The name of the gadget being edited
+       * @param {string} backendName - The backend name of the edited property
+       * @param {string} newValue - The new value of the property
+       * @param {string} oldValue - The previous value of the property
+       */
+      editGadgetProperty: function(
+          gadgetName, backendName, newValue, oldValue) {
+        if (!ALLOWED_GADGET_BACKEND_NAMES.hasOwnProperty(backendName)) {
+          alertsService.addWarning('Invalid gadget property: ' + backendName);
+          return;
+        }
+        addChange({
+          cmd: CMD_EDIT_GADGET_PROPERTY,
+          gadget_name: gadgetName,
+          new_value: angular.copy(newValue),
+          old_value: angular.copy(oldValue),
+          property_name: backendName
+        });
+      },
+      /**
+       * Saves a change dict that represents a change to a state property. It
+       * is the responsibility of the caller to check that the old and new
+       * values are not equal.
+       *
+       * @param {string} stateName - The name of the state that is being edited
+       * @param {string} backendName - The backend name of the edited property
+       * @param {string} newValue - The new value of the property
+       * @param {string} oldValue - The previous value of the property
+       */
+      editStateProperty: function(stateName, backendName, newValue, oldValue) {
+        if (!ALLOWED_STATE_BACKEND_NAMES.hasOwnProperty(backendName)) {
+          alertsService.addWarning('Invalid state property: ' + backendName);
+          return;
+        }
+        addChange({
+          cmd: CMD_EDIT_STATE_PROPERTY,
+          new_value: angular.copy(newValue),
+          old_value: angular.copy(oldValue),
+          property_name: backendName,
+          state_name: stateName
+        });
+      },
+      getChangeList: function() {
+        return angular.copy(explorationChangeList);
+      },
+      isExplorationLockedForEditing: function() {
+        return explorationChangeList.length > 0;
+      },
+      /**
+       * Initializes the current changeList with the one received from backend.
+       * This behavior exists only in case of an autosave.
+       *
+       * @param {object} changeList - Autosaved changeList data
+       */
+      loadAutosavedChangeList: function(changeList) {
+        explorationChangeList = changeList;
+      },
+      /**
+       * Saves a change dict that represents the renaming of a gadget.
+       *
+       * It is the responsibility of the caller to check that the two names
+       * are not equal.
+       *
+       * @param {string} oldGadgetName - The previous name of the gadget
+       * @param {string} newGadgetName - The new name of the gadget
+       */
+      renameGadget: function(oldGadgetName, newGadgetName) {
+        addChange({
+          cmd: CMD_RENAME_GADGET,
+          new_gadget_name: newGadgetName,
+          old_gadget_name: oldGadgetName
+        });
+      },
+      /**
+       * Saves a change dict that represents the renaming of a state. This
+       * is also intended to change the initial state name if necessary
+       * (that is, the latter change is implied and does not have to be
+       * recorded separately in another change dict). It is the responsibility
+       * of the caller to check that the two names are not equal.
+       *
+       * @param {string} newStateName - The new name of the state
+       * @param {string} oldStateName - The previous name of the state
+       */
+      renameState: function(newStateName, oldStateName) {
+        addChange({
+          cmd: CMD_RENAME_STATE,
+          new_state_name: newStateName,
+          old_state_name: oldStateName
+        });
+      },
+      undoLastChange: function() {
+        if (explorationChangeList.length === 0) {
+          alertsService.addWarning('There are no changes to undo.');
+          return;
+        }
+        var lastChange = explorationChangeList.pop();
+        undoneChangeStack.push(lastChange);
+        autosaveChangeListOnChange(explorationChangeList);
       }
-      addChange({
-        cmd: CMD_EDIT_EXPLORATION_PROPERTY,
-        new_value: angular.copy(newValue),
-        old_value: angular.copy(oldValue),
-        property_name: backendName
-      });
-    },
-    /**
-     * Saves a change dict that represents a change to a gadget property.
-     *
-     * It is the responsibility of the caller to check that the old and new
-     * values are not equal.
-     *
-     * @param {string} gadgetName - The name of the gadget that is being edited
-     * @param {string} backendName - The backend name of the edited property
-     * @param {string} newValue - The new value of the property
-     * @param {string} oldValue - The previous value of the property
-     */
-    editGadgetProperty: function(gadgetName, backendName, newValue, oldValue) {
-      if (!ALLOWED_GADGET_BACKEND_NAMES.hasOwnProperty(backendName)) {
-        alertsService.addWarning('Invalid gadget property: ' + backendName);
-        return;
-      }
-      addChange({
-        cmd: CMD_EDIT_GADGET_PROPERTY,
-        gadget_name: gadgetName,
-        new_value: angular.copy(newValue),
-        old_value: angular.copy(oldValue),
-        property_name: backendName
-      });
-    },
-    /**
-     * Saves a change dict that represents a change to a state property. It is
-     * the responsibility of the caller to check that the old and new values
-     * are not equal.
-     *
-     * @param {string} stateName - The name of the state that is being edited
-     * @param {string} backendName - The backend name of the edited property
-     * @param {string} newValue - The new value of the property
-     * @param {string} oldValue - The previous value of the property
-     */
-    editStateProperty: function(stateName, backendName, newValue, oldValue) {
-      if (!ALLOWED_STATE_BACKEND_NAMES.hasOwnProperty(backendName)) {
-        alertsService.addWarning('Invalid state property: ' + backendName);
-        return;
-      }
-      addChange({
-        cmd: CMD_EDIT_STATE_PROPERTY,
-        new_value: angular.copy(newValue),
-        old_value: angular.copy(oldValue),
-        property_name: backendName,
-        state_name: stateName
-      });
-    },
-    getChangeList: function() {
-      return angular.copy(explorationChangeList);
-    },
-    isExplorationLockedForEditing: function() {
-      return explorationChangeList.length > 0;
-    },
-    /**
-     * Saves a change dict that represents the renaming of a gadget.
-     *
-     * It is the responsibility of the caller to check that the two names
-     * are not equal.
-     *
-     * @param {string} oldGadgetName - The previous name of the gadget
-     * @param {string} newGadgetName - The new name of the gadget
-     */
-    renameGadget: function(oldGadgetName, newGadgetName) {
-      addChange({
-        cmd: CMD_RENAME_GADGET,
-        new_gadget_name: newGadgetName,
-        old_gadget_name: oldGadgetName
-      });
-    },
-    /**
-     * Saves a change dict that represents the renaming of a state. This
-     * is also intended to change the initial state name if necessary
-     * (that is, the latter change is implied and does not have to be recorded
-     * separately in another change dict). It is the responsibility of the
-     * caller to check that the two names are not equal.
-     *
-     * @param {string} newStateName - The new name of the state
-     * @param {string} oldStateName - The previous name of the state
-     */
-    renameState: function(newStateName, oldStateName) {
-      addChange({
-        cmd: CMD_RENAME_STATE,
-        new_state_name: newStateName,
-        old_state_name: oldStateName
-      });
-    },
-    undoLastChange: function() {
-      if (explorationChangeList.length === 0) {
-        alertsService.addWarning('There are no changes to undo.');
-        return;
-      }
-      var lastChange = explorationChangeList.pop();
-      undoneChangeStack.push(lastChange);
-    }
-  };
-}]);
+    };
+  }
+]);
 
 // A data service that stores data about the rights for this exploration.
 oppia.factory('explorationRightsService', [
@@ -545,59 +628,60 @@ oppia.factory('explorationPropertyService', [
 // A data service that stores the current exploration title so that it can be
 // displayed and edited in multiple places in the UI.
 oppia.factory('explorationTitleService', [
-    'explorationPropertyService', '$filter', 'validatorsService',
-    'explorationRightsService',
-    function(
-      explorationPropertyService, $filter, validatorsService,
-      explorationRightsService) {
-  var child = Object.create(explorationPropertyService);
-  child.propertyName = 'title';
-  child._normalize = $filter('normalizeWhitespace');
-  child._isValid = function(value) {
-    return (
-      explorationRightsService.isPrivate() ||
-      validatorsService.isValidEntityName(value, true));
-  };
-  return child;
-}]);
+  'explorationPropertyService', '$filter', 'validatorsService',
+  'explorationRightsService',
+  function(
+    explorationPropertyService, $filter, validatorsService,
+    explorationRightsService) {
+    var child = Object.create(explorationPropertyService);
+    child.propertyName = 'title';
+    child._normalize = $filter('normalizeWhitespace');
+    child._isValid = function(value) {
+      return validatorsService.isValidEntityName(
+        value, true, explorationRightsService.isPrivate());
+    };
+    return child;
+  }
+]);
 
 // A data service that stores the current exploration category so that it can be
 // displayed and edited in multiple places in the UI.
 oppia.factory('explorationCategoryService', [
-    'explorationPropertyService', '$filter', 'validatorsService',
-    'explorationRightsService',
-    function(
-      explorationPropertyService, $filter, validatorsService,
-      explorationRightsService) {
-  var child = Object.create(explorationPropertyService);
-  child.propertyName = 'category';
-  child._normalize = $filter('normalizeWhitespace');
-  child._isValid = function(value) {
-    return (
-      explorationRightsService.isPrivate() ||
-      validatorsService.isValidEntityName(value, true));
-  };
-  return child;
-}]);
+  'explorationPropertyService', '$filter', 'validatorsService',
+  'explorationRightsService',
+  function(
+    explorationPropertyService, $filter, validatorsService,
+    explorationRightsService) {
+    var child = Object.create(explorationPropertyService);
+    child.propertyName = 'category';
+    child._normalize = $filter('normalizeWhitespace');
+    child._isValid = function(value) {
+      return validatorsService.isValidEntityName(
+        value, true, explorationRightsService.isPrivate());
+    };
+    return child;
+  }
+]);
 
 // A data service that stores the current exploration objective so that it can
 // be displayed and edited in multiple places in the UI.
 oppia.factory('explorationObjectiveService', [
-    'explorationPropertyService', '$filter', 'validatorsService',
-    'explorationRightsService',
-    function(
-      explorationPropertyService, $filter, validatorsService,
-      explorationRightsService) {
-  var child = Object.create(explorationPropertyService);
-  child.propertyName = 'objective';
-  child._normalize = $filter('normalizeWhitespace');
-  child._isValid = function(value) {
-    return (
-      explorationRightsService.isPrivate() ||
-      validatorsService.isNonempty(value, false));
-  };
-  return child;
-}]);
+  'explorationPropertyService', '$filter', 'validatorsService',
+  'explorationRightsService',
+  function(
+    explorationPropertyService, $filter, validatorsService,
+    explorationRightsService) {
+    var child = Object.create(explorationPropertyService);
+    child.propertyName = 'objective';
+    child._normalize = $filter('normalizeWhitespace');
+    child._isValid = function(value) {
+      return (
+        explorationRightsService.isPrivate() ||
+        validatorsService.isNonempty(value, false));
+    };
+    return child;
+  }
+]);
 
 // A data service that stores the exploration language code.
 oppia.factory('explorationLanguageCodeService', [
@@ -1948,6 +2032,343 @@ oppia.factory('explorationWarningsService', [
       },
       updateWarnings: function() {
         _updateWarningsList();
+      }
+    };
+  }
+]);
+
+oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
+  var CMD_ADD_STATE = 'add_state';
+  var CMD_RENAME_STATE = 'rename_state';
+  var CMD_DELETE_STATE = 'delete_state';
+  var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
+
+  var makeRulesListHumanReadable = function(answerGroupValue) {
+    var rulesList = [];
+    answerGroupValue.rule_specs.forEach(function(ruleSpec) {
+      var ruleElm = angular.element('<li></li>');
+      ruleElm.html('<p>Type: ' + ruleSpec.rule_type + '</p>');
+      ruleElm.append(
+        '<p>Value: ' + (
+          Object.keys(ruleSpec.inputs).map(function(input) {
+            return ruleSpec.inputs[input];
+          })
+        ).toString() + '</p>');
+      rulesList.push(ruleElm);
+    });
+
+    return rulesList;
+  };
+
+  // An edit is represented either as an object or an array. If it's an object,
+  // then simply return that object. In case of an array, return the last item.
+  var getStatePropertyValue = function(statePropertyValue) {
+    return angular.isArray(statePropertyValue) ?
+      statePropertyValue[statePropertyValue.length - 1] : statePropertyValue;
+  };
+
+  // Detects whether an object of the type 'answer_group' or 'default_outcome'
+  // has been added, edited or deleted. Returns - 'addded', 'edited' or
+  // 'deleted' accordingly.
+  var getRelativeChangeToGroups = function(changeObject) {
+    var newValue = changeObject.new_value;
+    var oldValue = changeObject.old_value;
+    var result = '';
+
+    if (angular.isArray(newValue) && angular.isArray(oldValue)) {
+      result = (newValue.length > oldValue.length) ?
+        'added' : (newValue.length === oldValue.length) ?
+        'edited' : 'deleted';
+    } else {
+      if (!utilsService.isEmpty(oldValue)) {
+        if (!utilsService.isEmpty(newValue)) {
+          result = 'edited';
+        } else {
+          result = 'deleted';
+        }
+      } else if (!utilsService.isEmpty(newValue)) {
+        result = 'added';
+      }
+    }
+    return result;
+  };
+
+  var makeHumanReadable = function(lostChanges) {
+    var outerHtml = angular.element('<ul></ul>');
+    var stateWiseEditsMapping = {};
+    // The variable stateWiseEditsMapping stores the edits grouped by state.
+    // For instance, you made the following edits:
+    // 1. Changed content to 'Welcome!' instead of '' in 'First Card'.
+    // 2. Added an interaction in this state.
+    // 2. Added a new state 'End'.
+    // 3. Ended Exporation from state 'End'.
+    // stateWiseEditsMapping will look something like this:
+    // - 'First Card': [
+    //   - 'Edited Content: Welcome!',:
+    //   - 'Added Interaction: Continue',
+    //   - 'Added interaction customizations']
+    // - 'End': ['Ended exploration']
+
+    lostChanges.forEach(function(lostChange) {
+      switch (lostChange.cmd) {
+        case CMD_ADD_STATE:
+          outerHtml.append(
+            angular.element('<li></li>').html(
+              'Added state: ' + lostChange.state_name));
+          break;
+        case CMD_RENAME_STATE:
+          outerHtml.append(
+            angular.element('<li></li>').html(
+              'Renamed state: ' + lostChange.old_state_name + ' to ' +
+                lostChange.new_state_name));
+          break;
+        case CMD_DELETE_STATE:
+          outerHtml.append(
+            angular.element('<li></li>').html(
+              'Deleted state: ' + lostChange.state_name));
+          break;
+        case CMD_EDIT_STATE_PROPERTY:
+          var newValue = getStatePropertyValue(lostChange.new_value);
+          var oldValue = getStatePropertyValue(lostChange.old_value);
+          var stateName = lostChange.state_name;
+          if (!stateWiseEditsMapping[stateName]) {
+            stateWiseEditsMapping[stateName] = [];
+          }
+
+          switch (lostChange.property_name) {
+            case 'content':
+              if (newValue !== null) {
+                stateWiseEditsMapping[stateName].push(
+                  angular.element('<div></div>').html(
+                    '<strong>Edited content: </strong><div class="content">' +
+                      newValue.value + '</div>')
+                    .addClass('state-edit-desc'));
+              }
+              break;
+
+            case 'widget_id':
+              var lostChangeValue = '';
+              if (oldValue === null) {
+                if (newValue !== 'EndExploration') {
+                  lostChangeValue = ('<strong>Added Interaction: </strong>' +
+                                     newValue);
+                } else {
+                  lostChangeValue = 'Ended Exploration';
+                }
+              } else {
+                lostChangeValue = ('<strong>Deleted Interaction: </strong>' +
+                                   oldValue);
+              }
+              stateWiseEditsMapping[stateName].push(
+                angular.element('<div></div>').html(lostChangeValue)
+                  .addClass('state-edit-desc'));
+              break;
+
+            case 'widget_customization_args':
+              var lostChangeValue = '';
+              if (utilsService.isEmpty(oldValue)) {
+                lostChangeValue = 'Added Interaction Customizations';
+              } else if (utilsService.isEmpty(newValue)) {
+                lostChangeValue = 'Removed Interaction Customizations';
+              } else {
+                lostChangeValue = 'Edited Interaction Customizations';
+              }
+              stateWiseEditsMapping[stateName].push(
+                angular.element('<div></div>').html(lostChangeValue)
+                  .addClass('state-edit-desc'));
+              break;
+
+            case 'answer_groups':
+              var answerGroupChanges = getRelativeChangeToGroups(lostChange);
+              var answerGroupHtml = '';
+              if (answerGroupChanges === 'added') {
+                answerGroupHtml += (
+                  '<p class="sub-edit"><i>Destination: </i>' +
+                    newValue.outcome.dest + '</p>');
+                answerGroupHtml += (
+                  '<div class="sub-edit"><i>Feedback: </i>' +
+                    '<div class="feedback">' +
+                    newValue.outcome.feedback + '</div></div>');
+                var rulesList = makeRulesListHumanReadable(newValue);
+                if (rulesList.length > 0) {
+                  answerGroupHtml += '<p class="sub-edit"><i>Rules: </i></p>';
+                  var rulesListHtml = (angular.element('<ol></ol>')
+                                       .addClass('rules-list'));
+                  for (var rule in rulesList) {
+                    rulesListHtml.html(rulesList[rule][0].outerHTML);
+                  }
+                  answerGroupHtml += rulesListHtml[0].outerHTML;
+                }
+                stateWiseEditsMapping[stateName].push(
+                  angular.element('<div><strong>Added answer group: ' +
+                                  '</strong></div>')
+                    .append(answerGroupHtml)
+                    .addClass('state-edit-desc answer-group'));
+              } else if (answerGroupChanges === 'edited') {
+                if (newValue.outcome.dest !== oldValue.outcome.dest) {
+                  answerGroupHtml += (
+                    '<p class="sub-edit"><i>Destination: </i>' +
+                      newValue.outcome.dest + '</p>');
+                }
+                if (!angular.equals(
+                    newValue.outcome.feedback, oldValue.outcome.feedback)) {
+                  answerGroupHtml += (
+                    '<div class="sub-edit"><i>Feedback: </i>' +
+                      '<div class="feedback">' + newValue.outcome.feedback +
+                      '</div></div>');
+                }
+                if (!angular.equals(newValue.rule_specs, oldValue.rule_specs)) {
+                  var rulesList = makeRulesListHumanReadable(newValue);
+                  if (rulesList.length > 0) {
+                    answerGroupHtml += '<p class="sub-edit"><i>Rules: </i></p>';
+                    var rulesListHtml = (angular.element('<ol></ol>')
+                                         .addClass('rules-list'));
+                    for (var rule in rulesList) {
+                      rulesListHtml.html(rulesList[rule][0].outerHTML);
+                    }
+                    answerGroupChanges = rulesListHtml[0].outerHTML;
+                  }
+                }
+                stateWiseEditsMapping[stateName].push(
+                  angular.element('<div><strong>Edited answer group: <strong>' +
+                                  '</div>')
+                    .append(answerGroupHtml)
+                    .addClass('state-edit-desc answer-group'));
+              } else if (answerGroupChanges === 'deleted') {
+                stateWiseEditsMapping[stateName].push(
+                  angular.element('<div>Deleted answer group</div>')
+                    .addClass('state-edit-desc'));
+              }
+              break;
+
+            case 'default_outcome':
+              var defaultOutcomeChanges = getRelativeChangeToGroups(lostChange);
+              var defaultOutcomeHtml = '';
+              if (defaultOutcomeChanges === 'added') {
+                defaultOutcomeHtml += (
+                  '<p class="sub-edit"><i>Destination: </i>' +
+                    newValue.dest + '</p>');
+                defaultOutcomeHtml += (
+                  '<div class="sub-edit"><i>Feedback: </i>' +
+                    '<div class="feedback">' + newValue.feedback +
+                    '</div></div>');
+                stateWiseEditsMapping[stateName].push(
+                  angular.element('<div>Added default outcome: </div>')
+                    .append(defaultOutcomeHtml)
+                    .addClass('state-edit-desc default-outcome'));
+              } else if (defaultOutcomeChanges === 'edited') {
+                if (newValue.dest !== oldValue.dest) {
+                  defaultOutcomeHtml += (
+                    '<p class="sub-edit"><i>Destination: </i>' + newValue.dest +
+                      '</p>');
+                }
+                if (!angular.equals(newValue.feedback, oldValue.feedback)) {
+                  defaultOutcomeHtml += (
+                    '<div class="sub-edit"><i>Feedback: </i>' +
+                      '<div class="feedback">' + newValue.feedback +
+                      '</div></div>');
+                }
+                stateWiseEditsMapping[stateName].push(
+                  angular.element('<div>Edited default outcome: </div>')
+                    .append(defaultOutcomeHtml)
+                    .addClass('state-edit-desc default-outcome'));
+              } else if (defaultOutcomeChanges === 'deleted') {
+                stateWiseEditsMapping[stateName].push(
+                  angular.element('<div>Deleted default outcome</div>')
+                    .addClass('state-edit-desc'));
+              }
+          };
+      }
+    });
+
+    for (var stateName in stateWiseEditsMapping) {
+      var stateChangesEl = angular.element(
+        '<li>Edits to state: ' + stateName + '</li>');
+      for (var stateEdit in stateWiseEditsMapping[stateName]) {
+        stateChangesEl.append(stateWiseEditsMapping[stateName][stateEdit]);
+      }
+      outerHtml.append(stateChangesEl);
+    }
+
+    return outerHtml;
+  };
+
+  return {
+    makeHumanReadable: makeHumanReadable
+  };
+}]);
+
+// Service for displaying different types of modals depending on the type of
+// response received as a result of the autosaving request.
+oppia.factory('autosaveInfoModalsService', [
+  '$log', '$modal', '$timeout', '$window', 'lostChangesService',
+  'explorationData',
+  function(
+      $log, $modal, $timeout, $window, lostChangesService,
+      explorationData) {
+    var _isModalOpen = false;
+    var _refreshPage = function(delay) {
+      $timeout(function() {
+        $window.location.reload();
+      }, delay);
+    };
+
+    return {
+      showNonStrictValidationFailModal: function() {
+        $modal.open({
+          templateUrl: 'modals/saveValidationFail',
+          // Prevent modal from closing when the user clicks outside it.
+          backdrop: 'static',
+          controller: [
+            '$scope', '$modalInstance', function($scope, $modalInstance) {
+              $scope.closeAndRefresh = function() {
+                $modalInstance.dismiss('cancel');
+                _refreshPage(20);
+              };
+            }
+          ]
+        }).result.then(function() {
+          _isModalOpen = false;
+        }, function() {
+          _isModalOpen = false;
+        });
+
+        _isModalOpen = true;
+      },
+      isModalOpen: function() {
+        return _isModalOpen;
+      },
+      showVersionMismatchModal: function(lostChanges) {
+        $modal.open({
+          templateUrl: 'modals/saveVersionMismatch',
+          // Prevent modal from closing when the user clicks outside it.
+          backdrop: 'static',
+          controller: ['$scope', function($scope) {
+            // When the user clicks on discard changes button, signal backend
+            // to discard the draft and reload the page thereafter.
+            $scope.discardChanges = function() {
+              explorationData.discardDraft(function() {
+                _refreshPage(20);
+              });
+            };
+
+            $scope.hasLostChanges = (lostChanges && lostChanges.length > 0);
+            if ($scope.hasLostChanges) {
+              // TODO(sll): This should also include changes to exploration
+              // properties (such as the exploration title, category, etc.).
+              $scope.lostChangesHtml = (
+                lostChangesService.makeHumanReadable(lostChanges).html());
+              $log.error('Lost changes: ' + JSON.stringify(lostChanges));
+            }
+          }],
+          windowClass: 'oppia-autosave-version-mismatch-modal'
+        }).result.then(function() {
+          _isModalOpen = false;
+        }, function() {
+          _isModalOpen = false;
+        });
+
+        _isModalOpen = true;
       }
     };
   }

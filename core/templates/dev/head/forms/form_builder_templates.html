@@ -1,4 +1,5 @@
 <!-- SCHEMA-BASED EDITOR TEMPLATES -->
+
 <script type="text/ng-template" id="schemaBasedEditor/master">
   <schema-based-choices-editor ng-if="schema().choices" local-value="$parent.localValue"
                                schema="schema()" choices="schema().choices"
@@ -137,24 +138,19 @@
                require-is-float apply-validation="validators()" ui_config="uiConfig()"
                focus-on="<[labelForFocusTarget()]>" ng-keypress="onKeypress($event)"
                ng-blur="onBlur()" ng-focus="onFocus()" style="display: inline;">
+
         <span ng-if="hasLoaded && !isUserCurrentlyTyping && hasFocusedAtLeastOnce"
               style="font-size: 0.85em; position: absolute;"
               tabindex="-1" focus-on="<[labelForErrorFocusTarget]>">
-          <span ng-if="floatForm.floatValue.$error.isFloat && floatForm.floatValue.$viewValue" class="oppia-form-error" aria-live="assertive">
-            Please enter a valid decimal number.
-          </span>
+          <span ng-if="floatForm.floatValue.$error.isFloat && floatForm.floatValue.$viewValue" class="oppia-form-error" aria-live="assertive" translate="I18N_FORMS_TYPE_NUMBER_INVALID_DECIMAL"></span>
           <span ng-if="!floatForm.floatValue.$error.isFloat && floatForm.floatValue.$error.isAtLeast"
-                class="oppia-form-error" aria-live="assertive">
-            Please enter a number that is at least <[getMinValue()]>.
-          </span>
+                class="oppia-form-error" aria-live="assertive" translate="I18N_FORMS_TYPE_NUMBER_AT_LEAST" translate-values="{minValue: <[minValue]>}"></span>
           <span ng-if="!floatForm.floatValue.$error.isFloat && floatForm.floatValue.$error.isAtMost"
-                class="oppia-form-error" aria-live="assertive">
-            Please enter a number that is at most <[getMaxValue()]>.
-          </span>
+                class="oppia-form-error" aria-live="assertive" translate="I18N_FORMS_TYPE_NUMBER_AT_MOST" translate-values="{maxValue: <[maxValue]>}"></span>
         </span>
       </span>
 
-      <span ng-if="allowExpressions() && !uiConfig()">
+      <span ng-if="allowExpressions()">
         <schema-based-expression-editor ng-if="expressionMode" is-disabled="isDisabled()"
                                         local-value="$parent.$parent.localValue"
                                         param-names="paramNames" output-type="float"
