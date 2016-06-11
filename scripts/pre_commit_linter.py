@@ -98,7 +98,10 @@ BAD_PATTERNS_JS = {
             'core/templates/dev/head/expressions/typeParserSpec.js')},
     ' != ': {
         'message': 'Please replace != with !== in this file.',
-        'excluded_files': ()}
+        'excluded_files': (
+            'core/templates/dev/head/expressions/parserSpec.js',
+            'core/templates/dev/head/expressions/evaluatorSpec.js',
+            'core/templates/dev/head/expressions/typeParserSpec.js')}
 }
 
 EXCLUDED_PATHS = (
