@@ -374,6 +374,17 @@ DEMO_COLLECTIONS = {
     u'0': 'welcome_to_collections.yaml'
 }
 
+# IDs of explorations which should not be displayable in either the learner or
+# editor views.
+DISABLED_EXPLORATION_IDS = ['5']
+
+# Google Group embed URL for the Forum page.
+EMBEDDED_GOOGLE_GROUP_URL = (
+    'https://groups.google.com/forum/embed/?place=forum/oppia')
+
+# Whether to allow YAML file uploads.
+ALLOW_YAML_FILE_UPLOAD = False
+
 # TODO(sll): Add all other URLs here.
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_WRITABLE_DATA_URL_PREFIX = '/collection_editor_handler/data'
