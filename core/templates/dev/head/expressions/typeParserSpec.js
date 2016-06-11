@@ -51,8 +51,8 @@ describe('Expression type parser service', function() {
       ['23 % 5', 'Real'],
       ['1 <= numZero || 1 >= numZero', 'UnicodeString'],
       ['100 < num100_001 && 1 > num100_001', 'UnicodeString'],
-      ['boolTrue === boolFalse', 'UnicodeString'],
-      ['strNull !== strXYZ', 'UnicodeString'],
+      ['boolTrue == boolFalse', 'UnicodeString'],
+      ['strNull != strXYZ', 'UnicodeString'],
       ['if boolFalse then 8 else numZero', 'Real'],
       ['if boolFalse then 8 else strXYZ', ests.ExprWrongArgTypeError,
        'ExprWrongArgTypeError: Type Real does not match expected type ' +

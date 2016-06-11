@@ -92,6 +92,11 @@ BAD_PATTERNS_JS = {
         'Please replace != with !== in this file.')
 }
 
+EXCLUDED_FILES_JS = (
+    'core/templates/dev/head/expressions/parserSpec.js',
+    'core/templates/dev/head/expressions/evaluatorSpec.js',
+    'core/templates/dev/head/expressions/typeParserSpec.js')
+
 EXCLUDED_PATHS = (
     'third_party/*', '.git/*', '*.pyc', 'CHANGELOG',
     'scripts/pre_commit_linter.py', 'integrations/*',
@@ -399,7 +404,7 @@ def _check_bad_patterns(all_files):
                     print '%s --> %s' % (
                         filename, BAD_PATTERNS[pattern])
                     total_error_count += 1
-            if filename in all_js_files:
+            if filename in all_js_files and filename not in EXCLUDED_FILES_JS:
                 for pattern in BAD_PATTERNS_JS:
                     if pattern in content:
                         failed = True

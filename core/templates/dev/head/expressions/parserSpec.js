@@ -62,7 +62,7 @@ describe('Expression parser service', function() {
           '2 + 3 / 4 * 5 - 6'],
 
       [['||', ['&&', ['<', 2, 3], ['==', 4, 6]], true],
-          '2 < 3 && 4 === 6 || true'],
+          '2 < 3 && 4 == 6 || true'],
 
       // Expected to produce parser error.
       [undefined, 'a1a-'],
