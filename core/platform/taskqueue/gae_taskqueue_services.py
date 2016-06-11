@@ -41,9 +41,11 @@ def defer_to_events_queue(fn, *args, **kwargs):
 def enqueue_task(url, params, countdown):
     """Adds a new task for sending email.
 
-    - params sepcifies parameters that will be passed as payload to handler
-      function
-    - countdown specifies amount of time in secs to wait before executing task.
+    Args:
+    - url: url of the handler function.
+    - params: parameters that will be passed as payload to handler
+      function.
+    - countdown: amount of time, in seconds, to wait before executing task.
     """
     # See https://cloud.google.com/appengine/docs/python/taskqueue for
     # details of various parameters set when adding a new task.
