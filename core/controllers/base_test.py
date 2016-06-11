@@ -203,7 +203,7 @@ class EscapingTest(test_utils.GenericTestBase):
         def get(self):
             """Handles GET requests."""
             self.values.update({
-                'CONTACT_EMAIL_ADDRESS': ['<[angular_tag]> x{{51 * 3}}y'],
+                'BEFORE_END_HEAD_TAG_HOOK': ['<[angular_tag]> x{{51 * 3}}y'],
             })
             self.render_template('pages/about.html')
 

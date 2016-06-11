@@ -61,104 +61,10 @@ BEFORE_END_HEAD_TAG_HOOK = config_domain.ConfigProperty(
         },
     },
     'Code to insert just before the closing </head> tag in all pages.', '')
-BEFORE_END_BODY_TAG_HOOK = config_domain.ConfigProperty(
-    'before_end_body_tag_hook', {
-        'type': 'unicode',
-        'ui_config': {
-            'rows': 7,
-        },
-    },
-    'Code to insert just before the closing </body> tag in all pages.', '')
-
-SIDEBAR_MENU_ADDITIONAL_LINKS = config_domain.ConfigProperty(
-    'sidebar_menu_additional_links', {
-        'type': 'list',
-        'items': {
-            'type': 'dict',
-            'properties': [{
-                'name': 'name',
-                'description': 'Text of the menu item',
-                'schema': {'type': 'unicode'},
-            }, {
-                'name': 'link',
-                'description': 'The link to open in a new tab',
-                'schema': {'type': 'unicode'},
-            }, {
-                'name': 'icon_filename',
-                'description': (
-                    'Filename of the menu icon (in /images/sidebar)'),
-                'schema': {'type': 'unicode'},
-            }]
-        }
-    },
-    'Additional links to show in the sidebar menu.',
-    default_value=[{
-        'name': 'Blog',
-        'link': 'http://site/blog/url',
-        'icon_filename': 'comment.png',
-    }])
 
 SITE_FEEDBACK_FORM_URL = config_domain.ConfigProperty(
     'site_feedback_form_url', {'type': 'unicode'},
     'Site feedback form URL (leave blank if there is no such form)', '')
-
-SHARING_OPTIONS = config_domain.ConfigProperty(
-    'sharing_options', {
-        'type': 'dict',
-        'properties': [{
-            'name': 'gplus',
-            'schema': {
-                'type': 'bool',
-            }
-        }, {
-            'name': 'facebook',
-            'schema': {
-                'type': 'bool',
-            }
-        }, {
-            'name': 'twitter',
-            'schema': {
-                'type': 'bool',
-            }
-        }]
-    },
-    'Sharing options to display in the editor view',
-    default_value={
-        'gplus': False,
-        'facebook': False,
-        'twitter': False,
-    })
-
-SOCIAL_MEDIA_BUTTONS = config_domain.ConfigProperty(
-    'social_media_buttons', {
-        'type': 'list',
-        'items': {
-            'type': 'dict',
-            'properties': [{
-                'name': 'link',
-                'description': 'The link to open in a new tab',
-                'schema': {'type': 'unicode'},
-            }, {
-                'name': 'icon_filename',
-                'description': (
-                    'Filename of the social media icon (in /images/social)'),
-                'schema': {'type': 'unicode'},
-            }]
-        }
-    },
-    'Links and icon filenames for the social media buttons in the sidebar.',
-    [])
-
-DISABLED_EXPLORATIONS = config_domain.ConfigProperty(
-    'disabled_explorations', {
-        'type': 'list',
-        'items': {
-            'type': 'unicode'
-        }
-    },
-    'IDs of explorations which should not be displayable in either the '
-    'learner or editor views',
-    [])
 
 
 def require_user(handler):
@@ -411,8 +317,6 @@ class BaseHandler(webapp2.RequestHandler):
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
                 BEFORE_END_HEAD_TAG_HOOK.value),
-            'BEFORE_END_BODY_TAG_HOOK': jinja2.utils.Markup(
-                BEFORE_END_BODY_TAG_HOOK.value),
             'CAN_SEND_ANALYTICS_EVENTS': feconf.CAN_SEND_ANALYTICS_EVENTS,
             'DEFAULT_LANGUAGE_CODE': feconf.ALL_LANGUAGE_CODES[0]['code'],
             'DEV_MODE': feconf.DEV_MODE,
@@ -432,12 +336,9 @@ class BaseHandler(webapp2.RequestHandler):
             'RTE_COMPONENT_SPECS': (
                 rte_component_registry.Registry.get_all_specs()),
             'SHOW_CUSTOM_PAGES': feconf.SHOW_CUSTOM_PAGES,
-            'SIDEBAR_MENU_ADDITIONAL_LINKS': (
-                SIDEBAR_MENU_ADDITIONAL_LINKS.value),
             'SITE_FEEDBACK_FORM_URL': SITE_FEEDBACK_FORM_URL.value,
             'SITE_NAME': SITE_NAME.value,
             'SUPPORTED_SITE_LANGUAGES': feconf.SUPPORTED_SITE_LANGUAGES,
-            'SOCIAL_MEDIA_BUTTONS': SOCIAL_MEDIA_BUTTONS.value,
             'SYSTEM_USERNAMES': feconf.SYSTEM_USERNAMES,
             'user_is_logged_in': user_services.has_fully_registered(
                 self.user_id),
