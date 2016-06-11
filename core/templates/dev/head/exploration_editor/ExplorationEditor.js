@@ -1038,7 +1038,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
               $scope.formatStatePropertyChange = function(
                   propertyName, changeInfo) {
-                if (propertyName == 'name') {
+                if (propertyName === 'name') {
                   return getLongFormPropertyChange(
                     STATE_BACKEND_NAMES_TO_HUMAN_NAMES[propertyName],
                     changeInfo);
@@ -1049,7 +1049,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
               $scope.formatGadgetPropertyChange = function(
                   propertyName, changeInfo) {
-                if (propertyName == 'name') {
+                if (propertyName === 'name') {
                   return getLongFormPropertyChange(
                     GADGET_BACKEND_NAMES_TO_HUMAN_NAMES[propertyName],
                     changeInfo);

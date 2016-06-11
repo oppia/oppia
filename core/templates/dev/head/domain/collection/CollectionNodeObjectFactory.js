@@ -65,7 +65,8 @@ oppia.factory('CollectionNodeObjectFactory', [
     // function is undefined if doesExplorationExist() returns false.
     CollectionNode.prototype.isExplorationPrivate = function() {
       if (this._explorationSummaryObject) {
-        return this._explorationSummaryObject.status == ACTIVITY_STATUS_PRIVATE;
+        return this._explorationSummaryObject.status === (
+          ACTIVITY_STATUS_PRIVATE);
       } else {
         return undefined;
       }
