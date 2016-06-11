@@ -368,6 +368,9 @@ URLS = MAPREDUCE_HANDLERS + [
         'recent_feedback_messages_handler'),
 
     get_redirect_route(
+        r'%s' % feconf.FEEDBACK_MESSAGE_EMAIL_HANDLER_URL,
+        feedback.UnsentFeedbackEmailHandler, 'feedback_message_email_handler'),
+    get_redirect_route(
         r'%s/<exploration_id>' % feconf.FEEDBACK_THREADLIST_URL_PREFIX,
         feedback.ThreadListHandler, 'feedback_threadlist_handler'),
     get_redirect_route(

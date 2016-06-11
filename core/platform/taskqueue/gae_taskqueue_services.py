@@ -16,6 +16,7 @@
 
 """Provides a seam for taskqueue-related operations."""
 
+from google.appengine.api import taskqueue
 from google.appengine.ext import deferred
 
 # NOTE: The following constants should match the queue names in queue.yaml.
@@ -23,7 +24,8 @@ from google.appengine.ext import deferred
 QUEUE_NAME_DEFAULT = 'default'
 # Deferred queue for processing events outside the request/response cycle.
 QUEUE_NAME_EVENTS = 'events'
-
+# Taskqueue for sending email.
+QUEUE_NAME_EMAILS = 'emails'
 
 def defer(fn, *args, **kwargs):
     """Adds a new task to the default deferred queue."""
@@ -36,6 +38,20 @@ def defer_to_events_queue(fn, *args, **kwargs):
     # details on the _queue kwarg.
     deferred.defer(fn, *args, _queue=QUEUE_NAME_EVENTS, **kwargs)
 
+def enqueue_task(url, params, countdown):
+    """Adds a new task for sending email.
+
+    Args:
+    - url: url of the handler function.
+    - params: parameters that will be passed as payload to handler
+      function.
+    - countdown: amount of time, in seconds, to wait before executing task.
+    """
+    # See https://cloud.google.com/appengine/docs/python/taskqueue for
+    # details of various parameters set when adding a new task.
+    taskqueue.add(
+        queue_name=QUEUE_NAME_EMAILS, url=url, params=params,
+        countdown=countdown, target=taskqueue.DEFAULT_APP_VERSION)
 
 # A special exception that ensures that the task is not tried again, if it
 # fails.
