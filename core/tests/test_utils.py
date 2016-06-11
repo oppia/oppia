@@ -652,11 +652,7 @@ class AppEngineTestBase(TestBase):
         """Counts the jobs in the given queue. If queue_name is None,
         defaults to counting the jobs in all queues available.
         """
-        if queue_name:
-            return len(self.taskqueue_stub.get_filtered_tasks(
-                queue_names=[queue_name]))
-        else:
-            return len(self.taskqueue_stub.get_filtered_tasks())
+        return len(self.get_pending_tasks(queue_name))
 
     def get_pending_tasks(self, queue_name=None):
         """Returns the jobs in the given queue. If queue_name is None,

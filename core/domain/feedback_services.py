@@ -249,8 +249,8 @@ def get_all_threads(exploration_id, has_suggestion):
 
 
 def enqueue_feedback_message_email_task(user_id):
-    """Adds task for sending email of feedback messages into taskqueue"""
+    """Adds a 'send feedback email' task into the taskqueue."""
 
-    taskqueue_services.add_feedback_message_email_task(
-        feconf.FEEDBACK_MESSAGE_EMAIL_HANDLER_URL, params={'user_id':user_id},
-        countdown=feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS)
+    taskqueue_services.enqueue_task(
+        feconf.FEEDBACK_MESSAGE_EMAIL_HANDLER_URL, {'user_id': user_id},
+        feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS)
