@@ -23,6 +23,7 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import stats_services
 from core.domain import subscription_services
 from core.domain import user_jobs_continuous
 from core.domain import user_services
@@ -166,6 +167,11 @@ class DashboardHandler(base.BaseHandler):
 
             feedback_thread_analytics = feedback_services.get_thread_analytics(
                 exp_summary.id)
+            exp_stats = stats_services.get_exploration_stats(
+                exp_summary.id, 'all')
+            unresolved_answers = (
+                exp_services.get_total_unresolved_answers_for_exploration(
+                    exp_summary.id))
             # TODO(sll): Reuse _get_displayable_exp_summary_dicts() in
             # summary_services, instead of replicating it like this.
             explorations_list.append({
@@ -190,6 +196,8 @@ class DashboardHandler(base.BaseHandler):
                     feedback_thread_analytics.num_open_threads),
                 'num_total_threads': (
                     feedback_thread_analytics.num_total_threads),
+                'unresolved_answers': unresolved_answers,
+                'num_plays': exp_stats.num_starts
             })
 
         explorations_list = sorted(
@@ -227,6 +235,8 @@ class DashboardHandler(base.BaseHandler):
         self.values.update({
             'explorations_list': explorations_list,
             'collections_list': collections_list,
+            'weekly_dashboard_stats': user_services.get_total_dashboard_stats(
+                self.user_id)
         })
         self.render_json(self.values)
 
