@@ -7,7 +7,7 @@
 </style>
 
 <div ng-model="localValue" ui-validate="'validate($value)'">
-  <div ng-show="!imageUploaderIsActive">
+  <div ng-show="!imageUploaderIsActive" style="position: relative;">
     <div ng-if="!filepathsLoaded">
       <span class="text-align: center; width: 50px;">
         Loading...
@@ -22,7 +22,9 @@
         <[filepath]>
       </label>
     </div>
-    <img ng-if="localValue.label" ng-src="<[getPreviewUrl(localValue.label)]>" width="<[width]>"/>
+    <div style="display: block; height: 380px;">
+      <img ng-if="localValue.label" ng-src="<[getPreviewUrl(localValue.label)]>" width="<[width]>" style="display: block;position: absolute; top: 50%; left: 50%; margin-right: -50%; transform: translate(-50%, -50%); margin: 0;"/>
+    </div>
     <br><br>
     <button type="button" class="btn btn-default" ng-click="openImageUploader()">Upload a new image</button>
   </div>
