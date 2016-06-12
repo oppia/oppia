@@ -90,7 +90,7 @@ BAD_PATTERNS = {
         'excluded_files': ()},
     'glyphicon': {
         'message': 'Please use equivalent material-icons '
-                    'instead of glyphicons.',
+                   'instead of glyphicons.',
         'excluded_files': ()}
 }
 
