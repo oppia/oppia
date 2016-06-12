@@ -52,7 +52,7 @@ oppia.factory('CollectionValidationService', [
       }
 
       return collection.getExplorationIds().filter(function(explorationId) {
-        return completedExpIds.indexOf(explorationId) == -1;
+        return completedExpIds.indexOf(explorationId) === -1;
       });
     };
 
@@ -84,7 +84,7 @@ oppia.factory('CollectionValidationService', [
       }
 
       var startingExpIds = _getStartingExplorationIds(collection);
-      if (collectionHasNodes && startingExpIds.length != 1) {
+      if (collectionHasNodes && startingExpIds.length !== 1) {
         issues.push(
           'There should be exactly 1 exploration initially available to the ' +
           'learner.');
@@ -101,14 +101,14 @@ oppia.factory('CollectionValidationService', [
       });
 
       var unreachableExpIds = _getUnreachableExplorationIds(collection);
-      if (unreachableExpIds.length != 0) {
+      if (unreachableExpIds.length !== 0) {
         issues.push(
           'The following exploration(s) are unreachable from the initial ' +
           'exploration(s): ' + unreachableExpIds.join(', '));
       }
 
       var nonexistentExpIds = _getNonexistentExplorationIds(collection);
-      if (nonexistentExpIds.length != 0) {
+      if (nonexistentExpIds.length !== 0) {
         issues.push(
           'The following exploration(s) either do not exist, or you do not ' +
           'have edit access to add them to this collection: ' +
@@ -117,7 +117,7 @@ oppia.factory('CollectionValidationService', [
 
       if (isPublic) {
         var privateExpIds = _getPrivateExplorationIds(collection);
-        if (privateExpIds.length != 0) {
+        if (privateExpIds.length !== 0) {
           issues.push(
             'Private explorations cannot be added to a public collection: ' +
             privateExpIds.join(', '));

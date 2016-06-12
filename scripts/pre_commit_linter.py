@@ -74,15 +74,34 @@ _EXCLUSIVE_GROUP.add_argument(
     action='store')
 
 BAD_PATTERNS = {
-    '__author__': (
-        'Please remove author tags from this file.'),
-    'datetime.datetime.now()': (
-        'Please use datetime.datetime.utcnow() instead of'
-        'datetime.datetime.now().'),
-    '\t': (
-        'Please use spaces instead of tabs.'),
-    '\r': (
-        'Please make sure all files only have LF endings (no CRLF).')
+    '__author__': {
+        'message': 'Please remove author tags from this file.',
+        'excluded_files': ()},
+    'datetime.datetime.now()': {
+        'message': 'Please use datetime.datetime.utcnow() instead of'
+                   'datetime.datetime.now().',
+        'excluded_files': ()},
+    '\t': {
+        'message': 'Please use spaces instead of tabs.',
+        'excluded_files': ()},
+    '\r': {
+        'message': 'Please make sure all files only have LF endings (no CRLF).',
+        'excluded_files': ()}
+}
+
+BAD_PATTERNS_JS = {
+    ' == ': {
+        'message': 'Please replace == with === in this file.',
+        'excluded_files': (
+            'core/templates/dev/head/expressions/parserSpec.js',
+            'core/templates/dev/head/expressions/evaluatorSpec.js',
+            'core/templates/dev/head/expressions/typeParserSpec.js')},
+    ' != ': {
+        'message': 'Please replace != with !== in this file.',
+        'excluded_files': (
+            'core/templates/dev/head/expressions/parserSpec.js',
+            'core/templates/dev/head/expressions/evaluatorSpec.js',
+            'core/templates/dev/head/expressions/typeParserSpec.js')}
 }
 
 EXCLUDED_PATHS = (
@@ -379,17 +398,30 @@ def _check_bad_patterns(all_files):
     all_files = [
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
+    all_js_files = [
+        filename for filename in all_files if filename.endswith('.js')]
     failed = False
     for filename in all_files:
         with open(filename) as f:
             content = f.read()
             total_files_checked += 1
             for pattern in BAD_PATTERNS:
-                if pattern in content:
+                if pattern in content and filename not in (
+                        BAD_PATTERNS[pattern]['excluded_files']):
                     failed = True
                     print '%s --> %s' % (
-                        filename, BAD_PATTERNS[pattern])
+                        filename, BAD_PATTERNS[pattern]['message'])
                     total_error_count += 1
+            if filename in all_js_files:
+                for pattern in BAD_PATTERNS_JS:
+                    if filename not in (
+                            BAD_PATTERNS_JS[pattern]['excluded_files']):
+                        if pattern in content:
+                            failed = True
+                            print '%s --> %s' % (
+                                filename,
+                                BAD_PATTERNS_JS[pattern]['message'])
+                            total_error_count += 1
     if failed:
         summary_message = '%s   Pattern checks failed' % _MESSAGE_TYPE_FAILED
         summary_messages.append(summary_message)

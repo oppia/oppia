@@ -72,7 +72,7 @@ oppia.factory('alertsService', ['$log', function($log) {
     var warnings = alertsService.warnings;
     var newWarnings = [];
     for (var i = 0; i < warnings.length; i++) {
-      if (warnings[i].content != warningObject.content) {
+      if (warnings[i].content !== warningObject.content) {
         newWarnings.push(warnings[i]);
       }
     }
@@ -109,8 +109,8 @@ oppia.factory('alertsService', ['$log', function($log) {
     var messages = alertsService.messages;
     var newMessages = [];
     for (var i = 0; i < messages.length; i++) {
-      if (messages[i].type != messageObject.type ||
-          messages[i].content != messageObject.content) {
+      if (messages[i].type !== messageObject.type ||
+          messages[i].content !== messageObject.content) {
         newMessages.push(messages[i]);
       }
     }
