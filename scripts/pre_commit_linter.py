@@ -89,7 +89,8 @@ BAD_PATTERNS = {
         'message': 'Please make sure all files only have LF endings (no CRLF).',
         'excluded_files': ()},
     'glyphicon': {
-        'message': 'Please use equivalent material-icons instead of glyphicons.',
+        'message': 'Please use equivalent material-icons '
+                    'instead of glyphicons.',
         'excluded_files': ()}
 }
 
