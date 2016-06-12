@@ -209,3 +209,10 @@ class SuggestionListHandler(base.BaseHandler):
 
         self.values.update({'threads': [t.to_dict() for t in threads]})
         self.render_json(self.values)
+
+
+class UnsentFeedbackEmailHandler(base.BaseHandler):
+    """Handler task of sending emails of feedback messages.
+    This is yet to be implemented."""
+    def post(self):
+        pass

@@ -18,9 +18,9 @@ from core.domain import feedback_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
+import feconf
 
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
-
 
 class FeedbackServicesUnitTests(test_utils.GenericTestBase):
     """Test functions in feedback_services."""
@@ -244,3 +244,18 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         self.assertEqual(2, len(threads))
         self.assertDictContainsSubset(expected_thread_dict,
                                       threads[1].to_dict())
+
+
+class EmailsTaskqueueTests(test_utils.GenericTestBase):
+    """Tests for tasks in emails taskqueue."""
+
+    def test_create_new_task(self):
+        user_id = 'user'
+        feedback_services.enqueue_feedback_message_email_task(user_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(), 1)
+
+        tasks = self.get_pending_tasks()
+        self.assertEqual(
+            tasks[0].url, feconf.FEEDBACK_MESSAGE_EMAIL_HANDLER_URL)
+        self.process_and_flush_pending_tasks()

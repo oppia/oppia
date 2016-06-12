@@ -79,11 +79,11 @@ oppia.factory('expressionEvaluatorService', [
       // nodes are JavaScript primitives (as described in the "Parser output"
       // section of parser.pegjs).
       if (parsed instanceof Array) {
-        if (parsed.length == 0) {
+        if (parsed.length === 0) {
           throw 'Parser generated an intermediate node with zero children';
         }
 
-        if (parsed[0] == '#') {
+        if (parsed[0] === '#') {
           return expressionSyntaxTreeService.lookupEnvs(parsed[1], envs);
         }
 
@@ -122,7 +122,7 @@ oppia.factory('expressionEvaluatorService', [
         return true;
       }
 
-      if (parsed.length == 0) {
+      if (parsed.length === 0) {
         // This should not happen.
         return false;
       }
@@ -137,7 +137,7 @@ oppia.factory('expressionEvaluatorService', [
 
       // If it is a name look up, make sure the name exists.
       // TODO: Validate args for other operators.
-      if (parsed[0] == '#') {
+      if (parsed[0] === '#') {
         expressionSyntaxTreeService.lookupEnvs(parsed[1], envs);
       }
       return true;

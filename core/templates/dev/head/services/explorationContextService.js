@@ -72,8 +72,8 @@ oppia.factory('explorationContextService', [
       },
 
       isInExplorationContext: function() {
-        return (this.getPageContext() == PAGE_CONTEXT.EDITOR ||
-          this.getPageContext() == PAGE_CONTEXT.LEARNER);
+        return (this.getPageContext() === PAGE_CONTEXT.EDITOR ||
+          this.getPageContext() === PAGE_CONTEXT.LEARNER);
       },
 
       // Returns a string representing the explorationId (obtained from the

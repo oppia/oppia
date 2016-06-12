@@ -1,5 +1,5 @@
 var argv = require('yargs').argv;
-var isMinificationNeeded = (argv.minify == 'True');
+var isMinificationNeeded = (argv.minify === 'True');
 var generatedJs = 'third_party/generated/dev/js/third_party.js';
 if (isMinificationNeeded) {
   generatedJs = 'third_party/generated/prod/js/third_party.min.js';

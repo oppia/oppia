@@ -36,7 +36,7 @@
           ng-class="{'oppia-dashboard-row-recent': lastSeenMsec && lastSeenMsec < notification.last_updated_ms && notification.author_username !== currentUsername}" ng-click="navigateToItem(notification.activity_id, notification.type)">
           <div class="oppia-notification-content">
             <span class="oppia-notification-type">
-              <span ng-if="notification.type === 'feedback_thread'" 
+              <span ng-if="notification.type === 'feedback_thread'"
                     title="Feedback thread">
                 <i class="material-icons">&#xE0B9;</i>
               </span>
