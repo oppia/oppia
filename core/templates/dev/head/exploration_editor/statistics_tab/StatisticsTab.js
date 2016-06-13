@@ -99,9 +99,9 @@ oppia.controller('StatisticsTab', [
 
         $scope.highlightStates = {};
         improvements.forEach(function(impItem) {
-          if (impItem.type == 'default') {
+          if (impItem.type === 'default') {
             $scope.highlightStates[impItem.state_name] = 'Needs more feedback';
-          } else if (impItem.type == 'incomplete') {
+          } else if (impItem.type === 'incomplete') {
             $scope.highlightStates[impItem.state_name] = 'May be confusing';
           }
         });
@@ -150,7 +150,7 @@ oppia.controller('StatisticsTab', [
               $scope.rulesStats = rulesStats;
 
               $scope.getNumTimesString = function(numberOfTimes) {
-                var suffix = (numberOfTimes == 1 ? ' time' : ' times');
+                var suffix = (numberOfTimes === 1 ? ' time' : ' times');
                 return numberOfTimes + suffix;
               };
 

@@ -270,32 +270,32 @@ oppia.factory('codeReplRulesService', [
         codeNormalizationService.getNormalizedCode(answer.code);
       var normalizedExpectedCode =
         codeNormalizationService.getNormalizedCode(inputs.x);
-      return normalizedCode == normalizedExpectedCode;
+      return normalizedCode === normalizedExpectedCode;
     },
     CodeContains: function(answer, inputs) {
       var normalizedCode =
         codeNormalizationService.getNormalizedCode(answer.code);
       var normalizedSnippet =
         codeNormalizationService.getNormalizedCode(inputs.x);
-      return normalizedCode.indexOf(normalizedSnippet) != -1;
+      return normalizedCode.indexOf(normalizedSnippet) !== -1;
     },
     CodeDoesNotContain: function(answer, inputs) {
       var normalizedCode =
         codeNormalizationService.getNormalizedCode(answer.code);
       var normalizedSnippet =
         codeNormalizationService.getNormalizedCode(inputs.x);
-      return normalizedCode.indexOf(normalizedSnippet) == -1;
+      return normalizedCode.indexOf(normalizedSnippet) === -1;
     },
     OutputContains: function(answer, inputs) {
       var normalizedOutput = $filter('normalizeWhitespace')(answer.output);
       var normalizedSnippet = $filter('normalizeWhitespace')(inputs.x);
-      return normalizedOutput.indexOf(normalizedSnippet) != -1;
+      return normalizedOutput.indexOf(normalizedSnippet) !== -1;
     },
     OutputEquals: function(answer, inputs) {
       var normalizedOutput = $filter('normalizeWhitespace')(answer.output);
       var normalizedExpectedOutput =
         $filter('normalizeWhitespace')(inputs.x);
-      return normalizedOutput == normalizedExpectedOutput;
+      return normalizedOutput === normalizedExpectedOutput;
     },
     ResultsInError: function(answer) {
       return !!(answer.error.trim());
@@ -303,7 +303,7 @@ oppia.factory('codeReplRulesService', [
     ErrorContains: function(answer, inputs) {
       var normalizedError = $filter('normalizeWhitespace')(answer.error);
       var normalizedSnippet = $filter('normalizeWhitespace')(inputs.x);
-      return normalizedError.indexOf(normalizedSnippet) != -1;
+      return normalizedError.indexOf(normalizedSnippet) !== -1;
     }
   };
 }]);

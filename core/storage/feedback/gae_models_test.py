@@ -107,3 +107,25 @@ class SuggestionModelTest(test_utils.GenericTestBase):
                 'invalid_exp_id', 'thread_id1'))
 
         self.assertIsNone(actual_suggestion)
+
+
+class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):
+    """Tests for FeedbackMessageEmailDataModel class"""
+
+    def test_new_instances_stores_correct_data(self):
+        user_id = 'A'
+        feedback_messages_dict = {
+            'exploration_id': 'ABC123',
+            'thread_id': 'thread_id1',
+            'message_id': 'message_id1'
+        }
+        email_instance = feedback_models.UnsentFeedbackEmailModel(
+            id=user_id, feedback_messages=[feedback_messages_dict])
+        email_instance.put()
+
+        retrieved_instance = (
+            feedback_models.UnsentFeedbackEmailModel.get_by_id(id=user_id))
+
+        self.assertEqual(
+            retrieved_instance.feedback_messages, [feedback_messages_dict])
+        self.assertEqual(retrieved_instance.retries, 0)

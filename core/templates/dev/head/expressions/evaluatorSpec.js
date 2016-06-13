@@ -65,7 +65,7 @@ describe('Expression evaluator service', function() {
       var expectedParams = test[1];
 
       var parsed = (
-        typeof expression == 'string' ? eps.parse(expression) : expression);
+        typeof expression === 'string' ? eps.parse(expression) : expression);
       var parsedJson = JSON.stringify(parsed);
       var failed = false;
 
@@ -129,7 +129,7 @@ describe('Expression evaluator service', function() {
       // 'expression' is either a string (in which case parsed) or an array
       // (representing a parse tree).
       var parsed = (
-        typeof expression == 'string' ? eps.parse(expression) : expression);
+        typeof expression === 'string' ? eps.parse(expression) : expression);
       var parsedJson = JSON.stringify(parsed);
       var failed = false;
 
@@ -160,7 +160,7 @@ describe('Expression evaluator service', function() {
       }
       expect(failed).toBe(false);
 
-      if (typeof expression != 'string') {
+      if (typeof expression !== 'string') {
         return;
       }
 

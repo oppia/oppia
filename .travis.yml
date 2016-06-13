@@ -22,7 +22,8 @@ branches:
 
 env:
   matrix:
-    - RUN_E2E_TESTS_EDITOR=true
+    - RUN_E2E_TESTS_MAIN_EDITOR=true
+    - RUN_E2E_TESTS_EDITOR_FEATURES=true
     - RUN_E2E_TESTS_EXTENSIONS=true
     - RUN_E2E_TESTS_LIBRARY=true
     - RUN_E2E_TESTS_MISC=true
@@ -72,7 +73,8 @@ install:
 - source scripts/setup_gae.sh || exit 1
 
 script:
-- if [ $RUN_E2E_TESTS_EDITOR == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="editor"; fi
+- if [ $RUN_E2E_TESTS_MAIN_EDITOR == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="mainEditor"; fi
+- if [ $RUN_E2E_TESTS_EDITOR_FEATURES == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="editorFeatures"; fi
 - if [ $RUN_E2E_TESTS_EXTENSIONS == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="extensions"; fi
 - if [ $RUN_E2E_TESTS_LIBRARY == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="library"; fi
 - if [ $RUN_E2E_TESTS_MISC == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="misc"; fi

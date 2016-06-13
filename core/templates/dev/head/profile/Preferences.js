@@ -70,7 +70,7 @@ oppia.controller('Preferences', [
       $scope.subjectInterestsChangedAtLeastOnce = true;
       $scope.subjectInterestsWarningText = null;
       $scope.updateSubjectInterestsWarning(subjectInterests);
-      if ($scope.subjectInterestsWarningText == null) {
+      if ($scope.subjectInterestsWarningText === null) {
         _saveDataItem('subject_interests', subjectInterests);
       }
     };

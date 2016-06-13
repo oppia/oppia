@@ -601,13 +601,15 @@ oppia.directive('conversationSkin', [function() {
           $scope.startCardChangeAnimation = true;
 
           $timeout(function() {
+            var newInteractionHtml = oppiaPlayerService.getInteractionHtml(
+              newStateName, _nextFocusLabel);
+            // Note that newInteractionHtml may be null.
+            if (newInteractionHtml) {
+              newInteractionHtml += oppiaPlayerService.getRandomSuffix();
+            }
+
             _addNewCard(
-              newStateName,
-              newParams,
-              newContentHtml,
-              oppiaPlayerService.getInteractionHtml(
-                newStateName, _nextFocusLabel
-              ) + oppiaPlayerService.getRandomSuffix());
+              newStateName, newParams, newContentHtml, newInteractionHtml);
 
             $scope.upcomingStateName = null;
             $scope.upcomingParams = null;
@@ -632,7 +634,7 @@ oppia.directive('conversationSkin', [function() {
           $timeout(function() {
             var tutorCard = $('.conversation-skin-main-tutor-card');
 
-            if (tutorCard.length == 0) {
+            if (tutorCard.length === 0) {
               return;
             }
             var tutorCardBottom = (

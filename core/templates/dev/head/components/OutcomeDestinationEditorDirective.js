@@ -32,7 +32,7 @@ oppia.directive('outcomeDestinationEditor', [function() {
           StateGraphLayoutService, PLACEHOLDER_OUTCOME_DEST, focusService) {
         $scope.$on('saveOutcomeDestDetails', function() {
           // Create new state if specified.
-          if ($scope.outcome.dest == PLACEHOLDER_OUTCOME_DEST) {
+          if ($scope.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
             var newStateName = $scope.outcome.newStateName;
             $scope.outcome.dest = newStateName;
             delete $scope.outcome.newStateName;
@@ -48,7 +48,7 @@ oppia.directive('outcomeDestinationEditor', [function() {
         };
 
         $scope.isCreatingNewState = function(outcome) {
-          return outcome.dest == PLACEHOLDER_OUTCOME_DEST;
+          return outcome.dest === PLACEHOLDER_OUTCOME_DEST;
         };
 
         $scope.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;

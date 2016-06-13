@@ -45,7 +45,7 @@ oppia.factory('gadgetValidationService', [
 
         // Fail early for unrecognized axis. This error should never reach
         // the front-end, but is flagged here for defense-in-depth.
-        if (VALID_AXIS_OPTIONS.indexOf(stackableAxis) == -1) {
+        if (VALID_AXIS_OPTIONS.indexOf(stackableAxis) === -1) {
           var warningText = 'Unrecognized axis: ' + stackableAxis + ' for ' +
             panel + ' panel.';
           alertsService.addWarning(warningText);
@@ -65,7 +65,7 @@ oppia.factory('gadgetValidationService', [
 
           var totalWidth = 0;
           var totalHeight = 0;
-          if (stackableAxis == AXIS_VERTICAL) {
+          if (stackableAxis === AXIS_VERTICAL) {
             // Factor in pixel buffer between gadgets, if multiple gadgets share
             // a panel in the same state.
             totalHeight += currentPanelSpec.pixels_between_gadgets * (
@@ -81,7 +81,7 @@ oppia.factory('gadgetValidationService', [
                 totalWidth = GADGET_SPECS[gadgetType].width_px;
               }
             }
-          } else if (stackableAxis == AXIS_HORIZONTAL) {
+          } else if (stackableAxis === AXIS_HORIZONTAL) {
             totalWidth += currentPanelSpec.pixels_between_gadgets * (
               gadgetInstances.length - 1);
 
