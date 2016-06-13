@@ -495,7 +495,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             self.owner_id).first_contribution_msec)
 
 
-class UpdateContributionTests(test_utils.GenericTestBase):
+class UserDashboardStatsTests(test_utils.GenericTestBase):
     """Test whether exploration-related statistics of a user change as events
     are registered.
     """

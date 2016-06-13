@@ -645,7 +645,7 @@ def get_user_dashboard_stats(user_id):
     total_plays, average_ratings
     """
     model = user_models.UserStatsModel.get(user_id, strict=False)
-    print model
+
     if model is not None:
         return {
             'total_plays': model.total_plays or 0,
