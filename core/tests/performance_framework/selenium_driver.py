@@ -18,7 +18,6 @@ Browsermob-proxy to fetch performance data.
 
 import urlparse
 import os
-from xvfbwrapper import Xvfb
 
 # We need to import browsermob-proxy and selenium. To do so, we need to add
 # add their directories to path.
@@ -27,12 +26,17 @@ OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
 
 DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(OPPIA_TOOLS_DIR, 'browsermob-proxy-0.7.1'),
-    os.path.join(OPPIA_TOOLS_DIR, 'selenium-2.53.2')
+    os.path.join(OPPIA_TOOLS_DIR, 'selenium-2.53.2'),
+    os.path.join(OPPIA_TOOLS_DIR, 'xvfbwrapper-0.2.8')
 ]
 
 # pylint: disable=import-error, wrong-import-position
 from browsermobproxy import Server
 from selenium import webdriver
+
+# Used for headless testing i.e, making browser windows invisible to the user.
+from xvfbwrapper import Xvfb
+# pylint: enable=import-error, wrong-import-position
 
 CHROME_DRIVER_PATH = os.path.join(
     '..', 'node_modules', 'protractor', 'selenium', 'chromedriver_2.21')
