@@ -25,10 +25,12 @@ oppia.controller('Library', [
     $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
     $scope.bannerImageFilename = getRandomBannerImage();
     function getRandomBannerImage() {
-      var possibleBanners = ['banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
-      var cloudBanner = possibleBanners[Math.floor(Math.random() * possibleBanners.length)];
-      return(cloudBanner);
-      }
+      var possibleBanners = ['banner1.svg', 'banner2.svg', 'banner3.svg',
+      'banner4.svg'];
+      var cloudBanner = possibleBanners[Math.floor(Math.random()
+       * possibleBanners.length)];
+      return (cloudBanner);
+    }
 
     // Below is the width of each tile (width + margins), which can be found
     // in core/templates/dev/head/components/
