@@ -246,7 +246,7 @@ body {
 }
 
 /* For issue #1867 (https://github.com/oppia/oppia/issues/1867) 
-   Added "overflow:hidden;"" to this class to fix a problem with the screen 
+   Added "overflow:hidden;" to this class to fix a problem with the screen 
    flickering between 2 and 3 columns when someone hovered over either 
    the rating or the number of views explorations in the second row and 
    on when there are at least four explorations listed. */
