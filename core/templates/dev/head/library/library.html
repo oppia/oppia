@@ -44,15 +44,8 @@
         </div>
 
         <div class="oppia-exp-summary-tiles-container" ng-if="!inSearchMode">
-          <script type="text/javascript">
-            window.onload = chooseCloud;
-            var newCloud = new Array("/images/library/banner1.svg","/images/library/banner2.svg","/images/library/banner3.svg","/images/library/banner4.svg");
-            function chooseCloud(){
-            cloudNum = Math.floor((Math.random() * newCloud.length));
-            document.getElementById("iconCloud").src = newCloud[cloudNum]
-            }
-          </script>
-          <img id="iconCloud" align="center" width="100%">
+          <img ng-src="/images/library/<[bannerImageFilename]>" align="center"
+          width="100%">
           <div style="text-align: center; width: 100%;">
             <h1 class="oppia-library-h1" translate="I18N_LIBRARY_MAIN_HEADER"></h1>
             <h2 class="oppia-library-h2" translate="I18N_LIBRARY_SUB_HEADER"></h2>
