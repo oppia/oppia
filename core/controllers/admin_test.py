@@ -14,7 +14,7 @@
 
 """Tests for the admin page."""
 
-from core.controllers import pages
+from core.controllers import base
 from core.domain import config_domain
 from core.tests import test_utils
 import feconf
@@ -75,13 +75,13 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response_dict = self.get_json('/adminhandler')
         response_config_properties = response_dict['config_properties']
         self.assertDictContainsSubset({
-            'value': pages.MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE,
-        }, response_config_properties[pages.MODERATOR_REQUEST_FORUM_URL.name])
+            'value': '',
+        }, response_config_properties[base.BEFORE_END_HEAD_TAG_HOOK.name])
 
         payload = {
             'action': 'save_config_properties',
             'new_config_property_values': {
-                pages.MODERATOR_REQUEST_FORUM_URL.name: (
+                base.BEFORE_END_HEAD_TAG_HOOK.name: (
                     self.UNICODE_TEST_STRING),
             }
         }
@@ -91,18 +91,16 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response_config_properties = response_dict['config_properties']
         self.assertDictContainsSubset({
             'value': self.UNICODE_TEST_STRING,
-        }, response_config_properties[pages.MODERATOR_REQUEST_FORUM_URL.name])
+        }, response_config_properties[base.BEFORE_END_HEAD_TAG_HOOK.name])
 
         self.logout()
 
     def test_change_about_page_config_property(self):
-        """Test that the correct variables show up on the about page."""
-        new_contact_email = 'test2@example.com'
+        """Test that config property values are changed correctly."""
+        new_config_value = 'new_config_value'
 
-        # Navigate to the about page. The site name is not set.
         response = self.testapp.get('/about')
-        self.assertIn('CONTACT_EMAIL_ADDRESS', response.body)
-        self.assertNotIn(new_contact_email, response.body)
+        self.assertNotIn(new_config_value, response.body)
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.testapp.get('/admin')
@@ -110,15 +108,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.post_json('/adminhandler', {
             'action': 'save_config_properties',
             'new_config_property_values': {
-                pages.CONTACT_EMAIL_ADDRESS.name: new_contact_email
+                base.BEFORE_END_HEAD_TAG_HOOK.name: new_config_value
             }
         }, csrf_token)
-        self.logout()
 
-        # Navigate to the splash page. The site name is set.
         response = self.testapp.get('/about')
-        self.assertNotIn('CONTACT_EMAIL_ADDRESS', response.body)
-        self.assertIn(new_contact_email, response.body)
+        self.assertIn(new_config_value, response.body)
 
     def test_change_rights(self):
         """Test that the correct role indicators show up on app pages."""
