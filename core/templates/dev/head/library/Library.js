@@ -27,8 +27,8 @@ oppia.controller('Library', [
     function getRandomBannerImage() {
       var possibleBanners = ['banner1.svg', 'banner2.svg', 'banner3.svg',
       'banner4.svg'];
-      var cloudBanner = possibleBanners[Math.floor(Math.random()
-       * possibleBanners.length)];
+      var cloudBanner = possibleBanners[Math.floor(Math.random() *
+        possibleBanners.length)];
       return (cloudBanner);
     }
 
