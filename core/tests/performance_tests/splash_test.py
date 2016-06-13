@@ -15,29 +15,34 @@
 """Tests for the splash page"""
 
 import unittest
-from test_utils import TestBase
+import os
+import sys
+
+CURR_DIR = os.path.abspath(os.getcwd())
+sys.path.insert(0, os.path.join(CURR_DIR))
+
+from core.tests.performance_tests import base
 
 
-class SplashPageTest(TestBase):
-    """Tests for `splash page`."""
+class SplashPagePerformanceTest(base.TestBase):
+    """Tests for the splash page."""
 
     def setUp(self):
-        super(SplashPageTest, self).setUp()
+        super(SplashPagePerformanceTest, self).setUp()
         splash_url = 'http://localhost:8181/splash'
 
-        self._set_har(splash_url)
-        self._set_timings(splash_url)
-        self._fetch_stats()
-
-        self.page_timings = self.process_data.result['timings']
+        self._set_page_session_stats(splash_url)
+        self._set_page_session_timings(splash_url)
+        self._set_stats()
 
     def test_splash_page_metrics(self):
         """Test metrics for splash page."""
         #Is total size below 10,000,000 in bytes.
-        self.assertLessEqual(self.process_data.result['total_size'], 10000000)
+        self.assertLessEqual(
+            self.page_metrics.get_total_page_size_bytes(), 10000000)
 
-        #Is page load time below 3 secs.
-        self.assertLessEqual(self.page_timings['load_time'], 5)
+        #Is page load time below 5 secs.
+        self.assertLessEqual(self.page_metrics.get_page_load_time_secs(), 5)
 
 
 if __name__ == '__main__':

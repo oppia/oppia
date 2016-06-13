@@ -12,82 +12,100 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Script to process HAR data and timing data"""
+"""Script to process page loading stats or HTTP Archive(also referred to as HAR)
+data and/or timing stats to obtain stats/metrics for the corresponding page.
 
-import datetime
-import dateutil.relativedelta
+We need selenium + browsermob-proxy to capture page loading session
+(or HTTP Archive), to obtain page size stats. However, owing to the sluggish
+nature of the proxy server, timing stats are not accurate.
+Hence, we have separate timing stats which are obtained without making
+use of the proxy, directly from the browser console.
+"""
 
 
-class ProcessData(object):
-    """Class that contains methods to process data and get us metrics"""
+class PageSessionMetricsRetriever(object):
+    """Contains methods to process stats and provide performance metrics.
 
-    def __init__(self, har=None, timings=None):
-        self.har = har
-        self.timings = timings
-        self.page_load_timings = None
-        self.result = {
-            'no_requests': -1,
-            'total_size': -1, #in bytes
-            'timings': {
-                'load_time': -1,
-                'dom_ready_time': -1,
-                'request_time': -1
-            }
+    page_session_stats if a dictionary containing page load statistics or
+    HTTP Archive (HAR).
+    Refer: https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/HAR/Overview.html
+
+    page_session_timings is a dictionary containing various timings associated
+    with a page load like request time, dom load time, etc.
+    Structure:
+        {
+          "webkitClearResourceTimings": {},
+          "memory": {...},
+          "timing": {
+            "domLoading": 1465470586738,
+            "fetchStart": 1465470583251,
+          }
         }
+    """
 
-    def get_stats(self):
-        """Call all the methods"""
-        self.result['no_requests'] = self._get_no_requests()
-        self.result['total_size'] = self._get_total_size()
-        self.result['timings'] = self._get_timings(self.result['timings'])
+    def __init__(self, page_session_stats, page_session_timings):
+        self.page_session_stats = page_session_stats
+        self.page_session_timings = page_session_timings
 
-    def _get_no_requests(self):
-        no_requests = 0
+        self.page_load_timings = {}
+        if 'timing' not in self.page_session_timings:
+            raise ValueError
 
-        if 'log' in self.har:
-            if 'entries' in self.har['log']:
-                no_requests = len(self.har['log']['entries'])
+        self.page_load_timings = page_session_timings['timing']
 
-        return no_requests
+    def get_request_count(self):
+        """Return no of requests made for the page load."""
+        request_count = 0
 
-    def _get_total_size(self):
+        if 'log' in self.page_session_stats:
+            if 'entries' in self.page_session_stats['log']:
+                request_count = len(self.page_session_stats['log']['entries'])
+
+        return request_count
+
+    def get_total_page_size_bytes(self):
+        """Return total page size which includes the size of all resources
+        for a page.
+        """
         total_size = 0
 
-        for entry in self.har['log']['entries']:
+        for entry in self.page_session_stats['log']['entries']:
             total_size += int(entry['response']['bodySize'])
 
         return total_size
 
-    def _get_delta(self, event_end, event_initial):
-        return get_diff(self.page_load_timings[event_initial]/1000.0,
-                        self.page_load_timings[event_end]/1000.0)
+    def _get_duration_secs(self, event_end, event_initial):
+        # Check if timestamps are seconds or milliseconds.
+        # From: http://goo.gl/iHNYWx
+        if event_initial not in self.page_load_timings:
+            raise ValueError
 
-    def _get_timings(self, options):
-        # If self.timings is not set, this is the case where
-        # only the har is available. So, get timings from har file.
-        if self.timings is None:
-            return
+        initial_timestamp = self.page_load_timings[event_initial]
 
-        self.page_load_timings = self.timings['timing']
-        for key in options:
-            time_delta = -1
+        if event_end not in self.page_load_timings:
+            raise ValueError
 
-            if key == 'load_time':
-                time_delta = self._get_delta('loadEventEnd', 'fetchStart')
-            elif key == 'dom_ready_time':
-                time_delta = self._get_delta('domComplete', 'domInteractive')
-            elif key == 'request_time':
-                time_delta = self._get_delta('responseEnd', 'requestStart')
+        end_timestamp = self.page_load_timings[event_end]
 
-            options[key] = time_delta
+        # If milliseconds convert to seconds.
+        if len(str(initial_timestamp)) >= 13:
+            initial_timestamp /= 1000000.0
 
-        return options
+        if len(str(end_timestamp)) >= 13:
+            end_timestamp /= 1000000.0
 
+        duration_secs = end_timestamp - initial_timestamp
 
-def get_diff(epoch_initial, epoch_end):
-    """Get seconds"""
-    dt1 = datetime.datetime.fromtimestamp(epoch_initial) # 1973-11-29 22:33:09
-    dt2 = datetime.datetime.fromtimestamp(epoch_end) # 1977-06-07 23:44:50
-    dt_diff = dateutil.relativedelta.relativedelta(dt2, dt1)
+        return duration_secs
 
-    return dt_diff.minutes*60 + dt_diff.seconds + dt_diff.microseconds/1000000
+    def get_page_load_time_secs(self):
+        """Return total page load time"""
+        return self._get_duration_secs('loadEventEnd', 'fetchStart')
+
+    def get_dom_ready_time_secs(self):
+        """Return dom ready time"""
+        return self._get_duration_secs('domComplete', 'domInteractive')
+
+    def get_request_time_secs(self):
+        """Return time required to make requests"""
+        return self._get_duration_secs('responseEnd', 'requestStart')
