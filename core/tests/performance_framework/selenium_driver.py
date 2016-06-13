@@ -30,6 +30,7 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(OPPIA_TOOLS_DIR, 'selenium-2.53.2')
 ]
 
+# pylint: disable=import-error, wrong-import-position
 from browsermobproxy import Server
 from selenium import webdriver
 

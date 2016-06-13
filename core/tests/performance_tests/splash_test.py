@@ -21,6 +21,7 @@ import sys
 CURR_DIR = os.path.abspath(os.getcwd())
 sys.path.insert(0, os.path.join(CURR_DIR))
 
+# pylint: disable=import-error, wrong-import-position
 from core.tests.performance_tests import base
 
 
@@ -35,13 +36,13 @@ class SplashPagePerformanceTest(base.TestBase):
         self._set_page_session_timings(splash_url)
         self._set_stats()
 
-    def test_splash_page_metrics(self):
-        """Test metrics for splash page."""
-        #Is total size below 10,000,000 in bytes.
+    def test_splash_page_has_less_than_10_megabytes_sent_to_the_client(self):
+        """"Is total size below 10,000,000 in bytes."""
         self.assertLessEqual(
             self.page_metrics.get_total_page_size_bytes(), 10000000)
 
-        #Is page load time below 5 secs.
+    def test_splash_page_loads_under_5_seconds(self):
+        """Is page load time below 5 secs."""
         self.assertLessEqual(self.page_metrics.get_page_load_time_secs(), 5)
 
 
