@@ -98,12 +98,64 @@ class SeleniumPerformanceDataFetcher(object):
 
         return har_dict
 
+    def get_har_dict_cached_state(self, page_url):
+        """Retrieve HTTP Archive (HAR) or page session stats for a page URL
+        while simulating a cached state i.e, a return user.
+
+        To get it we require the use of a proxy server as we need to record the
+        communication between server and client.
+        """
+        # pylint: disable=unused-variable
+        with Xvfb() as xvfb:
+        # pylint: enable=unused-variable
+            self._setup_proxy()
+            self._setup_driver(use_proxy=True)
+
+            # Fetch the page once. This leads to caching of various resources.
+            self.driver.get(page_url)
+
+            # Start recording har data for the next page fetch.
+            self.proxy.new_har(page_url, options={'captureHeaders': True})
+            self.driver.get(page_url)
+
+        har_dict = self.proxy.har
+
+        self._clear_proxy()
+        self._clear_driver()
+
+        return har_dict
+
     def get_page_session_timings(self, page_url):
         """Retrieve page load timings for a page URL."""
         # pylint: disable=unused-variable
         with Xvfb() as xvfb:
         # pylint: enable=unused-variable
             self._setup_driver(use_proxy=False)
+
+            self.driver.get(page_url)
+
+            # To get entries for all the resources we can use:
+            #   driver.execute_script("return window.performance.getEntries();")
+            # To get only the timing we can use:
+            #   driver.execute_script("return window.performance.timing;")
+            page_session_timings = (
+                self.driver.execute_script("return window.performance"))
+
+        self._clear_driver()
+
+        return page_session_timings
+
+    def get_page_session_timings_cached_state(self, page_url):
+        """Retrieve page load timings for a page URL while simulating a
+        cached state i.e, a return user.
+        """
+        # pylint: disable=unused-variable
+        with Xvfb() as xvfb:
+        # pylint: enable=unused-variable
+            self._setup_driver(use_proxy=False)
+
+            # Fetch the page once. This leads to caching of various resources.
+            self.driver.get(page_url)
 
             self.driver.get(page_url)
 

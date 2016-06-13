@@ -49,7 +49,7 @@ class PageSessionMetricsRetriever(object):
 
         self.page_load_timings = {}
         if 'timing' not in self.page_session_timings:
-            raise ValueError
+            raise ValueError('page_session_timings missing key: timing')
 
         self.page_load_timings = page_session_timings['timing']
 
@@ -72,27 +72,32 @@ class PageSessionMetricsRetriever(object):
         for entry in self.page_session_stats['log']['entries']:
             total_size += int(entry['response']['bodySize'])
 
+        print 'total_size: ', total_size
+
+        if total_size < 0:
+            raise Exception('Total page size cannot be negative.')
+
         return total_size
 
     def _get_duration_secs(self, event_end, event_initial):
         # Check if timestamps are seconds or milliseconds.
         # From: http://goo.gl/iHNYWx
         if event_initial not in self.page_load_timings:
-            raise ValueError
+            raise ValueError('page_load_timings missing key: %s' %event_initial)
 
         initial_timestamp = self.page_load_timings[event_initial]
 
         if event_end not in self.page_load_timings:
-            raise ValueError
+            raise ValueError('page_load_timings missing key: %s' %event_end)
 
         end_timestamp = self.page_load_timings[event_end]
 
         # If milliseconds convert to seconds.
         if len(str(initial_timestamp)) >= 13:
-            initial_timestamp /= 1000000.0
+            initial_timestamp /= 1000.0
 
         if len(str(end_timestamp)) >= 13:
-            end_timestamp /= 1000000.0
+            end_timestamp /= 1000.0
 
         duration_secs = end_timestamp - initial_timestamp
 
@@ -100,6 +105,7 @@ class PageSessionMetricsRetriever(object):
 
     def get_page_load_time_secs(self):
         """Return total page load time"""
+        print self._get_duration_secs('loadEventEnd', 'fetchStart')
         return self._get_duration_secs('loadEventEnd', 'fetchStart')
 
     def get_dom_ready_time_secs(self):

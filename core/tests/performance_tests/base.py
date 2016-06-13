@@ -29,20 +29,22 @@ class TestBase(unittest.TestCase):
     """Base class for performance tests."""
 
     def setUp(self):
-        self.selenium_data_fetcher = selenium_data_fetcher(browser='chrome')
-        self.page_session_stats = None
-        self.page_session_timings = None
+        self.data_fetcher = selenium_data_fetcher(browser='chrome')
         self.page_metrics = None
 
-    def _set_page_session_stats(self, page_url):
-        self.page_session_stats = (
-            self.selenium_data_fetcher.get_har_dict(page_url))
+    def _get_page_session_stats(self, page_url):
+        return self.data_fetcher.get_har_dict(page_url)
 
-    def _set_page_session_timings(self, page_url):
-        self.page_session_timings = (
-            self.selenium_data_fetcher.get_page_session_timings(page_url))
+    def _get_page_session_timings(self, page_url):
+        return self.data_fetcher.get_page_session_timings(page_url)
 
-    def _set_stats(self):
+    def _get_page_stats_cached_state(self, page_url):
+        return self.data_fetcher.get_har_dict_cached_state(page_url)
+
+    def _get_page_timings_cached_state(self, page_url):
+        return self.data_fetcher.get_page_session_timings_cached_state(page_url)
+
+    def _set_stats(self, page_stats, page_timings):
         self.page_metrics = page_metrics_retriever(
-            page_session_stats=self.page_session_stats,
-            page_session_timings=self.page_session_timings)
+            page_session_stats=page_stats,
+            page_session_timings=page_timings)
