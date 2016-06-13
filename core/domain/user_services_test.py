@@ -507,7 +507,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
     USER_SESSION_ID = 'session1'
 
     def setUp(self):
-        super(UpdateContributionTests, self).setUp()
+        super(UserDashboardStatsTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
