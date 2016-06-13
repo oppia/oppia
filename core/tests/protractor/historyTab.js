@@ -37,7 +37,6 @@ describe('Exploration history', function() {
     var COLOR_RENAMED_UNCHANGED = 'rgb(255, 215, 0)';
 
     // Check renaming state, editing text, editing interactions and adding state
-    editor.moveToState(general.FIRST_STATE_DEFAULT_NAME);
     editor.setStateName('first');
     editor.setContent(forms.toRichText('enter 6 to continue'));
     editor.setInteraction('NumericInput');
