@@ -70,10 +70,6 @@ class SeleniumPerformanceDataFetcher(object):
 
         self.server = self.driver = self.proxy = None
 
-    def check_valid_url(self, page_url):
-        """Check if the url specified is valid."""
-        pass
-
     def get_har_dict(self, page_url):
         """Retrieve HTTP Archive (HAR) or page session stats for a page URL.
 
@@ -85,8 +81,6 @@ class SeleniumPerformanceDataFetcher(object):
         # pylint: enable=unused-variable
             self._setup_proxy()
             self._setup_driver(use_proxy=True)
-
-            self.check_valid_url(page_url)
 
             self.proxy.new_har(page_url, options={'captureHeaders': True})
 
@@ -105,8 +99,6 @@ class SeleniumPerformanceDataFetcher(object):
         with Xvfb() as xvfb:
         # pylint: enable=unused-variable
             self._setup_driver(use_proxy=False)
-
-            self.check_valid_url(page_url)
 
             self.driver.get(page_url)
 
