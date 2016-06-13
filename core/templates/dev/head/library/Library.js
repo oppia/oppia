@@ -26,7 +26,7 @@ oppia.controller('Library', [
     var possibleBanners = ['banner1.svg', 'banner2.svg', 'banner3.svg',
     'banner4.svg'];
     $scope.bannerImageFilename = possibleBanners[Math.floor(Math.random() *
-    possibleBanners.length)]
+    possibleBanners.length)];
 
     // Below is the width of each tile (width + margins), which can be found
     // in core/templates/dev/head/components/
