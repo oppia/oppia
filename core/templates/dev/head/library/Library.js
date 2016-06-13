@@ -23,10 +23,10 @@ oppia.controller('Library', [
       $scope, $http, $rootScope, $window, $timeout, i18nIdService,
       urlService, CATEGORY_LIST, searchService, windowDimensionsService) {
     $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
-      var possibleBannerFilenames = [
-        'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
-          $scope.bannerImageFilename = possibleBannerFilenames[
-            Math.floor(Math.random() * possibleBannerFilenames.length)];
+    var possibleBannerFilenames = [
+      'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
+    $scope.bannerImageFilename = possibleBannerFilenames[
+      Math.floor(Math.random() * possibleBannerFilenames.length)];
 
     // Below is the width of each tile (width + margins), which can be found
     // in core/templates/dev/head/components/
