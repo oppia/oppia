@@ -138,6 +138,9 @@ class DashboardPage(base.BaseHandler):
 class DashboardHandler(base.BaseHandler):
     """Provides data for the user's creator dashboard page."""
 
+    # Count num_plays for all versions
+    VERSION_ALL = 'all'
+
     def get(self):
         """Handles GET requests."""
         if self.user_id is None:
@@ -168,7 +171,7 @@ class DashboardHandler(base.BaseHandler):
             feedback_thread_analytics = feedback_services.get_thread_analytics(
                 exp_summary.id)
             exp_stats = stats_services.get_exploration_stats(
-                exp_summary.id, 'all')
+                exp_summary.id, self.VERSION_ALL)
             # TODO(sll): Reuse _get_displayable_exp_summary_dicts() in
             # summary_services, instead of replicating it like this.
             explorations_list.append({
@@ -231,7 +234,7 @@ class DashboardHandler(base.BaseHandler):
         self.values.update({
             'explorations_list': explorations_list,
             'collections_list': collections_list,
-            'weekly_dashboard_stats': user_services.get_user_dashboard_stats(
+            'dashboard_stats': user_services.get_user_dashboard_stats(
                 self.user_id)
         })
         self.render_json(self.values)
