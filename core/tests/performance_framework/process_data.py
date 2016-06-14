@@ -61,6 +61,9 @@ class PageSessionMetricsRetriever(object):
             if 'entries' in self.page_session_stats['log']:
                 request_count = len(self.page_session_stats['log']['entries'])
 
+        if request_count == 0:
+            raise Exception('Total requests cannot be 0.')
+
         return request_count
 
     def get_total_page_size_bytes(self):
@@ -69,13 +72,13 @@ class PageSessionMetricsRetriever(object):
         """
         total_size = 0
 
-        for entry in self.page_session_stats['log']['entries']:
-            total_size += int(entry['response']['bodySize'])
+        if 'log' in self.page_session_stats:
+            if 'entries' in self.page_session_stats['log']:
+                for entry in self.page_session_stats['log']['entries']:
+                    total_size += int(entry['response']['bodySize'])
 
-        print 'total_size: ', total_size
-
-        if total_size < 0:
-            raise Exception('Total page size cannot be negative.')
+        if total_size <= 0:
+            raise Exception('Total page size should be positive.')
 
         return total_size
 
@@ -83,12 +86,14 @@ class PageSessionMetricsRetriever(object):
         # Check if timestamps are seconds or milliseconds.
         # From: http://goo.gl/iHNYWx
         if event_initial not in self.page_load_timings:
-            raise ValueError('page_load_timings missing key: %s' %event_initial)
+            error_msg = 'page_load_timings missing key: %s' % event_initial
+            raise ValueError(error_msg)
 
         initial_timestamp = self.page_load_timings[event_initial]
 
         if event_end not in self.page_load_timings:
-            raise ValueError('page_load_timings missing key: %s' %event_end)
+            error_msg = 'page_load_timings missing key: %s' % event_end
+            raise ValueError(error_msg)
 
         end_timestamp = self.page_load_timings[event_end]
 
@@ -101,11 +106,17 @@ class PageSessionMetricsRetriever(object):
 
         duration_secs = end_timestamp - initial_timestamp
 
+        if duration_secs < 0:
+            error_msg = (
+                'Time duration cannot be negative. Events: %s and %s'
+                % (event_initial, event_end)
+                )
+            raise Exception(error_msg)
+
         return duration_secs
 
     def get_page_load_time_secs(self):
         """Return total page load time"""
-        print self._get_duration_secs('loadEventEnd', 'fetchStart')
         return self._get_duration_secs('loadEventEnd', 'fetchStart')
 
     def get_dom_ready_time_secs(self):

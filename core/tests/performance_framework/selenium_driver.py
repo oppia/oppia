@@ -178,14 +178,24 @@ class SeleniumPerformanceDataFetcher(object):
 
         # The proxy server is pretty sluggish, setting the limits might not
         # achieve the desired behavior.
-        if downstream_kbps and upstream_kbps and latency:
-            self.proxy.limits({
-                'downstream_kbps': downstream_kbps,
-                'upstream_kbps': upstream_kbps,
-                'latency': latency
-            })
+        proxy_options = {}
+
+        if downstream_kbps:
+            proxy_options['downstream_kbps'] = downstream_kbps
+
+        if upstream_kbps:
+            proxy_options['upstream_kbps'] = upstream_kbps
+
+        if latency:
+            proxy_options['latency'] = latency
+
+        if len(proxy_options.items()) > 0:
+            self.proxy.limits(proxy_options)
 
     def _setup_driver(self, use_proxy=False):
+        """Initialize a selenium webdriver instance which helps us
+        programmitically interact with a browser.
+        """
         if self.browser == 'chrome':
             chrome_options = webdriver.ChromeOptions()
             # Disable several subsystems which run network requests in the
@@ -193,7 +203,7 @@ class SeleniumPerformanceDataFetcher(object):
             # testing to avoid noise in the measurements
             chrome_options.add_argument("--disable-background-networking")
 
-            if use_proxy and self.proxy:
+            if use_proxy:
                 proxy_url = urlparse.urlparse(self.proxy.proxy).path
                 proxy_argument = "--proxy-server={0}".format(proxy_url)
                 chrome_options.add_argument(proxy_argument)
@@ -205,7 +215,7 @@ class SeleniumPerformanceDataFetcher(object):
         elif self.browser == 'firefox':
             firefox_profile = webdriver.FirefoxProfile()
 
-            if use_proxy and self.proxy:
+            if use_proxy:
                 firefox_profile.set_proxy(self.proxy.selenium_proxy())
 
             # pylint: disable=redefined-variable-type
