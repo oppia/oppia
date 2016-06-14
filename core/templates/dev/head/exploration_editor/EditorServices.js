@@ -1874,9 +1874,9 @@ oppia.factory('explorationWarningsService', [
       var answerGroups = state.interaction.answer_groups;
       for (var i = 0; i < answerGroups.length; i++) {
         var group = answerGroups[i];
-        if (group.rule_specs.length == 1 &&
-            group.rule_specs[0].rule_type == CLASSIFIER_RULESPEC_STR &&
-            group.rule_specs[0].inputs.training_data.length == 0) {
+        if (group.rule_specs.length === 1 &&
+            group.rule_specs[0].rule_type === CLASSIFIER_RULESPEC_STR &&
+            group.rule_specs[0].inputs.training_data.length === 0) {
           indexes.push(i);
         }
       }
@@ -1999,7 +1999,7 @@ oppia.factory('explorationWarningsService', [
         _getStatesAndAnswerGroupsWithEmptyClassifiers());
       statesWithAnswerGroupsWithEmptyClassifiers.forEach(function(result) {
         var warningMessage = 'In \'' + result.stateName + '\'';
-        if (result.groupIndexes.length != 1) {
+        if (result.groupIndexes.length !== 1) {
           warningMessage += ', the following answer groups have classifiers ';
           warningMessage += 'with no training data: ';
         } else {

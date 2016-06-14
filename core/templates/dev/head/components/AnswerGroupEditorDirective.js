@@ -157,7 +157,7 @@ oppia.directive('answerGroupEditor', [function() {
           var ruleTypes = Object.keys(ruleDescriptions);
           var ruleType = null;
           for (var i = 0; i < ruleTypes.length; i++) {
-            if (ruleTypes[i] != CLASSIFIER_RULESPEC_STR) {
+            if (ruleTypes[i] !== CLASSIFIER_RULESPEC_STR) {
               ruleType = ruleTypes[i];
               break;
             }

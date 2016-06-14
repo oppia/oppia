@@ -512,7 +512,8 @@ oppia.controller('StateResponses', [
                         _state.interaction.answer_groups.length &&
                       _state.interaction.answer_groups[
                         answerGroupIndex].rule_specs[
-                          ruleSpecIndex].rule_type !== CLASSIFIER_RULESPEC_STR) {
+                          ruleSpecIndex].rule_type !==
+                            CLASSIFIER_RULESPEC_STR) {
                     $scope.classification.answerGroupIndex = -1;
                   } else {
                     $scope.classification.answerGroupIndex = (

@@ -245,15 +245,15 @@ oppia.factory('trainingDataService', [
         var classifierIndex = -1;
         for (var j = 0; j < ruleSpecs.length; j++) {
           var ruleSpec = ruleSpecs[j];
-          if (ruleSpec.rule_type == CLASSIFIER_RULESPEC_STR) {
+          if (ruleSpec.rule_type === CLASSIFIER_RULESPEC_STR) {
             trainingData = ruleSpec.inputs.training_data;
             classifierIndex = j;
             break;
           }
         }
         if (trainingData &&
-            _removeAnswerFromTrainingData(answer, trainingData) != -1) {
-          if (trainingData.length == 0 && ruleSpecs.length > 1) {
+            _removeAnswerFromTrainingData(answer, trainingData) !== -1) {
+          if (trainingData.length === 0 && ruleSpecs.length > 1) {
             // If the last of the training data for a classifier has been
             // removed and the classifier is not the only rule in the group,
             // remove the rule since it is no longer doing anything.
@@ -335,7 +335,7 @@ oppia.factory('trainingDataService', [
         var classifierRule = null;
         for (var i = 0; i < rules.length; i++) {
           var rule = rules[i];
-          if (rule.rule_type == CLASSIFIER_RULESPEC_STR) {
+          if (rule.rule_type === CLASSIFIER_RULESPEC_STR) {
             classifierRule = rule;
             break;
           }
@@ -350,7 +350,7 @@ oppia.factory('trainingDataService', [
         // Train the rule to include this answer, but only if it's not already
         // in the training data.
         if (_getIndexOfTrainingData(
-            answer, classifierRule.inputs.training_data) == -1) {
+            answer, classifierRule.inputs.training_data) === -1) {
           classifierRule.inputs.training_data.push(answer);
         }
 
