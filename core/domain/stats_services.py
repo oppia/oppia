@@ -169,17 +169,6 @@ def get_versions_for_exploration_stats(exploration_id):
         exploration_id)
 
 
-def get_total_unresolved_answers_for_exploration(exploration_id):
-    """Returns the sum total of unresolved answers (across all states) of an
-    exploration."""
-    exploration = exp_services.get_exploration_by_id(exploration_id)
-    state_names = exploration.states.keys()
-
-    return sum(stats_domain.StateRuleAnswerLog.get(
-        exploration_id, state_name, exp_domain.DEFAULT_RULESPEC_STR
-    ).total_answer_count for state_name in state_names)
-
-
 def get_exploration_stats(exploration_id, exploration_version):
     """Returns a dict with state statistics for the given exploration id.
 
