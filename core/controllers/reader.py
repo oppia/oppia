@@ -57,7 +57,7 @@ DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = config_domain.ConfigProperty(
 def require_playable(handler):
     """Decorator that checks if the user can play the given exploration."""
     def test_can_play(self, exploration_id, **kwargs):
-        if exploration_id in base.DISABLED_EXPLORATIONS.value:
+        if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             self.render_template(
                 'error/disabled_exploration.html', iframe_restriction=None)
             return
@@ -311,7 +311,6 @@ class ExplorationPage(base.BaseHandler):
         self.values.update({
             'GADGET_SPECS': gadget_registry.Registry.get_all_specs(),
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
-            'SHARING_OPTIONS': base.SHARING_OPTIONS.value,
             'DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER': (
                 DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER.value),
             'additional_angular_modules': additional_angular_modules,

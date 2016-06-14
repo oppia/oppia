@@ -35,15 +35,12 @@
       </li>
     {% endif %}
 
-    {% for additional_link in SIDEBAR_MENU_ADDITIONAL_LINKS %}
-      <li>
-        <a href="{{additional_link['link']}}" target="_blank">
-          <img src="/images/sidebar/{{additional_link['icon_filename']}}"
-                 class="oppia-sidebar-menu-icon">
-          <span translate>{{additional_link['name']}}</span>
-        </a>
-      </li>
-    {% endfor %}
+    <li>
+      <a href="https://oppiablog.blogspot.com" target="_blank">
+        <img src="/images/sidebar/blogger.png" class="oppia-sidebar-menu-icon">
+        <span translate="I18N_SIDEBAR_BLOG"></span>
+      </a>
+    </li>
 
     {% if SHOW_CUSTOM_PAGES %}
       <hr>
@@ -65,15 +62,20 @@
   </ul>
 
   <div class="oppia-sidebar-footer">
-    {% if SOCIAL_MEDIA_BUTTONS %}
-      <div>
-        <span="I18N_SIDEBAR_FOLLOW_US"></span>:
-      </div>
-      {% for button in SOCIAL_MEDIA_BUTTONS %}
-        <a href="{{button['link']}}" target="_blank">
-          <img src="/images/social/{{button['icon_filename']}}">
-        </a>
-      {% endfor %}
-    {% endif %}
+    <div>
+      <span="I18N_SIDEBAR_FOLLOW_US"></span>:
+    </div>
+    <a href="https://plus.google.com/109898456505810251700/about" target="_blank">
+      <img src="/images/social/gplus.png">
+    </a>
+    <a href="https://www.youtube.com/channel/UC5c1G7BNDCfv1rczcBp9FPw" target="_blank">
+      <img src="/images/social/youtube.png">
+    </a>
+    <a href="https://www.facebook.com/oppiaorg" target="_blank">
+      <img src="/images/social/fb.png">
+    </a>
+    <a href="https://twitter.com/oppiaorg" target="_blank">
+      <img src="/images/social/twitter.png">
+    </a>
   </div>
 </nav>
