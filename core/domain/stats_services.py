@@ -175,13 +175,9 @@ def get_total_unresolved_answers_for_exploration(exploration_id):
     exploration = exp_services.get_exploration_by_id(exploration_id)
     state_names = exploration.states.keys()
 
-    rules_list = []
-    for state_name in state_names:
-        rules_list.append({'state_name': state_name,
-                           'rule_str': exp_domain.DEFAULT_RULESPEC_STR})
-    return (sum(state_domain.total_answer_count for state_domain in
-                stats_domain.StateRuleAnswerLog.get_multi(
-                    exploration_id, rules_list)))
+    return sum(stats_domain.StateRuleAnswerLog.get(
+        exploration_id, state_name, exp_domain.DEFAULT_RULESPEC_STR
+    ).total_answer_count for state_name in state_names)
 
 
 def get_exploration_stats(exploration_id, exploration_version):
