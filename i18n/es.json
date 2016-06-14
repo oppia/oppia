@@ -221,7 +221,7 @@
   "I18N_PLAYER_FORWARD": "Forward",
   "I18N_PLAYER_BACK": "Back",
   "I18N_PLAYER_CONTINUE_NEXT_CARD": "Continue to next card",
-  "I18N_PLAYER_SHARE_EXPLORATION": "Disfrutado de esta exploración? Compártelo con tus amigos!"
+  "I18N_PLAYER_SHARE_EXPLORATION": "Disfrutado de esta exploración? Compártelo con tus amigos!",
   "I18N_ERROR_DISABLED_EXPLORATION_PAGE_TITLE": "Exploración deshabilitada - Oppia",
   "I18N_ERROR_DISABLED_EXPLORATION": "Exploración deshabilitada",
   "I18N_ERROR_DISABLED_EXPLORATION_MESSAGE": "Disculpa, pero la exploración que clickeaste está deshabilidada por ahora. Por favor, prueba de nuevo más tarde.",
