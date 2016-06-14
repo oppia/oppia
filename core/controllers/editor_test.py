@@ -185,7 +185,7 @@ class EditorTest(BaseEditorControllerTest):
 
         first_state_name = exploration_dict['exploration']['init_state_name']
         event_services.AnswerSubmissionEventHandler.record(
-            exp_id, 1, first_state_name, 'N/A', 0)
+            exp_id, 1, first_state_name, exp_domain.DEFAULT_RULESPEC_STR, 0)
 
         second_state_name = 'What language'
         event_services.AnswerSubmissionEventHandler.record(
@@ -280,7 +280,7 @@ class EditorTest(BaseEditorControllerTest):
                 state_name].interaction.answer_groups
             explicit_rule_spec_string = (
                 answer_groups[0].rule_specs[0].stringify_classified_rule())
-            classifier_spec_string = (
+            classifier_rule_spec_string = (
                 answer_groups[1].rule_specs[0].stringify_classified_rule())
 
             # Input happy since there is an explicit rule checking for that.
@@ -294,12 +294,12 @@ class EditorTest(BaseEditorControllerTest):
             # Input cheerful: this is current training data and falls under the
             # classifier.
             event_services.AnswerSubmissionEventHandler.record(
-                exp_id, 1, state_name, classifier_spec_string, 'cheerful')
+                exp_id, 1, state_name, classifier_rule_spec_string, 'cheerful')
 
             # Input joyful: this is not training data but will be classified
             # under the classifier.
             event_services.AnswerSubmissionEventHandler.record(
-                exp_id, 1, state_name, classifier_spec_string, 'joyful')
+                exp_id, 1, state_name, classifier_rule_spec_string, 'joyful')
 
             # Log in as an editor.
             self.login(self.EDITOR_EMAIL)
@@ -344,7 +344,7 @@ class EditorTest(BaseEditorControllerTest):
             answer_group = state['interaction']['answer_groups'][1]
             rule_spec = answer_group['rule_specs'][0]
             self.assertEqual(
-                rule_spec['rule_type'], feconf.CLASSIFIER_RULE_TYPE)
+                rule_spec['rule_type'], exp_domain.CLASSIFIER_RULESPEC_STR)
             rule_spec['inputs']['training_data'].append('joyful')
 
             self.put_json('/createhandler/data/%s' % exp_id, {

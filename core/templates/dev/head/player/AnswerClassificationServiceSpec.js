@@ -31,7 +31,7 @@ describe('Answer classification service', function() {
 
   var acs, $httpBackend, successHandler, failHandler, $rootScope, state;
   beforeEach(inject(function($injector) {
-    acs = $injector.get('answerClassificationService');
+    acs = $injector.get('AnswerClassificationService');
     sof = $injector.get('StateObjectFactory');
     $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');

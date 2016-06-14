@@ -77,22 +77,22 @@ def classify_string_classifier_rule(state, normalized_answer):
     best_matched_answer_group = None
     best_matched_answer_group_index = len(state.interaction.answer_groups)
     best_matched_rule_spec_index = None
-    best_matched_truth_value = feconf.CERTAIN_FALSE_VALUE
 
     sc = classifier_services.StringClassifier()
     training_examples = [
         [doc, []] for doc in state.interaction.confirmed_unclassified_answers]
     for (answer_group_index, answer_group) in enumerate(
             state.interaction.answer_groups):
-        classifier_spec_index = answer_group.get_classifier_index()
-        if classifier_spec_index is not None:
-            classifier_spec = answer_group.rule_specs[classifier_spec_index]
+        classifier_rule_spec_index = answer_group.get_classifier_rule_index()
+        if classifier_rule_spec_index is not None:
+            classifier_rule_spec = answer_group.rule_specs[
+                classifier_rule_spec_index]
         else:
-            classifier_spec = None
-        if classifier_spec is not None:
+            classifier_rule_spec = None
+        if classifier_rule_spec is not None:
             training_examples.extend([
                 [doc, [str(answer_group_index)]]
-                for doc in classifier_spec.inputs['training_data']])
+                for doc in classifier_rule_spec.inputs['training_data']])
     if len(training_examples) > 0:
         sc.load_examples(training_examples)
         doc_ids = sc.add_examples_for_predicting([normalized_answer])
@@ -102,17 +102,15 @@ def classify_string_classifier_rule(state, normalized_answer):
             predicted_answer_group_index = int(predicted_label)
             predicted_answer_group = state.interaction.answer_groups[
                 predicted_answer_group_index]
-            best_matched_truth_value = feconf.CERTAIN_TRUE_VALUE
             for rule_spec in predicted_answer_group.rule_specs:
-                if rule_spec.rule_type == feconf.CLASSIFIER_RULE_TYPE:
-                    best_matched_rule_spec_index = classifier_spec_index
+                if rule_spec.rule_type == exp_domain.CLASSIFIER_RULESPEC_STR:
+                    best_matched_rule_spec_index = classifier_rule_spec_index
                     break
             best_matched_answer_group = predicted_answer_group
             best_matched_answer_group_index = predicted_answer_group_index
             return {
                 'outcome': best_matched_answer_group.outcome.to_dict(),
                 'answer_group_index': best_matched_answer_group_index,
-                'classification_certainty': best_matched_truth_value,
                 'rule_spec_index': best_matched_rule_spec_index,
             }
         else:
@@ -125,20 +123,18 @@ def classify_string_classifier_rule(state, normalized_answer):
 # rule specs over multiple answer groups and making sure the best match over all
 # those rules is picked.
 def classify(state, answer):
-    """Normalize the answer and select among the answer groups the group in
-    which the answer best belongs. The best group is decided by finding the
-    first rule best satisfied by the answer. Returns a dict with the following
-    keys:
+    """Classify the answer using the string classifier.
+
+    Normalize the answer and classifies the answer if the interaction has a
+    classifier associated with it and the string classifier functionality is
+    enabled. Otherwise, classifies the answer to the default outcome.
+
+    Returns a dict with the following keys:
         'outcome': A dict representing the outcome of the answer group matched.
         'answer_group_index': An index into the answer groups list indicating
             which one was selected as the group which this answer belongs to.
             This is equal to the number of answer groups if the default outcome
             was matched.
-        'classification_certainty': A normalized value within the range of
-            [0, 1] representing at which confidence level the answer belongs in
-            the chosen answer group. A certainty of 1 means it is the best
-            possible match. A certainty of 0 means it is matched to the default
-            outcome.
         'rule_spec_index': An index into the rule specs list of the matched
             answer group which was selected that indicates which rule spec was
             matched. This is equal to 0 if the default outcome is selected.
@@ -156,12 +152,7 @@ def classify(state, answer):
     elif feconf.ENABLE_STRING_CLASSIFIER:
         raise Exception('No classifier found for interaction.')
 
-    # The best matched group must match above a certain threshold. If no group
-    # meets this requirement, then the default 'group' automatically matches
-    # resulting in the outcome of the answer being the default outcome of the
-    # state.
-    if (response is not None and response['classification_certainty'] >=
-            feconf.DEFAULT_ANSWER_GROUP_CLASSIFICATION_THRESHOLD):
+    if response is not None:
         return response
     elif state.interaction.default_outcome is not None:
         return {
@@ -382,7 +373,11 @@ class ClassifyHandler(base.BaseHandler):
 
     @require_playable
     def post(self, unused_exploration_id):
-        """Handles POST requests."""
+        """Handle POST requests.
+
+        Note: unused_exploration_id is needed because @require_playable needs 2
+        arguments
+        """
         # A domain object representing the old state.
         old_state = exp_domain.State.from_dict(self.payload.get('old_state'))
         # The learner's raw answer.

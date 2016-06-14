@@ -22,6 +22,7 @@ import string
 import struct
 
 from core.domain import dependency_registry
+from core.domain import exp_domain
 from core.domain import interaction_registry
 from core.domain import obj_services
 from core.tests import test_utils
@@ -367,7 +368,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 interaction_id)
             if interaction.is_trainable:
                 self.assertIn(
-                    feconf.CLASSIFIER_RULE_TYPE, interaction.rules,
+                    exp_domain.CLASSIFIER_RULESPEC_STR, interaction.rules,
                     'Expected to find a classifier in trainable '
                     'interaction: %s' % interaction_id)
 
@@ -380,7 +381,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 interaction_id)
             if not interaction.is_trainable:
                 self.assertNotIn(
-                    feconf.CLASSIFIER_RULE_TYPE, interaction.rules,
+                    exp_domain.CLASSIFIER_RULESPEC_STR, interaction.rules,
                     'Did not expect to find a classifier in untrainable '
                     'interaction: %s' % interaction_id)
 

@@ -79,7 +79,7 @@ class BaseInteraction(object):
     is_terminal = False
     # Whether the interaction has only one possible answer.
     is_linear = False
-    # Whether this interaction supports training and classification.
+    # Whether this interaction supports training and statistical classification.
     is_trainable = False
     # Whether this interaction supports the string classifier.
     # TODO(chiangs): remove once classifier_services is generalized.
@@ -148,8 +148,7 @@ class BaseInteraction(object):
             return self._cached_rules
 
         rules_index_dict = json.loads(
-            utils.get_file_contents(os.path.join(
-                os.getcwd(), 'extensions', 'interactions', 'rules.json')))
+            utils.get_file_contents(feconf.RULES_DESCRIPTIONS_FILE_PATH))
         self._cached_rules = rules_index_dict[self.id]
 
         return self._cached_rules
@@ -231,11 +230,11 @@ class BaseInteraction(object):
             description = description[opening_index + 2:]
 
             bar_index = description.find('|')
-            param_name = description[: bar_index]
+            param_name = description[:bar_index]
             description = description[bar_index + 1:]
 
             closing_index = description.find('}}')
-            normalizer_string = description[: closing_index]
+            normalizer_string = description[:closing_index]
             description = description[closing_index + 2:]
 
             param_list.append(
@@ -248,9 +247,9 @@ class BaseInteraction(object):
         """Gets the parameter type for a given rule parameter name."""
         rule_param_list = self.get_rule_param_list(rule_name)
 
-        for item in rule_param_list:
-            if item[0] == rule_param_name:
-                return item[1]
+        for rule_name, rule_type in rule_param_list:
+            if rule_name == rule_param_name:
+                return rule_type
         raise Exception(
             'Rule %s has no param called %s' % (rule_name, rule_param_name))
 

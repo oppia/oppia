@@ -25,12 +25,13 @@ oppia.constant('PLACEHOLDER_OUTCOME_DEST', '/');
 
 oppia.constant('DEFAULT_RULE_NAME', 'Default');
 
-oppia.constant('CLASSIFIER_RULE_TYPE', 'ClassifyMatches');
+oppia.constant('CLASSIFIER_RULESPEC_STR', 'ClassifyMatches');
 
-// Feature still in development. Synchronize this with feconf.
+// Feature still in development.
+// NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
 oppia.constant('ENABLE_STRING_CLASSIFIER', false);
 
-oppia.constant('DEFAULT_CLASSIFIER', {
+oppia.constant('DEFAULT_CLASSIFIER_RULE_SPEC', {
   rule_type: 'ClassifyMatches',
   inputs: {
     training_data: []

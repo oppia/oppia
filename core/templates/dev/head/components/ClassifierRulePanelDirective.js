@@ -16,14 +16,14 @@
  * @fileoverview Directive for the classifier panel.
  */
 
-oppia.directive('classifierPanel', [function() {
+oppia.directive('classifierRulePanel', [function() {
   return {
     restrict: 'E',
     scope: {
       onTrainingDataDeletion: '&',
       ruleInputs: '='
     },
-    templateUrl: 'rules/classifierPanel',
+    templateUrl: 'rules/classifierRulePanel',
     controller: [
       '$scope', '$modal', 'oppiaExplorationHtmlFormatterService',
       'stateInteractionIdService', 'stateCustomizationArgsService',

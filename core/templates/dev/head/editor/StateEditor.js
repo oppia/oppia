@@ -137,10 +137,10 @@ oppia.factory('trainingModalService', ['$rootScope', '$modal', 'alertsService',
         templateUrl: 'modals/trainUnresolvedAnswer',
         backdrop: true,
         controller: ['$scope', '$modalInstance', 'explorationStatesService',
-          'editorContextService', 'answerClassificationService',
+          'editorContextService', 'AnswerClassificationService',
           'explorationContextService',
           function($scope, $modalInstance, explorationStatesService,
-              editorContextService, answerClassificationService,
+              editorContextService, AnswerClassificationService,
               explorationContextService) {
             $scope.trainingDataAnswer = '';
             $scope.trainingDataFeedback = '';
@@ -162,7 +162,7 @@ oppia.factory('trainingModalService', ['$rootScope', '$modal', 'alertsService',
               var currentStateName = editorContextService.getActiveStateName();
               var state = explorationStatesService.getState(currentStateName);
 
-              answerClassificationService.getMatchingClassificationResult(
+              AnswerClassificationService.getMatchingClassificationResult(
                 explorationId, state, unhandledAnswer, true).then(
                     function(classificationResult) {
                   var feedback = 'Nothing';
@@ -201,11 +201,11 @@ oppia.factory('trainingModalService', ['$rootScope', '$modal', 'alertsService',
 // answers which do not have certain classification and are not currently used
 // as part of any classifier training models.
 oppia.factory('trainingDataService', [
-  '$rootScope', '$http', 'responsesService', 'CLASSIFIER_RULE_TYPE',
-  'DEFAULT_CLASSIFIER',
+  '$rootScope', '$http', 'responsesService', 'CLASSIFIER_RULESPEC_STR',
+  'DEFAULT_CLASSIFIER_RULE_SPEC',
   function(
-      $rootScope, $http, responsesService, CLASSIFIER_RULE_TYPE,
-      DEFAULT_CLASSIFIER) {
+      $rootScope, $http, responsesService, CLASSIFIER_RULESPEC_STR,
+      DEFAULT_CLASSIFIER_RULE_SPEC) {
     var _trainingDataAnswers = [];
     var _trainingDataCounts = [];
 
@@ -250,7 +250,7 @@ oppia.factory('trainingDataService', [
         var classifierIndex = -1;
         for (var j = 0; j < ruleSpecs.length; j++) {
           var ruleSpec = ruleSpecs[j];
-          if (ruleSpec.rule_type == CLASSIFIER_RULE_TYPE) {
+          if (ruleSpec.rule_type == CLASSIFIER_RULESPEC_STR) {
             trainingData = ruleSpec.inputs.training_data;
             classifierIndex = j;
             break;
@@ -340,7 +340,7 @@ oppia.factory('trainingDataService', [
         var classifier = null;
         for (var i = 0; i < rules.length; i++) {
           var rule = rules[i];
-          if (rule.rule_type == CLASSIFIER_RULE_TYPE) {
+          if (rule.rule_type == CLASSIFIER_RULESPEC_STR) {
             classifier = rule;
             break;
           }
@@ -348,7 +348,7 @@ oppia.factory('trainingDataService', [
         if (!classifier) {
           // Create new classifier for classification. All classifiers should
           // match this schema.
-          classifier = angular.copy(DEFAULT_CLASSIFIER);
+          classifier = angular.copy(DEFAULT_CLASSIFIER_RULE_SPEC);
           rules.push(classifier);
         }
 

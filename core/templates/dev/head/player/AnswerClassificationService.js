@@ -16,11 +16,11 @@
  * @fileoverview Classification service for answer groups.
  */
 
-oppia.factory('answerClassificationService', [
-  '$http', '$q', 'LearnerParamsService', 'INTERACTION_SPECS',
-  'ENABLE_STRING_CLASSIFIER',
-  function($http, $q, LearnerParamsService, INTERACTION_SPECS,
-      ENABLE_STRING_CLASSIFIER, CLASSIFIER_RULE_TYPE) {
+oppia.factory('AnswerClassificationService', [
+  '$http', '$q', 'LearnerParamsService', 'alertsService', 'INTERACTION_SPECS',
+  'ENABLE_STRING_CLASSIFIER', 'CLASSIFIER_RULESPEC_STR',
+  function($http, $q, LearnerParamsService, alertsService, INTERACTION_SPECS,
+      ENABLE_STRING_CLASSIFIER, CLASSIFIER_RULESPEC_STR) {
     /**
      * Finds the first answer group with a rule that returns true.
      *
@@ -46,7 +46,7 @@ oppia.factory('answerClassificationService', [
       for (var i = 0; i < answerGroups.length; i++) {
         for (var j = 0; j < answerGroups[i].rule_specs.length; j++) {
           var ruleSpec = answerGroups[i].rule_specs[j];
-          if (ruleSpec.rule_type != CLASSIFIER_RULE_TYPE &&
+          if (ruleSpec.rule_type != CLASSIFIER_RULESPEC_STR &&
               interactionRulesService[ruleSpec.rule_type](
                 answer, ruleSpec.inputs)) {
             return {
@@ -67,7 +67,7 @@ oppia.factory('answerClassificationService', [
           ruleSpecIndex: 0
         };
       } else {
-        alertsService.addWarning('No default outcome found.');
+        alertsService.addWarning('Something went wrong with the exploration.');
       }
     };
 
@@ -81,8 +81,8 @@ oppia.factory('answerClassificationService', [
        * @param {*} answer - The answer that the user has submitted.
        * @param {boolean} isInEditorMode - Whether the function is being called
        *   in editor mode.
-       * @param {?function} interactionRulesService - The service which contains
-       *   the rules of that interaction.
+       * @param {function} interactionRulesService - The service which contains
+       *   the explicit rules of that interaction.
        *
        * @return {promise} A promise for an object representing the answer group
        *     with the following properties:
@@ -105,6 +105,9 @@ oppia.factory('answerClassificationService', [
           result = classifyAnswer(
             answer, answerGroups, defaultOutcome, interactionRulesService);
           deferred.resolve(result);
+        } else {
+          alertsService.addWarning(
+            'Something went wrong with the exploration.');
         }
 
         if (result === null || (result.outcome == defaultOutcome &&

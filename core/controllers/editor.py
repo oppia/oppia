@@ -604,7 +604,7 @@ class UntrainedAnswersHandler(EditorHandler):
         # matched to the classifier individually.
         answers = stats_services.get_top_state_rule_answers(
             exploration_id, state_name, [
-                exp_domain.DEFAULT_RULESPEC_STR, feconf.CLASSIFIER_RULE_TYPE],
+                exp_domain.DEFAULT_RULESPEC_STR, exp_domain.CLASSIFIER_RULESPEC_STR],
             self.NUMBER_OF_TOP_ANSWERS_PER_RULE)
 
         interaction = state.interaction
@@ -623,7 +623,7 @@ class UntrainedAnswersHandler(EditorHandler):
                 trained_answers = set()
                 for answer_group in interaction.answer_groups:
                     for rule_spec in answer_group.rule_specs:
-                        if rule_spec.rule_type == feconf.CLASSIFIER_RULE_TYPE:
+                        if rule_spec.rule_type == exp_domain.CLASSIFIER_RULESPEC_STR:
                             trained_answers.update(
                                 interaction_instance.normalize_answer(trained)
                                 for trained

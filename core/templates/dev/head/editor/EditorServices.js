@@ -1562,13 +1562,13 @@ oppia.factory('explorationWarningsService', [
   'expressionInterpolationService', 'explorationParamChangesService',
   'explorationObjectiveService', 'parameterMetadataService',
   'INTERACTION_SPECS', 'WARNING_TYPES', 'STATE_ERROR_MESSAGES',
-  'CLASSIFIER_RULE_TYPE',
+  'CLASSIFIER_RULESPEC_STR',
   function(
       $filter, graphDataService, explorationStatesService,
       expressionInterpolationService, explorationParamChangesService,
       explorationObjectiveService, parameterMetadataService,
       INTERACTION_SPECS, WARNING_TYPES, STATE_ERROR_MESSAGES,
-      CLASSIFIER_RULE_TYPE) {
+      CLASSIFIER_RULESPEC_STR) {
     var _warningsList = [];
     var stateWarnings = {};
     var hasCriticalStateWarning = false;
@@ -1680,7 +1680,7 @@ oppia.factory('explorationWarningsService', [
       for (var i = 0; i < answerGroups.length; i++) {
         var group = answerGroups[i];
         if (group.rule_specs.length == 1 &&
-            group.rule_specs[0].rule_type == CLASSIFIER_RULE_TYPE &&
+            group.rule_specs[0].rule_type == CLASSIFIER_RULESPEC_STR &&
             group.rule_specs[0].inputs.training_data.length == 0) {
           indexes.push(i);
         }
