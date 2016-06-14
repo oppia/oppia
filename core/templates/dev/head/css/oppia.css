@@ -1615,6 +1615,16 @@ pre.oppia-pre-wrapped-text {
   position: relative;
 }
 
+.oppia-state-graph-animate-show {
+  opacity: 1;
+}
+.oppia-state-graph-animate-show.ng-hide-add, .oppia-state-graph-animate-show.ng-hide-remove {
+  transition: all linear 0.5s;
+}
+.oppia-state-graph-animate-show.ng-hide {
+  opacity: 0;
+}
+
 /* Styles for the collections learner view */
 
 .oppia-collection-player-tiles-container {

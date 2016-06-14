@@ -161,7 +161,7 @@ class ExplorationPage(EditorHandler):
 
     def get(self, exploration_id):
         """Handles GET requests."""
-        if exploration_id in base.DISABLED_EXPLORATIONS.value:
+        if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             self.render_template(
                 'error/disabled_exploration.html', iframe_restriction=None)
             return
@@ -207,7 +207,6 @@ class ExplorationPage(EditorHandler):
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'PANEL_SPECS': feconf.PANELS_PROPERTIES,
             'DEFAULT_OBJECT_VALUES': rule_domain.get_default_object_values(),
-            'SHARING_OPTIONS': base.SHARING_OPTIONS.value,
             'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR': (
                 DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR.value),
             'additional_angular_modules': additional_angular_modules,
