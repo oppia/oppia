@@ -221,6 +221,8 @@ def _get_displayable_exp_summary_dicts(
             'title': exploration_summary.title,
             'activity_type': rights_manager.ACTIVITY_TYPE_EXPLORATION,
             'category': exploration_summary.category,
+            'created_on': utils.get_time_in_millisecs(
+                exploration_summary.exploration_model_created_on),
             'objective': exploration_summary.objective,
             'language_code': exploration_summary.language_code,
             'last_updated_msec': utils.get_time_in_millisecs(
@@ -413,3 +415,9 @@ def get_recently_published_exploration_summary_dicts():
         reverse=True)
 
     return _get_displayable_exp_summary_dicts(summaries)
+
+def get_displayable_exp_summaries(exploration_summaries):
+    """Returns list of exploration summaries which are human readable.
+    Wrapper around _get_displayable_exp_summary_dicts method.
+    """
+    return _get_displayable_exp_summary_dicts(exploration_summaries)

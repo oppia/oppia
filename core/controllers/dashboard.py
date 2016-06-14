@@ -23,8 +23,8 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
-from core.domain import stats_services
 from core.domain import subscription_services
+from core.domain import summary_services
 from core.domain import user_jobs_continuous
 from core.domain import user_services
 import feconf
@@ -161,47 +161,21 @@ class DashboardHandler(base.BaseHandler):
                 subscription_services.get_collection_ids_subscribed_to(
                     self.user_id)))
 
-        explorations_list = []
+        explorations_list = summary_services.get_displayable_exp_summaries(
+            subscribed_exploration_summaries)
         collections_list = []
 
-        for exp_summary in subscribed_exploration_summaries:
-            if exp_summary is None:
-                continue
-
+        for exploration in explorations_list:
             feedback_thread_analytics = feedback_services.get_thread_analytics(
-                exp_summary.id)
-            exp_stats = stats_services.get_exploration_stats(
-                exp_summary.id, self.VERSION_ALL)
-            # TODO(sll): Reuse _get_displayable_exp_summary_dicts() in
-            # summary_services, instead of replicating it like this.
-            explorations_list.append({
-                'id': exp_summary.id,
-                'title': exp_summary.title,
-                'category': exp_summary.category,
-                'objective': exp_summary.objective,
-                'language_code': exp_summary.language_code,
-                'last_updated': utils.get_time_in_millisecs(
-                    exp_summary.exploration_model_last_updated),
-                'created_on': utils.get_time_in_millisecs(
-                    exp_summary.exploration_model_created_on),
-                'status': exp_summary.status,
-                'community_owned': exp_summary.community_owned,
-                'thumbnail_icon_url': (
-                    utils.get_thumbnail_icon_url_for_category(
-                        exp_summary.category)),
-                'thumbnail_bg_color': utils.get_hex_color_for_category(
-                    exp_summary.category),
-                'ratings': exp_summary.ratings,
-                'num_open_threads': (
-                    feedback_thread_analytics.num_open_threads),
-                'num_total_threads': (
-                    feedback_thread_analytics.num_total_threads),
-                'num_plays': exp_stats.num_starts
+                exploration['id'])
+            exploration.update({
+                'num_open_threads': feedback_thread_analytics.num_open_threads,
+                'num_total_threads': feedback_thread_analytics.num_total_threads
             })
 
         explorations_list = sorted(
             explorations_list,
-            key=lambda x: (x['num_open_threads'], x['last_updated']),
+            key=lambda x: (x['num_open_threads'], x['last_updated_msec']),
             reverse=True)
 
         if (self.username in

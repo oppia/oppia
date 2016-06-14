@@ -132,7 +132,7 @@
                     <span style="color: #888">
                       <strong><[exploration.category]></strong>
                       <span style="font-weight: bold;" ng-if="exploration.category">&middot;</span>
-                      Last updated <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
+                      Last updated <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
                     </span>
 
                     <span ng-if="exploration.status === 'publicized'">
@@ -214,7 +214,7 @@
                       <span style="color: #888">
                         <strong><[collection.category]></strong>
                         <span style="font-weight: bold;" ng-if="collection.category">&middot;</span>
-                        Last updated <[getLocaleAbbreviatedDatetimeString(collection.last_updated)]>
+                        Last updated <[getLocaleAbbreviatedDatetimeString(collection.last_updated_msec)]>
                       </span>
 
                       <span ng-if="collection.status === 'publicized'">
