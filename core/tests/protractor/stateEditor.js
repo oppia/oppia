@@ -29,7 +29,7 @@ var rules = require('../../../extensions/rules/protractor.js');
 describe('State editor', function() {
   it('should walk through the tutorial when user repeatedly clicks Next',
       function() {
-    var NUM_TUTORIAL_STAGES = 8;
+    var NUM_TUTORIAL_STAGES = 7;
     users.createUser(
       'userTutorial@stateEditor.com', 'userTutorialStateEditor');
     users.login('userTutorial@stateEditor.com');

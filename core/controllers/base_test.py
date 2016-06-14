@@ -197,15 +197,12 @@ class CsrfTokenManagerTest(test_utils.GenericTestBase):
 
 class EscapingTest(test_utils.GenericTestBase):
 
-    class FakeAboutPage(base.BaseHandler):
+    class FakePage(base.BaseHandler):
         """Fake page for testing autoescaping."""
 
         def get(self):
             """Handles GET requests."""
-            self.values.update({
-                'CONTACT_EMAIL_ADDRESS': ['<[angular_tag]> x{{51 * 3}}y'],
-            })
-            self.render_template('pages/about.html')
+            self.render_template('pages/contact.html')
 
         def post(self):
             """Handles POST requests."""
@@ -213,8 +210,23 @@ class EscapingTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(EscapingTest, self).setUp()
+
+        # Update a config property that shows in all pages.
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        response = self.testapp.get('/admin')
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.post_json('/adminhandler', {
+            'action': 'save_config_properties',
+            'new_config_property_values': {
+                base.SITE_FEEDBACK_FORM_URL.name: (
+                    '<[angular_tag]> x{{51 * 3}}y'),
+            }
+        }, csrf_token)
+
+        # Modify the testapp to use the fake handler.
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/fake', self.FakeAboutPage, name='FakePage')],
+            [webapp2.Route('/fake', self.FakePage, name='FakePage')],
             debug=feconf.DEBUG,
         ))
 

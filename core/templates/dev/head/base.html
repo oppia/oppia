@@ -263,9 +263,7 @@
                               <ul class="dropdown-menu oppia-navbar-dropdown" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
                                 <li><a href="/about" translate="I18N_TOPNAV_ABOUT_OPPIA"></a></li>
                                 <li><a href="/teach" translate="I18N_TOPNAV_TEACH_WITH_OPPIA"></a></li>
-                                {% for additional_link in SIDEBAR_MENU_ADDITIONAL_LINKS %}
-                                  <li><a href="{{additional_link['link']}}" target="_blank">{{additional_link['name']}}</a></li>
-                                {% endfor %}
+                                <li><a href="https://oppiablog.blogspot.com" translate="I18N_TOPNAV_BLOG" target="_blank"></a></li>
                                 {% if SHOW_CUSTOM_PAGES %}
                                   <li><a href="/terms" translate="I18N_TOPNAV_TERMS_OF_SERVICE"></a></li>
                                   <li><a href="/privacy" translate="I18N_TOPNAV_PRIVACY_POLICY"></a></li>
@@ -384,7 +382,5 @@
 
     {% block footer_js %}
     {% endblock footer_js %}
-
-    {{BEFORE_END_BODY_TAG_HOOK}}
   </body>
 </html>
