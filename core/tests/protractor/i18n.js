@@ -46,7 +46,7 @@ describe('Site language', function() {
     browser.get('/splash');
     _selectLanguage('Español');
     browser.get('/library');
-    expect(browser.getTitle()).toEqual('Oppia - Librería');
+    expect(browser.getTitle()).toEqual('Oppia - Biblioteca');
     general.ensurePageHasNoTranslationIds();
   });
 
@@ -58,7 +58,7 @@ describe('Site language', function() {
     var options = element.all(by.css('.select2-drop-active li div')).filter(
       function(elem) {
         return elem.getText().then(function(text) {
-          return text == 'Español';
+          return text === 'Español';
         });
       });
     options.first().click();
@@ -75,7 +75,7 @@ describe('Site language', function() {
     browser.get('/splash');
     _selectLanguage('Español');
     browser.get('/library');
-    expect(browser.getTitle()).toEqual('Oppia - Librería');
+    expect(browser.getTitle()).toEqual('Oppia - Biblioteca');
 
     // The preference page shows the last selected language
     browser.get('/preferences');

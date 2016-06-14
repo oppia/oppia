@@ -84,8 +84,9 @@
       <p class="oppia-profile-subject-interest-container">
         Interests:
         <span ng-if="subjectInterests.length > 0"><br>
-          <!-- The following tag should remain on a single line due to http://bugzilla.mozilla.org/show_bug.cgi?id=922773. -->
-          <span ng-repeat="interest in subjectInterests track by $index"><span class="oppia-profile-subject-interest"><[interest]></span></span>
+          <span ng-repeat="interest in subjectInterests track by $index">
+            <span class="oppia-profile-subject-interest"><[interest]></span>
+          </span>
         </span>
         <span ng-if="subjectInterests.length === 0" class="oppia-profile-no-interests-text">
           <em>none specified</em>

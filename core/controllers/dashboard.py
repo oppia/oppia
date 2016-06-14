@@ -32,11 +32,6 @@ import utils
 EXPLORATION_ID_KEY = 'explorationId'
 COLLECTION_ID_KEY = 'collectionId'
 
-ALLOW_YAML_FILE_UPLOAD = config_domain.ConfigProperty(
-    'allow_yaml_file_upload', {'type': 'bool'},
-    'Whether to allow exploration uploads via YAML.',
-    default_value=False)
-
 
 class NotificationsDashboardPage(base.BaseHandler):
     """Page with notifications for the user."""
@@ -125,7 +120,7 @@ class DashboardPage(base.BaseHandler):
                     self.username in
                     config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value
                 ),
-                'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
+                'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD,
             })
             self.render_template(
                 'dashboard/dashboard.html', redirect_url_on_logout='/')
@@ -303,7 +298,7 @@ class UploadExploration(base.BaseHandler):
         yaml_content = self.request.get('yaml_file')
 
         new_exploration_id = exp_services.get_new_exploration_id()
-        if ALLOW_YAML_FILE_UPLOAD.value:
+        if feconf.ALLOW_YAML_FILE_UPLOAD:
             exp_services.save_new_exploration_from_yaml_and_assets(
                 self.user_id, yaml_content, new_exploration_id, [])
             self.render_json({

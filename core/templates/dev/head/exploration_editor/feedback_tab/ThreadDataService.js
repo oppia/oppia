@@ -123,9 +123,9 @@ oppia.factory('threadDataService', [
       var oldStatus = thread.status;
       if (newStatus !== oldStatus) {
         updatedStatus = newStatus;
-        if (oldStatus == _THREAD_STATUS_OPEN) {
+        if (oldStatus === _THREAD_STATUS_OPEN) {
           _openThreadsCount -= 1;
-        } else if (newStatus == _THREAD_STATUS_OPEN) {
+        } else if (newStatus === _THREAD_STATUS_OPEN) {
           _openThreadsCount += 1;
         }
         thread.status = updatedStatus;
@@ -146,9 +146,9 @@ oppia.factory('threadDataService', [
       }, function() {
         // Revert changes
         if (newStatus !== oldStatus) {
-          if (oldStatus == _THREAD_STATUS_OPEN) {
+          if (oldStatus === _THREAD_STATUS_OPEN) {
             _openThreadsCount += 1;
-          } else if (newStatus == _THREAD_STATUS_OPEN) {
+          } else if (newStatus === _THREAD_STATUS_OPEN) {
             _openThreadsCount -= 1;
           }
           thread.status = oldStatus;

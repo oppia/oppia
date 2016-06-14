@@ -49,7 +49,7 @@ describe('Alerts Service', function() {
       // Search for the deleted warning message
       var found = false;
       for (var i = 0; i < alertsService.warnings.length; i++) {
-        if (alertsService.warnings[i].content == warning) {
+        if (alertsService.warnings[i].content === warning) {
           found = true;
         }
       }
@@ -77,7 +77,7 @@ describe('Alerts Service', function() {
       // Search for the deleted warning message
       var found = false;
       for (var i = 0; i < alertsService.warnings.length; i++) {
-        if (alertsService.warnings[i].content == warning) {
+        if (alertsService.warnings[i].content === warning) {
           found = true;
         }
       }
@@ -141,8 +141,8 @@ describe('Alerts Service', function() {
       // Search for the message
       var found = false;
       for (var i = 0; i < alertsService.messages.length; i++) {
-        if (alertsService.messages[i].content == message &&
-            alertsService.messages[i].type == 'info') {
+        if (alertsService.messages[i].content === message &&
+            alertsService.messages[i].type === 'info') {
           found = true;
         }
       }
@@ -170,8 +170,8 @@ describe('Alerts Service', function() {
       // Search for the message
       var found = false;
       for (var i = 0; i < alertsService.messages.length; i++) {
-        if (alertsService.messages[i].content == message &&
-            alertsService.messages[i].type == 'info') {
+        if (alertsService.messages[i].content === message &&
+            alertsService.messages[i].type === 'info') {
           found = true;
         }
       }

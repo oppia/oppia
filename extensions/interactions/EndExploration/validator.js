@@ -27,7 +27,7 @@ oppia.filter('oppiaInteractiveEndExplorationValidator', ['WARNING_TYPES',
     baseInteractionValidationService.requireCustomizationArguments(
       customizationArgs, ['recommendedExplorationIds']);
 
-    if (answerGroups.length != 0) {
+    if (answerGroups.length !== 0) {
       warningsList.push({
         type: WARNING_TYPES.ERROR,
         message: 'Please make sure end exploration interactions do not have ' +

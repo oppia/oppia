@@ -37,7 +37,7 @@ oppia.factory('CollectionLinearizerService', [
       return collection.getExplorationIds().filter(function(explorationId) {
         var collectionNode = collection.getCollectionNodeByExplorationId(
           explorationId);
-        return completedExpIds.indexOf(explorationId) == -1 &&
+        return completedExpIds.indexOf(explorationId) === -1 &&
           acquiredSkillList.isSupersetOfSkillList(
             collectionNode.getPrerequisiteSkillList());
       });
@@ -72,7 +72,7 @@ oppia.factory('CollectionLinearizerService', [
     var _findNodeIndex = function(linearNodeList, explorationId) {
       var index = -1;
       for (var i = 0; i < linearNodeList.length; i++) {
-        if (linearNodeList[i].getExplorationId() == explorationId) {
+        if (linearNodeList[i].getExplorationId() === explorationId) {
           index = i;
           break;
         }
@@ -142,7 +142,7 @@ oppia.factory('CollectionLinearizerService', [
       if (collection.getCollectionNodeCount() > 1) {
         var linearNodeList = _getCollectionNodesInPlayableOrder(collection);
         var nodeIndex = _findNodeIndex(linearNodeList, explorationId);
-        if (nodeIndex == -1) {
+        if (nodeIndex === -1) {
           return false;
         }
         swapFunction(collection, linearNodeList, nodeIndex);
@@ -204,7 +204,7 @@ oppia.factory('CollectionLinearizerService', [
         if (collection.getCollectionNodeCount() > 1) {
           var linearNodeList = _getCollectionNodesInPlayableOrder(collection);
           var nodeIndex = _findNodeIndex(linearNodeList, explorationId);
-          if (nodeIndex == -1) {
+          if (nodeIndex === -1) {
             return false;
           }
 

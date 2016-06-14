@@ -96,7 +96,7 @@ var checkCommands = function(yargs, argv, numRequired) {
 // There should atleast be minimum of one defined task.
 checkCommands(yargs, argv, 1);
 
-var isMinificationNeeded = (argv.minify == 'True');
+var isMinificationNeeded = (argv.minify === 'True');
 var frontendDependencies = manifest.dependencies.frontend;
 var cssFilePaths = [];
 var jsFilePaths = [];

@@ -27,7 +27,7 @@ oppia.directive('profileLinkImage', [function() {
       var DEFAULT_PROFILE_IMAGE_PATH = '/images/avatar/user_blue_72px.png';
 
       $scope.isUsernameLinkable = function(username) {
-        return GLOBALS.SYSTEM_USERNAMES.indexOf(username) == -1;
+        return GLOBALS.SYSTEM_USERNAMES.indexOf(username) === -1;
       };
 
       $scope.profileImageUrl = (
