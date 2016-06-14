@@ -257,6 +257,7 @@
   "I18N_PLAYER_FORWARD": "Forward",
   "I18N_PLAYER_BACK": "Back",
   "I18N_PLAYER_CONTINUE_NEXT_CARD": "Continue to next card",
+  "I18N_PLAYER_SHARE_EXPLORATION": "Enjoyed this exploration? Share it with your friends!",
   "I18N_ERROR_DISABLED_EXPLORATION_PAGE_TITLE": "Disabled Exploration - Oppia",
   "I18N_ERROR_DISABLED_EXPLORATION": "Disabled Exploration",
   "I18N_ERROR_DISABLED_EXPLORATION_MESSAGE": "Sorry, but the exploration you clicked on is currently disabled. Please try again later.",

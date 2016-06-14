@@ -26,7 +26,7 @@
 
     <li>
       <a href="" ng-click="showEmbedExplorationModal(explorationId)" tooltip="Embed" tooltip-placement="top">
-        <i class="material-icons md-18" style="color: black;">&#xE157;</i>
+        <i class="material-icons md-15 share-option-embed" style="color: black;">&#xE157;</i>
       </a>
     </li>
   </ul>
@@ -37,10 +37,14 @@
     list-style: none;
   }
 
-  .oppia-sharing-links .share-option-img {
+  .oppia-sharing-links .share-option-img, .share-option-embed {
     border-radius: 2px;
     height: 40px;
     margin: 3px;
     width: 40px;
+  }
+  .share-option-embed {
+    background-color: #eee;
+    background-size: cover;
   }
 </style>

@@ -170,7 +170,13 @@
 
   <div ng-if="isOnTerminalCard() && isLoggedIn && !isInPreviewMode && !isIframed && isCurrentCardAtEndOfTranscript()"
        class="conversation-skin-final-ratings">
-
+    <div style="color: #eee; margin-bottom: 20px;" translate="I18N_PLAYER_SHARE_EXPLORATION">
+    </div>
+      <div flex="55">
+        <sharing-links flex="50" layout-type="row" layout-align-type="end center"
+                         twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER">
+        </sharing-links>
+      </div>     
     <div style="color: #eee; margin-bottom: 20px;" translate="I18N_PLAYER_RATE_EXPLORATION">
     </div>
     <div popover-placement="bottom" popover-template="'popover/feedback'" popover-trigger="click">
