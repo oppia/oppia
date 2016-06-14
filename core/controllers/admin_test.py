@@ -14,7 +14,6 @@
 
 """Tests for the admin page."""
 
-from core.controllers import editor
 from core.controllers import pages
 from core.domain import config_domain
 from core.tests import test_utils
@@ -23,7 +22,6 @@ import feconf
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
-SITE_FORUM_URL = 'siteforum.url'
 
 
 class AdminIntegrationTest(test_utils.GenericTestBase):
@@ -77,13 +75,13 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response_dict = self.get_json('/adminhandler')
         response_config_properties = response_dict['config_properties']
         self.assertDictContainsSubset({
-            'value': editor.MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE,
-        }, response_config_properties[editor.MODERATOR_REQUEST_FORUM_URL.name])
+            'value': pages.MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE,
+        }, response_config_properties[pages.MODERATOR_REQUEST_FORUM_URL.name])
 
         payload = {
             'action': 'save_config_properties',
             'new_config_property_values': {
-                editor.MODERATOR_REQUEST_FORUM_URL.name: (
+                pages.MODERATOR_REQUEST_FORUM_URL.name: (
                     self.UNICODE_TEST_STRING),
             }
         }
@@ -93,16 +91,18 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response_config_properties = response_dict['config_properties']
         self.assertDictContainsSubset({
             'value': self.UNICODE_TEST_STRING,
-        }, response_config_properties[editor.MODERATOR_REQUEST_FORUM_URL.name])
+        }, response_config_properties[pages.MODERATOR_REQUEST_FORUM_URL.name])
 
         self.logout()
 
     def test_change_about_page_config_property(self):
         """Test that the correct variables show up on the about page."""
+        new_contact_email = 'test2@example.com'
+
         # Navigate to the about page. The site name is not set.
         response = self.testapp.get('/about')
-        self.assertIn('https://site/forum/url', response.body)
-        self.assertNotIn(SITE_FORUM_URL, response.body)
+        self.assertIn('CONTACT_EMAIL_ADDRESS', response.body)
+        self.assertNotIn(new_contact_email, response.body)
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.testapp.get('/admin')
@@ -110,15 +110,15 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.post_json('/adminhandler', {
             'action': 'save_config_properties',
             'new_config_property_values': {
-                pages.SITE_FORUM_URL.name: SITE_FORUM_URL
+                pages.CONTACT_EMAIL_ADDRESS.name: new_contact_email
             }
         }, csrf_token)
         self.logout()
 
         # Navigate to the splash page. The site name is set.
         response = self.testapp.get('/about')
-        self.assertNotIn('https://site/forum/url', response.body)
-        self.assertIn(SITE_FORUM_URL, response.body)
+        self.assertNotIn('CONTACT_EMAIL_ADDRESS', response.body)
+        self.assertIn(new_contact_email, response.body)
 
     def test_change_rights(self):
         """Test that the correct role indicators show up on app pages."""

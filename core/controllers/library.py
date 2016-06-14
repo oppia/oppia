@@ -19,6 +19,7 @@ import logging
 import string
 
 from core.controllers import base
+from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import summary_services
 from core.domain import user_services
@@ -31,24 +32,30 @@ import utils
 current_user_services = models.Registry.import_current_user_services()
 
 
-def get_matching_exploration_dicts(query_string, search_cursor):
-    """Given a query string and a search cursor, returns a list of exploration
+def get_matching_activity_dicts(query_string, search_cursor):
+    """Given a query string and a search cursor, returns a list of activity
        dicts that satisfy the search query.
     """
+    collection_ids, search_cursor = (
+        collection_services.get_collection_ids_matching_query(
+            query_string, cursor=search_cursor))
     exp_ids, new_search_cursor = (
         exp_services.get_exploration_ids_matching_query(
             query_string, cursor=search_cursor))
-
-    explorations_list = (
+    activity_list = []
+    activity_list = (
+        summary_services.get_displayable_collection_summary_dicts_matching_ids(
+            collection_ids))
+    activity_list += (
         summary_services.get_displayable_exp_summary_dicts_matching_ids(
             exp_ids))
 
-    if len(explorations_list) == feconf.DEFAULT_QUERY_LIMIT:
+    if len(activity_list) == feconf.DEFAULT_QUERY_LIMIT:
         logging.error(
-            '%s explorations were fetched to load the search results. '
+            '%s activities were fetched to load the library page. '
             'You may be running up against the default query limits.'
             % feconf.DEFAULT_QUERY_LIMIT)
-    return explorations_list, new_search_cursor
+    return activity_list, new_search_cursor
 
 
 class LibraryPage(base.BaseHandler):
@@ -56,15 +63,23 @@ class LibraryPage(base.BaseHandler):
     for search results.
     """
 
+    PAGE_NAME_FOR_CSRF = 'library'
+
     def get(self):
         """Handles GET requests."""
+        search_mode = 'search' in self.request.url
+
         self.values.update({
+            'meta_description': (
+                feconf.SEARCH_PAGE_DESCRIPTION if search_mode
+                else feconf.LIBRARY_PAGE_DESCRIPTION),
             'nav_mode': feconf.NAV_MODE_LIBRARY,
             'has_fully_registered': bool(
                 self.user_id and
                 user_services.has_fully_registered(self.user_id)),
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
+            'search_mode': search_mode,
             'SEARCH_DROPDOWN_CATEGORIES': feconf.SEARCH_DROPDOWN_CATEGORIES,
         })
         self.render_template('library/library.html')
@@ -78,6 +93,11 @@ class LibraryIndexHandler(base.BaseHandler):
         # TODO(sll): Support index pages for other language codes.
         summary_dicts_by_category = summary_services.get_library_groups([
             feconf.DEFAULT_LANGUAGE_CODE])
+        recently_published_summary_dicts = (
+            summary_services.get_recently_published_exploration_summary_dicts())
+        top_rated_activity_summary_dicts = (
+            summary_services.get_top_rated_exploration_summary_dicts(
+                [feconf.DEFAULT_LANGUAGE_CODE]))
         featured_activity_summary_dicts = (
             summary_services.get_featured_exploration_summary_dicts(
                 [feconf.DEFAULT_LANGUAGE_CODE]))
@@ -87,6 +107,18 @@ class LibraryIndexHandler(base.BaseHandler):
             user_settings = user_services.get_user_settings(self.user_id)
             preferred_language_codes = user_settings.preferred_language_codes
 
+        if recently_published_summary_dicts:
+            summary_dicts_by_category.insert(0, {
+                'activity_summary_dicts': recently_published_summary_dicts,
+                'categories': [],
+                'header': feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED,
+            })
+        if top_rated_activity_summary_dicts:
+            summary_dicts_by_category.insert(0, {
+                'activity_summary_dicts': top_rated_activity_summary_dicts,
+                'categories': [],
+                'header': feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS,
+            })
         if featured_activity_summary_dicts:
             summary_dicts_by_category.insert(0, {
                 'activity_summary_dicts': featured_activity_summary_dicts,
@@ -103,7 +135,7 @@ class LibraryIndexHandler(base.BaseHandler):
 
 
 class SearchHandler(base.BaseHandler):
-    """Provides data for exploration search results."""
+    """Provides data for activity search results."""
 
     def get(self):
         """Handles GET requests."""
@@ -124,11 +156,11 @@ class SearchHandler(base.BaseHandler):
                 'language_code')
         search_cursor = self.request.get('cursor', None)
 
-        explorations_list, new_search_cursor = get_matching_exploration_dicts(
+        activity_list, new_search_cursor = get_matching_activity_dicts(
             query_string, search_cursor)
 
         self.values.update({
-            'explorations_list': explorations_list,
+            'activity_list': activity_list,
             'search_cursor': new_search_cursor,
         })
 

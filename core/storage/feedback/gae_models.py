@@ -287,3 +287,24 @@ class SuggestionModel(base_models.BaseModel):
         Returns None if it doesn't match anything."""
 
         return cls.get_by_id(cls._get_instance_id(exploration_id, thread_id))
+
+
+class UnsentFeedbackEmailModel(base_models.BaseModel):
+    """Model for storing feedback messages that need to be sent to creators.
+
+    Instances of this model contain information about feedback messages that
+    have been received by the site, but have not yet been sent to creators.
+    The model instances will be deleted once the corresponding email has been
+    sent.
+
+    The id of each model instance is the user_id of the user who should receive
+    the messages."""
+
+    # The list of feedback messages that need to be sent to this user.
+    # Each element in this list is a dict with keys 'exploration_id',
+    # 'thread_id' and 'message_id'; this information is used to retrieve
+    # corresponding FeedbackMessageModel instance.
+    feedback_messages = ndb.JsonProperty(repeated=True)
+    # The number of failed attempts that have been made (so far) to
+    # send an email to this user.
+    retries = ndb.IntegerProperty(default=0, required=True, indexed=True)

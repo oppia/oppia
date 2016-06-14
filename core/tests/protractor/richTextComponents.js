@@ -28,7 +28,7 @@ describe('rich-text components', function() {
     users.createUser('user@richTextComponents.com', 'userRichTextComponents');
     users.login('user@richTextComponents.com');
 
-    workflow.createExploration('RTE components', 'maths');
+    workflow.createExploration();
 
     editor.setContent(function(richTextEditor) {
       richTextEditor.appendBoldText('bold');

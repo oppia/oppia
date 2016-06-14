@@ -47,7 +47,9 @@ oppia.directive('oppiaInteractiveEndExploration', [function() {
             EDITOR_TAB_CONTEXT.EDITOR);
 
         $scope.collectionId = GLOBALS.collectionId;
-        $scope.collectionTitle = GLOBALS.collectionTitle;
+        $scope.getCollectionTitle = function() {
+          return GLOBALS.collectionTitle;
+        };
 
         $scope.errorMessage = '';
 

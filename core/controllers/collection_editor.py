@@ -20,7 +20,9 @@ from core.controllers import base
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import rights_manager
+from core.domain import summary_services
 from core.platform import models
+import feconf
 import utils
 
 current_user_services = models.Registry.import_current_user_services()
@@ -95,6 +97,8 @@ class CollectionEditorHandler(base.BaseHandler):
 class CollectionEditorPage(CollectionEditorHandler):
     """The editor page for a single collection."""
 
+    PAGE_HAS_CREATE_EXP_REQUEST = True
+
     # TODO(bhenning): Implement read-only version of the editor. Until that
     # exists, ensure the user has proper permission to edit this collection
     # before seeing the editor.
@@ -118,13 +122,20 @@ class CollectionEditorPage(CollectionEditorHandler):
                 rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id))
 
         self.values.update({
-            'is_private': rights_manager.is_collection_private(collection_id),
             'can_edit': can_edit,
-            'collection_id': collection.id,
-            'title': collection.title,
             'can_unpublish': rights_manager.Actor(
                 self.user_id).can_unpublish(
-                    rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id)
+                    rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id),
+            'collection_id': collection.id,
+            'is_private': rights_manager.is_collection_private(collection_id),
+            'nav_mode': feconf.NAV_MODE_CREATE,
+            'title': collection.title,
+            'SHOW_COLLECTION_NAVIGATION_TAB_HISTORY': (
+                feconf.SHOW_COLLECTION_NAVIGATION_TAB_HISTORY),
+            'SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK': (
+                feconf.SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK),
+            'SHOW_COLLECTION_NAVIGATION_TAB_STATS': (
+                feconf.SHOW_COLLECTION_NAVIGATION_TAB_STATS)
         })
 
         self.render_template('collection_editor/collection_editor.html')
@@ -165,7 +176,7 @@ class WritableCollectionDataHandler(CollectionEditorHandler):
 
         # Retrieve the updated collection.
         collection_dict = (
-            collection_services.get_learner_collection_dict_by_id(
+            summary_services.get_learner_collection_dict_by_id(
                 collection_id, self.user_id, allow_invalid_explorations=True))
 
         # Send the updated collection back to the frontend.
@@ -212,4 +223,3 @@ class CollectionRightsHandler(CollectionEditorHandler):
             'rights': rights_manager.get_collection_rights(
                 collection_id).to_dict()
         })
-

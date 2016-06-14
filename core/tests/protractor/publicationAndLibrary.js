@@ -66,7 +66,7 @@ describe('Library index page', function() {
     users.logout();
 
     users.login('celebrimor@publicationAndLibrary.com');
-    workflow.createExploration('Vilya', 'rings');
+    workflow.createExploration();
     editor.setContent(forms.toRichText('Celebrimbor wrote this'));
     editor.setInteraction('EndExploration');
     editor.setObjective('preserve the works of the elves');
@@ -148,6 +148,31 @@ describe('Library index page', function() {
     player.submitAnswer('Continue');
 
     users.logout();
+  });
+
+  it('should not have any non translated strings', function() {
+    var EXPLORATION_SILMARILS = 'silmarils';
+    var EXPLORATION_VINGILOT = 'Vingilot';
+    var CATEGORY_ENVIRONMENT = 'Environment';
+    var CATEGORY_BUSINESS = 'Business';
+    var LANGUAGE_FRANCAIS = 'français';
+    users.createUser('aule@example.com', 'Aule');
+
+    users.login('aule@example.com');
+    workflow.createAndPublishExploration(
+      EXPLORATION_SILMARILS, CATEGORY_BUSINESS,
+      'hold the light of the two trees', LANGUAGE_FRANCAIS);
+    workflow.createAndPublishExploration(
+      EXPLORATION_VINGILOT, CATEGORY_ENVIRONMENT, 'seek the aid of the Valar');
+    users.logout();
+
+    browser.get('/library');
+    expect(browser.getTitle()).toEqual('Exploration Library - Oppia');
+    general.ensurePageHasNoTranslationIds();
+
+    // Filter library explorations
+    library.selectLanguages([LANGUAGE_FRANCAIS]);
+    general.ensurePageHasNoTranslationIds();
   });
 
   afterEach(function() {

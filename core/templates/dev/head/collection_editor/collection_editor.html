@@ -1,17 +1,18 @@
 {% extends "base.html" %}
 
 {% block maintitle %}
-  Oppia Editor
+  {% if title %}
+    {{ title }} - Oppia Editor
+  {% else %}
+    Untitled Collection - Oppia Editor
+  {% endif %}
 {% endblock maintitle %}
-
-{% block subtitle %}
-  {{ title }}
-{% endblock subtitle %}
 
 {% block header_js %}
   {{ super() }}
   <script type="text/javascript">
     GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
+    GLOBALS.collectionTitle = JSON.parse('{{title|js_string}}');
     GLOBALS.isPrivate = JSON.parse('{{is_private|js_string}}');
     GLOBALS.canEdit = JSON.parse('{{can_edit|js_string}}');
     GLOBALS.canUnpublish = JSON.parse('{{can_unpublish|js_string}}');
@@ -26,60 +27,72 @@
   {{dependencies_html}}
 {% endblock header_js %}
 
+{% block navbar_breadcrumb %}
+  <collection-editor-navbar-breadcrumb>
+  </collection-editor-navbar-breadcrumb>
+{% endblock navbar_breadcrumb %}
+
+{% block local_top_nav_options %}
+  <collection-editor-navbar>
+  </collection-editor-navbar>
+{% endblock local_top_nav_options %}
+
 {% block content %}
   <div ng-controller="CollectionEditor">
-    <div ng-if="collection">
-      <!-- Collection details -->
-      <collection-details-editor-directive collection="collection">
-      </collection-details-editor-directive>
-      <a ng-href="/collection/<[collection.getId()]>" target="_blank">Go to Collection</a>
+    <div ng-if="getTabStatuses().active === 'main'">
+      <collection-main-tab></collection-main-tab>
+    </div>
 
-      <!-- List of acquired and pre-requisite skills -->
-      <br>
-      <br>
-      <strong>Skills</strong>
-      <collection-skill-list-directive collection-skill-list="collectionSkillList">
-      </collection-skill-list-directive>
+    <div ng-show="getTabStatuses().active === 'settings'">
+      <collection-settings-tab></collection-settings-tab>
+    </div>
 
-      <!-- List of explorations -->
-      <br>
-      <strong>Explorations</strong>
-      <ul>
-        <li ng-repeat="node in collection.getBindableCollectionNodes()">
-          <collection-node-editor-directive collection="collection" collection-node="node" update-skill-list="updateSkillList()">
-          </collection-node-editor-directive>
-        </li>
-      </ul>
+    <div ng-show="getTabStatuses().active === 'history'">
+      <collection-history-tab></collection-history-tab>
+    </div>
 
-      <!-- A list of validation errors, if there are any -->
-      <div ng-if="validationIssues.length > 0">
-        <strong>Errors that must be addressed before saving:</strong>
-        <ul>
-          <li ng-repeat="issue in validationIssues"><[issue]></li>
-        </ul>
-      </div>
+    <div ng-show="getTabStatuses().active === 'feedback'">
+      <collection-feedback-tab></collection-feedback-tab>
+    </div>
 
-      <!-- Collection changes to be commited -->
-      <h3><span ng-if="getChangeListCount() > 0"> <em>(<[getChangeListCount()]> changes pending)</em></h3>
-      <br>
-      <input ng-model="commitMessage" type="text" placeholder="Commit Message"><button ng-click="saveCollection(commitMessage)" ng-disabled="validationIssues.length > 0">Save Collection</button>
-      <button ng-click="publishCollection()" ng-if="isPrivate">Publish Collection</button>
-      <button ng-click="unpublishCollection()" ng-if="!isPrivate && canUnpublish">Unpublish Collection</button>
+    <div ng-show="getTabStatuses().active === 'stats'">
+      <collection-statistics-tab></collection-statistics-tab>
     </div>
   </div>
 
-  {% include 'collection_editor/collection_details_editor_directive.html' %}
-  {% include 'collection_editor/collection_node_editor_directive.html' %}
-  {% include 'collection_editor/collection_skill_list_directive.html' %}
+  {% include 'collection_editor/collection_editor_navbar_breadcrumb_directive.html' %}
+  {% include 'collection_editor/collection_editor_navbar_directive.html' %}
+  {% include 'collection_editor/collection_editor_save_modal.html' %}
+  {% include 'collection_editor/collection_editor_pre_publish_modal.html' %}
+  {% include 'collection_editor/editor_tab/collection_main_tab_directive.html' %}
+  {% include 'collection_editor/editor_tab/collection_node_creator_directive.html' %}
+  {% include 'collection_editor/editor_tab/collection_node_editor_directive.html' %}
+  {% include 'collection_editor/editor_tab/collection_skill_list_directive.html' %}
+  {% include 'collection_editor/feedback_tab/collection_feedback_tab_directive.html' %}
+  {% include 'collection_editor/history_tab/collection_history_tab_directive.html' %}
+  {% include 'collection_editor/settings_tab/collection_details_editor_directive.html' %}
+  {% include 'collection_editor/settings_tab/collection_settings_tab_directive.html' %}
+  {% include 'collection_editor/statistics_tab/collection_statistics_tab_directive.html' %}
 {% endblock content %}
 
 {% block footer_js %}
   {{ super() }}
   <script>
     {{ include_js_file('collection_editor/CollectionEditor.js') }}
-    {{ include_js_file('collection_editor/CollectionDetailsEditorDirective.js') }}
-    {{ include_js_file('collection_editor/CollectionNodeEditorDirective.js') }}
-    {{ include_js_file('collection_editor/CollectionSkillListDirective.js') }}
+    {{ include_js_file('collection_editor/CollectionEditorNavbarBreadcrumbDirective.js') }}
+    {{ include_js_file('collection_editor/CollectionEditorNavbarDirective.js') }}
+    {{ include_js_file('collection_editor/CollectionEditorStateService.js') }}
+    {{ include_js_file('collection_editor/editor_tab/CollectionLinearizerService.js') }}
+    {{ include_js_file('collection_editor/editor_tab/CollectionMainTabDirective.js') }}
+    {{ include_js_file('collection_editor/editor_tab/CollectionNodeCreatorDirective.js') }}
+    {{ include_js_file('collection_editor/editor_tab/CollectionNodeEditorDirective.js') }}
+    {{ include_js_file('collection_editor/editor_tab/CollectionSkillListDirective.js') }}
+    {{ include_js_file('collection_editor/feedback_tab/CollectionFeedbackTabDirective.js') }}
+    {{ include_js_file('collection_editor/history_tab/CollectionHistoryTabDirective.js') }}
+    {{ include_js_file('collection_editor/settings_tab/CollectionDetailsEditorDirective.js') }}
+    {{ include_js_file('collection_editor/settings_tab/CollectionSettingsTabDirective.js') }}
+    {{ include_js_file('collection_editor/statistics_tab/CollectionStatisticsTabDirective.js') }}
+
     {{ include_js_file('domain/collection/CollectionBackendApiService.js') }}
     {{ include_js_file('domain/collection/CollectionNodeObjectFactory.js') }}
     {{ include_js_file('domain/collection/CollectionObjectFactory.js') }}
@@ -92,5 +105,13 @@
     {{ include_js_file('domain/editor/UndoRedoService.js') }}
     {{ include_js_file('domain/summaries/ExplorationSummaryBackendApiService.js') }}
     {{ include_js_file('domain/utilities/UrlInterpolationService.js') }}
+
+    {# TODO(bhenning): Remove these once RouterServices is decoupled from the exploration editor #}
+    {{ include_js_file('exploration_editor/EditorServices.js') }}
+    {{ include_js_file('exploration_editor/ExplorationEditor.js') }}
+    {{ include_js_file('exploration_editor/GadgetValidationService.js') }}
+    {{ include_js_file('exploration_editor/RouterServices.js') }}
+    {{ include_js_file('expressions/expressionInterpolationService.js') }}
+    {{ include_js_file('services/utilsService.js') }}
   </script>
 {% endblock footer_js %}

@@ -122,7 +122,7 @@ oppia.factory('messengerService', ['$log', '$window', function($log, $window) {
           return;
         }
 
-        if (hashDict.version == '0.0.0' || hashDict.version == '0.0.1') {
+        if (hashDict.version === '0.0.0' || hashDict.version === '0.0.1') {
           $log.info('Posting message to parent: ' + messageTitle);
 
           var payload = getPayload[messageTitle](messageData);
@@ -137,7 +137,7 @@ oppia.factory('messengerService', ['$log', '$window', function($log, $window) {
             title: messageTitle,
             payload: payload
           };
-          if (hashDict.version == '0.0.0') {
+          if (hashDict.version === '0.0.0') {
             // Ensure backwards-compatibility.
             objToSendToParent.sourceTagId = hashDict.tagid;
             objToSendToParent.secret = hashDict.secret;

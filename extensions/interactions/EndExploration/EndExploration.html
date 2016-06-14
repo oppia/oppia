@@ -1,13 +1,14 @@
 <script type="text/ng-template" id="interaction/EndExploration">
   <div ng-if="!isIframed && !isInEditorPreviewMode">
     <a ng-href="/collection/<[collectionId]>" ng-if="collectionId">
-      <md-button class="oppia-learner-continue-button">
-        Return to "<[collectionTitle]>"
+      <md-button class="oppia-learner-continue-button"
+                 translate="I18N_PLAYER_RETURN_TO_COLLECTION"
+                 translate-values="{collectionTitle: getCollectionTitle()}">
       </md-button>
     </a>
     <a href="/library">
-      <md-button class="oppia-learner-continue-button" ng-if="!collectionId">
-        Return to Library
+      <md-button class="oppia-learner-continue-button" ng-if="!collectionId"
+                 translate="I18N_PLAYER_RETURN_TO_LIBRARY">
       </md-button>
     </a>
   </div>

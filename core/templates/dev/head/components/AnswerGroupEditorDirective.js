@@ -201,7 +201,7 @@ oppia.directive('answerGroupEditor', [function() {
           $scope.rules.splice(index, 1);
           $scope.saveRules();
 
-          if ($scope.rules.length == 0) {
+          if ($scope.rules.length === 0) {
             alertsService.addWarning(
               'All answer groups must have at least one rule.');
           }

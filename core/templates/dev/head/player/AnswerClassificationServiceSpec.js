@@ -29,6 +29,8 @@ describe('Answer classification service', function() {
     });
   });
 
+  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+
   var acs, $httpBackend, successHandler, failHandler, $rootScope, state;
   beforeEach(inject(function($injector) {
     acs = $injector.get('AnswerClassificationService');
@@ -80,7 +82,7 @@ describe('Answer classification service', function() {
       return inputs.x === answer;
     },
     NotEquals: function(answer, inputs) {
-      return inputs.x != answer;
+      return inputs.x !== answer;
     }
   };
 

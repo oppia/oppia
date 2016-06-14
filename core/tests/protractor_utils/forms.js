@@ -133,11 +133,6 @@ var RichTextEditor = function(elem) {
       _appendContentText(text);
       _clickToolbarButton('italics');
     },
-    appendUnderlineText: function(text) {
-      _clickToolbarButton('underline');
-      _appendContentText(text);
-      _clickToolbarButton('underline');
-    },
     appendOrderedList: function(textArray) {
       _appendContentText('\n');
       _clickToolbarButton('ol');
@@ -412,9 +407,6 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
     readItalicText: function(text) {
       _readFormattedText(text, 'i');
     },
-    readUnderlineText: function(text) {
-      _readFormattedText(text, 'u');
-    },
     // TODO(Jacob): add functions for other rich text components.
     // Additional arguments may be sent to this function, and they will be
     // passed on to the relevant RTE component editor.
@@ -503,7 +495,7 @@ var CodeMirrorChecker = function(elem) {
           .then(function(lineNumber) {
         // Note: the last line in codemirror will have an empty string for line
         // number and for text. This is to skip that line.
-        if (lineNumber == '') {
+        if (lineNumber === '') {
           return lineNumber;
         }
         if (!compareDict.hasOwnProperty(lineNumber)) {
@@ -519,7 +511,7 @@ var CodeMirrorChecker = function(elem) {
       });
     }).then(function(lineNumbers) {
       var largestLineNumber = lineNumbers[lineNumbers.length - 1];
-      if (largestLineNumber != currentLineNumber) {
+      if (largestLineNumber !== currentLineNumber) {
         _compareTextAndHighlightingFromLine(
           largestLineNumber,
           scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS,

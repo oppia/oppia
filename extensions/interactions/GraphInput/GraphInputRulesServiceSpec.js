@@ -202,7 +202,7 @@ describe('Graph Input service', function() {
 
   var undirectedCycleGraph = function(numVertices) {
     var graph = undirectedNullGraph(numVertices);
-    if (numVertices == 1) {
+    if (numVertices === 1) {
       return graph;
     }
     for (var i = 0; i < numVertices; i++) {
@@ -265,7 +265,7 @@ describe('Graph Input service', function() {
 
   var directedCycleGraph = function(numVertices) {
     var graph = directedNullGraph(numVertices);
-    if (numVertices == 1) {
+    if (numVertices === 1) {
       return graph;
     }
     for (var i = 0; i < numVertices; i++) {

@@ -45,6 +45,10 @@ current_user_services = models.Registry.import_current_user_services()
 
 CSRF_REGEX = (
     r'csrf_token: JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\)')
+CSRF_I18N_REGEX = (
+    r'csrf_token_i18n: JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\)')
+CSRF_CREATE_EXPLORATION_REGEX = (
+    r'csrf_token_create_exploration: JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\)') # pylint: disable=line-too-long
 # Prefix to append to all lines printed by tests to the console.
 LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
 
@@ -263,9 +267,18 @@ class TestBase(unittest.TestCase):
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
 
-    def get_csrf_token_from_response(self, response):
+    def get_csrf_token_from_response(self, response, token_type=None):
         """Retrieve the CSRF token from a GET response."""
-        return re.search(CSRF_REGEX, response.body).group(1)
+        if token_type is None:
+            regex = CSRF_REGEX
+        elif token_type == feconf.CSRF_PAGE_NAME_CREATE_EXPLORATION:
+            regex = CSRF_CREATE_EXPLORATION_REGEX
+        elif token_type == feconf.CSRF_PAGE_NAME_I18N:
+            regex = CSRF_I18N_REGEX
+        else:
+            raise Exception('Invalid CSRF token type: %s' % token_type)
+
+        return re.search(regex, response.body).group(1)
 
     def signup(self, email, username):
         """Complete the signup process for the user with the given username."""
@@ -331,7 +344,7 @@ class TestBase(unittest.TestCase):
         Returns the exploration domain object.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
-            exploration_id, title, 'A category')
+            exploration_id, title=title, category='A category')
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 
@@ -345,7 +358,8 @@ class TestBase(unittest.TestCase):
         Returns the exploration domain object.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
-            exploration_id, title, category, language_code=language_code)
+            exploration_id, title=title, category=category,
+            language_code=language_code)
         exploration.states[exploration.init_state_name].update_interaction_id(
             'TextInput')
         exploration.objective = objective
@@ -405,23 +419,27 @@ class TestBase(unittest.TestCase):
 
     def save_new_default_collection(
             self, collection_id, owner_id, title='A title',
-            category='A category', objective='An objective'):
+            category='A category', objective='An objective',
+            language_code=feconf.DEFAULT_LANGUAGE_CODE):
         """Saves a new default collection written by owner_id.
 
         Returns the collection domain object.
         """
         collection = collection_domain.Collection.create_default_collection(
-            collection_id, title, category, objective)
+            collection_id, title=title, category=category, objective=objective,
+            language_code=language_code)
         collection_services.save_new_collection(owner_id, collection)
         return collection
 
     def save_new_valid_collection(
             self, collection_id, owner_id, title='A title',
             category='A category', objective='An objective',
+            language_code=feconf.DEFAULT_LANGUAGE_CODE,
             exploration_id='an_exploration_id',
             end_state_name=DEFAULT_END_STATE_NAME):
         collection = collection_domain.Collection.create_default_collection(
-            collection_id, title, category, objective=objective)
+            collection_id, title, category, objective,
+            language_code=language_code)
         collection.add_node(
             self.save_new_valid_exploration(
                 exploration_id, owner_id, title, category, objective,
@@ -571,11 +589,17 @@ class AppEngineTestBase(TestBase):
         """Counts the jobs in the given queue. If queue_name is None,
         defaults to counting the jobs in all queues available.
         """
+        return len(self.get_pending_tasks(queue_name))
+
+    def get_pending_tasks(self, queue_name=None):
+        """Returns the jobs in the given queue. If queue_name is None,
+        defaults to returning the jobs in all queues available.
+        """
         if queue_name:
-            return len(self.taskqueue_stub.get_filtered_tasks(
-                queue_names=[queue_name]))
+            return self.taskqueue_stub.get_filtered_tasks(
+                queue_names=[queue_name])
         else:
-            return len(self.taskqueue_stub.get_filtered_tasks())
+            return self.taskqueue_stub.get_filtered_tasks()
 
     def process_and_flush_pending_tasks(self, queue_name=None):
         """Runs and flushes pending tasks. If queue_name is None, does so for

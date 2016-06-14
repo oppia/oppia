@@ -5,32 +5,38 @@
   <div class="oppia-footer-container">
     <div class="row">
       <div class="col-sm-3">
-        <h4>ABOUT OPPIA</h4>
+        <h4 translate="I18N_FOOTER_ABOUT_ALL_CAPS"></h4>
         <ul>
-          <li><a href="/about">About</a><br /></li>
-          <li><a href="/about#foundation">The Oppia Foundation</a></li>
-          <li><a href="/about#contact">Get Involved</a></li>
-          <li><a href="/about#credits">Credits</a></li>
+          <li><a href="/about" translate="I18N_FOOTER_ABOUT"></a></li>
+          <li><a href="/about#foundation" translate="I18N_FOOTER_OPPIA_FOUNDATION"></a></li>
+          <li><a href="/contact" translate="I18N_FOOTER_GET_INVOLVED"></a></li>
+          <li><a href="/about#credits" translate="I18N_FOOTER_CREDITS"></a></li>
         </ul>
       </div>
       <div class="col-sm-3">
-        <h4>TEACH</h4>
+        <h4 translate="I18N_FOOTER_TEACH_LEARN_ALL_CAPS"></h4>
         <ul>
-          <li><a href="/about#teach">Teach on Oppia</a></li>
-          <li><a href="/participate">Participation Playbook</a></li>
+          <li><a href="/teach#teach" translate="I18N_FOOTER_TEACH"></a></li>
+          <li><a href="/teach#playbook" translate="I18N_FOOTER_PARTICIPATION_PLAYBOOK"></a></li>
+          <li><a href="/library" translate="I18N_FOOTER_BROWSE_LIBRARY"></a></li>
         </ul>
       </div>
       <div class="col-sm-3">
-        <h4>LEARN</h4>
+        <h4 translate="I18N_FOOTER_CONTACT_ALL_CAPS"></h4>
         <ul>
-          <li><a href="/library">Browse the Library</a></li>
+          <li><a href="/forum" translate="I18N_FOOTER_FORUM"></a></li>
+          <li><a href="/contact" translate="I18N_FOOTER_CONTACT_US"></a></li>
         </ul>
       </div>
       <div class="col-sm-3">
-        <h4>CONTACT US</h4>
-        <ul>
-          <li><a href="/forum">Forum</a></li>
-          <li><a href="/about#contact">Contact Us</a></li>
+        <h4><span translate="I18N_LANGUAGE_FOOTER_VIEW_IN"></span></h4>
+        <ul ng-controller="I18nFooter">
+          <select ng-model="currentLanguageCode"
+                  ng-change="changeLanguage()"
+                  ng-options="langCode as langName for (langCode, langName) in supportedSiteLanguages"
+                  class="protractor-test-i18n-language-selector"
+                  style="color: black;">
+          </select>
         </ul>
       </div>
     </div>

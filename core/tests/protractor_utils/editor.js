@@ -358,7 +358,7 @@ var disableGadgetVisibilityForState = function(stateName) {
 var expectGadgetListNameToMatch = function(
     gadgetType, gadgetShortDescription, gadgetName) {
   var expectedListName;
-  if (gadgetShortDescription == gadgetName) {
+  if (gadgetShortDescription === gadgetName) {
     expectedListName = gadgetName;
   } else {
     expectedListName = gadgetShortDescription + ' (' + gadgetName + ')';
@@ -913,6 +913,7 @@ var addFallback = function(
 
 // NOTE: if the state is not visible in the state graph this function will fail
 var moveToState = function(targetName) {
+  general.scrollToTop();
   element.all(by.css('.protractor-test-node')).map(function(stateElement) {
     return stateElement.element(by.css('.protractor-test-node-label')).
       getText();
@@ -975,16 +976,17 @@ var runFromSettingsTab = function(callbackFunction) {
 
 var setTitle = function(title) {
   runFromSettingsTab(function() {
-    element(by.css('protractor-test-exploration-title-input')).clear();
-    element(by.css('protractor-test-exploration-title-input')).sendKeys(title);
+    element(by.css('.protractor-test-exploration-title-input')).clear();
+    element(by.css('.protractor-test-exploration-title-input')).sendKeys(
+      title);
   });
 };
 
 var setCategory = function(category) {
   runFromSettingsTab(function() {
-    element(by.css('.protractor-test-exploration-category-input')).clear();
-    element(by.css('.protractor-test-exploration-category-input')).
-      sendKeys(category);
+    forms.AutocompleteDropdownEditor(
+      element(by.css('.protractor-test-exploration-category-input'))
+    ).setValue(category);
   });
 };
 
@@ -1166,9 +1168,9 @@ var expectGraphComparisonOf = function(v1, v2) {
     element(by.css('.protractor-test-history-graph'))
         .all(by.css('.protractor-test-link')).map(function(link) {
       return link.getCssValue('stroke').then(function(linkColor) {
-        if (linkColor == COLOR_ADDED) {
+        if (linkColor === COLOR_ADDED) {
           return 'added';
-        } else if (linkColor == COLOR_DELETED) {
+        } else if (linkColor === COLOR_DELETED) {
           return 'deleted';
         } else {
           return 'other';
@@ -1187,19 +1189,19 @@ var expectGraphComparisonOf = function(v1, v2) {
         }
       }
 
-      if (totalCount != totalLinks) {
+      if (totalCount !== totalLinks) {
         throw Error(
           'In editor.expectGraphComparisonOf(' + v1 + ', ' + v2 + '), ' +
           'expected to find ' + totalLinks + ' links in total, ' +
           'but found ' + totalCount);
       }
-      if (addedCount != addedLinks) {
+      if (addedCount !== addedLinks) {
         throw Error(
           'In editor.expectGraphComparisonOf(' + v1 + ', ' + v2 + '), ' +
           'expected to find ' + addedLinks + ' added links, ' + 'but found ' +
           addedCount);
       }
-      if (deletedCount != deletedLinks) {
+      if (deletedCount !== deletedLinks) {
         throw Error(
           'In editor.expectGraphComparisonOf(' + v1 + ', ' + v2 + '), ' +
           'expected to find ' + deletedLinks + ' deleted links, ' +

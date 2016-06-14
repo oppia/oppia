@@ -1,0 +1,30 @@
+<div>
+  <div ng-if="!contentEditorIsOpen" class="protractor-test-edit-content"
+       ng-click="openStateContentEditor()"
+       ng-class="{'oppia-editable-section': editabilityService.isEditable()}">
+    <i ng-if="editabilityService.isEditable()" class="material-icons oppia-editor-edit-icon"
+       title="Edit Card Content">&#xE254;
+    </i>
+    <div class="oppia-state-content-display oppia-transition-200" ng-class="{'oppia-prevent-selection': editabilityService.isEditable()}" title="Card Content">
+      <span ng-show="content[0].value == '' && isCurrentStateInitialState()" class="oppia-placeholder">
+        This is the first card of your exploration. Use this space to introduce your topic and engage the learner, then ask them a question.
+      </span>
+      <span ng-show="content[0].value == '' && !isCurrentStateInitialState()" class="oppia-placeholder">
+        You can speak to the learner here, then ask them a question.
+      </span>
+      <span angular-html-bind="content[0].value" class="oppia-state-content-display-html protractor-test-state-content-display"></span>
+    </div>
+    <!-- This is a dummy div created to mask the contents when hovered above user contents-->
+    <div class="oppia-editable-section-mask protractor-test-state-edit-content"></div>
+  </div>
+</div>
+
+<div ng-if="contentEditorIsOpen" class="protractor-test-state-content-editor">
+  <schema-based-editor schema="STATE_CONTENT_SCHEMA" local-value="content[0].value">
+  </schema-based-editor>
+  <div style="margin-top: 2px;">
+    <button type="button" class="btn btn-success oppia-save-state-item-button protractor-test-save-state-content pull-right" ng-click="onSaveContentButtonClicked()">Save Content</button>
+    <button type="button" class="btn btn-default pull-right" ng-click="cancelEdit()">Cancel</button>
+    <div style="clear: both;"></div>
+  </div>
+</div>

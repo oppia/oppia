@@ -21,16 +21,16 @@ oppia.directive('searchResults', [function() {
     restrict: 'E',
     templateUrl: 'components/searchResults',
     controller: [
-      '$scope', '$rootScope', '$timeout', 'siteAnalyticsService',
-      function($scope, $rootScope, $timeout, siteAnalyticsService) {
+      '$scope', '$rootScope', '$timeout', '$window', 'siteAnalyticsService',
+      function($scope, $rootScope, $timeout, $window, siteAnalyticsService) {
         $rootScope.loadingMessage = 'Loading';
         $scope.someResultsExist = true;
 
         // Called when the first batch of search results is retrieved from the
         // server.
         $scope.$on(
-          'initialSearchResultsLoaded', function(evt, explorationsList) {
-            $scope.someResultsExist = explorationsList.length > 0;
+          'initialSearchResultsLoaded', function(evt, activityList) {
+            $scope.someResultsExist = activityList.length > 0;
             $rootScope.loadingMessage = '';
           }
         );
