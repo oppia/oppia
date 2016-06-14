@@ -169,9 +169,6 @@ class DashboardHandler(base.BaseHandler):
                 exp_summary.id)
             exp_stats = stats_services.get_exploration_stats(
                 exp_summary.id, 'all')
-            unresolved_answers = (
-                exp_services.get_total_unresolved_answers_for_exploration(
-                    exp_summary.id))
             # TODO(sll): Reuse _get_displayable_exp_summary_dicts() in
             # summary_services, instead of replicating it like this.
             explorations_list.append({
@@ -196,7 +193,6 @@ class DashboardHandler(base.BaseHandler):
                     feedback_thread_analytics.num_open_threads),
                 'num_total_threads': (
                     feedback_thread_analytics.num_total_threads),
-                'unresolved_answers': unresolved_answers,
                 'num_plays': exp_stats.num_starts
             })
 
