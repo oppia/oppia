@@ -955,6 +955,8 @@ var deleteState = function(stateName) {
   });
 };
 
+// For this to work, there must be more than one name, otherwise the
+// exploration overview will be disabled.
 var expectStateNamesToBe = function(names) {
   element.all(by.css('.protractor-test-node')).map(function(stateNode) {
     return stateNode.element(by.css('.protractor-test-node-label')).getText();

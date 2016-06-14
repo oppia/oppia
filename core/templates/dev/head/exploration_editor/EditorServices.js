@@ -2098,12 +2098,12 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
     var stateWiseEditsMapping = {};
     // The variable stateWiseEditsMapping stores the edits grouped by state.
     // For instance, you made the following edits:
-    // 1. Changed content to 'Welcome!' instead of '' in 'First Card'.
+    // 1. Changed content to 'Welcome!' instead of '' in 'Introduction'.
     // 2. Added an interaction in this state.
     // 2. Added a new state 'End'.
     // 3. Ended Exporation from state 'End'.
     // stateWiseEditsMapping will look something like this:
-    // - 'First Card': [
+    // - 'Introduction': [
     //   - 'Edited Content: Welcome!',:
     //   - 'Added Interaction: Continue',
     //   - 'Added interaction customizations']

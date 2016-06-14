@@ -97,7 +97,7 @@ DEFAULT_EXPLORATION_CATEGORY = ''
 DEFAULT_EXPLORATION_OBJECTIVE = ''
 
 # Default name for the initial state of an exploration.
-DEFAULT_INIT_STATE_NAME = 'First Card'
+DEFAULT_INIT_STATE_NAME = 'Introduction'
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
 
@@ -371,6 +371,17 @@ DEMO_EXPLORATIONS = {
 DEMO_COLLECTIONS = {
     u'0': 'welcome_to_collections.yaml'
 }
+
+# IDs of explorations which should not be displayable in either the learner or
+# editor views.
+DISABLED_EXPLORATION_IDS = ['5']
+
+# Google Group embed URL for the Forum page.
+EMBEDDED_GOOGLE_GROUP_URL = (
+    'https://groups.google.com/forum/embed/?place=forum/oppia')
+
+# Whether to allow YAML file uploads.
+ALLOW_YAML_FILE_UPLOAD = False
 
 # TODO(sll): Add all other URLs here.
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
