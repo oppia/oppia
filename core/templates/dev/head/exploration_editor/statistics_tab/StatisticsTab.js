@@ -70,7 +70,7 @@ oppia.controller('StatisticsTab', [
         var numCompletions = data.num_completions;
         var improvements = data.improvements;
         $scope.stateStats = data.state_stats;
-        $scope.lastUpdated = data.last_updated_msec;
+        $scope.lastUpdated = data.last_updated;
 
         if (numVisits > 0) {
           $scope.hasExplorationBeenVisited = true;

@@ -162,6 +162,13 @@ def get_thread_analytics(exploration_id):
     return feedback_jobs_continuous.FeedbackAnalyticsAggregator.get_thread_analytics( # pylint: disable=line-too-long
         exploration_id)
 
+def get_thread_analytics_multi(exploration_ids):
+    """Returns a dict with feedback thread analytics for the given exploration
+    ids.
+    """
+    return feedback_jobs_continuous.FeedbackAnalyticsAggregator.get_thread_analytics_multi( # pylint: disable=line-too-long
+        exploration_ids)
+
 
 def create_suggestion(exploration_id, author_id, exploration_version,
                       state_name, description, suggestion_content):

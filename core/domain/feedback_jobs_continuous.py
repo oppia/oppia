@@ -145,6 +145,38 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
         return feedback_domain.FeedbackAnalytics(
             exploration_id, num_open_threads, num_total_threads)
 
+    @classmethod
+    def get_thread_analytics_multi(cls, exploration_ids):
+        realtime_model_ids = cls.get_multi_active_realtime_layer_ids(
+            exploration_ids)
+        realtime_models = cls._get_realtime_datastore_class().get_multi(
+            realtime_model_ids)
+        feedback_thread_analytics_models = (
+            feedback_models.FeedbackAnalyticsModel.get_multi(
+                exploration_ids))
+
+        num_open_threads_list = []
+        num_total_threads_list = []
+        for i in range(len(exploration_ids)):
+            num_open_threads = 0
+            num_total_threads = 0
+            if realtime_models[i] is not None:
+                num_open_threads += realtime_models[i].num_open_threads
+                num_total_threads += realtime_models[i].num_total_threads
+            if feedback_thread_analytics_models[i] is not None:
+                num_open_threads += (
+                    feedback_thread_analytics_models[i].num_open_threads)
+                num_total_threads += (
+                    feedback_thread_analytics_models[i].num_total_threads)
+            num_open_threads_list.append(num_open_threads)
+            num_total_threads_list.append(num_total_threads)
+
+        return [feedback_domain.FeedbackAnalytics(
+            exploration_ids[i],
+            num_open_threads_list[i],
+            num_total_threads_list[i])
+                for i in range(len(exploration_ids))]
+
 
 class FeedbackAnalyticsMRJobManager(
         jobs.BaseMapReduceJobManagerForContinuousComputations):

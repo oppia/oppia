@@ -133,9 +133,6 @@ class DashboardPage(base.BaseHandler):
 class DashboardHandler(base.BaseHandler):
     """Provides data for the user's creator dashboard page."""
 
-    # Count num_plays for all versions
-    VERSION_ALL = 'all'
-
     def get(self):
         """Handles GET requests."""
         if self.user_id is None:
@@ -156,17 +153,17 @@ class DashboardHandler(base.BaseHandler):
                 subscription_services.get_collection_ids_subscribed_to(
                     self.user_id)))
 
-        explorations_list = summary_services.get_displayable_exp_summaries(
+        explorations_list = summary_services.get_displayable_exp_summary_dicts(
             subscribed_exploration_summaries)
         collections_list = []
 
-        for exploration in explorations_list:
-            feedback_thread_analytics = feedback_services.get_thread_analytics(
-                exploration['id'])
-            exploration.update({
-                'num_open_threads': feedback_thread_analytics.num_open_threads,
-                'num_total_threads': feedback_thread_analytics.num_total_threads
-            })
+        feedback_thread_analytics = (
+            feedback_services.get_thread_analytics_multi(
+                subscription_services.get_exploration_ids_subscribed_to(
+                    self.user_id)))
+
+        for ind, exploration in enumerate(explorations_list):
+            exploration.update(feedback_thread_analytics[ind])
 
         explorations_list = sorted(
             explorations_list,

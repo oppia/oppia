@@ -147,16 +147,17 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedFeedbackAnalyticsAggregator.start_computation()
             self.assertEqual(self.count_jobs_in_taskqueue(), 1)
             self.process_and_flush_pending_tasks()
+            feedback_analytics = (
+                ModifiedFeedbackAnalyticsAggregator.get_thread_analytics_multi(
+                    [exp_id_1, exp_id_2]))
             self.assertEqual(
-                ModifiedFeedbackAnalyticsAggregator.get_thread_analytics(
-                    exp_id_1).to_dict(),
+                feedback_analytics[0].to_dict(),
                 {
                     'num_open_threads': 2,
                     'num_total_threads': 2,
                 })
             self.assertEqual(
-                ModifiedFeedbackAnalyticsAggregator.get_thread_analytics(
-                    exp_id_2).to_dict(),
+                feedback_analytics[1].to_dict(),
                 {
                     'num_open_threads': 2,
                     'num_total_threads': 2,
