@@ -644,7 +644,7 @@ oppia.factory('rteHelperService', [
           if (componentDefn.name === 'image' && attrName === 'width') {
             el.attr('width',
               oppiaHtmlEscaper.objToEscapedJson(customizationArgsDict[attrName]));
-          }
+            }
         }
 
         return el.get(0);
