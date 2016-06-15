@@ -45,6 +45,8 @@ CHROME_DRIVER_PATH = os.path.join(
 BROWSERMOB_PROXY_PATH = os.path.join(
     '..', 'oppia_tools', 'browsermob-proxy-2.1.1', 'bin', 'browsermob-proxy')
 
+# Duration to wait for the complete page to load, otherwise XHR requests made
+# after page load will not be recorded.
 WAIT_DURATION = 0
 
 
