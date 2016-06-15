@@ -98,6 +98,7 @@ describe('Answer classification service', function() {
       answerGroupIndex: 0,
       ruleSpecIndex: 0
     };
+    console.log('yo');
     $httpBackend.expectPOST(
       '/explorehandler/classify/' + explorationId).respond(
       backendClassifiedOutcome);
