@@ -12,54 +12,85 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Script to process page loading stats or HTTP Archive(also referred to as HAR)
-data and/or timing stats to obtain stats/metrics for the corresponding page.
+"""Contains domain objects for storing page session stats as provided by a
+HTTP Archive file (also referred to as HAR).
 
-We need selenium + browsermob-proxy to capture page loading session
-(or HTTP Archive), to obtain page size stats. However, owing to the sluggish
-nature of the proxy server, timing stats are not accurate.
-Hence, we have separate timing stats which are obtained without making
-use of the proxy, directly from the browser console.
+Selenium and Browsermob-proxy are used for capturing session information, such
+as load times and page size statistics. Timing statistics are retrieved directly
+from the browser console rather than the proxy server, as the latter is sluggish
+and gives inaccurate timings.
 """
 
+import utils
 
-class PageSessionMetricsRetriever(object):
+
+class PageSessionMetrics(object):
     """Contains methods to process stats and provide performance metrics.
 
-    page_session_stats if a dictionary containing page load statistics or
-    HTTP Archive (HAR).
-    Refer: https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/HAR/Overview.html
+    page_session_stats is a dictionary containing page load statistics from an
+    HTTP Archive.
+    (https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/HAR/Overview.html)
 
-    page_session_timings is a dictionary containing various timings associated
-    with a page load like request time, dom load time, etc.
-    Structure:
-        {
-          "webkitClearResourceTimings": {},
-          "memory": {...},
-          "timing": {
-            "domLoading": 1465470586738,
-            "fetchStart": 1465470583251,
-          }
-        }
+    page_session_timings is a dictionary containing metrics associated with page
+    loading and includes the following keys:
+
+        timing: maps to a dict containing the keys (all in milliseconds):
+            domLoading: the Unix time the DOM started loading
+            fetchStart: the Unix time the page began loading
+            responseStart: the Unix time the response started
+            loadEventEnd: the Unix time the page finished loading
+            requestStart: the Unix time the request started
+            responseEnd: the Unix time the request finished
+            domComplete: the Unix time the DOM finished loading
+            domInteractive: the Unix time the the parser finished its work on
+                            the main document
     """
 
-    def __init__(self, page_session_stats, page_session_timings):
+    TIMING_PROPERTIES = [
+        'loadEventEnd', 'fetchStart', 'domComplete', 'domInteractive',
+        'responseEnd', 'requestStart'
+        ]
+
+    def __init__(self, page_session_stats=None, page_session_timings=None):
         self.page_session_stats = page_session_stats
         self.page_session_timings = page_session_timings
 
         self.page_load_timings = {}
-        if 'timing' not in self.page_session_timings:
-            raise ValueError('page_session_timings missing key: timing')
+        if self.page_session_timings:
+            self.page_load_timings = page_session_timings['timing']
 
-        self.page_load_timings = page_session_timings['timing']
+        self._validate()
+
+    def _validate(self):
+        """Validates various properties of a PageSessionMetrics object."""
+        if not self.page_session_stats and not self.page_session_timings:
+            raise utils.ValidationError(
+                'Expected atleast one argument among page_session_stats or '
+                'page_session_timings to be present.')
+
+        if self.page_session_stats:
+            if 'log' not in self.page_session_stats:
+                raise utils.ValidationError(
+                    'Expected the page load stats to have a \'log\' entry')
+
+            if 'entries' not in self.page_session_stats['log']:
+                raise utils.ValidationError(
+                    'Expected the log entry of the page load stats to include'
+                    'an additional \'entries\' element')
+
+        if self.page_session_timings:
+            for timing_prop in self.TIMING_PROPERTIES:
+                if timing_prop not in self.page_load_timings:
+                    raise utils.ValidationError(
+                        'Expected the timing entry of the page load timings to'
+                        'include %s property' % timing_prop)
 
     def get_request_count(self):
-        """Return no of requests made for the page load."""
+        """Returns the number of requests made prior to the page load
+        completing."""
         request_count = 0
 
-        if 'log' in self.page_session_stats:
-            if 'entries' in self.page_session_stats['log']:
-                request_count = len(self.page_session_stats['log']['entries'])
+        request_count = len(self.page_session_stats['log']['entries'])
 
         if request_count == 0:
             raise Exception('Total requests cannot be 0.')
@@ -67,15 +98,11 @@ class PageSessionMetricsRetriever(object):
         return request_count
 
     def get_total_page_size_bytes(self):
-        """Return total page size which includes the size of all resources
-        for a page.
-        """
+        """Returns the total size of a page including all of its resources."""
         total_size = 0
 
-        if 'log' in self.page_session_stats:
-            if 'entries' in self.page_session_stats['log']:
-                for entry in self.page_session_stats['log']['entries']:
-                    total_size += int(entry['response']['bodySize'])
+        for entry in self.page_session_stats['log']['entries']:
+            total_size += int(entry['response']['bodySize'])
 
         if total_size <= 0:
             raise Exception('Total page size should be positive.')
@@ -85,15 +112,7 @@ class PageSessionMetricsRetriever(object):
     def _get_duration_secs(self, event_end, event_initial):
         # Check if timestamps are seconds or milliseconds.
         # From: http://goo.gl/iHNYWx
-        if event_initial not in self.page_load_timings:
-            error_msg = 'page_load_timings missing key: %s' % event_initial
-            raise ValueError(error_msg)
-
         initial_timestamp = self.page_load_timings[event_initial]
-
-        if event_end not in self.page_load_timings:
-            error_msg = 'page_load_timings missing key: %s' % event_end
-            raise ValueError(error_msg)
 
         end_timestamp = self.page_load_timings[event_end]
 
@@ -116,13 +135,13 @@ class PageSessionMetricsRetriever(object):
         return duration_secs
 
     def get_page_load_time_secs(self):
-        """Return total page load time"""
+        """Returns the total page load time (in seconds)."""
         return self._get_duration_secs('loadEventEnd', 'fetchStart')
 
     def get_dom_ready_time_secs(self):
-        """Return dom ready time"""
+        """Returns the total dom ready time (in seconds)."""
         return self._get_duration_secs('domComplete', 'domInteractive')
 
     def get_request_time_secs(self):
-        """Return time required to make requests"""
+        """Returns the total request time (in seconds)."""
         return self._get_duration_secs('responseEnd', 'requestStart')

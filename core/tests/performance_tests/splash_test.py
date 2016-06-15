@@ -15,11 +15,6 @@
 """Tests for the splash page"""
 
 import unittest
-import os
-import sys
-
-CURR_DIR = os.path.abspath(os.getcwd())
-sys.path.insert(0, os.path.join(CURR_DIR))
 
 # pylint: disable=import-error, wrong-import-position
 from core.tests.performance_tests import base
@@ -28,44 +23,47 @@ from core.tests.performance_tests import base
 class SplashPagePerformanceTest(base.TestBase):
     """Tests for the splash page."""
 
+    SPLASH_URL = 'http://localhost:8181/splash'
+
     def setUp(self):
         super(SplashPagePerformanceTest, self).setUp()
-        splash_url = 'http://localhost:8181/splash'
-
-        page_session_stats = self._get_page_session_stats(splash_url)
-        page_session_timings = self._get_page_session_timings(splash_url)
-
-        self._set_stats(page_session_stats, page_session_timings)
 
     def test_splash_page_has_less_than_10_megabytes_sent_to_the_client(self):
         """"Is total size below 10,000,000 in bytes."""
+        page_session_stats = self._get_page_session_stats(self.SPLASH_URL)
+        self._set_stats(page_session_stats, None)
+
         self.assertLessEqual(
             self.page_metrics.get_total_page_size_bytes(), 10000000)
 
-    def test_splash_page_loads_under_5_seconds(self):
-        """Is page load time below 5 secs."""
-        self.assertLessEqual(self.page_metrics.get_page_load_time_secs(), 5)
+    def test_splash_page_loads_under_10_seconds(self):
+        """Is page load time below 10 secs."""
+        page_session_timings = self._get_page_session_timings(self.SPLASH_URL)
+        self._set_stats(None, page_session_timings)
+
+        self.assertLessEqual(self.page_metrics.get_page_load_time_secs(), 10)
 
 
 class SplashPagePerformanceForCachedStateTest(base.TestBase):
     """Tests for the splash page for the cached state or return user."""
+    SPLASH_URL = 'http://localhost:8181/splash'
 
     def setUp(self):
         super(SplashPagePerformanceForCachedStateTest, self).setUp()
-        splash_url = 'http://localhost:8181/splash'
-
-        page_session_stats = self._get_page_stats_cached_state(splash_url)
-        page_session_timings = self._get_page_timings_cached_state(splash_url)
-
-        self._set_stats(page_session_stats, page_session_timings)
 
     def test_splash_page_has_less_than_1_megabytes_sent_to_the_client(self):
         """"Is total size below 1,000,000 in bytes."""
+        page_session_stats = self._get_page_stats_cached_state(self.SPLASH_URL)
+        self._set_stats(page_session_stats, None)
+
         self.assertLessEqual(
             self.page_metrics.get_total_page_size_bytes(), 1000000)
 
     def test_splash_page_loads_under_3_seconds(self):
         """Is page load time below 3 secs."""
+        page_timings = self._get_page_timings_cached_state(self.SPLASH_URL)
+        self._set_stats(None, page_timings)
+
         self.assertLessEqual(self.page_metrics.get_page_load_time_secs(), 3)
 
 

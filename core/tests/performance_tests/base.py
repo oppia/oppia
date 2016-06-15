@@ -21,7 +21,7 @@ from core.tests.performance_framework import process_data
 
 # pylint: disable=invalid-name
 selenium_data_fetcher = selenium_driver.SeleniumPerformanceDataFetcher
-page_metrics_retriever = process_data.PageSessionMetricsRetriever
+page_session_metrics = process_data.PageSessionMetrics
 # pylint: enable=invalid-name
 
 
@@ -44,7 +44,7 @@ class TestBase(unittest.TestCase):
     def _get_page_timings_cached_state(self, page_url):
         return self.data_fetcher.get_page_session_timings_cached_state(page_url)
 
-    def _set_stats(self, page_stats, page_timings):
-        self.page_metrics = page_metrics_retriever(
+    def _set_stats(self, page_stats=None, page_timings=None):
+        self.page_metrics = page_session_metrics(
             page_session_stats=page_stats,
             page_session_timings=page_timings)

@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This file contains an implementation which interacts with Selenium and
-Browsermob-proxy to fetch performance data.
+"""Contains a utility for fetching performance data using Selenium and
+Browsermob-proxy.
 """
 
-import urlparse
 import os
+import time
+import urlparse
 
 # We need to import browsermob-proxy and selenium. To do so, we need to add
 # add their directories to path.
@@ -44,46 +45,45 @@ CHROME_DRIVER_PATH = os.path.join(
 BROWSERMOB_PROXY_PATH = os.path.join(
     '..', 'oppia_tools', 'browsermob-proxy-2.1.1', 'bin', 'browsermob-proxy')
 
+WAIT_DURATION = 0
+
 
 class SeleniumPerformanceDataFetcher(object):
     """Fetches performance data for locally served Oppia pages using Selenium
     and Browsermob-proxy.
 
     Selenium is used to programitically interact with a browser.
-    Browsermob-proxy is used to capture HTTP Archive(referred to as HAR) data.
+    Browsermob-proxy is used to capture HTTP Archive (referred to as HAR) data.
 
-    The HTTP Archive format or HAR, is a JSON-formatted archive file format for
-    logging of a web browser's interaction with a site. It is used by a web
-    browser to export detailed performance data about web pages it loads. It
-    contains an entry for every resource required to load and display a
-    web-page. Each entry contains the url requested, request and response
-    headers.
-    Refer: https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/HAR/Overview.html
+    The HTTP Archive format is a JSON-formatted archive file format used for
+    logging a web browser's interaction with a site. It contains detailed
+    performance data, including information about page loading and displaying
+    and per-resource statistics. Each entry contains the URL requested and
+    request and response headers. For additional details, please see:
+    https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/HAR/Overview.html
     """
 
-    def __init__(self, browser='chrome'):
-        if browser in ['chrome', 'firefox']:
+    # Chrome is the default browser that selenium will use for extracting
+    # performance stats.
+    DEFAULT_BROWSER_SOURCE = 'chrome'
+    SUPPORTED_BROWSER_SOURCES = ['chrome', 'firefox']
+
+    def __init__(self, browser=DEFAULT_BROWSER_SOURCE):
+        if browser in self.SUPPORTED_BROWSER_SOURCES:
             self.browser = browser
         else:
-            raise ValueError
-
-        if self.browser == 'chrome':
-            os.environ["webdriver.chrome.driver"] = CHROME_DRIVER_PATH
-
-        self.chrome_driver_path = CHROME_DRIVER_PATH
-        self.browser_mob_path = BROWSERMOB_PROXY_PATH
+            error_msg = 'Unsupported browser specified: %s' % browser
+            raise ValueError(error_msg)
 
         self.server = self.driver = self.proxy = None
 
     def get_har_dict(self, page_url):
-        """Retrieve HTTP Archive (HAR) or page session stats for a page URL.
+        """Retrieves an HTTP Archive (HAR) dict for a given page URL.
 
-        To get it we require the use of a proxy server as we need to record the
-        communication between server and client.
+        The HAR dict is retrieved using the proxy server by recording the
+        communication between the client and server.
         """
-        # pylint: disable=unused-variable
-        with Xvfb() as xvfb:
-        # pylint: enable=unused-variable
+        with Xvfb() as _xvfb:
             self._setup_proxy()
             self._setup_driver(use_proxy=True)
 
@@ -91,10 +91,14 @@ class SeleniumPerformanceDataFetcher(object):
 
             self.driver.get(page_url)
 
+            # Wait for the complete page to load, otherwise XHR requests made
+            # after page load will not be recorded.
+            time.sleep(WAIT_DURATION)
+
         har_dict = self.proxy.har
 
-        self._clear_proxy()
-        self._clear_driver()
+        self._stop_proxy()
+        self._stop_driver()
 
         return har_dict
 
@@ -105,9 +109,7 @@ class SeleniumPerformanceDataFetcher(object):
         To get it we require the use of a proxy server as we need to record the
         communication between server and client.
         """
-        # pylint: disable=unused-variable
-        with Xvfb() as xvfb:
-        # pylint: enable=unused-variable
+        with Xvfb() as _xvfb:
             self._setup_proxy()
             self._setup_driver(use_proxy=True)
 
@@ -118,30 +120,32 @@ class SeleniumPerformanceDataFetcher(object):
             self.proxy.new_har(page_url, options={'captureHeaders': True})
             self.driver.get(page_url)
 
+            # Wait for the complete page to load, otherwise XHR requests made
+            # after page load will not be recorded.
+            time.sleep(WAIT_DURATION)
+
         har_dict = self.proxy.har
 
-        self._clear_proxy()
-        self._clear_driver()
+        self._stop_proxy()
+        self._stop_driver()
 
         return har_dict
 
     def get_page_session_timings(self, page_url):
         """Retrieve page load timings for a page URL."""
-        # pylint: disable=unused-variable
-        with Xvfb() as xvfb:
-        # pylint: enable=unused-variable
+        with Xvfb() as _xvfb:
             self._setup_driver(use_proxy=False)
 
             self.driver.get(page_url)
+            # Wait for the complete page to load, otherwise XHR requests made
+            # after page load will not be recorded.
+            time.sleep(WAIT_DURATION)
 
-            # To get entries for all the resources we can use:
-            #   driver.execute_script("return window.performance.getEntries();")
-            # To get only the timing we can use:
-            #   driver.execute_script("return window.performance.timing;")
             page_session_timings = (
                 self.driver.execute_script("return window.performance"))
 
-        self._clear_driver()
+
+        self._stop_driver()
 
         return page_session_timings
 
@@ -149,30 +153,30 @@ class SeleniumPerformanceDataFetcher(object):
         """Retrieve page load timings for a page URL while simulating a
         cached state i.e, a return user.
         """
-        # pylint: disable=unused-variable
-        with Xvfb() as xvfb:
-        # pylint: enable=unused-variable
+        with Xvfb() as _xvfb:
             self._setup_driver(use_proxy=False)
 
             # Fetch the page once. This leads to caching of various resources.
             self.driver.get(page_url)
+            # Wait for the complete page to load, otherwise XHR requests made
+            # after page load will not be recorded.
+            time.sleep(WAIT_DURATION)
 
             self.driver.get(page_url)
+            # Wait for the complete page to load, otherwise XHR requests made
+            # after page load will not be recorded.
+            time.sleep(WAIT_DURATION)
 
-            # To get entries for all the resources we can use:
-            #   driver.execute_script("return window.performance.getEntries();")
-            # To get only the timing we can use:
-            #   driver.execute_script("return window.performance.timing;")
             page_session_timings = (
                 self.driver.execute_script("return window.performance"))
 
-        self._clear_driver()
+        self._stop_driver()
 
         return page_session_timings
 
     def _setup_proxy(self, downstream_kbps=None, upstream_kbps=None,
                      latency=None):
-        self.server = Server(self.browser_mob_path)
+        self.server = Server(BROWSERMOB_PROXY_PATH)
         self.server.start()
         self.proxy = self.server.create_proxy()
 
@@ -193,14 +197,14 @@ class SeleniumPerformanceDataFetcher(object):
             self.proxy.limits(proxy_options)
 
     def _setup_driver(self, use_proxy=False):
-        """Initialize a selenium webdriver instance which helps us
-        programmitically interact with a browser.
+        """Initialize a Selenium webdrive instance to programmatically interact
+        with a browser.
         """
         if self.browser == 'chrome':
             chrome_options = webdriver.ChromeOptions()
             # Disable several subsystems which run network requests in the
-            # background. This is for use when doing network performance
-            # testing to avoid noise in the measurements
+            # background. This helps reduce noise when measuring network
+            # performance.
             chrome_options.add_argument("--disable-background-networking")
 
             if use_proxy:
@@ -209,7 +213,7 @@ class SeleniumPerformanceDataFetcher(object):
                 chrome_options.add_argument(proxy_argument)
 
             self.driver = webdriver.Chrome(
-                self.chrome_driver_path,
+                CHROME_DRIVER_PATH,
                 chrome_options=chrome_options)
 
         elif self.browser == 'firefox':
@@ -222,10 +226,10 @@ class SeleniumPerformanceDataFetcher(object):
             self.driver = webdriver.Firefox(firefox_profile=firefox_profile)
             # pylint: enable=redefined-variable-type
 
-    def _clear_proxy(self):
+    def _stop_proxy(self):
         self.server.stop()
         self.proxy = None
 
-    def _clear_driver(self):
+    def _stop_driver(self):
         self.driver.quit()
         self.driver = None
