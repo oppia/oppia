@@ -336,13 +336,12 @@ class FeaturedExplorationDisplayableSummariesTest(
         The call to get_featured_explorations() should only return
         [EXP_ID_2].
         """
+        summary_services.update_featured_activity_ids(['e:%s' % self.EXP_ID_2])
 
-        rights_manager.publicize_exploration(self.admin_id, self.EXP_ID_2)
-
-        featured_exploration_summaries = (
-            summary_services.get_featured_exploration_summary_dicts([
+        featured_activity_summaries = (
+            summary_services.get_featured_activity_summary_dicts([
                 feconf.DEFAULT_LANGUAGE_CODE]))
-        expected_summary = {
+        self.assertDictContainsSubset({
             'status': u'publicized',
             'thumbnail_bg_color': '#a33f40',
             'community_owned': False,
@@ -355,9 +354,7 @@ class FeaturedExplorationDisplayableSummariesTest(
             'title': u'A title',
             'num_views': 0,
             'objective': u'An objective'
-        }
-        self.assertDictContainsSubset(
-            expected_summary, featured_exploration_summaries[0])
+        }, featured_activity_summaries[0])
 
 
 class CollectionLearnerDictTests(test_utils.GenericTestBase):

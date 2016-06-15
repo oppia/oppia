@@ -453,3 +453,33 @@ def get_all_language_codes_and_names():
 def unescape_encoded_uri_component(escaped_string):
     """Unescape a string that is encoded with encodeURIComponent."""
     return urllib.unquote(escaped_string).decode('utf-8')
+
+
+def split_activity_ids_by_type(activity_ids):
+    """Given a list of activity ids, returns two lists: the first list contains
+    the exploration ids, and the second contains the collection ids. The
+    elements in each of the returned lists are in the same order as those in
+    the input list.
+
+    If any activity id is incorrectly formatted, this raises an Exception.
+    """
+    exploration_ids, collection_ids = [], []
+    for activity_id in activity_ids:
+        if activity_id.startswith(feconf.ACTIVITY_ID_PREFIX_EXPLORATION):
+            exploration_ids.append(
+                activity_id[len(feconf.ACTIVITY_ID_PREFIX_EXPLORATION):])
+        elif activity_id.startswith(feconf.ACTIVITY_ID_PREFIX_COLLECTION):
+            collection_ids.append(
+                activity_id[len(feconf.ACTIVITY_ID_PREFIX_COLLECTION):])
+        else:
+            raise Exception('Invalid activity id: %s' % activity_id)
+
+    return exploration_ids, collection_ids
+
+
+def get_activity_id_from_exploration_id(exploration_id):
+    return '%s%s' % (feconf.ACTIVITY_ID_PREFIX_EXPLORATION, exploration_id)
+
+
+def get_activity_id_from_collection_id(collection_id):
+    return '%s%s' % (feconf.ACTIVITY_ID_PREFIX_COLLECTION, collection_id)

@@ -21,8 +21,11 @@ from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import stats_jobs_continuous
 from core.domain import user_services
+from core.platform import models
 import feconf
 import utils
+
+(library_models,) = models.Registry.import_models([models.NAMES.library])
 
 _LIBRARY_INDEX_GROUPS = [{
     'header': 'Mathematics & Statistics',
@@ -84,8 +87,8 @@ def get_learner_collection_dict_by_id(
     includes progress in the collection, information about explorations
     referenced within the collection, and a slightly nicer data structure for
     frontend work.
-    This raises a ValidationError if the collection retrieved using the given ID
-    references non-existent explorations.
+    This raises a ValidationError if the collection retrieved using the given
+    ID references non-existent explorations.
     which includes useful data for the collection learner view.
     """
     collection = collection_services.get_collection_by_id(
@@ -104,8 +107,9 @@ def get_learner_collection_dict_by_id(
     next_exploration_ids = None
     completed_exp_ids = None
     if user_id:
-        completed_exp_ids = collection_services.get_valid_completed_exploration_ids( # pylint: disable=line-too-long
-            user_id, collection_id, collection)
+        completed_exp_ids = (
+            collection_services.get_valid_completed_exploration_ids(
+                user_id, collection_id, collection))
         next_exploration_ids = collection.get_next_exploration_ids(
             completed_exp_ids)
     else:
@@ -263,8 +267,9 @@ def _get_displayable_collection_summary_dicts(collection_summaries):
                 'node_count': collection_summary.node_count,
                 'last_updated_msec': utils.get_time_in_millisecs(
                     collection_summary.collection_model_last_updated),
-                'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
-                    collection_summary.category),
+                'thumbnail_icon_url': (
+                    utils.get_thumbnail_icon_url_for_category(
+                        collection_summary.category)),
                 'thumbnail_bg_color': utils.get_hex_color_for_category(
                     collection_summary.category)})
     return displayable_collection_summaries
@@ -305,7 +310,6 @@ def get_library_groups(language_codes):
             collection_summaries)
     }
 
-
     # Collect all exp ids so that the summary details can be retrieved with a
     # single get_multi() call.
     all_exp_ids = []
@@ -332,7 +336,8 @@ def get_library_groups(language_codes):
         summary_dicts = []
         collection_ids_to_display = header_to_collection_ids[group['header']]
         summary_dicts = [
-            collection_summary_dicts[collection_id] for collection_id in collection_ids_to_display # pylint: disable=line-too-long
+            collection_summary_dicts[collection_id]
+            for collection_id in collection_ids_to_display
             if collection_id in collection_summary_dicts]
 
         exp_ids_to_display = header_to_exp_ids[group['header']]
@@ -352,29 +357,80 @@ def get_library_groups(language_codes):
     return results
 
 
-def get_featured_exploration_summary_dicts(language_codes):
-    """Returns a list of featured explorations with the given language code.
-
-    The return value is sorted in decreasing order of search rank.
+def require_activity_ids_to_be_public(activity_ids):
+    """Raises an exception if any activity id in the list does not exist, or
+    is not public.
     """
-    filtered_exp_summaries = [
-        exp_summary for exp_summary in
-        exp_services.get_featured_exploration_summaries().values()
-        if exp_summary.language_code in language_codes]
+    exploration_ids, collection_ids = utils.split_activity_ids_by_type(
+        activity_ids)
 
-    search_ranks = {
-        exp_summary.id: exp_services.get_search_rank_from_exp_summary(
-            exp_summary)
-        for exp_summary in filtered_exp_summaries
-    }
+    exp_summaries = exp_services.get_exploration_summaries_matching_ids(
+        exploration_ids)
+    col_summaries = collection_services.get_collection_summaries_matching_ids(
+        collection_ids)
 
-    sorted_exp_summaries = sorted(
-        filtered_exp_summaries,
-        key=lambda exp_summary: search_ranks[exp_summary.id],
-        reverse=True)
+    for index, summary in enumerate(exp_summaries):
+        if summary is None:
+            raise Exception(
+                'Cannot feature non-existent exploration with id %s' %
+                exploration_ids[index])
+        if summary.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+            raise Exception(
+                'Cannot feature private exploration with id %s' % summary.id)
 
-    return _get_displayable_exp_summary_dicts(
-        sorted_exp_summaries, include_contributors=False)
+    for index, summary in enumerate(col_summaries):
+        if summary is None:
+            raise Exception(
+                'Cannot feature non-existent collection with id %s' %
+                collection_ids[index])
+        if summary.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+            raise Exception(
+                'Cannot feature private collection with id %s' % summary.id)
+
+
+def get_featured_activity_ids():
+    return library_models.ActivityListModel.get(
+        library_models.ACTIVITY_LIST_FEATURED).activity_ids
+
+
+def update_featured_activity_ids(featured_activity_ids):
+    featured_activity_list_model = library_models.ActivityListModel.get(
+        library_models.ACTIVITY_LIST_FEATURED)
+    featured_activity_list_model.activity_ids = featured_activity_ids
+    featured_activity_list_model.put()
+
+
+def get_featured_activity_summary_dicts(language_codes):
+    """Returns a list of featured activities with the given language code.
+
+    The return value is sorted according to the list stored in the datastore.
+    """
+    featured_activity_ids = get_featured_activity_ids()
+
+    exploration_ids_to_fetch, collection_ids_to_fetch = (
+        utils.split_activity_ids_by_type(featured_activity_ids))
+
+    exp_summary_dicts = get_displayable_exp_summary_dicts_matching_ids(
+        exploration_ids_to_fetch)
+    col_summary_dicts = get_displayable_collection_summary_dicts_matching_ids(
+        collection_ids_to_fetch)
+
+    activity_ids_to_summary_dicts = {}
+    for summary_dict in exp_summary_dicts:
+        activity_id = utils.get_activity_id_from_exploration_id(
+            summary_dict['id'])
+        activity_ids_to_summary_dicts[activity_id] = summary_dict
+    for summary_dict in col_summary_dicts:
+        activity_id = utils.get_activity_id_from_collection_id(
+            summary_dict['id'])
+        activity_ids_to_summary_dicts[activity_id] = summary_dict
+
+    return [
+        activity_ids_to_summary_dicts[activity_id]
+        for activity_id in featured_activity_ids if (
+            activity_id in activity_ids_to_summary_dicts and
+            activity_ids_to_summary_dicts[activity_id]['language_code']
+            in language_codes)]
 
 
 def get_top_rated_exploration_summary_dicts(language_codes):

@@ -184,7 +184,8 @@ CAN_SEND_EMAILS_TO_USERS = False
 CAN_SEND_EDITOR_ROLE_EMAILS = False
 # If enabled then emails will be sent to creators for feedback messages.
 CAN_SEND_FEEDBACK_MESSAGE_EMAILS = False
-# Time to wait before sending feedback message emails (currently set to 1 hour).
+# Time to wait before sending feedback message emails (currently set to 1
+# hour).
 DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS = 3600
 # Whether to send email updates to a user who has not specified a preference.
 DEFAULT_EMAIL_UPDATES_PREFERENCE = False
@@ -211,7 +212,8 @@ MODERATOR_ACTION_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 DEFAULT_SALUTATION_HTML_FN = (
     lambda recipient_username: 'Hi %s,' % recipient_username)
 DEFAULT_SIGNOFF_HTML_FN = (
-    lambda sender_username: 'Thanks!<br>%s (Oppia moderator)' % sender_username)
+    lambda sender_username: (
+        'Thanks!<br>%s (Oppia moderator)' % sender_username))
 
 VALID_MODERATOR_ACTIONS = {
     MODERATOR_ACTION_PUBLICIZE_EXPLORATION: {
@@ -234,6 +236,11 @@ VALID_MODERATOR_ACTIONS = {
         'email_signoff_html_fn': DEFAULT_SIGNOFF_HTML_FN,
     },
 }
+
+# Prefixes for activity ids to denote the type of activity. These values should
+# not be changed.
+ACTIVITY_ID_PREFIX_EXPLORATION = 'e:'
+ACTIVITY_ID_PREFIX_COLLECTION = 'c:'
 
 # Panel properties and other constants for the default skin.
 GADGET_PANEL_AXIS_HORIZONTAL = 'horizontal'
@@ -680,15 +687,16 @@ LIBRARY_PAGE_DESCRIPTION = (
     'teachers and Oppia users in a subject you\'re interested in, and start '
     'exploring!')
 PARTICIPATE_PAGE_DESCRIPTION = (
-    'The Oppia library is full of user-created lessons called \'explorations\'.'
-    ' Read about how to participate in the community and begin creating '
-    'explorations.')
+    'The Oppia library is full of user-created lessons called '
+    '\'explorations\'. Read about how to participate in the community and '
+    'begin creating explorations.')
 PREFERENCES_PAGE_DESCRIPTION = (
     'Change your Oppia profile settings and preferences')
 SEARCH_PAGE_DESCRIPTION = (
     'Discover a new exploration to learn from, or help improve an existing '
     'one for the community.')
-SIGNUP_PAGE_DESCRIPTION = 'Sign up for Oppia and begin exploring a new subject.'
+SIGNUP_PAGE_DESCRIPTION = (
+    'Sign up for Oppia and begin exploring a new subject.')
 SPLASH_PAGE_DESCRIPTION = (
     'Oppia is a free site for sharing knowledge via interactive lessons '
     'called \'explorations\'. Learn from user-created explorations, or teach '

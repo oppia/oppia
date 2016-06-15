@@ -369,14 +369,6 @@ def get_non_private_exploration_summaries():
         exp_models.ExpSummaryModel.get_non_private())
 
 
-def get_featured_exploration_summaries():
-    """Returns a dict with all featured exploration summary domain objects,
-    keyed by their id.
-    """
-    return _get_exploration_summaries_from_models(
-        exp_models.ExpSummaryModel.get_featured())
-
-
 def get_top_rated_exploration_summaries():
     """Returns a dict with top rated exploration summary domain objects,
     keyed by their id.
