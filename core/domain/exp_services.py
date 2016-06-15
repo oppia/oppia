@@ -932,7 +932,7 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     # force_deletion is True.
     delete_exploration_summary(exploration_id)
 
-    # Remove the collection from the featured activity list, if necessary.
+    # Remove the exploration from the featured activity list, if necessary.
     library_services.remove_activity_from_featured_list(
         feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id)
 

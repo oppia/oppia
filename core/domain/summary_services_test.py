@@ -771,8 +771,12 @@ class ActivityIdValidationTests(test_utils.GenericTestBase):
     EXP_ID_1 = 'exp_id_1'
     COL_ID_2 = 'col_id_2'
 
-    def test_validation_of_activity_ids_list(self):
+    def setUp(self):
+        super(ActivityIdValidationTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
+    def test_validation_of_activity_ids_list(self):
         with self.assertRaisesRegexp(Exception, 'non-existent exploration'):
             summary_services.require_activity_ids_to_be_public(['e:fake'])
         with self.assertRaisesRegexp(Exception, 'non-existent collection'):

@@ -362,32 +362,32 @@ def require_activity_ids_to_be_public(activity_ids):
     exploration_ids, collection_ids = utils.split_activity_ids_by_type(
         activity_ids)
 
-    exp_summaries = exp_services.get_exploration_summaries_matching_ids(
-        exploration_ids)
-    col_summaries = collection_services.get_collection_summaries_matching_ids(
-        collection_ids)
+    activity_summaries_by_type = [{
+        'type': 'exploration',
+        'ids': exploration_ids,
+        'summaries': exp_services.get_exploration_summaries_matching_ids(
+            exploration_ids),
+    }, {
+        'type': 'collection',
+        'ids': collection_ids,
+        'summaries': collection_services.get_collection_summaries_matching_ids(
+            collection_ids),
+    }]
 
-    for index, summary in enumerate(exp_summaries):
-        if summary is None:
-            raise Exception(
-                'Cannot feature non-existent exploration with id %s' %
-                exploration_ids[index])
-        if summary.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
-            raise Exception(
-                'Cannot feature private exploration with id %s' % summary.id)
-
-    for index, summary in enumerate(col_summaries):
-        if summary is None:
-            raise Exception(
-                'Cannot feature non-existent collection with id %s' %
-                collection_ids[index])
-        if summary.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
-            raise Exception(
-                'Cannot feature private collection with id %s' % summary.id)
+    for activities_info in activity_summaries_by_type:
+        for index, summary in enumerate(activities_info['summaries']):
+            if summary is None:
+                raise Exception(
+                    'Cannot feature non-existent %s with id %s' %
+                    (activities_info['type'], activities_info['ids'][index]))
+            if summary.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+                raise Exception(
+                    'Cannot feature private %s with id %s' %
+                    (activities_info['type'], activities_info['ids'][index]))
 
 
 def get_featured_activity_summary_dicts(language_codes):
-    """Returns a list of featured activities with the given language code.
+    """Returns a list of featured activities with the given language codes.
 
     The return value is sorted according to the list stored in the datastore.
     """
