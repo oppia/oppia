@@ -16,7 +16,8 @@
  * @fileoverview Unit tests for the answer classification service
  */
 
-describe('Answer classification service', function() {
+describe('Answer classification service with string classifier disabled',
+    function() {
   beforeEach(module('oppia'));
 
   beforeEach(function() {
@@ -26,6 +27,7 @@ describe('Answer classification service', function() {
           is_string_classifier_trainable: false
         }
       });
+      $provide.constant('ENABLE_STRING_CLASSIFIER', false);
     });
   });
 
@@ -86,31 +88,9 @@ describe('Answer classification service', function() {
     }
   };
 
-  it('should query the backend when no frontend rules are provided',
-      function() {
-    var backendClassifiedOutcome = {
-      outcome: 'outcome',
-      answer_group_index: 0,
-      rule_spec_index: 0
-    };
-    var expectedClassificationResult = {
-      outcome: 'outcome',
-      answerGroupIndex: 0,
-      ruleSpecIndex: 0
-    };
-    console.log('yo');
-    $httpBackend.expectPOST(
-      '/explorehandler/classify/' + explorationId).respond(
-      backendClassifiedOutcome);
-    acs.getMatchingClassificationResult(explorationId, state, 0, false).
-      then(successHandler, failHandler);
-    $httpBackend.flush();
-
-    expect(successHandler).toHaveBeenCalledWith(expectedClassificationResult);
-    expect(failHandler).not.toHaveBeenCalled();
-
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+  it('should be undefined if no frontend rules are provided', function() {
+    expect(acs.getMatchingClassificationResult(explorationId, state, 0, false))
+      .toBe(undefined);
   });
 
   it('should return the first matching answer group and first matching rule' +
@@ -156,5 +136,104 @@ describe('Answer classification service', function() {
       ruleSpecIndex: 0
     });
     expect(failHandler).not.toHaveBeenCalled();
+  });
+});
+
+describe('Answer classification service with string classifier enabled',
+    function() {
+  beforeEach(module('oppia'));
+
+  beforeEach(function() {
+    module(function($provide) {
+      $provide.constant('INTERACTION_SPECS', {
+        RuleTest: {
+          is_string_classifier_trainable: true
+        }
+      });
+      $provide.constant('ENABLE_STRING_CLASSIFIER', true);
+    });
+  });
+
+  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+
+  var acs, $httpBackend, successHandler, failHandler, $rootScope, state;
+  beforeEach(inject(function($injector) {
+    acs = $injector.get('AnswerClassificationService');
+    sof = $injector.get('StateObjectFactory');
+    $httpBackend = $injector.get('$httpBackend');
+    $rootScope = $injector.get('$rootScope');
+    successHandler = jasmine.createSpy('success');
+    failHandler = jasmine.createSpy('fail');
+
+    state = sof.create('stateName', {
+      content: [{
+        type: 'text',
+        value: 'content'
+      }],
+      interaction: {
+        id: 'RuleTest',
+        answer_groups: [{
+          outcome: 'outcome 1',
+          rule_specs: [{
+            inputs: {
+              x: 10
+            },
+            rule_type: 'Equals'
+          }]
+        }, {
+          outcome: 'outcome 2',
+          rule_specs: [{
+            inputs: {
+              x: 5
+            },
+            rule_type: 'Equals'
+          }, {
+            inputs: {
+              x: 7
+            },
+            rule_type: 'Equals'
+          }]
+        }],
+        default_outcome: 'default'
+      },
+      param_changes: []
+    });
+  }));
+
+  var explorationId = 'exploration';
+
+  var rules = {
+    Equals: function(answer, inputs) {
+      return inputs.x === answer;
+    },
+    NotEquals: function(answer, inputs) {
+      return inputs.x !== answer;
+    }
+  };
+
+  it('should query the backend if no answer group matches', function() {
+    var backendClassifiedOutcome = {
+      outcome: 'outcome',
+      answer_group_index: 0,
+      rule_spec_index: 0
+    };
+    var expectedClassificationResult = {
+      outcome: 'outcome',
+      answerGroupIndex: 0,
+      ruleSpecIndex: 0
+    };
+    $httpBackend.expectPOST(
+      '/explorehandler/classify/' + explorationId).respond(
+      backendClassifiedOutcome);
+    acs.getMatchingClassificationResult(explorationId, state, 0, false, rules).
+      then(successHandler, failHandler);
+    $rootScope.$apply();
+    $httpBackend.flush();
+
+    expect(successHandler).toHaveBeenCalledWith(expectedClassificationResult);
+    expect(failHandler).not.toHaveBeenCalled();
+
+    $httpBackend.verifyNoOutstandingExpectation();
+    $httpBackend.verifyNoOutstandingRequest();
   });
 });

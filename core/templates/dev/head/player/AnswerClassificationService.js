@@ -104,16 +104,16 @@ oppia.factory('AnswerClassificationService', [
         if (interactionRulesService) {
           result = classifyAnswer(
             answer, answerGroups, defaultOutcome, interactionRulesService);
-          deferred.resolve(result);
         } else {
           alertsService.addWarning(
             'Something went wrong with the exploration.');
+          return;
         }
 
-        if (result === null || (result.outcome == defaultOutcome &&
+        if (result.outcome == defaultOutcome &&
             INTERACTION_SPECS[oldState.interaction.id]
               .is_string_classifier_trainable &&
-            ENABLE_STRING_CLASSIFIER)) {
+            ENABLE_STRING_CLASSIFIER) {
           // TODO(bhenning): Figure out a long-term solution for determining
           // what params should be passed to the batch classifier.
           var classifyUrl = '/explorehandler/classify/' + explorationId;
@@ -132,6 +132,8 @@ oppia.factory('AnswerClassificationService', [
               answerGroupIndex: result.answer_group_index
             });
           });
+        } else {
+          deferred.resolve(result);
         }
         return deferred.promise;
       }
