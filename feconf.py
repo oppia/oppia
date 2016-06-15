@@ -538,6 +538,10 @@ CATEGORIES_TO_COLORS = {
     'Welcome': '#992a2b',
 }
 
+# Types of activities that can be created with Oppia.
+ACTIVITY_TYPE_EXPLORATION = 'exploration'
+ACTIVITY_TYPE_COLLECTION = 'collection'
+
 # A sorted list of default categories for which icons and background colours
 # exist.
 ALL_CATEGORIES = sorted(CATEGORIES_TO_COLORS.keys())

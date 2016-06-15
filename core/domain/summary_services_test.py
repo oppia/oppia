@@ -18,6 +18,7 @@ from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import exp_services_test
+from core.domain import library_services
 from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import summary_services
@@ -336,24 +337,24 @@ class FeaturedExplorationDisplayableSummariesTest(
         The call to get_featured_explorations() should only return
         [EXP_ID_2].
         """
-        summary_services.update_featured_activity_ids(['e:%s' % self.EXP_ID_2])
+        library_services.update_featured_activity_ids(['e:%s' % self.EXP_ID_2])
 
         featured_activity_summaries = (
             summary_services.get_featured_activity_summary_dicts([
                 feconf.DEFAULT_LANGUAGE_CODE]))
         self.assertDictContainsSubset({
-            'status': u'publicized',
+            'status': 'public',
             'thumbnail_bg_color': '#a33f40',
             'community_owned': False,
             'tags': [],
             'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
             'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
-            'category': u'A category',
+            'category': 'A category',
             'ratings': feconf.get_empty_ratings(),
-            'title': u'A title',
+            'title': 'A title',
             'num_views': 0,
-            'objective': u'An objective'
+            'objective': 'An objective'
         }, featured_activity_summaries[0])
 
 

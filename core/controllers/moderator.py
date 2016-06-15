@@ -16,6 +16,7 @@
 
 from core.controllers import base
 from core.domain import email_manager
+from core.domain import library_services
 from core.domain import summary_services
 
 
@@ -40,16 +41,16 @@ class FeaturedActivitiesHandler(base.BaseHandler):
         """Handles GET requests."""
         self.render_json({
             'featured_activity_ids': (
-                summary_services.get_featured_activity_ids()),
+                library_services.get_featured_activity_ids()),
         })
 
     @base.require_moderator
     def post(self):
         """Handles POST requests."""
         featured_activity_ids = self.payload.get('featured_activity_ids')
-        summary_services.require_activity_ids_to_be_public(
+        summary_services.require_activity_ids_to_be_public_and_unique(
             featured_activity_ids)
-        summary_services.update_featured_activity_ids(featured_activity_ids)
+        library_services.update_featured_activity_ids(featured_activity_ids)
 
 
 class EmailDraftHandler(base.BaseHandler):

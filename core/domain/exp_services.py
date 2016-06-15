@@ -34,6 +34,7 @@ import zipfile
 from core.domain import exp_domain
 from core.domain import feedback_services
 from core.domain import fs_domain
+from core.domain import library_services
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
@@ -930,6 +931,10 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     # Delete the exploration summary, regardless of whether or not
     # force_deletion is True.
     delete_exploration_summary(exploration_id)
+
+    # Remove the collection from the featured activity list, if necessary.
+    library_services.remove_activity_from_featured_list(
+        feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id)
 
 
 # Operations on exploration snapshots.

@@ -20,6 +20,7 @@ from core.domain import config_domain
 from core.domain import rights_manager
 from core.domain import summary_services
 from core.platform import models
+import feconf
 import utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
@@ -31,9 +32,9 @@ def require_collection_playable(handler):
         """Check if the current user can play the collection."""
         actor = rights_manager.Actor(self.user_id)
         can_play = actor.can_play(
-            rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id)
+            feconf.ACTIVITY_TYPE_COLLECTION, collection_id)
         can_view = actor.can_view(
-            rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id)
+            feconf.ACTIVITY_TYPE_COLLECTION, collection_id)
         if can_play and can_view:
             return handler(self, collection_id, **kwargs)
         else:
@@ -63,7 +64,7 @@ class CollectionPage(base.BaseHandler):
                 self.username in whitelisted_usernames and
                 self.username not in config_domain.BANNED_USERNAMES.value and
                 rights_manager.Actor(self.user_id).can_edit(
-                    rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id)
+                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id)
             ),
             'is_logged_in': bool(self.user_id),
             'collection_id': collection_id,
@@ -96,7 +97,7 @@ class CollectionDataHandler(base.BaseHandler):
         self.values.update({
             'can_edit': (
                 self.user_id and rights_manager.Actor(self.user_id).can_edit(
-                    rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id)),
+                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id)),
             'collection': collection_dict,
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),

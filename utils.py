@@ -477,9 +477,10 @@ def split_activity_ids_by_type(activity_ids):
     return exploration_ids, collection_ids
 
 
-def get_activity_id_from_exploration_id(exploration_id):
-    return '%s%s' % (feconf.ACTIVITY_ID_PREFIX_EXPLORATION, exploration_id)
-
-
-def get_activity_id_from_collection_id(collection_id):
-    return '%s%s' % (feconf.ACTIVITY_ID_PREFIX_COLLECTION, collection_id)
+def get_activity_id(activity_type, item_id):
+    if activity_type == feconf.ACTIVITY_TYPE_EXPLORATION:
+        return '%s%s' % (feconf.ACTIVITY_ID_PREFIX_EXPLORATION, item_id)
+    elif activity_type == feconf.ACTIVITY_TYPE_COLLECTION:
+        return '%s%s' % (feconf.ACTIVITY_ID_PREFIX_COLLECTION, item_id)
+    else:
+        raise Exception('Invalid activity type: %s' % activity_type)

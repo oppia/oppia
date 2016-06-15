@@ -30,6 +30,7 @@ import os
 
 from core.domain import collection_domain
 from core.domain import exp_services
+from core.domain import library_services
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
@@ -626,6 +627,10 @@ def delete_collection(committer_id, collection_id, force_deletion=False):
     # Delete the summary of the collection (regardless of whether
     # force_deletion is True or not).
     delete_collection_summary(collection_id)
+
+    # Remove the collection from the featured activity list, if necessary.
+    library_services.remove_activity_from_featured_list(
+        feconf.ACTIVITY_TYPE_COLLECTION, collection_id)
 
 
 def get_collection_snapshots_metadata(collection_id):

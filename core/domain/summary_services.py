@@ -18,14 +18,12 @@
 
 from core.domain import collection_services
 from core.domain import exp_services
+from core.domain import library_services
 from core.domain import rights_manager
 from core.domain import stats_jobs_continuous
 from core.domain import user_services
-from core.platform import models
 import feconf
 import utils
-
-(library_models,) = models.Registry.import_models([models.NAMES.library])
 
 _LIBRARY_INDEX_GROUPS = [{
     'header': 'Mathematics & Statistics',
@@ -187,7 +185,7 @@ def get_displayable_exp_summary_dicts_matching_ids(
             if editor_user_id is None:
                 continue
             if not rights_manager.Actor(editor_user_id).can_edit(
-                    rights_manager.ACTIVITY_TYPE_EXPLORATION,
+                    feconf.ACTIVITY_TYPE_EXPLORATION,
                     exploration_summary.id):
                 continue
 
@@ -223,7 +221,7 @@ def _get_displayable_exp_summary_dicts(
         summary_dict = {
             'id': exploration_summary.id,
             'title': exploration_summary.title,
-            'activity_type': rights_manager.ACTIVITY_TYPE_EXPLORATION,
+            'activity_type': feconf.ACTIVITY_TYPE_EXPLORATION,
             'category': exploration_summary.category,
             'objective': exploration_summary.objective,
             'language_code': exploration_summary.language_code,
@@ -260,7 +258,7 @@ def _get_displayable_collection_summary_dicts(collection_summaries):
                 'id': collection_summary.id,
                 'title': collection_summary.title,
                 'category': collection_summary.category,
-                'activity_type': rights_manager.ACTIVITY_TYPE_COLLECTION,
+                'activity_type': feconf.ACTIVITY_TYPE_COLLECTION,
                 'objective': collection_summary.objective,
                 'language_code': collection_summary.language_code,
                 'tags': collection_summary.tags,
@@ -357,9 +355,9 @@ def get_library_groups(language_codes):
     return results
 
 
-def require_activity_ids_to_be_public(activity_ids):
+def require_activity_ids_to_be_public_and_unique(activity_ids):
     """Raises an exception if any activity id in the list does not exist, or
-    is not public.
+    is not public, or if the list has duplicates.
     """
     exploration_ids, collection_ids = utils.split_activity_ids_by_type(
         activity_ids)
@@ -387,17 +385,8 @@ def require_activity_ids_to_be_public(activity_ids):
             raise Exception(
                 'Cannot feature private collection with id %s' % summary.id)
 
-
-def get_featured_activity_ids():
-    return library_models.ActivityListModel.get(
-        library_models.ACTIVITY_LIST_FEATURED).activity_ids
-
-
-def update_featured_activity_ids(featured_activity_ids):
-    featured_activity_list_model = library_models.ActivityListModel.get(
-        library_models.ACTIVITY_LIST_FEATURED)
-    featured_activity_list_model.activity_ids = featured_activity_ids
-    featured_activity_list_model.put()
+    if len(activity_ids) != len(set(activity_ids)):
+        raise Exception('The activity list should not have duplicates.')
 
 
 def get_featured_activity_summary_dicts(language_codes):
@@ -405,7 +394,7 @@ def get_featured_activity_summary_dicts(language_codes):
 
     The return value is sorted according to the list stored in the datastore.
     """
-    featured_activity_ids = get_featured_activity_ids()
+    featured_activity_ids = library_services.get_featured_activity_ids()
 
     exploration_ids_to_fetch, collection_ids_to_fetch = (
         utils.split_activity_ids_by_type(featured_activity_ids))
@@ -417,20 +406,20 @@ def get_featured_activity_summary_dicts(language_codes):
 
     activity_ids_to_summary_dicts = {}
     for summary_dict in exp_summary_dicts:
-        activity_id = utils.get_activity_id_from_exploration_id(
-            summary_dict['id'])
+        activity_id = utils.get_activity_id(
+            feconf.ACTIVITY_TYPE_EXPLORATION, summary_dict['id'])
         activity_ids_to_summary_dicts[activity_id] = summary_dict
     for summary_dict in col_summary_dicts:
-        activity_id = utils.get_activity_id_from_collection_id(
-            summary_dict['id'])
+        activity_id = utils.get_activity_id(
+            feconf.ACTIVITY_TYPE_COLLECTION, summary_dict['id'])
         activity_ids_to_summary_dicts[activity_id] = summary_dict
 
     return [
-        activity_ids_to_summary_dicts[activity_id]
-        for activity_id in featured_activity_ids if (
-            activity_id in activity_ids_to_summary_dicts and
-            activity_ids_to_summary_dicts[activity_id]['language_code']
-            in language_codes)]
+        activity_ids_to_summary_dicts[featured_activity_id]
+        for featured_activity_id in featured_activity_ids if (
+            featured_activity_id in activity_ids_to_summary_dicts and
+            activity_ids_to_summary_dicts[
+                featured_activity_id]['language_code'] in language_codes)]
 
 
 def get_top_rated_exploration_summary_dicts(language_codes):
