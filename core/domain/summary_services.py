@@ -355,7 +355,7 @@ def get_library_groups(language_codes):
     return results
 
 
-def require_activity_ids_to_be_public_and_unique(activity_ids):
+def require_activity_ids_to_be_public(activity_ids):
     """Raises an exception if any activity id in the list does not exist, or
     is not public, or if the list has duplicates.
     """
@@ -384,9 +384,6 @@ def require_activity_ids_to_be_public_and_unique(activity_ids):
         if summary.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
             raise Exception(
                 'Cannot feature private collection with id %s' % summary.id)
-
-    if len(activity_ids) != len(set(activity_ids)):
-        raise Exception('The activity list should not have duplicates.')
 
 
 def get_featured_activity_summary_dicts(language_codes):

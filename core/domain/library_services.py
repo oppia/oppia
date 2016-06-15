@@ -29,6 +29,17 @@ def get_featured_activity_ids():
 
 
 def update_featured_activity_ids(featured_activity_ids):
+    """Updates the current list of featured activity ids.
+
+    This assumes that the input is a list of activity ids corresponding to
+    publicly-viewable activities.
+    """
+    for activity_id in featured_activity_ids:
+        utils.validate_activity_id(activity_id)
+
+    if len(featured_activity_ids) != len(set(featured_activity_ids)):
+        raise Exception('The activity list should not have duplicates.')
+
     featured_activity_list_model = library_models.ActivityListModel.get(
         library_models.ACTIVITY_LIST_FEATURED)
     featured_activity_list_model.activity_ids = featured_activity_ids

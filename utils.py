@@ -484,3 +484,9 @@ def get_activity_id(activity_type, item_id):
         return '%s%s' % (feconf.ACTIVITY_ID_PREFIX_COLLECTION, item_id)
     else:
         raise Exception('Invalid activity type: %s' % activity_type)
+
+
+def validate_activity_id(activity_id):
+    if (not activity_id.startswith(feconf.ACTIVITY_ID_PREFIX_EXPLORATION) and
+            not activity_id.startswith(feconf.ACTIVITY_ID_PREFIX_COLLECTION)):
+        raise Exception('Invalid activity id: %s' % activity_id)

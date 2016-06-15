@@ -762,3 +762,37 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             recently_published_exploration_summaries[1]['title'], 'New title')
         self.assertDictContainsSubset(
             test_summary_3, recently_published_exploration_summaries[0])
+
+
+class ActivityIdValidationTests(test_utils.GenericTestBase):
+    """Tests for validation of activity ids."""
+
+    EXP_ID_0 = 'exp_id_0'
+    EXP_ID_1 = 'exp_id_1'
+    COL_ID_2 = 'col_id_2'
+
+    def test_validation_of_activity_ids_list(self):
+
+        with self.assertRaisesRegexp(Exception, 'non-existent exploration'):
+            summary_services.require_activity_ids_to_be_public(['e:fake'])
+        with self.assertRaisesRegexp(Exception, 'non-existent collection'):
+            summary_services.require_activity_ids_to_be_public(['c:fake'])
+
+        self.save_new_valid_exploration(self.EXP_ID_0, self.owner_id)
+        self.save_new_valid_exploration(self.EXP_ID_1, self.owner_id)
+        self.save_new_valid_collection(
+            self.COL_ID_2, self.owner_id, exploration_id=self.EXP_ID_0)
+
+        with self.assertRaisesRegexp(Exception, 'private exploration'):
+            summary_services.require_activity_ids_to_be_public([
+                'e:%s' % self.EXP_ID_0])
+        with self.assertRaisesRegexp(Exception, 'private collection'):
+            summary_services.require_activity_ids_to_be_public([
+                'c:%s' % self.COL_ID_2])
+
+        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_0)
+        rights_manager.publish_collection(self.owner_id, self.COL_ID_2)
+
+        # There are no more validation errors.
+        summary_services.require_activity_ids_to_be_public([
+            'e:%s' % self.EXP_ID_0, 'c:%s' % self.COL_ID_2])

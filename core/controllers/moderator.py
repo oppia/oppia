@@ -48,7 +48,7 @@ class FeaturedActivitiesHandler(base.BaseHandler):
     def post(self):
         """Handles POST requests."""
         featured_activity_ids = self.payload.get('featured_activity_ids')
-        summary_services.require_activity_ids_to_be_public_and_unique(
+        summary_services.require_activity_ids_to_be_public(
             featured_activity_ids)
         library_services.update_featured_activity_ids(featured_activity_ids)
 
