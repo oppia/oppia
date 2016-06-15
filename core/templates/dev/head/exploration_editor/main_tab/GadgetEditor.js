@@ -122,7 +122,7 @@ oppia.controller('GadgetEditor', [
 
             $scope.renameGadget = function(newGadgetName) {
               var originalName = $scope.gadgetDict.gadget_name;
-              if (originalName != newGadgetName) {
+              if (originalName !== newGadgetName) {
                 // Record the change.
                 explorationGadgetsService.renameGadget(
                   originalName, newGadgetName);

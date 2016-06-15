@@ -187,7 +187,6 @@ oppia.controller('ExplorationEditor', [
 
     var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
     var _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
-    var _ID_TUTORIAL_EXPLORATION_OVERVIEW = '.oppia-state-graph-container';
     var _ID_TUTORIAL_PREVIEW_TAB = '#tutorialPreviewTab';
     var _ID_TUTORIAL_SAVE_BUTTON = '#tutorialSaveButton';
 
@@ -269,29 +268,9 @@ oppia.controller('ExplorationEditor', [
     }, {
       type: 'function',
       fn: function(isGoingForward) {
-        var positionToScrollTo = (
-          isGoingForward ? 0 :
-          angular.element(_ID_TUTORIAL_STATE_INTERACTION).offset().top - 200);
-        $('html, body').animate({
-          scrollTop: positionToScrollTo
-        }, 1000);
-      }
-    }, {
-      type: 'element',
-      selector: _ID_TUTORIAL_EXPLORATION_OVERVIEW,
-      heading: 'Exploration Overview',
-      text: (
-        'The exploration overview gives you a map-like view of all of the ' +
-        'cards in your exploration and how they link together. ' +
-        'You may need to drag around in the overview to see all ' +
-        'of your cards if your exploration is large.'),
-      placement: 'left'
-    }, {
-      type: 'function',
-      fn: function(isGoingForward) {
         var idToScrollTo = (
           isGoingForward ? _ID_TUTORIAL_PREVIEW_TAB :
-          _ID_TUTORIAL_EXPLORATION_OVERVIEW);
+          _ID_TUTORIAL_STATE_INTERACTION);
         $('html, body').animate({
           scrollTop: angular.element(idToScrollTo).offset().top - 200
         }, 1000);
@@ -1038,7 +1017,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
               $scope.formatStatePropertyChange = function(
                   propertyName, changeInfo) {
-                if (propertyName == 'name') {
+                if (propertyName === 'name') {
                   return getLongFormPropertyChange(
                     STATE_BACKEND_NAMES_TO_HUMAN_NAMES[propertyName],
                     changeInfo);
@@ -1049,7 +1028,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
               $scope.formatGadgetPropertyChange = function(
                   propertyName, changeInfo) {
-                if (propertyName == 'name') {
+                if (propertyName === 'name') {
                   return getLongFormPropertyChange(
                     GADGET_BACKEND_NAMES_TO_HUMAN_NAMES[propertyName],
                     changeInfo);

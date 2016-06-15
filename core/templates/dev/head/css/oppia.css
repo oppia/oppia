@@ -245,6 +245,7 @@ body {
   width: calc(100% - 280px);
 }
 
+
 .oppia-profile-portfolio-container {
   margin: 0 auto;
   margin-bottom: 20px;
@@ -1612,6 +1613,16 @@ pre.oppia-pre-wrapped-text {
   height: 400px;
   overflow-y: hidden;
   position: relative;
+}
+
+.oppia-state-graph-animate-show {
+  opacity: 1;
+}
+.oppia-state-graph-animate-show.ng-hide-add, .oppia-state-graph-animate-show.ng-hide-remove {
+  transition: all linear 0.5s;
+}
+.oppia-state-graph-animate-show.ng-hide {
+  opacity: 0;
 }
 
 /* Styles for the collections learner view */

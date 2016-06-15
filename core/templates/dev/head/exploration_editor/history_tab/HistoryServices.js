@@ -33,7 +33,7 @@ oppia.factory('versionsTreeService', [function() {
 
       // Generate the version tree of an exploration from its snapshots
       for (var versionNum = 2; versionNum <= numberOfVersions; versionNum++) {
-        if (_snapshots[versionNum].commit_type == 'revert') {
+        if (_snapshots[versionNum].commit_type === 'revert') {
           for (var i = 0; i < _snapshots[versionNum].commit_cmds.length; i++) {
             if (_snapshots[versionNum].commit_cmds[i].cmd ==
                 'AUTO_revert_version_number') {
@@ -64,7 +64,7 @@ oppia.factory('versionsTreeService', [function() {
       // Find paths from root to v1 and v2
       var pathToV1 = [];
       var pathToV2 = [];
-      while (_treeParents[v1] != -1) {
+      while (_treeParents[v1] !== -1) {
         pathToV1.push(v1);
         if (_treeParents[v1] === undefined) {
           throw new Error('Could not find parent of ' + v1);
@@ -74,7 +74,7 @@ oppia.factory('versionsTreeService', [function() {
       pathToV1.push(1);
       pathToV1.reverse();
 
-      while (_treeParents[v2] != -1) {
+      while (_treeParents[v2] !== -1) {
         pathToV2.push(v2);
         if (_treeParents[v2] === undefined) {
           throw new Error('Could not find parent of ' + v2);
@@ -88,7 +88,7 @@ oppia.factory('versionsTreeService', [function() {
       var maxIndex = Math.min(pathToV1.length, pathToV2.length) - 1;
       var lca = null;
       for (var i = maxIndex; i >= 0; i--) {
-        if (pathToV1[i] == pathToV2[i]) {
+        if (pathToV1[i] === pathToV2[i]) {
           lca = pathToV1[i];
           break;
         }
@@ -117,7 +117,7 @@ oppia.factory('versionsTreeService', [function() {
     getChangeList: function(version) {
       if (_snapshots === null) {
         throw new Error('snapshots is not initialized');
-      } else if (version == 1) {
+      } else if (version === 1) {
         throw new Error('Tried to retrieve change list of version 1');
       }
       return angular.copy(_snapshots[version].commit_cmds);
@@ -163,7 +163,7 @@ oppia.factory('compareVersionsService', [
       var _treeParents = versionsTreeService.getVersionTree();
 
       var nodeList = [];
-      while (v2 != v1) {
+      while (v2 !== v1) {
         nodeList.push(v2);
         v2 = _treeParents[v2];
       }
@@ -178,8 +178,8 @@ oppia.factory('compareVersionsService', [
         }
         for (var j = 0; j < changeList.length; j++) {
           var change = changeList[j];
-          if ((directionForwards && change.cmd == 'add_state') ||
-              (!directionForwards && change.cmd == 'delete_state')) {
+          if ((directionForwards && change.cmd === 'add_state') ||
+              (!directionForwards && change.cmd === 'delete_state')) {
             if (!stateIds.hasOwnProperty(change.state_name)) {
               var newId = _generateNewId();
               stateIds[change.state_name] = newId;
@@ -197,8 +197,8 @@ oppia.factory('compareVersionsService', [
                 stateProperty: STATE_PROPERTY_ADDED
               };
             }
-          } else if ((directionForwards && change.cmd == 'delete_state') ||
-              (!directionForwards && change.cmd == 'add_state')) {
+          } else if ((directionForwards && change.cmd === 'delete_state') ||
+              (!directionForwards && change.cmd === 'add_state')) {
             if (stateData[stateIds[change.state_name]].stateProperty ==
                 STATE_PROPERTY_ADDED) {
               stateData[stateIds[change.state_name]].stateProperty = (
@@ -207,7 +207,7 @@ oppia.factory('compareVersionsService', [
               stateData[stateIds[change.state_name]].stateProperty = (
                 STATE_PROPERTY_DELETED);
             }
-          } else if (change.cmd == 'rename_state') {
+          } else if (change.cmd === 'rename_state') {
             var newStateName = null;
             var oldStateName = null;
             if (directionForwards) {
@@ -220,16 +220,16 @@ oppia.factory('compareVersionsService', [
             stateIds[newStateName] = stateIds[oldStateName];
             delete stateIds[oldStateName];
             stateData[stateIds[newStateName]].newestStateName = newStateName;
-          } else if (change.cmd == 'edit_state_property') {
+          } else if (change.cmd === 'edit_state_property') {
             if (stateData[stateIds[change.state_name]].stateProperty ==
                 STATE_PROPERTY_UNCHANGED) {
               stateData[stateIds[change.state_name]].stateProperty = (
                 STATE_PROPERTY_CHANGED);
             }
           } else if (
-              change.cmd != 'migrate_states_schema_to_latest_version' &&
-              change.cmd != 'AUTO_revert_version_number' &&
-              change.cmd != 'edit_exploration_property') {
+              change.cmd !== 'migrate_states_schema_to_latest_version' &&
+              change.cmd !== 'AUTO_revert_version_number' &&
+              change.cmd !== 'edit_exploration_property') {
             throw new Error('Invalid change command: ' + change.cmd);
           }
         }
@@ -288,7 +288,7 @@ oppia.factory('compareVersionsService', [
 
       for (var i = 1; i <= _maxId; i++) {
         for (var j = 1; j <= _maxId; j++) {
-          if (i == j) {
+          if (i === j) {
             continue;
           }
           if (adjMatrixV1[i][j] && adjMatrixV2[i][j]) {
@@ -375,7 +375,7 @@ oppia.factory('compareVersionsService', [
 
           // Ignore changes that were canceled out by later changes
           for (var stateId in statesData) {
-            if (statesData[stateId].stateProperty == STATE_PROPERTY_CHANGED &&
+            if (statesData[stateId].stateProperty === STATE_PROPERTY_CHANGED &&
                 v1States.hasOwnProperty(
                   statesData[stateId].originalStateName) &&
                 v2States.hasOwnProperty(statesData[stateId].newestStateName) &&
@@ -404,11 +404,11 @@ oppia.factory('compareVersionsService', [
             var newStateIsTerminal = false;
             if (oldState) {
               oldStateIsTerminal = (
-                oldState.interaction.id == 'EndExploration');
+                oldState.interaction.id === 'EndExploration');
             }
             if (newState) {
               newStateIsTerminal = (
-                newState.interaction.id == 'EndExploration');
+                newState.interaction.id === 'EndExploration');
             }
             if (oldStateIsTerminal || newStateIsTerminal) {
               finalStateIds.push(stateId);

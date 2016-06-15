@@ -58,7 +58,7 @@ describe('Site language', function() {
     var options = element.all(by.css('.select2-drop-active li div')).filter(
       function(elem) {
         return elem.getText().then(function(text) {
-          return text == 'Español';
+          return text === 'Español';
         });
       });
     options.first().click();

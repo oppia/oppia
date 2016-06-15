@@ -37,11 +37,11 @@ oppia.factory('expressionTypeParserService', [
       // nodes are JavaScript primitives (as described in the "Parser output"
       // section of parser.pegjs).
       if (parsed instanceof Array) {
-        if (parsed.length == 0) {
+        if (parsed.length === 0) {
           throw 'Parser generated an intermediate node with zero children';
         }
 
-        if (parsed[0] == '#') {
+        if (parsed[0] === '#') {
           return expressionSyntaxTreeService.lookupEnvs(parsed[1], envs);
         }
 

@@ -69,7 +69,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
               text: i !== 0 ? finalInputArray[i] : '',
               type: 'noneditable'
             });
-            if (i == finalInputArray.length - 1) {
+            if (i === finalInputArray.length - 1) {
               break;
             }
 

@@ -27,6 +27,13 @@ oppia.controller('ExplorationGraph', [
     $scope.getGraphData = graphDataService.getGraphData;
     $scope.isEditable = editabilityService.isEditable;
 
+    // We hide the graph at the outset in order not to confuse new exploration
+    // creators.
+    $scope.isGraphShown = function() {
+      var states = explorationStatesService.getStates();
+      return Boolean(states && Object.keys(states).length > 1);
+    };
+
     $scope.deleteState = function(deleteStateName) {
       explorationStatesService.deleteState(deleteStateName);
     };
