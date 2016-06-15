@@ -46,7 +46,7 @@ oppia.factory('AnswerClassificationService', [
       for (var i = 0; i < answerGroups.length; i++) {
         for (var j = 0; j < answerGroups[i].rule_specs.length; j++) {
           var ruleSpec = answerGroups[i].rule_specs[j];
-          if (ruleSpec.rule_type != CLASSIFIER_RULESPEC_STR &&
+          if (ruleSpec.rule_type !== CLASSIFIER_RULESPEC_STR &&
               interactionRulesService[ruleSpec.rule_type](
                 answer, ruleSpec.inputs)) {
             return {
@@ -110,7 +110,7 @@ oppia.factory('AnswerClassificationService', [
           return;
         }
 
-        if (result.outcome == defaultOutcome &&
+        if (result.outcome === defaultOutcome &&
             INTERACTION_SPECS[oldState.interaction.id]
               .is_string_classifier_trainable &&
             ENABLE_STRING_CLASSIFIER) {
