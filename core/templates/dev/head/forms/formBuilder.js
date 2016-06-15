@@ -641,6 +641,9 @@ oppia.factory('rteHelperService', [
           el.attr(
             $filter('camelCaseToHyphens')(attrName) + '-with-value',
             oppiaHtmlEscaper.objToEscapedJson(customizationArgsDict[attrName]));
+          if (componentDefn.name === 'image' && attrName === 'width') {
+          el.attr('width', oppiaHtmlEscaper.objToEscapedJson(customizationArgsDict[attrName]));
+        }
         }
 
         return el.get(0);
