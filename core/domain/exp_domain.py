@@ -1165,10 +1165,6 @@ class State(object):
                 'Expected interaction_answer_groups to be a list, received %s'
                 % answer_groups_list)
 
-        interaction = (
-            interaction_registry.Registry.get_interaction_by_id(
-                self.interaction.id))
-
         interaction_answer_groups = []
 
         # TODO(yanamal): Do additional calculations here to get the
@@ -1195,8 +1191,10 @@ class State(object):
                         'Expected rule_inputs to be a dict, received %s'
                         % rule_inputs)
                 for param_name, value in rule_inputs.iteritems():
-                    param_type = interaction.get_rule_param_type(
-                        rule_spec.rule_type, param_name)
+                    param_type = (
+                        interaction_registry.Registry.get_interaction_by_id(
+                            self.interaction.id
+                        ).get_rule_param_type(rule_spec.rule_type, param_name))
 
                     if (isinstance(value, basestring) and
                             '{{' in value and '}}' in value):
