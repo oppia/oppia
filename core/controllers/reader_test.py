@@ -153,7 +153,7 @@ class ReaderClassifyTests(test_utils.GenericTestBase):
             return 'default'
 
         answer_group = answer_groups[answer_group_index]
-        return (answer_group.get_rule_classifier_index() == rule_spec_index and
+        return (answer_group.get_classifier_rule_index() == rule_spec_index and
                 predict_counter.times_called > 0)
 
     def test_string_classifier_classification(self):
