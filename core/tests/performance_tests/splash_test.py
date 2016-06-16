@@ -14,14 +14,11 @@
 
 """Tests for the splash page"""
 
-import unittest
-
-# pylint: disable=import-error, wrong-import-position
 from core.tests.performance_tests import base
 
 
 class SplashPagePerformanceTest(base.TestBase):
-    """Tests for the splash page."""
+    """Performance tests for the splash page."""
 
     SPLASH_URL = 'http://localhost:8181/splash'
 
@@ -29,7 +26,6 @@ class SplashPagePerformanceTest(base.TestBase):
         super(SplashPagePerformanceTest, self).setUp()
 
     def test_splash_page_has_less_than_10_megabytes_sent_to_the_client(self):
-        """"Is total size below 10,000,000 in bytes."""
         page_session_stats = self._get_page_session_stats(self.SPLASH_URL)
         self._set_stats(page_session_stats, None)
 
@@ -37,7 +33,6 @@ class SplashPagePerformanceTest(base.TestBase):
             self.page_metrics.get_total_page_size_bytes(), 10000000)
 
     def test_splash_page_loads_under_10_seconds(self):
-        """Is page load time below 10 secs."""
         page_session_timings = self._get_page_session_timings(self.SPLASH_URL)
         self._set_stats(None, page_session_timings)
 
@@ -45,14 +40,15 @@ class SplashPagePerformanceTest(base.TestBase):
 
 
 class SplashPagePerformanceForCachedStateTest(base.TestBase):
-    """Tests for the splash page for the cached state or return user."""
+    """Performance tests for the splash page for the cached state or
+    return user.
+    """
     SPLASH_URL = 'http://localhost:8181/splash'
 
     def setUp(self):
         super(SplashPagePerformanceForCachedStateTest, self).setUp()
 
     def test_splash_page_has_less_than_1_megabytes_sent_to_the_client(self):
-        """"Is total size below 1,000,000 in bytes."""
         page_session_stats = self._get_page_stats_cached_state(self.SPLASH_URL)
         self._set_stats(page_session_stats, None)
 
@@ -60,12 +56,7 @@ class SplashPagePerformanceForCachedStateTest(base.TestBase):
             self.page_metrics.get_total_page_size_bytes(), 1000000)
 
     def test_splash_page_loads_under_3_seconds(self):
-        """Is page load time below 3 secs."""
         page_timings = self._get_page_timings_cached_state(self.SPLASH_URL)
         self._set_stats(None, page_timings)
 
         self.assertLessEqual(self.page_metrics.get_page_load_time_secs(), 3)
-
-
-if __name__ == '__main__':
-    unittest.main()

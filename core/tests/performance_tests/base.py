@@ -19,17 +19,13 @@ import unittest
 from core.tests.performance_framework import selenium_driver
 from core.tests.performance_framework import process_data
 
-# pylint: disable=invalid-name
-selenium_data_fetcher = selenium_driver.SeleniumPerformanceDataFetcher
-page_session_metrics = process_data.PageSessionMetrics
-# pylint: enable=invalid-name
-
 
 class TestBase(unittest.TestCase):
     """Base class for performance tests."""
 
     def setUp(self):
-        self.data_fetcher = selenium_data_fetcher(browser='chrome')
+        self.data_fetcher = selenium_driver.SeleniumPerformanceDataFetcher(
+            browser='chrome')
         self.page_metrics = None
 
     def _get_page_session_stats(self, page_url):
@@ -45,6 +41,6 @@ class TestBase(unittest.TestCase):
         return self.data_fetcher.get_page_session_timings_cached_state(page_url)
 
     def _set_stats(self, page_stats=None, page_timings=None):
-        self.page_metrics = page_session_metrics(
+        self.page_metrics = process_data.PageSessionMetrics(
             page_session_stats=page_stats,
             page_session_timings=page_timings)

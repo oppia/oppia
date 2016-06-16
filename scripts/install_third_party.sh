@@ -122,6 +122,7 @@ if [ ! -d "$TOOLS_DIR/webtest-1.4.2" ]; then
   rm webtest-download.zip
 fi
 
+# Python API for browsermob-proxy.
 echo Checking if browsermob-proxy is installed in $TOOLS_DIR/pip_packages
 if [ ! -d "$TOOLS_DIR/browsermob-proxy-0.7.1" ]; then
   echo Installing browsermob-proxy

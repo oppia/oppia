@@ -187,7 +187,7 @@ if [ ! -d "$NODE_PATH" ]; then
 fi
 
 # Change execute status of browsermob-proxy
-chmod +x $TOOLS_DIR/browsermob-proxy-2.1.1/bin/browsermob-proxy
+chmod u+x $TOOLS_DIR/browsermob-proxy-2.1.1/bin/browsermob-proxy
 
 # Adjust path to support the default Chrome locations for Unix, Windows and Mac OS.
 if [ "$TRAVIS" = true ]; then

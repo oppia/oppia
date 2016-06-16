@@ -35,21 +35,20 @@ class PageSessionMetrics(object):
     loading and includes the following keys:
 
         timing: maps to a dict containing the keys (all in milliseconds):
-            domLoading: the Unix time the DOM started loading
-            fetchStart: the Unix time the page began loading
-            responseStart: the Unix time the response started
-            loadEventEnd: the Unix time the page finished loading
-            requestStart: the Unix time the request started
-            responseEnd: the Unix time the request finished
-            domComplete: the Unix time the DOM finished loading
             domInteractive: the Unix time the the parser finished its work on
                             the main document
+            domLoading: the Unix time the DOM started loading
+            fetchStart: the Unix time the page began loading
+            loadEventEnd: the Unix time the page finished loading
+            requestStart: the Unix time the request started
+            responseStart: the Unix time the response started
+            responseEnd: the Unix time the request finished
     """
 
     TIMING_PROPERTIES = [
         'loadEventEnd', 'fetchStart', 'domComplete', 'domInteractive',
         'responseEnd', 'requestStart'
-        ]
+    ]
 
     def __init__(self, page_session_stats=None, page_session_timings=None):
         self.page_session_stats = page_session_stats
@@ -65,8 +64,8 @@ class PageSessionMetrics(object):
         """Validates various properties of a PageSessionMetrics object."""
         if not self.page_session_stats and not self.page_session_timings:
             raise utils.ValidationError(
-                'Expected atleast one argument among page_session_stats or '
-                'page_session_timings to be present.')
+                'Expected one of page_session_stats or page_session_timings '
+                'to be provided.')
 
         if self.page_session_stats:
             if 'log' not in self.page_session_stats:
@@ -75,27 +74,54 @@ class PageSessionMetrics(object):
 
             if 'entries' not in self.page_session_stats['log']:
                 raise utils.ValidationError(
-                    'Expected the log entry of the page load stats to include'
+                    'Expected the log entry of the page load stats to include '
                     'an additional \'entries\' element')
+
+            for entry in self.page_session_stats['log']['entries']:
+                if '_error' in entry['response']:
+                    raise utils.ValidationError(
+                        'Expected a valid server response, found server '
+                        'not reachable.')
+
+            if self.get_request_count() == 0:
+                raise utils.ValidationError(
+                    'Expected the log entry of the page load stats to include '
+                    'a positive number of entries.')
+
+            if self.get_total_page_size_bytes() == 0:
+                raise utils.ValidationError(
+                    'Expected the total size of a page including all its '
+                    'resources to be positive.')
 
         if self.page_session_timings:
             for timing_prop in self.TIMING_PROPERTIES:
                 if timing_prop not in self.page_load_timings:
                     raise utils.ValidationError(
-                        'Expected the timing entry of the page load timings to'
+                        'Expected the timing entry of the page load timings to '
                         'include %s property' % timing_prop)
+
+                if timing_prop in self.page_session_timings:
+                    if len(str(self.page_session_timings[timing_prop])) < 13:
+                        raise utils.ValidationError(
+                            'Expected %s to be in milliseconds, instead found '
+                            'seconds' % timing_prop)
+
+            if self.get_page_load_time_secs() < 0:
+                raise utils.ValidationError(
+                    'Expected the page load time to be positive.')
+            if self.get_dom_ready_time_secs() < 0:
+                raise utils.ValidationError(
+                    'Expected the dom ready time to be positive.')
+            if self.get_request_time_secs() < 0:
+                raise utils.ValidationError(
+                    'Expected the request time to be positive.')
+
 
     def get_request_count(self):
         """Returns the number of requests made prior to the page load
-        completing."""
-        request_count = 0
-
-        request_count = len(self.page_session_stats['log']['entries'])
-
-        if request_count == 0:
-            raise Exception('Total requests cannot be 0.')
-
-        return request_count
+        completing.
+        """
+        return len(self.page_session_stats['log']['entries'])
 
     def get_total_page_size_bytes(self):
         """Returns the total size of a page including all of its resources."""
@@ -104,35 +130,18 @@ class PageSessionMetrics(object):
         for entry in self.page_session_stats['log']['entries']:
             total_size += int(entry['response']['bodySize'])
 
-        if total_size <= 0:
-            raise Exception('Total page size should be positive.')
-
         return total_size
 
     def _get_duration_secs(self, event_end, event_initial):
-        # Check if timestamps are seconds or milliseconds.
-        # From: http://goo.gl/iHNYWx
+        # Timestamps are in milliseconds.
         initial_timestamp = self.page_load_timings[event_initial]
 
         end_timestamp = self.page_load_timings[event_end]
 
-        # If milliseconds convert to seconds.
-        if len(str(initial_timestamp)) >= 13:
-            initial_timestamp /= 1000.0
-
-        if len(str(end_timestamp)) >= 13:
-            end_timestamp /= 1000.0
-
         duration_secs = end_timestamp - initial_timestamp
 
-        if duration_secs < 0:
-            error_msg = (
-                'Time duration cannot be negative. Events: %s and %s'
-                % (event_initial, event_end)
-                )
-            raise Exception(error_msg)
-
-        return duration_secs
+        # Returns in seconds.
+        return duration_secs/1000.0
 
     def get_page_load_time_secs(self):
         """Returns the total page load time (in seconds)."""
