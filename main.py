@@ -141,6 +141,10 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(feconf.SPLASH_URL, pages.SplashPage, 'splash_page'),
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
+    get_redirect_route(
+        r'/foundation', pages.AboutRedirectPage, 'foundation_page'),
+    get_redirect_route(
+        r'/credits', pages.AboutRedirectPage, 'credits_page'),
     get_redirect_route(r'/teach', pages.TeachPage, 'teach_page'),
     get_redirect_route(
         r'/participate', pages.ParticipatePage, 'participate_page'),
@@ -363,6 +367,9 @@ URLS = MAPREDUCE_HANDLERS + [
         feedback.RecentFeedbackMessagesHandler,
         'recent_feedback_messages_handler'),
 
+    get_redirect_route(
+        r'%s' % feconf.FEEDBACK_MESSAGE_EMAIL_HANDLER_URL,
+        feedback.UnsentFeedbackEmailHandler, 'feedback_message_email_handler'),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.FEEDBACK_THREADLIST_URL_PREFIX,
         feedback.ThreadListHandler, 'feedback_threadlist_handler'),

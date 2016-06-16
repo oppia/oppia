@@ -157,7 +157,7 @@ oppia.directive('answerGroupEditor', [function() {
           var ruleTypes = Object.keys(ruleDescriptions);
           var ruleType = null;
           for (var i = 0; i < ruleTypes.length; i++) {
-            if (ruleTypes[i] != FUZZY_RULE_TYPE) {
+            if (ruleTypes[i] !== FUZZY_RULE_TYPE) {
               ruleType = ruleTypes[i];
               break;
             }
@@ -201,7 +201,7 @@ oppia.directive('answerGroupEditor', [function() {
           $scope.rules.splice(index, 1);
           $scope.saveRules();
 
-          if ($scope.rules.length == 0) {
+          if ($scope.rules.length === 0) {
             alertsService.addWarning(
               'All answer groups must have at least one rule.');
           }

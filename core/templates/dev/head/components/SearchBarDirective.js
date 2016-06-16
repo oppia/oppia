@@ -136,7 +136,7 @@ oppia.directive('searchBar', [function() {
             $scope.searchQuery, $scope.selectionDetails.categories.selections,
             $scope.selectionDetails.languageCodes.selections
           );
-          if ($window.location.pathname == '/search/find') {
+          if ($window.location.pathname === '/search/find') {
             $location.url('/find?q=' + searchUrlQueryString);
           } else {
             $window.location.href = '/search/find?q=' + searchUrlQueryString;
@@ -150,7 +150,7 @@ oppia.directive('searchBar', [function() {
 
         $scope.onSearchQueryChange = function(evt) {
           // Query immediately when the enter or space key is pressed.
-          if (evt.keyCode == 13 || evt.keyCode == 32) {
+          if (evt.keyCode === 13 || evt.keyCode === 32) {
             onSearchQueryChangeExec();
           } else {
             oppiaDebouncer.debounce(onSearchQueryChangeExec, 650)();
@@ -194,7 +194,7 @@ oppia.directive('searchBar', [function() {
               updateSearchFieldsBasedOnUrlQuery();
             }
 
-            if ($window.location.pathname == '/search/find') {
+            if ($window.location.pathname === '/search/find') {
               onSearchQueryChangeExec();
             }
 

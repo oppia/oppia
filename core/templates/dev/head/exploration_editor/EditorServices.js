@@ -1366,7 +1366,7 @@ oppia.factory('explorationGadgetsService', [
         for (var gadgetName in _gadgets) {
           var gadgetStateVisibilityList = (
             _gadgets[gadgetName].visible_in_states);
-          if (gadgetStateVisibilityList.length == 1 &&
+          if (gadgetStateVisibilityList.length === 1 &&
               gadgetStateVisibilityList[0] === stateName) {
             gadgetNameList.push(gadgetName);
           }
@@ -1874,9 +1874,9 @@ oppia.factory('explorationWarningsService', [
       var answerGroups = state.interaction.answer_groups;
       for (var i = 0; i < answerGroups.length; i++) {
         var group = answerGroups[i];
-        if (group.rule_specs.length == 1 &&
-            group.rule_specs[0].rule_type == FUZZY_RULE_TYPE &&
-            group.rule_specs[0].inputs.training_data.length == 0) {
+        if (group.rule_specs.length === 1 &&
+            group.rule_specs[0].rule_type === FUZZY_RULE_TYPE &&
+            group.rule_specs[0].inputs.training_data.length === 0) {
           indexes.push(i);
         }
       }
@@ -1999,7 +1999,7 @@ oppia.factory('explorationWarningsService', [
         _getStatesAndAnswerGroupsWithEmptyFuzzyRules());
       statesWithAnswerGroupsWithEmptyFuzzyRules.forEach(function(result) {
         var warningMessage = 'In \'' + result.stateName + '\'';
-        if (result.groupIndexes.length != 1) {
+        if (result.groupIndexes.length !== 1) {
           warningMessage += ', the following answer groups have fuzzy rules ';
           warningMessage += 'with no training data: ';
         } else {
@@ -2098,12 +2098,12 @@ oppia.factory('lostChangesService', ['utilsService', function(utilsService) {
     var stateWiseEditsMapping = {};
     // The variable stateWiseEditsMapping stores the edits grouped by state.
     // For instance, you made the following edits:
-    // 1. Changed content to 'Welcome!' instead of '' in 'First Card'.
+    // 1. Changed content to 'Welcome!' instead of '' in 'Introduction'.
     // 2. Added an interaction in this state.
     // 2. Added a new state 'End'.
     // 3. Ended Exporation from state 'End'.
     // stateWiseEditsMapping will look something like this:
-    // - 'First Card': [
+    // - 'Introduction': [
     //   - 'Edited Content: Welcome!',:
     //   - 'Added Interaction: Continue',
     //   - 'Added interaction customizations']
@@ -2317,12 +2317,13 @@ oppia.factory('autosaveInfoModalsService', [
       showNonStrictValidationFailModal: function() {
         $modal.open({
           templateUrl: 'modals/saveValidationFail',
-          backdrop: true,
+          // Prevent modal from closing when the user clicks outside it.
+          backdrop: 'static',
           controller: [
             '$scope', '$modalInstance', function($scope, $modalInstance) {
               $scope.closeAndRefresh = function() {
                 $modalInstance.dismiss('cancel');
-                _refreshPage(500);
+                _refreshPage(20);
               };
             }
           ]
@@ -2340,15 +2341,17 @@ oppia.factory('autosaveInfoModalsService', [
       showVersionMismatchModal: function(lostChanges) {
         $modal.open({
           templateUrl: 'modals/saveVersionMismatch',
-          backdrop: true,
+          // Prevent modal from closing when the user clicks outside it.
+          backdrop: 'static',
           controller: ['$scope', function($scope) {
             // When the user clicks on discard changes button, signal backend
             // to discard the draft and reload the page thereafter.
             $scope.discardChanges = function() {
               explorationData.discardDraft(function() {
-                _refreshPage(500);
+                _refreshPage(20);
               });
             };
+
             $scope.hasLostChanges = (lostChanges && lostChanges.length > 0);
             if ($scope.hasLostChanges) {
               // TODO(sll): This should also include changes to exploration

@@ -25,7 +25,7 @@ oppia.directive('profileLinkText', [function() {
     templateUrl: 'components/profileLinkText',
     controller: ['$scope', function($scope) {
       $scope.isUsernameLinkable = function(username) {
-        return GLOBALS.SYSTEM_USERNAMES.indexOf(username) == -1;
+        return GLOBALS.SYSTEM_USERNAMES.indexOf(username) === -1;
       };
     }]
   };

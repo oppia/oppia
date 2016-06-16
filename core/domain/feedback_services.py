@@ -23,6 +23,7 @@ from core.platform import models
 import feconf
 
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
+taskqueue_services = models.Registry.import_taskqueue_services()
 
 DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a learner'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
@@ -245,3 +246,11 @@ def get_all_threads(exploration_id, has_suggestion):
         if thread.has_suggestion == has_suggestion:
             all_threads.append(thread)
     return all_threads
+
+
+def enqueue_feedback_message_email_task(user_id):
+    """Adds a 'send feedback email' task into the taskqueue."""
+
+    taskqueue_services.enqueue_task(
+        feconf.FEEDBACK_MESSAGE_EMAIL_HANDLER_URL, {'user_id': user_id},
+        feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS)

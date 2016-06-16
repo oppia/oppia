@@ -23,6 +23,10 @@ oppia.controller('Library', [
       $scope, $http, $rootScope, $window, $timeout, i18nIdService,
       urlService, CATEGORY_LIST, searchService, windowDimensionsService) {
     $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
+    var possibleBannerFilenames = [
+      'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
+    $scope.bannerImageFilename = possibleBannerFilenames[
+      Math.floor(Math.random() * possibleBannerFilenames.length)];
 
     // Below is the width of each tile (width + margins), which can be found
     // in core/templates/dev/head/components/
@@ -78,8 +82,11 @@ oppia.controller('Library', [
       }
 
       var windowWidth = $(window).width() * 0.85;
+      // The number 20 is added to tileDisplayWidth in order to compensate
+      // for padding and margins. 20 is just an arbitrary number.
       $scope.tileDisplayCount = Math.min(
-        Math.floor(windowWidth / tileDisplayWidth), MAX_NUM_TILES_PER_ROW);
+        Math.floor(windowWidth / (tileDisplayWidth + 20)),
+        MAX_NUM_TILES_PER_ROW);
 
       $('.oppia-library-carousel').css({
         width: ($scope.tileDisplayCount * tileDisplayWidth) + 'px'

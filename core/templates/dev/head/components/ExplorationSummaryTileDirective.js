@@ -99,7 +99,7 @@ oppia.directive('explorationSummaryTile', [function() {
             tooltipText: contributorName
           };
 
-          if (GLOBALS.SYSTEM_USERNAMES.indexOf(contributorName) == -1) {
+          if (GLOBALS.SYSTEM_USERNAMES.indexOf(contributorName) === -1) {
             avatarData.link = '/profile/' + contributorName;
           }
 

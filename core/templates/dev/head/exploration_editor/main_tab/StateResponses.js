@@ -192,7 +192,7 @@ oppia.factory('responsesService', [
       },
       changeActiveAnswerGroupIndex: function(newIndex) {
         // If the current group is being clicked on again, close it.
-        if (newIndex == _activeAnswerGroupIndex) {
+        if (newIndex === _activeAnswerGroupIndex) {
           _activeAnswerGroupIndex = -1;
         } else {
           _activeAnswerGroupIndex = newIndex;
@@ -304,7 +304,7 @@ oppia.controller('StateResponses', [
         // We only suppress the default warning if each choice index has
         // been handled by at least one answer group.
         return choiceIndices.every(function(choiceIndex) {
-          return handledAnswersArray.indexOf(choiceIndex) != -1;
+          return handledAnswersArray.indexOf(choiceIndex) !== -1;
         });
       }
     };
@@ -341,7 +341,7 @@ oppia.controller('StateResponses', [
     };
 
     $scope.isCreatingNewState = function(outcome) {
-      return outcome && outcome.dest == PLACEHOLDER_OUTCOME_DEST;
+      return outcome && outcome.dest === PLACEHOLDER_OUTCOME_DEST;
     };
 
     // This returns false if the current interaction ID is null.
@@ -499,7 +499,7 @@ oppia.controller('StateResponses', [
                   if (classificationResult.outcome.feedback.length > 0) {
                     feedback = classificationResult.outcome.feedback[0];
                   }
-                  if (dest == _stateName) {
+                  if (dest === _stateName) {
                     dest = '<em>(try again)</em>';
                   }
                   $scope.trainingDataAnswer = answer;
@@ -696,7 +696,7 @@ oppia.controller('StateResponses', [
 
     $scope.isOutcomeLooping = function(outcome) {
       var activeStateName = editorContextService.getActiveStateName();
-      return outcome && (outcome.dest == activeStateName);
+      return outcome && (outcome.dest === activeStateName);
     };
 
     $scope.navigateToState = function(stateName) {
