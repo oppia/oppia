@@ -74,9 +74,6 @@ class ForumPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        if not feconf.SHOW_CUSTOM_PAGES:
-            raise self.PageNotFoundException
-
         # Note: if you are working in the development environment and
         # are accessing this page at localhost, please replace
         # 'localhost' with '127.0.0.1'.
@@ -100,9 +97,6 @@ class TermsPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        if not feconf.SHOW_CUSTOM_PAGES:
-            raise self.PageNotFoundException
-
         self.values.update({
             'meta_description': feconf.TERMS_PAGE_DESCRIPTION,
         })
@@ -115,9 +109,6 @@ class PrivacyPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        if not feconf.SHOW_CUSTOM_PAGES:
-            raise self.PageNotFoundException
-
         self.render_template('pages/privacy.html')
 
 
