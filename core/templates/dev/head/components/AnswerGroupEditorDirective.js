@@ -164,7 +164,7 @@ oppia.directive('answerGroupEditor', [function() {
           }
           if (!ruleType) {
             // This should never happen. An interaction must have more than just
-            // a classifier, as verified in a backend test suite:
+            // a classifier rule, as verified in a backend test suite:
             //   extensions.interactions.base_test.InteractionUnitTests.
             return;
           }

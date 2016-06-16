@@ -19,7 +19,7 @@
 describe('Rule spec services', function() {
   var ruleSpecsServices = {};
   var rulesJson;
-  var IMPLICIT_RULE_NAME = 'ClassifyMatches';
+  var CLASSIFIER_RULESPEC_STR = 'ClassifyMatches';
 
   beforeEach(function() {
     module('oppia');
@@ -43,7 +43,7 @@ describe('Rule spec services', function() {
     Object.keys(rulesJson).forEach(function(interactionId) {
       var serviceName = getRulesServiceName(interactionId);
       Object.keys(rulesJson[interactionId]).forEach(function(ruleName) {
-        if (ruleName !== IMPLICIT_RULE_NAME) {
+        if (ruleName !== CLASSIFIER_RULESPEC_STR) {
           expect(ruleSpecsServices[serviceName][ruleName]).toBeDefined(
             '. ERROR: ' + ruleName + ' not found in service ' + serviceName);
         }

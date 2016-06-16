@@ -106,7 +106,8 @@ oppia.factory('AnswerClassificationService', [
             answer, answerGroups, defaultOutcome, interactionRulesService);
         } else {
           alertsService.addWarning(
-            'Something went wrong with the exploration.');
+            'Something went wrong with the exploration: no ' +
+            'interactionRulesService was available.');
           return;
         }
 

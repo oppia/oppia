@@ -154,7 +154,7 @@ class ReaderClassifyTests(test_utils.GenericTestBase):
 
         answer_group = answer_groups[answer_group_index]
         return (answer_group.get_classifier_rule_index() == rule_spec_index and
-                predict_counter.times_called > 0)
+                predict_counter.times_called == 1)
 
     def test_string_classifier_classification(self):
         """All these responses trigger the string classifier."""

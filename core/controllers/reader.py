@@ -375,7 +375,7 @@ class ClassifyHandler(base.BaseHandler):
         """Handle POST requests.
 
         Note: unused_exploration_id is needed because @require_playable needs 2
-        arguments
+        arguments.
         """
         # A domain object representing the old state.
         old_state = exp_domain.State.from_dict(self.payload.get('old_state'))

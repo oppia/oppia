@@ -339,25 +339,28 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             else:
                 self.assertIsNone(interaction.default_outcome_heading)
 
+            default_object_values = obj_services.get_default_object_values()
+
             # Check that the rules for this interaction have object editor
-            # templates.
+            # templates and default values.
             for rule_name, rule_dict in interaction.rules.iteritems():
                 param_list = interaction.get_rule_param_list(rule_name)
 
-                for (_, param_obj_type) in param_list:
+                for (_, param_obj_cls) in param_list:
                     # TODO(sll): Get rid of these special cases.
-                    if param_obj_type.__name__ in [
+                    if param_obj_cls.__name__ in [
                             'NonnegativeInt', 'ListOfGraph',
                             'ListOfCoordTwoDim', 'SetOfNormalizedString']:
                         continue
 
+                    # Check that the rule has an object editor template.
                     self.assertTrue(
-                        param_obj_type.has_editor_js_template(),
+                        param_obj_cls.has_editor_js_template(),
                         msg='(%s)' % rule_dict['description'])
-                    at_least_one_rule_found = True
 
-                self.assertTrue(at_least_one_rule_found)
-
+                    # Check that the rule has a default value.
+                    self.assertIn(
+                        param_obj_cls.__name__, default_object_values)
 
     def test_trainable_interactions_have_classifiers(self):
         all_interaction_ids = (
@@ -416,6 +419,3 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 count += 1
 
         self.assertEqual(count, 1)
-
-    def test_objects_in_rules_have_default_values(self):
-        pass

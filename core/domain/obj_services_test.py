@@ -70,12 +70,13 @@ class ObjectDefaultValuesUnitTests(test_utils.GenericTestBase):
     """Test that the default value of objects recorded in
     extensions/interactions/object_defaults.json correspond to
     the defined default values in objects.py for all objects that
-    are used in rules."""
+    are used in rules.
+    """
 
     def test_all_rule_input_fields_have_default_values(self):
         """Checks that all rule input fields have a default value, and this
-        is provided in get_default_values()."""
-
+        is provided in get_default_values().
+        """
         interactions = interaction_registry.Registry.get_all_interactions()
         object_default_vals = obj_services.get_default_object_values()
 
@@ -96,8 +97,8 @@ class ObjectDefaultValuesUnitTests(test_utils.GenericTestBase):
 
     def test_get_object_default_values_is_valid(self):
         """Checks that the default values provided by get_default_values()
-        correspond to the ones defined in objects.py"""
-
+        correspond to the ones defined in objects.py.
+        """
         object_default_vals = obj_services.get_default_object_values()
         all_object_classes = obj_services.Registry.get_all_object_classes()
         for (obj_type, default_value) in object_default_vals.iteritems():
