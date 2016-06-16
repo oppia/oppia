@@ -117,36 +117,15 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
 
     # Public query methods.
     @classmethod
-    def get_thread_analytics(cls, exploration_id):
+    def get_thread_analytics_multi(cls, exploration_ids):
         """
         Args:
-          - exploration_id: id of the exploration to get statistics for.
+          - exploration_ids: ids of the exploration to get statistics for.
 
-        Returns a dict with two keys: 'num_open_threads' and
+        Returns a list of dict with two keys: 'num_open_threads' and
         'num_total_threads', representing the counts of open and all feedback
         threads, respectively.
         """
-        realtime_model = cls._get_realtime_datastore_class().get(
-            cls.get_active_realtime_layer_id(exploration_id), strict=False)
-        feedback_thread_analytics_model = (
-            feedback_models.FeedbackAnalyticsModel.get(
-                exploration_id, strict=False))
-
-        num_open_threads = 0
-        num_total_threads = 0
-        if realtime_model:
-            num_open_threads = realtime_model.num_open_threads
-            num_total_threads = realtime_model.num_total_threads
-        if feedback_thread_analytics_model:
-            num_open_threads += feedback_thread_analytics_model.num_open_threads
-            num_total_threads += (
-                feedback_thread_analytics_model.num_total_threads)
-
-        return feedback_domain.FeedbackAnalytics(
-            exploration_id, num_open_threads, num_total_threads)
-
-    @classmethod
-    def get_thread_analytics_multi(cls, exploration_ids):
         realtime_model_ids = cls.get_multi_active_realtime_layer_ids(
             exploration_ids)
         realtime_models = cls._get_realtime_datastore_class().get_multi(
@@ -155,27 +134,17 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
             feedback_models.FeedbackAnalyticsModel.get_multi(
                 exploration_ids))
 
-        num_open_threads_list = []
-        num_total_threads_list = []
-        for i in range(len(exploration_ids)):
-            num_open_threads = 0
-            num_total_threads = 0
-            if realtime_models[i] is not None:
-                num_open_threads += realtime_models[i].num_open_threads
-                num_total_threads += realtime_models[i].num_total_threads
-            if feedback_thread_analytics_models[i] is not None:
-                num_open_threads += (
-                    feedback_thread_analytics_models[i].num_open_threads)
-                num_total_threads += (
-                    feedback_thread_analytics_models[i].num_total_threads)
-            num_open_threads_list.append(num_open_threads)
-            num_total_threads_list.append(num_total_threads)
-
         return [feedback_domain.FeedbackAnalytics(
             exploration_ids[i],
-            num_open_threads_list[i],
-            num_total_threads_list[i])
-                for i in range(len(exploration_ids))]
+            (realtime_models[i].num_open_threads
+             if realtime_models[i] is not None else 0) +
+            (feedback_thread_analytics_models[i].num_open_threads
+             if feedback_thread_analytics_models[i] is not None else 0),
+            (realtime_models[i].num_total_threads
+             if realtime_models[i] is not None else 0) +
+            (feedback_thread_analytics_models[i].num_open_threads
+             if feedback_thread_analytics_models[i] is not None else 0)
+            ).to_dict() for i in range(len(exploration_ids))]
 
 
 class FeedbackAnalyticsMRJobManager(
