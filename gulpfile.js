@@ -100,7 +100,7 @@ var checkCommands = function(yargs, argv, numRequired) {
 checkCommands(yargs, argv, 1);
 
 var isMinificationNeeded = (
-  argv.minify == 'True' || argv.use_minification == 'True');
+  argv.minify === 'True' || argv.use_minification === 'True');
 var frontendDependencies = manifest.dependencies.frontend;
 var cssFilePaths = [];
 var jsFilePaths = [];

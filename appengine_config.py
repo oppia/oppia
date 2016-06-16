@@ -85,7 +85,7 @@ THIRD_PARTY_LIBS = [
 # trying to access a path outside the oppia/ directory will lead to an error.
 # So, we only add numpy to the system path in development mode.
 # Or, if we pass the flag to emulate production mode while in development mode.
-if feconf.DEV_MODE or feconf.IS_MINIFIED:
+if feconf.DEV_MODE:
     THIRD_PARTY_LIBS.append(
         os.path.abspath(os.path.join(
             ROOT_PATH, '..', 'oppia_tools', 'numpy-1.6.1')))

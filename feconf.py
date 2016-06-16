@@ -35,9 +35,8 @@ IS_MINIFIED = os.environ.get('MINIFICATION') == 'True'
 # Whether we should serve the development or production experience.
 if PLATFORM == 'gae':
     DEV_MODE = (
-        (not os.environ.get('SERVER_SOFTWARE')
-         or os.environ['SERVER_SOFTWARE'].startswith('Development'))
-        and not IS_MINIFIED)
+        not os.environ.get('SERVER_SOFTWARE')
+        or os.environ['SERVER_SOFTWARE'].startswith('Development'))
 else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
 
@@ -51,7 +50,10 @@ RTE_EXTENSIONS_DIR = os.path.join('extensions', 'rich_text_components')
 RULES_DIR = os.path.join('extensions', 'rules')
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
-TEMPLATES_DIR_PREFIX = 'dev' if DEV_MODE else 'prod'
+
+# Choose production template if minification flag is used or
+# if is in Production mode
+TEMPLATES_DIR_PREFIX = 'prod' if (IS_MINIFIED or not DEV_MODE) else 'dev'
 FRONTEND_TEMPLATES_DIR = os.path.join(
     'core', 'templates', TEMPLATES_DIR_PREFIX, 'head')
 DEPENDENCIES_TEMPLATES_DIR = os.path.join('extensions', 'dependencies')
