@@ -423,16 +423,15 @@ UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 
 NAV_MODE_ABOUT = 'about'
+NAV_MODE_CONTACT = 'contact'
 NAV_MODE_CREATE = 'create'
 NAV_MODE_DASHBOARD = 'dashboard'
 NAV_MODE_EXPLORE = 'explore'
 NAV_MODE_LIBRARY = 'library'
-NAV_MODE_PARTICIPATE = 'participate'
 NAV_MODE_PROFILE = 'profile'
 NAV_MODE_SIGNUP = 'signup'
 NAV_MODE_SPLASH = 'splash'
 NAV_MODE_TEACH = 'teach'
-NAV_MODE_CONTACT = 'contact'
 
 # Event types.
 EVENT_TYPE_STATE_HIT = 'state_hit'
@@ -666,6 +665,9 @@ ABOUT_PAGE_DESCRIPTION = (
     'Oppia is an open source learning platform that connects a community of '
     'teachers and learners. You can use this site to create 1-1 learning '
     'scenarios for others.')
+CONTACT_PAGE_DESCRIPTION = (
+    'Contact the Oppia team, submit feedback, and learn how to get involved '
+    'with the Oppia project.')
 CREATE_PAGE_DESCRIPTION = (
     'Help others learn new things. Create lessons through explorations and '
     'share your knowledge with the community.')
@@ -679,10 +681,6 @@ LIBRARY_PAGE_DESCRIPTION = (
     'Looking to learn something new? Find explorations created by professors, '
     'teachers and Oppia users in a subject you\'re interested in, and start '
     'exploring!')
-PARTICIPATE_PAGE_DESCRIPTION = (
-    'The Oppia library is full of user-created lessons called \'explorations\'.'
-    ' Read about how to participate in the community and begin creating '
-    'explorations.')
 PREFERENCES_PAGE_DESCRIPTION = (
     'Change your Oppia profile settings and preferences')
 SEARCH_PAGE_DESCRIPTION = (
@@ -693,6 +691,10 @@ SPLASH_PAGE_DESCRIPTION = (
     'Oppia is a free site for sharing knowledge via interactive lessons '
     'called \'explorations\'. Learn from user-created explorations, or teach '
     'and create your own.')
+TEACH_PAGE_DESCRIPTION = (
+    'The Oppia library is full of user-created lessons called \'explorations\'.'
+    ' Read about how to participate in the community and begin creating '
+    'explorations.')
 TERMS_PAGE_DESCRIPTION = (
     'Oppia is a 501(c)(3) registered non-profit open-source e-learning '
     'platform. Learn about our terms and conditions for creating and '

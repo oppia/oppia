@@ -51,6 +51,7 @@ class TeachPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.values.update({
+            'meta_description': feconf.TEACH_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_TEACH,
         })
         self.render_template('pages/teach.html')
@@ -62,21 +63,10 @@ class ContactPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.values.update({
+            'meta_description': feconf.CONTACT_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_CONTACT,
         })
         self.render_template('pages/contact.html')
-
-
-class ParticipatePage(base.BaseHandler):
-    """Page with information about participating in Oppia."""
-
-    def get(self):
-        """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.PARTICIPATE_PAGE_DESCRIPTION,
-            'nav_mode': feconf.NAV_MODE_PARTICIPATE,
-        })
-        self.render_template('pages/participate.html')
 
 
 class ForumPage(base.BaseHandler):
@@ -132,8 +122,16 @@ class PrivacyPage(base.BaseHandler):
 
 
 class AboutRedirectPage(base.BaseHandler):
-    """An page that redirects to the main About page."""
+    """A page that redirects to the main About page."""
 
     def get(self):
         """Handles GET requests."""
         self.redirect('/about')
+
+
+class TeachRedirectPage(base.BaseHandler):
+    """A page that redirects to the main Teach page."""
+
+    def get(self):
+        """Handles GET requests."""
+        self.redirect('/teach')

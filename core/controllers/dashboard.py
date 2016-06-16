@@ -307,3 +307,11 @@ class UploadExploration(base.BaseHandler):
         else:
             raise self.InvalidInputException(
                 'This server does not allow file uploads.')
+
+
+class DashboardRedirectPage(base.BaseHandler):
+    """An page that redirects to the main Dashboard page."""
+
+    def get(self):
+        """Handles GET requests."""
+        self.redirect(feconf.DASHBOARD_URL)
