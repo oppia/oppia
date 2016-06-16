@@ -69,6 +69,11 @@ describe('Answer classification service with string classifier disabled',
               x: 7
             },
             rule_type: 'NotEquals'
+          }, {
+            inputs: {
+              x: 7
+            },
+            rule_type: 'ClassifyMatches'
           }]
         }],
         default_outcome: 'default'
@@ -149,8 +154,11 @@ describe('Answer classification service with string classifier enabled',
   beforeEach(function() {
     module(function($provide) {
       $provide.constant('INTERACTION_SPECS', {
-        RuleTest: {
+        TrainableInteraction: {
           is_string_classifier_trainable: true
+        },
+        UntrainableInteraction: {
+          is_string_classifier_trainable: false
         }
       });
       $provide.constant('ENABLE_STRING_CLASSIFIER', true);
@@ -159,7 +167,7 @@ describe('Answer classification service with string classifier enabled',
 
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-  var acs, $httpBackend, successHandler, failHandler, $rootScope, state;
+  var acs, $httpBackend, successHandler, failHandler, $rootScope, state, state2;
   beforeEach(inject(function($injector) {
     acs = $injector.get('AnswerClassificationService');
     sof = $injector.get('StateObjectFactory');
@@ -174,7 +182,7 @@ describe('Answer classification service with string classifier enabled',
         value: 'content'
       }],
       interaction: {
-        id: 'RuleTest',
+        id: 'TrainableInteraction',
         answer_groups: [{
           outcome: 'outcome 1',
           rule_specs: [{
@@ -195,12 +203,20 @@ describe('Answer classification service with string classifier enabled',
               x: 7
             },
             rule_type: 'Equals'
+          }, {
+            inputs: {
+              x: 7
+            },
+            rule_type: 'ClassifyMatches'
           }]
         }],
         default_outcome: 'default'
       },
       param_changes: []
     });
+
+    state2 = angular.copy(state);
+    state2.interaction.id = 'UntrainableInteraction';
   }));
 
   var explorationId = 'exploration';
@@ -214,7 +230,8 @@ describe('Answer classification service with string classifier enabled',
     }
   };
 
-  it('should query the backend if no answer group matches', function() {
+  it('should query the backend if no answer group matches and interaction ' +
+     'is trainable', function() {
     var backendClassifiedOutcome = {
       outcome: 'outcome',
       answer_group_index: 0,
@@ -238,5 +255,18 @@ describe('Answer classification service with string classifier enabled',
 
     $httpBackend.verifyNoOutstandingExpectation();
     $httpBackend.verifyNoOutstandingRequest();
+  });
+
+  it('should return the default rule if no answer group matches and ' +
+     'interaction is not trainable', function() {
+    acs.getMatchingClassificationResult(
+      explorationId, state2, 0, false, rules).then(successHandler, failHandler);
+    $rootScope.$digest();
+    expect(successHandler).toHaveBeenCalledWith({
+      outcome: 'default',
+      answerGroupIndex: 2,
+      ruleSpecIndex: 0
+    });
+    expect(failHandler).not.toHaveBeenCalled();
   });
 });
