@@ -116,7 +116,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
                 'num_total_threads': 2,
             })
 
-    def test_single_thread_multiple_exp(self):
+    def test_threads_multiple_exp(self):
         with self._get_swap_context():
             exp_id_1 = 'eid1'
             exp_id_2 = 'eid2'
@@ -132,8 +132,8 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread_1.exploration_id = exp_id_1
             thread_1.put()
             thread_2 = feedback_models.FeedbackThreadModel.create(
-                exp_id_2, thread_id_2)
-            thread_2.exploration_id = exp_id_2
+                exp_id_1, thread_id_2)
+            thread_2.exploration_id = exp_id_1
             thread_2.put()
             thread_3 = feedback_models.FeedbackThreadModel.create(
                 exp_id_3, thread_id_3)
@@ -149,14 +149,14 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             self.assertEqual(
                 feedback_analytics[0].to_dict(),
                 {
-                    'num_open_threads': 1,
-                    'num_total_threads': 1,
+                    'num_open_threads': 2,
+                    'num_total_threads': 2,
                 })
             self.assertEqual(
                 feedback_analytics[1].to_dict(),
                 {
-                    'num_open_threads': 1,
-                    'num_total_threads': 1,
+                    'num_open_threads': 0,
+                    'num_total_threads': 0,
                 })
             self.assertEqual(
                 feedback_analytics[2].to_dict(),
