@@ -123,7 +123,7 @@ def classify(state, answer):
     """Classify the answer using the string classifier.
 
     This should only be called if the string classifier functionality is
-    enabled.
+    enabled, and the interaction is trainable.
 
     Normalize the answer and classifies the answer if the interaction has a
     classifier associated with it. Otherwise, classifies the answer to the
@@ -148,10 +148,9 @@ def classify(state, answer):
     normalized_answer = interaction_instance.normalize_answer(answer)
     response = None
 
-    if (interaction_instance.is_string_classifier_trainable and
-            feconf.ENABLE_STRING_CLASSIFIER):
+    if interaction_instance.is_string_classifier_trainable:
         response = classify_string_classifier_rule(state, normalized_answer)
-    elif feconf.ENABLE_STRING_CLASSIFIER:
+    else:
         raise Exception('No classifier found for interaction.')
 
     if response is not None:
