@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the splash page"""
+"""Performance tests for the splash page"""
 
 from core.tests.performance_tests import base
 
@@ -26,15 +26,13 @@ class SplashPagePerformanceTest(base.TestBase):
         super(SplashPagePerformanceTest, self).setUp()
 
     def test_splash_page_has_less_than_10_megabytes_sent_to_the_client(self):
-        page_session_stats = self._get_page_session_stats(self.SPLASH_URL)
-        self._set_stats(page_session_stats, None)
+        self._set_page_session_stats(self.SPLASH_URL)
 
         self.assertLessEqual(
             self.page_metrics.get_total_page_size_bytes(), 10000000)
 
     def test_splash_page_loads_under_10_seconds(self):
-        page_session_timings = self._get_page_session_timings(self.SPLASH_URL)
-        self._set_stats(None, page_session_timings)
+        self._set_page_session_timings(self.SPLASH_URL)
 
         self.assertLessEqual(self.page_metrics.get_page_load_time_secs(), 10)
 
@@ -49,14 +47,12 @@ class SplashPagePerformanceForCachedStateTest(base.TestBase):
         super(SplashPagePerformanceForCachedStateTest, self).setUp()
 
     def test_splash_page_has_less_than_1_megabytes_sent_to_the_client(self):
-        page_session_stats = self._get_page_stats_cached_state(self.SPLASH_URL)
-        self._set_stats(page_session_stats, None)
+        self._set_page_stats_cached_state(self.SPLASH_URL)
 
         self.assertLessEqual(
             self.page_metrics.get_total_page_size_bytes(), 1000000)
 
     def test_splash_page_loads_under_3_seconds(self):
-        page_timings = self._get_page_timings_cached_state(self.SPLASH_URL)
-        self._set_stats(None, page_timings)
+        self._set_page_timings_cached_state(self.SPLASH_URL)
 
         self.assertLessEqual(self.page_metrics.get_page_load_time_secs(), 3)

@@ -16,31 +16,29 @@
 
 import unittest
 
-from core.tests.performance_framework import selenium_driver
-from core.tests.performance_framework import process_data
+from core.tests.performance_framework import perf_services
 
 
 class TestBase(unittest.TestCase):
     """Base class for performance tests."""
 
     def setUp(self):
-        self.data_fetcher = selenium_driver.SeleniumPerformanceDataFetcher(
+        self.data_fetcher = perf_services.SeleniumPerformanceDataFetcher(
             browser='chrome')
         self.page_metrics = None
 
-    def _get_page_session_stats(self, page_url):
-        return self.data_fetcher.get_har_dict(page_url)
+    def _set_page_session_stats(self, page_url):
+        self.page_metrics = (
+            self.data_fetcher.get_metrics_from_har_dict(page_url))
 
-    def _get_page_session_timings(self, page_url):
-        return self.data_fetcher.get_page_session_timings(page_url)
+    def _set_page_session_timings(self, page_url):
+        self.page_metrics = (
+            self.data_fetcher.get_metrics_from_session_timings(page_url))
 
-    def _get_page_stats_cached_state(self, page_url):
-        return self.data_fetcher.get_har_dict_cached_state(page_url)
+    def _set_page_stats_cached_state(self, page_url):
+        self.page_metrics = (
+            self.data_fetcher.get_metrics_from_har_dict_cached_state(page_url))
 
-    def _get_page_timings_cached_state(self, page_url):
-        return self.data_fetcher.get_page_session_timings_cached_state(page_url)
-
-    def _set_stats(self, page_stats=None, page_timings=None):
-        self.page_metrics = process_data.PageSessionMetrics(
-            page_session_stats=page_stats,
-            page_session_timings=page_timings)
+    def _set_page_timings_cached_state(self, page_url):
+        self.page_metrics = (
+            self.data_fetcher.get_metrics_from_cached_session_timings(page_url))
