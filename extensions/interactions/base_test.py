@@ -152,7 +152,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         def _check_num_interaction_rules(interaction_id, expected_num):
             interaction = interaction_registry.Registry.get_interaction_by_id(
                 interaction_id)
-            self.assertEqual(len(interaction.rules), expected_num)
+            self.assertEqual(len(interaction.rules_dict), expected_num)
 
         _check_num_interaction_rules('MultipleChoiceInput', 1)
         _check_num_interaction_rules('NumericInput', 7)
@@ -343,7 +343,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             # Check that the rules for this interaction have object editor
             # templates and default values.
-            for rule_name, rule_dict in interaction.rules.iteritems():
+            for rule_name, rule_dict in interaction.rules_dict.iteritems():
                 param_list = interaction.get_rule_param_list(rule_name)
 
                 for (_, param_obj_cls) in param_list:
@@ -371,7 +371,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 interaction_id)
             if interaction.is_trainable:
                 self.assertIn(
-                    exp_domain.CLASSIFIER_RULESPEC_STR, interaction.rules,
+                    exp_domain.CLASSIFIER_RULESPEC_STR, interaction.rules_dict,
                     'Expected to find a classifier in trainable '
                     'interaction: %s' % interaction_id)
 
@@ -384,7 +384,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 interaction_id)
             if not interaction.is_trainable:
                 self.assertNotIn(
-                    exp_domain.CLASSIFIER_RULESPEC_STR, interaction.rules,
+                    exp_domain.CLASSIFIER_RULESPEC_STR, interaction.rules_dict,
                     'Did not expect to find a classifier in untrainable '
                     'interaction: %s' % interaction_id)
 
@@ -401,7 +401,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 interaction_id)
             if interaction.is_trainable:
                 self.assertNotEqual(
-                    len(interaction.rules), 1,
+                    len(interaction.rules_dict), 1,
                     'Expected trainable interaction to have more than just a '
                     'classifier: %s' % interaction_id)
 

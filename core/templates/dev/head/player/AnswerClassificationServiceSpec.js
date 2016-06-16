@@ -88,9 +88,12 @@ describe('Answer classification service with string classifier disabled',
     }
   };
 
-  it('should be undefined if no frontend rules are provided', function() {
-    expect(acs.getMatchingClassificationResult(explorationId, state, 0, false))
-      .toBe(undefined);
+  it('should fail if no frontend rules are provided', function() {
+    acs.getMatchingClassificationResult(explorationId, state, 0, false).then(
+      successHandler, failHandler);
+    $rootScope.$digest();
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
   });
 
   it('should return the first matching answer group and first matching rule' +

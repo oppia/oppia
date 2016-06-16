@@ -109,7 +109,7 @@ class BaseInteraction(object):
     default_outcome_heading = None
 
     # Temporary cache for the rule definitions.
-    _cached_rules = None
+    _cached_rules_dict = None
 
     @property
     def id(self):
@@ -143,21 +143,22 @@ class BaseInteraction(object):
             return '{{answer}}'
 
     @property
-    def rules(self):
-        if self._cached_rules is not None:
-            return self._cached_rules
+    def rules_dict(self):
+        """A dict of rule names to rule properties."""
+        if self._cached_rules_dict is not None:
+            return self._cached_rules_dict
 
         rules_index_dict = json.loads(
             utils.get_file_contents(feconf.RULES_DESCRIPTIONS_FILE_PATH))
-        self._cached_rules = rules_index_dict[self.id]
+        self._cached_rules_dict = rules_index_dict[self.id]
 
-        return self._cached_rules
+        return self._cached_rules_dict
 
     @property
     def _rule_description_strings(self):
         return {
-            rule_name: self.rules[rule_name]['description']
-            for rule_name in self.rules
+            rule_name: self.rules_dict[rule_name]['description']
+            for rule_name in self.rules_dict
         }
 
     @property
@@ -215,10 +216,10 @@ class BaseInteraction(object):
 
     def get_rule_description(self, rule_name):
         """Gets a rule description, given its name."""
-        if rule_name not in self.rules:
+        if rule_name not in self.rules_dict:
             raise Exception('Could not find rule with name %s' % rule_name)
         else:
-            return self.rules[rule_name]['description']
+            return self.rules_dict[rule_name]['description']
 
     def get_rule_param_list(self, rule_name):
         """Gets the parameter list for a given rule."""

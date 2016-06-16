@@ -119,15 +119,15 @@ def classify_string_classifier_rule(state, normalized_answer):
     return None
 
 
-# TODO(bhenning): Add more tests for classification, such as testing multiple
-# rule specs over multiple answer groups and making sure the best match over all
-# those rules is picked.
 def classify(state, answer):
     """Classify the answer using the string classifier.
 
+    This should only be called if the string classifier functionality is
+    enabled.
+
     Normalize the answer and classifies the answer if the interaction has a
-    classifier associated with it and the string classifier functionality is
-    enabled. Otherwise, classifies the answer to the default outcome.
+    classifier associated with it. Otherwise, classifies the answer to the
+    default outcome.
 
     Returns a dict with the following keys:
         'outcome': A dict representing the outcome of the answer group matched.
@@ -141,6 +141,8 @@ def classify(state, answer):
     When the default rule is matched, outcome is the default_outcome of the
     state's interaction.
     """
+    assert feconf.ENABLE_STRING_CLASSIFIER
+
     interaction_instance = interaction_registry.Registry.get_interaction_by_id(
         state.interaction.id)
     normalized_answer = interaction_instance.normalize_answer(answer)

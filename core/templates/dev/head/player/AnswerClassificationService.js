@@ -108,7 +108,8 @@ oppia.factory('AnswerClassificationService', [
           alertsService.addWarning(
             'Something went wrong with the exploration: no ' +
             'interactionRulesService was available.');
-          return;
+          deferred.reject();
+          return deferred.promise;
         }
 
         if (result.outcome === defaultOutcome &&

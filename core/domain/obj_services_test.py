@@ -81,7 +81,7 @@ class ObjectDefaultValuesUnitTests(test_utils.GenericTestBase):
         object_default_vals = obj_services.get_default_object_values()
 
         for interaction in interactions:
-            for rule_name in interaction.rules:
+            for rule_name in interaction.rules_dict:
                 param_list = interaction.get_rule_param_list(rule_name)
 
                 for (_, param_obj_type) in param_list:

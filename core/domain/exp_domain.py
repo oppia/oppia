@@ -535,7 +535,7 @@ class AnswerGroup(object):
 
         seen_classifier_rule = False
         for rule_spec in self.rule_specs:
-            if rule_spec.rule_type not in interaction.rules:
+            if rule_spec.rule_type not in interaction.rules_dict:
                 raise utils.ValidationError(
                     'Unrecognized rule type: %s' % rule_spec.rule_type)
 
