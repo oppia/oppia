@@ -116,6 +116,55 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
                 'num_total_threads': 2,
             })
 
+    def test_single_thread_multiple_exp(self):
+        with self._get_swap_context():
+            exp_id_1 = 'eid1'
+            exp_id_2 = 'eid2'
+            exp_id_3 = 'eid3'
+            thread_id_1 = 'tid1'
+            thread_id_2 = 'tid2'
+            thread_id_3 = 'tid3'
+            self.save_new_valid_exploration(exp_id_1, 'owner')
+            self.save_new_valid_exploration(exp_id_2, 'owner')
+            self.save_new_valid_exploration(exp_id_3, 'owner')
+            thread_1 = feedback_models.FeedbackThreadModel.create(
+                exp_id_1, thread_id_1)
+            thread_1.exploration_id = exp_id_1
+            thread_1.put()
+            thread_2 = feedback_models.FeedbackThreadModel.create(
+                exp_id_2, thread_id_2)
+            thread_2.exploration_id = exp_id_2
+            thread_2.put()
+            thread_3 = feedback_models.FeedbackThreadModel.create(
+                exp_id_3, thread_id_3)
+            thread_3.exploration_id = exp_id_3
+            thread_3.put()
+            self.process_and_flush_pending_tasks()
+            ModifiedFeedbackAnalyticsAggregator.start_computation()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+            feedback_analytics = (
+                ModifiedFeedbackAnalyticsAggregator.get_thread_analytics_multi(
+                    [exp_id_1, exp_id_2, exp_id_3]))
+            self.assertEqual(
+                feedback_analytics[0].to_dict(),
+                {
+                    'num_open_threads': 1,
+                    'num_total_threads': 1,
+                })
+            self.assertEqual(
+                feedback_analytics[1].to_dict(),
+                {
+                    'num_open_threads': 1,
+                    'num_total_threads': 1,
+                })
+            self.assertEqual(
+                feedback_analytics[2].to_dict(),
+                {
+                    'num_open_threads': 1,
+                    'num_total_threads': 1,
+                })
+
     def test_multiple_threads_multiple_exp(self):
         with self._get_swap_context():
             exp_id_1 = 'eid1'
