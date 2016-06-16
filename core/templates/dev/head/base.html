@@ -249,12 +249,11 @@
                           </ul>
                           <ul ng-if="!windowIsNarrow" class="nav oppia-navbar-tabs">
                             <create-activity-button></create-activity-button>
-                            {% if SHOW_CUSTOM_PAGES %}
-                              <li class="oppia-clickable-navbar-element pull-right">
-                                <a class="oppia-navbar-tab" href="/forum" translate="I18N_TOPNAV_FORUM">
-                                </a>
-                              </li>
-                            {% endif %}
+
+                            <li class="oppia-clickable-navbar-element pull-right">
+                              <a class="oppia-navbar-tab" href="/forum" translate="I18N_TOPNAV_FORUM">
+                              </a>
+                            </li>
                             <li class="dropdown oppia-navbar-clickable-dropdown pull-right">
                               <a class="oppia-navbar-tab">
                                 <span translate="I18N_TOPNAV_ABOUT"></span>
@@ -264,10 +263,7 @@
                                 <li><a href="/about" translate="I18N_TOPNAV_ABOUT_OPPIA"></a></li>
                                 <li><a href="/teach" translate="I18N_TOPNAV_TEACH_WITH_OPPIA"></a></li>
                                 <li><a href="https://oppiablog.blogspot.com" translate="I18N_TOPNAV_BLOG" target="_blank"></a></li>
-                                {% if SHOW_CUSTOM_PAGES %}
-                                  <li><a href="/terms" translate="I18N_TOPNAV_TERMS_OF_SERVICE"></a></li>
-                                  <li><a href="/privacy" translate="I18N_TOPNAV_PRIVACY_POLICY"></a></li>
-                                {% endif %}
+                                <li><a href="/contact" translate="I18N_TOPNAV_CONTACT_US"></a></li>
                               </ul>
                             </li>
                             <li class="oppia-clickable-navbar-element pull-right">

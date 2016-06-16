@@ -26,14 +26,12 @@
       </a>
     </li>
 
-    {% if SHOW_CUSTOM_PAGES %}
-      <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
-        <a href="/forum">
-          <i class="material-icons oppia-sidebar-menu-icon">&#xE7EF;</i>
-          <span translate="I18N_SIDEBAR_FORUM"></span>
-        </a>
-      </li>
-    {% endif %}
+    <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
+      <a href="/forum">
+        <i class="material-icons oppia-sidebar-menu-icon">&#xE7EF;</i>
+        <span translate="I18N_SIDEBAR_FORUM"></span>
+      </a>
+    </li>
 
     <li>
       <a href="https://oppiablog.blogspot.com" target="_blank">
@@ -42,23 +40,12 @@
       </a>
     </li>
 
-    {% if SHOW_CUSTOM_PAGES %}
-      <hr>
-
-      <li>
-        <a href="/terms">
-          <i class="material-icons oppia-sidebar-menu-icon">&#xE88E;</i>
-          Terms of Use
-        </a>
-      </li>
-
-      <li>
-        <a href="/privacy">
-          <i class="material-icons oppia-sidebar-menu-icon">&#xE88E;</i>
-          Privacy Policy
-        </a>
-      </li>
-    {% endif %}
+    <li {% if nav_mode == 'contact' %}class="active"{% endif %}>
+      <a href="/contact">
+        <i class="material-icons oppia-sidebar-menu-icon">&#xE87F;</i>
+        <span translate="I18N_SIDEBAR_CONTACT_US"></span>
+      </a>
+    </li>
   </ul>
 
   <div class="oppia-sidebar-footer">
