@@ -72,6 +72,19 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
                 exp_id).to_dict(),
             expected_thread_analytics_dict)
 
+    def test_no_threads_job_not_run(self):
+        # Create a new exploration, but don't create any threads and don't even
+        # start the MR job.
+        with self._get_swap_context():
+            exp_id = 'eid'
+            self.save_new_valid_exploration(exp_id, 'owner')
+            self.assertEqual(
+                ModifiedFeedbackAnalyticsAggregator.get_thread_analytics(
+                    exp_id).to_dict(), {
+                        'num_open_threads': 0,
+                        'num_total_threads': 0,
+                    })
+
     def test_no_threads(self):
         with self._get_swap_context():
             exp_id = 'eid'
