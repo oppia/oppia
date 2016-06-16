@@ -122,9 +122,9 @@ class FeedbackStatsHandler(base.BaseHandler):
                 [exploration_id]))[0]
         self.values.update({
             'num_open_threads': (
-                feedback_thread_analytics.num_open_threads),
+                feedback_thread_analytics['num_open_threads']),
             'num_total_threads': (
-                feedback_thread_analytics.num_total_threads),
+                feedback_thread_analytics['num_total_threads']),
         })
         self.render_json(self.values)
 
