@@ -163,7 +163,7 @@ class DashboardHandler(base.BaseHandler):
                     self.user_id)))
 
         for ind, exploration in enumerate(explorations_list):
-            exploration.update(feedback_thread_analytics[ind])
+            exploration.update(feedback_thread_analytics[ind].to_dict())
 
         explorations_list = sorted(
             explorations_list,

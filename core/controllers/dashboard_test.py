@@ -532,7 +532,7 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
 
         def mock_get_thread_analytics_multi(unused_exploration_ids):
             return [
-                (feedback_domain.FeedbackAnalytics(self.EXP_ID, 2, 3).to_dict()
+                (feedback_domain.FeedbackAnalytics(self.EXP_ID, 2, 3)
                 )]
 
         with self.swap(

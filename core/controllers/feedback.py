@@ -118,8 +118,8 @@ class FeedbackStatsHandler(base.BaseHandler):
 
     def get(self, exploration_id):
         feedback_thread_analytics = (
-            feedback_services.get_thread_analytics_multi(
-                [exploration_id]))[0]
+            feedback_services.get_thread_analytics(
+                exploration_id)).to_dict()
         self.values.update({
             'num_open_threads': (
                 feedback_thread_analytics['num_open_threads']),
