@@ -18,10 +18,12 @@
 
 oppia.controller('Dashboard', [
   '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
-  'RatingComputationService', 'ExplorationCreationService',
+  'DashboardBackendApiService', 'RatingComputationService',
+  'ExplorationCreationService',
   function(
-      $scope, $http, $rootScope, oppiaDatetimeFormatter,
-      RatingComputationService, ExplorationCreationService) {
+    $scope, $http, $rootScope, oppiaDatetimeFormatter,
+    DashboardBackendApiService, RatingComputationService,
+    ExplorationCreationService) {
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
     $scope.createNewExploration = (
       ExplorationCreationService.createNewExploration);
@@ -34,10 +36,10 @@ oppia.controller('Dashboard', [
     };
 
     $rootScope.loadingMessage = 'Loading';
-    $http.get('/dashboardhandler/data').then(function(response) {
-      var data = response.data;
-      $scope.explorationsList = data.explorations_list;
-      $scope.collectionsList = data.collections_list;
+    DashboardBackendApiService.fetchDashboardData().then(function(response) {
+      $scope.explorationsList = response.explorationsList;
+      $scope.collectionsList = response.collectionsList;
+      $scope.dashboardStats = response.dashboardStats;
       $rootScope.loadingMessage = '';
     });
   }
