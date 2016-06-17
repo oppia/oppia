@@ -73,6 +73,6 @@ trap cleanup EXIT
 # Wait for the servers to come up.
 while ! nc -vz localhost 9501; do sleep 1; done
 
-$PYTHON_CMD scripts/backend_tests.py --test_path='core/tests/performance_tests' $@
+$PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.splash_test $@ 
 
 rm bmp.log server.log

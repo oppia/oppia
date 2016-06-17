@@ -198,7 +198,6 @@ def _get_all_test_targets(test_path=None):
         return os.path.relpath(path, os.getcwd())[:-3].replace('/', '.')
 
     base_path = os.path.join(os.getcwd(), test_path or '')
-    performance_tests_path = os.path.join('core', 'tests', 'performance_tests')
     result = []
     for root in os.listdir(base_path):
         if any([s in root for s in ['.git', 'third_party', 'core/tests']]):
@@ -208,9 +207,8 @@ def _get_all_test_targets(test_path=None):
                 os.path.join(base_path, root)))
         for subroot, _, files in os.walk(os.path.join(base_path, root)):
             for f in files:
-                if (f.endswith('_test.py') and (
-                        (os.path.join('core', 'tests') not in subroot) or
-                        (performance_tests_path in subroot))):
+                if (f.endswith('_test.py') and
+                        os.path.join('core', 'tests') not in subroot):
                     result.append(_convert_to_test_target(
                         os.path.join(subroot, f)))
 
