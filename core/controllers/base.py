@@ -335,7 +335,6 @@ class BaseHandler(webapp2.RequestHandler):
                 obj_services.get_all_object_editor_js_templates()),
             'RTE_COMPONENT_SPECS': (
                 rte_component_registry.Registry.get_all_specs()),
-            'SHOW_CUSTOM_PAGES': feconf.SHOW_CUSTOM_PAGES,
             'SITE_FEEDBACK_FORM_URL': SITE_FEEDBACK_FORM_URL.value,
             'SITE_NAME': SITE_NAME.value,
             'SUPPORTED_SITE_LANGUAGES': feconf.SUPPORTED_SITE_LANGUAGES,
