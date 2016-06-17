@@ -47,6 +47,9 @@ class SeleniumPerformanceDataFetcher(object):
     and per-resource statistics. Each entry contains the URL requested and
     request and response headers. For additional details, please see:
     https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/HAR/Overview.html
+
+    The HTTP Archive data is retrieved using the proxy server by recording the
+    communication between the client and server.
     """
 
     # Chrome is the default browser that selenium will use for extracting
@@ -54,9 +57,9 @@ class SeleniumPerformanceDataFetcher(object):
     DEFAULT_BROWSER_SOURCE = 'chrome'
     SUPPORTED_BROWSER_SOURCES = ['chrome', 'firefox']
 
-    # Duration to wait for the complete page to load, otherwise XHR requests
-    # made post initial page load will not be recorded.
-    WAIT_DURATION = 3
+    # Duration (in seconds) to wait for the complete page to load, otherwise
+    # XHR requests made post initial page load will not be recorded.
+    WAIT_DURATION_SECS = 3
 
     def __init__(self, browser=DEFAULT_BROWSER_SOURCE):
         if browser in self.SUPPORTED_BROWSER_SOURCES:
@@ -67,12 +70,9 @@ class SeleniumPerformanceDataFetcher(object):
 
         self.server = self.driver = self.proxy = None
 
-    def get_metrics_from_har_dict(self, page_url):
+    def get_page_metrics_for_url(self, page_url):
         """Returns a PageSessionMetrics domain object initialized using
         HTTP Archive (HAR) dict for a given page URL.
-
-        The HAR dict is retrieved using the proxy server by recording the
-        communication between the client and server.
         """
         with Xvfb() as _:
             self._setup_proxy()
@@ -89,18 +89,16 @@ class SeleniumPerformanceDataFetcher(object):
         self._stop_proxy()
         self._stop_driver()
 
-        page_session_metrics = perf_domain.PageSessionMetrics(
+        return perf_domain.PageSessionMetrics(
             page_session_stats=har_dict, page_session_timings=None)
 
-        return page_session_metrics
-
-    def get_metrics_from_har_dict_cached_state(self, page_url):
+    def get_page_metrics_from_cached_state(self, page_url):
         """Returns a PageSessionMetrics domain object initialized using
         HTTP Archive (HAR) dict for a given page URL while simulating a
         cached state i.e, a return user.
 
-        To get it we require the use of a proxy server as we need to record the
-        communication between server and client.
+        Note: This method is stand-alone and does not require
+        `get_page_session_metrics_for_url` to be called before it.
         """
         with Xvfb() as _:
             self._setup_proxy()
@@ -121,12 +119,10 @@ class SeleniumPerformanceDataFetcher(object):
         self._stop_proxy()
         self._stop_driver()
 
-        page_session_metrics = perf_domain.PageSessionMetrics(
+        return perf_domain.PageSessionMetrics(
             page_session_stats=har_dict, page_session_timings=None)
 
-        return page_session_metrics
-
-    def get_metrics_from_session_timings(self, page_url):
+    def get_page_timings_for_url(self, page_url):
         """Returns a PageSessionMetrics domain object initialized using
         page load timings for a page URL.
         """
@@ -141,12 +137,10 @@ class SeleniumPerformanceDataFetcher(object):
 
         self._stop_driver()
 
-        page_session_metrics = perf_domain.PageSessionMetrics(
+        return perf_domain.PageSessionMetrics(
             page_session_stats=None, page_session_timings=page_session_timings)
 
-        return page_session_metrics
-
-    def get_metrics_from_cached_session_timings(self, page_url):
+    def get_page_timings_from_cached_state(self, page_url):
         """Returns a PageSessionMetrics domain object initialized using page
         load timings for a page URL while simulating a cached state i.e, a
         return user.
@@ -166,15 +160,13 @@ class SeleniumPerformanceDataFetcher(object):
 
         self._stop_driver()
 
-        page_session_metrics = perf_domain.PageSessionMetrics(
+        return perf_domain.PageSessionMetrics(
             page_session_stats=None, page_session_timings=page_session_timings)
-
-        return page_session_metrics
 
     def _wait_until_page_load_is_finished(self):
         # Waits for the complete page to load, otherwise XHR requests
         # made post initial page load will not be recorded.
-        time.sleep(self.WAIT_DURATION)
+        time.sleep(self.WAIT_DURATION_SECS)
 
     def _setup_proxy(self, downstream_kbps=None, upstream_kbps=None,
                      latency=None):
@@ -199,8 +191,8 @@ class SeleniumPerformanceDataFetcher(object):
             self.proxy.limits(proxy_options)
 
     def _setup_driver(self, use_proxy=False):
-        """Initializes a Selenium webdrive instance to programmatically interact
-        with a browser.
+        """Initializes a Selenium webdriver instance to programmatically
+        interact with a browser.
         """
         if self.browser == 'chrome':
             chrome_options = webdriver.ChromeOptions()

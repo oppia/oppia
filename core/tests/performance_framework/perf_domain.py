@@ -86,7 +86,7 @@ class PageSessionMetrics(object):
             if self.get_request_count() == 0:
                 raise utils.ValidationError(
                     'Expected the log entry of the page load stats to include '
-                    'a positive number of entries.')
+                    'a positive number of requests.')
 
             if self.get_total_page_size_bytes() == 0:
                 raise utils.ValidationError(
@@ -106,13 +106,13 @@ class PageSessionMetrics(object):
                             'Expected %s to be in milliseconds, instead found '
                             'seconds' % timing_prop)
 
-            if self.get_page_load_time_secs() < 0:
+            if self.get_page_load_time_millisecs() < 0:
                 raise utils.ValidationError(
                     'Expected the page load time to be positive.')
-            if self.get_dom_ready_time_secs() < 0:
+            if self.get_dom_ready_time_millisecs() < 0:
                 raise utils.ValidationError(
                     'Expected the dom ready time to be positive.')
-            if self.get_request_time_secs() < 0:
+            if self.get_request_time_millisecs() < 0:
                 raise utils.ValidationError(
                     'Expected the request time to be positive.')
 
@@ -132,7 +132,7 @@ class PageSessionMetrics(object):
 
         return total_size
 
-    def _get_duration_secs(self, event_end, event_initial):
+    def _get_duration_millisecs(self, event_end, event_initial):
         # Timestamps are in milliseconds.
         initial_timestamp = self.page_load_timings[event_initial]
 
@@ -140,17 +140,16 @@ class PageSessionMetrics(object):
 
         duration_secs = end_timestamp - initial_timestamp
 
-        # Returns in seconds.
-        return duration_secs/1000.0
+        return duration_secs
 
-    def get_page_load_time_secs(self):
-        """Returns the total page load time (in seconds)."""
-        return self._get_duration_secs('loadEventEnd', 'fetchStart')
+    def get_page_load_time_millisecs(self):
+        """Returns the total page load time (in milliseconds)."""
+        return self._get_duration_millisecs('loadEventEnd', 'fetchStart')
 
-    def get_dom_ready_time_secs(self):
-        """Returns the total dom ready time (in seconds)."""
-        return self._get_duration_secs('domComplete', 'domInteractive')
+    def get_dom_ready_time_millisecs(self):
+        """Returns the total dom ready time (in milliseconds)."""
+        return self._get_duration_millisecs('domComplete', 'domInteractive')
 
-    def get_request_time_secs(self):
-        """Returns the total request time (in seconds)."""
-        return self._get_duration_secs('responseEnd', 'requestStart')
+    def get_request_time_millisecs(self):
+        """Returns the total request time (in milliseconds)."""
+        return self._get_duration_millisecs('responseEnd', 'requestStart')
