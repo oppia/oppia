@@ -128,10 +128,10 @@
       </md-content>
 
       <span class="oppia-profile-portfolio-pages" ng-if="numUserPortfolioExplorations > 6">
-        <i class="material-icons small-size" ng-disabled="currentPageNumber == 0"
+        <i class="material-icons md-18" ng-disabled="currentPageNumber == 0"
            ng-click="goToPreviousPage()">&#xE5C4;</i>
            Showing <[currentPageNumber * PAGE_SIZE + 1]> - <[Math.min(numUserPortfolioExplorations, (currentPageNumber + 1) * PAGE_SIZE)]> of <[numUserPortfolioExplorations]>
-        <i class="material-icons small-size" ng-disabled="(currentPageNumber + 1) * PAGE_SIZE >= userEditedExplorations.length"   ng-click="goToNextPage()">&#xE5C8;</i>
+        <i class="material-icons md-18" ng-disabled="(currentPageNumber + 1) * PAGE_SIZE >= userEditedExplorations.length"   ng-click="goToNextPage()">&#xE5C8;</i>
       </span>
     </md-card>
   </div>
