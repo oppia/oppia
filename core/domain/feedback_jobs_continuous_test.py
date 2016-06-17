@@ -17,7 +17,6 @@
 """Tests for continuous computations relating to feedback analytics."""
 
 from core import jobs_registry
-from core.domain import event_services
 from core.domain import feedback_jobs_continuous
 from core.domain import feedback_services
 from core.platform import models
@@ -92,7 +91,6 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
         with self._get_swap_context():
             exp_id_1 = 'eid1'
             exp_id_2 = 'eid2'
-            thread_id = 'tid'
             self.save_new_valid_exploration(exp_id_1, 'owner')
             self.save_new_valid_exploration(exp_id_2, 'owner')
 
@@ -109,12 +107,8 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
                 'num_total_threads': 0,
             })
 
-            thread = feedback_models.FeedbackThreadModel.create(
-                exp_id_1, thread_id)
-            thread.exploration_id = exp_id_1
-            event_services.FeedbackThreadCreatedEventHandler.record(
-                thread.exploration_id)
-            thread.put()
+            feedback_services.create_thread(
+                exp_id_1, None, 'owner', 'subject', 'text')
             self.process_and_flush_pending_tasks()
             feedback_threads = (
                 ModifiedFeedbackAnalyticsAggregator.get_thread_analytics_multi(
