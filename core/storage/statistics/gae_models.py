@@ -84,32 +84,40 @@ class StateRuleAnswerLogModel(base_models.BaseModel):
     @classmethod
     def get_or_create(cls, exploration_id, state_name, rule_str):
         # TODO(sll): Deprecate this method.
-        return cls.get_or_create_multi(exploration_id, [{
-            'state_name': state_name,
-            'rule_str': rule_str
-        }])[0]
+        return cls.get_or_create_multi({
+            exploration_id: [{
+                'state_name': state_name,
+                'rule_str': rule_str
+            }]})[exploration_id][0]
 
     @classmethod
     def _get_entity_key(cls, unused_exploration_id, entity_id):
         return ndb.Key(cls._get_kind(), entity_id)
 
     @classmethod
-    def get_or_create_multi(cls, exploration_id, rule_data):
-        """Gets or creates entities for the given rules.
+    def get_or_create_multi(cls, exploration_rule_data_dict):
+        """Gets entities given a list of dicts containing an exploration and
+        rule data. Returns a dict mapping exploration IDs to a list of
+        StateRuleAnswerLogModel entities.
 
         Args:
-            exploration_id: the exploration id
-            rule_data: a list of dicts, each with the following keys:
+            exploration_rule_data_dict: a list of dicts with an exploration_id
+            as the key and a rule_data_list as the value, where each value in
+            the rule_data_list has the following keys:
                 (state_name, rule_str).
         """
         # TODO(sll): Use a hash instead to disambiguate.
-        entity_ids = ['.'.join([
-            exploration_id, datum['state_name'],
-            _OLD_SUBMIT_HANDLER_NAME, datum['rule_str']
-        ])[:490] for datum in rule_data]
+        entity_ids = []
+        exploration_ids = []
+        for exploration_id, rule_data in exploration_rule_data_dict.iteritems():
+            entity_ids += ['.'.join([
+                exploration_id, datum['state_name'],
+                _OLD_SUBMIT_HANDLER_NAME, datum['rule_str']
+            ])[:490] for datum in rule_data]
+            exploration_ids += [exploration_id] * len(rule_data)
 
-        entity_keys = [cls._get_entity_key(exploration_id, entity_id)
-                       for entity_id in entity_ids]
+        entity_keys = [cls._get_entity_key(exploration_ids[ind], entity_id)
+                       for ind, entity_id in enumerate(entity_ids)]
 
         entities = ndb.get_multi(entity_keys)
         entities_to_put = []
@@ -118,9 +126,17 @@ class StateRuleAnswerLogModel(base_models.BaseModel):
                 new_entity = cls(id=entity_ids[ind], answers={})
                 entities_to_put.append(new_entity)
                 entities[ind] = new_entity
+        if entities_to_put:
+            ndb.put_multi(entities_to_put)
 
-        ndb.put_multi(entities_to_put)
-        return entities
+        entity_dict = {
+            exploration_id: []
+            for exploration_id in exploration_rule_data_dict.keys()
+        }
+
+        for (exploration_id, entity) in zip(exploration_ids, entities):
+            entity_dict[exploration_id].append(entity)
+        return entity_dict
 
 
 class StartExplorationEventLogEntryModel(base_models.BaseModel):

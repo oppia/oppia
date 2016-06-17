@@ -43,28 +43,40 @@ class StateRuleAnswerLog(object):
         return sum(self.answers.values())
 
     @classmethod
-    def get_multi(cls, exploration_id, rule_data):
-        """Gets domain objects corresponding to the given rule data.
+    def get_multi(cls, exploration_rule_data_dict):
+        """Gets domain objects given a list of dicts containing an exploration
+        and rule data.
 
         Args:
-            exploration_id: the exploration id
-            rule_data: a list of dicts, each with the following keys:
+            exploration_rule_data_dict: a list of dicts with an exploration_id
+            as the key and a rule_data_list as the value, where each value in
+            the rule_data_list has the following keys:
                 (state_name, rule_str).
+
+        Returns a dict with the input exploration IDs as keys mapped to
+        a list of StateRuleAnswerLog objects containing the results of the
+        query.
         """
         # TODO(sll): Should each rule_str be unicode instead?
-        answer_log_models = (
+        answer_logs_model_dict = (
             stats_models.StateRuleAnswerLogModel.get_or_create_multi(
-                exploration_id, rule_data))
-        return [cls(answer_log_model.answers)
+                exploration_rule_data_dict))
+        return {
+            exploration_id: [
+                cls(answer_log_model.answers)
                 for answer_log_model in answer_log_models]
+            for exploration_id, answer_log_models
+            in answer_logs_model_dict.iteritems()
+        }
 
     @classmethod
     def get(cls, exploration_id, state_name, rule_str):
         # TODO(sll): Deprecate this method.
-        return cls.get_multi(exploration_id, [{
-            'state_name': state_name,
-            'rule_str': rule_str
-        }])[0]
+        return cls.get_multi({
+            exploration_id: [{
+                'state_name': state_name,
+                'rule_str': rule_str
+            }]})[exploration_id][0]
 
     def get_top_answers(self, num_answers_to_return):
         """Returns the top `num_answers_to_return` answers.
