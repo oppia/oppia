@@ -189,11 +189,11 @@ def get_displayable_exp_summary_dicts_matching_ids(
 
         filtered_exploration_summaries.append(exploration_summary)
 
-    return _get_displayable_exp_summary_dicts(
+    return get_displayable_exp_summary_dicts(
         filtered_exploration_summaries, include_contributors=False)
 
 
-def _get_displayable_exp_summary_dicts(
+def get_displayable_exp_summary_dicts(
         exploration_summaries, include_contributors=True):
     """Given a list of exploration summary domain objects, returns a list,
     with the same number of elements, of the corresponding human-readable
@@ -221,6 +221,8 @@ def _get_displayable_exp_summary_dicts(
             'title': exploration_summary.title,
             'activity_type': rights_manager.ACTIVITY_TYPE_EXPLORATION,
             'category': exploration_summary.category,
+            'created_on_msec': utils.get_time_in_millisecs(
+                exploration_summary.exploration_model_created_on),
             'objective': exploration_summary.objective,
             'language_code': exploration_summary.language_code,
             'last_updated_msec': utils.get_time_in_millisecs(
@@ -323,7 +325,7 @@ def get_library_groups(language_codes):
 
     exp_summary_dicts = {
         summary_dict['id']: summary_dict
-        for summary_dict in _get_displayable_exp_summary_dicts(
+        for summary_dict in get_displayable_exp_summary_dicts(
             exp_summaries, include_contributors=False)
     }
 
@@ -373,7 +375,7 @@ def get_featured_exploration_summary_dicts(language_codes):
         key=lambda exp_summary: search_ranks[exp_summary.id],
         reverse=True)
 
-    return _get_displayable_exp_summary_dicts(
+    return get_displayable_exp_summary_dicts(
         sorted_exp_summaries, include_contributors=False)
 
 
@@ -393,7 +395,7 @@ def get_top_rated_exploration_summary_dicts(language_codes):
         key=lambda exp_summary: exp_summary.scaled_average_rating,
         reverse=True)[:feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS]
 
-    return _get_displayable_exp_summary_dicts(
+    return get_displayable_exp_summary_dicts(
         sorted_exp_summaries, include_contributors=False)
 
 
@@ -412,4 +414,4 @@ def get_recently_published_exploration_summary_dicts():
         key=lambda exp_summary: exp_summary.first_published_msec,
         reverse=True)
 
-    return _get_displayable_exp_summary_dicts(summaries)
+    return get_displayable_exp_summary_dicts(summaries)
