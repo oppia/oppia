@@ -65,13 +65,9 @@ button.md-button.md-default-theme.oppia-learner-continue-button:hover {
   background-color: #115FD4;
 }
 
-/* Style for unaligned material-icons. */
+/* Attributes for material-icons. */
 .material-icons{
   vertical-align: middle;
-}
-/* Style for smaller size of material icons for arrows on profile page. */
-.small-size{
-  font-size: 18px;
 }
 .material-icons.md-18 {
   font-size: 18px;
