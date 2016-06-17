@@ -17,13 +17,12 @@
  */
 
 oppia.controller('Dashboard', [
-  '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
+  '$scope', '$rootScope', 'oppiaDatetimeFormatter',
   'DashboardBackendApiService', 'RatingComputationService',
   'ExplorationCreationService',
   function(
-    $scope, $http, $rootScope, oppiaDatetimeFormatter,
-    DashboardBackendApiService, RatingComputationService,
-    ExplorationCreationService) {
+    $scope, $rootScope, oppiaDatetimeFormatter, DashboardBackendApiService,
+    RatingComputationService, ExplorationCreationService) {
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
     $scope.createNewExploration = (
       ExplorationCreationService.createNewExploration);
