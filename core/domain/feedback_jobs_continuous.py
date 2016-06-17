@@ -122,7 +122,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
         Args:
           - exploration_ids: ids of the explorations to get statistics for.
 
-        Returns a list of dict with two keys: 'num_open_threads' and
+        Returns a list of dicts, each with two keys: 'num_open_threads' and
         'num_total_threads', representing the counts of open and all feedback
         threads, respectively.
         """
@@ -144,7 +144,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
              if realtime_models[i] is not None else 0) +
             (feedback_thread_analytics_models[i].num_total_threads
              if feedback_thread_analytics_models[i] is not None else 0)
-            ) for i in range(len(exploration_ids))]
+        ) for i in range(len(exploration_ids))]
 
     @classmethod
     def get_thread_analytics(cls, exploration_id):
@@ -156,8 +156,8 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
         keys - 'num_open_threads' and 'num_total_threads'.
 
         """
-        return (FeedbackAnalyticsAggregator.get_thread_analytics_multi(
-            [exploration_id])[0])
+        return FeedbackAnalyticsAggregator.get_thread_analytics_multi(
+            [exploration_id])[0]
 
 
 class FeedbackAnalyticsMRJobManager(

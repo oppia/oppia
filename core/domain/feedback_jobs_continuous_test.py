@@ -17,6 +17,7 @@
 """Tests for continuous computations relating to feedback analytics."""
 
 from core import jobs_registry
+from core.domain import event_services
 from core.domain import feedback_jobs_continuous
 from core.domain import feedback_services
 from core.platform import models
@@ -111,14 +112,17 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread = feedback_models.FeedbackThreadModel.create(
                 exp_id_1, thread_id)
             thread.exploration_id = exp_id_1
+            event_services.FeedbackThreadCreatedEventHandler.record(
+                thread.exploration_id)
             thread.put()
+            self.process_and_flush_pending_tasks()
             feedback_threads = (
                 ModifiedFeedbackAnalyticsAggregator.get_thread_analytics_multi(
                     [exp_id_1, exp_id_2]))
             self.assertEqual(len(feedback_threads), 2)
             self.assertEqual(feedback_threads[0].to_dict(), {
-                'num_open_threads': 0,
-                'num_total_threads': 0,
+                'num_open_threads': 1,
+                'num_total_threads': 1,
             })
             self.assertEqual(feedback_threads[1].to_dict(), {
                 'num_open_threads': 0,
@@ -183,7 +187,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
                 'num_total_threads': 2,
             })
 
-    def test_threads_multiple_exp(self):
+    def test_multiple_threads_multiple_exp(self):
         with self._get_swap_context():
             exp_id_1 = 'eid1'
             exp_id_2 = 'eid2'
@@ -210,73 +214,49 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedFeedbackAnalyticsAggregator.start_computation()
             self.assertEqual(self.count_jobs_in_taskqueue(), 1)
             self.process_and_flush_pending_tasks()
-            feedback_analytics = (
+            # Do a multi call for all explorations and check for stats.
+            feedback_analytics_multi = (
                 ModifiedFeedbackAnalyticsAggregator.get_thread_analytics_multi(
                     [exp_id_1, exp_id_2, exp_id_3]))
             self.assertEqual(
-                feedback_analytics[0].to_dict(),
+                feedback_analytics_multi[0].to_dict(),
                 {
                     'num_open_threads': 2,
                     'num_total_threads': 2,
                 })
             self.assertEqual(
-                feedback_analytics[1].to_dict(),
+                feedback_analytics_multi[1].to_dict(),
                 {
                     'num_open_threads': 0,
                     'num_total_threads': 0,
                 })
             self.assertEqual(
-                feedback_analytics[2].to_dict(),
+                feedback_analytics_multi[2].to_dict(),
                 {
                     'num_open_threads': 1,
                     'num_total_threads': 1,
                 })
-
-    def test_multiple_threads_multiple_exp(self):
-        with self._get_swap_context():
-            exp_id_1 = 'eid1'
-            exp_id_2 = 'eid2'
-            thread_id_1 = 'tid1'
-            thread_id_2 = 'tid2'
-            thread_id_3 = 'tid3'
-            thread_id_4 = 'tid4'
-            self.save_new_valid_exploration(exp_id_1, 'owner')
-            self.save_new_valid_exploration(exp_id_2, 'owner')
-            thread_1 = feedback_models.FeedbackThreadModel.create(
-                exp_id_1, thread_id_1)
-            thread_1.exploration_id = exp_id_1
-            thread_1.put()
-            thread_2 = feedback_models.FeedbackThreadModel.create(
-                exp_id_1, thread_id_2)
-            thread_2.exploration_id = exp_id_1
-            thread_2.put()
-            thread_3 = feedback_models.FeedbackThreadModel.create(
-                exp_id_2, thread_id_3)
-            thread_3.exploration_id = exp_id_2
-            thread_3.put()
-            thread_4 = feedback_models.FeedbackThreadModel.create(
-                exp_id_2, thread_id_4)
-            thread_4.exploration_id = exp_id_2
-            thread_4.put()
-
-            self.process_and_flush_pending_tasks()
-            ModifiedFeedbackAnalyticsAggregator.start_computation()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
-            self.process_and_flush_pending_tasks()
-            feedback_analytics = (
-                ModifiedFeedbackAnalyticsAggregator.get_thread_analytics_multi(
-                    [exp_id_1, exp_id_2]))
+            # Do calls for each exploration separately and check for stats.
             self.assertEqual(
-                feedback_analytics[0].to_dict(),
+                ModifiedFeedbackAnalyticsAggregator.get_thread_analytics(
+                    exp_id_1).to_dict(),
                 {
                     'num_open_threads': 2,
                     'num_total_threads': 2,
                 })
             self.assertEqual(
-                feedback_analytics[1].to_dict(),
+                ModifiedFeedbackAnalyticsAggregator.get_thread_analytics(
+                    exp_id_2).to_dict(),
                 {
-                    'num_open_threads': 2,
-                    'num_total_threads': 2,
+                    'num_open_threads': 0,
+                    'num_total_threads': 0,
+                })
+            self.assertEqual(
+                ModifiedFeedbackAnalyticsAggregator.get_thread_analytics(
+                    exp_id_3).to_dict(),
+                {
+                    'num_open_threads': 1,
+                    'num_total_threads': 1,
                 })
 
     def test_thread_closed_job_running(self):

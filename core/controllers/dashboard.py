@@ -144,10 +144,13 @@ class DashboardHandler(base.BaseHandler):
                 category in feconf.CATEGORIES_TO_COLORS else
                 feconf.DEFAULT_COLOR)
 
+        exploration_ids_subscribed_to = (
+            subscription_services.get_exploration_ids_subscribed_to(
+                self.user_id))
+
         subscribed_exploration_summaries = (
             exp_services.get_exploration_summaries_matching_ids(
-                subscription_services.get_exploration_ids_subscribed_to(
-                    self.user_id)))
+                exploration_ids_subscribed_to))
         subscribed_collection_summaries = (
             collection_services.get_collection_summaries_matching_ids(
                 subscription_services.get_collection_ids_subscribed_to(
@@ -159,8 +162,7 @@ class DashboardHandler(base.BaseHandler):
 
         feedback_thread_analytics = (
             feedback_services.get_thread_analytics_multi(
-                subscription_services.get_exploration_ids_subscribed_to(
-                    self.user_id)))
+                exploration_ids_subscribed_to))
 
         for ind, exploration in enumerate(explorations_list):
             exploration.update(feedback_thread_analytics[ind].to_dict())
