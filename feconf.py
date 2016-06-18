@@ -237,11 +237,6 @@ VALID_MODERATOR_ACTIONS = {
     },
 }
 
-# Prefixes for activity ids to denote the type of activity. These values should
-# not be changed.
-ACTIVITY_ID_PREFIX_EXPLORATION = 'e:'
-ACTIVITY_ID_PREFIX_COLLECTION = 'c:'
-
 # Panel properties and other constants for the default skin.
 GADGET_PANEL_AXIS_HORIZONTAL = 'horizontal'
 PANELS_PROPERTIES = {
