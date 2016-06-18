@@ -153,3 +153,33 @@ class PageSessionMetrics(object):
     def get_request_time_millisecs(self):
         """Returns the total request time (in milliseconds)."""
         return self._get_duration_millisecs('responseEnd', 'requestStart')
+
+
+class MultiplePageSessionMetrics(object):
+    """Domain object for multiple PageSessionMetrics.
+    """
+
+    def  __init__(self, page_session_metrics):
+        self.page_metrics = page_session_metrics
+        self._validate()
+
+    def _validate(self):
+        if not isinstance(self.page_metrics, list):
+            raise utils.ValidationError(
+                'Expected page_session_metrics to be a list, '
+                'received %s' % self.page_metrics)
+
+    def get_page_load_time_millisecs(self):
+        """Returns the average total page load time (in milliseconds)."""
+        return (sum(item.get_page_load_time_millisecs()
+                    for item in self.page_metrics))/len(self.page_metrics)
+
+    def get_dom_ready_time_millisecs(self):
+        """Returns the average total page load time (in milliseconds)."""
+        return (sum(item.get_dom_ready_time_millisecs()
+                    for item in self.page_metrics))/len(self.page_metrics)
+
+    def get_request_time_millisecs(self):
+        """Returns the average total page load time (in milliseconds)."""
+        return (sum(item.get_request_time_millisecs()
+                    for item in self.page_metrics))/len(self.page_metrics)

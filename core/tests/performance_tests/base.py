@@ -17,7 +17,7 @@
 import unittest
 
 from core.tests.performance_framework import perf_services
-
+from core.tests.performance_framework import perf_domain
 
 class TestBase(unittest.TestCase):
     """Base class for performance tests."""
@@ -36,9 +36,21 @@ class TestBase(unittest.TestCase):
             self.data_fetcher.get_page_metrics_from_cached_state(page_url))
 
     def _record_page_session_timings(self, page_url):
-        self.page_metrics = (
-            self.data_fetcher.get_page_timings_for_url(page_url))
+        page_session_metrics = []
+
+        for _ in range(0, 3):
+            page_session_metrics.append(
+                self.data_fetcher.get_page_timings_for_url(page_url))
+
+        self.page_metrics = perf_domain.MultiplePageSessionMetrics(
+            page_session_metrics)
 
     def _record_page_timings_cached_state(self, page_url):
-        self.page_metrics = (
-            self.data_fetcher.get_page_timings_from_cached_state(page_url))
+        page_session_metrics = []
+
+        for _ in range(0, 3):
+            page_session_metrics.append(
+                self.data_fetcher.get_page_timings_from_cached_state(page_url))
+
+        self.page_metrics = perf_domain.MultiplePageSessionMetrics(
+            page_session_metrics)
