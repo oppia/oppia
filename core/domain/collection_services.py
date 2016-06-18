@@ -28,9 +28,10 @@ import datetime
 import logging
 import os
 
+from core.domain import activity_domain
+from core.domain import activity_services
 from core.domain import collection_domain
 from core.domain import exp_services
-from core.domain import library_services
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
@@ -248,6 +249,12 @@ def is_collection_summary_editable(collection_summary, user_id=None):
         user_id in collection_summary.editor_ids
         or user_id in collection_summary.owner_ids
         or collection_summary.community_owned)
+
+
+def get_collection_reference(collection_id):
+    """Returns an ActivityReference for the given collection."""
+    return activity_domain.ActivityReference(
+        feconf.ACTIVITY_TYPE_COLLECTION, collection_id)
 
 
 # Query methods.
@@ -629,8 +636,8 @@ def delete_collection(committer_id, collection_id, force_deletion=False):
     delete_collection_summary(collection_id)
 
     # Remove the collection from the featured activity list, if necessary.
-    library_services.remove_activity_from_featured_list(
-        feconf.ACTIVITY_TYPE_COLLECTION, collection_id)
+    activity_services.remove_featured_activity_reference(
+        get_collection_reference(collection_id))
 
 
 def get_collection_snapshots_metadata(collection_id):

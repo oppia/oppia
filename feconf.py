@@ -537,6 +537,7 @@ CATEGORIES_TO_COLORS = {
 # Types of activities that can be created with Oppia.
 ACTIVITY_TYPE_EXPLORATION = 'exploration'
 ACTIVITY_TYPE_COLLECTION = 'collection'
+ALL_ACTIVITY_TYPES = [ACTIVITY_TYPE_EXPLORATION, ACTIVITY_TYPE_COLLECTION]
 
 # A sorted list of default categories for which icons and background colours
 # exist.

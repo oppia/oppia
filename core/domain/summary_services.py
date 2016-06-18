@@ -14,11 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Commands that can be used to operate on exploration summaries."""
+"""Commands that can be used to operate on activity summaries."""
 
+from core.domain import activity_services
 from core.domain import collection_services
 from core.domain import exp_services
-from core.domain import library_services
 from core.domain import rights_manager
 from core.domain import stats_jobs_continuous
 from core.domain import user_services
@@ -355,12 +355,12 @@ def get_library_groups(language_codes):
     return results
 
 
-def require_activity_ids_to_be_public(activity_ids):
-    """Raises an exception if any activity id in the list does not exist, or
-    is not public, or if the list has duplicates.
+def require_activities_to_be_public(activity_references):
+    """Raises an exception if any activity reference in the list does not
+    exist, or is not public, or if the list has duplicates.
     """
-    exploration_ids, collection_ids = utils.split_activity_ids_by_type(
-        activity_ids)
+    exploration_ids, collection_ids = activity_services.split_by_type(
+        activity_references)
 
     activity_summaries_by_type = [{
         'type': 'exploration',
@@ -391,32 +391,33 @@ def get_featured_activity_summary_dicts(language_codes):
 
     The return value is sorted according to the list stored in the datastore.
     """
-    featured_activity_ids = library_services.get_featured_activity_ids()
-
-    exploration_ids_to_fetch, collection_ids_to_fetch = (
-        utils.split_activity_ids_by_type(featured_activity_ids))
+    activity_references = activity_services.get_featured_activity_references()
+    exploration_ids, collection_ids = activity_services.split_by_type(
+        activity_references)
 
     exp_summary_dicts = get_displayable_exp_summary_dicts_matching_ids(
-        exploration_ids_to_fetch)
+        exploration_ids)
     col_summary_dicts = get_displayable_collection_summary_dicts_matching_ids(
-        collection_ids_to_fetch)
+        collection_ids)
 
-    activity_ids_to_summary_dicts = {}
-    for summary_dict in exp_summary_dicts:
-        activity_id = utils.get_activity_id(
-            feconf.ACTIVITY_TYPE_EXPLORATION, summary_dict['id'])
-        activity_ids_to_summary_dicts[activity_id] = summary_dict
-    for summary_dict in col_summary_dicts:
-        activity_id = utils.get_activity_id(
-            feconf.ACTIVITY_TYPE_COLLECTION, summary_dict['id'])
-        activity_ids_to_summary_dicts[activity_id] = summary_dict
+    summary_dicts_by_id = {
+        feconf.ACTIVITY_TYPE_EXPLORATION: {
+            summary_dict['id']: summary_dict
+            for summary_dict in exp_summary_dicts
+        },
+        feconf.ACTIVITY_TYPE_COLLECTION: {
+            summary_dict['id']: summary_dict
+            for summary_dict in col_summary_dicts
+        },
+    }
 
-    return [
-        activity_ids_to_summary_dicts[featured_activity_id]
-        for featured_activity_id in featured_activity_ids if (
-            featured_activity_id in activity_ids_to_summary_dicts and
-            activity_ids_to_summary_dicts[
-                featured_activity_id]['language_code'] in language_codes)]
+    featured_summary_dicts = []
+    for reference in activity_references:
+        if reference.id in summary_dicts_by_id[reference.type]:
+            summary_dict = summary_dicts_by_id[reference.type][reference.id]
+            if summary_dict and summary_dict['language_code'] in language_codes:
+                featured_summary_dicts.append(summary_dict)
+    return featured_summary_dicts
 
 
 def get_top_rated_exploration_summary_dicts(language_codes):

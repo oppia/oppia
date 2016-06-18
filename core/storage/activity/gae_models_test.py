@@ -17,15 +17,15 @@
 from core.platform import models
 from core.tests import test_utils
 
-(library_models,) = models.Registry.import_models([models.NAMES.library])
+(activity_models,) = models.Registry.import_models([models.NAMES.activity])
 
 
 class ActivityListModelTest(test_utils.GenericTestBase):
     """Tests the ActivityListModel class."""
 
     def test_featured_activity_list_always_exists(self):
-        default_activity_list_model_instance = (
-            library_models.ActivityListModel.get('featured'))
-        self.assertIsNotNone(default_activity_list_model_instance)
-        self.assertEqual(default_activity_list_model_instance.id, 'featured')
-        self.assertEqual(default_activity_list_model_instance.activity_ids, [])
+        featured_model_instance = (
+            activity_models.ActivityReferencesModel.get('featured'))
+        self.assertIsNotNone(featured_model_instance)
+        self.assertEqual(featured_model_instance.id, 'featured')
+        self.assertEqual(featured_model_instance.activity_references, [])

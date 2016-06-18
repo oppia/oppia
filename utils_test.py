@@ -16,7 +16,6 @@
 
 # pylint: disable=relative-import
 from core.tests import test_utils
-import feconf
 import utils
 # pylint: enable=relative-import
 
@@ -189,33 +188,3 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(
             utils.get_thumbnail_icon_url_for_category('Nonexistent'),
             '/images/subjects/Lightbulb.svg')
-
-    def test_split_activity_ids_by_type(self):
-        self.assertEqual(
-            utils.split_activity_ids_by_type([]), ([], []))
-        self.assertEqual(
-            utils.split_activity_ids_by_type(['e:123']), (['123'], []))
-        self.assertEqual(
-            utils.split_activity_ids_by_type(['c:def']), ([], ['def']))
-        self.assertEqual(
-            utils.split_activity_ids_by_type(['e:123', 'c:def']),
-            (['123'], ['def']))
-        self.assertEqual(
-            utils.split_activity_ids_by_type(['e:123', 'c:def', 'e:ab']),
-            (['123', 'ab'], ['def']))
-
-        with self.assertRaisesRegexp(Exception, 'Invalid activity id: n:abc'):
-            utils.split_activity_ids_by_type(['e:123', 'n:abc'])
-
-    def test_get_activity_id(self):
-        self.assertEqual(
-            utils.get_activity_id(feconf.ACTIVITY_TYPE_EXPLORATION, 'abc'),
-            'e:abc')
-        self.assertEqual(
-            utils.get_activity_id(feconf.ACTIVITY_TYPE_COLLECTION, 'def'),
-            'c:def')
-
-        with self.assertRaisesRegexp(
-            Exception, 'Invalid activity type: badtype'
-            ):
-            utils.get_activity_id('badtype', 'itemid')

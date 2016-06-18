@@ -14,11 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from core.domain import activity_domain
+from core.domain import activity_services
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import exp_services_test
-from core.domain import library_services
 from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import summary_services
@@ -337,7 +338,10 @@ class FeaturedExplorationDisplayableSummariesTest(
         The call to get_featured_explorations() should only return
         [EXP_ID_2].
         """
-        library_services.update_featured_activity_ids(['e:%s' % self.EXP_ID_2])
+        activity_services.update_featured_activity_references([
+            activity_domain.ActivityReference(
+                feconf.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_2)
+        ])
 
         featured_activity_summaries = (
             summary_services.get_featured_activity_summary_dicts([
@@ -764,23 +768,25 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             test_summary_3, recently_published_exploration_summaries[0])
 
 
-class ActivityIdValidationTests(test_utils.GenericTestBase):
-    """Tests for validation of activity ids."""
+class ActivityReferenceValidationTests(test_utils.GenericTestBase):
+    """Tests for validation of activity references."""
 
     EXP_ID_0 = 'exp_id_0'
     EXP_ID_1 = 'exp_id_1'
     COL_ID_2 = 'col_id_2'
 
     def setUp(self):
-        super(ActivityIdValidationTests, self).setUp()
+        super(ActivityReferenceValidationTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
     def test_validation_of_activity_ids_list(self):
         with self.assertRaisesRegexp(Exception, 'non-existent exploration'):
-            summary_services.require_activity_ids_to_be_public(['e:fake'])
+            summary_services.require_activities_to_be_public([
+                exp_services.get_exploration_reference('fake')])
         with self.assertRaisesRegexp(Exception, 'non-existent collection'):
-            summary_services.require_activity_ids_to_be_public(['c:fake'])
+            summary_services.require_activities_to_be_public([
+                collection_services.get_collection_reference('fake')])
 
         self.save_new_valid_exploration(self.EXP_ID_0, self.owner_id)
         self.save_new_valid_exploration(self.EXP_ID_1, self.owner_id)
@@ -788,15 +794,16 @@ class ActivityIdValidationTests(test_utils.GenericTestBase):
             self.COL_ID_2, self.owner_id, exploration_id=self.EXP_ID_0)
 
         with self.assertRaisesRegexp(Exception, 'private exploration'):
-            summary_services.require_activity_ids_to_be_public([
-                'e:%s' % self.EXP_ID_0])
+            summary_services.require_activities_to_be_public([
+                exp_services.get_exploration_reference(self.EXP_ID_0)])
         with self.assertRaisesRegexp(Exception, 'private collection'):
-            summary_services.require_activity_ids_to_be_public([
-                'c:%s' % self.COL_ID_2])
+            summary_services.require_activities_to_be_public([
+                collection_services.get_collection_reference(self.COL_ID_2)])
 
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID_0)
         rights_manager.publish_collection(self.owner_id, self.COL_ID_2)
 
         # There are no more validation errors.
-        summary_services.require_activity_ids_to_be_public([
-            'e:%s' % self.EXP_ID_0, 'c:%s' % self.COL_ID_2])
+        summary_services.require_activities_to_be_public([
+            exp_services.get_exploration_reference(self.EXP_ID_0),
+            collection_services.get_collection_reference(self.COL_ID_2)])

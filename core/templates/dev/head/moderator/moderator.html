@@ -74,18 +74,14 @@
 
         <tab heading="Featured Activities">
           <h3>Activities to feature in the library</h3>
-          <em>
-            Explorations should be entered as "e:exploration_id".
-            Collections should be entered as "c:collection_id".
-          </em>
           <br><br>
 
-          <schema-based-editor schema="FEATURED_ACTIVITY_IDS_SCHEMA"
-                               local-value="displayedFeaturedActivityIds">
+          <schema-based-editor schema="FEATURED_ACTIVITY_REFERENCES_SCHEMA"
+                               local-value="displayedFeaturedActivityReferences">
           </schema-based-editor>
           <br><br>
 
-          <button class="btn btn-success" ng-click="saveFeaturedActivityIds()"
+          <button class="btn btn-success" ng-click="saveFeaturedActivityReferences()"
                   ng-disabled="isSaveFeaturedActivitiesButtonDisabled()">
             Save Featured Activities
           </button>

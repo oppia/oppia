@@ -28,23 +28,35 @@ oppia.controller('Moderator', [
       return '/create/' + explorationId;
     };
 
-    $scope.getActivityCreateUrl = function(activityId) {
-      var prefix = activityId.substring(0, 2);
-      var suffix = activityId.substring(2);
+    $scope.getActivityCreateUrl = function(reference) {
       return (
-        (prefix === 'e:' ? '/create/' : '/create_collection/') + suffix);
+        (reference.type === 'exploration' ? '/create/' : '/create_collection') +
+        reference.id);
     };
 
     $scope.allCommits = [];
     $scope.allFeedbackMessages = [];
-    $scope.displayedFeaturedActivityIds = [];
-    $scope.lastSavedFeaturedActivityIds = [];
     // Map of exploration ids to objects containing a single key: title.
     $scope.explorationData = {};
-    $scope.FEATURED_ACTIVITY_IDS_SCHEMA = {
+
+    $scope.displayedFeaturedActivityReferences = [];
+    $scope.lastSavedFeaturedActivityReferences = [];
+    $scope.FEATURED_ACTIVITY_REFERENCES_SCHEMA = {
       type: 'list',
       items: {
-        type: 'unicode'
+        type: 'dict',
+        properties: [{
+          name: 'type',
+          schema: {
+            type: 'unicode',
+            choices: ['exploration', 'collection']
+          }
+        }, {
+          name: 'id',
+          schema: {
+            type: 'unicode'
+          }
+        }]
       }
     };
 
@@ -70,27 +82,27 @@ oppia.controller('Moderator', [
     });
 
     $http.get('/moderatorhandler/featured').then(function(response) {
-      $scope.displayedFeaturedActivityIds = (
-        response.data.featured_activity_ids);
-      $scope.lastSavedFeaturedActivityIds = angular.copy(
-        $scope.displayedFeaturedActivityIds);
+      $scope.displayedFeaturedActivityReferences = (
+        response.data.featured_activity_references);
+      $scope.lastSavedFeaturedActivityReferences = angular.copy(
+        $scope.displayedFeaturedActivityReferences);
     });
 
     $scope.isSaveFeaturedActivitiesButtonDisabled = function() {
       return angular.equals(
-        $scope.displayedFeaturedActivityIds,
-        $scope.lastSavedFeaturedActivityIds);
+        $scope.displayedFeaturedActivityReferences,
+        $scope.lastSavedFeaturedActivityReferences);
     };
 
-    $scope.saveFeaturedActivityIds = function() {
+    $scope.saveFeaturedActivityReferences = function() {
       alertsService.clearWarnings();
 
-      var activityIdsToSave = angular.copy(
-        $scope.displayedFeaturedActivityIds);
+      var activityReferencesToSave = angular.copy(
+        $scope.displayedFeaturedActivityReferences);
       $http.post('/moderatorhandler/featured', {
-        featured_activity_ids: activityIdsToSave
+        featured_activity_reference_dicts: activityReferencesToSave
       }).then(function() {
-        $scope.lastSavedFeaturedActivityIds = angular.copy(activityIdsToSave);
+        $scope.lastSavedFeaturedActivityReferences = activityReferencesToSave;
       });
     };
   }

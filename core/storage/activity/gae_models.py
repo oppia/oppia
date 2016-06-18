@@ -14,40 +14,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Models for data stored to populate the library page."""
+"""Models for activity references."""
 
 import core.storage.base_model.gae_models as base_models
 
 from google.appengine.ext import ndb
 
 
-# The IDs for the list of featured explorations in the datastore. This value
-# should not be changed.
-ACTIVITY_LIST_FEATURED = 'featured'
-ALL_ACTIVITY_LISTS = [ACTIVITY_LIST_FEATURED]
+# The datastore model ID for the list of featured activity references. This
+# value should not be changed.
+ACTIVITY_REFERENCE_LIST_FEATURED = 'featured'
+ALL_ACTIVITY_REFERENCE_LISTS = [ACTIVITY_REFERENCE_LIST_FEATURED]
 
 
-class ActivityListModel(base_models.BaseModel):
-    """Storage model for a list of activities.
+class ActivityReferencesModel(base_models.BaseModel):
+    """Storage model for a list of activity references.
 
     The only instances of this model in the datastore should be those whose ids
-    are in ALL_ACTIVITY_LISTS.
+    are in ALL_ACTIVITY_REFERENCE_LISTS.
     """
-    # The ids of activities to show in the library page.
-    # An activity id takes the form e:{{EXPLORATION_ID}} or c:{{COLLECTION_ID}}
-    # depending on the type of the activity.
-    activity_ids = ndb.StringProperty(repeated=True)
+    # The types and ids of activities to show in the library page. Each item
+    # in this list is a dict with two keys: 'type' and 'id'.
+    activity_references = ndb.JsonProperty(repeated=True)
 
     @classmethod
     def get(cls, entity_id):
         """This creates the relevant model instance, if it does not already
         exist.
         """
-        if entity_id not in ALL_ACTIVITY_LISTS:
+        if entity_id not in ALL_ACTIVITY_REFERENCE_LISTS:
             raise Exception(
                 'Invalid ActivityListModel id: %s' % entity_id)
 
-        entity = super(ActivityListModel, cls).get(entity_id, strict=False)
+        entity = super(
+            ActivityReferencesModel, cls).get(entity_id, strict=False)
         if entity is None:
             entity = cls(id=entity_id)
             entity.put()
