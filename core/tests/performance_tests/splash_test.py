@@ -26,13 +26,13 @@ class SplashPagePerformanceTest(base.TestBase):
         super(SplashPagePerformanceTest, self).setUp()
 
     def test_splash_page_has_less_than_10_megabytes_sent_to_the_client(self):
-        self._record_page_session_stats(self.SPLASH_URL)
+        self._record_page_metrics_for_url(self.SPLASH_URL)
 
         self.assertLessEqual(
             self.page_metrics.get_total_page_size_bytes(), 10000000)
 
-    def test_splash_page_loads_under_10000_milliseconds(self):
-        self._record_page_session_timings(self.SPLASH_URL)
+    def test_splash_page_loads_under_10_seconds(self):
+        self._record_page_timings_for_url(self.SPLASH_URL)
 
         self.assertLessEqual(
             self.page_metrics.get_page_load_time_millisecs(), 10000)
@@ -48,13 +48,13 @@ class SplashPagePerformanceForCachedStateTest(base.TestBase):
         super(SplashPagePerformanceForCachedStateTest, self).setUp()
 
     def test_splash_page_has_less_than_1_megabytes_sent_to_the_client(self):
-        self._record_page_stats_cached_state(self.SPLASH_URL)
+        self._record_page_metrics_from_cached_session(self.SPLASH_URL)
 
         self.assertLessEqual(
             self.page_metrics.get_total_page_size_bytes(), 1000000)
 
-    def test_splash_page_loads_under_3000_milliseconds(self):
-        self._record_page_timings_cached_state(self.SPLASH_URL)
+    def test_splash_page_loads_under_3_seconds(self):
+        self._record_page_timings_from_cached_session(self.SPLASH_URL)
 
         self.assertLessEqual(
             self.page_metrics.get_page_load_time_millisecs(), 3000)

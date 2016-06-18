@@ -71,8 +71,7 @@ class SeleniumPerformanceDataFetcher(object):
         self.server = self.driver = self.proxy = None
 
     def get_page_metrics_for_url(self, page_url):
-        """Returns a PageSessionMetrics domain object initialized using
-        HTTP Archive (HAR) dict for a given page URL.
+        """Returns a PageSessionMetrics domain object for a given page URL.
         """
         with Xvfb() as _:
             self._setup_proxy()
@@ -92,10 +91,9 @@ class SeleniumPerformanceDataFetcher(object):
         return perf_domain.PageSessionMetrics(
             page_session_stats=har_dict, page_session_timings=None)
 
-    def get_page_metrics_from_cached_state(self, page_url):
-        """Returns a PageSessionMetrics domain object initialized using
-        HTTP Archive (HAR) dict for a given page URL while simulating a
-        cached state i.e, a return user.
+    def get_page_metrics_from_cached_session(self, page_url):
+        """Returns a PageSessionMetrics domain object for a given page URL
+        while simulating a cached session i.e, a return user.
 
         Note: This method is stand-alone and does not require
         `get_page_session_metrics_for_url` to be called before it.
@@ -140,9 +138,9 @@ class SeleniumPerformanceDataFetcher(object):
         return perf_domain.PageSessionMetrics(
             page_session_stats=None, page_session_timings=page_session_timings)
 
-    def get_page_timings_from_cached_state(self, page_url):
+    def get_page_timings_from_cached_session(self, page_url):
         """Returns a PageSessionMetrics domain object initialized using page
-        load timings for a page URL while simulating a cached state i.e, a
+        load timings for a page URL while simulating a cached session i.e, a
         return user.
         """
         with Xvfb() as _:

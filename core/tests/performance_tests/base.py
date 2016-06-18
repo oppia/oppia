@@ -27,18 +27,18 @@ class TestBase(unittest.TestCase):
             browser='chrome')
         self.page_metrics = None
 
-    def _record_page_session_stats(self, page_url):
+    def _record_page_metrics_for_url(self, page_url):
         self.page_metrics = (
             self.data_fetcher.get_page_metrics_for_url(page_url))
 
-    def _record_page_stats_cached_state(self, page_url):
+    def _record_page_metrics_from_cached_session(self, page_url):
         self.page_metrics = (
-            self.data_fetcher.get_page_metrics_from_cached_state(page_url))
+            self.data_fetcher.get_page_metrics_from_cached_session(page_url))
 
-    def _record_page_session_timings(self, page_url):
+    def _record_page_timings_for_url(self, page_url):
         self.page_metrics = (
             self.data_fetcher.get_page_timings_for_url(page_url))
 
-    def _record_page_timings_cached_state(self, page_url):
+    def _record_page_timings_from_cached_session(self, page_url):
         self.page_metrics = (
-            self.data_fetcher.get_page_timings_from_cached_state(page_url))
+            self.data_fetcher.get_page_timings_from_cached_session(page_url))

@@ -55,17 +55,20 @@ maybeInstallDependencies "$@"
 if ( nc -vz localhost 8181 ); then
   echo ""
   echo "  There is already a server running on localhost:8181."
-  echo "  Please terminate it before running the end-to-end tests."
+  echo "  Please terminate it before running the performance tests."
   echo "  Exiting."
   echo ""
   exit 1
 fi
-
+  
 
 # Forces the cleanup function to run on exit.
 # Developers: note that at the end of this script, the cleanup() function at
 # the top of the file is run.
 trap cleanup EXIT
+
+# Change execute status of browsermob-proxy
+chmod +x $TOOLS_DIR/browsermob-proxy-2.1.1/bin/browsermob-proxy
 
 # Start a demo server.
 ($PYTHON_CMD $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=9501 --clear_datastore=yes --dev_appserver_log_level=critical --log_level=critical --skip_sdk_update_check=true .)&
