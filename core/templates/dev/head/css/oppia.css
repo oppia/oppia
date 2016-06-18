@@ -81,6 +81,10 @@ button.md-button.md-default-theme.oppia-learner-continue-button:hover {
 .material-icons.md-dark {
   color: rgba(0, 0, 0, 0.54);
 }
+.middle{
+  font-size:17px;
+  padding-top: 1px;
+}
 
 /* Bootstrap overrides and additions. */
 html {

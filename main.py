@@ -142,17 +142,15 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(feconf.SPLASH_URL, pages.SplashPage, 'splash_page'),
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
     get_redirect_route(
-        r'/foundation', pages.AboutRedirectPage, 'foundation_page'),
+        r'/foundation', pages.AboutRedirectPage, 'about_redirect_page_1'),
     get_redirect_route(
-        r'/credits', pages.AboutRedirectPage, 'credits_page'),
+        r'/credits', pages.AboutRedirectPage, 'about_redirect_page_2'),
     get_redirect_route(r'/teach', pages.TeachPage, 'teach_page'),
     get_redirect_route(
-        r'/participate', pages.ParticipatePage, 'participate_page'),
+        r'/participate', pages.TeachRedirectPage, 'teach_redirect_page_1'),
     get_redirect_route(
-        r'/site_guidelines', pages.ParticipatePage,
-        'redirect_to_participate_page'),
-    get_redirect_route(
-        r'/contact', pages.ContactPage, 'contact_page'),
+        r'/site_guidelines', pages.TeachRedirectPage, 'teach_redirect_page_2'),
+    get_redirect_route(r'/contact', pages.ContactPage, 'contact_page'),
 
     get_redirect_route(r'/forum', pages.ForumPage, 'forum_page'),
     get_redirect_route(r'/terms', pages.TermsPage, 'terms_page'),
@@ -175,6 +173,9 @@ URLS = MAPREDUCE_HANDLERS + [
         dashboard.NotificationsDashboardHandler,
         'notifications_dashboard_handler'),
     get_redirect_route(
+        r'/notificationshandler', dashboard.NotificationsHandler,
+        'notifications_handler'),
+    get_redirect_route(
         r'%s' % feconf.DASHBOARD_URL, dashboard.DashboardPage,
         'dashboard_page'),
     get_redirect_route(
@@ -190,8 +191,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
         dashboard.UploadExploration, 'upload_exploration'),
     get_redirect_route(
-        r'/notificationshandler', dashboard.NotificationsHandler,
-        'notifications_handler'),
+        r'/my_explorations', dashboard.DashboardRedirectPage,
+        'dashboard_redirect_page'),
 
     get_redirect_route(
         r'/imagehandler/<exploration_id>/<encoded_filepath>',
