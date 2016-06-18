@@ -19,8 +19,6 @@
 describe('Dashboard backend API service', function() {
   var DashboardBackendApiService = null;
   var sampleDataResults = null;
-  var $rootScope = null;
-  var $scope = null;
   var $httpBackend = null;
 
   beforeEach(module('oppia'));
@@ -28,8 +26,6 @@ describe('Dashboard backend API service', function() {
 
   beforeEach(inject(function($injector) {
     DashboardBackendApiService = $injector.get('DashboardBackendApiService');
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
 
     // Sample dashboard data returnable from the backend
