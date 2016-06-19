@@ -129,7 +129,6 @@ class PageSessionMetrics(object):
     def _get_duration_millisecs(self, event_end, event_initial):
         # Timestamps are in milliseconds.
         initial_timestamp = self.page_load_timings[event_initial]
-
         end_timestamp = self.page_load_timings[event_end]
 
         return end_timestamp - initial_timestamp

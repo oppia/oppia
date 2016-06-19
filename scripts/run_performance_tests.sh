@@ -68,7 +68,9 @@ fi
 trap cleanup EXIT
 
 # Change execute status of browsermob-proxy
-chmod +x $TOOLS_DIR/browsermob-proxy-2.1.1/bin/browsermob-proxy
+# export ME=$(whoami)
+# chown $ME $TOOLS_DIR/browsermob-proxy-2.1.1/bin/browsermob-proxy
+chmod 744 $TOOLS_DIR/browsermob-proxy-2.1.1/bin/browsermob-proxy
 
 # Start a demo server.
 ($PYTHON_CMD $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=9501 --clear_datastore=yes --dev_appserver_log_level=critical --log_level=critical --skip_sdk_update_check=true .)&
@@ -78,4 +80,5 @@ while ! nc -vz localhost 9501; do sleep 1; done
 
 $PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.splash_test $@ 
 
+chmod 644 $TOOLS_DIR/browsermob-proxy-2.1.1/bin/browsermob-proxy
 rm bmp.log server.log

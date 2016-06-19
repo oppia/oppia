@@ -68,25 +68,23 @@ class SeleniumPerformanceDataFetcher(object):
             error_msg = 'Unsupported browser specified: %s' % browser
             raise ValueError(error_msg)
 
-        self.server = self.driver = self.proxy = None
-
     def get_page_metrics_for_url(self, page_url):
         """Returns a PageSessionMetrics domain object for a given page URL.
         """
         with Xvfb() as _:
-            self._setup_proxy()
-            self._setup_driver(use_proxy=True)
+            server, proxy = self._setup_proxy_server()
+            driver = self._setup_driver(proxy=proxy, use_proxy=True)
 
-            self.proxy.new_har(page_url, options={'captureHeaders': True})
+            proxy.new_har(page_url, options={'captureHeaders': True})
 
-            self.driver.get(page_url)
+            driver.get(page_url)
 
             self._wait_until_page_load_is_finished()
 
-        har_dict = self.proxy.har
+        har_dict = proxy.har
 
-        self._stop_proxy()
-        self._stop_driver()
+        self._stop_proxy_server(server)
+        self._stop_driver(driver)
 
         return perf_domain.PageSessionMetrics(
             page_session_stats=har_dict, page_session_timings=None)
@@ -99,23 +97,23 @@ class SeleniumPerformanceDataFetcher(object):
         `get_page_session_metrics_for_url` to be called before it.
         """
         with Xvfb() as _:
-            self._setup_proxy()
-            self._setup_driver(use_proxy=True)
+            server, proxy = self._setup_proxy_server()
+            driver = self._setup_driver(proxy=proxy, use_proxy=True)
 
             # Fetch the page once. This leads to caching of various resources.
-            self.driver.get(page_url)
+            driver.get(page_url)
             self._wait_until_page_load_is_finished()
 
             # Start recording har data for the next page fetch.
-            self.proxy.new_har(page_url, options={'captureHeaders': True})
-            self.driver.get(page_url)
+            proxy.new_har(page_url, options={'captureHeaders': True})
+            driver.get(page_url)
 
             self._wait_until_page_load_is_finished()
 
-        har_dict = self.proxy.har
+        har_dict = proxy.har
 
-        self._stop_proxy()
-        self._stop_driver()
+        self._stop_proxy_server(server)
+        self._stop_driver(driver)
 
         return perf_domain.PageSessionMetrics(
             page_session_stats=har_dict, page_session_timings=None)
@@ -125,15 +123,15 @@ class SeleniumPerformanceDataFetcher(object):
         page load timings for a page URL.
         """
         with Xvfb() as _:
-            self._setup_driver(use_proxy=False)
+            driver = self._setup_driver(proxy=None, use_proxy=False)
 
-            self.driver.get(page_url)
+            driver.get(page_url)
             self._wait_until_page_load_is_finished()
 
             page_session_timings = (
-                self.driver.execute_script("return window.performance"))
+                driver.execute_script("return window.performance"))
 
-        self._stop_driver()
+        self._stop_driver(driver)
 
         return perf_domain.PageSessionMetrics(
             page_session_stats=None, page_session_timings=page_session_timings)
@@ -144,19 +142,19 @@ class SeleniumPerformanceDataFetcher(object):
         return user.
         """
         with Xvfb() as _:
-            self._setup_driver(use_proxy=False)
+            driver = self._setup_driver(proxy=None, use_proxy=False)
 
             # Fetch the page once. This leads to caching of various resources.
-            self.driver.get(page_url)
+            driver.get(page_url)
             self._wait_until_page_load_is_finished()
 
-            self.driver.get(page_url)
+            driver.get(page_url)
             self._wait_until_page_load_is_finished()
 
             page_session_timings = (
-                self.driver.execute_script("return window.performance"))
+                driver.execute_script("return window.performance"))
 
-        self._stop_driver()
+        self._stop_driver(driver)
 
         return perf_domain.PageSessionMetrics(
             page_session_stats=None, page_session_timings=page_session_timings)
@@ -166,11 +164,11 @@ class SeleniumPerformanceDataFetcher(object):
         # made post initial page load will not be recorded.
         time.sleep(self.WAIT_DURATION_SECS)
 
-    def _setup_proxy(self, downstream_kbps=None, upstream_kbps=None,
-                     latency=None):
-        self.server = Server(BROWSERMOB_PROXY_PATH)
-        self.server.start()
-        self.proxy = self.server.create_proxy()
+    def _setup_proxy_server(self, downstream_kbps=None, upstream_kbps=None,
+                            latency=None):
+        server = Server(BROWSERMOB_PROXY_PATH)
+        server.start()
+        proxy = server.create_proxy()
 
         # The proxy server is pretty sluggish, setting the limits might not
         # achieve the desired behavior.
@@ -186,12 +184,15 @@ class SeleniumPerformanceDataFetcher(object):
             proxy_options['latency'] = latency
 
         if len(proxy_options.items()) > 0:
-            self.proxy.limits(proxy_options)
+            proxy.limits(proxy_options)
 
-    def _setup_driver(self, use_proxy=False):
+        return server, proxy
+
+    def _setup_driver(self, proxy=None, use_proxy=False):
         """Initializes a Selenium webdriver instance to programmatically
         interact with a browser.
         """
+        driver = None
         if self.browser == 'chrome':
             chrome_options = webdriver.ChromeOptions()
             # Disable several subsystems which run network requests in the
@@ -200,11 +201,11 @@ class SeleniumPerformanceDataFetcher(object):
             chrome_options.add_argument("--disable-background-networking")
 
             if use_proxy:
-                proxy_url = urlparse.urlparse(self.proxy.proxy).path
+                proxy_url = urlparse.urlparse(proxy.proxy).path
                 proxy_argument = "--proxy-server={0}".format(proxy_url)
                 chrome_options.add_argument(proxy_argument)
 
-            self.driver = webdriver.Chrome(
+            driver = webdriver.Chrome(
                 CHROME_DRIVER_PATH,
                 chrome_options=chrome_options)
 
@@ -212,16 +213,14 @@ class SeleniumPerformanceDataFetcher(object):
             firefox_profile = webdriver.FirefoxProfile()
 
             if use_proxy:
-                firefox_profile.set_proxy(self.proxy.selenium_proxy())
+                firefox_profile.set_proxy(proxy.selenium_proxy())
 
-            # pylint: disable=redefined-variable-type
-            self.driver = webdriver.Firefox(firefox_profile=firefox_profile)
-            # pylint: enable=redefined-variable-type
+            driver = webdriver.Firefox(firefox_profile=firefox_profile)
 
-    def _stop_proxy(self):
-        self.server.stop()
-        self.proxy = None
+        return driver
 
-    def _stop_driver(self):
-        self.driver.quit()
-        self.driver = None
+    def _stop_proxy_server(self, server):
+        server.stop()
+
+    def _stop_driver(self, driver):
+        driver.quit()
