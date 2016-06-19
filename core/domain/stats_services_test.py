@@ -161,18 +161,12 @@ class AnalyticsEventHandlersUnitTests(test_utils.GenericTestBase):
 
     def test_get_top_state_rule_answers_from_multiple_explorations(self):
         # There are no initial top answers for these explorations.
-        top_answers_dict = stats_services.get_top_state_rule_answers_multi([{
-            'exploration_id': 'eid0',
-            'state_name': 'First',
-            'rule_str_list': [self.DEFAULT_RULESPEC_STR]
-        }, {
-            'exploration_id': 'eid1',
-            'state_name': 'Second',
-            'rule_str_list': [self.DEFAULT_RULESPEC_STR]
-        }], 10)
+        top_answers_dict = stats_services.get_top_state_rule_answers_multi(
+            [('eid0', 'First'), ('eid1', 'Second')],
+            [self.DEFAULT_RULESPEC_STR], 10)
         self.assertEquals(len(top_answers_dict), 2)
-        self.assertEquals(len(top_answers_dict['eid0']), 0)
-        self.assertEquals(len(top_answers_dict['eid1']), 0)
+        self.assertEquals(len(top_answers_dict[0]), 0)
+        self.assertEquals(len(top_answers_dict[1]), 0)
 
         # Submit some answers.
         self._record_answer('a', exploration_id='eid0', state_name='First')
@@ -183,24 +177,18 @@ class AnalyticsEventHandlersUnitTests(test_utils.GenericTestBase):
         self._record_answer('c', exploration_id='eid1', state_name='Second')
         self._record_answer('c', exploration_id='eid0', state_name='First')
 
-        top_answers_dict = stats_services.get_top_state_rule_answers_multi([{
-            'exploration_id': 'eid0',
-            'state_name': 'First',
-            'rule_str_list': [self.DEFAULT_RULESPEC_STR]
-        }, {
-            'exploration_id': 'eid1',
-            'state_name': 'Second',
-            'rule_str_list': [self.DEFAULT_RULESPEC_STR]
-        }], 10)
+        top_answers_dict = stats_services.get_top_state_rule_answers_multi(
+            [('eid0', 'First'), ('eid1', 'Second')],
+            [self.DEFAULT_RULESPEC_STR], 10)
         self.assertEquals(len(top_answers_dict), 2)
-        self.assertEquals(top_answers_dict['eid0'], [{
+        self.assertEquals(top_answers_dict[0], [{
             'value': 'a',
             'count': 1
         }, {
             'value': 'c',
             'count': 1
         }])
-        self.assertEquals(top_answers_dict['eid1'], [{
+        self.assertEquals(top_answers_dict[1], [{
             'value': 'b',
             'count': 3
         }, {
@@ -213,18 +201,12 @@ class AnalyticsEventHandlersUnitTests(test_utils.GenericTestBase):
 
     def test_get_top_state_rule_answers_fixed_number_from_multiple_exps(self):
         # There are no initial top answers for these explorations.
-        top_answers_dict = stats_services.get_top_state_rule_answers_multi([{
-            'exploration_id': 'eid0',
-            'state_name': 'First',
-            'rule_str_list': [self.DEFAULT_RULESPEC_STR]
-        }, {
-            'exploration_id': 'eid1',
-            'state_name': 'Second',
-            'rule_str_list': [self.DEFAULT_RULESPEC_STR]
-        }], 2)
+        top_answers_dict = stats_services.get_top_state_rule_answers_multi(
+            [('eid0', 'First'), ('eid1', 'Second')],
+            [self.DEFAULT_RULESPEC_STR], 2)
         self.assertEquals(len(top_answers_dict), 2)
-        self.assertEquals(len(top_answers_dict['eid0']), 0)
-        self.assertEquals(len(top_answers_dict['eid1']), 0)
+        self.assertEquals(len(top_answers_dict[0]), 0)
+        self.assertEquals(len(top_answers_dict[1]), 0)
 
         # Submit some answers.
         self._record_answer('a', exploration_id='eid0', state_name='First')
@@ -233,18 +215,12 @@ class AnalyticsEventHandlersUnitTests(test_utils.GenericTestBase):
         self._record_answer('d', exploration_id='eid1', state_name='Second')
 
         # Only 2 answers were requested.
-        top_answers_dict = stats_services.get_top_state_rule_answers_multi([{
-            'exploration_id': 'eid0',
-            'state_name': 'First',
-            'rule_str_list': [self.DEFAULT_RULESPEC_STR]
-        }, {
-            'exploration_id': 'eid1',
-            'state_name': 'Second',
-            'rule_str_list': [self.DEFAULT_RULESPEC_STR]
-        }], 2)
+        top_answers_dict = stats_services.get_top_state_rule_answers_multi(
+            [('eid0', 'First'), ('eid1', 'Second')],
+            [self.DEFAULT_RULESPEC_STR], 2)
         self.assertEquals(len(top_answers_dict), 2)
-        self.assertEquals(len(top_answers_dict['eid0']), 1)
-        self.assertEquals(len(top_answers_dict['eid1']), 2)
+        self.assertEquals(len(top_answers_dict[0]), 1)
+        self.assertEquals(len(top_answers_dict[1]), 2)
 
 
 class StateImprovementsUnitTests(test_utils.GenericTestBase):

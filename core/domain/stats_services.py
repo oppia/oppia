@@ -61,12 +61,9 @@ def get_state_rules_stats(exploration_id, state_name):
         rule_keys.append((
             _OLD_SUBMIT_HANDLER_NAME, exp_domain.DEFAULT_RULESPEC_STR))
 
-    answer_logs = stats_domain.StateRuleAnswerLog.get_multi({
-        exploration_id: [{
-            'state_name': state_name,
-            'rule_str': rule_key[1]
-        } for rule_key in rule_keys]
-    })[exploration_id]
+    answer_logs = stats_domain.StateRuleAnswerLog.get_multi(
+        [(exploration_id, state_name)],
+        [rule_key[1] for rule_key in rule_keys])[0]
 
     results = {}
     for ind, answer_log in enumerate(answer_logs):
@@ -85,48 +82,33 @@ def get_top_state_rule_answers(
     listed in 'rule_str_list'. The number of answers returned is the number of
     rule spec strings based in multiplied by top_answer_count_per_rule.
     """
-    return get_top_state_rule_answers_multi([{
-        'exploration_id': exploration_id,
-        'state_name': state_name,
-        'rule_str_list': rule_str_list
-    }], top_answer_count_per_rule)[exploration_id]
+    return get_top_state_rule_answers_multi(
+        [(exploration_id, state_name)], rule_str_list,
+        top_answer_count_per_rule)[0]
 
 
 def get_top_state_rule_answers_multi(
-        exploration_rule_data_list, top_answer_count_per_rule):
-    """Returns a dict of exploration IDs mapped to lists of top answers (by
-    submission frequency) submitted to the given state for each provided
-    exploration-rule data dict, which contain the following keys:
-        exploration_id
-        state_name
-        rule_str_list
-    The number of answers returned is the number of rule spec strings based in
-    multiplied by top_answer_count_per_rule. These are returned as a list for
-    each entry in the exploration_rule_data_dict.
+        exploration_state_list, rule_str_list, top_answer_count_per_rule):
+    """Returns a list of top answers (by submission frequency) submitted to the
+    given explorations and states which were mapped to any of the rules listed
+    in 'rule_str_list'. The number of answers returned is at most the number of
+    rule spec strings multiplied by top_answer_count_per_rule.
+
+    exploration_state_list is a list of exploration ID and state name tuples.
+    A list of StateRuleAnswerLogs is returned for each exploration in the
+    specified exploration_state_list.
     """
-    exploration_rule_data_dict = {}
-    for exploration_state_rule_strs in exploration_rule_data_list:
-        exploration_id = exploration_state_rule_strs['exploration_id']
-        state_name = exploration_state_rule_strs['state_name']
-        rule_str_list = exploration_state_rule_strs['rule_str_list']
-        exploration_rule_data_dict[exploration_id] = [{
-            'state_name': state_name,
-            'rule_str': rule_str
-        } for rule_str in rule_str_list]
-
-    answer_logs_dict = stats_domain.StateRuleAnswerLog.get_multi(
-        exploration_rule_data_dict)
-
-    all_top_answers_dict = {}
-    for exploration_id, answer_logs in answer_logs_dict.iteritems():
-        all_top_answers = []
-        for answer_log in answer_logs:
-            top_answers = answer_log.get_top_answers(top_answer_count_per_rule)
-            all_top_answers += [{
-                'value': top_answer[0], 'count': top_answer[1]
-            } for top_answer in top_answers]
-        all_top_answers_dict[exploration_id] = all_top_answers
-    return all_top_answers_dict
+    answer_logs_list = stats_domain.StateRuleAnswerLog.get_multi(
+        exploration_state_list, rule_str_list)
+    return [
+        [{
+            'value': top_answer[0],
+            'count': top_answer[1]
+        } for answer_log in answer_logs
+         for top_answer in answer_log.get_top_answers(
+             top_answer_count_per_rule)]
+        for answer_logs in answer_logs_list
+    ]
 
 
 def get_state_improvements(exploration_id, exploration_version):
@@ -138,12 +120,9 @@ def get_state_improvements(exploration_id, exploration_version):
     exploration = exp_services.get_exploration_by_id(exploration_id)
     state_names = exploration.states.keys()
 
-    default_rule_answer_logs = stats_domain.StateRuleAnswerLog.get_multi({
-        exploration_id: [{
-            'state_name': state_name,
-            'rule_str': exp_domain.DEFAULT_RULESPEC_STR
-        } for state_name in state_names]
-    })[exploration_id]
+    default_rule_answer_logs = stats_domain.StateRuleAnswerLog.get_multi(
+        [(exploration_id, state_name) for state_name in state_names],
+        [exp_domain.DEFAULT_RULESPEC_STR])[0]
 
     statistics = stats_jobs_continuous.StatisticsAggregator.get_statistics(
         exploration_id, exploration_version)

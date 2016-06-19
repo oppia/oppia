@@ -43,40 +43,32 @@ class StateRuleAnswerLog(object):
         return sum(self.answers.values())
 
     @classmethod
-    def get_multi(cls, exploration_rule_data_dict):
-        """Gets domain objects given a list of dicts containing an exploration
-        and rule data.
+    def get_multi(cls, exploration_state_list, rule_str_list):
+        """Gets domain objects given a list of exploration and state tuples.
 
         Args:
-            exploration_rule_data_dict: a list of dicts with an exploration_id
-            as the key and a rule_data_list as the value, where each value in
-            the rule_data_list has the following keys:
-                (state_name, rule_str).
+            exploration_state_list: a list of exploration ID and state name
+                tuples
+            rule_str_list: a list of rule spec strings which are used to filter
+                the answers matched to the provided explorations and states
 
-        Returns a dict with the input exploration IDs as keys mapped to
-        a list of StateRuleAnswerLog objects containing the results of the
-        query.
+        Returns a list with a list of StateRuleAnswerLog objects for each group
+        of answers matched to each exploration ID-state name.
         """
         # TODO(sll): Should each rule_str be unicode instead?
-        answer_logs_model_dict = (
+        answer_log_models_list = (
             stats_models.StateRuleAnswerLogModel.get_or_create_multi(
-                exploration_rule_data_dict))
-        return {
-            exploration_id: [
-                cls(answer_log_model.answers)
-                for answer_log_model in answer_log_models]
-            for exploration_id, answer_log_models
-            in answer_logs_model_dict.iteritems()
-        }
+                exploration_state_list, rule_str_list))
+        return [
+            [cls(answer_log_model.answers)
+             for answer_log_model in answer_log_models]
+            for answer_log_models in answer_log_models_list
+        ]
 
     @classmethod
     def get(cls, exploration_id, state_name, rule_str):
         # TODO(sll): Deprecate this method.
-        return cls.get_multi({
-            exploration_id: [{
-                'state_name': state_name,
-                'rule_str': rule_str
-            }]})[exploration_id][0]
+        return cls.get_multi([(exploration_id, state_name)], [rule_str])[0][0]
 
     def get_top_answers(self, num_answers_to_return):
         """Returns the top `num_answers_to_return` answers.
