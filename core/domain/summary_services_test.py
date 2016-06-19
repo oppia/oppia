@@ -783,10 +783,12 @@ class ActivityReferenceValidationTests(test_utils.GenericTestBase):
     def test_validation_of_activity_ids_list(self):
         with self.assertRaisesRegexp(Exception, 'non-existent exploration'):
             summary_services.require_activities_to_be_public([
-                exp_services.get_exploration_reference('fake')])
+                activity_domain.ActivityReference(
+                    feconf.ACTIVITY_TYPE_EXPLORATION, 'fake')])
         with self.assertRaisesRegexp(Exception, 'non-existent collection'):
             summary_services.require_activities_to_be_public([
-                collection_services.get_collection_reference('fake')])
+                activity_domain.ActivityReference(
+                    feconf.ACTIVITY_TYPE_COLLECTION, 'fake')])
 
         self.save_new_valid_exploration(self.EXP_ID_0, self.owner_id)
         self.save_new_valid_exploration(self.EXP_ID_1, self.owner_id)
@@ -795,15 +797,19 @@ class ActivityReferenceValidationTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(Exception, 'private exploration'):
             summary_services.require_activities_to_be_public([
-                exp_services.get_exploration_reference(self.EXP_ID_0)])
+                activity_domain.ActivityReference(
+                    feconf.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0)])
         with self.assertRaisesRegexp(Exception, 'private collection'):
             summary_services.require_activities_to_be_public([
-                collection_services.get_collection_reference(self.COL_ID_2)])
+                activity_domain.ActivityReference(
+                    feconf.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2)])
 
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID_0)
         rights_manager.publish_collection(self.owner_id, self.COL_ID_2)
 
         # There are no more validation errors.
         summary_services.require_activities_to_be_public([
-            exp_services.get_exploration_reference(self.EXP_ID_0),
-            collection_services.get_collection_reference(self.COL_ID_2)])
+            activity_domain.ActivityReference(
+                feconf.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0),
+            activity_domain.ActivityReference(
+                feconf.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2)])

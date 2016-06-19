@@ -350,7 +350,7 @@ def get_library_groups(language_codes):
 
 def require_activities_to_be_public(activity_references):
     """Raises an exception if any activity reference in the list does not
-    exist, or is not public, or if the list has duplicates.
+    exist, or is not public.
     """
     exploration_ids, collection_ids = activity_services.split_by_type(
         activity_references)

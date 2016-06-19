@@ -54,14 +54,13 @@ def update_featured_activity_references(featured_activity_references):
     featured_model_instance.put()
 
 
-def remove_featured_activity_reference(activity_reference):
+def remove_featured_activity(activity_type, activity_id):
     featured_references = get_featured_activity_references()
 
     activity_reference_found = False
     new_activity_references = []
     for reference in featured_references:
-        if (reference.type != activity_reference.type or
-                reference.id != activity_reference.id):
+        if reference.type != activity_type or reference.id != activity_id:
             new_activity_references.append(reference)
         else:
             activity_reference_found = True
@@ -71,7 +70,7 @@ def remove_featured_activity_reference(activity_reference):
         # deleted, so we log a message.
         logging.info(
             'The %s with id %s was removed from the featured list.' % (
-                activity_reference.type, activity_reference.id))
+                activity_type, activity_id))
         update_featured_activity_references(new_activity_references)
 
 

@@ -18,7 +18,6 @@
 
 import logging
 
-from core.domain import activity_domain
 from core.domain import activity_services
 from core.domain import config_domain
 from core.domain import subscription_services
@@ -659,8 +658,7 @@ def _unpublish_activity(committer_id, activity_id, activity_type):
         committer_id, activity_id, activity_type, ACTIVITY_STATUS_PRIVATE,
         '%s unpublished.' % activity_type)
 
-    activity_services.remove_featured_activity_reference(
-        activity_domain.ActivityReference(activity_type, activity_id))
+    activity_services.remove_featured_activity(activity_type, activity_id)
 
 
 def _publicize_activity(committer_id, activity_id, activity_type):

@@ -31,7 +31,6 @@ import pprint
 import StringIO
 import zipfile
 
-from core.domain import activity_domain
 from core.domain import activity_services
 from core.domain import exp_domain
 from core.domain import feedback_services
@@ -393,11 +392,6 @@ def get_all_exploration_summaries():
     """
     return _get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_all())
-
-
-def get_exploration_reference(exploration_id):
-    return activity_domain.ActivityReference(
-        feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id)
 
 
 # Methods for exporting states and explorations to other formats.
@@ -940,8 +934,8 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
 
     # Remove the exploration from the featured activity references, if
     # necessary.
-    activity_services.remove_featured_activity_reference(
-        get_exploration_reference(exploration_id))
+    activity_services.remove_featured_activity(
+        feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id)
 
 
 # Operations on exploration snapshots.
