@@ -36,9 +36,9 @@ oppia.controller('Dashboard', [
 
     $rootScope.loadingMessage = 'Loading';
     DashboardBackendApiService.fetchDashboardData().then(function(response) {
-      $scope.explorationsList = response.explorationsList;
-      $scope.collectionsList = response.collectionsList;
-      $scope.dashboardStats = response.dashboardStats;
+      $scope.explorationsList = response.explorations_list;
+      $scope.collectionsList = response.collections_list;
+      $scope.dashboardStats = response.dashboard_stats;
       $rootScope.loadingMessage = '';
     });
   }

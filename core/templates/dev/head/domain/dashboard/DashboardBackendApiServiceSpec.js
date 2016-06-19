@@ -79,11 +79,7 @@ describe('Dashboard backend API service', function() {
       successHandler, failHandler);
     $httpBackend.flush();
 
-    expect(successHandler).toHaveBeenCalledWith({
-      explorationsList: sampleDataResults.explorations_list,
-      collectionsList: sampleDataResults.collections_list,
-      dashboardStats: sampleDataResults.dashboard_stats
-    });
+    expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
     expect(failHandler).not.toHaveBeenCalled();
   });
 

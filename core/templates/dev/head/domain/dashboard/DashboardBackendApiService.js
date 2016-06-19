@@ -19,32 +19,22 @@
 
 oppia.factory('DashboardBackendApiService', ['$http', '$q',
   function($http, $q) {
-    var _fetchDashboardData = function(
-        successCallback, errorCallback) {
-      $http.get('/dashboardhandler/data').then(function(response) {
-        var dashboardData = {};
-        dashboardData.explorationsList = (
-          angular.copy(response.data.explorations_list));
-        dashboardData.collectionsList = (
-          angular.copy(response.data.collections_list));
-        dashboardData.dashboardStats = (
-          angular.copy(response.data.dashboard_stats));
-        if (successCallback) {
-          successCallback(dashboardData);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
+    var _fetchDashboardData = function() {
+      return $q(function(resolve, reject) {
+        $http.get('/dashboardhandler/data').then(function(response) {
+          if (resolve) {
+            resolve(angular.copy(response.data));
+          }
+        }, function(errorResponse) {
+          if (reject) {
+            reject(errorResponse.data);
+          }
+        });
       });
     };
 
     return {
-      fetchDashboardData: function() {
-        return $q(function(resolve, reject) {
-          _fetchDashboardData(resolve, reject);
-        });
-      }
+      fetchDashboardData: _fetchDashboardData
     };
   }
 ]);

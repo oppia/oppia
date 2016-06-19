@@ -22,7 +22,7 @@ describe('Creator dashboard controller', function() {
     var scope, ctrl;
     var mockDashboardBackendApiService;
     var dashboardData = {
-      explorations_list: [{
+      explorationsList: [{
         category: 'Private category',
         id: 'private_exp_id',
         num_open_threads: 0,
@@ -37,8 +37,8 @@ describe('Creator dashboard controller', function() {
         status: 'publicized',
         title: 'Featured exploration'
       }],
-      collections_list: [],
-      dashboard_stats: {
+      collectionsList: [],
+      dashboardStats: {
         total_plays: 2,
         average_ratings: 3
       }
@@ -75,9 +75,9 @@ describe('Creator dashboard controller', function() {
     ));
 
     it('should have the correct data for creator dashboard', function() {
-      expect(scope.explorationsList).toEqual(dashboardData.explorationsList);
-      expect(scope.collectionsList).toEqual(dashboardData.collectionsList);
-      expect(scope.dashboardStats).toEqual(dashboardData.dashboardStats);
+      expect(scope.explorationsList).toEqual(dashboardData.explorations_list);
+      expect(scope.collectionsList).toEqual(dashboardData.collections_list);
+      expect(scope.dashboardStats).toEqual(dashboardData.dashboard_stats);
     });
   });
 });
