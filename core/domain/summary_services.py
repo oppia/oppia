@@ -191,16 +191,13 @@ def get_displayable_exp_summary_dicts_matching_ids(
 
         filtered_exploration_summaries.append(exploration_summary)
 
-    return get_displayable_exp_summary_dicts(
-        filtered_exploration_summaries, include_contributors=False)
+    return get_displayable_exp_summary_dicts(filtered_exploration_summaries)
 
 
-def get_displayable_exp_summary_dicts(
-        exploration_summaries, include_contributors=True):
+def get_displayable_exp_summary_dicts(exploration_summaries):
     """Given a list of exploration summary domain objects, returns a list,
     with the same number of elements, of the corresponding human-readable
-    exploration summary dicts. If include_contributors is False, the resulting
-    dicts will not have a 'human_readable_contributors_summary' attribute.
+    exploration summary dicts.
 
     This assumes that all the exploration summary domain objects passed in are
     valid (i.e., none of them are None).
@@ -240,11 +237,6 @@ def get_displayable_exp_summary_dicts(
                 exploration_summary.category),
             'num_views': view_counts[ind],
         }
-
-        if include_contributors:
-            summary_dict['human_readable_contributors_summary'] = (
-                get_human_readable_contributors_summary(
-                    exploration_summary.contributors_summary))
 
         displayable_exp_summaries.append(summary_dict)
 
@@ -327,8 +319,7 @@ def get_library_groups(language_codes):
 
     exp_summary_dicts = {
         summary_dict['id']: summary_dict
-        for summary_dict in get_displayable_exp_summary_dicts(
-            exp_summaries, include_contributors=False)
+        for summary_dict in get_displayable_exp_summary_dicts(exp_summaries)
     }
 
     results = []
@@ -438,8 +429,7 @@ def get_top_rated_exploration_summary_dicts(language_codes):
         key=lambda exp_summary: exp_summary.scaled_average_rating,
         reverse=True)[:feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS]
 
-    return get_displayable_exp_summary_dicts(
-        sorted_exp_summaries, include_contributors=False)
+    return get_displayable_exp_summary_dicts(sorted_exp_summaries)
 
 
 def get_recently_published_exploration_summary_dicts():
