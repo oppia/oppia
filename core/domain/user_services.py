@@ -638,3 +638,21 @@ def get_user_impact_score(user_id):
         return model.impact_score
     else:
         return 0
+
+def get_user_dashboard_stats(user_id):
+    """Return statistics for creator dashboard of a user.
+
+    total_plays, average_ratings
+    """
+    model = user_models.UserStatsModel.get(user_id, strict=False)
+
+    if model is not None:
+        return {
+            'total_plays': model.total_plays or 0,
+            'average_ratings': model.average_ratings
+        }
+    else:
+        return {
+            'total_plays': 0,
+            'average_ratings': None
+        }

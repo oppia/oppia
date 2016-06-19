@@ -76,7 +76,7 @@ describe('Expression type parser service', function() {
       // expected to be thrown.
       // 'expression' is either a string (in which case parsed) or an array
       // (representing a parse tree).
-      var parsed = typeof (expression) == 'string' ?
+      var parsed = typeof (expression) === 'string' ?
           eps.parse(expression) : expression;
       var parsedJson = JSON.stringify(parsed);
       var failed = false;
@@ -114,7 +114,7 @@ describe('Expression type parser service', function() {
       }
       expect(failed).toBe(false);
 
-      if (typeof (expression) != 'string') {
+      if (typeof (expression) !== 'string') {
         return;
       }
 

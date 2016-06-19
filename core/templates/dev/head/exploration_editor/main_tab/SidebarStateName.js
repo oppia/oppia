@@ -58,8 +58,9 @@ oppia.controller('SidebarStateName', [
         explorationStatesService.renameState(
           editorContextService.getActiveStateName(), normalizedNewName);
         $scope.stateNameEditorIsShown = false;
+        // Save the contents of other open fields.
+        $rootScope.$broadcast('externalSave');
         $scope.initStateNameEditor();
-        $rootScope.$broadcast('refreshStateEditor');
         return true;
       }
     };

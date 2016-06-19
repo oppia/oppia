@@ -115,7 +115,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
   };
 
   $scope.saveConfigProperties = function() {
-    if ($scope.message == 'Saving...') {
+    if ($scope.message === 'Saving...') {
       return;
     }
 

@@ -31,7 +31,7 @@ oppia.factory('SkillListObjectFactory', [function() {
     SkillList.prototype.containsSkill = function(skillName) {
       var lowercaseSkillName = skillName.toLowerCase();
       return this._skillList.some(function(arrayItem) {
-        return arrayItem.toLowerCase() == lowercaseSkillName;
+        return arrayItem.toLowerCase() === lowercaseSkillName;
       });
     };
 
@@ -93,7 +93,7 @@ oppia.factory('SkillListObjectFactory', [function() {
     SkillList.prototype.indexOfSkill = function(skillName) {
       var lowercaseSkillName = skillName.toLowerCase();
       for (var i = 0; i < this._skillList.length; i++) {
-        if (this._skillList[i] == lowercaseSkillName) {
+        if (this._skillList[i] === lowercaseSkillName) {
           return i;
         }
       }
@@ -121,7 +121,7 @@ oppia.factory('SkillListObjectFactory', [function() {
 
     // Returns whether this list contains any skills.
     SkillList.prototype.isEmpty = function() {
-      return this._skillList.length == 0;
+      return this._skillList.length === 0;
     };
 
     // Returns the number of skills contained in this list.
@@ -145,7 +145,7 @@ oppia.factory('SkillListObjectFactory', [function() {
       var that = this;
       return otherSkillList._skillList.filter(function(skill) {
         return !that.containsSkill(skill);
-      }).length == 0;
+      }).length === 0;
     };
 
     // Empties this list of all skill names. This will not invalidate previous

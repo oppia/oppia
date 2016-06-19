@@ -53,7 +53,7 @@ oppia.factory('expressionSyntaxTreeService', [
     ExprWrongArgTypeError.prototype.constructor = ExprWrongArgTypeError;
     ExprWrongArgTypeError.prototype.name = 'ExprWrongArgTypeError';
     ExprWrongArgTypeError.prototype.toString = function() {
-      if (this.arg == null) {
+      if (this.arg === null) {
         return this.name + ': Type ' + this.actualType +
         ' does not match expected type ' + this.expectedType;
       }
@@ -105,7 +105,7 @@ oppia.factory('expressionSyntaxTreeService', [
 
     var _verifyArgTypesMatchExpectedType = function(argTypes, expectedType) {
       for (var i = 0; i < argTypes.length; i++) {
-        if (argTypes[i] != expectedType) {
+        if (argTypes[i] !== expectedType) {
           throw new ExprWrongArgTypeError(null, argTypes[i], expectedType);
         }
       }
@@ -113,7 +113,7 @@ oppia.factory('expressionSyntaxTreeService', [
     };
 
     var _verifyArgTypesMatch = function(argType1, argType2) {
-      if (argType1 != argType2) {
+      if (argType1 !== argType2) {
         throw new ExprWrongArgTypeError(null, argType1, argType2);
       }
       return true;
@@ -184,7 +184,7 @@ oppia.factory('expressionSyntaxTreeService', [
         eval: function(args) {
           verifyNumArgs(args, 1, 2);
           var numericArgs = _coerceAllArgsToNumber(args);
-          return numericArgs.length == 1 ? numericArgs[0] :
+          return numericArgs.length === 1 ? numericArgs[0] :
             numericArgs[0] + numericArgs[1];
         },
         getType: function(args) {
@@ -197,7 +197,7 @@ oppia.factory('expressionSyntaxTreeService', [
         eval: function(args) {
           verifyNumArgs(args, 1, 2);
           var numericArgs = _coerceAllArgsToNumber(args);
-          return numericArgs.length == 1 ? -numericArgs[0] :
+          return numericArgs.length === 1 ? -numericArgs[0] :
             numericArgs[0] - numericArgs[1];
         },
         getType: function(args) {
@@ -305,7 +305,7 @@ oppia.factory('expressionSyntaxTreeService', [
       '==': {
         eval: function(args) {
           verifyNumArgs(args, 2);
-          return args[0] == args[1];
+          return args[0] === args[1];
         },
         getType: function(args) {
           verifyNumArgs(args, 2);
@@ -315,7 +315,7 @@ oppia.factory('expressionSyntaxTreeService', [
       '!=': {
         eval: function(args) {
           verifyNumArgs(args, 2);
-          return args[0] != args[1];
+          return args[0] !== args[1];
         },
         getType: function(args) {
           verifyNumArgs(args, 2);

@@ -129,7 +129,7 @@ oppia.directive('oppiaShortResponseImageClickInput', [
 oppia.factory('imageClickInputRulesService', [function() {
   return {
     IsInRegion: function(answer, inputs) {
-      return answer.clickedRegions.indexOf(inputs.x) != -1;
+      return answer.clickedRegions.indexOf(inputs.x) !== -1;
     }
   };
 }]);

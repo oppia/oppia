@@ -117,8 +117,9 @@ class FeedbackStatsHandler(base.BaseHandler):
     """
 
     def get(self, exploration_id):
-        feedback_thread_analytics = feedback_services.get_thread_analytics(
-            exploration_id)
+        feedback_thread_analytics = (
+            feedback_services.get_thread_analytics(
+                exploration_id))
         self.values.update({
             'num_open_threads': (
                 feedback_thread_analytics.num_open_threads),
@@ -209,3 +210,10 @@ class SuggestionListHandler(base.BaseHandler):
 
         self.values.update({'threads': [t.to_dict() for t in threads]})
         self.render_json(self.values)
+
+
+class UnsentFeedbackEmailHandler(base.BaseHandler):
+    """Handler task of sending emails of feedback messages.
+    This is yet to be implemented."""
+    def post(self):
+        pass

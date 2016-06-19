@@ -1,4 +1,7 @@
 <script type="text/ng-template" id="richTextComponent/Image">
-  <img ng-src="<[imageUrl]>" alt="<[imageAltText]>"
-       style="display: block; margin-left: auto; margin-right: auto;" width="<[width]>">
+  <figure>
+    <img ng-src="<[imageUrl]>" alt="<[imageAltText]>"
+         style="display: block; margin-left: auto; margin-right: auto;" width="<[width]>">
+    <figcaption style="text-align:center;"><[imageCaption]></figcaption>
+  </figure>
 </script>
