@@ -356,12 +356,12 @@ def require_activities_to_be_public(activity_references):
         activity_references)
 
     activity_summaries_by_type = [{
-        'type': 'exploration',
+        'type': feconf.ACTIVITY_TYPE_EXPLORATION,
         'ids': exploration_ids,
         'summaries': exp_services.get_exploration_summaries_matching_ids(
             exploration_ids),
     }, {
-        'type': 'collection',
+        'type': feconf.ACTIVITY_TYPE_COLLECTION,
         'ids': collection_ids,
         'summaries': collection_services.get_collection_summaries_matching_ids(
             collection_ids),

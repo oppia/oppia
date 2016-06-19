@@ -30,26 +30,26 @@ ALL_ACTIVITY_REFERENCE_LISTS = [ACTIVITY_REFERENCE_LIST_FEATURED]
 class ActivityReferencesModel(base_models.BaseModel):
     """Storage model for a list of activity references.
 
-    The only instances of this model in the datastore should be those whose ids
-    are in ALL_ACTIVITY_REFERENCE_LISTS.
+    The id of each model instance is the name of the list. This should be one
+    of the constants in ALL_ACTIVITY_REFERENCE_LISTS.
     """
     # The types and ids of activities to show in the library page. Each item
     # in this list is a dict with two keys: 'type' and 'id'.
     activity_references = ndb.JsonProperty(repeated=True)
 
     @classmethod
-    def get(cls, entity_id):
+    def get(cls, list_name):
         """This creates the relevant model instance, if it does not already
         exist.
         """
-        if entity_id not in ALL_ACTIVITY_REFERENCE_LISTS:
+        if list_name not in ALL_ACTIVITY_REFERENCE_LISTS:
             raise Exception(
-                'Invalid ActivityListModel id: %s' % entity_id)
+                'Invalid ActivityListModel id: %s' % list_name)
 
         entity = super(
-            ActivityReferencesModel, cls).get(entity_id, strict=False)
+            ActivityReferencesModel, cls).get(list_name, strict=False)
         if entity is None:
-            entity = cls(id=entity_id)
+            entity = cls(id=list_name, activity_references=[])
             entity.put()
 
         return entity
