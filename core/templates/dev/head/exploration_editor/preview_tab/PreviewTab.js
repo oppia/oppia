@@ -136,6 +136,11 @@ oppia.controller('PreviewTab', [
       }, 200);
     };
 
+    $scope.resetPreview = function() {
+      $scope.isExplorationPopulated = false;
+      $scope.loadPreviewState(explorationInitStateNameService.savedMemento, []);
+    };
+
     // This allows the active state to be kept up-to-date whilst navigating in
     // preview mode, ensuring that the state does not change when toggling
     // between editor and preview.
