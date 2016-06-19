@@ -126,8 +126,8 @@ oppia.factory('versionsTreeService', [function() {
 }]);
 
 oppia.factory('compareVersionsService', [
-  '$http', '$q', 'versionsTreeService', 'explorationData',
-  function($http, $q, versionsTreeService, explorationData) {
+  '$http', '$q', 'versionsTreeService', 'explorationData', 'INTERACTION_SPECS',
+  function($http, $q, versionsTreeService, explorationData, INTERACTION_SPECS) {
     var STATE_PROPERTY_ADDED = 'added';
     var STATE_PROPERTY_DELETED = 'deleted';
     var STATE_PROPERTY_CHANGED = 'changed';
@@ -144,9 +144,8 @@ oppia.factory('compareVersionsService', [
     };
 
     /**
-     * A helper function for getStatesDiff. Tracks changes from v1 to v2 and
-     * modifies stateIds and stateData accordingly.
-     * v1 must be an ancestor of v2.
+     * A helper function that takes a list of changes and uses them to modify
+     * stateIds and stateData accordingly.
      *
      * stateIds is an object whose keys are the newest state name and whose
      * values are the assigned state id.
@@ -155,85 +154,101 @@ oppia.factory('compareVersionsService', [
      *  - 'newestStateName': the latest name of the state
      *  - 'originalStateName': the first encountered name for the state
      *  - 'stateProperty': 'changed', 'unchanged', 'added' or 'deleted'
+     * changeList is the change list to apply.
      * directionForwards is true if changes are compared in increasing version
      * number, and false if changes are compared in decreasing version number.
      */
     var _trackChanges = function(
-        v1, v2, stateIds, stateData, directionForwards) {
+        stateIds, stateData, changeList, directionForwards) {
+      changeList.forEach(function(change) {
+        if ((directionForwards && change.cmd === 'add_state') ||
+            (!directionForwards && change.cmd === 'delete_state')) {
+          if (!stateIds.hasOwnProperty(change.state_name)) {
+            var newId = _generateNewId();
+            stateIds[change.state_name] = newId;
+          }
+          var currentStateId = stateIds[change.state_name];
+          if (stateData.hasOwnProperty(currentStateId) &&
+              stateData[currentStateId].stateProperty ==
+                STATE_PROPERTY_DELETED) {
+            stateData[currentStateId].stateProperty = STATE_PROPERTY_CHANGED;
+            stateData[currentStateId].newestStateName = change.state_name;
+          } else {
+            stateData[currentStateId] = {
+              newestStateName: change.state_name,
+              originalStateName: change.state_name,
+              stateProperty: STATE_PROPERTY_ADDED
+            };
+          }
+        } else if ((directionForwards && change.cmd === 'delete_state') ||
+            (!directionForwards && change.cmd === 'add_state')) {
+          if (stateData[stateIds[change.state_name]].stateProperty ==
+              STATE_PROPERTY_ADDED) {
+            stateData[stateIds[change.state_name]].stateProperty = (
+              STATE_PROPERTY_CHANGED);
+          } else {
+            stateData[stateIds[change.state_name]].stateProperty = (
+              STATE_PROPERTY_DELETED);
+          }
+        } else if (change.cmd === 'rename_state') {
+          var newStateName = null;
+          var oldStateName = null;
+          if (directionForwards) {
+            newStateName = change.new_state_name;
+            oldStateName = change.old_state_name;
+          } else {
+            newStateName = change.old_state_name;
+            oldStateName = change.new_state_name;
+          }
+          stateIds[newStateName] = stateIds[oldStateName];
+          delete stateIds[oldStateName];
+          stateData[stateIds[newStateName]].newestStateName = newStateName;
+        } else if (change.cmd === 'edit_state_property') {
+          if (stateData[stateIds[change.state_name]].stateProperty ==
+              STATE_PROPERTY_UNCHANGED) {
+            stateData[stateIds[change.state_name]].stateProperty = (
+              STATE_PROPERTY_CHANGED);
+          }
+        } else if (
+            change.cmd !== 'migrate_states_schema_to_latest_version' &&
+            change.cmd !== 'AUTO_revert_version_number' &&
+            change.cmd !== 'edit_exploration_property') {
+          throw new Error('Invalid change command: ' + change.cmd);
+        }
+      });
+    };
+
+    /**
+     * Constructs the combined list of changes needed to get from v1 to v2.
+     *
+     * v1, v2 are version numbers. v1 must be an ancestor of v2.
+     * directionForwards is true if changes are compared in increasing version
+     * number, and false if changes are compared in decreasing version number.
+     */
+    var _getCombinedChangeList = function(v1, v2, directionForwards) {
       var _treeParents = versionsTreeService.getVersionTree();
 
-      var nodeList = [];
+      // Stores the path of version numbers from v1 to v2.
+      var versionPath = [];
       while (v2 !== v1) {
-        nodeList.push(v2);
+        versionPath.push(v2);
         v2 = _treeParents[v2];
       }
       if (directionForwards) {
-        nodeList.reverse();
+        versionPath.reverse();
       }
 
-      for (var i = 0; i < nodeList.length; i++) {
-        var changeList = versionsTreeService.getChangeList(nodeList[i]);
-        if (!directionForwards) {
-          changeList.reverse();
-        }
-        for (var j = 0; j < changeList.length; j++) {
-          var change = changeList[j];
-          if ((directionForwards && change.cmd === 'add_state') ||
-              (!directionForwards && change.cmd === 'delete_state')) {
-            if (!stateIds.hasOwnProperty(change.state_name)) {
-              var newId = _generateNewId();
-              stateIds[change.state_name] = newId;
-            }
-            var currentStateId = stateIds[change.state_name];
-            if (stateData.hasOwnProperty(currentStateId) &&
-                stateData[currentStateId].stateProperty ==
-                  STATE_PROPERTY_DELETED) {
-              stateData[currentStateId].stateProperty = STATE_PROPERTY_CHANGED;
-              stateData[currentStateId].newestStateName = change.state_name;
-            } else {
-              stateData[currentStateId] = {
-                newestStateName: change.state_name,
-                originalStateName: change.state_name,
-                stateProperty: STATE_PROPERTY_ADDED
-              };
-            }
-          } else if ((directionForwards && change.cmd === 'delete_state') ||
-              (!directionForwards && change.cmd === 'add_state')) {
-            if (stateData[stateIds[change.state_name]].stateProperty ==
-                STATE_PROPERTY_ADDED) {
-              stateData[stateIds[change.state_name]].stateProperty = (
-                STATE_PROPERTY_CHANGED);
-            } else {
-              stateData[stateIds[change.state_name]].stateProperty = (
-                STATE_PROPERTY_DELETED);
-            }
-          } else if (change.cmd === 'rename_state') {
-            var newStateName = null;
-            var oldStateName = null;
-            if (directionForwards) {
-              newStateName = change.new_state_name;
-              oldStateName = change.old_state_name;
-            } else {
-              newStateName = change.old_state_name;
-              oldStateName = change.new_state_name;
-            }
-            stateIds[newStateName] = stateIds[oldStateName];
-            delete stateIds[oldStateName];
-            stateData[stateIds[newStateName]].newestStateName = newStateName;
-          } else if (change.cmd === 'edit_state_property') {
-            if (stateData[stateIds[change.state_name]].stateProperty ==
-                STATE_PROPERTY_UNCHANGED) {
-              stateData[stateIds[change.state_name]].stateProperty = (
-                STATE_PROPERTY_CHANGED);
-            }
-          } else if (
-              change.cmd !== 'migrate_states_schema_to_latest_version' &&
-              change.cmd !== 'AUTO_revert_version_number' &&
-              change.cmd !== 'edit_exploration_property') {
-            throw new Error('Invalid change command: ' + change.cmd);
-          }
-        }
+      // The full changelist that is applied to go from v1 to v2.
+      var combinedChangeList = [];
+      versionPath.forEach(function(version) {
+        combinedChangeList = combinedChangeList.concat(
+          versionsTreeService.getChangeList(version));
+      });
+      if (!directionForwards) {
+        combinedChangeList.reverse();
       }
+
+      return combinedChangeList;
     };
 
     /**
@@ -316,7 +331,104 @@ oppia.factory('compareVersionsService', [
       return links;
     };
 
+    var _generateInitialStateIdsAndData = function(statesDict) {
+      var result = {
+        stateIds: {},
+        stateData: {}
+      };
+
+      _resetMaxId();
+
+      for (var stateName in statesDict) {
+        var stateId = _generateNewId();
+        result.stateData[stateId] = {
+          newestStateName: stateName,
+          originalStateName: stateName,
+          stateProperty: STATE_PROPERTY_UNCHANGED
+        };
+        result.stateIds[stateName] = stateId;
+      }
+      return result;
+    };
+
+    var _postprocessStateIdsAndData = function(
+        originalStateIds, stateIds, stateData, v1States, v2States,
+        v1InitStateName, v2InitStateName) {
+      // Ignore changes that were canceled out by later changes
+      for (var stateId in stateData) {
+        if (stateData[stateId].stateProperty === STATE_PROPERTY_CHANGED &&
+            v1States.hasOwnProperty(
+              stateData[stateId].originalStateName) &&
+            v2States.hasOwnProperty(stateData[stateId].newestStateName) &&
+            angular.equals(v1States[stateData[stateId].originalStateName],
+              v2States[stateData[stateId].newestStateName])) {
+          stateData[stateId].stateProperty = STATE_PROPERTY_UNCHANGED;
+        }
+      }
+
+      // Delete states not present in both v1 and v2
+      for (var stateId in stateData) {
+        if (!v1States.hasOwnProperty(
+              stateData[stateId].originalStateName) &&
+            !v2States.hasOwnProperty(stateData[stateId].newestStateName)) {
+          delete stateData[stateId];
+        }
+      }
+
+      // Track whether terminal nodes in v1 or v2
+      // TODO(bhenning): could show changes to terminal nodes in diff
+      var finalStateIds = [];
+      for (var stateId in stateData) {
+        var oldState = v1States[stateData[stateId].originalStateName];
+        var newState = v2States[stateData[stateId].newestStateName];
+        var oldStateIsTerminal = false;
+        var newStateIsTerminal = false;
+        if (oldState) {
+          oldStateIsTerminal = (
+            oldState.interaction.id &&
+            INTERACTION_SPECS[oldState.interaction.id].is_terminal);
+        }
+        if (newState) {
+          newStateIsTerminal = (
+            newState.interaction.id &&
+            INTERACTION_SPECS[newState.interaction.id].is_terminal);
+        }
+        if (oldStateIsTerminal || newStateIsTerminal) {
+          finalStateIds.push(stateId);
+        }
+      }
+
+      var links = _compareLinks(
+        v1States, originalStateIds, v2States, stateIds);
+
+      return {
+        nodes: stateData,
+        links: links,
+        v1InitStateId: originalStateIds[v1InitStateName],
+        v2InitStateId: stateIds[v2InitStateName],
+        finalStateIds: finalStateIds
+      };
+    };
+
     return {
+      /**
+       * Summarizes the diff information for a single change that moves an
+       * exploration from one version to the next.
+       */
+      getDiffData: function(
+          oldStates, newStates, changeList, oldInitStateName,
+          newInitStateName) {
+        var oldInfo = _generateInitialStateIdsAndData(oldStates);
+        var stateData = oldInfo.stateData;
+        var stateIds = oldInfo.stateIds;
+
+        var originalStateIds = angular.copy(stateIds);
+        _trackChanges(stateIds, stateData, changeList, true);
+
+        return _postprocessStateIdsAndData(
+          originalStateIds, stateIds, stateData, oldStates, newStates,
+          oldInitStateName, newInitStateName);
+      },
       /**
        * Summarize changes to states and rules between v1 and v2.
        * Returns a promise for an object whose keys are 'initStateName',
@@ -353,79 +465,25 @@ oppia.factory('compareVersionsService', [
           var v1States = response.v1Data.data.states;
           var v2States = response.v2Data.data.states;
 
-          // Find initial stateIds and originalStateNames
-          var statesData = {};
-          var stateIds = {};
-          _resetMaxId();
-          for (var stateName in v1States) {
-            var stateId = _generateNewId();
-            statesData[stateId] = {
-              newestStateName: stateName,
-              originalStateName: stateName,
-              stateProperty: STATE_PROPERTY_UNCHANGED
-            };
-            stateIds[stateName] = stateId;
-          }
+          var v1Info = _generateInitialStateIdsAndData(v1States);
+          var stateData = v1Info.stateData;
+          var stateIds = v1Info.stateIds;
+
           var originalStateIds = angular.copy(stateIds);
 
-          // Populate statesData with changes from v1 to LCA and from LCA to v2
+          // Populate stateData with changes from v1 to LCA and from LCA to v2
           var lca = versionsTreeService.findLCA(v1, v2);
-          _trackChanges(lca, v1, stateIds, statesData, false);
-          _trackChanges(lca, v2, stateIds, statesData, true);
+          _trackChanges(
+            stateIds, stateData, _getCombinedChangeList(lca, v1, false),
+            false);
+          _trackChanges(
+            stateIds, stateData, _getCombinedChangeList(lca, v2, true),
+            true);
 
-          // Ignore changes that were canceled out by later changes
-          for (var stateId in statesData) {
-            if (statesData[stateId].stateProperty === STATE_PROPERTY_CHANGED &&
-                v1States.hasOwnProperty(
-                  statesData[stateId].originalStateName) &&
-                v2States.hasOwnProperty(statesData[stateId].newestStateName) &&
-                angular.equals(v1States[statesData[stateId].originalStateName],
-                  v2States[statesData[stateId].newestStateName])) {
-              statesData[stateId].stateProperty = STATE_PROPERTY_UNCHANGED;
-            }
-          }
-
-          // Delete states not present in both v1 and v2
-          for (var stateId in statesData) {
-            if (!v1States.hasOwnProperty(
-                  statesData[stateId].originalStateName) &&
-                !v2States.hasOwnProperty(statesData[stateId].newestStateName)) {
-              delete statesData[stateId];
-            }
-          }
-
-          // Track whether terminal nodes in v1 or v2
-          // TODO(bhenning): could show changes to terminal nodes in diff
-          var finalStateIds = [];
-          for (var stateId in statesData) {
-            var oldState = v1States[statesData[stateId].originalStateName];
-            var newState = v2States[statesData[stateId].newestStateName];
-            var oldStateIsTerminal = false;
-            var newStateIsTerminal = false;
-            if (oldState) {
-              oldStateIsTerminal = (
-                oldState.interaction.id === 'EndExploration');
-            }
-            if (newState) {
-              newStateIsTerminal = (
-                newState.interaction.id === 'EndExploration');
-            }
-            if (oldStateIsTerminal || newStateIsTerminal) {
-              finalStateIds.push(stateId);
-            }
-          }
-
-          var links = _compareLinks(
-            v1States, originalStateIds, v2States, stateIds);
-
-          return {
-            nodes: statesData,
-            links: links,
-            v1InitStateId: originalStateIds[
-              response.v1Data.data.init_state_name],
-            v2InitStateId: stateIds[response.v2Data.data.init_state_name],
-            finalStateIds: finalStateIds
-          };
+          return _postprocessStateIdsAndData(
+            originalStateIds, stateIds, stateData, v1States, v2States,
+            response.v1Data.data.init_state_name,
+            response.v2Data.data.init_state_name);
         });
       }
     };
