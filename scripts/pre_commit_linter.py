@@ -74,7 +74,6 @@ _EXCLUSIVE_GROUP.add_argument(
     action='store')
 
 BAD_PATTERNS = {
-
     '__author__': {
         'message': 'Please remove author tags from this file.',
         'excluded_files': ()},
