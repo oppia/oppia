@@ -27,6 +27,7 @@ env:
     - RUN_E2E_TESTS_EXTENSIONS=true
     - RUN_E2E_TESTS_LIBRARY=true
     - RUN_E2E_TESTS_MISC=true
+    - RUN_E2E_TESTS_I18N=true
     - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=false
     - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=true
     - RUN_LINT=true
@@ -78,6 +79,7 @@ script:
 - if [ $RUN_E2E_TESTS_EXTENSIONS == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="extensions"; fi
 - if [ $RUN_E2E_TESTS_LIBRARY == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="library"; fi
 - if [ $RUN_E2E_TESTS_MISC == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="misc"; fi
+- if [ $RUN_E2E_TESTS_I18N == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="i18n"; fi
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report; fi
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'false' ]; then bash scripts/run_backend_tests.sh; fi
 - if [ $RUN_LINT == 'true' ]; then bash scripts/install_third_party.sh; python scripts/pre_commit_linter.py --path=.; fi

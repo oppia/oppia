@@ -42,7 +42,6 @@ SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
 INTERACTIONS_DIR = os.path.join('extensions', 'interactions')
 GADGETS_DIR = os.path.join('extensions', 'gadgets')
 RTE_EXTENSIONS_DIR = os.path.join('extensions', 'rich_text_components')
-RULES_DIR = os.path.join('extensions', 'rules')
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 TEMPLATES_DIR_PREFIX = 'dev' if DEV_MODE else 'prod'
@@ -50,6 +49,10 @@ FRONTEND_TEMPLATES_DIR = os.path.join(
     'core', 'templates', TEMPLATES_DIR_PREFIX, 'head')
 DEPENDENCIES_TEMPLATES_DIR = os.path.join('extensions', 'dependencies')
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
+OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
+    'extensions', 'interactions', 'object_defaults.json')
+RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
+    os.getcwd(), 'extensions', 'interactions', 'rules.json')
 
 # The maximum number of results to retrieve in a datastore query.
 DEFAULT_QUERY_LIMIT = 1000
@@ -104,11 +107,6 @@ DEFAULT_COLLECTION_TITLE = ''
 DEFAULT_COLLECTION_CATEGORY = ''
 # Default objective for a newly-minted collection.
 DEFAULT_COLLECTION_OBJECTIVE = ''
-
-# The threshold the truth value of an evaluated answer group must equal or
-# exceed in order to be considered a better classification than the default
-# group.
-DEFAULT_ANSWER_GROUP_CLASSIFICATION_THRESHOLD = 0.3
 
 # A dict containing the accepted image formats (as determined by the imghdr
 # module) and the corresponding allowed extensions in the filenames of uploaded
@@ -363,7 +361,7 @@ DEMO_EXPLORATIONS = {
     u'12': 'protractor_test_1.yaml',
     u'13': 'solar_system',
     u'14': 'about_oppia.yaml',
-    u'15': 'fuzzy_exploration.yaml',
+    u'15': 'classifier_demo_exploration.yaml',
     u'16': 'all_interactions',
 }
 
@@ -457,6 +455,7 @@ COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
+# NOTE TO DEVELOPERS: This should be synchronized with base.js
 ENABLE_STRING_CLASSIFIER = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
 SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK = False
