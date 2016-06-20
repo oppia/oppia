@@ -48,11 +48,11 @@ oppia.directive('setOfHtmlStringEditor', [
 
       // The following function is necessary to insert elements into the answer
       // groups for the Item Selection Widget.
-      $scope.toggleSelection = function(index) {
-        var choiceHtml = $scope.choices[index].id;
-        var searchIndex = $scope.$parent.value.indexOf(choiceHtml);
-        if (searchIndex > -1) {
-          $scope.$parent.value.splice(searchIndex, 1);
+      $scope.toggleSelection = function(choiceListIndex) {
+        var choiceHtml = $scope.choices[choiceListIndex].id;
+        var selectedChoicesIndex = $scope.$parent.value.indexOf(choiceHtml);
+        if (selectedChoicesIndex > -1) {
+          $scope.$parent.value.splice(selectedChoicesIndex, 1);
         } else {
           $scope.$parent.value.push(choiceHtml);
         }
