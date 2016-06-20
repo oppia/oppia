@@ -60,10 +60,13 @@ exports.config = {
       'protractor/*.js',
     ],
 
-    editor: [
+    mainEditor: [
       'protractor/editorAndPlayer.js',
+      'protractor/stateEditor.js'
+    ],
+
+    editorFeatures: [
       'protractor/gadgetEditor.js',
-      'protractor/stateEditor.js',
       'protractor/fallbacks.js',
       'protractor/historyTab.js'
     ],
@@ -147,7 +150,7 @@ exports.config = {
         // Directory for screenshots
         baseDirectory: '../protractor-screenshots',
         // Function to build filenames of screenshots
-        pathBuilder: function pathBuilder(spec, descriptions, results, capabilities) {
+        pathBuilder: function(spec, descriptions, results, capabilities) {
           return descriptions[1] + ' ' + descriptions[0];
         },
         takeScreenShotsOnlyForFailedSpecs: true
@@ -188,7 +191,7 @@ exports.config = {
   //
   // See the full list at https://github.com/juliemr/minijasminenode
   jasmineNodeOpts: {
-    // onComplete will be called just before the driver quits.
+    // The onComplete method will be called just before the driver quits.
     onComplete: null,
     // If true, display spec names.
     isVerbose: false,

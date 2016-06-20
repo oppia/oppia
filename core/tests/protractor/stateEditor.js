@@ -24,12 +24,11 @@ var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
 var player = require('../protractor_utils/player.js');
-var rules = require('../../../extensions/rules/protractor.js');
 
 describe('State editor', function() {
   it('should walk through the tutorial when user repeatedly clicks Next',
       function() {
-    var NUM_TUTORIAL_STAGES = 8;
+    var NUM_TUTORIAL_STAGES = 7;
     users.createUser(
       'userTutorial@stateEditor.com', 'userTutorialStateEditor');
     users.login('userTutorial@stateEditor.com');

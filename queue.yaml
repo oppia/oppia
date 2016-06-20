@@ -1,9 +1,10 @@
 total_storage_limit: 120M
 queue:
-# Slow down the default processing rate (for background MapReduce jobs).
-# Users might wish to speed this up temporarily for one-off
-# computations. (The default used to be 5/s.)
 - name: default
   rate: 3/m
 - name: events
   rate: 5/s
+- name: backups
+  rate: 5/s
+- name: emails
+  rate: 5/s 

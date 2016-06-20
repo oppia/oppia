@@ -245,9 +245,15 @@ body {
   width: calc(100% - 280px);
 }
 
+/* For issue #1867 (https://github.com/oppia/oppia/issues/1867)
+   Added "overflow: hidden;" to this class to fix a problem with the screen
+   flickering between 2 and 3 columns when someone hovered over either
+   the rating or the number of views explorations in the second row and
+   on when there are at least four explorations listed. */
 .oppia-profile-portfolio-container {
   margin: 0 auto;
   margin-bottom: 20px;
+  overflow: hidden;
   width: 100%;
 }
 
@@ -1614,6 +1620,16 @@ pre.oppia-pre-wrapped-text {
   position: relative;
 }
 
+.oppia-state-graph-animate-show {
+  opacity: 1;
+}
+.oppia-state-graph-animate-show.ng-hide-add, .oppia-state-graph-animate-show.ng-hide-remove {
+  transition: all linear 0.5s;
+}
+.oppia-state-graph-animate-show.ng-hide {
+  opacity: 0;
+}
+
 /* Styles for the collections learner view */
 
 .oppia-collection-player-tiles-container {
@@ -2240,7 +2256,7 @@ div#ng-curtain {
       This needs to take i18n of the "Create" and "Sign in" buttons into
       account.
     */
-    min-width: 535px;
+    min-width: 580px;
   }
 }
 .nav > li > a.oppia-navbar-tab {

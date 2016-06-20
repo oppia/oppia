@@ -16,20 +16,20 @@
  * @fileoverview Classification service for answer groups.
  */
 
-oppia.factory('answerClassificationService', [
-  '$http', '$q', 'LearnerParamsService',
-  function($http, $q, LearnerParamsService) {
+oppia.factory('AnswerClassificationService', [
+  '$http', '$q', 'LearnerParamsService', 'alertsService', 'INTERACTION_SPECS',
+  'ENABLE_STRING_CLASSIFIER', 'CLASSIFIER_RULESPEC_STR',
+  function($http, $q, LearnerParamsService, alertsService, INTERACTION_SPECS,
+      ENABLE_STRING_CLASSIFIER, CLASSIFIER_RULESPEC_STR) {
     /**
-     * Finds the first answer group with a rule that returns true. This should
-     * be synced with the backend classify() function in
-     * core/controllers/reader.
+     * Finds the first answer group with a rule that returns true.
      *
      * @param {*} answer - The answer that the user has submitted.
      * @param {array} answerGroups - The answer groups of the interaction. Each
      *     answer group contains rule_specs, which is a list of rules.
      * @param {object} defaultOutcome - The default outcome of the interaction.
      * @param {function} interactionRulesService The service which contains the
-     *     rules of that interaction.
+     *     explicit rules of that interaction.
      *
      * @return {object} An object representing the answer group with the
      *     following properties:
@@ -46,8 +46,9 @@ oppia.factory('answerClassificationService', [
       for (var i = 0; i < answerGroups.length; i++) {
         for (var j = 0; j < answerGroups[i].rule_specs.length; j++) {
           var ruleSpec = answerGroups[i].rule_specs[j];
-          if (interactionRulesService[ruleSpec.rule_type](
-              answer, ruleSpec.inputs)) {
+          if (ruleSpec.rule_type !== CLASSIFIER_RULESPEC_STR &&
+              interactionRulesService[ruleSpec.rule_type](
+                answer, ruleSpec.inputs)) {
             return {
               outcome: answerGroups[i].outcome,
               answerGroupIndex: i,
@@ -66,7 +67,7 @@ oppia.factory('answerClassificationService', [
           ruleSpecIndex: 0
         };
       } else {
-        alertsService.addWarning('No default outcome found.');
+        alertsService.addWarning('Something went wrong with the exploration.');
       }
     };
 
@@ -80,9 +81,8 @@ oppia.factory('answerClassificationService', [
        * @param {*} answer - The answer that the user has submitted.
        * @param {boolean} isInEditorMode - Whether the function is being called
        *   in editor mode.
-       * @param {?function} interactionRulesService - The service which contains
-       *   the rules of that interaction. If this is undefined, then the
-       *   function uses server-side classification.
+       * @param {function} interactionRulesService - The service which contains
+       *   the explicit rules of that interaction.
        *
        * @return {promise} A promise for an object representing the answer group
        *     with the following properties:
@@ -97,13 +97,25 @@ oppia.factory('answerClassificationService', [
           explorationId, oldState, answer, isInEditorMode,
           interactionRulesService) {
         var deferred = $q.defer();
-        if (interactionRulesService) {
-          var answerGroups = oldState.interaction.answer_groups;
-          var defaultOutcome = oldState.interaction.default_outcome;
+        var result = null;
+        var answerGroups = oldState.interaction.answer_groups;
+        var defaultOutcome = oldState.interaction.default_outcome;
 
-          deferred.resolve(classifyAnswer(
-            answer, answerGroups, defaultOutcome, interactionRulesService));
+        if (interactionRulesService) {
+          result = classifyAnswer(
+            answer, answerGroups, defaultOutcome, interactionRulesService);
         } else {
+          alertsService.addWarning(
+            'Something went wrong with the exploration: no ' +
+            'interactionRulesService was available.');
+          deferred.reject();
+          return deferred.promise;
+        }
+
+        if (result.outcome === defaultOutcome &&
+            INTERACTION_SPECS[oldState.interaction.id]
+              .is_string_classifier_trainable &&
+            ENABLE_STRING_CLASSIFIER) {
           // TODO(bhenning): Figure out a long-term solution for determining
           // what params should be passed to the batch classifier.
           var classifyUrl = '/explorehandler/classify/' + explorationId;
@@ -122,6 +134,8 @@ oppia.factory('answerClassificationService', [
               answerGroupIndex: result.answer_group_index
             });
           });
+        } else {
+          deferred.resolve(result);
         }
         return deferred.promise;
       }

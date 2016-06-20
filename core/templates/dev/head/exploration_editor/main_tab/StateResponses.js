@@ -192,7 +192,7 @@ oppia.factory('responsesService', [
       },
       changeActiveAnswerGroupIndex: function(newIndex) {
         // If the current group is being clicked on again, close it.
-        if (newIndex == _activeAnswerGroupIndex) {
+        if (newIndex === _activeAnswerGroupIndex) {
           _activeAnswerGroupIndex = -1;
         } else {
           _activeAnswerGroupIndex = newIndex;
@@ -304,7 +304,7 @@ oppia.controller('StateResponses', [
         // We only suppress the default warning if each choice index has
         // been handled by at least one answer group.
         return choiceIndices.every(function(choiceIndex) {
-          return handledAnswersArray.indexOf(choiceIndex) != -1;
+          return handledAnswersArray.indexOf(choiceIndex) !== -1;
         });
       }
     };
@@ -341,7 +341,7 @@ oppia.controller('StateResponses', [
     };
 
     $scope.isCreatingNewState = function(outcome) {
-      return outcome && outcome.dest == PLACEHOLDER_OUTCOME_DEST;
+      return outcome && outcome.dest === PLACEHOLDER_OUTCOME_DEST;
     };
 
     // This returns false if the current interaction ID is null.
@@ -444,15 +444,15 @@ oppia.controller('StateResponses', [
           'stateInteractionIdService', 'stateCustomizationArgsService',
           'explorationContextService', 'editorContextService',
           'explorationStatesService', 'trainingDataService',
-          'answerClassificationService', 'focusService', 'DEFAULT_RULE_NAME',
-          'FUZZY_RULE_TYPE',
+          'AnswerClassificationService', 'focusService', 'DEFAULT_RULE_NAME',
+          'CLASSIFIER_RULESPEC_STR',
           function(
               $scope, $modalInstance, oppiaExplorationHtmlFormatterService,
               stateInteractionIdService, stateCustomizationArgsService,
               explorationContextService, editorContextService,
               explorationStatesService, trainingDataService,
-              answerClassificationService, focusService, DEFAULT_RULE_NAME,
-              FUZZY_RULE_TYPE) {
+              AnswerClassificationService, focusService, DEFAULT_RULE_NAME,
+              CLASSIFIER_RULESPEC_STR) {
             var _explorationId = explorationContextService.getExplorationId();
             var _stateName = editorContextService.getActiveStateName();
             var _state = explorationStatesService.getState(_stateName);
@@ -491,7 +491,7 @@ oppia.controller('StateResponses', [
                   answer, stateInteractionIdService.savedMemento,
                   stateCustomizationArgsService.savedMemento));
 
-              answerClassificationService.getMatchingClassificationResult(
+              AnswerClassificationService.getMatchingClassificationResult(
                 _explorationId, _state, answer, true).then(
                     function(classificationResult) {
                   var feedback = 'Nothing';
@@ -499,7 +499,7 @@ oppia.controller('StateResponses', [
                   if (classificationResult.outcome.feedback.length > 0) {
                     feedback = classificationResult.outcome.feedback[0];
                   }
-                  if (dest == _stateName) {
+                  if (dest === _stateName) {
                     dest = '<em>(try again)</em>';
                   }
                   $scope.trainingDataAnswer = answer;
@@ -512,7 +512,8 @@ oppia.controller('StateResponses', [
                         _state.interaction.answer_groups.length &&
                       _state.interaction.answer_groups[
                         answerGroupIndex].rule_specs[
-                          ruleSpecIndex].rule_type !== FUZZY_RULE_TYPE) {
+                          ruleSpecIndex].rule_type !==
+                            CLASSIFIER_RULESPEC_STR) {
                     $scope.classification.answerGroupIndex = -1;
                   } else {
                     $scope.classification.answerGroupIndex = (
@@ -696,7 +697,7 @@ oppia.controller('StateResponses', [
 
     $scope.isOutcomeLooping = function(outcome) {
       var activeStateName = editorContextService.getActiveStateName();
-      return outcome && (outcome.dest == activeStateName);
+      return outcome && (outcome.dest === activeStateName);
     };
 
     $scope.navigateToState = function(stateName) {

@@ -120,8 +120,8 @@ oppia.controller('StateInteraction', [
       // Check if the content is currently empty, as expected.
       var previousContent = explorationStatesService.getStateContentMemento(
         stateName);
-      if (previousContent.length != 1 || previousContent[0].value !== '' ||
-          previousContent[0].type != 'text') {
+      if (previousContent.length !== 1 || previousContent[0].value !== '' ||
+          previousContent[0].type !== 'text') {
         return;
       }
 

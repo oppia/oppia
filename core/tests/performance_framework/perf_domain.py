@@ -100,12 +100,6 @@ class PageSessionMetrics(object):
                         'Expected the timing entry of the page load timings to '
                         'include %s property' % timing_prop)
 
-                if timing_prop in self.page_session_timings:
-                    if len(str(self.page_session_timings[timing_prop])) < 13:
-                        raise utils.ValidationError(
-                            'Expected %s to be in milliseconds, instead found '
-                            'seconds' % timing_prop)
-
             if self.get_page_load_time_millisecs() < 0:
                 raise utils.ValidationError(
                     'Expected the page load time to be positive.')
@@ -135,12 +129,9 @@ class PageSessionMetrics(object):
     def _get_duration_millisecs(self, event_end, event_initial):
         # Timestamps are in milliseconds.
         initial_timestamp = self.page_load_timings[event_initial]
-
         end_timestamp = self.page_load_timings[event_end]
 
-        duration_secs = end_timestamp - initial_timestamp
-
-        return duration_secs
+        return end_timestamp - initial_timestamp
 
     def get_page_load_time_millisecs(self):
         """Returns the total page load time (in milliseconds)."""

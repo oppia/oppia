@@ -23,6 +23,7 @@ from core.platform import models
 import feconf
 
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
+taskqueue_services = models.Registry.import_taskqueue_services()
 
 DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a learner'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
@@ -148,15 +149,22 @@ def get_next_page_of_all_feedback_messages(
     result_messages = [_get_message_from_model(m) for m in results]
     return (result_messages, new_urlsafe_start_cursor, more)
 
+def get_thread_analytics_multi(exploration_ids):
+    """Returns a dict with feedback thread analytics for the given exploration
+    ids.
+    """
+    return feedback_jobs_continuous.FeedbackAnalyticsAggregator.get_thread_analytics_multi( # pylint: disable=line-too-long
+        exploration_ids)
+
 
 def get_thread_analytics(exploration_id):
     """Returns a dict with feedback thread analytics for the given exploration.
 
     The returned dict has two keys:
     - 'num_open_threads': the number of open feedback threads for this
-         exploration.
+        exploration.
     - 'num_total_threads': the total number of feedback threads for this
-         exploration.
+        exploration.
     """
     return feedback_jobs_continuous.FeedbackAnalyticsAggregator.get_thread_analytics( # pylint: disable=line-too-long
         exploration_id)
@@ -245,3 +253,11 @@ def get_all_threads(exploration_id, has_suggestion):
         if thread.has_suggestion == has_suggestion:
             all_threads.append(thread)
     return all_threads
+
+
+def enqueue_feedback_message_email_task(user_id):
+    """Adds a 'send feedback email' task into the taskqueue."""
+
+    taskqueue_services.enqueue_task(
+        feconf.FEEDBACK_MESSAGE_EMAIL_HANDLER_URL, {'user_id': user_id},
+        feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS)

@@ -35,7 +35,7 @@ oppia.filter('underscoresToCamelCase', [function() {
 oppia.filter('camelCaseToHyphens', [function() {
   return function(input) {
     var result = input.replace(/([a-z])?([A-Z])/g, '$1-$2').toLowerCase();
-    if (result[0] == '-') {
+    if (result[0] === '-') {
       result = result.substring(1);
     }
     return result;
@@ -121,7 +121,7 @@ oppia.filter('truncateAtFirstEllipsis', [function() {
 
 oppia.filter('wrapTextWithEllipsis', ['$filter', function($filter) {
   return function(input, characterCount) {
-    if (typeof input == 'string' || input instanceof String) {
+    if (typeof input === 'string' || input instanceof String) {
       input = $filter('normalizeWhitespace')(input);
       if (input.length <= characterCount || characterCount < 3) {
         // String fits within the criteria; no wrapping is necessary.
@@ -179,7 +179,7 @@ oppia.filter('parameterizeRuleDescription', [
     var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
     var iter = 0;
     while (true) {
-      if (!description.match(PATTERN) || iter == 100) {
+      if (!description.match(PATTERN) || iter === 100) {
         break;
       }
       iter++;
@@ -256,7 +256,7 @@ oppia.filter('parameterizeRuleDescription', [
 // replaces interior whitespace with a single space character.
 oppia.filter('normalizeWhitespace', [function() {
   return function(input) {
-    if (typeof input == 'string' || input instanceof String) {
+    if (typeof input === 'string' || input instanceof String) {
       // Remove whitespace from the beginning and end of the string, and
       // replace interior whitespace with a single space character.
       input = input.trim();
@@ -391,7 +391,7 @@ oppia.filter('truncateAndCapitalize', [function() {
 oppia.filter('removeDuplicatesInArray', [function() {
   return function(input) {
     return input.filter(function(val, pos) {
-      return input.indexOf(val) == pos;
+      return input.indexOf(val) === pos;
     });
   };
 }]);
