@@ -32,6 +32,7 @@ env:
     - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=true
     - RUN_LINT=true
     - RUN_FRONTEND_TESTS=true
+    - RUN_PERFORMANCE_TESTS=true
 matrix:
   allow_failures:
   # The backend tests, with coverage, take too long to run, so we make this
@@ -86,6 +87,7 @@ script:
 # Travis aborts test run if nothing is printed back to STDOUT for some time.
 # -x is used to avoid that.
 - if [ $RUN_FRONTEND_TESTS == 'true' ]; then bash -x scripts/run_frontend_tests.sh --run-minified-tests=true; fi
+- if [ $RUN_PERFORMANCE_TESTS == 'true' ]; then bash scripts/run_performance_tests.sh; fi
 
 after_success:
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then codecov; fi
