@@ -19,18 +19,20 @@
 
 oppia.controller('PreviewTab', [
   '$scope', '$modal', '$q', '$timeout', 'LearnerParamsService',
-  'explorationData', 'editorContextService',
-  'explorationStatesService', 'explorationInitStateNameService',
-  'explorationParamSpecsService', 'explorationTitleService',
-  'explorationCategoryService', 'explorationParamChangesService',
-  'explorationGadgetsService', 'oppiaPlayerService', 'parameterMetadataService',
+  'explorationData', 'explorationAdvancedFeaturesService',
+  'explorationCategoryService', 'editorContextService',
+  'explorationGadgetsService', 'explorationInitStateNameService',
+  'explorationParamChangesService', 'explorationParamSpecsService',
+  'explorationStatesService', 'explorationTitleService',
+  'oppiaPlayerService', 'parameterMetadataService',
   function(
       $scope, $modal, $q, $timeout, LearnerParamsService,
-      explorationData, editorContextService,
-      explorationStatesService, explorationInitStateNameService,
-      explorationParamSpecsService, explorationTitleService,
-      explorationCategoryService, explorationParamChangesService,
-      explorationGadgetsService, oppiaPlayerService, parameterMetadataService) {
+      explorationData, explorationAdvancedFeaturesService,
+      explorationCategoryService, editorContextService,
+      explorationGadgetsService, explorationInitStateNameService,
+      explorationParamChangesService, explorationParamSpecsService,
+      explorationStatesService, explorationTitleService,
+      oppiaPlayerService, parameterMetadataService) {
     $scope.isExplorationPopulated = false;
     explorationData.getData().then(function() {
       var initStateNameForPreview = editorContextService.getActiveStateName();
@@ -88,6 +90,11 @@ oppia.controller('PreviewTab', [
       return deferred.promise;
     };
 
+    $scope.showParameterSummary = function() {
+      return (explorationAdvancedFeaturesService.areParametersEnabled() &&
+              !angular.equals({}, $scope.allParams));
+    };
+
     $scope.showSetParamsModal = function(manualParamChanges, callback) {
       var modalInstance = $modal.open({
         templateUrl: 'modals/previewParams',
@@ -137,6 +144,7 @@ oppia.controller('PreviewTab', [
     };
 
     $scope.resetPreview = function() {
+      $scope.previewWarning = '';
       $scope.isExplorationPopulated = false;
       $scope.loadPreviewState(explorationInitStateNameService.savedMemento, []);
     };

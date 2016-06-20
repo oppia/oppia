@@ -6,8 +6,8 @@
     <conversation-skin></conversation-skin>
   </div>
 
-  <div class="oppia-parameters">
-    <div class="oppia-parameter-summary">
+  <div class="oppia-preview-bottom-right-container">
+    <div class="oppia-parameter-summary" ng-if="showParameterSummary()">
       <strong>Parameters:</strong>
       <table>
         <tr ng-repeat="(paramName, paramValue) in allParams">
@@ -27,14 +27,14 @@
 </div>
 
 <style>
-  .oppia-parameters {
+  .oppia-preview-bottom-right-container {
     bottom: 5px;
     display: block;
     position: absolute;
     right: 5px;
   }
 
-  .oppia-parameters .oppia-parameter-summary {
+  .oppia-preview-bottom-right-container .oppia-parameter-summary {
     background-color: #fff;
     font-size: 16px;
     margin: 0px 0px 2px 0px;
@@ -42,7 +42,7 @@
     text-align: left;
   }
 
-  .oppia-parameters .btn-lg {
+  .oppia-preview-bottom-right-container .btn-lg {
     background-color: #fff;
     border: none;
     border-radius: 0px;
