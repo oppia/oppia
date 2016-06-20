@@ -1,7 +1,7 @@
 <div class="container-fluid">
-  <div ng-repeat="choice in choices">
-    <md-checkbox ng-click="toggleSelection(choice)"
-                 ng-checked="choiceGroup.indexOf(choice.id) !== -1"
+  <div ng-repeat="choice in choices track by $index">
+    <md-checkbox ng-click="toggleSelection($index)"
+                 ng-model="selections[$index]"
                  style="max-width: 300px;" aria-label="choice">
       <span angular-html-bind="choice.id"></span>
     </md-checkbox>
