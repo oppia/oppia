@@ -279,16 +279,6 @@ oppia.factory('ExplorationDiffService', [
     };
 
     return {
-      /**
-       * Summarizes the diff information for a single change that moves an
-       * exploration from one version to the next.
-       */
-      getDiffData: function(oldStates, newStates, changeList) {
-        return _getDiffGraphData(oldStates, newStates, [{
-          changeList: changeList,
-          directionForwards: true
-        }]);
-      },
       getDiffGraphData: function(oldStates, newStates, changeListData) {
         return _getDiffGraphData(oldStates, newStates, changeListData);
       }

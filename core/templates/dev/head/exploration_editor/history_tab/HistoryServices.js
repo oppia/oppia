@@ -154,12 +154,12 @@ oppia.factory('compareVersionsService', [
       // The full changelist that is applied to go from v1 to v2.
       var combinedChangeList = [];
       versionPath.forEach(function(version) {
-        combinedChangeList = combinedChangeList.concat(
-          versionsTreeService.getChangeList(version));
+        var changeListForVersion = versionsTreeService.getChangeList(version);
+        if (!directionForwards) {
+          changeListForVersion.reverse();
+        }
+        combinedChangeList = combinedChangeList.concat(changeListForVersion);
       });
-      if (!directionForwards) {
-        combinedChangeList.reverse();
-      }
 
       return combinedChangeList;
     };
