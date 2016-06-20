@@ -32,20 +32,20 @@ class SplashPagePerformanceTest(base.TestBase):
             self.page_metrics.get_total_page_size_bytes(), 10000000)
 
     def test_splash_page_loads_under_10_seconds(self):
-        self._record_page_timings_for_url(self.SPLASH_URL)
+        self._record_page_timings_for_url(self.SPLASH_URL, session_count=3)
 
         self.assertLessEqual(
-            self.page_metrics.get_page_load_time_millisecs(), 10000)
+            self.page_metrics.get_average_page_load_time_millisecs(), 10000)
 
 
-class SplashPagePerformanceForCachedStateTest(base.TestBase):
-    """Performance tests for the splash page for the cached state or
+class SplashPagePerformanceForCachedSessionTest(base.TestBase):
+    """Performance tests for the splash page for the cached session or
     return user.
     """
     SPLASH_URL = 'http://localhost:9501/splash'
 
     def setUp(self):
-        super(SplashPagePerformanceForCachedStateTest, self).setUp()
+        super(SplashPagePerformanceForCachedSessionTest, self).setUp()
 
     def test_splash_page_has_less_than_1_megabytes_sent_to_the_client(self):
         self._record_page_metrics_from_cached_session(self.SPLASH_URL)
@@ -54,7 +54,8 @@ class SplashPagePerformanceForCachedStateTest(base.TestBase):
             self.page_metrics.get_total_page_size_bytes(), 1000000)
 
     def test_splash_page_loads_under_3_seconds(self):
-        self._record_page_timings_from_cached_session(self.SPLASH_URL)
+        self._record_page_timings_from_cached_session(
+            self.SPLASH_URL, session_count=3)
 
         self.assertLessEqual(
-            self.page_metrics.get_page_load_time_millisecs(), 3000)
+            self.page_metrics.get_average_page_load_time_millisecs(), 3000)
