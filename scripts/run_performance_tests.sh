@@ -68,8 +68,6 @@ fi
 trap cleanup EXIT
 
 # Change execute status of browsermob-proxy
-# export ME=$(whoami)
-# chown $ME $TOOLS_DIR/browsermob-proxy-2.1.1/bin/browsermob-proxy
 chmod 744 $TOOLS_DIR/browsermob-proxy-2.1.1/bin/browsermob-proxy
 
 # Start a demo server.
