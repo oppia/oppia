@@ -22,11 +22,11 @@ import zipfile
 from core.controllers import dashboard
 from core.controllers import editor
 from core.domain import config_services
+from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_domain
 from core.domain import rights_manager
-from core.domain import rule_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -203,34 +203,42 @@ class EditorTest(BaseEditorControllerTest):
         self.logout()
 
     def test_resolved_answers_handler(self):
-        # In the reader perspective, submit the first multiple-choice answer,
-        # then submit 'blah' once, 'blah2' twice and 'blah3' three times.
-        # TODO(sll): Use the ExplorationPlayer in reader_test for this.
+        # As a learner, submit the first multiple-choice answer, then submit
+        # 'blah' once, 'blah2' twice and 'blah3' three times.
+        exp_id = '0'
         exploration_dict = self.get_json(
-            '%s/0' % feconf.EXPLORATION_INIT_URL_PREFIX)
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
         self.assertEqual(
             exploration_dict['exploration']['title'], 'Welcome to Oppia!')
 
-        state_name = exploration_dict['exploration']['init_state_name']
-        result_dict = self.submit_answer('0', state_name, '0')
+        first_state_name = exploration_dict['exploration']['init_state_name']
+        event_services.AnswerSubmissionEventHandler.record(
+            exp_id, 1, first_state_name, exp_domain.DEFAULT_RULESPEC_STR, 0)
 
-        state_name = result_dict['state_name']
-        self.submit_answer('0', state_name, 'blah')
+        second_state_name = 'What language'
+        event_services.AnswerSubmissionEventHandler.record(
+            exp_id, 1, second_state_name, exp_domain.DEFAULT_RULESPEC_STR,
+            'blah')
         for _ in range(2):
-            self.submit_answer('0', state_name, 'blah2')
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, 1, second_state_name, exp_domain.DEFAULT_RULESPEC_STR,
+                'blah2')
         for _ in range(3):
-            self.submit_answer('0', state_name, 'blah3')
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, 1, second_state_name, exp_domain.DEFAULT_RULESPEC_STR,
+                'blah3')
 
         # Log in as an editor.
         self.login(self.EDITOR_EMAIL)
 
-        response = self.testapp.get('/create/0')
+        response = self.testapp.get('/create/%s' % exp_id)
         csrf_token = self.get_csrf_token_from_response(response)
-        url = str('/createhandler/resolved_answers/0/%s' % state_name)
+        url = str('/createhandler/resolved_answers/%s/%s' % (
+            exp_id, second_state_name))
 
         def _get_unresolved_answers():
             return stats_domain.StateRuleAnswerLog.get(
-                '0', state_name, exp_domain.DEFAULT_RULESPEC_STR
+                exp_id, second_state_name, exp_domain.DEFAULT_RULESPEC_STR
             ).answers
 
         self.assertEqual(
@@ -275,16 +283,17 @@ class EditorTest(BaseEditorControllerTest):
             def _create_training_data(*arg):
                 return [_create_answer(value) for value in arg]
 
-            # Load the fuzzy rules demo exploration.
-            exp_services.load_demo('15')
+            # Load the string classifier demo exploration.
+            exp_id = '15'
+            exp_services.load_demo(exp_id)
             rights_manager.release_ownership_of_exploration(
-                feconf.SYSTEM_COMMITTER_ID, '15')
+                feconf.SYSTEM_COMMITTER_ID, exp_id)
 
             exploration_dict = self.get_json(
-                '%s/15' % feconf.EXPLORATION_INIT_URL_PREFIX)
+                '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
             self.assertEqual(
                 exploration_dict['exploration']['title'],
-                'Demonstrating fuzzy rules')
+                'Demonstrating string classifier')
 
             # This test uses the interaction which supports numeric input.
             state_name = 'text'
@@ -295,38 +304,50 @@ class EditorTest(BaseEditorControllerTest):
                 exploration_dict['exploration']['states'][state_name][
                     'interaction']['id'], 'TextInput')
 
+            answer_groups = exp_services.get_exploration_by_id('15').states[
+                state_name].interaction.answer_groups
+            explicit_rule_spec_string = (
+                answer_groups[0].rule_specs[0].stringify_classified_rule())
+            classifier_rule_spec_string = (
+                answer_groups[1].rule_specs[0].stringify_classified_rule())
+
             # Input happy since there is an explicit rule checking for that.
-            self.submit_answer('15', state_name, 'happy')
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, 1, state_name, explicit_rule_spec_string, 'happy')
 
             # Input text not at all similar to happy (default outcome).
-            self.submit_answer('15', state_name, 'sad')
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, 1, state_name, exp_domain.DEFAULT_RULESPEC_STR, 'sad')
 
             # Input cheerful: this is current training data and falls under the
-            # fuzzy rule.
-            self.submit_answer('15', state_name, 'cheerful')
+            # classifier.
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, 1, state_name, classifier_rule_spec_string, 'cheerful')
 
             # Input joyful: this is not training data but will be classified
-            # under the fuzzy rule.
-            self.submit_answer('15', state_name, 'joyful')
+            # under the classifier.
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, 1, state_name, classifier_rule_spec_string, 'joyful')
 
             # Log in as an editor.
             self.login(self.EDITOR_EMAIL)
-            response = self.testapp.get('/create/15')
+            response = self.testapp.get('/create/%s' % exp_id)
             csrf_token = self.get_csrf_token_from_response(response)
-            url = str('/createhandler/training_data/15/%s' % state_name)
+            url = str(
+                '/createhandler/training_data/%s/%s' % (exp_id, state_name))
 
             exploration_dict = self.get_json(
-                '%s/15' % feconf.EXPLORATION_INIT_URL_PREFIX)
+                '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
 
             # Only two of the four submitted answers should be unhandled.
             response_dict = self.get_json(url)
             self.assertEqual(
                 response_dict['unhandled_answers'],
-                _create_training_data('joyful', 'sad'))
+                _create_training_data('sad', 'joyful'))
 
             # If the confirmed unclassified answers is trained for one of the
             # values, it should no longer show up in unhandled answers.
-            self.put_json('/createhandler/data/15', {
+            self.put_json('/createhandler/data/%s' % exp_id, {
                 'change_list': [{
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': state_name,
@@ -343,18 +364,18 @@ class EditorTest(BaseEditorControllerTest):
                 _create_training_data('joyful'))
 
             exploration_dict = self.get_json(
-                '%s/15' % feconf.EXPLORATION_INIT_URL_PREFIX)
+                '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
 
-            # If one of the values is added to the training data of a fuzzy
-            # rule, then it should not be returned as an unhandled answer.
+            # If one of the values is added to the training data of the
+            # classifier, then it should not be returned as an unhandled answer.
             state = exploration_dict['exploration']['states'][state_name]
             answer_group = state['interaction']['answer_groups'][1]
             rule_spec = answer_group['rule_specs'][0]
             self.assertEqual(
-                rule_spec['rule_type'], rule_domain.FUZZY_RULE_TYPE)
+                rule_spec['rule_type'], exp_domain.CLASSIFIER_RULESPEC_STR)
             rule_spec['inputs']['training_data'].append('joyful')
 
-            self.put_json('/createhandler/data/15', {
+            self.put_json('/createhandler/data/%s' % exp_id, {
                 'change_list': [{
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': state_name,
@@ -377,11 +398,11 @@ class EditorTest(BaseEditorControllerTest):
                 _create_training_data('sad'))
 
             exploration_dict = self.get_json(
-                '%s/15' % feconf.EXPLORATION_INIT_URL_PREFIX)
+                '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
 
             # If both are classified, then nothing should be returned
             # unhandled.
-            self.put_json('/createhandler/data/15', {
+            self.put_json('/createhandler/data/%s' % exp_id, {
                 'change_list': [{
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': state_name,
@@ -396,9 +417,9 @@ class EditorTest(BaseEditorControllerTest):
             self.assertEqual(response_dict['unhandled_answers'], [])
 
             exploration_dict = self.get_json(
-                '%s/15' % feconf.EXPLORATION_INIT_URL_PREFIX)
+                '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
 
-            # If one of the existing training data elements in the fuzzy rule
+            # If one of the existing training data elements in the classifier
             # is removed (5 in this case), but it is not backed up by an
             # answer, it will not be returned as potential training data.
             state = exploration_dict['exploration']['states'][state_name]

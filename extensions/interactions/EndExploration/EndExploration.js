@@ -107,3 +107,7 @@ oppia.directive('oppiaShortResponseEndExploration', [function() {
     templateUrl: 'shortResponse/EndExploration'
   };
 }]);
+
+oppia.factory('endExplorationRulesService', [function() {
+  return {};
+}]);
