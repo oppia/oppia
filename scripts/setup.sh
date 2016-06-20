@@ -188,6 +188,9 @@ if [ ! -d "$NODE_PATH" ]; then
   chmod -R 744 $NODE_MODULE_DIR
 fi
 
+# Change execute status of browsermob-proxy
+chmod u+x $TOOLS_DIR/browsermob-proxy-2.1.1/bin/browsermob-proxy
+
 # Adjust path to support the default Chrome locations for Unix, Windows and Mac OS.
 if [ "$TRAVIS" = true ]; then
   export CHROME_BIN="/usr/bin/chromium-browser"
