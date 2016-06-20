@@ -44,7 +44,7 @@ notifications:
   email:
     recipients:
     - sean@seanlip.org
-    - henning.benmax@gmail.com
+    - briggs.brenton@gmail.com
     - wxy.xinyu@gmail.com
     on_success: change
     on_failure: change
