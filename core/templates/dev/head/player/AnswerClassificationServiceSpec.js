@@ -71,6 +71,11 @@ describe('Answer classification service with string classifier disabled',
             rule_type: 'NotEquals'
           }, {
             inputs: {
+              x: 6
+            },
+            rule_type: 'Equals'
+          }, {
+            inputs: {
               x: 7
             },
             rule_type: 'ClassifyMatches'
@@ -81,6 +86,11 @@ describe('Answer classification service with string classifier disabled',
       param_changes: []
     });
   }));
+
+  afterEach(function() {
+    $httpBackend.verifyNoOutstandingExpectation();
+    $httpBackend.verifyNoOutstandingRequest();
+  });
 
   var explorationId = 'exploration';
 
@@ -144,6 +154,35 @@ describe('Answer classification service with string classifier disabled',
       ruleSpecIndex: 0
     });
     expect(failHandler).not.toHaveBeenCalled();
+  });
+
+  it('should fail if no answer group matches and no default rule is ' +
+     'provided', function() {
+    var state2 = sof.create('stateName', {
+      content: [{
+        type: 'text',
+        value: 'content'
+      }],
+      interaction: {
+        id: 'RuleTest',
+        answer_groups: [{
+          outcome: 'outcome 1',
+          rule_specs: [{
+            inputs: {
+              x: 10
+            },
+            rule_type: 'Equals'
+          }]
+        }]
+      },
+      param_changes: []
+    });
+
+    acs.getMatchingClassificationResult(explorationId, state, 0, false).then(
+      successHandler, failHandler);
+    $rootScope.$digest();
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
   });
 });
 
@@ -219,6 +258,11 @@ describe('Answer classification service with string classifier enabled',
     state2.interaction.id = 'UntrainableInteraction';
   }));
 
+  afterEach(function() {
+    $httpBackend.verifyNoOutstandingExpectation();
+    $httpBackend.verifyNoOutstandingRequest();
+  });
+
   var explorationId = 'exploration';
 
   var rules = {
@@ -252,9 +296,6 @@ describe('Answer classification service with string classifier enabled',
 
     expect(successHandler).toHaveBeenCalledWith(expectedClassificationResult);
     expect(failHandler).not.toHaveBeenCalled();
-
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
   });
 
   it('should return the default rule if no answer group matches and ' +
