@@ -38,7 +38,7 @@ class SeleniumPerformanceDataFetcher(object):
     """Fetches performance data for locally served Oppia pages using Selenium
     and Browsermob-proxy.
 
-    Selenium is used to programitically interact with a browser.
+    Selenium is used to programmitically interact with a browser.
     Browsermob-proxy is used to capture HTTP Archive (referred to as HAR) data.
 
     The HTTP Archive format is a JSON-formatted archive file format used for
