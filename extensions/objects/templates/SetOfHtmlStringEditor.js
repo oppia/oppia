@@ -42,16 +42,19 @@ oppia.directive('setOfHtmlStringEditor', [
       }
 
       $scope.choices = $scope.initArgs.choices;
-      $scope.choiceGroup = $scope.$parent.value;
+      $scope.selections = $scope.choices.map(function(choice) {
+        return $scope.$parent.value.indexOf(choice.id) !== -1;
+      });
 
       // The following function is necessary to insert elements into the answer
       // groups for the Item Selection Widget.
-      $scope.toggleSelection = function(choice) {
-        var index = $scope.$parent.value.indexOf(choice.id);
-        if (index > -1) {
-          $scope.$parent.value.splice(index, 1);
+      $scope.toggleSelection = function(index) {
+        var choiceHtml = $scope.choices[index].id;
+        var searchIndex = $scope.$parent.value.indexOf(choiceHtml);
+        if (searchIndex > -1) {
+          $scope.$parent.value.splice(searchIndex, 1);
         } else {
-          $scope.$parent.value.push(choice.id);
+          $scope.$parent.value.push(choiceHtml);
         }
       };
     }
