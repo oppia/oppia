@@ -254,10 +254,7 @@ oppia.directive('versionDiffVisualization', [function() {
               $scope.headers = headers;
               $scope.newStateName = newStateName;
               $scope.oldStateName = oldStateName;
-              $scope.yamlStrs = {
-                leftPane: '',
-                rightPane: ''
-              };
+              $scope.yamlStrs = {};
 
               if (newState) {
                 $http.get(STATE_YAML_URL, {
@@ -268,6 +265,13 @@ oppia.directive('versionDiffVisualization', [function() {
                 }).then(function(response) {
                   $scope.yamlStrs.leftPane = response.data.yaml;
                 });
+              } else {
+                // Note: the timeout is needed or the string will be sent
+                // before codemirror has fully loaded and will not be
+                // displayed. This causes issues with the e2e tests.
+                $timeout(function() {
+                  $scope.yamlStrs.leftPane = '';
+                }, 200);
               }
 
               if (oldState) {
@@ -279,6 +283,13 @@ oppia.directive('versionDiffVisualization', [function() {
                 }).then(function(response) {
                   $scope.yamlStrs.rightPane = response.data.yaml;
                 });
+              } else {
+                // Note: the timeout is needed or the string will be sent
+                // before codemirror has fully loaded and will not be
+                // displayed. This causes issues with the e2e tests.
+                $timeout(function() {
+                  $scope.yamlStrs.rightPane = '';
+                }, 200);
               }
 
               $scope.cancel = function() {
