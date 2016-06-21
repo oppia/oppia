@@ -65,6 +65,10 @@ button.md-button.md-default-theme.oppia-learner-continue-button:hover {
   background-color: #115FD4;
 }
 
+/* Attributes for material-icons. */
+.material-icons {
+  vertical-align: middle;
+}
 .material-icons.md-18 {
   font-size: 18px;
 }
@@ -2623,7 +2627,7 @@ div#ng-curtain {
 }
 
 /* Hide the 'Skip' icon on the editor tutorial. */
-.skipBtn .glyphicon-ban-circle {
+.skipBtn i {
   display: none;
 }
 
