@@ -431,6 +431,17 @@ def export_to_zip_file(exploration_id, version=None):
     return memfile.getvalue()
 
 
+def convert_state_dict_to_yaml(state_dict, width=80):
+    try:
+        # Check if the state_dict can be converted to a State.
+        state = exp_domain.State.from_dict(state_dict)
+    except Exception:
+        logging.info('Bad state dict: %s' % str(state_dict))
+        raise Exception('Could not convert state dict to YAML.')
+
+    return utils.yaml_from_dict(state.to_dict(), width=width)
+
+
 def export_states_to_yaml(exploration_id, version=None, width=80):
     """Returns a python dictionary of the exploration, whose keys are state
     names and values are yaml strings representing the state contents with
@@ -894,7 +905,8 @@ def _create_exploration(
 
 def save_new_exploration(committer_id, exploration):
     commit_message = (
-        'New exploration created with title \'%s\'.' % exploration.title)
+        ('New exploration created with title \'%s\'.' % exploration.title)
+        if exploration.title else 'New exploration created.')
     _create_exploration(committer_id, exploration, commit_message, [{
         'cmd': CMD_CREATE_NEW,
         'title': exploration.title,

@@ -221,7 +221,9 @@ oppia.factory('compareVersionsService', [
             v1InitStateId: diffGraphData.originalStateIds[
               response.v1Data.data.init_state_name],
             v2InitStateId: diffGraphData.stateIds[
-              response.v2Data.data.init_state_name]
+              response.v2Data.data.init_state_name],
+            v1States: v1States,
+            v2States: v2States
           };
         });
       }
