@@ -2102,24 +2102,29 @@ md-card.oppia-dashboard-tile {
 }
 
 .oppia-dashboard-table th {
-  padding: 10px 0;
+  padding: 12px 0;
 }
 
 .oppia-dashboard-table td {
-  padding: 5px 0;
+  padding: 7px 0;
+}
+
+.exploration-list-item:not(:last-child) {
+  border-bottom: 1px solid #bbb;
 }
 
 .exploration-list-item .exp-private-text {
   color: #aaa;
   font-style: italic;
+  font-size: 15px;
 }
 
-/*ul.oppia-dashboard-tiles {
+ul.oppia-dashboard-tiles {
   list-style-type: none;
   margin-top: 30px;
   padding-left: 0;
 }
-*/
+
 .oppia-large-modal-window .modal-dialog {
   max-width: 900px;
   width: 80%;
