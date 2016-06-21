@@ -711,8 +711,11 @@ class StateYamlHandler(EditorHandler):
 
     def get(self):
         """Handles GET requests."""
-        state_dict = json.loads(self.request.get('stringified_state'))
-        width = json.loads(self.request.get('stringified_width'))
+        try:
+            state_dict = json.loads(self.request.get('stringified_state'))
+            width = json.loads(self.request.get('stringified_width'))
+        except Exception:
+            raise self.PageNotFoundException
 
         self.render_json({
             'yaml': exp_services.convert_state_dict_to_yaml(state_dict, width),
