@@ -84,8 +84,8 @@ def get_learner_collection_dict_by_id(
     includes progress in the collection, information about explorations
     referenced within the collection, and a slightly nicer data structure for
     frontend work.
-    This raises a ValidationError if the collection retrieved using the given ID
-    references non-existent explorations.
+    This raises a ValidationError if the collection retrieved using the given
+    ID references non-existent explorations.
     which includes useful data for the collection learner view.
     """
     collection = collection_services.get_collection_by_id(
@@ -189,16 +189,13 @@ def get_displayable_exp_summary_dicts_matching_ids(
 
         filtered_exploration_summaries.append(exploration_summary)
 
-    return _get_displayable_exp_summary_dicts(
-        filtered_exploration_summaries, include_contributors=False)
+    return get_displayable_exp_summary_dicts(filtered_exploration_summaries)
 
 
-def _get_displayable_exp_summary_dicts(
-        exploration_summaries, include_contributors=True):
+def get_displayable_exp_summary_dicts(exploration_summaries):
     """Given a list of exploration summary domain objects, returns a list,
     with the same number of elements, of the corresponding human-readable
-    exploration summary dicts. If include_contributors is False, the resulting
-    dicts will not have a 'human_readable_contributors_summary' attribute.
+    exploration summary dicts.
 
     This assumes that all the exploration summary domain objects passed in are
     valid (i.e., none of them are None).
@@ -221,6 +218,8 @@ def _get_displayable_exp_summary_dicts(
             'title': exploration_summary.title,
             'activity_type': rights_manager.ACTIVITY_TYPE_EXPLORATION,
             'category': exploration_summary.category,
+            'created_on_msec': utils.get_time_in_millisecs(
+                exploration_summary.exploration_model_created_on),
             'objective': exploration_summary.objective,
             'language_code': exploration_summary.language_code,
             'last_updated_msec': utils.get_time_in_millisecs(
@@ -236,11 +235,6 @@ def _get_displayable_exp_summary_dicts(
                 exploration_summary.category),
             'num_views': view_counts[ind],
         }
-
-        if include_contributors:
-            summary_dict['human_readable_contributors_summary'] = (
-                get_human_readable_contributors_summary(
-                    exploration_summary.contributors_summary))
 
         displayable_exp_summaries.append(summary_dict)
 
@@ -305,7 +299,6 @@ def get_library_groups(language_codes):
             collection_summaries)
     }
 
-
     # Collect all exp ids so that the summary details can be retrieved with a
     # single get_multi() call.
     all_exp_ids = []
@@ -323,8 +316,7 @@ def get_library_groups(language_codes):
 
     exp_summary_dicts = {
         summary_dict['id']: summary_dict
-        for summary_dict in _get_displayable_exp_summary_dicts(
-            exp_summaries, include_contributors=False)
+        for summary_dict in get_displayable_exp_summary_dicts(exp_summaries)
     }
 
     results = []
@@ -332,7 +324,8 @@ def get_library_groups(language_codes):
         summary_dicts = []
         collection_ids_to_display = header_to_collection_ids[group['header']]
         summary_dicts = [
-            collection_summary_dicts[collection_id] for collection_id in collection_ids_to_display # pylint: disable=line-too-long
+            collection_summary_dicts[collection_id]
+            for collection_id in collection_ids_to_display
             if collection_id in collection_summary_dicts]
 
         exp_ids_to_display = header_to_exp_ids[group['header']]
@@ -373,8 +366,7 @@ def get_featured_exploration_summary_dicts(language_codes):
         key=lambda exp_summary: search_ranks[exp_summary.id],
         reverse=True)
 
-    return _get_displayable_exp_summary_dicts(
-        sorted_exp_summaries, include_contributors=False)
+    return get_displayable_exp_summary_dicts(sorted_exp_summaries)
 
 
 def get_top_rated_exploration_summary_dicts(language_codes):
@@ -393,8 +385,7 @@ def get_top_rated_exploration_summary_dicts(language_codes):
         key=lambda exp_summary: exp_summary.scaled_average_rating,
         reverse=True)[:feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS]
 
-    return _get_displayable_exp_summary_dicts(
-        sorted_exp_summaries, include_contributors=False)
+    return get_displayable_exp_summary_dicts(sorted_exp_summaries)
 
 
 def get_recently_published_exploration_summary_dicts():
@@ -412,4 +403,4 @@ def get_recently_published_exploration_summary_dicts():
         key=lambda exp_summary: exp_summary.first_published_msec,
         reverse=True)
 
-    return _get_displayable_exp_summary_dicts(summaries)
+    return get_displayable_exp_summary_dicts(summaries)

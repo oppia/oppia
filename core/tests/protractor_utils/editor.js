@@ -21,7 +21,7 @@ var forms = require('./forms.js');
 var gadgets = require('../../../extensions/gadgets/protractor.js');
 var general = require('./general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
-var rules = require('../../../extensions/rules/protractor.js');
+var rulesJson = require('../../../extensions/interactions/rules.json');
 
 var _NEW_STATE_OPTION = 'A New Card Called...';
 var _CURRENT_STATE_OPTION = '(try again)';
@@ -398,6 +398,17 @@ var addParameterChange = function(paramName, paramValue) {
 };
 
 // RULES
+var _getRuleDescription = function(interactionId, ruleName) {
+  if (rulesJson.hasOwnProperty(interactionId)) {
+    if (rulesJson[interactionId].hasOwnProperty(ruleName)) {
+      return rulesJson[interactionId][ruleName].description;
+    } else {
+      throw Error('Unknown rule: ' + ruleName);
+    }
+  } else {
+    throw Error('Could not find rules for interaction: ' + interactionId);
+  }
+};
 
 var selectRuleInAddResponseModal = function(interactionId, ruleName) {
   var ruleElement = element(by.css('.protractor-test-add-response-details'));
@@ -416,8 +427,7 @@ var setRuleParametersInAddResponseModal = function() {
 // Parses the relevant ruleDescription string, and returns an Array containing
 // the types of the rule input parameters.
 var _getRuleParameterTypes = function(interactionId, ruleName) {
-  var ruleDescription = rules.getDescription(
-    interactions.getInteraction(interactionId).answerObjectType, ruleName);
+  var ruleDescription = _getRuleDescription(interactionId, ruleName);
 
   var parameterStart = (ruleDescription.indexOf('{{') === -1) ?
     undefined : ruleDescription.indexOf('{{');
@@ -473,13 +483,16 @@ var _setRuleParameters = function(ruleElement, interactionId, ruleName) {
 // This function selects a rule from the dropdown,
 // but does not set any of its input parameters.
 var _selectRule = function(ruleElement, interactionId, ruleName) {
-  var ruleDescription = rules.getDescription(
-    interactions.getInteraction(interactionId).answerObjectType, ruleName);
+  var ruleDescription = _getRuleDescription(interactionId, ruleName);
 
-  var parameterStart = (ruleDescription.indexOf('{{') === -1) ?
-    undefined : ruleDescription.indexOf('{{');
-  // From the ruleDescription string we can deduce the description used
-  // in the page (which will have the form "is equal to ...")
+  var parameterStart = (
+    ruleDescription.indexOf('{{') === -1) ?
+    undefined :
+    ruleDescription.indexOf('{{');
+  // From the ruleDescription string we can deduce both the description used
+  // in the page (which will have the form "is equal to ...") and the types
+  // of the parameter objects, which will later tell us which object editors
+  // to use to enter the parameterValues.
   var ruleDescriptionInDropdown = ruleDescription.substring(0, parameterStart);
   while (parameterStart !== undefined) {
     var parameterEnd = ruleDescription.indexOf('}}', parameterStart) + 2;
