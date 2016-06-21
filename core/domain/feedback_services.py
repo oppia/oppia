@@ -25,6 +25,7 @@ import feconf
 
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
 taskqueue_services = models.Registry.import_taskqueue_services()
+transaction_services = models.Registry.import_transaction_services()
 
 DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a learner'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
@@ -265,24 +266,18 @@ def enqueue_feedback_message_email_task(user_id):
 
 
 def send_feedback_message_email(exploration_id, thread_id, message_id):
-    """Creates"""
     exploration_rights = rights_manager.get_exploration_rights(exploration_id)
-    feedback_message = {
+    feedback_message_reference = {
         'exploration_id': exploration_id,
         'thread_id': thread_id,
         'message_id': message_id
     }
 
-    for owner in exploration_rights.owner_ids:
-        model = feedback_models.UnsentFeedbackEmailModel.get(
-            owner, strict=False)
+    for owner_id in exploration_rights.owner_ids:
+        new_instance = transaction_services.run_in_transaction(
+            feedback_models.UnsentFeedbackEmailModel.create_or_modify,
+            owner_id, feedback_message_reference)
 
-        if model:
-            model.feedback_messages.append(feedback_message)
-            model.put()
-
-        else:
-            model = feedback_models.UnsentFeedbackEmailModel(
-                id=owner, feedback_messages=[feedback_message])
-            model.put()
-            enqueue_feedback_message_email_task(owner)
+        # new_instance is True when a new model instance is created.
+        if new_instance:
+            enqueue_feedback_message_email_task(owner_id)
