@@ -1080,6 +1080,29 @@ textarea {
   right: 0;
 }
 
+.oppia-dashboard-aggregated-stats md-card {
+  background: #fff;
+  margin: auto;
+}
+
+.oppia-dashboard-aggregated-stats .stats-card {
+  width: 50%;
+  border-right: 1px solid #bbb;
+  padding-left: 35px;
+  margin: 10px 0;
+}
+.oppia-dashboard-aggregated-stats .stats-card:last-child {
+  border: none;
+}
+
+.stats-card p {
+  color: #555;
+}
+
+.stats-card .stat-value {
+  margin: 2px 0;
+}
+
 .oppia-dashboard-tabs {
   border-bottom: 1px solid #eee;
   display: flex;
@@ -1112,7 +1135,6 @@ textarea {
   text-decoration: none;
 }
 .oppia-dashboard-empty-text {
-  padding-left: 20px;
   padding-top: 50px;
 }
 
@@ -2563,7 +2585,7 @@ div#ng-curtain {
   margin-right: auto;
   margin-bottom: 30px;
   margin-top: 40px;
-  padding: 30px 55px;
+  padding: 30px 55px 30px 45px;
 }
 .oppia-page-card li {
   margin-bottom: 10px;

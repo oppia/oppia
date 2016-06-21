@@ -39,8 +39,19 @@
       </ul>
     </div>
 
-    <div ng-if="explorationsList.length === 0 && collectionsList.length === 0">
-      <h2 style="margin-bottom: -20px; margin-left: 52px;">Creator Dashboard</h2>
+    <div class="oppia-dashboard-aggregated-stats">
+      <md-card layout="row">
+        <div class="average-ratings stats-card">
+          <p class="stat-description">Average Ratings</p>
+          <h1 class="stat-value">4.5</h1>
+          <p class="stat-metric">(by 63 users)</p>
+        </div>
+        <div class="total-plays stats-card">
+          <p class="stat-description">Total Plays</p>
+          <h1 class="stat-value">68</h1>
+          <p class="stat-metric">(+20 from last week)</p>
+        </div>
+      </md-card>
     </div>
 
     <div ng-if="activeTab === 'myExplorations'">
