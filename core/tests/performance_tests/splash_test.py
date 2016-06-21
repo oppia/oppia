@@ -24,6 +24,7 @@ class SplashPagePerformanceTest(base.TestBase):
 
     def setUp(self):
         super(SplashPagePerformanceTest, self).setUp()
+        self._load_page_to_cache_server_resources(self.SPLASH_URL)
 
     def test_splash_page_has_less_than_10_megabytes_sent_to_the_client(self):
         self._record_page_metrics_for_url(self.SPLASH_URL)
@@ -46,6 +47,7 @@ class SplashPagePerformanceForCachedSessionTest(base.TestBase):
 
     def setUp(self):
         super(SplashPagePerformanceForCachedSessionTest, self).setUp()
+        self._load_page_to_cache_server_resources(self.SPLASH_URL)
 
     def test_splash_page_has_less_than_1_megabytes_sent_to_the_client(self):
         self._record_page_metrics_from_cached_session(self.SPLASH_URL)

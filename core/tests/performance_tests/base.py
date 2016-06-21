@@ -23,13 +23,17 @@ from core.tests.performance_framework import perf_domain
 class TestBase(unittest.TestCase):
     """Base class for performance tests."""
     # Count of the number of page load sessions that we consider for
-    # calculating timing     metrics.
+    # calculating timing metrics.
     SESSION_COUNT = 3
 
     def setUp(self):
         self.data_fetcher = perf_services.SeleniumPerformanceDataFetcher(
             browser='chrome')
         self.page_metrics = None
+
+    def _load_page_to_cache_server_resources(self, page_url):
+        """Load the specified page url to cache server resources."""
+        self.data_fetcher.get_url(page_url)
 
     def _record_page_metrics_for_url(self, page_url):
         self.page_metrics = (
