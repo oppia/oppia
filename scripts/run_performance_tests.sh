@@ -76,7 +76,7 @@ chmod 744 $TOOLS_DIR/browsermob-proxy-2.1.1/bin/browsermob-proxy
 # Wait for the servers to come up.
 while ! nc -vz localhost 9501; do sleep 1; done
 
-$PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.splash_test $@ 
+$PYTHON_CMD scripts/backend_tests.py --test_path='core/tests/performance_tests' $@ 
 
 chmod 644 $TOOLS_DIR/browsermob-proxy-2.1.1/bin/browsermob-proxy
 rm bmp.log server.log
