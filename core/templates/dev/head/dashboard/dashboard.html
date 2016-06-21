@@ -54,6 +54,10 @@
       </ul>
     </div>
 
+    <div ng-if="explorationsList.length === 0 && collectionsList.length === 0">
+      <h2 style="margin-bottom: -20px; margin-left: 52px;">Creator Dashboard</h2>
+    </div>
+
     <div ng-if="activeTab === 'myExplorations'">
       <div ng-if="explorationsList.length === 0" class="oppia-dashboard-empty-text">
         <md-card layout="row" class="oppia-page-card oppia-dashboard-intro-card"
