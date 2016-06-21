@@ -327,7 +327,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         default_outcome.dest = exploration.init_state_name
         exploration.validate()
 
-        # Ensure an answer group with two fuzzy rules is invalid
+        # Ensure an answer group with two classifier rules is invalid
         init_state.interaction.answer_groups.append(
             exp_domain.AnswerGroup.from_dict({
                 'outcome': {
@@ -339,18 +339,18 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     'inputs': {
                         'training_data': ['Test']
                     },
-                    'rule_type': 'FuzzyMatches'
+                    'rule_type': 'ClassifyMatches'
                 }, {
                     'inputs': {
                         'training_data': ['Test']
                     },
-                    'rule_type': 'FuzzyMatches'
+                    'rule_type': 'ClassifyMatches'
                 }]
             })
         )
 
         self._assert_validation_error(
-            exploration, 'AnswerGroups can only have one fuzzy rule.')
+            exploration, 'AnswerGroups can only have one classifier rule.')
 
         # Restore a valid exploration.
         init_state.interaction.answer_groups.pop()
