@@ -1,4 +1,4 @@
-<script type="text/ng-template" id="history/versionDiffVisualization">
+<script type="text/ng-template" id="visualization/versionDiff">
   <div ng-hide="diffGraphData" class="oppia-align-center">
     Loading
     <loading-dots></loading-dots>
@@ -9,7 +9,7 @@
        node-secondary-labels="diffGraphSecondaryLabels"
        init-state-id2="v1InitStateId"
        link-property-mapping="DIFF_GRAPH_LINK_PROPERTY_MAPPING"
-       on-click-function="onClickStateInHistoryGraph">
+       on-click-function="onClickStateInDiffGraph">
   </div>
 
   <div style="position: absolute; right: -100px; top: 10px;"

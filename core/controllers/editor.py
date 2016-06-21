@@ -703,19 +703,20 @@ class ExplorationDownloadHandler(EditorHandler):
 
 
 class StateYamlHandler(EditorHandler):
-    """Given a representation of a state, converts it to a YAML string."""
+    """Given a representation of a state, converts it to a YAML string.
+
+    Note that this handler is stateless; it does not make use of the storage
+    layer.
+    """
 
     def get(self):
         """Handles GET requests."""
         state_dict = json.loads(self.request.get('stringified_state'))
         width = json.loads(self.request.get('stringified_width'))
 
-        if 'unresolved_answers' in state_dict:
-            del state_dict['unresolved_answers']
-
-        state_yaml = exp_services.convert_state_dict_to_yaml(
-            state_dict, width=width)
-        self.render_json({'yaml': state_yaml})
+        self.render_json({
+            'yaml': exp_services.convert_state_dict_to_yaml(state_dict, width),
+        })
 
 
 class ExplorationResourcesHandler(EditorHandler):

@@ -431,7 +431,7 @@ def export_to_zip_file(exploration_id, version=None):
     return memfile.getvalue()
 
 
-def convert_state_dict_to_yaml(state_dict, width=80):
+def convert_state_dict_to_yaml(state_dict, width):
     try:
         # Check if the state_dict can be converted to a State.
         state = exp_domain.State.from_dict(state_dict)

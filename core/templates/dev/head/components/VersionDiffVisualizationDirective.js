@@ -46,7 +46,7 @@ oppia.directive('versionDiffVisualization', [function() {
       // the later version of the exploration.
       getLaterVersionHeader: '&laterVersionHeader'
     },
-    templateUrl: 'history/versionDiffVisualization',
+    templateUrl: 'visualization/versionDiff',
     controller: ['$scope', '$modal', function($scope, $modal) {
       // Constants for color of nodes in diff graph
       var COLOR_ADDED = '#4EA24E';
@@ -182,10 +182,10 @@ oppia.directive('versionDiffVisualization', [function() {
       }
       $scope.legendGraph.finalStateIds = [_lastUsedStateType];
 
-      // Functions to show modal of history diff of a state
-      // stateId is the unique ID assigned to a state during calculation of
-      // state graph.
-      $scope.onClickStateInHistoryGraph = function(stateId) {
+      // Opens the modal showing the history diff for a given state.
+      // stateId is the unique ID assigned to a state during the calculation of
+      // the state graph.
+      $scope.onClickStateInDiffGraph = function(stateId) {
         var oldStateName = undefined;
         if (nodesData[stateId].newestStateName !=
             nodesData[stateId].originalStateName) {
