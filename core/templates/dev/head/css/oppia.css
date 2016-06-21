@@ -1082,7 +1082,7 @@ textarea {
 
 .oppia-dashboard-aggregated-stats md-card {
   background: #fff;
-  margin: auto;
+  margin: 0 auto 40px;
 }
 
 .oppia-dashboard-aggregated-stats .stats-card {
@@ -2085,12 +2085,41 @@ md-card.oppia-dashboard-tile {
   position: relative;
 }
 
-ul.oppia-dashboard-tiles {
+.oppia-dashboard-list-view-card {
+  width: 100%;
+  margin: 20px auto 0;
+  background: #fff;
+  padding: 10px 20px;
+}
+
+.oppia-dashboard-table {
+  width: 100%;
+}
+
+.oppia-dashboard-table tr:first-child {
+  border-bottom: 2px solid #ccc;
+  color: #555;
+}
+
+.oppia-dashboard-table th {
+  padding: 10px 0;
+}
+
+.oppia-dashboard-table td {
+  padding: 5px 0;
+}
+
+.exploration-list-item .exp-private-text {
+  color: #aaa;
+  font-style: italic;
+}
+
+/*ul.oppia-dashboard-tiles {
   list-style-type: none;
   margin-top: 30px;
   padding-left: 0;
 }
-
+*/
 .oppia-large-modal-window .modal-dialog {
   max-width: 900px;
   width: 80%;
