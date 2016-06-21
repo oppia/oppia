@@ -32,7 +32,7 @@ class SplashPagePerformanceTest(base.TestBase):
             self.page_metrics.get_total_page_size_bytes(), 10000000)
 
     def test_splash_page_loads_under_10_seconds(self):
-        self._record_page_timings_for_url(self.SPLASH_URL, session_count=3)
+        self._record_page_timings_for_url(self.SPLASH_URL)
 
         self.assertLessEqual(
             self.page_metrics.get_average_page_load_time_millisecs(), 10000)
@@ -54,8 +54,7 @@ class SplashPagePerformanceForCachedSessionTest(base.TestBase):
             self.page_metrics.get_total_page_size_bytes(), 1000000)
 
     def test_splash_page_loads_under_3_seconds(self):
-        self._record_page_timings_from_cached_session(
-            self.SPLASH_URL, session_count=3)
+        self._record_page_timings_from_cached_session(self.SPLASH_URL)
 
         self.assertLessEqual(
             self.page_metrics.get_average_page_load_time_millisecs(), 3000)

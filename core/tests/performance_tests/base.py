@@ -22,6 +22,9 @@ from core.tests.performance_framework import perf_domain
 
 class TestBase(unittest.TestCase):
     """Base class for performance tests."""
+    # Count of the number of page load sessions that we consider for
+    # calculating timing     metrics.
+    SESSION_COUNT = 3
 
     def setUp(self):
         self.data_fetcher = perf_services.SeleniumPerformanceDataFetcher(
@@ -36,21 +39,20 @@ class TestBase(unittest.TestCase):
         self.page_metrics = (
             self.data_fetcher.get_page_metrics_from_cached_session(page_url))
 
-    def _record_page_timings_for_url(self, page_url, session_count=3):
+    def _record_page_timings_for_url(self, page_url):
         page_session_metrics = []
 
-        for _ in range(session_count):
+        for _ in range(self.SESSION_COUNT):
             page_session_metrics.append(
                 self.data_fetcher.get_page_timings_for_url(page_url))
 
         self.page_metrics = perf_domain.MultiplePageSessionMetrics(
             page_session_metrics)
 
-    def _record_page_timings_from_cached_session(
-            self, page_url, session_count=3):
+    def _record_page_timings_from_cached_session(self, page_url):
         page_session_metrics = []
 
-        for _ in range(session_count):
+        for _ in range(self.SESSION_COUNT):
             page_session_metrics.append(
                 self.data_fetcher.get_page_timings_from_cached_session(
                     page_url))

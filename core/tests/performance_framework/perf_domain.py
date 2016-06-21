@@ -152,7 +152,6 @@ class MultiplePageSessionMetrics(object):
     different page load sessions. This may happen due to various factors like
     background processes.
     """
-
     def  __init__(self, page_session_metrics):
         self.page_metrics = page_session_metrics
         self._validate()
@@ -169,11 +168,11 @@ class MultiplePageSessionMetrics(object):
                     for item in self.page_metrics)) / len(self.page_metrics)
 
     def get_average_dom_ready_time_millisecs(self):
-        """Returns the average total page load time (in milliseconds)."""
+        """Returns the average dom ready time (in milliseconds)."""
         return (sum(item.get_dom_ready_time_millisecs()
                     for item in self.page_metrics)) / len(self.page_metrics)
 
     def get_average_request_time_millisecs(self):
-        """Returns the average total page load time (in milliseconds)."""
+        """Returns the average request time (in milliseconds)."""
         return (sum(item.get_request_time_millisecs()
                     for item in self.page_metrics)) / len(self.page_metrics)
