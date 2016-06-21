@@ -243,18 +243,17 @@
                         {% endif %}
                       </ul>
                       <ul class="nav oppia-navbar-nav">
-                        {% if nav_mode != 'create' and nav_mode != 'explore' %}
+                        {% if nav_mode not in ['create', 'explore', 'collection'] %}
                           <ul ng-if="windowIsNarrow" class="nav oppia-navbar-tabs-narrow">
                             <create-activity-button></create-activity-button>
                           </ul>
                           <ul ng-if="!windowIsNarrow" class="nav oppia-navbar-tabs">
                             <create-activity-button></create-activity-button>
-                            {% if SHOW_CUSTOM_PAGES %}
-                              <li class="oppia-clickable-navbar-element pull-right">
-                                <a class="oppia-navbar-tab" href="/forum" translate="I18N_TOPNAV_FORUM">
-                                </a>
-                              </li>
-                            {% endif %}
+
+                            <li class="oppia-clickable-navbar-element pull-right">
+                              <a class="oppia-navbar-tab" href="/forum" translate="I18N_TOPNAV_FORUM">
+                              </a>
+                            </li>
                             <li class="dropdown oppia-navbar-clickable-dropdown pull-right">
                               <a class="oppia-navbar-tab">
                                 <span translate="I18N_TOPNAV_ABOUT"></span>
@@ -264,10 +263,7 @@
                                 <li><a href="/about" translate="I18N_TOPNAV_ABOUT_OPPIA"></a></li>
                                 <li><a href="/teach" translate="I18N_TOPNAV_TEACH_WITH_OPPIA"></a></li>
                                 <li><a href="https://oppiablog.blogspot.com" translate="I18N_TOPNAV_BLOG" target="_blank"></a></li>
-                                {% if SHOW_CUSTOM_PAGES %}
-                                  <li><a href="/terms" translate="I18N_TOPNAV_TERMS_OF_SERVICE"></a></li>
-                                  <li><a href="/privacy" translate="I18N_TOPNAV_PRIVACY_POLICY"></a></li>
-                                {% endif %}
+                                <li><a href="/contact" translate="I18N_TOPNAV_CONTACT_US"></a></li>
                               </ul>
                             </li>
                             <li class="oppia-clickable-navbar-element pull-right">
@@ -325,7 +321,7 @@
       {% if SITE_FEEDBACK_FORM_URL %}
         <a href="{{SITE_FEEDBACK_FORM_URL}}" target="_blank"
            class="oppia-site-feedback oppia-transition-200">
-          <i class="material-icons md-18" style="vertical-align: middle;">&#xE87F;</i>
+          <i class="material-icons md-18">&#xE87F;</i>
             <span translate="I18N_SPLASH_SITE_FEEDBACK"></span>
           </i>
         </a>

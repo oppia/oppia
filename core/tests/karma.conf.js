@@ -27,6 +27,7 @@ module.exports = function(config) {
       'core/templates/dev/head/components/rating_display.html',
       'extensions/**/*.js',
       'extensions/interactions/**/*.html',
+      'extensions/interactions/rules.json',
       {
         pattern: 'i18n/**/*.json',
         watched: true,
@@ -75,7 +76,8 @@ module.exports = function(config) {
       // Jinja expressions. They should also be specified within the 'files'
       // list above.
       'core/templates/dev/head/components/rating_display.html': ['ng-html2js'],
-      'extensions/interactions/**/*.html': ['ng-html2js']
+      'extensions/interactions/**/*.html': ['ng-html2js'],
+      'extensions/interactions/rules.json': ['json_fixtures']
     },
     reporters: ['progress', 'coverage'],
     coverageReporter: {
@@ -101,9 +103,11 @@ module.exports = function(config) {
       }
     },
     plugins: [
+      'karma-jasmine-jquery',
       'karma-jasmine',
       'karma-chrome-launcher',
       'karma-ng-html2js-preprocessor',
+      'karma-json-fixtures-preprocessor',
       'karma-coverage'
     ],
     ngHtml2JsPreprocessor: {
@@ -111,6 +115,9 @@ module.exports = function(config) {
         return filepath;
       },
       moduleName: 'directiveTemplates'
+    },
+    jsonFixturesPreprocessor: {
+      variableName: '__fixtures__'
     }
   });
 };

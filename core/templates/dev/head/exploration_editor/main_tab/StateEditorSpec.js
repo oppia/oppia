@@ -189,7 +189,7 @@ describe('State Editor controller', function() {
 
   describe('TrainingDataService', function() {
     var $httpBackend;
-    var scope, siis, ecs, cls, rs, tds, ess, IS, FUZZY_RULE_TYPE;
+    var scope, siis, ecs, cls, rs, tds, ess, IS, CLASSIFIER_RULESPEC_STR;
     var mockExplorationData;
 
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
@@ -226,7 +226,7 @@ describe('State Editor controller', function() {
       rs = $injector.get('responsesService');
       tds = $injector.get('trainingDataService');
       IS = $injector.get('INTERACTION_SPECS');
-      FUZZY_RULE_TYPE = $injector.get('FUZZY_RULE_TYPE');
+      CLASSIFIER_RULESPEC_STR = $injector.get('CLASSIFIER_RULESPEC_STR');
 
       // Set the currently loaded interaction ID.
       siis.savedMemento = 'TextInput';
@@ -309,11 +309,11 @@ describe('State Editor controller', function() {
 
     it('should be able to train answer groups and the default response',
         function() {
-      // Training the first answer of a group should add a new fuzzy rule.
+      // Training the first answer of a group should add a new classifier.
       tds.trainAnswerGroup(0, 'text answer');
       var state = ess.getState('State');
       expect(state.interaction.answer_groups[0].rule_specs[1]).toEqual({
-        rule_type: FUZZY_RULE_TYPE,
+        rule_type: CLASSIFIER_RULESPEC_STR,
         inputs: {
           training_data: ['text answer']
         }
@@ -324,7 +324,7 @@ describe('State Editor controller', function() {
       tds.trainAnswerGroup(0, 'second answer');
       state = ess.getState('State');
       expect(state.interaction.answer_groups[0].rule_specs[1]).toEqual({
-        rule_type: FUZZY_RULE_TYPE,
+        rule_type: CLASSIFIER_RULESPEC_STR,
         inputs: {
           training_data: ['text answer', 'second answer']
         }
@@ -350,7 +350,7 @@ describe('State Editor controller', function() {
       // Verify initial state.
       var state = ess.getState('State');
       expect(state.interaction.answer_groups[0].rule_specs[1]).toEqual({
-        rule_type: FUZZY_RULE_TYPE,
+        rule_type: CLASSIFIER_RULESPEC_STR,
         inputs: {
           training_data: ['text answer', 'second answer']
         }
@@ -363,7 +363,7 @@ describe('State Editor controller', function() {
       tds.trainDefaultResponse('second answer');
       state = ess.getState('State');
       expect(state.interaction.answer_groups[0].rule_specs[1]).toEqual({
-        rule_type: FUZZY_RULE_TYPE,
+        rule_type: CLASSIFIER_RULESPEC_STR,
         inputs: {
           training_data: ['text answer']
         }
@@ -376,7 +376,7 @@ describe('State Editor controller', function() {
       tds.trainAnswerGroup(0, 'third answer');
       state = ess.getState('State');
       expect(state.interaction.answer_groups[0].rule_specs[1]).toEqual({
-        rule_type: FUZZY_RULE_TYPE,
+        rule_type: CLASSIFIER_RULESPEC_STR,
         inputs: {
           training_data: ['text answer', 'third answer']
         }
@@ -386,7 +386,7 @@ describe('State Editor controller', function() {
       ]);
     });
 
-    it('should properly clear the default answer and remove a fuzzy rule ' +
+    it('should properly clear the default answer and remove a classifier ' +
         'when it is not the last rule left in a group', function() {
       tds.trainAnswerGroup(0, 'text answer');
       tds.trainDefaultResponse('second answer');
@@ -394,7 +394,7 @@ describe('State Editor controller', function() {
       // Verify initial state.
       var state = ess.getState('State');
       expect(state.interaction.answer_groups[0].rule_specs[1]).toEqual({
-        rule_type: FUZZY_RULE_TYPE,
+        rule_type: CLASSIFIER_RULESPEC_STR,
         inputs: {
           training_data: ['text answer']
         }
@@ -407,14 +407,14 @@ describe('State Editor controller', function() {
       tds.trainAnswerGroup(0, 'second answer');
       state = ess.getState('State');
       expect(state.interaction.answer_groups[0].rule_specs[1]).toEqual({
-        rule_type: FUZZY_RULE_TYPE,
+        rule_type: CLASSIFIER_RULESPEC_STR,
         inputs: {
           training_data: ['text answer', 'second answer']
         }
       });
       expect(state.interaction.confirmed_unclassified_answers).toEqual([]);
 
-      // Ensure emptying the answer group's fuzzy rule properly deletes the rule
+      // Ensure emptying the answer group's classifier properly deletes the rule
       // since there is another rule in the group.
       tds.trainDefaultResponse('second answer');
       tds.trainDefaultResponse('text answer');
@@ -429,7 +429,7 @@ describe('State Editor controller', function() {
         'second answer', 'text answer'
       ]);
 
-      // Training the answer group should add the fuzzy rule back.
+      // Training the answer group should add the classifier back.
       tds.trainAnswerGroup(0, 'second answer');
       state = ess.getState('State');
       expect(state.interaction.answer_groups[0].rule_specs).toEqual([{
@@ -438,7 +438,7 @@ describe('State Editor controller', function() {
             x: 'Test'
           }
         }, {
-          rule_type: FUZZY_RULE_TYPE,
+          rule_type: CLASSIFIER_RULESPEC_STR,
           inputs: {
             training_data: ['second answer']
           }
@@ -446,7 +446,7 @@ describe('State Editor controller', function() {
       ]);
 
       // Removing the the 'contains' rule from the group and then removing the
-      // training data should not remove the fuzzy rule.
+      // training data should not remove the classifier.
       state.interaction.answer_groups[0].rule_specs.splice(0, 1);
       ess.setState('State', state);
       rs.init({
@@ -459,7 +459,7 @@ describe('State Editor controller', function() {
       tds.trainDefaultResponse('second answer');
       state = ess.getState('State');
       expect(state.interaction.answer_groups[0].rule_specs).toEqual([{
-          rule_type: FUZZY_RULE_TYPE,
+          rule_type: CLASSIFIER_RULESPEC_STR,
           inputs: {
             training_data: []
           }
@@ -474,7 +474,7 @@ describe('State Editor controller', function() {
       // Verify initial state.
       var state = ess.getState('State');
       expect(state.interaction.answer_groups[0].rule_specs[1]).toEqual({
-        rule_type: FUZZY_RULE_TYPE,
+        rule_type: CLASSIFIER_RULESPEC_STR,
         inputs: {
           training_data: ['text answer']
         }
@@ -487,7 +487,7 @@ describe('State Editor controller', function() {
       tds.trainAnswerGroup(0, 'text answer');
       state = ess.getState('State');
       expect(state.interaction.answer_groups[0].rule_specs[1]).toEqual({
-        rule_type: FUZZY_RULE_TYPE,
+        rule_type: CLASSIFIER_RULESPEC_STR,
         inputs: {
           training_data: ['text answer']
         }
@@ -498,7 +498,7 @@ describe('State Editor controller', function() {
       tds.trainDefaultResponse('second answer');
       state = ess.getState('State');
       expect(state.interaction.answer_groups[0].rule_specs[1]).toEqual({
-        rule_type: FUZZY_RULE_TYPE,
+        rule_type: CLASSIFIER_RULESPEC_STR,
         inputs: {
           training_data: ['text answer']
         }

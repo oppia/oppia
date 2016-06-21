@@ -444,15 +444,15 @@ oppia.controller('StateResponses', [
           'stateInteractionIdService', 'stateCustomizationArgsService',
           'explorationContextService', 'editorContextService',
           'explorationStatesService', 'trainingDataService',
-          'answerClassificationService', 'focusService', 'DEFAULT_RULE_NAME',
-          'FUZZY_RULE_TYPE',
+          'AnswerClassificationService', 'focusService', 'DEFAULT_RULE_NAME',
+          'CLASSIFIER_RULESPEC_STR',
           function(
               $scope, $modalInstance, oppiaExplorationHtmlFormatterService,
               stateInteractionIdService, stateCustomizationArgsService,
               explorationContextService, editorContextService,
               explorationStatesService, trainingDataService,
-              answerClassificationService, focusService, DEFAULT_RULE_NAME,
-              FUZZY_RULE_TYPE) {
+              AnswerClassificationService, focusService, DEFAULT_RULE_NAME,
+              CLASSIFIER_RULESPEC_STR) {
             var _explorationId = explorationContextService.getExplorationId();
             var _stateName = editorContextService.getActiveStateName();
             var _state = explorationStatesService.getState(_stateName);
@@ -491,7 +491,7 @@ oppia.controller('StateResponses', [
                   answer, stateInteractionIdService.savedMemento,
                   stateCustomizationArgsService.savedMemento));
 
-              answerClassificationService.getMatchingClassificationResult(
+              AnswerClassificationService.getMatchingClassificationResult(
                 _explorationId, _state, answer, true).then(
                     function(classificationResult) {
                   var feedback = 'Nothing';
@@ -512,7 +512,8 @@ oppia.controller('StateResponses', [
                         _state.interaction.answer_groups.length &&
                       _state.interaction.answer_groups[
                         answerGroupIndex].rule_specs[
-                          ruleSpecIndex].rule_type !== FUZZY_RULE_TYPE) {
+                          ruleSpecIndex].rule_type !==
+                            CLASSIFIER_RULESPEC_STR) {
                     $scope.classification.answerGroupIndex = -1;
                   } else {
                     $scope.classification.answerGroupIndex = (
