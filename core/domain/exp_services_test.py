@@ -2363,19 +2363,19 @@ class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
             'new_value': [{'value': '<p>a</p>', 'type': 'text'}],
             'property_name': 'content',
             'old_value': [{'value': '', 'type': 'text'}],
-            'state_name': 'First Card'
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME
         }, {
             'cmd': 'edit_state_property',
             'new_value': 'Continue',
             'property_name': 'widget_id',
             'old_value': None,
-            'state_name': 'First Card'
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME
         }, {
             'cmd': 'edit_state_property',
             'new_value': {'buttonText': {'value': 'Continue'}},
             'property_name': 'widget_customization_args',
             'old_value': {},
-            'state_name': 'First Card'
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME
         }, {
             'cmd': 'edit_state_property',
             'new_value': {
@@ -2385,11 +2385,11 @@ class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
             },
             'property_name': 'default_outcome',
             'old_value': {
-                'dest': 'First Card',
+                'dest': feconf.DEFAULT_INIT_STATE_NAME,
                 'param_changes': [],
                 'feedback': []
             },
-            'state_name': 'First Card'
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME
         }
     ]
 
@@ -2404,15 +2404,15 @@ class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
                 'value': '<p>a</p>'
             }],
             'cmd': 'edit_state_property',
-            'state_name': 'First Card',
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'property_name': 'content'
         }, {
-            'old_state_name': 'First Card',
+            'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'cmd': 'rename_state',
             'new_state_name': 'First Card renamed'
         }, {
             'new_value': 'First Card renamed',
-            'old_value': 'First Card',
+            'old_value': feconf.DEFAULT_INIT_STATE_NAME,
             'cmd': 'edit_exploration_property',
             'property_name': 'init_state_name'
         }
@@ -2535,7 +2535,7 @@ class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
         expected_result = copy.deepcopy(
             ChangeListSummaryUnitTests.BASIC_CHANGE_SUMMARY)
         expected_result['state_property_changes'] = {
-            'First Card': {
+            feconf.DEFAULT_INIT_STATE_NAME: {
                 'content': {
                     'new_value': [
                         {
@@ -2565,7 +2565,7 @@ class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
                         'param_changes': []
                     },
                     'old_value': {
-                        'dest': 'First Card',
+                        'dest': feconf.DEFAULT_INIT_STATE_NAME,
                         'feedback': [],
                         'param_changes': []
                     }
@@ -2602,11 +2602,11 @@ class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
         expected_result['exploration_property_changes'] = {
             'init_state_name': {
                 'new_value': 'First Card renamed',
-                'old_value': 'First Card'
+                'old_value': feconf.DEFAULT_INIT_STATE_NAME
             }
         }
         expected_result['state_property_changes'] = {
-            'First Card': {
+            feconf.DEFAULT_INIT_STATE_NAME: {
                 'content': {
                     'new_value': [
                         {
@@ -2623,7 +2623,7 @@ class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
                 },
                 'name': {
                     'new_value': 'First Card renamed',
-                    'old_value': 'First Card'
+                    'old_value': feconf.DEFAULT_INIT_STATE_NAME
                 }
             }
         }

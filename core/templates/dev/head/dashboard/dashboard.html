@@ -70,7 +70,7 @@
             <a ng-href="/create/<[exploration.id]>" class="oppia-dashboard-tile-container-link" style="text-decoration: none;">
               <div class="oppia-dashboard-tile-metadata-parent hidden-xs">
                 <div class="oppia-dashboard-tile-metadata">
-                  Created: <span style="color: black;"><[getLocaleAbbreviatedDatetimeString(exploration.created_on)]></span>
+                  Created: <span style="color: black;"><[getLocaleAbbreviatedDatetimeString(exploration.created_on_msec)]></span>
 
                   <br>
 
@@ -132,7 +132,7 @@
                     <span style="color: #888">
                       <strong><[exploration.category]></strong>
                       <span style="font-weight: bold;" ng-if="exploration.category">&middot;</span>
-                      Last updated <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
+                      Last updated <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
                     </span>
 
                     <span ng-if="exploration.status === 'publicized'">
@@ -168,7 +168,7 @@
               <a ng-href="/collection_editor/create/<[collection.id]>" class="oppia-dashboard-tile-container-link" style="text-decoration: none;">
                 <div class="oppia-dashboard-tile-metadata-parent hidden-xs">
                   <div class="oppia-dashboard-tile-metadata">
-                    Created: <span style="color: black;"><[getLocaleAbbreviatedDatetimeString(collection.created_on)]></span>
+                    Created: <span style="color: black;"><[getLocaleAbbreviatedDatetimeString(collection.created_on_msec)]></span>
 
                     <br>
                     <br>
@@ -214,7 +214,7 @@
                       <span style="color: #888">
                         <strong><[collection.category]></strong>
                         <span style="font-weight: bold;" ng-if="collection.category">&middot;</span>
-                        Last updated <[getLocaleAbbreviatedDatetimeString(collection.last_updated)]>
+                        Last updated <[getLocaleAbbreviatedDatetimeString(collection.last_updated_msec)]>
                       </span>
 
                       <span ng-if="collection.status === 'publicized'">

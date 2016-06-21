@@ -21,34 +21,13 @@ from core.domain import collection_services
 from core.domain import event_services
 from core.domain import exp_services
 from core.domain import rights_manager
-from core.domain import user_jobs_continuous
+from core.domain import user_jobs_continuous_test
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
 import utils
 
 from google.appengine.api import urlfetch
-
-class ModifiedUserStatsAggregator(user_jobs_continuous.UserStatsAggregator):
-    """A modified StatisticsAggregator that does not start a new batch
-    job when the previous one has finished.
-    """
-    @classmethod
-    def _get_batch_job_manager_class(cls):
-        return ModifiedUserStatsMRJobManager
-
-    @classmethod
-    def _kickoff_batch_job_after_previous_one_ends(cls):
-        pass
-
-
-class ModifiedUserStatsMRJobManager(
-        user_jobs_continuous.UserStatsMRJobManager):
-
-    @classmethod
-    def _get_continuous_computation_class(cls):
-        return ModifiedUserStatsAggregator
-
 
 class UserServicesUnitTests(test_utils.GenericTestBase):
     """Test the user services methods."""
@@ -507,7 +486,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
     USER_SESSION_ID = 'session1'
 
     def setUp(self):
-        super(UpdateContributionTests, self).setUp()
+        super(UserDashboardStatsTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
@@ -518,7 +497,13 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         event_services.StartExplorationEventHandler.record(
             self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
             feconf.PLAY_TYPE_NORMAL)
-        ModifiedUserStatsAggregator.start_computation()
+        self.assertEquals(
+            user_services.get_user_dashboard_stats(self.owner_id), {
+                'total_plays': 0,
+                'average_ratings': None
+            })
+        (user_jobs_continuous_test.ModifiedUserStatsAggregator
+         .start_computation())
         self.process_and_flush_pending_tasks()
         self.assertEquals(
             user_services.get_user_dashboard_stats(self.owner_id), {

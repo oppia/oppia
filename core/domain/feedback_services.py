@@ -149,15 +149,22 @@ def get_next_page_of_all_feedback_messages(
     result_messages = [_get_message_from_model(m) for m in results]
     return (result_messages, new_urlsafe_start_cursor, more)
 
+def get_thread_analytics_multi(exploration_ids):
+    """Returns a dict with feedback thread analytics for the given exploration
+    ids.
+    """
+    return feedback_jobs_continuous.FeedbackAnalyticsAggregator.get_thread_analytics_multi( # pylint: disable=line-too-long
+        exploration_ids)
+
 
 def get_thread_analytics(exploration_id):
     """Returns a dict with feedback thread analytics for the given exploration.
 
     The returned dict has two keys:
     - 'num_open_threads': the number of open feedback threads for this
-         exploration.
+        exploration.
     - 'num_total_threads': the total number of feedback threads for this
-         exploration.
+        exploration.
     """
     return feedback_jobs_continuous.FeedbackAnalyticsAggregator.get_thread_analytics( # pylint: disable=line-too-long
         exploration_id)
