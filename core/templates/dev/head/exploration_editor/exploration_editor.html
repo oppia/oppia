@@ -544,7 +544,9 @@
   {% include 'components/response_header_directive.html' %}
   {% include 'components/rule_editor_directive.html' %}
   {% include 'components/sharing_links_directive.html' %}
+  {% include 'components/state_diff_modal_directive.html' %}
   {% include 'components/state_graph_viz_directive.html' %}
+  {% include 'components/version_diff_visualization_directive.html' %}
 
   {% include 'player/answer_feedback_pair_directive.html' %}
   {% include 'player/conversation_skin_directive.html' %}
@@ -586,6 +588,7 @@
     {{ include_js_file('components/StateGraphLayoutService.js') }}
     {{ include_js_file('components/StateGraphVizDirective.js') }}
     {{ include_js_file('components/ValueGeneratorEditorDirective.js') }}
+    {{ include_js_file('components/VersionDiffVisualizationDirective.js') }}
 
     {{ include_js_file('services/explorationServices.js') }}
     {{ include_js_file('services/messengerService.js') }}

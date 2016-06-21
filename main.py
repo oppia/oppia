@@ -314,15 +314,15 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/download/<exploration_id>',
         editor.ExplorationDownloadHandler, 'exploration_download_handler'),
     get_redirect_route(
-        r'/createhandler/download_state/<exploration_id>',
-        editor.StateDownloadHandler, 'state_download_handler'),
-    get_redirect_route(
         r'/createhandler/imageupload/<exploration_id>',
         editor.ImageUploadHandler, 'image_upload_handler'),
     get_redirect_route(
         r'/createhandler/resolved_answers/<exploration_id>/' +
         r'<escaped_state_name>',
         editor.ResolvedAnswersHandler, 'resolved_answers_handler'),
+    get_redirect_route(
+        r'/createhandler/state_yaml', editor.StateYamlHandler,
+        'state_yaml_handler'),
     get_redirect_route(
         r'/createhandler/training_data/<exploration_id>/<escaped_state_name>',
         editor.UntrainedAnswersHandler, 'training_data_handler'),

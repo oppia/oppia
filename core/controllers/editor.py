@@ -18,6 +18,7 @@
 
 import datetime
 import imghdr
+import json
 import logging
 
 import jinja2
@@ -701,33 +702,24 @@ class ExplorationDownloadHandler(EditorHandler):
                 'Unrecognized output format %s' % output_format)
 
 
-class StateDownloadHandler(EditorHandler):
-    """Downloads a state as a YAML string."""
+class StateYamlHandler(EditorHandler):
+    """Given a representation of a state, converts it to a YAML string.
 
-    def get(self, exploration_id):
+    Note that this handler is stateless; it does not make use of the storage
+    layer.
+    """
+
+    def get(self):
         """Handles GET requests."""
         try:
-            exploration = exp_services.get_exploration_by_id(exploration_id)
-        except:
+            state_dict = json.loads(self.request.get('stringified_state'))
+            width = json.loads(self.request.get('stringified_width'))
+        except Exception:
             raise self.PageNotFoundException
 
-        if not rights_manager.Actor(self.user_id).can_view(
-                rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
-            raise self.PageNotFoundException
-
-        version = self.request.get('v', default_value=exploration.version)
-        width = int(self.request.get('width', default_value=80))
-
-        try:
-            state = self.request.get('state')
-        except:
-            raise self.InvalidInputException('State not found')
-
-        exploration_dict = exp_services.export_states_to_yaml(
-            exploration_id, version=version, width=width)
-        if state not in exploration_dict:
-            raise self.PageNotFoundException
-        self.response.write(exploration_dict[state])
+        self.render_json({
+            'yaml': exp_services.convert_state_dict_to_yaml(state_dict, width),
+        })
 
 
 class ExplorationResourcesHandler(EditorHandler):

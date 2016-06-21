@@ -98,7 +98,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       12: {
-        text: '        x: 6.0',
+        text: '        x: 6',
         highlighted: true
       },
       13: {

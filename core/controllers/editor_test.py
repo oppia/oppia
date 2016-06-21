@@ -15,6 +15,7 @@
 """Tests for the exploration editor page."""
 
 import datetime
+import json
 import os
 import StringIO
 import zipfile
@@ -599,8 +600,7 @@ param_changes: []
 
         self.logout()
 
-    def test_state_download_handler_for_default_exploration(self):
-
+    def test_state_yaml_handler(self):
         self.login(self.EDITOR_EMAIL)
         owner_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
@@ -614,22 +614,15 @@ param_changes: []
         exploration = exp_services.get_exploration_by_id(exp_id)
         exploration.add_states(['State A', 'State 2', 'State 3'])
         exploration.states['State A'].update_interaction_id('TextInput')
-        exploration.states['State 2'].update_interaction_id('TextInput')
-        exploration.states['State 3'].update_interaction_id('TextInput')
-        exploration.rename_state('State 2', 'State B')
-        exploration.delete_state('State 3')
-        exp_services._save_exploration(  # pylint: disable=protected-access
-            owner_id, exploration, '', [])
-        response = self.testapp.get('/create/%s' % exp_id)
 
-        # Check download state as YAML string
-        self.maxDiff = None
-        state_name = 'State%20A'
         download_url = (
-            '/createhandler/download_state/%s?state=%s&width=50' %
-            (exp_id, state_name))
-        response = self.testapp.get(download_url)
-        self.assertEqual(self.SAMPLE_STATE_STRING, response.body)
+            '/createhandler/state_yaml?'
+            'stringified_state=%s&stringified_width=50' %
+            json.dumps(exploration.states['State A'].to_dict()))
+        response = self.get_json(download_url)
+        self.assertEqual({
+            'yaml': self.SAMPLE_STATE_STRING
+        }, response)
 
         self.logout()
 
