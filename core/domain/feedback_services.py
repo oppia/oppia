@@ -18,6 +18,7 @@
 
 from core.domain import feedback_domain
 from core.domain import feedback_jobs_continuous
+from core.domain import rights_manager
 from core.domain import subscription_services
 from core.platform import models
 import feconf
@@ -261,3 +262,27 @@ def enqueue_feedback_message_email_task(user_id):
     taskqueue_services.enqueue_task(
         feconf.FEEDBACK_MESSAGE_EMAIL_HANDLER_URL, {'user_id': user_id},
         feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS)
+
+
+def send_feedback_message_email(exploration_id, thread_id, message_id):
+    """Creates"""
+    exploration_rights = rights_manager.get_exploration_rights(exploration_id)
+    feedback_message = {
+        'exploration_id': exploration_id,
+        'thread_id': thread_id,
+        'message_id': message_id
+    }
+
+    for owner in exploration_rights.owner_ids:
+        model = feedback_models.UnsentFeedbackEmailModel.get(
+            owner, strict=False)
+
+        if model:
+            model.feedback_messages.append(feedback_message)
+            model.put()
+
+        else:
+            model = feedback_models.UnsentFeedbackEmailModel(
+                id=owner, feedback_messages=[feedback_message])
+            model.put()
+            enqueue_feedback_message_email_task(owner)
