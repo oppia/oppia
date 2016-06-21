@@ -680,9 +680,17 @@ textarea {
   height: 198px;
 }
 
+.oppia-footer-margin{
+
+}
+
 @media (max-width: 768px) {
   .oppia-footer-padding {
     height: 464px;
+  }
+
+  .oppia-footer-margin {
+    margin-left: -60px;
   }
 }
 
