@@ -2125,8 +2125,8 @@ md-card.oppia-dashboard-tile {
 
 .exploration-list-item .exp-private-text {
   color: #aaa;
-  font-style: italic;
   font-size: 15px;
+  font-style: italic;
 }
 
 .exploration-list-item .featured-badge {
