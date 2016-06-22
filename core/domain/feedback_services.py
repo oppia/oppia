@@ -265,33 +265,38 @@ def enqueue_feedback_message_email_task(user_id):
         feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS)
 
 
-def _add_feedback_message_reference(user_id, reference):
-    """Creates a new instance of UnsentFeedbackEmailModel or modifies existing
+def get_feedback_message_references(user_id):
+    model = feedback_models.UnsentFeedbackEmailModel.get(user_id, strict=True)
+
+    return [feedback_domain.FeedbackMessageReferences(
+        reference['exploration_id'], reference['thread_id'],
+        reference['message_id'])
+            for reference in model.feedback_message_references]
+
+def update_feedback_message_reference(user_id, reference):
+    """Creates a new instance of UnsentFeedbackEmailModel or update existing
     model instance for sending feedback message email."""
 
     model = feedback_models.UnsentFeedbackEmailModel.get(user_id, strict=False)
 
     if model is not None:
-        model.feedback_message_references.append(reference)
+        model.feedback_message_references.append(reference.to_dict())
         model.put()
 
     else:
         model = feedback_models.UnsentFeedbackEmailModel(
             id=user_id,
-            feedback_message_references=[reference])
+            feedback_message_references=[reference.to_dict()])
         model.put()
         enqueue_feedback_message_email_task(user_id)
 
 
 def send_feedback_message_email(exploration_id, thread_id, message_id):
     exploration_rights = rights_manager.get_exploration_rights(exploration_id)
-    feedback_message_reference = {
-        'exploration_id': exploration_id,
-        'thread_id': thread_id,
-        'message_id': message_id
-    }
+    feedback_message_reference = feedback_domain.FeedbackMessageReferences(
+        exploration_id, thread_id, message_id)
 
     for owner_id in exploration_rights.owner_ids:
         transaction_services.run_in_transaction(
-            _add_feedback_message_reference, owner_id,
+            update_feedback_message_reference, owner_id,
             feedback_message_reference)

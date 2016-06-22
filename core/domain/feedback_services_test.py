@@ -287,7 +287,7 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             'message_id': self.message_id1
         }
         model = feedback_models.UnsentFeedbackEmailModel.get(self.user_id_a)
-        self.assertEqual(
+        self.assertDictEqual(
             model.feedback_message_references[0],
             expected_feedback_message_dict)
         self.assertEqual(model.retries, 0)
@@ -316,10 +316,10 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
         }
 
         model = feedback_models.UnsentFeedbackEmailModel.get(self.user_id_a)
-        self.assertEqual(
+        self.assertDictEqual(
             model.feedback_message_references[0],
             expected_feedback_message_dict1)
-        self.assertEqual(
+        self.assertDictEqual(
             model.feedback_message_references[1],
             expected_feedback_message_dict2)
         self.assertEqual(model.retries, 0)

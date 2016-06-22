@@ -120,12 +120,13 @@ class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):
             'message_id': 'message_id1'
         }
         email_instance = feedback_models.UnsentFeedbackEmailModel(
-            id=user_id, feedback_messages=[feedback_messages_dict])
+            id=user_id, feedback_message_references=[feedback_messages_dict])
         email_instance.put()
 
         retrieved_instance = (
             feedback_models.UnsentFeedbackEmailModel.get_by_id(id=user_id))
 
         self.assertEqual(
-            retrieved_instance.feedback_messages, [feedback_messages_dict])
+            retrieved_instance.feedback_message_references,
+            [feedback_messages_dict])
         self.assertEqual(retrieved_instance.retries, 0)
