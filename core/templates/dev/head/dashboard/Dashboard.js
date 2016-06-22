@@ -44,8 +44,7 @@ oppia.controller('Dashboard', [
         $rootScope.loadingMessage = '';
       },
       function(error) {
-        var ERROR_STATUSES = [404, 500];
-        if (ERROR_STATUSES.indexOf(error.status) !== -1) {
+        if (error.status === 500) {
           alertsService.addWarning('Failed to get dashboard data');
         }
       }
