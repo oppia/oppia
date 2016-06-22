@@ -85,25 +85,30 @@
         <table class="oppia-dashboard-table">
            <colgroup>
              <col style="width: 40%;">
-             <col style="width: 30%;">
-             <col style="width: 30%;">
+             <col style="width: 20%;">
+             <col style="width: 20%;">
+             <col style="width: 20%;">
           </colgroup>
           <tr>
             <th>Exploration</th>
             <th>Rating</th>
             <th>Plays</th>
+            <th>Feedback</th>
           </tr>
           <tr ng-repeat="exploration in explorationsList" class="exploration-list-item">
             <td>
               <[exploration.title || 'Untitled']>
             </td>
-            <td colspan="2" ng-if="exploration.status === 'private'" class="exp-private-text">
+            <td colspan="3" ng-if="exploration.status === 'private'" class="exp-private-text">
               This exploration is private. Publish to receive statistics.</td>
             <td ng-if="exploration.status !== 'private'">
               <[(getAverageRating(exploration.ratings) | number:1) || 'N/A']>
             </td>
             <td ng-if="exploration.status !== 'private'">
               10
+            </td>
+            <td ng-if="exploration.status !== 'private'">
+              <[exploration.num_total_threads]>
             </td>
           </tr>
         </table>
