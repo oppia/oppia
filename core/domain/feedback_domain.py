@@ -138,7 +138,7 @@ class Suggestion(object):
         }
 
 
-class FeedbackMessageReferences(object):
+class FeedbackMessageReference(object):
     """Domain object for feedback message references"""
 
     def __init__(self, exploration_id, thread_id, message_id):

@@ -268,12 +268,13 @@ def enqueue_feedback_message_email_task(user_id):
 def get_feedback_message_references(user_id):
     model = feedback_models.UnsentFeedbackEmailModel.get(user_id, strict=True)
 
-    return [feedback_domain.FeedbackMessageReferences(
+    return [feedback_domain.FeedbackMessageReference(
         reference['exploration_id'], reference['thread_id'],
-        reference['message_id'])
-            for reference in model.feedback_message_references]
+        reference['message_id']
+    ) for reference in model.feedback_message_references]
 
-def update_feedback_message_reference(user_id, reference):
+
+def _add_feedback_message_reference(user_id, reference):
     """Creates a new instance of UnsentFeedbackEmailModel or update existing
     model instance for sending feedback message email."""
 
@@ -282,7 +283,6 @@ def update_feedback_message_reference(user_id, reference):
     if model is not None:
         model.feedback_message_references.append(reference.to_dict())
         model.put()
-
     else:
         model = feedback_models.UnsentFeedbackEmailModel(
             id=user_id,
@@ -293,10 +293,10 @@ def update_feedback_message_reference(user_id, reference):
 
 def send_feedback_message_email(exploration_id, thread_id, message_id):
     exploration_rights = rights_manager.get_exploration_rights(exploration_id)
-    feedback_message_reference = feedback_domain.FeedbackMessageReferences(
+    feedback_message_reference = feedback_domain.FeedbackMessageReference(
         exploration_id, thread_id, message_id)
 
     for owner_id in exploration_rights.owner_ids:
         transaction_services.run_in_transaction(
-            update_feedback_message_reference, owner_id,
+            _add_feedback_message_reference, owner_id,
             feedback_message_reference)

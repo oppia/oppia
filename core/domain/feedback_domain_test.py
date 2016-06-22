@@ -144,9 +144,10 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
                              observed_suggestion.to_dict())
 
 
-class FeedbackMessageReferencesDomainTests(test_utils.GenericTestBase):
+class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
+
     def setUp(self):
-        super(FeedbackMessageReferencesDomainTests, self).setUp()
+        super(FeedbackMessageReferenceDomainTests, self).setUp()
         self.exp_id = 'exp'
         self.message_id = 'message'
         self.thread_id = 'thread'
@@ -159,7 +160,7 @@ class FeedbackMessageReferencesDomainTests(test_utils.GenericTestBase):
         }
 
         observed_feedback_message_reference = (
-            feedback_domain.FeedbackMessageReferences(
+            feedback_domain.FeedbackMessageReference(
                 self.exp_id, self.thread_id, self.message_id))
 
         self.assertDictEqual(observed_feedback_message_reference.to_dict(),
