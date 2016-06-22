@@ -102,11 +102,16 @@
               class="exploration-list-item">
             <td>
               <[exploration.title || 'Untitled']>
+              <span ng-if="exploration.status === 'featured'"
+                    class="featured-badge">
+                featured
+              </span>
             </td>
             <td colspan="3"
                 ng-if="exploration.status === 'private'"
                 class="exp-private-text">
-              This exploration is private. Publish to receive statistics.</td>
+              This exploration is private. Publish to receive statistics.
+            </td>
             <td ng-if="exploration.status !== 'private'">
               <[(getAverageRating(exploration.ratings) | number:1) || 'N/A']>
             </td>

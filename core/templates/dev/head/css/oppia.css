@@ -2129,6 +2129,17 @@ md-card.oppia-dashboard-tile {
   font-size: 15px;
 }
 
+.exploration-list-item .featured-badge {
+  background-color: #009688;
+  border-radius: 5px;
+  color: white;
+  font-size: 10px;
+  margin-left: 3px;
+  padding: 4px 6px;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
 ul.oppia-dashboard-tiles {
   list-style-type: none;
   margin-top: 30px;
