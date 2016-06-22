@@ -1095,10 +1095,10 @@ textarea {
 }
 
 .oppia-dashboard-aggregated-stats .stats-card {
-  width: 50%;
   border-right: 1px solid #bbb;
-  padding-left: 35px;
   margin: 10px 0;
+  padding-left: 35px;
+  width: 50%;
 }
 .oppia-dashboard-aggregated-stats .stats-card:last-child {
   border: none;
@@ -2034,8 +2034,8 @@ oppia-parameter {
 }
 
 .oppia-dashboard-row {
-  cursor: pointer;
   background-color: #fff;
+  cursor: pointer;
   margin-bottom: -5px;
   overflow: auto;
 }
@@ -2095,10 +2095,10 @@ md-card.oppia-dashboard-tile {
 }
 
 .oppia-dashboard-list-view-card {
-  width: 100%;
-  margin: 20px auto 0;
   background: #fff;
+  margin: 20px auto 0;
   padding: 10px 20px;
+  width: 100%;
 }
 
 .oppia-dashboard-table {
