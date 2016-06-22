@@ -476,14 +476,16 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         try:
             latest_exp_model = exp_models.ExplorationModel.get(exp_id)
             if (latest_exp_model.version == 1 or
-                    latest_exp_model.last_updated < when):
+                    latest_exp_model.last_updated <= when):
                 # Short-circuit: the answer was submitted later than the current
                 # exp version. Otherwise, this is the only version and something
                 # is wrong with the answer. Just deal with it.
-                return exp_services.get_exploration_from_model(latest_exp_model)
+                return (
+                    exp_services.get_exploration_from_model(latest_exp_model),
+                    True)
         except Exception:
             # The exploration may have been deleted.
-            return None
+            return (None, True)
 
         # Look backwards in the history of the exploration, starting with the
         # latest version. This depends on ExplorationCommitLogEntryModel, which
@@ -494,17 +496,21 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                     exp_models.ExplorationCommitLogEntryModel.get(
                         'exploration-%s-%s' % (exp_id, version)))
                 if exp_commit_model.created_on < when:
-                    # Found the closest exploration to the given
+                    # Found the closest exploration to the given answer
+                    # submission
                     exp_model = exp_models.ExplorationModel.get(
                         exp_id, version=version)
-                    return exp_services.get_exploration_from_model(exp_model)
+                    return (
+                        exp_services.get_exploration_from_model(exp_model),
+                        True)
         except Exception:
             # No history available for this exploration.
             pass
 
         # Any data added before ecbfff0 is assumed to match the earliest
         # recorded commit.
-        return exp_services.get_exploration_from_model(latest_exp_model)
+        return (
+            exp_services.get_exploration_from_model(latest_exp_model), False)
 
     # This function comes from extensions.answer_summarizers.models.
     @classmethod
@@ -1136,43 +1142,61 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             AnswerMigrationJob._evaluate_string_literal(stringified_value)
             for stringified_value in stringified_values]
 
+        # The first dict can be used to extract exploration_id and state_name,
+        # since they will be same for all mapped results. It cannot be used to
+        # extract any other values, however. Doing so will introduce a race
+        # condition since the order of value_dict_list is not deterministic.
         first_value_dict = value_dict_list[0]
         exploration_id = first_value_dict['exploration_id']
         state_name = first_value_dict['state_name']
-        created_on = first_value_dict['created_on']
 
-        # One major point of failure is the exploration not existing.
-        # Another major point of failure comes from the time matching. Since
-        # one entity in StateRuleAnswerLogModel represents many different
-        # answers, all answers are being matched to a single exploration even
-        # though each answer may have been submitted to a different exploration
-        # version. This may cause significant migration issues and will be
-        # tricky to work around.
-        exploration = (
-            AnswerMigrationJob._find_exploration_immediately_before_timestamp(
-                exploration_id, created_on))
+        dated_explorations_dict = {}
+        for value_dict in value_dict_list:
+            created_on = value_dict['created_on']
 
-        if not exploration:
-            yield (
-                'Encountered missing exploration referenced to by submitted '
-                'answers: %s' % exploration_id)
-            return
+            # One major point of failure is the exploration not existing.
+            # Another major point of failure comes from the time matching. Since
+            # one entity in StateRuleAnswerLogModel represents many different
+            # answers, all answers are being matched to a single exploration
+            # even though each answer may have been submitted to a different
+            # exploration version. This may cause significant migration issues
+            # and will be tricky to work around.
+            (exploration, has_history) = (
+                AnswerMigrationJob._find_exploration_immediately_before_timestamp( # pylint: disable=line-too-long
+                    exploration_id, created_on))
+            dated_explorations_dict[created_on] = exploration
 
-        # Another point of failure is the state not matching due to an
-        # incorrect exploration version selection.
-        if state_name in exploration.states:
-            state = exploration.states[state_name]
-        else:
-            yield (
-                'Encountered missing state name \'%s\' in exploration %s '
-                'referenced to by submitted answers' % (
-                    state_name, exploration_id))
-            return
+            if not exploration:
+                yield (
+                    'Encountered missing exploration referenced to by '
+                    'submitted answers: %s' % exploration_id)
+                return
+
+            # Another point of failure is the state not matching due to an
+            # incorrect exploration version selection.
+            if state_name not in exploration.states:
+                if has_history:
+                    # TODO(bhenning): Add state_name back to this output. It was
+                    # removed to reduce the amount of output from the production
+                    # migration job.
+                    yield (
+                        'Encountered missing state name in exploration %s '
+                        '(version: %s) referenced to by submitted answers' % (
+                            exploration_id, exploration.version))
+                    return
+                else:
+                    yield (
+                        'Failed to utilize exploration without history: %s '
+                        '(version: %s)' % (exploration_id, exploration.version))
+                    return
 
         for value_dict in value_dict_list:
             item_id = value_dict['item_id']
             item = stats_models.StateRuleAnswerLogModel.get(item_id)
             rule_str = value_dict['rule_str']
+            created_on = value_dict['created_on']
+            exploration = dated_explorations_dict[created_on]
+            state = exploration.states[state_name]
             migration_errors = AnswerMigrationJob._migrate_answers(
                 item_id, exploration, state_name, state, item.answers, rule_str)
             for error in migration_errors:

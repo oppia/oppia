@@ -167,6 +167,18 @@ class BaseJobManager(object):
         # TODO(bhenning): Add tests for this.
         output_str_list = ['%s' % output_value for output_value in output_list]
 
+        # De-duplicate the lines of output since it's not very useful to repeat
+        # them.
+        unique_output_str_list = list(set(output_str_list))
+        output_str_frequency_list = [
+            output_str_list.count(output_str)
+            for output_str in unique_output_str_list]
+        output_str_list = [
+            line if freq == 1 else '%s (%d times)' % (line, freq)
+            for (line, freq) in zip(
+                unique_output_str_list, output_str_frequency_list)
+        ]
+
         cutoff_index = 0
         total_output_size = 0
         for idx, output_str in enumerate(output_str_list):
