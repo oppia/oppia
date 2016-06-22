@@ -250,26 +250,13 @@ oppia.factory('ExplorationDiffService', [
 
       for (var i = 1; i <= _maxId; i++) {
         for (var j = 1; j <= _maxId; j++) {
-          if (i === j) {
-            continue;
-          }
-          if (adjMatrixV1[i][j] && adjMatrixV2[i][j]) {
+          if (i !== j && (adjMatrixV1[i][j] || adjMatrixV2[i][j])) {
             links.push({
               source: i,
               target: j,
-              linkProperty: 'unchanged'
-            });
-          } else if (!adjMatrixV1[i][j] && adjMatrixV2[i][j]) {
-            links.push({
-              source: i,
-              target: j,
-              linkProperty: 'added'
-            });
-          } else if (adjMatrixV1[i][j] && !adjMatrixV2[i][j]) {
-            links.push({
-              source: i,
-              target: j,
-              linkProperty: 'deleted'
+              linkProperty: (
+                adjMatrixV1[i][j] && adjMatrixV2[i][j] ? 'unchanged' :
+                !adjMatrixV1[i][j] && adjMatrixV2[i][j] ? 'added' : 'deleted')
             });
           }
         }
