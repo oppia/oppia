@@ -683,7 +683,6 @@ textarea {
 @media (max-width: 768px) {
   .oppia-footer-padding {
     height: 464px;
-    padding-left: -100px;
   }
   
   .oppia-footer-container {
