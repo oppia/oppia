@@ -19,11 +19,11 @@
 oppia.controller('Dashboard', [
   '$scope', '$rootScope', 'oppiaDatetimeFormatter', 'alertsService',
   'DashboardBackendApiService', 'RatingComputationService',
-  'ExplorationCreationService',
+  'ExplorationCreationService', 'FATAL_ERROR_CODES',
   function(
     $scope, $rootScope, oppiaDatetimeFormatter, alertsService,
     DashboardBackendApiService, RatingComputationService,
-    ExplorationCreationService) {
+    ExplorationCreationService, FATAL_ERROR_CODES) {
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
     $scope.createNewExploration = (
       ExplorationCreationService.createNewExploration);
@@ -44,8 +44,7 @@ oppia.controller('Dashboard', [
         $rootScope.loadingMessage = '';
       },
       function(errorStatus) {
-        var ERROR_STATUSES_FOR_WARNING = [400, 401, 404, 500];
-        if (ERROR_STATUSES_FOR_WARNING.indexOf(errorStatus) !== -1) {
+        if (FATAL_ERROR_CODES.indexOf(errorStatus) !== -1) {
           alertsService.addWarning('Failed to get dashboard data');
         }
       }
