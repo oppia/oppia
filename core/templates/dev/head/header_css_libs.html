@@ -9,7 +9,7 @@
 <link rel="stylesheet" type="text/css" media="screen"
       href="https://fonts.googleapis.com/css?family=Rubik">
 
-{% if not DEV_MODE or MINIFICATION %}
+{% if MINIFICATION or not DEV_MODE %}
   <link rel="stylesheet" type="text/css" media="screen"
         href="/third_party/generated/prod/css/third_party.css">
 {% else %}

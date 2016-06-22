@@ -52,7 +52,7 @@ RULES_DIR = os.path.join('extensions', 'rules')
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
 # Choose production template if minification flag is used or
-# if is in Production mode
+# if in production mode
 TEMPLATES_DIR_PREFIX = 'prod' if (IS_MINIFIED or not DEV_MODE) else 'dev'
 FRONTEND_TEMPLATES_DIR = os.path.join(
     'core', 'templates', TEMPLATES_DIR_PREFIX, 'head')

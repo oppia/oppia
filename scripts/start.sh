@@ -82,14 +82,13 @@ fi
 # Argument passed to dev_appserver.py to indicate whether or not to
 # clear the datastore.
 CLEAR_DATASTORE_ARG="--clear_datastore=true"
-# Argument passed to gulpfile.js to help build with minification
+# Argument passed to gulpfile.js to help build with minification.
 MINIFICATION=false
 for arg in "$@"; do
   if [ "$arg" == "--save_datastore" ]; then
     CLEAR_DATASTORE_ARG=""
   fi
-  # if you want to start run oppia in production enviroment
-  # while in development environment
+  # Used to emulate running Oppia in a production environment.
   if [ "$arg" == "--prod_env" ]; then
     MINIFICATION=true
     $PYTHON_CMD scripts/build.py
