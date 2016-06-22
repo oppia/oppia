@@ -2103,6 +2103,7 @@ md-card.oppia-dashboard-tile {
 
 .oppia-dashboard-table {
   width: 100%;
+  font-size: 15px;
 }
 
 .oppia-dashboard-table tr:first-child {

@@ -17,10 +17,10 @@
  */
 
 oppia.controller('Dashboard', [
-  '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
+  '$scope', '$http', '$rootScope', '$window', 'oppiaDatetimeFormatter',
   'RatingComputationService', 'ExplorationCreationService',
   function(
-      $scope, $http, $rootScope, oppiaDatetimeFormatter,
+      $scope, $http, $rootScope, $window, oppiaDatetimeFormatter,
       RatingComputationService, ExplorationCreationService) {
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
     $scope.createNewExploration = (
@@ -31,6 +31,10 @@ oppia.controller('Dashboard', [
     $scope.activeTab = 'myExplorations';
     $scope.setActiveTab = function(newActiveTabName) {
       $scope.activeTab = newActiveTabName;
+    };
+
+    $scope.showExplorationEditor = function(explorationId) {
+      $window.location = '/create/' + explorationId;
     };
 
     $rootScope.loadingMessage = 'Loading';

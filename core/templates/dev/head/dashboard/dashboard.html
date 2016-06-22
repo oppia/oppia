@@ -97,11 +97,15 @@
             <th>Feedback</th>
             <th>Last Updated</th>
           </tr>
-          <tr ng-repeat="exploration in explorationsList" class="exploration-list-item">
+          <tr ng-repeat="exploration in explorationsList"
+              ng-click="showExplorationEditor(exploration.id)"
+              class="exploration-list-item">
             <td>
               <[exploration.title || 'Untitled']>
             </td>
-            <td colspan="3" ng-if="exploration.status === 'private'" class="exp-private-text">
+            <td colspan="3"
+                ng-if="exploration.status === 'private'"
+                class="exp-private-text">
               This exploration is private. Publish to receive statistics.</td>
             <td ng-if="exploration.status !== 'private'">
               <[(getAverageRating(exploration.ratings) | number:1) || 'N/A']>
