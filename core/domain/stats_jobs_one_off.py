@@ -1154,6 +1154,10 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         for value_dict in value_dict_list:
             created_on = value_dict['created_on']
 
+            # Avoid unnecessary exploration loads.
+            if created_on in dated_explorations_dict:
+                continue
+
             # One major point of failure is the exploration not existing.
             # Another major point of failure comes from the time matching. Since
             # one entity in StateRuleAnswerLogModel represents many different
