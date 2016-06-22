@@ -395,7 +395,7 @@ oppia.factory('urlService', ['$window', function($window) {
     isIframed: function() {
       var pathname = this.getPathname();
       var urlParts = pathname.split('/');
-      return urlParts.indexOf('embed') !== -1;
+      return urlParts[1] === 'embed';
     },
     getPathname: function() {
       return window.location.pathname;

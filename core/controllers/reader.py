@@ -169,8 +169,8 @@ def classify(state, answer):
         'exploration owner.')
 
 
-class ExplorationPage(base.BaseHandler):
-    """Page describing a single exploration."""
+class ExplorationPageEmbed(base.BaseHandler):
+    """Page describing a single embeded exploration."""
 
     PAGE_NAME_FOR_CSRF = 'player'
 
@@ -204,9 +204,7 @@ class ExplorationPage(base.BaseHandler):
         if not rights_manager.Actor(self.user_id).can_view(
                 rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             raise self.PageNotFoundException
-
-        url_parts = [x.strip() for x in self.request.path.split('/')]
-        is_iframed = 'embed' in url_parts
+        is_iframed = True
 
         # TODO(sll): Cache these computations.
         gadget_types = exploration.get_gadget_types()
@@ -257,11 +255,98 @@ class ExplorationPage(base.BaseHandler):
             'nav_mode': feconf.NAV_MODE_EXPLORE,
         })
 
-        if is_iframed:
-            self.render_template(
-                'player/exploration_player.html', iframe_restriction=None)
-        else:
-            self.render_template('player/exploration_player.html')
+        self.render_template(
+            'player/exploration_player.html', iframe_restriction=None)
+
+
+class ExplorationPage(base.BaseHandler):
+    """Page describing a single exploration."""
+
+    PAGE_NAME_FOR_CSRF = 'player'
+
+    @require_playable
+    def get(self, exploration_id):
+        """Handles GET requests."""
+        version_str = self.request.get('v')
+        version = int(version_str) if version_str else None
+
+        # Note: this is an optional argument and will be None when the
+        # exploration is being played outside the context of a collection.
+        collection_id = self.request.get('collection_id')
+
+        try:
+            exploration = exp_services.get_exploration_by_id(
+                exploration_id, version=version)
+        except Exception as e:
+            raise self.PageNotFoundException(e)
+
+        collection_title = None
+        if collection_id:
+            try:
+                collection = collection_services.get_collection_by_id(
+                    collection_id)
+                collection_title = collection.title
+            except Exception as e:
+                raise self.PageNotFoundException(e)
+
+        version = exploration.version
+
+        if not rights_manager.Actor(self.user_id).can_view(
+                rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
+            raise self.PageNotFoundException
+
+        is_iframed = False
+
+        # TODO(sll): Cache these computations.
+        gadget_types = exploration.get_gadget_types()
+        interaction_ids = exploration.get_interaction_ids()
+        dependency_ids = (
+            interaction_registry.Registry.get_deduplicated_dependency_ids(
+                interaction_ids))
+        dependencies_html, additional_angular_modules = (
+            dependency_registry.Registry.get_deps_html_and_angular_modules(
+                dependency_ids))
+
+        gadget_templates = (
+            gadget_registry.Registry.get_gadget_html(gadget_types))
+
+        interaction_templates = (
+            rte_component_registry.Registry.get_html_for_all_components() +
+            interaction_registry.Registry.get_interaction_html(
+                interaction_ids))
+
+        self.values.update({
+            'GADGET_SPECS': gadget_registry.Registry.get_all_specs(),
+            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
+            'DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER': (
+                DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER.value),
+            'additional_angular_modules': additional_angular_modules,
+            'can_edit': (
+                bool(self.username) and
+                self.username not in config_domain.BANNED_USERNAMES.value and
+                rights_manager.Actor(self.user_id).can_edit(
+                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id)
+            ),
+            'dependencies_html': jinja2.utils.Markup(
+                dependencies_html),
+            'exploration_title': exploration.title,
+            'exploration_version': version,
+            'collection_id': collection_id,
+            'collection_title': collection_title,
+            'gadget_templates': jinja2.utils.Markup(gadget_templates),
+            'iframed': is_iframed,
+            'interaction_templates': jinja2.utils.Markup(
+                interaction_templates),
+            'is_private': rights_manager.is_exploration_private(
+                exploration_id),
+            # Note that this overwrites the value in base.py.
+            'meta_name': exploration.title,
+            # Note that this overwrites the value in base.py.
+            'meta_description': utils.capitalize_string(exploration.objective),
+            'nav_mode': feconf.NAV_MODE_EXPLORE,
+        })
+
+        self.render_template('player/exploration_player.html')
 
 
 class ExplorationHandler(base.BaseHandler):

@@ -256,7 +256,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
       scope.myTemplate = isIframed ?
         'skins/ConversationEmbed' : 'skins/Conversation';
     },
-    template: "<div ng-include='myTemplate'></div>",
+    template: '<div ng-include="myTemplate"></div>',
     controller: [
       '$scope', '$timeout', '$rootScope', '$window', '$translate',
        'messengerService', 'oppiaPlayerService', 'urlService', 'focusService',
@@ -349,7 +349,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
           }, 100);
         };
 
-        $scope.iframeReloadEprolation = function() {
+        $scope.iframeReloadExprolation = function() {
           $window.location.reload();
         };
 
@@ -415,7 +415,6 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
           if (newParams) {
             LearnerParamsService.init(newParams);
           }
-          console.log($scope.activeCard);
 
           $scope.numProgressDots++;
 
