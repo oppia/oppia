@@ -88,13 +88,14 @@ describe('Dashboard backend API service', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
+    var ERROR_STATUS_CODE = 500;
     $httpBackend.expect('GET', '/dashboardhandler/data').respond(
-      500, 'Error loading dashboard data.');
+      ERROR_STATUS_CODE, 'Error loading dashboard data.');
     DashboardBackendApiService.fetchDashboardData().then(
       successHandler, failHandler);
     $httpBackend.flush();
 
     expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Error loading dashboard data.');
+    expect(failHandler).toHaveBeenCalledWith(ERROR_STATUS_CODE);
   });
 });
