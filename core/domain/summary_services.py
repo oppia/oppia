@@ -201,7 +201,7 @@ def get_displayable_exp_summary_dicts(exploration_summaries):
     valid (i.e., none of them are None).
     """
     exploration_ids = [
-        exploration_summary.id
+        exploration_summary.id if exploration_summary else None
         for exploration_summary in exploration_summaries]
 
     view_counts = (
