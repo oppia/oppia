@@ -27,7 +27,7 @@ oppia.factory('DashboardBackendApiService', ['$http', '$q',
           }
         }, function(errorResponse) {
           if (reject) {
-            reject(errorResponse.data);
+            reject(errorResponse);
           }
         });
       });
