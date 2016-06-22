@@ -40,7 +40,15 @@ oppia.controller('Dashboard', [
     $rootScope.loadingMessage = 'Loading';
     $http.get('/dashboardhandler/data').then(function(response) {
       var data = response.data;
-      $scope.explorationsList = data.explorations_list;
+      $scope.explorationsList = data.explorations_list.sort(function(a, b) {
+        if (a.title === '' || b.title === '' || a.title > b.title) {
+          return 1;
+        }
+        if (a.title < b.title) {
+          return -1;
+        }
+        return 0;
+      });
       $scope.collectionsList = data.collections_list;
       $rootScope.loadingMessage = '';
     });

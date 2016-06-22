@@ -2112,11 +2112,11 @@ md-card.oppia-dashboard-tile {
 }
 
 .oppia-dashboard-table th {
-  padding: 12px 0;
+  padding: 12px 3px;
 }
 
 .oppia-dashboard-table td {
-  padding: 7px 0;
+  padding: 7px 3px;
 }
 
 .exploration-list-item:not(:last-child) {
