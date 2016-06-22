@@ -680,18 +680,19 @@ textarea {
   height: 198px;
 }
 
-.oppia-footer-margin{
-
-}
-
 @media (max-width: 768px) {
   .oppia-footer-padding {
     height: 464px;
+    padding-left: -100px;
   }
+  
+  .oppia-footer-container {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 30px 80px 30px 30px;
+}
 
-  .oppia-footer-margin {
-    margin-left: -60px;
-  }
 }
 
 /*
