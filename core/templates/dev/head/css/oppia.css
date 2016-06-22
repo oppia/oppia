@@ -2168,8 +2168,8 @@ ul.oppia-dashboard-tiles {
 
 .oppia-version-mismatch-modal .oppia-content {
   max-height: 700px;
-  overflow-y: scroll;
   overflow-x: hidden;
+  overflow-y: scroll;
 }
 
 .oppia-vcenter {
@@ -2498,23 +2498,23 @@ div#ng-curtain {
 }
 
 .oppia-exploration-open-threads-indicator {
-  position: absolute;
-  right: 5px;
-  width: 16px;
+  border-radius: 10%;
   bottom: 10px;
   height: 13px;
+  position: absolute;
+  right: 5px;
   text-align: center;
-  border-radius: 10%;
+  width: 16px;
 }
 .oppia-exploration-open-threads-color {
   background-color: #4078C0;
   border: 1px solid rgb(243, 243, 243);
 }
 .oppia-exploration-open-threads-count {
-  font-size: 9px;
-  position: relative;
   bottom: 8px;
   color: white;
+  font-size: 9px;
+  position: relative;
 }
 
 .dropdown-menu.oppia-editor-warnings-box {
