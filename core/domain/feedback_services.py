@@ -265,6 +265,24 @@ def enqueue_feedback_message_email_task(user_id):
         feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS)
 
 
+def _add_feedback_message_reference(user_id, reference):
+    """Creates a new instance of UnsentFeedbackEmailModel or modifies existing
+    model instance for sending feedback message email."""
+
+    model = feedback_models.UnsentFeedbackEmailModel.get(user_id, strict=False)
+
+    if model is not None:
+        model.feedback_message_references.append(reference)
+        model.put()
+
+    else:
+        model = feedback_models.UnsentFeedbackEmailModel(
+            id=user_id,
+            feedback_message_references=[reference])
+        model.put()
+        enqueue_feedback_message_email_task(user_id)
+
+
 def send_feedback_message_email(exploration_id, thread_id, message_id):
     exploration_rights = rights_manager.get_exploration_rights(exploration_id)
     feedback_message_reference = {
@@ -274,10 +292,6 @@ def send_feedback_message_email(exploration_id, thread_id, message_id):
     }
 
     for owner_id in exploration_rights.owner_ids:
-        new_instance = transaction_services.run_in_transaction(
-            feedback_models.UnsentFeedbackEmailModel.create_or_modify,
-            owner_id, feedback_message_reference)
-
-        # new_instance is True when a new model instance is created.
-        if new_instance:
-            enqueue_feedback_message_email_task(owner_id)
+        transaction_services.run_in_transaction(
+            _add_feedback_message_reference, owner_id,
+            feedback_message_reference)

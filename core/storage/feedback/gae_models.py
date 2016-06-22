@@ -308,22 +308,3 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
     # The number of failed attempts that have been made (so far) to
     # send an email to this user.
     retries = ndb.IntegerProperty(default=0, required=True, indexed=True)
-
-    @classmethod
-    def create_or_modify(cls, owner_id, feedback_message_reference):
-        """Creates a new instance of UnsentFeedbackEmailModel for sending
-        feedback message email"""
-
-        model = cls.get(owner_id, strict=False)
-        new_instance = True
-
-        if model:
-            model.feedback_message_references.append(feedback_message_reference)
-            model.put()
-            return not new_instance
-        else:
-            model = cls(
-                id=owner_id,
-                feedback_message_references=[feedback_message_reference])
-            model.put()
-            return new_instance
