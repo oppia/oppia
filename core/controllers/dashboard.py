@@ -148,9 +148,9 @@ class DashboardHandler(base.BaseHandler):
             subscription_services.get_exploration_ids_subscribed_to(
                 self.user_id))
 
-        subscribed_exploration_summaries = (
+        subscribed_exploration_summaries = filter(None, (
             exp_services.get_exploration_summaries_matching_ids(
-                exploration_ids_subscribed_to))
+                exploration_ids_subscribed_to)))
         subscribed_collection_summaries = (
             collection_services.get_collection_summaries_matching_ids(
                 subscription_services.get_collection_ids_subscribed_to(
