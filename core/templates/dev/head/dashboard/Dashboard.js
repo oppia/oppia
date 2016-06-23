@@ -17,11 +17,13 @@
  */
 
 oppia.controller('Dashboard', [
-  '$scope', '$http', '$rootScope', '$window', 'oppiaDatetimeFormatter',
-  'RatingComputationService', 'ExplorationCreationService',
+  '$scope', '$rootScope', '$window', 'oppiaDatetimeFormatter', 'alertsService',
+  'DashboardBackendApiService', 'RatingComputationService',
+  'ExplorationCreationService', 'FATAL_ERROR_CODES',
   function(
-      $scope, $http, $rootScope, $window, oppiaDatetimeFormatter,
-      RatingComputationService, ExplorationCreationService) {
+      $scope, $rootScope, $window, oppiaDatetimeFormatter, alertsService,
+      DashboardBackendApiService, RatingComputationService,
+      ExplorationCreationService, FATAL_ERROR_CODES) {
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
     $scope.createNewExploration = (
       ExplorationCreationService.createNewExploration);
@@ -38,19 +40,28 @@ oppia.controller('Dashboard', [
     };
 
     $rootScope.loadingMessage = 'Loading';
-    $http.get('/dashboardhandler/data').then(function(response) {
-      var data = response.data;
-      $scope.explorationsList = data.explorations_list.sort(function(a, b) {
-        if (a.title === '' || a.title > b.title) {
-          return 1;
+    DashboardBackendApiService.fetchDashboardData().then(
+      function(response) {
+        $scope.explorationsList = response.explorations_list.sort(
+          function(a, b) {
+            if (a.title === '' || a.title > b.title) {
+              return 1;
+            }
+            if (a.title < b.title) {
+              return -1;
+            }
+            return 0;
+          }
+        );
+        $scope.collectionsList = response.collections_list;
+        $scope.dashboardStats = response.dashboard_stats;
+        $rootScope.loadingMessage = '';
+      },
+      function(errorStatus) {
+        if (FATAL_ERROR_CODES.indexOf(errorStatus) !== -1) {
+          alertsService.addWarning('Failed to get dashboard data');
         }
-        if (a.title < b.title) {
-          return -1;
-        }
-        return 0;
-      });
-      $scope.collectionsList = data.collections_list;
-      $rootScope.loadingMessage = '';
-    });
+      }
+    );
   }
 ]);
