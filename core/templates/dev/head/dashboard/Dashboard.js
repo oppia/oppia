@@ -44,13 +44,10 @@ oppia.controller('Dashboard', [
       function(response) {
         $scope.explorationsList = response.explorations_list.sort(
           function(a, b) {
-            if (a.title === '' || a.title > b.title) {
-              return 1;
-            }
-            if (a.title < b.title) {
-              return -1;
-            }
-            return 0;
+            return (a.title === '' ? 1 :
+              b.title === '' ? -1 :
+              a.title < b.title ? -1 :
+              a.title > b.title ? 1 : 0);
           }
         );
         $scope.collectionsList = response.collections_list;
