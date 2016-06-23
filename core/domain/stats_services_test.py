@@ -17,7 +17,6 @@
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import rule_domain
 from core.domain import stats_domain
 from core.domain import stats_jobs_continuous
 from core.domain import stats_services
@@ -50,7 +49,7 @@ class AnalyticsEventHandlersUnitTests(test_utils.GenericTestBase):
     """Test the event handlers for analytics events."""
 
     DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
-    FUZZY_RULE_TYPE = rule_domain.FUZZY_RULE_TYPE
+    CLASSIFIER_RULESPEC_STR = exp_domain.CLASSIFIER_RULESPEC_STR
 
     def _record_answer(
             self, answer, exploration_id='eid', state_name='sname',
@@ -150,20 +149,22 @@ class AnalyticsEventHandlersUnitTests(test_utils.GenericTestBase):
     def test_get_top_state_answers_for_multiple_classified_rules(self):
         # There are no initial top answers for this state.
         top_answers = stats_services.get_top_state_rule_answers(
-            'eid', 'sname', [self.FUZZY_RULE_TYPE, self.DEFAULT_RULESPEC_STR])
+            'eid', 'sname',
+            [self.CLASSIFIER_RULESPEC_STR, self.DEFAULT_RULESPEC_STR])
         self.assertEquals(len(top_answers), 0)
 
         # Submit some answers.
         self._record_answer('a', rule_spec_str=self.DEFAULT_RULESPEC_STR)
         self._record_answer('a', rule_spec_str=self.DEFAULT_RULESPEC_STR)
-        self._record_answer('b', rule_spec_str=self.FUZZY_RULE_TYPE)
-        self._record_answer('b', rule_spec_str=self.FUZZY_RULE_TYPE)
-        self._record_answer('b', rule_spec_str=self.FUZZY_RULE_TYPE)
-        self._record_answer('c', rule_spec_str=self.FUZZY_RULE_TYPE)
+        self._record_answer('b', rule_spec_str=self.CLASSIFIER_RULESPEC_STR)
+        self._record_answer('b', rule_spec_str=self.CLASSIFIER_RULESPEC_STR)
+        self._record_answer('b', rule_spec_str=self.CLASSIFIER_RULESPEC_STR)
+        self._record_answer('c', rule_spec_str=self.CLASSIFIER_RULESPEC_STR)
         self._record_answer('c', rule_spec_str=self.DEFAULT_RULESPEC_STR)
 
         top_answers = stats_services.get_top_state_rule_answers(
-            'eid', 'sname', [self.FUZZY_RULE_TYPE, self.DEFAULT_RULESPEC_STR])
+            'eid', 'sname',
+            [self.CLASSIFIER_RULESPEC_STR, self.DEFAULT_RULESPEC_STR])
         self.assertEquals(len(top_answers), 3)
         # Rules across multiple rule types are combined and still sorted by
         # frequency.
