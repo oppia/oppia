@@ -312,10 +312,9 @@ def get_exploration_summaries_matching_ids(exp_ids):
     summary domain objects (or None if the corresponding summary does not
     exist).
     """
-    return [
-        (get_exploration_summary_from_model(model) if model else None)
-        for model in exp_models.ExpSummaryModel.get_multi(exp_ids)]
-
+    return map(
+        get_exploration_summary_from_model,
+        filter(None, exp_models.ExpSummaryModel.get_multi(exp_ids)))
 
 def get_exploration_ids_matching_query(query_string, cursor=None):
     """Returns a list with all exploration ids matching the given search query
