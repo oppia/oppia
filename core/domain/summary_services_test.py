@@ -14,15 +14,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from core.domain import collection_domain
+from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import exp_services_test
+from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import summary_services
 from core.domain import user_services
+from core.tests import test_utils
 import feconf
+import utils
 
 
-class ExplorationDisplayableSummaries(
+class ExplorationDisplayableSummariesTest(
         exp_services_test.ExplorationServicesUnitTests):
     """Test functions for getting displayable exploration summary dicts."""
 
@@ -68,7 +73,7 @@ class ExplorationDisplayableSummaries(
         - (3) User_4 edits the title of EXP_ID_4.
         """
 
-        super(ExplorationDisplayableSummaries, self).setUp()
+        super(ExplorationDisplayableSummariesTest, self).setUp()
 
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
@@ -142,11 +147,13 @@ class ExplorationDisplayableSummaries(
         self.assertEqual({
             self.ALBERT_NAME: {
                 'num_commits': 10,
-                'profile_picture_data_url': None
+                'profile_picture_data_url': (
+                    user_services.DEFAULT_IDENTICON_DATA_URL)
             },
             self.BOB_NAME: {
                 'num_commits': 13,
-                'profile_picture_data_url': None
+                'profile_picture_data_url': (
+                    user_services.DEFAULT_IDENTICON_DATA_URL)
             }
         }, summary_services.get_human_readable_contributors_summary(
             contributors_summary))
@@ -159,7 +166,8 @@ class ExplorationDisplayableSummaries(
             },
             self.USER_D_NAME: {
                 'num_commits': 2,
-                'profile_picture_data_url': None
+                'profile_picture_data_url': (
+                    user_services.DEFAULT_IDENTICON_DATA_URL)
             }
         }, summary_services.get_human_readable_contributors_summary(
             contributors_summary))
@@ -176,24 +184,18 @@ class ExplorationDisplayableSummaries(
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
                 [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5]))
         expected_summary = {
-            'status': u'public',
-            'thumbnail_bg_color': '#05a69a',
-            'community_owned': False,
-            'tags': [],
-            'thumbnail_icon_url': '/images/gallery/thumbnails/Lightbulb.svg',
-            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
-            'human_readable_contributors_summary': {
-                self.ALBERT_NAME: {
-                    'num_commits': 2,
-                    'profile_picture_data_url': None
-                }
-            },
-            'id': self.EXP_ID_2,
             'category': u'A category',
-            'ratings': feconf.get_empty_ratings(),
-            'title': u'Exploration 2 Albert title',
+            'community_owned': False,
+            'id': self.EXP_ID_2,
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'num_views': 0,
-            'objective': u'An objective'
+            'objective': u'An objective',
+            'ratings': feconf.get_empty_ratings(),
+            'status': 'public',
+            'tags': [],
+            'thumbnail_bg_color': '#a33f40',
+            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
+            'title': u'Exploration 2 Albert title',
         }
         self.assertIn('last_updated_msec', displayable_summaries[0])
         self.assertDictContainsSubset(expected_summary,
@@ -211,8 +213,8 @@ class ExplorationDisplayableSummaries(
         self.assertEqual(displayable_summaries[0]['id'], self.EXP_ID_1)
         self.assertEqual(displayable_summaries[1]['id'], self.EXP_ID_2)
 
-        # However, if Albert is granted editor access to Bob's exploration, then
-        # Albert has access to the corresponding summary.
+        # However, if Albert is granted editor access to Bob's exploration,
+        # then Albert has access to the corresponding summary.
         rights_manager.assign_role_for_exploration(
             self.bob_id, self.EXP_ID_5, self.albert_id,
             rights_manager.ROLE_EDITOR)
@@ -231,3 +233,534 @@ class ExplorationDisplayableSummaries(
 
         self.assertEqual(displayable_summaries[2]['status'], 'private')
         self.assertEqual(displayable_summaries[2]['id'], self.EXP_ID_5)
+
+
+class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
+    """Test functions for getting summary dicts for library groups."""
+
+    def setUp(self):
+        """Populate the database of explorations and their summaries.
+
+        The sequence of events is:
+        - (1) Admin logs in.
+        - (2) Admin access admin page.
+        - (3) Admin reloads exploration with id '2'.
+        - (4) Admin logs out.
+        """
+
+        super(LibraryGroupsTest, self).setUp()
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        response = self.testapp.get('/admin')
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.post_json('/adminhandler', {
+            'action': 'reload_exploration',
+            'exploration_id': '2'
+        }, csrf_token)
+        self.logout()
+
+    def test_get_library_groups(self):
+        """The exploration with id '2' is an exploration in the Mathematics
+        category. The call to get_library_groups() should return the
+        exploration as part of the Mathematics & Statistics group.
+        """
+        library_groups = summary_services.get_library_groups([])
+        expected_exploration_summary_dict = {
+            'category': u'Algorithms',
+            'community_owned': True,
+            'id': '2',
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'num_views': 0,
+            'objective': u'discover the binary search algorithm',
+            'ratings': feconf.get_empty_ratings(),
+            'status': u'public',
+            'tags': [],
+            'title':  u'The Lazy Magician',
+            'thumbnail_bg_color': '#d0982a',
+            'thumbnail_icon_url': '/images/subjects/Algorithms.svg',
+        }
+        expected_group = {
+            'categories': ['Algorithms', 'Computing', 'Programming'],
+            'header': 'Computing',
+        }
+
+        self.assertEqual(len(library_groups), 1)
+        self.assertDictContainsSubset(expected_group, library_groups[0])
+        self.assertEqual(
+            len(library_groups[0]['activity_summary_dicts']), 1)
+        actual_exploration_summary_dict = (
+            library_groups[0]['activity_summary_dicts'][0])
+        self.assertDictContainsSubset(expected_exploration_summary_dict, (
+            actual_exploration_summary_dict))
+
+
+class FeaturedExplorationDisplayableSummariesTest(
+        test_utils.GenericTestBase):
+    """Test functions for getting displayable featured exploration
+    summary dicts.
+    """
+
+    ALBERT_NAME = 'albert'
+    ALBERT_EMAIL = 'albert@example.com'
+
+    EXP_ID_1 = 'eid1'
+    EXP_ID_2 = 'eid2'
+
+    def setUp(self):
+        """Populate the database of explorations and their summaries.
+
+        The sequence of events is:
+        - (1) Albert creates EXP_ID_1.
+        - (2) Albert creates EXP_ID_2.
+        - (3) Albert publishes EXP_ID_1.
+        - (4) Albert publishes EXP_ID_2.
+        - (5) Admin user is set up.
+        """
+
+        super(FeaturedExplorationDisplayableSummariesTest, self).setUp()
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+
+        self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
+        self.save_new_valid_exploration(self.EXP_ID_2, self.albert_id)
+
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_1)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_2)
+
+        self.set_admins([self.ADMIN_USERNAME])
+
+    def test_for_featured_explorations(self):
+        """Note that EXP_ID_1 is public, and EXP_ID_2 is publicized.
+        The call to get_featured_explorations() should only return
+        [EXP_ID_2].
+        """
+
+        rights_manager.publicize_exploration(self.admin_id, self.EXP_ID_2)
+
+        featured_exploration_summaries = (
+            summary_services.get_featured_exploration_summary_dicts([
+                feconf.DEFAULT_LANGUAGE_CODE]))
+        expected_summary = {
+            'status': u'publicized',
+            'thumbnail_bg_color': '#a33f40',
+            'community_owned': False,
+            'tags': [],
+            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'id': self.EXP_ID_2,
+            'category': u'A category',
+            'ratings': feconf.get_empty_ratings(),
+            'title': u'A title',
+            'num_views': 0,
+            'objective': u'An objective'
+        }
+        self.assertDictContainsSubset(
+            expected_summary, featured_exploration_summaries[0])
+
+
+class CollectionLearnerDictTests(test_utils.GenericTestBase):
+    """Test get_learner_collection_dict_by_id."""
+
+    EXP_ID = 'exploration_id'
+    EXP_ID_1 = 'exp_id1'
+    COLLECTION_ID = 'A_collection_id'
+
+    def setUp(self):
+        super(CollectionLearnerDictTests, self).setUp()
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        user_services.get_or_create_user(self.owner_id, self.OWNER_EMAIL)
+        user_services.get_or_create_user(self.editor_id, self.EDITOR_EMAIL)
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+
+    def test_get_learner_dict_with_deleted_exp_fails_validation(self):
+        self.save_new_valid_collection(
+            self.COLLECTION_ID, self.owner_id, exploration_id=self.EXP_ID)
+        summary_services.get_learner_collection_dict_by_id(
+            self.COLLECTION_ID, self.owner_id)
+
+        exp_services.delete_exploration(self.owner_id, self.EXP_ID)
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected collection to only reference valid explorations, but '
+            'found an exploration with ID: exploration_id'):
+            summary_services.get_learner_collection_dict_by_id(
+                self.COLLECTION_ID, self.owner_id)
+
+    def test_get_learner_dict_when_referencing_inaccessible_explorations(self):
+        self.save_new_default_collection(self.COLLECTION_ID, self.owner_id)
+        self.save_new_valid_exploration(self.EXP_ID, self.editor_id)
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                'exploration_id': self.EXP_ID
+            }], 'Added another creator\'s private exploration')
+
+        # A collection cannot access someone else's private exploration.
+        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected collection to only reference valid explorations, but '
+            'found an exploration with ID: exploration_id'):
+            summary_services.get_learner_collection_dict_by_id(
+                self.COLLECTION_ID, self.owner_id)
+
+        # After the exploration is published, the dict can now be created.
+        rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
+        summary_services.get_learner_collection_dict_by_id(
+            self.COLLECTION_ID, self.owner_id)
+
+    def test_get_learner_dict_with_private_exp_fails_validation(self):
+        self.save_new_valid_collection(
+            self.COLLECTION_ID, self.owner_id, exploration_id=self.EXP_ID)
+
+        # Since both the collection and exploration are private, the learner
+        # dict can be created.
+        summary_services.get_learner_collection_dict_by_id(
+            self.COLLECTION_ID, self.owner_id)
+
+        # A public collection referencing a private exploration is bad, however.
+        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Cannot reference a private exploration within a public '
+            'collection, exploration ID: exploration_id'):
+            summary_services.get_learner_collection_dict_by_id(
+                self.COLLECTION_ID, self.owner_id)
+
+        # After the exploration is published, the learner dict can be crated
+        # again.
+        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
+        summary_services.get_learner_collection_dict_by_id(
+            self.COLLECTION_ID, self.owner_id)
+
+    def test_get_learner_dict_with_allowed_private_exps(self):
+        self.save_new_valid_collection(
+            self.COLLECTION_ID, self.owner_id, exploration_id=self.EXP_ID)
+        self.save_new_valid_exploration(self.EXP_ID_1, self.editor_id)
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                'exploration_id': self.EXP_ID_1
+            }], 'Added another creator\'s private exploration')
+
+        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
+
+        collection_dict = summary_services.get_learner_collection_dict_by_id(
+            self.COLLECTION_ID, self.owner_id, allow_invalid_explorations=True)
+
+        # The author's private exploration will be contained in the public
+        # collection since invalid explorations are being allowed, but the
+        # private exploration of another author will not.
+        collection_node_dicts = collection_dict['nodes']
+        self.assertEqual(
+            collection_node_dicts[0]['exploration_summary']['id'],
+            self.EXP_ID)
+        self.assertIsNone(collection_node_dicts[1]['exploration_summary'])
+
+
+class TopRatedExplorationDisplayableSummariesTest(
+        test_utils.GenericTestBase):
+    """Test functions for getting displayable top rated exploration
+    summary dicts.
+    """
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALICE_EMAIL = 'alice@example.com'
+    BOB_EMAIL = 'bob@example.com'
+    ALBERT_NAME = 'albert'
+    ALICE_NAME = 'alice'
+    BOB_NAME = 'bob'
+
+    EXP_ID_1 = 'eid1'
+    EXP_ID_2 = 'eid2'
+    EXP_ID_3 = 'eid3'
+    EXP_ID_4 = 'eid4'
+    EXP_ID_5 = 'eid5'
+    EXP_ID_6 = 'eid6'
+    EXP_ID_7 = 'eid7'
+    EXP_ID_8 = 'eid8'
+    EXP_ID_9 = 'eid9'
+
+    def setUp(self):
+        """Populate the database of explorations and their summaries.
+
+        The sequence of events is:
+        - (1) Albert creates EXP_ID_1.
+        - (2) Albert creates EXP_ID_2.
+        - (3) Albert creates EXP_ID_3.
+        - (4) Albert creates EXP_ID_4.
+        - (5) Albert creates EXP_ID_5.
+        - (6) Albert creates EXP_ID_6.
+        - (7) Albert creates EXP_ID_7.
+        - (8) Albert creates EXP_ID_8.
+        - (9) Albert creates EXP_ID_9.
+        - (10) Albert publishes EXP_ID_1.
+        - (11) Albert publishes EXP_ID_2.
+        - (12) Albert publishes EXP_ID_3.
+        - (13) Albert publishes EXP_ID_4.
+        - (14) Albert publishes EXP_ID_5.
+        - (15) Albert publishes EXP_ID_6.
+        - (16) Albert publishes EXP_ID_7.
+        - (17) Albert publishes EXP_ID_8.
+        - (18) Albert publishes EXP_ID_9.
+        - (19) Admin user is set up.
+        """
+
+        super(TopRatedExplorationDisplayableSummariesTest, self).setUp()
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.alice_id = self.get_user_id_from_email(self.ALICE_EMAIL)
+        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
+
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.signup(self.ALICE_EMAIL, self.ALICE_NAME)
+        self.signup(self.BOB_EMAIL, self.BOB_NAME)
+
+        self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
+        self.save_new_valid_exploration(self.EXP_ID_2, self.albert_id)
+        self.save_new_valid_exploration(self.EXP_ID_3, self.albert_id)
+        self.save_new_valid_exploration(self.EXP_ID_4, self.albert_id)
+        self.save_new_valid_exploration(self.EXP_ID_5, self.albert_id)
+        self.save_new_valid_exploration(self.EXP_ID_6, self.albert_id)
+        self.save_new_valid_exploration(self.EXP_ID_7, self.albert_id)
+        self.save_new_valid_exploration(self.EXP_ID_8, self.albert_id)
+        self.save_new_valid_exploration(self.EXP_ID_9, self.albert_id)
+
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_1)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_2)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_3)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_4)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_5)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_6)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_7)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_8)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_9)
+
+        self.set_admins([self.ADMIN_USERNAME])
+
+    def test_at_most_eight_top_rated_explorations(self):
+        """Note that at most 8 explorations should be returned.
+        """
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_2, 5)
+        rating_services.assign_rating_to_exploration(
+            self.alice_id, self.EXP_ID_3, 5)
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_3, 4)
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_4, 4)
+        rating_services.assign_rating_to_exploration(
+            self.alice_id, self.EXP_ID_5, 4)
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_5, 3)
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_6, 3)
+        rating_services.assign_rating_to_exploration(
+            self.alice_id, self.EXP_ID_6, 2)
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_8, 2)
+        rating_services.assign_rating_to_exploration(
+            self.alice_id, self.EXP_ID_8, 2)
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_7, 2)
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_9, 2)
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_1, 1)
+
+        top_rated_exploration_summaries = (
+            summary_services.get_top_rated_exploration_summary_dicts([
+                feconf.DEFAULT_LANGUAGE_CODE]))
+        expected_summary = {
+            'status': u'public',
+            'thumbnail_bg_color': '#a33f40',
+            'community_owned': False,
+            'tags': [],
+            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'id': self.EXP_ID_3,
+            'category': u'A category',
+            'ratings': {u'1': 0, u'3': 0, u'2': 0, u'5': 1, u'4': 1},
+            'title': u'A title',
+            'num_views': 0,
+            'objective': u'An objective'
+        }
+
+        self.assertDictContainsSubset(
+            expected_summary, top_rated_exploration_summaries[0])
+
+        expected_ordering = [
+            self.EXP_ID_3, self.EXP_ID_2, self.EXP_ID_5, self.EXP_ID_4,
+            self.EXP_ID_6, self.EXP_ID_8, self.EXP_ID_7, self.EXP_ID_9]
+
+        actual_ordering = [exploration['id'] for exploration in
+                           top_rated_exploration_summaries]
+
+        self.assertEqual(expected_ordering, actual_ordering)
+
+    def test_only_explorations_with_ratings_are_returned(self):
+        """Note that only explorations with ratings will be included
+        """
+        rating_services.assign_rating_to_exploration(
+            self.bob_id, self.EXP_ID_2, 5)
+
+        top_rated_exploration_summaries = (
+            summary_services.get_top_rated_exploration_summary_dicts([
+                feconf.DEFAULT_LANGUAGE_CODE]))
+
+        expected_summary = {
+            'status': u'public',
+            'thumbnail_bg_color': '#a33f40',
+            'community_owned': False,
+            'tags': [],
+            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'id': self.EXP_ID_2,
+            'category': u'A category',
+            'ratings': {u'1': 0, u'3': 0, u'2': 0, u'5': 1, u'4': 0},
+            'title': u'A title',
+            'num_views': 0,
+            'objective': u'An objective'
+        }
+        self.assertDictContainsSubset(
+            expected_summary, top_rated_exploration_summaries[0])
+
+        expected_ordering = [self.EXP_ID_2]
+
+        actual_ordering = [exploration['id'] for exploration in
+                           top_rated_exploration_summaries]
+
+        self.assertEqual(expected_ordering, actual_ordering)
+
+
+class RecentlyPublishedExplorationDisplayableSummariesTest(
+        test_utils.GenericTestBase):
+    """Test functions for getting displayable recently published exploration
+    summary dicts.
+    """
+
+    ALBERT_NAME = 'albert'
+    ALBERT_EMAIL = 'albert@example.com'
+
+    EXP_ID_1 = 'eid1'
+    EXP_ID_2 = 'eid2'
+    EXP_ID_3 = 'eid3'
+
+    def setUp(self):
+        """Populate the database of explorations and their summaries.
+
+        The sequence of events is:
+        - (1) Albert creates EXP_ID_1.
+        - (2) Albert creates EXP_ID_2.
+        - (3) Albert creates EXP_ID_3.
+        - (4) Albert publishes EXP_ID_1.
+        - (5) Albert publishes EXP_ID_2.
+        - (6) Albert publishes EXP_ID_3.
+        - (7) Admin user is set up.
+        """
+
+        super(RecentlyPublishedExplorationDisplayableSummariesTest,
+              self).setUp()
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+
+        self.save_new_valid_exploration(
+            self.EXP_ID_1, self.albert_id,
+            end_state_name='End')
+        self.save_new_valid_exploration(
+            self.EXP_ID_2, self.albert_id,
+            end_state_name='End')
+        self.save_new_valid_exploration(
+            self.EXP_ID_3, self.albert_id,
+            end_state_name='End')
+
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_2)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_1)
+        rights_manager.publish_exploration(self.albert_id, self.EXP_ID_3)
+
+        self.set_admins([self.ADMIN_USERNAME])
+
+    def test_for_recently_published_explorations(self):
+        """ Tests for recently published explorations.
+        """
+
+        recently_published_exploration_summaries = (
+            summary_services.get_recently_published_exploration_summary_dicts())
+        test_summary_1 = {
+            'status': 'public',
+            'thumbnail_bg_color': '#a33f40',
+            'community_owned': False,
+            'tags': [],
+            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'id': self.EXP_ID_1,
+            'category': u'A category',
+            'ratings': feconf.get_empty_ratings(),
+            'title': u'A title',
+            'num_views': 0,
+            'objective': u'An objective'
+        }
+        test_summary_2 = {
+            'status': 'public',
+            'thumbnail_bg_color': '#a33f40',
+            'community_owned': False,
+            'tags': [],
+            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'id': self.EXP_ID_2,
+            'category': u'A category',
+            'ratings': feconf.get_empty_ratings(),
+            'title': u'A title',
+            'num_views': 0,
+            'objective': u'An objective'
+        }
+        test_summary_3 = {
+            'status': 'public',
+            'thumbnail_bg_color': '#a33f40',
+            'community_owned': False,
+            'tags': [],
+            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'id': self.EXP_ID_3,
+            'category': u'A category',
+            'ratings': feconf.get_empty_ratings(),
+            'title': u'A title',
+            'num_views': 0,
+            'objective': u'An objective'
+        }
+
+        self.assertDictContainsSubset(
+            test_summary_3, recently_published_exploration_summaries[0])
+        self.assertDictContainsSubset(
+            test_summary_1, recently_published_exploration_summaries[1])
+        self.assertDictContainsSubset(
+            test_summary_2, recently_published_exploration_summaries[2])
+
+        # Test that editing an exploration does not change its
+        # 'recently-published' status.
+        exp_services.update_exploration(
+            self.albert_id, self.EXP_ID_1, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'New title'
+            }], 'Changed title.')
+
+        recently_published_exploration_summaries = (
+            summary_services.get_recently_published_exploration_summary_dicts())
+        self.assertEqual(
+            recently_published_exploration_summaries[1]['title'], 'New title')
+        self.assertDictContainsSubset(
+            test_summary_3, recently_published_exploration_summaries[0])

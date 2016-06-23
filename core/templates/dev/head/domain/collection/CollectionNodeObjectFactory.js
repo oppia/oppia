@@ -65,7 +65,8 @@ oppia.factory('CollectionNodeObjectFactory', [
     // function is undefined if doesExplorationExist() returns false.
     CollectionNode.prototype.isExplorationPrivate = function() {
       if (this._explorationSummaryObject) {
-        return this._explorationSummaryObject.status == ACTIVITY_STATUS_PRIVATE;
+        return this._explorationSummaryObject.status === (
+          ACTIVITY_STATUS_PRIVATE);
       } else {
         return undefined;
       }
@@ -91,7 +92,7 @@ oppia.factory('CollectionNodeObjectFactory', [
     // this function is null if doesExplorationExist() returns false.
     CollectionNode.prototype.getExplorationSummaryObject = function() {
       // TODO(bhenning): This should be represented by a frontend summary domain
-      // object that is also shared with the gallery and profile pages.
+      // object that is also shared with the search result and profile pages.
       return angular.copy(this._explorationSummaryObject);
     };
 

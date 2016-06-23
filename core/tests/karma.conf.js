@@ -1,5 +1,5 @@
 var argv = require('yargs').argv;
-var isMinificationNeeded = (argv.minify == 'True');
+var isMinificationNeeded = (argv.minify === 'True');
 var generatedJs = 'third_party/generated/dev/js/third_party.js';
 if (isMinificationNeeded) {
   generatedJs = 'third_party/generated/prod/js/third_party.min.js';
@@ -26,7 +26,14 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*.js',
       'core/templates/dev/head/components/rating_display.html',
       'extensions/**/*.js',
-      'extensions/interactions/**/*.html'
+      'extensions/interactions/**/*.html',
+      'extensions/interactions/rules.json',
+      {
+        pattern: 'i18n/**/*.json',
+        watched: true,
+        served: true,
+        included: false
+      }
     ],
     exclude: [
       'core/templates/dev/head/**/*-e2e.js',
@@ -46,17 +53,18 @@ module.exports = function(config) {
       // for it, which is easily fixed.
       'core/templates/dev/head/admin/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/collection_player/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/collection_editor/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/components/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/css/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/dashboard/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/domain/editor/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/domain/collection/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/domain/utilities/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/editor/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/exploration_editor/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/error/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/expressions/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/forms/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/galleries/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/library/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/moderator/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/pages/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/player/!(*Spec).js': ['coverage'],
@@ -68,7 +76,8 @@ module.exports = function(config) {
       // Jinja expressions. They should also be specified within the 'files'
       // list above.
       'core/templates/dev/head/components/rating_display.html': ['ng-html2js'],
-      'extensions/interactions/**/*.html': ['ng-html2js']
+      'extensions/interactions/**/*.html': ['ng-html2js'],
+      'extensions/interactions/rules.json': ['json_fixtures']
     },
     reporters: ['progress', 'coverage'],
     coverageReporter: {
@@ -94,9 +103,11 @@ module.exports = function(config) {
       }
     },
     plugins: [
+      'karma-jasmine-jquery',
       'karma-jasmine',
       'karma-chrome-launcher',
       'karma-ng-html2js-preprocessor',
+      'karma-json-fixtures-preprocessor',
       'karma-coverage'
     ],
     ngHtml2JsPreprocessor: {
@@ -104,6 +115,9 @@ module.exports = function(config) {
         return filepath;
       },
       moduleName: 'directiveTemplates'
+    },
+    jsonFixturesPreprocessor: {
+      variableName: '__fixtures__'
     }
   });
 };

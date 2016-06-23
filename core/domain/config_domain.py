@@ -1,3 +1,5 @@
+# coding: utf-8
+#
 # Copyright 2014 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,15 +41,28 @@ class ConfigProperty(object):
 
     NOTE TO DEVELOPERS: These config properties are deprecated. Do not reuse
     these names:
+    - about_page_youtube_video_id
     - admin_email_address
+    - allow_yaml_file_upload
     - banner_alt_text
+    - before_end_body_tag_hook
+    - carousel_slides_config
+    - contact_email_address
     - contribute_gallery_page_announcement
+    - disabled_explorations
     - editor_page_announcement
     - editor_prerequisites_agreement
+    - embedded_google_group_url
     - full_site_url
+    - moderator_request_forum_url
+    - sharing_options
     - sharing_options_twitter_text
+    - sidebar_menu_additional_links
+    - site_forum_url
+    - social_media_buttons
     - splash_page_exploration_id
     - splash_page_exploration_version
+    - splash_page_youtube_video_id
     """
 
     def refresh_default_value(self, default_value):

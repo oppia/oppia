@@ -76,7 +76,7 @@ oppia.directive('oppiaInteractiveGraphInput', [
           if (checkValidGraph(newGraph)) {
             $scope.graph = newGraph;
           } else {
-            $scope.errorMessage = 'Invalid graph!';
+            $scope.errorMessage = 'I18N_INTERACTIONS_GRAPH_ERROR_INVALID';
           }
         };
 
@@ -284,28 +284,28 @@ oppia.directive('graphViz', function() {
           if ($scope.canMoveVertex) {
             $scope.buttons.push({
               text: '\uE068',
-              description: 'Move',
+              description: 'I18N_INTERACTIONS_GRAPH_MOVE',
               mode: _MODES.MOVE
             });
           }
           if ($scope.canAddEdge) {
             $scope.buttons.push({
               text: '\uE144',
-              description: 'Add Edge',
+              description: 'I18N_INTERACTIONS_GRAPH_ADD_EDGE',
               mode: _MODES.ADD_EDGE
             });
           }
           if ($scope.canAddVertex) {
             $scope.buttons.push({
               text: '\u002B',
-              description: 'Add Node',
+              description: 'I18N_INTERACTIONS_GRAPH_ADD_NODE',
               mode: _MODES.ADD_VERTEX
             });
           }
           if ($scope.canDeleteVertex || $scope.canDeleteEdge) {
             $scope.buttons.push({
               text: '\u2212',
-              description: 'Delete',
+              description: 'I18N_INTERACTIONS_GRAPH_DELETE',
               mode: _MODES.DELETE
             });
           }
@@ -652,13 +652,13 @@ oppia.factory('graphUtilsService', [function() {
       isVisited[currentVertex] = this.DFS_STATUS.STILL_VISITING;
       for (var i = 0; i < adjacencyLists[currentVertex].length; i++) {
         var nextVertex = adjacencyLists[currentVertex][i];
-        if (nextVertex == previousVertex && !isDirected) {
+        if (nextVertex === previousVertex && !isDirected) {
           continue;
         }
-        if (isVisited[nextVertex] == this.DFS_STATUS.STILL_VISITING) {
+        if (isVisited[nextVertex] === this.DFS_STATUS.STILL_VISITING) {
           return true;
         }
-        if (isVisited[nextVertex] == this.DFS_STATUS.UNVISITED &&
+        if (isVisited[nextVertex] === this.DFS_STATUS.UNVISITED &&
             this.findCycle(
             nextVertex, currentVertex, adjacencyLists, isVisited, isDirected)) {
           return true;
@@ -721,7 +721,7 @@ oppia.factory('graphUtilsService', [function() {
       var numVertices = adj1.length;
       for (var i = 0; i < numVertices; i++) {
         for (var j = 0; j < numVertices; j++) {
-          if (adj1[permutation[i]][permutation[j]] != adj2[i][j]) {
+          if (adj1[permutation[i]][permutation[j]] !== adj2[i][j]) {
             return false;
           }
         }
@@ -777,7 +777,7 @@ oppia.factory('graphInputRulesService', [
   var isWeaklyConnected = function(graph) {
     // Generates adjacency lists assuming graph is undirected, then uses depth
     // first search on node 0 to try to reach every other vertex
-    if (graph.vertices.length == 0) {
+    if (graph.vertices.length === 0) {
       return true;
     }
 
@@ -808,7 +808,7 @@ oppia.factory('graphInputRulesService', [
     for (var startVertex = 0;
          startVertex < graph.vertices.length;
          startVertex++) {
-      if (isVisited[startVertex] == graphUtilsService.DFS_STATUS.UNVISITED) {
+      if (isVisited[startVertex] === graphUtilsService.DFS_STATUS.UNVISITED) {
         if (graphUtilsService.findCycle(
             startVertex, -1, adjacencyLists, isVisited, graph.isDirected)) {
           return false;
@@ -843,16 +843,16 @@ oppia.factory('graphInputRulesService', [
     });
 
     var areIndegreeCountsEqual = indegreeCounts.every(function(indegree) {
-      return indegree == indegreeCounts[0];
+      return indegree === indegreeCounts[0];
     });
     var areOutdegreeCountsEqual = outdegreeCounts.every(function(outdegree) {
-      return outdegree == outdegreeCounts[0];
+      return outdegree === outdegreeCounts[0];
     });
     return areIndegreeCountsEqual && areOutdegreeCountsEqual;
   };
 
   var isIsomorphic = function(graph1, graph2) {
-    if (graph1.vertices.length != graph2.vertices.length) {
+    if (graph1.vertices.length !== graph2.vertices.length) {
       return false;
     }
 
@@ -886,7 +886,7 @@ oppia.factory('graphInputRulesService', [
     while (permutation !== null) {
       var doLabelsMatch = (!graph1.isLabeled && !graph2.isLabeled) ||
         graph2.vertices.every(function(vertex, index) {
-          return vertex.label == graph1.vertices[permutation[index]].label;
+          return vertex.label === graph1.vertices[permutation[index]].label;
         });
       if (doLabelsMatch &&
           graphUtilsService.areAdjacencyMatricesEqualWithPermutation(
@@ -900,13 +900,13 @@ oppia.factory('graphInputRulesService', [
 
   return {
     HasGraphProperty: function(answer, inputs) {
-      if (inputs.p == 'strongly_connected') {
+      if (inputs.p === 'strongly_connected') {
         return isStronglyConnected(answer);
-      } else if (inputs.p == 'weakly_connected') {
+      } else if (inputs.p === 'weakly_connected') {
         return isWeaklyConnected(answer);
-      } else if (inputs.p == 'acyclic') {
+      } else if (inputs.p === 'acyclic') {
         return isAcyclic(answer);
-      } else if (inputs.p == 'regular') {
+      } else if (inputs.p === 'regular') {
         return isRegular(answer);
       } else {
         return false;
@@ -914,11 +914,6 @@ oppia.factory('graphInputRulesService', [
     },
     IsIsomorphicTo: function(answer, inputs) {
       return isIsomorphic(answer, inputs.g);
-    },
-    FuzzyMatches: function(answer, inputs) {
-      return inputs.training_data.some(function(trainingGraph) {
-        return isIsomorphic(answer, trainingGraph);
-      });
     }
   };
 }]);

@@ -49,14 +49,18 @@ class UserSettingsModel(base_models.BaseModel):
     # The time, in milliseconds, when the user first contributed to Oppia.
     # May be None.
     first_contribution_msec = ndb.FloatProperty(default=None)
-    # Language preferences specified by the user.
+    # Exploration language preferences specified by the user.
     # TODO(sll): Add another field for the language that the user wants the
     # site to display in. These language preferences are mainly for the purpose
-    # of figuring out what to show by default in the gallery.
+    # of figuring out what to show by default in the library index page.
     preferred_language_codes = ndb.StringProperty(
         repeated=True,
         indexed=True,
         choices=[lc['code'] for lc in feconf.ALL_LANGUAGE_CODES])
+    # System language preference (for I18N).
+    preferred_site_language_code = ndb.StringProperty(
+        default=None,
+        choices=feconf.SUPPORTED_SITE_LANGUAGES.keys())
 
     @classmethod
     def is_normalized_username_taken(cls, normalized_username):
@@ -96,6 +100,11 @@ class UserEmailPreferencesModel(base_models.BaseModel):
     # None if the user has never set a preference.
     site_updates = ndb.BooleanProperty(indexed=True)
 
+    # The user's preference for receiving email when user is added as a member
+    # in exploration. This is set to True when user has never set a preference.
+    editor_role_notifications = ndb.BooleanProperty(
+        indexed=True, default=feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+
 
 class UserSubscriptionsModel(base_models.BaseModel):
     """A list of things that a user subscribes to.
@@ -127,7 +136,13 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
 
 
 class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
-    """The impact score for a particular user, where impact is defined as:
+    """User-specific statistics keyed by user id.
+    Values for total plays and average ratings are recorded by aggregating over
+    all explorations owned by a user.
+    Impact scores are calculated over explorations for which a user
+    is listed as a contributor
+
+    The impact score for a particular user is defined as:
     Sum of (
     ln(playthroughs) * (ratings_scaler) * (average(ratings) - 2.5))
     *(multiplier),
@@ -136,12 +151,15 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
     The impact score is 0 for an exploration with 0 playthroughs or with an
     average rating of less than 2.5.
-
-    Impact scores are calculated over explorations for which a user
-    is listed as a contributor. Keys for this model are user_ids.
     """
     # The impact score.
     impact_score = ndb.FloatProperty(indexed=True)
+
+    # The total plays of all the explorations.
+    total_plays = ndb.IntegerProperty(indexed=True)
+
+    # The average of average ratings of all explorations.
+    average_ratings = ndb.FloatProperty(indexed=True)
 
 
 class ExplorationUserDataModel(base_models.BaseModel):

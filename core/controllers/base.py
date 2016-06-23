@@ -24,7 +24,6 @@ import os
 import sys
 import time
 import traceback
-import urllib
 import urlparse
 
 import jinja2
@@ -62,104 +61,10 @@ BEFORE_END_HEAD_TAG_HOOK = config_domain.ConfigProperty(
         },
     },
     'Code to insert just before the closing </head> tag in all pages.', '')
-BEFORE_END_BODY_TAG_HOOK = config_domain.ConfigProperty(
-    'before_end_body_tag_hook', {
-        'type': 'unicode',
-        'ui_config': {
-            'rows': 7,
-        },
-    },
-    'Code to insert just before the closing </body> tag in all pages.', '')
-
-SIDEBAR_MENU_ADDITIONAL_LINKS = config_domain.ConfigProperty(
-    'sidebar_menu_additional_links', {
-        'type': 'list',
-        'items': {
-            'type': 'dict',
-            'properties': [{
-                'name': 'name',
-                'description': 'Text of the menu item',
-                'schema': {'type': 'unicode'},
-            }, {
-                'name': 'link',
-                'description': 'The link to open in a new tab',
-                'schema': {'type': 'unicode'},
-            }, {
-                'name': 'icon_filename',
-                'description': (
-                    'Filename of the menu icon (in /images/sidebar)'),
-                'schema': {'type': 'unicode'},
-            }]
-        }
-    },
-    'Additional links to show in the sidebar menu.',
-    default_value=[{
-        'name': 'Blog',
-        'link': 'http://site/blog/url',
-        'icon_filename': 'comment.png',
-    }])
 
 SITE_FEEDBACK_FORM_URL = config_domain.ConfigProperty(
     'site_feedback_form_url', {'type': 'unicode'},
     'Site feedback form URL (leave blank if there is no such form)', '')
-
-SHARING_OPTIONS = config_domain.ConfigProperty(
-    'sharing_options', {
-        'type': 'dict',
-        'properties': [{
-            'name': 'gplus',
-            'schema': {
-                'type': 'bool',
-            }
-        }, {
-            'name': 'facebook',
-            'schema': {
-                'type': 'bool',
-            }
-        }, {
-            'name': 'twitter',
-            'schema': {
-                'type': 'bool',
-            }
-        }]
-    },
-    'Sharing options to display in the editor view',
-    default_value={
-        'gplus': False,
-        'facebook': False,
-        'twitter': False,
-    })
-
-SOCIAL_MEDIA_BUTTONS = config_domain.ConfigProperty(
-    'social_media_buttons', {
-        'type': 'list',
-        'items': {
-            'type': 'dict',
-            'properties': [{
-                'name': 'link',
-                'description': 'The link to open in a new tab',
-                'schema': {'type': 'unicode'},
-            }, {
-                'name': 'icon_filename',
-                'description': (
-                    'Filename of the social media icon (in /images/social)'),
-                'schema': {'type': 'unicode'},
-            }]
-        }
-    },
-    'Links and icon filenames for the social media buttons in the sidebar.',
-    [])
-
-DISABLED_EXPLORATIONS = config_domain.ConfigProperty(
-    'disabled_explorations', {
-        'type': 'list',
-        'items': {
-            'type': 'unicode'
-        }
-    },
-    'IDs of explorations which should not be displayable in either the '
-    'learner or editor views',
-    [])
 
 
 def require_user(handler):
@@ -256,6 +161,11 @@ class BaseHandler(webapp2.RequestHandler):
     # TODO(sll): A weakness of the current approach is that the source and
     # destination page names have to be the same. Consider fixing this.
     PAGE_NAME_FOR_CSRF = ''
+    # Whether the page includes a button for creating explorations. If this is
+    # set to True, a CSRF token for that button will be generated. This is
+    # needed because "create exploration" requests can come from multiple
+    # pages.
+    PAGE_HAS_CREATE_EXP_REQUEST = False
     # Whether to redirect requests corresponding to a logged-in user who has
     # not completed signup in to the signup page. This ensures that logged-in
     # users have agreed to the latest terms.
@@ -281,6 +191,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.has_seen_editor_tutorial = False
         self.partially_logged_in = False
         self.values['profile_picture_data_url'] = None
+        self.preferred_site_language_code = None
 
         if self.user_id:
             email = current_user_services.get_user_email(self.user)
@@ -295,6 +206,8 @@ class BaseHandler(webapp2.RequestHandler):
                 self.user_id = None
             else:
                 self.username = user_settings.username
+                self.preferred_site_language_code = (
+                    user_settings.preferred_site_language_code)
                 self.values['username'] = self.username
                 self.values['profile_picture_data_url'] = (
                     user_settings.profile_picture_data_url)
@@ -315,10 +228,6 @@ class BaseHandler(webapp2.RequestHandler):
         else:
             self.payload = None
 
-    def unescape_state_name(self, escaped_state_name):
-        """Unescape a state name that is encoded with encodeURIComponent."""
-        return urllib.unquote(escaped_state_name).decode('utf-8')
-
     def dispatch(self):
         """Overrides dispatch method in webapp2 superclass."""
         # If the request is to the old demo server, redirect it permanently to
@@ -333,7 +242,7 @@ class BaseHandler(webapp2.RequestHandler):
             self.redirect(users.create_logout_url(self.request.uri))
             return
 
-        if self.payload and self.REQUIRE_PAYLOAD_CSRF_CHECK:
+        if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
             try:
                 if not self.PAGE_NAME_FOR_CSRF:
                     raise Exception('No CSRF page name specified for this '
@@ -404,11 +313,10 @@ class BaseHandler(webapp2.RequestHandler):
         scheme, netloc, path, _, _ = urlparse.urlsplit(self.request.uri)
 
         values.update({
+            'ALL_CATEGORIES': feconf.ALL_CATEGORIES,
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
                 BEFORE_END_HEAD_TAG_HOOK.value),
-            'BEFORE_END_BODY_TAG_HOOK': jinja2.utils.Markup(
-                BEFORE_END_BODY_TAG_HOOK.value),
             'CAN_SEND_ANALYTICS_EVENTS': feconf.CAN_SEND_ANALYTICS_EVENTS,
             'DEFAULT_LANGUAGE_CODE': feconf.ALL_LANGUAGE_CODES[0]['code'],
             'DEV_MODE': feconf.DEV_MODE,
@@ -427,15 +335,13 @@ class BaseHandler(webapp2.RequestHandler):
                 obj_services.get_all_object_editor_js_templates()),
             'RTE_COMPONENT_SPECS': (
                 rte_component_registry.Registry.get_all_specs()),
-            'SHOW_CUSTOM_PAGES': feconf.SHOW_CUSTOM_PAGES,
-            'SIDEBAR_MENU_ADDITIONAL_LINKS': (
-                SIDEBAR_MENU_ADDITIONAL_LINKS.value),
             'SITE_FEEDBACK_FORM_URL': SITE_FEEDBACK_FORM_URL.value,
             'SITE_NAME': SITE_NAME.value,
-            'SOCIAL_MEDIA_BUTTONS': SOCIAL_MEDIA_BUTTONS.value,
+            'SUPPORTED_SITE_LANGUAGES': feconf.SUPPORTED_SITE_LANGUAGES,
             'SYSTEM_USERNAMES': feconf.SYSTEM_USERNAMES,
             'user_is_logged_in': user_services.has_fully_registered(
                 self.user_id),
+            'preferred_site_language_code': self.preferred_site_language_code
         })
 
         if 'meta_name' not in values:
@@ -453,16 +359,28 @@ class BaseHandler(webapp2.RequestHandler):
                 current_user_services.create_logout_url(
                     redirect_url_on_logout))
         else:
+            target_url = (
+                '/' if self.request.uri.endswith(feconf.SPLASH_URL)
+                else self.request.uri)
             values['login_url'] = (
-                current_user_services.create_login_url(self.request.uri))
+                current_user_services.create_login_url(target_url))
 
         # Create a new csrf token for inclusion in HTML responses. This assumes
         # that tokens generated in one handler will be sent back to a handler
         # with the same page name.
         values['csrf_token'] = ''
+        values['csrf_token_create_exploration'] = ''
+        values['csrf_token_i18n'] = (
+            CsrfTokenManager.create_csrf_token(
+                self.user_id, feconf.CSRF_PAGE_NAME_I18N))
+
         if self.REQUIRE_PAYLOAD_CSRF_CHECK and self.PAGE_NAME_FOR_CSRF:
             values['csrf_token'] = CsrfTokenManager.create_csrf_token(
                 self.user_id, self.PAGE_NAME_FOR_CSRF)
+        if self.PAGE_HAS_CREATE_EXP_REQUEST:
+            values['csrf_token_create_exploration'] = (
+                CsrfTokenManager.create_csrf_token(
+                    self.user_id, feconf.CSRF_PAGE_NAME_CREATE_EXPLORATION))
 
         self.response.cache_control.no_cache = True
         self.response.cache_control.must_revalidate = True

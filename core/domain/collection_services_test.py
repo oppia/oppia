@@ -18,7 +18,6 @@ import datetime
 
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
@@ -343,8 +342,6 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
             self.COL_ID_0, self.COL_ID_1, self.COL_ID_2, self.COL_ID_3,
             self.COL_ID_4])
 
-    def _summaries_to_ids(self, col_summaries):
-        return sorted([col_summary.id for col_summary in col_summaries])
 
     def _create_search_query(self, terms, categories):
         query = ' '.join(terms)
@@ -355,9 +352,9 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
 
     def test_get_collection_summaries_with_no_query(self):
         # An empty query should return all collections.
-        (col_summaries, search_cursor) = (
-            collection_services.get_collection_summaries_matching_query(''))
-        self.assertEqual(self._summaries_to_ids(col_summaries), [
+        (col_ids, search_cursor) = (
+            collection_services.get_collection_ids_matching_query(''))
+        self.assertEqual(sorted(col_ids), [
             self.COL_ID_0, self.COL_ID_1, self.COL_ID_2, self.COL_ID_3,
             self.COL_ID_4
         ])
@@ -369,11 +366,9 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
         collection_services.delete_collection(self.owner_id, self.COL_ID_2)
         collection_services.delete_collection(self.owner_id, self.COL_ID_4)
 
-        col_summaries = (
-            collection_services.get_collection_summaries_matching_query(''))[0]
-        self.assertEqual(
-            self._summaries_to_ids(col_summaries),
-            [self.COL_ID_1, self.COL_ID_3])
+        col_ids = (
+            collection_services.get_collection_ids_matching_query(''))[0]
+        self.assertEqual(sorted(col_ids), [self.COL_ID_1, self.COL_ID_3])
 
         collection_services.delete_collection(self.owner_id, self.COL_ID_1)
         collection_services.delete_collection(self.owner_id, self.COL_ID_3)
@@ -381,62 +376,53 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
         # If no collections are loaded, a blank query should not get any
         # collections.
         self.assertEqual(
-            collection_services.get_collection_summaries_matching_query(''),
+            collection_services.get_collection_ids_matching_query(''),
             ([], None))
 
     def test_search_collection_summaries(self):
         # Search within the 'Architecture' category.
-        col_summaries = (
-            collection_services.get_collection_summaries_matching_query(
+        col_ids = (
+            collection_services.get_collection_ids_matching_query(
                 self._create_search_query([], ['Architecture'])))[0]
-        self.assertEqual(
-            self._summaries_to_ids(col_summaries), [self.COL_ID_0])
+        self.assertEqual(col_ids, [self.COL_ID_0])
 
         # Search for collections containing 'Oppia'.
-        col_summaries = (
-            collection_services.get_collection_summaries_matching_query(
+        col_ids = (
+            collection_services.get_collection_ids_matching_query(
                 self._create_search_query(['Oppia'], [])))[0]
-        self.assertEqual(
-            self._summaries_to_ids(col_summaries),
-            [self.COL_ID_1, self.COL_ID_2])
+        self.assertEqual(sorted(col_ids), [self.COL_ID_1, self.COL_ID_2])
 
         # Search for collections containing 'Oppia' and 'Introduce'.
-        col_summaries = (
-            collection_services.get_collection_summaries_matching_query(
+        col_ids = (
+            collection_services.get_collection_ids_matching_query(
                 self._create_search_query(['Oppia', 'Introduce'], [])))[0]
-        self.assertEqual(
-            self._summaries_to_ids(col_summaries),
-            [self.COL_ID_1, self.COL_ID_2])
+        self.assertEqual(sorted(col_ids), [self.COL_ID_1, self.COL_ID_2])
 
         # Search for collections containing 'England'.
-        col_summaries = (
-            collection_services.get_collection_summaries_matching_query(
+        col_ids = (
+            collection_services.get_collection_ids_matching_query(
                 self._create_search_query(['England'], [])))[0]
-        self.assertEqual(
-            self._summaries_to_ids(col_summaries), [self.COL_ID_0])
+        self.assertEqual(col_ids, [self.COL_ID_0])
 
         # Search for collections containing 'in'.
-        col_summaries = (
-            collection_services.get_collection_summaries_matching_query(
+        col_ids = (
+            collection_services.get_collection_ids_matching_query(
                 self._create_search_query(['in'], [])))[0]
         self.assertEqual(
-            self._summaries_to_ids(col_summaries),
-            [self.COL_ID_0, self.COL_ID_2, self.COL_ID_4])
+            sorted(col_ids), [self.COL_ID_0, self.COL_ID_2, self.COL_ID_4])
 
         # Search for collections containing 'in' in the 'Architecture' and
         # 'Welcome' categories.
-        col_summaries = (
-            collection_services.get_collection_summaries_matching_query(
+        col_ids = (
+            collection_services.get_collection_ids_matching_query(
                 self._create_search_query(
                     ['in'], ['Architecture', 'Welcome'])))[0]
-        self.assertEqual(
-            self._summaries_to_ids(col_summaries),
-            [self.COL_ID_0, self.COL_ID_2])
+        self.assertEqual(sorted(col_ids), [self.COL_ID_0, self.COL_ID_2])
 
-    def test_collection_summaries_pagination_in_filled_gallery(self):
-        # Ensure the maximum number of collections that can fit on the gallery
-        # page is maintained by the summaries function.
-        with self.swap(feconf, 'GALLERY_PAGE_SIZE', 2):
+    def test_collection_summaries_pagination_in_filled_search_results(self):
+        # Ensure the maximum number of collections that can fit on the search
+        # results page is maintained by the summaries function.
+        with self.swap(feconf, 'SEARCH_RESULTS_PAGE_SIZE', 2):
             # Need to load 3 pages to find all of the collections. Since the
             # returned order is arbitrary, we need to concatenate the results
             # to ensure all collections are returned. We validate the correct
@@ -444,28 +430,28 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
             found_col_ids = []
 
             # Page 1: 2 initial collections.
-            (col_summaries, search_cursor) = (
-                collection_services.get_collection_summaries_matching_query(
+            (col_ids, search_cursor) = (
+                collection_services.get_collection_ids_matching_query(
                     '', None))
-            self.assertEqual(len(col_summaries), 2)
+            self.assertEqual(len(col_ids), 2)
             self.assertIsNotNone(search_cursor)
-            found_col_ids += self._summaries_to_ids(col_summaries)
+            found_col_ids += col_ids
 
             # Page 2: 2 more collections.
-            (col_summaries, search_cursor) = (
-                collection_services.get_collection_summaries_matching_query(
+            (col_ids, search_cursor) = (
+                collection_services.get_collection_ids_matching_query(
                     '', search_cursor))
-            self.assertEqual(len(col_summaries), 2)
+            self.assertEqual(len(col_ids), 2)
             self.assertIsNotNone(search_cursor)
-            found_col_ids += self._summaries_to_ids(col_summaries)
+            found_col_ids += col_ids
 
             # Page 3: 1 final collection.
-            (col_summaries, search_cursor) = (
-                collection_services.get_collection_summaries_matching_query(
+            (col_ids, search_cursor) = (
+                collection_services.get_collection_ids_matching_query(
                     '', search_cursor))
-            self.assertEqual(len(col_summaries), 1)
+            self.assertEqual(len(col_ids), 1)
             self.assertIsNone(search_cursor)
-            found_col_ids += self._summaries_to_ids(col_summaries)
+            found_col_ids += col_ids
 
             # Validate all collections were seen.
             self.assertEqual(sorted(found_col_ids), [
@@ -607,16 +593,11 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             collection_services.delete_collection(
                 self.owner_id, self.COLLECTION_ID)
 
-    def test_create_new_collection_error_cases(self):
-        collection = collection_domain.Collection.create_default_collection(
-            self.COLLECTION_ID, '', '', '')
-        with self.assertRaisesRegexp(Exception, 'between 1 and 50 characters'):
-            collection_services.save_new_collection(self.owner_id, collection)
-
-        collection = collection_domain.Collection.create_default_collection(
-            self.COLLECTION_ID, 'title', '', '')
-        with self.assertRaisesRegexp(Exception, 'between 1 and 50 characters'):
-            collection_services.save_new_collection(self.owner_id, collection)
+    def test_create_new_collection(self):
+        # Test that creating a new collection (with an empty title, etc.)
+        # succeeds.
+        collection_domain.Collection.create_default_collection(
+            self.COLLECTION_ID)
 
     def test_save_and_retrieve_collection(self):
         collection = self.save_new_valid_collection(
@@ -863,6 +844,44 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
             self.COLLECTION_ID)
         self.assertEqual(collection.objective, 'Some new objective')
 
+    def test_update_collection_language_code(self):
+        # Verify initial language code.
+        collection = collection_services.get_collection_by_id(
+            self.COLLECTION_ID)
+        self.assertEqual(collection.language_code, 'en')
+
+        # Update the language code.
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+                'property_name': 'language_code',
+                'new_value': 'fi'
+            }], 'Changed the language to Finnish')
+
+        # Verify the language is different.
+        collection = collection_services.get_collection_by_id(
+            self.COLLECTION_ID)
+        self.assertEqual(collection.language_code, 'fi')
+
+    def test_update_collection_tags(self):
+        # Verify initial tags.
+        collection = collection_services.get_collection_by_id(
+            self.COLLECTION_ID)
+        self.assertEqual(collection.tags, [])
+
+        # Update the tags.
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+                'property_name': 'tags',
+                'new_value': ['test']
+            }], 'Add a new tag')
+
+        # Verify that the tags are different.
+        collection = collection_services.get_collection_by_id(
+            self.COLLECTION_ID)
+        self.assertEqual(collection.tags, ['test'])
+
     def test_update_collection_node_prerequisite_skills(self):
         # Verify initial prerequisite skills are empty.
         collection = collection_services.get_collection_by_id(
@@ -907,103 +926,6 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
             self.COLLECTION_ID)
         collection_node = collection.get_node(self.EXPLORATION_ID)
         self.assertEqual(collection_node.acquired_skills, ['third', 'fourth'])
-
-
-class CollectionLearnerDictTests(CollectionServicesUnitTests):
-    """Test get_learner_collection_dict_by_id."""
-
-    EXP_ID = 'exploration_id'
-    EXP_ID_1 = 'exp_id1'
-
-    def setUp(self):
-        super(CollectionLearnerDictTests, self).setUp()
-
-    def test_get_learner_dict_with_deleted_exp_fails_validation(self):
-        self.save_new_valid_collection(
-            self.COLLECTION_ID, self.owner_id, exploration_id=self.EXP_ID)
-        collection_services.get_learner_collection_dict_by_id(
-            self.COLLECTION_ID, self.owner_id)
-
-        exp_services.delete_exploration(self.owner_id, self.EXP_ID)
-
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Expected collection to only reference valid explorations, but '
-            'found an exploration with ID: exploration_id'):
-            collection_services.get_learner_collection_dict_by_id(
-                self.COLLECTION_ID, self.owner_id)
-
-    def test_get_learner_dict_when_referencing_inaccessible_explorations(self):
-        self.save_new_default_collection(self.COLLECTION_ID, self.owner_id)
-        self.save_new_valid_exploration(self.EXP_ID, self.editor_id)
-        collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, [{
-                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                'exploration_id': self.EXP_ID
-            }], 'Added another creator\'s private exploration')
-
-        # A collection cannot access someone else's private exploration.
-        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Expected collection to only reference valid explorations, but '
-            'found an exploration with ID: exploration_id'):
-            collection_services.get_learner_collection_dict_by_id(
-                self.COLLECTION_ID, self.owner_id)
-
-        # After the exploration is published, the dict can now be created.
-        rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
-        collection_services.get_learner_collection_dict_by_id(
-            self.COLLECTION_ID, self.owner_id)
-
-    def test_get_learner_dict_with_private_exp_fails_validation(self):
-        self.save_new_valid_collection(
-            self.COLLECTION_ID, self.owner_id, exploration_id=self.EXP_ID)
-
-        # Since both the collection and exploration are private, the learner
-        # dict can be created.
-        collection_services.get_learner_collection_dict_by_id(
-            self.COLLECTION_ID, self.owner_id)
-
-        # A public collection referencing a private exploration is bad, however.
-        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Cannot reference a private exploration within a public '
-            'collection, exploration ID: exploration_id'):
-            collection_services.get_learner_collection_dict_by_id(
-                self.COLLECTION_ID, self.owner_id)
-
-        # After the exploration is published, the learner dict can be crated
-        # again.
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
-        collection_services.get_learner_collection_dict_by_id(
-            self.COLLECTION_ID, self.owner_id)
-
-    def test_get_learner_dict_with_allowed_private_exps(self):
-        self.save_new_valid_collection(
-            self.COLLECTION_ID, self.owner_id, exploration_id=self.EXP_ID)
-        self.save_new_valid_exploration(self.EXP_ID_1, self.editor_id)
-        collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, [{
-                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                'exploration_id': self.EXP_ID_1
-            }], 'Added another creator\'s private exploration')
-
-        rights_manager.publish_collection(self.owner_id, self.COLLECTION_ID)
-
-        collection_dict = collection_services.get_learner_collection_dict_by_id(
-            self.COLLECTION_ID, self.owner_id, allow_invalid_explorations=True)
-
-        # The author's private exploration will be contained in the public
-        # collection since invalid explorations are being allowed, but the
-        # private exploration of another author will not.
-        collection_node_dicts = collection_dict['nodes']
-        self.assertEqual(
-            collection_node_dicts[0]['exploration_summary']['id'],
-            self.EXP_ID)
-        self.assertIsNone(collection_node_dicts[1]['exploration_summary'])
-
 
 def _get_node_change_list(exploration_id, property_name, new_value):
     """Generates a change list for a single collection node change."""
@@ -1731,8 +1653,7 @@ class CollectionSearchTests(CollectionServicesUnitTests):
     def test_get_search_rank(self):
         self.save_new_valid_collection(self.COLLECTION_ID, self.owner_id)
 
-        # The search rank has a 'last updated' bonus of 80.
-        base_search_rank = 20 + 80
+        base_search_rank = 20
 
         self.assertEqual(
             collection_services._get_search_rank(self.COLLECTION_ID),

@@ -25,6 +25,7 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import utils
+
 (job_models, exp_models,) = models.Registry.import_models([
     models.NAMES.job, models.NAMES.exploration])
 search_services = models.Registry.import_search_services()
@@ -111,7 +112,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             self.ONE_OFF_JOB_MANAGERS_FOR_TESTS
             ):
 
-            default_specs = {
+            default_spec = {
                 'title': default_title,
                 'category': default_category,
                 'status': default_status
@@ -128,8 +129,8 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             self.save_new_valid_exploration(
                 exp_id,
                 admin_id,
-                title=default_specs['title'],
-                category=default_specs['category'])
+                title=default_spec['title'],
+                category=default_spec['category'])
             exploration = exp_services.get_exploration_by_id(exp_id)
             exp_services.delete_exploration(admin_id, exp_id)
 
@@ -139,7 +140,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
 
             for ind in range(num_exps):
                 exp_id = str(ind)
-                spec = default_specs
+                spec = default_spec
                 spec.update(exp_specs[ind])
                 self.save_new_valid_exploration(
                     exp_id,
@@ -166,8 +167,10 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                 exploration = exp_services.get_exploration_by_id(exp_id)
                 exploration_model_last_updated = exploration.last_updated
                 exploration_model_created_on = exploration.created_on
+                first_published_msec = (
+                    exp_rights_model.first_published_msec)
 
-                # Manually create the expectated summary specifying title,
+                # Manually create the expected summary specifying title,
                 # category, etc.
                 expected_job_output[exp_id] = exp_domain.ExplorationSummary(
                     exp_id,
@@ -177,6 +180,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                     exploration.language_code,
                     exploration.tags,
                     feconf.get_empty_ratings(),
+                    feconf.EMPTY_SCALED_AVERAGE_RATING,
                     spec['status'],
                     exp_rights_model.community_owned,
                     exp_rights_model.owner_ids,
@@ -186,7 +190,8 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                     {admin_id: 1},
                     exploration.version,
                     exploration_model_created_on,
-                    exploration_model_last_updated)
+                    exploration_model_last_updated,
+                    first_published_msec)
 
                 # Note: Calling constructor for fields that are not required
                 # and have no default value does not work, because
@@ -308,7 +313,8 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
 
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, user_a_id)
-        job_id = exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new()
+        job_id = (
+            exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new())
         exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
@@ -335,7 +341,8 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
             user_a_id, 'Changed title.', [])
 
         # Run the job to compute the contributor ids.
-        job_id = exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new()
+        job_id = (
+            exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new())
         exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
@@ -368,7 +375,8 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         exp_services.revert_exploration(user_b_id, self.EXP_ID, 2, 1)
 
         # Run the job to compute the contributor ids.
-        job_id = exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new()
+        job_id = (
+            exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new())
         exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
@@ -385,7 +393,8 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, feconf.SYSTEM_COMMITTER_ID, title='Original Title')
         # Run the job to compute the contributor ids.
-        job_id = exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new()
+        job_id = (
+            exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new())
         exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
         # Check that the system id was not added to the exploration's
@@ -403,7 +412,8 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         exploration_model.commit(
             feconf.MIGRATION_BOT_USERNAME, 'Changed title.', [])
         # Run the job to compute the contributor ids.
-        job_id = exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new()
+        job_id = (
+            exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new())
         exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
         # Check that the migration bot id was not added to the exploration's
@@ -412,6 +422,174 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
             exploration.id)
         self.assertNotIn(
             feconf.MIGRATION_BOT_USERNAME, exploration_summary.contributor_ids)
+
+
+class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
+    ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
+        exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob]
+
+    EXP_ID = 'exp_id'
+
+    USERNAME_A = 'usernamea'
+    USERNAME_B = 'usernameb'
+    EMAIL_A = 'emaila@example.com'
+    EMAIL_B = 'emailb@example.com'
+
+    def setUp(self):
+        super(ExplorationContributorsSummaryOneOffJobTest, self).setUp()
+        self.signup(self.EMAIL_A, self.USERNAME_A)
+        self.signup(self.EMAIL_B, self.USERNAME_B)
+
+    def test_contributors_for_valid_nonrevert_contribution(self):
+        """Test that if only non-revert commits are made by
+        contributor then the contributions summary shows same
+        exact number of commits for that contributor's ID
+        """
+
+        user_a_id = self.get_user_id_from_email(self.EMAIL_A)
+
+        # Let USER A make three commits.
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, user_a_id, title='Exploration Title')
+
+        exp_services.update_exploration(
+            user_a_id, self.EXP_ID, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'New Exploration Title'
+            }], 'Changed title.')
+
+        exp_services.update_exploration(
+            user_a_id, self.EXP_ID, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'New Objective'
+            }], 'Changed Objective.')
+
+        # Run the job to compute contributors summary
+        job_id = exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.create_new() # pylint: disable=line-too-long
+        exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        exploration_summary = exp_services.get_exploration_summary_by_id(
+            exploration.id)
+
+        self.assertEqual(
+            3, exploration_summary.contributors_summary[user_a_id])
+
+    def test_contributors_with_only_reverts_not_included(self):
+        """Test that if only reverts are made by contributor then the
+        contributions summary shouldn’t contain that contributor’s ID
+        """
+
+        user_a_id = self.get_user_id_from_email(self.EMAIL_A)
+        user_b_id = self.get_user_id_from_email(self.EMAIL_B)
+
+        # Let USER A make three commits.
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, user_a_id, title='Exploration Title 1')
+
+        exp_services.update_exploration(
+            user_a_id, self.EXP_ID, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'New Exploration Title'
+            }], 'Changed title.')
+        exp_services.update_exploration(
+            user_a_id, self.EXP_ID, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'New Objective'
+            }], 'Changed Objective.')
+
+        # Let the second user revert version 3 to version 2
+        exp_services.revert_exploration(user_b_id, self.EXP_ID, 3, 2)
+
+        # Run the job to compute the contributors summary.
+        job_id = exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.create_new() # pylint: disable=line-too-long
+        exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        exploration_summary = exp_services.get_exploration_summary_by_id(
+            exploration.id)
+
+        # Check that the contributors_summary does not contains user_b_id
+        self.assertNotIn(user_b_id, exploration_summary.contributors_summary)
+
+        # Check that the User A has only 2 commits after user b has reverted
+        # to version 2
+        self.assertEquals(2, exploration_summary.contributors_summary[user_a_id]) # pylint: disable=line-too-long
+
+    def test_reverts_not_counted(self):
+        """Test that if both non-revert commits and revert are
+        made by contributor then the contributions summary shows
+        only non-revert commits for that contributor. However,
+        the commits made after the version to which we have reverted
+        shouldn't be counted either.
+        """
+
+        user_a_id = self.get_user_id_from_email(self.EMAIL_A)
+
+        # Let USER A make 3 non-revert commits
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, user_a_id, title='Exploration Title')
+        exp_services.update_exploration(
+            user_a_id, self.EXP_ID, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'New Exploration Title'
+            }], 'Changed title.')
+        exp_services.update_exploration(
+            user_a_id, self.EXP_ID, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'New Objective'
+            }], 'Changed Objective.')
+
+        # Let USER A revert version 3 to version 2
+        exp_services.revert_exploration(user_a_id, self.EXP_ID, 3, 2)
+
+        # Run the job to compute the contributor summary.
+        job_id = exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.create_new() # pylint: disable=line-too-long
+        exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        # Check that USER A's number of contributions is equal to 2
+        exploration_summary = exp_services.get_exploration_summary_by_id(
+            exploration.id)
+        self.assertEqual(2, exploration_summary.contributors_summary[user_a_id])
+
+    def test_nonhuman_committers_not_counted(self):
+        """Test that only human committers are counted as contributors.
+        """
+        # Create a commit with the system user id.
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, feconf.SYSTEM_COMMITTER_ID, title='Original Title')
+
+        # Create commits with all the system user ids
+        for system_id in feconf.SYSTEM_USER_IDS:
+            exp_services.update_exploration(
+                system_id, self.EXP_ID, [{
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'title',
+                    'new_value': 'Title changed by %s' % system_id
+                }], 'Changed title.')
+
+        # Run the job to compute the contributor summary.
+        job_id = exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.create_new() # pylint: disable=line-too-long
+        exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        # Check that no system id was added to the exploration's
+        # contributor's summary
+
+        exploration_summary = exp_services.get_exploration_summary_by_id(
+            exploration.id)
+
+        for system_id in feconf.SYSTEM_USER_IDS:
+            self.assertNotIn(
+                system_id,
+                exploration_summary.contributors_summary)
 
 
 class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
@@ -425,7 +603,9 @@ class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
-            '%s%s' % (self.EXP_ID, i), 'title %d' % i, 'category%d' % i
+            '%s%s' % (self.EXP_ID, i),
+            title='title %d' % i,
+            category='category%d' % i
         ) for i in xrange(5)]
 
         for exp in explorations:
@@ -477,7 +657,6 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
         # Setup user who will own the test explorations.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-
         self.process_and_flush_pending_tasks()
 
     def test_migration_job_does_not_convert_up_to_date_exp(self):
@@ -487,7 +666,7 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
         # Create a new, default exploration that should not be affected by the
         # job.
         exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, 'title', 'category')
+            self.VALID_EXP_ID, title='title', category='category')
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_interaction_id('EndExploration')
         init_state.interaction.default_outcome = None

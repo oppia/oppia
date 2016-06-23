@@ -31,19 +31,24 @@ from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import rule_domain
 from core.domain import rights_manager
 from core.platform import models
 import feconf
-import jinja_utils
 import main
 import utils
+
+from google.appengine.api import apiproxy_stub
+from google.appengine.api import apiproxy_stub_map
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 current_user_services = models.Registry.import_current_user_services()
 
 CSRF_REGEX = (
     r'csrf_token: JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\)')
+CSRF_I18N_REGEX = (
+    r'csrf_token_i18n: JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\)')
+CSRF_CREATE_EXPLORATION_REGEX = (
+    r'csrf_token_create_exploration: JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\)') # pylint: disable=line-too-long
 # Prefix to append to all lines printed by tests to the console.
 LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
 
@@ -58,6 +63,33 @@ def empty_environ():
     os.environ['USER_IS_ADMIN'] = '0'
     os.environ['DEFAULT_VERSION_HOSTNAME'] = '%s:%s' % (
         os.environ['HTTP_HOST'], os.environ['SERVER_PORT'])
+
+class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
+    """Mock for google.appengine.api.urlfetch"""
+
+    def __init__(self, service_name='urlfetch'):
+        super(URLFetchServiceMock, self).__init__(service_name)
+        self.return_values = {}
+        self.response = None
+        self.request = None
+
+    def set_return_values(self, content='', status_code=200, headers=None):
+        self.return_values['content'] = content
+        self.return_values['status_code'] = status_code
+        self.return_values['headers'] = headers
+
+    def _Dynamic_Fetch(self, request, response): # pylint: disable=invalid-name
+        return_values = self.return_values
+        response.set_content(return_values.get('content', ''))
+        response.set_statuscode(return_values.get('status_code', 200))
+        for header_key, header_value in return_values.get(
+                'headers', {}).items():
+            new_header = response.add_header()
+            new_header.set_key(header_key)
+            new_header.set_value(header_value)
+
+        self.request = request
+        self.response = response
 
 
 class TestBase(unittest.TestCase):
@@ -118,14 +150,6 @@ class TestBase(unittest.TestCase):
 
     def tearDown(self):
         raise NotImplementedError
-
-    def assertFuzzyTrue(self, value):  # pylint: disable=invalid-name
-        self.assertEqual(value, rule_domain.CERTAIN_TRUE_VALUE)
-        self.assertTrue(isinstance(value, float))
-
-    def assertFuzzyFalse(self, value):  # pylint: disable=invalid-name
-        self.assertEqual(value, rule_domain.CERTAIN_FALSE_VALUE)
-        self.assertTrue(isinstance(value, float))
 
     def _assert_validation_error(self, item, error_substring):
         """Checks that the given item passes default validation."""
@@ -243,26 +267,39 @@ class TestBase(unittest.TestCase):
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
 
-    def get_csrf_token_from_response(self, response):
+    def get_csrf_token_from_response(self, response, token_type=None):
         """Retrieve the CSRF token from a GET response."""
-        return re.search(CSRF_REGEX, response.body).group(1)
+        if token_type is None:
+            regex = CSRF_REGEX
+        elif token_type == feconf.CSRF_PAGE_NAME_CREATE_EXPLORATION:
+            regex = CSRF_CREATE_EXPLORATION_REGEX
+        elif token_type == feconf.CSRF_PAGE_NAME_I18N:
+            regex = CSRF_I18N_REGEX
+        else:
+            raise Exception('Invalid CSRF token type: %s' % token_type)
+
+        return re.search(regex, response.body).group(1)
 
     def signup(self, email, username):
         """Complete the signup process for the user with the given username."""
         self.login(email)
-
-        response = self.testapp.get(feconf.SIGNUP_URL)
-        self.assertEqual(response.status_int, 200)
-        csrf_token = self.get_csrf_token_from_response(response)
-        response = self.testapp.post(feconf.SIGNUP_DATA_URL, {
-            'csrf_token': csrf_token,
-            'payload': json.dumps({
-                'username': username,
-                'agreed_to_terms': True
+        # Signup uses a custom urlfetch mock (URLFetchServiceMock), instead
+        # of the stub provided by testbed. This custom mock is disabled
+        # immediately once the signup is complete. This is done to avoid
+        # external  calls being made to Gravatar when running the backend
+        # tests.
+        with self.urlfetch_mock():
+            response = self.testapp.get(feconf.SIGNUP_URL)
+            self.assertEqual(response.status_int, 200)
+            csrf_token = self.get_csrf_token_from_response(response)
+            response = self.testapp.post(feconf.SIGNUP_DATA_URL, {
+                'csrf_token': csrf_token,
+                'payload': json.dumps({
+                    'username': username,
+                    'agreed_to_terms': True
+                })
             })
-        })
-        self.assertEqual(response.status_int, 200)
-
+            self.assertEqual(response.status_int, 200)
         self.logout()
 
     def set_config_property(self, config_obj, new_config_value):
@@ -307,7 +344,7 @@ class TestBase(unittest.TestCase):
         Returns the exploration domain object.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
-            exploration_id, title, 'A category')
+            exploration_id, title=title, category='A category')
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 
@@ -321,7 +358,8 @@ class TestBase(unittest.TestCase):
         Returns the exploration domain object.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
-            exploration_id, title, category, language_code=language_code)
+            exploration_id, title=title, category=category,
+            language_code=language_code)
         exploration.states[exploration.init_state_name].update_interaction_id(
             'TextInput')
         exploration.objective = objective
@@ -381,23 +419,27 @@ class TestBase(unittest.TestCase):
 
     def save_new_default_collection(
             self, collection_id, owner_id, title='A title',
-            category='A category', objective='An objective'):
+            category='A category', objective='An objective',
+            language_code=feconf.DEFAULT_LANGUAGE_CODE):
         """Saves a new default collection written by owner_id.
 
         Returns the collection domain object.
         """
         collection = collection_domain.Collection.create_default_collection(
-            collection_id, title, category, objective)
+            collection_id, title=title, category=category, objective=objective,
+            language_code=language_code)
         collection_services.save_new_collection(owner_id, collection)
         return collection
 
     def save_new_valid_collection(
             self, collection_id, owner_id, title='A title',
             category='A category', objective='An objective',
+            language_code=feconf.DEFAULT_LANGUAGE_CODE,
             exploration_id='an_exploration_id',
             end_state_name=DEFAULT_END_STATE_NAME):
         collection = collection_domain.Collection.create_default_collection(
-            collection_id, title, category, objective=objective)
+            collection_id, title, category, objective,
+            language_code=language_code)
         collection.add_node(
             self.save_new_valid_exploration(
                 exploration_id, owner_id, title, category, objective,
@@ -423,59 +465,6 @@ class TestBase(unittest.TestCase):
             new_param_dict[pc.name] = pc.get_normalized_value(
                 obj_type, new_param_dict)
         return new_param_dict
-
-    def submit_answer(
-            self, exploration_id, state_name, answer,
-            params=None, unused_exploration_version=None):
-        """Submits an answer as an exploration player and returns the
-        corresponding dict. This function has strong parallels to code in
-        PlayerServices.js which has the non-test code to perform the same
-        functionality. This is replicated here so backend tests may utilize the
-        functionality of PlayerServices.js without being able to access it.
-
-        TODO(bhenning): Replicate this in an end-to-end Protractor test to
-        protect against code skew here.
-        """
-        if params is None:
-            params = {}
-
-        exploration = exp_services.get_exploration_by_id(exploration_id)
-
-        # First, the answer must be classified.
-        classify_result = self.post_json(
-            '/explorehandler/classify/%s' % exploration_id, {
-                'old_state': exploration.states[state_name].to_dict(),
-                'params': params,
-                'answer': answer
-            }
-        )
-
-        # Next, ensure the submission is recorded.
-        self.post_json(
-            '/explorehandler/answer_submitted_event/%s' % exploration_id, {
-                'answer': answer,
-                'params': params,
-                'version': exploration.version,
-                'old_state_name': state_name,
-                'answer_group_index': classify_result['answer_group_index'],
-                'rule_spec_index': classify_result['rule_spec_index']
-            }
-        )
-
-        # Now the next state's data must be calculated.
-        outcome = classify_result['outcome']
-        new_state = exploration.states[outcome['dest']]
-        params['answer'] = answer
-        new_params = self.get_updated_param_dict(
-            params, new_state.param_changes, exploration.param_specs)
-
-        return {
-            'feedback_html': jinja_utils.parse_string(
-                utils.get_random_choice(outcome['feedback'])
-                if outcome['feedback'] else '', params),
-            'question_html': new_state.content[0].to_html(new_params),
-            'state_name': outcome['dest']
-        }
 
     @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):
@@ -564,15 +553,53 @@ class AppEngineTestBase(TestBase):
     def _get_all_queue_names(self):
         return [q['name'] for q in self.taskqueue_stub.GetQueues()]
 
+    @contextlib.contextmanager
+    def urlfetch_mock(
+            self, content='', status_code=200, headers=None):
+        """Enables the custom urlfetch mock (URLFetchServiceMock) within the
+        context of a 'with' statement.
+
+        This mock is currently used for signup to prevent external HTTP
+        requests to fetch the Gravatar profile picture for new users while the
+        backend tests are being run.
+
+        args:
+          - content: Response content or body.
+          - status_code: Response status code.
+          - headers: Response headers.
+        """
+        if headers is None:
+            response_headers = {}
+        else:
+            response_headers = headers
+        self.testbed.init_urlfetch_stub(enable=False)
+        urlfetch_mock = URLFetchServiceMock()
+        apiproxy_stub_map.apiproxy.RegisterStub('urlfetch', urlfetch_mock)
+        urlfetch_mock.set_return_values(
+            content=content, status_code=status_code, headers=response_headers)
+        try:
+            yield
+        finally:
+            # Disables the custom mock
+            self.testbed.init_urlfetch_stub(enable=False)
+            # Enables the testbed urlfetch mock
+            self.testbed.init_urlfetch_stub()
+
     def count_jobs_in_taskqueue(self, queue_name=None):
         """Counts the jobs in the given queue. If queue_name is None,
         defaults to counting the jobs in all queues available.
         """
+        return len(self.get_pending_tasks(queue_name))
+
+    def get_pending_tasks(self, queue_name=None):
+        """Returns the jobs in the given queue. If queue_name is None,
+        defaults to returning the jobs in all queues available.
+        """
         if queue_name:
-            return len(self.taskqueue_stub.get_filtered_tasks(
-                queue_names=[queue_name]))
+            return self.taskqueue_stub.get_filtered_tasks(
+                queue_names=[queue_name])
         else:
-            return len(self.taskqueue_stub.get_filtered_tasks())
+            return self.taskqueue_stub.get_filtered_tasks()
 
     def process_and_flush_pending_tasks(self, queue_name=None):
         """Runs and flushes pending tasks. If queue_name is None, does so for

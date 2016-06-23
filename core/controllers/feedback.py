@@ -27,8 +27,8 @@ class ThreadListHandler(base.BaseHandler):
 
     def get(self, exploration_id):
         self.values.update({
-            'threads': feedback_services.get_all_threads(
-                exploration_id, False)})
+            'threads': [t.to_dict() for t in feedback_services.get_all_threads(
+                exploration_id, False)]})
         self.render_json(self.values)
 
     @base.require_user
@@ -58,12 +58,12 @@ class ThreadHandler(base.BaseHandler):
     PAGE_NAME_FOR_CSRF = 'editor'
 
     def get(self, exploration_id, thread_id):  # pylint: disable=unused-argument
+        suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
         self.values.update({
-            'messages': feedback_services.get_messages(
-                exploration_id, thread_id)})
-        self.values.update({
-            'suggestion': feedback_services.get_suggestion(
-                exploration_id, thread_id)})
+            'messages': [m.to_dict() for m in feedback_services.get_messages(
+                exploration_id, thread_id)],
+            'suggestion': suggestion.to_dict() if suggestion else None
+        })
         self.render_json(self.values)
 
     @base.require_user
@@ -88,16 +88,6 @@ class ThreadHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class FeedbackLastUpdatedHandler(base.BaseHandler):
-    """Returns the last time a thread for this exploration was updated."""
-
-    def get(self, exploration_id):
-        self.values.update({
-            'last_updated': feedback_services.get_last_updated_time(
-                exploration_id)})
-        self.render_json(self.values)
-
-
 class RecentFeedbackMessagesHandler(base.BaseHandler):
     """Returns a list of recently-posted feedback messages.
 
@@ -114,7 +104,7 @@ class RecentFeedbackMessagesHandler(base.BaseHandler):
                 urlsafe_start_cursor=urlsafe_start_cursor))
 
         self.render_json({
-            'results': all_feedback_messages,
+            'results': [m.to_dict() for m in all_feedback_messages],
             'cursor': new_urlsafe_start_cursor,
             'more': more,
         })
@@ -127,13 +117,14 @@ class FeedbackStatsHandler(base.BaseHandler):
     """
 
     def get(self, exploration_id):
-        feedback_thread_analytics = feedback_services.get_thread_analytics(
-            exploration_id)
+        feedback_thread_analytics = (
+            feedback_services.get_thread_analytics(
+                exploration_id))
         self.values.update({
             'num_open_threads': (
-                feedback_thread_analytics['num_open_threads']),
+                feedback_thread_analytics.num_open_threads),
             'num_total_threads': (
-                feedback_thread_analytics['num_total_threads']),
+                feedback_thread_analytics.num_total_threads),
         })
         self.render_json(self.values)
 
@@ -217,5 +208,12 @@ class SuggestionListHandler(base.BaseHandler):
         else:
             raise self.InvalidInputException('Invalid list type.')
 
-        self.values.update({'threads': threads})
+        self.values.update({'threads': [t.to_dict() for t in threads]})
         self.render_json(self.values)
+
+
+class UnsentFeedbackEmailHandler(base.BaseHandler):
+    """Handler task of sending emails of feedback messages.
+    This is yet to be implemented."""
+    def post(self):
+        pass

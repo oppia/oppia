@@ -42,7 +42,6 @@ SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
 INTERACTIONS_DIR = os.path.join('extensions', 'interactions')
 GADGETS_DIR = os.path.join('extensions', 'gadgets')
 RTE_EXTENSIONS_DIR = os.path.join('extensions', 'rich_text_components')
-RULES_DIR = os.path.join('extensions', 'rules')
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 TEMPLATES_DIR_PREFIX = 'dev' if DEV_MODE else 'prod'
@@ -50,9 +49,21 @@ FRONTEND_TEMPLATES_DIR = os.path.join(
     'core', 'templates', TEMPLATES_DIR_PREFIX, 'head')
 DEPENDENCIES_TEMPLATES_DIR = os.path.join('extensions', 'dependencies')
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
+OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
+    'extensions', 'interactions', 'object_defaults.json')
+RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
+    os.getcwd(), 'extensions', 'interactions', 'rules.json')
 
 # The maximum number of results to retrieve in a datastore query.
 DEFAULT_QUERY_LIMIT = 1000
+
+# The maximum number of results to retrieve in a datastore query
+# for top rated published explorations.
+NUMBER_OF_TOP_RATED_EXPLORATIONS = 8
+
+# The maximum number of results to retrieve in a datastore query
+# for recently published explorations.
+RECENTLY_PUBLISHED_QUERY_LIMIT = 8
 
 # The current version of the exploration states blob schema. If any backward-
 # incompatible changes are made to the states blob schema in the data store,
@@ -64,11 +75,11 @@ CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 7
 # structure within the Collection domain object). If any backward-incompatible
 # changes are made to any of the blob schemas in the data store, this version
 # number must be changed.
-CURRENT_COLLECTION_SCHEMA_VERSION = 1
+CURRENT_COLLECTION_SCHEMA_VERSION = 2
 
-# The default number of exploration tiles to load at a time in the gallery
-# page.
-GALLERY_PAGE_SIZE = 20
+# The default number of exploration tiles to load at a time in the search
+# results page.
+SEARCH_RESULTS_PAGE_SIZE = 20
 
 # The default number of commits to show on a page in the exploration history
 # tab.
@@ -78,15 +89,24 @@ COMMIT_LIST_PAGE_SIZE = 50
 # tab.
 FEEDBACK_TAB_PAGE_SIZE = 20
 
+# Default title for a newly-minted exploration.
+DEFAULT_EXPLORATION_TITLE = ''
+# Default category for a newly-minted exploration.
+DEFAULT_EXPLORATION_CATEGORY = ''
+# Default objective for a newly-minted exploration.
+DEFAULT_EXPLORATION_OBJECTIVE = ''
+
 # Default name for the initial state of an exploration.
-DEFAULT_INIT_STATE_NAME = 'First Card'
+DEFAULT_INIT_STATE_NAME = 'Introduction'
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
 
-# The threshold the truth value of an evaluated answer group must equal or
-# exceed in order to be considered a better classification than the default
-# group.
-DEFAULT_ANSWER_GROUP_CLASSIFICATION_THRESHOLD = 0.3
+# Default title for a newly-minted collection.
+DEFAULT_COLLECTION_TITLE = ''
+# Default category for a newly-minted collection.
+DEFAULT_COLLECTION_CATEGORY = ''
+# Default objective for a newly-minted collection.
+DEFAULT_COLLECTION_OBJECTIVE = ''
 
 # A dict containing the accepted image formats (as determined by the imghdr
 # module) and the corresponding allowed extensions in the filenames of uploaded
@@ -139,6 +159,9 @@ _EMPTY_RATINGS = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
 def get_empty_ratings():
     return copy.deepcopy(_EMPTY_RATINGS)
 
+# Empty scaled average rating as a float.
+EMPTY_SCALED_AVERAGE_RATING = 0.0
+
 # Committer id for system actions.
 SYSTEM_COMMITTER_ID = 'admin'
 SYSTEM_EMAIL_ADDRESS = 'system@example.com'
@@ -153,8 +176,19 @@ CAN_SEND_EMAILS_TO_ADMIN = False
 # SYSTEM_EMAIL_ADDRESS. If SYSTEM_EMAIL_ADDRESS is not that of an app owner,
 # email messages from this user cannot be sent.
 CAN_SEND_EMAILS_TO_USERS = False
+# If you want to turn on this facility please check the email templates in the
+# send_role_notification_email() function in email_manager.py and modify them
+# accordingly.
+CAN_SEND_EDITOR_ROLE_EMAILS = False
+# If enabled then emails will be sent to creators for feedback messages.
+CAN_SEND_FEEDBACK_MESSAGE_EMAILS = False
+# Time to wait before sending feedback message emails (currently set to 1 hour).
+DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS = 3600
 # Whether to send email updates to a user who has not specified a preference.
 DEFAULT_EMAIL_UPDATES_PREFERENCE = False
+# Whether to send an invitation email when the user is granted
+# new role permissions in an exploration.
+DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE = True
 # Whether to require an email to be sent, following a moderator action.
 REQUIRE_EMAIL_ON_MODERATOR_ACTION = False
 # Whether to allow custom event reporting to Google Analytics.
@@ -164,6 +198,7 @@ DUPLICATE_EMAIL_INTERVAL_MINS = 2
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
+EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION = 'editor_role_notification'
 EMAIL_INTENT_MARKETING = 'marketing'
 EMAIL_INTENT_PUBLICIZE_EXPLORATION = 'publicize_exploration'
 EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
@@ -219,9 +254,6 @@ MAX_FILE_SIZE_BYTES = 1048576
 # The default language code for an exploration.
 DEFAULT_LANGUAGE_CODE = 'en'
 
-# Whether to include the forum, terms and privacy pages.
-SHOW_CUSTOM_PAGES = True
-
 # The id of the default skin.
 # TODO(sll): Deprecate this; it is no longer used.
 DEFAULT_SKIN_ID = 'conversation_v1'
@@ -230,8 +262,8 @@ DEFAULT_SKIN_ID = 'conversation_v1'
 COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
 
 # User id and username for exploration migration bot. Commits made by this bot
-# are not reflected in the exploration summary models (for the gallery and
-# last-updated timestamps), but are recorded in the exploration commit log.
+# are not reflected in the exploration summary models, but are recorded in the
+# exploration commit log.
 MIGRATION_BOT_USER_ID = 'OppiaMigrationBot'
 MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
 
@@ -329,7 +361,7 @@ DEMO_EXPLORATIONS = {
     u'12': 'protractor_test_1.yaml',
     u'13': 'solar_system',
     u'14': 'about_oppia.yaml',
-    u'15': 'fuzzy_exploration.yaml',
+    u'15': 'classifier_demo_exploration.yaml',
     u'16': 'all_interactions',
 }
 
@@ -337,35 +369,48 @@ DEMO_COLLECTIONS = {
     u'0': 'welcome_to_collections.yaml'
 }
 
+# IDs of explorations which should not be displayable in either the learner or
+# editor views.
+DISABLED_EXPLORATION_IDS = ['5']
+
+# Google Group embed URL for the Forum page.
+EMBEDDED_GOOGLE_GROUP_URL = (
+    'https://groups.google.com/forum/embed/?place=forum/oppia')
+
+# Whether to allow YAML file uploads.
+ALLOW_YAML_FILE_UPLOAD = False
+
 # TODO(sll): Add all other URLs here.
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_WRITABLE_DATA_URL_PREFIX = '/collection_editor_handler/data'
 COLLECTION_RIGHTS_PREFIX = '/collection_editor_handler/rights'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
-CONTRIBUTE_GALLERY_URL = '/contribute'
+DASHBOARD_URL = '/dashboard'
+DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % DASHBOARD_URL
+DASHBOARD_DATA_URL = '/dashboardhandler/data'
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
 EXPLORATION_SUMMARIES_DATA_URL = '/explorationsummarieshandler/data'
 EXPLORATION_URL_PREFIX = '/explore'
-FEEDBACK_LAST_UPDATED_URL_PREFIX = '/feedback_last_updated'
 FEEDBACK_STATS_URL_PREFIX = '/feedbackstatshandler'
 FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
-GALLERY_DATA_URL = '/galleryhandler/data'
-GALLERY_URL = '/gallery'
-LEARN_GALLERY_URL = '/learn'
-MY_EXPLORATIONS_URL = '/my_explorations'
-MY_EXPLORATIONS_CREATE_MODE_URL = '%s?mode=create' % MY_EXPLORATIONS_URL
+FEEDBACK_MESSAGE_EMAIL_HANDLER_URL = '/feedbackemailhandler'
+LIBRARY_INDEX_URL = '/library'
+LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
+LIBRARY_SEARCH_URL = '/search/find'
+LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
-PLAYTEST_QUEUE_URL = '/playtest'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
+SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
+SPLASH_URL = '/splash'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
@@ -373,13 +418,16 @@ UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 
 NAV_MODE_ABOUT = 'about'
+NAV_MODE_COLLECTION = 'collection'
+NAV_MODE_CONTACT = 'contact'
 NAV_MODE_CREATE = 'create'
+NAV_MODE_DASHBOARD = 'dashboard'
 NAV_MODE_EXPLORE = 'explore'
-NAV_MODE_GALLERY = 'gallery'
-NAV_MODE_HOME = 'home'
-NAV_MODE_PARTICIPATE = 'participate'
+NAV_MODE_LIBRARY = 'library'
 NAV_MODE_PROFILE = 'profile'
 NAV_MODE_SIGNUP = 'signup'
+NAV_MODE_SPLASH = 'splash'
+NAV_MODE_TEACH = 'teach'
 
 # Event types.
 EVENT_TYPE_STATE_HIT = 'state_hit'
@@ -407,7 +455,11 @@ COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
+# NOTE TO DEVELOPERS: This should be synchronized with base.js
 ENABLE_STRING_CLASSIFIER = False
+SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
+SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK = False
+SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
 
 # Output formats of downloaded explorations.
 OUTPUT_FORMAT_JSON = 'json'
@@ -418,64 +470,97 @@ UPDATE_TYPE_EXPLORATION_COMMIT = 'exploration_commit'
 UPDATE_TYPE_COLLECTION_COMMIT = 'collection_commit'
 UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
 
-# Default color
-COLOR_TEAL = 'teal'
-# Social sciences
-COLOR_SALMON = 'salmon'
-# Art
-COLOR_SUNNYSIDE = 'sunnyside'
-# Mathematics and computing
-COLOR_SHARKFIN = 'sharkfin'
-# Science
-COLOR_GUNMETAL = 'gunmetal'
-DEFAULT_COLOR = COLOR_TEAL
+DEFAULT_COLOR = '#a33f40'
 DEFAULT_THUMBNAIL_ICON = 'Lightbulb'
-
-COLORS_TO_HEX_VALUES = {
-    COLOR_TEAL: '#05a69a',
-    COLOR_SALMON: '#f35f55',
-    COLOR_SUNNYSIDE: '#f7a541',
-    COLOR_SHARKFIN: '#058ca6',
-    COLOR_GUNMETAL: '#607d8b',
-}
 
 # List of supported default categories. For now, each category has
 # a specific color associated with it. Each category also has a thumbnail icon
 # whose filename is "{{CategoryName}}.svg".
 CATEGORIES_TO_COLORS = {
-    'Architecture': COLOR_SUNNYSIDE,
-    'Art': COLOR_SUNNYSIDE,
-    'Biology': COLOR_GUNMETAL,
-    'Business': COLOR_SALMON,
-    'Chemistry': COLOR_GUNMETAL,
-    'Computing': COLOR_SHARKFIN,
-    'Economics': COLOR_SALMON,
-    'Education': COLOR_TEAL,
-    'Engineering': COLOR_GUNMETAL,
-    'Environment': COLOR_GUNMETAL,
-    'Geography': COLOR_SALMON,
-    'Government': COLOR_SALMON,
-    'Hobbies': COLOR_TEAL,
-    'Languages': COLOR_SUNNYSIDE,
-    'Law': COLOR_SALMON,
-    'Life Skills': COLOR_TEAL,
-    'Mathematics': COLOR_SHARKFIN,
-    'Medicine': COLOR_GUNMETAL,
-    'Music': COLOR_SUNNYSIDE,
-    'Philosophy': COLOR_SALMON,
-    'Physics': COLOR_GUNMETAL,
-    'Programming': COLOR_SHARKFIN,
-    'Psychology': COLOR_SALMON,
-    'Puzzles': COLOR_TEAL,
-    'Reading': COLOR_TEAL,
-    'Religion': COLOR_SALMON,
-    'Sport': COLOR_SUNNYSIDE,
-    'Statistics': COLOR_SHARKFIN,
-    'Welcome': COLOR_TEAL,
+    'Mathematics': '#cd672b',
+    'Algebra': '#cd672b',
+    'Arithmetic': '#d68453',
+    'Calculus': '#b86330',
+    'Logic': '#d68453',
+    'Combinatorics': '#cf5935',
+    'Graph Theory': '#cf5935',
+    'Probability': '#cf5935',
+    'Statistics': '#cd672b',
+    'Geometry': '#d46949',
+    'Trigonometry': '#d46949',
+
+    'Algorithms': '#d0982a',
+    'Computing': '#bb8b2f',
+    'Programming': '#d9aa53',
+
+    'Astronomy': '#879d6c',
+    'Biology': '#97a766',
+    'Chemistry': '#aab883',
+    'Engineering': '#8b9862',
+    'Environment': '#aba86d',
+    'Medicine': '#97a766',
+    'Physics': '#879d6c',
+
+    'Architecture': '#6e3466',
+    'Art': '#895a83',
+    'Music': '#6a3862',
+    'Philosophy': '#613968',
+    'Poetry': '#7f507f',
+
+    'English': '#193a69',
+    'Languages': '#1b4174',
+    'Latin': '#3d5a89',
+    'Reading': '#193a69',
+    'Spanish': '#405185',
+    'Gaulish': '#1b4174',
+
+    'Business': '#387163',
+    'Economics': '#5d8b7f',
+    'Geography': '#3c6d62',
+    'Government': '#538270',
+    'History': '#3d6b52',
+    'Law': '#538270',
+
+    'Education': '#942e20',
+    'Puzzles': '#a8554a',
+    'Sport': '#893327',
+    'Welcome': '#992a2b',
 }
 
-# A sorted list of default categories.
-DEFAULT_CATEGORIES = sorted(CATEGORIES_TO_COLORS.keys())
+# A sorted list of default categories for which icons and background colours
+# exist.
+ALL_CATEGORIES = sorted(CATEGORIES_TO_COLORS.keys())
+
+# These categories are shown in the library navbar.
+SEARCH_DROPDOWN_CATEGORIES = sorted([
+    'Mathematics',
+    'Statistics',
+    'Algorithms',
+    'Programming',
+    'Biology',
+    'Chemistry',
+    'Physics',
+    'Medicine',
+    'English',
+    'Architecture',
+    'Art',
+    'Music',
+    'Reading',
+    'Business',
+    'Economics',
+    'Geography',
+    'History',
+])
+
+# The header for the "Featured Explorations" category in the library index
+# page.
+LIBRARY_CATEGORY_FEATURED_EXPLORATIONS = 'Featured Explorations'
+# The header for the "Top Rated Explorations" category in the library index
+# page.
+LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = 'Top Rated Explorations'
+# The header for the "Recently Published" category in the library index
+# page.
+LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'Recently Published'
 
 # List of supported language codes. Each description has a
 # parenthetical part that may be stripped out to give a shorter
@@ -562,5 +647,53 @@ ALL_LANGUAGE_CODES = [{
 DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
 
+SUPPORTED_SITE_LANGUAGES = {
+    'en': 'English',
+    'es': 'Español',
+    'id': 'Bahasa Indonesia'
+}
 SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 SYSTEM_USER_IDS = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
+
+CSRF_PAGE_NAME_CREATE_EXPLORATION = 'create_exploration'
+CSRF_PAGE_NAME_I18N = 'i18n'
+
+# The following are all page descriptions for the meta tag.
+ABOUT_PAGE_DESCRIPTION = (
+    'Oppia is an open source learning platform that connects a community of '
+    'teachers and learners. You can use this site to create 1-1 learning '
+    'scenarios for others.')
+CONTACT_PAGE_DESCRIPTION = (
+    'Contact the Oppia team, submit feedback, and learn how to get involved '
+    'with the Oppia project.')
+CREATE_PAGE_DESCRIPTION = (
+    'Help others learn new things. Create lessons through explorations and '
+    'share your knowledge with the community.')
+DASHBOARD_PAGE_DESCRIPTION = (
+    'Keep track of the lessons you have created, as well as feedback from '
+    'learners.')
+FORUM_PAGE_DESCRIPTION = (
+    'Engage with the Oppia community by discussing questions, bugs and '
+    'explorations in the forum.')
+LIBRARY_PAGE_DESCRIPTION = (
+    'Looking to learn something new? Find explorations created by professors, '
+    'teachers and Oppia users in a subject you\'re interested in, and start '
+    'exploring!')
+PREFERENCES_PAGE_DESCRIPTION = (
+    'Change your Oppia profile settings and preferences')
+SEARCH_PAGE_DESCRIPTION = (
+    'Discover a new exploration to learn from, or help improve an existing '
+    'one for the community.')
+SIGNUP_PAGE_DESCRIPTION = 'Sign up for Oppia and begin exploring a new subject.'
+SPLASH_PAGE_DESCRIPTION = (
+    'Oppia is a free site for sharing knowledge via interactive lessons '
+    'called \'explorations\'. Learn from user-created explorations, or teach '
+    'and create your own.')
+TEACH_PAGE_DESCRIPTION = (
+    'The Oppia library is full of user-created lessons called \'explorations\'.'
+    ' Read about how to participate in the community and begin creating '
+    'explorations.')
+TERMS_PAGE_DESCRIPTION = (
+    'Oppia is a 501(c)(3) registered non-profit open-source e-learning '
+    'platform. Learn about our terms and conditions for creating and '
+    'distributing learning material.')

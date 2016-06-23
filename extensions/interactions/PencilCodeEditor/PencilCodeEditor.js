@@ -33,8 +33,8 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
             pencilCodeEditorRulesService) {
           $scope.initialCode = oppiaHtmlEscaper.escapedJsonToObj(
             $attrs.initialCodeWithValue);
-
-          var pce = new PencilCodeEmbed($element[0].children[0]);
+          var iframeDiv = $element.find('.pencil-code-editor-iframe').get(0);
+          var pce = new PencilCodeEmbed(iframeDiv);
           pce.beginLoad($scope.initialCode);
           pce.on('load', function() {
             // Hides the error console at the bottom right, and prevents it
@@ -181,27 +181,27 @@ oppia.factory('pencilCodeEditorRulesService', [
         codeNormalizationService.getNormalizedCode(answer.code);
       var normalizedExpectedCode =
         codeNormalizationService.getNormalizedCode(inputs.x);
-      return normalizedCode == normalizedExpectedCode;
+      return normalizedCode === normalizedExpectedCode;
     },
     CodeContains: function(answer, inputs) {
       var normalizedCode =
         codeNormalizationService.getNormalizedCode(answer.code);
       var normalizedSnippet =
         codeNormalizationService.getNormalizedCode(inputs.x);
-      return normalizedCode.indexOf(normalizedSnippet) != -1;
+      return normalizedCode.indexOf(normalizedSnippet) !== -1;
     },
     CodeDoesNotContain: function(answer, inputs) {
       var normalizedCode =
         codeNormalizationService.getNormalizedCode(answer.code);
       var normalizedSnippet =
         codeNormalizationService.getNormalizedCode(inputs.x);
-      return normalizedCode.indexOf(normalizedSnippet) == -1;
+      return normalizedCode.indexOf(normalizedSnippet) === -1;
     },
     OutputEquals: function(answer, inputs) {
       var normalizedOutput = $filter('normalizeWhitespace')(answer.output);
       var normalizedExpectedOutput =
         $filter('normalizeWhitespace')(inputs.x);
-      return normalizedOutput == normalizedExpectedOutput;
+      return normalizedOutput === normalizedExpectedOutput;
     },
     ResultsInError: function(answer) {
       return !!(answer.error.trim());
@@ -209,7 +209,7 @@ oppia.factory('pencilCodeEditorRulesService', [
     ErrorContains: function(answer, inputs) {
       var normalizedError = $filter('normalizeWhitespace')(answer.error);
       var normalizedSnippet = $filter('normalizeWhitespace')(inputs.x);
-      return normalizedError.indexOf(normalizedSnippet) != -1;
+      return normalizedError.indexOf(normalizedSnippet) !== -1;
     }
   };
 }]);

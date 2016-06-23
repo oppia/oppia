@@ -44,10 +44,7 @@ You can help with Oppia's development in many ways, including art, coding, desig
   * **Developers**: please see the [CONTRIBUTING](CONTRIBUTING.md) file for instructions on how to set things up and commit changes.
   * **All other contributors**: please see our [general contributor guidelines](https://github.com/oppia/oppia/wiki/Contributing-to-Oppia).
 
-In addition, if you're making contributions to the codebase, please sign the CLA so that we can accept your contributions.
-  * If you're contributing as an individual, use the [individual CLA](https://goo.gl/forms/AttNH80OV0).
-  * If your company owns the copyright to your contributions, a company representative should sign the [corporate CLA](https://goo.gl/forms/xDq9gK3Zcv).
-
+In addition, if you'd like to make contributions to the codebase, please follow [these instructions](https://github.com/oppia/oppia/blob/develop/CONTRIBUTING.md#setting-things-up), which will walk you through setting things up, signing the CLA, and joining the developer mailing list. Thanks!
 
 ## Support
 

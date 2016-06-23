@@ -17,6 +17,7 @@
 import base64
 import datetime
 import hashlib
+import imghdr
 import json
 import os
 import random
@@ -227,14 +228,19 @@ def get_random_choice(alist):
     return alist[index]
 
 
-def convert_png_to_data_url(filepath):
-    """Converts the png file at filepath to a data URL.
+def convert_png_binary_to_data_url(content):
+    """Converts a png image string (represented by 'content') to a data URL."""
+    if imghdr.what(None, content) == 'png':
+        return 'data:image/png;base64,%s' % urllib.quote(
+            content.encode('base64'))
+    else:
+        raise Exception('The given string does not represent a PNG image.')
 
-    This method is currently used only in tests for RTE extensions.
-    """
+
+def convert_png_to_data_url(filepath):
+    """Converts the png file at filepath to a data URL."""
     file_contents = get_file_contents(filepath, raw_bytes=True, mode='rb')
-    return 'data:image/png;base64,%s' % urllib.quote(
-        file_contents.encode('base64'))
+    return convert_png_binary_to_data_url(file_contents)
 
 
 def camelcase_to_hyphenated(camelcase_str):
@@ -363,14 +369,21 @@ def vfs_normpath(path):
     return path or dot
 
 
-def require_valid_name(name, name_type):
+def require_valid_name(name, name_type, allow_empty=False):
     """Generic name validation.
 
     Args:
       name: the name to validate.
       name_type: a human-readable string, like 'the exploration title' or
         'a state name'. This will be shown in error messages.
+      allow_empty: if True, empty strings are allowed.
     """
+    if not isinstance(name, basestring):
+        raise ValidationError('%s must be a string.' % name_type)
+
+    if allow_empty and name == '':
+        return
+
     # This check is needed because state names are used in URLs and as ids
     # for statistics, so the name length should be bounded above.
     if len(name) > 50 or len(name) < 1:
@@ -404,29 +417,19 @@ def capitalize_string(input_string):
         return input_string
 
 
-def get_info_card_url_for_category(category):
-    info_card_color = (
-        feconf.CATEGORIES_TO_COLORS[category] if
-        category in feconf.CATEGORIES_TO_COLORS else feconf.DEFAULT_COLOR)
-    return (
-        '/images/gallery/exploration_background_%s_large.png' %
-        info_card_color)
-
-
 def get_hex_color_for_category(category):
-    color = (
+    return (
         feconf.CATEGORIES_TO_COLORS[category]
         if category in feconf.CATEGORIES_TO_COLORS
         else feconf.DEFAULT_COLOR)
-    return feconf.COLORS_TO_HEX_VALUES[color]
 
 
 def get_thumbnail_icon_url_for_category(category):
     icon_name = (
-        category if category in feconf.DEFAULT_CATEGORIES
+        category if category in feconf.ALL_CATEGORIES
         else feconf.DEFAULT_THUMBNAIL_ICON)
     # Remove all spaces from the string.
-    return '/images/gallery/thumbnails/%s.svg' % icon_name.replace(' ', '')
+    return '/images/subjects/%s.svg' % icon_name.replace(' ', '')
 
 
 def _get_short_language_description(full_language_description):
@@ -445,3 +448,8 @@ def get_all_language_codes_and_names():
         'code': lc['code'],
         'name': _get_short_language_description(lc['description']),
     } for lc in feconf.ALL_LANGUAGE_CODES]
+
+
+def unescape_encoded_uri_component(escaped_string):
+    """Unescape a string that is encoded with encodeURIComponent."""
+    return urllib.unquote(escaped_string).decode('utf-8')

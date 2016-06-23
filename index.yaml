@@ -30,6 +30,20 @@ indexes:
   - name: deleted
   - name: status
 
+- kind: ExpSummaryModel
+  properties:
+  - name: deleted
+  - name: status
+  - name: first_published_msec
+    direction: desc
+
+- kind: ExpSummaryModel
+  properties:
+  - name: deleted
+  - name: status
+  - name: scaled_average_rating
+    direction: desc
+
 - kind: ExpSummaryRealtimeModel
   properties:
   - name: realtime_layer
@@ -97,12 +111,22 @@ indexes:
   - name: realtime_layer
   - name: created_on
 
+- kind: SentEmailModel
+  properties:
+  - name: email_hash
+  - name: sent_datetime
+
 - kind: StatisticsRealtimeModel
   properties:
   - name: realtime_layer
   - name: created_on
 
 - kind: UserImpactRealtimeModel
+  properties:
+  - name: realtime_layer
+  - name: created_on
+
+- kind: UserStatsRealtimeModel
   properties:
   - name: realtime_layer
   - name: created_on

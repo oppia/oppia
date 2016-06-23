@@ -2,6 +2,166 @@ This file contains a summary of changes to the Oppia code base. For a full chang
 
     https://github.com/oppia/oppia/commits/master
 
+v2.3.0 (7 Jun 2016)
+-------------------
+Site-wide features:
+* Add suppport for internationalization.
+* Add title and meta descriptions.
+* Fix #1845: add a warning if the user has disabled JavaScript.
+* Fix #1900: correctly close the sidebar menu on mobile.
+* Fix #1842: prevent the profile avatar dropping off the top of the page on small screens.
+
+Splash/About pages:
+* Add new About, Teach and Get Involved pages.
+* Reverse the text and update the images in the lower half of the splash page.
+* Redirect to the creator dashboard if the user logs in from the splash page.
+* Use absolute paths for images on the splash page.
+
+Library page:
+* Add a recently-published group to the library index page.
+* Add a top-rated group to the library index page.
+* Add a banner and text to the top of the library index page.
+* Add a footer to the library index page.
+* Filter null explorations from showing up in the library index page.
+* Fix #1456: create summary tiles for collections.
+* Fix #1860: elongate exploration summary tiles to allow two lines of the exploration title to show.
+* Fix #1840: fix the oval around the contributor icons in the exploration summary tiles.
+* Remove avatars from the exploration summary tiles due to latency issues.
+* Remove the on-hover indicator from the library carousel scroll button.
+* Fix #1864: fix carousel behaviour when the user clicks on the scroll button multiple times in rapid succession.
+* Fix #1911: fix incorrect carousel shadow height.
+* Fix #1918: Prevent the site feedback button from being hidden in the library index page.
+* Add new subject icons for Spanish and Gaulish.
+
+Exploration editor:
+* Add functionality for autosaving drafts.
+* Allow jumping to a particular state in preview mode.
+* Prompt for missing metadata fields just before publication.
+* Streamline the saving flow for the various state properties.
+* Refactor the parameter metadata computation into a separate service.
+* Fix #1877: prevent the 'add new response' modal from exiting when a creator clicks outside it.
+* Fix #1829: in the history tab, reduce the space between the committer's username and the exploration version.
+* Fix #1894: prevent the category dropdown list from unnecessarily scrolling to the bottom.
+* Remove the underline button from the rich-text editor toolbar.
+* Remove the "nominate exploration" button from the editor settings page.
+* Remove the 'missing objective' warning.
+
+Collection editor:
+* Introduce a new collection editor (currently in beta).
+
+Creator dashboard:
+* Rename 'My Explorations' to 'Creator Dashboard'.
+* Fix #1954: add collection tiles to the creator dashboard.
+* Fix #1696: introduce a modal for choosing which type of activity to create.
+* Fix #1705: remove the old exploration creation modal.
+
+Learner page:
+* Fix #1489: make the learner view responsive.
+* Fix #1881: remove unnecessary scroll bar.
+* Fix #1814: remove unnecessary button styling and arrows in the tutor card.
+* Fix #1815: place the tutor avatar above the supplemental card.
+* Fix #1818: show the help card at the bottom of the viewport if the interaction is too tall.
+* Fix jerky animation for showing previous answers.
+* Fix #1816: fix single-card to double-card animation.
+* Fix #1817: center the animation at the Oppia avatar position.
+
+Interactions:
+* ItemSelectionInput:
+  - Fix #1766: correctly initialize the notEnoughSelections flag.
+
+Profile page:
+* Fix #1793: allow the user to click on their profile image in order to edit it in their Preferences page.
+* Fix #1826: show subject interests properly in Firefox.
+
+Infrastructure and tests:
+* Improve application performance by disabling debug data.
+* Fix #1540: add tests for detecting bad patterns.
+* Add a one-off test case to check the computation of exploration contributor summaries.
+* Support setting CHROME_BIN to the Chromium browser path in Unix-based systems.
+* Fix #1394: fix Python version check in setup.sh.
+* Fix #1848: set the appropriate http_proxy environment variable if the user is on Vagrant.
+* Increase the default memory in the Vagrantfile to 2048MB.
+* Fix #1836: add a .gitattributes file to set proper EOL terminators.
+* Tighten CSRF payload checks to correctly handle empty request data.
+* Fix #1757: divide e2e tests into separate suites.
+* Fix #1779: split e2e tests into separate suites on Travis-CI.
+* Protractor bugfix: scroll to the top of the page before clicking on the state graph.
+
+
+v2.2.0 (7 May 2016)
+-------------------
+Overall site design and navigation:
+* Fix #1510: separate the library page from the splash page.
+* Clicking on the logo at the top left redirects to the appropriate home page.
+* Fix #1075: use material icons instead of glyphicons.
+* Fix #1615: add a footer to all informational pages on the site
+
+Splash page:
+* Redesign the splash page.
+
+Library page:
+* Rename 'gallery' to 'library' throughout the codebase.
+* Add an index page with explorations in different categories.
+* Fix #1360: add a separate category for featured explorations.
+* Fix #1681: redesign the number-of-contributors indicator on the exploration summary tiles.
+* Create new category icons.
+* Reduce the number of categories in the category dropdown menu.
+* Add stable URLs for search result pages.
+* Redesign the 'loading more results' indicator.
+
+Editor page:
+* Redesign the editor onboarding flow.
+* Fix #1537: send an email when a user is granted new rights to an exploration.
+* Fix (part of) #798: clarify the message shown when an interaction is missing.
+* Fix #1679: in the editor view, prevent the feedback tab overlapping the sign-in menu.
+* Reduce the widths of the editor tabs.
+* Tidy up the save/publish button styling in the navbar.
+* Fix #1676: remove the small gap between the "Save Draft" and "Discard Draft" buttons.
+* Remove the visibility toggle for private explorations from the Settings tab.
+* Fix a bug in getEditorTabContext() that resulted in incorrect detection of the editor preview mode.
+* Fix #1788: correctly align parameter input fields in Firefox.
+
+Learner page:
+* Fix #1497: ensure that the inter-paragraph spacing behaves correctly.
+* Fix #1678: prevent share links from being squashed in the information card.
+
+Interactions:
+* CodeRepl:
+  - Fix #1682: add an OutputContains rule.
+  - Fix #1671: make text highlighting visible.
+  - Fix #1767: add a 'test run' button.
+  - Fix a bug where the error message displayed in the user-facing console was not updated promptly.
+
+Rich-text editor:
+* Add indent/outdent functionality.
+* Add block-style previews for some RTE components.
+* Fix #914: remove the RTE icon resize handlebars in Firefox.
+
+Profile page:
+* Fix #1350: redesign the profile page to include a portfolio section and display responsively.
+* Fix #1544: Fetch Gravatar images or identicons when a new user signs up.
+
+Other pages:
+* Fix #1703 (preferences page): fix the preferred languages dropdown width.
+* Fix #1712 (admin page): add a navigation bar, and separate the page into different categories.
+* "My explorations" page:
+  - Autofocus correctly when the 'create exploration' modal is opened.
+  - Redesign the page to be more useful to new creators.
+  - Show a more informative status ("Published" instead of "Good") for published explorations that have no unresolved feedback messages.
+
+Developer workflow:
+* Fix #995: add Protractor e2e tests to Travis-CI.
+* Improve Travis-CI build times by caching specific directories.
+* Fix #1717: enforce correct permissions on the node_modules/ dir in Vagrant.
+
+Infrastructure and tests:
+* Update protractor to 3.3.0.
+* Fix #1434: replace deprecated $http.success & $http.error with $http.then.
+* Fix #1369: add a domain layer for objects related to feedback threads.
+* Fix #1729: add tests for summary_services.py.
+* Add analytics events for buttons on the splash page, and for opening the 'publish exploration' modal.
+
+
 v2.1.5 (3 Apr 2016)
 -------------------
 Overall site design and navigation:

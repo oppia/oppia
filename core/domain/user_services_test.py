@@ -14,14 +14,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+import os
+
 from core.domain import collection_services
+from core.domain import event_services
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import user_jobs_continuous_test
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
 import utils
 
+from google.appengine.api import urlfetch
 
 class UserServicesUnitTests(test_utils.GenericTestBase):
     """Test the user services methods."""
@@ -131,6 +137,105 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         # Return None for usernames which don't exist.
         self.assertIsNone(
             user_services.get_user_id_from_username('fakeUsername'))
+
+    def test_fetch_gravatar_success(self):
+        user_email = 'user@example.com'
+        expected_gravatar_filepath = os.path.join(
+            'static', 'images', 'avatar', 'gravatar_example.png')
+        with open(expected_gravatar_filepath, 'r') as f:
+            gravatar = f.read()
+        with self.urlfetch_mock(content=gravatar):
+            profile_picture = user_services.fetch_gravatar(user_email)
+            gravatar_data_url = utils.convert_png_to_data_url(
+                expected_gravatar_filepath)
+            self.assertEqual(profile_picture, gravatar_data_url)
+
+    def test_fetch_gravatar_failure_404(self):
+        user_email = 'user@example.com'
+        error_messages = []
+        def log_mock(message):
+            error_messages.append(message)
+
+        gravatar_url = user_services.get_gravatar_url(user_email)
+        expected_error_message = (
+            '[Status 404] Failed to fetch Gravatar from %s' % gravatar_url)
+        logging_error_mock = test_utils.CallCounter(log_mock)
+        urlfetch_counter = test_utils.CallCounter(urlfetch.fetch)
+        urlfetch_mock_ctx = self.urlfetch_mock(status_code=404)
+        log_swap_ctx = self.swap(logging, 'error', logging_error_mock)
+        fetch_swap_ctx = self.swap(urlfetch, 'fetch', urlfetch_counter)
+        with urlfetch_mock_ctx, log_swap_ctx, fetch_swap_ctx:
+            profile_picture = user_services.fetch_gravatar(user_email)
+            self.assertEqual(urlfetch_counter.times_called, 1)
+            self.assertEqual(logging_error_mock.times_called, 1)
+            self.assertEqual(expected_error_message, error_messages[0])
+            self.assertEqual(
+                profile_picture, user_services.DEFAULT_IDENTICON_DATA_URL)
+
+    def test_fetch_gravatar_failure_exception(self):
+        user_email = 'user@example.com'
+        error_messages = []
+        def log_mock(message):
+            error_messages.append(message)
+
+        gravatar_url = user_services.get_gravatar_url(user_email)
+        expected_error_message = (
+            'Failed to fetch Gravatar from %s' % gravatar_url)
+        logging_error_mock = test_utils.CallCounter(log_mock)
+        urlfetch_fail_mock = test_utils.FailingFunction(
+            urlfetch.fetch, urlfetch.InvalidURLError,
+            test_utils.FailingFunction.INFINITY)
+        log_swap_ctx = self.swap(logging, 'error', logging_error_mock)
+        fetch_swap_ctx = self.swap(urlfetch, 'fetch', urlfetch_fail_mock)
+        with log_swap_ctx, fetch_swap_ctx:
+            profile_picture = user_services.fetch_gravatar(user_email)
+            self.assertEqual(logging_error_mock.times_called, 1)
+            self.assertEqual(expected_error_message, error_messages[0])
+            self.assertEqual(
+                profile_picture, user_services.DEFAULT_IDENTICON_DATA_URL)
+
+    def test_default_identicon_data_url(self):
+        identicon_filepath = os.path.join(
+            'static', 'images', 'avatar', 'user_blue_72px.png')
+        identicon_data_url = utils.convert_png_to_data_url(
+            identicon_filepath)
+        self.assertEqual(
+            identicon_data_url, user_services.DEFAULT_IDENTICON_DATA_URL)
+
+    def test_set_and_get_user_email_preferences(self):
+        user_id = 'someUser'
+        username = 'username'
+        user_email = 'user@example.com'
+
+        user_services.get_or_create_user(user_id, user_email)
+        user_services.set_username(user_id, username)
+
+        # When UserEmailPreferencesModel is yet to be created,
+        # the value returned by get_email_preferences() should be True.
+        email_preferences = user_services.get_email_preferences(user_id)
+        self.assertEquals(
+            email_preferences['can_receive_editor_role_email'],
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+
+        # The user retrieves their email preferences. This initializes
+        # a UserEmailPreferencesModel instance with the default values.
+        user_services.update_email_preferences(
+            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+
+        email_preferences = user_services.get_email_preferences(user_id)
+        self.assertEquals(
+            email_preferences['can_receive_editor_role_email'],
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+
+        # The user sets their membership email preference to False.
+        user_services.update_email_preferences(
+            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE, False)
+
+        email_preferences = user_services.get_email_preferences(user_id)
+        self.assertEquals(
+            email_preferences['can_receive_editor_role_email'],
+            False)
 
 
 class UpdateContributionMsecTests(test_utils.GenericTestBase):
@@ -367,6 +472,44 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         # unpublished.
         self.assertIsNotNone(user_services.get_user_settings(
             self.owner_id).first_contribution_msec)
+
+
+class UserDashboardStatsTests(test_utils.GenericTestBase):
+    """Test whether exploration-related statistics of a user change as events
+    are registered.
+    """
+
+    OWNER_EMAIL = 'owner@example.com'
+    OWNER_USERNAME = 'owner'
+    EXP_ID = 'exp1'
+
+    USER_SESSION_ID = 'session1'
+
+    def setUp(self):
+        super(UserDashboardStatsTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+    def test_get_user_dashboard_stats(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, end_state_name='End')
+        init_state_name = exploration.init_state_name
+        event_services.StartExplorationEventHandler.record(
+            self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
+            feconf.PLAY_TYPE_NORMAL)
+        self.assertEquals(
+            user_services.get_user_dashboard_stats(self.owner_id), {
+                'total_plays': 0,
+                'average_ratings': None
+            })
+        (user_jobs_continuous_test.ModifiedUserStatsAggregator
+         .start_computation())
+        self.process_and_flush_pending_tasks()
+        self.assertEquals(
+            user_services.get_user_dashboard_stats(self.owner_id), {
+                'total_plays': 1,
+                'average_ratings': None
+            })
 
 
 class SubjectInterestsUnitTests(test_utils.GenericTestBase):

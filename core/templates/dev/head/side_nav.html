@@ -5,73 +5,64 @@
   </div>
 
   <ul>
-    <li {% if nav_mode == 'gallery' %}class="active"{% endif %}>
-      <a href="/gallery">
+    <li {% if nav_mode == 'library' %}class="active"{% endif %}>
+      <a href="/library">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE88A;</i>
-        Home
+        <span translate="I18N_SIDEBAR_LIBRARY_LINK"></span>
       </a>
     </li>
 
     <li {% if nav_mode == 'about' %}class="active"{% endif %}>
       <a href="/about">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE887;</i>
-        About
+        <span translate="I18N_SIDEBAR_ABOUT_LINK"></span>
       </a>
     </li>
 
-    <li {% if nav_mode == 'participate' %}class="active"{% endif %}>
-      <a href="/participate">
+    <li {% if nav_mode == 'teach' %}class="active"{% endif %}>
+      <a href="/teach">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE88E;</i>
-        Participation Playbook
+        <span translate="I18N_SIDEBAR_TEACH_WITH_OPPIA"></span>
       </a>
     </li>
 
-    {% if SHOW_CUSTOM_PAGES %}
-      <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
-        <a href="/forum">
-          <i class="material-icons oppia-sidebar-menu-icon">&#xE7EF;</i>
-          Forum
-        </a>
-      </li>
-    {% endif %}
+    <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
+      <a href="/forum">
+        <i class="material-icons oppia-sidebar-menu-icon">&#xE7EF;</i>
+        <span translate="I18N_SIDEBAR_FORUM"></span>
+      </a>
+    </li>
 
-    {% for additional_link in SIDEBAR_MENU_ADDITIONAL_LINKS %}
-      <li>
-        <a href="{{additional_link['link']}}" target="_blank">
-          <img src="/images/sidebar/{{additional_link['icon_filename']}}"
-                 class="oppia-sidebar-menu-icon">
-          {{additional_link['name']}}
-        </a>
-      </li>
-    {% endfor %}
+    <li>
+      <a href="https://oppiablog.blogspot.com" target="_blank">
+        <img src="/images/sidebar/blogger.png" class="oppia-sidebar-menu-icon">
+        <span translate="I18N_SIDEBAR_BLOG"></span>
+      </a>
+    </li>
 
-    {% if SHOW_CUSTOM_PAGES %}
-      <hr>
-
-      <li>
-        <a href="/terms">
-          <i class="material-icons oppia-sidebar-menu-icon">&#xE88E;</i>
-          Terms of Use
-        </a>
-      </li>
-
-      <li>
-        <a href="/privacy">
-          <i class="material-icons oppia-sidebar-menu-icon">&#xE88E;</i>
-          Privacy Policy
-        </a>
-      </li>
-    {% endif %}
+    <li {% if nav_mode == 'contact' %}class="active"{% endif %}>
+      <a href="/contact">
+        <i class="material-icons oppia-sidebar-menu-icon">&#xE87F;</i>
+        <span translate="I18N_SIDEBAR_CONTACT_US"></span>
+      </a>
+    </li>
   </ul>
 
   <div class="oppia-sidebar-footer">
-    {% if SOCIAL_MEDIA_BUTTONS %}
-      <div>Follow Us:</div>
-      {% for button in SOCIAL_MEDIA_BUTTONS %}
-        <a href="{{button['link']}}" target="_blank">
-          <img src="/images/social/{{button['icon_filename']}}">
-        </a>
-      {% endfor %}
-    {% endif %}
+    <div>
+      <span="I18N_SIDEBAR_FOLLOW_US"></span>:
+    </div>
+    <a href="https://plus.google.com/109898456505810251700/about" target="_blank">
+      <img src="/images/social/gplus.png">
+    </a>
+    <a href="https://www.youtube.com/channel/UC5c1G7BNDCfv1rczcBp9FPw" target="_blank">
+      <img src="/images/social/youtube.png">
+    </a>
+    <a href="https://www.facebook.com/oppiaorg" target="_blank">
+      <img src="/images/social/fb.png">
+    </a>
+    <a href="https://twitter.com/oppiaorg" target="_blank">
+      <img src="/images/social/twitter.png">
+    </a>
   </div>
 </nav>

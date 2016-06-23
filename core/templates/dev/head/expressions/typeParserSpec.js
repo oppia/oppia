@@ -1,16 +1,16 @@
- // Copyright 2014 The Oppia Authors. All Rights Reserved.
- //
- // Licensed under the Apache License, Version 2.0 (the "License");
- // you may not use this file except in compliance with the License.
- // You may obtain a copy of the License at
- //
- //      http://www.apache.org/licenses/LICENSE-2.0
- //
- // Unless required by applicable law or agreed to in writing, software
- // distributed under the License is distributed on an "AS-IS" BASIS,
- // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- // See the License for the specific language governing permissions and
- // limitations under the License.
+// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 describe('Expression type parser service', function() {
   beforeEach(module('oppia'));
@@ -76,7 +76,7 @@ describe('Expression type parser service', function() {
       // expected to be thrown.
       // 'expression' is either a string (in which case parsed) or an array
       // (representing a parse tree).
-      var parsed = typeof (expression) == 'string' ?
+      var parsed = typeof (expression) === 'string' ?
           eps.parse(expression) : expression;
       var parsedJson = JSON.stringify(parsed);
       var failed = false;
@@ -114,7 +114,7 @@ describe('Expression type parser service', function() {
       }
       expect(failed).toBe(false);
 
-      if (typeof (expression) != 'string') {
+      if (typeof (expression) !== 'string') {
         return;
       }
 

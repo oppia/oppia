@@ -34,8 +34,8 @@ from core.tests import test_utils
 import feconf
 import utils
 
-(exp_models, feedback_models) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.feedback
+(exp_models, feedback_models, user_models) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
 ])
 search_services = models.Registry.import_search_services()
 transaction_services = models.Registry.import_transaction_services()
@@ -50,7 +50,7 @@ TEST_GADGETS = {
 }
 
 def _count_at_least_editable_exploration_summaries(user_id):
-    return len(exp_services._get_exploration_summary_dicts_from_models(  # pylint: disable=protected-access
+    return len(exp_services._get_exploration_summaries_from_models(  # pylint: disable=protected-access
         exp_models.ExpSummaryModel.get_at_least_editable(
             user_id=user_id)))
 
@@ -272,10 +272,10 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             self._create_search_query(['in'], ['Architecture', 'Welcome'], []))
         self.assertEqual(sorted(exp_ids), [self.EXP_ID_0, self.EXP_ID_3])
 
-    def test_exploration_summaries_pagination_in_filled_gallery(self):
-        # Ensure the maximum number of explorations that can fit on the gallery
-        # page is maintained by the summaries function.
-        with self.swap(feconf, 'GALLERY_PAGE_SIZE', 3):
+    def test_exploration_summaries_pagination_in_filled_search_results(self):
+        # Ensure the maximum number of explorations that can fit on the search
+        # results page is maintained by the summaries function.
+        with self.swap(feconf, 'SEARCH_RESULTS_PAGE_SIZE', 3):
             # Need to load 3 pages to find all of the explorations. Since the
             # returned order is arbitrary, we need to concatenate the results
             # to ensure all explorations are returned. We validate the correct
@@ -434,7 +434,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         """Tests that explorations are removed from the search index when
         deleted.
         """
-
         self.save_new_default_exploration(self.EXP_ID, self.owner_id)
 
         def mock_delete_docs(doc_ids, index):
@@ -447,16 +446,19 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         with delete_docs_swap:
             exp_services.delete_exploration(self.owner_id, self.EXP_ID)
 
-    def test_create_new_exploration_error_cases(self):
+    def test_no_errors_are_raised_when_creating_default_exploration(self):
         exploration = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, '', '')
-        with self.assertRaisesRegexp(Exception, 'between 1 and 50 characters'):
-            exp_services.save_new_exploration(self.owner_id, exploration)
+            self.EXP_ID)
+        exp_services.save_new_exploration(self.owner_id, exploration)
 
+    def test_that_default_exploration_fails_strict_validation(self):
         exploration = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, 'title', '')
-        with self.assertRaisesRegexp(Exception, 'between 1 and 50 characters'):
-            exp_services.save_new_exploration(self.owner_id, exploration)
+            self.EXP_ID)
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'This state does not have any interaction specified.'
+            ):
+            exploration.validate(strict=True)
 
     def test_save_and_retrieve_exploration(self):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
@@ -1806,6 +1808,8 @@ class ExplorationCommitLogSpecialCasesUnitTests(ExplorationServicesUnitTests):
 class ExplorationSearchTests(ExplorationServicesUnitTests):
     """Test exploration search."""
 
+    USER_ID_1 = 'user_1'
+
     def test_demo_explorations_are_added_to_search_index(self):
         results, _ = exp_services.search_explorations('Welcome', 2)
         self.assertEqual(results, [])
@@ -1971,52 +1975,91 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
         self.assertEqual(cursor, expected_result_cursor)
         self.assertEqual(result, doc_ids)
 
-    def test_get_search_rank(self):
+    def test_get_average_rating(self):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
-
-        # The search rank has a 'last updated' bonus of 80.
-        base_search_rank = 20 + 80
+        exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
 
         self.assertEqual(
-            exp_services._get_search_rank(self.EXP_ID), base_search_rank)
-
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
-        rights_manager.publicize_exploration(self.user_id_admin, self.EXP_ID)
-        self.assertEqual(
-            exp_services._get_search_rank(self.EXP_ID), base_search_rank + 30)
+            exp_services.get_average_rating(exp.ratings), 0)
 
         rating_services.assign_rating_to_exploration(
             self.owner_id, self.EXP_ID, 5)
         self.assertEqual(
-            exp_services._get_search_rank(self.EXP_ID), base_search_rank + 40)
+            exp_services.get_average_rating(exp.ratings), 5)
+
+        rating_services.assign_rating_to_exploration(
+            self.USER_ID_1, self.EXP_ID, 2)
+
+        exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+        self.assertEqual(
+            exp_services.get_average_rating(exp.ratings), 3.5)
+
+    def test_get_lower_bound_wilson_rating_from_exp_summary(self):
+        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+
+        self.assertEqual(
+            exp_services.get_scaled_average_rating(exp.ratings), 0)
+
+        rating_services.assign_rating_to_exploration(
+            self.owner_id, self.EXP_ID, 5)
+        self.assertAlmostEqual(
+            exp_services.get_scaled_average_rating(exp.ratings),
+            1.8261731658956, places=4)
+
+        rating_services.assign_rating_to_exploration(
+            self.USER_ID_1, self.EXP_ID, 4)
+
+        exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+        self.assertAlmostEqual(
+            exp_services.get_scaled_average_rating(exp.ratings),
+            2.056191454757, places=4)
+
+
+    def test_get_search_rank(self):
+        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+
+        base_search_rank = 20
+
+        self.assertEqual(
+            exp_services.get_search_rank(self.EXP_ID), base_search_rank)
+
+        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
+        rights_manager.publicize_exploration(self.user_id_admin, self.EXP_ID)
+        self.assertEqual(
+            exp_services.get_search_rank(self.EXP_ID), base_search_rank + 30)
+
+        rating_services.assign_rating_to_exploration(
+            self.owner_id, self.EXP_ID, 5)
+        self.assertEqual(
+            exp_services.get_search_rank(self.EXP_ID), base_search_rank + 40)
 
         rating_services.assign_rating_to_exploration(
             self.user_id_admin, self.EXP_ID, 2)
         self.assertEqual(
-            exp_services._get_search_rank(self.EXP_ID), base_search_rank + 38)
+            exp_services.get_search_rank(self.EXP_ID), base_search_rank + 38)
 
     def test_search_ranks_cannot_be_negative(self):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
 
-        # The search rank has a 'last updated' bonus of 80.
-        base_search_rank = 20 + 80
+        base_search_rank = 20
 
         self.assertEqual(
-            exp_services._get_search_rank(self.EXP_ID), base_search_rank)
+            exp_services.get_search_rank(self.EXP_ID), base_search_rank)
 
         # A user can (down-)rate an exploration at most once.
         for i in xrange(50):
             rating_services.assign_rating_to_exploration(
                 'user_id_1', self.EXP_ID, 1)
         self.assertEqual(
-            exp_services._get_search_rank(self.EXP_ID), base_search_rank - 5)
+            exp_services.get_search_rank(self.EXP_ID), base_search_rank - 5)
 
         for i in xrange(50):
             rating_services.assign_rating_to_exploration(
                 'user_id_%s' % i, self.EXP_ID, 1)
 
         # The rank will be at least 0.
-        self.assertEqual(exp_services._get_search_rank(self.EXP_ID), 0)
+        self.assertEqual(exp_services.get_search_rank(self.EXP_ID), 0)
 
 
 class ExplorationSummaryTests(ExplorationServicesUnitTests):
@@ -2220,20 +2263,22 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             self.EXP_ID_2: exp_domain.ExplorationSummary(
                 self.EXP_ID_2, 'Exploration 2 Albert title',
                 'A category', 'An objective', 'en', [],
-                feconf.get_empty_ratings(),
+                feconf.get_empty_ratings(), feconf.EMPTY_SCALED_AVERAGE_RATING,
                 rights_manager.ACTIVITY_STATUS_PUBLIC,
                 False, [self.albert_id], [], [], [self.albert_id],
                 {self.albert_id: 1},
                 self.EXPECTED_VERSION_2,
                 actual_summaries[self.EXP_ID_2].exploration_model_created_on,
-                actual_summaries[self.EXP_ID_2].exploration_model_last_updated
+                actual_summaries[self.EXP_ID_2].exploration_model_last_updated,
+                actual_summaries[self.EXP_ID_2].first_published_msec
                 )}
 
         # check actual summaries equal expected summaries
         self.assertEqual(actual_summaries.keys(),
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',
-                        'language_code', 'tags', 'ratings', 'status',
+                        'language_code', 'tags', 'ratings',
+                        'scaled_average_rating', 'status',
                         'community_owned', 'owner_ids',
                         'editor_ids', 'viewer_ids',
                         'contributor_ids', 'version',
@@ -2251,22 +2296,24 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             self.EXP_ID_1: exp_domain.ExplorationSummary(
                 self.EXP_ID_1, 'Exploration 1 title',
                 'A category', 'An objective', 'en', [],
-                feconf.get_empty_ratings(),
+                feconf.get_empty_ratings(), feconf.EMPTY_SCALED_AVERAGE_RATING,
                 rights_manager.ACTIVITY_STATUS_PRIVATE,
                 False, [self.albert_id], [], [], [self.albert_id, self.bob_id],
                 {self.albert_id: 1, self.bob_id: 1}, self.EXPECTED_VERSION_1,
                 actual_summaries[self.EXP_ID_1].exploration_model_created_on,
-                actual_summaries[self.EXP_ID_1].exploration_model_last_updated
+                actual_summaries[self.EXP_ID_1].exploration_model_last_updated,
+                actual_summaries[self.EXP_ID_1].first_published_msec
             ),
             self.EXP_ID_2: exp_domain.ExplorationSummary(
                 self.EXP_ID_2, 'Exploration 2 Albert title',
                 'A category', 'An objective', 'en', [],
-                feconf.get_empty_ratings(),
+                feconf.get_empty_ratings(), feconf.EMPTY_SCALED_AVERAGE_RATING,
                 rights_manager.ACTIVITY_STATUS_PUBLIC,
                 False, [self.albert_id], [], [], [self.albert_id],
                 {self.albert_id: 1}, self.EXPECTED_VERSION_2,
                 actual_summaries[self.EXP_ID_2].exploration_model_created_on,
-                actual_summaries[self.EXP_ID_2].exploration_model_last_updated
+                actual_summaries[self.EXP_ID_2].exploration_model_last_updated,
+                actual_summaries[self.EXP_ID_2].first_published_msec
             )
         }
 
@@ -2316,19 +2363,19 @@ class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
             'new_value': [{'value': '<p>a</p>', 'type': 'text'}],
             'property_name': 'content',
             'old_value': [{'value': '', 'type': 'text'}],
-            'state_name': 'First Card'
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME
         }, {
             'cmd': 'edit_state_property',
             'new_value': 'Continue',
             'property_name': 'widget_id',
             'old_value': None,
-            'state_name': 'First Card'
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME
         }, {
             'cmd': 'edit_state_property',
             'new_value': {'buttonText': {'value': 'Continue'}},
             'property_name': 'widget_customization_args',
             'old_value': {},
-            'state_name': 'First Card'
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME
         }, {
             'cmd': 'edit_state_property',
             'new_value': {
@@ -2338,11 +2385,11 @@ class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
             },
             'property_name': 'default_outcome',
             'old_value': {
-                'dest': 'First Card',
+                'dest': feconf.DEFAULT_INIT_STATE_NAME,
                 'param_changes': [],
                 'feedback': []
             },
-            'state_name': 'First Card'
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME
         }
     ]
 
@@ -2357,15 +2404,15 @@ class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
                 'value': '<p>a</p>'
             }],
             'cmd': 'edit_state_property',
-            'state_name': 'First Card',
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'property_name': 'content'
         }, {
-            'old_state_name': 'First Card',
+            'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'cmd': 'rename_state',
             'new_state_name': 'First Card renamed'
         }, {
             'new_value': 'First Card renamed',
-            'old_value': 'First Card',
+            'old_value': feconf.DEFAULT_INIT_STATE_NAME,
             'cmd': 'edit_exploration_property',
             'property_name': 'init_state_name'
         }
@@ -2488,7 +2535,7 @@ class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
         expected_result = copy.deepcopy(
             ChangeListSummaryUnitTests.BASIC_CHANGE_SUMMARY)
         expected_result['state_property_changes'] = {
-            'First Card': {
+            feconf.DEFAULT_INIT_STATE_NAME: {
                 'content': {
                     'new_value': [
                         {
@@ -2518,7 +2565,7 @@ class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
                         'param_changes': []
                     },
                     'old_value': {
-                        'dest': 'First Card',
+                        'dest': feconf.DEFAULT_INIT_STATE_NAME,
                         'feedback': [],
                         'param_changes': []
                     }
@@ -2555,11 +2602,11 @@ class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
         expected_result['exploration_property_changes'] = {
             'init_state_name': {
                 'new_value': 'First Card renamed',
-                'old_value': 'First Card'
+                'old_value': feconf.DEFAULT_INIT_STATE_NAME
             }
         }
         expected_result['state_property_changes'] = {
-            'First Card': {
+            feconf.DEFAULT_INIT_STATE_NAME: {
                 'content': {
                     'new_value': [
                         {
@@ -2576,7 +2623,7 @@ class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
                 },
                 'name': {
                     'new_value': 'First Card renamed',
-                    'old_value': 'First Card'
+                    'old_value': feconf.DEFAULT_INIT_STATE_NAME
                 }
             }
         }
@@ -3003,7 +3050,7 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
             self.EXP_ID1, self.THREAD_ID1)
         last_message = thread_messages[len(thread_messages) - 1]
         self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_FIXED)
-        self.assertEqual(last_message['text'], 'Suggestion accepted.')
+        self.assertEqual(last_message.text, 'Suggestion accepted.')
 
     def test_accept_suggestion_invalid_suggestion(self):
         with self.swap(exp_services, '_is_suggestion_valid',
@@ -3057,3 +3104,159 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
             with self.assertRaisesRegexp(Exception, exception_message):
                 exp_services.reject_suggestion(
                     self.editor_id, self.THREAD_ID1, self.EXP_ID2)
+
+
+class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
+    """Test editor auto saving functions in exp_services."""
+
+    EXP_ID1 = 'exp_id1'
+    EXP_ID2 = 'exp_id2'
+    EXP_ID3 = 'exp_id3'
+    USERNAME = 'user123'
+    USER_ID = 'user_id'
+    COMMIT_MESSAGE = 'commit message'
+    DATETIME = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
+    OLDER_DATETIME = datetime.datetime.strptime('2016-01-16', '%Y-%m-%d')
+    NEWER_DATETIME = datetime.datetime.strptime('2016-03-16', '%Y-%m-%d')
+    NEW_CHANGELIST = [{
+        'cmd': 'edit_exploration_property',
+        'property_name': 'title',
+        'new_value': 'New title'}]
+
+    def setUp(self):
+        super(EditorAutoSavingUnitTests, self).setUp()
+        # Create explorations.
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID1, self.USER_ID)
+        exploration.param_specs = {
+            'myParam': param_domain.ParamSpec('UnicodeString')}
+        exp_services._save_exploration(self.USER_ID, exploration, '', [])
+        self.save_new_valid_exploration(self.EXP_ID2, self.USER_ID)
+        self.save_new_valid_exploration(self.EXP_ID3, self.USER_ID)
+        self.init_state_name = exploration.init_state_name
+        self.param_changes = [{
+            'customization_args': {
+                'list_of_values': ['1', '2'], 'parse_with_jinja': False
+            },
+            'name': 'myParam',
+            'generator_id': 'RandomSelector'
+        }]
+        self.draft_change_list = _get_change_list(
+            self.init_state_name, 'param_changes', self.param_changes)
+        # Explorations with draft set.
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.USER_ID, self.EXP_ID1), user_id=self.USER_ID,
+            exploration_id=self.EXP_ID1,
+            draft_change_list=self.draft_change_list,
+            draft_change_list_last_updated=self.DATETIME,
+            draft_change_list_exp_version=2).put()
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.USER_ID, self.EXP_ID2), user_id=self.USER_ID,
+            exploration_id=self.EXP_ID2,
+            draft_change_list=self.draft_change_list,
+            draft_change_list_last_updated=self.DATETIME,
+            draft_change_list_exp_version=4).put()
+        # Exploration with no draft.
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.USER_ID, self.EXP_ID3), user_id=self.USER_ID,
+            exploration_id=self.EXP_ID3).put()
+
+    def test_draft_cleared_after_change_list_applied(self):
+        exp_services.update_exploration(
+            self.USER_ID, self.EXP_ID1, self.draft_change_list, '')
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.USER_ID, self.EXP_ID1))
+        self.assertIsNone(exp_user_data.draft_change_list)
+        self.assertIsNone(exp_user_data.draft_change_list_last_updated)
+        self.assertIsNone(exp_user_data.draft_change_list_exp_version)
+
+    def test_draft_version_valid_returns_true(self):
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.USER_ID, self.EXP_ID1))
+        self.assertTrue(exp_services.is_version_of_draft_valid(
+            self.EXP_ID1, exp_user_data.draft_change_list_exp_version))
+
+    def test_draft_version_valid_returns_false(self):
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.USER_ID, self.EXP_ID2))
+        self.assertFalse(exp_services.is_version_of_draft_valid(
+            self.EXP_ID2, exp_user_data.draft_change_list_exp_version))
+
+    def test_draft_version_valid_when_no_draft_exists(self):
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.USER_ID, self.EXP_ID3))
+        self.assertFalse(exp_services.is_version_of_draft_valid(
+            self.EXP_ID3, exp_user_data.draft_change_list_exp_version))
+
+    def test_create_or_update_draft_when_older_draft_exists(self):
+        exp_services.create_or_update_draft(
+            self.EXP_ID1, self.USER_ID, self.NEW_CHANGELIST, 5,
+            self.NEWER_DATETIME)
+        exp_user_data = user_models.ExplorationUserDataModel.get(
+            self.USER_ID, self.EXP_ID1)
+        self.assertEqual(exp_user_data.exploration_id, self.EXP_ID1)
+        self.assertEqual(
+            exp_user_data.draft_change_list, self.NEW_CHANGELIST)
+        self.assertEqual(exp_user_data.draft_change_list_last_updated,
+                         self.NEWER_DATETIME)
+        self.assertEqual(exp_user_data.draft_change_list_exp_version, 5)
+
+    def test_create_or_update_draft_when_newer_draft_exists(self):
+        exp_services.create_or_update_draft(
+            self.EXP_ID1, self.USER_ID, self.NEW_CHANGELIST, 5,
+            self.OLDER_DATETIME)
+        exp_user_data = user_models.ExplorationUserDataModel.get(
+            self.USER_ID, self.EXP_ID1)
+        self.assertEqual(exp_user_data.exploration_id, self.EXP_ID1)
+        self.assertEqual(
+            exp_user_data.draft_change_list, self.draft_change_list)
+        self.assertEqual(
+            exp_user_data.draft_change_list_last_updated, self.DATETIME)
+        self.assertEqual(exp_user_data.draft_change_list_exp_version, 2)
+
+    def test_create_or_update_draft_when_draft_does_not_exist(self):
+        exp_services.create_or_update_draft(
+            self.EXP_ID3, self.USER_ID, self.NEW_CHANGELIST, 5,
+            self.NEWER_DATETIME)
+        exp_user_data = user_models.ExplorationUserDataModel.get(
+            self.USER_ID, self.EXP_ID3)
+        self.assertEqual(exp_user_data.exploration_id, self.EXP_ID3)
+        self.assertEqual(
+            exp_user_data.draft_change_list, self.NEW_CHANGELIST)
+        self.assertEqual(exp_user_data.draft_change_list_last_updated,
+                         self.NEWER_DATETIME)
+        self.assertEqual(exp_user_data.draft_change_list_exp_version, 5)
+
+    def test_get_exp_with_draft_applied_when_draft_exists(self):
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID1)
+        self.assertEqual(exploration.init_state.param_changes, [])
+        updated_exp = exp_services.get_exp_with_draft_applied(
+            self.EXP_ID1, self.USER_ID)
+        param_changes = updated_exp.init_state.param_changes[0]
+        self.assertEqual(param_changes._name, 'myParam')
+        self.assertEqual(param_changes._generator_id, 'RandomSelector')
+        self.assertEqual(
+            param_changes._customization_args,
+            {'list_of_values': ['1', '2'], 'parse_with_jinja': False})
+
+    def test_get_exp_with_draft_applied_when_draft_does_not_exist(self):
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID3)
+        self.assertEqual(exploration.init_state.param_changes, [])
+        updated_exp = exp_services.get_exp_with_draft_applied(
+            self.EXP_ID3, self.USER_ID)
+        self.assertEqual(updated_exp.init_state.param_changes, [])
+
+    def test_get_exp_with_draft_applied_when_draft_version_is_invalid(self):
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID2)
+        self.assertEqual(exploration.init_state.param_changes, [])
+        updated_exp = exp_services.get_exp_with_draft_applied(
+            self.EXP_ID2, self.USER_ID)
+        self.assertEqual(updated_exp.init_state.param_changes, [])
+
+    def test_draft_discarded(self):
+        exp_services.discard_draft(self.EXP_ID1, self.USER_ID,)
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.USER_ID, self.EXP_ID1))
+        self.assertIsNone(exp_user_data.draft_change_list)
+        self.assertIsNone(exp_user_data.draft_change_list_last_updated)
+        self.assertIsNone(exp_user_data.draft_change_list_exp_version)
