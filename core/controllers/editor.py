@@ -616,8 +616,8 @@ class UntrainedAnswersHandler(EditorHandler):
         # matched to a fuzzy rule individually.
         answers = stats_services.get_top_state_rule_answers(
             exploration_id, state_name, [
-                exp_domain.DEFAULT_RULESPEC_STR, rule_domain.FUZZY_RULE_TYPE],
-            self.NUMBER_OF_TOP_ANSWERS_PER_RULE)
+                exp_domain.DEFAULT_RULESPEC_STR, rule_domain.FUZZY_RULE_TYPE])[
+                    :self.NUMBER_OF_TOP_ANSWERS_PER_RULE]
 
         interaction = state.interaction
         unhandled_answers = []
