@@ -20,6 +20,7 @@ from core.domain import config_domain
 from core.domain import rights_manager
 from core.domain import summary_services
 from core.platform import models
+import feconf
 import utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
@@ -58,6 +59,7 @@ class CollectionPage(base.BaseHandler):
         whitelisted_usernames = (
             config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value)
         self.values.update({
+            'nav_mode': feconf.NAV_MODE_COLLECTION,
             'can_edit': (
                 bool(self.username) and
                 self.username in whitelisted_usernames and

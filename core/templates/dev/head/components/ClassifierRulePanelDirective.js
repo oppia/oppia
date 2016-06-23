@@ -13,17 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the fuzzy rule panel.
+ * @fileoverview Directive for the classifier panel.
  */
 
-oppia.directive('fuzzyRulePanel', [function() {
+oppia.directive('classifierRulePanel', [function() {
   return {
     restrict: 'E',
     scope: {
       onTrainingDataDeletion: '&',
       ruleInputs: '='
     },
-    templateUrl: 'rules/fuzzyRulePanel',
+    templateUrl: 'rules/classifierRulePanel',
     controller: [
       '$scope', '$modal', 'oppiaExplorationHtmlFormatterService',
       'stateInteractionIdService', 'stateCustomizationArgsService',

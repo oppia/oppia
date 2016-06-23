@@ -42,7 +42,6 @@ SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
 INTERACTIONS_DIR = os.path.join('extensions', 'interactions')
 GADGETS_DIR = os.path.join('extensions', 'gadgets')
 RTE_EXTENSIONS_DIR = os.path.join('extensions', 'rich_text_components')
-RULES_DIR = os.path.join('extensions', 'rules')
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 TEMPLATES_DIR_PREFIX = 'dev' if DEV_MODE else 'prod'
@@ -50,6 +49,10 @@ FRONTEND_TEMPLATES_DIR = os.path.join(
     'core', 'templates', TEMPLATES_DIR_PREFIX, 'head')
 DEPENDENCIES_TEMPLATES_DIR = os.path.join('extensions', 'dependencies')
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
+OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
+    'extensions', 'interactions', 'object_defaults.json')
+RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
+    os.getcwd(), 'extensions', 'interactions', 'rules.json')
 
 # The maximum number of results to retrieve in a datastore query.
 DEFAULT_QUERY_LIMIT = 1000
@@ -104,11 +107,6 @@ DEFAULT_COLLECTION_TITLE = ''
 DEFAULT_COLLECTION_CATEGORY = ''
 # Default objective for a newly-minted collection.
 DEFAULT_COLLECTION_OBJECTIVE = ''
-
-# The threshold the truth value of an evaluated answer group must equal or
-# exceed in order to be considered a better classification than the default
-# group.
-DEFAULT_ANSWER_GROUP_CLASSIFICATION_THRESHOLD = 0.3
 
 # A dict containing the accepted image formats (as determined by the imghdr
 # module) and the corresponding allowed extensions in the filenames of uploaded
@@ -256,9 +254,6 @@ MAX_FILE_SIZE_BYTES = 1048576
 # The default language code for an exploration.
 DEFAULT_LANGUAGE_CODE = 'en'
 
-# Whether to include the forum, terms and privacy pages.
-SHOW_CUSTOM_PAGES = True
-
 # The id of the default skin.
 # TODO(sll): Deprecate this; it is no longer used.
 DEFAULT_SKIN_ID = 'conversation_v1'
@@ -366,7 +361,7 @@ DEMO_EXPLORATIONS = {
     u'12': 'protractor_test_1.yaml',
     u'13': 'solar_system',
     u'14': 'about_oppia.yaml',
-    u'15': 'fuzzy_exploration.yaml',
+    u'15': 'classifier_demo_exploration.yaml',
     u'16': 'all_interactions',
 }
 
@@ -423,16 +418,16 @@ UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 
 NAV_MODE_ABOUT = 'about'
+NAV_MODE_COLLECTION = 'collection'
+NAV_MODE_CONTACT = 'contact'
 NAV_MODE_CREATE = 'create'
 NAV_MODE_DASHBOARD = 'dashboard'
 NAV_MODE_EXPLORE = 'explore'
 NAV_MODE_LIBRARY = 'library'
-NAV_MODE_PARTICIPATE = 'participate'
 NAV_MODE_PROFILE = 'profile'
 NAV_MODE_SIGNUP = 'signup'
 NAV_MODE_SPLASH = 'splash'
 NAV_MODE_TEACH = 'teach'
-NAV_MODE_CONTACT = 'contact'
 
 # Event types.
 EVENT_TYPE_STATE_HIT = 'state_hit'
@@ -460,6 +455,7 @@ COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
+# NOTE TO DEVELOPERS: This should be synchronized with base.js
 ENABLE_STRING_CLASSIFIER = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
 SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK = False
@@ -653,7 +649,8 @@ SAME_TOPIC_SIMILARITY = 1.0
 
 SUPPORTED_SITE_LANGUAGES = {
     'en': 'English',
-    'es': 'Español'
+    'es': 'Español',
+    'id': 'Bahasa Indonesia'
 }
 SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 SYSTEM_USER_IDS = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
@@ -666,6 +663,9 @@ ABOUT_PAGE_DESCRIPTION = (
     'Oppia is an open source learning platform that connects a community of '
     'teachers and learners. You can use this site to create 1-1 learning '
     'scenarios for others.')
+CONTACT_PAGE_DESCRIPTION = (
+    'Contact the Oppia team, submit feedback, and learn how to get involved '
+    'with the Oppia project.')
 CREATE_PAGE_DESCRIPTION = (
     'Help others learn new things. Create lessons through explorations and '
     'share your knowledge with the community.')
@@ -679,10 +679,6 @@ LIBRARY_PAGE_DESCRIPTION = (
     'Looking to learn something new? Find explorations created by professors, '
     'teachers and Oppia users in a subject you\'re interested in, and start '
     'exploring!')
-PARTICIPATE_PAGE_DESCRIPTION = (
-    'The Oppia library is full of user-created lessons called \'explorations\'.'
-    ' Read about how to participate in the community and begin creating '
-    'explorations.')
 PREFERENCES_PAGE_DESCRIPTION = (
     'Change your Oppia profile settings and preferences')
 SEARCH_PAGE_DESCRIPTION = (
@@ -693,6 +689,10 @@ SPLASH_PAGE_DESCRIPTION = (
     'Oppia is a free site for sharing knowledge via interactive lessons '
     'called \'explorations\'. Learn from user-created explorations, or teach '
     'and create your own.')
+TEACH_PAGE_DESCRIPTION = (
+    'The Oppia library is full of user-created lessons called \'explorations\'.'
+    ' Read about how to participate in the community and begin creating '
+    'explorations.')
 TERMS_PAGE_DESCRIPTION = (
     'Oppia is a 501(c)(3) registered non-profit open-source e-learning '
     'platform. Learn about our terms and conditions for creating and '

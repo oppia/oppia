@@ -109,110 +109,12 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
 
 
-class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
-    """Test the reader controller using the sample explorations."""
-
-    def setUp(self):
-        super(ReaderControllerEndToEndTests, self).setUp()
-
-    def submit_and_compare(self, answer, expected_feedback, expected_question):
-        """Submits an answer and compares the output to a regex.
-
-        `expected_response` will be interpreted as a regex string.
-        """
-        reader_dict = self.submit_answer(
-            self.exp_id, self.last_state_name, answer)
-        self.last_state_name = reader_dict['state_name']  # pylint: disable=attribute-defined-outside-init
-        self.assertRegexpMatches(
-            reader_dict['feedback_html'], expected_feedback)
-        self.assertRegexpMatches(
-            reader_dict['question_html'], expected_question)
-        return self
-
-    def init_player(self, exploration_id, expected_title, expected_response):
-        """Starts a reader session and gets the first state from the server.
-
-        `expected_response` will be interpreted as a regex string.
-        """
-        exp_services.delete_demo(exploration_id)
-        exp_services.load_demo(exploration_id)
-
-        self.exp_id = exploration_id  # pylint: disable=attribute-defined-outside-init
-
-        reader_dict = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.exp_id))
-
-        self.last_state_name = reader_dict['exploration']['init_state_name']  # pylint: disable=attribute-defined-outside-init
-        init_state_data = (
-            reader_dict['exploration']['states'][self.last_state_name])
-        init_content = init_state_data['content'][0]['value']
-
-        self.assertRegexpMatches(init_content, expected_response)
-        self.assertEqual(reader_dict['exploration']['title'], expected_title)
-
-    def test_welcome_exploration(self):
-        """Test a reader's progression through the default exploration."""
-        self.init_player(
-            '0', 'Welcome to Oppia!', 'do you know where the name \'Oppia\'')
-        self.submit_and_compare(
-            '0', 'Yes!', 'In fact, the word Oppia means \'learn\'.')
-        self.submit_and_compare('Finish', 'Check your spelling!', '')
-        self.submit_and_compare(
-            'Finnish', 'Yes! Oppia is the Finnish word for learn.',
-            'What is the value of')
-
-    def test_binary_search(self):
-        """Test the binary search (lazy magician) exploration."""
-        self.init_player(
-            '2', 'The Lazy Magician', 'How does he do it?')
-        self.submit_and_compare(
-            'Dont know', 'we should watch him first', 'town square')
-        self.submit_and_compare(0, '', 'Is it')
-        self.submit_and_compare(2, '', 'Do you want to play again?')
-        # TODO(sll): Redo all of the following as a JS test, since the
-        # backend can no longer parse expressions:
-        #
-        # self.submit_and_compare(1, '', 'how do you think he does it?')
-        # self.submit_and_compare('middle',
-        #     'he\'s always picking a number in the middle',
-        #     'what number the magician picked')
-        # self.submit_and_compare(0, 'Exactly!', 'try it out')
-        # self.submit_and_compare(10, '', 'best worst case')
-        # self.submit_and_compare(
-        #     0, '', 'to be sure our strategy works in all cases')
-        # self.submit_and_compare(0, 'try to guess', '')
-
-    def test_parametrized_adventure(self):
-        """Test a reader's progression through the parametrized adventure."""
-        self.init_player(
-            '8', 'Parameterized Adventure', 'Hello, brave adventurer')
-        self.submit_and_compare(
-            'My Name', '', 'Hello, I\'m My Name!.*get a pretty red')
-        self.submit_and_compare(0, '', 'fork in the road')
-        # TODO(sll): Redo all of the following as a JS test, since the
-        # backend can no longer parse expressions:
-        #
-        # self.submit_and_compare(
-        #     'ne', '', 'Hello, My Name. You have to pay a toll')
-
-    def test_huge_answers(self):
-        """Test correct behavior if huge answers are submitted."""
-        self.init_player(
-            '0', 'Welcome to Oppia!', 'do you know where the name \'Oppia\'')
-        self.submit_and_compare(
-            '0', '', 'In fact, the word Oppia means \'learn\'.')
-        # This could potentially cause errors in stats_models when the answer
-        # is persisted to the backend.
-        self.submit_and_compare(
-            'a' * 1000500, 'Sorry, nope, we didn\'t get it', '')
-
-
 class ReaderClassifyTests(test_utils.GenericTestBase):
     """Test reader.classify using the sample explorations.
 
-    Since the end to end tests cover correct classification,
-    ReaderClassifyTests is only checking which of the hard/soft/classifier
-    rules is classified on input.
+    Since the end to end tests cover correct classification, and frontend tests
+    test hard rules, ReaderClassifyTests is only checking that the string
+    classifier is actually called.
     """
 
     def setUp(self):
@@ -232,7 +134,7 @@ class ReaderClassifyTests(test_utils.GenericTestBase):
         self.exp_state = (
             exp_services.get_exploration_by_id(exploration_id).states['Home'])
 
-    def _get_classiying_rule_type(self, answer):
+    def _is_string_classifier_called(self, answer):
         string_classifier_predict = (
             classifier_services.StringClassifier.predict_label_for_doc)
         predict_counter = test_utils.CallCounter(
@@ -242,8 +144,7 @@ class ReaderClassifyTests(test_utils.GenericTestBase):
             classifier_services.StringClassifier,
             'predict_label_for_doc', predict_counter):
 
-            response = reader.classify(
-                self.exp_id, self.exp_state, answer, {'answer': answer})
+            response = reader.classify(self.exp_state, answer)
 
         answer_group_index = response['answer_group_index']
         rule_spec_index = response['rule_spec_index']
@@ -252,79 +153,23 @@ class ReaderClassifyTests(test_utils.GenericTestBase):
             return 'default'
 
         answer_group = answer_groups[answer_group_index]
-        if answer_group.get_fuzzy_rule_index() == rule_spec_index:
-            return (
-                'soft' if predict_counter.times_called == 0
-                else 'classifier')
-        return 'hard'
-
-    def test_hard_rule_classification(self):
-        """All of these responses are classified by the hard classifier.
-
-        Note: Any response beginning with 'hardrule' will result in
-        reader.classify selecting a hard rule.
-        """
-        self.assertEquals(
-            self._get_classiying_rule_type('permutations'),
-            'hard')
-        self.assertEquals(
-            self._get_classiying_rule_type('hardrule0'),
-            'hard')
-        self.assertEquals(
-            self._get_classiying_rule_type('hardrule3'),
-            'hard')
-        self.assertEquals(
-            self._get_classiying_rule_type('hardrule1254'),
-            'hard')
-        self.assertEquals(
-            self._get_classiying_rule_type('exit'),
-            'hard')
-
-    def test_soft_rule_classification(self):
-        """All these responses trigger the soft classifier."""
-        self.assertEquals(
-            self._get_classiying_rule_type('Combination 3 x 2 x 1'),
-            'soft')
-        self.assertEquals(
-            self._get_classiying_rule_type('bcse combinations'),
-            'soft')
-        self.assertEquals(
-            self._get_classiying_rule_type('Because the answer is 3!'),
-            'soft')
-        self.assertEquals(
-            self._get_classiying_rule_type('3 balls time two time one'),
-            'soft')
-        self.assertEquals(
-            self._get_classiying_rule_type('try all possible combinations'),
-            'soft')
-        self.assertEquals(
-            self._get_classiying_rule_type('rby, ryb, bry, byr, ybr, yrb'),
-            'soft')
-        self.assertEquals(
-            self._get_classiying_rule_type('I dunno!'),
-            'soft')
-        self.assertEquals(
-            self._get_classiying_rule_type('I guessed.'),
-            'soft')
+        return (answer_group.get_classifier_rule_index() == rule_spec_index and
+                predict_counter.times_called == 1)
 
     def test_string_classifier_classification(self):
         """All these responses trigger the string classifier."""
         with self.swap(feconf, 'ENABLE_STRING_CLASSIFIER', True):
-            self.assertEquals(
-                self._get_classiying_rule_type(
-                    'it\'s a permutation of 3 elements'),
-                'classifier')
-            self.assertEquals(
-                self._get_classiying_rule_type(
+            self.assertTrue(
+                self._is_string_classifier_called(
+                    'it\'s a permutation of 3 elements'))
+            self.assertTrue(
+                self._is_string_classifier_called(
                     'There are 3 options for the first ball, and 2 for the '
-                    'remaining two. So 3*2=6.'),
-                'classifier')
-            self.assertEquals(
-                self._get_classiying_rule_type('abc acb bac bca cbb cba'),
-                'classifier')
-            self.assertEquals(
-                self._get_classiying_rule_type('dunno, just guessed'),
-                'classifier')
+                    'remaining two. So 3*2=6.'))
+            self.assertTrue(
+                self._is_string_classifier_called('abc acb bac bca cbb cba'))
+            self.assertTrue(
+                self._is_string_classifier_called('dunno, just guessed'))
 
 
 class FeedbackIntegrationTest(test_utils.GenericTestBase):
@@ -354,18 +199,6 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
             }
         )
 
-        # Viewer submits answer '0'
-        result_dict = self.submit_answer(exp_id, state_name_1, '0')
-        state_name_2 = result_dict['state_name']
-
-        # Viewer gives 2nd feedback
-        self.post_json(
-            '/explorehandler/give_feedback/%s' % exp_id,
-            {
-                'state_name': state_name_2,
-                'feedback': 'This is a 2nd feedback message.',
-            }
-        )
         self.logout()
 
 
