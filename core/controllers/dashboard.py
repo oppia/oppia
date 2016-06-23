@@ -151,10 +151,10 @@ class DashboardHandler(base.BaseHandler):
         subscribed_exploration_summaries = filter(None, (
             exp_services.get_exploration_summaries_matching_ids(
                 exploration_ids_subscribed_to)))
-        subscribed_collection_summaries = (
+        subscribed_collection_summaries = filter(None, (
             collection_services.get_collection_summaries_matching_ids(
                 subscription_services.get_collection_ids_subscribed_to(
-                    self.user_id)))
+                    self.user_id))))
 
         explorations_list = summary_services.get_displayable_exp_summary_dicts(
             subscribed_exploration_summaries)
@@ -175,9 +175,6 @@ class DashboardHandler(base.BaseHandler):
         if (self.username in
                 config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value):
             for collection_summary in subscribed_collection_summaries:
-                if collection_summary is None:
-                    continue
-
                 # TODO(sll): Reuse _get_displayable_collection_summary_dicts()
                 # in summary_services, instead of replicating it like this.
                 collections_list.append({
