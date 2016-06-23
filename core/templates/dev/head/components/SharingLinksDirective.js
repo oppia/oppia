@@ -26,18 +26,23 @@ oppia.directive('sharingLinks', [function() {
     },
     templateUrl: 'components/sharingLinks',
     controller: [
-      '$scope', '$window', 'oppiaHtmlEscaper', 'ExplorationEmbedButtonService',
-      'explorationContextService', 'siteAnalyticsService',
+      '$scope', '$window', '$http', 'oppiaHtmlEscaper', 'ExplorationEmbedButtonService',
+      'siteAnalyticsService',
       function(
-        $scope, $window, oppiaHtmlEscaper, ExplorationEmbedButtonService,
-        explorationContextService, siteAnalyticsService) {
-        $scope.explorationId = explorationContextService.getExplorationId();
+        $scope, $window, $http, oppiaHtmlEscaper, ExplorationEmbedButtonService,
+        siteAnalyticsService) {
+          var _explorationId = null;
+          $scope.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
+            GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD);
+
+            $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR= (
+              GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
 
         $scope.registerShareExplorationEvent = function(network) {
           siteAnalyticsService.registerShareExplorationEvent(network);
         };
 
-        $scope.showEmbedExplorationModal = (
+        $scope.showEmbedExplorationModal= (
           ExplorationEmbedButtonService.showModal);
 
         $scope.serverName = (
@@ -45,6 +50,43 @@ oppia.directive('sharingLinks', [function() {
 
         $scope.escapedTwitterText = (
           oppiaHtmlEscaper.unescapedStrToEscapedStr($scope.getTwitterText()));
+
+          $scope.dashboardData = function() {
+            $http.get('/dashboardhandler/data').then(function(response){
+              var data = response.data;
+              console.log(data);
+              $scope.explorationsList = data.explorations_list;
+              $scope.collectionsList = data.collections_list;
+
+              for (var i = 0; i < $scope.explorationsList.length; i++){
+                _explorationId = $scope.explorationsList[i].id;
+                return _explorationId;
+              }
+            });
+
+          };
+
+          $scope.getExplorationId = function() {
+            if (_explorationId) {
+              return _explorationId;
+            } else {
+              // The pathname should be one of /explore/{exploration_id} or
+              // /create/{exploration_id} .
+              var pathnameArray = $window.location.pathname.split('/');
+              for (var i = 0; i < pathnameArray.length; i++) {
+                if (pathnameArray[i] === 'explore' ||
+                    pathnameArray[i] === 'create') {
+                  _explorationId = pathnameArray[i + 1];
+                  return pathnameArray[i + 1];
+                } else if (pathnameArray[i] === 'dashboard'){
+                  $scope.dashboardData();
+
+                }
+              }
+            }
+          };
+
+          $scope.explorationId = $scope.getExplorationId();
       }
     ]
   };

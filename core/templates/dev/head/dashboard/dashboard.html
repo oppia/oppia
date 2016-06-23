@@ -4,6 +4,13 @@
   Creator Dashboard - Oppia
 {% endblock maintitle %}
 
+{% block header_js %}
+  {{ super() }}
+  <script type="text/javascript">
+    GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = JSON.parse('{{DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD|js_string}}');
+  </script>
+{% endblock header_js %}
+
 {% block navbar_breadcrumb %}
   <ul class="nav navbar-nav oppia-navbar-breadcrumb">
     <li>
@@ -104,6 +111,12 @@
                       Private
                     </span>
                   </span>
+                  <div ng-if="exploration.num_open_threads == 0 && exploration.status !== 'private'" class="oppia-share">
+                  Share:
+                  <span class="oppia-dashboard-status-green">
+                    <sharing-links class="oppia-sharing-links-small" flex="100" layout-type="row" layout-align-type="center center" twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD"></sharing-links>
+                  </span>
+                  </div>
                 </div>
               </div>
               <div class="oppia-dashboard-tile-contents">
@@ -232,14 +245,18 @@
     {% endif %}
   </div>
 
+  {% include 'components/exploration_embed_button_modal.html' %}
   {% include 'components/create_activity_modal.html' %}
   {% include 'components/upload_activity_modal.html' %}
-{% endblock %}
+  {% include 'components/sharing_links_directive.html' %}
+{% endblock%}
 
 {% block footer_js %}
   {{ super() }}
   <script>
     {{ include_js_file('components/CollectionCreationService.js') }}
+    {{ include_js_file('components/ExplorationEmbedButtonService.js') }}
     {{ include_js_file('dashboard/Dashboard.js') }}
+    {{ include_js_file('components/SharingLinksDirective.js') }}
   </script>
 {% endblock footer_js %}

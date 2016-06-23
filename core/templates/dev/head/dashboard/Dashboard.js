@@ -32,6 +32,8 @@ oppia.controller('Dashboard', [
     $scope.setActiveTab = function(newActiveTabName) {
       $scope.activeTab = newActiveTabName;
     };
+    $scope.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
+      GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD);
 
     $rootScope.loadingMessage = 'Loading';
     $http.get('/dashboardhandler/data').then(function(response) {
