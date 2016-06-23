@@ -686,10 +686,7 @@ textarea {
   }
   
   .oppia-footer-container {
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 30px 80px 30px 30px;
+    padding: 30px;
   }
 
 }
