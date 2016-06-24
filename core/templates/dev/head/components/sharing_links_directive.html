@@ -52,9 +52,20 @@
 </script>
 
 <style>
-  ul.oppia-sharing-links {
-    list-style: none;
-    padding: 0;
+
+  .oppia-share {
+    float: left;
+  }
+
+  .oppia-sharing-links .embed-link {
+    color: white;
+    background: #009688;
+    border-radius: 2px;
+    height: 40px;
+    margin: 3px;
+    padding-top: calc(50% - 15px);
+    text-align: center;
+    width: 40px;
   }
 
   .oppia-sharing-links .share-option-img {
@@ -64,29 +75,22 @@
     width: 40px;
   }
 
-  .oppia-sharing-links .embed-link {
-    color: white;
-    background: #009688;
-    border-radius: 2px;
-    height: 40px;
-    margin: 0 3px;
-    width: 40px;
-    text-align: center;
-    padding-top: calc(50% - 15px);
+  .oppia-sharing-links-small {
+    float:left;
   }
 
   .oppia-sharing-links-small ul .share-option-img,
   .oppia-sharing-links-small ul .embed-link {
-    width: 19px;
-    height: 19px;
+    height: 21px;
+    width: 21px;
   }
 
-  .oppia-sharing-links-small ul {
-    display: inline-block;
-
+  .oppia-sharing-links-small ul .embed-link {
+    padding-top: 0;
   }
 
-  .oppia-sharing-links-small ul li {
-    display: inline-block;
+  ul.oppia-sharing-links {
+    list-style: none;
+    padding: 0;
   }
 </style>
