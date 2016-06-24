@@ -52,14 +52,14 @@ class PageSessionMetrics(object):
                 is completed.
             loadEventStart: the Unix time the load event of the current document
                 is fired.
-            navigationStart: the Unix time  the prompt for unload terminates
-                on the previous document in the same browsing context
+            navigationStart: the Unix time the prompt for unload terminates
+                on the previous document in the same browsing context.
             redirectEnd: the Unix time the last HTTP redirect is completed, that
-                is when the last byte of the HTTP response has been received
+                is when the last byte of the HTTP response has been received.
             redirectStart: the Unix time the first HTTP redirect starts.
-            requestStart: the Unix time the request started
-            responseEnd: the Unix time the request finished
-            responseStart: the Unix time the response started
+            requestStart: the Unix time the request started.
+            responseEnd: the Unix time the request finished.
+            responseStart: the Unix time the response started.
             unloadEventEnd: the Unix time the unload event handler finishes.
             unloadEventStart: the Unix time the unload event has been thrown.
     """
@@ -81,6 +81,7 @@ class PageSessionMetrics(object):
             self.page_load_timings = page_session_timings['timing']
 
         self._validate()
+        self.print_details()
 
     def _validate(self):
         """Validates various properties of a PageSessionMetrics object."""
@@ -131,7 +132,30 @@ class PageSessionMetrics(object):
             if self.get_request_time_millisecs() < 0:
                 raise utils.ValidationError(
                     'Expected the request time to be positive.')
-
+            if self.get_ready_start_time_millisecs() < 0:
+                raise utils.ValidationError(
+                    'Expected the ready start time to be positive.')
+            if self.get_redirect_time_millisecs() < 0:
+                raise utils.ValidationError(
+                    'Expected the redirect time to be positive.')
+            if self.get_appcache_time_millisecs() < 0:
+                raise utils.ValidationError(
+                    'Expected the appcache time to be positive.')
+            if self.get_unload_event_time_millisecs() < 0:
+                raise utils.ValidationError(
+                    'Expected the unload time to be positive.')
+            if self.get_lookup_domain_time_millisecs() < 0:
+                raise utils.ValidationError(
+                    'Expected the domain lookup time to be positive.')
+            if self.get_connect_time_millisecs() < 0:
+                raise utils.ValidationError(
+                    'Expected the connect time to be positive.')
+            if self.get_init_dom_tree_time_millisecs() < 0:
+                raise utils.ValidationError(
+                    'Expected the init dom tree time to be positive.')
+            if self.get_load_event_time_millisecs() < 0:
+                raise utils.ValidationError(
+                    'Expected the load time to be positive.')
 
     def get_request_count(self):
         """Returns the number of requests made prior to the page load
@@ -186,40 +210,54 @@ class PageSessionMetrics(object):
 
     def get_lookup_domain_time_millisecs(self):
         """Returns the time spent for the domain name lookup for the current
-        document."""
+        document.
+        """
         return self._get_duration_millisecs(
             'domainLookupEnd', 'domainLookupStart')
 
     def get_connect_time_millisecs(self):
         """Returns the time spent for establishing the connection to the server
-        to retrieve the current document."""
+        to retrieve the current document.
+        """
         return self._get_duration_millisecs('connectEnd', 'connectStart')
 
     def get_init_dom_tree_time_millisecs(self):
-        """Returns the time for request to completion of DOM loading."""
+        """Returns the time from request to completion of DOM loading."""
         return self._get_duration_millisecs('domInteractive', 'responseEnd')
 
     def get_load_event_time_millisecs(self):
         """Returns the time spent for completion of the load event of the
         current document. The load event is fired when a resource and its
-        dependent resources have finished loading."""
+        dependent resources have finished loading.
+        """
         return self._get_duration_millisecs('loadEventEnd', 'loadEventStart')
 
     def print_details(self):
         """Helper function to print details for all the events."""
-        if not self.page_session_timings:
-            return
-        print 'Page load time: %d' % self.get_page_load_time_millisecs()
-        print 'Dom ready time: %d' % self.get_dom_ready_time_millisecs()
-        print 'Request time: %d' % self.get_request_time_millisecs()
-        print 'Ready start time: %d' % self.get_ready_start_time_millisecs()
-        print 'Redirect time: %d' % self.get_redirect_time_millisecs()
-        print 'Appcache time: %d' % self.get_appcache_time_millisecs()
-        print 'Unload event time: %d' % self.get_unload_event_time_millisecs()
-        print 'DNS query time: %d' % self.get_lookup_domain_time_millisecs()
-        print 'TCP connection time: %d' % self.get_connect_time_millisecs()
-        print 'Init domtree time: %d' % self.get_init_dom_tree_time_millisecs()
-        print 'Load event time: %d' % self.get_load_event_time_millisecs()
+        if self.page_session_stats:
+            print 'Total number of requests: %d' % self.get_request_count()
+            print ('Total page size in bytes: %d'
+                   % self.get_total_page_size_bytes())
+        else:
+            print 'Page session stats are not available.'
+
+        if self.page_session_timings:
+            print 'Page load time: %d' % self.get_page_load_time_millisecs()
+            print 'Dom ready time: %d' % self.get_dom_ready_time_millisecs()
+            print 'Request time: %d' % self.get_request_time_millisecs()
+            print 'Ready start time: %d' % self.get_ready_start_time_millisecs()
+            print 'Redirect time: %d' % self.get_redirect_time_millisecs()
+            print 'Appcache time: %d' % self.get_appcache_time_millisecs()
+            print ('Unload event time: %d'
+                   % self.get_unload_event_time_millisecs())
+            print 'DNS query time: %d' % self.get_lookup_domain_time_millisecs()
+            print ('TCP connection time: %d'
+                   % self.get_connect_time_millisecs())
+            print ('Init domtree time: %d'
+                   % self.get_init_dom_tree_time_millisecs())
+            print 'Load event time: %d' % self.get_load_event_time_millisecs()
+        else:
+            print 'Page session timings are not available.'
 
 
 class MultiplePageSessionMetrics(object):
@@ -231,14 +269,6 @@ class MultiplePageSessionMetrics(object):
     def  __init__(self, page_session_metrics):
         self.page_metrics = page_session_metrics
         self._validate()
-
-    def _log_details(self):
-        """Helper function to print details for all the sessions."""
-        print 'No of sessions: %d' % len(self.page_metrics)
-
-        for i, item in enumerate(self.page_metrics):
-            print 'Session %d details: ' % (i + 1)
-            item.print_details()
 
     def _validate(self):
         if not isinstance(self.page_metrics, list):

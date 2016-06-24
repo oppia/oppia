@@ -43,23 +43,23 @@ class TestBase(unittest.TestCase):
 
     def _record_average_page_timings_for_url(
             self, page_url, session_count=DEFAULT_SESSION_SAMPLE_COUNT):
-        page_session_metrics = []
+        page_session_metrics_list = []
 
         for _ in range(session_count):
-            page_session_metrics.append(
+            page_session_metrics_list.append(
                 self.data_fetcher.get_page_timings_for_url(page_url))
 
         self.page_metrics = perf_domain.MultiplePageSessionMetrics(
-            page_session_metrics)
+            page_session_metrics_list)
 
     def _record_average_page_timings_from_cached_session(
             self, page_url, session_count=DEFAULT_SESSION_SAMPLE_COUNT):
-        page_session_metrics = []
+        page_session_metrics_list = []
 
         for _ in range(session_count):
-            page_session_metrics.append(
+            page_session_metrics_list.append(
                 self.data_fetcher.get_page_timings_from_cached_session(
                     page_url))
 
         self.page_metrics = perf_domain.MultiplePageSessionMetrics(
-            page_session_metrics)
+            page_session_metrics_list)
