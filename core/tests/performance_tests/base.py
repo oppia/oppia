@@ -40,7 +40,7 @@ class TestBase(unittest.TestCase):
         self.load_time_limit_uncached_ms = None
         self.load_time_limit_cached_ms = None
 
-    def _return_full_url(self, page_url_short):
+    def _get_complete_url(self, page_url_short):
         return urlparse.urljoin(self.BASE_URL, page_url_short)
 
     def _load_page_to_cache_server_resources(self):
@@ -57,29 +57,29 @@ class TestBase(unittest.TestCase):
 
     def _record_average_page_timings_for_url(
             self, session_count=DEFAULT_SESSION_SAMPLE_COUNT):
-        page_session_metrics = []
+        page_session_metrics_list = []
 
         for _ in range(session_count):
-            page_session_metrics.append(
+            page_session_metrics_list.append(
                 self.data_fetcher.get_page_timings_for_url(self.page_url))
 
         self.page_metrics = perf_domain.MultiplePageSessionMetrics(
-            page_session_metrics)
+            page_session_metrics_list)
 
     def _record_average_page_timings_from_cached_session(
             self, session_count=DEFAULT_SESSION_SAMPLE_COUNT):
-        page_session_metrics = []
+        page_session_metrics_list = []
 
         for _ in range(session_count):
-            page_session_metrics.append(
+            page_session_metrics_list.append(
                 self.data_fetcher.get_page_timings_from_cached_session(
                     self.page_url))
 
         self.page_metrics = perf_domain.MultiplePageSessionMetrics(
-            page_session_metrics)
+            page_session_metrics_list)
 
-    def _set_tests_limits(self, page_config):
-        self.page_url = self._return_full_url(page_config['url'])
+    def _set_test_limits(self, page_config):
+        self.page_url = self._get_complete_url(page_config['url'])
 
         self.size_limit_uncached_bytes = (
             page_config['size_limits_mb']['uncached'] * 1024 * 1024)
