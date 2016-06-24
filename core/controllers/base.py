@@ -411,13 +411,7 @@ class BaseHandler(webapp2.RequestHandler):
         assert error_code in [400, 401, 404, 500]
         values['code'] = error_code
 
-        # This checks if the response should be JSON or HTML.
-        if self.payload is not None:
-            self.render_json(values)
-        else:
-            self.values.update(values)
-            self.render_template(
-                'error/error.html', iframe_restriction=None)
+        self.render_json(values)
 
     def handle_exception(self, exception, unused_debug_mode):
         """Overwrites the default exception handler."""
