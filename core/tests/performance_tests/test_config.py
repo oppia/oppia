@@ -14,8 +14,8 @@
 
 """Config file for threshold metrics of Performance Tests.
 
-This file contains, for every Oppia page, the corresponding thresholds for
-the different performance metrics.
+This file contains, for every Oppia page, corresponding thresholds for
+different performance metrics.
 
 Each page entry includes:
     url: relative path to the page.
