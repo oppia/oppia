@@ -68,6 +68,15 @@ class SeleniumPerformanceDataFetcher(object):
             error_msg = 'Unsupported browser specified: %s' % browser
             raise ValueError(error_msg)
 
+    def load_url(self, page_url):
+        """Loads the specified url."""
+        with Xvfb() as _:
+            driver = self._setup_driver(proxy=None, use_proxy=False)
+
+            driver.get(page_url)
+
+        self._stop_driver(driver)
+
     def get_page_metrics_for_url(self, page_url):
         """Returns a PageSessionMetrics domain object for a given page URL.
         """
