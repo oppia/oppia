@@ -68,7 +68,7 @@ class SeleniumPerformanceDataFetcher(object):
             error_msg = 'Unsupported browser specified: %s' % browser
             raise ValueError(error_msg)
 
-    def get_url(self, page_url):
+    def load_url(self, page_url):
         """Loads the specified url."""
         with Xvfb() as _:
             driver = self._setup_driver(proxy=None, use_proxy=False)

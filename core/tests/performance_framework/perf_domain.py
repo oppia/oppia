@@ -35,19 +35,41 @@ class PageSessionMetrics(object):
     loading and includes the following keys:
 
         timing: maps to a dict containing the keys (all in milliseconds):
+            connectEnd: the Unix time the user agent finishes establishing the
+                connection to the server to retrive the current document.
+            connectStart: the Unix time before the user agent starts
+                establishing the connection to the server to retrive the
+                document.
+            domainLookupEnd: the Unix time the domain lookup ends.
+            domainLookupStart: the Unix time the domain lookup starts.
+            domComplete: the Unix time user agent sets the current document
+                readiness to "complete".
             domInteractive: the Unix time the the parser finished its work on
-                            the main document
-            domLoading: the Unix time the DOM started loading
-            fetchStart: the Unix time the page began loading
-            loadEventEnd: the Unix time the page finished loading
+                            the main document.
+            domLoading: the Unix time the DOM started loading.
+            fetchStart: the Unix time the page began loading.
+            loadEventEnd: the Unix time the load event of the current document
+                is completed.
+            loadEventStart: the Unix time the load event of the current document
+                is fired.
+            navigationStart: the Unix time  the prompt for unload terminates
+                on the previous document in the same browsing context
+            redirectEnd: the Unix time the last HTTP redirect is completed, that
+                is when the last byte of the HTTP response has been received
+            redirectStart: the Unix time the first HTTP redirect starts.
             requestStart: the Unix time the request started
-            responseStart: the Unix time the response started
             responseEnd: the Unix time the request finished
+            responseStart: the Unix time the response started
+            unloadEventEnd: the Unix time the unload event handler finishes.
+            unloadEventStart: the Unix time the unload event has been thrown.
     """
 
     TIMING_PROPERTIES = [
-        'loadEventEnd', 'fetchStart', 'domComplete', 'domInteractive',
-        'responseEnd', 'requestStart'
+        'connectEnd', 'connectStart', 'domainLookupEnd', 'domainLookupStart',
+        'domComplete', 'domInteractive', 'domLoading', 'fetchStart',
+        'loadEventEnd', 'loadEventStart', 'navigationStart', 'redirectEnd',
+        'redirectStart', 'requestStart', 'responseEnd', 'responseStart',
+        'unloadEventEnd', 'unloadEventStart'
     ]
 
     def __init__(self, page_session_stats=None, page_session_timings=None):
@@ -163,12 +185,14 @@ class PageSessionMetrics(object):
             'unloadEventEnd', 'unloadEventStart')
 
     def get_lookup_domain_time_millisecs(self):
-        """Returns the time spent for DNS query."""
+        """Returns the time spent for the domain name lookup for the current
+        document."""
         return self._get_duration_millisecs(
             'domainLookupEnd', 'domainLookupStart')
 
     def get_connect_time_millisecs(self):
-        """Returns the time spent for TCP connection."""
+        """Returns the time spent for establishing the connection to the server
+        to retrieve the current document."""
         return self._get_duration_millisecs('connectEnd', 'connectStart')
 
     def get_init_dom_tree_time_millisecs(self):
@@ -176,11 +200,15 @@ class PageSessionMetrics(object):
         return self._get_duration_millisecs('domInteractive', 'responseEnd')
 
     def get_load_event_time_millisecs(self):
-        """Returns the time for load event."""
+        """Returns the time spent for completion of the load event of the
+        current document. The load event is fired when a resource and its
+        dependent resources have finished loading."""
         return self._get_duration_millisecs('loadEventEnd', 'loadEventStart')
 
     def print_details(self):
         """Helper function to print details for all the events."""
+        if not self.page_session_timings:
+            return
         print 'Page load time: %d' % self.get_page_load_time_millisecs()
         print 'Dom ready time: %d' % self.get_dom_ready_time_millisecs()
         print 'Request time: %d' % self.get_request_time_millisecs()
