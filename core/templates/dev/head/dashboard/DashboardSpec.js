@@ -23,19 +23,19 @@ describe('Creator dashboard controller', function() {
     var mockDashboardBackendApiService;
     var dashboardData = {
       explorationsList: [{
-        category: 'Private category',
-        id: 'private_exp_id',
-        num_open_threads: 0,
-        num_total_threads: 0,
-        status: 'private',
-        title: 'Private exploration'
-      }, {
         category: 'Featured category',
         id: 'featured_exp_id',
         num_open_threads: 2,
         num_total_threads: 3,
         status: 'publicized',
         title: 'Featured exploration'
+      }, {
+        category: 'Private category',
+        id: 'private_exp_id',
+        num_open_threads: 0,
+        num_total_threads: 0,
+        status: 'private',
+        title: 'Private exploration'
       }],
       collectionsList: [],
       dashboardStats: {
