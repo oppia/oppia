@@ -26,7 +26,7 @@ class SplashPagePerformanceTest(base.TestBase):
         super(SplashPagePerformanceTest, self).setUp()
 
         page_config = test_config.TEST_DATA[self.PAGE_KEY]
-        self._set_tests_limits(page_config)
+        self._set_test_limits(page_config)
 
         self._load_page_to_cache_server_resources()
 
