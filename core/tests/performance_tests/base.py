@@ -28,7 +28,6 @@ class TestBase(unittest.TestCase):
 
     BASE_URL = 'http://localhost:9501'
 
-
     def setUp(self):
         self.data_fetcher = perf_services.SeleniumPerformanceDataFetcher(
             browser='chrome')
