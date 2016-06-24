@@ -93,8 +93,8 @@ def get_top_state_rule_answers_multi(exploration_state_list, rule_str_list):
     in 'rule_str_list' for each exploration ID and state name tuple in
     exploration_state_list.
 
-    For each exploration ID and state, all answers submitted that match the rule
-    spec strings in rule_str_list are returned.
+    For each exploration ID and state, all answers submitted that match any of
+    the rule spec strings in rule_str_list are returned.
     """
     answer_log_list = (
         stats_domain.StateRuleAnswerLog.get_multi_by_multi_explorations(
