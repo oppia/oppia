@@ -43,7 +43,7 @@ oppia.directive('searchBar', [function() {
           function(languageItem) {
             return {
               id: languageItem.code,
-              text: i18nIdService.getLibraryId('languages', languageItem.code)
+              text: languageItem.name
             };
           });
 

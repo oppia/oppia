@@ -143,3 +143,25 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(expected_suggestion_dict,
                              observed_suggestion.to_dict())
 
+
+class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(FeedbackMessageReferenceDomainTests, self).setUp()
+        self.exp_id = 'exp'
+        self.message_id = 'message'
+        self.thread_id = 'thread'
+
+    def test_to_dict(self):
+        expected_feedback_message_reference = {
+            'exploration_id': self.exp_id,
+            'thread_id': self.thread_id,
+            'message_id': self.message_id
+        }
+
+        observed_feedback_message_reference = (
+            feedback_domain.FeedbackMessageReference(
+                self.exp_id, self.thread_id, self.message_id))
+
+        self.assertDictEqual(observed_feedback_message_reference.to_dict(),
+                             expected_feedback_message_reference)

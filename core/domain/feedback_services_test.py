@@ -13,7 +13,8 @@
 # limitations under the License.
 
 """Tests for feedback-related services."""
-
+from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import user_services
 from core.platform import models
@@ -252,10 +253,74 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
     def test_create_new_task(self):
         user_id = 'user'
         feedback_services.enqueue_feedback_message_email_task(user_id)
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(), 1)
+        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
 
         tasks = self.get_pending_tasks()
         self.assertEqual(
             tasks[0].url, feconf.FEEDBACK_MESSAGE_EMAIL_HANDLER_URL)
+        self.process_and_flush_pending_tasks()
+
+
+class FeedbackMessageEmailTests(test_utils.GenericTestBase):
+    """Tests for feedback message emails."""
+
+    def setUp(self):
+        super(FeedbackMessageEmailTests, self).setUp()
+        self.signup('a@example.com', 'A')
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.exp_id = 'exp'
+        self.thread_id = 'thread'
+        self.message_id1 = 'msg1'
+        self.message_id2 = 'msg2'
+
+    def test_send_feedback_message_email(self):
+        exp = exp_domain.Exploration.create_default_exploration(self.exp_id)
+        exp_services.save_new_exploration(self.user_id_a, exp)
+
+        feedback_services.send_feedback_message_email(
+            self.exp_id, self.thread_id, self.message_id1)
+        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+
+        expected_feedback_message_dict = {
+            'exploration_id': self.exp_id,
+            'thread_id': self.thread_id,
+            'message_id': self.message_id1
+        }
+        model = feedback_models.UnsentFeedbackEmailModel.get(self.user_id_a)
+        self.assertDictEqual(
+            model.feedback_message_references[0],
+            expected_feedback_message_dict)
+        self.assertEqual(model.retries, 0)
+        self.process_and_flush_pending_tasks()
+
+    def test_add_new_feedback_message(self):
+        exp = exp_domain.Exploration.create_default_exploration(self.exp_id)
+        exp_services.save_new_exploration(self.user_id_a, exp)
+
+        feedback_services.send_feedback_message_email(
+            self.exp_id, self.thread_id, self.message_id1)
+        feedback_services.send_feedback_message_email(
+            self.exp_id, self.thread_id, self.message_id2)
+
+        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+
+        expected_feedback_message_dict1 = {
+            'exploration_id': self.exp_id,
+            'thread_id': self.thread_id,
+            'message_id': self.message_id1
+        }
+        expected_feedback_message_dict2 = {
+            'exploration_id': self.exp_id,
+            'thread_id': self.thread_id,
+            'message_id': self.message_id2
+        }
+
+        model = feedback_models.UnsentFeedbackEmailModel.get(self.user_id_a)
+        self.assertDictEqual(
+            model.feedback_message_references[0],
+            expected_feedback_message_dict1)
+        self.assertDictEqual(
+            model.feedback_message_references[1],
+            expected_feedback_message_dict2)
+        self.assertEqual(model.retries, 0)
         self.process_and_flush_pending_tasks()

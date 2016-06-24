@@ -304,7 +304,7 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
     # Each element in this list is a dict with keys 'exploration_id',
     # 'thread_id' and 'message_id'; this information is used to retrieve
     # corresponding FeedbackMessageModel instance.
-    feedback_messages = ndb.JsonProperty(repeated=True)
+    feedback_message_references = ndb.JsonProperty(repeated=True)
     # The number of failed attempts that have been made (so far) to
     # send an email to this user.
     retries = ndb.IntegerProperty(default=0, required=True, indexed=True)

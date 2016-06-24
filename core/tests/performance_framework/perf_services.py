@@ -69,7 +69,10 @@ class SeleniumPerformanceDataFetcher(object):
             raise ValueError(error_msg)
 
     def load_url(self, page_url):
-        """Loads the specified url."""
+        """Loads the specified url, resulting in server-side caching of related
+        resources. Used to obtain a uniform and warm-cache state for the tests,
+        similar to a typical production server state.
+        """
         with Xvfb() as _:
             driver = self._setup_driver(proxy=None, use_proxy=False)
 

@@ -28,6 +28,7 @@ class TestBase(unittest.TestCase):
 
     BASE_URL = 'http://localhost:9501'
 
+
     def setUp(self):
         self.data_fetcher = perf_services.SeleniumPerformanceDataFetcher(
             browser='chrome')
@@ -42,8 +43,8 @@ class TestBase(unittest.TestCase):
     def _return_full_url(self, page_url_short):
         return urlparse.urljoin(self.BASE_URL, page_url_short)
 
-    def _load_page_to_cache_server_resources(self, page_url):
-        self.data_fetcher.load_url(page_url)
+    def _load_page_to_cache_server_resources(self):
+        self.data_fetcher.load_url(self.page_url)
 
     def _record_page_metrics_for_url(self):
         self.page_metrics = (

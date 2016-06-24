@@ -28,7 +28,7 @@ class SplashPagePerformanceTest(base.TestBase):
         page_config = test_config.TEST_DATA[self.PAGE_KEY]
         self._set_tests_limits(page_config)
 
-        self._load_page_to_cache_server_resources(self.page_url)
+        self._load_page_to_cache_server_resources()
 
     def test_page_size_under_specified_limit(self):
         self._test_total_page_size()
