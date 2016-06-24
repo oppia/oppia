@@ -38,7 +38,7 @@ class SeleniumPerformanceDataFetcher(object):
     """Fetches performance data for locally served Oppia pages using Selenium
     and Browsermob-proxy.
 
-    Selenium is used to programitically interact with a browser.
+    Selenium is used to programmatically interact with a browser.
     Browsermob-proxy is used to capture HTTP Archive (referred to as HAR) data.
 
     The HTTP Archive format is a JSON-formatted archive file format used for
@@ -67,6 +67,18 @@ class SeleniumPerformanceDataFetcher(object):
         else:
             error_msg = 'Unsupported browser specified: %s' % browser
             raise ValueError(error_msg)
+
+    def load_url(self, page_url):
+        """Loads the specified url, resulting in server-side caching of related
+        resources. Used to obtain a uniform and warm-cache state for the tests,
+        similar to a typical production server state.
+        """
+        with Xvfb() as _:
+            driver = self._setup_driver(proxy=None, use_proxy=False)
+
+            driver.get(page_url)
+
+        self._stop_driver(driver)
 
     def get_page_metrics_for_url(self, page_url):
         """Returns a PageSessionMetrics domain object for a given page URL.
