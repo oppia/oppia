@@ -684,6 +684,11 @@ textarea {
   .oppia-footer-padding {
     height: 464px;
   }
+  
+  .oppia-footer-container {
+    padding: 30px;
+  }
+
 }
 
 /*
