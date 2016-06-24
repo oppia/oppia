@@ -43,15 +43,50 @@ class StateRuleAnswerLog(object):
         return sum(self.answers.values())
 
     @classmethod
+    def get_multi_by_multi_explorations(
+            cls, exploration_state_list, rule_str_list):
+        """Gets domain objects given a list of exploration and state tuples.
+
+        Args:
+            exploration_state_list: a list of exploration ID and state name
+                tuples
+            rule_str_list: a list of rule spec strings which are used to filter
+                the answers matched to the provided explorations and states
+
+        Returns a list of StateRuleAnswerLog objects containing answers matched
+        to each exploration ID-state name. The number of elements returned is
+        the same as the number of elements passed in exploration_state_list. The
+        number of answers in each StateRuleAnswerLog object depends on the
+        number of answers matched against each rule spec strings specified in
+        rule_str_list.
+        """
+        # TODO(sll): Should each rule_str be unicode instead?
+        answer_log_models_list = (
+            stats_models.StateRuleAnswerLogModel.get_or_create_multi_for_multi_explorations( # pylint: disable=line-too-long
+                exploration_state_list, rule_str_list))
+        answer_log_list = []
+        for answer_log_models in answer_log_models_list:
+            combined_answers = {}
+            for answer_log_model in answer_log_models:
+                for answer, frequency in answer_log_model.answers.iteritems():
+                    if answer in combined_answers:
+                        combined_answers[answer] += frequency
+                    else:
+                        combined_answers[answer] = frequency
+            answer_log_list.append(cls(combined_answers))
+        return answer_log_list
+
+    @classmethod
     def get_multi(cls, exploration_id, rule_data):
         """Gets domain objects corresponding to the given rule data.
-
         Args:
             exploration_id: the exploration id
             rule_data: a list of dicts, each with the following keys:
                 (state_name, rule_str).
         """
         # TODO(sll): Should each rule_str be unicode instead?
+        # TODO(bhenning): Combine this with get_multi_by_multi_explorations as
+        # part of the answer migration project.
         answer_log_models = (
             stats_models.StateRuleAnswerLogModel.get_or_create_multi(
                 exploration_id, rule_data))
@@ -61,10 +96,15 @@ class StateRuleAnswerLog(object):
     @classmethod
     def get(cls, exploration_id, state_name, rule_str):
         # TODO(sll): Deprecate this method.
-        return cls.get_multi(exploration_id, [{
-            'state_name': state_name,
-            'rule_str': rule_str
-        }])[0]
+        return cls.get_multi_by_multi_explorations(
+            [(exploration_id, state_name)], [rule_str])[0]
+
+    def get_all_top_answers(self):
+        """Returns a list of (answer, count) sorted by count."""
+
+        return sorted(
+            self.answers.iteritems(), key=operator.itemgetter(1),
+            reverse=True)
 
     def get_top_answers(self, num_answers_to_return):
         """Returns the top `num_answers_to_return` answers.
@@ -76,6 +116,4 @@ class StateRuleAnswerLog(object):
             A list of (answer, count) tuples for the `num_answers_to_return`
             answers with the highest counts.
         """
-        return sorted(
-            self.answers.iteritems(), key=operator.itemgetter(1),
-            reverse=True)[:num_answers_to_return]
+        return self.get_all_top_answers()[:num_answers_to_return]

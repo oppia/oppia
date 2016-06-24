@@ -618,8 +618,8 @@ class UntrainedAnswersHandler(EditorHandler):
         answers = stats_services.get_top_state_rule_answers(
             exploration_id, state_name, [
                 exp_domain.DEFAULT_RULESPEC_STR,
-                exp_domain.CLASSIFIER_RULESPEC_STR],
-            self.NUMBER_OF_TOP_ANSWERS_PER_RULE)
+                exp_domain.CLASSIFIER_RULESPEC_STR])[
+                    :self.NUMBER_OF_TOP_ANSWERS_PER_RULE]
 
         interaction = state.interaction
         unhandled_answers = []
