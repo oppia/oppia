@@ -320,6 +320,7 @@ class BaseHandler(webapp2.RequestHandler):
             'CAN_SEND_ANALYTICS_EVENTS': feconf.CAN_SEND_ANALYTICS_EVENTS,
             'DEFAULT_LANGUAGE_CODE': feconf.ALL_LANGUAGE_CODES[0]['code'],
             'DEV_MODE': feconf.DEV_MODE,
+            'MINIFICATION': feconf.IS_MINIFIED,
             'DOMAIN_URL': '%s://%s' % (scheme, netloc),
             'ACTIVITY_STATUS_PRIVATE': (
                 rights_manager.ACTIVITY_STATUS_PRIVATE),
