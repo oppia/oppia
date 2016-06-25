@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 
+{% block maintitle %}
+  Creator Dashboard - Oppia
+{% endblock maintitle %}
+
 {% block header_js %}
   {{ super() }}
   <script type="text/javascript">
     GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = JSON.parse('{{DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD|js_string}}');
   </script>
 {% endblock header_js %}
-
-{% block maintitle %}
-  Creator Dashboard - Oppia
-{% endblock maintitle %}
 
 {% block navbar_breadcrumb %}
   <ul class="nav navbar-nav oppia-navbar-breadcrumb">

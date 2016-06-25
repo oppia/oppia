@@ -132,16 +132,17 @@ class DashboardPage(base.BaseHandler):
                 ),
                 'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD,
             })
+            self.values.update({
+                'DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD': (
+                    DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD.value),
+            })
             self.render_template(
                 'dashboard/dashboard.html', redirect_url_on_logout='/')
         else:
             self.redirect(utils.set_url_query_parameter(
                 feconf.SIGNUP_URL, 'return_url', feconf.DASHBOARD_URL))
 
-        self.values.update({
-            'DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD': (
-                DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD.value),
-        })
+
 
 class DashboardHandler(base.BaseHandler):
     """Provides data for the user's creator dashboard page."""
