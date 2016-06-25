@@ -1,5 +1,12 @@
 {% extends "base.html" %}
 
+{% block header_js %}
+  {{ super() }}
+  <script type="text/javascript">
+    GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = JSON.parse('{{DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD|js_string}}');
+  </script>
+{% endblock header_js %}
+
 {% block maintitle %}
   Creator Dashboard - Oppia
 {% endblock maintitle %}
@@ -83,16 +90,18 @@
         <table class="oppia-dashboard-table">
            <colgroup>
              <col style="width: 40%;">
-             <col style="width: 15%;">
-             <col style="width: 15%;">
-             <col style="width: 15%;">
-             <col style="width: 15%;">
+             <col style="width: 12%;">
+             <col style="width: 12%;">
+             <col style="width: 12%;">
+             <col style="width: 12%;">
+             <col style="width: 12%;">
           </colgroup>
           <tr>
             <th>Exploration</th>
             <th>Rating</th>
             <th>Plays</th>
             <th>Feedback</th>
+            <th>Share</th>
             <th>Last Updated</th>
           </tr>
           <tr ng-repeat="exploration in explorationsList"
@@ -105,7 +114,7 @@
                 featured
               </span>
             </td>
-            <td colspan="3"
+            <td colspan="4"
                 ng-if="exploration.status === 'private'"
                 class="exp-private-text">
               This exploration is private. Publish to receive statistics.
@@ -118,6 +127,9 @@
             </td>
             <td ng-if="exploration.status !== 'private'">
               <[exploration.num_total_threads]>
+            </td>
+            <td ng-if="exploration.status !== 'private'">
+                <sharing-links class="oppia-sharing-links-small" flex="100" layout-type="row" layout-align-type="center center" twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD" exploration-id="exploration.id"></sharing-links>
             </td>
             <td>
               <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
@@ -204,14 +216,18 @@
   </div>
 
   {% include 'components/create_activity_modal.html' %}
+  {% include 'components/exploration_embed_button_modal.html' %}
   {% include 'components/upload_activity_modal.html' %}
+  {% include 'components/sharing_links_directive.html' %}
 {% endblock %}
 
 {% block footer_js %}
   {{ super() }}
   <script>
-    {{ include_js_file('components/CollectionCreationService.js') }}
-    {{ include_js_file('dashboard/Dashboard.js') }}
-    {{ include_js_file('domain/dashboard/DashboardBackendApiService.js') }}
+  {{ include_js_file('components/CollectionCreationService.js') }}
+  {{ include_js_file('components/ExplorationEmbedButtonService.js') }}
+  {{ include_js_file('dashboard/Dashboard.js') }}
+  {{ include_js_file('domain/dashboard/DashboardBackendApiService.js') }}
+  {{ include_js_file('components/SharingLinksDirective.js') }}
   </script>
 {% endblock footer_js %}

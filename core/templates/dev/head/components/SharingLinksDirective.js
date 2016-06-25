@@ -22,7 +22,8 @@ oppia.directive('sharingLinks', [function() {
     scope: {
       layoutType: '@',
       layoutAlignType: '@',
-      getTwitterText: '&twitterText'
+      getTwitterText: '&twitterText',
+      getDashboardExplorationId: '&explorationId'
     },
     templateUrl: 'components/sharingLinks',
     controller: [
@@ -31,20 +32,59 @@ oppia.directive('sharingLinks', [function() {
       function(
         $scope, $window, oppiaHtmlEscaper, ExplorationEmbedButtonService,
         explorationContextService, siteAnalyticsService) {
-        $scope.explorationId = explorationContextService.getExplorationId();
+          var _explorationId = null;
 
-        $scope.registerShareExplorationEvent = function(network) {
-          siteAnalyticsService.registerShareExplorationEvent(network);
-        };
+          $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
+              GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
 
-        $scope.showEmbedExplorationModal = (
-          ExplorationEmbedButtonService.showModal);
+          $scope.registerShareExplorationEvent = function(network) {
+            siteAnalyticsService.registerShareExplorationEvent(network);
+          };
 
-        $scope.serverName = (
-          $window.location.protocol + '//' + $window.location.host);
+          $scope.showEmbedExplorationModal = (
+            ExplorationEmbedButtonService.showModal);
 
-        $scope.escapedTwitterText = (
-          oppiaHtmlEscaper.unescapedStrToEscapedStr($scope.getTwitterText()));
+          $scope.serverName = (
+            $window.location.protocol + '//' + $window.location.host);
+
+          $scope.escapedTwitterText = (
+            oppiaHtmlEscaper.unescapedStrToEscapedStr($scope.getTwitterText()));
+
+          $scope.isNotDashboard = function() {
+            var pathnameArray = $window.location.pathname.split('/');
+
+            for (var i = 0; i < pathnameArray.length; i++) {
+              if (pathnameArray[i] === 'explore' ||
+                  pathnameArray[i] === 'create') {
+                console.log(pathnameArray);
+                return true;
+              } else if (pathnameArray[i] === 'dashboard') {
+                console.log(pathnameArray);
+                return false;
+              }
+            }
+          };
+          $scope.getExplorationId = function() {
+            if (_explorationId) {
+              return _explorationId;
+            } else {
+              // The pathname should be one of /explore/{exploration_id} or
+              // /create/{exploration_id} .
+              var pathnameArray = $window.location.pathname.split('/');
+
+              for (var i = 0; i < pathnameArray.length; i++) {
+                if (pathnameArray[i] === 'explore' ||
+                    pathnameArray[i] === 'create') {
+                  _explorationId = pathnameArray[i + 1];
+                  return pathnameArray[i + 1];
+                } else if (pathnameArray[i] === 'dashboard') {
+                  return $scope.getDashboardExplorationId();
+                }
+              }
+            }
+          };
+
+          $scope.explorationId = $scope.getExplorationId();
       }
     ]
   };
