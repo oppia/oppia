@@ -32,6 +32,7 @@ Each page entry includes:
 """
 
 SPLASH_PAGE_KEY = 'splash'
+LIBRARY_PAGE_KEY = 'library'
 
 TEST_DATA = {
     SPLASH_PAGE_KEY: {
@@ -44,5 +45,16 @@ TEST_DATA = {
             'uncached': 10.0,
             'cached': 3.0,
         },
-    }
+    },
+    LIBRARY_PAGE_KEY: {
+        'url': '/library',
+        'size_limits_mb': {
+            'uncached': 10.0,
+            'cached': 1.0,
+        },
+        'load_time_limits_secs': {
+            'uncached': 10.0,
+            'cached': 3.0,
+        },
+    },
 }
