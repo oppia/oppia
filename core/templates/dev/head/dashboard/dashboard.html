@@ -49,7 +49,7 @@
             </a>
           </li>
         {% endif %}
-        <li class="list-card-view-toggle">
+        <li class="list-card-view-toggle" ng-if="activeTab === 'myExplorations'">
           <button class="list-view-btn"
                   ng-class="{'dashboard-active-view': myExplorationsView === 'list'}"
                   ng-click="setMyExplorationsView('list')">
