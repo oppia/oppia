@@ -13,8 +13,6 @@
 # limitations under the License.
 
 """Tests for feedback-related services."""
-from core.domain import exp_domain
-from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import user_services
 from core.platform import models
@@ -268,25 +266,29 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
         super(FeedbackMessageEmailTests, self).setUp()
         self.signup('a@example.com', 'A')
         self.user_id_a = self.get_user_id_from_email('a@example.com')
-        self.exp_id = 'exp'
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.exploration = self.save_new_default_exploration(
+            'A', self.editor_id, 'Title')
         self.thread_id = 'thread'
         self.message_id1 = 'msg1'
         self.message_id2 = 'msg2'
+        self.can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
+        self.can_send_feedback_email_ctx = self.swap(
+            feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
 
     def test_send_feedback_message_email(self):
-        exp = exp_domain.Exploration.create_default_exploration(self.exp_id)
-        exp_services.save_new_exploration(self.user_id_a, exp)
-
         feedback_services.send_feedback_message_email(
-            self.exp_id, self.thread_id, self.message_id1)
+            self.exploration.id, self.thread_id, self.message_id1)
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)
 
         expected_feedback_message_dict = {
-            'exploration_id': self.exp_id,
+            'exploration_id': self.exploration.id,
             'thread_id': self.thread_id,
             'message_id': self.message_id1
         }
-        model = feedback_models.UnsentFeedbackEmailModel.get(self.user_id_a)
+        model = feedback_models.UnsentFeedbackEmailModel.get(self.editor_id)
         self.assertDictEqual(
             model.feedback_message_references[0],
             expected_feedback_message_dict)
@@ -294,28 +296,25 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
     def test_add_new_feedback_message(self):
-        exp = exp_domain.Exploration.create_default_exploration(self.exp_id)
-        exp_services.save_new_exploration(self.user_id_a, exp)
-
         feedback_services.send_feedback_message_email(
-            self.exp_id, self.thread_id, self.message_id1)
+            self.exploration.id, self.thread_id, self.message_id1)
         feedback_services.send_feedback_message_email(
-            self.exp_id, self.thread_id, self.message_id2)
+            self.exploration.id, self.thread_id, self.message_id2)
 
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)
 
         expected_feedback_message_dict1 = {
-            'exploration_id': self.exp_id,
+            'exploration_id': self.exploration.id,
             'thread_id': self.thread_id,
             'message_id': self.message_id1
         }
         expected_feedback_message_dict2 = {
-            'exploration_id': self.exp_id,
+            'exploration_id': self.exploration.id,
             'thread_id': self.thread_id,
             'message_id': self.message_id2
         }
 
-        model = feedback_models.UnsentFeedbackEmailModel.get(self.user_id_a)
+        model = feedback_models.UnsentFeedbackEmailModel.get(self.editor_id)
         self.assertDictEqual(
             model.feedback_message_references[0],
             expected_feedback_message_dict1)
@@ -324,3 +323,47 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             expected_feedback_message_dict2)
         self.assertEqual(model.retries, 0)
         self.process_and_flush_pending_tasks()
+
+    def test_that_emails_are_not_sent_for_anonymous_user(self):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                self.exploration.id, 'a_state_name', None, 'a subject',
+                'some text')
+
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+
+    def test_that_emails_are_sent_for_registered_user(self):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                self.exploration.id, 'a_state_name', self.user_id_a,
+                'a subject', 'some text')
+
+            self.assertEqual(self.count_jobs_in_taskqueue(), 2)
+
+            tasks = self.get_pending_tasks()
+            self.assertEqual(
+                tasks[0].url, feconf.FEEDBACK_MESSAGE_EMAIL_HANDLER_URL)
+            self.process_and_flush_pending_tasks()
+
+    def test_that_emails_are_not_sent_if_service_is_disabled(self):
+        can_not_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS_TO_USERS', False)
+        can_not_send_feedback_message_email_ctx = self.swap(
+            feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', False)
+        with can_not_send_emails_ctx, can_not_send_feedback_message_email_ctx:
+            feedback_services.create_thread(
+                self.exploration.id, 'a_state_name', self.user_id_a,
+                'a subject', 'some text')
+
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+
+    def test_that_emails_are_not_sent_for_state_updates(self):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                self.exploration.id, 'a_state_name', self.user_id_a,
+                'a subject', '')
+
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()

@@ -20,6 +20,7 @@ import feconf
 from core.tests import test_utils
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import feedback_services
 from core.domain import rights_manager
 from core.platform import models
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
@@ -623,3 +624,45 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
                 'true'))
         threads = response_dict['threads']
         self.assertEqual(len(threads), 4)
+
+
+class FeedbackMessageEmailHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(FeedbackMessageEmailHandlerTests, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        self.exploration = self.save_new_default_exploration(
+            'A', self.editor_id, 'Title')
+        self.can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
+        self.can_send_feedback_email_ctx = self.swap(
+            feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+
+
+    def test_that_emails_are_sent(self):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                self.exploration.id, 'a_state_name',
+                self.editor_id, 'a subject', 'some text')
+
+            threadlist = feedback_services.get_all_threads(
+                self.exploration.id, False)
+            self.assertEqual(len(threadlist), 1)
+            thread_id = threadlist[0].get_thread_id()
+
+            messagelist = feedback_services.get_messages(
+                self.exploration.id, thread_id)
+            self.assertEqual(len(messagelist), 1)
+
+            response = self.testapp.post(
+                url=feconf.FEEDBACK_MESSAGE_EMAIL_HANDLER_URL,
+                params={'user_id': self.editor_id})
+            if response.status_code != 200:
+                raise RuntimeError('Task for feedback message email failed.')
+
+            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            self.assertEqual(len(messages), 1)
+
+        self.process_and_flush_pending_tasks()

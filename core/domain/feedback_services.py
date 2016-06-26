@@ -16,10 +16,13 @@
 
 """Commands for feedback thread and message operations."""
 
+import datetime
+
 from core.domain import feedback_domain
 from core.domain import feedback_jobs_continuous
 from core.domain import rights_manager
 from core.domain import subscription_services
+from core.domain import user_services
 from core.platform import models
 import feconf
 
@@ -115,8 +118,15 @@ def create_message(
             thread.subject = updated_subject
     thread.put()
 
+    if (user_services.has_fully_registered(author_id) and
+            len(text) > 0 and feconf.CAN_SEND_EMAILS_TO_USERS and
+            feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS):
+            # send feedback message email if user is registered.
+        send_feedback_message_email(exploration_id, thread_id, message_id)
+
     if author_id:
         subscription_services.subscribe_to_thread(author_id, full_thread_id)
+
     return True
 
 
@@ -133,6 +143,11 @@ def get_messages(exploration_id, thread_id):
         _get_message_from_model(m)
         for m in feedback_models.FeedbackMessageModel.get_messages(
             exploration_id, thread_id)]
+
+
+def get_message(exploration_id, thread_id, message_id):
+    return feedback_models.FeedbackMessageModel.get(
+        exploration_id, thread_id, message_id)
 
 
 def get_next_page_of_all_feedback_messages(
@@ -266,7 +281,7 @@ def enqueue_feedback_message_email_task(user_id):
 
 
 def get_feedback_message_references(user_id):
-    model = feedback_models.UnsentFeedbackEmailModel.get(user_id, strict=True)
+    model = feedback_models.UnsentFeedbackEmailModel.get_by_id(user_id)
 
     return [feedback_domain.FeedbackMessageReference(
         reference['exploration_id'], reference['thread_id'],
@@ -276,7 +291,8 @@ def get_feedback_message_references(user_id):
 
 def _add_feedback_message_reference(user_id, reference):
     """Creates a new instance of UnsentFeedbackEmailModel or update existing
-    model instance for sending feedback message email."""
+    model instance for seget_feedback_message_referencesnding feedback message
+    email."""
 
     model = feedback_models.UnsentFeedbackEmailModel.get(user_id, strict=False)
 
@@ -287,6 +303,31 @@ def _add_feedback_message_reference(user_id, reference):
         model = feedback_models.UnsentFeedbackEmailModel(
             id=user_id,
             feedback_message_references=[reference.to_dict()])
+        model.put()
+        enqueue_feedback_message_email_task(user_id)
+
+
+def update_feedback_email_retries(user_id):
+    model = feedback_models.UnsentFeedbackEmailModel.get(user_id)
+    time = (datetime.datetime.utcnow() - model.created_on).seconds
+
+    if time > feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS:
+        model.retries += 1
+        model.put()
+
+
+def delete_feedback_message_references(user_id, references_length):
+    model = feedback_models.UnsentFeedbackEmailModel.get(user_id)
+
+    if references_length == len(model.feedback_message_references):
+        model.delete()
+    else:
+        message_references = (
+            model.feedback_message_references[references_length:])
+        model.delete()
+        model = feedback_models.UnsentFeedbackEmailModel(
+            id=user_id,
+            feedback_message_references=message_references)
         model.put()
         enqueue_feedback_message_email_task(user_id)
 

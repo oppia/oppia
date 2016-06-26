@@ -131,6 +131,8 @@ SENDER_VALIDATORS = {
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_MARKETING: (
         lambda x: rights_manager.Actor(x).is_admin()),
     feconf.EMAIL_INTENT_DELETE_EXPLORATION: (
@@ -354,3 +356,56 @@ def send_role_notification_email(
     _send_email(
         recipient_id, feconf.SYSTEM_COMMITTER_ID,
         feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION, email_subject, email_body)
+
+
+def send_feedback_message_email(recipient_id, feedback_messages):
+    """Sends an email when creator receives feedback message to an exploration.
+
+    Args:
+    - recipient_id: id of recipient user.
+    - feedback_messages: dictionary containing feedback messages.
+    """
+
+    email_subject = 'New messages on Oppia.'
+
+    email_body_template = (
+        'Hi %s,<br>'
+        '<br>'
+        'You have %s new message(s) about your Oppia explorations:<br>'
+        '<ul>%s</ul>'
+        'You can view and reply to your messages from your '
+        '<a href="http://www.oppia.org/dashboard">dashboard</a>.'
+        '<br>'
+        'Thanks, and happy collaborating!<br>'
+        '<br>'
+        'Best wishes,<br>'
+        'The Oppia Team<br>'
+        '<br>%s')
+
+    if not feconf.CAN_SEND_EMAILS_TO_USERS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    if not feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS:
+        log_new_error('This app cannot send feedback message emails to users.')
+        return
+
+    recipient_user_settings = user_services.get_user_settings(recipient_id)
+    recipient_preferences = user_services.get_email_preferences(recipient_id)
+
+    if not recipient_preferences['can_receive_feedback_message_email']:
+        return
+
+    messages_html = ''
+    for title, message in feedback_messages.iteritems():
+        messages_html += '<li>' + title + ': ' + message + '<br></li>'
+
+    email_body = email_body_template % (
+        recipient_user_settings.username, len(feedback_messages), messages_html,
+        EMAIL_FOOTER.value)
+
+    _send_email(
+        recipient_id, feconf.SYSTEM_COMMITTER_ID,
+        feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION,
+        email_subject, email_body)
+

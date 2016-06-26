@@ -16,9 +16,12 @@
 
 from core.controllers import base
 from core.controllers import editor
+from core.domain import email_manager
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.platform import models
 
+transaction_services = models.Registry.import_transaction_services()
 
 class ThreadListHandler(base.BaseHandler):
     """Handles operations relating to feedback thread lists."""
@@ -215,5 +218,28 @@ class SuggestionListHandler(base.BaseHandler):
 class UnsentFeedbackEmailHandler(base.BaseHandler):
     """Handler task of sending emails of feedback messages.
     This is yet to be implemented."""
+
     def post(self):
-        pass
+        user_id = self.request.get('user_id')
+        references = feedback_services.get_feedback_message_references(user_id)
+        transaction_services.run_in_transaction(
+            feedback_services.update_feedback_email_retries, user_id)
+
+        messages = {}
+        for reference in references:
+            message = feedback_services.get_message(
+                reference.exploration_id, reference.thread_id,
+                reference.message_id)
+
+            exploration = exp_services.get_exploration_by_id(
+                reference.exploration_id)
+
+            message_text = message.text
+            if len(message_text) > 200:
+                message_text = message_text[:200] + '...'
+            messages[exploration.title] = message_text
+
+        email_manager.send_feedback_message_email(user_id, messages)
+        transaction_services.run_in_transaction(
+            feedback_services.delete_feedback_message_references, user_id,
+            len(references))

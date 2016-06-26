@@ -622,6 +622,9 @@ class AppEngineTestBase(TestBase):
                 if task.url == '/_ah/queue/deferred':
                     from google.appengine.ext import deferred
                     deferred.run(task.payload)
+                elif feconf.EMAILS_TASK_PREFIX in task.url:
+                    # Flush task if task is of emails taskqueue.
+                    pass
                 else:
                     # All other tasks are expected to be mapreduce ones.
                     headers = {
