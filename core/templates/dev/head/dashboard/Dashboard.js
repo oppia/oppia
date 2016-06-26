@@ -39,6 +39,11 @@ oppia.controller('Dashboard', [
       $window.location = '/create/' + explorationId;
     };
 
+    $scope.myExplorationsView = 'list';
+    $scope.setMyExplorationsView = function(viewType) {
+      $scope.myExplorationsView = viewType;
+    };
+
     $rootScope.loadingMessage = 'Loading';
     DashboardBackendApiService.fetchDashboardData().then(
       function(response) {
