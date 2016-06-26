@@ -280,7 +280,8 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
 
     def test_send_feedback_message_email(self):
         feedback_services.send_feedback_message_email(
-            self.exploration.id, self.thread_id, self.message_id1)
+            self.user_id_a, self.exploration.id, self.thread_id,
+            self.message_id1)
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)
 
         expected_feedback_message_dict = {
@@ -297,9 +298,11 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
 
     def test_add_new_feedback_message(self):
         feedback_services.send_feedback_message_email(
-            self.exploration.id, self.thread_id, self.message_id1)
+            self.user_id_a, self.exploration.id, self.thread_id,
+            self.message_id1)
         feedback_services.send_feedback_message_email(
-            self.exploration.id, self.thread_id, self.message_id2)
+            self.user_id_a, self.exploration.id, self.thread_id,
+            self.message_id2)
 
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)
 
@@ -364,6 +367,15 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             feedback_services.create_thread(
                 self.exploration.id, 'a_state_name', self.user_id_a,
                 'a subject', '')
+
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+
+    def test_that_email_are_not_sent_to_author_himself(self):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                self.exploration.id, 'a_state_name', self.editor_id,
+                'a subject', 'A message')
 
             self.assertEqual(self.count_jobs_in_taskqueue(), 1)
             self.process_and_flush_pending_tasks()

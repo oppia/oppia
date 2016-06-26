@@ -118,11 +118,12 @@ def create_message(
             thread.subject = updated_subject
     thread.put()
 
-    if (user_services.has_fully_registered(author_id) and
-            len(text) > 0 and feconf.CAN_SEND_EMAILS_TO_USERS and
+    if (user_services.is_user_registered(author_id) and len(text) > 0 and
+            feconf.CAN_SEND_EMAILS_TO_USERS and
             feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS):
             # send feedback message email if user is registered.
-        send_feedback_message_email(exploration_id, thread_id, message_id)
+        send_feedback_message_email(
+            author_id, exploration_id, thread_id, message_id)
 
     if author_id:
         subscription_services.subscribe_to_thread(author_id, full_thread_id)
@@ -332,12 +333,14 @@ def delete_feedback_message_references(user_id, references_length):
         enqueue_feedback_message_email_task(user_id)
 
 
-def send_feedback_message_email(exploration_id, thread_id, message_id):
+def send_feedback_message_email(author_id, exploration_id, thread_id,
+                                message_id):
     exploration_rights = rights_manager.get_exploration_rights(exploration_id)
     feedback_message_reference = feedback_domain.FeedbackMessageReference(
         exploration_id, thread_id, message_id)
 
     for owner_id in exploration_rights.owner_ids:
-        transaction_services.run_in_transaction(
-            _add_feedback_message_reference, owner_id,
-            feedback_message_reference)
+        if owner_id != author_id:
+            transaction_services.run_in_transaction(
+                _add_feedback_message_reference, owner_id,
+                feedback_message_reference)
