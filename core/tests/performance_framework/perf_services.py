@@ -74,18 +74,20 @@ class SeleniumPerformanceDataFetcher(object):
         similar to a typical production server state.
         """
         with Xvfb() as _:
-            driver = self._setup_driver(proxy=None, use_proxy=False)
+            driver = self.setup_driver(proxy=None, use_proxy=False)
 
             driver.get(page_url)
 
         self._stop_driver(driver)
 
-    def get_page_metrics_for_url(self, page_url):
+    def get_page_metrics_for_url(self, page_url, func_call):
         """Returns a PageSessionMetrics domain object for a given page URL.
         """
         with Xvfb() as _:
             server, proxy = self._setup_proxy_server()
-            driver = self._setup_driver(proxy=proxy, use_proxy=True)
+            driver = self.setup_driver(proxy=proxy, use_proxy=True)
+
+            func_call(driver)
 
             proxy.new_har(page_url, options={'captureHeaders': True})
 
@@ -101,7 +103,7 @@ class SeleniumPerformanceDataFetcher(object):
         return perf_domain.PageSessionMetrics(
             page_session_stats=har_dict, page_session_timings=None)
 
-    def get_page_metrics_from_cached_session(self, page_url):
+    def get_page_metrics_from_cached_session(self, page_url, func_call):
         """Returns a PageSessionMetrics domain object for a given page URL
         while simulating a cached session i.e, a return user.
 
@@ -110,7 +112,9 @@ class SeleniumPerformanceDataFetcher(object):
         """
         with Xvfb() as _:
             server, proxy = self._setup_proxy_server()
-            driver = self._setup_driver(proxy=proxy, use_proxy=True)
+            driver = self.setup_driver(proxy=proxy, use_proxy=True)
+
+            func_call(driver)
 
             # Fetch the page once. This leads to caching of various resources.
             driver.get(page_url)
@@ -130,12 +134,14 @@ class SeleniumPerformanceDataFetcher(object):
         return perf_domain.PageSessionMetrics(
             page_session_stats=har_dict, page_session_timings=None)
 
-    def get_page_timings_for_url(self, page_url):
+    def get_page_timings_for_url(self, page_url, func_call):
         """Returns a PageSessionMetrics domain object initialized using
         page load timings for a page URL.
         """
         with Xvfb() as _:
-            driver = self._setup_driver(proxy=None, use_proxy=False)
+            driver = self.setup_driver(proxy=None, use_proxy=False)
+
+            func_call(driver)
 
             driver.get(page_url)
             self._wait_until_page_load_is_finished()
@@ -148,13 +154,15 @@ class SeleniumPerformanceDataFetcher(object):
         return perf_domain.PageSessionMetrics(
             page_session_stats=None, page_session_timings=page_session_timings)
 
-    def get_page_timings_from_cached_session(self, page_url):
+    def get_page_timings_from_cached_session(self, page_url, func_call):
         """Returns a PageSessionMetrics domain object initialized using page
         load timings for a page URL while simulating a cached session i.e, a
         return user.
         """
         with Xvfb() as _:
-            driver = self._setup_driver(proxy=None, use_proxy=False)
+            driver = self.setup_driver(proxy=None, use_proxy=False)
+
+            func_call(driver)
 
             # Fetch the page once. This leads to caching of various resources.
             driver.get(page_url)
@@ -200,7 +208,7 @@ class SeleniumPerformanceDataFetcher(object):
 
         return server, proxy
 
-    def _setup_driver(self, proxy=None, use_proxy=False):
+    def setup_driver(self, proxy=None, use_proxy=False):
         """Initializes a Selenium webdriver instance to programmatically
         interact with a browser.
         """

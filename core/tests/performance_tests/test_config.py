@@ -33,6 +33,11 @@ Each page entry includes:
 
 SPLASH_PAGE_KEY = 'splash'
 LIBRARY_PAGE_KEY = 'library'
+CREATOR_DASHBOARD_KEY = 'dashboard'
+EXPLORATION_PLAYER_KEY = 'explore'
+EXPLORATION_EDITOR_KEY = 'editor'
+COLLECTION_PLAYER_KEY = 'collection'
+PROFILE_PAGE_KEY = 'profile'
 
 TEST_DATA = {
     SPLASH_PAGE_KEY: {
@@ -57,4 +62,59 @@ TEST_DATA = {
             'cached': 3.0,
         },
     },
+    CREATOR_DASHBOARD_KEY: {
+        'url': '/dashboard',
+        'size_limits_mb': {
+            'uncached': 10.0,
+            'cached': 1.0,
+        },
+        'load_time_limits_secs': {
+            'uncached': 10.0,
+            'cached': 3.0,
+        },
+    },
+    EXPLORATION_PLAYER_KEY: {
+        'url': '/explore/0',
+        'size_limits_mb': {
+            'uncached': 10.0,
+            'cached': 1.0,
+        },
+        'load_time_limits_secs': {
+            'uncached': 10.0,
+            'cached': 3.0,
+        },
+    },
+    EXPLORATION_EDITOR_KEY: {
+        'url': '/create/0',
+        'size_limits_mb': {
+            'uncached': 10.0,
+            'cached': 1.0,
+        },
+        'load_time_limits_secs': {
+            'uncached': 10.0,
+            'cached': 3.0,
+        },
+    },
+    COLLECTION_PLAYER_KEY: {
+        'url': '/collection/0',
+        'size_limits_mb': {
+            'uncached': 10.0,
+            'cached': 1.0,
+        },
+        'load_time_limits_secs': {
+            'uncached': 10.0,
+            'cached': 3.0,
+        },
+    },
+    PROFILE_PAGE_KEY: {
+        'url': '/profile/',
+        'size_limits_mb': {
+            'uncached': 10.0,
+            'cached': 1.0,
+        },
+        'load_time_limits_secs': {
+            'uncached': 10.0,
+            'cached': 3.0,
+        },
+    }
 }
