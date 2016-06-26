@@ -74,7 +74,6 @@ class UserSettingsModel(base_models.BaseModel):
         return cls.get_all().filter(
             cls.normalized_username == normalized_username).get()
 
-
 class UserContributionsModel(base_models.BaseModel):
     """Tracks explorations created/edited for a particular user.
 
@@ -160,6 +159,25 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
     # The average of average ratings of all explorations.
     average_ratings = ndb.FloatProperty(indexed=True)
+
+    # A list which stores history of creator stats.
+    # Each item in the list is a Json object with key as datetime and value as
+    # another Json object containing key-value pairs to be stored.
+    # [
+    #  {
+    #   (datetime_1): {
+    #    "average_ratings": 4.3,
+    #    "total_plays": 40
+    #   }
+    #  },
+    #  {
+    #   (datetime_2): {
+    #    "average_ratings": 4.1,
+    #    "total_plays": 60
+    #   }
+    #  },
+    # ]
+    weekly_creator_stats_list = ndb.JsonProperty(default=None)
 
 
 class ExplorationUserDataModel(base_models.BaseModel):

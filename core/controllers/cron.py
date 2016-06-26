@@ -20,11 +20,14 @@ from pipeline import pipeline
 
 from core import jobs
 from core.controllers import base
+from core.domain import user_services
 from core.platform import models
 import utils
 
 email_services = models.Registry.import_email_services()
-(job_models,) = models.Registry.import_models([models.NAMES.job])
+(job_models, user_models) = models.Registry.import_models([
+    models.NAMES.job, models.NAMES.user
+])
 
 # The default retention time is 2 days.
 MAX_MAPREDUCE_METADATA_RETENTION_MSECS = 2 * 24 * 60 * 60 * 1000
@@ -84,6 +87,16 @@ class JobStatusMailerHandler(base.BaseHandler):
             email_message = 'All MapReduce jobs are running fine.'
 
         email_services.send_mail_to_admin(email_subject, email_message)
+
+
+class AppendLastDashboardStatsToList(base.BaseHandler):
+    """Handler for appending dashboard stats to a list."""
+
+    @require_cron_or_superadmin
+    def get(self):
+        """Handles GET requests."""
+        for user_model in user_models.get_all():
+            user_services.save_last_dashboard_stats(user_model.id)
 
 
 class CronMapreduceCleanupHandler(base.BaseHandler):

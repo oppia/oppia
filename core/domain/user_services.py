@@ -646,7 +646,7 @@ def get_user_dashboard_stats(user_id):
     """
     model = user_models.UserStatsModel.get(user_id, strict=False)
 
-    if model is not None:
+    if model:
         return {
             'total_plays': model.total_plays or 0,
             'average_ratings': model.average_ratings
@@ -656,3 +656,19 @@ def get_user_dashboard_stats(user_id):
             'total_plays': 0,
             'average_ratings': None
         }
+
+def save_last_dashboard_stats(user_id):
+    model = user_models.UserStatsModel.get(user_id, strict=False)
+    weekly_dashboard_stats = {
+        str(datetime.datetime.utcnow()): {
+            'average_ratings': model.average_ratings,
+            'total_plays': model.total_plays
+        }
+    }
+
+    if len(model.weekly_dashboard_stats_list) > 0:
+        model.weekly_dashboard_stats_list.push(weekly_dashboard_stats)
+    else:
+        model.weekly_dashboard_stats_list = weekly_dashboard_stats
+
+    model.put()
