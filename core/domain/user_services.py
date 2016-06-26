@@ -659,6 +659,9 @@ def get_user_dashboard_stats(user_id):
 
 def save_last_dashboard_stats(user_id):
     model = user_models.UserStatsModel.get(user_id, strict=False)
+    if not model:
+        return
+
     weekly_dashboard_stats = {
         str(datetime.datetime.utcnow()): {
             'average_ratings': model.average_ratings,
@@ -666,9 +669,8 @@ def save_last_dashboard_stats(user_id):
         }
     }
 
-    if len(model.weekly_dashboard_stats_list) > 0:
-        model.weekly_dashboard_stats_list.push(weekly_dashboard_stats)
-    else:
-        model.weekly_dashboard_stats_list = weekly_dashboard_stats
+    if not model.weekly_creator_stats_list:
+        model.weekly_creator_stats_list = []
+    model.weekly_creator_stats_list.append(weekly_dashboard_stats)
 
     model.put()

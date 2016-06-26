@@ -95,7 +95,7 @@ class AppendLastDashboardStatsToList(base.BaseHandler):
     @require_cron_or_superadmin
     def get(self):
         """Handles GET requests."""
-        for user_model in user_models.get_all():
+        for user_model in user_models.UserSettingsModel.get_all():
             user_services.save_last_dashboard_stats(user_model.id)
 
 
