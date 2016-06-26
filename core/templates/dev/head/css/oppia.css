@@ -1165,10 +1165,10 @@ textarea {
 .list-card-view-toggle button {
   background: #fff;
   border: 1px solid #bbb;
+  color: #009688;
   height: 32px;
   margin-top: 7px;
   padding: 5px 12px;
-  color: #009688;
 }
 
 .list-card-view-toggle .dashboard-active-view {
