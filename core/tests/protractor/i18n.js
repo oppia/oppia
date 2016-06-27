@@ -26,6 +26,8 @@ var admin = require('../protractor_utils/admin.js');
 var _selectLanguage = function(language) {
   element(by.css('.protractor-test-i18n-language-selector')).
     element(by.cssContainingText('option', language)).click();
+  // Wait for the language-change request to reach the backend.
+  general.waitForSystem();
 };
 
 describe('Site language', function() {
@@ -33,7 +35,7 @@ describe('Site language', function() {
     // Starting language is English
     browser.get('/splash');
     _selectLanguage('English');
-    expect(browser.getTitle()).toEqual('Home - Oppia');
+    expect(browser.getTitle()).toEqual('Oppia: Teach, Learn, Explore');
   });
 
   afterEach(function() {
@@ -46,7 +48,7 @@ describe('Site language', function() {
     browser.get('/splash');
     _selectLanguage('Español');
     browser.get('/library');
-    expect(browser.getTitle()).toEqual('Oppia - Biblioteca');
+    expect(browser.getTitle()).toEqual('Biblioteca - Oppia');
     general.ensurePageHasNoTranslationIds();
   });
 
@@ -75,14 +77,15 @@ describe('Site language', function() {
     browser.get('/splash');
     _selectLanguage('Español');
     browser.get('/library');
-    expect(browser.getTitle()).toEqual('Oppia - Biblioteca');
+    expect(browser.getTitle()).toEqual('Biblioteca - Oppia');
 
     // The preference page shows the last selected language
     browser.get('/preferences');
     language = element(by.css('.protractor-test-system-language-selector'))
       .element(by.css('.select2-chosen'));
     expect(language.getText(), 'Español');
-    expect(browser.getTitle()).toEqual('Preferencias - Oppia');
+    expect(browser.getTitle()).toEqual(
+      'Cambiar sus preferencias de perfil - Oppia');
     general.ensurePageHasNoTranslationIds();
     users.logout();
   });
@@ -90,9 +93,9 @@ describe('Site language', function() {
   it('should be used in titles of pages without controllers', function() {
     browser.get('/about');
     _selectLanguage('English');
-    expect(browser.getTitle()).toEqual('About - Oppia');
+    expect(browser.getTitle()).toEqual('About us - Oppia');
     _selectLanguage('Español');
-    expect(browser.getTitle()).toEqual('Acerca de - Oppia');
+    expect(browser.getTitle()).toEqual('Acerca de nosotros - Oppia');
     general.ensurePageHasNoTranslationIds();
   });
 

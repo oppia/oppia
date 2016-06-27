@@ -86,6 +86,10 @@ BAD_PATTERNS = {
         'excluded_files': ()},
     '\r': {
         'message': 'Please make sure all files only have LF endings (no CRLF).',
+        'excluded_files': ()},
+    'glyphicon': {
+        'message': 'Please use equivalent material-icons '
+                   'instead of glyphicons.',
         'excluded_files': ()}
 }
 
@@ -138,6 +142,9 @@ _PATHS_TO_INSERT = [
         'google_appengine'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'webtest-1.4.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'numpy-1.6.1'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'browsermob-proxy-0.7.1'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-2.53.2'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'xvfbwrapper-0.2.8'),
     os.path.join('third_party', 'gae-pipeline-1.9.17.0'),
     os.path.join('third_party', 'bleach-1.2.2'),
     os.path.join('third_party', 'gae-mapreduce-1.9.17.0'),

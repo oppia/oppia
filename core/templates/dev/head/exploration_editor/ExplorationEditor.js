@@ -563,10 +563,16 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       $modal.open({
         templateUrl: 'modals/shareExplorationAfterPublish',
         backdrop: true,
-        controller: ['$scope', function($scope) {
-          $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
-            GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
-        }]
+        controller: [
+          '$scope', 'explorationContextService',
+          function($scope, explorationContextService) {
+            $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
+              GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
+
+            $scope.explorationId = (
+              explorationContextService.getExplorationId());
+          }
+        ]
       });
     };
 
