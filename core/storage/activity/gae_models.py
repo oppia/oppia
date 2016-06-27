@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2016 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,14 +24,14 @@ from google.appengine.ext import ndb
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.
 ACTIVITY_REFERENCE_LIST_FEATURED = 'featured'
-ALL_ACTIVITY_REFERENCE_LISTS = [ACTIVITY_REFERENCE_LIST_FEATURED]
+ALL_ACTIVITY_REFERENCE_LIST_TYPES = [ACTIVITY_REFERENCE_LIST_FEATURED]
 
 
 class ActivityReferencesModel(base_models.BaseModel):
     """Storage model for a list of activity references.
 
     The id of each model instance is the name of the list. This should be one
-    of the constants in ALL_ACTIVITY_REFERENCE_LISTS.
+    of the constants in ALL_ACTIVITY_REFERENCE_LIST_TYPES.
     """
     # The types and ids of activities to show in the library page. Each item
     # in this list is a dict with two keys: 'type' and 'id'.
@@ -42,7 +42,7 @@ class ActivityReferencesModel(base_models.BaseModel):
         """This creates the relevant model instance, if it does not already
         exist.
         """
-        if list_name not in ALL_ACTIVITY_REFERENCE_LISTS:
+        if list_name not in ALL_ACTIVITY_REFERENCE_LIST_TYPES:
             raise Exception(
                 'Invalid ActivityListModel id: %s' % list_name)
 

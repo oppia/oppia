@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2016 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,11 +30,11 @@ class ActivityServicesTests(test_utils.GenericTestBase):
     EXP_ID_1 = 'EXP_ID_1'
     COL_ID_2 = 'COL_ID_2'
 
-    def _get_exploration_reference(self, exploration_id):
+    def _create_exploration_reference(self, exploration_id):
         return activity_domain.ActivityReference(
             feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id)
 
-    def _get_collection_reference(self, collection_id):
+    def _create_collection_reference(self, collection_id):
         return activity_domain.ActivityReference(
             feconf.ACTIVITY_TYPE_COLLECTION, collection_id)
 
@@ -58,26 +58,33 @@ class ActivityServicesTests(test_utils.GenericTestBase):
         self.save_new_valid_collection(
             self.COL_ID_2, self.owner_id, exploration_id=self.EXP_ID_0)
 
-    def test_basic_operations(self):
+    def test_update_featured_refs_correctly_promotes_activities(self):
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID_0)
         rights_manager.publish_collection(self.owner_id, self.COL_ID_2)
-
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 
         activity_services.update_featured_activity_references([
-            self._get_exploration_reference(self.EXP_ID_0),
-            self._get_collection_reference(self.COL_ID_2)])
+            self._create_exploration_reference(self.EXP_ID_0),
+            self._create_collection_reference(self.COL_ID_2)])
         self._compare_lists(
             activity_services.get_featured_activity_references(), [
-                self._get_exploration_reference(self.EXP_ID_0),
-                self._get_collection_reference(self.COL_ID_2)])
+                self._create_exploration_reference(self.EXP_ID_0),
+                self._create_collection_reference(self.COL_ID_2)])
+
+    def test_update_featured_refs_clears_existing_featured_activities(self):
+        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_0)
+        activity_services.update_featured_activity_references([
+            self._create_exploration_reference(self.EXP_ID_0)])
+        self._compare_lists(
+            activity_services.get_featured_activity_references(), [
+                self._create_exploration_reference(self.EXP_ID_0)])
 
         activity_services.update_featured_activity_references([])
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 
-    def test_error_handling(self):
+    def test_updating_with_duplicate_refs_raises_exception(self):
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID_0)
         rights_manager.publish_collection(self.owner_id, self.COL_ID_2)
         self._compare_lists(
@@ -85,34 +92,34 @@ class ActivityServicesTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(Exception, 'should not have duplicates'):
             activity_services.update_featured_activity_references([
-                self._get_exploration_reference(self.EXP_ID_0),
-                self._get_exploration_reference(self.EXP_ID_0)])
+                self._create_exploration_reference(self.EXP_ID_0),
+                self._create_exploration_reference(self.EXP_ID_0)])
 
     def test_deleted_activity_is_removed_from_featured_list(self):
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID_0)
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID_1)
         rights_manager.publish_collection(self.owner_id, self.COL_ID_2)
         activity_services.update_featured_activity_references([
-            self._get_exploration_reference(self.EXP_ID_0),
-            self._get_collection_reference(self.COL_ID_2)])
+            self._create_exploration_reference(self.EXP_ID_0),
+            self._create_collection_reference(self.COL_ID_2)])
 
         self._compare_lists(
             activity_services.get_featured_activity_references(), [
-                self._get_exploration_reference(self.EXP_ID_0),
-                self._get_collection_reference(self.COL_ID_2)])
+                self._create_exploration_reference(self.EXP_ID_0),
+                self._create_collection_reference(self.COL_ID_2)])
 
         # Deleting an unfeatured activity does not affect the featured list.
         exp_services.delete_exploration(self.owner_id, self.EXP_ID_1)
         self._compare_lists(
             activity_services.get_featured_activity_references(), [
-                self._get_exploration_reference(self.EXP_ID_0),
-                self._get_collection_reference(self.COL_ID_2)])
+                self._create_exploration_reference(self.EXP_ID_0),
+                self._create_collection_reference(self.COL_ID_2)])
 
         # Deleting a featured activity removes it from the featured list.
         collection_services.delete_collection(self.owner_id, self.COL_ID_2)
         self._compare_lists(
             activity_services.get_featured_activity_references(), [
-                self._get_exploration_reference(self.EXP_ID_0)])
+                self._create_exploration_reference(self.EXP_ID_0)])
         exp_services.delete_exploration(self.owner_id, self.EXP_ID_0)
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
@@ -122,27 +129,27 @@ class ActivityServicesTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner_id, self.EXP_ID_1)
         rights_manager.publish_collection(self.owner_id, self.COL_ID_2)
         activity_services.update_featured_activity_references([
-            self._get_exploration_reference(self.EXP_ID_0),
-            self._get_collection_reference(self.COL_ID_2)])
+            self._create_exploration_reference(self.EXP_ID_0),
+            self._create_collection_reference(self.COL_ID_2)])
 
         self._compare_lists(
             activity_services.get_featured_activity_references(), [
-                self._get_exploration_reference(self.EXP_ID_0),
-                self._get_collection_reference(self.COL_ID_2)])
+                self._create_exploration_reference(self.EXP_ID_0),
+                self._create_collection_reference(self.COL_ID_2)])
 
         # Unpublishing an unfeatured activity does not affect the featured
         # list.
         rights_manager.unpublish_exploration(self.moderator_id, self.EXP_ID_1)
         self._compare_lists(
             activity_services.get_featured_activity_references(), [
-                self._get_exploration_reference(self.EXP_ID_0),
-                self._get_collection_reference(self.COL_ID_2)])
+                self._create_exploration_reference(self.EXP_ID_0),
+                self._create_collection_reference(self.COL_ID_2)])
 
         # Unpublishing a featured activity removes it from the featured list.
         rights_manager.unpublish_collection(self.moderator_id, self.COL_ID_2)
         self._compare_lists(
             activity_services.get_featured_activity_references(), [
-                self._get_exploration_reference(self.EXP_ID_0)])
+                self._create_exploration_reference(self.EXP_ID_0)])
 
         rights_manager.unpublish_exploration(self.moderator_id, self.EXP_ID_0)
         self._compare_lists(
@@ -178,22 +185,24 @@ class ActivityServicesTests(test_utils.GenericTestBase):
         self.assertEqual(
             activity_services.split_by_type([]), ([], []))
 
-        exploration_123 = self._get_exploration_reference('123')
+        exploration_123 = self._create_exploration_reference('123')
         self.assertEqual(
             activity_services.split_by_type([exploration_123]),
             (['123'], []))
 
-        collection_def = self._get_collection_reference('def')
+        collection_def = self._create_collection_reference('def')
         self.assertEqual(
             activity_services.split_by_type([collection_def]),
             ([], ['def']))
 
-        exploration_ab = self._get_exploration_reference('ab')
+        exploration_ab = self._create_exploration_reference('ab')
         self.assertEqual(
             activity_services.split_by_type([
                 exploration_123, collection_def, exploration_ab]),
             (['123', 'ab'], ['def']))
 
+    def test_split_by_type_raises_error_if_given_invalid_activity_ref(self):
+        exploration_123 = self._create_exploration_reference('123')
         with self.assertRaisesRegexp(Exception, 'Invalid activity reference'):
             activity_services.split_by_type([
                 exploration_123,

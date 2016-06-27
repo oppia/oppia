@@ -30,8 +30,8 @@ oppia.controller('Moderator', [
 
     $scope.getActivityCreateUrl = function(reference) {
       return (
-        (reference.type === 'exploration' ? '/create/' : '/create_collection') +
-        reference.id);
+        (reference.type === 'exploration' ? '/create' : '/create_collection') +
+        '/' + reference.id);
     };
 
     $scope.allCommits = [];
@@ -63,6 +63,7 @@ oppia.controller('Moderator', [
     var RECENT_COMMITS_URL = (
       '/recentcommitshandler/recent_commits' +
       '?query_type=all_non_private_commits');
+    // TODO(sll): Update this to also support collections.
     $http.get(RECENT_COMMITS_URL).then(function(response) {
       // Update the explorationData object with information about newly-
       // discovered explorations.
