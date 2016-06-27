@@ -820,7 +820,22 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
       routerService.savePendingChanges();
 
+      if (!explorationRightsService.isPrivate() &&
+          explorationWarningsService.countWarnings() > 0) {
+        // If the exploration is not private, warnings should be fixed before
+        // it can be saved.
+        alertsService.addWarning(explorationWarningsService.getWarnings()[0]);
+      }
+
       explorationData.getLastSavedData().then(function(data) {
+        explorationData.getData().then(function(currentData) {
+          if (data.version > currentData.version) {
+            autosaveInfoModalsService.showVersionMismatchModal(
+              changeListService.getChangeList());
+            return;
+          }
+        });
+
         var oldStates = data.states;
         var newStates = explorationStatesService.getStates();
         var diffGraphData = ExplorationDiffService.getDiffGraphData(
@@ -841,13 +856,6 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
         // TODO(wxy): after diff supports exploration metadata, add a check to
         // exit if changes cancel each other out.
-
-        if (!explorationRightsService.isPrivate() &&
-            explorationWarningsService.countWarnings() > 0) {
-          // If the exploration is not private, warnings should be fixed before
-          // it can be saved.
-          alertsService.addWarning(explorationWarningsService.getWarnings()[0]);
-        }
 
         alertsService.clearWarnings();
 
