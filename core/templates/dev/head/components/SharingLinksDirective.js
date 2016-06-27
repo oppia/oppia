@@ -23,7 +23,6 @@ oppia.directive('sharingLinks', [function() {
       layoutType: '@',
       layoutAlignType: '@',
       getTwitterText: '&twitterText',
-      getDashboardExplorationId: '&explorationId'
     },
     templateUrl: 'components/sharingLinks',
     controller: [
@@ -36,9 +35,6 @@ oppia.directive('sharingLinks', [function() {
 
         $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
             GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
-
-        $scope.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
-          GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD);
 
         $scope.registerShareExplorationEvent = function(network) {
           siteAnalyticsService.registerShareExplorationEvent(network);
@@ -80,8 +76,6 @@ oppia.directive('sharingLinks', [function() {
                   pathnameArray[i] === 'create') {
                 _explorationId = pathnameArray[i + 1];
                 return pathnameArray[i + 1];
-              } else if (pathnameArray[i] === 'dashboard') {
-                return $scope.getDashboardExplorationId();
               }
             }
           }
