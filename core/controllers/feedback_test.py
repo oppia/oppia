@@ -633,6 +633,9 @@ class FeedbackMessageEmailHandlerTests(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, 'Title')
         self.can_send_emails_ctx = self.swap(
@@ -645,7 +648,7 @@ class FeedbackMessageEmailHandlerTests(test_utils.GenericTestBase):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
                 self.exploration.id, 'a_state_name',
-                self.editor_id, 'a subject', 'some text')
+                self.new_user_id, 'a subject', 'some text')
 
             threadlist = feedback_services.get_all_threads(
                 self.exploration.id, False)
