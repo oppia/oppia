@@ -22,7 +22,7 @@ oppia.directive('sharingLinks', [function() {
     scope: {
       layoutType: '@',
       layoutAlignType: '@',
-      getTwitterText: '&twitterText',
+      getTwitterText: '&twitterText'
     },
     templateUrl: 'components/sharingLinks',
     controller: [
