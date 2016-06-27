@@ -684,7 +684,7 @@ textarea {
   .oppia-footer-padding {
     height: 464px;
   }
-  
+
   .oppia-footer-container {
     padding: 30px;
   }
@@ -3931,4 +3931,9 @@ md-card.preview-conversation-skin-supplemental-card {
   .oppia-about-extra-info {
     height: 400px;
   }
+}
+
+.save-exploration-modal .modal-dialog {
+  max-width: 1200px;
+  width: 90%;
 }

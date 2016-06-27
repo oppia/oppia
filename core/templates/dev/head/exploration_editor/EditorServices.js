@@ -99,6 +99,16 @@ oppia.factory('explorationData', [
           });
         }
       },
+      // Returns a promise supplying the last saved version for the current
+      // exploration.
+      getLastSavedData: function() {
+        return $http.get(explorationDataUrl).then(function(response) {
+          $log.info('Retrieved saved exploration data.');
+          $log.info(response.data);
+
+          return response.data;
+        });
+      },
       resolveAnswers: function(stateName, resolvedAnswersList) {
         alertsService.clearWarnings();
         $http.put(
