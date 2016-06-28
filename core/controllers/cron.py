@@ -93,7 +93,6 @@ class AppendLastDashboardStatsToList(base.BaseHandler):
     @require_cron_or_superadmin
     def get(self):
         """Handles GET requests."""
-
         user_jobs_one_off.DashboardStatsOneOffJob.enqueue(
             user_jobs_one_off.DashboardStatsOneOffJob.create_new())
 
