@@ -14,9 +14,9 @@
             <div class="form-group" ng-class="{'has-error': !explorationObjectiveService.displayed}">
               <label for="explorationObjective" class="col-lg-2 col-md-2 col-sm-2">Goal</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
-                <input id="explorationObjective" type="text" class="form-control protractor-test-exploration-objective-input" ng-model="explorationObjectiveService.displayed" ng-blur="saveExplorationObjective()" placeholder="Learn how to ...">
+                <input id="explorationObjective" type="text" class="form-control protractor-test-exploration-objective-input" ng-model="explorationObjectiveService.displayed" ng-blur="saveExplorationObjective()" ng-minlength="25" placeholder="Learn how to ...">
                 <span class="help-block" style="font-size: smaller">
-                  What does this exploration help people to do?
+                  What does this exploration help people to do? (Minimum: 25 Characters)
                 </span>
               </div>
             </div>
