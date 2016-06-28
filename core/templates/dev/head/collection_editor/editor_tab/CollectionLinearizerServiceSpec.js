@@ -35,7 +35,7 @@ describe('Collection linearizer service', function() {
     var firstCollectionNodeBackendObject = {
       exploration_id: 'exp_id0',
       prerequisite_skills: [],
-      acquired_skills: ['exp title0'],
+      acquired_skills: [],
       exploration_summary: {
         title: 'exp title0',
         category: 'exp category',
@@ -47,8 +47,8 @@ describe('Collection linearizer service', function() {
 
     var secondCollectionNodeBackendObject = {
       exploration_id: 'exp_id1',
-      prerequisite_skills: ['exp title0'],
-      acquired_skills: ['exp title1'],
+      prerequisite_skills: [],
+      acquired_skills: [],
       exploration_summary: {
         title: 'exp title1',
         category: 'exp category',
@@ -60,8 +60,8 @@ describe('Collection linearizer service', function() {
 
     var thirdCollectionNodeBackendObject = {
       exploration_id: 'exp_id2',
-      prerequisite_skills: ['exp title1'],
-      acquired_skills: ['exp title2'],
+      prerequisite_skills: [],
+      acquired_skills: [],
       exploration_summary: {
         title: 'exp title2',
         category: 'exp category',
@@ -74,29 +74,86 @@ describe('Collection linearizer service', function() {
 
   var _createLinearCollection = function() {
     var collection = CollectionObjectFactory.createEmptyCollection();
+    firstCollectionNode.getAcquiredSkillList().setSkills(['exp title0']);
+    secondCollectionNode.getPrerequisiteSkillList().setSkills(['exp title0']);
+    secondCollectionNode.getAcquiredSkillList().setSkills(['exp title1']);
+    thirdCollectionNode.getPrerequisiteSkillList().setSkills(['exp title1']);
+    thirdCollectionNode.getAcquiredSkillList().setSkills(['exp title2']);
+
+    // Randomize the add order for robust testing since linearity depends on
+    // skills and not the order in which the nodes where added.
+    collection.addCollectionNode(thirdCollectionNode);
+    collection.addCollectionNode(secondCollectionNode);
+    collection.addCollectionNode(firstCollectionNode);
+    return collection;
+  };
+
+  var _createNonLinearCollection = function() {
+    var collection = CollectionObjectFactory.createEmptyCollection();
+    firstCollectionNode.getAcquiredSkillList().setSkills(['exp title0']);
+    secondCollectionNode.getPrerequisiteSkillList().setSkills(['exp title0']);
+    secondCollectionNode.getAcquiredSkillList().setSkills(['exp title1']);
+    thirdCollectionNode.getPrerequisiteSkillList().setSkills(['exp title0']);
+    thirdCollectionNode.getAcquiredSkillList().setSkills(['exp title2']);
     collection.addCollectionNode(firstCollectionNode);
     collection.addCollectionNode(secondCollectionNode);
     collection.addCollectionNode(thirdCollectionNode);
     return collection;
   };
 
-  describe('Collection linearizer node removal function', function() {
-    it('should correctly remove a node from a collection with a single node',
+  describe('removeCollectionNode()', function() {
+    it('should not remove a non-existent node from a single node collection',
         function() {
-          var collection = CollectionObjectFactory.createEmptyCollection();
-          collection.addCollectionNode(firstCollectionNode);
-          expect(collection.containsCollectionNode('exp_id0')).toBe(true);
-          CollectionLinearizerService.removeCollectionNode(
-              collection, 'exp_id0');
-          expect(collection.containsCollectionNode('exp_id0')).toBe(false);
-          expect(
-              CollectionLinearizerService.getCollectionNodesInPlayableOrder(
-                  collection)).toEqual([]);
-        });
+      var collection = CollectionObjectFactory.createEmptyCollection();
+      collection.addCollectionNode(firstCollectionNode);
+      expect(collection.containsCollectionNode('exp_id0')).toBe(true);
+      expect(CollectionLinearizerService.removeCollectionNode(collection,
+          'non_existent')).toBe(false);
+      expect(collection.containsCollectionNode('exp_id0')).toBe(true);
+      expect(
+          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+              collection)).toEqual([firstCollectionNode]);
+    });
+
+    it('should not remove a non-existent node from a multiple nodes collection',
+        function() {
+      var collection = _createLinearCollection();
+      expect(
+          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+              collection)).toEqual([
+                  firstCollectionNode, secondCollectionNode,
+                  thirdCollectionNode]);
+      expect(CollectionLinearizerService.removeCollectionNode(collection,
+          'non_existent')).toBe(false);
+      expect(
+          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+              collection)).toEqual([
+                  firstCollectionNode, secondCollectionNode,
+                  thirdCollectionNode]);
+    });
+
+    it('should correctly remove a node from a single node collection',
+        function() {
+      var collection = CollectionObjectFactory.createEmptyCollection();
+      collection.addCollectionNode(firstCollectionNode);
+      expect(collection.containsCollectionNode('exp_id0')).toBe(true);
+      expect(CollectionLinearizerService.removeCollectionNode(collection,
+          'exp_id0')).toBe(true);
+      expect(collection.containsCollectionNode('exp_id0')).toBe(false);
+      expect(
+          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+              collection)).toEqual([]);
+    });
 
     it('should correctly remove the first node from a collection', function() {
       var collection = _createLinearCollection();
-      CollectionLinearizerService.removeCollectionNode(collection, 'exp_id0');
+      expect(collection.containsCollectionNode('exp_id0')).toBe(true);
+      expect(
+          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+              collection)).toEqual([firstCollectionNode, secondCollectionNode,
+                  thirdCollectionNode]);
+      expect(CollectionLinearizerService.removeCollectionNode(collection,
+          'exp_id0')).toBe(true);
       expect(collection.containsCollectionNode('exp_id0')).toBe(false);
       expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
@@ -105,7 +162,13 @@ describe('Collection linearizer service', function() {
 
     it('should correctly remove the last node from a collection', function() {
       var collection = _createLinearCollection();
-      CollectionLinearizerService.removeCollectionNode(collection, 'exp_id2');
+      expect(collection.containsCollectionNode('exp_id2')).toBe(true);
+      expect(
+          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+              collection)).toEqual([firstCollectionNode, secondCollectionNode,
+                  thirdCollectionNode]);
+      expect(CollectionLinearizerService.removeCollectionNode(collection,
+          'exp_id2')).toBe(true);
       expect(collection.containsCollectionNode('exp_id2')).toBe(false);
       expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
@@ -114,7 +177,13 @@ describe('Collection linearizer service', function() {
 
     it('should correctly remove a middle node from a collection', function() {
       var collection = _createLinearCollection();
-      CollectionLinearizerService.removeCollectionNode(collection, 'exp_id1');
+      expect(collection.containsCollectionNode('exp_id1')).toBe(true);
+      expect(
+          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+              collection)).toEqual([firstCollectionNode, secondCollectionNode,
+                  thirdCollectionNode]);
+      expect(CollectionLinearizerService.removeCollectionNode(collection,
+          'exp_id1')).toBe(true);
       expect(collection.containsCollectionNode('exp_id1')).toBe(false);
       expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
@@ -122,83 +191,278 @@ describe('Collection linearizer service', function() {
     });
   });
 
-  describe('Collection linearizer node append function', function() {
-    it('should correctly append a node in an empty collection', function() {
+  describe('appendCollectionNode()', function() {
+    it('should correctly append a node to an empty collection', function() {
       var collection = CollectionObjectFactory.createEmptyCollection();
+      expect(collection.containsCollectionNode('exp_id0')).toBe(false);
+      expect(
+          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+                  collection)).toEqual([]);
+      expect(firstCollectionNode.getAcquiredSkillList().getSkills()).toEqual(
+          []);
       CollectionLinearizerService.appendCollectionNode(collection, 'exp_id0',
           firstCollectionNode.getExplorationSummaryObject());
+      firstCollectionNode = collection.getCollectionNodeByExplorationId(
+          'exp_id0');
+      expect(
+          firstCollectionNode.getPrerequisiteSkillList().getSkills()).toEqual(
+              []);
+      expect(firstCollectionNode.getAcquiredSkillList().getSkills()).toEqual([
+          'exp title0']);
       expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
-                  collection)).toEqual([firstCollectionNode]);
+              collection)).toEqual([firstCollectionNode]);
     });
 
-    it('should correctly append a node in a non-empty collection', function() {
-      var collection = CollectionObjectFactory.createEmptyCollection();
-      collection.addCollectionNode(firstCollectionNode);
-      collection.addCollectionNode(secondCollectionNode);
-      expect(
-          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
-              collection)).toEqual([firstCollectionNode, secondCollectionNode]);
-      CollectionLinearizerService.appendCollectionNode(collection, 'exp_id2',
-          thirdCollectionNode.getExplorationSummaryObject());
+    it('should correctly append a node to a non-empty collection', function() {
+      var collection = _createLinearCollection();
+      var newCollectionNodeBackendObject = {
+        exploration_id: 'exp_id3',
+        prerequisite_skills: [],
+        acquired_skills: [],
+        exploration_summary: {
+          title: 'exp title3',
+          category: 'exp category',
+          objective: 'exp objective'
+        }
+      };
+      var newCollectionNode = CollectionNodeObjectFactory.create(
+          newCollectionNodeBackendObject);
+      expect(newCollectionNode.getPrerequisiteSkillList().getSkills()).toEqual(
+          []);
+      expect(newCollectionNode.getAcquiredSkillList().getSkills()).toEqual(
+          []);
       expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
               collection)).toEqual([firstCollectionNode, secondCollectionNode,
+                  thirdCollectionNode]);
+      CollectionLinearizerService.appendCollectionNode(collection, 'exp_id3',
+          newCollectionNode.getExplorationSummaryObject());
+      newCollectionNode = collection.getCollectionNodeByExplorationId(
+        'exp_id3');
+      expect(newCollectionNode.getPrerequisiteSkillList().getSkills()).toEqual(
+          ['exp title2']);
+      expect(newCollectionNode.getAcquiredSkillList().getSkills()).toEqual(
+          ['exp title3']);
+      expect(
+          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+              collection)).toEqual([
+                collection.getCollectionNodeByExplorationId('exp_id0'),
+                collection.getCollectionNodeByExplorationId('exp_id1'),
+                collection.getCollectionNodeByExplorationId('exp_id2'),
+                collection.getCollectionNodeByExplorationId('exp_id3')]);
+    });
+  });
+
+  describe('shiftNodeLeft()', function() {
+    it('should handle shifting a node in a single node collection',
+        function() {
+      var collection = CollectionObjectFactory.createEmptyCollection();
+      firstCollectionNode.getAcquiredSkillList().setSkills(['exp title0']);
+      collection.addCollectionNode(firstCollectionNode);
+      expect(
+          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+              collection)).toEqual([firstCollectionNode]);
+      expect(CollectionLinearizerService.shiftNodeLeft(
+          collection, 'exp_id0')).toBe(true);
+      expect(
+          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+              collection)).toEqual([firstCollectionNode]);
+    });
+
+    it('should not shift a non-existent node', function() {
+      var collection = _createLinearCollection();
+      expect(
+          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+              collection)).toEqual([firstCollectionNode, secondCollectionNode,
+                  thirdCollectionNode]);
+      expect(CollectionLinearizerService.shiftNodeLeft(
+          collection, 'non_existent')).toBe(false);
+      expect(
+          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+              collection)).toEqual([firstCollectionNode, secondCollectionNode,
+                  thirdCollectionNode]);
+    });
+
+    it('should handle shifting the first node', function() {
+      var collection = _createLinearCollection();
+      expect(
+          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+              collection)).toEqual([firstCollectionNode, secondCollectionNode,
+                  thirdCollectionNode]);
+      expect(CollectionLinearizerService.shiftNodeLeft(
+          collection, 'exp_id0')).toBe(true);
+      expect(
+          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+              collection)).toEqual([firstCollectionNode, secondCollectionNode,
+                  thirdCollectionNode]);
+    });
+
+    iit('should handle shifting the last node', function() {
+      var collection = _createLinearCollection();
+      expect(
+          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+              collection)).toEqual([firstCollectionNode, secondCollectionNode,
+                  thirdCollectionNode]);
+      expect(CollectionLinearizerService.shiftNodeLeft(
+          collection, 'exp_id2')).toBe(true);
+      expect(
+          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+              collection)).toEqual([firstCollectionNode, thirdCollectionNode,
+                secondCollectionNode]);
+    });
+
+    it('should handle shifting a middle node', function() {
+      var collection = _createLinearCollection();
+      expect(
+          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+              collection)).toEqual([firstCollectionNode, secondCollectionNode,
+                  thirdCollectionNode]);
+      expect(CollectionLinearizerService.shiftNodeLeft(
+          collection, 'exp_id1')).toBe(true);
+      expect(
+          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+              collection)).toEqual([secondCollectionNode, firstCollectionNode,
                   thirdCollectionNode]);
     });
   });
 
-  describe('Collection linearizer node shifting function', function() {
-    it('should correctly shift the first node to the right', function() {
+  describe('shiftNodeRight()', function() {
+    it('should handle shifting a node in a single node collection',
+        function() {
+      var collection = CollectionObjectFactory.createEmptyCollection();
+      firstCollectionNode.getAcquiredSkillList().setSkills(['exp title0']);
+      collection.addCollectionNode(firstCollectionNode);
+      expect(
+          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+              collection)).toEqual([firstCollectionNode]);
+      expect(CollectionLinearizerService.shiftNodeRight(
+          collection, 'exp_id0')).toBe(true);
+      expect(
+          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+              collection)).toEqual([firstCollectionNode]);
+    });
+
+    it('should not shift a non-existent node', function() {
       var collection = _createLinearCollection();
       expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
               collection)).toEqual([firstCollectionNode, secondCollectionNode,
                   thirdCollectionNode]);
-      CollectionLinearizerService.shiftNodeRight(collection, 'exp_id0');
+      expect(CollectionLinearizerService.shiftNodeRight(
+          collection, 'non_existent')).toBe(false);
+      expect(
+          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+              collection)).toEqual([firstCollectionNode, secondCollectionNode,
+                  thirdCollectionNode]);
+    });
+
+    it('should handle shifting the first node', function() {
+      var collection = _createLinearCollection();
+      expect(
+          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+              collection)).toEqual([firstCollectionNode, secondCollectionNode,
+                  thirdCollectionNode]);
+      expect(CollectionLinearizerService.shiftNodeRight(
+          collection, 'exp_id0')).toBe(true);
       expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
               collection)).toEqual([secondCollectionNode, firstCollectionNode,
                   thirdCollectionNode]);
     });
 
-    it('should correctly shift the last node to the left', function() {
+    it('should handle shifting the last node', function() {
       var collection = _createLinearCollection();
       expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
               collection)).toEqual([firstCollectionNode, secondCollectionNode,
                   thirdCollectionNode]);
-      CollectionLinearizerService.shiftNodeLeft(collection, 'exp_id2');
+      expect(CollectionLinearizerService.shiftNodeRight(
+          collection, 'exp_id2')).toBe(true);
+      expect(
+          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+              collection)).toEqual([firstCollectionNode, secondCollectionNode,
+                  thirdCollectionNode]);
+    });
+
+    it('should correctly handle shifting middle node', function() {
+      var collection = _createLinearCollection();
+      expect(
+          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+              collection)).toEqual([firstCollectionNode, secondCollectionNode,
+                  thirdCollectionNode]);
+
+      expect(CollectionLinearizerService.shiftNodeRight(
+          collection, 'exp_id1')).toBe(true);
       expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
               collection)).toEqual([firstCollectionNode, thirdCollectionNode,
                 secondCollectionNode]);
     });
+  });
 
-    it('should correctly shift middle node to the right', function() {
+  describe('getNextExplorationIds()', function() {
+    it('should return no exploration ids for last node in linear collection',
+        function() {
       var collection = _createLinearCollection();
-      expect(
-          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
-              collection)).toEqual([firstCollectionNode, secondCollectionNode,
-                  thirdCollectionNode]);
-      CollectionLinearizerService.shiftNodeRight(collection, 'exp_id1');
-      expect(
-          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
-              collection)).toEqual([firstCollectionNode, thirdCollectionNode,
-                secondCollectionNode]);
+      expect(CollectionLinearizerService.getNextExplorationIds(collection,
+          ['exp_id0', 'exp_id1', 'exp_id2'])).toEqual([]);
     });
 
-    it('should correctly shift middle node to the left', function() {
+    it('should correctly return the next exploration id for linear collection',
+        function() {
+      var collection = _createLinearCollection();
+      expect(CollectionLinearizerService.getNextExplorationIds(collection,
+          ['exp_id0', 'exp_id1'])).toEqual(['exp_id2']);
+    });
+
+    it('should return no ids for the last node in non-linear collection',
+        function() {
+      var collection = _createNonLinearCollection();
+      expect(CollectionLinearizerService.getNextExplorationIds(collection,
+          ['exp_id0', 'exp_id1', 'exp_id2'])).toEqual([]);
+    });
+
+    it('should correctly return next exploration ids for non-linear collection',
+        function() {
+      var collection = _createNonLinearCollection();
+      expect(CollectionLinearizerService.getNextExplorationIds(collection,
+          ['exp_id0'])).toEqual(['exp_id1', 'exp_id2']);
+    });
+  });
+
+  describe('getCollectionNodesInPlayableOrder()', function() {
+    it('should correctly return an empty list for an empty collection',
+        function() {
+      var collection = CollectionObjectFactory.createEmptyCollection();
+      expect(CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+          collection)).toEqual([]);
+    });
+
+    it('should correctly return a list for a collection with a single node',
+        function() {
+      var collection = CollectionObjectFactory.createEmptyCollection();
+      firstCollectionNode.getAcquiredSkillList().setSkills(['exp title0']);
+      collection.addCollectionNode(firstCollectionNode);
+      expect(CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+          collection)).toEqual([firstCollectionNode]);
+    });
+
+    it('should correctly return a list for a collection with multiple nodes',
+        function() {
       var collection = _createLinearCollection();
       expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
-              collection)).toEqual([firstCollectionNode, secondCollectionNode,
+              collection)).toEqual([
+                  firstCollectionNode, secondCollectionNode,
                   thirdCollectionNode]);
-      CollectionLinearizerService.shiftNodeLeft(collection, 'exp_id1');
+    });
+
+    it('should linearize non-linear collection', function() {
+      var collection = _createNonLinearCollection();
       expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
-              collection)).toEqual([secondCollectionNode, firstCollectionNode,
-                  thirdCollectionNode]);
+              collection)).toEqual([firstCollectionNode, secondCollectionNode]);
     });
   });
 });

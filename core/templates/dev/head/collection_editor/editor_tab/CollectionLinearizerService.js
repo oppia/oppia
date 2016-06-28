@@ -43,6 +43,8 @@ oppia.factory('CollectionLinearizerService', [
       });
     };
 
+    // Given a non linear collection input, the function will linearize it by
+    // picking the first node it encounters on the branch and ignore the others.
     var _getCollectionNodesInPlayableOrder = function(collection) {
       var nodeList = collection.getStartingCollectionNodes();
       var completedExpIds = nodeList.map(function(collectionNode) {
@@ -154,7 +156,7 @@ oppia.factory('CollectionLinearizerService', [
       /**
        * Given a collection and a list of completed exploration IDs within the
        * context of that collection, returns a list of which explorations in the
-       * collection is immediately playablen by the user. NOTE: This function
+       * collection is immediately playable by the user. NOTE: This function
        * does not assume that the collection is linear.
        */
       getNextExplorationIds: function(collection, completedExpIds) {
@@ -199,14 +201,15 @@ oppia.factory('CollectionLinearizerService', [
        * collection.
        */
       removeCollectionNode: function(collection, explorationId) {
+        if (!collection.containsCollectionNode(explorationId)) {
+          return false;
+        }
+
         // Relinking is only needed if more than just the specified node is in
         // the collection.
         if (collection.getCollectionNodeCount() > 1) {
           var linearNodeList = _getCollectionNodesInPlayableOrder(collection);
           var nodeIndex = _findNodeIndex(linearNodeList, explorationId);
-          if (nodeIndex === -1) {
-            return false;
-          }
 
           // Ensure any present left/right nodes are appropriately linked after
           // the node is removed.
