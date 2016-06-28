@@ -825,6 +825,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         // If the exploration is not private, warnings should be fixed before
         // it can be saved.
         alertsService.addWarning(explorationWarningsService.getWarnings()[0]);
+        return;
       }
 
       explorationData.getLastSavedData().then(function(data) {
@@ -875,10 +876,22 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               return $scope.diffData;
             }
           },
-          windowClass: 'save-exploration-modal',
+          windowClass: 'oppia-save-exploration-modal',
           controller: [
             '$scope', '$modalInstance', 'isExplorationPrivate', 'diffData',
             function($scope, $modalInstance, isExplorationPrivate, diffData) {
+              $scope.showDiff = false;
+              $scope.onClickToggleDiffButton = function() {
+                $scope.showDiff = !$scope.showDiff;
+                if ($scope.showDiff) {
+                  $('.oppia-save-exploration-modal').addClass(
+                    'oppia-save-exploration-wide-modal');
+                } else {
+                  $('.oppia-save-exploration-modal').removeClass(
+                    'oppia-save-exploration-wide-modal');
+                }
+              };
+
               $scope.diffData = diffData;
               $scope.isExplorationPrivate = isExplorationPrivate;
 

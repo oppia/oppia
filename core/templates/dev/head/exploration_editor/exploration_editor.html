@@ -346,16 +346,20 @@
         </h3>
       </div>
       <div class="modal-body oppia-long-text">
-        <version-diff-visualization diff-data="diffData"
-                                    earlier-version-header="earlierVersionHeader"
-                                    later-version-header="laterVersionHeader">
-        </version-diff-visualization>
         <p>
           <span ng-if="isExplorationPrivate">(Optional)</span>
           Please enter a brief description of what you have changed:
           <textarea rows="3" cols="50" ng-model="commitMessage" focus-on="saveChangesModalOpened" class="protractor-test-commit-message-input" autofocus></textarea>
         </p>
+        <button class="btn btn-default" ng-click="onClickToggleDiffButton()">
+          <span ng-if="!showDiff">Show Changes</span>
+          <span ng-if="showDiff">Hide Changes</span>
+        </button>
 
+        <version-diff-visualization ng-if="showDiff" diff-data="diffData"
+                                    earlier-version-header="earlierVersionHeader"
+                                    later-version-header="laterVersionHeader">
+        </version-diff-visualization>
       </div>
       <div class="modal-footer">
         <button class="btn btn-default" ng-click="cancel()">Cancel</button>

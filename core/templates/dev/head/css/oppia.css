@@ -3933,7 +3933,15 @@ md-card.preview-conversation-skin-supplemental-card {
   }
 }
 
-.save-exploration-modal .modal-dialog {
+.oppia-save-exploration-wide-modal .modal-dialog {
   max-width: 1200px;
   width: 90%;
+}
+
+.oppia-save-exploration-wide-modal .diff-graph {
+  margin-top: 50px;
+}
+.oppia-save-exploration-wide-modal .legend-graph {
+  right: -25px;
+  top: 175px;
 }

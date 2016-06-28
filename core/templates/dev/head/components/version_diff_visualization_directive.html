@@ -4,7 +4,7 @@
     <loading-dots></loading-dots>
   </div>
 
-  <div state-graph-viz class="protractor-test-history-graph"
+  <div state-graph-viz class="protractor-test-history-graph diff-graph"
        graph-data="diffGraphData" node-colors="diffGraphNodeColors"
        node-secondary-labels="diffGraphSecondaryLabels"
        init-state-id2="v1InitStateId"
@@ -12,8 +12,7 @@
        on-click-function="onClickStateInDiffGraph">
   </div>
 
-  <div style="position: absolute; right: -100px; top: 10px;"
-       ng-show="diffGraphData">
+  <div class="legend-graph" ng-show="diffGraphData">
     <h4>Exploration Graph Legend</h4>
     <div state-graph-viz ng-disabled="true"
          graph-data="legendGraph" node-colors="LEGEND_GRAPH_COLORS"
@@ -25,7 +24,12 @@
 </script>
 
 <style>
-  #legend-graph .node rect {
+  .legend-graph .node rect {
     pointer-events: none;
+  }
+  .legend-graph {
+    position: absolute;
+    right: -100px;
+    top: 10px;
   }
 </style>
