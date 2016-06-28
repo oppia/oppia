@@ -286,6 +286,18 @@ class I18nDictsTest(test_utils.GenericTestBase):
             if filename == 'en.json':
                 continue
 
+            self.log_line('Processing %s...' % filename)
+
             key_list = self._extract_keys_from_json_file(filename)
             # All other JSON files should have a subset of the keys in en.json.
             self.assertEqual(len(set(key_list) - set(master_key_list)), 0)
+
+            # If there are missing keys, log an error, but don't fail the
+            # tests.
+            if set(key_list) != set(master_key_list):
+                self.log_line('')
+                untranslated_keys = list(set(master_key_list) - set(key_list))
+                self.log_line('ERROR: Untranslated keys in %s:' % filename)
+                for key in untranslated_keys:
+                    self.log_line('- %s' % key)
+                self.log_line('')
