@@ -286,6 +286,8 @@ class I18nDictsTest(test_utils.GenericTestBase):
             if filename == 'en.json':
                 continue
 
+            self.log_line('Processing %s...' % filename)
+
             key_list = self._extract_keys_from_json_file(filename)
-            # All other JSON files should have a subset of the keys in en.json.
-            self.assertEqual(len(set(key_list) - set(master_key_list)), 0)
+            # All other JSON files should have the same keys as in en.json.
+            self.assertEqual(set(key_list), set(master_key_list))
