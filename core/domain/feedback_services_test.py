@@ -279,7 +279,7 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
 
     def test_send_feedback_message_email(self):
-        feedback_services.send_feedback_message_email(
+        feedback_services.add_message_to_email_buffer(
             self.user_id_a, self.exploration.id, self.thread_id,
             self.message_id1)
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)
@@ -297,10 +297,10 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
     def test_add_new_feedback_message(self):
-        feedback_services.send_feedback_message_email(
+        feedback_services.add_message_to_email_buffer(
             self.user_id_a, self.exploration.id, self.thread_id,
             self.message_id1)
-        feedback_services.send_feedback_message_email(
+        feedback_services.add_message_to_email_buffer(
             self.user_id_a, self.exploration.id, self.thread_id,
             self.message_id2)
 

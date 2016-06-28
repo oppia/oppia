@@ -122,7 +122,7 @@ def create_message(
             feconf.CAN_SEND_EMAILS_TO_USERS and
             feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS):
             # send feedback message email if user is registered.
-        send_feedback_message_email(
+        add_message_to_email_buffer(
             author_id, exploration_id, thread_id, message_id)
 
     if author_id:
@@ -147,8 +147,9 @@ def get_messages(exploration_id, thread_id):
 
 
 def get_message(exploration_id, thread_id, message_id):
-    return feedback_models.FeedbackMessageModel.get(
-        exploration_id, thread_id, message_id)
+    return _get_message_from_model(
+        feedback_models.FeedbackMessageModel.get(
+            exploration_id, thread_id, message_id))
 
 
 def get_next_page_of_all_feedback_messages(
@@ -282,7 +283,7 @@ def enqueue_feedback_message_email_task(user_id):
 
 
 def get_feedback_message_references(user_id):
-    model = feedback_models.UnsentFeedbackEmailModel.get_by_id(user_id)
+    model = feedback_models.UnsentFeedbackEmailModel.get(user_id)
 
     return [feedback_domain.FeedbackMessageReference(
         reference['exploration_id'], reference['thread_id'],
@@ -292,8 +293,7 @@ def get_feedback_message_references(user_id):
 
 def _add_feedback_message_reference(user_id, reference):
     """Creates a new instance of UnsentFeedbackEmailModel or update existing
-    model instance for seget_feedback_message_referencesnding feedback message
-    email."""
+    model instance for sending feedback message email."""
 
     model = feedback_models.UnsentFeedbackEmailModel.get(user_id, strict=False)
 
@@ -310,14 +310,22 @@ def _add_feedback_message_reference(user_id, reference):
 
 def update_feedback_email_retries(user_id):
     model = feedback_models.UnsentFeedbackEmailModel.get(user_id)
-    time = (datetime.datetime.utcnow() - model.created_on).seconds
+    time_since_buffered = (
+        (datetime.datetime.utcnow() - model.created_on).seconds)
 
-    if time > feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS:
+    if (time_since_buffered >
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS):
         model.retries += 1
         model.put()
 
 
-def delete_feedback_message_references(user_id, references_length):
+def pop_feedback_message_references(user_id, references_length):
+    """Pop feedback message references which have been processed already.
+
+    Args:
+    - user_id: id of the receiving user.
+    - references_length: no. of feedback message references that have been
+    processed already."""
     model = feedback_models.UnsentFeedbackEmailModel.get(user_id)
 
     if references_length == len(model.feedback_message_references):
@@ -326,6 +334,8 @@ def delete_feedback_message_references(user_id, references_length):
         message_references = (
             model.feedback_message_references[references_length:])
         model.delete()
+        # model is delted and re-created so that created_on property of model
+        # is updates otherwise it would created complications in retries count.
         model = feedback_models.UnsentFeedbackEmailModel(
             id=user_id,
             feedback_message_references=message_references)
@@ -333,14 +343,16 @@ def delete_feedback_message_references(user_id, references_length):
         enqueue_feedback_message_email_task(user_id)
 
 
-def send_feedback_message_email(author_id, exploration_id, thread_id,
+def add_message_to_email_buffer(author_id, exploration_id, thread_id,
                                 message_id):
     exploration_rights = rights_manager.get_exploration_rights(exploration_id)
     feedback_message_reference = feedback_domain.FeedbackMessageReference(
         exploration_id, thread_id, message_id)
 
     for owner_id in exploration_rights.owner_ids:
-        if owner_id != author_id:
+        owner_preferences = user_services.get_email_preferences(owner_id)
+        if (owner_id != author_id and
+                owner_preferences['can_receive_feedback_message_email']):
             transaction_services.run_in_transaction(
                 _add_feedback_message_reference, owner_id,
                 feedback_message_reference)

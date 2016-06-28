@@ -662,8 +662,8 @@ class FeedbackMessageEmailHandlerTests(test_utils.GenericTestBase):
             response = self.testapp.post(
                 url=feconf.FEEDBACK_MESSAGE_EMAIL_HANDLER_URL,
                 params={'user_id': self.editor_id})
-            if response.status_code != 200:
-                raise RuntimeError('Task for feedback message email failed.')
+
+            self.assertEqual(response.status_code, 200)
 
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 1)

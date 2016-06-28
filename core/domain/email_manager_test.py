@@ -1082,20 +1082,6 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
 
-    def test_email_is_not_sent_if_recipient_has_declined_such_emails(self):
-        user_services.update_email_preferences(
-            self.editor_id, True, False, False)
-
-        feedback_messages = {
-            self.exploration.title : 'A message'
-        }
-
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
-            email_manager.send_feedback_message_email(
-                self.editor_id, feedback_messages)
-            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
-            self.assertEqual(len(messages), 0)
-
     def test_correct_email_body_is_sent(self):
         expected_email_html_body = (
             'Hi editor,<br>'
@@ -1128,7 +1114,7 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             'You can change your email preferences via the Preferences page.')
 
         feedback_messages = {
-            self.exploration.title : 'A message'
+            self.exploration.title : ['A message']
         }
 
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:

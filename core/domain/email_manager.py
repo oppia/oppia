@@ -391,14 +391,11 @@ def send_feedback_message_email(recipient_id, feedback_messages):
         return
 
     recipient_user_settings = user_services.get_user_settings(recipient_id)
-    recipient_preferences = user_services.get_email_preferences(recipient_id)
-
-    if not recipient_preferences['can_receive_feedback_message_email']:
-        return
 
     messages_html = ''
-    for title, message in feedback_messages.iteritems():
-        messages_html += '<li>' + title + ': ' + message + '<br></li>'
+    for title, messages in feedback_messages.iteritems():
+        for message in messages:
+            messages_html += '<li>%s: %s<br></li>' % (title, message)
 
     email_body = email_body_template % (
         recipient_user_settings.username, len(feedback_messages), messages_html,
