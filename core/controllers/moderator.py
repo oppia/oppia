@@ -55,12 +55,18 @@ class FeaturedActivitiesHandler(base.BaseHandler):
         featured_activity_references = [
             activity_domain.ActivityReference(
                 reference_dict['type'], reference_dict['id'])
-            for reference_dict in featured_activity_reference_dicts
-        ]
-        summary_services.require_activities_to_be_public(
-            featured_activity_references)
+            for reference_dict in featured_activity_reference_dicts]
+
+        try:
+            summary_services.require_activities_to_be_public(
+                featured_activity_references)
+        except Exception as e:
+            raise self.InvalidInputException(e)
+
         activity_services.update_featured_activity_references(
             featured_activity_references)
+
+        self.render_json({})
 
 
 class EmailDraftHandler(base.BaseHandler):

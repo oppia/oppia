@@ -25,8 +25,10 @@ import feconf
 
 
 def get_featured_activity_references():
-    featured_model_instance = activity_models.ActivityReferencesModel.get(
-        activity_models.ACTIVITY_REFERENCE_LIST_FEATURED)
+    featured_model_instance = (
+        activity_models.ActivityReferencesModel.get_or_create(
+            activity_models.ACTIVITY_REFERENCE_LIST_FEATURED))
+
     return [
         activity_domain.ActivityReference(reference['type'], reference['id'])
         for reference in featured_model_instance.activity_references]
@@ -47,8 +49,9 @@ def update_featured_activity_references(featured_activity_references):
         raise Exception(
             'The activity reference list should not have duplicates.')
 
-    featured_model_instance = activity_models.ActivityReferencesModel.get(
-        activity_models.ACTIVITY_REFERENCE_LIST_FEATURED)
+    featured_model_instance = (
+        activity_models.ActivityReferencesModel.get_or_create(
+            activity_models.ACTIVITY_REFERENCE_LIST_FEATURED))
     featured_model_instance.activity_references = [
         reference.to_dict() for reference in featured_activity_references]
     featured_model_instance.put()

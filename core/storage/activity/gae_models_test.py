@@ -16,6 +16,7 @@
 
 from core.platform import models
 from core.tests import test_utils
+import feconf
 
 (activity_models,) = models.Registry.import_models([models.NAMES.activity])
 
@@ -25,7 +26,31 @@ class ActivityListModelTest(test_utils.GenericTestBase):
 
     def test_featured_activity_list_always_exists(self):
         featured_model_instance = (
-            activity_models.ActivityReferencesModel.get('featured'))
+            activity_models.ActivityReferencesModel.get_or_create('featured'))
         self.assertIsNotNone(featured_model_instance)
         self.assertEqual(featured_model_instance.id, 'featured')
         self.assertEqual(featured_model_instance.activity_references, [])
+
+    def test_retrieving_non_existent_list(self):
+        with self.assertRaisesRegexp(Exception, 'Invalid ActivityListModel'):
+            activity_models.ActivityReferencesModel.get_or_create(
+                'nonexistent_key')
+
+    def test_updating_featured_activity_list(self):
+        featured_model_instance = (
+            activity_models.ActivityReferencesModel.get_or_create('featured'))
+        self.assertEqual(featured_model_instance.activity_references, [])
+
+        featured_model_instance.activity_references = [{
+            'type': feconf.ACTIVITY_TYPE_EXPLORATION,
+            'id': '0',
+        }]
+        featured_model_instance.put()
+
+        featured_model_instance = (
+            activity_models.ActivityReferencesModel.get_or_create('featured'))
+        self.assertEqual(featured_model_instance.id, 'featured')
+        self.assertEqual(featured_model_instance.activity_references, [{
+            'type': feconf.ACTIVITY_TYPE_EXPLORATION,
+            'id': '0',
+        }])

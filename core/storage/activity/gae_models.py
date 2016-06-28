@@ -38,7 +38,7 @@ class ActivityReferencesModel(base_models.BaseModel):
     activity_references = ndb.JsonProperty(repeated=True)
 
     @classmethod
-    def get(cls, list_name):
+    def get_or_create(cls, list_name):
         """This creates the relevant model instance, if it does not already
         exist.
         """
@@ -46,8 +46,7 @@ class ActivityReferencesModel(base_models.BaseModel):
             raise Exception(
                 'Invalid ActivityListModel id: %s' % list_name)
 
-        entity = super(
-            ActivityReferencesModel, cls).get(list_name, strict=False)
+        entity = cls.get(list_name, strict=False)
         if entity is None:
             entity = cls(id=list_name, activity_references=[])
             entity.put()
