@@ -20,12 +20,17 @@ import copy
 import datetime
 import os
 
+
 # Whether to unconditionally log info messages.
 DEBUG = False
 
 # The platform for the storage backend. This is used in the model-switching
 # code in core/platform.
 PLATFORM = 'gae'
+
+# This should be string comparison, since all environment variables
+# are converted to string
+IS_MINIFIED = os.environ.get('MINIFICATION') == 'True'
 
 # Whether we should serve the development or production experience.
 if PLATFORM == 'gae':
@@ -44,7 +49,10 @@ GADGETS_DIR = os.path.join('extensions', 'gadgets')
 RTE_EXTENSIONS_DIR = os.path.join('extensions', 'rich_text_components')
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
-TEMPLATES_DIR_PREFIX = 'dev' if DEV_MODE else 'prod'
+
+# Choose production template if minification flag is used or
+# if in production mode
+TEMPLATES_DIR_PREFIX = 'prod' if (IS_MINIFIED or not DEV_MODE) else 'dev'
 FRONTEND_TEMPLATES_DIR = os.path.join(
     'core', 'templates', TEMPLATES_DIR_PREFIX, 'head')
 DEPENDENCIES_TEMPLATES_DIR = os.path.join('extensions', 'dependencies')
@@ -182,7 +190,8 @@ CAN_SEND_EMAILS_TO_USERS = False
 CAN_SEND_EDITOR_ROLE_EMAILS = False
 # If enabled then emails will be sent to creators for feedback messages.
 CAN_SEND_FEEDBACK_MESSAGE_EMAILS = False
-# Time to wait before sending feedback message emails (currently set to 1 hour).
+# Time to wait before sending feedback message emails (currently set to 1
+# hour).
 DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS = 3600
 # Whether to send email updates to a user who has not specified a preference.
 DEFAULT_EMAIL_UPDATES_PREFERENCE = False
@@ -209,7 +218,8 @@ MODERATOR_ACTION_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 DEFAULT_SALUTATION_HTML_FN = (
     lambda recipient_username: 'Hi %s,' % recipient_username)
 DEFAULT_SIGNOFF_HTML_FN = (
-    lambda sender_username: 'Thanks!<br>%s (Oppia moderator)' % sender_username)
+    lambda sender_username: (
+        'Thanks!<br>%s (Oppia moderator)' % sender_username))
 
 VALID_MODERATOR_ACTIONS = {
     MODERATOR_ACTION_PUBLICIZE_EXPLORATION: {
@@ -527,6 +537,11 @@ CATEGORIES_TO_COLORS = {
     'Welcome': '#992a2b',
 }
 
+# Types of activities that can be created with Oppia.
+ACTIVITY_TYPE_EXPLORATION = 'exploration'
+ACTIVITY_TYPE_COLLECTION = 'collection'
+ALL_ACTIVITY_TYPES = [ACTIVITY_TYPE_EXPLORATION, ACTIVITY_TYPE_COLLECTION]
+
 # A sorted list of default categories for which icons and background colours
 # exist.
 ALL_CATEGORIES = sorted(CATEGORIES_TO_COLORS.keys())
@@ -684,7 +699,8 @@ PREFERENCES_PAGE_DESCRIPTION = (
 SEARCH_PAGE_DESCRIPTION = (
     'Discover a new exploration to learn from, or help improve an existing '
     'one for the community.')
-SIGNUP_PAGE_DESCRIPTION = 'Sign up for Oppia and begin exploring a new subject.'
+SIGNUP_PAGE_DESCRIPTION = (
+    'Sign up for Oppia and begin exploring a new subject.')
 SPLASH_PAGE_DESCRIPTION = (
     'Oppia is a free site for sharing knowledge via interactive lessons '
     'called \'explorations\'. Learn from user-created explorations, or teach '

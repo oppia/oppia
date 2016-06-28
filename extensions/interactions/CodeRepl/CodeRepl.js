@@ -164,7 +164,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
 
           // Mark pre- and post- code as uneditable, and give it some styling.
           var markOptions = {
-            atomic: true,
+            atomic: false,
             readOnly: true,
             inclusiveLeft: true,
             inclusiveRight: true

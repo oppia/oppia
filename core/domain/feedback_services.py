@@ -18,12 +18,14 @@
 
 from core.domain import feedback_domain
 from core.domain import feedback_jobs_continuous
+from core.domain import rights_manager
 from core.domain import subscription_services
 from core.platform import models
 import feconf
 
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
 taskqueue_services = models.Registry.import_taskqueue_services()
+transaction_services = models.Registry.import_transaction_services()
 
 DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a learner'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
@@ -261,3 +263,40 @@ def enqueue_feedback_message_email_task(user_id):
     taskqueue_services.enqueue_task(
         feconf.FEEDBACK_MESSAGE_EMAIL_HANDLER_URL, {'user_id': user_id},
         feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS)
+
+
+def get_feedback_message_references(user_id):
+    model = feedback_models.UnsentFeedbackEmailModel.get(user_id, strict=True)
+
+    return [feedback_domain.FeedbackMessageReference(
+        reference['exploration_id'], reference['thread_id'],
+        reference['message_id']
+    ) for reference in model.feedback_message_references]
+
+
+def _add_feedback_message_reference(user_id, reference):
+    """Creates a new instance of UnsentFeedbackEmailModel or update existing
+    model instance for sending feedback message email."""
+
+    model = feedback_models.UnsentFeedbackEmailModel.get(user_id, strict=False)
+
+    if model is not None:
+        model.feedback_message_references.append(reference.to_dict())
+        model.put()
+    else:
+        model = feedback_models.UnsentFeedbackEmailModel(
+            id=user_id,
+            feedback_message_references=[reference.to_dict()])
+        model.put()
+        enqueue_feedback_message_email_task(user_id)
+
+
+def send_feedback_message_email(exploration_id, thread_id, message_id):
+    exploration_rights = rights_manager.get_exploration_rights(exploration_id)
+    feedback_message_reference = feedback_domain.FeedbackMessageReference(
+        exploration_id, thread_id, message_id)
+
+    for owner_id in exploration_rights.owner_ids:
+        transaction_services.run_in_transaction(
+            _add_feedback_message_reference, owner_id,
+            feedback_message_reference)
