@@ -1,20 +1,20 @@
 <script type="text/ng-template" id="components/sharingLinks">
   <ul class="oppia-sharing-links" layout="<[layoutType]>" layout-align="<[layoutAlignType]>">
     <li>
-      <a ng-href="https://plus.google.com/share?url=<[serverName]>/explore/<[explorationId]>" onclick="return !window.open(this.href, '', 'height=600, width=600, menubar=no, toolbar=no, resizable=yes, scrollbars=yes')" ng-click="registerShareExplorationEvent('gplus');" target="_window">
+      <a ng-href="https://plus.google.com/share?url=<[serverName]>/explore/<[explorationId]>" onclick="return !window.open(this.href, '', 'height=600, width=600, menubar=no, toolbar=no, resizable=yes, scrollbars=yes')" ng-click="registerShareExplorationEvent('gplus')" target="_window">
         <img class="share-option-img" src="/images/general/gplus.png" alt="Google+">
       </a>
     </li>
 
     <li>
-      <a ng-href="https://www.facebook.com/sharer/sharer.php?sdk=joey&u=<[serverName]>/explore/<[explorationId]>&display=popup&ref=plugin&src=share_button" onclick="return !window.open(this.href, '', 'height=336, width=640')" ng-click="registerShareExplorationEvent('facebook');" target="_window">
+      <a ng-href="https://www.facebook.com/sharer/sharer.php?sdk=joey&u=<[serverName]>/explore/<[explorationId]>&display=popup&ref=plugin&src=share_button" onclick="return !window.open(this.href, '', 'height=336, width=640')" ng-click="registerShareExplorationEvent('facebook')" target="_window">
         <img class="share-option-img" src='/images/general/fb.png' alt="Facebook">
       </a>
     </li>
 
     <li>
       <a ng-href="https://twitter.com/share?text=<[escapedTwitterText]>&url=<[serverName]>/explore/<[explorationId]>" onclick="return !window.open(this.href, '', 'height=460, width=640')" target="_window">
-        <img class="share-option-img" src="/images/general/twitter.png" ng-click="registerShareExplorationEvent('twitter');" alt="Twitter">
+        <img class="share-option-img" src="/images/general/twitter.png" ng-click="registerShareExplorationEvent('twitter')" alt="Twitter">
       </a>
     </li>
 
@@ -59,9 +59,9 @@
 
   .oppia-sharing-links-small ul .share-option-img,
   .oppia-sharing-links-small ul .embed-link {
+    font-size: 14px;
     height: 16px;
     width: 16px;
-    font-size: 14px;
   }
 
   .oppia-sharing-links-small ul .embed-link {
