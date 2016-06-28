@@ -32,6 +32,13 @@ oppia.controller('Preferences', [
       });
     };
 
+    var _forceDOMRefresh = function() {
+      $scope.isClean = false;
+      $timeout(function() {
+        $scope.isClean = true;
+      }, 100);
+    };
+
     $scope.saveUserBio = function(userBio) {
       _saveDataItem('user_bio', userBio);
     };
@@ -78,6 +85,7 @@ oppia.controller('Preferences', [
     $scope.savePreferredSiteLanguageCodes = function(
       preferredSiteLanguageCode) {
       $translate.use(preferredSiteLanguageCode);
+      _forceDOMRefresh();
       _saveDataItem(
         'preferred_site_language_code', preferredSiteLanguageCode);
     };
@@ -184,6 +192,7 @@ oppia.controller('Preferences', [
       $scope.canReceiveEditorRoleEmail = data.can_receive_editor_role_email;
       $scope.preferredSiteLanguageCode = data.preferred_site_language_code;
       $scope.hasPageLoaded = true;
+      _forceDOMRefresh();
     });
   }
 ]);
