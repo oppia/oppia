@@ -20,7 +20,7 @@ from pipeline import pipeline
 
 from core import jobs
 from core.controllers import base
-from core.domain import user_jobs_one_off_test
+from core.domain import user_jobs_one_off
 from core.platform import models
 import utils
 
@@ -93,7 +93,9 @@ class AppendLastDashboardStatsToList(base.BaseHandler):
     @require_cron_or_superadmin
     def get(self):
         """Handles GET requests."""
-        user_jobs_one_off_test.DashboardStatsOneOffJobTests.run_one_off_job()
+
+        user_jobs_one_off.DashboardStatsOneOffJob.enqueue(
+            user_jobs_one_off.DashboardStatsOneOffJob.create_new())
 
 class CronMapreduceCleanupHandler(base.BaseHandler):
 
