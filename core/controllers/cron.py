@@ -20,14 +20,12 @@ from pipeline import pipeline
 
 from core import jobs
 from core.controllers import base
-from core.domain import user_services
+from core.domain import user_jobs_one_off_test
 from core.platform import models
 import utils
 
 email_services = models.Registry.import_email_services()
-(job_models, user_models) = models.Registry.import_models([
-    models.NAMES.job, models.NAMES.user
-])
+(job_models,) = models.Registry.import_models([models.NAMES.job])
 
 # The default retention time is 2 days.
 MAX_MAPREDUCE_METADATA_RETENTION_MSECS = 2 * 24 * 60 * 60 * 1000
@@ -95,9 +93,7 @@ class AppendLastDashboardStatsToList(base.BaseHandler):
     @require_cron_or_superadmin
     def get(self):
         """Handles GET requests."""
-        for user_model in user_models.UserSettingsModel.get_all():
-            user_services.save_last_dashboard_stats(user_model.id)
-
+        user_jobs_one_off_test.DashboardStatsOneOffJobTests.run_one_off_job()
 
 class CronMapreduceCleanupHandler(base.BaseHandler):
 

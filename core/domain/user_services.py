@@ -658,7 +658,11 @@ def get_user_dashboard_stats(user_id):
         }
 
 def get_weekly_dashboard_stats(user_id):
-    """Returns list which contains the dashboard stats of a user"""
+    """Returns a list which contains the dashboard stats of a user,
+    keyed by a datetime string.
+
+    The stats currently being saved are: 'average ratings' and 'total plays'.
+    """
 
     model = user_models.UserStatsModel.get(user_id, strict=False)
 
@@ -669,16 +673,14 @@ def get_weekly_dashboard_stats(user_id):
 
 def save_last_dashboard_stats(user_id):
     """Save statistics for creator dashboard of a user by appending to a list
-    keyed by datetime.utcnow().date().
-
-    This method is called through a cron job which is run weekly.
+    keyed by a datetime string.
     """
     model = user_models.UserStatsModel.get(user_id, strict=False)
     if not model:
         return
 
     weekly_dashboard_stats = {
-        str(datetime.datetime.utcnow().date()): {
+        utils.get_current_date_as_string(): {
             'average_ratings': model.average_ratings,
             'total_plays': model.total_plays
         }

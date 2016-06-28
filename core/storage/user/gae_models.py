@@ -162,8 +162,8 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     average_ratings = ndb.FloatProperty(indexed=True)
 
     # A list which stores history of creator stats.
-    # Each item in the list is a Json object keyed by datetime.utcnow().date()
-    # and value as another Json object containing key-value pairs to be stored.
+    # Each item in the list is a Json object keyed by a datetime string and
+    # value as another Json object containing key-value pairs to be stored.
     # [
     #  {
     #   (date_1): {
@@ -178,7 +178,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     #   }
     #  },
     # ]
-    weekly_creator_stats_list = ndb.JsonProperty(default=None)
+    weekly_creator_stats_list = ndb.JsonProperty(repeated=True, default=None)
 
 
 class ExplorationUserDataModel(base_models.BaseModel):

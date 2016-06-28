@@ -15,6 +15,8 @@
 # limitations under the License.
 
 # pylint: disable=relative-import
+import datetime
+
 from core.tests import test_utils
 import utils
 # pylint: enable=relative-import
@@ -188,3 +190,12 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(
             utils.get_thumbnail_icon_url_for_category('Nonexistent'),
             '/images/subjects/Lightbulb.svg')
+
+    def test_parse_date_from_string(self):
+        self.assertEqual(
+            utils.parse_date_from_string(utils.get_current_date_as_string()),
+            {
+                'year': datetime.datetime.utcnow().year,
+                'month': datetime.datetime.utcnow().month,
+                'day': datetime.datetime.utcnow().day
+            })

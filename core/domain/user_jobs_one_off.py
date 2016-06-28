@@ -175,6 +175,24 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):
                 subscription_services.subscribe_to_collection(key, item['id'])
 
 
+class DashboardStatsOneOffJob(jobs.BaseMapReduceJobManager):
+    """One-off job for populating weekly dashboard stats for all registered
+    users who have a non-None value of UserStatsModel.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(item):
+        if isinstance(item, user_models.UserSettingsModel):
+            user_services.save_last_dashboard_stats(item.id)
+
+    @staticmethod
+    def reduce(item):
+        pass
+
+
 class UserFirstContributionMsecOneOffJob(jobs.BaseMapReduceJobManager):
     """One-off job that updates first contribution time in milliseconds for
     current users. This job makes the assumption that once an exploration is

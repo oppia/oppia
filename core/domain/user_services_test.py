@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime
 import logging
 import os
 
@@ -536,7 +535,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         user_services.save_last_dashboard_stats(self.owner_id)
         self.assertEquals(
             user_services.get_weekly_dashboard_stats(self.owner_id), [{
-                str(datetime.datetime.utcnow().date()): {
+                utils.get_current_date_as_string(): {
                     'total_plays': 1,
                     'average_ratings': None
                 }
