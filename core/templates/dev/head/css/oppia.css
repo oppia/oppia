@@ -1164,11 +1164,21 @@ textarea {
 
 .list-card-view-toggle button {
   background: #fff;
-  border: 1px solid #bbb;
+  border: 1px solid #ddd;
   color: #009688;
   height: 32px;
   margin-top: 7px;
   padding: 5px 12px;
+}
+
+.list-card-view-toggle .list-view-btn {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+.list-card-view-toggle .card-view-btn {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
 }
 
 .list-card-view-toggle .dashboard-active-view {
@@ -1233,16 +1243,6 @@ md-card.oppia-dashboard-tile {
 }
 .oppia-dashboard-tile-contents:hover {
   text-decoration: none;
-}
-
-.oppia-dashboard-tile-collection-label {
-  background-color: #333;
-  border-radius: 5px;
-  bottom: 0;
-  color: #f0f0f0;
-  padding: 5px;
-  position: absolute;
-  right: 0;
 }
 
 .oppia-dashboard-tile-image-container {

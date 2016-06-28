@@ -65,7 +65,11 @@
     </div>
 
     <div ng-if="explorationsList.length === 0 && collectionsList.length === 0">
-      <h2 style="margin-bottom: -20px; margin-left: 52px;">Creator Dashboard</h2>
+      <h2 style="margin-bottom: -20px;
+                 margin-left: 52px;
+                 font-family: 'Capriola', 'Roboto', Arial, sans-serif;">
+        Creator Dashboard
+      </h2>
     </div>
 
     <div ng-if="activeTab === 'myExplorations'">
@@ -146,7 +150,7 @@
           <div class="title-section" style="background-color: <[exploration.thumbnail_bg_color]>;">
             <img class="thumbnail-image" ng-src="<[exploration.thumbnail_icon_url]>">
             <h2 class="activity-title protractor-test-exp-summary-tile-title">
-              <span><[exploration.title | truncate:40]></span>
+              <span><[exploration.title || 'Untitled' | truncate:40]></span>
             </h2>
           </div>
           <div class="title-section-mask"></div>
@@ -234,7 +238,6 @@
                 </div>
                 <div class="oppia-dashboard-tile-contents">
                   <span class="oppia-dashboard-tile-image-container" style="position: absolute;">
-                    <div class="oppia-dashboard-tile-collection-label">Collection</div>
                     <img class="oppia-dashboard-tile-image" ng-src="<[collection.thumbnail_icon_url]>" style="background-color: <[collection.thumbnail_bg_color]>" ng-class="{'oppia-dashboard-tile-image-private': collection.status === 'private'}">
                   </span>
 
