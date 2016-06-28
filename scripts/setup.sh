@@ -188,15 +188,17 @@ if [ ! -d "$NODE_PATH" ]; then
   chmod -R 744 $NODE_MODULE_DIR
 fi
 
+# Install xvfb, used in frontend, e2e tests and performance tests.
+sudo apt-get install xvfb
+export XVFB_PREFIX="/usr/bin/xvfb-run"
+
 # Adjust path to support the default Chrome locations for Unix, Windows and Mac OS.
 if [ "$TRAVIS" = true ]; then
   export CHROME_BIN="/usr/bin/chromium-browser"
 elif [ "$VAGRANT" = true ]; then
   # XVFB is required for headless testing in Vagrant
-  sudo apt-get install xvfb chromium-browser
+  sudo apt-get install chromium-browser
   export CHROME_BIN="/usr/bin/chromium-browser"
-  # Used in frontend and e2e tests. Only gets set if using Vagrant VM.
-  export XVFB_PREFIX="/usr/bin/xvfb-run"
   # Enforce proper ownership on oppia, oppia_tools, and node_modules or else NPM installs will fail.
   sudo chown -R vagrant.vagrant /home/vagrant/oppia /home/vagrant/oppia_tools /home/vagrant/node_modules
 elif [ -f "/usr/bin/google-chrome" ]; then
