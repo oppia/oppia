@@ -31,6 +31,7 @@ import pprint
 import StringIO
 import zipfile
 
+from core.domain import activity_services
 from core.domain import exp_domain
 from core.domain import feedback_services
 from core.domain import fs_domain
@@ -367,14 +368,6 @@ def get_non_private_exploration_summaries():
     """
     return _get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_non_private())
-
-
-def get_featured_exploration_summaries():
-    """Returns a dict with all featured exploration summary domain objects,
-    keyed by their id.
-    """
-    return _get_exploration_summaries_from_models(
-        exp_models.ExpSummaryModel.get_featured())
 
 
 def get_top_rated_exploration_summaries():
@@ -950,6 +943,11 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     # Delete the exploration summary, regardless of whether or not
     # force_deletion is True.
     delete_exploration_summary(exploration_id)
+
+    # Remove the exploration from the featured activity references, if
+    # necessary.
+    activity_services.remove_featured_activity(
+        feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id)
 
 
 # Operations on exploration snapshots.
