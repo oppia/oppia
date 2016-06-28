@@ -185,21 +185,15 @@ oppia.factory('ExplorationDiffService', [
               stateData[stateIds[change.state_name]].stateProperty = (
                 STATE_PROPERTY_CHANGED);
             }
-          } else if (change.cmd === 'add_gadget' ||
-                     change.cmd === 'rename_gadget' ||
-                     change.cmd === 'delete_gadget' ||
-                     change.cmd === 'edit_gadget_property') {
-            change.gadget_dict.visible_in_states.forEach(function(stateName) {
-              if (stateData[stateIds[stateName]].stateProperty ==
-                  STATE_PROPERTY_UNCHANGED) {
-                stateData[stateIds[stateName]].stateProperty = (
-                  STATE_PROPERTY_CHANGED);
-              }
-            });
           } else if (
               change.cmd !== 'migrate_states_schema_to_latest_version' &&
               change.cmd !== 'AUTO_revert_version_number' &&
-              change.cmd !== 'edit_exploration_property') {
+              change.cmd !== 'edit_exploration_property' &&
+              change.cmd !== 'add_gadget' &&
+              change.cmd !== 'rename_gadget' &&
+              change.cmd !== 'delete_gadget' &&
+              change.cmd !== 'edit_gadget_property') {
+            // TODO(wxy): add a visualization for gadgets.
             throw new Error('Invalid change command: ' + change.cmd);
           }
         });
