@@ -564,7 +564,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         templateUrl: 'modals/shareExplorationAfterPublish',
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance','explorationContextService',
+          '$scope', '$modalInstance', 'explorationContextService',
           function($scope, $modalInstance, explorationContextService) {
             $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
               GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
