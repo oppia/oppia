@@ -31,6 +31,7 @@ import pprint
 import StringIO
 import zipfile
 
+from core.domain import activity_services
 from core.domain import exp_domain
 from core.domain import feedback_services
 from core.domain import fs_domain
@@ -369,14 +370,6 @@ def get_non_private_exploration_summaries():
         exp_models.ExpSummaryModel.get_non_private())
 
 
-def get_featured_exploration_summaries():
-    """Returns a dict with all featured exploration summary domain objects,
-    keyed by their id.
-    """
-    return _get_exploration_summaries_from_models(
-        exp_models.ExpSummaryModel.get_featured())
-
-
 def get_top_rated_exploration_summaries():
     """Returns a dict with top rated exploration summary domain objects,
     keyed by their id.
@@ -429,6 +422,17 @@ def export_to_zip_file(exploration_id, version=None):
             zfile.writestr(unicode_filepath, file_contents)
 
     return memfile.getvalue()
+
+
+def convert_state_dict_to_yaml(state_dict, width):
+    try:
+        # Check if the state_dict can be converted to a State.
+        state = exp_domain.State.from_dict(state_dict)
+    except Exception:
+        logging.info('Bad state dict: %s' % str(state_dict))
+        raise Exception('Could not convert state dict to YAML.')
+
+    return utils.yaml_from_dict(state.to_dict(), width=width)
 
 
 def export_states_to_yaml(exploration_id, version=None, width=80):
@@ -894,7 +898,8 @@ def _create_exploration(
 
 def save_new_exploration(committer_id, exploration):
     commit_message = (
-        'New exploration created with title \'%s\'.' % exploration.title)
+        ('New exploration created with title \'%s\'.' % exploration.title)
+        if exploration.title else 'New exploration created.')
     _create_exploration(committer_id, exploration, commit_message, [{
         'cmd': CMD_CREATE_NEW,
         'title': exploration.title,
@@ -938,6 +943,11 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     # Delete the exploration summary, regardless of whether or not
     # force_deletion is True.
     delete_exploration_summary(exploration_id)
+
+    # Remove the exploration from the featured activity references, if
+    # necessary.
+    activity_services.remove_featured_activity(
+        feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id)
 
 
 # Operations on exploration snapshots.

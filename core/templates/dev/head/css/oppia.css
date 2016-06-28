@@ -65,6 +65,10 @@ button.md-button.md-default-theme.oppia-learner-continue-button:hover {
   background-color: #115FD4;
 }
 
+/* Attributes for material-icons. */
+.material-icons {
+  vertical-align: middle;
+}
 .material-icons.md-18 {
   font-size: 18px;
 }
@@ -245,10 +249,15 @@ body {
   width: calc(100% - 280px);
 }
 
-
+/* For issue #1867 (https://github.com/oppia/oppia/issues/1867)
+   Added "overflow: hidden;" to this class to fix a problem with the screen
+   flickering between 2 and 3 columns when someone hovered over either
+   the rating or the number of views explorations in the second row and
+   on when there are at least four explorations listed. */
 .oppia-profile-portfolio-container {
   margin: 0 auto;
   margin-bottom: 20px;
+  overflow: hidden;
   width: 100%;
 }
 
@@ -675,6 +684,11 @@ textarea {
   .oppia-footer-padding {
     height: 464px;
   }
+  
+  .oppia-footer-container {
+    padding: 30px;
+  }
+
 }
 
 /*
@@ -1080,6 +1094,29 @@ textarea {
   right: 0;
 }
 
+.oppia-dashboard-aggregated-stats md-card {
+  background: #fff;
+  margin: 0 auto 40px;
+}
+
+.oppia-dashboard-aggregated-stats .stats-card {
+  border-right: 1px solid #bbb;
+  margin: 10px 0;
+  padding-left: 35px;
+  width: 50%;
+}
+.oppia-dashboard-aggregated-stats .stats-card:last-child {
+  border: none;
+}
+
+.stats-card p {
+  color: #555;
+}
+
+.stats-card .stat-value {
+  margin: 2px 0;
+}
+
 .oppia-dashboard-tabs {
   border-bottom: 1px solid #eee;
   display: flex;
@@ -1112,7 +1149,6 @@ textarea {
   text-decoration: none;
 }
 .oppia-dashboard-empty-text {
-  padding-left: 20px;
   padding-top: 50px;
 }
 
@@ -1615,6 +1651,16 @@ pre.oppia-pre-wrapped-text {
   position: relative;
 }
 
+.oppia-state-graph-animate-show {
+  opacity: 1;
+}
+.oppia-state-graph-animate-show.ng-hide-add, .oppia-state-graph-animate-show.ng-hide-remove {
+  transition: all linear 0.5s;
+}
+.oppia-state-graph-animate-show.ng-hide {
+  opacity: 0;
+}
+
 /* Styles for the collections learner view */
 
 .oppia-collection-player-tiles-container {
@@ -1993,8 +2039,8 @@ oppia-parameter {
 }
 
 .oppia-dashboard-row {
-  cursor: pointer;
   background-color: #fff;
+  cursor: pointer;
   margin-bottom: -5px;
   overflow: auto;
 }
@@ -2053,6 +2099,52 @@ md-card.oppia-dashboard-tile {
   position: relative;
 }
 
+.oppia-dashboard-list-view-card {
+  background: #fff;
+  margin: 20px auto 0;
+  padding: 10px 20px;
+  width: 100%;
+}
+
+.oppia-dashboard-table {
+  width: 100%;
+  font-size: 15px;
+}
+
+.oppia-dashboard-table tr:first-child {
+  border-bottom: 2px solid #ccc;
+  color: #555;
+}
+
+.oppia-dashboard-table th {
+  padding: 12px 3px;
+}
+
+.oppia-dashboard-table td {
+  padding: 7px 3px;
+}
+
+.exploration-list-item:not(:last-child) {
+  border-bottom: 1px solid #bbb;
+}
+
+.exploration-list-item .exp-private-text {
+  color: #aaa;
+  font-size: 15px;
+  font-style: italic;
+}
+
+.exploration-list-item .featured-badge {
+  background-color: #009688;
+  border-radius: 5px;
+  color: white;
+  font-size: 10px;
+  margin-left: 3px;
+  padding: 4px 6px;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
 ul.oppia-dashboard-tiles {
   list-style-type: none;
   margin-top: 30px;
@@ -2081,8 +2173,8 @@ ul.oppia-dashboard-tiles {
 
 .oppia-version-mismatch-modal .oppia-content {
   max-height: 700px;
-  overflow-y: scroll;
   overflow-x: hidden;
+  overflow-y: scroll;
 }
 
 .oppia-vcenter {
@@ -2411,23 +2503,23 @@ div#ng-curtain {
 }
 
 .oppia-exploration-open-threads-indicator {
-  position: absolute;
-  right: 5px;
-  width: 16px;
+  border-radius: 10%;
   bottom: 10px;
   height: 13px;
+  position: absolute;
+  right: 5px;
   text-align: center;
-  border-radius: 10%;
+  width: 16px;
 }
 .oppia-exploration-open-threads-color {
   background-color: #4078C0;
   border: 1px solid rgb(243, 243, 243);
 }
 .oppia-exploration-open-threads-count {
-  font-size: 9px;
-  position: relative;
   bottom: 8px;
   color: white;
+  font-size: 9px;
+  position: relative;
 }
 
 .dropdown-menu.oppia-editor-warnings-box {
@@ -2553,7 +2645,7 @@ div#ng-curtain {
   margin-right: auto;
   margin-bottom: 30px;
   margin-top: 40px;
-  padding: 30px 55px;
+  padding: 30px 55px 30px 45px;
 }
 .oppia-page-card li {
   margin-bottom: 10px;
@@ -2608,7 +2700,7 @@ div#ng-curtain {
 }
 
 /* Hide the 'Skip' icon on the editor tutorial. */
-.skipBtn .glyphicon-ban-circle {
+.skipBtn i {
   display: none;
 }
 

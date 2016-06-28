@@ -247,7 +247,11 @@
         <p>
           <strong>Share your exploration via:</strong>
         </p>
-        <sharing-links flex="100" layout-type="row" layout-align-type="center center" twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR"></sharing-links>
+        <sharing-links flex="100" layout-type="row"
+                       layout-align-type="center center"
+                       twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR"
+                       exploration-id="explorationId">
+        </sharing-links>
       </div>
     </script>
 
@@ -317,7 +321,7 @@
         </p>
         <p>
           Before publishing, please ensure that your exploration fits the
-          <a href="/participate#publication-criteria" target="_blank">site publication criteria</a>. In particular, it should:
+          <a href="/teach#playbook" target="_blank">site publication criteria</a>. In particular, it should:
           <ul>
             <li>help its intended audience learn something new</li>
             <li>provide useful feedback/guidance to help them if they get stuck.</li>
@@ -532,7 +536,7 @@
   {% include 'components/answer_group_editor_directive.html' %}
   {% include 'components/exploration_embed_button_modal.html' %}
   {% include 'components/fallback_editor_directive.html' %}
-  {% include 'components/fuzzy_rule_panel_directive.html' %}
+  {% include 'components/classifier_panel_directive.html' %}
   {% include 'components/gadget_directive.html' %}
   {% include 'components/gadget_panel_directive.html' %}
   {% include 'components/html_select_directive.html' %}
@@ -544,7 +548,9 @@
   {% include 'components/response_header_directive.html' %}
   {% include 'components/rule_editor_directive.html' %}
   {% include 'components/sharing_links_directive.html' %}
+  {% include 'components/state_diff_modal_directive.html' %}
   {% include 'components/state_graph_viz_directive.html' %}
+  {% include 'components/version_diff_visualization_directive.html' %}
 
   {% include 'player/answer_feedback_pair_directive.html' %}
   {% include 'player/conversation_skin_directive.html' %}
@@ -559,6 +565,7 @@
 
     {{ include_js_file('exploration_editor/ExplorationEditor.js') }}
     {{ include_js_file('exploration_editor/EditorServices.js') }}
+    {{ include_js_file('exploration_editor/ExplorationDiffService.js') }}
     {{ include_js_file('exploration_editor/ExplorationEditorAdvancedFeaturesService.js') }}
     {{ include_js_file('exploration_editor/GadgetValidationService.js') }}
     {{ include_js_file('exploration_editor/ParameterMetadataService.js') }}
@@ -569,7 +576,7 @@
     {{ include_js_file('components/CodemirrorMergeviewDirective.js') }}
     {{ include_js_file('components/ExplorationEmbedButtonService.js') }}
     {{ include_js_file('components/FallbackEditorDirective.js') }}
-    {{ include_js_file('components/FuzzyRulePanelDirective.js') }}
+    {{ include_js_file('components/ClassifierRulePanelDirective.js') }}
     {{ include_js_file('components/GadgetDirective.js') }}
     {{ include_js_file('components/GadgetPanelDirective.js') }}
     {{ include_js_file('components/HtmlSelectDirective.js') }}
@@ -585,6 +592,7 @@
     {{ include_js_file('components/StateGraphLayoutService.js') }}
     {{ include_js_file('components/StateGraphVizDirective.js') }}
     {{ include_js_file('components/ValueGeneratorEditorDirective.js') }}
+    {{ include_js_file('components/VersionDiffVisualizationDirective.js') }}
 
     {{ include_js_file('services/explorationServices.js') }}
     {{ include_js_file('services/messengerService.js') }}

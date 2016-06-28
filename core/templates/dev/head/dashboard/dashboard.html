@@ -8,7 +8,7 @@
   <ul class="nav navbar-nav oppia-navbar-breadcrumb">
     <li>
       <span class="oppia-navbar-breadcrumb-separator"></span>
-      Creator Dashboard
+      <span translate="I18N_TOPNAV_DASHBOARD"></span>
     </li>
   </ul>
 
@@ -21,6 +21,19 @@
 
 {% block content %}
   <div class="oppia-dashboard-container" ng-controller="Dashboard">
+    <div class="oppia-dashboard-aggregated-stats" ng-if="explorationsList.length > 0">
+      <md-card layout="row">
+        <div class="average-ratings stats-card">
+          <p class="stat-description">Average Rating</p>
+          <h1 class="stat-value"><[dashboardStats.average_ratings || 'N/A']></h1>
+        </div>
+        <div class="total-plays stats-card">
+          <p class="stat-description">Total Plays</p>
+          <h1 class="stat-value"><[dashboardStats.total_plays]></h1>
+        </div>
+      </md-card>
+    </div>
+
     <div ng-if="explorationsList.length > 0 || collectionsList.length > 0">
       <ul class="oppia-dashboard-tabs">
         <li ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myExplorations'}">
@@ -64,96 +77,54 @@
         </md-card>
       </div>
 
-      <ul class="oppia-dashboard-tiles" ng-if="explorationsList.length > 0">
-        <li ng-repeat="exploration in explorationsList">
-          <md-card layout="row" class="oppia-dashboard-tile protractor-test-exp-summary-tile">
-            <a ng-href="/create/<[exploration.id]>" class="oppia-dashboard-tile-container-link" style="text-decoration: none;">
-              <div class="oppia-dashboard-tile-metadata-parent hidden-xs">
-                <div class="oppia-dashboard-tile-metadata">
-                  Created: <span style="color: black;"><[getLocaleAbbreviatedDatetimeString(exploration.created_on)]></span>
-
-                  <br>
-
-                  <div ng-show="exploration.num_total_threads == 0">
-                    <br>
-                  </div>
-                  <div ng-show="exploration.num_total_threads > 0">
-                    Feedback:
-                    <span style="color: black;">
-                      <[exploration.num_total_threads]>
-                      <span ng-if="exploration.num_open_threads > 0">
-                        (<[exploration.num_open_threads]> unresolved)
-                      </span>
-                    </span>
-                  </div>
-                  <br>
-
-                  Status:
-                  <span ng-if="exploration.num_open_threads > 0 && exploration.status !== 'private'">
-                    <span class="oppia-dashboard-status-orange">
-                      Unresolved Feedback
-                    </span>
-                  </span>
-                  <span ng-if="exploration.num_open_threads == 0 && exploration.status !== 'private'">
-                    <span class="oppia-dashboard-status-green">
-                      Published
-                    </span>
-                  </span>
-                  <span ng-if="exploration.status === 'private'">
-                    <span class="oppia-dashboard-status-grey">
-                      Private
-                    </span>
-                  </span>
-                </div>
-              </div>
-              <div class="oppia-dashboard-tile-contents">
-                <span class="oppia-dashboard-tile-image-container" style="position: absolute;">
-                  <img class="oppia-dashboard-tile-image" ng-src="<[exploration.thumbnail_icon_url]>" style="background-color: <[exploration.thumbnail_bg_color]>" ng-class="{'oppia-dashboard-tile-image-private': exploration.status === 'private'}">
-                </span>
-
-                <div class="oppia-dashboard-tile-details">
-                  <div class="oppia-dashboard-tile-first-row">
-                    <span class="oppia-dashboard-tile-title">
-                      <span ng-if="exploration.title"><[exploration.title]></span>
-                      <span ng-if="!exploration.title">Untitled</span>
-                    </span>
-                    <span style="font-weight: bold;">&middot;</span>
-                    <span style="color: #888; font-size: 0.9em;" class="protractor-test-exploration-objective">
-                      <span ng-if="exploration.objective">
-                        <[exploration.objective | truncateAndCapitalize: 105]>
-                      </span>
-                      <span ng-if="!exploration.objective">
-                        <em>No objective specified.</em>
-                      </span>
-                    </span>
-                  </div>
-
-                  <div class="oppia-dashboard-tile-second-row">
-                    <span style="color: #888">
-                      <strong><[exploration.category]></strong>
-                      <span style="font-weight: bold;" ng-if="exploration.category">&middot;</span>
-                      Last updated <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
-                    </span>
-
-                    <span ng-if="exploration.status === 'publicized'">
-                      <span style="font-weight: bold;">&middot;</span>
-                      <span style="color: #888">Featured</span>
-                    </span>
-
-                    <span ng-if="getAverageRating(exploration.ratings)">
-                      <span style="font-weight: bold;">&middot;</span>
-                      <span style="color: #888">
-                        Average rating <[getAverageRating(exploration.ratings) | number:1]>
-                      </span>
-                    </span>
-                  </div>
-
-                </div>
-              </div>
-            </a>
-          </md-card>
-        </li>
-      </ul>
+      <md-card layout="row"
+               ng-if="explorationsList.length > 0"
+               class="oppia-dashboard-list-view-card">
+        <table class="oppia-dashboard-table">
+           <colgroup>
+             <col style="width: 40%;">
+             <col style="width: 15%;">
+             <col style="width: 15%;">
+             <col style="width: 15%;">
+             <col style="width: 15%;">
+          </colgroup>
+          <tr>
+            <th>Exploration</th>
+            <th>Rating</th>
+            <th>Plays</th>
+            <th>Feedback</th>
+            <th>Last Updated</th>
+          </tr>
+          <tr ng-repeat="exploration in explorationsList"
+              ng-click="showExplorationEditor(exploration.id)"
+              class="exploration-list-item">
+            <td>
+              <[exploration.title || 'Untitled']>
+              <span ng-if="exploration.status === 'publicized'"
+                    class="featured-badge">
+                featured
+              </span>
+            </td>
+            <td colspan="3"
+                ng-if="exploration.status === 'private'"
+                class="exp-private-text">
+              This exploration is private. Publish to receive statistics.
+            </td>
+            <td ng-if="exploration.status !== 'private'">
+              <[(getAverageRating(exploration.ratings) | number:1) || 'N/A']>
+            </td>
+            <td ng-if="exploration.status !== 'private'">
+              <[exploration.num_views]>
+            </td>
+            <td ng-if="exploration.status !== 'private'">
+              <[exploration.num_total_threads]>
+            </td>
+            <td>
+              <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
+            </td>
+          </tr>
+        </table>
+      </md-card>
     </div>
 
     {% if can_create_collections %}
@@ -168,7 +139,7 @@
               <a ng-href="/collection_editor/create/<[collection.id]>" class="oppia-dashboard-tile-container-link" style="text-decoration: none;">
                 <div class="oppia-dashboard-tile-metadata-parent hidden-xs">
                   <div class="oppia-dashboard-tile-metadata">
-                    Created: <span style="color: black;"><[getLocaleAbbreviatedDatetimeString(collection.created_on)]></span>
+                    Created: <span style="color: black;"><[getLocaleAbbreviatedDatetimeString(collection.created_on_msec)]></span>
 
                     <br>
                     <br>
@@ -214,7 +185,7 @@
                       <span style="color: #888">
                         <strong><[collection.category]></strong>
                         <span style="font-weight: bold;" ng-if="collection.category">&middot;</span>
-                        Last updated <[getLocaleAbbreviatedDatetimeString(collection.last_updated)]>
+                        Last updated <[getLocaleAbbreviatedDatetimeString(collection.last_updated_msec)]>
                       </span>
 
                       <span ng-if="collection.status === 'publicized'">
@@ -241,5 +212,6 @@
   <script>
     {{ include_js_file('components/CollectionCreationService.js') }}
     {{ include_js_file('dashboard/Dashboard.js') }}
+    {{ include_js_file('domain/dashboard/DashboardBackendApiService.js') }}
   </script>
 {% endblock footer_js %}

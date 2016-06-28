@@ -37,11 +37,13 @@
           <div class="oppia-notification-content">
             <span class="oppia-notification-type">
               <span ng-if="notification.type === 'feedback_thread'"
-                    class="glyphicon glyphicon-comment"
-                    title="Feedback thread"></span>
+                    title="Feedback thread">
+                <i class="material-icons">&#xE0B9;</i>
+              </span>
               <span ng-if="notification.type === 'exploration_commit'"
-                    class="glyphicon glyphicon-pencil"
-                    title="Exploration commit"></span>
+                    title="Exploration commit">
+                <i class="material-icons">&#xE150;</i>
+              </span>
             </span>
             <span class="oppia-notification-author-username">
               <strong>

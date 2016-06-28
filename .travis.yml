@@ -27,10 +27,12 @@ env:
     - RUN_E2E_TESTS_EXTENSIONS=true
     - RUN_E2E_TESTS_LIBRARY=true
     - RUN_E2E_TESTS_MISC=true
+    - RUN_E2E_TESTS_I18N=true
     - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=false
     - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=true
     - RUN_LINT=true
     - RUN_FRONTEND_TESTS=true
+    - RUN_PERFORMANCE_TESTS=true
 matrix:
   allow_failures:
   # The backend tests, with coverage, take too long to run, so we make this
@@ -42,7 +44,7 @@ notifications:
   email:
     recipients:
     - sean@seanlip.org
-    - henning.benmax@gmail.com
+    - briggs.brenton@gmail.com
     - wxy.xinyu@gmail.com
     on_success: change
     on_failure: change
@@ -78,12 +80,14 @@ script:
 - if [ $RUN_E2E_TESTS_EXTENSIONS == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="extensions"; fi
 - if [ $RUN_E2E_TESTS_LIBRARY == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="library"; fi
 - if [ $RUN_E2E_TESTS_MISC == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="misc"; fi
+- if [ $RUN_E2E_TESTS_I18N == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="i18n"; fi
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report; fi
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'false' ]; then bash scripts/run_backend_tests.sh; fi
 - if [ $RUN_LINT == 'true' ]; then bash scripts/install_third_party.sh; python scripts/pre_commit_linter.py --path=.; fi
 # Travis aborts test run if nothing is printed back to STDOUT for some time.
 # -x is used to avoid that.
 - if [ $RUN_FRONTEND_TESTS == 'true' ]; then bash -x scripts/run_frontend_tests.sh --run-minified-tests=true; fi
+- if [ $RUN_PERFORMANCE_TESTS == 'true' ]; then bash scripts/run_performance_tests.sh; fi
 
 after_success:
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then codecov; fi

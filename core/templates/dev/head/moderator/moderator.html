@@ -20,7 +20,7 @@
       <tabset>
         <tab heading="Recent Commits" active>
           <h3>Recent Commits (all non-private explorations)</h3>
-          <div when-scrolled-to-bottom="loadMoreCommits()" ng-show="allCommits.length">
+          <div ng-show="allCommits.length">
             <table class="oppia-padded-table">
               <tr>
                 <th>Timestamp</th>
@@ -52,7 +52,7 @@
           <h3>Recent Feedback Messages</h3>
           (Note that some of these links may be to private explorations, and thus result in authorization errors.)
           <br><br>
-          <div when-scrolled-to-bottom="loadMoreFeedbackMessages()" ng-show="allFeedbackMessages.length">
+          <div ng-show="allFeedbackMessages.length">
             <table class="oppia-padded-table">
               <tr>
                 <th>Timestamp</th>
@@ -70,6 +70,21 @@
               </tr>
             </table>
           </div>
+        </tab>
+
+        <tab heading="Featured Activities">
+          <h3>Activities to feature in the library</h3>
+          <br><br>
+
+          <schema-based-editor schema="FEATURED_ACTIVITY_REFERENCES_SCHEMA"
+                               local-value="displayedFeaturedActivityReferences">
+          </schema-based-editor>
+          <br><br>
+
+          <button class="btn btn-success" ng-click="saveFeaturedActivityReferences()"
+                  ng-disabled="isSaveFeaturedActivitiesButtonDisabled()">
+            Save Featured Activities
+          </button>
         </tab>
       </tabset>
     </div>

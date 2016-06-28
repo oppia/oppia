@@ -15,7 +15,6 @@
 """Tests for the creator dashboard and the notifications dashboard."""
 
 from core.controllers import dashboard
-from core.domain import config_services
 from core.domain import event_services
 from core.domain import feedback_domain
 from core.domain import feedback_services
@@ -531,12 +530,12 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['explorations_list'][0]['num_total_threads'], 0)
 
-        def mock_get_thread_analytics(unused_exploration_id):
-            return feedback_domain.FeedbackAnalytics(self.EXP_ID, 2, 3)
+        def mock_get_thread_analytics_multi(unused_exploration_ids):
+            return [feedback_domain.FeedbackAnalytics(self.EXP_ID, 2, 3)]
 
         with self.swap(
-            feedback_services, 'get_thread_analytics',
-            mock_get_thread_analytics):
+            feedback_services, 'get_thread_analytics_multi',
+            mock_get_thread_analytics_multi):
 
             response = self.get_json(feconf.DASHBOARD_DATA_URL)
             self.assertEqual(len(response['explorations_list']), 1)
@@ -638,11 +637,9 @@ class CreationButtonsTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
         response.mustcontain(no=['ng-click="showUploadExplorationModal()"'])
 
-        config_services.set_property(
-            feconf.SYSTEM_COMMITTER_ID, 'allow_yaml_file_upload', True)
-
-        response = self.testapp.get(feconf.DASHBOARD_URL)
-        self.assertEqual(response.status_int, 200)
-        response.mustcontain('ng-click="showUploadExplorationModal()"')
+        with self.swap(feconf, 'ALLOW_YAML_FILE_UPLOAD', True):
+            response = self.testapp.get(feconf.DASHBOARD_URL)
+            self.assertEqual(response.status_int, 200)
+            response.mustcontain('ng-click="showUploadExplorationModal()"')
 
         self.logout()

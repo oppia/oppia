@@ -24,6 +24,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import subscription_services
+from core.domain import summary_services
 from core.domain import user_jobs_continuous
 from core.domain import user_services
 import feconf
@@ -31,11 +32,6 @@ import utils
 
 EXPLORATION_ID_KEY = 'explorationId'
 COLLECTION_ID_KEY = 'collectionId'
-
-ALLOW_YAML_FILE_UPLOAD = config_domain.ConfigProperty(
-    'allow_yaml_file_upload', {'type': 'bool'},
-    'Whether to allow exploration uploads via YAML.',
-    default_value=False)
 
 
 class NotificationsDashboardPage(base.BaseHandler):
@@ -125,7 +121,7 @@ class DashboardPage(base.BaseHandler):
                     self.username in
                     config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value
                 ),
-                'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
+                'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD,
             })
             self.render_template(
                 'dashboard/dashboard.html', redirect_url_on_logout='/')
@@ -148,61 +144,37 @@ class DashboardHandler(base.BaseHandler):
                 category in feconf.CATEGORIES_TO_COLORS else
                 feconf.DEFAULT_COLOR)
 
-        subscribed_exploration_summaries = (
+        exploration_ids_subscribed_to = (
+            subscription_services.get_exploration_ids_subscribed_to(
+                self.user_id))
+
+        subscribed_exploration_summaries = filter(None, (
             exp_services.get_exploration_summaries_matching_ids(
-                subscription_services.get_exploration_ids_subscribed_to(
-                    self.user_id)))
-        subscribed_collection_summaries = (
+                exploration_ids_subscribed_to)))
+        subscribed_collection_summaries = filter(None, (
             collection_services.get_collection_summaries_matching_ids(
                 subscription_services.get_collection_ids_subscribed_to(
-                    self.user_id)))
+                    self.user_id))))
 
-        explorations_list = []
+        explorations_list = summary_services.get_displayable_exp_summary_dicts(
+            subscribed_exploration_summaries)
         collections_list = []
 
-        for exp_summary in subscribed_exploration_summaries:
-            if exp_summary is None:
-                continue
+        feedback_thread_analytics = (
+            feedback_services.get_thread_analytics_multi(
+                exploration_ids_subscribed_to))
 
-            feedback_thread_analytics = feedback_services.get_thread_analytics(
-                exp_summary.id)
-            # TODO(sll): Reuse _get_displayable_exp_summary_dicts() in
-            # summary_services, instead of replicating it like this.
-            explorations_list.append({
-                'id': exp_summary.id,
-                'title': exp_summary.title,
-                'category': exp_summary.category,
-                'objective': exp_summary.objective,
-                'language_code': exp_summary.language_code,
-                'last_updated': utils.get_time_in_millisecs(
-                    exp_summary.exploration_model_last_updated),
-                'created_on': utils.get_time_in_millisecs(
-                    exp_summary.exploration_model_created_on),
-                'status': exp_summary.status,
-                'community_owned': exp_summary.community_owned,
-                'thumbnail_icon_url': (
-                    utils.get_thumbnail_icon_url_for_category(
-                        exp_summary.category)),
-                'thumbnail_bg_color': utils.get_hex_color_for_category(
-                    exp_summary.category),
-                'ratings': exp_summary.ratings,
-                'num_open_threads': (
-                    feedback_thread_analytics.num_open_threads),
-                'num_total_threads': (
-                    feedback_thread_analytics.num_total_threads),
-            })
+        for ind, exploration in enumerate(explorations_list):
+            exploration.update(feedback_thread_analytics[ind].to_dict())
 
         explorations_list = sorted(
             explorations_list,
-            key=lambda x: (x['num_open_threads'], x['last_updated']),
+            key=lambda x: (x['num_open_threads'], x['last_updated_msec']),
             reverse=True)
 
         if (self.username in
                 config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value):
             for collection_summary in subscribed_collection_summaries:
-                if collection_summary is None:
-                    continue
-
                 # TODO(sll): Reuse _get_displayable_collection_summary_dicts()
                 # in summary_services, instead of replicating it like this.
                 collections_list.append({
@@ -227,6 +199,8 @@ class DashboardHandler(base.BaseHandler):
         self.values.update({
             'explorations_list': explorations_list,
             'collections_list': collections_list,
+            'dashboard_stats': user_services.get_user_dashboard_stats(
+                self.user_id)
         })
         self.render_json(self.values)
 
@@ -303,7 +277,7 @@ class UploadExploration(base.BaseHandler):
         yaml_content = self.request.get('yaml_file')
 
         new_exploration_id = exp_services.get_new_exploration_id()
-        if ALLOW_YAML_FILE_UPLOAD.value:
+        if feconf.ALLOW_YAML_FILE_UPLOAD:
             exp_services.save_new_exploration_from_yaml_and_assets(
                 self.user_id, yaml_content, new_exploration_id, [])
             self.render_json({
@@ -312,3 +286,11 @@ class UploadExploration(base.BaseHandler):
         else:
             raise self.InvalidInputException(
                 'This server does not allow file uploads.')
+
+
+class DashboardRedirectPage(base.BaseHandler):
+    """An page that redirects to the main Dashboard page."""
+
+    def get(self):
+        """Handles GET requests."""
+        self.redirect(feconf.DASHBOARD_URL)

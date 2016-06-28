@@ -33,7 +33,7 @@ var argv = yargs
     function(yargs) {
       argv = yargs
         .usage('Usage: $0 start_devserver [--gae_devserver_path]' +
-         '[--clear_datastore] [--enable_sendmail]')
+         '[--clear_datastore] [--enable_sendmail] [--use_minification]')
         .option('gae_devserver_path', {
           describe: 'A path to app engine'
         })
@@ -42,6 +42,9 @@ var argv = yargs
         })
         .option('clear_datastore', {
           describe: 'Whether to clear all data storage'
+        })
+        .option('use_minification', {
+          describe: 'Whether to build with minification'
         })
         .demand(['gae_devserver_path'])
         .argv;
@@ -96,7 +99,8 @@ var checkCommands = function(yargs, argv, numRequired) {
 // There should atleast be minimum of one defined task.
 checkCommands(yargs, argv, 1);
 
-var isMinificationNeeded = (argv.minify === 'True');
+var isMinificationNeeded = (
+  argv.minify === 'True' || argv.use_minification === 'True');
 var frontendDependencies = manifest.dependencies.frontend;
 var cssFilePaths = [];
 var jsFilePaths = [];
