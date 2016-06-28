@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for user-related one-off computations."""
+
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_services
