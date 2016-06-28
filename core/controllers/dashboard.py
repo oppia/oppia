@@ -33,6 +33,7 @@ import utils
 EXPLORATION_ID_KEY = 'explorationId'
 COLLECTION_ID_KEY = 'collectionId'
 
+
 class NotificationsDashboardPage(base.BaseHandler):
     """Page with notifications for the user."""
 
@@ -127,7 +128,6 @@ class DashboardPage(base.BaseHandler):
         else:
             self.redirect(utils.set_url_query_parameter(
                 feconf.SIGNUP_URL, 'return_url', feconf.DASHBOARD_URL))
-
 
 
 class DashboardHandler(base.BaseHandler):

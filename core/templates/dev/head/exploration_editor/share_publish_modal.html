@@ -8,8 +8,15 @@
     <p>
       Now that you're a published Oppia teacher, share your creation.
     </p>
-    <sharing-links flex="100" layout-type="row" layout-align-type="center center" twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR"></sharing-links>
-    <button class="btn btn-default oppia-share-publish-close" ng-click="close()" translate="I18N_SIGNUP_CLOSE_BUTTON"></button>
+    <sharing-links flex="100" layout-type="row"
+      layout-align-type="center center"
+      twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR"
+      exploration-id="explorationId">
+    </sharing-links>
+    <button class="btn btn-default oppia-share-publish-close"
+      ng-click="close()"
+      translate="I18N_SIGNUP_CLOSE_BUTTON">
+    </button>
   </div>
   </script>
   <style>

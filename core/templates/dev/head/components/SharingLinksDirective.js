@@ -46,26 +46,6 @@ oppia.directive('sharingLinks', [function() {
 
         $scope.escapedTwitterText = (
           oppiaHtmlEscaper.unescapedStrToEscapedStr($scope.getTwitterText()));
-
-        $scope.getExplorationId = function() {
-          if (_explorationId) {
-            return _explorationId;
-          } else {
-            // The pathname should be one of /explore/{exploration_id} or
-            // /create/{exploration_id} .
-            var pathnameArray = $window.location.pathname.split('/');
-
-            for (var i = 0; i < pathnameArray.length; i++) {
-              if (pathnameArray[i] === 'explore' ||
-                  pathnameArray[i] === 'create') {
-                _explorationId = pathnameArray[i + 1];
-                return pathnameArray[i + 1];
-              }
-            }
-          }
-        };
-
-        $scope.explorationId = $scope.getExplorationId();
       }
     ]
   };
