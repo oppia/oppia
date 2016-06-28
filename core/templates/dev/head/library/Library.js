@@ -50,7 +50,7 @@ oppia.controller('Library', [
       // The use of 208 here is a hack, and the underlying problem of the tiles
       // not having a defined width on small screens needs to be fixed.
       $timeout(function() {
-        tileDisplayWidth = $('exploration-summary-tile').width() || 208;
+        tileDisplayWidth = $('exploration-summary-tile').width() || 214;
       }, 20);
 
       // Initialize the carousel(s) on the library index page.

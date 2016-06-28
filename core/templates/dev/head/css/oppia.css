@@ -684,7 +684,7 @@ textarea {
   .oppia-footer-padding {
     height: 464px;
   }
-  
+
   .oppia-footer-container {
     padding: 30px;
   }
@@ -3378,7 +3378,7 @@ md-card.preview-conversation-skin-supplemental-card {
   cursor: pointer;
   display: inline-block;
   height: 258px;
-  margin: 12px 4px;
+  margin: 12px 7px;
   padding: 0;
   position: relative;
   text-align: left;
