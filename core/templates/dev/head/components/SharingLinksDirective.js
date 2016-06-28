@@ -49,20 +49,6 @@ oppia.directive('sharingLinks', [function() {
         $scope.escapedTwitterText = (
           oppiaHtmlEscaper.unescapedStrToEscapedStr($scope.getTwitterText()));
 
-        $scope.isNotDashboard = function() {
-          var pathnameArray = $window.location.pathname.split('/');
-
-          for (var i = 0; i < pathnameArray.length; i++) {
-            if (pathnameArray[i] === 'explore' ||
-                pathnameArray[i] === 'create') {
-              console.log(pathnameArray);
-              return true;
-            } else if (pathnameArray[i] === 'dashboard') {
-              console.log(pathnameArray);
-              return false;
-            }
-          }
-        };
         $scope.getExplorationId = function() {
           if (_explorationId) {
             return _explorationId;
