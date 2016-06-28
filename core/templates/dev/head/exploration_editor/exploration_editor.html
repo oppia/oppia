@@ -235,25 +235,6 @@
 
 {% block content %}
   <div ng-controller="ExplorationEditor" ng-cloak>
-    <script type="text/ng-template" id="modals/shareExplorationAfterPublish">
-      <div class="modal-header">
-        <h3>Exploration Published</h3>
-      </div>
-
-      <div class="modal-body oppia-long-text">
-        <p>
-          Congratulations! Your exploration was successfully published.
-        </p>
-        <p>
-          <strong>Share your exploration via:</strong>
-        </p>
-        <sharing-links flex="100" layout-type="row"
-                       layout-align-type="center center"
-                       twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR"
-                       exploration-id="explorationId">
-        </sharing-links>
-      </div>
-    </script>
 
     <script type="text/ng-template" id="modals/addExplorationMetadata">
       <div class="modal-header">
@@ -338,7 +319,7 @@
         <button class="btn btn-success protractor-test-confirm-publish" ng-click="publish()">Publish Exploration</button>
       </div>
     </script>
-
+    {% include 'exploration_editor/share_publish_modal.html' %}
     {% include 'components/exploration_welcome_modal_directive.html' %}
     {% include 'components/help_modal_directive.html' %}
 
