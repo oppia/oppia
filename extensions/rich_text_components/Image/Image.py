@@ -58,10 +58,10 @@ class Image(base.BaseRichTextComponent):
         'schema': {
             'type': 'float',
             'ui_config': {
-                'slider': 'True',
+                'slider': True,
             },
         },
-        'default_value': '',
+        'default_value': 300.0,
     }]
 
     @property
