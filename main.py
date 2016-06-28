@@ -73,19 +73,6 @@ class HomePageRedirectHandler(base.BaseHandler):
         else:
             self.redirect(feconf.SPLASH_URL)
 
-
-def get_redirect_route(regex_route, handler, name, defaults=None):
-    """Returns a route that redirects /foo/ to /foo.
-
-    Warning: this method strips off parameters after the trailing slash. URLs
-    with parameters should be formulated without the trailing slash.
-    """
-    if defaults is None:
-        defaults = {}
-    return RedirectRoute(
-        regex_route, handler, name, strict_slash=True, defaults=defaults)
-
-
 def authorization_wrapper(self, *args, **kwargs):
     # developers.google.com/appengine/docs/python/taskqueue/overview-push
     # promises that this header cannot be set by external callers. If this
@@ -137,287 +124,377 @@ mapreduce_parameters.config.BASE_PATH = '/mapreduce/worker'
 
 # Register the URLs with the classes responsible for handling them.
 URLS = MAPREDUCE_HANDLERS + [
-    get_redirect_route(r'/_ah/warmup', WarmupHandler, 'warmup_handler'),
-
-    get_redirect_route(feconf.SPLASH_URL, pages.SplashPage, 'splash_page'),
-    get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
-    get_redirect_route(
-        r'/foundation', pages.AboutRedirectPage, 'about_redirect_page_1'),
-    get_redirect_route(
-        r'/credits', pages.AboutRedirectPage, 'about_redirect_page_2'),
-    get_redirect_route(r'/teach', pages.TeachPage, 'teach_page'),
-    get_redirect_route(
-        r'/participate', pages.TeachRedirectPage, 'teach_redirect_page_1'),
-    get_redirect_route(
-        r'/site_guidelines', pages.TeachRedirectPage, 'teach_redirect_page_2'),
-    get_redirect_route(r'/contact', pages.ContactPage, 'contact_page'),
-
-    get_redirect_route(r'/forum', pages.ForumPage, 'forum_page'),
-    get_redirect_route(r'/terms', pages.TermsPage, 'terms_page'),
-    get_redirect_route(r'/privacy', pages.PrivacyPage, 'privacy_page'),
-
-    get_redirect_route(r'/admin', admin.AdminPage, 'admin_page'),
-    get_redirect_route(r'/adminhandler', admin.AdminHandler, 'admin_handler'),
-    get_redirect_route(
-        r'/adminjoboutput', admin.AdminJobOutput, 'admin_job_output'),
-    get_redirect_route(
+    RedirectRoute(
+        r'/_ah/warmup', WarmupHandler,
+        'warmup_handler', strict_slash=True, defaults={}),
+    RedirectRoute(
+        feconf.SPLASH_URL, pages.SplashPage, 'splash_page',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
+        r'/about', pages.AboutPage, 'about_page',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
+        r'/foundation', pages.AboutRedirectPage, 'about_redirect_page_1',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
+        r'/credits', pages.AboutRedirectPage, 'about_redirect_page_2',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
+        r'/teach', pages.TeachPage, 'teach_page',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
+        r'/participate', pages.TeachRedirectPage, 'teach_redirect_page_1',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
+        r'/site_guidelines', pages.TeachRedirectPage, 'teach_redirect_page_2',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
+        r'/contact', pages.ContactPage, 'contact_page',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
+        r'/forum', pages.ForumPage, 'forum_page',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
+        r'/terms', pages.TermsPage, 'terms_page',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
+        r'/privacy', pages.PrivacyPage, 'privacy_page',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
+        r'/admin', admin.AdminPage, 'admin_page',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
+        r'/adminhandler', admin.AdminHandler, 'admin_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
+        r'/adminjoboutput', admin.AdminJobOutput, 'admin_job_output',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/admintopicscsvdownloadhandler',
         admin.AdminTopicsCsvDownloadHandler,
-        'admin_topics_csv_download_handler'),
-
-    get_redirect_route(
+        'admin_topics_csv_download_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/notifications_dashboard', dashboard.NotificationsDashboardPage,
-        'notifications_dashboard_handler'),
-    get_redirect_route(
+        'notifications_dashboard_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/notificationsdashboardhandler/data',
         dashboard.NotificationsDashboardHandler,
-        'notifications_dashboard_handler'),
-    get_redirect_route(
+        'notifications_dashboard_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/notificationshandler', dashboard.NotificationsHandler,
-        'notifications_handler'),
-    get_redirect_route(
+        'notifications_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s' % feconf.DASHBOARD_URL, dashboard.DashboardPage,
-        'dashboard_page'),
-    get_redirect_route(
+        'dashboard_page',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s' % feconf.DASHBOARD_DATA_URL, dashboard.DashboardHandler,
-        'dashboard_handler'),
-    get_redirect_route(
+        'dashboard_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s' % feconf.NEW_EXPLORATION_URL,
-        dashboard.NewExploration, 'new_exploration'),
-    get_redirect_route(
+        dashboard.NewExploration, 'new_exploration',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s' % feconf.NEW_COLLECTION_URL,
-        dashboard.NewCollection, 'new_collection'),
-    get_redirect_route(
+        dashboard.NewCollection, 'new_collection',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
-        dashboard.UploadExploration, 'upload_exploration'),
-    get_redirect_route(
+        dashboard.UploadExploration, 'upload_exploration',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/my_explorations', dashboard.DashboardRedirectPage,
-        'dashboard_redirect_page'),
-
-    get_redirect_route(
+        'dashboard_redirect_page',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/imagehandler/<exploration_id>/<encoded_filepath>',
-        resources.ImageHandler, 'image_handler'),
-    get_redirect_route(
+        resources.ImageHandler, 'image_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/object_editor_template/<obj_type>',
-        resources.ObjectEditorTemplateHandler, 'object_editor_template'),
-    get_redirect_route(
+        resources.ObjectEditorTemplateHandler, 'object_editor_template',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/value_generator_handler/<generator_id>',
-        resources.ValueGeneratorHandler, 'value_generator_handler'),
-
-    get_redirect_route(r'/', HomePageRedirectHandler, 'home_page'),
-
-    get_redirect_route(
+        resources.ValueGeneratorHandler, 'value_generator_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
+        r'/', HomePageRedirectHandler, 'home_page',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s' % feconf.LIBRARY_INDEX_URL, library.LibraryPage,
-        'library_index_page'),
-    get_redirect_route(
+        'library_index_page',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/libraryindexhandler', library.LibraryIndexHandler,
-        'library_index_handler'),
-    get_redirect_route(
+        'library_index_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s' % feconf.LIBRARY_SEARCH_URL, library.LibraryPage,
-        'library_search_page'),
-    get_redirect_route(
+        'library_search_page',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s' % feconf.LIBRARY_SEARCH_DATA_URL, library.SearchHandler,
-        'library_search_handler'),
-    get_redirect_route(
-        r'/gallery', library.LibraryRedirectPage, 'old_gallery_page_1'),
-    get_redirect_route(
-        r'/contribute', library.LibraryRedirectPage, 'old_gallery_page_2'),
-    get_redirect_route(
-        r'/learn', library.LibraryRedirectPage, 'old_gallery_page_3'),
-    get_redirect_route(
-        r'/playtest', library.LibraryRedirectPage, 'old_gallery_page_4'),
-    get_redirect_route(
+        'library_search_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
+        r'/gallery', library.LibraryRedirectPage, 'old_gallery_page_1',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
+        r'/contribute', library.LibraryRedirectPage, 'old_gallery_page_2',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
+        r'/learn', library.LibraryRedirectPage, 'old_gallery_page_3',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
+        r'/playtest', library.LibraryRedirectPage, 'old_gallery_page_4',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         feconf.EXPLORATION_SUMMARIES_DATA_URL,
         library.ExplorationSummariesHandler,
-        'exploration_summaries_handler'),
-
-    get_redirect_route(
-        r'/profile/<username>', profile.ProfilePage, 'profile_page'),
-    get_redirect_route(
+        'exploration_summaries_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
+        r'/profile/<username>', profile.ProfilePage, 'profile_page',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/profilehandler/data/<username>', profile.ProfileHandler,
-        'profile_handler'),
-    get_redirect_route(
-        r'/preferences', profile.PreferencesPage, 'preferences_page'),
-    get_redirect_route(
+        'profile_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
+        r'/preferences', profile.PreferencesPage, 'preferences_page',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/preferenceshandler/data', profile.PreferencesHandler,
-        'preferences_handler'),
-    get_redirect_route(
+        'preferences_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/preferenceshandler/profile_picture', profile.ProfilePictureHandler,
-        'profle_picture_handler'),
-    get_redirect_route(
+        'profle_picture_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/preferenceshandler/profile_picture_by_username/<username>',
         profile.ProfilePictureHandlerByUsername,
-        'profile_picture_handler_by_username'),
-    get_redirect_route(
-        r'%s' % feconf.SIGNUP_URL, profile.SignupPage, 'signup_page'),
-    get_redirect_route(
+        'profile_picture_handler_by_username',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
+        r'%s' % feconf.SIGNUP_URL, profile.SignupPage, 'signup_page',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s' % feconf.SIGNUP_DATA_URL, profile.SignupHandler,
-        'signup_handler'),
-    get_redirect_route(
+        'signup_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s' % feconf.USERNAME_CHECK_DATA_URL,
-        profile.UsernameCheckHandler, 'username_check_handler'),
-    get_redirect_route(
+        profile.UsernameCheckHandler, 'username_check_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s' % feconf.SITE_LANGUAGE_DATA_URL,
-        profile.SiteLanguageHandler, 'save_site_language'),
-
-    get_redirect_route(
-        r'/moderator', moderator.ModeratorPage, 'moderator_page'),
-    get_redirect_route(
+        profile.SiteLanguageHandler, 'save_site_language',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
+        r'/moderator', moderator.ModeratorPage, 'moderator_page',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/moderatorhandler/email_draft/<action>',
-        moderator.EmailDraftHandler, 'moderator_action_email_draft'),
-
-    get_redirect_route(
+        moderator.EmailDraftHandler, 'moderator_action_email_draft',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
-        reader.ExplorationPage, 'exploration_page'),
-    get_redirect_route(
+        reader.ExplorationPage, 'exploration_page',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s/<exploration_id>' % feconf.EXPLORATION_INIT_URL_PREFIX,
-        reader.ExplorationHandler, 'exploration_handler'),
-    get_redirect_route(
+        reader.ExplorationHandler, 'exploration_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/explorehandler/exploration_start_event/<exploration_id>',
         reader.ExplorationStartEventHandler,
-        'exploration_start_event_handler'),
-    get_redirect_route(
+        'exploration_start_event_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/explorehandler/state_hit_event/<exploration_id>',
-        reader.StateHitEventHandler, 'state_hit_event_handler'),
-    get_redirect_route(
+        reader.StateHitEventHandler, 'state_hit_event_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/explorehandler/answer_submitted_event/<exploration_id>',
-        reader.AnswerSubmittedEventHandler, 'answer_submitted_event_handler'),
-    get_redirect_route(
+        reader.AnswerSubmittedEventHandler, 'answer_submitted_event_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/explorehandler/give_feedback/<exploration_id>',
-        reader.ReaderFeedbackHandler, 'reader_feedback_handler'),
-    get_redirect_route(
+        reader.ReaderFeedbackHandler, 'reader_feedback_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/explorehandler/exploration_complete_event/<exploration_id>',
-        reader.ExplorationCompleteEventHandler, 'reader_complete_handler'),
-    get_redirect_route(
+        reader.ExplorationCompleteEventHandler, 'reader_complete_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/explorehandler/exploration_maybe_leave_event/<exploration_id>',
-        reader.ExplorationMaybeLeaveHandler, 'reader_leave_handler'),
-    get_redirect_route(
+        reader.ExplorationMaybeLeaveHandler, 'reader_leave_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/explorehandler/classify/<exploration_id>', reader.ClassifyHandler,
-        'reader_classify_handler'),
-    get_redirect_route(
+        'reader_classify_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/explorehandler/rating/<exploration_id>',
-        reader.RatingHandler, 'rating_handler'),
-    get_redirect_route(
+        reader.RatingHandler, 'rating_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/explorehandler/recommendations/<exploration_id>',
-        reader.RecommendationsHandler, 'recommendations_handler'),
-
-    get_redirect_route(
+        reader.RecommendationsHandler, 'recommendations_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s/<exploration_id>' % feconf.EDITOR_URL_PREFIX,
-        editor.ExplorationPage, 'editor_exploration_page'),
-    get_redirect_route(
+        editor.ExplorationPage, 'editor_exploration_page',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/createhandler/data/<exploration_id>', editor.ExplorationHandler,
-        'editor_exploration_handler'),
-    get_redirect_route(
+        'editor_exploration_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/createhandler/change_list_summary/<exploration_id>',
-        editor.ChangeListSummaryHandler, 'change_list_summary'),
-    get_redirect_route(
+        editor.ChangeListSummaryHandler, 'change_list_summary',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/createhandler/download/<exploration_id>',
-        editor.ExplorationDownloadHandler, 'exploration_download_handler'),
-    get_redirect_route(
+        editor.ExplorationDownloadHandler, 'exploration_download_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/createhandler/imageupload/<exploration_id>',
-        editor.ImageUploadHandler, 'image_upload_handler'),
-    get_redirect_route(
+        editor.ImageUploadHandler, 'image_upload_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/createhandler/resolved_answers/<exploration_id>/' +
         r'<escaped_state_name>',
-        editor.ResolvedAnswersHandler, 'resolved_answers_handler'),
-    get_redirect_route(
+        editor.ResolvedAnswersHandler, 'resolved_answers_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/createhandler/state_yaml', editor.StateYamlHandler,
-        'state_yaml_handler'),
-    get_redirect_route(
+        'state_yaml_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/createhandler/training_data/<exploration_id>/<escaped_state_name>',
-        editor.UntrainedAnswersHandler, 'training_data_handler'),
-    get_redirect_route(
+        editor.UntrainedAnswersHandler, 'training_data_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/createhandler/resource_list/<exploration_id>',
-        editor.ExplorationResourcesHandler, 'exploration_resources_handler'),
-    get_redirect_route(
+        editor.ExplorationResourcesHandler, 'exploration_resources_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/createhandler/revert/<exploration_id>',
-        editor.ExplorationRevertHandler, 'exploration_revert_handler'),
-    get_redirect_route(
+        editor.ExplorationRevertHandler, 'exploration_revert_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s/<exploration_id>' % feconf.EXPLORATION_RIGHTS_PREFIX,
-        editor.ExplorationRightsHandler, 'exploration_rights_handler'),
-    get_redirect_route(
+        editor.ExplorationRightsHandler, 'exploration_rights_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/createhandler/moderatorrights/<exploration_id>',
         editor.ExplorationModeratorRightsHandler,
-        'exploration_moderator_rights_handler'),
-    get_redirect_route(
+        'exploration_moderator_rights_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/createhandler/snapshots/<exploration_id>',
-        editor.ExplorationSnapshotsHandler, 'exploration_snapshots_handler'),
-    get_redirect_route(
+        editor.ExplorationSnapshotsHandler, 'exploration_snapshots_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/createhandler/statisticsversion/<exploration_id>',
         editor.ExplorationStatsVersionsHandler,
-        'exploration_stats_versions_handler'),
-    get_redirect_route(
+        'exploration_stats_versions_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/createhandler/statistics/<exploration_id>/<exploration_version>',
-        editor.ExplorationStatisticsHandler, 'exploration_statistics_handler'),
-    get_redirect_route(
+        editor.ExplorationStatisticsHandler, 'exploration_statistics_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/createhandler/state_rules_stats/<exploration_id>/' +
         r'<escaped_state_name>',
-        editor.StateRulesStatsHandler, 'state_rules_stats_handler'),
-    get_redirect_route(
+        editor.StateRulesStatsHandler, 'state_rules_stats_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/createhandler/started_tutorial_event',
-        editor.StartedTutorialEventHandler, 'started_tutorial_event_handler'),
-    get_redirect_route(
+        editor.StartedTutorialEventHandler, 'started_tutorial_event_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'/createhandler/autosave_draft/<exploration_id>',
-        editor.EditorAutosaveHandler, 'editor_autosave_handler'),
-
-    get_redirect_route(
+        editor.EditorAutosaveHandler, 'editor_autosave_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s' % feconf.RECENT_COMMITS_DATA_URL,
-        recent_commits.RecentCommitsHandler, 'recent_commits_handler'),
-    get_redirect_route(
+        recent_commits.RecentCommitsHandler, 'recent_commits_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s' % feconf.RECENT_FEEDBACK_MESSAGES_DATA_URL,
         feedback.RecentFeedbackMessagesHandler,
-        'recent_feedback_messages_handler'),
-
-    get_redirect_route(
+        'recent_feedback_messages_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s' % feconf.FEEDBACK_MESSAGE_EMAIL_HANDLER_URL,
-        feedback.UnsentFeedbackEmailHandler, 'feedback_message_email_handler'),
-    get_redirect_route(
+        feedback.UnsentFeedbackEmailHandler, 'feedback_message_email_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s/<exploration_id>' % feconf.FEEDBACK_THREADLIST_URL_PREFIX,
-        feedback.ThreadListHandler, 'feedback_threadlist_handler'),
-    get_redirect_route(
+        feedback.ThreadListHandler, 'feedback_threadlist_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s/<exploration_id>/<thread_id>' % feconf.FEEDBACK_THREAD_URL_PREFIX,
-        feedback.ThreadHandler, 'feedback_thread_handler'),
-    get_redirect_route(
+        feedback.ThreadHandler, 'feedback_thread_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s/<exploration_id>' % feconf.FEEDBACK_STATS_URL_PREFIX,
-        feedback.FeedbackStatsHandler, 'feedback_stats_handler'),
-    get_redirect_route(
+        feedback.FeedbackStatsHandler, 'feedback_stats_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s/<exploration_id>' % feconf.SUGGESTION_URL_PREFIX,
-        feedback.SuggestionHandler, 'suggestion_handler'),
-    get_redirect_route(
+        feedback.SuggestionHandler, 'suggestion_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s/<exploration_id>/<thread_id>' %
         feconf.SUGGESTION_ACTION_URL_PREFIX,
-        feedback.SuggestionActionHandler, 'suggestion_action_handler'),
-    get_redirect_route(
+        feedback.SuggestionActionHandler, 'suggestion_action_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s/<exploration_id>' % feconf.SUGGESTION_LIST_URL_PREFIX,
-        feedback.SuggestionListHandler, 'suggestion_list_handler'),
-
-    get_redirect_route(
+        feedback.SuggestionListHandler, 'suggestion_list_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s/<collection_id>' % feconf.COLLECTION_URL_PREFIX,
-        collection_viewer.CollectionPage, 'collection_page'),
-    get_redirect_route(
+        collection_viewer.CollectionPage, 'collection_page',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s/<collection_id>' % feconf.COLLECTION_DATA_URL_PREFIX,
-        collection_viewer.CollectionDataHandler, 'collection_data_handler'),
-
-    get_redirect_route(
+        collection_viewer.CollectionDataHandler, 'collection_data_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s/<collection_id>' % feconf.COLLECTION_EDITOR_URL_PREFIX,
-        collection_editor.CollectionEditorPage, 'collection_editor_page'),
-    get_redirect_route(
+        collection_editor.CollectionEditorPage, 'collection_editor_page',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s/<collection_id>' % feconf.COLLECTION_WRITABLE_DATA_URL_PREFIX,
         collection_editor.WritableCollectionDataHandler,
-        'writable_collection_data_handler'),
-    get_redirect_route(
+        'writable_collection_data_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
         r'%s/<collection_id>' % feconf.COLLECTION_RIGHTS_PREFIX,
         collection_editor.CollectionRightsHandler,
-        'collection_rights_handler'),
-
-    get_redirect_route(
-        r'/frontend_errors', FrontendErrorHandler, 'frontend_error_handler'),
-
-    get_redirect_route(
-        r'/logout', base.LogoutPage, 'logout_page_handler'),
-
+        'collection_rights_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
+        r'/frontend_errors', FrontendErrorHandler, 'frontend_error_handler',
+        strict_slash=True, defaults={}),
+    RedirectRoute(
+        r'/logout', base.LogoutPage, 'logout_page_handler',
+        strict_slash=True, defaults={}),
     # 404 error handler.
-    get_redirect_route(r'/<:.*>', base.Error404Handler, 'error_404_handler'),
+    RedirectRoute(
+        r'/<:.*>', base.Error404Handler, 'error_404_handler',
+        strict_slash=True, defaults={}),
 ]
 
 app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
