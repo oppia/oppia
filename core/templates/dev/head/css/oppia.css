@@ -3378,6 +3378,10 @@ md-card.preview-conversation-skin-supplemental-card {
   cursor: pointer;
   display: inline-block;
   height: 258px;
+  /*
+    The margin setting is so that exploration summary tiles and collection
+    summary tiles would be the same widths (214px).
+  */
   margin: 12px 7px;
   padding: 0;
   position: relative;
