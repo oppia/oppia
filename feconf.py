@@ -665,7 +665,8 @@ SAME_TOPIC_SIMILARITY = 1.0
 SUPPORTED_SITE_LANGUAGES = {
     'en': 'English',
     'es': 'Español',
-    'id': 'Bahasa Indonesia'
+    'id': 'Bahasa Indonesia',
+    'pt': 'Português',
 }
 SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 SYSTEM_USER_IDS = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
