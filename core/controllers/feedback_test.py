@@ -659,13 +659,6 @@ class FeedbackMessageEmailHandlerTests(test_utils.GenericTestBase):
                 self.exploration.id, thread_id)
             self.assertEqual(len(messagelist), 1)
 
-            response = self.testapp.post(
-                url=feconf.FEEDBACK_MESSAGE_EMAIL_HANDLER_URL,
-                params={'user_id': self.editor_id})
-
-            self.assertEqual(response.status_code, 200)
-
+            self.process_and_flush_pending_tasks()
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 1)
-
-        self.process_and_flush_pending_tasks()

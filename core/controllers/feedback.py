@@ -14,6 +14,8 @@
 
 """Controllers for the feedback thread page."""
 
+import json
+
 from core.controllers import base
 from core.controllers import editor
 from core.domain import email_manager
@@ -220,7 +222,8 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
     This is yet to be implemented."""
 
     def post(self):
-        user_id = self.request.get('user_id')
+        payload = json.loads(self.request.body)
+        user_id = payload['user_id']
         references = feedback_services.get_feedback_message_references(user_id)
         transaction_services.run_in_transaction(
             feedback_services.update_feedback_email_retries, user_id)

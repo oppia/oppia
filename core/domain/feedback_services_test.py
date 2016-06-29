@@ -256,7 +256,6 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
         tasks = self.get_pending_tasks()
         self.assertEqual(
             tasks[0].url, feconf.FEEDBACK_MESSAGE_EMAIL_HANDLER_URL)
-        self.process_and_flush_pending_tasks()
 
 
 class FeedbackMessageEmailTests(test_utils.GenericTestBase):
@@ -294,7 +293,6 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             model.feedback_message_references[0],
             expected_feedback_message_dict)
         self.assertEqual(model.retries, 0)
-        self.process_and_flush_pending_tasks()
 
     def test_add_new_feedback_message(self):
         feedback_services.add_message_to_email_buffer(
@@ -325,7 +323,6 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             model.feedback_message_references[1],
             expected_feedback_message_dict2)
         self.assertEqual(model.retries, 0)
-        self.process_and_flush_pending_tasks()
 
     def test_that_emails_are_not_sent_for_anonymous_user(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:

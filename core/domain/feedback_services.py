@@ -296,7 +296,6 @@ def _add_feedback_message_reference(user_id, reference):
     model instance for sending feedback message email."""
 
     model = feedback_models.UnsentFeedbackEmailModel.get(user_id, strict=False)
-
     if model is not None:
         model.feedback_message_references.append(reference.to_dict())
         model.put()
