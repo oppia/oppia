@@ -1378,7 +1378,7 @@ oppia.directive('schemaBasedFloatEditor', [function() {
           }
         };
 
-        if ($scope.uiConfig().slider) {
+        if (typeof $scope.uiConfig() !== 'undefined' && $scope.uiConfig().slider === true) {
           if (!$scope.localValue) {
             $scope.localValue = 300.0;
           }
