@@ -67,18 +67,6 @@ oppia.directive('selectOnClick', [function() {
   };
 }]);
 
-oppia.directive('whenScrolledToBottom', [function() {
-  return function(scope, elm, attr) {
-    var raw = elm[0];
-
-    elm.bind('scroll', function() {
-      if (raw.scrollTop + raw.offsetHeight >= raw.scrollHeight) {
-        scope.$apply(attr.whenScrolled);
-      }
-    });
-  };
-}]);
-
 // A popover that is shown when its label is hovered or clicked upon, and
 // disappears when focus moves away from its label.
 oppia.directive('customPopover', ['$sce', function($sce) {

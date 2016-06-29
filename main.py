@@ -263,6 +263,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/moderator', moderator.ModeratorPage, 'moderator_page'),
     get_redirect_route(
+        r'/moderatorhandler/featured', moderator.FeaturedActivitiesHandler,
+        'moderator_featured_activities'),
+    get_redirect_route(
         r'/moderatorhandler/email_draft/<action>',
         moderator.EmailDraftHandler, 'moderator_action_email_draft'),
 
@@ -308,14 +311,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/data/<exploration_id>', editor.ExplorationHandler,
         'editor_exploration_handler'),
     get_redirect_route(
-        r'/createhandler/change_list_summary/<exploration_id>',
-        editor.ChangeListSummaryHandler, 'change_list_summary'),
-    get_redirect_route(
         r'/createhandler/download/<exploration_id>',
         editor.ExplorationDownloadHandler, 'exploration_download_handler'),
-    get_redirect_route(
-        r'/createhandler/download_state/<exploration_id>',
-        editor.StateDownloadHandler, 'state_download_handler'),
     get_redirect_route(
         r'/createhandler/imageupload/<exploration_id>',
         editor.ImageUploadHandler, 'image_upload_handler'),
@@ -323,6 +320,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/resolved_answers/<exploration_id>/' +
         r'<escaped_state_name>',
         editor.ResolvedAnswersHandler, 'resolved_answers_handler'),
+    get_redirect_route(
+        r'/createhandler/state_yaml', editor.StateYamlHandler,
+        'state_yaml_handler'),
     get_redirect_route(
         r'/createhandler/training_data/<exploration_id>/<escaped_state_name>',
         editor.UntrainedAnswersHandler, 'training_data_handler'),

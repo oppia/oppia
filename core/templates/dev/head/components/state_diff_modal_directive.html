@@ -1,0 +1,59 @@
+<script type="text/ng-template" id="modals/stateDiff">
+  <div class="modal-header">
+    <h3>
+      Card name: <[newStateName]>
+      <span ng-show="oldStateName">(was: <[oldStateName]>)</span>
+    </h3>
+  </div>
+
+  <table class="table" style="margin-left: 20px; table-layout: fixed; width: 97%">
+    <!--
+      Spacing on the left of table and in the middle of the table is to
+      ensure text above each pane is aligned to codemirror gutter.
+     -->
+    <td style="width: 47%; word-wrap: break-word">
+      <div>
+        <[headers.leftPane]>
+      </div>
+    </td>
+    <td style="width: 6%"></td>
+    <td style="width: 47%; word-wrap: break-word">
+      <div>
+        <[headers.rightPane]>
+      </div>
+    </td>
+  </table>
+
+  <div class="modal-body" style="margin-top: -30px" ng-cloak>
+    <codemirror-mergeview options="CODEMIRROR_MERGEVIEW_OPTIONS"
+                          left-value="yamlStrs.leftPane"
+                          right-value="yamlStrs.rightPane">
+    </codemirror-mergeview>
+    <div align="center" style="margin-bottom: 20px">
+      <strong>Click arrows to desynchronize scrolling</strong>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default protractor-test-close-history-state-modal"
+            ng-click="cancel()">
+      Done
+    </button>
+  </div>
+</script>
+
+<style>
+  .CodeMirror-merge-copy {
+    display: none;
+  }
+  .CodeMirror-merge, .CodeMirror-merge .CodeMirror {
+    height: 55vh;
+  }
+  .state-diff-modal .modal-dialog {
+    max-width: 1200px;
+    width: 90%;
+  }
+  .state-diff-modal .modal-body {
+    height: 60vh;
+  }
+</style>

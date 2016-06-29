@@ -75,7 +75,7 @@
           <div class="form-group">
             <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_SUBJECT_INTERESTS"></label>
             <div class="col-lg-10 col-md-10 col-sm-10">
-              <div ng-if="hasPageLoaded">
+              <div ng-if="hasPageLoaded && select2DropdownIsShown">
                 <select2-dropdown
                   item="$parent.subjectInterests"
                   ng-model="subjectInterests"
@@ -127,12 +127,12 @@
                 If the ng-if is omitted, the select2-dropdown directive won't be
                 updated after the initial page load.
               -->
-              <div ng-if="hasPageLoaded">
+              <div ng-if="hasPageLoaded && select2DropdownIsShown">
                 <select2-dropdown choices="SITE_LANGUAGE_CHOICES"
                   class="protractor-test-system-language-selector"
                   item="$parent.preferredSiteLanguageCode"
                   allow-multiple-choices="false"
-                  new-choice-regex=".^" width="400"
+                  new-choice-regex=".^" width="100%"
                   placeholder="<['I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE_PLACEHOLDER' | translate]>"
                   on-selection-change="savePreferredSiteLanguageCodes($parent.preferredSiteLanguageCode)">
                 </select2-dropdown>

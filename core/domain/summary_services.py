@@ -14,8 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Commands that can be used to operate on exploration summaries."""
+"""Commands that can be used to operate on activity summaries."""
 
+from core.domain import activity_services
 from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import rights_manager
@@ -104,8 +105,9 @@ def get_learner_collection_dict_by_id(
     next_exploration_ids = None
     completed_exp_ids = None
     if user_id:
-        completed_exp_ids = collection_services.get_valid_completed_exploration_ids( # pylint: disable=line-too-long
-            user_id, collection_id, collection)
+        completed_exp_ids = (
+            collection_services.get_valid_completed_exploration_ids(
+                user_id, collection_id, collection))
         next_exploration_ids = collection.get_next_exploration_ids(
             completed_exp_ids)
     else:
@@ -183,7 +185,7 @@ def get_displayable_exp_summary_dicts_matching_ids(
             if editor_user_id is None:
                 continue
             if not rights_manager.Actor(editor_user_id).can_edit(
-                    rights_manager.ACTIVITY_TYPE_EXPLORATION,
+                    feconf.ACTIVITY_TYPE_EXPLORATION,
                     exploration_summary.id):
                 continue
 
@@ -216,7 +218,7 @@ def get_displayable_exp_summary_dicts(exploration_summaries):
         summary_dict = {
             'id': exploration_summary.id,
             'title': exploration_summary.title,
-            'activity_type': rights_manager.ACTIVITY_TYPE_EXPLORATION,
+            'activity_type': feconf.ACTIVITY_TYPE_EXPLORATION,
             'category': exploration_summary.category,
             'created_on_msec': utils.get_time_in_millisecs(
                 exploration_summary.exploration_model_created_on),
@@ -250,15 +252,16 @@ def _get_displayable_collection_summary_dicts(collection_summaries):
                 'id': collection_summary.id,
                 'title': collection_summary.title,
                 'category': collection_summary.category,
-                'activity_type': rights_manager.ACTIVITY_TYPE_COLLECTION,
+                'activity_type': feconf.ACTIVITY_TYPE_COLLECTION,
                 'objective': collection_summary.objective,
                 'language_code': collection_summary.language_code,
                 'tags': collection_summary.tags,
                 'node_count': collection_summary.node_count,
                 'last_updated_msec': utils.get_time_in_millisecs(
                     collection_summary.collection_model_last_updated),
-                'thumbnail_icon_url': utils.get_thumbnail_icon_url_for_category(
-                    collection_summary.category),
+                'thumbnail_icon_url': (
+                    utils.get_thumbnail_icon_url_for_category(
+                        collection_summary.category)),
                 'thumbnail_bg_color': utils.get_hex_color_for_category(
                     collection_summary.category)})
     return displayable_collection_summaries
@@ -345,28 +348,69 @@ def get_library_groups(language_codes):
     return results
 
 
-def get_featured_exploration_summary_dicts(language_codes):
-    """Returns a list of featured explorations with the given language code.
-
-    The return value is sorted in decreasing order of search rank.
+def require_activities_to_be_public(activity_references):
+    """Raises an exception if any activity reference in the list does not
+    exist, or is not public.
     """
-    filtered_exp_summaries = [
-        exp_summary for exp_summary in
-        exp_services.get_featured_exploration_summaries().values()
-        if exp_summary.language_code in language_codes]
+    exploration_ids, collection_ids = activity_services.split_by_type(
+        activity_references)
 
-    search_ranks = {
-        exp_summary.id: exp_services.get_search_rank_from_exp_summary(
-            exp_summary)
-        for exp_summary in filtered_exp_summaries
+    activity_summaries_by_type = [{
+        'type': feconf.ACTIVITY_TYPE_EXPLORATION,
+        'ids': exploration_ids,
+        'summaries': exp_services.get_exploration_summaries_matching_ids(
+            exploration_ids),
+    }, {
+        'type': feconf.ACTIVITY_TYPE_COLLECTION,
+        'ids': collection_ids,
+        'summaries': collection_services.get_collection_summaries_matching_ids(
+            collection_ids),
+    }]
+
+    for activities_info in activity_summaries_by_type:
+        for index, summary in enumerate(activities_info['summaries']):
+            if summary is None:
+                raise Exception(
+                    'Cannot feature non-existent %s with id %s' %
+                    (activities_info['type'], activities_info['ids'][index]))
+            if summary.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+                raise Exception(
+                    'Cannot feature private %s with id %s' %
+                    (activities_info['type'], activities_info['ids'][index]))
+
+
+def get_featured_activity_summary_dicts(language_codes):
+    """Returns a list of featured activities with the given language codes.
+
+    The return value is sorted according to the list stored in the datastore.
+    """
+    activity_references = activity_services.get_featured_activity_references()
+    exploration_ids, collection_ids = activity_services.split_by_type(
+        activity_references)
+
+    exp_summary_dicts = get_displayable_exp_summary_dicts_matching_ids(
+        exploration_ids)
+    col_summary_dicts = get_displayable_collection_summary_dicts_matching_ids(
+        collection_ids)
+
+    summary_dicts_by_id = {
+        feconf.ACTIVITY_TYPE_EXPLORATION: {
+            summary_dict['id']: summary_dict
+            for summary_dict in exp_summary_dicts
+        },
+        feconf.ACTIVITY_TYPE_COLLECTION: {
+            summary_dict['id']: summary_dict
+            for summary_dict in col_summary_dicts
+        },
     }
 
-    sorted_exp_summaries = sorted(
-        filtered_exp_summaries,
-        key=lambda exp_summary: search_ranks[exp_summary.id],
-        reverse=True)
-
-    return get_displayable_exp_summary_dicts(sorted_exp_summaries)
+    featured_summary_dicts = []
+    for reference in activity_references:
+        if reference.id in summary_dicts_by_id[reference.type]:
+            summary_dict = summary_dicts_by_id[reference.type][reference.id]
+            if summary_dict and summary_dict['language_code'] in language_codes:
+                featured_summary_dicts.append(summary_dict)
+    return featured_summary_dicts
 
 
 def get_top_rated_exploration_summary_dicts(language_codes):

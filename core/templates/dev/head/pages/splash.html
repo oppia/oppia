@@ -127,27 +127,28 @@
       <div>
         <button type="button" ng-click="onClickBrowseLibraryButton()"
                 class="btn oppia-splash-button oppia-splash-button-browse oppia-transition-200"
-                translate="I18N_SPLASH_BROWSE_EXPLORATIONS">
+                translate="I18N_ACTION_BROWSE_EXPLORATIONS">
         </button>
 
         {% if not user_is_logged_in %}
           <!-- User must complete the registration process. -->
           <button type="button"
                   ng-click="onRedirectToLogin('/dashboard?mode=create')"
-                  class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200" translate="I18N_SPLASH_CREATE_EXPLORATION">
+                  class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200"
+                  translate="I18N_ACTION_CREATE_EXPLORATION">
           </button>
         {% else %}
           <button type="button"
                   ng-click="onClickCreateExplorationButton()"
                   class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200"
-                  translate="I18N_SPLASH_CREATE_EXPLORATION">
+                  translate="I18N_ACTION_CREATE_EXPLORATION">
           </button>
         {% endif %}
 
         <button type="button"
                 ng-click="onRedirectToLogin('/dashboard?mode=create')"
                 class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200"
-                translate="I18N_SPLASH_CREATE_EXPLORATION">
+                translate="I18N_ACTION_CREATE_EXPLORATION">
         </button>
       </div>
 
