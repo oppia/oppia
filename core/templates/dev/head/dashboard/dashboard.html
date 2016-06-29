@@ -94,114 +94,116 @@
         </md-card>
       </div>
 
-      <md-card layout="row"
-               ng-if="myExplorationsView === 'list' && explorationsList.length > 0"
-               class="oppia-dashboard-list-view-item">
-        <table class="oppia-dashboard-table">
-           <colgroup>
-             <col style="width: 40%;">
-             <col style="width: 15%;">
-             <col style="width: 15%;">
-             <col style="width: 15%;">
-             <col style="width: 15%;">
-          </colgroup>
-          <tr>
-            <th>Exploration</th>
-            <th>Rating</th>
-            <th>Plays</th>
-            <th>Feedback</th>
-            <th>Last Updated</th>
-          </tr>
-          <tr ng-repeat="exploration in explorationsList track by exploration.id"
-              ng-click="showExplorationEditor(exploration.id)"
-              class="exploration-list-item">
-            <td>
-              <[exploration.title || 'Untitled']>
-              <span ng-if="exploration.status === 'publicized'"
-                    class="featured-badge">
-                featured
-              </span>
-            </td>
-            <td colspan="3"
-                ng-if="exploration.status === 'private'"
-                class="exp-private-text">
-              This exploration is private. Publish to receive statistics.
-            </td>
-            <td ng-if="exploration.status !== 'private'">
-              <[(getAverageRating(exploration.ratings) | number:1) || 'N/A']>
-            </td>
-            <td ng-if="exploration.status !== 'private'">
-              <[exploration.num_views]>
-            </td>
-            <td ng-if="exploration.status !== 'private'">
-              <[exploration.num_total_threads]>
-            </td>
-            <td>
-              <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
-            </td>
-          </tr>
-        </table>
-      </md-card>
+      <div ng-if="myExplorationsView === 'list' && explorationsList.length > 0">
+        <md-card layout="row"
+                 class="oppia-dashboard-list-view-item">
+          <table class="oppia-dashboard-table">
+             <colgroup>
+               <col style="width: 40%;">
+               <col style="width: 15%;">
+               <col style="width: 15%;">
+               <col style="width: 15%;">
+               <col style="width: 15%;">
+            </colgroup>
+            <tr>
+              <th>Exploration</th>
+              <th>Rating</th>
+              <th>Plays</th>
+              <th>Feedback</th>
+              <th>Last Updated</th>
+            </tr>
+            <tr ng-repeat="exploration in explorationsList track by exploration.id"
+                ng-click="showExplorationEditor(exploration.id)"
+                class="exploration-list-item">
+              <td>
+                <[exploration.title || 'Untitled']>
+                <span ng-if="exploration.status === 'publicized'"
+                      class="featured-badge">
+                  featured
+                </span>
+              </td>
+              <td colspan="3"
+                  ng-if="exploration.status === 'private'"
+                  class="exp-private-text">
+                This exploration is private. Publish to receive statistics.
+              </td>
+              <td ng-if="exploration.status !== 'private'">
+                <[(getAverageRating(exploration.ratings) | number:1) || 'N/A']>
+              </td>
+              <td ng-if="exploration.status !== 'private'">
+                <[exploration.num_views]>
+              </td>
+              <td ng-if="exploration.status !== 'private'">
+                <[exploration.num_total_threads]>
+              </td>
+              <td>
+                <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
+              </td>
+            </tr>
+          </table>
+        </md-card>
+      </div>
 
-      <md-card ng-repeat="exploration in explorationsList track by exploration.id"
-               ng-if="myExplorationsView === 'card' && explorationsList.length > 0"
-               class="oppia-activity-summary-tile oppia-dashboard-card-view-item"
-               ng-click="showExplorationEditor(exploration.id)">
-          <div class="title-section" style="background-color: <[exploration.thumbnail_bg_color]>;">
-            <img class="thumbnail-image" ng-src="<[exploration.thumbnail_icon_url]>">
-            <h2 class="activity-title protractor-test-exp-summary-tile-title">
-              <span><[exploration.title || 'Untitled' | truncate:40]></span>
-            </h2>
-          </div>
-          <div class="title-section-mask"></div>
-
-          <div ng-attr-section="'<['right-section']>">
-            <div ng-if="exploration.status === 'private'" class="exp-private-text">
-              This exploration is private. Publish to receive statistics.
+      <div ng-if="myExplorationsView === 'card' && explorationsList.length > 0">
+        <md-card ng-repeat="exploration in explorationsList track by exploration.id"
+                 class="oppia-activity-summary-tile oppia-dashboard-card-view-item"
+                 ng-click="showExplorationEditor(exploration.id)">
+            <div class="title-section" style="background-color: <[exploration.thumbnail_bg_color]>;">
+              <img class="thumbnail-image" ng-src="<[exploration.thumbnail_icon_url]>">
+              <h2 class="activity-title protractor-test-exp-summary-tile-title">
+                <span><[exploration.title || 'Untitled' | truncate:40]></span>
+              </h2>
             </div>
-            <ul ng-if="exploration.status !== 'private'"
-                layout="row"
-                layout-wrap
-                class="metrics"
-                layout-align="space-between center">
-              <li flex="50">
-                <span class="protractor-test-exp-summary-tile-rating">
-                  <span class="fa fa-star fa-lg"
-                        tooltip="<['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]>"
+            <div class="title-section-mask"></div>
+
+            <div ng-attr-section="'<['right-section']>">
+              <div ng-if="exploration.status === 'private'" class="exp-private-text">
+                This exploration is private. Publish to receive statistics.
+              </div>
+              <ul ng-if="exploration.status !== 'private'"
+                  layout="row"
+                  layout-wrap
+                  class="metrics"
+                  layout-align="space-between center">
+                <li flex="50">
+                  <span class="protractor-test-exp-summary-tile-rating">
+                    <span class="fa fa-star fa-lg"
+                          tooltip="<['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]>"
+                          tooltip-placement="top">
+                    </span>
+                    <span>
+                      <[(getAverageRating(exploration.ratings) | number:1) || 'N/A']>
+                    </span>
+                  </span>
+                </li>
+
+                <li flex="50">
+                  <span class="fa fa-eye fa-lg"
+                        tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>"
                         tooltip-placement="top">
                   </span>
-                  <span>
-                    <[(getAverageRating(exploration.ratings) | number:1) || 'N/A']>
+                  <[exploration.num_views]>
+                </li>
+
+                <li flex="50">
+                  <span class="fa fa-clock-o fa-lg"
+                        tooltip="<['I18N_LIBRARY_LAST_UPDATED' | translate]>"
+                        tooltip-placement="top">
+                    <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
                   </span>
-                </span>
-              </li>
+                </li>
 
-              <li flex="50">
-                <span class="fa fa-eye fa-lg"
-                      tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>"
-                      tooltip-placement="top">
-                </span>
-                <[exploration.num_views]>
-              </li>
-
-              <li flex="50">
-                <span class="fa fa-clock-o fa-lg"
-                      tooltip="<['I18N_LIBRARY_LAST_UPDATED' | translate]>"
-                      tooltip-placement="top">
-                  <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
-                </span>
-              </li>
-
-              <li flex="50">
-                <span class="fa fa-comments fa-lg"
-                      tooltip="<['I18N_PLAYER_FEEDBACK_TOOLTIP' | translate]>"
-                      tooltip-placement="top">
-                </span>
-                <[exploration.num_total_threads]>
-              </li>
-            </ul>
-          </div>
-      </md-card>
+                <li flex="50">
+                  <span class="fa fa-comments fa-lg"
+                        tooltip="<['I18N_PLAYER_FEEDBACK_TOOLTIP' | translate]>"
+                        tooltip-placement="top">
+                  </span>
+                  <[exploration.num_total_threads]>
+                </li>
+              </ul>
+            </div>
+        </md-card>
+      </div>
 
     </div>
 
