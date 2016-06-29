@@ -974,7 +974,7 @@ textarea {
 }
 @media (max-width: 420px) {
   .oppia-exp-summary-tiles-container {
-    width: 208px;
+    width: initial;
   }
 }
 
