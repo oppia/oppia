@@ -87,7 +87,7 @@ class JobStatusMailerHandler(base.BaseHandler):
         email_services.send_mail_to_admin(email_subject, email_message)
 
 
-class AppendLastDashboardStatsToList(base.BaseHandler):
+class CronDashboardStatsHandler(base.BaseHandler):
     """Handler for appending dashboard stats to a list."""
 
     @require_cron_or_superadmin
@@ -95,6 +95,7 @@ class AppendLastDashboardStatsToList(base.BaseHandler):
         """Handles GET requests."""
         user_jobs_one_off.DashboardStatsOneOffJob.enqueue(
             user_jobs_one_off.DashboardStatsOneOffJob.create_new())
+
 
 class CronMapreduceCleanupHandler(base.BaseHandler):
 

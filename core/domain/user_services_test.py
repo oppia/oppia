@@ -521,7 +521,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         self.assertEquals(
             user_services.get_weekly_dashboard_stats(self.owner_id), None)
 
-        user_services.save_last_dashboard_stats(self.owner_id)
+        user_services.update_dashboard_stats_log(self.owner_id)
         self.assertEquals(
             user_services.get_weekly_dashboard_stats(self.owner_id), None)
 
@@ -532,7 +532,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         self.assertEquals(
             user_services.get_weekly_dashboard_stats(self.owner_id), None)
 
-        user_services.save_last_dashboard_stats(self.owner_id)
+        user_services.update_dashboard_stats_log(self.owner_id)
         self.assertEquals(
             user_services.get_weekly_dashboard_stats(self.owner_id), [{
                 utils.get_current_date_as_string(): {

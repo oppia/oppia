@@ -258,6 +258,9 @@ PANELS_PROPERTIES = {
 # When the site terms were last updated, in UTC.
 REGISTRATION_PAGE_LAST_UPDATED_UTC = datetime.datetime(2015, 10, 14, 2, 40, 0)
 
+# Format of string for dashboard statistics logs
+DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
+
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576
 

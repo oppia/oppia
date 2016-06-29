@@ -39,11 +39,10 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        if isinstance(item, exp_models.ExplorationSnapshotMetadataModel):
-            yield (item.committer_id, {
-                'exploration_id': item.get_unversioned_instance_id(),
-                'version_string': item.get_version_string(),
-            })
+        yield (item.committer_id, {
+            'exploration_id': item.get_unversioned_instance_id(),
+            'version_string': item.get_version_string(),
+        })
 
     @staticmethod
     def reduce(key, version_and_exp_ids):
@@ -185,8 +184,7 @@ class DashboardStatsOneOffJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        if isinstance(item, user_models.UserSettingsModel):
-            user_services.save_last_dashboard_stats(item.id)
+        user_services.update_dashboard_stats_log(item.id)
 
     @staticmethod
     def reduce(item):

@@ -639,6 +639,7 @@ def get_user_impact_score(user_id):
     else:
         return 0
 
+
 def get_user_dashboard_stats(user_id):
     """Return statistics for creator dashboard of a user.
 
@@ -657,6 +658,7 @@ def get_user_dashboard_stats(user_id):
             'average_ratings': None
         }
 
+
 def get_weekly_dashboard_stats(user_id):
     """Returns a list which contains the dashboard stats of a user,
     keyed by a datetime string.
@@ -671,7 +673,8 @@ def get_weekly_dashboard_stats(user_id):
     else:
         return None
 
-def save_last_dashboard_stats(user_id):
+
+def update_dashboard_stats_log(user_id):
     """Save statistics for creator dashboard of a user by appending to a list
     keyed by a datetime string.
     """
@@ -685,9 +688,5 @@ def save_last_dashboard_stats(user_id):
             'total_plays': model.total_plays
         }
     }
-
-    if not model.weekly_creator_stats_list:
-        model.weekly_creator_stats_list = []
     model.weekly_creator_stats_list.append(weekly_dashboard_stats)
-
     model.put()
