@@ -178,7 +178,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     #   }
     #  },
     # ]
-    weekly_creator_stats_list = ndb.JsonProperty(repeated=True, default=None)
+    weekly_creator_stats_list = ndb.JsonProperty(repeated=True)
 
 
 class ExplorationUserDataModel(base_models.BaseModel):

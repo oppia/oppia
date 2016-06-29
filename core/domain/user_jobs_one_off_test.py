@@ -16,6 +16,8 @@
 
 """Tests for user-related one-off computations."""
 
+import datetime
+
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_services
@@ -526,7 +528,14 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
             exp_id, self.EXP_VERSION, state, self.USER_SESSION_ID, {},
             feconf.PLAY_TYPE_NORMAL)
 
-    def test_no_weekly_stats_till_continuous_stats_job_has_not_been_run(self):
+    def test_no_weekly_stats_if_continuous_stats_job_has_not_been_run(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID_1, self.owner_id)
+        exp_id = exploration.id
+        init_state_name = exploration.init_state_name
+        self._record_play(exp_id, init_state_name)
+        self._rate_exploration('user1', exp_id, 5)
+
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         self.assertEqual(weekly_stats, None)
 
@@ -544,12 +553,12 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(weekly_stats, None)
 
     def test_weekly_stats_for_single_exploration(self):
-        exploration_1 = self.save_new_valid_exploration(
+        exploration = self.save_new_valid_exploration(
             self.EXP_ID_1, self.owner_id)
-        exp_id_1 = exploration_1.id
-        init_state_name_1 = exploration_1.init_state_name
-        self._record_play(exp_id_1, init_state_name_1)
-        self._rate_exploration('user1', exp_id_1, 5)
+        exp_id = exploration.id
+        init_state_name = exploration.init_state_name
+        self._record_play(exp_id, init_state_name)
+        self._rate_exploration('user1', exp_id, 5)
 
         (user_jobs_continuous_test.ModifiedUserStatsAggregator.
          start_computation())
@@ -559,7 +568,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         self.assertEqual(weekly_stats, [{
             utils.get_current_date_as_string(): {
-                'average_ratings': 5,
+                'average_ratings': 5.0,
                 'total_plays': 1
             }
         }])
@@ -588,6 +597,58 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
                 'total_plays': 1
             }
         }])
+
+    def test_stats_for_multiple_weeks(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID_1, self.owner_id)
+        exp_id = exploration.id
+        init_state_name = exploration.init_state_name
+        self._rate_exploration('user1', exp_id, 4)
+        self._record_play(exp_id, init_state_name)
+        self._record_play(exp_id, init_state_name)
+
+        (user_jobs_continuous_test.ModifiedUserStatsAggregator.
+         start_computation())
+        self.process_and_flush_pending_tasks()
+
+        self._run_one_off_job()
+        weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
+        self.assertEqual(weekly_stats, [{
+            utils.get_current_date_as_string(): {
+                'average_ratings': 4.0,
+                'total_plays': 2
+            }
+        }])
+
+        (user_jobs_continuous_test.ModifiedUserStatsAggregator.
+         stop_computation(self.owner_id))
+        self.process_and_flush_pending_tasks()
+
+        self._rate_exploration('user2', exp_id, 2)
+
+        (user_jobs_continuous_test.ModifiedUserStatsAggregator.
+         start_computation())
+        self.process_and_flush_pending_tasks()
+
+        def _mock_get_date_after_one_week():
+            """Returns the date of the next week."""
+            return (
+                datetime.datetime.utcnow() + datetime.timedelta(7)).strftime(
+                    feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
+
+        with self.swap(
+            utils, 'get_current_date_as_string', _mock_get_date_after_one_week):
+            self._run_one_off_job()
+
+        weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
+        self.assertEqual(weekly_stats, [
+            {
+                _mock_get_date_after_one_week(): {
+                    'average_ratings': 3.0,
+                    'total_plays': 2
+                }
+            }
+        ])
 
 
 class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
