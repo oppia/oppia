@@ -320,6 +320,7 @@ class BaseHandler(webapp2.RequestHandler):
             'CAN_SEND_ANALYTICS_EVENTS': feconf.CAN_SEND_ANALYTICS_EVENTS,
             'DEFAULT_LANGUAGE_CODE': feconf.ALL_LANGUAGE_CODES[0]['code'],
             'DEV_MODE': feconf.DEV_MODE,
+            'MINIFICATION': feconf.IS_MINIFIED,
             'DOMAIN_URL': '%s://%s' % (scheme, netloc),
             'ACTIVITY_STATUS_PRIVATE': (
                 rights_manager.ACTIVITY_STATUS_PRIVATE),
@@ -335,7 +336,6 @@ class BaseHandler(webapp2.RequestHandler):
                 obj_services.get_all_object_editor_js_templates()),
             'RTE_COMPONENT_SPECS': (
                 rte_component_registry.Registry.get_all_specs()),
-            'SHOW_CUSTOM_PAGES': feconf.SHOW_CUSTOM_PAGES,
             'SITE_FEEDBACK_FORM_URL': SITE_FEEDBACK_FORM_URL.value,
             'SITE_NAME': SITE_NAME.value,
             'SUPPORTED_SITE_LANGUAGES': feconf.SUPPORTED_SITE_LANGUAGES,

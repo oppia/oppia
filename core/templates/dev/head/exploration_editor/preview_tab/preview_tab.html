@@ -6,19 +6,53 @@
     <conversation-skin></conversation-skin>
   </div>
 
-  <!-- Developers: set ng-show="true" to see a parameter debug log. -->
-  <div ng-show="false">
-    <h4><strong>Parameter values</strong></h4>
-    <table>
-      <tr ng-repeat="(paramName, paramValue) in allParams">
-        <td style="padding: 1px 5px;"><[paramName]></td>
-        <td style="padding: 1px 5px;"><[paramValue ? paramValue : null]></td>
-      </tr>
-    </table>
+  <div class="oppia-preview-bottom-right-container">
+    <div class="oppia-parameter-summary" ng-if="showParameterSummary()">
+      <strong>Parameters:</strong>
+      <table>
+        <tr ng-repeat="(paramName, paramValue) in allParams">
+          <td style="padding: 1px 5px;"><[paramName]>:</td>
+          <td style="padding: 1px 5px;">
+            <[paramValue != "" ? paramValue : "[Not set]"]>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <button class="btn-lg" ng-click="resetPreview()">
+      <i class="material-icons" style="margin-bottom: 2px;">&#xE5D5;</i>
+      <span style="margin-left: 10px; padding-top: 20px;">Restart From Beginning</span>
+    </button>
   </div>
+
 </div>
 
 <style>
+  .oppia-preview-bottom-right-container {
+    bottom: 5px;
+    display: block;
+    position: absolute;
+    right: 5px;
+  }
+
+  .oppia-preview-bottom-right-container .oppia-parameter-summary {
+    background-color: #fff;
+    font-size: 16px;
+    margin: 0px 0px 2px 0px;
+    padding: 5px 0px 0px 5px;
+    text-align: left;
+  }
+
+  .oppia-preview-bottom-right-container .btn-lg {
+    background-color: #fff;
+    border: none;
+    border-radius: 0px;
+    display: block;
+    font-size: 20px;
+    text-align: right;
+    top-margin: 10px;
+    top-padding: 10px;
+  }
+
   .oppia-preview-state-warning {
     background-color: #fff;
     border: 1px solid #ccc;

@@ -530,12 +530,12 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['explorations_list'][0]['num_total_threads'], 0)
 
-        def mock_get_thread_analytics(unused_exploration_id):
-            return feedback_domain.FeedbackAnalytics(self.EXP_ID, 2, 3)
+        def mock_get_thread_analytics_multi(unused_exploration_ids):
+            return [feedback_domain.FeedbackAnalytics(self.EXP_ID, 2, 3)]
 
         with self.swap(
-            feedback_services, 'get_thread_analytics',
-            mock_get_thread_analytics):
+            feedback_services, 'get_thread_analytics_multi',
+            mock_get_thread_analytics_multi):
 
             response = self.get_json(feconf.DASHBOARD_DATA_URL)
             self.assertEqual(len(response['explorations_list']), 1)

@@ -49,17 +49,22 @@ class AnalyticsEventHandlersUnitTests(test_utils.GenericTestBase):
     """Test the event handlers for analytics events."""
 
     DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
+    CLASSIFIER_RULESPEC_STR = exp_domain.CLASSIFIER_RULESPEC_STR
+
+    def _record_answer(
+            self, answer, exploration_id='eid', state_name='sname',
+            rule_spec_str=DEFAULT_RULESPEC_STR):
+        event_services.AnswerSubmissionEventHandler.record(
+            exploration_id, 1, state_name, rule_spec_str, answer)
 
     def test_record_answer_submitted(self):
-        event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, 'sname', self.DEFAULT_RULESPEC_STR, 'answer')
+        self._record_answer('answer')
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
             'eid', 'sname', self.DEFAULT_RULESPEC_STR)
         self.assertEquals(answer_log.answers, {'answer': 1})
 
-        event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, 'sname', self.DEFAULT_RULESPEC_STR, 'answer')
+        self._record_answer('answer')
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
             'eid', 'sname', self.DEFAULT_RULESPEC_STR)
@@ -71,12 +76,9 @@ class AnalyticsEventHandlersUnitTests(test_utils.GenericTestBase):
 
     def test_resolve_answers_for_default_rule(self):
         # Submit three answers.
-        event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, 'sname', self.DEFAULT_RULESPEC_STR, 'a1')
-        event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, 'sname', self.DEFAULT_RULESPEC_STR, 'a2')
-        event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, 'sname', self.DEFAULT_RULESPEC_STR, 'a3')
+        self._record_answer('a1')
+        self._record_answer('a2')
+        self._record_answer('a3')
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
             'eid', 'sname', self.DEFAULT_RULESPEC_STR)
@@ -114,6 +116,148 @@ class AnalyticsEventHandlersUnitTests(test_utils.GenericTestBase):
         answer_log = stats_domain.StateRuleAnswerLog.get(
             'eid', 'sname', 'Rule')
         self.assertEquals(answer_log.answers, {})
+
+    def test_get_top_state_rule_answers(self):
+        # There are no initial top answers for this state.
+        top_answers = stats_services.get_top_state_rule_answers(
+            'eid', 'sname', [self.DEFAULT_RULESPEC_STR])
+        self.assertEquals(len(top_answers), 0)
+
+        # Submit some answers.
+        self._record_answer('a')
+        self._record_answer('a')
+        self._record_answer('b')
+        self._record_answer('b')
+        self._record_answer('b')
+        self._record_answer('c')
+        self._record_answer('c')
+
+        top_answers = stats_services.get_top_state_rule_answers(
+            'eid', 'sname', [self.DEFAULT_RULESPEC_STR])
+        self.assertEquals(len(top_answers), 3)
+        self.assertEquals(top_answers, [{
+            'value': 'b',
+            'count': 3
+        }, {
+            'value': 'a',
+            'count': 2
+        }, {
+            'value': 'c',
+            'count': 2
+        }])
+
+    def test_get_top_state_answers_for_multiple_classified_rules(self):
+        # There are no initial top answers for this state.
+        top_answers = stats_services.get_top_state_rule_answers(
+            'eid', 'sname',
+            [self.CLASSIFIER_RULESPEC_STR, self.DEFAULT_RULESPEC_STR])
+        self.assertEquals(len(top_answers), 0)
+
+        # Submit some answers.
+        self._record_answer('a', rule_spec_str=self.DEFAULT_RULESPEC_STR)
+        self._record_answer('a', rule_spec_str=self.DEFAULT_RULESPEC_STR)
+        self._record_answer('b', rule_spec_str=self.CLASSIFIER_RULESPEC_STR)
+        self._record_answer('b', rule_spec_str=self.CLASSIFIER_RULESPEC_STR)
+        self._record_answer('b', rule_spec_str=self.CLASSIFIER_RULESPEC_STR)
+        self._record_answer('c', rule_spec_str=self.CLASSIFIER_RULESPEC_STR)
+        self._record_answer('c', rule_spec_str=self.DEFAULT_RULESPEC_STR)
+
+        top_answers = stats_services.get_top_state_rule_answers(
+            'eid', 'sname',
+            [self.CLASSIFIER_RULESPEC_STR, self.DEFAULT_RULESPEC_STR])
+        self.assertEquals(len(top_answers), 3)
+        # Rules across multiple rule types are combined and still sorted by
+        # frequency.
+        self.assertEquals(top_answers, [{
+            'value': 'b',
+            'count': 3
+        }, {
+            'value': 'a',
+            'count': 2
+        }, {
+            'value': 'c',
+            'count': 2
+        }])
+
+    def test_get_top_state_rule_answers_from_multiple_explorations(self):
+        # There are no initial top answers for these explorations.
+        top_answers_list = stats_services.get_top_state_rule_answers_multi(
+            [('eid0', 'First'), ('eid1', 'Second')],
+            [self.DEFAULT_RULESPEC_STR])
+        self.assertEquals(len(top_answers_list), 2)
+        self.assertEquals(len(top_answers_list[0]), 0)
+        self.assertEquals(len(top_answers_list[1]), 0)
+
+        # Submit some answers.
+        self._record_answer('a', exploration_id='eid0', state_name='First')
+        self._record_answer('a', exploration_id='eid1', state_name='Second')
+        self._record_answer('b', exploration_id='eid1', state_name='Second')
+        self._record_answer('b', exploration_id='eid1', state_name='Second')
+        self._record_answer('b', exploration_id='eid1', state_name='Second')
+        self._record_answer('c', exploration_id='eid1', state_name='Second')
+        self._record_answer('c', exploration_id='eid0', state_name='First')
+
+        top_answers_list = stats_services.get_top_state_rule_answers_multi(
+            [('eid0', 'First'), ('eid1', 'Second')],
+            [self.DEFAULT_RULESPEC_STR])
+        self.assertEquals(len(top_answers_list), 2)
+        self.assertEquals(top_answers_list[0], [{
+            'value': 'a',
+            'count': 1
+        }, {
+            'value': 'c',
+            'count': 1
+        }])
+        self.assertEquals(top_answers_list[1], [{
+            'value': 'b',
+            'count': 3
+        }, {
+            'value': 'a',
+            'count': 1
+        }, {
+            'value': 'c',
+            'count': 1
+        }])
+
+    def test_get_top_state_rule_answers_from_multiple_states(self):
+        # There are no initial top answers for these states.
+        top_answers_list = stats_services.get_top_state_rule_answers_multi(
+            [('eid0', 'First'), ('eid0', 'Second')],
+            [self.DEFAULT_RULESPEC_STR])
+        self.assertEquals(len(top_answers_list), 2)
+        self.assertEquals(len(top_answers_list[0]), 0)
+        self.assertEquals(len(top_answers_list[1]), 0)
+
+        # Submit some answers.
+        self._record_answer('a', exploration_id='eid0', state_name='First')
+        self._record_answer('a', exploration_id='eid0', state_name='Second')
+        self._record_answer('b', exploration_id='eid0', state_name='Second')
+        self._record_answer('b', exploration_id='eid0', state_name='Second')
+        self._record_answer('b', exploration_id='eid0', state_name='Second')
+        self._record_answer('c', exploration_id='eid0', state_name='Second')
+        self._record_answer('c', exploration_id='eid0', state_name='First')
+
+        top_answers_list = stats_services.get_top_state_rule_answers_multi(
+            [('eid0', 'First'), ('eid0', 'Second')],
+            [self.DEFAULT_RULESPEC_STR])
+        self.assertEquals(len(top_answers_list), 2)
+        self.assertEquals(top_answers_list[0], [{
+            'value': 'a',
+            'count': 1
+        }, {
+            'value': 'c',
+            'count': 1
+        }])
+        self.assertEquals(top_answers_list[1], [{
+            'value': 'b',
+            'count': 3
+        }, {
+            'value': 'a',
+            'count': 1
+        }, {
+            'value': 'c',
+            'count': 1
+        }])
 
 
 class StateImprovementsUnitTests(test_utils.GenericTestBase):

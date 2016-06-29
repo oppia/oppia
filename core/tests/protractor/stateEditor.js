@@ -24,7 +24,6 @@ var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
 var player = require('../protractor_utils/player.js');
-var rules = require('../../../extensions/rules/protractor.js');
 
 describe('State editor', function() {
   it('should walk through the tutorial when user repeatedly clicks Next',
