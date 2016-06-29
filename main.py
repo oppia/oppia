@@ -311,9 +311,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/data/<exploration_id>', editor.ExplorationHandler,
         'editor_exploration_handler'),
     get_redirect_route(
-        r'/createhandler/change_list_summary/<exploration_id>',
-        editor.ChangeListSummaryHandler, 'change_list_summary'),
-    get_redirect_route(
         r'/createhandler/download/<exploration_id>',
         editor.ExplorationDownloadHandler, 'exploration_download_handler'),
     get_redirect_route(
