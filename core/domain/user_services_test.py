@@ -511,6 +511,36 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
                 'average_ratings': None
             })
 
+    def test_get_weekly_dashboard_stats(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, end_state_name='End')
+        init_state_name = exploration.init_state_name
+        event_services.StartExplorationEventHandler.record(
+            self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
+            feconf.PLAY_TYPE_NORMAL)
+        self.assertEquals(
+            user_services.get_weekly_dashboard_stats(self.owner_id), None)
+
+        user_services.save_last_dashboard_stats(self.owner_id)
+        self.assertEquals(
+            user_services.get_weekly_dashboard_stats(self.owner_id), None)
+
+        (user_jobs_continuous_test.ModifiedUserStatsAggregator
+         .start_computation())
+        self.process_and_flush_pending_tasks()
+
+        self.assertEquals(
+            user_services.get_weekly_dashboard_stats(self.owner_id), None)
+
+        user_services.save_last_dashboard_stats(self.owner_id)
+        self.assertEquals(
+            user_services.get_weekly_dashboard_stats(self.owner_id), [{
+                utils.get_current_date_as_string(): {
+                    'total_plays': 1,
+                    'average_ratings': None
+                }
+            }])
+
 
 class SubjectInterestsUnitTests(test_utils.GenericTestBase):
     """Test the update_subject_interests method."""

@@ -646,7 +646,7 @@ def get_user_dashboard_stats(user_id):
     """
     model = user_models.UserStatsModel.get(user_id, strict=False)
 
-    if model is not None:
+    if model:
         return {
             'total_plays': model.total_plays or 0,
             'average_ratings': model.average_ratings
@@ -656,3 +656,38 @@ def get_user_dashboard_stats(user_id):
             'total_plays': 0,
             'average_ratings': None
         }
+
+def get_weekly_dashboard_stats(user_id):
+    """Returns a list which contains the dashboard stats of a user,
+    keyed by a datetime string.
+
+    The stats currently being saved are: 'average ratings' and 'total plays'.
+    """
+
+    model = user_models.UserStatsModel.get(user_id, strict=False)
+
+    if model and model.weekly_creator_stats_list:
+        return model.weekly_creator_stats_list
+    else:
+        return None
+
+def save_last_dashboard_stats(user_id):
+    """Save statistics for creator dashboard of a user by appending to a list
+    keyed by a datetime string.
+    """
+    model = user_models.UserStatsModel.get(user_id, strict=False)
+    if not model:
+        return
+
+    weekly_dashboard_stats = {
+        utils.get_current_date_as_string(): {
+            'average_ratings': model.average_ratings,
+            'total_plays': model.total_plays
+        }
+    }
+
+    if not model.weekly_creator_stats_list:
+        model.weekly_creator_stats_list = []
+    model.weekly_creator_stats_list.append(weekly_dashboard_stats)
+
+    model.put()
