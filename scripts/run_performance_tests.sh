@@ -77,7 +77,7 @@ chmod 744 $TOOLS_DIR/browsermob-proxy-2.1.1/bin/browsermob-proxy
 while ! nc -vz localhost 9501; do sleep 1; done
 
 # Install xvfb if not on travis, used in frontend, e2e tests and performance tests.
-if [ "$TRAVIS" = false ]; then
+if [ "$TRAVIS" = true ]; then
   export XVFB_PREFIX=""
 else
   sudo apt-get install xvfb
