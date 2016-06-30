@@ -195,7 +195,7 @@ elif [ "$VAGRANT" = true ]; then
   # XVFB is required for headless testing in Vagrant
   sudo apt-get install xvfb chromium-browser
   export CHROME_BIN="/usr/bin/chromium-browser"
-  # Used in frontend and e2e tests. Only gets set if using Vagrant VM.
+  # Used in frontend and e2e tests. Only gets set if using Vagrant VM.   
   export XVFB_PREFIX="/usr/bin/xvfb-run"
   # Enforce proper ownership on oppia, oppia_tools, and node_modules or else NPM installs will fail.
   sudo chown -R vagrant.vagrant /home/vagrant/oppia /home/vagrant/oppia_tools /home/vagrant/node_modules

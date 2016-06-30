@@ -144,7 +144,6 @@ _PATHS_TO_INSERT = [
     os.path.join(_PARENT_DIR, 'oppia_tools', 'numpy-1.6.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'browsermob-proxy-0.7.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-2.53.2'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'xvfbwrapper-0.2.8'),
     os.path.join('third_party', 'gae-pipeline-1.9.17.0'),
     os.path.join('third_party', 'bleach-1.2.2'),
     os.path.join('third_party', 'gae-mapreduce-1.9.17.0'),

@@ -263,6 +263,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/moderator', moderator.ModeratorPage, 'moderator_page'),
     get_redirect_route(
+        r'/moderatorhandler/featured', moderator.FeaturedActivitiesHandler,
+        'moderator_featured_activities'),
+    get_redirect_route(
         r'/moderatorhandler/email_draft/<action>',
         moderator.EmailDraftHandler, 'moderator_action_email_draft'),
 
