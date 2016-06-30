@@ -22,6 +22,16 @@
 #   bash scripts/run_performance_tests.sh
 # 
 # The root folder MUST be named 'oppia'.
+# (1) Append a test target to make the script run all tests in a given module
+# or class, or run a particular test. For example, appending
+#
+#   --test_target='foo.bar.Baz'
+#
+# runs all tests in test class Baz in the foo/bar.py module, and appending
+#
+#   --test_target='foo.bar.Baz.quux'
+#
+# runs the test method quux in the test class Baz in the foo/bar.py module.
 
 function cleanup {
   # Send a kill signal to the dev server.
@@ -84,7 +94,11 @@ else
   export XVFB_PREFIX="/usr/bin/xvfb-run"
 fi
 
-$XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_path='core/tests/performance_tests' $@ 
+if [ $# -eq 0 ]; then
+  $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_path='core/tests/performance_tests'
+else
+  $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py $@
+fi
 
 chmod 644 $TOOLS_DIR/browsermob-proxy-2.1.1/bin/browsermob-proxy
 rm bmp.log server.log
