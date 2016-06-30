@@ -86,10 +86,12 @@ chmod 744 $TOOLS_DIR/browsermob-proxy-2.1.1/bin/browsermob-proxy
 # Wait for the servers to come up.
 while ! nc -vz localhost 9501; do sleep 1; done
 
-# Install xvfb if not on travis, used in frontend, e2e tests and performance tests.
+# Install xvfb if not on travis, Used in frontend, e2e tests and performance tests.
 if [ "$TRAVIS" = true ]; then
   export XVFB_PREFIX=""
 else
+  # This installs xvfb for systems with apt-get installer like Ubuntu, and will fail for other systems.
+  # TODO(gvishal): Install/provide xvfb for other systems.
   sudo apt-get install xvfb
   export XVFB_PREFIX="/usr/bin/xvfb-run"
 fi
