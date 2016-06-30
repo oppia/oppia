@@ -693,8 +693,7 @@ def update_dashboard_stats_log(user_id):
     if not model:
         return
 
-    if (model.schema_version !=
-        feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION):
+    if (model.schema_version != feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION):
         _migrate_dashboard_stats_to_latest_schema(model)
 
     weekly_dashboard_stats = {
