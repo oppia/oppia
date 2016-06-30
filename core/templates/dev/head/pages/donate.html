@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block subtitle %}
+  Contact
+{% endblock subtitle %}
+
+{% block header_js %}
+  {{ super() }}
+
+  <style>
+    html, body {
+      background-color: #eee;
+    }
+  </style>
+{% endblock %}
+
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      Donate
+    </li>
+  </ul>
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+  <div class="oppia-page-card oppia-about-content">
+    <div class="oppia-about-card-content-wide">
+      <h2>Donate to The Oppia Foundation!</h2>
+      <p>
+        In 2012, Sean Lip was a software engineer at Google who missed the
+        teaching he used to do while completing his doctorate at the University
+        of Cambridge. He saw that the online education tools of the time were
+        mostly recorded faces on a screen, missing the feedback and evaluation
+        teachers used to work their magic in the classroom. He dreamt of a tool
+        that could not only improve the education of students around the world,
+        but improve the teaching of educators both online and off. That was
+        the beginning of The Oppia Foundation.
+      </p>
+      <p>
+        Sean and Stephanie Federwisch started developing Oppia internally at
+        Google in June 2012 and launched Oppia.org in 2014. Entirely opensource,
+        Oppia has grown to 145,000 users and 5,500 explorations through the
+        contributions of 110 people from 20 countries around the world.
+      </p>
+      <p>
+        Oppia.org and its explorations are free to anyone to learn anything.
+        In order to continue this while growing and improving the site, The
+        Oppia Foundation will gladly accept any donations! These donations
+        will be used to fund server costs, marketing, and distribution into
+        schools.
+      </p>
+      <div style="text-align: center;">
+        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+        <input type="hidden" name="cmd" value="_s-xclick">
+        <input type="hidden" name="hosted_button_id" value="UWKTY87SYU766">
+        <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif"
+          border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+        <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif"
+          width="1" height="1">
+        </form>
+      </div>
+      <p>
+        Thank you for your support!
+      </p>
+    </div>
+  </div>
+{% endblock %}
+
+{% block footer%}
+  {% include 'footer.html' %}
+{% endblock %}
