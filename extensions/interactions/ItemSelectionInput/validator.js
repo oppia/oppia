@@ -89,14 +89,30 @@ oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
         baseInteractionValidationService.getAnswerGroupWarnings(
           answerGroups, stateName));
 
-      if (!defaultOutcome ||
-          $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
-        warningsList.push({
-          type: WARNING_TYPES.ERROR,
-          message: (
-            'Please clarify the default outcome so it is less confusing to ' +
-            'the user.')
-        });
+      var selectedChoices = [];
+      for (var i = 0; i < answerGroups.length; i++) {
+        var ruleSpecs = answerGroups[i].rule_specs;
+        for (var j = 0; j < ruleSpecs.length; j++) {
+          for (var k = 0; k < ruleSpecs[j].inputs.x.length; k++) {
+            var choicePreviouslySelected = (
+              selectedChoices.indexOf(ruleSpecs[j].inputs.x[k]) !== -1);
+            if (!choicePreviouslySelected) {
+              selectedChoices.push(ruleSpecs[j].inputs.x[k]);
+            }
+          }
+        }
+      }
+
+      if (selectedChoices.length < numChoices) {
+        if (!defaultOutcome ||
+            $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
+          warningsList.push({
+            type: WARNING_TYPES.ERROR,
+            message: (
+              'Please clarify the default outcome so it is less confusing to ' +
+              'the user.')
+          });
+        }
       }
 
       return warningsList;

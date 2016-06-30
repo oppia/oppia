@@ -286,18 +286,19 @@ oppia.controller('StateResponses', [
     };
     $scope.suppressDefaultAnswerGroupWarnings = function() {
       var interactionId = $scope.getCurrentInteractionId();
+      var answerGroups = responsesService.getAnswerGroups();
+      var handledAnswersArray = [];
+      var choiceIndices = [];
+      var answerChoices = [];
+      var numChoices = $scope.getAnswerChoices().length;
       if (interactionId === 'MultipleChoiceInput') {
-        var answerGroups = responsesService.getAnswerGroups();
         // Collect all answers which have been handled by at least one
         // answer group.
-        var handledAnswersArray = [];
-        for (var j = 0; j < answerGroups.length; j++) {
-          for (var k = 0; k < answerGroups[j].rule_specs.length; k++) {
-            handledAnswersArray.push(answerGroups[j].rule_specs[k].inputs.x);
+        for (var i = 0; i < answerGroups.length; i++) {
+          for (var j = 0; j < answerGroups[i].rule_specs.length; j++) {
+            handledAnswersArray.push(answerGroups[i].rule_specs[j].inputs.x);
           }
         }
-        var choiceIndices = [];
-        var numChoices = $scope.getAnswerChoices().length;
         for (var i = 0; i < numChoices; i++) {
           choiceIndices.push(i);
         }
@@ -305,6 +306,25 @@ oppia.controller('StateResponses', [
         // been handled by at least one answer group.
         return choiceIndices.every(function(choiceIndex) {
           return handledAnswersArray.indexOf(choiceIndex) !== -1;
+        });
+      } else if (interactionId === 'ItemSelectionInput') {
+        for (var i = 0; i < answerGroups.length; i++) {
+          var ruleSpecs = answerGroups[i].rule_specs;
+          for (var j = 0; j < ruleSpecs.length; j++) {
+            for (var k = 0; k < ruleSpecs[j].inputs.x.length; k++) {
+              var choicePreviouslySelected = (
+                handledAnswersArray.indexOf(ruleSpecs[j].inputs.x[k]) !== -1);
+              if (!choicePreviouslySelected) {
+                handledAnswersArray.push(ruleSpecs[j].inputs.x[k]);
+              }
+            }
+          }
+        }
+        for (var l = 0; l < numChoices; l++) {
+          answerChoices.push($scope.getAnswerChoices()[l].label);
+        }
+        return answerChoices.every(function(answerChoice) {
+          return handledAnswersArray.indexOf(answerChoice) !== -1;
         });
       }
     };
