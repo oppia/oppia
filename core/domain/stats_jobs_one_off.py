@@ -358,12 +358,14 @@ class AnswersAudit2(jobs.BaseMapReduceJobManager):
 
 class ClearMigratedAnswersJob(jobs.BaseMapReduceJobManager):
     """This job deletes all answers stored in the
-    stats_models.StateAnswersModel. As an extra precaution, this job is a no-op
-    unless feconf.DELETE_ANSWERS_AFTER_MIGRATION is enabled.
+    stats_models.StateAnswersModel and all book-keeping information stored in
+    stats_models.MigratedAnswerModel. As an extra precaution, this job is a
+    no-op unless feconf.DELETE_ANSWERS_AFTER_MIGRATION is enabled.
     """
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [stats_models.StateAnswersModel]
+        return [
+            stats_models.StateAnswersModel, stats_models.MigratedAnswerModel]
 
     @staticmethod
     def map(item):
@@ -375,11 +377,37 @@ class ClearMigratedAnswersJob(jobs.BaseMapReduceJobManager):
         pass
 
 
+class AnswerMigrationValidationJob(jobs.BaseMapReduceJobManager):
+    """This job performs a strict validation to check if every answer in the old
+    storage model has at least been migrated to the new model (no form of
+    correctness happens in this test, only accountability).
+    """
+    _ERROR_KEY = 'Answer Migration Validation ERROR'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.StateRuleAnswerLogModel]
+
+    @staticmethod
+    def map(item):
+        try:
+            stats_models.MigratedAnswerModel.validate_answers_are_migrated(item)
+        except utils.ValidationError as e:
+            yield (AnswerMigrationValidationJob._ERROR_KEY, str(e))
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        if key == AnswerMigrationValidationJob._ERROR_KEY:
+            for value in stringified_values:
+                yield value
+
+
 class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     """This job is responsible for migrating all answers stored within
     stats_models.StateRuleAnswerLogModel to stats_models.StateAnswersModel
     """
     _ERROR_KEY = 'Answer Migration ERROR'
+    _ALREADY_MIGRATED_KEY = 'Answer ALREADY MIGRATED'
 
     _DEFAULT_RULESPEC_STR = 'Default'
 
@@ -1067,7 +1095,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
             # pylint: disable=invalid-name
             def visit_Name(self, node):
-                if not node.id in self.ALLOWED_NAMES:
+                if node.id not in self.ALLOWED_NAMES:
                     raise RuntimeError(
                         'Name access to %s not allowed' % node.id)
                 return self.generic_visit(node)
@@ -1090,11 +1118,20 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        # If this answer has alerady been migrated, skip it.
+        if stats_models.MigratedAnswerModel.is_marked_as_migrated(item.id):
+            yield (
+                AnswerMigrationJob._ALREADY_MIGRATED_KEY,
+                'Encountered a submitted answer which has already been '
+                'migrated')
+            return
+
         # Cannot unpack the item ID with a simple split, since the rule_str
         # component can contains periods. The ID is guaranteed to always
         # contain 4 parts: exploration ID, state name, handler name, and
         # rule_str.
         item_id = item.id
+
         period_idx = item_id.index('.')
         exp_id = item_id[:period_idx]
 
@@ -1132,8 +1169,9 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
     def reduce(key, stringified_values):
         # TODO(bhenning): Throw errors for all major points of failure.
 
-        # Print any errors encountered during the map step.
-        if key == AnswerMigrationJob._ERROR_KEY:
+        # Print any errors or notices encountered during the map step.
+        if key == AnswerMigrationJob._ERROR_KEY or (
+                key == AnswerMigrationJob._ALREADY_MIGRATED_KEY):
             for value in stringified_values:
                 yield value
             return
@@ -1277,6 +1315,9 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                     rule_spec_index, classification_categorization, params,
                     session_id, time_spent_in_sec, rule_spec_str=rule_str,
                     answer_str=answer_str)] * answer_frequency)
+
+        stats_models.MigratedAnswerModel.finish_migrating_answer(
+            item_id, exploration.id, exploration.version, state_name)
 
     # Following are helpers and constants related to reconstituting the
     # CheckedProof object.

@@ -25,8 +25,8 @@ from core.domain import stats_services
 from core.domain import stats_jobs_one_off
 from core.domain import user_services
 from core.platform import models
-(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 from core.tests import test_utils
+(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 
 # TODO(bhenning): Implement tests for multiple answers submitted to the same
@@ -59,6 +59,18 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         stats_jobs_one_off.AnswerMigrationJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
         return jobs.get_job_output(job_id)
+
+    def _run_migration_validation_job(self):
+        job_id = stats_jobs_one_off.AnswerMigrationValidationJob.create_new()
+        stats_jobs_one_off.AnswerMigrationValidationJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+        return jobs.get_job_output(job_id)
+
+    def _verify_no_migration_validation_problems(self):
+        self.assertEqual(self._run_migration_validation_job(), [])
+
+    def _verify_migration_validation_problems(self, count):
+        self.assertEqual(len(self._run_migration_validation_job()), count)
 
     def _get_state_answers(self, state_name, exploration_version=1):
         return stats_services.get_state_answers(
@@ -128,6 +140,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_str': html_answer
         }])
         self.assertEqual(job_output, [])
+        self._verify_no_migration_validation_problems()
 
     def test_migrated_answer_from_deleted_exploration_is_ignored(self):
         state_name = 'Text Input'
@@ -152,6 +165,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self.assertEqual(len(job_output), 1)
         self.assertIn(
             'Encountered missing exploration referenced', job_output[0])
+        self._verify_migration_validation_problems(1)
 
     def test_rule_parameter_evaluation_with_invalid_characters(self):
         exploration = self.save_new_valid_exploration(
@@ -206,6 +220,93 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(job_output), 1)
         self.assertIn('failing to evaluate param string', job_output[0])
+        self._verify_migration_validation_problems(1)
+
+    def test_multiple_migrations_does_not_duplicate_answers(self):
+        state_name = 'Text Input'
+
+        rule_spec_str = 'Contains(ate)'
+        self._record_old_answer(state_name, rule_spec_str, 'levitate')
+        self._record_old_answer(state_name, rule_spec_str, 'appropriate')
+        self._record_old_answer(state_name, rule_spec_str, 'truncate')
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        job_output = self._run_migration_job()
+
+        # 3 answers should be in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(len(state_answers.submitted_answer_list), 3)
+        self.assertEqual(job_output, [])
+
+        job_output = self._run_migration_job()
+
+        # Only 3 answers should be in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(len(state_answers.submitted_answer_list), 3)
+        self.assertEqual(job_output, [
+            'Encountered a submitted answer which has already been migrated'])
+        self._verify_no_migration_validation_problems()
+
+    def test_migration_results_can_be_validated(self):
+        state_name1 = 'Text Input'
+        rule_spec_str1 = 'Contains(ate)'
+
+        state_name2 = 'Code Editor'
+        rule_spec_str2 = 'OutputEquals(Hello Oppia)'
+        code_answer2 = '# Type your code here.\nprint \'Hello Oppia\''
+
+        self._record_old_answer(state_name1, rule_spec_str1, 'levitate')
+        self._record_old_answer(state_name1, rule_spec_str1, 'appropriate')
+
+        # There should be no answers in the new data storage model.
+        state_answers1 = self._get_state_answers(state_name1)
+        state_answers2 = self._get_state_answers(state_name2)
+        self.assertIsNone(state_answers1)
+        self.assertIsNone(state_answers2)
+
+        self._run_migration_job()
+        validation_output = self._run_migration_validation_job()
+
+        # 2 answers should be in the new data storage model. No errors should
+        # occur on validation.
+        state_answers1 = self._get_state_answers(state_name1)
+        state_answers2 = self._get_state_answers(state_name2)
+        self.assertEqual(len(state_answers1.submitted_answer_list), 2)
+        self.assertIsNone(state_answers2)
+        self.assertEqual(validation_output, [])
+
+        # TODO(bhenning): Update the validation process so that if this answer
+        # were submitted to the same state as the other answers, it would not be
+        # skipped.
+
+        # Simulate the migration job "missing an answer".
+        self._record_old_answer(state_name2, rule_spec_str2, code_answer2)
+        validation_output = self._run_migration_validation_job()
+
+        # Two answers are still in the new model, but now a validation error
+        # will occur because an answer was not migrated.
+        state_answers1 = self._get_state_answers(state_name1)
+        state_answers2 = self._get_state_answers(state_name2)
+        self.assertEqual(len(state_answers1.submitted_answer_list), 2)
+        self.assertIsNone(state_answers2)
+        self.assertEqual(validation_output, [
+            'Answers not migrated: '
+            '16.Code Editor.submit.OutputEquals(Hello Oppia)'])
+
+        # Running the migration job again should fix the problem and reuslt in
+        # no validation issues.
+        self._run_migration_job()
+        validation_output = self._run_migration_validation_job()
+
+        # All 3 answers should be in the new data storage model.
+        state_answers1 = self._get_state_answers(state_name1)
+        state_answers2 = self._get_state_answers(state_name2)
+        self.assertEqual(len(state_answers1.submitted_answer_list), 2)
+        self.assertEqual(len(state_answers2.submitted_answer_list), 1)
+        self.assertEqual(validation_output, [])
 
     def test_migration_job_catches_answer_which_fails_normalization(self):
         state_name = 'Set Input'
@@ -227,6 +328,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(job_output), 1)
         self.assertIn('Failed to normalize', job_output[0])
+        self._verify_migration_validation_problems(1)
 
     def test_migration_job_should_support_very_large_answers(self):
         """This test ensures the migration job does not fail when submitting
@@ -251,6 +353,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         state_answers = self._get_state_answers(state_name)
         self.assertEqual(len(state_answers.submitted_answer_list), 1000)
         self.assertEqual(job_output, [])
+        self._verify_no_migration_validation_problems()
 
     def test_migrate_code_repl(self):
         state_name = 'Code Editor'
@@ -287,6 +390,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_str': code_answer
         }])
         self.assertEqual(job_output, [])
+        self._verify_no_migration_validation_problems()
 
     def test_migrate_continue(self):
         state_name = 'Continue'
@@ -315,6 +419,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_str': ''
         }])
         self.assertEqual(job_output, [])
+        self._verify_no_migration_validation_problems()
 
     def test_migrate_image_click_input(self):
         state_name = 'Image Region'
@@ -349,6 +454,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_str': html_answer
         }])
         self.assertEqual(job_output, [])
+        self._verify_no_migration_validation_problems()
 
     def test_migrate_interactive_map(self):
         state_name = 'World Map'
@@ -381,6 +487,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_str': html_answer
         }])
         self.assertEqual(job_output, [])
+        self._verify_no_migration_validation_problems()
 
     def test_migrate_item_selection_input(self):
         state_name = 'Item Selection'
@@ -414,6 +521,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_str': html_answer
         }])
         self.assertEqual(job_output, [])
+        self._verify_no_migration_validation_problems()
 
     def test_migrate_logic_proof(self):
         state_name = 'Logic Proof'
@@ -450,6 +558,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_str': html_answer
         }])
         self.assertEqual(job_output, [])
+        self._verify_no_migration_validation_problems()
 
     def test_migrate_math_expression_input(self):
         state_name = 'Math Expression Input'
@@ -486,6 +595,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_str': html_answer
         }])
         self.assertEqual(job_output, [])
+        self._verify_no_migration_validation_problems()
 
     def test_migrate_multiple_choice_input(self):
         state_name = 'Multiple Choice'
@@ -517,6 +627,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_str': html_answer
         }])
         self.assertEqual(job_output, [])
+        self._verify_no_migration_validation_problems()
 
     def test_migrate_music_notes_input(self):
         state_name = 'Music Notes Input'
@@ -556,6 +667,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_str': html_answer
         }])
         self.assertEqual(job_output, [])
+        self._verify_no_migration_validation_problems()
 
     def test_migrate_numeric_input(self):
         state_name = 'Number Input'
@@ -587,6 +699,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_str': html_answer
         }])
         self.assertEqual(job_output, [])
+        self._verify_no_migration_validation_problems()
 
     def test_migrate_pencil_code_editor(self):
         state_name = 'Pencil Code Editor'
@@ -627,6 +740,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_str': html_answer
         }])
         self.assertEqual(job_output, [])
+        self._verify_no_migration_validation_problems()
 
     def test_migrate_set_input(self):
         state_name = 'Set Input'
@@ -659,6 +773,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_str': html_answer
         }])
         self.assertEqual(job_output, [])
+        self._verify_no_migration_validation_problems()
 
     def test_migrate_set_input_with_html(self):
         state_name = 'Set Input'
@@ -691,6 +806,7 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_str': html_answer
         }])
         self.assertEqual(job_output, [])
+        self._verify_no_migration_validation_problems()
 
     def test_migrate_text_input(self):
         state_name = 'Text Input'
@@ -722,3 +838,4 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
             'answer_str': html_answer
         }])
         self.assertEqual(job_output, [])
+        self._verify_no_migration_validation_problems()

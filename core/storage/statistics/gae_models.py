@@ -533,8 +533,7 @@ class StateAnswersModel(base_models.BaseModel):
             cls, exploration_id, exploration_version, state_name, shard_id):
         entity_id = cls._get_entity_id(
             exploration_id, exploration_version, state_name, shard_id)
-        instance = cls.get(entity_id, strict=False)
-        return instance
+        return cls.get(entity_id, strict=False)
 
     @classmethod
     def get_all_models(cls, exploration_id, exploration_version, state_name):
@@ -723,3 +722,82 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
         return ':'.join([
             exploration_id, str(exploration_version), state_name,
             calculation_id])
+
+
+class MigratedAnswerModel(base_models.BaseModel):
+    """A temporary model which maps answers in StateRuleAnswerLogModel to
+    answers migrated and inserted in StateAnswersModel. This model can be used
+    to verify a given answer exists (and the correct number of times) in
+    StateAnswersModel. Although the AnswerMigrationJob is not idempotent, this
+    model aims to help make it closer to idempotent.
+    """
+    # TODO(bhenning): Remove this model once the AnswerMigrationJob has
+    # successfully run in production.
+
+    exploration_id = ndb.StringProperty(indexed=True, required=True)
+    state_name = ndb.StringProperty(indexed=True, required=True)
+    exploration_versions = ndb.IntegerProperty(indexed=False, repeated=True)
+
+    @classmethod
+    def finish_migrating_answer(
+            cls, state_answer_log_model_item_id, exploration_id,
+            exploration_version, state_name):
+        model = cls.get(state_answer_log_model_item_id, strict=False)
+        if not model:
+            model = cls(
+                id=state_answer_log_model_item_id,
+                exploration_id=exploration_id, state_name=state_name,
+                exploration_versions=set([exploration_version]))
+        else:
+            model.exploration_versions = set(
+                model.exploration_versions + [exploration_version])
+        model.put()
+
+    @classmethod
+    def is_marked_as_migrated(cls, state_answer_log_model_item_id):
+        model = cls.get(state_answer_log_model_item_id, strict=False)
+        return model is not None
+
+    @classmethod
+    def validate_answers_are_migrated(cls, state_rule_answer_log_model):
+        migrated_answer_model = MigratedAnswerModel.get(
+            state_rule_answer_log_model.id, strict=False)
+        if not migrated_answer_model:
+            raise utils.ValidationError(
+                'Answers not migrated: %s' % state_rule_answer_log_model.id)
+        state_answer_models_list = []
+        for exploration_version in migrated_answer_model.exploration_versions:
+            state_answer_models = StateAnswersModel.get_all_models(
+                migrated_answer_model.exploration_id, exploration_version,
+                migrated_answer_model.state_name)
+            if not state_answer_models:
+                raise utils.ValidationError(
+                    'Inconsistency: previous mentioned answers were migrated '
+                    'for exploration %s (version=%s) state name %s, but none '
+                    'found' % (
+                        migrated_answer_model.exploration_id,
+                        exploration_version, migrated_answer_model.state_name))
+            state_answer_models_list.append(state_answer_models)
+        answer_str_list = (
+            cls._get_answer_str_list_from_state_answer_models_list(
+                state_answer_models_list))
+        for answer_str, expected_count in (
+                state_rule_answer_log_model.answers.iteritems()):
+            observed_count = answer_str_list.count(answer_str)
+            if expected_count != observed_count:
+                raise utils.ValidationError(
+                    'Expected \'%s\' answer string %d time(s) in new data '
+                    'model, but found it %d time(s)' % (
+                        answer_str, expected_count, observed_count))
+
+    @classmethod
+    def _get_answer_str_list_from_state_answer_models_list(
+            cls, state_answer_models_list):
+        answer_str_list = []
+        for state_answer_models in state_answer_models_list:
+            for state_answer_model in state_answer_models:
+                for submitted_answer_dict in (
+                        state_answer_model.submitted_answer_list):
+                    answer_str_list.append(submitted_answer_dict['answer_str'])
+        return answer_str_list
+
