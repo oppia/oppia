@@ -81,7 +81,7 @@ if [ "$TRAVIS" = true ]; then
   export XVFB_PREFIX=""
 else
   # This installs xvfb for systems with apt-get installer like Ubuntu, and will fail for other systems.
-  # TODO: Install/provide xvfb for other systems.
+  # TODO(gvishal): Install/provide xvfb for other systems.
   sudo apt-get install xvfb
   export XVFB_PREFIX="/usr/bin/xvfb-run"
 fi
