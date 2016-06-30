@@ -676,7 +676,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
               $scope.requireTitleToBeSpecified = (
                 !explorationTitleService.savedMemento);
               $scope.requireObjectiveToBeSpecified = (
-                !explorationObjectiveService.savedMemento);
+                explorationObjectiveService.savedMemento.length < 15);
               $scope.requireCategoryToBeSpecified = (
                 !explorationCategoryService.savedMemento);
               $scope.askForLanguageCheck = (
