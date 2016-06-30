@@ -629,6 +629,17 @@ def _save_user_contributions(user_contributions):
     ).put()
 
 
+def _migrate_dashboard_stats_to_latest_schema(versioned_dashboard_stats):
+    """Holds responsibility of updating the structure of dashboard stats"""
+
+    stats_schema_version = versioned_dashboard_stats.schema_version
+    if not (1 <= stats_schema_version
+            <= feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION):
+        raise Exception(
+            'Sorry, we can only process v1-v%d dashboard stats schemas at '
+            'present.' % feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION)
+
+
 def get_user_impact_score(user_id):
     """Returns user impact score associated with user_id"""
 
@@ -681,6 +692,10 @@ def update_dashboard_stats_log(user_id):
     model = user_models.UserStatsModel.get(user_id, strict=False)
     if not model:
         return
+
+    if (model.schema_version !=
+        feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION):
+        _migrate_dashboard_stats_to_latest_schema(model)
 
     weekly_dashboard_stats = {
         utils.get_current_date_as_string(): {

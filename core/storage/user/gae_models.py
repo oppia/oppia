@@ -180,6 +180,10 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     # ]
     weekly_creator_stats_list = ndb.JsonProperty(repeated=True)
 
+    # The version of dashboard stats schema.
+    schema_version = ndb.IntegerProperty(
+        required=True, default=1, indexed=True)
+
 
 class ExplorationUserDataModel(base_models.BaseModel):
     """User-specific data pertaining to a specific exploration.
