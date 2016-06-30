@@ -67,14 +67,13 @@ class TestBase(unittest.TestCase):
 
     def _record_page_metrics_for_url(self):
         self.page_metrics = (
-            self.data_fetcher.get_page_metrics_for_url(self.page_url,
-                                                       self.func_call))
+            self.data_fetcher.get_page_metrics_for_url(
+                self.page_url, self.func_call))
 
     def _record_page_metrics_from_cached_session(self):
         self.page_metrics = (
             self.data_fetcher.get_page_metrics_from_cached_session(
-                self.page_url,
-                self.func_call))
+                self.page_url, self.func_call))
 
     def _record_average_page_timings_for_url(
             self, session_count=DEFAULT_SESSION_SAMPLE_COUNT):
@@ -82,8 +81,8 @@ class TestBase(unittest.TestCase):
 
         for _ in range(session_count):
             page_session_metrics_list.append(
-                self.data_fetcher.get_page_timings_for_url(self.page_url,
-                                                           self.func_call))
+                self.data_fetcher.get_page_timings_for_url(
+                    self.page_url, self.func_call))
 
         self.page_metrics = perf_domain.MultiplePageSessionMetrics(
             page_session_metrics_list)
@@ -95,8 +94,7 @@ class TestBase(unittest.TestCase):
         for _ in range(session_count):
             page_session_metrics_list.append(
                 self.data_fetcher.get_page_timings_from_cached_session(
-                    self.page_url,
-                    self.func_call))
+                    self.page_url, self.func_call))
 
         self.page_metrics = perf_domain.MultiplePageSessionMetrics(
             page_session_metrics_list)
@@ -152,7 +150,7 @@ class TestBase(unittest.TestCase):
         time.sleep(5)
         resulting_url = driver.current_url
 
-        if resulting_url == self.BASE_URL + self.SPLASH_URL_SUFFIX:
+        if resulting_url == '%s%s' % (self.BASE_URL, self.SPLASH_URL_SUFFIX):
             return False
 
         return True
