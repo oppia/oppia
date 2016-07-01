@@ -111,7 +111,7 @@ states:
               is n*n-1.
             - I think it is 6 because you can start with each of 3 balls and there
               are two permutations for each start colour.
-          rule_type: ClassifyMatches
+          rule_type: FuzzyMatches
         - inputs:
             x: permutations
           rule_type: StartsWith
@@ -163,7 +163,7 @@ states:
             - bcse combinations
             - 3C3
             - It is a combination
-          rule_type: ClassifyMatches
+          rule_type: FuzzyMatches
       - outcome:
           dest: Home
           feedback:
@@ -1077,7 +1077,7 @@ states:
             - With each color first ball there are 2 combinations
             - I know you do this by multiplying 1 x 2 x 3 because you have 3 balls
             - There are n x n-1 combinations
-          rule_type: ClassifyMatches
+          rule_type: FuzzyMatches
       - outcome:
           dest: Home
           feedback:
@@ -1273,7 +1273,7 @@ states:
             - r,b,y r,y,b b,r,y b,y,r y,b,r y,r,b
             - I counted in my head
             - b-y-g b-g-y g-b-y g-y-b y-b-g y-g-b
-          rule_type: ClassifyMatches
+          rule_type: FuzzyMatches
       - outcome:
           dest: Home
           feedback:
@@ -1308,7 +1308,7 @@ states:
             - realmente solo adivin\u00e9
             - I guessed.
             - don't know
-          rule_type: ClassifyMatches
+          rule_type: FuzzyMatches
         - inputs:
             x: hardrule
           rule_type: StartsWith

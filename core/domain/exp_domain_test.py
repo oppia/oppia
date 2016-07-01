@@ -339,12 +339,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     'inputs': {
                         'training_data': ['Test']
                     },
-                    'rule_type': 'ClassifyMatches'
+                    'rule_type': 'FuzzyMatches'
                 }, {
                     'inputs': {
                         'training_data': ['Test']
                     },
-                    'rule_type': 'ClassifyMatches'
+                    'rule_type': 'FuzzyMatches'
                 }]
             })
         )
