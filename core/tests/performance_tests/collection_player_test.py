@@ -26,10 +26,9 @@ class CollectionPlayerPerformanceTest(base.TestBase):
         super(CollectionPlayerPerformanceTest, self).setUp()
 
         page_config = test_config.TEST_DATA[self.PAGE_KEY]
-        self._set_test_limits(page_config)
+        self._set_page_config(page_config)
 
-        self.func_call = self._setup_enable_collections
-
+        self._initialize_data_fetcher()
         self._load_page_to_cache_server_resources()
 
     def test_page_size_under_specified_limit(self):

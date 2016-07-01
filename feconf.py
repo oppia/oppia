@@ -40,6 +40,8 @@ if PLATFORM == 'gae':
 else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
 
+# Default port for GAE server that is started for performance tests.
+PERFORMANCE_TESTS_SERVER_PORT = 9501
 
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')

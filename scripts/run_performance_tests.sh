@@ -97,7 +97,14 @@ else
 fi
 
 if [ $# -eq 0 ]; then
-  $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_path='core/tests/performance_tests'
+  # $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_path='core/tests/performance_tests'
+  $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.collection_player_test
+  $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.creator_dashboard_test
+  $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.exploration_editor_test
+  $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.exploration_player_test
+  $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.library_test
+  $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.profile_page_test
+  $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.splash_test
 else
   $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py $@
 fi

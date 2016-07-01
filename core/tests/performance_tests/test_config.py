@@ -50,6 +50,12 @@ TEST_DATA = {
             'uncached': 10.0,
             'cached': 3.0,
         },
+        'preload_options':{
+            'login': False,
+            'enable_explorations': False,
+            'enable_collections': False,
+            'create_exploration': False
+        }
     },
     LIBRARY_PAGE_KEY: {
         'url': '/library',
@@ -61,6 +67,12 @@ TEST_DATA = {
             'uncached': 10.0,
             'cached': 3.0,
         },
+        'preload_options':{
+            'login': False,
+            'enable_explorations': True,
+            'enable_collections': False,
+            'create_exploration': False
+        }
     },
     CREATOR_DASHBOARD_KEY: {
         'url': '/dashboard',
@@ -72,6 +84,12 @@ TEST_DATA = {
             'uncached': 10.0,
             'cached': 3.0,
         },
+        'preload_options':{
+            'login': True,
+            'enable_explorations': False,
+            'enable_collections': False,
+            'create_exploration': False
+        }
     },
     EXPLORATION_PLAYER_KEY: {
         'url': '/explore/0',
@@ -83,6 +101,12 @@ TEST_DATA = {
             'uncached': 10.0,
             'cached': 3.0,
         },
+        'preload_options':{
+            'login': False,
+            'enable_explorations': True,
+            'enable_collections': False,
+            'create_exploration': False
+        }
     },
     EXPLORATION_EDITOR_KEY: {
         'url': '/create/0',
@@ -94,6 +118,12 @@ TEST_DATA = {
             'uncached': 10.0,
             'cached': 3.0,
         },
+        'preload_options':{
+            'login': False,
+            'enable_explorations': False,
+            'enable_collections': False,
+            'create_exploration': True
+        }
     },
     COLLECTION_PLAYER_KEY: {
         'url': '/collection/0',
@@ -105,6 +135,12 @@ TEST_DATA = {
             'uncached': 10.0,
             'cached': 3.0,
         },
+        'preload_options':{
+            'login': False,
+            'enable_explorations': False,
+            'enable_collections': True,
+            'create_exploration': False
+        }
     },
     PROFILE_PAGE_KEY: {
         'url': '/profile/',
@@ -116,5 +152,11 @@ TEST_DATA = {
             'uncached': 10.0,
             'cached': 3.0,
         },
+        'preload_options':{
+            'login': True,
+            'enable_explorations': False,
+            'enable_collections': False,
+            'create_exploration': False
+        }
     }
 }
