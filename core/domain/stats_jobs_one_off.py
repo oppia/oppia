@@ -18,6 +18,8 @@ import ast
 import collections
 import datetime
 import itertools
+import os
+import random
 import re
 
 from core import jobs
@@ -1157,7 +1159,11 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 'Encountered submitted answer without the standard \'submit\' '
                 'handler: %s' % item.id)
 
-        yield ('%s.%s' % (exp_id, state_name), {
+        # Split up the answers across multiple shards (10) so that they may be
+        # more randomly distributed.
+        random.seed('%s.%s.%s' % (
+            item.id, datetime.datetime.utcnow(), os.urandom(64)))
+        yield ('%s.%s.%s' % (exp_id, state_name, random.randint(0, 9)), {
             'item_id': item.id,
             'exploration_id': exp_id,
             'state_name': state_name,
