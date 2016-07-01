@@ -284,14 +284,15 @@ oppia.controller('StateResponses', [
       trainingDataService.initializeTrainingData(
         explorationId, currentStateName);
     };
+
     $scope.suppressDefaultAnswerGroupWarnings = function() {
       var interactionId = $scope.getCurrentInteractionId();
       var answerGroups = responsesService.getAnswerGroups();
       var handledAnswersArray = [];
       var choiceIndices = [];
       var answerChoices = [];
-      var numChoices = $scope.getAnswerChoices().length;
       if (interactionId === 'MultipleChoiceInput') {
+        var numChoices = $scope.getAnswerChoices().length;
         // Collect all answers which have been handled by at least one
         // answer group.
         for (var i = 0; i < answerGroups.length; i++) {
@@ -308,6 +309,7 @@ oppia.controller('StateResponses', [
           return handledAnswersArray.indexOf(choiceIndex) !== -1;
         });
       } else if (interactionId === 'ItemSelectionInput') {
+        var numChoices = $scope.getAnswerChoices().length;
         for (var i = 0; i < answerGroups.length; i++) {
           var ruleSpecs = answerGroups[i].rule_specs;
           for (var j = 0; j < ruleSpecs.length; j++) {
