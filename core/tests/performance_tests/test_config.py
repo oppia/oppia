@@ -43,7 +43,7 @@ TEST_DATA = {
     SPLASH_PAGE_KEY: {
         'url': '/splash',
         'size_limits_mb': {
-            'uncached': 10.0,
+            'uncached': 6.5,
             'cached': 1.0,
         },
         'load_time_limits_secs': {
@@ -60,7 +60,7 @@ TEST_DATA = {
     LIBRARY_PAGE_KEY: {
         'url': '/library',
         'size_limits_mb': {
-            'uncached': 10.0,
+            'uncached': 6.5,
             'cached': 1.0,
         },
         'load_time_limits_secs': {
@@ -77,12 +77,12 @@ TEST_DATA = {
     CREATOR_DASHBOARD_KEY: {
         'url': '/dashboard',
         'size_limits_mb': {
-            'uncached': 10.0,
+            'uncached': 8.0,
             'cached': 1.0,
         },
         'load_time_limits_secs': {
             'uncached': 10.0,
-            'cached': 3.0,
+            'cached': 4.0,
         },
         'preload_options':{
             'login': True,
@@ -94,12 +94,12 @@ TEST_DATA = {
     EXPLORATION_PLAYER_KEY: {
         'url': '/explore/0',
         'size_limits_mb': {
-            'uncached': 10.0,
-            'cached': 1.0,
+            'uncached': 8.0,
+            'cached': 1.2,
         },
         'load_time_limits_secs': {
             'uncached': 10.0,
-            'cached': 3.0,
+            'cached': 8.0
         },
         'preload_options':{
             'login': False,
@@ -111,12 +111,12 @@ TEST_DATA = {
     EXPLORATION_EDITOR_KEY: {
         'url': '/create/0',
         'size_limits_mb': {
-            'uncached': 10.0,
-            'cached': 1.0,
+            'uncached': 12.0,
+            'cached': 2.0,
         },
         'load_time_limits_secs': {
-            'uncached': 10.0,
-            'cached': 3.0,
+            'uncached': 15.0,
+            'cached': 14.0,
         },
         'preload_options':{
             'login': False,
@@ -128,12 +128,12 @@ TEST_DATA = {
     COLLECTION_PLAYER_KEY: {
         'url': '/collection/0',
         'size_limits_mb': {
-            'uncached': 10.0,
+            'uncached': 8.0,
             'cached': 1.0,
         },
         'load_time_limits_secs': {
             'uncached': 10.0,
-            'cached': 3.0,
+            'cached': 5.0,
         },
         'preload_options':{
             'login': False,
@@ -145,7 +145,7 @@ TEST_DATA = {
     PROFILE_PAGE_KEY: {
         'url': '/profile/',
         'size_limits_mb': {
-            'uncached': 10.0,
+            'uncached': 7.0,
             'cached': 1.0,
         },
         'load_time_limits_secs': {
