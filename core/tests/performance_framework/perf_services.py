@@ -88,7 +88,7 @@ class SeleniumPerformanceDataFetcher(object):
 
         self.preload_options = preload_options
         self.exploration_url = None
-        self.dev_appserver_login = None
+        self.dev_appserver_login_cookie = None
 
         random_id = random.randint(1, 100000)
         self.email = 'test%d@example.com' % random_id
@@ -284,11 +284,9 @@ class SeleniumPerformanceDataFetcher(object):
         return driver
 
     def _add_cookie(self, driver):
-        if self.dev_appserver_login:
+        if self.dev_appserver_login_cookie:
             driver.get('%s%s' % (self.BASE_URL, self.DUMMY_URL))
-            driver.add_cookie({'name': 'dev_appserver_login',
-                               'value': self.dev_appserver_login
-                              })
+            driver.add_cookie(self.dev_appserver_login_cookie)
 
     def _stop_proxy_server(self, server):
         server.stop()
@@ -316,7 +314,8 @@ class SeleniumPerformanceDataFetcher(object):
         self._wait_until_page_load_is_finished(5)
         self._complete_signup(driver)
         self._wait_until_page_load_is_finished()
-        self.dev_appserver_login = driver.get_cookie('dev_appserver_login')
+        self.dev_appserver_login_cookie = driver.get_cookie(
+            'dev_appserver_login')
 
     def _complete_signup(self, driver):
         driver.get(self.BASE_URL + self.SIGNUP_URL_SUFFIX)
