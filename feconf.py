@@ -569,9 +569,8 @@ SEARCH_DROPDOWN_CATEGORIES = sorted([
     'History',
 ])
 
-# The header for the "Featured Explorations" category in the library index
-# page.
-LIBRARY_CATEGORY_FEATURED_EXPLORATIONS = 'Featured Explorations'
+# The header for the "Featured Activities" category in the library index page.
+LIBRARY_CATEGORY_FEATURED_ACTIVITIES = 'Featured Activities'
 # The header for the "Top Rated Explorations" category in the library index
 # page.
 LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = 'Top Rated Explorations'
@@ -667,7 +666,8 @@ SAME_TOPIC_SIMILARITY = 1.0
 SUPPORTED_SITE_LANGUAGES = {
     'en': 'English',
     'es': 'Español',
-    'id': 'Bahasa Indonesia'
+    'id': 'Bahasa Indonesia',
+    'pt': 'Português',
 }
 SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 SYSTEM_USER_IDS = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]

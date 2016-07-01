@@ -127,7 +127,6 @@ class SeleniumPerformanceDataFetcher(object):
         server, proxy = self._setup_proxy_server()
         driver = self._setup_driver(proxy=proxy, use_proxy=True)
 
-
         get_page_url = page_url
         if self.exploration_url:
             get_page_url = self.exploration_url

@@ -56,7 +56,7 @@ states:
             - pleased
             - thrilled
             - smile
-          rule_type: ClassifyMatches
+          rule_type: FuzzyMatches
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
