@@ -69,6 +69,18 @@ class ContactPage(base.BaseHandler):
         self.render_template('pages/contact.html')
 
 
+class DonatePage(base.BaseHandler):
+    """Page with information about how to donate to Oppia."""
+
+    def get(self):
+        """Handles GET requests."""
+        self.values.update({
+            'meta_description': feconf.DONATE_PAGE_DESCRIPTION,
+            'nav_mode': feconf.NAV_MODE_DONATE,
+        })
+        self.render_template('pages/donate.html')
+
+
 class ForumPage(base.BaseHandler):
     """Page with an embedded forum."""
 
