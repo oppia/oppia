@@ -137,3 +137,18 @@ class Suggestion(object):
             'state_content': self.state_content
         }
 
+
+class FeedbackMessageReference(object):
+    """Domain object for feedback message references"""
+
+    def __init__(self, exploration_id, thread_id, message_id):
+        self.exploration_id = exploration_id
+        self.thread_id = thread_id
+        self.message_id = message_id
+
+    def to_dict(self):
+        return {
+            'exploration_id': self.exploration_id,
+            'thread_id': self.thread_id,
+            'message_id': self.message_id
+        }

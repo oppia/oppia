@@ -153,6 +153,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/contact', pages.ContactPage, 'contact_page'),
 
     get_redirect_route(r'/forum', pages.ForumPage, 'forum_page'),
+    get_redirect_route(r'/donate', pages.DonatePage, 'donate_page'),
     get_redirect_route(r'/terms', pages.TermsPage, 'terms_page'),
     get_redirect_route(r'/privacy', pages.PrivacyPage, 'privacy_page'),
 
@@ -263,6 +264,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/moderator', moderator.ModeratorPage, 'moderator_page'),
     get_redirect_route(
+        r'/moderatorhandler/featured', moderator.FeaturedActivitiesHandler,
+        'moderator_featured_activities'),
+    get_redirect_route(
         r'/moderatorhandler/email_draft/<action>',
         moderator.EmailDraftHandler, 'moderator_action_email_draft'),
 
@@ -307,9 +311,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/createhandler/data/<exploration_id>', editor.ExplorationHandler,
         'editor_exploration_handler'),
-    get_redirect_route(
-        r'/createhandler/change_list_summary/<exploration_id>',
-        editor.ChangeListSummaryHandler, 'change_list_summary'),
     get_redirect_route(
         r'/createhandler/download/<exploration_id>',
         editor.ExplorationDownloadHandler, 'exploration_download_handler'),

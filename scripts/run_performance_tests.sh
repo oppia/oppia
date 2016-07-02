@@ -76,7 +76,17 @@ chmod 744 $TOOLS_DIR/browsermob-proxy-2.1.1/bin/browsermob-proxy
 # Wait for the servers to come up.
 while ! nc -vz localhost 9501; do sleep 1; done
 
-$PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.splash_test $@ 
+# Install xvfb if not on travis, Used in frontend, e2e tests and performance tests.
+if [ "$TRAVIS" = true ]; then
+  export XVFB_PREFIX=""
+else
+  # This installs xvfb for systems with apt-get installer like Ubuntu, and will fail for other systems.
+  # TODO(gvishal): Install/provide xvfb for other systems.
+  sudo apt-get install xvfb
+  export XVFB_PREFIX="/usr/bin/xvfb-run"
+fi
+
+$XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_path='core/tests/performance_tests' $@ 
 
 chmod 644 $TOOLS_DIR/browsermob-proxy-2.1.1/bin/browsermob-proxy
 rm bmp.log server.log

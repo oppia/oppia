@@ -22,9 +22,6 @@ import urlparse
 from browsermobproxy import Server
 from selenium import webdriver
 
-# Used for headless testing i.e, making browser windows invisible to the user.
-from xvfbwrapper import Xvfb
-
 from core.tests.performance_framework import perf_domain
 
 CHROME_DRIVER_PATH = os.path.join(
@@ -38,7 +35,7 @@ class SeleniumPerformanceDataFetcher(object):
     """Fetches performance data for locally served Oppia pages using Selenium
     and Browsermob-proxy.
 
-    Selenium is used to programitically interact with a browser.
+    Selenium is used to programmatically interact with a browser.
     Browsermob-proxy is used to capture HTTP Archive (referred to as HAR) data.
 
     The HTTP Archive format is a JSON-formatted archive file format used for
@@ -68,18 +65,28 @@ class SeleniumPerformanceDataFetcher(object):
             error_msg = 'Unsupported browser specified: %s' % browser
             raise ValueError(error_msg)
 
+    def load_url(self, page_url):
+        """Loads the specified url, resulting in server-side caching of related
+        resources. Used to obtain a uniform and warm-cache state for the tests,
+        similar to a typical production server state.
+        """
+        driver = self._setup_driver(proxy=None, use_proxy=False)
+
+        driver.get(page_url)
+
+        self._stop_driver(driver)
+
     def get_page_metrics_for_url(self, page_url):
         """Returns a PageSessionMetrics domain object for a given page URL.
         """
-        with Xvfb() as _:
-            server, proxy = self._setup_proxy_server()
-            driver = self._setup_driver(proxy=proxy, use_proxy=True)
+        server, proxy = self._setup_proxy_server()
+        driver = self._setup_driver(proxy=proxy, use_proxy=True)
 
-            proxy.new_har(page_url, options={'captureHeaders': True})
+        proxy.new_har(page_url, options={'captureHeaders': True})
 
-            driver.get(page_url)
+        driver.get(page_url)
 
-            self._wait_until_page_load_is_finished()
+        self._wait_until_page_load_is_finished()
 
         har_dict = proxy.har
 
@@ -96,19 +103,18 @@ class SeleniumPerformanceDataFetcher(object):
         Note: This method is stand-alone and does not require
         `get_page_session_metrics_for_url` to be called before it.
         """
-        with Xvfb() as _:
-            server, proxy = self._setup_proxy_server()
-            driver = self._setup_driver(proxy=proxy, use_proxy=True)
+        server, proxy = self._setup_proxy_server()
+        driver = self._setup_driver(proxy=proxy, use_proxy=True)
 
-            # Fetch the page once. This leads to caching of various resources.
-            driver.get(page_url)
-            self._wait_until_page_load_is_finished()
+        # Fetch the page once. This leads to caching of various resources.
+        driver.get(page_url)
+        self._wait_until_page_load_is_finished()
 
-            # Start recording har data for the next page fetch.
-            proxy.new_har(page_url, options={'captureHeaders': True})
-            driver.get(page_url)
+        # Start recording har data for the next page fetch.
+        proxy.new_har(page_url, options={'captureHeaders': True})
+        driver.get(page_url)
 
-            self._wait_until_page_load_is_finished()
+        self._wait_until_page_load_is_finished()
 
         har_dict = proxy.har
 
@@ -122,14 +128,13 @@ class SeleniumPerformanceDataFetcher(object):
         """Returns a PageSessionMetrics domain object initialized using
         page load timings for a page URL.
         """
-        with Xvfb() as _:
-            driver = self._setup_driver(proxy=None, use_proxy=False)
+        driver = self._setup_driver(proxy=None, use_proxy=False)
 
-            driver.get(page_url)
-            self._wait_until_page_load_is_finished()
+        driver.get(page_url)
+        self._wait_until_page_load_is_finished()
 
-            page_session_timings = (
-                driver.execute_script("return window.performance"))
+        page_session_timings = (
+            driver.execute_script("return window.performance"))
 
         self._stop_driver(driver)
 
@@ -141,18 +146,17 @@ class SeleniumPerformanceDataFetcher(object):
         load timings for a page URL while simulating a cached session i.e, a
         return user.
         """
-        with Xvfb() as _:
-            driver = self._setup_driver(proxy=None, use_proxy=False)
+        driver = self._setup_driver(proxy=None, use_proxy=False)
 
-            # Fetch the page once. This leads to caching of various resources.
-            driver.get(page_url)
-            self._wait_until_page_load_is_finished()
+        # Fetch the page once. This leads to caching of various resources.
+        driver.get(page_url)
+        self._wait_until_page_load_is_finished()
 
-            driver.get(page_url)
-            self._wait_until_page_load_is_finished()
+        driver.get(page_url)
+        self._wait_until_page_load_is_finished()
 
-            page_session_timings = (
-                driver.execute_script("return window.performance"))
+        page_session_timings = (
+            driver.execute_script("return window.performance"))
 
         self._stop_driver(driver)
 

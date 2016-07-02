@@ -137,13 +137,6 @@ if [ ! -d "$TOOLS_DIR/selenium-2.53.2" ]; then
   pip install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2"
 fi
 
-echo Checking if xvfbwrapper is installed in $TOOLS_DIR/pip_packages
-if [ ! -d "$TOOLS_DIR/xvfbwrapper-0.2.8" ]; then
-  echo Installing xvfbwrapper
-
-  pip install xvfbwrapper==0.2.8 --target="$TOOLS_DIR/xvfbwrapper-0.2.8"
-fi
-
 # install pre-push script
 echo Installing pre-push hook for git
 $PYTHON_CMD $OPPIA_DIR/scripts/pre_push_hook.py --install

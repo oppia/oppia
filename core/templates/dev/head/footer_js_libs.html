@@ -1,5 +1,5 @@
-{% if DEV_MODE %}
-  <script src="/third_party/generated/dev/js/third_party.js"></script>
-{% else %}
+{% if MINIFICATION or not DEV_MODE %}
   <script src="/third_party/generated/prod/js/third_party.min.js"></script>
+{% else %}
+  <script src="/third_party/generated/dev/js/third_party.js"></script>
 {% endif %}

@@ -20,25 +20,59 @@
 
     <li>
       <a href="" ng-click="showEmbedExplorationModal(explorationId)" tooltip="Embed" tooltip-placement="top">
-        <i class="material-icons md-15 share-option-embed" style="color: black;">&#xE157;</i>
+        <i class="material-icons md-48 embed-link">&#xE86F;</i>
       </a>
     </li>
   </ul>
 </script>
 
 <style>
-  ul.oppia-sharing-links {
-    list-style: none;
+  .oppia-sharing-links .embed-link {
+    color: white;
+    background: #009688;
+    border-radius: 2px;
+    height: 40px;
+    margin: 3px;
+    padding-top: calc(50% - 15px);
+    text-align: center;
+    width: 40px;
   }
 
   .oppia-sharing-links .share-option-img, .share-option-embed {
     border-radius: 2px;
-    height: 40px;
+    height: 100%;
     margin: 3px;
     width: 40px;
   }
   .share-option-embed {
     background-color: #eee;
     background-size: cover;
+	}
+  .oppia-sharing-links-small {
+    float: left;
+  }
+
+  .oppia-sharing-links-small ul {
+    margin-bottom: 0;
+  }
+
+  .oppia-sharing-links-small li:first-child a img {
+    margin-left: 0;
+  }
+
+  .oppia-sharing-links-small ul .share-option-img,
+  .oppia-sharing-links-small ul .embed-link {
+    font-size: 14px;
+    height: 16px;
+    width: 16px;
+  }
+
+  .oppia-sharing-links-small ul .embed-link {
+    padding-top: 0;
+  }
+
+  ul.oppia-sharing-links {
+    list-style: none;
+    padding: 0;
   }
 </style>

@@ -129,7 +129,7 @@ def require_editor(handler):
             raise self.PageNotFoundException
 
         if not rights_manager.Actor(self.user_id).can_edit(
-                rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
+                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to edit this exploration.',
                 self.user_id)
@@ -171,7 +171,7 @@ class ExplorationPage(EditorHandler):
             exploration_id, strict=False)
         if (exploration is None or
                 not rights_manager.Actor(self.user_id).can_view(
-                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id)):
+                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id)):
             self.redirect('/')
             return
 
@@ -179,7 +179,7 @@ class ExplorationPage(EditorHandler):
             bool(self.user_id) and
             self.username not in config_domain.BANNED_USERNAMES.value and
             rights_manager.Actor(self.user_id).can_edit(
-                rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id))
+                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
 
         interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
@@ -213,26 +213,26 @@ class ExplorationPage(EditorHandler):
             'additional_angular_modules': additional_angular_modules,
             'can_delete': rights_manager.Actor(
                 self.user_id).can_delete(
-                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id),
+                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
             'can_edit': can_edit,
             'can_modify_roles': rights_manager.Actor(
                 self.user_id).can_modify_roles(
-                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id),
+                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
             'can_publicize': rights_manager.Actor(
                 self.user_id).can_publicize(
-                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id),
+                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
             'can_publish': rights_manager.Actor(
                 self.user_id).can_publish(
-                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id),
+                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
             'can_release_ownership': rights_manager.Actor(
                 self.user_id).can_release_ownership(
-                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id),
+                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
             'can_unpublicize': rights_manager.Actor(
                 self.user_id).can_unpublicize(
-                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id),
+                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
             'can_unpublish': rights_manager.Actor(
                 self.user_id).can_unpublish(
-                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id),
+                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
             'gadget_templates': jinja2.utils.Markup(gadget_templates),
             'interaction_templates': jinja2.utils.Markup(
@@ -319,7 +319,7 @@ class ExplorationHandler(EditorHandler):
     def get(self, exploration_id):
         """Gets the data for the exploration overview page."""
         if not rights_manager.Actor(self.user_id).can_view(
-                rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
+                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             raise self.PageNotFoundException
         # 'apply_draft' and 'v'(version) are optional parameters because the
         # exploration history tab also uses this handler, and these parameters
@@ -382,7 +382,7 @@ class ExplorationHandler(EditorHandler):
 
         exploration = exp_services.get_exploration_by_id(exploration_id)
         can_delete = rights_manager.Actor(self.user_id).can_delete(
-            rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration.id)
+            feconf.ACTIVITY_TYPE_EXPLORATION, exploration.id)
         if not can_delete:
             raise self.UnauthorizedUserException(
                 'User %s does not have permissions to delete exploration %s' %
@@ -420,7 +420,7 @@ class ExplorationRightsHandler(EditorHandler):
         if new_member_username:
             if not rights_manager.Actor(
                     self.user_id).can_modify_roles(
-                        rights_manager.ACTIVITY_TYPE_EXPLORATION,
+                        feconf.ACTIVITY_TYPE_EXPLORATION,
                         exploration_id):
                 raise self.UnauthorizedUserException(
                     'Only an owner of this exploration can add or change '
@@ -618,8 +618,8 @@ class UntrainedAnswersHandler(EditorHandler):
         answers = stats_services.get_top_state_rule_answers(
             exploration_id, state_name, [
                 exp_domain.DEFAULT_RULESPEC_STR,
-                exp_domain.CLASSIFIER_RULESPEC_STR],
-            self.NUMBER_OF_TOP_ANSWERS_PER_RULE)
+                exp_domain.CLASSIFIER_RULESPEC_STR])[
+                    :self.NUMBER_OF_TOP_ANSWERS_PER_RULE]
 
         interaction = state.interaction
         unhandled_answers = []
@@ -677,7 +677,7 @@ class ExplorationDownloadHandler(EditorHandler):
             raise self.PageNotFoundException
 
         if not rights_manager.Actor(self.user_id).can_view(
-                rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
+                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             raise self.PageNotFoundException
 
         version = self.request.get('v', default_value=exploration.version)
@@ -887,41 +887,6 @@ class ImageUploadHandler(EditorHandler):
         fs.commit(self.user_id, filepath, raw)
 
         self.render_json({'filepath': filepath})
-
-
-class ChangeListSummaryHandler(EditorHandler):
-    """Returns a summary of a changelist applied to a given exploration."""
-
-    @require_editor
-    def post(self, exploration_id):
-        """Handles POST requests."""
-        change_list = self.payload.get('change_list')
-        version = self.payload.get('version')
-        current_exploration = exp_services.get_exploration_by_id(
-            exploration_id)
-
-        if version != current_exploration.version:
-            # TODO(sll): Improve the handling of merge conflicts.
-            self.render_json({
-                'is_version_of_draft_valid': False
-            })
-        else:
-            utils.recursively_remove_key(change_list, '$$hashKey')
-
-            summary = exp_services.get_summary_of_change_list(
-                current_exploration, change_list)
-            updated_exploration = exp_services.apply_change_list(
-                exploration_id, change_list)
-            warning_message = ''
-            try:
-                updated_exploration.validate(strict=True)
-            except utils.ValidationError as e:
-                warning_message = unicode(e)
-
-            self.render_json({
-                'summary': summary,
-                'warning_message': warning_message
-            })
 
 
 class StartedTutorialEventHandler(EditorHandler):
