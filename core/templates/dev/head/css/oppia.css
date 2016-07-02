@@ -961,7 +961,7 @@ textarea {
     margin-left: 5vw;
     margin-right: 5vw;
     max-width: 89vw;
-    width: 632px;
+    width: initial;
   }
 }
 @media (max-width: 632px) {
@@ -969,7 +969,7 @@ textarea {
     margin-left: 2vw;
     margin-right: 2vw;
     max-width: 96vw;
-    width: 420px;
+    width :initial;
   }
 }
 @media (max-width: 420px) {
