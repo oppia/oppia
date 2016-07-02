@@ -85,7 +85,7 @@ CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION = (
 # used as an identifier for the default rule when storing which rule an answer
 # was matched against.
 DEFAULT_RULESPEC_STR = 'Default'
-CLASSIFIER_RULESPEC_STR = 'ClassifyMatches'
+CLASSIFIER_RULESPEC_STR = 'FuzzyMatches'
 
 
 def _get_full_customization_args(customization_args, ca_specs):

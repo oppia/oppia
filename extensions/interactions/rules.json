@@ -176,7 +176,7 @@
     "FuzzyEquals": {
       "description": "is equal to {{x|NormalizedString}}, misspelled by at most one character"
     },
-    "ClassifyMatches": {
+    "FuzzyMatches": {
       "description": "is similar to {{training_data|SetOfNormalizedString}}"
     }
   }
