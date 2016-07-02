@@ -988,6 +988,7 @@ textarea {
 }
 
 .oppia-library-group-header-container {
+  width: 95%;
   width: calc(100% - 143px);
   max-width: 928px;
   min-width: 315px;
@@ -1015,6 +1016,7 @@ textarea {
 
 @media(max-width: 720px) {
   .oppia-library-group-header {
+    width: 76%;
     width: calc(80% - 143px);
   }
 }
