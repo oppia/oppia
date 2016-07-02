@@ -39,10 +39,10 @@
     <!-- Tiles for Internet Explorer. -->
     <meta name="application-name" content="{{SITE_NAME}}">
     <meta name="msapplication-TileColor" content="#ffffff">
-    <meta name="msapplication-square70x70logo" content="{{DOMAIN_URL}}/images/logo/msapplication-tiny.png">
-    <meta name="msapplication-square150x150logo" content="{{DOMAIN_URL}}/images/logo/msapplication-square.png">
-    <meta name="msapplication-wide310x150logo" content="{{DOMAIN_URL}}/images/logo/msapplication-wide.png">
-    <meta name="msapplication-square310x310logo" content="{{DOMAIN_URL}}/images/logo/msapplication-large.png">
+    <meta name="msapplication-square70x70logo" content="{{DOMAIN_URL}}/static/{{cache_slug}}/images/logo/msapplication-tiny.png">
+    <meta name="msapplication-square150x150logo" content="{{DOMAIN_URL}}/static/{{cache_slug}}/images/logo/msapplication-square.png">
+    <meta name="msapplication-wide310x150logo" content="{{DOMAIN_URL}}/static/{{cache_slug}}/images/logo/msapplication-wide.png">
+    <meta name="msapplication-square310x310logo" content="{{DOMAIN_URL}}/static/{{cache_slug}}/images/logo/msapplication-large.png">
 
     <!-- The itemprops are for G+ sharing. -->
     <meta itemprop="name" content="{{meta_name}}">
@@ -53,9 +53,9 @@
     <meta property="og:url" content="{{FULL_URL}}">
     <meta property="og:description" content="{{meta_description}}">
     <meta property="og:type" content="article">
-    <meta property="og:image" content="{{DOMAIN_URL}}/images/logo/288x288_logo_mint.png">
+    <meta property="og:image" content="{{DOMAIN_URL}}/static/{{cache_slug}}/images/logo/288x288_logo_mint.png">
 
-    <link rel="apple-touch-icon" href="/images/logo/favicon.png">
+    <link rel="apple-touch-icon" href="/static/{{cache_slug}}/images/logo/favicon.png">
 
     <!-- The title is bound to the rootScope. The content of the block
     maintitle can be a string or a translation id. If it is a translation it
@@ -76,6 +76,7 @@
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
         csrf_token_i18n: JSON.parse('{{csrf_token_i18n|js_string}}'),
         csrf_token_create_exploration: JSON.parse('{{csrf_token_create_exploration|js_string}}'),
+        CACHE_SLUG: JSON.parse('{{cache_slug|js_string}}'),
         DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}'),
         MINIFICATION: JSON.parse('{{MINIFICATION|js_string}}'),
         INVALID_NAME_CHARS: JSON.parse('{{INVALID_NAME_CHARS|js_string}}'),
@@ -129,11 +130,11 @@
                       <i class="material-icons oppia-navbar-menu-icon">&#xE5D2;</i>
                     </a>
                     <a class="oppia-navbar-brand-name oppia-transition-200" href="/" focus-on="<[LABEL_FOR_CLEARING_FOCUS]>">
-                      <img src="/images/logo/288x128_logo_white.png" class="oppia-logo" ng-class="windowIsNarrow ? 'oppia-logo-small' : 'oppia-logo-wide'">
+                      <img src="/static/{{cache_slug}}/images/logo/288x128_logo_white.png" class="oppia-logo" ng-class="windowIsNarrow ? 'oppia-logo-small' : 'oppia-logo-wide'">
                     </a>
                     <!-- This is needed for the correct image to appear when an exploration is shared using G+. -->
                     <a style="display: none;">
-                      <img src="/images/logo/288x128_logo_mint.png" itemprop="image">
+                      <img src="/static/{{cache_slug}}/images/logo/288x128_logo_mint.png" itemprop="image">
                     </a>
                   </div>
 
@@ -236,7 +237,7 @@
                             <ul class="dropdown-menu oppia-navbar-dropdown" role="menu" style="margin-right: 15px; padding: 0;" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
                               <li>
                                 <a href style="padding: 0; width: 200px;" ng-click="onLoginButtonClicked('{{login_url}}')">
-                                  <img src="/images/signin/Red-signin-Long-base-44dp.png">
+                                  <img src="/static/{{cache_slug}}/images/signin/Red-signin-Long-base-44dp.png">
                                 </a>
                               </li>
                             </ul>

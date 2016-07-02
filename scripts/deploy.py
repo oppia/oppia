@@ -23,7 +23,7 @@ of the uploaded files to a deployment folder in the parent directory of the
 oppia/ folder. It then pushes this build to the production server.
 
 IMPORTANT NOTES:
-
+@TODO(gvishal): update cache slugs here.
 1.  You will need to first create a folder called ../deploy_data/[APP_NAME],
     where [APP_NAME] is the name of your app as defined in app.yaml. This
     folder should contain a folder called /images, which in turn should

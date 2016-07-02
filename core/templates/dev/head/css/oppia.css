@@ -1307,7 +1307,7 @@ md-card.oppia-dashboard-tile {
   cursor: pointer;
 }
 .toast-warning {
-  background-image: url("/images/general/warning.png");
+  background-image: url("/static/common/images/general/warning.png");
 }
 
 @media all and (max-width: 240px) {
@@ -3657,7 +3657,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-about-header {
   background-blend-mode: multiply;
   background-color: #afd2eb;
-  background-image: url("../images/general/icons-bg.png");
+  background-image: url("../static/common/images/general/icons-bg.png");
   padding: 10%;
   text-align: center;
 }

@@ -49,7 +49,8 @@ describe('Dashboard backend API service', function() {
         },
         community_owned: false,
         tags: '',
-        thumbnail_icon_url: '/images/subjects/Computing.svg',
+        thumbnail_icon_url: (
+          '/static/' + GLOBALS.CACHE_SLUG + '/images/subjects/Computing.svg'),
         thumbnail_bg_color: '#bb8b2f',
         num_views: 2,
         num_open_threads: 0,

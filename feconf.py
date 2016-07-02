@@ -40,6 +40,7 @@ if PLATFORM == 'gae':
 else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
 
+CACHE_SLUG = 'dev'
 
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
@@ -131,8 +132,8 @@ PATH_MAP = {
     '/extensions/gadgets': GADGETS_DIR,
     '/extensions/interactions': INTERACTIONS_DIR,
     '/extensions/rich_text_components': RTE_EXTENSIONS_DIR,
-    '/favicon.ico': os.path.join('static', 'images', 'favicon.ico'),
-    '/images': os.path.join('static', 'images'),
+    '/favicon.ico': os.path.join('static', 'favicon.ico'),
+    '/images': os.path.join('static', CACHE_SLUG, 'images'),
     '/lib/static': os.path.join('lib', 'static'),
     '/third_party/static': os.path.join('third_party', 'static'),
 }

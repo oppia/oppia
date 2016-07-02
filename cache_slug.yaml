@@ -1,0 +1,3 @@
+# cache slug should not start or end with any slashes.
+cache_slug:
+  prod/1234

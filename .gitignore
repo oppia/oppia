@@ -14,3 +14,7 @@ venv/
 .DS_Store
 .idea
 .vagrant/*
+
+# required for cache slugs
+static/*
+!static/dev

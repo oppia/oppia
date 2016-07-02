@@ -353,7 +353,8 @@ oppia.factory('oppiaPlayerService', [
       // user is not logged in or has not uploaded a profile picture, or the
       // player is in preview mode.
       getUserProfileImage: function() {
-        var DEFAULT_PROFILE_IMAGE_PATH = '/images/avatar/user_blue_72px.png';
+        var DEFAULT_PROFILE_IMAGE_PATH = ('/static/' + GLOBALS.CACHE_SLUG +
+          '/images/avatar/user_blue_72px.png');
         var deferred = $q.defer();
         if (_isLoggedIn && !_editorPreviewMode) {
           $http.get(

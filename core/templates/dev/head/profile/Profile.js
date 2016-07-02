@@ -20,7 +20,8 @@ oppia.controller('Profile', [
   '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
   function($scope, $http, $rootScope, oppiaDatetimeFormatter) {
     var profileDataUrl = '/profilehandler/data/' + GLOBALS.PROFILE_USERNAME;
-    var DEFAULT_PROFILE_PICTURE_URL = '/images/general/no_profile_picture.png';
+    var DEFAULT_PROFILE_PICTURE_URL = ('/static/' + GLOBALS.CACHE_SLUG +
+      '/images/general/no_profile_picture.png');
 
     $scope.getLocaleDateString = function(millisSinceEpoch) {
       return oppiaDatetimeFormatter.getLocaleDateString(millisSinceEpoch);

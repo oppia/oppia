@@ -429,7 +429,8 @@ def get_thumbnail_icon_url_for_category(category):
         category if category in feconf.ALL_CATEGORIES
         else feconf.DEFAULT_THUMBNAIL_ICON)
     # Remove all spaces from the string.
-    return '/images/subjects/%s.svg' % icon_name.replace(' ', '')
+    return ('/static/%s/images/subjects/%s.svg'
+            % (get_cache_slug(), icon_name.replace(' ', '')))
 
 
 def _get_short_language_description(full_language_description):
@@ -453,3 +454,17 @@ def get_all_language_codes_and_names():
 def unescape_encoded_uri_component(escaped_string):
     """Unescape a string that is encoded with encodeURIComponent."""
     return urllib.unquote(escaped_string).decode('utf-8')
+
+
+cache_slug = None  # pylint: disable=invalid-name
+def get_cache_slug():
+    if cache_slug is None:
+        yaml_file_content = {}
+        if not feconf.DEV_MODE:
+            yaml_file_content = dict_from_yaml(
+                get_file_contents('cache_slug.yaml'))
+
+        # pylint: disable=redefined-outer-name
+        cache_slug = yaml_file_content.get('cache_slug', feconf.CACHE_SLUG)
+
+    return cache_slug
