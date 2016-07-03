@@ -120,6 +120,12 @@ body {
   display: none !important;
 }
 
+/* Select2 dropdown corners should not be rounded */
+.select2-container .select2-choice,
+.select2-container .select2-choice .select2-arrow {
+  border-radius: 0;
+}
+
 .oppia-dashboard-container {
   margin: 60px auto 30px auto;
   max-width: 800px;
