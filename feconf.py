@@ -193,6 +193,9 @@ CAN_SEND_FEEDBACK_MESSAGE_EMAILS = False
 # Time to wait before sending feedback message emails (currently set to 1
 # hour).
 DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS = 3600
+# Whether to send an email when new feedback message is recived for
+# an exploration.
+DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE = True
 # Whether to send email updates to a user who has not specified a preference.
 DEFAULT_EMAIL_UPDATES_PREFERENCE = False
 # Whether to send an invitation email when the user is granted
@@ -208,6 +211,7 @@ DUPLICATE_EMAIL_INTERVAL_MINS = 2
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
 EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION = 'editor_role_notification'
+EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION = 'feedback_message_notification'
 EMAIL_INTENT_MARKETING = 'marketing'
 EMAIL_INTENT_PUBLICIZE_EXPLORATION = 'publicize_exploration'
 EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
@@ -400,6 +404,7 @@ DASHBOARD_URL = '/dashboard'
 DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % DASHBOARD_URL
 DASHBOARD_DATA_URL = '/dashboardhandler/data'
 EDITOR_URL_PREFIX = '/create'
+EMAILS_TASK_PREFIX = '/task/email'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
@@ -408,7 +413,8 @@ EXPLORATION_URL_PREFIX = '/explore'
 FEEDBACK_STATS_URL_PREFIX = '/feedbackstatshandler'
 FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
-FEEDBACK_MESSAGE_EMAIL_HANDLER_URL = '/feedbackemailhandler'
+FEEDBACK_MESSAGE_EMAIL_HANDLER_URL = (
+    '%s/feedbackemailhandler' % EMAILS_TASK_PREFIX)
 LIBRARY_INDEX_URL = '/library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
 LIBRARY_SEARCH_URL = '/search/find'

@@ -95,10 +95,12 @@ oppia.controller('Preferences', [
     };
 
     $scope.saveEmailPreferences = function(
-      canReceiveEmailUpdates, canReceiveEditorRoleEmail) {
+      canReceiveEmailUpdates, canReceiveEditorRoleEmail,
+      canReceiveFeedbackMessageEmail) {
       var data = {
         can_receive_email_updates: canReceiveEmailUpdates,
-        can_receive_editor_role_email: canReceiveEditorRoleEmail
+        can_receive_editor_role_email: canReceiveEditorRoleEmail,
+        can_receive_feedback_message_email: canReceiveFeedbackMessageEmail
       };
       _saveDataItem('email_preferences', data);
     };
@@ -194,6 +196,8 @@ oppia.controller('Preferences', [
       $scope.profilePictureDataUrl = data.profile_picture_data_url;
       $scope.canReceiveEmailUpdates = data.can_receive_email_updates;
       $scope.canReceiveEditorRoleEmail = data.can_receive_editor_role_email;
+      $scope.canReceiveFeedbackMessageEmail = (
+        data.can_receive_feedback_message_email);
       $scope.preferredSiteLanguageCode = data.preferred_site_language_code;
       $scope.hasPageLoaded = true;
       _forceSelect2Refresh();

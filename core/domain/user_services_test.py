@@ -217,25 +217,36 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             email_preferences['can_receive_editor_role_email'],
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
 
+        email_preferences = user_services.get_email_preferences(user_id)
+        self.assertEquals(
+            email_preferences['can_receive_feedback_message_email'],
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
+
         # The user retrieves their email preferences. This initializes
         # a UserEmailPreferencesModel instance with the default values.
         user_services.update_email_preferences(
             user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
-            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
 
         email_preferences = user_services.get_email_preferences(user_id)
         self.assertEquals(
             email_preferences['can_receive_editor_role_email'],
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+        self.assertEquals(
+            email_preferences['can_receive_feedback_message_email'],
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
 
         # The user sets their membership email preference to False.
         user_services.update_email_preferences(
-            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE, False)
+            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE, False,
+            False)
 
         email_preferences = user_services.get_email_preferences(user_id)
         self.assertEquals(
-            email_preferences['can_receive_editor_role_email'],
-            False)
+            email_preferences['can_receive_editor_role_email'], False)
+        self.assertEquals(
+            email_preferences['can_receive_feedback_message_email'], False)
 
 
 class UpdateContributionMsecTests(test_utils.GenericTestBase):
