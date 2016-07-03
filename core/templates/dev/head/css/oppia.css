@@ -3599,16 +3599,6 @@ md-card.preview-conversation-skin-supplemental-card {
   vertical-align: initial;
 }
 
-.oppia-activity-summary-tile .oppia-sharing-links {
-  padding-left: 22px;
-  margin-top: 2px;
-}
-
-.oppia-activity-summary-tile .oppia-sharing-links .share-option-img {
-  height: 15px;
-  width: 15px;
-}
-
 .oppia-activity-summary-tile .recently-updated {
   color: rgb(19,105,193);
   font-size: 1.1em;
@@ -3617,7 +3607,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-activity-summary-tile.oppia-dashboard-card-view-item {
-  height: 260px;
+  height: 240px;
 }
 
 .oppia-activity-summary-tile.oppia-dashboard-card-view-item .exp-private-text {

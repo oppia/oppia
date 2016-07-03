@@ -201,12 +201,6 @@
                   <[exploration.num_total_threads]>
                 </li>
               </ul>
-              <sharing-links flex="100"
-                             layout-type="row"
-                             layout-align-type="center center"
-                             twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR"
-                             exploration-id="exploration.id">
-               </sharing-links>
             </div>
         </md-card>
       </div>
@@ -289,7 +283,6 @@
   </div>
 
   {% include 'components/create_activity_modal.html' %}
-  {% include 'components/sharing_links_directive.html' %}
   {% include 'components/upload_activity_modal.html' %}
 {% endblock %}
 
@@ -297,7 +290,6 @@
   {{ super() }}
   <script>
     {{ include_js_file('components/CollectionCreationService.js') }}
-    {{ include_js_file('components/SharingLinksDirective.js') }}
     {{ include_js_file('dashboard/Dashboard.js') }}
     {{ include_js_file('domain/dashboard/DashboardBackendApiService.js') }}
   </script>
