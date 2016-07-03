@@ -250,12 +250,14 @@
           <input type="text" class="form-control" ng-model="explorationTitleService.displayed"
                  placeholder="Music in the 19th Century">
         </p>
-        <p ng-if="requireObjectiveToBeSpecified">
-          Add a goal: what does the exploration help people to do?
-          <input type="text" class="form-control" ng-minlength="15" ng-model="explorationObjectiveService.displayed"
-                 placeholder="Learn how to ...">
-          <span class="help-block" style="font-size: smaller">Please provide a descriptive goal to help people understand what this exploration is about.</span>
-        </p>
+        <div ng-class="{'has-error': !explorationObjectiveService.displayed}">
+          <p ng-if="requireObjectiveToBeSpecified">
+            Add a goal: what does the exploration help people to do?
+            <input type="text" class="form-control" ng-minlength="15" ng-model="explorationObjectiveService.displayed"
+                   placeholder="Learn how to ...">
+            <span class="help-block" style="font-size: smaller">Please provide a descriptive goal to help people understand what this exploration is about.</span>
+          </p>
+        </div>
         <p ng-if="requireCategoryToBeSpecified">
           Add a category: how would you categorize your exploration?
           <select2-dropdown item="explorationCategoryService.displayed"
