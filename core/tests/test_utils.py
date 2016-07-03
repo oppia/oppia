@@ -467,7 +467,9 @@ class TestBase(unittest.TestCase):
         return new_param_dict
 
     def get_cache_slug_filepath(self):
-        """Returns cache slug filepath for referencing files on disk."""
+        """Returns cache slug filepath for referencing files on disk.
+        examples: 'dev' or 'prod/1234'
+        """
         if feconf.DEV_MODE:
             cache_slug_filepath = feconf.CACHE_SLUG_DEV
         else:
