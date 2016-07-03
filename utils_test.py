@@ -16,6 +16,7 @@
 
 # pylint: disable=relative-import
 from core.tests import test_utils
+import feconf
 import utils
 # pylint: enable=relative-import
 
@@ -181,10 +182,23 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_get_thumbnail_icon_url_for_category(self):
         self.assertEqual(
             utils.get_thumbnail_icon_url_for_category('Architecture'),
-            '/images/subjects/Architecture.svg')
+            '/static/%s/images/subjects/Architecture.svg'
+            % utils.get_cache_slug())
         self.assertEqual(
             utils.get_thumbnail_icon_url_for_category('Graph Theory'),
-            '/images/subjects/GraphTheory.svg')
+            '/static/%s/images/subjects/GraphTheory.svg'
+            % utils.get_cache_slug())
         self.assertEqual(
             utils.get_thumbnail_icon_url_for_category('Nonexistent'),
-            '/images/subjects/Lightbulb.svg')
+            '/static/%s/images/subjects/Lightbulb.svg' % utils.get_cache_slug())
+
+    def test_get_cache_slug_returns_correct_slug(self):
+
+        with self.swap(feconf, 'DEV_MODE', True):
+            cache_slug = utils.get_cache_slug()
+            self.assertIn('dev', cache_slug)
+
+        # TODO(gvishal): Fix it for prod.
+        # with self.swap(feconf, 'DEV_MODE', False):
+        #     cache_slug = utils.get_cache_slug()
+        #     self.assertIn('prod/', cache_slug)

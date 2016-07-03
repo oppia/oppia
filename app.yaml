@@ -21,11 +21,6 @@ handlers:
   http_headers:
     Cache-Control: 'public, max-age=2592000'
     Vary: Accept-Encoding
-- url: /static
-  static_dir: static
-  secure: always
-  http_headers:
-    Cache-Control: 'public, max-age=600'
 - url: /robots.txt
   static_files: static/common/robots.txt
   upload: static/common/robots.txt
@@ -33,6 +28,11 @@ handlers:
   http_headers:
     Cache-Control: 'public, max-age=2592000'
     Vary: Accept-Encoding
+- url: /static
+  static_dir: static
+  secure: always
+  http_headers:
+    Cache-Control: 'public, max-age=600'
 - url: /css
   # NB: not minified. TODO(sll): fix.
   static_dir: core/templates/dev/head/css

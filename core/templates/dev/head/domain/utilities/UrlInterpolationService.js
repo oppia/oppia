@@ -114,6 +114,29 @@ oppia.factory('UrlInterpolationService', ['alertsService',
         match = filledUrl.match(INTERPOLATION_VARIABLE_REGEX);
       }
       return filledUrl;
+    },
+
+    /**
+     * Given an image path, returns the complete url path to that image
+     * prefixing the appropriate cache_slug to it.
+     */
+    getStaticImageUrl: function(imagePath) {
+      if (!imagePath) {
+        alertsService.fatalWarning(
+          'Empty image path passed in getStaticImageUrl.');
+        return null;
+      }
+
+      var IMAGE_PATH_STARTS_WITH_FORWARD_SLASH = /^\//;
+      // Ensure that imagePath starts with a forward slash.
+      if (!imagePath.match(IMAGE_PATH_STARTS_WITH_FORWARD_SLASH)) {
+        alertsService.fatalWarning(
+          'Image path passed into getStaticImageUrl must start with \'\/\': ' +
+          '\'' + new String(imagePath) + '\'.');
+        return null;
+      }
+
+      return '/static/' + GLOBALS.CACHE_SLUG + '/images' + imagePath;
     }
   };
 }]);

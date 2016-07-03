@@ -40,7 +40,11 @@ if PLATFORM == 'gae':
 else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
 
-CACHE_SLUG = 'dev'
+# Defines the cache slug to be used in development mode. It is referenced
+# in utils.get_cache_slug() if Oppia is in dev mode. It is used as a prefix
+# in urls for images, css and script files. It is also used in backend_tests
+# to verify the presence of static resources.
+CACHE_SLUG_DEV = 'dev'
 
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
@@ -124,18 +128,6 @@ ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
     'jpeg': ['jpg', 'jpeg'],
     'png': ['png'],
     'gif': ['gif']
-}
-
-# Static file url to path mapping
-PATH_MAP = {
-    '/css': os.path.join('core', 'templates', 'dev', 'head', 'css'),
-    '/extensions/gadgets': GADGETS_DIR,
-    '/extensions/interactions': INTERACTIONS_DIR,
-    '/extensions/rich_text_components': RTE_EXTENSIONS_DIR,
-    '/favicon.ico': os.path.join('static', 'favicon.ico'),
-    '/images': os.path.join('static', CACHE_SLUG, 'images'),
-    '/lib/static': os.path.join('lib', 'static'),
-    '/third_party/static': os.path.join('third_party', 'static'),
 }
 
 # A string containing the disallowed characters in state or exploration names.

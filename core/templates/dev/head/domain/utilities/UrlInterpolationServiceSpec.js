@@ -205,4 +205,33 @@ describe('URL Interpolation Service', function() {
     })).toThrow(new Error(
       'Parameters passed into interpolateUrl must be strings.'));
   });
+
+  it('should interpolate correct imagePath', function() {
+    expect(uis.getStaticImageUrl('/test_url/')).toBe(
+      '/static/' + GLOBALS.CACHE_SLUG + '/images' + '/test_url/');
+    expect(uis.getStaticImageUrl('/test_url/test.png')).toBe(
+      '/static/' + GLOBALS.CACHE_SLUG + '/images' + '/test_url/test.png');
+  });
+
+  it('should throw an error for empty imagePath', function() {
+    expect(uis.getStaticImageUrl.bind(null)).toThrow(
+      new Error(
+        'Empty image path passed in getStaticImageUrl.'));
+    expect(uis.getStaticImageUrl.bind('')).toThrow(
+      new Error(
+        'Empty image path passed in getStaticImageUrl.'));
+  });
+
+  // TODO(gvishal): This test gives error, despite everything being correct.
+  it('should throw an error for imagePath not beginning with forward slash',
+    function() {
+      expect(uis.getStaticImageUrl('test_url_fail')).toThrow(
+        new Error(
+          'Image path passed into getStaticImageUrl must start with \'\/\': ' +
+          '\'' + new String('test_url_fail') + '\''));
+      expect(uis.getStaticImageUrl('test_url_fail/fail.png')).toThrow(
+        new Error(
+          'Image path passed into getStaticImageUrl must start with \'\/\': ' +
+          '\'' + new String('test_url_fail/fail.png') + '\'.'));
+    });
 });

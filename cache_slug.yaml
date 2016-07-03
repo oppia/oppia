@@ -1,3 +1,5 @@
-# cache slug should not start or end with any slashes.
+# Cache slug is a prefix that is attached to static resource paths such as
+# images, scripts and css.It should only contain alphanumeric characters.
+# It will be automatically updated by build.py when deploy.py is run.
 cache_slug:
-  prod/1234
+  1234

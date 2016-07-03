@@ -291,8 +291,9 @@ oppia.directive('conversationSkin', [function() {
         $scope.hasFullyLoaded = false;
         $scope.recommendedExplorationSummaries = [];
 
-        $scope.OPPIA_AVATAR_IMAGE_URL = ('/static/' + GLOBALS.CACHE_SLUG +
-          '/images/avatar/oppia_black_72px.png');
+        $scope.OPPIA_AVATAR_IMAGE_URL = (
+          UrlInterpolationService.getStaticImageUrl(
+            '/avatar/oppia_black_72px.png'));
 
         $scope.activeCard = null;
         $scope.numProgressDots = 0;
@@ -305,8 +306,10 @@ oppia.directive('conversationSkin', [function() {
         $scope.helpCardHtml = null;
         $scope.helpCardHasContinueButton = false;
 
-        $scope.profilePicture = ('/static/' + GLOBALS.CACHE_SLUG +
-          '/images/avatar/user_blue_72px.png');
+        $scope.profilePicture = (
+          UrlInterpolationService.getStaticImageUrl(
+          '/avatar/user_blue_72px.png'));
+
         oppiaPlayerService.getUserProfileImage().then(function(result) {
           $scope.profilePicture = result;
         });

@@ -458,13 +458,18 @@ def unescape_encoded_uri_component(escaped_string):
 
 cache_slug = None  # pylint: disable=invalid-name
 def get_cache_slug():
+    """Returns appropriate cache slug depending whether dev or prod. This cache
+    slug should only be used for urls in html, css and js files since it
+    contains a forward slash.
+    """
+    global cache_slug # pylint: disable=global-statement, invalid-name
     if cache_slug is None:
-        yaml_file_content = {}
-        if not feconf.DEV_MODE:
+        # pylint: disable=redefined-outer-name
+        if feconf.DEV_MODE:
+            cache_slug = feconf.CACHE_SLUG_DEV
+        else:
             yaml_file_content = dict_from_yaml(
                 get_file_contents('cache_slug.yaml'))
-
-        # pylint: disable=redefined-outer-name
-        cache_slug = yaml_file_content.get('cache_slug', feconf.CACHE_SLUG)
+            cache_slug = '%s/%s' % ('prod', yaml_file_content['cache_slug'])
 
     return cache_slug

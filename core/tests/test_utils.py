@@ -466,6 +466,19 @@ class TestBase(unittest.TestCase):
                 obj_type, new_param_dict)
         return new_param_dict
 
+    def get_cache_slug_filepath(self):
+        """Returns cache slug filepath for referencing files on disk."""
+        if feconf.DEV_MODE:
+            cache_slug_filepath = feconf.CACHE_SLUG_DEV
+        else:
+            yaml_file_content = {}
+            yaml_file_content = utils.dict_from_yaml(
+                utils.get_file_contents('cache_slug.yaml'))
+            cache_slug_filepath = os.path.join(
+                'prod', yaml_file_content['cache_slug'])
+
+        return cache_slug_filepath
+
     @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):
         """Swap an object's attribute value within the context of a

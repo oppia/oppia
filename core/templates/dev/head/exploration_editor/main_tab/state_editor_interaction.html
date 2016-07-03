@@ -10,7 +10,7 @@
   <div ng-if="interactionId">
     <md-card class="oppia-editor-card-with-avatar">
       <div class="oppia-editor-card-body" title="<[getCurrentInteractionName()]>">
-        <img src="/static/{{cache_slug}}/images/avatar/user_blue_72px.png" alt="" class="oppia-editor-card-avatar">
+        <img ng-src="<[userBlueImgUrl]>" alt="" class="oppia-editor-card-avatar">
         <div class="oppia-editor-card-section-container">
           <div class="oppia-editor-card-section" style="height: 100%;">
             <button type="button" class="protractor-test-delete-interaction oppia-delete-interaction-button oppia-transition-200" ng-click="deleteInteraction()" ng-if="editabilityService.isEditable()">
@@ -115,7 +115,7 @@
     <table class="preview-conversation-skin-card-row-container">
       <tr class="preview-conversation-skin-card-row">
         <td class="preview-conversation-skin-row-avatar" valign="top">
-          <img class="preview-conversation-skin-row-avatar-img" src="/static/{{cache_slug}}/images/avatar/oppia_black_72px.png">
+          <img class="preview-conversation-skin-row-avatar-img" ng-src="<[userBlackImgUrl]>">
         </td>
         <td class="preview-conversation-skin-oppia-content">
           <div angular-html-bind="stateContent()"></div>
@@ -127,7 +127,7 @@
         <table class="preview-conversation-skin-card-row-container" style="margin-bottom: 0;">
           <tr class="preview-conversation-skin-card-row">
             <td class="preview-conversation-skin-row-avatar" valign="top">
-              <img class="preview-conversation-skin-row-avatar-img img-circle" ng-src="/static/{{cache_slug}}/images/avatar/user_blue_72px.png">
+              <img class="preview-conversation-skin-row-avatar-img img-circle" ng-src="<[userBlueImgUrl]>" >
             </td>
             <td class="preview-conversation-skin-learner-input" angular-html-bind="inputTemplate()">
             </td>

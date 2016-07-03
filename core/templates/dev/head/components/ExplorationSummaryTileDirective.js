@@ -71,11 +71,11 @@ oppia.directive('explorationSummaryTile', [function() {
     controller: [
       '$scope', '$http',
       'oppiaDatetimeFormatter', 'RatingComputationService',
-      'windowDimensionsService',
+      'windowDimensionsService', 'UrlInterpolationService',
       function(
         $scope, $http,
         oppiaDatetimeFormatter, RatingComputationService,
-        windowDimensionsService) {
+        windowDimensionsService, UrlInterpolationService) {
         var contributorsSummary = $scope.getContributorsSummary() || {};
         $scope.contributors = Object.keys(
           contributorsSummary).sort(
@@ -90,8 +90,9 @@ oppia.directive('explorationSummaryTile', [function() {
 
         $scope.avatarsList = [];
         $scope.contributors.forEach(function(contributorName) {
-          var DEFAULT_PROFILE_IMAGE_PATH = ('/static/' + GLOBALS.CACHE_SLUG +
-            '/images/avatar/user_blue_72px.png');
+          var DEFAULT_PROFILE_IMAGE_PATH = (
+            UrlInterpolationService.getStaticImageUrl(
+              '/avatar/user_blue_72px.png'));
 
           var avatarData = {
             image: contributorsSummary[
@@ -108,8 +109,10 @@ oppia.directive('explorationSummaryTile', [function() {
         });
 
         if ($scope.isCommunityOwned()) {
-          var COMMUNITY_OWNED_IMAGE_PATH = ('/static/' + GLOBALS.CACHE_SLUG +
-            '/images/avatar/fa_globe_72px.png');
+          var COMMUNITY_OWNED_IMAGE_PATH = (
+            UrlInterpolationService.getStaticImageUrl(
+              '/avatar/fa_globe_72px.png'));
+
           var COMMUNITY_OWNED_TOOLTIP_TEXT = 'Community Owned';
 
           var communityOwnedAvatar = {

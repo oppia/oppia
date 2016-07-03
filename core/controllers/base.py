@@ -399,8 +399,6 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
         self.response.pragma = 'no-cache'
 
-        # cache_slug passed to the template should not have trailing or ending
-        # slashes.
         values['cache_slug'] = utils.get_cache_slug()
 
         self.response.write(self.jinja2_env.get_template(

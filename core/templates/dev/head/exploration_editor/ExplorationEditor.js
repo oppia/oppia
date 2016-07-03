@@ -35,7 +35,7 @@ oppia.controller('ExplorationEditor', [
   'explorationParamSpecsService', 'explorationParamChangesService',
   'explorationWarningsService', '$templateCache', 'explorationContextService',
   'explorationAdvancedFeaturesService', '$modal', 'changeListService',
-  'autosaveInfoModalsService',
+  'autosaveInfoModalsService', 'UrlInterpolationService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
       explorationData, editorContextService, explorationTitleService,
@@ -47,7 +47,7 @@ oppia.controller('ExplorationEditor', [
       explorationParamSpecsService, explorationParamChangesService,
       explorationWarningsService, $templateCache, explorationContextService,
       explorationAdvancedFeaturesService, $modal, changeListService,
-      autosaveInfoModalsService) {
+      autosaveInfoModalsService, UrlInterpolationService) {
     $scope.editabilityService = editabilityService;
     $scope.editorContextService = editorContextService;
 
@@ -351,6 +351,10 @@ oppia.controller('ExplorationEditor', [
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
             };
+
+            $scope.editorWelcomeImgUrl = (
+              UrlInterpolationService.getStaticImageUrl(
+                '/general/editor_welcome.svg'));
           }
         ],
         windowClass: 'oppia-welcome-modal'

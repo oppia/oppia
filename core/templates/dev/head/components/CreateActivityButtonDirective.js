@@ -23,9 +23,11 @@ oppia.directive('createActivityButton', [function() {
     controller: [
       '$scope', '$timeout', '$window', '$modal', 'ExplorationCreationService',
       'CollectionCreationService', 'siteAnalyticsService', 'urlService',
+      'UrlInterpolationService',
       function(
           $scope, $timeout, $window, $modal, ExplorationCreationService,
-          CollectionCreationService, siteAnalyticsService, urlService) {
+          CollectionCreationService, siteAnalyticsService, urlService,
+          UrlInterpolationService) {
         $scope.creationInProgress = false;
 
         $scope.showUploadExplorationModal = (
@@ -68,6 +70,14 @@ oppia.directive('createActivityButton', [function() {
                 $scope.cancel = function() {
                   $modalInstance.dismiss('cancel');
                 };
+
+                $scope.explorationImgUrl = (
+                  UrlInterpolationService.getStaticImageUrl(
+                  '/activity/exploration.svg'));
+
+                $scope.collectionImgUrl = (
+                  UrlInterpolationService.getStaticImageUrl(
+                  '/activity/collection.svg'));
               }],
               windowClass: 'oppia-creation-modal'
             }).result.then(function() {}, function() {

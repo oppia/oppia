@@ -49,11 +49,13 @@ oppia.controller('StateInteraction', [
   'stateInteractionIdService', 'stateCustomizationArgsService',
   'editabilityService', 'explorationStatesService', 'graphDataService',
   'interactionDetailsCache', 'oppiaExplorationHtmlFormatterService',
+  'UrlInterpolationService',
   function($scope, $http, $rootScope, $modal, $filter, alertsService,
       editorContextService, oppiaHtmlEscaper, INTERACTION_SPECS,
       stateInteractionIdService, stateCustomizationArgsService,
       editabilityService, explorationStatesService, graphDataService,
-      interactionDetailsCache, oppiaExplorationHtmlFormatterService) {
+      interactionDetailsCache, oppiaExplorationHtmlFormatterService,
+      UrlInterpolationService) {
     var DEFAULT_TERMINAL_STATE_CONTENT = 'Congratulations, you have finished!';
 
     // Declare dummy submitAnswer() and adjustPageHeight() methods for the
@@ -63,6 +65,11 @@ oppia.controller('StateInteraction', [
 
     $scope.stateInteractionIdService = stateInteractionIdService;
     $scope.hasLoaded = false;
+
+    $scope.userBlueImgUrl = UrlInterpolationService.getStaticImageUrl(
+                              '/avatar/user_blue_72px.png');
+    $scope.userBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
+                              '/avatar/user_black_72px.png');
 
     $scope.getCurrentInteractionName = function() {
       return (
