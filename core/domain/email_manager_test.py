@@ -131,7 +131,8 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             self.assertEqual(len(messages), 1)
 
     def test_email_is_not_sent_if_recipient_has_declined_such_emails(self):
-        user_services.update_email_preferences(self.new_user_id, True, False)
+        user_services.update_email_preferences(
+            self.new_user_id, True, False, False)
 
         with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             email_manager.send_role_notification_email(
@@ -1061,3 +1062,93 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
                 sent_email_model1.email_hash, sent_email_model2.email_hash)
             self.assertEqual(
                 sent_email_model1.email_hash, sent_email_model3.email_hash)
+
+
+class FeedbackMessageEmailTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(FeedbackMessageEmailTests, self).setUp()
+
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        self.exploration = self.save_new_default_exploration(
+            'A', self.editor_id, 'Title')
+
+        self.expected_email_subject = 'New messages on Oppia.'
+
+        self.can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
+        self.can_send_feedback_email_ctx = self.swap(
+            feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+
+    def test_correct_email_body_is_sent(self):
+        expected_email_html_body = (
+            'Hi editor,<br>'
+            '<br>'
+            'You have 1 new message(s) about your Oppia explorations:<br>'
+            '<ul><li>Title: A message<br></li></ul>'
+            'You can view and reply to your messages from your '
+            '<a href="https://www.oppia.org/dashboard">dashboard</a>.'
+            '<br>'
+            'Thanks, and happy teaching!<br>'
+            '<br>'
+            'Best wishes,<br>'
+            'The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        expected_email_text_body = (
+            'Hi editor,\n'
+            '\n'
+            'You have 1 new message(s) about your Oppia explorations:\n'
+            '- Title: A message\n'
+            'You can view and reply to your messages from your dashboard.'
+            '\n'
+            'Thanks, and happy teaching!\n'
+            '\n'
+            'Best wishes,\n'
+            'The Oppia Team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+
+        feedback_messages = {
+            self.exploration.id : {
+                'title': self.exploration.title,
+                'messages': ['A message']}
+        }
+
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            email_manager.send_feedback_message_email(
+                self.editor_id, feedback_messages)
+
+            # check that email body is correct.
+            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(),
+                expected_email_html_body)
+            self.assertEqual(
+                messages[0].body.decode(),
+                expected_email_text_body)
+
+            # check that email model is correct.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            self.assertEqual(len(all_models), 1)
+
+            sent_email_model = all_models[0]
+            self.assertEqual(
+                sent_email_model.recipient_id, self.editor_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.EDITOR_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.SYSTEM_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION)
+            self.assertEqual(
+                sent_email_model.subject, self.expected_email_subject)
