@@ -134,6 +134,7 @@
   "I18N_LIBRARY_GROUPS_SCIENCE" : "Title of a group of explorations - This text is shown on top of a group of explorations regarding the same topic.",
   "I18N_LIBRARY_GROUPS_SOCIAL_SCIENCE": "Title of a group of explorations - This text is shown on top of a group of explorations regarding the same topic.",
   "I18N_LIBRARY_GROUPS_TOP_RATED_EXPLORATIONS": "Title of a group of explorations - This text is shown on top of a group of explorations. It makes reference to explorations with higher score given by the users.",
+  "I18N_LIBRARY_LAST_UPDATED": "Text displayed when hovered over the clock icon inside an exploration tile in card view of creator dashboard.",
   "I18N_LIBRARY_LOADING": "Text displayed in the middle of the page while the content is being loaded.",
   "I18N_LIBRARY_MAIN_HEADER": "Main title of the library page. - The library page shows all the explorations and collections available. It should be a single phrase and fit in one line.",
   "I18N_LIBRARY_N/A": "Text displayed inside the exploration card in the library - It's shown when the exploration has no rating. It should be very small as it's replacing a two digit number.",
