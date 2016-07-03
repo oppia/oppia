@@ -969,12 +969,6 @@ textarea {
     margin-left: 2vw;
     margin-right: 2vw;
     max-width: 96vw;
-    width :initial;
-  }
-}
-@media (max-width: 420px) {
-  .oppia-exp-summary-tiles-container {
-    width: initial;
   }
 }
 
