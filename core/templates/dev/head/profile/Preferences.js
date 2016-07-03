@@ -32,6 +32,17 @@ oppia.controller('Preferences', [
       });
     };
 
+    // Select2 dropdown cannot automatically refresh its display
+    // after being translated.
+    // Use $scope.select2DropdownIsShown in its ng-if attribute
+    // and this function to force it to reload
+    var _forceSelect2Refresh = function() {
+      $scope.select2DropdownIsShown = false;
+      $timeout(function() {
+        $scope.select2DropdownIsShown = true;
+      }, 100);
+    };
+
     $scope.saveUserBio = function(userBio) {
       _saveDataItem('user_bio', userBio);
     };
@@ -78,6 +89,7 @@ oppia.controller('Preferences', [
     $scope.savePreferredSiteLanguageCodes = function(
       preferredSiteLanguageCode) {
       $translate.use(preferredSiteLanguageCode);
+      _forceSelect2Refresh();
       _saveDataItem(
         'preferred_site_language_code', preferredSiteLanguageCode);
     };
@@ -184,6 +196,7 @@ oppia.controller('Preferences', [
       $scope.canReceiveEditorRoleEmail = data.can_receive_editor_role_email;
       $scope.preferredSiteLanguageCode = data.preferred_site_language_code;
       $scope.hasPageLoaded = true;
+      _forceSelect2Refresh();
     });
   }
 ]);
