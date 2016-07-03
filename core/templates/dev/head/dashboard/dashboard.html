@@ -151,7 +151,8 @@
         </md-card>
       </div>
 
-      <div ng-if="myExplorationsView === 'card' && explorationsList.length > 0">
+      <div ng-if="myExplorationsView === 'card' && explorationsList.length > 0"
+           style="margin-top: 8px;">
         <md-card ng-repeat="exploration in explorationsList track by exploration.id"
                  class="oppia-activity-summary-tile oppia-dashboard-card-view-item"
                  ng-click="showExplorationEditor(exploration.id)">

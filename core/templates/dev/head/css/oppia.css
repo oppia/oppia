@@ -3613,13 +3613,13 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-activity-summary-tile.oppia-dashboard-card-view-item {
   height: 250px;
   margin-left: 0;
-  margin-right: 20px;
-  width: 215px;
+  margin-right: 15px;
+  width: 184px;
 }
 
 .oppia-activity-summary-tile.oppia-dashboard-card-view-item .exp-private-text {
-  font-size: 14px;
-  margin: 13px auto 0 11px;
+  font-size: 13px;
+  margin: 13px 11px 0;
 }
 
 .oppia-activity-summary-tile.oppia-dashboard-card-view-item .metrics {
