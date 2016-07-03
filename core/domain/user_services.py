@@ -303,6 +303,13 @@ def _save_user_settings(user_settings):
     ).put()
 
 
+def is_user_registered(user_id):
+    if user_id is None:
+        return False
+    user_settings = user_models.UserSettingsModel.get(user_id, strict=False)
+    return bool(user_settings)
+
+
 def has_ever_registered(user_id):
     user_settings = get_user_settings(user_id, strict=True)
     return bool(user_settings.username and user_settings.last_agreed_to_terms)
@@ -470,7 +477,8 @@ def record_user_started_state_editor_tutorial(user_id):
 
 
 def update_email_preferences(
-        user_id, can_receive_email_updates, can_receive_editor_role_email):
+        user_id, can_receive_email_updates, can_receive_editor_role_email,
+        can_receive_feedback_email):
     """Updates whether the user has chosen to receive email updates.
 
     If no UserEmailPreferencesModel exists for this user, a new one will
@@ -485,6 +493,8 @@ def update_email_preferences(
     email_preferences_model.site_updates = can_receive_email_updates
     email_preferences_model.editor_role_notifications = (
         can_receive_editor_role_email)
+    email_preferences_model.feedback_message_notifications = (
+        can_receive_feedback_email)
     email_preferences_model.put()
 
 
@@ -502,7 +512,11 @@ def get_email_preferences(user_id):
         'can_receive_editor_role_email': (
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE
             if email_preferences_model is None
-            else email_preferences_model.editor_role_notifications)
+            else email_preferences_model.editor_role_notifications),
+        'can_receive_feedback_message_email': (
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE
+            if email_preferences_model is None
+            else email_preferences_model.feedback_message_notifications)
     }
 
 
