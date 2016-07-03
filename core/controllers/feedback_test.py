@@ -643,7 +643,6 @@ class FeedbackMessageEmailHandlerTests(test_utils.GenericTestBase):
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
 
-
     def test_that_emails_are_sent(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             feedback_services.create_thread(
@@ -652,7 +651,6 @@ class FeedbackMessageEmailHandlerTests(test_utils.GenericTestBase):
 
             threadlist = feedback_services.get_all_threads(
                 self.exploration.id, False)
-            self.assertEqual(len(threadlist), 1)
             thread_id = threadlist[0].get_thread_id()
 
             messagelist = feedback_services.get_messages(

@@ -307,7 +307,7 @@ def is_user_registered(user_id):
     if user_id is None:
         return False
     user_settings = user_models.UserSettingsModel.get(user_id, strict=False)
-    return True if user_settings else False
+    return bool(user_settings)
 
 
 def has_ever_registered(user_id):

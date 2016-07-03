@@ -283,7 +283,14 @@ def enqueue_feedback_message_email_task(user_id):
 
 
 def get_feedback_message_references(user_id):
+    """Returns a list of feedback message references corresponding to the given
+    user id. If the user id is invalid or there are no messages for this user,
+    returns an empty list."""
+
     model = feedback_models.UnsentFeedbackEmailModel.get(user_id)
+
+    if model is None:
+        return []
 
     return [feedback_domain.FeedbackMessageReference(
         reference['exploration_id'], reference['thread_id'],
@@ -333,8 +340,9 @@ def pop_feedback_message_references(user_id, references_length):
         message_references = (
             model.feedback_message_references[references_length:])
         model.delete()
-        # model is delted and re-created so that created_on property of model
-        # is updates otherwise it would created complications in retries count.
+        # We delete and recreate the model in order to re-initialize its
+        # 'created_on' property and reset the retries count to 0.
+        # If we don't do this, then the retries count will be incorrect.
         model = feedback_models.UnsentFeedbackEmailModel(
             id=user_id,
             feedback_message_references=message_references)

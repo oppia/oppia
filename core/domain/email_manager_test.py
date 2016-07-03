@@ -1089,9 +1089,9 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             'You have 1 new message(s) about your Oppia explorations:<br>'
             '<ul><li>Title: A message<br></li></ul>'
             'You can view and reply to your messages from your '
-            '<a href="http://www.oppia.org/dashboard">dashboard</a>.'
+            '<a href="https://www.oppia.org/dashboard">dashboard</a>.'
             '<br>'
-            'Thanks, and happy collaborating!<br>'
+            'Thanks, and happy teaching!<br>'
             '<br>'
             'Best wishes,<br>'
             'The Oppia Team<br>'
@@ -1106,7 +1106,7 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             '- Title: A message\n'
             'You can view and reply to your messages from your dashboard.'
             '\n'
-            'Thanks, and happy collaborating!\n'
+            'Thanks, and happy teaching!\n'
             '\n'
             'Best wishes,\n'
             'The Oppia Team\n'
@@ -1114,7 +1114,7 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             'You can change your email preferences via the Preferences page.')
 
         feedback_messages = {
-            self.exploration.title : ['A message']
+            self.exploration.id : {self.exploration.title: 'A message'}
         }
 
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:

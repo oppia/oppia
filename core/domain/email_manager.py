@@ -374,9 +374,9 @@ def send_feedback_message_email(recipient_id, feedback_messages):
         'You have %s new message(s) about your Oppia explorations:<br>'
         '<ul>%s</ul>'
         'You can view and reply to your messages from your '
-        '<a href="http://www.oppia.org/dashboard">dashboard</a>.'
+        '<a href="https://www.oppia.org/dashboard">dashboard</a>.'
         '<br>'
-        'Thanks, and happy collaborating!<br>'
+        'Thanks, and happy teaching!<br>'
         '<br>'
         'Best wishes,<br>'
         'The Oppia Team<br>'
@@ -390,11 +390,14 @@ def send_feedback_message_email(recipient_id, feedback_messages):
         log_new_error('This app cannot send feedback message emails to users.')
         return
 
+    if not feedback_messages:
+        return
+
     recipient_user_settings = user_services.get_user_settings(recipient_id)
 
     messages_html = ''
-    for title, messages in feedback_messages.iteritems():
-        for message in messages:
+    for _, reference in feedback_messages.iteritems():
+        for title, message in reference.iteritems():
             messages_html += '<li>%s: %s<br></li>' % (title, message)
 
     email_body = email_body_template % (

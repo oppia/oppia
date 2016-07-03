@@ -218,8 +218,7 @@ class SuggestionListHandler(base.BaseHandler):
 
 
 class UnsentFeedbackEmailHandler(base.BaseHandler):
-    """Handler task of sending emails of feedback messages.
-    This is yet to be implemented."""
+    """Handler task of sending emails of feedback messages."""
 
     def post(self):
         payload = json.loads(self.request.body)
@@ -241,10 +240,11 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
             if len(message_text) > 200:
                 message_text = message_text[:200] + '...'
 
-            if exploration.title in messages:
-                messages[exploration.title].append(message_text)
+            reference_dict = {exploration.title: message_text}
+            if exploration.id in messages:
+                messages[exploration.id].update(reference_dict)
             else:
-                messages[exploration.title] = [message_text]
+                messages[exploration.id] = reference_dict
 
         email_manager.send_feedback_message_email(user_id, messages)
         transaction_services.run_in_transaction(
