@@ -3802,7 +3802,6 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-about-tabs {
   border-bottom: 1px solid #eee;
   display: flex;
-  flex-wrap: wrap;
   text-align: center;
   margin-bottom: 0;
 }
