@@ -989,7 +989,7 @@ textarea {
 
 .oppia-library-group-header-container {
   width: 95%;
-  width: calc(100% - 143px);
+  width: calc(100% - 120px);
   max-width: 928px;
   min-width: 315px;
 }
@@ -1017,7 +1017,7 @@ textarea {
 @media(max-width: 720px) {
   .oppia-library-group-header {
     width: 76%;
-    width: calc(80% - 143px);
+    width: calc(80% - 120px);
   }
 }
 
@@ -1049,10 +1049,8 @@ textarea {
 
 @media (max-width: 992px) {
   .oppia-library-group-view-all-btn {
-    position: inherit;
-  }
-  .oppia-library-group-view-all-btn {
     margin-top: 18px;
+    position: inherit;
   }
 }
 
