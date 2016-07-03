@@ -432,6 +432,7 @@ NAV_MODE_COLLECTION = 'collection'
 NAV_MODE_CONTACT = 'contact'
 NAV_MODE_CREATE = 'create'
 NAV_MODE_DASHBOARD = 'dashboard'
+NAV_MODE_DONATE = 'donate'
 NAV_MODE_EXPLORE = 'explore'
 NAV_MODE_LIBRARY = 'library'
 NAV_MODE_PROFILE = 'profile'
@@ -567,9 +568,8 @@ SEARCH_DROPDOWN_CATEGORIES = sorted([
     'History',
 ])
 
-# The header for the "Featured Explorations" category in the library index
-# page.
-LIBRARY_CATEGORY_FEATURED_EXPLORATIONS = 'Featured Explorations'
+# The header for the "Featured Activities" category in the library index page.
+LIBRARY_CATEGORY_FEATURED_ACTIVITIES = 'Featured Activities'
 # The header for the "Top Rated Explorations" category in the library index
 # page.
 LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = 'Top Rated Explorations'
@@ -688,6 +688,8 @@ CREATE_PAGE_DESCRIPTION = (
 DASHBOARD_PAGE_DESCRIPTION = (
     'Keep track of the lessons you have created, as well as feedback from '
     'learners.')
+DONATE_PAGE_DESCRIPTION = (
+    'Donate to The Oppia Foundation.')
 FORUM_PAGE_DESCRIPTION = (
     'Engage with the Oppia community by discussing questions, bugs and '
     'explorations in the forum.')
