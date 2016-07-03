@@ -397,8 +397,9 @@ def send_feedback_message_email(recipient_id, feedback_messages):
 
     messages_html = ''
     for _, reference in feedback_messages.iteritems():
-        for title, message in reference.iteritems():
-            messages_html += '<li>%s: %s<br></li>' % (title, message)
+        for message in reference['messages']:
+            messages_html += (
+                '<li>%s: %s<br></li>' % (reference['title'], message))
 
     email_body = email_body_template % (
         recipient_user_settings.username, len(feedback_messages), messages_html,

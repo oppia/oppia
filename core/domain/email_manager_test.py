@@ -1114,7 +1114,9 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             'You can change your email preferences via the Preferences page.')
 
         feedback_messages = {
-            self.exploration.id : {self.exploration.title: 'A message'}
+            self.exploration.id : {
+                'title': self.exploration.title,
+                'messages': ['A message']}
         }
 
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
