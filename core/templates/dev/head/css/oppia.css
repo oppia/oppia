@@ -131,6 +131,11 @@ body {
   max-width: 800px;
 }
 
+.oppia-dashboard-container .exp-private-text {
+  color: #aaa;
+  font-style: italic;
+}
+
 .oppia-profile-container {
   margin: 30px auto 30px auto;
   max-width: 980px;
@@ -1184,6 +1189,39 @@ textarea {
   padding-top: 50px;
 }
 
+.oppia-dashboard-tabs .list-card-view-toggle {
+  margin-left: auto;
+  width: auto;
+}
+
+.list-card-view-toggle button {
+  background: #fff;
+  border: 1px solid #ddd;
+  color: #009688;
+  height: 32px;
+  margin-top: 7px;
+  padding: 5px 12px;
+}
+
+.list-card-view-toggle .list-view-btn {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+.list-card-view-toggle .card-view-btn {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.list-card-view-toggle .dashboard-active-view {
+  background: #009688;
+  color: #fff;
+}
+
+.list-card-view-toggle .card-view-btn {
+  margin-left: -1px;
+}
+
 /* Rules for the tiles in the creator dashboard. */
 
 .oppia-dashboard-intro-card {
@@ -1237,16 +1275,6 @@ md-card.oppia-dashboard-tile {
 }
 .oppia-dashboard-tile-contents:hover {
   text-decoration: none;
-}
-
-.oppia-dashboard-tile-collection-label {
-  background-color: #333;
-  border-radius: 5px;
-  bottom: 0;
-  color: #f0f0f0;
-  padding: 5px;
-  position: absolute;
-  right: 0;
 }
 
 .oppia-dashboard-tile-image-container {
@@ -2131,7 +2159,7 @@ md-card.oppia-dashboard-tile {
   position: relative;
 }
 
-.oppia-dashboard-list-view-card {
+.oppia-dashboard-list-view-item {
   background: #fff;
   margin: 20px auto 0;
   padding: 10px 20px;
@@ -2161,9 +2189,7 @@ md-card.oppia-dashboard-tile {
 }
 
 .exploration-list-item .exp-private-text {
-  color: #aaa;
   font-size: 15px;
-  font-style: italic;
 }
 
 .exploration-list-item .featured-badge {
@@ -3489,7 +3515,7 @@ md-card.preview-conversation-skin-supplemental-card {
   opacity: 0.4;
   position: absolute;
   top: 0;
-  width: 200px;
+  width: 100%;
   z-index: 10;
 }
 
@@ -3614,6 +3640,43 @@ md-card.preview-conversation-skin-supplemental-card {
   font-size: 1.1em;
   font-weight: bold;
   padding: 5px 8px 4px 8px;
+}
+
+.oppia-activity-summary-tile.oppia-dashboard-card-view-item {
+  height: 250px;
+  margin-left: 0;
+  margin-right: 15px;
+  width: 184px;
+}
+
+.oppia-activity-summary-tile.oppia-dashboard-card-view-item .exp-private-text {
+  font-size: 13px;
+  margin: 13px 11px 0;
+}
+
+.oppia-activity-summary-tile.oppia-dashboard-card-view-item .metrics {
+  height: 50px;
+  margin: 13px 0 0 0;
+}
+
+.oppia-activity-summary-tile.oppia-dashboard-card-view-item .metrics > li {
+  padding: 0 0 4px 14px;
+  text-align: left;
+}
+
+.oppia-activity-summary-tile.oppia-dashboard-card-view-item .oppia-sharing-links {
+  margin-top: 3px;
+  padding-left: 12px;
+}
+
+.oppia-activity-summary-tile.oppia-dashboard-card-view-item .oppia-sharing-links .share-option-img,
+.oppia-activity-summary-tile.oppia-dashboard-card-view-item .oppia-sharing-links i.embed-link {
+  height: 16px;
+  width: 16px;
+}
+
+.oppia-activity-summary-tile.oppia-dashboard-card-view-item .oppia-sharing-links i.embed-link {
+  font-size: 16px;
 }
 
 /* Styles for small-width screens. */

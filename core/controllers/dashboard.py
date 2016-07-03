@@ -33,6 +33,15 @@ import utils
 EXPLORATION_ID_KEY = 'explorationId'
 COLLECTION_ID_KEY = 'collectionId'
 
+DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = config_domain.ConfigProperty(
+    'default_twitter_share_message_dashboard', {
+        'type': 'unicode',
+    },
+    'Default text for the Twitter share message for the dashboard',
+    default_value=(
+        'Check out this interactive lesson I created on Oppia - a free '
+        'platform for teaching and learning!'))
+
 
 class NotificationsDashboardPage(base.BaseHandler):
     """Page with notifications for the user."""
@@ -122,6 +131,8 @@ class DashboardPage(base.BaseHandler):
                     config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value
                 ),
                 'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD,
+                'DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD': (
+                    DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD.value)
             })
             self.render_template(
                 'dashboard/dashboard.html', redirect_url_on_logout='/')
