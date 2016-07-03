@@ -170,10 +170,10 @@
   </oppia-gadget-panel>
 
   <div ng-if="isOnTerminalCard() && isLoggedIn && !isInPreviewMode && !isIframed && isCurrentCardAtEndOfTranscript()" class="conversation-skin-final-ratings">
-    <div style="color: #eee; margin: 20px 0;" translate="I18N_PLAYER_SHARE_EXPLORATION">
+    <div style="color: #eee; margin-bottom: 20px;" translate="I18N_PLAYER_SHARE_EXPLORATION">
     </div>
     <div class="sharing-links">
-      <sharing-links layout-type="row" layout-align-type="end center"
+      <sharing-links layout-type="row" class="conversation-skin-sharing-links"
                      twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER"
                      exploration-id="explorationId">
       </sharing-links>
@@ -720,8 +720,9 @@
         opacity: 0.8;
       }
     }
-    .sharing-links {
-      padding-right: 43%;
+    .conversation-skin-sharing-links {
+      display: table;
+      margin: auto;
     }
   </style>
 </script>
