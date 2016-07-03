@@ -3483,7 +3483,7 @@ md-card.preview-conversation-skin-supplemental-card {
   opacity: 0.4;
   position: absolute;
   top: 0;
-  width: 200px;
+  width: 100%;
   z-index: 10;
 }
 
@@ -3612,11 +3612,14 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-activity-summary-tile.oppia-dashboard-card-view-item {
   height: 240px;
+  margin-left: 0;
+  margin-right: 20px;
+  width: 215px;
 }
 
 .oppia-activity-summary-tile.oppia-dashboard-card-view-item .exp-private-text {
   font-size: 14px;
-  margin: 16px auto 0 7px;
+  margin: 16px auto 0 11px;
 }
 
 .oppia-activity-summary-tile.oppia-dashboard-card-view-item .metrics {
@@ -3625,13 +3628,13 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-activity-summary-tile.oppia-dashboard-card-view-item .metrics > li {
-  padding: 0 0 0 25px;
+  padding: 0 0 0 14px;
   text-align: left;
 }
 
 .oppia-activity-summary-tile.oppia-dashboard-card-view-item .oppia-sharing-links {
-  padding-left: 22px;
-  margin-top: 2px;
+  margin-top: 3px;
+  padding-left: 12px;
 }
 
 .oppia-activity-summary-tile.oppia-dashboard-card-view-item .oppia-sharing-links .share-option-img,
