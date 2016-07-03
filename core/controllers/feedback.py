@@ -240,14 +240,13 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
             if len(message_text) > 200:
                 message_text = message_text[:200] + '...'
 
-            reference_dict = {
-                'title': exploration.title,
-                'messages': [message_text]
-            }
             if exploration.id in messages:
                 messages[exploration.id]['messages'].append(message_text)
             else:
-                messages[exploration.id] = reference_dict
+                messages[exploration.id] = {
+                    'title': exploration.title,
+                    'messages': [message_text]
+                }
 
         email_manager.send_feedback_message_email(user_id, messages)
         transaction_services.run_in_transaction(
