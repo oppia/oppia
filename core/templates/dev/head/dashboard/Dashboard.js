@@ -24,6 +24,8 @@ oppia.controller('Dashboard', [
       $scope, $rootScope, $window, oppiaDatetimeFormatter, alertsService,
       DashboardBackendApiService, RatingComputationService,
       ExplorationCreationService, FATAL_ERROR_CODES) {
+    $scope.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
+        GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD);
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
     $scope.createNewExploration = (
       ExplorationCreationService.createNewExploration);
