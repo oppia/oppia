@@ -258,14 +258,14 @@ oppia.directive('conversationSkin', [function() {
       'LearnerViewRatingService', 'windowDimensionsService',
       'playerTranscriptService', 'LearnerParamsService',
       'playerPositionService', 'explorationRecommendationsService',
-      'StatsReportingService',
+      'StatsReportingService', 'UrlInterpolationService',
       function(
           $scope, $timeout, $rootScope, $window, $translate,
           messengerService, oppiaPlayerService, urlService, focusService,
           LearnerViewRatingService, windowDimensionsService,
           playerTranscriptService, LearnerParamsService,
           playerPositionService, explorationRecommendationsService,
-          StatsReportingService) {
+          StatsReportingService, UrlInterpolationService) {
         $scope.CONTINUE_BUTTON_FOCUS_LABEL = 'continueButton';
         // The exploration domain object.
         $scope.exploration = null;
