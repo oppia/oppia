@@ -1463,6 +1463,10 @@ md-card.oppia-dashboard-tile {
   height: 34px;
 }
 
+.oppia-save-draft-button-padding {
+  padding-right: 140px;
+}
+
 @media(max-width: 1099px) {
   .oppia-editor-publish-button {
     padding-bottom: 3px;
