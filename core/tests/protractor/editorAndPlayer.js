@@ -77,7 +77,7 @@ describe('Full exploration editor', function() {
     general.getExplorationIdFromEditor().then(function(explorationId) {
       // Check discarding of changes
       editor.setStateName('card1');
-      editor.expectStateNamesToBe(['card1']);
+      editor.expectCurrentStateToBe('card1');
       editor.setContent(forms.toRichText('card1 content'));
       editor.setInteraction('TextInput');
       editor.setDefaultOutcome(null, 'final card', true);
@@ -92,7 +92,7 @@ describe('Full exploration editor', function() {
       editor.discardChanges();
       editor.expectCurrentStateToBe(general.FIRST_STATE_DEFAULT_NAME);
       editor.setStateName('first');
-      editor.expectStateNamesToBe(['first']);
+      editor.expectCurrentStateToBe('first');
 
       // Check deletion of states and changing the first state
       editor.setInteraction('TextInput');

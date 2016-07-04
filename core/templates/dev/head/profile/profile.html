@@ -84,8 +84,9 @@
       <p class="oppia-profile-subject-interest-container">
         Interests:
         <span ng-if="subjectInterests.length > 0"><br>
-          <!-- The following tag should remain on a single line due to http://bugzilla.mozilla.org/show_bug.cgi?id=922773. -->
-          <span ng-repeat="interest in subjectInterests track by $index"><span class="oppia-profile-subject-interest"><[interest]></span></span>
+          <span ng-repeat="interest in subjectInterests track by $index">
+            <span class="oppia-profile-subject-interest"><[interest]></span>
+          </span>
         </span>
         <span ng-if="subjectInterests.length === 0" class="oppia-profile-no-interests-text">
           <em>none specified</em>
@@ -127,11 +128,10 @@
       </md-content>
 
       <span class="oppia-profile-portfolio-pages" ng-if="numUserPortfolioExplorations > 6">
-        <li class="glyphicon glyphicon-arrow-left" ng-disabled="currentPageNumber == 0" ng-click="goToPreviousPage()"></li>
+        <i class="material-icons md-18" ng-disabled="currentPageNumber == 0"
+           ng-click="goToPreviousPage()">&#xE5C4;</i>
         Showing <[currentPageNumber * PAGE_SIZE + 1]> - <[Math.min(numUserPortfolioExplorations, (currentPageNumber + 1) * PAGE_SIZE)]> of <[numUserPortfolioExplorations]>
-        <li class="glyphicon glyphicon-arrow-right" ng-disabled="(currentPageNumber + 1) * PAGE_SIZE >= userEditedExplorations.length"
-            ng-click="goToNextPage()">
-        </li>
+        <i class="material-icons md-18" ng-disabled="(currentPageNumber + 1) * PAGE_SIZE >= userEditedExplorations.length" ng-click="goToNextPage()">&#xE5C8;</i>
       </span>
     </md-card>
   </div>

@@ -557,31 +557,32 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 recent_notifications[0]['last_updated_ms'])
 
 
-class ModifiedUserImpactAggregator(
-        user_jobs_continuous.UserImpactAggregator):
-    """A modified UserImpactAggregator that does not start a new
+class ModifiedUserStatsAggregator(
+        user_jobs_continuous.UserStatsAggregator):
+    """A modified UserStatsAggregator that does not start a new
      batch job when the previous one has finished.
     """
     @classmethod
     def _get_batch_job_manager_class(cls):
-        return ModifiedUserImpactMRJobManager
+        return ModifiedUserStatsMRJobManager
 
     @classmethod
     def _kickoff_batch_job_after_previous_one_ends(cls):
         pass
 
 
-class ModifiedUserImpactMRJobManager(
-        user_jobs_continuous.UserImpactMRJobManager):
+class ModifiedUserStatsMRJobManager(
+        user_jobs_continuous.UserStatsMRJobManager):
 
     @classmethod
     def _get_continuous_computation_class(cls):
-        return ModifiedUserImpactAggregator
+        return ModifiedUserStatsAggregator
 
 
-class UserImpactAggregatorTest(test_utils.GenericTestBase):
-    """ Tests the calculation of a user's impact score from the
-    continuous computation of UserImpactAggregator.
+class UserStatsAggregatorTest(test_utils.GenericTestBase):
+    """ Tests the calculation of a user's statistics -
+    impact score, average ratings, total plays
+    from the continuous computation of UserStatsAggregator.
     """
 
     EXP_ID_1 = 'exp_id_1'
@@ -595,14 +596,17 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
     EXPONENT = 2.0/3
 
     def setUp(self):
-        super(UserImpactAggregatorTest, self).setUp()
+        super(UserStatsAggregatorTest, self).setUp()
         self.num_completions = defaultdict(int)
+        self.num_starts = defaultdict(int)
 
     def _mock_get_statistics(self, exp_id, unused_version):
         current_completions = {
             self.EXP_ID_1: {
                 'complete_exploration_count': (
                     self.num_completions[self.EXP_ID_1]),
+                'start_exploration_count': (
+                    self.num_starts[self.EXP_ID_1]),
                 'state_hit_counts': {
                     'state1': {
                         'first_entry_count': 3,
@@ -617,6 +621,8 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
             self.EXP_ID_2: {
                 'complete_exploration_count': (
                     self.num_completions[self.EXP_ID_2]),
+                'start_exploration_count': (
+                    self.num_starts[self.EXP_ID_2]),
                 'state_hit_counts': {
                     'state1': {
                         'first_entry_count': 3,
@@ -629,6 +635,8 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
                 }
             },
             self.EXP_ID_3: {
+                'start_exploration_count': (
+                    self.num_starts[self.EXP_ID_3]),
                 'state_hit_counts': {}
             }
         }
@@ -652,7 +660,7 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
         completion events."""
         with self.swap(stats_jobs_continuous.StatisticsAggregator,
                        'get_statistics', self._mock_get_statistics):
-            ModifiedUserImpactAggregator.start_computation()
+            ModifiedUserStatsAggregator.start_computation()
             self.process_and_flush_pending_tasks()
 
 
@@ -677,9 +685,9 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
             rating_services.assign_rating_to_exploration(
                 user_id, exp_id, rating)
 
-    def test_user_with_no_explorations_has_no_impact(self):
+    def test_stats_for_user_with_no_explorations(self):
         """Test that a user who is not a contributor on any exploration
-        is not assigned an impact score by the UserImpactMRJobManager.
+        is not assigned value of impact score, total plays and average ratings.
         """
         user_a_id = self._sign_up_user(
             self.USER_A_EMAIL, self.USER_A_USERNAME)
@@ -688,7 +696,7 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
             user_a_id, strict=False)
         self.assertIsNone(user_stats_model)
 
-    def test_standard_user_impact_calculation_one_exploration(self):
+    def test_standard_user_stats_calculation_one_exploration(self):
         # Sign up a user and have them create an exploration.
         user_a_id = self._sign_up_user(
             self.USER_A_EMAIL, self.USER_A_USERNAME)
@@ -737,7 +745,7 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
         self.assertEqual(
             user_stats_model.impact_score, expected_user_impact_score)
 
-    def test_standard_user_impact_calculation_multiple_explorations(self):
+    def test_standard_user_stats_calculation_multiple_explorations(self):
         # Sign up a user and have them create two explorations.
         user_a_id = self._sign_up_user(
             self.USER_A_EMAIL, self.USER_A_USERNAME)
@@ -773,16 +781,16 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
         self._run_computation()
         user_stats_model = user_models.UserStatsModel.get(
             user_a_id, strict=False)
-        self.assertIsNone(user_stats_model)
-        ModifiedUserImpactAggregator.stop_computation(user_a_id)
+        self.assertEqual(user_stats_model.impact_score, 0)
+        ModifiedUserStatsAggregator.stop_computation(user_a_id)
 
         # Give two ratings of 2.
         self._rate_exploration(self.EXP_ID_1, 2, 2)
         self._run_computation()
         user_stats_model = user_models.UserStatsModel.get(
             user_a_id, strict=False)
-        self.assertIsNone(user_stats_model)
-        ModifiedUserImpactAggregator.stop_computation(user_a_id)
+        self.assertEqual(user_stats_model.impact_score, 0)
+        ModifiedUserStatsAggregator.stop_computation(user_a_id)
 
         # Give two ratings of 3. The impact score should now be nonzero.
         self._rate_exploration(self.EXP_ID_1, 2, 3)

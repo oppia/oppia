@@ -16,13 +16,19 @@
 
 """Commands for feedback thread and message operations."""
 
+import datetime
+
 from core.domain import feedback_domain
 from core.domain import feedback_jobs_continuous
+from core.domain import rights_manager
 from core.domain import subscription_services
+from core.domain import user_services
 from core.platform import models
 import feconf
 
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
+taskqueue_services = models.Registry.import_taskqueue_services()
+transaction_services = models.Registry.import_transaction_services()
 
 DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a learner'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
@@ -112,8 +118,16 @@ def create_message(
             thread.subject = updated_subject
     thread.put()
 
+    if (user_services.is_user_registered(author_id) and len(text) > 0 and
+            feconf.CAN_SEND_EMAILS_TO_USERS and
+            feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS):
+            # send feedback message email if user is registered.
+        add_message_to_email_buffer(
+            author_id, exploration_id, thread_id, message_id)
+
     if author_id:
         subscription_services.subscribe_to_thread(author_id, full_thread_id)
+
     return True
 
 
@@ -132,6 +146,12 @@ def get_messages(exploration_id, thread_id):
             exploration_id, thread_id)]
 
 
+def get_message(exploration_id, thread_id, message_id):
+    return _get_message_from_model(
+        feedback_models.FeedbackMessageModel.get(
+            exploration_id, thread_id, message_id))
+
+
 def get_next_page_of_all_feedback_messages(
         page_size=feconf.FEEDBACK_TAB_PAGE_SIZE, urlsafe_start_cursor=None):
     """Returns a page of feedback messages in reverse time order.
@@ -148,15 +168,22 @@ def get_next_page_of_all_feedback_messages(
     result_messages = [_get_message_from_model(m) for m in results]
     return (result_messages, new_urlsafe_start_cursor, more)
 
+def get_thread_analytics_multi(exploration_ids):
+    """Returns a dict with feedback thread analytics for the given exploration
+    ids.
+    """
+    return feedback_jobs_continuous.FeedbackAnalyticsAggregator.get_thread_analytics_multi( # pylint: disable=line-too-long
+        exploration_ids)
+
 
 def get_thread_analytics(exploration_id):
     """Returns a dict with feedback thread analytics for the given exploration.
 
     The returned dict has two keys:
     - 'num_open_threads': the number of open feedback threads for this
-         exploration.
+        exploration.
     - 'num_total_threads': the total number of feedback threads for this
-         exploration.
+        exploration.
     """
     return feedback_jobs_continuous.FeedbackAnalyticsAggregator.get_thread_analytics( # pylint: disable=line-too-long
         exploration_id)
@@ -245,3 +272,94 @@ def get_all_threads(exploration_id, has_suggestion):
         if thread.has_suggestion == has_suggestion:
             all_threads.append(thread)
     return all_threads
+
+
+def enqueue_feedback_message_email_task(user_id):
+    """Adds a 'send feedback email' task into the taskqueue."""
+
+    taskqueue_services.enqueue_task(
+        feconf.FEEDBACK_MESSAGE_EMAIL_HANDLER_URL, {'user_id': user_id},
+        feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS)
+
+
+def get_feedback_message_references(user_id):
+    """Returns a list of feedback message references corresponding to the given
+    user id. If the user id is invalid or there are no messages for this user,
+    returns an empty list."""
+
+    model = feedback_models.UnsentFeedbackEmailModel.get(user_id)
+
+    if model is None:
+        return []
+
+    return [feedback_domain.FeedbackMessageReference(
+        reference['exploration_id'], reference['thread_id'],
+        reference['message_id']
+    ) for reference in model.feedback_message_references]
+
+
+def _add_feedback_message_reference(user_id, reference):
+    """Creates a new instance of UnsentFeedbackEmailModel or update existing
+    model instance for sending feedback message email."""
+
+    model = feedback_models.UnsentFeedbackEmailModel.get(user_id, strict=False)
+    if model is not None:
+        model.feedback_message_references.append(reference.to_dict())
+        model.put()
+    else:
+        model = feedback_models.UnsentFeedbackEmailModel(
+            id=user_id,
+            feedback_message_references=[reference.to_dict()])
+        model.put()
+        enqueue_feedback_message_email_task(user_id)
+
+
+def update_feedback_email_retries(user_id):
+    model = feedback_models.UnsentFeedbackEmailModel.get(user_id)
+    time_since_buffered = (
+        (datetime.datetime.utcnow() - model.created_on).seconds)
+
+    if (time_since_buffered >
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS):
+        model.retries += 1
+        model.put()
+
+
+def pop_feedback_message_references(user_id, references_length):
+    """Pop feedback message references which have been processed already.
+
+    Args:
+    - user_id: id of the receiving user.
+    - references_length: no. of feedback message references that have been
+    processed already."""
+    model = feedback_models.UnsentFeedbackEmailModel.get(user_id)
+
+    if references_length == len(model.feedback_message_references):
+        model.delete()
+    else:
+        message_references = (
+            model.feedback_message_references[references_length:])
+        model.delete()
+        # We delete and recreate the model in order to re-initialize its
+        # 'created_on' property and reset the retries count to 0.
+        # If we don't do this, then the retries count will be incorrect.
+        model = feedback_models.UnsentFeedbackEmailModel(
+            id=user_id,
+            feedback_message_references=message_references)
+        model.put()
+        enqueue_feedback_message_email_task(user_id)
+
+
+def add_message_to_email_buffer(author_id, exploration_id, thread_id,
+                                message_id):
+    exploration_rights = rights_manager.get_exploration_rights(exploration_id)
+    feedback_message_reference = feedback_domain.FeedbackMessageReference(
+        exploration_id, thread_id, message_id)
+
+    for owner_id in exploration_rights.owner_ids:
+        owner_preferences = user_services.get_email_preferences(owner_id)
+        if (owner_id != author_id and
+                owner_preferences['can_receive_feedback_message_email']):
+            transaction_services.run_in_transaction(
+                _add_feedback_message_reference, owner_id,
+                feedback_message_reference)

@@ -290,10 +290,7 @@
             This exploration is <strong>private</strong>. Only invited users, moderators and site admins can
             access it.
           </p>
-          <p ng-if="explorationRightsService.isPublic()">
-            This exploration is <strong>public</strong>: anyone can access it.
-          </p>
-          <p ng-if="explorationRightsService.isPublicized()">
+          <p ng-if="!explorationRightsService.isPrivate()">
             This exploration is <strong>public</strong>: anyone can access it.
           </p>
 
@@ -307,11 +304,8 @@
           <p ng-if="explorationRightsService.isPrivate()">
             It is <strong>not shown</strong> in the Oppia library.
           </p>
-          <p ng-if="explorationRightsService.isPublic()">
-            It is <strong>shown</strong> in the Oppia library.
-          </p>
-          <p ng-if="explorationRightsService.isPublicized()">
-            It is <strong>featured</strong> in the Oppia library.
+          <p ng-if="!explorationRightsService.isPrivate()">
+            It is <strong>available</strong> in the Oppia library.
           </p>
         </div>
       </div>
@@ -321,11 +315,8 @@
       <h3>Permissions</h3>
       <div>
         This exploration is <strong>public</strong> and <strong>community-editable</strong>.
-        <p ng-if="explorationRightsService.isPublic()">
-          It is <strong>shown</strong> in the Oppia library.
-        </p>
-        <p ng-if="explorationRightsService.isPublicized()">
-          It is <strong>featured</strong> in the Oppia library.
+        <p ng-if="!explorationRightsService.isPrivate()">
+          It is <strong>available</strong> in the Oppia library.
         </p>
       </div>
     </div>
@@ -372,7 +363,7 @@
         {% if can_publicize %}
           <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-show="explorationRightsService.isPublic()">
             <button type="button" class="btn btn-default protractor-test-mark-exploration-featured" ng-click="publicizeExplorationAsModerator()" ng-disabled="isExplorationLockedForEditing()">
-              Mark "featured"
+              Boost search ranking
               <span ng-if="currentUserIsAdmin">(as admin)</span>
               <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
             </button>
@@ -382,7 +373,7 @@
         {% if can_unpublicize %}
           <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-show="explorationRightsService.isPublicized()">
             <button type="button" class="btn btn-default" ng-click="unpublicizeExplorationAsModerator()" ng-disabled="isExplorationLockedForEditing()">
-              Remove "featured" status
+              Remove search ranking boost
               <span ng-if="currentUserIsAdmin">(as admin)</span>
               <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
             </button>
@@ -479,7 +470,7 @@
 <script type="text/ng-template" id="modals/takeModeratorAction">
   <div class="modal-header">
     <h3 ng-if="action === 'unpublish_exploration'">Unpublish exploration (as moderator)</h3>
-    <h3 ng-if="action === 'publicize_exploration'">Feature exploration (as moderator)</h3>
+    <h3 ng-if="action === 'publicize_exploration'">Boost exploration ranking (as moderator)</h3>
   </div>
 
   <div class="modal-body">
@@ -487,7 +478,7 @@
       You are about to unpublish this exploration.
     </p>
     <p ng-if="action === 'publicize_exploration'">
-      You are about to feature this exploration in the Oppia library.
+      You are about to give this exploration a ranking boost in the Oppia library search results.
     </p>
 
     <div ng-if="willEmailBeSent">
@@ -508,7 +499,7 @@
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
     <button class="btn btn-success" ng-click="reallyTakeAction()">
       <span ng-if="action === 'unpublish_exploration'">Unpublish Exploration</span>
-      <span ng-if="action === 'publicize_exploration'" class="protractor-test-feature-exploration-button">Feature Exploration</span>
+      <span ng-if="action === 'publicize_exploration'" class="protractor-test-feature-exploration-button">Boost Exploration Ranking</span>
     </button>
   </div>
 </script>

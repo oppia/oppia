@@ -31,13 +31,13 @@ oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 // mode. Add tests to ensure this.
 oppia.factory('oppiaPlayerService', [
   '$http', '$rootScope', '$q', 'LearnerParamsService',
-  'alertsService', 'answerClassificationService', 'explorationContextService',
+  'alertsService', 'AnswerClassificationService', 'explorationContextService',
   'PAGE_CONTEXT', 'oppiaExplorationHtmlFormatterService',
   'playerTranscriptService', 'ExplorationObjectFactory',
   'expressionInterpolationService', 'StatsReportingService',
   function(
       $http, $rootScope, $q, LearnerParamsService,
-      alertsService, answerClassificationService, explorationContextService,
+      alertsService, AnswerClassificationService, explorationContextService,
       PAGE_CONTEXT, oppiaExplorationHtmlFormatterService,
       playerTranscriptService, ExplorationObjectFactory,
       expressionInterpolationService, StatsReportingService) {
@@ -257,7 +257,7 @@ oppia.factory('oppiaPlayerService', [
         var oldState = exploration.getState(
           playerTranscriptService.getLastStateName());
 
-        answerClassificationService.getMatchingClassificationResult(
+        AnswerClassificationService.getMatchingClassificationResult(
           _explorationId, oldState, answer, false, interactionRulesService
         ).then(function(classificationResult) {
           if (!_editorPreviewMode) {
@@ -276,7 +276,7 @@ oppia.factory('oppiaPlayerService', [
           if (outcome.dest === playerTranscriptService.getLastStateName()) {
             for (var i = 0; i < oldState.interaction.fallbacks.length; i++) {
               var fallback = oldState.interaction.fallbacks[i];
-              if (fallback.trigger.trigger_type == 'NthResubmission' &&
+              if (fallback.trigger.trigger_type === 'NthResubmission' &&
                   fallback.trigger.customization_args.num_submits.value ===
                     playerTranscriptService.getNumSubmitsForLastCard()) {
                 outcome.dest = fallback.outcome.dest;

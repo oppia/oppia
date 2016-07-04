@@ -20,12 +20,17 @@ import copy
 import datetime
 import os
 
+
 # Whether to unconditionally log info messages.
 DEBUG = False
 
 # The platform for the storage backend. This is used in the model-switching
 # code in core/platform.
 PLATFORM = 'gae'
+
+# This should be string comparison, since all environment variables
+# are converted to string
+IS_MINIFIED = os.environ.get('MINIFICATION') == 'True'
 
 # Whether we should serve the development or production experience.
 if PLATFORM == 'gae':
@@ -42,14 +47,20 @@ SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
 INTERACTIONS_DIR = os.path.join('extensions', 'interactions')
 GADGETS_DIR = os.path.join('extensions', 'gadgets')
 RTE_EXTENSIONS_DIR = os.path.join('extensions', 'rich_text_components')
-RULES_DIR = os.path.join('extensions', 'rules')
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
-TEMPLATES_DIR_PREFIX = 'dev' if DEV_MODE else 'prod'
+
+# Choose production template if minification flag is used or
+# if in production mode
+TEMPLATES_DIR_PREFIX = 'prod' if (IS_MINIFIED or not DEV_MODE) else 'dev'
 FRONTEND_TEMPLATES_DIR = os.path.join(
     'core', 'templates', TEMPLATES_DIR_PREFIX, 'head')
 DEPENDENCIES_TEMPLATES_DIR = os.path.join('extensions', 'dependencies')
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
+OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
+    'extensions', 'interactions', 'object_defaults.json')
+RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
+    os.getcwd(), 'extensions', 'interactions', 'rules.json')
 
 # The maximum number of results to retrieve in a datastore query.
 DEFAULT_QUERY_LIMIT = 1000
@@ -94,7 +105,7 @@ DEFAULT_EXPLORATION_CATEGORY = ''
 DEFAULT_EXPLORATION_OBJECTIVE = ''
 
 # Default name for the initial state of an exploration.
-DEFAULT_INIT_STATE_NAME = 'First Card'
+DEFAULT_INIT_STATE_NAME = 'Introduction'
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
 
@@ -104,11 +115,6 @@ DEFAULT_COLLECTION_TITLE = ''
 DEFAULT_COLLECTION_CATEGORY = ''
 # Default objective for a newly-minted collection.
 DEFAULT_COLLECTION_OBJECTIVE = ''
-
-# The threshold the truth value of an evaluated answer group must equal or
-# exceed in order to be considered a better classification than the default
-# group.
-DEFAULT_ANSWER_GROUP_CLASSIFICATION_THRESHOLD = 0.3
 
 # A dict containing the accepted image formats (as determined by the imghdr
 # module) and the corresponding allowed extensions in the filenames of uploaded
@@ -182,6 +188,14 @@ CAN_SEND_EMAILS_TO_USERS = False
 # send_role_notification_email() function in email_manager.py and modify them
 # accordingly.
 CAN_SEND_EDITOR_ROLE_EMAILS = False
+# If enabled then emails will be sent to creators for feedback messages.
+CAN_SEND_FEEDBACK_MESSAGE_EMAILS = False
+# Time to wait before sending feedback message emails (currently set to 1
+# hour).
+DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS = 3600
+# Whether to send an email when new feedback message is recived for
+# an exploration.
+DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE = True
 # Whether to send email updates to a user who has not specified a preference.
 DEFAULT_EMAIL_UPDATES_PREFERENCE = False
 # Whether to send an invitation email when the user is granted
@@ -197,6 +211,7 @@ DUPLICATE_EMAIL_INTERVAL_MINS = 2
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
 EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION = 'editor_role_notification'
+EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION = 'feedback_message_notification'
 EMAIL_INTENT_MARKETING = 'marketing'
 EMAIL_INTENT_PUBLICIZE_EXPLORATION = 'publicize_exploration'
 EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
@@ -207,7 +222,8 @@ MODERATOR_ACTION_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 DEFAULT_SALUTATION_HTML_FN = (
     lambda recipient_username: 'Hi %s,' % recipient_username)
 DEFAULT_SIGNOFF_HTML_FN = (
-    lambda sender_username: 'Thanks!<br>%s (Oppia moderator)' % sender_username)
+    lambda sender_username: (
+        'Thanks!<br>%s (Oppia moderator)' % sender_username))
 
 VALID_MODERATOR_ACTIONS = {
     MODERATOR_ACTION_PUBLICIZE_EXPLORATION: {
@@ -251,9 +267,6 @@ MAX_FILE_SIZE_BYTES = 1048576
 
 # The default language code for an exploration.
 DEFAULT_LANGUAGE_CODE = 'en'
-
-# Whether to include the forum, terms and privacy pages.
-SHOW_CUSTOM_PAGES = True
 
 # The id of the default skin.
 # TODO(sll): Deprecate this; it is no longer used.
@@ -362,13 +375,24 @@ DEMO_EXPLORATIONS = {
     u'12': 'protractor_test_1.yaml',
     u'13': 'solar_system',
     u'14': 'about_oppia.yaml',
-    u'15': 'fuzzy_exploration.yaml',
+    u'15': 'classifier_demo_exploration.yaml',
     u'16': 'all_interactions',
 }
 
 DEMO_COLLECTIONS = {
     u'0': 'welcome_to_collections.yaml'
 }
+
+# IDs of explorations which should not be displayable in either the learner or
+# editor views.
+DISABLED_EXPLORATION_IDS = ['5']
+
+# Google Group embed URL for the Forum page.
+EMBEDDED_GOOGLE_GROUP_URL = (
+    'https://groups.google.com/forum/embed/?place=forum/oppia')
+
+# Whether to allow YAML file uploads.
+ALLOW_YAML_FILE_UPLOAD = False
 
 # TODO(sll): Add all other URLs here.
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
@@ -380,6 +404,7 @@ DASHBOARD_URL = '/dashboard'
 DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % DASHBOARD_URL
 DASHBOARD_DATA_URL = '/dashboardhandler/data'
 EDITOR_URL_PREFIX = '/create'
+EMAILS_TASK_PREFIX = '/task/email'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
@@ -388,6 +413,8 @@ EXPLORATION_URL_PREFIX = '/explore'
 FEEDBACK_STATS_URL_PREFIX = '/feedbackstatshandler'
 FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
+FEEDBACK_MESSAGE_EMAIL_HANDLER_URL = (
+    '%s/feedbackemailhandler' % EMAILS_TASK_PREFIX)
 LIBRARY_INDEX_URL = '/library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
 LIBRARY_SEARCH_URL = '/search/find'
@@ -407,16 +434,17 @@ UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 
 NAV_MODE_ABOUT = 'about'
+NAV_MODE_COLLECTION = 'collection'
+NAV_MODE_CONTACT = 'contact'
 NAV_MODE_CREATE = 'create'
 NAV_MODE_DASHBOARD = 'dashboard'
+NAV_MODE_DONATE = 'donate'
 NAV_MODE_EXPLORE = 'explore'
 NAV_MODE_LIBRARY = 'library'
-NAV_MODE_PARTICIPATE = 'participate'
 NAV_MODE_PROFILE = 'profile'
 NAV_MODE_SIGNUP = 'signup'
 NAV_MODE_SPLASH = 'splash'
 NAV_MODE_TEACH = 'teach'
-NAV_MODE_CONTACT = 'contact'
 
 # Event types.
 EVENT_TYPE_STATE_HIT = 'state_hit'
@@ -444,6 +472,7 @@ COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
+# NOTE TO DEVELOPERS: This should be synchronized with base.js
 ENABLE_STRING_CLASSIFIER = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
 SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK = False
@@ -515,6 +544,11 @@ CATEGORIES_TO_COLORS = {
     'Welcome': '#992a2b',
 }
 
+# Types of activities that can be created with Oppia.
+ACTIVITY_TYPE_EXPLORATION = 'exploration'
+ACTIVITY_TYPE_COLLECTION = 'collection'
+ALL_ACTIVITY_TYPES = [ACTIVITY_TYPE_EXPLORATION, ACTIVITY_TYPE_COLLECTION]
+
 # A sorted list of default categories for which icons and background colours
 # exist.
 ALL_CATEGORIES = sorted(CATEGORIES_TO_COLORS.keys())
@@ -540,9 +574,8 @@ SEARCH_DROPDOWN_CATEGORIES = sorted([
     'History',
 ])
 
-# The header for the "Featured Explorations" category in the library index
-# page.
-LIBRARY_CATEGORY_FEATURED_EXPLORATIONS = 'Featured Explorations'
+# The header for the "Featured Activities" category in the library index page.
+LIBRARY_CATEGORY_FEATURED_ACTIVITIES = 'Featured Activities'
 # The header for the "Top Rated Explorations" category in the library index
 # page.
 LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS = 'Top Rated Explorations'
@@ -637,7 +670,9 @@ SAME_TOPIC_SIMILARITY = 1.0
 
 SUPPORTED_SITE_LANGUAGES = {
     'en': 'English',
-    'es': 'Español'
+    'es': 'Español',
+    'id': 'Bahasa Indonesia',
+    'pt': 'Português',
 }
 SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 SYSTEM_USER_IDS = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
@@ -650,12 +685,17 @@ ABOUT_PAGE_DESCRIPTION = (
     'Oppia is an open source learning platform that connects a community of '
     'teachers and learners. You can use this site to create 1-1 learning '
     'scenarios for others.')
+CONTACT_PAGE_DESCRIPTION = (
+    'Contact the Oppia team, submit feedback, and learn how to get involved '
+    'with the Oppia project.')
 CREATE_PAGE_DESCRIPTION = (
     'Help others learn new things. Create lessons through explorations and '
     'share your knowledge with the community.')
 DASHBOARD_PAGE_DESCRIPTION = (
     'Keep track of the lessons you have created, as well as feedback from '
     'learners.')
+DONATE_PAGE_DESCRIPTION = (
+    'Donate to The Oppia Foundation.')
 FORUM_PAGE_DESCRIPTION = (
     'Engage with the Oppia community by discussing questions, bugs and '
     'explorations in the forum.')
@@ -663,20 +703,21 @@ LIBRARY_PAGE_DESCRIPTION = (
     'Looking to learn something new? Find explorations created by professors, '
     'teachers and Oppia users in a subject you\'re interested in, and start '
     'exploring!')
-PARTICIPATE_PAGE_DESCRIPTION = (
-    'The Oppia library is full of user-created lessons called \'explorations\'.'
-    ' Read about how to participate in the community and begin creating '
-    'explorations.')
 PREFERENCES_PAGE_DESCRIPTION = (
     'Change your Oppia profile settings and preferences')
 SEARCH_PAGE_DESCRIPTION = (
     'Discover a new exploration to learn from, or help improve an existing '
     'one for the community.')
-SIGNUP_PAGE_DESCRIPTION = 'Sign up for Oppia and begin exploring a new subject.'
+SIGNUP_PAGE_DESCRIPTION = (
+    'Sign up for Oppia and begin exploring a new subject.')
 SPLASH_PAGE_DESCRIPTION = (
     'Oppia is a free site for sharing knowledge via interactive lessons '
     'called \'explorations\'. Learn from user-created explorations, or teach '
     'and create your own.')
+TEACH_PAGE_DESCRIPTION = (
+    'The Oppia library is full of user-created lessons called \'explorations\'.'
+    ' Read about how to participate in the community and begin creating '
+    'explorations.')
 TERMS_PAGE_DESCRIPTION = (
     'Oppia is a 501(c)(3) registered non-profit open-source e-learning '
     'platform. Learn about our terms and conditions for creating and '

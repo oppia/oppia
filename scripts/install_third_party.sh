@@ -122,6 +122,21 @@ if [ ! -d "$TOOLS_DIR/webtest-1.4.2" ]; then
   rm webtest-download.zip
 fi
 
+# Python API for browsermob-proxy.
+echo Checking if browsermob-proxy is installed in $TOOLS_DIR/pip_packages
+if [ ! -d "$TOOLS_DIR/browsermob-proxy-0.7.1" ]; then
+  echo Installing browsermob-proxy
+
+  pip install browsermob-proxy==0.7.1 --target="$TOOLS_DIR/browsermob-proxy-0.7.1"
+fi
+
+echo Checking if selenium is installed in $TOOLS_DIR/pip_packages
+if [ ! -d "$TOOLS_DIR/selenium-2.53.2" ]; then
+  echo Installing selenium
+
+  pip install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2"
+fi
+
 # install pre-push script
 echo Installing pre-push hook for git
 $PYTHON_CMD $OPPIA_DIR/scripts/pre_push_hook.py --install

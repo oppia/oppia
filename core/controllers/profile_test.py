@@ -174,7 +174,9 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                 {
                     'can_receive_email_updates': True,
                     'can_receive_editor_role_email': (
-                        feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+                        feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE),
+                    'can_receive_feedback_message_email': (
+                        feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
                 })
         with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', False):
             self.assertEqual(
@@ -182,7 +184,9 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                 {
                     'can_receive_email_updates': False,
                     'can_receive_editor_role_email': (
-                        feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+                        feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE),
+                    'can_receive_feedback_message_email': (
+                        feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
                 })
 
     def test_user_allowing_emails_on_signup(self):
@@ -203,7 +207,9 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                 {
                     'can_receive_email_updates': True,
                     'can_receive_editor_role_email': (
-                        feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+                        feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE),
+                    'can_receive_feedback_message_email': (
+                        feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
                 })
         with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', False):
             self.assertEqual(
@@ -211,7 +217,9 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                 {
                     'can_receive_email_updates': True,
                     'can_receive_editor_role_email': (
-                        feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+                        feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE),
+                    'can_receive_feedback_message_email': (
+                        feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
                 })
 
     def test_user_disallowing_emails_on_signup(self):
@@ -232,7 +240,9 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                 {
                     'can_receive_email_updates': False,
                     'can_receive_editor_role_email': (
-                        feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+                        feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE),
+                    'can_receive_feedback_message_email': (
+                        feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
                 })
         with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', False):
             self.assertEqual(
@@ -240,7 +250,9 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                 {
                     'can_receive_email_updates': False,
                     'can_receive_editor_role_email': (
-                        feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+                        feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE),
+                    'can_receive_feedback_message_email': (
+                        feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
                 })
 
 

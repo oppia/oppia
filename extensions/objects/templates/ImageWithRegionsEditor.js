@@ -235,7 +235,7 @@ oppia.directive('imageWithRegionsEditor', [
           $scope.userIsCurrentlyDragging = false;
           if ($scope.regionDrawMode) {
             $scope.regionDrawMode = false;
-            if ($scope.rectWidth != 0 && $scope.rectHeight != 0) {
+            if ($scope.rectWidth !== 0 && $scope.rectHeight !== 0) {
               var labels = $scope.$parent.value.labeledRegions.map(
                 function(region) {
                   return region.label;

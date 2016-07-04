@@ -17,11 +17,15 @@
  */
 
 oppia.controller('Dashboard', [
-  '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
-  'RatingComputationService', 'ExplorationCreationService',
+  '$scope', '$rootScope', '$window', 'oppiaDatetimeFormatter', 'alertsService',
+  'DashboardBackendApiService', 'RatingComputationService',
+  'ExplorationCreationService', 'FATAL_ERROR_CODES',
   function(
-      $scope, $http, $rootScope, oppiaDatetimeFormatter,
-      RatingComputationService, ExplorationCreationService) {
+      $scope, $rootScope, $window, oppiaDatetimeFormatter, alertsService,
+      DashboardBackendApiService, RatingComputationService,
+      ExplorationCreationService, FATAL_ERROR_CODES) {
+    $scope.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
+        GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD);
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
     $scope.createNewExploration = (
       ExplorationCreationService.createNewExploration);
@@ -33,12 +37,35 @@ oppia.controller('Dashboard', [
       $scope.activeTab = newActiveTabName;
     };
 
+    $scope.showExplorationEditor = function(explorationId) {
+      $window.location = '/create/' + explorationId;
+    };
+
+    $scope.myExplorationsView = 'list';
+    $scope.setMyExplorationsView = function(viewType) {
+      $scope.myExplorationsView = viewType;
+    };
+
     $rootScope.loadingMessage = 'Loading';
-    $http.get('/dashboardhandler/data').then(function(response) {
-      var data = response.data;
-      $scope.explorationsList = data.explorations_list;
-      $scope.collectionsList = data.collections_list;
-      $rootScope.loadingMessage = '';
-    });
+    DashboardBackendApiService.fetchDashboardData().then(
+      function(response) {
+        $scope.explorationsList = response.explorations_list.sort(
+          function(a, b) {
+            return (a.title === '' ? 1 :
+              b.title === '' ? -1 :
+              a.title < b.title ? -1 :
+              a.title > b.title ? 1 : 0);
+          }
+        );
+        $scope.collectionsList = response.collections_list;
+        $scope.dashboardStats = response.dashboard_stats;
+        $rootScope.loadingMessage = '';
+      },
+      function(errorStatus) {
+        if (FATAL_ERROR_CODES.indexOf(errorStatus) !== -1) {
+          alertsService.addWarning('Failed to get dashboard data');
+        }
+      }
+    );
   }
 ]);
