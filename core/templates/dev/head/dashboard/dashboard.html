@@ -211,6 +211,7 @@
                   <[exploration.num_total_threads]>
                 </li>
                 <sharing-links ng-if="exploration.status !== 'private'"
+                               ng-click="$event.stopPropagation();"
                                flex="100"
                                layout-type="row"
                                layout-align-type="center left"
