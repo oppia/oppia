@@ -130,7 +130,7 @@ class TestBase(unittest.TestCase):
                 self.page_url, self.username)
 
     def _test_total_page_size(self):
-        self._record_page_metrics_for_url()
+        self._record_page_metrics_from_uncached_session()
 
         self.assertLessEqual(
             self.page_metrics.get_total_page_size_bytes(),
@@ -144,7 +144,7 @@ class TestBase(unittest.TestCase):
             self.size_limit_cached_bytes)
 
     def _test_page_load_time(self):
-        self._record_average_page_timings_for_url()
+        self._record_average_page_timings_from_uncached_session()
 
         self.assertLessEqual(
             self.page_metrics.get_average_page_load_time_millisecs(),
