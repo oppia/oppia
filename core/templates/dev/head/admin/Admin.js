@@ -43,8 +43,9 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
       case '#misc':
         $scope.currentTab = $scope.TAB_MISC;
         break;
-      default:
+      case '#activities':
         $scope.currentTab = $scope.TAB_ACTIVITIES;
+        break;
     }
   });
 
