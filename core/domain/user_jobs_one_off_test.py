@@ -498,6 +498,10 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
 class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off dashboard stats job."""
 
+    DATE_AFTER_ONE_WEEK = (
+        (datetime.datetime.utcnow() + datetime.timedelta(7)).strftime(
+            feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT))
+
     USER_SESSION_ID = 'session1'
 
     EXP_ID_1 = 'exp_id_1'
@@ -632,9 +636,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
 
         def _mock_get_date_after_one_week():
             """Returns the date of the next week."""
-            return (
-                datetime.datetime.utcnow() + datetime.timedelta(7)).strftime(
-                    feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
+            return self.DATE_AFTER_ONE_WEEK
 
         with self.swap(
             utils, 'get_current_date_as_string', _mock_get_date_after_one_week):
@@ -642,6 +644,12 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
 
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         self.assertEqual(weekly_stats, [
+            {
+                utils.get_current_date_as_string(): {
+                    'average_ratings': 4.0,
+                    'total_plays': 2
+                }
+            },
             {
                 _mock_get_date_after_one_week(): {
                     'average_ratings': 3.0,
