@@ -771,7 +771,8 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             # pylint: disable=protected-access
             email_manager._send_email(
                 self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
-                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body')
+                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
+                feconf.SYSTEM_EMAIL_ADDRESS)
             # pylint: enable=protected-access
 
             # An error should be recorded in the logs.
@@ -814,7 +815,8 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             # pylint: disable=protected-access
             email_manager._send_email(
                 self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
-                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body')
+                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
+                feconf.SYSTEM_EMAIL_ADDRESS)
 
             # Check that a new email was sent.
             messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
@@ -830,7 +832,8 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
 
             email_manager._send_email(
                 self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
-                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body')
+                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
+                feconf.SYSTEM_EMAIL_ADDRESS)
             # pylint: enable=protected-access
 
             # An error should be recorded in the logs.
@@ -872,7 +875,8 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             # pylint: disable=protected-access
             email_manager._send_email(
                 self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
-                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body')
+                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
+                feconf.SYSTEM_EMAIL_ADDRESS)
             # pylint: enable=protected-access
 
             # Check that a new email was sent.
@@ -923,7 +927,8 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             # pylint: disable=protected-access
             email_manager._send_email(
                 self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
-                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body')
+                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
+                feconf.SYSTEM_EMAIL_ADDRESS)
             # pylint: enable=protected-access
 
             # Check that a new email was sent.
@@ -974,7 +979,8 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             # pylint: disable=protected-access
             email_manager._send_email(
                 self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
-                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body')
+                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
+                feconf.SYSTEM_EMAIL_ADDRESS)
             # pylint: enable=protected-access
 
             # Check that a new email was sent.
@@ -1041,7 +1047,8 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             # pylint: disable=protected-access
             email_manager._send_email(
                 self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
-                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body')
+                feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
+                feconf.SYSTEM_EMAIL_ADDRESS)
             # pylint: enable=protected-access
 
             # Check that a new email was sent.
