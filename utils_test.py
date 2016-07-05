@@ -194,7 +194,7 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_get_current_date_as_string(self):
         custom_datetimes = [
-            datetime.date(2011, 01, 01),
+            datetime.date(2011, 1, 1),
             datetime.date(2012, 2, 28)
         ]
         datetime_strings = [custom_datetime.strftime(

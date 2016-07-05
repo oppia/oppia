@@ -152,6 +152,9 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     The impact score is 0 for an exploration with 0 playthroughs or with an
     average rating of less than 2.5.
     """
+    # This value should be updated in the event of any event schema change.
+    CURRENT_EVENT_SCHEMA_VERSION = 1
+
     # The impact score.
     impact_score = ndb.FloatProperty(indexed=True)
 
@@ -182,7 +185,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
     # The version of dashboard stats schema.
     schema_version = ndb.IntegerProperty(
-        required=True, default=1, indexed=True)
+        required=True, default=CURRENT_EVENT_SCHEMA_VERSION, indexed=True)
 
 
 class ExplorationUserDataModel(base_models.BaseModel):

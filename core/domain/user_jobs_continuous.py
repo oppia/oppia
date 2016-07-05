@@ -432,12 +432,11 @@ class UserStatsMRJobManager(
 
         if len(ratings) != 0:
             average_ratings = (sum(ratings) / float(len(ratings)))
-            is_average_ratings = True
         else:
-            is_average_ratings = False
+            average_ratings = None
 
         if not mr_model:
-            if is_average_ratings:
+            if average_ratings:
                 user_models.UserStatsModel(
                     id=key,
                     impact_score=user_impact_score,
@@ -451,6 +450,6 @@ class UserStatsMRJobManager(
         else:
             mr_model.impact_score = user_impact_score
             mr_model.total_plays = total_plays
-            if is_average_ratings:
+            if average_ratings:
                 mr_model.average_ratings = average_ratings
             mr_model.put()
