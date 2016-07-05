@@ -690,8 +690,9 @@ def update_dashboard_stats_log(user_id):
     keyed by a datetime string.
     """
     model = user_models.UserStatsModel.get(user_id, strict=False)
+    # Create the user stats model if not already present
     if not model:
-        return
+        model = user_models.UserStatsModel(id=user_id)
 
     if model.schema_version != feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION:
         _migrate_dashboard_stats_to_latest_schema(model)
@@ -699,7 +700,7 @@ def update_dashboard_stats_log(user_id):
     weekly_dashboard_stats = {
         utils.get_current_date_as_string(): {
             'average_ratings': model.average_ratings,
-            'total_plays': model.total_plays
+            'total_plays': model.total_plays or 0
         }
     }
     model.weekly_creator_stats_list.append(weekly_dashboard_stats)
