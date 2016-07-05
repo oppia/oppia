@@ -167,6 +167,9 @@ URLS = MAPREDUCE_HANDLERS + [
         'admin_topics_csv_download_handler'),
 
     get_redirect_route(
+        r'/basedata', reader.OppiaBaseDataHandler, 'base_data'),
+
+    get_redirect_route(
         r'/notifications_dashboard', dashboard.NotificationsDashboardPage,
         'notifications_dashboard_handler'),
     get_redirect_route(

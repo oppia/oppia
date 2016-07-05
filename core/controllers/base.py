@@ -304,12 +304,7 @@ class BaseHandler(webapp2.RequestHandler):
         counters.JSON_RESPONSE_TIME_SECS.inc(increment=processing_time)
         counters.JSON_RESPONSE_COUNT.inc()
 
-    def render_template(
-            self, filename, values=None, iframe_restriction='DENY',
-            redirect_url_on_logout=None):
-        if values is None:
-            values = self.values
-
+    def update_base_data(self, values):
         scheme, netloc, path, _, _ = urlparse.urlsplit(self.request.uri)
 
         values.update({
@@ -353,19 +348,6 @@ class BaseHandler(webapp2.RequestHandler):
                 'Oppia is a free, open-source learning platform. Join the '
                 'community to create or try an exploration today!')
 
-        if redirect_url_on_logout is None:
-            redirect_url_on_logout = self.request.uri
-        if self.user_id:
-            values['logout_url'] = (
-                current_user_services.create_logout_url(
-                    redirect_url_on_logout))
-        else:
-            target_url = (
-                '/' if self.request.uri.endswith(feconf.SPLASH_URL)
-                else self.request.uri)
-            values['login_url'] = (
-                current_user_services.create_login_url(target_url))
-
         # Create a new csrf token for inclusion in HTML responses. This assumes
         # that tokens generated in one handler will be sent back to a handler
         # with the same page name.
@@ -382,6 +364,27 @@ class BaseHandler(webapp2.RequestHandler):
             values['csrf_token_create_exploration'] = (
                 CsrfTokenManager.create_csrf_token(
                     self.user_id, feconf.CSRF_PAGE_NAME_CREATE_EXPLORATION))
+
+    def render_template(
+            self, filename, values=None, iframe_restriction='DENY',
+            redirect_url_on_logout=None):
+        if values is None:
+            values = self.values
+
+        self.update_base_data(values)
+
+        if redirect_url_on_logout is None:
+            redirect_url_on_logout = self.request.uri
+        if self.user_id:
+            values['logout_url'] = (
+                current_user_services.create_logout_url(
+                    redirect_url_on_logout))
+        else:
+            target_url = (
+                '/' if self.request.uri.endswith(feconf.SPLASH_URL)
+                else self.request.uri)
+            values['login_url'] = (
+                current_user_services.create_login_url(target_url))
 
         self.response.cache_control.no_cache = True
         self.response.cache_control.must_revalidate = True

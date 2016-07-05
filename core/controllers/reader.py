@@ -169,6 +169,14 @@ def classify(state, answer):
         'exploration owner.')
 
 
+class OppiaBaseDataHandler(base.BaseHandler):
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    def get(self):
+        self.update_base_data(self.values)
+        self.render_json(self.values)
+
+
 class ExplorationPage(base.BaseHandler):
     """Page describing a single exploration."""
 
