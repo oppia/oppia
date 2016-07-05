@@ -17,16 +17,16 @@ Browsermob-proxy.
 """
 
 import os
-import random
 import time
 import urlparse
-from browsermobproxy import Server
+
+from core.tests.performance_framework import perf_domain
+import feconf
+
+import browsermobproxy
 from selenium import webdriver
 
-import feconf
-from core.tests.performance_framework import perf_domain
-
-CHROME_DRIVER_PATH = os.path.join(
+CHROMEDRIVER_PATH = os.path.join(
     '..', 'node_modules', 'protractor', 'selenium', 'chromedriver_2.21')
 
 BROWSERMOB_PROXY_PATH = os.path.join(
@@ -58,22 +58,14 @@ class SeleniumPerformanceDataFetcher(object):
 
     # Duration (in seconds) to wait for the complete page to load, otherwise
     # XHR requests made post initial page load will not be recorded.
-    WAIT_DURATION_SECS = 3
+    DEFAULT_WAIT_DURATION_SECS = 3
 
     BASE_URL = 'http://localhost:%d' % feconf.PERFORMANCE_TESTS_SERVER_PORT
 
-    LIBRARY_URL_SUFFIX = '/library'
-    EDITOR_URL_SLICE = '/create/'
-    PLAYER_URL_SLICE = '/explore/'
-    PROFILE_URL_SLICE = '/profile/'
-    LOGIN_URL_SUFFIX = '/_ah/login'
-    ADMIN_URL_SUFFIX = '/admin'
-    DASHBOARD_URL_SUFFIX = '/dashboard'
-    SPLASH_URL_SUFFIX = '/splash'
-    SIGNUP_URL_SUFFIX = '/signup'
-    DUMMY_URL = '/robots.txt'
-
-    def __init__(self, browser=DEFAULT_BROWSER_SOURCE, preload_options=None):
+    def __init__(self, browser=DEFAULT_BROWSER_SOURCE, username=None,
+                 do_login=False, create_exploration=False,
+                 reload_demo_collections=False, reload_demo_explorations=False,
+                 reload_first_exploration=False):
         """preload_options:
             login: True if login is required.
             enable_explorations: True if explorations needs to be enabled.
@@ -86,24 +78,26 @@ class SeleniumPerformanceDataFetcher(object):
             error_msg = 'Unsupported browser specified: %s' % browser
             raise ValueError(error_msg)
 
-        self.preload_options = preload_options
         self.exploration_url = None
         self.dev_appserver_login_cookie = None
 
-        random_id = random.randint(1, 100000)
-        self.email = 'test%d@example.com' % random_id
-        self.username = 'username%d' % random_id
-        self.username = self.preload_options.get('username', self.username)
+        # All tests are independent and they do login + signup + other test
+        # specific work. Using the same username across tests breaks this flow.
+        # Thus, different usernames enable independent tests.
+        self.email = '%s@example.com' % username
+        self.username = username
 
         driver = self._setup_driver()
-        if preload_options['login']:
+        if do_login:
             self._setup_login(driver)
-        elif preload_options['enable_explorations']:
-            self._setup_enable_explorations(driver)
-        elif preload_options['enable_collections']:
-            self._setup_enable_collections(driver)
-        elif preload_options['create_exploration']:
-            self._setup_create_exploration(driver)
+        elif create_exploration:
+            self._create_exploration(driver)
+        elif reload_demo_collections:
+            self._setup_reload_demo_collections(driver)
+        elif reload_demo_explorations:
+            self._setup_reload_demo_explorations(driver)
+        elif reload_first_exploration:
+            self._setup_reload_first_exploration(driver)
         self._stop_driver(driver)
 
     def load_url(self, page_url):
@@ -113,26 +107,18 @@ class SeleniumPerformanceDataFetcher(object):
         """
         driver = self._setup_driver(proxy=None, use_proxy=False)
 
-        get_page_url = page_url
-        if self.exploration_url:
-            get_page_url = self.exploration_url
-
-        driver.get(get_page_url)
+        driver.get(page_url)
 
         self._stop_driver(driver)
 
-    def get_page_metrics_for_url(self, page_url):
+    def get_page_metrics_from_uncached_session(self, page_url):
         """Returns a PageSessionMetrics domain object for a given page URL.
         """
         server, proxy = self._setup_proxy_server()
         driver = self._setup_driver(proxy=proxy, use_proxy=True)
 
-        get_page_url = page_url
-        if self.exploration_url:
-            get_page_url = self.exploration_url
-
-        proxy.new_har(get_page_url, options={'captureHeaders': True})
-        driver.get(get_page_url)
+        proxy.new_har(page_url, options={'captureHeaders': True})
+        driver.get(page_url)
 
         self._wait_until_page_load_is_finished()
 
@@ -154,16 +140,13 @@ class SeleniumPerformanceDataFetcher(object):
         server, proxy = self._setup_proxy_server()
         driver = self._setup_driver(proxy=proxy, use_proxy=True)
 
-        get_page_url = page_url
-        if self.exploration_url:
-            get_page_url = self.exploration_url
         # Fetch the page once. This leads to caching of various resources.
-        driver.get(get_page_url)
+        driver.get(page_url)
         self._wait_until_page_load_is_finished()
 
         # Start recording har data for the next page fetch.
-        proxy.new_har(get_page_url, options={'captureHeaders': True})
-        driver.get(get_page_url)
+        proxy.new_har(page_url, options={'captureHeaders': True})
+        driver.get(page_url)
 
         self._wait_until_page_load_is_finished()
 
@@ -175,17 +158,13 @@ class SeleniumPerformanceDataFetcher(object):
         return perf_domain.PageSessionMetrics(
             page_session_stats=har_dict, page_session_timings=None)
 
-    def get_page_timings_for_url(self, page_url):
+    def get_page_timings_from_uncached_session(self, page_url):
         """Returns a PageSessionMetrics domain object initialized using
         page load timings for a page URL.
         """
         driver = self._setup_driver(proxy=None, use_proxy=False)
 
-        get_page_url = page_url
-        if self.exploration_url:
-            get_page_url = self.exploration_url
-
-        driver.get(get_page_url)
+        driver.get(page_url)
         self._wait_until_page_load_is_finished()
 
         page_session_timings = (
@@ -203,14 +182,11 @@ class SeleniumPerformanceDataFetcher(object):
         """
         driver = self._setup_driver(proxy=None, use_proxy=False)
 
-        get_page_url = page_url
-        if self.exploration_url:
-            get_page_url = self.exploration_url
         # Fetch the page once. This leads to caching of various resources.
-        driver.get(get_page_url)
+        driver.get(page_url)
         self._wait_until_page_load_is_finished()
 
-        driver.get(get_page_url)
+        driver.get(page_url)
         self._wait_until_page_load_is_finished()
 
         page_session_timings = (
@@ -224,11 +200,11 @@ class SeleniumPerformanceDataFetcher(object):
     def _wait_until_page_load_is_finished(self, time_duration_secs=None):
         # Waits for the complete page to load, otherwise XHR requests
         # made post initial page load will not be recorded.
-        time.sleep(time_duration_secs or self.WAIT_DURATION_SECS)
+        time.sleep(time_duration_secs or self.DEFAULT_WAIT_DURATION_SECS)
 
     def _setup_proxy_server(self, downstream_kbps=None, upstream_kbps=None,
                             latency=None):
-        server = Server(BROWSERMOB_PROXY_PATH)
+        server = browsermobproxy.Server(BROWSERMOB_PROXY_PATH)
         server.start()
         proxy = server.create_proxy()
 
@@ -268,7 +244,7 @@ class SeleniumPerformanceDataFetcher(object):
                 chrome_options.add_argument(proxy_argument)
 
             driver = webdriver.Chrome(
-                CHROME_DRIVER_PATH,
+                CHROMEDRIVER_PATH,
                 chrome_options=chrome_options)
 
         elif self.browser == 'firefox':
@@ -285,7 +261,7 @@ class SeleniumPerformanceDataFetcher(object):
 
     def _add_cookie(self, driver):
         if self.dev_appserver_login_cookie:
-            driver.get('%s%s' % (self.BASE_URL, self.DUMMY_URL))
+            driver.get('%s%s' % (self.BASE_URL, feconf.ROBOTS_TXT_URL))
             driver.add_cookie(self.dev_appserver_login_cookie)
 
     def _stop_proxy_server(self, server):
@@ -305,21 +281,20 @@ class SeleniumPerformanceDataFetcher(object):
         return True
 
     def _login_user(self, driver):
-        driver.get(self.BASE_URL + self.LOGIN_URL_SUFFIX)
-        elem = driver.find_element_by_name("email")
+        driver.get(self.BASE_URL + feconf.LOGIN_URL)
+        elem = driver.find_element_by_name('email')
         elem.clear()
         elem.send_keys(self.email)
         driver.find_element_by_name('admin').click()
         driver.find_element_by_id('submit-login').click()
-        self._wait_until_page_load_is_finished(5)
-        self._complete_signup(driver)
         self._wait_until_page_load_is_finished()
+        self._complete_signup(driver)
         self.dev_appserver_login_cookie = driver.get_cookie(
             'dev_appserver_login')
 
     def _complete_signup(self, driver):
-        driver.get(self.BASE_URL + self.SIGNUP_URL_SUFFIX)
-        self._wait_until_page_load_is_finished(5)
+        driver.get(self.BASE_URL + feconf.SIGNUP_URL)
+        self._wait_until_page_load_is_finished()
         driver.find_element_by_css_selector(
             '.protractor-test-username-input').send_keys(self.username)
         driver.find_element_by_css_selector(
@@ -328,27 +303,35 @@ class SeleniumPerformanceDataFetcher(object):
             '.protractor-test-register-user').click()
         self._wait_until_page_load_is_finished()
 
-    def _reload_explorations(self, driver):
-        driver.get(self.BASE_URL + self.ADMIN_URL_SUFFIX)
-        self._wait_until_page_load_is_finished(5)
+    def _reload_demo_explorations(self, driver):
+        driver.get(self.BASE_URL + feconf.ADMIN_URL)
+        self._wait_until_page_load_is_finished()
         driver.find_element_by_css_selector(
             '.protractor-test-reload-all-explorations-button').click()
         driver.switch_to.alert.accept()
         self._wait_until_page_load_is_finished(20)
 
-    def _reload_collection(self, driver):
-        driver.get(self.BASE_URL + self.ADMIN_URL_SUFFIX)
-        self._wait_until_page_load_is_finished(5)
+    def _reload_first_exploration(self, driver):
+        driver.get(self.BASE_URL + feconf.ADMIN_URL)
+        self._wait_until_page_load_is_finished()
+        driver.find_element_by_css_selector(
+            '.protractor-test-reload-exploration-button').click()
+        driver.switch_to.alert.accept()
+        self._wait_until_page_load_is_finished()
+
+    def _reload_demo_collections(self, driver):
+        driver.get(self.BASE_URL + feconf.ADMIN_URL)
+        self._wait_until_page_load_is_finished()
         driver.find_element_by_css_selector(
             '.protractor-test-reload-collection-button').click()
         driver.switch_to.alert.accept()
         self._wait_until_page_load_is_finished(5)
 
     def _create_exploration(self, driver):
-        driver.get(self.BASE_URL + self.DASHBOARD_URL_SUFFIX)
+        driver.get(self.BASE_URL + feconf.DASHBOARD_URL)
         driver.find_element_by_css_selector(
             '.protractor-test-create-activity').click()
-        self._wait_until_page_load_is_finished(2)
+        self._wait_until_page_load_is_finished(1)
         driver.find_element_by_css_selector(
             '.protractor-test-create-exploration').click()
         self._wait_until_page_load_is_finished()
@@ -358,13 +341,17 @@ class SeleniumPerformanceDataFetcher(object):
     def _setup_login(self, driver):
         self._login_user(driver)
 
-    def _setup_enable_explorations(self, driver):
+    def _setup_reload_demo_explorations(self, driver):
         self._login_user(driver)
-        self._reload_explorations(driver)
+        self._reload_demo_explorations(driver)
 
-    def _setup_enable_collections(self, driver):
+    def _setup_reload_first_exploration(self, driver):
         self._login_user(driver)
-        self._reload_collection(driver)
+        self._reload_first_exploration(driver)
+
+    def _setup_reload_demo_collections(self, driver):
+        self._login_user(driver)
+        self._reload_demo_collections(driver)
 
     def _setup_create_exploration(self, driver):
         self._login_user(driver)

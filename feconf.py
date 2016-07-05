@@ -393,6 +393,7 @@ EMBEDDED_GOOGLE_GROUP_URL = (
 ALLOW_YAML_FILE_UPLOAD = False
 
 # TODO(sll): Add all other URLs here.
+ADMIN_URL = '/admin'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_WRITABLE_DATA_URL_PREFIX = '/collection_editor_handler/data'
 COLLECTION_RIGHTS_PREFIX = '/collection_editor_handler/rights'
@@ -415,10 +416,12 @@ LIBRARY_INDEX_URL = '/library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
 LIBRARY_SEARCH_URL = '/search/find'
 LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
+LOGIN_URL = '/_ah/login'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
+ROBOTS_TXT_URL = '/robots.txt'
 SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'

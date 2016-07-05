@@ -50,11 +50,12 @@ TEST_DATA = {
             'uncached': 10.0,
             'cached': 3.0,
         },
-        'preload_options':{
-            'login': False,
-            'enable_explorations': False,
-            'enable_collections': False,
-            'create_exploration': False
+        'preload_options': {
+            'do_login': False,
+            'create_exploration': False,
+            'reload_demo_collections': False,
+            'reload_demo_explorations': False,
+            'reload_single_exploration': False,
         }
     },
     LIBRARY_PAGE_KEY: {
@@ -67,11 +68,12 @@ TEST_DATA = {
             'uncached': 10.0,
             'cached': 3.0,
         },
-        'preload_options':{
-            'login': False,
-            'enable_explorations': True,
-            'enable_collections': False,
-            'create_exploration': False
+        'preload_options': {
+            'do_login': False,
+            'create_exploration': False,
+            'reload_demo_collections': False,
+            'reload_demo_explorations': True,
+            'reload_single_exploration': False,
         }
     },
     CREATOR_DASHBOARD_KEY: {
@@ -84,11 +86,12 @@ TEST_DATA = {
             'uncached': 10.0,
             'cached': 4.0,
         },
-        'preload_options':{
-            'login': True,
-            'enable_explorations': False,
-            'enable_collections': False,
-            'create_exploration': False
+        'preload_options': {
+            'do_login': True,
+            'create_exploration': False,
+            'reload_demo_collections': False,
+            'reload_demo_explorations': False,
+            'reload_single_exploration': False,
         }
     },
     EXPLORATION_PLAYER_KEY: {
@@ -101,11 +104,12 @@ TEST_DATA = {
             'uncached': 10.0,
             'cached': 8.0
         },
-        'preload_options':{
-            'login': False,
-            'enable_explorations': True,
-            'enable_collections': False,
-            'create_exploration': False
+        'preload_options': {
+            'do_login': False,
+            'create_exploration': True,
+            'reload_demo_collections': False,
+            'reload_demo_explorations': False,
+            'reload_single_exploration': False,
         }
     },
     EXPLORATION_EDITOR_KEY: {
@@ -118,11 +122,12 @@ TEST_DATA = {
             'uncached': 15.0,
             'cached': 14.0,
         },
-        'preload_options':{
-            'login': False,
-            'enable_explorations': False,
-            'enable_collections': False,
-            'create_exploration': True
+        'preload_options': {
+            'do_login': False,
+            'create_exploration': False,
+            'reload_demo_collections': False,
+            'reload_demo_explorations': False,
+            'reload_single_exploration': True,
         }
     },
     COLLECTION_PLAYER_KEY: {
@@ -135,11 +140,12 @@ TEST_DATA = {
             'uncached': 10.0,
             'cached': 5.0,
         },
-        'preload_options':{
-            'login': False,
-            'enable_explorations': False,
-            'enable_collections': True,
-            'create_exploration': False
+        'preload_options': {
+            'do_login': False,
+            'create_exploration': False,
+            'reload_demo_collections': True,
+            'reload_demo_explorations': False,
+            'reload_single_exploration': False,
         }
     },
     PROFILE_PAGE_KEY: {
@@ -152,11 +158,12 @@ TEST_DATA = {
             'uncached': 10.0,
             'cached': 3.0,
         },
-        'preload_options':{
-            'login': True,
-            'enable_explorations': False,
-            'enable_collections': False,
-            'create_exploration': False
+        'preload_options': {
+            'do_login': True,
+            'create_exploration': False,
+            'reload_demo_collections': False,
+            'reload_demo_explorations': False,
+            'reload_single_exploration': False,
         }
     }
 }

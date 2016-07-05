@@ -13,7 +13,6 @@
 # limitations under the License.
 
 """Performance tests for the profile page."""
-import random
 
 from core.tests.performance_tests import base
 from core.tests.performance_tests import test_config
@@ -26,12 +25,9 @@ class ProfilePagePerformanceTest(base.TestBase):
     def setUp(self):
         super(ProfilePagePerformanceTest, self).setUp()
 
-        random_id = random.randint(1, 100000)
-        username = 'username%d' % random_id
-
         page_config = test_config.TEST_DATA[self.PAGE_KEY]
-        page_config['preload_options']['username'] = username
-        self._set_page_config(page_config)
+
+        self._set_page_config(page_config, append_username=True)
 
         self._initialize_data_fetcher()
         self._load_page_to_cache_server_resources()

@@ -96,6 +96,7 @@ else
   export XVFB_PREFIX="/usr/bin/xvfb-run"
 fi
 
+# If no arguments are given.
 if [ $# -eq 0 ]; then
   # $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_path='core/tests/performance_tests'
   $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.collection_player_test
