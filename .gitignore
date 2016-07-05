@@ -19,3 +19,4 @@ venv/
 # directories for dev and prod. Resource directories for prod are generated
 # via build.py and should not be committed to the repo.
 static/prod
+i18n/prod

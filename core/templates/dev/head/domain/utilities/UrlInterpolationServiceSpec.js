@@ -214,10 +214,10 @@ describe('URL Interpolation Service', function() {
   });
 
   it('should throw an error for empty imagePath', function() {
-    expect(uis.getStaticImageUrl.bind(null)).toThrow(
+    expect(uis.getStaticImageUrl.bind(null, null)).toThrow(
       new Error(
         'Empty image path passed in getStaticImageUrl.'));
-    expect(uis.getStaticImageUrl.bind('')).toThrow(
+    expect(uis.getStaticImageUrl.bind(null, '')).toThrow(
       new Error(
         'Empty image path passed in getStaticImageUrl.'));
   });
@@ -225,13 +225,13 @@ describe('URL Interpolation Service', function() {
   // TODO(gvishal): This test gives error, despite everything being correct.
   it('should throw an error for imagePath not beginning with forward slash',
     function() {
-      expect(uis.getStaticImageUrl('test_url_fail')).toThrow(
+      expect(uis.getStaticImageUrl.bind(null, 'test_url_fail')).toThrow(
         new Error(
           'Image path passed into getStaticImageUrl must start with \'\/\': ' +
-          '\'' + new String('test_url_fail') + '\''));
-      expect(uis.getStaticImageUrl('test_url_fail/fail.png')).toThrow(
+          '\'' + new String('test_url_fail') + '\'.'));
+      expect(uis.getStaticImageUrl.bind(null, 'test_url/fail.png')).toThrow(
         new Error(
           'Image path passed into getStaticImageUrl must start with \'\/\': ' +
-          '\'' + new String('test_url_fail/fail.png') + '\'.'));
+          '\'' + new String('test_url/fail.png') + '\'.'));
     });
 });
