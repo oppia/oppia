@@ -276,11 +276,12 @@ class SeleniumPerformanceDataFetcher(object):
         driver.quit()
 
     def _check_login(self, driver):
+        """Checks whether a user is already logged in."""
         driver.get(self.BASE_URL)
         self._wait_until_page_load_is_finished()
         resulting_url = driver.current_url
 
-        if resulting_url == '%s%s' % (self.BASE_URL, self.SPLASH_URL_SUFFIX):
+        if resulting_url == '%s%s' % (self.BASE_URL, feconf.DASHBOARD_URL):
             return False
 
         return True
