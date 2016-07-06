@@ -33,7 +33,7 @@ CHROMEDRIVER_PATH = os.path.join(
 BROWSERMOB_PROXY_PATH = os.path.join(
     '..', 'oppia_tools', 'browsermob-proxy-2.1.1', 'bin', 'browsermob-proxy')
 
-BROWSER_SOURCE_CHROME = 'chrome'
+BROWSER_CHROME = 'chrome'
 
 
 class SeleniumPerformanceDataFetcher(object):
@@ -56,8 +56,8 @@ class SeleniumPerformanceDataFetcher(object):
 
     # Chrome is the default browser that selenium will use for extracting
     # performance stats.
-    DEFAULT_BROWSER_SOURCE = 'chrome'
-    SUPPORTED_BROWSER_SOURCES = ['chrome', 'firefox']
+    DEFAULT_BROWSER = 'chrome'
+    SUPPORTED_BROWSERS = ['chrome', 'firefox']
 
     # Duration (in seconds) to wait for the complete page to load, otherwise
     # XHR requests made post initial page load will not be recorded.
@@ -66,11 +66,11 @@ class SeleniumPerformanceDataFetcher(object):
     BASE_URL = 'http://localhost:%d' % test_config.PERFORMANCE_TESTS_SERVER_PORT
     LOGIN_URL = '/_ah/login'
 
-    def __init__(self, browser, username=None, preload_option=None):
+    def __init__(self, browser, preload_option, username=None):
         """preload_options can be either of the possible preload options
-        described at the top of this file.
+        described in test_config.
         """
-        if browser in self.SUPPORTED_BROWSER_SOURCES:
+        if browser in self.SUPPORTED_BROWSERS:
             self.browser = browser
         else:
             error_msg = 'Unsupported browser specified: %s' % browser
@@ -89,7 +89,9 @@ class SeleniumPerformanceDataFetcher(object):
         # is required to prevent browser cached resources altering the metrics
         # for our tests.
         driver = self._setup_driver()
-        if preload_option == test_config.PRELOAD_DO_LOGIN:
+        if preload_option == test_config.PRELOAD_NONE:
+            pass
+        elif preload_option == test_config.PRELOAD_DO_LOGIN:
             self._setup_login(driver)
         elif preload_option == test_config.PRELOAD_CREATE_EXP:
             self._create_exploration(driver)
@@ -99,6 +101,8 @@ class SeleniumPerformanceDataFetcher(object):
             self._setup_reload_demo_explorations(driver)
         elif preload_option == test_config.PRELOAD_RELOAD_FIRST_EXP:
             self._setup_reload_first_exploration(driver)
+        else:
+            raise Exception("Empty or invalid preload option.")
         self._stop_driver(driver)
 
     def load_url(self, page_url):

@@ -45,7 +45,7 @@ class TestBase(unittest.TestCase):
 
     def _initialize_data_fetcher(self):
         self.data_fetcher = perf_services.SeleniumPerformanceDataFetcher(
-            browser=perf_services.BROWSER_SOURCE_CHROME, username=self.username,
+            browser=perf_services.BROWSER_CHROME, username=self.username,
             preload_option=self.preload_option)
 
     def _get_complete_url(self, base_url, page_url_short):

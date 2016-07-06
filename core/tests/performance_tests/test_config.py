@@ -37,13 +37,13 @@ PAGE_KEY_CREATOR_DASHBOARD = 'dashboard'
 PAGE_KEY_EXPLORATION_PLAYER = 'explore'
 PAGE_KEY_EXPLORATION_EDITOR = 'editor'
 PAGE_KEY_COLLECTION_PLAYER = 'collection'
-PAGE_KEY_PROFILE_PAGE = 'profile'
+PAGE_KEY_PROFILE = 'profile'
 
-# Default port for GAE server that is started for performance tests.
+# Default port for GAE server that is used for performance tests.
 PERFORMANCE_TESTS_SERVER_PORT = 9501
 
-# Possible preload options. Only either one of them could be used and they are
-# mutually exclusive.
+# Possible preload options. Exactly one of these can be used.
+PRELOAD_NONE = 'NONE'
 PRELOAD_DO_LOGIN = 'DO_LOGIN'
 PRELOAD_CREATE_EXP = 'CREATE_EXPLORATION'
 PRELOAD_LOAD_DEMO_COLLECTIONS = 'LOAD_DEMO_COLLECTIONS'
@@ -61,7 +61,7 @@ TEST_DATA = {
             'uncached': 10.0,
             'cached': 3.0,
         },
-        'preload_options': None
+        'preload_options': PRELOAD_NONE
     },
     PAGE_KEY_LIBRARY: {
         'url': '/library',
@@ -123,7 +123,7 @@ TEST_DATA = {
         },
         'preload_options': PRELOAD_LOAD_DEMO_COLLECTIONS
     },
-    PAGE_KEY_PROFILE_PAGE: {
+    PAGE_KEY_PROFILE: {
         'url': '/profile/',
         'size_limits_mb': {
             'uncached': 7.0,
