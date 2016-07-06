@@ -117,10 +117,9 @@ def _check_versions(current_release):
         current_release (str): The current release tag to diff against.
 
     Returns:
-        Dictionary consisting of name --> boolean that indicates whether or not
-            it has changed.
+        List of variable names that changed
     """
-    feconf_changed_version = {}
+    feconf_changed_version = []
     git_show_cmd = (GIT_CMD_SHOW_FORMAT_STRING % current_release)
     old_feconf = _run_cmd(git_show_cmd)
     with open('feconf.py', 'r') as feconf:
@@ -130,7 +129,8 @@ def _check_versions(current_release):
                                  old_feconf)[0]
         new_version = re.findall(VERSION_RE_FORMAT_STRING % variable,
                                  new_feconf)[0]
-        feconf_changed_version[variable] = old_version != new_version
+        if old_version != new_version:
+            feconf_changed_version.append(variable)
     return feconf_changed_version
 
 
@@ -194,16 +194,19 @@ def main():
         current_release = _run_cmd(GIT_CMD_GET_CURRENT_VERSION)
         logs = _gather_logs(current_release)
         issue_links = _extract_issues(logs)
-        version_changes = _check_versions(current_release)
+        feconf_version_changes = _check_versions(current_release)
         setup_changes = _check_setup_scripts(current_release)
         storage_changes = _check_storage_models(current_release)
 
     summary_file = os.path.join(os.getcwd(), os.pardir, 'release_summary.md')
     with open(summary_file, 'w') as out:
         out.write('## Collected release information\n')
-        out.write('\n### Feconf version changes:\n')
-        for var, status in version_changes.items():
-            out.write('* %s: %s\n' % (var, status))
+
+        if feconf_version_changes:
+            out.write('\n### Feconf version changes:\nThis indicates that a '
+                      'migration may be needed\n\n')
+            for var in feconf_version_changes:
+                out.write('* %s  \n' % var)
 
         if setup_changes:
             out.write('\n### Changed setup scripts:\n')
