@@ -92,7 +92,7 @@ else
   export XVFB_PREFIX="/usr/bin/xvfb-run"
 fi
 
-
+TEST_NAME=""
 # Refer: http://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash
 for i in "$@"
 do
@@ -105,7 +105,7 @@ done
 
 # If an argument is present then run test for that specific page. Otherwise
 # run tests for all the pages sequentially.
-if [ $# -gt 0 ]; then
+if [[ ! -z $TEST_NAME ]]; then
   TEST_PATH="core.tests.performance_tests.$TEST_NAME"
   echo "Running performance test for: $TEST_NAME, executing: $TEST_PATH"
   $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_target=$TEST_PATH
