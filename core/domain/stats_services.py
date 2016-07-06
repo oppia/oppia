@@ -40,6 +40,33 @@ def get_top_unresolved_answers_for_default_rule(exploration_id, state_name):
     }
 
 
+def get_exp_wise_unresolved_answers_count_for_default_rule(exp_ids):
+    exploration_objects = exp_services.get_multiple_explorations_by_id(exp_ids)
+
+    explorations_num_states = [
+        len(exp_domain_objects[1].states)
+        for exp_domain_objects in
+        exploration_objects.iteritems()
+    ]
+
+    explorationwise_answer_counts = [0] * len(exp_ids)
+    for statewise_answers in (
+            get_top_state_rule_answers_multi(
+                [(exp_domain_objects[1].id, state_tuple[0])
+                 for exp_domain_objects in exploration_objects.iteritems()
+                 for state_tuple in exp_domain_objects[1].states.iteritems()
+                ],
+                exp_domain.DEFAULT_RULESPEC_STR)
+        ):
+
+        for ind, answer in enumerate(statewise_answers):
+            explorationwise_answer_counts[ind] += (
+                sum(answer[i].count
+                    for i in range(0, explorations_num_states[ind]-1)))
+
+    return explorationwise_answer_counts
+
+
 def get_state_rules_stats(exploration_id, state_name):
     """Gets statistics for the answer groups and rules of this state.
 

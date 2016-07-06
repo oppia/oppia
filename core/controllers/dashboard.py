@@ -23,6 +23,7 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import stats_services
 from core.domain import subscription_services
 from core.domain import summary_services
 from core.domain import user_jobs_continuous
@@ -164,8 +165,15 @@ class DashboardHandler(base.BaseHandler):
             feedback_services.get_thread_analytics_multi(
                 exploration_ids_subscribed_to))
 
+        unresolved_answers_list = (
+            stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
+                exploration_ids_subscribed_to))
+
         for ind, exploration in enumerate(explorations_list):
             exploration.update(feedback_thread_analytics[ind].to_dict())
+            exploration.update({
+                'num_unresolved_answers': unresolved_answers_list[ind]
+            })
 
         explorations_list = sorted(
             explorations_list,
