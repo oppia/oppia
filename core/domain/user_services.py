@@ -640,6 +640,22 @@ def _migrate_dashboard_stats_to_latest_schema(versioned_dashboard_stats):
             'present.' % feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION)
 
 
+def get_current_date_as_string():
+    """Returns current date as a string of format 'YYYY-MM-DD'"""
+    return datetime.datetime.utcnow().strftime(
+        feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
+
+
+def parse_date_from_string(datetime_str):
+    datetime_obj = datetime.datetime.strptime(
+        datetime_str, feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
+    return {
+        'year': datetime_obj.year,
+        'month': datetime_obj.month,
+        'day': datetime_obj.day
+    }
+
+
 def get_user_impact_score(user_id):
     """Returns user impact score associated with user_id"""
 
@@ -673,8 +689,28 @@ def get_user_dashboard_stats(user_id):
 def get_weekly_dashboard_stats(user_id):
     """Returns a list which contains the dashboard stats of a user,
     keyed by a datetime string.
+    The stats currently being saved are:
+      - 'average ratings': Average of ratings across all explorations of a
+        user.
+      - 'total plays': Sum total of number of plays across all explorations of
+        a user.
 
-    The stats currently being saved are: 'average ratings' and 'total plays'.
+    The format of returned value:
+    [
+        {
+            {{datetime_string_1}}: {
+                'average_ratings': (value),
+                'total_plays': (value)
+            }
+        },
+        {
+            {{datetime_string_2}}: {
+                'average_ratings': (value),
+                'total_plays': (value)
+            }
+        }
+    ]
+    If the user doesn't exist, then this method returns None.
     """
 
     model = user_models.UserStatsModel.get(user_id, strict=False)
@@ -698,7 +734,7 @@ def update_dashboard_stats_log(user_id):
         _migrate_dashboard_stats_to_latest_schema(model)
 
     weekly_dashboard_stats = {
-        utils.get_current_date_as_string(): {
+        get_current_date_as_string(): {
             'average_ratings': model.average_ratings,
             'total_plays': model.total_plays or 0
         }

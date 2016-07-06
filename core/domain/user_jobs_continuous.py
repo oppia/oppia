@@ -436,20 +436,13 @@ class UserStatsMRJobManager(
             average_ratings = None
 
         if not mr_model:
-            if average_ratings:
-                user_models.UserStatsModel(
-                    id=key,
-                    impact_score=user_impact_score,
-                    total_plays=total_plays,
-                    average_ratings=average_ratings).put()
-            else:
-                user_models.UserStatsModel(
-                    id=key,
-                    impact_score=user_impact_score,
-                    total_plays=total_plays).put()
+            user_models.UserStatsModel(
+                id=key,
+                impact_score=user_impact_score,
+                total_plays=total_plays,
+                average_ratings=average_ratings).put()
         else:
             mr_model.impact_score = user_impact_score
             mr_model.total_plays = total_plays
-            if average_ratings:
-                mr_model.average_ratings = average_ratings
+            mr_model.average_ratings = average_ratings
             mr_model.put()

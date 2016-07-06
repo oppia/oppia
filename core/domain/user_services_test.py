@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
 import logging
 import os
 
@@ -236,6 +237,54 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEquals(
             email_preferences['can_receive_editor_role_email'],
             False)
+
+    def test_get_current_date_as_string(self):
+        custom_datetimes = [
+            datetime.date(2011, 1, 1),
+            datetime.date(2012, 2, 28)
+        ]
+        datetime_strings = [custom_datetime.strftime(
+            feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
+                            for custom_datetime in custom_datetimes]
+
+        self.assertEqual(len(datetime_strings[0].split('-')[0]), 4)
+        self.assertEqual(len(datetime_strings[0].split('-')[1]), 2)
+        self.assertEqual(len(datetime_strings[0].split('-')[2]), 2)
+
+        self.assertEqual(len(datetime_strings[1].split('-')[0]), 4)
+        self.assertEqual(len(datetime_strings[1].split('-')[1]), 2)
+        self.assertEqual(len(datetime_strings[1].split('-')[2]), 2)
+
+        self.assertEqual(datetime_strings[0], '2011-01-01')
+        self.assertEqual(datetime_strings[1], '2012-02-28')
+
+    def test_parse_date_from_string(self):
+        test_datetime_strings = [
+            '2016-06-30',
+            '2016-07-05',
+            '2016-13-01',
+            '2016-03-32'
+        ]
+
+        self.assertEqual(
+            user_services.parse_date_from_string(test_datetime_strings[0]),
+            {
+                'year': 2016,
+                'month': 6,
+                'day': 30
+            })
+        self.assertEqual(
+            user_services.parse_date_from_string(test_datetime_strings[1]),
+            {
+                'year': 2016,
+                'month': 7,
+                'day': 5
+            })
+
+        with self.assertRaises(ValueError):
+            user_services.parse_date_from_string(test_datetime_strings[2])
+        with self.assertRaises(ValueError):
+            user_services.parse_date_from_string(test_datetime_strings[3])
 
 
 class UpdateContributionMsecTests(test_utils.GenericTestBase):
@@ -485,7 +534,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
 
     USER_SESSION_ID = 'session1'
 
-    CURRENT_DATE_AS_STRING = utils.get_current_date_as_string()
+    CURRENT_DATE_AS_STRING = user_services.get_current_date_as_string()
 
     def setUp(self):
         super(UserDashboardStatsTests, self).setUp()
@@ -526,7 +575,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         self.assertEquals(
             user_services.get_weekly_dashboard_stats(self.owner_id), None)
 
-        with self.swap(utils,
+        with self.swap(user_services,
                        'get_current_date_as_string',
                        self._mock_get_current_date_as_string):
             user_services.update_dashboard_stats_log(self.owner_id)
@@ -556,7 +605,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         self.assertEquals(
             user_services.get_weekly_dashboard_stats(self.owner_id), None)
 
-        with self.swap(utils,
+        with self.swap(user_services,
                        'get_current_date_as_string',
                        self._mock_get_current_date_as_string):
             user_services.update_dashboard_stats_log(self.owner_id)

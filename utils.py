@@ -311,22 +311,6 @@ def get_current_time_in_millisecs():
     return get_time_in_millisecs(datetime.datetime.utcnow())
 
 
-def get_current_date_as_string():
-    """Returns current date as a string of format 'YYYY-MM-DD'"""
-    return datetime.datetime.utcnow().strftime(
-        feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
-
-
-def parse_date_from_string(datetime_str):
-    datetime_obj = datetime.datetime.strptime(
-        datetime_str, feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
-    return {
-        'year': datetime_obj.year,
-        'month': datetime_obj.month,
-        'day': datetime_obj.day
-    }
-
-
 def get_human_readable_time_string(time_msec):
     """Given a time in milliseconds since the epoch, get a human-readable
     time string for the admin dashboard.

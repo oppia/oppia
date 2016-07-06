@@ -15,10 +15,7 @@
 # limitations under the License.
 
 # pylint: disable=relative-import
-import datetime
-
 from core.tests import test_utils
-import feconf
 import utils
 # pylint: enable=relative-import
 
@@ -191,48 +188,3 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(
             utils.get_thumbnail_icon_url_for_category('Nonexistent'),
             '/images/subjects/Lightbulb.svg')
-
-    def test_get_current_date_as_string(self):
-        custom_datetimes = [
-            datetime.date(2011, 1, 1),
-            datetime.date(2012, 2, 28)
-        ]
-        datetime_strings = [custom_datetime.strftime(
-            feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
-                            for custom_datetime in custom_datetimes]
-
-        self.assertEqual(len(datetime_strings[0].split('-')[0]), 4)
-        self.assertEqual(len(datetime_strings[0].split('-')[1]), 2)
-        self.assertEqual(len(datetime_strings[0].split('-')[2]), 2)
-
-        self.assertEqual(len(datetime_strings[1].split('-')[0]), 4)
-        self.assertEqual(len(datetime_strings[1].split('-')[1]), 2)
-        self.assertEqual(len(datetime_strings[1].split('-')[2]), 2)
-
-    def test_parse_date_from_string(self):
-        test_datetime_strings = [
-            '2016-06-30',
-            '2016-07-05',
-            '2016-13-01',
-            '2016-03-32'
-        ]
-
-        self.assertEqual(
-            utils.parse_date_from_string(test_datetime_strings[0]),
-            {
-                'year': 2016,
-                'month': 6,
-                'day': 30
-            })
-        self.assertEqual(
-            utils.parse_date_from_string(test_datetime_strings[1]),
-            {
-                'year': 2016,
-                'month': 7,
-                'day': 5
-            })
-
-        with self.assertRaises(ValueError):
-            utils.parse_date_from_string(test_datetime_strings[2])
-        with self.assertRaises(ValueError):
-            utils.parse_date_from_string(test_datetime_strings[3])

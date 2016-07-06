@@ -33,7 +33,6 @@ from core.platform import models
 from core.tests import test_utils
 
 import feconf
-import utils
 
 (user_models, feedback_models) = models.Registry.import_models(
     [models.NAMES.user, models.NAMES.feedback])
@@ -498,6 +497,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
 class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off dashboard stats job."""
 
+    CURRENT_DATE_AS_STRING = user_services.get_current_date_as_string()
     DATE_AFTER_ONE_WEEK = (
         (datetime.datetime.utcnow() + datetime.timedelta(7)).strftime(
             feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT))
@@ -524,6 +524,9 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
+    def _mock_get_current_date_as_string(self):
+        return self.CURRENT_DATE_AS_STRING
+
     def _rate_exploration(self, user_id, exp_id, rating):
         rating_services.assign_rating_to_exploration(user_id, exp_id, rating)
 
@@ -532,7 +535,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
             exp_id, self.EXP_VERSION, state, self.USER_SESSION_ID, {},
             feconf.PLAY_TYPE_NORMAL)
 
-    def test_no_weekly_stats_if_continuous_stats_job_has_not_been_run(self):
+    def test_weekly_stats_if_continuous_stats_job_has_not_been_run(self):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID_1, self.owner_id)
         exp_id = exploration.id
@@ -543,18 +546,36 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         self.assertEqual(weekly_stats, None)
 
-        self._run_one_off_job()
-        weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
-        self.assertEqual(weekly_stats, None)
+        with self.swap(user_services,
+                       'get_current_date_as_string',
+                       self._mock_get_current_date_as_string):
+            self._run_one_off_job()
 
-    def test_no_weekly_stats_if_no_explorations(self):
+        weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
+        self.assertEqual(weekly_stats, [{
+            self._mock_get_current_date_as_string(): {
+                'average_ratings': None,
+                'total_plays': 0
+            }
+        }])
+
+    def test_weekly_stats_if_no_explorations(self):
         (user_jobs_continuous_test.ModifiedUserStatsAggregator.
          start_computation())
         self.process_and_flush_pending_tasks()
 
-        self._run_one_off_job()
+        with self.swap(user_services,
+                       'get_current_date_as_string',
+                       self._mock_get_current_date_as_string):
+            self._run_one_off_job()
+
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
-        self.assertEqual(weekly_stats, None)
+        self.assertEqual(weekly_stats, [{
+            self._mock_get_current_date_as_string(): {
+                'average_ratings': None,
+                'total_plays': 0
+            }
+        }])
 
     def test_weekly_stats_for_single_exploration(self):
         exploration = self.save_new_valid_exploration(
@@ -568,10 +589,14 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
          start_computation())
         self.process_and_flush_pending_tasks()
 
-        self._run_one_off_job()
+        with self.swap(user_services,
+                       'get_current_date_as_string',
+                       self._mock_get_current_date_as_string):
+            self._run_one_off_job()
+
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         self.assertEqual(weekly_stats, [{
-            utils.get_current_date_as_string(): {
+            self._mock_get_current_date_as_string(): {
                 'average_ratings': 5.0,
                 'total_plays': 1
             }
@@ -593,10 +618,14 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
          start_computation())
         self.process_and_flush_pending_tasks()
 
-        self._run_one_off_job()
+        with self.swap(user_services,
+                       'get_current_date_as_string',
+                       self._mock_get_current_date_as_string):
+            self._run_one_off_job()
+
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         self.assertEqual(weekly_stats, [{
-            utils.get_current_date_as_string(): {
+            self._mock_get_current_date_as_string(): {
                 'average_ratings': 4.5,
                 'total_plays': 1
             }
@@ -615,10 +644,14 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
          start_computation())
         self.process_and_flush_pending_tasks()
 
-        self._run_one_off_job()
+        with self.swap(user_services,
+                       'get_current_date_as_string',
+                       self._mock_get_current_date_as_string):
+            self._run_one_off_job()
+
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         self.assertEqual(weekly_stats, [{
-            utils.get_current_date_as_string(): {
+            self._mock_get_current_date_as_string(): {
                 'average_ratings': 4.0,
                 'total_plays': 2
             }
@@ -638,14 +671,15 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
             """Returns the date of the next week."""
             return self.DATE_AFTER_ONE_WEEK
 
-        with self.swap(
-            utils, 'get_current_date_as_string', _mock_get_date_after_one_week):
+        with self.swap(user_services,
+                       'get_current_date_as_string',
+                       _mock_get_date_after_one_week):
             self._run_one_off_job()
 
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         self.assertEqual(weekly_stats, [
             {
-                utils.get_current_date_as_string(): {
+                self._mock_get_current_date_as_string(): {
                     'average_ratings': 4.0,
                     'total_plays': 2
                 }
