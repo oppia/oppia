@@ -428,21 +428,11 @@ class UserStatsMRJobManager(
         # Find the average of all average ratings
         ratings = [value['average_rating_for_owned_exp'] for value in values
                    if value.get('average_rating_for_owned_exp')]
-        mr_model = user_models.UserStatsModel.get(key, strict=False)
 
+        mr_model = user_models.UserStatsModel.get_or_create(key)
+        mr_model.impact_score = user_impact_score
+        mr_model.total_plays = total_plays
         if len(ratings) != 0:
             average_ratings = (sum(ratings) / float(len(ratings)))
-        else:
-            average_ratings = None
-
-        if not mr_model:
-            user_models.UserStatsModel(
-                id=key,
-                impact_score=user_impact_score,
-                total_plays=total_plays,
-                average_ratings=average_ratings).put()
-        else:
-            mr_model.impact_score = user_impact_score
-            mr_model.total_plays = total_plays
             mr_model.average_ratings = average_ratings
-            mr_model.put()
+        mr_model.put()

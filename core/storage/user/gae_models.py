@@ -187,6 +187,16 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
             default=feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION,
             indexed=True))
 
+    @classmethod
+    def get_or_create(cls, user_id):
+        """Creates a new UserStatsModel instance, if it does not already
+        exist.
+        """
+        entity = cls.get(user_id, strict=False)
+        if not entity:
+            entity = cls(id=user_id)
+        return entity
+
 
 class ExplorationUserDataModel(base_models.BaseModel):
     """User-specific data pertaining to a specific exploration.
