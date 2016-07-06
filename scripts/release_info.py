@@ -208,27 +208,27 @@ def main():
         if setup_changes:
             out.write('\n### Changed setup scripts:\n')
             for var in setup_changes.keys():
-                out.write('* %s\n' % var)
+                out.write('* %s  \n' % var)
 
         if storage_changes:
             out.write('\n### Changed storage models:\n')
             for item in storage_changes:
-                out.write('* %s\n' % item)
+                out.write('* %s  \n' % item)
 
         out.write('\n### Authors:\n')
         # TODO: duplicate author handling due to email changes
         for name, email in sorted({(log.author, log.email) for log in logs}):
-            out.write('%s <%s>\n' % (name, email))
+            out.write('%s <%s>  \n' % (name, email))
 
         out.write('\n### Commit History:\n')
         for name, title in [(log.author, log.message.split('\n\n')[0])
                             for log in logs]:
-            out.write('%s: %s\n' % (name, title))
+            out.write('%s: %s  \n' % (name, title))
 
         if issue_links:
             out.write('\n### Issues mentioned in commits:\n')
             for link in issue_links:
-                out.write('* [%s](%s)\n' % (link, link))
+                out.write('* [%s](%s)  \n' % (link, link))
 
     print 'Done. Summary file generated in ../release_summary.md'
 
