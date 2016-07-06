@@ -51,8 +51,8 @@ class ChangedBranch(object):
             try:
                 subprocess.check_output(['git', 'checkout', self.new_branch])
             except subprocess.CalledProcessError:
-                print ('\nCould not change to %s. This is most probably because'
-                       ' you are in a dirty state' % self.new_branch)
+                print ('\nCould not change to %s. This is most probably '
+                       'because you are in a dirty state' % self.new_branch)
                 sys.exit(1)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -85,7 +85,8 @@ def _gather_logs(start, stop='HEAD'):
         list[Log]: List of Logs
 
     """
-    get_logs_cmd = GIT_CMD_GET_LOGS_FORMAT_STRING.format(GROUP_SEP, start, stop)
+    get_logs_cmd = GIT_CMD_GET_LOGS_FORMAT_STRING.format(GROUP_SEP, start,
+                                                         stop)
     out = _run_cmd(get_logs_cmd).split('\x00')
     if len(out) == 1 and out[0] == '':
         return []
@@ -164,9 +165,11 @@ def _check_setup_scripts(base_release_tag, changed_only=True):
                      ['setup.sh', 'setup_gae.sh', 'install_third_party.sh',
                       'install_third_party.py']]
     changed_files = _git_diff_names_only(base_release_tag)
-    changes_dict = {script: script in changed_files for script in setup_scripts}
+    changes_dict = {script: script in changed_files
+                    for script in setup_scripts}
     if changed_only:
-        return {name: status for name, status in changes_dict.items() if status}
+        return {name: status for name, status
+                in changes_dict.items() if status}
     else:
         return changes_dict
 
