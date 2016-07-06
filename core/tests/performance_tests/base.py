@@ -18,9 +18,9 @@ import random
 import unittest
 import urlparse
 
-import feconf
 from core.tests.performance_framework import perf_services
 from core.tests.performance_framework import perf_domain
+import feconf
 
 
 class TestBase(unittest.TestCase):
@@ -39,22 +39,14 @@ class TestBase(unittest.TestCase):
         self.size_limit_cached_bytes = None
         self.load_time_limit_uncached_ms = None
         self.load_time_limit_cached_ms = None
-        self.preload_options = None
 
         self.username = 'user%d' % random.randint(1, 100000)
-        self.do_login = False
-        self.create_exploration = False
-        self.reload_demo_collections = False
-        self.reload_demo_explorations = False
-        self.reload_first_exploration = False
+        self.preload_option = None
 
     def _initialize_data_fetcher(self):
         self.data_fetcher = perf_services.SeleniumPerformanceDataFetcher(
-            browser='chrome', username=self.username, do_login=self.do_login,
-            create_exploration=self.create_exploration,
-            reload_demo_collections=self.reload_demo_collections,
-            reload_demo_explorations=self.reload_demo_explorations,
-            reload_first_exploration=self.reload_first_exploration)
+            browser='chrome', username=self.username,
+            preload_option=self.preload_option)
 
     def _get_complete_url(self, base_url, page_url_short):
         return urlparse.urljoin(base_url, page_url_short)
@@ -112,18 +104,16 @@ class TestBase(unittest.TestCase):
         self.load_time_limit_cached_ms = (
             page_config['load_time_limits_secs']['cached'] * 1000)
 
-        self.preload_options = page_config['preload_options']
-
-        if self.preload_options['do_login']:
-            self.do_login = True
-        elif self.preload_options['create_exploration']:
-            self.create_exploration = True
-        elif self.preload_options['reload_demo_collections']:
-            self.reload_demo_collections = True
-        elif self.preload_options['reload_demo_explorations']:
-            self.reload_demo_explorations = True
-        elif self.preload_options['reload_single_exploration']:
-            self.reload_first_exploration = True
+        if page_config['preload_options']['do_login']:
+            self.preload_option = perf_services.DO_LOGIN
+        elif page_config['preload_options']['create_exploration']:
+            self.preload_option = perf_services.CREATE_EXPLORATION
+        elif page_config['preload_options']['reload_demo_collections']:
+            self.preload_option = perf_services.RELOAD_DEMO_COLLECTIONS
+        elif page_config['preload_options']['reload_demo_explorations']:
+            self.preload_option = perf_services.RELOAD_DEMO_EXPLORATIONS
+        elif page_config['preload_options']['reload_single_exploration']:
+            self.preload_option = perf_services.RELOAD_FIRST_EXPLORATION
 
         if append_username:
             self.page_url = self._get_complete_url(

@@ -32,6 +32,14 @@ CHROMEDRIVER_PATH = os.path.join(
 BROWSERMOB_PROXY_PATH = os.path.join(
     '..', 'oppia_tools', 'browsermob-proxy-2.1.1', 'bin', 'browsermob-proxy')
 
+# Possible preload options. Only either one of them could be used and they are
+# mutually exclusive.
+DO_LOGIN = 'DO_LOGIN'
+CREATE_EXPLORATION = 'CREATE_EXPLORATION'
+RELOAD_DEMO_COLLECTIONS = 'RELOAD_DEMO_COLLECTIONS'
+RELOAD_DEMO_EXPLORATIONS = 'RELOAD_DEMO_EXPLORATIONS'
+RELOAD_FIRST_EXPLORATION = 'RELOAD_FIRST_EXPLORATION'
+
 
 class SeleniumPerformanceDataFetcher(object):
     """Fetches performance data for locally served Oppia pages using Selenium
@@ -63,14 +71,9 @@ class SeleniumPerformanceDataFetcher(object):
     BASE_URL = 'http://localhost:%d' % feconf.PERFORMANCE_TESTS_SERVER_PORT
 
     def __init__(self, browser=DEFAULT_BROWSER_SOURCE, username=None,
-                 do_login=False, create_exploration=False,
-                 reload_demo_collections=False, reload_demo_explorations=False,
-                 reload_first_exploration=False):
-        """preload_options:
-            login: True if login is required.
-            enable_explorations: True if explorations needs to be enabled.
-            enable_collections: True if collections needs to be enabled.
-            create_exploration: True if exploration needs to be created.
+                 preload_option=None):
+        """preload_options can be either of the possible preload options
+        described at the top of this file.
         """
         if browser in self.SUPPORTED_BROWSER_SOURCES:
             self.browser = browser
@@ -87,16 +90,19 @@ class SeleniumPerformanceDataFetcher(object):
         self.email = '%s@example.com' % username
         self.username = username
 
+        # Initialize stuff required by the test. A separate driver instance
+        # is required to prevent browser cached resources altering the metrics
+        # for our tests.
         driver = self._setup_driver()
-        if do_login:
+        if preload_option == DO_LOGIN:
             self._setup_login(driver)
-        elif create_exploration:
+        elif preload_option == CREATE_EXPLORATION:
             self._create_exploration(driver)
-        elif reload_demo_collections:
+        elif preload_option == RELOAD_DEMO_COLLECTIONS:
             self._setup_reload_demo_collections(driver)
-        elif reload_demo_explorations:
+        elif preload_option == RELOAD_DEMO_EXPLORATIONS:
             self._setup_reload_demo_explorations(driver)
-        elif reload_first_exploration:
+        elif preload_option == RELOAD_FIRST_EXPLORATION:
             self._setup_reload_first_exploration(driver)
         self._stop_driver(driver)
 
