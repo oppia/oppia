@@ -50,19 +50,21 @@ def get_exp_wise_unresolved_answers_count_for_default_rule(exp_ids):
     ]
 
     explorationwise_answer_counts = [0] * len(exp_ids)
+    exp_index = 0
     for statewise_answers in (
             get_top_state_rule_answers_multi(
                 [(exp_domain_objects[1].id, state_tuple[0])
                  for exp_domain_objects in exploration_objects.iteritems()
                  for state_tuple in exp_domain_objects[1].states.iteritems()
                 ],
-                exp_domain.DEFAULT_RULESPEC_STR)
+                [exp_domain.DEFAULT_RULESPEC_STR])
         ):
-
-        for ind, answer in enumerate(statewise_answers):
-            explorationwise_answer_counts[ind] += (
-                sum(answer[i].count
-                    for i in range(0, explorations_num_states[ind]-1)))
+        for answer in statewise_answers:
+            explorationwise_answer_counts[exp_index] += answer['count']
+            explorations_num_states[exp_index] -= 1
+            if explorations_num_states[exp_index] == 0:
+                exp_index += 1
+                break
 
     return explorationwise_answer_counts
 
@@ -202,21 +204,6 @@ def get_versions_for_exploration_stats(exploration_id):
     """Returns list of versions for this exploration."""
     return stats_models.ExplorationAnnotationsModel.get_versions(
         exploration_id)
-
-
-def get_total_unresolved_answers_for_exploration(exploration_id):
-    """Returns the sum total of unresolved answers (across all states) of an
-    exploration."""
-    exploration = exp_services.get_exploration_by_id(exploration_id)
-    state_names = exploration.states.keys()
-
-    rules_list = []
-    for state_name in state_names:
-        rules_list.append({'state_name': state_name,
-                           'rule_str': exp_domain.DEFAULT_RULESPEC_STR})
-    return (sum(state_domain.total_answer_count for state_domain in
-                stats_domain.StateRuleAnswerLog.get_multi(
-                    exploration_id, rules_list)))
 
 
 def get_exploration_stats(exploration_id, exploration_version):
