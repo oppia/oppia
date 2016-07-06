@@ -96,9 +96,8 @@ else
   export XVFB_PREFIX="/usr/bin/xvfb-run"
 fi
 
-# If no arguments are given.
+# If no arguments are given execute all the tests sequentially.
 if [ $# -eq 0 ]; then
-  # $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_path='core/tests/performance_tests'
   $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.collection_player_test
   $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.creator_dashboard_test
   $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.exploration_editor_test

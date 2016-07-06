@@ -102,7 +102,7 @@ class SeleniumPerformanceDataFetcher(object):
         elif preload_option == test_config.PRELOAD_RELOAD_FIRST_EXP:
             self._setup_reload_first_exploration(driver)
         else:
-            raise Exception("Empty or invalid preload option.")
+            raise Exception('Empty or invalid preload option.')
         self._stop_driver(driver)
 
     def load_url(self, page_url):
@@ -275,7 +275,7 @@ class SeleniumPerformanceDataFetcher(object):
     def _stop_driver(self, driver):
         driver.quit()
 
-    def _check_login(self, driver):
+    def _is_current_user_logged_in(self, driver):
         """Checks whether a user is already logged in."""
         driver.get(self.BASE_URL)
         self._wait_until_page_load_is_finished()
