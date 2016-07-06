@@ -20,7 +20,7 @@ from core.tests.performance_tests import test_config
 
 class LibraryPagePerformanceTest(base.TestBase):
     """Performance tests for the library page."""
-    PAGE_KEY = test_config.LIBRARY_PAGE_KEY
+    PAGE_KEY = test_config.PAGE_KEY_LIBRARY
 
     def setUp(self):
         super(LibraryPagePerformanceTest, self).setUp()

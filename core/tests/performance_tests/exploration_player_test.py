@@ -20,7 +20,7 @@ from core.tests.performance_tests import test_config
 
 class ExplorationPlayerPerformanceTest(base.TestBase):
     """Performance tests for the exploration player."""
-    PAGE_KEY = test_config.EXPLORATION_PLAYER_KEY
+    PAGE_KEY = test_config.PAGE_KEY_EXPLORATION_PLAYER
 
     def setUp(self):
         super(ExplorationPlayerPerformanceTest, self).setUp()

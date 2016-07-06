@@ -31,16 +31,27 @@ Each page entry includes:
         cached: see above.
 """
 
-SPLASH_PAGE_KEY = 'splash'
-LIBRARY_PAGE_KEY = 'library'
-CREATOR_DASHBOARD_KEY = 'dashboard'
-EXPLORATION_PLAYER_KEY = 'explore'
-EXPLORATION_EDITOR_KEY = 'editor'
-COLLECTION_PLAYER_KEY = 'collection'
-PROFILE_PAGE_KEY = 'profile'
+PAGE_KEY_SPLASH = 'splash'
+PAGE_KEY_LIBRARY = 'library'
+PAGE_KEY_CREATOR_DASHBOARD = 'dashboard'
+PAGE_KEY_EXPLORATION_PLAYER = 'explore'
+PAGE_KEY_EXPLORATION_EDITOR = 'editor'
+PAGE_KEY_COLLECTION_PLAYER = 'collection'
+PAGE_KEY_PROFILE_PAGE = 'profile'
+
+# Default port for GAE server that is started for performance tests.
+PERFORMANCE_TESTS_SERVER_PORT = 9501
+
+# Possible preload options. Only either one of them could be used and they are
+# mutually exclusive.
+PRELOAD_DO_LOGIN = 'DO_LOGIN'
+PRELOAD_CREATE_EXP = 'CREATE_EXPLORATION'
+PRELOAD_LOAD_DEMO_COLLECTIONS = 'LOAD_DEMO_COLLECTIONS'
+PRELOAD_RELOAD_DEMO_EXPS = 'RELOAD_DEMO_EXPLORATIONS'
+PRELOAD_RELOAD_FIRST_EXP = 'RELOAD_FIRST_EXPLORATION'
 
 TEST_DATA = {
-    SPLASH_PAGE_KEY: {
+    PAGE_KEY_SPLASH: {
         'url': '/splash',
         'size_limits_mb': {
             'uncached': 6.5,
@@ -50,15 +61,9 @@ TEST_DATA = {
             'uncached': 10.0,
             'cached': 3.0,
         },
-        'preload_options': {
-            'do_login': False,
-            'create_exploration': False,
-            'reload_demo_collections': False,
-            'reload_demo_explorations': False,
-            'reload_single_exploration': False,
-        }
+        'preload_options': None
     },
-    LIBRARY_PAGE_KEY: {
+    PAGE_KEY_LIBRARY: {
         'url': '/library',
         'size_limits_mb': {
             'uncached': 6.5,
@@ -68,15 +73,9 @@ TEST_DATA = {
             'uncached': 10.0,
             'cached': 3.0,
         },
-        'preload_options': {
-            'do_login': False,
-            'create_exploration': False,
-            'reload_demo_collections': False,
-            'reload_demo_explorations': True,
-            'reload_single_exploration': False,
-        }
+        'preload_options': PRELOAD_RELOAD_DEMO_EXPS
     },
-    CREATOR_DASHBOARD_KEY: {
+    PAGE_KEY_CREATOR_DASHBOARD: {
         'url': '/dashboard',
         'size_limits_mb': {
             'uncached': 8.0,
@@ -86,15 +85,9 @@ TEST_DATA = {
             'uncached': 10.0,
             'cached': 4.0,
         },
-        'preload_options': {
-            'do_login': True,
-            'create_exploration': False,
-            'reload_demo_collections': False,
-            'reload_demo_explorations': False,
-            'reload_single_exploration': False,
-        }
+        'preload_options': PRELOAD_DO_LOGIN
     },
-    EXPLORATION_PLAYER_KEY: {
+    PAGE_KEY_EXPLORATION_PLAYER: {
         'url': '/explore/0',
         'size_limits_mb': {
             'uncached': 8.0,
@@ -104,15 +97,9 @@ TEST_DATA = {
             'uncached': 10.0,
             'cached': 8.0
         },
-        'preload_options': {
-            'do_login': False,
-            'create_exploration': True,
-            'reload_demo_collections': False,
-            'reload_demo_explorations': False,
-            'reload_single_exploration': False,
-        }
+        'preload_options': PRELOAD_RELOAD_FIRST_EXP
     },
-    EXPLORATION_EDITOR_KEY: {
+    PAGE_KEY_EXPLORATION_EDITOR: {
         'url': '/create/0',
         'size_limits_mb': {
             'uncached': 12.0,
@@ -122,15 +109,9 @@ TEST_DATA = {
             'uncached': 15.0,
             'cached': 14.0,
         },
-        'preload_options': {
-            'do_login': False,
-            'create_exploration': False,
-            'reload_demo_collections': False,
-            'reload_demo_explorations': False,
-            'reload_single_exploration': True,
-        }
+        'preload_options': PRELOAD_RELOAD_FIRST_EXP
     },
-    COLLECTION_PLAYER_KEY: {
+    PAGE_KEY_COLLECTION_PLAYER: {
         'url': '/collection/0',
         'size_limits_mb': {
             'uncached': 8.0,
@@ -140,15 +121,9 @@ TEST_DATA = {
             'uncached': 10.0,
             'cached': 5.0,
         },
-        'preload_options': {
-            'do_login': False,
-            'create_exploration': False,
-            'reload_demo_collections': True,
-            'reload_demo_explorations': False,
-            'reload_single_exploration': False,
-        }
+        'preload_options': PRELOAD_LOAD_DEMO_COLLECTIONS
     },
-    PROFILE_PAGE_KEY: {
+    PAGE_KEY_PROFILE_PAGE: {
         'url': '/profile/',
         'size_limits_mb': {
             'uncached': 7.0,
@@ -158,12 +133,6 @@ TEST_DATA = {
             'uncached': 10.0,
             'cached': 3.0,
         },
-        'preload_options': {
-            'do_login': True,
-            'create_exploration': False,
-            'reload_demo_collections': False,
-            'reload_demo_explorations': False,
-            'reload_single_exploration': False,
-        }
+        'preload_options': PRELOAD_DO_LOGIN
     }
 }

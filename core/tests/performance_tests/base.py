@@ -20,7 +20,7 @@ import urlparse
 
 from core.tests.performance_framework import perf_services
 from core.tests.performance_framework import perf_domain
-import feconf
+from core.tests.performance_tests import test_config
 
 
 class TestBase(unittest.TestCase):
@@ -28,7 +28,7 @@ class TestBase(unittest.TestCase):
     # The default number of page load sessions used to collect timing metrics.
     DEFAULT_SESSION_SAMPLE_COUNT = 3
 
-    BASE_URL = 'http://localhost:%d' % feconf.PERFORMANCE_TESTS_SERVER_PORT
+    BASE_URL = 'http://localhost:%d' % test_config.PERFORMANCE_TESTS_SERVER_PORT
 
     def setUp(self):
         self.data_fetcher = None
@@ -45,7 +45,7 @@ class TestBase(unittest.TestCase):
 
     def _initialize_data_fetcher(self):
         self.data_fetcher = perf_services.SeleniumPerformanceDataFetcher(
-            browser='chrome', username=self.username,
+            browser=perf_services.BROWSER_SOURCE_CHROME, username=self.username,
             preload_option=self.preload_option)
 
     def _get_complete_url(self, base_url, page_url_short):
@@ -104,16 +104,7 @@ class TestBase(unittest.TestCase):
         self.load_time_limit_cached_ms = (
             page_config['load_time_limits_secs']['cached'] * 1000)
 
-        if page_config['preload_options']['do_login']:
-            self.preload_option = perf_services.DO_LOGIN
-        elif page_config['preload_options']['create_exploration']:
-            self.preload_option = perf_services.CREATE_EXPLORATION
-        elif page_config['preload_options']['reload_demo_collections']:
-            self.preload_option = perf_services.RELOAD_DEMO_COLLECTIONS
-        elif page_config['preload_options']['reload_demo_explorations']:
-            self.preload_option = perf_services.RELOAD_DEMO_EXPLORATIONS
-        elif page_config['preload_options']['reload_single_exploration']:
-            self.preload_option = perf_services.RELOAD_FIRST_EXPLORATION
+        self.preload_option = page_config['preload_options']
 
         if append_username:
             self.page_url = self._get_complete_url(

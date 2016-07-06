@@ -20,7 +20,7 @@ from core.tests.performance_tests import test_config
 
 class CollectionPlayerPerformanceTest(base.TestBase):
     """Performance tests for the collection player."""
-    PAGE_KEY = test_config.COLLECTION_PLAYER_KEY
+    PAGE_KEY = test_config.PAGE_KEY_COLLECTION_PLAYER
 
     def setUp(self):
         super(CollectionPlayerPerformanceTest, self).setUp()

@@ -21,6 +21,7 @@ import time
 import urlparse
 
 from core.tests.performance_framework import perf_domain
+from core.tests.performance_tests import test_config
 import feconf
 
 import browsermobproxy
@@ -32,13 +33,7 @@ CHROMEDRIVER_PATH = os.path.join(
 BROWSERMOB_PROXY_PATH = os.path.join(
     '..', 'oppia_tools', 'browsermob-proxy-2.1.1', 'bin', 'browsermob-proxy')
 
-# Possible preload options. Only either one of them could be used and they are
-# mutually exclusive.
-DO_LOGIN = 'DO_LOGIN'
-CREATE_EXPLORATION = 'CREATE_EXPLORATION'
-RELOAD_DEMO_COLLECTIONS = 'RELOAD_DEMO_COLLECTIONS'
-RELOAD_DEMO_EXPLORATIONS = 'RELOAD_DEMO_EXPLORATIONS'
-RELOAD_FIRST_EXPLORATION = 'RELOAD_FIRST_EXPLORATION'
+BROWSER_SOURCE_CHROME = 'chrome'
 
 
 class SeleniumPerformanceDataFetcher(object):
@@ -68,10 +63,10 @@ class SeleniumPerformanceDataFetcher(object):
     # XHR requests made post initial page load will not be recorded.
     DEFAULT_WAIT_DURATION_SECS = 3
 
-    BASE_URL = 'http://localhost:%d' % feconf.PERFORMANCE_TESTS_SERVER_PORT
+    BASE_URL = 'http://localhost:%d' % test_config.PERFORMANCE_TESTS_SERVER_PORT
+    LOGIN_URL = '/_ah/login'
 
-    def __init__(self, browser=DEFAULT_BROWSER_SOURCE, username=None,
-                 preload_option=None):
+    def __init__(self, browser, username=None, preload_option=None):
         """preload_options can be either of the possible preload options
         described at the top of this file.
         """
@@ -94,15 +89,15 @@ class SeleniumPerformanceDataFetcher(object):
         # is required to prevent browser cached resources altering the metrics
         # for our tests.
         driver = self._setup_driver()
-        if preload_option == DO_LOGIN:
+        if preload_option == test_config.PRELOAD_DO_LOGIN:
             self._setup_login(driver)
-        elif preload_option == CREATE_EXPLORATION:
+        elif preload_option == test_config.PRELOAD_CREATE_EXP:
             self._create_exploration(driver)
-        elif preload_option == RELOAD_DEMO_COLLECTIONS:
+        elif preload_option == test_config.PRELOAD_LOAD_DEMO_COLLECTIONS:
             self._setup_reload_demo_collections(driver)
-        elif preload_option == RELOAD_DEMO_EXPLORATIONS:
+        elif preload_option == test_config.PRELOAD_RELOAD_DEMO_EXPS:
             self._setup_reload_demo_explorations(driver)
-        elif preload_option == RELOAD_FIRST_EXPLORATION:
+        elif preload_option == test_config.PRELOAD_RELOAD_FIRST_EXP:
             self._setup_reload_first_exploration(driver)
         self._stop_driver(driver)
 
@@ -287,7 +282,7 @@ class SeleniumPerformanceDataFetcher(object):
         return True
 
     def _login_user(self, driver):
-        driver.get(self.BASE_URL + feconf.LOGIN_URL)
+        driver.get(self.BASE_URL + self.LOGIN_URL)
         elem = driver.find_element_by_name('email')
         elem.clear()
         elem.send_keys(self.email)

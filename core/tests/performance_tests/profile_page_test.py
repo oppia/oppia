@@ -20,7 +20,7 @@ from core.tests.performance_tests import test_config
 
 class ProfilePagePerformanceTest(base.TestBase):
     """Performance tests for the profile page."""
-    PAGE_KEY = test_config.PROFILE_PAGE_KEY
+    PAGE_KEY = test_config.PAGE_KEY_PROFILE_PAGE
 
     def setUp(self):
         super(ProfilePagePerformanceTest, self).setUp()

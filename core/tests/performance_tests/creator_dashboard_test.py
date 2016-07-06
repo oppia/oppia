@@ -20,7 +20,7 @@ from core.tests.performance_tests import test_config
 
 class CreatorDashboardPerformanceTest(base.TestBase):
     """Performance tests for the creator dashboard."""
-    PAGE_KEY = test_config.CREATOR_DASHBOARD_KEY
+    PAGE_KEY = test_config.PAGE_KEY_CREATOR_DASHBOARD
 
     def setUp(self):
         super(CreatorDashboardPerformanceTest, self).setUp()

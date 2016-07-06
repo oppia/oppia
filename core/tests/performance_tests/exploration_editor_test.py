@@ -20,7 +20,7 @@ from core.tests.performance_tests import test_config
 
 class ExplorationEditorPerformanceTest(base.TestBase):
     """Performance tests for the exploration editor."""
-    PAGE_KEY = test_config.EXPLORATION_EDITOR_KEY
+    PAGE_KEY = test_config.PAGE_KEY_EXPLORATION_EDITOR
 
     def setUp(self):
         super(ExplorationEditorPerformanceTest, self).setUp()
