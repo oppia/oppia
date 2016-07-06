@@ -27,6 +27,10 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
   $scope.TAB_JOBS = 'TAB_JOBS';
   $scope.TAB_CONFIG = 'TAB_CONFIG';
   $scope.TAB_MISC = 'TAB_MISC';
+  $scope.jobsUrl = '#jobs';
+  $scope.configUrl = '#config';
+  $scope.miscUrl = '#misc';
+  $scope.activitiesUrl = '#activities';
 
   $scope.currentTab = $scope.TAB_ACTIVITIES;
 
@@ -34,17 +38,17 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
     return window.location.hash;
   }, function(newHash) {
     switch (newHash) {
-      case '#jobs':
-        $scope.currentTab = $scope.TAB_JOBS;
+      case $scope.jobsUrl:
+        $scope.showJobsTab();
         break;
-      case '#config':
-        $scope.currentTab = $scope.TAB_CONFIG;
+      case $scope.configUrl:
+        $scope.showConfigTab();
         break;
-      case '#misc':
-        $scope.currentTab = $scope.TAB_MISC;
+      case $scope.miscUrl:
+        $scope.showMiscTab();
         break;
-      case '#activities':
-        $scope.currentTab = $scope.TAB_ACTIVITIES;
+      case $scope.activitiesUrl:
+        $scope.showActivitiesTab();
         break;
     }
   });
