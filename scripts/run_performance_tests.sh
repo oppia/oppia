@@ -18,20 +18,16 @@
 
 # INSTRUCTIONS:
 #
-# Run this script from the oppia root folder:
-#   bash scripts/run_performance_tests.sh
-# 
 # The root folder MUST be named 'oppia'.
-# (1) Append a test target to make the script run all tests in a given module
-# or class, or run a particular test. For example, appending
-#
-#   --test_target='foo.bar.Baz'
-#
-# runs all tests in test class Baz in the foo/bar.py module, and appending
-#
-#   --test_target='foo.bar.Baz.quux'
-#
-# runs the test method quux in the test class Baz in the foo/bar.py module.
+# 
+# Run all tests sequentially:
+# - run bash scripts/run_performance_tests.sh without args in order to run all tests sequentially
+# 
+# Run test for a specific page:
+# - run bash scripts/run_performance_tests.sh --test_name=page_test
+# 
+# page_test is the name of the file containing that test eg. splash_test.
+
 
 function cleanup {
   # Send a kill signal to the dev server.
@@ -96,8 +92,24 @@ else
   export XVFB_PREFIX="/usr/bin/xvfb-run"
 fi
 
-# If no arguments are given execute all the tests sequentially.
-if [ $# -eq 0 ]; then
+
+# Refer: http://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash
+for i in "$@"
+do
+case $i in
+    --test_name=*)
+    TEST_NAME="${i#*=}"
+    ;;
+esac
+done
+
+# If an argument is present then run test for that specific page. Otherwise
+# run tests for all the pages sequentially.
+if [ $# -gt 0 ]; then
+  TEST_PATH="core.tests.performance_tests.$TEST_NAME"
+  echo "Running performance test for: $TEST_NAME, executing: $TEST_PATH"
+  $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_target=$TEST_PATH
+else
   $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.collection_player_test
   $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.creator_dashboard_test
   $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.exploration_editor_test
@@ -105,8 +117,6 @@ if [ $# -eq 0 ]; then
   $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.library_test
   $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.profile_page_test
   $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.splash_test
-else
-  $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py $@
 fi
 
 chmod 644 $TOOLS_DIR/browsermob-proxy-2.1.1/bin/browsermob-proxy
