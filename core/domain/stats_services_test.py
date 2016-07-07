@@ -470,6 +470,25 @@ class UnresolvedAnswersTests(test_utils.GenericTestBase):
 
     DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
 
+    def _create_and_update_fake_exploration(self, exp_id):
+        exp = exp_domain.Exploration.create_default_exploration(exp_id)
+        exp_services.save_new_exploration('fake@user.com', exp)
+        exp_services.update_exploration('fake@user.com', exp_id, [{
+            'cmd': 'edit_state_property',
+            'state_name': exp.init_state_name,
+            'property_name': 'widget_id',
+            'new_value': 'TextInput',
+        }, {
+            'cmd': 'add_state',
+            'state_name': 'State 2',
+        }, {
+            'cmd': 'edit_state_property',
+            'state_name': 'State 2',
+            'property_name': 'widget_id',
+            'new_value': 'TextInput',
+        }], 'Add new state')
+        return exp
+
     def test_get_top_unresolved_answers(self):
         self.assertEquals(
             stats_services.get_top_unresolved_answers_for_default_rule(
@@ -493,44 +512,65 @@ class UnresolvedAnswersTests(test_utils.GenericTestBase):
             stats_services.get_top_unresolved_answers_for_default_rule(
                 'eid', 'sid'), {})
 
-    def test_exp_wise_unresolved_answers_count_for_default_rule(self):
-        def _create_and_update_fake_exploration(exp_id):
-            exp = exp_domain.Exploration.create_default_exploration(exp_id)
-            exp_services.save_new_exploration('fake@user.com', exp)
-            exp_services.update_exploration('fake@user.com', exp_id, [{
-                'cmd': 'edit_state_property',
-                'state_name': exp.init_state_name,
-                'property_name': 'widget_id',
-                'new_value': 'TextInput',
-            }, {
-                'cmd': 'add_state',
-                'state_name': 'State 2',
-            }, {
-                'cmd': 'edit_state_property',
-                'state_name': 'State 2',
-                'property_name': 'widget_id',
-                'new_value': 'TextInput',
-            }], 'Add new state')
-            return exp
-
-        exp_1 = _create_and_update_fake_exploration('eid1')
+    def test_unresolved_answers_count_for_single_exploration(self):
+        exp_1 = self._create_and_update_fake_exploration('eid1')
         self.assertEquals(
             stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
-                ['eid1']), [0])
-
+                ['eid1']), {})
         event_services.AnswerSubmissionEventHandler.record(
             'eid1', 1, exp_1.init_state_name, self.DEFAULT_RULESPEC_STR, 'a1')
         self.assertEquals(
             stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
-                ['eid1']), [1])
+                ['eid1']), {'eid1': 1})
 
-        exp_2 = _create_and_update_fake_exploration('eid2')
-        event_services.AnswerSubmissionEventHandler.record(
-            'eid2', 1, exp_2.init_state_name, self.DEFAULT_RULESPEC_STR, 'a2')
-
+    def test_unresolved_answers_count_for_multiple_explorations(self):
+        exp_1 = self._create_and_update_fake_exploration('eid1')
+        exp_2 = self._create_and_update_fake_exploration('eid2')
+        exp_3 = self._create_and_update_fake_exploration('eid3')
         self.assertEquals(
             stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
-                ['eid2']), [1])
+                ['eid1', 'eid2', 'eid3']), {})
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid1', 1, exp_1.init_state_name, self.DEFAULT_RULESPEC_STR, 'a1')
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid2', 1, exp_2.init_state_name, self.DEFAULT_RULESPEC_STR, 'a3')
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid2', 1, exp_2.init_state_name, self.DEFAULT_RULESPEC_STR, 'a2')
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid3', 1, exp_3.init_state_name, self.DEFAULT_RULESPEC_STR, 'a2')
+        self.assertEquals(
+            stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
+                ['eid1', 'eid2', 'eid3']), {'eid1': 1, 'eid2': 2, 'eid3': 1})
+
+    def test_unresolved_answers_count_when_answers_marked_as_resolved(self):
+        exp_1 = self._create_and_update_fake_exploration('eid1')
+        self.assertEquals(
+            stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
+                ['eid1']), {})
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid1', 1, exp_1.init_state_name, self.DEFAULT_RULESPEC_STR, 'a1')
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid1', 1, exp_1.init_state_name, self.DEFAULT_RULESPEC_STR, 'a2')
+        self.assertEquals(
+            stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
+                ['eid1']), {'eid1': 2})
+
+        event_services.DefaultRuleAnswerResolutionEventHandler.record(
+            'eid1', exp_1.init_state_name, ['a1'])
+        self.assertEquals(
+            stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
+                ['eid1']), {'eid1': 1})
+
+        exp_2 = self._create_and_update_fake_exploration('eid2')
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid2', 1, exp_2.init_state_name, self.DEFAULT_RULESPEC_STR, 'a1')
+        event_services.DefaultRuleAnswerResolutionEventHandler.record(
+            'eid1', exp_1.init_state_name, ['a2'])
+        event_services.DefaultRuleAnswerResolutionEventHandler.record(
+            'eid2', exp_1.init_state_name, ['a1'])
+        self.assertEquals(
+            stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
+                ['eid1', 'eid2']), {})
 
 
 class EventLogEntryTests(test_utils.GenericTestBase):

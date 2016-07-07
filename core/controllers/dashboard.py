@@ -165,14 +165,17 @@ class DashboardHandler(base.BaseHandler):
             feedback_services.get_thread_analytics_multi(
                 exploration_ids_subscribed_to))
 
-        unresolved_answers_list = (
+        unresolved_answers_mapping = (
             stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
                 exploration_ids_subscribed_to))
 
         for ind, exploration in enumerate(explorations_list):
             exploration.update(feedback_thread_analytics[ind].to_dict())
             exploration.update({
-                'num_unresolved_answers': unresolved_answers_list[ind]
+                'num_unresolved_answers': (
+                    unresolved_answers_mapping[exploration['id']]
+                    if unresolved_answers_mapping.get(exploration['id']) else 0
+                )
             })
 
         explorations_list = sorted(

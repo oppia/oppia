@@ -42,16 +42,14 @@ def get_top_unresolved_answers_for_default_rule(exploration_id, state_name):
 
 def get_exp_wise_unresolved_answers_count_for_default_rule(exp_ids):
     exploration_objects = exp_services.get_multiple_explorations_by_id(exp_ids)
-
-    explorations_num_states = [
-        len(exp_domain_objects[1].states)
-        for exp_domain_objects in
-        exploration_objects.iteritems()
+    explorations_ids_list = [
+        exp_domain_objects[1].id
+        for exp_domain_objects in exploration_objects.iteritems()
+        for state_tuple in exp_domain_objects[1].states.iteritems()
     ]
+    exps_answers_mapping = {}
 
-    explorationwise_answer_counts = [0] * len(exp_ids)
-    exp_index = 0
-    for statewise_answers in (
+    for ind, statewise_answers in enumerate(
             get_top_state_rule_answers_multi(
                 [(exp_domain_objects[1].id, state_tuple[0])
                  for exp_domain_objects in exploration_objects.iteritems()
@@ -60,13 +58,11 @@ def get_exp_wise_unresolved_answers_count_for_default_rule(exp_ids):
                 [exp_domain.DEFAULT_RULESPEC_STR])
         ):
         for answer in statewise_answers:
-            explorationwise_answer_counts[exp_index] += answer['count']
-            explorations_num_states[exp_index] -= 1
-            if explorations_num_states[exp_index] == 0:
-                exp_index += 1
-                break
+            if not exps_answers_mapping.get(explorations_ids_list[ind]):
+                exps_answers_mapping[explorations_ids_list[ind]] = 0
+            exps_answers_mapping[explorations_ids_list[ind]] += answer['count']
 
-    return explorationwise_answer_counts
+    return exps_answers_mapping
 
 
 def get_state_rules_stats(exploration_id, state_name):
