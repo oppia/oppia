@@ -72,6 +72,11 @@ NUMBER_OF_TOP_RATED_EXPLORATIONS = 8
 # for recently published explorations.
 RECENTLY_PUBLISHED_QUERY_LIMIT = 8
 
+# The current version of the dashboard stats blob schema. If any backward-
+# incompatible changes are made to the stats blob schema in the data store,
+# this version number must be changed.
+CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
+
 # The current version of the exploration states blob schema. If any backward-
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
@@ -261,6 +266,11 @@ PANELS_PROPERTIES = {
 
 # When the site terms were last updated, in UTC.
 REGISTRATION_PAGE_LAST_UPDATED_UTC = datetime.datetime(2015, 10, 14, 2, 40, 0)
+
+# Format of string for dashboard statistics logs.
+# NOTE TO DEVELOPERS: This format should not be changed, since it is used in
+# the existing storage models for UserStatsModel.
+DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
 
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576
