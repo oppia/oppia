@@ -106,17 +106,19 @@
                  class="oppia-dashboard-list-view-item">
           <table class="oppia-dashboard-table">
              <colgroup>
-               <col style="width: 40%;">
-               <col style="width: 15%;">
-               <col style="width: 15%;">
-               <col style="width: 15%;">
-               <col style="width: 15%;">
+               <col style="width: 30%;">
+               <col style="width: 14%;">
+               <col style="width: 14%;">
+               <col style="width: 14%;">
+               <col style="width: 14%;">
+               <col style="width: 14%;">
             </colgroup>
             <tr>
               <th>Exploration</th>
               <th>Rating</th>
               <th>Plays</th>
               <th>Feedback</th>
+              <th>Unresolved Answers</th>
               <th>Last Updated</th>
             </tr>
             <tr ng-repeat="exploration in explorationsList track by exploration.id"
@@ -129,10 +131,10 @@
                   featured
                 </span>
               </td>
-              <td colspan="3"
+              <td colspan="4"
                   ng-if="exploration.status === 'private'"
                   class="exp-private-text">
-                This exploration is private. Publish to receive statistics.
+                This exploration is private. Publish it to receive statistics.
               </td>
               <td ng-if="exploration.status !== 'private'">
                 <[(getAverageRating(exploration.ratings) | number:1) || 'N/A']>
@@ -142,6 +144,9 @@
               </td>
               <td ng-if="exploration.status !== 'private'">
                 <[exploration.num_total_threads]>
+              </td>
+              <td ng-if="exploration.status !== 'private'">
+                <[exploration.num_unresolved_answers]>
               </td>
               <td>
                 <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
@@ -166,7 +171,7 @@
 
             <div ng-attr-section="'<['right-section']>">
               <div ng-if="exploration.status === 'private'" class="exp-private-text">
-                This exploration is private. Publish to receive statistics.
+                This exploration is private. Publish it to receive statistics.
               </div>
               <ul ng-if="exploration.status !== 'private'"
                   layout="row"
@@ -222,7 +227,6 @@
             </div>
         </md-card>
       </div>
-
     </div>
 
     {% if can_create_collections %}
