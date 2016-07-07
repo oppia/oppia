@@ -90,7 +90,7 @@ script:
 # TODO(gvishal): add all tests to travis. Running all tests on travis fails currently due to
 # unexplained reasons. Sometimes 2-4 out of the total 7 page tests succeed and then the next one
 # gets stuck for a long time.
-- if [ $RUN_PERFORMANCE_TESTS == 'true' ]; then bash scripts/run_performance_tests.sh --test_target=core.tests.performance_tests.splash_test; fi
+- if [ $RUN_PERFORMANCE_TESTS == 'true' ]; then bash scripts/run_performance_tests.sh --test_name=splash_test; fi
 
 after_success:
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then codecov; fi

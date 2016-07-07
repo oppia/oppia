@@ -79,7 +79,7 @@ TEST_DATA = {
         'url': '/dashboard',
         'size_limits_mb': {
             'uncached': 8.0,
-            'cached': 1.0,
+            'cached': 0.8,
         },
         'load_time_limits_secs': {
             'uncached': 10.0,
@@ -103,7 +103,7 @@ TEST_DATA = {
         'url': '/create/0',
         'size_limits_mb': {
             'uncached': 12.0,
-            'cached': 2.0,
+            'cached': 2.2,
         },
         'load_time_limits_secs': {
             'uncached': 15.0,
@@ -115,7 +115,7 @@ TEST_DATA = {
         'url': '/collection/0',
         'size_limits_mb': {
             'uncached': 8.0,
-            'cached': 1.0,
+            'cached': 0.9,
         },
         'load_time_limits_secs': {
             'uncached': 10.0,
@@ -127,7 +127,7 @@ TEST_DATA = {
         'url': '/profile/',
         'size_limits_mb': {
             'uncached': 7.0,
-            'cached': 1.0,
+            'cached': 0.8,
         },
         'load_time_limits_secs': {
             'uncached': 10.0,
