@@ -725,10 +725,7 @@ def update_dashboard_stats_log(user_id):
     """Save statistics for creator dashboard of a user by appending to a list
     keyed by a datetime string.
     """
-    model = user_models.UserStatsModel.get(user_id, strict=False)
-    # Create the user stats model if not already present
-    if not model:
-        model = user_models.UserStatsModel(id=user_id)
+    model = user_models.UserStatsModel.get_or_create(user_id)
 
     if model.schema_version != feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION:
         _migrate_dashboard_stats_to_latest_schema(model)
