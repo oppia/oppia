@@ -157,7 +157,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/terms', pages.TermsPage, 'terms_page'),
     get_redirect_route(r'/privacy', pages.PrivacyPage, 'privacy_page'),
 
-    get_redirect_route(r'/admin', admin.AdminPage, 'admin_page'),
+    get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage, 'admin_page'),
     get_redirect_route(r'/adminhandler', admin.AdminHandler, 'admin_handler'),
     get_redirect_route(
         r'/adminjoboutput', admin.AdminJobOutput, 'admin_job_output'),
