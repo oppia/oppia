@@ -20,6 +20,7 @@ from pipeline import pipeline
 
 from core import jobs
 from core.controllers import base
+from core.domain import user_jobs_one_off
 from core.platform import models
 import utils
 
@@ -84,6 +85,16 @@ class JobStatusMailerHandler(base.BaseHandler):
             email_message = 'All MapReduce jobs are running fine.'
 
         email_services.send_mail_to_admin(email_subject, email_message)
+
+
+class CronDashboardStatsHandler(base.BaseHandler):
+    """Handler for appending dashboard stats to a list."""
+
+    @require_cron_or_superadmin
+    def get(self):
+        """Handles GET requests."""
+        user_jobs_one_off.DashboardStatsOneOffJob.enqueue(
+            user_jobs_one_off.DashboardStatsOneOffJob.create_new())
 
 
 class CronMapreduceCleanupHandler(base.BaseHandler):

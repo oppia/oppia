@@ -166,6 +166,42 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     # The average of average ratings of all explorations.
     average_ratings = ndb.FloatProperty(indexed=True)
 
+    # A list which stores history of creator stats.
+    # Each item in the list is a Json object keyed by a datetime string and
+    # value as another Json object containing key-value pairs to be stored.
+    # [
+    #  {
+    #   (date_1): {
+    #    "average_ratings": 4.3,
+    #    "total_plays": 40
+    #   }
+    #  },
+    #  {
+    #   (date_2): {
+    #    "average_ratings": 4.1,
+    #    "total_plays": 60
+    #   }
+    #  },
+    # ]
+    weekly_creator_stats_list = ndb.JsonProperty(repeated=True)
+
+    # The version of dashboard stats schema.
+    schema_version = (
+        ndb.IntegerProperty(
+            required=True,
+            default=feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION,
+            indexed=True))
+
+    @classmethod
+    def get_or_create(cls, user_id):
+        """Creates a new UserStatsModel instance, if it does not already
+        exist.
+        """
+        entity = cls.get(user_id, strict=False)
+        if not entity:
+            entity = cls(id=user_id)
+        return entity
+
 
 class ExplorationUserDataModel(base_models.BaseModel):
     """User-specific data pertaining to a specific exploration.
