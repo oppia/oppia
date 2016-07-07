@@ -1,7 +1,7 @@
 <script type="text/ng-template" id="inline/rule_editor">
   <div style="position: relative;">
     <form class="form-inline protractor-test-rule-details" role="form" name="ruleEditForm.form">
-      <div ng-if="rule.rule_type != 'ClassifyMatches'">
+      <div ng-if="rule.rule_type != 'FuzzyMatches'">
         <rule-type-selector class="protractor-test-answer-description" local-value="<[rule.rule_type]>" on-selection-change="onSelectNewRuleType">
         </rule-type-selector>
 
@@ -28,7 +28,7 @@
         </span>
       </div>
 
-      <div ng-if="rule.rule_type == 'ClassifyMatches'">
+      <div ng-if="rule.rule_type == 'FuzzyMatches'">
         <classifier-panel rule-inputs="rule.inputs" on-training-data-deletion="onDeleteTrainingDataEntry(index)">
         </classifier-panel>
       </div>

@@ -131,6 +131,8 @@ SENDER_VALIDATORS = {
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_MARKETING: (
         lambda x: rights_manager.Actor(x).is_admin()),
     feconf.EMAIL_INTENT_DELETE_EXPLORATION: (
@@ -152,7 +154,7 @@ def _require_sender_id_is_valid(intent, sender_id):
 
 def _send_email(
         recipient_id, sender_id, intent, email_subject, email_html_body,
-        bcc_admin=False):
+        sender_email, bcc_admin=False):
     """Sends an email to the given recipient.
 
     This function should be used for sending all user-facing emails.
@@ -185,14 +187,14 @@ def _send_email(
         return
 
     def _send_email_in_transaction():
-        sender_email = '%s <%s>' % (
-            EMAIL_SENDER_NAME.value, feconf.SYSTEM_EMAIL_ADDRESS)
+        sender_name_email = '%s <%s>' % (
+            EMAIL_SENDER_NAME.value, sender_email)
 
         email_services.send_mail(
-            sender_email, recipient_email, email_subject,
+            sender_name_email, recipient_email, email_subject,
             cleaned_plaintext_body, cleaned_html_body, bcc_admin)
         email_models.SentEmailModel.create(
-            recipient_id, recipient_email, sender_id, sender_email, intent,
+            recipient_id, recipient_email, sender_id, sender_name_email, intent,
             email_subject, cleaned_html_body, datetime.datetime.utcnow())
 
     return transaction_services.run_in_transaction(_send_email_in_transaction)
@@ -221,7 +223,7 @@ def send_post_signup_email(user_id):
 
     _send_email(
         user_id, feconf.SYSTEM_COMMITTER_ID, feconf.EMAIL_INTENT_SIGNUP,
-        email_subject, email_body)
+        email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
 
 def require_valid_intent(intent):
@@ -286,7 +288,7 @@ def send_moderator_action_email(
             EMAIL_FOOTER.value))
     _send_email(
         recipient_id, sender_id, intent, email_subject, full_email_content,
-        bcc_admin=True)
+        feconf.SYSTEM_EMAIL_ADDRESS, bcc_admin=True)
 
 
 def send_role_notification_email(
@@ -353,4 +355,59 @@ def send_role_notification_email(
 
     _send_email(
         recipient_id, feconf.SYSTEM_COMMITTER_ID,
-        feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION, email_subject, email_body)
+        feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION, email_subject, email_body,
+        feconf.NOREPLY_EMAIL_ADDRESS)
+
+
+def send_feedback_message_email(recipient_id, feedback_messages):
+    """Sends an email when creator receives feedback message to an exploration.
+
+    Args:
+    - recipient_id: id of recipient user.
+    - feedback_messages: dictionary containing feedback messages.
+    """
+
+    email_subject = 'New messages on Oppia.'
+
+    email_body_template = (
+        'Hi %s,<br>'
+        '<br>'
+        'You have %s new message(s) about your Oppia explorations:<br>'
+        '<ul>%s</ul>'
+        'You can view and reply to your messages from your '
+        '<a href="https://www.oppia.org/dashboard">dashboard</a>.'
+        '<br>'
+        'Thanks, and happy teaching!<br>'
+        '<br>'
+        'Best wishes,<br>'
+        'The Oppia Team<br>'
+        '<br>%s')
+
+    if not feconf.CAN_SEND_EMAILS_TO_USERS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    if not feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS:
+        log_new_error('This app cannot send feedback message emails to users.')
+        return
+
+    if not feedback_messages:
+        return
+
+    recipient_user_settings = user_services.get_user_settings(recipient_id)
+
+    messages_html = ''
+    for _, reference in feedback_messages.iteritems():
+        for message in reference['messages']:
+            messages_html += (
+                '<li>%s: %s<br></li>' % (reference['title'], message))
+
+    email_body = email_body_template % (
+        recipient_user_settings.username, len(feedback_messages), messages_html,
+        EMAIL_FOOTER.value)
+
+    _send_email(
+        recipient_id, feconf.SYSTEM_COMMITTER_ID,
+        feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION,
+        email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+

@@ -24,6 +24,8 @@ oppia.controller('Dashboard', [
       $scope, $rootScope, $window, oppiaDatetimeFormatter, alertsService,
       DashboardBackendApiService, RatingComputationService,
       ExplorationCreationService, FATAL_ERROR_CODES) {
+    $scope.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
+        GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD);
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
     $scope.createNewExploration = (
       ExplorationCreationService.createNewExploration);
@@ -37,6 +39,11 @@ oppia.controller('Dashboard', [
 
     $scope.showExplorationEditor = function(explorationId) {
       $window.location = '/create/' + explorationId;
+    };
+
+    $scope.myExplorationsView = 'list';
+    $scope.setMyExplorationsView = function(viewType) {
+      $scope.myExplorationsView = viewType;
     };
 
     $rootScope.loadingMessage = 'Loading';
