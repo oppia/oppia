@@ -138,6 +138,16 @@ class CompleteExplorationEventHandler(BaseEventHandler):
             params, play_type)
 
 
+class RateExplorationEventHandler(BaseEventHandler):
+    """Event handler for recording exploration rating events."""
+
+    EVENT_TYPE = feconf.EVENT_TYPE_RATE_EXPLORATION
+
+    @classmethod
+    def _handle_event(cls, exp_id, session_id, rating):
+        pass
+
+
 class StateHitEventHandler(BaseEventHandler):
     """Event handler for recording state hit events."""
 

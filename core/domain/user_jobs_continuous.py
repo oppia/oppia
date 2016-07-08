@@ -26,10 +26,13 @@ from core.platform import models
 import feconf
 import utils
 
+from google.appengine.ext import ndb
+
 (exp_models, collection_models, feedback_models, user_models) = (
     models.Registry.import_models([
         models.NAMES.exploration, models.NAMES.collection,
         models.NAMES.feedback, models.NAMES.user]))
+transaction_services = models.Registry.import_transaction_services()
 
 # TODO(bhenning): Implement a working real-time layer for the recent dashboard
 # updates aggregator job.
@@ -260,7 +263,8 @@ class RecentUpdatesMRJobManager(
 
 class UserStatsRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
-    pass
+    total_plays = ndb.IntegerProperty(default=0)
+    average_ratings = ndb.FloatProperty(indexed=True)
 
 
 class UserStatsAggregator(jobs.BaseContinuousComputationManager):
@@ -274,7 +278,9 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
     """
     @classmethod
     def get_event_types_listened_to(cls):
-        return []
+        return [
+            feconf.EVENT_TYPE_START_EXPLORATION,
+            feconf.EVENT_TYPE_RATE_EXPLORATION]
 
     @classmethod
     def _get_realtime_datastore_class(cls):
@@ -286,7 +292,46 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
 
     @classmethod
     def _handle_incoming_event(cls, active_realtime_layer, event_type, *args):
-        pass
+        user_id = args[0]
+
+        def _increment_total_plays_count():
+            realtime_class = cls._get_realtime_datastore_class()
+            realtime_model_id = realtime_class.get_realtime_id(
+                active_realtime_layer, user_id)
+
+            model = realtime_class.get(realtime_model_id, strict=False)
+            if model is None:
+                realtime_class(
+                    id=realtime_model_id, total_plays=1,
+                    realtime_layer=active_realtime_layer).put()
+            else:
+                model.total_plays += 1
+                model.put()
+
+        if event_type == feconf.EVENT_TYPE_NEW_THREAD_CREATED:
+            transaction_services.run_in_transaction(
+                _increment_total_plays_count)
+
+    # Public query method.
+    @classmethod
+    def get_dashboard_stats(cls, user_id):
+        # TODO: Add doctstring.
+
+        total_plays = 0
+
+        mr_model = user_models.UserStatsModel.get(user_id, strict=False)
+        if mr_model is not None:
+            total_plays += mr_model.total_plays
+
+        realtime_model = cls._get_realtime_datastore_class().get(
+            cls.get_active_realtime_layer_id(user_id), strict=False)
+
+        if realtime_model is not None:
+            total_plays += realtime_model.total_plays
+
+        return {
+            'total_plays': total_plays
+        }
 
 
 class UserStatsMRJobManager(
