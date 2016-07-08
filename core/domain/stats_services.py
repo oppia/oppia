@@ -44,12 +44,15 @@ def get_exp_wise_unresolved_answers_count_for_default_rule(exp_ids):
     """Gets answer counts per exploration for the answer groups for default
     rule across all states for explorations with ids in exp_ids.
 
+    Note that this method currently returns the counts only for the DEFAULT
+    rule. This should ideally handle all types of unresolved answers.
+
     Returns:
-        A dict, keyed by the string '{exp_id}', whose
-        values are the number of unresolved answers that exploration has.
+        A dict, keyed by the string '{exp_id}', whose values are the number of
+        unresolved answers that exploration has.
     """
     explorations = exp_services.get_multiple_explorations_by_id(exp_ids)
-    
+
     # The variable `exploration_states_tuples` is a list of all
     # (exp_id, state_name) tuples for the given exp_ids.
     # E.g. - [
@@ -64,11 +67,11 @@ def get_exp_wise_unresolved_answers_count_for_default_rule(exp_ids):
         for exp_domain_object in explorations.values()
         for state_key in exp_domain_object.states
     ]
-    exploration_state_list = get_top_state_rule_answers_multi(
+    exploration_states_answers_list = get_top_state_rule_answers_multi(
         explorations_states_tuples, [exp_domain.DEFAULT_RULESPEC_STR])
     exps_answers_mapping = {}
 
-    for ind, statewise_answers in enumerate(exploration_state_list):
+    for ind, statewise_answers in enumerate(exploration_states_answers_list):
         for answer in statewise_answers:
             exp_id = explorations_states_tuples[ind][0]
             if exp_id not in exps_answers_mapping:
