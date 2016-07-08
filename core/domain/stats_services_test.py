@@ -469,6 +469,7 @@ class UnresolvedAnswersTests(test_utils.GenericTestBase):
     """Test the unresolved answers methods."""
 
     DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
+    CLASSIFIER_RULESPEC_STR = exp_domain.CLASSIFIER_RULESPEC_STR
 
     def _create_and_update_fake_exploration(self, exp_id):
         exp = exp_domain.Exploration.create_default_exploration(exp_id)
@@ -571,6 +572,32 @@ class UnresolvedAnswersTests(test_utils.GenericTestBase):
         self.assertEquals(
             stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
                 ['eid1', 'eid2']), {})
+
+    def test_unresolved_answers_count_for_multiple_states(self):
+        exp_1 = self._create_and_update_fake_exploration('eid1')
+        self.assertEquals(
+            stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
+                ['eid1']), {})
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid1', 1, exp_1.init_state_name, self.DEFAULT_RULESPEC_STR, 'a1')
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid1', 1, exp_1.states.keys()[1], self.DEFAULT_RULESPEC_STR, 'a1')
+        self.assertEquals(
+            stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
+                ['eid1']), {'eid1': 2})
+
+    def test_unresolved_answers_count_for_non_default_rules(self):
+        exp_1 = self._create_and_update_fake_exploration('eid1')
+        self.assertEquals(
+            stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
+                ['eid1']), {})
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid1', 1, exp_1.init_state_name, self.CLASSIFIER_RULESPEC_STR, 'a1')
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid1', 1, exp_1.states.keys()[1], self.CLASSIFIER_RULESPEC_STR, 'a1')
+        self.assertEquals(
+            stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
+                ['eid1']), {})
 
 
 class EventLogEntryTests(test_utils.GenericTestBase):

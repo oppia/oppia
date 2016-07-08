@@ -185,7 +185,7 @@ class DashboardHandler(base.BaseHandler):
             exploration.update({
                 'num_unresolved_answers': (
                     unresolved_answers_mapping[exploration['id']]
-                    if exploration['id'] in unresolved_answers_mapping else 0
+                    if exploration['id'] in unresolved_answers_dict else 0
                 )
             })
 
