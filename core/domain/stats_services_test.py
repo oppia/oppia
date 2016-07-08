@@ -517,12 +517,12 @@ class UnresolvedAnswersTests(test_utils.GenericTestBase):
     def test_unresolved_answers_count_for_single_exploration(self):
         exp_1 = self._create_and_update_fake_exploration('eid1')
         self.assertEquals(
-            stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
+            stats_services.get_exps_unresolved_answers_count_for_default_rule(
                 ['eid1']), {})
         event_services.AnswerSubmissionEventHandler.record(
             'eid1', 1, exp_1.init_state_name, self.DEFAULT_RULESPEC_STR, 'a1')
         self.assertEquals(
-            stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
+            stats_services.get_exps_unresolved_answers_count_for_default_rule(
                 ['eid1']), {'eid1': 1})
 
     def test_unresolved_answers_count_for_multiple_explorations(self):
@@ -530,7 +530,7 @@ class UnresolvedAnswersTests(test_utils.GenericTestBase):
         exp_2 = self._create_and_update_fake_exploration('eid2')
         exp_3 = self._create_and_update_fake_exploration('eid3')
         self.assertEquals(
-            stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
+            stats_services.get_exps_unresolved_answers_count_for_default_rule(
                 ['eid1', 'eid2', 'eid3']), {})
         event_services.AnswerSubmissionEventHandler.record(
             'eid1', 1, exp_1.init_state_name, self.DEFAULT_RULESPEC_STR, 'a1')
@@ -541,26 +541,26 @@ class UnresolvedAnswersTests(test_utils.GenericTestBase):
         event_services.AnswerSubmissionEventHandler.record(
             'eid3', 1, exp_3.init_state_name, self.DEFAULT_RULESPEC_STR, 'a2')
         self.assertEquals(
-            stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
+            stats_services.get_exps_unresolved_answers_count_for_default_rule(
                 ['eid1', 'eid2', 'eid3']), {'eid1': 1, 'eid2': 2, 'eid3': 1})
 
     def test_unresolved_answers_count_when_answers_marked_as_resolved(self):
         exp_1 = self._create_and_update_fake_exploration('eid1')
         self.assertEquals(
-            stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
+            stats_services.get_exps_unresolved_answers_count_for_default_rule(
                 ['eid1']), {})
         event_services.AnswerSubmissionEventHandler.record(
             'eid1', 1, exp_1.init_state_name, self.DEFAULT_RULESPEC_STR, 'a1')
         event_services.AnswerSubmissionEventHandler.record(
             'eid1', 1, exp_1.init_state_name, self.DEFAULT_RULESPEC_STR, 'a2')
         self.assertEquals(
-            stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
+            stats_services.get_exps_unresolved_answers_count_for_default_rule(
                 ['eid1']), {'eid1': 2})
 
         event_services.DefaultRuleAnswerResolutionEventHandler.record(
             'eid1', exp_1.init_state_name, ['a1'])
         self.assertEquals(
-            stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
+            stats_services.get_exps_unresolved_answers_count_for_default_rule(
                 ['eid1']), {'eid1': 1})
 
         exp_2 = self._create_and_update_fake_exploration('eid2')
@@ -571,13 +571,13 @@ class UnresolvedAnswersTests(test_utils.GenericTestBase):
         event_services.DefaultRuleAnswerResolutionEventHandler.record(
             'eid2', exp_1.init_state_name, ['a1'])
         self.assertEquals(
-            stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
+            stats_services.get_exps_unresolved_answers_count_for_default_rule(
                 ['eid1', 'eid2']), {})
 
     def test_unresolved_answers_count_for_multiple_states(self):
         exp_1 = self._create_and_update_fake_exploration('eid1')
         self.assertEquals(
-            stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
+            stats_services.get_exps_unresolved_answers_count_for_default_rule(
                 ['eid1']), {})
         event_services.AnswerSubmissionEventHandler.record(
             'eid1', 1, exp_1.init_state_name, self.DEFAULT_RULESPEC_STR, 'a1')
@@ -586,13 +586,13 @@ class UnresolvedAnswersTests(test_utils.GenericTestBase):
         event_services.AnswerSubmissionEventHandler.record(
             'eid1', 1, self.STATE_2_NAME, self.DEFAULT_RULESPEC_STR, 'a2')
         self.assertEquals(
-            stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
+            stats_services.get_exps_unresolved_answers_count_for_default_rule(
                 ['eid1']), {'eid1': 3})
 
     def test_unresolved_answers_count_for_non_default_rules(self):
         exp_1 = self._create_and_update_fake_exploration('eid1')
         self.assertEquals(
-            stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
+            stats_services.get_exps_unresolved_answers_count_for_default_rule(
                 ['eid1']), {})
         event_services.AnswerSubmissionEventHandler.record(
             'eid1', 1, exp_1.init_state_name, self.CLASSIFIER_RULESPEC_STR, 'a1'
@@ -600,7 +600,7 @@ class UnresolvedAnswersTests(test_utils.GenericTestBase):
         event_services.AnswerSubmissionEventHandler.record(
             'eid1', 1, self.STATE_2_NAME, self.CLASSIFIER_RULESPEC_STR, 'a1')
         self.assertEquals(
-            stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
+            stats_services.get_exps_unresolved_answers_count_for_default_rule(
                 ['eid1']), {})
 
 

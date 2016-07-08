@@ -177,7 +177,7 @@ class DashboardHandler(base.BaseHandler):
                 exploration_ids_subscribed_to))
 
         unresolved_answers_dict = (
-            stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
+            stats_services.get_exps_unresolved_answers_count_for_default_rule(
                 exploration_ids_subscribed_to))
 
         for ind, exploration in enumerate(exp_summary_list):
