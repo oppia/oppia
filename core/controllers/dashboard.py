@@ -168,29 +168,29 @@ class DashboardHandler(base.BaseHandler):
                 subscription_services.get_collection_ids_subscribed_to(
                     self.user_id))))
 
-        explorations_list = summary_services.get_displayable_exp_summary_dicts(
+        exp_summary_list = summary_services.get_displayable_exp_summary_dicts(
             subscribed_exploration_summaries)
-        collections_list = []
+        collection_summary_list = []
 
         feedback_thread_analytics = (
             feedback_services.get_thread_analytics_multi(
                 exploration_ids_subscribed_to))
 
-        unresolved_answers_mapping = (
+        unresolved_answers_dict = (
             stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
                 exploration_ids_subscribed_to))
 
-        for ind, exploration in enumerate(explorations_list):
+        for ind, exploration in enumerate(exp_summary_list):
             exploration.update(feedback_thread_analytics[ind].to_dict())
             exploration.update({
                 'num_unresolved_answers': (
                     unresolved_answers_mapping[exploration['id']]
-                    if unresolved_answers_mapping.get(exploration['id']) else 0
+                    if exploration['id'] in unresolved_answers_mapping else 0
                 )
             })
 
-        explorations_list = sorted(
-            explorations_list,
+        exp_summary_list = sorted(
+            exp_summary_list,
             key=lambda x: (x['num_open_threads'], x['last_updated_msec']),
             reverse=True)
 
@@ -199,7 +199,7 @@ class DashboardHandler(base.BaseHandler):
             for collection_summary in subscribed_collection_summaries:
                 # TODO(sll): Reuse _get_displayable_collection_summary_dicts()
                 # in summary_services, instead of replicating it like this.
-                collections_list.append({
+                collection_summary_list.append({
                     'id': collection_summary.id,
                     'title': collection_summary.title,
                     'category': collection_summary.category,
@@ -219,8 +219,8 @@ class DashboardHandler(base.BaseHandler):
                 })
 
         self.values.update({
-            'explorations_list': explorations_list,
-            'collections_list': collections_list,
+            'explorations_list': exp_summary_list,
+            'collections_list': collection_summary_list,
             'dashboard_stats': user_services.get_user_dashboard_stats(
                 self.user_id)
         })

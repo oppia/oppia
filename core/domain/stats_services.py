@@ -41,26 +41,29 @@ def get_top_unresolved_answers_for_default_rule(exploration_id, state_name):
 
 
 def get_exp_wise_unresolved_answers_count_for_default_rule(exp_ids):
-    exploration_objects = exp_services.get_multiple_explorations_by_id(exp_ids)
-    explorations_ids_list = [
-        exp_domain_objects[1].id
-        for exp_domain_objects in exploration_objects.iteritems()
-        for state_tuple in exp_domain_objects[1].states.iteritems()
+    """Gets answer counts per exploration for the answer groups for default
+    rule across all states for explorations with ids in exp_ids.
+
+    Returns:
+        A dict, keyed by the string '{exp_id}', whose
+        values are the number of unresolved answers that exploration has.
+    """
+    explorations = exp_services.get_multiple_explorations_by_id(exp_ids)
+    explorations_states_tuples = [
+        (exp_domain_object.id, state_key)
+        for exp_domain_object in explorations.values()
+        for state_key in exp_domain_object.states
     ]
+    exploration_state_list = get_top_state_rule_answers_multi(
+        explorations_states_tuples, [exp_domain.DEFAULT_RULESPEC_STR])
     exps_answers_mapping = {}
 
-    for ind, statewise_answers in enumerate(
-            get_top_state_rule_answers_multi(
-                [(exp_domain_objects[1].id, state_tuple[0])
-                 for exp_domain_objects in exploration_objects.iteritems()
-                 for state_tuple in exp_domain_objects[1].states.iteritems()
-                ],
-                [exp_domain.DEFAULT_RULESPEC_STR])
-        ):
+    for ind, statewise_answers in enumerate(exploration_state_list):
         for answer in statewise_answers:
-            if not exps_answers_mapping.get(explorations_ids_list[ind]):
-                exps_answers_mapping[explorations_ids_list[ind]] = 0
-            exps_answers_mapping[explorations_ids_list[ind]] += answer['count']
+            exp_id = explorations_states_tuples[ind][0]
+            if exp_id not in exps_answers_mapping:
+                exps_answers_mapping[exp_id] = 0
+            exps_answers_mapping[exp_id] += answer['count']
 
     return exps_answers_mapping
 
