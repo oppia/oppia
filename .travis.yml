@@ -55,5 +55,3 @@ script: --retry
 after_success:
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then codecov; fi
 - if [ $RUN_FRONTEND_TESTS == 'true' ]; then codecov --file ../karma_coverage_reports/coverage-final.json; fi
-
-after_failure:
