@@ -470,6 +470,7 @@ class UnresolvedAnswersTests(test_utils.GenericTestBase):
 
     DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
     CLASSIFIER_RULESPEC_STR = exp_domain.CLASSIFIER_RULESPEC_STR
+    STATE_2_NAME = 'State 2'
 
     def _create_and_update_fake_exploration(self, exp_id):
         exp = exp_domain.Exploration.create_default_exploration(exp_id)
@@ -481,10 +482,10 @@ class UnresolvedAnswersTests(test_utils.GenericTestBase):
             'new_value': 'TextInput',
         }, {
             'cmd': 'add_state',
-            'state_name': 'State 2',
+            'state_name': self.STATE_2_NAME,
         }, {
             'cmd': 'edit_state_property',
-            'state_name': 'State 2',
+            'state_name': self.STATE_2_NAME,
             'property_name': 'widget_id',
             'new_value': 'TextInput',
         }], 'Add new state')
@@ -581,10 +582,12 @@ class UnresolvedAnswersTests(test_utils.GenericTestBase):
         event_services.AnswerSubmissionEventHandler.record(
             'eid1', 1, exp_1.init_state_name, self.DEFAULT_RULESPEC_STR, 'a1')
         event_services.AnswerSubmissionEventHandler.record(
-            'eid1', 1, exp_1.states.keys()[1], self.DEFAULT_RULESPEC_STR, 'a1')
+            'eid1', 1, self.STATE_2_NAME, self.DEFAULT_RULESPEC_STR, 'a1')
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid1', 1, self.STATE_2_NAME, self.DEFAULT_RULESPEC_STR, 'a2')
         self.assertEquals(
             stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
-                ['eid1']), {'eid1': 2})
+                ['eid1']), {'eid1': 3})
 
     def test_unresolved_answers_count_for_non_default_rules(self):
         exp_1 = self._create_and_update_fake_exploration('eid1')
@@ -592,9 +595,10 @@ class UnresolvedAnswersTests(test_utils.GenericTestBase):
             stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
                 ['eid1']), {})
         event_services.AnswerSubmissionEventHandler.record(
-            'eid1', 1, exp_1.init_state_name, self.CLASSIFIER_RULESPEC_STR, 'a1')
+            'eid1', 1, exp_1.init_state_name, self.CLASSIFIER_RULESPEC_STR, 'a1'
+        )
         event_services.AnswerSubmissionEventHandler.record(
-            'eid1', 1, exp_1.states.keys()[1], self.CLASSIFIER_RULESPEC_STR, 'a1')
+            'eid1', 1, self.STATE_2_NAME, self.CLASSIFIER_RULESPEC_STR, 'a1')
         self.assertEquals(
             stats_services.get_exp_wise_unresolved_answers_count_for_default_rule(  # pylint: disable=line-too-long
                 ['eid1']), {})
