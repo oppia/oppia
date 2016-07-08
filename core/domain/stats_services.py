@@ -49,6 +49,16 @@ def get_exp_wise_unresolved_answers_count_for_default_rule(exp_ids):
         values are the number of unresolved answers that exploration has.
     """
     explorations = exp_services.get_multiple_explorations_by_id(exp_ids)
+    
+    # The variable `exploration_states_tuples` is a list of all
+    # (exp_id, state_name) tuples for the given exp_ids.
+    # E.g. - [
+    #   ('eid1', 'Introduction'),
+    #   ('eid1', 'End'),
+    #   ('eid2', 'Introduction'),
+    #   ('eid3', 'Introduction')
+    # ]
+    # when exp_ids = ['eid1', 'eid2', 'eid3'].
     explorations_states_tuples = [
         (exp_domain_object.id, state_key)
         for exp_domain_object in explorations.values()
