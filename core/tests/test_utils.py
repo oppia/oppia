@@ -468,7 +468,7 @@ class TestBase(unittest.TestCase):
 
     def get_cache_slug_filepath(self):
         """Returns cache slug filepath for referencing files on disk.
-        examples: 'dev' or 'prod/1234'
+        examples: 'dev' or 'build/1234'
         """
         if feconf.DEV_MODE:
             cache_slug_filepath = feconf.CACHE_SLUG_DEV
@@ -477,7 +477,7 @@ class TestBase(unittest.TestCase):
             yaml_file_content = utils.dict_from_yaml(
                 utils.get_file_contents('cache_slug.yaml'))
             cache_slug_filepath = os.path.join(
-                'prod', yaml_file_content['cache_slug'])
+                'build', yaml_file_content['cache_slug'])
 
         return cache_slug_filepath
 

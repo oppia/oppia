@@ -76,7 +76,7 @@
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
         csrf_token_i18n: JSON.parse('{{csrf_token_i18n|js_string}}'),
         csrf_token_create_exploration: JSON.parse('{{csrf_token_create_exploration|js_string}}'),
-        CACHE_SLUG: JSON.parse('{{cache_slug|js_string}}'),
+        ASSET_DIR_PREFIX: JSON.parse('{{ASSET_DIR_PREFIX|js_string}}'),
         DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}'),
         MINIFICATION: JSON.parse('{{MINIFICATION|js_string}}'),
         INVALID_NAME_CHARS: JSON.parse('{{INVALID_NAME_CHARS|js_string}}'),
@@ -130,11 +130,11 @@
                       <i class="material-icons oppia-navbar-menu-icon">&#xE5D2;</i>
                     </a>
                     <a class="oppia-navbar-brand-name oppia-transition-200" href="/" focus-on="<[LABEL_FOR_CLEARING_FOCUS]>">
-                      <img src="/static/{{cache_slug}}/images/logo/288x128_logo_white.png" class="oppia-logo" ng-class="windowIsNarrow ? 'oppia-logo-small' : 'oppia-logo-wide'">
+                      <img src="{{get_static_resource_url('/assets/images/logo/288x128_logo_white.png')}}" class="oppia-logo" ng-class="windowIsNarrow ? 'oppia-logo-small' : 'oppia-logo-wide'">
                     </a>
                     <!-- This is needed for the correct image to appear when an exploration is shared using G+. -->
                     <a style="display: none;">
-                      <img src="/static/{{cache_slug}}/images/logo/288x128_logo_mint.png" itemprop="image">
+                      <img src="{{get_static_resource_url('/assets/images/logo/288x128_logo_mint.png')}}" itemprop="image">
                     </a>
                   </div>
 
@@ -237,7 +237,7 @@
                             <ul class="dropdown-menu oppia-navbar-dropdown" role="menu" style="margin-right: 15px; padding: 0;" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
                               <li>
                                 <a href style="padding: 0; width: 200px;" ng-click="onLoginButtonClicked('{{login_url}}')">
-                                  <img src="/static/{{cache_slug}}/images/signin/Red-signin-Long-base-44dp.png">
+                                  <img src="{{get_static_resource_url('/assets/images/signin/Red-signin-Long-base-44dp.png')}}">
                                 </a>
                               </li>
                             </ul>

@@ -208,9 +208,9 @@ describe('URL Interpolation Service', function() {
 
   it('should interpolate correct imagePath', function() {
     expect(uis.getStaticImageUrl('/test_url/')).toBe(
-      '/static/' + GLOBALS.CACHE_SLUG + '/images' + '/test_url/');
+      GLOBALS.ASSET_DIR_PREFIX + '/assets/images' + '/test_url/');
     expect(uis.getStaticImageUrl('/test_url/test.png')).toBe(
-      '/static/' + GLOBALS.CACHE_SLUG + '/images' + '/test_url/test.png');
+      GLOBALS.ASSET_DIR_PREFIX + '/assets/images' + '/test_url/test.png');
   });
 
   it('should throw an error for empty imagePath', function() {

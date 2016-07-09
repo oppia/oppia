@@ -196,7 +196,7 @@ class ExplorationDisplayableSummariesTest(
             'status': 'public',
             'tags': [],
             'thumbnail_bg_color': '#a33f40',
-            'thumbnail_icon_url': ('/static/%s/images/subjects/Lightbulb.svg'
+            'thumbnail_icon_url': ('%s/assets/images/subjects/Lightbulb.svg'
                                    % self.get_cache_slug_filepath()),
             'title': u'Exploration 2 Albert title',
         }
@@ -279,7 +279,7 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
             'tags': [],
             'title':  u'The Lazy Magician',
             'thumbnail_bg_color': '#d0982a',
-            'thumbnail_icon_url': ('/static/%s/images/subjects/Algorithms.svg'
+            'thumbnail_icon_url': ('%s/assets/images/subjects/Algorithms.svg'
                                    % self.get_cache_slug_filepath()),
         }
         expected_group = {
@@ -356,7 +356,7 @@ class FeaturedExplorationDisplayableSummariesTest(
             'thumbnail_bg_color': '#a33f40',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': ('/static/%s/images/subjects/Lightbulb.svg'
+            'thumbnail_icon_url': ('%s/assets/images/subjects/Lightbulb.svg'
                                    % self.get_cache_slug_filepath()),
             'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
@@ -643,7 +643,7 @@ class TopRatedExplorationDisplayableSummariesTest(
             'thumbnail_bg_color': '#a33f40',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': ('/static/%s/images/subjects/Lightbulb.svg'
+            'thumbnail_icon_url': ('%s/assets/images/subjects/Lightbulb.svg'
                                    % self.get_cache_slug_filepath()),
             'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_3,
@@ -681,7 +681,7 @@ class TopRatedExplorationDisplayableSummariesTest(
             'thumbnail_bg_color': '#a33f40',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': ('/static/%s/images/subjects/Lightbulb.svg'
+            'thumbnail_icon_url': ('%s/assets/images/subjects/Lightbulb.svg'
                                    % self.get_cache_slug_filepath()),
             'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
@@ -763,7 +763,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             'thumbnail_bg_color': '#a33f40',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': ('/static/%s/images/subjects/Lightbulb.svg'
+            'thumbnail_icon_url': ('%s/assets/images/subjects/Lightbulb.svg'
                                    % self.get_cache_slug_filepath()),
             'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_1,
@@ -778,7 +778,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             'thumbnail_bg_color': '#a33f40',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': ('/static/%s/images/subjects/Lightbulb.svg'
+            'thumbnail_icon_url': ('%s/assets/images/subjects/Lightbulb.svg'
                                    % self.get_cache_slug_filepath()),
             'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
@@ -793,7 +793,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             'thumbnail_bg_color': '#a33f40',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': ('/static/%s/images/subjects/Lightbulb.svg'
+            'thumbnail_icon_url': ('%s/assets/images/subjects/Lightbulb.svg'
                                    % self.get_cache_slug_filepath()),
             'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_3,

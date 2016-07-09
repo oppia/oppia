@@ -14,7 +14,7 @@
 
     <style>
       html, body {
-        background: url('/static/{{cache_slug}}/images/general/background.jpg') no-repeat center center fixed;
+        background: url("{{get_static_resource_url('/assets/images/general/background.jpg')}}") no-repeat center center fixed;
         background-size: cover;
       }
     </style>

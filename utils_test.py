@@ -182,15 +182,15 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_get_thumbnail_icon_url_for_category(self):
         self.assertEqual(
             utils.get_thumbnail_icon_url_for_category('Architecture'),
-            '/static/%s/images/subjects/Architecture.svg'
+            '%s/assets/images/subjects/Architecture.svg'
             % utils.get_cache_slug())
         self.assertEqual(
             utils.get_thumbnail_icon_url_for_category('Graph Theory'),
-            '/static/%s/images/subjects/GraphTheory.svg'
+            '%s/assets/images/subjects/GraphTheory.svg'
             % utils.get_cache_slug())
         self.assertEqual(
             utils.get_thumbnail_icon_url_for_category('Nonexistent'),
-            '/static/%s/images/subjects/Lightbulb.svg' % utils.get_cache_slug())
+            '%s/assets/images/subjects/Lightbulb.svg' % utils.get_cache_slug())
 
     def test_get_cache_slug_returns_correct_slug(self):
 

@@ -136,7 +136,7 @@ oppia.factory('UrlInterpolationService', ['alertsService',
         return null;
       }
 
-      return '/static/' + GLOBALS.CACHE_SLUG + '/images' + imagePath;
+      return GLOBALS.ASSET_DIR_PREFIX + '/assets/images' + imagePath;
     }
   };
 }]);

@@ -23,8 +23,7 @@ import math
 import jinja2
 from jinja2 import meta
 
-import feconf
-import utils
+import utils # pylint: disable=relative-import
 
 
 _OPPIA_MODULE_DEFINITION_FILE = 'app.js'
@@ -73,22 +72,18 @@ def get_jinja_env(dir_path):
 
     def get_static_resource_url(resource_suffix):
         """Returns the relative path for the resource, appending it to the
-        corresponding cache slug.
+        corresponding cache slug. resource_suffix should have a leading
+        slash.
         """
-        if feconf.DEV_MODE:
-            return resource_suffix
-        else:
-            return '/build/%s%s' % (utils.get_cache_slug(), resource_suffix)
+        return '%s%s' % (utils.get_cache_slug(), resource_suffix)
 
     def get_complete_static_resource_url(domain_url, resource_suffix):
         """Returns the relative path for the resource, appending it to the
-        corresponding cache slug.
+        corresponding cache slug. resource_suffix should have a leading
+        slash.
         """
-        if feconf.DEV_MODE:
-            return '%s%s' % (domain_url, resource_suffix)
-        else:
-            return '%s/build/%s%s' % (
-                domain_url, utils.get_cache_slug(), resource_suffix)
+        return '%s%s%s' % (
+            domain_url, utils.get_cache_slug(), resource_suffix)
 
 
     env.globals['include_js_file'] = include_js_file

@@ -315,6 +315,7 @@ class BaseHandler(webapp2.RequestHandler):
         values.update({
             'ALL_CATEGORIES': feconf.ALL_CATEGORIES,
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
+            'ASSET_DIR_PREFIX': utils.get_cache_slug(),
             'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
                 BEFORE_END_HEAD_TAG_HOOK.value),
             'CAN_SEND_ANALYTICS_EVENTS': feconf.CAN_SEND_ANALYTICS_EVENTS,
@@ -399,8 +400,6 @@ class BaseHandler(webapp2.RequestHandler):
 
         self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
         self.response.pragma = 'no-cache'
-
-        values['cache_slug'] = utils.get_cache_slug()
 
         self.response.write(self.jinja2_env.get_template(
             filename).render(**values))

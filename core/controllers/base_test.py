@@ -273,8 +273,8 @@ class I18nDictsTest(test_utils.GenericTestBase):
 
     def _extract_keys_from_json_file(self, filename):
         return sorted(json.loads(utils.get_file_contents(
-            os.path.join(os.getcwd(), 'i18n', self.get_cache_slug_filepath(),
-                         filename)
+            os.path.join(os.getcwd(), self.get_cache_slug_filepath(), 'assets',
+                         'i18n', filename)
         )).keys())
 
     def test_i18n_keys(self):
@@ -283,7 +283,8 @@ class I18nDictsTest(test_utils.GenericTestBase):
         self.assertGreater(len(master_key_list), 0)
 
         filenames = os.listdir(
-            os.path.join(os.getcwd(), 'i18n', self.get_cache_slug_filepath()))
+            os.path.join(os.getcwd(), self.get_cache_slug_filepath(), 'assets',
+                         'i18n'))
         for filename in filenames:
             if filename == 'en.json':
                 continue

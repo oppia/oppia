@@ -429,7 +429,7 @@ def get_thumbnail_icon_url_for_category(category):
         category if category in feconf.ALL_CATEGORIES
         else feconf.DEFAULT_THUMBNAIL_ICON)
     # Remove all spaces from the string.
-    return ('/static/%s/images/subjects/%s.svg'
+    return ('%s/assets/images/subjects/%s.svg'
             % (get_cache_slug(), icon_name.replace(' ', '')))
 
 
@@ -466,10 +466,13 @@ def get_cache_slug():
     if cache_slug is None:
         # pylint: disable=redefined-outer-name
         if feconf.DEV_MODE:
-            cache_slug = feconf.CACHE_SLUG_DEV
+            if feconf.CACHE_SLUG_DEV:
+                cache_slug = '/%s' % feconf.CACHE_SLUG_DEV
+            else:
+                cache_slug = ''
         else:
             yaml_file_content = dict_from_yaml(
                 get_file_contents('cache_slug.yaml'))
-            cache_slug = yaml_file_content['cache_slug']
+            cache_slug = '/build/%s' % yaml_file_content['cache_slug']
 
     return cache_slug

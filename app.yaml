@@ -32,17 +32,17 @@ handlers:
   static_dir: build
   secure: always
   http_headers:
-    Cache-Control: 'public, max-age=600'
-- url: /static
-  static_dir: assets
-  secure: always
-  http_headers:
-    Cache-Control: 'public, max-age=600'
+    Cache-Control: 'public, max-age=2592000'
 - url: /assets
   static_dir: assets
   secure: always
   http_headers:
-    Cache-Control: 'public, max-age=600'
+    Cache-Control: 'public, max-age=2592000'
+- url: /assets/common
+  static_dir: assets/common
+  secure: always
+  http_headers:
+    Cache-Control: 'public, max-age=2592000'
 - url: /css
   # NB: not minified. TODO(sll): fix.
   static_dir: core/templates/dev/head/css
@@ -54,7 +54,7 @@ handlers:
     Cache-Control: 'public, max-age=2592000'
     Vary: Accept-Encoding
 - url: /i18n
-  static_dir: i18n
+  static_dir: assets/i18n
   secure: always
   http_headers:
     Cache-Control: 'no-cache'
