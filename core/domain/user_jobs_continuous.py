@@ -294,6 +294,28 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
     def _handle_incoming_event(cls, active_realtime_layer, event_type, *args):
         user_id = args[0]
 
+        def _refresh_average_ratings(rating, num_ratings):
+            realtime_class = cls._get_realtime_datastore_class()
+            realtime_model_id = realtime_class.get_realtime_id(
+                active_realtime_layer, user_id)
+
+            model = realtime_class.get(realtime_model_id, strict=False)
+            # print model
+            if model is None:
+                realtime_class(
+                    id=realtime_model_id, average_ratings=rating,
+                    realtime_layer=active_realtime_layer).put()
+            else:
+                average_ratings = model.average_ratings
+                if average_ratings is not None:
+                    model.average_ratings = (
+                        (model.average_ratings * num_ratings + rating)/
+                        (num_ratings + 1)
+                    )
+                else:
+                    model.average_ratings = rating
+                model.put()
+
         def _increment_total_plays_count():
             realtime_class = cls._get_realtime_datastore_class()
             realtime_model_id = realtime_class.get_realtime_id(
@@ -308,9 +330,13 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                 model.total_plays += 1
                 model.put()
 
-        if event_type == feconf.EVENT_TYPE_NEW_THREAD_CREATED:
+        if event_type == feconf.EVENT_TYPE_START_EXPLORATION:
             transaction_services.run_in_transaction(
                 _increment_total_plays_count)
+
+        if event_type == feconf.EVENT_TYPE_RATE_EXPLORATION:
+            transaction_services.run_in_transaction(
+                _refresh_average_ratings, args[1], args[2])
 
     # Public query method.
     @classmethod
@@ -318,19 +344,22 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
         # TODO: Add doctstring.
 
         total_plays = 0
+        average_ratings = None
 
         mr_model = user_models.UserStatsModel.get(user_id, strict=False)
         if mr_model is not None:
             total_plays += mr_model.total_plays
+            average_ratings = mr_model.average_ratings
 
         realtime_model = cls._get_realtime_datastore_class().get(
             cls.get_active_realtime_layer_id(user_id), strict=False)
-
         if realtime_model is not None:
             total_plays += realtime_model.total_plays
+            average_ratings = realtime_model.average_ratings
 
         return {
-            'total_plays': total_plays
+            'total_plays': total_plays,
+            'average_ratings': average_ratings
         }
 
 

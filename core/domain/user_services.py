@@ -681,25 +681,6 @@ def get_user_impact_score(user_id):
         return 0
 
 
-def get_user_dashboard_stats(user_id):
-    """Return statistics for creator dashboard of a user.
-
-    total_plays, average_ratings
-    """
-    model = user_models.UserStatsModel.get(user_id, strict=False)
-
-    if model:
-        return {
-            'total_plays': model.total_plays or 0,
-            'average_ratings': model.average_ratings
-        }
-    else:
-        return {
-            'total_plays': 0,
-            'average_ratings': None
-        }
-
-
 def get_weekly_dashboard_stats(user_id):
     """Returns a list which contains the dashboard stats of a user,
     keyed by a datetime string.

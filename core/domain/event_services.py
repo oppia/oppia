@@ -144,8 +144,9 @@ class RateExplorationEventHandler(BaseEventHandler):
     EVENT_TYPE = feconf.EVENT_TYPE_RATE_EXPLORATION
 
     @classmethod
-    def _handle_event(cls, exp_id, session_id, rating):
-        pass
+    def _handle_event(cls, exploration_id, session_id, rating, num_ratings):
+        stats_models.RateExplorationEventLogEntryModel.create(
+            exploration_id, session_id, rating, num_ratings)
 
 
 class StateHitEventHandler(BaseEventHandler):

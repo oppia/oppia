@@ -1975,6 +1975,22 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
         self.assertEqual(cursor, expected_result_cursor)
         self.assertEqual(result, doc_ids)
 
+    def test_get_number_of_ratings(self):
+        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+
+        self.assertEqual(exp_services.get_number_of_ratings(exp.ratings), 0)
+
+        rating_services.assign_rating_to_exploration(
+            self.owner_id, self.EXP_ID, 5)
+        self.assertEqual(
+            exp_services.get_number_of_ratings(exp.ratings), 1)
+
+        rating_services.assign_rating_to_exploration(
+            self.owner_id, self.EXP_ID, 3)
+        self.assertEqual(
+            exp_services.get_number_of_ratings(exp.ratings), 2)
+
     def test_get_average_rating(self):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
         exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
