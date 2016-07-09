@@ -44,7 +44,7 @@ else:
 # in utils.get_cache_slug() if Oppia is in dev mode. It is used as a prefix
 # in urls for images, css and script files. It is also used in backend_tests
 # to verify the presence of static resources.
-CACHE_SLUG_DEV = 'dev'
+CACHE_SLUG_DEV = ''
 
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')

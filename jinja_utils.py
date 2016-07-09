@@ -23,6 +23,9 @@ import math
 import jinja2
 from jinja2 import meta
 
+import feconf
+import utils
+
 
 _OPPIA_MODULE_DEFINITION_FILE = 'app.js'
 
@@ -68,7 +71,30 @@ def get_jinja_env(dir_path):
             # (IIFE) to prevent pollution of the global scope.
             return jinja2.Markup('(function() {%s})();' % raw_file_contents)
 
+    def get_static_resource_url(resource_suffix):
+        """Returns the relative path for the resource, appending it to the
+        corresponding cache slug.
+        """
+        if feconf.DEV_MODE:
+            return resource_suffix
+        else:
+            return '/build/%s%s' % (utils.get_cache_slug(), resource_suffix)
+
+    def get_complete_static_resource_url(domain_url, resource_suffix):
+        """Returns the relative path for the resource, appending it to the
+        corresponding cache slug.
+        """
+        if feconf.DEV_MODE:
+            return '%s%s' % (domain_url, resource_suffix)
+        else:
+            return '%s/build/%s%s' % (
+                domain_url, utils.get_cache_slug(), resource_suffix)
+
+
     env.globals['include_js_file'] = include_js_file
+    env.globals['get_static_resource_url'] = get_static_resource_url
+    env.globals['get_complete_static_resource_url'] = (
+        get_complete_static_resource_url)
     env.filters.update(JINJA_FILTERS)
     return env
 

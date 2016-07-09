@@ -39,10 +39,10 @@
     <!-- Tiles for Internet Explorer. -->
     <meta name="application-name" content="{{SITE_NAME}}">
     <meta name="msapplication-TileColor" content="#ffffff">
-    <meta name="msapplication-square70x70logo" content="{{DOMAIN_URL}}/static/{{cache_slug}}/images/logo/msapplication-tiny.png">
-    <meta name="msapplication-square150x150logo" content="{{DOMAIN_URL}}/static/{{cache_slug}}/images/logo/msapplication-square.png">
-    <meta name="msapplication-wide310x150logo" content="{{DOMAIN_URL}}/static/{{cache_slug}}/images/logo/msapplication-wide.png">
-    <meta name="msapplication-square310x310logo" content="{{DOMAIN_URL}}/static/{{cache_slug}}/images/logo/msapplication-large.png">
+    <meta name="msapplication-square70x70logo" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/msapplication-tiny.png')}}">
+    <meta name="msapplication-square150x150logo" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/msapplication-square.png')}}">
+    <meta name="msapplication-wide310x150logo" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/msapplication-wide.png')}}">
+    <meta name="msapplication-square310x310logo" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/msapplication-large.png')}}">
 
     <!-- The itemprops are for G+ sharing. -->
     <meta itemprop="name" content="{{meta_name}}">
@@ -53,9 +53,9 @@
     <meta property="og:url" content="{{FULL_URL}}">
     <meta property="og:description" content="{{meta_description}}">
     <meta property="og:type" content="article">
-    <meta property="og:image" content="{{DOMAIN_URL}}/static/{{cache_slug}}/images/logo/288x288_logo_mint.png">
+    <meta property="og:image" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/288x288_logo_mint.png')}}>
 
-    <link rel="apple-touch-icon" href="/static/{{cache_slug}}/images/logo/favicon.png">
+    <link rel="apple-touch-icon" href="{{get_static_resource_url('/assets/images/logo/favicon.png')}}">
 
     <!-- The title is bound to the rootScope. The content of the block
     maintitle can be a string or a translation id. If it is a translation it

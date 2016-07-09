@@ -196,7 +196,7 @@ class UtilsTests(test_utils.GenericTestBase):
 
         with self.swap(feconf, 'DEV_MODE', True):
             cache_slug = utils.get_cache_slug()
-            self.assertIn('dev', cache_slug)
+            self.assertIn(feconf.CACHE_SLUG_DEV, cache_slug)
 
         # TODO(gvishal): Fix it for prod.
         # with self.swap(feconf, 'DEV_MODE', False):

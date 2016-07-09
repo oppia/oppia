@@ -470,6 +470,6 @@ def get_cache_slug():
         else:
             yaml_file_content = dict_from_yaml(
                 get_file_contents('cache_slug.yaml'))
-            cache_slug = '%s/%s' % ('prod', yaml_file_content['cache_slug'])
+            cache_slug = yaml_file_content['cache_slug']
 
     return cache_slug

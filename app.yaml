@@ -15,21 +15,31 @@ inbound_services:
 
 handlers:
 - url: /favicon.ico
-  static_files: static/common/favicon.ico
-  upload: static/common/favicon.ico
+  static_files: assets/common/favicon.ico
+  upload: assets/common/favicon.ico
   secure: always
   http_headers:
     Cache-Control: 'public, max-age=2592000'
     Vary: Accept-Encoding
 - url: /robots.txt
-  static_files: static/common/robots.txt
-  upload: static/common/robots.txt
+  static_files: assets/common/robots.txt
+  upload: assets/common/robots.txt
   secure: always
   http_headers:
     Cache-Control: 'public, max-age=2592000'
     Vary: Accept-Encoding
+- url: /build
+  static_dir: build
+  secure: always
+  http_headers:
+    Cache-Control: 'public, max-age=600'
 - url: /static
-  static_dir: static
+  static_dir: assets
+  secure: always
+  http_headers:
+    Cache-Control: 'public, max-age=600'
+- url: /assets
+  static_dir: assets
   secure: always
   http_headers:
     Cache-Control: 'public, max-age=600'
