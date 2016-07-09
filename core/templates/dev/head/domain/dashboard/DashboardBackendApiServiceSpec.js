@@ -53,7 +53,8 @@ describe('Dashboard backend API service', function() {
         thumbnail_bg_color: '#bb8b2f',
         num_views: 2,
         num_open_threads: 0,
-        num_total_threads: 0
+        num_total_threads: 0,
+        num_unresolved_answers: 2
       }],
       collections_list: [],
       dashboard_stats: {

@@ -41,7 +41,7 @@ oppia.controller('Dashboard', [
       $window.location = '/create/' + explorationId;
     };
 
-    $scope.myExplorationsView = 'list';
+    $scope.myExplorationsView = 'card';
     $scope.setMyExplorationsView = function(viewType) {
       $scope.myExplorationsView = viewType;
     };
