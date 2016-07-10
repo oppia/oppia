@@ -43,8 +43,10 @@ else:
 # Defines the cache slug to be used in development mode. It is referenced
 # in utils.get_cache_slug() if Oppia is in dev mode. It is used as a prefix
 # in urls for images, css and script files. It is also used in backend_tests
-# to verify the presence of static resources. Changing it requires changing
+# to verify the presence of static resources.
+# Changing it requires changing
 # - url: /assets to - url: /{CACHE_SLUG_DEV}/assets
+# gulpfile.js #110 cacheSlugDev variable
 CACHE_SLUG_DEV = ''
 
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')

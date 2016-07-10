@@ -106,9 +106,11 @@ var cssFilePaths = [];
 var jsFilePaths = [];
 var fontFolderPaths = [];
 var cssBackgroundFilepaths = [];
+// This cache slug should be same as feconf.CACHE_SLUG_DEV
+var cacheSlugDev = '';
 var generatedTargetDir = path.join(
   'third_party', 'generated',
-  isMinificationNeeded ? 'prod' : 'dev');
+  isMinificationNeeded ? 'prod' : cacheSlugDev);
 var generatedCssTargetDir = path.join(generatedTargetDir, 'css');
 var generatedJsTargetDir = path.join(generatedTargetDir, 'js');
 
@@ -173,11 +175,10 @@ gulp.task('generateJs', function() {
 });
 // This task is used to copy all fonts which are used by
 // Bootstrap and font-Awesome to one folder
+var generatedFontsTargetDir = path.join(generatedTargetDir, 'fonts');
 gulp.task('copyFonts', function() {
   gulp.src(fontFolderPaths)
-    .pipe(gulp.dest(path.join(
-      'third_party', 'generated',
-      isMinificationNeeded ? 'prod' : 'dev', 'fonts')));
+    .pipe(gulp.dest(path.join(generatedFontsTargetDir)));
 });
 
 // This is a task which copies background image used by css.
