@@ -35,6 +35,8 @@ oppia.controller('GadgetEditor', [
       $scope.activeStateName = currentStateName;
     });
 
+    $scope.extensionResourcePrefix = GLOBALS.ASSET_DIR_PREFIX;
+
     $scope.refreshGadgetsInfo = function() {
       $scope.gadgets = explorationGadgetsService.getGadgets();
       $scope.panels = explorationGadgetsService.getPanels();

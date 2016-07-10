@@ -88,8 +88,8 @@ oppia.factory('ExplorationObjectFactory', [
       // state_editor_interaction.html.
       var interactionId = this.getInteractionId(stateName);
       return interactionId ? (
-        '/extensions/interactions/' + interactionId + '/static/' +
-        interactionId + '.png') : '';
+        GLOBALS.ASSET_DIR_PREFIX + '/extensions/interactions/' + interactionId +
+        '/static/' + interactionId + '.png') : '';
     };
 
     Exploration.prototype.isInteractionInline = function(stateName) {

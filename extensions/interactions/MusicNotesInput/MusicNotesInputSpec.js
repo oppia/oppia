@@ -26,6 +26,7 @@ describe('MusicNotesInput interaction', function() {
 
     beforeEach(inject(function($compile, _$templateCache_, $rootScope) {
       $templateCache = _$templateCache_;
+      $rootScope.extensionResourcePrefix = GLOBALS.ASSET_DIR_PREFIX;
       var templatesHtml = $templateCache.get(
         'extensions/interactions/MusicNotesInput/MusicNotesInput.html');
       $compile(templatesHtml)($rootScope);

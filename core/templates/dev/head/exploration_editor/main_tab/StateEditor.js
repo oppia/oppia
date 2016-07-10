@@ -42,6 +42,8 @@ oppia.controller('StateEditor', [
     $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
                                 '/avatar/oppia_black_72px.png');
 
+    $scope.extensionResourcePrefix = GLOBALS.ASSET_DIR_PREFIX;
+
     $scope.isCurrentStateInitialState = function() {
       return (
         editorContextService.getActiveStateName() ===

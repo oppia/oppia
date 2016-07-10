@@ -137,6 +137,30 @@ oppia.factory('UrlInterpolationService', ['alertsService',
       }
 
       return GLOBALS.ASSET_DIR_PREFIX + '/assets/images' + imagePath;
+    },
+
+    /**
+     * Given an extension resource path, returns the complete url path to that
+     * extension resource, prefixing the appropriate cache_slug to it.
+     */
+    getExtensionResourceUrl: function(extensionResourcePath) {
+      if (!extensionResourcePath) {
+        alertsService.fatalWarning(
+          'Empty extension resource path passed in getExtensionResourceUrl.');
+        return null;
+      }
+
+      var EXTENSION_RESOURCE_PATH_CHECK = /^\//;
+      // Ensure that extensionResourcePath starts with a forward slash.
+      if (!extensionResourcePath.match(EXTENSION_RESOURCE_PATH_CHECK)) {
+        alertsService.fatalWarning(
+          'Extension resource path passed into getExtensionResourceUrl' +
+          'must start with \'\/\': ' +
+          '\'' + new String(extensionResourcePath) + '\'.');
+        return null;
+      }
+
+      return GLOBALS.ASSET_DIR_PREFIX + extensionResourcePath;
     }
   };
 }]);

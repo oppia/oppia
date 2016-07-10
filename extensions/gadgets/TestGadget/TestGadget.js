@@ -53,6 +53,7 @@ oppia.directive('oppiaGadgetTestGadget', [
           $scope.overlayAdviceModal = function(adviceResourceIndex) {
             $modal.open({
               templateUrl: (
+                GLOBALS.ASSET_DIR_PREFIX +
                 '../extensions/gadgets/TestGadget/' +
                 'static/html/test_gadget_overlay.html'),
               controller: 'TestGadgetAdviceModalCtrl',
@@ -80,5 +81,6 @@ oppia.controller('TestGadgetAdviceModalCtrl', [
   function($scope, adviceTitle, adviceHtml) {
     $scope.adviceTitle = adviceTitle;
     $scope.adviceHtml = adviceHtml;
+    $scope.extensionResourcePrefix = GLOBALS.ASSET_DIR_PREFIX;
   }
 ]);
