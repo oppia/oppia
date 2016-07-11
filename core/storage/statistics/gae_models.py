@@ -445,7 +445,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
     # ID of current learner's session
     session_id = ndb.StringProperty(indexed=True)
     # Value of rating assigned
-    rating = ndb.IntegerProperty(indexed=True)
+    rating = ndb.FloatProperty(indexed=True)
     # Number of times exploration has already been rated.
     num_ratings = ndb.IntegerProperty(indexed=True)
     # The version of the event schema used to describe an event of this type.
