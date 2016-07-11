@@ -424,3 +424,10 @@ class ExpSummaryModel(base_models.BaseModel):
         ).order(
             -ExpSummaryModel.first_published_msec
         ).fetch(feconf.RECENTLY_PUBLISHED_QUERY_LIMIT)
+
+    def get_subscribed_explorations_by_id(cls, user_id, exp_ids, page_size):
+        query = cls.query.filter(
+            ndb.AND(user_id IN cls.owner_ids,
+                    cls.id IN exp_ids))
+        return cls._fetch_page_sorted_by_last_updated(
+            query, page_size, urlsafe_start_cursor)

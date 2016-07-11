@@ -168,6 +168,12 @@ class DashboardHandler(base.BaseHandler):
                 subscription_services.get_collection_ids_subscribed_to(
                     self.user_id))))
 
+        res, new_urlsafe_start_cursor, more = (
+            user_services.get_next_page_of_explorations(
+                urlsafe_start_cursor=urlsafe_start_cursor))
+
+        print res
+
         exp_summary_list = summary_services.get_displayable_exp_summary_dicts(
             subscribed_exploration_summaries)
         collection_summary_list = []

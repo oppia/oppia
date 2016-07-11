@@ -273,6 +273,16 @@ def get_profile_pictures_by_user_ids(user_ids):
     return result
 
 
+def get_next_page_of_explorations(
+    page_size=feconf.DASHBOARD_EXPLORATIONS_PAGE_SIZE, urlsafe_start_cursor=None):
+
+    results, new_urlsafe_start_cursor, more = (
+        exp_models.ExpSummaryModel.get_subscribed_explorations_by_id(
+            page_size, urlsafe_start_cursor))
+
+    return results
+
+
 def get_user_settings(user_id, strict=False):
     """Return the user settings for a single user."""
     user_settings = get_users_settings([user_id])[0]
