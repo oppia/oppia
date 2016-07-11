@@ -89,9 +89,7 @@ def require_editor(handler):
 
 class CollectionEditorHandler(base.BaseHandler):
     """Base class for all handlers for the collection editor page."""
-
-    # The page name to use as a key for generating CSRF tokens.
-    PAGE_NAME_FOR_CSRF = 'collection_editor'
+    pass
 
 
 class CollectionEditorPage(CollectionEditorHandler):

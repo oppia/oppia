@@ -68,8 +68,6 @@ class NotificationsDashboardPage(base.BaseHandler):
 class NotificationsDashboardHandler(base.BaseHandler):
     """Provides data for the user notifications dashboard."""
 
-    PAGE_NAME_FOR_CSRF = 'dashboard'
-
     def get(self):
         """Handles GET requests."""
         if self.user_id is None:
@@ -116,7 +114,6 @@ class NotificationsDashboardHandler(base.BaseHandler):
 class DashboardPage(base.BaseHandler):
     """Page showing the user's creator dashboard."""
 
-    PAGE_NAME_FOR_CSRF = 'dashboard'
     PAGE_HAS_CREATE_EXP_REQUEST = True
 
     @base.require_user
@@ -253,8 +250,6 @@ class NotificationsHandler(base.BaseHandler):
 class NewExploration(base.BaseHandler):
     """Creates a new exploration."""
 
-    PAGE_NAME_FOR_CSRF = feconf.CSRF_PAGE_NAME_CREATE_EXPLORATION
-
     @base.require_fully_signed_up
     def post(self):
         """Handles POST requests."""
@@ -273,8 +268,6 @@ class NewExploration(base.BaseHandler):
 class NewCollection(base.BaseHandler):
     """Creates a new collection."""
 
-    PAGE_NAME_FOR_CSRF = 'dashboard'
-
     @base.require_fully_signed_up
     def post(self):
         """Handles POST requests."""
@@ -290,8 +283,6 @@ class NewCollection(base.BaseHandler):
 
 class UploadExploration(base.BaseHandler):
     """Uploads a new exploration."""
-
-    PAGE_NAME_FOR_CSRF = 'dashboard'
 
     @base.require_fully_signed_up
     def post(self):

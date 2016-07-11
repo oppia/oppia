@@ -114,25 +114,20 @@ class CsrfTokenManagerTest(test_utils.GenericTestBase):
 
     def test_create_and_validate_token(self):
         uid = 'user_id'
-        page = 'page_name'
 
-        token = base.CsrfTokenManager.create_csrf_token(uid, page)
+        token = base.CsrfTokenManager.create_csrf_token(uid)
         self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(
-            uid, page, token))
+            uid, token))
 
         self.assertFalse(
-            base.CsrfTokenManager.is_csrf_token_valid('bad_user', page, token))
-        self.assertFalse(base.CsrfTokenManager.is_csrf_token_valid(
-            uid, 'wrong_page', token))
-        self.assertFalse(base.CsrfTokenManager.is_csrf_token_valid(
-            uid, self.UNICODE_TEST_STRING, token))
+            base.CsrfTokenManager.is_csrf_token_valid('bad_user', token))
         self.assertFalse(
-            base.CsrfTokenManager.is_csrf_token_valid(uid, page, 'new_token'))
+            base.CsrfTokenManager.is_csrf_token_valid(uid, 'new_token'))
         self.assertFalse(
-            base.CsrfTokenManager.is_csrf_token_valid(uid, page, 'new/token'))
+            base.CsrfTokenManager.is_csrf_token_valid(uid, 'new/token'))
 
     def test_nondefault_csrf_secret_is_used(self):
-        base.CsrfTokenManager.create_csrf_token('uid', 'page')
+        base.CsrfTokenManager.create_csrf_token('uid')
         self.assertNotEqual(base.CSRF_SECRET.value, base.DEFAULT_CSRF_SECRET)
 
     def test_token_expiry(self):
@@ -147,52 +142,21 @@ class CsrfTokenManagerTest(test_utils.GenericTestBase):
             base.CsrfTokenManager, '_get_current_time',
             types.MethodType(_get_current_time, base.CsrfTokenManager)):
             # Create a token and check that it expires correctly.
-            token = base.CsrfTokenManager().create_csrf_token('uid', 'page')
+            token = base.CsrfTokenManager().create_csrf_token('uid')
             self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(
-                'uid', 'page', token))
+                'uid', token))
 
             current_time = orig_time + 1
             self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(
-                'uid', 'page', token))
+                'uid', token))
 
             current_time = orig_time + FORTY_EIGHT_HOURS_IN_SECS - PADDING
             self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(
-                'uid', 'page', token))
+                'uid', token))
 
             current_time = orig_time + FORTY_EIGHT_HOURS_IN_SECS + PADDING
             self.assertFalse(base.CsrfTokenManager.is_csrf_token_valid(
-                'uid', 'page', token))
-
-            # Check that the expiry of one token does not cause the other to
-            # expire.
-            current_time = orig_time
-            token1 = base.CsrfTokenManager.create_csrf_token('uid', 'page1')
-            self.assertTrue(
-                base.CsrfTokenManager.is_csrf_token_valid(
-                    'uid', 'page1', token1))
-
-            current_time = orig_time + 100
-            token2 = base.CsrfTokenManager.create_csrf_token('uid', 'page2')
-            self.assertTrue(
-                base.CsrfTokenManager.is_csrf_token_valid(
-                    'uid', 'page2', token2))
-
-            current_time = orig_time + FORTY_EIGHT_HOURS_IN_SECS + PADDING
-            self.assertFalse(
-                base.CsrfTokenManager.is_csrf_token_valid(
-                    'uid', 'page1', token1))
-            self.assertTrue(
-                base.CsrfTokenManager.is_csrf_token_valid(
-                    'uid', 'page2', token2))
-
-            current_time = (
-                orig_time + 100 + FORTY_EIGHT_HOURS_IN_SECS + PADDING)
-            self.assertFalse(
-                base.CsrfTokenManager.is_csrf_token_valid(
-                    'uid', 'page1', token1))
-            self.assertFalse(
-                base.CsrfTokenManager.is_csrf_token_valid(
-                    'uid', 'page2', token2))
+                'uid', token))
 
 
 class EscapingTest(test_utils.GenericTestBase):
