@@ -198,7 +198,7 @@ class UtilsTests(test_utils.GenericTestBase):
             cache_slug = utils.get_cache_slug()
             self.assertIn(feconf.CACHE_SLUG_DEV, cache_slug)
 
-        # TODO(gvishal): Fix it for prod.
-        # with self.swap(feconf, 'DEV_MODE', False):
-        #     cache_slug = utils.get_cache_slug()
-        #     self.assertIn('prod/', cache_slug)
+        with self.swap(feconf, 'DEV_MODE', False):
+            utils.cache_slug = None
+            cache_slug = utils.get_cache_slug()
+            self.assertIn('/build/', cache_slug)
