@@ -228,14 +228,12 @@
                   <button class="pull-right" ng-click="startNewJob('{{job_spec.job_type}}')">
                     Start new job
                   </button>
-                </td>
-                {% if job_spec.is_queued_or_running %}
-                  <td>
+                  {% if job_spec.is_queued_or_running %}
                     <span class="oppia-serious-warning-text">
                       <strong>(warning: an instance of this job type is already running)</strong>
                     </span>
-                  </td>
                 {% endif %}
+                </td>
               </tr>
             {% endfor %}
           </table>
