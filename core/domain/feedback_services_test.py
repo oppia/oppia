@@ -306,11 +306,20 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         threads_2 = feedback_services.get_all_threads(self.EXP_ID_2, False)
         self.assertEqual(1, len(threads_2))
 
+        def _close_thread(exp_id, thread_id):
+            thread = (feedback_models.FeedbackThreadModel.
+                      get_by_exp_and_thread_id(exp_id, thread_id))
+            thread.status = feedback_models.STATUS_CHOICES_FIXED
+            thread.put()
+
+        _close_thread(self.EXP_ID_1, threads_1[0].id)
+        self.assertEqual(
+            feedback_services.get_closed_threads(self.EXP_ID_1, False), 1)
         self._run_computation()
 
         self.assertEqual(feedback_services.get_total_open_threads(
             feedback_services.get_thread_analytics_multi(
-                [self.EXP_ID_1, self.EXP_ID_2])), 2)
+                [self.EXP_ID_1, self.EXP_ID_2])), 1)
 
 
 class EmailsTaskqueueTests(test_utils.GenericTestBase):
