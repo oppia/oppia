@@ -28,10 +28,15 @@ IMPORTANT NOTES:
     where [APP_NAME] is the name of your app as defined in app.yaml. This
     folder should contain a folder called /images, which in turn should
     contain:
-    - one file: favicon.ico
     - four folders: /avatar, /general, /logo and /sidebar, containing
         images used for the avatar, general-purpose usage, logo and sidebar,
         respectively.
+    It should also contain a folder called /common, which should contain:
+    - favicon.ico and robots.txt.
+    - one folder images/general which contains:
+        - background.jpg
+        - icons-bg.png
+        - warning.png
 
 2.  Before running this script, you must install third-party dependencies by
     running
@@ -58,6 +63,7 @@ import subprocess
 # pylint: enable=wrong-import-order
 
 import common
+import utils
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
@@ -84,7 +90,8 @@ LOG_FILE_PATH = os.path.join('..', 'deploy.log')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
 DEPLOY_DATA_PATH = os.path.join(os.getcwd(), '..', 'deploy_data', APP_NAME)
 
-IMAGE_FILES_AT_ROOT = ['favicon.ico']
+FILES_AT_ROOT_IN_COMMON = ['favicon.ico', 'robots.txt']
+COMMON_DIRS = ['general']
 IMAGE_DIRS = ['avatar', 'general', 'sidebar', 'logo']
 
 
@@ -109,9 +116,10 @@ def preprocess_release():
         raise Exception(
             'Could not find deploy_data directory at %s' % DEPLOY_DATA_PATH)
 
-    for filename in IMAGE_FILES_AT_ROOT:
-        src = os.path.join(DEPLOY_DATA_PATH, 'images', filename)
-        dst = os.path.join(os.getcwd(), 'static', 'images', filename)
+    # Copies files in common folder to assets/common.
+    for filename in FILES_AT_ROOT_IN_COMMON:
+        src = os.path.join(DEPLOY_DATA_PATH, 'common', filename)
+        dst = os.path.join(os.getcwd(), 'assets', 'common', filename)
         if not os.path.exists(src):
             raise Exception(
                 'Could not find source path %s. Please check your deploy_data '
@@ -122,9 +130,26 @@ def preprocess_release():
                 'updated in the meantime?' % dst)
         shutil.copyfile(src, dst)
 
+    # Copies files in common/images to assets/common/images
+    for dir_name in COMMON_DIRS:
+        src_dir = os.path.join(DEPLOY_DATA_PATH, 'common', 'images', dir_name)
+        dst_dir = os.path.join(os.getcwd(), 'assets', 'common', 'images', dir_name)
+
+        if not os.path.exists(src_dir):
+            raise Exception(
+                'Could not find source dir %s. Please check your deploy_data '
+                'folder.' % src_dir)
+        common.ensure_directory_exists(dst_dir)
+
+        for filename in os.listdir(src_dir):
+            src = os.path.join(src_dir, filename)
+            dst = os.path.join(dst_dir, filename)
+            shutil.copyfile(src, dst)
+
+    # Copies files in images to /assets/images
     for dir_name in IMAGE_DIRS:
         src_dir = os.path.join(DEPLOY_DATA_PATH, 'images', dir_name)
-        dst_dir = os.path.join(os.getcwd(), 'static', 'images', dir_name)
+        dst_dir = os.path.join(os.getcwd(), 'assets', 'images', dir_name)
 
         if not os.path.exists(src_dir):
             raise Exception(
@@ -206,5 +231,19 @@ def _execute_deployment():
     print 'Done!'
 
 
+def _store_cache_slug():
+    """Changes the cache slug in cache_slug.yaml"""
+    cache_slug = utils.get_unique_id()
+
+    # Change the cache slug in cache_slug.yaml.
+    f = open('cache_slug.yaml', 'r')
+    content = f.read()
+    os.remove('cache_slug.yaml')
+    content = content.replace('default', cache_slug)
+    d = open('cache_slug.yaml', 'w+')
+    d.write(content)
+
+
 if __name__ == '__main__':
+    _store_cache_slug()
     _execute_deployment()

@@ -29,7 +29,7 @@ module.exports = function(config) {
       'extensions/interactions/**/*.html',
       'extensions/interactions/rules.json',
       {
-        pattern: 'i18n/**/*.json',
+        pattern: 'assets/i18n/**/*.json',
         watched: true,
         served: true,
         included: false

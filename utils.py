@@ -465,7 +465,7 @@ def get_cache_slug():
     global cache_slug # pylint: disable=global-statement, invalid-name
     if cache_slug is None:
         # pylint: disable=redefined-outer-name
-        if feconf.DEV_MODE:
+        if feconf.DEV_MODE and not feconf.IS_MINIFIED:
             if feconf.CACHE_SLUG_DEV:
                 cache_slug = '/%s' % feconf.CACHE_SLUG_DEV
             else:
@@ -476,3 +476,8 @@ def get_cache_slug():
             cache_slug = '/build/%s' % yaml_file_content['cache_slug']
 
     return cache_slug
+
+
+def get_unique_id():
+    """Returns a unique id."""
+    return str(random.randint(1000, 9999))
