@@ -72,7 +72,7 @@ describe('Collection linearizer service', function() {
         thirdCollectionNodeBackendObject);
   }));
 
-  var _createLinearCollection = function() {
+  var createLinearCollection = function() {
     var collection = CollectionObjectFactory.createEmptyCollection();
     firstCollectionNode.getAcquiredSkillList().setSkills(['exp title0']);
     secondCollectionNode.getPrerequisiteSkillList().setSkills(['exp title0']);
@@ -88,7 +88,7 @@ describe('Collection linearizer service', function() {
     return collection;
   };
 
-  var _createNonLinearCollection = function() {
+  var createNonLinearCollection = function() {
     var collection = CollectionObjectFactory.createEmptyCollection();
     firstCollectionNode.getAcquiredSkillList().setSkills(['exp title0']);
     secondCollectionNode.getPrerequisiteSkillList().setSkills(['exp title0']);
@@ -117,7 +117,7 @@ describe('Collection linearizer service', function() {
 
     it('should not remove a non-existent node from a multiple nodes collection',
         function() {
-      var collection = _createLinearCollection();
+      var collection = createLinearCollection();
       expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
               collection)).toEqual([
@@ -146,7 +146,7 @@ describe('Collection linearizer service', function() {
     });
 
     it('should correctly remove the first node from a collection', function() {
-      var collection = _createLinearCollection();
+      var collection = createLinearCollection();
       expect(collection.containsCollectionNode('exp_id0')).toBe(true);
       expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
@@ -161,7 +161,7 @@ describe('Collection linearizer service', function() {
     });
 
     it('should correctly remove the last node from a collection', function() {
-      var collection = _createLinearCollection();
+      var collection = createLinearCollection();
       expect(collection.containsCollectionNode('exp_id2')).toBe(true);
       expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
@@ -176,7 +176,7 @@ describe('Collection linearizer service', function() {
     });
 
     it('should correctly remove a middle node from a collection', function() {
-      var collection = _createLinearCollection();
+      var collection = createLinearCollection();
       expect(collection.containsCollectionNode('exp_id1')).toBe(true);
       expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
@@ -215,7 +215,7 @@ describe('Collection linearizer service', function() {
     });
 
     it('should correctly append a node to a non-empty collection', function() {
-      var collection = _createLinearCollection();
+      var collection = createLinearCollection();
       var newCollectionNodeBackendObject = {
         exploration_id: 'exp_id3',
         prerequisite_skills: [],
@@ -271,7 +271,7 @@ describe('Collection linearizer service', function() {
     });
 
     it('should not shift a non-existent node', function() {
-      var collection = _createLinearCollection();
+      var collection = createLinearCollection();
       expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
               collection)).toEqual([firstCollectionNode, secondCollectionNode,
@@ -285,7 +285,7 @@ describe('Collection linearizer service', function() {
     });
 
     it('should handle shifting the first node', function() {
-      var collection = _createLinearCollection();
+      var collection = createLinearCollection();
       expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
               collection)).toEqual([firstCollectionNode, secondCollectionNode,
@@ -299,7 +299,7 @@ describe('Collection linearizer service', function() {
     });
 
     iit('should handle shifting the last node', function() {
-      var collection = _createLinearCollection();
+      var collection = createLinearCollection();
       expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
               collection)).toEqual([firstCollectionNode, secondCollectionNode,
@@ -313,7 +313,7 @@ describe('Collection linearizer service', function() {
     });
 
     it('should handle shifting a middle node', function() {
-      var collection = _createLinearCollection();
+      var collection = createLinearCollection();
       expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
               collection)).toEqual([firstCollectionNode, secondCollectionNode,
@@ -344,7 +344,7 @@ describe('Collection linearizer service', function() {
     });
 
     it('should not shift a non-existent node', function() {
-      var collection = _createLinearCollection();
+      var collection = createLinearCollection();
       expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
               collection)).toEqual([firstCollectionNode, secondCollectionNode,
@@ -358,7 +358,7 @@ describe('Collection linearizer service', function() {
     });
 
     it('should handle shifting the first node', function() {
-      var collection = _createLinearCollection();
+      var collection = createLinearCollection();
       expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
               collection)).toEqual([firstCollectionNode, secondCollectionNode,
@@ -372,7 +372,7 @@ describe('Collection linearizer service', function() {
     });
 
     it('should handle shifting the last node', function() {
-      var collection = _createLinearCollection();
+      var collection = createLinearCollection();
       expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
               collection)).toEqual([firstCollectionNode, secondCollectionNode,
@@ -386,7 +386,7 @@ describe('Collection linearizer service', function() {
     });
 
     it('should correctly handle shifting middle node', function() {
-      var collection = _createLinearCollection();
+      var collection = createLinearCollection();
       expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
               collection)).toEqual([firstCollectionNode, secondCollectionNode,
@@ -404,28 +404,28 @@ describe('Collection linearizer service', function() {
   describe('getNextExplorationIds()', function() {
     it('should return no exploration ids for last node in linear collection',
         function() {
-      var collection = _createLinearCollection();
+      var collection = createLinearCollection();
       expect(CollectionLinearizerService.getNextExplorationIds(collection,
           ['exp_id0', 'exp_id1', 'exp_id2'])).toEqual([]);
     });
 
     it('should correctly return the next exploration id for linear collection',
         function() {
-      var collection = _createLinearCollection();
+      var collection = createLinearCollection();
       expect(CollectionLinearizerService.getNextExplorationIds(collection,
           ['exp_id0', 'exp_id1'])).toEqual(['exp_id2']);
     });
 
     it('should return no ids for the last node in non-linear collection',
         function() {
-      var collection = _createNonLinearCollection();
+      var collection = createNonLinearCollection();
       expect(CollectionLinearizerService.getNextExplorationIds(collection,
           ['exp_id0', 'exp_id1', 'exp_id2'])).toEqual([]);
     });
 
     it('should correctly return next exploration ids for non-linear collection',
         function() {
-      var collection = _createNonLinearCollection();
+      var collection = createNonLinearCollection();
       expect(CollectionLinearizerService.getNextExplorationIds(collection,
           ['exp_id0'])).toEqual(['exp_id1', 'exp_id2']);
     });
@@ -450,7 +450,7 @@ describe('Collection linearizer service', function() {
 
     it('should correctly return a list for a collection with multiple nodes',
         function() {
-      var collection = _createLinearCollection();
+      var collection = createLinearCollection();
       expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
               collection)).toEqual([
@@ -459,7 +459,7 @@ describe('Collection linearizer service', function() {
     });
 
     it('should linearize non-linear collection', function() {
-      var collection = _createNonLinearCollection();
+      var collection = createNonLinearCollection();
       expect(
           CollectionLinearizerService.getCollectionNodesInPlayableOrder(
               collection)).toEqual([firstCollectionNode, secondCollectionNode]);
