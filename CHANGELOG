@@ -2,6 +2,85 @@ This file contains a summary of changes to the Oppia code base. For a full chang
 
     https://github.com/oppia/oppia/commits/master
 
+v2.3.1 (3 Jul 2016)
+-------------------
+Creator dashboard and notifications:
+* Fix #1366: redesign the creator dashboard to highlight stats and display card/list view.
+* Fix #461: implement functionality for sending emails to creators when they receive feedback messages on their explorations.
+* Remove the "neither, thanks" option from the activity creation modal.
+* Implemented a version of stats_services.get_top_state_rule_answers to
+fetch answers for multiple explorations simultaneously.
+
+Library page:
+* Read featured activities from a list, in order to reduce loading time in the library.
+* Change "featured explorations" to "featured activities" in the library.
+* Add scripts to randomize the library banner image.
+* Fix #2013: correctly align the banner image.
+* Fix #2164: expand the width of an exploration summary tile to match the width for the collection summary tile.
+* Fix #1979: fix alignment of the carousel scroll buttons.
+* Fix #2144: position the language dropdown selector correctly in the navbar for screen widths less than 1230px.
+* Fully remove the 'contributors' field from the exploration summary data passed to the frontend.
+
+Learner page:
+* Fix #1795: add social sharing icons to the end of an exploration.
+* Fix #2113: prevent recommended explorations from disappearing behind the tutor card on small screens.
+* Fix missing text next to player feedback checkbox.
+* Remove the standard navbar tabs from the collection player.
+
+Editor page:
+* Use the graph visualization in the history tab to display the changes when an exploration is saved, and remove the corresponding logic from the backend.
+* Fix #1801: modify the “publish exploration” modal to be more visually appealing.
+* Add a button to the exploration preview tab that allows the user to restart from the initial card.
+* Show a list of all current parameter values in preview mode.
+* Hide the exploration graph if there is only one card in the exploration.
+* Fix #2078: prevent unsaved changes from being lost when editing a state name.
+* Change the wording for the "featuring" functionality in the exploration settings tab to indicate that this no longer places the exploration in the “Featured Activities” group in the library.
+
+Profile page:
+* Fix #1867: prevent the tooltips on the summary tiles from flickering.
+* Fix #2075: make the subject interests wrap properly.
+
+Preferences page:
+* Fix #2092: prevent the dropdown placeholders from showing i18n keys instead of the correct placeholders.
+* Fix #2089: update the display of the text field for Preferred Languages on mobile phones.
+
+I18n:
+* Add Indonesian and Portuguese translations.
+* Add a qqq.json file with explanations of translation keys.
+* Add tests to verify keys in i18n json files.
+* Fix #2117: add i18n for title of creator dashboard.
+* Fix #2120: add i18n for the buttons on the Teach page.
+* Fix #2121: remove unused keys from translation JSON files.
+
+Other pages:
+* Fix #2023: display the About page tabs correctly on small-width screens.
+* Add a Donate page.
+* Remove redundant /participate page, add redirect URLs, and add a new URL for the 'Contact us' page.
+
+UI (general):
+* Fix #2108: remove rounded corners from the select2 dropdown.
+* Fix #2035: replace glyphicons with material icons.
+* Fix #2091: adjust footer on smaller screens.
+* Fix #1901: move terms/privacy links to the footer.
+
+Rich-text components:
+* Fix #1931: add caption functionality for images
+
+Interactions:
+* Fix #2074: for ItemSelectionInput, display the rule selections correctly.
+* Fix #1740: for CodeRepl, start at the top of the code when initially displaying the Python coding window.
+* InteractiveMap: fix width of map on narrow viewports.
+
+Infrastructure and tests:
+* Move the rules to a rules.json file that is accessible by both the frontend and backend.
+* Fix #2047: add a performance testing framework.
+* Remove obsolete configuration properties.
+* Add a new task queue for backups.
+* Fix #1857: add a flag allowing developers to enable minification on the dev server.
+* Fix #1974: add pattern checks for ‘==’ and ‘!=’ in JavaScript files.
+* Divide the editor e2e test suite into mainEditor and editorFeatures.
+
+
 v2.3.0 (7 Jun 2016)
 -------------------
 Site-wide features:

@@ -179,7 +179,7 @@
     <li ng-if="isEditableOutsideTutorialMode()">
       <div dropdown class="btn-group" style="margin-right: 10px; margin-top: 8px;"
            title="<[getSaveButtonTooltip()]>">
-        <button id="tutorialSaveButton" class="btn btn-default oppia-save-draft-button protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
+        <button id="tutorialSaveButton" class="btn btn-default oppia-save-draft-button protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable(), 'oppia-save-draft-button-padding': getChangeListLength() && !isPrivate()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
           <span ng-if="!isSaveInProgress">
             <span ng-if="isPrivate()">
               <span ng-if="!saveModalIsOpening">
@@ -201,6 +201,7 @@
                 <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
                    alt="Publish Changes">&#xE2C3;</i>
                 <span class="oppia-save-publish-button-label">Publish Changes</span>
+                <span class="hidden-sm hidden-xs" ng-if="getChangeListLength()" style="opacity: 0.5">(<[getChangeListLength()]>)</span>
               </span>
 
               <span ng-if="saveModalIsOpening">
@@ -225,7 +226,7 @@
                 ng-disabled="!getChangeListLength()" dropdown-toggle>
           <span class="caret"></span>
         </button>
-        <ul class="dropdown-menu" role="menu" style="min-width: 120px; right: inherit; width: 120px;">
+        <ul class="dropdown-menu" role="menu" style="min-width: 120px; right: inherit;" ng-style="{ width: getChangeListLength() && !isPrivate() ? '150px' : '120px' }">
           <li><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="protractor-test-discard-changes" title="Discard all pending changes.">Discard Draft</a></li>
         </ul>
       </div>
@@ -336,69 +337,15 @@
           Please enter a brief description of what you have changed:
           <textarea rows="3" cols="50" ng-model="commitMessage" focus-on="saveChangesModalOpened" class="protractor-test-commit-message-input" autofocus></textarea>
         </p>
+        <button class="btn btn-default" ng-click="onClickToggleDiffButton()">
+          <span ng-if="!showDiff">Show Changes</span>
+          <span ng-if="showDiff">Hide Changes</span>
+        </button>
 
-        <div ng-if="explorationChangesExist">
-          <em>
-            You changed the following properties of the exploration:
-          </em>
-          <ul>
-            <li ng-repeat="(propertyName, changeInfo) in explorationPropertyChanges">
-              <[formatExplorationPropertyChange(propertyName, changeInfo)]>
-            </li>
-          </ul>
-        </div>
-
-        <p ng-if="addedStates.length > 0">
-          <em>You added the following cards</em>: <strong><[formatStateList(addedStates)]></strong>
-        </p>
-
-        <div ng-if="stateChangesExist">
-          <em>
-            You made the following changes to cards:
-          </em>
-          <div ng-repeat="(stateName, stateChanges) in statePropertyChanges">
-            <h5><[stateName]></h5>
-            <ul>
-              <li ng-repeat="(propertyName, changeInfo) in stateChanges">
-                <[formatStatePropertyChange(propertyName, changeInfo)]>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <p ng-if="deletedStates.length > 0">
-          <em>You deleted the following cards:</em> <strong><[formatStateList(deletedStates)]></strong>
-        </p>
-
-        <p ng-if="changedStates.length > 0">
-          <em>You changed the following cards:</em> <strong><[formatStateList(changedStates)]></strong>
-        </p>
-
-        <p ng-if="addedGadgets.length > 0">
-          <em>You added the following gadgets</em>: <strong><[formatGadgetList(addedGadgets)]></strong>
-        </p>
-
-        <div ng-if="gadgetChangesExist">
-          <em>
-            You made the following changes to gadgets:
-          </em>
-          <div ng-repeat="(gadgetName, gadgetChanges) in gadgetPropertyChanges">
-            <h5><[gadgetName]></h5>
-            <ul>
-              <li ng-repeat="(propertyName, changeInfo) in gadgetChanges">
-                <[formatGadgetPropertyChange(propertyName, changeInfo)]>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <p ng-if="deletedGadgets.length > 0">
-          <em>You deleted the following gadgets:</em> <strong><[formatGadgetList(deletedGadgets)]></strong>
-        </p>
-
-        <p ng-if="changedGadgets.length > 0">
-          <em>You changed the following gadgets:</em> <strong><[formatGadgetList(changedGadgets)]></strong>
-        </p>
+        <version-diff-visualization ng-if="showDiff" diff-data="diffData"
+                                    earlier-version-header="earlierVersionHeader"
+                                    later-version-header="laterVersionHeader">
+        </version-diff-visualization>
       </div>
       <div class="modal-footer">
         <button class="btn btn-default" ng-click="cancel()">Cancel</button>

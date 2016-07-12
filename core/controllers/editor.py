@@ -889,41 +889,6 @@ class ImageUploadHandler(EditorHandler):
         self.render_json({'filepath': filepath})
 
 
-class ChangeListSummaryHandler(EditorHandler):
-    """Returns a summary of a changelist applied to a given exploration."""
-
-    @require_editor
-    def post(self, exploration_id):
-        """Handles POST requests."""
-        change_list = self.payload.get('change_list')
-        version = self.payload.get('version')
-        current_exploration = exp_services.get_exploration_by_id(
-            exploration_id)
-
-        if version != current_exploration.version:
-            # TODO(sll): Improve the handling of merge conflicts.
-            self.render_json({
-                'is_version_of_draft_valid': False
-            })
-        else:
-            utils.recursively_remove_key(change_list, '$$hashKey')
-
-            summary = exp_services.get_summary_of_change_list(
-                current_exploration, change_list)
-            updated_exploration = exp_services.apply_change_list(
-                exploration_id, change_list)
-            warning_message = ''
-            try:
-                updated_exploration.validate(strict=True)
-            except utils.ValidationError as e:
-                warning_message = unicode(e)
-
-            self.render_json({
-                'summary': summary,
-                'warning_message': warning_message
-            })
-
-
 class StartedTutorialEventHandler(EditorHandler):
     """Records that this user has started the state editor tutorial."""
 
