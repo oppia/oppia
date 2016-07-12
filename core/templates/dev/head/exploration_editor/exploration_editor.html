@@ -252,7 +252,7 @@
         </p>
         <p ng-if="requireObjectiveToBeSpecified">
           Add a goal: what does the exploration help people to do?
-          <input type="text" class="form-control" ng-minlength="15" ng-model="explorationObjectiveService.displayed"
+          <input type="text" class="form-control" ng-minlength="15" required ng-model="explorationObjectiveService.displayed"
                  placeholder="Learn how to ...">
           <span class="help-block" ng-show="!explorationObjectiveService.displayed" style="font-size: smaller; color: red">Please provide a descriptive goal to help people understand what this exploration is about.</span>
         </p>
