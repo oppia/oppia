@@ -469,6 +469,27 @@ class UnresolvedAnswersTests(test_utils.GenericTestBase):
     """Test the unresolved answers methods."""
 
     DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
+    CLASSIFIER_RULESPEC_STR = exp_domain.CLASSIFIER_RULESPEC_STR
+    STATE_2_NAME = 'State 2'
+
+    def _create_and_update_fake_exploration(self, exp_id):
+        exp = exp_domain.Exploration.create_default_exploration(exp_id)
+        exp_services.save_new_exploration('fake@user.com', exp)
+        exp_services.update_exploration('fake@user.com', exp_id, [{
+            'cmd': 'edit_state_property',
+            'state_name': exp.init_state_name,
+            'property_name': 'widget_id',
+            'new_value': 'TextInput',
+        }, {
+            'cmd': 'add_state',
+            'state_name': self.STATE_2_NAME,
+        }, {
+            'cmd': 'edit_state_property',
+            'state_name': self.STATE_2_NAME,
+            'property_name': 'widget_id',
+            'new_value': 'TextInput',
+        }], 'Add new state')
+        return exp
 
     def test_get_top_unresolved_answers(self):
         self.assertEquals(
@@ -492,6 +513,95 @@ class UnresolvedAnswersTests(test_utils.GenericTestBase):
         self.assertEquals(
             stats_services.get_top_unresolved_answers_for_default_rule(
                 'eid', 'sid'), {})
+
+    def test_unresolved_answers_count_for_single_exploration(self):
+        exp_1 = self._create_and_update_fake_exploration('eid1')
+        self.assertEquals(
+            stats_services.get_exps_unresolved_answers_count_for_default_rule(
+                ['eid1']), {})
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid1', 1, exp_1.init_state_name, self.DEFAULT_RULESPEC_STR, 'a1')
+        self.assertEquals(
+            stats_services.get_exps_unresolved_answers_count_for_default_rule(
+                ['eid1']), {'eid1': 1})
+
+    def test_unresolved_answers_count_for_multiple_explorations(self):
+        exp_1 = self._create_and_update_fake_exploration('eid1')
+        exp_2 = self._create_and_update_fake_exploration('eid2')
+        exp_3 = self._create_and_update_fake_exploration('eid3')
+        self.assertEquals(
+            stats_services.get_exps_unresolved_answers_count_for_default_rule(
+                ['eid1', 'eid2', 'eid3']), {})
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid1', 1, exp_1.init_state_name, self.DEFAULT_RULESPEC_STR, 'a1')
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid2', 1, exp_2.init_state_name, self.DEFAULT_RULESPEC_STR, 'a3')
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid2', 1, exp_2.init_state_name, self.DEFAULT_RULESPEC_STR, 'a2')
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid3', 1, exp_3.init_state_name, self.DEFAULT_RULESPEC_STR, 'a2')
+        self.assertEquals(
+            stats_services.get_exps_unresolved_answers_count_for_default_rule(
+                ['eid1', 'eid2', 'eid3']), {'eid1': 1, 'eid2': 2, 'eid3': 1})
+
+    def test_unresolved_answers_count_when_answers_marked_as_resolved(self):
+        exp_1 = self._create_and_update_fake_exploration('eid1')
+        self.assertEquals(
+            stats_services.get_exps_unresolved_answers_count_for_default_rule(
+                ['eid1']), {})
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid1', 1, exp_1.init_state_name, self.DEFAULT_RULESPEC_STR, 'a1')
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid1', 1, exp_1.init_state_name, self.DEFAULT_RULESPEC_STR, 'a2')
+        self.assertEquals(
+            stats_services.get_exps_unresolved_answers_count_for_default_rule(
+                ['eid1']), {'eid1': 2})
+
+        event_services.DefaultRuleAnswerResolutionEventHandler.record(
+            'eid1', exp_1.init_state_name, ['a1'])
+        self.assertEquals(
+            stats_services.get_exps_unresolved_answers_count_for_default_rule(
+                ['eid1']), {'eid1': 1})
+
+        exp_2 = self._create_and_update_fake_exploration('eid2')
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid2', 1, exp_2.init_state_name, self.DEFAULT_RULESPEC_STR, 'a1')
+        event_services.DefaultRuleAnswerResolutionEventHandler.record(
+            'eid1', exp_1.init_state_name, ['a2'])
+        event_services.DefaultRuleAnswerResolutionEventHandler.record(
+            'eid2', exp_1.init_state_name, ['a1'])
+        self.assertEquals(
+            stats_services.get_exps_unresolved_answers_count_for_default_rule(
+                ['eid1', 'eid2']), {})
+
+    def test_unresolved_answers_count_for_multiple_states(self):
+        exp_1 = self._create_and_update_fake_exploration('eid1')
+        self.assertEquals(
+            stats_services.get_exps_unresolved_answers_count_for_default_rule(
+                ['eid1']), {})
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid1', 1, exp_1.init_state_name, self.DEFAULT_RULESPEC_STR, 'a1')
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid1', 1, self.STATE_2_NAME, self.DEFAULT_RULESPEC_STR, 'a1')
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid1', 1, self.STATE_2_NAME, self.DEFAULT_RULESPEC_STR, 'a2')
+        self.assertEquals(
+            stats_services.get_exps_unresolved_answers_count_for_default_rule(
+                ['eid1']), {'eid1': 3})
+
+    def test_unresolved_answers_count_for_non_default_rules(self):
+        exp_1 = self._create_and_update_fake_exploration('eid1')
+        self.assertEquals(
+            stats_services.get_exps_unresolved_answers_count_for_default_rule(
+                ['eid1']), {})
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid1', 1, exp_1.init_state_name, self.CLASSIFIER_RULESPEC_STR, 'a1'
+        )
+        event_services.AnswerSubmissionEventHandler.record(
+            'eid1', 1, self.STATE_2_NAME, self.CLASSIFIER_RULESPEC_STR, 'a1')
+        self.assertEquals(
+            stats_services.get_exps_unresolved_answers_count_for_default_rule(
+                ['eid1']), {})
 
 
 class EventLogEntryTests(test_utils.GenericTestBase):

@@ -483,7 +483,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
   'explorationObjectiveService', 'explorationTitleService',
   'explorationCategoryService', 'explorationStatesService', 'CATEGORY_LIST',
   'explorationLanguageCodeService', 'explorationTagsService',
-  'autosaveInfoModalsService',
+  'autosaveInfoModalsService', 'ExplorationDiffService',
+  'explorationInitStateNameService',
   function(
       $scope, $http, $rootScope, $window, $timeout, $modal,
       alertsService, changeListService, focusService, routerService,
@@ -492,7 +493,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       explorationObjectiveService, explorationTitleService,
       explorationCategoryService, explorationStatesService, CATEGORY_LIST,
       explorationLanguageCodeService, explorationTagsService,
-      autosaveInfoModalsService) {
+      autosaveInfoModalsService, ExplorationDiffService,
+      explorationInitStateNameService) {
     // Whether or not a save action is currently in progress.
     $scope.isSaveInProgress = false;
     // Whether or not a discard action is currently in progress.
@@ -826,57 +828,43 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
       routerService.savePendingChanges();
 
-      $scope.changeListSummaryUrl = (
-        '/createhandler/change_list_summary/' + explorationData.explorationId);
+      if (!explorationRightsService.isPrivate() &&
+          explorationWarningsService.countWarnings() > 0) {
+        // If the exploration is not private, warnings should be fixed before
+        // it can be saved.
+        alertsService.addWarning(explorationWarningsService.getWarnings()[0]);
+        return;
+      }
 
-      $http.post($scope.changeListSummaryUrl, {
-        change_list: changeListService.getChangeList(),
-        version: explorationData.data.version
-      }).then(function(response) {
-        var data = response.data;
-        if (data.is_version_of_draft_valid === false) {
-          autosaveInfoModalsService.showVersionMismatchModal(
-            changeListService.getChangeList());
-          return;
-        }
+      explorationData.getLastSavedData().then(function(data) {
+        explorationData.getData().then(function(currentData) {
+          if (data.version > currentData.version) {
+            autosaveInfoModalsService.showVersionMismatchModal(
+              changeListService.getChangeList());
+            return;
+          }
+        });
 
-        var explorationPropertyChanges = (
-          data.summary.exploration_property_changes);
-        var statePropertyChanges = data.summary.state_property_changes;
-        var changedStates = data.summary.changed_states;
-        var addedStates = data.summary.added_states;
-        var deletedStates = data.summary.deleted_states;
-        var gadgetPropertyChanges = data.summary.gadget_property_changes;
-        var changedGadgets = data.summary.changed_gadgets;
-        var addedGadgets = data.summary.added_gadgets;
-        var deletedGadgets = data.summary.deleted_gadgets;
-        var warningMessage = data.warning_message;
+        var oldStates = data.states;
+        var newStates = explorationStatesService.getStates();
+        var diffGraphData = ExplorationDiffService.getDiffGraphData(
+          oldStates, newStates, [{
+            changeList: changeListService.getChangeList(),
+            directionForwards: true
+          }]);
+        $scope.diffData = {
+          nodes: diffGraphData.nodes,
+          links: diffGraphData.links,
+          finalStateIds: diffGraphData.finalStateIds,
+          v1InitStateId: diffGraphData.originalStateIds[data.init_state_name],
+          v2InitStateId: diffGraphData.stateIds[
+            explorationInitStateNameService.displayed],
+          v1States: oldStates,
+          v2States: newStates
+        };
 
-        var changesExist = (
-          !$.isEmptyObject(explorationPropertyChanges) ||
-          !$.isEmptyObject(statePropertyChanges) ||
-          !$.isEmptyObject(gadgetPropertyChanges) ||
-          changedStates.length > 0 ||
-          changedGadgets.length > 0 ||
-          addedStates.length > 0 ||
-          addedGadgets.length > 0 ||
-          deletedStates.length > 0 ||
-          deletedGadgets.length > 0);
-
-        if (!changesExist) {
-          alertsService.addWarning('Your changes cancel each other out, ' +
-            'so nothing has been saved.');
-          $scope.saveModalIsOpening = false;
-          changeListService.discardAllChanges();
-          return;
-        }
-
-        if (!explorationRightsService.isPrivate() && warningMessage) {
-          // If the exploration is not private, warnings should be fixed before
-          // it can be saved.
-          alertsService.addWarning(warningMessage);
-          return;
-        }
+        // TODO(wxy): after diff supports exploration metadata, add a check to
+        // exit if changes cancel each other out.
 
         alertsService.clearWarnings();
 
@@ -889,169 +877,34 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
           templateUrl: 'modals/saveExploration',
           backdrop: true,
           resolve: {
-            explorationPropertyChanges: function() {
-              return explorationPropertyChanges;
-            },
-            statePropertyChanges: function() {
-              return statePropertyChanges;
-            },
-            changedStates: function() {
-              return changedStates;
-            },
-            addedStates: function() {
-              return addedStates;
-            },
-            deletedStates: function() {
-              return deletedStates;
-            },
-            gadgetPropertyChanges: function() {
-              return gadgetPropertyChanges;
-            },
-            changedGadgets: function() {
-              return changedGadgets;
-            },
-            addedGadgets: function() {
-              return addedGadgets;
-            },
-            deletedGadgets: function() {
-              return deletedGadgets;
-            },
             isExplorationPrivate: function() {
               return explorationRightsService.isPrivate();
+            },
+            diffData: function() {
+              return $scope.diffData;
             }
           },
+          windowClass: 'oppia-save-exploration-modal',
           controller: [
-            '$scope', '$modalInstance', 'explorationPropertyChanges',
-            'statePropertyChanges', 'changedStates', 'addedStates',
-            'deletedStates', 'gadgetPropertyChanges', 'changedGadgets',
-            'addedGadgets', 'deletedGadgets', 'isExplorationPrivate',
-            function($scope, $modalInstance, explorationPropertyChanges,
-                     statePropertyChanges, changedStates, addedStates,
-                     deletedStates, gadgetPropertyChanges, changedGadgets,
-                     addedGadgets, deletedGadgets, isExplorationPrivate) {
-              $scope.explorationPropertyChanges = explorationPropertyChanges;
-              $scope.statePropertyChanges = statePropertyChanges;
-              $scope.changedStates = changedStates;
-              $scope.addedStates = addedStates;
-              $scope.deletedStates = deletedStates;
-              $scope.gadgetPropertyChanges = gadgetPropertyChanges;
-              $scope.changedGadgets = changedGadgets;
-              $scope.addedGadgets = addedGadgets;
-              $scope.deletedGadgets = deletedGadgets;
+            '$scope', '$modalInstance', 'isExplorationPrivate', 'diffData',
+            function($scope, $modalInstance, isExplorationPrivate, diffData) {
+              $scope.showDiff = false;
+              $scope.onClickToggleDiffButton = function() {
+                $scope.showDiff = !$scope.showDiff;
+                if ($scope.showDiff) {
+                  $('.oppia-save-exploration-modal').addClass(
+                    'oppia-save-exploration-wide-modal');
+                } else {
+                  $('.oppia-save-exploration-modal').removeClass(
+                    'oppia-save-exploration-wide-modal');
+                }
+              };
+
+              $scope.diffData = diffData;
               $scope.isExplorationPrivate = isExplorationPrivate;
 
-              // For reasons of backwards compatibility, the following keys
-              // should not be changed.
-              // TODO(sll): The keys for this dict already appear in
-              // EditorServices.changeListService; consider deduplicating.
-              var EXP_BACKEND_NAMES_TO_HUMAN_NAMES = {
-                category: 'Category',
-                init_state_name: 'First card',
-                language_code: 'Language',
-                objective: 'Objective',
-                param_changes: 'Initial parameter changes',
-                param_specs: 'Parameter specifications',
-                tags: 'Tags',
-                title: 'Title'
-              };
-
-              // For reasons of backwards compatibility, the following keys
-              // should not be changed.
-              var EXP_PROPERTIES_WHICH_ARE_SIMPLE_STRINGS = {
-                category: true,
-                init_state_name: true,
-                objective: true,
-                title: true
-              };
-
-              // For reasons of backwards compatibility, the following keys
-              // should not be changed.
-              var STATE_BACKEND_NAMES_TO_HUMAN_NAMES = {
-                answer_groups: 'Responses',
-                confirmed_unclassified_answers: (
-                  'Confirmed unclassified answers'),
-                content: 'Content',
-                default_outcome: 'Default outcome',
-                fallbacks: 'Fallbacks',
-                name: 'Card name',
-                param_changes: 'Parameter changes',
-                widget_customization_args: 'Interaction customizations',
-                widget_id: 'Interaction type'
-              };
-
-              // For reasons of backwards compatibility, the following keys
-              // should not be changed.
-              var GADGET_BACKEND_NAMES_TO_HUMAN_NAMES = {
-                gadget_customization_args: 'Gadget customizations',
-                gadget_visibility: 'Gadget visibility between states',
-                name: 'Gadget name'
-              };
-
-              // An ordered list of state properties that determines the order
-              // in which to show them in the save confirmation modal.
-              // For reasons of backwards compatibility, the following keys
-              // should not be changed.
-              // TODO(sll): Implement this fully. Currently there is no sorting.
-              $scope.ORDERED_STATE_PROPERTIES = [
-                'name', 'param_changes', 'content', 'widget_id',
-                'widget_customization_args', 'answer_groups',
-                'default_outcome', 'fallbacks'
-              ];
-
-              $scope.explorationChangesExist = !$.isEmptyObject(
-                $scope.explorationPropertyChanges);
-              $scope.stateChangesExist = !$.isEmptyObject(
-                $scope.statePropertyChanges);
-              $scope.gadgetChangesExist = !$.isEmptyObject(
-                $scope.gadgetPropertyChanges);
-
-              var getLongFormPropertyChange = function(
-                  humanReadableName, changeInfo) {
-                return (
-                  humanReadableName + ' (from \'' + changeInfo.old_value +
-                  '\' to \'' + changeInfo.new_value + '\')');
-              };
-
-              $scope.formatExplorationPropertyChange = function(
-                  propertyName, changeInfo) {
-                if (EXP_PROPERTIES_WHICH_ARE_SIMPLE_STRINGS[propertyName]) {
-                  return getLongFormPropertyChange(
-                    EXP_BACKEND_NAMES_TO_HUMAN_NAMES[propertyName],
-                    changeInfo);
-                } else {
-                  return EXP_BACKEND_NAMES_TO_HUMAN_NAMES[propertyName];
-                }
-              };
-
-              $scope.formatStatePropertyChange = function(
-                  propertyName, changeInfo) {
-                if (propertyName === 'name') {
-                  return getLongFormPropertyChange(
-                    STATE_BACKEND_NAMES_TO_HUMAN_NAMES[propertyName],
-                    changeInfo);
-                } else {
-                  return STATE_BACKEND_NAMES_TO_HUMAN_NAMES[propertyName];
-                }
-              };
-
-              $scope.formatGadgetPropertyChange = function(
-                  propertyName, changeInfo) {
-                if (propertyName === 'name') {
-                  return getLongFormPropertyChange(
-                    GADGET_BACKEND_NAMES_TO_HUMAN_NAMES[propertyName],
-                    changeInfo);
-                } else {
-                  return GADGET_BACKEND_NAMES_TO_HUMAN_NAMES[propertyName];
-                }
-              };
-
-              $scope.formatStateList = function(stateList) {
-                return stateList.join('; ');
-              };
-
-              $scope.formatGadgetList = function(gadgetList) {
-                return gadgetList.join('; ');
-              };
+              $scope.earlierVersionHeader = 'Last saved';
+              $scope.laterVersionHeader = 'New changes';
 
               $scope.save = function(commitMessage) {
                 $modalInstance.close(commitMessage);

@@ -147,7 +147,9 @@ class PreferencesHandler(base.BaseHandler):
             'can_receive_email_updates': (
                 user_email_preferences['can_receive_email_updates']),
             'can_receive_editor_role_email': (
-                user_email_preferences['can_receive_editor_role_email'])
+                user_email_preferences['can_receive_editor_role_email']),
+            'can_receive_feedback_message_email': (
+                user_email_preferences['can_receive_feedback_message_email'])
         })
         self.render_json(self.values)
 
@@ -171,7 +173,8 @@ class PreferencesHandler(base.BaseHandler):
         elif update_type == 'email_preferences':
             user_services.update_email_preferences(
                 self.user_id, data['can_receive_email_updates'],
-                data['can_receive_editor_role_email'])
+                data['can_receive_editor_role_email'],
+                data['can_receive_feedback_message_email'])
         else:
             raise self.InvalidInputException(
                 'Invalid update type: %s' % update_type)
@@ -283,7 +286,8 @@ class SignupHandler(base.BaseHandler):
         if can_receive_email_updates is not None:
             user_services.update_email_preferences(
                 self.user_id, can_receive_email_updates,
-                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
 
         # Note that an email is only sent when the user registers for the first
         # time.

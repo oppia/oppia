@@ -19,7 +19,7 @@
 describe('Rule spec services', function() {
   var ruleSpecsServices = {};
   var rulesJson;
-  var CLASSIFIER_RULESPEC_STR = 'ClassifyMatches';
+  var CLASSIFIER_RULESPEC_STR = 'FuzzyMatches';
 
   beforeEach(function() {
     module('oppia');
