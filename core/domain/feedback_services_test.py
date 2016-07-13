@@ -301,10 +301,10 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             self.EXP_ID_2, self.EXPECTED_THREAD_DICT['state_name'], None,
             self.EXPECTED_THREAD_DICT['subject'], 'not used here')
 
-        threads_1 = feedback_services.get_all_threads(self.EXP_ID_1, False)
-        self.assertEqual(1, len(threads_1))
-        threads_2 = feedback_services.get_all_threads(self.EXP_ID_2, False)
-        self.assertEqual(1, len(threads_2))
+        threads_exp_1 = feedback_services.get_all_threads(self.EXP_ID_1, False)
+        self.assertEqual(1, len(threads_exp_1))
+        threads_exp_2 = feedback_services.get_all_threads(self.EXP_ID_2, False)
+        self.assertEqual(1, len(threads_exp_2))
 
         def _close_thread(exp_id, thread_id):
             thread = (feedback_models.FeedbackThreadModel.
@@ -312,9 +312,9 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             thread.status = feedback_models.STATUS_CHOICES_FIXED
             thread.put()
 
-        _close_thread(self.EXP_ID_1, threads_1[0].id)
+        _close_thread(self.EXP_ID_1, threads_exp_1[0].get_thread_id())
         self.assertEqual(
-            feedback_services.get_closed_threads(self.EXP_ID_1, False), 1)
+            len(feedback_services.get_closed_threads(self.EXP_ID_1, False)), 1)
         self._run_computation()
 
         self.assertEqual(feedback_services.get_total_open_threads(
