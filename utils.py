@@ -456,26 +456,26 @@ def unescape_encoded_uri_component(escaped_string):
     return urllib.unquote(escaped_string).decode('utf-8')
 
 
-cache_slug = None  # pylint: disable=invalid-name
+CACHE_SLUG = None
 def get_cache_slug():
     """Returns appropriate cache slug depending whether dev or prod. This cache
     slug should only be used for urls in html, css and js files since it
     contains a forward slash.
     """
-    global cache_slug # pylint: disable=global-statement, invalid-name
-    if cache_slug is None:
+    global CACHE_SLUG # pylint: disable=global-statement
+    if CACHE_SLUG is None:
         # pylint: disable=redefined-outer-name
         if feconf.DEV_MODE and not feconf.IS_MINIFIED:
             if feconf.CACHE_SLUG_DEV:
-                cache_slug = '/%s' % feconf.CACHE_SLUG_DEV
+                CACHE_SLUG = '/%s' % feconf.CACHE_SLUG_DEV
             else:
-                cache_slug = ''
+                CACHE_SLUG = ''
         else:
             yaml_file_content = dict_from_yaml(
                 get_file_contents('cache_slug.yaml'))
-            cache_slug = '/build/%s' % yaml_file_content['cache_slug']
+            CACHE_SLUG = '/build/%s' % yaml_file_content['cache_slug']
 
-    return cache_slug
+    return CACHE_SLUG
 
 
 def get_unique_id():

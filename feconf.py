@@ -44,7 +44,8 @@ else:
 # in utils.get_cache_slug() if Oppia is in dev mode. It is used as a prefix
 # in urls for images, css and script files. It is also used in backend_tests
 # to verify the presence of static resources.
-# Changing it requires changing
+# It should be an empty string. Changing it requires changing resource paths
+# in app.yaml:
 # - url: /assets to - url: /{CACHE_SLUG_DEV}/assets
 # gulpfile.js #110 cacheSlugDev variable
 CACHE_SLUG_DEV = ''

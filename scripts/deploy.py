@@ -23,7 +23,6 @@ of the uploaded files to a deployment folder in the parent directory of the
 oppia/ folder. It then pushes this build to the production server.
 
 IMPORTANT NOTES:
-@TODO(gvishal): update cache slugs here.
 1.  You will need to first create a folder called ../deploy_data/[APP_NAME],
     where [APP_NAME] is the name of your app as defined in app.yaml. This
     folder should contain a folder called /images, which in turn should
@@ -167,6 +166,8 @@ def _execute_deployment():
     # Check that the current directory is correct.
     common.require_cwd_to_be_oppia()
 
+    update_cache_slug()
+
     current_git_revision = subprocess.check_output(
         ['git', 'rev-parse', 'HEAD']).strip()
 
@@ -231,8 +232,8 @@ def _execute_deployment():
     print 'Done!'
 
 
-def _store_cache_slug():
-    """Changes the cache slug in cache_slug.yaml"""
+def update_cache_slug():
+    """Updates the cache slug in cache_slug.yaml"""
     cache_slug = utils.get_unique_id()
 
     # Change the cache slug in cache_slug.yaml.
@@ -245,5 +246,4 @@ def _store_cache_slug():
 
 
 if __name__ == '__main__':
-    _store_cache_slug()
     _execute_deployment()
