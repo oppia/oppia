@@ -585,19 +585,26 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             feconf.PLAY_TYPE_NORMAL)
         self.assertEquals(
             user_services.get_weekly_dashboard_stats(self.owner_id), None)
+        self.assertEquals(
+            user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
         with self.swap(user_services,
                        'get_current_date_as_string',
                        self._mock_get_current_date_as_string):
             user_services.update_dashboard_stats_log(self.owner_id)
 
+        expected_results_list = [{
+            self.CURRENT_DATE_AS_STRING: {
+                'total_plays': 0,
+                'average_ratings': None
+            }
+        }]
         self.assertEquals(
-            user_services.get_weekly_dashboard_stats(self.owner_id), [{
-                self.CURRENT_DATE_AS_STRING: {
-                    'total_plays': 0,
-                    'average_ratings': None
-                }
-            }])
+            user_services.get_weekly_dashboard_stats(self.owner_id),
+            expected_results_list)
+        self.assertEquals(
+            user_services.get_last_week_dashboard_stats(self.owner_id),
+            expected_results_list[0])
 
     def test_get_weekly_dashboard_stats(self):
         exploration = self.save_new_valid_exploration(
@@ -608,6 +615,8 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             feconf.PLAY_TYPE_NORMAL)
         self.assertEquals(
             user_services.get_weekly_dashboard_stats(self.owner_id), None)
+        self.assertEquals(
+            user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
         (user_jobs_continuous_test.ModifiedUserStatsAggregator
          .start_computation())
@@ -615,19 +624,26 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
 
         self.assertEquals(
             user_services.get_weekly_dashboard_stats(self.owner_id), None)
+        self.assertEquals(
+            user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
         with self.swap(user_services,
                        'get_current_date_as_string',
                        self._mock_get_current_date_as_string):
             user_services.update_dashboard_stats_log(self.owner_id)
 
+        expected_results_list = [{
+            self.CURRENT_DATE_AS_STRING: {
+                'total_plays': 1,
+                'average_ratings': None
+            }
+        }]
         self.assertEquals(
-            user_services.get_weekly_dashboard_stats(self.owner_id), [{
-                self.CURRENT_DATE_AS_STRING: {
-                    'total_plays': 1,
-                    'average_ratings': None
-                }
-            }])
+            user_services.get_weekly_dashboard_stats(self.owner_id),
+            expected_results_list)
+        self.assertEquals(
+            user_services.get_last_week_dashboard_stats(self.owner_id),
+            expected_results_list[0])
 
 
 class SubjectInterestsUnitTests(test_utils.GenericTestBase):

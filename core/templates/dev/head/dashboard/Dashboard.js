@@ -59,6 +59,7 @@ oppia.controller('Dashboard', [
         );
         $scope.collectionsList = response.collections_list;
         $scope.dashboardStats = response.dashboard_stats;
+        $scope.lastWeekStats = response.last_week_stats;
         $rootScope.loadingMessage = '';
       },
       function(errorStatus) {

@@ -63,4 +63,15 @@ describe('Rating computation service', function() {
       5: 11
     })).toBe(3.475);
   });
+
+  it('should get the relative change in average rating correctly', function() {
+    expect(RatingComputationService.getRelativeChangeInAverageRating(
+      2, null)).toBe('+2.00');
+    expect(RatingComputationService.getRelativeChangeInAverageRating(
+      4, 3.8)).toBe('+0.20');
+    expect(RatingComputationService.getRelativeChangeInAverageRating(
+      3.6, 4.9)).toBe('-1.30');
+    expect(RatingComputationService.getRelativeChangeInAverageRating(
+      2.8, 2.8)).toBe('+0.00');
+  });
 });

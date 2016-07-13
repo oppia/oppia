@@ -228,7 +228,9 @@ class DashboardHandler(base.BaseHandler):
         self.values.update({
             'explorations_list': exp_summary_list,
             'collections_list': collection_summary_list,
-            'dashboard_stats': dashboard_stats
+            'dashboard_stats': dashboard_stats,
+            'last_week_stats': (
+                user_services.get_last_week_dashboard_stats(self.user_id))
         })
         self.render_json(self.values)
 
