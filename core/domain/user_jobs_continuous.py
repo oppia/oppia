@@ -373,7 +373,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
 
         return {
             'total_plays': total_plays,
-            'num_ratings': num_ratings
+            'num_ratings': num_ratings,
             'average_ratings': average_ratings
         }
 
