@@ -442,8 +442,6 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
     event_type = ndb.StringProperty(indexed=True)
     # Id of exploration currently being played.
     exploration_id = ndb.StringProperty(indexed=True)
-    # ID of current learner's session
-    session_id = ndb.StringProperty(indexed=True)
     # Value of rating assigned
     rating = ndb.FloatProperty(indexed=True)
     # Number of times exploration has already been rated.
@@ -454,22 +452,20 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
         indexed=True, default=CURRENT_EVENT_SCHEMA_VERSION)
 
     @classmethod
-    def get_new_event_entity_id(cls, exp_id, session_id):
+    def get_new_event_entity_id(cls, exp_id):
         timestamp = datetime.datetime.utcnow()
-        return cls.get_new_id('%s:%s:%s' % (
+        return cls.get_new_id('%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
-            exp_id,
-            session_id))
+            exp_id))
 
     @classmethod
-    def create(cls, exp_id, session_id, rating, num_ratings):
+    def create(cls, exp_id, rating, num_ratings):
         """Creates a new rate exploration event."""
         entity_id = cls.get_new_event_entity_id(
-            exp_id, session_id)
+            exp_id)
         cls(id=entity_id,
             event_type=feconf.EVENT_TYPE_RATE_EXPLORATION,
             exploration_id=exp_id,
-            session_id=session_id,
             rating=rating,
             num_ratings=num_ratings).put()
 
