@@ -333,15 +333,16 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                 model.put()
 
         exp_summary = exp_services.get_exploration_summary_by_id(exp_id)
-        for user_id in exp_summary.owner_ids:
-            if event_type == feconf.EVENT_TYPE_START_EXPLORATION:
-                transaction_services.run_in_transaction(
-                    _increment_total_plays_count, user_id)
+        if exp_summary:
+            for user_id in exp_summary.owner_ids:
+                if event_type == feconf.EVENT_TYPE_START_EXPLORATION:
+                    transaction_services.run_in_transaction(
+                        _increment_total_plays_count, user_id)
 
-            if event_type == feconf.EVENT_TYPE_RATE_EXPLORATION:
-                rating = args[1]
-                transaction_services.run_in_transaction(
-                    _refresh_average_ratings, user_id, rating)
+                if event_type == feconf.EVENT_TYPE_RATE_EXPLORATION:
+                    rating = args[1]
+                    transaction_services.run_in_transaction(
+                        _refresh_average_ratings, user_id, rating)
 
     # Public query method.
     @classmethod

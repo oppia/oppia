@@ -1987,7 +1987,9 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
             exp_services.get_number_of_ratings(exp.ratings), 1)
 
         rating_services.assign_rating_to_exploration(
-            self.owner_id, self.EXP_ID, 3)
+            self.USER_ID_1, self.EXP_ID, 3)
+        self.process_and_flush_pending_tasks()
+        exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
         self.assertEqual(
             exp_services.get_number_of_ratings(exp.ratings), 2)
 
