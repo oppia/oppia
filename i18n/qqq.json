@@ -12,6 +12,7 @@
   "I18N_CREATE_EXPLORATION_UPLOAD": "Text displayed in a button in the navigation bar",
   "I18N_CREATE_NO_THANKS": "Text of the cancel button of a dialog. - see I18N_CREATE_EXPLORATION_CREATE.",
   "I18N_CREATE_YES_PLEASE": "Text of the confirmation button of a dialog. - see I18N_CREATE_EXPLORATION_CREATE.",
+  "I18N_DASHBOARD_OPEN_FEEDBACK": "Text of feedback icon shown in summary tile of an exploration in card view in the user's dashboard page.",
   "I18N_DASHBOARD_MY_COLLECTIONS": "Title shown in a tab header in the user's dashboard page. - Clicking on this tab header shows a list of the collections the user has created.",
   "I18N_DASHBOARD_MY_EXPLORATIONS": "Title shown in a tab header in the user's dashboard page. - Clicking on this tab header shows a list of the explorations the user has created.",
   "I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Text displayed in the preferences page. - Text shown in the dialog shown to upload a profile picture. The user can upload the picture by dragging a file to the area with this text.",

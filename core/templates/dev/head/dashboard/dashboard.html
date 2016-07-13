@@ -38,6 +38,10 @@
           <p class="stat-description">Total Plays</p>
           <h1 class="stat-value"><[dashboardStats.total_plays]></h1>
         </div>
+        <div class="total-open-feedback stats-card">
+          <p class="stat-description">Open feedback</p>
+          <h1 class="stat-value"><[dashboardStats.total_open_feedback]></h1>
+        </div>
       </md-card>
     </div>
 
@@ -57,15 +61,15 @@
           </li>
         {% endif %}
         <li class="list-card-view-toggle" ng-if="activeTab === 'myExplorations'">
-          <button class="list-view-btn"
-                  ng-class="{'dashboard-active-view': myExplorationsView === 'list'}"
-                  ng-click="setMyExplorationsView('list')">
-            <span class="fa fa-list fa-lg"></span>
-          </button>
           <button class="card-view-btn"
                   ng-class="{'dashboard-active-view': myExplorationsView === 'card'}"
                   ng-click="setMyExplorationsView('card')">
             <span class="fa fa-th-large fa-lg"></span>
+          </button>
+          <button class="list-view-btn"
+                  ng-class="{'dashboard-active-view': myExplorationsView === 'list'}"
+                  ng-click="setMyExplorationsView('list')">
+            <span class="fa fa-list fa-lg"></span>
           </button>
         </li>
       </ul>
@@ -117,7 +121,7 @@
               <th>Exploration</th>
               <th>Rating</th>
               <th>Plays</th>
-              <th>Feedback</th>
+              <th>Feedback (Open/Total)</th>
               <th>Unresolved Answers</th>
               <th>Last Updated</th>
             </tr>
@@ -143,7 +147,7 @@
                 <[exploration.num_views]>
               </td>
               <td ng-if="exploration.status !== 'private'">
-                <[exploration.num_total_threads]>
+                <[exploration.num_open_threads]>/<[exploration.num_total_threads]>
               </td>
               <td ng-if="exploration.status !== 'private'">
                 <[exploration.num_unresolved_answers]>
@@ -210,10 +214,10 @@
 
                 <li flex="50">
                   <span class="fa fa-comments fa-lg"
-                        tooltip="<['I18N_PLAYER_FEEDBACK_TOOLTIP' | translate]>"
+                        tooltip="<['I18N_DASHBOARD_OPEN_FEEDBACK' | translate]>"
                         tooltip-placement="top">
                   </span>
-                  <[exploration.num_total_threads]>
+                  <[exploration.num_open_threads]>
                 </li>
                 <sharing-links ng-if="exploration.status !== 'private'"
                                ng-click="$event.stopPropagation()"
