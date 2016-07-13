@@ -14,9 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from oppia.core.tests import test_utils
-import oppia.feconf as feconf
-import oppia.utils as utils
+# pylint: disable=relative-import
+from core.tests import test_utils
+import feconf
+import utils
+# pylint: enable=relative-import
 
 
 class UtilsTests(test_utils.GenericTestBase):
