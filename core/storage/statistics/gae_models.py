@@ -431,9 +431,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
     V1:
         event_type: 'rate_exploration'
         exploration_id: id of exploration which is being rated
-        session_id: ID of current learner's session
         rating: value of rating assigned to exploration
-        num_ratings: number of times the exploration has already been rated
     """
     # This value should be updated in the event of any event schema change.
     CURRENT_EVENT_SCHEMA_VERSION = 1
@@ -444,8 +442,6 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
     exploration_id = ndb.StringProperty(indexed=True)
     # Value of rating assigned
     rating = ndb.FloatProperty(indexed=True)
-    # Number of times exploration has already been rated.
-    num_ratings = ndb.IntegerProperty(indexed=True)
     # The version of the event schema used to describe an event of this type.
     # Details on the schema are given in the docstring for this class.
     event_schema_version = ndb.IntegerProperty(
@@ -466,8 +462,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
         cls(id=entity_id,
             event_type=feconf.EVENT_TYPE_RATE_EXPLORATION,
             exploration_id=exp_id,
-            rating=rating,
-            num_ratings=num_ratings).put()
+            rating=rating).put()
 
 
 class StateHitEventLogEntryModel(base_models.BaseModel):

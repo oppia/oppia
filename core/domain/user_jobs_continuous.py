@@ -301,7 +301,6 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                 active_realtime_layer, user_id)
 
             model = realtime_class.get(realtime_model_id, strict=False)
-            # print model
             if model is None:
                 realtime_class(
                     id=realtime_model_id, average_ratings=rating,
@@ -404,6 +403,7 @@ class UserStatsMRJobManager(
     def map(item):
         if item.deleted:
             return
+
         exponent = 2.0/3
 
         # This is set to False only when the exploration impact score is not
@@ -506,6 +506,7 @@ class UserStatsMRJobManager(
         values = [ast.literal_eval(v) for v in stringified_values]
         exponent = 2.0/3
 
+        # Find the final score and round to a whole number
         user_impact_score = int(round(sum(
             value['exploration_impact_score'] for value in values
             if value.get('exploration_impact_score')) ** exponent))
