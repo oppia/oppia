@@ -383,161 +383,127 @@ class UserStatsMRJobManager(
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [exp_models.ExpSummaryModel,
-                stats_models.RateExplorationEventLogEntryModel,
-                stats_models.StartExplorationEventLogEntryModel]
+        return [exp_models.ExpSummaryModel]
 
     @staticmethod
     def map(item):
+        if item.deleted:
+            return
+        exponent = 2.0/3
+
+        # This is set to False only when the exploration impact score is not
+        # valid to be calculated.
+        calculate_exploration_impact_score = True
+
+        # Get average rating and value per user
+        total_rating = 0
+        for ratings_value in item.ratings:
+            total_rating += item.ratings[ratings_value] * int(ratings_value)
+        sum_of_ratings = sum(item.ratings.itervalues())
+
+        average_rating = ((total_rating / sum_of_ratings) if sum_of_ratings
+                          else None)
+
+        if average_rating is not None:
+            value_per_user = average_rating - 2
+            if value_per_user <= 0:
+                calculate_exploration_impact_score = False
+        else:
+            calculate_exploration_impact_score = False
+
+        statistics = (
+            stats_jobs_continuous.StatisticsAggregator.get_statistics(
+                item.id, stats_jobs_continuous.VERSION_ALL))
+        answer_count = 0
+        # Find number of users per state (card), and subtract no answer
+        # This will not count people who have been back to a state twice
+        # but did not give an answer the second time, but is probably the
+        # closest we can get with current statistics to "number of users
+        # who gave an answer" since it is "number of users who always gave
+        # an answer".
+        for state_name in statistics['state_hit_counts']:
+            state_stats = statistics['state_hit_counts'][state_name]
+            first_entry_count = state_stats.get('first_entry_count', 0)
+            no_answer_count = state_stats.get('no_answer_count', 0)
+            answer_count += first_entry_count - no_answer_count
+        # Turn answer count into reach
+        reach = answer_count**exponent
+
         exploration_summary = exp_services.get_exploration_summary_by_id(
             item.id)
-        if isinstance(item, exp_models.ExpSummaryModel):
-            if item.deleted:
-                return
-            exponent = 2.0/3
+        contributors = exploration_summary.contributors_summary
+        total_commits = sum(contributors.itervalues())
+        if total_commits == 0:
+            calculate_exploration_impact_score = False
 
-            # This is set to False only when the exploration impact score is not
-            # valid to be calculated.
-            calculate_exploration_impact_score = True
+        mapped_owner_ids = []
+        for contrib_id in contributors:
+            exploration_data = {}
 
-            # Get average rating and value per user
-            total_rating = 0
-            for ratings_value in item.ratings:
-                total_rating += item.ratings[ratings_value] * int(ratings_value)
-            sum_of_ratings = sum(item.ratings.itervalues())
+            # Set the value of exploration impact score only if it needs to be
+            # calculated.
+            if calculate_exploration_impact_score:
+                # Find fractional contribution for each contributor
+                contribution = (
+                    contributors[contrib_id] / float(total_commits))
 
-            average_rating = ((total_rating / sum_of_ratings) if sum_of_ratings
-                              else None)
-
-            if average_rating is not None:
-                value_per_user = average_rating - 2
-                if value_per_user <= 0:
-                    calculate_exploration_impact_score = False
-            else:
-                calculate_exploration_impact_score = False
-
-            statistics = (
-                stats_jobs_continuous.StatisticsAggregator.get_statistics(
-                    item.id, stats_jobs_continuous.VERSION_ALL))
-            answer_count = 0
-            # Find number of users per state (card), and subtract no answer
-            # This will not count people who have been back to a state twice
-            # but did not give an answer the second time, but is probably the
-            # closest we can get with current statistics to "number of users
-            # who gave an answer" since it is "number of users who always gave
-            # an answer".
-            for state_name in statistics['state_hit_counts']:
-                state_stats = statistics['state_hit_counts'][state_name]
-                first_entry_count = state_stats.get('first_entry_count', 0)
-                no_answer_count = state_stats.get('no_answer_count', 0)
-                answer_count += first_entry_count - no_answer_count
-            # Turn answer count into reach
-            reach = answer_count**exponent
-
-            contributors = exploration_summary.contributors_summary
-            total_commits = sum(contributors.itervalues())
-            if total_commits == 0:
-                calculate_exploration_impact_score = False
-
-            mapped_owner_ids = []
-            for contrib_id in contributors:
-                exploration_data = {}
-
-                # Set the value of exploration impact score only if it needs to be
-                # calculated.
-                if calculate_exploration_impact_score:
-                    # Find fractional contribution for each contributor
-                    contribution = (
-                        contributors[contrib_id] / float(total_commits))
-
-                    # Find score for this specific exploration
-                    exploration_data.update({
-                        'exploration_impact_score': (
-                            value_per_user * reach * contribution)
-                    })
-
-                # if the user is an owner for the exploration, then update dict with
-                # 'average ratings' and 'total plays' as well.
-                if contrib_id in exploration_summary.owner_ids:
-                    mapped_owner_ids.append(contrib_id)
-                    # Get num starts (total plays) for the exploration
-                    exploration_data.update({
-                        'total_plays_for_owned_exp': (
-                            statistics['start_exploration_count']),
-                    })
-                    # Update data with average rating only if it is not None.
-                    if average_rating is not None:
-                        exploration_data.update({
-                            'average_rating_for_owned_exp': average_rating
-                        })
-                yield (contrib_id, exploration_data)
-
-            for owner_id in exploration_summary.owner_ids:
-                if owner_id not in mapped_owner_ids:
-                    mapped_owner_ids.append(owner_id)
-                    # Get num starts (total plays) for the exploration
-                    exploration_data = {
-                        'total_plays_for_owned_exp': (
-                            statistics['start_exploration_count']),
-                    }
-                    # Update data with average rating only if it is not None.
-                    if average_rating is not None:
-                        exploration_data.update({
-                            'average_rating_for_owned_exp': average_rating,
-                            'num_ratings_for_owned_exp': sum_of_ratings
-                        })
-                    yield (owner_id, exploration_data)
-
-        elif isinstance(item, stats_models.RateExplorationEventLogEntryModel):
-            if item.num_ratings > 0:
-                ratings_data = {}
-                ratings_data.update({
-                    'event_type': feconf.EVENT_TYPE_RATE_EXPLORATION,
-                    'average_rating_realtime': item.rating,
-                    'num_ratings_realtime': item.num_ratings,
+                # Find score for this specific exploration
+                exploration_data.update({
+                    'exploration_impact_score': (
+                        value_per_user * reach * contribution)
                 })
-            for owner_id in exploration_summary.owner_ids:
-                yield(owner_id, ratings_data)
 
-        elif isinstance(item, stats_models.StartExplorationEventLogEntryModel):
-            for owner_id in exploration_summary.owner_ids:
-                yield(owner_id, {
-                    'event_type': feconf.EVENT_TYPE_START_EXPLORATION,
+            # if the user is an owner for the exploration, then update dict with
+            # 'average ratings' and 'total plays' as well.
+            if contrib_id in exploration_summary.owner_ids:
+                mapped_owner_ids.append(contrib_id)
+                # Get num starts (total plays) for the exploration
+                exploration_data.update({
+                    'total_plays_for_owned_exp': (
+                        statistics['start_exploration_count']),
                 })
+                # Update data with average rating only if it is not None.
+                if average_rating is not None:
+                    exploration_data.update({
+                        'average_rating_for_owned_exp': average_rating,
+                        'num_ratings_for_owned_exp': sum_of_ratings
+                    })
+            yield (contrib_id, exploration_data)
+
+        for owner_id in exploration_summary.owner_ids:
+            if owner_id not in mapped_owner_ids:
+                mapped_owner_ids.append(owner_id)
+                # Get num starts (total plays) for the exploration
+                exploration_data = {
+                    'total_plays_for_owned_exp': (
+                        statistics['start_exploration_count']),
+                }
+                # Update data with average rating only if it is not None.
+                if average_rating is not None:
+                    exploration_data.update({
+                        'average_rating_for_owned_exp': average_rating,
+                        'num_ratings_for_owned_exp': sum_of_ratings
+                    })
+                yield (owner_id, exploration_data)
 
     @staticmethod
     def reduce(key, stringified_values):
         values = [ast.literal_eval(v) for v in stringified_values]
         exponent = 2.0/3
 
-        new_models_total_plays = 0
-        new_models_average_ratings = None
-        new_models_num_ratings = 0
-
-        event_type = value['event_type']
-
-        if event.type == feconf.EVENT_TYPE_RATE_EXPLORATION:
-            new_models_average_ratings = (
-                (new_models_average_ratings * new_models_num_ratings + 1)/
-                 new_models_num_ratings + 1
-            )
-            new_models_num_ratings += 1
-
-        elif event.type == feconf.EVENT_TYPE_START_EXPLORATION:
-            new_models_total_plays += 1
-
         user_impact_score = int(round(sum(
             value['exploration_impact_score'] for value in values
             if value.get('exploration_impact_score')) ** exponent))
 
         # Sum up the total plays for all explorations
-        old_models_total_plays = sum(
+        total_plays = sum(
             value['total_plays_for_owned_exp'] for value in values
             if value.get('total_plays_for_owned_exp'))
 
-        old_models_num_ratings = sum(
+        # Number of ratings for all explorations
+        num_ratings = sum(
             value['num_ratings_for_owned_exp'] for value in values
-            if value.get('total_plays_for_owned_exp'))
+            if value.get('num_ratings_for_owned_exp'))
 
         # Find the average of all average ratings
         ratings = [value['average_rating_for_owned_exp'] for value in values
@@ -545,19 +511,9 @@ class UserStatsMRJobManager(
 
         mr_model = user_models.UserStatsModel.get_or_create(key)
         mr_model.impact_score = user_impact_score
-        mr_model.total_plays = old_models_total_plays + new_models_total_plays
-
-        total_ratings_value = 0
-        total_ratings_count = 0
-        if new_models_average_ratings:
-            total_ratings_value += (
-                float(new_models_num_ratings * new_models_average_ratings))
-            total_ratings_count += new_models_num_ratings
-        elif len(ratings) != 0:
-            total_ratings_value += float(sum(ratings) * len(ratings))
-            total_ratings_count += len(ratings)
-
-        if total_ratings_count > 0:
-            mr_model.average_ratings = (
-                total_ratings_value / float(total_ratings_count))
+        mr_model.total_plays = total_plays
+        mr_model.num_ratings = num_ratings
+        if len(ratings) != 0:
+            average_ratings = (sum(ratings) / float(len(ratings)))
+            mr_model.average_ratings = average_ratings
         mr_model.put()

@@ -177,6 +177,7 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         self.assertEquals(user_model.total_plays, 1)
         self.assertEquals(
             user_model.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
+        self.assertEquals(user_model.num_ratings, 0)
         self.assertIsNone(user_model.average_ratings)
         self.logout()
 
@@ -196,6 +197,7 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         self.assertEquals(user_model.total_plays, 0)
         self.assertEquals(
             user_model.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
+        self.assertEquals(user_model.num_ratings, 1)
         self.assertEquals(user_model.average_ratings, 4)
         self.logout()
 
@@ -222,6 +224,7 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         self.assertEquals(user_model.total_plays, 1)
         self.assertEquals(
             user_model.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
+        self.assertEquals(user_model.num_ratings, 1)
         self.assertEquals(user_model.average_ratings, 3)
         self.logout()
 
@@ -250,6 +253,7 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         self.assertEquals(user_model.total_plays, 4)
         self.assertEquals(
             user_model.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
+        self.assertEquals(user_model.num_ratings, 3)
         self.assertEquals(user_model.average_ratings, 4)
         self.logout()
 
@@ -278,6 +282,7 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         self.assertEquals(user_model.total_plays, 1)
         self.assertEquals(
             user_model.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
+        self.assertEquals(user_model.num_ratings, 1)
         self.assertEquals(user_model.average_ratings, 4)
         self.logout()
 
@@ -312,6 +317,7 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         self.assertEquals(user_model.total_plays, 3)
         self.assertEquals(
             user_model.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
+        self.assertEquals(user_model.num_ratings, 2)
         self.assertEquals(user_model.average_ratings, 3.5)
         self.logout()
 
@@ -351,6 +357,7 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         self.assertEquals(user_model_1.total_plays, 2)
         self.assertEquals(
             user_model_1.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
+        self.assertEquals(user_model_1.num_ratings, 3)
         self.assertEquals(user_model_1.average_ratings, 4)
 
         user_model_2 = user_models.UserStatsModel.get(
@@ -358,6 +365,7 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         self.assertEquals(user_model_2.total_plays, 2)
         self.assertEquals(
             user_model_2.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
+        self.assertEquals(user_model_2.num_ratings, 3)
         self.assertEquals(user_model_2.average_ratings, 4)
         self.logout()
 
@@ -399,6 +407,7 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         self.assertEquals(user_model_2.total_plays, 4)
         self.assertEquals(
             user_model_2.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
+        self.assertEquals(user_model_2.num_ratings, 2)
         self.assertEquals(user_model_2.average_ratings, 2.5)
         self.logout()
 
@@ -410,6 +419,7 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         self.assertEquals(user_model_1.total_plays, 4)
         self.assertEquals(
             user_model_1.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
+        self.assertEquals(user_model_1.num_ratings, 2)
         self.assertEquals(user_model_1.average_ratings, 2.5)
         self.logout()
 
