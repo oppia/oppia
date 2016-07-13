@@ -264,6 +264,7 @@ class RecentUpdatesMRJobManager(
 class UserStatsRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
     total_plays = ndb.IntegerProperty(default=0)
+    num_ratings = ndb.IntegerProperty(default=0)
     average_ratings = ndb.FloatProperty(indexed=True)
 
 
@@ -294,7 +295,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
     def _handle_incoming_event(cls, active_realtime_layer, event_type, *args):
         user_id = args[0]
 
-        def _refresh_average_ratings(rating, num_ratings):
+        def _refresh_average_ratings(rating):
             realtime_class = cls._get_realtime_datastore_class()
             realtime_model_id = realtime_class.get_realtime_id(
                 active_realtime_layer, user_id)
@@ -304,16 +305,18 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
             if model is None:
                 realtime_class(
                     id=realtime_model_id, average_ratings=rating,
-                    realtime_layer=active_realtime_layer).put()
+                    num_ratings=1, realtime_layer=active_realtime_layer).put()
             else:
+                num_ratings = model.num_ratings
                 average_ratings = model.average_ratings
                 if average_ratings is not None:
                     model.average_ratings = (
-                        (model.average_ratings * num_ratings + rating)/
+                        (average_ratings * num_ratings + rating)/
                         (num_ratings + 1)
                     )
                 else:
                     model.average_ratings = rating
+                model.num_ratings += 1
                 model.put()
 
         def _increment_total_plays_count():
@@ -335,8 +338,9 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                 _increment_total_plays_count)
 
         if event_type == feconf.EVENT_TYPE_RATE_EXPLORATION:
+            rating = args[1]
             transaction_services.run_in_transaction(
-                _refresh_average_ratings, args[1], args[2])
+                _refresh_average_ratings, rating)
 
     # Public query method.
     @classmethod

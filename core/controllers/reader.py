@@ -510,10 +510,8 @@ class RatingHandler(base.BaseHandler):
         rating_services.assign_rating_to_exploration(
             self.user_id, exploration_id, user_rating)
 
-        num_ratings = exp_services.get_number_of_ratings(
-            exp_services.get_exploration_summary_by_id(exploration_id).ratings)
         event_services.RateExplorationEventHandler.record(
-            exploration_id, user_rating, num_ratings).put()
+            exploration_id, user_rating).put()
 
         self.render_json({})
 
