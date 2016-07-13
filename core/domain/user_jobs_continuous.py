@@ -293,9 +293,9 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
 
     @classmethod
     def _handle_incoming_event(cls, active_realtime_layer, event_type, *args):
-        user_id = args[0]
+        exp_id = args[0]
 
-        def _refresh_average_ratings(rating):
+        def _refresh_average_ratings(user_id, rating):
             realtime_class = cls._get_realtime_datastore_class()
             realtime_model_id = realtime_class.get_realtime_id(
                 active_realtime_layer, user_id)
@@ -318,7 +318,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                 model.num_ratings += 1
                 model.put()
 
-        def _increment_total_plays_count():
+        def _increment_total_plays_count(user_id):
             realtime_class = cls._get_realtime_datastore_class()
             realtime_model_id = realtime_class.get_realtime_id(
                 active_realtime_layer, user_id)
@@ -332,14 +332,16 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                 model.total_plays += 1
                 model.put()
 
-        if event_type == feconf.EVENT_TYPE_START_EXPLORATION:
-            transaction_services.run_in_transaction(
-                _increment_total_plays_count)
+        exp_summary = exp_services.get_exploration_summary_by_id(exp_id)
+        for user_id in exp_summary.owner_ids:
+            if event_type == feconf.EVENT_TYPE_START_EXPLORATION:
+                transaction_services.run_in_transaction(
+                    _increment_total_plays_count, user_id)
 
-        if event_type == feconf.EVENT_TYPE_RATE_EXPLORATION:
-            rating = args[1]
-            transaction_services.run_in_transaction(
-                _refresh_average_ratings, rating)
+            if event_type == feconf.EVENT_TYPE_RATE_EXPLORATION:
+                rating = args[1]
+                transaction_services.run_in_transaction(
+                    _refresh_average_ratings, user_id, rating)
 
     # Public query method.
     @classmethod
@@ -357,18 +359,28 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
         num_ratings = 0
         average_ratings = None
 
+        ratings_value = 0
+
         mr_model = user_models.UserStatsModel.get(user_id, strict=False)
         if mr_model is not None:
             total_plays += mr_model.total_plays
             num_ratings += mr_model.num_ratings
-            average_ratings = mr_model.average_ratings
+            if mr_model.average_ratings is not None:
+                ratings_value += (
+                    mr_model.average_ratings * mr_model.num_ratings)
 
         realtime_model = cls._get_realtime_datastore_class().get(
             cls.get_active_realtime_layer_id(user_id), strict=False)
+
         if realtime_model is not None:
             total_plays += realtime_model.total_plays
             num_ratings += realtime_model.num_ratings
-            average_ratings = realtime_model.average_ratings
+            if realtime_model.average_ratings is not None:
+                ratings_value += (
+                    realtime_model.average_ratings * realtime_model.num_ratings)
+
+        if num_ratings > 0:
+            average_ratings = ratings_value / float(num_ratings)
 
         return {
             'total_plays': total_plays,
