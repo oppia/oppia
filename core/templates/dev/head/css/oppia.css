@@ -1203,23 +1203,20 @@ textarea {
   padding: 5px 12px;
 }
 
-.list-card-view-toggle .list-view-btn {
+.list-card-view-toggle .card-view-btn {
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
 }
 
-.list-card-view-toggle .card-view-btn {
+.list-card-view-toggle .list-view-btn {
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
+  margin-left: -1px;
 }
 
 .list-card-view-toggle .dashboard-active-view {
   background: #009688;
   color: #fff;
-}
-
-.list-card-view-toggle .card-view-btn {
-  margin-left: -1px;
 }
 
 /* Rules for the tiles in the creator dashboard. */
