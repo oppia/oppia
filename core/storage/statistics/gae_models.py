@@ -455,7 +455,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
             exp_id))
 
     @classmethod
-    def create(cls, exp_id, rating, num_ratings):
+    def create(cls, exp_id, rating):
         """Creates a new rate exploration event."""
         entity_id = cls.get_new_event_entity_id(
             exp_id)
