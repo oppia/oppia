@@ -565,6 +565,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         self.assertEquals(
             user_services.get_user_dashboard_stats(self.owner_id), {
                 'total_plays': 0,
+                'num_ratings': 0,
                 'average_ratings': None
             })
         (user_jobs_continuous_test.ModifiedUserStatsAggregator
@@ -573,6 +574,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         self.assertEquals(
             user_services.get_user_dashboard_stats(self.owner_id), {
                 'total_plays': 1,
+                'num_ratings': 0,
                 'average_ratings': None
             })
 
@@ -595,6 +597,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             user_services.get_weekly_dashboard_stats(self.owner_id), [{
                 self.CURRENT_DATE_AS_STRING: {
                     'total_plays': 0,
+                    'num_ratings': 0
                     'average_ratings': None
                 }
             }])
@@ -625,6 +628,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             user_services.get_weekly_dashboard_stats(self.owner_id), [{
                 self.CURRENT_DATE_AS_STRING: {
                     'total_plays': 1,
+                    'num_ratings': 0
                     'average_ratings': None
                 }
             }])

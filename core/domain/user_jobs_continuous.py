@@ -345,24 +345,35 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
     # Public query method.
     @classmethod
     def get_dashboard_stats(cls, user_id):
-        # TODO: Add doctstring.
+        """
+        Args:
+          - user_id: id of the exploration to get statistics for
 
+        Returns a dict with the following keys:
+        - 'total_plays': # of times the user's explorations were played
+        - 'num_ratings': # of times the user's explorations were started
+        - 'average_ratings': average of average ratings across all explorations
+        """
         total_plays = 0
+        num_ratings = 0
         average_ratings = None
 
         mr_model = user_models.UserStatsModel.get(user_id, strict=False)
         if mr_model is not None:
             total_plays += mr_model.total_plays
+            num_ratings += mr_model.num_ratings
             average_ratings = mr_model.average_ratings
 
         realtime_model = cls._get_realtime_datastore_class().get(
             cls.get_active_realtime_layer_id(user_id), strict=False)
         if realtime_model is not None:
             total_plays += realtime_model.total_plays
+            num_ratings += realtime_model.num_ratings
             average_ratings = realtime_model.average_ratings
 
         return {
             'total_plays': total_plays,
+            'num_ratings': num_ratings
             'average_ratings': average_ratings
         }
 
