@@ -689,9 +689,6 @@ SUPPORTED_SITE_LANGUAGES = {
 SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 SYSTEM_USER_IDS = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 
-CSRF_PAGE_NAME_CREATE_EXPLORATION = 'create_exploration'
-CSRF_PAGE_NAME_I18N = 'i18n'
-
 # The following are all page descriptions for the meta tag.
 ABOUT_PAGE_DESCRIPTION = (
     'Oppia is an open source learning platform that connects a community of '

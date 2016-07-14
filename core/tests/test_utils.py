@@ -267,18 +267,9 @@ class TestBase(unittest.TestCase):
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
 
-    def get_csrf_token_from_response(self, response, token_type=None):
+    def get_csrf_token_from_response(self, response):
         """Retrieve the CSRF token from a GET response."""
-        if token_type is None:
-            regex = CSRF_REGEX
-        elif token_type == feconf.CSRF_PAGE_NAME_CREATE_EXPLORATION:
-            regex = CSRF_CREATE_EXPLORATION_REGEX
-        elif token_type == feconf.CSRF_PAGE_NAME_I18N:
-            regex = CSRF_I18N_REGEX
-        else:
-            raise Exception('Invalid CSRF token type: %s' % token_type)
-
-        return re.search(regex, response.body).group(1)
+        return re.search(CSRF_REGEX, response.body).group(1)
 
     def signup(self, email, username):
         """Complete the signup process for the user with the given username."""
