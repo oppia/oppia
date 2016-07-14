@@ -22,6 +22,7 @@ import imghdr
 import logging
 import re
 
+from core.domain import exp_services
 from core.platform import models
 import feconf
 import utils
@@ -274,13 +275,23 @@ def get_profile_pictures_by_user_ids(user_ids):
 
 
 def get_next_page_of_explorations(
-    page_size=feconf.DASHBOARD_EXPLORATIONS_PAGE_SIZE, urlsafe_start_cursor=None):
+        exp_ids,
+        page_size=feconf.DASHBOARD_EXPLORATIONS_PAGE_SIZE,
+        urlsafe_start_cursor=None):
+    """Returns a page of creator dashboard explorations in reverse time order.
 
+    The return value is a triple (results, cursor, more) as described in
+    fetch_page() at:
+
+        https://developers.google.com/appengine/docs/python/ndb/queryclass
+    """
     results, new_urlsafe_start_cursor, more = (
-        exp_models.ExpSummaryModel.get_subscribed_explorations_by_id(
-            page_size, urlsafe_start_cursor))
+        user_models.UserSubscriptionsModel.get_subscribed_explorations_by_id(
+            exp_ids, page_size, urlsafe_start_cursor))
 
-    return results
+    result_explorations = [exp_services.get_exploration_from_model(m)
+                           for m in results]
+    return (result_explorations, new_urlsafe_start_cursor, more)
 
 
 def get_user_settings(user_id, strict=False):
