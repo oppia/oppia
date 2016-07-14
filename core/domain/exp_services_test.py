@@ -1809,6 +1809,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
     """Test exploration search."""
 
     USER_ID_1 = 'user_1'
+    USER_ID_2 = 'user_2'
 
     def test_demo_explorations_are_added_to_search_index(self):
         results, _ = exp_services.search_explorations('Welcome', 2)
@@ -1992,6 +1993,13 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
         exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
         self.assertEqual(
             exp_services.get_number_of_ratings(exp.ratings), 2)
+
+        rating_services.assign_rating_to_exploration(
+            self.USER_ID_2, self.EXP_ID, 5)
+        self.process_and_flush_pending_tasks()
+        exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+        self.assertEqual(
+            exp_services.get_number_of_ratings(exp.ratings), 3)
 
     def test_get_average_rating(self):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
