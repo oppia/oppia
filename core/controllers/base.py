@@ -155,11 +155,6 @@ class BaseHandler(webapp2.RequestHandler):
     # processing them. Can be overridden by subclasses if this check is
     # not necessary.
     REQUIRE_PAYLOAD_CSRF_CHECK = True
-    # Whether the page includes a button for creating explorations. If this is
-    # set to True, a CSRF token for that button will be generated. This is
-    # needed because "create exploration" requests can come from multiple
-    # pages.
-    PAGE_HAS_CREATE_EXP_REQUEST = False
     # Whether to redirect requests corresponding to a logged-in user who has
     # not completed signup in to the signup page. This ensures that logged-in
     # users have agreed to the latest terms.
@@ -360,18 +355,10 @@ class BaseHandler(webapp2.RequestHandler):
         # that tokens generated in one handler will be sent back to a handler
         # with the same page name.
         values['csrf_token'] = ''
-        values['csrf_token_create_exploration'] = ''
-        values['csrf_token_i18n'] = (
-            CsrfTokenManager.create_csrf_token(
-                self.user_id))
 
         if self.REQUIRE_PAYLOAD_CSRF_CHECK:
             values['csrf_token'] = CsrfTokenManager.create_csrf_token(
                 self.user_id)
-        if self.PAGE_HAS_CREATE_EXP_REQUEST:
-            values['csrf_token_create_exploration'] = (
-                CsrfTokenManager.create_csrf_token(
-                    self.user_id))
 
         self.response.cache_control.no_cache = True
         self.response.cache_control.must_revalidate = True

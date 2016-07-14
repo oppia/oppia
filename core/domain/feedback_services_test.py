@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for feedback-related services."""
+from core.domain import feedback_jobs_continuous_test
 from core.domain import feedback_services
 from core.domain import user_services
 from core.platform import models
@@ -20,6 +21,8 @@ from core.tests import test_utils
 import feconf
 
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
+taskqueue_services = models.Registry.import_taskqueue_services()
+
 
 class FeedbackServicesUnitTests(test_utils.GenericTestBase):
     """Test functions in feedback_services."""
@@ -200,7 +203,23 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
 
 class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
-    EXP_ID = '0'
+    EXP_ID_1 = 'eid1'
+    EXP_ID_2 = 'eid2'
+
+    EXPECTED_THREAD_DICT = {
+        'status': u'open',
+        'state_name': u'a_state_name',
+        'summary': None,
+        'original_author_username': None,
+        'subject': u'a subject'
+    }
+    EXPECTED_THREAD_DICT_VIEWER = {
+        'status': u'open',
+        'state_name': u'a_state_name_second',
+        'summary': None,
+        'original_author_username': None,
+        'subject': u'a subject second'
+    }
 
     def setUp(self):
         super(FeedbackThreadUnitTests, self).setUp()
@@ -209,40 +228,98 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         user_services.get_or_create_user(self.viewer_id, self.VIEWER_EMAIL)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
+    def _run_computation(self):
+        (feedback_jobs_continuous_test.ModifiedFeedbackAnalyticsAggregator.
+         start_computation())
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
+        self.process_and_flush_pending_tasks()
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+            0)
+        self.process_and_flush_pending_tasks()
+
     def test_get_all_threads(self):
         # Create an anonymous feedback thread
-        expected_thread_dict = {
-            'status': u'open',
-            'state_name': u'a_state_name',
-            'summary': None,
-            'original_author_username': None,
-            'subject': u'a subject'
-        }
         feedback_services.create_thread(
-            self.EXP_ID, expected_thread_dict['state_name'], None,
-            expected_thread_dict['subject'], 'not used here')
+            self.EXP_ID_1, self.EXPECTED_THREAD_DICT['state_name'], None,
+            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
 
-        threads = feedback_services.get_all_threads(self.EXP_ID, False)
+        threads = feedback_services.get_all_threads(self.EXP_ID_1, False)
         self.assertEqual(1, len(threads))
-        self.assertDictContainsSubset(expected_thread_dict,
+        self.assertDictContainsSubset(self.EXPECTED_THREAD_DICT,
                                       threads[0].to_dict())
 
-        # Viewer creates feedback thread
-        expected_thread_dict = {
-            'status': u'open',
-            'state_name': u'a_state_name_second',
-            'summary': None,
-            'original_author_username': self.VIEWER_USERNAME,
-            'subject': u'a subject second'
-        }
-        feedback_services.create_thread(
-            self.EXP_ID, expected_thread_dict['state_name'], self.viewer_id,
-            expected_thread_dict['subject'], 'not used here')
+        self.EXPECTED_THREAD_DICT_VIEWER['original_author_username'] = (
+            self.VIEWER_USERNAME)
 
-        threads = feedback_services.get_all_threads(self.EXP_ID, False)
+        # Viewer creates feedback thread
+        feedback_services.create_thread(
+            self.EXP_ID_1, self.EXPECTED_THREAD_DICT_VIEWER['state_name'],
+            self.viewer_id, self.EXPECTED_THREAD_DICT_VIEWER['subject'],
+            'not used here')
+
+        threads = feedback_services.get_all_threads(self.EXP_ID_1, False)
         self.assertEqual(2, len(threads))
-        self.assertDictContainsSubset(expected_thread_dict,
+        self.assertDictContainsSubset(self.EXPECTED_THREAD_DICT_VIEWER,
                                       threads[1].to_dict())
+
+    def test_get_total_open_threads_before_job_run(self):
+        self.assertEqual(feedback_services.get_total_open_threads(
+            feedback_services.get_thread_analytics_multi([self.EXP_ID_1])), 0)
+
+        feedback_services.create_thread(
+            self.EXP_ID_1, self.EXPECTED_THREAD_DICT['state_name'], None,
+            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
+
+        threads = feedback_services.get_all_threads(self.EXP_ID_1, False)
+        self.assertEqual(1, len(threads))
+
+        self.assertEqual(feedback_services.get_total_open_threads(
+            feedback_services.get_thread_analytics_multi([self.EXP_ID_1])), 0)
+
+    def test_get_total_open_threads_for_single_exploration(self):
+        feedback_services.create_thread(
+            self.EXP_ID_1, self.EXPECTED_THREAD_DICT['state_name'], None,
+            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
+
+        threads = feedback_services.get_all_threads(self.EXP_ID_1, False)
+        self.assertEqual(1, len(threads))
+
+        self._run_computation()
+        self.assertEqual(feedback_services.get_total_open_threads(
+            feedback_services.get_thread_analytics_multi([self.EXP_ID_1])), 1)
+
+    def test_get_total_open_threads_for_multiple_explorations(self):
+        feedback_services.create_thread(
+            self.EXP_ID_1, self.EXPECTED_THREAD_DICT['state_name'], None,
+            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
+        feedback_services.create_thread(
+            self.EXP_ID_2, self.EXPECTED_THREAD_DICT['state_name'], None,
+            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
+
+        threads_exp_1 = feedback_services.get_all_threads(self.EXP_ID_1, False)
+        self.assertEqual(1, len(threads_exp_1))
+        threads_exp_2 = feedback_services.get_all_threads(self.EXP_ID_2, False)
+        self.assertEqual(1, len(threads_exp_2))
+
+        def _close_thread(exp_id, thread_id):
+            thread = (feedback_models.FeedbackThreadModel.
+                      get_by_exp_and_thread_id(exp_id, thread_id))
+            thread.status = feedback_models.STATUS_CHOICES_FIXED
+            thread.put()
+
+        _close_thread(self.EXP_ID_1, threads_exp_1[0].get_thread_id())
+        self.assertEqual(
+            len(feedback_services.get_closed_threads(self.EXP_ID_1, False)), 1)
+        self._run_computation()
+
+        self.assertEqual(feedback_services.get_total_open_threads(
+            feedback_services.get_thread_analytics_multi(
+                [self.EXP_ID_1, self.EXP_ID_2])), 1)
 
 
 class EmailsTaskqueueTests(test_utils.GenericTestBase):

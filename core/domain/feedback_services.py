@@ -189,6 +189,13 @@ def get_thread_analytics(exploration_id):
         exploration_id)
 
 
+def get_total_open_threads(feedback_thread_analytics):
+    """Returns the count of all open threads for the given
+    FeedbackThreadAnalytics domain objects."""
+    return sum(
+        feedback.num_open_threads for feedback in feedback_thread_analytics)
+
+
 def create_suggestion(exploration_id, author_id, exploration_version,
                       state_name, description, suggestion_content):
     """Creates a new SuggestionModel object and the corresponding

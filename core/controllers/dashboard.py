@@ -114,8 +114,6 @@ class NotificationsDashboardHandler(base.BaseHandler):
 class DashboardPage(base.BaseHandler):
     """Page showing the user's creator dashboard."""
 
-    PAGE_HAS_CREATE_EXP_REQUEST = True
-
     @base.require_user
     def get(self):
         if self.username in config_domain.BANNED_USERNAMES.value:
@@ -215,11 +213,17 @@ class DashboardHandler(base.BaseHandler):
                         collection_summary.category),
                 })
 
+        dashboard_stats = user_services.get_user_dashboard_stats(
+            self.user_id)
+        dashboard_stats.update({
+            'total_open_feedback': feedback_services.get_total_open_threads(
+                feedback_thread_analytics)
+        })
+
         self.values.update({
             'explorations_list': exp_summary_list,
             'collections_list': collection_summary_list,
-            'dashboard_stats': user_services.get_user_dashboard_stats(
-                self.user_id)
+            'dashboard_stats': dashboard_stats
         })
         self.render_json(self.values)
 
