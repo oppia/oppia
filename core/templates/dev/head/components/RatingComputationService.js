@@ -49,9 +49,9 @@ oppia.factory('RatingComputationService', [function() {
     },
     getRelativeChangeInAverageRating: function(newRating, oldRating) {
       if (!oldRating) {
-        return '+' + parseFloat(newRating).toFixed(2);
+        return '+' + newRating.toFixed(2);
       } else {
-        var ratingDiff = parseFloat(newRating - oldRating).toFixed(2);
+        var ratingDiff = (newRating - oldRating).toFixed(2);
         return ratingDiff >= 0 ? '+' + ratingDiff : ratingDiff;
       }
     }
