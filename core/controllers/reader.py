@@ -511,7 +511,7 @@ class RatingHandler(base.BaseHandler):
             self.user_id, exploration_id, user_rating)
 
         event_services.RateExplorationEventHandler.record(
-            exploration_id, user_rating)
+            exploration_id, self.user_id, user_rating)
 
         self.render_json({})
 

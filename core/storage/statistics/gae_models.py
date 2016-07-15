@@ -448,17 +448,18 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
         indexed=True, default=CURRENT_EVENT_SCHEMA_VERSION)
 
     @classmethod
-    def get_new_event_entity_id(cls, exp_id):
+    def get_new_event_entity_id(cls, exp_id, user_id):
         timestamp = datetime.datetime.utcnow()
-        return cls.get_new_id('%s:%s' % (
+        return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
-            exp_id))
+            exp_id,
+            user_id))
 
     @classmethod
-    def create(cls, exp_id, rating):
+    def create(cls, exp_id, user_id, rating):
         """Creates a new rate exploration event."""
         entity_id = cls.get_new_event_entity_id(
-            exp_id)
+            exp_id, user_id)
         cls(id=entity_id,
             event_type=feconf.EVENT_TYPE_RATE_EXPLORATION,
             exploration_id=exp_id,
