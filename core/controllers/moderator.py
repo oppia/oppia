@@ -24,8 +24,6 @@ from core.domain import summary_services
 class ModeratorPage(base.BaseHandler):
     """The moderator page."""
 
-    PAGE_NAME_FOR_CSRF = 'moderator_page'
-
     @base.require_moderator
     def get(self):
         """Handles GET requests."""
@@ -34,8 +32,6 @@ class ModeratorPage(base.BaseHandler):
 
 class FeaturedActivitiesHandler(base.BaseHandler):
     """The moderator page handler for featured activities."""
-
-    PAGE_NAME_FOR_CSRF = 'moderator_page'
 
     @base.require_moderator
     def get(self):
