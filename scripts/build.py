@@ -30,15 +30,6 @@ OUT_DIR = os.path.join('core', 'templates', 'prod', 'head', '')
 REMOVE_WS = re.compile(r'\s{2,}').sub
 YUICOMPRESSOR_DIR = os.path.join(
     '..', 'oppia_tools', 'yuicompressor-2.4.8', 'yuicompressor-2.4.8.jar')
-CACHE_SLUG = None
-ASSETS_SRC_DIR = os.path.join('assets', '')
-ASSETS_OUT_DIR = None
-THIRD_PARTY_GENERATED_SRC_DIR = os.path.join(
-    'third_party', 'generated', 'prod', '')
-THIRD_PARTY_GENERATED_OUT_DIR = None
-CSS_SRC_DIR = os.path.join('core', 'templates', 'prod', 'head', 'css', '')
-CSS_OUT_DIR = None
-BUILD_DIR = None
 
 
 def _minify(source_path, target_path):
@@ -97,111 +88,77 @@ def process_third_party_libs():
         sys.exit(1)
 
 
+def copy_files_source_to_target(source, target):
+    """Copies all files in source directory to target."""
+    print 'Processing %s' % os.path.join(os.getcwd(), source)
+    print 'Copying into %s' % os.path.join(os.getcwd(), target)
+
+    ensure_directory_exists(target)
+    shutil.rmtree(target)
+    for root, dirs, files in os.walk(os.path.join(os.getcwd(), source)):
+        for directory in dirs:
+            print 'Processing %s' % os.path.join(root, directory)
+
+        for filename in files:
+            print 'Processing %s' % filename
+            source_path = os.path.join(root, filename)
+            if source_path.find(target) > 0:
+                continue
+            if source_path.find(source) == -1:
+                continue
+            target_path = source_path.replace(
+                source, target)
+            process_build(source_path, target_path)
+
+
 def _build_files():
     ensure_directory_exists(OUT_DIR)
     shutil.rmtree(OUT_DIR)
-    ensure_directory_exists(ASSETS_OUT_DIR)
-    shutil.rmtree(ASSETS_OUT_DIR)
-    ensure_directory_exists(THIRD_PARTY_GENERATED_OUT_DIR)
-    shutil.rmtree(THIRD_PARTY_GENERATED_OUT_DIR)
-    ensure_directory_exists(CSS_OUT_DIR)
-    shutil.rmtree(CSS_OUT_DIR)
     process_third_party_libs()
 
-    for root in os.listdir(os.path.join(os.getcwd())):
-        if any([s in root for s in ['.git', 'extensions', 'build']]):
-            continue
-
-        print 'Processing %s' % os.path.join(os.getcwd(), root)
-
-        # Process assets, copy it to build/[cache_slug]/assets
-        if any([s in root for s in ['assets']]):
-            for root, dirs, files in os.walk(os.path.join(os.getcwd(), root)):
-                for directory in dirs:
-                    print 'Processing %s' % os.path.join(root, directory)
-
-                for filename in files:
-                    source_path = os.path.join(root, filename)
-                    if source_path.find(ASSETS_OUT_DIR) > 0:
-                        continue
-                    if source_path.find(ASSETS_SRC_DIR) == -1:
-                        continue
-                    target_path = source_path.replace(
-                        ASSETS_SRC_DIR, ASSETS_OUT_DIR)
-                    process_build(source_path, target_path)
-
-        # Process third_party/generated/prod, copy it to
-        # build/[cache_slug]/third_party/generated
-        if any([s in root for s in ['third_party']]):
-            for root, dirs, files in os.walk(os.path.join(os.getcwd(), root)):
-                if not any([s in root for s in [
-                        os.path.join('generated', 'prod')]]):
-                    continue
-
-                for directory in dirs:
-                    print 'Processing %s' % os.path.join(root, directory)
-
-                for filename in files:
-                    source_path = os.path.join(root, filename)
-                    if source_path.find(THIRD_PARTY_GENERATED_OUT_DIR) > 0:
-                        continue
-                    if source_path.find(THIRD_PARTY_GENERATED_SRC_DIR) == -1:
-                        continue
-                    target_path = source_path.replace(
-                        THIRD_PARTY_GENERATED_SRC_DIR,
-                        THIRD_PARTY_GENERATED_OUT_DIR)
-                    process_build(source_path, target_path)
-
-        # Process core/templates/dev/head
-        if any([s in root for s in ['core']]):
-            for root, dirs, files in os.walk(os.path.join(os.getcwd(), root)):
-                if not any([s in root for s in [os.path.join('templates')]]):
-                    continue
-                for directory in dirs:
-                    print 'Processing %s' % os.path.join(root, directory)
-                for filename in files:
-                    source_path = os.path.join(root, filename)
-                    if source_path.find(OUT_DIR) > 0:
-                        continue
-                    if source_path.find(HEAD_DIR) == -1:
-                        continue
-                    target_path = source_path.replace(HEAD_DIR, OUT_DIR)
-                    if filename.endswith('.html'):
-                        process_html(source_path, target_path)
-                    if filename.endswith('.css'):
-                        process_css(source_path, target_path)
-                    if filename.endswith('.js'):
-                        process_js(source_path, target_path)
-
-                # Process core/templates/prod/head/css,
-                # copy it to build/[cache_slug]/css
-                if not any([s in root for s in [
-                        os.path.join('templates', 'prod', 'head', 'css')]]):
-                    continue
-
-                print 'Processing css directory.'
-
-                for directory in dirs:
-                    print 'Processing %s' % os.path.join(root, directory)
-
-                for filename in files:
-                    source_path = os.path.join(root, filename)
-                    if source_path.find(CSS_OUT_DIR) > 0:
-                        continue
-                    if source_path.find(CSS_SRC_DIR) == -1:
-                        continue
-                    target_path = source_path.replace(CSS_SRC_DIR, CSS_OUT_DIR)
-                    process_build(source_path, target_path)
+    for root, dirs, files in os.walk(os.path.join(os.getcwd(), HEAD_DIR)):
+        for directory in dirs:
+            print 'Processing %s' % os.path.join(root, directory)
+        for filename in files:
+            source_path = os.path.join(root, filename)
+            if source_path.find(OUT_DIR) > 0:
+                continue
+            if source_path.find(HEAD_DIR) == -1:
+                continue
+            target_path = source_path.replace(HEAD_DIR, OUT_DIR)
+            if filename.endswith('.html'):
+                process_html(source_path, target_path)
+            if filename.endswith('.css'):
+                process_css(source_path, target_path)
+            if filename.endswith('.js'):
+                process_js(source_path, target_path)
 
 
 if __name__ == '__main__':
-    # TODO(gvishal): get this cache slug somehow
+    # TODO(gvishal): get this cache slug somehow, unable to import the module.
     # CACHE_SLUG = utils.get_cache_slug()
     CACHE_SLUG = 'default'
     BUILD_DIR = os.path.join('build', CACHE_SLUG)
+
+    # Process assets, copy it to build/[cache_slug]/assets
+    ASSETS_SRC_DIR = os.path.join('assets', '')
     ASSETS_OUT_DIR = os.path.join(BUILD_DIR, 'assets', '')
+    copy_files_source_to_target(ASSETS_SRC_DIR, ASSETS_OUT_DIR)
+
+    # Process third_party/generated/prod, copy it to
+    # build/[cache_slug]/third_party/generated
+    THIRD_PARTY_GENERATED_SRC_DIR = os.path.join(
+        'third_party', 'generated', 'prod', '')
     THIRD_PARTY_GENERATED_OUT_DIR = os.path.join(
         BUILD_DIR, 'third_party', 'generated', '')
-    CSS_OUT_DIR = os.path.join(BUILD_DIR, 'css', '')
-    # TODO(gvishal): copy extensions to build.
+    copy_files_source_to_target(
+        THIRD_PARTY_GENERATED_SRC_DIR, THIRD_PARTY_GENERATED_OUT_DIR)
+
     _build_files()
+
+    # Process core/templates/prod/head/css, copy it to build/[cache_slug]/css
+    CSS_SRC_DIR = os.path.join('core', 'templates', 'prod', 'head', 'css', '')
+    CSS_OUT_DIR = os.path.join(BUILD_DIR, 'css', '')
+    copy_files_source_to_target(CSS_SRC_DIR, CSS_OUT_DIR)
+
+    # TODO(gvishal): copy extensions to build.
