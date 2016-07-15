@@ -195,10 +195,11 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_get_cache_slug_returns_correct_slug(self):
 
         with self.swap(feconf, 'DEV_MODE', True):
+            utils.CACHE_SLUG = None
             cache_slug = utils.get_cache_slug()
-            self.assertIn(feconf.CACHE_SLUG_DEV, cache_slug)
+            self.assertEqual(feconf.CACHE_SLUG_DEV, cache_slug)
 
         with self.swap(feconf, 'DEV_MODE', False):
-            utils.cache_slug = None
+            utils.CACHE_SLUG = None
             cache_slug = utils.get_cache_slug()
             self.assertIn('/build/', cache_slug)

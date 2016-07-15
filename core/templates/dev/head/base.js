@@ -63,11 +63,11 @@ oppia.constant('FATAL_ERROR_CODES', [400, 401, 404, 500]);
 oppia.controller('Base', [
   '$scope', '$http', '$rootScope', '$window', '$timeout', '$document', '$log',
   'alertsService', 'LABEL_FOR_CLEARING_FOCUS', 'siteAnalyticsService',
-  'windowDimensionsService',
+  'windowDimensionsService', 'UrlInterpolationService',
   function(
       $scope, $http, $rootScope, $window, $timeout, $document, $log,
       alertsService, LABEL_FOR_CLEARING_FOCUS, siteAnalyticsService,
-      windowDimensionsService) {
+      windowDimensionsService, UrlInterpolationService) {
     $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
 
     $scope.alertsService = alertsService;
@@ -91,6 +91,8 @@ oppia.controller('Base', [
         }
       });
     }
+
+    $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
     // This method is here because the trigger for the tutorial is in the site
     // navbar. It broadcasts an event to tell the exploration editor to open the

@@ -67,9 +67,9 @@ oppia.controller('StateInteraction', [
     $scope.hasLoaded = false;
 
     $scope.userBlueImgUrl = UrlInterpolationService.getStaticImageUrl(
-                              '/avatar/user_blue_72px.png');
+      '/avatar/user_blue_72px.png');
     $scope.userBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
-                              '/avatar/user_black_72px.png');
+      '/avatar/user_black_72px.png');
 
     $scope.getCurrentInteractionName = function() {
       return (

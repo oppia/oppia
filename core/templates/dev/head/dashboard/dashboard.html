@@ -72,7 +72,7 @@
             </button>
           </div>
           <div class="oppia-dashboard-intro-picture">
-            <img src="{{get_static_resource_url('/assets/images/general/empty_dashboard.svg')}}">
+            <img ng-src="<[emptyDashboardImgUrl]>">
           </div>
         </md-card>
       </div>
@@ -213,5 +213,6 @@
     {{ include_js_file('components/CollectionCreationService.js') }}
     {{ include_js_file('dashboard/Dashboard.js') }}
     {{ include_js_file('domain/dashboard/DashboardBackendApiService.js') }}
+    {{ include_js_file('domain/utilities/UrlInterpolationService.js') }}
   </script>
 {% endblock footer_js %}

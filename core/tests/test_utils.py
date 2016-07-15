@@ -468,7 +468,7 @@ class TestBase(unittest.TestCase):
 
     def get_cache_slug_filepath(self):
         """Returns cache slug filepath for referencing files on disk.
-        examples: 'dev' or 'build/1234'
+        examples: '' or 'build/1234'
         """
         if feconf.DEV_MODE:
             cache_slug_filepath = feconf.CACHE_SLUG_DEV
@@ -480,6 +480,14 @@ class TestBase(unittest.TestCase):
                 'build', yaml_file_content['cache_slug'])
 
         return cache_slug_filepath
+
+    def get_static_asset_url(self, asset_suffix):
+        """Returns the relative path for the asset, appending it to the
+        corresponding cache slug. asset_suffix should have a leading
+        slash.
+        """
+        return '%s%s' % (utils.get_cache_slug(), asset_suffix)
+
 
     @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):

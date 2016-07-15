@@ -106,7 +106,7 @@ var cssFilePaths = [];
 var jsFilePaths = [];
 var fontFolderPaths = [];
 var cssBackgroundFilepaths = [];
-// This cache slug should be same as feconf.CACHE_SLUG_DEV
+// There is no cache slug for dev.
 var cacheSlugDev = '';
 var generatedTargetDir = path.join(
   'third_party', 'generated',

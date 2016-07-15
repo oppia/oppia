@@ -478,6 +478,11 @@ def get_cache_slug():
     return CACHE_SLUG
 
 
+def get_asset_dir_prefix():
+    return get_cache_slug()
+
+
 def get_unique_id():
     """Returns a unique id."""
+    # TODO(gvishal): discuss this.
     return str(random.randint(1000, 9999))

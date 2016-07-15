@@ -117,6 +117,52 @@ oppia.factory('UrlInterpolationService', ['alertsService',
     },
 
     /**
+     * Given an resource path, returns the relative url path to that resource
+     * prefixing the appropriate cache_slug to it.
+     */
+    getStaticResourceUrl: function(resourcePath) {
+      if (!resourcePath) {
+        alertsService.fatalWarning(
+          'Empty resource path passed in getStaticResourceUrl.');
+        return null;
+      }
+
+      var RESOURCE_PATH_STARTS_WITH_FORWARD_SLASH = /^\//;
+      // Ensure that resourcePath starts with a forward slash.
+      if (!resourcePath.match(RESOURCE_PATH_STARTS_WITH_FORWARD_SLASH)) {
+        alertsService.fatalWarning(
+          'Resource path passed into getStaticResourceUrl must start with' +
+          '\'\/\': \'' + new String(resourcePath) + '\'.');
+        return null;
+      }
+
+      return GLOBALS.ASSET_DIR_PREFIX + resourcePath;
+    },
+
+    /**
+     * Given a domain url and resource path, returns the complete url path
+     * to that resource prefixing the appropriate cache_slug to it.
+     */
+    getCompleteStaticResourceUrl: function(domainUrl, resourcePath) {
+      if (!resourcePath) {
+        alertsService.fatalWarning(
+          'Empty resource path passed in getCompleteStaticResourceUrl.');
+        return null;
+      }
+
+      var RESOURCE_PATH_STARTS_WITH_FORWARD_SLASH = /^\//;
+      // Ensure that resourcePath starts with a forward slash.
+      if (!resourcePath.match(RESOURCE_PATH_STARTS_WITH_FORWARD_SLASH)) {
+        alertsService.fatalWarning(
+          'Resource path passed into getCompleteStaticResourceUrl must start' +
+          'with \'\/\': \'' + new String(resourcePath) + '\'.');
+        return null;
+      }
+
+      return domainUrl + GLOBALS.ASSET_DIR_PREFIX + resourcePath;
+    },
+
+    /**
      * Given an image path, returns the complete url path to that image
      * prefixing the appropriate cache_slug to it.
      */
@@ -161,6 +207,15 @@ oppia.factory('UrlInterpolationService', ['alertsService',
       }
 
       return GLOBALS.ASSET_DIR_PREFIX + extensionResourcePath;
+    },
+
+    /**
+     * Given an interaction id, returns the complete url path to the thumbnail
+     * image for the interaction, prefixing the appropriate cache_slug to it.
+     */
+    getInteractionThumbnailImageUrl: function(interactionId) {
+      return GLOBALS.ASSET_DIR_PREFIX + '/extensions/interactions/' +
+        interactionId + '/static/' + interactionId + '.png';
     }
   };
 }]);

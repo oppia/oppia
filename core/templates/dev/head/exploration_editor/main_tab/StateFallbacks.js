@@ -31,7 +31,7 @@ oppia.controller('StateFallbacks', [
     $scope.activeFallbackIndex = null;
 
     $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
-                              '/general/drag_dots.png');
+      '/general/drag_dots.png');
 
     $scope.$on('stateEditorInitialized', function(evt, stateData) {
       stateFallbacksService.init(

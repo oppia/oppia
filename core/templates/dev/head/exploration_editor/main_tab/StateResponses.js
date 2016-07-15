@@ -279,7 +279,7 @@ oppia.controller('StateResponses', [
     $scope.editorContextService = editorContextService;
 
     $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
-          '/general/drag_dots.png');
+      '/general/drag_dots.png');
 
     var _initializeTrainingData = function() {
       var explorationId = explorationContextService.getExplorationId();

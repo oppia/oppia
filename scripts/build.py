@@ -33,7 +33,8 @@ YUICOMPRESSOR_DIR = os.path.join(
 CACHE_SLUG = None
 ASSETS_SRC_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = None
-THIRD_PARTY_GENERATED_SRC_DIR = os.path.join('third_party', 'generated', 'prod', '')
+THIRD_PARTY_GENERATED_SRC_DIR = os.path.join(
+    'third_party', 'generated', 'prod', '')
 THIRD_PARTY_GENERATED_OUT_DIR = None
 CSS_SRC_DIR = os.path.join('core', 'templates', 'prod', 'head', 'css', '')
 CSS_OUT_DIR = None
@@ -125,14 +126,16 @@ def _build_files():
                         continue
                     if source_path.find(ASSETS_SRC_DIR) == -1:
                         continue
-                    target_path = source_path.replace(ASSETS_SRC_DIR, ASSETS_OUT_DIR)
+                    target_path = source_path.replace(
+                        ASSETS_SRC_DIR, ASSETS_OUT_DIR)
                     process_build(source_path, target_path)
 
         # Process third_party/generated/prod, copy it to
         # build/[cache_slug]/third_party/generated
         if any([s in root for s in ['third_party']]):
             for root, dirs, files in os.walk(os.path.join(os.getcwd(), root)):
-                if not any([s in root for s in [os.path.join('generated', 'prod')]]):
+                if not any([s in root for s in [
+                        os.path.join('generated', 'prod')]]):
                     continue
 
                 for directory in dirs:
@@ -144,8 +147,9 @@ def _build_files():
                         continue
                     if source_path.find(THIRD_PARTY_GENERATED_SRC_DIR) == -1:
                         continue
-                    target_path = source_path.replace(THIRD_PARTY_GENERATED_SRC_DIR,
-                                                      THIRD_PARTY_GENERATED_OUT_DIR)
+                    target_path = source_path.replace(
+                        THIRD_PARTY_GENERATED_SRC_DIR,
+                        THIRD_PARTY_GENERATED_OUT_DIR)
                     process_build(source_path, target_path)
 
         # Process core/templates/dev/head
@@ -169,8 +173,10 @@ def _build_files():
                     if filename.endswith('.js'):
                         process_js(source_path, target_path)
 
-                # Process core/templates/prod/head/css, copy it to build/[cache_slug]/css
-                if not any([s in root for s in [os.path.join('templates', 'prod', 'head', 'css')]]):
+                # Process core/templates/prod/head/css,
+                # copy it to build/[cache_slug]/css
+                if not any([s in root for s in [
+                        os.path.join('templates', 'prod', 'head', 'css')]]):
                     continue
 
                 print 'Processing css directory.'
@@ -194,6 +200,8 @@ if __name__ == '__main__':
     CACHE_SLUG = 'default'
     BUILD_DIR = os.path.join('build', CACHE_SLUG)
     ASSETS_OUT_DIR = os.path.join(BUILD_DIR, 'assets', '')
-    THIRD_PARTY_GENERATED_OUT_DIR = os.path.join(BUILD_DIR, 'third_party', 'generated', '')
+    THIRD_PARTY_GENERATED_OUT_DIR = os.path.join(
+        BUILD_DIR, 'third_party', 'generated', '')
     CSS_OUT_DIR = os.path.join(BUILD_DIR, 'css', '')
+    # TODO(gvishal): copy extensions to build.
     _build_files()

@@ -141,7 +141,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_fetch_gravatar_success(self):
         user_email = 'user@example.com'
         expected_gravatar_filepath = os.path.join(
-            'static', self.get_cache_slug_filepath(), 'images', 'avatar',
+            self.get_cache_slug_filepath(), 'assets', 'images', 'avatar',
             'gravatar_example.png')
         with open(expected_gravatar_filepath, 'r') as f:
             gravatar = f.read()
@@ -197,7 +197,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_default_identicon_data_url(self):
         identicon_filepath = os.path.join(
-            'static', self.get_cache_slug_filepath(), 'images', 'avatar',
+            self.get_cache_slug_filepath(), 'assets', 'images', 'avatar',
             'user_blue_72px.png')
         identicon_data_url = utils.convert_png_to_data_url(
             identicon_filepath)

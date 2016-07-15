@@ -73,7 +73,7 @@ var PLAYER_URL_SLICE = '/explore/';
 var LOGIN_URL_SUFFIX = '/_ah/login';
 var ADMIN_URL_SUFFIX = '/admin';
 // TODO(gvishal): update for prod as well.
-var SCRIPTS_URL_SLICE = '/static/dev/scripts/';
+var SCRIPTS_URL_SLICE = '/assets/scripts/';
 var EXPLORATION_ID_LENGTH = 12;
 
 var FIRST_STATE_DEFAULT_NAME = 'Introduction';

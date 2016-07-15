@@ -40,7 +40,7 @@ oppia.controller('StateEditor', [
     $scope.isInteractionShown = false;
 
     $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
-                                '/avatar/oppia_black_72px.png');
+      '/avatar/oppia_black_72px.png');
 
     $scope.extensionResourcePrefix = GLOBALS.ASSET_DIR_PREFIX;
 

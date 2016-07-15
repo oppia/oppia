@@ -572,6 +572,8 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         controller: [
           '$scope', '$modalInstance', 'explorationContextService',
           function($scope, $modalInstance, explorationContextService) {
+            $scope.congratsImgUrl = UrlInterpolationService.getStaticImageUrl(
+              '/general/congrats.svg');
             $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
               GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
             $scope.close = function() {

@@ -222,7 +222,6 @@ describe('URL Interpolation Service', function() {
         'Empty image path passed in getStaticImageUrl.'));
   });
 
-  // TODO(gvishal): This test gives error, despite everything being correct.
   it('should throw an error for imagePath not beginning with forward slash',
     function() {
       expect(uis.getStaticImageUrl.bind(null, 'test_url_fail')).toThrow(

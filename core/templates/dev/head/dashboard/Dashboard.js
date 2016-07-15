@@ -19,16 +19,19 @@
 oppia.controller('Dashboard', [
   '$scope', '$rootScope', '$window', 'oppiaDatetimeFormatter', 'alertsService',
   'DashboardBackendApiService', 'RatingComputationService',
-  'ExplorationCreationService', 'FATAL_ERROR_CODES',
+  'ExplorationCreationService', 'FATAL_ERROR_CODES', 'UrlInterpolationService',
   function(
       $scope, $rootScope, $window, oppiaDatetimeFormatter, alertsService,
       DashboardBackendApiService, RatingComputationService,
-      ExplorationCreationService, FATAL_ERROR_CODES) {
+      ExplorationCreationService, FATAL_ERROR_CODES, UrlInterpolationService) {
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
     $scope.createNewExploration = (
       ExplorationCreationService.createNewExploration);
     $scope.getLocaleAbbreviatedDatetimeString = (
       oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString);
+
+    $scope.emptyDashboardImgUrl = UrlInterpolationService.getStaticImageUrl(
+      '/general/empty_dashboard.svg');
 
     $scope.activeTab = 'myExplorations';
     $scope.setActiveTab = function(newActiveTabName) {
