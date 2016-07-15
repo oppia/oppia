@@ -495,8 +495,7 @@ class SiteLanguageHandlerTests(test_utils.GenericTestBase):
         """The SiteLanguageHandler handler can be called without a user."""
         response = self.testapp.get(feconf.SPLASH_URL)
         self.assertEqual(response.status_int, 200)
-        csrf_token = self.get_csrf_token_from_response(
-            response, token_type=feconf.CSRF_PAGE_NAME_I18N)
+        csrf_token = self.get_csrf_token_from_response(response)
         self.put_json(feconf.SITE_LANGUAGE_DATA_URL, {
             'site_language_code': 'es',
         }, csrf_token)
