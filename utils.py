@@ -486,5 +486,6 @@ def get_asset_dir_prefix():
 
 def get_unique_id():
     """Returns a unique id."""
-    # TODO(gvishal): discuss this.
-    return str(random.randint(1000, 9999))
+    unique_id = ''.join(random.choice(string.ascii_lowercase + string.digits)
+                        for _ in range(feconf.CACHE_SLUG_PROD_LENGTH))
+    return unique_id
