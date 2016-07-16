@@ -198,7 +198,7 @@ CAN_SEND_FEEDBACK_MESSAGE_EMAILS = False
 # Time to wait before sending feedback message emails (currently set to 1
 # hour).
 DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS = 3600
-# Whether to send an email when new feedback message is recived for
+# Whether to send an email when new feedback message is received for
 # an exploration.
 DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE = True
 # Whether to send email updates to a user who has not specified a preference.

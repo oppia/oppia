@@ -32,6 +32,8 @@ class ThreadListHandler(base.BaseHandler):
         self.values.update({
             'threads': [t.to_dict() for t in feedback_services.get_all_threads(
                 exploration_id, False)]})
+        feedback_services.update_feedback_message_references(
+            self.user_id, exploration_id)
         self.render_json(self.values)
 
     @base.require_user
@@ -216,6 +218,10 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
         payload = json.loads(self.request.body)
         user_id = payload['user_id']
         references = feedback_services.get_feedback_message_references(user_id)
+        if not references:
+            # Model may not exist if user has already attended to the feedback.
+            return
+
         transaction_services.run_in_transaction(
             feedback_services.update_feedback_email_retries, user_id)
 
