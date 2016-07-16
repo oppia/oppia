@@ -470,14 +470,11 @@ class TestBase(unittest.TestCase):
         """Returns cache slug filepath for referencing files on disk.
         examples: '' or 'build/1234'
         """
-        if feconf.DEV_MODE:
-            cache_slug_filepath = feconf.CACHE_SLUG_DEV
+        cache_slug = utils.get_cache_slug()
+        if feconf.DEV_MODE and not feconf.IS_MINIFIED:
+            cache_slug_filepath = cache_slug
         else:
-            yaml_file_content = {}
-            yaml_file_content = utils.dict_from_yaml(
-                utils.get_file_contents('cache_slug.yaml'))
-            cache_slug_filepath = os.path.join(
-                'build', yaml_file_content['cache_slug'])
+            cache_slug_filepath = os.path.join('build', cache_slug)
 
         return cache_slug_filepath
 
@@ -486,7 +483,7 @@ class TestBase(unittest.TestCase):
         corresponding cache slug. asset_suffix should have a leading
         slash.
         """
-        return '%s%s' % (utils.get_cache_slug(), asset_suffix)
+        return '%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
 
 
     @contextlib.contextmanager

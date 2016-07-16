@@ -430,7 +430,7 @@ def get_thumbnail_icon_url_for_category(category):
         else feconf.DEFAULT_THUMBNAIL_ICON)
     # Remove all spaces from the string.
     return ('%s/assets/images/subjects/%s.svg'
-            % (get_cache_slug(), icon_name.replace(' ', '')))
+            % (get_asset_dir_prefix(), icon_name.replace(' ', '')))
 
 
 def _get_short_language_description(full_language_description):
@@ -458,28 +458,30 @@ def unescape_encoded_uri_component(escaped_string):
 
 CACHE_SLUG = None
 def get_cache_slug():
-    """Returns appropriate cache slug depending whether dev or prod. This cache
-    slug should only be used for urls in html, css and js files since it
-    contains a forward slash.
+    """Returns appropriate cache slug depending whether dev or prod. It is used
+    as a prefix in urls for images, css and script files. It is also used in
+    backend_tests to verify the presence of static resources.
     """
     global CACHE_SLUG # pylint: disable=global-statement
     if CACHE_SLUG is None:
         # pylint: disable=redefined-outer-name
         if feconf.DEV_MODE and not feconf.IS_MINIFIED:
-            if feconf.CACHE_SLUG_DEV:
-                CACHE_SLUG = '/%s' % feconf.CACHE_SLUG_DEV
-            else:
-                CACHE_SLUG = ''
+            # Defines the cache slug to be used in development mode. It must be
+            # an empty string.
+            CACHE_SLUG = ''
         else:
             yaml_file_content = dict_from_yaml(
                 get_file_contents('cache_slug.yaml'))
-            CACHE_SLUG = '/build/%s' % yaml_file_content['cache_slug']
+            CACHE_SLUG = yaml_file_content['cache_slug']
 
     return CACHE_SLUG
 
 
 def get_asset_dir_prefix():
-    return get_cache_slug()
+    asset_dir_prefix = get_cache_slug()
+    if feconf.IS_MINIFIED or not feconf.DEV_MODE:
+        asset_dir_prefix = '/build/%s' % asset_dir_prefix
+    return asset_dir_prefix
 
 
 def get_unique_id():

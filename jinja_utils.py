@@ -75,7 +75,7 @@ def get_jinja_env(dir_path):
         corresponding cache slug. resource_suffix should have a leading
         slash.
         """
-        return '%s%s' % (utils.get_cache_slug(), resource_suffix)
+        return '%s%s' % (utils.get_asset_dir_prefix(), resource_suffix)
 
     def get_complete_static_resource_url(domain_url, resource_suffix):
         """Returns the relative path for the resource, appending it to the
@@ -83,7 +83,7 @@ def get_jinja_env(dir_path):
         slash.
         """
         return '%s%s%s' % (
-            domain_url, utils.get_cache_slug(), resource_suffix)
+            domain_url, utils.get_asset_dir_prefix(), resource_suffix)
 
 
     env.globals['include_js_file'] = include_js_file

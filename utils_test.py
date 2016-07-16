@@ -183,23 +183,29 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(
             utils.get_thumbnail_icon_url_for_category('Architecture'),
             '%s/assets/images/subjects/Architecture.svg'
-            % utils.get_cache_slug())
+            % utils.get_asset_dir_prefix())
         self.assertEqual(
             utils.get_thumbnail_icon_url_for_category('Graph Theory'),
             '%s/assets/images/subjects/GraphTheory.svg'
-            % utils.get_cache_slug())
+            % utils.get_asset_dir_prefix())
         self.assertEqual(
             utils.get_thumbnail_icon_url_for_category('Nonexistent'),
-            '%s/assets/images/subjects/Lightbulb.svg' % utils.get_cache_slug())
+            '%s/assets/images/subjects/Lightbulb.svg'
+            % utils.get_asset_dir_prefix())
 
-    def test_get_cache_slug_returns_correct_slug(self):
+    def test_get_asset_dir_prefix_returns_correct_slug(self):
 
         with self.swap(feconf, 'DEV_MODE', True):
             utils.CACHE_SLUG = None
-            cache_slug = utils.get_cache_slug()
-            self.assertEqual(feconf.CACHE_SLUG_DEV, cache_slug)
+            cache_slug = utils.get_asset_dir_prefix()
+            self.assertEqual('', cache_slug)
 
         with self.swap(feconf, 'DEV_MODE', False):
             utils.CACHE_SLUG = None
-            cache_slug = utils.get_cache_slug()
-            self.assertIn('/build/', cache_slug)
+            cache_slug = utils.get_asset_dir_prefix()
+            self.assertTrue(cache_slug.startswith('/build'))
+
+        with self.swap(feconf, 'IS_MINIFIED', True):
+            utils.CACHE_SLUG = None
+            cache_slug = utils.get_asset_dir_prefix()
+            self.assertTrue(cache_slug.startswith('/build'))
