@@ -64,11 +64,6 @@ def process_js(source_path, target_path):
     _minify(source_path, target_path)
 
 
-def process_build(filename, target):
-    ensure_directory_exists(target)
-    shutil.copyfile(filename, target)
-
-
 def process_third_party_libs():
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
     node_path = os.path.join(
@@ -108,7 +103,8 @@ def copy_files_source_to_target(source, target):
                 continue
             target_path = source_path.replace(
                 source, target)
-            process_build(source_path, target_path)
+            ensure_directory_exists(target_path)
+            shutil.copyfile(source_path, target_path)
 
 
 def _build_files():
