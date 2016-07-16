@@ -265,3 +265,9 @@ class I18nDictsTest(test_utils.GenericTestBase):
                 for key in untranslated_keys:
                     self.log_line('- %s' % key)
                 self.log_line('')
+
+    def test_keys_match_en_qqq(self):
+        """Tests that en.json and qqq.json have the exact same set of keys."""
+        en_key_list = self._extract_keys_from_json_file('en.json')
+        qqq_key_list = self._extract_keys_from_json_file('qqq.json')
+        self.assertEqual(en_key_list, qqq_key_list)
