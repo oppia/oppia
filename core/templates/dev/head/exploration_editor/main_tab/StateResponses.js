@@ -270,12 +270,14 @@ oppia.controller('StateResponses', [
   '$scope', '$rootScope', '$modal', '$filter', 'stateInteractionIdService',
   'editorContextService', 'alertsService', 'responsesService', 'routerService',
   'explorationContextService', 'trainingDataService',
-  'PLACEHOLDER_OUTCOME_DEST', 'INTERACTION_SPECS',
+  'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
+  'INTERACTION_SPECS',
   function(
       $scope, $rootScope, $modal, $filter, stateInteractionIdService,
       editorContextService, alertsService, responsesService, routerService,
       explorationContextService, trainingDataService,
-      PLACEHOLDER_OUTCOME_DEST, INTERACTION_SPECS) {
+      stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
+      INTERACTION_SPECS) {
     $scope.editorContextService = editorContextService;
 
     var _initializeTrainingData = function() {
@@ -291,6 +293,10 @@ oppia.controller('StateResponses', [
       var handledAnswersArray = [];
       var choiceIndices = [];
       var answerChoices = [];
+      var choiceRules = [];
+      var customizationArgs = stateCustomizationArgsService.savedMemento;
+      var maxSelectionCount = customizationArgs.
+                              maxAllowableSelectionCount.value;
       if (interactionId === 'MultipleChoiceInput') {
         var numChoices = $scope.getAnswerChoices().length;
         // Collect all answers which have been handled by at least one
@@ -308,12 +314,40 @@ oppia.controller('StateResponses', [
         return choiceIndices.every(function(choiceIndex) {
           return handledAnswersArray.indexOf(choiceIndex) !== -1;
         });
-      } else if (interactionId === 'ItemSelectionInput') {
+      } else if (interactionId === 'ItemSelectionInput' &&
+                  maxSelectionCount === 1) {
         var numChoices = $scope.getAnswerChoices().length;
+        choiceRules = [];
+        for (var i = 0; i < numChoices; i++) {
+          choiceRules.push(false);
+        }
+
+        var newChoiceRules = function(current) {
+          return choiceRules.map(function(element, index) {
+            if (index !== current || element === true) {
+              return true;
+            } else if (index === current && element !== true) {
+              return false;
+            }
+          });
+        };
+
         for (var i = 0; i < answerGroups.length; i++) {
           var ruleSpecs = answerGroups[i].rule_specs;
           for (var j = 0; j < ruleSpecs.length; j++) {
             for (var k = 0; k < ruleSpecs[j].inputs.x.length; k++) {
+              // If the rule_type of the first input is equalTo or containsOne,
+              // then set first choiceRules to true
+              if (ruleSpecs[j].rule_type === 'Equals') {
+                choiceRules[i] = true;
+              } else if (ruleSpecs[j].rule_type === 'ContainsAtLeastOneOf') {
+                choiceRules[i] = true;
+              } else if (ruleSpecs[j].rule_type ===
+                'DoesNotContainAtLeastOneOf') {
+                // If the ruleType is omits one of, then set the others to true
+                var current = i;
+                choiceRules = newChoiceRules(current);
+              }
               var choicePreviouslySelected = (
                 handledAnswersArray.indexOf(ruleSpecs[j].inputs.x[k]) !== -1);
               if (!choicePreviouslySelected) {
@@ -322,12 +356,17 @@ oppia.controller('StateResponses', [
             }
           }
         }
+
         for (var l = 0; l < numChoices; l++) {
           answerChoices.push($scope.getAnswerChoices()[l].label);
         }
-        return answerChoices.every(function(answerChoice) {
+        var allAnswersHandled = answerChoices.every(function(answerChoice) {
           return handledAnswersArray.indexOf(answerChoice) !== -1;
         });
+        var answerRulesCheck = choiceRules.every(function(choiceRule) {
+          return choiceRule ? true : false;
+        });
+        return allAnswersHandled && answerRulesCheck;
       }
     };
 
