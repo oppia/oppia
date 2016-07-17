@@ -22,7 +22,6 @@ import imghdr
 import logging
 import re
 
-from core.domain import exp_services
 from core.platform import models
 import feconf
 import utils
@@ -289,9 +288,9 @@ def get_next_page_of_explorations(
         user_models.UserSubscriptionsModel.get_subscribed_explorations_by_id(
             exp_ids, page_size, urlsafe_start_cursor))
 
-    result_explorations = [exp_services.get_exploration_from_model(m)
-                           for m in results]
-    return (result_explorations, new_urlsafe_start_cursor, more)
+    # result_explorations = [exp_services.get_exploration_from_model(m)
+    #                        for m in results]
+    return (results, new_urlsafe_start_cursor, more)
 
 
 def get_user_settings(user_id, strict=False):

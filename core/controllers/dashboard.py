@@ -160,20 +160,25 @@ class DashboardHandler(base.BaseHandler):
             subscription_services.get_exploration_ids_subscribed_to(
                 self.user_id))
 
-        subscribed_exploration_summaries = filter(None, (
-            exp_services.get_exploration_summaries_matching_ids(
-                exploration_ids_subscribed_to)))
-        subscribed_collection_summaries = filter(None, (
-            collection_services.get_collection_summaries_matching_ids(
-                subscription_services.get_collection_ids_subscribed_to(
-                    self.user_id))))
-
         urlsafe_start_cursor = None
         res, new_urlsafe_start_cursor, more = (
             user_services.get_next_page_of_explorations(
                 exploration_ids_subscribed_to,
                 urlsafe_start_cursor=urlsafe_start_cursor))
         print res, new_urlsafe_start_cursor, more
+
+        subscribed_exploration_summaries = filter(None, (
+            exp_services.get_exploration_summaries_from_models(
+                res)))
+        subscribed_collection_summaries = filter(None, (
+            collection_services.get_collection_summaries_matching_ids(
+                subscription_services.get_collection_ids_subscribed_to(
+                    self.user_id))))
+
+        # res, new_urlsafe_start_cursor, more = (
+        #     user_services.get_next_page_of_explorations(
+        #         exploration_ids_subscribed_to,
+        #         urlsafe_start_cursor=urlsafe_start_cursor))
 
         exp_summary_list = summary_services.get_displayable_exp_summary_dicts(
             subscribed_exploration_summaries)

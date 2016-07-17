@@ -291,7 +291,7 @@ def get_exploration_titles_and_categories(exp_ids):
     return result
 
 
-def _get_exploration_summaries_from_models(exp_summary_models):
+def get_exploration_summaries_from_models(exp_summary_models):
     """Given an iterable of ExpSummaryModel instances, create a dict containing
     corresponding exploration summary domain objects, keyed by id.
     """
@@ -362,7 +362,7 @@ def get_non_private_exploration_summaries():
     """Returns a dict with all non-private exploration summary domain objects,
     keyed by their id.
     """
-    return _get_exploration_summaries_from_models(
+    return get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_non_private())
 
 
@@ -370,7 +370,7 @@ def get_top_rated_exploration_summaries():
     """Returns a dict with top rated exploration summary domain objects,
     keyed by their id.
     """
-    return _get_exploration_summaries_from_models(
+    return get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_top_rated())
 
 
@@ -378,7 +378,7 @@ def get_recently_published_exploration_summaries():
     """Returns a dict with all featured exploration summary domain objects,
     keyed by their id.
     """
-    return _get_exploration_summaries_from_models(
+    return get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_recently_published())
 
 
@@ -386,7 +386,7 @@ def get_all_exploration_summaries():
     """Returns a dict with all exploration summary domain objects,
     keyed by their id.
     """
-    return _get_exploration_summaries_from_models(
+    return get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_all())
 
 
