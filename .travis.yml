@@ -87,7 +87,10 @@ script:
 # Travis aborts test run if nothing is printed back to STDOUT for some time.
 # -x is used to avoid that.
 - if [ $RUN_FRONTEND_TESTS == 'true' ]; then bash -x scripts/run_frontend_tests.sh --run-minified-tests=true; fi
-- if [ $RUN_PERFORMANCE_TESTS == 'true' ]; then bash scripts/run_performance_tests.sh; fi
+# TODO(gvishal): add all tests to travis. Running all tests on travis fails currently due to
+# unexplained reasons. Sometimes 2-4 out of the total 7 page tests succeed and then the next one
+# gets stuck for a long time.
+- if [ $RUN_PERFORMANCE_TESTS == 'true' ]; then bash scripts/run_performance_tests.sh --test_name=splash_test; fi
 
 after_success:
 - if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ]; then codecov; fi

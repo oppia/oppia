@@ -59,8 +59,6 @@ oppia.controller('I18nFooter', [
     if (GLOBALS.userIsLoggedIn) {
       $http.put(siteLanguageUrl, {
         site_language_code: $scope.currentLanguageCode
-      }, {
-        requestIsForI18n: true
       });
     }
   };

@@ -285,6 +285,7 @@ oppia.directive('conversationSkin', [function() {
         // Indicates whether the tutor card is displayed.
         var tutorCardIsDisplayedIfNarrow = true;
 
+        $scope.explorationId = oppiaPlayerService.getExplorationId();
         $scope.isInPreviewMode = oppiaPlayerService.isInPreviewMode();
         $scope.isIframed = urlService.isIframed();
         $rootScope.loadingMessage = 'Loading';
@@ -309,6 +310,9 @@ oppia.directive('conversationSkin', [function() {
         $scope.profilePicture = (
           UrlInterpolationService.getStaticImageUrl(
           '/avatar/user_blue_72px.png'));
+
+        $scope.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER =
+          GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER;
 
         oppiaPlayerService.getUserProfileImage().then(function(result) {
           $scope.profilePicture = result;
