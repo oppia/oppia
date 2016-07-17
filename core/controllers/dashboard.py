@@ -156,33 +156,21 @@ class DashboardHandler(base.BaseHandler):
                 category in feconf.CATEGORIES_TO_COLORS else
                 feconf.DEFAULT_COLOR)
 
-        exploration_ids_subscribed_to = (
-            subscription_services.get_exploration_ids_subscribed_to(
-                self.user_id))
-
-        urlsafe_start_cursor = None
         res, new_urlsafe_start_cursor, more = (
-            user_services.get_next_page_of_explorations(
-                exploration_ids_subscribed_to,
-                urlsafe_start_cursor=urlsafe_start_cursor))
-        print res, new_urlsafe_start_cursor, more
+            user_services.get_next_page_of_explorations(self.user_id))
 
-        subscribed_exploration_summaries = filter(None, (
-            exp_services.get_exploration_summaries_from_models(
-                res)))
+        exp_summary_list = summary_services.get_displayable_exp_summary_dicts(
+            res)
+        collection_summary_list = []
+
         subscribed_collection_summaries = filter(None, (
             collection_services.get_collection_summaries_matching_ids(
                 subscription_services.get_collection_ids_subscribed_to(
                     self.user_id))))
 
-        # res, new_urlsafe_start_cursor, more = (
-        #     user_services.get_next_page_of_explorations(
-        #         exploration_ids_subscribed_to,
-        #         urlsafe_start_cursor=urlsafe_start_cursor))
-
-        exp_summary_list = summary_services.get_displayable_exp_summary_dicts(
-            subscribed_exploration_summaries)
-        collection_summary_list = []
+        exploration_ids_subscribed_to = (
+            subscription_services.get_exploration_ids_subscribed_to(
+                self.user_id))
 
         feedback_thread_analytics = (
             feedback_services.get_thread_analytics_multi(
@@ -234,7 +222,9 @@ class DashboardHandler(base.BaseHandler):
             'explorations_list': exp_summary_list,
             'collections_list': collection_summary_list,
             'dashboard_stats': user_services.get_user_dashboard_stats(
-                self.user_id)
+                self.user_id),
+            'cursor': new_urlsafe_start_cursor,
+            'more': more
         })
         self.render_json(self.values)
 

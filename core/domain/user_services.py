@@ -29,7 +29,8 @@ import utils
 from google.appengine.api import urlfetch
 
 current_user_services = models.Registry.import_current_user_services()
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(exp_models, user_models) = models.Registry.import_models(
+    [models.NAMES.exploration, models.NAMES.user])
 
 MAX_USERNAME_LENGTH = 50
 # Size (in px) of the gravatar being retrieved.
@@ -274,7 +275,7 @@ def get_profile_pictures_by_user_ids(user_ids):
 
 
 def get_next_page_of_explorations(
-        exp_ids,
+        user_id,
         page_size=feconf.DASHBOARD_EXPLORATIONS_PAGE_SIZE,
         urlsafe_start_cursor=None):
     """Returns a page of creator dashboard explorations in reverse time order.
@@ -285,11 +286,9 @@ def get_next_page_of_explorations(
         https://developers.google.com/appengine/docs/python/ndb/queryclass
     """
     results, new_urlsafe_start_cursor, more = (
-        user_models.UserSubscriptionsModel.get_subscribed_explorations_by_id(
-            exp_ids, page_size, urlsafe_start_cursor))
+        exp_models.ExpSummaryModel.get_explorations_of_user(
+            user_id, page_size, urlsafe_start_cursor))
 
-    # result_explorations = [exp_services.get_exploration_from_model(m)
-    #                        for m in results]
     return (results, new_urlsafe_start_cursor, more)
 
 

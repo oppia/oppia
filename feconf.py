@@ -102,7 +102,7 @@ COMMIT_LIST_PAGE_SIZE = 50
 FEEDBACK_TAB_PAGE_SIZE = 20
 
 # The default number of explorations to show on a page in the creator dashboard.
-DASHBOARD_EXPLORATIONS_PAGE_SIZE = 8
+DASHBOARD_EXPLORATIONS_PAGE_SIZE = 2
 
 # Default title for a newly-minted exploration.
 DEFAULT_EXPLORATION_TITLE = ''

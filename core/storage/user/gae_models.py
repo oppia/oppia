@@ -126,15 +126,6 @@ class UserSubscriptionsModel(base_models.BaseModel):
     # When the user last checked notifications. May be None.
     last_checked = ndb.DateTimeProperty(default=None)
 
-    @classmethod
-    def get_subscribed_explorations_by_id(
-            cls,
-            exp_ids, page_size,
-            urlsafe_start_cursor):
-        query = cls.query(cls.activity_ids.IN(exp_ids)).order(cls._key)
-        return cls._fetch_page_sorted_by_last_updated(
-            query, page_size, urlsafe_start_cursor)
-
 
 class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
     """A list of recent changes corresponding to things a user subscribes to.
