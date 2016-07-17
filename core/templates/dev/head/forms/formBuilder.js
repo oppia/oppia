@@ -930,7 +930,7 @@ oppia.directive('textAngularRte', [
           };
 
           $scope.stripFormatting = function(html) {
-            return $filter('sanitizeHtmlForRte')(html);
+            return html ? String(html).replace(/<[^>]+>/gm, '') : '';
           };
 
           $scope.init = function() {
