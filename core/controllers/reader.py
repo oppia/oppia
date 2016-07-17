@@ -509,10 +509,6 @@ class RatingHandler(base.BaseHandler):
         user_rating = self.payload.get('user_rating')
         rating_services.assign_rating_to_exploration(
             self.user_id, exploration_id, user_rating)
-
-        event_services.RateExplorationEventHandler.record(
-            exploration_id, self.user_id, user_rating)
-
         self.render_json({})
 
 

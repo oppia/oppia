@@ -442,6 +442,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
     exploration_id = ndb.StringProperty(indexed=True)
     # Value of rating assigned
     rating = ndb.FloatProperty(indexed=True)
+    old_rating = ndb.FloatProperty(indexed=True)
     # The version of the event schema used to describe an event of this type.
     # Details on the schema are given in the docstring for this class.
     event_schema_version = ndb.IntegerProperty(
@@ -456,14 +457,15 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
             user_id))
 
     @classmethod
-    def create(cls, exp_id, user_id, rating):
+    def create(cls, exp_id, user_id, rating, old_rating):
         """Creates a new rate exploration event."""
         entity_id = cls.get_new_event_entity_id(
             exp_id, user_id)
         cls(id=entity_id,
             event_type=feconf.EVENT_TYPE_RATE_EXPLORATION,
             exploration_id=exp_id,
-            rating=rating).put()
+            rating=rating,
+            old_rating=old_rating).put()
 
 
 class StateHitEventLogEntryModel(base_models.BaseModel):

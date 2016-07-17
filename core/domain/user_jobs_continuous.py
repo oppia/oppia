@@ -295,7 +295,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
     def _handle_incoming_event(cls, active_realtime_layer, event_type, *args):
         exp_id = args[0]
 
-        def _refresh_average_ratings(user_id, rating):
+        def _refresh_average_ratings(user_id, rating, old_rating):
             realtime_class = cls._get_realtime_datastore_class()
             realtime_model_id = realtime_class.get_realtime_id(
                 active_realtime_layer, user_id)
@@ -308,14 +308,17 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
             else:
                 num_ratings = model.num_ratings
                 average_ratings = model.average_ratings
+                num_ratings += 1
                 if average_ratings is not None:
-                    model.average_ratings = (
-                        (average_ratings * num_ratings + rating)/
-                        (num_ratings + 1)
-                    )
+                    ratings_value = (
+                        average_ratings * (num_ratings - 1) + rating)
+                    if old_rating is not None:
+                        ratings_value -= old_rating
+                        num_ratings -= 1
+                    model.average_ratings = (ratings_value/num_ratings * 1.0)
                 else:
                     model.average_ratings = rating
-                model.num_ratings += 1
+                model.num_ratings = num_ratings
                 model.put()
 
         def _increment_total_plays_count(user_id):
@@ -341,8 +344,9 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
 
                 if event_type == feconf.EVENT_TYPE_RATE_EXPLORATION:
                     rating = args[2]
+                    old_rating = args[3]
                     transaction_services.run_in_transaction(
-                        _refresh_average_ratings, user_id, rating)
+                        _refresh_average_ratings, user_id, rating, old_rating)
 
     # Public query method.
     @classmethod
