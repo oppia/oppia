@@ -22,7 +22,7 @@ oppia.controller('Splash', [
   function($scope, $timeout, $window, siteAnalyticsService,
     UrlInterpolationService) {
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-    $scope.getSubjectsImageUrl = function(subjectName) {
+    $scope.getStaticSubjectImageUrl = function(subjectName) {
       return UrlInterpolationService.getStaticImageUrl('/subjects/' +
         subjectName + '.svg');
     };

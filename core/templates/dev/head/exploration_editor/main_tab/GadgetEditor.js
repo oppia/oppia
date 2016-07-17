@@ -19,10 +19,10 @@
 // Controls adding, deleting and updating gadgets.
 oppia.controller('GadgetEditor', [
   '$scope', '$modal', '$log', 'editorContextService',
-  'explorationGadgetsService', 'GADGET_SPECS',
+  'explorationGadgetsService', 'GADGET_SPECS', 'UrlInterpolationService',
   function(
       $scope, $modal, $log, editorContextService,
-      explorationGadgetsService, GADGET_SPECS) {
+      explorationGadgetsService, GADGET_SPECS, UrlInterpolationService) {
     $scope.GADGET_SPECS = GADGET_SPECS;
 
     $scope.$on('gadgetsChangedOrInitialized', function() {
@@ -35,7 +35,7 @@ oppia.controller('GadgetEditor', [
       $scope.activeStateName = currentStateName;
     });
 
-    $scope.extensionResourcePrefix = GLOBALS.ASSET_DIR_PREFIX;
+    $scope.getGadgetImgUrl = UrlInterpolationService.getGadgetImgUrl;
 
     $scope.refreshGadgetsInfo = function() {
       $scope.gadgets = explorationGadgetsService.getGadgets();

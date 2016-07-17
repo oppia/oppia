@@ -23,7 +23,7 @@ oppia.controller('Profile', [
     UrlInterpolationService) {
     var profileDataUrl = '/profilehandler/data/' + GLOBALS.PROFILE_USERNAME;
     var DEFAULT_PROFILE_PICTURE_URL = UrlInterpolationService.getStaticImageUrl(
-          '/general/no_profile_picture.png');
+      '/general/no_profile_picture.png');
 
     $scope.getLocaleDateString = function(millisSinceEpoch) {
       return oppiaDatetimeFormatter.getLocaleDateString(millisSinceEpoch);

@@ -20,8 +20,6 @@ import shutil
 import subprocess
 import sys
 
-# TODO(gvishal): Import utils
-# import utils
 
 # ensure_directory_exists method trims file paths passed to it. Hence, directory
 # paths require a trailing slash.
@@ -131,8 +129,7 @@ def _build_files():
 
 
 if __name__ == '__main__':
-    # TODO(gvishal): get this cache slug somehow, unable to import the module.
-    # CACHE_SLUG = utils.get_cache_slug()
+    # Update this.
     CACHE_SLUG = 'default'
     BUILD_DIR = os.path.join('build', CACHE_SLUG)
 
@@ -150,11 +147,14 @@ if __name__ == '__main__':
     copy_files_source_to_target(
         THIRD_PARTY_GENERATED_SRC_DIR, THIRD_PARTY_GENERATED_OUT_DIR)
 
+    # Process extensions, copy it to build/[cache_slug]/extensions
+    EXTENSIONS_SRC_DIR = os.path.join('extensions', '')
+    EXTENSIONS_OUT_DIR = os.path.join(BUILD_DIR, 'extensions', '')
+    copy_files_source_to_target(EXTENSIONS_SRC_DIR, EXTENSIONS_OUT_DIR)
+
     _build_files()
 
     # Process core/templates/prod/head/css, copy it to build/[cache_slug]/css
     CSS_SRC_DIR = os.path.join('core', 'templates', 'prod', 'head', 'css', '')
     CSS_OUT_DIR = os.path.join(BUILD_DIR, 'css', '')
     copy_files_source_to_target(CSS_SRC_DIR, CSS_OUT_DIR)
-
-    # TODO(gvishal): copy extensions to build.

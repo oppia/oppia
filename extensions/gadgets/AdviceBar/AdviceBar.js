@@ -30,9 +30,13 @@ oppia.directive('oppiaGadgetAdviceBar', [
       restrict: 'E',
       templateUrl: 'gadget/AdviceBar',
       controller: [
-        '$scope', '$attrs', '$modal', function($scope, $attrs, $modal) {
+        '$scope', '$attrs', '$modal', 'UrlInterpolationService',
+        function($scope, $attrs, $modal, UrlInterpolationService) {
           $scope.adviceBarResources = oppiaHtmlEscaper.escapedJsonToObj(
             $attrs.adviceObjectsWithValue);
+
+          $scope.getExtensionResourceUrl = (
+            UrlInterpolationService.getExtensionResourceUrl);
 
           $scope.overlayAdviceModal = function(adviceResourceIndex) {
             $modal.open({
@@ -65,6 +69,5 @@ oppia.controller('AdviceBarModalCtrl', [
   function($scope, adviceTitle, adviceHtml) {
     $scope.adviceTitle = adviceTitle;
     $scope.adviceHtml = adviceHtml;
-    $scope.extensionResourcePrefix = GLOBALS.ASSET_DIR_PREFIX;
   }
 ]);

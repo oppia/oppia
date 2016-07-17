@@ -233,8 +233,10 @@ oppia.directive('oppiaInteractiveLogicProof', [
           $modal.open({
             templateUrl: 'modals/logicProofHelp',
             backdrop: true,
-            controller: ['$scope', '$modalInstance',
-              function($scope, $modalInstance) {
+            controller: ['$scope', '$modalInstance', 'UrlInterpolationService',
+              function($scope, $modalInstance, UrlInterpolationService) {
+                $scope.getExtensionResourceUrl = (
+                  UrlInterpolationService.getExtensionResourceUrl);
                 $scope.close = function() {
                   $modalInstance.close();
                 };

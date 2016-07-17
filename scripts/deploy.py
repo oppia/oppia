@@ -57,12 +57,13 @@ IMPORTANT NOTES:
 import argparse
 import datetime
 import os
+import random
 import shutil
+import string
 import subprocess
 # pylint: enable=wrong-import-order
 
 import common
-import utils
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
@@ -92,6 +93,10 @@ DEPLOY_DATA_PATH = os.path.join(os.getcwd(), '..', 'deploy_data', APP_NAME)
 FILES_AT_ROOT_IN_COMMON = ['favicon.ico', 'robots.txt']
 COMMON_DIRS = ['general']
 IMAGE_DIRS = ['avatar', 'general', 'sidebar', 'logo']
+
+# Denotes length for cache slug used in production mode. It consists of
+# lowercase alphanumeric characters.
+CACHE_SLUG_PROD_LENGTH = 6
 
 
 def preprocess_release():
@@ -132,7 +137,8 @@ def preprocess_release():
     # Copies files in common/images to assets/common/images
     for dir_name in COMMON_DIRS:
         src_dir = os.path.join(DEPLOY_DATA_PATH, 'common', 'images', dir_name)
-        dst_dir = os.path.join(os.getcwd(), 'assets', 'common', 'images', dir_name)
+        dst_dir = os.path.join(os.getcwd(), 'assets', 'common', 'images',
+                               dir_name)
 
         if not os.path.exists(src_dir):
             raise Exception(
@@ -166,8 +172,6 @@ def _execute_deployment():
     # Check that the current directory is correct.
     common.require_cwd_to_be_oppia()
 
-    update_cache_slug()
-
     current_git_revision = subprocess.check_output(
         ['git', 'rev-parse', 'HEAD']).strip()
 
@@ -200,6 +204,7 @@ def _execute_deployment():
         print 'Preprocessing release...'
         preprocess_release()
 
+        update_cache_slug()
         # Do a build; ensure there are no errors.
         print 'Building and minifying scripts...'
         subprocess.check_output(['python', 'scripts/build.py'])
@@ -232,17 +237,24 @@ def _execute_deployment():
     print 'Done!'
 
 
+def get_unique_id():
+    """Returns a unique id."""
+    unique_id = ''.join(random.choice(string.ascii_lowercase + string.digits)
+                        for _ in range(CACHE_SLUG_PROD_LENGTH))
+    return unique_id
+
+
 def update_cache_slug():
     """Updates the cache slug in cache_slug.yaml"""
-    cache_slug = utils.get_unique_id()
+    cache_slug = get_unique_id()
 
     # Change the cache slug in cache_slug.yaml.
-    f = open('cache_slug.yaml', 'r')
-    content = f.read()
+    with open('cache_slug.yaml', 'r') as f:
+        content = f.read()
     os.remove('cache_slug.yaml')
     content = content.replace('default', cache_slug)
-    d = open('cache_slug.yaml', 'w+')
-    d.write(content)
+    with open('cache_slug.yaml', 'w+') as d:
+        d.write(content)
 
 
 if __name__ == '__main__':

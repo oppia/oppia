@@ -24,6 +24,28 @@ oppia.factory('UrlInterpolationService', ['alertsService',
     return (typeof value === 'string') || (value instanceof String);
   };
 
+  var validateResourcePath = function(resourcePath) {
+    if (!resourcePath) {
+      alertsService.fatalWarning(
+        'Empty path passed in method.');
+      return null;
+    }
+
+    var RESOURCE_PATH_STARTS_WITH_FORWARD_SLASH = /^\//;
+    // Ensure that resourcePath starts with a forward slash.
+    if (!resourcePath.match(RESOURCE_PATH_STARTS_WITH_FORWARD_SLASH)) {
+      alertsService.fatalWarning(
+        'Path must start with \'\/\': \'' + new String(resourcePath) +
+        '\'.');
+      return null;
+    }
+  };
+
+  var getCachePrefixedUrl = function(resourcePath) {
+    validateResourcePath(resourcePath);
+    return GLOBALS.ASSET_DIR_PREFIX + resourcePath;
+  };
+
   return {
     /**
      * Given a formatted URL, interpolates the URL by inserting values the URL
@@ -121,45 +143,7 @@ oppia.factory('UrlInterpolationService', ['alertsService',
      * prefixing the appropriate cache_slug to it.
      */
     getStaticResourceUrl: function(resourcePath) {
-      if (!resourcePath) {
-        alertsService.fatalWarning(
-          'Empty resource path passed in getStaticResourceUrl.');
-        return null;
-      }
-
-      var RESOURCE_PATH_STARTS_WITH_FORWARD_SLASH = /^\//;
-      // Ensure that resourcePath starts with a forward slash.
-      if (!resourcePath.match(RESOURCE_PATH_STARTS_WITH_FORWARD_SLASH)) {
-        alertsService.fatalWarning(
-          'Resource path passed into getStaticResourceUrl must start with' +
-          '\'\/\': \'' + new String(resourcePath) + '\'.');
-        return null;
-      }
-
-      return GLOBALS.ASSET_DIR_PREFIX + resourcePath;
-    },
-
-    /**
-     * Given a domain url and resource path, returns the complete url path
-     * to that resource prefixing the appropriate cache_slug to it.
-     */
-    getCompleteStaticResourceUrl: function(domainUrl, resourcePath) {
-      if (!resourcePath) {
-        alertsService.fatalWarning(
-          'Empty resource path passed in getCompleteStaticResourceUrl.');
-        return null;
-      }
-
-      var RESOURCE_PATH_STARTS_WITH_FORWARD_SLASH = /^\//;
-      // Ensure that resourcePath starts with a forward slash.
-      if (!resourcePath.match(RESOURCE_PATH_STARTS_WITH_FORWARD_SLASH)) {
-        alertsService.fatalWarning(
-          'Resource path passed into getCompleteStaticResourceUrl must start' +
-          'with \'\/\': \'' + new String(resourcePath) + '\'.');
-        return null;
-      }
-
-      return domainUrl + GLOBALS.ASSET_DIR_PREFIX + resourcePath;
+      return getCachePrefixedUrl(resourcePath);
     },
 
     /**
@@ -167,22 +151,8 @@ oppia.factory('UrlInterpolationService', ['alertsService',
      * prefixing the appropriate cache_slug to it.
      */
     getStaticImageUrl: function(imagePath) {
-      if (!imagePath) {
-        alertsService.fatalWarning(
-          'Empty image path passed in getStaticImageUrl.');
-        return null;
-      }
-
-      var IMAGE_PATH_STARTS_WITH_FORWARD_SLASH = /^\//;
-      // Ensure that imagePath starts with a forward slash.
-      if (!imagePath.match(IMAGE_PATH_STARTS_WITH_FORWARD_SLASH)) {
-        alertsService.fatalWarning(
-          'Image path passed into getStaticImageUrl must start with \'\/\': ' +
-          '\'' + new String(imagePath) + '\'.');
-        return null;
-      }
-
-      return GLOBALS.ASSET_DIR_PREFIX + '/assets/images' + imagePath;
+      validateResourcePath(imagePath);
+      return getCachePrefixedUrl('/assets/images' + imagePath);
     },
 
     /**
@@ -190,23 +160,16 @@ oppia.factory('UrlInterpolationService', ['alertsService',
      * extension resource, prefixing the appropriate cache_slug to it.
      */
     getExtensionResourceUrl: function(extensionResourcePath) {
-      if (!extensionResourcePath) {
-        alertsService.fatalWarning(
-          'Empty extension resource path passed in getExtensionResourceUrl.');
-        return null;
-      }
+      return getCachePrefixedUrl(extensionResourcePath);
+    },
 
-      var EXTENSION_RESOURCE_PATH_CHECK = /^\//;
-      // Ensure that extensionResourcePath starts with a forward slash.
-      if (!extensionResourcePath.match(EXTENSION_RESOURCE_PATH_CHECK)) {
-        alertsService.fatalWarning(
-          'Extension resource path passed into getExtensionResourceUrl' +
-          'must start with \'\/\': ' +
-          '\'' + new String(extensionResourcePath) + '\'.');
-        return null;
-      }
-
-      return GLOBALS.ASSET_DIR_PREFIX + extensionResourcePath;
+    /**
+     * Given a gadget type, returns the complete url path to that
+     * gadget type image, prefixing the appropriate cache_slug to it.
+     */
+    getGadgetImgUrl: function(gadgetType) {
+      return getCachePrefixedUrl('/extensions/gadgets/' + gadgetType +
+        '/static/images/' + gadgetType + '.png');
     },
 
     /**
@@ -214,8 +177,8 @@ oppia.factory('UrlInterpolationService', ['alertsService',
      * image for the interaction, prefixing the appropriate cache_slug to it.
      */
     getInteractionThumbnailImageUrl: function(interactionId) {
-      return GLOBALS.ASSET_DIR_PREFIX + '/extensions/interactions/' +
-        interactionId + '/static/' + interactionId + '.png';
+      return getCachePrefixedUrl('/extensions/interactions/' +
+        interactionId + '/static/' + interactionId + '.png');
     }
   };
 }]);

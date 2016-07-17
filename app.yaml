@@ -37,7 +37,8 @@ handlers:
   static_dir: assets/common
   secure: always
   http_headers:
-    # TODO(gvishal): set an appropriate time for this.
+    # WARNING TO DEVELOPERS: Files in this folder may be stale for
+    # up to an hour after a code release.
     Cache-Control: 'public, max-age=3600'
 - url: /assets
   static_dir: assets

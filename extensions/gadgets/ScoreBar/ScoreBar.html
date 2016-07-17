@@ -1,5 +1,4 @@
-<link rel="stylesheet" type="text/css" ng-href="<[extensionResourcePrefix]>/extensions/gadgets/ScoreBar/static/css/scoreBar.css">
-
 <script type="text/ng-template" id="gadget/ScoreBar">
+  <link rel="stylesheet" type="text/css" ng-href="<[getExtensionResourceUrl('/extensions/gadgets/ScoreBar/static/css/scoreBar.css')]>">
   <progressbar class="scorebar-progressbar protractor-test-scorebar-progressbar" max="maxValue" value="getScoreValue()"><span class="scorebar-label protractor-test-scorebar-label"><[scoreBarLabel]></span></progressbar>
 </script>

@@ -81,7 +81,7 @@ oppia.config([
     .registerAvailableLanguageKeys(
       availableLanguageKeys, availableLanguageKeysMap)
     .useStaticFilesLoader({
-      prefix: GLOBALS.ASSET_DIR_PREFIX + '/assets/i18n' + '/',
+      prefix: GLOBALS.ASSET_DIR_PREFIX + '/assets/i18n/',
       suffix: '.json'
     })
     // The use of default translation improves the loading time when English is

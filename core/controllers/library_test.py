@@ -195,12 +195,12 @@ class CategoryConfigTest(test_utils.GenericTestBase):
         # Test that an icon exists for each default category.
         for category in all_categories:
             utils.get_file_contents(os.path.join(
-                self.get_cache_slug_filepath(), 'assets', 'images', 'subjects',
-                '%s.svg' % category.replace(' ', '')))
+                self.get_static_asset_filepath(), 'assets', 'images',
+                'subjects', '%s.svg' % category.replace(' ', '')))
 
         # Test that the default icon exists.
         utils.get_file_contents(os.path.join(
-            self.get_cache_slug_filepath(), 'assets', 'images', 'subjects',
+            self.get_static_asset_filepath(), 'assets', 'images', 'subjects',
             '%s.svg' % feconf.DEFAULT_THUMBNAIL_ICON))
 
 

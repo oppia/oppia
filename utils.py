@@ -464,7 +464,6 @@ def get_cache_slug():
     """
     global CACHE_SLUG # pylint: disable=global-statement
     if CACHE_SLUG is None:
-        # pylint: disable=redefined-outer-name
         if feconf.DEV_MODE and not feconf.IS_MINIFIED:
             # Defines the cache slug to be used in development mode. It must be
             # an empty string.
@@ -482,10 +481,3 @@ def get_asset_dir_prefix():
     if feconf.IS_MINIFIED or not feconf.DEV_MODE:
         asset_dir_prefix = '/build/%s' % asset_dir_prefix
     return asset_dir_prefix
-
-
-def get_unique_id():
-    """Returns a unique id."""
-    unique_id = ''.join(random.choice(string.ascii_lowercase + string.digits)
-                        for _ in range(feconf.CACHE_SLUG_PROD_LENGTH))
-    return unique_id

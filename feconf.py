@@ -40,10 +40,6 @@ if PLATFORM == 'gae':
 else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
 
-# Denotes length for cache slug used in production mode. It consists of
-# lowercase alphanumeric characters.
-CACHE_SLUG_PROD_LENGTH = 6
-
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')

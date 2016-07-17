@@ -208,29 +208,29 @@ describe('URL Interpolation Service', function() {
 
   it('should interpolate correct imagePath', function() {
     expect(uis.getStaticImageUrl('/test_url/')).toBe(
-      GLOBALS.ASSET_DIR_PREFIX + '/assets/images' + '/test_url/');
+      GLOBALS.ASSET_DIR_PREFIX + '/assets/images/test_url/');
     expect(uis.getStaticImageUrl('/test_url/test.png')).toBe(
-      GLOBALS.ASSET_DIR_PREFIX + '/assets/images' + '/test_url/test.png');
+      GLOBALS.ASSET_DIR_PREFIX + '/assets/images/test_url/test.png');
   });
 
   it('should throw an error for empty imagePath', function() {
     expect(uis.getStaticImageUrl.bind(null, null)).toThrow(
       new Error(
-        'Empty image path passed in getStaticImageUrl.'));
+        'Empty path passed in method.'));
     expect(uis.getStaticImageUrl.bind(null, '')).toThrow(
       new Error(
-        'Empty image path passed in getStaticImageUrl.'));
+        'Empty path passed in method.'));
   });
 
   it('should throw an error for imagePath not beginning with forward slash',
     function() {
       expect(uis.getStaticImageUrl.bind(null, 'test_url_fail')).toThrow(
         new Error(
-          'Image path passed into getStaticImageUrl must start with \'\/\': ' +
-          '\'' + new String('test_url_fail') + '\'.'));
+          'Path must start with \'\/\': \'' + new String('test_url_fail') +
+          '\'.'));
       expect(uis.getStaticImageUrl.bind(null, 'test_url/fail.png')).toThrow(
         new Error(
-          'Image path passed into getStaticImageUrl must start with \'\/\': ' +
-          '\'' + new String('test_url/fail.png') + '\'.'));
+          'Path must start with \'\/\': \'' + new String('test_url/fail.png') +
+          '\'.'));
     });
 });

@@ -1,7 +1,5 @@
-<!-- TODO(gvishal): Find the appropriate service to define extensionResourcePrefix -->
-<link rel="stylesheet" type="text/css" ng-href="<[extensionResourcePrefix]>/extensions/interactions/MusicNotesInput/static/css/musicNotesInput.css">
-
 <script type="text/ng-template" id="interaction/MusicNotesInput">
+  <link rel="stylesheet" type="text/css" ng-href="<[getExtensionResourceUrl('/extensions/interactions/MusicNotesInput/static/css/musicNotesInput.css')]>">
   <div class="music-notes-input-container">
     <div class="oppia-music-input-valid-note-area">
       <button type="button" class="btn btn-default oppia-music-input-btn oppia-music-input-play-btn"

@@ -466,8 +466,8 @@ class TestBase(unittest.TestCase):
                 obj_type, new_param_dict)
         return new_param_dict
 
-    def get_cache_slug_filepath(self):
-        """Returns cache slug filepath for referencing files on disk.
+    def get_static_asset_filepath(self):
+        """Returns filepath for referencing static files on disk.
         examples: '' or 'build/1234'
         """
         cache_slug = utils.get_cache_slug()
@@ -483,7 +483,7 @@ class TestBase(unittest.TestCase):
         corresponding cache slug. asset_suffix should have a leading
         slash.
         """
-        return '%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
+        return '/assets%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
 
 
     @contextlib.contextmanager

@@ -18,12 +18,15 @@
 
 oppia.controller('Preferences', [
   '$scope', '$http', '$rootScope', '$modal', '$timeout', '$translate',
-  'alertsService',
+  'alertsService', 'UrlInterpolationService',
   function(
-      $scope, $http, $rootScope, $modal, $timeout, $translate, alertsService) {
+      $scope, $http, $rootScope, $modal, $timeout, $translate, alertsService,
+      UrlInterpolationService) {
     var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
     $rootScope.loadingMessage = 'Loading';
     $scope.profilePictureDataUrl = '';
+
+    $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
     var _saveDataItem = function(updateType, data) {
       $http.put(_PREFERENCES_DATA_URL, {
