@@ -438,11 +438,13 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
 
     # Which specific type of event this is
     event_type = ndb.StringProperty(indexed=True)
-    # Id of exploration currently being played.
+    # Id of exploration which has been rated.
     exploration_id = ndb.StringProperty(indexed=True)
     # Value of rating assigned
-    rating = ndb.FloatProperty(indexed=True)
-    old_rating = ndb.FloatProperty(indexed=True)
+    rating = ndb.IntegerProperty(indexed=True)
+    # Value of rating previously assigned by the same user. Will be None when a
+    # user rates an exploration for the first time.
+    old_rating = ndb.IntegerProperty(indexed=True)
     # The version of the event schema used to describe an event of this type.
     # Details on the schema are given in the docstring for this class.
     event_schema_version = ndb.IntegerProperty(
