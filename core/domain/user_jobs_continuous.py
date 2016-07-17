@@ -340,7 +340,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                         _increment_total_plays_count, user_id)
 
                 if event_type == feconf.EVENT_TYPE_RATE_EXPLORATION:
-                    rating = args[1]
+                    rating = args[2]
                     transaction_services.run_in_transaction(
                         _refresh_average_ratings, user_id, rating)
 

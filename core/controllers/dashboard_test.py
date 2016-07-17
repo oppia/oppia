@@ -117,12 +117,12 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
         for ind, user_id in enumerate(user_ids):
             if is_record:
-                rating_services.assign_rating_to_exploration(
-                    user_id, exp_id, ratings[ind])
-            else:
                 event_services.RateExplorationEventHandler.record(
                     exp_id, user_id, ratings[ind])
-        self.process_and_flush_pending_tasks()
+            else:
+                rating_services.assign_rating_to_exploration(
+                    user_id, exp_id, ratings[ind])
+            self.process_and_flush_pending_tasks()
 
     def _run_user_stats_aggregator_job(self):
         (user_jobs_continuous_test.ModifiedUserStatsAggregator.
@@ -420,11 +420,71 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         self.assertEqual(len(response['explorations_list']), 2)
 
         user_model_1 = user_models.UserStatsModel.get(self.owner_id_1)
-        self.assertEquals(user_model_1.total_plays, 4)
+        self.assertEquals(user_model_1.total_plays, 5)
         self.assertEquals(
             user_model_1.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
         self.assertEquals(user_model_1.num_ratings, 2)
-        self.assertEquals(user_model_1.average_ratings, 2.5)
+        self.assertEquals(user_model_1.average_ratings, 4)
+        self.logout()
+
+    def test_realtime_layer_batch_job_no_ratings_plays(self):
+        self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
+
+        self.login(self.OWNER_EMAIL_1)
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['explorations_list']), 1)
+
+        expected_results = {
+            'total_plays': 0,
+            'num_ratings': 0,
+            'average_ratings': None
+        }
+
+        # Fetch and verify stats before even running the stats aggregator job.
+        user_stats = (
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.owner_id_1))
+        self.assertEquals(
+            user_stats['total_plays'], expected_results['total_plays'])
+        self.assertEquals(
+            user_stats['num_ratings'], expected_results['num_ratings'])
+        self.assertEquals(
+            user_stats['average_ratings'], expected_results['average_ratings'])
+
+        self._run_stats_aggregator_jobs()
+
+        # Fetch and verify stats after the stats aggregator job has been run.
+        user_stats = (
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.owner_id_1))
+        self.assertEquals(
+            user_stats['total_plays'], expected_results['total_plays'])
+        self.assertEquals(
+            user_stats['num_ratings'], expected_results['num_ratings'])
+        self.assertEquals(
+            user_stats['average_ratings'], expected_results['average_ratings'])
+        self.logout()
+
+
+    def test_realtime_layer_batch_job_single_rating(self):
+        self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
+
+        self.login(self.OWNER_EMAIL_1)
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['explorations_list']), 1)
+
+        self._rate_exploration(self.EXP_ID_1, [4], is_record=True)
+
+        self._run_stats_aggregator_jobs()
+
+        user_stats = (
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.owner_id_1))
+        self.assertEquals(user_stats['total_plays'], 0)
+        self.assertEquals(user_stats['num_ratings'], 1)
+        self.assertEquals(user_stats['average_ratings'], 4)
         self.logout()
 
     def test_realtime_layer_batch_job_single_exploration_one_owner(self):
@@ -436,7 +496,6 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         self.assertEqual(len(response['explorations_list']), 1)
 
         exp_id = self.EXP_ID_1
-
         exp_version = self.EXP_DEFAULT_VERSION
         state = exploration.init_state_name
 
@@ -446,14 +505,13 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
 
         self._run_stats_aggregator_jobs()
 
-        user_model = user_models.UserStatsModel.get(self.owner_id_1)
-        self.assertEquals(user_model.total_plays, 1)
-        self.assertEquals(
-            user_model.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
-        self.assertEquals(user_model.num_ratings, 2)
-        self.assertEquals(user_model.average_ratings, 3.5)
+        user_stats = (
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.owner_id_1))
+        self.assertEquals(user_stats['total_plays'], 2)
+        self.assertEquals(user_stats['num_ratings'], 2)
+        self.assertEquals(user_stats['average_ratings'], 3.5)
         self.logout()
-
 
     def test_realtime_layer_batch_job_single_exploration_multiple_owners(self):
         exploration = self.save_new_default_exploration(
@@ -473,62 +531,71 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
 
         self._record_start(exp_id, exp_version, state)
         self._record_start(exp_id, exp_version, state)
-        self._run_stats_aggregator_jobs()
-
         self._rate_exploration(exp_id, [3, 4, 5], is_record=True)
+
+        self._run_stats_aggregator_jobs()
         self.logout()
 
         self.login(self.OWNER_EMAIL_2)
         response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
 
-        self._rate_exploration(exp_id, [3, 4, 5], is_record=True)
+        self._rate_exploration(exp_id, [1, 5, 4], is_record=True)
 
-        user_model_1 = user_models.UserStatsModel.get(
-            self.owner_id_1)
-        self.assertEquals(user_model_1.total_plays, 2)
-        self.assertEquals(
-            user_model_1.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
-        self.assertEquals(user_model_1.num_ratings, 3)
-        self.assertEquals(user_model_1.average_ratings, 4)
+        expected_results = {
+            'total_plays': 2,
+            'num_ratings': 6,
+            'average_ratings': 22/6.0
+        }
 
-        user_model_2 = user_models.UserStatsModel.get(
-            self.owner_id_2)
-        self.assertEquals(user_model_2.total_plays, 2)
+        user_stats_1 = (
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.owner_id_1))
         self.assertEquals(
-            user_model_2.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
-        self.assertEquals(user_model_2.num_ratings, 3)
-        self.assertEquals(user_model_2.average_ratings, 4)
+            user_stats_1['total_plays'], expected_results['total_plays'])
+        self.assertEquals(
+            user_stats_1['num_ratings'], expected_results['num_ratings'])
+        self.assertEquals(
+            user_stats_1['average_ratings'],
+            expected_results['average_ratings'])
+
+        user_stats_2 = (
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.owner_id_2))
+        self.assertEquals(
+            user_stats_2['total_plays'], expected_results['total_plays'])
+        self.assertEquals(
+            user_stats_2['num_ratings'], expected_results['num_ratings'])
+        self.assertEquals(
+            user_stats_2['average_ratings'],
+            expected_results['average_ratings'])
+
         self.logout()
 
     def test_realtime_layer_batch_job_multiple_explorations_one_owner(self):
-        exploration_1 = self.save_new_default_exploration(
+        self.save_new_default_exploration(
             self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
-
-        exploration_2 = self.save_new_default_exploration(
+        self.save_new_default_exploration(
             self.EXP_ID_2, self.owner_id_1, title=self.EXP_TITLE_2)
 
         self.login(self.OWNER_EMAIL_1)
         response = self.get_json(feconf.DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 2)
 
-        exp_version = self.EXP_DEFAULT_VERSION
-
         exp_id_1 = self.EXP_ID_1
-        state_1 = exploration_1.init_state_name
         exp_id_2 = self.EXP_ID_2
-        state_2 = exploration_2.init_state_name
 
         self._rate_exploration(exp_id_1, [4, 5, 2], is_record=True)
+        self._rate_exploration(exp_id_2, [5, 2], is_record=True)
 
         self._run_stats_aggregator_jobs()
 
-        user_model = user_models.UserStatsModel.get(self.owner_id_1)
-        self.assertEquals(user_model.total_plays, 0)
-        self.assertEquals(
-            user_model.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
-        self.assertEquals(user_model.num_ratings, 3)
-        self.assertEquals(user_model.average_ratings, 3.33)
+        user_stats = (
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.owner_id_1))
+        self.assertEquals(user_stats['total_plays'], 0)
+        self.assertEquals(user_stats['num_ratings'], 5)
+        self.assertEquals(user_stats['average_ratings'], 18/5.0)
         self.logout()
 
 
