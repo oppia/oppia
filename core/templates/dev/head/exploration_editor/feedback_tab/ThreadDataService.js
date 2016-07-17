@@ -27,6 +27,7 @@ oppia.factory('threadDataService', [
   var _SUGGESTION_ACTION_HANDLER_URL = '/suggestionactionhandler/' +
     _expId + '/';
   var _THREAD_HANDLER_PREFIX = '/threadhandler/' + _expId + '/';
+  var _FEEDBACK_MESSAGE_CLEAR = '/task/email/feedbackmessageclear';
   var _THREAD_STATUS_OPEN = 'open';
 
   // All the threads for this exploration. This is a list whose entries are
@@ -69,6 +70,11 @@ oppia.factory('threadDataService', [
         }
       }
     });
+    var payload = {
+      exploration_id: _expId,
+      thread_id: threadId
+    };
+    $http.post(_FEEDBACK_MESSAGE_CLEAR, payload);
   };
 
   return {

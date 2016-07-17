@@ -426,6 +426,8 @@ FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 FEEDBACK_MESSAGE_EMAIL_HANDLER_URL = (
     '%s/feedbackemailhandler' % EMAILS_TASK_PREFIX)
+FEEDBACK_MESSAGE_EMAIL_CLEAR_URL = (
+    '%s/feedbackmessageclear' % EMAILS_TASK_PREFIX)
 LIBRARY_INDEX_URL = '/library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
 LIBRARY_SEARCH_URL = '/search/find'

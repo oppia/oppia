@@ -391,6 +391,9 @@ def send_feedback_message_email(recipient_id, feedback_messages):
         log_new_error('This app cannot send feedback message emails to users.')
         return
 
+    if not feedback_messages:
+        return
+
     recipient_user_settings = user_services.get_user_settings(recipient_id)
 
     messages_html = ''

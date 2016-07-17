@@ -32,8 +32,6 @@ class ThreadListHandler(base.BaseHandler):
         self.values.update({
             'threads': [t.to_dict() for t in feedback_services.get_all_threads(
                 exploration_id, False)]})
-        feedback_services.update_feedback_message_references(
-            self.user_id, exploration_id)
         self.render_json(self.values)
 
     @base.require_user
@@ -250,3 +248,16 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
         transaction_services.run_in_transaction(
             feedback_services.pop_feedback_message_references, user_id,
             len(references))
+
+
+class FeedbackMessageClear(base.BaseHandler):
+    """Task for clearing feedback messages from email."""
+
+    @base.require_user
+    def post(self):
+        exploration_id = self.payload.get('exploration_id')
+        thread_id = self.payload.get('thread_id')
+        transaction_services.run_in_transaction(
+            feedback_services.clear_feedback_message_references, self.user_id,
+            exploration_id, thread_id)
+        self.render_json(self.values)

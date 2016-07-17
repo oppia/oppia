@@ -297,7 +297,7 @@ def get_feedback_message_references(user_id):
     model = feedback_models.UnsentFeedbackEmailModel.get(user_id, strict=False)
 
     if model is None:
-        # Model may not exist is user has already attended to feedback.
+        # Model may not exist if user has already attended to feedback.
         return []
 
     return [feedback_domain.FeedbackMessageReference(
@@ -358,12 +358,8 @@ def pop_feedback_message_references(user_id, references_length):
         enqueue_feedback_message_email_task(user_id)
 
 
-def update_feedback_message_references(user_id, exploration_id):
+def clear_feedback_message_references(user_id, exploration_id, thread_id):
     """Removes feedback message references associated with exploration."""
-    if not user_id:
-        # If user is not logged in this will be True.
-        return
-
     model = feedback_models.UnsentFeedbackEmailModel.get(user_id, strict=False)
     if model is None:
         # Model exists only if user has received feedback on exploration.
@@ -371,13 +367,14 @@ def update_feedback_message_references(user_id, exploration_id):
 
     updated_references = []
     for reference in model.feedback_message_references:
-        if exploration_id not in reference.values():
+        if (exploration_id not in reference.values() or
+                thread_id not in reference.values()):
             updated_references.append(reference)
 
     if not updated_references:
         # Allow task to process even if model is deleted. Email will not be
         # sent if model does not exist.
-        model.key.delete()
+        model.delete()
     else:
         model.feedback_message_references = updated_references
         model.put()
