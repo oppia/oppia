@@ -836,15 +836,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         return;
       }
 
-      explorationData.getLastSavedData().then(function(data) {
-        explorationData.getData().then(function(currentData) {
-          if (data.version > currentData.version) {
-            autosaveInfoModalsService.showVersionMismatchModal(
-              changeListService.getChangeList());
-            return;
-          }
-        });
-
+      explorationData.getData().then(function(data) {
         var oldStates = data.states;
         var newStates = explorationStatesService.getStates();
         var diffGraphData = ExplorationDiffService.getDiffGraphData(
@@ -931,7 +923,17 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
         modalInstance.result.then(function(commitMessage) {
           _modalIsOpen = false;
-          saveDraftToBackend(commitMessage);
+          saveDraftToBackend(commitMessage, function() {
+            explorationData.getLastSavedData().then(function(data) {
+              explorationData.getData().then(function(currentData) {
+                if (data.version > currentData.version) {
+                  autosaveInfoModalsService.showVersionMismatchModal(
+                    changeListService.getChangeList());
+                  return;
+                }
+              });
+            });
+          });
         }, function() {
           _modalIsOpen = false;
         });
