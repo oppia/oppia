@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block subtitle %}
+  Contact
+{% endblock subtitle %}
+
+{% block header_js %}
+  {{ super() }}
+
+  <style>
+    html, body {
+      background-color: #eee;
+    }
+  </style>
+{% endblock %}
+
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      Donate
+    </li>
+  </ul>
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+  <div class="oppia-page-card oppia-about-content">
+    <div class="oppia-about-card-content-wide">
+      <h2>Donate to The Oppia Foundation!</h2>
+      <br>
+      <div style="text-align: center">
+        <img src="/images/general/donate.png" style="height: 250px;
+          text-align: center;">
+      </div>
+      <p>
+        In 2012, Sean Lip was a software engineer at Google who missed the
+        teaching he used to do while completing his doctorate at the University
+        of Cambridge. He saw that the online education tools of the time were
+        mostly recorded faces on a screen, missing the feedback and evaluation
+        that teachers used to work their magic in the classroom. He dreamt of a
+        tool that could not only improve the education of students around the
+        world, but also improve the quality of teaching both online and off.
+        That was the beginning of the Oppia project.
+      </p>
+      <p>
+        Since then, Oppia has grown into an educational platform with 145,000
+        users and 5,500 explorations, thanks to the contributions of 110 people
+        from 20 countries around the world. This entirely open source project
+        is supported through The Oppia Foundation, a 501(c)(3) non-profit
+        organization directed by Sean, Amit Deutsch, and Jacob Davis. We’ve
+        become a community of  coders, designers, writers, students, and teachers
+        that are bonded in one common mission: help anyone learn anything. We’re
+        proud that we’ve expanded while staying true to our values of community
+        ownership, diversity, and student participation.
+      </p>
+      <p>
+        The Oppia.org site and the learning material on it are entirely free,
+        thanks to the efforts of our team of  volunteers from around the world.
+        Donations to The Oppia Foundation will help us to fund server costs,
+        marketing, and the distribution of learning material to students. Join
+        us in bringing the joys of teaching and learning to people everywhere.
+      </p>
+
+      <div style="text-align: center;">
+        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+          <input type="hidden" name="cmd" value="_s-xclick">
+          <input type="hidden" name="hosted_button_id" value="UWKTY87SYU766">
+          <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif"
+            border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+          <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif"
+            width="1" height="1">
+        </form>
+      </div>
+      <p>
+        Thank you for your support!
+      </p>
+    </div>
+  </div>
+{% endblock %}
+
+{% block footer%}
+  {% include 'footer.html' %}
+{% endblock %}

@@ -84,8 +84,6 @@ oppia.directive('collectionNodeCreator', [function() {
           // Create a new exploration with the given title.
           $http.post('/contributehandler/create_new', {
             title: title
-          }, {
-            requestIsForCreateExploration: true
           }).then(function(response) {
             $scope.newExplorationTitle = '';
             var newExplorationId = response.data.explorationId;

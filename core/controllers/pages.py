@@ -80,6 +80,10 @@ class DonatePage(base.BaseHandler):
         })
         self.render_template('pages/donate.html')
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/develop
 class ForumPage(base.BaseHandler):
     """Page with an embedded forum."""
 

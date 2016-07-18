@@ -12,18 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Performance tests for the splash page."""
+"""Performance tests for the library page."""
 
 from core.tests.performance_tests import base
 from core.tests.performance_tests import test_config
 
 
-class SplashPagePerformanceTest(base.TestBase):
-    """Performance tests for the splash page."""
-    PAGE_KEY = test_config.PAGE_KEY_SPLASH
+class LibraryPagePerformanceTest(base.TestBase):
+    """Performance tests for the library page."""
+    PAGE_KEY = test_config.PAGE_KEY_LIBRARY
 
     def setUp(self):
-        super(SplashPagePerformanceTest, self).setUp()
+        super(LibraryPagePerformanceTest, self).setUp()
 
         page_config = test_config.TEST_DATA[self.PAGE_KEY]
         self._set_page_config(page_config)
