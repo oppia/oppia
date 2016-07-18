@@ -80,10 +80,19 @@ class DonatePage(base.BaseHandler):
         })
         self.render_template('pages/donate.html')
 
-<<<<<<< HEAD
-=======
 
->>>>>>> upstream/develop
+class ThanksPage(base.BaseHandler):
+    """Page that thanks people who donate to Oppia."""
+
+    def get(self):
+        """Handles GET requests."""
+        self.values.update({
+            'meta_description': feconf.THANKS_PAGE_DESCRIPTION,
+            'nav_mode': feconf.NAV_MODE_THANKS,
+        })
+        self.render_template('pages/thanks.html')
+
+
 class ForumPage(base.BaseHandler):
     """Page with an embedded forum."""
 
