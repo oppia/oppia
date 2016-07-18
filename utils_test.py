@@ -196,16 +196,16 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_get_asset_dir_prefix_returns_correct_slug(self):
 
         with self.swap(feconf, 'DEV_MODE', True):
-            utils.CACHE_SLUG = None
+            utils.ASSET_DIR_PREFIX = None
             cache_slug = utils.get_asset_dir_prefix()
             self.assertEqual('', cache_slug)
 
         with self.swap(feconf, 'DEV_MODE', False):
-            utils.CACHE_SLUG = None
+            utils.ASSET_DIR_PREFIX = None
             cache_slug = utils.get_asset_dir_prefix()
             self.assertTrue(cache_slug.startswith('/build'))
 
         with self.swap(feconf, 'IS_MINIFIED', True):
-            utils.CACHE_SLUG = None
+            utils.ASSET_DIR_PREFIX = None
             cache_slug = utils.get_asset_dir_prefix()
             self.assertTrue(cache_slug.startswith('/build'))

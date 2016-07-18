@@ -457,10 +457,11 @@ class TestBase(unittest.TestCase):
         """Returns filepath for referencing static files on disk.
         examples: '' or 'build/1234'
         """
-        cache_slug = utils.get_cache_slug()
-        if feconf.DEV_MODE and not feconf.IS_MINIFIED:
-            cache_slug_filepath = cache_slug
-        else:
+        cache_slug_filepath = ''
+        if feconf.IS_MINIFIED or not feconf.DEV_MODE:
+            yaml_file_content = utils.dict_from_yaml(
+                utils.get_file_contents('cache_slug.yaml'))
+            cache_slug = yaml_file_content['cache_slug']
             cache_slug_filepath = os.path.join('build', cache_slug)
 
         return cache_slug_filepath

@@ -456,28 +456,18 @@ def unescape_encoded_uri_component(escaped_string):
     return urllib.unquote(escaped_string).decode('utf-8')
 
 
-CACHE_SLUG = None
-def get_cache_slug():
-    """Returns appropriate cache slug depending whether dev or prod. It is used
-    as a prefix in urls for images, css and script files. It is also used in
-    backend_tests to verify the presence of static resources.
+ASSET_DIR_PREFIX = None
+def get_asset_dir_prefix():
+    """Returns prefix for asset directory depending whether dev or prod.
+    It is used as a prefix in urls for images, css and script files.
     """
-    global CACHE_SLUG # pylint: disable=global-statement
-    if CACHE_SLUG is None:
-        if feconf.DEV_MODE and not feconf.IS_MINIFIED:
-            # Defines the cache slug to be used in development mode. It must be
-            # an empty string.
-            CACHE_SLUG = ''
-        else:
+    global ASSET_DIR_PREFIX # pylint: disable=global-statement
+    if ASSET_DIR_PREFIX is None:
+        ASSET_DIR_PREFIX = ''
+        if feconf.IS_MINIFIED or not feconf.DEV_MODE:
             yaml_file_content = dict_from_yaml(
                 get_file_contents('cache_slug.yaml'))
-            CACHE_SLUG = yaml_file_content['cache_slug']
+            cache_slug = yaml_file_content['cache_slug']
+            ASSET_DIR_PREFIX = '/build/%s' % cache_slug
 
-    return CACHE_SLUG
-
-
-def get_asset_dir_prefix():
-    asset_dir_prefix = get_cache_slug()
-    if feconf.IS_MINIFIED or not feconf.DEV_MODE:
-        asset_dir_prefix = '/build/%s' % asset_dir_prefix
-    return asset_dir_prefix
+    return ASSET_DIR_PREFIX

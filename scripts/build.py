@@ -19,6 +19,7 @@ import re
 import shutil
 import subprocess
 import sys
+import yaml
 
 
 # ensure_directory_exists method trims file paths passed to it. Hence, directory
@@ -128,9 +129,17 @@ def _build_files():
                 process_js(source_path, target_path)
 
 
+def get_cache_slug():
+    """Returns the cache slug read from file."""
+    with open('cache_slug.yaml', 'r') as f:
+        content = f.read()
+    retrieved_dict = yaml.safe_load(content)
+    assert isinstance(retrieved_dict, dict)
+    return retrieved_dict['cache_slug']
+
+
 if __name__ == '__main__':
-    # Update this.
-    CACHE_SLUG = 'default'
+    CACHE_SLUG = get_cache_slug()
     BUILD_DIR = os.path.join('build', CACHE_SLUG)
 
     # Process assets, copy it to build/[cache_slug]/assets
