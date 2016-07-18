@@ -216,6 +216,10 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
         payload = json.loads(self.request.body)
         user_id = payload['user_id']
         references = feedback_services.get_feedback_message_references(user_id)
+        if not references:
+            # Model may not exist if user has already attended to the feedback.
+            return
+
         transaction_services.run_in_transaction(
             feedback_services.update_feedback_email_retries, user_id)
 
@@ -244,3 +248,18 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
         transaction_services.run_in_transaction(
             feedback_services.pop_feedback_message_references, user_id,
             len(references))
+
+
+class FeedbackThreadViewEventHandler(base.BaseHandler):
+    """Records when the given user views a feedback thread, in order to clear
+    viewed feedback messages from emails that might be sent in future to this
+    user."""
+
+    @base.require_user
+    def post(self):
+        exploration_id = self.payload.get('exploration_id')
+        thread_id = self.payload.get('thread_id')
+        transaction_services.run_in_transaction(
+            feedback_services.clear_feedback_message_references, self.user_id,
+            exploration_id, thread_id)
+        self.render_json(self.values)

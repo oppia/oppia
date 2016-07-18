@@ -758,3 +758,24 @@ class FeedbackMessageEmailHandlerTests(test_utils.GenericTestBase):
             self.assertEqual(
                 messages[0].body.decode(),
                 expected_email_text_body)
+
+    def test_that_emails_are_not_sent_if_already_seen(self):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                self.exploration.id, 'a_state_name',
+                self.new_user_id, 'a subject', 'some text')
+
+            threadlist = feedback_services.get_all_threads(
+                self.exploration.id, False)
+            thread_id = threadlist[0].get_thread_id()
+
+            self.login(self.EDITOR_EMAIL)
+            csrf_token = self.get_csrf_token_from_response(
+                self.testapp.get('/create/%s' % self.exploration.id))
+            self.post_json('%s' % feconf.FEEDBACK_THREAD_VIEW_EVENT_URL, {
+                'exploration_id': self.exploration.id,
+                'thread_id': thread_id}, csrf_token)
+
+            self.process_and_flush_pending_tasks()
+            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            self.assertEqual(len(messages), 0)
