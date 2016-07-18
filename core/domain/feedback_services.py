@@ -379,10 +379,10 @@ def clear_feedback_message_references(user_id, exploration_id, thread_id):
         # Note that, since the task in the queue is not deleted, the following
         # scenario may occur: If creator attends to arrived feedback bedore
         # email is sent then model will be deleted but task will still execute
-        # after its countdown. Arrival new feedback arrives before task is
-        # executed will create new model and task. But actual email will be sent
-        # by first task. It means that email may be sent just after a few
-        # minutes of feedback's arrival.
+        # after its countdown. Arrival of new feedback (before task is executed)
+        # will create new model and task. But actual email will be sent by first
+        # task. It means that email may be sent just after a few minutes of
+        # feedback's arrival.
 
         # In PR #2261, we decided to leave things as they are for now, since it
         # looks like the obvious solution of keying tasks by user id doesn't

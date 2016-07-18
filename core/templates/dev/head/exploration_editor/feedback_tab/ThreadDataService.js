@@ -70,11 +70,6 @@ oppia.factory('threadDataService', [
         }
       }
     });
-    var payload = {
-      exploration_id: _expId,
-      thread_id: threadId
-    };
-    $http.post(_FEEDBACK_THREAD_VIEW_EVENT_URL, payload);
   };
 
   return {
@@ -107,6 +102,12 @@ oppia.factory('threadDataService', [
       }, function() {
         _openThreadsCount -= 1;
         alertsService.addWarning('Error creating new thread.');
+      });
+    },
+    markThreadAsSeen: function(threadId) {
+      $http.post(_FEEDBACK_THREAD_VIEW_EVENT_URL, {
+        exploration_id: _expId,
+        thread_id: threadId
       });
     },
     addNewMessage: function(
