@@ -359,7 +359,7 @@ def pop_feedback_message_references(user_id, references_length):
 
 
 def clear_feedback_message_references(user_id, exploration_id, thread_id):
-    """Removes feedback message references associated with exploration."""
+    """Removes feedback message references associated with a feedback thread."""
     model = feedback_models.UnsentFeedbackEmailModel.get(user_id, strict=False)
     if model is None:
         # Model exists only if user has received feedback on exploration.
@@ -367,13 +367,26 @@ def clear_feedback_message_references(user_id, exploration_id, thread_id):
 
     updated_references = []
     for reference in model.feedback_message_references:
-        if (exploration_id not in reference.values() or
-                thread_id not in reference.values()):
+        if (reference['exploration_id'] != exploration_id or
+                reference['thread_id'] != thread_id):
             updated_references.append(reference)
 
     if not updated_references:
-        # Allow task to process even if model is deleted. Email will not be
-        # sent if model does not exist.
+        # Note that any tasks remaining in the email queue will still be
+        # processed, but if the model for the given user does not exist,
+        # no email will be sent.
+
+        # Note that, since the task in the queue is not deleted, the following
+        # scenario may occur: If creator attends to arrived feedback bedore
+        # email is sent then model will be deleted but task will still execute
+        # after its countdown. Arrival new feedback arrives before task is
+        # executed will create new model and task. But actual email will be sent
+        # by first task. It means that email may be sent just after a few
+        # minutes of feedback's arrival.
+
+        # In PR #2261, we decided to leave things as they are for now, since it
+        # looks like the obvious solution of keying tasks by user id doesn't
+        # work (see #2258). However, this may be worth addressing in the future.
         model.delete()
     else:
         model.feedback_message_references = updated_references

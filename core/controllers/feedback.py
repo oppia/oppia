@@ -250,8 +250,10 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
             len(references))
 
 
-class FeedbackMessageClear(base.BaseHandler):
-    """Task for clearing feedback messages from email."""
+class FeedbackThreadViewEventHandler(base.BaseHandler):
+    """Records when the given user views a feedback thread, in order to clear
+    viewed feedback messages from emails that might be sent in future to this
+    user."""
 
     @base.require_user
     def post(self):

@@ -772,7 +772,7 @@ class FeedbackMessageEmailHandlerTests(test_utils.GenericTestBase):
             self.login(self.EDITOR_EMAIL)
             csrf_token = self.get_csrf_token_from_response(
                 self.testapp.get('/create/%s' % self.exploration.id))
-            self.post_json('%s' % feconf.FEEDBACK_MESSAGE_EMAIL_CLEAR_URL, {
+            self.post_json('%s' % feconf.FEEDBACK_THREAD_VIEW_EVENT_URL, {
                 'exploration_id': self.exploration.id,
                 'thread_id': thread_id}, csrf_token)
 
