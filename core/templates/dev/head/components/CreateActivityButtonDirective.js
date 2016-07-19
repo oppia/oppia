@@ -47,13 +47,10 @@ oppia.directive('createActivityButton', [function() {
 
           $scope.creationInProgress = true;
 
-          if (!GLOBALS.can_create_collections) {
-            ExplorationCreationService.createNewExploration();
-            return;
-          }
-
           if (urlService.getPathname() !== '/dashboard') {
             $window.location.replace('/dashboard?mode=create');
+          } else if (!GLOBALS.can_create_collections) {
+            ExplorationCreationService.createNewExploration();
           } else {
             $modal.open({
               templateUrl: 'modals/createActivity',
@@ -86,7 +83,11 @@ oppia.directive('createActivityButton', [function() {
         // open the create modal immediately (or redirect to the exploration
         // editor if the create modal does not need to be shown).
         if (urlService.getUrlParams().mode === 'create') {
-          $scope.initCreationProcess();
+          if (!GLOBALS.can_create_collections) {
+            ExplorationCreationService.createNewExploration();
+          } else {
+            $scope.initCreationProcess();
+          }
         }
       }
     ]
