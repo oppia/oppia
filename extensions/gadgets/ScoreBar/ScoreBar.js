@@ -21,12 +21,13 @@
  */
 
 oppia.directive('oppiaGadgetScoreBar', [
-  'oppiaHtmlEscaper', 'LearnerParamsService', 'UrlInterpolationService',
-  function(oppiaHtmlEscaper, LearnerParamsService, UrlInterpolationService) {
+  'oppiaHtmlEscaper', 'LearnerParamsService',
+  function(oppiaHtmlEscaper, LearnerParamsService) {
     return {
       restrict: 'E',
       templateUrl: 'gadget/ScoreBar',
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
+      controller: ['$scope', '$attrs', 'UrlInterpolationService',
+      function($scope, $attrs, UrlInterpolationService) {
         $scope.getExtensionResourceUrl = (
           UrlInterpolationService.getExtensionResourceUrl);
         $scope.scoreBarLabel = oppiaHtmlEscaper.escapedJsonToObj(
