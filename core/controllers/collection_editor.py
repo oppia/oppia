@@ -138,7 +138,7 @@ class CollectionEditorPage(CollectionEditorHandler):
         self.render_template('collection_editor/collection_editor.html')
 
 
-class WritableCollectionDataHandler(CollectionEditorHandler):
+class EditableCollectionDataHandler(CollectionEditorHandler):
     """A data handler for collections which supports writing."""
 
     def _require_valid_version(self, version_from_payload, collection_version):
@@ -153,6 +153,44 @@ class WritableCollectionDataHandler(CollectionEditorHandler):
                 'Trying to update version %s of collection from version %s, '
                 'which is too old. Please reload the page and try again.'
                 % (collection_version, version_from_payload))
+    
+    @require_editor
+    def get(self, collection_id):
+        """Populates the data on the individual collection page."""
+
+        collection = (
+                collection_services.get_collection_by_id(collection_id))
+        
+        if (collection is None or
+                not rights_manager.Actor(self.user_id).can_view(
+                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id)):
+            self.redirect('/')
+            return
+
+        can_edit = (
+            bool(self.user_id) and
+            self.username not in config_domain.BANNED_USERNAMES.value and
+            rights_manager.Actor(self.user_id).can_edit(
+                feconf.ACTIVITY_TYPE_COLLECTION, collection_id))
+
+        self.values.update({
+            'can_edit': can_edit,
+            'can_unpublish': rights_manager.Actor(
+                self.user_id).can_unpublish(
+                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id),
+            'collection_id': collection.id,
+            'is_private': rights_manager.is_collection_private(collection_id),
+            'nav_mode': feconf.NAV_MODE_CREATE,
+            'title': collection.title,
+            'SHOW_COLLECTION_NAVIGATION_TAB_HISTORY': (
+                feconf.SHOW_COLLECTION_NAVIGATION_TAB_HISTORY),
+            'SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK': (
+                feconf.SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK),
+            'SHOW_COLLECTION_NAVIGATION_TAB_STATS': (
+                feconf.SHOW_COLLECTION_NAVIGATION_TAB_STATS)
+        })
+
+        self.render_template(self.values)
 
     @require_editor
     def put(self, collection_id):
