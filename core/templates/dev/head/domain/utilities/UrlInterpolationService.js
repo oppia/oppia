@@ -168,6 +168,11 @@ oppia.factory('UrlInterpolationService', ['alertsService',
      * gadget type image, prefixing the appropriate cache_slug to it.
      */
     getGadgetImgUrl: function(gadgetType) {
+      if (!gadgetType) {
+        alertsService.fatalWarning(
+          'Empty gadgetType passed in getGadgetImgUrl.');
+        return null;
+      }
       return getCachePrefixedUrl('/extensions/gadgets/' + gadgetType +
         '/static/images/' + gadgetType + '.png');
     },
@@ -177,6 +182,11 @@ oppia.factory('UrlInterpolationService', ['alertsService',
      * image for the interaction, prefixing the appropriate cache_slug to it.
      */
     getInteractionThumbnailImageUrl: function(interactionId) {
+      if (!interactionId) {
+        alertsService.fatalWarning(
+          'Empty interactionId passed in getInteractionThumbnailImageUrl.');
+        return null;
+      }
       return getCachePrefixedUrl('/extensions/interactions/' +
         interactionId + '/static/' + interactionId + '.png');
     }

@@ -85,7 +85,6 @@ def get_jinja_env(dir_path):
         return '%s%s%s' % (
             domain_url, utils.get_asset_dir_prefix(), resource_suffix)
 
-
     env.globals['include_js_file'] = include_js_file
     env.globals['get_static_resource_url'] = get_static_resource_url
     env.globals['get_complete_static_resource_url'] = (
