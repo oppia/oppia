@@ -310,12 +310,12 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                 average_ratings = model.average_ratings
                 num_ratings += 1
                 if average_ratings is not None:
-                    ratings_value = (
+                    sum_of_ratings = (
                         average_ratings * (num_ratings - 1) + rating)
                     if old_rating is not None:
-                        ratings_value -= old_rating
+                        sum_of_ratings -= old_rating
                         num_ratings -= 1
-                    model.average_ratings = (ratings_value/num_ratings * 1.0)
+                    model.average_ratings = sum_of_ratings/(num_ratings * 1.0)
                 else:
                     model.average_ratings = rating
                 model.num_ratings = num_ratings
@@ -342,7 +342,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                     transaction_services.run_in_transaction(
                         _increment_total_plays_count, user_id)
 
-                if event_type == feconf.EVENT_TYPE_RATE_EXPLORATION:
+                elif event_type == feconf.EVENT_TYPE_RATE_EXPLORATION:
                     rating = args[2]
                     old_rating = args[3]
                     transaction_services.run_in_transaction(
@@ -364,14 +364,14 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
         num_ratings = 0
         average_ratings = None
 
-        ratings_value = 0
+        sum_of_ratings = 0
 
         mr_model = user_models.UserStatsModel.get(user_id, strict=False)
         if mr_model is not None:
             total_plays += mr_model.total_plays
             num_ratings += mr_model.num_ratings
             if mr_model.average_ratings is not None:
-                ratings_value += (
+                sum_of_ratings += (
                     mr_model.average_ratings * mr_model.num_ratings)
 
         realtime_model = cls._get_realtime_datastore_class().get(
@@ -381,11 +381,11 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
             total_plays += realtime_model.total_plays
             num_ratings += realtime_model.num_ratings
             if realtime_model.average_ratings is not None:
-                ratings_value += (
+                sum_of_ratings += (
                     realtime_model.average_ratings * realtime_model.num_ratings)
 
         if num_ratings > 0:
-            average_ratings = ratings_value / float(num_ratings)
+            average_ratings = sum_of_ratings / float(num_ratings)
 
         return {
             'total_plays': total_plays,
