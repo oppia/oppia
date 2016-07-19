@@ -39,13 +39,19 @@ oppia.directive('createActivityButton', [function() {
           return false;
         };
 
-        $scope.showCreationChoiceModal = function() {
+        $scope.initCreationProcess = function() {
           // Without this, the modal keeps reopening when the window is resized.
           if ($scope.creationInProgress) {
             return;
           }
 
           $scope.creationInProgress = true;
+
+          if (!GLOBALS.can_create_collections) {
+            ExplorationCreationService.createNewExploration();
+            return;
+          }
+
           if (urlService.getPathname() !== '/dashboard') {
             $window.location.replace('/dashboard?mode=create');
           } else {
@@ -77,9 +83,10 @@ oppia.directive('createActivityButton', [function() {
         };
 
         // If the user clicked on a 'create' button to get to the dashboard,
-        // open the create modal immediately.
+        // open the create modal immediately (or redirect to the exploration
+        // editor if the create modal does not need to be shown).
         if (urlService.getUrlParams().mode === 'create') {
-          $scope.showCreationChoiceModal();
+          $scope.initCreationProcess();
         }
       }
     ]
