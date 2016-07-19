@@ -98,6 +98,10 @@ handlers:
   login: admin
   script: main_cron.app
   secure: always
+- url: /task/.*
+  login: admin
+  script: main_taskqueue.app
+  secure: always
 - url: /.*
   script: main.app
   secure: always
