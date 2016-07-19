@@ -407,7 +407,7 @@ ALLOW_YAML_FILE_UPLOAD = False
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
-COLLECTION_WRITABLE_DATA_URL_PREFIX = '/collection_editor_handler/data'
+COLLECTION_EDITABLE_DATA_URL_PREFIX = '/collection_editor_handler/data'
 COLLECTION_RIGHTS_PREFIX = '/collection_editor_handler/rights'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
