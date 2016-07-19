@@ -35,6 +35,7 @@ from core.domain import rights_manager
 from core.platform import models
 import feconf
 import main
+import main_taskqueue
 import utils
 
 from google.appengine.api import apiproxy_stub
@@ -610,12 +611,18 @@ class AppEngineTestBase(TestBase):
                     from google.appengine.ext import deferred
                     deferred.run(task.payload)
                 else:
-                    # All other tasks are expected to be mapreduce ones.
+                    # All other tasks are expected to be mapreduce ones, or
+                    # Oppia-taskqueue-related ones.
                     headers = {
                         key: str(val) for key, val in task.headers.iteritems()
                     }
                     headers['Content-Length'] = str(len(task.payload or ''))
-                    response = self.testapp.post(
+
+                    app = (
+                        webtest.TestApp(main_taskqueue.app)
+                        if task.url.startswith('/task')
+                        else self.testapp)
+                    response = app.post(
                         url=str(task.url), params=(task.payload or ''),
                         headers=headers)
                     if response.status_code != 200:
