@@ -318,7 +318,7 @@ oppia.controller('StateResponses', [
                   maxSelectionCount === 1) {
         var numChoices = $scope.getAnswerChoices().length;
         choiceRules = [];
-        for (var i = 0; i < numChoices; i++) {
+        for (var i = 0; i < answerGroups.length; i++) {
           choiceRules.push(false);
         }
 
@@ -356,7 +356,6 @@ oppia.controller('StateResponses', [
             }
           }
         }
-
         for (var l = 0; l < numChoices; l++) {
           answerChoices.push($scope.getAnswerChoices()[l].label);
         }

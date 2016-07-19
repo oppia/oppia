@@ -115,6 +115,34 @@ oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
           });
         }
       }
+      // For situations where max choices is 1,
+      // ensure that number of answers matches number of choices
+      if (maxAllowedCount === 1 && answerGroups.length > numChoices) {
+        warningsList.push({
+          type: WARNING_TYPES.ERROR,
+          message: (
+            'Please ensure that the number of choices and answers match.')
+        });
+      }
+      // For situations where max choices is 1,
+      // ensure that containsAtLeastOneOf only handles one option
+      if (maxAllowedCount === 1) {
+        for (var i = 0; i < answerGroups.length; i++) {
+          var ruleSpecs = answerGroups[i].rule_specs;
+          for (var j = 0; j < ruleSpecs.length; j++) {
+            for (var k = 0; k < ruleSpecs[j].inputs.x.length; k++) {
+              if (ruleSpecs[j].rule_type === 'ContainsAtLeastOneOf' &&
+                  ruleSpecs[j].inputs.x.length > 1) {
+                warningsList.push({
+                  type: WARNING_TYPES.ERROR,
+                  message: (
+                    'Please ensure that you only match one answer choice.')
+                });
+              }
+            }
+          }
+        }
+      }
 
       return warningsList;
     };
