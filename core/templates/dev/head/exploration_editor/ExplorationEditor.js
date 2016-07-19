@@ -35,7 +35,7 @@ oppia.controller('ExplorationEditor', [
   'explorationParamSpecsService', 'explorationParamChangesService',
   'explorationWarningsService', '$templateCache', 'explorationContextService',
   'explorationAdvancedFeaturesService', '$modal', 'changeListService',
-  'autosaveInfoModalsService', 'UrlInterpolationService',
+  'autosaveInfoModalsService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
       explorationData, editorContextService, explorationTitleService,
@@ -47,7 +47,7 @@ oppia.controller('ExplorationEditor', [
       explorationParamSpecsService, explorationParamChangesService,
       explorationWarningsService, $templateCache, explorationContextService,
       explorationAdvancedFeaturesService, $modal, changeListService,
-      autosaveInfoModalsService, UrlInterpolationService) {
+      autosaveInfoModalsService) {
     $scope.editabilityService = editabilityService;
     $scope.editorContextService = editorContextService;
 
@@ -345,7 +345,8 @@ oppia.controller('ExplorationEditor', [
         templateUrl: 'modals/welcomeExploration',
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', function($scope, $modalInstance) {
+          '$scope', '$modalInstance', 'UrlInterpolationService',
+          function($scope, $modalInstance, UrlInterpolationService) {
             $scope.beginTutorial = $modalInstance.close;
 
             $scope.cancel = function() {
@@ -571,7 +572,9 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         backdrop: true,
         controller: [
           '$scope', '$modalInstance', 'explorationContextService',
-          function($scope, $modalInstance, explorationContextService) {
+          'UrlInterpolationService',
+          function($scope, $modalInstance, explorationContextService,
+            UrlInterpolationService) {
             $scope.congratsImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/general/congrats.svg');
             $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (

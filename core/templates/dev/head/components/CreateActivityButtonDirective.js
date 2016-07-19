@@ -23,11 +23,9 @@ oppia.directive('createActivityButton', [function() {
     controller: [
       '$scope', '$timeout', '$window', '$modal', 'ExplorationCreationService',
       'CollectionCreationService', 'siteAnalyticsService', 'urlService',
-      'UrlInterpolationService',
       function(
           $scope, $timeout, $window, $modal, ExplorationCreationService,
-          CollectionCreationService, siteAnalyticsService, urlService,
-          UrlInterpolationService) {
+          CollectionCreationService, siteAnalyticsService, urlService) {
         $scope.creationInProgress = false;
 
         $scope.showUploadExplorationModal = (
@@ -55,8 +53,8 @@ oppia.directive('createActivityButton', [function() {
               templateUrl: 'modals/createActivity',
               backdrop: true,
               controller: [
-                  '$scope', '$modalInstance',
-                  function($scope, $modalInstance) {
+                  '$scope', '$modalInstance', 'UrlInterpolationService',
+                  function($scope, $modalInstance, UrlInterpolationService) {
                 $scope.chooseExploration = function() {
                   ExplorationCreationService.createNewExploration();
                   $modalInstance.close();
