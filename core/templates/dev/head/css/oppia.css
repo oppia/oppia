@@ -2165,7 +2165,7 @@ md-card.oppia-dashboard-tile {
 .oppia-dashboard-list-view-item {
   background: #fff;
   margin: 20px 7.5px 0px 7.5px;
-  padding: 10px 12.5px;
+  padding: 10px 20px;
 }
 
 .oppia-dashboard-table {
