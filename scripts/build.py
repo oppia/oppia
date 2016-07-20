@@ -94,7 +94,6 @@ def copy_files_source_to_target(source, target):
             print 'Processing %s' % os.path.join(root, directory)
 
         for filename in files:
-            print 'Processing %s' % filename
             source_path = os.path.join(root, filename)
             if source_path.find(target) > 0:
                 continue

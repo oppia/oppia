@@ -108,3 +108,16 @@ class JinjaUtilsUnitTests(test_utils.GenericTestBase):
         parsed_dict = jinja_utils.evaluate_object(orig_dict, {'b': 'c'})
         self.assertEqual(orig_dict, {'a': '{{b}}'})
         self.assertEqual(parsed_dict, {'a': 'c'})
+
+    def test_interpolate_cache_slug(self):
+        parsed_str = jinja_utils.parse_string(
+            '{{cache_slug}}', {'cache_slug': '/build/test'})
+        self.assertEqual(parsed_str, '/build/test')
+
+        parsed_str = jinja_utils.parse_string(
+            '{{cache_slug}}', {'cache_slug': ''})
+        self.assertEqual(parsed_str, '')
+
+        # cache slug parameter is missing.
+        parsed_str = jinja_utils.parse_string('{{cache_slug}}', {})
+        self.assertEqual(parsed_str, '')
