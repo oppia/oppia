@@ -286,41 +286,40 @@ class DashboardStatisticsTest(test_utils.GenericTestBase):
         self.assertEquals(user_model.average_ratings, 4)
         self.logout()
 
-    # def test_multiple_plays_and_ratings_for_multiple_explorations(self):
-    #     exploration_1 = self.save_new_default_exploration(
-    #         self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
+    def test_multiple_plays_and_ratings_for_multiple_explorations(self):
+        exploration_1 = self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
+        exploration_2 = self.save_new_default_exploration(
+            self.EXP_ID_2, self.owner_id_1, title=self.EXP_TITLE_2)
 
-    #     exploration_2 = self.save_new_default_exploration(
-    #         self.EXP_ID_2, self.owner_id_1, title=self.EXP_TITLE_2)
+        self.login(self.OWNER_EMAIL_1)
+        response = self.get_json(feconf.DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['explorations_list']), 2)
 
-    #     self.login(self.OWNER_EMAIL_1)
-    #     response = self.get_json(feconf.DASHBOARD_DATA_URL)
-    #     self.assertEqual(len(response['explorations_list']), 2)
+        exp_version = self.EXP_DEFAULT_VERSION
 
-    #     exp_version = self.EXP_DEFAULT_VERSION
+        exp_id_1 = self.EXP_ID_1
+        state_1 = exploration_1.init_state_name
+        exp_id_2 = self.EXP_ID_2
+        state_2 = exploration_2.init_state_name
 
-    #     exp_id_1 = self.EXP_ID_1
-    #     state_1 = exploration_1.init_state_name
-    #     exp_id_2 = self.EXP_ID_2
-    #     state_2 = exploration_2.init_state_name
+        self._record_start(exp_id_1, exp_version, state_1)
+        self._record_start(exp_id_2, exp_version, state_2)
+        self._record_start(exp_id_2, exp_version, state_2)
 
-    #     self._record_start(exp_id_1, exp_version, state_1)
-    #     self._record_start(exp_id_2, exp_version, state_2)
-    #     self._record_start(exp_id_2, exp_version, state_2)
+        self._rate_exploration(exp_id_1, [4])
+        self._rate_exploration(exp_id_2, [3, 3])
 
-    #     self._rate_exploration(exp_id_1, [4, 1])
-    #     self._rate_exploration(exp_id_2, [3, 3])
+        self._run_stats_aggregator_jobs()
+        self._run_user_stats_aggregator_job()
 
-    #     self._run_stats_aggregator_jobs()
-    #     self._run_user_stats_aggregator_job()
-
-    #     user_model = user_models.UserStatsModel.get(self.owner_id_1)
-    #     self.assertEquals(user_model.total_plays, 3)
-    #     self.assertEquals(
-    #         user_model.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
-    #     self.assertEquals(user_model.num_ratings, 4)
-    #     self.assertEquals(user_model.average_ratings, 11/4.0)
-    #     self.logout()
+        user_model = user_models.UserStatsModel.get(self.owner_id_1)
+        self.assertEquals(user_model.total_plays, 3)
+        self.assertEquals(
+            user_model.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
+        self.assertEquals(user_model.num_ratings, 3)
+        self.assertEquals(user_model.average_ratings, 10/3.0)
+        self.logout()
 
     def test_stats_for_single_exploration_with_multiple_owners(self):
         exploration = self.save_new_default_exploration(
