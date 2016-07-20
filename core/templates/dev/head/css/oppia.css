@@ -1133,7 +1133,7 @@ textarea {
 
 .oppia-dashboard-aggregated-stats md-card {
   background: #fff;
-  margin: 0 auto 40px;
+  margin: 0 7.5px 40px 7.5px;
 }
 
 .oppia-dashboard-aggregated-stats .stats-card {
@@ -1168,6 +1168,7 @@ textarea {
   width: 200px;
 }
 .oppia-dashboard-tabs-active .oppia-dashboard-tabs-text {
+  margin-left: 7.5px;
   border-bottom: 4px solid #009688;
   color: #009688;
 }
@@ -1191,6 +1192,7 @@ textarea {
 
 .oppia-dashboard-tabs .list-card-view-toggle {
   margin-left: auto;
+  margin-right: 7.5px;
   width: auto;
 }
 
@@ -2162,9 +2164,8 @@ md-card.oppia-dashboard-tile {
 
 .oppia-dashboard-list-view-item {
   background: #fff;
-  margin: 20px auto 0;
+  margin: 20px 7.5px 0px 7.5px;
   padding: 10px 20px;
-  width: 100%;
 }
 
 .oppia-dashboard-table {
@@ -3645,8 +3646,8 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-activity-summary-tile.oppia-dashboard-card-view-item {
   height: 250px;
-  margin-left: 0;
-  margin-right: 15px;
+  margin-left: 7.5px;
+  margin-right: 7.5px;
   width: 184px;
 }
 
