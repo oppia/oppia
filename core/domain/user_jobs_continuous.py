@@ -533,20 +533,22 @@ class UserStatsMRJobManager(
             value['total_plays_for_owned_exp'] for value in values
             if value.get('total_plays_for_owned_exp'))
 
-        # Number of ratings for all explorations
-        num_ratings = sum(
-            value['num_ratings_for_owned_exp'] for value in values
-            if value.get('num_ratings_for_owned_exp'))
+        # Sum of ratings across all explorations
+        sum_of_ratings = 0
+        # Number of ratings across all explorations
+        num_ratings = 0
 
-        # Find the average of all average ratings
-        ratings = [value['average_rating_for_owned_exp'] for value in values
-                   if value.get('average_rating_for_owned_exp')]
+        for value in values:
+            if value.get('num_ratings_for_owned_exp'):
+                num_ratings += value['num_ratings_for_owned_exp']
+                sum_of_ratings += (
+                    value['average_rating_for_owned_exp'] * value['num_ratings_for_owned_exp'])  #pylint: disable=line-too-long
 
         mr_model = user_models.UserStatsModel.get_or_create(key)
         mr_model.impact_score = user_impact_score
         mr_model.total_plays = total_plays
         mr_model.num_ratings = num_ratings
-        if len(ratings) != 0:
-            average_ratings = (sum(ratings) / float(len(ratings)))
+        if sum_of_ratings != 0:
+            average_ratings = (sum_of_ratings / float(num_ratings))
             mr_model.average_ratings = average_ratings
         mr_model.put()
