@@ -428,6 +428,6 @@ class ExpSummaryModel(base_models.BaseModel):
     @classmethod
     def get_explorations_of_user(
             cls, user_id, page_size, urlsafe_start_cursor):
-        query = cls.query(cls.contributor_ids.IN([user_id])).order(cls._key)
+        query = cls.query(cls.contributor_ids.IN([user_id]))
         return cls._fetch_page_sorted_by_last_updated(
             query, page_size, urlsafe_start_cursor)

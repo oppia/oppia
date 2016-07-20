@@ -555,6 +555,21 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
     def _mock_get_current_date_as_string(self):
         return self.CURRENT_DATE_AS_STRING
 
+    def test_get_next_page_of_explorations(self):
+        explorations_list = []
+        for i in range(10):
+            exp_id = 'exp%d' % i
+            explorations_list.append(self.save_new_valid_exploration(
+                exp_id, self.owner_id, end_state_name='End'))
+
+        dashboard_explorations = (
+            user_services.get_next_page_of_explorations(self.owner_id)[0])
+
+        self.assertEquals(
+            len(dashboard_explorations),
+            feconf.DASHBOARD_EXPLORATIONS_PAGE_SIZE
+        )
+
     def test_get_user_dashboard_stats(self):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')

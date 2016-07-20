@@ -27,6 +27,12 @@ indexes:
 
 - kind: ExpSummaryModel
   properties:
+  - name: contributor_ids
+  - name: last_updated
+    direction: desc
+
+- kind: ExpSummaryModel
+  properties:
   - name: deleted
   - name: status
 
