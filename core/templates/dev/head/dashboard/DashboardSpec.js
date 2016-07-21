@@ -40,6 +40,7 @@ describe('Creator dashboard controller', function() {
       collectionsList: [],
       dashboardStats: {
         total_plays: 2,
+        num_ratings: 1,
         average_ratings: 3
       }
     };

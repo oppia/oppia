@@ -59,6 +59,7 @@ describe('Dashboard backend API service', function() {
       collections_list: [],
       dashboard_stats: {
         total_plays: 10,
+        num_ratings: 1,
         average_ratings: 4.0,
         total_open_feedback: 5
       }
