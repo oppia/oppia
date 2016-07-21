@@ -681,25 +681,6 @@ def get_user_impact_score(user_id):
         return 0
 
 
-def get_user_dashboard_stats(user_id):
-    """Return statistics for creator dashboard of a user.
-
-    total_plays, average_ratings
-    """
-    model = user_models.UserStatsModel.get(user_id, strict=False)
-
-    if model:
-        return {
-            'total_plays': model.total_plays or 0,
-            'average_ratings': model.average_ratings
-        }
-    else:
-        return {
-            'total_plays': 0,
-            'average_ratings': None
-        }
-
-
 def get_weekly_dashboard_stats(user_id):
     """Returns a list which contains the dashboard stats of a user,
     keyed by a datetime string.
@@ -713,12 +694,14 @@ def get_weekly_dashboard_stats(user_id):
     [
         {
             {{datetime_string_1}}: {
+                'num_ratings': (value),
                 'average_ratings': (value),
                 'total_plays': (value)
             }
         },
         {
             {{datetime_string_2}}: {
+                'num_ratings': (value),
                 'average_ratings': (value),
                 'total_plays': (value)
             }
@@ -746,6 +729,7 @@ def update_dashboard_stats_log(user_id):
 
     weekly_dashboard_stats = {
         get_current_date_as_string(): {
+            'num_ratings': model.num_ratings or 0,
             'average_ratings': model.average_ratings,
             'total_plays': model.total_plays or 0
         }

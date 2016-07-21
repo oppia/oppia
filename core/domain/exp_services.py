@@ -1152,6 +1152,10 @@ def _should_index(exp):
     return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
 
 
+def get_number_of_ratings(ratings):
+    return sum(ratings.values())
+
+
 def get_average_rating(ratings):
     """Returns the average rating of the ratings as a float. If there are no
     ratings, it will return 0.
@@ -1159,13 +1163,13 @@ def get_average_rating(ratings):
     rating_weightings = {'1': 1, '2': 2, '3': 3, '4': 4, '5': 5}
     if ratings:
         rating_sum = 0.0
-        number_of_ratings = 0.0
+        number_of_ratings = get_number_of_ratings(ratings)
+        if number_of_ratings == 0:
+            return 0
+
         for rating_value, rating_count in ratings.items():
             rating_sum += rating_weightings[rating_value] * rating_count
-            number_of_ratings += rating_count
-        if number_of_ratings > 0:
-            return rating_sum / number_of_ratings
-    return 0
+        return rating_sum / (number_of_ratings * 1.0)
 
 
 def get_scaled_average_rating(ratings):
@@ -1174,7 +1178,7 @@ def get_scaled_average_rating(ratings):
     95%.
     """
     # The following is the number of ratings.
-    n = sum(ratings.values())
+    n = get_number_of_ratings(ratings)
     if n == 0:
         return 0
     average_rating = get_average_rating(ratings)
