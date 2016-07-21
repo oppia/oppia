@@ -227,7 +227,6 @@ class DashboardHandler(base.BaseHandler):
             dashboard_stats['average_ratings'] = (
                 _round_average_ratings(dashboard_stats['average_ratings']))
 
-
         last_week_stats = (
             user_services.get_last_week_dashboard_stats(self.user_id))
         if last_week_stats and last_week_stats.get('average_ratings'):

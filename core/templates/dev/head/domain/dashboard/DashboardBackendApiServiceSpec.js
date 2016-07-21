@@ -66,6 +66,7 @@ describe('Dashboard backend API service', function() {
       last_week_stats: {
         total_plays: 2,
         average_ratings: 3.5,
+        num_ratings: 3,
         total_open_feedback: 1
       }
     };
