@@ -44,7 +44,7 @@ handlers:
   static_dir: assets
   secure: always
   http_headers:
-    Cache-Control: 'public, max-age=2592000'
+    Cache-Control: 'public, max-age=60'
 - url: /css
   # NB: not minified. TODO(sll): fix.
   static_dir: core/templates/dev/head/css

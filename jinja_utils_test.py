@@ -17,7 +17,9 @@
 # pylint: disable=relative-import
 
 from core.tests import test_utils
+import feconf
 import jinja_utils
+import utils
 
 
 class JinjaUtilsUnitTests(test_utils.GenericTestBase):
@@ -110,14 +112,31 @@ class JinjaUtilsUnitTests(test_utils.GenericTestBase):
         self.assertEqual(parsed_dict, {'a': 'c'})
 
     def test_interpolate_cache_slug(self):
-        parsed_str = jinja_utils.parse_string(
-            '{{cache_slug}}', {'cache_slug': '/build/test'})
-        self.assertEqual(parsed_str, '/build/test')
+        with self.swap(feconf, 'DEV_MODE', True):
+            utils.ASSET_DIR_PREFIX = None
+            cache_slug = utils.get_asset_dir_prefix()
+            parsed_str = jinja_utils.interpolate_cache_slug('{{cache_slug}}')
+            self.assertEqual(parsed_str, '%s' % cache_slug)
 
-        parsed_str = jinja_utils.parse_string(
-            '{{cache_slug}}', {'cache_slug': ''})
-        self.assertEqual(parsed_str, '')
+        with self.swap(feconf, 'DEV_MODE', False):
+            utils.ASSET_DIR_PREFIX = None
+            cache_slug = utils.get_asset_dir_prefix()
+            parsed_str = jinja_utils.interpolate_cache_slug('{{cache_slug}}')
+            self.assertEqual(parsed_str, '%s' % cache_slug)
+
+        with self.swap(feconf, 'IS_MINIFIED', True):
+            utils.ASSET_DIR_PREFIX = None
+            cache_slug = utils.get_asset_dir_prefix()
+            parsed_str = jinja_utils.interpolate_cache_slug('{{cache_slug}}')
+            self.assertEqual(parsed_str, '%s' % cache_slug)
+
+        cache_slug = utils.get_asset_dir_prefix()
+        parsed_str = jinja_utils.interpolate_cache_slug(
+            '{{cache_slug}}/test/test.css')
+        self.assertEqual(parsed_str, '%s/test/test.css' % cache_slug)
 
         # cache slug parameter is missing.
-        parsed_str = jinja_utils.parse_string('{{cache_slug}}', {})
-        self.assertEqual(parsed_str, '')
+        parsed_str = jinja_utils.interpolate_cache_slug(
+            '{{invalid_test}}/test/test.css')
+        self.assertEqual(parsed_str, '/test/test.css')
+

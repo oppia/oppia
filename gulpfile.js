@@ -106,11 +106,10 @@ var cssFilePaths = [];
 var jsFilePaths = [];
 var fontFolderPaths = [];
 var cssBackgroundFilepaths = [];
-// There is no cache slug for dev.
-var cacheSlugDev = '';
+
 var generatedTargetDir = path.join(
   'third_party', 'generated',
-  isMinificationNeeded ? 'prod' : cacheSlugDev);
+  isMinificationNeeded ? 'prod' : '');
 var generatedCssTargetDir = path.join(generatedTargetDir, 'css');
 var generatedJsTargetDir = path.join(generatedTargetDir, 'js');
 

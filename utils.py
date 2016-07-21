@@ -462,7 +462,7 @@ def get_asset_dir_prefix():
     It is used as a prefix in urls for images, css and script files.
     """
     global ASSET_DIR_PREFIX # pylint: disable=global-statement
-    if ASSET_DIR_PREFIX is None:
+    if not ASSET_DIR_PREFIX:
         ASSET_DIR_PREFIX = ''
         if feconf.IS_MINIFIED or not feconf.DEV_MODE:
             yaml_file_content = dict_from_yaml(

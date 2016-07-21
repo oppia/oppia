@@ -197,15 +197,15 @@ class UtilsTests(test_utils.GenericTestBase):
 
         with self.swap(feconf, 'DEV_MODE', True):
             utils.ASSET_DIR_PREFIX = None
-            cache_slug = utils.get_asset_dir_prefix()
-            self.assertEqual('', cache_slug)
+            asset_dir_prefix = utils.get_asset_dir_prefix()
+            self.assertEqual('', asset_dir_prefix)
 
         with self.swap(feconf, 'DEV_MODE', False):
             utils.ASSET_DIR_PREFIX = None
-            cache_slug = utils.get_asset_dir_prefix()
-            self.assertTrue(cache_slug.startswith('/build'))
+            asset_dir_prefix = utils.get_asset_dir_prefix()
+            self.assertTrue(asset_dir_prefix.startswith('/build'))
 
         with self.swap(feconf, 'IS_MINIFIED', True):
             utils.ASSET_DIR_PREFIX = None
-            cache_slug = utils.get_asset_dir_prefix()
-            self.assertTrue(cache_slug.startswith('/build'))
+            asset_dir_prefix = utils.get_asset_dir_prefix()
+            self.assertTrue(asset_dir_prefix.startswith('/build'))

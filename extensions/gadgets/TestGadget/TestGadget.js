@@ -31,7 +31,8 @@ oppia.directive('oppiaGadgetTestGadget', [
       restrict: 'E',
       templateUrl: 'gadget/TestGadget',
       controller: [
-        '$scope', '$attrs', '$modal', function($scope, $attrs, $modal) {
+        '$scope', '$attrs', '$modal', 'UrlInterpolationService',
+        function($scope, $attrs, $modal, UrlInterpolationService) {
           $scope.testGadgetAdviceResources = oppiaHtmlEscaper.escapedJsonToObj(
             $attrs.adviceObjectsWithValue);
 
@@ -53,9 +54,9 @@ oppia.directive('oppiaGadgetTestGadget', [
           $scope.overlayAdviceModal = function(adviceResourceIndex) {
             $modal.open({
               templateUrl: (
-                GLOBALS.ASSET_DIR_PREFIX +
-                '../extensions/gadgets/TestGadget/' +
-                'static/html/test_gadget_overlay.html'),
+                UrlInterpolationService.getExtensionResourceUrl(
+                '/extensions/gadgets/TestGadget/static/html/' +
+                'test_gadget_overlay.html')),
               controller: 'TestGadgetAdviceModalCtrl',
               backdrop: true,
               resolve: {
