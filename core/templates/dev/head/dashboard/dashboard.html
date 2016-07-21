@@ -151,7 +151,11 @@
                 <[exploration.num_views]>
               </td>
               <td ng-if="exploration.status !== 'private'">
-                <[exploration.num_total_threads]> (<[exploration.num_open_threads]> new)
+                <[exploration.num_total_threads]>
+                <a ng-if="exploration.num_open_threads != 0"
+                   ng-href="/create/<[exploration.id]>#/feedback">
+                  (<[exploration.num_open_threads]> new)
+                </a>
               </td>
               <td ng-if="exploration.status !== 'private'">
                 <[exploration.num_unresolved_answers]>

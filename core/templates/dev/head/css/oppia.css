@@ -131,6 +131,10 @@ body {
   max-width: 800px;
 }
 
+.oppia-dashboard-container a, .oppia-dashboard-container a:hover {
+  color: #009688;
+}
+
 .oppia-dashboard-container .exp-private-text {
   color: #aaa;
   font-style: italic;
