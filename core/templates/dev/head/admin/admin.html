@@ -218,21 +218,25 @@
           <h3>Jobs</h3>
           <h4>Current time: {{human_readable_current_time}}</h4>
           <h4>One-off jobs</h4>
-          <ul>
+          <table class="table table-striped">
             {% for job_spec in one_off_job_specs %}
-              <li>
-                {{job_spec.job_type}}
-                <button class="pull-right" ng-click="startNewJob('{{job_spec.job_type}}')">
-                  Start new job
-                </button>
-                {% if job_spec.is_queued_or_running %}
-                  <span class="oppia-serious-warning-text">
-                    <strong>(warning: an instance of this job type is already running)</strong>
-                  </span>
-                {% endif %}
-              </li>
+              <tr>
+                <td>
+                  {{job_spec.job_type}}
+                </td>
+                <td>
+                  <button class="pull-right" ng-click="startNewJob('{{job_spec.job_type}}')">
+                    Start new job
+                  </button>
+                  {% if job_spec.is_queued_or_running %}
+                    <span class="oppia-serious-warning-text">
+                      <strong>(warning: an instance of this job type is already running)</strong>
+                    </span>
+                  {% endif %}
+                </td>
+              </tr>
             {% endfor %}
-          </ul>
+          </table>
         </md-card>
 
         <md-card class="oppia-page-card oppia-long-text" ng-if="currentTab === TAB_JOBS" style="max-width: 900px">

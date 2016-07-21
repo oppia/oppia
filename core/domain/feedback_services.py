@@ -294,9 +294,10 @@ def get_feedback_message_references(user_id):
     user id. If the user id is invalid or there are no messages for this user,
     returns an empty list."""
 
-    model = feedback_models.UnsentFeedbackEmailModel.get(user_id)
+    model = feedback_models.UnsentFeedbackEmailModel.get(user_id, strict=False)
 
     if model is None:
+        # Model may not exist if user has already attended to feedback.
         return []
 
     return [feedback_domain.FeedbackMessageReference(
@@ -355,6 +356,41 @@ def pop_feedback_message_references(user_id, references_length):
             feedback_message_references=message_references)
         model.put()
         enqueue_feedback_message_email_task(user_id)
+
+
+def clear_feedback_message_references(user_id, exploration_id, thread_id):
+    """Removes feedback message references associated with a feedback thread."""
+    model = feedback_models.UnsentFeedbackEmailModel.get(user_id, strict=False)
+    if model is None:
+        # Model exists only if user has received feedback on exploration.
+        return
+
+    updated_references = []
+    for reference in model.feedback_message_references:
+        if (reference['exploration_id'] != exploration_id or
+                reference['thread_id'] != thread_id):
+            updated_references.append(reference)
+
+    if not updated_references:
+        # Note that any tasks remaining in the email queue will still be
+        # processed, but if the model for the given user does not exist,
+        # no email will be sent.
+
+        # Note that, since the task in the queue is not deleted, the following
+        # scenario may occur: If creator attends to arrived feedback bedore
+        # email is sent then model will be deleted but task will still execute
+        # after its countdown. Arrival of new feedback (before task is executed)
+        # will create new model and task. But actual email will be sent by first
+        # task. It means that email may be sent just after a few minutes of
+        # feedback's arrival.
+
+        # In PR #2261, we decided to leave things as they are for now, since it
+        # looks like the obvious solution of keying tasks by user id doesn't
+        # work (see #2258). However, this may be worth addressing in the future.
+        model.delete()
+    else:
+        model.feedback_message_references = updated_references
+        model.put()
 
 
 def add_message_to_email_buffer(author_id, exploration_id, thread_id,

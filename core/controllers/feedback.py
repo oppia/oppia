@@ -28,8 +28,6 @@ transaction_services = models.Registry.import_transaction_services()
 class ThreadListHandler(base.BaseHandler):
     """Handles operations relating to feedback thread lists."""
 
-    PAGE_NAME_FOR_CSRF = 'editor'
-
     def get(self, exploration_id):
         self.values.update({
             'threads': [t.to_dict() for t in feedback_services.get_all_threads(
@@ -59,8 +57,6 @@ class ThreadListHandler(base.BaseHandler):
 
 class ThreadHandler(base.BaseHandler):
     """Handles operations relating to feedback threads."""
-
-    PAGE_NAME_FOR_CSRF = 'editor'
 
     def get(self, exploration_id, thread_id):  # pylint: disable=unused-argument
         suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
@@ -137,8 +133,6 @@ class FeedbackStatsHandler(base.BaseHandler):
 class SuggestionHandler(base.BaseHandler):
     """"Handles operations relating to learner suggestions."""
 
-    PAGE_NAME_FOR_CSRF = 'player'
-
     @base.require_user
     def post(self, exploration_id):
         feedback_services.create_suggestion(
@@ -154,7 +148,6 @@ class SuggestionHandler(base.BaseHandler):
 class SuggestionActionHandler(base.BaseHandler):
     """"Handles actions performed on threads with suggestions."""
 
-    PAGE_NAME_FOR_CSRF = 'editor'
     _ACCEPT_ACTION = 'accept'
     _REJECT_ACTION = 'reject'
 
@@ -179,7 +172,6 @@ class SuggestionActionHandler(base.BaseHandler):
 class SuggestionListHandler(base.BaseHandler):
     """Handles operations relating to list of threads with suggestions."""
 
-    PAGE_NAME_FOR_CSRF = 'editor'
     _LIST_TYPE_OPEN = 'open'
     _LIST_TYPE_CLOSED = 'closed'
     _LIST_TYPE_ALL = 'all'
@@ -224,6 +216,10 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
         payload = json.loads(self.request.body)
         user_id = payload['user_id']
         references = feedback_services.get_feedback_message_references(user_id)
+        if not references:
+            # Model may not exist if user has already attended to the feedback.
+            return
+
         transaction_services.run_in_transaction(
             feedback_services.update_feedback_email_retries, user_id)
 
@@ -252,3 +248,18 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
         transaction_services.run_in_transaction(
             feedback_services.pop_feedback_message_references, user_id,
             len(references))
+
+
+class FeedbackThreadViewEventHandler(base.BaseHandler):
+    """Records when the given user views a feedback thread, in order to clear
+    viewed feedback messages from emails that might be sent in future to this
+    user."""
+
+    @base.require_user
+    def post(self):
+        exploration_id = self.payload.get('exploration_id')
+        thread_id = self.payload.get('thread_id')
+        transaction_services.run_in_transaction(
+            feedback_services.clear_feedback_message_references, self.user_id,
+            exploration_id, thread_id)
+        self.render_json(self.values)

@@ -41,11 +41,13 @@ describe('Creator dashboard controller', function() {
       dashboardStats: {
         total_plays: 2,
         average_ratings: 3,
+        num_ratings: 2,
         total_open_feedback: 1
       },
       lastWeekStats: {
         total_plays: 1,
         average_ratings: 4,
+        num_ratings: 1,
         total_open_feedback: 0
       }
     };

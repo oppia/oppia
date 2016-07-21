@@ -7,7 +7,8 @@
 {% block header_js %}
   {{ super() }}
   <script type="text/javascript">
-    GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = JSON.parse('{{DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD|js_string}}');
+    GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = JSON.parse(
+      '{{DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD|js_string}}');
   </script>
 {% endblock header_js %}
 
@@ -33,6 +34,9 @@
         <div class="average-ratings stats-card">
           <p class="stat-description">Average Rating</p>
           <h1 class="stat-value"><[dashboardStats.average_ratings || 'N/A']></h1>
+          <p ng-hide="!dashboardStats.num_ratings">
+            (by <[dashboardStats.num_ratings]> users)
+          </p>
         </div>
         <div class="total-plays stats-card">
           <p class="stat-description">Total Plays</p>

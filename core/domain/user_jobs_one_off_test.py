@@ -556,6 +556,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         expected_results_list = [{
             self._mock_get_current_date_as_string(): {
+                'num_ratings': 0,
                 'average_ratings': None,
                 'total_plays': 0
             }
@@ -578,6 +579,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         self.assertEqual(weekly_stats, [{
             self._mock_get_current_date_as_string(): {
+                'num_ratings': 0,
                 'average_ratings': None,
                 'total_plays': 0
             }
@@ -603,6 +605,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         self.assertEqual(weekly_stats, [{
             self._mock_get_current_date_as_string(): {
+                'num_ratings': 1,
                 'average_ratings': 5.0,
                 'total_plays': 1
             }
@@ -632,6 +635,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         self.assertEqual(weekly_stats, [{
             self._mock_get_current_date_as_string(): {
+                'num_ratings': 2,
                 'average_ratings': 4.5,
                 'total_plays': 1
             }
@@ -658,6 +662,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         self.assertEqual(weekly_stats, [{
             self._mock_get_current_date_as_string(): {
+                'num_ratings': 1,
                 'average_ratings': 4.0,
                 'total_plays': 2
             }
@@ -685,12 +690,14 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         expected_results_list = [
             {
                 self._mock_get_current_date_as_string(): {
+                    'num_ratings': 1,
                     'average_ratings': 4.0,
                     'total_plays': 2
                 }
             },
             {
                 _mock_get_date_after_one_week(): {
+                    'num_ratings': 2,
                     'average_ratings': 3.0,
                     'total_plays': 2
                 }
