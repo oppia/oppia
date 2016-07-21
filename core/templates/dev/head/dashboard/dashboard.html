@@ -41,6 +41,9 @@
         <div class="total-plays stats-card">
           <p class="stat-description">Total Plays</p>
           <h1 class="stat-value"><[dashboardStats.total_plays]></h1>
+          <p ng-hide="(dashboardStats.total_plays - lastWeekStats.total_plays) == 0">
+            (+<[dashboardStats.total_plays - lastWeekStats.total_plays]> from last week)
+          </p>
         </div>
         <div class="total-open-feedback stats-card">
           <p class="stat-description">Open feedback</p>

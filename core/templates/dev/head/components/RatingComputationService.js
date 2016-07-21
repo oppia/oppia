@@ -46,14 +46,6 @@ oppia.factory('RatingComputationService', [function() {
 
         return totalValue / totalNumber;
       }
-    },
-    getRelativeChangeInAverageRating: function(newRating, oldRating) {
-      if (!oldRating) {
-        return '+' + newRating.toFixed(2);
-      } else {
-        var ratingDiff = (newRating - oldRating).toFixed(2);
-        return ratingDiff >= 0 ? '+' + ratingDiff : ratingDiff;
-      }
     }
   };
 }]);
