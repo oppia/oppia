@@ -32,7 +32,7 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
   $scope.MISC_URL = '#misc';
   $scope.ACTIVITIES_URL = '#activities';
 
-  $scope.currentTab = $scope.TAB_ACTIVITIES;
+  $scope.currentTab = $scope.TAB_JOBS;
 
   $scope.$watch(function() {
     return window.location.hash;
@@ -49,6 +49,9 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
         break;
       case $scope.ACTIVITIES_URL:
         $scope.showActivitiesTab();
+        break;
+      default:
+        $scope.showJobsTab();
         break;
     }
   });
@@ -107,10 +110,6 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
   $scope.reloadConfigProperties();
 
   $scope.revertToDefaultConfigPropertyValue = function(configPropertyId) {
-    if (!confirm('This action is irreversible. Are you sure?')) {
-      return;
-    }
-
     $http.post($scope.adminHandlerUrl, {
       action: 'revert_config_property',
       config_property_id: configPropertyId
@@ -140,10 +139,6 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
 
   $scope.saveConfigProperties = function() {
     if ($scope.message === 'Saving...') {
-      return;
-    }
-
-    if (!confirm('This action is irreversible. Are you sure?')) {
       return;
     }
 
@@ -190,10 +185,6 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
       return;
     }
 
-    if (!confirm('This action is irreversible. Are you sure?')) {
-      return;
-    }
-
     $scope.message = 'Processing...';
 
     $http.post($scope.adminHandlerUrl, {
@@ -208,10 +199,6 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
 
   $scope.reloadAllExplorations = function() {
     if ($scope.message.startsWith('Processing...')) {
-      return;
-    }
-
-    if (!confirm('This action is irreversible. Are you sure?')) {
       return;
     }
 
@@ -251,10 +238,6 @@ oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
 
   $scope.reloadCollection = function(collectionId) {
     if ($scope.message.startsWith('Processing...')) {
-      return;
-    }
-
-    if (!confirm('This action is irreversible. Are you sure?')) {
       return;
     }
 
