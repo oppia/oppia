@@ -364,6 +364,8 @@ class ClearMigratedAnswersJob(jobs.BaseMapReduceJobManager):
     stats_models.MigratedAnswerModel. As an extra precaution, this job is a
     no-op unless feconf.DELETE_ANSWERS_AFTER_MIGRATION is enabled.
     """
+    _DELETE_KEY = 'Migrated Answer Cleared'
+
     @classmethod
     def entity_classes_to_map_over(cls):
         return [
@@ -373,10 +375,11 @@ class ClearMigratedAnswersJob(jobs.BaseMapReduceJobManager):
     def map(item):
         if feconf.DELETE_ANSWERS_AFTER_MIGRATION:
             item.delete()
+            yield (ClearMigratedAnswersJob._DELETE_KEY, 'Deleted answer.')
 
     @staticmethod
     def reduce(key, stringified_values):
-        pass
+        yield 'Deleted %d answers' % len(stringified_values)
 
 
 class AnswerMigrationValidationJob(jobs.BaseMapReduceJobManager):
@@ -395,7 +398,9 @@ class AnswerMigrationValidationJob(jobs.BaseMapReduceJobManager):
         try:
             stats_models.MigratedAnswerModel.validate_answers_are_migrated(item)
         except utils.ValidationError as e:
-            yield (AnswerMigrationValidationJob._ERROR_KEY, str(e))
+            yield (
+                AnswerMigrationValidationJob._ERROR_KEY,
+                unicode(e.message).encode('utf-8'))
 
     @staticmethod
     def reduce(key, stringified_values):
