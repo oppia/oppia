@@ -40,13 +40,11 @@
 
 function cleanup {
   # Send a kill signal to the dev server.
-  #
+  kill `ps aux | grep "[Dd]ev_appserver.py --host=0.0.0.0 --port=9001" | awk '{print $2}'`
+
   # The [Pp] is to avoid the grep finding the 'grep protractor/selenium' process
   # as well. The awk command gets just the process ID from the grepped line.
   kill `ps aux | grep [Pp]rotractor/selenium | awk '{print $2}'`
-
-  # Send a kill signal to the dev server.
-  kill `ps aux | grep "[Dd]ev_appserver.py --host=0.0.0.0 --port=9001" | awk '{print $2}'`
 
   # Wait for the servers to go down; suppress "connection refused" error output
   # from nc since that is exactly what we are expecting to happen.
