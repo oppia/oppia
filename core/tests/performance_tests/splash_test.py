@@ -15,46 +15,30 @@
 """Performance tests for the splash page."""
 
 from core.tests.performance_tests import base
+from core.tests.performance_tests import test_config
 
 
 class SplashPagePerformanceTest(base.TestBase):
     """Performance tests for the splash page."""
-
-    SPLASH_URL = 'http://localhost:9501/splash'
+    PAGE_KEY = test_config.PAGE_KEY_SPLASH
 
     def setUp(self):
         super(SplashPagePerformanceTest, self).setUp()
 
-    def test_splash_page_has_less_than_10_megabytes_sent_to_the_client(self):
-        self._record_page_metrics_for_url(self.SPLASH_URL)
+        page_config = test_config.TEST_DATA[self.PAGE_KEY]
+        self._set_page_config(page_config)
 
-        self.assertLessEqual(
-            self.page_metrics.get_total_page_size_bytes(), 10000000)
+        self._initialize_data_fetcher()
+        self._load_page_to_cache_server_resources()
 
-    def test_splash_page_loads_under_10_seconds(self):
-        self._record_page_timings_for_url(self.SPLASH_URL)
+    def test_page_size_under_specified_limit(self):
+        self._test_total_page_size()
 
-        self.assertLessEqual(
-            self.page_metrics.get_page_load_time_millisecs(), 10000)
+    def test_page_size_under_specified_limit_for_cached_session(self):
+        self._test_total_page_size_for_cached_session()
 
+    def test_page_loads_under_specified_limit(self):
+        self._test_page_load_time()
 
-class SplashPagePerformanceForCachedStateTest(base.TestBase):
-    """Performance tests for the splash page for the cached state or
-    return user.
-    """
-    SPLASH_URL = 'http://localhost:9501/splash'
-
-    def setUp(self):
-        super(SplashPagePerformanceForCachedStateTest, self).setUp()
-
-    def test_splash_page_has_less_than_1_megabytes_sent_to_the_client(self):
-        self._record_page_metrics_from_cached_session(self.SPLASH_URL)
-
-        self.assertLessEqual(
-            self.page_metrics.get_total_page_size_bytes(), 1000000)
-
-    def test_splash_page_loads_under_3_seconds(self):
-        self._record_page_timings_from_cached_session(self.SPLASH_URL)
-
-        self.assertLessEqual(
-            self.page_metrics.get_page_load_time_millisecs(), 3000)
+    def test_page_loads_under_specified_limit_cached_session(self):
+        self._test_page_load_time_for_cached_session()

@@ -114,25 +114,20 @@ class CsrfTokenManagerTest(test_utils.GenericTestBase):
 
     def test_create_and_validate_token(self):
         uid = 'user_id'
-        page = 'page_name'
 
-        token = base.CsrfTokenManager.create_csrf_token(uid, page)
+        token = base.CsrfTokenManager.create_csrf_token(uid)
         self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(
-            uid, page, token))
+            uid, token))
 
         self.assertFalse(
-            base.CsrfTokenManager.is_csrf_token_valid('bad_user', page, token))
-        self.assertFalse(base.CsrfTokenManager.is_csrf_token_valid(
-            uid, 'wrong_page', token))
-        self.assertFalse(base.CsrfTokenManager.is_csrf_token_valid(
-            uid, self.UNICODE_TEST_STRING, token))
+            base.CsrfTokenManager.is_csrf_token_valid('bad_user', token))
         self.assertFalse(
-            base.CsrfTokenManager.is_csrf_token_valid(uid, page, 'new_token'))
+            base.CsrfTokenManager.is_csrf_token_valid(uid, 'new_token'))
         self.assertFalse(
-            base.CsrfTokenManager.is_csrf_token_valid(uid, page, 'new/token'))
+            base.CsrfTokenManager.is_csrf_token_valid(uid, 'new/token'))
 
     def test_nondefault_csrf_secret_is_used(self):
-        base.CsrfTokenManager.create_csrf_token('uid', 'page')
+        base.CsrfTokenManager.create_csrf_token('uid')
         self.assertNotEqual(base.CSRF_SECRET.value, base.DEFAULT_CSRF_SECRET)
 
     def test_token_expiry(self):
@@ -147,52 +142,21 @@ class CsrfTokenManagerTest(test_utils.GenericTestBase):
             base.CsrfTokenManager, '_get_current_time',
             types.MethodType(_get_current_time, base.CsrfTokenManager)):
             # Create a token and check that it expires correctly.
-            token = base.CsrfTokenManager().create_csrf_token('uid', 'page')
+            token = base.CsrfTokenManager().create_csrf_token('uid')
             self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(
-                'uid', 'page', token))
+                'uid', token))
 
             current_time = orig_time + 1
             self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(
-                'uid', 'page', token))
+                'uid', token))
 
             current_time = orig_time + FORTY_EIGHT_HOURS_IN_SECS - PADDING
             self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(
-                'uid', 'page', token))
+                'uid', token))
 
             current_time = orig_time + FORTY_EIGHT_HOURS_IN_SECS + PADDING
             self.assertFalse(base.CsrfTokenManager.is_csrf_token_valid(
-                'uid', 'page', token))
-
-            # Check that the expiry of one token does not cause the other to
-            # expire.
-            current_time = orig_time
-            token1 = base.CsrfTokenManager.create_csrf_token('uid', 'page1')
-            self.assertTrue(
-                base.CsrfTokenManager.is_csrf_token_valid(
-                    'uid', 'page1', token1))
-
-            current_time = orig_time + 100
-            token2 = base.CsrfTokenManager.create_csrf_token('uid', 'page2')
-            self.assertTrue(
-                base.CsrfTokenManager.is_csrf_token_valid(
-                    'uid', 'page2', token2))
-
-            current_time = orig_time + FORTY_EIGHT_HOURS_IN_SECS + PADDING
-            self.assertFalse(
-                base.CsrfTokenManager.is_csrf_token_valid(
-                    'uid', 'page1', token1))
-            self.assertTrue(
-                base.CsrfTokenManager.is_csrf_token_valid(
-                    'uid', 'page2', token2))
-
-            current_time = (
-                orig_time + 100 + FORTY_EIGHT_HOURS_IN_SECS + PADDING)
-            self.assertFalse(
-                base.CsrfTokenManager.is_csrf_token_valid(
-                    'uid', 'page1', token1))
-            self.assertFalse(
-                base.CsrfTokenManager.is_csrf_token_valid(
-                    'uid', 'page2', token2))
+                'uid', token))
 
 
 class EscapingTest(test_utils.GenericTestBase):
@@ -286,6 +250,24 @@ class I18nDictsTest(test_utils.GenericTestBase):
             if filename == 'en.json':
                 continue
 
+            self.log_line('Processing %s...' % filename)
+
             key_list = self._extract_keys_from_json_file(filename)
             # All other JSON files should have a subset of the keys in en.json.
             self.assertEqual(len(set(key_list) - set(master_key_list)), 0)
+
+            # If there are missing keys, log an error, but don't fail the
+            # tests.
+            if set(key_list) != set(master_key_list):
+                self.log_line('')
+                untranslated_keys = list(set(master_key_list) - set(key_list))
+                self.log_line('ERROR: Untranslated keys in %s:' % filename)
+                for key in untranslated_keys:
+                    self.log_line('- %s' % key)
+                self.log_line('')
+
+    def test_keys_match_en_qqq(self):
+        """Tests that en.json and qqq.json have the exact same set of keys."""
+        en_key_list = self._extract_keys_from_json_file('en.json')
+        qqq_key_list = self._extract_keys_from_json_file('qqq.json')
+        self.assertEqual(en_key_list, qqq_key_list)

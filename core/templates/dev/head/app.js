@@ -65,18 +65,9 @@ oppia.config([
       '$q', '$log', 'alertsService', function($q, $log, alertsService) {
         return {
           request: function(config) {
-            // If this request carries data (in the form of a JS object),
-            // JSON-stringify it and store it under 'payload'.
-            var csrfToken = '';
             if (config.data) {
-              var csrfToken = (
-                config.requestIsForCreateExploration ?
-                  GLOBALS.csrf_token_create_exploration :
-                config.requestIsForI18n ? GLOBALS.csrf_token_i18n :
-                GLOBALS.csrf_token);
-
               config.data = $.param({
-                csrf_token: csrfToken,
+                csrf_token: GLOBALS.csrf_token,
                 payload: JSON.stringify(config.data),
                 source: document.URL
               }, true);

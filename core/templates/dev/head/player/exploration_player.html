@@ -8,12 +8,15 @@
   {{ super() }}
   {% if exploration_version %}
     <script type="text/javascript">
-      GLOBALS.GADGET_SPECS = JSON.parse('{{GADGET_SPECS|js_string}}');
-      GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
-      GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = JSON.parse('{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER|js_string}}');
-      GLOBALS.explorationVersion = JSON.parse('{{exploration_version|js_string}}');
       GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
       GLOBALS.collectionTitle = JSON.parse('{{collection_title|js_string}}');
+      GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = JSON.parse(
+        '{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER|js_string}}');
+      GLOBALS.explorationVersion = JSON.parse(
+        '{{exploration_version|js_string}}');
+      GLOBALS.GADGET_SPECS = JSON.parse('{{GADGET_SPECS|js_string}}');
+      GLOBALS.INTERACTION_SPECS = JSON.parse(
+        '{{INTERACTION_SPECS|js_string}}');
     </script>
   {% endif %}
 

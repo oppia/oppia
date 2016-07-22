@@ -44,6 +44,12 @@ indexes:
   - name: scaled_average_rating
     direction: desc
 
+- kind: ExpSummaryModel
+  properties:
+  - name: owner_ids
+  - name: last_updated
+    direction: desc
+
 - kind: ExpSummaryRealtimeModel
   properties:
   - name: realtime_layer

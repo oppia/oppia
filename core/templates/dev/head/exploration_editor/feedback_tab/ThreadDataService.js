@@ -27,6 +27,7 @@ oppia.factory('threadDataService', [
   var _SUGGESTION_ACTION_HANDLER_URL = '/suggestionactionhandler/' +
     _expId + '/';
   var _THREAD_HANDLER_PREFIX = '/threadhandler/' + _expId + '/';
+  var _FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event';
   var _THREAD_STATUS_OPEN = 'open';
 
   // All the threads for this exploration. This is a list whose entries are
@@ -101,6 +102,12 @@ oppia.factory('threadDataService', [
       }, function() {
         _openThreadsCount -= 1;
         alertsService.addWarning('Error creating new thread.');
+      });
+    },
+    markThreadAsSeen: function(threadId) {
+      $http.post(_FEEDBACK_THREAD_VIEW_EVENT_URL, {
+        exploration_id: _expId,
+        thread_id: threadId
       });
     },
     addNewMessage: function(

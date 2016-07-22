@@ -22,16 +22,17 @@ oppia.directive('sharingLinks', [function() {
     scope: {
       layoutType: '@',
       layoutAlignType: '@',
-      getTwitterText: '&twitterText'
+      getTwitterText: '&twitterText',
+      getExplorationId: '&explorationId'
     },
     templateUrl: 'components/sharingLinks',
     controller: [
       '$scope', '$window', 'oppiaHtmlEscaper', 'ExplorationEmbedButtonService',
-      'explorationContextService', 'siteAnalyticsService',
+      'siteAnalyticsService',
       function(
-        $scope, $window, oppiaHtmlEscaper, ExplorationEmbedButtonService,
-        explorationContextService, siteAnalyticsService) {
-        $scope.explorationId = explorationContextService.getExplorationId();
+          $scope, $window, oppiaHtmlEscaper, ExplorationEmbedButtonService,
+          siteAnalyticsService) {
+        $scope.explorationId = $scope.getExplorationId();
 
         $scope.registerShareExplorationEvent = function(network) {
           siteAnalyticsService.registerShareExplorationEvent(network);

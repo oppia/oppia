@@ -62,7 +62,7 @@ def require_playable(handler):
 
         # Checks if the user for the current session is logged in.
         if rights_manager.Actor(self.user_id).can_play(
-                rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
+                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.PageNotFoundException
@@ -262,8 +262,6 @@ class ExplorationPageEmbed(base.BaseHandler):
 class ExplorationPage(base.BaseHandler):
     """Page describing a single exploration."""
 
-    PAGE_NAME_FOR_CSRF = 'player'
-
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests."""
@@ -292,7 +290,7 @@ class ExplorationPage(base.BaseHandler):
         version = exploration.version
 
         if not rights_manager.Actor(self.user_id).can_view(
-                rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
+                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             raise self.PageNotFoundException
 
         is_iframed = False
@@ -325,7 +323,7 @@ class ExplorationPage(base.BaseHandler):
                 bool(self.username) and
                 self.username not in config_domain.BANNED_USERNAMES.value and
                 rights_manager.Actor(self.user_id).can_edit(
-                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id)
+                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id)
             ),
             'dependencies_html': jinja2.utils.Markup(
                 dependencies_html),
@@ -367,7 +365,7 @@ class ExplorationHandler(base.BaseHandler):
             'can_edit': (
                 self.user_id and
                 rights_manager.Actor(self.user_id).can_edit(
-                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id)),
+                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id)),
             'exploration': exploration.to_player_dict(),
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
@@ -571,8 +569,6 @@ class RatingHandler(base.BaseHandler):
     Note that this represents ratings submitted on completion of the
     exploration.
     """
-
-    PAGE_NAME_FOR_CSRF = 'player'
 
     @require_playable
     def get(self, exploration_id):

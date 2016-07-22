@@ -1,5 +1,5 @@
 application: oppiaserver
-version: 2-3-0
+version: 2-3-1
 runtime: python27
 api_version: 1
 threadsafe: false
@@ -98,6 +98,10 @@ handlers:
   login: admin
   script: main_cron.app
   secure: always
+- url: /task/.*
+  login: admin
+  script: main_taskqueue.app
+  secure: always
 - url: /.*
   script: main.app
   secure: always
@@ -109,3 +113,5 @@ libraries:
   version: '1.6.1'
 - name: webapp2
   version: '2.5.2'
+env_variables:
+  MINIFICATION: false

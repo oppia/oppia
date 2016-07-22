@@ -18,10 +18,16 @@
 
 # INSTRUCTIONS:
 #
-# Run this script from the oppia root folder:
-#   bash scripts/run_performance_tests.sh
-# 
 # The root folder MUST be named 'oppia'.
+# 
+# Run all tests sequentially:
+# - run bash scripts/run_performance_tests.sh without args in order to run all tests sequentially
+# 
+# Run test for a specific page:
+# - run bash scripts/run_performance_tests.sh --test_name=page_test
+# 
+# page_test is the name of the file containing that test eg. splash_test.
+
 
 function cleanup {
   # Send a kill signal to the dev server.
@@ -76,7 +82,42 @@ chmod 744 $TOOLS_DIR/browsermob-proxy-2.1.1/bin/browsermob-proxy
 # Wait for the servers to come up.
 while ! nc -vz localhost 9501; do sleep 1; done
 
-$PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.splash_test $@ 
+# Install xvfb if not on travis, Used in frontend, e2e tests and performance tests.
+if [ "$TRAVIS" = true ]; then
+  export XVFB_PREFIX=""
+else
+  # This installs xvfb for systems with apt-get installer like Ubuntu, and will fail for other systems.
+  # TODO(gvishal): Install/provide xvfb for other systems.
+  sudo apt-get install xvfb
+  export XVFB_PREFIX="/usr/bin/xvfb-run"
+fi
+
+TEST_NAME=""
+# Refer: http://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash
+for i in "$@"
+do
+case $i in
+    --test_name=*)
+    TEST_NAME="${i#*=}"
+    ;;
+esac
+done
+
+# If an argument is present then run test for that specific page. Otherwise
+# run tests for all the pages sequentially.
+if [[ ! -z $TEST_NAME ]]; then
+  TEST_PATH="core.tests.performance_tests.$TEST_NAME"
+  echo "Running performance test for: $TEST_NAME, executing: $TEST_PATH"
+  $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_target=$TEST_PATH
+else
+  $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.collection_player_test
+  $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.creator_dashboard_test
+  $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.exploration_editor_test
+  $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.exploration_player_test
+  $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.library_test
+  $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.profile_page_test
+  $XVFB_PREFIX $PYTHON_CMD scripts/backend_tests.py --test_target=core.tests.performance_tests.splash_test
+fi
 
 chmod 644 $TOOLS_DIR/browsermob-proxy-2.1.1/bin/browsermob-proxy
 rm bmp.log server.log
