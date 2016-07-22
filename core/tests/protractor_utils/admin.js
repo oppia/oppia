@@ -39,7 +39,6 @@ var editConfigProperty = function(
       if (title.match(propertyName)) {
         editingInstructions(forms.getEditor(objectType)(configProperty));
         element(by.css('.protractor-test-save-all-configs')).click();
-        browser.driver.switchTo().alert().accept();
         // Time is needed for the saving to complete.
         browser.waitForAngular();
         return true;
@@ -70,7 +69,6 @@ var reloadExploration = function(name) {
         explorationElement.element(
           by.css('.protractor-test-reload-exploration-button')
         ).click();
-        browser.driver.switchTo().alert().accept();
         // Time is needed for the reloading to complete.
         browser.waitForAngular();
       }
