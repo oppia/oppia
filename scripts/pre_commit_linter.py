@@ -237,6 +237,7 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint, stdout,
 
     jscs_cmd_args = [node_path, jscs_path, config_jscsrc]
     for _, filename in enumerate(files_to_lint):
+        print 'Linting: ', filename
         proc_args = jscs_cmd_args + [filename]
         proc = subprocess.Popen(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
