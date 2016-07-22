@@ -3870,6 +3870,8 @@ md-card.preview-conversation-skin-supplemental-card {
   -moz-column-gap: 20px;
   -webkit-column-count: 3;
   -webkit-column-gap: 20px;
+  column-count: 3;
+  column-gap: 20px;
 }
 
 .oppia-about-extra-info {
