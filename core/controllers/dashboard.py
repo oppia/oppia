@@ -213,8 +213,9 @@ class DashboardHandler(base.BaseHandler):
                         collection_summary.category),
                 })
 
-        dashboard_stats = user_services.get_user_dashboard_stats(
-            self.user_id)
+        dashboard_stats = (
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.user_id))
         dashboard_stats.update({
             'total_open_feedback': feedback_services.get_total_open_threads(
                 feedback_thread_analytics)

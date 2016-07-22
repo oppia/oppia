@@ -34,6 +34,9 @@
         <div class="average-ratings stats-card">
           <p class="stat-description">Average Rating</p>
           <h1 class="stat-value"><[dashboardStats.average_ratings || 'N/A']></h1>
+          <p ng-hide="!dashboardStats.num_ratings">
+            (by <[dashboardStats.num_ratings]> users)
+          </p>
         </div>
         <div class="total-plays stats-card">
           <p class="stat-description">Total Plays</p>
