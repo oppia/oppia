@@ -104,7 +104,7 @@ if [ ${OS} == "Linux" ]; then
   if [ ${MACHINE_TYPE} == 'x86_64' ]; then
     echo "  Replacing chromedriver with a newer version..."
     curl --silent https://chromedriver.storage.googleapis.com/2.22/chromedriver_linux64.zip -o chromedriver_2.21.zip
-    mv chromedriver_2.21.zip $NODE_MODULE_DIR/protractor/selenium
+    mv -f chromedriver_2.21.zip $NODE_MODULE_DIR/protractor/selenium
     unzip -q $NODE_MODULE_DIR/protractor/selenium/chromedriver_2.21.zip -d $NODE_MODULE_DIR/protractor/selenium
   fi
 fi
