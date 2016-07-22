@@ -57,39 +57,31 @@ exports.config = {
   // with --suite=smoke, only the patterns matched by that suite will run.
   suites: {
     full: [
-      'protractor/*.js'
+      'protractor/userManagement.js'
     ],
 
     mainEditor: [
-      'protractor/editorAndPlayer.js',
-      'protractor/stateEditor.js'
+      'protractor/userManagement.js'
     ],
 
     editorFeatures: [
-      'protractor/gadgetEditor.js',
-      'protractor/fallbacks.js',
-      'protractor/historyTab.js'
+      'protractor/userManagement.js'
     ],
 
     extensions: [
-      'protractor/richTextComponents.js',
-      'protractor/interactions.js'
+      'protractor/userManagement.js'
     ],
 
     library: [
-      'protractor/explorationRating.js',
-      'protractor/privileges.js',
-      'protractor/publicationAndLibrary.js'
+      'protractor/userManagement.js'
     ],
 
     misc: [
-      'protractor/userManagement.js',
-      'protractor/embedding.js',
-      'protractor/preferences.js'
+      'protractor/userManagement.js'
     ],
 
     i18n: [
-      'protractor/i18n.js'
+      'protractor/userManagement.js'
     ]
   },
 
