@@ -63,7 +63,6 @@ notifications:
 
 before_install:
 - pip install codecov
-- pip install numpy==1.6.1
 - export CHROME_BIN=/usr/bin/google-chrome-stable
 - export DISPLAY=:99.0
 - bash -e /etc/init.d/xvfb start

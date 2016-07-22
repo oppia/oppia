@@ -95,6 +95,20 @@ fi
 # the top of the file is run.
 trap cleanup EXIT
 
+# THIS IS A HACK WHICH SHOULD BE REMOVED AT THE EARLIEST OPPORTUNITY, PROBABLY
+# WHEN PROTRACTOR IS UPGRADED BEYOND v3.3.0.
+# Chromedriver v2.21 fails on Travis with an "unexpected alert open" error.
+# Attempt to replace it with v2.22, but rename it to 2.21 so as not to trigger
+# a version check error.
+if [ ${OS} == "Linux" ]; then
+  if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+    echo "  Replacing chromedriver with a newer version..."
+    curl --silent https://chromedriver.storage.googleapis.com/2.22/chromedriver_linux64.zip -o chromedriver_2.21.zip
+    mv chromedriver_2.21.zip $NODE_MODULE_DIR/protractor/selenium
+    unzip -q $NODE_MODULE_DIR/protractor/selenium/chromedriver_2.21.zip -d $NODE_MODULE_DIR/protractor/selenium
+  fi
+fi
+
 # Start a selenium process. The program sends thousands of lines of useless
 # info logs to stderr so we discard them.
 # TODO(jacob): Find a webdriver or selenium argument that controls log level.
