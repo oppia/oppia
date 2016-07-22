@@ -54,7 +54,7 @@ oppia.directive('oppiaGadgetTestGadget', [
           $scope.overlayAdviceModal = function(adviceResourceIndex) {
             $modal.open({
               templateUrl: (
-                UrlInterpolationService.getExtensionResourceUrl(
+                UrlInterpolationService.getStaticResourceUrl(
                 '/extensions/gadgets/TestGadget/static/html/' +
                 'test_gadget_overlay.html')),
               controller: 'TestGadgetAdviceModalCtrl',

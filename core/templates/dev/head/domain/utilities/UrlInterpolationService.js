@@ -28,7 +28,6 @@ oppia.factory('UrlInterpolationService', ['alertsService',
     if (!resourcePath) {
       alertsService.fatalWarning(
         'Empty path passed in method.');
-      return null;
     }
 
     var RESOURCE_PATH_STARTS_WITH_FORWARD_SLASH = /^\//;
@@ -37,7 +36,6 @@ oppia.factory('UrlInterpolationService', ['alertsService',
       alertsService.fatalWarning(
         'Path must start with \'\/\': \'' + new String(resourcePath) +
         '\'.');
-      return null;
     }
   };
 
@@ -156,14 +154,6 @@ oppia.factory('UrlInterpolationService', ['alertsService',
     },
 
     /**
-     * Given an extension resource path, returns the complete url path to that
-     * extension resource, prefixing the appropriate cache_slug to it.
-     */
-    getExtensionResourceUrl: function(extensionResourcePath) {
-      return getCachePrefixedUrl(extensionResourcePath);
-    },
-
-    /**
      * Given a gadget type, returns the complete url path to that
      * gadget type image, prefixing the appropriate cache_slug to it.
      */
@@ -171,7 +161,6 @@ oppia.factory('UrlInterpolationService', ['alertsService',
       if (!gadgetType) {
         alertsService.fatalWarning(
           'Empty gadgetType passed in getGadgetImgUrl.');
-        return null;
       }
       return getCachePrefixedUrl('/extensions/gadgets/' + gadgetType +
         '/static/images/' + gadgetType + '.png');
@@ -185,7 +174,6 @@ oppia.factory('UrlInterpolationService', ['alertsService',
       if (!interactionId) {
         alertsService.fatalWarning(
           'Empty interactionId passed in getInteractionThumbnailImageUrl.');
-        return null;
       }
       return getCachePrefixedUrl('/extensions/interactions/' +
         interactionId + '/static/' + interactionId + '.png');

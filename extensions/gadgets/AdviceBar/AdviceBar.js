@@ -35,13 +35,13 @@ oppia.directive('oppiaGadgetAdviceBar', [
           $scope.adviceBarResources = oppiaHtmlEscaper.escapedJsonToObj(
             $attrs.adviceObjectsWithValue);
 
-          $scope.getExtensionResourceUrl = (
-            UrlInterpolationService.getExtensionResourceUrl);
+          $scope.getStaticResourceUrl = (
+            UrlInterpolationService.getStaticResourceUrl);
 
           $scope.overlayAdviceModal = function(adviceResourceIndex) {
             $modal.open({
               templateUrl: (
-                UrlInterpolationService.getExtensionResourceUrl(
+                UrlInterpolationService.getStaticResourceUrl(
                 '/extensions/gadgets/AdviceBar/static/html' +
                 '/advice_overlay.html')),
               controller: 'AdviceBarModalCtrl',

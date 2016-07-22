@@ -94,8 +94,8 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           return scope;
         };
 
-        scope.getExtensionResourceUrl = (
-          UrlInterpolationService.getExtensionResourceUrl);
+        scope.getStaticResourceUrl = (
+          UrlInterpolationService.getStaticResourceUrl);
 
         scope.SOUNDFONT_URL = '/third_party/static/midi-js-2ef687/soundfont/';
         scope.sequenceToGuess = oppiaHtmlEscaper.escapedJsonToObj(

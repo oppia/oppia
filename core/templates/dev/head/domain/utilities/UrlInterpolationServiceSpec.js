@@ -217,13 +217,6 @@ describe('URL Interpolation Service', function() {
     expect(uis.getStaticImageUrl('/test_url/test.png')).toBe(
       GLOBALS.ASSET_DIR_PREFIX + '/assets/images/test_url/test.png');
 
-    expect(uis.getExtensionResourceUrl('/scoreBar.css')).toBe(
-      GLOBALS.ASSET_DIR_PREFIX + '/scoreBar.css');
-    expect(uis.getExtensionResourceUrl(
-      '/extensions/gadgets/ScoreBar/static/css/scoreBar.css')).toBe(
-      GLOBALS.ASSET_DIR_PREFIX +
-      '/extensions/gadgets/ScoreBar/static/css/scoreBar.css');
-
     expect(uis.getGadgetImgUrl('ScoreBar')).toBe(
       GLOBALS.ASSET_DIR_PREFIX + '/extensions/gadgets/ScoreBar' +
         '/static/images/ScoreBar.png');
@@ -245,13 +238,6 @@ describe('URL Interpolation Service', function() {
       new Error(
         'Empty path passed in method.'));
     expect(uis.getStaticImageUrl.bind(null, '')).toThrow(
-      new Error(
-        'Empty path passed in method.'));
-
-    expect(uis.getExtensionResourceUrl.bind(null, null)).toThrow(
-      new Error(
-        'Empty path passed in method.'));
-    expect(uis.getExtensionResourceUrl.bind(null, '')).toThrow(
       new Error(
         'Empty path passed in method.'));
 
@@ -288,17 +274,6 @@ describe('URL Interpolation Service', function() {
       expect(uis.getStaticImageUrl.bind(null, 'test_url/fail.png')).toThrow(
         new Error(
           'Path must start with \'\/\': \'' + new String('test_url/fail.png') +
-          '\'.'));
-
-      expect(uis.getExtensionResourceUrl.bind(null, 'test_fail.css')).toThrow(
-        new Error(
-          'Path must start with \'\/\': \'' + new String('test_fail.css') +
-          '\'.'));
-      expect(uis.getExtensionResourceUrl.bind(
-        null, 'extensions/gadgets/fail.png')).toThrow(
-        new Error(
-          'Path must start with \'\/\': \'' +
-          new String('extensions/gadgets/fail.png') +
           '\'.'));
     });
 });

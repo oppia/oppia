@@ -187,16 +187,19 @@ oppia.controller('StateInteraction', [
           controller: [
             '$scope', '$modalInstance', 'stateInteractionIdService',
             'stateCustomizationArgsService', 'interactionDetailsCache',
-            'INTERACTION_SPECS',
+            'INTERACTION_SPECS', 'UrlInterpolationService',
             function(
                 $scope, $modalInstance, stateInteractionIdService,
                 stateCustomizationArgsService, interactionDetailsCache,
-                INTERACTION_SPECS) {
+                INTERACTION_SPECS, UrlInterpolationService) {
               // This binds the services to the HTML template, so that their
               // displayed values can be used in the HTML.
               $scope.stateInteractionIdService = stateInteractionIdService;
               $scope.stateCustomizationArgsService = (
                 stateCustomizationArgsService);
+
+              $scope.getInteractionThumbnailImageUrl = (
+                UrlInterpolationService.getInteractionThumbnailImageUrl);
 
               $scope.INTERACTION_SPECS = INTERACTION_SPECS;
               $scope.ALLOWED_INTERACTION_CATEGORIES = (

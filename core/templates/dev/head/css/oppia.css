@@ -3362,7 +3362,10 @@ md-card.preview-conversation-skin-supplemental-card {
     left: calc(50% - 200px);
   }
   .oppia-splash-button-create {
-    left: calc(50% + 200px);
+    /* Need double math to prevent issues with addition after minification.
+      https://github.com/yui/yuicompressor/issues/59#issuecomment-35528166
+    */
+    left: calc(50% - -200px);
   }
 
   .oppia-splash-section-two-content {
