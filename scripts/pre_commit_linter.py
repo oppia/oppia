@@ -279,12 +279,29 @@ def _lint_py_files(config_pylint, files_to_lint, result):
         print 'There are no Python files to lint.'
         return
 
-    try:
-        # This prints output to the console.
-        lint.Run(files_to_lint + [config_pylint])
-    except SystemExit as e:
-        if str(e) != '0':
-            are_there_errors = True
+    print 'Linting %s Python files' % num_py_files
+
+    _BATCH_SIZE = 50
+    current_batch_start_index = 0
+
+    while current_batch_start_index < len(files_to_lint):
+        # Note that this index is an exclusive upper bound -- i.e., the current
+        # batch of files ranges from 'start_index' to 'end_index - 1'.
+        current_batch_end_index = min(
+            current_batch_start_index + _BATCH_SIZE, len(files_to_lint))
+        current_files_to_lint = files_to_lint[
+            current_batch_start_index : current_batch_end_index]
+        print 'Linting Python files %s to %s...' % (
+            current_batch_start_index + 1, current_batch_end_index)
+
+        try:
+            # This prints output to the console.
+            lint.Run(current_files_to_lint + [config_pylint])
+        except SystemExit as e:
+            if str(e) != '0':
+                are_there_errors = True
+
+        current_batch_start_index = current_batch_end_index
 
     if are_there_errors:
         result.put('%s    Python linting failed' % _MESSAGE_TYPE_FAILED)
@@ -335,6 +352,8 @@ def _pre_commit_linter(all_files):
     """This function is used to check if node-jscs dependencies are installed
     and pass JSCS binary path
     """
+    print 'Starting linter...'
+
     jscsrc_path = os.path.join(os.getcwd(), '.jscsrc')
     pylintrc_path = os.path.join(os.getcwd(), '.pylintrc')
 
