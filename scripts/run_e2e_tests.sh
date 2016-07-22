@@ -103,9 +103,12 @@ trap cleanup EXIT
 if [ ${OS} == "Linux" ]; then
   if [ ${MACHINE_TYPE} == 'x86_64' ]; then
     echo "  Replacing chromedriver with a newer version..."
-    curl --silent https://chromedriver.storage.googleapis.com/2.22/chromedriver_linux64.zip -o chromedriver_2.21.zip
-    mv -f chromedriver_2.21.zip $NODE_MODULE_DIR/protractor/selenium
-    unzip -q $NODE_MODULE_DIR/protractor/selenium/chromedriver_2.21.zip -d $NODE_MODULE_DIR/protractor/selenium
+    curl --silent https://chromedriver.storage.googleapis.com/2.22/chromedriver_linux64.zip -o chromedriver_2.21linux64.zip
+    mv -f chromedriver_2.21linux64.zip $NODE_MODULE_DIR/protractor/selenium
+    rm $NODE_MODULE_DIR/protractor/selenium/chromedriver_2.21
+    unzip -q $NODE_MODULE_DIR/protractor/selenium/chromedriver_2.21linux64.zip -d $NODE_MODULE_DIR/protractor/selenium
+    mv $NODE_MODULE_DIR/protractor/selenium/chromedriver $NODE_MODULE_DIR/protractor/selenium/chromedriver_2.21
+    ls $NODE_MODULE_DIR/protractor/selenium
   fi
 fi
 
