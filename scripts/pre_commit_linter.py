@@ -292,7 +292,7 @@ def _lint_py_files(config_pylint, files_to_lint, result):
         current_files_to_lint = files_to_lint[
             current_batch_start_index : current_batch_end_index]
         print 'Linting Python files %s to %s...' % (
-            current_batch_start_index, current_batch_end_index - 1)
+            current_batch_start_index + 1, current_batch_end_index)
 
         try:
             # This prints output to the console.
