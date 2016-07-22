@@ -9,8 +9,17 @@
     </p>
 
     <accordion close-others="true">
-      <accordion-group heading="If your website allows Iframe" is-open="false" style="margin-top: 3px;">
-        <div class="oppia-embed-modal-code" ng-click="selectText($event)">&lt;iframe src="<[serverName]>/embed/<[explorationId]>" width="700" height="500"&gt;</div>
+      <accordion-group heading="If your website allows JavaScript" is-open="false">
+        <div class="oppia-embed-modal-code" ng-click="selectText($event)">
+&lt;oppia oppia-id="<[explorationId]>" src="<[serverName]>"&gt;&lt;/oppia&gt;
+&lt;script src="https://cdn.jsdelivr.net/oppia/0.0.1/oppia-player.min.js"&gt;&lt;/script&gt;
+        </div>
+      </accordion-group>
+      <accordion-group heading="If your website does not allow JavaScript" is-open="false" style="margin-top: 3px;">
+        <div class="oppia-embed-modal-code" ng-click="selectText($event)">&lt;iframe src="<[serverName]>/explore/<[explorationId]>?iframed=true" width="700" height="1000"&gt;</div>
+        <p>
+          <em>Note: explorations embedded using iframes will not have automatic scrolling and expanding on your webpage.</em>
+        </p>
       </accordion-group>
     </accordion>
 
