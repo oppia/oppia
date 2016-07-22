@@ -43,6 +43,9 @@ oppia.directive('collectionDetailsEditor', [function() {
             };
           }
         );
+        $scope.LANGUAGE_LIST_FOR_SELECT = function() {
+          return GLOBALS.ALL_LANGUAGE_CODES;
+        };
 
         var refreshSettingsTab = function() {
           $scope.displayedCollectionTitle = $scope.collection.getTitle();
@@ -50,6 +53,10 @@ oppia.directive('collectionDetailsEditor', [function() {
             $scope.collection.getObjective());
           $scope.displayedCollectionCategory = (
             $scope.collection.getCategory());
+          $scope.displayedCollectionLanguage = (
+            $scope.collection.getLanguageCode());
+          $scope.displayedCollectionTags = (
+            $scope.collection.getTags());
 
           var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2.some(
             function(categoryItem) {
@@ -98,6 +105,21 @@ oppia.directive('collectionDetailsEditor', [function() {
           }
           CollectionUpdateService.setCollectionCategory(
             $scope.collection, $scope.displayedCollectionCategory);
+        };
+
+        $scope.updateCollectionLanguageCode = function() {
+          if (!$scope.displayedCollectionLanguage) {
+            alertsService.addWarning(
+              'Please specify a language for the collection.');
+            return;
+          }
+          CollectionUpdateService.setCollectionLanguageCode(
+            $scope.collection, $scope.displayedCollectionLanguage);
+        };
+
+        $scope.updateCollectionTags = function() {
+          CollectionUpdateService.setCollectionTags(
+            $scope.collection, $scope.displayedCollectionTags);
         };
       }
     ]
