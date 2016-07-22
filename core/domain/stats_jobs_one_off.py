@@ -712,11 +712,10 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
         if rule_spec.rule_type == 'OutputEquals':
             code_output = cls._get_plaintext(rule_spec.inputs['x'])
-            code = cls._get_plaintext(answer_str)
-            if not code:
+            if not answer_str:
                 return (None, 'Failed to recover code: %s' % answer_str)
             code_evaluation_dict = {
-                'code': code,
+                'code': answer_str,
                 'output': code_output,
                 'evaluation': '',
                 'error': ''
@@ -724,11 +723,10 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             return cls._normalize_raw_answer_object(
                 objects.CodeEvaluation, code_evaluation_dict, answer_str)
         elif rule_spec.rule_type in rule_types_without_output:
-            code = cls._get_plaintext(answer_str)
-            if not code:
+            if not answer_str:
                 return (None, 'Failed to recover code: %s' % answer_str)
             code_evaluation_dict = {
-                'code': code,
+                'code': answer_str,
                 'output': '',
                 'evaluation': '',
                 'error': ''
@@ -1220,27 +1218,31 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             dated_explorations_dict[created_on] = exploration
 
             if not exploration:
+                # TODO(bhenning): Add exploration_id back to this output. It was
+                # removed to reduce the amount of output from the production
+                # migration job.
                 yield (
                     'Encountered missing exploration referenced to by '
-                    'submitted answers: %s' % exploration_id)
+                    'submitted answers')
                 return
 
             # Another point of failure is the state not matching due to an
             # incorrect exploration version selection.
             if state_name not in exploration.states:
                 if has_history:
-                    # TODO(bhenning): Add state_name back to this output. It was
-                    # removed to reduce the amount of output from the production
+                    # TODO(bhenning): Add state_name, exploration_id, and
+                    # exploration version. back to this output. It was removed
+                    # to reduce the amount of output from the production
                     # migration job.
                     yield (
-                        'Encountered missing state name in exploration %s '
-                        '(version: %s) referenced to by submitted answers' % (
-                            exploration_id, exploration.version))
+                        'Encountered missing state name in exploration '
+                        'referenced to by submitted answers')
                     return
                 else:
-                    yield (
-                        'Failed to utilize exploration without history: %s '
-                        '(version: %s)' % (exploration_id, exploration.version))
+                    # TODO(bhenning): Add exploration_id and exploration
+                    # version. back to this output. It was removed to reduce the
+                    # amount of output from the production migration job.
+                    yield 'Failed to utilize exploration without history'
                     return
 
         for value_dict in value_dict_list:
