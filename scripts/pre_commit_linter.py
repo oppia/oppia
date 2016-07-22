@@ -234,9 +234,11 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint, stdout,
         result.put('')
         print 'There are no JavaScript files to lint.'
         return
-
+    
+    print 'Total js files: ', num_js_files
     jscs_cmd_args = [node_path, jscs_path, config_jscsrc]
     for _, filename in enumerate(files_to_lint):
+        print 'Linting: ', filename
         proc_args = jscs_cmd_args + [filename]
         proc = subprocess.Popen(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -250,6 +252,8 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint, stdout,
         if linter_stdout:
             num_files_with_errors += 1
             stdout.put(linter_stdout)
+
+    print 'js over'
 
     if num_files_with_errors:
         result.put('%s    %s JavaScript files' % (
@@ -302,6 +306,8 @@ def _lint_py_files(config_pylint, files_to_lint, result):
                 are_there_errors = True
 
         current_batch_start_index = current_batch_end_index
+
+    print 'Pythin pver'
 
     if are_there_errors:
         result.put('%s    Python linting failed' % _MESSAGE_TYPE_FAILED)
