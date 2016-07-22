@@ -47,10 +47,10 @@ oppia.directive('createActivityButton', [function() {
 
           $scope.creationInProgress = true;
 
-          if (urlService.getPathname() !== '/dashboard') {
-            $window.location.replace('/dashboard?mode=create');
-          } else if (!GLOBALS.can_create_collections) {
+          if (!GLOBALS.can_create_collections) {
             ExplorationCreationService.createNewExploration();
+          } else if (urlService.getPathname() !== '/dashboard') {
+            $window.location.replace('/dashboard?mode=create');
           } else {
             $modal.open({
               templateUrl: 'modals/createActivity',

@@ -122,10 +122,6 @@ class DashboardPage(base.BaseHandler):
         elif user_services.has_fully_registered(self.user_id):
             self.values.update({
                 'nav_mode': feconf.NAV_MODE_DASHBOARD,
-                'can_create_collections': (
-                    self.username in
-                    config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value
-                ),
                 'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD,
                 'DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD': (
                     DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD.value)
