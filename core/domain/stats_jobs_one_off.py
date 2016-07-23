@@ -555,7 +555,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         # Any data added before ecbfff0 is assumed to match the earliest
         # recorded commit.
         history_models = [cls._get_exploration_model_by_id_version(
-            exp_id, version)) for version in versions]
+            exp_id, version) for version in versions]
         return (
             exp_services.get_exploration_from_model(latest_exp_model),
             [exp_services.get_exploration_from_model(model)
