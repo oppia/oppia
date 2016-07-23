@@ -401,6 +401,8 @@ def _pre_commit_linter(all_files):
         process.start()
 
     for process in linting_processes:
+        # Require timeout parameter to prevent against endless waiting for the
+        # linting function to return.
         process.join(timeout=600)
 
 
@@ -412,6 +414,8 @@ def _pre_commit_linter(all_files):
     print '\n'.join(js_messages)
     print '----------------------------------------'
     summary_messages = []
+    # Require block = False to prevent unnecessary waiting for the process
+    # output.
     summary_messages.append(js_result.get(block=False))
     summary_messages.append(py_result.get(block=False))
     print '\n'.join(summary_messages)
