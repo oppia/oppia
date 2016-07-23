@@ -17,16 +17,23 @@
  * used at multiple places in the codebase.
  */
 
-oppia.factory('utilsService', [function() {
-  var utils = {
-    isEmpty: function(obj) {
-      for (var property in obj) {
-        if (obj.hasOwnProperty(property)) {
-          return false;
+oppia.factory('utilsService', ['UrlInterpolationService',
+  function(UrlInterpolationService) {
+    var utils = {
+      isEmpty: function(obj) {
+        for (var property in obj) {
+          if (obj.hasOwnProperty(property)) {
+            return false;
+          }
         }
+        return true;
+      },
+
+      getDefaultUserAvatarImageUrl: function() {
+        return UrlInterpolationService.getStaticImageUrl(
+          '/avatar/user_blue_72px.png');
       }
-      return true;
-    }
-  };
-  return utils;
-}]);
+    };
+    return utils;
+  }
+]);

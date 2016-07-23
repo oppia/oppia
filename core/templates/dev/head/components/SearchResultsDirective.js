@@ -22,7 +22,9 @@ oppia.directive('searchResults', [function() {
     templateUrl: 'components/searchResults',
     controller: [
       '$scope', '$rootScope', '$timeout', '$window', 'siteAnalyticsService',
-      function($scope, $rootScope, $timeout, $window, siteAnalyticsService) {
+      'UrlInterpolationService',
+      function($scope, $rootScope, $timeout, $window, siteAnalyticsService,
+        UrlInterpolationService) {
         $rootScope.loadingMessage = 'Loading';
         $scope.someResultsExist = true;
 
@@ -42,6 +44,9 @@ oppia.directive('searchResults', [function() {
           }, 150);
           return false;
         };
+
+        $scope.noExplorationsImgUrl = UrlInterpolationService.getStaticImageUrl(
+          '/general/no_explorations_found.png');
       }
     ]
   };
