@@ -131,10 +131,6 @@ body {
   max-width: 800px;
 }
 
-.oppia-dashboard-container a, .oppia-dashboard-container a:hover {
-  color: #009688;
-}
-
 .oppia-dashboard-container .exp-private-text {
   color: #aaa;
   font-style: italic;
@@ -3469,6 +3465,17 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-activity-summary-tile a:visited {
   color: inherit;
   text-decoration: none;
+}
+
+.oppia-dashboard-container a,
+.oppia-dashboard-container a:hover,
+.oppia-dashboard-container a:active,
+.oppia-dashboard-container a:visited {
+  color: #009688;
+}
+
+.oppia-dashboard-container a:hover {
+    text-decoration: underline;
 }
 
 .oppia-activity-summary-tile:hover {

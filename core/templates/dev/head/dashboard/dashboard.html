@@ -225,7 +225,11 @@
                         tooltip="<['I18N_DASHBOARD_OPEN_FEEDBACK' | translate]>"
                         tooltip-placement="top">
                   </span>
-                  <[exploration.num_open_threads]>
+                  <[exploration.num_total_threads]>
+                  <a ng-if="exploration.num_open_threads != 0"
+                     ng-href="/create/<[exploration.id]>#/feedback">
+                      (<[exploration.num_open_threads]> new)
+                  </a>
                 </li>
                 <sharing-links ng-if="exploration.status !== 'private'"
                                ng-click="$event.stopPropagation()"
