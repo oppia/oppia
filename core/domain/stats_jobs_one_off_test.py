@@ -142,7 +142,41 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         self.assertEqual(job_output, [])
         self._verify_no_migration_validation_problems()
 
-    def test_migrated_answer_from_deleted_exploration_is_ignored(self):
+    def test_migrated_answer_from_deleted_exploration_is_still_migrated(self):
+        state_name = 'Text Input'
+
+        rule_spec_str = 'Contains(ate)'
+        html_answer = 'appreciate'
+        self._record_old_answer(state_name, rule_spec_str, html_answer)
+
+        # There should be no answers in the new data storage model.
+        state_answers = self._get_state_answers(state_name)
+        self.assertIsNone(state_answers)
+
+        exp_services.delete_exploration(self.owner_id, self.DEMO_EXP_ID)
+
+        job_output = self._run_migration_job()
+
+        # The answer should have still migrated.
+        state_answers = self._get_state_answers(state_name)
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': 'appreciate',
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': 0,
+            'rule_spec_index': 0,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'TextInput',
+            'params': [],
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
+
+        self.assertEqual(len(job_output), 0)
+        self._verify_no_migration_validation_problems()
+
+    def test_migrated_answer_from_fully_deleted_exploration_is_migrated(self):
         state_name = 'Text Input'
 
         rule_spec_str = 'Contains(ate)'
@@ -159,13 +193,42 @@ class AnswerMigrationJobTests(test_utils.GenericTestBase):
         job_output = self._run_migration_job()
 
         # There should still be no answers in the new data storage model.
-        state_answers = self._get_state_answers(state_name)
-        self.assertIsNone(state_answers)
+        state_answers = self._get_state_answers(
+            state_name, exploration_version=0)
 
-        self.assertEqual(len(job_output), 1)
+        self.assertEqual(state_answers.exploration_id, self.DEMO_EXP_ID)
+        self.assertEqual(state_answers.exploration_version, 0)
+        self.assertEqual(state_answers.state_name, state_name)
+        self.assertEqual(state_answers.interaction_id, 'EndExploration')
+        self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
+            'answer': None,
+            'time_spent_in_sec': 0.0,
+            'answer_group_index': None,
+            'rule_spec_index': None,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'session_id': 'migrated_state_answer_session_id',
+            'interaction_id': 'EndExploration',
+            'params': [],
+            'rule_spec_str': rule_spec_str,
+            'answer_str': html_answer
+        }])
+
+        self.assertEqual(len(job_output), 4)
         self.assertIn(
-            'Encountered missing exploration referenced', job_output[0])
-        self._verify_migration_validation_problems(1)
+            'Encountered permanently missing exploration referenced to by '
+            'submitted answers. Migrating with missing exploration.',
+            job_output)
+        self.assertIn(
+            'Assuming answer belongs to the default outcome due to missing '
+            'state object.', job_output)
+        self.assertIn(
+            'Assuming answer belongs to EndExploration due to missing state '
+            'object', job_output)
+        self.assertIn(
+            'Cannot migrate answer due to missing answer state. Assuming it is '
+            'None.', job_output)
+        self._verify_no_migration_validation_problems()
 
     def test_rule_parameter_evaluation_with_invalid_characters(self):
         exploration = self.save_new_valid_exploration(
