@@ -495,13 +495,16 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
 
     @classmethod
     def _get_exploration_model_by_id_version(cls, exp_id, version):
-        # From VersionedModel.get_version(), except this allows retrieval of
-        # exploration models marked as deleted.
-        exp_model = exp_models.ExplorationModel(id=exp_id)
-        # pylint: disable=protected-access
-        exp_model._reconstitute_from_snapshot_id(
-            exp_models.ExplorationModel._get_snapshot_id(exp_id, version))
-        return exp_model
+        try:
+            # From VersionedModel.get_version(), except this allows retrieval of
+            # exploration models marked as deleted.
+            exp_model = exp_models.ExplorationModel(id=exp_id)
+            # pylint: disable=protected-access
+            exp_model._reconstitute_from_snapshot_id(
+                exp_models.ExplorationModel._get_snapshot_id(exp_id, version))
+            return exp_model
+        except Exception:
+            return None
 
     @classmethod
     def _find_exploration_immediately_before_timestamp(cls, exp_id, when):
@@ -544,16 +547,19 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 # submission
                 exp_model = cls._get_exploration_model_by_id_version(
                     exp_id, version)
+                if not exp_model:
+                    return (None, None)
                 return (
                     exp_services.get_exploration_from_model(exp_model), None)
 
         # Any data added before ecbfff0 is assumed to match the earliest
         # recorded commit.
+        history_models = [cls._get_exploration_model_by_id_version(
+            exp_id, version)) for version in versions]
         return (
             exp_services.get_exploration_from_model(latest_exp_model),
-            [exp_services.get_exploration_from_model(
-                cls._get_exploration_model_by_id_version(exp_id, version))
-             for version in versions])
+            [exp_services.get_exploration_from_model(model)
+             for model in history_models])
 
     # This function comes from extensions.answer_summarizers.models.
     @classmethod
@@ -1239,7 +1245,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 if history:
                     recovered_state = False
                     for old_exp in history:
-                        if state_name in old_exp.states:
+                        if old_exp and state_name in old_exp.states:
                             dated_explorations_dict[created_on] = old_exp
                             recovered_state = True
                             yield (
