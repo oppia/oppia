@@ -108,7 +108,6 @@ def copy_files_source_to_target(source, target):
 def _build_files():
     ensure_directory_exists(OUT_DIR)
     shutil.rmtree(OUT_DIR)
-    process_third_party_libs()
 
     for root, dirs, files in os.walk(os.path.join(os.getcwd(), HEAD_DIR)):
         for directory in dirs:
@@ -146,6 +145,7 @@ if __name__ == '__main__':
     ASSETS_OUT_DIR = os.path.join(BUILD_DIR, 'assets', '')
     copy_files_source_to_target(ASSETS_SRC_DIR, ASSETS_OUT_DIR)
 
+    process_third_party_libs()
     # Process third_party/generated/prod, copy it to
     # build/[cache_slug]/third_party/generated
     THIRD_PARTY_GENERATED_SRC_DIR = os.path.join(
