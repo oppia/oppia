@@ -270,13 +270,16 @@ oppia.controller('StateResponses', [
   '$scope', '$rootScope', '$modal', '$filter', 'stateInteractionIdService',
   'editorContextService', 'alertsService', 'responsesService', 'routerService',
   'explorationContextService', 'trainingDataService',
-  'PLACEHOLDER_OUTCOME_DEST', 'INTERACTION_SPECS',
+  'PLACEHOLDER_OUTCOME_DEST', 'INTERACTION_SPECS', 'UrlInterpolationService',
   function(
       $scope, $rootScope, $modal, $filter, stateInteractionIdService,
       editorContextService, alertsService, responsesService, routerService,
       explorationContextService, trainingDataService,
-      PLACEHOLDER_OUTCOME_DEST, INTERACTION_SPECS) {
+      PLACEHOLDER_OUTCOME_DEST, INTERACTION_SPECS, UrlInterpolationService) {
     $scope.editorContextService = editorContextService;
+
+    $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
+      '/general/drag_dots.png');
 
     var _initializeTrainingData = function() {
       var explorationId = explorationContextService.getExplorationId();

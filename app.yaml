@@ -15,34 +15,36 @@ inbound_services:
 
 handlers:
 - url: /favicon.ico
-  static_files: static/images/favicon.ico
-  upload: static/images/favicon.ico
+  static_files: assets/common/favicon.ico
+  upload: assets/common/favicon.ico
   secure: always
   http_headers:
     Cache-Control: 'public, max-age=2592000'
     Vary: Accept-Encoding
-- url: /images
-  static_dir: static/images
-  secure: always
-  http_headers:
-    Cache-Control: 'public, max-age=600'
-- url: /static/pages
-  static_dir: static/pages
-  secure: always
-  http_headers:
-    Cache-Control: 'public, max-age=600'
 - url: /robots.txt
-  static_files: static/pages/robots.txt
-  upload: static/pages/robots.txt
+  static_files: assets/common/robots.txt
+  upload: assets/common/robots.txt
   secure: always
   http_headers:
     Cache-Control: 'public, max-age=2592000'
     Vary: Accept-Encoding
-- url: /scripts
-  static_dir: static/scripts
+- url: /build
+  static_dir: build
   secure: always
   http_headers:
-    Cache-Control: 'no-cache'
+    Cache-Control: 'public, max-age=2592000'
+- url: /assets/common
+  static_dir: assets/common
+  secure: always
+  http_headers:
+    # WARNING TO DEVELOPERS: Files in this folder may be stale for
+    # up to 10 mins after a code release.
+    Cache-Control: 'public, max-age=600'
+- url: /assets
+  static_dir: assets
+  secure: always
+  http_headers:
+    Cache-Control: 'public, max-age=60'
 - url: /css
   # NB: not minified. TODO(sll): fix.
   static_dir: core/templates/dev/head/css
@@ -53,11 +55,6 @@ handlers:
   http_headers:
     Cache-Control: 'public, max-age=2592000'
     Vary: Accept-Encoding
-- url: /i18n
-  static_dir: i18n
-  secure: always
-  http_headers:
-    Cache-Control: 'no-cache'
 - url: /third_party/generated
   static_dir: third_party/generated
   secure: always

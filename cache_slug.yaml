@@ -1,0 +1,5 @@
+# Cache slug is a prefix that is attached to static resource paths such as
+# images, scripts and css. It should only contain alphanumeric characters.
+# It will be automatically updated when deploy.py is run.
+cache_slug:
+  default

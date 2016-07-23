@@ -26,7 +26,10 @@ oppia.directive('oppiaGadgetScoreBar', [
     return {
       restrict: 'E',
       templateUrl: 'gadget/ScoreBar',
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
+      controller: ['$scope', '$attrs', 'UrlInterpolationService',
+      function($scope, $attrs, UrlInterpolationService) {
+        $scope.getStaticResourceUrl = (
+          UrlInterpolationService.getStaticResourceUrl);
         $scope.scoreBarLabel = oppiaHtmlEscaper.escapedJsonToObj(
           $attrs.gadgetName);
         $scope.maxValue = oppiaHtmlEscaper.escapedJsonToObj(
