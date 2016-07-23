@@ -1269,7 +1269,10 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             rule_str = value_dict['rule_str']
             created_on = value_dict['created_on']
             exploration = dated_explorations_dict[created_on]
-            state = exploration.states[state_name] if exploration else None
+            if exploration and state_name in exploration.states:
+                state = exploration.states[state_name]
+            else:
+                state = None
             migration_errors = AnswerMigrationJob._migrate_answers(
                 item_id, exploration_id, exploration, state_name, state,
                 item.answers, rule_str)
