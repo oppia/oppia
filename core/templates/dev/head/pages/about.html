@@ -365,10 +365,10 @@
     </div>
   </div>
 
-  <div class="oppia-about-extra-container">
+  <div class="oppia-about-extra-container" ng-controller="About">
     <div class="oppia-about-extra-content oppia-about-clearfix">
       <div class="oppia-about-otter-container">
-        <img src="images/general/about_page_mascot.png" class="oppia-about-otter" alt="Otter">
+        <img ng-src="<[aboutPageMascotImgUrl]>" class="oppia-about-otter" alt="Otter">
       </div>
       <div class="oppia-about-otter-speech-card">
         <blockquote class="oppia-about-otter-speech-bubble">
@@ -428,6 +428,13 @@
     });
   </script>
 {% endblock %}
+
+{% block footer_js %} 
+  {{ super() }}
+  <script>
+    {{ include_js_file('pages/About.js') }}
+  </script>
+{% endblock footer_js %}
 
 {% block footer%}
   {% include 'footer.html' %}

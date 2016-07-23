@@ -16,6 +16,7 @@
 
 # pylint: disable=relative-import
 from core.tests import test_utils
+import feconf
 import utils
 # pylint: enable=relative-import
 
@@ -181,10 +182,30 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_get_thumbnail_icon_url_for_category(self):
         self.assertEqual(
             utils.get_thumbnail_icon_url_for_category('Architecture'),
-            '/images/subjects/Architecture.svg')
+            '%s/assets/images/subjects/Architecture.svg'
+            % utils.get_asset_dir_prefix())
         self.assertEqual(
             utils.get_thumbnail_icon_url_for_category('Graph Theory'),
-            '/images/subjects/GraphTheory.svg')
+            '%s/assets/images/subjects/GraphTheory.svg'
+            % utils.get_asset_dir_prefix())
         self.assertEqual(
             utils.get_thumbnail_icon_url_for_category('Nonexistent'),
-            '/images/subjects/Lightbulb.svg')
+            '%s/assets/images/subjects/Lightbulb.svg'
+            % utils.get_asset_dir_prefix())
+
+    def test_get_asset_dir_prefix_returns_correct_slug(self):
+
+        with self.swap(feconf, 'DEV_MODE', True):
+            utils.ASSET_DIR_PREFIX = None
+            asset_dir_prefix = utils.get_asset_dir_prefix()
+            self.assertEqual('', asset_dir_prefix)
+
+        with self.swap(feconf, 'DEV_MODE', False):
+            utils.ASSET_DIR_PREFIX = None
+            asset_dir_prefix = utils.get_asset_dir_prefix()
+            self.assertTrue(asset_dir_prefix.startswith('/build'))
+
+        with self.swap(feconf, 'IS_MINIFIED', True):
+            utils.ASSET_DIR_PREFIX = None
+            asset_dir_prefix = utils.get_asset_dir_prefix()
+            self.assertTrue(asset_dir_prefix.startswith('/build'))

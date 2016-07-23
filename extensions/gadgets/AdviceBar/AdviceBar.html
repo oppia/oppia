@@ -1,6 +1,5 @@
-<link rel="stylesheet" type="text/css" href="/extensions/gadgets/AdviceBar/static/css/adviceBar.css">
-
 <script type="text/ng-template" id="gadget/AdviceBar">
+  <link rel="stylesheet" type="text/css" ng-href="<[getStaticResourceUrl('/extensions/gadgets/AdviceBar/static/css/adviceBar.css')]>">
   <div class="oppia-advice-bar-container">
     <h2 class="oppia-advice-bar-title protractor-test-advicebar-title">Tips</h2>
     <div ng-repeat="resource in adviceBarResources track by $index">

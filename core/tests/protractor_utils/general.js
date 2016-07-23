@@ -72,7 +72,8 @@ var EDITOR_URL_SLICE = '/create/';
 var PLAYER_URL_SLICE = '/explore/';
 var LOGIN_URL_SUFFIX = '/_ah/login';
 var ADMIN_URL_SUFFIX = '/admin';
-var SCRIPTS_URL_SLICE = '/scripts/';
+// Note that this only works in dev, due to the use of cache slugs in prod.
+var SCRIPTS_URL_SLICE = '/assets/scripts/';
 var EXPLORATION_ID_LENGTH = 12;
 
 var FIRST_STATE_DEFAULT_NAME = 'Introduction';

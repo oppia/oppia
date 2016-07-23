@@ -26,6 +26,7 @@ describe('Dashboard backend API service', function() {
 
   beforeEach(inject(function($injector) {
     DashboardBackendApiService = $injector.get('DashboardBackendApiService');
+    UrlInterpolationService = $injector.get('UrlInterpolationService');
     $httpBackend = $injector.get('$httpBackend');
 
     // Sample dashboard data returnable from the backend
@@ -49,7 +50,8 @@ describe('Dashboard backend API service', function() {
         },
         community_owned: false,
         tags: '',
-        thumbnail_icon_url: '/images/subjects/Computing.svg',
+        thumbnail_icon_url: UrlInterpolationService.getStaticImageUrl(
+          '/subjects/Computing.svg'),
         thumbnail_bg_color: '#bb8b2f',
         num_views: 2,
         num_open_threads: 0,
