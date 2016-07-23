@@ -109,9 +109,10 @@ BAD_PATTERNS_JS = {
 }
 
 EXCLUDED_PATHS = (
-    'third_party/*', '.git/*', '*.pyc', 'CHANGELOG',
+    'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
     'scripts/pre_commit_linter.py', 'integrations/*',
-    'integrations_dev/*', '*.svg', '*.png', '*.zip', '*.ico', '*.jpg')
+    'integrations_dev/*', '*.svg', '*.png', '*.zip', '*.ico', '*.jpg',
+    '*.min.js')
 
 if not os.getcwd().endswith('oppia'):
     print ''
@@ -234,7 +235,7 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint, stdout,
         result.put('')
         print 'There are no JavaScript files to lint.'
         return
-    
+
     print 'Total js files: ', num_js_files
     jscs_cmd_args = [node_path, jscs_path, config_jscsrc]
     for _, filename in enumerate(files_to_lint):
@@ -253,14 +254,14 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint, stdout,
             num_files_with_errors += 1
             stdout.put(linter_stdout)
 
-    print 'js over'
-
     if num_files_with_errors:
         result.put('%s    %s JavaScript files' % (
             _MESSAGE_TYPE_FAILED, num_files_with_errors))
     else:
         result.put('%s   %s JavaScript files linted (%.1f secs)' % (
             _MESSAGE_TYPE_SUCCESS, num_js_files, time.time() - start_time))
+
+    print 'Js linting finished.'
 
 
 def _lint_py_files(config_pylint, files_to_lint, result):
@@ -307,14 +308,13 @@ def _lint_py_files(config_pylint, files_to_lint, result):
 
         current_batch_start_index = current_batch_end_index
 
-    print 'Pythin pver'
-
     if are_there_errors:
         result.put('%s    Python linting failed' % _MESSAGE_TYPE_FAILED)
     else:
         result.put('%s   %s Python files linted (%.1f secs)' % (
             _MESSAGE_TYPE_SUCCESS, num_py_files, time.time() - start_time))
 
+    print 'Python linting finished.'
 
 def _get_all_files():
     """This function is used to check if this script is ran from
@@ -401,7 +401,8 @@ def _pre_commit_linter(all_files):
         process.start()
 
     for process in linting_processes:
-        process.join()
+        process.join(timeout=600)
+
 
     js_messages = []
     while not js_stdout.empty():
@@ -411,8 +412,8 @@ def _pre_commit_linter(all_files):
     print '\n'.join(js_messages)
     print '----------------------------------------'
     summary_messages = []
-    summary_messages.append(js_result.get())
-    summary_messages.append(py_result.get())
+    summary_messages.append(js_result.get(block=False))
+    summary_messages.append(py_result.get(block=False))
     print '\n'.join(summary_messages)
     print ''
     return summary_messages
