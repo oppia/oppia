@@ -31,8 +31,11 @@ oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
       var areAnyChoicesEmpty = false;
       var areAnyChoicesDuplicated = false;
       var seenChoices = [];
+      var handledAnswers = [];
       var numChoices = customizationArgs.choices.value.length;
-      for (var i = 0; i < customizationArgs.choices.value.length; i++) {
+      var areAllChoicesCovered = false;
+
+      for (var i = 0; i < numChoices; i++) {
         var choice = customizationArgs.choices.value[i];
         if (choice.trim().length === 0) {
           areAnyChoicesEmpty = true;
@@ -41,6 +44,7 @@ oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
           areAnyChoicesDuplicated = true;
         }
         seenChoices.push(choice);
+        handledAnswers.push(false);
       }
 
       if (areAnyChoicesEmpty) {
@@ -91,20 +95,42 @@ oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
 
       var selectedChoices = [];
       if (maxAllowedCount === 1) {
-        for (var i = 0; i < answerGroups.length; i++) {
-          var ruleSpecs = answerGroups[i].rule_specs;
-          for (var j = 0; j < ruleSpecs.length; j++) {
-            for (var k = 0; k < ruleSpecs[j].inputs.x.length; k++) {
-              var choicePreviouslySelected = (
-                selectedChoices.indexOf(ruleSpecs[j].inputs.x[k]) !== -1);
-              if (!choicePreviouslySelected) {
-                selectedChoices.push(ruleSpecs[j].inputs.x[k]);
-              }
+        var newHandledAnswers = function(current) {
+          return handledAnswers.map(function(element, index) {
+            if (index !== current || element === true) {
+              return true;
+            } else if (index === current && element !== true) {
+              return false;
             }
-          }
-        }
+          });
+        };
+
+        seenChoices.forEach(function(seenChoice, choiceIndex) {
+          answerGroups.forEach(function(answerGroup) {
+            var ruleSpecs = answerGroup.rule_specs;
+            ruleSpecs.forEach(function(ruleSpec) {
+              var ruleInputs = ruleSpec.inputs.x;
+              ruleInputs.forEach(function(ruleInput) {
+                if (ruleInput === seenChoice) {
+                  if (ruleSpec.rule_type === 'Equals') {
+                    handledAnswers[choiceIndex] = true;
+                  } else if (ruleSpec.rule_type === 'ContainsAtLeastOneOf') {
+                    handledAnswers[choiceIndex] = true;
+                  } else if (ruleSpec.rule_type ===
+                    'DoesNotContainAtLeastOneOf') {
+                    handledAnswers = newHandledAnswers(choiceIndex);
+                  }
+                }
+              });
+            });
+          });
+        });
+        areAllChoicesCovered = handledAnswers.every(function(handledAnswer) {
+          return handledAnswer ? true : false;
+        });
       }
-      if (selectedChoices.length < numChoices) {
+
+      if (!areAllChoicesCovered) {
         if (!defaultOutcome ||
             $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
           warningsList.push({
@@ -113,34 +139,6 @@ oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
               'Please clarify the default outcome so it is less confusing to ' +
               'the user.')
           });
-        }
-      }
-      // For situations where max choices is 1,
-      // ensure that number of answers matches number of choices
-      if (maxAllowedCount === 1 && answerGroups.length > numChoices) {
-        warningsList.push({
-          type: WARNING_TYPES.ERROR,
-          message: (
-            'Please ensure that the number of choices and answers match.')
-        });
-      }
-      // For situations where max choices is 1,
-      // ensure that containsAtLeastOneOf only handles one option
-      if (maxAllowedCount === 1) {
-        for (var i = 0; i < answerGroups.length; i++) {
-          var ruleSpecs = answerGroups[i].rule_specs;
-          for (var j = 0; j < ruleSpecs.length; j++) {
-            for (var k = 0; k < ruleSpecs[j].inputs.x.length; k++) {
-              if (ruleSpecs[j].rule_type === 'ContainsAtLeastOneOf' &&
-                  ruleSpecs[j].inputs.x.length > 1) {
-                warningsList.push({
-                  type: WARNING_TYPES.ERROR,
-                  message: (
-                    'Please ensure that you only match one answer choice.')
-                });
-              }
-            }
-          }
         }
       }
 

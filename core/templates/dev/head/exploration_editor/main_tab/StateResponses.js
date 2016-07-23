@@ -290,14 +290,16 @@ oppia.controller('StateResponses', [
     $scope.suppressDefaultAnswerGroupWarnings = function() {
       var interactionId = $scope.getCurrentInteractionId();
       var answerGroups = responsesService.getAnswerGroups();
-      var handledAnswersArray = [];
-      var choiceIndices = [];
+      // Use answerChoices to store answer choice text for comparison
       var answerChoices = [];
-      var choiceRules = [];
       var customizationArgs = stateCustomizationArgsService.savedMemento;
+      // Use handledAnswersArray to check that
+      // each answer choice has been covered
+      var handledAnswersArray = [];
 
       if (interactionId === 'MultipleChoiceInput') {
         var numChoices = $scope.getAnswerChoices().length;
+        var choiceIndices = [];
         // Collect all answers which have been handled by at least one
         // answer group.
         for (var i = 0; i < answerGroups.length; i++) {
@@ -314,17 +316,20 @@ oppia.controller('StateResponses', [
           return handledAnswersArray.indexOf(choiceIndex) !== -1;
         });
       } else if (interactionId === 'ItemSelectionInput') {
-        var maxSelectionCount = customizationArgs.
-                                maxAllowableSelectionCount.value;
+        var maxSelectionCount = (
+            customizationArgs.maxAllowableSelectionCount.value);
         if (maxSelectionCount === 1) {
           var numChoices = $scope.getAnswerChoices().length;
-          choiceRules = [];
-          for (var i = 0; i < answerGroups.length; i++) {
-            choiceRules.push(false);
+          // Use array to store booleans that become true
+          // if answerChoice is covered
+          handledAnswersArray = [];
+          for (var i = 0; i < numChoices; i++) {
+            handledAnswersArray.push(false);
+            answerChoices.push($scope.getAnswerChoices()[i].val);
           }
 
-          var newChoiceRules = function(current) {
-            return choiceRules.map(function(element, index) {
+          var newHandledAnswers = function(current) {
+            return handledAnswersArray.map(function(element, index) {
               if (index !== current || element === true) {
                 return true;
               } else if (index === current && element !== true) {
@@ -333,41 +338,34 @@ oppia.controller('StateResponses', [
             });
           };
 
-          for (var i = 0; i < answerGroups.length; i++) {
-            var ruleSpecs = answerGroups[i].rule_specs;
-            for (var j = 0; j < ruleSpecs.length; j++) {
-              for (var k = 0; k < ruleSpecs[j].inputs.x.length; k++) {
-                // If the rule_type of the first input is equalTo
-                // or containsOne, then set first choiceRules to true
-                if (ruleSpecs[j].rule_type === 'Equals') {
-                  choiceRules[i] = true;
-                } else if (ruleSpecs[j].rule_type === 'ContainsAtLeastOneOf') {
-                  choiceRules[i] = true;
-                } else if (ruleSpecs[j].rule_type ===
-                  'DoesNotContainAtLeastOneOf') {
-                  // If the ruleType is omits one of,
-                  // then set the others to true
-                  var current = i;
-                  choiceRules = newChoiceRules(current);
-                }
-                var choicePreviouslySelected = (
-                  handledAnswersArray.indexOf(ruleSpecs[j].inputs.x[k]) !== -1);
-                if (!choicePreviouslySelected) {
-                  handledAnswersArray.push(ruleSpecs[j].inputs.x[k]);
-                }
-              }
-            }
-          }
-          for (var l = 0; l < numChoices; l++) {
-            answerChoices.push($scope.getAnswerChoices()[l].label);
-          }
-          var allAnswersHandled = answerChoices.every(function(answerChoice) {
-            return handledAnswersArray.indexOf(answerChoice) !== -1;
-          });
-          var answerRulesCheck = choiceRules.every(function(choiceRule) {
-              return choiceRule ? true : false;
+          answerChoices.forEach(function(answerChoice, choiceIndex) {
+            answerGroups.forEach(function(answerGroup) {
+              var ruleSpecs = answerGroup.rule_specs;
+              ruleSpecs.forEach(function(ruleSpec) {
+                var ruleInputs = ruleSpec.inputs.x;
+                ruleInputs.forEach(function(ruleInput) {
+                  if (ruleInput === answerChoice) {
+                    if (ruleSpec.rule_type === 'Equals') {
+                      handledAnswersArray[choiceIndex] = true;
+                    } else if (ruleSpec.rule_type === 'ContainsAtLeastOneOf') {
+                      handledAnswersArray[choiceIndex] = true;
+                    } else if (ruleSpec.rule_type ===
+                      'DoesNotContainAtLeastOneOf') {
+                      handledAnswersArray = newHandledAnswers(choiceIndex);
+                    }
+                  }
+                });
+              });
             });
-          return allAnswersHandled && answerRulesCheck;
+          });
+
+          var areAllChoicesCovered = handledAnswersArray.every(
+            function(handledAnswer) {
+              return handledAnswer ? true : false;
+            });
+          // We only suppress the default warning if each choice text has
+          // been handled by at least one answer group, based on rule type.
+          return areAllChoicesCovered;
         }
       }
     };
