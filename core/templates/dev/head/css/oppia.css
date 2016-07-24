@@ -3470,6 +3470,17 @@ md-card.preview-conversation-skin-supplemental-card {
   text-decoration: none;
 }
 
+.oppia-dashboard-container a,
+.oppia-dashboard-container a:hover,
+.oppia-dashboard-container a:active,
+.oppia-dashboard-container a:visited {
+  color: #009688;
+}
+
+.oppia-dashboard-container a:hover {
+    text-decoration: underline;
+}
+
 .oppia-activity-summary-tile:hover {
   /*
     This is based on the levels defined on the following page:
