@@ -454,6 +454,27 @@ class TestBase(unittest.TestCase):
                 obj_type, new_param_dict)
         return new_param_dict
 
+    def get_static_asset_filepath(self):
+        """Returns filepath for referencing static files on disk.
+        examples: '' or 'build/1234'
+        """
+        cache_slug_filepath = ''
+        if feconf.IS_MINIFIED or not feconf.DEV_MODE:
+            yaml_file_content = utils.dict_from_yaml(
+                utils.get_file_contents('cache_slug.yaml'))
+            cache_slug = yaml_file_content['cache_slug']
+            cache_slug_filepath = os.path.join('build', cache_slug)
+
+        return cache_slug_filepath
+
+    def get_static_asset_url(self, asset_suffix):
+        """Returns the relative path for the asset, appending it to the
+        corresponding cache slug. asset_suffix should have a leading
+        slash.
+        """
+        return '/assets%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
+
+
     @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):
         """Swap an object's attribute value within the context of a

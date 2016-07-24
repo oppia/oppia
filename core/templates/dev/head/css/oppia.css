@@ -1366,7 +1366,7 @@ md-card.oppia-dashboard-tile {
   cursor: pointer;
 }
 .toast-warning {
-  background-image: url("/images/general/warning.png");
+  background-image: url("/assets/common/images/general/warning.png");
 }
 
 @media all and (max-width: 240px) {
@@ -3362,7 +3362,10 @@ md-card.preview-conversation-skin-supplemental-card {
     left: calc(50% - 200px);
   }
   .oppia-splash-button-create {
-    left: calc(50% + 200px);
+    /* Need double math to prevent issues with addition after minification.
+      https://github.com/yui/yuicompressor/issues/59#issuecomment-35528166
+    */
+    left: calc(50% - -200px);
   }
 
   .oppia-splash-section-two-content {
@@ -3754,7 +3757,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-about-header {
   background-blend-mode: multiply;
   background-color: #afd2eb;
-  background-image: url("../images/general/icons-bg.png");
+  background-image: url("/assets/common/images/general/icons-bg.png");
   padding: 10%;
   text-align: center;
 }

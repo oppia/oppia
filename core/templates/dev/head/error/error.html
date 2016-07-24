@@ -16,7 +16,7 @@
 {% endblock maintitle %}
 
 {% block content %}
-  <div class="oppia-content">
+  <div class="oppia-content" ng-controller="Error">
     <br>
 
     <div class="oppia-wide-panel oppia-error-wide-container">
@@ -39,7 +39,7 @@
 
         <br>
 
-        <img src="/images/general/oops_mint.png" alt="Oops!" width="299" height="142"/>
+        <img ng-src="<[oopsMintImgUrl]>" alt="Oops!" width="299" height="142"/>
         <p><h3>
           {% if code == 400 %}
             <h3 translate="I18N_ERROR_MESSAGE_400"></h3>
@@ -57,6 +57,13 @@
 
   </div>
 {% endblock %}
+
+{% block footer_js %} 
+  {{ super() }}
+  <script>
+    {{ include_js_file('error/Error.js') }}
+  </script>
+{% endblock footer_js %}
 
 {% block footer%}
   {% include 'footer.html' %}
