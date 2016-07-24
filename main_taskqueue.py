@@ -32,7 +32,7 @@ URLS = [
         feedback.UnsentFeedbackEmailHandler, 'feedback_message_email_handler'),
     main.get_redirect_route(
         r'%s' % feconf.SUGGESTION_EMAIL_HANDLER_URL,
-        feedback.UnsentSuggestionEmailHandler, 'suggestion_email_handler'),
+        feedback.SuggestionEmailHandler, 'suggestion_email_handler'),
 ]
 
 app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name

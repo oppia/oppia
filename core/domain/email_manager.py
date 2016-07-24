@@ -421,9 +421,9 @@ def send_suggestion_email(
     email_body_template = (
         'Hi %s,<br>'
         '%s has submitted a new suggestion for your Oppia exploration, '
-        '<a href="https://www.oppia.org/%s">"%s"</a>.<br>'
+        '<a href="https://www.oppia.org/create/%s">"%s"</a>.<br>'
         'You can accept or reject this suggestion by visiting the '
-        '<a href="https://www.oppia.org/%s#feedback">feedback page</a> '
+        '<a href="https://www.oppia.org/create/%s#/feedback">feedback page</a> '
         'for your exploration.<br>'
         '<br>'
         'Thanks!<br>'

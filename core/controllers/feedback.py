@@ -266,7 +266,7 @@ class FeedbackThreadViewEventHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class UnsentSuggestionEmailHandler(base.BaseHandler):
+class SuggestionEmailHandler(base.BaseHandler):
     """Handler task of sending email of suggestion."""
 
     def post(self):

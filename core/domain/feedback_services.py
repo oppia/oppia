@@ -291,7 +291,8 @@ def enqueue_feedback_message_email_task(user_id):
 
 
 def enqueue_suggestion_email_task(exploration_id, thread_id):
-    """Adds a 'send suggestion email' task into taskqueue."""
+    """Adds a 'send suggestion email' task into taskqueue.
+    suggestion emails are sent immidiately"""
 
     payload = {
         'exploration_id': exploration_id,
