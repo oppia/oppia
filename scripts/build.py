@@ -102,7 +102,11 @@ def copy_files_source_to_target(source, target):
             shutil.copyfile(source_path, target_path)
 
 
-def build_files(source, target):
+def build_files(source, target, ignore=None):
+    """Minifies all css and js files, and removes whitespace from html in source
+    directory and copies it to target, ignoring paths/files mentioned in ignore.
+    Copies files in ignore to target without any changes.
+    """
     print 'Processing %s' % os.path.join(os.getcwd(), source)
     print 'Generating into %s' % os.path.join(os.getcwd(), target)
     ensure_directory_exists(target)
@@ -118,6 +122,18 @@ def build_files(source, target):
             if source_path.find(source) == -1:
                 continue
             target_path = source_path.replace(source, target)
+
+            only_copy_file = False
+            if (any(source_path.find(p) > 0 for p in ignore) or
+                    any(source_path.find(p) > 0 for p in ['.json']) or
+                    not any(source_path.find(p) > 0 for p in ['.html', '.css', '.js'])):
+                only_copy_file = True
+
+            if only_copy_file:
+                ensure_directory_exists(target_path)
+                shutil.copyfile(source_path, target_path)
+                continue
+
             if filename.endswith('.html'):
                 process_html(source_path, target_path)
             if filename.endswith('.css'):
@@ -155,12 +171,17 @@ if __name__ == '__main__':
     # Process extensions, copy it to build/[cache_slug]/extensions
     EXTENSIONS_SRC_DIR = os.path.join('extensions', '')
     EXTENSIONS_OUT_DIR = os.path.join(BUILD_DIR, 'extensions', '')
-    copy_files_source_to_target(EXTENSIONS_SRC_DIR, EXTENSIONS_OUT_DIR)
+    # Certain files' syntax becomes incorrect after minification and hence
+    # they are ignored.
+    EXTENSIONS_IGNORE = [os.path.join('extensions', 'interactions',
+                                      'LogicProof', 'static', 'js')
+                        ]
+    build_files(EXTENSIONS_SRC_DIR, EXTENSIONS_OUT_DIR, EXTENSIONS_IGNORE)
 
     # Process core/templates/dev/head
     TEMPLATES_HEAD_DIR = os.path.join('core', 'templates', 'dev', 'head', '')
     TEMPLATES_OUT_DIR = os.path.join('core', 'templates', 'prod', 'head', '')
-    build_files(TEMPLATES_HEAD_DIR, TEMPLATES_OUT_DIR)
+    build_files(TEMPLATES_HEAD_DIR, TEMPLATES_OUT_DIR, [])
 
     # Process core/templates/prod/head/css, copy it to build/[cache_slug]/css
     CSS_SRC_DIR = os.path.join('core', 'templates', 'prod', 'head', 'css', '')

@@ -43,23 +43,28 @@ else:
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
-INTERACTIONS_DIR = os.path.join('extensions', 'interactions')
-GADGETS_DIR = os.path.join('extensions', 'gadgets')
-RTE_EXTENSIONS_DIR = os.path.join('extensions', 'rich_text_components')
+INTERACTIONS_DIR = os.path.join(
+    'build', 'default', 'extensions', 'interactions')
+GADGETS_DIR = os.path.join('build', 'default', 'extensions', 'gadgets')
+RTE_EXTENSIONS_DIR = os.path.join(
+    'build', 'default', 'extensions', 'rich_text_components')
 
-OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
+OBJECT_TEMPLATES_DIR = os.path.join(
+    'build', 'default', 'extensions', 'objects', 'templates')
 
 # Choose production template if minification flag is used or
 # if in production mode
 TEMPLATES_DIR_PREFIX = 'prod' if (IS_MINIFIED or not DEV_MODE) else 'dev'
 FRONTEND_TEMPLATES_DIR = os.path.join(
     'core', 'templates', TEMPLATES_DIR_PREFIX, 'head')
-DEPENDENCIES_TEMPLATES_DIR = os.path.join('extensions', 'dependencies')
-VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
+DEPENDENCIES_TEMPLATES_DIR = os.path.join(
+    'build', 'default', 'extensions', 'dependencies')
+VALUE_GENERATORS_DIR = os.path.join(
+    'build', 'default', 'extensions', 'value_generators')
 OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
-    'extensions', 'interactions', 'object_defaults.json')
+    'build', 'default', 'extensions', 'interactions', 'object_defaults.json')
 RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
-    os.getcwd(), 'extensions', 'interactions', 'rules.json')
+    os.getcwd(), 'build', 'default', 'extensions', 'interactions', 'rules.json')
 
 # The maximum number of results to retrieve in a datastore query.
 DEFAULT_QUERY_LIMIT = 1000
