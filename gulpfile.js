@@ -31,7 +31,6 @@ var argv = yargs
         .option('output_directory', {
           describe: 'A path to the directory where the files will be generated'
         })
-        .demand(['output_directory'])
         .argv;
     })
   .command('start_devserver', 'start GAE development server',
@@ -123,7 +122,10 @@ var cssBackgroundFilepaths = [];
 // directly inside 'third_party/generated/' since we need to keep urls
 // compatible across both dev and prod modes. This compatibility is achieved by
 // only interpolating the prefix for urls to these files.
-var generatedTargetDir = argv.output_directory;
+var generatedTargetDir = path.join('third_party', 'generated');
+if ('output_directory' in argv && argv.output_directory !== undefined) {
+  generatedTargetDir = argv.output_directory;
+}
 var generatedCssTargetDir = path.join(generatedTargetDir, 'css');
 var generatedJsTargetDir = path.join(generatedTargetDir, 'js');
 
