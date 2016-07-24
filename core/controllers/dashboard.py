@@ -147,6 +147,9 @@ class DashboardHandler(base.BaseHandler):
                 category in feconf.CATEGORIES_TO_COLORS else
                 feconf.DEFAULT_COLOR)
 
+        def _round_average_ratings(rating):
+            return round(rating, feconf.AVERAGE_RATINGS_DASHBOARD_PRECISION)
+
         exploration_ids_subscribed_to = (
             subscription_services.get_exploration_ids_subscribed_to(
                 self.user_id))
@@ -216,11 +219,21 @@ class DashboardHandler(base.BaseHandler):
             'total_open_feedback': feedback_services.get_total_open_threads(
                 feedback_thread_analytics)
         })
+        if dashboard_stats and dashboard_stats.get('average_ratings'):
+            dashboard_stats['average_ratings'] = (
+                _round_average_ratings(dashboard_stats['average_ratings']))
+
+        last_week_stats = (
+            user_services.get_last_week_dashboard_stats(self.user_id))
+        if last_week_stats and last_week_stats.get('average_ratings'):
+            last_week_stats['average_ratings'] = (
+                _round_average_ratings(last_week_stats['average_ratings']))
 
         self.values.update({
             'explorations_list': exp_summary_list,
             'collections_list': collection_summary_list,
-            'dashboard_stats': dashboard_stats
+            'dashboard_stats': dashboard_stats,
+            'last_week_stats': last_week_stats
         })
         self.render_json(self.values)
 
