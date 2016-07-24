@@ -43,9 +43,10 @@ oppia.directive('collectionDetailsEditor', [function() {
             };
           }
         );
-        $scope.LANGUAGE_LIST_FOR_SELECT = function() {
+        $scope.getLanguageListForSelect = function() {
           return GLOBALS.ALL_LANGUAGE_CODES;
         };
+        $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
 
         var refreshSettingsTab = function() {
           $scope.displayedCollectionTitle = $scope.collection.getTitle();
@@ -108,16 +109,28 @@ oppia.directive('collectionDetailsEditor', [function() {
         };
 
         $scope.updateCollectionLanguageCode = function() {
-          if (!$scope.displayedCollectionLanguage) {
-            alertsService.addWarning(
-              'Please specify a language for the collection.');
-            return;
-          }
           CollectionUpdateService.setCollectionLanguageCode(
             $scope.collection, $scope.displayedCollectionLanguage);
         };
 
+        var checkValidTag = function() {
+          // Every tag should match the TAG_REGEX.
+          for (var i = 0; i < $scope.displayedCollectionTags.length; i++) {
+            var tagRegex = new RegExp(GLOBALS.TAG_REGEX);
+            if (!$scope.displayedCollectionTags[i].match(tagRegex)) {
+              return false;
+            }
+          }
+          return true;
+        };
+
         $scope.updateCollectionTags = function() {
+          if (!checkValidTag()) {
+            alertsService.addWarning(
+              'Please verify that the tags for the collection contains only ' +
+              'lower case letters and/or spaces.');
+            return;
+          }
           CollectionUpdateService.setCollectionTags(
             $scope.collection, $scope.displayedCollectionTags);
         };
