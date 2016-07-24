@@ -177,6 +177,12 @@ class DashboardHandler(base.BaseHandler):
 
         for ind, exploration in enumerate(explorations_list):
             exploration.update(feedback_thread_analytics[ind].to_dict())
+            exploration.update({
+                'num_unresolved_answers': (
+                    unresolved_answers_dict[exploration['id']]['count']
+                    if exploration['id'] in unresolved_answers_dict else 0
+                )
+            })
 
         explorations_list = sorted(
             explorations_list,

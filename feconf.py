@@ -473,6 +473,9 @@ COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
+# Number of unresolved answers to be displayed in the dashboard for
+# each exploration.
+TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
 # NOTE TO DEVELOPERS: This should be synchronized with base.js
 ENABLE_STRING_CLASSIFIER = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False

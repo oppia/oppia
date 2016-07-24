@@ -21,6 +21,7 @@ from core.domain import exp_services
 from core.domain import stats_domain
 from core.domain import stats_jobs_continuous
 from core.platform import models
+import feconf
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
@@ -38,6 +39,76 @@ def get_top_unresolved_answers_for_default_rule(exploration_id, state_name):
             exploration_id, state_name, exp_domain.DEFAULT_RULESPEC_STR
         ).get_top_answers(3)
     }
+
+
+def get_exps_unresolved_answers_count_for_default_rule(exp_ids):
+    """Gets answer counts per exploration for the answer groups for default
+    rule across all states for explorations with ids in exp_ids.
+
+    Note that this method currently returns the counts only for the DEFAULT
+    rule. This should ideally handle all types of unresolved answers.
+
+    Returns a dict of the following format:
+        {
+          'exp_id_1': {
+            'count': (number of unresolved answers for this exploration),
+            'values': [
+              {'count': 4, value: 'answer_1'},
+              {'count': 2, value: 'answer_2'},
+              {'count': 1, value: 'answer_3'}
+            ]
+          },
+          'exp_id_2': {
+            'count': (number of unresolved answers for this exploration),
+            'values': [
+              {'count': 8, value: 'answer_4'},
+              {'count': 3, value: 'answer_5'},
+              {'count': 1, value: 'answer_6'}
+            ]
+          }
+        }
+    """
+    def _get_explorations_state_tuples_by_ids(exp_ids):
+        """Returns a list of all (exp_id, state_name) tuples for the given
+        exp_ids.
+        E.g. - [
+          ('eid1', 'Introduction'),
+          ('eid1', 'End'),
+          ('eid2', 'Introduction'),
+          ('eid3', 'Introduction')
+        ]
+        when exp_ids = ['eid1', 'eid2', 'eid3']."""
+        explorations = exp_services.get_multiple_explorations_by_id(exp_ids)
+        return [
+            (exp_domain_object.id, state_key)
+            for exp_domain_object in explorations.values()
+            for state_key in exp_domain_object.states
+        ]
+
+    explorations_states_tuples = _get_explorations_state_tuples_by_ids(exp_ids)
+    exploration_states_answers_list = get_top_state_rule_answers_multi(
+        explorations_states_tuples, [exp_domain.DEFAULT_RULESPEC_STR])
+    exps_answers_mapping = {}
+
+    for ind, statewise_answers in enumerate(exploration_states_answers_list):
+        exp_id = explorations_states_tuples[ind][0]
+        if exp_id not in exps_answers_mapping:
+            exps_answers_mapping[exp_id] = {
+                'count': 0,
+                'values': []
+            }
+            exps_answers_mapping[exp_id]['values'].extend(statewise_answers)
+        for answer in statewise_answers:
+            exps_answers_mapping[exp_id]['count'] += answer['count']
+
+    for exp_id in exps_answers_mapping:
+        exps_answers_mapping[exp_id]['values'] = (
+            sorted(
+                exps_answers_mapping[exp_id]['values'],
+                key=lambda a: a['count'],
+                reverse=True)[:feconf.TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD])
+
+    return exps_answers_mapping
 
 
 def get_state_rules_stats(exploration_id, state_name):
