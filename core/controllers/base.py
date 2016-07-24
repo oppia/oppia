@@ -327,6 +327,10 @@ class BaseHandler(webapp2.RequestHandler):
             'SITE_NAME': SITE_NAME.value,
             'SUPPORTED_SITE_LANGUAGES': feconf.SUPPORTED_SITE_LANGUAGES,
             'SYSTEM_USERNAMES': feconf.SYSTEM_USERNAMES,
+            'can_create_collections': (
+                self.username and self.username in
+                config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value
+            ),
             'user_is_logged_in': user_services.has_fully_registered(
                 self.user_id),
             'preferred_site_language_code': self.preferred_site_language_code
