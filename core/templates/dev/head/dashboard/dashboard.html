@@ -142,7 +142,7 @@
               <td colspan="4"
                   ng-if="exploration.status === 'private'"
                   class="exp-private-text">
-                <[PUBLISH_TEXT]>
+                <[publishText]>
               </td>
               <td ng-if="exploration.status !== 'private'">
                 <[(getAverageRating(exploration.ratings) | number:1) || 'N/A']>
@@ -179,7 +179,7 @@
 
             <div ng-attr-section="'<['right-section']>">
               <div ng-if="exploration.status === 'private'" class="exp-private-text">
-                <[PUBLISH_TEXT]>
+                <[publishText]>
               </div>
               <ul ng-if="exploration.status !== 'private'"
                   layout="row"

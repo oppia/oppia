@@ -31,7 +31,6 @@ oppia.controller('Dashboard', [
 
     $scope.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
         GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD);
-    $scope.PUBLISH_TEXT = EXP_PUBLISH_TEXTS.default;
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
     $scope.createNewExploration = (
       ExplorationCreationService.createNewExploration);
@@ -58,9 +57,9 @@ oppia.controller('Dashboard', [
     $scope.checkForMobileView = function() {
       if ($window.innerWidth < 500) {
         $scope.myExplorationsView = 'card';
-        $scope.PUBLISH_TEXT = EXP_PUBLISH_TEXTS.sm;
+        $scope.publishText = EXP_PUBLISH_TEXTS.sm;
       } else {
-        $scope.PUBLISH_TEXT = EXP_PUBLISH_TEXTS.default;
+        $scope.publishText = EXP_PUBLISH_TEXTS.default;
       }
     };
 

@@ -2728,11 +2728,10 @@ div#ng-curtain {
 }
 
  @media (max-width: 500px) {
-  .oppia-notification-content,
-  .oppia-notification-last-updated {
-    display: inline;
-  }
-
+   .oppia-notification-content,
+   .oppia-notification-last-updated {
+     display: inline;
+   }
  }
 
 .oppia-about-anchor {
@@ -3690,8 +3689,9 @@ md-card.preview-conversation-skin-supplemental-card {
     padding-right: 10px;
   }
 
-  .oppia-dashboard-container .dashboard-hide-mobile {
-    display: none !important;
+  .oppia-dashboard-container .oppia-dashboard-tabs .list-card-view-toggle,
+  .oppia-dashboard-container .oppia-dashboard-card-view-item .oppia-sharing-links {
+    display: none;
   }
 
   .oppia-dashboard-aggregated-stats .stats-card {
