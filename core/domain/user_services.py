@@ -718,6 +718,14 @@ def get_weekly_dashboard_stats(user_id):
         return None
 
 
+def get_last_week_dashboard_stats(user_id):
+    weekly_dashboard_stats = get_weekly_dashboard_stats(user_id)
+    if weekly_dashboard_stats:
+        return weekly_dashboard_stats[-1]
+    else:
+        return None
+
+
 def update_dashboard_stats_log(user_id):
     """Save statistics for creator dashboard of a user by appending to a list
     keyed by a datetime string.
