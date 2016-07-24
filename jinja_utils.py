@@ -23,6 +23,8 @@ import math
 import jinja2
 from jinja2 import meta
 
+import utils # pylint: disable=relative-import
+
 
 _OPPIA_MODULE_DEFINITION_FILE = 'app.js'
 
@@ -68,7 +70,25 @@ def get_jinja_env(dir_path):
             # (IIFE) to prevent pollution of the global scope.
             return jinja2.Markup('(function() {%s})();' % raw_file_contents)
 
+    def get_static_resource_url(resource_suffix):
+        """Returns the relative path for the resource, appending it to the
+        corresponding cache slug. resource_suffix should have a leading
+        slash.
+        """
+        return '%s%s' % (utils.get_asset_dir_prefix(), resource_suffix)
+
+    def get_complete_static_resource_url(domain_url, resource_suffix):
+        """Returns the relative path for the resource, appending it to the
+        corresponding cache slug. resource_suffix should have a leading
+        slash.
+        """
+        return '%s%s%s' % (
+            domain_url, utils.get_asset_dir_prefix(), resource_suffix)
+
     env.globals['include_js_file'] = include_js_file
+    env.globals['get_static_resource_url'] = get_static_resource_url
+    env.globals['get_complete_static_resource_url'] = (
+        get_complete_static_resource_url)
     env.filters.update(JINJA_FILTERS)
     return env
 
@@ -122,3 +142,13 @@ def evaluate_object(obj, params):
         return new_dict
     else:
         return copy.deepcopy(obj)
+
+
+def interpolate_cache_slug(string):
+    """Parses the cache slug in the input string.
+
+    Returns:
+      the parsed string, or None if the string could not be parsed.
+    """
+    cache_slug = utils.get_asset_dir_prefix()
+    return parse_string(string, {'cache_slug': cache_slug})

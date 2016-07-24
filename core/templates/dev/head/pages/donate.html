@@ -24,12 +24,12 @@
 {% endblock navbar_breadcrumb %}
 
 {% block content %}
-  <div class="oppia-page-card oppia-about-content">
+  <div class="oppia-page-card oppia-about-content" ng-controller="Donate">
     <div class="oppia-about-card-content-wide">
       <h2>Donate to The Oppia Foundation!</h2>
       <br>
       <div style="text-align: center">
-        <img src="/images/general/donate.png" style="height: 250px;
+        <img ng-src="<[donateImgUrl]>" style="height: 250px;
           text-align: center;">
       </div>
       <p>
@@ -77,6 +77,13 @@
     </div>
   </div>
 {% endblock %}
+
+{% block footer_js %} 
+  {{ super() }}
+  <script>
+    {{ include_js_file('pages/Donate.js') }}
+  </script>
+{% endblock footer_js %}
 
 {% block footer%}
   {% include 'footer.html' %}

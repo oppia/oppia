@@ -19,11 +19,11 @@
 oppia.controller('Dashboard', [
   '$scope', '$rootScope', '$window', 'oppiaDatetimeFormatter', 'alertsService',
   'DashboardBackendApiService', 'RatingComputationService',
-  'ExplorationCreationService', 'FATAL_ERROR_CODES',
+  'ExplorationCreationService', 'FATAL_ERROR_CODES', 'UrlInterpolationService',
   function(
       $scope, $rootScope, $window, oppiaDatetimeFormatter, alertsService,
       DashboardBackendApiService, RatingComputationService,
-      ExplorationCreationService, FATAL_ERROR_CODES) {
+      ExplorationCreationService, FATAL_ERROR_CODES, UrlInterpolationService) {
     $scope.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
         GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD);
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
@@ -31,6 +31,9 @@ oppia.controller('Dashboard', [
       ExplorationCreationService.createNewExploration);
     $scope.getLocaleAbbreviatedDatetimeString = (
       oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString);
+
+    $scope.emptyDashboardImgUrl = UrlInterpolationService.getStaticImageUrl(
+      '/general/empty_dashboard.svg');
 
     $scope.activeTab = 'myExplorations';
     $scope.setActiveTab = function(newActiveTabName) {

@@ -56,8 +56,8 @@ oppia.directive('createActivityButton', [function() {
               templateUrl: 'modals/createActivity',
               backdrop: true,
               controller: [
-                  '$scope', '$modalInstance',
-                  function($scope, $modalInstance) {
+                  '$scope', '$modalInstance', 'UrlInterpolationService',
+                  function($scope, $modalInstance, UrlInterpolationService) {
                 $scope.chooseExploration = function() {
                   ExplorationCreationService.createNewExploration();
                   $modalInstance.close();
@@ -71,6 +71,14 @@ oppia.directive('createActivityButton', [function() {
                 $scope.cancel = function() {
                   $modalInstance.dismiss('cancel');
                 };
+
+                $scope.explorationImgUrl = (
+                  UrlInterpolationService.getStaticImageUrl(
+                  '/activity/exploration.svg'));
+
+                $scope.collectionImgUrl = (
+                  UrlInterpolationService.getStaticImageUrl(
+                  '/activity/collection.svg'));
               }],
               windowClass: 'oppia-creation-modal'
             }).result.then(function() {}, function() {

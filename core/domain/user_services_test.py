@@ -22,6 +22,7 @@ from core.domain import collection_services
 from core.domain import event_services
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import user_jobs_continuous
 from core.domain import user_jobs_continuous_test
 from core.domain import user_services
 from core.tests import test_utils
@@ -142,7 +143,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_fetch_gravatar_success(self):
         user_email = 'user@example.com'
         expected_gravatar_filepath = os.path.join(
-            'static', 'images', 'avatar', 'gravatar_example.png')
+            self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
+            'gravatar_example.png')
         with open(expected_gravatar_filepath, 'r') as f:
             gravatar = f.read()
         with self.urlfetch_mock(content=gravatar):
@@ -197,7 +199,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_default_identicon_data_url(self):
         identicon_filepath = os.path.join(
-            'static', 'images', 'avatar', 'user_blue_72px.png')
+            self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
+            'user_blue_72px.png')
         identicon_data_url = utils.convert_png_to_data_url(
             identicon_filepath)
         self.assertEqual(
@@ -563,16 +566,22 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
             feconf.PLAY_TYPE_NORMAL)
         self.assertEquals(
-            user_services.get_user_dashboard_stats(self.owner_id), {
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.owner_id),
+            {
                 'total_plays': 0,
+                'num_ratings': 0,
                 'average_ratings': None
             })
         (user_jobs_continuous_test.ModifiedUserStatsAggregator
          .start_computation())
         self.process_and_flush_pending_tasks()
         self.assertEquals(
-            user_services.get_user_dashboard_stats(self.owner_id), {
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.owner_id),
+            {
                 'total_plays': 1,
+                'num_ratings': 0,
                 'average_ratings': None
             })
 
@@ -595,6 +604,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             user_services.get_weekly_dashboard_stats(self.owner_id), [{
                 self.CURRENT_DATE_AS_STRING: {
                     'total_plays': 0,
+                    'num_ratings': 0,
                     'average_ratings': None
                 }
             }])
@@ -625,6 +635,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             user_services.get_weekly_dashboard_stats(self.owner_id), [{
                 self.CURRENT_DATE_AS_STRING: {
                     'total_plays': 1,
+                    'num_ratings': 0,
                     'average_ratings': None
                 }
             }])

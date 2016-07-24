@@ -345,12 +345,17 @@ oppia.controller('ExplorationEditor', [
         templateUrl: 'modals/welcomeExploration',
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', function($scope, $modalInstance) {
+          '$scope', '$modalInstance', 'UrlInterpolationService',
+          function($scope, $modalInstance, UrlInterpolationService) {
             $scope.beginTutorial = $modalInstance.close;
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
             };
+
+            $scope.editorWelcomeImgUrl = (
+              UrlInterpolationService.getStaticImageUrl(
+                '/general/editor_welcome.svg'));
           }
         ],
         windowClass: 'oppia-welcome-modal'
@@ -567,7 +572,11 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         backdrop: true,
         controller: [
           '$scope', '$modalInstance', 'explorationContextService',
-          function($scope, $modalInstance, explorationContextService) {
+          'UrlInterpolationService',
+          function($scope, $modalInstance, explorationContextService,
+            UrlInterpolationService) {
+            $scope.congratsImgUrl = UrlInterpolationService.getStaticImageUrl(
+              '/general/congrats.svg');
             $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
               GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
             $scope.close = function() {

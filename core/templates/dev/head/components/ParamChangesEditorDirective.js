@@ -28,9 +28,11 @@ oppia.directive('paramChangesEditor', [function() {
     controller: [
       '$scope', '$rootScope', 'editabilityService',
       'explorationParamSpecsService', 'alertsService',
+      'UrlInterpolationService',
       function(
           $scope, $rootScope, editabilityService,
-          explorationParamSpecsService, alertsService) {
+          explorationParamSpecsService, alertsService,
+          UrlInterpolationService) {
         $scope.editabilityService = editabilityService;
         $scope.isParamChangesEditorOpen = false;
         $scope.warningText = '';
@@ -263,6 +265,9 @@ oppia.directive('paramChangesEditor', [function() {
           $scope.paramChangesService.restoreFromMemento();
           $scope.isParamChangesEditorOpen = false;
         };
+
+        $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
+          '/general/drag_dots.png');
       }
     ]
   };
