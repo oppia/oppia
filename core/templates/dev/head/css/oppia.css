@@ -1366,7 +1366,7 @@ md-card.oppia-dashboard-tile {
   cursor: pointer;
 }
 .toast-warning {
-  background-image: url("/images/general/warning.png");
+  background-image: url("/assets/common/images/general/warning.png");
 }
 
 @media all and (max-width: 240px) {
@@ -3362,7 +3362,10 @@ md-card.preview-conversation-skin-supplemental-card {
     left: calc(50% - 200px);
   }
   .oppia-splash-button-create {
-    left: calc(50% + 200px);
+    /* Need double math to prevent issues with addition after minification.
+      https://github.com/yui/yuicompressor/issues/59#issuecomment-35528166
+    */
+    left: calc(50% - -200px);
   }
 
   .oppia-splash-section-two-content {
@@ -3465,6 +3468,17 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-activity-summary-tile a:visited {
   color: inherit;
   text-decoration: none;
+}
+
+.oppia-dashboard-container a,
+.oppia-dashboard-container a:hover,
+.oppia-dashboard-container a:active,
+.oppia-dashboard-container a:visited {
+  color: #009688;
+}
+
+.oppia-dashboard-container a:hover {
+    text-decoration: underline;
 }
 
 .oppia-activity-summary-tile:hover {
@@ -3754,7 +3768,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-about-header {
   background-blend-mode: multiply;
   background-color: #afd2eb;
-  background-image: url("../images/general/icons-bg.png");
+  background-image: url("/assets/common/images/general/icons-bg.png");
   padding: 10%;
   text-align: center;
 }
@@ -3850,11 +3864,6 @@ md-card.preview-conversation-skin-supplemental-card {
   width: 70%;
 }
 
-.oppia-about-three-cols-container {
-  display: flex;
-  flex-wrap: wrap;
-}
-
 .oppia-about-three-cols-feature,
 .oppia-about-three-cols-feature p {
   text-align: center;
@@ -3869,8 +3878,14 @@ md-card.preview-conversation-skin-supplemental-card {
   margin-right: 0;
 }
 
-.oppia-about-credits-letter-groups {
+.oppia-about-credits-letter-groups.three-col{
   margin: 0 0 10% 0;
+  -moz-column-count: 3;
+  -moz-column-gap: 20px;
+  -webkit-column-count: 3;
+  -webkit-column-gap: 20px;
+  column-count: 3;
+  column-gap: 20px;
 }
 
 .oppia-about-extra-info {
@@ -4011,12 +4026,6 @@ md-card.preview-conversation-skin-supplemental-card {
   }
   .oppia-about-card-content-wide, .oppia-about-card-content-narrow {
     width: 80%;
-  }
-  .oppia-about-three-cols-layout {
-    width: 100%;
-    text-align: center;
-    padding: 0;
-    margin: 0;
   }
   .oppia-about-otter-speech-card {
     width: 50%;

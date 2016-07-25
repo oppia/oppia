@@ -133,6 +133,8 @@ SENDER_VALIDATORS = {
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_MARKETING: (
         lambda x: rights_manager.Actor(x).is_admin()),
     feconf.EMAIL_INTENT_DELETE_EXPLORATION: (
@@ -411,3 +413,44 @@ def send_feedback_message_email(recipient_id, feedback_messages):
         feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION,
         email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
+
+def send_suggestion_email(
+        exploration_title, exploration_id, author_id, recipient_list):
+    email_subject = 'New suggestion for "%s"' % exploration_title
+
+    email_body_template = (
+        'Hi %s,<br>'
+        '%s has submitted a new suggestion for your Oppia exploration, '
+        '<a href="https://www.oppia.org/create/%s">"%s"</a>.<br>'
+        'You can accept or reject this suggestion by visiting the '
+        '<a href="https://www.oppia.org/create/%s#/feedback">feedback page</a> '
+        'for your exploration.<br>'
+        '<br>'
+        'Thanks!<br>'
+        '- The Oppia Team<br>'
+        '<br>%s')
+
+    if not feconf.CAN_SEND_EMAILS_TO_USERS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    if not feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS:
+        log_new_error('This app cannot send feedback message emails to users.')
+        return
+
+    author_settings = user_services.get_user_settings(author_id)
+    for recipient_id in recipient_list:
+        recipient_user_settings = user_services.get_user_settings(recipient_id)
+        recipient_preferences = (
+            user_services.get_email_preferences(recipient_id))
+
+        if recipient_preferences['can_receive_feedback_message_email']:
+            # Send email only if recipient wants to receive.
+            email_body = email_body_template % (
+                recipient_user_settings.username, author_settings.username,
+                exploration_id, exploration_title, exploration_id,
+                EMAIL_FOOTER.value)
+            _send_email(
+                recipient_id, feconf.SYSTEM_COMMITTER_ID,
+                feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION,
+                email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)

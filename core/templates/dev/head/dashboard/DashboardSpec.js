@@ -40,8 +40,15 @@ describe('Creator dashboard controller', function() {
       collectionsList: [],
       dashboardStats: {
         total_plays: 2,
+        average_ratings: 3,
+        num_ratings: 2,
+        total_open_feedback: 1
+      },
+      lastWeekStats: {
+        total_plays: 1,
+        average_ratings: 4,
         num_ratings: 1,
-        average_ratings: 3
+        total_open_feedback: 0
       }
     };
 
@@ -79,6 +86,7 @@ describe('Creator dashboard controller', function() {
       expect(scope.explorationsList).toEqual(dashboardData.explorations_list);
       expect(scope.collectionsList).toEqual(dashboardData.collections_list);
       expect(scope.dashboardStats).toEqual(dashboardData.dashboard_stats);
+      expect(scope.lastWeekStats).toEqual(dashboardData.last_week_stats);
     });
   });
 });

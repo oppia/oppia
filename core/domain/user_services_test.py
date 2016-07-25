@@ -143,7 +143,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_fetch_gravatar_success(self):
         user_email = 'user@example.com'
         expected_gravatar_filepath = os.path.join(
-            'static', 'images', 'avatar', 'gravatar_example.png')
+            self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
+            'gravatar_example.png')
         with open(expected_gravatar_filepath, 'r') as f:
             gravatar = f.read()
         with self.urlfetch_mock(content=gravatar):
@@ -198,7 +199,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_default_identicon_data_url(self):
         identicon_filepath = os.path.join(
-            'static', 'images', 'avatar', 'user_blue_72px.png')
+            self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
+            'user_blue_72px.png')
         identicon_data_url = utils.convert_png_to_data_url(
             identicon_filepath)
         self.assertEqual(
@@ -592,6 +594,8 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             feconf.PLAY_TYPE_NORMAL)
         self.assertEquals(
             user_services.get_weekly_dashboard_stats(self.owner_id), None)
+        self.assertEquals(
+            user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
         with self.swap(user_services,
                        'get_current_date_as_string',
@@ -616,6 +620,8 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             feconf.PLAY_TYPE_NORMAL)
         self.assertEquals(
             user_services.get_weekly_dashboard_stats(self.owner_id), None)
+        self.assertEquals(
+            user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
         (user_jobs_continuous_test.ModifiedUserStatsAggregator
          .start_computation())
@@ -623,6 +629,8 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
 
         self.assertEquals(
             user_services.get_weekly_dashboard_stats(self.owner_id), None)
+        self.assertEquals(
+            user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
         with self.swap(user_services,
                        'get_current_date_as_string',
