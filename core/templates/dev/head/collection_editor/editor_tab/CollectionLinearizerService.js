@@ -22,7 +22,7 @@
 oppia.factory('CollectionLinearizerService', [
   'CollectionUpdateService', 'SkillListObjectFactory',
   function(CollectionUpdateService, SkillListObjectFactory) {
-    var getNextExplorationIds = function(collection, completedExpIds) {
+    var _getNextExplorationIds = function(collection, completedExpIds) {
       var acquiredSkillList = completedExpIds.reduce(
         function(skillList, explorationId) {
           var collectionNode = collection.getCollectionNodeByExplorationId(
@@ -45,18 +45,18 @@ oppia.factory('CollectionLinearizerService', [
 
     // Given a non linear collection input, the function will linearize it by
     // picking the first node it encounters on the branch and ignore the others.
-    var getCollectionNodesInPlayableOrder = function(collection) {
+    var _getCollectionNodesInPlayableOrder = function(collection) {
       var nodeList = collection.getStartingCollectionNodes();
       var completedExpIds = nodeList.map(function(collectionNode) {
         return collectionNode.getExplorationId();
       });
 
-      var nextExpIds = getNextExplorationIds(collection, completedExpIds);
+      var nextExpIds = _getNextExplorationIds(collection, completedExpIds);
       while (nextExpIds.length > 0) {
         completedExpIds = completedExpIds.concat(nextExpIds);
         nodeList.push(collection.getCollectionNodeByExplorationId(
             nextExpIds[0]));
-        nextExpIds = getNextExplorationIds(collection, completedExpIds);
+        nextExpIds = _getNextExplorationIds(collection, completedExpIds);
       }
       return nodeList;
     };
@@ -142,7 +142,7 @@ oppia.factory('CollectionLinearizerService', [
     var shiftNode = function(collection, explorationId, swapFunction) {
       // There is nothing to shift if the collection has only 1 node.
       if (collection.getCollectionNodeCount() > 1) {
-        var linearNodeList = getCollectionNodesInPlayableOrder(collection);
+        var linearNodeList = _getCollectionNodesInPlayableOrder(collection);
         var nodeIndex = findNodeIndex(linearNodeList, explorationId);
         if (nodeIndex === -1) {
           return false;
@@ -160,7 +160,7 @@ oppia.factory('CollectionLinearizerService', [
        * does not assume that the collection is linear.
        */
       getNextExplorationIds: function(collection, completedExpIds) {
-        return getNextExplorationIds(collection, completedExpIds);
+        return _getNextExplorationIds(collection, completedExpIds);
       },
 
       /**
@@ -168,7 +168,7 @@ oppia.factory('CollectionLinearizerService', [
        * represents a valid path for playing through this collection.
        */
       getCollectionNodesInPlayableOrder: function(collection) {
-        return getCollectionNodesInPlayableOrder(collection);
+        return _getCollectionNodesInPlayableOrder(collection);
       },
 
       /**
@@ -181,7 +181,7 @@ oppia.factory('CollectionLinearizerService', [
        */
       appendCollectionNode: function(
           collection, explorationId, summaryBackendObject) {
-        var linearNodeList = getCollectionNodesInPlayableOrder(collection);
+        var linearNodeList = _getCollectionNodesInPlayableOrder(collection);
         CollectionUpdateService.addCollectionNode(
           collection, explorationId, summaryBackendObject);
         CollectionUpdateService.setAcquiredSkills(
@@ -208,7 +208,7 @@ oppia.factory('CollectionLinearizerService', [
         // Relinking is only needed if more than just the specified node is in
         // the collection.
         if (collection.getCollectionNodeCount() > 1) {
-          var linearNodeList = getCollectionNodesInPlayableOrder(collection);
+          var linearNodeList = _getCollectionNodesInPlayableOrder(collection);
           var nodeIndex = findNodeIndex(linearNodeList, explorationId);
 
           // Ensure any present left/right nodes are appropriately linked after
