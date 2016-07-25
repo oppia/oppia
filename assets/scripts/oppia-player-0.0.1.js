@@ -167,14 +167,14 @@
       var fixedWidth = 'false';
       var explorationVersion = this.oppiaNode.getAttribute('exploration-version') || '';
 
-      if (!height || height === 'auto') {
+      if (!height || height == 'auto') {
         // The default height is 700px.
         height = '700px';
       } else {
         fixedHeight = 'true';
       }
 
-      if (!width || width === 'auto') {
+      if (!width || width == 'auto') {
         // The default width is 98%. This leaves room for the vertical scrollbar
         // (otherwise we get a horizontal scrollbar when there's a vertical
         // scrollbar).

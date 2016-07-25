@@ -43,9 +43,8 @@ oppia.directive('collectionDetailsEditor', [function() {
             };
           }
         );
-        $scope.getLanguageListForSelect = function() {
-          return GLOBALS.ALL_LANGUAGE_CODES;
-        };
+
+        $scope.languageListForSelect = GLOBALS.ALL_LANGUAGE_CODES;
         $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
 
         var refreshSettingsTab = function() {
@@ -113,22 +112,22 @@ oppia.directive('collectionDetailsEditor', [function() {
             $scope.collection, $scope.displayedCollectionLanguage);
         };
 
-        var checkValidTag = function() {
-          // Every tag should match the TAG_REGEX.
-          for (var i = 0; i < $scope.displayedCollectionTags.length; i++) {
-            var tagRegex = new RegExp(GLOBALS.TAG_REGEX);
-            if (!$scope.displayedCollectionTags[i].match(tagRegex)) {
-              return false;
-            }
+        // Normalize the tags for the collection
+        var _normalizeTags = function(tags) {
+          for (var i = 0; i < tags.length; i++) {
+            tags[i] = tags[i].trim().replace(/\s+/g, ' ');
           }
-          return true;
+          return tags;
         };
 
         $scope.updateCollectionTags = function() {
-          if (!checkValidTag()) {
+          $scope.displayedCollectionTags = _normalizeTags(
+            $scope.displayedCollectionTags);
+          if (!CollectionUpdateService.isTagValid(
+                $scope.collection, $scope.displayedCollectionTags)) {
             alertsService.addWarning(
-              'Please verify that the tags for the collection contains only ' +
-              'lower case letters and/or spaces.');
+              'Please verify that there are no duplicate tags and/or ' +
+              'that all tags contain only spaces and lower case letters.');
             return;
           }
           CollectionUpdateService.setCollectionTags(

@@ -44,7 +44,7 @@
     <div class="form-group">
       <label for="collectionLanguage" class="col-lg-2 col-md-2 col-sm-2">Language</label>
       <div class="col-lg-10 col-md-10 col-sm-10">
-        <select id="collectionLanguageCode" class="form-control protractor-test-exploration-language-select" ng-model="displayedCollectionLanguage" ng-change="updateCollectionLanguageCode()" ng-options="lc.code as lc.description for lc in getLanguageListForSelect()">
+        <select id="collectionLanguageCode" class="form-control protractor-test-exploration-language-select" ng-model="displayedCollectionLanguage" ng-change="updateCollectionLanguageCode()" ng-options="lc.code as lc.description for lc in languageListForSelect">
         </select>
         <span class="help-block" style="font-size: smaller">
           <em>

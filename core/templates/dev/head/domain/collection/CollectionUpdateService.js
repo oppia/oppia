@@ -99,6 +99,28 @@ oppia.factory('CollectionUpdateService', [
         return _getParameterFromChangeDict(changeDict, 'exploration_id');
       };
 
+      // Validates the tags for the collection
+      var _validateTags = function(tags) {
+        // Check to ensure that all tags follow the format specified in
+        // TAG_REGEX.
+        for (var i = 0; i < tags.length; i++) {
+          var tagRegex = new RegExp(GLOBALS.TAG_REGEX);
+          if (!tags[i].match(tagRegex)) {
+            return false;
+          }
+        }
+
+        // Check to ensure that there are no duplicate tags.
+        for (var i = 0; i < tags.length; i++) {
+          for (var j = 0; j < tags.length; j++) {
+            if (tags[i] === tags[j] && i !== j) {
+              return false;
+            }
+          }
+        }
+        return true;
+      };
+
       // A mutator object which provides generic apply() and reverse() functions
       // for changing the skills of a collection. The skillListGetterCallback()
       // takes a CollectionNode domain object and needs to return a SkillList
@@ -257,21 +279,30 @@ oppia.factory('CollectionUpdateService', [
         },
 
         /**
+         * Returns whether the collection tag is valid.
+         */
+        isTagValid: function(collection, tags) {
+          return _validateTags(tags);
+        },
+
+        /**
          * Changes the tags of a collection and records the change in
          * the undo/redo service.
          */
         setCollectionTags: function(collection, tags) {
           var oldTags = angular.copy(collection.getTags());
-          _applyPropertyChange(
-            collection, COLLECTION_PROPERTY_TAGS, tags, oldTags,
-            function(changeDict, collection) {
-              // Apply.
-              var tags = _getNewPropertyValueFromChangeDict(changeDict);
-              collection.setTags(tags);
-            }, function(changeDict, collection) {
-              // Undo.
-              collection.setTags(oldTags);
-            });
+          if (_validateTags(tags)) {
+            _applyPropertyChange(
+              collection, COLLECTION_PROPERTY_TAGS, tags, oldTags,
+              function(changeDict, collection) {
+                // Apply.
+                var tags = _getNewPropertyValueFromChangeDict(changeDict);
+                collection.setTags(tags);
+              }, function(changeDict, collection) {
+                // Undo.
+                collection.setTags(oldTags);
+              });
+          }
         },
 
         /**

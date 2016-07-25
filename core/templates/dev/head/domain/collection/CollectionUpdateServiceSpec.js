@@ -192,6 +192,14 @@ describe('Collection update service', function() {
     expect(_sampleCollection.getTags()).toEqual([]);
   });
 
+  it('should prevent duplicate tags from setting to the collection',
+       function() {
+    expect(_sampleCollection.getTags()).toEqual([]);
+    CollectionUpdateService.setCollectionTags(_sampleCollection,
+                                              ['test', 'test']);
+    expect(_sampleCollection.getTags()).toEqual([]);
+  });
+
   it('should create a proper backend change dict for changing tags',
       function() {
     CollectionUpdateService.setCollectionTags(_sampleCollection, ['test']);

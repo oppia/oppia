@@ -219,14 +219,14 @@
 
     var tagId = oppiaNode.getAttribute('id') || generateNewRandomId();
 
-    if (!height || height === 'auto') {
+    if (!height || height == 'auto') {
       // The default height is 700px.
       height = '700px';
     } else {
       fixedHeight = 'true';
     }
 
-    if (!width || width === 'auto') {
+    if (!width || width == 'auto') {
       // The default width is 98%. This leaves room for the vert scrollbar
       // (otherwise we get a horiz scrollbar when there's a vert scrollbar).
       width = '98%';
