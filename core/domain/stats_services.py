@@ -21,7 +21,6 @@ from core.domain import exp_services
 from core.domain import stats_domain
 from core.domain import stats_jobs_continuous
 from core.platform import models
-import feconf
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
@@ -41,7 +40,7 @@ def get_top_unresolved_answers_for_default_rule(exploration_id, state_name):
     }
 
 
-def get_exps_unresolved_answers_count_for_default_rule(exp_ids):
+def get_exps_unresolved_answers_for_default_rule(exp_ids):
     """Gets answer counts per exploration for the answer groups for default
     rule across all states for explorations with ids in exp_ids.
 
@@ -51,20 +50,22 @@ def get_exps_unresolved_answers_count_for_default_rule(exp_ids):
     Returns a dict of the following format:
         {
           'exp_id_1': {
-            'count': (number of unresolved answers for this exploration),
-            'values': [
-              {'count': 4, value: 'answer_1'},
-              {'count': 2, value: 'answer_2'},
-              {'count': 1, value: 'answer_3'}
-            ]
+            'count': 10 (number of unresolved answers for this exploration),
+            'unresolved_answers': (list of unresolved answers sorted by count)
+              [
+                {'count': 4, value: 'answer_1'},
+                {'count': 2, value: 'answer_2'},
+                {'count': 1, value: 'answer_3'}
+              ]
           },
           'exp_id_2': {
-            'count': (number of unresolved answers for this exploration),
-            'values': [
-              {'count': 8, value: 'answer_4'},
-              {'count': 3, value: 'answer_5'},
-              {'count': 1, value: 'answer_6'}
-            ]
+            'count': 20,
+            'unresolved_answers':
+              [
+                {'count': 8, value: 'answer_4'},
+                {'count': 3, value: 'answer_5'},
+                {'count': 1, value: 'answer_6'}
+              ]
           }
         }
     """
@@ -95,18 +96,18 @@ def get_exps_unresolved_answers_count_for_default_rule(exp_ids):
         if exp_id not in exps_answers_mapping:
             exps_answers_mapping[exp_id] = {
                 'count': 0,
-                'values': []
+                'unresolved_answers': []
             }
-            exps_answers_mapping[exp_id]['values'].extend(statewise_answers)
+            exps_answers_mapping[exp_id]['unresolved_answers'].extend(
+                statewise_answers)
         for answer in statewise_answers:
             exps_answers_mapping[exp_id]['count'] += answer['count']
 
     for exp_id in exps_answers_mapping:
-        exps_answers_mapping[exp_id]['values'] = (
-            sorted(
-                exps_answers_mapping[exp_id]['values'],
-                key=lambda a: a['count'],
-                reverse=True)[:feconf.TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD])
+        exps_answers_mapping[exp_id]['unresolved_answers'] = (sorted(
+            exps_answers_mapping[exp_id]['unresolved_answers'],
+            key=lambda a: a['count'],
+            reverse=True))
 
     return exps_answers_mapping
 
