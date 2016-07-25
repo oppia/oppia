@@ -930,6 +930,8 @@ oppia.directive('ckEditorRte', [
         var icons = [];
         // CKEditor plugin/widget name for each component.
         var pluginNames = [];
+        // Map to check if a component is inline or not by name.
+        var isInlineMap = {};
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
           if (!((scope.uiConfig() &&
                  scope.uiConfig().hide_complex_extensions &&
@@ -938,6 +940,7 @@ oppia.directive('ckEditorRte', [
             componentNames.push(componentDefn.name);
             icons.push(componentDefn.iconDataUrl);
             pluginNames.push(componentDefn.ckWidgetName);
+            isInlineMap[componentDefn.name] = componentDefn.isInline;
           }
         });
 
@@ -1033,7 +1036,7 @@ oppia.directive('ckEditorRte', [
             return html;
           }
           return html.replace(componentRe, function(match, p1, p2, p3) {
-            if (rteHelperService.isInlineComponent(p3)) {
+            if (isInlineMap[p3]) {
               return '<span type="oppia-noninteractive-' + p3 + '">' +
                     match + '</span>';
             } else {
