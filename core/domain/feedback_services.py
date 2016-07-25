@@ -291,13 +291,13 @@ def enqueue_feedback_message_email_task(user_id):
 
 
 def enqueue_suggestion_email_task(exploration_id, thread_id):
-    """Adds a 'send suggestion email' task into taskqueue.
-    suggestion emails are sent immidiately"""
+    """Adds a 'send suggestion email' task into taskqueue."""
 
     payload = {
         'exploration_id': exploration_id,
         'thread_id': thread_id
     }
+    # Suggestion emails are sent immidiately.
     taskqueue_services.enqueue_task(
         feconf.SUGGESTION_EMAIL_HANDLER_URL, payload, 0)
 
