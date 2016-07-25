@@ -33,6 +33,10 @@ PLATFORM = 'gae'
 IS_MINIFIED = os.environ.get('MINIFICATION') == 'True'
 
 # Whether we should serve the development or production experience.
+# This is environment specific variable(DEV_MODE) changes to true only
+# if is run in real production environment.
+# To use minified resources as in production mode if in development
+# environment IS_MINIFIED will be set to True.
 if PLATFORM == 'gae':
     DEV_MODE = (
         not os.environ.get('SERVER_SOFTWARE')

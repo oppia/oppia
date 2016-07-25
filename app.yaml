@@ -110,5 +110,8 @@ libraries:
   version: '1.6.1'
 - name: webapp2
   version: '2.5.2'
+# This environmental variable is for serving minified resources
+# when set True. It is used to run server as prod environment
+# when in development environment.
 env_variables:
   MINIFICATION: false
