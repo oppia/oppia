@@ -8,7 +8,7 @@
       </button>
     {% else %}
       <button class="btn oppia-navbar-button oppia-navbar-hide-on-small-width protractor-test-create-activity oppia-transition-200"
-              ng-click="showCreationChoiceModal()" ng-disabled="creationInProgress">
+              ng-click="initCreationProcess()" ng-disabled="creationInProgress">
         <span translate="I18N_CREATE_EXPLORATION_CREATE"></span>
       </button>
       {% if allow_yaml_file_upload %}

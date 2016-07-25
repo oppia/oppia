@@ -53,7 +53,7 @@
     <meta property="og:url" content="{{FULL_URL}}">
     <meta property="og:description" content="{{meta_description}}">
     <meta property="og:type" content="article">
-    <meta property="og:image" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/288x288_logo_mint.png')}}>
+    <meta property="og:image" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/288x288_logo_mint.png')}}">
 
     <link rel="apple-touch-icon" href="{{get_static_resource_url('/assets/images/logo/favicon.png')}}">
 
@@ -82,6 +82,8 @@
         ALL_CATEGORIES: JSON.parse('{{ALL_CATEGORIES|js_string}}'),
         ALL_LANGUAGE_CODES: JSON.parse('{{ALL_LANGUAGE_CODES|js_string}}'),
         ASSET_DIR_PREFIX: JSON.parse('{{ASSET_DIR_PREFIX|js_string}}'),
+        can_create_collections: JSON.parse(
+          '{{can_create_collections|js_string}}'),
         CAN_SEND_ANALYTICS_EVENTS: JSON.parse(
           '{{CAN_SEND_ANALYTICS_EVENTS|js_string}}'),
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
