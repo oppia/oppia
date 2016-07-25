@@ -21,6 +21,7 @@ from core.controllers import editor
 from core.domain import email_manager
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import rights_manager
 from core.platform import models
 
 transaction_services = models.Registry.import_transaction_services()
@@ -263,3 +264,21 @@ class FeedbackThreadViewEventHandler(base.BaseHandler):
             feedback_services.clear_feedback_message_references, self.user_id,
             exploration_id, thread_id)
         self.render_json(self.values)
+
+
+class SuggestionEmailHandler(base.BaseHandler):
+    """Handler task of sending email of suggestion."""
+
+    def post(self):
+        payload = json.loads(self.request.body)
+        exploration_id = payload['exploration_id']
+        thread_id = payload['thread_id']
+
+        exploration_rights = (
+            rights_manager.get_exploration_rights(exploration_id))
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
+
+        email_manager.send_suggestion_email(
+            exploration.title, exploration.id, suggestion.author_id,
+            exploration_rights.owner_ids)
