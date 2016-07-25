@@ -63,7 +63,7 @@ def process_js(source_path, target_path):
     _minify(source_path, target_path)
 
 
-def process_third_party_libs(output_directory):
+def build_minified_third_party_libs(output_directory):
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
     node_path = os.path.join(
         parent_dir, 'oppia_tools', 'node-4.2.1', 'bin', 'node')
@@ -150,7 +150,7 @@ if __name__ == '__main__':
     # build/[cache_slug]/third_party/generated
     THIRD_PARTY_GENERATED_OUT_DIR = os.path.join(
         BUILD_DIR, 'third_party', 'generated')
-    process_third_party_libs(THIRD_PARTY_GENERATED_OUT_DIR)
+    build_minified_third_party_libs(THIRD_PARTY_GENERATED_OUT_DIR)
 
     # Process extensions, copy it to build/[cache_slug]/extensions
     EXTENSIONS_SRC_DIR = os.path.join('extensions', '')
