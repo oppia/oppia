@@ -46,8 +46,6 @@ def require_collection_playable(handler):
 class CollectionPage(base.BaseHandler):
     """Page describing a single collection."""
 
-    PAGE_NAME_FOR_CSRF = 'collection'
-
     @require_collection_playable
     def get(self, collection_id):
         """Handles GET requests."""

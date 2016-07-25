@@ -758,3 +758,178 @@ class FeedbackMessageEmailHandlerTests(test_utils.GenericTestBase):
             self.assertEqual(
                 messages[0].body.decode(),
                 expected_email_text_body)
+
+    def test_that_emails_are_not_sent_if_already_seen(self):
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_thread(
+                self.exploration.id, 'a_state_name',
+                self.new_user_id, 'a subject', 'some text')
+
+            threadlist = feedback_services.get_all_threads(
+                self.exploration.id, False)
+            thread_id = threadlist[0].get_thread_id()
+
+            self.login(self.EDITOR_EMAIL)
+            csrf_token = self.get_csrf_token_from_response(
+                self.testapp.get('/create/%s' % self.exploration.id))
+            self.post_json('%s' % feconf.FEEDBACK_THREAD_VIEW_EVENT_URL, {
+                'exploration_id': self.exploration.id,
+                'thread_id': thread_id}, csrf_token)
+
+            self.process_and_flush_pending_tasks()
+            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            self.assertEqual(len(messages), 0)
+
+
+class SuggestionEmailHandlerTest(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(SuggestionEmailHandlerTest, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+
+        self.exploration = self.save_new_default_exploration(
+            'A', self.editor_id, 'Title')
+        self.can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
+        self.can_send_feedback_email_ctx = self.swap(
+            feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+
+    def test_that_emails_are_sent(self):
+        expected_email_html_body = (
+            'Hi editor,<br>'
+            'newuser has submitted a new suggestion for your Oppia '
+            'exploration, '
+            '<a href="https://www.oppia.org/create/A">"Title"</a>.<br>'
+            'You can accept or reject this suggestion by visiting the '
+            '<a href="https://www.oppia.org/create/A#/feedback">'
+            'feedback page</a> '
+            'for your exploration.<br>'
+            '<br>'
+            'Thanks!<br>'
+            '- The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        expected_email_text_body = (
+            'Hi editor,\n'
+            'newuser has submitted a new suggestion for your Oppia '
+            'exploration, "Title".\n'
+            'You can accept or reject this suggestion by visiting the '
+            'feedback page for your exploration.\n'
+            '\n'
+            'Thanks!\n'
+            '- The Oppia Team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_suggestion(
+                self.exploration.id, self.new_user_id, self.exploration.version,
+                'a state', 'simple description', {'content': {}})
+
+            self.process_and_flush_pending_tasks()
+
+            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(),
+                expected_email_html_body)
+            self.assertEqual(
+                messages[0].body.decode(),
+                expected_email_text_body)
+
+    def test_correct_email_is_sent_for_multiple_recipients(self):
+        rights_manager.assign_role_for_exploration(
+            self.editor_id, self.exploration.id, self.owner_id,
+            rights_manager.ROLE_OWNER)
+
+        expected_editor_email_html_body = (
+            'Hi editor,<br>'
+            'newuser has submitted a new suggestion for your Oppia '
+            'exploration, '
+            '<a href="https://www.oppia.org/create/A">"Title"</a>.<br>'
+            'You can accept or reject this suggestion by visiting the '
+            '<a href="https://www.oppia.org/create/A#/feedback">'
+            'feedback page</a> '
+            'for your exploration.<br>'
+            '<br>'
+            'Thanks!<br>'
+            '- The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        expected_owner_email_html_body = (
+            'Hi owner,<br>'
+            'newuser has submitted a new suggestion for your Oppia '
+            'exploration, '
+            '<a href="https://www.oppia.org/create/A">"Title"</a>.<br>'
+            'You can accept or reject this suggestion by visiting the '
+            '<a href="https://www.oppia.org/create/A#/feedback">'
+            'feedback page</a> '
+            'for your exploration.<br>'
+            '<br>'
+            'Thanks!<br>'
+            '- The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        expected_editor_email_text_body = (
+            'Hi editor,\n'
+            'newuser has submitted a new suggestion for your Oppia '
+            'exploration, "Title".\n'
+            'You can accept or reject this suggestion by visiting the '
+            'feedback page for your exploration.\n'
+            '\n'
+            'Thanks!\n'
+            '- The Oppia Team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+
+        expected_owner_email_text_body = (
+            'Hi owner,\n'
+            'newuser has submitted a new suggestion for your Oppia '
+            'exploration, "Title".\n'
+            'You can accept or reject this suggestion by visiting the '
+            'feedback page for your exploration.\n'
+            '\n'
+            'Thanks!\n'
+            '- The Oppia Team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            feedback_services.create_suggestion(
+                self.exploration.id, self.new_user_id, self.exploration.version,
+                'a state', 'simple description', {'content': {}})
+
+            self.process_and_flush_pending_tasks()
+
+            editor_messages = (
+                self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL))
+            self.assertEqual(len(editor_messages), 1)
+            self.assertEqual(
+                editor_messages[0].html.decode(),
+                expected_editor_email_html_body)
+            self.assertEqual(
+                editor_messages[0].body.decode(),
+                expected_editor_email_text_body)
+
+            owner_messages = (
+                self.mail_stub.get_sent_messages(to=self.OWNER_EMAIL))
+            self.assertEqual(len(owner_messages), 1)
+            self.assertEqual(
+                owner_messages[0].html.decode(),
+                expected_owner_email_html_body)
+            self.assertEqual(
+                owner_messages[0].body.decode(),
+                expected_owner_email_text_body)

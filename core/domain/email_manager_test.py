@@ -1159,3 +1159,87 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
                 feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION)
             self.assertEqual(
                 sent_email_model.subject, self.expected_email_subject)
+
+
+class SuggestionEmailTest(test_utils.GenericTestBase):
+    def setUp(self):
+        super(SuggestionEmailTest, self).setUp()
+
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+
+        self.exploration = self.save_new_default_exploration(
+            'A', self.editor_id, 'Title')
+        self.recipient_list = [self.editor_id]
+
+        self.can_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
+        self.can_send_feedback_email_ctx = self.swap(
+            feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+
+    def test_that_suggestion_emails_are_correct(self):
+        expected_email_subject = 'New suggestion for "Title"'
+
+        expected_email_html_body = (
+            'Hi editor,<br>'
+            'newuser has submitted a new suggestion for your Oppia '
+            'exploration, '
+            '<a href="https://www.oppia.org/create/A">"Title"</a>.<br>'
+            'You can accept or reject this suggestion by visiting the '
+            '<a href="https://www.oppia.org/create/A#/feedback">'
+            'feedback page</a> '
+            'for your exploration.<br>'
+            '<br>'
+            'Thanks!<br>'
+            '- The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        expected_email_text_body = (
+            'Hi editor,\n'
+            'newuser has submitted a new suggestion for your Oppia '
+            'exploration, "Title".\n'
+            'You can accept or reject this suggestion by visiting the '
+            'feedback page for your exploration.\n'
+            '\n'
+            'Thanks!\n'
+            '- The Oppia Team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.')
+
+        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
+            email_manager.send_suggestion_email(
+                self.exploration.title, self.exploration.id, self.new_user_id,
+                self.recipient_list)
+
+            # make sure correct email is sent.
+            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(),
+                expected_email_html_body)
+            self.assertEqual(
+                messages[0].body.decode(),
+                expected_email_text_body)
+
+            # Make sure correct email model is stored.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            sent_email_model = all_models[0]
+            self.assertEqual(
+                sent_email_model.subject, expected_email_subject)
+            self.assertEqual(
+                sent_email_model.recipient_id, self.editor_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.EDITOR_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION)

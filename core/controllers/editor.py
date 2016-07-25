@@ -150,9 +150,7 @@ def require_editor(handler):
 
 class EditorHandler(base.BaseHandler):
     """Base class for all handlers for the editor page."""
-
-    # The page name to use as a key for generating CSRF tokens.
-    PAGE_NAME_FOR_CSRF = 'editor'
+    pass
 
 
 class ExplorationPage(EditorHandler):
@@ -260,8 +258,6 @@ class ExplorationPage(EditorHandler):
 
 class ExplorationHandler(EditorHandler):
     """Page with editor data for a single exploration."""
-
-    PAGE_NAME_FOR_CSRF = 'editor'
 
     def _get_exploration_data(
             self, exploration_id, apply_draft=False, version=None):
@@ -401,8 +397,6 @@ class ExplorationHandler(EditorHandler):
 class ExplorationRightsHandler(EditorHandler):
     """Handles management of exploration editing rights."""
 
-    PAGE_NAME_FOR_CSRF = 'editor'
-
     @require_editor
     def put(self, exploration_id):
         """Updates the editing rights for the given exploration."""
@@ -496,8 +490,6 @@ class ExplorationRightsHandler(EditorHandler):
 class ExplorationModeratorRightsHandler(EditorHandler):
     """Handles management of exploration rights by moderators."""
 
-    PAGE_NAME_FOR_CSRF = 'editor'
-
     @base.require_moderator
     def put(self, exploration_id):
         """Updates the publication status of the given exploration, and sends
@@ -557,8 +549,6 @@ class ExplorationModeratorRightsHandler(EditorHandler):
 
 class ResolvedAnswersHandler(EditorHandler):
     """Allows learners' answers for a state to be marked as resolved."""
-
-    PAGE_NAME_FOR_CSRF = 'editor'
 
     @require_editor
     def put(self, exploration_id, state_name):
