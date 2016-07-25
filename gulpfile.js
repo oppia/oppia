@@ -106,9 +106,17 @@ var cssFilePaths = [];
 var jsFilePaths = [];
 var fontFolderPaths = [];
 var cssBackgroundFilepaths = [];
+
+// In non-dev mode, we move all files inside 'third_party/generated' to
+// 'build/{{cache_slug}}/third_party/generated/' and serve it from there.
+// And, for dev mode without minification, we generate the files inside
+// 'third_party/generated/' and serve it from there. These files are generated
+// directly inside 'third_party/generated/' since we need to keep urls
+// compatible across both dev and prod modes. This compatibility is achieved by
+// only interpolating the prefix for urls to these files.
 var generatedTargetDir = path.join(
   'third_party', 'generated',
-  isMinificationNeeded ? 'prod' : 'dev');
+  isMinificationNeeded ? 'prod' : '');
 var generatedCssTargetDir = path.join(generatedTargetDir, 'css');
 var generatedJsTargetDir = path.join(generatedTargetDir, 'js');
 
@@ -173,11 +181,10 @@ gulp.task('generateJs', function() {
 });
 // This task is used to copy all fonts which are used by
 // Bootstrap and font-Awesome to one folder
+var generatedFontsTargetDir = path.join(generatedTargetDir, 'fonts');
 gulp.task('copyFonts', function() {
   gulp.src(fontFolderPaths)
-    .pipe(gulp.dest(path.join(
-      'third_party', 'generated',
-      isMinificationNeeded ? 'prod' : 'dev', 'fonts')));
+    .pipe(gulp.dest(path.join(generatedFontsTargetDir)));
 });
 
 // This is a task which copies background image used by css.

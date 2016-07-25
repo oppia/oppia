@@ -23,8 +23,11 @@ oppia.directive('profileLinkImage', [function() {
       username: '&'
     },
     templateUrl: 'components/profileLinkImage',
-    controller: ['$scope', '$http', function($scope, $http) {
-      var DEFAULT_PROFILE_IMAGE_PATH = '/images/avatar/user_blue_72px.png';
+    controller: ['$scope', '$http', 'UrlInterpolationService',
+    function($scope, $http, UrlInterpolationService) {
+      var DEFAULT_PROFILE_IMAGE_PATH = (
+        UrlInterpolationService.getStaticImageUrl(
+          '/avatar/user_blue_72px.png'));
 
       $scope.isUsernameLinkable = function(username) {
         return GLOBALS.SYSTEM_USERNAMES.indexOf(username) === -1;

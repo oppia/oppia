@@ -40,7 +40,7 @@
       </ul>
     </div>
 
-    <div class="about-tab-container">
+    <div class="about-tab-container" ng-controller="Teach">
       <div class="teach oppia-about-tab-content oppia-about-visible-content">
 
         <div class="oppia-about-card-content-wide oppia-about-card-content-narrow">
@@ -50,21 +50,21 @@
 
           <div class="oppia-about-card-content-wide oppia-about-three-cols-container">
             <div class="oppia-about-three-cols-layout oppia-about-three-cols-feature">
-              <img src="images/general/creator-create-exp.png">
+              <img ng-src="<[getStaticImageUrl('/general/creator-create-exp.png')]>">
               <h3>Create an Exploration</h3>
               <p style="margin-top: -10px;">
                 about a topic you care about.
               </p>
             </div>
             <div class="oppia-about-three-cols-layout oppia-about-three-cols-feature">
-              <img src="images/general/creator-pub-share.png">
+              <img ng-src="<[getStaticImageUrl('/general/creator-pub-share.png')]>">
               <h3>Publish &amp; Share</h3>
               <p style="margin-top: -10px;">
                 your creations with the community.
               </p>
             </div>
             <div class="oppia-about-three-cols-layout oppia-about-three-cols-feature">
-              <img src="images/general/creator-feedback.png">
+              <img ng-src="<[getStaticImageUrl('/general/creator-feedback.png')]>">
               <h3>Earn feedback</h3>
               <p style="margin-top: -10px;">
                 to improve your exploration.
@@ -284,6 +284,13 @@
     });
   </script>
 {% endblock %}
+
+{% block footer_js %} 
+  {{ super() }}
+  <script>
+    {{ include_js_file('pages/Teach.js') }}
+  </script>
+{% endblock footer_js %}
 
 {% block footer%}
   {% include 'footer.html' %}

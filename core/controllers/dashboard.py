@@ -68,8 +68,6 @@ class NotificationsDashboardPage(base.BaseHandler):
 class NotificationsDashboardHandler(base.BaseHandler):
     """Provides data for the user notifications dashboard."""
 
-    PAGE_NAME_FOR_CSRF = 'dashboard'
-
     def get(self):
         """Handles GET requests."""
         if self.user_id is None:
@@ -116,9 +114,6 @@ class NotificationsDashboardHandler(base.BaseHandler):
 class DashboardPage(base.BaseHandler):
     """Page showing the user's creator dashboard."""
 
-    PAGE_NAME_FOR_CSRF = 'dashboard'
-    PAGE_HAS_CREATE_EXP_REQUEST = True
-
     @base.require_user
     def get(self):
         if self.username in config_domain.BANNED_USERNAMES.value:
@@ -127,10 +122,6 @@ class DashboardPage(base.BaseHandler):
         elif user_services.has_fully_registered(self.user_id):
             self.values.update({
                 'nav_mode': feconf.NAV_MODE_DASHBOARD,
-                'can_create_collections': (
-                    self.username in
-                    config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value
-                ),
                 'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD,
                 'DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD': (
                     DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD.value)
@@ -155,6 +146,9 @@ class DashboardHandler(base.BaseHandler):
                 feconf.CATEGORIES_TO_COLORS[category] if
                 category in feconf.CATEGORIES_TO_COLORS else
                 feconf.DEFAULT_COLOR)
+
+        def _round_average_ratings(rating):
+            return round(rating, feconf.AVERAGE_RATINGS_DASHBOARD_PRECISION)
 
         exploration_ids_subscribed_to = (
             subscription_services.get_exploration_ids_subscribed_to(
@@ -218,11 +212,28 @@ class DashboardHandler(base.BaseHandler):
                         collection_summary.category),
                 })
 
+        dashboard_stats = (
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.user_id))
+        dashboard_stats.update({
+            'total_open_feedback': feedback_services.get_total_open_threads(
+                feedback_thread_analytics)
+        })
+        if dashboard_stats and dashboard_stats.get('average_ratings'):
+            dashboard_stats['average_ratings'] = (
+                _round_average_ratings(dashboard_stats['average_ratings']))
+
+        last_week_stats = (
+            user_services.get_last_week_dashboard_stats(self.user_id))
+        if last_week_stats and last_week_stats.get('average_ratings'):
+            last_week_stats['average_ratings'] = (
+                _round_average_ratings(last_week_stats['average_ratings']))
+
         self.values.update({
             'explorations_list': exp_summary_list,
             'collections_list': collection_summary_list,
-            'dashboard_stats': user_services.get_user_dashboard_stats(
-                self.user_id)
+            'dashboard_stats': dashboard_stats,
+            'last_week_stats': last_week_stats
         })
         self.render_json(self.values)
 
@@ -253,8 +264,6 @@ class NotificationsHandler(base.BaseHandler):
 class NewExploration(base.BaseHandler):
     """Creates a new exploration."""
 
-    PAGE_NAME_FOR_CSRF = feconf.CSRF_PAGE_NAME_CREATE_EXPLORATION
-
     @base.require_fully_signed_up
     def post(self):
         """Handles POST requests."""
@@ -273,8 +282,6 @@ class NewExploration(base.BaseHandler):
 class NewCollection(base.BaseHandler):
     """Creates a new collection."""
 
-    PAGE_NAME_FOR_CSRF = 'dashboard'
-
     @base.require_fully_signed_up
     def post(self):
         """Handles POST requests."""
@@ -290,8 +297,6 @@ class NewCollection(base.BaseHandler):
 
 class UploadExploration(base.BaseHandler):
     """Uploads a new exploration."""
-
-    PAGE_NAME_FOR_CSRF = 'dashboard'
 
     @base.require_fully_signed_up
     def post(self):

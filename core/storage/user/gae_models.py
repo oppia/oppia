@@ -166,6 +166,9 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     # The average of average ratings of all explorations.
     average_ratings = ndb.FloatProperty(indexed=True)
 
+    # The number of ratings of all explorations.
+    num_ratings = ndb.IntegerProperty(indexed=True)
+
     # A list which stores history of creator stats.
     # Each item in the list is a Json object keyed by a datetime string and
     # value as another Json object containing key-value pairs to be stored.
