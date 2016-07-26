@@ -255,7 +255,7 @@ def _install_hook():
 def subprocess_multiple_cmd(command):
     """This is to run multiple commands as  which are joined as a single
     string."""
-    process = subprocess.Popen(command,stdout=subprocess.PIPE, shell=True)
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
     proc_stdout = process.communicate()[0].strip()
 
 
