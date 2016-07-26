@@ -108,9 +108,10 @@ BAD_PATTERNS_JS = {
             'core/templates/dev/head/expressions/typeParserSpec.js')}
 }
 
-BAD_PATTERNS_YAML = {
+BAD_PATTERNS_APP_YAML = {
     'MINIFICATION: true': {
-        'message': 'Please set minification  to false(MINIFICATION: false)',
+        'message': 'Please set the MINIFICATION env variable in app.yaml'
+                   'to False before committing.',
         'excluded_files': ()}
 }
 
@@ -465,12 +466,12 @@ def _check_bad_patterns(all_files):
                                 BAD_PATTERNS_JS[pattern]['message'])
                             total_error_count += 1
             if filename == 'app.yaml':
-                for pattern in BAD_PATTERNS_YAML:
+                for pattern in BAD_PATTERNS_APP_YAML:
                     if pattern in content:
                         failed = True
                         print '%s --> %s' % (
                             filename,
-                            BAD_PATTERNS_YAML[pattern]['message'])
+                            BAD_PATTERNS_APP_YAML[pattern]['message'])
                         total_error_count += 1
     if failed:
         summary_message = '%s   Pattern checks failed' % _MESSAGE_TYPE_FAILED

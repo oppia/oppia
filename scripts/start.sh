@@ -95,7 +95,7 @@ for arg in "$@"; do
   fi
 done
 
-# Set value of MINIFICATION variable in app.yaml
+# Updates value of MINIFICATION variable in app.yaml
 yaml_env_variable="MINIFICATION: $MINIFICATION"
 sed -i.bak -e s/"MINIFICATION: .*"/"$yaml_env_variable"/ app.yaml
 # Delete the modified yaml file(-i.bak)
@@ -109,9 +109,8 @@ echo Starting GAE development server
 # accidentally!
 
 if [[ "$MINIFICATION" == "true" ]]; then
-  # To start server with minified/optimized resources as in production environment.
-  # This will set MINIFICATION environment variable to true while preserving value of
-  # DEV_MODE variable.
+  # This starts up a dev server which uses minified resources as in production environment.
+  # This will set MINIFICATION environment variable to true.
   $NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js start_devserver --prod_env=True --gae_devserver_path=$GOOGLE_APP_ENGINE_HOME/dev_appserver.py --clear_datastore=$CLEAR_DATASTORE_ARG
 else
   $NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js start_devserver --gae_devserver_path=$GOOGLE_APP_ENGINE_HOME/dev_appserver.py --clear_datastore=$CLEAR_DATASTORE_ARG
