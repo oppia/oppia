@@ -95,7 +95,7 @@ for arg in "$@"; do
   fi
 done
 
-# Updates value of MINIFICATION variable in app.yaml
+# Update value of MINIFICATION variable in app.yaml
 yaml_env_variable="MINIFICATION: $MINIFICATION"
 sed -i.bak -e s/"MINIFICATION: .*"/"$yaml_env_variable"/ app.yaml
 # Delete the modified yaml file(-i.bak)
