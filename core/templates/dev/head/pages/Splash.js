@@ -18,7 +18,15 @@
 
 oppia.controller('Splash', [
   '$scope', '$timeout', '$window', 'siteAnalyticsService',
-  function($scope, $timeout, $window, siteAnalyticsService) {
+  'UrlInterpolationService',
+  function($scope, $timeout, $window, siteAnalyticsService,
+    UrlInterpolationService) {
+    $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+    $scope.getStaticSubjectImageUrl = function(subjectName) {
+      return UrlInterpolationService.getStaticImageUrl('/subjects/' +
+        subjectName + '.svg');
+    };
+
     $scope.onRedirectToLogin = function(destinationUrl) {
       siteAnalyticsService.registerStartLoginEvent(
         'splashPageCreateExplorationButton');

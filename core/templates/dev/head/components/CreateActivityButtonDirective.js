@@ -39,22 +39,25 @@ oppia.directive('createActivityButton', [function() {
           return false;
         };
 
-        $scope.showCreationChoiceModal = function() {
+        $scope.initCreationProcess = function() {
           // Without this, the modal keeps reopening when the window is resized.
           if ($scope.creationInProgress) {
             return;
           }
 
           $scope.creationInProgress = true;
-          if (urlService.getPathname() !== '/dashboard') {
+
+          if (!GLOBALS.can_create_collections) {
+            ExplorationCreationService.createNewExploration();
+          } else if (urlService.getPathname() !== '/dashboard') {
             $window.location.replace('/dashboard?mode=create');
           } else {
             $modal.open({
               templateUrl: 'modals/createActivity',
               backdrop: true,
               controller: [
-                  '$scope', '$modalInstance',
-                  function($scope, $modalInstance) {
+                  '$scope', '$modalInstance', 'UrlInterpolationService',
+                  function($scope, $modalInstance, UrlInterpolationService) {
                 $scope.chooseExploration = function() {
                   ExplorationCreationService.createNewExploration();
                   $modalInstance.close();
@@ -68,6 +71,14 @@ oppia.directive('createActivityButton', [function() {
                 $scope.cancel = function() {
                   $modalInstance.dismiss('cancel');
                 };
+
+                $scope.explorationImgUrl = (
+                  UrlInterpolationService.getStaticImageUrl(
+                  '/activity/exploration.svg'));
+
+                $scope.collectionImgUrl = (
+                  UrlInterpolationService.getStaticImageUrl(
+                  '/activity/collection.svg'));
               }],
               windowClass: 'oppia-creation-modal'
             }).result.then(function() {}, function() {
@@ -77,9 +88,14 @@ oppia.directive('createActivityButton', [function() {
         };
 
         // If the user clicked on a 'create' button to get to the dashboard,
-        // open the create modal immediately.
+        // open the create modal immediately (or redirect to the exploration
+        // editor if the create modal does not need to be shown).
         if (urlService.getUrlParams().mode === 'create') {
-          $scope.showCreationChoiceModal();
+          if (!GLOBALS.can_create_collections) {
+            ExplorationCreationService.createNewExploration();
+          } else {
+            $scope.initCreationProcess();
+          }
         }
       }
     ]

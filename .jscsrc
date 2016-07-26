@@ -11,8 +11,10 @@
         "extensions/interactions/LogicProof/static/js/generatedParser.js",
         "integrations/**",
         "integrations_dev/**",
-        "static/scripts/**",
-        "third_party/**"
+        "assets/scripts/**",
+        "third_party/**",
+        "build/**",
+        "**.min.js"
     ],
     "fileExtensions": [".js"],
     "extract": ["*.html"],

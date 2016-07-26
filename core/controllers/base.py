@@ -300,6 +300,7 @@ class BaseHandler(webapp2.RequestHandler):
         values.update({
             'ALL_CATEGORIES': feconf.ALL_CATEGORIES,
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
+            'ASSET_DIR_PREFIX': utils.get_asset_dir_prefix(),
             'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
                 BEFORE_END_HEAD_TAG_HOOK.value),
             'CAN_SEND_ANALYTICS_EVENTS': feconf.CAN_SEND_ANALYTICS_EVENTS,
@@ -313,7 +314,8 @@ class BaseHandler(webapp2.RequestHandler):
                 rights_manager.ACTIVITY_STATUS_PUBLIC),
             'ACTIVITY_STATUS_PUBLICIZED': (
                 rights_manager.ACTIVITY_STATUS_PUBLICIZED),
-            'FULL_URL': '%s://%s/%s' % (scheme, netloc, path),
+            # The 'path' variable starts with a forward slash.
+            'FULL_URL': '%s://%s%s' % (scheme, netloc, path),
             'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
             # TODO(sll): Consider including the obj_editor html directly as
             # part of the base HTML template?
@@ -325,6 +327,10 @@ class BaseHandler(webapp2.RequestHandler):
             'SITE_NAME': SITE_NAME.value,
             'SUPPORTED_SITE_LANGUAGES': feconf.SUPPORTED_SITE_LANGUAGES,
             'SYSTEM_USERNAMES': feconf.SYSTEM_USERNAMES,
+            'can_create_collections': (
+                self.username and self.username in
+                config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value
+            ),
             'user_is_logged_in': user_services.has_fully_registered(
                 self.user_id),
             'preferred_site_language_code': self.preferred_site_language_code
@@ -375,6 +381,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
         self.response.pragma = 'no-cache'
+
         self.response.write(self.jinja2_env.get_template(
             filename).render(**values))
 

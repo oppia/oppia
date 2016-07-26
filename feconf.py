@@ -129,18 +129,6 @@ ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
     'gif': ['gif']
 }
 
-# Static file url to path mapping
-PATH_MAP = {
-    '/css': os.path.join('core', 'templates', 'dev', 'head', 'css'),
-    '/extensions/gadgets': GADGETS_DIR,
-    '/extensions/interactions': INTERACTIONS_DIR,
-    '/extensions/rich_text_components': RTE_EXTENSIONS_DIR,
-    '/favicon.ico': os.path.join('static', 'images', 'favicon.ico'),
-    '/images': os.path.join('static', 'images'),
-    '/lib/static': os.path.join('lib', 'static'),
-    '/third_party/static': os.path.join('third_party', 'static'),
-}
-
 # A string containing the disallowed characters in state or exploration names.
 # The underscore is needed because spaces in names must be converted to
 # underscores when displayed as part of a URL or key. The other conventions
@@ -210,13 +198,17 @@ DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE = True
 REQUIRE_EMAIL_ON_MODERATOR_ACTION = False
 # Whether to allow custom event reporting to Google Analytics.
 CAN_SEND_ANALYTICS_EVENTS = False
-# Timespan in minutes before allowing duplicate emails
+# Timespan in minutes before allowing duplicate emails.
 DUPLICATE_EMAIL_INTERVAL_MINS = 2
+# Number of digits after decimal to which the average ratings value in the
+# dashboard is rounded off to.
+AVERAGE_RATINGS_DASHBOARD_PRECISION = 2
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
 EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION = 'editor_role_notification'
 EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION = 'feedback_message_notification'
+EMAIL_INTENT_SUGGESTION_NOTIFICATION = 'suggestion_notification'
 EMAIL_INTENT_MARKETING = 'marketing'
 EMAIL_INTENT_PUBLICIZE_EXPLORATION = 'publicize_exploration'
 EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
@@ -443,6 +435,8 @@ SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
 SPLASH_URL = '/splash'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
+SUGGESTION_EMAIL_HANDLER_URL = (
+    '%s/email/suggestionemailhandler' % TASKQUEUE_URL_PREFIX)
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
@@ -468,6 +462,7 @@ EVENT_TYPE_ANSWER_SUBMITTED = 'answer_submitted'
 EVENT_TYPE_DEFAULT_ANSWER_RESOLVED = 'default_answer_resolved'
 EVENT_TYPE_NEW_THREAD_CREATED = 'feedback_thread_created'
 EVENT_TYPE_THREAD_STATUS_CHANGED = 'feedback_thread_status_changed'
+EVENT_TYPE_RATE_EXPLORATION = 'rate_exploration'
 # The values for these event types should be left as-is for backwards
 # compatibility.
 EVENT_TYPE_START_EXPLORATION = 'start'

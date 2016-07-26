@@ -212,6 +212,7 @@ def create_suggestion(exploration_id, author_id, exploration_version,
         feedback_models.FeedbackThreadModel.generate_full_thread_id(
             exploration_id, thread_id))
     subscription_services.subscribe_to_thread(author_id, full_thread_id)
+    enqueue_suggestion_email_task(exploration_id, thread_id)
 
 
 def _get_suggestion_from_model(suggestion_model):
@@ -287,6 +288,18 @@ def enqueue_feedback_message_email_task(user_id):
     taskqueue_services.enqueue_task(
         feconf.FEEDBACK_MESSAGE_EMAIL_HANDLER_URL, {'user_id': user_id},
         feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS)
+
+
+def enqueue_suggestion_email_task(exploration_id, thread_id):
+    """Adds a 'send suggestion email' task into taskqueue."""
+
+    payload = {
+        'exploration_id': exploration_id,
+        'thread_id': thread_id
+    }
+    # Suggestion emails are sent immidiately.
+    taskqueue_services.enqueue_task(
+        feconf.SUGGESTION_EMAIL_HANDLER_URL, payload, 0)
 
 
 def get_feedback_message_references(user_id):

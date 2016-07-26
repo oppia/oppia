@@ -8,6 +8,7 @@
     <script>
       var GLOBALS = {
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
+        ASSET_DIR_PREFIX: JSON.parse('{{ASSET_DIR_PREFIX|js_string}}'),
         DEMO_EXPLORATION_IDS: JSON.parse('{{demo_exploration_ids|js_string}}')
       }
     </script>
@@ -23,7 +24,7 @@
       <div class="navbar-container" style="background-color: #00376d">
         <div class="navbar-header protractor-test-navbar-header pull-left">
           <a class="oppia-navbar-brand-name oppia-transition-200" href="/library">
-            <img src="/images/logo/288x128_logo_white.png" class="oppia-logo" ng-class="'oppia-logo-wide'">
+            <img ng-src="<[logoWhiteImgUrl]>" class="oppia-logo" ng-class="'oppia-logo-wide'">
           </a>
           <ul class="nav navbar-nav oppia-navbar-breadcrumb">
             <li>
@@ -382,6 +383,7 @@
       {{ include_js_file('expressions/evaluator.js') }}
       {{ include_js_file('expressions/parser.js') }}
       {{ value_generators_js }}
+      {{ include_js_file('domain/utilities/UrlInterpolationService.js') }}
     </script>
 
     {{ rte_components_html }}
