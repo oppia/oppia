@@ -2727,12 +2727,12 @@ div#ng-curtain {
   float: right;
 }
 
- @media (max-width: 500px) {
-   .oppia-notification-content,
-   .oppia-notification-last-updated {
-     display: inline;
-   }
- }
+@media (max-width: 500px) {
+  .oppia-notification-content,
+  .oppia-notification-last-updated {
+    display: inline;
+  }
+}
 
 .oppia-about-anchor {
   display: block;
