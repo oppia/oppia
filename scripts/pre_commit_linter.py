@@ -110,7 +110,7 @@ BAD_PATTERNS_JS = {
 
 BAD_PATTERNS_YAML = {
     'MINIFICATION: true': {
-        'message': 'Please set minification variable to false(MINIFICATION: false)',
+        'message': 'Please set minification  to false(MINIFICATION: false)',
         'excluded_files': ()}
 }
 
