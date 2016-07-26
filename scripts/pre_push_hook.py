@@ -252,13 +252,6 @@ def _install_hook():
         print 'Copied file to .git/hooks directory'
 
 
-def subprocess_multiple_cmd(command):
-    """This is to run multiple commands as  which are joined as a single
-    string."""
-    process = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
-    process.communicate()[0].strip()
-
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('remote', nargs='?', help='provided by git before push')
@@ -294,11 +287,4 @@ def main():
 
 
 if __name__ == '__main__':
-    # This is to check MINIFICATION variable in app.yaml is not changed
-    # to true before any commit.
-    subprocess_multiple_cmd(
-        'yaml_env_variable="MINIFICATION: true";'+
-        'sed -i.bak -e s/"MINIFICATION: .*"/"$yaml_env_variable"/ app.yaml;'+
-        'rm app.yaml.bak;'
-    )
     main()
