@@ -3986,6 +3986,39 @@ md-card.preview-conversation-skin-supplemental-card {
   list-style-type: none;
 }
 
+.oppia-donation-card-content-wide {
+  height: 600px;
+  margin: 0 auto;
+}
+
+.oppia-donate-info {
+  float: left;
+  width: calc(100%-400px);
+  height: 100%;
+}
+
+.oppia-donate-options {
+  background-color: #009688;
+  display: block;
+  float: right;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  height: 100%;
+  padding: 10px;
+  width: 340px;
+}
+
+.btn.oppia-donate-options-button {
+  background-color: rgba(0,0,0,0.2);
+  color: rgba(255,255,255,1.0);
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 16px;
+  height: 40px;
+  margin-right: 5px;
+  margin-left: 5px;
+  margin-top: 20px;
+  width: 180px;
+}
+
 /*
   about/learners/creators media queries
 */
