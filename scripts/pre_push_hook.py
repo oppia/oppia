@@ -296,7 +296,9 @@ def main():
 if __name__ == '__main__':
     # This is to check MINIFICATION variable in app.yaml is not changed
     # to true before any commit.
-    subprocess_multiple_cmd('yaml_env_variable="MINIFICATION: false";'+
-    'sed -i.bak -e s/"MINIFICATION: .*"/"$yaml_env_variable"/ app.yaml;'+
-    'rm app.yaml.bak;')
+    subprocess_multiple_cmd(
+        'yaml_env_variable="MINIFICATION: false";'+
+        'sed -i.bak -e s/"MINIFICATION: .*"/"$yaml_env_variable"/ app.yaml;'+
+        'rm app.yaml.bak;'
+    )
     main()
