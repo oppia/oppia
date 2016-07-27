@@ -290,11 +290,10 @@ oppia.controller('StateResponses', [
     $scope.suppressDefaultAnswerGroupWarnings = function() {
       var interactionId = $scope.getCurrentInteractionId();
       var answerGroups = responsesService.getAnswerGroups();
-      // Use answerChoices to store answer choice text for comparison
+      // This array contains the text of each of the possible answers
+      // for the interaction.
       var answerChoices = [];
       var customizationArgs = stateCustomizationArgsService.savedMemento;
-      // Use handledAnswersArray to check that
-      // each answer choice has been covered
       var handledAnswersArray = [];
 
       if (interactionId === 'MultipleChoiceInput') {
@@ -320,15 +319,16 @@ oppia.controller('StateResponses', [
             customizationArgs.maxAllowableSelectionCount.value);
         if (maxSelectionCount === 1) {
           var numChoices = $scope.getAnswerChoices().length;
-          // Use array to store booleans that become true
-          // if answerChoice is covered
+          // This array contains a list of booleans, one for each answer choice.
+          // Each boolean is true if the corresponding answer has been
+          // covered by at least one rule, and false otherwise.
           handledAnswersArray = [];
           for (var i = 0; i < numChoices; i++) {
             handledAnswersArray.push(false);
             answerChoices.push($scope.getAnswerChoices()[i].val);
           }
 
-          var newHandledAnswers = function(current) {
+          var handleAllAnswersExceptGivenOne = function(current) {
             return handledAnswersArray.map(function(element, index) {
               if (index !== current || element === true) {
                 return true;
@@ -351,7 +351,8 @@ oppia.controller('StateResponses', [
                       handledAnswersArray[choiceIndex] = true;
                     } else if (ruleSpec.rule_type ===
                       'DoesNotContainAtLeastOneOf') {
-                      handledAnswersArray = newHandledAnswers(choiceIndex);
+                      handledAnswersArray = handleAllAnswersExceptGivenOne(
+                                              choiceIndex);
                     }
                   }
                 });
@@ -361,7 +362,7 @@ oppia.controller('StateResponses', [
 
           var areAllChoicesCovered = handledAnswersArray.every(
             function(handledAnswer) {
-              return handledAnswer ? true : false;
+              return handledAnswer;
             });
           // We only suppress the default warning if each choice text has
           // been handled by at least one answer group, based on rule type.
@@ -424,6 +425,7 @@ oppia.controller('StateResponses', [
 
     $scope.getOutcomeTooltip = function(outcome) {
       // Outcome tooltip depends on whether feedback is displayed
+      console.log(outcome);
       if ($scope.isLinearWithNoFeedback(outcome)) {
         return 'Please direct the learner to a different card.';
       } else {
