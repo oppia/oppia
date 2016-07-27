@@ -95,36 +95,38 @@ oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
 
       var selectedChoices = [];
       if (maxAllowedCount === 1) {
+        var answerChoiceToIndex = {};
         seenChoices.forEach(function(seenChoice, choiceIndex) {
-          answerGroups.forEach(function(answerGroup) {
-            var ruleSpecs = answerGroup.rule_specs;
-            ruleSpecs.forEach(function(ruleSpec) {
-              var ruleInputs = ruleSpec.inputs.x;
-              ruleInputs.forEach(function(ruleInput) {
-                if (ruleInput === seenChoice) {
-                  if (ruleSpec.rule_type === 'Equals') {
-                    handledAnswers[choiceIndex] = true;
-                    if (ruleInputs.length > 1) {
-                      warningsList.push({
-                        type: WARNING_TYPES.ERROR,
-                        message: (
-                          'Please ensure that you only tick one answer ' +
-                          'choice when you check if the learner\'s answer ' +
-                          'is equal to.')
-                      });
-                    }
-                  } else if (ruleSpec.rule_type === 'ContainsAtLeastOneOf') {
-                    handledAnswers[choiceIndex] = true;
-                  } else if (ruleSpec.rule_type ===
-                    'DoesNotContainAtLeastOneOf') {
-                    for (var i = 0; i < handledAnswers.length; i++) {
-                      if (i !== choiceIndex) {
-                        handledAnswers[i] = true;
-                      }
-                    }
+          answerChoiceToIndex[seenChoice] = choiceIndex;
+        });
+
+        answerGroups.forEach(function(answerGroup, answerIndex) {
+          var ruleSpecs = answerGroup.rule_specs;
+          ruleSpecs.forEach(function(ruleSpec, ruleIndex) {
+            var ruleInputs = ruleSpec.inputs.x;
+            ruleInputs.forEach(function(ruleInput) {
+              var choiceIndex = answerChoiceToIndex[ruleInput];
+              if (ruleSpec.rule_type === 'Equals') {
+                handledAnswers[choiceIndex] = true;
+                if (ruleInputs.length > 1) {
+                  warningsList.push({
+                    type: WARNING_TYPES.ERROR,
+                    message: (
+                      'In answer group ' + (answerIndex + 1) + ', ' +
+                      'rule ' + (ruleIndex + 1) + ', ' +
+                      'please select only one answer choice.')
+                  });
+                }
+              } else if (ruleSpec.rule_type === 'ContainsAtLeastOneOf') {
+                handledAnswers[choiceIndex] = true;
+              } else if (ruleSpec.rule_type ===
+                'DoesNotContainAtLeastOneOf') {
+                for (var i = 0; i < handledAnswers.length; i++) {
+                  if (i !== choiceIndex) {
+                    handledAnswers[i] = true;
                   }
                 }
-              });
+              }
             });
           });
         });
