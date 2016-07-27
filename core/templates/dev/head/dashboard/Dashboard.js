@@ -24,6 +24,11 @@ oppia.controller('Dashboard', [
       $scope, $rootScope, $window, oppiaDatetimeFormatter, alertsService,
       DashboardBackendApiService, RatingComputationService,
       ExplorationCreationService, FATAL_ERROR_CODES, UrlInterpolationService) {
+    var EXP_PUBLISH_TEXTS = {
+      default: 'This exploration is private. Publish it to receive statistics.',
+      sm: 'Publish the exploration to receive statistics.'
+    };
+
     $scope.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
         GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD);
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
@@ -48,6 +53,20 @@ oppia.controller('Dashboard', [
     $scope.setMyExplorationsView = function(viewType) {
       $scope.myExplorationsView = viewType;
     };
+
+    $scope.checkForMobileView = function() {
+      if ($window.innerWidth < 500) {
+        $scope.myExplorationsView = 'card';
+        $scope.publishText = EXP_PUBLISH_TEXTS.sm;
+      } else {
+        $scope.publishText = EXP_PUBLISH_TEXTS.default;
+      }
+    };
+
+    $scope.checkForMobileView();
+    angular.element($window).bind('resize', function() {
+      $scope.checkForMobileView();
+    });
 
     $rootScope.loadingMessage = 'Loading';
     DashboardBackendApiService.fetchDashboardData().then(

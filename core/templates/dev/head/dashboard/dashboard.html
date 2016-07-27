@@ -67,7 +67,7 @@
             </a>
           </li>
         {% endif %}
-        <li class="list-card-view-toggle" ng-if="activeTab === 'myExplorations'">
+        <li class="list-card-view-toggle dashboard-hide-mobile" ng-if="activeTab === 'myExplorations'">
           <button class="card-view-btn"
                   ng-class="{'dashboard-active-view': myExplorationsView === 'card'}"
                   ng-click="setMyExplorationsView('card')">
@@ -145,7 +145,7 @@
               <td colspan="4"
                   ng-if="exploration.status === 'private'"
                   class="exp-private-text">
-                This exploration is private. Publish it to receive statistics.
+                <[publishText]>
               </td>
               <td ng-if="exploration.status !== 'private'">
                 <[(getAverageRating(exploration.ratings) | number:1) || 'N/A']>
@@ -186,7 +186,7 @@
 
             <div ng-attr-section="'<['right-section']>">
               <div ng-if="exploration.status === 'private'" class="exp-private-text">
-                This exploration is private. Publish it to receive statistics.
+                <[publishText]>
               </div>
               <ul ng-if="exploration.status !== 'private'"
                   layout="row"
@@ -237,6 +237,7 @@
                 <sharing-links ng-if="exploration.status !== 'private'"
                                ng-click="$event.stopPropagation()"
                                flex="100"
+                               class="dashboard-hide-mobile"
                                layout-type="row"
                                layout-align-type="center left"
                                twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD"
