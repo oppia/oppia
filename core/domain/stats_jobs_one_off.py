@@ -559,7 +559,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         return (
             exp_services.get_exploration_from_model(latest_exp_model),
             [exp_services.get_exploration_from_model(model)
-             for model in history_models])
+             if model else None for model in history_models])
 
     # This function comes from extensions.answer_summarizers.models.
     @classmethod
