@@ -33,6 +33,13 @@ PLATFORM = 'gae'
 IS_MINIFIED = os.environ.get('MINIFICATION') == 'True'
 
 # Whether we should serve the development or production experience.
+# DEV_MODE should only be changed to False in the production environment.
+# To use minified resources in the development environment,
+# change the MINIFICATION env variable in app.yaml to True.
+# When DEV_MODE is True, this indicates that we are not running in
+# the production App Engine environment, which affects things like
+# login/logout URLs,as well as third-party libraries
+# that App Engine normally provides.
 if PLATFORM == 'gae':
     DEV_MODE = (
         not os.environ.get('SERVER_SOFTWARE')
