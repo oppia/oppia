@@ -4033,15 +4033,22 @@ md-card.preview-conversation-skin-supplemental-card {
   list-style-type: none;
 }
 
+.oppia-donation-card {
+  margin: auto;
+  position: relative;
+  width: 660px;
+}
+
 .oppia-donation-card-content-wide {
-  height: 600px;
   margin: 0 auto;
+  min-height: 670px;
+  overflow: auto;
 }
 
 .oppia-donate-info {
   float: left;
-  width: calc(100%-400px);
-  height: 100%;
+  padding: 60px;
+  width: calc(100% - 340px);
 }
 
 .oppia-donate-options {
@@ -4049,7 +4056,6 @@ md-card.preview-conversation-skin-supplemental-card {
   display: block;
   float: right;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  height: 100%;
   padding: 10px;
   width: 340px;
 }
@@ -4060,10 +4066,13 @@ md-card.preview-conversation-skin-supplemental-card {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 16px;
   height: 40px;
-  margin-right: 5px;
-  margin-left: 5px;
-  margin-top: 20px;
+  margin: 15px auto;
   width: 180px;
+}
+
+.btn.oppia-donate-options-button:hover {
+  background-color: rgba(5, 190, 178, 1);
+  color: rgba(255,255,255,1);
 }
 
 /*
@@ -4075,6 +4084,16 @@ md-card.preview-conversation-skin-supplemental-card {
     width: 960px;
   }
 }
+
+@media only screen and (max-width: 1140px) {
+  .oppia-donate-info {
+    display: none;
+  }
+  .oppia-donate-options {
+    float: clear;
+    margin-bottom: 30px;
+    width: 100%;
+  }
 
 @media only screen and (max-width: 768px) {
   .oppia-about-content, .oppia-about-extra-content {

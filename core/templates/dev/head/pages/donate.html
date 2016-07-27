@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
-{% block subtitle %}
-  Contact
-{% endblock subtitle %}
+{% block maintitle %}
+  Donate - Oppia
+{% endblock maintitle %}
 
 {% block header_js %}
   {{ super() }}
@@ -27,10 +27,25 @@
   <div class="oppia-page-card oppia-about-content" ng-controller="Donate">
     <div class="oppia-donation-card-content-wide">
       <div class="oppia-donate-info">
-
+        <div style="height: 200px; margin: 0 auto; width: 90%;">
+        </div>
+        <h6 style="text-align: center;"><em>Hear from our Oppia community</em></h6>
+        <div style="margin: 0 auto; width: 90%;">
+          <p style="font-size: 0.8em;">
+            In 2012, Oppia started with a simple idea: to improve the education of
+            students around the world while improving the quality of teaching.
+            This vision has since turned into an educational platform with over
+            5,500 explorations that are used by approximately 145,000
+            users worldwide.
+          </p>
+          <p style="font-size: 0.8em;">
+            Please donate to The Oppia Foundation, a registered 501(c)(3), and
+            join us in bringing the joys of teaching and learning to people everywhere.
+          </p>
+        </div>
       </div>
       <div class="oppia-donate-options">
-        <h2 style="color: #fff; margin-bottom: 0px; margin-top: 40px;">Donate to</h2>
+        <h2 style="color: #fff; margin-top: 60px;">Donate to</h2>
         <h2 style="color: #fff; margin-top: 10px;">The Oppia Foundation</h2>
         <div style="text-align: center;">
           <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
@@ -46,9 +61,10 @@
             Amazon Smile
           </a>
         </div>
-        <h2 style="color: #fff; font-size: 20px; margin-top: 40px;">Your generous gift funds:</h2>
-        <div style="text-align: center;">
-          <img src="/images/general/opp_donate_text.png">
+        <h2 style="color: #fff; font-size: 20px; margin-bottom: 20px; margin-top: 20px;">
+          Your generous gift funds:</h2>
+        <div style="margin-bottom: 16px; text-align: center;">
+          <img src="assets/images/general/opp_donate_text.png">
         </div>
       </div>
     </div>
