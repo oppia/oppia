@@ -108,10 +108,18 @@ BAD_PATTERNS_JS = {
             'core/templates/dev/head/expressions/typeParserSpec.js')}
 }
 
+BAD_PATTERNS_APP_YAML = {
+    'MINIFICATION: true': {
+        'message': 'Please set the MINIFICATION env variable in app.yaml'
+                   'to False before committing.',
+        'excluded_files': ()}
+}
+
 EXCLUDED_PATHS = (
-    'third_party/*', '.git/*', '*.pyc', 'CHANGELOG',
+    'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
     'scripts/pre_commit_linter.py', 'integrations/*',
-    'integrations_dev/*', '*.svg', '*.png', '*.zip', '*.ico', '*.jpg')
+    'integrations_dev/*', '*.svg', '*.png', '*.zip', '*.ico', '*.jpg',
+    '*.min.js', 'assets/scripts/*')
 
 if not os.getcwd().endswith('oppia'):
     print ''
@@ -144,7 +152,6 @@ _PATHS_TO_INSERT = [
     os.path.join(_PARENT_DIR, 'oppia_tools', 'numpy-1.6.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'browsermob-proxy-0.7.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-2.53.2'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'xvfbwrapper-0.2.8'),
     os.path.join('third_party', 'gae-pipeline-1.9.17.0'),
     os.path.join('third_party', 'bleach-1.2.2'),
     os.path.join('third_party', 'gae-mapreduce-1.9.17.0'),
@@ -236,8 +243,10 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint, stdout,
         print 'There are no JavaScript files to lint.'
         return
 
+    print 'Total js files: ', num_js_files
     jscs_cmd_args = [node_path, jscs_path, config_jscsrc]
     for _, filename in enumerate(files_to_lint):
+        print 'Linting: ', filename
         proc_args = jscs_cmd_args + [filename]
         proc = subprocess.Popen(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -258,6 +267,8 @@ def _lint_js_files(node_path, jscs_path, config_jscsrc, files_to_lint, stdout,
     else:
         result.put('%s   %s JavaScript files linted (%.1f secs)' % (
             _MESSAGE_TYPE_SUCCESS, num_js_files, time.time() - start_time))
+
+    print 'Js linting finished.'
 
 
 def _lint_py_files(config_pylint, files_to_lint, result):
@@ -280,12 +291,29 @@ def _lint_py_files(config_pylint, files_to_lint, result):
         print 'There are no Python files to lint.'
         return
 
-    try:
-        # This prints output to the console.
-        lint.Run(files_to_lint + [config_pylint])
-    except SystemExit as e:
-        if str(e) != '0':
-            are_there_errors = True
+    print 'Linting %s Python files' % num_py_files
+
+    _BATCH_SIZE = 50
+    current_batch_start_index = 0
+
+    while current_batch_start_index < len(files_to_lint):
+        # Note that this index is an exclusive upper bound -- i.e., the current
+        # batch of files ranges from 'start_index' to 'end_index - 1'.
+        current_batch_end_index = min(
+            current_batch_start_index + _BATCH_SIZE, len(files_to_lint))
+        current_files_to_lint = files_to_lint[
+            current_batch_start_index : current_batch_end_index]
+        print 'Linting Python files %s to %s...' % (
+            current_batch_start_index + 1, current_batch_end_index)
+
+        try:
+            # This prints output to the console.
+            lint.Run(current_files_to_lint + [config_pylint])
+        except SystemExit as e:
+            if str(e) != '0':
+                are_there_errors = True
+
+        current_batch_start_index = current_batch_end_index
 
     if are_there_errors:
         result.put('%s    Python linting failed' % _MESSAGE_TYPE_FAILED)
@@ -293,6 +321,7 @@ def _lint_py_files(config_pylint, files_to_lint, result):
         result.put('%s   %s Python files linted (%.1f secs)' % (
             _MESSAGE_TYPE_SUCCESS, num_py_files, time.time() - start_time))
 
+    print 'Python linting finished.'
 
 def _get_all_files():
     """This function is used to check if this script is ran from
@@ -336,6 +365,8 @@ def _pre_commit_linter(all_files):
     """This function is used to check if node-jscs dependencies are installed
     and pass JSCS binary path
     """
+    print 'Starting linter...'
+
     jscsrc_path = os.path.join(os.getcwd(), '.jscsrc')
     pylintrc_path = os.path.join(os.getcwd(), '.pylintrc')
 
@@ -377,7 +408,10 @@ def _pre_commit_linter(all_files):
         process.start()
 
     for process in linting_processes:
-        process.join()
+        # Require timeout parameter to prevent against endless waiting for the
+        # linting function to return.
+        process.join(timeout=600)
+
 
     js_messages = []
     while not js_stdout.empty():
@@ -387,8 +421,10 @@ def _pre_commit_linter(all_files):
     print '\n'.join(js_messages)
     print '----------------------------------------'
     summary_messages = []
-    summary_messages.append(js_result.get())
-    summary_messages.append(py_result.get())
+    # Require block = False to prevent unnecessary waiting for the process
+    # output.
+    summary_messages.append(js_result.get(block=False))
+    summary_messages.append(py_result.get(block=False))
     print '\n'.join(summary_messages)
     print ''
     return summary_messages
@@ -429,6 +465,14 @@ def _check_bad_patterns(all_files):
                                 filename,
                                 BAD_PATTERNS_JS[pattern]['message'])
                             total_error_count += 1
+            if filename == 'app.yaml':
+                for pattern in BAD_PATTERNS_APP_YAML:
+                    if pattern in content:
+                        failed = True
+                        print '%s --> %s' % (
+                            filename,
+                            BAD_PATTERNS_APP_YAML[pattern]['message'])
+                        total_error_count += 1
     if failed:
         summary_message = '%s   Pattern checks failed' % _MESSAGE_TYPE_FAILED
         summary_messages.append(summary_message)

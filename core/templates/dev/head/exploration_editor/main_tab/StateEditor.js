@@ -20,10 +20,12 @@ oppia.controller('StateEditor', [
   '$scope', '$rootScope', 'editorContextService', 'changeListService',
   'editabilityService', 'explorationStatesService', 'INTERACTION_SPECS',
   'explorationInitStateNameService', 'explorationAdvancedFeaturesService',
+  'UrlInterpolationService',
   function(
       $scope, $rootScope, editorContextService, changeListService,
       editabilityService, explorationStatesService, INTERACTION_SPECS,
-      explorationInitStateNameService, explorationAdvancedFeaturesService) {
+      explorationInitStateNameService, explorationAdvancedFeaturesService,
+      UrlInterpolationService) {
     $scope.STATE_CONTENT_SCHEMA = {
       type: 'html'
     };
@@ -36,6 +38,9 @@ oppia.controller('StateEditor', [
     $scope.isCurrentStateTerminal = false;
     $scope.isInteractionIdSet = false;
     $scope.isInteractionShown = false;
+
+    $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
+      '/avatar/oppia_black_72px.png');
 
     $scope.isCurrentStateInitialState = function() {
       return (

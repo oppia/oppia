@@ -16,6 +16,8 @@
 
 """Provides a seam for taskqueue-related operations."""
 
+import json
+
 from google.appengine.api import taskqueue
 from google.appengine.ext import deferred
 
@@ -50,7 +52,7 @@ def enqueue_task(url, params, countdown):
     # See https://cloud.google.com/appengine/docs/python/taskqueue for
     # details of various parameters set when adding a new task.
     taskqueue.add(
-        queue_name=QUEUE_NAME_EMAILS, url=url, params=params,
+        queue_name=QUEUE_NAME_EMAILS, url=url, payload=json.dumps(params),
         countdown=countdown, target=taskqueue.DEFAULT_APP_VERSION)
 
 # A special exception that ensures that the task is not tried again, if it

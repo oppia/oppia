@@ -19,14 +19,18 @@
 oppia.controller('Library', [
   '$scope', '$http', '$rootScope', '$window', '$timeout', 'i18nIdService',
   'urlService', 'CATEGORY_LIST', 'searchService', 'windowDimensionsService',
-  function(
+  'UrlInterpolationService', function(
       $scope, $http, $rootScope, $window, $timeout, i18nIdService,
-      urlService, CATEGORY_LIST, searchService, windowDimensionsService) {
+      urlService, CATEGORY_LIST, searchService, windowDimensionsService,
+      UrlInterpolationService) {
     $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
     var possibleBannerFilenames = [
       'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
     $scope.bannerImageFilename = possibleBannerFilenames[
       Math.floor(Math.random() * possibleBannerFilenames.length)];
+
+    $scope.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
+      '/library/' + $scope.bannerImageFilename);
 
     // Below is the width of each tile (width + margins), which can be found
     // in core/templates/dev/head/components/
@@ -47,10 +51,10 @@ oppia.controller('Library', [
       // Pause is necessary to ensure all elements have loaded, same for
       // initCarousels.
       // TODO(sll): On small screens, the tiles do not have a defined width.
-      // The use of 208 here is a hack, and the underlying problem of the tiles
+      // The use of 214 here is a hack, and the underlying problem of the tiles
       // not having a defined width on small screens needs to be fixed.
       $timeout(function() {
-        tileDisplayWidth = $('exploration-summary-tile').width() || 208;
+        tileDisplayWidth = $('exploration-summary-tile').width() || 214;
       }, 20);
 
       // Initialize the carousel(s) on the library index page.

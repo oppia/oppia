@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
 import logging
 import os
 
@@ -21,6 +22,7 @@ from core.domain import collection_services
 from core.domain import event_services
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import user_jobs_continuous
 from core.domain import user_jobs_continuous_test
 from core.domain import user_services
 from core.tests import test_utils
@@ -141,7 +143,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_fetch_gravatar_success(self):
         user_email = 'user@example.com'
         expected_gravatar_filepath = os.path.join(
-            'static', 'images', 'avatar', 'gravatar_example.png')
+            self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
+            'gravatar_example.png')
         with open(expected_gravatar_filepath, 'r') as f:
             gravatar = f.read()
         with self.urlfetch_mock(content=gravatar):
@@ -196,7 +199,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_default_identicon_data_url(self):
         identicon_filepath = os.path.join(
-            'static', 'images', 'avatar', 'user_blue_72px.png')
+            self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
+            'user_blue_72px.png')
         identicon_data_url = utils.convert_png_to_data_url(
             identicon_filepath)
         self.assertEqual(
@@ -217,25 +221,84 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             email_preferences['can_receive_editor_role_email'],
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
 
+        email_preferences = user_services.get_email_preferences(user_id)
+        self.assertEquals(
+            email_preferences['can_receive_feedback_message_email'],
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
+
         # The user retrieves their email preferences. This initializes
         # a UserEmailPreferencesModel instance with the default values.
         user_services.update_email_preferences(
             user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
-            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
 
         email_preferences = user_services.get_email_preferences(user_id)
         self.assertEquals(
             email_preferences['can_receive_editor_role_email'],
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+        self.assertEquals(
+            email_preferences['can_receive_feedback_message_email'],
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
 
         # The user sets their membership email preference to False.
         user_services.update_email_preferences(
-            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE, False)
+            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE, False,
+            False)
 
         email_preferences = user_services.get_email_preferences(user_id)
         self.assertEquals(
-            email_preferences['can_receive_editor_role_email'],
-            False)
+            email_preferences['can_receive_editor_role_email'], False)
+        self.assertEquals(
+            email_preferences['can_receive_feedback_message_email'], False)
+
+    def test_get_current_date_as_string(self):
+        custom_datetimes = [
+            datetime.date(2011, 1, 1),
+            datetime.date(2012, 2, 28)
+        ]
+        datetime_strings = [custom_datetime.strftime(
+            feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
+                            for custom_datetime in custom_datetimes]
+
+        self.assertEqual(len(datetime_strings[0].split('-')[0]), 4)
+        self.assertEqual(len(datetime_strings[0].split('-')[1]), 2)
+        self.assertEqual(len(datetime_strings[0].split('-')[2]), 2)
+
+        self.assertEqual(len(datetime_strings[1].split('-')[0]), 4)
+        self.assertEqual(len(datetime_strings[1].split('-')[1]), 2)
+        self.assertEqual(len(datetime_strings[1].split('-')[2]), 2)
+
+        self.assertEqual(datetime_strings[0], '2011-01-01')
+        self.assertEqual(datetime_strings[1], '2012-02-28')
+
+    def test_parse_date_from_string(self):
+        test_datetime_strings = [
+            '2016-06-30',
+            '2016-07-05',
+            '2016-13-01',
+            '2016-03-32'
+        ]
+
+        self.assertEqual(
+            user_services.parse_date_from_string(test_datetime_strings[0]),
+            {
+                'year': 2016,
+                'month': 6,
+                'day': 30
+            })
+        self.assertEqual(
+            user_services.parse_date_from_string(test_datetime_strings[1]),
+            {
+                'year': 2016,
+                'month': 7,
+                'day': 5
+            })
+
+        with self.assertRaises(ValueError):
+            user_services.parse_date_from_string(test_datetime_strings[2])
+        with self.assertRaises(ValueError):
+            user_services.parse_date_from_string(test_datetime_strings[3])
 
 
 class UpdateContributionMsecTests(test_utils.GenericTestBase):
@@ -485,10 +548,15 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
 
     USER_SESSION_ID = 'session1'
 
+    CURRENT_DATE_AS_STRING = user_services.get_current_date_as_string()
+
     def setUp(self):
         super(UserDashboardStatsTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+    def _mock_get_current_date_as_string(self):
+        return self.CURRENT_DATE_AS_STRING
 
     def test_get_user_dashboard_stats(self):
         exploration = self.save_new_valid_exploration(
@@ -498,18 +566,85 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
             feconf.PLAY_TYPE_NORMAL)
         self.assertEquals(
-            user_services.get_user_dashboard_stats(self.owner_id), {
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.owner_id),
+            {
                 'total_plays': 0,
+                'num_ratings': 0,
                 'average_ratings': None
             })
         (user_jobs_continuous_test.ModifiedUserStatsAggregator
          .start_computation())
         self.process_and_flush_pending_tasks()
         self.assertEquals(
-            user_services.get_user_dashboard_stats(self.owner_id), {
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.owner_id),
+            {
                 'total_plays': 1,
+                'num_ratings': 0,
                 'average_ratings': None
             })
+
+    def test_get_weekly_dashboard_stats_when_stats_model_is_none(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, end_state_name='End')
+        init_state_name = exploration.init_state_name
+        event_services.StartExplorationEventHandler.record(
+            self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
+            feconf.PLAY_TYPE_NORMAL)
+        self.assertEquals(
+            user_services.get_weekly_dashboard_stats(self.owner_id), None)
+        self.assertEquals(
+            user_services.get_last_week_dashboard_stats(self.owner_id), None)
+
+        with self.swap(user_services,
+                       'get_current_date_as_string',
+                       self._mock_get_current_date_as_string):
+            user_services.update_dashboard_stats_log(self.owner_id)
+
+        self.assertEquals(
+            user_services.get_weekly_dashboard_stats(self.owner_id), [{
+                self.CURRENT_DATE_AS_STRING: {
+                    'total_plays': 0,
+                    'num_ratings': 0,
+                    'average_ratings': None
+                }
+            }])
+
+    def test_get_weekly_dashboard_stats(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, end_state_name='End')
+        init_state_name = exploration.init_state_name
+        event_services.StartExplorationEventHandler.record(
+            self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
+            feconf.PLAY_TYPE_NORMAL)
+        self.assertEquals(
+            user_services.get_weekly_dashboard_stats(self.owner_id), None)
+        self.assertEquals(
+            user_services.get_last_week_dashboard_stats(self.owner_id), None)
+
+        (user_jobs_continuous_test.ModifiedUserStatsAggregator
+         .start_computation())
+        self.process_and_flush_pending_tasks()
+
+        self.assertEquals(
+            user_services.get_weekly_dashboard_stats(self.owner_id), None)
+        self.assertEquals(
+            user_services.get_last_week_dashboard_stats(self.owner_id), None)
+
+        with self.swap(user_services,
+                       'get_current_date_as_string',
+                       self._mock_get_current_date_as_string):
+            user_services.update_dashboard_stats_log(self.owner_id)
+
+        self.assertEquals(
+            user_services.get_weekly_dashboard_stats(self.owner_id), [{
+                self.CURRENT_DATE_AS_STRING: {
+                    'total_plays': 1,
+                    'num_ratings': 0,
+                    'average_ratings': None
+                }
+            }])
 
 
 class SubjectInterestsUnitTests(test_utils.GenericTestBase):

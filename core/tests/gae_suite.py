@@ -46,7 +46,6 @@ DIRS_TO_ADD_TO_SYS_PATH = [
         'lib', 'webob_0_9'),
     os.path.join(OPPIA_TOOLS_DIR, 'browsermob-proxy-0.7.1'),
     os.path.join(OPPIA_TOOLS_DIR, 'selenium-2.53.2'),
-    os.path.join(OPPIA_TOOLS_DIR, 'xvfbwrapper-0.2.8'),
     CURR_DIR,
     os.path.join(THIRD_PARTY_DIR, 'bleach-1.2.2'),
     os.path.join(THIRD_PARTY_DIR, 'gae-cloud-storage-1.9.15.0'),

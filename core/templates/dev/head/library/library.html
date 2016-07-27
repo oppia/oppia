@@ -44,7 +44,7 @@
         </div>
 
         <div class="oppia-exp-summary-tiles-container" ng-if="!inSearchMode">
-          <img ng-src="/images/library/<[bannerImageFilename]>" align="center"
+          <img ng-src="<[bannerImageFileUrl]>" align="center"
                width="100%">
           <div style="text-align: center; width: 100%;">
             <h1 class="oppia-library-h1" translate="I18N_LIBRARY_MAIN_HEADER"></h1>
@@ -57,16 +57,14 @@
           </div>
 
           <div class="oppia-library-group" ng-repeat="group in libraryGroups track by $index">
-            <div>
+            <div class="row oppia-library-group-header-container">
+              <h2 class="oppia-library-group-header">
+                <a ng-click="showAllResultsForCategories(group.categories)" translate="<[group.translationId]>">
+                </a>
+              </h2>
               <div class="pull-right">
                 <button class="btn oppia-library-group-view-all-btn oppia-transition-200" ng-click="showAllResultsForCategories(group.categories)" translate="I18N_LIBRARY_VIEW_ALL">
                 </button>
-              </div>
-              <div class="oppia-library-group-header-container">
-                <h2 class="oppia-library-group-header">
-                  <a ng-click="showAllResultsForCategories(group.categories)" translate="<[group.translationId]>">
-                  </a>
-                </h2>
               </div>
             </div>
 

@@ -1809,6 +1809,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
     """Test exploration search."""
 
     USER_ID_1 = 'user_1'
+    USER_ID_2 = 'user_2'
 
     def test_demo_explorations_are_added_to_search_index(self):
         results, _ = exp_services.search_explorations('Welcome', 2)
@@ -1974,6 +1975,31 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
 
         self.assertEqual(cursor, expected_result_cursor)
         self.assertEqual(result, doc_ids)
+
+    def test_get_number_of_ratings(self):
+        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+
+        self.assertEqual(exp_services.get_number_of_ratings(exp.ratings), 0)
+
+        rating_services.assign_rating_to_exploration(
+            self.owner_id, self.EXP_ID, 5)
+        self.assertEqual(
+            exp_services.get_number_of_ratings(exp.ratings), 1)
+
+        rating_services.assign_rating_to_exploration(
+            self.USER_ID_1, self.EXP_ID, 3)
+        self.process_and_flush_pending_tasks()
+        exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+        self.assertEqual(
+            exp_services.get_number_of_ratings(exp.ratings), 2)
+
+        rating_services.assign_rating_to_exploration(
+            self.USER_ID_2, self.EXP_ID, 5)
+        self.process_and_flush_pending_tasks()
+        exp = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+        self.assertEqual(
+            exp_services.get_number_of_ratings(exp.ratings), 3)
 
     def test_get_average_rating(self):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
@@ -2330,401 +2356,6 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             for prop in simple_props:
                 self.assertEqual(getattr(actual_summaries[exp_id], prop),
                                  getattr(expected_summaries[exp_id], prop))
-
-
-class ChangeListSummaryUnitTests(ExplorationServicesUnitTests):
-    """Test change list summaries generate as expected for edge cases.
-
-    CHANGE_LIST_ONE: Adds a simple state with a Continue interaction.
-    CHANGE_LIST_TWO: Edits the first state's content and renames it.
-    CHANGE_LIST_THREE: Adds a gadget.
-    CHANGE_LIST_FOUR: Edits the gadget customization_args then deletes it.
-    CHANGE_LIST_FIVE: Adds a gadget, edits a state, deletes the gadget.
-    """
-
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
-
-    BASIC_CHANGE_SUMMARY = {
-        'exploration_property_changes': {},
-        'state_property_changes': {},
-        'changed_states': [],
-        'added_states': [],
-        'deleted_states': [],
-        'gadget_property_changes': {},
-        'changed_gadgets': [],
-        'added_gadgets': [],
-        'deleted_gadgets': []
-    }
-
-    CHANGE_LIST_ONE = [
-        {
-            'cmd': 'edit_state_property',
-            'new_value': [{'value': '<p>a</p>', 'type': 'text'}],
-            'property_name': 'content',
-            'old_value': [{'value': '', 'type': 'text'}],
-            'state_name': feconf.DEFAULT_INIT_STATE_NAME
-        }, {
-            'cmd': 'edit_state_property',
-            'new_value': 'Continue',
-            'property_name': 'widget_id',
-            'old_value': None,
-            'state_name': feconf.DEFAULT_INIT_STATE_NAME
-        }, {
-            'cmd': 'edit_state_property',
-            'new_value': {'buttonText': {'value': 'Continue'}},
-            'property_name': 'widget_customization_args',
-            'old_value': {},
-            'state_name': feconf.DEFAULT_INIT_STATE_NAME
-        }, {
-            'cmd': 'edit_state_property',
-            'new_value': {
-                'dest': 'END',
-                'param_changes': [],
-                'feedback': []
-            },
-            'property_name': 'default_outcome',
-            'old_value': {
-                'dest': feconf.DEFAULT_INIT_STATE_NAME,
-                'param_changes': [],
-                'feedback': []
-            },
-            'state_name': feconf.DEFAULT_INIT_STATE_NAME
-        }
-    ]
-
-    CHANGE_LIST_TWO = [
-        {
-            'new_value': [{
-                'type': 'text',
-                'value': '<p>EDITED CONTENT here</p>'
-            }],
-            'old_value': [{
-                'type': 'text',
-                'value': '<p>a</p>'
-            }],
-            'cmd': 'edit_state_property',
-            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'property_name': 'content'
-        }, {
-            'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'cmd': 'rename_state',
-            'new_state_name': 'First Card renamed'
-        }, {
-            'new_value': 'First Card renamed',
-            'old_value': feconf.DEFAULT_INIT_STATE_NAME,
-            'cmd': 'edit_exploration_property',
-            'property_name': 'init_state_name'
-        }
-    ]
-
-    CHANGE_LIST_THREE = [
-        {
-            'cmd': 'add_gadget',
-            'gadget_dict': {
-                'gadget_type': 'TestGadget',
-                'visible_in_states': ['First Card renamed'],
-                'customization_args': {
-                    'adviceObjects': {
-                        'value': [{
-                            'adviceTitle': 'b',
-                            'adviceHtml': '<p>c</p>'
-                        }]
-                    },
-                    'title': {
-                        'value': 'a'
-                    }
-                },
-                'gadget_name': 'TestGadget'
-            },
-            'panel': 'bottom'
-        }
-    ]
-
-    CHANGE_LIST_FOUR = [
-        {
-            'new_value': {
-                'adviceObjects': {
-                    'value': [{
-                        'adviceTitle': 'b',
-                        'adviceHtml': '<p>cG</p>'
-                    }]
-                },
-                'title': {
-                    'value': 'a'
-                }
-            },
-            'old_value': {
-                'adviceObjects': {
-                    'value': [{
-                        'adviceTitle': 'b',
-                        'adviceHtml': '<p>c</p>'
-                    }]
-                },
-                'title': {'value': 'a'}
-            },
-            'cmd': 'edit_gadget_property',
-            'gadget_name': 'TestGadget',
-            'property_name': 'gadget_customization_args'
-        }, {
-            'new_value': ['First Card renamed'],
-            'old_value': ['First Card renamed'],
-            'cmd': 'edit_gadget_property',
-            'gadget_name': 'TestGadget',
-            'property_name': 'gadget_visibility'
-        }, {
-            'cmd': 'delete_gadget',
-            'gadget_name': 'TestGadget'
-        }
-    ]
-
-    CHANGE_LIST_FIVE = [
-        {
-            'cmd': 'add_gadget',
-            'gadget_dict': {
-                'gadget_type': 'TestGadget',
-                'visible_in_states': ['First Card renamed'],
-                'customization_args': {
-                    'adviceObjects': {
-                        'value': [{
-                            'adviceTitle': 'b', 'adviceHtml': '<p>c</p>'
-                        }]
-                    },
-                    'title': {'value': 'a'}
-                },
-                'gadget_name': 'TestGadget'
-            },
-            'panel': 'bottom'
-        }, {
-            'new_value': [{
-                'type': 'text', 'value': '<p>EDITED CONTENT here 2</p>'
-            }],
-            'old_value': [{
-                'type': 'text', 'value': '<p>EDITED CONTENT here</p>'
-            }],
-            'cmd': 'edit_state_property',
-            'state_name': 'First Card renamed',
-            'property_name': 'content'
-        }, {
-            'cmd': 'delete_gadget',
-            'gadget_name': 'TestGadget'
-        }
-    ]
-
-    EXP_ID = 'eid1'
-
-    def setUp(self):
-        """Prepare an exploration instance to receive changes via
-        exp_services.apply_change_list method."""
-        super(ChangeListSummaryUnitTests, self).setUp()
-
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-
-        self.exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.albert_id, end_state_name='END')
-
-    def test_get_summary_of_change_list(self):
-        """Test accurate generation of change summaries."""
-
-        actual_result = exp_services.get_summary_of_change_list(
-            self.exploration,
-            ChangeListSummaryUnitTests.CHANGE_LIST_ONE
-        )
-
-        expected_result = copy.deepcopy(
-            ChangeListSummaryUnitTests.BASIC_CHANGE_SUMMARY)
-        expected_result['state_property_changes'] = {
-            feconf.DEFAULT_INIT_STATE_NAME: {
-                'content': {
-                    'new_value': [
-                        {
-                            'type': 'text',
-                            'value': '<p>a</p>'
-                        }
-                    ],
-                    'old_value': [
-                        {
-                            'type': 'text',
-                            'value': ''
-                        }
-                    ]
-                },
-                'widget_customization_args': {
-                    'new_value': {
-                        'buttonText': {
-                            'value': 'Continue'
-                        }
-                    },
-                    'old_value': {}
-                },
-                'default_outcome': {
-                    'new_value': {
-                        'dest': 'END',
-                        'feedback': [],
-                        'param_changes': []
-                    },
-                    'old_value': {
-                        'dest': feconf.DEFAULT_INIT_STATE_NAME,
-                        'feedback': [],
-                        'param_changes': []
-                    }
-                },
-                'widget_id': {
-                    'new_value': 'Continue',
-                    'old_value': None
-                }
-            }
-        }
-
-        self.assertEqual(actual_result, expected_result)
-
-        # Apply changes from list one so future changes can be applied.
-        #
-        # Note that this test cannot use exp_services.apply_change_list as
-        # that method generates an Exploration instance from the backend
-        # model, but does not save back to it.
-        exp_services.update_exploration(
-            self.albert_id,
-            self.EXP_ID,
-            ChangeListSummaryUnitTests.CHANGE_LIST_ONE,
-            "a commit message")
-        self.exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-
-        # CHANGE_LIST_TWO
-        actual_result = exp_services.get_summary_of_change_list(
-            self.exploration,
-            ChangeListSummaryUnitTests.CHANGE_LIST_TWO
-        )
-
-        expected_result = copy.deepcopy(
-            ChangeListSummaryUnitTests.BASIC_CHANGE_SUMMARY)
-        expected_result['exploration_property_changes'] = {
-            'init_state_name': {
-                'new_value': 'First Card renamed',
-                'old_value': feconf.DEFAULT_INIT_STATE_NAME
-            }
-        }
-        expected_result['state_property_changes'] = {
-            feconf.DEFAULT_INIT_STATE_NAME: {
-                'content': {
-                    'new_value': [
-                        {
-                            'type': 'text',
-                            'value': '<p>EDITED CONTENT here</p>'
-                        }
-                    ],
-                    'old_value': [
-                        {
-                            'type': 'text',
-                            'value': '<p>a</p>'
-                        }
-                    ]
-                },
-                'name': {
-                    'new_value': 'First Card renamed',
-                    'old_value': feconf.DEFAULT_INIT_STATE_NAME
-                }
-            }
-        }
-
-        self.assertEqual(actual_result, expected_result)
-
-        # Apply changes from list two so future changes can be applied.
-        exp_services.update_exploration(
-            self.albert_id,
-            self.EXP_ID,
-            ChangeListSummaryUnitTests.CHANGE_LIST_TWO,
-            "a commit message")
-        self.exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-
-        # CHANGE_LIST_THREE
-        actual_result = exp_services.get_summary_of_change_list(
-            self.exploration,
-            ChangeListSummaryUnitTests.CHANGE_LIST_THREE
-        )
-
-        expected_result = copy.deepcopy(
-            ChangeListSummaryUnitTests.BASIC_CHANGE_SUMMARY)
-        expected_result['added_gadgets'] = ['TestGadget']
-
-        self.assertEqual(actual_result, expected_result)
-
-        # Apply changes from list three so future changes can be applied.
-        with self.swap(feconf, 'ALLOWED_GADGETS', TEST_GADGETS):
-            exp_services.update_exploration(
-                self.albert_id,
-                self.EXP_ID,
-                ChangeListSummaryUnitTests.CHANGE_LIST_THREE,
-                "a commit message")
-            self.exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-
-        # CHANGE_LIST_FOUR
-        actual_result = exp_services.get_summary_of_change_list(
-            self.exploration,
-            ChangeListSummaryUnitTests.CHANGE_LIST_FOUR
-        )
-        expected_result = copy.deepcopy(
-            ChangeListSummaryUnitTests.BASIC_CHANGE_SUMMARY)
-        expected_result['deleted_gadgets'] = ['TestGadget']
-        expected_result['gadget_property_changes'] = {
-            'TestGadget': {
-                'gadget_customization_args': {
-                    'new_value': {
-                        'adviceObjects': {
-                            'value': [{
-                                'adviceHtml': '<p>cG</p>',
-                                'adviceTitle': 'b'
-                            }]
-                        },
-                        'title': {'value': 'a'}
-                    },
-                    'old_value': {
-                        'adviceObjects': {
-                            'value': [{
-                                'adviceHtml': '<p>c</p>',
-                                'adviceTitle': 'b'
-                            }]
-                        },
-                        'title': {'value': 'a'}
-                    }
-                }
-            }
-        }
-
-        self.assertEqual(actual_result, expected_result)
-
-        # Apply changes from list four so future changes can be applied.
-        exp_services.update_exploration(
-            self.albert_id,
-            self.EXP_ID,
-            ChangeListSummaryUnitTests.CHANGE_LIST_FOUR,
-            "a commit message")
-        self.exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-
-        # CHANGE_LIST_FIVE
-        actual_result = exp_services.get_summary_of_change_list(
-            self.exploration,
-            ChangeListSummaryUnitTests.CHANGE_LIST_FIVE
-        )
-        expected_result = copy.deepcopy(
-            ChangeListSummaryUnitTests.BASIC_CHANGE_SUMMARY)
-        expected_result['state_property_changes'] = {
-            'First Card renamed': {
-                'content': {
-                    'new_value': [{
-                        'type': 'text',
-                        'value': '<p>EDITED CONTENT here 2</p>'
-                    }],
-                    'old_value': [{
-                        'type': 'text',
-                        'value': '<p>EDITED CONTENT here</p>'
-                    }]
-                }
-            }
-        }
-
-        self.assertEqual(actual_result, expected_result)
 
 
 class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):

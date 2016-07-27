@@ -423,6 +423,53 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
         complete_event_entity.put()
 
 
+class RateExplorationEventLogEntryModel(base_models.BaseModel):
+    """An event triggered by a learner rating the exploration.
+
+    Event schema documentation
+    --------------------------
+    V1:
+        event_type: 'rate_exploration'
+        exploration_id: id of exploration which is being rated
+        rating: value of rating assigned to exploration
+    """
+    # This value should be updated in the event of any event schema change.
+    CURRENT_EVENT_SCHEMA_VERSION = 1
+
+    # Which specific type of event this is
+    event_type = ndb.StringProperty(indexed=True)
+    # Id of exploration which has been rated.
+    exploration_id = ndb.StringProperty(indexed=True)
+    # Value of rating assigned
+    rating = ndb.IntegerProperty(indexed=True)
+    # Value of rating previously assigned by the same user. Will be None when a
+    # user rates an exploration for the first time.
+    old_rating = ndb.IntegerProperty(indexed=True)
+    # The version of the event schema used to describe an event of this type.
+    # Details on the schema are given in the docstring for this class.
+    event_schema_version = ndb.IntegerProperty(
+        indexed=True, default=CURRENT_EVENT_SCHEMA_VERSION)
+
+    @classmethod
+    def get_new_event_entity_id(cls, exp_id, user_id):
+        timestamp = datetime.datetime.utcnow()
+        return cls.get_new_id('%s:%s:%s' % (
+            utils.get_time_in_millisecs(timestamp),
+            exp_id,
+            user_id))
+
+    @classmethod
+    def create(cls, exp_id, user_id, rating, old_rating):
+        """Creates a new rate exploration event."""
+        entity_id = cls.get_new_event_entity_id(
+            exp_id, user_id)
+        cls(id=entity_id,
+            event_type=feconf.EVENT_TYPE_RATE_EXPLORATION,
+            exploration_id=exp_id,
+            rating=rating,
+            old_rating=old_rating).put()
+
+
 class StateHitEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student getting to a particular state. The
     definitions of the fields are as follows:

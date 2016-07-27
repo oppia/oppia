@@ -150,9 +150,7 @@ def require_editor(handler):
 
 class EditorHandler(base.BaseHandler):
     """Base class for all handlers for the editor page."""
-
-    # The page name to use as a key for generating CSRF tokens.
-    PAGE_NAME_FOR_CSRF = 'editor'
+    pass
 
 
 class ExplorationPage(EditorHandler):
@@ -260,8 +258,6 @@ class ExplorationPage(EditorHandler):
 
 class ExplorationHandler(EditorHandler):
     """Page with editor data for a single exploration."""
-
-    PAGE_NAME_FOR_CSRF = 'editor'
 
     def _get_exploration_data(
             self, exploration_id, apply_draft=False, version=None):
@@ -401,8 +397,6 @@ class ExplorationHandler(EditorHandler):
 class ExplorationRightsHandler(EditorHandler):
     """Handles management of exploration editing rights."""
 
-    PAGE_NAME_FOR_CSRF = 'editor'
-
     @require_editor
     def put(self, exploration_id):
         """Updates the editing rights for the given exploration."""
@@ -496,8 +490,6 @@ class ExplorationRightsHandler(EditorHandler):
 class ExplorationModeratorRightsHandler(EditorHandler):
     """Handles management of exploration rights by moderators."""
 
-    PAGE_NAME_FOR_CSRF = 'editor'
-
     @base.require_moderator
     def put(self, exploration_id):
         """Updates the publication status of the given exploration, and sends
@@ -557,8 +549,6 @@ class ExplorationModeratorRightsHandler(EditorHandler):
 
 class ResolvedAnswersHandler(EditorHandler):
     """Allows learners' answers for a state to be marked as resolved."""
-
-    PAGE_NAME_FOR_CSRF = 'editor'
 
     @require_editor
     def put(self, exploration_id, state_name):
@@ -887,41 +877,6 @@ class ImageUploadHandler(EditorHandler):
         fs.commit(self.user_id, filepath, raw)
 
         self.render_json({'filepath': filepath})
-
-
-class ChangeListSummaryHandler(EditorHandler):
-    """Returns a summary of a changelist applied to a given exploration."""
-
-    @require_editor
-    def post(self, exploration_id):
-        """Handles POST requests."""
-        change_list = self.payload.get('change_list')
-        version = self.payload.get('version')
-        current_exploration = exp_services.get_exploration_by_id(
-            exploration_id)
-
-        if version != current_exploration.version:
-            # TODO(sll): Improve the handling of merge conflicts.
-            self.render_json({
-                'is_version_of_draft_valid': False
-            })
-        else:
-            utils.recursively_remove_key(change_list, '$$hashKey')
-
-            summary = exp_services.get_summary_of_change_list(
-                current_exploration, change_list)
-            updated_exploration = exp_services.apply_change_list(
-                exploration_id, change_list)
-            warning_message = ''
-            try:
-                updated_exploration.validate(strict=True)
-            except utils.ValidationError as e:
-                warning_message = unicode(e)
-
-            self.render_json({
-                'summary': summary,
-                'warning_message': warning_message
-            })
 
 
 class StartedTutorialEventHandler(EditorHandler):

@@ -258,14 +258,14 @@ oppia.directive('conversationSkin', [function() {
       'LearnerViewRatingService', 'windowDimensionsService',
       'playerTranscriptService', 'LearnerParamsService',
       'playerPositionService', 'explorationRecommendationsService',
-      'StatsReportingService',
+      'StatsReportingService', 'UrlInterpolationService',
       function(
           $scope, $timeout, $rootScope, $window, $translate,
           messengerService, oppiaPlayerService, urlService, focusService,
           LearnerViewRatingService, windowDimensionsService,
           playerTranscriptService, LearnerParamsService,
           playerPositionService, explorationRecommendationsService,
-          StatsReportingService) {
+          StatsReportingService, UrlInterpolationService) {
         $scope.CONTINUE_BUTTON_FOCUS_LABEL = 'continueButton';
         // The exploration domain object.
         $scope.exploration = null;
@@ -285,13 +285,16 @@ oppia.directive('conversationSkin', [function() {
         // Indicates whether the tutor card is displayed.
         var tutorCardIsDisplayedIfNarrow = true;
 
+        $scope.explorationId = oppiaPlayerService.getExplorationId();
         $scope.isInPreviewMode = oppiaPlayerService.isInPreviewMode();
         $scope.isIframed = urlService.isIframed();
         $rootScope.loadingMessage = 'Loading';
         $scope.hasFullyLoaded = false;
         $scope.recommendedExplorationSummaries = [];
 
-        $scope.OPPIA_AVATAR_IMAGE_URL = '/images/avatar/oppia_black_72px.png';
+        $scope.OPPIA_AVATAR_IMAGE_URL = (
+          UrlInterpolationService.getStaticImageUrl(
+            '/avatar/oppia_black_72px.png'));
 
         $scope.activeCard = null;
         $scope.numProgressDots = 0;
@@ -304,7 +307,13 @@ oppia.directive('conversationSkin', [function() {
         $scope.helpCardHtml = null;
         $scope.helpCardHasContinueButton = false;
 
-        $scope.profilePicture = '/images/avatar/user_blue_72px.png';
+        $scope.profilePicture = (
+          UrlInterpolationService.getStaticImageUrl(
+          '/avatar/user_blue_72px.png'));
+
+        $scope.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER =
+          GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER;
+
         oppiaPlayerService.getUserProfileImage().then(function(result) {
           $scope.profilePicture = result;
         });

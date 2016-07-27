@@ -26,7 +26,8 @@ describe('Preferences Controller', function() {
       $httpBackend = _$httpBackend_;
       $httpBackend.expectGET('/preferenceshandler/data').respond({
         can_receive_email_updates: false,
-        can_receive_editor_role_email: true
+        can_receive_editor_role_email: true,
+        can_receive_feedback_message_email: true
       });
 
       mockAlertsService = {};
@@ -45,6 +46,12 @@ describe('Preferences Controller', function() {
       function() {
         $httpBackend.flush();
         expect(scope.canReceiveEditorRoleEmail).toBe(true);
+      });
+
+    it('should show that feedback message notifications checkbox is true' +
+      'by default', function() {
+        $httpBackend.flush();
+        expect(scope.canReceiveFeedbackMessageEmail).toBe(true);
       });
   });
 });

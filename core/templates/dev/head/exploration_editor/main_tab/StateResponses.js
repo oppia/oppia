@@ -271,14 +271,17 @@ oppia.controller('StateResponses', [
   'editorContextService', 'alertsService', 'responsesService', 'routerService',
   'explorationContextService', 'trainingDataService',
   'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
-  'INTERACTION_SPECS',
+  'INTERACTION_SPECS', 'UrlInterpolationService',
   function(
       $scope, $rootScope, $modal, $filter, stateInteractionIdService,
       editorContextService, alertsService, responsesService, routerService,
       explorationContextService, trainingDataService,
       stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
-      INTERACTION_SPECS) {
+      INTERACTION_SPECS, UrlInterpolationService) {
     $scope.editorContextService = editorContextService;
+
+    $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
+      '/general/drag_dots.png');
 
     var _initializeTrainingData = function() {
       var explorationId = explorationContextService.getExplorationId();
@@ -328,34 +331,28 @@ oppia.controller('StateResponses', [
             answerChoices.push($scope.getAnswerChoices()[i].val);
           }
 
-          var handleAllAnswersExceptGivenOne = function(current) {
-            return handledAnswersArray.map(function(element, index) {
-              if (index !== current || element === true) {
-                return true;
-              } else if (index === current && element !== true) {
-                return false;
-              }
-            });
-          };
-
+          var answerChoiceToIndex = {};
           answerChoices.forEach(function(answerChoice, choiceIndex) {
-            answerGroups.forEach(function(answerGroup) {
-              var ruleSpecs = answerGroup.rule_specs;
-              ruleSpecs.forEach(function(ruleSpec) {
-                var ruleInputs = ruleSpec.inputs.x;
-                ruleInputs.forEach(function(ruleInput) {
-                  if (ruleInput === answerChoice) {
-                    if (ruleSpec.rule_type === 'Equals') {
-                      handledAnswersArray[choiceIndex] = true;
-                    } else if (ruleSpec.rule_type === 'ContainsAtLeastOneOf') {
-                      handledAnswersArray[choiceIndex] = true;
-                    } else if (ruleSpec.rule_type ===
-                      'DoesNotContainAtLeastOneOf') {
-                      handledAnswersArray = handleAllAnswersExceptGivenOne(
-                                              choiceIndex);
+            answerChoiceToIndex[answerChoice] = choiceIndex;
+          });
+
+          answerGroups.forEach(function(answerGroup) {
+            var ruleSpecs = answerGroup.rule_specs;
+            ruleSpecs.forEach(function(ruleSpec) {
+              var ruleInputs = ruleSpec.inputs.x;
+              ruleInputs.forEach(function(ruleInput) {
+                var choiceIndex = answerChoiceToIndex[ruleInput];
+                if (ruleSpec.rule_type === 'Equals' ||
+                    ruleSpec.rule_type === 'ContainsAtLeastOneOf') {
+                  handledAnswersArray[choiceIndex] = true;
+                } else if (ruleSpec.rule_type ===
+                  'DoesNotContainAtLeastOneOf') {
+                  for (var i = 0; i < handledAnswersArray.length; i++) {
+                    if (i !== choiceIndex) {
+                      handledAnswersArray[i] = true;
                     }
                   }
-                });
+                }
               });
             });
           });
@@ -425,7 +422,6 @@ oppia.controller('StateResponses', [
 
     $scope.getOutcomeTooltip = function(outcome) {
       // Outcome tooltip depends on whether feedback is displayed
-      console.log(outcome);
       if ($scope.isLinearWithNoFeedback(outcome)) {
         return 'Please direct the learner to a different card.';
       } else {

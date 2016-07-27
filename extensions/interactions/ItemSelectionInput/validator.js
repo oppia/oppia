@@ -95,16 +95,6 @@ oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
 
       var selectedChoices = [];
       if (maxAllowedCount === 1) {
-        var handleAllAnswersExceptGivenOne = function(current) {
-          return handledAnswers.map(function(element, index) {
-            if (index !== current || element === true) {
-              return true;
-            } else if (index === current && element !== true) {
-              return false;
-            }
-          });
-        };
-
         seenChoices.forEach(function(seenChoice, choiceIndex) {
           answerGroups.forEach(function(answerGroup) {
             var ruleSpecs = answerGroup.rule_specs;
@@ -118,8 +108,8 @@ oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
                       warningsList.push({
                         type: WARNING_TYPES.ERROR,
                         message: (
-                          'Please ensure that you only tick one answer choice ' +
-                          'when you check if the learner\'s answer ' +
+                          'Please ensure that you only tick one answer ' +
+                          'choice when you check if the learner\'s answer ' +
                           'is equal to.')
                       });
                     }
@@ -127,8 +117,11 @@ oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
                     handledAnswers[choiceIndex] = true;
                   } else if (ruleSpec.rule_type ===
                     'DoesNotContainAtLeastOneOf') {
-                    handledAnswers = handleAllAnswersExceptGivenOne(
-                                      choiceIndex);
+                    for (var i = 0; i < handledAnswers.length; i++) {
+                      if (i !== choiceIndex) {
+                        handledAnswers[i] = true;
+                      }
+                    }
                   }
                 }
               });

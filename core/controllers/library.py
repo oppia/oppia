@@ -63,8 +63,6 @@ class LibraryPage(base.BaseHandler):
     for search results.
     """
 
-    PAGE_NAME_FOR_CSRF = 'library'
-
     def get(self):
         """Handles GET requests."""
         search_mode = 'search' in self.request.url
@@ -123,7 +121,7 @@ class LibraryIndexHandler(base.BaseHandler):
             summary_dicts_by_category.insert(0, {
                 'activity_summary_dicts': featured_activity_summary_dicts,
                 'categories': [],
-                'header': feconf.LIBRARY_CATEGORY_FEATURED_EXPLORATIONS,
+                'header': feconf.LIBRARY_CATEGORY_FEATURED_ACTIVITIES,
             })
 
         self.values.update({

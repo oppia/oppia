@@ -303,6 +303,13 @@ def _save_user_settings(user_settings):
     ).put()
 
 
+def is_user_registered(user_id):
+    if user_id is None:
+        return False
+    user_settings = user_models.UserSettingsModel.get(user_id, strict=False)
+    return bool(user_settings)
+
+
 def has_ever_registered(user_id):
     user_settings = get_user_settings(user_id, strict=True)
     return bool(user_settings.username and user_settings.last_agreed_to_terms)
@@ -470,7 +477,8 @@ def record_user_started_state_editor_tutorial(user_id):
 
 
 def update_email_preferences(
-        user_id, can_receive_email_updates, can_receive_editor_role_email):
+        user_id, can_receive_email_updates, can_receive_editor_role_email,
+        can_receive_feedback_email):
     """Updates whether the user has chosen to receive email updates.
 
     If no UserEmailPreferencesModel exists for this user, a new one will
@@ -485,6 +493,8 @@ def update_email_preferences(
     email_preferences_model.site_updates = can_receive_email_updates
     email_preferences_model.editor_role_notifications = (
         can_receive_editor_role_email)
+    email_preferences_model.feedback_message_notifications = (
+        can_receive_feedback_email)
     email_preferences_model.put()
 
 
@@ -502,7 +512,11 @@ def get_email_preferences(user_id):
         'can_receive_editor_role_email': (
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE
             if email_preferences_model is None
-            else email_preferences_model.editor_role_notifications)
+            else email_preferences_model.editor_role_notifications),
+        'can_receive_feedback_message_email': (
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE
+            if email_preferences_model is None
+            else email_preferences_model.feedback_message_notifications)
     }
 
 
@@ -629,6 +643,33 @@ def _save_user_contributions(user_contributions):
     ).put()
 
 
+def _migrate_dashboard_stats_to_latest_schema(versioned_dashboard_stats):
+    """Holds responsibility of updating the structure of dashboard stats"""
+
+    stats_schema_version = versioned_dashboard_stats.schema_version
+    if not (1 <= stats_schema_version
+            <= feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION):
+        raise Exception(
+            'Sorry, we can only process v1-v%d dashboard stats schemas at '
+            'present.' % feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION)
+
+
+def get_current_date_as_string():
+    """Returns current date as a string of format 'YYYY-MM-DD'"""
+    return datetime.datetime.utcnow().strftime(
+        feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
+
+
+def parse_date_from_string(datetime_str):
+    datetime_obj = datetime.datetime.strptime(
+        datetime_str, feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
+    return {
+        'year': datetime_obj.year,
+        'month': datetime_obj.month,
+        'day': datetime_obj.day
+    }
+
+
 def get_user_impact_score(user_id):
     """Returns user impact score associated with user_id"""
 
@@ -639,20 +680,67 @@ def get_user_impact_score(user_id):
     else:
         return 0
 
-def get_user_dashboard_stats(user_id):
-    """Return statistics for creator dashboard of a user.
 
-    total_plays, average_ratings
+def get_weekly_dashboard_stats(user_id):
+    """Returns a list which contains the dashboard stats of a user,
+    keyed by a datetime string.
+    The stats currently being saved are:
+      - 'average ratings': Average of ratings across all explorations of a
+        user.
+      - 'total plays': Sum total of number of plays across all explorations of
+        a user.
+
+    The format of returned value:
+    [
+        {
+            {{datetime_string_1}}: {
+                'num_ratings': (value),
+                'average_ratings': (value),
+                'total_plays': (value)
+            }
+        },
+        {
+            {{datetime_string_2}}: {
+                'num_ratings': (value),
+                'average_ratings': (value),
+                'total_plays': (value)
+            }
+        }
+    ]
+    If the user doesn't exist, then this method returns None.
     """
+
     model = user_models.UserStatsModel.get(user_id, strict=False)
 
-    if model is not None:
-        return {
-            'total_plays': model.total_plays or 0,
-            'average_ratings': model.average_ratings
-        }
+    if model and model.weekly_creator_stats_list:
+        return model.weekly_creator_stats_list
     else:
-        return {
-            'total_plays': 0,
-            'average_ratings': None
+        return None
+
+
+def get_last_week_dashboard_stats(user_id):
+    weekly_dashboard_stats = get_weekly_dashboard_stats(user_id)
+    if weekly_dashboard_stats:
+        return weekly_dashboard_stats[-1]
+    else:
+        return None
+
+
+def update_dashboard_stats_log(user_id):
+    """Save statistics for creator dashboard of a user by appending to a list
+    keyed by a datetime string.
+    """
+    model = user_models.UserStatsModel.get_or_create(user_id)
+
+    if model.schema_version != feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION:
+        _migrate_dashboard_stats_to_latest_schema(model)
+
+    weekly_dashboard_stats = {
+        get_current_date_as_string(): {
+            'num_ratings': model.num_ratings or 0,
+            'average_ratings': model.average_ratings,
+            'total_plays': model.total_plays or 0
         }
+    }
+    model.weekly_creator_stats_list.append(weekly_dashboard_stats)
+    model.put()

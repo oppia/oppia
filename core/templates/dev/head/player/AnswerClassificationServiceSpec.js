@@ -78,7 +78,7 @@ describe('Answer classification service with string classifier disabled',
             inputs: {
               x: 7
             },
-            rule_type: 'ClassifyMatches'
+            rule_type: 'FuzzyMatches'
           }]
         }],
         default_outcome: 'default'
@@ -246,7 +246,7 @@ describe('Answer classification service with string classifier enabled',
             inputs: {
               x: 7
             },
-            rule_type: 'ClassifyMatches'
+            rule_type: 'FuzzyMatches'
           }]
         }],
         default_outcome: 'default'

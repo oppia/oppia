@@ -32,8 +32,8 @@
            class="conversation-skin-main-tutor-card"
            ng-class="{'animate-card-width': startCardChangeAnimation,
                       'has-shadow': isViewportNarrow() && isCurrentSupplementalCardNonempty(),
-                      'conversation-skin-animate-tutor-card-on-narrow': isViewportNarrow() &&
-                      isCurrentSupplementalCardNonempty()}">
+                      'conversation-skin-animate-tutor-card-on-narrow': isViewportNarrow() && isCurrentSupplementalCardNonempty(),
+                      'conversation-skin-main-tutor-card-wide': !isViewportNarrow() || !isOnTerminalCard()}">
         <div class="conversation-skin-tutor-card-content conversation-skin-animate-card-contents"
              ng-class="{'animate-card-change': startCardChangeAnimation}">
           <div class="conversation-skin-tutor-card-top-section">
@@ -169,10 +169,15 @@
                       current-state-name="activeCard.stateName">
   </oppia-gadget-panel>
 
-  <div ng-if="isOnTerminalCard() && isLoggedIn && !isInPreviewMode && !isIframed && isCurrentCardAtEndOfTranscript()"
-       class="conversation-skin-final-ratings">
-
-    <div style="color: #eee; margin-bottom: 20px;" translate="I18N_PLAYER_RATE_EXPLORATION">
+  <div ng-if="isOnTerminalCard() && isLoggedIn && !isInPreviewMode && !isIframed && isCurrentCardAtEndOfTranscript()" class="conversation-skin-final-ratings">
+    <div style="color: #eee; margin-bottom: 20px;" translate="I18N_PLAYER_SHARE_EXPLORATION">
+    </div>
+    <sharing-links layout-type="row"
+                   class="conversation-skin-sharing-links"
+                   twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER"
+                   exploration-id="explorationId">
+    </sharing-links>
+    <div style="color: #eee; margin: 20px 0;" translate="I18N_PLAYER_RATE_EXPLORATION">
     </div>
     <div popover-placement="bottom" popover-template="'popover/feedback'" popover-trigger="click">
       <rating-display rating-value="userRating"
@@ -214,7 +219,7 @@
       mode.
     */
     html, body {
-      background: url('/images/general/background.jpg') no-repeat center center fixed;
+      background: url('/assets/common/images/general/background.jpg') no-repeat center center fixed;
       background-color: #eee;
       background-size: cover;
       color: rgba(0,0,0,0.87);
@@ -648,11 +653,14 @@
       .conversation-skin-main-tutor-card {
         left: 0px;
         margin: 0 auto;
-        position: absolute;
         right: 0px;
         top: 40px;
         width: 100%;
         z-index: 15;
+      }
+
+      .conversation-skin-main-tutor-card-wide {
+        position: absolute;
       }
 
       .has-shadow {
@@ -710,6 +718,10 @@
       .conversation-skin-oppia-avatar.show-tutor-card:hover {
         opacity: 0.8;
       }
+    }
+    .conversation-skin-sharing-links {
+      display: table;
+      margin: auto;
     }
   </style>
 </script>
