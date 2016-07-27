@@ -540,9 +540,9 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             # Short-circuit: the answer was submitted later than the current exp
             # version. Otherwise, this is the only version and something is
             # wrong with the answer. Just deal with it.
-            return (
-                exp_services.get_exploration_from_model(latest_exp_model), None,
-                False)
+            latest_exp, failed_migration = cls._get_exploration_from_model(
+                latest_exp_model)
+            return (latest_exp, None, failed_migration)
 
         # Look backwards in the history of the exploration, starting with the
         # latest version. This depends on ExplorationCommitLogEntryModel, which
@@ -561,9 +561,9 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                     exp_id, version)
                 if not exp_model:
                     return (None, None, False)
-                return (
-                    exp_services.get_exploration_from_model(exp_model), None,
-                    False)
+                exp, failed_migration = cls._get_exploration_from_model(
+                    exp_model)
+                return (exp, None, failed_migration)
 
         # Any data added before ecbfff0 is assumed to match the earliest
         # recorded commit.
