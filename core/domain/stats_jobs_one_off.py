@@ -507,6 +507,17 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             return None
 
     @classmethod
+    def _get_exploration_from_model(cls, exp_model):
+        try:
+            if exp_model:
+                return (
+                    exp_services.get_exploration_from_model(exp_model), False)
+            else:
+                return (None, False)
+        except utils.ExplorationConversionError:
+            return (None, True)
+
+    @classmethod
     def _find_exploration_immediately_before_timestamp(cls, exp_id, when):
         # Find the latest exploration version before the given time.
 
@@ -523,14 +534,15 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
         latest_exp_model = exp_models.ExplorationModel.get_by_id(exp_id)
         if not latest_exp_model:
             # The exploration may have been permanently deleted.
-            return (None, None)
+            return (None, None, False)
         if (latest_exp_model.version == 1 or
                 latest_exp_model.last_updated <= when):
             # Short-circuit: the answer was submitted later than the current exp
             # version. Otherwise, this is the only version and something is
             # wrong with the answer. Just deal with it.
             return (
-                exp_services.get_exploration_from_model(latest_exp_model), None)
+                exp_services.get_exploration_from_model(latest_exp_model), None,
+                False)
 
         # Look backwards in the history of the exploration, starting with the
         # latest version. This depends on ExplorationCommitLogEntryModel, which
@@ -548,18 +560,21 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 exp_model = cls._get_exploration_model_by_id_version(
                     exp_id, version)
                 if not exp_model:
-                    return (None, None)
+                    return (None, None, False)
                 return (
-                    exp_services.get_exploration_from_model(exp_model), None)
+                    exp_services.get_exploration_from_model(exp_model), None,
+                    False)
 
         # Any data added before ecbfff0 is assumed to match the earliest
         # recorded commit.
         history_models = [cls._get_exploration_model_by_id_version(
             exp_id, version) for version in versions]
+        latest_exp, failed_migration = cls._get_exploration_from_model(
+            latest_exp_model)
         return (
-            exp_services.get_exploration_from_model(latest_exp_model),
-            [exp_services.get_exploration_from_model(model)
-             if model else None for model in history_models])
+            latest_exp,
+            [cls._get_exploration_from_model(model)[0]
+             for model in history_models], failed_migration)
 
     # This function comes from extensions.answer_summarizers.models.
     @classmethod
@@ -1226,7 +1241,7 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             # even though each answer may have been submitted to a different
             # exploration version. This may cause significant migration issues
             # and will be tricky to work around.
-            (exploration, history) = (
+            (exploration, history, failed_migration) = (
                 AnswerMigrationJob._find_exploration_immediately_before_timestamp( # pylint: disable=line-too-long
                     exploration_id, created_on))
             dated_explorations_dict[created_on] = exploration
@@ -1235,9 +1250,16 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                 # TODO(bhenning): Add exploration_id back to this output. It was
                 # removed to reduce the amount of output from the production
                 # migration job.
-                yield (
-                    'Encountered permanently missing exploration referenced to '
-                    'by submitted answers. Migrating with missing exploration.')
+                if failed_migration:
+                    yield (
+                        'Encountered exploration which cannot be converted to '
+                        'the latest states schema version. Migrating with '
+                        'missing exploration.')
+                else:
+                    yield (
+                        'Encountered permanently missing exploration '
+                        'referenced to by submitted answers. Migrating with '
+                        'missing exploration.')
 
             # Another point of failure is the state not matching due to an
             # incorrect exploration version selection.
