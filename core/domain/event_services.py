@@ -16,18 +16,16 @@
 
 """Classes for handling events."""
 
-__author__ = 'Sean Lip'
-
 import inspect
 
 from core import jobs_registry
 from core.domain import exp_domain
 from core.platform import models
+import feconf
+
 (stats_models, feedback_models) = models.Registry.import_models([
     models.NAMES.statistics, models.NAMES.feedback])
 taskqueue_services = models.Registry.import_taskqueue_services()
-import feconf
-
 
 class BaseEventHandler(object):
     """Base class for event dispatchers."""
@@ -138,6 +136,17 @@ class CompleteExplorationEventHandler(BaseEventHandler):
         stats_models.CompleteExplorationEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id, time_spent,
             params, play_type)
+
+
+class RateExplorationEventHandler(BaseEventHandler):
+    """Event handler for recording exploration rating events."""
+
+    EVENT_TYPE = feconf.EVENT_TYPE_RATE_EXPLORATION
+
+    @classmethod
+    def _handle_event(cls, exploration_id, user_id, rating, old_rating):
+        stats_models.RateExplorationEventLogEntryModel.create(
+            exploration_id, user_id, rating, old_rating)
 
 
 class StateHitEventHandler(BaseEventHandler):

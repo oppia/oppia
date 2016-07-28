@@ -15,16 +15,14 @@
 /**
  * @fileoverview Directive for creating a list of collection nodes which link to
  * playing the exploration in each node.
- *
- * @author henning.benmax@google.com (Ben Henning)
  */
 
-oppia.directive('collectionNodeListDirective', [function() {
+oppia.directive('collectionNodeList', [function() {
   return {
     restrict: 'E',
     scope: {
       getCollectionId: '&collectionId',
-      getCollectionNodes: '&collectionNodes',
+      getCollectionNodes: '&collectionNodes'
     },
     templateUrl: 'inline/collection_node_list_directive'
   };

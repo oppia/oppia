@@ -15,13 +15,12 @@
 /**
  * @fileoverview Utilities for using the Video component during
  * end-to-end testing with Protractor.js
- *
- * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var objects = require('../../objects/protractor.js');
 
-var customizeComponent = function(modal, youtubeId, startTime, endTime, ifAutoplay) {
+var customizeComponent = function(
+    modal, youtubeId, startTime, endTime, ifAutoplay) {
   objects.UnicodeStringEditor(
     modal.element(by.tagName('schema-based-unicode-editor'))
   ).setValue(youtubeId);

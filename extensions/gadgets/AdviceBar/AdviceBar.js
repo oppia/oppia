@@ -22,7 +22,6 @@
 
 oppia.directive('oppiaGadgetAdviceBar', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
-
     // Maximum and minimum number of tips that an AdviceBar can hold.
     var _MAX_TIP_COUNT = 3;
     var _MIN_TIP_COUNT = 1;
@@ -30,32 +29,45 @@ oppia.directive('oppiaGadgetAdviceBar', [
     return {
       restrict: 'E',
       templateUrl: 'gadget/AdviceBar',
-      controller: ['$scope', '$attrs', '$modal', function ($scope, $attrs, $modal) {
-        $scope.adviceBarResources = oppiaHtmlEscaper.escapedJsonToObj($attrs.adviceObjectsWithValue);
+      controller: [
+        '$scope', '$attrs', '$modal', 'UrlInterpolationService',
+        function($scope, $attrs, $modal, UrlInterpolationService) {
+          $scope.adviceBarResources = oppiaHtmlEscaper.escapedJsonToObj(
+            $attrs.adviceObjectsWithValue);
 
-        $scope.overlayAdviceModal = function(adviceResourceIndex) {
-          $modal.open({
-            templateUrl: '../extensions/gadgets/AdviceBar/static/html/advice_overlay.html',
-            controller: 'AdviceBarModalCtrl',
-            backdrop: true,
-            resolve: {
-              adviceTitle: function() {
-                return $scope.adviceBarResources[adviceResourceIndex].adviceTitle;
-              },
-              adviceHtml: function() {
-                return $scope.adviceBarResources[adviceResourceIndex].adviceHtml;
+          $scope.getStaticResourceUrl = (
+            UrlInterpolationService.getStaticResourceUrl);
+
+          $scope.overlayAdviceModal = function(adviceResourceIndex) {
+            $modal.open({
+              templateUrl: (
+                UrlInterpolationService.getStaticResourceUrl(
+                '/extensions/gadgets/AdviceBar/static/html' +
+                '/advice_overlay.html')),
+              controller: 'AdviceBarModalCtrl',
+              backdrop: true,
+              resolve: {
+                adviceTitle: function() {
+                  return $scope.adviceBarResources[
+                    adviceResourceIndex].adviceTitle;
+                },
+                adviceHtml: function() {
+                  return $scope.adviceBarResources[
+                    adviceResourceIndex].adviceHtml;
+                }
               }
-            },
-          })
-        };
-      }],
-    }
+            });
+          };
+        }
+      ]
+    };
   }
 ]);
 
-oppia.controller('AdviceBarModalCtrl',
-  ['$scope', 'adviceTitle', 'adviceHtml',
-  function ($scope, adviceTitle, adviceHtml) {
+oppia.controller('AdviceBarModalCtrl', [
+  '$scope', 'adviceTitle', 'adviceHtml',
+  function($scope, adviceTitle, adviceHtml) {
     $scope.adviceTitle = adviceTitle;
     $scope.adviceHtml = adviceHtml;
-}]);
+  }
+]);

@@ -14,20 +14,25 @@
 
 """Controllers for the feedback thread page."""
 
-__author__ = 'kashida@google.com (Koji Ashida)'
+import json
 
 from core.controllers import base
+from core.controllers import editor
+from core.domain import email_manager
+from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import rights_manager
+from core.platform import models
 
+transaction_services = models.Registry.import_transaction_services()
 
 class ThreadListHandler(base.BaseHandler):
     """Handles operations relating to feedback thread lists."""
 
-    PAGE_NAME_FOR_CSRF = 'editor'
-
     def get(self, exploration_id):
         self.values.update({
-            'threads': feedback_services.get_threadlist(exploration_id)})
+            'threads': [t.to_dict() for t in feedback_services.get_all_threads(
+                exploration_id, False)]})
         self.render_json(self.values)
 
     @base.require_user
@@ -54,37 +59,34 @@ class ThreadListHandler(base.BaseHandler):
 class ThreadHandler(base.BaseHandler):
     """Handles operations relating to feedback threads."""
 
-    PAGE_NAME_FOR_CSRF = 'editor'
-
-    def get(self, exploration_id, thread_id):
+    def get(self, exploration_id, thread_id):  # pylint: disable=unused-argument
+        suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
         self.values.update({
-            'messages': feedback_services.get_messages(thread_id)})
+            'messages': [m.to_dict() for m in feedback_services.get_messages(
+                exploration_id, thread_id)],
+            'suggestion': suggestion.to_dict() if suggestion else None
+        })
         self.render_json(self.values)
 
     @base.require_user
-    def post(self, exploration_id, thread_id):
+    def post(self, exploration_id, thread_id):  # pylint: disable=unused-argument
+        suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
         text = self.payload.get('text')
         updated_status = self.payload.get('updated_status')
         if not text and not updated_status:
             raise self.InvalidInputException(
                 'Text for the message must be specified.')
+        if suggestion and updated_status:
+            raise self.InvalidInputException(
+                'Suggestion thread status cannot be changed manually.')
 
         feedback_services.create_message(
+            exploration_id,
             thread_id,
             self.user_id,
             updated_status,
             self.payload.get('updated_subject'),
             text)
-        self.render_json(self.values)
-
-
-class FeedbackLastUpdatedHandler(base.BaseHandler):
-    """Returns the last time a thread for this exploration was updated."""
-
-    def get(self, exploration_id):
-        self.values.update({
-            'last_updated': feedback_services.get_last_updated_time(
-                exploration_id)})
         self.render_json(self.values)
 
 
@@ -104,7 +106,179 @@ class RecentFeedbackMessagesHandler(base.BaseHandler):
                 urlsafe_start_cursor=urlsafe_start_cursor))
 
         self.render_json({
-            'results': all_feedback_messages,
+            'results': [m.to_dict() for m in all_feedback_messages],
             'cursor': new_urlsafe_start_cursor,
             'more': more,
         })
+
+
+class FeedbackStatsHandler(base.BaseHandler):
+    """Returns Feedback stats for an exploration.
+        - Number of open threads
+        - Number of total threads
+    """
+
+    def get(self, exploration_id):
+        feedback_thread_analytics = (
+            feedback_services.get_thread_analytics(
+                exploration_id))
+        self.values.update({
+            'num_open_threads': (
+                feedback_thread_analytics.num_open_threads),
+            'num_total_threads': (
+                feedback_thread_analytics.num_total_threads),
+        })
+        self.render_json(self.values)
+
+
+class SuggestionHandler(base.BaseHandler):
+    """"Handles operations relating to learner suggestions."""
+
+    @base.require_user
+    def post(self, exploration_id):
+        feedback_services.create_suggestion(
+            exploration_id,
+            self.user_id,
+            self.payload.get('exploration_version'),
+            self.payload.get('state_name'),
+            self.payload.get('description'),
+            self.payload.get('suggestion_content'))
+        self.render_json(self.values)
+
+
+class SuggestionActionHandler(base.BaseHandler):
+    """"Handles actions performed on threads with suggestions."""
+
+    _ACCEPT_ACTION = 'accept'
+    _REJECT_ACTION = 'reject'
+
+    @editor.require_editor
+    def put(self, exploration_id, thread_id):
+        action = self.payload.get('action')
+        if action == self._ACCEPT_ACTION:
+            exp_services.accept_suggestion(
+                self.user_id,
+                thread_id,
+                exploration_id,
+                self.payload.get('commit_message'))
+        elif action == self._REJECT_ACTION:
+            exp_services.reject_suggestion(
+                self.user_id, thread_id, exploration_id)
+        else:
+            raise self.InvalidInputException('Invalid action.')
+
+        self.render_json(self.values)
+
+
+class SuggestionListHandler(base.BaseHandler):
+    """Handles operations relating to list of threads with suggestions."""
+
+    _LIST_TYPE_OPEN = 'open'
+    _LIST_TYPE_CLOSED = 'closed'
+    _LIST_TYPE_ALL = 'all'
+
+    def _string_to_bool(self, has_suggestion):
+        if has_suggestion == 'true':
+            return True
+        elif has_suggestion == 'false':
+            return False
+        else:
+            return None
+
+    @base.require_user
+    def get(self, exploration_id):
+        threads = None
+        list_type = self.request.get('list_type')
+        has_suggestion = self._string_to_bool(
+            self.request.get('has_suggestion'))
+        if has_suggestion is None:
+            raise self.InvalidInputException(
+                'Invalid value for has_suggestion.')
+        if list_type == self._LIST_TYPE_OPEN:
+            threads = feedback_services.get_open_threads(
+                exploration_id, has_suggestion)
+        elif list_type == self._LIST_TYPE_CLOSED:
+            threads = feedback_services.get_closed_threads(
+                exploration_id, has_suggestion)
+        elif list_type == self._LIST_TYPE_ALL:
+            threads = feedback_services.get_all_threads(
+                exploration_id, has_suggestion)
+        else:
+            raise self.InvalidInputException('Invalid list type.')
+
+        self.values.update({'threads': [t.to_dict() for t in threads]})
+        self.render_json(self.values)
+
+
+class UnsentFeedbackEmailHandler(base.BaseHandler):
+    """Handler task of sending emails of feedback messages."""
+
+    def post(self):
+        payload = json.loads(self.request.body)
+        user_id = payload['user_id']
+        references = feedback_services.get_feedback_message_references(user_id)
+        if not references:
+            # Model may not exist if user has already attended to the feedback.
+            return
+
+        transaction_services.run_in_transaction(
+            feedback_services.update_feedback_email_retries, user_id)
+
+        messages = {}
+        for reference in references:
+            message = feedback_services.get_message(
+                reference.exploration_id, reference.thread_id,
+                reference.message_id)
+
+            exploration = exp_services.get_exploration_by_id(
+                reference.exploration_id)
+
+            message_text = message.text
+            if len(message_text) > 200:
+                message_text = message_text[:200] + '...'
+
+            if exploration.id in messages:
+                messages[exploration.id]['messages'].append(message_text)
+            else:
+                messages[exploration.id] = {
+                    'title': exploration.title,
+                    'messages': [message_text]
+                }
+
+        email_manager.send_feedback_message_email(user_id, messages)
+        transaction_services.run_in_transaction(
+            feedback_services.pop_feedback_message_references, user_id,
+            len(references))
+
+
+class FeedbackThreadViewEventHandler(base.BaseHandler):
+    """Records when the given user views a feedback thread, in order to clear
+    viewed feedback messages from emails that might be sent in future to this
+    user."""
+
+    @base.require_user
+    def post(self):
+        exploration_id = self.payload.get('exploration_id')
+        thread_id = self.payload.get('thread_id')
+        transaction_services.run_in_transaction(
+            feedback_services.clear_feedback_message_references, self.user_id,
+            exploration_id, thread_id)
+        self.render_json(self.values)
+
+
+class SuggestionEmailHandler(base.BaseHandler):
+    """Handler task of sending email of suggestion."""
+
+    def post(self):
+        payload = json.loads(self.request.body)
+        exploration_id = payload['exploration_id']
+        thread_id = payload['thread_id']
+
+        exploration_rights = (
+            rights_manager.get_exploration_rights(exploration_id))
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
+
+        email_manager.send_suggestion_email(
+            exploration.title, exploration.id, suggestion.author_id,
+            exploration_rights.owner_ids)

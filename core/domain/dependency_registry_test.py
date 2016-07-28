@@ -16,8 +16,6 @@
 
 """Tests for JavaScript library dependencies."""
 
-__author__ = 'Sean Lip'
-
 from core.domain import dependency_registry
 from core.domain import exp_services
 from core.domain import interaction_registry
@@ -41,7 +39,7 @@ class DependencyControllerTests(test_utils.GenericTestBase):
     """Tests for dependency loading on user-facing pages."""
 
     def test_no_dependencies_in_non_exploration_pages(self):
-        response = self.testapp.get(feconf.GALLERY_URL)
+        response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
         self.assertEqual(response.status_int, 200)
         response.mustcontain(no=['skulpt'])
 
@@ -74,12 +72,12 @@ class DependencyControllerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_dependency_does_not_load_in_exploration_not_containing_it(self):
-        EXP_ID = '0'
+        exp_id = '0'
 
-        exp_services.load_demo(EXP_ID)
+        exp_services.load_demo(exp_id)
 
         # Verify that exploration 0 does not have a Skulpt dependency.
-        exploration = exp_services.get_exploration_by_id(EXP_ID)
+        exploration = exp_services.get_exploration_by_id(exp_id)
         interaction_ids = exploration.get_interaction_ids()
         all_dependency_ids = (
             interaction_registry.Registry.get_deduplicated_dependency_ids(
@@ -87,17 +85,17 @@ class DependencyControllerTests(test_utils.GenericTestBase):
         self.assertNotIn('skulpt', all_dependency_ids)
 
         # Thus, Skulpt is not loaded in the exploration reader.
-        response = self.testapp.get('/explore/%s' % EXP_ID)
+        response = self.testapp.get('/explore/%s' % exp_id)
         self.assertEqual(response.status_int, 200)
         response.mustcontain(no=['skulpt'])
 
     def test_dependency_loads_in_exploration_containing_it(self):
-        EXP_ID = '1'
+        exp_id = '1'
 
-        exp_services.load_demo(EXP_ID)
+        exp_services.load_demo(exp_id)
 
         # Verify that exploration 1 has a Skulpt dependency.
-        exploration = exp_services.get_exploration_by_id(EXP_ID)
+        exploration = exp_services.get_exploration_by_id(exp_id)
         interaction_ids = exploration.get_interaction_ids()
         all_dependency_ids = (
             interaction_registry.Registry.get_deduplicated_dependency_ids(
@@ -105,6 +103,6 @@ class DependencyControllerTests(test_utils.GenericTestBase):
         self.assertIn('skulpt', all_dependency_ids)
 
         # Thus, Skulpt is loaded in the exploration reader.
-        response = self.testapp.get('/explore/%s' % EXP_ID)
+        response = self.testapp.get('/explore/%s' % exp_id)
         self.assertEqual(response.status_int, 200)
         response.mustcontain('skulpt')

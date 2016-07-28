@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Unit tests for Set Input rules.
- *
- * @author wxyxinyu@gmail.com (Xinyu Wu)
  */
 
 describe('Set Input rules service', function() {
@@ -34,8 +32,12 @@ describe('Set Input rules service', function() {
     expect(sirs.Equals(['a', 'b'], RULE_INPUT)).toBe(true);
     expect(sirs.Equals(['b', 'a'], RULE_INPUT)).toBe(true);
     expect(sirs.Equals(['a'], RULE_INPUT)).toBe(false);
-    expect(sirs.Equals(['b'], {x: ['b', 'a']})).toBe(false);
-    expect(sirs.Equals(['b', 'c'], {x: ['c', 'd']})).toBe(false);
+    expect(sirs.Equals(['b'], {
+      x: ['b', 'a']
+    })).toBe(false);
+    expect(sirs.Equals(['b', 'c'], {
+      x: ['c', 'd']
+    })).toBe(false);
   });
 
   it('should have a correct \'is subset of\' rule', function() {

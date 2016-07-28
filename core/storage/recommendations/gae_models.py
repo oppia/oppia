@@ -16,13 +16,11 @@
 
 """Models for Oppia recommendations."""
 
-__author__ = 'Xinyu Wu'
-
 from core.platform import models
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 from google.appengine.ext import ndb
 
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 TOPIC_SIMILARITIES_ID = 'topics'
 

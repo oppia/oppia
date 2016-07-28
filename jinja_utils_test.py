@@ -14,10 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'Sean Lip'
+# pylint: disable=relative-import
 
 from core.tests import test_utils
+import feconf
 import jinja_utils
+import utils
 
 
 class JinjaUtilsUnitTests(test_utils.GenericTestBase):
@@ -35,11 +37,11 @@ class JinjaUtilsUnitTests(test_utils.GenericTestBase):
             ('', '\\"\\"'),
             (None, 'null'),
             (['a', {'b': 'c', 'd': ['e', None]}],
-                '[\\"a\\", {\\"b\\": \\"c\\", \\"d\\": [\\"e\\", null]}]')
+             '[\\"a\\", {\\"b\\": \\"c\\", \\"d\\": [\\"e\\", null]}]')
         ]
 
         for tup in expected_values:
-            self.assertEqual(jinja_utils.JinjaConfig.FILTERS['js_string'](
+            self.assertEqual(jinja_utils.JINJA_FILTERS['js_string'](
                 tup[0]), tup[1])
 
     def test_parse_string(self):
@@ -108,3 +110,33 @@ class JinjaUtilsUnitTests(test_utils.GenericTestBase):
         parsed_dict = jinja_utils.evaluate_object(orig_dict, {'b': 'c'})
         self.assertEqual(orig_dict, {'a': '{{b}}'})
         self.assertEqual(parsed_dict, {'a': 'c'})
+
+    def test_interpolate_cache_slug(self):
+        with self.swap(feconf, 'DEV_MODE', True):
+            utils.ASSET_DIR_PREFIX = None
+            cache_slug = utils.get_asset_dir_prefix()
+            parsed_str = jinja_utils.interpolate_cache_slug('{{cache_slug}}')
+            self.assertEqual(parsed_str, '%s' % cache_slug)
+
+        with self.swap(feconf, 'DEV_MODE', False):
+            utils.ASSET_DIR_PREFIX = None
+            cache_slug = utils.get_asset_dir_prefix()
+            parsed_str = jinja_utils.interpolate_cache_slug('{{cache_slug}}')
+            self.assertEqual(parsed_str, '%s' % cache_slug)
+
+        with self.swap(feconf, 'IS_MINIFIED', True):
+            utils.ASSET_DIR_PREFIX = None
+            cache_slug = utils.get_asset_dir_prefix()
+            parsed_str = jinja_utils.interpolate_cache_slug('{{cache_slug}}')
+            self.assertEqual(parsed_str, '%s' % cache_slug)
+
+        cache_slug = utils.get_asset_dir_prefix()
+        parsed_str = jinja_utils.interpolate_cache_slug(
+            '{{cache_slug}}/test/test.css')
+        self.assertEqual(parsed_str, '%s/test/test.css' % cache_slug)
+
+        # cache slug parameter is missing.
+        parsed_str = jinja_utils.interpolate_cache_slug(
+            '{{invalid_test}}/test/test.css')
+        self.assertEqual(parsed_str, '/test/test.css')
+

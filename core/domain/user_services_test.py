@@ -14,16 +14,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'Stephanie Federwisch'
+import datetime
+import logging
+import os
 
 from core.domain import collection_services
+from core.domain import event_services
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import user_jobs_continuous
+from core.domain import user_jobs_continuous_test
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
 import utils
 
+from google.appengine.api import urlfetch
 
 class UserServicesUnitTests(test_utils.GenericTestBase):
     """Test the user services methods."""
@@ -34,7 +40,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'User not found.'):
             user_services.set_username(user_id, username)
 
-        user_services._create_user(user_id, 'user@example.com')
+        user_services.get_or_create_user(user_id, 'user@example.com')
 
         user_services.set_username(user_id, username)
         self.assertEquals(username, user_services.get_username(user_id))
@@ -44,7 +50,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_username('fakeUser')
 
     def test_get_username_none(self):
-        user_services._create_user('fakeUser', 'user@example.com')
+        user_services.get_or_create_user('fakeUser', 'user@example.com')
         self.assertEquals(None, user_services.get_username('fakeUser'))
 
     def test_is_username_taken_false(self):
@@ -53,20 +59,20 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_is_username_taken_true(self):
         user_id = 'someUser'
         username = 'newUsername'
-        user_services._create_user(user_id, 'user@example.com')
+        user_services.get_or_create_user(user_id, 'user@example.com')
         user_services.set_username(user_id, username)
         self.assertTrue(user_services.is_username_taken(username))
 
     def test_is_username_taken_different_case(self):
         user_id = 'someUser'
         username = 'camelCase'
-        user_services._create_user(user_id, 'user@example.com')
+        user_services.get_or_create_user(user_id, 'user@example.com')
         user_services.set_username(user_id, username)
         self.assertTrue(user_services.is_username_taken('CaMeLcAsE'))
 
     def test_set_invalid_usernames(self):
         user_id = 'someUser'
-        user_services._create_user(user_id, 'user@example.com')
+        user_services.get_or_create_user(user_id, 'user@example.com')
         bad_usernames = [
             ' bob ', '@', '', 'a' * 100, 'ADMIN', 'admin', 'AdMiN2020']
         for username in bad_usernames:
@@ -97,7 +103,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         username = 'username'
         user_email = 'user@example.com'
 
-        user_services._create_user(user_id, user_email)
+        user_services.get_or_create_user(user_id, user_email)
         user_services.set_username(user_id, username)
         self.assertEquals(user_services.get_username(user_id), username)
 
@@ -118,7 +124,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         username = 'username'
         user_email = 'user@example.com'
 
-        user_services._create_user(user_id, user_email)
+        user_services.get_or_create_user(user_id, user_email)
         user_services.set_username(user_id, username)
         self.assertEquals(user_services.get_username(user_id), username)
 
@@ -134,10 +140,171 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             user_services.get_user_id_from_username('fakeUsername'))
 
+    def test_fetch_gravatar_success(self):
+        user_email = 'user@example.com'
+        expected_gravatar_filepath = os.path.join(
+            self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
+            'gravatar_example.png')
+        with open(expected_gravatar_filepath, 'r') as f:
+            gravatar = f.read()
+        with self.urlfetch_mock(content=gravatar):
+            profile_picture = user_services.fetch_gravatar(user_email)
+            gravatar_data_url = utils.convert_png_to_data_url(
+                expected_gravatar_filepath)
+            self.assertEqual(profile_picture, gravatar_data_url)
+
+    def test_fetch_gravatar_failure_404(self):
+        user_email = 'user@example.com'
+        error_messages = []
+        def log_mock(message):
+            error_messages.append(message)
+
+        gravatar_url = user_services.get_gravatar_url(user_email)
+        expected_error_message = (
+            '[Status 404] Failed to fetch Gravatar from %s' % gravatar_url)
+        logging_error_mock = test_utils.CallCounter(log_mock)
+        urlfetch_counter = test_utils.CallCounter(urlfetch.fetch)
+        urlfetch_mock_ctx = self.urlfetch_mock(status_code=404)
+        log_swap_ctx = self.swap(logging, 'error', logging_error_mock)
+        fetch_swap_ctx = self.swap(urlfetch, 'fetch', urlfetch_counter)
+        with urlfetch_mock_ctx, log_swap_ctx, fetch_swap_ctx:
+            profile_picture = user_services.fetch_gravatar(user_email)
+            self.assertEqual(urlfetch_counter.times_called, 1)
+            self.assertEqual(logging_error_mock.times_called, 1)
+            self.assertEqual(expected_error_message, error_messages[0])
+            self.assertEqual(
+                profile_picture, user_services.DEFAULT_IDENTICON_DATA_URL)
+
+    def test_fetch_gravatar_failure_exception(self):
+        user_email = 'user@example.com'
+        error_messages = []
+        def log_mock(message):
+            error_messages.append(message)
+
+        gravatar_url = user_services.get_gravatar_url(user_email)
+        expected_error_message = (
+            'Failed to fetch Gravatar from %s' % gravatar_url)
+        logging_error_mock = test_utils.CallCounter(log_mock)
+        urlfetch_fail_mock = test_utils.FailingFunction(
+            urlfetch.fetch, urlfetch.InvalidURLError,
+            test_utils.FailingFunction.INFINITY)
+        log_swap_ctx = self.swap(logging, 'error', logging_error_mock)
+        fetch_swap_ctx = self.swap(urlfetch, 'fetch', urlfetch_fail_mock)
+        with log_swap_ctx, fetch_swap_ctx:
+            profile_picture = user_services.fetch_gravatar(user_email)
+            self.assertEqual(logging_error_mock.times_called, 1)
+            self.assertEqual(expected_error_message, error_messages[0])
+            self.assertEqual(
+                profile_picture, user_services.DEFAULT_IDENTICON_DATA_URL)
+
+    def test_default_identicon_data_url(self):
+        identicon_filepath = os.path.join(
+            self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
+            'user_blue_72px.png')
+        identicon_data_url = utils.convert_png_to_data_url(
+            identicon_filepath)
+        self.assertEqual(
+            identicon_data_url, user_services.DEFAULT_IDENTICON_DATA_URL)
+
+    def test_set_and_get_user_email_preferences(self):
+        user_id = 'someUser'
+        username = 'username'
+        user_email = 'user@example.com'
+
+        user_services.get_or_create_user(user_id, user_email)
+        user_services.set_username(user_id, username)
+
+        # When UserEmailPreferencesModel is yet to be created,
+        # the value returned by get_email_preferences() should be True.
+        email_preferences = user_services.get_email_preferences(user_id)
+        self.assertEquals(
+            email_preferences['can_receive_editor_role_email'],
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+
+        email_preferences = user_services.get_email_preferences(user_id)
+        self.assertEquals(
+            email_preferences['can_receive_feedback_message_email'],
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
+
+        # The user retrieves their email preferences. This initializes
+        # a UserEmailPreferencesModel instance with the default values.
+        user_services.update_email_preferences(
+            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
+
+        email_preferences = user_services.get_email_preferences(user_id)
+        self.assertEquals(
+            email_preferences['can_receive_editor_role_email'],
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+        self.assertEquals(
+            email_preferences['can_receive_feedback_message_email'],
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
+
+        # The user sets their membership email preference to False.
+        user_services.update_email_preferences(
+            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE, False,
+            False)
+
+        email_preferences = user_services.get_email_preferences(user_id)
+        self.assertEquals(
+            email_preferences['can_receive_editor_role_email'], False)
+        self.assertEquals(
+            email_preferences['can_receive_feedback_message_email'], False)
+
+    def test_get_current_date_as_string(self):
+        custom_datetimes = [
+            datetime.date(2011, 1, 1),
+            datetime.date(2012, 2, 28)
+        ]
+        datetime_strings = [custom_datetime.strftime(
+            feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
+                            for custom_datetime in custom_datetimes]
+
+        self.assertEqual(len(datetime_strings[0].split('-')[0]), 4)
+        self.assertEqual(len(datetime_strings[0].split('-')[1]), 2)
+        self.assertEqual(len(datetime_strings[0].split('-')[2]), 2)
+
+        self.assertEqual(len(datetime_strings[1].split('-')[0]), 4)
+        self.assertEqual(len(datetime_strings[1].split('-')[1]), 2)
+        self.assertEqual(len(datetime_strings[1].split('-')[2]), 2)
+
+        self.assertEqual(datetime_strings[0], '2011-01-01')
+        self.assertEqual(datetime_strings[1], '2012-02-28')
+
+    def test_parse_date_from_string(self):
+        test_datetime_strings = [
+            '2016-06-30',
+            '2016-07-05',
+            '2016-13-01',
+            '2016-03-32'
+        ]
+
+        self.assertEqual(
+            user_services.parse_date_from_string(test_datetime_strings[0]),
+            {
+                'year': 2016,
+                'month': 6,
+                'day': 30
+            })
+        self.assertEqual(
+            user_services.parse_date_from_string(test_datetime_strings[1]),
+            {
+                'year': 2016,
+                'month': 7,
+                'day': 5
+            })
+
+        with self.assertRaises(ValueError):
+            user_services.parse_date_from_string(test_datetime_strings[2])
+        with self.assertRaises(ValueError):
+            user_services.parse_date_from_string(test_datetime_strings[3])
+
 
 class UpdateContributionMsecTests(test_utils.GenericTestBase):
     """Test whether contribution date changes with publication of
-    exploration/collection and update of already published exploration/collection
+    exploration/collection and update of already published
+    exploration/collection.
     """
 
     EXP_ID = 'test_exp'
@@ -146,13 +313,22 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
     COLLECTION_CATEGORY = 'category'
     COLLECTION_OBJECTIVE = 'objective'
 
-    def test_contribution_msec_updates_on_published_explorations(self):
+    def setUp(self):
+        super(UpdateContributionMsecTests, self).setUp()
+
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
 
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+    def test_contribution_msec_updates_on_published_explorations(self):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.admin_id, end_state_name='End')
-        self.init_state_name = exploration.init_state_name
+        init_state_name = exploration.init_state_name
         exp_services.publish_exploration_and_update_user_profiles(
             self.admin_id, self.EXP_ID)
 
@@ -164,13 +340,11 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         # Test editor of published exploration has updated contribution time.
         rights_manager.release_ownership_of_exploration(
             self.admin_id, self.EXP_ID)
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [{
                 'cmd': 'edit_state_property',
-                'state_name': self.init_state_name,
+                'state_name': init_state_name,
                 'property_name': 'widget_id',
                 'new_value': 'MultipleChoiceInput'
             }], 'commit')
@@ -178,16 +352,10 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         self.assertIsNotNone(user_services.get_user_settings(
             self.editor_id).first_contribution_msec)
 
-    def test_contribution_msec_does_not_update_until_exploration_is_published(self):
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-
+    def test_contribution_msec_does_not_update_until_exp_is_published(self):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.admin_id, end_state_name='End')
-        self.init_state_name = exploration.init_state_name
+        init_state_name = exploration.init_state_name
 
         # Test that saving an exploration does not update first contribution
         # time.
@@ -199,7 +367,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         exp_services.update_exploration(
             self.admin_id, self.EXP_ID, [{
                 'cmd': 'edit_state_property',
-                'state_name': self.init_state_name,
+                'state_name': init_state_name,
                 'property_name': 'widget_id',
                 'new_value': 'MultipleChoiceInput'
             }], '')
@@ -212,9 +380,9 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             self.admin_id, self.EXP_ID, self.editor_id, 'editor')
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [{
-            'cmd': 'rename_state',
-            'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'new_state_name': u'¡Hola! αβγ',
+                'cmd': 'rename_state',
+                'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                'new_state_name': u'¡Hola! αβγ',
             }], '')
         self.assertIsNone(user_services.get_user_settings(
             self.editor_id).first_contribution_msec)
@@ -228,13 +396,8 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         self.assertIsNotNone(user_services.get_user_settings(
             self.editor_id).first_contribution_msec)
 
-    def test_contribution_msec_does_not_change_if_no_contribution_to_exploration(self):
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-
-        exploration = self.save_new_valid_exploration(
+    def test_contribution_msec_does_not_change_if_no_contribution_to_exp(self):
+        self.save_new_valid_exploration(
             self.EXP_ID, self.admin_id, end_state_name='End')
         rights_manager.assign_role_for_exploration(
             self.admin_id, self.EXP_ID, self.editor_id, 'editor')
@@ -248,17 +411,10 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         self.assertIsNone(user_services.get_user_settings(
             self.editor_id).first_contribution_msec)
 
-    def test_contribution_msec_does_not_change_if_exploration_unpublished(self):
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_EMAIL])
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        exploration = self.save_new_valid_exploration(
+    def test_contribution_msec_does_not_change_if_exp_unpublished(self):
+        self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
-        self.init_state_name = exploration.init_state_name
+
         exp_services.publish_exploration_and_update_user_profiles(
             self.owner_id, self.EXP_ID)
         rights_manager.unpublish_exploration(self.admin_id, self.EXP_ID)
@@ -269,10 +425,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             self.owner_id).first_contribution_msec)
 
     def test_contribution_msec_updates_on_published_collections(self):
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-
-        collection = self.save_new_valid_collection(
+        self.save_new_valid_collection(
             self.COL_ID, self.admin_id, title=self.COLLECTION_TITLE,
             category=self.COLLECTION_CATEGORY,
             objective=self.COLLECTION_OBJECTIVE,
@@ -280,17 +433,18 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         collection_services.publish_collection_and_update_user_profiles(
             self.admin_id, self.COL_ID)
+        exp_services.publish_exploration_and_update_user_profiles(
+            self.admin_id, self.EXP_ID)
 
         # Test all owners and editors of collection after publication have
         # updated first contribution times.
-        self.assertIsNotNone(user_services.get_user_settings(self.admin_id)
-            .first_contribution_msec)
+        self.assertIsNotNone(user_services.get_user_settings(
+            self.admin_id).first_contribution_msec)
 
-        # Test editor of published collection has updated first contribution time.
-        rights_manager.release_ownership_of_collection(self.admin_id,
-            self.COL_ID)
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        # Test editor of published collection has updated
+        # first contribution time.
+        rights_manager.release_ownership_of_collection(
+            self.admin_id, self.COL_ID)
 
         collection_services.update_collection(
             self.editor_id, self.COL_ID, [{
@@ -302,11 +456,9 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         self.assertIsNotNone(user_services.get_user_settings(
             self.editor_id).first_contribution_msec)
 
-    def test_contribution_msec_does_not_update_until_collection_is_published(self):
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-
-        collection = self.save_new_valid_collection(
+    def test_contribution_msec_does_not_update_until_collection_is_published(
+            self):
+        self.save_new_valid_collection(
             self.COL_ID, self.admin_id, title=self.COLLECTION_TITLE,
             category=self.COLLECTION_CATEGORY,
             objective=self.COLLECTION_OBJECTIVE,
@@ -330,12 +482,10 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test that another user who commits to unpublished collection does not
         # have updated first contribution time.
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         rights_manager.assign_role_for_collection(
             self.admin_id, self.COL_ID, self.editor_id, 'editor')
         collection_services.update_collection(
-                self.editor_id, self.COL_ID, [{
+            self.editor_id, self.COL_ID, [{
                 'cmd': 'edit_collection_property',
                 'property_name': 'category',
                 'new_value': 'Some new category'
@@ -352,13 +502,9 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         self.assertIsNotNone(user_services.get_user_settings(
             self.editor_id).first_contribution_msec)
 
-    def test_contribution_msec_does_not_change_if_no_contribution_to_collection(self):
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-
-        collection = self.save_new_valid_collection(
+    def test_contribution_msec_does_not_change_if_no_contribution_to_collection(
+            self):
+        self.save_new_valid_collection(
             self.COL_ID, self.admin_id, title=self.COLLECTION_TITLE,
             category=self.COLLECTION_CATEGORY,
             objective=self.COLLECTION_OBJECTIVE,
@@ -376,14 +522,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             self.editor_id).first_contribution_msec)
 
     def test_contribution_msec_does_not_change_if_collection_unpublished(self):
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_EMAIL])
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        collection = self.save_new_valid_collection(
+        self.save_new_valid_collection(
             self.COL_ID, self.owner_id, title=self.COLLECTION_TITLE,
             category=self.COLLECTION_CATEGORY,
             objective=self.COLLECTION_OBJECTIVE,
@@ -398,6 +537,116 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             self.owner_id).first_contribution_msec)
 
 
+class UserDashboardStatsTests(test_utils.GenericTestBase):
+    """Test whether exploration-related statistics of a user change as events
+    are registered.
+    """
+
+    OWNER_EMAIL = 'owner@example.com'
+    OWNER_USERNAME = 'owner'
+    EXP_ID = 'exp1'
+
+    USER_SESSION_ID = 'session1'
+
+    CURRENT_DATE_AS_STRING = user_services.get_current_date_as_string()
+
+    def setUp(self):
+        super(UserDashboardStatsTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+    def _mock_get_current_date_as_string(self):
+        return self.CURRENT_DATE_AS_STRING
+
+    def test_get_user_dashboard_stats(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, end_state_name='End')
+        init_state_name = exploration.init_state_name
+        event_services.StartExplorationEventHandler.record(
+            self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
+            feconf.PLAY_TYPE_NORMAL)
+        self.assertEquals(
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.owner_id),
+            {
+                'total_plays': 0,
+                'num_ratings': 0,
+                'average_ratings': None
+            })
+        (user_jobs_continuous_test.ModifiedUserStatsAggregator
+         .start_computation())
+        self.process_and_flush_pending_tasks()
+        self.assertEquals(
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.owner_id),
+            {
+                'total_plays': 1,
+                'num_ratings': 0,
+                'average_ratings': None
+            })
+
+    def test_get_weekly_dashboard_stats_when_stats_model_is_none(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, end_state_name='End')
+        init_state_name = exploration.init_state_name
+        event_services.StartExplorationEventHandler.record(
+            self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
+            feconf.PLAY_TYPE_NORMAL)
+        self.assertEquals(
+            user_services.get_weekly_dashboard_stats(self.owner_id), None)
+        self.assertEquals(
+            user_services.get_last_week_dashboard_stats(self.owner_id), None)
+
+        with self.swap(user_services,
+                       'get_current_date_as_string',
+                       self._mock_get_current_date_as_string):
+            user_services.update_dashboard_stats_log(self.owner_id)
+
+        self.assertEquals(
+            user_services.get_weekly_dashboard_stats(self.owner_id), [{
+                self.CURRENT_DATE_AS_STRING: {
+                    'total_plays': 0,
+                    'num_ratings': 0,
+                    'average_ratings': None
+                }
+            }])
+
+    def test_get_weekly_dashboard_stats(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, end_state_name='End')
+        init_state_name = exploration.init_state_name
+        event_services.StartExplorationEventHandler.record(
+            self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
+            feconf.PLAY_TYPE_NORMAL)
+        self.assertEquals(
+            user_services.get_weekly_dashboard_stats(self.owner_id), None)
+        self.assertEquals(
+            user_services.get_last_week_dashboard_stats(self.owner_id), None)
+
+        (user_jobs_continuous_test.ModifiedUserStatsAggregator
+         .start_computation())
+        self.process_and_flush_pending_tasks()
+
+        self.assertEquals(
+            user_services.get_weekly_dashboard_stats(self.owner_id), None)
+        self.assertEquals(
+            user_services.get_last_week_dashboard_stats(self.owner_id), None)
+
+        with self.swap(user_services,
+                       'get_current_date_as_string',
+                       self._mock_get_current_date_as_string):
+            user_services.update_dashboard_stats_log(self.owner_id)
+
+        self.assertEquals(
+            user_services.get_weekly_dashboard_stats(self.owner_id), [{
+                self.CURRENT_DATE_AS_STRING: {
+                    'total_plays': 1,
+                    'num_ratings': 0,
+                    'average_ratings': None
+                }
+            }])
+
+
 class SubjectInterestsUnitTests(test_utils.GenericTestBase):
     """Test the update_subject_interests method."""
 
@@ -407,7 +656,7 @@ class SubjectInterestsUnitTests(test_utils.GenericTestBase):
         self.username = 'username'
         self.user_email = 'user@example.com'
 
-        user_services._create_user(self.user_id, self.user_email)
+        user_services.get_or_create_user(self.user_id, self.user_email)
         user_services.set_username(self.user_id, self.username)
 
     def test_invalid_subject_interests_are_not_accepted(self):
@@ -421,22 +670,22 @@ class SubjectInterestsUnitTests(test_utils.GenericTestBase):
             user_services.update_subject_interests(self.user_id, ['', 'ab'])
 
         with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'to consist only of lowercase alphabetic characters and '
-                'spaces'):
+            utils.ValidationError,
+            'to consist only of lowercase alphabetic characters and spaces'
+            ):
             user_services.update_subject_interests(self.user_id, ['!'])
 
         with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'to consist only of lowercase alphabetic characters and '
-                'spaces'):
+            utils.ValidationError,
+            'to consist only of lowercase alphabetic characters and spaces'
+            ):
             user_services.update_subject_interests(
                 self.user_id, ['has-hyphens'])
 
         with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'to consist only of lowercase alphabetic characters and '
-                'spaces'):
+            utils.ValidationError,
+            'to consist only of lowercase alphabetic characters and spaces'
+            ):
             user_services.update_subject_interests(
                 self.user_id, ['HasCapitalLetters'])
 

@@ -16,8 +16,6 @@
 
 """Provides search services."""
 
-__author__ = 'Frederik Creemers'
-
 import datetime
 import logging
 import numbers
@@ -142,8 +140,7 @@ def _validate_list(key, value):
     """Validates a list to be included as document fields. The key is just
     passed in to make better error messages."""
 
-    for i in xrange(len(value)):
-        element = value[i]
+    for ind, element in enumerate(value):
         if not (isinstance(element, basestring) or
                 isinstance(element, datetime.date) or
                 isinstance(element, datetime.datetime) or
@@ -151,7 +148,7 @@ def _validate_list(key, value):
             raise ValueError(
                 'All values of a multi-valued field must be numbers, strings, '
                 'date or datetime instances, The %dth value for field %s has'
-                ' type %s.' % (i, key, type(element)))
+                ' type %s.' % (ind, key, type(element)))
 
 
 def delete_documents_from_index(
@@ -173,10 +170,10 @@ def delete_documents_from_index(
             'Index must be the unicode/str name of an index, got %s'
             % type(index))
 
-    for i in xrange(len(doc_ids)):
-        if not isinstance(doc_ids[i], basestring):
+    for ind, doc_id in enumerate(doc_ids):
+        if not isinstance(doc_id, basestring):
             raise ValueError('all doc_ids must be string, got %s at index %d' %
-                             (type(doc_ids[i]), i))
+                             (type(doc_id), ind))
 
     index = gae_search.Index(index)
     try:
@@ -219,8 +216,9 @@ def clear_index(index_name):
         index.delete(doc_ids)
 
 
-def search(query_string, index, cursor=None, limit=feconf.GALLERY_PAGE_SIZE,
-           sort='', ids_only=False, retries=DEFAULT_NUM_RETRIES):
+def search(query_string, index, cursor=None,
+           limit=feconf.SEARCH_RESULTS_PAGE_SIZE, sort='', ids_only=False,
+           retries=DEFAULT_NUM_RETRIES):
     """Searches for documents in an index.
 
     Args:
@@ -278,7 +276,7 @@ def search(query_string, index, cursor=None, limit=feconf.GALLERY_PAGE_SIZE,
     try:
         logging.debug('attempting a search with query %s' % query)
         results = index.search(query)
-    except gae_search.TransientError as e:
+    except Exception as e:
         logging.exception('something went wrong while searching.')
         if retries > 1:
             logging.debug('%d attempts left, retrying...' % (retries - 1))
@@ -306,9 +304,9 @@ def search(query_string, index, cursor=None, limit=feconf.GALLERY_PAGE_SIZE,
     return result_docs, result_cursor_str
 
 
-def _string_to_sort_expressions(s):
+def _string_to_sort_expressions(input_string):
     sort_expressions = []
-    s_tokens = s.split()
+    s_tokens = input_string.split()
     for expression in s_tokens:
         if expression.startswith('+'):
             direction = gae_search.SortExpression.ASCENDING
@@ -319,9 +317,9 @@ def _string_to_sort_expressions(s):
                 'Fields in the sort expression must start with "+"'
                 ' or "-" to indicate sort direction.'
                 ' The field %s has no such indicator'
-                ' in expression "%s".' % (expression, s))
-        sort_expressions.append(gae_search.SortExpression(expression[1:],
-                                                          direction))
+                ' in expression "%s".' % (expression, input_string))
+        sort_expressions.append(
+            gae_search.SortExpression(expression[1:], direction))
     return sort_expressions
 
 

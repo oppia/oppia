@@ -14,12 +14,14 @@
 
 """Controllers for the Oppia exploration learner view."""
 
-__author__ = 'Sean Lip'
-
+import json
 import logging
+import random
+
+import jinja2
 
 from core.controllers import base
-from core.domain import collection_domain
+from core.domain import classifier_services
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import dependency_registry
@@ -27,53 +29,24 @@ from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
-from core.domain import fs_domain
 from core.domain import gadget_registry
 from core.domain import interaction_registry
 from core.domain import rating_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
-from core.domain import rule_domain
-from core.domain import skins_services
+from core.domain import summary_services
 import feconf
 import utils
 
-import jinja2
 
+MAX_SYSTEM_RECOMMENDATIONS = 4
 
-SHARING_OPTIONS = config_domain.ConfigProperty(
-    'sharing_options', {
-        'type': 'dict',
-        'properties': [{
-            'name': 'gplus',
-            'schema': {
-                'type': 'bool',
-            }
-        }, {
-            'name': 'facebook',
-            'schema': {
-                'type': 'bool',
-            }
-        }, {
-            'name': 'twitter',
-            'schema': {
-                'type': 'bool',
-            }
-        }]
-    },
-    'Sharing options to display in the learner view',
-    default_value={
-        'gplus': False,
-        'facebook': False,
-        'twitter': False,
-    })
-
-SHARING_OPTIONS_TWITTER_TEXT = config_domain.ConfigProperty(
-    'sharing_options_twitter_text', {
+DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = config_domain.ConfigProperty(
+    'default_twitter_share_message_player', {
         'type': 'unicode',
     },
-    'Default text for the Twitter share message',
+    'Default text for the Twitter share message for the learner view',
     default_value=(
         'Check out this interactive lesson from Oppia - a free, open-source '
         'learning platform!'))
@@ -82,14 +55,14 @@ SHARING_OPTIONS_TWITTER_TEXT = config_domain.ConfigProperty(
 def require_playable(handler):
     """Decorator that checks if the user can play the given exploration."""
     def test_can_play(self, exploration_id, **kwargs):
-        if exploration_id in base.DISABLED_EXPLORATIONS.value:
+        if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             self.render_template(
                 'error/disabled_exploration.html', iframe_restriction=None)
             return
 
-        """Checks if the user for the current session is logged in."""
+        # Checks if the user for the current session is logged in.
         if rights_manager.Actor(self.user_id).can_play(
-                rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
+                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.PageNotFoundException
@@ -97,14 +70,66 @@ def require_playable(handler):
     return test_can_play
 
 
-# TODO(bhenning): Add more tests for classification, such as testing multiple
-# rule specs over multiple answer groups and making sure the best match over all
-# those rules is picked.
-def classify(exp_id, state, answer, params):
-    """Normalize the answer and select among the answer groups the group in
-    which the answer best belongs. The best group is decided by finding the
-    first rule best satisfied by the answer. Returns a dict with the following
-    keys:
+def classify_string_classifier_rule(state, normalized_answer):
+    """Run the classifier if no prediction has been made yet. Currently this
+    is behind a development flag.
+    """
+    best_matched_answer_group = None
+    best_matched_answer_group_index = len(state.interaction.answer_groups)
+    best_matched_rule_spec_index = None
+
+    sc = classifier_services.StringClassifier()
+    training_examples = [
+        [doc, []] for doc in state.interaction.confirmed_unclassified_answers]
+    for (answer_group_index, answer_group) in enumerate(
+            state.interaction.answer_groups):
+        classifier_rule_spec_index = answer_group.get_classifier_rule_index()
+        if classifier_rule_spec_index is not None:
+            classifier_rule_spec = answer_group.rule_specs[
+                classifier_rule_spec_index]
+        else:
+            classifier_rule_spec = None
+        if classifier_rule_spec is not None:
+            training_examples.extend([
+                [doc, [str(answer_group_index)]]
+                for doc in classifier_rule_spec.inputs['training_data']])
+    if len(training_examples) > 0:
+        sc.load_examples(training_examples)
+        doc_ids = sc.add_examples_for_predicting([normalized_answer])
+        predicted_label = sc.predict_label_for_doc(doc_ids[0])
+        if (predicted_label !=
+                classifier_services.StringClassifier.DEFAULT_LABEL):
+            predicted_answer_group_index = int(predicted_label)
+            predicted_answer_group = state.interaction.answer_groups[
+                predicted_answer_group_index]
+            for rule_spec in predicted_answer_group.rule_specs:
+                if rule_spec.rule_type == exp_domain.CLASSIFIER_RULESPEC_STR:
+                    best_matched_rule_spec_index = classifier_rule_spec_index
+                    break
+            best_matched_answer_group = predicted_answer_group
+            best_matched_answer_group_index = predicted_answer_group_index
+            return {
+                'outcome': best_matched_answer_group.outcome.to_dict(),
+                'answer_group_index': best_matched_answer_group_index,
+                'rule_spec_index': best_matched_rule_spec_index,
+            }
+        else:
+            return None
+
+    return None
+
+
+def classify(state, answer):
+    """Classify the answer using the string classifier.
+
+    This should only be called if the string classifier functionality is
+    enabled, and the interaction is trainable.
+
+    Normalize the answer and classifies the answer if the interaction has a
+    classifier associated with it. Otherwise, classifies the answer to the
+    default outcome.
+
+    Returns a dict with the following keys:
         'outcome': A dict representing the outcome of the answer group matched.
         'answer_group_index': An index into the answer groups list indicating
             which one was selected as the group which this answer belongs to.
@@ -116,64 +141,36 @@ def classify(exp_id, state, answer, params):
     When the default rule is matched, outcome is the default_outcome of the
     state's interaction.
     """
+    assert feconf.ENABLE_STRING_CLASSIFIER
+
     interaction_instance = interaction_registry.Registry.get_interaction_by_id(
         state.interaction.id)
     normalized_answer = interaction_instance.normalize_answer(answer)
+    response = None
 
-    # Find the first group that satisfactorily matches the given answer. This
-    # is done by ORing (maximizing) all truth values of all rules over all
-    # answer groups. The group with the highest truth value is considered the
-    # best match.
-    best_matched_answer_group = None
-    best_matched_answer_group_index = len(state.interaction.answer_groups)
-    best_matched_rule_spec_index = None
-    best_matched_truth_value = 0.0
-    for (answer_group_index, answer_group) in enumerate(
-            state.interaction.answer_groups):
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(exp_id))
-        input_type = interaction_instance.answer_type
-        ored_truth_value = 0.0
-        best_rule_spec_index = None
-        for (rule_spec_index, rule_spec) in enumerate(answer_group.rule_specs):
-            evaluated_truth_value = rule_domain.evaluate_rule(
-                rule_spec, input_type, params, normalized_answer, fs)
-            if evaluated_truth_value > ored_truth_value:
-                ored_truth_value = evaluated_truth_value
-                best_rule_spec_index = rule_spec_index
-        if ored_truth_value > best_matched_truth_value:
-            best_matched_truth_value = ored_truth_value
-            best_matched_answer_group = answer_group
-            best_matched_answer_group_index = answer_group_index
-            best_matched_rule_spec_index = best_rule_spec_index
+    if interaction_instance.is_string_classifier_trainable:
+        response = classify_string_classifier_rule(state, normalized_answer)
+    else:
+        raise Exception('No classifier found for interaction.')
 
-    # The best matched group must match above a certain threshold. If no group
-    # meets this requirement, then the default 'group' automatically matches
-    # resulting in the outcome of the answer being the default outcome of the
-    # state.
-    if (best_matched_truth_value >=
-            feconf.DEFAULT_ANSWER_GROUP_CLASSIFICATION_THRESHOLD):
-        return {
-            'outcome': best_matched_answer_group.outcome.to_dict(),
-            'answer_group_index': best_matched_answer_group_index,
-            'rule_spec_index': best_matched_rule_spec_index,
-        }
+    if response is not None:
+        return response
     elif state.interaction.default_outcome is not None:
         return {
             'outcome': state.interaction.default_outcome.to_dict(),
             'answer_group_index': len(state.interaction.answer_groups),
+            'classification_certainty': 0.0,
             'rule_spec_index': 0
         }
 
-    raise Exception('Something has seriously gone wrong with the exploration. '
-        'Oppia does not know what to do with this answer. Please contact the '
+    raise Exception(
+        'Something has seriously gone wrong with the exploration. Oppia does '
+        'not know what to do with this answer. Please contact the '
         'exploration owner.')
 
 
 class ExplorationPage(base.BaseHandler):
     """Page describing a single exploration."""
-
-    PAGE_NAME_FOR_CSRF = 'player'
 
     @require_playable
     def get(self, exploration_id):
@@ -203,7 +200,7 @@ class ExplorationPage(base.BaseHandler):
         version = exploration.version
 
         if not rights_manager.Actor(self.user_id).can_view(
-                rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id):
+                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             raise self.PageNotFoundException
 
         is_iframed = (self.request.get('iframed') == 'true')
@@ -229,14 +226,14 @@ class ExplorationPage(base.BaseHandler):
         self.values.update({
             'GADGET_SPECS': gadget_registry.Registry.get_all_specs(),
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
-            'SHARING_OPTIONS': SHARING_OPTIONS.value,
-            'SHARING_OPTIONS_TWITTER_TEXT': SHARING_OPTIONS_TWITTER_TEXT.value,
+            'DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER': (
+                DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER.value),
             'additional_angular_modules': additional_angular_modules,
             'can_edit': (
                 bool(self.username) and
                 self.username not in config_domain.BANNED_USERNAMES.value and
                 rights_manager.Actor(self.user_id).can_edit(
-                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id)
+                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id)
             ),
             'dependencies_html': jinja2.utils.Markup(
                 dependencies_html),
@@ -255,13 +252,6 @@ class ExplorationPage(base.BaseHandler):
             # Note that this overwrites the value in base.py.
             'meta_description': utils.capitalize_string(exploration.objective),
             'nav_mode': feconf.NAV_MODE_EXPLORE,
-            'skin_templates': jinja2.utils.Markup(
-                skins_services.Registry.get_skin_templates(
-                    [feconf.DEFAULT_SKIN_ID])),
-            'skin_js_url': skins_services.Registry.get_skin_js_url(
-                feconf.DEFAULT_SKIN_ID),
-            'skin_tag': jinja2.utils.Markup(
-                skins_services.Registry.get_skin_tag(feconf.DEFAULT_SKIN_ID)),
         })
 
         if is_iframed:
@@ -289,10 +279,8 @@ class ExplorationHandler(base.BaseHandler):
             'can_edit': (
                 self.user_id and
                 rights_manager.Actor(self.user_id).can_edit(
-                    rights_manager.ACTIVITY_TYPE_EXPLORATION, exploration_id)),
+                    feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id)),
             'exploration': exploration.to_player_dict(),
-            'info_card_image_url': utils.get_info_card_url_for_category(
-                exploration.category),
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
             'version': exploration.version,
@@ -355,7 +343,8 @@ class StateHitEventHandler(base.BaseHandler):
         new_state_name = self.payload.get('new_state_name')
         exploration_version = self.payload.get('exploration_version')
         session_id = self.payload.get('session_id')
-        client_time_spent_in_secs = self.payload.get(
+        # TODO(sll): why do we not record the value of this anywhere?
+        client_time_spent_in_secs = self.payload.get(  # pylint: disable=unused-variable
             'client_time_spent_in_secs')
         old_params = self.payload.get('old_params')
 
@@ -381,8 +370,12 @@ class ClassifyHandler(base.BaseHandler):
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     @require_playable
-    def post(self, exploration_id):
-        """Handles POST requests."""
+    def post(self, unused_exploration_id):
+        """Handle POST requests.
+
+        Note: unused_exploration_id is needed because @require_playable needs 2
+        arguments.
+        """
         # A domain object representing the old state.
         old_state = exp_domain.State.from_dict(self.payload.get('old_state'))
         # The learner's raw answer.
@@ -391,7 +384,7 @@ class ClassifyHandler(base.BaseHandler):
         params = self.payload.get('params')
         params['answer'] = answer
 
-        self.render_json(classify(exploration_id, old_state, answer, params))
+        self.render_json(classify(old_state, answer))
 
 
 class ReaderFeedbackHandler(base.BaseHandler):
@@ -491,8 +484,6 @@ class RatingHandler(base.BaseHandler):
     exploration.
     """
 
-    PAGE_NAME_FOR_CSRF = 'player'
-
     @require_playable
     def get(self, exploration_id):
         """Handles GET requests."""
@@ -529,18 +520,36 @@ class RecommendationsHandler(base.BaseHandler):
     def get(self, exploration_id):
         """Handles GET requests."""
         collection_id = self.request.get('collection_id')
+        include_system_recommendations = self.request.get(
+            'include_system_recommendations')
+        try:
+            author_recommended_exp_ids = json.loads(self.request.get(
+                'stringified_author_recommended_ids'))
+        except Exception:
+            raise self.PageNotFoundException
 
-        recommended_exp_ids = []
+        auto_recommended_exp_ids = []
         if self.user_id and collection_id:
-            recommended_exp_ids = (
-                collection_services.get_next_exploration_ids_to_complete_by_user(
+            next_exp_ids_in_collection = (
+                collection_services.get_next_exploration_ids_to_complete_by_user( # pylint: disable=line-too-long
                     self.user_id, collection_id))
-        else:
-            recommended_exp_ids = (
+            auto_recommended_exp_ids = list(
+                set(next_exp_ids_in_collection) -
+                set(author_recommended_exp_ids))
+        elif include_system_recommendations:
+            system_chosen_exp_ids = (
                 recommendations_services.get_exploration_recommendations(
                     exploration_id))
+            filtered_exp_ids = list(
+                set(system_chosen_exp_ids) -
+                set(author_recommended_exp_ids))
+            auto_recommended_exp_ids = random.sample(
+                filtered_exp_ids,
+                min(MAX_SYSTEM_RECOMMENDATIONS, len(filtered_exp_ids)))
 
         self.values.update({
-            'recommended_exp_ids': recommended_exp_ids
+            'summaries': (
+                summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                    author_recommended_exp_ids + auto_recommended_exp_ids)),
         })
         self.render_json(self.values)

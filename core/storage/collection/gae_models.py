@@ -16,8 +16,6 @@
 
 """Model for an Oppia collection."""
 
-__author__ = 'Ben Henning'
-
 import datetime
 
 import core.storage.base_model.gae_models as base_models
@@ -53,6 +51,11 @@ class CollectionModel(base_models.VersionedModel):
     category = ndb.StringProperty(required=True, indexed=True)
     # The objective of this collection.
     objective = ndb.TextProperty(default='', indexed=False)
+    # The language code of this collection.
+    language_code = ndb.StringProperty(
+        default=feconf.DEFAULT_LANGUAGE_CODE, indexed=True)
+    # Tags associated with this collection.
+    tags = ndb.StringProperty(repeated=True, indexed=True)
 
     # The version of all property blob schemas.
     schema_version = ndb.IntegerProperty(
@@ -249,7 +252,8 @@ class CollectionCommitLogEntryModel(base_models.BaseModel):
             raise ValueError(
                 'max_age must be a datetime.timedelta instance or None.')
 
-        query = cls.query(cls.post_commit_is_private == False)
+        query = cls.query(
+            cls.post_commit_is_private == False)  # pylint: disable=singleton-comparison
         if max_age:
             query = query.filter(
                 cls.last_updated >= datetime.datetime.utcnow() - max_age)
@@ -261,7 +265,7 @@ class CollectionSummaryModel(base_models.BaseModel):
     """Summary model for an Oppia collection.
 
     This should be used whenever the content blob of the collection is not
-    needed (e.g. gallery, search, etc).
+    needed (e.g. search results, etc).
 
     A CollectionSummaryModel instance stores the following information:
 
@@ -279,6 +283,10 @@ class CollectionSummaryModel(base_models.BaseModel):
     category = ndb.StringProperty(required=True, indexed=True)
     # The objective of this collection.
     objective = ndb.TextProperty(required=True, indexed=False)
+    # The ISO 639-1 code for the language this collection is written in.
+    language_code = ndb.StringProperty(required=True, indexed=True)
+    # Tags associated with this collection.
+    tags = ndb.StringProperty(repeated=True, indexed=True)
 
     # Aggregate user-assigned ratings of the collection
     ratings = ndb.JsonProperty(default=None, indexed=False)
@@ -314,9 +322,15 @@ class CollectionSummaryModel(base_models.BaseModel):
     # The user_ids of users who have contributed (humans who have made a
     # positive (not just a revert) change to the collection's content)
     contributor_ids = ndb.StringProperty(indexed=True, repeated=True)
+    # A dict representing the contributors of non-trivial commits to this
+    # collection. Each key of this dict is a user_id, and the corresponding
+    # value is the number of non-trivial commits that the user has made.
+    contributors_summary = ndb.JsonProperty(default={}, indexed=False)
     # The version number of the collection after this commit. Only populated
     # for commits to an collection (as opposed to its rights, etc.)
     version = ndb.IntegerProperty()
+    # The number of nodes(explorations) that are within this collection.
+    node_count = ndb.IntegerProperty()
 
     @classmethod
     def get_non_private(cls):
@@ -324,7 +338,7 @@ class CollectionSummaryModel(base_models.BaseModel):
         return CollectionSummaryModel.query().filter(
             CollectionSummaryModel.status != feconf.ACTIVITY_STATUS_PRIVATE
         ).filter(
-            CollectionSummaryModel.deleted == False
+            CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
@@ -339,7 +353,7 @@ class CollectionSummaryModel(base_models.BaseModel):
                    CollectionSummaryModel.editor_ids == user_id,
                    CollectionSummaryModel.viewer_ids == user_id)
         ).filter(
-            CollectionSummaryModel.deleted == False
+            CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
@@ -351,5 +365,5 @@ class CollectionSummaryModel(base_models.BaseModel):
             ndb.OR(CollectionSummaryModel.owner_ids == user_id,
                    CollectionSummaryModel.editor_ids == user_id)
         ).filter(
-            CollectionSummaryModel.deleted == False
+            CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)

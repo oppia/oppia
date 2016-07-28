@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview End-to-end tests for rich-text components.
- *
- * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var general = require('../protractor_utils/general.js');
@@ -27,10 +25,10 @@ var player = require('../protractor_utils/player.js');
 
 describe('rich-text components', function() {
   it('should display correctly', function() {
-    users.createUser('user11@example.com', 'user11');
-    users.login('user11@example.com')
+    users.createUser('user@richTextComponents.com', 'userRichTextComponents');
+    users.login('user@richTextComponents.com');
 
-    workflow.createExploration('RTE components', 'maths');
+    workflow.createExploration();
 
     editor.setContent(function(richTextEditor) {
       richTextEditor.appendBoldText('bold');
@@ -50,7 +48,7 @@ describe('rich-text components', function() {
         title: 'title 1',
         content: forms.toRichText('contents 2')
       }]);
-    })
+    });
 
     editor.navigateToPreviewTab();
 
@@ -96,6 +94,8 @@ describe('rich-text components', function() {
       'chrome-extension://eojlgccfgnjlphjnlopmadngcgmmdgpk/' +
         'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED',
       'chrome-extension://fjhoaacokmgbjemoflkofnenfaiekifl/' +
+        'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED',
+      'chrome-extension://pkedcjkdefgpdelpbcmbmeomcjbeemfm/' +
         'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED'
     ]);
   });

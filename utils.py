@@ -14,11 +14,10 @@
 
 """Common utility functions."""
 
-__author__ = 'sll@google.com (Sean Lip)'
-
 import base64
 import datetime
 import hashlib
+import imghdr
 import json
 import os
 import random
@@ -29,10 +28,11 @@ import time
 import unicodedata
 import urllib
 import urlparse
-import yaml
 import zipfile
 
-import feconf
+import yaml
+
+import feconf  # pylint: disable=relative-import
 
 
 class InvalidInputException(Exception):
@@ -139,10 +139,10 @@ def get_exploration_components_from_zip(zip_file_contents):
       Exception: if the following condition doesn't hold: "There is exactly one
         file not in assets/, and this file has a .yaml suffix".
     """
-    o = StringIO.StringIO()
-    o.write(zip_file_contents)
+    memfile = StringIO.StringIO()
+    memfile.write(zip_file_contents)
 
-    zf = zipfile.ZipFile(o, 'r')
+    zf = zipfile.ZipFile(memfile, 'r')
     yaml_content = None
     assets_list = []
     for filepath in zf.namelist():
@@ -179,10 +179,10 @@ def get_comma_sep_string_from_list(items):
     return '%s and %s' % (', '.join(items[:-1]), items[-1])
 
 
-def to_ascii(string):
+def to_ascii(input_string):
     """Change unicode characters in a string to ascii if possible."""
     return unicodedata.normalize(
-        'NFKD', unicode(string)).encode('ascii', 'ignore')
+        'NFKD', unicode(input_string)).encode('ascii', 'ignore')
 
 
 def yaml_from_dict(dictionary, width=80):
@@ -228,19 +228,24 @@ def get_random_choice(alist):
     return alist[index]
 
 
-def convert_png_to_data_url(filepath):
-    """Converts the png file at filepath to a data URL.
+def convert_png_binary_to_data_url(content):
+    """Converts a png image string (represented by 'content') to a data URL."""
+    if imghdr.what(None, content) == 'png':
+        return 'data:image/png;base64,%s' % urllib.quote(
+            content.encode('base64'))
+    else:
+        raise Exception('The given string does not represent a PNG image.')
 
-    This method is currently used only in tests for RTE extensions.
-    """
+
+def convert_png_to_data_url(filepath):
+    """Converts the png file at filepath to a data URL."""
     file_contents = get_file_contents(filepath, raw_bytes=True, mode='rb')
-    return 'data:image/png;base64,%s' % urllib.quote(
-        file_contents.encode('base64'))
+    return convert_png_binary_to_data_url(file_contents)
 
 
 def camelcase_to_hyphenated(camelcase_str):
-    s = re.sub('(.)([A-Z][a-z]+)', r'\1-\2', camelcase_str)
-    return re.sub('([a-z0-9])([A-Z])', r'\1-\2', s).lower()
+    intermediate_str = re.sub('(.)([A-Z][a-z]+)', r'\1-\2', camelcase_str)
+    return re.sub('([a-z0-9])([A-Z])', r'\1-\2', intermediate_str).lower()
 
 
 def set_url_query_parameter(url, param_name, param_value):
@@ -274,15 +279,15 @@ class JSONEncoderForHTML(json.JSONEncoder):
                 '<', '\\u003c').replace('>', '\\u003e')
 
 
-def convert_to_hash(string, max_length):
+def convert_to_hash(input_string, max_length):
     """Convert a string to a SHA1 hash."""
-    if not isinstance(string, basestring):
+    if not isinstance(input_string, basestring):
         raise Exception(
             'Expected string, received %s of type %s' %
-            (string, type(string)))
+            (input_string, type(input_string)))
 
     encoded_string = base64.urlsafe_b64encode(
-        hashlib.sha1(string).digest())
+        hashlib.sha1(input_string.encode('utf-8')).digest())
 
     return encoded_string[:max_length]
 
@@ -321,16 +326,16 @@ def generate_new_session_id():
     return generate_random_string(24)
 
 
-def vfs_construct_path(a, *p):
+def vfs_construct_path(base_path, *path_components):
     """Mimics behavior of os.path.join on Posix machines."""
-    path = a
-    for b in p:
-        if b.startswith('/'):
-            path = b
+    path = base_path
+    for component in path_components:
+        if component.startswith('/'):
+            path = component
         elif path == '' or path.endswith('/'):
-            path += b
+            path += component
         else:
-            path += '/' + b
+            path += '/%s' % component
     return path
 
 
@@ -344,15 +349,16 @@ def vfs_normpath(path):
     # POSIX allows one or two initial slashes, but treats three or more
     # as single slash.
     if (initial_slashes and
-        path.startswith('//') and not path.startswith('///')):
+            path.startswith('//') and not path.startswith('///')):
         initial_slashes = 2
     comps = path.split('/')
     new_comps = []
     for comp in comps:
         if comp in ('', '.'):
             continue
-        if (comp != '..' or (not initial_slashes and not new_comps) or
-             (new_comps and new_comps[-1] == '..')):
+        if (comp != '..' or
+                (not initial_slashes and not new_comps) or
+                (new_comps and new_comps[-1] == '..')):
             new_comps.append(comp)
         elif new_comps:
             new_comps.pop()
@@ -363,25 +369,21 @@ def vfs_normpath(path):
     return path or dot
 
 
-def get_short_language_description(full_language_description):
-    """Given one of the descriptions in feconf.ALL_LANGUAGE_CODES, generates
-    the corresponding short description.
-    """
-    if ' (' not in full_language_description:
-        return full_language_description
-    else:
-        ind = full_language_description.find(' (')
-        return full_language_description[:ind]
-
-
-def require_valid_name(name, name_type):
+def require_valid_name(name, name_type, allow_empty=False):
     """Generic name validation.
 
     Args:
       name: the name to validate.
       name_type: a human-readable string, like 'the exploration title' or
         'a state name'. This will be shown in error messages.
+      allow_empty: if True, empty strings are allowed.
     """
+    if not isinstance(name, basestring):
+        raise ValidationError('%s must be a string.' % name_type)
+
+    if allow_empty and name == '':
+        return
+
     # This check is needed because state names are used in URLs and as ids
     # for statistics, so the name length should be bounded above.
     if len(name) > 50 or len(name) < 1:
@@ -393,45 +395,79 @@ def require_valid_name(name, name_type):
         raise ValidationError(
             'Names should not start or end with whitespace.')
 
-    if re.search('\s\s+', name):
+    if re.search(r'\s\s+', name):
         raise ValidationError(
             'Adjacent whitespace in %s should be collapsed.' % name_type)
 
-    for c in feconf.INVALID_NAME_CHARS:
-        if c in name:
+    for character in feconf.INVALID_NAME_CHARS:
+        if character in name:
             raise ValidationError(
-                'Invalid character %s in %s: %s' % (c, name_type, name))
+                'Invalid character %s in %s: %s' %
+                (character, name_type, name))
 
 
-def capitalize_string(s):
+def capitalize_string(input_string):
     """Converts the first character of a string to its uppercase equivalent (if
     it's a letter), and returns the result.
     """
     # This guards against empty strings.
-    if s:
-        return s[0].upper() + s[1:]
+    if input_string:
+        return input_string[0].upper() + input_string[1:]
     else:
-        return s
-
-
-def get_info_card_url_for_category(category):
-    info_card_color = (
-        feconf.CATEGORIES_TO_COLORS[category] if
-        category in feconf.CATEGORIES_TO_COLORS else feconf.DEFAULT_COLOR)
-    return (
-        '/images/gallery/exploration_background_%s_large.png' %
-        info_card_color)
+        return input_string
 
 
 def get_hex_color_for_category(category):
-    color = (feconf.CATEGORIES_TO_COLORS[category] if
-        category in feconf.CATEGORIES_TO_COLORS else feconf.DEFAULT_COLOR)
-    return feconf.COLORS_TO_HEX_VALUES[color]
+    return (
+        feconf.CATEGORIES_TO_COLORS[category]
+        if category in feconf.CATEGORIES_TO_COLORS
+        else feconf.DEFAULT_COLOR)
 
 
 def get_thumbnail_icon_url_for_category(category):
     icon_name = (
-        category if category in feconf.DEFAULT_CATEGORIES
+        category if category in feconf.ALL_CATEGORIES
         else feconf.DEFAULT_THUMBNAIL_ICON)
     # Remove all spaces from the string.
-    return '/images/gallery/thumbnails/%s.svg' % icon_name.replace(' ', '')
+    return ('%s/assets/images/subjects/%s.svg'
+            % (get_asset_dir_prefix(), icon_name.replace(' ', '')))
+
+
+def _get_short_language_description(full_language_description):
+    """Given one of the descriptions in feconf.ALL_LANGUAGE_CODES, generates
+    the corresponding short description.
+    """
+    if ' (' not in full_language_description:
+        return full_language_description
+    else:
+        ind = full_language_description.find(' (')
+        return full_language_description[:ind]
+
+
+def get_all_language_codes_and_names():
+    return [{
+        'code': lc['code'],
+        'name': _get_short_language_description(lc['description']),
+    } for lc in feconf.ALL_LANGUAGE_CODES]
+
+
+def unescape_encoded_uri_component(escaped_string):
+    """Unescape a string that is encoded with encodeURIComponent."""
+    return urllib.unquote(escaped_string).decode('utf-8')
+
+
+ASSET_DIR_PREFIX = None
+def get_asset_dir_prefix():
+    """Returns prefix for asset directory depending whether dev or prod.
+    It is used as a prefix in urls for images, css and script files.
+    """
+    global ASSET_DIR_PREFIX # pylint: disable=global-statement
+    if not ASSET_DIR_PREFIX:
+        ASSET_DIR_PREFIX = ''
+        if feconf.IS_MINIFIED or not feconf.DEV_MODE:
+            yaml_file_content = dict_from_yaml(
+                get_file_contents('cache_slug.yaml'))
+            cache_slug = yaml_file_content['cache_slug']
+            ASSET_DIR_PREFIX = '/build/%s' % cache_slug
+
+    return ASSET_DIR_PREFIX

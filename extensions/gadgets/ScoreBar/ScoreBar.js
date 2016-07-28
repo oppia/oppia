@@ -21,12 +21,15 @@
  */
 
 oppia.directive('oppiaGadgetScoreBar', [
-  'oppiaHtmlEscaper', 'learnerParamsService',
-  function(oppiaHtmlEscaper, learnerParamsService) {
+  'oppiaHtmlEscaper', 'LearnerParamsService',
+  function(oppiaHtmlEscaper, LearnerParamsService) {
     return {
       restrict: 'E',
       templateUrl: 'gadget/ScoreBar',
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
+      controller: ['$scope', '$attrs', 'UrlInterpolationService',
+      function($scope, $attrs, UrlInterpolationService) {
+        $scope.getStaticResourceUrl = (
+          UrlInterpolationService.getStaticResourceUrl);
         $scope.scoreBarLabel = oppiaHtmlEscaper.escapedJsonToObj(
           $attrs.gadgetName);
         $scope.maxValue = oppiaHtmlEscaper.escapedJsonToObj(
@@ -45,7 +48,7 @@ oppia.directive('oppiaGadgetScoreBar', [
         // maxValue to keep the label text visible.
         $scope.getScoreValue = function() {
           return clamp(
-            learnerParamsService.getValue($scope.scoreBarParamName),
+            LearnerParamsService.getValue($scope.scoreBarParamName),
             0,
             $scope.maxValue
           );

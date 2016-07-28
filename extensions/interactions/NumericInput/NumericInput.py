@@ -28,6 +28,7 @@ class NumericInput(base.BaseInteraction):
     _dependency_ids = []
     answer_type = 'Real'
     instructions = None
+    narrow_instructions = None
     needs_summary = False
 
     _customization_arg_specs = []

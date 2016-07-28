@@ -15,77 +15,68 @@
 /**
  * @fileoverview Utility services for explorations which may be shared by both
  * the learner and editor views.
- *
- * @author bhenning@google.com (Ben Henning)
  */
 
 // A service that provides a number of utility functions useful to both the
 // editor and player.
 oppia.factory('oppiaExplorationHtmlFormatterService', [
-    '$filter', 'extensionTagAssemblerService', 'oppiaHtmlEscaper',
-    function($filter, extensionTagAssemblerService, oppiaHtmlEscaper) {
+  '$filter', 'extensionTagAssemblerService', 'oppiaHtmlEscaper',
+  function($filter, extensionTagAssemblerService, oppiaHtmlEscaper) {
+    return {
+      getInteractionHtml: function(
+          interactionId, interactionCustomizationArgSpecs,
+          labelForFocusTarget) {
+        var htmlInteractionId = $filter('camelCaseToHyphens')(interactionId);
+        var element = $('<oppia-interactive-' + htmlInteractionId + '>');
 
-  var _NULL_INTERACTION_HTML = (
-    '<span style="color: red;"><strong>Error</strong>: ' +
-    'No interaction specified.</span>');
+        element = (
+          extensionTagAssemblerService.formatCustomizationArgAttrs(
+            element, interactionCustomizationArgSpecs));
 
-  return {
-    getInteractionHtml: function(
-        interactionId, interactionCustomizationArgSpecs, labelForFocusTarget) {
-      if (!interactionId) {
-        return _NULL_INTERACTION_HTML;
-      }
+        if (labelForFocusTarget) {
+          element.attr('label-for-focus-target', labelForFocusTarget);
+        }
 
-      var htmlInteractionId = $filter('camelCaseToHyphens')(interactionId);
-      var element = $('<oppia-interactive-' + htmlInteractionId + '>');
+        return element.get(0).outerHTML;
+      },
 
-      element = (
-        extensionTagAssemblerService.formatCustomizationArgAttrs(
-          element, interactionCustomizationArgSpecs));
+      getAnswerHtml: function(
+          answer, interactionId, interactionCustomizationArgs) {
+        // TODO(sll): Get rid of this special case for multiple choice.
+        var interactionChoices = null;
+        if (interactionCustomizationArgs.choices) {
+          interactionChoices = interactionCustomizationArgs.choices.value;
+        }
 
-      if (labelForFocusTarget) {
-        element.attr('label-for-focus-target', labelForFocusTarget);
-      }
+        var el = $(
+          '<oppia-response-' + $filter('camelCaseToHyphens')(
+            interactionId) + '>');
+        el.attr('answer', oppiaHtmlEscaper.objToEscapedJson(answer));
+        if (interactionChoices) {
+          el.attr('choices', oppiaHtmlEscaper.objToEscapedJson(
+            interactionChoices));
+        }
+        return ($('<div>').append(el)).html();
+      },
 
-      return element.get(0).outerHTML;
-    },
-
-    getAnswerHtml: function(
+      getShortAnswerHtml: function(
         answer, interactionId, interactionCustomizationArgs) {
-      // TODO(sll): Get rid of this special case for multiple choice.
-      var interactionChoices = null;
-      if (interactionCustomizationArgs.choices) {
-        interactionChoices = interactionCustomizationArgs.choices.value;
-      }
+        // TODO(sll): Get rid of this special case for multiple choice.
+        var interactionChoices = null;
+        if (interactionCustomizationArgs.choices) {
+          interactionChoices = interactionCustomizationArgs.choices.value;
+        }
 
-      var el = $(
-        '<oppia-response-' + $filter('camelCaseToHyphens')(
-          interactionId) + '>');
-      el.attr('answer', oppiaHtmlEscaper.objToEscapedJson(answer));
-      if (interactionChoices) {
-        el.attr('choices', oppiaHtmlEscaper.objToEscapedJson(
-          interactionChoices));
+        var el = $(
+          '<oppia-short-response-' + $filter('camelCaseToHyphens')(
+            interactionId) + '>');
+        el.attr('answer', oppiaHtmlEscaper.objToEscapedJson(answer));
+        if (interactionChoices) {
+          el.attr('choices', oppiaHtmlEscaper.objToEscapedJson(
+            interactionChoices));
+        }
+        return ($('<span>').append(el)).html();
       }
-      return ($('<div>').append(el)).html();
-    },
-
-    getShortAnswerHtml: function(
-      answer, interactionId, interactionCustomizationArgs) {
-      // TODO(sll): Get rid of this special case for multiple choice.
-      var interactionChoices = null;
-      if (interactionCustomizationArgs.choices) {
-        interactionChoices = interactionCustomizationArgs.choices.value;
-      }
-
-      var el = $(
-        '<oppia-short-response-' + $filter('camelCaseToHyphens')(
-          interactionId) + '>');
-      el.attr('answer', oppiaHtmlEscaper.objToEscapedJson(answer));
-      if (interactionChoices) {
-        el.attr('choices', oppiaHtmlEscaper.objToEscapedJson(
-          interactionChoices));
-      }
-      return ($('<span>').append(el)).html();
-    }
-  };
-}]);
+    };
+  }
+]);

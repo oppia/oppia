@@ -15,8 +15,6 @@
 /**
  * @fileoverview Unit tests for the services and controllers of the exploration
  *   editor page.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 describe('Exploration context service', function() {
@@ -34,6 +32,8 @@ describe('Exploration context service', function() {
         });
       });
     });
+
+    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
     beforeEach(inject(function($injector) {
       ecs = $injector.get('explorationContextService');
@@ -91,12 +91,14 @@ describe('Exploration context service', function() {
       ecs = $injector.get('explorationContextService');
     }));
 
-    it('should throw an error when trying to retrieve the exploration id', function() {
+    it('should throw an error when trying to retrieve the exploration id',
+        function() {
       expect(ecs.getExplorationId).toThrow();
     });
 
-    it('should throw an error when trying to retrieve the page context', function() {
-      expect(ecs.getPageContext).toThrow();
+    it('should retrieve other as page context',
+        function() {
+      expect(ecs.getPageContext()).toBe('other');
     });
   });
 });

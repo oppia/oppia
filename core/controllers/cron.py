@@ -16,18 +16,21 @@
 
 import logging
 
+from pipeline import pipeline
+
 from core import jobs
 from core.controllers import base
+from core.domain import user_jobs_one_off
 from core.platform import models
-email_services = models.Registry.import_email_services()
-(job_models,) = models.Registry.import_models([models.NAMES.job])
-import feconf
 import utils
 
-from pipeline import pipeline
+email_services = models.Registry.import_email_services()
+(job_models,) = models.Registry.import_models([models.NAMES.job])
 
 # The default retention time is 2 days.
 MAX_MAPREDUCE_METADATA_RETENTION_MSECS = 2 * 24 * 60 * 60 * 1000
+TWENTY_FIVE_HOURS_IN_MSECS = 25 * 60 * 60 * 1000
+MAX_JOBS_TO_REPORT_ON = 50
 
 
 def require_cron_or_superadmin(handler):
@@ -51,9 +54,6 @@ class JobStatusMailerHandler(base.BaseHandler):
     @require_cron_or_superadmin
     def get(self):
         """Handles GET requests."""
-        TWENTY_FIVE_HOURS_IN_MSECS = 25 * 60 * 60 * 1000
-        MAX_JOBS_TO_REPORT_ON = 50
-
         # TODO(sll): Get the 50 most recent failed shards, not all of them.
         failed_jobs = jobs.get_stuck_jobs(TWENTY_FIVE_HOURS_IN_MSECS)
         if failed_jobs:
@@ -85,6 +85,16 @@ class JobStatusMailerHandler(base.BaseHandler):
             email_message = 'All MapReduce jobs are running fine.'
 
         email_services.send_mail_to_admin(email_subject, email_message)
+
+
+class CronDashboardStatsHandler(base.BaseHandler):
+    """Handler for appending dashboard stats to a list."""
+
+    @require_cron_or_superadmin
+    def get(self):
+        """Handles GET requests."""
+        user_jobs_one_off.DashboardStatsOneOffJob.enqueue(
+            user_jobs_one_off.DashboardStatsOneOffJob.create_new())
 
 
 class CronMapreduceCleanupHandler(base.BaseHandler):
@@ -137,7 +147,7 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
                 pline['startTimeMs'] < max_start_time_msec)
 
             if (job_started_too_long_ago or
-                (not have_start_time and job_definitely_terminated)):
+                    (not have_start_time and job_definitely_terminated)):
                 # At this point, the map/reduce pipeline is either in a
                 # terminal state, or has taken so long that there's no
                 # realistic possibility that there might be a race condition

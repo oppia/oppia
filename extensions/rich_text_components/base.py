@@ -16,8 +16,6 @@
 
 """Base class for rich-text components."""
 
-__author__ = 'Sean Lip'
-
 import os
 
 from extensions import domain
@@ -48,13 +46,14 @@ class BaseRichTextComponent(object):
     # Whether the component is large enough to discourage its use when the
     # rich-text editor is intended to be lightweight.
     is_complex = False
+    # Whether the component requires the filesystem in some way that
+    # prevents it from being used by unauthorized users.
+    requires_fs = False
+    # Whether the component should be displayed as a block element.
+    is_block_element = False
     # Customization arg specifications for the component, including their
     # descriptions, schemas and default values. Overridden in subclasses.
     _customization_arg_specs = []
-    # The icon to show in the rich-text editor. This is a representation of the
-    # .png file in this rich-text component folder, generated with the
-    # utils.convert_png_to_data_url() function. Overridden in subclasses.
-    icon_data_url = ''
 
     @property
     def id(self):
@@ -65,6 +64,17 @@ class BaseRichTextComponent(object):
         return [
             domain.CustomizationArgSpec(**cas)
             for cas in self._customization_arg_specs]
+
+    @property
+    def preview_url_template(self):
+        """Returns a URL template which can be interpolated to a URL for the
+        image that represents the component in the RTE. The interpolation
+        dictionary used is the component's customization_args dict, extended
+        with an additional 'explorationId' key whose value corresponds to the
+        id of the containing exploration.
+        """
+        return utils.convert_png_to_data_url(os.path.join(
+            feconf.RTE_EXTENSIONS_DIR, self.id, '%sPreview.png' % self.id))
 
     @property
     def html_body(self):
@@ -93,7 +103,11 @@ class BaseRichTextComponent(object):
                 'schema': ca_spec.schema,
             } for ca_spec in self.customization_arg_specs],
             'frontend_name': self.frontend_name,
-            'icon_data_url': self.icon_data_url,
+            'icon_data_url': utils.convert_png_to_data_url(os.path.join(
+                feconf.RTE_EXTENSIONS_DIR, self.id, '%s.png' % self.id)),
             'is_complex': self.is_complex,
+            'requires_fs': self.requires_fs,
             'tooltip': self.tooltip,
+            'is_block_element': self.is_block_element,
+            'preview_url_template': self.preview_url_template
         }

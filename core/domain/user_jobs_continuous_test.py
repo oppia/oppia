@@ -16,9 +16,6 @@
 
 """Tests for user dashboard computations."""
 
-__author__ = 'Sean Lip'
-
-import math
 from collections import defaultdict
 
 from core import jobs_registry
@@ -33,11 +30,32 @@ from core.domain import rights_manager
 from core.domain import stats_jobs_continuous
 from core.domain import user_jobs_continuous
 from core.platform import models
-(exp_models, user_models,) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.user])
-taskqueue_services = models.Registry.import_taskqueue_services()
 from core.tests import test_utils
 import feconf
+import utils
+
+(exp_models, stats_models, user_models,) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.statistics, models.NAMES.user])
+taskqueue_services = models.Registry.import_taskqueue_services()
+
+COLLECTION_ID = 'cid'
+COLLECTION_TITLE = 'Title'
+
+EXP_ID = 'eid'
+EXP_TITLE = 'Title'
+EXP_1_ID = 'eid1'
+EXP_1_TITLE = 'Title1'
+EXP_2_ID = 'eid2'
+EXP_2_TITLE = 'Title2'
+
+FEEDBACK_THREAD_SUBJECT = 'feedback thread subject'
+
+USER_ID = 'user_id'
+ANOTHER_USER_ID = 'another_user_id'
+USER_A_EMAIL = 'user_a@example.com'
+USER_A_USERNAME = 'a'
+USER_B_EMAIL = 'user_b@example.com'
+USER_B_USERNAME = 'b'
 
 
 class ModifiedRecentUpdatesAggregator(
@@ -67,7 +85,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
     the user dashboard.
     """
 
-    ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS = [
+    ALL_CC_MANAGERS_FOR_TESTS = [
         ModifiedRecentUpdatesAggregator]
 
     def _get_expected_activity_created_dict(
@@ -96,14 +114,13 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 collection_id)[-1])
         return most_recent_snapshot['created_on_ms']
 
-    def test_basic_computation_for_explorations(self):
-        with self.swap(
-                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
-            EXP_ID = 'eid'
-            EXP_TITLE = 'Title'
-            USER_ID = 'user_id'
+    def _get_test_context(self):
+        return self.swap(
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.ALL_CC_MANAGERS_FOR_TESTS)
 
+    def test_basic_computation_for_explorations(self):
+        with self._get_test_context():
             self.save_new_valid_exploration(
                 EXP_ID, USER_ID, title=EXP_TITLE, category='Category')
             expected_last_updated_ms = (
@@ -128,14 +145,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                     expected_last_updated_ms))
 
     def test_basic_computation_ignores_automated_exploration_commits(self):
-        with self.swap(
-                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
-            EXP_ID = 'eid'
-            EXP_TITLE = 'title'
-            USER_ID = 'user_id'
-            ANOTHER_USER_ID = 'another_user_id'
-
+        with self._get_test_context():
             self.save_new_exp_with_states_schema_v0(EXP_ID, USER_ID, EXP_TITLE)
 
             # Confirm that the exploration is at version 1.
@@ -171,7 +181,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 ModifiedRecentUpdatesAggregator.get_recent_notifications(
                     USER_ID)[1])
             self.assertEqual(len(recent_notifications), 1)
-            self.assertEqual(recent_notifications[0],
+            self.assertEqual(
+                recent_notifications[0],
                 self._get_expected_activity_created_dict(
                     USER_ID, EXP_ID, EXP_TITLE, 'exploration',
                     feconf.UPDATE_TYPE_EXPLORATION_COMMIT, v1_last_updated_ms))
@@ -204,15 +215,9 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 'subject': 'Update exploration',
             }], recent_notifications)
 
-    def test_basic_computation_with_an_update_after_exploration_is_created(self):
-        with self.swap(
-                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
-            EXP_ID = 'eid'
-            EXP_TITLE = 'Title'
-            USER_ID = 'user_id'
-            ANOTHER_USER_ID = 'another_user_id'
-
+    def test_basic_computation_with_an_update_after_exploration_is_created(
+            self):
+        with self._get_test_context():
             self.save_new_valid_exploration(
                 EXP_ID, USER_ID, title=EXP_TITLE, category='Category')
             # Another user makes a commit; this, too, shows up in the
@@ -242,13 +247,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             }], recent_notifications)
 
     def test_basic_computation_works_if_exploration_is_deleted(self):
-        with self.swap(
-                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
-            EXP_ID = 'eid'
-            EXP_TITLE = 'Title'
-            USER_ID = 'user_id'
-
+        with self._get_test_context():
             self.save_new_valid_exploration(
                 EXP_ID, USER_ID, title=EXP_TITLE, category='Category')
             last_updated_ms_before_deletion = (
@@ -281,21 +280,13 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 recent_notifications[0]['last_updated_ms'])
 
     def test_multiple_exploration_commits_and_feedback_messages(self):
-        with self.swap(
-                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
-            EXP_1_ID = 'eid1'
-            EXP_1_TITLE = 'Title1'
-            EXP_2_ID = 'eid2'
-            EXP_2_TITLE = 'Title2'
-            FEEDBACK_THREAD_SUBJECT = 'feedback thread subject'
-
+        with self._get_test_context():
             self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-            self.EDITOR_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
+            editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
             # User creates an exploration.
             self.save_new_valid_exploration(
-                EXP_1_ID, self.EDITOR_ID, title=EXP_1_TITLE,
+                EXP_1_ID, editor_id, title=EXP_1_TITLE,
                 category='Category')
 
             exp1_last_updated_ms = (
@@ -303,15 +294,15 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             # User gives feedback on it.
             feedback_services.create_thread(
-                EXP_1_ID, None, self.EDITOR_ID, FEEDBACK_THREAD_SUBJECT,
+                EXP_1_ID, None, editor_id, FEEDBACK_THREAD_SUBJECT,
                 'text')
-            thread_id = (
-                feedback_services.get_threadlist(EXP_1_ID)[0]['thread_id'])
-            message = feedback_services.get_messages(thread_id)[0]
+            thread_id = feedback_services.get_all_threads(
+                EXP_1_ID, False)[0].get_thread_id()
+            message = feedback_services.get_messages(EXP_1_ID, thread_id)[0]
 
             # User creates another exploration.
             self.save_new_valid_exploration(
-                EXP_2_ID, self.EDITOR_ID, title=EXP_2_TITLE,
+                EXP_2_ID, editor_id, title=EXP_2_TITLE,
                 category='Category')
             exp2_last_updated_ms = (
                 self._get_most_recent_exp_snapshot_created_on_ms(EXP_2_ID))
@@ -325,41 +316,31 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             recent_notifications = (
                 ModifiedRecentUpdatesAggregator.get_recent_notifications(
-                    self.EDITOR_ID)[1])
+                    editor_id)[1])
             self.assertEqual([(
                 self._get_expected_activity_created_dict(
-                    self.EDITOR_ID, EXP_2_ID, EXP_2_TITLE, 'exploration',
+                    editor_id, EXP_2_ID, EXP_2_TITLE, 'exploration',
                     feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
                     exp2_last_updated_ms)
             ), {
                 'activity_id': EXP_1_ID,
                 'activity_title': EXP_1_TITLE,
-                'author_id': self.EDITOR_ID,
-                'last_updated_ms': message['created_on'],
+                'author_id': editor_id,
+                'last_updated_ms': utils.get_time_in_millisecs(
+                    message.created_on),
                 'subject': FEEDBACK_THREAD_SUBJECT,
                 'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
             }, (
                 self._get_expected_activity_created_dict(
-                    self.EDITOR_ID, EXP_1_ID, EXP_1_TITLE, 'exploration',
+                    editor_id, EXP_1_ID, EXP_1_TITLE, 'exploration',
                     feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
                     exp1_last_updated_ms)
             )], recent_notifications)
 
     def test_making_feedback_thread_does_not_subscribe_to_exploration(self):
-        with self.swap(
-                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
-            EXP_ID = 'eid'
-            EXP_TITLE = 'Title'
-            FEEDBACK_THREAD_SUBJECT = 'feedback thread subject'
-
-            USER_A_EMAIL = 'user_a@example.com'
-            USER_A_USERNAME = 'a'
+        with self._get_test_context():
             self.signup(USER_A_EMAIL, USER_A_USERNAME)
             user_a_id = self.get_user_id_from_email(USER_A_EMAIL)
-
-            USER_B_EMAIL = 'user_b@example.com'
-            USER_B_USERNAME = 'b'
             self.signup(USER_B_EMAIL, USER_B_USERNAME)
             user_b_id = self.get_user_id_from_email(USER_B_EMAIL)
 
@@ -372,9 +353,11 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             # User B starts a feedback thread.
             feedback_services.create_thread(
                 EXP_ID, None, user_b_id, FEEDBACK_THREAD_SUBJECT, 'text')
-            thread_id = (
-                feedback_services.get_threadlist(EXP_ID)[0]['thread_id'])
-            message = feedback_services.get_messages(thread_id)[0]
+            thread_id = feedback_services.get_all_threads(
+                EXP_ID, False)[0].get_thread_id()
+
+            message = feedback_services.get_messages(
+                EXP_ID, thread_id)[0]
 
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
@@ -389,15 +372,16 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             recent_notifications_for_user_b = (
                 ModifiedRecentUpdatesAggregator.get_recent_notifications(
                     user_b_id)[1])
-            expected_feedback_thread_notification_dict = {
+            expected_thread_notification = {
                 'activity_id': EXP_ID,
                 'activity_title': EXP_TITLE,
                 'author_id': user_b_id,
-                'last_updated_ms': message['created_on'],
+                'last_updated_ms': utils.get_time_in_millisecs(
+                    message.created_on),
                 'subject': FEEDBACK_THREAD_SUBJECT,
                 'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
             }
-            expected_exploration_created_notification_dict = (
+            expected_creation_notification = (
                 self._get_expected_activity_created_dict(
                     user_a_id, EXP_ID, EXP_TITLE, 'exploration',
                     feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
@@ -405,29 +389,19 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             # User A sees A's commit and B's feedback thread.
             self.assertEqual(recent_notifications_for_user_a, [
-                expected_feedback_thread_notification_dict,
-                expected_exploration_created_notification_dict
+                expected_thread_notification,
+                expected_creation_notification
             ])
             # User B sees only her feedback thread, but no commits.
             self.assertEqual(recent_notifications_for_user_b, [
-                expected_feedback_thread_notification_dict,
+                expected_thread_notification,
             ])
 
-    def test_subscribing_to_exploration_subscribes_to_its_feedback_threads(self):
-        with self.swap(
-                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
-            EXP_ID = 'eid'
-            EXP_TITLE = 'Title'
-            FEEDBACK_THREAD_SUBJECT = 'feedback thread subject'
-
-            USER_A_EMAIL = 'user_a@example.com'
-            USER_A_USERNAME = 'a'
+    def test_subscribing_to_exploration_subscribes_to_its_feedback_threads(
+            self):
+        with self._get_test_context():
             self.signup(USER_A_EMAIL, USER_A_USERNAME)
             user_a_id = self.get_user_id_from_email(USER_A_EMAIL)
-
-            USER_B_EMAIL = 'user_b@example.com'
-            USER_B_USERNAME = 'b'
             self.signup(USER_B_EMAIL, USER_B_USERNAME)
             user_b_id = self.get_user_id_from_email(USER_B_EMAIL)
 
@@ -440,9 +414,10 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             # User B starts a feedback thread.
             feedback_services.create_thread(
                 EXP_ID, None, user_b_id, FEEDBACK_THREAD_SUBJECT, 'text')
-            thread_id = (
-                feedback_services.get_threadlist(EXP_ID)[0]['thread_id'])
-            message = feedback_services.get_messages(thread_id)[0]
+            thread_id = feedback_services.get_all_threads(
+                EXP_ID, False)[0].get_thread_id()
+            message = feedback_services.get_messages(
+                EXP_ID, thread_id)[0]
 
             # User A adds user B as an editor of the exploration.
             rights_manager.assign_role_for_exploration(
@@ -461,15 +436,16 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             recent_notifications_for_user_b = (
                 ModifiedRecentUpdatesAggregator.get_recent_notifications(
                     user_b_id)[1])
-            expected_feedback_thread_notification_dict = {
+            expected_thread_notification = {
                 'activity_id': EXP_ID,
                 'activity_title': EXP_TITLE,
                 'author_id': user_b_id,
-                'last_updated_ms': message['created_on'],
+                'last_updated_ms': utils.get_time_in_millisecs(
+                    message.created_on),
                 'subject': FEEDBACK_THREAD_SUBJECT,
                 'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
             }
-            expected_exploration_created_notification_dict = (
+            expected_creation_notification = (
                 self._get_expected_activity_created_dict(
                     user_a_id, EXP_ID, EXP_TITLE, 'exploration',
                     feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
@@ -477,23 +453,17 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             # User A sees A's commit and B's feedback thread.
             self.assertEqual(recent_notifications_for_user_a, [
-                expected_feedback_thread_notification_dict,
-                expected_exploration_created_notification_dict
+                expected_thread_notification,
+                expected_creation_notification
             ])
             # User B sees A's commit and B's feedback thread.
             self.assertEqual(recent_notifications_for_user_b, [
-                expected_feedback_thread_notification_dict,
-                expected_exploration_created_notification_dict,
+                expected_thread_notification,
+                expected_creation_notification,
             ])
 
     def test_basic_computation_for_collections(self):
-        with self.swap(
-                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
-            COLLECTION_ID = 'cid'
-            COLLECTION_TITLE = 'Title'
-            USER_ID = 'user_id'
-
+        with self._get_test_context():
             self.save_new_default_collection(
                 COLLECTION_ID, USER_ID, title=COLLECTION_TITLE)
             expected_last_updated_ms = (
@@ -519,14 +489,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                     expected_last_updated_ms))
 
     def test_basic_computation_with_an_update_after_collection_is_created(self):
-        with self.swap(
-                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
-            COLLECTION_ID = 'cid'
-            COLLECTION_TITLE = 'Title'
-            USER_ID = 'user_id'
-            ANOTHER_USER_ID = 'another_user_id'
-
+        with self._get_test_context():
             self.save_new_default_collection(
                 COLLECTION_ID, USER_ID, title=COLLECTION_TITLE)
             # Another user makes a commit; this, too, shows up in the
@@ -561,13 +524,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             }], recent_notifications)
 
     def test_basic_computation_works_if_collection_is_deleted(self):
-        with self.swap(
-                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
-            COLLECTION_ID = 'cid'
-            COLLECTION_TITLE = 'Title'
-            USER_ID = 'user_id'
-
+        with self._get_test_context():
             self.save_new_default_collection(
                 COLLECTION_ID, USER_ID, title=COLLECTION_TITLE)
             last_updated_ms_before_deletion = (
@@ -601,75 +558,110 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 recent_notifications[0]['last_updated_ms'])
 
 
-class ModifiedUserImpactAggregator(
-        user_jobs_continuous.UserImpactAggregator):
-    """A modified UserImpactAggregator that does not start a new
+class ModifiedUserStatsAggregator(
+        user_jobs_continuous.UserStatsAggregator):
+    """A modified UserStatsAggregator that does not start a new
      batch job when the previous one has finished.
     """
     @classmethod
     def _get_batch_job_manager_class(cls):
-        return ModifiedUserImpactMRJobManager
+        return ModifiedUserStatsMRJobManager
 
     @classmethod
     def _kickoff_batch_job_after_previous_one_ends(cls):
         pass
 
 
-class ModifiedUserImpactMRJobManager(
-        user_jobs_continuous.UserImpactMRJobManager):
+class ModifiedUserStatsMRJobManager(
+        user_jobs_continuous.UserStatsMRJobManager):
 
     @classmethod
     def _get_continuous_computation_class(cls):
-        return ModifiedUserImpactAggregator
+        return ModifiedUserStatsAggregator
 
 
-class UserImpactAggregatorTest(test_utils.GenericTestBase):
-    """ Tests the calculation of a user's impact score from the
-    continuous computation of UserImpactAggregator.
+class UserStatsAggregatorTest(test_utils.GenericTestBase):
+    """ Tests the calculation of a user's statistics -
+    impact score, average ratings, total plays
+    from the continuous computation of UserStatsAggregator.
     """
 
     EXP_ID_1 = 'exp_id_1'
     EXP_ID_2 = 'exp_id_2'
+    EXP_ID_3 = 'exp_id_3'
+    EXP_DEFAULT_VERSION = 1
+
+    USER_SESSION_ID = 'session1'
     USER_A_EMAIL = 'a@example.com'
+    USER_B_EMAIL = 'b@example.com'
     USER_A_USERNAME = 'a'
-    # Constants imported from the impact job manager.
-    impact_mr_job_manager = ModifiedUserImpactMRJobManager
-    NUM_RATINGS_SCALER_CUTOFF = impact_mr_job_manager.NUM_RATINGS_SCALER_CUTOFF
-    NUM_RATINGS_SCALER = impact_mr_job_manager.NUM_RATINGS_SCALER
-    MIN_AVERAGE_RATING = impact_mr_job_manager.MIN_AVERAGE_RATING
-    MULTIPLIER = impact_mr_job_manager.MULTIPLIER
-    # The impact score takes the ln of the number of completions as a factor,
-    # so the minimum number of completions to get a nonzero impact score
-    # is 2.
+    USER_B_USERNAME = 'b'
+
     MIN_NUM_COMPLETIONS = 2
-    BELOW_MIN_RATING = int(math.ceil(MIN_AVERAGE_RATING - 1))
-    ABOVE_MIN_RATING = int(math.floor(MIN_AVERAGE_RATING + 1))
+    EXPONENT = 2.0/3
 
     def setUp(self):
-        super(UserImpactAggregatorTest, self).setUp()
+        super(UserStatsAggregatorTest, self).setUp()
         self.num_completions = defaultdict(int)
+        self.num_starts = defaultdict(int)
+        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
+        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
 
-    def _mock_get_statistics(self, exp_id, version):
+        self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
+        self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
+
+    def _mock_get_statistics(self, exp_id, unused_version):
         current_completions = {
-            self.EXP_ID_1:
-                {'complete_exploration_count':
-                    self.num_completions[self.EXP_ID_1]},
-            self.EXP_ID_2:
-                {'complete_exploration_count':
-                    self.num_completions[self.EXP_ID_2]},
+            self.EXP_ID_1: {
+                'complete_exploration_count': (
+                    self.num_completions[self.EXP_ID_1]),
+                'start_exploration_count': (
+                    self.num_starts[self.EXP_ID_1]),
+                'state_hit_counts': {
+                    'state1': {
+                        'first_entry_count': 3,
+                        'no_answer_count': 1
+                    },
+                    'state2': {
+                        'first_entry_count': 7,
+                        'no_answer_count': 1
+                    },
+                }
+            },
+            self.EXP_ID_2: {
+                'complete_exploration_count': (
+                    self.num_completions[self.EXP_ID_2]),
+                'start_exploration_count': (
+                    self.num_starts[self.EXP_ID_2]),
+                'state_hit_counts': {
+                    'state1': {
+                        'first_entry_count': 3,
+                        'no_answer_count': 1
+                    },
+                    'state2': {
+                        'first_entry_count': 7,
+                        'no_answer_count': 1
+                    },
+                }
+            },
+            self.EXP_ID_3: {
+                'start_exploration_count': (
+                    self.num_starts[self.EXP_ID_3]),
+                'state_hit_counts': {}
+            }
         }
         return current_completions[exp_id]
 
     @classmethod
-    def _mock_get_zero_impact_score(cls, exploration_id):
+    def _mock_get_zero_impact_score(cls, unused_exploration_id):
         return 0
 
     @classmethod
-    def _mock_get_below_zero_impact_score(cls, exploration_id):
+    def _mock_get_below_zero_impact_score(cls, unused_exploration_id):
         return -1
 
     @classmethod
-    def _mock_get_positive_impact_score(cls, exploration_id):
+    def _mock_get_positive_impact_score(cls, unused_exploration_id):
         return 1
 
     def _run_computation(self):
@@ -677,28 +669,29 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
         statistics aggregator for explorations to get the correct num
         completion events."""
         with self.swap(stats_jobs_continuous.StatisticsAggregator,
-                    'get_statistics', self._mock_get_statistics):
-            ModifiedUserImpactAggregator.start_computation()
+                       'get_statistics', self._mock_get_statistics):
+            ModifiedUserStatsAggregator.start_computation()
             self.process_and_flush_pending_tasks()
 
-    def _run_exp_impact_calculation_and_assert_equals(
-            self, exploration_id, expected_impact):
-        with self.swap(stats_jobs_continuous.StatisticsAggregator,
-                    'get_statistics', self._mock_get_statistics):
-            self.assertEqual(expected_impact,
-                self.impact_mr_job_manager._get_exp_impact_score(
-                exploration_id))
-
-    def _sign_up_user(self, user_email, username):
-        # Sign up a user, have them create an exploration.
-        self.signup(user_email, username)
-        return self.get_user_id_from_email(user_email)
+    def _generate_user_ids(self, count):
+        """Generate unique user ids to rate an exploration. Each user id needs
+        to be unique since each user can only give an exploration one rating.
+        """
+        return ['user%d' % i for i in range(count)]
 
     def _create_exploration(self, exp_id, user_id):
-        exploration = exp_domain.Exploration.create_default_exploration(
-            exp_id, 'A title', 'A category')
+        exploration = exp_domain.Exploration.create_default_exploration(exp_id)
         exp_services.save_new_exploration(user_id, exploration)
         return exploration
+
+    def _record_start(self, exp_id, exp_version, state):
+        """Record start event to an exploration.
+        Completing the exploration is not necessary here since the total_plays
+        are currently being counted taking into account only the # of starts.
+        """
+        event_services.StartExplorationEventHandler.record(
+            exp_id, exp_version, state, self.USER_SESSION_ID, {},
+            feconf.PLAY_TYPE_NORMAL)
 
     def _rate_exploration(self, exp_id, num_ratings, rating):
         """Create num_ratings ratings for exploration with exp_id,
@@ -706,368 +699,303 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
         """
         # Each user id needs to be unique since each user can only give an
         # exploration one rating.
-        user_ids = ['user%d' % i for i in range(num_ratings)]
+        user_ids = self._generate_user_ids(num_ratings)
         for user_id in user_ids:
             rating_services.assign_rating_to_exploration(
-                user_id, exp_id, rating
-            )
+                user_id, exp_id, rating)
 
-    def _complete_exploration(self, exploration, num_completions):
-        """Log a completion of exploration with id exp_id num_completions
-        times."""
-        exp_version = 1
-        state = exploration.init_state_name
-        session_ids = ['session%d' % i for i in range(num_completions)]
-        for session_id in session_ids:
-            event_services.StartExplorationEventHandler.record(
-                exploration.id, exp_version, state, session_id, {},
-                feconf.PLAY_TYPE_NORMAL)
-            event_services.CompleteExplorationEventHandler.record(
-                exploration.id, exp_version, state, session_id, 27, {},
-                feconf.PLAY_TYPE_NORMAL)
-        # Set the number of completions, so mock can function
-        # correctly.
-        self.num_completions[exploration.id] += num_completions
+    def _record_exploration_rating(self, exp_id, ratings):
+        user_ids = self._generate_user_ids(len(ratings))
+        self.process_and_flush_pending_tasks()
+        for ind, user_id in enumerate(user_ids):
+            event_services.RateExplorationEventHandler.record(
+                exp_id, user_id, ratings[ind], None)
+        self.process_and_flush_pending_tasks()
 
-    def test_user_with_no_explorations_has_no_impact(self):
+    def _record_exploration_rating_for_user(
+            self, exp_id, user_id, rating, old_rating=None):
+        self.process_and_flush_pending_tasks()
+        event_services.RateExplorationEventHandler.record(
+            exp_id, user_id, rating, old_rating)
+        self.process_and_flush_pending_tasks()
+
+    def test_stats_for_user_with_no_explorations(self):
         """Test that a user who is not a contributor on any exploration
-        is not assigned an impact score by the UserImpactMRJobManager.
+        is not assigned value of impact score, total plays and average ratings.
         """
-        self.user_a_id = self._sign_up_user(
-            self.USER_A_EMAIL, self.USER_A_USERNAME)
         self._run_computation()
         user_stats_model = user_models.UserStatsModel.get(
             self.user_a_id, strict=False)
         self.assertIsNone(user_stats_model)
 
-    def test_standard_user_impact_calculation_one_exploration(self):
-        """Test that a user who is a contributor on one exploration that:
-        - has a number of ratings for that exploration above the treshold
-        for the scaler for number of ratings
-        - has an average rating above the minimum average rating
-        - has a number of playthroughs > 1
-        is assigned the correct impact score by the
-        UserImpactMRJobManager.
-        """
-        # Sign up a user and have them create an exploration.
-        self.user_a_id = self._sign_up_user(
-            self.USER_A_EMAIL, self.USER_A_USERNAME)
-        self.exploration = self._create_exploration(
-            self.EXP_ID_1, self.user_a_id)
-        # Give this exploration as many ratings as necessary to avoid
-        # the scaler for number of ratings.
-        self._rate_exploration(
-            self.exploration.id, self.NUM_RATINGS_SCALER_CUTOFF, self.ABOVE_MIN_RATING)
-        # Give this exploration more than one playthrough (so
-        # ln(num_completions) != 0.
-        self._complete_exploration(self.exploration, self.MIN_NUM_COMPLETIONS)
+    def test_standard_user_stats_calculation_one_exploration(self):
+        exploration = self._create_exploration(self.EXP_ID_1, self.user_a_id)
+        # Give this exploration an average rating of 4
+        avg_rating = 4
+        self._rate_exploration(exploration.id, 5, avg_rating)
 
+        # See state counts in _mock_get_statistics(), above.
+        expected_answer_count = 8
+        reach = expected_answer_count ** self.EXPONENT
         expected_user_impact_score = round(
-            math.log(self.MIN_NUM_COMPLETIONS) *
-            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING) *
-            self.MULTIPLIER)
+            ((avg_rating - 2) * reach) ** self.EXPONENT)
 
         # Verify that the impact score matches the expected.
         self._run_computation()
         user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
-        self.assertEqual(user_stats_model.impact_score, expected_user_impact_score)
+        self.assertEqual(
+            user_stats_model.impact_score, expected_user_impact_score)
 
-    def test_standard_user_impact_calculation_multiple_explorations(self):
-        """Test that a user who is a contributor on two explorations that:
-        - have a number of ratings for that exploration above the treshold
-        for the scaler for number of ratings
-        - have an average rating above the minimum average rating
-        - have a number of playthroughs > 1
-        is assigned the correct impact score by the
-        UserImpactMRJobManager.
-        """
-        # Sign up a user and have them create two explorations.
-        self.user_a_id = self._sign_up_user(
-            self.USER_A_EMAIL, self.USER_A_USERNAME)
-        self.exploration_1 = self._create_exploration(
-            self.EXP_ID_1, self.user_a_id)
-        self.exploration_2 = self._create_exploration(
-            self.EXP_ID_2, self.user_a_id)
-        # Give these explorations as many ratings as necessary to avoid
-        # the scaler for number of ratings.
-        self._rate_exploration(
-            self.exploration_1.id, self.NUM_RATINGS_SCALER_CUTOFF, self.ABOVE_MIN_RATING)
-        self._rate_exploration(
-            self.exploration_2.id, self.NUM_RATINGS_SCALER_CUTOFF, self.ABOVE_MIN_RATING)
-        # Give these explorations more than one playthrough (so
-        # ln(num_completions) != 0.
-        self._complete_exploration(self.exploration_1, self.MIN_NUM_COMPLETIONS)
-        self._complete_exploration(self.exploration_2, self.MIN_NUM_COMPLETIONS)
+    def test_exploration_multiple_contributors(self):
+        exploration = self._create_exploration(self.EXP_ID_1, self.user_a_id)
+        # Give this exploration an average rating of 4
+        avg_rating = 4
+        self._rate_exploration(exploration.id, 5, avg_rating)
+        exp_services.update_exploration(self.user_b_id, self.EXP_ID_1, [], '')
 
-        # The user impact score should be the rounded sum of these two impacts
-        # (2 * the same impact).
-        expected_user_impact_score = round(2 *
-            math.log(self.MIN_NUM_COMPLETIONS) *
-            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING) *
-            self.MULTIPLIER)
+        # See state counts in _mock_get_statistics(), above.
+        expected_answer_count = 8
+        reach = expected_answer_count ** self.EXPONENT
+        contrib = 0.5
+        expected_user_impact_score = round(
+            ((avg_rating - 2) * reach * contrib) ** self.EXPONENT)
 
         # Verify that the impact score matches the expected.
         self._run_computation()
         user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
-        self.assertEqual(user_stats_model.impact_score, expected_user_impact_score)
+        self.assertEqual(
+            user_stats_model.impact_score, expected_user_impact_score)
+        user_stats_model = user_models.UserStatsModel.get(self.user_b_id)
+        self.assertEqual(
+            user_stats_model.impact_score, expected_user_impact_score)
 
-    def test_only_yield_when_impact_greater_than_zero(self):
+    def test_standard_user_stats_calculation_multiple_explorations(self):
+        exploration_1 = self._create_exploration(self.EXP_ID_1, self.user_a_id)
+        exploration_2 = self._create_exploration(self.EXP_ID_2, self.user_a_id)
+        avg_rating = 4
+        self._rate_exploration(exploration_1.id, 2, avg_rating)
+        self._rate_exploration(exploration_2.id, 2, avg_rating)
+
+        # See state counts in _mock_get_statistics(), above.
+        expected_answer_count = 8
+        reach = expected_answer_count ** self.EXPONENT
+        impact_per_exp = ((avg_rating - 2) * reach) # * 1 for contribution
+        expected_user_impact_score = round(
+            (impact_per_exp * 2) ** self.EXPONENT)
+
+        # Verify that the impact score matches the expected.
+        self._run_computation()
+        user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
+        self.assertEqual(
+            user_stats_model.impact_score, expected_user_impact_score)
+
+    def test_only_yield_when_rating_greater_than_two(self):
         """Tests that map only yields an impact score for an
         exploration when the impact score is greater than 0."""
-        # Sign up a user and have them create an exploration.
-        self.user_a_id = self._sign_up_user(
-            self.USER_A_EMAIL, self.USER_A_USERNAME)
-        self.exploration = self._create_exploration(
-            self.EXP_ID_1, self.user_a_id)
-        exp_model = exp_models.ExplorationModel.get(self.EXP_ID_1)
+        self._create_exploration(self.EXP_ID_1, self.user_a_id)
 
-        # Use mock impact scores to verify that map only yields when
-        # the impact score > 0.
-        # Should not yield when impact score < 0.
-        with self.swap(user_jobs_continuous.UserImpactMRJobManager,
-                '_get_exp_impact_score',
-                self._mock_get_zero_impact_score):
-            results = self.impact_mr_job_manager.map(exp_model)
-            with self.assertRaises(StopIteration):
-                next(results)
-        with self.swap(user_jobs_continuous.UserImpactMRJobManager,
-                '_get_exp_impact_score',
-                self._mock_get_below_zero_impact_score):
-            results = self.impact_mr_job_manager.map(exp_model)
-            with self.assertRaises(StopIteration):
-                next(results)
-        # Should yield one result when impact score > 0.
-        with self.swap(user_jobs_continuous.UserImpactMRJobManager,
-                '_get_exp_impact_score',
-                self._mock_get_positive_impact_score):
-            results = self.impact_mr_job_manager.map(exp_model)
-            next(results)
-            with self.assertRaises(StopIteration):
-                next(results)
+        # Give two ratings of 1.
+        self._rate_exploration(self.EXP_ID_1, 2, 1)
+        self._run_computation()
+        user_stats_model = user_models.UserStatsModel.get(
+            self.user_a_id, strict=False)
+        self.assertEqual(user_stats_model.impact_score, 0)
+        ModifiedUserStatsAggregator.stop_computation(self.user_a_id)
 
+        # Give two ratings of 2.
+        self._rate_exploration(self.EXP_ID_1, 2, 2)
+        self._run_computation()
+        user_stats_model = user_models.UserStatsModel.get(
+            self.user_a_id, strict=False)
+        self.assertEqual(user_stats_model.impact_score, 0)
+        ModifiedUserStatsAggregator.stop_computation(self.user_a_id)
 
-    def test_impact_for_exp_with_one_completion(self):
-        """Test that when an exploration has only one completion,
-        the impact returned from the impact function is 0.
+        # Give two ratings of 3. The impact score should now be nonzero.
+        self._rate_exploration(self.EXP_ID_1, 2, 3)
+        self._run_computation()
+        user_stats_model = user_models.UserStatsModel.get(
+            self.user_a_id, strict=False)
+        self.assertIsNotNone(user_stats_model)
+        self.assertGreater(user_stats_model.impact_score, 0)
+
+    def test_impact_for_exp_with_no_answers(self):
+        """Test that when an exploration has no answers, it is considered to
+        have no reach.
         """
-        # Sign up a user and have them create an exploration.
-        self.user_a_id = self._sign_up_user(
-            self.USER_A_EMAIL, self.USER_A_USERNAME)
-        self.exploration = self._create_exploration(
-            self.EXP_ID_1, self.user_a_id)
-        # Give this exploration as many ratings as necessary to avoid
-        # the scaler for number of ratings.
-        self._rate_exploration(
-            self.exploration.id, self.NUM_RATINGS_SCALER_CUTOFF, self.ABOVE_MIN_RATING)
-        # Complete the exploration once.
-        self._complete_exploration(self.exploration, 1)
-        # Verify that the impact calculated is 0.
-        self._run_exp_impact_calculation_and_assert_equals(
-            self.exploration.id, 0)
+        exploration = self._create_exploration(self.EXP_ID_3, self.user_a_id)
+        self._rate_exploration(exploration.id, 5, 3)
+        self._run_computation()
+        user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
+        self.assertEqual(user_stats_model.impact_score, 0)
 
     def test_impact_for_exp_with_no_ratings(self):
         """Test that when an exploration has no ratings, the impact returned
         from the impact function is 0.
         """
-        # Sign up a user and have them create an exploration.
-        self.user_a_id = self._sign_up_user(
-            self.USER_A_EMAIL, self.USER_A_USERNAME)
-        self.exploration = self._create_exploration(
+        self._create_exploration(self.EXP_ID_1, self.user_a_id)
+        user_stats_model = user_models.UserStatsModel.get(
+            self.user_a_id, strict=False)
+        self.assertEqual(user_stats_model, None)
+
+    def test_realtime_layer_batch_job_no_ratings_plays(self):
+        self._create_exploration(
             self.EXP_ID_1, self.user_a_id)
-        # Give this exploration more than one playthrough (so
-        # ln(num_completions) != 0.
-        self._complete_exploration(self.exploration, self.MIN_NUM_COMPLETIONS)
-        # Verify that the impact calculated is 0.
-        self._run_exp_impact_calculation_and_assert_equals(
-            self.exploration.id, 0)
+        user_stats = (
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.user_a_id))
+        self.assertEquals(
+            user_stats['total_plays'], 0)
+        self.assertEquals(
+            user_stats['num_ratings'], 0)
+        self.assertEquals(
+            user_stats['average_ratings'], None)
 
-    def test_impact_for_exp_with_avg_rating_not_greater_than_min(self):
-        """Test that an exploration has an average rating less than the
-        minimum average rating, the impact returned from the impact function
-        is 0.
-        """
-        # Sign up a user and have them create an exploration.
-        self.user_a_id = self._sign_up_user(
-            self.USER_A_EMAIL, self.USER_A_USERNAME)
-        self.exploration = self._create_exploration(
+    def test_realtime_layer_batch_job_single_rating(self):
+        self._create_exploration(
             self.EXP_ID_1, self.user_a_id)
-        # Give this exploration more than one playthrough (so
-        # ln(num_completions) != 0.
-        self._complete_exploration(self.exploration, self.MIN_NUM_COMPLETIONS)
+        self._record_exploration_rating(self.EXP_ID_1, [4])
 
-        # Rate this exploration once, with exactly the minimum average
-        # rating.
-        self._rate_exploration(self.exploration.id, 1, self.BELOW_MIN_RATING)
-        # Verify that the impact calculated is 0.
-        self._run_exp_impact_calculation_and_assert_equals(
-            self.exploration.id, 0)
+        user_stats = (
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.user_a_id))
+        self.assertEquals(user_stats['total_plays'], 0)
+        self.assertEquals(user_stats['num_ratings'], 1)
+        self.assertEquals(user_stats['average_ratings'], 4)
 
-        # Rate this exploration again, dropping the average below the minimum.
-        self._rate_exploration(self.exploration.id, 1, self.BELOW_MIN_RATING)
-        # Verify that the impact calculated is still 0.
-        self._run_exp_impact_calculation_and_assert_equals(
-            self.exploration.id, 0)
-
-    def test_impact_with_ratings_scaler(self):
-        """Test that the ratings scaler is being properly applied in the
-        impact calculation.
-        """
-        # Sign up a user and have them create an exploration.
-        self.user_a_id = self._sign_up_user(
-            self.USER_A_EMAIL, self.USER_A_USERNAME)
-        self.exploration = self._create_exploration(
+    def test_realtime_layer_batch_job_single_exploration_one_owner(self):
+        exploration = self._create_exploration(
             self.EXP_ID_1, self.user_a_id)
-        # Give this exploration more than one playthrough (so
-        # ln(num_completions) != 0.
-        self._complete_exploration(self.exploration, self.MIN_NUM_COMPLETIONS)
-        # Rate this exploration only twice, but give rating above minimum
-        # average rating.
-        self._rate_exploration(
-            self.exploration.id, 2, self.ABOVE_MIN_RATING)
 
-        expected_exp_impact_score = (
-            math.log(self.MIN_NUM_COMPLETIONS) *
-            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING) *
-            (self.NUM_RATINGS_SCALER * 2) *
-            self.MULTIPLIER)
-        self._run_exp_impact_calculation_and_assert_equals(
-            self.exploration.id, expected_exp_impact_score)
+        exp_id = self.EXP_ID_1
+        exp_version = self.EXP_DEFAULT_VERSION
+        state = exploration.init_state_name
 
-    def test_scaler_multiplier_independence(self):
-        """Test that when one exploration has less than 10 ratings,
-        the other exploration's impact score is not impacted.
-        """
-        # Sign up a user and have them create two explorations.
-        self.user_a_id = self._sign_up_user(
-            self.USER_A_EMAIL, self.USER_A_USERNAME)
-        self.exploration_1 = self._create_exploration(
+        self._record_start(exp_id, exp_version, state)
+        self._record_start(exp_id, exp_version, state)
+        self._record_exploration_rating(exp_id, [2, 5])
+
+        user_stats = (
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.user_a_id))
+        self.assertEquals(user_stats['total_plays'], 2)
+        self.assertEquals(user_stats['num_ratings'], 2)
+        self.assertEquals(user_stats['average_ratings'], 3.5)
+
+    def test_realtime_layer_batch_job_single_exploration_multiple_owners(self):
+        exploration = self._create_exploration(
             self.EXP_ID_1, self.user_a_id)
-        self.exploration_2 = self._create_exploration(
+
+        rights_manager.assign_role_for_exploration(
+            self.user_a_id, self.EXP_ID_1, self.user_b_id,
+            rights_manager.ROLE_OWNER)
+
+        exp_version = self.EXP_DEFAULT_VERSION
+        exp_id = self.EXP_ID_1
+        state = exploration.init_state_name
+
+        self._record_start(exp_id, exp_version, state)
+        self._record_start(exp_id, exp_version, state)
+        self._record_exploration_rating(exp_id, [3, 4, 5])
+        self._record_exploration_rating(exp_id, [1, 5, 4])
+
+        expected_results = {
+            'total_plays': 2,
+            'num_ratings': 6,
+            'average_ratings': 22/6.0
+        }
+
+        user_stats_1 = (
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.user_a_id))
+        self.assertEquals(
+            user_stats_1['total_plays'], expected_results['total_plays'])
+        self.assertEquals(
+            user_stats_1['num_ratings'], expected_results['num_ratings'])
+        self.assertEquals(
+            user_stats_1['average_ratings'],
+            expected_results['average_ratings'])
+
+        user_stats_2 = (
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.user_b_id))
+        self.assertEquals(
+            user_stats_2['total_plays'], expected_results['total_plays'])
+        self.assertEquals(
+            user_stats_2['num_ratings'], expected_results['num_ratings'])
+        self.assertEquals(
+            user_stats_2['average_ratings'],
+            expected_results['average_ratings'])
+
+    def test_realtime_layer_batch_job_multiple_explorations_one_owner(self):
+        self._create_exploration(
+            self.EXP_ID_1, self.user_a_id)
+        self._create_exploration(
             self.EXP_ID_2, self.user_a_id)
-        # Give one explorations as many ratings as necessary to avoid
-        # the scaler for number of ratings. Give the other only 1.
-        self._rate_exploration(
-            self.exploration_1.id, self.NUM_RATINGS_SCALER_CUTOFF, self.ABOVE_MIN_RATING)
-        self._rate_exploration(
-            self.exploration_2.id, 1, self.ABOVE_MIN_RATING)
-        # Give these explorations more than one playthrough (so
-        # ln(num_completions) != 0.
-        self._complete_exploration(self.exploration_1, self.MIN_NUM_COMPLETIONS)
-        self._complete_exploration(self.exploration_2, self.MIN_NUM_COMPLETIONS)
 
-        # Calculate the expected impact for each exploration.
-        exp_1_impact = (
-            math.log(self.MIN_NUM_COMPLETIONS) *
-            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING) *
-            self.MULTIPLIER)
-        exp_2_impact = (
-            math.log(self.MIN_NUM_COMPLETIONS) *
-            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING) *
-            self.NUM_RATINGS_SCALER *
-            self.MULTIPLIER)
-        # The user impact score should be the rounded sum of these two impacts.
-        expected_user_impact_score = round(exp_1_impact + exp_2_impact)
+        self._record_exploration_rating(self.EXP_ID_1, [4, 5, 2])
+        self._record_exploration_rating(self.EXP_ID_2, [5, 2])
 
-        # Verify that the impact score matches the expected.
+        user_stats = (
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.user_a_id))
+        self.assertEquals(user_stats['total_plays'], 0)
+        self.assertEquals(user_stats['num_ratings'], 5)
+        self.assertEquals(user_stats['average_ratings'], 18/5.0)
+
+    def test_realtime_layer_batch_job_user_rate_same_exp_multiple_times(self):
+        self._create_exploration(
+            self.EXP_ID_1, self.user_a_id)
+
+        exp_id_1 = self.EXP_ID_1
+
+        self._record_exploration_rating_for_user(exp_id_1, self.user_b_id, 5)
+        user_stats = (
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.user_a_id))
+        self.assertEquals(user_stats['total_plays'], 0)
+        self.assertEquals(user_stats['num_ratings'], 1)
+        self.assertEquals(user_stats['average_ratings'], 5)
+
+        self._record_exploration_rating_for_user(
+            exp_id_1, self.user_b_id, 3, old_rating=5)
+        user_stats = (
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.user_a_id))
+        self.assertEquals(user_stats['total_plays'], 0)
+        self.assertEquals(user_stats['num_ratings'], 1)
+        self.assertEquals(user_stats['average_ratings'], 3)
+
+    def test_both_realtime_layer_and_batch_data(self):
+        exploration_1 = self._create_exploration(self.EXP_ID_1, self.user_a_id)
+        exploration_2 = self._create_exploration(self.EXP_ID_2, self.user_a_id)
+
+        exp_id_1 = self.EXP_ID_1
+        exp_id_2 = self.EXP_ID_2
+        exp_version = self.EXP_DEFAULT_VERSION
+        state_1 = exploration_1.init_state_name
+        state_2 = exploration_2.init_state_name
+
+        self._rate_exploration(exp_id_1, 2, 4)
+        self._rate_exploration(exp_id_2, 4, 3)
+
+        # Run the computation and check data from batch job.
         self._run_computation()
         user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
-        self.assertEqual(user_stats_model.impact_score, expected_user_impact_score)
+        self.assertEqual(user_stats_model.total_plays, 0)
+        self.assertEqual(user_stats_model.num_ratings, 6)
+        self.assertEqual(user_stats_model.average_ratings, 20/6.0)
 
-    def test_no_ratings_independence(self):
-        """Test that when one exploration has no ratings, the other exploration's
-        impact score is not impacted.
-        """
-        # Sign up a user and have them create two explorations.
-        self.user_a_id = self._sign_up_user(
-            self.USER_A_EMAIL, self.USER_A_USERNAME)
-        self.exploration_1 = self._create_exploration(
-            self.EXP_ID_1, self.user_a_id)
-        self.exploration_2 = self._create_exploration(
-            self.EXP_ID_2, self.user_a_id)
-        # Give one exploration as many ratings as necessary to avoid
-        # the scaler for number of ratings. Don't give the other any ratings.
-        self._rate_exploration(
-            self.exploration_1.id, self.NUM_RATINGS_SCALER_CUTOFF, self.ABOVE_MIN_RATING)
-        # Give these explorations more than one playthrough (so
-        # ln(num_completions) != 0.
-        self._complete_exploration(self.exploration_1, self.MIN_NUM_COMPLETIONS)
-        self._complete_exploration(self.exploration_2, self.MIN_NUM_COMPLETIONS)
-        # We expect the second exploration to yield 0 (since it has no
-        # ratings), so the expected impact score is just the impact score for
-        # exploration 1.
-        expected_user_impact_score = round(
-            math.log(self.MIN_NUM_COMPLETIONS) *
-            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING) *
-            self.MULTIPLIER)
-        # Verify that the impact score matches the expected.
-        self._run_computation()
-        user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
-        self.assertEqual(user_stats_model.impact_score, expected_user_impact_score)
+        # Stop the batch job. Fire up a few events and check data from realtime
+        # job.
+        ModifiedUserStatsAggregator.stop_computation(self.user_a_id)
+        self._record_start(exp_id_1, exp_version, state_1)
+        self._record_start(exp_id_2, exp_version, state_2)
+        self._record_exploration_rating(exp_id_1, [2, 5])
+        self._record_exploration_rating(exp_id_2, [4, 1])
 
-    def test_min_avg_rating_independence(self):
-        """Test that when one exploration has less than the minimum average
-        rating, the other exploration's impact score is not impacted.
-        """
-        # Sign up a user and have them create two explorations.
-        self.user_a_id = self._sign_up_user(
-            self.USER_A_EMAIL, self.USER_A_USERNAME)
-        self.exploration_1 = self._create_exploration(
-            self.EXP_ID_1, self.user_a_id)
-        self.exploration_2 = self._create_exploration(
-            self.EXP_ID_2, self.user_a_id)
-        # Give these explorations as many ratings as necessary to avoid
-        # the scaler for number of ratings. Rate one above the minimum,
-        # rate the other below.
-        self._rate_exploration(
-            self.exploration_1.id, self.NUM_RATINGS_SCALER_CUTOFF, self.ABOVE_MIN_RATING)
-        self._rate_exploration(
-            self.exploration_2.id, self.NUM_RATINGS_SCALER_CUTOFF,
-                self.BELOW_MIN_RATING)
-        # Give these explorations more than one playthrough (so
-        # ln(num_completions) != 0.
-        self._complete_exploration(self.exploration_1, self.MIN_NUM_COMPLETIONS)
-        self._complete_exploration(self.exploration_2, self.MIN_NUM_COMPLETIONS)
-        # We expect the second exploration to yield 0 (since its average rating
-        # is below the minimum), so the expected impact score is just the
-        # impact score for exploration 1.
-        expected_user_impact_score = round(
-            math.log(self.MIN_NUM_COMPLETIONS) *
-            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING) *
-            self.MULTIPLIER)
-        # Verify that the impact score matches the expected.
-        self._run_computation()
-        user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
-        self.assertEqual(user_stats_model.impact_score, expected_user_impact_score)
-
-    def test_num_completions_independence(self):
-        """Test that when one exploration has less than the minimum number
-        of completions, the other exploration's impact score is not impacted.
-        """
-        # Sign up a user and have them create two explorations.
-        self.user_a_id = self._sign_up_user(
-            self.USER_A_EMAIL, self.USER_A_USERNAME)
-        self.exploration_1 = self._create_exploration(
-            self.EXP_ID_1, self.user_a_id)
-        self.exploration_2 = self._create_exploration(
-            self.EXP_ID_2, self.user_a_id)
-        # Give these explorations as many ratings as necessary to avoid
-        # the scaler for number of ratings.
-        self._rate_exploration(
-            self.exploration_1.id, self.NUM_RATINGS_SCALER_CUTOFF, self.ABOVE_MIN_RATING)
-        self._rate_exploration(
-            self.exploration_2.id, self.NUM_RATINGS_SCALER_CUTOFF, self.ABOVE_MIN_RATING)
-        # Give one exploration the minimum number of completions. Give the other
-        # only one.
-        self._complete_exploration(self.exploration_1, self.MIN_NUM_COMPLETIONS)
-        self._complete_exploration(self.exploration_2, 1)
-        # We expect the second exploration to yield 0 (since its average rating
-        # is below the minimum), so the expected impact score is just the
-        # impact score for exploration 1.
-        expected_user_impact_score = round(
-            math.log(self.MIN_NUM_COMPLETIONS) *
-            (self.ABOVE_MIN_RATING - self.MIN_AVERAGE_RATING) *
-            self.MULTIPLIER)
-        # Verify that the impact score matches the expected.
-        self._run_computation()
-        user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
-        self.assertEqual(user_stats_model.impact_score, expected_user_impact_score)
+        user_stats = (
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.user_a_id))
+        self.assertEquals(user_stats['total_plays'], 2)
+        self.assertEquals(user_stats['num_ratings'], 10)
+        self.assertEquals(user_stats['average_ratings'], 32/10.0)

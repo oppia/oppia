@@ -1,0 +1,83 @@
+<script type="text/ng-template" id="summaryTile/exploration">
+  <md-card class="oppia-activity-summary-tile" ng-class="{'small-width': !isWindowLarge}">
+    <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
+      <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
+        <img class="thumbnail-image" ng-src="<[getThumbnailIconUrl()]>">
+        <h2 class="activity-title protractor-test-exp-summary-tile-title">
+          <span ng-if="isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
+          <span ng-if="!isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
+        </h2>
+
+        <!-- Note that if this is ng-if instead, the avatar area will not detect a mouseover and the tile will behave incorrectly. -->
+        <div ng-show="isWindowLarge && avatarsList.length > 0" class="exploration-summary-avatars" ng-show="avatarsList.length > 0">
+          <div>
+            <circular-image ng-if="avatarsList.length > 0"
+                            src="avatarsList[0].image"
+                            link="avatarsList[0].link"
+                            tooltip="<[avatarsList[0].tooltipText | truncate:14]>"
+                            tooltip-placement="right">
+            </circular-image>
+          </div>
+          <div class="avatars-num-minus-one contributor-indicator contributor-indicator-background" ng-show="avatarsList.length > 1">
+            <span ng-if="!isCommunityOwned()">+</span><[avatarsList.length - 1]>
+          </div>
+
+          <div class="all-avatars" style="display: none;">
+            <div ng-repeat="avatar in avatarsList | limitTo:MAX_AVATARS_TO_DISPLAY-1:1">
+              <circular-image src="avatar.image"
+                              link="avatar.link"
+                              tooltip="<[avatar.tooltipText | truncate:14]>"
+                              tooltip-placement="right">
+              </circular-image>
+            </div>
+
+            <div style="position: relative;" ng-show="avatarsList.length > MAX_AVATARS_TO_DISPLAY">
+              <div class="exploration-black-profile"></div>
+              <div class="num-remaining-avatars" ng-show="avatarsList.length > MAX_AVATARS_TO_DISPLAY">
+                +<[avatarsList.length - MAX_AVATARS_TO_DISPLAY]>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="title-section-mask"></div>
+
+      <div ng-attr-section="<[isWindowLarge ? undefined : 'right-section']>">
+        <div ng-if="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
+          <span ng-if="getObjective()">
+            <[getObjective() | truncateAndCapitalize: 40]>
+          </span>
+          <span ng-if="!getObjective()" translate="I18N_LIBRARY_NO_OBJECTIVE">
+          </span>
+        </div>
+        <ul layout="row" class="metrics" layout-align="space-between center">
+          <li>
+            <span class="protractor-test-exp-summary-tile-rating" ng-class="{'rating-disabled': !getAverageRating()}">
+              <span class="fa fa-star fa-lg" tooltip="<['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]>" tooltip-placement="top">
+              </span>
+              <span ng-if="getAverageRating()">
+                <[getAverageRating() | number:1]>
+              </span>
+              <span ng-if="!getAverageRating()" translate="I18N_LIBRARY_N/A">
+              </span>
+            </span>
+          </li>
+
+          <li>
+            <span class="fa fa-eye fa-lg" tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>" tooltip-placement="top">
+            </span>
+            <[getNumViews() | summarizeNonnegativeNumber]>
+          </li>
+
+          <li>
+            <span ng-if="!wasRecentlyUpdated()">
+              <[getLastUpdatedDatetime()]>
+            </span>
+            <span ng-if="wasRecentlyUpdated()" class="recently-updated" translate="I18N_LIBRARY_UPDATED">
+            </span>
+          </li>
+        </ul>
+      </div>
+    </a>
+  </md-card>
+</script>

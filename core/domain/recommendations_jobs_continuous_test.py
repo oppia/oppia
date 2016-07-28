@@ -16,8 +16,6 @@
 
 """Tests for recommendations_jobs_continuous."""
 
-__author__ = 'Xinyu Wu'
-
 from core import jobs_registry
 from core.domain import recommendations_jobs_continuous
 from core.domain import recommendations_services
@@ -56,7 +54,7 @@ class ExplorationRecommendationsAggregatorUnitTests(
         recommendations_services_test.RecommendationsServicesUnitTests):
     """Test recommendations services."""
 
-    ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS = [
+    ALL_CC_MANAGERS_FOR_TESTS = [
         ModifiedExplorationRecommendationsAggregator]
 
     def test_basic_computation(self):
@@ -67,8 +65,9 @@ class ExplorationRecommendationsAggregatorUnitTests(
             '0.1,0.8,1.0')
 
         with self.swap(
-                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.ALL_CC_MANAGERS_FOR_TESTS
+            ):
             ModifiedExplorationRecommendationsAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
@@ -89,8 +88,9 @@ class ExplorationRecommendationsAggregatorUnitTests(
 
     def test_recommendations_after_changes_in_rights(self):
         with self.swap(
-                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.ALL_CC_MANAGERS_FOR_TESTS
+            ):
             ModifiedExplorationRecommendationsAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
@@ -103,9 +103,9 @@ class ExplorationRecommendationsAggregatorUnitTests(
             self.assertEqual(
                 recommendations, ['exp_id_4', 'exp_id_2', 'exp_id_3'])
 
-            rights_manager.unpublish_exploration(self.ADMIN_ID, 'exp_id_4')
+            rights_manager.unpublish_exploration(self.admin_id, 'exp_id_4')
             ModifiedExplorationRecommendationsAggregator.stop_computation(
-                self.ADMIN_ID)
+                self.admin_id)
             ModifiedExplorationRecommendationsAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(

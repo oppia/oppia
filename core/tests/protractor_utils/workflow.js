@@ -15,8 +15,6 @@
 /**
  * @fileoverview Utilities for exploration creation, publication ect. when
  * carrrying out end-to-end testing with protractor.
- *
- * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var forms = require('./forms.js');
@@ -24,24 +22,17 @@ var editor = require('./editor.js');
 var general = require('./general.js');
 
 // Creates an exploration and opens its editor.
-var createExploration = function(name, category) {
-  createExplorationAndStartTutorial(name, category);
+var createExploration = function() {
+  createExplorationAndStartTutorial();
   editor.exitTutorialIfNecessary();
 };
 
-// Creates a new exploration and wait for the exploration
-// tutorial to start.
-var createExplorationAndStartTutorial = function(name, category) {
-  browser.get(general.GALLERY_URL_SUFFIX);
-  element(by.css('.protractor-test-create-exploration')).click();
-  browser.waitForAngular();
-  element(by.css('.protractor-test-new-exploration-title')).sendKeys(name);
-  forms.AutocompleteDropdownEditor(
-    element(by.css('.protractor-test-new-exploration-category'))
-  ).setValue(category);
-  element(by.css('.protractor-test-submit-new-exploration')).click();
+// Creates a new exploration and wait for the exploration tutorial to start.
+var createExplorationAndStartTutorial = function() {
+  browser.get(general.LIBRARY_URL_SUFFIX);
+  element(by.css('.protractor-test-create-activity')).click();
 
-  // We now want to wait for the editor to fully load.
+  // Wait for the dashboard to transition the creator into the editor page.
   browser.waitForAngular();
 };
 
@@ -51,15 +42,26 @@ var publishExploration = function() {
   element(by.css('.protractor-test-publish-exploration')).click();
   browser.waitForAngular();
   general.waitForSystem();
+
+  var prePublicationButtonElem = element(by.css(
+    '.protractor-test-confirm-pre-publication'));
+  prePublicationButtonElem.isPresent().then(function() {
+    prePublicationButtonElem.click();
+    general.waitForSystem();
+  });
+
   element(by.css('.protractor-test-confirm-publish')).click();
 };
 
 // Creates and publishes a minimal exploration
-var createAndPublishExploration = function(name, category, objective, language) {
-  createExploration(name, category);
+var createAndPublishExploration = function(
+    title, category, objective, language) {
+  createExploration();
   editor.setContent(forms.toRichText('new exploration'));
   editor.setInteraction('TextInput');
   editor.setDefaultOutcome(null, 'final state', true);
+  editor.setTitle(title);
+  editor.setCategory(category);
   editor.setObjective(objective);
   if (language) {
     editor.setLanguage(language);
@@ -85,7 +87,7 @@ var markExplorationAsFeatured = function() {
 
 // Role management (state editor settings tab)
 
-// roleName here is the user-visible form of the role name (e.g. 'Manager')
+// Here, 'roleName' is the user-visible form of the role name (e.g. 'Manager').
 var _addExplorationRole = function(roleName, username) {
   editor.runFromSettingsTab(function() {
     element(by.css('.protractor-test-edit-roles')).click();
@@ -108,14 +110,14 @@ var addExplorationPlaytester = function(username) {
   _addExplorationRole('Playtester', username);
 };
 
-// roleName here is the server-side form of the name (e.g. 'owner')
+// Here, roleName is the server-side form of the name (e.g. 'owner').
 var _getExplorationRoles = function(roleName) {
   var result = editor.runFromSettingsTab(function() {
     var itemName = roleName + 'Name';
     var listName = roleName + 'Names';
     return element.all(by.repeater(
-          itemName + ' in explorationRightsService.' + listName + ' track by $index'
-        )).map(function(elem) {
+      itemName + ' in explorationRightsService.' + listName + ' track by $index'
+    )).map(function(elem) {
       return elem.getText();
     });
   });

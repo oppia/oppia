@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Unit tests for custom filters.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 describe('Testing filters', function() {
@@ -36,7 +34,7 @@ describe('Testing filters', function() {
     'summarizeAnswerGroup',
     'summarizeDefaultOutcome',
     'summarizeNonnegativeNumber',
-    'truncateAndCapitalize',
+    'truncateAndCapitalize'
   ];
 
   beforeEach(angular.mock.module('oppia'));
@@ -212,11 +210,12 @@ describe('Testing filters', function() {
     expect(filter('Line Separator\u2028EOL')).toEqual('Line Separator...');
 
     // Paragraph Separator
-    expect(filter('Paragraph Separator\u2029EOL')).toEqual('Paragraph Separator...');
+    expect(filter('Paragraph Separator\u2029EOL')).toEqual(
+      'Paragraph Separator...');
   }));
 
-  it('should summarize large number to maximum of four significant figures and append metrix prefix',
-       inject(function($filter) {
+  it('should summarize large number to at most 4 s.f. and append metric prefix',
+      inject(function($filter) {
     var filter = $filter('summarizeNonnegativeNumber');
 
     expect(filter(100)).toEqual(100);
@@ -226,10 +225,10 @@ describe('Testing filters', function() {
     expect(filter(12389654281)).toEqual('12.4B');
     expect(filter(897978581123)).toEqual('898.0B');
     expect(filter(476678)).toEqual('476.7K');
-
   }));
 
-  it('should capitalize first letter and truncate string at a word break', inject(function($filter) {
+  it('should capitalize first letter and truncate string at a word break',
+      inject(function($filter) {
     var filter = $filter('truncateAndCapitalize');
 
     // The first word always appears in the result.
@@ -249,15 +248,20 @@ describe('Testing filters', function() {
 
     // If the maximum number of characters is not specified, return
     // the whole input string with the first letter capitalized.
-    expect(filter('capitalize first letter and truncate')).toEqual('Capitalize first letter and truncate');
-    expect(filter('a single sentence with more than twenty one characters', 21)).toEqual(
-      'A single sentence...');
+    expect(filter('capitalize first letter and truncate')).toEqual(
+      'Capitalize first letter and truncate');
+    expect(filter(
+      'a single sentence with more than twenty one characters', 21
+    )).toEqual('A single sentence...');
 
-    expect(filter('a single sentence with more than twenty one characters and all will be shown')).toEqual(
-      'A single sentence with more than twenty one characters and all will be shown');
+    expect(filter(
+      'a single sentence with more than 21 characters and all will be shown'
+    )).toEqual(
+      'A single sentence with more than 21 characters and all will be shown');
 
     // If maximum characters is greater than objective length
     // return whole objective.
-    expect(filter('please do not test empty string', 100)).toEqual('Please do not test empty string');
+    expect(filter('please do not test empty string', 100)).toEqual(
+      'Please do not test empty string');
   }));
 });

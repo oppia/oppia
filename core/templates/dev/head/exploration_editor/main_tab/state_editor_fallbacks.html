@@ -1,0 +1,117 @@
+<div ng-controller="StateFallbacks">
+  <div ng-if="!isCurrentInteractionLinear()">
+    <div class="oppia-editor-header">
+      <strong>Fallbacks</strong>
+    </div>
+
+    <md-card class="oppia-editor-card-with-avatar">
+      <div class="oppia-editor-card-body">
+        <div ng-if="stateFallbacksService.displayed.length > 0">
+          <!-- An HTML element marked ui-sortable should contain only one element,
+          and this element should have an ng-repeat defined on it. See the
+          ui-sortable documentation for more details. -->
+          <ul class="nav nav-stacked nav-pills" role="tablist"
+              ui-sortable="FALLBACK_LIST_SORTABLE_OPTIONS"
+              ng-model="stateFallbacksService.displayed">
+            <!-- Note that adding "track by $index" here seems to mess up the final
+            index in the stop() event handler. -->
+            <li ng-repeat="fallback in stateFallbacksService.displayed"
+                ng-class="{'active': activeFallbackIndex === $index}"
+                class="oppia-rule-block oppia-sortable-fallback oppia-prevent-selection"
+                style="margin-top: 0;">
+              <span class="oppia-fallback-sort-handle"
+                    ng-if="stateFallbacksService.displayed.length > 1"
+                    ng-mousedown="changeActiveFallbackIndex(null)">
+                <img ng-if="editabilityService.isEditable()" ng-src="<[dragDotsImgUrl]>" width="10">
+              </span>
+              <a ng-click="changeActiveFallbackIndex($index)"
+                 class="oppia-rule-tab protractor-test-fallback-tab"
+                 ng-class="{'oppia-rule-tab-active': activeFallbackIndex === $index}">
+                <response-header index="$index"
+                                 summary="getFallbackSummary(fallback)"
+                                 short-summary="getFallbackSummary(fallback)"
+                                 is-active="$index === activeFallbackIndex"
+                                 on-delete-fn="deleteFallback"
+                                 outcome="fallback.outcome">
+                </response-header>
+              </a>
+
+              <div ng-if="activeFallbackIndex === $index">
+                <div class="oppia-editor-card-section">
+                  <div class="oppia-rule-body-container protractor-test-fallback-body-<[$index]>">
+                    <fallback-editor trigger="fallback.trigger"
+                                     outcome="fallback.outcome"
+                                     on-save="onComponentSave"
+                                     class="protractor-test-fallback-body">
+                    </fallback-editor>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </md-card>
+
+    <md-card style="margin: 0; padding: 0;">
+      <div ng-if="editabilityService.isEditableOutsideTutorialMode()">
+        <button type="button" class="btn btn-default btn-lg oppia-add-fallback-button protractor-test-open-add-fallback-modal" ng-click="openAddFallbackModal()">
+          + Add Fallback
+        </button>
+      </div>
+    </md-card>
+  </div>
+</div>
+
+<script type="text/ng-template" id="modals/addFallback">
+  <div class="modal-header protractor-test-add-fallback-modal-header">
+    <h3>Add Fallback</h3>
+  </div>
+
+  <div class="modal-body">
+    <form name="addFallbackForm.outcomeDetailsForm"
+          class="form-inline protractor-test-add-fallback-details">
+      <div class="oppia-rule-details-header">
+        Once the learner has made
+        <schema-based-editor schema="INT_FORM_SCHEMA" local-value="tmpFallback.trigger.customization_args.num_submits.value" class="protractor-test-fallback-num-submits">
+        </schema-based-editor>
+        unsuccessful attempt<span ng-if="tmpFallback.trigger.customization_args.num_submits.value !== 1">s</span>:
+      </div>
+
+      <br>
+
+      <outcome-feedback-editor outcome="tmpFallback.outcome">
+      </outcome-feedback-editor>
+
+      <br>
+
+      <outcome-destination-editor outcome="tmpFallback.outcome">
+      </outcome-destination-editor>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default protractor-test-close-add-fallback-modal" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-success protractor-test-add-new-fallback" ng-click="saveFallback()" ng-disabled="addFallbackForm.outcomeDetailsForm.$invalid || isSelfLoopWithNoFeedback(tmpFallback.outcome)">Save Fallback</button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="modals/deleteFallback">
+  <div class="modal-header">
+    <h3>Delete Fallback</h3>
+  </div>
+
+  <div class="modal-body">
+    <p>
+      Are you sure you want to delete this fallback?
+    </p>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-danger protractor-test-confirm-delete-fallback"
+            ng-click="reallyDelete()">
+      Delete Fallback
+    </button>
+  </div>
+</script>

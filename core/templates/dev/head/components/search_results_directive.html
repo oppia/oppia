@@ -1,0 +1,40 @@
+<script type="text/ng-template" id="components/searchResults">
+  <div>
+    <div ng-if="!someResultsExist" class="oppia-search-results-intro" ng-cloak>
+      <div class="oppia-search-results-no-match">
+        <img ng-src="<[noExplorationsImgUrl]>" alt="No explorations found">
+        <p style="text-align: center;">
+          <span translate="I18N_LIBRARY_NO_EXPLORATION_FOR_QUERY"></span><br><br>
+          {% if not has_fully_registered %}
+            <a href ng-click="onRedirectToLogin('/dashboard?mode=create')"
+               translate="I18N_LIBRARY_CREATE_EXPLORATION_QUESTION"></a>
+          {% else %}
+            <a href="/dashboard?mode=create"
+               translate="I18N_LIBRARY_CREATE_EXPLORATION_QUESTION"></a>
+          {% endif %}
+        </p>
+      </div>
+    </div>
+
+    <activity-tiles-infinity-grid></activity-tiles-infinity-grid>
+  </div>
+</script>
+
+<style>
+  .oppia-search-results-no-match, .oppia-search-results-no-match p {
+    font-size: 0.85em;
+    text-align: center;
+  }
+
+  .oppia-search-results-intro {
+    font-size: 1.6em;
+    padding-bottom: 40px;
+    padding-top: 40px;
+  }
+  @media (max-width: 800px) {
+    .oppia-search-results-intro {
+      margin-left: 20px;
+      margin-right: 20px;
+    }
+  }
+</style>

@@ -51,6 +51,7 @@ class Tabs(base.BaseRichTextComponent):
     frontend_name = 'tabs'
     tooltip = 'Insert tabs (e.g. for hints)'
     is_complex = True
+    is_block_element = True
 
     _customization_arg_specs = [{
         'name': 'tab_contents',
@@ -71,19 +72,3 @@ class Tabs(base.BaseRichTextComponent):
             'content': 'This is a first hint.'
         }],
     }]
-
-    icon_data_url = (
-        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAA'
-        'ABGdBTUEAAK/INwWK6QAAABl0RVh0%0AU29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZ'
-        'TwAAAHWSURBVDjLzZPdS1NxGMf3L3TbXV5EEN50%0A30UJpTdClBBKSgh2Y5cyW0QXISY'
-        '2eiGxklYgGoaE2YtFdTjHvZyO25i6uReOuRc3T7TNnOFOw8bH%0As2MmZUEQRRefm9%2B'
-        'P74fn9zzPzwJY/gTLPxUsjB04Hh06ifq4i%2Bm7R5jp29/82%2BHFiT2NmmBlZfYp%0Af'
-        'MrwcXYU%2BUrte/PS4XDUGLw14Gc8G%2B4gF7pIaXEcTeylGHzEl4SL4L02fUsQ9vtl0m'
-        'nVJJOpML9J%0AbITl0AXKRRfFd%2B3kp84SGWwlMHC6PHXj2N4twYd4PIzH40KSJBOn04'
-        'lX6GM5eI6yLrM234KeamI1%0AbCNxv54HA/bStyZuCiIoimwG3W430lgvmtf6NdyMnmyk'
-        'EDqPeqsOLSJWnqZ/J0gmY/h8XmRZZnL8%0AKuEXHUbZk%2BjxVj6nTrFiVKL21zLnFclm'
-        'MzsFqZRKIODn5VA3c89tzExcI600sBZvIj/dSex2vRmO%0ARiPkctq2oNJlQXhlHC6Rzy'
-        '/xsKcGVhNE75xAsO3GbZTssR8lu%2BCjUMga5ExEUTAnZPlxZJfaqinJ%0ANykp11G6Dj'
-        'FyporB/h5%2BNeIdC9NwcJfe3bJv/c3luvXX9sPSE2t11f/zF/6KYAOj9QWRU1s5XQAA%'
-        '0AAABJRU5ErkJggg%3D%3D%0A'
-    )

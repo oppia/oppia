@@ -18,6 +18,70 @@
 # Bash execution environent set up for all scripts.
 
 
+function maybeInstallDependencies {
+  # Parse additional command line arguments.
+  # Credit: http://stackoverflow.com/questions/192249
+  export SKIP_INSTALLING_THIRD_PARTY_LIBS=$DEFAULT_SKIP_INSTALLING_THIRD_PARTY_LIBS
+  export RUN_MINIFIED_TESTS=$DEFAULT_RUN_MINIFIED_TESTS
+  for i in "$@"; do
+    # Match each space-separated argument passed to the shell file to a separate
+    # case label, based on a pattern. E.g. Match to --skip-install=*, where the
+    # asterisk refers to any characters following the equals sign, other than
+    # whitespace.
+    case $i in
+      --skip-install=*)
+      # Extract the value right of the equal sign by substringing the $i
+      # variable at the equal sign.
+      # http://tldp.org/LDP/abs/html/string-manipulation.html
+      SKIP_INSTALLING_THIRD_PARTY_LIBS="${i#*=}"
+      # Shifts the argument parameters over by one. E.g. $2 becomes $1, etc.
+      shift
+      ;;
+
+      --run-minified-tests=*)
+      RUN_MINIFIED_TESTS="${i#*=}"
+      shift
+      ;;
+
+    esac
+  done
+
+  if [ "$SKIP_INSTALLING_THIRD_PARTY_LIBS" = "false" ]; then
+    # Install third party dependencies
+    # TODO(sll): Make this work with fewer third-party dependencies.
+    bash scripts/install_third_party.sh
+
+    # Ensure that generated JS and CSS files are in place before running the
+    # tests.
+    echo ""
+    echo "  Running build task with concatenation only "
+    echo ""
+
+    $NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js build
+
+    install_node_module karma 0.12.16
+    install_node_module karma-jasmine 0.1.0
+    install_node_module karma-jasmine-jquery 0.1.1
+    install_node_module karma-json-fixtures-preprocessor 0.0.6
+    install_node_module karma-coverage 0.5.2
+    install_node_module karma-ng-html2js-preprocessor 0.1.0
+    install_node_module karma-chrome-launcher 0.1.4
+    install_node_module protractor 3.3.0
+    install_node_module protractor-screenshot-reporter 0.0.5
+    install_node_module jasmine-spec-reporter 2.2.2
+
+    $NODE_MODULE_DIR/.bin/webdriver-manager update
+  fi
+
+  if [ "$RUN_MINIFIED_TESTS" = "true" ]; then
+    echo ""
+    echo "  Running build task with concatenation and minification"
+    echo ""
+
+    $NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js build --minify=True
+  fi
+}
+
 if [ "$SETUP_DONE" ]; then
   echo 'Environment setup completed.'
   return 0
@@ -76,22 +140,8 @@ export MACHINE_TYPE=`uname -m`
 export OS=`uname`
 
 if [ ! "${OS}" == "Darwin" -a ! "${OS}" == "Linux" ]; then
-  # If the OS is Windows, node will be installed globally.
-  export NPM_CMD=npm
-else
-  # Otherwise, npm will be installed locally, in NODE_PATH.
-  export NPM_CMD=$NODE_PATH/bin/npm
-  # Also, change ownership of $NODE_MODULE_DIR. (For Windows,
-  # chown does not seem to be available in git bash.)
-  chown -R $ME $NODE_MODULE_DIR
-  chmod -R 744 $NODE_MODULE_DIR
-fi
-
-export NPM_INSTALL="$NPM_CMD install"
-
-# Node is a requirement for all installation scripts. Here, we check if the OS
-# supports node.js installation; if not, we exit with an error.
-if [ ! "${OS}" == "Darwin" -a ! "${OS}" == "Linux" ]; then
+  # Node is a requirement for all installation scripts. Here, we check if the
+  # OS supports node.js installation; if not, we exit with an error.
   echo ""
   echo "  WARNING: Unsupported OS for installation of node.js."
   echo "  If you are running this script on Windows, see the instructions"
@@ -102,7 +152,12 @@ if [ ! "${OS}" == "Darwin" -a ! "${OS}" == "Linux" ]; then
   echo "  STATUS: Installation completed except for node.js. Exiting."
   echo ""
   return 1
+else
+  # Otherwise, npm will be installed locally, in NODE_PATH.
+  export NPM_CMD=$NODE_PATH/bin/npm
 fi
+
+export NPM_INSTALL="$NPM_CMD install"
 
 # Download and install node.js.
 echo Checking if node.js is installed in $TOOLS_DIR
@@ -126,20 +181,30 @@ if [ ! -d "$NODE_PATH" ]; then
   tar xzf node-download.tgz --directory $TOOLS_DIR
   mv $TOOLS_DIR/$NODE_FILE_NAME $NODE_PATH
   rm node-download.tgz
+
+  # Change ownership of $NODE_MODULE_DIR.
+  # Note: on some machines, these commands seem to take quite a long time.
+  chown -R $ME $NODE_MODULE_DIR
+  chmod -R 744 $NODE_MODULE_DIR
 fi
 
-# Prevent SELF_SIGNED_CERT_IN_CHAIN error as per
-#
-#   http://blog.npmjs.org/post/78085451721
-#
-$NPM_CMD config set ca ""
-
 # Adjust path to support the default Chrome locations for Unix, Windows and Mac OS.
-if [[ $TRAVIS == 'true' ]]; then
-  export CHROME_BIN="chromium-browser"
+if [ "$TRAVIS" = true ]; then
+  export CHROME_BIN="/usr/bin/chromium-browser"
+elif [ "$VAGRANT" = true ]; then
+  # XVFB is required for headless testing in Vagrant
+  sudo apt-get install xvfb chromium-browser
+  export CHROME_BIN="/usr/bin/chromium-browser"
+  # Used in frontend and e2e tests. Only gets set if using Vagrant VM.
+  export XVFB_PREFIX="/usr/bin/xvfb-run"
+  # Enforce proper ownership on oppia, oppia_tools, and node_modules or else NPM installs will fail.
+  sudo chown -R vagrant.vagrant /home/vagrant/oppia /home/vagrant/oppia_tools /home/vagrant/node_modules
 elif [ -f "/usr/bin/google-chrome" ]; then
   # Unix.
   export CHROME_BIN="/usr/bin/google-chrome"
+elif [ -f "/usr/bin/chromium-browser" ]; then
+  # Unix.
+  export CHROME_BIN="/usr/bin/chromium-browser"
 elif [ -f "/c/Program Files (x86)/Google/Chrome/Application/chrome.exe" ]; then
   # Windows.
   export CHROME_BIN="/c/Program Files (x86)/Google/Chrome/Application/chrome.exe"
@@ -159,14 +224,14 @@ function test_python_version() {
   else
     echo "Unrecognizable Python command output: ${PYTHON_VERSION}"
     # Return a false condition if output of tested command is unrecognizable.
-    return 0
-  fi
-  if [[ "${PYTHON_VERSION}" = "${EXPECTED_PYTHON_VERSION_PREFIX}*" ]]; then
-    # The value '1' indicates a true return value,
-    # indicating the version of the input Python command is the expected Python version.
     return 1
-  else
+  fi
+  if [[ "${PYTHON_VERSION}" = ${EXPECTED_PYTHON_VERSION_PREFIX}* ]]; then
+    # Return 0 to indicate a successful match.
+    # Return 1 to indicate a failed match.
     return 0
+  else
+    return 1
   fi
 }
 
@@ -199,7 +264,7 @@ export PYTHON_CMD
 echo "Generating list of installed node modules..."
 NPM_INSTALLED_MODULES="$($NPM_CMD list)"
 export NPM_INSTALLED_MODULES
-echo "done."
+echo "Generation completed."
 
 install_node_module() {
   # Usage: install_node_module [module_name] [module_version]

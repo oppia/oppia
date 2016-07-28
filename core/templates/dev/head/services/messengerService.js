@@ -17,8 +17,6 @@
  * communication with a parent iframe should pass through here. (This
  * communication should be outbound only; reverse communication should NOT
  * be attempted due to cross-domain security issues.)
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.factory('messengerService', ['$log', '$window', function($log, $window) {
@@ -29,38 +27,37 @@ oppia.factory('messengerService', ['$log', '$window', function($log, $window) {
     return typeof b === 'boolean';
   };
 
-
   MESSAGE_VALIDATORS = {
-    'heightChange': function(payload) {
+    heightChange: function(payload) {
       return isPositiveInteger(payload.height) && isBoolean(payload.scroll);
     },
-    'explorationLoaded': function(payload) {
+    explorationLoaded: function() {
       return true;
     },
-    'stateTransition': function(payload) {
+    stateTransition: function(payload) {
       return Boolean(payload.oldStateName) || Boolean(payload.newStateName);
     },
-    'explorationReset': function(payload) {
+    explorationReset: function(payload) {
       return Boolean(payload.stateName);
     },
-    'explorationCompleted': function(payload) {
+    explorationCompleted: function() {
       return true;
     }
   };
 
   var getPayload = {
-    'heightChange': function(data) {
+    heightChange: function(data) {
       return {
         height: data.height,
         scroll: data.scroll
       };
     },
-    'explorationLoaded': function(data) {
+    explorationLoaded: function(data) {
       return {
         explorationVersion: data.explorationVersion
       };
     },
-    'stateTransition': function(data) {
+    stateTransition: function(data) {
       return {
         explorationVersion: data.explorationVersion,
         oldStateName: data.oldStateName,
@@ -68,13 +65,13 @@ oppia.factory('messengerService', ['$log', '$window', function($log, $window) {
         newStateName: data.newStateName
       };
     },
-    'explorationCompleted': function(data) {
+    explorationCompleted: function(data) {
       return {
         explorationVersion: data.explorationVersion
       };
     },
     // DEPRECATED
-    'explorationReset': function(data) {
+    explorationReset: function(data) {
       return {
         stateName: data
       };
@@ -125,7 +122,7 @@ oppia.factory('messengerService', ['$log', '$window', function($log, $window) {
           return;
         }
 
-        if (hashDict.version == '0.0.0' || hashDict.version == '0.0.1') {
+        if (hashDict.version === '0.0.0' || hashDict.version === '0.0.1') {
           $log.info('Posting message to parent: ' + messageTitle);
 
           var payload = getPayload[messageTitle](messageData);
@@ -140,7 +137,7 @@ oppia.factory('messengerService', ['$log', '$window', function($log, $window) {
             title: messageTitle,
             payload: payload
           };
-          if (hashDict.version == '0.0.0') {
+          if (hashDict.version === '0.0.0') {
             // Ensure backwards-compatibility.
             objToSendToParent.sourceTagId = hashDict.tagid;
             objToSendToParent.secret = hashDict.secret;

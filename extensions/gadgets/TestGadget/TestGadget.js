@@ -23,7 +23,6 @@
 
 oppia.directive('oppiaGadgetTestGadget', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
-
     // Maximum and minimum number of tips that an TestGadget can hold.
     var _MAX_TIP_COUNT = 3;
     var _MIN_TIP_COUNT = 1;
@@ -31,48 +30,58 @@ oppia.directive('oppiaGadgetTestGadget', [
     return {
       restrict: 'E',
       templateUrl: 'gadget/TestGadget',
-      controller: ['$scope', '$attrs', '$modal', function ($scope, $attrs, $modal) {
-        $scope.testGadgetAdviceResources = oppiaHtmlEscaper.escapedJsonToObj(
-        	$attrs.adviceObjectsWithValue);
+      controller: [
+        '$scope', '$attrs', '$modal', 'UrlInterpolationService',
+        function($scope, $attrs, $modal, UrlInterpolationService) {
+          $scope.testGadgetAdviceResources = oppiaHtmlEscaper.escapedJsonToObj(
+            $attrs.adviceObjectsWithValue);
 
-        $scope.validate = function() {
-          var tipCount = $scope.testGadgetAdviceResources.length;
-          if (tipCount > _MAX_TIP_COUNT) {
-            var validationError = 'TestGadget is limited to ' +
-              _MAX_TIP_COUNT + ' tip' + (_MAX_TIP_COUNT>1 ? 's' : '') + '.';
-            return validationError;
-          } else if (tipCount < _MIN_TIP_COUNT) {
-            var validationError = 'TestGadget needs at least ' +
-              _MIN_TIP_COUNT + ' tip' + (_MIN_TIP_COUNT>1 ? 's' : '') + '.';
-            return validationError;
-          } else {
-            return '';
-          }
-        };
+          $scope.validate = function() {
+            var tipCount = $scope.testGadgetAdviceResources.length;
+            if (tipCount > _MAX_TIP_COUNT) {
+              var validationError = 'TestGadget is limited to ' +
+                _MAX_TIP_COUNT + ' tip' + (_MAX_TIP_COUNT > 1 ? 's' : '') + '.';
+              return validationError;
+            } else if (tipCount < _MIN_TIP_COUNT) {
+              var validationError = 'TestGadget needs at least ' +
+                _MIN_TIP_COUNT + ' tip' + (_MIN_TIP_COUNT > 1 ? 's' : '') + '.';
+              return validationError;
+            } else {
+              return '';
+            }
+          };
 
-        $scope.overlayAdviceModal = function(adviceResourceIndex) {
-          $modal.open({
-            templateUrl: '../extensions/gadgets/TestGadget/static/html/test_gadget_overlay.html',
-            controller: 'TestGadgetAdviceModalCtrl',
-            backdrop: true,
-            resolve: {
-              adviceTitle: function() {
-                return $scope.testGadgetAdviceResources[adviceResourceIndex].adviceTitle;
-              },
-              adviceHtml: function() {
-                return $scope.testGadgetAdviceResources[adviceResourceIndex].adviceHtml;
+          $scope.overlayAdviceModal = function(adviceResourceIndex) {
+            $modal.open({
+              templateUrl: (
+                UrlInterpolationService.getStaticResourceUrl(
+                '/extensions/gadgets/TestGadget/static/html/' +
+                'test_gadget_overlay.html')),
+              controller: 'TestGadgetAdviceModalCtrl',
+              backdrop: true,
+              resolve: {
+                adviceTitle: function() {
+                  return $scope.testGadgetAdviceResources[
+                    adviceResourceIndex].adviceTitle;
+                },
+                adviceHtml: function() {
+                  return $scope.testGadgetAdviceResources[
+                    adviceResourceIndex].adviceHtml;
+                }
               }
-            },
-          })
-        };
-      }],
-    }
+            });
+          };
+        }
+      ]
+    };
   }
 ]);
 
-oppia.controller('TestGadgetAdviceModalCtrl',
-  ['$scope', 'adviceTitle', 'adviceHtml',
-  function ($scope, adviceTitle, adviceHtml) {
+oppia.controller('TestGadgetAdviceModalCtrl', [
+  '$scope', 'adviceTitle', 'adviceHtml',
+  function($scope, adviceTitle, adviceHtml) {
     $scope.adviceTitle = adviceTitle;
     $scope.adviceHtml = adviceHtml;
-}]);
+    $scope.extensionResourcePrefix = GLOBALS.ASSET_DIR_PREFIX;
+  }
+]);

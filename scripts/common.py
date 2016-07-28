@@ -46,6 +46,7 @@ class CD(object):
     """Context manager for changing the current working directory."""
     def __init__(self, new_path):
         self.new_path = new_path
+        self.saved_path = None
 
     def __enter__(self):
         self.saved_path = os.getcwd()

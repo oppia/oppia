@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the editor components of the LogicProof interaction.
- * @author Jacob Davis (jacobdavis11@gmail.com)
+ * @fileoverview Unit tests for the editor components of the LogicProof
+ * interaction.
  */
 
 describe('Build questions', function() {
@@ -37,8 +37,8 @@ describe('Build questions', function() {
       logicProofTeacher.buildQuestion(
         'R(albert)\u2227R(betty)', 'p', logicProofData.BASE_VOCABULARY
       ).results).toEqual([{
-        top_kind_name: "variable",
-        top_operator_name: "p",
+        top_kind_name: 'variable',
+        top_operator_name: 'p',
         arguments: [],
         dummies: []
       }]);

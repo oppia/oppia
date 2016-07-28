@@ -16,23 +16,20 @@
 
 """System for computing recommendations for explorations and users."""
 
-__author__ = 'Xinyu Wu'
-
 import csv
 import datetime
 import json
 import StringIO
 
-from core.domain import exp_services
 from core.domain import rights_manager
 from core.platform import models
-(exp_models, recommendations_models,) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.recommendations])
 import feconf
 
+(exp_models, recommendations_models,) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.recommendations])
 
-DEFAULT_TOPIC_SIMILARITIES_STRING = (
-"""Architecture,Art,Biology,Business,Chemistry,Computing,Economics,Education,Engineering,Environment,Geography,Government,Hobbies,Languages,Law,Life Skills,Mathematics,Medicine,Music,Philosophy,Physics,Programming,Psychology,Puzzles,Reading,Religion,Sport,Statistics,Welcome
+# pylint: disable=line-too-long
+DEFAULT_TOPIC_SIMILARITIES_STRING = ("""Architecture,Art,Biology,Business,Chemistry,Computing,Economics,Education,Engineering,Environment,Geography,Government,Hobbies,Languages,Law,Life Skills,Mathematics,Medicine,Music,Philosophy,Physics,Programming,Psychology,Puzzles,Reading,Religion,Sport,Statistics,Welcome
 1.0,0.9,0.2,0.4,0.1,0.2,0.3,0.3,0.6,0.6,0.4,0.2,0.5,0.5,0.5,0.3,0.5,0.3,0.3,0.5,0.4,0.1,0.6,0.1,0.1,0.1,0.1,0.1,0.3
 0.9,1.0,0.1,0.6,0.1,0.1,0.6,0.6,0.2,0.3,0.3,0.2,0.5,0.7,0.6,0.2,0.3,0.2,0.9,0.7,0.3,0.1,0.6,0.1,0.1,0.1,0.1,0.1,0.3
 0.2,0.1,1.0,0.2,0.8,0.3,0.2,0.3,0.3,0.7,0.4,0.2,0.2,0.1,0.1,0.9,0.4,0.8,0.1,0.1,0.4,0.1,0.6,0.1,0.1,0.1,0.1,0.6,0.3
@@ -62,6 +59,39 @@ DEFAULT_TOPIC_SIMILARITIES_STRING = (
 0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.2,0.1,0.1,0.1,0.2,0.6,0.1,0.1,0.3,0.1,0.1,0.1,0.1,0.3,0.1,0.2,0.1,0.1,0.2,1.0,0.3,0.3
 0.1,0.1,0.6,0.5,0.3,0.6,0.7,0.2,0.5,0.3,0.2,0.4,0.2,0.1,0.2,0.4,0.8,0.1,0.1,0.3,0.4,0.6,0.4,0.5,0.1,0.1,0.3,1.0,0.3
 0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,1.0""")
+# pylint: enable=line-too-long
+
+RECOMMENDATION_CATEGORIES = [
+    'Architecture',
+    'Art',
+    'Biology',
+    'Business',
+    'Chemistry',
+    'Computing',
+    'Economics',
+    'Education',
+    'Engineering',
+    'Environment',
+    'Geography',
+    'Government',
+    'Hobbies',
+    'Languages',
+    'Law',
+    'Life Skills',
+    'Mathematics',
+    'Medicine',
+    'Music',
+    'Philosophy',
+    'Physics',
+    'Programming',
+    'Psychology',
+    'Puzzles',
+    'Reading',
+    'Religion',
+    'Sport',
+    'Statistics',
+    'Welcome'
+]
 
 
 def get_topic_similarities_dict():
@@ -104,8 +134,9 @@ def _create_default_topic_similarities():
 
     Returns the newly created TopicSimilaritiesModel."""
 
-    topic_similarities_dict = {topic: {}
-                               for topic in feconf.DEFAULT_CATEGORIES}
+    topic_similarities_dict = {
+        topic: {} for topic in RECOMMENDATION_CATEGORIES
+    }
     data = DEFAULT_TOPIC_SIMILARITIES_STRING.splitlines()
     data = list(csv.reader(data))
     topics_list = data[0]
@@ -125,8 +156,8 @@ def get_topic_similarity(topic_1, topic_2):
     not, it returns the default similarity if the topics are different or 1 if
     the topics are the same."""
 
-    if (topic_1 in feconf.DEFAULT_CATEGORIES and
-            topic_2 in feconf.DEFAULT_CATEGORIES):
+    if (topic_1 in RECOMMENDATION_CATEGORIES and
+            topic_2 in RECOMMENDATION_CATEGORIES):
         topic_similarities = get_topic_similarities_dict()
         return topic_similarities[topic_1][topic_2]
     else:
@@ -145,11 +176,11 @@ def get_topic_similarities_as_csv():
 
     output = StringIO.StringIO()
     writer = csv.writer(output)
-    writer.writerow(feconf.DEFAULT_CATEGORIES)
+    writer.writerow(RECOMMENDATION_CATEGORIES)
 
     topic_similarities = get_topic_similarities_dict()
-    for topic in feconf.DEFAULT_CATEGORIES:
-        topic_similarities_row = [value for key, value in sorted(
+    for topic in RECOMMENDATION_CATEGORIES:
+        topic_similarities_row = [value for _, value in sorted(
             topic_similarities[topic].iteritems())]
         writer.writerow(topic_similarities_row)
 
@@ -178,7 +209,7 @@ def _validate_topic_similarities(data):
             'Length of topic similarities columns does not match topic list.')
 
     for topic in topics_list:
-        if topic not in feconf.DEFAULT_CATEGORIES:
+        if topic not in RECOMMENDATION_CATEGORIES:
             raise Exception('Topic %s not in list of known topics.' % topic)
 
     for index, topic in enumerate(topics_list):
@@ -255,16 +286,16 @@ def get_item_similarity(
 
     similarity_score = 0
 
-    if (compared_exp_status == rights_manager.ACTIVITY_STATUS_PRIVATE):
+    if compared_exp_status == rights_manager.ACTIVITY_STATUS_PRIVATE:
         return 0
-    elif (compared_exp_status == rights_manager.ACTIVITY_STATUS_PUBLICIZED):
+    elif compared_exp_status == rights_manager.ACTIVITY_STATUS_PUBLICIZED:
         similarity_score += 1
 
     similarity_score += get_topic_similarity(
         reference_exp_category, compared_exp_category) * 5
     if reference_exp_owner_ids == compared_exp_owner_ids:
         similarity_score += 1
-    if (reference_exp_language_code == compared_exp_language_code):
+    if reference_exp_language_code == compared_exp_language_code:
         similarity_score += 2
 
     time_now = datetime.datetime.utcnow()

@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Controllers for the form builder test page.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.directive('formOverlay', ['recursionHelper', function(recursionHelper) {
@@ -30,11 +28,11 @@ oppia.directive('formOverlay', ['recursionHelper', function(recursionHelper) {
     restrict: 'E',
     compile: recursionHelper.compile,
     controller: ['$scope', function($scope) {
-      $scope.$watch('savedValue', function(newValue, oldValue) {
+      $scope.$watch('savedValue', function() {
         $scope.localValue = angular.copy($scope.savedValue);
       });
 
-      $scope.submitValue = function(value) {
+      $scope.submitValue = function() {
         $scope.savedValue = angular.copy($scope.localValue);
         alert($scope.savedValue);
       };
@@ -44,7 +42,6 @@ oppia.directive('formOverlay', ['recursionHelper', function(recursionHelper) {
     }]
   };
 }]);
-
 
 oppia.controller('FormBuilderTests', [
     '$scope', 'parameterSpecsService', function($scope, parameterSpecsService) {
@@ -149,7 +146,9 @@ oppia.controller('FormBuilderTests', [
   }];
 
   $scope.compositeForms = [{
-    name: 'Dict with a bool, a unicode string and a list of ints. The string must be either \'abc\' or \'def\'.',
+    name: (
+      'Dict with a bool, a unicode string and a list of ints. ' +
+      'The string must be either \'abc\' or \'def\'.'),
     schema: {
       type: 'dict',
       properties: [{
@@ -216,7 +215,7 @@ oppia.controller('FormBuilderTests', [
         properties: [{
           name: 'intField',
           schema: {
-            type: 'int',
+            type: 'int'
           }
         }, {
           name: 'htmlField',

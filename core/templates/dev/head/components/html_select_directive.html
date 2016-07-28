@@ -1,0 +1,52 @@
+<script type="text/ng-template" id="components/htmlSelect">
+  <div class="oppia-html-select">
+    <button class="btn btn-default dropdown-toggle oppia-html-select-selection" type="button" aria-expanded="false" data-toggle="dropdown">
+      <div class="oppia-html-select-selection-element" angular-html-bind="options[selection].val"></div>
+      <span class="caret oppia-html-select-selection-caret"></span>
+    </button>
+    <ul class="dropdown-menu" style="width: inherit;">
+      <li ng-repeat="choice in options">
+        <a class="oppia-html-select-option protractor-test-html-select-option" angular-html-bind="choice.val" ng-click="select(choice.id)">
+        </a>
+      </li>
+    </ul>
+  </div>
+</script>
+
+<style>
+  .oppia-html-select {
+    position: relative;
+    width: 80%;
+  }
+  .oppia-html-select .oppia-html-select-selection-element {
+    overflow: hidden;
+    padding-top: 5px;
+  }
+  .oppia-html-select .oppia-html-select-selection-caret {
+    bottom: 0;
+    color: black;
+    margin: auto;
+    position: absolute;
+    right: 5px;
+    top: 0;
+  }
+  .oppia-html-select .oppia-html-select-selection {
+    padding-right: 20px;
+    position: relative;
+    text-decoration: none;
+    width: inherit;
+  }
+  .oppia-html-select .oppia-html-select-option {
+    padding-top: 10px;
+    overflow: hidden;
+    margin-right: 10px;
+  }
+  .oppia-html-select .oppia-html-select-option:hover {
+    background: #1485E6;
+    color: white;
+  }
+  .oppia-html-select .oppia-html-select-option oppia-noninteractive-image {
+    display: inline-block;
+    margin-bottom: 0;
+  }
+</style>

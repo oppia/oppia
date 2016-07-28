@@ -24,8 +24,8 @@ Run this script from the Oppia root directory:
 
 """
 
-__author__ = 'Sean Lip (sll@google.com)'
-
+# Pylint has issues with import order of argparse.
+#pylint: disable=wrong-import-order
 import argparse
 import cookielib
 import json
@@ -35,6 +35,7 @@ import threading
 import time
 import urllib
 import urllib2
+#pylint: enable=wrong-import-order
 
 
 XSSI_PREFIX = ')]}\'\n'
@@ -87,9 +88,9 @@ class WebSession(object):
             common_headers = {}
         self.uid = uid
         self.common_headers = common_headers
-        self.cj = cookielib.CookieJar()
+        self.cookie_jar = cookielib.CookieJar()
         self.opener = urllib2.build_opener(
-            urllib2.HTTPCookieProcessor(self.cj))
+            urllib2.HTTPCookieProcessor(self.cookie_jar))
 
     @classmethod
     def increment_duration_bucket(cls, index):
@@ -121,7 +122,7 @@ class WebSession(object):
                 cls.RESPONSE_TIME_HISTOGRAM)
 
     def get_cookie_value(self, name):
-        for cookie in self.cj:
+        for cookie in self.cookie_jar:
             if cookie.name == name:
                 return cookie.value
         return None
@@ -148,15 +149,15 @@ class WebSession(object):
             while True:
                 try:
                     return self.opener.open(request)
-                except urllib2.HTTPError as he:
+                except urllib2.HTTPError as http_error:
                     if (try_count < WebSession.MAX_RETRIES and
-                            self.is_soft_error(he)):
+                            self.is_soft_error(http_error)):
                         try_count += 1
                         with WebSession.PROGRESS_LOCK:
                             WebSession.RETRY_COUNT += 1
                         time.sleep(WebSession.RETRY_SLEEP_SEC)
                         continue
-                    raise he
+                    raise http_error
         except Exception as e:
             logging.info(
                 'Error in session %s executing: %s', self.uid, hint)
@@ -234,10 +235,10 @@ class TaskThread(threading.Thread):
     def run(self):
         try:
             self.func()
-        except Exception as e:  # pylint: disable-msg=broad-except
+        except Exception as e:
             logging.error('Error in %s: %s', self.name, e)
-            self.exc_info = sys.exc_info()
-            raise self.exc_info[1], None, self.exc_info[2]
+            exc_info = sys.exc_info()
+            raise exc_info[1], None, exc_info[2]
 
 
 class ReaderViewLoadTest(object):
@@ -287,7 +288,7 @@ class ReaderViewLoadTest(object):
 
         body = self._get('%s/explore/%s' % (self.host, self.exp_id))
         assert_contains('Learn', body)
-        assert_contains('Return to the gallery', body)
+        assert_contains('Return to Library', body)
 
         body = self._get_json(
             '%s/explorehandler/init/%s' % (self.host, self.exp_id))

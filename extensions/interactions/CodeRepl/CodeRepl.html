@@ -4,22 +4,73 @@
   }
   .code-repl-language {
     float: right;
+    font-size: 0.8em;
     margin-top: 8px;
+  }
+  .code-repl-terminal {
+    background-color: #222;
+    color: white;
+    font-weight: bold;
+    max-height: 600px;
+  }
+  .code-repl-terminal-error {
+    background-color: #222;
+    color: red;
+    font-weight: bold;
+  }
+  .cm-s-preview.CodeMirror {
+    background-color: #eee;
+  }
+  .cm-s-preview .CodeMirror-code pre {
+    /* Without this, underscore characters are not visible. */
+    height: 1.04em;
+    width: 100%;
+  }
+  .cm-s-preview .CodeMirror-code .code-repl-noneditable-line {
+    background-color: #eee;
+    opacity: 0.8;
+  }
+  .CodeMirror-lines {
+    background-color: white;
+  }
+  .code-repl-container {
+    background: #fff;
+    padding: 8px;
+    width: 100%;
+  }
+
+  @media screen and (max-width: 959px) {
+    .code-repl-container {
+      width: 100vw;
+    }
   }
 </style>
 
 <script type="text/ng-template" id="interaction/CodeRepl">
-  <div>
-    <form ng-submit="runCode(code)">
-      <div class="code-repl-input-box">
-        <div ui-codemirror="{onLoad: initCodeEditor}">
+  <div class="code-repl-container">
+    <div>
+      <form ng-submit="runAndSubmitCode(code)">
+        <div class="code-repl-input-box">
+          <div ui-codemirror="{onLoad: initCodeEditor}">
+          </div>
         </div>
-      </div>
-      <md-button type="submit" class="md-raised" ng-disabled="!hasLoaded">Run</md-button>
-      <span class="code-repl-language">
-        <em>Language: <[language]></em>
-      </span>
-    </form>
+        <md-button type="button" class="md-raised" ng-click="runCode(code)" ng-disabled="!hasLoaded">Test Run</md-button>
+        <md-button type="submit" class="md-raised" ng-disabled="!hasLoaded">Submit</md-button>
+        <span class="code-repl-language">
+          <em>Language: <[language]></em>
+        </span>
+      </form>
+    </div>
+
+    <hr>
+
+    <div ng-if="fullError">
+      <pre class="code-repl-terminal-error"><[fullError]></pre>
+    </div>
+    <div ng-if="!fullError">
+      <pre ng-if="output" class="code-repl-terminal"><[output]></pre>
+      <pre ng-if="!output" class="code-repl-terminal">[No terminal output]</pre>
+    </div>
   </div>
 </script>
 
@@ -44,7 +95,7 @@
 </script>
 
 <script type="text/ng-template" id="shortResponse/CodeRepl">
-  <span><pre><[answer.code | truncateAtFirstLine]></pre></span>
+  <span><pre><[answer.code]></pre></span>
 
   <span ng-if="answer.output">
     <h5>Output</h5>

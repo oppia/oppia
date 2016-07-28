@@ -14,8 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'Zhan Xiong Chin'
-
 from extensions.interactions import base
 
 
@@ -25,10 +23,11 @@ class GraphInput(base.BaseInteraction):
     name = 'Graph Theory'
     description = 'Allows learners to create and manipulate graphs.'
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
-    is_trainable = True
+    is_trainable = False
     _dependency_ids = []
     answer_type = 'Graph'
     instructions = 'Create a graph'
+    narrow_instructions = 'View graph'
     needs_summary = True
 
     _customization_arg_specs = [{

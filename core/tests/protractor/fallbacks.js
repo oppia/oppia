@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview End-to-end tests of the fallbacks functionality.
- *
- * @author Sean Lip (sean@seanlip.org)
  */
 
 var general = require('../protractor_utils/general.js');
@@ -28,10 +26,10 @@ var player = require('../protractor_utils/player.js');
 describe('Fallbacks editor', function() {
   it('should allow a fallback to be set and apply it correctly, and ' +
      'disallow editing of fallbacks in read-only explorations', function() {
-    users.createUser('fallback@example.com', 'fallback');
-    users.login('fallback@example.com');
+    users.createUser('user1@fallbacks.com', 'user1Fallbacks');
+    users.login('user1@fallbacks.com');
 
-    workflow.createExploration('sums', 'maths');
+    workflow.createExploration();
     general.getExplorationIdFromEditor().then(function(explorationId) {
       editor.enableFallbacks();
 
@@ -52,6 +50,8 @@ describe('Fallbacks editor', function() {
       editor.setStateName('new name for final card');
       editor.setInteraction('EndExploration');
 
+      editor.setTitle('Fallbacks');
+      editor.setCategory('Test');
       editor.setObjective('To test fallbacks.');
       editor.saveChanges();
       workflow.publishExploration();
@@ -59,7 +59,7 @@ describe('Fallbacks editor', function() {
       // Login as another user and verify that the exploration editor does not
       // allow the second user to modify the exploration.
       users.logout();
-      users.login('user7@example.com');
+      users.login('user7@fallbacks.com');
       general.openEditor(explorationId);
       editor.exitTutorialIfNecessary();
 

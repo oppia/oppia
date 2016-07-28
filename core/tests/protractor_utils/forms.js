@@ -15,8 +15,6 @@
 /**
  * @fileoverview Utilities for interacting with forms when carrrying
  * out end-to-end testing with protractor.
- *
- * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
 var interactions = require('../../../extensions/interactions/protractor.js');
@@ -41,7 +39,6 @@ var ListEditor = function(elem) {
   var _getLength = function() {
     return elem.all(by.repeater('item in localValue track by $index')).
         then(function(items) {
-
       return items.length;
     });
   };
@@ -77,15 +74,16 @@ var ListEditor = function(elem) {
     deleteItem: deleteItem,
     // This will add or delete list elements as necessary
     setLength: function(desiredLength) {
-      elem.all(by.repeater('item in localValue track by $index')).count().
-          then(function(startingLength) {
-        for (var i = startingLength; i < desiredLength; i++) {
-          addItem();
+      elem.all(by.repeater('item in localValue track by $index')).count().then(
+        function(startingLength) {
+          for (var i = startingLength; i < desiredLength; i++) {
+            addItem();
+          }
+          for (var i = startingLength - 1; i >= desiredLength; i--) {
+            deleteItem(i);
+          }
         }
-        for (var i = startingLength - 1; i >= desiredLength; i--) {
-          deleteItem(i);
-        }
-    });
+      );
     }
   };
 };
@@ -135,11 +133,6 @@ var RichTextEditor = function(elem) {
       _appendContentText(text);
       _clickToolbarButton('italics');
     },
-    appendUnderlineText: function(text) {
-      _clickToolbarButton('underline');
-      _appendContentText(text);
-      _clickToolbarButton('underline');
-    },
     appendOrderedList: function(textArray) {
       _appendContentText('\n');
       _clickToolbarButton('ol');
@@ -177,10 +170,10 @@ var RichTextEditor = function(elem) {
         by.css('.protractor-test-close-rich-text-component-editor')).click();
       general.waitForSystem();
 
-      // Refocus back into the RTE.
-      elem.all(by.model('html')).first().click();
-      elem.all(by.model('html')).first().sendKeys(protractor.Key.END);
-    },
+      // Ensure that the cursor is at the end of the RTE.
+      elem.all(by.model('html')).first().sendKeys(
+        protractor.Key.chord(protractor.Key.CONTROL, protractor.Key.END));
+    }
   };
 };
 
@@ -205,9 +198,11 @@ var AutocompleteDropdownEditor = function(elem) {
     },
     expectOptionsToBe: function(expectedOptions) {
       elem.element(by.css('.select2-container')).click();
-      element(by.id('select2-drop')).all(by.tagName('li')).map(function(optionElem) {
-        return optionElem.getText();
-      }).then(function(actualOptions) {
+      element(by.id('select2-drop')).all(by.tagName('li')).map(
+        function(optionElem) {
+          return optionElem.getText();
+        }
+      ).then(function(actualOptions) {
         expect(actualOptions).toEqual(expectedOptions);
       });
       // Re-close the dropdown.
@@ -260,11 +255,13 @@ var MultiSelectEditor = function(elem) {
     // Open the dropdown menu.
     elem.element(by.css('.dropdown-toggle')).click();
 
-    elem.element(by.css('.dropdown-menu')).all(by.tagName('li')).filter(function(choiceElem, index) {
-      return choiceElem.getText().then(function(choiceText) {
-        return texts.indexOf(choiceText) !== -1;
-      });
-    }).then(function(filteredElements) {
+    elem.element(by.css('.dropdown-menu')).all(by.tagName('span')).filter(
+      function(choiceElem) {
+        return choiceElem.getText().then(function(choiceText) {
+          return texts.indexOf(choiceText) !== -1;
+        });
+      }
+    ).then(function(filteredElements) {
       if (filteredElements.length !== texts.length) {
         throw (
           'Could not toggle element selection. Values requested: ' + texts +
@@ -276,6 +273,9 @@ var MultiSelectEditor = function(elem) {
         expect(filteredElements[i].getAttribute('class')).toMatch(
           expectedClassBeforeToggle);
         filteredElements[i].click();
+        // Reopen the dropdown menu, since it closes after an item is
+        // toggled.
+        elem.element(by.css('.dropdown-toggle')).click();
       }
 
       // Close the dropdown menu at the end.
@@ -318,17 +318,21 @@ var MultiSelectEditor = function(elem) {
 //   <oppia-nointeractive-math> ... </oppia-noninteractive-math>
 // <div>
 // The richTextInstructions function will be supplied with a 'handler' argument
-// which it should then use to read through the rich-text area using the functions
-// supplied by the RichTextChecker below. In the example above richTextInstructions
-// should consist of:
+// which it should then use to read through the rich-text area using the
+// functions supplied by the RichTextChecker below. In the example above
+// richTextInstructions should consist of:
 //   handler.readPlainText('plain');
 //   handler.readBoldText('bold');
 //   handler.readRteComponent('Math', ...);
 var expectRichText = function(elem) {
   var toMatch = function(richTextInstructions) {
-    // We remove all <p> elements since these are plain text that is
-    // sometimes represented just by text nodes.
-    elem.all(by.xpath('./*[not(self::p)]')).map(function(entry) {
+    // We select all top-level non-paragraph elements, as well as all children
+    // of paragraph elements. (Note that it is possible for <p> elements to
+    // surround, e.g., <i> tags, so we can't just ignore the <p> elements
+    // altogether.)
+    var XPATH_SELECTOR = './p/*|./*[not(self::p)]';
+
+    elem.all(by.xpath(XPATH_SELECTOR)).map(function(entry) {
       // It is necessary to obtain the texts of the elements in advance since
       // applying .getText() while the RichTextChecker is running would be
       // asynchronous and so not allow us to update the textPointer
@@ -338,7 +342,7 @@ var expectRichText = function(elem) {
       });
     }).then(function(arrayOfTexts) {
       // We re-derive the array of elements as we need it too.
-      elem.all(by.xpath('./*[not(self::p)]')).then(function(arrayOfElements) {
+      elem.all(by.xpath(XPATH_SELECTOR)).then(function(arrayOfElements) {
         elem.getText().then(function(fullText) {
           var checker = RichTextChecker(
             arrayOfElements, arrayOfTexts, fullText);
@@ -353,7 +357,7 @@ var expectRichText = function(elem) {
     toEqual: function(text) {
       toMatch(function(checker) {
         checker.readPlainText(text);
-      })
+      });
     }
   };
 };
@@ -403,9 +407,6 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
     readItalicText: function(text) {
       _readFormattedText(text, 'i');
     },
-    readUnderlineText: function(text) {
-      _readFormattedText(text, 'u');
-    },
     // TODO(Jacob): add functions for other rich text components.
     // Additional arguments may be sent to this function, and they will be
     // passed on to the relevant RTE component editor.
@@ -431,12 +432,12 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
     expectEnd: function() {
       expect(arrayPointer).toBe(arrayOfElems.length);
     }
-  }
+  };
 };
 
-// This converts a string into a function that represents rich text, which can then
-// be sent to either editRichText() or expectRichText(). The string should not
-// contain any html formatting. In the first case the function created will
+// This converts a string into a function that represents rich text, which can
+// then be sent to either editRichText() or expectRichText(). The string should
+// not contain any html formatting. In the first case the function created will
 // write the given text into the rich text editor (as plain text), and in
 // the second it will verify that the html created by a rich text editor
 // consists of the given text (without any formatting).
@@ -480,20 +481,21 @@ var CodeMirrorChecker = function(elem) {
    *  - 'highlighted': true or false, whether the line is highlighted
    *  - 'checked': true or false, whether the line has been checked
    */
-  function _compareTextAndHighlightingFromLine(
+  var _compareTextAndHighlightingFromLine = function(
       currentLineNumber, scrollTo, compareDict) {
     // This is used to scroll the text in codemirror to a point scrollTo pixels
     // from the top of the text or the bottom of the text if scrollTo is too
     // large.
     browser.executeScript(
-      "$('.CodeMirror-vscrollbar').first().scrollTop(" + String(scrollTo) + ");");
+      "$('.CodeMirror-vscrollbar').first().scrollTop(" + String(scrollTo) +
+      ');');
     general.waitForSystem();
     elem.all(by.xpath('./div')).map(function(lineElement) {
       return lineElement.element(by.css('.CodeMirror-linenumber')).getText()
           .then(function(lineNumber) {
         // Note: the last line in codemirror will have an empty string for line
         // number and for text. This is to skip that line.
-        if (lineNumber == '') {
+        if (lineNumber === '') {
           return lineNumber;
         }
         if (!compareDict.hasOwnProperty(lineNumber)) {
@@ -509,9 +511,11 @@ var CodeMirrorChecker = function(elem) {
       });
     }).then(function(lineNumbers) {
       var largestLineNumber = lineNumbers[lineNumbers.length - 1];
-      if (largestLineNumber != currentLineNumber) {
+      if (largestLineNumber !== currentLineNumber) {
         _compareTextAndHighlightingFromLine(
-          largestLineNumber, scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS, compareDict);
+          largestLineNumber,
+          scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS,
+          compareDict);
       } else {
         for (var lineNumber in compareDict) {
           if (compareDict[lineNumber].checked !== true) {
@@ -521,7 +525,8 @@ var CodeMirrorChecker = function(elem) {
         }
       }
     });
-  }
+  };
+
   /**
    * This recursive function is used by expectTextToBe(). The previous function
    * is not used because it is very slow.
@@ -533,13 +538,15 @@ var CodeMirrorChecker = function(elem) {
    *  - 'text': the exact string of text expected on that line
    *  - 'checked': true or false, whether the line has been checked
    */
-  function _compareTextFromLine(currentLineNumber, scrollTo, compareDict) {
+  var _compareTextFromLine = function(
+      currentLineNumber, scrollTo, compareDict) {
     browser.executeScript(
-      "$('.CodeMirror-vscrollbar').first().scrollTop(" + String(scrollTo) + ");");
+      "$('.CodeMirror-vscrollbar').first().scrollTop(" + String(scrollTo) +
+      ');');
     elem.getText().then(function(text) {
-      // text is a string 2n lines long representing n lines of text codemirror
-      // has loaded. The (2i)th line contains a line number and the (2i+1)th
-      // line contains the text on that line.
+      // The 'text' arg is a string 2n lines long representing n lines of text
+      // codemirror has loaded. The (2i)th line contains a line number and the
+      // (2i+1)th line contains the text on that line.
       var textArray = text.split('\n');
       for (var i = 0; i < textArray.length; i += 2) {
         var lineNumber = textArray[i];
@@ -553,7 +560,9 @@ var CodeMirrorChecker = function(elem) {
       var largestLineNumber = textArray[textArray.length - 2];
       if (largestLineNumber !== currentLineNumber) {
         _compareTextFromLine(
-          largestLineNumber, scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS, compareDict);
+          largestLineNumber,
+          scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS,
+          compareDict);
       } else {
         for (var lineNumber in compareDict) {
           if (compareDict[lineNumber].checked !== true) {
@@ -563,7 +572,8 @@ var CodeMirrorChecker = function(elem) {
         }
       }
     });
-  }
+  };
+
   return {
     /**
      * Compares text and highlighting with codemirror-mergeview. The input
@@ -576,7 +586,7 @@ var CodeMirrorChecker = function(elem) {
      */
     expectTextWithHighlightingToBe: function(expectedTextDict) {
       for (var lineNumber in expectedTextDict) {
-        expectedTextDict[lineNumber]['checked'] = false;
+        expectedTextDict[lineNumber].checked = false;
       }
       _compareTextAndHighlightingFromLine(1, 0, expectedTextDict);
     },
@@ -587,10 +597,11 @@ var CodeMirrorChecker = function(elem) {
     expectTextToBe: function(expectedTextString) {
       var expectedTextArray = expectedTextString.split('\n');
       var expectedDict = {};
-      for (var lineNumber = 1; lineNumber <= expectedTextArray.length; lineNumber++) {
+      for (var lineNumber = 1; lineNumber <= expectedTextArray.length;
+           lineNumber++) {
         expectedDict[lineNumber] = {
-          'text': expectedTextArray[lineNumber - 1],
-          'checked': false
+          text: expectedTextArray[lineNumber - 1],
+          checked: false
         };
       }
       _compareTextFromLine(1, 0, expectedDict);
@@ -598,15 +609,14 @@ var CodeMirrorChecker = function(elem) {
   };
 };
 
-
 // This is used by the list and dictionary editors to retrieve the editors of
 // their entries dynamically.
 var FORM_EDITORS = {
-  'Dictionary': DictionaryEditor,
-  'List': ListEditor,
-  'Real': RealEditor,
-  'RichText': RichTextEditor,
-  'Unicode': UnicodeEditor
+  Dictionary: DictionaryEditor,
+  List: ListEditor,
+  Real: RealEditor,
+  RichText: RichTextEditor,
+  Unicode: UnicodeEditor
 };
 
 var getEditor = function(formName) {
@@ -615,7 +625,7 @@ var getEditor = function(formName) {
   } else if (objects.OBJECT_EDITORS.hasOwnProperty(formName)) {
     return objects.OBJECT_EDITORS[formName];
   } else {
-    throw Error('Unknown form / object requested: ' + formName)
+    throw Error('Unknown form / object requested: ' + formName);
   }
 };
 

@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Data and controllers for the user's notifications dashboard.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.controller('DashboardNotifications', [
@@ -26,13 +24,19 @@ oppia.controller('DashboardNotifications', [
       notificationType === 'feedback_thread' ? '#/feedback' : '');
   };
 
+  $scope.navigateToProfile = function($event, username) {
+    $event.stopPropagation();
+    window.location.href = '/profile/' + username;
+  };
+
   $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
     return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
       millisSinceEpoch);
   };
 
   $rootScope.loadingMessage = 'Loading';
-  $http.get('/notificationsdashboardhandler/data').success(function(data) {
+  $http.get('/notificationsdashboardhandler/data').then(function(response) {
+    var data = response.data;
     $scope.recentNotifications = data.recent_notifications;
     $scope.jobQueuedMsec = data.job_queued_msec;
     $scope.lastSeenMsec = data.last_seen_msec || 0.0;

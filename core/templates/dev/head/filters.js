@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Filters for Oppia.
- *
- * @author sll@google.com (Sean Lip)
  */
 
 oppia.constant('RULE_SUMMARY_WRAP_CHARACTER_COUNT', 30);
@@ -37,7 +35,7 @@ oppia.filter('underscoresToCamelCase', [function() {
 oppia.filter('camelCaseToHyphens', [function() {
   return function(input) {
     var result = input.replace(/([a-z])?([A-Z])/g, '$1-$2').toLowerCase();
-    if (result[0] == '-') {
+    if (result[0] === '-') {
       result = result.substring(1);
     }
     return result;
@@ -123,7 +121,7 @@ oppia.filter('truncateAtFirstEllipsis', [function() {
 
 oppia.filter('wrapTextWithEllipsis', ['$filter', function($filter) {
   return function(input, characterCount) {
-    if (typeof input == 'string' || input instanceof String) {
+    if (typeof input === 'string' || input instanceof String) {
       input = $filter('normalizeWhitespace')(input);
       if (input.length <= characterCount || characterCount < 3) {
         // String fits within the criteria; no wrapping is necessary.
@@ -151,10 +149,11 @@ oppia.filter('isOutcomeConfusing', [function() {
   };
 }]);
 
-// Filter that changes {{...}} tags into the corresponding parameter input values.
-// Note that this returns an HTML string to accommodate the case of multiple-choice
-// input and image-click input.
-oppia.filter('parameterizeRuleDescription', ['INTERACTION_SPECS', function(INTERACTION_SPECS) {
+// Filter that changes {{...}} tags into the corresponding parameter input
+// values. Note that this returns an HTML string to accommodate the case of
+// multiple-choice input and image-click input.
+oppia.filter('parameterizeRuleDescription', [
+    'INTERACTION_SPECS', function(INTERACTION_SPECS) {
   return function(rule, interactionId, choices) {
     if (!rule) {
       return '';
@@ -180,7 +179,7 @@ oppia.filter('parameterizeRuleDescription', ['INTERACTION_SPECS', function(INTER
     var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
     var iter = 0;
     while (true) {
-      if (!description.match(PATTERN) || iter == 100) {
+      if (!description.match(PATTERN) || iter === 100) {
         break;
       }
       iter++;
@@ -192,7 +191,8 @@ oppia.filter('parameterizeRuleDescription', ['INTERACTION_SPECS', function(INTER
       }
 
       var replacementText = '[INVALID]';
-      // Special case for MultipleChoiceInput, ImageClickInput, and ItemSelectionInput.
+      // Special case for MultipleChoiceInput, ImageClickInput, and
+      // ItemSelectionInput.
       if (choices) {
         if (varType === 'SetOfHtmlString') {
           replacementText = '[';
@@ -212,8 +212,8 @@ oppia.filter('parameterizeRuleDescription', ['INTERACTION_SPECS', function(INTER
             }
           }
         }
-      // TODO(sll): Generalize this to use the inline string representation of
-      // an object type.
+        // TODO(sll): Generalize this to use the inline string representation of
+        // an object type.
       } else if (varType === 'MusicPhrase') {
         replacementText = '[';
         for (var i = 0; i < inputs[varName].length; i++) {
@@ -228,12 +228,14 @@ oppia.filter('parameterizeRuleDescription', ['INTERACTION_SPECS', function(INTER
         var longitude = inputs[varName][1] || 0.0;
         replacementText = '(';
         replacementText += (
-          inputs[varName][0] >= 0.0
-          ? latitude.toFixed(2) + '°N' : -latitude.toFixed(2) + '°S');
+          inputs[varName][0] >= 0.0 ?
+          latitude.toFixed(2) + '°N' :
+          -latitude.toFixed(2) + '°S');
         replacementText += ', ';
         replacementText += (
-          inputs[varName][1] >= 0.0
-          ? longitude.toFixed(2) + '°E' : -longitude.toFixed(2) + '°W');
+          inputs[varName][1] >= 0.0 ?
+          longitude.toFixed(2) + '°E' :
+          -longitude.toFixed(2) + '°W');
         replacementText += ')';
       } else if (varType === 'NormalizedString') {
         replacementText = '"' + inputs[varName] + '"';
@@ -254,7 +256,7 @@ oppia.filter('parameterizeRuleDescription', ['INTERACTION_SPECS', function(INTER
 // replaces interior whitespace with a single space character.
 oppia.filter('normalizeWhitespace', [function() {
   return function(input) {
-    if (typeof input == 'string' || input instanceof String) {
+    if (typeof input === 'string' || input instanceof String) {
       // Remove whitespace from the beginning and end of the string, and
       // replace interior whitespace with a single space character.
       input = input.trim();
@@ -339,7 +341,7 @@ oppia.filter('summarizeDefaultOutcome', [
       summary += $filter('convertToPlainText')(defaultOutcome.feedback[0]);
     }
     return summary;
-  }
+  };
 }]);
 
 // Filter that summarizes a large number to a decimal followed by
@@ -347,25 +349,17 @@ oppia.filter('summarizeDefaultOutcome', [
 // becomes 167.7K.
 // Users of this filter should ensure that the input is a non-negative number.
 oppia.filter('summarizeNonnegativeNumber', [function() {
-  return function (input) {
-    input = Number(input)
-    // Nine Zeroes for Billions
-    return input >= 1.0e+9
-    // Example 146008788788 becomes 146.0B
-    ? (input / 1.0e+9).toFixed(1) + 'B'
-
-    // Six Zeroes for Millions
-    : input >= 1.0e+6
-    // Example 146008788 becomes 146.0M
-    ? (input / 1.0e+6).toFixed(1) + 'M'
-
-    // Three Zeroes for Thousands
-    : input >= 1.0e+3
-    // Example 146008 becomes 146.0K
-    ? (input / 1.0e+3).toFixed(1) + 'K'
-    // For small number it should return number as it is
-    // Example 12 becomes 12
-    : input;
+  return function(input) {
+    input = Number(input);
+    // Nine zeros for billions (e.g. 146008788788 --> 146.0B).
+    // Six zeros for millions (e.g. 146008788 --> 146.0M).
+    // Three zeros for thousands (e.g. 146008 --> 146.0K).
+    // No change for small numbers (e.g. 12 --> 12).
+    return (
+      input >= 1.0e+9 ? (input / 1.0e+9).toFixed(1) + 'B' :
+      input >= 1.0e+6 ? (input / 1.0e+6).toFixed(1) + 'M' :
+      input >= 1.0e+3 ? (input / 1.0e+3).toFixed(1) + 'K' :
+      input);
   };
 }]);
 
@@ -391,13 +385,13 @@ oppia.filter('truncateAndCapitalize', [function() {
     }
 
     return result;
-  }
+  };
 }]);
 
 oppia.filter('removeDuplicatesInArray', [function() {
   return function(input) {
     return input.filter(function(val, pos) {
-      return input.indexOf(val) == pos;
+      return input.indexOf(val) === pos;
     });
   };
 }]);

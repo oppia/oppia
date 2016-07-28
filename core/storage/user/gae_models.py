@@ -16,13 +16,12 @@
 
 """Models for Oppia users."""
 
-__author__ = 'Stephanie Federwisch'
-
 from core.platform import models
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 import feconf
 
 from google.appengine.ext import ndb
+
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
 class UserSettingsModel(base_models.BaseModel):
@@ -40,7 +39,7 @@ class UserSettingsModel(base_models.BaseModel):
     # When the user last agreed to the terms of the site. May be None.
     last_agreed_to_terms = ndb.DateTimeProperty(default=None)
     # When the user last started the state editor tutorial. May be None.
-    last_started_state_editor_tutorial = ndb.DateTimeProperty(default=None)
+    last_started_state_editor_tutorial = ndb.DateTimeProperty(default=None)  # pylint: disable=invalid-name
     # User uploaded profile picture as a dataURI string. May be None.
     profile_picture_data_url = ndb.TextProperty(default=None, indexed=False)
     # User specified biography (to be shown on their profile page).
@@ -50,12 +49,18 @@ class UserSettingsModel(base_models.BaseModel):
     # The time, in milliseconds, when the user first contributed to Oppia.
     # May be None.
     first_contribution_msec = ndb.FloatProperty(default=None)
-    # Language preferences specified by the user.
+    # Exploration language preferences specified by the user.
     # TODO(sll): Add another field for the language that the user wants the
     # site to display in. These language preferences are mainly for the purpose
-    # of figuring out what to show by default in the gallery.
-    preferred_language_codes = ndb.StringProperty(repeated=True, indexed=True,
+    # of figuring out what to show by default in the library index page.
+    preferred_language_codes = ndb.StringProperty(
+        repeated=True,
+        indexed=True,
         choices=[lc['code'] for lc in feconf.ALL_LANGUAGE_CODES])
+    # System language preference (for I18N).
+    preferred_site_language_code = ndb.StringProperty(
+        default=None,
+        choices=feconf.SUPPORTED_SITE_LANGUAGES.keys())
 
     @classmethod
     def is_normalized_username_taken(cls, normalized_username):
@@ -75,12 +80,12 @@ class UserContributionsModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
-    # IDs of explorations that this user has created 
+    # IDs of explorations that this user has created
     # Includes subsequently deleted and private explorations.
     created_exploration_ids = ndb.StringProperty(
         repeated=True, indexed=True, default=None)
-    # IDs of explorations that this user has made a positive 
-    # (i.e. non-revert) commit to. 
+    # IDs of explorations that this user has made a positive
+    # (i.e. non-revert) commit to.
     # Includes subsequently deleted and private explorations.
     edited_exploration_ids = ndb.StringProperty(
         repeated=True, indexed=True, default=None)
@@ -94,6 +99,16 @@ class UserEmailPreferencesModel(base_models.BaseModel):
     # The user's preference for receiving general site updates. This is set to
     # None if the user has never set a preference.
     site_updates = ndb.BooleanProperty(indexed=True)
+
+    # The user's preference for receiving email when user is added as a member
+    # in exploration. This is set to True when user has never set a preference.
+    editor_role_notifications = ndb.BooleanProperty(
+        indexed=True, default=feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+
+    # The user's preference for receiving email when user receives feedback
+    # message for his/her exploration.
+    feedback_message_notifications = ndb.BooleanProperty(
+        indexed=True, default=feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
 
 
 class UserSubscriptionsModel(base_models.BaseModel):
@@ -126,7 +141,13 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
 
 
 class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
-    """The impact score for a particular user, where impact is defined as:
+    """User-specific statistics keyed by user id.
+    Values for total plays and average ratings are recorded by aggregating over
+    all explorations owned by a user.
+    Impact scores are calculated over explorations for which a user
+    is listed as a contributor
+
+    The impact score for a particular user is defined as:
     Sum of (
     ln(playthroughs) * (ratings_scaler) * (average(ratings) - 2.5))
     *(multiplier),
@@ -135,12 +156,54 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
     The impact score is 0 for an exploration with 0 playthroughs or with an
     average rating of less than 2.5.
-
-    Impact scores are calculated over explorations for which a user
-    is listed as a contributor. Keys for this model are user_ids.
     """
     # The impact score.
     impact_score = ndb.FloatProperty(indexed=True)
+
+    # The total plays of all the explorations.
+    total_plays = ndb.IntegerProperty(indexed=True)
+
+    # The average of average ratings of all explorations.
+    average_ratings = ndb.FloatProperty(indexed=True)
+
+    # The number of ratings of all explorations.
+    num_ratings = ndb.IntegerProperty(indexed=True)
+
+    # A list which stores history of creator stats.
+    # Each item in the list is a Json object keyed by a datetime string and
+    # value as another Json object containing key-value pairs to be stored.
+    # [
+    #  {
+    #   (date_1): {
+    #    "average_ratings": 4.3,
+    #    "total_plays": 40
+    #   }
+    #  },
+    #  {
+    #   (date_2): {
+    #    "average_ratings": 4.1,
+    #    "total_plays": 60
+    #   }
+    #  },
+    # ]
+    weekly_creator_stats_list = ndb.JsonProperty(repeated=True)
+
+    # The version of dashboard stats schema.
+    schema_version = (
+        ndb.IntegerProperty(
+            required=True,
+            default=feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION,
+            indexed=True))
+
+    @classmethod
+    def get_or_create(cls, user_id):
+        """Creates a new UserStatsModel instance, if it does not already
+        exist.
+        """
+        entity = cls.get(user_id, strict=False)
+        if not entity:
+            entity = cls(id=user_id)
+        return entity
 
 
 class ExplorationUserDataModel(base_models.BaseModel):
@@ -152,6 +215,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     # The user id.
     user_id = ndb.StringProperty(required=True, indexed=True)
+
     # The exploration id.
     exploration_id = ndb.StringProperty(required=True, indexed=True)
 
@@ -161,6 +225,15 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     # When the most recent rating was awarded, or None if not rated.
     rated_on = ndb.DateTimeProperty(default=None, indexed=False)
+
+    # List of uncommitted changes made by the user to the exploration.
+    draft_change_list = ndb.JsonProperty(default=None)
+
+    # Timestamp of when the change list was last updated.
+    draft_change_list_last_updated = ndb.DateTimeProperty(default=None)
+
+    # The exploration version that this change list applied to.
+    draft_change_list_exp_version = ndb.IntegerProperty(default=None)
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):

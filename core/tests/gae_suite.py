@@ -22,18 +22,17 @@ it from the command line by running
 from the oppia/ root folder.
 """
 
-__author__ = 'Sean Lip'
-
+# Pylint has issues with import order of argparse.
+#pylint: disable=wrong-import-order
 import argparse
 import os
 import sys
 import unittest
-
-CURR_DIR = os.path.abspath(os.getcwd())
-sys.path.insert(0, CURR_DIR)
+#pylint: enable=wrong-import-order
 
 import feconf
 
+CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 
@@ -45,6 +44,8 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(
         OPPIA_TOOLS_DIR, 'google_appengine_1.9.19', 'google_appengine',
         'lib', 'webob_0_9'),
+    os.path.join(OPPIA_TOOLS_DIR, 'browsermob-proxy-0.7.1'),
+    os.path.join(OPPIA_TOOLS_DIR, 'selenium-2.53.2'),
     CURR_DIR,
     os.path.join(THIRD_PARTY_DIR, 'bleach-1.2.2'),
     os.path.join(THIRD_PARTY_DIR, 'gae-cloud-storage-1.9.15.0'),
@@ -68,9 +69,9 @@ def create_test_suites(test_target=None):
         raise Exception('The delimiter in test_target should be a dot (.)')
 
     loader = unittest.TestLoader()
-    return ([
-        loader.loadTestsFromName(test_target)] if test_target
-        else [loader.discover(
+    return (
+        [loader.loadTestsFromName(test_target)]
+        if test_target else [loader.discover(
             CURR_DIR, pattern='*_test.py', top_level_dir=CURR_DIR)])
 
 

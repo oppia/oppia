@@ -14,11 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'Jeremy Emerson'
-
 import os
 import re
 import string
+import struct
 
 from core.domain import obj_services
 from core.domain import rte_component_registry
@@ -31,6 +30,12 @@ import utils
 # File names ending in any of these suffixes will be ignored when checking for
 # RTE component validity.
 IGNORED_FILE_SUFFIXES = ['.pyc', '.DS_Store']
+RTE_THUMBNAIL_HEIGHT_PX = 16
+RTE_THUMBNAIL_WIDTH_PX = 16
+
+_COMPONENT_CONFIG_SCHEMA = [
+    ('name', basestring), ('category', basestring),
+    ('description', basestring), ('_customization_arg_specs', list)]
 
 
 class RteComponentUnitTests(test_utils.GenericTestBase):
@@ -40,9 +45,9 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
         """Check whether a name is in CamelCase."""
         return name and (name[0] in string.ascii_uppercase)
 
-    def _is_alphanumeric_string(self, string):
+    def _is_alphanumeric_string(self, input_string):
         """Check whether a string is alphanumeric."""
-        return bool(re.compile("^[a-zA-Z0-9_]+$").match(string))
+        return bool(re.compile("^[a-zA-Z0-9_]+$").match(input_string))
 
     def _validate_customization_arg_specs(self, customization_arg_specs):
         for ca_spec in customization_arg_specs:
@@ -69,10 +74,10 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                     ca_spec['default_value'],
                     obj_class.normalize(ca_spec['default_value']))
 
-    def _listdir_omit_ignored(self, dir):
-        """List all files and directories within 'dir', omitting the ones whose
-        name ends in one of the IGNORED_FILE_SUFFIXES."""
-        names = os.listdir(dir)
+    def _listdir_omit_ignored(self, directory):
+        """List all files and directories within 'directory', omitting the ones
+        whose name ends in one of the IGNORED_FILE_SUFFIXES."""
+        names = os.listdir(directory)
         for suffix in IGNORED_FILE_SUFFIXES:
             names = [name for name in names if not name.endswith(suffix)]
         return names
@@ -89,22 +94,20 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 os.path.join(os.getcwd(), component_definition['dir']))
             self.assertIn('%s.py' % component_name, contents)
 
-    def test_image_data_urls_for_rte_components(self):
-        """Test the data urls for the RTE component icons."""
-        component_list = rte_component_registry.Registry._rte_components
+    def test_image_thumbnails_for_rte_components(self):
+        """Test the thumbnails for the RTE component icons."""
         for (cpt_name, cpt_spec) in feconf.ALLOWED_RTE_EXTENSIONS.iteritems():
             image_filepath = os.path.join(
                 os.getcwd(), cpt_spec['dir'], '%s.png' % cpt_name)
-            self.assertEqual(
-                utils.convert_png_to_data_url(image_filepath),
-                component_list[cpt_name].icon_data_url)
+
+            with open(image_filepath, 'rb') as f:
+                img_data = f.read()
+                width, height = struct.unpack('>LL', img_data[16:24])
+                self.assertEqual(int(width), RTE_THUMBNAIL_WIDTH_PX)
+                self.assertEqual(int(height), RTE_THUMBNAIL_HEIGHT_PX)
 
     def test_default_rte_components_are_valid(self):
         """Test that the default RTE components are valid."""
-
-        _COMPONENT_CONFIG_SCHEMA = [
-            ('name', basestring), ('category', basestring),
-            ('description', basestring), ('_customization_arg_specs', list)]
 
         for component_id in feconf.ALLOWED_RTE_EXTENSIONS:
             # Check that the component id is valid.
@@ -116,14 +119,17 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isdir(component_dir))
 
             # In this directory there should be a config .py file, an
-            # html file, a JS file, a .png file and a protractor.js file.
+            # html file, a JS file, an icon .png file and a protractor.js file,
+            # and an optional preview .png file.
             dir_contents = self._listdir_omit_ignored(component_dir)
-            self.assertLessEqual(len(dir_contents), 5)
+            self.assertLessEqual(len(dir_contents), 6)
 
             py_file = os.path.join(component_dir, '%s.py' % component_id)
             html_file = os.path.join(component_dir, '%s.html' % component_id)
             js_file = os.path.join(component_dir, '%s.js' % component_id)
             png_file = os.path.join(component_dir, '%s.png' % component_id)
+            preview_file = os.path.join(
+                component_dir, '%sPreview.png' % component_id)
             protractor_file = os.path.join(component_dir, 'protractor.js')
 
             self.assertTrue(os.path.isfile(py_file))
@@ -131,6 +137,8 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isfile(js_file))
             self.assertTrue(os.path.isfile(png_file))
             self.assertTrue(os.path.isfile(protractor_file))
+            if len(dir_contents) == 6:
+                self.assertTrue(os.path.isfile(preview_file))
 
             js_file_content = utils.get_file_contents(js_file)
             html_file_content = utils.get_file_contents(html_file)
@@ -143,8 +151,8 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             self.assertNotIn('<script>', js_file_content)
             self.assertNotIn('</script>', js_file_content)
 
-            component = rte_component_registry.Registry._rte_components[
-                component_id]
+            component = rte_component_registry.Registry.get_rte_component(
+                component_id)
 
             # Check that the specified component id is the same as the class
             # name.
@@ -160,4 +168,4 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                     self.assertTrue(getattr(component, item))
 
             self._validate_customization_arg_specs(
-                component._customization_arg_specs)
+                component._customization_arg_specs)  # pylint: disable=protected-access

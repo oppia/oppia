@@ -14,12 +14,13 @@
 
 """Service methods for typed instances."""
 
-__author__ = 'Sean Lip'
-
 import copy
 import inspect
+import json
 
 from extensions.objects.models import objects
+import feconf
+import utils
 
 
 class Registry(object):
@@ -68,8 +69,16 @@ def get_all_object_editor_js_templates():
     object_editors_js = ''
 
     all_object_classes = Registry.get_all_object_classes()
-    for obj_type, obj_cls in all_object_classes.iteritems():
+    for obj_cls in all_object_classes.values():
         if obj_cls.has_editor_js_template():
             object_editors_js += obj_cls.get_editor_js_template()
 
     return object_editors_js
+
+
+def get_default_object_values():
+    """Returns a dictionary containing the default object values."""
+    # TODO(wxy): Cache this as it is accessed many times.
+
+    return json.loads(
+        utils.get_file_contents(feconf.OBJECT_DEFAULT_VALUES_FILE_PATH))

@@ -14,27 +14,29 @@
 
 """Main package for URL routing and the index page."""
 
-__author__ = 'Sean Lip'
-
-import feconf
-
+# pylint: disable=relative-import
 from core.controllers import cron
 from core.platform import models
-transaction_services = models.Registry.import_transaction_services()
+import feconf
 import main
+# pylint: enable=relative-import
 
 import webapp2
 
+transaction_services = models.Registry.import_transaction_services()
+
 # Register the URLs with the classes responsible for handling them.
-urls = [
+URLS = [
     main.get_redirect_route(
         r'/cron/mail/admin/job_status', cron.JobStatusMailerHandler,
         'job_failure_mailer'),
+    main.get_redirect_route(
+        r'/cron/users/dashboard_stats', cron.CronDashboardStatsHandler,
+        'job_creator_dashboard_stats'),
     main.get_redirect_route(
         r'/cron/jobs/cleanup', cron.CronMapreduceCleanupHandler,
         'job_cleanup_handler'),
 ]
 
-
-app = transaction_services.toplevel_wrapper(
-    webapp2.WSGIApplication(urls, debug=feconf.DEBUG))
+app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
+    webapp2.WSGIApplication(URLS, debug=feconf.DEBUG))

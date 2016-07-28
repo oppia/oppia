@@ -16,8 +16,6 @@
 
 """Models relating to configuration properties."""
 
-__author__ = 'Sean Lip'
-
 import core.storage.base_model.gae_models as base_models
 
 from google.appengine.ext import ndb

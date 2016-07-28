@@ -16,7 +16,7 @@
 
 """Tests for object schema definitions."""
 
-__author__ = 'Sean Lip'
+# pylint: disable=relative-import
 
 import inspect
 
@@ -185,7 +185,7 @@ def _validate_validator(obj_type, validator):
             raise AssertionError(e)
 
     # Check that the id corresponds to a valid normalizer function.
-    validator_fn = schema_utils._Validators.get(validator['id'])
+    validator_fn = schema_utils._Validators.get(validator['id'])  # pylint: disable=protected-access
     assert set(inspect.getargspec(validator_fn).args) == set(
         customization_keys + ['obj'])
 

@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Clearing-house for protractor test utilities for gadgets.
- *
- * @author Michael Anuzis (anuzis@gmail.com)
  */
 
 /* Each gadgets's protractor file must implement the following:
@@ -29,7 +27,7 @@
 
 var GADGETS = {
   AdviceBar: require('./AdviceBar/protractor.js'),
-  ScoreBar: require('./ScoreBar/protractor.js'),
+  ScoreBar: require('./ScoreBar/protractor.js')
 };
 
 var getGadget = function(gadgetType) {

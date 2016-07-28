@@ -15,15 +15,33 @@
 /**
  * @fileoverview Service to construct URLs by inserting variables within them as
  * necessary to have a fully-qualified URL.
- *
- * @author henning.benmax@gmail.com (Ben Henning)
  */
 
-oppia.factory('UrlInterpolationService', ['warningsData',
-    function(warningsData) {
+oppia.factory('UrlInterpolationService', ['alertsService',
+    function(alertsService) {
   // http://stackoverflow.com/questions/203739
   var _isString = function(value) {
-    return (typeof(value) === 'string') || (value instanceof String);
+    return (typeof value === 'string') || (value instanceof String);
+  };
+
+  var validateResourcePath = function(resourcePath) {
+    if (!resourcePath) {
+      alertsService.fatalWarning(
+        'Empty path passed in method.');
+    }
+
+    var RESOURCE_PATH_STARTS_WITH_FORWARD_SLASH = /^\//;
+    // Ensure that resourcePath starts with a forward slash.
+    if (!resourcePath.match(RESOURCE_PATH_STARTS_WITH_FORWARD_SLASH)) {
+      alertsService.fatalWarning(
+        'Path must start with \'\/\': \'' + new String(resourcePath) +
+        '\'.');
+    }
+  };
+
+  var getCachePrefixedUrl = function(resourcePath) {
+    validateResourcePath(resourcePath);
+    return GLOBALS.ASSET_DIR_PREFIX + resourcePath;
   };
 
   return {
@@ -44,7 +62,7 @@ oppia.factory('UrlInterpolationService', ['warningsData',
      */
     interpolateUrl: function(urlTemplate, interpolationValues) {
       if (!urlTemplate) {
-        warningsData.fatalWarning(
+        alertsService.fatalWarning(
           'Invalid or empty URL template passed in: \'' +
           new String(urlTemplate) + '\'');
         return null;
@@ -54,7 +72,7 @@ oppia.factory('UrlInterpolationService', ['warningsData',
       if (!(interpolationValues instanceof Object) || (
           Object.prototype.toString.call(
             interpolationValues) === '[object Array]')) {
-        warningsData.fatalWarning(
+        alertsService.fatalWarning(
           'Expected an object of interpolation values to be passed into ' +
           'interpolateUrl.');
         return null;
@@ -67,12 +85,13 @@ oppia.factory('UrlInterpolationService', ['warningsData',
       var EMPTY_VARIABLE_REGEX = /<>/;
       var INVALID_VARIABLE_REGEX = /(<{2,})(\w*)(>{2,})/;
 
-      // Parameter values can only contain alphanumerical characters.
-      var VALID_PARAMETER_VALUE_REGEX = /^(\w| )+$/;
+      // Parameter values can only contain alphanumerical characters, spaces,
+      // hyphens or underscores.
+      var VALID_URL_PARAMETER_VALUE_REGEX = /^(\w| |_|-)+$/;
 
       if (urlTemplate.match(INVALID_VARIABLE_REGEX) ||
           urlTemplate.match(EMPTY_VARIABLE_REGEX)) {
-        warningsData.fatalWarning(
+        alertsService.fatalWarning(
           'Invalid URL template received: \'' + urlTemplate + '\'');
         return null;
       }
@@ -81,16 +100,17 @@ oppia.factory('UrlInterpolationService', ['warningsData',
       for (var varName in interpolationValues) {
         var value = interpolationValues[varName];
         if (!_isString(value)) {
-          warningsData.fatalWarning(
+          alertsService.fatalWarning(
             'Parameters passed into interpolateUrl must be strings.');
           return null;
         }
 
         // Ensure the value is valid.
-        if (!value.match(VALID_PARAMETER_VALUE_REGEX)) {
-          warningsData.fatalWarning(
+        if (!value.match(VALID_URL_PARAMETER_VALUE_REGEX)) {
+          alertsService.fatalWarning(
             'Parameter values passed into interpolateUrl must only contain ' +
-            'alphanumerical characters or spaces: \'' + value + '\'');
+            'alphanumerical characters, hyphens, underscores or spaces: \'' +
+            value + '\'');
           return null;
         }
 
@@ -104,7 +124,7 @@ oppia.factory('UrlInterpolationService', ['warningsData',
       while (match) {
         var varName = match[1];
         if (!escapedInterpolationValues.hasOwnProperty(varName)) {
-          warningsData.fatalWarning('Expected variable \'' + varName +
+          alertsService.fatalWarning('Expected variable \'' + varName +
             '\' when interpolating URL.');
           return null;
         }
@@ -114,6 +134,49 @@ oppia.factory('UrlInterpolationService', ['warningsData',
         match = filledUrl.match(INTERPOLATION_VARIABLE_REGEX);
       }
       return filledUrl;
+    },
+
+    /**
+     * Given an resource path, returns the relative url path to that resource
+     * prefixing the appropriate cache_slug to it.
+     */
+    getStaticResourceUrl: function(resourcePath) {
+      return getCachePrefixedUrl(resourcePath);
+    },
+
+    /**
+     * Given an image path, returns the complete url path to that image
+     * prefixing the appropriate cache_slug to it.
+     */
+    getStaticImageUrl: function(imagePath) {
+      validateResourcePath(imagePath);
+      return getCachePrefixedUrl('/assets/images' + imagePath);
+    },
+
+    /**
+     * Given a gadget type, returns the complete url path to that
+     * gadget type image, prefixing the appropriate cache_slug to it.
+     */
+    getGadgetImgUrl: function(gadgetType) {
+      if (!gadgetType) {
+        alertsService.fatalWarning(
+          'Empty gadgetType passed in getGadgetImgUrl.');
+      }
+      return getCachePrefixedUrl('/extensions/gadgets/' + gadgetType +
+        '/static/images/' + gadgetType + '.png');
+    },
+
+    /**
+     * Given an interaction id, returns the complete url path to the thumbnail
+     * image for the interaction, prefixing the appropriate cache_slug to it.
+     */
+    getInteractionThumbnailImageUrl: function(interactionId) {
+      if (!interactionId) {
+        alertsService.fatalWarning(
+          'Empty interactionId passed in getInteractionThumbnailImageUrl.');
+      }
+      return getCachePrefixedUrl('/extensions/interactions/' +
+        interactionId + '/static/' + interactionId + '.png');
     }
   };
 }]);
