@@ -154,6 +154,7 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(r'/forum', pages.ForumPage, 'forum_page'),
     get_redirect_route(r'/donate', pages.DonatePage, 'donate_page'),
+    get_redirect_route(r'/thanks', pages.ThanksPage, 'thanks_page'),
     get_redirect_route(r'/terms', pages.TermsPage, 'terms_page'),
     get_redirect_route(r'/privacy', pages.PrivacyPage, 'privacy_page'),
 
