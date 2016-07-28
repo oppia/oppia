@@ -923,17 +923,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
 
         modalInstance.result.then(function(commitMessage) {
           _modalIsOpen = false;
-          saveDraftToBackend(commitMessage, function() {
-            explorationData.getLastSavedData().then(function(data) {
-              explorationData.getData().then(function(currentData) {
-                if (data.version > currentData.version) {
-                  autosaveInfoModalsService.showVersionMismatchModal(
-                    changeListService.getChangeList());
-                  return;
-                }
-              });
-            });
-          });
+          saveDraftToBackend(commitMessage);
         }, function() {
           _modalIsOpen = false;
         });
