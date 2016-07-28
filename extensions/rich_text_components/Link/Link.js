@@ -27,9 +27,6 @@ oppia.directive('oppiaNoninteractiveLink', [
       templateUrl: 'richTextComponent/Link',
       controller: ['$scope', '$attrs', 'explorationContextService',
         function($scope, $attrs, explorationContextService) {
-          // Always open link in new tab/window
-          $scope.target = '_blank';
-
           var untrustedUrl = encodeURI(oppiaHtmlEscaper.escapedJsonToObj(
             $attrs.urlWithValue));
           if (untrustedUrl.indexOf('http://') !== 0 &&
