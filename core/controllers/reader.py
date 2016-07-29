@@ -255,11 +255,11 @@ class ExplorationPageEmbed(base.BaseHandler):
         # exploration is being played outside the context of a collection.
         collection_id = self.request.get('collection_id')
 
-        exploration_data_values = _get_exploration_player_data(self,
-            exploration_id, version, collection_id)
+        exploration_data_values = _get_exploration_player_data(
+            self, exploration_id, version, collection_id)
         exploration_data_values['iframed'] = True
 
-        self.values.update(exploration_values)
+        self.values.update(exploration_data_values)
 
         self.render_template(
             'player/exploration_player.html', iframe_restriction=None)
@@ -278,11 +278,11 @@ class ExplorationPage(base.BaseHandler):
         # exploration is being played outside the context of a collection.
         collection_id = self.request.get('collection_id')
 
-        exploration_data_values = _get_exploration_player_data(self,
-            exploration_id, version, collection_id)
+        exploration_data_values = _get_exploration_player_data(
+            self, exploration_id, version, collection_id)
         exploration_data_values['iframed'] = False
 
-        self.values.update(exploration_values)
+        self.values.update(exploration_data_values)
 
         self.render_template('player/exploration_player.html')
 

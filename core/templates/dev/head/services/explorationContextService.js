@@ -59,7 +59,8 @@ oppia.factory('explorationContextService', [
         } else {
           var pathnameArray = $window.location.pathname.split('/');
           for (var i = 0; i < pathnameArray.length; i++) {
-            if (pathnameArray[i] === 'explore' || pathnameArray[i] === 'embed') {
+            if (pathnameArray[i] === 'explore' ||
+                pathnameArray[i] === 'embed') {
               pageContext = PAGE_CONTEXT.LEARNER;
               return PAGE_CONTEXT.LEARNER;
             } else if (pathnameArray[i] === 'create') {
@@ -74,7 +75,7 @@ oppia.factory('explorationContextService', [
 
       isInExplorationContext: function() {
         return (this.getPageContext() === PAGE_CONTEXT.EDITOR ||
-          this.getPageContext() === PAGE_CONTEXT.LEARNER)
+          this.getPageContext() === PAGE_CONTEXT.LEARNER);
       },
 
       // Returns a string representing the explorationId (obtained from the
@@ -92,9 +93,9 @@ oppia.factory('explorationContextService', [
               explorationId = pathnameArray[i + 1];
               return pathnameArray[i + 1];
             }
-            if(pathnameArray[i] == 'embed') {
+            if (pathnameArray[i] === 'embed') {
               explorationId = pathnameArray[i + 2];
-              return explorationId
+              return explorationId;
             }
           }
 
