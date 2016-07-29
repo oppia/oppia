@@ -31,22 +31,29 @@
         </div>
         <h6 style="text-align: center;"><em>Hear from our Oppia community</em></h6>
         <div style="margin: 0 auto; width: 70%;">
-          <p style="font-size: 0.8em;">
+          <p style="font-size: 0.825em;">
             In 2012, Oppia started with a simple idea: to improve the education of
             students around the world while improving the quality of teaching.
             This vision has since turned into an educational platform with over
             5,500 explorations that are used by approximately 145,000
             users worldwide.
           </p>
-          <p style="font-size: 0.8em;">
-            Please donate to The Oppia Foundation, a registered 501(c)(3), and
-            join us in bringing the joys of teaching and learning to people everywhere.
+          <p style="font-size: 0.825em;">
+            Please donate to The Oppia Foundation, a registered 501(c)(3) nonprofit,
+            and join us in bringing the joys of teaching and learning to people
+            everywhere.
           </p>
         </div>
       </div>
       <div class="oppia-donate-options">
-        <h2 style="color: #fff; margin-top: 60px;">Donate to</h2>
-        <h2 style="color: #fff; margin-top: 10px;">The Oppia Foundation</h2>
+        <div ng-if="windowIsNarrow">
+          <h2 style="color: #fff; margin-top: 60px;">Donate to the</h2>
+          <h2 style="color: #fff; margin-top: 10px;">Oppia Foundation</h2>
+        </div>
+        <div ng-if="!windowIsNarrow">
+          <h2 style="color: #fff; margin-top: 60px;">Donate to</h2>
+          <h2 style="color: #fff; margin-top: 10px;">The Oppia Foundation</h2>
+        </div>
         <div style="text-align: center;">
           <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
           <input type="hidden" name="cmd" value="_s-xclick">
@@ -57,7 +64,7 @@
         </div>
         <div style="text-align: center;">
           <a href="https://smile.amazon.com/ch/81-1740068"
-            class="btn oppia-donate-options-button">
+          class="btn oppia-donate-options-button">
             Amazon Smile
           </a>
         </div>

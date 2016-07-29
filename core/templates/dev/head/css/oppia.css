@@ -4098,6 +4098,7 @@ md-card.preview-conversation-skin-supplemental-card {
     float: clear;
     width: 100%;
   }
+}
 
 @media only screen and (max-width: 768px) {
   .oppia-about-content, .oppia-about-extra-content {
