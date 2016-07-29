@@ -253,10 +253,10 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
     scope: {},
     link: function(scope) {
       var isIframed = urlService.isIframed();
-      scope.myTemplate = isIframed ?
+      scope.directiveTemplateId = isIframed ?
         'skins/ConversationEmbed' : 'skins/Conversation';
     },
-    template: '<div ng-include="myTemplate"></div>',
+    template: '<div ng-include="directiveTemplateId"></div>',
     controller: [
       '$scope', '$timeout', '$rootScope', '$window', '$translate',
        'messengerService', 'oppiaPlayerService', 'urlService', 'focusService',
@@ -358,7 +358,7 @@ oppia.directive('conversationSkin', ['urlService', function(urlService) {
           }, 100);
         };
 
-        $scope.iframeReloadExprolation = function() {
+        $scope.reloadExploration = function() {
           $window.location.reload();
         };
 
