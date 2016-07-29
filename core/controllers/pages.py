@@ -14,6 +14,7 @@
 
 """Controllers for simple, mostly-static pages (like About, Forum, etc.)."""
 
+import random
 import urllib
 import urlparse
 
@@ -26,11 +27,16 @@ class SplashPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
+        c_value = self.request.get('c')
+        if not c_value:
+            c_value = 's%d' % random.randrange(4)
+            self.redirect('/splash?c=%s' % c_value)
+
         self.values.update({
             'meta_description': feconf.SPLASH_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_SPLASH,
         })
-        self.render_template('pages/splash.html')
+        self.render_template('pages/splash_%s.html' % c_value)
 
 
 class AboutPage(base.BaseHandler):
