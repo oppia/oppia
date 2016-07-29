@@ -84,7 +84,7 @@ exports.config = {
 
     misc: [
       'protractor/userManagement.js',
-      //'protractor/embedding.js',
+      'protractor/embedding.js',
       'protractor/preferences.js'
     ],
 
