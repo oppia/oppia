@@ -31,8 +31,11 @@ oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
       var areAnyChoicesEmpty = false;
       var areAnyChoicesDuplicated = false;
       var seenChoices = [];
+      var handledAnswers = [];
       var numChoices = customizationArgs.choices.value.length;
-      for (var i = 0; i < customizationArgs.choices.value.length; i++) {
+      var areAllChoicesCovered = false;
+
+      for (var i = 0; i < numChoices; i++) {
         var choice = customizationArgs.choices.value[i];
         if (choice.trim().length === 0) {
           areAnyChoicesEmpty = true;
@@ -41,6 +44,7 @@ oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
           areAnyChoicesDuplicated = true;
         }
         seenChoices.push(choice);
+        handledAnswers.push(false);
       }
 
       if (areAnyChoicesEmpty) {
@@ -89,14 +93,58 @@ oppia.filter('oppiaInteractiveItemSelectionInputValidator', [
         baseInteractionValidationService.getAnswerGroupWarnings(
           answerGroups, stateName));
 
-      if (!defaultOutcome ||
-          $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
-        warningsList.push({
-          type: WARNING_TYPES.ERROR,
-          message: (
-            'Please clarify the default outcome so it is less confusing to ' +
-            'the user.')
+      var selectedChoices = [];
+      if (maxAllowedCount === 1) {
+        var answerChoiceToIndex = {};
+        seenChoices.forEach(function(seenChoice, choiceIndex) {
+          answerChoiceToIndex[seenChoice] = choiceIndex;
         });
+
+        answerGroups.forEach(function(answerGroup, answerIndex) {
+          var ruleSpecs = answerGroup.rule_specs;
+          ruleSpecs.forEach(function(ruleSpec, ruleIndex) {
+            var ruleInputs = ruleSpec.inputs.x;
+            ruleInputs.forEach(function(ruleInput) {
+              var choiceIndex = answerChoiceToIndex[ruleInput];
+              if (ruleSpec.rule_type === 'Equals') {
+                handledAnswers[choiceIndex] = true;
+                if (ruleInputs.length > 1) {
+                  warningsList.push({
+                    type: WARNING_TYPES.ERROR,
+                    message: (
+                      'In answer group ' + (answerIndex + 1) + ', ' +
+                      'rule ' + (ruleIndex + 1) + ', ' +
+                      'please select only one answer choice.')
+                  });
+                }
+              } else if (ruleSpec.rule_type === 'ContainsAtLeastOneOf') {
+                handledAnswers[choiceIndex] = true;
+              } else if (ruleSpec.rule_type ===
+                'DoesNotContainAtLeastOneOf') {
+                for (var i = 0; i < handledAnswers.length; i++) {
+                  if (i !== choiceIndex) {
+                    handledAnswers[i] = true;
+                  }
+                }
+              }
+            });
+          });
+        });
+        areAllChoicesCovered = handledAnswers.every(function(handledAnswer) {
+          return handledAnswer;
+        });
+      }
+
+      if (!areAllChoicesCovered) {
+        if (!defaultOutcome ||
+            $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
+          warningsList.push({
+            type: WARNING_TYPES.ERROR,
+            message: (
+              'Please clarify the default outcome so it is less confusing to ' +
+              'the user.')
+          });
+        }
       }
 
       return warningsList;

@@ -3917,15 +3917,16 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-about-three-cols-layout {
+  display: inline-block;
   margin-right: 20px;
-  width: calc((100% - 40px) / 3);
+  width: calc((100% - 60px) / 3);
 }
 
 .oppia-about-three-cols-layout:last-of-type {
   margin-right: 0;
 }
 
-.oppia-about-credits-letter-groups.three-col{
+.oppia-about-credits-letter-groups.three-col {
   margin: 0 0 10% 0;
   -moz-column-count: 3;
   -moz-column-gap: 20px;
@@ -3938,8 +3939,10 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-about-extra-info {
   background-color: #009788;
   color: #fff;
-  height: 220px;
   width: 100%;
+}
+.oppia-about-page-extra-info {
+  height: 220px;
 }
 
 .oppia-about-tab-content {
