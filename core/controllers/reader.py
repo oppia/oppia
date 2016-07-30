@@ -120,7 +120,7 @@ def classify_string_classifier_rule(state, normalized_answer):
 
 
 def _get_exploration_player_data(
-    exploration_id, version, collection_id, can_edit):
+        exploration_id, version, collection_id, can_edit):
 
     try:
         exploration = exp_services.get_exploration_by_id(
@@ -245,10 +245,10 @@ class ExplorationPageEmbed(base.BaseHandler):
         # Note: this is an optional argument and will be None when the
         # exploration is being played outside the context of a collection.
         collection_id = self.request.get('collection_id')
-        can_edit = (bool(self.username) and
-            self.username not in config_domain.BANNED_USERNAMES.value and
-            rights_manager.Actor(self.user_id).can_edit(
-                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
+        can_edit = (bool(self.username) and self.username not in
+                    config_domain.BANNED_USERNAMES.value and
+                    rights_manager.Actor(self.user_id).can_edit(
+                        feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
         if not rights_manager.Actor(self.user_id).can_view(
                 feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             raise self.PageNotFoundException
@@ -280,10 +280,10 @@ class ExplorationPage(base.BaseHandler):
         # exploration is being played outside the context of a collection.
         collection_id = self.request.get('collection_id')
 
-        can_edit = (bool(self.username) and
-            self.username not in config_domain.BANNED_USERNAMES.value and
-            rights_manager.Actor(self.user_id).can_edit(
-                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
+        can_edit = (bool(self.username) and self.username not in
+                    config_domain.BANNED_USERNAMES.value and
+                    rights_manager.Actor(self.user_id).can_edit(
+                        feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
         if not rights_manager.Actor(self.user_id).can_view(
                 feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             raise self.PageNotFoundException
