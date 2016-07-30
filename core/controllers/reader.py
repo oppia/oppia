@@ -119,13 +119,14 @@ def classify_string_classifier_rule(state, normalized_answer):
     return None
 
 
-def _get_exploration_player_data(self, exploration_id, version, collection_id):
+def _get_exploration_player_data(
+    exploration_id, version, collection_id, can_edit):
 
     try:
         exploration = exp_services.get_exploration_by_id(
             exploration_id, version=version)
-    except Exception as e:
-        raise self.PageNotFoundException(e)
+    except Exception:
+        raise Exception
 
     collection_title = None
     if collection_id:
@@ -133,14 +134,10 @@ def _get_exploration_player_data(self, exploration_id, version, collection_id):
             collection = collection_services.get_collection_by_id(
                 collection_id)
             collection_title = collection.title
-        except Exception as e:
-            raise self.PageNotFoundException(e)
+        except Exception:
+            raise Exception
 
     version = exploration.version
-
-    if not rights_manager.Actor(self.user_id).can_view(
-            feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
-        raise self.PageNotFoundException
 
     # TODO(sll): Cache these computations.
     gadget_types = exploration.get_gadget_types()
@@ -165,12 +162,7 @@ def _get_exploration_player_data(self, exploration_id, version, collection_id):
         'DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER': (
             DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER.value),
         'additional_angular_modules': additional_angular_modules,
-        'can_edit': (
-            bool(self.username) and
-            self.username not in config_domain.BANNED_USERNAMES.value and
-            rights_manager.Actor(self.user_id).can_edit(
-                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id)
-        ),
+        'can_edit': can_edit,
         'dependencies_html': jinja2.utils.Markup(
             dependencies_html),
         'exploration_title': exploration.title,
@@ -242,7 +234,7 @@ def classify(state, answer):
 
 
 class ExplorationPageEmbed(base.BaseHandler):
-    """Page describing a single embeded exploration."""
+    """Page describing a single embedded exploration."""
 
     @require_playable
     def get(self, exploration_id):
@@ -250,13 +242,23 @@ class ExplorationPageEmbed(base.BaseHandler):
         version_str = self.request.get('v')
         version = int(version_str) if version_str else None
 
-
         # Note: this is an optional argument and will be None when the
         # exploration is being played outside the context of a collection.
         collection_id = self.request.get('collection_id')
+        can_edit = (bool(self.username) and
+            self.username not in config_domain.BANNED_USERNAMES.value and
+            rights_manager.Actor(self.user_id).can_edit(
+                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
+        if not rights_manager.Actor(self.user_id).can_view(
+                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
+            raise self.PageNotFoundException
 
-        exploration_data_values = _get_exploration_player_data(
-            self, exploration_id, version, collection_id)
+        try:
+            exploration_data_values = _get_exploration_player_data(
+                exploration_id, version, collection_id, can_edit)
+        except Exception as e:
+            raise self.PageNotFoundException(e)
+
         exploration_data_values['iframed'] = True
 
         self.values.update(exploration_data_values)
@@ -278,8 +280,20 @@ class ExplorationPage(base.BaseHandler):
         # exploration is being played outside the context of a collection.
         collection_id = self.request.get('collection_id')
 
-        exploration_data_values = _get_exploration_player_data(
-            self, exploration_id, version, collection_id)
+        can_edit = (bool(self.username) and
+            self.username not in config_domain.BANNED_USERNAMES.value and
+            rights_manager.Actor(self.user_id).can_edit(
+                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id))
+        if not rights_manager.Actor(self.user_id).can_view(
+                feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
+            raise self.PageNotFoundException
+
+        try:
+            exploration_data_values = _get_exploration_player_data(
+                exploration_id, version, collection_id, can_edit)
+        except Exception as e:
+            raise self.PageNotFoundException(e)
+
         exploration_data_values['iframed'] = False
 
         self.values.update(exploration_data_values)

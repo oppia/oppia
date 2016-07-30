@@ -20,8 +20,7 @@
 oppia.constant('PAGE_CONTEXT', {
   EDITOR: 'editor',
   LEARNER: 'learner',
-  OTHER: 'other',
-  EMBED: 'iframe'
+  OTHER: 'other'
 });
 
 oppia.constant('EDITOR_TAB_CONTEXT', {
