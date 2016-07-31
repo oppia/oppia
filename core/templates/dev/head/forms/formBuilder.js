@@ -548,11 +548,13 @@ oppia.filter('sanitizeHtmlForRte', ['$sanitize', function($sanitize) {
 }]);
 
 oppia.factory('rteHelperService', [
-  '$filter', '$log', '$modal', '$interpolate', 'RTE_COMPONENT_SPECS',
-  'explorationContextService', 'oppiaHtmlEscaper', 'focusService',
+  '$filter', '$log', '$modal', '$interpolate', '$document',
+  'RTE_COMPONENT_SPECS', 'explorationContextService', 'oppiaHtmlEscaper',
+  'focusService',
   function(
-    $filter, $log, $modal, $interpolate, RTE_COMPONENT_SPECS,
-    explorationContextService, oppiaHtmlEscaper, focusService) {
+    $filter, $log, $modal, $interpolate, $document,
+    RTE_COMPONENT_SPECS, explorationContextService, oppiaHtmlEscaper,
+    focusService) {
     var _RICH_TEXT_COMPONENTS = [];
 
     Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
