@@ -35,6 +35,7 @@ class Video(base.BaseRichTextComponent):
     description = 'A YouTube video.'
     frontend_name = 'video'
     tooltip = 'Insert video'
+    is_block_element = True
 
     _customization_arg_specs = [{
         'name': 'video_id',
@@ -68,3 +69,6 @@ class Video(base.BaseRichTextComponent):
         'default_value': False,
     }]
 
+    @property
+    def preview_url_template(self):
+        return 'https://img.youtube.com/vi/<[video_id]>/hqdefault.jpg'

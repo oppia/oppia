@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Gallery tile component.
+ * @fileoverview Component for an exploration summary tile.
  */
 
 oppia.directive('explorationSummaryTile', [function() {
@@ -34,7 +34,12 @@ oppia.directive('explorationSummaryTile', [function() {
       // If this is not null, the new exploration opens in a new window when
       // the summary tile is clicked.
       openInNewWindow: '@openInNewWindow',
-      isCommunityOwned: '&isCommunityOwned'
+      isCommunityOwned: '&isCommunityOwned',
+      // If the screen width is below the threshold defined here, the mobile
+      // version of the summary tile is displayed. This attribute is optional:
+      // if it is not specified, it is treated as 0, which means that the
+      // desktop version of the summary tile is always displayed.
+      mobileCutoffPx: '@mobileCutoffPx'
     },
     templateUrl: 'summaryTile/exploration',
     link: function(scope, element) {
@@ -66,9 +71,11 @@ oppia.directive('explorationSummaryTile', [function() {
     controller: [
       '$scope', '$http',
       'oppiaDatetimeFormatter', 'RatingComputationService',
+      'windowDimensionsService', 'UrlInterpolationService',
       function(
         $scope, $http,
-        oppiaDatetimeFormatter, RatingComputationService) {
+        oppiaDatetimeFormatter, RatingComputationService,
+        windowDimensionsService, UrlInterpolationService) {
         var contributorsSummary = $scope.getContributorsSummary() || {};
         $scope.contributors = Object.keys(
           contributorsSummary).sort(
@@ -83,7 +90,9 @@ oppia.directive('explorationSummaryTile', [function() {
 
         $scope.avatarsList = [];
         $scope.contributors.forEach(function(contributorName) {
-          var DEFAULT_PROFILE_IMAGE_PATH = '/images/avatar/user_blue_72px.png';
+          var DEFAULT_PROFILE_IMAGE_PATH = (
+            UrlInterpolationService.getStaticImageUrl(
+              '/avatar/user_blue_72px.png'));
 
           var avatarData = {
             image: contributorsSummary[
@@ -92,7 +101,7 @@ oppia.directive('explorationSummaryTile', [function() {
             tooltipText: contributorName
           };
 
-          if (GLOBALS.SYSTEM_USERNAMES.indexOf(contributorName) == -1) {
+          if (GLOBALS.SYSTEM_USERNAMES.indexOf(contributorName) === -1) {
             avatarData.link = '/profile/' + contributorName;
           }
 
@@ -100,7 +109,10 @@ oppia.directive('explorationSummaryTile', [function() {
         });
 
         if ($scope.isCommunityOwned()) {
-          var COMMUNITY_OWNED_IMAGE_PATH = '/images/avatar/fa_globe_72px.png';
+          var COMMUNITY_OWNED_IMAGE_PATH = (
+            UrlInterpolationService.getStaticImageUrl(
+              '/avatar/fa_globe_72px.png'));
+
           var COMMUNITY_OWNED_TOOLTIP_TEXT = 'Community Owned';
 
           var communityOwnedAvatar = {
@@ -134,6 +146,18 @@ oppia.directive('explorationSummaryTile', [function() {
           }
           return result;
         };
+
+        if (!$scope.mobileCutoffPx) {
+          $scope.mobileCutoffPx = 0;
+        }
+        $scope.isWindowLarge = (
+          windowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
+
+        windowDimensionsService.registerOnResizeHook(function() {
+          $scope.isWindowLarge = (
+            windowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
+          $scope.$apply();
+        });
       }
     ]
   };

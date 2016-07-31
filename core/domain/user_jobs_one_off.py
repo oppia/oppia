@@ -39,11 +39,10 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        if isinstance(item, exp_models.ExplorationSnapshotMetadataModel):
-            yield (item.committer_id, {
-                'exploration_id': item.get_unversioned_instance_id(),
-                'version_string': item.get_version_string(),
-            })
+        yield (item.committer_id, {
+            'exploration_id': item.get_unversioned_instance_id(),
+            'version_string': item.get_version_string(),
+        })
 
     @staticmethod
     def reduce(key, version_and_exp_ids):
@@ -175,6 +174,23 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):
                 subscription_services.subscribe_to_collection(key, item['id'])
 
 
+class DashboardStatsOneOffJob(jobs.BaseMapReduceJobManager):
+    """One-off job for populating weekly dashboard stats for all registered
+    users who have a non-None value of UserStatsModel.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(item):
+        user_services.update_dashboard_stats_log(item.id)
+
+    @staticmethod
+    def reduce(item):
+        pass
+
+
 class UserFirstContributionMsecOneOffJob(jobs.BaseMapReduceJobManager):
     """One-off job that updates first contribution time in milliseconds for
     current users. This job makes the assumption that once an exploration is
@@ -216,3 +232,25 @@ class UserFirstContributionMsecOneOffJob(jobs.BaseMapReduceJobManager):
         first_contribution_msec = min(commit_times_msec)
         user_services.update_first_contribution_msec_if_not_set(
             user_id, first_contribution_msec)
+
+
+class UserProfilePictureOneOffJob(jobs.BaseMapReduceJobManager):
+    """One-off job that updates profile pictures for users which do not
+    currently have them. Users who already have profile pictures are
+    unaffected.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted or item.profile_picture_data_url is not None:
+            return
+
+        user_services.generate_initial_profile_picture(item.id)
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        pass

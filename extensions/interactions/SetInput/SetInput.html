@@ -1,6 +1,6 @@
 <script type="text/ng-template" id="interaction/SetInput">
   <div ng-if="answer.length === 0">
-    <em>(Add one item per line.)</em>
+    <em translate="I18N_INTERACTIONS_SET_INPUT_EMPTY_SET"></em>
   </div>
 
   <div>
@@ -8,24 +8,18 @@
     </schema-based-editor>
   </div>
 
-  <div ng-if="errorMessage" class="oppia-form-error" aria-live="assertive">
-    <[errorMessage]>
-  </div>
+  <div ng-if="errorMessage" class="oppia-form-error" aria-live="assertive" translate="<[errorMessage]>"></div>
 
   <br>
 
   <div>
-    <button type="button" class="btn btn-default" ng-click="submitAnswer(answer)">
-      Submit
-    </button>
+    <button type="button" class="btn btn-default" ng-click="submitAnswer(answer)" translate="I18N_INTERACTIONS_SET_INPUT_SUBMIT"></button>
   </div>
 </script>
 
 <script type="text/ng-template" id="response/SetInput">
   <div>
-    <span ng-if="answer.length === 0">
-      No answer given.
-    </span>
+    <span ng-if="answer.length === 0" translate="I18N_INTERACTIONS_SET_INPUT_NO_ANSWER"></span>
     <span ng-if="answer.length > 0">
       <ul style="padding-left: 12px">
         <li ng-repeat="item in answer">
@@ -37,5 +31,5 @@
 </script>
 
 <script type="text/ng-template" id="shortResponse/SetInput">
-  <span><[displayedAnswer]></span>
+  <span translate="<[displayedAnswer]>"></span>
 </script>

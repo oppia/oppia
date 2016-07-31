@@ -1,0 +1,71 @@
+<div ng-controller="HistoryTab" class="container-fluid" style="word-wrap: break-word;">
+  <md-card class="oppia-editor-card">
+    <h3>List of Changes</h3>
+    <div ng-repeat="versionCheckbox in versionCheckboxArray " class="row">
+      <div class="col-sm-4 col-md-4 col-lg-4">
+        <input type="checkbox" name="compareVer" ng-model="versionCheckbox.selected" ng-init="init()" ng-click="changeSelectedVersions($event, versionCheckbox.vnum)" ng-disabled="isCheckboxDisabled(versionCheckbox.vnum)" ng-hide="comparisonsAreDisabled" class='protractor-test-history-checkbox-selector'>
+        [<[versionCheckbox.vnum]>]
+        <strong><profile-link-text username="explorationVersionMetadata[versionCheckbox.vnum].committerId"></profile-link-text></strong>
+      </div>
+      <div class="col-sm-4 col-md-4 col-lg-4">
+        <[explorationVersionMetadata[versionCheckbox.vnum].commitMessage]>
+      </div>
+      <div class="col-sm-4 col-md-4 col-lg-4">
+        <span>
+          <em><[explorationVersionMetadata[versionCheckbox.vnum].createdOnStr]></em>
+          <span ng-if="versionCheckbox.vnum !== currentVersion && editabilityService.isEditable()">
+            | <a href="#" class='protractor-test-revert-version' ng-click="showRevertExplorationModal(versionCheckbox.vnum)">Revert</a>
+          </span>
+          <span>
+            | <a href="#" ng-click="downloadExplorationWithVersion(versionCheckbox.vnum)" title="Download exploration as a zip file.">Download</a>
+          </span>
+        </span>
+      </div>
+    </div>
+
+    <br>
+
+    <div ng-hide="!explorationVersionMetadata || compareVersionsButtonIsHidden">
+      <button class="btn protractor-test-show-history-graph" ng-class="{'btn-success': areCompareVersionsSelected(), 'btn-default': !areCompareVersionsSelected()}" ng-click="compareSelectedVersions()" ng-disabled="!areCompareVersionsSelected()">Compare selected revisions</button>
+      <div class="version-count-prompt">
+        <[versionCountPrompt]>
+      </div>
+    </div>
+  </md-card>
+
+  <md-card class="oppia-editor-card" style="position: relative;"
+           ng-if="diffData && !hideHistoryGraph && explorationVersionMetadata">
+    <h3>
+      Changes from version <[compareVersionMetadata.earlierVersion.versionNumber]>
+      to version <[compareVersionMetadata.laterVersion.versionNumber]>
+    </h3>
+
+    <version-diff-visualization diff-data="diffData"
+                                earlier-version-header="earlierVersionHeader"
+                                later-version-header="laterVersionHeader">
+    </version-diff-visualization>
+  </md-card>
+</div>
+
+<script type="text/ng-template" id="modals/revertExploration">
+  <div class="modal-header">
+    <h3>Revert Exploration</h3>
+  </div>
+
+  <div class="modal-body oppia-long-text">
+    <p>
+      You are about to revert this exploration to version <[version]>. All changes made since that older version will be retracted and you will lose any unsaved changes.
+    </p>
+    <p>
+      Before reverting, you can preview the exploration you are reverting to by following <a ng-href="<[getExplorationUrl(version)]>" target="_blank">this link</a>. (It opens in a new window.)
+    </p>
+    <p>
+      Are you sure you want to revert this exploration to version <[version]>?
+    </p>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-danger protractor-test-confirm-revert" ng-click="revert()">Revert</button>
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+  </div>
+</script>

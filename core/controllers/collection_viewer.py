@@ -18,7 +18,9 @@ from core.controllers import base
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import rights_manager
+from core.domain import summary_services
 from core.platform import models
+import feconf
 import utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
@@ -30,9 +32,9 @@ def require_collection_playable(handler):
         """Check if the current user can play the collection."""
         actor = rights_manager.Actor(self.user_id)
         can_play = actor.can_play(
-            rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id)
+            feconf.ACTIVITY_TYPE_COLLECTION, collection_id)
         can_view = actor.can_view(
-            rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id)
+            feconf.ACTIVITY_TYPE_COLLECTION, collection_id)
         if can_play and can_view:
             return handler(self, collection_id, **kwargs)
         else:
@@ -43,8 +45,6 @@ def require_collection_playable(handler):
 
 class CollectionPage(base.BaseHandler):
     """Page describing a single collection."""
-
-    PAGE_NAME_FOR_CSRF = 'collection'
 
     @require_collection_playable
     def get(self, collection_id):
@@ -57,12 +57,13 @@ class CollectionPage(base.BaseHandler):
         whitelisted_usernames = (
             config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value)
         self.values.update({
+            'nav_mode': feconf.NAV_MODE_COLLECTION,
             'can_edit': (
                 bool(self.username) and
                 self.username in whitelisted_usernames and
                 self.username not in config_domain.BANNED_USERNAMES.value and
                 rights_manager.Actor(self.user_id).can_edit(
-                    rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id)
+                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id)
             ),
             'is_logged_in': bool(self.user_id),
             'collection_id': collection_id,
@@ -86,7 +87,7 @@ class CollectionDataHandler(base.BaseHandler):
 
         try:
             collection_dict = (
-                collection_services.get_learner_collection_dict_by_id(
+                summary_services.get_learner_collection_dict_by_id(
                     collection_id, self.user_id,
                     allow_invalid_explorations=allow_invalid_explorations))
         except Exception as e:
@@ -95,10 +96,8 @@ class CollectionDataHandler(base.BaseHandler):
         self.values.update({
             'can_edit': (
                 self.user_id and rights_manager.Actor(self.user_id).can_edit(
-                    rights_manager.ACTIVITY_TYPE_COLLECTION, collection_id)),
+                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id)),
             'collection': collection_dict,
-            'info_card_image_url': utils.get_info_card_url_for_category(
-                collection_dict['category']),
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
         })

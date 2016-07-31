@@ -54,6 +54,18 @@ describe('Collection object factory', function() {
     return _sampleCollection.getCollectionNodeByExplorationId(explorationId);
   };
 
+  it('should be able to create an empty collection object', function() {
+    var collection = CollectionObjectFactory.createEmptyCollection();
+    expect(collection.getId()).toBeUndefined();
+    expect(collection.getTitle()).toBeUndefined();
+    expect(collection.getCategory()).toBeUndefined();
+    expect(collection.getObjective()).toBeUndefined();
+    expect(collection.getLanguageCode()).toBeUndefined();
+    expect(collection.getTags()).toBeUndefined();
+    expect(collection.getVersion()).toBeUndefined();
+    expect(collection.getCollectionNodes()).toEqual([]);
+  });
+
   it('should contain a collection node defined in the backend object',
       function() {
     var collectionNodeBackendObject = {
@@ -66,7 +78,7 @@ describe('Collection object factory', function() {
       id: 'collection_id',
       nodes: [collectionNodeBackendObject]
     });
-    expect(collection.containsCollectionNode('exp_id0')).toBeTruthy();
+    expect(collection.containsCollectionNode('exp_id0')).toBe(true);
     expect(collection.getCollectionNodes()).toEqual([
       CollectionNodeObjectFactory.create(collectionNodeBackendObject)
     ]);
@@ -74,7 +86,7 @@ describe('Collection object factory', function() {
 
   it('should contain added explorations and not contain removed ones',
       function() {
-    expect(_sampleCollection.containsCollectionNode('exp_id0')).toBeFalsy();
+    expect(_sampleCollection.containsCollectionNode('exp_id0')).toBe(false);
     expect(_sampleCollection.getCollectionNodeCount()).toEqual(0);
 
     var collectionNodeBackendObject = {
@@ -86,15 +98,15 @@ describe('Collection object factory', function() {
     var collectionNode = CollectionNodeObjectFactory.create(
       collectionNodeBackendObject);
 
-    expect(_sampleCollection.addCollectionNode(collectionNode)).toBeTruthy();
-    expect(_sampleCollection.containsCollectionNode('exp_id0')).toBeTruthy();
+    expect(_sampleCollection.addCollectionNode(collectionNode)).toBe(true);
+    expect(_sampleCollection.containsCollectionNode('exp_id0')).toBe(true);
     expect(_sampleCollection.getCollectionNodes()).toEqual([
       CollectionNodeObjectFactory.create(collectionNodeBackendObject)
     ]);
     expect(_sampleCollection.getCollectionNodeCount()).toEqual(1);
 
-    expect(_sampleCollection.deleteCollectionNode('exp_id0')).toBeTruthy();
-    expect(_sampleCollection.containsCollectionNode('exp_id0')).toBeFalsy();
+    expect(_sampleCollection.deleteCollectionNode('exp_id0')).toBe(true);
+    expect(_sampleCollection.containsCollectionNode('exp_id0')).toBe(false);
     expect(_sampleCollection.getCollectionNodeCount()).toEqual(0);
   });
 
@@ -108,12 +120,46 @@ describe('Collection object factory', function() {
     var collectionNode = CollectionNodeObjectFactory.create(
       collectionNodeBackendObject);
 
-    expect(_sampleCollection.addCollectionNode(collectionNode)).toBeTruthy();
-    expect(_sampleCollection.addCollectionNode(collectionNode)).toBeFalsy();
+    expect(_sampleCollection.addCollectionNode(collectionNode)).toBe(true);
+    expect(_sampleCollection.addCollectionNode(collectionNode)).toBe(false);
   });
 
   it('should fail to delete nonexistent explorations', function() {
-    expect(_sampleCollection.deleteCollectionNode('fake_exp_id')).toBeFalsy();
+    expect(_sampleCollection.deleteCollectionNode('fake_exp_id')).toBe(false);
+  });
+
+  it('should be able to clear all nodes from a collection', function() {
+    expect(_sampleCollection.getCollectionNodeCount()).toEqual(0);
+
+    var collectionNodeBackendObject1 = {
+      exploration_id: 'exp_id0',
+      prerequisite_skills: [],
+      acquired_skills: [],
+      exploration: {}
+    };
+    var collectionNodeBackendObject2 = {
+      exploration_id: 'exp_id1',
+      prerequisite_skills: [],
+      acquired_skills: [],
+      exploration: {}
+    };
+    var collectionNode1 = CollectionNodeObjectFactory.create(
+      collectionNodeBackendObject1);
+    var collectionNode2 = CollectionNodeObjectFactory.create(
+      collectionNodeBackendObject2);
+
+    _sampleCollection.addCollectionNode(collectionNode1);
+    expect(_sampleCollection.getCollectionNodeCount()).toEqual(1);
+    expect(_sampleCollection.containsCollectionNode('exp_id0')).toBe(true);
+
+    _sampleCollection.clearCollectionNodes();
+    expect(_sampleCollection.getCollectionNodeCount()).toEqual(0);
+    expect(_sampleCollection.containsCollectionNode('exp_id0')).toBe(false);
+    expect(_sampleCollection.getCollectionNodes()).toEqual([]);
+
+    _sampleCollection.addCollectionNode(collectionNode2);
+    expect(_sampleCollection.getCollectionNodeCount()).toEqual(1);
+    expect(_sampleCollection.containsCollectionNode('exp_id1')).toBe(true);
   });
 
   it('should be able to retrieve a mutable collection node by exploration id',
@@ -141,7 +187,7 @@ describe('Collection object factory', function() {
     expect(collectionNodeAfter).not.toEqual(CollectionNodeObjectFactory.create(
       collectionNodeBackendObject));
     expect(collectionNodeAfter.getPrerequisiteSkillList().containsSkill(
-      'example')).toBeTruthy();
+      'example')).toBe(true);
   });
 
   it('should return a list of collection nodes in the order they were added',
@@ -266,5 +312,33 @@ describe('Collection object factory', function() {
 
     skillList.sortSkills();
     expect(skillList.getSkills()).toEqual(expectedSkills);
+  });
+
+  it('should be able to copy from another collection', function() {
+    var secondCollection = CollectionObjectFactory.create({
+      id: 'col_id0',
+      title: 'Another title',
+      objective: 'Another objective',
+      category: 'Another category',
+      language_code: 'en',
+      version: '15',
+      nodes: []
+    });
+    secondCollection.addCollectionNode(CollectionNodeObjectFactory.create({
+      exploration_id: 'exp_id5',
+      prerequisite_skills: [],
+      acquired_skills: [],
+      exploration: {}
+    }));
+
+    _addCollectionNode('exp_id0');
+    _addCollectionNode('exp_id1');
+
+    expect(_sampleCollection).not.toBe(secondCollection);
+    expect(_sampleCollection).not.toEqual(secondCollection);
+
+    _sampleCollection.copyFromCollection(secondCollection);
+    expect(_sampleCollection).not.toBe(secondCollection);
+    expect(_sampleCollection).toEqual(secondCollection);
   });
 });

@@ -83,7 +83,7 @@ oppia.controller('CollectionPlayer', [
       for (var i = 0; i < collectionNodes.length; i++) {
         var collectionNode = collectionNodes[i];
         var explorationId = collectionNode.getExplorationId();
-        if (displayedExplorationIds.indexOf(explorationId) == -1) {
+        if (displayedExplorationIds.indexOf(explorationId) === -1) {
           nonRecommendedCollectionNodes.push(collectionNode);
         }
       }

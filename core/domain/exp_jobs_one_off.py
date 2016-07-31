@@ -34,10 +34,9 @@ _COMMIT_TYPE_REVERT = 'revert'
 
 
 class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
-    """Job that calculates summaries of explorations, which can be
-    used to get e.g. the gallery. For every ExplorationModel entity,
-    create a ExpSummaryModel entity containing information described
-    in ExpSummariesAggregator.
+    """Job that calculates summaries of explorations. For every
+    ExplorationModel entity, create a ExpSummaryModel entity containing
+    information described in ExpSummariesAggregator.
 
     The summaries store the following information:
         title, category, objective, language_code, tags,
@@ -140,7 +139,7 @@ class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
             commit_time_string in stringified_commit_times_msecs]
         first_published_msec = min(commit_times_msecs)
         rights_manager.update_activity_first_published_msec(
-            rights_manager.ACTIVITY_TYPE_EXPLORATION, exp_id,
+            feconf.ACTIVITY_TYPE_EXPLORATION, exp_id,
             first_published_msec)
 
 

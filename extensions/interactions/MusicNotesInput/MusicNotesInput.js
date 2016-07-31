@@ -78,13 +78,25 @@ oppia.constant('NOTE_NAMES_TO_MIDI_VALUES', {
 oppia.directive('oppiaInteractiveMusicNotesInput', [
   'oppiaHtmlEscaper', 'NOTE_NAMES_TO_MIDI_VALUES',
   'musicNotesInputRulesService', 'musicPhrasePlayerService',
+  'UrlInterpolationService',
   function(oppiaHtmlEscaper, NOTE_NAMES_TO_MIDI_VALUES,
-      musicNotesInputRulesService, musicPhrasePlayerService) {
+      musicNotesInputRulesService, musicPhrasePlayerService,
+      UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'interaction/MusicNotesInput',
       link: function(scope, element, attrs) {
+        // This is needed in order for the scope to be retrievable during Karma
+        // unit testing. See http://stackoverflow.com/a/29833832 for more
+        // details.
+        element[0].isolateScope = function() {
+          return scope;
+        };
+
+        scope.getStaticResourceUrl = (
+          UrlInterpolationService.getStaticResourceUrl);
+
         scope.SOUNDFONT_URL = '/third_party/static/midi-js-2ef687/soundfont/';
         scope.sequenceToGuess = oppiaHtmlEscaper.escapedJsonToObj(
           attrs.sequenceToGuessWithValue);
@@ -926,13 +938,13 @@ oppia.factory('musicNotesInputRulesService', [
     IsEqualToExceptFor: function(answer, inputs) {
       var targetSequence = _convertSequenceToMidi(inputs.x);
       var userSequence = _convertSequenceToMidi(answer);
-      if (userSequence.length != targetSequence.length) {
+      if (userSequence.length !== targetSequence.length) {
         return false;
       }
 
       var numWrongNotes = 0;
       userSequence.map(function(noteValue, index) {
-        if (noteValue != targetSequence[index]) {
+        if (noteValue !== targetSequence[index]) {
           numWrongNotes++;
         }
       });
@@ -941,23 +953,23 @@ oppia.factory('musicNotesInputRulesService', [
     IsTranspositionOf: function(answer, inputs) {
       var targetSequence = _convertSequenceToMidi(inputs.x);
       var userSequence = _convertSequenceToMidi(answer);
-      if (userSequence.length != targetSequence.length) {
+      if (userSequence.length !== targetSequence.length) {
         return false;
       }
       return userSequence.every(function(noteValue, index) {
-        return targetSequence[index] + inputs.y == noteValue;
+        return targetSequence[index] + inputs.y === noteValue;
       });
     },
     IsTranspositionOfExceptFor: function(answer, inputs) {
       var targetSequence = _convertSequenceToMidi(inputs.x);
       var userSequence = _convertSequenceToMidi(answer);
-      if (userSequence.length != targetSequence.length) {
+      if (userSequence.length !== targetSequence.length) {
         return false;
       }
 
       var numWrongNotes = 0;
       userSequence.map(function(noteValue, index) {
-        if (targetSequence[index] + inputs.y != noteValue) {
+        if (targetSequence[index] + inputs.y !== noteValue) {
           numWrongNotes++;
         }
       });

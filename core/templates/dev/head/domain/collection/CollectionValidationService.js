@@ -20,7 +20,8 @@
  */
 
 oppia.factory('CollectionValidationService', [
-  'SkillListObjectFactory', function(SkillListObjectFactory) {
+  'CollectionLinearizerService', 'SkillListObjectFactory',
+  function(CollectionLinearizerService, SkillListObjectFactory) {
     var _getStartingExplorationIds = function(collection) {
       var startingCollectionNodes = collection.getStartingCollectionNodes();
       return startingCollectionNodes.map(function(collectionNode) {
@@ -40,37 +41,18 @@ oppia.factory('CollectionValidationService', [
       return overlappingSkillList.getSkills();
     };
 
-    var _getNextExplorationIds = function(collection, completedExpIds) {
-      var acquiredSkillList = completedExpIds.reduce(
-        function(skillList, explorationId) {
-          var collectionNode = collection.getCollectionNodeByExplorationId(
-            explorationId);
-          skillList.addSkillsFromSkillList(
-            collectionNode.getAcquiredSkillList());
-          return skillList;
-        }, SkillListObjectFactory.create([]));
-
-      // Pick all collection nodes whose prerequisite skills are satisified by
-      // the currently acquired skills and which have not yet been completed.
-      return collection.getExplorationIds().filter(function(explorationId) {
-        var collectionNode = collection.getCollectionNodeByExplorationId(
-          explorationId);
-        return completedExpIds.indexOf(explorationId) == -1 &&
-          acquiredSkillList.isSupersetOfSkillList(
-            collectionNode.getPrerequisiteSkillList());
-      });
-    };
-
     var _getUnreachableExplorationIds = function(collection) {
       var completedExpIds = _getStartingExplorationIds(collection);
-      var nextExpIds = _getNextExplorationIds(collection, completedExpIds);
+      var nextExpIds = CollectionLinearizerService.getNextExplorationIds(
+        collection, completedExpIds);
       while (nextExpIds.length > 0) {
         completedExpIds = completedExpIds.concat(nextExpIds);
-        nextExpIds = _getNextExplorationIds(collection, completedExpIds);
+        nextExpIds = CollectionLinearizerService.getNextExplorationIds(
+          collection, completedExpIds);
       }
 
       return collection.getExplorationIds().filter(function(explorationId) {
-        return completedExpIds.indexOf(explorationId) == -1;
+        return completedExpIds.indexOf(explorationId) === -1;
       });
     };
 
@@ -98,14 +80,14 @@ oppia.factory('CollectionValidationService', [
       var collectionHasNodes = collection.getCollectionNodeCount() > 0;
       if (!collectionHasNodes) {
         issues.push(
-          'There should be at least 1 exploration in the collection');
+          'There should be at least 1 exploration in the collection.');
       }
 
       var startingExpIds = _getStartingExplorationIds(collection);
-      if (collectionHasNodes && startingExpIds.length == 0) {
+      if (collectionHasNodes && startingExpIds.length !== 1) {
         issues.push(
-          'There should be at least 1 exploration initially available to the ' +
-          'learner');
+          'There should be exactly 1 exploration initially available to the ' +
+          'learner.');
       }
 
       collection.getCollectionNodes().forEach(function(collectionNode) {
@@ -119,14 +101,14 @@ oppia.factory('CollectionValidationService', [
       });
 
       var unreachableExpIds = _getUnreachableExplorationIds(collection);
-      if (unreachableExpIds.length != 0) {
+      if (unreachableExpIds.length !== 0) {
         issues.push(
           'The following exploration(s) are unreachable from the initial ' +
           'exploration(s): ' + unreachableExpIds.join(', '));
       }
 
       var nonexistentExpIds = _getNonexistentExplorationIds(collection);
-      if (nonexistentExpIds.length != 0) {
+      if (nonexistentExpIds.length !== 0) {
         issues.push(
           'The following exploration(s) either do not exist, or you do not ' +
           'have edit access to add them to this collection: ' +
@@ -135,10 +117,29 @@ oppia.factory('CollectionValidationService', [
 
       if (isPublic) {
         var privateExpIds = _getPrivateExplorationIds(collection);
-        if (privateExpIds.length != 0) {
+        if (privateExpIds.length !== 0) {
           issues.push(
             'Private explorations cannot be added to a public collection: ' +
             privateExpIds.join(', '));
+        }
+      }
+
+      var completedExpIds = _getStartingExplorationIds(collection);
+      var nextExpIds = CollectionLinearizerService.getNextExplorationIds(
+        collection, completedExpIds);
+      if (nextExpIds.length > 1) {
+        issues.push('The collection should have linear progression. The ' +
+          'following explorations are a part of a branch: ' +
+          nextExpIds.join(', '));
+      }
+      while (nextExpIds.length > 0) {
+        completedExpIds = completedExpIds.concat(nextExpIds);
+        nextExpIds = CollectionLinearizerService.getNextExplorationIds(
+          collection, completedExpIds);
+        if (nextExpIds.length > 1) {
+          issues.push('The collection should have linear progression. The ' +
+            'following explorations are a part of a branch: ' +
+            nextExpIds.join(', '));
         }
       }
 

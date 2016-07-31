@@ -129,7 +129,7 @@ oppia.filter('convertUnicodeWithParamsToHtml', ['$filter', function($filter) {
     var currentFragment = '';
     var currentFragmentIsParam = false;
     for (var i = 0; i < text.length; i++) {
-      if (text[i] == '\\') {
+      if (text[i] === '\\') {
         assert(
           !currentFragmentIsParam && text.length > i + 1 &&
           {
@@ -548,11 +548,11 @@ oppia.filter('sanitizeHtmlForRte', ['$sanitize', function($sanitize) {
 }]);
 
 oppia.factory('rteHelperService', [
-  '$filter', '$log', '$modal', 'RTE_COMPONENT_SPECS',
-  'oppiaHtmlEscaper', 'focusService',
+  '$filter', '$log', '$modal', '$interpolate', 'RTE_COMPONENT_SPECS',
+  'explorationContextService', 'oppiaHtmlEscaper', 'focusService',
   function(
-    $filter, $log, $modal, RTE_COMPONENT_SPECS,
-    oppiaHtmlEscaper, focusService) {
+    $filter, $log, $modal, $interpolate, RTE_COMPONENT_SPECS,
+    explorationContextService, oppiaHtmlEscaper, focusService) {
     var _RICH_TEXT_COMPONENTS = [];
 
     Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
@@ -562,9 +562,12 @@ oppia.factory('rteHelperService', [
         customizationArgSpecs: angular.copy(
           RTE_COMPONENT_SPECS[componentId].customization_arg_specs),
         iconDataUrl: RTE_COMPONENT_SPECS[componentId].icon_data_url,
+        previewUrlTemplate:
+          RTE_COMPONENT_SPECS[componentId].preview_url_template,
         isComplex: RTE_COMPONENT_SPECS[componentId].is_complex,
         isInline: RTE_COMPONENT_SPECS[componentId].is_inline,
         name: RTE_COMPONENT_SPECS[componentId].frontend_name,
+        isBlockElement: RTE_COMPONENT_SPECS[componentId].is_block_element,
         requiresFs: RTE_COMPONENT_SPECS[componentId].requires_fs,
         tooltip: RTE_COMPONENT_SPECS[componentId].tooltip
       });
@@ -574,8 +577,8 @@ oppia.factory('rteHelperService', [
       var customizationArgsDict = {};
       for (var i = 0; i < attrs.length; i++) {
         var attr = attrs[i];
-        if (attr.name == 'class' || attr.name == 'src' ||
-            attr.name == '_moz_resizing') {
+        if (attr.name === 'class' || attr.name === 'src' ||
+            attr.name === '_moz_resizing') {
           continue;
         }
         var separatorLocation = attr.name.indexOf('-with-value');
@@ -603,9 +606,26 @@ oppia.factory('rteHelperService', [
       // Returns a DOM node.
       createRteElement: function(componentDefn, customizationArgsDict) {
         var el = $('<img/>');
-        el.attr('src', componentDefn.iconDataUrl);
+        if (explorationContextService.isInExplorationContext()) {
+          customizationArgsDict = angular.extend(customizationArgsDict,
+            {
+              explorationId: explorationContextService.getExplorationId()
+            }
+          );
+        }
+        var interpolatedUrl = $interpolate(
+          componentDefn.previewUrlTemplate, false, null, true)(
+            customizationArgsDict);
+        if (!interpolatedUrl) {
+          $log.error(
+            'Error interpolating url : ' + componentDefn.previewUrlTemplate);
+        } else {
+          el.attr('src', interpolatedUrl);
+        }
         el.addClass('oppia-noninteractive-' + componentDefn.name);
-
+        if (componentDefn.isBlockElement) {
+          el.addClass('block-element');
+        }
         for (var attrName in customizationArgsDict) {
           el.attr(
             $filter('camelCaseToHyphens')(attrName) + '-with-value',
@@ -655,7 +675,13 @@ oppia.factory('rteHelperService', [
           elt.find(
             'img.oppia-noninteractive-' + componentDefn.name
           ).replaceWith(function() {
-            var jQueryElt = $('<' + this.className + '/>');
+            // Look for a class name starting with oppia-noninteractive-*.
+            var tagNameMatch = /(^|\s)(oppia-noninteractive-[a-z0-9\-]+)/.exec(
+              this.className);
+            if (!tagNameMatch) {
+              $log.error('RTE Error: invalid class name ' + this.className);
+            }
+            var jQueryElt = $('<' + tagNameMatch[2] + '/>');
             for (var i = 0; i < this.attributes.length; i++) {
               var attr = this.attributes[i];
               if (attr.name !== 'class' && attr.name !== 'src') {
@@ -672,8 +698,9 @@ oppia.factory('rteHelperService', [
         return angular.copy(_RICH_TEXT_COMPONENTS);
       },
       openCustomizationModal: function(
-          customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
-          onDismissCallback, refocusFn) {
+        customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
+        onDismissCallback, refocusFn) {
+        $document[0].execCommand('enableObjectResizing', false, false);
         var modalDialog = $modal.open({
           templateUrl: 'modals/customizeRteComponent',
           backdrop: 'static',
@@ -1236,7 +1263,7 @@ oppia.directive('textAngularRte', [
           // the editor context.
           $scope.isCustomizationModalOpen = false;
           var toolbarOptions = [
-            ['bold', 'italics', 'underline'],
+            ['bold', 'italics'],
             ['ol', 'ul', 'pre', 'indent', 'outdent'],
             []
           ];
@@ -2009,7 +2036,7 @@ oppia.directive('schemaBasedListEditor', [
           if ($scope.len <= 0) {
             throw 'Invalid length for list editor: ' + $scope.len;
           }
-          if ($scope.len != $scope.localValue.length) {
+          if ($scope.len !== $scope.localValue.length) {
             throw 'List editor length does not match length of input value: ' +
               $scope.len + ' ' + $scope.localValue;
           }

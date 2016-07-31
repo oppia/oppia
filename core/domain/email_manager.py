@@ -77,17 +77,47 @@ SIGNUP_EMAIL_CONTENT = config_domain.ConfigProperty(
         'subject': _PLACEHOLDER_SUBJECT,
         'html_body': _PLACEHOLDER_HTML_BODY,
     })
+
+EXPLORATION_ROLE_MANAGER = 'manager rights'
+EXPLORATION_ROLE_EDITOR = 'editor rights'
+EXPLORATION_ROLE_PLAYTESTER = 'playtest access'
+
+EDITOR_ROLE_EMAIL_HTML_ROLES = {
+    rights_manager.ROLE_OWNER: EXPLORATION_ROLE_MANAGER,
+    rights_manager.ROLE_EDITOR: EXPLORATION_ROLE_EDITOR,
+    rights_manager.ROLE_VIEWER: EXPLORATION_ROLE_PLAYTESTER
+}
+
+_EDITOR_ROLE_EMAIL_HTML_RIGHTS = {
+    'can_manage': '<li>Change the exploration permissions</li><br>',
+    'can_edit': '<li>Edit the exploration</li><br>',
+    'can_play': '<li>View and playtest the exploration</li><br>'
+}
+
+EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE = {
+    EXPLORATION_ROLE_MANAGER: (
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_manage'] +
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_edit'] +
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']),
+    EXPLORATION_ROLE_EDITOR: (
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_edit'] +
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']),
+    EXPLORATION_ROLE_PLAYTESTER: _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']
+}
+
 PUBLICIZE_EXPLORATION_EMAIL_HTML_BODY = config_domain.ConfigProperty(
     'publicize_exploration_email_html_body', EMAIL_HTML_BODY_SCHEMA,
     'Default content for the email sent after an exploration is publicized by '
     'a moderator. These emails are only sent if the functionality is enabled '
     'in feconf.py. Leave this field blank if emails should not be sent.',
-    'Congratulations, your exploration has been featured in the gallery!')
+    'Congratulations, your exploration has been featured in the Oppia '
+    'library!')
 UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY = config_domain.ConfigProperty(
     'unpublish_exploration_email_html_body', EMAIL_HTML_BODY_SCHEMA,
-    'Default content for the email sent after an exploration is unpublished by '
-    'a moderator. These emails are only sent if the functionality is enabled '
-    'in feconf.py. Leave this field blank if emails should not be sent.',
+    'Default content for the email sent after an exploration is unpublished '
+    'by a moderator. These emails are only sent if the functionality is '
+    'enabled in feconf.py. Leave this field blank if emails should not be '
+    'sent.',
     'I\'m writing to inform you that I have unpublished the above '
     'exploration.')
 
@@ -98,6 +128,12 @@ SENDER_VALIDATORS = {
     feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: (
         lambda x: rights_manager.Actor(x).is_moderator()),
     feconf.EMAIL_INTENT_DAILY_BATCH: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_MARKETING: (
         lambda x: rights_manager.Actor(x).is_admin()),
@@ -120,7 +156,7 @@ def _require_sender_id_is_valid(intent, sender_id):
 
 def _send_email(
         recipient_id, sender_id, intent, email_subject, email_html_body,
-        bcc_admin=False):
+        sender_email, bcc_admin=False):
     """Sends an email to the given recipient.
 
     This function should be used for sending all user-facing emails.
@@ -141,7 +177,7 @@ def _send_email(
         return
 
     raw_plaintext_body = cleaned_html_body.replace('<br/>', '\n').replace(
-        '<br>', '\n').replace('</p><p>', '</p>\n<p>')
+        '<br>', '\n').replace('<li>', '<li>- ').replace('</p><p>', '</p>\n<p>')
     cleaned_plaintext_body = html_cleaner.strip_html_tags(raw_plaintext_body)
 
     if email_models.SentEmailModel.check_duplicate_message(
@@ -153,14 +189,14 @@ def _send_email(
         return
 
     def _send_email_in_transaction():
-        sender_email = '%s <%s>' % (
-            EMAIL_SENDER_NAME.value, feconf.SYSTEM_EMAIL_ADDRESS)
+        sender_name_email = '%s <%s>' % (
+            EMAIL_SENDER_NAME.value, sender_email)
 
         email_services.send_mail(
-            sender_email, recipient_email, email_subject,
+            sender_name_email, recipient_email, email_subject,
             cleaned_plaintext_body, cleaned_html_body, bcc_admin)
         email_models.SentEmailModel.create(
-            recipient_id, recipient_email, sender_id, sender_email, intent,
+            recipient_id, recipient_email, sender_id, sender_name_email, intent,
             email_subject, cleaned_html_body, datetime.datetime.utcnow())
 
     return transaction_services.run_in_transaction(_send_email_in_transaction)
@@ -189,7 +225,7 @@ def send_post_signup_email(user_id):
 
     _send_email(
         user_id, feconf.SYSTEM_COMMITTER_ID, feconf.EMAIL_INTENT_SIGNUP,
-        email_subject, email_body)
+        email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
 
 def require_valid_intent(intent):
@@ -254,4 +290,167 @@ def send_moderator_action_email(
             EMAIL_FOOTER.value))
     _send_email(
         recipient_id, sender_id, intent, email_subject, full_email_content,
-        bcc_admin=True)
+        feconf.SYSTEM_EMAIL_ADDRESS, bcc_admin=True)
+
+
+def send_role_notification_email(
+        inviter_id, recipient_id, recipient_role, exploration_id,
+        exploration_title):
+    """Sends a email when a new user is given activity rights (Manager, Editor,
+    Viewer) to an exploration by creator of exploration.
+
+    Email will only be sent if recipient wants to receive these emails (i.e.
+    'can_receive_editor_role_email' is set True in recipent's preferences).
+    """
+    # Editor role email body and email subject templates.
+    email_subject_template = (
+        '%s invited you to collaborate on Oppia.org')
+
+    email_body_template = (
+        'Hi %s,<br>'
+        '<br>'
+        '<b>%s</b> has granted you %s to their learning exploration, '
+        '"<a href="http://www.oppia.org/create/%s">%s</a>", on Oppia.org.<br>'
+        '<br>'
+        'This allows you to:<br>'
+        '<ul>%s</ul>'
+        'You can find the exploration '
+        '<a href="http://www.oppia.org/create/%s">here</a>.<br>'
+        '<br>'
+        'Thanks, and happy collaborating!<br>'
+        '<br>'
+        'Best wishes,<br>'
+        'The Oppia Team<br>'
+        '<br>%s')
+
+    # Return from here if sending email is turned off.
+    if not feconf.CAN_SEND_EMAILS_TO_USERS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    # Return from here is sending editor role email is disabled.
+    if not feconf.CAN_SEND_EDITOR_ROLE_EMAILS:
+        log_new_error('This app cannot send editor role emails to users.')
+        return
+
+    recipient_user_settings = user_services.get_user_settings(recipient_id)
+    inviter_user_settings = user_services.get_user_settings(inviter_id)
+    recipient_preferences = user_services.get_email_preferences(recipient_id)
+
+    if not recipient_preferences['can_receive_editor_role_email']:
+        # Do not send email if recipient has declined.
+        return
+
+    if recipient_role not in EDITOR_ROLE_EMAIL_HTML_ROLES:
+        raise Exception(
+            'Invalid role: %s' % recipient_role)
+
+    role_descriptipn = EDITOR_ROLE_EMAIL_HTML_ROLES[recipient_role]
+    rights_html = EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE[role_descriptipn]
+
+    email_subject = email_subject_template % (
+        inviter_user_settings.username)
+    email_body = email_body_template % (
+        recipient_user_settings.username, inviter_user_settings.username,
+        role_descriptipn, exploration_id, exploration_title, rights_html,
+        exploration_id, EMAIL_FOOTER.value)
+
+    _send_email(
+        recipient_id, feconf.SYSTEM_COMMITTER_ID,
+        feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION, email_subject, email_body,
+        feconf.NOREPLY_EMAIL_ADDRESS)
+
+
+def send_feedback_message_email(recipient_id, feedback_messages):
+    """Sends an email when creator receives feedback message to an exploration.
+
+    Args:
+    - recipient_id: id of recipient user.
+    - feedback_messages: dictionary containing feedback messages.
+    """
+
+    email_subject = 'New messages on Oppia.'
+
+    email_body_template = (
+        'Hi %s,<br>'
+        '<br>'
+        'You have %s new message(s) about your Oppia explorations:<br>'
+        '<ul>%s</ul>'
+        'You can view and reply to your messages from your '
+        '<a href="https://www.oppia.org/dashboard">dashboard</a>.'
+        '<br>'
+        'Thanks, and happy teaching!<br>'
+        '<br>'
+        'Best wishes,<br>'
+        'The Oppia Team<br>'
+        '<br>%s')
+
+    if not feconf.CAN_SEND_EMAILS_TO_USERS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    if not feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS:
+        log_new_error('This app cannot send feedback message emails to users.')
+        return
+
+    if not feedback_messages:
+        return
+
+    recipient_user_settings = user_services.get_user_settings(recipient_id)
+
+    messages_html = ''
+    for _, reference in feedback_messages.iteritems():
+        for message in reference['messages']:
+            messages_html += (
+                '<li>%s: %s<br></li>' % (reference['title'], message))
+
+    email_body = email_body_template % (
+        recipient_user_settings.username, len(feedback_messages), messages_html,
+        EMAIL_FOOTER.value)
+
+    _send_email(
+        recipient_id, feconf.SYSTEM_COMMITTER_ID,
+        feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION,
+        email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+
+
+def send_suggestion_email(
+        exploration_title, exploration_id, author_id, recipient_list):
+    email_subject = 'New suggestion for "%s"' % exploration_title
+
+    email_body_template = (
+        'Hi %s,<br>'
+        '%s has submitted a new suggestion for your Oppia exploration, '
+        '<a href="https://www.oppia.org/create/%s">"%s"</a>.<br>'
+        'You can accept or reject this suggestion by visiting the '
+        '<a href="https://www.oppia.org/create/%s#/feedback">feedback page</a> '
+        'for your exploration.<br>'
+        '<br>'
+        'Thanks!<br>'
+        '- The Oppia Team<br>'
+        '<br>%s')
+
+    if not feconf.CAN_SEND_EMAILS_TO_USERS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    if not feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS:
+        log_new_error('This app cannot send feedback message emails to users.')
+        return
+
+    author_settings = user_services.get_user_settings(author_id)
+    for recipient_id in recipient_list:
+        recipient_user_settings = user_services.get_user_settings(recipient_id)
+        recipient_preferences = (
+            user_services.get_email_preferences(recipient_id))
+
+        if recipient_preferences['can_receive_feedback_message_email']:
+            # Send email only if recipient wants to receive.
+            email_body = email_body_template % (
+                recipient_user_settings.username, author_settings.username,
+                exploration_id, exploration_title, exploration_id,
+                EMAIL_FOOTER.value)
+            _send_email(
+                recipient_id, feconf.SYSTEM_COMMITTER_ID,
+                feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION,
+                email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)

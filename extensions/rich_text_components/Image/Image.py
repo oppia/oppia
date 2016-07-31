@@ -27,6 +27,7 @@ class Image(base.BaseRichTextComponent):
     frontend_name = 'image'
     requires_fs = True
     tooltip = 'Insert image'
+    is_block_element = True
 
     _customization_arg_specs = [{
         'name': 'filepath',
@@ -39,6 +40,13 @@ class Image(base.BaseRichTextComponent):
         },
         'default_value': '',
     }, {
+        'name': 'caption',
+        'description': ('Caption for image (optional)'),
+        'schema': {
+            'type': 'unicode',
+        },
+        'default_value': '',
+    }, {
         'name': 'alt',
         'description': 'Alternative text (for screen readers)',
         'schema': {
@@ -46,3 +54,7 @@ class Image(base.BaseRichTextComponent):
         },
         'default_value': '',
     }]
+
+    @property
+    def preview_url_template(self):
+        return '/imagehandler/<[explorationId]>/<[filepath]>'

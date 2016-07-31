@@ -1,5 +1,5 @@
-{% if DEV_MODE %}
-  <script src="/third_party/generated/dev/js/third_party.js"></script>
+{% if MINIFICATION or not DEV_MODE %}
+  <script src="{{get_static_resource_url('/third_party/generated/js/third_party.min.js')}}"></script>
 {% else %}
-  <script src="/third_party/generated/prod/js/third_party.min.js"></script>
+  <script src="{{get_static_resource_url('/third_party/generated/js/third_party.js')}}"></script>
 {% endif %}

@@ -23,12 +23,13 @@ oppia.controller('Signup', [
       $scope, $http, $rootScope, $modal, alertsService, urlService,
       focusService, siteAnalyticsService) {
     var _SIGNUP_DATA_URL = '/signuphandler/data';
-    $rootScope.loadingMessage = 'Loading';
-    $scope.warningText = '';
+    $rootScope.loadingMessage = 'I18N_SIGNUP_LOADING';
+    $scope.warningI18nCode = '';
     $scope.showEmailPreferencesForm = GLOBALS.CAN_SEND_EMAILS_TO_USERS;
     $scope.submissionInProcess = false;
 
-    $http.get(_SIGNUP_DATA_URL).success(function(data) {
+    $http.get(_SIGNUP_DATA_URL).then(function(response) {
+      var data = response.data;
       $rootScope.loadingMessage = '';
       $scope.username = data.username;
       $scope.hasEverRegistered = data.has_ever_registered;
@@ -69,12 +70,12 @@ oppia.controller('Signup', [
       alertsService.clearWarnings();
       $scope.blurredAtLeastOnce = true;
       $scope.updateWarningText(username);
-      if (!$scope.warningText) {
+      if (!$scope.warningI18nCode) {
         $http.post('usernamehandler/data', {
           username: $scope.username
-        }).success(function(data) {
-          if (data.username_is_taken) {
-            $scope.warningText = 'Sorry, this username is already taken.';
+        }).then(function(response) {
+          if (response.data.username_is_taken) {
+            $scope.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_TAKEN';
           }
         });
       }
@@ -88,19 +89,19 @@ oppia.controller('Signup', [
       var oppia = /oppia/i;
 
       if (!username) {
-        $scope.warningText = 'Please choose a username.';
+        $scope.warningI18nCode = 'I18N_SIGNUP_ERROR_NO_USERNAME';
       } else if (username.indexOf(' ') !== -1) {
-        $scope.warningText = 'Please ensure that your username has no spaces.';
+        $scope.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES';
       } else if (username.length > 50) {
-        $scope.warningText = 'A username can have at most 50 characters.';
+        $scope.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS';
       } else if (!alphanumeric.test(username)) {
-        $scope.warningText = 'Usernames can only have alphanumeric characters.';
+        $scope.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM';
       } else if (admin.test(username)) {
-        $scope.warningText = 'User names with \'admin\' are reserved.';
+        $scope.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN';
       } else if (oppia.test(username)) {
-        $scope.warningText = 'This user name is not available.';
+        $scope.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE';
       } else {
-        $scope.warningText = '';
+        $scope.warningI18nCode = '';
       }
     };
 
@@ -111,13 +112,11 @@ oppia.controller('Signup', [
     $scope.submitPrerequisitesForm = function(
         agreedToTerms, username, canReceiveEmailUpdates) {
       if (!agreedToTerms) {
-        alertsService.addWarning(
-          'In order to edit explorations on this site, you will need to ' +
-          'agree to the site terms.');
+        alertsService.addWarning('I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
         return;
       }
 
-      if (!$scope.hasUsername && $scope.warningText) {
+      if (!$scope.hasUsername && $scope.warningI18nCode) {
         return;
       }
 
@@ -131,7 +130,7 @@ oppia.controller('Signup', [
 
       if (GLOBALS.CAN_SEND_EMAILS_TO_USERS && !$scope.hasUsername) {
         if (canReceiveEmailUpdates === null) {
-          $scope.emailPreferencesWarningText = 'This field is required.';
+          $scope.emailPreferencesWarningText = 'I18N_SIGNUP_FIELD_REQUIRED';
           return;
         }
 
@@ -148,10 +147,10 @@ oppia.controller('Signup', [
       siteAnalyticsService.registerNewSignupEvent();
 
       $scope.submissionInProcess = true;
-      $http.post(_SIGNUP_DATA_URL, requestParams).success(function() {
+      $http.post(_SIGNUP_DATA_URL, requestParams).then(function() {
         window.location = window.decodeURIComponent(
           urlService.getUrlParams().return_url);
-      }).error(function() {
+      }, function() {
         $scope.submissionInProcess = false;
       });
     };

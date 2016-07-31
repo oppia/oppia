@@ -45,7 +45,7 @@ oppia.directive('mathjaxBind', [function() {
         $scope.$watch($attrs.mathjaxBind, function(value) {
           var $script = angular.element(
             '<script type="math/tex">'
-          ).html(value == undefined ? '' : value);
+          ).html(value === undefined ? '' : value);
           $element.html('');
           $element.append($script);
           MathJax.Hub.Queue(['Reprocess', MathJax.Hub, $element[0]]);
@@ -64,18 +64,6 @@ oppia.directive('selectOnClick', [function() {
         this.select();
       });
     }
-  };
-}]);
-
-oppia.directive('whenScrolledToBottom', [function() {
-  return function(scope, elm, attr) {
-    var raw = elm[0];
-
-    elm.bind('scroll', function() {
-      if (raw.scrollTop + raw.offsetHeight >= raw.scrollHeight) {
-        scope.$apply(attr.whenScrolled);
-      }
-    });
   };
 }]);
 

@@ -145,7 +145,6 @@ oppia.directive('filepathEditor', [
             $scope.localValue.label = data.filepath;
             $scope.$apply();
           }).fail(function(data) {
-            console.log(data);
             // Remove the XSSI prefix.
             var transformedData = data.responseText.substring(5);
             var parsedResponse = JSON.parse(transformedData);
@@ -158,8 +157,8 @@ oppia.directive('filepathEditor', [
         $scope.filepathsLoaded = false;
         $http.get(
           '/createhandler/resource_list/' + $scope.explorationId
-        ).success(function(data) {
-          $scope.filepaths = data.filepaths;
+        ).then(function(response) {
+          $scope.filepaths = response.data.filepaths;
           $scope.filepathsLoaded = true;
         });
       }

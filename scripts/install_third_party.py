@@ -27,6 +27,12 @@ import zipfile
 
 import common
 
+#These two lines prevent a "IOError: [Errno socket error]
+#[Errno -2] Name or service not known" error
+# in urllib.urlretrieve, if the user is behind a proxy.
+if 'VAGRANT' in os.environ:
+    os.environ['http_proxy'] = ''
+
 TOOLS_DIR = os.path.join('..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
 THIRD_PARTY_STATIC_DIR = os.path.join(THIRD_PARTY_DIR, 'static')
@@ -254,6 +260,10 @@ def validate_manifest(filepath):
     dependencies = manifest_data['dependencies']
     for _, dependency in dependencies.items():
         for _, dependency_contents in dependency.items():
+            if 'downloadFormat' not in dependency_contents:
+                raise Exception(
+                    'downloadFormat not specified in %s' %
+                    dependency_contents)
             download_format = dependency_contents['downloadFormat']
             test_manifest_syntax(download_format, dependency_contents)
 

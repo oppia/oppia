@@ -31,21 +31,10 @@ describe('Base controller', function() {
       });
     }));
 
-    it('should check if an object is empty', function() {
-      var a = {
-        a: 'b'
-      };
-      var isEmpty = scope.isEmpty(a);
-      expect(isEmpty).toEqual(false);
-      var b = {};
-      var isEmpty = scope.isEmpty(b);
-      expect(isEmpty).toEqual(true);
-    });
-
-    it('should have matching fuzzy rule constants',
+    it('should have matching classifier constants',
         inject(function($injector) {
-      expect($injector.get('DEFAULT_FUZZY_RULE').rule_type).toEqual(
-        $injector.get('FUZZY_RULE_TYPE'));
+      expect($injector.get('DEFAULT_CLASSIFIER_RULE_SPEC').rule_type).toEqual(
+        $injector.get('CLASSIFIER_RULESPEC_STR'));
     }));
   });
 });

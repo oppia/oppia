@@ -44,8 +44,6 @@ def require_user_id_else_redirect_to_homepage(handler):
 class ProfilePage(base.BaseHandler):
     """The world-viewable profile page."""
 
-    PAGE_NAME_FOR_CSRF = 'profile'
-
     def get(self, username):
         """Handles GET requests for the publicly-viewable profile page."""
         if not username:
@@ -58,15 +56,13 @@ class ProfilePage(base.BaseHandler):
 
         self.values.update({
             'nav_mode': feconf.NAV_MODE_PROFILE,
-            'PROFILE_USERNAME': username,
+            'PROFILE_USERNAME': user_settings.username,
         })
         self.render_template('profile/profile.html')
 
 
 class ProfileHandler(base.BaseHandler):
     """Provides data for the profile page."""
-
-    PAGE_NAME_FOR_CSRF = 'profile'
 
     def get(self, username):
         """Handles GET requests."""
@@ -89,8 +85,11 @@ class ProfileHandler(base.BaseHandler):
             edited_exp_summary_dicts = (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
                     user_contributions.edited_exploration_ids))
+        profile_is_of_current_user = (self.username == username)
 
         self.values.update({
+            'profile_is_of_current_user': profile_is_of_current_user,
+            'profile_username': user_settings.username,
             'user_bio': user_settings.user_bio,
             'subject_interests': user_settings.subject_interests,
             'first_contribution_msec': (
@@ -108,12 +107,11 @@ class ProfileHandler(base.BaseHandler):
 class PreferencesPage(base.BaseHandler):
     """The preferences page."""
 
-    PAGE_NAME_FOR_CSRF = 'preferences'
-
     @base.require_user
     def get(self):
         """Handles GET requests."""
         self.values.update({
+            'meta_description': feconf.PREFERENCES_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_PROFILE,
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
@@ -125,19 +123,25 @@ class PreferencesPage(base.BaseHandler):
 class PreferencesHandler(base.BaseHandler):
     """Provides data for the preferences page."""
 
-    PAGE_NAME_FOR_CSRF = 'preferences'
-
     @base.require_user
     def get(self):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
+        user_email_preferences = user_services.get_email_preferences(
+            self.user_id)
         self.values.update({
             'preferred_language_codes': user_settings.preferred_language_codes,
+            'preferred_site_language_code': (
+                user_settings.preferred_site_language_code),
             'profile_picture_data_url': user_settings.profile_picture_data_url,
             'user_bio': user_settings.user_bio,
             'subject_interests': user_settings.subject_interests,
-            'can_receive_email_updates': user_services.get_email_preferences(
-                self.user_id)['can_receive_email_updates'],
+            'can_receive_email_updates': (
+                user_email_preferences['can_receive_email_updates']),
+            'can_receive_editor_role_email': (
+                user_email_preferences['can_receive_editor_role_email']),
+            'can_receive_feedback_message_email': (
+                user_email_preferences['can_receive_feedback_message_email'])
         })
         self.render_json(self.values)
 
@@ -153,10 +157,16 @@ class PreferencesHandler(base.BaseHandler):
             user_services.update_subject_interests(self.user_id, data)
         elif update_type == 'preferred_language_codes':
             user_services.update_preferred_language_codes(self.user_id, data)
+        elif update_type == 'preferred_site_language_code':
+            user_services.update_preferred_site_language_code(
+                self.user_id, data)
         elif update_type == 'profile_picture_data_url':
             user_services.update_profile_picture_data_url(self.user_id, data)
-        elif update_type == 'can_receive_email_updates':
-            user_services.update_email_preferences(self.user_id, data)
+        elif update_type == 'email_preferences':
+            user_services.update_email_preferences(
+                self.user_id, data['can_receive_email_updates'],
+                data['can_receive_editor_role_email'],
+                data['can_receive_feedback_message_email'])
         else:
             raise self.InvalidInputException(
                 'Invalid update type: %s' % update_type)
@@ -197,7 +207,6 @@ class ProfilePictureHandlerByUsername(base.BaseHandler):
 class SignupPage(base.BaseHandler):
     """The page which prompts for username and acceptance of terms."""
 
-    PAGE_NAME_FOR_CSRF = 'signup'
     REDIRECT_UNFINISHED_SIGNUPS = False
 
     @require_user_id_else_redirect_to_homepage
@@ -210,6 +219,7 @@ class SignupPage(base.BaseHandler):
             return
 
         self.values.update({
+            'meta_description': feconf.SIGNUP_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_SIGNUP,
             'CAN_SEND_EMAILS_TO_USERS': feconf.CAN_SEND_EMAILS_TO_USERS,
         })
@@ -219,7 +229,6 @@ class SignupPage(base.BaseHandler):
 class SignupHandler(base.BaseHandler):
     """Provides data for the editor prerequisites page."""
 
-    PAGE_NAME_FOR_CSRF = 'signup'
     REDIRECT_UNFINISHED_SIGNUPS = False
 
     @require_user_id_else_redirect_to_homepage
@@ -266,12 +275,16 @@ class SignupHandler(base.BaseHandler):
 
         if can_receive_email_updates is not None:
             user_services.update_email_preferences(
-                self.user_id, can_receive_email_updates)
+                self.user_id, can_receive_email_updates,
+                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
 
         # Note that an email is only sent when the user registers for the first
         # time.
         if feconf.CAN_SEND_EMAILS_TO_USERS and not has_ever_registered:
             email_manager.send_post_signup_email(self.user_id)
+
+        user_services.generate_initial_profile_picture(self.user_id)
 
         self.render_json({})
 
@@ -279,7 +292,6 @@ class SignupHandler(base.BaseHandler):
 class UsernameCheckHandler(base.BaseHandler):
     """Checks whether a username has already been taken."""
 
-    PAGE_NAME_FOR_CSRF = 'signup'
     REDIRECT_UNFINISHED_SIGNUPS = False
 
     @require_user_id_else_redirect_to_homepage
@@ -295,3 +307,15 @@ class UsernameCheckHandler(base.BaseHandler):
         self.render_json({
             'username_is_taken': username_is_taken,
         })
+
+
+class SiteLanguageHandler(base.BaseHandler):
+    """Changes the preferred system language in the user's preferences."""
+
+    def put(self):
+        """Handles PUT requests."""
+        if user_services.has_fully_registered(self.user_id):
+            site_language_code = self.payload.get('site_language_code')
+            user_services.update_preferred_site_language_code(
+                self.user_id, site_language_code)
+        self.render_json({})

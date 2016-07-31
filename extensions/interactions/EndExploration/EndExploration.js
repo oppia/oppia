@@ -47,7 +47,9 @@ oppia.directive('oppiaInteractiveEndExploration', [function() {
             EDITOR_TAB_CONTEXT.EDITOR);
 
         $scope.collectionId = GLOBALS.collectionId;
-        $scope.collectionTitle = GLOBALS.collectionTitle;
+        $scope.getCollectionTitle = function() {
+          return GLOBALS.collectionTitle;
+        };
 
         $scope.errorMessage = '';
 
@@ -60,7 +62,8 @@ oppia.directive('oppiaInteractiveEndExploration', [function() {
               stringified_exp_ids: JSON.stringify(
                 authorRecommendedExplorationIds)
             }
-          }).success(function(data) {
+          }).then(function(response) {
+            var data = response.data;
             var foundExpIds = [];
             data.summaries.map(function(expSummary) {
               foundExpIds.push(expSummary.id);
@@ -103,4 +106,8 @@ oppia.directive('oppiaShortResponseEndExploration', [function() {
     scope: {},
     templateUrl: 'shortResponse/EndExploration'
   };
+}]);
+
+oppia.factory('endExplorationRulesService', [function() {
+  return {};
 }]);
