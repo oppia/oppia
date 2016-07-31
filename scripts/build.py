@@ -25,7 +25,8 @@ import yaml
 REMOVE_WS = re.compile(r'\s{2,}').sub
 YUICOMPRESSOR_DIR = os.path.join(
     '..', 'oppia_tools', 'yuicompressor-2.4.8', 'yuicompressor-2.4.8.jar')
-
+FILE_EXTENSIONS_TO_COPY_DIRECTLY = ['.json']
+FILE_EXTENSIONS_NOT_TO_COPY_DIRECTLY = ['.html', '.css', '.js']
 
 def _minify(source_path, target_path):
     """Runs the given file through a minifier and outputs it to target_path."""
@@ -106,6 +107,10 @@ def build_files(source, target, ignore=None):
     """Minifies all css and js files, and removes whitespace from html in source
     directory and copies it to target, ignoring paths/files mentioned in ignore.
     Copies files in ignore to target without any changes.
+
+    Arguments:
+        source, target: strings
+        ignore: list of files/paths to ignore
     """
     print 'Processing %s' % os.path.join(os.getcwd(), source)
     print 'Generating into %s' % os.path.join(os.getcwd(), target)
@@ -125,8 +130,10 @@ def build_files(source, target, ignore=None):
 
             only_copy_file = False
             if (any(source_path.find(p) > 0 for p in ignore) or
-                    any(source_path.find(p) > 0 for p in ['.json']) or
-                    not any(source_path.find(p) > 0 for p in ['.html', '.css', '.js'])):
+                    any(source_path.find(p) > 0
+                        for p in FILE_EXTENSIONS_TO_COPY_DIRECTLY) or
+                    not any(source_path.find(p) > 0
+                            for p in FILE_EXTENSIONS_NOT_TO_COPY_DIRECTLY)):
                 only_copy_file = True
 
             if only_copy_file:
@@ -155,7 +162,7 @@ if __name__ == '__main__':
     CACHE_SLUG = get_cache_slug()
     BUILD_DIR = os.path.join('build', CACHE_SLUG)
 
-    # ensure_directory_exists method trims file paths passed to it. Hence, directory
+    # ensure_directory_exists trims file paths passed to it. Hence, directory
     # paths require a trailing slash.
     # Process assets, copy it to build/[cache_slug]/assets
     ASSETS_SRC_DIR = os.path.join('assets', '')
@@ -171,11 +178,10 @@ if __name__ == '__main__':
     # Process extensions, copy it to build/[cache_slug]/extensions
     EXTENSIONS_SRC_DIR = os.path.join('extensions', '')
     EXTENSIONS_OUT_DIR = os.path.join(BUILD_DIR, 'extensions', '')
-    # Certain files' syntax becomes incorrect after minification and hence
+    # Certain files' syntax become incorrect after minification and hence
     # they are ignored.
     EXTENSIONS_IGNORE = [os.path.join('extensions', 'interactions',
-                                      'LogicProof', 'static', 'js')
-                        ]
+                                      'LogicProof', 'static', 'js')]
     build_files(EXTENSIONS_SRC_DIR, EXTENSIONS_OUT_DIR, EXTENSIONS_IGNORE)
 
     # Process core/templates/dev/head
