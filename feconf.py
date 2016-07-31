@@ -33,6 +33,13 @@ PLATFORM = 'gae'
 IS_MINIFIED = os.environ.get('MINIFICATION') == 'True'
 
 # Whether we should serve the development or production experience.
+# DEV_MODE should only be changed to False in the production environment.
+# To use minified resources in the development environment,
+# change the MINIFICATION env variable in app.yaml to True.
+# When DEV_MODE is True, this indicates that we are not running in
+# the production App Engine environment, which affects things like
+# login/logout URLs,as well as third-party libraries
+# that App Engine normally provides.
 if PLATFORM == 'gae':
     DEV_MODE = (
         not os.environ.get('SERVER_SOFTWARE')
@@ -203,13 +210,17 @@ DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE = True
 REQUIRE_EMAIL_ON_MODERATOR_ACTION = False
 # Whether to allow custom event reporting to Google Analytics.
 CAN_SEND_ANALYTICS_EVENTS = False
-# Timespan in minutes before allowing duplicate emails
+# Timespan in minutes before allowing duplicate emails.
 DUPLICATE_EMAIL_INTERVAL_MINS = 2
+# Number of digits after decimal to which the average ratings value in the
+# dashboard is rounded off to.
+AVERAGE_RATINGS_DASHBOARD_PRECISION = 2
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
 EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION = 'editor_role_notification'
 EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION = 'feedback_message_notification'
+EMAIL_INTENT_SUGGESTION_NOTIFICATION = 'suggestion_notification'
 EMAIL_INTENT_MARKETING = 'marketing'
 EMAIL_INTENT_PUBLICIZE_EXPLORATION = 'publicize_exploration'
 EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
@@ -436,6 +447,8 @@ SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
 SPLASH_URL = '/splash'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
+SUGGESTION_EMAIL_HANDLER_URL = (
+    '%s/email/suggestionemailhandler' % TASKQUEUE_URL_PREFIX)
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
@@ -453,6 +466,7 @@ NAV_MODE_PROFILE = 'profile'
 NAV_MODE_SIGNUP = 'signup'
 NAV_MODE_SPLASH = 'splash'
 NAV_MODE_TEACH = 'teach'
+NAV_MODE_THANKS = 'thanks'
 
 # Event types.
 EVENT_TYPE_STATE_HIT = 'state_hit'
@@ -728,3 +742,5 @@ TERMS_PAGE_DESCRIPTION = (
     'Oppia is a 501(c)(3) registered non-profit open-source e-learning '
     'platform. Learn about our terms and conditions for creating and '
     'distributing learning material.')
+THANKS_PAGE_DESCRIPTION = (
+    'Thank you for donating to The Oppia Foundation.')

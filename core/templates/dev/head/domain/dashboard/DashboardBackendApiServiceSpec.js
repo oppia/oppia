@@ -64,6 +64,12 @@ describe('Dashboard backend API service', function() {
         num_ratings: 1,
         average_ratings: 4.0,
         total_open_feedback: 5
+      },
+      last_week_stats: {
+        total_plays: 2,
+        average_ratings: 3.5,
+        num_ratings: 3,
+        total_open_feedback: 1
       }
     };
   }));
