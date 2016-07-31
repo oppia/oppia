@@ -254,11 +254,14 @@
                           </ul>
                           <ul ng-if="!windowIsNarrow" class="nav oppia-navbar-tabs">
                             <create-activity-button></create-activity-button>
-
-                            <li class="oppia-clickable-navbar-element pull-right">
-                              <a class="oppia-navbar-tab" href="/donate" translate="I18N_TOPNAV_DONATE">
-                              </a>
+                            <li>
+                              <div class="pull-right oppia-navbar-button-container">
+                                <a href="/donate" class="btn oppia-navbar-button oppia-navbar-hide-on-small-width protractor-test-create-activity oppia-transition-200"
+                                  <span translate="I18N_TOPNAV_DONATE"></span>
+                                </a>
+                              </div>
                             </li>
+
                             <li class="dropdown oppia-navbar-clickable-dropdown pull-right">
                               <a class="oppia-navbar-tab">
                                 <span translate="I18N_TOPNAV_ABOUT"></span>

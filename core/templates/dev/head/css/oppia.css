@@ -3917,16 +3917,15 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-about-three-cols-layout {
-  display: inline-block;
   margin-right: 20px;
-  width: calc((100% - 60px) / 3);
+  width: calc((100% - 40px) / 3);
 }
 
 .oppia-about-three-cols-layout:last-of-type {
   margin-right: 0;
 }
 
-.oppia-about-credits-letter-groups.three-col {
+.oppia-about-credits-letter-groups.three-col{
   margin: 0 0 10% 0;
   -moz-column-count: 3;
   -moz-column-gap: 20px;
@@ -3939,10 +3938,8 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-about-extra-info {
   background-color: #009788;
   color: #fff;
-  width: 100%;
-}
-.oppia-about-page-extra-info {
   height: 220px;
+  width: 100%;
 }
 
 .oppia-about-tab-content {
@@ -4036,6 +4033,47 @@ md-card.preview-conversation-skin-supplemental-card {
   list-style-type: none;
 }
 
+.oppia-donation-card {
+  margin: auto;
+  position: relative;
+  width: 660px;
+}
+
+.oppia-donation-card-content-wide {
+  margin: 0 auto;
+  min-height: 670px;
+  overflow: auto;
+}
+
+.oppia-donate-info {
+  float: left;
+  width: calc(100% - 340px);
+}
+
+.oppia-donate-options {
+  background-color: #009688;
+  display: block;
+  float: right;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  padding: 10px;
+  width: 340px;
+}
+
+.btn.oppia-donate-options-button {
+  background-color: rgba(0,0,0,0.2);
+  color: rgba(255,255,255,1.0);
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 16px;
+  height: 40px;
+  margin: 15px auto;
+  width: 180px;
+}
+
+.btn.oppia-donate-options-button:hover {
+  background-color: rgba(5, 190, 178, 1);
+  color: rgba(255,255,255,1);
+}
+
 /*
   about/learners/creators media queries
 */
@@ -4043,6 +4081,19 @@ md-card.preview-conversation-skin-supplemental-card {
 @media only screen and (min-width: 1400px) {
   .oppia-about-content, .oppia-about-extra-content {
     width: 960px;
+  }
+}
+
+@media only screen and (max-width: 1140px) {
+  .oppia-donation-card-content-wide {
+    margin-bottom: 30px;
+  }
+  .oppia-donate-info {
+    display: none;
+  }
+  .oppia-donate-options {
+    float: clear;
+    width: 100%;
   }
 }
 
