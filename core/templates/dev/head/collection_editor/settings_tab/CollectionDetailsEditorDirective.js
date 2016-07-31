@@ -24,12 +24,14 @@ oppia.directive('collectionDetailsEditor', [function() {
     templateUrl: 'inline/collection_details_editor_directive',
     controller: [
       '$scope', 'CollectionEditorStateService', 'CollectionUpdateService',
-      'alertsService', 'CATEGORY_LIST', 'EVENT_COLLECTION_INITIALIZED',
-      'EVENT_COLLECTION_REINITIALIZED', 'COLLECTION_TITLE_INPUT_FOCUS_LABEL',
+      'CollectionValidationService', 'alertsService', 'CATEGORY_LIST',
+      'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
+      'COLLECTION_TITLE_INPUT_FOCUS_LABEL',
       function(
           $scope, CollectionEditorStateService, CollectionUpdateService,
-          alertsService, CATEGORY_LIST, EVENT_COLLECTION_INITIALIZED,
-          EVENT_COLLECTION_REINITIALIZED, COLLECTION_TITLE_INPUT_FOCUS_LABEL) {
+          CollectionValidationService, alertsService, CATEGORY_LIST,
+          EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED,
+          COLLECTION_TITLE_INPUT_FOCUS_LABEL) {
         $scope.collection = CollectionEditorStateService.getCollection();
         $scope.COLLECTION_TITLE_INPUT_FOCUS_LABEL = (
           COLLECTION_TITLE_INPUT_FOCUS_LABEL);
@@ -113,7 +115,7 @@ oppia.directive('collectionDetailsEditor', [function() {
         };
 
         // Normalize the tags for the collection
-        var _normalizeTags = function(tags) {
+        var normalizeTags = function(tags) {
           for (var i = 0; i < tags.length; i++) {
             tags[i] = tags[i].trim().replace(/\s+/g, ' ');
           }
@@ -121,13 +123,13 @@ oppia.directive('collectionDetailsEditor', [function() {
         };
 
         $scope.updateCollectionTags = function() {
-          $scope.displayedCollectionTags = _normalizeTags(
+          $scope.displayedCollectionTags = normalizeTags(
             $scope.displayedCollectionTags);
-          if (!CollectionUpdateService.isTagValid(
-                $scope.collection, $scope.displayedCollectionTags)) {
+          if (!CollectionValidationService.isTagValid(
+                $scope.displayedCollectionTags)) {
             alertsService.addWarning(
-              'Please verify that there are no duplicate tags and/or ' +
-              'that all tags contain only spaces and lower case letters.');
+              'Please ensure that there are no duplicate tags and that all ' +
+              'tags contain only lower case and spaces.');
             return;
           }
           CollectionUpdateService.setCollectionTags(

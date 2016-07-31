@@ -531,6 +531,11 @@ class Collection(object):
         if not isinstance(self.tags, list):
             raise utils.ValidationError(
                 'Expected tags to be a list, received %s' % self.tags)
+
+        if len(set(self.tags)) < len(self.tags):
+            raise utils.ValidationError(
+                'Expected tags to be unique, but found duplicates')
+
         for tag in self.tags:
             if not isinstance(tag, basestring):
                 raise utils.ValidationError(
