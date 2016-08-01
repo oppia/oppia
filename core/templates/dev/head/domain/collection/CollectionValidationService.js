@@ -77,20 +77,18 @@ oppia.factory('CollectionValidationService', [
     var validateTagFormat = function(tags) {
       // Check to ensure that all tags follow the format specified in
       // TAG_REGEX.
-      for (var i = 0; i < tags.length; i++) {
-        var tagRegex = new RegExp(GLOBALS.TAG_REGEX);
-        if (!tags[i].match(tagRegex)) {
-          return false;
-        }
-      }
-      return true;
+      var tagRegex = new RegExp(GLOBALS.TAG_REGEX);
+      return tags.every(function(tag) {
+        return tag.match(tagRegex);
+      });
     };
 
     // Validates that the tags for the collection do not have duplicates,
     // returns true if there are duplicates.
     var validateDuplicateTags = function(tags) {
       return tags.every(function(tag, idx) {
-        return tags.indexOf(tag, idx + 1) === -1;
+        return tags.indexOf(tag, idx + 1) === -1 &&
+          tag === tag.trim().replace(/\s+/g, ' ');
       });
     };
 
