@@ -113,6 +113,21 @@ if [ ${OS} == "Linux" ]; then
   fi
 fi
 
+# Argument passed to gulpfile.js to help build with minification.
+MINIFICATION=false
+for arg in "$@"; do
+  # Used to emulate running Oppia in a production environment.
+  if [ "$arg" == "--prod_env" ]; then
+    MINIFICATION=true
+    $PYTHON_CMD scripts/build.py
+  fi
+done
+
+yaml_env_variable="MINIFICATION: $MINIFICATION"
+sed -i.bak -e s/"MINIFICATION: .*"/"$yaml_env_variable"/ app.yaml
+# Delete the modified yaml file(-i.bak)
+rm app.yaml.bak
+
 # Start a selenium process. The program sends thousands of lines of useless
 # info logs to stderr so we discard them.
 # TODO(jacob): Find a webdriver or selenium argument that controls log level.
