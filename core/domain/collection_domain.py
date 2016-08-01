@@ -559,8 +559,6 @@ class Collection(object):
                 raise utils.ValidationError(
                     'Adjacent whitespace in tags should be collapsed, '
                     'received \'%s\'' % tag)
-        if len(set(self.tags)) != len(self.tags):
-            raise utils.ValidationError('Some tags duplicate each other')
 
         if not isinstance(self.schema_version, int):
             raise utils.ValidationError(
