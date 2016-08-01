@@ -119,6 +119,7 @@ for arg in "$@"; do
   # Used to emulate running Oppia in a production environment.
   if [ "$arg" == "--prod_env" ]; then
     MINIFICATION=true
+    echo "  Generating files for production mode..."
     $PYTHON_CMD scripts/build.py
   fi
 done
@@ -150,6 +151,7 @@ fi
 SUITE="full"
 SHARDING=true
 SHARD_INSTANCES=3
+PROD_ENV=false
 for j in "$@"; do
   # Match each space-separated argument passed to the shell file to a separate
   # case label, based on a pattern. E.g. Match to -suite=*, -sharding=*, where the
@@ -172,6 +174,11 @@ for j in "$@"; do
 
     --sharding-instances=*)
     SHARD_INSTANCES="${j#*=}"
+    shift
+    ;;
+
+    --prod_env=*)
+    PROD_ENV="${j#*=}"
     shift
     ;;
 
