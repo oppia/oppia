@@ -19,11 +19,18 @@
 oppia.controller('Dashboard', [
   '$scope', '$rootScope', '$window', 'oppiaDatetimeFormatter', 'alertsService',
   'DashboardBackendApiService', 'RatingComputationService',
-  'ExplorationCreationService', 'FATAL_ERROR_CODES',
+  'ExplorationCreationService', 'FATAL_ERROR_CODES', 'UrlInterpolationService',
+  'sortExplorationsService',
   function(
-      $scope, $rootScope, $window, oppiaDatetimeFormatter, alertsService,
-      DashboardBackendApiService, RatingComputationService,
-      ExplorationCreationService, FATAL_ERROR_CODES) {
+    $scope, $rootScope, $window, oppiaDatetimeFormatter, alertsService,
+    DashboardBackendApiService, RatingComputationService,
+    ExplorationCreationService, FATAL_ERROR_CODES, UrlInterpolationService,
+    sortExplorationsService) {
+    var EXP_PUBLISH_TEXTS = {
+      default: 'This exploration is private. Publish it to receive statistics.',
+      sm: 'Publish the exploration to receive statistics.'
+    };
+
     $scope.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
         GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD);
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
@@ -49,14 +56,8 @@ oppia.controller('Dashboard', [
     $rootScope.loadingMessage = 'Loading';
     DashboardBackendApiService.fetchDashboardData().then(
       function(response) {
-        $scope.explorationsList = response.explorations_list.sort(
-          function(a, b) {
-            return (a.title === '' ? 1 :
-              b.title === '' ? -1 :
-              a.title < b.title ? -1 :
-              a.title > b.title ? 1 : 0);
-          }
-        );
+        $scope.explorationsList = (
+          sortExplorationsService.sortBy(response.explorations_list, 'title'));
         $scope.collectionsList = response.collections_list;
         $scope.dashboardStats = response.dashboard_stats;
         $rootScope.loadingMessage = '';

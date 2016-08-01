@@ -17,40 +17,42 @@
  */
 
 // Service for sorting the explorations based on different parameters.
-oppia.factory('sortExplorationsService', [
-  function() {
-    var explorationsList = [];
-    var SORT_BY_KEYS = [
-      'title',
-      'last_updated_msec',
-      'num_views',
-      'num_open_threads',
-      'num_unresolved_answers'
-    ];
-    var sortByKey = function(key, reverse) {
-      var result = explorationsList;
-      result.sort(function(prev, next) {
-        if (prev[key] < next[key]) {
-          return true;
-        }
-        return false;
-      });
-      if (reverse) {
-        return result.reverse();
+oppia.factory('sortExplorationsService', [function() {
+  var SORT_BY_KEYS = [
+    'title',
+    'last_updated_msec',
+    'num_views',
+    'num_open_threads',
+    'num_unresolved_answers'
+  ];
+  var EMPTY_TITLE_TEXT = 'Untitled';
+
+  var sortByKey = function(explorationsList, key, reverse) {
+    var result = explorationsList;
+    var prevValue, nextValue;
+    result.sort(function(prev, next) {
+      if (key === 'title') {
+        prevValue = prev[key] === '' ? EMPTY_TITLE_TEXT : prev[key];
+        nextValue = next[key] === '' ? EMPTY_TITLE_TEXT : next[key];
       }
-      return result;
-    };
-    return {
-      setExplorationsList: function(explorationsList) {
-        explorationsList = explorationsList;
-      },
-      sortBy: function(param, reverse) {
-        if (SORT_BY_KEYS.indexOf(param) !== -1) {
-          return sortByKey(param, reverse);
-        } else {
-          return explorationsList;
-        }
+      if (typeof prevValue === 'string') {
+        prevValue = prevValue.toLowerCase();
+        nextValue = nextValue.toLowerCase();
       }
-    };
-  }
-]);
+      return prevValue > nextValue;
+    });
+    if (reverse) {
+      return result.reverse();
+    }
+    return result;
+  };
+  return {
+    sortBy: function(explorationsList, param, reverse) {
+      if (SORT_BY_KEYS.indexOf(param) !== -1) {
+        return sortByKey(explorationsList, param, reverse);
+      } else {
+        return explorationsList;
+      }
+    }
+  };
+}]);
