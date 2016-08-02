@@ -17,6 +17,7 @@ describe('Expression evaluator service', function() {
 
   var ees = null;
   var eps = null;
+  var ests = null;
   beforeEach(inject(function($injector) {
     ees = $injector.get('expressionEvaluatorService');
     eps = $injector.get('expressionParserService');

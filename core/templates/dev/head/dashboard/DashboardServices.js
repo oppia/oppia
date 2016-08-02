@@ -17,42 +17,44 @@
  */
 
 // Service for sorting the explorations based on different parameters.
-oppia.factory('sortExplorationsService', [function() {
-  var SORT_BY_KEYS = [
-    'title',
-    'last_updated_msec',
-    'num_views',
-    'num_open_threads',
-    'num_unresolved_answers'
-  ];
-  var EMPTY_TITLE_TEXT = 'Untitled';
+oppia.factory('sortExplorationsService', [
+  'utilsService', function(utilsService) {
+    var SORT_BY_KEYS = [
+      'title',
+      'last_updated_msec',
+      'num_views',
+      'num_open_threads',
+      'num_unresolved_answers'
+    ];
+    var EMPTY_TITLE_TEXT = 'Untitled';
 
-  var sortByKey = function(explorationsList, key, reverse) {
-    var result = explorationsList;
-    var prevValue, nextValue;
-    result.sort(function(prev, next) {
-      if (key === 'title') {
-        prevValue = prev[key] === '' ? EMPTY_TITLE_TEXT : prev[key];
-        nextValue = next[key] === '' ? EMPTY_TITLE_TEXT : next[key];
+    var sortByKey = function(explorationsList, key, reverse) {
+      var result = explorationsList;
+      var prevValue, nextValue;
+      result.sort(function(prev, next) {
+        if (key === 'title') {
+          prevValue = prev[key] === '' ? EMPTY_TITLE_TEXT : prev[key];
+          nextValue = next[key] === '' ? EMPTY_TITLE_TEXT : next[key];
+        }
+        if (utilsService.isString(prevValue)) {
+          prevValue = prevValue.toLowerCase();
+          nextValue = nextValue.toLowerCase();
+        }
+        return prevValue > nextValue;
+      });
+      if (reverse) {
+        return result.reverse();
       }
-      if (typeof prevValue === 'string') {
-        prevValue = prevValue.toLowerCase();
-        nextValue = nextValue.toLowerCase();
+      return result;
+    };
+    return {
+      sortBy: function(explorationsList, param, reverse) {
+        if (SORT_BY_KEYS.indexOf(param) !== -1) {
+          return sortByKey(explorationsList, param, reverse);
+        } else {
+          return explorationsList;
+        }
       }
-      return prevValue > nextValue;
-    });
-    if (reverse) {
-      return result.reverse();
-    }
-    return result;
-  };
-  return {
-    sortBy: function(explorationsList, param, reverse) {
-      if (SORT_BY_KEYS.indexOf(param) !== -1) {
-        return sortByKey(explorationsList, param, reverse);
-      } else {
-        return explorationsList;
-      }
-    }
-  };
-}]);
+    };
+  }
+]);
