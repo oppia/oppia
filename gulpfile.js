@@ -115,13 +115,11 @@ var jsFilePaths = [];
 var fontFolderPaths = [];
 var cssBackgroundFilepaths = [];
 
-// In non-dev mode, we move all files inside 'third_party/generated' to
-// 'build/{{cache_slug}}/third_party/generated/' and serve it from there.
-// And, for dev mode without minification, we generate the files inside
-// 'third_party/generated/' and serve it from there. These files are generated
-// directly inside 'third_party/generated/' since we need to keep urls
-// compatible across both dev and prod modes. This compatibility is achieved by
-// only interpolating the prefix for urls to these files.
+// If output_directory argument is specified we generate files there, otherwise
+// we generate files in /third_party/generated.
+// In non-dev mode, we serve files from a separate build directory specified by
+// the output_directory argument.
+// And for dev mode without minification, we do it from /third_party/generated.
 var generatedTargetDir = path.join('third_party', 'generated');
 if ('output_directory' in argv && argv.output_directory !== undefined) {
   generatedTargetDir = argv.output_directory;
