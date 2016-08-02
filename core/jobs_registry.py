@@ -16,7 +16,6 @@
 
 """Job registries."""
 
-from core.domain import exp_jobs_continuous
 from core.domain import exp_jobs_one_off
 from core.domain import feedback_jobs_continuous
 from core.domain import stats_jobs_continuous
@@ -47,7 +46,6 @@ ONE_OFF_JOB_MANAGERS = [
 # NOTE TO DEVELOPERS: When a new ContinuousComputation manager is defined,
 # it should be registered here.
 ALL_CONTINUOUS_COMPUTATION_MANAGERS = [
-    exp_jobs_continuous.SearchRanker,
     stats_jobs_continuous.StatisticsAggregator,
     user_jobs_continuous.DashboardRecentUpdatesAggregator,
     user_jobs_continuous.UserStatsAggregator,

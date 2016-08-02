@@ -144,7 +144,7 @@ class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
 
 
 class IndexAllExplorationsJobManager(jobs.BaseMapReduceJobManager):
-    """One-off job that indexes all explorations"""
+    """One-off job that indexes all explorations and computes their ranks."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
