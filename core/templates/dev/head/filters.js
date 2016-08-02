@@ -132,8 +132,9 @@ oppia.filter('wrapTextWithEllipsis', [
         // Replace characters counting backwards from character count with an
         // ellipsis, then trim the string.
         return input.substr(0, characterCount - 3).trim() + '...';
+      } else {
+        return input;
       }
-      return input;
     };
   }
 ]);
