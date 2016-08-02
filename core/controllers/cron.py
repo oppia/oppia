@@ -105,9 +105,9 @@ class CronExplorationRecommendationsHandler(base.BaseHandler):
     @require_cron_or_superadmin
     def get(self):
         """Handles GET requests."""
-        JobClass = (
+        job_class = (
             recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob)
-        JobClass.enqueue(JobClass.create_new())
+        job_class.enqueue(job_class.create_new())
 
 
 class CronExplorationSearchRankHandler(base.BaseHandler):

@@ -36,7 +36,7 @@ class ExplorationRecommendationsOneOffJobUnitTests(
 
     def setUp(self):
         super(ExplorationRecommendationsOneOffJobUnitTests, self).setUp()
-        self.JobClass = (
+        self.job_class = (
             recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob)
 
     def test_basic_computation(self):
@@ -50,7 +50,7 @@ class ExplorationRecommendationsOneOffJobUnitTests(
             jobs_registry, 'ONE_OFF_JOB_MANAGERS',
             self.ONE_OFF_JOB_MANAGERS_FOR_TESTS
             ):
-            self.JobClass.enqueue(self.JobClass.create_new())
+            self.job_class.enqueue(self.job_class.create_new())
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
@@ -73,7 +73,7 @@ class ExplorationRecommendationsOneOffJobUnitTests(
             jobs_registry, 'ONE_OFF_JOB_MANAGERS',
             self.ONE_OFF_JOB_MANAGERS_FOR_TESTS
             ):
-            self.JobClass.enqueue(self.JobClass.create_new())
+            self.job_class.enqueue(self.job_class.create_new())
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     queue_name=taskqueue_services.QUEUE_NAME_DEFAULT), 1)
@@ -87,7 +87,7 @@ class ExplorationRecommendationsOneOffJobUnitTests(
 
             rights_manager.unpublish_exploration(self.admin_id, 'exp_id_4')
 
-            self.JobClass.enqueue(self.JobClass.create_new())
+            self.job_class.enqueue(self.job_class.create_new())
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     queue_name=taskqueue_services.QUEUE_NAME_DEFAULT), 1)
