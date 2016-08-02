@@ -20,6 +20,7 @@ from pipeline import pipeline
 
 from core import jobs
 from core.controllers import base
+from core.domain import recommendations_jobs_one_off
 from core.domain import user_jobs_one_off
 from core.platform import models
 import utils
@@ -95,6 +96,17 @@ class CronDashboardStatsHandler(base.BaseHandler):
         """Handles GET requests."""
         user_jobs_one_off.DashboardStatsOneOffJob.enqueue(
             user_jobs_one_off.DashboardStatsOneOffJob.create_new())
+
+
+class CronExplorationRecommendationsHandler(base.BaseHandler):
+    """Handler for appending dashboard stats to a list."""
+
+    @require_cron_or_superadmin
+    def get(self):
+        """Handles GET requests."""
+        JobClass = (
+            recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob)
+        JobClass.enqueue(JobClass.create_new())
 
 
 class CronMapreduceCleanupHandler(base.BaseHandler):
