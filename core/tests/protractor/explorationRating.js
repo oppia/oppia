@@ -70,6 +70,7 @@ describe('Library index page', function() {
     library.playExploration(EXPLORATION_RATINGTEST);
     player.expectExplorationRatingOnInformationCardToEqual('4.0');
   });
+
   afterEach(function() {
     general.checkForConsoleErrors([]);
   });
