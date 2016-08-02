@@ -85,7 +85,8 @@ exports.config = {
     misc: [
       'protractor/userManagement.js',
       'protractor/embedding.js',
-      'protractor/preferences.js'
+      'protractor/preferences.js',
+      'protractor/cacheSlugs.js'
     ],
 
     i18n: [
