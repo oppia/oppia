@@ -29,12 +29,18 @@ oppia.factory('sortExplorationsService', [
     var EMPTY_TITLE_TEXT = 'Untitled';
 
     var sortByKey = function(explorationsList, key, reverse) {
-      var result = explorationsList;
+      var result = angular.copy(explorationsList);
       var prevValue, nextValue;
       result.sort(function(prev, next) {
+        prevValue = prev[key];
+        nextValue = next[key];
         if (key === 'title') {
-          prevValue = prev[key] === '' ? EMPTY_TITLE_TEXT : prev[key];
-          nextValue = next[key] === '' ? EMPTY_TITLE_TEXT : next[key];
+          if (prevValue === '') {
+            prevValue = EMPTY_TITLE_TEXT;
+          }
+          if (nextValue === '') {
+            nextValue = EMPTY_TITLE_TEXT;
+          }
         }
         if (utilsService.isString(prevValue)) {
           prevValue = prevValue.toLowerCase();
