@@ -151,7 +151,6 @@ fi
 SUITE="full"
 SHARDING=true
 SHARD_INSTANCES=3
-PROD_ENV=false
 for j in "$@"; do
   # Match each space-separated argument passed to the shell file to a separate
   # case label, based on a pattern. E.g. Match to -suite=*, -sharding=*, where the
@@ -177,8 +176,7 @@ for j in "$@"; do
     shift
     ;;
 
-    --prod_env=*)
-    PROD_ENV="${j#*=}"
+    --prod_env*)
     shift
     ;;
 
