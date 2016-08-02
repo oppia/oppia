@@ -22,10 +22,10 @@ oppia.controller('Dashboard', [
   'ExplorationCreationService', 'FATAL_ERROR_CODES', 'UrlInterpolationService',
   'sortExplorationsService',
   function(
-    $scope, $rootScope, $window, oppiaDatetimeFormatter, alertsService,
-    DashboardBackendApiService, RatingComputationService,
-    ExplorationCreationService, FATAL_ERROR_CODES, UrlInterpolationService,
-    sortExplorationsService) {
+      $scope, $rootScope, $window, oppiaDatetimeFormatter, alertsService,
+      DashboardBackendApiService, RatingComputationService,
+      ExplorationCreationService, FATAL_ERROR_CODES, UrlInterpolationService,
+      sortExplorationsService) {
     var EXP_PUBLISH_TEXTS = {
       default: 'This exploration is private. Publish it to receive statistics.',
       sm: 'Publish the exploration to receive statistics.'

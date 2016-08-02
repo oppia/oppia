@@ -51,9 +51,8 @@ oppia.factory('sortExplorationsService', [
       sortBy: function(explorationsList, param, reverse) {
         if (SORT_BY_KEYS.indexOf(param) !== -1) {
           return sortByKey(explorationsList, param, reverse);
-        } else {
-          return explorationsList;
         }
+        return explorationsList;
       }
     };
   }
