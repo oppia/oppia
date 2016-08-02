@@ -132,7 +132,7 @@
           </div>
           <div ng-if="isOnTerminalCard()" class="nav-bar-bottom-replay-content">
             <i ng-click="reloadExploration()" class="material-icons replay-nav-icon">replay</i>
-            <span> Restart exploration? </span>
+            <span class="oppia-restart-exploration"> Restart exploration? </span>
           </div>
         </div>
         <div class="col-1-2">
@@ -142,7 +142,7 @@
         <div class="col-1-4">
           <div class="logo-bottom-nav-bar">
             <div class="nav-bar-bottom-visit-oppia">
-              <span ng-if="isOnTerminalCard()">For more explorations, visit:</span>
+              <span ng-if="isOnTerminalCard()" class="oppia-more-exploratotion">For more explorations, visit:</span>
               <a class="oppia-link" href="https://www.oppia.org/"
                   target="_blank">
                 <img class="logo-bottom-nav-bar" src="/assets/images/logo/288x128_logo_white.png">
@@ -200,7 +200,7 @@
     [class*='col-'] {
        float: left;
        min-height: 1px;
-       padding: 0px;
+       padding: 0;
     }
 
     [class*='col-'] {
@@ -217,8 +217,15 @@
     .col-1-4{
      width: 25%;
     }
+    .col-lg-12,
+    .col-md-12,
+    .col-sm-12 {
+      width: 100%;
+    }
 
     .logo-bottom-nav-bar {
+      display: flex;
+      align-items: center;
       float: right;
       max-height: 50px;
     }
@@ -253,6 +260,7 @@
     footer {
       background-color: #015c53;
       padding: 0.5em;
+      z-index: 20;
     }
 
     iframe {
@@ -363,7 +371,6 @@
       height: 100%;
       margin: 20px auto;
       max-width: 1400px;
-      /*padding-left: 30px;*/
       width: 100%;
     }
 
@@ -497,14 +504,14 @@
     .conversation-skin-oppia-feedback-content > p:first-child,
     .conversation-skin-learner-answer-content > p:first-child,
     .conversation-skin-help-card-content > p:first-child {
-      margin-top: 0px;
+      margin-top: 0;
     }
 
     .conversation-skin-tutor-card-top-content > p:last-child,
     .conversation-skin-oppia-feedback-content > p:last-child,
     .conversation-skin-learner-answer-content > p:last-child,
     .conversation-skin-help-card-content > p:last-child {
-      margin-bottom: 0px;
+      margin-bottom: 0;
     }
 
     .conversation-skin-tutor-card-top-content,
@@ -690,7 +697,7 @@
     @media screen and (max-width: 959px) {
       .conversation-skin-main-tutor-card-embed,
       .conversation-skin-future-tutor-card-embed {
-        margin-left: 0px;
+        margin-left: 0;
       }
 
       .conversation-skin-cards-container {
@@ -703,10 +710,10 @@
       }
 
       .conversation-skin-main-tutor-card {
-        left: 0px;
+        left: 0;
         margin: 0 auto;
         position: absolute;
-        right: 0px;
+        right: 0;
         top: 40px;
         width: 100%;
         z-index: 15;
@@ -722,17 +729,17 @@
         max-width: 959px;
         min-width: 360px;
         position: absolute;
-        top: 0px;
+        top: 0;
         transform: translateX(-50%);
       }
 
       .conversation-skin-supplemental-card-container .supplemental-mask {
         background-color: #ccc;
         height: 100%;
-        left: 0px;
+        left: 0;
         opacity: 0.7;
         position: absolute;
-        top: 0px;
+        top: 0;
         width: 100%;
       }
       .conversation-skin-main-tutor-card .instructions-button {
@@ -766,6 +773,27 @@
       .nav-bar-bottom-replay-content,
       .nav-bar-bottom-visit-oppia {
         font-size: 0.7em;
+      }
+      .oppia-more-exploratotion {
+        display: none;
+      }
+    }
+    @media screen and (max-width: 550px) {
+      .oppia-restart-exploration {
+        display: none;
+      }
+      [class*='col-'] {
+        padding: 0;
+      }
+
+      .col-1-2 {
+       width: 60%;
+      }
+      .col-1-4{
+       width: 20%;
+      }
+      .replay-nav-icon {
+        font-size: 40px;
       }
     }
   </style>

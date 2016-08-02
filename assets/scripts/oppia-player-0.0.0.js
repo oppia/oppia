@@ -244,8 +244,9 @@
     var versionString = explorationVersion ? '&v=' + explorationVersion : '';
     iframe.setAttribute('src', encodeURI(
       (oppiaNode.getAttribute('src') || currLoc) +
-      '/embed/exploration/' + oppiaNode.getAttribute('oppia-id') +
-      versionString + '#' + TAG_ID_KEY + tagId +
+      '/explore/' + oppiaNode.getAttribute('oppia-id') +
+      '?iframed=true&locale=en' + versionString +
+      '#' + TAG_ID_KEY + tagId +
       '&' + VERSION_KEY + OPPIA_EMBED_GLOBALS.version +
       '&' + SECRET_KEY + secret));
     iframe.setAttribute('seamless', 'seamless');

@@ -253,12 +253,9 @@ class ExplorationPageEmbed(base.BaseHandler):
                 feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             raise self.PageNotFoundException
 
-        try:
-            exploration_data_values = _get_exploration_player_data(
+        # If the exploration does not exist, an Exception is raised.
+        exploration_data_values = _get_exploration_player_data(
                 exploration_id, version, collection_id, can_edit)
-        except Exception as e:
-            raise self.PageNotFoundException(e)
-
         exploration_data_values['iframed'] = True
 
         self.values.update(exploration_data_values)
@@ -288,12 +285,9 @@ class ExplorationPage(base.BaseHandler):
                 feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id):
             raise self.PageNotFoundException
 
-        try:
-            exploration_data_values = _get_exploration_player_data(
+        # If the exploration does not exist, an Exception is raised.
+        exploration_data_values = _get_exploration_player_data(
                 exploration_id, version, collection_id, can_edit)
-        except Exception as e:
-            raise self.PageNotFoundException(e)
-
         exploration_data_values['iframed'] = False
 
         self.values.update(exploration_data_values)
