@@ -84,11 +84,18 @@ oppia.factory('CollectionValidationService', [
     };
 
     // Validates that the tags for the collection do not have duplicates,
-    // returns true if there are duplicates.
+    // returns true if there are no duplicates.
     var validateDuplicateTags = function(tags) {
       return tags.every(function(tag, idx) {
-        return tags.indexOf(tag, idx + 1) === -1 &&
-          tag === tag.trim().replace(/\s+/g, ' ');
+        return tags.indexOf(tag, idx + 1) === -1;
+      });
+    };
+
+    // Validates that the tags for the collection are normalized,
+    // returns true if all tags were normalized.
+    var validateTagsNormalized = function(tags) {
+      return tags.every(function(tag) {
+        return tag === tag.trim().replace(/\s+/g, ' ');
       });
     };
 
@@ -190,7 +197,8 @@ oppia.factory('CollectionValidationService', [
        * Returns false if the tags are not validate.
        */
       isTagValid: function(tags) {
-        return validateTagFormat(tags) && validateDuplicateTags(tags);
+        return validateTagFormat(tags) && validateDuplicateTags(tags) &&
+          validateTagsNormalized(tags);
       }
     };
   }]);

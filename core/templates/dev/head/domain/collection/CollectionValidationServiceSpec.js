@@ -283,7 +283,7 @@ describe('Collection validation service', function() {
     ]);
   });
 
-  iit('should return false if the tags are not valid', function() {
+  it('should return false if the tags are not valid', function() {
     expect(CollectionValidationService.isTagValid(['test'])).toBe(true);
     expect(CollectionValidationService.isTagValid(['test', 'math'])).toBe(true);
 
