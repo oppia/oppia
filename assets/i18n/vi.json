@@ -1,4 +1,5 @@
-  "I18N_ABOUT_PAGE_TITLE": "Về Chúng Tôi - Oppia",
+{ 
+ "I18N_ABOUT_PAGE_TITLE": "Về Chúng Tôi - Oppia",
   "I18N_ACTION_BROWSE_EXPLORATIONS": "Tra cứu các cuộc hành trình",
   "I18N_ACTION_CREATE_EXPLORATION": "Tạo cuộc hành trình của bạn",
   "I18N_CREATE_ACTIVITY_QUESTION": "Bạn muốn tạo ra cái gì?",
@@ -280,5 +281,4 @@
   "I18N_TOPNAV_PREFERENCES": "Lựa Chọn",
   "I18N_TOPNAV_SIGN_IN": "Đăng Nhập",
   "I18N_TOPNAV_TEACH_WITH_OPPIA": "Dạy học với Oppia",
-{
 }
