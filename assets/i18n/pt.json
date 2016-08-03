@@ -252,6 +252,7 @@
   "I18N_SIGNUP_WAIVER_OBJECTIVE":"A renúncia do requisito de atribuição (BY) significa que, se alguém reutilizar um trabalho, não é exigido que sejam indicados os autores. Contudo, todas as contribuições individuais para explorações ficarão disponíveis neste site, no registo de alterações, e as pessoas que reutilizarem a exploração serão encorajadas, mas não obrigadas a incluir o link desta página.",
   "I18N_SIGNUP_WHY_LICENSE": "Porquê a licença CC-BY-SA?",
   "I18N_SPLASH_FIRST_EXPLORATION_DESCRIPTION": "As explorações são aulas interactivas que proporcionam uma experiência mais imersiva do que videos e textos estáticos, ajudando e os utilizadores aprendem fazendo.",
+  "I18N_SPLASH_FIRST_EXPLORATION_DESCRIPTION_ALTERNATE": "Aulas de Oppia, também conhecidas como explorações, proporcionam uma experiência mais imersiva do que videos e textos estáticos, ajudando e os utilizadores aprendem fazendo.",
   "I18N_SPLASH_JAVASCRIPT_ERROR_DESCRIPTION": "Oppia é uma plataforma gratuita de aprendizagem de código aberto, online cheia actividades interactivas chamadas 'explorações'. Lamentamos, mas para que funcione correctamente, Oppia requer que o JavaScript esteja activo para correr no teu navegador. Se precisares de ajuda para activar o JavaScript, <a href=\"<[hrefUrl]>\">clica aqui.</a>",
   "I18N_SPLASH_JAVASCRIPT_ERROR_THANKS": "Obrigado.",
   "I18N_SPLASH_JAVASCRIPT_ERROR_TITLE": "Precisamos do JavaScript no teu navegador",

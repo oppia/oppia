@@ -252,6 +252,7 @@
   "I18N_SIGNUP_WAIVER_OBJECTIVE": "The waiver of the attribution (BY) requirement means that, if someone reuses this work, they are not required to attribute the authors. However, all of your individual contributions to explorations will be available on this site in the exploration change log, and people who reuse the exploration are encouraged (but not required) to include a link to this page.",
   "I18N_SIGNUP_WHY_LICENSE": "Why CC-BY-SA?",
   "I18N_SPLASH_FIRST_EXPLORATION_DESCRIPTION": "Explorations are interactive lessons that provide more immersive experiences than static videos or text, helping users learn by doing.",
+  "I18N_SPLASH_FIRST_EXPLORATION_DESCRIPTION_ALTERNATE": "Oppia's lessons, also known as explorations, provide more immersive experiences than static videos or text, helping users learn by doing.",
   "I18N_SPLASH_JAVASCRIPT_ERROR_DESCRIPTION": "Oppia is a free, open-source learning platform full of interactive activities called 'explorations'.  Sadly, Oppia requires JavaScript to be enabled in your web browser in order to function properly and your web browser has JavaScript disabled.  If you need help enabling JavaScript, <a href=\"<[hrefUrl]>\">click here.</a>",
   "I18N_SPLASH_JAVASCRIPT_ERROR_THANKS": "Thank you.",
   "I18N_SPLASH_JAVASCRIPT_ERROR_TITLE": "We Need JavaScript in Your Browser",
