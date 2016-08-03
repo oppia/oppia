@@ -117,7 +117,8 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
             'Adjacent whitespace in tags should be collapsed')
 
         self.collection.tags = ['abc', 'abc']
-        self._assert_validation_error('Some tags duplicate each other')
+        self._assert_validation_error(
+            'Expected tags to be unique, but found duplicates')
 
     def test_schema_version_validation(self):
         self.collection.schema_version = 'some_schema_version'

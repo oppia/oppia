@@ -14,10 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for recommendations_jobs_continuous."""
+"""Tests for recommendations_jobs_one_off."""
 
 from core import jobs_registry
-from core.domain import recommendations_jobs_continuous
+from core.domain import recommendations_jobs_one_off
 from core.domain import recommendations_services
 from core.domain import recommendations_services_test
 from core.domain import rights_manager
@@ -27,35 +27,17 @@ from core.platform import models
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
-class ModifiedExplorationRecommendationsAggregator(
-        recommendations_jobs_continuous.ExplorationRecommendationsAggregator):
-    """A modified ExplorationRecommendationsAggregator that does not start a
-    new batch job when the previous one has finished.
-    """
-
-    @classmethod
-    def _get_batch_job_manager_class(cls):
-        return ModifiedExplorationRecommendationsMRJobManager
-
-    @classmethod
-    def _kickoff_batch_job_after_previous_one_ends(cls):
-        pass
-
-
-class ModifiedExplorationRecommendationsMRJobManager(
-        recommendations_jobs_continuous.ExplorationRecommendationsMRJobManager):
-
-    @classmethod
-    def _get_continuous_computation_class(cls):
-        return ModifiedExplorationRecommendationsAggregator
-
-
-class ExplorationRecommendationsAggregatorUnitTests(
+class ExplorationRecommendationsOneOffJobUnitTests(
         recommendations_services_test.RecommendationsServicesUnitTests):
-    """Test recommendations services."""
+    """Test exploration recommendations one-off job."""
 
-    ALL_CC_MANAGERS_FOR_TESTS = [
-        ModifiedExplorationRecommendationsAggregator]
+    ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
+        recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob]
+
+    def setUp(self):
+        super(ExplorationRecommendationsOneOffJobUnitTests, self).setUp()
+        self.job_class = (
+            recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob)
 
     def test_basic_computation(self):
         recommendations_services.update_topic_similarities(
@@ -65,10 +47,10 @@ class ExplorationRecommendationsAggregatorUnitTests(
             '0.1,0.8,1.0')
 
         with self.swap(
-            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-            self.ALL_CC_MANAGERS_FOR_TESTS
+            jobs_registry, 'ONE_OFF_JOB_MANAGERS',
+            self.ONE_OFF_JOB_MANAGERS_FOR_TESTS
             ):
-            ModifiedExplorationRecommendationsAggregator.start_computation()
+            self.job_class.enqueue(self.job_class.create_new())
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
@@ -88,10 +70,10 @@ class ExplorationRecommendationsAggregatorUnitTests(
 
     def test_recommendations_after_changes_in_rights(self):
         with self.swap(
-            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-            self.ALL_CC_MANAGERS_FOR_TESTS
+            jobs_registry, 'ONE_OFF_JOB_MANAGERS',
+            self.ONE_OFF_JOB_MANAGERS_FOR_TESTS
             ):
-            ModifiedExplorationRecommendationsAggregator.start_computation()
+            self.job_class.enqueue(self.job_class.create_new())
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     queue_name=taskqueue_services.QUEUE_NAME_DEFAULT), 1)
@@ -104,9 +86,8 @@ class ExplorationRecommendationsAggregatorUnitTests(
                 recommendations, ['exp_id_4', 'exp_id_2', 'exp_id_3'])
 
             rights_manager.unpublish_exploration(self.admin_id, 'exp_id_4')
-            ModifiedExplorationRecommendationsAggregator.stop_computation(
-                self.admin_id)
-            ModifiedExplorationRecommendationsAggregator.start_computation()
+
+            self.job_class.enqueue(self.job_class.create_new())
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     queue_name=taskqueue_services.QUEUE_NAME_DEFAULT), 1)

@@ -70,6 +70,9 @@ UI_CONFIG_SPECS = {
     SCHEMA_TYPE_HTML: {
         'hide_complex_extensions': {
             'type': SCHEMA_TYPE_BOOL,
+        },
+        'placeholder': {
+            'type': SCHEMA_TYPE_UNICODE,
         }
     },
     SCHEMA_TYPE_INT: {},
