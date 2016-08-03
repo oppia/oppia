@@ -16,13 +16,15 @@
  * @fileoverview Unit tests for DashboardServices.
  */
 
-describe('Dashboard services', function() {
+ddescribe('Dashboard services', function() {
   var sortExplorationsService = null;
+  var alertsService = null;
   var sampleExplorationsList = null;
 
   beforeEach(module('oppia'));
   beforeEach(inject(function($injector) {
     sortExplorationsService = $injector.get('sortExplorationsService');
+    alertsService = $injector.get('alertsService');
 
     // Sample explorations list
     sampleExplorationsList = [
@@ -109,15 +111,19 @@ describe('Dashboard services', function() {
 
   it('should correctly sort the explorations list', function() {
     var sortedByTitle = (
-      sortExplorationsService.sortBy(sampleExplorationsList, 'title'));
+      sortExplorationsService.sortBy(sampleExplorationsList, 'TITLE'));
     expect(sortedByTitle.length).toBe(sampleExplorationsList.length);
     expect(sortedByTitle[0].title).toBe(sampleExplorationsList[1].title);
     expect(sortedByTitle[1].title).toBe(sampleExplorationsList[0].title);
     expect(sortedByTitle[2].title).toBe(sampleExplorationsList[2].title);
 
+    var sortedByTitleDescending = (
+      sortExplorationsService.sortBy(sampleExplorationsList, 'TITLE', true));
+    expect(sortedByTitle).toBe(sortedByTitle.reverse());
+
     var sortedByLastUpdated = (
       sortExplorationsService.sortBy(
-        sampleExplorationsList, 'last_updated_msec'));
+        sampleExplorationsList, 'LAST_UPDATED'));
     expect(sortedByLastUpdated.length).toBe(sampleExplorationsList.length);
     expect(sortedByLastUpdated[0].last_updated_msec).toBe(
       sampleExplorationsList[2].last_updated_msec);
@@ -128,7 +134,7 @@ describe('Dashboard services', function() {
 
     var sortedByNumOpenThreads = (
       sortExplorationsService.sortBy(
-        sampleExplorationsList, 'num_open_threads'));
+        sampleExplorationsList, 'OPEN_FEEDBACK'));
     expect(sortedByNumOpenThreads.length).toBe(sampleExplorationsList.length);
     expect(sortedByNumOpenThreads[0].num_open_threads).toBe(
       sampleExplorationsList[0].num_open_threads);
@@ -139,7 +145,7 @@ describe('Dashboard services', function() {
 
     var sortedByNumUnresolvedAnswers = (
       sortExplorationsService.sortBy(
-        sampleExplorationsList, 'num_unresolved_answers'));
+        sampleExplorationsList, 'UNRESOLVED_ANSWERS'));
     expect(sortedByNumUnresolvedAnswers.length).toBe(
       sampleExplorationsList.length);
     expect(sortedByNumUnresolvedAnswers[0].num_unresolved_answers).toBe(
@@ -150,7 +156,7 @@ describe('Dashboard services', function() {
       sampleExplorationsList[2].num_unresolved_answers);
 
     var sortedByNumViews = (
-      sortExplorationsService.sortBy(sampleExplorationsList, 'num_views'));
+      sortExplorationsService.sortBy(sampleExplorationsList, 'NUM_VIEWS'));
     expect(sortedByNumViews.length).toBe(sampleExplorationsList.length);
     expect(sortedByNumViews[0].num_views).toBe(
       sampleExplorationsList[1].num_views);
@@ -161,6 +167,9 @@ describe('Dashboard services', function() {
 
     var sortedByUnexpectedParameter = (
       sortExplorationsService.sortBy(sampleExplorationsList, 'abc'));
+    expect(alertsService.warnings.length).toBe(1);
+    expect(alertsService.warnings[0].content).toBe(
+      'Invalid type of key name for sorting explorations: abc');
     expect(sortedByUnexpectedParameter).toBe(sampleExplorationsList);
   });
 });

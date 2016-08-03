@@ -57,7 +57,8 @@ oppia.controller('Dashboard', [
     DashboardBackendApiService.fetchDashboardData().then(
       function(response) {
         $scope.explorationsList = (
-          sortExplorationsService.sortBy(response.explorations_list, 'title'));
+          sortExplorationsService.sortBy(
+            response.explorations_list, 'OPEN_FEEDBACK', true));
         $scope.collectionsList = response.collections_list;
         $scope.dashboardStats = response.dashboard_stats;
         $rootScope.loadingMessage = '';

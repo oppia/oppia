@@ -16,19 +16,21 @@
  * @fileoverview Standalone services for the creator dashboard page.
  */
 
+oppia.constant('EXPLORATIONS_SORT_BY_KEYS', {
+  TITLE: 'title',
+  LAST_UPDATED: 'last_updated_msec',
+  NUM_VIEWS: 'num_views',
+  OPEN_FEEDBACK: 'num_open_threads',
+  UNRESOLVED_ANSWERS: 'num_unresolved_answers'
+});
+
 // Service for sorting the explorations based on different parameters.
 oppia.factory('sortExplorationsService', [
-  'utilsService', function(utilsService) {
-    var SORT_BY_KEYS = [
-      'title',
-      'last_updated_msec',
-      'num_views',
-      'num_open_threads',
-      'num_unresolved_answers'
-    ];
+  'utilsService', 'EXPLORATIONS_SORT_BY_KEYS', 'alertsService',
+  function(utilsService, EXPLORATIONS_SORT_BY_KEYS, alertsService) {
     var EMPTY_TITLE_TEXT = 'Untitled';
 
-    var sortByKey = function(explorationsList, key, reverse) {
+    var sortByKey = function(explorationsList, key, isDescending) {
       var result = angular.copy(explorationsList);
       var prevValue, nextValue;
       result.sort(function(prev, next) {
@@ -48,16 +50,25 @@ oppia.factory('sortExplorationsService', [
         }
         return prevValue > nextValue;
       });
-      if (reverse) {
+      if (isDescending) {
         return result.reverse();
       }
       return result;
     };
     return {
-      sortBy: function(explorationsList, param, reverse) {
-        if (SORT_BY_KEYS.indexOf(param) !== -1) {
-          return sortByKey(explorationsList, param, reverse);
+      getValidSortTypes: function() {
+        return EXPLORATIONS_SORT_BY_KEYS;
+      },
+
+      sortBy: function(explorationsList, sortType, isDescending) {
+        if (Object.keys(EXPLORATIONS_SORT_BY_KEYS).indexOf(sortType) !== -1) {
+          return sortByKey(
+            explorationsList,
+            EXPLORATIONS_SORT_BY_KEYS[sortType],
+            isDescending);
         }
+        alertsService.addWarning(
+          'Invalid type of key name for sorting explorations: ' + sortType);
         return explorationsList;
       }
     };
