@@ -216,6 +216,7 @@
   "I18N_SIDEBAR_ABOUT_LINK": "Text displayed in the side navigation bar. - When the user clicks the link, they are redirected to the about page.",
   "I18N_SIDEBAR_BLOG": "Text displayed in the side navigation bar. - When the user clicks the link, they are redirected to the Oppia blog.",
   "I18N_SIDEBAR_CONTACT_US": "Text displayed in the side navigation bar. - When the user clicks the link, they are redirected to the Contact Us page.",
+  "I18N_SIDEBAR_DONATE": "Text displayed in the side navigation bar. - When the user clicks the link, they are redirected to the Donate page.",
   "I18N_SIDEBAR_FOLLOW_US": "Text displayed in the side navigation bar. - It's shown next to the social media icons like Facebook and YouTube.",
   "I18N_SIDEBAR_FORUM": "Text displayed in the side navigation bar. - When the user clicks the link, they are redirected to the forum (an external page)",
   "I18N_SIDEBAR_LIBRARY_LINK": "Text displayed in the side navigation bar. - When the user clicks the link, they are redirected to the Library page.",
