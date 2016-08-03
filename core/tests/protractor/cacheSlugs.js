@@ -20,13 +20,13 @@ var general = require('../protractor_utils/general.js');
 
 var ERROR_PAGE_URL_SUFFIX = '/console_errors';
 
-var checkConsoleErrorsExist = function(errorsToFind) {
+var checkConsoleErrorsExist = function(expectedErrors) {
   browser.manage().logs().get('browser').then(function(browserLogs) {
-    var errorsExpected = [];
-    for (var i = 0; i < browserLogs.length; i++) {
+    expect(browserLogs.length).toBeGreaterThan(0);
+    for (var i = 0; i < expectedErrors.length; i++) {
       var errorPresent = false;
-      for (var j = 0; j < errorsToFind.length; j++) {
-        if (browserLogs[i].message.match(errorsToFind[j])) {
+      for (var j = 0; j < browserLogs.length; j++) {
+        if (browserLogs[j].message.match(expectedErrors[i])) {
           errorPresent = true;
         }
       }
