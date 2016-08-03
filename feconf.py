@@ -169,6 +169,16 @@ def get_empty_ratings():
 # Empty scaled average rating as a float.
 EMPTY_SCALED_AVERAGE_RATING = 0.0
 
+# To use GAE email service.
+GAE_EMAIL_SERVICE = 'gae_email_service'
+# To use mailgun email service.
+MAILGUN_EMAIL_SERVICE = 'mailgun_email_service'
+# Use GAE email service by default.
+EMAIL_SERVICE_PROVIDER = GAE_EMAIL_SERVICE
+# Mailgun api key should be replaced with None below.
+MAILGUN_API_KEY = None
+# Mailgun domain name should be replaced with None below.
+MAILGUN_DOMAIN_NAME = None
 # Committer id for system actions.
 SYSTEM_COMMITTER_ID = 'admin'
 SYSTEM_EMAIL_ADDRESS = 'system@example.com'

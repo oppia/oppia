@@ -17,6 +17,7 @@
 """Provides email services."""
 
 from core import counters
+from core.platform.email import mailgun_email_services
 import feconf
 
 from google.appengine.api import app_identity
@@ -79,14 +80,25 @@ def send_mail(
     if not mail.is_email_valid(recipient_email):
         raise ValueError(
             'Malformed recipient email address: %s' % recipient_email)
-
-    if bcc_admin:
-        mail.send_mail(
-            sender_email, recipient_email, subject, plaintext_body,
-            html=html_body, bcc=[feconf.ADMIN_EMAIL_ADDRESS])
-    else:
-        mail.send_mail(
-            sender_email, recipient_email, subject, plaintext_body,
-            html=html_body)
+    if feconf.EMAIL_SERVICE_PROVIDER == feconf.GAE_EMAIL_SERVICE:
+        if bcc_admin:
+            mail.send_mail(
+                sender_email, recipient_email, subject, plaintext_body,
+                html=html_body, bcc=[feconf.ADMIN_EMAIL_ADDRESS])
+        else:
+            mail.send_mail(
+                sender_email, recipient_email, subject, plaintext_body,
+                html=html_body)
+    elif feconf.EMAIL_SERVICE_PROVIDER == feconf.MAILGUN_EMAIL_SERVICE:
+        if not feconf.MAILGUN_API_KEY:
+            raise Exception('Mailgun API key is not available.')
+        if bcc_admin:
+            mailgun_email_services.send_mail(
+                sender_email, recipient_email, subject, plaintext_body,
+                html_body, bcc=[feconf.ADMIN_EMAIL_ADDRESS])
+        else:
+            mailgun_email_services.send_mail(
+                sender_email, recipient_email, subject, plaintext_body,
+                html_body)
 
     counters.EMAILS_SENT.inc()
