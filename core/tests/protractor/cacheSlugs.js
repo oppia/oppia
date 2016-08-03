@@ -23,23 +23,15 @@ var ERROR_PAGE_URL_SUFFIX = '/console_errors';
 var checkConsoleErrorsExist = function(errorsToFind) {
   browser.manage().logs().get('browser').then(function(browserLogs) {
     var errorsExpected = [];
-    var errorsNotExpected = [];
     for (var i = 0; i < browserLogs.length; i++) {
-      var error = false;
+      var errorPresent = false;
       for (var j = 0; j < errorsToFind.length; j++) {
         if (browserLogs[i].message.match(errorsToFind[j])) {
-          error = true;
+          errorPresent = true;
         }
       }
-      if (error) {
-        errorsExpected.push(browserLogs[i]);
-      } else {
-        errorsNotExpected.push(browserLogs[i]);
-      }
+      expect(errorPresent).toBe(true);
     }
-    // We get 2 console errors for a missing resource.
-    expect(errorsExpected.length).toBe(2);
-    expect(errorsNotExpected.length).toBe(0);
   });
 };
 
@@ -47,6 +39,7 @@ describe('Cache Slugs', function() {
   it('should check that errors get logged for missing resources', function() {
     browser.get(ERROR_PAGE_URL_SUFFIX);
     var missingFiles = [
+      'http://localhost:9001/build/fail/logo/288x128_logo_white.png',
       'http://localhost:9001/build/fail/logo/288x128_logo_white.png'
     ];
     checkConsoleErrorsExist(missingFiles);
