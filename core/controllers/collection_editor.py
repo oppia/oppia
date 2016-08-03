@@ -131,7 +131,8 @@ class CollectionEditorPage(CollectionEditorHandler):
             'SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK': (
                 feconf.SHOW_COLLECTION_NAVIGATION_TAB_FEEDBACK),
             'SHOW_COLLECTION_NAVIGATION_TAB_STATS': (
-                feconf.SHOW_COLLECTION_NAVIGATION_TAB_STATS)
+                feconf.SHOW_COLLECTION_NAVIGATION_TAB_STATS),
+            'TAG_REGEX': feconf.TAG_REGEX,
         })
 
         self.render_template('collection_editor/collection_editor.html')
