@@ -27,6 +27,8 @@
 #   --sharding=true/false Disables/Enables parallelization of protractor tests.
 #   --sharding-instances=# Sets the number of parallel browsers to open while
 #         sharding.
+#   --prod_env Run the tests in prod mode. Static resources are served from
+#         build directory and use cache slugs.
 # Sharding must be disabled (either by passing in false to --sharding or 1 to
 # --sharding-instances) if running any tests in isolation (iit or ddescribe).
 #   --suite=suite_name Performs test for different suites.

@@ -18,23 +18,28 @@
 
 var general = require('../protractor_utils/general.js');
 
-var ERROR_PAGE_URL_SUFFIX = '/console-errors';
+var ERROR_PAGE_URL_SUFFIX = '/console_errors';
 
 var checkConsoleErrorsExist = function(errorsToFind) {
   browser.manage().logs().get('browser').then(function(browserLogs) {
-    var fatalErrors = [];
+    var errorsExpected = [];
+    var errorsNotExpected = [];
     for (var i = 0; i < browserLogs.length; i++) {
-      var errorFatal = true;
+      var error = false;
       for (var j = 0; j < errorsToFind.length; j++) {
         if (browserLogs[i].message.match(errorsToFind[j])) {
-          errorFatal = false;
+          error = true;
         }
       }
-      if (errorFatal) {
-        fatalErrors.push(browserLogs[i]);
+      if (error) {
+        errorsExpected.push(browserLogs[i]);
+      } else {
+        errorsNotExpected.push(browserLogs[i]);
       }
     }
-    expect(fatalErrors.length).toBeGreaterThan(0);
+    // We get 2 console errors for a missing resource.
+    expect(errorsExpected.length).toBe(2);
+    expect(errorsNotExpected.length).toBe(0);
   });
 };
 
@@ -42,7 +47,7 @@ describe('Cache Slugs', function() {
   it('should check that errors get logged for missing resources', function() {
     browser.get(ERROR_PAGE_URL_SUFFIX);
     var missingFiles = [
-      'http://localhost:8181/build/fail/logo/288x128_logo_white.png'
+      'http://localhost:9001/build/fail/logo/288x128_logo_white.png'
     ];
     checkConsoleErrorsExist(missingFiles);
   });
