@@ -100,7 +100,7 @@ class CronDashboardStatsHandler(base.BaseHandler):
 
 
 class CronExplorationRecommendationsHandler(base.BaseHandler):
-    """Handler for appending dashboard stats to a list."""
+    """Handler for computing exploration recommendations."""
 
     @require_cron_or_superadmin
     def get(self):
