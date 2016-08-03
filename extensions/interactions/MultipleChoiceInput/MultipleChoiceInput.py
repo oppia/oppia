@@ -43,11 +43,12 @@ class MultipleChoiceInput(base.BaseInteraction):
                 'type': 'html',
                 'ui_config': {
                     'hide_complex_extensions': True,
+                    'placeholder': 'Sample multiple-choice answer',
                 },
             },
             'ui_config': {
                 'add_element_text': 'Add multiple choice option',
             }
         },
-        'default_value': ['Sample multiple-choice answer'],
+        'default_value': [''],
     }]
