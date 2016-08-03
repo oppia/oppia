@@ -33,7 +33,7 @@ var argv = yargs
     function(yargs) {
       argv = yargs
         .usage('Usage: $0 start_devserver [--gae_devserver_path]' +
-         '[--clear_datastore] [--enable_sendmail]')
+         '[--clear_datastore] [--enable_sendmail] [--use_minification]')
         .option('gae_devserver_path', {
           describe: 'A path to app engine'
         })
@@ -42,6 +42,9 @@ var argv = yargs
         })
         .option('clear_datastore', {
           describe: 'Whether to clear all data storage'
+        })
+        .option('use_minification', {
+          describe: 'Whether to build with minification'
         })
         .demand(['gae_devserver_path'])
         .argv;
@@ -96,15 +99,24 @@ var checkCommands = function(yargs, argv, numRequired) {
 // There should atleast be minimum of one defined task.
 checkCommands(yargs, argv, 1);
 
-var isMinificationNeeded = (argv.minify == 'True');
+var isMinificationNeeded = (
+  argv.minify === 'True' || argv.use_minification === 'True');
 var frontendDependencies = manifest.dependencies.frontend;
 var cssFilePaths = [];
 var jsFilePaths = [];
 var fontFolderPaths = [];
 var cssBackgroundFilepaths = [];
+
+// In non-dev mode, we move all files inside 'third_party/generated' to
+// 'build/{{cache_slug}}/third_party/generated/' and serve it from there.
+// And, for dev mode without minification, we generate the files inside
+// 'third_party/generated/' and serve it from there. These files are generated
+// directly inside 'third_party/generated/' since we need to keep urls
+// compatible across both dev and prod modes. This compatibility is achieved by
+// only interpolating the prefix for urls to these files.
 var generatedTargetDir = path.join(
   'third_party', 'generated',
-  isMinificationNeeded ? 'prod' : 'dev');
+  isMinificationNeeded ? 'prod' : '');
 var generatedCssTargetDir = path.join(generatedTargetDir, 'css');
 var generatedJsTargetDir = path.join(generatedTargetDir, 'js');
 
@@ -169,11 +181,10 @@ gulp.task('generateJs', function() {
 });
 // This task is used to copy all fonts which are used by
 // Bootstrap and font-Awesome to one folder
+var generatedFontsTargetDir = path.join(generatedTargetDir, 'fonts');
 gulp.task('copyFonts', function() {
   gulp.src(fontFolderPaths)
-    .pipe(gulp.dest(path.join(
-      'third_party', 'generated',
-      isMinificationNeeded ? 'prod' : 'dev', 'fonts')));
+    .pipe(gulp.dest(path.join(generatedFontsTargetDir)));
 });
 
 // This is a task which copies background image used by css.

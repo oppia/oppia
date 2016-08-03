@@ -27,6 +27,7 @@ oppia.factory('threadDataService', [
   var _SUGGESTION_ACTION_HANDLER_URL = '/suggestionactionhandler/' +
     _expId + '/';
   var _THREAD_HANDLER_PREFIX = '/threadhandler/' + _expId + '/';
+  var _FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event';
   var _THREAD_STATUS_OPEN = 'open';
 
   // All the threads for this exploration. This is a list whose entries are
@@ -103,6 +104,12 @@ oppia.factory('threadDataService', [
         alertsService.addWarning('Error creating new thread.');
       });
     },
+    markThreadAsSeen: function(threadId) {
+      $http.post(_FEEDBACK_THREAD_VIEW_EVENT_URL, {
+        exploration_id: _expId,
+        thread_id: threadId
+      });
+    },
     addNewMessage: function(
       threadId, newMessage, newStatus, successCallback, errorCallback) {
       var url = _THREAD_HANDLER_PREFIX + threadId;
@@ -123,9 +130,9 @@ oppia.factory('threadDataService', [
       var oldStatus = thread.status;
       if (newStatus !== oldStatus) {
         updatedStatus = newStatus;
-        if (oldStatus == _THREAD_STATUS_OPEN) {
+        if (oldStatus === _THREAD_STATUS_OPEN) {
           _openThreadsCount -= 1;
-        } else if (newStatus == _THREAD_STATUS_OPEN) {
+        } else if (newStatus === _THREAD_STATUS_OPEN) {
           _openThreadsCount += 1;
         }
         thread.status = updatedStatus;
@@ -146,9 +153,9 @@ oppia.factory('threadDataService', [
       }, function() {
         // Revert changes
         if (newStatus !== oldStatus) {
-          if (oldStatus == _THREAD_STATUS_OPEN) {
+          if (oldStatus === _THREAD_STATUS_OPEN) {
             _openThreadsCount += 1;
-          } else if (newStatus == _THREAD_STATUS_OPEN) {
+          } else if (newStatus === _THREAD_STATUS_OPEN) {
             _openThreadsCount -= 1;
           }
           thread.status = oldStatus;

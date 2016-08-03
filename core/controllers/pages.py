@@ -14,39 +14,12 @@
 
 """Controllers for simple, mostly-static pages (like About, Forum, etc.)."""
 
+import random
 import urllib
 import urlparse
 
 from core.controllers import base
-from core.domain import config_domain
 import feconf
-
-
-MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE = (
-    'https://moderator/request/forum/url')
-
-ABOUT_PAGE_YOUTUBE_VIDEO_ID = config_domain.ConfigProperty(
-    'about_page_youtube_video_id', {'type': 'unicode'},
-    'The (optional) video id for the About page',
-    default_value='')
-CONTACT_EMAIL_ADDRESS = config_domain.ConfigProperty(
-    'contact_email_address', {'type': 'unicode'},
-    'The contact email address to display on the About pages',
-    default_value='CONTACT_EMAIL_ADDRESS')
-EMBEDDED_GOOGLE_GROUP_URL = config_domain.ConfigProperty(
-    'embedded_google_group_url', {'type': 'unicode'},
-    'The URL for the embedded Google Group in the Forum page',
-    default_value=(
-        'https://groups.google.com/forum/embed/?place=forum/oppia'))
-SITE_FORUM_URL = config_domain.ConfigProperty(
-    'site_forum_url', {'type': 'unicode'},
-    'The site forum URL (for links; the Forum page is configured separately)',
-    default_value='https://site/forum/url')
-MODERATOR_REQUEST_FORUM_URL = config_domain.ConfigProperty(
-    'moderator_request_forum_url', {'type': 'unicode'},
-    'A link to the forum for nominating explorations to be featured '
-    'in the Oppia library',
-    default_value=MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE)
 
 
 class SplashPage(base.BaseHandler):
@@ -54,11 +27,16 @@ class SplashPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
+        c_value = self.request.get('c')
+        if not c_value:
+            c_value = 's%d' % random.randrange(4)
+            self.redirect('/splash?c=%s' % c_value)
+
         self.values.update({
             'meta_description': feconf.SPLASH_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_SPLASH,
         })
-        self.render_template('pages/splash.html')
+        self.render_template('pages/splash_%s.html' % c_value)
 
 
 class AboutPage(base.BaseHandler):
@@ -67,8 +45,6 @@ class AboutPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.values.update({
-            'ABOUT_PAGE_YOUTUBE_VIDEO_ID': ABOUT_PAGE_YOUTUBE_VIDEO_ID.value,
-            'CONTACT_EMAIL_ADDRESS': CONTACT_EMAIL_ADDRESS.value,
             'meta_description': feconf.ABOUT_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_ABOUT,
         })
@@ -81,8 +57,7 @@ class TeachPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.values.update({
-            'SITE_FORUM_URL': SITE_FORUM_URL.value,
-            'MODERATOR_REQUEST_FORUM_URL': MODERATOR_REQUEST_FORUM_URL.value,
+            'meta_description': feconf.TEACH_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_TEACH,
         })
         self.render_template('pages/teach.html')
@@ -94,25 +69,34 @@ class ContactPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.values.update({
-            'CONTACT_EMAIL_ADDRESS': CONTACT_EMAIL_ADDRESS.value,
-            'SITE_FORUM_URL': SITE_FORUM_URL.value,
+            'meta_description': feconf.CONTACT_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_CONTACT,
         })
         self.render_template('pages/contact.html')
 
 
-class ParticipatePage(base.BaseHandler):
-    """Page with information about participating in Oppia."""
+class DonatePage(base.BaseHandler):
+    """Page with information about how to donate to Oppia."""
 
     def get(self):
         """Handles GET requests."""
         self.values.update({
-            'meta_description': feconf.PARTICIPATE_PAGE_DESCRIPTION,
-            'MODERATOR_REQUEST_FORUM_URL': MODERATOR_REQUEST_FORUM_URL.value,
-            'SITE_FORUM_URL': SITE_FORUM_URL.value,
-            'nav_mode': feconf.NAV_MODE_PARTICIPATE,
+            'meta_description': feconf.DONATE_PAGE_DESCRIPTION,
+            'nav_mode': feconf.NAV_MODE_DONATE,
         })
-        self.render_template('pages/participate.html')
+        self.render_template('pages/donate.html')
+
+
+class ThanksPage(base.BaseHandler):
+    """Page that thanks people who donate to Oppia."""
+
+    def get(self):
+        """Handles GET requests."""
+        self.values.update({
+            'meta_description': feconf.THANKS_PAGE_DESCRIPTION,
+            'nav_mode': feconf.NAV_MODE_THANKS,
+        })
+        self.render_template('pages/thanks.html')
 
 
 class ForumPage(base.BaseHandler):
@@ -120,18 +104,15 @@ class ForumPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        if not feconf.SHOW_CUSTOM_PAGES:
-            raise self.PageNotFoundException
-
         # Note: if you are working in the development environment and
         # are accessing this page at localhost, please replace
         # 'localhost' with '127.0.0.1'.
         _, netloc, _, _, _ = urlparse.urlsplit(self.request.uri)
 
         self.values.update({
-            'EMBEDDED_GOOGLE_GROUP_URL': (
+            'full_google_group_url': (
                 '%s&showtabs=false&hideforumtitle=true&parenturl=%s' % (
-                    EMBEDDED_GOOGLE_GROUP_URL.value,
+                    feconf.EMBEDDED_GOOGLE_GROUP_URL,
                     urllib.quote(self.request.uri, safe=''),
                 )
             ),
@@ -146,9 +127,6 @@ class TermsPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        if not feconf.SHOW_CUSTOM_PAGES:
-            raise self.PageNotFoundException
-
         self.values.update({
             'meta_description': feconf.TERMS_PAGE_DESCRIPTION,
         })
@@ -161,15 +139,20 @@ class PrivacyPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        if not feconf.SHOW_CUSTOM_PAGES:
-            raise self.PageNotFoundException
-
         self.render_template('pages/privacy.html')
 
 
 class AboutRedirectPage(base.BaseHandler):
-    """An page that redirects to the main About page."""
+    """A page that redirects to the main About page."""
 
     def get(self):
         """Handles GET requests."""
         self.redirect('/about')
+
+
+class TeachRedirectPage(base.BaseHandler):
+    """A page that redirects to the main Teach page."""
+
+    def get(self):
+        """Handles GET requests."""
+        self.redirect('/teach')

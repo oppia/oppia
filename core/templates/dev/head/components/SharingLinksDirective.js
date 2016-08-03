@@ -22,16 +22,17 @@ oppia.directive('sharingLinks', [function() {
     scope: {
       layoutType: '@',
       layoutAlignType: '@',
-      getTwitterText: '&twitterText'
+      getTwitterText: '&twitterText',
+      getExplorationId: '&explorationId'
     },
     templateUrl: 'components/sharingLinks',
     controller: [
       '$scope', '$window', 'oppiaHtmlEscaper', 'ExplorationEmbedButtonService',
-      'explorationContextService', 'siteAnalyticsService',
+      'siteAnalyticsService', 'UrlInterpolationService',
       function(
-        $scope, $window, oppiaHtmlEscaper, ExplorationEmbedButtonService,
-        explorationContextService, siteAnalyticsService) {
-        $scope.explorationId = explorationContextService.getExplorationId();
+          $scope, $window, oppiaHtmlEscaper, ExplorationEmbedButtonService,
+          siteAnalyticsService, UrlInterpolationService) {
+        $scope.explorationId = $scope.getExplorationId();
 
         $scope.registerShareExplorationEvent = function(network) {
           siteAnalyticsService.registerShareExplorationEvent(network);
@@ -45,6 +46,15 @@ oppia.directive('sharingLinks', [function() {
 
         $scope.escapedTwitterText = (
           oppiaHtmlEscaper.unescapedStrToEscapedStr($scope.getTwitterText()));
+
+        $scope.gplusUrl = UrlInterpolationService.getStaticImageUrl(
+          '/general/gplus.png');
+
+        $scope.fbUrl = UrlInterpolationService.getStaticImageUrl(
+          '/general/fb.png');
+
+        $scope.twitterUrl = UrlInterpolationService.getStaticImageUrl(
+          '/general/twitter.png');
       }
     ]
   };

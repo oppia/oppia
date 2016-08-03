@@ -93,9 +93,12 @@ oppia.controller('GadgetEditor', [
         controller: [
           '$scope', '$modalInstance', 'explorationStatesService',
           'explorationGadgetsService', 'gadgetDict', 'GADGET_SPECS',
+          'UrlInterpolationService',
           function(
               $scope, $modalInstance, explorationStatesService,
-              explorationGadgetsService, gadgetDict, GADGET_SPECS) {
+              explorationGadgetsService, gadgetDict, GADGET_SPECS,
+              UrlInterpolationService) {
+            $scope.getGadgetImgUrl = UrlInterpolationService.getGadgetImgUrl;
             $scope.ALLOWED_GADGETS = GLOBALS.ALLOWED_GADGETS;
             $scope.GADGET_SPECS = GADGET_SPECS;
             $scope.SHOW_GADGET_NAME_EDITOR = false;
@@ -122,7 +125,7 @@ oppia.controller('GadgetEditor', [
 
             $scope.renameGadget = function(newGadgetName) {
               var originalName = $scope.gadgetDict.gadget_name;
-              if (originalName != newGadgetName) {
+              if (originalName !== newGadgetName) {
                 // Record the change.
                 explorationGadgetsService.renameGadget(
                   originalName, newGadgetName);

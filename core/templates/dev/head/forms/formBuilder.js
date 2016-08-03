@@ -129,7 +129,7 @@ oppia.filter('convertUnicodeWithParamsToHtml', ['$filter', function($filter) {
     var currentFragment = '';
     var currentFragmentIsParam = false;
     for (var i = 0; i < text.length; i++) {
-      if (text[i] == '\\') {
+      if (text[i] === '\\') {
         assert(
           !currentFragmentIsParam && text.length > i + 1 &&
           {
@@ -574,8 +574,8 @@ oppia.factory('rteHelperService', [
       var customizationArgsDict = {};
       for (var i = 0; i < attrs.length; i++) {
         var attr = attrs[i];
-        if (attr.name == 'class' || attr.name == 'src' ||
-            attr.name == '_moz_resizing') {
+        if (attr.name === 'class' || attr.name === 'src' ||
+            attr.name === '_moz_resizing') {
           continue;
         }
         var separatorLocation = attr.name.indexOf('-with-value');
@@ -902,7 +902,8 @@ oppia.directive('textAngularRte', [
         },
         template: (
           '<div text-angular="" ta-toolbar="<[toolbarOptionsJson]>" ' +
-          '     ta-paste="stripFormatting($html)" ng-model="tempContent">' +
+          '     ta-paste="stripFormatting($html)" ng-model="tempContent"' +
+          '     placeholder="<[placeholderText]>">' +
           '</div>'),
         controller: ['$scope', function($scope) {
           // Currently, operations affecting the filesystem are allowed only in
@@ -913,6 +914,10 @@ oppia.directive('textAngularRte', [
             ['ol', 'ul', 'pre', 'indent', 'outdent'],
             []
           ];
+
+          if ($scope.uiConfig() && $scope.uiConfig().placeholder) {
+            $scope.placeholderText = $scope.uiConfig().placeholder;
+          }
 
           rteHelperService.getRichTextComponents().forEach(
             function(componentDefn) {
@@ -1682,7 +1687,7 @@ oppia.directive('schemaBasedListEditor', [
           if ($scope.len <= 0) {
             throw 'Invalid length for list editor: ' + $scope.len;
           }
-          if ($scope.len != $scope.localValue.length) {
+          if ($scope.len !== $scope.localValue.length) {
             throw 'List editor length does not match length of input value: ' +
               $scope.len + ' ' + $scope.localValue;
           }

@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from core.domain import activity_domain
+from core.domain import activity_services
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_services
@@ -194,7 +196,8 @@ class ExplorationDisplayableSummariesTest(
             'status': 'public',
             'tags': [],
             'thumbnail_bg_color': '#a33f40',
-            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
+            'thumbnail_icon_url': self.get_static_asset_url(
+                '/images/subjects/Lightbulb.svg'),
             'title': u'Exploration 2 Albert title',
         }
         self.assertIn('last_updated_msec', displayable_summaries[0])
@@ -276,7 +279,8 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
             'tags': [],
             'title':  u'The Lazy Magician',
             'thumbnail_bg_color': '#d0982a',
-            'thumbnail_icon_url': '/images/subjects/Algorithms.svg',
+            'thumbnail_icon_url': self.get_static_asset_url(
+                '/images/subjects/Algorithms.svg'),
         }
         expected_group = {
             'categories': ['Algorithms', 'Computing', 'Programming'],
@@ -304,6 +308,7 @@ class FeaturedExplorationDisplayableSummariesTest(
 
     EXP_ID_1 = 'eid1'
     EXP_ID_2 = 'eid2'
+    LANGUAGE_CODE_ES = 'es'
 
     def setUp(self):
         """Populate the database of explorations and their summaries.
@@ -323,7 +328,8 @@ class FeaturedExplorationDisplayableSummariesTest(
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
 
-        self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
+        self.save_new_valid_exploration(
+            self.EXP_ID_1, self.albert_id, language_code=self.LANGUAGE_CODE_ES)
         self.save_new_valid_exploration(self.EXP_ID_2, self.albert_id)
 
         rights_manager.publish_exploration(self.albert_id, self.EXP_ID_1)
@@ -332,32 +338,83 @@ class FeaturedExplorationDisplayableSummariesTest(
         self.set_admins([self.ADMIN_USERNAME])
 
     def test_for_featured_explorations(self):
-        """Note that EXP_ID_1 is public, and EXP_ID_2 is publicized.
-        The call to get_featured_explorations() should only return
-        [EXP_ID_2].
+        """Note that both EXP_ID_1 and EXP_ID_2 are public. However, only
+        EXP_ID_2 is featured, so the call to get_featured_explorations() should
+        only return [EXP_ID_2].
         """
+        activity_services.update_featured_activity_references([
+            activity_domain.ActivityReference(
+                feconf.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_2)
+        ])
 
-        rights_manager.publicize_exploration(self.admin_id, self.EXP_ID_2)
-
-        featured_exploration_summaries = (
-            summary_services.get_featured_exploration_summary_dicts([
+        featured_activity_summaries = (
+            summary_services.get_featured_activity_summary_dicts([
                 feconf.DEFAULT_LANGUAGE_CODE]))
-        expected_summary = {
-            'status': u'publicized',
+        self.assertEqual(len(featured_activity_summaries), 1)
+        self.assertDictContainsSubset({
+            'status': 'public',
             'thumbnail_bg_color': '#a33f40',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
+            'thumbnail_icon_url': self.get_static_asset_url(
+                '/images/subjects/Lightbulb.svg'),
             'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
-            'category': u'A category',
+            'category': 'A category',
             'ratings': feconf.get_empty_ratings(),
-            'title': u'A title',
+            'title': 'A title',
             'num_views': 0,
-            'objective': u'An objective'
-        }
-        self.assertDictContainsSubset(
-            expected_summary, featured_exploration_summaries[0])
+            'objective': 'An objective'
+        }, featured_activity_summaries[0])
+
+    def test_language_code_filter(self):
+        """Note that both EXP_ID_1 is in Spanish and EXP_ID_2 is in English."""
+        activity_services.update_featured_activity_references([
+            activity_domain.ActivityReference(
+                feconf.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_1),
+            activity_domain.ActivityReference(
+                feconf.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_2)
+        ])
+
+        featured_activity_summaries = (
+            summary_services.get_featured_activity_summary_dicts([
+                feconf.DEFAULT_LANGUAGE_CODE]))
+        self.assertEqual(len(featured_activity_summaries), 1)
+        self.assertDictContainsSubset({
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'id': self.EXP_ID_2,
+        }, featured_activity_summaries[0])
+
+        featured_activity_summaries = (
+            summary_services.get_featured_activity_summary_dicts([
+                self.LANGUAGE_CODE_ES]))
+        self.assertEqual(len(featured_activity_summaries), 1)
+        self.assertDictContainsSubset({
+            'language_code': self.LANGUAGE_CODE_ES,
+            'id': self.EXP_ID_1,
+        }, featured_activity_summaries[0])
+
+        featured_activity_summaries = (
+            summary_services.get_featured_activity_summary_dicts([
+                feconf.DEFAULT_LANGUAGE_CODE, self.LANGUAGE_CODE_ES]))
+        self.assertEqual(len(featured_activity_summaries), 2)
+        self.assertDictContainsSubset({
+            'language_code': self.LANGUAGE_CODE_ES,
+            'id': self.EXP_ID_1,
+        }, featured_activity_summaries[0])
+        self.assertDictContainsSubset({
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE,
+            'id': self.EXP_ID_2,
+        }, featured_activity_summaries[1])
+
+        featured_activity_summaries = (
+            summary_services.get_featured_activity_summary_dicts([
+                'nonexistent_language_code']))
+        self.assertEqual(len(featured_activity_summaries), 0)
+
+        featured_activity_summaries = (
+            summary_services.get_featured_activity_summary_dicts([]))
+        self.assertEqual(len(featured_activity_summaries), 0)
 
 
 class CollectionLearnerDictTests(test_utils.GenericTestBase):
@@ -586,7 +643,8 @@ class TopRatedExplorationDisplayableSummariesTest(
             'thumbnail_bg_color': '#a33f40',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
+            'thumbnail_icon_url': self.get_static_asset_url(
+                '/images/subjects/Lightbulb.svg'),
             'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_3,
             'category': u'A category',
@@ -623,7 +681,8 @@ class TopRatedExplorationDisplayableSummariesTest(
             'thumbnail_bg_color': '#a33f40',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
+            'thumbnail_icon_url': self.get_static_asset_url(
+                '/images/subjects/Lightbulb.svg'),
             'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
             'category': u'A category',
@@ -704,7 +763,8 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             'thumbnail_bg_color': '#a33f40',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
+            'thumbnail_icon_url': self.get_static_asset_url(
+                '/images/subjects/Lightbulb.svg'),
             'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_1,
             'category': u'A category',
@@ -718,7 +778,8 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             'thumbnail_bg_color': '#a33f40',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
+            'thumbnail_icon_url': self.get_static_asset_url(
+                '/images/subjects/Lightbulb.svg'),
             'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
             'category': u'A category',
@@ -732,7 +793,8 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             'thumbnail_bg_color': '#a33f40',
             'community_owned': False,
             'tags': [],
-            'thumbnail_icon_url': '/images/subjects/Lightbulb.svg',
+            'thumbnail_icon_url': self.get_static_asset_url(
+                '/images/subjects/Lightbulb.svg'),
             'language_code': feconf.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_3,
             'category': u'A category',
@@ -764,3 +826,56 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             recently_published_exploration_summaries[1]['title'], 'New title')
         self.assertDictContainsSubset(
             test_summary_3, recently_published_exploration_summaries[0])
+
+
+class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
+    """Tests for requiring that activity references are public."""
+
+    EXP_ID_0 = 'exp_id_0'
+    EXP_ID_1 = 'exp_id_1'
+    COL_ID_2 = 'col_id_2'
+
+    def setUp(self):
+        super(ActivityReferenceAccessCheckerTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+    def test_requiring_nonexistent_activities_be_public_raises_exception(self):
+        with self.assertRaisesRegexp(Exception, 'non-existent exploration'):
+            summary_services.require_activities_to_be_public([
+                activity_domain.ActivityReference(
+                    feconf.ACTIVITY_TYPE_EXPLORATION, 'fake')])
+        with self.assertRaisesRegexp(Exception, 'non-existent collection'):
+            summary_services.require_activities_to_be_public([
+                activity_domain.ActivityReference(
+                    feconf.ACTIVITY_TYPE_COLLECTION, 'fake')])
+
+    def test_requiring_private_activities_to_be_public_raises_exception(self):
+        self.save_new_valid_exploration(self.EXP_ID_0, self.owner_id)
+        self.save_new_valid_exploration(self.EXP_ID_1, self.owner_id)
+        self.save_new_valid_collection(
+            self.COL_ID_2, self.owner_id, exploration_id=self.EXP_ID_0)
+
+        with self.assertRaisesRegexp(Exception, 'private exploration'):
+            summary_services.require_activities_to_be_public([
+                activity_domain.ActivityReference(
+                    feconf.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0)])
+        with self.assertRaisesRegexp(Exception, 'private collection'):
+            summary_services.require_activities_to_be_public([
+                activity_domain.ActivityReference(
+                    feconf.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2)])
+
+    def test_requiring_public_activities_to_be_public_succeeds(self):
+        self.save_new_valid_exploration(self.EXP_ID_0, self.owner_id)
+        self.save_new_valid_collection(
+            self.COL_ID_2, self.owner_id, exploration_id=self.EXP_ID_0)
+
+        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_0)
+        rights_manager.publish_collection(self.owner_id, self.COL_ID_2)
+
+        # There are no validation errors.
+        summary_services.require_activities_to_be_public([
+            activity_domain.ActivityReference(
+                feconf.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0),
+            activity_domain.ActivityReference(
+                feconf.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2)])

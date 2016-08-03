@@ -20,13 +20,18 @@ oppia.controller('StateFallbacks', [
   '$scope', '$rootScope', '$modal', '$filter', 'editorContextService',
   'alertsService', 'INTERACTION_SPECS', 'stateFallbacksService',
   'explorationStatesService', 'stateInteractionIdService',
+  'UrlInterpolationService',
   function(
       $scope, $rootScope, $modal, $filter, editorContextService,
       alertsService, INTERACTION_SPECS, stateFallbacksService,
-      explorationStatesService, stateInteractionIdService) {
+      explorationStatesService, stateInteractionIdService,
+      UrlInterpolationService) {
     $scope.editorContextService = editorContextService;
     $scope.stateFallbacksService = stateFallbacksService;
     $scope.activeFallbackIndex = null;
+
+    $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
+      '/general/drag_dots.png');
 
     $scope.$on('stateEditorInitialized', function(evt, stateData) {
       stateFallbacksService.init(

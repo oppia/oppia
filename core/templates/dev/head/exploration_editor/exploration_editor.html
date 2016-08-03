@@ -11,20 +11,24 @@
 {% block header_js %}
   {{ super() }}
   <script type="text/javascript">
-    GLOBALS.can_edit = JSON.parse('{{can_edit|js_string}}');
     GLOBALS.ALLOWED_GADGETS = JSON.parse('{{ALLOWED_GADGETS|js_string}}');
     GLOBALS.ALLOWED_INTERACTION_CATEGORIES = JSON.parse(
       '{{ALLOWED_INTERACTION_CATEGORIES|js_string}}');
-    GLOBALS.DEFAULT_OBJECT_VALUES = JSON.parse('{{DEFAULT_OBJECT_VALUES|js_string}}');
+    GLOBALS.can_edit = JSON.parse('{{can_edit|js_string}}');
+    GLOBALS.DEFAULT_OBJECT_VALUES = JSON.parse(
+      '{{DEFAULT_OBJECT_VALUES|js_string}}');
+    GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = JSON.parse(
+      '{{DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR|js_string}}');
     GLOBALS.GADGET_SPECS = JSON.parse('{{GADGET_SPECS|js_string}}');
     GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
-    GLOBALS.INVALID_PARAMETER_NAMES = JSON.parse('{{INVALID_PARAMETER_NAMES|js_string}}');
+    GLOBALS.INVALID_PARAMETER_NAMES = JSON.parse(
+      '{{INVALID_PARAMETER_NAMES|js_string}}');
     GLOBALS.NEW_STATE_TEMPLATE = JSON.parse(
       '{{NEW_STATE_TEMPLATE|js_string}}');
     GLOBALS.PANEL_SPECS = JSON.parse('{{PANEL_SPECS|js_string}}');
+    GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = JSON.parse(
+      '{{SHOW_TRAINABLE_UNRESOLVED_ANSWERS|js_string}}');
     GLOBALS.TAG_REGEX = JSON.parse('{{TAG_REGEX|js_string}}');
-    GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = JSON.parse('{{SHOW_TRAINABLE_UNRESOLVED_ANSWERS|js_string}}');
-    GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = JSON.parse('{{DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR|js_string}}');
   </script>
 
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
@@ -179,7 +183,7 @@
     <li ng-if="isEditableOutsideTutorialMode()">
       <div dropdown class="btn-group" style="margin-right: 10px; margin-top: 8px;"
            title="<[getSaveButtonTooltip()]>">
-        <button id="tutorialSaveButton" class="btn btn-default oppia-save-draft-button protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
+        <button id="tutorialSaveButton" class="btn btn-default oppia-save-draft-button protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable(), 'oppia-save-draft-button-padding': getChangeListLength() && !isPrivate()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
           <span ng-if="!isSaveInProgress">
             <span ng-if="isPrivate()">
               <span ng-if="!saveModalIsOpening">
@@ -201,6 +205,7 @@
                 <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
                    alt="Publish Changes">&#xE2C3;</i>
                 <span class="oppia-save-publish-button-label">Publish Changes</span>
+                <span class="hidden-sm hidden-xs" ng-if="getChangeListLength()" style="opacity: 0.5">(<[getChangeListLength()]>)</span>
               </span>
 
               <span ng-if="saveModalIsOpening">
@@ -225,7 +230,7 @@
                 ng-disabled="!getChangeListLength()" dropdown-toggle>
           <span class="caret"></span>
         </button>
-        <ul class="dropdown-menu" role="menu" style="min-width: 120px; right: inherit; width: 120px;">
+        <ul class="dropdown-menu" role="menu" style="min-width: 120px; right: inherit;" ng-style="{ width: getChangeListLength() && !isPrivate() ? '150px' : '120px' }">
           <li><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="protractor-test-discard-changes" title="Discard all pending changes.">Discard Draft</a></li>
         </ul>
       </div>
@@ -235,21 +240,6 @@
 
 {% block content %}
   <div ng-controller="ExplorationEditor" ng-cloak>
-    <script type="text/ng-template" id="modals/shareExplorationAfterPublish">
-      <div class="modal-header">
-        <h3>Exploration Published</h3>
-      </div>
-
-      <div class="modal-body oppia-long-text">
-        <p>
-          Congratulations! Your exploration was successfully published.
-        </p>
-        <p>
-          <strong>Share your exploration via:</strong>
-        </p>
-        <sharing-links flex="100" layout-type="row" layout-align-type="center center" twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR"></sharing-links>
-      </div>
-    </script>
 
     <script type="text/ng-template" id="modals/addExplorationMetadata">
       <div class="modal-header">
@@ -265,11 +255,14 @@
           <input type="text" class="form-control" ng-model="explorationTitleService.displayed"
                  placeholder="Music in the 19th Century">
         </p>
-        <p ng-if="requireObjectiveToBeSpecified">
-          Add a goal: what does the exploration help people to do?
-          <input type="text" class="form-control" ng-model="explorationObjectiveService.displayed"
-                 placeholder="Learn how to ...">
-        </p>
+        <form name="objectiveForm">
+          <p ng-if="requireObjectiveToBeSpecified">
+            Add a goal: what does the exploration help people to do?
+            <input name="objectiveInput" type="text" class="form-control" ng-minlength="15" required ng-model="explorationObjectiveService.displayed"
+                   placeholder="Learn how to ...">
+            <span class="help-block" ng-show="objectiveForm.objectiveInput.$touched && !explorationObjectiveService.displayed" style="font-size: smaller; color: red">Please provide a descriptive goal to help people understand what this exploration is about.</span>
+          </p>
+        </form>
         <p ng-if="requireCategoryToBeSpecified">
           Add a category: how would you categorize your exploration?
           <select2-dropdown item="explorationCategoryService.displayed"
@@ -317,7 +310,7 @@
         </p>
         <p>
           Before publishing, please ensure that your exploration fits the
-          <a href="/participate#publication-criteria" target="_blank">site publication criteria</a>. In particular, it should:
+          <a href="/teach#playbook" target="_blank">site publication criteria</a>. In particular, it should:
           <ul>
             <li>help its intended audience learn something new</li>
             <li>provide useful feedback/guidance to help them if they get stuck.</li>
@@ -334,7 +327,7 @@
         <button class="btn btn-success protractor-test-confirm-publish" ng-click="publish()">Publish Exploration</button>
       </div>
     </script>
-
+    {% include 'exploration_editor/share_publish_modal.html' %}
     {% include 'components/exploration_welcome_modal_directive.html' %}
     {% include 'components/help_modal_directive.html' %}
 
@@ -351,69 +344,15 @@
           Please enter a brief description of what you have changed:
           <textarea rows="3" cols="50" ng-model="commitMessage" focus-on="saveChangesModalOpened" class="protractor-test-commit-message-input" autofocus></textarea>
         </p>
+        <button class="btn btn-default" ng-click="onClickToggleDiffButton()">
+          <span ng-if="!showDiff">Show Changes</span>
+          <span ng-if="showDiff">Hide Changes</span>
+        </button>
 
-        <div ng-if="explorationChangesExist">
-          <em>
-            You changed the following properties of the exploration:
-          </em>
-          <ul>
-            <li ng-repeat="(propertyName, changeInfo) in explorationPropertyChanges">
-              <[formatExplorationPropertyChange(propertyName, changeInfo)]>
-            </li>
-          </ul>
-        </div>
-
-        <p ng-if="addedStates.length > 0">
-          <em>You added the following cards</em>: <strong><[formatStateList(addedStates)]></strong>
-        </p>
-
-        <div ng-if="stateChangesExist">
-          <em>
-            You made the following changes to cards:
-          </em>
-          <div ng-repeat="(stateName, stateChanges) in statePropertyChanges">
-            <h5><[stateName]></h5>
-            <ul>
-              <li ng-repeat="(propertyName, changeInfo) in stateChanges">
-                <[formatStatePropertyChange(propertyName, changeInfo)]>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <p ng-if="deletedStates.length > 0">
-          <em>You deleted the following cards:</em> <strong><[formatStateList(deletedStates)]></strong>
-        </p>
-
-        <p ng-if="changedStates.length > 0">
-          <em>You changed the following cards:</em> <strong><[formatStateList(changedStates)]></strong>
-        </p>
-
-        <p ng-if="addedGadgets.length > 0">
-          <em>You added the following gadgets</em>: <strong><[formatGadgetList(addedGadgets)]></strong>
-        </p>
-
-        <div ng-if="gadgetChangesExist">
-          <em>
-            You made the following changes to gadgets:
-          </em>
-          <div ng-repeat="(gadgetName, gadgetChanges) in gadgetPropertyChanges">
-            <h5><[gadgetName]></h5>
-            <ul>
-              <li ng-repeat="(propertyName, changeInfo) in gadgetChanges">
-                <[formatGadgetPropertyChange(propertyName, changeInfo)]>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <p ng-if="deletedGadgets.length > 0">
-          <em>You deleted the following gadgets:</em> <strong><[formatGadgetList(deletedGadgets)]></strong>
-        </p>
-
-        <p ng-if="changedGadgets.length > 0">
-          <em>You changed the following gadgets:</em> <strong><[formatGadgetList(changedGadgets)]></strong>
-        </p>
+        <version-diff-visualization ng-if="showDiff" diff-data="diffData"
+                                    earlier-version-header="earlierVersionHeader"
+                                    later-version-header="laterVersionHeader">
+        </version-diff-visualization>
       </div>
       <div class="modal-footer">
         <button class="btn btn-default" ng-click="cancel()">Cancel</button>
@@ -532,7 +471,7 @@
   {% include 'components/answer_group_editor_directive.html' %}
   {% include 'components/exploration_embed_button_modal.html' %}
   {% include 'components/fallback_editor_directive.html' %}
-  {% include 'components/fuzzy_rule_panel_directive.html' %}
+  {% include 'components/classifier_panel_directive.html' %}
   {% include 'components/gadget_directive.html' %}
   {% include 'components/gadget_panel_directive.html' %}
   {% include 'components/html_select_directive.html' %}
@@ -544,7 +483,9 @@
   {% include 'components/response_header_directive.html' %}
   {% include 'components/rule_editor_directive.html' %}
   {% include 'components/sharing_links_directive.html' %}
+  {% include 'components/state_diff_modal_directive.html' %}
   {% include 'components/state_graph_viz_directive.html' %}
+  {% include 'components/version_diff_visualization_directive.html' %}
 
   {% include 'player/answer_feedback_pair_directive.html' %}
   {% include 'player/conversation_skin_directive.html' %}
@@ -559,6 +500,7 @@
 
     {{ include_js_file('exploration_editor/ExplorationEditor.js') }}
     {{ include_js_file('exploration_editor/EditorServices.js') }}
+    {{ include_js_file('exploration_editor/ExplorationDiffService.js') }}
     {{ include_js_file('exploration_editor/ExplorationEditorAdvancedFeaturesService.js') }}
     {{ include_js_file('exploration_editor/GadgetValidationService.js') }}
     {{ include_js_file('exploration_editor/ParameterMetadataService.js') }}
@@ -569,7 +511,7 @@
     {{ include_js_file('components/CodemirrorMergeviewDirective.js') }}
     {{ include_js_file('components/ExplorationEmbedButtonService.js') }}
     {{ include_js_file('components/FallbackEditorDirective.js') }}
-    {{ include_js_file('components/FuzzyRulePanelDirective.js') }}
+    {{ include_js_file('components/ClassifierRulePanelDirective.js') }}
     {{ include_js_file('components/GadgetDirective.js') }}
     {{ include_js_file('components/GadgetPanelDirective.js') }}
     {{ include_js_file('components/HtmlSelectDirective.js') }}
@@ -585,6 +527,7 @@
     {{ include_js_file('components/StateGraphLayoutService.js') }}
     {{ include_js_file('components/StateGraphVizDirective.js') }}
     {{ include_js_file('components/ValueGeneratorEditorDirective.js') }}
+    {{ include_js_file('components/VersionDiffVisualizationDirective.js') }}
 
     {{ include_js_file('services/explorationServices.js') }}
     {{ include_js_file('services/messengerService.js') }}

@@ -20,10 +20,12 @@ oppia.controller('StateEditor', [
   '$scope', '$rootScope', 'editorContextService', 'changeListService',
   'editabilityService', 'explorationStatesService', 'INTERACTION_SPECS',
   'explorationInitStateNameService', 'explorationAdvancedFeaturesService',
+  'UrlInterpolationService',
   function(
       $scope, $rootScope, editorContextService, changeListService,
       editabilityService, explorationStatesService, INTERACTION_SPECS,
-      explorationInitStateNameService, explorationAdvancedFeaturesService) {
+      explorationInitStateNameService, explorationAdvancedFeaturesService,
+      UrlInterpolationService) {
     $scope.STATE_CONTENT_SCHEMA = {
       type: 'html'
     };
@@ -36,6 +38,9 @@ oppia.controller('StateEditor', [
     $scope.isCurrentStateTerminal = false;
     $scope.isInteractionIdSet = false;
     $scope.isInteractionShown = false;
+
+    $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
+      '/avatar/oppia_black_72px.png');
 
     $scope.isCurrentStateInitialState = function() {
       return (
@@ -118,7 +123,7 @@ oppia.controller('StateEditor', [
 ]);
 
 // A service which handles opening and closing the training modal used for both
-// unresolved answers and answers within the training data of a fuzzy rule.
+// unresolved answers and answers within the training data of a classifier.
 oppia.factory('trainingModalService', ['$rootScope', '$modal', 'alertsService',
     function($rootScope, $modal, alertsService) {
   return {
@@ -132,10 +137,10 @@ oppia.factory('trainingModalService', ['$rootScope', '$modal', 'alertsService',
         templateUrl: 'modals/trainUnresolvedAnswer',
         backdrop: true,
         controller: ['$scope', '$modalInstance', 'explorationStatesService',
-          'editorContextService', 'answerClassificationService',
+          'editorContextService', 'AnswerClassificationService',
           'explorationContextService',
           function($scope, $modalInstance, explorationStatesService,
-              editorContextService, answerClassificationService,
+              editorContextService, AnswerClassificationService,
               explorationContextService) {
             $scope.trainingDataAnswer = '';
             $scope.trainingDataFeedback = '';
@@ -157,7 +162,7 @@ oppia.factory('trainingModalService', ['$rootScope', '$modal', 'alertsService',
               var currentStateName = editorContextService.getActiveStateName();
               var state = explorationStatesService.getState(currentStateName);
 
-              answerClassificationService.getMatchingClassificationResult(
+              AnswerClassificationService.getMatchingClassificationResult(
                 explorationId, state, unhandledAnswer, true).then(
                     function(classificationResult) {
                   var feedback = 'Nothing';
@@ -165,7 +170,7 @@ oppia.factory('trainingModalService', ['$rootScope', '$modal', 'alertsService',
                   if (classificationResult.outcome.feedback.length > 0) {
                     feedback = classificationResult.outcome.feedback[0];
                   }
-                  if (dest == currentStateName) {
+                  if (dest === currentStateName) {
                     dest = '<em>(try again)</em>';
                   }
 
@@ -194,13 +199,13 @@ oppia.factory('trainingModalService', ['$rootScope', '$modal', 'alertsService',
 
 // A service that, given an exploration ID and state name, determines all of the
 // answers which do not have certain classification and are not currently used
-// as part of any fuzzy rule training models.
+// as part of any classifier training models.
 oppia.factory('trainingDataService', [
-  '$rootScope', '$http', 'responsesService', 'FUZZY_RULE_TYPE',
-  'DEFAULT_FUZZY_RULE',
+  '$rootScope', '$http', 'responsesService', 'CLASSIFIER_RULESPEC_STR',
+  'DEFAULT_CLASSIFIER_RULE_SPEC',
   function(
-      $rootScope, $http, responsesService, FUZZY_RULE_TYPE,
-      DEFAULT_FUZZY_RULE) {
+      $rootScope, $http, responsesService, CLASSIFIER_RULESPEC_STR,
+      DEFAULT_CLASSIFIER_RULE_SPEC) {
     var _trainingDataAnswers = [];
     var _trainingDataCounts = [];
 
@@ -220,7 +225,7 @@ oppia.factory('trainingDataService', [
     // successfully removed from the training data, or -1 otherwise.
     var _removeAnswerFromTrainingData = function(answer, trainingData) {
       var index = _getIndexOfTrainingData(answer, trainingData);
-      if (index != -1) {
+      if (index !== -1) {
         trainingData.splice(index, 1);
       }
       return index;
@@ -242,22 +247,22 @@ oppia.factory('trainingDataService', [
         var answerGroup = answerGroups[i];
         var ruleSpecs = answerGroup.rule_specs;
         var trainingData = null;
-        var fuzzyRuleIndex = -1;
+        var classifierIndex = -1;
         for (var j = 0; j < ruleSpecs.length; j++) {
           var ruleSpec = ruleSpecs[j];
-          if (ruleSpec.rule_type == FUZZY_RULE_TYPE) {
+          if (ruleSpec.rule_type === CLASSIFIER_RULESPEC_STR) {
             trainingData = ruleSpec.inputs.training_data;
-            fuzzyRuleIndex = j;
+            classifierIndex = j;
             break;
           }
         }
         if (trainingData &&
-            _removeAnswerFromTrainingData(answer, trainingData) != -1) {
-          if (trainingData.length == 0 && ruleSpecs.length > 1) {
-            // If the last of the training data for a fuzzy rule has been
-            // removed and the fuzzy rule is not the only rule in the group,
+            _removeAnswerFromTrainingData(answer, trainingData) !== -1) {
+          if (trainingData.length === 0 && ruleSpecs.length > 1) {
+            // If the last of the training data for a classifier has been
+            // removed and the classifier is not the only rule in the group,
             // remove the rule since it is no longer doing anything.
-            ruleSpecs.splice(fuzzyRuleIndex, 1);
+            ruleSpecs.splice(classifierIndex, 1);
           }
           updatedAnswerGroups = true;
         }
@@ -265,7 +270,7 @@ oppia.factory('trainingDataService', [
 
       // Remove the answer from the confirmed unclassified answers.
       updatedConfirmedUnclassifiedAnswers = (_removeAnswerFromTrainingData(
-        answer, confirmedUnclassifiedAnswers) != -1);
+        answer, confirmedUnclassifiedAnswers) !== -1);
 
       if (updatedAnswerGroups) {
         responsesService.save(
@@ -278,7 +283,7 @@ oppia.factory('trainingDataService', [
       }
 
       var index = _removeAnswerFromTrainingData(answer, _trainingDataAnswers);
-      if (index != -1) {
+      if (index !== -1) {
         _trainingDataCounts.splice(index, 1);
         $rootScope.$broadcast('updatedTrainingData');
       }
@@ -331,27 +336,27 @@ oppia.factory('trainingDataService', [
         var answerGroup = responsesService.getAnswerGroup(answerGroupIndex);
         var rules = answerGroup.rule_specs;
 
-        // Ensure the answer group has a fuzzy rule.
-        var fuzzyRule = null;
+        // Ensure the answer group has a classifier rule.
+        var classifierRule = null;
         for (var i = 0; i < rules.length; i++) {
           var rule = rules[i];
-          if (rule.rule_type == FUZZY_RULE_TYPE) {
-            fuzzyRule = rule;
+          if (rule.rule_type === CLASSIFIER_RULESPEC_STR) {
+            classifierRule = rule;
             break;
           }
         }
-        if (!fuzzyRule) {
-          // Create new fuzzy rule for classification. All fuzzy rules should
-          // match this schema.
-          fuzzyRule = angular.copy(DEFAULT_FUZZY_RULE);
-          rules.push(fuzzyRule);
+        if (!classifierRule) {
+          // Create new classifier rule for classification. All classifiers
+          // should match this schema.
+          classifierRule = angular.copy(DEFAULT_CLASSIFIER_RULE_SPEC);
+          rules.push(classifierRule);
         }
 
         // Train the rule to include this answer, but only if it's not already
         // in the training data.
         if (_getIndexOfTrainingData(
-            answer, fuzzyRule.inputs.training_data) == -1) {
-          fuzzyRule.inputs.training_data.push(answer);
+            answer, classifierRule.inputs.training_data) === -1) {
+          classifierRule.inputs.training_data.push(answer);
         }
 
         responsesService.updateAnswerGroup(answerGroupIndex, {
@@ -366,7 +371,7 @@ oppia.factory('trainingDataService', [
           responsesService.getConfirmedUnclassifiedAnswers());
 
         if (_getIndexOfTrainingData(
-              answer, confirmedUnclassifiedAnswers) == -1) {
+              answer, confirmedUnclassifiedAnswers) === -1) {
           confirmedUnclassifiedAnswers.push(answer);
         }
 
@@ -445,7 +450,7 @@ oppia.directive('trainingPanel', [function() {
         $scope.confirmAnswerGroupIndex = function(index) {
           $scope.classification.answerGroupIndex = index;
 
-          if (index == responsesService.getAnswerGroupCount()) {
+          if (index === responsesService.getAnswerGroupCount()) {
             trainingDataService.trainDefaultResponse($scope.answer);
           } else {
             trainingDataService.trainAnswerGroup(index, $scope.answer);

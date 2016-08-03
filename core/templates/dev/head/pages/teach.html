@@ -40,7 +40,7 @@
       </ul>
     </div>
 
-    <div class="about-tab-container">
+    <div class="about-tab-container" ng-controller="Teach">
       <div class="teach oppia-about-tab-content oppia-about-visible-content">
 
         <div class="oppia-about-card-content-wide oppia-about-card-content-narrow">
@@ -48,56 +48,54 @@
             Teach with Oppia
           </h2>
 
-          <div class="oppia-about-card-content-wide oppia-about-three-cols-container">
-            <div class="oppia-about-three-cols-layout oppia-about-three-cols-feature">
-              <img src="images/general/creator-create-exp.png">
-              <h3>Create an Exploration</h3>
-              <p style="margin-top: -10px;">
-                about a topic you care about.
-              </p>
-            </div>
-            <div class="oppia-about-three-cols-layout oppia-about-three-cols-feature">
-              <img src="images/general/creator-pub-share.png">
-              <h3>Publish &amp; Share</h3>
-              <p style="margin-top: -10px;">
-                your creations with the community.
-              </p>
-            </div>
-            <div class="oppia-about-three-cols-layout oppia-about-three-cols-feature">
-              <img src="images/general/creator-feedback.png">
-              <h3>Earn feedback</h3>
-              <p style="margin-top: -10px;">
-                to improve your exploration.
-              </p>
-            </div>
+          <div style="text-align: center; width: 100%;">
+            <em>Free personalized help to improve and promote your lessons.</em>
           </div>
 
-          <hr>
-
           <p>
-            How do pendulums work? Is light a particle or a wave? What is art?
-            Can you explain topics like these to a student who wants to learn
-            more? If so, you can use Oppia's unique technology to recreate 1-on-1
-            tutoring and reach students around the world by creating and sharing
-            a single piece of learning material.
+            You might know a student who's having some trouble with a topic at
+            school. They really want to learn it, but they've gotten a little
+            stuck. The lesson goes too fast, or the textbook isn't easy to
+            understand, or the material is presented in a dry or arbitrary
+            context. It's hard for them to get the personalized support they
+            need. And it's not just this student: other students, all over the
+            world, are likely to struggle with these same issues, again and
+            again and again.
           </p>
 
           <p>
-            With Oppia, you can create <em>explorations</em> that help students
-            learn in a fun and creative way, using videos, images, and open-ended
-            questions. Students often have similar misconceptions, and Oppia
-            helps you organize these so that you can give targeted feedback to a
-            group of students at a time. By teaching with Oppia, you can
-            communicate with students around the world, understand different
-            points of view, and improve your skills in communication and empathy.
+            In order to help address this, we're excited to announce the
+            <em>Teach with Oppia</em> program!
           </p>
+
           <p>
-            Don't feel comfortable enough to teach yet? You can
-            also collaborate with other Oppia creators by sharing feedback on
-            lessons to help create a better experience for students. Whether
-            you're a K-12 educator, a graduate student, or an individual who's
-            passionate about a specific subject and wants to share your
-            knowledge, Oppia welcomes you!
+            The <em>Teach with Oppia</em> program enables anyone &mdash;
+            especially students &mdash; to contribute to a collection of free,
+            accessible lessons on topics that learners find challenging. The
+            lessons use Oppia's unique technology to recreate one-on-one
+            tutoring, combining engaging instruction, clear explanations, and
+            ample exercises that allow students to gain proficiency with the
+            subject. Students can then do these lessons at their own pace,
+            supported by useful, targeted feedback.
+          </p>
+
+          <p>
+            Participation in the program is free. Participants will receive
+            personalized feedback on the lessons they create, and will help to
+            playtest and promote their lessons. They'll also be able to connect
+            with other like-minded creators, as well as the Oppia development
+            team, to ensure that their creations are as well-realized as
+            possible.
+          </p>
+
+          <p>
+            Though the program runs year-round, we can only accommodate a
+            certain number of participants at any given time. We accept
+            submissions on a rolling basis, so if you'd like to take part,
+            please fill out
+            <a href="https://goo.gl/forms/ljmQ9R3AZRkT2kU23">this form</a>,
+            which also has more information about the program. We look forward
+            to having you join us!
           </p>
         </div>
       </div>
@@ -130,7 +128,7 @@
           </ol>
           <p>
             If you're unsure about an exploration topic or
-            need clarification on guidelines, you can ask us on our <a href="{{SITE_FORUM_URL}}" class="inline-links">forum</a>.
+            need clarification on guidelines, you can ask us on our <a href="/forum" class="inline-links">forum</a>.
           </p>
 
           <h2>Publication Criteria</h2>
@@ -229,20 +227,6 @@
             This means that even if you or other community members make changes to the exploration,
             the version embedded on your website will remain the same.
           </p>
-
-          <strong>Releasing an exploration</strong>
-          <p>
-            We hope to make the exploration-release process community-driven soon,
-            but here's how it works now: When an owner of an exploration
-            — or anyone involved in the process — thinks the exploration is ready to be featured,
-            they can post to the
-            <a href="{{MODERATOR_REQUEST_FORUM_URL}}" class="inline-links">Moderator Requests forum</a>.
-            A moderator will play through the exploration, look at its structure, and
-            decide whether it fits the
-            <a href="#featured-criteria" class="inline-links">"Featured" criteria</a>.
-            If it does, the exploration will be marked as featured.
-            If it doesn't, the moderator will work with the creator(s) to improve the exploration.
-          </p>
         </div>
       </div>
     </div>
@@ -250,11 +234,15 @@
 
   <div class="oppia-about-extra-container about-tab-container">
     <div class="oppia-about-tab-content oppia-about-visible-content">
-      <div class="oppia-about-extra-info about-otter-buttons">
+      <div class="oppia-about-extra-info">
         <div class="oppia-about-content oppia-about-extra-content">
           <div class="oppia-about-card-content-wide oppia-about-buttons-container">
-            <a href="/dashboard?mode=create" class="btn oppia-about-button">Create an exploration</a>
-            <a href="/library" class="btn oppia-about-button">Browse all explorations</a>
+            <a href="https://goo.gl/forms/ljmQ9R3AZRkT2kU23" class="btn oppia-about-button"
+               translate="I18N_ACTION_APPLY_TO_TEACH_WITH_OPPIA" target="_blank"></a>
+            <a href="/dashboard?mode=create" class="btn oppia-about-button"
+               translate="I18N_ACTION_CREATE_EXPLORATION"></a>
+            <a href="/library" class="btn oppia-about-button"
+               translate="I18N_ACTION_BROWSE_EXPLORATIONS"></a>
           </div>
         </div>
       </div>
@@ -296,6 +284,13 @@
     });
   </script>
 {% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script>
+    {{ include_js_file('pages/Teach.js') }}
+  </script>
+{% endblock footer_js %}
 
 {% block footer%}
   {% include 'footer.html' %}

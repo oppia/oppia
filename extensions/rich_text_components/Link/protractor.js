@@ -19,20 +19,16 @@
 
 var objects = require('../../objects/protractor.js');
 
-var customizeComponent = function(modal, url, openInSameWindow) {
+var customizeComponent = function(modal, url) {
   objects.SanitizedUrlEditor(
     modal.element(by.tagName('sanitized-url-editor'))
   ).setValue(url);
-  objects.BooleanEditor(
-    modal.element(by.tagName('schema-based-bool-editor'))
-  ).setValue(openInSameWindow);
 };
 
-var expectComponentDetailsToMatch = function(elem, url, openInSameWindow) {
+var expectComponentDetailsToMatch = function(elem, url) {
   expect(elem.element(by.tagName('a')).getAttribute('href')).toBe(url);
   expect(
-    elem.element(by.tagName('a')).getAttribute('target')
-  ).toBe(openInSameWindow ? '_top' : '_blank');
+    elem.element(by.tagName('a')).getAttribute('target')).toBe('_blank');
 };
 
 exports.customizeComponent = customizeComponent;

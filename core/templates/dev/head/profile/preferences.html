@@ -55,7 +55,7 @@
                 <div class="oppia-click-to-start-editing" ng-click="showEditProfilePictureModal()"></div>
                 <i class="material-icons oppia-editor-edit-icon" style="top: 8px; right: 8px;">&#xE254;</i>
                 <img ng-if="profilePictureDataUrl" ng-src="<[profilePictureDataUrl]>" class="img-thumbnail">
-                <img ng-if="!profilePictureDataUrl" src="/images/general/no_profile_picture.png" class="img-thumbnail">
+                <img ng-if="!profilePictureDataUrl" ng-src="<[getStaticImageUrl('/general/no_profile_picture.png')]>" class="img-thumbnail">
               </div>
             </div>
           </div>
@@ -75,7 +75,7 @@
           <div class="form-group">
             <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_SUBJECT_INTERESTS"></label>
             <div class="col-lg-10 col-md-10 col-sm-10">
-              <div ng-if="hasPageLoaded">
+              <div ng-if="hasPageLoaded && select2DropdownIsShown">
                 <select2-dropdown
                   item="$parent.subjectInterests"
                   ng-model="subjectInterests"
@@ -127,12 +127,12 @@
                 If the ng-if is omitted, the select2-dropdown directive won't be
                 updated after the initial page load.
               -->
-              <div ng-if="hasPageLoaded">
+              <div ng-if="hasPageLoaded && select2DropdownIsShown">
                 <select2-dropdown choices="SITE_LANGUAGE_CHOICES"
                   class="protractor-test-system-language-selector"
                   item="$parent.preferredSiteLanguageCode"
                   allow-multiple-choices="false"
-                  new-choice-regex=".^" width="400"
+                  new-choice-regex=".^" width="100%"
                   placeholder="<['I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE_PLACEHOLDER' | translate]>"
                   on-selection-change="savePreferredSiteLanguageCodes($parent.preferredSiteLanguageCode)">
                 </select2-dropdown>
@@ -161,14 +161,20 @@
             <div class="col-lg-10 col-md-10 col-sm-10">
               <div class="checkbox">
                 <label>
-                  <input type="checkbox" ng-model="canReceiveEmailUpdates" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail)">
+                  <input type="checkbox" ng-model="canReceiveEmailUpdates" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail)">
                   <span translate="I18N_PREFERENCES_EMAIL_RECEIVE_NEWS"></span>
                 </label>
               </div>
               <div class="checkbox">
                 <label>
-                  <input type="checkbox" ng-model="canReceiveEditorRoleEmail" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail)">
+                  <input type="checkbox" ng-model="canReceiveEditorRoleEmail" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail)">
                   Receive emails when someone gives you edit rights to an exploration
+                </label>
+              </div>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" ng-model="canReceiveFeedbackMessageEmail" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail)">
+                  Receive emails when someone sends you feedback on an exploration
                 </label>
               </div>
             </div>

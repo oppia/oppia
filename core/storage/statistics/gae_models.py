@@ -84,19 +84,69 @@ class StateRuleAnswerLogModel(base_models.BaseModel):
     @classmethod
     def get_or_create(cls, exploration_id, state_name, rule_str):
         # TODO(sll): Deprecate this method.
-        return cls.get_or_create_multi(exploration_id, [{
-            'state_name': state_name,
-            'rule_str': rule_str
-        }])[0]
+        return cls.get_or_create_multi_for_multi_explorations(
+            [(exploration_id, state_name)], [rule_str])[0][0]
 
     @classmethod
     def _get_entity_key(cls, unused_exploration_id, entity_id):
         return ndb.Key(cls._get_kind(), entity_id)
 
     @classmethod
+    def get_or_create_multi_for_multi_explorations(
+            cls, exploration_state_list, rule_str_list):
+        """Gets entities given a list of exploration ID and state name tuples,
+        and a list of rule spec strings to filter answers matched for each of
+        the given explorations and states. Returns a list containing a list of
+        matched entities for each input exploration ID-state name tuple.
+
+        Args:
+            exploration_state_list: a list of exploration ID and state name
+                tuples
+            rule_str_list: a list of rule spec strings which are used to filter
+                the answers matched to the provided explorations and states
+        """
+        # TODO(sll): Use a hash instead to disambiguate.
+        exploration_ids = []
+        state_names = []
+        entity_ids = []
+        for exploration_id, state_name in exploration_state_list:
+            for rule_str in rule_str_list:
+                exploration_ids.append(exploration_id)
+                state_names.append(state_name)
+                entity_ids.append('.'.join([
+                    exploration_id, state_name, _OLD_SUBMIT_HANDLER_NAME,
+                    rule_str])[:490])
+
+        entity_keys = [
+            cls._get_entity_key(exploration_id, entity_id)
+            for exploration_id, entity_id in zip(exploration_ids, entity_ids)]
+
+        entities = ndb.get_multi(entity_keys)
+        entities_to_put = []
+        for ind, entity in enumerate(entities):
+            if entity is None:
+                new_entity = cls(id=entity_ids[ind], answers={})
+                entities_to_put.append(new_entity)
+                entities[ind] = new_entity
+        if entities_to_put:
+            ndb.put_multi(entities_to_put)
+
+        exploration_entities_list = []
+        exploration_state_name_entity_map = {}
+        for ind, exp_state_tuple in enumerate(exploration_state_list):
+            exploration_entities_list.append([])
+            exploration_state_name_entity_map[exp_state_tuple] = (
+                exploration_entities_list[ind])
+
+        for (exploration_id, state_name, entity) in zip(
+                exploration_ids, state_names, entities):
+            exploration_state_name_entity_map[(
+                exploration_id, state_name)].append(entity)
+        return exploration_entities_list
+
+    @classmethod
     def get_or_create_multi(cls, exploration_id, rule_data):
         """Gets or creates entities for the given rules.
-
         Args:
             exploration_id: the exploration id
             rule_data: a list of dicts, each with the following keys:
@@ -371,6 +421,53 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
             params=params,
             play_type=play_type)
         complete_event_entity.put()
+
+
+class RateExplorationEventLogEntryModel(base_models.BaseModel):
+    """An event triggered by a learner rating the exploration.
+
+    Event schema documentation
+    --------------------------
+    V1:
+        event_type: 'rate_exploration'
+        exploration_id: id of exploration which is being rated
+        rating: value of rating assigned to exploration
+    """
+    # This value should be updated in the event of any event schema change.
+    CURRENT_EVENT_SCHEMA_VERSION = 1
+
+    # Which specific type of event this is
+    event_type = ndb.StringProperty(indexed=True)
+    # Id of exploration which has been rated.
+    exploration_id = ndb.StringProperty(indexed=True)
+    # Value of rating assigned
+    rating = ndb.IntegerProperty(indexed=True)
+    # Value of rating previously assigned by the same user. Will be None when a
+    # user rates an exploration for the first time.
+    old_rating = ndb.IntegerProperty(indexed=True)
+    # The version of the event schema used to describe an event of this type.
+    # Details on the schema are given in the docstring for this class.
+    event_schema_version = ndb.IntegerProperty(
+        indexed=True, default=CURRENT_EVENT_SCHEMA_VERSION)
+
+    @classmethod
+    def get_new_event_entity_id(cls, exp_id, user_id):
+        timestamp = datetime.datetime.utcnow()
+        return cls.get_new_id('%s:%s:%s' % (
+            utils.get_time_in_millisecs(timestamp),
+            exp_id,
+            user_id))
+
+    @classmethod
+    def create(cls, exp_id, user_id, rating, old_rating):
+        """Creates a new rate exploration event."""
+        entity_id = cls.get_new_event_entity_id(
+            exp_id, user_id)
+        cls(id=entity_id,
+            event_type=feconf.EVENT_TYPE_RATE_EXPLORATION,
+            exploration_id=exp_id,
+            rating=rating,
+            old_rating=old_rating).put()
 
 
 class StateHitEventLogEntryModel(base_models.BaseModel):

@@ -19,40 +19,74 @@
 
 describe('Creator dashboard controller', function() {
   describe('Dashboard', function() {
-    var scope, ctrl, $httpBackend;
-    var explorationsList = [{
-      category: 'Private category',
-      id: 'private_exp_id',
-      num_open_threads: 0,
-      num_total_threads: 0,
-      status: 'private',
-      title: 'Private exploration'
-    }, {
-      category: 'Featured category',
-      id: 'featured_exp_id',
-      num_open_threads: 2,
-      num_total_threads: 3,
-      status: 'publicized',
-      title: 'Featured exploration'
-    }];
+    var scope, ctrl;
+    var mockDashboardBackendApiService;
+    var dashboardData = {
+      explorationsList: [{
+        category: 'Featured category',
+        id: 'featured_exp_id',
+        num_open_threads: 2,
+        num_total_threads: 3,
+        status: 'publicized',
+        title: 'Featured exploration'
+      }, {
+        category: 'Private category',
+        id: 'private_exp_id',
+        num_open_threads: 0,
+        num_total_threads: 0,
+        status: 'private',
+        title: 'Private exploration'
+      }],
+      collectionsList: [],
+      dashboardStats: {
+        total_plays: 2,
+        average_ratings: 3,
+        num_ratings: 2,
+        total_open_feedback: 1
+      },
+      lastWeekStats: {
+        total_plays: 1,
+        average_ratings: 4,
+        num_ratings: 1,
+        total_open_feedback: 0
+      }
+    };
 
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-    beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
-      $httpBackend = _$httpBackend_;
-      $httpBackend.expectGET('/dashboardhandler/data').respond({
-        explorations_list: explorationsList
+    beforeEach(function() {
+      module('oppia');
+      module(function($provide) {
+        $provide.factory('DashboardBackendApiService', ['$q', function($q) {
+          var fetchDashboardData = function() {
+            return $q.resolve(dashboardData);
+          };
+          return {
+            fetchDashboardData: fetchDashboardData
+          };
+        }]);
       });
-      scope = $rootScope.$new();
-      ctrl = $controller('Dashboard', {
-        $scope: scope,
-        alertsService: null
-      });
-    }));
+    });
 
-    it('should have the correct set of explorations', function() {
-      $httpBackend.flush();
-      expect(scope.explorationsList).toEqual(explorationsList);
+    beforeEach(inject(
+      function($rootScope, $controller, DashboardBackendApiService) {
+        mockDashboardBackendApiService = DashboardBackendApiService;
+        spyOn(mockDashboardBackendApiService, 'fetchDashboardData')
+          .andCallThrough();
+        scope = $rootScope.$new();
+        ctrl = $controller('Dashboard', {
+          $scope: scope,
+          alertsService: null,
+          DashboardBackendApiService: mockDashboardBackendApiService
+        });
+      }
+    ));
+
+    it('should have the correct data for creator dashboard', function() {
+      expect(scope.explorationsList).toEqual(dashboardData.explorations_list);
+      expect(scope.collectionsList).toEqual(dashboardData.collections_list);
+      expect(scope.dashboardStats).toEqual(dashboardData.dashboard_stats);
+      expect(scope.lastWeekStats).toEqual(dashboardData.last_week_stats);
     });
   });
 });

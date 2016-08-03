@@ -1,20 +1,8 @@
 <link rel="stylesheet" type="text/css" media="screen"
-      href="https://fonts.googleapis.com/css?family=Capriola">
-<link rel="stylesheet" type="text/css" media="screen"
-      href="https://fonts.googleapis.com/css?family=Open+Sans:400,600">
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet">
-<link rel="stylesheet" type="text/css" media="screen"
-      href="https://fonts.googleapis.com/css?family=Roboto">
-<link rel="stylesheet" type="text/css" media="screen"
-      href="https://fonts.googleapis.com/css?family=Rubik">
+      href="https://fonts.googleapis.com/css?family=Capriola|Rubik|Roboto|Material+Icons|Open+Sans:400,600">
 
-{% if DEV_MODE %}
-  <link rel="stylesheet" type="text/css" media="screen"
-        href="/third_party/generated/dev/css/third_party.css">
-{% else %}
-  <link rel="stylesheet" type="text/css" media="screen"
-        href="/third_party/generated/prod/css/third_party.css">
-{% endif %}
 <link rel="stylesheet" type="text/css" media="screen"
-      href="/css/oppia.css">
+      href="{{get_static_resource_url('/third_party/generated/css/third_party.css')}}">
+
+<link rel="stylesheet" type="text/css" media="screen"
+      href="{{get_static_resource_url('/css/oppia.css')}}">

@@ -53,8 +53,8 @@ oppia.directive('collectionNodeCreator', [function() {
             .loadPublicAndPrivateExplorationSummaries(
                 [newExplorationId]).then(function(summaries) {
               var summaryBackendObject = null;
-              if (summaries.length != 0 &&
-                  summaries[0].id == newExplorationId) {
+              if (summaries.length !== 0 &&
+                  summaries[0].id === newExplorationId) {
                 summaryBackendObject = summaries[0];
               }
               if (summaryBackendObject) {
@@ -84,8 +84,6 @@ oppia.directive('collectionNodeCreator', [function() {
           // Create a new exploration with the given title.
           $http.post('/contributehandler/create_new', {
             title: title
-          }, {
-            requestIsForCreateExploration: true
           }).then(function(response) {
             $scope.newExplorationTitle = '';
             var newExplorationId = response.data.explorationId;

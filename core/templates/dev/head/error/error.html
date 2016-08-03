@@ -5,34 +5,41 @@
 
 {% block maintitle %}
   {% if code == 400 %}
-    I18N_ERROR_400_PAGE_TITLE
+    I18N_ERROR_PAGE_TITLE_400
   {% elif code == 401 %}
-    I18N_ERROR_401_PAGE_TITLE
+    I18N_ERROR_PAGE_TITLE_401
   {% elif code == 404 %}
-    I18N_ERROR_404_PAGE_TITLE
+    I18N_ERROR_PAGE_TITLE_404
   {% elif code == 500 %}
-    I18N_ERROR_500_PAGE_TITLE
+    I18N_ERROR_PAGE_TITLE_500
   {% endif %}
 {% endblock maintitle %}
 
 {% block content %}
-  <div class="oppia-content">
+  <div class="oppia-content" ng-controller="Error">
     <br>
 
     <div class="oppia-wide-panel oppia-error-wide-container">
       <div class="oppia-wide-panel-content protractor-test-error-container">
+        <h4>
           {% if code == 400 %}
-            <h4 translate="I18N_ERROR_TITLE_400"></h4>
+            <span translate="I18N_ERROR_HEADER_400"></span>
+            - Bad Request
           {% elif code == 401 %}
-            <h4 translate="I18N_ERROR_TITLE_401"></h4>
+            <span translate="I18N_ERROR_HEADER_401"></span>
+            - Unauthorized
           {% elif code == 404 %}
-            <h4 translate="I18N_ERROR_TITLE_404"></h4>
+            <span translate="I18N_ERROR_HEADER_404"></span>
+            - Page Not Found
           {% elif code == 500 %}
-            <h4 translate="I18N_ERROR_TITLE_500"></h4>
+            <span translate="I18N_ERROR_HEADER_500"></span>
+            - System Error
           {% endif %}
+        </h4>
+
         <br>
 
-        <img src="/images/general/oops_mint.png" alt="Oops!" width="299" height="142"/>
+        <img ng-src="<[oopsMintImgUrl]>" alt="Oops!" width="299" height="142"/>
         <p><h3>
           {% if code == 400 %}
             <h3 translate="I18N_ERROR_MESSAGE_400"></h3>
@@ -50,6 +57,13 @@
 
   </div>
 {% endblock %}
+
+{% block footer_js %} 
+  {{ super() }}
+  <script>
+    {{ include_js_file('error/Error.js') }}
+  </script>
+{% endblock footer_js %}
 
 {% block footer%}
   {% include 'footer.html' %}

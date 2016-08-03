@@ -192,7 +192,7 @@ oppia.factory('responsesService', [
       },
       changeActiveAnswerGroupIndex: function(newIndex) {
         // If the current group is being clicked on again, close it.
-        if (newIndex == _activeAnswerGroupIndex) {
+        if (newIndex === _activeAnswerGroupIndex) {
           _activeAnswerGroupIndex = -1;
         } else {
           _activeAnswerGroupIndex = newIndex;
@@ -270,13 +270,18 @@ oppia.controller('StateResponses', [
   '$scope', '$rootScope', '$modal', '$filter', 'stateInteractionIdService',
   'editorContextService', 'alertsService', 'responsesService', 'routerService',
   'explorationContextService', 'trainingDataService',
-  'PLACEHOLDER_OUTCOME_DEST', 'INTERACTION_SPECS',
+  'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
+  'INTERACTION_SPECS', 'UrlInterpolationService',
   function(
       $scope, $rootScope, $modal, $filter, stateInteractionIdService,
       editorContextService, alertsService, responsesService, routerService,
       explorationContextService, trainingDataService,
-      PLACEHOLDER_OUTCOME_DEST, INTERACTION_SPECS) {
+      stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
+      INTERACTION_SPECS, UrlInterpolationService) {
     $scope.editorContextService = editorContextService;
+
+    $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
+      '/general/drag_dots.png');
 
     var _initializeTrainingData = function() {
       var explorationId = explorationContextService.getExplorationId();
@@ -284,28 +289,82 @@ oppia.controller('StateResponses', [
       trainingDataService.initializeTrainingData(
         explorationId, currentStateName);
     };
+
     $scope.suppressDefaultAnswerGroupWarnings = function() {
       var interactionId = $scope.getCurrentInteractionId();
+      var answerGroups = responsesService.getAnswerGroups();
+      // This array contains the text of each of the possible answers
+      // for the interaction.
+      var answerChoices = [];
+      var customizationArgs = stateCustomizationArgsService.savedMemento;
+      var handledAnswersArray = [];
+
       if (interactionId === 'MultipleChoiceInput') {
-        var answerGroups = responsesService.getAnswerGroups();
+        var numChoices = $scope.getAnswerChoices().length;
+        var choiceIndices = [];
         // Collect all answers which have been handled by at least one
         // answer group.
-        var handledAnswersArray = [];
-        for (var j = 0; j < answerGroups.length; j++) {
-          for (var k = 0; k < answerGroups[j].rule_specs.length; k++) {
-            handledAnswersArray.push(answerGroups[j].rule_specs[k].inputs.x);
+        for (var i = 0; i < answerGroups.length; i++) {
+          for (var j = 0; j < answerGroups[i].rule_specs.length; j++) {
+            handledAnswersArray.push(answerGroups[i].rule_specs[j].inputs.x);
           }
         }
-        var choiceIndices = [];
-        var numChoices = $scope.getAnswerChoices().length;
         for (var i = 0; i < numChoices; i++) {
           choiceIndices.push(i);
         }
         // We only suppress the default warning if each choice index has
         // been handled by at least one answer group.
         return choiceIndices.every(function(choiceIndex) {
-          return handledAnswersArray.indexOf(choiceIndex) != -1;
+          return handledAnswersArray.indexOf(choiceIndex) !== -1;
         });
+      } else if (interactionId === 'ItemSelectionInput') {
+        var maxSelectionCount = (
+            customizationArgs.maxAllowableSelectionCount.value);
+        if (maxSelectionCount === 1) {
+          var numChoices = $scope.getAnswerChoices().length;
+          // This array contains a list of booleans, one for each answer choice.
+          // Each boolean is true if the corresponding answer has been
+          // covered by at least one rule, and false otherwise.
+          handledAnswersArray = [];
+          for (var i = 0; i < numChoices; i++) {
+            handledAnswersArray.push(false);
+            answerChoices.push($scope.getAnswerChoices()[i].val);
+          }
+
+          var answerChoiceToIndex = {};
+          answerChoices.forEach(function(answerChoice, choiceIndex) {
+            answerChoiceToIndex[answerChoice] = choiceIndex;
+          });
+
+          answerGroups.forEach(function(answerGroup) {
+            var ruleSpecs = answerGroup.rule_specs;
+            ruleSpecs.forEach(function(ruleSpec) {
+              var ruleInputs = ruleSpec.inputs.x;
+              ruleInputs.forEach(function(ruleInput) {
+                var choiceIndex = answerChoiceToIndex[ruleInput];
+                if (ruleSpec.rule_type === 'Equals' ||
+                    ruleSpec.rule_type === 'ContainsAtLeastOneOf') {
+                  handledAnswersArray[choiceIndex] = true;
+                } else if (ruleSpec.rule_type ===
+                  'DoesNotContainAtLeastOneOf') {
+                  for (var i = 0; i < handledAnswersArray.length; i++) {
+                    if (i !== choiceIndex) {
+                      handledAnswersArray[i] = true;
+                    }
+                  }
+                }
+              });
+            });
+          });
+
+          var areAllChoicesCovered = handledAnswersArray.every(
+            function(handledAnswer) {
+              return handledAnswer;
+            });
+          // We only suppress the default warning if each choice text has
+          // been handled by at least one answer group, based on rule type.
+          return areAllChoicesCovered;
+        }
       }
     };
 
@@ -341,7 +400,7 @@ oppia.controller('StateResponses', [
     };
 
     $scope.isCreatingNewState = function(outcome) {
-      return outcome && outcome.dest == PLACEHOLDER_OUTCOME_DEST;
+      return outcome && outcome.dest === PLACEHOLDER_OUTCOME_DEST;
     };
 
     // This returns false if the current interaction ID is null.
@@ -444,15 +503,15 @@ oppia.controller('StateResponses', [
           'stateInteractionIdService', 'stateCustomizationArgsService',
           'explorationContextService', 'editorContextService',
           'explorationStatesService', 'trainingDataService',
-          'answerClassificationService', 'focusService', 'DEFAULT_RULE_NAME',
-          'FUZZY_RULE_TYPE',
+          'AnswerClassificationService', 'focusService', 'DEFAULT_RULE_NAME',
+          'CLASSIFIER_RULESPEC_STR',
           function(
               $scope, $modalInstance, oppiaExplorationHtmlFormatterService,
               stateInteractionIdService, stateCustomizationArgsService,
               explorationContextService, editorContextService,
               explorationStatesService, trainingDataService,
-              answerClassificationService, focusService, DEFAULT_RULE_NAME,
-              FUZZY_RULE_TYPE) {
+              AnswerClassificationService, focusService, DEFAULT_RULE_NAME,
+              CLASSIFIER_RULESPEC_STR) {
             var _explorationId = explorationContextService.getExplorationId();
             var _stateName = editorContextService.getActiveStateName();
             var _state = explorationStatesService.getState(_stateName);
@@ -491,7 +550,7 @@ oppia.controller('StateResponses', [
                   answer, stateInteractionIdService.savedMemento,
                   stateCustomizationArgsService.savedMemento));
 
-              answerClassificationService.getMatchingClassificationResult(
+              AnswerClassificationService.getMatchingClassificationResult(
                 _explorationId, _state, answer, true).then(
                     function(classificationResult) {
                   var feedback = 'Nothing';
@@ -499,7 +558,7 @@ oppia.controller('StateResponses', [
                   if (classificationResult.outcome.feedback.length > 0) {
                     feedback = classificationResult.outcome.feedback[0];
                   }
-                  if (dest == _stateName) {
+                  if (dest === _stateName) {
                     dest = '<em>(try again)</em>';
                   }
                   $scope.trainingDataAnswer = answer;
@@ -512,7 +571,8 @@ oppia.controller('StateResponses', [
                         _state.interaction.answer_groups.length &&
                       _state.interaction.answer_groups[
                         answerGroupIndex].rule_specs[
-                          ruleSpecIndex].rule_type !== FUZZY_RULE_TYPE) {
+                          ruleSpecIndex].rule_type !==
+                            CLASSIFIER_RULESPEC_STR) {
                     $scope.classification.answerGroupIndex = -1;
                   } else {
                     $scope.classification.answerGroupIndex = (
@@ -696,7 +756,7 @@ oppia.controller('StateResponses', [
 
     $scope.isOutcomeLooping = function(outcome) {
       var activeStateName = editorContextService.getActiveStateName();
-      return outcome && (outcome.dest == activeStateName);
+      return outcome && (outcome.dest === activeStateName);
     };
 
     $scope.navigateToState = function(stateName) {

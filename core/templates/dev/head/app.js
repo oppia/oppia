@@ -47,7 +47,7 @@ oppia.config([
 
     // Prevent the search page from reloading if the search query is changed.
     $locationProvider.html5Mode(false);
-    if (window.location.pathname == '/search/find') {
+    if (window.location.pathname === '/search/find') {
       $locationProvider.html5Mode(true);
     }
 
@@ -65,18 +65,9 @@ oppia.config([
       '$q', '$log', 'alertsService', function($q, $log, alertsService) {
         return {
           request: function(config) {
-            // If this request carries data (in the form of a JS object),
-            // JSON-stringify it and store it under 'payload'.
-            var csrfToken = '';
             if (config.data) {
-              var csrfToken = (
-                config.requestIsForCreateExploration ?
-                  GLOBALS.csrf_token_create_exploration :
-                config.requestIsForI18n ? GLOBALS.csrf_token_i18n :
-                GLOBALS.csrf_token);
-
               config.data = $.param({
-                csrf_token: csrfToken,
+                csrf_token: GLOBALS.csrf_token,
                 payload: JSON.stringify(config.data),
                 source: document.URL
               }, true);
@@ -240,10 +231,10 @@ oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
     // Otherwise, returns the full date (with the year abbreviated).
     getLocaleAbbreviatedDatetimeString: function(millisSinceEpoch) {
       var date = new Date(millisSinceEpoch);
-      if (date.toLocaleDateString() == new Date().toLocaleDateString()) {
+      if (date.toLocaleDateString() === new Date().toLocaleDateString()) {
         // The replace function removes 'seconds' from the time returned.
         return date.toLocaleTimeString().replace(/:\d\d /, ' ');
-      } else if (date.getFullYear() == new Date().getFullYear()) {
+      } else if (date.getFullYear() === new Date().getFullYear()) {
         return $filter('date')(date, 'MMM d');
       } else {
         return $filter('date')(date, 'shortDate');

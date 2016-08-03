@@ -1,0 +1,76 @@
+author_notes: ''
+blurb: ''
+category: Test
+init_state_name: text
+language_code: en
+objective: To demonstrate the string classifier and trained responses in explorations.
+param_changes: []
+param_specs: {}
+schema_version: 10
+skin_customizations:
+  panels_contents:
+    bottom: []
+states:
+  final:
+    content:
+    - type: text
+      value: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      fallbacks: []
+      id: EndExploration
+    param_changes: []
+  text:
+    content:
+    - type: text
+      value: <p>Give me an example of a happy word.</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: text
+          feedback:
+          - <p>Happy is certainly a happy word. Can you be more creative than that?</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: happy
+          rule_type: Contains
+      - outcome:
+          dest: text
+          feedback:
+          - <p>That is definitely happy! Can you think of any more?</p>
+          param_changes: []
+        rule_specs:
+        - inputs:
+            training_data:
+            - cheerful
+            - merry
+            - ecstatic
+            - glad
+            - overjoyed
+            - pleased
+            - thrilled
+            - smile
+          rule_type: FuzzyMatches
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: final
+        feedback:
+        - <p>Is {{answer}} actually happy? I'm not so sure. Let's move on!</p>
+        param_changes: []
+      fallbacks: []
+      id: TextInput
+    param_changes: []
+states_schema_version: 7
+tags: []
+title: Demonstrating string classifier

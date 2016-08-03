@@ -61,104 +61,10 @@ BEFORE_END_HEAD_TAG_HOOK = config_domain.ConfigProperty(
         },
     },
     'Code to insert just before the closing </head> tag in all pages.', '')
-BEFORE_END_BODY_TAG_HOOK = config_domain.ConfigProperty(
-    'before_end_body_tag_hook', {
-        'type': 'unicode',
-        'ui_config': {
-            'rows': 7,
-        },
-    },
-    'Code to insert just before the closing </body> tag in all pages.', '')
-
-SIDEBAR_MENU_ADDITIONAL_LINKS = config_domain.ConfigProperty(
-    'sidebar_menu_additional_links', {
-        'type': 'list',
-        'items': {
-            'type': 'dict',
-            'properties': [{
-                'name': 'name',
-                'description': 'Text of the menu item',
-                'schema': {'type': 'unicode'},
-            }, {
-                'name': 'link',
-                'description': 'The link to open in a new tab',
-                'schema': {'type': 'unicode'},
-            }, {
-                'name': 'icon_filename',
-                'description': (
-                    'Filename of the menu icon (in /images/sidebar)'),
-                'schema': {'type': 'unicode'},
-            }]
-        }
-    },
-    'Additional links to show in the sidebar menu.',
-    default_value=[{
-        'name': 'Blog',
-        'link': 'http://site/blog/url',
-        'icon_filename': 'comment.png',
-    }])
 
 SITE_FEEDBACK_FORM_URL = config_domain.ConfigProperty(
     'site_feedback_form_url', {'type': 'unicode'},
     'Site feedback form URL (leave blank if there is no such form)', '')
-
-SHARING_OPTIONS = config_domain.ConfigProperty(
-    'sharing_options', {
-        'type': 'dict',
-        'properties': [{
-            'name': 'gplus',
-            'schema': {
-                'type': 'bool',
-            }
-        }, {
-            'name': 'facebook',
-            'schema': {
-                'type': 'bool',
-            }
-        }, {
-            'name': 'twitter',
-            'schema': {
-                'type': 'bool',
-            }
-        }]
-    },
-    'Sharing options to display in the editor view',
-    default_value={
-        'gplus': False,
-        'facebook': False,
-        'twitter': False,
-    })
-
-SOCIAL_MEDIA_BUTTONS = config_domain.ConfigProperty(
-    'social_media_buttons', {
-        'type': 'list',
-        'items': {
-            'type': 'dict',
-            'properties': [{
-                'name': 'link',
-                'description': 'The link to open in a new tab',
-                'schema': {'type': 'unicode'},
-            }, {
-                'name': 'icon_filename',
-                'description': (
-                    'Filename of the social media icon (in /images/social)'),
-                'schema': {'type': 'unicode'},
-            }]
-        }
-    },
-    'Links and icon filenames for the social media buttons in the sidebar.',
-    [])
-
-DISABLED_EXPLORATIONS = config_domain.ConfigProperty(
-    'disabled_explorations', {
-        'type': 'list',
-        'items': {
-            'type': 'unicode'
-        }
-    },
-    'IDs of explorations which should not be displayable in either the '
-    'learner or editor views',
-    [])
 
 
 def require_user(handler):
@@ -249,17 +155,6 @@ class BaseHandler(webapp2.RequestHandler):
     # processing them. Can be overridden by subclasses if this check is
     # not necessary.
     REQUIRE_PAYLOAD_CSRF_CHECK = True
-    # Specific page name to use as a key for generating CSRF tokens. This name
-    # must be overwritten by subclasses. This represents both the source
-    # page name and the destination page name.
-    # TODO(sll): A weakness of the current approach is that the source and
-    # destination page names have to be the same. Consider fixing this.
-    PAGE_NAME_FOR_CSRF = ''
-    # Whether the page includes a button for creating explorations. If this is
-    # set to True, a CSRF token for that button will be generated. This is
-    # needed because "create exploration" requests can come from multiple
-    # pages.
-    PAGE_HAS_CREATE_EXP_REQUEST = False
     # Whether to redirect requests corresponding to a logged-in user who has
     # not completed signup in to the signup page. This ensures that logged-in
     # users have agreed to the latest terms.
@@ -338,10 +233,6 @@ class BaseHandler(webapp2.RequestHandler):
 
         if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
             try:
-                if not self.PAGE_NAME_FOR_CSRF:
-                    raise Exception('No CSRF page name specified for this '
-                                    'handler.')
-
                 csrf_token = self.request.get('csrf_token')
                 if not csrf_token:
                     raise Exception(
@@ -349,7 +240,7 @@ class BaseHandler(webapp2.RequestHandler):
                         'Please report this bug.')
 
                 is_csrf_token_valid = CsrfTokenManager.is_csrf_token_valid(
-                    self.user_id, self.PAGE_NAME_FOR_CSRF, csrf_token)
+                    self.user_id, csrf_token)
 
                 if not is_csrf_token_valid:
                     raise self.UnauthorizedUserException(
@@ -357,8 +248,8 @@ class BaseHandler(webapp2.RequestHandler):
                         'changes cannot be saved. Please refresh the page.')
             except Exception as e:
                 logging.error(
-                    '%s: page name %s, payload %s',
-                    e, self.PAGE_NAME_FOR_CSRF, self.payload)
+                    '%s: payload %s',
+                    e, self.payload)
 
                 return self.handle_exception(e, self.app.debug)
 
@@ -409,13 +300,13 @@ class BaseHandler(webapp2.RequestHandler):
         values.update({
             'ALL_CATEGORIES': feconf.ALL_CATEGORIES,
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
+            'ASSET_DIR_PREFIX': utils.get_asset_dir_prefix(),
             'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
                 BEFORE_END_HEAD_TAG_HOOK.value),
-            'BEFORE_END_BODY_TAG_HOOK': jinja2.utils.Markup(
-                BEFORE_END_BODY_TAG_HOOK.value),
             'CAN_SEND_ANALYTICS_EVENTS': feconf.CAN_SEND_ANALYTICS_EVENTS,
             'DEFAULT_LANGUAGE_CODE': feconf.ALL_LANGUAGE_CODES[0]['code'],
             'DEV_MODE': feconf.DEV_MODE,
+            'MINIFICATION': feconf.IS_MINIFIED,
             'DOMAIN_URL': '%s://%s' % (scheme, netloc),
             'ACTIVITY_STATUS_PRIVATE': (
                 rights_manager.ACTIVITY_STATUS_PRIVATE),
@@ -423,7 +314,8 @@ class BaseHandler(webapp2.RequestHandler):
                 rights_manager.ACTIVITY_STATUS_PUBLIC),
             'ACTIVITY_STATUS_PUBLICIZED': (
                 rights_manager.ACTIVITY_STATUS_PUBLICIZED),
-            'FULL_URL': '%s://%s/%s' % (scheme, netloc, path),
+            # The 'path' variable starts with a forward slash.
+            'FULL_URL': '%s://%s%s' % (scheme, netloc, path),
             'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
             # TODO(sll): Consider including the obj_editor html directly as
             # part of the base HTML template?
@@ -431,14 +323,14 @@ class BaseHandler(webapp2.RequestHandler):
                 obj_services.get_all_object_editor_js_templates()),
             'RTE_COMPONENT_SPECS': (
                 rte_component_registry.Registry.get_all_specs()),
-            'SHOW_CUSTOM_PAGES': feconf.SHOW_CUSTOM_PAGES,
-            'SIDEBAR_MENU_ADDITIONAL_LINKS': (
-                SIDEBAR_MENU_ADDITIONAL_LINKS.value),
             'SITE_FEEDBACK_FORM_URL': SITE_FEEDBACK_FORM_URL.value,
             'SITE_NAME': SITE_NAME.value,
             'SUPPORTED_SITE_LANGUAGES': feconf.SUPPORTED_SITE_LANGUAGES,
-            'SOCIAL_MEDIA_BUTTONS': SOCIAL_MEDIA_BUTTONS.value,
             'SYSTEM_USERNAMES': feconf.SYSTEM_USERNAMES,
+            'can_create_collections': (
+                self.username and self.username in
+                config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value
+            ),
             'user_is_logged_in': user_services.has_fully_registered(
                 self.user_id),
             'preferred_site_language_code': self.preferred_site_language_code
@@ -469,18 +361,10 @@ class BaseHandler(webapp2.RequestHandler):
         # that tokens generated in one handler will be sent back to a handler
         # with the same page name.
         values['csrf_token'] = ''
-        values['csrf_token_create_exploration'] = ''
-        values['csrf_token_i18n'] = (
-            CsrfTokenManager.create_csrf_token(
-                self.user_id, feconf.CSRF_PAGE_NAME_I18N))
 
-        if self.REQUIRE_PAYLOAD_CSRF_CHECK and self.PAGE_NAME_FOR_CSRF:
+        if self.REQUIRE_PAYLOAD_CSRF_CHECK:
             values['csrf_token'] = CsrfTokenManager.create_csrf_token(
-                self.user_id, self.PAGE_NAME_FOR_CSRF)
-        if self.PAGE_HAS_CREATE_EXP_REQUEST:
-            values['csrf_token_create_exploration'] = (
-                CsrfTokenManager.create_csrf_token(
-                    self.user_id, feconf.CSRF_PAGE_NAME_CREATE_EXPLORATION))
+                self.user_id)
 
         self.response.cache_control.no_cache = True
         self.response.cache_control.must_revalidate = True
@@ -497,6 +381,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
         self.response.pragma = 'no-cache'
+
         self.response.write(self.jinja2_env.get_template(
             filename).render(**values))
 
@@ -598,7 +483,7 @@ class CsrfTokenManager(object):
             base64.urlsafe_b64encode(os.urandom(20)))
 
     @classmethod
-    def _create_token(cls, user_id, page_name, issued_on):
+    def _create_token(cls, user_id, issued_on):
         """Creates a digest (string representation) of a token."""
         cls.init_csrf_secret()
 
@@ -614,8 +499,6 @@ class CsrfTokenManager(object):
         digester = hmac.new(str(CSRF_SECRET.value))
         digester.update(str(user_id))
         digester.update(':')
-        digester.update(str(page_name))
-        digester.update(':')
         digester.update(str(issued_on))
 
         digest = digester.digest()
@@ -628,13 +511,11 @@ class CsrfTokenManager(object):
         return time.time()
 
     @classmethod
-    def create_csrf_token(cls, user_id, page_name):
-        if not page_name:
-            raise Exception('Cannot create CSRF token if page name is empty.')
-        return cls._create_token(user_id, page_name, cls._get_current_time())
+    def create_csrf_token(cls, user_id):
+        return cls._create_token(user_id, cls._get_current_time())
 
     @classmethod
-    def is_csrf_token_valid(cls, user_id, page_name, token):
+    def is_csrf_token_valid(cls, user_id, token):
         """Validate a given CSRF token with the CSRF secret in memcache."""
         try:
             parts = token.split('/')
@@ -646,7 +527,7 @@ class CsrfTokenManager(object):
             if age > cls._CSRF_TOKEN_AGE_SECS:
                 return False
 
-            authentic_token = cls._create_token(user_id, page_name, issued_on)
+            authentic_token = cls._create_token(user_id, issued_on)
             if authentic_token == token:
                 return True
 
