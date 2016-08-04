@@ -20,13 +20,33 @@ var general = require('../protractor_utils/general.js');
 
 var ERROR_PAGE_URL_SUFFIX = '/console_errors';
 
+var getUniqueLogs = function(logs) {
+  // Returns logs with unique value for the message attribute.
+  var logsDict = {};
+  for (var i = 0; i < logs.length; i++) {
+    if (!(logs[i].message in logsDict)) {
+      logsDict[logs[i].message] = i;
+    }
+  }
+  var uniqueLogs = [];
+  for (var i in logsDict) {
+    uniqueLogs.push(logs[logsDict[i]]);
+  }
+  return uniqueLogs;
+};
+
 var checkConsoleErrorsExist = function(expectedErrors) {
+  // Checks that browser logs match entries in expectedErrors array.
   browser.manage().logs().get('browser').then(function(browserLogs) {
-    expect(browserLogs.length).toBeGreaterThan(0);
+    // Some browsers such as chrome raise two errors for a missing resource.
+    // To keep consistent behaviour across browsers, we keep only the logs
+    // that have a unique value for their message attribute.
+    uniqueBrowserLogs = getUniqueLogs(browserLogs);
+    expect(uniqueBrowserLogs.length).toBe(expectedErrors.length);
     for (var i = 0; i < expectedErrors.length; i++) {
       var errorPresent = false;
-      for (var j = 0; j < browserLogs.length; j++) {
-        if (browserLogs[j].message.match(expectedErrors[i])) {
+      for (var j = 0; j < uniqueBrowserLogs.length; j++) {
+        if (uniqueBrowserLogs[j].message.match(expectedErrors[i])) {
           errorPresent = true;
         }
       }
