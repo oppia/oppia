@@ -20,12 +20,12 @@ oppia.controller('Dashboard', [
   '$scope', '$rootScope', '$window', 'oppiaDatetimeFormatter', 'alertsService',
   'DashboardBackendApiService', 'RatingComputationService',
   'ExplorationCreationService', 'FATAL_ERROR_CODES', 'UrlInterpolationService',
-  'sortExplorationsService',
+  'sortExplorationsService', 'EXPLORATIONS_SORT_BY_KEYS',
   function(
       $scope, $rootScope, $window, oppiaDatetimeFormatter, alertsService,
       DashboardBackendApiService, RatingComputationService,
       ExplorationCreationService, FATAL_ERROR_CODES, UrlInterpolationService,
-      sortExplorationsService) {
+      sortExplorationsService, EXPLORATIONS_SORT_BY_KEYS) {
     var EXP_PUBLISH_TEXTS = {
       default: 'This exploration is private. Publish it to receive statistics.',
       sm: 'Publish the exploration to receive statistics.'
@@ -58,7 +58,9 @@ oppia.controller('Dashboard', [
       function(response) {
         $scope.explorationsList = (
           sortExplorationsService.sortBy(
-            response.explorations_list, 'OPEN_FEEDBACK', true));
+            response.explorations_list,
+            EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK,
+            true));
         $scope.collectionsList = response.collections_list;
         $scope.dashboardStats = response.dashboard_stats;
         $rootScope.loadingMessage = '';

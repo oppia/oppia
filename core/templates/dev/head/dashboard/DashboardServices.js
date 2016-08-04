@@ -32,23 +32,37 @@ oppia.factory('sortExplorationsService', [
 
     var sortByKey = function(explorationsList, key, isDescending) {
       var result = angular.copy(explorationsList);
-      var prevValue, nextValue;
-      result.sort(function(prev, next) {
-        prevValue = prev[key];
-        nextValue = next[key];
-        if (key === 'title') {
-          if (prevValue === '') {
-            prevValue = EMPTY_TITLE_TEXT;
+      var valA, valB;
+      result = result.map(function(data, idx) {
+        return {
+          index: idx,
+          data: data
+        };
+      });
+      result.sort(function(a, b) {
+        // Value of this variable should be -ve/+ve but not zero, to prevent
+        // unstable sort.
+        var returnValue;
+        valA = a.data[key];
+        valB = b.data[key];
+        if (key === EXPLORATIONS_SORT_BY_KEYS.TITLE &&
+            utilsService.isString(valA)) {
+          if (valA === '') {
+            valA = EMPTY_TITLE_TEXT;
           }
-          if (nextValue === '') {
-            nextValue = EMPTY_TITLE_TEXT;
+          if (valB === '') {
+            valB = EMPTY_TITLE_TEXT;
           }
+          valA = valA.toLowerCase();
+          valB = valB.toLowerCase();
+          returnValue = valA.localeCompare(valB);
+        } else {
+          returnValue = valA - valB;
         }
-        if (utilsService.isString(prevValue)) {
-          prevValue = prevValue.toLowerCase();
-          nextValue = nextValue.toLowerCase();
-        }
-        return prevValue > nextValue;
+        return returnValue ? returnValue : (a.index - b.index);
+      });
+      result = result.map(function(value) {
+        return value.data;
       });
       if (isDescending) {
         return result.reverse();
@@ -56,16 +70,14 @@ oppia.factory('sortExplorationsService', [
       return result;
     };
     return {
-      getValidSortTypes: function() {
-        return EXPLORATIONS_SORT_BY_KEYS;
-      },
-
       sortBy: function(explorationsList, sortType, isDescending) {
-        if (Object.keys(EXPLORATIONS_SORT_BY_KEYS).indexOf(sortType) !== -1) {
-          return sortByKey(
-            explorationsList,
-            EXPLORATIONS_SORT_BY_KEYS[sortType],
-            isDescending);
+        for (var sortKey in EXPLORATIONS_SORT_BY_KEYS) {
+          if (EXPLORATIONS_SORT_BY_KEYS[sortKey] === sortType) {
+            return sortByKey(
+              explorationsList,
+              EXPLORATIONS_SORT_BY_KEYS[sortKey],
+              isDescending);
+          }
         }
         alertsService.addWarning(
           'Invalid type of key name for sorting explorations: ' + sortType);
