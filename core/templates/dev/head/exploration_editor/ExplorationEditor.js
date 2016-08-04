@@ -845,15 +845,7 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         return;
       }
 
-      explorationData.getLastSavedData().then(function(data) {
-        explorationData.getData().then(function(currentData) {
-          if (data.version > currentData.version) {
-            autosaveInfoModalsService.showVersionMismatchModal(
-              changeListService.getChangeList());
-            return;
-          }
-        });
-
+      explorationData.getData().then(function(data) {
         var oldStates = data.states;
         var newStates = explorationStatesService.getStates();
         var diffGraphData = ExplorationDiffService.getDiffGraphData(
