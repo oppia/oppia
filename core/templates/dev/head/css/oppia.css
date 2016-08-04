@@ -3919,6 +3919,8 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-about-three-cols-layout {
   display: inline-block;
   margin-right: 20px;
+  /* This is a backup for browsers that do not support calc. */
+  width: 28%;
   width: calc((100% - 60px) / 3);
 }
 
