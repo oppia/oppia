@@ -74,7 +74,8 @@ install:
 - source scripts/setup.sh || exit 1
 - source scripts/setup_gae.sh || exit 1
 
-script:
+bundler_args: --retry 1
+script: 
 - if [ $RUN_E2E_TESTS_MAIN_EDITOR == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="mainEditor"; fi
 - if [ $RUN_E2E_TESTS_EDITOR_FEATURES == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="editorFeatures"; fi
 - if [ $RUN_E2E_TESTS_EXTENSIONS == 'true' ]; then bash scripts/run_e2e_tests.sh --suite="extensions"; fi
