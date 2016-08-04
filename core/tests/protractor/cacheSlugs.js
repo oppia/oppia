@@ -23,14 +23,12 @@ var ERROR_PAGE_URL_SUFFIX = '/console_errors';
 var getUniqueLogs = function(logs) {
   // Returns logs with unique value for the message attribute.
   var logsDict = {};
+  var uniqueLogs = [];
   for (var i = 0; i < logs.length; i++) {
     if (!(logs[i].message in logsDict)) {
       logsDict[logs[i].message] = i;
+      uniqueLogs.push(logs[i]);
     }
-  }
-  var uniqueLogs = [];
-  for (var i in logsDict) {
-    uniqueLogs.push(logs[logsDict[i]]);
   }
   return uniqueLogs;
 };
