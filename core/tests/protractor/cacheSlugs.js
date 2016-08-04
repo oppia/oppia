@@ -20,17 +20,15 @@ var general = require('../protractor_utils/general.js');
 
 var ERROR_PAGE_URL_SUFFIX = '/console_errors';
 
-var getUniqueLogs = function(logs) {
-  // Returns logs with unique value for the message attribute.
+var getUniqueLogMessages = function(logs) {
+  // Returns unique log messages.
   var logsDict = {};
-  var uniqueLogs = [];
   for (var i = 0; i < logs.length; i++) {
-    if (!(logs[i].message in logsDict)) {
-      logsDict[logs[i].message] = i;
-      uniqueLogs.push(logs[i]);
+    if (!logsDict.hasOwnProperty(logs[i].message)) {
+      logsDict[logs[i].message] = true;
     }
   }
-  return uniqueLogs;
+  return Object.keys(logsDict);
 };
 
 var checkConsoleErrorsExist = function(expectedErrors) {
@@ -39,12 +37,13 @@ var checkConsoleErrorsExist = function(expectedErrors) {
     // Some browsers such as chrome raise two errors for a missing resource.
     // To keep consistent behaviour across browsers, we keep only the logs
     // that have a unique value for their message attribute.
-    uniqueBrowserLogs = getUniqueLogs(browserLogs);
-    expect(uniqueBrowserLogs.length).toBe(expectedErrors.length);
+    var uniqueLogMessages = getUniqueLogMessages(browserLogs);
+    expect(uniqueLogMessages.length).toBe(expectedErrors.length);
+
     for (var i = 0; i < expectedErrors.length; i++) {
       var errorPresent = false;
-      for (var j = 0; j < uniqueBrowserLogs.length; j++) {
-        if (uniqueBrowserLogs[j].message.match(expectedErrors[i])) {
+      for (var j = 0; j < uniqueLogMessages.length; j++) {
+        if (uniqueLogMessages[j].match(expectedErrors[i])) {
           errorPresent = true;
         }
       }
