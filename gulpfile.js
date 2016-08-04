@@ -115,10 +115,15 @@ var jsFilePaths = [];
 var fontFolderPaths = [];
 var cssBackgroundFilepaths = [];
 
+// TODO(gvishal): Issue: https://github.com/oppia/oppia/issues/2324
+// This code needs refactoring, reasons for which are documented in the above
+// issue. The issue also contains a complete description of the build process
+// for clarity.
+
 // If output_directory argument is specified we generate files there, otherwise
 // we generate files in /third_party/generated.
-// In non-dev mode, we serve files from a separate build directory specified by
-// the output_directory argument.
+// In non-dev mode (prod mode), we serve files from a separate build directory
+// specified by the output_directory argument.
 // And for dev mode without minification, we do it from /third_party/generated.
 var generatedTargetDir = path.join('third_party', 'generated');
 if ('output_directory' in argv && argv.output_directory !== undefined) {
