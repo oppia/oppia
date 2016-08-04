@@ -90,8 +90,12 @@ class _Gae(_Platform):
 
     @classmethod
     def import_email_services(cls):
-        from core.platform.email import gae_email_services
-        return gae_email_services
+        if feconf.EMAIL_SERVICE_PROVIDER == feconf.EMAIL_SERVICE_PROVIDER_GAE:
+            from core.platform.email import gae_email_services
+            return gae_email_services
+        else:
+            from core.platform.email import mailgun_email_services
+            return mailgun_email_services
 
     @classmethod
     def import_memcache_services(cls):

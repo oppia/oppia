@@ -170,14 +170,16 @@ def get_empty_ratings():
 EMPTY_SCALED_AVERAGE_RATING = 0.0
 
 # To use GAE email service.
-GAE_EMAIL_SERVICE = 'gae_email_service'
+EMAIL_SERVICE_PROVIDER_GAE = 'gae_email_service'
 # To use mailgun email service.
-MAILGUN_EMAIL_SERVICE = 'mailgun_email_service'
+EMAIL_SERVICE_PROVIDER_MAILGUN = 'mailgun_email_service'
 # Use GAE email service by default.
-EMAIL_SERVICE_PROVIDER = GAE_EMAIL_SERVICE
-# Mailgun api key should be replaced with None below.
+EMAIL_SERVICE_PROVIDER = EMAIL_SERVICE_PROVIDER_GAE
+# If the Mailgun email API is used, the "None" below should be replaced
+# with the Mailgun API key.
 MAILGUN_API_KEY = None
-# Mailgun domain name should be replaced with None below.
+# If the Mailgun email API is used, the "None" below should be replaced
+# with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
 # Committer id for system actions.
 SYSTEM_COMMITTER_ID = 'admin'

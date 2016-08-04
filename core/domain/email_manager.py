@@ -202,6 +202,11 @@ def _send_email(
     return transaction_services.run_in_transaction(_send_email_in_transaction)
 
 
+def send_mail_to_admin(email_subject, email_body):
+    email_services.send_mail(
+        feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS, email_subject,
+        email_body, html_body=None, bcc_admin=False)
+
 def send_post_signup_email(user_id):
     """Sends a post-signup email to the given user.
 

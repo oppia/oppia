@@ -17,34 +17,10 @@
 """Provides email services."""
 
 from core import counters
-from core.platform.email import mailgun_email_services
 import feconf
 
 from google.appengine.api import app_identity
 from google.appengine.api import mail
-
-
-def send_mail_to_admin(subject, body):
-    """Enqueues a 'send email' request with the GAE mail service.
-
-    Args:
-      - subject: str. The subject line of the email.
-      - body: str. The plaintext body of the email.
-    """
-    if feconf.CAN_SEND_EMAILS_TO_ADMIN:
-        if not mail.is_email_valid(feconf.ADMIN_EMAIL_ADDRESS):
-            raise Exception(
-                'Malformed email address: %s' %
-                feconf.ADMIN_EMAIL_ADDRESS)
-
-        app_id = app_identity.get_application_id()
-        body = '(Sent from %s)\n\n%s' % (app_id, body)
-
-        mail.send_mail(
-            feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS, subject,
-            body)
-        counters.EMAILS_SENT.inc()
-
 
 def send_mail(
         sender_email, recipient_email, subject, plaintext_body, html_body,
@@ -71,6 +47,21 @@ def send_mail(
         to App Engine.
       (and possibly other exceptions, due to mail.send_mail() failures)
     """
+    if recipient_email == feconf.ADMIN_EMAIL_ADDRESS:
+        if feconf.CAN_SEND_EMAILS_TO_ADMIN:
+            if not mail.is_email_valid(recipient_email):
+                raise ValueError(
+                    'Malformed admin email address: %s' % recipient_email)
+
+            app_id = app_identity.get_application_id()
+            body = '(Sent from %s)\n\n%s' % (app_id, plaintext_body)
+
+            mail.send_mail(
+                feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
+                subject, body)
+            counters.EMAILS_SENT.inc()
+        return
+
     if not feconf.CAN_SEND_EMAILS_TO_USERS:
         raise Exception('This app cannot send emails to users.')
 
@@ -80,25 +71,13 @@ def send_mail(
     if not mail.is_email_valid(recipient_email):
         raise ValueError(
             'Malformed recipient email address: %s' % recipient_email)
-    if feconf.EMAIL_SERVICE_PROVIDER == feconf.GAE_EMAIL_SERVICE:
-        if bcc_admin:
-            mail.send_mail(
-                sender_email, recipient_email, subject, plaintext_body,
-                html=html_body, bcc=[feconf.ADMIN_EMAIL_ADDRESS])
-        else:
-            mail.send_mail(
-                sender_email, recipient_email, subject, plaintext_body,
-                html=html_body)
-    elif feconf.EMAIL_SERVICE_PROVIDER == feconf.MAILGUN_EMAIL_SERVICE:
-        if not feconf.MAILGUN_API_KEY:
-            raise Exception('Mailgun API key is not available.')
-        if bcc_admin:
-            mailgun_email_services.send_mail(
-                sender_email, recipient_email, subject, plaintext_body,
-                html_body, bcc=[feconf.ADMIN_EMAIL_ADDRESS])
-        else:
-            mailgun_email_services.send_mail(
-                sender_email, recipient_email, subject, plaintext_body,
-                html_body)
+    if bcc_admin:
+        mail.send_mail(
+            sender_email, recipient_email, subject, plaintext_body,
+            html=html_body, bcc=[feconf.ADMIN_EMAIL_ADDRESS])
+    else:
+        mail.send_mail(
+            sender_email, recipient_email, subject, plaintext_body,
+            html=html_body)
 
     counters.EMAILS_SENT.inc()

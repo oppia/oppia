@@ -17,22 +17,106 @@
 """Provides mailgun api to send email."""
 import requests
 
+from core import counters
 import feconf
+
+from google.appengine.api import app_identity
+
+MAILGUN_PUBLIC_DOMAIN_URL = "https://api.mailgun.net/v3/address/validate"
+MAILGUN_PUBLIC_API_KEY = "pubkey-5ogiflzbnjrljiky49qxsiozqef5jxp7"
+def is_email_valid(email):
+    """ Check whether recipient and sender email address are valid or not.
+    Mailgun uses public api key and public domain url to do this check. """
+    response = (
+        requests.get(
+            MAILGUN_PUBLIC_DOMAIN_URL, auth=("api", MAILGUN_PUBLIC_API_KEY),
+            params={"address": email}))
+    return response.json()['is_valid']
 
 def send_mail(
         sender_email, recipient_email, subject, plaintext_body,
-        html_body, bcc=None):
+        html_body, bcc_admin=False):
+    """Sends an email using mailgun api.
+
+    In general this function should only be called from
+    email_manager._send_email().
+
+    Args:
+      - sender_email: str. the email address of the sender. This should be in
+          the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>'.
+      - recipient_email: str. the email address of the recipient.
+      - subject: str. The subject line of the email.
+      - plaintext_body: str. The plaintext body of the email.
+      - html_body: str. The HTML body of the email. Must fit in a datastore
+          entity.
+      - bcc_admin: bool. Whether to bcc feconf.ADMIN_EMAIL_ADDRESS on the email.
+
+    Raises:
+      Exception: if the configuration in feconf.py forbids emails from being
+        sent.
+      ValueError: if 'sender_email' or 'recipient_email' is invalid, according
+        to App Engine.
+      Exception: if mailgun api key is not stored in feconf.MAILGUN_API_KEY.
+      Exception: if mailgun domain name is not stored in
+        feconf.MAILGUN_DOMAIN_NAME.
+      (and possibly other exceptions, due to mail.send_mail() failures)
+    """
+    if not feconf.MAILGUN_API_KEY:
+        raise Exception('Mailgun API key is not available.')
+
     if not feconf.MAILGUN_DOMAIN_NAME:
         raise Exception('Mailgun domain name is not set.')
+
     mailgun_domain_name = (
         'https://api.mailgun.net/v3/%s/messages' % feconf.MAILGUN_DOMAIN_NAME)
 
-    return requests.post(
-        mailgun_domain_name, auth=('api', feconf.MAILGUN_API_KEY),
-        data={
-            'from': sender_email,
-            'to': recipient_email,
-            'bcc': bcc,
-            'subject': subject,
-            'text': plaintext_body,
-            'html': html_body})
+    if recipient_email == feconf.ADMIN_EMAIL_ADDRESS:
+        if feconf.CAN_SEND_EMAILS_TO_ADMIN:
+            if not is_email_valid(recipient_email):
+                raise ValueError(
+                    'Malformed admin email address: %s' % recipient_email)
+
+            app_id = app_identity.get_application_id()
+            body = '(Sent from %s)\n\n%s' % (app_id, plaintext_body)
+
+            requests.post(
+                mailgun_domain_name, auth=('api', feconf.MAILGUN_API_KEY),
+                data={
+                    'from': sender_email,
+                    'to': recipient_email,
+                    'subject': subject,
+                    'text': body})
+            counters.EMAILS_SENT.inc()
+        return
+
+    if not feconf.CAN_SEND_EMAILS_TO_USERS:
+        raise Exception('This app cannot send emails to users.')
+
+    if not is_email_valid(sender_email):
+        raise ValueError('Malformed sender email address: %s' % sender_email)
+
+    if not is_email_valid(recipient_email):
+        raise ValueError(
+            'Malformed recipient email address: %s' % recipient_email)
+
+    if bcc_admin:
+        requests.post(
+            mailgun_domain_name, auth=('api', feconf.MAILGUN_API_KEY),
+            data={
+                'from': sender_email,
+                'to': recipient_email,
+                'bcc': feconf.ADMIN_EMAIL_ADDRESS,
+                'subject': subject,
+                'text': plaintext_body,
+                'html': html_body})
+    else:
+        requests.post(
+            mailgun_domain_name, auth=('api', feconf.MAILGUN_API_KEY),
+            data={
+                'from': sender_email,
+                'to': recipient_email,
+                'subject': subject,
+                'text': plaintext_body,
+                'html': html_body})
+
+    counters.EMAILS_SENT.inc()
