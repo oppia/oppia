@@ -113,11 +113,42 @@
                <col style="width: 15%;">
             </colgroup>
             <tr>
-              <th>Exploration</th>
+              <th ng-click="sortExplorationsList(EXPLORATIONS_SORT_BY_KEYS.TITLE)">
+                Exploration
+                <span ng-if="currentSortType === EXPLORATIONS_SORT_BY_KEYS.TITLE"
+                      class="fa"
+                      ng-class="isCurrentSortDescending ? 'fa-caret-up': 'fa-caret-down'">
+                </span>
+              </th>
               <th>Rating</th>
-              <th>Plays</th>
-              <th>Feedback</th>
-              <th>Last Updated</th>
+              <th ng-click="sortExplorationsList(EXPLORATIONS_SORT_BY_KEYS.NUM_VIEWS)">
+                Plays
+                <span ng-if="currentSortType === EXPLORATIONS_SORT_BY_KEYS.NUM_VIEWS"
+                      class="fa"
+                      ng-class="isCurrentSortDescending ? 'fa-caret-up': 'fa-caret-down'">
+                </span>
+              </th>
+              <th ng-click="sortExplorationsList(EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK)">
+                Feedback
+                <span ng-if="currentSortType === EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK"
+                      class="fa"
+                      ng-class="isCurrentSortDescending ? 'fa-caret-up': 'fa-caret-down'">
+                </span>
+              </th>
+              <th ng-click="sortExplorationsList(EXPLORATIONS_SORT_BY_KEYS.UNRESOLVED_ANSWERS)">
+                Unresolved Answers
+                <span ng-if="currentSortType === EXPLORATIONS_SORT_BY_KEYS.UNRESOLVED_ANSWERS"
+                      class="fa"
+                      ng-class="isCurrentSortDescending ? 'fa-caret-up': 'fa-caret-down'">
+                </span>
+              </th>
+              <th ng-click="sortExplorationsList(EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED)">
+                Last Updated
+                <span ng-if="currentSortType === EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED"
+                      class="fa"
+                      ng-class="isCurrentSortDescending ? 'fa-caret-up': 'fa-caret-down'">
+                </span>
+              </th>
             </tr>
             <tr ng-repeat="exploration in explorationsList track by exploration.id"
                 ng-click="showExplorationEditor(exploration.id)"

@@ -75,6 +75,10 @@ oppia.factory('sortExplorationsService', [
       return result;
     };
     return {
+      getValidSortingKeys: function() {
+        return EXPLORATIONS_SORT_BY_KEYS;
+      },
+
       sortBy: function(explorationsList, sortType, isDescending) {
         for (var sortKey in EXPLORATIONS_SORT_BY_KEYS) {
           if (EXPLORATIONS_SORT_BY_KEYS[sortKey] === sortType) {

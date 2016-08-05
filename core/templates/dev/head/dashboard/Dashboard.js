@@ -53,14 +53,41 @@ oppia.controller('Dashboard', [
       $scope.myExplorationsView = viewType;
     };
 
+    $scope.checkForMobileView = function() {
+      if ($window.innerWidth < 500) {
+        $scope.myExplorationsView = 'card';
+        $scope.publishText = EXP_PUBLISH_TEXTS.sm;
+      } else {
+        $scope.publishText = EXP_PUBLISH_TEXTS.default;
+      }
+    };
+
+    $scope.checkForMobileView();
+    angular.element($window).bind('resize', function() {
+      $scope.checkForMobileView();
+    });
+
+    $scope.sortExplorationsList = function(sortType) {
+      $scope.isCurrentSortDescending = !$scope.isCurrentSortDescending;
+      $scope.currentSortType = sortType;
+      $scope.explorationsList = (
+        sortExplorationsService.sortBy(
+          $scope.explorationsList,
+          $scope.currentSortType,
+          $scope.isCurrentSortDescending));
+    };
+
     $rootScope.loadingMessage = 'Loading';
     DashboardBackendApiService.fetchDashboardData().then(
       function(response) {
+        $scope.EXPLORATIONS_SORT_BY_KEYS = EXPLORATIONS_SORT_BY_KEYS;
+        $scope.currentSortType = EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK;
+        $scope.isCurrentSortDescending = true;
         $scope.explorationsList = (
           sortExplorationsService.sortBy(
             response.explorations_list,
-            EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK,
-            true));
+            $scope.currentSortType,
+            $scope.isCurrentSortDescending));
         $scope.collectionsList = response.collections_list;
         $scope.dashboardStats = response.dashboard_stats;
         $rootScope.loadingMessage = '';
