@@ -47,8 +47,8 @@ oppia.factory('UrlInterpolationService', [
      *
      *   /createhandler/resolved_answers/<exploration_id>/<escaped_state_name>
      *
-     * interpolationValues is an object whose keys are variables within the
-     * URL. For the above example, interpolationValues may look something
+     * interpolationValues is an object whose keys are variables within the URL.
+     * For the above example, interpolationValues may look something
      * like:
      *
      *   { 'exploration_id': '0', 'escaped_state_name': 'InputBinaryNumber' }
@@ -113,8 +113,8 @@ oppia.factory('UrlInterpolationService', [
         escapedInterpolationValues[varName] = encodeURIComponent(value);
       }
 
-      // Ensure the URL has no nested brackets (which would lead to
-      // indirection in the interpolated variables).
+      // Ensure the URL has no nested brackets (which would lead to indirection
+      // in the interpolated variables).
       var filledUrl = angular.copy(urlTemplate);
       var match = filledUrl.match(INTERPOLATION_VARIABLE_REGEX);
       while (match) {

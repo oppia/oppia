@@ -33,6 +33,11 @@ oppia.factory('sortExplorationsService', [
     var sortByKey = function(explorationsList, key, isDescending) {
       var result = angular.copy(explorationsList);
       var valA, valB;
+      // JS Array.sort() method is stable in all major browsers except Chrome,
+      // since Chrome uses quicksort internally if the length of Array to be
+      // sorted is greater than 10. To make this stable, we maintain indexes of
+      // items in the array and return non-zero values from the function passed
+      // to .sort() method.
       result = result.map(function(data, idx) {
         return {
           index: idx,
@@ -40,8 +45,6 @@ oppia.factory('sortExplorationsService', [
         };
       });
       result.sort(function(a, b) {
-        // Value of this variable should be -ve/+ve but not zero, to prevent
-        // unstable sort.
         var returnValue;
         valA = a.data[key];
         valB = b.data[key];
@@ -59,6 +62,8 @@ oppia.factory('sortExplorationsService', [
         } else {
           returnValue = valA - valB;
         }
+        // NOTE TO DEVELOPERS: Make sure the value returned here is non-zero to
+        // keep this sort stable.
         return returnValue ? returnValue : (a.index - b.index);
       });
       result = result.map(function(value) {
