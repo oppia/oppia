@@ -24,6 +24,14 @@ oppia.constant('EXPLORATIONS_SORT_BY_KEYS', {
   UNRESOLVED_ANSWERS: 'num_unresolved_answers'
 });
 
+oppia.constant('HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', {
+  TITLE: 'Title',
+  LAST_UPDATED: 'Last Updated',
+  NUM_VIEWS: 'Total Plays',
+  OPEN_FEEDBACK: 'New Feedback',
+  UNRESOLVED_ANSWERS: 'Unresolved Answers'
+});
+
 // Service for sorting the explorations based on different parameters.
 oppia.factory('sortExplorationsService', [
   'utilsService', 'EXPLORATIONS_SORT_BY_KEYS', 'alertsService',

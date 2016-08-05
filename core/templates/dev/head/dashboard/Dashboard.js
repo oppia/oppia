@@ -21,16 +21,21 @@ oppia.controller('Dashboard', [
   'DashboardBackendApiService', 'RatingComputationService',
   'ExplorationCreationService', 'FATAL_ERROR_CODES', 'UrlInterpolationService',
   'sortExplorationsService', 'EXPLORATIONS_SORT_BY_KEYS',
+  'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS',
   function(
       $scope, $rootScope, $window, oppiaDatetimeFormatter, alertsService,
       DashboardBackendApiService, RatingComputationService,
       ExplorationCreationService, FATAL_ERROR_CODES, UrlInterpolationService,
-      sortExplorationsService, EXPLORATIONS_SORT_BY_KEYS) {
+      sortExplorationsService, EXPLORATIONS_SORT_BY_KEYS,
+      HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS) {
     var EXP_PUBLISH_TEXTS = {
       default: 'This exploration is private. Publish it to receive statistics.',
       sm: 'Publish the exploration to receive statistics.'
     };
 
+    $scope.EXPLORATIONS_SORT_BY_KEYS = EXPLORATIONS_SORT_BY_KEYS;
+    $scope.HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS = (
+      HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS);
     $scope.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
         GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD);
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
@@ -69,7 +74,9 @@ oppia.controller('Dashboard', [
 
     $scope.sortExplorationsList = function(sortType) {
       $scope.isCurrentSortDescending = !$scope.isCurrentSortDescending;
-      $scope.currentSortType = sortType;
+      if (sortType) {
+        $scope.currentSortType = sortType;
+      }
       $scope.explorationsList = (
         sortExplorationsService.sortBy(
           $scope.explorationsList,
@@ -80,7 +87,6 @@ oppia.controller('Dashboard', [
     $rootScope.loadingMessage = 'Loading';
     DashboardBackendApiService.fetchDashboardData().then(
       function(response) {
-        $scope.EXPLORATIONS_SORT_BY_KEYS = EXPLORATIONS_SORT_BY_KEYS;
         $scope.currentSortType = EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK;
         $scope.isCurrentSortDescending = true;
         $scope.explorationsList = (
