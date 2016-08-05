@@ -56,12 +56,6 @@
             </a>
           </li>
         {% endif %}
-        <li class="sort-explorations-select" ng-if="activeTab === 'myExplorations'">
-          <select ng-model="currentSortType"
-                  ng-change="sortExplorationsList(currentSortType)"
-                  ng-options="EXPLORATIONS_SORT_BY_KEYS[key] as value for (key, value) in HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS">
-          </select>
-        </li>
         <li class="list-card-view-toggle dashboard-hide-mobile" ng-if="activeTab === 'myExplorations'">
           <button class="card-view-btn"
                   ng-class="{'dashboard-active-view': myExplorationsView === 'card'}"
@@ -78,6 +72,12 @@
                   ng-click="setMyExplorationsView('card')">
             <span class="fa fa-th-large fa-lg"></span>
           </button>
+        </li>
+        <li class="sort-explorations-select" ng-if="activeTab === 'myExplorations'">
+          <select ng-model="currentSortType"
+                  ng-change="sortExplorationsList(currentSortType)"
+                  ng-options="EXPLORATIONS_SORT_BY_KEYS[key] as value for (key, value) in HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS">
+          </select>
         </li>
       </ul>
     </div>

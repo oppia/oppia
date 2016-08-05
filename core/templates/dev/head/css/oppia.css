@@ -1218,8 +1218,15 @@ textarea {
   color: #fff;
 }
 
-.list-card-view-toggle .card-view-btn {
-  margin-left: -1px;
+li.sort-explorations-select {
+    width: auto;
+}
+
+.sort-explorations-select select {
+  height: 32px;
+  margin: 7px 7px 0 0;
+  background: #fff;
+  border-color: #ddd;
 }
 
 /* Rules for the tiles in the creator dashboard. */
