@@ -16,15 +16,17 @@
  * @fileoverview Unit tests for DashboardServices.
  */
 
-ddescribe('Dashboard services', function() {
+describe('Dashboard services', function() {
   var sortExplorationsService = null;
   var alertsService = null;
   var sampleExplorationsList = null;
+  var EXPLORATIONS_SORT_BY_KEYS = null;
 
   beforeEach(module('oppia'));
   beforeEach(inject(function($injector) {
     sortExplorationsService = $injector.get('sortExplorationsService');
     alertsService = $injector.get('alertsService');
+    EXPLORATIONS_SORT_BY_KEYS = $injector.get('EXPLORATIONS_SORT_BY_KEYS');
 
     // Sample explorations list
     sampleExplorationsList = [
@@ -111,19 +113,21 @@ ddescribe('Dashboard services', function() {
 
   it('should correctly sort the explorations list', function() {
     var sortedByTitle = (
-      sortExplorationsService.sortBy(sampleExplorationsList, 'TITLE'));
+      sortExplorationsService.sortBy(
+        sampleExplorationsList, EXPLORATIONS_SORT_BY_KEYS.TITLE));
     expect(sortedByTitle.length).toBe(sampleExplorationsList.length);
     expect(sortedByTitle[0].title).toBe(sampleExplorationsList[1].title);
     expect(sortedByTitle[1].title).toBe(sampleExplorationsList[0].title);
     expect(sortedByTitle[2].title).toBe(sampleExplorationsList[2].title);
 
     var sortedByTitleDescending = (
-      sortExplorationsService.sortBy(sampleExplorationsList, 'TITLE', true));
+      sortExplorationsService.sortBy(
+        sampleExplorationsList, EXPLORATIONS_SORT_BY_KEYS.TITLE, true));
     expect(sortedByTitle).toBe(sortedByTitle.reverse());
 
     var sortedByLastUpdated = (
       sortExplorationsService.sortBy(
-        sampleExplorationsList, 'LAST_UPDATED'));
+        sampleExplorationsList, EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED));
     expect(sortedByLastUpdated.length).toBe(sampleExplorationsList.length);
     expect(sortedByLastUpdated[0].last_updated_msec).toBe(
       sampleExplorationsList[2].last_updated_msec);
@@ -134,7 +138,7 @@ ddescribe('Dashboard services', function() {
 
     var sortedByNumOpenThreads = (
       sortExplorationsService.sortBy(
-        sampleExplorationsList, 'OPEN_FEEDBACK'));
+        sampleExplorationsList, EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK));
     expect(sortedByNumOpenThreads.length).toBe(sampleExplorationsList.length);
     expect(sortedByNumOpenThreads[0].num_open_threads).toBe(
       sampleExplorationsList[0].num_open_threads);
@@ -145,7 +149,7 @@ ddescribe('Dashboard services', function() {
 
     var sortedByNumUnresolvedAnswers = (
       sortExplorationsService.sortBy(
-        sampleExplorationsList, 'UNRESOLVED_ANSWERS'));
+        sampleExplorationsList, EXPLORATIONS_SORT_BY_KEYS.UNRESOLVED_ANSWERS));
     expect(sortedByNumUnresolvedAnswers.length).toBe(
       sampleExplorationsList.length);
     expect(sortedByNumUnresolvedAnswers[0].num_unresolved_answers).toBe(
@@ -156,7 +160,8 @@ ddescribe('Dashboard services', function() {
       sampleExplorationsList[2].num_unresolved_answers);
 
     var sortedByNumViews = (
-      sortExplorationsService.sortBy(sampleExplorationsList, 'NUM_VIEWS'));
+      sortExplorationsService.sortBy(
+        sampleExplorationsList, EXPLORATIONS_SORT_BY_KEYS.NUM_VIEWS));
     expect(sortedByNumViews.length).toBe(sampleExplorationsList.length);
     expect(sortedByNumViews[0].num_views).toBe(
       sampleExplorationsList[1].num_views);
@@ -166,10 +171,12 @@ ddescribe('Dashboard services', function() {
       sampleExplorationsList[0].num_views);
 
     var sortedByUnexpectedParameter = (
-      sortExplorationsService.sortBy(sampleExplorationsList, 'abc'));
+      sortExplorationsService.sortBy(
+        sampleExplorationsList, EXPLORATIONS_SORT_BY_KEYS.abc));
     expect(alertsService.warnings.length).toBe(1);
     expect(alertsService.warnings[0].content).toBe(
-      'Invalid type of key name for sorting explorations: abc');
+      'Invalid type of key name for sorting explorations: ' +
+        EXPLORATIONS_SORT_BY_KEYS.abc);
     expect(sortedByUnexpectedParameter).toBe(sampleExplorationsList);
   });
 });
