@@ -1341,7 +1341,8 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
             if answer_group_index is None or rule_spec_index is None:
                 yield (
                     'Failed to match rule string: \'%s\' for answer \'%s\' '
-                    'because of %s' % (rule_str, item_id, error_string))
+                    'because of %s (state=%s)' % (
+                        rule_str, item_id, error_string, state.to_dict()))
                 return
 
             answer_groups = state.interaction.answer_groups
@@ -1391,7 +1392,9 @@ class AnswerMigrationJob(jobs.BaseMapReduceJobManager):
                     AnswerMigrationJob._reconstitute_answer_object(
                         state, rule_spec, rule_str, answer_str))
                 if error:
-                    yield error
+                    yield (
+                        'Failed to migrate answer because of %s (answer=%s,'
+                        ' state=%s)' % (error, item_id, state.to_dict()))
                     continue
             else:
                 answer = None
