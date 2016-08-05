@@ -295,7 +295,7 @@ describe('Collection linearizer service', function() {
             [firstCollectionNode, secondCollectionNode, thirdCollectionNode]);
     });
 
-    iit('should correctly shift the last node', function() {
+    it('should correctly shift the last node', function() {
       var collection = createLinearCollection();
       expect(
         CollectionLinearizerService.getCollectionNodesInPlayableOrder(
