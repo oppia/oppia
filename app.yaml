@@ -30,6 +30,7 @@ handlers:
     Vary: Accept-Encoding
 - url: /build
   static_dir: build
+  application_readable: true
   secure: always
   http_headers:
     Cache-Control: 'public, max-age=2592000'

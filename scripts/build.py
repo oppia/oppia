@@ -22,14 +22,11 @@ import sys
 import yaml
 
 
-# ensure_directory_exists method trims file paths passed to it. Hence, directory
-# paths require a trailing slash.
-HEAD_DIR = os.path.join('core', 'templates', 'dev', 'head', '')
-OUT_DIR = os.path.join('core', 'templates', 'prod', 'head', '')
 REMOVE_WS = re.compile(r'\s{2,}').sub
 YUICOMPRESSOR_DIR = os.path.join(
     '..', 'oppia_tools', 'yuicompressor-2.4.8', 'yuicompressor-2.4.8.jar')
-
+FILE_EXTENSIONS_TO_COPY_DIRECTLY = ['.json']
+FILE_EXTENSIONS_NOT_TO_COPY_DIRECTLY = ['.html', '.css', '.js']
 
 def _minify(source_path, target_path):
     """Runs the given file through a minifier and outputs it to target_path."""
@@ -63,13 +60,14 @@ def process_js(source_path, target_path):
     _minify(source_path, target_path)
 
 
-def process_third_party_libs():
+def process_third_party_libs(output_directory):
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
     node_path = os.path.join(
         parent_dir, 'oppia_tools', 'node-4.2.1', 'bin', 'node')
     gulp_path = os.path.join(
         parent_dir, 'node_modules', 'gulp', 'bin', 'gulp.js')
-    gulp_build_cmd = [node_path, gulp_path, 'build', '--minify=True']
+    gulp_build_cmd = [node_path, gulp_path, 'build', '--minify=True',
+                      '--output_directory=%s' % output_directory]
     proc = subprocess.Popen(
         gulp_build_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     gulp_stdout, gulp_stderr = proc.communicate()
@@ -105,21 +103,44 @@ def copy_files_source_to_target(source, target):
             shutil.copyfile(source_path, target_path)
 
 
-def _build_files():
-    ensure_directory_exists(OUT_DIR)
-    shutil.rmtree(OUT_DIR)
-    process_third_party_libs()
+def build_files(source, target, ignore=None):
+    """Minifies all css and js files, and removes whitespace from html in source
+    directory and copies it to target, ignoring paths/files mentioned in ignore.
+    Copies files in ignore to target without any changes.
 
-    for root, dirs, files in os.walk(os.path.join(os.getcwd(), HEAD_DIR)):
+    Arguments:
+        source, target: strings
+        ignore: list of files/paths to ignore
+    """
+    print 'Processing %s' % os.path.join(os.getcwd(), source)
+    print 'Generating into %s' % os.path.join(os.getcwd(), target)
+    ensure_directory_exists(target)
+    shutil.rmtree(target)
+
+    for root, dirs, files in os.walk(os.path.join(os.getcwd(), source)):
         for directory in dirs:
             print 'Processing %s' % os.path.join(root, directory)
         for filename in files:
             source_path = os.path.join(root, filename)
-            if source_path.find(OUT_DIR) > 0:
+            if source_path.find(target) > 0:
                 continue
-            if source_path.find(HEAD_DIR) == -1:
+            if source_path.find(source) == -1:
                 continue
-            target_path = source_path.replace(HEAD_DIR, OUT_DIR)
+            target_path = source_path.replace(source, target)
+
+            only_copy_file = False
+            if (any(source_path.find(p) > 0 for p in ignore) or
+                    any(source_path.find(p) > 0
+                        for p in FILE_EXTENSIONS_TO_COPY_DIRECTLY) or
+                    not any(source_path.find(p) > 0
+                            for p in FILE_EXTENSIONS_NOT_TO_COPY_DIRECTLY)):
+                only_copy_file = True
+
+            if only_copy_file:
+                ensure_directory_exists(target_path)
+                shutil.copyfile(source_path, target_path)
+                continue
+
             if filename.endswith('.html'):
                 process_html(source_path, target_path)
             if filename.endswith('.css'):
@@ -141,26 +162,32 @@ if __name__ == '__main__':
     CACHE_SLUG = get_cache_slug()
     BUILD_DIR = os.path.join('build', CACHE_SLUG)
 
+    # ensure_directory_exists trims file paths passed to it. Hence, directory
+    # paths require a trailing slash.
     # Process assets, copy it to build/[cache_slug]/assets
     ASSETS_SRC_DIR = os.path.join('assets', '')
     ASSETS_OUT_DIR = os.path.join(BUILD_DIR, 'assets', '')
     copy_files_source_to_target(ASSETS_SRC_DIR, ASSETS_OUT_DIR)
 
-    # Process third_party/generated/prod, copy it to
+    # Process third_party resources, copy it to
     # build/[cache_slug]/third_party/generated
-    THIRD_PARTY_GENERATED_SRC_DIR = os.path.join(
-        'third_party', 'generated', 'prod', '')
     THIRD_PARTY_GENERATED_OUT_DIR = os.path.join(
-        BUILD_DIR, 'third_party', 'generated', '')
-    copy_files_source_to_target(
-        THIRD_PARTY_GENERATED_SRC_DIR, THIRD_PARTY_GENERATED_OUT_DIR)
+        BUILD_DIR, 'third_party', 'generated')
+    process_third_party_libs(THIRD_PARTY_GENERATED_OUT_DIR)
 
     # Process extensions, copy it to build/[cache_slug]/extensions
     EXTENSIONS_SRC_DIR = os.path.join('extensions', '')
     EXTENSIONS_OUT_DIR = os.path.join(BUILD_DIR, 'extensions', '')
-    copy_files_source_to_target(EXTENSIONS_SRC_DIR, EXTENSIONS_OUT_DIR)
+    # Certain files' syntax become incorrect after minification and hence
+    # they are ignored.
+    EXTENSIONS_IGNORE = [os.path.join('extensions', 'interactions',
+                                      'LogicProof', 'static', 'js')]
+    build_files(EXTENSIONS_SRC_DIR, EXTENSIONS_OUT_DIR, EXTENSIONS_IGNORE)
 
-    _build_files()
+    # Process core/templates/dev/head
+    TEMPLATES_HEAD_DIR = os.path.join('core', 'templates', 'dev', 'head', '')
+    TEMPLATES_OUT_DIR = os.path.join('core', 'templates', 'prod', 'head', '')
+    build_files(TEMPLATES_HEAD_DIR, TEMPLATES_OUT_DIR, [])
 
     # Process core/templates/prod/head/css, copy it to build/[cache_slug]/css
     CSS_SRC_DIR = os.path.join('core', 'templates', 'prod', 'head', 'css', '')

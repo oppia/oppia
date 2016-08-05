@@ -56,6 +56,27 @@ if ( nc -vz localhost 8181 >/dev/null 2>&1 ); then
   exit 1
 fi
 
+# Argument passed to dev_appserver.py to indicate whether or not to
+# clear the datastore.
+CLEAR_DATASTORE_ARG="--clear_datastore=true"
+# Argument passed to gulpfile.js to help build with minification.
+MINIFICATION=false
+for arg in "$@"; do
+  if [ "$arg" == "--save_datastore" ]; then
+    CLEAR_DATASTORE_ARG=""
+  fi
+  # Used to emulate running Oppia in a production environment.
+  if [ "$arg" == "--prod_env" ]; then
+    MINIFICATION=true
+    $PYTHON_CMD scripts/build.py
+  fi
+done
+
+yaml_env_variable="MINIFICATION: $MINIFICATION"
+sed -i.bak -e s/"MINIFICATION: .*"/"$yaml_env_variable"/ app.yaml
+# Delete the modified yaml file(-i.bak)
+rm app.yaml.bak
+
 # Launch a browser window.
 if [ -f "/usr/bin/google-chrome" ]; then
   echo ""
@@ -78,28 +99,6 @@ else
   echo "  by navigating to localhost:8181 in a browser window."
   echo ""
 fi
-
-# Argument passed to dev_appserver.py to indicate whether or not to
-# clear the datastore.
-CLEAR_DATASTORE_ARG="--clear_datastore=true"
-# Argument passed to gulpfile.js to help build with minification.
-MINIFICATION=false
-for arg in "$@"; do
-  if [ "$arg" == "--save_datastore" ]; then
-    CLEAR_DATASTORE_ARG=""
-  fi
-  # Used to emulate running Oppia in a production environment.
-  if [ "$arg" == "--prod_env" ]; then
-    MINIFICATION=true
-    $PYTHON_CMD scripts/build.py
-  fi
-done
-
-# Update value of MINIFICATION variable in app.yaml
-yaml_env_variable="MINIFICATION: $MINIFICATION"
-sed -i.bak -e s/"MINIFICATION: .*"/"$yaml_env_variable"/ app.yaml
-# Delete the modified yaml file(-i.bak)
-rm app.yaml.bak
 
 # Set up a local dev instance.
 # TODO(sll): do this in a new shell.
