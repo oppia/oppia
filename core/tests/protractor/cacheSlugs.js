@@ -55,9 +55,9 @@ var checkConsoleErrorsExist = function(expectedErrors) {
 describe('Cache Slugs', function() {
   it('should check that errors get logged for missing resources', function() {
     browser.get(ERROR_PAGE_URL_SUFFIX);
-    var missingFiles = [
+    var expectedErrors = [
       'http://localhost:9001/build/fail/logo/288x128_logo_white.png'
     ];
-    checkConsoleErrorsExist(missingFiles);
+    checkConsoleErrorsExist(expectedErrors);
   });
 });
