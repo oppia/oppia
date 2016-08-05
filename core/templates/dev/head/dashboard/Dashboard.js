@@ -25,8 +25,9 @@ oppia.controller('Dashboard', [
       DashboardBackendApiService, RatingComputationService,
       ExplorationCreationService, FATAL_ERROR_CODES, UrlInterpolationService) {
     var EXP_PUBLISH_TEXTS = {
-      default: 'This exploration is private. Publish it to receive statistics.',
-      sm: 'Publish the exploration to receive statistics.'
+      defaultText: (
+        'This exploration is private. Publish it to receive statistics.'),
+      smText: 'Publish the exploration to receive statistics.'
     };
 
     $scope.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
@@ -57,9 +58,9 @@ oppia.controller('Dashboard', [
     $scope.checkForMobileView = function() {
       if ($window.innerWidth < 500) {
         $scope.myExplorationsView = 'card';
-        $scope.publishText = EXP_PUBLISH_TEXTS.sm;
+        $scope.publishText = EXP_PUBLISH_TEXTS.smText;
       } else {
-        $scope.publishText = EXP_PUBLISH_TEXTS.default;
+        $scope.publishText = EXP_PUBLISH_TEXTS.defaultText;
       }
     };
 

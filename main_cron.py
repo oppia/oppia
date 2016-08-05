@@ -34,6 +34,14 @@ URLS = [
         r'/cron/users/dashboard_stats', cron.CronDashboardStatsHandler,
         'job_creator_dashboard_stats'),
     main.get_redirect_route(
+        r'/cron/explorations/recommendations',
+        cron.CronExplorationRecommendationsHandler,
+        'exploration_recommendations_handler'),
+    main.get_redirect_route(
+        r'/cron/explorations/search_rank',
+        cron.CronExplorationSearchRankHandler,
+        'exploration_search_rank_handler'),
+    main.get_redirect_route(
         r'/cron/jobs/cleanup', cron.CronMapreduceCleanupHandler,
         'job_cleanup_handler'),
 ]

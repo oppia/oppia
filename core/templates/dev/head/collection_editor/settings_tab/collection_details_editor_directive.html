@@ -40,5 +40,37 @@
         </div>
       </div>
     </div>
+
+    <div class="form-group">
+      <label for="collectionLanguage" class="col-lg-2 col-md-2 col-sm-2">Language</label>
+      <div class="col-lg-10 col-md-10 col-sm-10">
+        <select id="collectionLanguageCode" class="form-control protractor-test-exploration-language-select" ng-model="displayedCollectionLanguage" ng-change="updateCollectionLanguageCode()" ng-options="lc.code as lc.description for lc in languageListForSelect">
+        </select>
+        <span class="help-block" style="font-size: smaller">
+          <em>
+            Don't see the language you want? <a href="https://github.com/oppia/oppia/issues/new?title=Please%20add%20a%20new%20language%20choice%20to%20the%20exploration%20settings%20tab&body=Please%20add%20the%20language%20choice%20%7B%7BYOUR_LANGUAGE_HERE%7D%7D%20to%20the%20exploration%20settings%20tab.%0A%0AHere%20is%20a%20link%20to%20an%20exploration%20that%20uses%20it:%20%7B%7BINSERT_LINK_HERE%7D%7D" target="_blank">Tell us.</a>
+          </em>
+        </span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="collectionTags" class="col-lg-2 col-md-2 col-sm-2">Tags</label>
+      <div class="col-lg-10 col-md-10 col-sm-10">
+        <div ng-if="hasPageLoaded">
+          <select2-dropdown
+            item="$parent.displayedCollectionTags"
+            tag-mode="true" allow-multiple-choices="true"
+            invalid-search-term-message="Add a new tag (using lowercase letters and spaces)..."
+            new-choice-regex="<[TAG_REGEX]>" width="100%"
+            placeholder="Skills, concepts, topics, ..."
+            on-selection-change="updateCollectionTags()">
+          </select2-dropdown>
+        </div>
+        <span class="help-block" style="font-size: smaller">
+          <em>Tags help learners discover your collection when searching.</em>
+        </span>
+      </div>
+    </div>
   </div>
 </script>
