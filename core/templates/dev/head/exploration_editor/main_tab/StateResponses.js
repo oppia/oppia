@@ -239,6 +239,42 @@ oppia.factory('responsesService', [
       // the rules for multiple choice need to refer to the multiple choice
       // interaction's customization arguments.
       updateAnswerChoices: function(newAnswerChoices) {
+        // If the interaction is ItemSelectionInput,
+        // update the answer groups to refer to the new answer options.
+        if (stateInteractionIdService.savedMemento === 'ItemSelectionInput' &&
+          _answerChoices) {
+          var oldAnswerChoices = angular.copy(_answerChoices);
+          // Currently, this works fine in the case where you have only one
+          // answer choice represented in either an answer group or a rule spec
+          // but if you have more than one answer choice in a rule spec
+          // and change something other than the first answer [index 0]
+          // it throws an error because the index 0 answer choice becomes
+          // undefined
+          _answerGroups.forEach(function(answerGroup, answerIndex) {
+            var ruleSpecs = answerGroup.rule_specs;
+            ruleSpecs.forEach(function(ruleSpec, specIndex) {
+              var ruleInputs = ruleSpec.inputs.x;
+              ruleInputs.forEach(function(ruleInput, ruleIndex) {
+                for (var i = 0; i < oldAnswerChoices.length; i++) {
+                  if (oldAnswerChoices[i].val === ruleInput &&
+                      ruleInput !== newAnswerChoices[i].val) {
+                    // Tried making a copy of the answer groups and passing that
+                    // into _updateAnswerGroup, but found that this did not
+                    // solve the problem of the inputs.x array getting full of
+                    // old answer choices
+                    _answerGroups[answerIndex]
+                      .rule_specs[specIndex].inputs.x = [];
+                    _answerGroups[answerIndex].rule_specs[specIndex]
+                      .inputs.x[ruleIndex] = newAnswerChoices[i].val;
+                  }
+                }
+              });
+            });
+            // Without using this function, answer groups did not update
+            _updateAnswerGroup(answerIndex, _answerGroups[answerIndex]
+                                              .rule_specs);
+          });
+        }
         _answerChoices = newAnswerChoices;
       },
       getAnswerGroups: function() {
