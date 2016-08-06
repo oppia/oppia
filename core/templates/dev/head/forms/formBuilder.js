@@ -889,12 +889,12 @@ oppia.config(['$provide', function($provide) {
     }
   ]);
 
-  $provide.decorator("$sanitize", function($delegate, $log) {
-      return function(text, target){
-          text = text.replace(/<(\/)?a([^>]*)>/g, '<$1span$2>');
-          var result = $delegate(text, target);
-          return result;
-      };
+  $provide.decorator('$sanitize', function($delegate) {
+    return function(text, target) {
+      text = text.replace(/<(\/)?a([^>]*)>/g, '<$1span$2>');
+      var result = $delegate(text, target);
+      return result;
+    };
   });
 }]);
 
