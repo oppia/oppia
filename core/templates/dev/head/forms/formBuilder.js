@@ -888,6 +888,14 @@ oppia.config(['$provide', function($provide) {
       return taOptions;
     }
   ]);
+
+  $provide.decorator("$sanitize", function($delegate, $log) {
+      return function(text, target){
+          text = text.replace(/<(\/)?a([^>]*)>/g, '<$1span$2>');
+          var result = $delegate(text, target);
+          return result;
+      };
+  });
 }]);
 
 oppia.directive('textAngularRte', [
@@ -930,7 +938,7 @@ oppia.directive('textAngularRte', [
           };
 
           $scope.stripFormatting = function(html) {
-            return html ? String(html).replace(/<[^>]+>/gm, '') : '';
+            return $filter('sanitizeHtmlForRte')(html);
           };
 
           $scope.init = function() {
