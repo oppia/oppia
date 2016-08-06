@@ -271,7 +271,7 @@ describe('RTE helper service', function() {
       .toEqual('a<code>b</code>');
     expect($filter('sanitizeHtmlForRte')(
       'hello <a href="http://www.abc.com">a link</a> goodbye'
-    )).toEqual('hello <a href="http://www.abc.com">a link</a> goodbye');
+    )).toEqual('hello <span href="http://www.abc.com">a link</span> goodbye');
     expect($filter('sanitizeHtmlForRte')(
       '<table><tr><td>inside</td></tr></table>outside'
     )).toEqual('<table><tbody><tr><td>inside</td></tr></tbody></table>outside');
