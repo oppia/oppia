@@ -594,6 +594,8 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             feconf.PLAY_TYPE_NORMAL)
         self.assertEquals(
             user_services.get_weekly_dashboard_stats(self.owner_id), None)
+        self.assertEquals(
+            user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
         with self.swap(user_services,
                        'get_current_date_as_string',
@@ -618,6 +620,8 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             feconf.PLAY_TYPE_NORMAL)
         self.assertEquals(
             user_services.get_weekly_dashboard_stats(self.owner_id), None)
+        self.assertEquals(
+            user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
         (user_jobs_continuous_test.ModifiedUserStatsAggregator
          .start_computation())
@@ -625,6 +629,8 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
 
         self.assertEquals(
             user_services.get_weekly_dashboard_stats(self.owner_id), None)
+        self.assertEquals(
+            user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
         with self.swap(user_services,
                        'get_current_date_as_string',

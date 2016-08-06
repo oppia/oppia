@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block maintitle %}
+  I18N_SPLASH_PAGE_TITLE
+{% endblock maintitle %}
+
+{% block header_js %}
+  {{ super() }}
+
+  <style>
+    html, body {
+      background-color: #f2f2ee;
+    }
+  </style>
+{% endblock %}
+
+{% block navbar_breadcrumb %}
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+  <div ng-controller="Splash">
+    <div class="oppia-splash-section-one text-center">
+      <h1 class="oppia-splash-h1" translate="I18N_SPLASH_TITLE"></h1>
+      <div style="position: relative;">
+        <div style="padding-left: 200px;">
+          <div class="oppia-splash-background-icon-row">
+            <img ng-src="<[getStaticImageUrl('/splash/books.svg')]>" class="oppia-splash-books" style="margin-left: -250px; width: 500px; top: 95px;">
+
+            <img ng-src="<[getStaticSubjectImageUrl('Humor')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Combinatorics')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Cooking')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Government')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Architecture')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('History')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Microbiology')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Engineering')]>" class="oppia-splash-background-icon">
+
+            <img ng-src="<[getStaticSubjectImageUrl('Algorithms')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Economics')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Computing')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Reading')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Art')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Creativity')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Physics')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Language')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Arithmetic')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Chess')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Astronomy')]>" class="oppia-splash-background-icon">
+
+            <img ng-src="<[getStaticSubjectImageUrl('Religion')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Mathematics')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Philosophy')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Humor')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Combinatorics')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Cooking')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Government')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Architecture')]>" class="oppia-splash-background-icon">
+          </div>
+
+          <div class="oppia-splash-background-icon-row">
+            <img ng-src="<[getStaticSubjectImageUrl('Genetics')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Space')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Algebra')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Music')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Chemistry')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Poetry')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Puzzles')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Calculus')]>" class="oppia-splash-background-icon">
+
+            <img ng-src="<[getStaticSubjectImageUrl('Business')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Geography')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Biology')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Genetics')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Space')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Algebra')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Music')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Chemistry')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Poetry')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Puzzles')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Calculus')]>" class="oppia-splash-background-icon">
+
+            <img ng-src="<[getStaticSubjectImageUrl('Business')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Geography')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Biology')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Genetics')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Space')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Algebra')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Music')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Chemistry')]>" class="oppia-splash-background-icon">
+          </div>
+
+          <div class="oppia-splash-background-icon-row">
+            <img ng-src="<[getStaticSubjectImageUrl('Economics')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Algorithms')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Creativity')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Astronomy')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Chess')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Arithmetic')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Language')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Physics')]>" class="oppia-splash-background-icon">
+
+            <img ng-src="<[getStaticSubjectImageUrl('Combinatorics')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Humor')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Philosophy')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Mathematics')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Religion')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Cooking')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Engineering')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Microbiology')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('History')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Architecture')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Government')]>" class="oppia-splash-background-icon">
+
+            <img ng-src="<[getStaticSubjectImageUrl('Art')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Reading')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Computing')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Economics')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Algorithms')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Creativity')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Astronomy')]>" class="oppia-splash-background-icon">
+            <img ng-src="<[getStaticSubjectImageUrl('Chess')]>" class="oppia-splash-background-icon">
+          </div>
+        </div>
+
+        <div style="position: absolute; width: 100%;">
+          {% if not user_is_logged_in %}
+            <!-- User must complete the registration process. -->
+            <button type="button"
+                    ng-click="onRedirectToLogin('/dashboard?mode=create')"
+                    class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200"
+                    style="left: calc(130px + 15%); bottom: 210px; z-index: 10;"
+                    translate="I18N_ACTION_CREATE_EXPLORATION">
+            </button>
+          {% else %}
+            <button type="button"
+                    ng-click="onClickCreateExplorationButton()"
+                    class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200"
+                    style="left: calc(130px + 15%); bottom: 210px; z-index: 10;"
+                    translate="I18N_ACTION_CREATE_EXPLORATION">
+            </button>
+          {% endif %}
+
+          <button type="button" ng-click="onClickBrowseLibraryButton()"
+                  class="btn oppia-splash-button oppia-splash-button-browse oppia-transition-200"
+                  style="left: calc(130px + 15%); bottom: 150px; font-size: 0.93em; z-index: 10;"
+                  translate="I18N_ACTION_BROWSE_EXPLORATIONS">
+          </button>
+        </div>
+      </div>
+
+      <div class="oppia-splash-h2-container">
+        <h2 class="oppia-splash-h2" translate="I18N_SPLASH_SUBTITLE" style="padding-bottom: 30px; padding-top: 90px; font-size: 1.6em; max-width: 700px;"></h2>
+      </div>
+    </div>
+
+    <div class="oppia-splash-section-two">
+      <div class="oppia-splash-section-two-content" style="padding-top: 0;">
+        <div class="oppia-splash-bullet" style="overflow: visible;">
+          <div class="oppia-splash-bullet-block oppia-splash-block-left-image">
+            <img ng-src="<[getStaticImageUrl('/splash/bullet1icon.svg')]>"  class="oppia-splash-overlapping-image-1">
+          </div>
+          <div class="oppia-splash-bullet-block oppia-splash-block-right-text"
+               translate="I18N_SPLASH_FIRST_EXPLORATION_DESCRIPTION">
+          </div>
+        </div>
+
+        <div class="oppia-splash-bullet">
+          <div class="oppia-splash-bullet-block oppia-splash-block-right-image">
+            <img ng-src="<[getStaticImageUrl('/splash/bullet2icon.svg')]>">
+          </div>
+          <div class="oppia-splash-bullet-block oppia-splash-block-left-text"
+               translate="I18N_SPLASH_SECOND_EXPLORATION_DESCRIPTION">
+          </div>
+        </div>
+
+        <div class="oppia-splash-bullet">
+          <div class="oppia-splash-bullet-block oppia-splash-block-left-image">
+            <img ng-src="<[getStaticImageUrl('/splash/bullet3icon.svg')]>">
+          </div>
+          <div class="oppia-splash-bullet-block oppia-splash-block-right-text"
+               translate="I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @media (min-width: 608px) {
+      .oppia-splash-overlapping-image-1 {
+        margin-top: -105px;
+      }
+    }
+
+    @media (max-width: 608px) {
+      .oppia-splash-overlapping-image-1 {
+        margin-top: -30px;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block footer %}
+  {% include 'footer.html' %}
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script>
+    {{ include_js_file('pages/Splash.js') }}
+  </script>
+{% endblock footer_js %}

@@ -51,7 +51,12 @@ oppia.controller('I18nFooter', [
   // The $timeout seems to be necessary for the dropdown to show anything
   // at the outset, if the default language is not English.
   $timeout(function() {
-    $scope.currentLanguageCode = $translate.use();
+    // $translate.use() returns undefined until the language file is fully
+    // loaded, which causes a blank field in the dropdown, hence we use
+    // $translate.proposedLanguage() as suggested in
+    // http://stackoverflow.com/a/28903658
+    $scope.currentLanguageCode = $translate.use() ||
+      $translate.proposedLanguage();
   }, 50);
 
   $scope.changeLanguage = function() {

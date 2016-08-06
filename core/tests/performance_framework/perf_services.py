@@ -240,8 +240,11 @@ class SeleniumPerformanceDataFetcher(object):
             chrome_options = webdriver.ChromeOptions()
             # Disable several subsystems which run network requests in the
             # background. This helps reduce noise when measuring network
-            # performance.
+            # performance. Also, disable prerendering by chrome which renders
+            # a page in the background leading to wrong test results.
             chrome_options.add_argument("--disable-background-networking")
+            chrome_options.add_argument("--prerender=disabled")
+            chrome_options.add_argument("--prerender-from-omnibox=disabled")
 
             if use_proxy:
                 proxy_url = urlparse.urlparse(proxy.proxy).path

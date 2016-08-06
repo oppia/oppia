@@ -108,11 +108,18 @@ BAD_PATTERNS_JS = {
             'core/templates/dev/head/expressions/typeParserSpec.js')}
 }
 
+BAD_PATTERNS_APP_YAML = {
+    'MINIFICATION: true': {
+        'message': 'Please set the MINIFICATION env variable in app.yaml'
+                   'to False before committing.',
+        'excluded_files': ()}
+}
+
 EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
     'scripts/pre_commit_linter.py', 'integrations/*',
     'integrations_dev/*', '*.svg', '*.png', '*.zip', '*.ico', '*.jpg',
-    '*.min.js')
+    '*.min.js', 'assets/scripts/*')
 
 if not os.getcwd().endswith('oppia'):
     print ''
@@ -458,6 +465,14 @@ def _check_bad_patterns(all_files):
                                 filename,
                                 BAD_PATTERNS_JS[pattern]['message'])
                             total_error_count += 1
+            if filename == 'app.yaml':
+                for pattern in BAD_PATTERNS_APP_YAML:
+                    if pattern in content:
+                        failed = True
+                        print '%s --> %s' % (
+                            filename,
+                            BAD_PATTERNS_APP_YAML[pattern]['message'])
+                        total_error_count += 1
     if failed:
         summary_message = '%s   Pattern checks failed' % _MESSAGE_TYPE_FAILED
         summary_messages.append(summary_message)
