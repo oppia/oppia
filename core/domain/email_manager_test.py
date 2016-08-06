@@ -109,7 +109,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             'editor invited you to collaborate on Oppia.org')
 
         self.can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
+            feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_editor_role_email_ctx = self.swap(
             feconf, 'CAN_SEND_EDITOR_ROLE_EMAILS', True)
 
@@ -400,7 +400,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
             '<a href="https://www.site.com/prefs">Preferences page</a>.')
 
     def test_email_not_sent_if_config_does_not_permit_it(self):
-        with self.swap(feconf, 'CAN_SEND_EMAILS_TO_USERS', False):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', False):
             config_services.set_property(
                 self.admin_id, email_manager.EMAIL_FOOTER.name,
                 self.new_footer)
@@ -423,7 +423,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
 
     def test_email_not_sent_if_content_config_is_not_modified(self):
         can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
+            feconf, 'CAN_SEND_EMAILS', True)
 
         logged_errors = []
 
@@ -461,7 +461,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
 
     def test_email_not_sent_if_content_config_is_partially_modified(self):
         can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
+            feconf, 'CAN_SEND_EMAILS', True)
 
         config_services.set_property(
             self.admin_id, email_manager.SIGNUP_EMAIL_CONTENT.name, {
@@ -507,7 +507,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
 
     def test_email_with_bad_content_is_not_sent(self):
         can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
+            feconf, 'CAN_SEND_EMAILS', True)
 
         config_services.set_property(
             self.admin_id, email_manager.SIGNUP_EMAIL_CONTENT.name, {
@@ -547,7 +547,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
             self.assertEqual(0, len(messages))
 
     def test_contents_of_signup_email_are_correct(self):
-        with self.swap(feconf, 'CAN_SEND_EMAILS_TO_USERS', True):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             config_services.set_property(
                 self.admin_id, email_manager.EMAIL_FOOTER.name,
                 self.new_footer)
@@ -582,7 +582,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
                 messages[0].html.decode(), self.expected_html_email_content)
 
     def test_email_only_sent_once_for_repeated_signups_by_same_user(self):
-        with self.swap(feconf, 'CAN_SEND_EMAILS_TO_USERS', True):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             config_services.set_property(
                 self.admin_id, email_manager.EMAIL_FOOTER.name,
                 self.new_footer)
@@ -614,7 +614,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
             self.assertEqual(1, len(messages))
 
     def test_email_only_sent_if_signup_was_successful(self):
-        with self.swap(feconf, 'CAN_SEND_EMAILS_TO_USERS', True):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             config_services.set_property(
                 self.admin_id, email_manager.EMAIL_FOOTER.name,
                 self.new_footer)
@@ -651,7 +651,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
             self.assertEqual(1, len(messages))
 
     def test_record_of_sent_email_is_written_to_datastore(self):
-        with self.swap(feconf, 'CAN_SEND_EMAILS_TO_USERS', True):
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             config_services.set_property(
                 self.admin_id, email_manager.EMAIL_FOOTER.name,
                 self.new_footer)
@@ -739,7 +739,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
 
     def test_send_email_does_not_resend_if_same_hash_exists(self):
         can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
+            feconf, 'CAN_SEND_EMAILS', True)
 
         duplicate_email_ctx = self.swap(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 1000)
@@ -790,7 +790,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
 
     def test_send_email_does_not_resend_within_duplicate_interval(self):
         can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
+            feconf, 'CAN_SEND_EMAILS', True)
 
         duplicate_email_ctx = self.swap(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2)
@@ -852,7 +852,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
     def test_sending_email_with_different_recipient_but_same_hash(self):
         """Hash for both messages is same but recipients are different"""
         can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
+            feconf, 'CAN_SEND_EMAILS', True)
 
         duplicate_email_ctx = self.swap(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2)
@@ -904,7 +904,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
     def test_sending_email_with_different_subject_but_same_hash(self):
         """Hash for both messages is same but subjects are different"""
         can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
+            feconf, 'CAN_SEND_EMAILS', True)
 
         duplicate_email_ctx = self.swap(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2)
@@ -956,7 +956,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
     def test_sending_email_with_different_body_but_same_hash(self):
         """Hash for both messages is same but body is different"""
         can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
+            feconf, 'CAN_SEND_EMAILS', True)
 
         duplicate_email_ctx = self.swap(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2)
@@ -1007,7 +1007,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
 
     def test_duplicate_emails_are_sent_after_some_time_has_elapsed(self):
         can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
+            feconf, 'CAN_SEND_EMAILS', True)
 
         duplicate_email_ctx = self.swap(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2)
@@ -1085,7 +1085,7 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
         self.expected_email_subject = 'New messages on Oppia.'
 
         self.can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
+            feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
 
@@ -1176,7 +1176,7 @@ class SuggestionEmailTest(test_utils.GenericTestBase):
         self.recipient_list = [self.editor_id]
 
         self.can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
+            feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
 

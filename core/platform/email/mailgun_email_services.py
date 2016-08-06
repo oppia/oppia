@@ -20,8 +20,6 @@ import requests
 from core import counters
 import feconf
 
-from google.appengine.api import app_identity
-
 MAILGUN_PUBLIC_DOMAIN_URL = "https://api.mailgun.net/v3/address/validate"
 MAILGUN_PUBLIC_API_KEY = "pubkey-5ogiflzbnjrljiky49qxsiozqef5jxp7"
 def is_email_valid(email):
@@ -32,6 +30,7 @@ def is_email_valid(email):
             MAILGUN_PUBLIC_DOMAIN_URL, auth=("api", MAILGUN_PUBLIC_API_KEY),
             params={"address": email}))
     return response.json()['is_valid']
+
 
 def send_mail(
         sender_email, recipient_email, subject, plaintext_body,
@@ -70,26 +69,7 @@ def send_mail(
     mailgun_domain_name = (
         'https://api.mailgun.net/v3/%s/messages' % feconf.MAILGUN_DOMAIN_NAME)
 
-    if recipient_email == feconf.ADMIN_EMAIL_ADDRESS:
-        if feconf.CAN_SEND_EMAILS_TO_ADMIN:
-            if not is_email_valid(recipient_email):
-                raise ValueError(
-                    'Malformed admin email address: %s' % recipient_email)
-
-            app_id = app_identity.get_application_id()
-            body = '(Sent from %s)\n\n%s' % (app_id, plaintext_body)
-
-            requests.post(
-                mailgun_domain_name, auth=('api', feconf.MAILGUN_API_KEY),
-                data={
-                    'from': sender_email,
-                    'to': recipient_email,
-                    'subject': subject,
-                    'text': body})
-            counters.EMAILS_SENT.inc()
-        return
-
-    if not feconf.CAN_SEND_EMAILS_TO_USERS:
+    if not feconf.CAN_SEND_EMAILS:
         raise Exception('This app cannot send emails to users.')
 
     if not is_email_valid(sender_email):

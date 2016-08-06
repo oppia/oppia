@@ -16,7 +16,7 @@
 
 """Tests for the GAE mail API wrapper."""
 
-from core.platform.email import gae_email_services
+from core.platform.email import mailgun_email_services
 from core.tests import test_utils
 import feconf
 
@@ -26,22 +26,28 @@ class EmailTests(test_utils.GenericTestBase):
 
     def test_sending_email_to_admin(self):
         # Emails are not sent if the CAN_SEND_EMAILS setting is not turned on.
-        with self.swap(feconf, 'CAN_SEND_EMAILS', False):
-            gae_email_services.send_mail(
+        # mailgun api key and domain name are required to use API.
+        can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        mailgun_api_exception = (
+            self.assertRaisesRegexp(
+                Exception, 'Mailgun API key is not available.'))
+        with can_send_emails, mailgun_api_exception:
+            mailgun_email_services.send_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
-                'subject', 'body', None, bcc_admin=False)
+                'subject', 'body', 'html', bcc_admin=False)
             messages = self.mail_stub.get_sent_messages(
                 to=feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(0, len(messages))
 
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            gae_email_services.send_mail(
+        can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        mailgun_api = self.swap(feconf, 'MAILGUN_API_KEY', 'api')
+        mailgun_domain_name_exception = (
+            self.assertRaisesRegexp(
+                Exception, 'Mailgun domain name is not set.'))
+        with can_send_emails, mailgun_api, mailgun_domain_name_exception:
+            mailgun_email_services.send_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
-                'subject', 'body', None, bcc_admin=False)
+                'subject', 'body', 'html', bcc_admin=False)
             messages = self.mail_stub.get_sent_messages(
                 to=feconf.ADMIN_EMAIL_ADDRESS)
-            self.assertEqual(1, len(messages))
-            self.assertEqual(feconf.ADMIN_EMAIL_ADDRESS, messages[0].to)
-            self.assertIn(
-                '(Sent from %s)' % self.EXPECTED_TEST_APP_ID,
-                messages[0].body.decode())
+            self.assertEqual(0, len(messages))

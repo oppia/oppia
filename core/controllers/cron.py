@@ -25,7 +25,6 @@ from core.domain import email_manager
 from core.platform import models
 import utils
 
-email_services = models.Registry.import_email_services()
 (job_models,) = models.Registry.import_models([models.NAMES.job])
 
 # The default retention time is 2 days.

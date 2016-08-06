@@ -119,7 +119,7 @@ def create_message(
     thread.put()
 
     if (user_services.is_user_registered(author_id) and len(text) > 0 and
-            feconf.CAN_SEND_EMAILS_TO_USERS and
+            feconf.CAN_SEND_EMAILS and
             feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS):
             # send feedback message email if user is registered.
         add_message_to_email_buffer(

@@ -19,7 +19,6 @@
 from core import counters
 import feconf
 
-from google.appengine.api import app_identity
 from google.appengine.api import mail
 
 def send_mail(
@@ -47,23 +46,8 @@ def send_mail(
         to App Engine.
       (and possibly other exceptions, due to mail.send_mail() failures)
     """
-    if recipient_email == feconf.ADMIN_EMAIL_ADDRESS:
-        if feconf.CAN_SEND_EMAILS_TO_ADMIN:
-            if not mail.is_email_valid(recipient_email):
-                raise ValueError(
-                    'Malformed admin email address: %s' % recipient_email)
-
-            app_id = app_identity.get_application_id()
-            body = '(Sent from %s)\n\n%s' % (app_id, plaintext_body)
-
-            mail.send_mail(
-                feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
-                subject, body)
-            counters.EMAILS_SENT.inc()
-        return
-
-    if not feconf.CAN_SEND_EMAILS_TO_USERS:
-        raise Exception('This app cannot send emails to users.')
+    if not feconf.CAN_SEND_EMAILS:
+        raise Exception('This app cannot send emails.')
 
     if not mail.is_email_valid(sender_email):
         raise ValueError(
