@@ -1,6 +1,6 @@
 {
   "I18N_ABOUT_PAGE_TITLE": "Title of the About page that explains Oppia mission and the Oppia foundation.",
-  "I18N_ACTION_APPLY_TO_TEACH_WITH_OPPIA": "Text displayed in a button on the Teach page. - When the user clicks the button they are taken to a form that allows them to apply to the 'Teach with Oppia' program.",
+  "I18N_ACTION_APPLY_TO_TEACH_WITH_OPPIA": "Text displayed in a button on the Teach page. - When the user clicks the button they are taken to a form that allows them to apply to the 'Teach with Oppia' program. The 'Teach with Oppia' text should be in English.",
   "I18N_ACTION_BROWSE_EXPLORATIONS": "Text displayed in a button on the Home and Teach pages. - When the user clicks the button they are taken to the library page.",
   "I18N_ACTION_BROWSE_LESSONS": "Text displayed in a button on the Home page. - When the user clicks the button they are taken to the library page.",
   "I18N_ACTION_CREATE_EXPLORATION": "Text displayed in a button on the Home and Teach pages. - When the user clicks the button they are taken to their dashboard, and a dialog is opened where the user can create a new exploration.",
