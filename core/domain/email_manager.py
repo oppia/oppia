@@ -26,9 +26,8 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 
-from google.appengine.api import app_identity
-
 (email_models,) = models.Registry.import_models([models.NAMES.email])
+app_identity_services = models.import_app_identity_services()
 email_services = models.Registry.import_email_services()
 transaction_services = models.Registry.import_transaction_services()
 
@@ -206,7 +205,7 @@ def _send_email(
 
 def send_mail_to_admin(email_subject, email_body):
     """Sends email to admin."""
-    app_id = app_identity.get_application_id()
+    app_id = app_identity_services.get_application_id()
     body = '(Sent from %s)\n\n%s' % (app_id, email_body)
 
     email_services.send_mail(
