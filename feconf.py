@@ -692,6 +692,7 @@ SUPPORTED_SITE_LANGUAGES = {
     'id': 'Bahasa Indonesia',
     'pt': 'Português',
     'vi': 'Tiếng Việt',
+    'hi': 'हिन्दी',
 }
 SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 SYSTEM_USER_IDS = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
