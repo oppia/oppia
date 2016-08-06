@@ -63,13 +63,14 @@ def process_js(source_path, target_path):
     _minify(source_path, target_path)
 
 
-def process_third_party_libs():
+def build_minified_third_party_libs(output_directory):
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
     node_path = os.path.join(
         parent_dir, 'oppia_tools', 'node-4.2.1', 'bin', 'node')
     gulp_path = os.path.join(
         parent_dir, 'node_modules', 'gulp', 'bin', 'gulp.js')
-    gulp_build_cmd = [node_path, gulp_path, 'build', '--minify=True']
+    gulp_build_cmd = [node_path, gulp_path, 'build', '--minify=True',
+                      '--output_directory=%s' % output_directory]
     proc = subprocess.Popen(
         gulp_build_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     gulp_stdout, gulp_stderr = proc.communicate()
@@ -108,7 +109,6 @@ def copy_files_source_to_target(source, target):
 def _build_files():
     ensure_directory_exists(OUT_DIR)
     shutil.rmtree(OUT_DIR)
-    process_third_party_libs()
 
     for root, dirs, files in os.walk(os.path.join(os.getcwd(), HEAD_DIR)):
         for directory in dirs:
@@ -146,14 +146,11 @@ if __name__ == '__main__':
     ASSETS_OUT_DIR = os.path.join(BUILD_DIR, 'assets', '')
     copy_files_source_to_target(ASSETS_SRC_DIR, ASSETS_OUT_DIR)
 
-    # Process third_party/generated/prod, copy it to
+    # Process third_party resources, copy it to
     # build/[cache_slug]/third_party/generated
-    THIRD_PARTY_GENERATED_SRC_DIR = os.path.join(
-        'third_party', 'generated', 'prod', '')
     THIRD_PARTY_GENERATED_OUT_DIR = os.path.join(
-        BUILD_DIR, 'third_party', 'generated', '')
-    copy_files_source_to_target(
-        THIRD_PARTY_GENERATED_SRC_DIR, THIRD_PARTY_GENERATED_OUT_DIR)
+        BUILD_DIR, 'third_party', 'generated')
+    build_minified_third_party_libs(THIRD_PARTY_GENERATED_OUT_DIR)
 
     # Process extensions, copy it to build/[cache_slug]/extensions
     EXTENSIONS_SRC_DIR = os.path.join('extensions', '')

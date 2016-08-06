@@ -1,9 +1,5 @@
 {% extends "base.html" %}
 
-{% block prerender %}
-  <link rel="prerender" href="/library">
-{% endblock prerender %}
-
 {% block maintitle %}
   I18N_SPLASH_PAGE_TITLE
 {% endblock maintitle %}
@@ -123,7 +119,7 @@
         <img ng-src="<[getStaticSubjectImageUrl('Chess')]>" class="oppia-splash-background-icon">
       </div>
       <div class="oppia-splash-h2-container">
-        <h2 class="oppia-splash-h2" translate="I18N_SPLASH_SUBTITLE"></h2>
+        <h2 class="oppia-splash-h2" translate="I18N_SPLASH_SUBTITLE_ALTERNATE"></h2>
       </div>
     </div>
 
@@ -131,7 +127,7 @@
       <div>
         <button type="button" ng-click="onClickBrowseLibraryButton()"
                 class="btn oppia-splash-button oppia-splash-button-browse oppia-transition-200"
-                translate="I18N_ACTION_BROWSE_EXPLORATIONS">
+                translate="I18N_ACTION_BROWSE_LESSONS">
         </button>
 
         {% if not user_is_logged_in %}
@@ -139,20 +135,20 @@
           <button type="button"
                   ng-click="onRedirectToLogin('/dashboard?mode=create')"
                   class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200"
-                  translate="I18N_ACTION_CREATE_EXPLORATION">
+                  translate="I18N_ACTION_CREATE_LESSON">
           </button>
         {% else %}
           <button type="button"
                   ng-click="onClickCreateExplorationButton()"
                   class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200"
-                  translate="I18N_ACTION_CREATE_EXPLORATION">
+                  translate="I18N_ACTION_CREATE_LESSON">
           </button>
         {% endif %}
 
         <button type="button"
                 ng-click="onRedirectToLogin('/dashboard?mode=create')"
                 class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200"
-                translate="I18N_ACTION_CREATE_EXPLORATION">
+                translate="I18N_ACTION_CREATE_LESSON">
         </button>
       </div>
 
@@ -162,7 +158,7 @@
             <img ng-src="<[getStaticImageUrl('/splash/bullet1icon.svg')]>">
           </div>
           <div class="oppia-splash-bullet-block oppia-splash-block-right-text"
-               translate="I18N_SPLASH_FIRST_EXPLORATION_DESCRIPTION">
+               translate="I18N_SPLASH_FIRST_EXPLORATION_DESCRIPTION_ALTERNATE">
           </div>
         </div>
 

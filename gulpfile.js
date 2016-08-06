@@ -24,16 +24,21 @@ var argv = yargs
   .command('build', 'generate optimimized third party library for production',
     function(yargs) {
       argv = yargs
-        .usage('Usage: $0 build [--minify]')
+        .usage('Usage: $0 build [--minify] [--output_directory]')
         .option('minify', {
           describe: 'Whether to minify third-party dependencies'
-        }).argv;
+        })
+        .option('output_directory', {
+          describe: 'A path to the directory where the files will be generated'
+        })
+        .argv;
     })
   .command('start_devserver', 'start GAE development server',
     function(yargs) {
       argv = yargs
         .usage('Usage: $0 start_devserver [--gae_devserver_path]' +
-         '[--clear_datastore] [--enable_sendmail] [--use_minification]')
+         '[--clear_datastore] [--enable_sendmail] [--use_minification]' +
+         '[--prod_env]')
         .option('gae_devserver_path', {
           describe: 'A path to app engine'
         })
@@ -45,6 +50,9 @@ var argv = yargs
         })
         .option('use_minification', {
           describe: 'Whether to build with minification'
+        })
+        .option('prod_env', {
+          describe: 'Whether to run server in prod mode'
         })
         .demand(['gae_devserver_path'])
         .argv;
@@ -107,16 +115,20 @@ var jsFilePaths = [];
 var fontFolderPaths = [];
 var cssBackgroundFilepaths = [];
 
-// In non-dev mode, we move all files inside 'third_party/generated' to
-// 'build/{{cache_slug}}/third_party/generated/' and serve it from there.
-// And, for dev mode without minification, we generate the files inside
-// 'third_party/generated/' and serve it from there. These files are generated
-// directly inside 'third_party/generated/' since we need to keep urls
-// compatible across both dev and prod modes. This compatibility is achieved by
-// only interpolating the prefix for urls to these files.
-var generatedTargetDir = path.join(
-  'third_party', 'generated',
-  isMinificationNeeded ? 'prod' : '');
+// TODO(gvishal): Issue: https://github.com/oppia/oppia/issues/2324
+// This code needs refactoring, reasons for which are documented in the above
+// issue. The issue also contains a complete description of the build process
+// for clarity.
+
+// If output_directory argument is specified we generate files there, otherwise
+// we generate files in /third_party/generated.
+// In non-dev mode (prod mode), we serve files from a separate build directory
+// specified by the output_directory argument.
+// And for dev mode without minification, we do it from /third_party/generated.
+var generatedTargetDir = path.join('third_party', 'generated');
+if ('output_directory' in argv && argv.output_directory !== undefined) {
+  generatedTargetDir = argv.output_directory;
+}
 var generatedCssTargetDir = path.join(generatedTargetDir, 'css');
 var generatedJsTargetDir = path.join(generatedTargetDir, 'js');
 
@@ -223,4 +235,9 @@ gulp.task('watch', function() {
 // This task starts google app engine development server.
 // TODO(Barnabas Makonda): check if files are already generated and if so
 // do not build.
-gulp.task('start_devserver', ['build', 'gulpStartGae', 'watch']);
+var isProdMode = argv.prod_env === 'True';
+if (isProdMode) {
+  gulp.task('start_devserver', ['gulpStartGae', 'watch']);
+} else {
+  gulp.task('start_devserver', ['build', 'gulpStartGae', 'watch']);
+}
