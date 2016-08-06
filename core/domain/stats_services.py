@@ -53,18 +53,18 @@ def get_exps_unresolved_answers_for_default_rule(exp_ids):
             'count': 10 (number of unresolved answers for this exploration),
             'unresolved_answers': (list of unresolved answers sorted by count)
               [
-                {'count': 4, value: 'answer_1'},
-                {'count': 2, value: 'answer_2'},
-                {'count': 1, value: 'answer_3'}
+                {'count': 4, 'value': 'answer_1', 'state': 'Introduction'},
+                {'count': 2, 'value': 'answer_2', 'state': 'Introduction'},
+                {'count': 1, 'value': 'answer_3', 'state': 'End'}
               ]
           },
           'exp_id_2': {
             'count': 20,
             'unresolved_answers':
               [
-                {'count': 8, value: 'answer_4'},
-                {'count': 3, value: 'answer_5'},
-                {'count': 1, value: 'answer_6'}
+                {'count': 8, 'value': 'answer_5', 'state': 'Introduction'},
+                {'count': 3, 'value': 'answer_4', 'state': 'Quest'},
+                {'count': 1, 'value': 'answer_6', 'state': 'End'}
               ]
           }
         }
@@ -98,10 +98,12 @@ def get_exps_unresolved_answers_for_default_rule(exp_ids):
                 'count': 0,
                 'unresolved_answers': []
             }
-            exps_answers_mapping[exp_id]['unresolved_answers'].extend(
-                statewise_answers)
         for answer in statewise_answers:
             exps_answers_mapping[exp_id]['count'] += answer['count']
+            answer['state'] = explorations_states_tuples[ind][1]
+
+        exps_answers_mapping[exp_id]['unresolved_answers'].extend(
+            statewise_answers)
 
     for exp_id in exps_answers_mapping:
         exps_answers_mapping[exp_id]['unresolved_answers'] = (sorted(
