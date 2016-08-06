@@ -247,11 +247,16 @@ oppia.animation('.conversation-skin-animate-card-contents', function() {
   };
 });
 
-oppia.directive('conversationSkin', [function() {
+oppia.directive('conversationSkin', ['urlService', function(urlService) {
   return {
     restrict: 'E',
     scope: {},
-    templateUrl: 'skins/Conversation',
+    link: function(scope) {
+      var isIframed = urlService.isIframed();
+      scope.directiveTemplateId = isIframed ?
+        'skins/ConversationEmbed' : 'skins/Conversation';
+    },
+    template: '<div ng-include="directiveTemplateId"></div>',
     controller: [
       '$scope', '$timeout', '$rootScope', '$window', '$translate',
        'messengerService', 'oppiaPlayerService', 'urlService', 'focusService',
@@ -351,6 +356,10 @@ oppia.directive('conversationSkin', [function() {
               callback();
             }
           }, 100);
+        };
+
+        $scope.reloadExploration = function() {
+          $window.location.reload();
         };
 
         $scope.isOnTerminalCard = function() {

@@ -75,10 +75,8 @@
 
 {% block content %}
   <conversation-skin></conversation-skin>
-
-  <br><br><br>
-
   {% if not iframed %}
+    <br><br><br>
     {% include 'attribution_guide.html' %}
   {% endif %}
 
@@ -90,6 +88,7 @@
 
   {% include 'player/answer_feedback_pair_directive.html' %}
   {% include 'player/conversation_skin_directive.html' %}
+  {% include 'player/conversation_skin_embed_directive.html' %}
   {% include 'player/feedback_popup_directive.html' %}
   {% include 'player/information_card_modal.html' %}
   {% include 'player/progress_dots_directive.html' %}
