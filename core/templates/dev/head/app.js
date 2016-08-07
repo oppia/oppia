@@ -601,19 +601,31 @@ oppia.factory('codeNormalizationService', [function() {
         if (i < str.length) {
           answer += str[i];
         }
-      } else if (str[i] === '\'') {
-        inSingleQuotedString = !inSingleQuotedString;
-        answer += str[i];
-      } else if (str[i] === '"') {
-        inDoubleQuotedString = !inDoubleQuotedString;
-        answer += str[i];
-      } else {
-        if (inSingleQuotedString || inDoubleQuotedString) {
-          answer += str[i].toLowerCase();
-        } else {
-          answer += str[i];
+      } else if (inSingleQuotedString) {
+        answer += str[i].toLowerCase();
+        if (str[i] === '\'') {
+          inSingleQuotedString = false;
         }
+      } else if (inDoubleQuotedString) {
+        answer += str[i].toLowerCase();
+        if (str[i] === '"') {
+          inDoubleQuotedString = false;
+        }
+      } else {
+        if (str[i] === '\'') {
+          inSingleQuotedString = true;
+        } else if (str[i] === '"') {
+          inDoubleQuotedString = true;
+        }
+
+        answer += str[i];
       }
+    }
+
+    // If the string is invalid (with regards to quotation marks), just return
+    // it without normalization.
+    if (inSingleQuotedString || inDoubleQuotedString) {
+      answer = str;
     }
 
     return answer;

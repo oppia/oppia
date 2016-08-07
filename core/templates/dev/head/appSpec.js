@@ -242,12 +242,18 @@ describe('Code Normalization', function() {
       'abcdefg\n' +
       '    ABcDe \'HiJkL\'\n' +
       '    "HiJkL    MNopq  " ABcDe\n' +
-      '    "AbC@\\"DeF7"  GhI# \'JkL-\\\'MnO3\''
+      '    "AbC@\\"DeF7"  GhI# \'JkL-\\\'MnO3\'\n' +
+      '    \'not a real string\n' +
+      '    """another unreal string\n' +
+      '    \'a legit " STRING\' now outsiDe string'
     )).toBe(
       'abcdefg\n' +
       '    ABcDe \'hijkl\'\n' +
       '    "hijkl mnopq " ABcDe\n' +
-      '    "abc@\\"def7" GhI# \'jkl-\\\'mno3\''
+      '    "abc@\\"def7" GhI# \'jkl-\\\'mno3\'\n' +
+      '    \'not a real string\n' +
+      '    """another unreal string\n' +
+      '    \'a legit " string\' now outsiDe string'
     );
   });
 });
