@@ -188,10 +188,15 @@ oppia.controller('StateInteraction', [
             '$scope', '$modalInstance', 'stateInteractionIdService',
             'stateCustomizationArgsService', 'interactionDetailsCache',
             'INTERACTION_SPECS', 'UrlInterpolationService',
+            'editorFirstTimeEventsService',
             function(
                 $scope, $modalInstance, stateInteractionIdService,
                 stateCustomizationArgsService, interactionDetailsCache,
-                INTERACTION_SPECS, UrlInterpolationService) {
+                INTERACTION_SPECS, UrlInterpolationService,
+                editorFirstTimeEventsService) {
+              editorFirstTimeEventsService
+                .registerFirstClickAddInteractionEvent();
+
               // This binds the services to the HTML template, so that their
               // displayed values can be used in the HTML.
               $scope.stateInteractionIdService = stateInteractionIdService;
@@ -236,6 +241,9 @@ oppia.controller('StateInteraction', [
               }
 
               $scope.onChangeInteractionId = function(newInteractionId) {
+                editorFirstTimeEventsService
+                  .registerFirstSelectInteractionTypeEvent();
+
                 var interactionSpec = INTERACTION_SPECS[newInteractionId];
                 $scope.customizationArgSpecs = (
                   interactionSpec.customization_arg_specs);
@@ -268,6 +276,8 @@ oppia.controller('StateInteraction', [
               };
 
               $scope.save = function() {
+                editorFirstTimeEventsService
+                  .registerFirstSaveInteractionEvent();
                 $modalInstance.close();
               };
 

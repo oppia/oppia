@@ -35,7 +35,8 @@ oppia.controller('ExplorationEditor', [
   'explorationParamSpecsService', 'explorationParamChangesService',
   'explorationWarningsService', '$templateCache', 'explorationContextService',
   'explorationAdvancedFeaturesService', '$modal', 'changeListService',
-  'autosaveInfoModalsService',
+  'autosaveInfoModalsService', 'siteAnalyticsService',
+  'editorFirstTimeEventsService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
       explorationData, editorContextService, explorationTitleService,
@@ -47,7 +48,8 @@ oppia.controller('ExplorationEditor', [
       explorationParamSpecsService, explorationParamChangesService,
       explorationWarningsService, $templateCache, explorationContextService,
       explorationAdvancedFeaturesService, $modal, changeListService,
-      autosaveInfoModalsService) {
+      autosaveInfoModalsService, siteAnalyticsService,
+      editorFirstTimeEventsService) {
     $scope.editabilityService = editabilityService;
     $scope.editorContextService = editorContextService;
 
@@ -185,6 +187,8 @@ oppia.controller('ExplorationEditor', [
       $scope.initExplorationPage(successCallback);
     });
 
+    editorFirstTimeEventsService.initRegisterEvents($scope.explorationId);
+
     var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
     var _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
     var _ID_TUTORIAL_PREVIEW_TAB = '#tutorialPreviewTab';
@@ -321,11 +325,21 @@ oppia.controller('ExplorationEditor', [
       /\{\{/g, '<[').replace(/\}\}/g, ']>');
     $templateCache.put('ng-joyride-title-tplv1.html', ngJoyrideTemplate);
 
-    $scope.onLeaveTutorial = function() {
+    var leaveTutorial = function() {
       editabilityService.onEndTutorial();
       $scope.$apply();
       stateEditorTutorialFirstTimeService.markTutorialFinished();
       $scope.tutorialInProgress = false;
+    };
+
+    $scope.onSkipTutorial = function() {
+      siteAnalyticsService.registerSkipTutorialEvent($scope.explorationId);
+      leaveTutorial();
+    };
+
+    $scope.onFinishTutorial = function() {
+      siteAnalyticsService.registerFinishTutorialEvent($scope.explorationId);
+      leaveTutorial();
     };
 
     $scope.tutorialInProgress = false;
@@ -346,10 +360,22 @@ oppia.controller('ExplorationEditor', [
         backdrop: true,
         controller: [
           '$scope', '$modalInstance', 'UrlInterpolationService',
-          function($scope, $modalInstance, UrlInterpolationService) {
-            $scope.beginTutorial = $modalInstance.close;
+          'siteAnalyticsService', 'explorationContextService',
+          function($scope, $modalInstance, UrlInterpolationService,
+              siteAnalyticsService, explorationContextService) {
+            var explorationId = explorationContextService.getExplorationId();
+
+            siteAnalyticsService.registerTutorialModalOpenEvent(explorationId);
+
+            $scope.beginTutorial = function() {
+              siteAnalyticsService.registerAcceptTutorialModalEvent(
+                explorationId);
+              $modalInstance.close();
+            };
 
             $scope.cancel = function() {
+              siteAnalyticsService.registerDeclineTutorialModalEvent(
+                explorationId);
               $modalInstance.dismiss('cancel');
             };
 
@@ -378,12 +404,14 @@ oppia.controller('EditorNavigation', [
   '$scope', '$rootScope', '$timeout', '$modal', 'routerService',
   'explorationRightsService', 'explorationWarningsService',
   'stateEditorTutorialFirstTimeService',
-  'threadDataService',
+  'threadDataService', 'siteAnalyticsService',
+  'explorationContextService',
   function(
     $scope, $rootScope, $timeout, $modal, routerService,
     explorationRightsService, explorationWarningsService,
     stateEditorTutorialFirstTimeService,
-    threadDataService) {
+    threadDataService, siteAnalyticsService,
+    explorationContextService) {
     $scope.postTutorialHelpPopoverIsShown = false;
 
     $scope.$on('openPostTutorialHelpPopover', function() {
@@ -401,14 +429,27 @@ oppia.controller('EditorNavigation', [
     };
 
     $scope.showUserHelpModal = function() {
+      var explorationId = explorationContextService.getExplorationId();
+      siteAnalyticsService.registerClickHelpButtonEvent(explorationId);
       var modalInstance = $modal.open({
         templateUrl: 'modals/userHelp',
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', function($scope, $modalInstance) {
-            $scope.beginTutorial = $modalInstance.close;
+          '$scope', '$modalInstance',
+          'siteAnalyticsService', 'explorationContextService',
+          function(
+            $scope, $modalInstance,
+            siteAnalyticsService, explorationContextService) {
+            var explorationId = explorationContextService.getExplorationId();
+
+            $scope.beginTutorial = function() {
+              siteAnalyticsService.registerOpenTutorialFromHelpCenterEvent(
+                explorationId);
+              $modalInstance.close();
+            };
 
             $scope.goToHelpCenter = function() {
+              siteAnalyticsService.registerVisitHelpCenterEvent(explorationId);
               $modalInstance.dismiss('cancel');
             };
           }
@@ -597,6 +638,11 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
           explorationData.explorationId);
       } else {
         siteAnalyticsService.registerCommitChangesToPublicExplorationEvent(
+          explorationData.explorationId);
+      }
+
+      if (explorationWarningsService.countWarnings() === 0) {
+        siteAnalyticsService.registerSavePlayableExplorationEvent(
           explorationData.explorationId);
       }
 
