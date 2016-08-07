@@ -97,9 +97,7 @@ oppia.controller('StateEditor', [
 
     $scope.openStateContentEditor = function() {
       if (editabilityService.isEditable()) {
-        if ($scope.isCurrentStateInitialState()) {
-          editorFirstTimeEventsService.registerFirstOpenContentBoxEvent();
-        }
+        editorFirstTimeEventsService.registerFirstOpenContentBoxEvent();
         $scope.contentEditorIsOpen = true;
       }
     };
@@ -111,9 +109,7 @@ oppia.controller('StateEditor', [
     };
 
     $scope.onSaveContentButtonClicked = function() {
-      if ($scope.isCurrentStateInitialState()) {
-        editorFirstTimeEventsService.registerFirstSaveContentEvent();
-      }
+      editorFirstTimeEventsService.registerFirstSaveContentEvent();
       $scope.saveTextContent();
       // Show the interaction when the text content is saved, even if no content
       // is entered.
