@@ -585,6 +585,51 @@ oppia.factory('codeNormalizationService', [function() {
   var removeTrailingWhitespace = function(str) {
     return str.replace(/\s+$/g, '');
   };
+  var removeIntermediateWhitespace = function(str) {
+    return str.replace(/\s+/g, ' ');
+  };
+  var normalizeCaseInStrings = function(str) {
+    // Note that this only takes into account single-line strings. It also
+    // tries to properly account for escaped characters.
+    var inSingleQuotedString = false;
+    var inDoubleQuotedString = false;
+    var answer = '';
+    for (var i = 0; i < str.length; i++) {
+      if (str[i] === '\\') {
+        answer += str[i];
+        i++;
+        if (i < str.length) {
+          answer += str[i];
+        }
+      } else if (inSingleQuotedString) {
+        answer += str[i].toLowerCase();
+        if (str[i] === '\'') {
+          inSingleQuotedString = false;
+        }
+      } else if (inDoubleQuotedString) {
+        answer += str[i].toLowerCase();
+        if (str[i] === '"') {
+          inDoubleQuotedString = false;
+        }
+      } else {
+        if (str[i] === '\'') {
+          inSingleQuotedString = true;
+        } else if (str[i] === '"') {
+          inDoubleQuotedString = true;
+        }
+
+        answer += str[i];
+      }
+    }
+
+    // If the string is invalid (with regards to quotation marks), just return
+    // it without normalization.
+    if (inSingleQuotedString || inDoubleQuotedString) {
+      answer = str;
+    }
+
+    return answer;
+  };
   return {
     getNormalizedCode: function(codeString) {
       /*
@@ -593,7 +638,9 @@ oppia.factory('codeNormalizationService', [function() {
        *
        * - Strips out lines that start with '#' (comments), possibly preceded by
        *     whitespace.
-       * - Trims trailing whitespace on each line.
+       * - Trims trailing whitespace on each line, and normalizes multiple
+       *     whitespace characters within a single line into one space
+       *     character.
        * - Removes blank newlines.
        * - Make the indentation level four spaces.
        */
@@ -653,7 +700,8 @@ oppia.factory('codeNormalizationService', [function() {
         for (var i = 0; i < numSpacesToDesiredIndentLevel[numSpaces]; i++) {
           normalizedLine += FOUR_SPACES;
         }
-        normalizedLine += removeLeadingWhitespace(line);
+        normalizedLine += normalizeCaseInStrings(removeIntermediateWhitespace(
+          removeLeadingWhitespace(line)));
         normalizedCodeLines.push(normalizedLine);
       });
       return normalizedCodeLines.join('\n');
