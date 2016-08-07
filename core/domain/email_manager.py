@@ -27,7 +27,7 @@ from core.platform import models
 import feconf
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
-app_identity_services = models.import_app_identity_services()
+app_identity_services = models.Registry.import_app_identity_services()
 email_services = models.Registry.import_email_services()
 transaction_services = models.Registry.import_transaction_services()
 

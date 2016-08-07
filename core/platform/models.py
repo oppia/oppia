@@ -143,6 +143,10 @@ class Registry(object):
         return cls._get().import_transaction_services()
 
     @classmethod
+    def import_app_identity_services(cls):
+        return cls._get().import_app_identity_services()
+
+    @classmethod
     def import_email_services(cls):
         return cls._get().import_email_services()
 
