@@ -665,9 +665,10 @@ oppia.controller('StateResponses', [
         backdrop: 'static',
         controller: [
           '$scope', '$modalInstance', 'responsesService',
-          'editorContextService',
+          'editorContextService', 'editorFirstTimeEventsService',
           function(
-              $scope, $modalInstance, responsesService, editorContextService) {
+              $scope, $modalInstance, responsesService,
+              editorContextService, editorFirstTimeEventsService) {
             $scope.feedbackEditorIsOpen = false;
             $scope.openFeedbackEditor = function() {
               $scope.feedbackEditorIsOpen = true;
@@ -708,6 +709,8 @@ oppia.controller('StateResponses', [
                   $scope.tmpOutcome.feedback[0] === '') {
                 $scope.tmpOutcome.feedback = [];
               }
+
+              editorFirstTimeEventsService.registerFirstSaveRuleEvent();
 
               // Close the modal and save it afterwards.
               $modalInstance.close({
