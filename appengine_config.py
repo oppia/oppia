@@ -79,6 +79,7 @@ THIRD_PARTY_LIBS = [
     os.path.join(ROOT_PATH, 'third_party', 'gae-pipeline-1.9.17.0'),
     os.path.join(ROOT_PATH, 'third_party', 'graphy-1.0.0'),
     os.path.join(ROOT_PATH, 'third_party', 'simplejson-3.7.1'),
+    os.path.join(ROOT_PATH, 'third_party', 'beautifulsoup4-4.5.1')
 ]
 
 # In the GAE production environment, numpy is automatically provided, and

@@ -19,6 +19,7 @@
 import logging
 import urlparse
 
+from bs4 import BeautifulSoup
 import bleach
 
 from core.domain import rte_component_registry
@@ -83,3 +84,45 @@ def clean(user_submitted_html):
 def strip_html_tags(html):
     """Strips all HTML markup from an HTML string."""
     return bleach.clean(html, tags=[], attributes={}, strip=True)
+
+def textangular_to_ckeditor(content):
+    # Wrapping div serves as a parent to everything else.
+    content = '<div>' + content + '</div>'
+    soup = BeautifulSoup(content, 'html.parser')
+
+    # Move block components out of <p>,<b>, and <i>
+    invalid_parents = ['p', 'b', 'i']
+    components_names = ['image', 'collapsible', 'tabs']
+    tag_names = ['oppia-noninteractive-' + component_name
+                 for component_name in components_names]
+    components = soup.find_all(tag_names)
+    for component in components:
+        while component.parent.name in invalid_parents:
+            parent_name = component.parent.name
+            previous_siblings = soup.new_tag(parent_name)
+            for prev_sibling in component.previous_siblings:
+                previous_siblings.append(prev_sibling)
+            next_siblings = soup.new_tag(parent_name)
+            for next_sibling in component.next_siblings:
+                next_siblings.append(next_sibling)
+            if previous_siblings.contents:
+                component.parent.insert_before(previous_siblings)
+            if next_siblings.contents:
+                component.parent.insert_after(next_siblings)
+            component.parent.replace_with(component)
+
+    # Bold tag conversion: 'b' -> 'strong'.
+    for bold in soup.find_all('b'):
+        bold.name = 'strong'
+
+    # Italic tag conversion: 'i' -> 'em'.
+    for italic in soup.find_all('i'):
+        italic.name = 'em'
+
+    # Replace all spans with whatever is inside them.
+    for span in soup.find_all('span'):
+        span.unwrap()
+
+    # Remove the wrapping div
+    soup.div.unwrap()
+    return soup.encode_contents(formatter='html')

@@ -8,6 +8,13 @@
         "rootDirPrefix": "bleach-",
         "targetDirPrefix": "bleach-"
       },
+      "BeautifulSoup": {
+        "version": "4.5.1",
+        "downloadFormat": "tar",
+        "url": "https://www.crummy.com/software/BeautifulSoup/bs4/download/4.5/beautifulsoup4-4.5.1.tar.gz",
+        "tarRootDirPrefix": "beautifulsoup4-",
+        "targetDirPrefix": "beautifulsoup4-"
+      },
       "gaeCloudStorage": {
         "version": "1.9.15.0",
         "downloadFormat": "tar",

@@ -2397,6 +2397,21 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v10_dict_to_v11_dict(cls, exploration_dict):
+        exploration_dict['schema_version'] = 11
+        states = exploration_dict['states']
+        for state_key in states:
+            state = states[state_key]
+            state['content'][0]['value'] = html_cleaner.textangular_to_ckeditor(
+                state['content'][0]['value'])
+            if 'choices' in state['interaction']['customization_args']:
+                choices = state['interaction']['customization_args']['choices']
+                choices['value'] = map(
+                    html_cleaner.textangular_to_ckeditor,
+                    choices['value'])
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         try:
@@ -2460,6 +2475,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v9_dict_to_v10_dict(
                 exploration_dict, title, category)
             exploration_schema_version = 10
+
+        if exploration_schema_version == 10:
+            exploration_dict = cls._convert_v10_dict_to_v11_dict(
+                exploration_dict)
+            exploration_schema_version = 11
 
         return (exploration_dict, initial_schema_version)
 
