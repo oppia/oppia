@@ -360,14 +360,13 @@ oppia.controller('ExplorationEditor', [
           function($scope, $modalInstance, UrlInterpolationService,
               siteAnalyticsService, explorationContextService) {
             explorationId = explorationContextService.getExplorationId();
-            console.log(explorationId);
 
             siteAnalyticsService.registerTutorialModalOpenEvent(explorationId);
 
             $scope.beginTutorial = function() {
               siteAnalyticsService.registerAcceptTutorialModalEvent(
                 explorationId);
-              $modalInstance.close;
+              $modalInstance.close();
             };
 
             $scope.cancel = function() {
@@ -426,7 +425,7 @@ oppia.controller('EditorNavigation', [
     };
 
     $scope.showUserHelpModal = function() {
-      explorationId = explorationContextService.getExplorationId();
+      var explorationId = explorationContextService.getExplorationId();
       siteAnalyticsService.registerClickHelpButtonEvent(explorationId);
       var modalInstance = $modal.open({
         templateUrl: 'modals/userHelp',
@@ -437,12 +436,12 @@ oppia.controller('EditorNavigation', [
           function(
             $scope, $modalInstance,
             siteAnalyticsService, explorationContextService) {
-            explorationId = explorationContextService.getExplorationId();
+            var explorationId = explorationContextService.getExplorationId();
 
             $scope.beginTutorial = function() {
               siteAnalyticsService.registerOpenTutorialFromHelpCenterEvent(
                 explorationId);
-              $modalInstance.close;
+              $modalInstance.close();
             };
 
             $scope.goToHelpCenter = function() {
