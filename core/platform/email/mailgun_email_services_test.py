@@ -24,7 +24,7 @@ import feconf
 class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
 
-    def test_sending_email_to_admin(self):
+    def test_sending_email(self):
         # Emails are not sent if the CAN_SEND_EMAILS setting is not turned on.
         # mailgun api key and domain name are required to use API.
         can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)
@@ -35,9 +35,6 @@ class EmailTests(test_utils.GenericTestBase):
             mailgun_email_services.send_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html', bcc_admin=False)
-            messages = self.mail_stub.get_sent_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
-            self.assertEqual(0, len(messages))
 
         can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         mailgun_api = self.swap(feconf, 'MAILGUN_API_KEY', 'api')
@@ -48,6 +45,3 @@ class EmailTests(test_utils.GenericTestBase):
             mailgun_email_services.send_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html', bcc_admin=False)
-            messages = self.mail_stub.get_sent_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
-            self.assertEqual(0, len(messages))
