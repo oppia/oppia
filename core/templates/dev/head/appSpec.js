@@ -243,16 +243,16 @@ describe('Code Normalization', function() {
       '    ABcDe \'HiJkL\'\n' +
       '    "HiJkL    MNopq  " ABcDe\n' +
       '    "AbC@\\"DeF7"  GhI# \'JkL-\\\'MnO3\'\n' +
-      '    \'not a real string\n' +
-      '    """another unreal string\n' +
+      '    \'not a Real String\n' +
+      '    """another Unreal String\n' +
       '    \'a legit " STRING\' now outsiDe string'
     )).toBe(
       'abcdefg\n' +
       '    ABcDe \'hijkl\'\n' +
       '    "hijkl mnopq " ABcDe\n' +
       '    "abc@\\"def7" GhI# \'jkl-\\\'mno3\'\n' +
-      '    \'not a real string\n' +
-      '    """another unreal string\n' +
+      '    \'not a Real String\n' +
+      '    """another Unreal String\n' +
       '    \'a legit " string\' now outsiDe string'
     );
   });
