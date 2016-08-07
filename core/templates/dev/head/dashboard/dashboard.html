@@ -138,7 +138,13 @@
                       ng-class="isCurrentSortDescending ? 'fa-caret-up': 'fa-caret-down'">
                 </span>
               </th>
-              <th>Rating</th>
+              <th ng-click="sortExplorationsList(EXPLORATIONS_SORT_BY_KEYS.RATING)">
+                Rating
+                <span ng-if="currentSortType === EXPLORATIONS_SORT_BY_KEYS.RATING"
+                      class="fa"
+                      ng-class="isCurrentSortDescending ? 'fa-caret-up': 'fa-caret-down'">
+                </span>
+              </th>
               <th ng-click="sortExplorationsList(EXPLORATIONS_SORT_BY_KEYS.NUM_VIEWS)">
                 Plays
                 <span ng-if="currentSortType === EXPLORATIONS_SORT_BY_KEYS.NUM_VIEWS"

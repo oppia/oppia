@@ -16,17 +16,19 @@
  * @fileoverview Unit tests for DashboardServices.
  */
 
-describe('Dashboard services', function() {
+ddescribe('Dashboard services', function() {
   var sortExplorationsService = null;
   var alertsService = null;
   var sampleExplorationsList = null;
   var EXPLORATIONS_SORT_BY_KEYS = null;
+  var RatingComputationService = null;
 
   beforeEach(module('oppia'));
   beforeEach(inject(function($injector) {
     sortExplorationsService = $injector.get('sortExplorationsService');
     alertsService = $injector.get('alertsService');
     EXPLORATIONS_SORT_BY_KEYS = $injector.get('EXPLORATIONS_SORT_BY_KEYS');
+    RatingComputationService = $injector.get('RatingComputationService');
 
     // Sample explorations list
     sampleExplorationsList = [
@@ -93,10 +95,10 @@ describe('Dashboard services', function() {
         last_updated_msec: 1418178759219.124,
         status: 'private',
         ratings: {
-          5: 0,
+          5: 1,
           4: 1,
           3: 2,
-          2: 1,
+          2: 0,
           1: 0
         },
         community_owned: false,
@@ -112,71 +114,75 @@ describe('Dashboard services', function() {
   }));
 
   it('should correctly sort the explorations list', function() {
-    var sortedByTitle = (
-      sortExplorationsService.sortBy(
-        sampleExplorationsList, EXPLORATIONS_SORT_BY_KEYS.TITLE));
-    expect(sortedByTitle.length).toBe(sampleExplorationsList.length);
-    expect(sortedByTitle[0].title).toBe(sampleExplorationsList[1].title);
-    expect(sortedByTitle[1].title).toBe(sampleExplorationsList[0].title);
-    expect(sortedByTitle[2].title).toBe(sampleExplorationsList[2].title);
+    var expectListOrder = function(sortedList, sortType, expectedOrder) {
+      expect(sortedList.length, sampleExplorationsList.length);
+      expectedOrder.forEach(function(i, index) {
+        expect(sortedList[index][sortType]).toBe(
+          sampleExplorationsList[i][sortType]);
+      });
+    };
 
-    var sortedByTitleDescending = (
+    expectListOrder(
       sortExplorationsService.sortBy(
-        sampleExplorationsList, EXPLORATIONS_SORT_BY_KEYS.TITLE, true));
-    expect(sortedByTitle).toBe(sortedByTitle.reverse());
+        sampleExplorationsList, EXPLORATIONS_SORT_BY_KEYS.TITLE),
+      EXPLORATIONS_SORT_BY_KEYS.TITLE,
+      [1, 0, 2]);
 
-    var sortedByLastUpdated = (
+    expectListOrder(
       sortExplorationsService.sortBy(
-        sampleExplorationsList, EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED));
-    expect(sortedByLastUpdated.length).toBe(sampleExplorationsList.length);
-    expect(sortedByLastUpdated[0].last_updated_msec).toBe(
-      sampleExplorationsList[2].last_updated_msec);
-    expect(sortedByLastUpdated[1].last_updated_msec).toBe(
-      sampleExplorationsList[0].last_updated_msec);
-    expect(sortedByLastUpdated[2].last_updated_msec).toBe(
-      sampleExplorationsList[1].last_updated_msec);
+        sampleExplorationsList, EXPLORATIONS_SORT_BY_KEYS.TITLE, true),
+      EXPLORATIONS_SORT_BY_KEYS.TITLE,
+      [2, 0, 1]);
 
-    var sortedByNumOpenThreads = (
+    expectListOrder(
       sortExplorationsService.sortBy(
-        sampleExplorationsList, EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK));
-    expect(sortedByNumOpenThreads.length).toBe(sampleExplorationsList.length);
-    expect(sortedByNumOpenThreads[0].num_open_threads).toBe(
-      sampleExplorationsList[0].num_open_threads);
-    expect(sortedByNumOpenThreads[1].num_open_threads).toBe(
-      sampleExplorationsList[2].num_open_threads);
-    expect(sortedByNumOpenThreads[2].num_open_threads).toBe(
-      sampleExplorationsList[1].num_open_threads);
+        sampleExplorationsList, EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED),
+      EXPLORATIONS_SORT_BY_KEYS.LAST_UPDATED,
+      [2, 0, 1]);
 
-    var sortedByNumUnresolvedAnswers = (
+    expectListOrder(
       sortExplorationsService.sortBy(
-        sampleExplorationsList, EXPLORATIONS_SORT_BY_KEYS.UNRESOLVED_ANSWERS));
-    expect(sortedByNumUnresolvedAnswers.length).toBe(
-      sampleExplorationsList.length);
-    expect(sortedByNumUnresolvedAnswers[0].num_unresolved_answers).toBe(
-      sampleExplorationsList[1].num_unresolved_answers);
-    expect(sortedByNumUnresolvedAnswers[1].num_unresolved_answers).toBe(
-      sampleExplorationsList[0].num_unresolved_answers);
-    expect(sortedByNumUnresolvedAnswers[2].num_unresolved_answers).toBe(
-      sampleExplorationsList[2].num_unresolved_answers);
+        sampleExplorationsList, EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK),
+      EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK,
+      [0, 2, 1]);
 
-    var sortedByNumViews = (
+    expectListOrder(
       sortExplorationsService.sortBy(
-        sampleExplorationsList, EXPLORATIONS_SORT_BY_KEYS.NUM_VIEWS));
-    expect(sortedByNumViews.length).toBe(sampleExplorationsList.length);
-    expect(sortedByNumViews[0].num_views).toBe(
-      sampleExplorationsList[1].num_views);
-    expect(sortedByNumViews[1].num_views).toBe(
-      sampleExplorationsList[2].num_views);
-    expect(sortedByNumViews[2].num_views).toBe(
-      sampleExplorationsList[0].num_views);
+        sampleExplorationsList, EXPLORATIONS_SORT_BY_KEYS.UNRESOLVED_ANSWERS),
+      EXPLORATIONS_SORT_BY_KEYS.UNRESOLVED_ANSWERS,
+      [1, 0, 2]);
 
-    var sortedByUnexpectedParameter = (
+    expectListOrder(
       sortExplorationsService.sortBy(
-        sampleExplorationsList, EXPLORATIONS_SORT_BY_KEYS.abc));
+        sampleExplorationsList, EXPLORATIONS_SORT_BY_KEYS.NUM_VIEWS),
+      EXPLORATIONS_SORT_BY_KEYS.NUM_VIEWS,
+      [1, 2, 0]);
+
+    expectListOrder(
+      sortExplorationsService.sortBy(
+        sampleExplorationsList, EXPLORATIONS_SORT_BY_KEYS.abc),
+      EXPLORATIONS_SORT_BY_KEYS.abc,
+      [0, 1, 2]);
     expect(alertsService.warnings.length).toBe(1);
     expect(alertsService.warnings[0].content).toBe(
       'Invalid type of key name for sorting explorations: ' +
         EXPLORATIONS_SORT_BY_KEYS.abc);
-    expect(sortedByUnexpectedParameter).toBe(sampleExplorationsList);
+
+    var sortedByAverageRating = (
+      sortExplorationsService.sortBy(
+        sampleExplorationsList, EXPLORATIONS_SORT_BY_KEYS.RATING));
+    expect(sortedByAverageRating.length, sampleExplorationsList.length);
+    expect(RatingComputationService.computeAverageRating(
+      sortedByAverageRating[0][EXPLORATIONS_SORT_BY_KEYS.RATING])).toBe(
+        RatingComputationService.computeAverageRating(
+          sampleExplorationsList[2][EXPLORATIONS_SORT_BY_KEYS.RATING]));
+    expect(RatingComputationService.computeAverageRating(
+      sortedByAverageRating[1][EXPLORATIONS_SORT_BY_KEYS.RATING])).toBe(
+        RatingComputationService.computeAverageRating(
+          sampleExplorationsList[1][EXPLORATIONS_SORT_BY_KEYS.RATING]));
+    expect(RatingComputationService.computeAverageRating(
+      sortedByAverageRating[2][EXPLORATIONS_SORT_BY_KEYS.RATING])).toBe(
+        RatingComputationService.computeAverageRating(
+          sampleExplorationsList[0][EXPLORATIONS_SORT_BY_KEYS.RATING]));
   });
 });

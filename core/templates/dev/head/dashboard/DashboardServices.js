@@ -18,6 +18,7 @@
 
 oppia.constant('EXPLORATIONS_SORT_BY_KEYS', {
   TITLE: 'title',
+  RATING: 'ratings',
   LAST_UPDATED: 'last_updated_msec',
   NUM_VIEWS: 'num_views',
   OPEN_FEEDBACK: 'num_open_threads',
@@ -26,6 +27,7 @@ oppia.constant('EXPLORATIONS_SORT_BY_KEYS', {
 
 oppia.constant('HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', {
   TITLE: 'Title',
+  RATING: 'Average Rating',
   LAST_UPDATED: 'Last Updated',
   NUM_VIEWS: 'Total Plays',
   OPEN_FEEDBACK: 'New Feedback',
@@ -35,8 +37,13 @@ oppia.constant('HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', {
 // Service for sorting the explorations based on different parameters.
 oppia.factory('sortExplorationsService', [
   'utilsService', 'EXPLORATIONS_SORT_BY_KEYS', 'alertsService',
-  function(utilsService, EXPLORATIONS_SORT_BY_KEYS, alertsService) {
-    var EMPTY_TITLE_TEXT = 'Untitled';
+  'RatingComputationService',
+  function(
+      utilsService, EXPLORATIONS_SORT_BY_KEYS, alertsService,
+      RatingComputationService) {
+    var TITLE_TEXT_DEFAULT = 'Untitled';
+    var AVERAGE_RATING_DEFAULT = 0.0;
+    var NUM_VALUE_DEFAULT = 0;
 
     var sortByKey = function(explorationsList, key, isDescending) {
       var result = angular.copy(explorationsList);
@@ -59,15 +66,30 @@ oppia.factory('sortExplorationsService', [
         if (key === EXPLORATIONS_SORT_BY_KEYS.TITLE &&
             utilsService.isString(valA)) {
           if (valA === '') {
-            valA = EMPTY_TITLE_TEXT;
+            valA = TITLE_TEXT_DEFAULT;
           }
           if (valB === '') {
-            valB = EMPTY_TITLE_TEXT;
+            valB = TITLE_TEXT_DEFAULT;
           }
           valA = valA.toLowerCase();
           valB = valB.toLowerCase();
           returnValue = valA.localeCompare(valB);
+        } else if (key === EXPLORATIONS_SORT_BY_KEYS.RATING) {
+          valA = RatingComputationService.computeAverageRating(valA);
+          valB = RatingComputationService.computeAverageRating(valB);
+          if (!valA) {
+            valA = AVERAGE_RATING_DEFAULT;
+          }
+          if (!valB) {
+            valB = AVERAGE_RATING_DEFAULT;
+          }
         } else {
+          if (typeof valA === 'undefined' || valA === null) {
+            valA = NUM_VALUE_DEFAULT;
+          }
+          if (typeof valB === 'undefined' || valB === null) {
+            valB = NUM_VALUE_DEFAULT;
+          }
           returnValue = valA - valB;
         }
         // NOTE TO DEVELOPERS: Make sure the value returned here is non-zero to
@@ -77,7 +99,7 @@ oppia.factory('sortExplorationsService', [
       result = result.map(function(value) {
         return value.data;
       });
-      if (isDescending) {
+      if (isDescending || angular.equals(explorationsList, result)) {
         return result.reverse();
       }
       return result;

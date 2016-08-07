@@ -1233,15 +1233,15 @@ li.sort-explorations-select .sort-by-text {
 }
 
 li.sort-explorations-select .sort-options {
-  height: 32px;
-  margin: 7px 7px 0 0;
   background: #fff;
   border-color: #ddd;
+  height: 32px;
+  margin: 7px 7px 0 0;
 }
 
 li.sort-explorations-select .sort-order {
-  margin: 14px 8px 0 0;
   cursor: pointer;
+  margin: 14px 8px 0 0;
 }
 
 /* Rules for the tiles in the creator dashboard. */
