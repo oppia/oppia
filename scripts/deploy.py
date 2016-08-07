@@ -91,7 +91,6 @@ THIRD_PARTY_DIR = os.path.join('.', 'third_party')
 DEPLOY_DATA_PATH = os.path.join(os.getcwd(), '..', 'deploy_data', APP_NAME)
 
 FILES_AT_ROOT_IN_COMMON = ['favicon.ico', 'robots.txt']
-COMMON_DIRS = ['general']
 IMAGE_DIRS = ['avatar', 'general', 'sidebar', 'logo']
 
 # Denotes length for cache slug used in production mode. It consists of
@@ -133,23 +132,6 @@ def preprocess_release():
                 'Could not find destination path %s. Has the code been '
                 'updated in the meantime?' % dst)
         shutil.copyfile(src, dst)
-
-    # Copies files in common/images to assets/common/images
-    for dir_name in COMMON_DIRS:
-        src_dir = os.path.join(DEPLOY_DATA_PATH, 'common', 'images', dir_name)
-        dst_dir = os.path.join(os.getcwd(), 'assets', 'common', 'images',
-                               dir_name)
-
-        if not os.path.exists(src_dir):
-            raise Exception(
-                'Could not find source dir %s. Please check your deploy_data '
-                'folder.' % src_dir)
-        common.ensure_directory_exists(dst_dir)
-
-        for filename in os.listdir(src_dir):
-            src = os.path.join(src_dir, filename)
-            dst = os.path.join(dst_dir, filename)
-            shutil.copyfile(src, dst)
 
     # Copies files in images to /assets/images
     for dir_name in IMAGE_DIRS:
@@ -208,18 +190,6 @@ def _execute_deployment():
         # Do a build; ensure there are no errors.
         print 'Building and minifying scripts...'
         subprocess.check_output(['python', 'scripts/build.py'])
-
-        # Run the tests; ensure there are no errors.
-        print 'Running tests...'
-        tests_proc = subprocess.Popen([
-            'bash', os.path.join('scripts', 'run_tests.sh')
-        ], stdout=subprocess.PIPE)
-        tests_stdout, tests_stderr = tests_proc.communicate()
-        print tests_stdout
-        print tests_stderr
-
-        if tests_proc.returncode != 0:
-            raise Exception('Tests failed. Halting deployment.')
 
         # Deploy to GAE.
         subprocess.check_output([APPCFG_PATH, 'update', '.', '--oauth2'])
