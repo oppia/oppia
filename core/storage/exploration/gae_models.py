@@ -63,7 +63,7 @@ class ExplorationModel(base_models.VersionedModel):
     author_notes = ndb.TextProperty(default='', indexed=False)
     # Schema storing specifications of the contents of any gadget panels,
     # along with associated customizations for each gadget instance.
-    skin_customizations = ndb.JsonProperty(required=True, indexed=False)
+    skin_customizations = ndb.JsonProperty(indexed=False)
 
     # The version of the states blob schema.
     states_schema_version = ndb.IntegerProperty(

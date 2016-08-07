@@ -295,7 +295,9 @@ class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceJobManager):
                             if rule_item not in choices:
                                 yield (
                                     item.id,
-                                    '%s: %s' % (state_name, rule_item))
+                                    '%s: %s' % (
+                                        state_name.encode('utf-8'),
+                                        rule_item.encode('utf-8')))
 
     @staticmethod
     def reduce(key, values):
