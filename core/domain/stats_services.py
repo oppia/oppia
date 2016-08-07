@@ -49,9 +49,12 @@ def get_exps_unresolved_answers_count_for_default_rule(exp_ids):
 
     Returns:
         A dict, keyed by the string '{exp_id}', whose values are the number of
-        unresolved answers that exploration has.
+        unresolved answers that exploration has. Any exp_ids for explorations
+        that don't exist or that have been deleted will be ignored, and not
+        included in the return value.
     """
-    explorations = exp_services.get_multiple_explorations_by_id(exp_ids)
+    explorations = exp_services.get_multiple_explorations_by_id(
+        exp_ids, strict=False)
 
     # The variable `exploration_states_tuples` is a list of all
     # (exp_id, state_name) tuples for the given exp_ids.

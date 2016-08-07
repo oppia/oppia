@@ -161,13 +161,13 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     impact_score = ndb.FloatProperty(indexed=True)
 
     # The total plays of all the explorations.
-    total_plays = ndb.IntegerProperty(indexed=True)
+    total_plays = ndb.IntegerProperty(indexed=True, default=0)
 
     # The average of average ratings of all explorations.
     average_ratings = ndb.FloatProperty(indexed=True)
 
     # The number of ratings of all explorations.
-    num_ratings = ndb.IntegerProperty(indexed=True)
+    num_ratings = ndb.IntegerProperty(indexed=True, default=0)
 
     # A list which stores history of creator stats.
     # Each item in the list is a Json object keyed by a datetime string and
