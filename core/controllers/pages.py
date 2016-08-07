@@ -63,6 +63,14 @@ class TeachPage(base.BaseHandler):
         self.render_template('pages/teach.html')
 
 
+class ConsoleErrorPage(base.BaseHandler):
+    """Page with missing resources to test cache slugs."""
+
+    def get(self):
+        """Handles GET requests."""
+        self.render_template('pages/console_errors.html')
+
+
 class ContactPage(base.BaseHandler):
     """Page with information about how to contact Oppia."""
 
