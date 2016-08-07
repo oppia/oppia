@@ -2810,6 +2810,11 @@ div#ng-curtain {
   font-size: 100%;
 }
 
+.ta-editor .placeholder-text {
+  color: #999;
+  font-size: 0.9em;
+}
+
 .form-control.oppia-rte-content > .ta-bind {
   height: auto;
   min-height: 80px;
