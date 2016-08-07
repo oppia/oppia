@@ -36,6 +36,7 @@ oppia.controller('ExplorationEditor', [
   'explorationWarningsService', '$templateCache', 'explorationContextService',
   'explorationAdvancedFeaturesService', '$modal', 'changeListService',
   'autosaveInfoModalsService', 'siteAnalyticsService',
+  'editorFirstTimeEventsService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
       explorationData, editorContextService, explorationTitleService,
@@ -47,7 +48,8 @@ oppia.controller('ExplorationEditor', [
       explorationParamSpecsService, explorationParamChangesService,
       explorationWarningsService, $templateCache, explorationContextService,
       explorationAdvancedFeaturesService, $modal, changeListService,
-      autosaveInfoModalsService, siteAnalyticsService) {
+      autosaveInfoModalsService, siteAnalyticsService,
+      editorFirstTimeEventsService) {
     $scope.editabilityService = editabilityService;
     $scope.editorContextService = editorContextService;
 
@@ -351,6 +353,7 @@ oppia.controller('ExplorationEditor', [
     };
 
     $scope.showWelcomeExplorationModal = function() {
+      editorFirstTimeEventsService.initRegisterEvents($scope.explorationId);
       var modalInstance = $modal.open({
         templateUrl: 'modals/welcomeExploration',
         backdrop: true,
@@ -634,6 +637,11 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
           explorationData.explorationId);
       } else {
         siteAnalyticsService.registerCommitChangesToPublicExplorationEvent(
+          explorationData.explorationId);
+      }
+
+      if (explorationWarningsService.countWarnings() === 0) {
+        siteAnalyticsService.registerSavePlayableExplorationEvent(
           explorationData.explorationId);
       }
 

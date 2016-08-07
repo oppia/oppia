@@ -425,6 +425,7 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
   // developers.google.com/analytics/devguides/collection/analyticsjs/events
   var _sendEventToGoogleAnalytics = function(
       eventCategory, eventAction, eventLabel) {
+    console.log(eventCategory + ' ' + eventLabel);
     if ($window.ga && CAN_SEND_ANALYTICS_EVENTS) {
       $window.ga('send', 'event', eventCategory, eventAction, eventLabel);
     }
@@ -471,14 +472,6 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
       _sendEventToGoogleAnalytics(
         'CommitToPrivateExploration', 'click', explorationId);
     },
-    registerOpenPublishExplorationModalEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'PublishExplorationModal', 'open', explorationId);
-    },
-    registerPublishExplorationEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'PublishExploration', 'click', explorationId);
-    },
     registerShareExplorationEvent: function(network) {
       _sendSocialEventToGoogleAnalytics(
         network, 'share', $window.location.pathname);
@@ -524,6 +517,52 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
     registerFinishTutorialEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
         'FinishTutorial', 'click', explorationId);
+    },
+    // Metrics for first time editor use
+    registerEditorFirstEntryEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'FirstEnterEditor', 'open', explorationId);
+    },
+    registerFirstOpenContentBoxEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'FirstOpenContentBox', 'open', explorationId);
+    },
+    registerFirstSaveContentEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'FirstSaveContent', 'click', explorationId);
+    },
+    registerFirstClickAddInteractionEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'FirstClickAddInteraction', 'click', explorationId);
+    },
+    registerFirstSelectInteractionTypeEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'FirstSelectInteractionType', 'click', explorationId);
+    },
+    registerFirstSaveInteractionEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'FirstSaveInteraction', 'click', explorationId);
+    },
+    registerFirstSaveRuleEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'FirstSaveRule', 'click', explorationId);
+    },
+    registerFirstCreateSecondStateEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'FirstCreateSecondState', 'create', explorationId);
+    },
+    // Metrics for publishing explorations
+    registerSavePlayableExplorationEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'SavePlayableExploration', 'save', explorationId);
+    },
+    registerOpenPublishExplorationModalEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'PublishExplorationModal', 'open', explorationId);
+    },
+    registerPublishExplorationEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'PublishExploration', 'click', explorationId);
     }
   };
 }]);
