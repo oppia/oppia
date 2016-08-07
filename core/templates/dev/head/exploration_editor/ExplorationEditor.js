@@ -363,7 +363,7 @@ oppia.controller('ExplorationEditor', [
           'siteAnalyticsService', 'explorationContextService',
           function($scope, $modalInstance, UrlInterpolationService,
               siteAnalyticsService, explorationContextService) {
-            explorationId = explorationContextService.getExplorationId();
+            var explorationId = explorationContextService.getExplorationId();
 
             siteAnalyticsService.registerTutorialModalOpenEvent(explorationId);
 
