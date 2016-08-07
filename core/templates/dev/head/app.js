@@ -425,7 +425,6 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
   // developers.google.com/analytics/devguides/collection/analyticsjs/events
   var _sendEventToGoogleAnalytics = function(
       eventCategory, eventAction, eventLabel) {
-    console.log(eventCategory + ' ' + eventLabel);
     if ($window.ga && CAN_SEND_ANALYTICS_EVENTS) {
       $window.ga('send', 'event', eventCategory, eventAction, eventLabel);
     }

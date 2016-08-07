@@ -23,7 +23,7 @@ oppia.factory('ExplorationCreationService', [
   function(
       $http, $modal, $timeout, $rootScope, $window,
       alertsService, siteAnalyticsService, UrlInterpolationService) {
-    var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
+    var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>?new';
 
     var explorationCreationInProgress = false;
 

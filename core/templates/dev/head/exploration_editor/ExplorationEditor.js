@@ -187,6 +187,8 @@ oppia.controller('ExplorationEditor', [
       $scope.initExplorationPage(successCallback);
     });
 
+    editorFirstTimeEventsService.initRegisterEvents($scope.explorationId);
+
     var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
     var _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
     var _ID_TUTORIAL_PREVIEW_TAB = '#tutorialPreviewTab';
@@ -353,7 +355,6 @@ oppia.controller('ExplorationEditor', [
     };
 
     $scope.showWelcomeExplorationModal = function() {
-      editorFirstTimeEventsService.initRegisterEvents($scope.explorationId);
       var modalInstance = $modal.open({
         templateUrl: 'modals/welcomeExploration',
         backdrop: true,

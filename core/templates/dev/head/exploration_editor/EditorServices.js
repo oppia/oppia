@@ -2396,7 +2396,9 @@ oppia.factory('editorFirstTimeEventsService', ['siteAnalyticsService',
     var alreadyRegisteredEvents = {};
     return {
       initRegisterEvents: function(expId) {
-        shouldRegisterEvents = true;
+        if (location.search.split('?')[1] === 'new') {
+          shouldRegisterEvents = true;
+        }
         explorationId = expId;
       },
       registerEditorFirstEntryEvent: function() {
