@@ -489,6 +489,41 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
     registerCommitChangesToPublicExplorationEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
         'CommitToPublicExploration', 'click', explorationId);
+    },
+    // Metrics for tutorial on first creating exploration
+    registerTutorialModalOpenEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'TutorialModalOpen', 'open', explorationId);
+    },
+    registerDeclineTutorialModalEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'DeclineTutorialModal', 'click', explorationId);
+    },
+    registerAcceptTutorialModalEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'AcceptTutorialModal', 'click', explorationId);
+    },
+    // Metrics for visiting the help center
+    registerClickHelpButtonEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'ClickHelpButton', 'click', explorationId);
+    },
+    registerVisitHelpCenterEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'VisitHelpCenter', 'click', explorationId);
+    },
+    registerOpenTutorialFromHelpCenterEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'OpenTutorialFromHelpCenter', 'click', explorationId);
+    },
+    // Metrics for exiting the tutorial
+    registerSkipTutorialEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'SkipTutorial', 'click', explorationId);
+    },
+    registerFinishTutorialEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'FinishTutorial', 'click', explorationId);
     }
   };
 }]);
