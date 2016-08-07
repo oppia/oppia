@@ -1219,14 +1219,29 @@ textarea {
 }
 
 li.sort-explorations-select {
-    width: auto;
+  width: auto;
 }
 
-.sort-explorations-select select {
+li.sort-explorations-select .sort-by-text,
+li.sort-explorations-select .sort-options,
+li.sort-explorations-select .sort-order {
+  display: inline-block;
+}
+
+li.sort-explorations-select .sort-by-text {
+  margin: 8px 8px 0 ;
+}
+
+li.sort-explorations-select .sort-options {
   height: 32px;
   margin: 7px 7px 0 0;
   background: #fff;
   border-color: #ddd;
+}
+
+li.sort-explorations-select .sort-order {
+  margin: 14px 8px 0 0;
+  cursor: pointer;
 }
 
 /* Rules for the tiles in the creator dashboard. */

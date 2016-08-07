@@ -74,10 +74,16 @@
           </button>
         </li>
         <li class="sort-explorations-select" ng-if="activeTab === 'myExplorations'">
+          <p class="sort-by-text">Sort By</p>
           <select ng-model="currentSortType"
+                  class="sort-options"
                   ng-change="sortExplorationsList(currentSortType)"
                   ng-options="EXPLORATIONS_SORT_BY_KEYS[key] as value for (key, value) in HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS">
           </select>
+          <span class="sort-order fa"
+                ng-click="sortExplorationsList()"
+                ng-class="isCurrentSortDescending ? 'fa-long-arrow-up': 'fa-long-arrow-down'">
+          </span>
         </li>
       </ul>
     </div>
@@ -117,11 +123,12 @@
                  class="oppia-dashboard-list-view-item">
           <table class="oppia-dashboard-table">
              <colgroup>
-               <col style="width: 40%;">
-               <col style="width: 15%;">
-               <col style="width: 15%;">
-               <col style="width: 15%;">
-               <col style="width: 15%;">
+               <col style="width: 26%;">
+               <col style="width: 13%;">
+               <col style="width: 13%;">
+               <col style="width: 16%;">
+               <col style="width: 16%;">
+               <col style="width: 16%;">
             </colgroup>
             <tr>
               <th ng-click="sortExplorationsList(EXPLORATIONS_SORT_BY_KEYS.TITLE)">
