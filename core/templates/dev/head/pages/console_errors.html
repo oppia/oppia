@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block subtitle %}
+  Error
+{% endblock subtitle %}
+
+{% block header_js %}
+  {{ super() }}
+{% endblock %}
+
+{% block content %}
+  <div>
+    <img src="/build/fail/logo/288x128_logo_white.png">
+  </div>
+{% endblock %}
+
+{% block footer%}
+  {% include 'footer.html' %}
+{% endblock %}

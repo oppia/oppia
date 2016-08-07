@@ -150,6 +150,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/participate', pages.TeachRedirectPage, 'teach_redirect_page_1'),
     get_redirect_route(
         r'/site_guidelines', pages.TeachRedirectPage, 'teach_redirect_page_2'),
+    get_redirect_route(
+        r'/console_errors', pages.ConsoleErrorPage, 'console_errors'),
     get_redirect_route(r'/contact', pages.ContactPage, 'contact_page'),
 
     get_redirect_route(r'/forum', pages.ForumPage, 'forum_page'),
