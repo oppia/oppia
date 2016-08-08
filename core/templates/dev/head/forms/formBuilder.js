@@ -888,6 +888,14 @@ oppia.config(['$provide', function($provide) {
       return taOptions;
     }
   ]);
+
+  $provide.decorator('$sanitize', function($delegate) {
+    return function(text, target) {
+      text = text.replace(/<(\/)?a([^>]*)>/g, '<$1span$2>');
+      var result = $delegate(text, target);
+      return result;
+    };
+  });
 }]);
 
 oppia.directive('textAngularRte', [
