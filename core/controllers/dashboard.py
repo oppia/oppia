@@ -179,9 +179,13 @@ class DashboardHandler(base.BaseHandler):
             stats_services.get_exps_unresolved_answers_for_default_rule(
                 exploration_ids_subscribed_to))
 
+        new_feedback_dict = (
+            feedback_services.get_threads_multi(exploration_ids_subscribed_to))
+
         for ind, exploration in enumerate(exp_summary_list):
             exploration.update(feedback_thread_analytics[ind].to_dict())
             exploration.update({
+                'new_feedback': new_feedback_dict[exploration['id']],
                 'num_unresolved_answers': (
                     unresolved_answers_dict[exploration['id']]['count']
                     if exploration['id'] in unresolved_answers_dict else 0

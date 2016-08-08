@@ -112,15 +112,15 @@ class FeedbackThreadModel(base_models.BaseModel):
             exploration_id, thread_id))
 
     @classmethod
-    def get_threads(cls, exploration_id):
-        """Returns an array of threads associated to the exploration.
+    def get_threads_multi(cls, exploration_ids):
+        """Returns an array of threads ordered by last updated associated to
+        explorations with ids in exploration_ids.
 
         Does not include the deleted entries.
         """
         return cls.get_all().filter(
-            cls.exploration_id == exploration_id).order(
-                cls.last_updated).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
+            cls.exploration_id.IN(exploration_ids)).order(
+                cls.last_updated).fetch()
 
 class FeedbackMessageModel(base_models.BaseModel):
     """Feedback messages. One or more of these messages make a thread.

@@ -473,9 +473,11 @@ COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
-# Number of unresolved answers to be displayed in the dashboard for
-# each exploration.
+# Number of unresolved answers to be displayed in the dashboard for each
+# exploration.
 TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
+# Number of open feedback to be displayed in the dashboard for each exploration.
+NEW_FEEDBACK_COUNT_DASHBOARD = 3
 # NOTE TO DEVELOPERS: This should be synchronized with base.js
 ENABLE_STRING_CLASSIFIER = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
@@ -494,9 +496,9 @@ UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
 DEFAULT_COLOR = '#a33f40'
 DEFAULT_THUMBNAIL_ICON = 'Lightbulb'
 
-# List of supported default categories. For now, each category has
-# a specific color associated with it. Each category also has a thumbnail icon
-# whose filename is "{{CategoryName}}.svg".
+# List of supported default categories. For now, each category has a specific
+# color associated with it. Each category also has a thumbnail icon whose
+# filename is "{{CategoryName}}.svg".
 CATEGORIES_TO_COLORS = {
     'Mathematics': '#cd672b',
     'Algebra': '#cd672b',
