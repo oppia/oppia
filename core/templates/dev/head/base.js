@@ -162,6 +162,24 @@ oppia.controller('Base', [
     $scope.windowIsNarrow = (
       windowDimensionsService.getWidth() <= navbarCutoffWidthPx);
 
+    $scope.openSidebarOnSwipe = function() {
+      if ($scope.windowIsNarrow) {
+        if (!$scope.sidebarIsShown) {
+          $scope.sidebarIsShown = true;
+          $scope.pendingSidebarClick = true;
+        }
+      }
+    };
+
+    $scope.closeSidebarOnSwipe = function() {
+      if ($scope.windowIsNarrow) {
+        if ($scope.sidebarIsShown) {
+          $scope.sidebarIsShown = false;
+          $scope.pendingSidebarClick = false;
+        }
+      }
+    };
+
     windowDimensionsService.registerOnResizeHook(function() {
       $scope.windowIsNarrow = (
         windowDimensionsService.getWidth() <= navbarCutoffWidthPx);
