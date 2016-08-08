@@ -350,7 +350,7 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
         self.message_id1 = 'msg1'
         self.message_id2 = 'msg2'
         self.can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS_TO_USERS', True)
+            feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
 
@@ -454,7 +454,7 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
 
     def test_that_emails_are_not_sent_if_service_is_disabled(self):
         cannot_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS_TO_USERS', False)
+            feconf, 'CAN_SEND_EMAILS', False)
         cannot_send_feedback_message_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', False)
         with cannot_send_emails_ctx, cannot_send_feedback_message_email_ctx:
