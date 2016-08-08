@@ -29,7 +29,8 @@ env:
     - RUN_E2E_TESTS_MISC=true
     - RUN_E2E_TESTS_I18N=true
     - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=false
-    - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=true
+    # TODO(sll): Reinstate this when we can get it to run in reasonable time.
+    # - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=true
     - RUN_LINT=true
     - RUN_FRONTEND_TESTS=true
     - RUN_PERFORMANCE_TESTS=true
@@ -40,10 +41,7 @@ env:
     - RUN_E2E_TESTS_MISC_PROD=true
     - RUN_E2E_TESTS_I18N_PROD=true
 matrix:
-  allow_failures:
-  # The backend tests, with coverage, take too long to run, so we make this
-  # optional.
-  - env: RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=true
+  allow_failures: []
   fast_finish: true
 
 notifications:
