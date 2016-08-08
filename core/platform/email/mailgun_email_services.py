@@ -79,24 +79,18 @@ def send_mail(
         raise ValueError(
             'Malformed recipient email address: %s' % recipient_email)
 
+    data = {
+        'from': sender_email,
+        'to': recipient_email,
+        'subject': subject,
+        'text': plaintext_body,
+        'html': html_body}
+
     if bcc_admin:
-        requests.post(
-            mailgun_domain_name, auth=('api', feconf.MAILGUN_API_KEY),
-            data={
-                'from': sender_email,
-                'to': recipient_email,
-                'bcc': feconf.ADMIN_EMAIL_ADDRESS,
-                'subject': subject,
-                'text': plaintext_body,
-                'html': html_body})
-    else:
-        requests.post(
-            mailgun_domain_name, auth=('api', feconf.MAILGUN_API_KEY),
-            data={
-                'from': sender_email,
-                'to': recipient_email,
-                'subject': subject,
-                'text': plaintext_body,
-                'html': html_body})
+        data['bcc'] = feconf.ADMIN_EMAIL_ADDRESS
+
+    requests.post(
+        mailgun_domain_name, auth=('api', feconf.MAILGUN_API_KEY),
+        data=data)
 
     counters.EMAILS_SENT.inc()

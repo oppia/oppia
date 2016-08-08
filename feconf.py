@@ -189,8 +189,7 @@ NOREPLY_EMAIL_ADDRESS = 'noreply@example.com'
 # Ensure that SYSTEM_EMAIL_ADDRESS and ADMIN_EMAIL_ADDRESS are both valid and
 # correspond to owners of the app before setting this to True. If
 # SYSTEM_EMAIL_ADDRESS is not that of an app owner, email messages from this
-# address cannot be sent. If True then emails can be sent to both,
-# admin and users.
+# address cannot be sent. If True then emails can be sent to any user.
 CAN_SEND_EMAILS = False
 # If you want to turn on this facility please check the email templates in the
 # send_role_notification_email() function in email_manager.py and modify them

@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the GAE mail API wrapper."""
+"""Tests for the Mailgun API wrapper."""
 
 from core.platform.email import mailgun_email_services
 from core.tests import test_utils
@@ -27,21 +27,29 @@ class EmailTests(test_utils.GenericTestBase):
     def test_sending_email(self):
         # Emails are not sent if the CAN_SEND_EMAILS setting is not turned on.
         # mailgun api key and domain name are required to use API.
-        can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         mailgun_api_exception = (
             self.assertRaisesRegexp(
                 Exception, 'Mailgun API key is not available.'))
-        with can_send_emails, mailgun_api_exception:
+        with mailgun_api_exception:
             mailgun_email_services.send_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html', bcc_admin=False)
 
-        can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         mailgun_api = self.swap(feconf, 'MAILGUN_API_KEY', 'api')
         mailgun_domain_name_exception = (
             self.assertRaisesRegexp(
                 Exception, 'Mailgun domain name is not set.'))
-        with can_send_emails, mailgun_api, mailgun_domain_name_exception:
+        with mailgun_api, mailgun_domain_name_exception:
+            mailgun_email_services.send_mail(
+                feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
+                'subject', 'body', 'html', bcc_admin=False)
+
+        send_email_exception = (
+            self.assertRaisesRegexp(
+                Exception, 'This app cannot send emails to users.'))
+        mailgun_api = self.swap(feconf, 'MAILGUN_API_KEY', 'api')
+        mailgun_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
+        with mailgun_api, mailgun_domain, send_email_exception:
             mailgun_email_services.send_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html', bcc_admin=False)
