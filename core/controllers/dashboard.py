@@ -179,8 +179,15 @@ class DashboardHandler(base.BaseHandler):
             stats_services.get_exps_unresolved_answers_for_default_rule(
                 exploration_ids_subscribed_to))
 
-        new_feedback_dict = (
-            feedback_services.get_threads_multi(exploration_ids_subscribed_to))
+        new_feedback = (
+            feedback_services.get_threads_multi(
+                exploration_ids_subscribed_to,
+                limit=feconf.NEW_FEEDBACK_COUNT_DASHBOARD))
+        new_feedback_dict = {}
+        for exp_id in new_feedback:
+            new_feedback_dict[exp_id] = []
+            for feedback in new_feedback[exp_id]:
+                new_feedback_dict[exp_id].append(feedback.to_dict())
 
         for ind, exploration in enumerate(exp_summary_list):
             exploration.update(feedback_thread_analytics[ind].to_dict())

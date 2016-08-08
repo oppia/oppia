@@ -229,16 +229,19 @@ def _get_thread_from_model(thread_model):
         thread_model.created_on, thread_model.last_updated)
 
 
-def get_threads_multi(exploration_ids):
+def get_threads_multi(exploration_ids, limit=None):
     thread_models_exps = feedback_models.FeedbackThreadModel.get_threads_multi(
         exploration_ids)
     result = {}
     for exp_id in exploration_ids:
         result[exp_id] = []
     for thread_models_exp in thread_models_exps:
-        if len(result[thread_models_exp.exploration_id]) < feconf.NEW_FEEDBACK_COUNT_DASHBOARD:  # pylint: disable=line-too-long
+        if limit and len(result[thread_models_exp.exploration_id]) < limit:
             result[thread_models_exp.exploration_id].append(
-                _get_thread_from_model(thread_models_exp).to_dict())
+                _get_thread_from_model(thread_models_exp))
+        elif not limit:
+            result[thread_models_exp.exploration_id].append(
+                _get_thread_from_model(thread_models_exp))
     return result
 
 
@@ -254,6 +257,7 @@ def get_open_threads(exploration_id, has_suggestion):
     threads = get_threads(exploration_id)
     open_threads = []
     for thread in threads:
+        print thread.has_suggestion
         if (thread.has_suggestion == has_suggestion and
                 thread.status == feedback_models.STATUS_CHOICES_OPEN):
             open_threads.append(thread)
@@ -283,6 +287,7 @@ def get_all_threads(exploration_id, has_suggestion):
     for thread in threads:
         if thread.has_suggestion == has_suggestion:
             all_threads.append(thread)
+    print all_threads
     return all_threads
 
 
