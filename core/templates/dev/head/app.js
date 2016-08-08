@@ -65,18 +65,9 @@ oppia.config([
       '$q', '$log', 'alertsService', function($q, $log, alertsService) {
         return {
           request: function(config) {
-            // If this request carries data (in the form of a JS object),
-            // JSON-stringify it and store it under 'payload'.
-            var csrfToken = '';
             if (config.data) {
-              var csrfToken = (
-                config.requestIsForCreateExploration ?
-                  GLOBALS.csrf_token_create_exploration :
-                config.requestIsForI18n ? GLOBALS.csrf_token_i18n :
-                GLOBALS.csrf_token);
-
               config.data = $.param({
-                csrf_token: csrfToken,
+                csrf_token: GLOBALS.csrf_token,
                 payload: JSON.stringify(config.data),
                 source: document.URL
               }, true);
@@ -480,14 +471,6 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
       _sendEventToGoogleAnalytics(
         'CommitToPrivateExploration', 'click', explorationId);
     },
-    registerOpenPublishExplorationModalEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'PublishExplorationModal', 'open', explorationId);
-    },
-    registerPublishExplorationEvent: function(explorationId) {
-      _sendEventToGoogleAnalytics(
-        'PublishExploration', 'click', explorationId);
-    },
     registerShareExplorationEvent: function(network) {
       _sendSocialEventToGoogleAnalytics(
         network, 'share', $window.location.pathname);
@@ -498,6 +481,87 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
     registerCommitChangesToPublicExplorationEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
         'CommitToPublicExploration', 'click', explorationId);
+    },
+    // Metrics for tutorial on first creating exploration
+    registerTutorialModalOpenEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'TutorialModalOpen', 'open', explorationId);
+    },
+    registerDeclineTutorialModalEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'DeclineTutorialModal', 'click', explorationId);
+    },
+    registerAcceptTutorialModalEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'AcceptTutorialModal', 'click', explorationId);
+    },
+    // Metrics for visiting the help center
+    registerClickHelpButtonEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'ClickHelpButton', 'click', explorationId);
+    },
+    registerVisitHelpCenterEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'VisitHelpCenter', 'click', explorationId);
+    },
+    registerOpenTutorialFromHelpCenterEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'OpenTutorialFromHelpCenter', 'click', explorationId);
+    },
+    // Metrics for exiting the tutorial
+    registerSkipTutorialEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'SkipTutorial', 'click', explorationId);
+    },
+    registerFinishTutorialEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'FinishTutorial', 'click', explorationId);
+    },
+    // Metrics for first time editor use
+    registerEditorFirstEntryEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'FirstEnterEditor', 'open', explorationId);
+    },
+    registerFirstOpenContentBoxEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'FirstOpenContentBox', 'open', explorationId);
+    },
+    registerFirstSaveContentEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'FirstSaveContent', 'click', explorationId);
+    },
+    registerFirstClickAddInteractionEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'FirstClickAddInteraction', 'click', explorationId);
+    },
+    registerFirstSelectInteractionTypeEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'FirstSelectInteractionType', 'click', explorationId);
+    },
+    registerFirstSaveInteractionEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'FirstSaveInteraction', 'click', explorationId);
+    },
+    registerFirstSaveRuleEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'FirstSaveRule', 'click', explorationId);
+    },
+    registerFirstCreateSecondStateEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'FirstCreateSecondState', 'create', explorationId);
+    },
+    // Metrics for publishing explorations
+    registerSavePlayableExplorationEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'SavePlayableExploration', 'save', explorationId);
+    },
+    registerOpenPublishExplorationModalEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'PublishExplorationModal', 'open', explorationId);
+    },
+    registerPublishExplorationEvent: function(explorationId) {
+      _sendEventToGoogleAnalytics(
+        'PublishExploration', 'click', explorationId);
     }
   };
 }]);
@@ -594,6 +658,51 @@ oppia.factory('codeNormalizationService', [function() {
   var removeTrailingWhitespace = function(str) {
     return str.replace(/\s+$/g, '');
   };
+  var removeIntermediateWhitespace = function(str) {
+    return str.replace(/\s+/g, ' ');
+  };
+  var normalizeCaseInStrings = function(str) {
+    // Note that this only takes into account single-line strings. It also
+    // tries to properly account for escaped characters.
+    var inSingleQuotedString = false;
+    var inDoubleQuotedString = false;
+    var answer = '';
+    for (var i = 0; i < str.length; i++) {
+      if (str[i] === '\\') {
+        answer += str[i];
+        i++;
+        if (i < str.length) {
+          answer += str[i];
+        }
+      } else if (inSingleQuotedString) {
+        answer += str[i].toLowerCase();
+        if (str[i] === '\'') {
+          inSingleQuotedString = false;
+        }
+      } else if (inDoubleQuotedString) {
+        answer += str[i].toLowerCase();
+        if (str[i] === '"') {
+          inDoubleQuotedString = false;
+        }
+      } else {
+        if (str[i] === '\'') {
+          inSingleQuotedString = true;
+        } else if (str[i] === '"') {
+          inDoubleQuotedString = true;
+        }
+
+        answer += str[i];
+      }
+    }
+
+    // If the string is invalid (with regards to quotation marks), just return
+    // it without normalization.
+    if (inSingleQuotedString || inDoubleQuotedString) {
+      answer = str;
+    }
+
+    return answer;
+  };
   return {
     getNormalizedCode: function(codeString) {
       /*
@@ -602,7 +711,9 @@ oppia.factory('codeNormalizationService', [function() {
        *
        * - Strips out lines that start with '#' (comments), possibly preceded by
        *     whitespace.
-       * - Trims trailing whitespace on each line.
+       * - Trims trailing whitespace on each line, and normalizes multiple
+       *     whitespace characters within a single line into one space
+       *     character.
        * - Removes blank newlines.
        * - Make the indentation level four spaces.
        */
@@ -662,7 +773,8 @@ oppia.factory('codeNormalizationService', [function() {
         for (var i = 0; i < numSpacesToDesiredIndentLevel[numSpaces]; i++) {
           normalizedLine += FOUR_SPACES;
         }
-        normalizedLine += removeLeadingWhitespace(line);
+        normalizedLine += normalizeCaseInStrings(removeIntermediateWhitespace(
+          removeLeadingWhitespace(line)));
         normalizedCodeLines.push(normalizedLine);
       });
       return normalizedCodeLines.join('\n');

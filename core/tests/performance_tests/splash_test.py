@@ -20,14 +20,15 @@ from core.tests.performance_tests import test_config
 
 class SplashPagePerformanceTest(base.TestBase):
     """Performance tests for the splash page."""
-    PAGE_KEY = test_config.SPLASH_PAGE_KEY
+    PAGE_KEY = test_config.PAGE_KEY_SPLASH
 
     def setUp(self):
         super(SplashPagePerformanceTest, self).setUp()
 
         page_config = test_config.TEST_DATA[self.PAGE_KEY]
-        self._set_test_limits(page_config)
+        self._set_page_config(page_config)
 
+        self._initialize_data_fetcher()
         self._load_page_to_cache_server_resources()
 
     def test_page_size_under_specified_limit(self):

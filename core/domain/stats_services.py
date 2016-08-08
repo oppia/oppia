@@ -40,6 +40,50 @@ def get_top_unresolved_answers_for_default_rule(exploration_id, state_name):
     }
 
 
+def get_exps_unresolved_answers_count_for_default_rule(exp_ids):
+    """Gets answer counts per exploration for the answer groups for default
+    rule across all states for explorations with ids in exp_ids.
+
+    Note that this method currently returns the counts only for the DEFAULT
+    rule. This should ideally handle all types of unresolved answers.
+
+    Returns:
+        A dict, keyed by the string '{exp_id}', whose values are the number of
+        unresolved answers that exploration has. Any exp_ids for explorations
+        that don't exist or that have been deleted will be ignored, and not
+        included in the return value.
+    """
+    explorations = exp_services.get_multiple_explorations_by_id(
+        exp_ids, strict=False)
+
+    # The variable `exploration_states_tuples` is a list of all
+    # (exp_id, state_name) tuples for the given exp_ids.
+    # E.g. - [
+    #   ('eid1', 'Introduction'),
+    #   ('eid1', 'End'),
+    #   ('eid2', 'Introduction'),
+    #   ('eid3', 'Introduction')
+    # ]
+    # when exp_ids = ['eid1', 'eid2', 'eid3'].
+    explorations_states_tuples = [
+        (exp_domain_object.id, state_key)
+        for exp_domain_object in explorations.values()
+        for state_key in exp_domain_object.states
+    ]
+    exploration_states_answers_list = get_top_state_rule_answers_multi(
+        explorations_states_tuples, [exp_domain.DEFAULT_RULESPEC_STR])
+    exps_answers_mapping = {}
+
+    for ind, statewise_answers in enumerate(exploration_states_answers_list):
+        for answer in statewise_answers:
+            exp_id = explorations_states_tuples[ind][0]
+            if exp_id not in exps_answers_mapping:
+                exps_answers_mapping[exp_id] = 0
+            exps_answers_mapping[exp_id] += answer['count']
+
+    return exps_answers_mapping
+
+
 def get_state_rules_stats(exploration_id, state_name):
     """Gets statistics for the answer groups and rules of this state.
 

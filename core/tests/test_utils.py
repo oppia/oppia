@@ -35,6 +35,7 @@ from core.domain import rights_manager
 from core.platform import models
 import feconf
 import main
+import main_taskqueue
 import utils
 
 from google.appengine.api import apiproxy_stub
@@ -45,10 +46,6 @@ current_user_services = models.Registry.import_current_user_services()
 
 CSRF_REGEX = (
     r'csrf_token: JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\)')
-CSRF_I18N_REGEX = (
-    r'csrf_token_i18n: JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\)')
-CSRF_CREATE_EXPLORATION_REGEX = (
-    r'csrf_token_create_exploration: JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\)') # pylint: disable=line-too-long
 # Prefix to append to all lines printed by tests to the console.
 LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
 
@@ -267,18 +264,9 @@ class TestBase(unittest.TestCase):
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
 
-    def get_csrf_token_from_response(self, response, token_type=None):
+    def get_csrf_token_from_response(self, response):
         """Retrieve the CSRF token from a GET response."""
-        if token_type is None:
-            regex = CSRF_REGEX
-        elif token_type == feconf.CSRF_PAGE_NAME_CREATE_EXPLORATION:
-            regex = CSRF_CREATE_EXPLORATION_REGEX
-        elif token_type == feconf.CSRF_PAGE_NAME_I18N:
-            regex = CSRF_I18N_REGEX
-        else:
-            raise Exception('Invalid CSRF token type: %s' % token_type)
-
-        return re.search(regex, response.body).group(1)
+        return re.search(CSRF_REGEX, response.body).group(1)
 
     def signup(self, email, username):
         """Complete the signup process for the user with the given username."""
@@ -466,6 +454,27 @@ class TestBase(unittest.TestCase):
                 obj_type, new_param_dict)
         return new_param_dict
 
+    def get_static_asset_filepath(self):
+        """Returns filepath for referencing static files on disk.
+        examples: '' or 'build/1234'
+        """
+        cache_slug_filepath = ''
+        if feconf.IS_MINIFIED or not feconf.DEV_MODE:
+            yaml_file_content = utils.dict_from_yaml(
+                utils.get_file_contents('cache_slug.yaml'))
+            cache_slug = yaml_file_content['cache_slug']
+            cache_slug_filepath = os.path.join('build', cache_slug)
+
+        return cache_slug_filepath
+
+    def get_static_asset_url(self, asset_suffix):
+        """Returns the relative path for the asset, appending it to the
+        corresponding cache slug. asset_suffix should have a leading
+        slash.
+        """
+        return '/assets%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
+
+
     @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):
         """Swap an object's attribute value within the context of a
@@ -623,12 +632,18 @@ class AppEngineTestBase(TestBase):
                     from google.appengine.ext import deferred
                     deferred.run(task.payload)
                 else:
-                    # All other tasks are expected to be mapreduce ones.
+                    # All other tasks are expected to be mapreduce ones, or
+                    # Oppia-taskqueue-related ones.
                     headers = {
                         key: str(val) for key, val in task.headers.iteritems()
                     }
                     headers['Content-Length'] = str(len(task.payload or ''))
-                    response = self.testapp.post(
+
+                    app = (
+                        webtest.TestApp(main_taskqueue.app)
+                        if task.url.startswith('/task')
+                        else self.testapp)
+                    response = app.post(
                         url=str(task.url), params=(task.payload or ''),
                         headers=headers)
                     if response.status_code != 200:

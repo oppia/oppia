@@ -144,7 +144,7 @@ class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceJobManager):
 
 
 class IndexAllExplorationsJobManager(jobs.BaseMapReduceJobManager):
-    """One-off job that indexes all explorations"""
+    """One-off job that indexes all explorations and computes their ranks."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -263,6 +263,41 @@ class InteractionAuditOneOffJob(jobs.BaseMapReduceJobManager):
         for state_name, state in exploration.states.iteritems():
             exp_and_state_key = '%s %s' % (item.id, state_name)
             yield (state.interaction.id, exp_and_state_key)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
+
+
+class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceJobManager):
+    """Job that produces a list of (exploration, state) pairs that use the item
+    selection interaction and that have rules that do not match the answer
+    choices. These probably need to be fixed manually.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_services.get_exploration_from_model(item)
+        for state_name, state in exploration.states.iteritems():
+            if state.interaction.id == 'ItemSelectionInput':
+                choices = (
+                    state.interaction.customization_args['choices']['value'])
+                for group in state.interaction.answer_groups:
+                    for rule_spec in group.rule_specs:
+                        for rule_item in rule_spec.inputs['x']:
+                            if rule_item not in choices:
+                                yield (
+                                    item.id,
+                                    '%s: %s' % (
+                                        state_name.encode('utf-8'),
+                                        rule_item.encode('utf-8')))
 
     @staticmethod
     def reduce(key, values):

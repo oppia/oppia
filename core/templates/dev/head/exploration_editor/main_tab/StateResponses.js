@@ -235,11 +235,77 @@ oppia.factory('responsesService', [
           confirmedUnclassifiedAnswers) {
         _saveConfirmedUnclassifiedAnswers(confirmedUnclassifiedAnswers);
       },
-      // Updates answer choices when the interaction requires it -- for example,
-      // the rules for multiple choice need to refer to the multiple choice
-      // interaction's customization arguments.
+      // Updates answer choices when the interaction requires it -- for
+      // example, the rules for multiple choice need to refer to the multiple
+      // choice interaction's customization arguments.
       updateAnswerChoices: function(newAnswerChoices) {
+        var oldAnswerChoices = angular.copy(_answerChoices);
         _answerChoices = newAnswerChoices;
+
+        // If the interaction is ItemSelectionInput, update the answer groups
+        // to refer to the new answer options.
+        if (stateInteractionIdService.savedMemento === 'ItemSelectionInput' &&
+            oldAnswerChoices) {
+          // We use an approximate algorithm here. If the length of the answer
+          // choices array remains the same, and no choice is replicated at
+          // different indices in both arrays (which indicates that some
+          // moving-around happened), then replace any old choice with its
+          // corresponding new choice. Otherwise, we simply remove any answer
+          // that has not been changed. This is not foolproof, but it should
+          // cover most cases.
+          //
+          // TODO(sll): Find a way to make this fully deterministic. This can
+          // probably only occur after we support custom editors for
+          // interactions.
+          var onlyEditsHappened = false;
+          if (oldAnswerChoices.length === newAnswerChoices.length) {
+            onlyEditsHappened = true;
+
+            // Check that no answer choice appears to have been moved.
+            var numAnswerChoices = oldAnswerChoices.length;
+            for (var i = 0; i < numAnswerChoices; i++) {
+              for (var j = 0; j < numAnswerChoices; j++) {
+                if (i !== j &&
+                    oldAnswerChoices[i].val === newAnswerChoices[j].val) {
+                  onlyEditsHappened = false;
+                  break;
+                }
+              }
+            }
+          }
+
+          var oldChoiceStrings = oldAnswerChoices.map(function(choice) {
+            return choice.val;
+          });
+          var newChoiceStrings = newAnswerChoices.map(function(choice) {
+            return choice.val;
+          });
+
+          _answerGroups.forEach(function(answerGroup, answerGroupIndex) {
+            var newRules = angular.copy(answerGroup.rule_specs);
+            newRules.forEach(function(rule) {
+              for (var key in rule.inputs) {
+                var newInputValue = [];
+                rule.inputs[key].forEach(function(item) {
+                  var newIndex = newChoiceStrings.indexOf(item);
+                  if (newIndex !== -1) {
+                    newInputValue.push(item);
+                  } else if (onlyEditsHappened) {
+                    var oldIndex = oldChoiceStrings.indexOf(item);
+                    if (oldIndex !== -1) {
+                      newInputValue.push(newAnswerChoices[oldIndex].val);
+                    }
+                  }
+                });
+                rule.inputs[key] = newInputValue;
+              };
+            });
+
+            _updateAnswerGroup(answerGroupIndex, {
+              rules: newRules
+            });
+          });
+        }
       },
       getAnswerGroups: function() {
         return angular.copy(_answerGroups);
@@ -270,13 +336,18 @@ oppia.controller('StateResponses', [
   '$scope', '$rootScope', '$modal', '$filter', 'stateInteractionIdService',
   'editorContextService', 'alertsService', 'responsesService', 'routerService',
   'explorationContextService', 'trainingDataService',
-  'PLACEHOLDER_OUTCOME_DEST', 'INTERACTION_SPECS',
+  'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
+  'INTERACTION_SPECS', 'UrlInterpolationService',
   function(
       $scope, $rootScope, $modal, $filter, stateInteractionIdService,
       editorContextService, alertsService, responsesService, routerService,
       explorationContextService, trainingDataService,
-      PLACEHOLDER_OUTCOME_DEST, INTERACTION_SPECS) {
+      stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
+      INTERACTION_SPECS, UrlInterpolationService) {
     $scope.editorContextService = editorContextService;
+
+    $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
+      '/general/drag_dots.png');
 
     var _initializeTrainingData = function() {
       var explorationId = explorationContextService.getExplorationId();
@@ -284,20 +355,26 @@ oppia.controller('StateResponses', [
       trainingDataService.initializeTrainingData(
         explorationId, currentStateName);
     };
+
     $scope.suppressDefaultAnswerGroupWarnings = function() {
       var interactionId = $scope.getCurrentInteractionId();
+      var answerGroups = responsesService.getAnswerGroups();
+      // This array contains the text of each of the possible answers
+      // for the interaction.
+      var answerChoices = [];
+      var customizationArgs = stateCustomizationArgsService.savedMemento;
+      var handledAnswersArray = [];
+
       if (interactionId === 'MultipleChoiceInput') {
-        var answerGroups = responsesService.getAnswerGroups();
+        var numChoices = $scope.getAnswerChoices().length;
+        var choiceIndices = [];
         // Collect all answers which have been handled by at least one
         // answer group.
-        var handledAnswersArray = [];
-        for (var j = 0; j < answerGroups.length; j++) {
-          for (var k = 0; k < answerGroups[j].rule_specs.length; k++) {
-            handledAnswersArray.push(answerGroups[j].rule_specs[k].inputs.x);
+        for (var i = 0; i < answerGroups.length; i++) {
+          for (var j = 0; j < answerGroups[i].rule_specs.length; j++) {
+            handledAnswersArray.push(answerGroups[i].rule_specs[j].inputs.x);
           }
         }
-        var choiceIndices = [];
-        var numChoices = $scope.getAnswerChoices().length;
         for (var i = 0; i < numChoices; i++) {
           choiceIndices.push(i);
         }
@@ -306,6 +383,54 @@ oppia.controller('StateResponses', [
         return choiceIndices.every(function(choiceIndex) {
           return handledAnswersArray.indexOf(choiceIndex) !== -1;
         });
+      } else if (interactionId === 'ItemSelectionInput') {
+        var maxSelectionCount = (
+            customizationArgs.maxAllowableSelectionCount.value);
+        if (maxSelectionCount === 1) {
+          var numChoices = $scope.getAnswerChoices().length;
+          // This array contains a list of booleans, one for each answer choice.
+          // Each boolean is true if the corresponding answer has been
+          // covered by at least one rule, and false otherwise.
+          handledAnswersArray = [];
+          for (var i = 0; i < numChoices; i++) {
+            handledAnswersArray.push(false);
+            answerChoices.push($scope.getAnswerChoices()[i].val);
+          }
+
+          var answerChoiceToIndex = {};
+          answerChoices.forEach(function(answerChoice, choiceIndex) {
+            answerChoiceToIndex[answerChoice] = choiceIndex;
+          });
+
+          answerGroups.forEach(function(answerGroup) {
+            var ruleSpecs = answerGroup.rule_specs;
+            ruleSpecs.forEach(function(ruleSpec) {
+              var ruleInputs = ruleSpec.inputs.x;
+              ruleInputs.forEach(function(ruleInput) {
+                var choiceIndex = answerChoiceToIndex[ruleInput];
+                if (ruleSpec.rule_type === 'Equals' ||
+                    ruleSpec.rule_type === 'ContainsAtLeastOneOf') {
+                  handledAnswersArray[choiceIndex] = true;
+                } else if (ruleSpec.rule_type ===
+                  'DoesNotContainAtLeastOneOf') {
+                  for (var i = 0; i < handledAnswersArray.length; i++) {
+                    if (i !== choiceIndex) {
+                      handledAnswersArray[i] = true;
+                    }
+                  }
+                }
+              });
+            });
+          });
+
+          var areAllChoicesCovered = handledAnswersArray.every(
+            function(handledAnswer) {
+              return handledAnswer;
+            });
+          // We only suppress the default warning if each choice text has
+          // been handled by at least one answer group, based on rule type.
+          return areAllChoicesCovered;
+        }
       }
     };
 
@@ -540,9 +665,10 @@ oppia.controller('StateResponses', [
         backdrop: 'static',
         controller: [
           '$scope', '$modalInstance', 'responsesService',
-          'editorContextService',
+          'editorContextService', 'editorFirstTimeEventsService',
           function(
-              $scope, $modalInstance, responsesService, editorContextService) {
+              $scope, $modalInstance, responsesService,
+              editorContextService, editorFirstTimeEventsService) {
             $scope.feedbackEditorIsOpen = false;
             $scope.openFeedbackEditor = function() {
               $scope.feedbackEditorIsOpen = true;
@@ -583,6 +709,8 @@ oppia.controller('StateResponses', [
                   $scope.tmpOutcome.feedback[0] === '') {
                 $scope.tmpOutcome.feedback = [];
               }
+
+              editorFirstTimeEventsService.registerFirstSaveRuleEvent();
 
               // Close the modal and save it afterwards.
               $modalInstance.close({

@@ -26,10 +26,13 @@ from core.platform import models
 import feconf
 import utils
 
+from google.appengine.ext import ndb
+
 (exp_models, collection_models, feedback_models, user_models) = (
     models.Registry.import_models([
         models.NAMES.exploration, models.NAMES.collection,
         models.NAMES.feedback, models.NAMES.user]))
+transaction_services = models.Registry.import_transaction_services()
 
 # TODO(bhenning): Implement a working real-time layer for the recent dashboard
 # updates aggregator job.
@@ -260,7 +263,9 @@ class RecentUpdatesMRJobManager(
 
 class UserStatsRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
-    pass
+    total_plays = ndb.IntegerProperty(default=0)
+    num_ratings = ndb.IntegerProperty(default=0)
+    average_ratings = ndb.FloatProperty(indexed=True)
 
 
 class UserStatsAggregator(jobs.BaseContinuousComputationManager):
@@ -274,7 +279,9 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
     """
     @classmethod
     def get_event_types_listened_to(cls):
-        return []
+        return [
+            feconf.EVENT_TYPE_START_EXPLORATION,
+            feconf.EVENT_TYPE_RATE_EXPLORATION]
 
     @classmethod
     def _get_realtime_datastore_class(cls):
@@ -286,7 +293,105 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
 
     @classmethod
     def _handle_incoming_event(cls, active_realtime_layer, event_type, *args):
-        pass
+        exp_id = args[0]
+
+        def _refresh_average_ratings(user_id, rating, old_rating):
+            realtime_class = cls._get_realtime_datastore_class()
+            realtime_model_id = realtime_class.get_realtime_id(
+                active_realtime_layer, user_id)
+
+            model = realtime_class.get(realtime_model_id, strict=False)
+            if model is None:
+                realtime_class(
+                    id=realtime_model_id, average_ratings=rating,
+                    num_ratings=1, realtime_layer=active_realtime_layer).put()
+            else:
+                num_ratings = model.num_ratings
+                average_ratings = model.average_ratings
+                num_ratings += 1
+                if average_ratings is not None:
+                    sum_of_ratings = (
+                        average_ratings * (num_ratings - 1) + rating)
+                    if old_rating is not None:
+                        sum_of_ratings -= old_rating
+                        num_ratings -= 1
+                    model.average_ratings = sum_of_ratings/(num_ratings * 1.0)
+                else:
+                    model.average_ratings = rating
+                model.num_ratings = num_ratings
+                model.put()
+
+        def _increment_total_plays_count(user_id):
+            realtime_class = cls._get_realtime_datastore_class()
+            realtime_model_id = realtime_class.get_realtime_id(
+                active_realtime_layer, user_id)
+
+            model = realtime_class.get(realtime_model_id, strict=False)
+            if model is None:
+                realtime_class(
+                    id=realtime_model_id, total_plays=1,
+                    realtime_layer=active_realtime_layer).put()
+            else:
+                model.total_plays += 1
+                model.put()
+
+        exp_summary = exp_services.get_exploration_summary_by_id(exp_id)
+        if exp_summary:
+            for user_id in exp_summary.owner_ids:
+                if event_type == feconf.EVENT_TYPE_START_EXPLORATION:
+                    transaction_services.run_in_transaction(
+                        _increment_total_plays_count, user_id)
+
+                elif event_type == feconf.EVENT_TYPE_RATE_EXPLORATION:
+                    rating = args[2]
+                    old_rating = args[3]
+                    transaction_services.run_in_transaction(
+                        _refresh_average_ratings, user_id, rating, old_rating)
+
+    # Public query method.
+    @classmethod
+    def get_dashboard_stats(cls, user_id):
+        """
+        Args:
+          - user_id: id of the exploration to get statistics for
+
+        Returns a dict with the following keys:
+        - 'total_plays': # of times the user's explorations were played
+        - 'num_ratings': # of times the user's explorations were started
+        - 'average_ratings': average of average ratings across all explorations
+        """
+        total_plays = 0
+        num_ratings = 0
+        average_ratings = None
+
+        sum_of_ratings = 0
+
+        mr_model = user_models.UserStatsModel.get(user_id, strict=False)
+        if mr_model is not None:
+            total_plays += mr_model.total_plays
+            num_ratings += mr_model.num_ratings
+            if mr_model.average_ratings is not None:
+                sum_of_ratings += (
+                    mr_model.average_ratings * mr_model.num_ratings)
+
+        realtime_model = cls._get_realtime_datastore_class().get(
+            cls.get_active_realtime_layer_id(user_id), strict=False)
+
+        if realtime_model is not None:
+            total_plays += realtime_model.total_plays
+            num_ratings += realtime_model.num_ratings
+            if realtime_model.average_ratings is not None:
+                sum_of_ratings += (
+                    realtime_model.average_ratings * realtime_model.num_ratings)
+
+        if num_ratings > 0:
+            average_ratings = sum_of_ratings / float(num_ratings)
+
+        return {
+            'total_plays': total_plays,
+            'num_ratings': num_ratings,
+            'average_ratings': average_ratings
+        }
 
 
 class UserStatsMRJobManager(
@@ -392,7 +497,8 @@ class UserStatsMRJobManager(
                 # Update data with average rating only if it is not None.
                 if average_rating is not None:
                     exploration_data.update({
-                        'average_rating_for_owned_exp': average_rating
+                        'average_rating_for_owned_exp': average_rating,
+                        'num_ratings_for_owned_exp': sum_of_ratings
                     })
             yield (contrib_id, exploration_data)
 
@@ -407,7 +513,8 @@ class UserStatsMRJobManager(
                 # Update data with average rating only if it is not None.
                 if average_rating is not None:
                     exploration_data.update({
-                        'average_rating_for_owned_exp': average_rating
+                        'average_rating_for_owned_exp': average_rating,
+                        'num_ratings_for_owned_exp': sum_of_ratings
                     })
                 yield (owner_id, exploration_data)
 
@@ -415,6 +522,7 @@ class UserStatsMRJobManager(
     def reduce(key, stringified_values):
         values = [ast.literal_eval(v) for v in stringified_values]
         exponent = 2.0/3
+
         # Find the final score and round to a whole number
         user_impact_score = int(round(sum(
             value['exploration_impact_score'] for value in values
@@ -425,18 +533,22 @@ class UserStatsMRJobManager(
             value['total_plays_for_owned_exp'] for value in values
             if value.get('total_plays_for_owned_exp'))
 
-        # Find the average of all average ratings
-        ratings = [value['average_rating_for_owned_exp'] for value in values
-                   if value.get('average_rating_for_owned_exp')]
-        if len(ratings) != 0:
-            average_ratings = (sum(ratings) / float(len(ratings)))
-            user_models.UserStatsModel(
-                id=key,
-                impact_score=user_impact_score,
-                total_plays=total_plays,
-                average_ratings=average_ratings).put()
-        else:
-            user_models.UserStatsModel(
-                id=key,
-                impact_score=user_impact_score,
-                total_plays=total_plays).put()
+        # Sum of ratings across all explorations
+        sum_of_ratings = 0
+        # Number of ratings across all explorations
+        num_ratings = 0
+
+        for value in values:
+            if value.get('num_ratings_for_owned_exp'):
+                num_ratings += value['num_ratings_for_owned_exp']
+                sum_of_ratings += (
+                    value['average_rating_for_owned_exp'] * value['num_ratings_for_owned_exp'])  #pylint: disable=line-too-long
+
+        mr_model = user_models.UserStatsModel.get_or_create(key)
+        mr_model.impact_score = user_impact_score
+        mr_model.total_plays = total_plays
+        mr_model.num_ratings = num_ratings
+        if sum_of_ratings != 0:
+            average_ratings = (sum_of_ratings / float(num_ratings))
+            mr_model.average_ratings = average_ratings
+        mr_model.put()

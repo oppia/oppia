@@ -28,10 +28,10 @@ oppia.directive('sharingLinks', [function() {
     templateUrl: 'components/sharingLinks',
     controller: [
       '$scope', '$window', 'oppiaHtmlEscaper', 'ExplorationEmbedButtonService',
-      'siteAnalyticsService',
+      'siteAnalyticsService', 'UrlInterpolationService',
       function(
           $scope, $window, oppiaHtmlEscaper, ExplorationEmbedButtonService,
-          siteAnalyticsService) {
+          siteAnalyticsService, UrlInterpolationService) {
         $scope.explorationId = $scope.getExplorationId();
 
         $scope.registerShareExplorationEvent = function(network) {
@@ -46,6 +46,15 @@ oppia.directive('sharingLinks', [function() {
 
         $scope.escapedTwitterText = (
           oppiaHtmlEscaper.unescapedStrToEscapedStr($scope.getTwitterText()));
+
+        $scope.gplusUrl = UrlInterpolationService.getStaticImageUrl(
+          '/general/gplus.png');
+
+        $scope.fbUrl = UrlInterpolationService.getStaticImageUrl(
+          '/general/fb.png');
+
+        $scope.twitterUrl = UrlInterpolationService.getStaticImageUrl(
+          '/general/twitter.png');
       }
     ]
   };

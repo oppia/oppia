@@ -24,12 +24,14 @@ oppia.directive('collectionDetailsEditor', [function() {
     templateUrl: 'inline/collection_details_editor_directive',
     controller: [
       '$scope', 'CollectionEditorStateService', 'CollectionUpdateService',
-      'alertsService', 'CATEGORY_LIST', 'EVENT_COLLECTION_INITIALIZED',
-      'EVENT_COLLECTION_REINITIALIZED', 'COLLECTION_TITLE_INPUT_FOCUS_LABEL',
+      'CollectionValidationService', 'alertsService', 'CATEGORY_LIST',
+      'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
+      'COLLECTION_TITLE_INPUT_FOCUS_LABEL',
       function(
           $scope, CollectionEditorStateService, CollectionUpdateService,
-          alertsService, CATEGORY_LIST, EVENT_COLLECTION_INITIALIZED,
-          EVENT_COLLECTION_REINITIALIZED, COLLECTION_TITLE_INPUT_FOCUS_LABEL) {
+          CollectionValidationService, alertsService, CATEGORY_LIST,
+          EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED,
+          COLLECTION_TITLE_INPUT_FOCUS_LABEL) {
         $scope.collection = CollectionEditorStateService.getCollection();
         $scope.COLLECTION_TITLE_INPUT_FOCUS_LABEL = (
           COLLECTION_TITLE_INPUT_FOCUS_LABEL);
@@ -44,12 +46,19 @@ oppia.directive('collectionDetailsEditor', [function() {
           }
         );
 
+        $scope.languageListForSelect = GLOBALS.ALL_LANGUAGE_CODES;
+        $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
+
         var refreshSettingsTab = function() {
           $scope.displayedCollectionTitle = $scope.collection.getTitle();
           $scope.displayedCollectionObjective = (
             $scope.collection.getObjective());
           $scope.displayedCollectionCategory = (
             $scope.collection.getCategory());
+          $scope.displayedCollectionLanguage = (
+            $scope.collection.getLanguageCode());
+          $scope.displayedCollectionTags = (
+            $scope.collection.getTags());
 
           var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2.some(
             function(categoryItem) {
@@ -98,6 +107,33 @@ oppia.directive('collectionDetailsEditor', [function() {
           }
           CollectionUpdateService.setCollectionCategory(
             $scope.collection, $scope.displayedCollectionCategory);
+        };
+
+        $scope.updateCollectionLanguageCode = function() {
+          CollectionUpdateService.setCollectionLanguageCode(
+            $scope.collection, $scope.displayedCollectionLanguage);
+        };
+
+        // Normalize the tags for the collection
+        var normalizeTags = function(tags) {
+          for (var i = 0; i < tags.length; i++) {
+            tags[i] = tags[i].trim().replace(/\s+/g, ' ');
+          }
+          return tags;
+        };
+
+        $scope.updateCollectionTags = function() {
+          $scope.displayedCollectionTags = normalizeTags(
+            $scope.displayedCollectionTags);
+          if (!CollectionValidationService.isTagValid(
+                $scope.displayedCollectionTags)) {
+            alertsService.addWarning(
+              'Please ensure that there are no duplicate tags and that all ' +
+              'tags contain only lower case and spaces.');
+            return;
+          }
+          CollectionUpdateService.setCollectionTags(
+            $scope.collection, $scope.displayedCollectionTags);
         };
       }
     ]

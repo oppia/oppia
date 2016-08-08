@@ -55,9 +55,6 @@ def require_super_admin(handler):
 
 class AdminPage(base.BaseHandler):
     """Admin page shown in the App Engine admin console."""
-
-    PAGE_NAME_FOR_CSRF = 'admin'
-
     @require_super_admin
     def get(self):
         """Handles GET requests."""
@@ -142,9 +139,6 @@ class AdminPage(base.BaseHandler):
 
 class AdminHandler(base.BaseHandler):
     """Handler for the admin page."""
-
-    PAGE_NAME_FOR_CSRF = 'admin'
-
     @require_super_admin
     def get(self):
         """Handles GET requests."""
@@ -225,9 +219,6 @@ class AdminHandler(base.BaseHandler):
 
 class AdminJobOutput(base.BaseHandler):
     """Retrieves job output to show on the admin page."""
-
-    PAGE_NAME_FOR_CSRF = 'admin'
-
     @require_super_admin
     def get(self):
         """Handles GET requests."""

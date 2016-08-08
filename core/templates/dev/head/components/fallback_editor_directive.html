@@ -10,7 +10,7 @@
           <div class="oppia-click-to-start-editing protractor-test-open-trigger-editor"
                ng-if="isEditable" ng-click="openTriggerEditor()">
             <i ng-if="isEditable"
-               class="material-icons oppia-editor-edit-icon pull-right" 
+               class="material-icons oppia-editor-edit-icon pull-right"
                title="Edit Fallback Condition">&#xE254;
             </i>
           </div>
@@ -59,7 +59,8 @@
     <outcome-editor is-editable="isEditable"
                     on-save-dest="getOnSaveFn()"
                     on-save-feedback="getOnSaveFn()"
-                    outcome="outcome">
+                    outcome="outcome"
+                    display-feedback="displayFeedback">
     </outcome-editor>
   </div>
 </script>

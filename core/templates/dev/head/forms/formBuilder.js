@@ -902,7 +902,8 @@ oppia.directive('textAngularRte', [
         },
         template: (
           '<div text-angular="" ta-toolbar="<[toolbarOptionsJson]>" ' +
-          '     ta-paste="stripFormatting($html)" ng-model="tempContent">' +
+          '     ta-paste="stripFormatting($html)" ng-model="tempContent"' +
+          '     placeholder="<[placeholderText]>">' +
           '</div>'),
         controller: ['$scope', function($scope) {
           // Currently, operations affecting the filesystem are allowed only in
@@ -913,6 +914,10 @@ oppia.directive('textAngularRte', [
             ['ol', 'ul', 'pre', 'indent', 'outdent'],
             []
           ];
+
+          if ($scope.uiConfig() && $scope.uiConfig().placeholder) {
+            $scope.placeholderText = $scope.uiConfig().placeholder;
+          }
 
           rteHelperService.getRichTextComponents().forEach(
             function(componentDefn) {

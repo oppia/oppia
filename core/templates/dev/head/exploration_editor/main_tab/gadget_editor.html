@@ -68,7 +68,7 @@
       <div class="oppia-gadget-tile"
             ng-repeat="(gadgetType, gadget) in ALLOWED_GADGETS"
             ng-click="onChangeGadgetType(gadgetType)">
-        <img style="padding-top: 20px; padding-bottom: 10px;" ng-src="/extensions/gadgets/<[gadgetType]>/static/images/<[gadgetType]>.png">
+        <img style="padding-top: 20px; padding-bottom: 10px;" ng-src="<[getGadgetImgUrl(gadgetType)]>">
         <div class="oppia-gadget-tile-name protractor-test-<[gadgetType]>-gadget-selection-modal">
           <[GADGET_SPECS[gadgetType].short_description]>
         </div>
