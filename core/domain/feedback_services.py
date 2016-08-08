@@ -257,7 +257,6 @@ def get_open_threads(exploration_id, has_suggestion):
     threads = get_threads(exploration_id)
     open_threads = []
     for thread in threads:
-        print thread.has_suggestion
         if (thread.has_suggestion == has_suggestion and
                 thread.status == feedback_models.STATUS_CHOICES_OPEN):
             open_threads.append(thread)
@@ -287,7 +286,6 @@ def get_all_threads(exploration_id, has_suggestion):
     for thread in threads:
         if thread.has_suggestion == has_suggestion:
             all_threads.append(thread)
-    print all_threads
     return all_threads
 
 

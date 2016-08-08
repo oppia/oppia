@@ -253,6 +253,44 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         self.assertDictContainsSubset(self.EXPECTED_THREAD_DICT,
                                       threads[self.EXP_ID_2][0].to_dict())
 
+    def test_get_threads_multi_with_limit_multiple_explorations(self):
+        feedback_services.create_thread(
+            self.EXP_ID_1, self.EXPECTED_THREAD_DICT['state_name'], None,
+            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
+        feedback_services.create_thread(
+            self.EXP_ID_2, self.EXPECTED_THREAD_DICT['state_name'], None,
+            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
+        feedback_services.create_thread(
+            self.EXP_ID_2, self.EXPECTED_THREAD_DICT['state_name'], None,
+            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
+        feedback_services.create_thread(
+            self.EXP_ID_2, self.EXPECTED_THREAD_DICT['state_name'], None,
+            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
+        feedback_services.create_thread(
+            self.EXP_ID_2, self.EXPECTED_THREAD_DICT['state_name'], None,
+            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
+        feedback_services.create_thread(
+            self.EXP_ID_2, self.EXPECTED_THREAD_DICT['state_name'], None,
+            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
+        feedback_services.create_thread(
+            self.EXP_ID_2, self.EXPECTED_THREAD_DICT['state_name'], None,
+            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
+
+        threads = feedback_services.get_threads_multi(
+            [self.EXP_ID_1, self.EXP_ID_2],
+            limit=feconf.NEW_FEEDBACK_COUNT_DASHBOARD)
+        self.assertEqual(2, len(threads))
+        self.assertEqual(1, len(threads[self.EXP_ID_1]))
+        self.assertEqual(3, len(threads[self.EXP_ID_2]))
+        self.assertDictContainsSubset(self.EXPECTED_THREAD_DICT,
+                                      threads[self.EXP_ID_1][0].to_dict())
+        self.assertDictContainsSubset(self.EXPECTED_THREAD_DICT,
+                                      threads[self.EXP_ID_2][0].to_dict())
+        self.assertDictContainsSubset(self.EXPECTED_THREAD_DICT,
+                                      threads[self.EXP_ID_2][1].to_dict())
+        self.assertDictContainsSubset(self.EXPECTED_THREAD_DICT,
+                                      threads[self.EXP_ID_2][2].to_dict())
+
     def test_get_all_threads(self):
         # Create an anonymous feedback thread
         expected_thread_dict = {
