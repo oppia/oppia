@@ -171,11 +171,14 @@ class BaseInteraction(object):
         interaction itself and the other for displaying the learner's response
         in a read-only view after it has been submitted.
         """
-        js_directives = utils.get_file_contents(os.path.join(
-            feconf.INTERACTIONS_DIR, self.id, '%s.js' % self.id))
+        js_directives = ('%s/%s/%s/%s' %
+                         (utils.get_asset_dir_prefix(),
+                          feconf.INTERACTIONS_DIR, self.id, '%s.js' % self.id))
+        # utils.get_file_contents(os.path.join(
+        #     feconf.INTERACTIONS_DIR, self.id, '%s.js' % self.id))
         html_templates = utils.get_file_contents(os.path.join(
             feconf.INTERACTIONS_DIR, self.id, '%s.html' % self.id))
-        return '<script>%s</script>\n%s' % (js_directives, html_templates)
+        return '<script src="%s"></script>\n%s' % (js_directives, html_templates)
 
     @property
     def validator_html(self):

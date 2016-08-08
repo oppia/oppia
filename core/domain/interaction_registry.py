@@ -89,10 +89,11 @@ class Registry(object):
         """Returns the HTML bodies for the interaction validators."""
 
         # Add the base validator.
+        js_directives = ('%s/%s/%s' %
+                         (utils.get_asset_dir_prefix(),
+                          feconf.INTERACTIONS_DIR, 'baseValidator.js'))
         html_fragments = [
-            '<script>%s</script>' %
-            utils.get_file_contents(os.path.join(
-                feconf.INTERACTIONS_DIR, 'baseValidator.js'))]
+            '<script src="%s"></script>' % js_directives]
 
         # Add individual validators for each interaction.
         html_fragments += [
