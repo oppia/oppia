@@ -169,6 +169,18 @@ def get_empty_ratings():
 # Empty scaled average rating as a float.
 EMPTY_SCALED_AVERAGE_RATING = 0.0
 
+# To use GAE email service.
+EMAIL_SERVICE_PROVIDER_GAE = 'gae_email_service'
+# To use mailgun email service.
+EMAIL_SERVICE_PROVIDER_MAILGUN = 'mailgun_email_service'
+# Use GAE email service by default.
+EMAIL_SERVICE_PROVIDER = EMAIL_SERVICE_PROVIDER_GAE
+# If the Mailgun email API is used, the "None" below should be replaced
+# with the Mailgun API key.
+MAILGUN_API_KEY = None
+# If the Mailgun email API is used, the "None" below should be replaced
+# with the Mailgun domain name (ending with mailgun.org).
+MAILGUN_DOMAIN_NAME = None
 # Committer id for system actions.
 SYSTEM_COMMITTER_ID = 'admin'
 SYSTEM_EMAIL_ADDRESS = 'system@example.com'
@@ -177,13 +189,8 @@ NOREPLY_EMAIL_ADDRESS = 'noreply@example.com'
 # Ensure that SYSTEM_EMAIL_ADDRESS and ADMIN_EMAIL_ADDRESS are both valid and
 # correspond to owners of the app before setting this to True. If
 # SYSTEM_EMAIL_ADDRESS is not that of an app owner, email messages from this
-# address cannot be sent.
-CAN_SEND_EMAILS_TO_ADMIN = False
-# Ensure that SYSTEM_EMAIL_ADDRESS is valid and corresponds to an owner of the
-# app before setting this to True. Emails will be sent from
-# SYSTEM_EMAIL_ADDRESS. If SYSTEM_EMAIL_ADDRESS is not that of an app owner,
-# email messages from this user cannot be sent.
-CAN_SEND_EMAILS_TO_USERS = False
+# address cannot be sent. If True then emails can be sent to any user.
+CAN_SEND_EMAILS = False
 # If you want to turn on this facility please check the email templates in the
 # send_role_notification_email() function in email_manager.py and modify them
 # accordingly.
