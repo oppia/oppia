@@ -221,7 +221,7 @@ class SignupPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.SIGNUP_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_SIGNUP,
-            'CAN_SEND_EMAILS_TO_USERS': feconf.CAN_SEND_EMAILS_TO_USERS,
+            'CAN_SEND_EMAILS': feconf.CAN_SEND_EMAILS,
         })
         self.render_template('profile/signup.html')
 
@@ -281,7 +281,7 @@ class SignupHandler(base.BaseHandler):
 
         # Note that an email is only sent when the user registers for the first
         # time.
-        if feconf.CAN_SEND_EMAILS_TO_USERS and not has_ever_registered:
+        if feconf.CAN_SEND_EMAILS and not has_ever_registered:
             email_manager.send_post_signup_email(self.user_id)
 
         user_services.generate_initial_profile_picture(self.user_id)
