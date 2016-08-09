@@ -122,7 +122,7 @@
     {% if iframed %}
       {{ warnings_and_loader() }}
     {% else %}
-      <div class="oppia-base-container" ng-class="{'oppia-sidebar-menu-open': sidebarIsShown, 'oppia-sidebar-menu-closed': !sidebarIsShown}">
+      <div class="oppia-base-container" ng-class="{'oppia-sidebar-menu-open': sidebarIsShown, 'oppia-sidebar-menu-closed': !sidebarIsShown}" ng-swipe-left="closeSidebarOnSwipe()" ng-swipe-right="openSidebarOnSwipe()">
         <div class="oppia-content-container">
           <div id="wrapper">
             <div class="oppia-main-body">
