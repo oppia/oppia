@@ -29,7 +29,8 @@ oppia.controller('Dashboard', [
       sortExplorationsService, EXPLORATIONS_SORT_BY_KEYS,
       HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS) {
     var EXP_PUBLISH_TEXTS = {
-      defaultText: 'This exploration is private. Publish it to receive statistics.',
+      defaultText: (
+        'This exploration is private. Publish it to receive statistics.'),
       smText: 'Publish the exploration to receive statistics.'
     };
 
