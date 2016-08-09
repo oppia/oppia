@@ -118,6 +118,10 @@ class FeedbackThreadModel(base_models.BaseModel):
 
         Does not include the deleted entries.
         """
+        # To prevent "BadQueryError: Cannot convert FalseNode to predicate":
+        # http://stackoverflow.com/a/15552890
+        if len(exploration_ids) == 0:
+            return []
         return cls.get_all().filter(
             cls.exploration_id.IN(exploration_ids)).order(
                 cls.last_updated).fetch()
