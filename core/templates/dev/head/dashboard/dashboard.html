@@ -175,7 +175,8 @@
            style="margin-top: 8px;">
         <md-card ng-repeat="exploration in explorationsList track by exploration.id"
                  class="oppia-activity-summary-tile oppia-dashboard-card-view-item"
-                 ng-click="showExplorationEditor(exploration.id)">
+                 scroll-on-click
+                 ng-click="showExplorationDropdown(exploration.id)">
             <div class="title-section" style="background-color: <[exploration.thumbnail_bg_color]>;">
               <img class="thumbnail-image" ng-src="<[exploration.thumbnail_icon_url]>">
               <h2 class="activity-title protractor-test-exp-summary-tile-title">
@@ -183,7 +184,6 @@
               </h2>
             </div>
             <div class="title-section-mask"></div>
-
             <div ng-attr-section="'<['right-section']>">
               <div ng-if="exploration.status === 'private'" class="exp-private-text">
                 <[publishText]>
@@ -244,6 +244,34 @@
                                exploration-id="exploration.id">
                </sharing-links>
               </ul>
+            </div>
+            <div class="dropdown-stats"
+                 ng-if="exploration.status !=='private' && isDropdownOpen[$index]">
+              <div class="open-feedback">
+                <div class="open-feedback-text">
+                  <[x]> Open Feedback
+                </div>
+                <span class="fa"
+                      ng-class="subMenuOpen[$index] === 'feedback' ? 'fa-caret-up': 'fa-caret-down'">
+                </span>
+              </div>
+              <div class="unresolved-answers">
+                <div class="open-feedback-text">
+                  <[x]> Unresolved Answers from Users
+                </div>
+                <span class="fa"
+                      ng-class="subMenuOpen[$index] === 'unresolved_answers' ? 'fa-caret-up': 'fa-caret-down'">
+                </span>
+              </div>
+              <div class="new-updates">
+                <div class="open-feedback-text">
+                  <[x]> Updates Since You Last Updated
+                </div>
+                <span class="fa"
+                      ng-class="subMenuOpen[$index] === 'updates' ? 'fa-caret-up': 'fa-caret-down'">
+                </span>
+              </div>
+              <button>Open In Editor</button>
             </div>
         </md-card>
       </div>

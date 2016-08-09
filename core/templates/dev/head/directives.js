@@ -205,3 +205,16 @@ oppia.directive('mobileFriendlyTooltip', ['$timeout', function($timeout) {
     }
   };
 }]);
+
+oppia.directive('scrollOnClick', function() {
+  return {
+    restrict: 'A',
+    link: function(scope, element) {
+      element.on('click', function() {
+        $('html, body').animate({
+          scrollTop: element.offset().top
+        }, 'slow');
+      });
+    }
+  };
+});
